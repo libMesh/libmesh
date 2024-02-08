@@ -406,8 +406,10 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
       const std::string & lookup_table_param_name =
         get_rb_eim_evaluation().get_parametrized_function().lookup_table_param_name;
 
-      std::vector<Real> lookup_table_training_samples(n_training_samples_in);
-      std::iota(lookup_table_training_samples.begin(), lookup_table_training_samples.end(), 0);
+      Real val = 0.0;
+      std::vector<RBParameter> lookup_table_training_samples(n_training_samples_in, {val});
+      for(auto it = lookup_table_training_samples.begin(); it != lookup_table_training_samples.end(); ++it, ++val)
+        (*it)[0] = val;
 
       set_training_parameter_values(lookup_table_param_name, lookup_table_training_samples);
     }

@@ -2,6 +2,7 @@
 #include "libmesh/libmesh_exceptions.h"
 #include "libmesh/rb_parameters.h"
 #include "libmesh/rb_parametrized.h"
+#include "libmesh/simple_range.h"
 
 // CPPUnit includes
 #include "libmesh_cppunit.h"
@@ -87,7 +88,7 @@ public:
     params.set_value("c", 3.);
 
     std::map<std::string, Real> m;
-    m.insert(params.begin(), params.end());
+    m.insert(params.begin_serialized(), params.end_serialized());
 
     // Expected result
     // a: 1.000000e+00
@@ -116,8 +117,8 @@ public:
     // so instead we manually iterate and overwrite with the value from the latest sample.
     std::map<std::string, Real> m;
     // m.insert(params.begin(), params.end());  // unspecified behavior
-    for(const auto &it : params)
-      m[it.first] = it.second;
+    for(const auto & [key,val] : as_range(params.begin_serialized(), params.end_serialized()))
+      m[key] = val;
 
     // Expected result
     // a: 1.000000e+00
@@ -228,7 +229,16 @@ public:
     CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min, mu_max, {}), libMesh::LogicError);
 #endif
 
+    // Define an invalid max RBParameter with multiple steps.
+    mu_max.set_value("a", 2, -40.);
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    // Throw an error due to invalid max value.
+    CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min,mu_max, {}), libMesh::LogicError);
+#endif
+
     // Set the max value correctly and initialize the RBParametrized object
+    mu_max = RBParameters();
     mu_max.set_value("a",  10.);
     rb_parametrized.initialize_parameters(mu_min, mu_max, {});
 

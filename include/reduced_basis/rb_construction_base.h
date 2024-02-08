@@ -287,6 +287,7 @@ private:
    * When serial_training_set is true, the map contains all samples of all parameters.
    * Otherwise, the sample vectors will only contain the values for the local samples
    * as defined by _first_local_index and _n_local_training_samples.
+   * Mapped from parameter_name -> sample_vector -> value_vector.
    */
   std::map<std::string, std::vector<RBParameter>> _training_parameters;
 

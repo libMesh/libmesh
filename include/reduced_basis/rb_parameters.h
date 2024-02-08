@@ -33,14 +33,18 @@ namespace libMesh
 {
 
 /**
- * Typedef for an individual RB parameter.
+ * Typedef for an individual RB parameter. Each parameter is now stored
+ * as a vector of values (different from the vector of samples).
  */
-using RBParameter = Real;
+using RBParameter = std::vector<Real>;
 
 /**
  * This class is part of the rbOOmit framework.
  *
- * This class defines a set of parameters index by strings.
+ * This class defines a set of parameters indexed by strings.
+ * Multiple samples can be defined, where a sample is a set of values for
+ * each parameter. The parameters themselves can be multi-valued, e.g.
+ * for storing a matrix-type parameter.
  *
  * \author David J. Knezevic
  * \date 2012
@@ -75,8 +79,20 @@ public:
   RBParameters(const std::map<std::string, Real> & parameter_map);
 
   /**
-   * Define a constant iterator for this class. This custom iterator
-   * design is copied from the chunked_mapvector class.
+   * Return const_iterators to the internal parameter map, as a convenient
+   * way to access the parameter names and values.
+   * For example: for(const auto & [param_name, sample_vec] : my_parameters)
+   */
+  std::map<std::string,std::vector<RBParameter>>::const_iterator begin() const;
+  std::map<std::string,std::vector<RBParameter>>::const_iterator end() const;
+  std::map<std::string,std::vector<RBParameter>>::const_iterator extra_begin() const;
+  std::map<std::string,std::vector<RBParameter>>::const_iterator extra_end() const;
+
+  /**
+   * Define a constant iterator for iterating over the map of parameters.
+   * This will iterate over every individual value in the map, meaning all
+   * three levels (param name, sample vector, value vector).
+   * This custom iterator design is copied from the chunked_mapvector class.
    */
   class const_iterator
   {
@@ -93,9 +109,11 @@ public:
 
     // Constructor
     const_iterator(const MapIter & it,
-                   const std::size_t vec_index)
+                   const std::size_t sample_vec_index,
+                   const std::size_t value_vec_index)
       : _it(it),
-        _vec_index(vec_index)
+        _sample_vec_index(sample_vec_index),
+        _value_vec_index(value_vec_index)
     {}
 
     // Copy ctor
@@ -104,14 +122,20 @@ public:
     // Prefix increment operator "++it"
     const_iterator & operator++()
     {
-      // First increment the vector index
-      ++_vec_index;
-
-      // If _vec_index goes past the current vector, start at beginning of next one
-      if (_vec_index >= _it->second.size())
+      // First increment the value-vector index.
+      // If _value_vec_index goes beyond the current value-vector, reset to the next one.
+      ++_value_vec_index;
+      if (_value_vec_index >= _it->second[_sample_vec_index].size())
         {
-          _vec_index = 0;
-          ++_it;
+          _value_vec_index = 0;
+          // Now increment the sample-vector index, and do the same check.
+          // If we go beyond the current sample-vector, reset to the next one.
+          ++_sample_vec_index;
+          if (_sample_vec_index >= _it->second.size())
+            {
+              _sample_vec_index = 0;
+              ++_it;
+            }
         }
 
       return *this;
@@ -132,17 +156,16 @@ public:
     // compatibility but it is not the most efficient thing since we
     // need to construct a std::pair every time we dereference a
     // const_iterator.
-    const value_type &
-    operator*() const
+    const value_type & operator*() const
     {
-      _emulator = std::make_pair(_it->first, _it->second[_vec_index]);
+      _emulator = std::make_pair(_it->first, _it->second[_sample_vec_index][_value_vec_index]);
       return _emulator;
     }
 
     // Equivalence comparison operator.
     bool operator==(const const_iterator & other) const
     {
-      return (_it == other._it && _vec_index == other._vec_index);
+      return (_it == other._it && _sample_vec_index == other._sample_vec_index);
     }
 
     // Non-equvialence comparison operator
@@ -161,13 +184,36 @@ public:
     // Iterator into real container
     MapIter _it;
 
-    // Accompanying current vector index into it->second
-    std::size_t _vec_index;
+    // Accompanying current sample-vector index into it->second
+    std::size_t _sample_vec_index;
+
+    // Accompanying current value-vector index into it->second[_sample_vec_index]
+    std::size_t _value_vec_index;
 
     // Returned by the operator* function. Emulates dereferencing a
     // map<string, Real> iterator.
     mutable value_type _emulator;
-  };
+  };  // end const_iterator
+
+  /**
+   * Get const_iterator access to the parameters stored in this RBParameters object.
+   * This gives serialized access to all the individual Real values in the
+   * nested vector<vector<Real>>.
+   * Use this in a for loop with the following syntax, for example:
+   * for(const auto &[key,val] : as_range(rb_parameters.begin_serialized(), rb_parameters.end_serialized())
+   */
+  const_iterator begin_serialized() const;
+  const_iterator end_serialized() const;
+
+  /**
+   * Get const_iterator access to the extra parameters stored in this RBParameters object.
+   * This gives serialized access to all the individual Real values in the
+   * nested vector<vector<Real>>.
+   * Use this in a for loop with the following syntax, for example:
+   * for(const auto &[key,val] : as_range(rb_parameters.begin_serialized_extra(), rb_parameters.end_serialized_extra())
+   */
+  const_iterator begin_serialized_extra() const;
+  const_iterator end_serialized_extra() const;
 
   /**
    * Clear this object.
@@ -189,29 +235,41 @@ public:
   /**
    * Get the value of the specified parameter, throw an error if it does not exist.
    * Here we assume that there is only one sample, throw an error otherwise.
+   * The Real-returning version also throws an error if the parameter exists
+   * but contains multiple values.
    */
   Real get_value(const std::string & param_name) const;
+  const RBParameter & get_vector_value(const std::string & param_name) const;
 
   /**
    * Get the value of the specified parameter, returning the provided
    * default value if it does not exist.
    * If the value does exist, we assume that there is only one sample,
    * and throw an error otherwise.
+   * The Real-returning version also throws an error if the parameter exists
+   * but contains multiple values.
    */
   Real get_value(const std::string & param_name, const Real & default_val) const;
+  const RBParameter & get_vector_value(const std::string & param_name, const RBParameter & default_val) const;
 
   /**
    * Get the value of the specified parameter at the specified sample,
    * throwing an error if it does not exist.
+   * The Real-returning version throws an error if the parameter exists
+   * but contains multiple values.
    */
   Real get_sample_value(const std::string & param_name, std::size_t sample_idx) const;
+  const RBParameter & get_sample_vector_value(const std::string & param_name, std::size_t sample_idx) const;
 
   /**
    * Get the value of the specified parameter at the specified sample,
    * returning the provided default value if either the parameter is
    * not defined or the sample is invalid.
+   * The Real-returning version throws an error if the parameter exists
+   * but contains multiple values.
    */
   Real get_sample_value(const std::string & param_name, std::size_t sample_idx, const Real & default_val) const;
+  const RBParameter & get_sample_vector_value(const std::string & param_name, std::size_t sample_idx, const RBParameter & default_val) const;
 
   /**
    * Set the value of the specified parameter. If param_name
@@ -221,12 +279,14 @@ public:
    * only entry.
    */
   void set_value(const std::string & param_name, Real value);
+  void set_value(const std::string & param_name, const RBParameter & value);
 
   /**
    * Set the value of the specified parameter at the specified sample
    * index. The sample index can refer to, e.g., load or time steps.
    */
   void set_value(const std::string & param_name, std::size_t index, Real value);
+  void set_value(const std::string & param_name, std::size_t index, const RBParameter & value);
 
   /**
    * Similar to set_value(name, index, value) but instead of specifying a particular
@@ -235,29 +295,34 @@ public:
    * of the std::vector's size-doubling t reduce allocations.
    */
   void push_back_value(const std::string & param_name, Real value);
+  void push_back_value(const std::string & param_name, const RBParameter & value);
 
   /**
    * Same as push_back_value(), but for "extra" parameters.
    */
   void push_back_extra_value(const std::string & param_name, Real value);
+  void push_back_extra_value(const std::string & param_name, const RBParameter & value);
 
   /**
    * Get the value of the specified extra parameter, throwing an error
    * if it does not exist.
    */
   Real get_extra_value(const std::string & param_name) const;
+  const RBParameter & get_extra_vector_value(const std::string & param_name) const;
 
   /**
    * Get the value of the specified extra parameter, returning the
    * provided default value if it does not exist.
    */
   Real get_extra_value(const std::string & param_name, const Real & default_val) const;
+  const RBParameter & get_extra_vector_value(const std::string & param_name, const RBParameter & default_val) const;
 
   /**
    * Get the value of the specified "extra" parameter at the specified sample index,
    * throwing an error if it does not exist.
    */
   Real get_extra_sample_value(const std::string & param_name, std::size_t sample_idx) const;
+  const RBParameter & get_extra_sample_vector_value(const std::string & param_name, std::size_t sample_idx) const;
 
   /**
    * Get the value of the specified extra parameter at the specified sample index,
@@ -265,18 +330,21 @@ public:
    * not defined or the sample index is invalid.
    */
   Real get_extra_sample_value(const std::string & param_name, std::size_t sample_idx, const Real & default_val) const;
+  const RBParameter & get_extra_sample_vector_value(const std::string & param_name, std::size_t sample_idx, const RBParameter & default_val) const;
 
   /**
    * Set the value of the specified extra parameter. If param_name
    * doesn't already exist, it is added to the extra parameters.
    */
   void set_extra_value(const std::string & param_name, Real value);
+  void set_extra_value(const std::string & param_name, const RBParameter & value);
 
   /**
    * Set the value of the specified extra parameter at the specified sample
    * index. The sample index can refer to, e.g., load or time steps.
    */
   void set_extra_value(const std::string & param_name, std::size_t index, Real value);
+  void set_extra_value(const std::string & param_name, std::size_t index, const RBParameter & value);
 
   /**
    * Get the number of parameters that have been added.
@@ -302,24 +370,24 @@ public:
   unsigned int n_samples() const;
 
   /**
-   * Fill \p param_names with the names of the parameters.
+   * \return a set with the names of the parameters.
    *
-   * Note: this function was previously deprecated, but now that
-   * multi-step RBParameters objects are possible, this is actually
-   * the most efficient way to get a list of the parameter names
-   * stored on this object.
+   * Note that instead of creating a new set of strings here, it's
+   * better to iterate over the RBParameters object directly, using
+   * the iterators from the begin()/end() functions. The .first
+   * will provide the parameter name, .second can be ignored as needed.
    */
-  void get_parameter_names(std::set<std::string> & param_names) const;
+  std::set<std::string> get_parameter_names() const;
 
   /**
-   * Fill \p param_names with the names of the extra parameters.
+   * \return a set with the names of the extra parameters.
    *
-   * Note: this function was previously deprecated, but now that
-   * multi-step RBParameters objects are possible, this is actually
-   * the most efficient way to get a list of the parameter names
-   * stored on this object.
+   * Note that instead of creating a new set of strings here, it's
+   * better to iterate over the RBParameters extra object directly, using
+   * the iterators from the extra_begin()/extra_end() functions. The .first
+   * will provide the parameter name, .second can be ignored as needed.
    */
-  void get_extra_parameter_names(std::set<std::string> & param_names) const;
+  std::set<std::string> get_extra_parameter_names() const;
 
   /**
    * Erase \p param_name  from _parameters. If \p param_name is not present
@@ -332,18 +400,6 @@ public:
    * in _extra_parameters, then do nothing.
    */
   void erase_extra_parameter(const std::string & param_name);
-
-  /**
-   * Get const_iterator access to the parameters stored in this RBParameters object.
-   */
-  const_iterator begin() const;
-  const_iterator end() const;
-
-  /**
-   * Get const_iterator access to the extra parameters stored in this RBParameters object.
-   */
-  const_iterator extra_begin() const;
-  const_iterator extra_end() const;
 
   /**
    * Two RBParameters are equal if they have the same _parameters map.
@@ -384,7 +440,7 @@ private:
   void set_value_helper(std::map<std::string, std::vector<RBParameter>> & map,
                         const std::string & param_name,
                         const std::size_t index,
-                        const RBParameter &value);
+                        RBParameter value);
 
   /**
    * The number of samples represented by this RBParameters object, in
@@ -397,6 +453,9 @@ private:
   /**
    * Actual parameter values (in std::vector<RBParameter> form) across a vector of samples.
    * Each vector is indexed by a name.
+   * Note that the number of samples in the outer vector should be the same
+   * across all parameters, however, this is not necessary for the inner
+   * "value-vector".
    */
   std::map<std::string, std::vector<RBParameter>> _parameters;
 

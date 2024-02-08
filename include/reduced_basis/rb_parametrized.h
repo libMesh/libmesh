@@ -70,7 +70,10 @@ public:
 
   /**
    * Initialize the parameter ranges and set current_parameters.
-   * The input min/max parameters should have exactly 1 sample each.
+   * Parameter ranges are inclusive.
+   * The input min/max RBParameters should have exactly 1 sample each.
+   * Vector-valued samples are not currently supported for the min/max
+   * parameters or for discrete parameters.
    */
   void initialize_parameters(const RBParameters & mu_min_in,
                              const RBParameters & mu_max_in,
