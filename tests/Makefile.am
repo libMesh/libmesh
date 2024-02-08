@@ -128,6 +128,7 @@ unit_tests_sources = \
   solvers/time_solver_test_common.h \
   solvers/first_order_unsteady_solver_test.C \
   solvers/second_order_unsteady_solver_test.C \
+  systems/constraint_operator_test.C \
   systems/equation_systems_test.C \
   systems/periodic_bc_test.C \
   systems/systems_test.C \
