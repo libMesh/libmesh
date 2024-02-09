@@ -27,6 +27,7 @@
 #include "libmesh/reference_counted_object.h"
 
 // C++ includes
+#include <cstddef>
 #include <vector>
 
 namespace libMesh
@@ -69,6 +70,7 @@ public:
 
   /**
    * Initialize the parameter ranges and set current_parameters.
+   * The input min/max parameters should have exactly 1 sample each.
    */
   void initialize_parameters(const RBParameters & mu_min_in,
                              const RBParameters & mu_max_in,
@@ -111,8 +113,13 @@ public:
 
   /**
    * Set the current parameters to \p params
+   * The parameters are checked for validity; an error is thrown if
+   * the number of parameters or samples is different than expected.
+   * We \return a boolean true if the new parameters are within the min/max
+   * range, and false otherwise (but the parameters are set regardless).
+   * Enabling the "verbose_mode" flag will also print more details.
    */
-  void set_parameters(const RBParameters & params);
+  bool set_parameters(const RBParameters & params);
 
   /**
    * Get an RBParameters object that specifies the minimum allowable value

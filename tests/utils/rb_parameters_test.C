@@ -1,6 +1,7 @@
 // libMesh includes
 #include "libmesh/libmesh_exceptions.h"
 #include "libmesh/rb_parameters.h"
+#include "libmesh/rb_parametrized.h"
 
 // CPPUnit includes
 #include "libmesh_cppunit.h"
@@ -18,6 +19,7 @@ public:
   CPPUNIT_TEST( testIteratorsWithSamples );
   CPPUNIT_TEST( testAppend );
   CPPUNIT_TEST( testNSamples );
+  CPPUNIT_TEST( testRBParametrized );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -204,6 +206,44 @@ public:
     CPPUNIT_ASSERT_THROW(params.get_sample_value("c", 0), libMesh::LogicError); // parameter "c" does not exist.
     CPPUNIT_ASSERT_THROW(params.get_value("a"), libMesh::LogicError);           // a has multiple samples.
     CPPUNIT_ASSERT_THROW(params.get_value("a", 1.0), libMesh::LogicError);      // a has multiple samples.
+  }
+
+
+  void testRBParametrized()
+  {
+    LOG_UNIT_TEST;
+
+    RBParameters mu_min, mu_max;
+
+    mu_min.set_value("a", -10.);
+    mu_max.set_value("a", -11.);
+
+    RBParametrized rb_parametrized;
+    // rb_parametrized.verbose_mode = true; // Enable for more printed details.
+    // Throw an error due to invalid min/max.
+    CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min,mu_max, {}), libMesh::LogicError);
+
+    mu_max.set_value("a",  10.);
+    rb_parametrized.initialize_parameters(mu_min,mu_max, {});
+
+    RBParameters params;
+
+    // Value == min --> OK.
+    params.set_value("a", 0,  0.);
+    params.set_value("a", 1, -10.);
+    CPPUNIT_ASSERT(rb_parametrized.set_parameters(params));
+
+    // Value == max --> OK.
+    params.set_value("a", 2,  10.);
+    CPPUNIT_ASSERT(rb_parametrized.set_parameters(params));
+
+    // Value < min --> not OK.
+    params.set_value("a", 3, -40.);
+    CPPUNIT_ASSERT(!rb_parametrized.set_parameters(params));
+
+    // Throw an error due to different number of parameters.
+    mu_max.set_value("b", 3,  40.);
+    CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min,mu_max, {}), libMesh::LogicError);
   }
 
 };

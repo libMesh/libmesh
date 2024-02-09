@@ -52,12 +52,18 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
                                            const RBParameters & mu_max_in,
                                            const std::map<std::string, std::vector<Real>> & discrete_parameter_values)
 {
-  // Check that the min/max vectors are valid
+  // Check that the min/max vectors have the same size.
   libmesh_error_msg_if(mu_min_in.n_parameters() != mu_max_in.n_parameters(),
-                       "Error: Invalid mu_min/mu_max in RBParameters constructor.");
+                       "Error: Invalid mu_min/mu_max in initialize_parameters(), different number of parameters.");
+  libmesh_error_msg_if(mu_min_in.n_samples() != 1 ||
+                       mu_max_in.n_samples() != 1,
+                       "Error: Invalid mu_min/mu_max in initialize_parameters(), only 1 sample supported.");
 
-  for (const auto & pr : mu_min_in)
-    libmesh_error_msg_if(mu_min_in.get_value(pr.first) > mu_max_in.get_value(pr.first),
+  // Ensure all the values are valid for min and max.
+  auto pr_min = mu_min_in.begin();
+  auto pr_max = mu_max_in.begin();
+  for(; pr_min!=mu_min_in.end(); ++pr_min, ++pr_max)
+    libmesh_error_msg_if((*pr_min).second > (*pr_max).second,
                          "Error: Invalid mu_min/mu_max in RBParameters constructor.");
 
   parameters_min = mu_min_in;
@@ -130,14 +136,18 @@ std::set<std::string> RBParametrized::get_parameter_names() const
   return parameter_names;
 }
 
-void RBParametrized::set_parameters(const RBParameters & params)
+bool RBParametrized::set_parameters(const RBParameters & params)
 {
   libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::set_parameters");
 
-  check_if_valid_params(params); // Terminates if params has the wrong number of parameters
+  // Terminate if params has the wrong number of parameters or samples.
+  // If the parameters are outside the min/max range, return false.
+  const bool valid_params = check_if_valid_params(params);
 
   // Make a copy of params (default assignment operator just does memberwise copy, which is sufficient here)
   this->parameters = params;
+
+  return valid_params;
 }
 
 const RBParameters & RBParametrized::get_parameters() const
@@ -376,7 +386,7 @@ void RBParametrized::print_discrete_parameter_values() const
 
 bool RBParametrized::check_if_valid_params(const RBParameters &params) const
 {
-  // Check if number of parameters is correct.
+  // Check if number of parameters are correct.
   libmesh_error_msg_if(params.n_parameters() != get_n_params(),
                        "Error: Number of parameters don't match; found "
                        << params.n_parameters() << ", expected "
@@ -395,7 +405,8 @@ bool RBParametrized::check_if_valid_params(const RBParameters &params) const
         {
           libMesh::out << "Warning: parameter " << param_name << " value="
                        << param_val << " outside acceptable range: ("
-                       << get_parameter_min(param_name) << ", " << get_parameter_max(param_name)
+                       << get_parameter_min(param_name) << ", "
+                       << get_parameter_max(param_name)
                        << ")";
         }
 
@@ -404,7 +415,7 @@ bool RBParametrized::check_if_valid_params(const RBParameters &params) const
       if (is_discrete_parameter(param_name))
         {
           const bool is_value_discrete =
-            is_value_in_list(params.get_value(param_name),
+            is_value_in_list(param_val,
                              get_discrete_parameter_values().find(param_name)->second,
                              TOLERANCE);
           is_valid = is_valid && is_value_discrete;
