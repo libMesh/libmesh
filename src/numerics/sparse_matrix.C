@@ -484,6 +484,7 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
 {
 #ifndef LIBMESH_HAVE_CXX11_REGEX
   libmesh_not_implemented();  // What is your compiler?!?  Email us!
+  libmesh_ignore(filename);
 #else
   parallel_object_only();
 
