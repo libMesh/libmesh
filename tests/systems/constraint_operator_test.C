@@ -154,12 +154,49 @@ public:
     mesh.copy_constraint_rows(*matrix);
 
     es.init ();
-
     sys.solve();
 
     const DofMap & dof_map = sys.get_dof_map();
 
     CPPUNIT_ASSERT_EQUAL(dof_id_type(5), dof_map.n_constrained_dofs());
+
+    // Now compare the results to just solving on 5 elements.
+
+    // Matching up partitioning is hard, so just replicate+serialize
+    ReplicatedMesh mesh2(*TestCommWorld);
+    EquationSystems es2(mesh);
+
+    ExplicitSystem &sys2 =
+      es2.add_system<LinearImplicitSystem> ("test");
+
+    sys2.add_variable("u", FIRST);
+    sys2.attach_assemble_function (assemble_matrix_and_rhs);
+
+    MeshTools::Generation::build_line (mesh2,
+                                       5,
+                                       0., 1.,
+                                       EDGE2);
+
+    es2.init ();
+    sys2.solve();
+
+    // Integrate any differences on the fine grid
+    ExactSolution exact(es);
+
+    // Serialize rather than figure out proper ghosting for an
+    // arbitrary partitioning mix
+    auto serialized_solution2 =
+      NumericVector<Number>::build(*TestCommWorld);
+    serialized_solution2->init(sys2.solution->size(), false, SERIAL);
+    sys2.solution->localize(*serialized_solution2);
+
+    MeshFunction coarse_solution
+      (es2, *serialized_solution2, sys2.get_dof_map(), 0);
+
+    exact.attach_exact_value(0, &coarse_solution);
+    exact.compute_error("test", "u");
+    Real err = exact.l2_error("test", "u");
+    CPPUNIT_ASSERT_LESS(Real(TOLERANCE*TOLERANCE), err);
   }
 };
 
