@@ -221,10 +221,10 @@ public:
     RBParametrized rb_parametrized;
     // rb_parametrized.verbose_mode = true; // Enable for more printed details.
     // Throw an error due to invalid min/max.
-    CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min,mu_max, {}), libMesh::LogicError);
+    CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min, mu_max, {}), libMesh::LogicError);
 
     mu_max.set_value("a",  10.);
-    rb_parametrized.initialize_parameters(mu_min,mu_max, {});
+    rb_parametrized.initialize_parameters(mu_min, mu_max, {});
 
     RBParameters params;
 
@@ -243,7 +243,7 @@ public:
 
     // Throw an error due to different number of parameters.
     mu_max.set_value("b", 3,  40.);
-    CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min,mu_max, {}), libMesh::LogicError);
+    CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min, mu_max, {}), libMesh::LogicError);
   }
 
 };
