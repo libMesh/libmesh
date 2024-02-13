@@ -3,6 +3,7 @@
 #include "libmesh/rb_parameters.h"
 #include "libmesh/rb_parametrized.h"
 #include "libmesh/simple_range.h"
+#include "libmesh/int_range.h"
 
 // CPPUnit includes
 #include "libmesh_cppunit.h"
@@ -20,6 +21,7 @@ public:
   CPPUNIT_TEST( testIteratorsWithSamples );
   CPPUNIT_TEST( testAppend );
   CPPUNIT_TEST( testNSamples );
+  CPPUNIT_TEST( testMultiValued );
   CPPUNIT_TEST( testRBParametrized );
   CPPUNIT_TEST_SUITE_END();
 
@@ -211,6 +213,42 @@ public:
 #endif
   }
 
+  void testMultiValued()
+  {
+    LOG_UNIT_TEST;
+
+    RBParameters params;
+    std::vector<Real> test_vec1 = {2.1, 2.2, 2.3};
+    params.set_value("a", 0, {1.1, 1.2, 1.3});
+    params.set_value("a", 1, test_vec1);
+    params.set_value("a", 2, {3.1, 3.2, 3.3});
+    params.set_value("b", 2, {3.1, 3.2, 3.3});
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    // Test some errors.
+    CPPUNIT_ASSERT_THROW(params.get_sample_value("b", 0), libMesh::LogicError); // single-value requested, but multi-valued.
+    CPPUNIT_ASSERT_THROW(params.get_sample_value("b", 5), libMesh::LogicError); // sample_idx 5 does not exist.
+    CPPUNIT_ASSERT_THROW(params.get_sample_value("c", 0), libMesh::LogicError); // parameter "c" does not exist.
+    CPPUNIT_ASSERT_THROW(params.get_value("a"), libMesh::LogicError);           // a has multiple samples.
+    CPPUNIT_ASSERT_THROW(params.get_value("a", 1.0), libMesh::LogicError);      // a has multiple samples.
+    CPPUNIT_ASSERT_THROW(params.get_sample_vector_value("a", 3), libMesh::LogicError);  // sample_idx 3 does not exist.
+    CPPUNIT_ASSERT_THROW(params.get_sample_vector_value("c", 0), libMesh::LogicError);  // parameter "c" does not exist.
+#endif
+
+    const auto & vector_value_1 = params.get_sample_vector_value("a", 1);
+    for (const auto index : index_range(vector_value_1))
+      CPPUNIT_ASSERT_EQUAL(vector_value_1[index], test_vec1[index]);
+    const auto & vector_value_2 = params.get_sample_vector_value("a", 3, test_vec1);
+    for (const auto index : index_range(vector_value_2))
+      CPPUNIT_ASSERT_EQUAL(vector_value_2[index], test_vec1[index]);
+
+    std::vector<Real> test_vec2 = {5.1, 5.2, 5.3};
+    params.push_back_value("a", test_vec2);
+    params.push_back_value("b", test_vec2);
+    const auto & vector_value_3 = params.get_sample_vector_value("a", 3);
+    for (const auto index : index_range(vector_value_3))
+      CPPUNIT_ASSERT_EQUAL(vector_value_3[index], test_vec2[index]);
+  }
 
   void testRBParametrized()
   {
