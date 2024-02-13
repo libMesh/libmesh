@@ -147,11 +147,11 @@ public:
                                       unsigned int Nmax_in,
                                       Real rel_training_tolerance_in,
                                       Real abs_training_tolerance_in,
-                                      RBParameters mu_min_in,
-                                      RBParameters mu_max_in,
-                                      std::map<std::string, std::vector<Real>> discrete_parameter_values_in,
-                                      std::map<std::string,bool> log_scaling,
-                                      std::map<std::string, std::vector<Number>> * training_sample_list=nullptr);
+                                      const RBParameters & mu_min_in,
+                                      const RBParameters & mu_max_in,
+                                      const std::map<std::string, std::vector<Real>> & discrete_parameter_values_in,
+                                      const std::map<std::string,bool> & log_scaling,
+                                      std::map<std::string, std::vector<Real>> * training_sample_list=nullptr);
 
   /**
    * Specify which type of "best fit" we use to guide the EIM

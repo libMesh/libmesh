@@ -329,11 +329,11 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
                                                        unsigned int Nmax_in,
                                                        Real rel_training_tolerance_in,
                                                        Real abs_training_tolerance_in,
-                                                       RBParameters mu_min_in,
-                                                       RBParameters mu_max_in,
-                                                       std::map<std::string, std::vector<Real>> discrete_parameter_values_in,
-                                                       std::map<std::string,bool> log_scaling_in,
-                                                       std::map<std::string, std::vector<Number>> * training_sample_list)
+                                                       const RBParameters & mu_min_in,
+                                                       const RBParameters & mu_max_in,
+                                                       const std::map<std::string, std::vector<Real>> & discrete_parameter_values_in,
+                                                       const std::map<std::string,bool> & log_scaling_in,
+                                                       std::map<std::string, std::vector<Real>> * training_sample_list)
 {
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
@@ -357,8 +357,12 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
       libmesh_error_msg_if(!discrete_parameter_values_in.count(lookup_table_param_name),
         "Lookup table parameter should be discrete");
 
+      // Make an editable copy of discrete_parameters_values_in.
+      std::map<std::string, std::vector<Real>> discrete_parameter_values_final(
+          discrete_parameter_values_in);
+
       std::vector<Real> & lookup_table_param_values =
-        libmesh_map_find(discrete_parameter_values_in, lookup_table_param_name);
+        libmesh_map_find(discrete_parameter_values_final, lookup_table_param_name);
 
       // Overwrite the discrete values for lookup_table_param to make sure that
       // it is: 0, 1, 2, ..., size-1.
@@ -368,10 +372,16 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
       // lookup_table_size so that we will get full coverage of the
       // lookup table in our training set.
       n_training_samples_in = lookup_table_param_values.size();
+
+      // Initialize the parameter ranges and the parameters themselves
+      initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_final);
+    }
+  else
+    {
+      // Initialize the parameter ranges and the parameters themselves
+      initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
     }
 
-  // Initialize the parameter ranges and the parameters themselves
-  initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
 
   initialize_training_parameters(this->get_parameters_min(),
                                  this->get_parameters_max(),
@@ -394,7 +404,7 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
       const std::string & lookup_table_param_name =
         get_rb_eim_evaluation().get_parametrized_function().lookup_table_param_name;
 
-      std::vector<Number> lookup_table_training_samples(n_training_samples_in);
+      std::vector<Real> lookup_table_training_samples(n_training_samples_in);
       std::iota(lookup_table_training_samples.begin(), lookup_table_training_samples.end(), 0);
 
       set_training_parameter_values(lookup_table_param_name, lookup_table_training_samples);

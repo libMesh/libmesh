@@ -18,14 +18,21 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // C++ includes
+#include <algorithm>
+#include <cstddef>
 #include <ctime>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
+#include <iterator>
+#include <memory>
+#include <numeric>
 
 // rbOOmit includes
 #include "libmesh/rb_construction_base.h"
 
 // libMesh includes
+#include "libmesh/id_types.h"
+#include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/equation_systems.h"
@@ -40,6 +47,43 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/shell_matrix.h"
 #include "libmesh/sparse_matrix.h"
+#include "timpi/communicator.h"
+
+// Anonymous namespace
+namespace
+{
+
+/*
+ * Helper function to divide a vector of samples across processors.
+ * Returns a pair with num_local_samples and first_local_index.
+ */
+std::pair<unsigned int, unsigned int> calculate_n_local_samples_and_index(
+    const libMesh::Parallel::Communicator &communicator,
+    const unsigned int n_global_samples,
+    const bool serial)
+{
+  unsigned int n_local_samples = n_global_samples;
+  unsigned int first_local_index = 0;
+
+  if (serial || communicator.size() == 1)
+    return {n_local_samples, first_local_index};
+
+  // Calculate the number of training parameters local to this processor
+  unsigned int quotient  = n_global_samples/communicator.size();
+  unsigned int remainder = n_global_samples%communicator.size();
+  if (communicator.rank() < remainder)
+    {
+      n_local_samples = (quotient + 1);
+      first_local_index = communicator.rank()*(quotient+1);
+    }
+  else
+    {
+      n_local_samples = quotient;
+      first_local_index = communicator.rank()*quotient + remainder;
+    }
+    return {n_local_samples, first_local_index};
+}
+}  // end anonymous namespace
 
 namespace libMesh
 {
@@ -55,8 +99,11 @@ RBConstructionBase<Base>::RBConstructionBase (EquationSystems & es,
   : Base(es, name_in, number_in),
     quiet_mode(true),
     serial_training_set(false),
-    training_parameters_initialized(false),
-    training_parameters_random_seed(-1) // by default, use std::time to seed RNG
+    _training_parameters_initialized(false),
+    _first_local_index(0),
+    _n_local_training_samples(0),
+    _n_global_training_samples(0),
+    _training_parameters_random_seed(-1) // by default, use std::time to seed RNG
 {
 }
 
@@ -69,7 +116,7 @@ void RBConstructionBase<Base>::clear ()
   // clear the parent data
   Base::clear();
   RBParametrized::clear();
-  training_parameters.clear();
+  _training_parameters.clear();
 }
 
 template <class Base>
@@ -99,14 +146,15 @@ void RBConstructionBase<Base>::get_global_max_error_pair(const Parallel::Communi
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   // First we check if there are no parameters here, and in that case we
   // return 1 since a single training sample is sufficient to generate an
   // RB approximation if there are no parameters. Note that in parallel,
   // and when we don't have a serial training set, set return comm().size()
   // so that each processor is assigned a single (empty) training sample.
-  if (training_parameters.empty())
+  if (_training_parameters.empty())
     {
       if (serial_training_set)
         return 1;
@@ -114,35 +162,37 @@ numeric_index_type RBConstructionBase<Base>::get_n_training_samples() const
         return this->comm().size();
     }
 
-  return training_parameters.begin()->second->size();
+  return _n_global_training_samples;
 }
 
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_local_n_training_samples() const
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   // First we check if there are no parameters here, and in that case we
   // return 1 for both serial and parallel training sets. This is consistent
   // with get_n_training_samples(), and avoids accessing
   // training_parameters.begin() when training_parameters is empty.
-  if (training_parameters.empty())
+  if (_training_parameters.empty())
     return 1;
 
-  return training_parameters.begin()->second->local_size();
+  return _n_local_training_samples;
 }
 
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() const
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   // First we check if there are no parameters here, and in that case we
   // return 0 for a serial training set and comm().rank() for a parallel
   // training set. This is consistent with get_n_training_samples(), and
   // avoids accessing training_parameters.begin() when training_parameters
   // is empty.
-  if (training_parameters.empty())
+  if (_training_parameters.empty())
     {
       if (serial_training_set)
         return 0;
@@ -150,60 +200,72 @@ numeric_index_type RBConstructionBase<Base>::get_first_local_training_index() co
         return this->comm().rank();
     }
 
-  return training_parameters.begin()->second->first_local_index();
+  return _first_local_index;
 }
 
 template <class Base>
 numeric_index_type RBConstructionBase<Base>::get_last_local_training_index() const
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
-  if (training_parameters.empty())
+  if (_training_parameters.empty())
     return 0;
 
-  return training_parameters.begin()->second->last_local_index();
+  return _first_local_index + _n_local_training_samples;
 }
 
 template <class Base>
-void RBConstructionBase<Base>::set_params_from_training_set(unsigned int index)
+void RBConstructionBase<Base>::set_params_from_training_set(unsigned int global_index)
 {
-  set_parameters(get_params_from_training_set(index));
+  set_parameters(get_params_from_training_set(global_index));
 }
 
 template <class Base>
-RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int index)
+RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int global_index)
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
-  libmesh_assert( (this->get_first_local_training_index() <= index) &&
-                  (index < this->get_last_local_training_index()) );
-
+  // If the _training_parameters are empty, return an empty RBParameters.
+  // Otherwise, create a new RBParameters object from the single sample requested.
   RBParameters params;
-  for (const auto & [param_name, vec_ptr] : training_parameters)
+  if (!_training_parameters.empty())
     {
-      Real param_value = libmesh_real((*vec_ptr)(index));
-      params.set_value(param_name, param_value);
-    }
+      libmesh_error_msg_if((global_index < this->get_first_local_training_index()) ||
+                           (global_index >= this->get_last_local_training_index()),
+                           "Error: index "
+                           << global_index
+                           << " must be within range: "
+                           << this->get_first_local_training_index()
+                           << " - "
+                           << this->get_last_local_training_index());
 
-  // Add potential extra values
-  const auto & mine = get_parameters();
-  for (const auto & [key, val] : as_range(mine.extra_begin(), mine.extra_end()))
-    params.set_extra_value(key, val);
+      const numeric_index_type local_index = global_index - get_first_local_training_index();
+      for (const auto & [param_name, sample_vector] : _training_parameters)
+        params.set_value(param_name, sample_vector[local_index]);
+
+      // Copy all extra values into the new RBParameters.
+      const auto & mine = get_parameters();
+      for (const auto & [key, val] : as_range(mine.extra_begin(), mine.extra_end()))
+        params.set_extra_value(key, val);
+    }
 
   return params;
 }
 
 template <class Base>
-void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsigned int index)
+void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsigned int global_index)
 {
-  libmesh_assert(training_parameters_initialized);
+  libmesh_error_msg_if(!_training_parameters_initialized,
+                       "Error: training parameters must first be initialized.");
 
   processor_id_type root_id = 0;
-  if ((this->get_first_local_training_index() <= index) &&
-      (index < this->get_last_local_training_index()))
+  if ((this->get_first_local_training_index() <= global_index) &&
+      (global_index < this->get_last_local_training_index()))
     {
       // Set parameters on only one processor
-      set_params_from_training_set(index);
+      set_params_from_training_set(global_index);
 
       // set root_id, only non-zero on one processor
       root_id = this->processor_id();
@@ -217,9 +279,9 @@ void RBConstructionBase<Base>::set_params_from_training_set_and_broadcast(unsign
 template <class Base>
 void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters & mu_min,
                                                               const RBParameters & mu_max,
-                                                              unsigned int n_training_samples,
-                                                              std::map<std::string,bool> log_param_scale,
-                                                              bool deterministic)
+                                                              const unsigned int n_global_training_samples,
+                                                              const std::map<std::string,bool> & log_param_scale,
+                                                              const bool deterministic)
 {
   if (!is_quiet())
     {
@@ -240,195 +302,172 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
 
   if (deterministic)
     {
-      generate_training_parameters_deterministic(this->comm(),
-                                                 log_param_scale,
-                                                 training_parameters,
-                                                 n_training_samples,
-                                                 mu_min,
-                                                 mu_max,
-                                                 serial_training_set);
+      const auto [first_local_index, last_local_index] =
+        generate_training_parameters_deterministic(this->comm(),
+                                                   log_param_scale,
+                                                   _training_parameters,
+                                                   n_global_training_samples,
+                                                   mu_min,
+                                                   mu_max,
+                                                   serial_training_set);
+      _first_local_index = first_local_index;
+      _n_local_training_samples = last_local_index-first_local_index;
     }
   else
     {
       // Generate random training samples for all parameters
-      generate_training_parameters_random(this->comm(),
-                                          log_param_scale,
-                                          training_parameters,
-                                          n_training_samples,
-                                          mu_min,
-                                          mu_max,
-                                          this->training_parameters_random_seed,
-                                          serial_training_set);
+      const auto [first_local_index, last_local_index] =
+        generate_training_parameters_random(this->comm(),
+                                            log_param_scale,
+                                            _training_parameters,
+                                            n_global_training_samples,
+                                            mu_min,
+                                            mu_max,
+                                            this->_training_parameters_random_seed,
+                                            serial_training_set);
+      _first_local_index = first_local_index;
+      _n_local_training_samples = last_local_index-first_local_index;
     }
+  _n_global_training_samples = _n_local_training_samples;
+
+  if (!serial_training_set)
+    this->comm().sum(_n_global_training_samples);
 
   // For each parameter that only allows discrete values, we "snap" to the nearest
   // allowable discrete value
   if (get_n_discrete_params() > 0)
     {
-      for (const auto & pr : training_parameters)
+      for (auto & [param_name, sample_vector] : _training_parameters)
         {
-          const std::string & param_name = pr.first;
           if (is_discrete_parameter(param_name))
             {
               std::vector<Real> discrete_values =
                 get_discrete_parameter_values().find(param_name)->second;
-
-              NumericVector<Number> * training_vector = pr.second.get();
-
-              for (numeric_index_type index=training_vector->first_local_index();
-                   index<training_vector->last_local_index();
-                   index++)
+              for(const auto sample_idx : index_range(sample_vector))
                 {
-                  Real value = libmesh_real((*training_vector)(index));
-                  Real nearest_discrete_value = get_closest_value(value, discrete_values);
-                  training_vector->set(index, nearest_discrete_value);
+                  const auto &value = sample_vector[sample_idx];
+                  const Real nearest_discrete_value = get_closest_value(value, discrete_values);
+                  sample_vector[sample_idx] = nearest_discrete_value;
                 }
             }
         }
     }
 
-  training_parameters_initialized = true;
+  _training_parameters_initialized = true;
 }
 
 template <class Base>
-void RBConstructionBase<Base>::load_training_set(std::map<std::string, std::vector<Number>> & new_training_set)
+void RBConstructionBase<Base>::load_training_set(const std::map<std::string, std::vector<Real>> & new_training_set)
 {
   // Make sure we're running this on all processors at the same time
   libmesh_parallel_only(this->comm());
 
-  // First, make sure that an initial training set has already been
-  // generated
-  libmesh_error_msg_if(!training_parameters_initialized,
+  // First, make sure that an initial training set has already been generated
+  libmesh_error_msg_if(!_training_parameters_initialized,
                        "Error: load_training_set cannot be used to initialize parameters");
 
   // Make sure that the training set has the correct number of parameters
-  libmesh_error_msg_if(new_training_set.size() > get_n_params(),
+  const unsigned int n_params = get_n_params();
+  libmesh_error_msg_if(new_training_set.size() > n_params,
                        "Error: new_training_set should not have more than get_n_params() parameters.");
 
   // Check that (new_training_set.size() == get_n_params()) is the same on all processes so that
   // we go into the same branch of the "if" statement below on all processes.
-  bool size_matches = (new_training_set.size() == get_n_params());
+  const bool size_matches = (new_training_set.size() == n_params);
   this->comm().verify(size_matches);
 
   if (size_matches)
     {
-      // If new_training_set stores values for all parameters, then we overwrite training_parameters
-      // with new_training_set.
+      // If new_training_set stores values for all parameters, then we overwrite
+      // _training_parameters with new_training_set.
 
-      // Delete the training set vectors (but don't remove the existing keys!)
-      for (auto & pr : training_parameters)
-        pr.second.reset(nullptr);
+      // Get the number of local and global training parameters
+      _first_local_index = 0;
+      _n_local_training_samples =
+        cast_int<numeric_index_type>(new_training_set.begin()->second.size());
+      _n_global_training_samples = _n_local_training_samples;
 
-      numeric_index_type n_local_training_samples = 0;
-      if(!serial_training_set)
+      if (!serial_training_set)
         {
-          // Get the number of local and global training parameters
-          n_local_training_samples =
-            cast_int<numeric_index_type>(new_training_set.begin()->second.size());
-          numeric_index_type n_global_training_samples = n_local_training_samples;
-          this->comm().sum(n_global_training_samples);
+          this->comm().sum(_n_global_training_samples);
 
-          for (auto & pr : training_parameters)
-            {
-              pr.second = NumericVector<Number>::build(this->comm());
-              pr.second->init(n_global_training_samples, n_local_training_samples, false, PARALLEL);
-            }
-        }
-      else
-        {
-          n_local_training_samples =
-            cast_int<numeric_index_type>(new_training_set.begin()->second.size());
+          // Set the first/last indices.
+          std::vector<numeric_index_type> local_sizes (this->n_processors(), 0);
+          local_sizes[this->processor_id()] = _n_local_training_samples;
+          this->comm().sum(local_sizes);
 
-          for (auto & pr : training_parameters)
-            {
-              pr.second = NumericVector<Number>::build(this->comm());
-              pr.second->init(n_local_training_samples, false, SERIAL);
-            }
+          // first_local_index is the sum of local_sizes
+          // for all processor ids less than ours
+          for (auto p : make_range(this->processor_id()))
+            _first_local_index += local_sizes[p];
         }
 
-      for (auto & pr : training_parameters)
-        {
-          const std::string & param_name = pr.first;
-          NumericVector<Number> * training_vector = pr.second.get();
+      // Ensure that the parameters are the same.
+      for (const auto & pr : _training_parameters)
+        libmesh_error_msg_if(!new_training_set.count(pr.first),
+                             "Parameters must be identical in order to overwrite dataset.");
 
-          numeric_index_type first_index = training_vector->first_local_index();
-          for (numeric_index_type i=0; i<n_local_training_samples; i++)
-            {
-              numeric_index_type index = first_index + i;
-              training_vector->set(index, new_training_set[param_name][i]);
-            }
-        }
+      // Copy the values from the new_training_set to the internal training_parameters.
+      _training_parameters = new_training_set;
     }
   else
     {
       // If new_training_set stores values for a subset of the parameters, then we keep the
       // length of training_parameters unchanged and overwrite the entries of the specified
       // parameters from new_training_set. Note that we repeatedly loop over new_training_set
-      // to fill up the entire length of training_vector.
-
-      for (auto & pr : training_parameters)
+      // to fill up the entire length of the sample_vector.
+      for (auto & [param_name, sample_vector]: _training_parameters)
         {
-          const std::string & param_name = pr.first;
           if (new_training_set.count(param_name))
             {
-              NumericVector<Number> * training_vector = pr.second.get();
-
-              libmesh_error_msg_if(serial_training_set && training_vector->type() != SERIAL,
-                                   "Expected training samples vector to be SERIAL");
-
-              numeric_index_type first_index = training_vector->first_local_index();
-              for (numeric_index_type i=0; i<training_vector->local_size(); i++)
+              for(const auto i : make_range(get_local_n_training_samples()))
                 {
-                  libmesh_error_msg_if (new_training_set[param_name].empty(), "new_training_set set should not be empty");
-                  unsigned int new_training_set_index = i % new_training_set[param_name].size();
+                  const unsigned int num_new_samples = libmesh_map_find(new_training_set,param_name).size();
+                  libmesh_error_msg_if (num_new_samples==0, "new_training_set set should not be empty");
 
-                  numeric_index_type index = first_index + i;
-                  training_vector->set(index, new_training_set[param_name][new_training_set_index]);
+                  const unsigned int new_training_set_index = i % num_new_samples;
+                  sample_vector[i] = libmesh_map_find(new_training_set,param_name)[new_training_set_index];
                 }
             }
         }
     }
 }
 
-
 template <class Base>
 void RBConstructionBase<Base>::set_training_parameter_values(
-  const std::string & param_name, const std::vector<Number> & values)
+  const std::string & param_name, const std::vector<Real> & values)
 {
-  libmesh_error_msg_if(!training_parameters_initialized,
+  libmesh_error_msg_if(!_training_parameters_initialized,
     "Training parameters must be initialized before calling set_training_parameter_values");
   libmesh_error_msg_if(values.size() != get_local_n_training_samples(),
     "Inconsistent sizes");
 
-  auto & training_vector = libmesh_map_find(training_parameters, param_name);
-
-  numeric_index_type first_index = training_vector->first_local_index();
-  for (auto i : make_range(get_local_n_training_samples()))
-    {
-      numeric_index_type index = first_index + i;
-      training_vector->set(index, values[i]);
-    }
+  // Copy the new data, overwriting the old data.
+  auto & training_vector = libmesh_map_find(_training_parameters, param_name);
+  training_vector = values;
 }
 
 
 template <class Base>
-void RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Communicator & communicator,
-                                                                   std::map<std::string, bool> log_param_scale,
-                                                                   std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
-                                                                   unsigned int n_training_samples_in,
-                                                                   const RBParameters & min_parameters,
-                                                                   const RBParameters & max_parameters,
-                                                                   int training_parameters_random_seed,
-                                                                   bool serial_training_set)
+std::pair<std::size_t, std::size_t>
+RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Communicator & communicator,
+                                                              const std::map<std::string, bool> & log_param_scale,
+                                                              std::map<std::string, std::vector<Real>> & local_training_parameters_in,
+                                                              const unsigned int n_global_training_samples_in,
+                                                              const RBParameters & min_parameters,
+                                                              const RBParameters & max_parameters,
+                                                              const int training_parameters_random_seed,
+                                                              const bool serial_training_set)
 {
-  libmesh_assert_equal_to ( min_parameters.n_parameters(), max_parameters.n_parameters() );
   const unsigned int num_params = min_parameters.n_parameters();
+  libmesh_error_msg_if(num_params!=max_parameters.n_parameters(),
+    "Number of parameters must be identical for min/max.");
 
   // Clear training_parameters_in
-  training_parameters_in.clear();
+  local_training_parameters_in.clear();
 
   if (num_params == 0)
-    return;
+    return {0,0};
 
   if (training_parameters_random_seed < 0)
     {
@@ -469,115 +508,67 @@ void RBConstructionBase<Base>::generate_training_parameters_random(const Paralle
     }
 
   // initialize training_parameters_in
-    for (const auto & pr : min_parameters)
-      {
-        const std::string & param_name = pr.first;
-        training_parameters_in[param_name] = NumericVector<Number>::build(communicator);
-
-        if (!serial_training_set)
-          {
-            // Calculate the number of training parameters local to this processor
-            unsigned int n_local_training_samples;
-            unsigned int quotient  = n_training_samples_in/communicator.size();
-            unsigned int remainder = n_training_samples_in%communicator.size();
-            if (communicator.rank() < remainder)
-              n_local_training_samples = (quotient + 1);
-            else
-              n_local_training_samples = quotient;
-
-            training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, PARALLEL);
-          }
-        else
-          {
-            training_parameters_in[param_name]->init(n_training_samples_in, false, SERIAL);
-          }
-      }
+  const auto & [n_local_training_samples, first_local_index] =
+      calculate_n_local_samples_and_index(communicator, n_global_training_samples_in,
+                                          serial_training_set);
+  for (const auto & pr : min_parameters)
+    local_training_parameters_in[pr.first] = std::vector<Real>(n_local_training_samples);
 
   // finally, set the values
-  for (auto & pr : training_parameters_in)
+  for (auto & [param_name, sample_vector] : local_training_parameters_in)
     {
-      const std::string & param_name = pr.first;
-      NumericVector<Number> * training_vector = pr.second.get();
-
-      numeric_index_type first_index = training_vector->first_local_index();
-      for (auto i : make_range(training_vector->local_size()))
+      for (auto i : make_range(n_local_training_samples))
         {
-          numeric_index_type index = first_index + i;
           Real random_number = static_cast<Real>(std::rand()) / RAND_MAX; // in range [0,1]
 
           // Generate log10 scaled training parameters
-          if (log_param_scale[param_name])
+          if (libmesh_map_find(log_param_scale, param_name))
             {
-              Real log_min   = log10(min_parameters.get_value(param_name));
-              Real log_range = log10(max_parameters.get_value(param_name) / min_parameters.get_value(param_name));
+              Real log_min   = std::log10(min_parameters.get_value(param_name));
+              Real log_range = std::log10(max_parameters.get_value(param_name) / min_parameters.get_value(param_name));
 
-              training_vector->set(index, pow(10., log_min + random_number*log_range ) );
+              sample_vector[i] = {std::pow(10., log_min + random_number*log_range )};
             }
           // Generate linearly scaled training parameters
           else
             {
-              training_vector->set(index, random_number*(max_parameters.get_value(param_name) - min_parameters.get_value(param_name))
-                                   + min_parameters.get_value(param_name));
+              sample_vector[i] = {
+                  random_number * (max_parameters.get_value(param_name) -
+                                   min_parameters.get_value(param_name)) +
+                  min_parameters.get_value(param_name)};
             }
         }
     }
+  return {first_local_index, first_local_index+n_local_training_samples};
 }
 
 template <class Base>
-void RBConstructionBase<Base>::generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
-                                                                          std::map<std::string, bool> log_param_scale,
-                                                                          std::map<std::string, std::unique_ptr<NumericVector<Number>>> & training_parameters_in,
-                                                                          unsigned int n_training_samples_in,
-                                                                          const RBParameters & min_parameters,
-                                                                          const RBParameters & max_parameters,
-                                                                          bool serial_training_set)
+std::pair<std::size_t, std::size_t>
+RBConstructionBase<Base>::generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
+                                                                     const std::map<std::string, bool> & log_param_scale,
+                                                                     std::map<std::string, std::vector<Real>> & local_training_parameters_in,
+                                                                     const unsigned int n_global_training_samples_in,
+                                                                     const RBParameters & min_parameters,
+                                                                     const RBParameters & max_parameters,
+                                                                     const bool serial_training_set)
 {
   libmesh_assert_equal_to ( min_parameters.n_parameters(), max_parameters.n_parameters() );
   const unsigned int num_params = min_parameters.n_parameters();
 
   if (num_params == 0)
-    return;
+    return {0,0};
 
   if (num_params > 3)
-    {
-      libMesh::out << "ERROR: Deterministic training sample generation "
-                   << "not implemented for more than three parameters." << std::endl;
-      libmesh_not_implemented();
-    }
+    libmesh_not_implemented_msg("ERROR: Deterministic training sample generation "
+                                "not implemented for more than three parameters.");
 
-  // Clear training_parameters_in (but don't remove existing keys!)
-  for (auto & pr : training_parameters_in)
-    pr.second.reset(nullptr);
-
-  // Initialize training_parameters_in
-  std::vector<std::string> param_names(num_params);
-  unsigned int count = 0;
+  // Reinitialize training_parameters_in (but don't remove existing keys!)
+  const auto &[n_local_training_samples, first_local_index] =
+      calculate_n_local_samples_and_index(communicator, n_global_training_samples_in,
+                                         serial_training_set);
+  const auto last_local_index = first_local_index + n_local_training_samples;
   for (const auto & pr : min_parameters)
-    {
-      const std::string & param_name = pr.first;
-      param_names[count] = param_name;
-      training_parameters_in[param_name] = NumericVector<Number>::build(communicator);
-
-      if (!serial_training_set)
-        {
-          // Calculate the number of training parameters local to this processor
-          unsigned int n_local_training_samples;
-          unsigned int quotient  = n_training_samples_in/communicator.size();
-          unsigned int remainder = n_training_samples_in%communicator.size();
-          if (communicator.rank() < remainder)
-            n_local_training_samples = (quotient + 1);
-          else
-            n_local_training_samples = quotient;
-
-          training_parameters_in[param_name]->init(n_training_samples_in, n_local_training_samples, false, PARALLEL);
-        }
-      else
-        {
-          training_parameters_in[param_name]->init(n_training_samples_in, false, SERIAL);
-        }
-
-      count++;
-    }
+    local_training_parameters_in[pr.first] = std::vector<Real>(n_local_training_samples);
 
   // n_training_samples_per_param has 3 entries, but entries after "num_params"
   // are unused so we just set their value to 1. We need to set it to 1 (rather
@@ -589,7 +580,7 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
       if (param < num_params)
         {
           n_training_samples_per_param[param] =
-            static_cast<unsigned int>( std::round(std::pow(static_cast<Real>(n_training_samples_in), 1./num_params)) );
+            static_cast<unsigned int>( std::round(std::pow(static_cast<Real>(n_global_training_samples_in), 1./num_params)) );
         }
       else
         {
@@ -607,11 +598,12 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
         total_samples_check *= n_samples;
       }
 
-    libmesh_error_msg_if(total_samples_check != n_training_samples_in,
+    libmesh_error_msg_if(total_samples_check != n_global_training_samples_in,
                          "Error: Number of training samples = "
-                         << n_training_samples_in
+                         << n_global_training_samples_in
                          << " does not enable a uniform grid of samples with "
-                         << num_params << " parameters.");
+                         << num_params << " parameters. Try "
+                         << total_samples_check << " samples instead?");
   }
 
   // First we make a list of training samples associated with each parameter,
@@ -619,9 +611,10 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
   std::vector<std::vector<Real>> training_samples_per_param(num_params);
   {
     unsigned int i = 0;
-    for (const std::string & param_name : param_names)
+    for (const auto & pr : min_parameters)
       {
-        bool use_log_scaling = log_param_scale[param_name];
+        const std::string & param_name = pr.first;
+        const bool use_log_scaling = libmesh_map_find(log_param_scale, param_name);
         Real min_param = min_parameters.get_value(param_name);
         Real max_param = max_parameters.get_value(param_name);
 
@@ -633,14 +626,14 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
             if (use_log_scaling)
               {
                 Real epsilon = 1.e-6; // Prevent rounding errors triggering asserts
-                Real log_min   = log10(min_param + epsilon);
-                Real log_range = log10( (max_param-epsilon) / (min_param+epsilon) );
+                Real log_min   = std::log10(min_param + epsilon);
+                Real log_range = std::log10( (max_param-epsilon) / (min_param+epsilon) );
                 Real step_size = log_range /
                   std::max((unsigned int)1,(n_training_samples_per_param[i]-1));
 
                 if (j<(n_training_samples_per_param[i]-1))
                   {
-                    training_samples_per_param[i][j] = pow(10., log_min + j*step_size );
+                    training_samples_per_param[i][j] = std::pow(10., log_min + j*step_size );
                   }
                 else
                   {
@@ -673,19 +666,14 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
             for (indices[2]=0; indices[2]<n_training_samples_per_param[2]; indices[2]++)
               {
                 unsigned int param_count = 0;
-                for (const std::string & param_name : param_names)
+                for (const auto & pr : min_parameters)
                   {
-                    libmesh_error_msg_if(!training_parameters_in.count(param_name), "Invalid parameter name: " + param_name);
+                    std::vector<Real> & training_vector =
+                      libmesh_map_find(local_training_parameters_in, pr.first);
+                    if (first_local_index <= index_count && index_count < last_local_index)
+                      training_vector[index_count - first_local_index] =
+                        {training_samples_per_param[param_count][indices[param_count]]};
 
-                    std::unique_ptr<NumericVector<Number>> & training_vector =
-                      training_parameters_in.find(param_name)->second;
-
-                    if ((training_vector->first_local_index() <= index_count) &&
-                        (index_count < training_vector->last_local_index()))
-                      {
-                        training_vector->set(
-                          index_count, training_samples_per_param[param_count][indices[param_count]]);
-                      }
                     param_count++;
                   }
                 index_count++;
@@ -693,16 +681,19 @@ void RBConstructionBase<Base>::generate_training_parameters_deterministic(const 
           }
       }
   }
+  return {first_local_index, first_local_index+n_local_training_samples};
 }
 
 
 template <class Base>
-void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
+void RBConstructionBase<Base>::broadcast_parameters(const unsigned int proc_id)
 {
   libmesh_assert_less (proc_id, this->n_processors());
 
   // create a copy of the current parameters
   RBParameters current_parameters = get_parameters();
+  libmesh_error_msg_if(current_parameters.n_samples()!=1,
+      "Only single-sample RBParameter objects can be broadcast.");
 
   // copy current_parameters to current_parameters_vector in order to broadcast
   std::vector<Real> current_parameters_vector;
@@ -713,14 +704,11 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
   // do the broadcast
   this->comm().broadcast(current_parameters_vector, proc_id);
 
-  // update the copy of the RBParameters object
+  // update the copy of the RBParameters object.
+  // TODO - this only works with single-sample parameter objects.
   unsigned int count = 0;
   for (const auto & pr : current_parameters)
-    {
-      const std::string & param_name = pr.first;
-      current_parameters.set_value(param_name, current_parameters_vector[count]);
-      count++;
-    }
+    current_parameters.set_value(pr.first, current_parameters_vector[count++]);
 
   // set the parameters globally
   set_parameters(current_parameters);
@@ -729,7 +717,7 @@ void RBConstructionBase<Base>::broadcast_parameters(unsigned int proc_id)
 template <class Base>
 void RBConstructionBase<Base>::set_training_random_seed(int seed)
 {
-  this->training_parameters_random_seed = seed;
+  this->_training_parameters_random_seed = seed;
 }
 
 // Template specializations

@@ -177,17 +177,17 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
     get_parametrized_function().vectorized_evaluate(mus, _vec_eval_input, output_all_comps);
 
   // Previously we did one RB-EIM solve per input mu, but now we do
-  // one RB-EIM solve per input mu, per step. In order for this to
+  // one RB-EIM solve per input mu, per sample. In order for this to
   // work, we require that all the input mu objects have the same
-  // number of steps.
-  auto n_steps_0 = mus[0].n_steps();
+  // number of samples.
+  auto n_samples_0 = mus[0].n_samples();
   for (const auto & mu : mus)
-    libmesh_error_msg_if(mu.n_steps() != n_steps_0, "All RBParameters objects must have same n_steps()");
+    libmesh_error_msg_if(mu.n_samples() != n_samples_0, "All RBParameters objects must have same n_samples()");
 
-  // After we verified that all mus have the same number of steps,
+  // After we verified that all mus have the same number of samples,
   // the total number of RB-EIM solves is simply the number of mus
-  // times the number of steps.
-  unsigned int num_rb_eim_solves = mus.size() * n_steps_0;
+  // times the number of samples.
+  unsigned int num_rb_eim_solves = mus.size() * n_samples_0;
 
   // A special case is when we are passed a single RBParameters object
   // with no parameters stored on it. In this case, we effectively
@@ -212,10 +212,10 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   {
     unsigned int counter = 0;
     for (auto mu_index : index_range(mus))
-      for (auto step_index : make_range(mus[mu_index].n_steps()))
+      for (auto sample_index : make_range(mus[mu_index].n_samples()))
       {
         // Ignore compiler warnings about unused loop index
-        libmesh_ignore(step_index);
+        libmesh_ignore(sample_index);
 
         evaluated_values_at_interp_points[counter].resize(N);
 
@@ -224,7 +224,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
             unsigned int comp = _interpolation_points_comp[interp_pt_index];
 
             // This line of code previously used "mu_index", now we use
-            // "counter" handle the multi-step RBParameters case.
+            // "counter" handle the multi-sample RBParameters case.
             evaluated_values_at_interp_points[counter][interp_pt_index] =
               output_all_comps[counter][interp_pt_index][comp];
           }
@@ -260,10 +260,10 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
   {
     unsigned int counter = 0;
     for (auto mu_index : index_range(mus))
-      for (auto step_index : make_range(mus[mu_index].n_steps()))
+      for (auto sample_index : make_range(mus[mu_index].n_samples()))
       {
         // Ignore compiler warnings about unused loop index
-        libmesh_ignore(step_index);
+        libmesh_ignore(sample_index);
 
         DenseVector<Number> EIM_rhs = evaluated_values_at_interp_points[counter];
         interpolation_matrix_N.lu_solve(EIM_rhs, _rb_eim_solutions[counter]);

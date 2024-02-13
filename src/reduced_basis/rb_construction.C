@@ -292,11 +292,11 @@ void RBConstruction::set_rb_construction_parameters(
                                                     Real abs_training_tolerance_in,
                                                     bool normalize_rb_bound_in_greedy_in,
                                                     const std::string & RB_training_type_in,
-                                                    RBParameters mu_min_in,
-                                                    RBParameters mu_max_in,
-                                                    std::map<std::string, std::vector<Real>> discrete_parameter_values_in,
-                                                    std::map<std::string,bool> log_scaling_in,
-                                                    std::map<std::string, std::vector<Number>> * training_sample_list)
+                                                    const RBParameters & mu_min_in,
+                                                    const RBParameters & mu_max_in,
+                                                    const std::map<std::string, std::vector<Real>> & discrete_parameter_values_in,
+                                                    const std::map<std::string,bool> & log_scaling_in,
+                                                    std::map<std::string, std::vector<Real>> * training_sample_list)
 {
   // Read in training_parameters_random_seed value.  This is used to
   // seed the RNG when picking the training parameters.  By default the
@@ -2730,7 +2730,7 @@ void RBConstruction::preevaluate_thetas()
 
   // Collect all training parameters
   // TODO: Here instead of using a vector of RBParameters objects,
-  // we could use a single RBParameters object with multiple "steps".
+  // we could use a single RBParameters object with multiple samples.
   // This would save memory over the current approach, but that may
   // not be a big deal in practice unless the number of training samples
   // is very large for some reason.
@@ -2771,10 +2771,10 @@ void RBConstruction::preevaluate_thetas()
 
           // TODO: the size of _evaluated_thetas is currently assumed to be
           // the same as get_local_n_training_samples(), but this won't be
-          // the case if we use RBParameters objects that have multiple steps.
+          // the case if we use RBParameters objects that have multiple samples.
           // So just make sure that's the case for now.
           libmesh_error_msg_if(output_vals.size() != get_local_n_training_samples(),
-                               "We currently only support single-step RBParameters "
+                               "We currently only support single-sample RBParameters "
                                "objects during the training stage.");
 
           for (auto i : index_range(output_vals))
