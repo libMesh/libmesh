@@ -202,10 +202,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(params.get_sample_value("c", 5, 300.), static_cast<Real>(300.));
 
     // Test some errors.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
     CPPUNIT_ASSERT_THROW(params.get_sample_value("b", 5), libMesh::LogicError); // sample_idx 5 does not exist.
     CPPUNIT_ASSERT_THROW(params.get_sample_value("c", 0), libMesh::LogicError); // parameter "c" does not exist.
     CPPUNIT_ASSERT_THROW(params.get_value("a"), libMesh::LogicError);           // a has multiple samples.
     CPPUNIT_ASSERT_THROW(params.get_value("a", 1.0), libMesh::LogicError);      // a has multiple samples.
+#endif
   }
 
 
@@ -220,9 +222,13 @@ public:
 
     RBParametrized rb_parametrized;
     // rb_parametrized.verbose_mode = true; // Enable for more printed details.
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
     // Throw an error due to invalid min/max.
     CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min, mu_max, {}), libMesh::LogicError);
+#endif
 
+    // Set the max value correctly and initialize the RBParametrized object
     mu_max.set_value("a",  10.);
     rb_parametrized.initialize_parameters(mu_min, mu_max, {});
 
@@ -241,9 +247,11 @@ public:
     params.set_value("a", 3, -40.);
     CPPUNIT_ASSERT(!rb_parametrized.set_parameters(params));
 
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
     // Throw an error due to different number of parameters.
     mu_max.set_value("b", 3,  40.);
     CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min, mu_max, {}), libMesh::LogicError);
+#endif
   }
 
 };
