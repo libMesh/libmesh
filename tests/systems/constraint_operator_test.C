@@ -96,6 +96,7 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( ConstraintOperatorTest );
 
   CPPUNIT_TEST( test1DCoarseningOperator );
+  CPPUNIT_TEST( test1DCoarseningNewNodes );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -197,6 +198,47 @@ public:
     exact.compute_error("test", "u");
     Real err = exact.l2_error("test", "u");
     CPPUNIT_ASSERT_LESS(Real(TOLERANCE*TOLERANCE), err);
+  }
+
+
+  void test1DCoarseningNewNodes ()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+
+    ExplicitSystem &sys =
+      es.add_system<LinearImplicitSystem> ("test");
+
+    sys.add_variable("u", FIRST);
+    sys.attach_assemble_function (assemble_matrix_and_rhs);
+
+    // Make sure numbering matches our constraint operator matrix
+    mesh.allow_renumbering(false);
+
+    MeshTools::Generation::build_line (mesh,
+                                       10,
+                                       0., 1.,
+                                       EDGE2);
+
+    auto matrix = SparseMatrix<Number>::build (mesh.comm());
+
+    // Create a projection matrix from 10 elements to 4.  We'll only
+    // be leaving the end nodes and one central node unconstrained, so
+    // we should see two new unconstrained NodeElem added.
+    matrix->read_matlab("meshes/constrain10to4.m");
+
+    mesh.copy_constraint_rows(*matrix);
+
+    es.init ();
+    sys.solve();
+
+    const DofMap & dof_map = sys.get_dof_map();
+
+    CPPUNIT_ASSERT_EQUAL(dof_id_type(11+2), mesh.n_nodes());
+    CPPUNIT_ASSERT_EQUAL(dof_id_type(10+2), mesh.n_elem());
+    CPPUNIT_ASSERT_EQUAL(dof_id_type(8), dof_map.n_constrained_dofs());
   }
 };
 
