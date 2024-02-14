@@ -2076,18 +2076,21 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
       std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
       elem->set_node(0) = n;
 
+      Elem * added_elem = this->add_elem(std::move(elem));
+      node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
+      existing_unconstrained_columns.emplace(j,n->id());
+
+      // Repartition the new objects *after* adding them, so a
+      // DistributedMesh doesn't get confused and think you're not
+      // adding them on all processors at once.
       int n_pids = 0;
       for (auto [pid, count] : pids)
         if (count >= n_pids)
           {
             n_pids = count;
-            elem->processor_id() = pid;
+            added_elem->processor_id() = pid;
             n->processor_id() = pid;
           }
-
-      const Elem * added_elem = this->add_elem(std::move(elem));
-      node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
-      existing_unconstrained_columns.emplace(j,n->id());
     }
 
   // Calculate constraint rows in an indexed form that's easy for us
