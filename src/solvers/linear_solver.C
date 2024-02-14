@@ -28,6 +28,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/solver_configuration.h"
+#include "libmesh/string_to_enum.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/enum_solver_type.h"
@@ -50,6 +51,7 @@ LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator & comm_in) 
   same_preconditioner  (false),
   _solver_configuration(nullptr)
 {
+  this->set_default_preconditioner_type();
 }
 
 
@@ -95,6 +97,16 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator & comm,
   return std::unique_ptr<LinearSolver<T>>();
 }
 
+
+template <typename T>
+void LinearSolver<T>::clear ()
+{
+  this->_is_initialized = false;
+  this->_solver_type    = GMRES;
+  this->set_default_preconditioner_type();
+}
+
+
 template <typename T>
 PreconditionerType
 LinearSolver<T>::preconditioner_type () const
@@ -111,8 +123,37 @@ LinearSolver<T>::set_preconditioner_type (const PreconditionerType pct)
 {
   if (_preconditioner)
     _preconditioner->set_type(pct);
-  else
-    _preconditioner_type = pct;
+
+  _preconditioner_type = pct;
+}
+
+template <typename T>
+void
+LinearSolver<T>::set_default_preconditioner_type ()
+{
+  // Default to ILU for robustness
+  //
+  // But let users choose faster options via PETSc-compatible
+  // command-line options
+  const std::string pc_type =
+    libMesh::command_line_next("-pc_type", std::string("ilu"));
+
+  // try/catch to make sure we're forward compatible with PETSc
+  // preconditioners that our enum lacks
+  libmesh_try {
+    const PreconditionerType pct =
+      Utility::string_to_enum<PreconditionerType>(pc_type);
+    this->_preconditioner_type = pct;
+  }
+  libmesh_catch (...)
+  {
+    libmesh_warning("We don't recognize pc_type " << pc_type <<
+      "; hopefully you're using a solver backend which does.");
+
+    // Fall back on ILU again for the sake of non-PETSc backends;
+    // PETSc will override this from the command line.
+    this->_preconditioner_type = ILU_PRECOND;
+  }
 }
 
 template <typename T>

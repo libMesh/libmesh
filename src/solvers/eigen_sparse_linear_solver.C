@@ -55,13 +55,8 @@ EigenSparseLinearSolver(const Parallel::Communicator & comm_in) :
 template <typename T>
 void EigenSparseLinearSolver<T>::clear ()
 {
-  if (this->initialized())
-    {
-      this->_is_initialized = false;
-
-      this->_solver_type         = BICGSTAB;
-      this->_preconditioner_type = ILU_PRECOND;
-    }
+  this->LinearSolver<T>::clear ();
+  this->_solver_type = BICGSTAB;
 }
 
 
