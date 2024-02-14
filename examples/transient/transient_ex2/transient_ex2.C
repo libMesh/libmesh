@@ -260,6 +260,8 @@ int main (int argc, char** argv)
         fill_dirichlet_bc(equation_systems, "Wave");
 
       // Solve the system "Wave".
+      // Tell the user what we are doing.
+      libMesh::out << "Solving time step " << time_step << '/' << n_time_steps << std::endl;
       t_system.solve();
 
       // After solving the system, write the solution
