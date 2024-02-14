@@ -338,6 +338,9 @@ std::map<std::string, PreconditionerType> preconditioner_type_to_enum {
    {"AMG"         , AMG_PRECOND},
    {"SVD"         , SVD_PRECOND},
    {"INVALID"     , INVALID_PRECONDITIONER},
+
+      // PETSc compatible
+   {"NONE"    , IDENTITY_PRECOND},
   };
 
 std::map<PreconditionerType, std::string> enum_to_preconditioner_type =
