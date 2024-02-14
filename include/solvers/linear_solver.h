@@ -85,9 +85,9 @@ public:
   bool initialized () const { return _is_initialized; }
 
   /**
-   * Release all memory and clear data structures.
+   * Reset data
    */
-  virtual void clear () {}
+  virtual void clear ();
 
   /**
    * Initialize data structures if not done so already.
@@ -125,6 +125,12 @@ public:
    * Sets the type of preconditioner to use.
    */
   void set_preconditioner_type (const PreconditionerType pct);
+
+  /**
+   * Sets the preconditioner to use a default type or to use a type
+   * specified via a PETSc-style command line argument..
+   */
+  void set_default_preconditioner_type ();
 
   /**
    * Attaches a Preconditioner object to be used
