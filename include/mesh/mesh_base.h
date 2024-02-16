@@ -45,6 +45,10 @@ class Node;
 class Point;
 class Partitioner;
 class BoundaryInfo;
+
+template <typename T>
+class SparseMatrix;
+
 enum ElemType : int;
 enum ElemMappingType : unsigned char;
 
@@ -1681,6 +1685,31 @@ public:
 
   const constraint_rows_type & get_constraint_rows() const
   { return _constraint_rows; }
+
+  /**
+   * Copy the constraints from the given matrix to this mesh.  The
+   * \p constraint_operator should be an mxn matrix, where
+   * m == this->n_nodes() and the operator indexing matches the
+   * current node indexing.  This may require users to disable mesh
+   * renumbering in between loading a mesh file and loading a
+   * constraint matrix which matches it.
+   *
+   * If any "constraint" rows in the matrix are unit vectors, the node
+   * corresponding to that row index will be left unconstrained, and
+   * will be used to constrain any other nodes which have a non-zero
+   * in the column index of that unit vector.
+   *
+   * For each matrix column index which does not correspond to an
+   * existing node, a new NodeElem will be added to the mesh on which
+   * to store the new unconstrained degree(s) of freedom.
+   *
+   * \p T for the constraint_operator in this function should be \p
+   * Real or \p Number ... and the data should be \p Real - we just
+   * allow complex \p T for the sake of subclasses which have to be
+   * configured and compiled with only one runtime option.
+   */
+  template <typename T>
+  void copy_constraint_rows(const SparseMatrix<T> & constraint_operator);
 
   /**
    * \deprecated This method has ben replaced by \p cache_elem_data which

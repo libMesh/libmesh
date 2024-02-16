@@ -910,7 +910,10 @@ public:
 #endif // LIBMESH_ENABLE_NODE_CONSTRAINTS
 
   /**
-   * Rebuilds the raw degree of freedom and DofObject constraints.
+   * Rebuilds the raw degree of freedom and DofObject constraints,
+   * based on attached DirichletBoundary objects and on non-conforming
+   * interface in adapted meshes.
+   *
    * A time is specified for use in building time-dependent Dirichlet
    * constraints.
    */
