@@ -1738,20 +1738,17 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
   // First collect all the unique_ids we can see and make sure there's
   // no duplicates
   std::unordered_set<unique_id_type> semilocal_unique_ids;
-  dof_id_type n_semilocal_obj = 0;
 
   for (auto const & elem : mesh.active_element_ptr_range())
     {
       libmesh_assert (!semilocal_unique_ids.count(elem->unique_id()));
       semilocal_unique_ids.insert(elem->unique_id());
-      ++n_semilocal_obj;
     }
 
   for (auto const & node : mesh.node_ptr_range())
     {
       libmesh_assert (!semilocal_unique_ids.count(node->unique_id()));
       semilocal_unique_ids.insert(node->unique_id());
-      ++n_semilocal_obj;
     }
 
   // Then make sure elements are all in sync and remote elements don't
