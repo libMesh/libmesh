@@ -95,8 +95,10 @@ class ConstraintOperatorTest : public CppUnit::TestCase {
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( ConstraintOperatorTest );
 
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( test1DCoarseningOperator );
   CPPUNIT_TEST( test1DCoarseningNewNodes );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
