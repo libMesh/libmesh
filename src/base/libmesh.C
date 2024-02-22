@@ -79,6 +79,17 @@
 # endif // #if defined(LIBMESH_HAVE_SLEPC)
 #endif // #if defined(LIBMESH_HAVE_PETSC)
 
+#ifdef LIBMESH_HAVE_NETGEN
+// We need the nglib namespace, because it's used everywhere in nglib
+// and we don't get binary compatibility without it.
+//
+// We need the nglib namespace *here*, because somehow nobody ever
+// figured out to just put it in nglib.h?
+namespace nglib {
+#include "netgen/nglib/nglib.h"
+}
+#endif
+
 // If we're using MPI and VTK has been detected, we need to do some
 // MPI initialize/finalize stuff for VTK.
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
@@ -522,6 +533,10 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     }
 #endif
 
+#ifdef LIBMESH_HAVE_NETGEN
+  nglib::Ng_Init();
+#endif
+
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
   // Do MPI initialization for VTK.
   _vtk_mpi_controller = vtkMPIController::New();
@@ -757,6 +772,9 @@ LibMeshInit::~LibMeshInit()
   std::set_terminate(old_terminate_handler);
 #endif
 
+#ifdef LIBMESH_HAVE_NETGEN
+  nglib::Ng_Exit();
+#endif
 
   if (libMesh::on_command_line("--enable-fpe"))
     libMesh::enableFPE(false);
