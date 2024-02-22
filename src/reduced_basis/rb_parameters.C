@@ -160,7 +160,7 @@ Real RBParameters::get_extra_value(const std::string & param_name, const Real & 
 {
   // same as get_value(param_name, default_val) but for the map of extra parameters
   auto it = _extra_parameters.find(param_name);
-  if (it == _parameters.end())
+  if (it == _extra_parameters.end())
     return default_val;
 
   libmesh_error_msg_if(it->second.size() != 1,
