@@ -119,7 +119,7 @@ public:
     // so instead we manually iterate and overwrite with the value from the latest sample.
     std::map<std::string, Real> m;
     // m.insert(params.begin(), params.end());  // unspecified behavior
-    for(const auto & [key,val] : as_range(params.begin_serialized(), params.end_serialized()))
+    for (const auto & [key,val] : as_range(params.begin_serialized(), params.end_serialized()))
       m[key] = val;
 
     // Expected result

@@ -64,7 +64,7 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
   // Ensure all the values are valid for min and max.
   auto pr_min = mu_min_in.begin_serialized();
   auto pr_max = mu_max_in.begin_serialized();
-  for(; pr_min!=mu_min_in.end_serialized(); ++pr_min, ++pr_max)
+  for (; pr_min != mu_min_in.end_serialized(); ++pr_min, ++pr_max)
     libmesh_error_msg_if((*pr_min).second > (*pr_max).second,
                          "Error: Invalid mu_min/mu_max in RBParameters constructor.");
 
@@ -409,7 +409,7 @@ bool RBParametrized::check_if_valid_params(const RBParameters &params) const
               // to ensure it's within the min/max range.
               const bool outside_range = ((value < min_value) || (value > max_value));
               is_valid = is_valid && !outside_range;
-              if(outside_range && verbose_mode)
+              if (outside_range && verbose_mode)
                 {
                   libMesh::out << "Warning: parameter " << param_name << " value="
                                << value << " outside acceptable range: ("

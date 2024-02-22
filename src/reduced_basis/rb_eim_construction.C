@@ -410,7 +410,7 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
       // i.e. {{0.0}, {1.0}, {2.0}, ...}
       Real val = 0.0;
       std::vector<RBParameter> lookup_table_training_samples(n_training_samples_in, {val});
-      for(auto & vec : lookup_table_training_samples)
+      for (auto & vec : lookup_table_training_samples)
         {
           vec[0] = val;
           val += 1.0;   // Could use val++, but better to be explicit for doubles.
@@ -1459,7 +1459,7 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       // so that when we scale using these factors all components should have a magnitude on the same
       // order as the maximum component.
       _component_scaling_in_training_set.resize(n_comps);
-      for(unsigned int i : make_range(n_comps))
+      for (unsigned int i : make_range(n_comps))
         {
           if ((eim_eval.scale_components_in_enrichment().count(i) == 0) ||
                max_abs_value_per_component_in_training_set[i] == 0.)
@@ -1526,7 +1526,7 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       // so that when we scale using these factors all components should have a magnitude on the same
       // order as the maximum component.
       _component_scaling_in_training_set.resize(n_comps);
-      for(unsigned int i : make_range(n_comps))
+      for (unsigned int i : make_range(n_comps))
         {
           if ((eim_eval.scale_components_in_enrichment().count(i) == 0) ||
                max_abs_value_per_component_in_training_set[i] == 0.)
@@ -1595,7 +1595,7 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
       // so that when we scale using these factors all components should have a magnitude on the same
       // order as the maximum component.
       _component_scaling_in_training_set.resize(n_comps);
-      for(unsigned int i : make_range(n_comps))
+      for (unsigned int i : make_range(n_comps))
         {
           if ((eim_eval.scale_components_in_enrichment().count(i) == 0) ||
                max_abs_value_per_component_in_training_set[i] == 0.)
@@ -1671,7 +1671,7 @@ void RBEIMConstruction::initialize_qp_data()
 
                   bool has_side_boundary_id = false;
                   boundary_id_type matching_boundary_id = BoundaryInfo::invalid_id;
-                  for(boundary_id_type side_boundary_id : side_boundary_ids)
+                  for (boundary_id_type side_boundary_id : side_boundary_ids)
                     if(parametrized_function_boundary_ids.count(side_boundary_id))
                       {
                         has_side_boundary_id = true;
@@ -1775,7 +1775,7 @@ void RBEIMConstruction::initialize_qp_data()
 
                   bool has_side_boundary_id = false;
                   boundary_id_type matching_boundary_id = BoundaryInfo::invalid_id;
-                  for(boundary_id_type side_boundary_id : side_boundary_ids)
+                  for (boundary_id_type side_boundary_id : side_boundary_ids)
                     if(parametrized_function_boundary_ids.count(side_boundary_id))
                       {
                         has_side_boundary_id = true;
@@ -1879,7 +1879,7 @@ void RBEIMConstruction::initialize_qp_data()
       // To be filled in by BoundaryInfo calls in loop below
       std::vector<boundary_id_type> node_boundary_ids;
 
-      for(dof_id_type node_id : nodes_with_nodesets)
+      for (dof_id_type node_id : nodes_with_nodesets)
         {
           const Node * node = mesh.node_ptr(node_id);
 
@@ -1890,7 +1890,7 @@ void RBEIMConstruction::initialize_qp_data()
 
           bool has_node_boundary_id = false;
           boundary_id_type matching_boundary_id = BoundaryInfo::invalid_id;
-          for(boundary_id_type node_boundary_id : node_boundary_ids)
+          for (boundary_id_type node_boundary_id : node_boundary_ids)
             if(parametrized_function_boundary_ids.count(node_boundary_id))
               {
                 has_node_boundary_id = true;
@@ -2290,7 +2290,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
                   optimal_qp = qp;
 
                   optimal_point_phi_i_qp.resize(phi.size());
-                  for(auto i : index_range(phi))
+                  for (auto i : index_range(phi))
                     optimal_point_phi_i_qp[i] = phi[i][qp];
 
                   const auto & point_list =
@@ -2588,7 +2588,7 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                   optimal_elem_type = elem_ref.type();
 
                   optimal_point_phi_i_qp.resize(phi.size());
-                  for(auto i : index_range(phi))
+                  for (auto i : index_range(phi))
                     optimal_point_phi_i_qp[i] = phi[i][qp];
 
                   const auto & point_list =

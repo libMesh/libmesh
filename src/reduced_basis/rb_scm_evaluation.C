@@ -402,7 +402,7 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
 
       for (const auto & param : C_J)
         for (const auto & pr : param)
-          for(const auto & value_vector : pr.second)
+          for (const auto & value_vector : pr.second)
             {
               // Need to make a copy of the value so that it's not const
               // Xdr is not templated on const's

@@ -734,7 +734,7 @@ void RBEvaluation::legacy_write_offline_data_to_files(const std::string & direct
 
         for (const auto & param : greedy_param_list)
           for (const auto & pr : param)
-            for(const auto & value_vector : pr.second)
+            for (const auto & value_vector : pr.second)
               {
                 // Need to make a copy of the value so that it's not const
                 // Xdr is not templated on const's
@@ -994,7 +994,7 @@ void RBEvaluation::write_out_basis_functions(System & sys,
   LOG_SCOPE("write_out_basis_functions()", "RBEvaluation");
 
   std::vector<NumericVector<Number>*> basis_functions_ptrs;
-  for(std::size_t i=0; i<basis_functions.size(); i++)
+  for (std::size_t i=0; i<basis_functions.size(); i++)
   {
     basis_functions_ptrs.push_back(basis_functions[i].get());
   }

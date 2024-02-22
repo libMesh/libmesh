@@ -251,7 +251,7 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
       for (const auto & [key, extra_sample_vector] :
            as_range(mine.extra_begin(), mine.extra_end()))
         {
-          for(const auto idx : index_range(extra_sample_vector))
+          for (const auto idx : index_range(extra_sample_vector))
             params.set_extra_value(key, idx, extra_sample_vector[idx]);
         }
     }
@@ -348,7 +348,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
             {
               std::vector<Real> discrete_values =
                 get_discrete_parameter_values().find(param_name)->second;
-              for(const auto sample_idx : index_range(sample_vector))
+              for (const auto sample_idx : index_range(sample_vector))
                 {
                   // Round all values to the closest discrete value.
                   std::vector<Real> discretized_vector(sample_vector[sample_idx].size());
@@ -431,7 +431,7 @@ void RBConstructionBase<Base>::load_training_set(const std::map<std::string, std
         {
           if (new_training_set.count(param_name))
             {
-              for(const auto i : make_range(get_local_n_training_samples()))
+              for (const auto i : make_range(get_local_n_training_samples()))
                 {
                   const unsigned int num_new_samples = libmesh_map_find(new_training_set,param_name).size();
                   libmesh_error_msg_if (num_new_samples==0, "new_training_set set should not be empty");
@@ -727,7 +727,7 @@ void RBConstructionBase<Base>::broadcast_parameters(const unsigned int proc_id)
   // First we get the sizes of all the parameter value vectors.
   std::vector<std::size_t> param_value_sizes;
   param_value_sizes.reserve(nparams);
-  for(const auto & pr : current_parameters)
+  for (const auto & pr : current_parameters)
     param_value_sizes.push_back(pr.second[0].size());
 
   // Broadcast the sizes vector and reserve memory.
@@ -737,9 +737,9 @@ void RBConstructionBase<Base>::broadcast_parameters(const unsigned int proc_id)
   serialized_parameters.reserve(buffsize);
 
   // Then we serialize the parameters/sample/value vectors into a single vector.
-  for(const auto & pr : current_parameters)
+  for (const auto & pr : current_parameters)
     {
-      for(const auto sample_idx : make_range(nsamples))
+      for (const auto sample_idx : make_range(nsamples))
         serialized_parameters.insert(serialized_parameters.end(),
                                      pr.second[sample_idx].cbegin(),
                                      pr.second[sample_idx].cend());

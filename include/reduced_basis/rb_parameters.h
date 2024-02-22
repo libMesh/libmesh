@@ -81,7 +81,7 @@ public:
   /**
    * Return const_iterators to the internal parameter map, as a convenient
    * way to access the parameter names and values.
-   * For example: for(const auto & [param_name, sample_vec] : my_parameters)
+   * For example: for (const auto & [param_name, sample_vec] : my_parameters)
    */
   std::map<std::string,std::vector<RBParameter>>::const_iterator begin() const;
   std::map<std::string,std::vector<RBParameter>>::const_iterator end() const;
@@ -200,7 +200,7 @@ public:
    * This gives serialized access to all the individual Real values in the
    * nested vector<vector<Real>>.
    * Use this in a for loop with the following syntax, for example:
-   * for(const auto &[key,val] : as_range(rb_parameters.begin_serialized(), rb_parameters.end_serialized())
+   * for (const auto &[key,val] : as_range(rb_parameters.begin_serialized(), rb_parameters.end_serialized())
    */
   const_iterator begin_serialized() const;
   const_iterator end_serialized() const;
@@ -210,7 +210,7 @@ public:
    * This gives serialized access to all the individual Real values in the
    * nested vector<vector<Real>>.
    * Use this in a for loop with the following syntax, for example:
-   * for(const auto &[key,val] : as_range(rb_parameters.begin_serialized_extra(), rb_parameters.end_serialized_extra())
+   * for (const auto &[key,val] : as_range(rb_parameters.begin_serialized_extra(), rb_parameters.end_serialized_extra())
    */
   const_iterator begin_serialized_extra() const;
   const_iterator end_serialized_extra() const;
