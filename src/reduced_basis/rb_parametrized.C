@@ -18,6 +18,8 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // libMesh includes
+#include "libmesh/int_range.h"
+#include "libmesh/simple_range.h"
 #include "libmesh/xdr_cxx.h"
 
 // rbOOmit includes
@@ -60,9 +62,9 @@ void RBParametrized::initialize_parameters(const RBParameters & mu_min_in,
                        "Error: Invalid mu_min/mu_max in initialize_parameters(), only 1 sample supported.");
 
   // Ensure all the values are valid for min and max.
-  auto pr_min = mu_min_in.begin();
-  auto pr_max = mu_max_in.begin();
-  for(; pr_min!=mu_min_in.end(); ++pr_min, ++pr_max)
+  auto pr_min = mu_min_in.begin_serialized();
+  auto pr_max = mu_max_in.begin_serialized();
+  for (; pr_min != mu_min_in.end_serialized(); ++pr_min, ++pr_max)
     libmesh_error_msg_if((*pr_min).second > (*pr_max).second,
                          "Error: Invalid mu_min/mu_max in RBParameters constructor.");
 
@@ -220,7 +222,7 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string & file_nam
       std::string param_name = pr.first;
       if (!is_discrete_parameter(param_name))
         {
-          Real param_value = pr.second;
+          Real param_value = get_parameters_min().get_value(param_name);
           parameter_ranges_out << param_name << param_value;
         }
     }
@@ -229,7 +231,7 @@ void RBParametrized::write_parameter_ranges_to_file(const std::string & file_nam
       std::string param_name = pr.first;
       if (!is_discrete_parameter(param_name))
         {
-          Real param_value = pr.second;
+          Real param_value = get_parameters_max().get_value(param_name);
           parameter_ranges_out << param_name << param_value;
         }
     }
@@ -393,35 +395,46 @@ bool RBParametrized::check_if_valid_params(const RBParameters &params) const
                        << get_n_params());
 
   bool is_valid = true;
-  for(const auto & [param_name, param_val] : params)
+  std::string prev_param_name = "";
+  for (const auto & [param_name, sample_vec] : params)
     {
-      // Check every parameter value (including across samples) to ensure
-      // it's within the min/max range.
-      const bool outside_range =
-        ((param_val < get_parameter_min(param_name)) ||
-         (param_val > get_parameter_max(param_name)));
-      is_valid = is_valid && !outside_range;
-      if(outside_range && verbose_mode)
+      std::size_t sample_idx = 0;
+      const Real & min_value = get_parameter_min(param_name);
+      const Real & max_value = get_parameter_max(param_name);
+      for (const auto & value_vec : sample_vec)
         {
-          libMesh::out << "Warning: parameter " << param_name << " value="
-                       << param_val << " outside acceptable range: ("
-                       << get_parameter_min(param_name) << ", "
-                       << get_parameter_max(param_name)
-                       << ")";
-        }
+          for (const auto & value : value_vec)
+            {
+              // Check every parameter value (including across samples and vector-values)
+              // to ensure it's within the min/max range.
+              const bool outside_range = ((value < min_value) || (value > max_value));
+              is_valid = is_valid && !outside_range;
+              if (outside_range && verbose_mode)
+                {
+                  libMesh::out << "Warning: parameter " << param_name << " value="
+                               << value << " outside acceptable range: ("
+                               << min_value << ", " << max_value << ")";
+                }
 
-      // For discrete params, make sure params.get_value(param_name) is sufficiently
-      // close to one of the discrete parameter values.
-      if (is_discrete_parameter(param_name))
-        {
-          const bool is_value_discrete =
-            is_value_in_list(param_val,
-                             get_discrete_parameter_values().find(param_name)->second,
-                             TOLERANCE);
-          is_valid = is_valid && is_value_discrete;
-          if(!is_value_discrete && verbose_mode)
-            libMesh::out << "Warning: parameter " << param_name << " value="
-                         << param_val << " is not in discrete value list.";
+              // For discrete params, make sure params.get_value(param_name) is sufficiently
+              // close to one of the discrete parameter values.
+              // Note that vector-values not yet supported in discrete parameters,
+              // and the .get_sample_value() call will throw an error if the user
+              // tries to do it.
+              if (const auto it = get_discrete_parameter_values().find(param_name);
+                  it != get_discrete_parameter_values().end())
+                {
+                  const bool is_value_discrete =
+                    is_value_in_list(params.get_sample_value(param_name, sample_idx),
+                                     it->second,
+                                     TOLERANCE);
+                  is_valid = is_valid && is_value_discrete;
+                  if (!is_value_discrete && verbose_mode)
+                    libMesh::out << "Warning: parameter " << param_name << " value="
+                                 << value << " is not in discrete value list.";
+                }
+            }
+          ++sample_idx;
         }
     }
   return is_valid;

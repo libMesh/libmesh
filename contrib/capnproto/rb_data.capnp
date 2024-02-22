@@ -17,7 +17,10 @@ struct Complex @0xda65bfa81ea2ce0b {
 
 struct RBParameter @0xb73e071e0a405648 {
   name  @0 :Text;
-  value @1 :Real;
+  value    :union {
+    singleValued @1 :Real;              # single-value support.
+    vectorValued @2 :List(List(Real));  # support for sample-vector and value-vector.
+  }
 }
 
 struct ParameterRanges @0xeccae95c5c74616e {

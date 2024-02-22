@@ -22,6 +22,7 @@
 #include "libmesh/rb_theta_expansion.h"
 
 // libMesh includes
+#include "libmesh/libmesh_common.h"
 #include "libmesh/libmesh_version.h"
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
@@ -733,12 +734,15 @@ void RBEvaluation::legacy_write_offline_data_to_files(const std::string & direct
 
         for (const auto & param : greedy_param_list)
           for (const auto & pr : param)
-            {
-              // Need to make a copy of the value so that it's not const
-              // Xdr is not templated on const's
-              Real param_value = pr.second;
-              greedy_params_out << param_value;
-            }
+            for (const auto & value_vector : pr.second)
+              {
+                // Need to make a copy of the value so that it's not const
+                // Xdr is not templated on const's
+                libmesh_error_msg_if(value_vector.size() != 1,
+                                     "Error: multi-value RB parameters are not yet supported here.");
+                Real param_value = value_vector[0];
+                greedy_params_out << param_value;
+              }
         greedy_params_out.close();
       }
 
@@ -990,7 +994,7 @@ void RBEvaluation::write_out_basis_functions(System & sys,
   LOG_SCOPE("write_out_basis_functions()", "RBEvaluation");
 
   std::vector<NumericVector<Number>*> basis_functions_ptrs;
-  for(std::size_t i=0; i<basis_functions.size(); i++)
+  for (std::size_t i=0; i<basis_functions.size(); i++)
   {
     basis_functions_ptrs.push_back(basis_functions[i].get());
   }

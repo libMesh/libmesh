@@ -143,13 +143,13 @@ public:
    * Overwrite the training parameters with new_training_set.
    * This training set is assumed to contain only the samples local to this processor.
    */
-  virtual void load_training_set(const std::map<std::string, std::vector<Real>> & new_training_set);
+  virtual void load_training_set(const std::map<std::string, std::vector<RBParameter>> & new_training_set);
 
   /**
    * Overwrite the local training samples for \p param_name using \p values.
    * This assumes that values.size() matches get_local_n_training_samples().
    */
-  void set_training_parameter_values(const std::string & param_name, const std::vector<Real> & values);
+  void set_training_parameter_values(const std::string & param_name, const std::vector<RBParameter> & values);
 
   /**
    * Broadcasts parameters from processor proc_id to all processors.
@@ -192,7 +192,7 @@ public:
   static std::pair<std::size_t, std::size_t>
   generate_training_parameters_random(const Parallel::Communicator & communicator,
                                       const std::map<std::string, bool> & log_param_scale,
-                                      std::map<std::string, std::vector<Real>> & local_training_parameters_in,
+                                      std::map<std::string, std::vector<RBParameter>> & local_training_parameters_in,
                                       const unsigned int n_global_training_samples_in,
                                       const RBParameters & min_parameters,
                                       const RBParameters & max_parameters,
@@ -210,7 +210,7 @@ public:
   static std::pair<std::size_t, std::size_t>
   generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
                                              const std::map<std::string, bool> & log_param_scale,
-                                             std::map<std::string, std::vector<Real>> & local_training_parameters_in,
+                                             std::map<std::string, std::vector<RBParameter>> & local_training_parameters_in,
                                              const unsigned int n_global_training_samples_in,
                                              const RBParameters & min_parameters,
                                              const RBParameters & max_parameters,
@@ -287,8 +287,9 @@ private:
    * When serial_training_set is true, the map contains all samples of all parameters.
    * Otherwise, the sample vectors will only contain the values for the local samples
    * as defined by _first_local_index and _n_local_training_samples.
+   * Mapped from parameter_name -> sample_vector -> value_vector.
    */
-  std::map<std::string, std::vector<Real>> _training_parameters;
+  std::map<std::string, std::vector<RBParameter>> _training_parameters;
 
   /**
    * The first sample-vector index from the global vector which is stored in

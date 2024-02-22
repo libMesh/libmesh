@@ -400,14 +400,17 @@ void RBSCMEvaluation::legacy_write_offline_data_to_files(const std::string & dir
       file_name << directory_name << "/C_J" << suffix;
       Xdr C_J_out(file_name.str(), mode);
 
-      for (auto & param : C_J)
-        for (const auto & item : param)
-          {
-            // Need to make a copy of the value so that it's not const
-            // Xdr is not templated on const's
-            Real param_value = item.second;
-            C_J_out << param_value;
-          }
+      for (const auto & param : C_J)
+        for (const auto & pr : param)
+          for (const auto & value_vector : pr.second)
+            {
+              // Need to make a copy of the value so that it's not const
+              // Xdr is not templated on const's
+              libmesh_error_msg_if(value_vector.size() != 1,
+                                   "Error: multi-value RB parameters are not yet supported here.");
+              Real param_value = value_vector[0];
+              C_J_out << param_value;
+            }
       C_J_out.close();
 
       // Write out SCM_UB_vectors get_SCM_UB_vector

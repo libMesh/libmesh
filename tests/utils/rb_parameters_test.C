@@ -2,6 +2,8 @@
 #include "libmesh/libmesh_exceptions.h"
 #include "libmesh/rb_parameters.h"
 #include "libmesh/rb_parametrized.h"
+#include "libmesh/simple_range.h"
+#include "libmesh/int_range.h"
 
 // CPPUnit includes
 #include "libmesh_cppunit.h"
@@ -19,6 +21,7 @@ public:
   CPPUNIT_TEST( testIteratorsWithSamples );
   CPPUNIT_TEST( testAppend );
   CPPUNIT_TEST( testNSamples );
+  CPPUNIT_TEST( testMultiValued );
   CPPUNIT_TEST( testRBParametrized );
   CPPUNIT_TEST_SUITE_END();
 
@@ -87,7 +90,7 @@ public:
     params.set_value("c", 3.);
 
     std::map<std::string, Real> m;
-    m.insert(params.begin(), params.end());
+    m.insert(params.begin_serialized(), params.end_serialized());
 
     // Expected result
     // a: 1.000000e+00
@@ -116,8 +119,8 @@ public:
     // so instead we manually iterate and overwrite with the value from the latest sample.
     std::map<std::string, Real> m;
     // m.insert(params.begin(), params.end());  // unspecified behavior
-    for(const auto &it : params)
-      m[it.first] = it.second;
+    for (const auto & [key,val] : as_range(params.begin_serialized(), params.end_serialized()))
+      m[key] = val;
 
     // Expected result
     // a: 1.000000e+00
@@ -210,6 +213,42 @@ public:
 #endif
   }
 
+  void testMultiValued()
+  {
+    LOG_UNIT_TEST;
+
+    RBParameters params;
+    std::vector<Real> test_vec1 = {2.1, 2.2, 2.3};
+    params.set_value("a", 0, {1.1, 1.2, 1.3});
+    params.set_value("a", 1, test_vec1);
+    params.set_value("a", 2, {3.1, 3.2, 3.3});
+    params.set_value("b", 2, {3.1, 3.2, 3.3});
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    // Test some errors.
+    CPPUNIT_ASSERT_THROW(params.get_sample_value("b", 0), libMesh::LogicError); // single-value requested, but multi-valued.
+    CPPUNIT_ASSERT_THROW(params.get_sample_value("b", 5), libMesh::LogicError); // sample_idx 5 does not exist.
+    CPPUNIT_ASSERT_THROW(params.get_sample_value("c", 0), libMesh::LogicError); // parameter "c" does not exist.
+    CPPUNIT_ASSERT_THROW(params.get_value("a"), libMesh::LogicError);           // a has multiple samples.
+    CPPUNIT_ASSERT_THROW(params.get_value("a", 1.0), libMesh::LogicError);      // a has multiple samples.
+    CPPUNIT_ASSERT_THROW(params.get_sample_vector_value("a", 3), libMesh::LogicError);  // sample_idx 3 does not exist.
+    CPPUNIT_ASSERT_THROW(params.get_sample_vector_value("c", 0), libMesh::LogicError);  // parameter "c" does not exist.
+#endif
+
+    const auto & vector_value_1 = params.get_sample_vector_value("a", 1);
+    for (const auto index : index_range(vector_value_1))
+      CPPUNIT_ASSERT_EQUAL(vector_value_1[index], test_vec1[index]);
+    const auto & vector_value_2 = params.get_sample_vector_value("a", 3, test_vec1);
+    for (const auto index : index_range(vector_value_2))
+      CPPUNIT_ASSERT_EQUAL(vector_value_2[index], test_vec1[index]);
+
+    std::vector<Real> test_vec2 = {5.1, 5.2, 5.3};
+    params.push_back_value("a", test_vec2);
+    params.push_back_value("b", test_vec2);
+    const auto & vector_value_3 = params.get_sample_vector_value("a", 3);
+    for (const auto index : index_range(vector_value_3))
+      CPPUNIT_ASSERT_EQUAL(vector_value_3[index], test_vec2[index]);
+  }
 
   void testRBParametrized()
   {
@@ -228,7 +267,16 @@ public:
     CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min, mu_max, {}), libMesh::LogicError);
 #endif
 
+    // Define an invalid max RBParameter with multiple steps.
+    mu_max.set_value("a", 2, -40.);
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    // Throw an error due to invalid max value.
+    CPPUNIT_ASSERT_THROW(rb_parametrized.initialize_parameters(mu_min,mu_max, {}), libMesh::LogicError);
+#endif
+
     // Set the max value correctly and initialize the RBParametrized object
+    mu_max = RBParameters();
     mu_max.set_value("a",  10.);
     rb_parametrized.initialize_parameters(mu_min, mu_max, {});
 

@@ -29,15 +29,14 @@
 
 // rbOOmit includes
 #include "libmesh/rb_construction_base.h"
+#include "libmesh/rb_parameters.h"
 
 // libMesh includes
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/libmesh_logging.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/parallel.h"
-#include "libmesh/petsc_linear_solver.h"
 #include "libmesh/condensed_eigen_system.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/int_range.h"
@@ -246,9 +245,15 @@ RBParameters RBConstructionBase<Base>::get_params_from_training_set(unsigned int
         params.set_value(param_name, sample_vector[local_index]);
 
       // Copy all extra values into the new RBParameters.
+      // We assume that the samples may be indexed differently for extra parameters,
+      // so we don't just copy the local_index value.
       const auto & mine = get_parameters();
-      for (const auto & [key, val] : as_range(mine.extra_begin(), mine.extra_end()))
-        params.set_extra_value(key, val);
+      for (const auto & [key, extra_sample_vector] :
+           as_range(mine.extra_begin(), mine.extra_end()))
+        {
+          for (const auto idx : index_range(extra_sample_vector))
+            params.set_extra_value(key, idx, extra_sample_vector[idx]);
+        }
     }
 
   return params;
@@ -343,11 +348,17 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
             {
               std::vector<Real> discrete_values =
                 get_discrete_parameter_values().find(param_name)->second;
-              for(const auto sample_idx : index_range(sample_vector))
+              for (const auto sample_idx : index_range(sample_vector))
                 {
-                  const auto &value = sample_vector[sample_idx];
-                  const Real nearest_discrete_value = get_closest_value(value, discrete_values);
-                  sample_vector[sample_idx] = nearest_discrete_value;
+                  // Round all values to the closest discrete value.
+                  std::vector<Real> discretized_vector(sample_vector[sample_idx].size());
+                  std::transform(sample_vector[sample_idx].cbegin(),
+                                 sample_vector[sample_idx].cend(),
+                                 discretized_vector.begin(),
+                                 [&discrete_values](const Real & val) {
+                                   return get_closest_value(val, discrete_values);
+                                 });
+                  sample_vector[sample_idx] = discretized_vector;
                 }
             }
         }
@@ -357,7 +368,7 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
 }
 
 template <class Base>
-void RBConstructionBase<Base>::load_training_set(const std::map<std::string, std::vector<Real>> & new_training_set)
+void RBConstructionBase<Base>::load_training_set(const std::map<std::string, std::vector<RBParameter>> & new_training_set)
 {
   // Make sure we're running this on all processors at the same time
   libmesh_parallel_only(this->comm());
@@ -420,7 +431,7 @@ void RBConstructionBase<Base>::load_training_set(const std::map<std::string, std
         {
           if (new_training_set.count(param_name))
             {
-              for(const auto i : make_range(get_local_n_training_samples()))
+              for (const auto i : make_range(get_local_n_training_samples()))
                 {
                   const unsigned int num_new_samples = libmesh_map_find(new_training_set,param_name).size();
                   libmesh_error_msg_if (num_new_samples==0, "new_training_set set should not be empty");
@@ -435,7 +446,7 @@ void RBConstructionBase<Base>::load_training_set(const std::map<std::string, std
 
 template <class Base>
 void RBConstructionBase<Base>::set_training_parameter_values(
-  const std::string & param_name, const std::vector<Real> & values)
+  const std::string & param_name, const std::vector<RBParameter> & values)
 {
   libmesh_error_msg_if(!_training_parameters_initialized,
     "Training parameters must be initialized before calling set_training_parameter_values");
@@ -452,7 +463,7 @@ template <class Base>
 std::pair<std::size_t, std::size_t>
 RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Communicator & communicator,
                                                               const std::map<std::string, bool> & log_param_scale,
-                                                              std::map<std::string, std::vector<Real>> & local_training_parameters_in,
+                                                              std::map<std::string, std::vector<RBParameter>> & local_training_parameters_in,
                                                               const unsigned int n_global_training_samples_in,
                                                               const RBParameters & min_parameters,
                                                               const RBParameters & max_parameters,
@@ -507,12 +518,18 @@ RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Co
         }
     }
 
+  // TODO - we don't support vector-data here yet. This would only apply in the case where
+  //        min or max are vector-valued, and all the generated points need to stay within those ranges.
+  //        But typically we expect that if we're calling this function, we only have 1 min and 1 max,
+  //        so the generated values are single-valued as well. The .get_value() calls will throw an error
+  //        if this is not the case.
+
   // initialize training_parameters_in
   const auto & [n_local_training_samples, first_local_index] =
       calculate_n_local_samples_and_index(communicator, n_global_training_samples_in,
                                           serial_training_set);
   for (const auto & pr : min_parameters)
-    local_training_parameters_in[pr.first] = std::vector<Real>(n_local_training_samples);
+    local_training_parameters_in[pr.first] = std::vector<RBParameter>(n_local_training_samples);
 
   // finally, set the values
   for (auto & [param_name, sample_vector] : local_training_parameters_in)
@@ -546,7 +563,7 @@ template <class Base>
 std::pair<std::size_t, std::size_t>
 RBConstructionBase<Base>::generate_training_parameters_deterministic(const Parallel::Communicator & communicator,
                                                                      const std::map<std::string, bool> & log_param_scale,
-                                                                     std::map<std::string, std::vector<Real>> & local_training_parameters_in,
+                                                                     std::map<std::string, std::vector<RBParameter>> & local_training_parameters_in,
                                                                      const unsigned int n_global_training_samples_in,
                                                                      const RBParameters & min_parameters,
                                                                      const RBParameters & max_parameters,
@@ -562,13 +579,19 @@ RBConstructionBase<Base>::generate_training_parameters_deterministic(const Paral
     libmesh_not_implemented_msg("ERROR: Deterministic training sample generation "
                                 "not implemented for more than three parameters.");
 
+  // TODO - we don't support vector-data here yet. This would only apply in the case where
+  //        min or max are vector-valued, and all the generated points need to stay within those ranges.
+  //        But typically we expect that if we're calling this function, we only have 1 min and 1 max,
+  //        so the generated values are single-valued as well. The .get_value() calls will throw an error
+  //        if this is not the case.
+
   // Reinitialize training_parameters_in (but don't remove existing keys!)
   const auto &[n_local_training_samples, first_local_index] =
       calculate_n_local_samples_and_index(communicator, n_global_training_samples_in,
                                          serial_training_set);
   const auto last_local_index = first_local_index + n_local_training_samples;
   for (const auto & pr : min_parameters)
-    local_training_parameters_in[pr.first] = std::vector<Real>(n_local_training_samples);
+    local_training_parameters_in[pr.first] = std::vector<RBParameter>(n_local_training_samples);
 
   // n_training_samples_per_param has 3 entries, but entries after "num_params"
   // are unused so we just set their value to 1. We need to set it to 1 (rather
@@ -668,7 +691,7 @@ RBConstructionBase<Base>::generate_training_parameters_deterministic(const Paral
                 unsigned int param_count = 0;
                 for (const auto & pr : min_parameters)
                   {
-                    std::vector<Real> & training_vector =
+                    std::vector<RBParameter> & training_vector =
                       libmesh_map_find(local_training_parameters_in, pr.first);
                     if (first_local_index <= index_count && index_count < last_local_index)
                       training_vector[index_count - first_local_index] =
@@ -695,22 +718,53 @@ void RBConstructionBase<Base>::broadcast_parameters(const unsigned int proc_id)
   libmesh_error_msg_if(current_parameters.n_samples()!=1,
       "Only single-sample RBParameter objects can be broadcast.");
 
-  // copy current_parameters to current_parameters_vector in order to broadcast
-  std::vector<Real> current_parameters_vector;
+  // Serialize the current_parameters to current_parameters_vector in order to broadcast.
+  // We handle multiple samples and vector values.
+  // However, the vector values are assumed to remain the same size across samples.
+  const std::size_t nparams = current_parameters.n_parameters();
+  const std::size_t nsamples = current_parameters.n_samples();
 
+  // First we get the sizes of all the parameter value vectors.
+  std::vector<std::size_t> param_value_sizes;
+  param_value_sizes.reserve(nparams);
   for (const auto & pr : current_parameters)
-    current_parameters_vector.push_back(pr.second);
+    param_value_sizes.push_back(pr.second[0].size());
 
-  // do the broadcast
-  this->comm().broadcast(current_parameters_vector, proc_id);
+  // Broadcast the sizes vector and reserve memory.
+  this->comm().broadcast(param_value_sizes, proc_id);
+  std::size_t buffsize = std::accumulate(param_value_sizes.cbegin(), param_value_sizes.cend(), 0ul);
+  std::vector<Real> serialized_parameters;
+  serialized_parameters.reserve(buffsize);
 
-  // update the copy of the RBParameters object.
-  // TODO - this only works with single-sample parameter objects.
-  unsigned int count = 0;
+  // Then we serialize the parameters/sample/value vectors into a single vector.
   for (const auto & pr : current_parameters)
-    current_parameters.set_value(pr.first, current_parameters_vector[count++]);
+    {
+      for (const auto sample_idx : make_range(nsamples))
+        serialized_parameters.insert(serialized_parameters.end(),
+                                     pr.second[sample_idx].cbegin(),
+                                     pr.second[sample_idx].cend());
+    }
 
-  // set the parameters globally
+  // Do the broadcasts.
+  this->comm().broadcast(serialized_parameters, proc_id);
+
+  // Deserialize into the copy of the RBParameters object.
+  std::size_t param_idx = 0;
+  auto val_idx = serialized_parameters.cbegin();
+  for (const auto & pr : current_parameters)
+    {
+      const std::size_t param_value_size = param_value_sizes[param_idx];
+      for (const auto sample_idx: make_range(nsamples))
+        {
+          auto end_val_idx = std::next(val_idx,param_value_size);
+          RBParameter sample_val(val_idx, end_val_idx);
+          current_parameters.set_value(pr.first, sample_idx, sample_val);
+          val_idx = end_val_idx;
+        }
+      ++param_idx;
+    }
+
+  // Overwrite the parameters globally.
   set_parameters(current_parameters);
 }
 
