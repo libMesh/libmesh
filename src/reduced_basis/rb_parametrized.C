@@ -421,11 +421,12 @@ bool RBParametrized::check_if_valid_params(const RBParameters &params) const
               // Note that vector-values not yet supported in discrete parameters,
               // and the .get_sample_value() call will throw an error if the user
               // tries to do it.
-              if (is_discrete_parameter(param_name))
+              if (const auto it = get_discrete_parameter_values().find(param_name);
+                  it != get_discrete_parameter_values().end())
                 {
                   const bool is_value_discrete =
                     is_value_in_list(params.get_sample_value(param_name, sample_idx),
-                                     get_discrete_parameter_values().find(param_name)->second,
+                                     it->second,
                                      TOLERANCE);
                   is_valid = is_valid && is_value_discrete;
                   if (!is_value_discrete && verbose_mode)
