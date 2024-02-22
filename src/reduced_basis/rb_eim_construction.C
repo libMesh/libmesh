@@ -406,10 +406,15 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
       const std::string & lookup_table_param_name =
         get_rb_eim_evaluation().get_parametrized_function().lookup_table_param_name;
 
+      // Fill the lookup_table_training_samples with sequential single-entry vectors,
+      // i.e. {{0.0}, {1.0}, {2.0}, ...}
       Real val = 0.0;
       std::vector<RBParameter> lookup_table_training_samples(n_training_samples_in, {val});
-      for(auto it = lookup_table_training_samples.begin(); it != lookup_table_training_samples.end(); ++it, ++val)
-        (*it)[0] = val;
+      for(auto & vec : lookup_table_training_samples)
+        {
+          vec[0] = val;
+          val += 1.0;   // Could use val++, but better to be explicit for doubles.
+        }
 
       set_training_parameter_values(lookup_table_param_name, lookup_table_training_samples);
     }
