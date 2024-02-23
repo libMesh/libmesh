@@ -6,11 +6,11 @@ message_running() {
     shift
     executable=$1
     shift
-    options=$@
+    common_message_running_options=$@
 
     echo "***************************************************************"
     echo "* Running Example $example_name:"
-    echo "*  $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS"
+    echo "*  $LIBMESH_RUN ./$executable $common_message_running_options $LIBMESH_OPTIONS"
     echo "***************************************************************"
     echo " "
 }
@@ -22,12 +22,12 @@ message_done_running() {
     shift
     executable=$1
     shift
-    options=$@
+    common_message_done_running_options=$@
 
     echo " "
     echo "***************************************************************"
     echo "* Done Running Example $example_name:"
-    echo "*  $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS"
+    echo "*  $LIBMESH_RUN ./$executable $common_message_done_running_options $LIBMESH_OPTIONS"
     echo "***************************************************************"
 }
 
@@ -39,7 +39,7 @@ run_example() {
 
     example_name=$1
     shift
-    options=$@
+    common_run_example_options=$@
 
     # when run outside of the automake environment make sure we get METHODS set
     # to something useful
@@ -79,16 +79,16 @@ run_example() {
 	    exit 1
 	fi
 	
-	message_running $example_name $executable $options
+	message_running $example_name $executable $common_run_example_options
 
-	$LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS
+	$LIBMESH_RUN ./$executable $common_run_example_options $LIBMESH_OPTIONS
         RETVAL=$?
         # If we don't return 'success' or 'skip', quit
         if [ $RETVAL -ne 0 -a $RETVAL -ne 77 ]; then
           exit $RETVAL
         fi
 	
-	message_done_running $example_name $executable $options
+	message_done_running $example_name $executable $common_run_example_options
     done
 }
 
@@ -102,7 +102,7 @@ benchmark_example() {
     shift
     example_name=$1
     shift
-    options=$@
+    common_benchmark_example_options=$@
 
     # when benchmarking we only run specific benchmark examples
     if (test "x${LIBMESH_BENCHMARK}" = "x"); then
@@ -124,14 +124,14 @@ benchmark_example() {
         exit 1
     fi
 
-    message_running $example_name $executable $options
+    message_running $example_name $executable $common_benchmark_example_options
 
-    $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS
+    $LIBMESH_RUN ./$executable $common_benchmark_example_options $LIBMESH_OPTIONS
     RETVAL=$?
     # If we don't return 'success' or 'skip', quit
     if [ $RETVAL -ne 0 -a $RETVAL -ne 77 ]; then
       exit $RETVAL
     fi
 
-    message_done_running $example_name $executable $options
+    message_done_running $example_name $executable $common_benchmark_example_options
 }
