@@ -52,17 +52,7 @@ void MeshOutput<MT>::write_equation_systems (const std::string & fname,
       // been properly renumbered...
       libmesh_assert(!my_mesh.allow_renumbering());
 
-      libmesh_do_once(libMesh::out <<
-                      "Warning:  This MeshOutput subclass only supports meshes which are contiguously renumbered!"
-                      << std::endl;);
-
-      my_mesh.allow_renumbering(true);
-
-      my_mesh.renumber_nodes_and_elements();
-
-      // Not sure what good going back to false will do here, the
-      // renumbering horses have already left the barn...
-      my_mesh.allow_renumbering(false);
+      libmesh_error_msg("This MeshOutput subclass only supports meshes which are contiguously numbered!");
     }
 
   if (!_is_parallel_format)
