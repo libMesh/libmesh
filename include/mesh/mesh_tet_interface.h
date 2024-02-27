@@ -60,7 +60,8 @@ public:
   ~MeshTetInterface() = default;
 
   /**
-   * Sets and/or gets the desired element type.
+   * Sets and/or gets the desired element type.  This should be a Tet
+   * type.
    */
   ElemType & elem_type() {return _elem_type;}
 
