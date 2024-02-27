@@ -327,7 +327,7 @@ compute_enriched_soln(const MeshBase & mesh,
   const auto & scalar_phi_face = scalar_fe_face.get_phi();
   const auto & enriched_scalar_phi_face = enriched_scalar_fe_face->get_phi();
   const auto & lambda_phi_face = lambda_fe_face.get_phi();
-  const auto & JxW_face = vector_fe_face.get_JxW();
+  const auto & JxW_face = scalar_fe_face.get_JxW();
   const auto & normals = vector_fe_face.get_normals();
 
   // Data structures for computing the enriched scalar solution
@@ -516,7 +516,7 @@ fe_assembly(EquationSystems & es, const bool global_solve)
   const auto & vector_phi_face = vector_fe_face->get_phi();
   const auto & scalar_phi_face = scalar_fe_face->get_phi();
   const auto & lambda_phi_face = lambda_fe_face->get_phi();
-  const auto & JxW_face = vector_fe_face->get_JxW();
+  const auto & JxW_face = scalar_fe_face->get_JxW();
   const auto & qface_point = vector_fe_face->get_xyz();
   const auto & normals = vector_fe_face->get_normals();
 
@@ -885,7 +885,7 @@ alternative_fe_assembly(EquationSystems & es, const bool global_solve)
   const auto & vector_phi_face = vector_fe_face->get_phi();
   const auto & scalar_phi_face = scalar_fe_face->get_phi();
   const auto & lambda_phi_face = lambda_fe_face->get_phi();
-  const auto & JxW_face = vector_fe_face->get_JxW();
+  const auto & JxW_face = scalar_fe_face->get_JxW();
   const auto & qface_point = vector_fe_face->get_xyz();
   const auto & normals = vector_fe_face->get_normals();
 
