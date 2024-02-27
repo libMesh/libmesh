@@ -381,6 +381,13 @@ void ExodusII_IO::read (const std::string & fname)
   // maximum of subdomain_id() values set via Exodus block ids.
   int max_subdomain_id = std::numeric_limits<int>::min();
 
+  // We've already added all the nodes explicitly specified in the
+  // file, but if we have spline nodes we may need to add assembly
+  // element nodes based on them.  Add them contiguously so we're
+  // compatible with any subsequent code paths (including our
+  // ExodusII_IO::write()!) that don't support sparse ids.
+  dof_id_type n_nodes = mesh.n_nodes();
+
   // Loop over all the element blocks
   for (int i=0; i<exio_helper->num_elem_blk; i++)
     {
@@ -618,7 +625,7 @@ void ExodusII_IO::read (const std::string & fname)
                             }
                         }
 
-                      Node *n = mesh.add_point(p);
+                      Node *n = mesh.add_point(p, n_nodes++);
                       if (weights_exist)
                         n->set_extra_datum<Real>(weight_index, w);
 
