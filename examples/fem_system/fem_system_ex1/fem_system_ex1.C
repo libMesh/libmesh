@@ -162,13 +162,6 @@ int main (int argc, char ** argv)
                                        0., 1.,
                                        HEX27);
 
-  if  (slvr_type == "petscdiff")
-    {
-      mesh->allow_renumbering(false);
-      mesh->allow_remote_element_removal(false);
-      mesh->partitioner() = nullptr;
-    }
-
   mesh_refinement.uniformly_refine(coarserefinements);
 
   // Print information about the mesh to the screen.
