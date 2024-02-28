@@ -211,6 +211,7 @@ libmesh_SOURCES =  \
         src/mesh/mesh_generation.C \
         src/mesh/mesh_iterators.C \
         src/mesh/mesh_modification.C \
+        src/mesh/mesh_netgen_interface.C \
         src/mesh/mesh_output.C \
         src/mesh/mesh_refinement.C \
         src/mesh/mesh_refinement_flagging.C \
