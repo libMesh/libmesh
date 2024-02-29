@@ -74,6 +74,7 @@ unit_tests_sources = \
   mesh/mesh_generation_test.C \
   mesh/mesh_input.C \
   mesh/mesh_stitch.C \
+  mesh/mesh_tet_test.C \
   mesh/mesh_triangulation.C \
   mesh/mixed_dim_mesh_test.C \
   mesh/mixed_order_test.C \
