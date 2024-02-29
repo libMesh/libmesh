@@ -47,6 +47,7 @@ namespace libMesh
 RBEIMEvaluation::RBEIMEvaluation(const Parallel::Communicator & comm)
 :
 ParallelObject(comm),
+eim_error_indicator_normalization(RBEIMEvaluation::RESIDUAL_TERMS),
 _rb_eim_solves_N(0),
 _preserve_rb_eim_solutions(false),
 _is_eim_error_indicator_active(false)
@@ -2982,23 +2983,33 @@ std::pair<Real,Real> RBEIMEvaluation::get_eim_error_indicator(
   DenseVector<Number> coeffs;
   _error_indicator_interpolation_row.get_principal_subvector(eim_solution.size(), coeffs);
 
+  Number EIM_val_at_error_indicator_pt = coeffs.dot(eim_solution);
   Real error_indicator_val =
-    std::real(error_indicator_rhs - (coeffs.dot(eim_solution)));
+    std::real(error_indicator_rhs - EIM_val_at_error_indicator_pt);
 
-  // Normalize the error indicator based on the norm of the EIM RHS vector.
-  // Other normalizations are possible (e.g. see the commented-out option
-  // below), but we prefer the RHS norm approach since it helps to handle
-  // the case where different EIM variables have different magnitudes in
-  // a more sensible manner, i.e. if error_indicator_val is based on a
-  // "small magnitude" variable, then by normalizing based on the entire
-  // RHS vector (which will typically include values from multiple different
-  // EIM variables) we will effectively scale down the error indicator
-  // corresponding to small variables, which is typically what we want.
-  Real normalization = std::max(eim_rhs.linfty_norm(), std::abs(error_indicator_rhs));
-
-  // Commented-out alternative normalization
-  // Real normalization =
-  //   std::abs(error_indicator_rhs) + std::abs(coeffs.dot(eim_solution));
+  Real normalization = 0.;
+  if (eim_error_indicator_normalization == RESIDUAL_TERMS)
+  {
+    // This normalization is based on the terms from the "EIM residual" calculation
+    // used in the calculation of error_indicator_val.
+    normalization =
+      std::abs(error_indicator_rhs) + std::abs(EIM_val_at_error_indicator_pt);
+  }
+  else if (eim_error_indicator_normalization == MAX_RHS)
+  {
+    // Normalize the error indicator based on the max-norm of the EIM RHS vector.
+    // This approach handles the case where different EIM variables have different
+    // magnitudes well, i.e. if error_indicator_val is based on a
+    // "small magnitude" variable, then by normalizing based on the entire
+    // RHS vector (which will typically include values from multiple different
+    // EIM variables) we will effectively scale down the error indicator
+    // corresponding to small variables, which is typically what we want.
+    normalization = std::max(eim_rhs.linfty_norm(), std::abs(error_indicator_rhs));
+  }
+  else
+  {
+    libmesh_error_msg("unsupported eim_error_indicator_normalization");
+  }
 
   // We avoid NaNs by setting normalization to 1 in the case that it is exactly 0.
   if (normalization == 0.)
