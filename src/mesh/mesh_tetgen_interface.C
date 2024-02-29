@@ -28,6 +28,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/mesh_smoother_laplace.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h" // binary_find
 #include "libmesh/mesh_tetgen_wrapper.h"
@@ -89,6 +90,11 @@ void TetGenMeshInterface::triangulate_pointset ()
   // oss << "V"; // verbose operation
   //oss  << "q" << std::fixed << 2.0;  // quality constraint
   //oss  << "a" << std::fixed << 100.; // volume constraint
+
+  // But if the user wants refinement, let's do our best.
+  if (_desired_volume)
+    oss  << "a" << std::fixed << _desired_volume; // volume constraint
+
   tetgen_wrapper.set_switches(oss.str());
 
   // Run tetgen
@@ -114,6 +120,11 @@ void TetGenMeshInterface::triangulate_pointset ()
       // Finally, add this element to the mesh.
       this->_mesh.add_elem(std::move(elem));
     }
+
+  // To the naked eye, a few smoothing iterations usually looks better.
+  // We don't do this by default.
+  if (this->_smooth_after_generating)
+    LaplaceMeshSmoother(this->_mesh).smooth(2);
 }
 
 
@@ -164,6 +175,11 @@ void TetGenMeshInterface::pointset_convexhull ()
       // Finally, add this element to the mesh.
       this->_mesh.add_elem(std::move(elem));
     }
+
+  // To the naked eye, a few smoothing iterations usually looks better.
+  // We don't do this by default.
+  if (this->_smooth_after_generating)
+    LaplaceMeshSmoother(this->_mesh).smooth(2);
 }
 
 
@@ -350,6 +366,11 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   // Delete original convex hull elements.  Is there ever a case where
   // we should not do this?
   this->delete_2D_hull_elements();
+
+  // To the naked eye, a few smoothing iterations usually looks better.
+  // We don't do this by default.
+  if (this->_smooth_after_generating)
+    LaplaceMeshSmoother(_mesh).smooth(2);
 }
 
 

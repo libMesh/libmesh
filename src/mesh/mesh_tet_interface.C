@@ -34,6 +34,7 @@ namespace libMesh
 //----------------------------------------------------------------------
 // MeshTetInterface class members
 MeshTetInterface::MeshTetInterface (UnstructuredMesh & mesh) :
+  _desired_volume(0), _smooth_after_generating(false),
   _elem_type(TET4), _mesh(mesh)
 {
 }
