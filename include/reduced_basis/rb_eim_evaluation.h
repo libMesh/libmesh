@@ -580,6 +580,21 @@ public:
    */
   const VectorizedEvalInput & get_vec_eval_input() const;
 
+  /**
+   * Here we store an enum that defines the type of EIM error indicator
+   * normalization that we use in get_eim_error_indicator(). The enum
+   * is public so that it can be set in user code.
+   *
+   * RESIDUAL_TERMS: Use the terms in the EIM residual to determine the
+   * error indicator normalization (default).
+   *
+   * MAX_RHS: Use the maximum value in the EIM RHS vector to determine
+   * the error indicator normalization.
+   */
+  enum EimErrorIndicatorNormalization { RESIDUAL_TERMS, MAX_RHS };
+
+  EimErrorIndicatorNormalization eim_error_indicator_normalization;
+
 protected:
 
   /**
