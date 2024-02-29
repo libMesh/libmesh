@@ -63,8 +63,6 @@ namespace libMesh
 // NetGenMeshInterface class members
 NetGenMeshInterface::NetGenMeshInterface (UnstructuredMesh & mesh) :
   MeshTetInterface(mesh),
-  _desired_volume(0),
-  _smooth_after_generating(true),
   _serializer(mesh)
 {
 }

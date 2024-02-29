@@ -60,6 +60,19 @@ public:
   ~MeshTetInterface() = default;
 
   /**
+   * Sets and/or gets the desired tetrahedron volume.  Set to zero to
+   * disable volume constraint.
+   */
+  Real & desired_volume() {return _desired_volume;}
+
+  /**
+   * Sets/gets flag which tells whether to do two steps of Laplace
+   * mesh smoothing after generating the grid.  False by default (for
+   * compatibility with old TetGenMeshInterface behavior).
+   */
+  bool & smooth_after_generating() {return _smooth_after_generating;}
+
+  /**
    * Sets and/or gets the desired element type.  This should be a Tet
    * type.
    */
@@ -98,6 +111,18 @@ protected:
    * after performing a Delaunay tetrahedralization.
    */
   void delete_2D_hull_elements();
+
+  /**
+   * The desired volume for the elements in the resulting mesh.
+   * Unlimited (indicated by 0) by default
+   */
+  Real _desired_volume;
+
+  /**
+   * Flag which tells whether we should smooth the mesh after
+   * it is generated.  False by default.
+   */
+  bool _smooth_after_generating;
 
   /**
    * The exact type of tetrahedra we intend to construct
