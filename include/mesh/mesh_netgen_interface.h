@@ -71,35 +71,11 @@ public:
   ~NetGenMeshInterface() = default;
 
   /**
-   * Sets and/or gets the desired tetrahedron volume.  Set to zero to
-   * disable volume constraint.
-   */
-  Real & desired_volume() {return _desired_volume;}
-
-  /**
-   * Sets/gets flag which tells whether to do two steps of Laplace
-   * mesh smoothing after generating the grid.
-   */
-  bool & smooth_after_generating() {return _smooth_after_generating;}
-
-  /**
    * Method invokes NetGen library to compute a tetrahedralization
    */
   void triangulate ();
 
 protected:
-
-  /**
-   * The desired volume for the elements in the resulting mesh.
-   * Unlimited (indicated by 0) by default
-   */
-  Real _desired_volume;
-
-  /**
-   * Flag which tells whether we should smooth the mesh after
-   * it is generated.  True by default.
-   */
-  bool _smooth_after_generating;
 
   /**
    * Tetgen only operates on serial meshes.
