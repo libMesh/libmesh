@@ -65,7 +65,7 @@ public:
   /**
    * Empty destructor.
    */
-  ~TetGenMeshInterface() = default;
+  virtual ~TetGenMeshInterface() override = default;
 
   /**
    * Method to set switches to tetgen, allowing for different behaviours
@@ -75,7 +75,7 @@ public:
   /**
    * Method invokes TetGen library to compute a Delaunay tetrahedralization
    */
-  void triangulate ();
+  virtual void triangulate () override;
 
   /**
    * Method invokes TetGen library to compute a Delaunay tetrahedralization

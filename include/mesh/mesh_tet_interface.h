@@ -55,9 +55,9 @@ public:
   MeshTetInterface (UnstructuredMesh & mesh);
 
   /**
-   * Empty destructor.
+   * Empty destructor by default.
    */
-  ~MeshTetInterface() = default;
+  virtual ~MeshTetInterface() = default;
 
   /**
    * Sets and/or gets the desired tetrahedron volume.  Set to zero to

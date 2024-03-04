@@ -68,12 +68,12 @@ public:
   /**
    * Empty destructor.
    */
-  ~NetGenMeshInterface() = default;
+  virtual ~NetGenMeshInterface() override = default;
 
   /**
    * Method invokes NetGen library to compute a tetrahedralization
    */
-  void triangulate ();
+  virtual void triangulate () override;
 
 protected:
 
