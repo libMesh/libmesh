@@ -734,6 +734,73 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
 
 
 
+template <typename T>
+void PetscMatrix<T>::read_petsc_binary(const std::string & filename)
+{
+  parallel_object_only();
+
+  PetscErrorCode ierr=0;
+
+  // We'll get matrix sizes from the file, but we need to at least
+  // have a Mat object
+  if (!this->initialized())
+    {
+      ierr = MatCreate(this->comm().get(), &_mat);
+      LIBMESH_CHKERR(ierr);
+      this->_is_initialized = true;
+    }
+
+  PetscViewer viewer;
+  ierr = PetscViewerCreate(this->comm().get(), &viewer);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerSetType(viewer, PETSCVIEWERBINARY);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerSetFromOptions(viewer);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerFileSetMode(viewer, FILE_MODE_READ);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerFileSetName(viewer, filename.c_str());
+  LIBMESH_CHKERR(ierr);
+  ierr = MatLoad(_mat, viewer);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerDestroy(&viewer);
+  LIBMESH_CHKERR(ierr);
+}
+
+
+
+template <typename T>
+void PetscMatrix<T>::read_petsc_hdf5(const std::string & filename)
+{
+  parallel_object_only();
+
+  PetscErrorCode ierr=0;
+
+  // We'll get matrix sizes from the file, but we need to at least
+  // have a Mat object
+  if (!this->initialized())
+    {
+      ierr = MatCreate(this->comm().get(), &_mat);
+      LIBMESH_CHKERR(ierr);
+      this->_is_initialized = true;
+    }
+
+  PetscViewer viewer;
+  ierr = PetscViewerCreate(this->comm().get(), &viewer);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerSetType(viewer, PETSCVIEWERHDF5);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerSetFromOptions(viewer);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerFileSetMode(viewer, FILE_MODE_READ);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerFileSetName(viewer, filename.c_str());
+  LIBMESH_CHKERR(ierr);
+  ierr = MatLoad(_mat, viewer);
+  LIBMESH_CHKERR(ierr);
+  ierr = PetscViewerDestroy(&viewer);
+  LIBMESH_CHKERR(ierr);
+}
 
 
 

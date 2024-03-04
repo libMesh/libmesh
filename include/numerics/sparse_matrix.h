@@ -434,6 +434,18 @@ public:
   virtual void read_matlab(const std::string & filename);
 
   /**
+   * Read the contents of the matrix from a file in PETSc's binary
+   * sparse matrix format.
+   */
+  virtual void read_petsc_binary(const std::string & filename);
+
+  /**
+   * Read the contents of the matrix from a file in PETSc's HDF5
+   * sparse matrix format.
+   */
+  virtual void read_petsc_hdf5(const std::string & filename);
+
+  /**
    * This function creates a matrix called "submatrix" which is defined
    * by the row and column indices given in the "rows" and "cols" entries.
    * Currently this operation is only defined for the PetscMatrix type.

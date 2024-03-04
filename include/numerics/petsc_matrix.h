@@ -294,6 +294,10 @@ public:
 
   virtual void print_matlab(const std::string & name = "") const override;
 
+  virtual void read_petsc_binary(const std::string & filename) override;
+
+  virtual void read_petsc_hdf5(const std::string & filename) override;
+
   virtual void get_diagonal (NumericVector<T> & dest) const override;
 
   virtual void get_transpose (SparseMatrix<T> & dest) const override;
