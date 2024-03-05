@@ -421,6 +421,19 @@ public:
   virtual void print_matlab(const std::string & /*name*/ = "") const;
 
   /**
+   * Write the contents of the matrix to a file in PETSc's binary
+   * sparse matrix format.
+   */
+  virtual void print_petsc_binary(const std::string & filename);
+
+  /**
+   * Write the contents of the matrix to a file in PETSc's HDF5
+   * sparse matrix format.
+   */
+  virtual void print_petsc_hdf5(const std::string & filename);
+
+
+  /**
    * Read the contents of the matrix from Matlab's sparse matrix
    * format.
    *

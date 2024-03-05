@@ -294,6 +294,10 @@ public:
 
   virtual void print_matlab(const std::string & name = "") const override;
 
+  virtual void print_petsc_binary(const std::string & filename) override;
+
+  virtual void print_petsc_hdf5(const std::string & filename) override;
+
   virtual void read_petsc_binary(const std::string & filename) override;
 
   virtual void read_petsc_hdf5(const std::string & filename) override;
@@ -351,8 +355,9 @@ protected:
                               const std::vector<numeric_index_type> & cols,
                               const bool reuse_submatrix) const override;
 
-  void _petsc_read(const std::string & filename,
-                   PetscViewerType viewertype);
+  void _petsc_viewer(const std::string & filename,
+                     PetscViewerType viewertype,
+                     PetscFileMode filemode);
 
 private:
 

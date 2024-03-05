@@ -735,8 +735,9 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
 
 
 template <typename T>
-void PetscMatrix<T>::_petsc_read(const std::string & filename,
-                                 PetscViewerType viewertype)
+void PetscMatrix<T>::_petsc_viewer(const std::string & filename,
+                                   PetscViewerType viewertype,
+                                   PetscFileMode filemode)
 {
   parallel_object_only();
 
@@ -758,11 +759,14 @@ void PetscMatrix<T>::_petsc_read(const std::string & filename,
   LIBMESH_CHKERR(ierr);
   ierr = PetscViewerSetFromOptions(viewer);
   LIBMESH_CHKERR(ierr);
-  ierr = PetscViewerFileSetMode(viewer, FILE_MODE_READ);
+  ierr = PetscViewerFileSetMode(viewer, filemode);
   LIBMESH_CHKERR(ierr);
   ierr = PetscViewerFileSetName(viewer, filename.c_str());
   LIBMESH_CHKERR(ierr);
-  ierr = MatLoad(_mat, viewer);
+  if (filemode == FILE_MODE_READ)
+    ierr = MatLoad(_mat, viewer);
+  else
+    ierr = MatView(_mat, viewer);
   LIBMESH_CHKERR(ierr);
   ierr = PetscViewerDestroy(&viewer);
   LIBMESH_CHKERR(ierr);
@@ -771,9 +775,29 @@ void PetscMatrix<T>::_petsc_read(const std::string & filename,
 
 
 template <typename T>
+void PetscMatrix<T>::print_petsc_binary(const std::string & filename)
+{
+  libmesh_assert (this->initialized());
+
+  this->_petsc_viewer(filename, PETSCVIEWERBINARY, FILE_MODE_WRITE);
+}
+
+
+
+template <typename T>
+void PetscMatrix<T>::print_petsc_hdf5(const std::string & filename)
+{
+  libmesh_assert (this->initialized());
+
+  this->_petsc_viewer(filename, PETSCVIEWERHDF5, FILE_MODE_WRITE);
+}
+
+
+
+template <typename T>
 void PetscMatrix<T>::read_petsc_binary(const std::string & filename)
 {
-  this->_petsc_read(filename, PETSCVIEWERBINARY);
+  this->_petsc_viewer(filename, PETSCVIEWERBINARY, FILE_MODE_READ);
 }
 
 
@@ -781,7 +805,7 @@ void PetscMatrix<T>::read_petsc_binary(const std::string & filename)
 template <typename T>
 void PetscMatrix<T>::read_petsc_hdf5(const std::string & filename)
 {
-  this->_petsc_read(filename, PETSCVIEWERHDF5);
+  this->_petsc_viewer(filename, PETSCVIEWERHDF5, FILE_MODE_READ);
 }
 
 
