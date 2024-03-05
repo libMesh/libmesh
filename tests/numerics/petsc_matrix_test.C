@@ -23,7 +23,30 @@ public:
 
   SPARSEMATRIXTEST
 
+  CPPUNIT_TEST(testPetscBinaryRead);
+  // CPPUNIT_TEST(testPetscHDF5Read);
+
   CPPUNIT_TEST_SUITE_END();
+
+  void testPetscBinaryRead()
+  {
+    auto mat_to_read = std::make_unique<PetscMatrix<Number>>(*my_comm);
+
+    // Petsc binary formats depend on sizeof(PetscInt)
+#if LIBMESH_DOF_ID_BYTES == 4
+    mat_to_read->read_petsc_binary("matrices/geom_1_extraction_op.petsc32");
+
+    CPPUNIT_ASSERT_EQUAL(mat_to_read->m(), dof_id_type(27));
+    CPPUNIT_ASSERT_EQUAL(mat_to_read->n(), dof_id_type(27));
+
+    auto mat_ascii_format = std::make_unique<PetscMatrix<Number>>(*my_comm);
+    mat_ascii_format->read_matlab("matrices/geom_1_extraction_op.m");
+
+    mat_ascii_format->add(-1, *mat_to_read);
+    CPPUNIT_ASSERT_LESS(TOLERANCE, mat_ascii_format->l1_norm());
+#endif
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(PetscMatrixTest);
