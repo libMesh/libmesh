@@ -24,7 +24,9 @@ public:
   SPARSEMATRIXTEST
 
   CPPUNIT_TEST(testPetscBinaryRead);
+  CPPUNIT_TEST(testPetscBinaryWrite);
   // CPPUNIT_TEST(testPetscHDF5Read);
+  // CPPUNIT_TEST(testPetscHDF5Write);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -54,6 +56,43 @@ public:
     mat_ascii_format->add(-1, *mat_to_read);
     CPPUNIT_ASSERT_LESS(TOLERANCE, mat_ascii_format->l1_norm());
 #endif
+  }
+
+
+  void testPetscBinaryWrite()
+  {
+    auto mat_to_read = std::make_unique<PetscMatrix<Number>>(*my_comm);
+    mat_to_read->read_matlab("matrices/geom_1_extraction_op.m");
+    mat_to_read->print_petsc_binary("geom_1_extraction_op.petsc");
+
+    // Our read_matlab partitioning doesn't necessarily match PETSc's
+    // MatLoad partitioning, so we'll partition a matrix to compare
+    // against manually.  These particular files have bandwidth 8,
+    // so we'll ask for sufficient n_nz and n_oz to handle that
+    // regardless of partitioning.
+    auto mat_reread = std::make_unique<PetscMatrix<Number>>(*my_comm);
+    mat_reread->init(mat_to_read->m(), mat_to_read->n(),
+                     mat_to_read->local_m(), mat_to_read->local_n(),
+                     8, 7);
+
+    mat_reread->read_petsc_binary("geom_1_extraction_op.petsc");
+
+    mat_to_read->add(-1, *mat_reread);
+    CPPUNIT_ASSERT_LESS(TOLERANCE, mat_to_read->l1_norm());
+  }
+
+
+  void testPetscHDF5Write()
+  {
+    auto mat_to_read = std::make_unique<PetscMatrix<Number>>(*my_comm);
+    mat_to_read->read_matlab("matrices/geom_1_extraction_op.m");
+    mat_to_read->print_petsc_hdf5("geom_1_extraction_op.hdf5");
+
+    auto mat_reread = std::make_unique<PetscMatrix<Number>>(*my_comm);
+    mat_reread->read_petsc_hdf5("geom_1_extraction_op.hdf5");
+
+    mat_to_read->add(-1, *mat_reread);
+    CPPUNIT_ASSERT_LESS(TOLERANCE, mat_to_read->l1_norm());
   }
 
 };
