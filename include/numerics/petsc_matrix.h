@@ -350,6 +350,10 @@ protected:
                               const std::vector<numeric_index_type> & rows,
                               const std::vector<numeric_index_type> & cols,
                               const bool reuse_submatrix) const override;
+
+  void _petsc_read(const std::string & filename,
+                   PetscViewerType viewertype);
+
 private:
 
   /**
