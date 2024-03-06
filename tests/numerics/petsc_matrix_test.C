@@ -37,6 +37,11 @@ public:
     // Petsc binary formats depend on sizeof(PetscInt)
 #if LIBMESH_DOF_ID_BYTES == 4
     mat_to_read->read_petsc_binary("matrices/geom_1_extraction_op.petsc32");
+#elif LIBMESH_DOF_ID_BYTES == 8
+    mat_to_read->read_petsc_binary("matrices/geom_1_extraction_op.petsc64");
+#else
+    return;
+#endif
 
     CPPUNIT_ASSERT_EQUAL(mat_to_read->m(), dof_id_type(27));
     CPPUNIT_ASSERT_EQUAL(mat_to_read->n(), dof_id_type(27));
@@ -55,7 +60,6 @@ public:
 
     mat_ascii_format->add(-1, *mat_to_read);
     CPPUNIT_ASSERT_LESS(TOLERANCE, mat_ascii_format->l1_norm());
-#endif
   }
 
 
