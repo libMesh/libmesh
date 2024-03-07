@@ -10,7 +10,7 @@ AC_DEFUN([CONFIGURE_NETGEN],
                          [yes], [enablenetgen=yes],
                          [no],  [enablenetgen=no],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-netgen)])],
-                [enablenetgen=no])
+                [enablenetgen=$enableoptional])
 
   dnl Setting --enable-netgen-required causes an error to be emitted during
   dnl configure if Netgen is not successfully configured (e.g. if it
