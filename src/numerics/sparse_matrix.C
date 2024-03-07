@@ -479,6 +479,25 @@ void SparseMatrix<T>::print_matlab(const std::string & name) const
 }
 
 
+
+template <typename T>
+void SparseMatrix<T>::print_petsc_binary(const std::string &)
+{
+  libmesh_not_implemented_msg
+    ("libMesh cannot write PETSc binary-format files from non-PETSc matrices");
+}
+
+
+
+template <typename T>
+void SparseMatrix<T>::print_petsc_hdf5(const std::string &)
+{
+  libmesh_not_implemented_msg
+    ("libMesh cannot write PETSc HDF5-format files from non-PETSc matrices");
+}
+
+
+
 template <typename T>
 void SparseMatrix<T>::read_matlab(const std::string & filename)
 {
@@ -747,6 +766,23 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
 #endif
 }
 
+
+
+template <typename T>
+void SparseMatrix<T>::read_petsc_binary(const std::string &)
+{
+  libmesh_not_implemented_msg
+    ("libMesh cannot read PETSc binary-format files into non-PETSc matrices");
+}
+
+
+
+template <typename T>
+void SparseMatrix<T>::read_petsc_hdf5(const std::string &)
+{
+  libmesh_not_implemented_msg
+    ("libMesh cannot read PETSc HDF5-format files into non-PETSc matrices");
+}
 
 
 

@@ -143,7 +143,9 @@ unit_tests_sources = \
 
 # Make sure any data goes in "make dist"
 datadir = $(install_dir)
-data = meshes/1_quad.bxt.gz \
+data = matrices/geom_1_extraction_op.m \
+       matrices/geom_1_extraction_op.petsc32 \
+       meshes/1_quad.bxt.gz \
        meshes/25_quad.bxt.gz \
        meshes/BlockWithHole_Patch9.bxt.gz \
        meshes/PlateWithHole_Patch8.bxt.gz \
@@ -160,8 +162,7 @@ data = meshes/1_quad.bxt.gz \
        meshes/tetgen_one_tet10.ele \
        meshes/tetgen_one_tet10.node
 
-unit_tests_sources += \
-  $(data)
+unit_tests_data = $(data)
 
 if LIBMESH_ENABLE_FPARSER
   unit_tests_sources += \
@@ -333,6 +334,7 @@ if LIBMESH_VPATH_BUILD
 
 .linkstamp:
 	-rm -f meshes && $(LN_S) -f $(srcdir)/meshes .
+	-rm -f matrices && $(LN_S) -f $(srcdir)/matrices .
 	$(AM_V_GEN)touch .linkstamp
 
   CLEANFILES += .linkstamp
