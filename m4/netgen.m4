@@ -5,12 +5,29 @@ AC_DEFUN([CONFIGURE_NETGEN],
 [
   AC_ARG_ENABLE(netgen,
                 AS_HELP_STRING([--enable-netgen],
-                               [build with NetGen mesh generation library support]),
+                               [build with Netgen mesh generation library support]),
                 [AS_CASE("${enableval}",
                          [yes], [enablenetgen=yes],
                          [no],  [enablenetgen=no],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-netgen)])],
                 [enablenetgen=no])
+
+  dnl Setting --enable-netgen-required causes an error to be emitted during
+  dnl configure if Netgen is not successfully configured (e.g. if it
+  dnl is missing dependencies).  This is useful for app codes which
+  dnl require tetrahedral meshing, since it prevents situations where
+  dnl libmesh is accidentally built without Netgen support (which may
+  dnl take a long time), and then the app fails to compile, requiring
+  dnl you to redo everything.
+  AC_ARG_ENABLE(netgen-required,
+                AS_HELP_STRING([--enable-netgen-required],
+                               [Error if NetGen is not detected by configure]),
+                [AS_CASE("${enableval}",
+                         [yes], [netgenrequired=yes
+                                 enablenetgen=yes],
+                         [no],  [netgenrequired=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-netgen-required)])],
+                [netgenrequired=no])
 
   dnl The Netgen API is distributed with libmesh, so we don't
   dnl currently have to guess where it might be installed, though we
@@ -55,7 +72,10 @@ AC_DEFUN([CONFIGURE_NETGEN],
                   AC_MSG_RESULT(<<< Configuring library with Netgen support >>>)
                 ],
                 [
-                  AC_MSG_RESULT(<<< Failed cmake configuration of Netgen submodule >>>)
+                  AS_IF([test "x$enablenetgenrequired" = "xyes"],
+                        [AC_MSG_ERROR(<<< Failed cmake configuration of user-required Netgen submodule >>>)],
+                        [AC_MSG_RESULT(<<< Failed cmake configuration of Netgen submodule >>>)])
+
                   enablenetgen=no
                 ])
         ],
