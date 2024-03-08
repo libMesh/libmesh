@@ -1147,7 +1147,11 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
     LIBMESH_CHKERR(ierr);
     ierr = SNESLineSearchSetType(linesearch, SNESLINESEARCHSHELL);
     LIBMESH_CHKERR(ierr);
+#if PETSC_RELEASE_GREATER_EQUALS(3, 21, 0)
+    ierr = SNESLineSearchShellSetApply(linesearch, libmesh_petsc_linesearch_shellfunc, this);
+#else
     ierr = SNESLineSearchShellSetUserFunc(linesearch, libmesh_petsc_linesearch_shellfunc, this);
+#endif
     LIBMESH_CHKERR(ierr);
   }
 
