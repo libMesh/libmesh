@@ -60,7 +60,7 @@ AC_DEFUN([CONFIGURE_NETGEN],
           dnl than a relative path, because cmake emits errors if
           dnl given the latter.  Guess why?
           AS_IF([(cd contrib/netgen/build && \
-                   cmake -DCMAKE_INSTALL_PREFIX:PATH=$my_top_builddir/contrib/netgen/install \
+                   cmake -DUSE_OCC=OFF -DCMAKE_INSTALL_PREFIX:PATH=$my_top_builddir/contrib/netgen/install \
                    $my_top_srcdir/contrib/netgen/netgen)],
                 [
                   NETGEN_INCLUDE="-I\$(top_srcdir)/contrib/netgen/ -I\$(top_builddir)/contrib/netgen/build/"
