@@ -220,6 +220,7 @@ void NetGenMeshInterface::triangulate ()
 
     // But really nglib shouldn't go nuts
     libmesh_assert(ngtype == NG_TET);
+    libmesh_ignore(ngtype);
 
     auto elem = this->_mesh.add_elem(Elem::build_with_id(TET4, i));
     for (auto n : make_range(4))
