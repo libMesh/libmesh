@@ -1968,7 +1968,10 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
 
   // Our current mesh should already reflect the desired assembly space
   libmesh_error_msg_if(this->n_nodes() != constraint_operator.m(),
-                       "Constraint operator matrix does not match this mesh");
+                       "Constraint operator matrix with " <<
+                       constraint_operator.m() <<
+                       "rows does not match this mesh with " <<
+                       this->n_nodes() << " nodes");
 
   // First, find what new unconstrained DoFs we need to add.  We can't
   // iterate over columns in a SparseMatrix, so we'll iterate over

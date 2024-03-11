@@ -98,6 +98,12 @@ public:
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( test1DCoarseningOperator );
   CPPUNIT_TEST( test1DCoarseningNewNodes );
+
+#  ifdef LIBMESH_HAVE_EXODUS_API
+    CPPUNIT_TEST( testCoreformGeom2 );
+    CPPUNIT_TEST( testCoreformGeom4 );
+    CPPUNIT_TEST( testCoreformGeom8 );
+#  endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -200,6 +206,59 @@ public:
     exact.compute_error("test", "u");
     Real err = exact.l2_error("test", "u");
     CPPUNIT_ASSERT_LESS(Real(TOLERANCE*TOLERANCE), err);
+  }
+
+
+  void testCoreform(const std::string & meshfile,
+                    const std::string & matrixfile,
+                    const Order order = FIRST)
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+
+    ExplicitSystem &sys =
+      es.add_system<LinearImplicitSystem> ("test");
+
+    sys.add_variable("u", order);
+    sys.attach_assemble_function (assemble_matrix_and_rhs);
+
+    // Make sure numbering matches our constraint operator matrix
+    mesh.allow_renumbering(false);
+
+    mesh.read(meshfile);
+
+    // For these matrices Coreform has been experimenting with PETSc
+    // solvers which take the transpose of what we expect, so we'll
+    // un-transpose here.
+    auto matrix = SparseMatrix<Number>::build (mesh.comm());
+    matrix->read_matlab(matrixfile);
+    matrix->get_transpose(*matrix);
+
+    mesh.copy_constraint_rows(*matrix);
+
+    es.init ();
+    sys.solve();
+  }
+
+
+  void testCoreformGeom2()
+  {
+    LOG_UNIT_TEST;
+    testCoreform("meshes/geom_2.exo", "matrices/geom_2_extraction_op.m");
+  }
+
+
+  void testCoreformGeom4()
+  {
+    LOG_UNIT_TEST;
+    testCoreform("meshes/geom_4.exo", "matrices/geom_4_extraction_op.m");
+  }
+
+
+  void testCoreformGeom8()
+  {
+    LOG_UNIT_TEST;
+    testCoreform("meshes/geom_8.exo", "matrices/geom_8_extraction_op.m");
   }
 
 
