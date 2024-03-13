@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // libmesh includes
+#include "libmesh/int_range.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/rb_parameters.h"
 #include "libmesh/utility.h"
@@ -431,33 +432,47 @@ RBParameters & RBParameters::operator+= (const RBParameters & rhs)
   return *this;
 }
 
-std::string RBParameters::get_string(unsigned int precision) const
+std::string RBParameters::get_string(unsigned precision, int max_values) const
 {
   std::stringstream param_stringstream;
-  param_stringstream << std::setprecision(precision) << std::scientific;
+  param_stringstream << std::setprecision(static_cast<int>(precision)) << std::scientific;
 
-  for (const auto & [key, vec] : _parameters)
-  {
-    param_stringstream << key << ": ";
-
-    // Write comma separated list of values for each param_name
-    std::string separator = "";
-    for (const auto & val : vec)
+  for (const auto & [param_name, sample_vec] : _parameters)
     {
-      param_stringstream << separator;
-      for (const auto & v : val)
-        param_stringstream << v << " ";
-      separator = ", ";
+      // Write the param name, followed by a comma-separated list of the sample/vector values.
+      param_stringstream << param_name << ": ";
+      std::string separator = "";
+      for (const auto & value_vec : sample_vec)
+        {
+          param_stringstream << separator;
+          if (value_vec.size() == 1)
+            param_stringstream << value_vec[0];
+          else
+            {
+              param_stringstream << "[ ";
+              for (const auto val_idx : index_range(value_vec))
+                {
+                  if (max_values < 0 || val_idx < static_cast<unsigned>(max_values))
+                    param_stringstream << value_vec[val_idx] << " ";
+                  else
+                    {
+                      param_stringstream << "... ";
+                      break;
+                    }
+                }
+              param_stringstream << "]";
+            }
+          separator = ", ";
+        }
+      param_stringstream << std::endl;
     }
-    param_stringstream << std::endl;
-  }
 
   return param_stringstream.str();
 }
 
-void RBParameters::print() const
+void RBParameters::print(unsigned precision, int max_values) const
 {
-  libMesh::out << get_string();
+  libMesh::out << get_string(precision, max_values);
 }
 
 }
