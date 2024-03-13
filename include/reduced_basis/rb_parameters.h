@@ -423,13 +423,15 @@ public:
    * Get a string that specifies the contents of this RBParameters object.
    * \p precision specifies the number of digits of precision we use
    * in scientific notation in the string.
+   * \p max_values is the max number of values to print out if the parameter
+   * is vector-valued. Set to negative value to print all.
    */
-  std::string get_string(unsigned int precision=6) const;
+  std::string get_string(unsigned precision=6, int max_values=5) const;
 
   /**
    * Print the parameters.
    */
-  void print() const;
+  void print(unsigned precision=6, int max_values=5) const;
 
 private:
 
