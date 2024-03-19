@@ -335,7 +335,7 @@ void PetscVector<T>::add (const T v_in)
 {
   this->_get_array(false);
 
-  for (numeric_index_type i=0; i<_local_size; i++)
+  for (const auto i : make_range(_local_size.load()))
     _values[i] += PetscScalar(v_in);
 }
 
@@ -617,7 +617,7 @@ PetscVector<T>::operator = (const std::vector<T> & v)
    */
   else
     {
-      for (numeric_index_type i=0; i<_local_size; i++)
+      for (const auto i : make_range(_local_size.load()))
         _values[i] = PS(v[i]);
     }
 

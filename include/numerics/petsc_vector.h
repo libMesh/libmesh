@@ -370,19 +370,31 @@ private:
    *
    * Only valid when _array_is_present
    */
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  mutable std::atomic<numeric_index_type> _first;
+#else
   mutable numeric_index_type _first;
+#endif
 
   /**
    * Last local index.
    *
    * Only valid when _array_is_present
    */
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  mutable std::atomic<numeric_index_type> _last;
+#else
   mutable numeric_index_type _last;
+#endif
 
   /**
    * Size of the local values from _get_array()
    */
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  mutable std::atomic<numeric_index_type> _local_size;
+#else
   mutable numeric_index_type _local_size;
+#endif
 
   /**
    * PETSc vector datatype to hold the local form of a ghosted vector.
