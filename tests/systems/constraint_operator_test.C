@@ -12,6 +12,7 @@
 #include <libmesh/quadrature.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/sparse_matrix.h>
+#include <libmesh/petsc_macro.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
