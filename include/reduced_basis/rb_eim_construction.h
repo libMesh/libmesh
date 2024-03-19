@@ -291,22 +291,26 @@ protected:
    *
    * If \p eim_point_data is not nullptr, then we add the extra point that is
    * specified rather than looking for the "optimal point" in \p interior_pf.
+   *
+   * @return true if \p side_pf is linearly dependent to the existing basis,
+   * and in this case we skip adding the basis function since we do not want
+   * to add linearly dependent data to the basis.
    */
-  void enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf,
+  bool enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf,
                                          bool add_basis_function,
                                          EimPointData * eim_point_data);
 
   /**
    * Implementation of enrich_eim_approximation() for the case of element nodes.
    */
-  void enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf,
+  bool enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf,
                                          bool add_basis_function,
                                          EimPointData * eim_point_data);
 
   /**
    * Implementation of enrich_eim_approximation() for the case of element interiors.
    */
-  void enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
+  bool enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
                                              bool add_basis_function,
                                              EimPointData * eim_point_data);
 

@@ -834,9 +834,25 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               // If exit_on_next_iteration==true then we do not add a basis function in
               // that case since in that case we only need to add data for the EIM error
               // indicator.
-              enrich_eim_approximation_on_sides(v,
-                                                /*add_basis_function*/ !exit_on_next_iteration,
-                                                eim_point_data.get());
+              bool is_linearly_dependent = enrich_eim_approximation_on_sides(v,
+                                                                             /*add_basis_function*/ !exit_on_next_iteration,
+                                                                             eim_point_data.get());
+
+              if (is_linearly_dependent && !is_zero_bf)
+                {
+                  // In this case we detected that v is actually linearly dependent and that is_zero_bf
+                  // was previously not correct --- it should have been true. We typically
+                  // catch this earlier (e.g. by checking rel_err) but in some cases we do not catch
+                  // this until we call the enrichment method. In this situation we update is_zero_bf
+                  // to true and call the enrichment again.
+                  is_zero_bf = true;
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+
+                  enrich_eim_approximation_on_sides(v,
+                                                    /*add_basis_function*/ !exit_on_next_iteration,
+                                                    eim_point_data.get());
+                }
+
               update_eim_matrices(/*set_error_indicator*/ exit_on_next_iteration);
             }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
@@ -884,9 +900,25 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               // If exit_on_next_iteration==true then we do not add a basis function in
               // that case since in that case we only need to add data for the EIM error
               // indicator.
-              enrich_eim_approximation_on_nodes(v,
-                                                /*add_basis_function*/ !exit_on_next_iteration,
-                                                eim_point_data.get());
+              bool is_linearly_dependent = enrich_eim_approximation_on_nodes(v,
+                                                                             /*add_basis_function*/ !exit_on_next_iteration,
+                                                                             eim_point_data.get());
+
+              if (is_linearly_dependent && !is_zero_bf)
+                {
+                  // In this case we detected that v is actually linearly dependent and that is_zero_bf
+                  // was previously not correct --- it should have been true. We typically
+                  // catch this earlier (e.g. by checking rel_err) but in some cases we do not catch
+                  // this until we call the enrichment method. In this situation we update is_zero_bf
+                  // to true and call the enrichment again.
+                  is_zero_bf = true;
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+
+                  enrich_eim_approximation_on_nodes(v,
+                                                    /*add_basis_function*/ !exit_on_next_iteration,
+                                                    eim_point_data.get());
+                }
+
               update_eim_matrices(/*set_error_indicator*/ exit_on_next_iteration);
             }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
@@ -934,9 +966,25 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               // If exit_on_next_iteration==true then we do not add a basis function in
               // that case since in that case we only need to add data for the EIM error
               // indicator.
-              enrich_eim_approximation_on_interiors(v,
-                                                    /*add_basis_function*/ !exit_on_next_iteration,
-                                                    eim_point_data.get());
+              bool is_linearly_dependent = enrich_eim_approximation_on_interiors(v,
+                                                                                 /*add_basis_function*/ !exit_on_next_iteration,
+                                                                                 eim_point_data.get());
+
+              if (is_linearly_dependent && !is_zero_bf)
+                {
+                  // In this case we detected that v is actually linearly dependent and that is_zero_bf
+                  // was previously not correct --- it should have been true. We typically
+                  // catch this earlier (e.g. by checking rel_err) but in some cases we do not catch
+                  // this until we call the enrichment method. In this situation we update is_zero_bf
+                  // to true and call the enrichment again.
+                  is_zero_bf = true;
+                  eim_point_data = std::make_unique<EimPointData>(get_random_point(v));
+
+                  enrich_eim_approximation_on_interiors(v,
+                                                        /*add_basis_function*/ !exit_on_next_iteration,
+                                                        eim_point_data.get());
+                }
+
               update_eim_matrices(/*set_error_indicator*/ exit_on_next_iteration);
             }
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
@@ -2170,7 +2218,7 @@ void RBEIMConstruction::enrich_eim_approximation(unsigned int training_index,
     }
 }
 
-void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf,
+bool RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & side_pf,
                                                           bool add_basis_function,
                                                           EimPointData * eim_point_data)
 {
@@ -2338,13 +2386,8 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
     {
       if (optimal_value == 0.)
         {
-          // Use libMesh::out to print the error message because we want to see this error message
-          // in this case that we're doing an extra basis enrichment for the error indicator and
-          // we hit the "zero basis function" error. In that case we catch the exception and we
-          // do not print the exception's error message directly, so we print the message here
-          // instead.
-          libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
-          libmesh_error_msg("Error in EIM basis enrichment");
+          libMesh::out << "Encountered linearly dependent data in EIM enrichment, hence skip adding new basis function" << std::endl;
+          return true;
         }
 
       // Scale local_pf so that its largest value is 1.0
@@ -2364,9 +2407,12 @@ void RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
                                        optimal_qp,
                                        optimal_point_perturbs,
                                        optimal_point_phi_i_qp);
+
+  // In this case we did not encounter a linearly dependent basis function, so return false
+  return false;
 }
 
-void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf,
+bool RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & node_pf,
                                                           bool add_basis_function,
                                                           EimPointData * eim_point_data)
 {
@@ -2459,13 +2505,8 @@ void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & no
     {
       if (optimal_value == 0.)
         {
-          // Use libMesh::out to print the error message because we want to see this error message
-          // in this case that we're doing an extra basis enrichment for the error indicator and
-          // we hit the "zero basis function" error. In that case we catch the exception and we
-          // do not print the exception's error message directly, so we print the message here
-          // instead.
-          libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
-          libmesh_error_msg("Error in EIM basis enrichment");
+          libMesh::out << "Encountered linearly dependent data in EIM enrichment, hence skip adding new basis function" << std::endl;
+          return true;
         }
 
       // Scale local_pf so that its largest value is 1.0
@@ -2480,9 +2521,12 @@ void RBEIMConstruction::enrich_eim_approximation_on_nodes(const NodeDataMap & no
                                        optimal_comp,
                                        optimal_node_id,
                                        optimal_boundary_id);
+
+  // In this case we did not encounter a linearly dependent basis function, so return false
+  return false;
 }
 
-void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
+bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & interior_pf,
                                                               bool add_basis_function,
                                                               EimPointData * eim_point_data)
 {
@@ -2649,13 +2693,8 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
     {
       if (optimal_value == 0.)
         {
-          // Use libMesh::out to print the error message because we want to see this error message
-          // in this case that we're doing an extra basis enrichment for the error indicator and
-          // we hit the "zero basis function" error. In that case we catch the exception and we
-          // do not print the exception's error message directly, so we print the message here
-          // instead.
-          libMesh::out << "Error in EIM basis enrichment: New EIM basis function should not be zero" << std::endl;
-          libmesh_error_msg("Error in EIM basis enrichment");
+          libMesh::out << "Encountered linearly dependent data in EIM enrichment, hence skip adding new basis function" << std::endl;
+          return true;
         }
 
       // Scale local_pf so that its largest value is 1.0
@@ -2676,6 +2715,9 @@ void RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                                   optimal_elem_type,
                                   optimal_JxW_all_qp,
                                   optimal_phi_i_all_qp);
+
+  // In this case we did not encounter a linearly dependent basis function, so return false
+  return false;
 }
 
 void RBEIMConstruction::update_eim_matrices(bool set_eim_error_indicator)
