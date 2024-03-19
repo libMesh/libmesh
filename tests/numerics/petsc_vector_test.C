@@ -3,11 +3,18 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 #include "numeric_vector_test.h"
+#include <libmesh/equation_systems.h>
+#include <libmesh/mesh_generation.h>
+#include <libmesh/linear_implicit_system.h>
+#include <libmesh/mesh.h>
+#include <libmesh/dof_map.h>
+#include <libmesh/elem.h>
 
 
 using namespace libMesh;
 
 class PetscVectorTest : public NumericVectorTest<PetscVector<Number>> {
+
 public:
   PetscVectorTest() :
     NumericVectorTest<PetscVector<Number>>() {
@@ -24,6 +31,8 @@ public:
   CPPUNIT_TEST( testGetArray );
 
   CPPUNIT_TEST( testPetscOperations );
+
+  CPPUNIT_TEST( testPetscVectorGetSetThread );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -128,6 +137,89 @@ public:
                               libMesh::Real(0.5),
                               libMesh::TOLERANCE*libMesh::TOLERANCE);
   }
+
+  void testPetscVectorGetSetThread()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+
+    LinearImplicitSystem & sys = es.add_system<LinearImplicitSystem> ("test");
+
+    sys.add_variable("u", FEType(0, MONOMIAL));
+
+    MeshTools::Generation::build_line (mesh,
+                                       50,
+                                       0., 1.,
+                                       EDGE2);
+    es.init();
+
+    *sys.solution = 1.0;
+
+    ConstElemRange active_local_elem_range(mesh.active_local_elements_begin(),
+                                           mesh.active_local_elements_end());
+    std::vector<dof_id_type> cache(mesh.parallel_n_elem());
+    for (const auto & elem : active_local_elem_range)
+    {
+      std::vector<dof_id_type> indices;
+      sys.get_dof_map().dof_indices(elem, indices, 0);
+      libmesh_assert(indices.size() == 1);
+      cache[elem->id()] = indices[0];
+    }
+
+    ConstMonomialGetSetThread test_thread(sys, cache);
+
+    Threads::parallel_for(active_local_elem_range, test_thread);
+
+    sys.solution->close();
+
+    const libMesh::dof_id_type first = sys.solution->first_local_index();
+    const libMesh::dof_id_type last  = sys.solution->last_local_index();
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real((*sys.solution)(n)),
+                              libMesh::Real(0.5),
+                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+  }
+
+private:
+
+  class ConstMonomialGetSetThread
+  {
+  public:
+    ConstMonomialGetSetThread (LinearImplicitSystem & system,
+                               const std::vector<dof_id_type> & cache)
+    :
+    _system(system),
+    _cache(cache)
+    {}
+
+    ConstMonomialGetSetThread (ConstMonomialGetSetThread & x,
+                               Threads::split /*split*/)
+    :
+    _system(x._system),
+    _cache(x._cache)
+    {}
+
+    void operator()(const ConstElemRange & range) const
+    {
+      PetscVector<Number> * solution =
+              dynamic_cast<PetscVector<Number> *>(_system.solution.get());
+      libmesh_assert(solution);
+
+      for (const auto & elem : range)
+      {
+        const auto modified_value = (*solution)(_cache[elem->id()]) / 2.0;
+        solution->set(_cache[elem->id()], modified_value);
+      }
+    }
+
+  private:
+    LinearImplicitSystem & _system;
+    const std::vector<dof_id_type> & _cache;
+  };
 
 };
 
