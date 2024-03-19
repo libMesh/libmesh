@@ -12,6 +12,7 @@
 #include <libmesh/quadrature.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/sparse_matrix.h>
+#include <libmesh/petsc_macro.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -99,11 +100,23 @@ public:
   CPPUNIT_TEST( test1DCoarseningOperator );
   CPPUNIT_TEST( test1DCoarseningNewNodes );
 
-#  ifdef LIBMESH_HAVE_EXODUS_API
-    CPPUNIT_TEST( testCoreformGeom2 );
-    CPPUNIT_TEST( testCoreformGeom4 );
-    CPPUNIT_TEST( testCoreformGeom8 );
-#  endif
+#ifdef LIBMESH_HAVE_EXODUS_API
+  // These tests seem to fail on older PETScs with the following error:
+  // [0]PETSC ERROR: Nonconforming object sizes
+  // [0]PETSC ERROR: Square matrix only for in-place
+  // [0]PETSC ERROR: See http://www.mcs.anl.gov/petsc/documentation/faq.html for trouble shooting.
+  // [0]PETSC ERROR: Petsc Release Version 3.8.0, unknown
+  // So we only run them if you have new enough PETSc. We
+  // don't know exactly how new of a PETSc is required, though,
+  // so for now it's anything greater than 3.8. See also:
+  // libMesh/libmesh#3803.
+#if PETSC_RELEASE_GREATER_THAN(3,8,0)
+  CPPUNIT_TEST( testCoreformGeom2 );
+  CPPUNIT_TEST( testCoreformGeom4 );
+  CPPUNIT_TEST( testCoreformGeom8 );
+#endif
+
+#endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
