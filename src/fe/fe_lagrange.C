@@ -361,6 +361,39 @@ void lagrange_nodal_soln(const Elem * elem,
               return;
             }
 
+          case PRISM21:
+            {
+              nodal_soln[20]  = (elem_soln[9] + elem_soln[10] + elem_soln[11])/Real(3);
+              libmesh_fallthrough();
+            }
+          case PRISM20:
+            {
+              if (type == PRISM20)
+                libmesh_assert_equal_to (nodal_soln.size(), 20);
+
+              for (int i=0; i != 18; ++i)
+                nodal_soln[i] = elem_soln[i];
+
+              nodal_soln[18]  = (elem_soln[0] + elem_soln[1] + elem_soln[2])/Real(3);
+              nodal_soln[19]  = (elem_soln[3] + elem_soln[4] + elem_soln[5])/Real(3);
+              return;
+            }
+
+          case PYRAMID18:
+            {
+              libmesh_assert_equal_to (nodal_soln.size(), 18);
+
+              for (int i=0; i != 14; ++i)
+                nodal_soln[i] = elem_soln[i];
+
+              nodal_soln[14] = (elem_soln[0] + elem_soln[1] + elem_soln[4])/Real(3);
+              nodal_soln[15] = (elem_soln[1] + elem_soln[2] + elem_soln[4])/Real(3);
+              nodal_soln[16] = (elem_soln[2] + elem_soln[3] + elem_soln[4])/Real(3);
+              nodal_soln[17] = (elem_soln[0] + elem_soln[3] + elem_soln[4])/Real(3);
+
+              libmesh_fallthrough();
+            }
+
           default:
             {
               // By default the element solution _is_ nodal, so just
