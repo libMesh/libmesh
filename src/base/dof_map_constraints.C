@@ -871,10 +871,13 @@ private:
     // hold those fixed and project boundary edges, then hold
     // those fixed and project boundary faces,
 
-    // Interpolate node values first. Note that we have a special
-    // case for nodes that have a boundary nodeset, since we do
-    // need to interpolate them directly, even if they're non-vertex
-    // nodes.
+    // Interpolate node values first.
+    //
+    // If we have non-vertex nodes that have a boundary nodeset, we
+    // need to interpolate them directly, but that had better be
+    // happening in the apply_lagrange_dirichlet_impl code path,
+    // because you *can't* interpolate to evaluate non-nodal FE
+    // coefficients.
     unsigned int current_dof = 0;
     for (unsigned int n=0; n!= sebi.n_nodes; ++n)
       {
@@ -900,14 +903,7 @@ private:
           (is_boundary_node_it == sebi.is_boundary_node_map.end() ||
            !is_boundary_node_it->second[n]);
 
-        // Same thing for nodesets
-        auto is_boundary_nodeset_it = sebi.is_boundary_nodeset_map.find(&dirichlet);
-        const bool not_boundary_nodeset =
-          (is_boundary_nodeset_it == sebi.is_boundary_nodeset_map.end() ||
-           !is_boundary_nodeset_it->second[n]);
-
-        if ((!elem->is_vertex(n) || not_boundary_node) &&
-            not_boundary_nodeset)
+        if (!elem->is_vertex(n) || not_boundary_node)
           {
             current_dof += nc;
             continue;
