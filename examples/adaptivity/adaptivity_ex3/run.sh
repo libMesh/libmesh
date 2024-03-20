@@ -33,6 +33,7 @@ run_example "$example_name" dimension=2 element_type=simplex approx_type=HIERARC
 run_example "$example_name" dimension=2 element_type=simplex approx_type=CLOUGH singularity=false approx_order=3 refinement_type=h max_r_steps=3
 run_example "$example_name" dimension=3 element_type=simplex extrusion=true approx_type=LAGRANGE approx_order=1 refinement_type=h max_r_steps=3
 run_example "$example_name" dimension=3 element_type=simplex extrusion=true approx_type=LAGRANGE approx_order=2 refinement_type=h max_r_steps=3
+run_example "$example_name" dimension=3 element_type=simplex extrusion=true complete=true approx_type=LAGRANGE approx_order=2 refinement_type=h max_r_steps=3
 run_example "$example_name" dimension=3 element_type=simplex extrusion=true complete=true approx_type=LAGRANGE approx_order=3 refinement_type=h max_r_steps=3
 
 # Examples to use for benchmarking
