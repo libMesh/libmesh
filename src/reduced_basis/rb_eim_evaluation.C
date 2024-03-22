@@ -2821,12 +2821,13 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
 
 void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
                                                       const QpDataMap & qp_data_map,
-                                                      const std::tuple<unsigned int,FEType,std::string> & eim_var_tuple)
+                                                      const std::tuple<unsigned int,unsigned int,FEType,std::string> & eim_var_tuple)
 {
   LOG_SCOPE("project_basis_function_onto_system()", "RBEIMEvaluation");
 
   libmesh_error_msg_if(sys.n_vars() == 0, "System must have at least one variable");
 
+  // TODO: Currently only implemented for the case of one variable in a variable group
   unsigned int var = std::get<0>(eim_var_tuple);
 
   FEMContext context(sys);
@@ -2916,7 +2917,7 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
   (*sys.solution) = current_local_soln;
 }
 
-const std::set<std::tuple<unsigned int,FEType,std::string>> & RBEIMEvaluation::get_eim_vars_to_project_and_write() const
+const std::vector<std::tuple<unsigned int,unsigned int,FEType,std::string>> & RBEIMEvaluation::get_eim_vars_to_project_and_write() const
 {
   return _eim_vars_to_project_and_write;
 }
@@ -2927,6 +2928,7 @@ void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
   if (get_eim_vars_to_project_and_write().empty())
     return;
 
+  unsigned int var_group_idx = 0;
   for (const auto & eim_var_tuple : get_eim_vars_to_project_and_write())
     {
       std::vector<std::unique_ptr<NumericVector<Number>>> projected_bfs;
@@ -2947,11 +2949,11 @@ void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
           projected_bfs_ptrs[i] = projected_bfs[i].get();
         }
 
-      auto eim_var = std::get<0>(eim_var_tuple);
       RBEvaluation::write_out_vectors(sys,
                                       projected_bfs_ptrs,
                                       directory_name,
-                                      "projected_bf_var_" + std::to_string(eim_var));
+                                      "projected_bf_vargroup_" + var_group_idx);
+      var_group_idx++;
     }
 }
 

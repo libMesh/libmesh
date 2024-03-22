@@ -520,12 +520,12 @@ public:
    */
   virtual void project_qp_data_map_onto_system(System & sys,
                                                const QpDataMap & bf_data,
-                                               const std::tuple<unsigned int,FEType,std::string> & eim_var_tuple);
+                                               const std::tuple<unsigned int,unsigned int,FEType,std::string> & eim_var_tuple);
 
   /**
    * Get _eim_vars_to_project_and_write.
    */
-  const std::set<std::tuple<unsigned int,FEType,std::string>> & get_eim_vars_to_project_and_write() const;
+  const std::vector<std::tuple<unsigned int,unsigned int,FEType,std::string>> & get_eim_vars_to_project_and_write() const;
 
   /**
    * Project all basis functions using project_qp_data_map_onto_system() and
@@ -601,17 +601,22 @@ public:
 protected:
 
   /**
-   * This set specifies which EIM variables will be projected and written
+   * This vector specifies which EIM variables will be projected and written
    * out in write_out_projected_basis_functions(). By default this is an empty
    * set, but can be updated in subclasses to specify the EIM variables that
    * are relevant for visualization.
    *
-   * For each variable we specify a tuple with the following data:
-   *  - variable number
+   * We identify groups of variables with one or more variables in a group.
+   * The purpose of using a group is often we plot multiple components of
+   * a tensor-valued or vector-valued quantity, so it makes sense to refer
+   * to the entire group of variables together in those cases. For each
+   * variable group we specify a tuple with the following data:
+   *  - First variable number in variable group
+   *  - Number of variables in group (indices are assumed to be contiguous)
    *  - FEType used in the projection of the data
-   *  - a property name that can be used to identify the type of data
+   *  - A property name that can be used to identify the type of data
    */
-  std::set<std::tuple<unsigned int,FEType,std::string>> _eim_vars_to_project_and_write;
+  std::vector<std::tuple<unsigned int,unsigned int,FEType,std::string>> _eim_vars_to_project_and_write;
 
   /**
    * This set that specifies which EIM variables will be scaled during EIM
