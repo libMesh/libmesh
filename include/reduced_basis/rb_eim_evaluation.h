@@ -43,6 +43,7 @@ class RBParametrizedFunction;
 class RBTheta;
 class System;
 class Elem;
+class FEType;
 
 /**
  * This class enables evaluation of an Empirical Interpolation Method (EIM)
@@ -513,16 +514,18 @@ public:
                                bool read_binary_basis_functions = true);
 
   /**
-   * Project variable \p var of \p bf_data into the solution vector of System.
+   * Project variable the specified variable of \p bf_data into the solution
+   * vector of System. This method is virtual so that it can be overridden in
+   * sub-classes, e.g. to perform a specialized type of projection.
    */
-  void project_qp_data_map_onto_system(System & sys,
-                                       const QpDataMap & bf_data,
-                                       unsigned int var);
+  virtual void project_qp_data_map_onto_system(System & sys,
+                                               const QpDataMap & bf_data,
+                                               const std::tuple<unsigned int,FEType,std::string> & eim_var_tuple);
 
   /**
    * Get _eim_vars_to_project_and_write.
    */
-  const std::set<unsigned int> & get_eim_vars_to_project_and_write() const;
+  const std::set<std::tuple<unsigned int,FEType,std::string>> & get_eim_vars_to_project_and_write() const;
 
   /**
    * Project all basis functions using project_qp_data_map_onto_system() and
@@ -602,8 +605,13 @@ protected:
    * out in write_out_projected_basis_functions(). By default this is an empty
    * set, but can be updated in subclasses to specify the EIM variables that
    * are relevant for visualization.
+   *
+   * For each variable we specify a tuple with the following data:
+   *  - variable number
+   *  - FEType used in the projection of the data
+   *  - a property name that can be used to identify the type of data
    */
-  std::set<unsigned int> _eim_vars_to_project_and_write;
+  std::set<std::tuple<unsigned int,FEType,std::string>> _eim_vars_to_project_and_write;
 
   /**
    * This set that specifies which EIM variables will be scaled during EIM
