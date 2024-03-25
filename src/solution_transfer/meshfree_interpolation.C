@@ -281,10 +281,22 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
 
   // Compute the interpolation weights & interpolated value
   const unsigned int n_fv = this->n_field_variables();
-  _vals.resize(n_fv); /**/ std::fill (_vals.begin(), _vals.end(), Number(0.));
+  _vals.resize(n_fv);
 
-  Real tot_weight = 0.;
-
+  std::fill (_vals.begin(), _vals.end(), Number(0.));
+  Real tot_weight(0.);
+  // The background value is optional
+  // If background value option is enabled, add it to the total weight
+  // If not, a "zero" weight is added
+  if (_background_eff_dist > 0.0)
+  {
+    const Number background_wt = _background_eff_dist * _background_eff_dist > std::numeric_limits<Real>::epsilon()
+                             ? 1.0 / std::pow(_background_eff_dist * _background_eff_dist, _half_power)
+                             : 0.0;
+    tot_weight += background_wt;
+    std::fill (_vals.begin(), _vals.end(), Number(_background_value * background_wt));
+  }
+  
   std::vector<Real>::const_iterator src_dist_sqr_it=src_dist_sqr.begin();
   std::vector<size_t>::const_iterator src_idx_it=src_indices.begin();
 

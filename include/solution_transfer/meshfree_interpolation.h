@@ -316,6 +316,8 @@ protected:
 
   const Real         _half_power;
   const unsigned int _n_interp_pts;
+  const Number       _background_value;
+  const Real         _background_eff_dist;
 
   /**
    * Temporary work array.  Object level scope to avoid cache thrashing.
@@ -330,13 +332,17 @@ public:
    */
   InverseDistanceInterpolation (const libMesh::Parallel::Communicator & comm_in,
                                 const unsigned int n_interp_pts = 8,
-                                const Real  power               = 2) :
+                                const Real  power               = 2,
+                                const Number background_value   = 0.,
+                                const Real  background_eff_dist = -1.0) :
     MeshfreeInterpolation(comm_in),
 #if LIBMESH_HAVE_NANOFLANN
     _point_list_adaptor(_src_pts),
 #endif
     _half_power(power/2.0),
-    _n_interp_pts(n_interp_pts)
+    _n_interp_pts(n_interp_pts),
+    _background_value(background_value),
+    _background_eff_dist(background_eff_dist)
   {}
 
   /**
