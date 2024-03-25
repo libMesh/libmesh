@@ -111,26 +111,43 @@ void TriangulatorInterface::elems_to_segments()
           point_id_map.emplace(*node, node->id());
         }
 
+      // We don't support directly generating Tri6, so for
+      // compatibility with future stitching we need to be working
+      // with first-order elements.  Let's get rid of any non-vertex
+      // nodes we just added.
+      for (Elem * elem : _mesh.element_ptr_range())
+        for (auto n : make_range(elem->n_vertices(), elem->n_nodes()))
+          point_id_map.erase(elem->point(n));
+
       // We'll steal the ordering calculation from
       // the MeshedHole code
       const TriangulatorInterface::MeshedHole mh { _mesh, this->_bdy_ids };
-
-      // And now we're done with elements.  Delete them lest they have
-      // dangling pointers to nodes we'll be deleting.
-      _mesh.clear_elems();
 
       // If we've specified only a subset of the mesh as our outer
       // boundary, then we may have nodes that don't actually fall
       // inside that boundary.  Triangulator code doesn't like Steiner
       // points that aren't inside the triangulation domain, so we
       // need to get rid of them.
+      //
+      // Also, if we're using Edge3 elements to define our outer
+      // boundary, we're only dealing with their 2 end nodes and we'll
+      // need to get rid of their central nodes.
       std::unordered_set<Node *> nodes_to_delete;
+
+      for (Elem * elem : _mesh.element_ptr_range())
+        for (auto n : make_range(elem->n_vertices(), elem->n_nodes()))
+          nodes_to_delete.insert(elem->node_ptr(n));
+
       if (!this->_bdy_ids.empty())
         {
           for (auto & node : _mesh.node_ptr_range())
             if (!mh.contains(*node))
               nodes_to_delete.insert(node);
         }
+
+      // And now we're done with elements.  Delete them lest they have
+      // dangling pointers to nodes we'll be deleting.
+      _mesh.clear_elems();
 
       // Make segments from boundary nodes; also make sure we don't
       // delete them.
