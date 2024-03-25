@@ -25,6 +25,8 @@
 // Local Includes
 #include "libmesh/libmesh.h"
 
+#include "libmesh/meshfree_interpolation.h"
+
 // C++ includes
 #include <set>
 #include <vector>
@@ -242,6 +244,25 @@ public:
   void attach_region_list(const std::vector<Region*> * regions) { _regions = regions; }
 
   /**
+  *  Generate an auto area function based on spacing of boundary points.
+  */
+  void generate_auto_area_function(const Parallel::Communicator &comm,
+                                   const unsigned int num_nearest_pts,
+                                   const unsigned int power,
+                                   const Number background_value,
+                                   const Real  background_eff_dist);
+  
+  /**
+  *  Whether or not an auto area function has been generated.
+  */
+  bool has_auto_area_function() {return _auto_area_function != nullptr;}
+  
+  /**
+  *  Caluclate the local desired area based on the auto area function.
+  */
+  Real get_auto_desired_area(const Point &p);
+
+  /**
    * A set of ids to allow on the outer boundary loop: interpreted as
    * boundary ids of 2D elements and/or subdomain ids of 1D edges.  If
    * this is empty, then the outer boundary may be constructed from
@@ -361,6 +382,11 @@ protected:
    * Flag which tells if we want to check hole geometry
    */
   bool _verify_hole_boundaries;
+
+  /**
+  * The auto area function based on the spacing of boundary points
+  */
+  std::unique_ptr<InverseDistanceInterpolation<3>> _auto_area_function;
 };
 
 } // namespace libMesh

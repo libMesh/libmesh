@@ -54,7 +54,8 @@ TriangulatorInterface::TriangulatorInterface(UnstructuredMesh & mesh)
     _triangulation_type(GENERATE_CONVEX_HULL),
     _insert_extra_points(false),
     _smooth_after_generating(true),
-    _quiet(true)
+    _quiet(true),
+    _auto_area_function(nullptr)
 {}
 
 
@@ -312,6 +313,68 @@ unsigned int TriangulatorInterface::total_hole_points()
     }
 
   return n_hole_points;
+}
+
+void TriangulatorInterface::generate_auto_area_function(const Parallel::Communicator &comm,
+                                                        const unsigned int num_nearest_pts,
+                                                        const unsigned int power,
+                                                        const Number background_value,
+                                                        const Real  background_eff_dist)
+{
+  // Get the hole mesh of the outer boundary
+  // Holes should already be attached if applicable when this function is called
+  const TriangulatorInterface::MeshedHole bdry_mh { _mesh, this->_bdy_ids };
+  // Points and target element sizes for the interpolation
+  std::vector<Point> function_points;
+  std::vector<Real> function_sizes;
+  // Collect all the centroid points of the outer boundary segments
+  // and the corresponding element sizes
+  for (unsigned int i = 0; i < bdry_mh.n_points(); i++)
+  {
+    function_points.push_back((bdry_mh.point(i) + bdry_mh.point((i + 1) % bdry_mh.n_points())) /
+                              2.0);
+    function_sizes.push_back(
+        (bdry_mh.point(i) - bdry_mh.point((i + 1) % bdry_mh.n_points())).norm());
+  }
+  // If holes are present, do the same for the hole boundaries
+  if(_holes)
+    for (const Hole * hole : *_holes)
+    {
+      for (unsigned int i = 0; i < hole->n_points(); i++)
+      {
+        function_points.push_back(
+            (hole->point(i) + hole->point((i + 1) % hole->n_points())) / 2.0);
+        function_sizes.push_back(
+            (hole->point(i) - hole->point((i + 1) % hole->n_points())).norm());
+      }
+    }
+  
+  // We use the 150% area of the equilateral triangle with the same side length as the segment as the target size
+  // This might be adjusted in future versions
+  std::for_each(
+      function_sizes.begin(), function_sizes.end(), [](Real & a) { a = a * a * 1.5 * std::sqrt(3.0) / 4.0; });
+  // Use the inverse distance interpolation to interpolate the target element size
+  _auto_area_function = std::make_unique<InverseDistanceInterpolation<3>>(
+    comm, std::min(function_points.size(), (unsigned long)num_nearest_pts), power, background_value, background_eff_dist);
+  std::vector<std::string> field_vars{"f"};
+  _auto_area_function->set_field_variables(field_vars);
+  _auto_area_function->get_source_points() = function_points;
+  _auto_area_function->get_source_vals() = function_sizes;
+  _auto_area_function->prepare_for_use();    
+}
+
+Real TriangulatorInterface::get_auto_desired_area(const Point &p)
+{
+  libmesh_assert(_auto_area_function);
+  std::vector<Point> target_pts;
+  std::vector<Real> target_vals;
+
+  target_pts.push_back(p);
+  target_vals.resize(1);
+
+  _auto_area_function->interpolate_field_data(_auto_area_function->field_variables(), target_pts, target_vals);
+
+  return target_vals.front();
 }
 
 } // namespace libMesh
