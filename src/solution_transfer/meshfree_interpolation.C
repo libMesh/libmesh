@@ -296,7 +296,7 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
     tot_weight += background_wt;
     std::fill (_vals.begin(), _vals.end(), Number(_background_value * background_wt));
   }
-  
+
   std::vector<Real>::const_iterator src_dist_sqr_it=src_dist_sqr.begin();
   std::vector<size_t>::const_iterator src_idx_it=src_indices.begin();
 
