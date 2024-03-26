@@ -789,7 +789,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
   mesh.find_neighbors();
 
   if (this->desired_area() == 0 &&
-      this->get_desired_area_function() == nullptr)
+      this->get_desired_area_function() == nullptr &&
+      !this->has_auto_area_function())
     return false;
 
   BoundaryInfo & boundary_info = _mesh.get_boundary_info();
@@ -1485,13 +1486,14 @@ bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
 
   // If this isn't a question, why are we here?
   libmesh_assert(min_area_target > 0 ||
-                 area_func != nullptr);
+                 area_func != nullptr ||
+                 this->has_auto_area_function());
 
   const Real area = elem.volume();
 
   // If we don't have position-dependent area targets we can make a
   // decision quickly
-  if (!area_func)
+  if (!area_func && !this->has_auto_area_function())
     return (area > min_area_target);
 
   // If we do?
@@ -1500,7 +1502,8 @@ bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
   // vertices first
   for (auto v : make_range(elem.n_vertices()))
     {
-      const Real local_area_target = (*area_func)(elem.point(v));
+      // If we have an auto area function, we'll use it and override other area options
+      const Real local_area_target = this->has_auto_area_function() ? this->get_auto_desired_area(elem.point(v)) : (*area_func)(elem.point(v));
       libmesh_error_msg_if
         (local_area_target <= 0,
          "Non-positive desired element areas are unachievable");
