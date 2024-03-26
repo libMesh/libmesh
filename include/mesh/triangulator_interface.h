@@ -260,12 +260,12 @@ public:
                                    const unsigned int power,
                                    const Number background_value,
                                    const Real  background_eff_dist);
-  
+
   /**
   *  Whether or not an auto area function has been generated.
   */
   bool has_auto_area_function() {return _auto_area_function != nullptr;}
-  
+
   /**
   *  Caluclate the local desired area based on the auto area function.
   */

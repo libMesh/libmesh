@@ -448,7 +448,7 @@ void TriangulatorInterface::generate_auto_area_function(const Parallel::Communic
             (hole->point(i) - hole->point((i + 1) % hole->n_points())).norm());
       }
     }
-  
+
   // We use the 150% area of the equilateral triangle with the same side length as the segment as the target size
   // This might be adjusted in future versions
   std::for_each(
@@ -460,7 +460,7 @@ void TriangulatorInterface::generate_auto_area_function(const Parallel::Communic
   _auto_area_function->set_field_variables(field_vars);
   _auto_area_function->get_source_points() = function_points;
   _auto_area_function->get_source_vals() = function_sizes;
-  _auto_area_function->prepare_for_use();    
+  _auto_area_function->prepare_for_use();
 }
 
 Real TriangulatorInterface::get_auto_desired_area(const Point &p)
