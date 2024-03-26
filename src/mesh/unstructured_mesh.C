@@ -1205,15 +1205,15 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
           libmesh_assert(current_elem->interior_parent());
         }
     }
-
 #endif // AMR
-
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_neighbors(*this,
                                             !reset_remote_elements);
   MeshTools::libmesh_assert_valid_amr_interior_parents(*this);
 #endif
+
+  this->_preparation.has_neighbor_ptrs = true;
 }
 
 
@@ -1473,7 +1473,7 @@ void UnstructuredMesh::all_first_order ()
    * elements, so that the node ids
    * are correct
    */
-  if (!this->_is_prepared)
+  if (this->is_prepared())
     this->renumber_nodes_and_elements ();
 
   /**
