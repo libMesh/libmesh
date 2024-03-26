@@ -39,6 +39,13 @@ class Elem;
 class MeshBase;
 
 /**
+ * The type of enforcement of condition; strong(default) = constraint matrix
+ */
+enum class EnforcementType
+  { STRONG_ENFORCEMENT=0,
+    WEAK_ENFORCEMENT=1 };
+
+/**
  * The base class for defining periodic boundaries.
  *
  * \author Roy Stogner
@@ -126,6 +133,16 @@ public:
    */
   const std::set<unsigned int> & get_variables() const;
 
+  /**
+   * Get the enforcement type.
+   */
+  const EnforcementType & get_enforcement_type() const;
+
+  /**
+   * Set the enforcement type.
+   */
+  void set_enforcement_type(const EnforcementType & e_type);
+
 protected:
 
   /**
@@ -144,6 +161,8 @@ protected:
    * pointer is treated as equivalent to the identity matrix.
    */
   std::unique_ptr<DenseMatrix<Real>> _transformation_matrix;
+
+  EnforcementType _enforcement_type;
 
 };
 
