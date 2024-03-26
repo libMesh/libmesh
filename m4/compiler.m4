@@ -28,10 +28,10 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
                         [
                           AC_CHECK_PROGS(LOCAL_CC, [mpicxx mpiCC mpicc], [], ["$MPI/bin"])
                           AS_IF([test -z "$LOCAL_CC"],
-                                [AS_ECHO(["None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi compiler wrappers"])],
+                                [AS_ECHO(["None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi C compiler wrappers"])],
                                 [MPI_USING_WRAPPERS=1;CC="$MPI/bin/$LOCAL_CC"])
                         ],
-                        [AS_ECHO(["An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi compiler wrappers"])])
+                        [AS_ECHO(["An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi C compiler wrappers"])])
                 ],
                 [
                   dnl No MPI directory specified. If we have PETSc, let's try to snoop some
@@ -56,7 +56,6 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
 
   dnl If we still don't have a CC set then we will try to pick one up from CC_TRY_LIST
   AC_PROG_CC([$CC_TRY_LIST])
-
 
   # --------------------------------------------------------------
   # libMesh itself is not written in any Fortran and does not need
@@ -149,10 +148,10 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
                         [
                           AC_CHECK_PROGS(LOCAL_CXX, [mpicxx mpiCC mpicc], [], ["$MPI/bin"])
                           AS_IF([test -z "$LOCAL_CXX"],
-                                [AS_ECHO(["None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi compiler wrappers"])],
+                                [AS_ECHO(["None of the wrappers we look for exist in $MPI/bin. We will not try to use mpi C++ compiler wrappers"])],
                                 [MPI_USING_WRAPPERS=1;CXX="$MPI/bin/$LOCAL_CXX"])
                         ],
-                        [AS_ECHO(["An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi compiler wrappers"])])
+                        [AS_ECHO(["An MPI directory was specified, but $MPI/bin does not exist. We will not try to use mpi C++ compiler wrappers"])])
                 ],
                 [
                   dnl No MPI directory specified. If we have PETSc, let's try to snoop some
