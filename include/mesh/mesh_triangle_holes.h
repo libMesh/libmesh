@@ -64,9 +64,22 @@ public:
   virtual unsigned int n_points() const = 0;
 
   /**
+   * The number of geometric midpoints along *each* of the sides
+   * defining the hole.
+   */
+  virtual unsigned int n_midpoints() const { return 0; }
+
+  /**
    * Return the nth point defining the hole.
    */
   virtual Point point(const unsigned int n) const = 0;
+
+  /**
+   * Return the midpoint \p m along the side \p n defining the hole.
+   */
+  virtual Point midpoint(const unsigned int /* m */,
+                         const unsigned int /* n */) const
+  { libmesh_error(); /* by default holes are polygonal */ }
 
   /**
    * Return an (arbitrary) point which lies inside the hole.
@@ -75,11 +88,17 @@ public:
 
   /**
    * Return true iff \p p lies inside the hole.
+   *
+   * This method currently does not take any higher-order hole
+   * geometry into account, but treats the hole as a polygon.
    */
   bool contains(Point p) const;
 
   /**
    * Return the area of the hole
+   *
+   * This method currently does not take any higher-order hole
+   * geometry into account, but treats the hole as a polygon.
    */
   Real area() const;
 
@@ -87,6 +106,9 @@ public:
    * Return a vector with right-hand-rule orientation and length of
    * twice area() squared.  This is useful for determining
    * orientation of non-planar or non-counter-clockwise holes.
+   *
+   * This method currently does not take any higher-order hole
+   * geometry into account, but treats the hole as a polygon.
    */
   RealGradient areavec() const;
 
@@ -330,7 +352,12 @@ public:
 
   virtual unsigned int n_points() const override;
 
+  virtual unsigned int n_midpoints() const override;
+
   virtual Point point(const unsigned int n) const override;
+
+  virtual Point midpoint(const unsigned int m,
+                         const unsigned int n) const override;
 
   virtual Point inside() const override;
 
@@ -346,6 +373,14 @@ private:
    * The sorted vector of points which makes up the hole.
    */
   std::vector<Point> _points;
+
+  /**
+   * The sorted vector of midpoints in between points along the edges
+   * of the hole.  For a hole with m midpoints per edge, between
+   * _points[n] and _points[n+1] lies _midpoints[n*m] through
+   * _midpoints[n*m+m-1]
+   */
+  std::vector<Point> _midpoints;
 };
 
 
