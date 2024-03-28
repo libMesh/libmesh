@@ -373,29 +373,38 @@ void System::project_vector (const NumericVector<Number> & old_v,
           vector_vars.push_back(var);
       }
 
-      // Use a typedef to make the calling sequence for parallel_for() a bit more readable
-      typedef
-        GenericProjector<OldSolutionValue<Number,   &FEMContext::point_value>,
-                         OldSolutionValue<Gradient, &FEMContext::point_gradient>,
-                         Number, VectorSetAction<Number>> FEMProjector;
-
-      OldSolutionValue<Number,   &FEMContext::point_value>    f(*this, old_vector, &regular_vars);
-      OldSolutionValue<Gradient, &FEMContext::point_gradient> g(*this, old_vector, &regular_vars);
       VectorSetAction<Number> setter(new_vector);
 
-      FEMProjector projector(*this, f, &g, setter, regular_vars);
-      projector.project(active_local_elem_range);
+      if (!regular_vars.empty())
+        {
+          // Use a typedef to make the calling sequence for parallel_for() a bit more readable
+          typedef
+            GenericProjector<OldSolutionValue<Number,   &FEMContext::point_value>,
+                             OldSolutionValue<Gradient, &FEMContext::point_gradient>,
+                             Number, VectorSetAction<Number>> FEMProjector;
 
-      typedef
-        GenericProjector<OldSolutionValue<Gradient,   &FEMContext::point_value>,
-                         OldSolutionValue<Tensor, &FEMContext::point_gradient>,
-                         Gradient, VectorSetAction<Number>> FEMVectorProjector;
+          OldSolutionValue<Number,   &FEMContext::point_value>
+            f(*this, old_vector, &regular_vars);
+          OldSolutionValue<Gradient, &FEMContext::point_gradient>
+            g(*this, old_vector, &regular_vars);
 
-      OldSolutionValue<Gradient, &FEMContext::point_value> f_vector(*this, old_vector, &vector_vars);
-      OldSolutionValue<Tensor, &FEMContext::point_gradient> g_vector(*this, old_vector, &vector_vars);
+          FEMProjector projector(*this, f, &g, setter, regular_vars);
+          projector.project(active_local_elem_range);
+        }
 
-      FEMVectorProjector vector_projector(*this, f_vector, &g_vector, setter, vector_vars);
-      vector_projector.project(active_local_elem_range);
+      if (!vector_vars.empty())
+        {
+          typedef
+            GenericProjector<OldSolutionValue<Gradient,   &FEMContext::point_value>,
+                             OldSolutionValue<Tensor, &FEMContext::point_gradient>,
+                             Gradient, VectorSetAction<Number>> FEMVectorProjector;
+
+          OldSolutionValue<Gradient, &FEMContext::point_value> f_vector(*this, old_vector, &vector_vars);
+          OldSolutionValue<Tensor, &FEMContext::point_gradient> g_vector(*this, old_vector, &vector_vars);
+
+          FEMVectorProjector vector_projector(*this, f_vector, &g_vector, setter, vector_vars);
+          vector_projector.project(active_local_elem_range);
+        }
 
       // Copy the SCALAR dofs from old_vector to new_vector
       // Note: We assume that all SCALAR dofs are on the
