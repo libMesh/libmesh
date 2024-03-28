@@ -42,6 +42,7 @@ class RBParameters;
 class RBParametrizedFunction;
 class RBTheta;
 class System;
+class EquationSystems;
 class Elem;
 class FEType;
 
@@ -531,7 +532,7 @@ public:
    * Project all basis functions using project_qp_data_map_onto_system() and
    * then write out the resulting vectors.
    */
-  void write_out_projected_basis_functions(System & sys,
+  void write_out_projected_basis_functions(EquationSystems & es,
                                            const std::string & directory_name = "offline_data");
 
   /**

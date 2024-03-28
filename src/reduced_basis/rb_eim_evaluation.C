@@ -30,6 +30,7 @@
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/elem.h"
 #include "libmesh/system.h"
+#include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/boundary_info.h"
@@ -2922,7 +2923,7 @@ const std::vector<std::tuple<unsigned int,unsigned int,FEType,std::string>> & RB
   return _eim_vars_to_project_and_write;
 }
 
-void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
+void RBEIMEvaluation::write_out_projected_basis_functions(EquationSystems & es,
                                                           const std::string & directory_name)
 {
   if (get_eim_vars_to_project_and_write().empty())
@@ -2932,6 +2933,10 @@ void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
   for (const auto & eim_var_tuple : get_eim_vars_to_project_and_write())
     {
       std::vector<std::unique_ptr<NumericVector<Number>>> projected_bfs;
+
+      const auto & sys_name = std::get<3>(eim_var_tuple);
+      System & sys = es.get_system(sys_name);
+
       for (unsigned int bf_index : make_range(get_n_basis_functions()))
         {
           project_qp_data_map_onto_system(
@@ -2952,7 +2957,7 @@ void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
       RBEvaluation::write_out_vectors(sys,
                                       projected_bfs_ptrs,
                                       directory_name,
-                                      "projected_bf_vargroup_" + var_group_idx);
+                                      "projected_bf_vargroup_" + std::to_string(var_group_idx));
       var_group_idx++;
     }
 }
