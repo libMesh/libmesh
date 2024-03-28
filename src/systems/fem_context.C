@@ -86,7 +86,9 @@ FEMContext::FEMContext (const System & sys,
 FEType FEMContext::find_hardest_fe_type()
 {
   const System & sys = this->get_system();
-  FEType hardest_fe_type = sys.variable_type(0);
+  FEType hardest_fe_type =
+    sys.variable_type(_active_vars ?
+                      (*_active_vars)[0] : 0);
 
   auto check_var = [&hardest_fe_type, &sys](unsigned int v)
     {
