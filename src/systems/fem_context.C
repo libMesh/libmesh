@@ -68,6 +68,7 @@ FEMContext::FEMContext (const System & sys,
 {
   if (active_vars)
     {
+      libmesh_assert(!active_vars->empty());
       auto vars_copy =
         std::make_unique<std::vector<unsigned int>>(*active_vars);
 
