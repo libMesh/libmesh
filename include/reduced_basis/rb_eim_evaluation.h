@@ -28,6 +28,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/rb_parametrized_function.h"
+#include "libmesh/fe_type.h"
 
 // C++ includes
 #include <memory>
@@ -44,7 +45,42 @@ class RBTheta;
 class System;
 class EquationSystems;
 class Elem;
-class FEType;
+
+/**
+ * This struct encapsulates data that specifies how we will
+ * perform plotting for EIM variable groups.
+ */
+struct EimVargroupPlottingInfo
+{
+  /**
+   * The index for the first EIM variable in this variable group.
+   */
+  unsigned int first_eim_var_index;
+
+  /**
+   * The number of EIM variables in the group. The variables
+   * are assumed to be numbered contiguously.
+   */
+  unsigned int n_eim_vars;
+
+  /**
+   * The FEType for the variables in this group.
+   */
+  FEType eim_var_fe_type;
+
+  /**
+   * The name of the System we use for plotting this EIM variable group.
+   */
+  std::string eim_sys_name;
+
+  /**
+   * A string that specifies how we plot this variable. This string
+   * will be interpreted as needing in subclasses that perform the
+   * plotting. Some plotting options are whether we extrapolate data
+   * or copy data from qps to nodes.
+   */
+  std::string plotting_type;
+};
 
 /**
  * This class enables evaluation of an Empirical Interpolation Method (EIM)
@@ -521,12 +557,12 @@ public:
    */
   virtual void project_qp_data_map_onto_system(System & sys,
                                                const QpDataMap & bf_data,
-                                               const std::tuple<unsigned int,unsigned int,FEType,std::string> & eim_var_tuple);
+                                               const EimVargroupPlottingInfo & eim_vargroup);
 
   /**
    * Get _eim_vars_to_project_and_write.
    */
-  const std::vector<std::tuple<unsigned int,unsigned int,FEType,std::string>> & get_eim_vars_to_project_and_write() const;
+  const std::vector<EimVargroupPlottingInfo> & get_eim_vars_to_project_and_write() const;
 
   /**
    * Project all basis functions using project_qp_data_map_onto_system() and
@@ -610,14 +646,9 @@ protected:
    * We identify groups of variables with one or more variables in a group.
    * The purpose of using a group is often we plot multiple components of
    * a tensor-valued or vector-valued quantity, so it makes sense to refer
-   * to the entire group of variables together in those cases. For each
-   * variable group we specify a tuple with the following data:
-   *  - First variable number in variable group
-   *  - Number of variables in group (indices are assumed to be contiguous)
-   *  - FEType used in the projection of the data
-   *  - A property name that can be used to identify the type of data
+   * to the entire group of variables together in those cases.
    */
-  std::vector<std::tuple<unsigned int,unsigned int,FEType,std::string>> _eim_vars_to_project_and_write;
+  std::vector<EimVargroupPlottingInfo> _eim_vars_to_project_and_write;
 
   /**
    * This set that specifies which EIM variables will be scaled during EIM
