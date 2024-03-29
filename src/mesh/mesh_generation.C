@@ -1753,17 +1753,31 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // with the ElemType.
   if (mesh.mesh_dimension() == 1)
     {
-      if (type==HEX8 || type==HEX27)
+      switch (type)
+      {
+      case HEX8:
+      case HEX27:
         mesh.set_mesh_dimension(3);
-
-      else if (type==TRI3 || type==QUAD4)
+        break;
+      case TRI3:
+      case TRI6:
+      case TRI7:
+      case QUAD4:
+      case QUAD8:
+      case QUAD9:
         mesh.set_mesh_dimension(2);
-
-      else if (type==EDGE2 || type==EDGE3 || type==EDGE4 || type==INVALID_ELEM)
+        break;
+      case EDGE2:
+      case EDGE3:
+      case EDGE4:
         mesh.set_mesh_dimension(1);
-
-      else
-        libmesh_error_msg("build_sphere(): Please specify a mesh dimension or a valid ElemType (EDGE{2,3,4}, TRI3, QUAD4, HEX{8,27})");
+        break;
+      case INVALID_ELEM:
+        // Just keep the existing dimension
+        break;
+      default:
+        libmesh_error_msg("build_sphere(): Please specify a mesh dimension or a valid ElemType (EDGE{2,3,4}, TRI{3,6,7}, QUAD{4,8,9}, HEX{8,27})");
+      }
     }
 
   BoundaryInfo & boundary_info = mesh.get_boundary_info();
