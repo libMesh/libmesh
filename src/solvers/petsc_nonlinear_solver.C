@@ -658,7 +658,7 @@ void PetscNonlinearSolver<T>::init (const char * name)
       if (_default_monitor)
         {
           ierr = SNESMonitorSet (_snes, libmesh_petsc_snes_monitor,
-                                 this, PETSC_NULL);
+                                 this, LIBMESH_PETSC_NULLPTR);
           LIBMESH_CHKERR(ierr);
         }
 

@@ -322,7 +322,8 @@ SlepcEigenSolver<T>::_solve_standard_helper(Mat mat,
 
   for (PetscInt i=0; i<nconv; i++ )
     {
-      ierr = EPSGetEigenpair(_eps, i, &kr, &ki, PETSC_NULL, PETSC_NULL);
+      ierr = EPSGetEigenpair(_eps, i, &kr, &ki, LIBMESH_PETSC_NULLPTR,
+                             LIBMESH_PETSC_NULLPTR);
       LIBMESH_CHKERR(ierr);
 
 #if SLEPC_VERSION_LESS_THAN(3,6,0)
