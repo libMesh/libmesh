@@ -1,3 +1,12 @@
+1.7.1 -> 1.7.3
+  * PETSc support
+    - Full compatibility with PETSc 3.18 and 3.19
+1.7.0 -> 1.7.1
+  * PETSc support
+    - Avoid using AC_CHECK_HEADER to search for petscversion.h
+    - Full compatibility with PETSc 3.17
+    - Remove method deprecated in C++17
+    - Compatibility fix for MS VC 2019
 1.6.2 -> 1.7.0
   * Benchmarking support
     - Add benchmark_example() macro, $LIBMESH_BENCHMARK env
