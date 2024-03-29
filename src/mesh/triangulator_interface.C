@@ -29,6 +29,7 @@
 #include "libmesh/mesh_triangle_holes.h"
 #include "libmesh/mesh_triangle_wrapper.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_order.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/utility.h"
 
@@ -160,6 +161,8 @@ void TriangulatorInterface::elems_to_segments()
           const Point next_pt = mh.point((np+i+1)%np);
           const dof_id_type id1 = libmesh_map_find(point_id_map, next_pt);
           this->segments.emplace_back(id0, id1);
+          for (auto m : make_range(mh.n_midpoints()))
+            this->segment_midpoints.emplace_back(mh.midpoint(m, i));
         }
 
       for (Node * node : nodes_to_delete)
@@ -260,6 +263,102 @@ void TriangulatorInterface::insert_any_extra_boundary_points()
             }
           this->segments.emplace_back(current_id,
                                       end_node->id());
+        }
+    }
+}
+
+
+void TriangulatorInterface::increase_triangle_order()
+{
+  switch (_elem_type)
+    {
+    case TRI3:
+    // Nothing to do if we're not requested to increase order
+      return;
+    case TRI6:
+      _mesh.all_second_order();
+      break;
+    case TRI7:
+      _mesh.all_complete_order();
+      break;
+    default:
+      libmesh_not_implemented();
+    }
+
+  // If we have any midpoint location data, we'll want to look it up
+  // by point.  all_midpoints[{p, m}] will be the mth midpoint
+  // location following after point p (when traversing a triangle
+  // counter-clockwise)
+  std::map<std::pair<Point, unsigned int>, Point> all_midpoints;
+  unsigned int n_midpoints =
+    this->segment_midpoints.size() / this->segments.size();
+  libmesh_assert_equal_to(this->segments.size() * n_midpoints,
+                          this->segment_midpoints.size());
+  for (auto m : make_range(n_midpoints))
+    for (auto i : make_range(this->segments.size()))
+      {
+        const Point & p = _mesh.point(this->segments[i].first);
+        all_midpoints[{p,m}] =
+          this->segment_midpoints[i*n_midpoints+m];
+      }
+
+  if (_holes)
+    for (const Hole * hole : *_holes)
+      {
+        if (!hole->n_midpoints())
+          continue;
+        if (!n_midpoints)
+          n_midpoints = hole->n_midpoints();
+        else if (hole->n_midpoints() != n_midpoints)
+          libmesh_not_implemented_msg
+            ("Differing boundary midpoint counts " <<
+             hole->n_midpoints() << " and " << n_midpoints);
+
+        // Our inner holes are expected to have points in
+        // counter-clockwise order, which is backwards from how we
+        // want to traverse them when iterating in counter-clockwise
+        // order over a triangle, so we'll need to reverse our maps
+        // carefully here.
+        const auto n_hole_points = hole->n_points();
+        libmesh_assert(n_hole_points);
+        for (auto m : make_range(n_midpoints))
+          {
+            for (auto i : make_range(n_hole_points-1))
+              {
+                const Point & p = hole->point(i+1);
+                all_midpoints[{p,m}] = hole->midpoint(n_midpoints-m-1, i);
+              }
+            const Point & p = hole->point(0);
+            all_midpoints[{p,m}] = hole->midpoint(n_midpoints-m-1, n_hole_points-1);
+          }
+      }
+
+  // The n_midpoints > 1 case is for future proofing, but in the
+  // present we have EDGE4 and no TRI10 yet.
+  if (n_midpoints > 1)
+    libmesh_not_implemented_msg
+      ("Cannot construct triangles with more than 1 midpoint per edge");
+
+  if (!n_midpoints)
+    return;
+
+  for (Elem * elem : _mesh.element_ptr_range())
+    {
+      // This should only be called right after we've finished
+      // converting a triangulation to higher order
+      libmesh_assert_equal_to(elem->n_vertices(), 3);
+      libmesh_assert_not_equal_to(elem->default_order(), FIRST);
+
+      for (auto n : make_range(3))
+        {
+          // Only hole/outer boundary segments need adjusted midpoints
+          if (elem->neighbor_ptr(n))
+            continue;
+
+          const Point & p = elem->point(n);
+          auto it = all_midpoints.find({p,0});
+          if (it != all_midpoints.end())
+            elem->point(n+3) = it->second;
         }
     }
 }
