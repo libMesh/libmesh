@@ -353,6 +353,14 @@ void TriangleInterface::triangulate()
 
   _mesh.set_mesh_dimension(2);
 
+  // The user might have requested TRI6 or higher instead of TRI3.  If
+  // so then we'll need to get our neighbor pointers in order ahead of
+  // time for increase_triangle_order() to use.
+  if (_elem_type != TRI3)
+    {
+      _mesh.find_neighbors();
+      this->increase_triangle_order();
+    }
 
   // To the naked eye, a few smoothing iterations usually looks better,
   // so we do this by default unless the user says not to.
