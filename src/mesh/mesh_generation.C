@@ -2192,7 +2192,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // In 2D, convert all the quads to triangles if requested
   if (mesh.mesh_dimension()==2)
     {
-      if ((type == TRI6) || (type == TRI3))
+      if ((type == TRI7) || (type == TRI6) || (type == TRI3))
         {
           // A DistributedMesh needs a little prep before all_tri()
           if (is_replicated)
