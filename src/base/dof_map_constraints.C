@@ -2198,11 +2198,8 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
     libmesh_assert_less(pr.first, this->n_dofs());
 #endif
 
-  // We don't get insert_or_assign until C++17 so we make do.
-  std::pair<DofConstraints::iterator, bool> it =
-    _dof_constraints.emplace(dof_number, constraint_row);
-  if (!it.second)
-    it.first->second = constraint_row;
+  // Store the constraint_row in the map
+  _dof_constraints.insert_or_assign(dof_number, constraint_row);
 
   std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
     _primal_constraint_values.emplace(dof_number, constraint_rhs);
@@ -2245,11 +2242,8 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
   // Creates the map of rhs values if it doesn't already exist; then
   // adds the current value to that map
 
-  // We don't get insert_or_assign until C++17 so we make do.
-  std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
-    _adjoint_constraint_values[qoi_index].emplace(dof_number, constraint_rhs);
-  if (!rhs_it.second)
-    rhs_it.first->second = constraint_rhs;
+  // Store the rhs value in the map
+  _adjoint_constraint_values[qoi_index].insert_or_assign(dof_number, constraint_rhs);
 }
 
 
