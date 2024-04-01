@@ -20,6 +20,7 @@ The default is to build libmesh "out of tree," i.e. within a separate `build` di
 1. (Only if using a git clone) `git submodule update --init --recursive`
 1. `mkdir build`
 1. `cd build`
+1. `../configure --help | less` (optional, shows useful configuration options)
 1. `../configure --prefix=/some/final/install/directory`
 1. `make`
 1. `make check` (optional, runs the example programs and unit tests when possible)
@@ -84,7 +85,11 @@ platforms in parallel, you will also need MPI.
 ## Optional Packages
 We support a [large number](http://libmesh.github.io/externalsoftware.html) of
 optional packages. Some of these are distributed inside the `contrib` directory
-and compiled directly with libMesh, others can be used via third-party installations.
+and compiled directly with libMesh; these are usually enabled by
+default.  Others can be used via third-party installations; a third
+party package like PETSc typically is only enabled if a corresponding
+environment variable (such as `$PETSC_DIR` and `$PETSC_ARCH`) or
+command line option is used at `configure` time.
 
 ## License
 LibMesh is open source software distributed under the LGPL license, version 2.1.
