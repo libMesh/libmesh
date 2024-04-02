@@ -3322,10 +3322,8 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
       Number exact_value = 0;
       if (constraint_map)
         {
-          const DofConstraintValueMap::const_iterator
-            adjoint_constraint_it =
-            constraint_map->find(constrained_dof);
-          if (adjoint_constraint_it != constraint_map->end())
+          if (auto adjoint_constraint_it = constraint_map->find(constrained_dof);
+              adjoint_constraint_it != constraint_map->end())
             exact_value = adjoint_constraint_it->second;
         }
 
@@ -3638,9 +3636,8 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
 
             if (rhs_values)
               {
-                DofConstraintValueMap::const_iterator rhsit =
-                  rhs_values->find(elem_dofs[i]);
-                if (rhsit != rhs_values->end())
+                if (auto rhsit = rhs_values->find(elem_dofs[i]);
+                    rhsit != rhs_values->end())
                   H(i) = rhsit->second;
               }
           }
