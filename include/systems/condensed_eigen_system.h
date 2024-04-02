@@ -150,6 +150,7 @@ public:
   std::vector<dof_id_type> local_non_condensed_dofs_vector;
 
 private:
+  virtual bool condense_constrained_dofs() const override final { return true; }
 
   /**
    * A private flag to indicate whether the condensed dofs

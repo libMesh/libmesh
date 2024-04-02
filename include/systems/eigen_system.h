@@ -388,8 +388,13 @@ protected:
   void set_n_iterations (unsigned int its)
   { _n_iterations = its;}
 
+  void solve_helper(SparseMatrix<Number> * const A, SparseMatrix<Number> * const B);
 
 private:
+  /**
+   * Whether this object should condense out constrained degrees of freedom
+   */
+  virtual bool condense_constrained_dofs() const { return false; }
 
   /**
    * The number of converged eigenpairs.

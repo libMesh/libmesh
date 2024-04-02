@@ -49,6 +49,8 @@ void
 CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & global_dirichlet_dofs_set)
 {
   const DofMap & dof_map = this->get_dof_map();
+  if (global_dirichlet_dofs_set.empty() && !dof_map.n_constrained_dofs())
+    return;
 
   // First, put all unconstrained local dofs into non_dirichlet_dofs_set
   std::set<dof_id_type> local_non_condensed_dofs_set;
@@ -115,8 +117,9 @@ void CondensedEigenSystem::solve()
 
       // And close the assembled matrices; using a non-closed matrix
       // with create_submatrix() is deprecated.
+      if (matrix_A)
       matrix_A->close();
-      if (generalized())
+      if (generalized() && matrix_B)
         matrix_B->close();
     }
 
@@ -124,53 +127,17 @@ void CondensedEigenSystem::solve()
   libmesh_assert(!local_non_condensed_dofs_vector.empty());
 
   // Now condense the matrices
-  matrix_A->create_submatrix(*condensed_matrix_A,
-                             local_non_condensed_dofs_vector,
-                             local_non_condensed_dofs_vector);
+  if (matrix_A)
+    matrix_A->create_submatrix(*condensed_matrix_A,
+                               local_non_condensed_dofs_vector,
+                               local_non_condensed_dofs_vector);
 
-  if (generalized())
-    {
-      matrix_B->create_submatrix(*condensed_matrix_B,
-                                 local_non_condensed_dofs_vector,
-                                 local_non_condensed_dofs_vector);
-    }
+  if (generalized() && matrix_B)
+    matrix_B->create_submatrix(*condensed_matrix_B,
+                               local_non_condensed_dofs_vector,
+                               local_non_condensed_dofs_vector);
 
-
-  // Get the tolerance for the solver and the maximum
-  // number of iterations. Here, we simply adopt the linear solver
-  // specific parameters.
-  const double tol          =
-    double(es.parameters.get<Real>("linear solver tolerance"));
-
-  const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
-
-  const unsigned int nev    =
-    es.parameters.get<unsigned int>("eigenpairs");
-
-  const unsigned int ncv    =
-    es.parameters.get<unsigned int>("basis vectors");
-
-  std::pair<unsigned int, unsigned int> solve_data;
-
-  // call the solver depending on the type of eigenproblem
-  if (generalized())
-    {
-      //in case of a generalized eigenproblem
-      solve_data = eigen_solver->solve_generalized
-        (*condensed_matrix_A,*condensed_matrix_B, nev, ncv, tol, maxits);
-    }
-
-  else
-    {
-      libmesh_assert (!matrix_B);
-
-      //in case of a standard eigenproblem
-      solve_data = eigen_solver->solve_standard (*condensed_matrix_A, nev, ncv, tol, maxits);
-    }
-
-  set_n_converged(solve_data.first);
-  set_n_iterations(solve_data.second);
+  solve_helper(condensed_matrix_A, condensed_matrix_B);
 }
 
 
