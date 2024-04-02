@@ -392,11 +392,6 @@ protected:
 
 private:
   /**
-   * Whether this object should condense out constrained degrees of freedom
-   */
-  virtual bool condense_constrained_dofs() const { return false; }
-
-  /**
    * The number of converged eigenpairs.
    */
   unsigned int _n_converged_eigenpairs;

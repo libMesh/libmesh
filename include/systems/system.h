@@ -1946,6 +1946,11 @@ protected:
   void solve_for_unconstrained_dofs (NumericVector<Number> &,
                                      int is_adjoint = -1) const;
 
+  /**
+   * Whether this object should condense out constrained degrees of freedom
+   */
+  virtual bool condense_constrained_dofs() const { return false; }
+
 private:
   /**
    * Helper function to keep DofMap forward declarable in system.h
