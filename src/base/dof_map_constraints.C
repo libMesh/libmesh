@@ -1247,12 +1247,12 @@ private:
         // current DirichletBoundary object.  In case the map does not
         // contain an entry for this DirichletBoundary object, it
         // means there are no boundary sides active.
-        auto is_boundary_side_it = sebi.is_boundary_side_map.find(&dirichlet);
-
+        if (auto is_boundary_side_it = sebi.is_boundary_side_map.find(&dirichlet);
+            is_boundary_side_it != sebi.is_boundary_side_map.end())
+        {
         for (unsigned int s=0; s != sebi.n_sides; ++s)
           {
-            if (is_boundary_side_it == sebi.is_boundary_side_map.end() ||
-                !is_boundary_side_it->second[s])
+            if (!is_boundary_side_it->second[s])
               continue;
 
             FEInterface::dofs_on_side(elem, dim, fe_type, s,
@@ -1371,6 +1371,7 @@ private:
                 dof_is_fixed[side_dofs[free_dof[i]]] = true;
               }
           } // end for (s = 0..n_sides)
+        } // end if (is_boundary_side_it != sebi.is_boundary_side_map.end())
       } // end if (dim > 1 && cont != DISCONTINUOUS)
 
         // Project any shellface values
