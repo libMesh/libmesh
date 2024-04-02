@@ -50,7 +50,7 @@ class Elem;
  * This struct encapsulates data that specifies how we will
  * perform plotting for EIM variable groups.
  */
-struct EimVargroupPlottingInfo
+struct EIMVarGroupPlottingInfo
 {
   /**
    * The index for the first EIM variable in this variable group.
@@ -557,12 +557,12 @@ public:
    */
   virtual void project_qp_data_map_onto_system(System & sys,
                                                const QpDataMap & bf_data,
-                                               const EimVargroupPlottingInfo & eim_vargroup);
+                                               const EIMVarGroupPlottingInfo & eim_vargroup);
 
   /**
    * Get _eim_vars_to_project_and_write.
    */
-  const std::vector<EimVargroupPlottingInfo> & get_eim_vars_to_project_and_write() const;
+  const std::vector<EIMVarGroupPlottingInfo> & get_eim_vars_to_project_and_write() const;
 
   /**
    * Project all basis functions using project_qp_data_map_onto_system() and
@@ -648,7 +648,7 @@ protected:
    * a tensor-valued or vector-valued quantity, so it makes sense to refer
    * to the entire group of variables together in those cases.
    */
-  std::vector<EimVargroupPlottingInfo> _eim_vars_to_project_and_write;
+  std::vector<EIMVarGroupPlottingInfo> _eim_vars_to_project_and_write;
 
   /**
    * This set that specifies which EIM variables will be scaled during EIM

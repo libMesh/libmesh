@@ -2822,7 +2822,7 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
 
 void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
                                                       const QpDataMap & qp_data_map,
-                                                      const EimVargroupPlottingInfo & eim_vargroup)
+                                                      const EIMVarGroupPlottingInfo & eim_vargroup)
 {
   LOG_SCOPE("project_basis_function_onto_system()", "RBEIMEvaluation");
 
@@ -2918,7 +2918,7 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
   (*sys.solution) = current_local_soln;
 }
 
-const std::vector<EimVargroupPlottingInfo> & RBEIMEvaluation::get_eim_vars_to_project_and_write() const
+const std::vector<EIMVarGroupPlottingInfo> & RBEIMEvaluation::get_eim_vars_to_project_and_write() const
 {
   return _eim_vars_to_project_and_write;
 }
