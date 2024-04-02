@@ -432,6 +432,11 @@ void Poly2TriTriangulator::triangulate()
   if (this->_smooth_after_generating)
     LaplaceMeshSmoother(_mesh).smooth(2);
 
+  // The user might have requested TRI6 or higher instead of TRI3.  We
+  // can do this before prepare_for_use() because all we need for it
+  // is find_neighbors(), which we did in insert_refinement_points()
+  this->increase_triangle_order();
+
   // Prepare the mesh for use before returning.  This ensures (among
   // other things) that it is partitioned and therefore users can
   // iterate over local elements, etc.

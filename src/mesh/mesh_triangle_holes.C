@@ -478,6 +478,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
 
       // Receive the points proc 0 will send later
       mesh.comm().broadcast(_points);
+      mesh.comm().broadcast(_midpoints);
       return;
     }
 
@@ -487,7 +488,14 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   // around the element or "2" for CCW, to make it easier to detect
   // and scream about cases where we have a disconnected outer
   // boundary.
-  std::multimap<const Node *, std::pair<const Node *, int>> hole_edge_map;
+  std::multimap<const Node *,
+                std::pair<const Node *, int>> hole_edge_map;
+
+  // If we're looking at higher-order elements, we have mid-edge edge
+  // nodes to worry about.  hole_midpoint_map[{m,n}][i] should give us
+  // the ith mid-edge node traveling from vertex m to vertex n
+  std::map<std::pair<const Node *, const Node *>,
+           std::vector<const Node *>> hole_midpoint_map;
 
   std::vector<boundary_id_type> bcids;
 
@@ -505,6 +513,28 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
               hole_edge_map.emplace(elem->node_ptr(1),
                                     std::make_pair(elem->node_ptr(0),
                                                    /*edge*/ 0));
+              if (elem->type() == EDGE3)
+                {
+                  hole_midpoint_map.emplace(std::make_pair(elem->node_ptr(0),
+                                                           elem->node_ptr(1)),
+                                            std::vector<const Node *>{elem->node_ptr(2)});
+                  hole_midpoint_map.emplace(std::make_pair(elem->node_ptr(1),
+                                                           elem->node_ptr(0)),
+                                            std::vector<const Node *>{elem->node_ptr(2)});
+                }
+              else if (elem->type() == EDGE4)
+                {
+                  hole_midpoint_map.emplace(std::make_pair(elem->node_ptr(0),
+                                                           elem->node_ptr(1)),
+                                            std::vector<const Node *>{elem->node_ptr(2),
+                                                                      elem->node_ptr(3)});
+                  hole_midpoint_map.emplace(std::make_pair(elem->node_ptr(1),
+                                                           elem->node_ptr(0)),
+                                            std::vector<const Node *>{elem->node_ptr(3),
+                                                                      elem->node_ptr(2)});
+                }
+              else
+                libmesh_assert_equal_to(elem->default_side_order(), 1);
             }
           continue;
         }
@@ -534,6 +564,19 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
                   hole_edge_map.emplace(elem->node_ptr((s+1)%ns),
                                         std::make_pair(elem->node_ptr(s),
                                                        /*clockwise*/ 1));
+
+                  if (elem->default_side_order() == 2)
+                    {
+                      hole_midpoint_map.emplace(std::make_pair(elem->node_ptr(s),
+                                                               elem->node_ptr((s+1)%ns)),
+                                                std::vector<const Node *>{elem->node_ptr(s+ns)});
+                      hole_midpoint_map.emplace(std::make_pair(elem->node_ptr((s+1)%ns),
+                                                               elem->node_ptr(s)),
+                                                std::vector<const Node *>{elem->node_ptr(s+ns)});
+                    }
+                  else
+                    libmesh_assert_equal_to(elem->default_side_order(), 1);
+
                   continue;
                 }
             }
@@ -549,14 +592,16 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   // then a random vector will be extracted; this function will be
   // called multiple times so that the various options can be
   // compared.  We choose the largest option.
-  auto extract_edge_vector = [&report_error, &hole_edge_map]() {
-    // Start with any edge
-    std::pair<std::vector<const Node *>, int> hole_points_and_edge_type
-    {{hole_edge_map.begin()->first, hole_edge_map.begin()->second.first},
-     hole_edge_map.begin()->second.second};
+  auto extract_edge_vector =
+    [&report_error, &hole_edge_map, &hole_midpoint_map]() {
+    std::tuple<std::vector<const Node *>, std::vector<const Node *>, int>
+    hole_points_and_edge_type
+      {{hole_edge_map.begin()->first, hole_edge_map.begin()->second.first},
+       {}, hole_edge_map.begin()->second.second};
 
-    int & edge_type = hole_points_and_edge_type.second;
-    auto & hole_points = hole_points_and_edge_type.first;
+    auto & hole_points = std::get<0>(hole_points_and_edge_type);
+    auto & midpoint_points = std::get<1>(hole_points_and_edge_type);
+    int & edge_type = std::get<2>(hole_points_and_edge_type);
 
     // We won't be needing to search for this edge
     hole_edge_map.erase(hole_points.front());
@@ -603,6 +648,13 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
         hole_points.push_back(next);
       }
 
+    for (auto i : make_range(hole_points.size()-1))
+      {
+        const auto & midpoints = hole_midpoint_map[{hole_points[i],hole_points[i+1]}];
+        midpoint_points.insert(midpoint_points.end(),
+                               midpoints.begin(), midpoints.end());
+      }
+
     hole_points.pop_back();
 
     return hole_points_and_edge_type;
@@ -616,7 +668,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
       n_positive_areas = 0,
       n_edgeelem_loops = 0;
 
-  std::vector<const Node *> outer_hole_points;
+  std::vector<const Node *> outer_hole_points, outer_mid_points;
   int outer_edge_type = -1;
   Real twice_outer_area = 0,
        abs_twice_outer_area = 0;
@@ -627,7 +679,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
 #endif
 
   while (!hole_edge_map.empty()) {
-    auto [hole_points, edge_type] = extract_edge_vector();
+    auto [hole_points, mid_points, edge_type] = extract_edge_vector();
 
     if (edge_type == 0)
     {
@@ -670,6 +722,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
         twice_outer_area = twice_this_area;
         abs_twice_outer_area = abs_twice_this_area;
         outer_hole_points = std::move(hole_points);
+        outer_mid_points = std::move(mid_points);
         outer_edge_type = edge_type;
       }
   }
@@ -679,6 +732,11 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
                  outer_hole_points.end(),
                  _points.begin(),
                  [](const Node * n){ return Point(*n); });
+  _midpoints.resize(outer_mid_points.size());
+  std::transform(outer_mid_points.begin(),
+                 outer_mid_points.end(),
+                 _midpoints.begin(),
+                 [](const Node * n){ return Point(*n); });
 
   if (!twice_outer_area)
     report_error("Zero-area MeshedHoles are not currently supported");
@@ -686,7 +744,18 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   // We ordered ourselves counter-clockwise?  But a hole is expected
   // to be clockwise, so use the reverse order.
   if (twice_outer_area > 0)
-    std::reverse(_points.begin(), _points.end());
+    {
+      std::reverse(_points.begin(), _points.end());
+
+      // Our midpoints are numbered e.g.
+      // (01a)(01b)(12a)(12b)(23a)(23b)(30a)(30b) for points 0123, but
+      // if we reverse to get 3210 then we want our midpoints to be
+      // (23b)(23a)(12b)(12a)(01b)(01a)(30b)(30a)
+      const unsigned int n_midpoints = _midpoints.size() / _points.size();
+      auto split_it = _midpoints.end() - n_midpoints;
+      std::reverse(_midpoints.begin(), split_it);
+      std::reverse(split_it, _midpoints.end());
+    }
 
 #ifdef DEBUG
   auto print_areas = [areas](){
@@ -728,6 +797,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
   // Hey, no errors!  Broadcast that empty string.
   mesh.comm().broadcast(error_reported);
   mesh.comm().broadcast(_points);
+  mesh.comm().broadcast(_midpoints);
 }
 
 
@@ -737,10 +807,27 @@ unsigned int TriangulatorInterface::MeshedHole::n_points() const
 }
 
 
+unsigned int TriangulatorInterface::MeshedHole::n_midpoints() const
+{
+  libmesh_assert (!(_midpoints.size() % _points.size()));
+  return _midpoints.size() / _points.size();
+}
+
+
 Point TriangulatorInterface::MeshedHole::point(const unsigned int n) const
 {
   libmesh_assert_less (n, _points.size());
   return _points[n];
+}
+
+
+Point TriangulatorInterface::MeshedHole::midpoint(const unsigned int m,
+                                                  const unsigned int n) const
+{
+  const unsigned int n_mid = this->n_midpoints();
+  libmesh_assert_less (m, n_mid);
+  libmesh_assert_less (n, _points.size());
+  return _midpoints[n*n_mid+m];
 }
 
 

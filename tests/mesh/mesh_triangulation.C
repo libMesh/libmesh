@@ -2,6 +2,7 @@
 #include <libmesh/elem.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
+#include <libmesh/mesh_modification.h>
 #include <libmesh/mesh_triangle_holes.h>
 #include <libmesh/mesh_triangle_interface.h>
 #include <libmesh/parallel_implementation.h> // max()
@@ -39,6 +40,7 @@ public:
   CPPUNIT_TEST( testPoly2TriInterp2 );
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriMeshedHoles );
+  CPPUNIT_TEST( testPoly2TriRoundHole );
   CPPUNIT_TEST( testPoly2TriEdges );
   CPPUNIT_TEST( testPoly2TriEdge3s );
   CPPUNIT_TEST( testPoly2TriBadEdges );
@@ -67,6 +69,7 @@ public:
   CPPUNIT_TEST( testTriangleInterp2 );
   CPPUNIT_TEST( testTriangleHoles );
   CPPUNIT_TEST( testTriangleMeshedHoles );
+  CPPUNIT_TEST( testTriangleRoundHole );
   CPPUNIT_TEST( testTriangleEdges );
   CPPUNIT_TEST( testTriangleSegments );
 #endif
@@ -521,6 +524,84 @@ public:
   }
 
 
+  void testTriangulatorRoundHole(MeshBase & mesh,
+                                 TriangulatorInterface & triangulator)
+  {
+    // A square quad; we'll put a round hole in the middle.
+    mesh.add_point(Point(19,19), 0);
+    mesh.add_point(Point(21,19), 1);
+    mesh.add_point(Point(21,21), 2);
+    mesh.add_point(Point(19,21), 3);
+
+    commonSettings(triangulator);
+
+    // Add a square meshed hole in the center
+    const Real radius = 0.5;
+    const Point center{20,20};
+
+    Mesh centermesh { mesh.comm() };
+    MeshTools::Generation::build_sphere(centermesh, radius, 1, QUAD9, 0);
+    MeshTools::Modification::translate(centermesh, center(0), center(1));
+
+    TriangulatorInterface::MeshedHole centerhole { centermesh };
+
+    CPPUNIT_ASSERT_EQUAL(centerhole.n_points(), 8u);
+    Point inside = centerhole.inside();
+    CPPUNIT_ASSERT_EQUAL(inside(0), Real(20));
+    CPPUNIT_ASSERT_EQUAL(inside(1), Real(20));
+
+    const std::vector<TriangulatorInterface::Hole*> holes { &centerhole };
+    triangulator.attach_hole_list(&holes);
+    triangulator.elem_type() = TRI6;
+
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), static_cast<dof_id_type>(12));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), static_cast<dof_id_type>(36));
+
+    // Make sure we didn't screw up the outer sides.  We should
+    // have exact values for the outer vertices, so we can use
+    // those for a map.
+    std::map<std::pair<Real, Real>, Point> outer_midpoints
+      {{{19, 19}, {20, 19}},
+       {{21, 19}, {21, 20}},
+       {{21, 21}, {20, 21}},
+       {{19, 21}, {19, 20}}
+      };
+
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      for (const auto n : make_range(elem->n_sides()))
+        {
+          if (elem->neighbor_ptr(n))
+            continue;
+
+          auto it =
+            outer_midpoints.find(std::make_pair(elem->point(n)(0),
+                                                elem->point(n)(1)));
+          if (it != outer_midpoints.end())
+            {
+              const Point error = it->second - elem->point(n+3);
+              CPPUNIT_ASSERT_LESS(TOLERANCE*TOLERANCE,
+                                  error.norm_sq());
+            }
+          else
+            {
+              const Point radius1 = elem->point(n) - center;
+              CPPUNIT_ASSERT_LESS(TOLERANCE*TOLERANCE,
+                                  std::abs(radius1.norm()-radius));
+
+              const Point radius2 = elem->point((n+1)%3) - center;
+              CPPUNIT_ASSERT_LESS(TOLERANCE*TOLERANCE,
+                                  std::abs(radius2.norm()-radius));
+
+              const Point radius3 = elem->point(n+3) - center;
+              CPPUNIT_ASSERT_LESS(TOLERANCE*TOLERANCE,
+                                  std::abs(radius3.norm()-radius));
+            }
+        }
+  }
+
+
   void testTriangulatorSegments(MeshBase & mesh,
                                 TriangulatorInterface & triangulator)
   {
@@ -700,6 +781,16 @@ public:
   }
 
 
+  void testTriangleRoundHole()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangle(mesh);
+    testTriangulatorRoundHole(mesh, triangle);
+  }
+
+
   void testTriangleEdges()
   {
     LOG_UNIT_TEST;
@@ -791,6 +882,16 @@ public:
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorMeshedHoles(mesh, p2t_tri);
+  }
+
+
+  void testPoly2TriRoundHole()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testTriangulatorRoundHole(mesh, p2t_tri);
   }
 
 

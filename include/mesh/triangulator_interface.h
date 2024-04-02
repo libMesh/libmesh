@@ -24,6 +24,7 @@
 
 // Local Includes
 #include "libmesh/libmesh.h"
+#include "libmesh/point.h"
 
 // C++ includes
 #include <set>
@@ -229,6 +230,14 @@ public:
   std::vector<std::pair<unsigned int, unsigned int>> segments;
 
   /**
+   * When constructing a second-order triangulation from a
+   * second-order boundary, we may do the triangulation using
+   * first-order elements, in which case we need to save midpoint
+   * location data in order to reconstruct curvature along boundaries.
+   */
+  std::vector<Point> segment_midpoints;
+
+  /**
    * Attaches boundary markers.
    * If segments is set, the number of markers must be equal to the size of segments,
    * otherwise, it is equal to the number of points.
@@ -269,6 +278,13 @@ protected:
    * segments) to a PSLG triangulation
    */
   void insert_any_extra_boundary_points();
+
+  /**
+   * Helper function to upconvert Tri3 to any higher order triangle
+   * type if requested via \p _elem_type.  Should be called at the end
+   * of triangulate()
+   */
+  void increase_triangle_order();
 
   /**
    * Helper function to check holes for intersections if requested.
