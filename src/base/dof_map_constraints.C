@@ -1404,12 +1404,12 @@ private:
         // current DirichletBoundary object.  In case the map does not
         // contain an entry for this DirichletBoundary object, it
         // means there are no boundary shellfaces active.
-        auto is_boundary_shellface_it = sebi.is_boundary_shellface_map.find(&dirichlet);
-
+        if (auto is_boundary_shellface_it = sebi.is_boundary_shellface_map.find(&dirichlet);
+            is_boundary_shellface_it != sebi.is_boundary_shellface_map.end())
+        {
         for (unsigned int shellface=0; shellface != 2; ++shellface)
           {
-            if (is_boundary_shellface_it == sebi.is_boundary_shellface_map.end() ||
-                !is_boundary_shellface_it->second[shellface])
+            if (!is_boundary_shellface_it->second[shellface])
               continue;
 
             // A shellface has the same dof indices as the element itself
@@ -1526,6 +1526,7 @@ private:
                 dof_is_fixed[shellface_dofs[free_dof[i]]] = true;
               }
           } // end for (shellface = 0..2)
+        } // end if (is_boundary_shellface_it != sebi.is_boundary_shellface_map.end())
       } // end if (dim == 2 && cont != DISCONTINUOUS)
 
     // Lock the DofConstraints since it is shared among threads.
