@@ -478,6 +478,7 @@ TriangulatorInterface::MeshedHole::MeshedHole(const MeshBase & mesh,
 
       // Receive the points proc 0 will send later
       mesh.comm().broadcast(_points);
+      mesh.comm().broadcast(_midpoints);
       return;
     }
 
