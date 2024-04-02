@@ -30,6 +30,7 @@
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/elem.h"
 #include "libmesh/system.h"
+#include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/boundary_info.h"
@@ -2821,11 +2822,14 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
 
 void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
                                                       const QpDataMap & qp_data_map,
-                                                      unsigned int var)
+                                                      const EIMVarGroupPlottingInfo & eim_vargroup)
 {
   LOG_SCOPE("project_basis_function_onto_system()", "RBEIMEvaluation");
 
   libmesh_error_msg_if(sys.n_vars() == 0, "System must have at least one variable");
+
+  // TODO: Currently only implemented for the case of one variable in a variable group
+  unsigned int var = eim_vargroup.first_eim_var_index;
 
   FEMContext context(sys);
   {
@@ -2914,26 +2918,31 @@ void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
   (*sys.solution) = current_local_soln;
 }
 
-const std::set<unsigned int> & RBEIMEvaluation::get_eim_vars_to_project_and_write() const
+const std::vector<EIMVarGroupPlottingInfo> & RBEIMEvaluation::get_eim_vars_to_project_and_write() const
 {
   return _eim_vars_to_project_and_write;
 }
 
-void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
+void RBEIMEvaluation::write_out_projected_basis_functions(EquationSystems & es,
                                                           const std::string & directory_name)
 {
   if (get_eim_vars_to_project_and_write().empty())
     return;
 
-  for (unsigned int eim_var : get_eim_vars_to_project_and_write())
+  unsigned int var_group_idx = 0;
+  for (const auto & eim_vargroup : get_eim_vars_to_project_and_write())
     {
       std::vector<std::unique_ptr<NumericVector<Number>>> projected_bfs;
+
+      const auto & sys_name = eim_vargroup.eim_sys_name;
+      System & sys = es.get_system(sys_name);
+
       for (unsigned int bf_index : make_range(get_n_basis_functions()))
         {
           project_qp_data_map_onto_system(
             sys,
             get_basis_function(bf_index),
-            eim_var);
+            eim_vargroup);
 
           projected_bfs.emplace_back(sys.solution->clone());
         }
@@ -2948,7 +2957,8 @@ void RBEIMEvaluation::write_out_projected_basis_functions(System & sys,
       RBEvaluation::write_out_vectors(sys,
                                       projected_bfs_ptrs,
                                       directory_name,
-                                      "projected_bf_var_" + std::to_string(eim_var));
+                                      "projected_bf_vargroup_" + std::to_string(var_group_idx));
+      var_group_idx++;
     }
 }
 
