@@ -75,7 +75,7 @@ struct EIMVarGroupPlottingInfo
 
   /**
    * A string that specifies how we plot this variable. This string
-   * will be interpreted as needing in subclasses that perform the
+   * will be interpreted as needed in subclasses that perform the
    * plotting. Some plotting options are whether we extrapolate data
    * or copy data from qps to nodes.
    */
@@ -551,7 +551,7 @@ public:
                                bool read_binary_basis_functions = true);
 
   /**
-   * Project variable the specified variable of \p bf_data into the solution
+   * Project the specified variable of \p bf_data into the solution
    * vector of System. This method is virtual so that it can be overridden in
    * sub-classes, e.g. to perform a specialized type of projection.
    */
