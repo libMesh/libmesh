@@ -40,7 +40,9 @@ public:
   CPPUNIT_TEST( testPoly2TriInterp2 );
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriMeshedHoles );
-  CPPUNIT_TEST( testPoly2TriRoundHole );
+#  ifdef LIBMESH_ENABLE_AMR
+    CPPUNIT_TEST( testPoly2TriRoundHole );
+#  endif
   CPPUNIT_TEST( testPoly2TriEdges );
   CPPUNIT_TEST( testPoly2TriEdge3s );
   CPPUNIT_TEST( testPoly2TriBadEdges );
@@ -69,7 +71,9 @@ public:
   CPPUNIT_TEST( testTriangleInterp2 );
   CPPUNIT_TEST( testTriangleHoles );
   CPPUNIT_TEST( testTriangleMeshedHoles );
-  CPPUNIT_TEST( testTriangleRoundHole );
+#  ifdef LIBMESH_ENABLE_AMR
+    CPPUNIT_TEST( testTriangleRoundHole );
+#  endif
   CPPUNIT_TEST( testTriangleEdges );
   CPPUNIT_TEST( testTriangleSegments );
 #endif
@@ -524,6 +528,7 @@ public:
   }
 
 
+#ifdef LIBMESH_ENABLE_AMR
   void testTriangulatorRoundHole(MeshBase & mesh,
                                  TriangulatorInterface & triangulator)
   {
@@ -600,6 +605,7 @@ public:
             }
         }
   }
+#endif // LIBMESH_ENABLE_AMR
 
 
   void testTriangulatorSegments(MeshBase & mesh,
@@ -781,6 +787,7 @@ public:
   }
 
 
+#ifdef LIBMESH_ENABLE_AMR
   void testTriangleRoundHole()
   {
     LOG_UNIT_TEST;
@@ -789,6 +796,7 @@ public:
     TriangleInterface triangle(mesh);
     testTriangulatorRoundHole(mesh, triangle);
   }
+#endif // LIBMESH_ENABLE_AMR
 
 
   void testTriangleEdges()
@@ -885,6 +893,7 @@ public:
   }
 
 
+#ifdef LIBMESH_ENABLE_AMR
   void testPoly2TriRoundHole()
   {
     LOG_UNIT_TEST;
@@ -893,6 +902,7 @@ public:
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorRoundHole(mesh, p2t_tri);
   }
+#endif // LIBMESH_ENABLE_AMR
 
 
   void testPoly2TriEdges()
