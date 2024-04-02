@@ -1089,12 +1089,12 @@ private:
         // current DirichletBoundary object.  In case the map does not
         // contain an entry for this DirichletBoundary object, it
         // means there are no boundary edges active.
-        auto is_boundary_edge_it = sebi.is_boundary_edge_map.find(&dirichlet);
-
+        if (auto is_boundary_edge_it = sebi.is_boundary_edge_map.find(&dirichlet);
+            is_boundary_edge_it != sebi.is_boundary_edge_map.end())
+        {
         for (unsigned int e=0; e != sebi.n_edges; ++e)
           {
-            if (is_boundary_edge_it == sebi.is_boundary_edge_map.end() ||
-                !is_boundary_edge_it->second[e])
+            if (!is_boundary_edge_it->second[e])
               continue;
 
             FEInterface::dofs_on_edge(elem, dim, fe_type, e,
@@ -1211,6 +1211,7 @@ private:
                 dof_is_fixed[edge_dofs[free_dof[i]]] = true;
               }
           } // end for (e = 0..n_edges)
+        } // end if (is_boundary_edge_it != sebi.is_boundary_edge_map.end())
       } // end if (dim > 2 && cont != DISCONTINUOUS)
 
         // Project any side values (edges in 2D, faces in 3D)
