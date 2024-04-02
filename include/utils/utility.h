@@ -380,6 +380,12 @@ void deallocate (std::vector<T> & vec)
 }
 
 
+// When looking for a complicated suffix to a filename, we only want
+// to consider the base name, without any preceding path name.
+// "/tmp/foo.e25ad0/mesh.msh" is not ExodusII.
+std::string_view basename_of(const std::string & fullname);
+
+
 // Utility functions useful when dealing with complex numbers.
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS

@@ -105,6 +105,14 @@ std::string Utility::system_info()
 }
 
 
+std::string_view Utility::basename_of(const std::string & fullname)
+{
+  std::size_t first_char = fullname.find_last_of("/\\");
+  if (first_char == std::string::npos)
+    first_char = 0;
+  return std::string_view(fullname).substr(first_char);
+}
+
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 
