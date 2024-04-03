@@ -28,6 +28,7 @@
 #include "libmesh/tetgen_io.h"
 #include "libmesh/ucd_io.h"
 #include "libmesh/unv_io.h"
+#include "libmesh/utility.h"
 #include "libmesh/matlab_io.h"
 #include "libmesh/off_io.h"
 #include "libmesh/medit_io.h"
@@ -57,19 +58,6 @@
 #endif
 
 
-namespace // Anonymous namespace for helper
-{
-  // Only check a basename for a suffix, without any preceding
-  // path name.  "/tmp/foo.e25ad0/mesh.msh" is not ExodusII.
-  std::string_view basename_of(const std::string & fullname)
-  {
-    std::size_t first_char = fullname.find_last_of("/\\");
-    if (first_char == std::string::npos)
-      first_char = 0;
-    return std::string_view(fullname).substr(first_char);
-  }
-}
-
 namespace libMesh
 {
 
@@ -81,7 +69,7 @@ void NameBasedIO::read (const std::string & name)
 {
   MeshBase & mymesh = MeshInput<MeshBase>::mesh();
 
-  const std::string_view basename = basename_of(name);
+  const std::string_view basename = Utility::basename_of(name);
 
   // See if the file exists.  Perform this check on all processors
   // so that the code is terminated properly in the case that the
@@ -311,7 +299,7 @@ void NameBasedIO::write (const std::string & name)
 {
   MeshBase & mymesh = MeshInput<MeshBase>::mesh();
 
-  const std::string_view basename = basename_of(name);
+  const std::string_view basename = Utility::basename_of(name);
 
   // parallel formats are special -- they may choose to write
   // separate files, let's not try to handle the zipping here.
@@ -538,7 +526,8 @@ void NameBasedIO::write_equation_systems (const std::string & filename,
   // writing complete restarts
   if (!system_names)
     {
-      const std::string_view basename = basename_of(filename);
+      const std::string_view basename =
+        Utility::basename_of(filename);
 
       if (basename.rfind(".xda") < basename.size())
         {

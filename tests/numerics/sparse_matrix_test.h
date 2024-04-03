@@ -164,7 +164,7 @@ public:
     return;
 #endif
 
-    matrix->read_matlab(libmesh_suite_name+"_matrix.m");
+    matrix->read(libmesh_suite_name+"_matrix.m");
 
     TestCommWorld->barrier();
 

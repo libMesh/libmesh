@@ -434,6 +434,12 @@ public:
 
 
   /**
+   * Read the contents of the matrix from a file, with the file format
+   * inferred from the extension of \p filename.
+   */
+  virtual void read(const std::string & filename);
+
+  /**
    * Read the contents of the matrix from Matlab's sparse matrix
    * format.
    *

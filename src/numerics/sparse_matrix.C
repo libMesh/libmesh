@@ -499,6 +499,57 @@ void SparseMatrix<T>::print_petsc_hdf5(const std::string &)
 
 
 template <typename T>
+void SparseMatrix<T>::read(const std::string & filename)
+{
+  const std::string_view basename = Utility::basename_of(filename);
+
+  {
+    std::ifstream in (filename.c_str());
+    libmesh_error_msg_if
+      (!in.good(), "ERROR: cannot read file:\n\t" <<
+       filename);
+  }
+
+  if (basename.rfind(".matlab") == basename.size() - 7 ||
+      basename.rfind(".m") == basename.size() - 2)
+    this->read_matlab(filename);
+  else if (basename.rfind(".petsc64") == basename.size() - 8)
+    {
+#ifndef LIBMESH_HAVE_PETSC
+      libmesh_error_msg("Cannot load PETSc matrix file " <<
+                        filename << " without PETSc-enabled libMesh.");
+#endif
+#if LIBMESH_DOF_ID_BYTES != 8
+      libmesh_error_msg("Cannot load 64-bit PETSc matrix file " <<
+                        filename << " with non-64-bit libMesh.");
+#endif
+      this->read_petsc_binary(filename);
+    }
+  else if (basename.rfind(".petsc32") == basename.size() - 8)
+    {
+#ifndef LIBMESH_HAVE_PETSC
+      libmesh_error_msg("Cannot load PETSc matrix file " <<
+                        filename << " without PETSc-enabled libMesh.");
+#endif
+#if LIBMESH_DOF_ID_BYTES != 4
+      libmesh_error_msg("Cannot load 32-bit PETSc matrix file " <<
+                        filename << " with non-32-bit libMesh.");
+#endif
+      this->read_petsc_binary(filename);
+    }
+  else
+    libmesh_error_msg(" ERROR: Unrecognized matrix file extension on: "
+                      << basename
+                      << "\n   I understand the following:\n\n"
+                      << "     *.matlab  -- Matlab sparse matrix format\n"
+                      << "     *.m       -- Matlab sparse matrix format\n"
+                      << "     *.petsc32 -- PETSc binary format, 32-bit\n"
+                      << "     *.petsc64 -- PETSc binary format, 64-bit\n"
+                     );
+}
+
+
+template <typename T>
 void SparseMatrix<T>::read_matlab(const std::string & filename)
 {
 #ifndef LIBMESH_HAVE_CXX11_REGEX

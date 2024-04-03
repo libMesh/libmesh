@@ -36,9 +36,9 @@ public:
 
     // Petsc binary formats depend on sizeof(PetscInt)
 #if LIBMESH_DOF_ID_BYTES == 4
-    mat_to_read->read_petsc_binary("matrices/geom_1_extraction_op.petsc32");
+    mat_to_read->read("matrices/geom_1_extraction_op.petsc32");
 #elif LIBMESH_DOF_ID_BYTES == 8
-    mat_to_read->read_petsc_binary("matrices/geom_1_extraction_op.petsc64");
+    mat_to_read->read("matrices/geom_1_extraction_op.petsc64");
 #else
     return;
 #endif
