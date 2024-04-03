@@ -127,6 +127,16 @@ public:
   SparseMatrix<Number> & get_condensed_matrix_B() const;
 
   /**
+   * Copy a logically sub-vector into a super-vector
+   */
+  void copy_sub_to_super(const NumericVector<Number> & sub, NumericVector<Number> & super);
+
+  /**
+   * Copy a logically super-vector into a sub-vector
+   */
+  void copy_super_to_sub(NumericVector<Number> & super, NumericVector<Number> & sub);
+
+  /**
    * The (condensed) system matrix for standard eigenvalue problems.
    *
    * Public access to this member variable will be deprecated in

@@ -198,7 +198,29 @@ SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_B() const
   return *condensed_matrix_B;
 }
 
+void
+CondensedEigenSystem::copy_sub_to_super(const NumericVector<Number> & sub,
+                                        NumericVector<Number> & super)
+{
+  libmesh_assert_equal_to(sub.local_size(), local_non_condensed_dofs_vector.size());
+  libmesh_assert_equal_to(sub.local_size() + this->get_dof_map().n_local_constrained_dofs(),
+                          super.local_size());
+  auto super_sub_view = super.get_subvector(local_non_condensed_dofs_vector);
+  *super_sub_view = sub;
+  super.restore_subvector(std::move(*super_sub_view), local_non_condensed_dofs_vector);
+}
 
+void
+CondensedEigenSystem::copy_super_to_sub(NumericVector<Number> & super,
+                                        NumericVector<Number> & sub)
+{
+  libmesh_assert_equal_to(sub.local_size(), local_non_condensed_dofs_vector.size());
+  libmesh_assert_equal_to(sub.local_size() + this->get_dof_map().n_local_constrained_dofs(),
+                          super.local_size());
+  auto super_sub_view = super.get_subvector(local_non_condensed_dofs_vector);
+  sub = *super_sub_view;
+  super.restore_subvector(std::move(*super_sub_view), local_non_condensed_dofs_vector);
+}
 
 } // namespace libMesh
 
