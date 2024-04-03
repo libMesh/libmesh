@@ -212,7 +212,9 @@ void EigenSystem::reinit ()
 }
 
 void
-EigenSystem::solve_helper(SparseMatrix<Number> * const A, SparseMatrix<Number> * const B)
+EigenSystem::solve_helper(SparseMatrix<Number> * const A,
+                          SparseMatrix<Number> * const B,
+                          SparseMatrix<Number> * const P)
 {
   // A reference to the EquationSystems
   EquationSystems & es = this->get_equation_systems();
@@ -242,33 +244,36 @@ EigenSystem::solve_helper(SparseMatrix<Number> * const A, SparseMatrix<Number> *
     if (generalized())
       // Shell preconditioning matrix
       if (_use_shell_precond_matrix)
-        solve_data = eigen_solver->solve_generalized (*shell_matrix_A, *shell_matrix_B,*shell_precond_matrix, nev, ncv, tol, maxits);
+        solve_data = eigen_solver->solve_generalized(
+            *shell_matrix_A, *shell_matrix_B, *shell_precond_matrix, nev, ncv, tol, maxits);
       else
-        solve_data = eigen_solver->solve_generalized (*shell_matrix_A, *shell_matrix_B,*precond_matrix, nev, ncv, tol, maxits);
+        solve_data = eigen_solver->solve_generalized(
+            *shell_matrix_A, *shell_matrix_B, *P, nev, ncv, tol, maxits);
 
     // Standard eigenproblem
     else
-      {
-        libmesh_assert (!shell_matrix_B);
-        // Shell preconditioning matrix
-        if (_use_shell_precond_matrix)
-          solve_data = eigen_solver->solve_standard (*shell_matrix_A,*shell_precond_matrix, nev, ncv, tol, maxits);
-        else
-          solve_data = eigen_solver->solve_standard (*shell_matrix_A,*precond_matrix, nev, ncv, tol, maxits);
-      }
+    {
+      libmesh_assert(!shell_matrix_B);
+      // Shell preconditioning matrix
+      if (_use_shell_precond_matrix)
+        solve_data = eigen_solver->solve_standard(
+            *shell_matrix_A, *shell_precond_matrix, nev, ncv, tol, maxits);
+      else
+        solve_data = eigen_solver->solve_standard(*shell_matrix_A, *P, nev, ncv, tol, maxits);
+    }
   }
   else
   {
     // Generalized eigenproblem
     if (generalized())
-      solve_data = eigen_solver->solve_generalized (*A, *B, nev, ncv, tol, maxits);
+      solve_data = eigen_solver->solve_generalized(*A, *B, nev, ncv, tol, maxits);
 
     // Standard eigenproblem
     else
-      {
-        libmesh_assert (!matrix_B);
-        solve_data = eigen_solver->solve_standard (*A, nev, ncv, tol, maxits);
-      }
+    {
+      libmesh_assert(!matrix_B);
+      solve_data = eigen_solver->solve_standard(*A, nev, ncv, tol, maxits);
+    }
   }
 
   this->_n_converged_eigenpairs = solve_data.first;
@@ -293,7 +298,7 @@ void EigenSystem::solve ()
     // Assemble the linear system
     this->assemble ();
 
-  solve_helper(matrix_A, matrix_B);
+  solve_helper(matrix_A, matrix_B, precond_matrix);
 }
 
 std::pair<Real, Real> EigenSystem::get_eigenpair (dof_id_type i)

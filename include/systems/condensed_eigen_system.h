@@ -164,6 +164,12 @@ public:
    */
   std::vector<dof_id_type> local_non_condensed_dofs_vector;
 
+protected:
+  /**
+   * The condensed preconditioning matrix
+   */
+  SparseMatrix<Number> * condensed_precond_matrix;
+
 private:
   virtual bool condense_constrained_dofs() const override final { return true; }
 

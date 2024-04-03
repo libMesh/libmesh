@@ -388,7 +388,9 @@ protected:
   void set_n_iterations (unsigned int its)
   { _n_iterations = its;}
 
-  void solve_helper(SparseMatrix<Number> * const A, SparseMatrix<Number> * const B);
+  void solve_helper(SparseMatrix<Number> * const A,
+                    SparseMatrix<Number> * const B,
+                    SparseMatrix<Number> * const P);
 
 private:
   /**

@@ -39,6 +39,7 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
   : Parent(es, name_in, number_in),
     condensed_matrix_A(&this->add_matrix("Condensed Eigen Matrix A")),
     condensed_matrix_B(&this->add_matrix("Condensed Eigen Matrix B")),
+    condensed_precond_matrix(&this->add_matrix("Condensed Eigen Preconditioner")),
     condensed_dofs_initialized(false)
 {
 }
@@ -118,9 +119,11 @@ void CondensedEigenSystem::solve()
       // And close the assembled matrices; using a non-closed matrix
       // with create_submatrix() is deprecated.
       if (matrix_A)
-      matrix_A->close();
+        matrix_A->close();
       if (generalized() && matrix_B)
         matrix_B->close();
+      if (precond_matrix)
+        precond_matrix->close();
     }
 
   // If we reach here, then there should be some non-condensed dofs
@@ -137,7 +140,12 @@ void CondensedEigenSystem::solve()
                                local_non_condensed_dofs_vector,
                                local_non_condensed_dofs_vector);
 
-  solve_helper(condensed_matrix_A, condensed_matrix_B);
+  if (precond_matrix)
+    precond_matrix->create_submatrix(*condensed_precond_matrix,
+                                     local_non_condensed_dofs_vector,
+                                     local_non_condensed_dofs_vector);
+
+  solve_helper(condensed_matrix_A, condensed_matrix_B, condensed_precond_matrix);
 }
 
 
