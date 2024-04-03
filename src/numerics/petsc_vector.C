@@ -1384,8 +1384,46 @@ void PetscVector<T>::_restore_array() const
     }
 }
 
+template <typename T>
+std::unique_ptr<NumericVector<T>>
+PetscVector<T>::get_subvector(const std::vector<numeric_index_type> & rows)
+{
+  // Construct index set
+  WrappedPetsc<IS> parent_is;
+  auto ierr = ISCreateGeneral(this->comm().get(),
+                              cast_int<PetscInt>(rows.size()),
+                              numeric_petsc_cast(rows.data()),
+                              PETSC_USE_POINTER,
+                              parent_is.get());
+  LIBMESH_CHKERR(ierr);
 
+  Vec subvec;
+  ierr = VecGetSubVector(_vec, parent_is, &subvec);
+  LIBMESH_CHKERR(ierr);
 
+  return std::make_unique<PetscVector<T>>(subvec, this->comm());
+}
+
+template <typename T>
+void
+PetscVector<T>::restore_subvector(NumericVector<T> && subvector,
+                                  const std::vector<numeric_index_type> & rows)
+{
+  auto * const petsc_subvector = cast_ptr<PetscVector<T> *>(&subvector);
+
+  // Construct index set
+  WrappedPetsc<IS> parent_is;
+  auto ierr = ISCreateGeneral(this->comm().get(),
+                              cast_int<PetscInt>(rows.size()),
+                              numeric_petsc_cast(rows.data()),
+                              PETSC_USE_POINTER,
+                              parent_is.get());
+  LIBMESH_CHKERR(ierr);
+
+  Vec subvec = petsc_subvector->vec();
+  ierr = VecRestoreSubVector(_vec, parent_is, &subvec);
+  LIBMESH_CHKERR(ierr);
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations

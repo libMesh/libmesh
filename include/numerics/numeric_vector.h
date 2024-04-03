@@ -729,6 +729,28 @@ public:
   }
 
   /**
+   * Creates a view into this vector using the indices in \p
+   * rows.  Similar to the \p create_submatrix() routine for the
+   * SparseMatrix class, it is currently only implemented for
+   * PetscVectors.
+   */
+  virtual std::unique_ptr<NumericVector<T>>
+  get_subvector(const std::vector<numeric_index_type> &)
+  {
+    libmesh_not_implemented();
+  }
+
+  /**
+   * Restores a view into this vector using the indices in \p
+   * rows.  This  is currently only implemented for
+   * PetscVectors.
+   */
+  virtual void restore_subvector(NumericVector<T> &&, const std::vector<numeric_index_type> &)
+  {
+    libmesh_not_implemented();
+  }
+
+  /**
    * Swaps the contents of this with \p v.  There should be enough
    * indirection in subclasses to make this an O(1) header-swap
    * operation.
