@@ -137,6 +137,11 @@ public:
   void copy_super_to_sub(NumericVector<Number> & super, NumericVector<Number> & sub);
 
   /**
+   * Copy a logically super-matrix into a sub-matrix
+   */
+  void copy_super_to_sub(const SparseMatrix<Number> & super, SparseMatrix<Number> & sub);
+
+  /**
    * The (condensed) system matrix for standard eigenvalue problems.
    *
    * Public access to this member variable will be deprecated in
