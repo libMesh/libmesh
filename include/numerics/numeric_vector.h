@@ -119,7 +119,7 @@ public:
   virtual NumericVector<T> & operator= (const NumericVector<T> & v) = 0;
 
   /**
-   * The 5 special functions can be defaulted for this class, as it
+   * These 3 special functions can be defaulted for this class, as it
    * does not manage any memory itself.
    */
   NumericVector (NumericVector &&) = default;

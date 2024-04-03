@@ -1517,6 +1517,41 @@ void PetscMatrix<T>::swap(PetscMatrix<T> & m_in)
   std::swap(_destroy_mat_on_exit, m_in._destroy_mat_on_exit);
 }
 
+template <typename T>
+PetscMatrix<T> & PetscMatrix<T>::operator= (const PetscMatrix<T> & v)
+{
+  if (_mat)
+  {
+    MatInfo our_info, v_info;
+
+    auto ierr = MatGetInfo(_mat, MAT_GLOBAL_SUM, &our_info);
+    LIBMESH_CHKERR(ierr);
+    ierr = MatGetInfo(v._mat, MAT_GLOBAL_SUM, &v_info);
+    LIBMESH_CHKERR(ierr);
+    if (our_info.nz_allocated == v_info.nz_allocated)
+      // Strong chance we have the same nonzero structure
+      ierr = MatCopy(v._mat, _mat, SAME_NONZERO_PATTERN);
+    else
+      ierr = MatCopy(v._mat, _mat, DIFFERENT_NONZERO_PATTERN);
+    LIBMESH_CHKERR(ierr);
+  }
+  else
+  {
+    auto ierr = MatDuplicate(v._mat, MAT_COPY_VALUES, &_mat);
+    LIBMESH_CHKERR(ierr);
+  }
+
+  this->_is_initialized = true;
+
+  return *this;
+}
+
+template <typename T>
+SparseMatrix<T> & PetscMatrix<T>::operator= (const SparseMatrix<T> & v)
+{
+  *this = cast_ref<const PetscMatrix<T> &>(v);
+  return *this;
+}
 
 
 //------------------------------------------------------------------

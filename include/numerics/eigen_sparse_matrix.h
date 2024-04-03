@@ -77,6 +77,12 @@ public:
   EigenSparseMatrix & operator= (EigenSparseMatrix &&) = default;
   virtual ~EigenSparseMatrix () = default;
 
+  virtual SparseMatrix<T> & operator=(const SparseMatrix<T> & v) override
+  {
+    *this = cast_ref<const EigenSparseMatrix<T> &>(v);
+    return *this;
+  }
+
   /**
    * Convenient typedefs
    */

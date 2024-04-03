@@ -96,6 +96,11 @@ public:
   EpetraMatrix & operator= (const EpetraMatrix &) = delete;
   EpetraMatrix & operator= (EpetraMatrix &&) = delete;
   virtual ~EpetraMatrix ();
+  virtual SparseMatrix<T> & operator=(const SparseMatrix<T> &) override
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   /**
    * The \p EpetraMatrix needs the full sparsity pattern.

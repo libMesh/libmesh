@@ -84,14 +84,35 @@ public:
   SparseMatrix (const Parallel::Communicator & comm);
 
   /**
-   * The 5 special functions can be defaulted for this class, as it
+   * This _looks_ like a copy assignment operator, but note that,
+   * unlike normal copy assignment operators, it is pure virtual. This
+   * function should be overridden in derived classes so that they can
+   * be copied correctly via references to the base class. This design
+   * usually isn't a good idea in general, but in this context it
+   * works because we usually don't have a mix of different kinds of
+   * SparseMatrix active in the library at a single time.
+   *
+   * \returns A reference to *this as the base type.
+   */
+  virtual SparseMatrix<T> & operator= (const SparseMatrix<T> &)
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
+
+  /**
+   * These 3 special functions can be defaulted for this class, as it
    * does not manage any memory itself.
    */
   SparseMatrix (SparseMatrix &&) = default;
   SparseMatrix (const SparseMatrix &) = default;
-  SparseMatrix & operator= (const SparseMatrix &) = default;
   SparseMatrix & operator= (SparseMatrix &&) = default;
-  virtual ~SparseMatrix () = default;
+
+  /**
+   * While this class doesn't manage any memory, the derived class might and
+   * users may be deleting through a pointer to this base class
+   */
+  virtual ~SparseMatrix() = default;
 
   /**
    * Builds a \p SparseMatrix<T> using the linear solver package specified by

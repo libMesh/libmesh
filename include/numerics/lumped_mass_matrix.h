@@ -53,6 +53,11 @@ public:
    */
   LumpedMassMatrix(LumpedMassMatrix &&) = default;
   LumpedMassMatrix & operator=(LumpedMassMatrix &&) = default;
+  virtual SparseMatrix<T> & operator=(const SparseMatrix<T> &) override
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   virtual std::unique_ptr<SparseMatrix<T>> zero_clone() const override;
 
