@@ -1486,10 +1486,8 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
           // if we had to fix up gf output to get here.
           libmesh_assert(elem->active());
 
-          GhostingFunctor::map_type::iterator existing_it =
-            elements_to_ghost.find (elem);
-
-          if (existing_it == elements_to_ghost.end())
+          if (auto existing_it = elements_to_ghost.find(elem);
+              existing_it == elements_to_ghost.end())
             elements_to_ghost.emplace(elem, elem_cm);
           else
             {
@@ -1524,8 +1522,8 @@ merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                       // we don't need it anymore; we might as well
                       // remove it to keep the set of temporaries
                       // small.
-                      auto temp_it = temporary_coupling_matrices.find(existing_it->second);
-                      if (temp_it != temporary_coupling_matrices.end())
+                      if (auto temp_it = temporary_coupling_matrices.find(existing_it->second);
+                          temp_it != temporary_coupling_matrices.end())
                         temporary_coupling_matrices.erase(temp_it);
 
                       existing_it->second = nullptr;
@@ -1875,8 +1873,8 @@ DofMap::remove_coupling_functor(GhostingFunctor & coupling_functor)
   _coupling_functors.erase(&coupling_functor);
   _mesh.remove_ghosting_functor(coupling_functor);
 
-  auto it = _shared_functors.find(&coupling_functor);
-  if (it != _shared_functors.end())
+  if (auto it = _shared_functors.find(&coupling_functor);
+      it != _shared_functors.end())
     _shared_functors.erase(it);
 }
 
@@ -1900,8 +1898,8 @@ DofMap::remove_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor)
   _algebraic_ghosting_functors.erase(&evaluable_functor);
   _mesh.remove_ghosting_functor(evaluable_functor);
 
-  auto it = _shared_functors.find(&evaluable_functor);
-  if (it != _shared_functors.end())
+  if (auto it = _shared_functors.find(&evaluable_functor);
+      it != _shared_functors.end())
     _shared_functors.erase(it);
 }
 
