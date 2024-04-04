@@ -392,8 +392,8 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
       //    more than 3 parameters, and
       // b) we will overwrite the training samples anyway in the call to
       //    load_training_set() below, so we do not want to generate an
-      //    error due to deterministic training sample generation when we
-      //    will the samples will be overwritten anyway.
+      //    error due to deterministic training sample generation when
+      //    the samples will be overwritten anyway.
       updated_deterministic_training = false;
     }
 
