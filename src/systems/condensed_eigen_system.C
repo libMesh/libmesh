@@ -122,6 +122,31 @@ CondensedEigenSystem::add_matrices()
   }
 }
 
+void
+CondensedEigenSystem::init_matrices()
+{
+  Parent::init_matrices();
+
+  if (!this->assemble_before_solve)
+  {
+    // We just want to create matrices of the proper size from our condensed dofs. We will assemble
+    // directly into these submatrices later
+    initialize_condensed_dofs();
+    if (matrix_A)
+      matrix_A->create_submatrix(
+          *condensed_matrix_A, local_non_condensed_dofs_vector, local_non_condensed_dofs_vector);
+
+    if (generalized() && matrix_B)
+      matrix_B->create_submatrix(
+          *condensed_matrix_B, local_non_condensed_dofs_vector, local_non_condensed_dofs_vector);
+
+    if (precond_matrix)
+      precond_matrix->create_submatrix(*condensed_precond_matrix,
+                                       local_non_condensed_dofs_vector,
+                                       local_non_condensed_dofs_vector);
+  }
+}
+
 void CondensedEigenSystem::solve()
 {
   LOG_SCOPE("solve()", "CondensedEigenSystem");
@@ -141,39 +166,38 @@ void CondensedEigenSystem::solve()
   libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
   libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
 
+  // If we reach here, then there should be some non-condensed dofs
+  libmesh_assert(!local_non_condensed_dofs_vector.empty());
+
   if (this->assemble_before_solve)
     {
       // Assemble the linear system
       this->assemble ();
 
-      // And close the assembled matrices; using a non-closed matrix
+      // And close and condense the assembled matrices; using a non-closed matrix
       // with create_submatrix() is deprecated.
       if (matrix_A)
-        matrix_A->close();
-      if (generalized() && matrix_B)
-        matrix_B->close();
-      if (precond_matrix)
-        precond_matrix->close();
-    }
-
-  // If we reach here, then there should be some non-condensed dofs
-  libmesh_assert(!local_non_condensed_dofs_vector.empty());
-
-  // Now condense the matrices
-  if (matrix_A)
-    matrix_A->create_submatrix(*condensed_matrix_A,
-                               local_non_condensed_dofs_vector,
-                               local_non_condensed_dofs_vector);
-
-  if (generalized() && matrix_B)
-    matrix_B->create_submatrix(*condensed_matrix_B,
-                               local_non_condensed_dofs_vector,
-                               local_non_condensed_dofs_vector);
-
-  if (precond_matrix)
-    precond_matrix->create_submatrix(*condensed_precond_matrix,
+        {
+          matrix_A->close();
+          matrix_A->create_submatrix(*condensed_matrix_A,
                                      local_non_condensed_dofs_vector,
                                      local_non_condensed_dofs_vector);
+        }
+      if (generalized() && matrix_B)
+        {
+          matrix_B->close();
+          matrix_B->create_submatrix(*condensed_matrix_B,
+                                     local_non_condensed_dofs_vector,
+                                     local_non_condensed_dofs_vector);
+        }
+      if (precond_matrix)
+        {
+          precond_matrix->close();
+          precond_matrix->create_submatrix(*condensed_precond_matrix,
+                                           local_non_condensed_dofs_vector,
+                                           local_non_condensed_dofs_vector);
+        }
+    }
 
   solve_helper(condensed_matrix_A, condensed_matrix_B, condensed_precond_matrix);
 }

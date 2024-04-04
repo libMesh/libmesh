@@ -176,10 +176,8 @@ public:
   std::vector<dof_id_type> local_non_condensed_dofs_vector;
 
 protected:
-  /**
-   * Adds the necessary matrices and shell matrices
-   */
   virtual void add_matrices () override;
+  virtual void init_matrices () override;
 
   /**
    * The condensed preconditioning matrix
