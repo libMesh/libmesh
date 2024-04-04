@@ -380,8 +380,8 @@ private:
           bool do_this_side = false;
           for (const auto & bc_id : ids_vec)
             {
-              auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
-              if (it != boundary_id_to_ordered_dirichlet_boundaries.end())
+              if (auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
+                  it != boundary_id_to_ordered_dirichlet_boundaries.end())
                 {
                   do_this_side = true;
 
@@ -420,8 +420,8 @@ private:
                   {
                     // Only add this as a boundary node for this db if
                     // it is also a boundary side for this db.
-                    auto side_it = is_boundary_side_map.find(db_pair.second);
-                    if (side_it != is_boundary_side_map.end() && side_it->second[s])
+                    if (auto side_it = is_boundary_side_map.find(db_pair.second);
+                        side_it != is_boundary_side_map.end() && side_it->second[s])
                       {
                         auto pr = is_boundary_node_map.emplace(db_pair.second, std::vector<bool>(n_nodes, false));
                         pr.first->second[n] = true;
@@ -442,8 +442,8 @@ private:
                   {
                     // Only add this as a boundary edge for this db if
                     // it is also a boundary side for this db.
-                    auto side_it = is_boundary_side_map.find(db_pair.second);
-                    if (side_it != is_boundary_side_map.end() && side_it->second[s])
+                    if (auto side_it = is_boundary_side_map.find(db_pair.second);
+                        side_it != is_boundary_side_map.end() && side_it->second[s])
                       {
                         auto pr = is_boundary_edge_map.emplace(db_pair.second, std::vector<bool>(n_edges, false));
                         pr.first->second[e] = true;
@@ -460,8 +460,8 @@ private:
 
           for (const auto & bc_id : ids_vec)
             {
-              auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
-              if (it != boundary_id_to_ordered_dirichlet_boundaries.end())
+              if (auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
+                  it != boundary_id_to_ordered_dirichlet_boundaries.end())
                 {
                   // Associate every DirichletBoundary object that has this bc_id with the current Elem
                   ordered_dbs.insert(it->second.begin(), it->second.end());
@@ -490,8 +490,8 @@ private:
           bool do_this_side = false;
           for (const auto & bc_id : ids_vec)
             {
-              auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
-              if (it != boundary_id_to_ordered_dirichlet_boundaries.end())
+              if (auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
+                  it != boundary_id_to_ordered_dirichlet_boundaries.end())
                 {
                   do_this_side = true;
 
@@ -525,8 +525,8 @@ private:
                   {
                     // Only add this as a boundary node for this db if
                     // it is also a boundary edge for this db.
-                    auto edge_it = is_boundary_edge_map.find(db_pair.second);
-                    if (edge_it != is_boundary_edge_map.end() && edge_it->second[e])
+                    if (auto edge_it = is_boundary_edge_map.find(db_pair.second);
+                        edge_it != is_boundary_edge_map.end() && edge_it->second[e])
                       {
                         auto pr = is_boundary_node_map.emplace(db_pair.second, std::vector<bool>(n_nodes, false));
                         pr.first->second[n] = true;
@@ -544,8 +544,8 @@ private:
 
           for (const auto & bc_id : ids_vec)
             {
-              auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
-              if (it != boundary_id_to_ordered_dirichlet_boundaries.end())
+              if (auto it = boundary_id_to_ordered_dirichlet_boundaries.find(bc_id);
+                  it != boundary_id_to_ordered_dirichlet_boundaries.end())
                 {
                   has_dirichlet_constraint = true;
                   do_this_shellface = true;
@@ -570,8 +570,8 @@ private:
                   {
                     // Only add this as a boundary node for this db if
                     // it is also a boundary shellface for this db.
-                    auto side_it = is_boundary_shellface_map.find(db_pair.second);
-                    if (side_it != is_boundary_shellface_map.end() && side_it->second[shellface])
+                    if (auto side_it = is_boundary_shellface_map.find(db_pair.second);
+                        side_it != is_boundary_shellface_map.end() && side_it->second[shellface])
                       {
                         auto pr = is_boundary_node_map.emplace(db_pair.second, std::vector<bool>(n_nodes, false));
                         pr.first->second[n] = true;
@@ -2198,11 +2198,8 @@ void DofMap::add_constraint_row (const dof_id_type dof_number,
     libmesh_assert_less(pr.first, this->n_dofs());
 #endif
 
-  // We don't get insert_or_assign until C++17 so we make do.
-  std::pair<DofConstraints::iterator, bool> it =
-    _dof_constraints.emplace(dof_number, constraint_row);
-  if (!it.second)
-    it.first->second = constraint_row;
+  // Store the constraint_row in the map
+  _dof_constraints.insert_or_assign(dof_number, constraint_row);
 
   std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
     _primal_constraint_values.emplace(dof_number, constraint_rhs);
@@ -2245,11 +2242,8 @@ void DofMap::add_adjoint_constraint_row (const unsigned int qoi_index,
   // Creates the map of rhs values if it doesn't already exist; then
   // adds the current value to that map
 
-  // We don't get insert_or_assign until C++17 so we make do.
-  std::pair<DofConstraintValueMap::iterator, bool> rhs_it =
-    _adjoint_constraint_values[qoi_index].emplace(dof_number, constraint_rhs);
-  if (!rhs_it.second)
-    rhs_it.first->second = constraint_rhs;
+  // Store the rhs value in the map
+  _adjoint_constraint_values[qoi_index].insert_or_assign(dof_number, constraint_rhs);
 }
 
 
@@ -2351,10 +2345,8 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
       os << "Adjoint " << qoi_index << " DoF rhs values:"
          << std::endl;
 
-      AdjointDofConstraintValues::const_iterator adjoint_map_it =
-        _adjoint_constraint_values.find(qoi_index);
-
-      if (adjoint_map_it != _adjoint_constraint_values.end())
+      if (auto adjoint_map_it = _adjoint_constraint_values.find(qoi_index);
+          adjoint_map_it != _adjoint_constraint_values.end())
         for (const auto [i, rhs] : adjoint_map_it->second)
           {
             // Skip non-local dofs if requested
@@ -2553,13 +2545,9 @@ void DofMap::heterogeneously_constrain_element_matrix_and_vector (DenseMatrix<Nu
       const DofConstraintValueMap * rhs_values = nullptr;
       if (qoi_index < 0)
         rhs_values = &_primal_constraint_values;
-      else
-        {
-          const AdjointDofConstraintValues::const_iterator
-            it = _adjoint_constraint_values.find(qoi_index);
-          if (it != _adjoint_constraint_values.end())
-            rhs_values = &it->second;
-        }
+      else if (auto it = _adjoint_constraint_values.find(qoi_index);
+               it != _adjoint_constraint_values.end())
+        rhs_values = &it->second;
 
       // Compute matrix/vector product K H
       DenseVector<Number> KH;
@@ -2677,10 +2665,8 @@ void DofMap::heterogeneously_constrain_element_jacobian_and_residual
     {
       const dof_id_type dof_id = elem_dofs[i];
 
-      const DofConstraints::const_iterator
-        pos = _dof_constraints.find(dof_id);
-
-      if (pos != _dof_constraints.end())
+      if (auto pos = _dof_constraints.find(dof_id);
+          pos != _dof_constraints.end())
         {
           for (auto j : make_range(matrix.n()))
             matrix(i,j) = 0.;
@@ -2750,10 +2736,8 @@ void DofMap::heterogeneously_constrain_element_residual
     {
       const dof_id_type dof_id = elem_dofs[i];
 
-      const DofConstraints::const_iterator
-        pos = _dof_constraints.find(dof_id);
-
-      if (pos != _dof_constraints.end())
+      if (auto pos = _dof_constraints.find(dof_id);
+          pos != _dof_constraints.end())
         {
           // This will put a nonsymmetric entry in the constraint
           // row to ensure that the linear system produces the
@@ -2809,10 +2793,8 @@ void DofMap::constrain_element_residual
     {
       const dof_id_type dof_id = elem_dofs[i];
 
-      const DofConstraints::const_iterator
-        pos = _dof_constraints.find(dof_id);
-
-      if (pos != _dof_constraints.end())
+      if (auto pos = _dof_constraints.find(dof_id);
+          pos != _dof_constraints.end())
         {
           // This will put a nonsymmetric entry in the constraint
           // row to ensure that the linear system produces the
@@ -2860,13 +2842,9 @@ void DofMap::heterogeneously_constrain_element_vector (const DenseMatrix<Number>
       const DofConstraintValueMap * rhs_values = nullptr;
       if (qoi_index < 0)
         rhs_values = &_primal_constraint_values;
-      else
-        {
-          const AdjointDofConstraintValues::const_iterator
-            it = _adjoint_constraint_values.find(qoi_index);
-          if (it != _adjoint_constraint_values.end())
-            rhs_values = &it->second;
-        }
+      else if (auto it = _adjoint_constraint_values.find(qoi_index);
+               it != _adjoint_constraint_values.end())
+        rhs_values = &it->second;
 
       // Compute matrix/vector product K H
       DenseVector<Number> KH;
@@ -3173,9 +3151,8 @@ void DofMap::enforce_constraints_exactly (const System & system,
       Number exact_value = 0;
       if (!homogeneous)
         {
-          DofConstraintValueMap::const_iterator rhsit =
-            _primal_constraint_values.find(constrained_dof);
-          if (rhsit != _primal_constraint_values.end())
+          if (auto rhsit = _primal_constraint_values.find(constrained_dof);
+              rhsit != _primal_constraint_values.end())
             exact_value = rhsit->second;
         }
       for (const auto & [dof, val] : constraint_row)
@@ -3243,9 +3220,8 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
       exact_value += (*solution_local)(constrained_dof);
       if (!homogeneous)
         {
-          DofConstraintValueMap::const_iterator rhsit =
-            _primal_constraint_values.find(constrained_dof);
-          if (rhsit != _primal_constraint_values.end())
+          if (auto rhsit = _primal_constraint_values.find(constrained_dof);
+              rhsit != _primal_constraint_values.end())
             exact_value += rhsit->second;
         }
 
@@ -3621,13 +3597,9 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
       const DofConstraintValueMap * rhs_values = nullptr;
       if (qoi_index < 0)
         rhs_values = &_primal_constraint_values;
-      else
-        {
-          const AdjointDofConstraintValues::const_iterator
-            it = _adjoint_constraint_values.find(qoi_index);
-          if (it != _adjoint_constraint_values.end())
-            rhs_values = &it->second;
-        }
+      else if (auto it = _adjoint_constraint_values.find(qoi_index);
+               it != _adjoint_constraint_values.end())
+        rhs_values = &it->second;
 
       const unsigned int old_size =
         cast_int<unsigned int>(elem_dofs.size());
@@ -4457,21 +4429,16 @@ void DofMap::process_constraints (MeshBase & mesh)
                 constraint_row[item.first] += item.second * this_coef;
               }
 
-            DofConstraintValueMap::const_iterator subrhsit =
-              _primal_constraint_values.find(expandable);
-            if (subrhsit != _primal_constraint_values.end())
+            if (auto subrhsit = _primal_constraint_values.find(expandable);
+                subrhsit != _primal_constraint_values.end())
               constraint_rhs += subrhsit->second * this_coef;
 
             // Find and gather recursive constraints for each adjoint variable
             for (const auto & adjoint_map : _adjoint_constraint_values)
               {
-                const std::size_t q = adjoint_map.first;
-
-                DofConstraintValueMap::const_iterator adjoint_subrhsit =
-                  adjoint_map.second.find(expandable);
-
-                if (adjoint_subrhsit != adjoint_map.second.end())
-                adjoint_constraint_rhs[q] += adjoint_subrhsit->second * this_coef;
+                if (auto adjoint_subrhsit = adjoint_map.second.find(expandable);
+                    adjoint_subrhsit != adjoint_map.second.end())
+                  adjoint_constraint_rhs[adjoint_map.first] += adjoint_subrhsit->second * this_coef;
               }
 
             constraint_row.erase(expandable);
@@ -4979,8 +4946,8 @@ void DofMap::scatter_constraints(MeshBase & mesh)
 
       for (const auto & dof : my_dof_indices)
         {
-          DofConstrainsMap::const_iterator dcmi = dof_id_constrains.find(dof);
-          if (dcmi != dof_id_constrains.end())
+          if (auto dcmi = dof_id_constrains.find(dof);
+              dcmi != dof_id_constrains.end())
             {
               for (const auto & constrained : dcmi->second)
                 {
@@ -5084,12 +5051,10 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
       // Fill (and thereby sort and uniq!) the main request sets
       for (const auto & unexpanded_dof : unexpanded_dofs)
         {
-          DofConstraints::const_iterator
-            pos = _dof_constraints.find(unexpanded_dof);
-
           // If we were asked for a DoF and we don't already have a
           // constraint for it, then we need to check for one.
-          if (pos == _dof_constraints.end())
+          if (auto pos = _dof_constraints.find(unexpanded_dof);
+              pos == _dof_constraints.end())
             {
               if (!this->local_index(unexpanded_dof) &&
                   !_dof_constraints.count(unexpanded_dof) )
