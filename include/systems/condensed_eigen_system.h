@@ -108,6 +108,8 @@ public:
    */
   virtual void solve() override;
 
+  virtual void clear () override;
+
   /**
    * Override \p get_eigenpair() to retrieve the eigenpair for
    * the condensed eigensolve. We only set the non-condensed
@@ -116,15 +118,24 @@ public:
    */
   virtual std::pair<Real, Real> get_eigenpair(dof_id_type i) override;
 
+  bool has_condensed_matrix_A() const { return condensed_matrix_A; }
+  bool has_condensed_matrix_B() const { return condensed_matrix_B; }
+  bool has_condensed_precond_matrix() const { return condensed_precond_matrix; }
+
   /**
    * \returns The system matrix used for standard eigenvalue problems
    */
-  SparseMatrix<Number> & get_condensed_matrix_A() const;
+  SparseMatrix<Number> & get_condensed_matrix_A();
 
   /**
    * \returns The second system matrix used for generalized eigenvalue problems.
    */
-  SparseMatrix<Number> & get_condensed_matrix_B() const;
+  SparseMatrix<Number> & get_condensed_matrix_B();
+
+  /**
+   * \returns The condensed preconditioning matrix
+   */
+  SparseMatrix<Number> & get_condensed_precond_matrix();
 
   /**
    * Copy a logically sub-vector into a super-vector
@@ -165,6 +176,11 @@ public:
   std::vector<dof_id_type> local_non_condensed_dofs_vector;
 
 protected:
+  /**
+   * Adds the necessary matrices and shell matrices
+   */
+  virtual void add_matrices () override;
+
   /**
    * The condensed preconditioning matrix
    */

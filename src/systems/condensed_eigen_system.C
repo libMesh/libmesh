@@ -37,9 +37,9 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
                                             const std::string & name_in,
                                             const unsigned int number_in)
   : Parent(es, name_in, number_in),
-    condensed_matrix_A(&this->add_matrix("Condensed Eigen Matrix A")),
-    condensed_matrix_B(&this->add_matrix("Condensed Eigen Matrix B")),
-    condensed_precond_matrix(&this->add_matrix("Condensed Eigen Preconditioner")),
+    condensed_matrix_A(nullptr),
+    condensed_matrix_B(nullptr),
+    condensed_precond_matrix(nullptr),
     condensed_dofs_initialized(false)
 {
 }
@@ -91,6 +91,36 @@ dof_id_type CondensedEigenSystem::n_global_non_condensed_dofs() const
     }
 }
 
+void
+CondensedEigenSystem::clear()
+{
+  Parent::clear();
+  condensed_matrix_A = nullptr;
+  condensed_matrix_B = nullptr;
+  condensed_precond_matrix = nullptr;
+}
+
+void
+CondensedEigenSystem::add_matrices()
+{
+  Parent::add_matrices();
+
+  if (!this->use_shell_matrices())
+  {
+    if (!condensed_matrix_A)
+      condensed_matrix_A = &this->add_matrix("Condensed Eigen Matrix A");
+    if (!condensed_matrix_B)
+      condensed_matrix_B = &this->add_matrix("Condensed Eigen Matrix B");
+
+    // When not using shell matrices we use A for P as well so we don't need to add P
+  }
+  // we *are* using shell matrices but we might not be using a shell matrix for P
+  else if (!this->use_shell_precond_matrix())
+  {
+    if (!condensed_precond_matrix)
+      condensed_precond_matrix = &this->add_matrix("Condensed Eigen Preconditioner");
+  }
+}
 
 void CondensedEigenSystem::solve()
 {
@@ -193,20 +223,25 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
 
 
 
-SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_A() const
+SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_A()
 {
   libmesh_assert(condensed_matrix_A);
   libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix A"), condensed_matrix_A);
   return *condensed_matrix_A;
 }
 
-
-
-SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_B() const
+SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_B()
 {
   libmesh_assert(condensed_matrix_B);
   libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix B"), condensed_matrix_B);
   return *condensed_matrix_B;
+}
+
+SparseMatrix<Number> & CondensedEigenSystem::get_condensed_precond_matrix()
+{
+  libmesh_assert(condensed_precond_matrix);
+  libmesh_assert_equal_to(&get_matrix("Condensed Eigen Preconditioner"), condensed_precond_matrix);
+  return *condensed_precond_matrix;
 }
 
 void
