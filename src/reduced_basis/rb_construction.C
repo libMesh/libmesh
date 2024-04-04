@@ -320,11 +320,24 @@ void RBConstruction::set_rb_construction_parameters(
   // Initialize the parameter ranges and the parameters themselves
   initialize_parameters(mu_min_in, mu_max_in, discrete_parameter_values_in);
 
+  bool updated_deterministic_training = deterministic_training_in;
+  if (training_sample_list && (this->get_parameters_min().n_parameters() > 3))
+    {
+      // In this case we force deterministic_training to be false because
+      // a) deterministic training samples are not currrently supported with
+      //    more than 3 parameters, and
+      // b) we will overwrite the training samples anyway in the call to
+      //    load_training_set() below, so we do not want to generate an
+      //    error due to deterministic training sample generation when we
+      //    will the samples will be overwritten anyway.
+      updated_deterministic_training = false;
+    }
+
   initialize_training_parameters(this->get_parameters_min(),
                                  this->get_parameters_max(),
                                  n_training_samples_in,
                                  log_scaling_in,
-                                 deterministic_training_in);   // use deterministic parameters
+                                 updated_deterministic_training); // use deterministic parameters
 
   if (training_sample_list)
     {
