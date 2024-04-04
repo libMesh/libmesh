@@ -182,7 +182,10 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
       solution->set(index,(*temp)(temp->first_local_index()+j));
     }
 
+  // Enforcing constraints requires creating a ghosted version of the solution, which requires the
+  // solution be assembled
   solution->close();
+  get_dof_map().enforce_constraints_exactly(*this);
   this->update();
 
   return eval;
