@@ -664,8 +664,8 @@ void AdjointRefinementEstimator::estimate_error (const System & _system,
 
       // If it's a vector we already had (and not a newly created
       // vector like an adjoint rhs), we need to restore it.
-      auto it = coarse_vectors.find(var_name);
-      if (it != coarse_vectors.end())
+      if (auto it = coarse_vectors.find(var_name);
+          it != coarse_vectors.end())
         {
           NumericVector<Number> * coarsevec = it->second.get();
           system.get_vector(var_name) = *coarsevec;
