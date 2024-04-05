@@ -159,12 +159,11 @@ void CondensedEigenSystem::solve()
       return;
     }
 
-  // A reference to the EquationSystems
-  EquationSystems & es = this->get_equation_systems();
-
   // check that necessary parameters have been set
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
+  libmesh_assert(
+      this->get_equation_systems().parameters.have_parameter<unsigned int>("eigenpairs"));
+  libmesh_assert(
+      this->get_equation_systems().parameters.have_parameter<unsigned int>("basis vectors"));
 
   // If we reach here, then there should be some non-condensed dofs
   libmesh_assert(!local_non_condensed_dofs_vector.empty());
@@ -172,7 +171,7 @@ void CondensedEigenSystem::solve()
   if (this->assemble_before_solve)
     {
       // Assemble the linear system
-      this->assemble ();
+      this->assemble();
 
       // And close and condense the assembled matrices; using a non-closed matrix
       // with create_submatrix() is deprecated.
