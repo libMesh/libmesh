@@ -153,6 +153,12 @@ public:
   void copy_super_to_sub(const SparseMatrix<Number> & super, SparseMatrix<Number> & sub);
 
   /**
+   * Instructs not to create the condensed submatrices from the global matrices in the solve
+   */
+  void dont_create_submatrices_in_solve() { _create_submatrices_in_solve = false; }
+
+
+  /**
    * The (condensed) system matrix for standard eigenvalue problems.
    *
    * Public access to this member variable will be deprecated in
@@ -177,7 +183,6 @@ public:
 
 protected:
   virtual void add_matrices () override;
-  virtual void init_matrices () override;
 
   /**
    * The condensed preconditioning matrix
@@ -192,6 +197,11 @@ private:
    * have been initialized.
    */
   bool condensed_dofs_initialized;
+
+  /**
+   * Denotes whether to create the condensed submatrices from the global matrices in the solve
+   */
+  bool _create_submatrices_in_solve;
 };
 
 
