@@ -508,14 +508,6 @@ SlepcEigenSolver<T>::_solve_helper(Mat precond,
   PetscInt its=0;
   ST st=nullptr;
 
-#ifdef  DEBUG
-  // The relative error.
-  PetscReal error, re, im;
-
-  // Pointer to vectors of the real parts, imaginary parts.
-  PetscScalar kr, ki;
-#endif
-
   //set the problem type and the position of the spectrum
   set_slepc_problem_type();
   set_slepc_position_of_spectrum();
@@ -578,11 +570,27 @@ SlepcEigenSolver<T>::_solve_helper(Mat precond,
   ierr = EPSGetConverged(_eps,&nconv);
   LIBMESH_CHKERR(ierr);
 
+  // return the number of converged eigenpairs
+  // and the number of iterations
+  return std::make_pair(nconv, its);
+}
 
-#ifdef DEBUG
-  // ierr = PetscPrintf(this->comm().get(),
-  //         "\n Number of iterations: %d\n"
-  //         " Number of converged eigenpairs: %d\n\n", its, nconv);
+
+template <typename T>
+void SlepcEigenSolver<T>::print_eigenvalues() const
+{
+  // converged eigen pairs and number of iterations
+  PetscInt nconv=0;
+
+  // The relative error.
+  PetscReal error, re, im;
+
+  // Pointer to vectors of the real parts, imaginary parts.
+  PetscScalar kr, ki;
+
+  // Get number of converged eigenpairs.
+  auto ierr = EPSGetConverged(_eps,&nconv);
+  LIBMESH_CHKERR(ierr);
 
   // Display eigenvalues and relative errors.
   ierr = PetscPrintf(this->comm().get(),
@@ -625,22 +633,7 @@ SlepcEigenSolver<T>::_solve_helper(Mat precond,
 
   ierr = PetscPrintf(this->comm().get(),"\n" );
   LIBMESH_CHKERR(ierr);
-#endif // DEBUG
-
-  // return the number of converged eigenpairs
-  // and the number of iterations
-  return std::make_pair(nconv, its);
 }
-
-
-
-
-
-
-
-
-
-
 
 
 template <typename T>
