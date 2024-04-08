@@ -267,7 +267,7 @@ public:
   bool has_auto_area_function() {return _auto_area_function != nullptr;}
 
   /**
-  *  Caluclate the local desired area based on the auto area function.
+  *  Calculate the local desired area based on the auto area function.
   */
   Real get_auto_desired_area(const Point &p);
 
