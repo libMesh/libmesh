@@ -602,10 +602,8 @@ void Poly2TriTriangulator::triangulate_current_points()
       for (auto & node : _mesh.node_ptr_range())
         {
           const p2t::Point pt = to_p2t(*node);
-
-          auto it = point_node_map.find(pt);
-
-          if (it == point_node_map.end())
+          if (auto it = point_node_map.find(pt);
+              it == point_node_map.end())
             {
               steiner_points.insert(pt);
               point_node_map.emplace(pt, node);
@@ -921,8 +919,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
         libmesh_assert(old_segment_end);
         libmesh_assert(old_segment_end->valid_id());
 
-        auto it = next_boundary_node.find(*old_segment_start);
-        if (it != next_boundary_node.end())
+        if (auto it = next_boundary_node.find(*old_segment_start);
+            it != next_boundary_node.end())
           {
             libmesh_assert(it->second == old_segment_end);
             it->second = new_node;
@@ -1075,13 +1073,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
               for (auto s : make_range(3u))
                 {
                   Elem * neigh = checking_elem->neighbor_ptr(s);
-                  if (!neigh)
-                    continue;
-                  if (checking_cavity.find(neigh) !=
-                      checking_cavity.end())
-                    continue;
-                  if (cavity.find(neigh) !=
-                      cavity.end())
+                  if (!neigh || checking_cavity.count(neigh) || cavity.count(neigh))
                     continue;
 
                   if (in_circumcircle(*neigh, new_pt, TOLERANCE*TOLERANCE))
@@ -1120,8 +1112,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
                     (Elem * new_neigh, boundary_id_type bcid)
                   {
                     // Set clockwise neighbor and vice-versa if possible
-                    auto CW_it = neighbors_CW.find(node_CW);
-                    if (CW_it == neighbors_CW.end())
+                    if (auto CW_it = neighbors_CW.find(node_CW);
+                        CW_it == neighbors_CW.end())
                       {
                         libmesh_assert(!neighbors_CCW.count(node_CW));
                         neighbors_CCW[node_CW] = std::make_pair(new_neigh, bcid);
@@ -1147,8 +1139,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
                       }
 
                     // Set counter-CW neighbor and vice-versa if possible
-                    auto CCW_it = neighbors_CCW.find(node_CCW);
-                    if (CCW_it == neighbors_CCW.end())
+                    if (auto CCW_it = neighbors_CCW.find(node_CCW);
+                        CCW_it == neighbors_CCW.end())
                       {
                         libmesh_assert(!neighbors_CW.count(node_CCW));
                         neighbors_CW[node_CCW] = std::make_pair(new_neigh, bcid);
@@ -1224,11 +1216,11 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
       // Now that we're done using our cavity elems (including with a
       // cavity.find() that used a comparator that dereferences the
-      // elmeents!) it's safe to delete them.
+      // elements!) it's safe to delete them.
       for (Elem * old_elem : cavity)
         {
-          auto it = new_elems.find(old_elem);
-          if (it == new_elems.end())
+          if (auto it = new_elems.find(old_elem);
+              it == new_elems.end())
             mesh.delete_elem(old_elem);
           else
             new_elems.erase(it);
@@ -1343,8 +1335,8 @@ bool Poly2TriTriangulator::insert_refinement_points()
           do
             {
               const dof_id_type node_id = node->id();
-              auto it = next_boundary_node.find(*node);
-              if (it == next_boundary_node.end())
+              if (auto it = next_boundary_node.find(*node);
+                  it == next_boundary_node.end())
                 {
                   while (node_id != old_it->first)
                     {
