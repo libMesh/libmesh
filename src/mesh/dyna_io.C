@@ -674,9 +674,8 @@ void DynaIO::read_mesh(std::istream & in)
                     key.emplace_back(global_node_idx, coef);
                 }
 
-              auto local_node_it = local_nodes.find(key);
-
-              if (local_node_it != local_nodes.end())
+              if (auto local_node_it = local_nodes.find(key);
+                  local_node_it != local_nodes.end())
                 elem->set_node(elem_defn.nodes[elem_node_index]) =
                   local_node_it->second;
               else
