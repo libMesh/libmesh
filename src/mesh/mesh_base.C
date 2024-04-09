@@ -288,12 +288,9 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
     }
 
   for (const auto & [elemset_code, elemset_ptr] : this->_elemset_codes)
-    {
-      auto it = other_mesh._elemset_codes.find(elemset_code);
-      if (it == other_mesh._elemset_codes.end() ||
-          *elemset_ptr != *it->second)
-        return false;
-    }
+    if (auto it = other_mesh._elemset_codes.find(elemset_code);
+        it == other_mesh._elemset_codes.end() || *elemset_ptr != *it->second)
+      return false;
 
   // FIXME: we have no good way to compare ghosting functors, since
   // they're in a set sorted by pointer, and we have no way *at all*
@@ -383,8 +380,8 @@ void MeshBase::get_elemsets(dof_id_type elemset_code, MeshBase::elemset_type & i
   // If we don't recognize this elemset_code, hand back an empty set
   id_set_to_fill.clear();
 
-  auto it = _elemset_codes.find(elemset_code);
-  if (it != _elemset_codes.end())
+  if (auto it = _elemset_codes.find(elemset_code);
+      it != _elemset_codes.end())
     id_set_to_fill.insert(it->second->begin(), it->second->end());
 }
 
@@ -549,8 +546,8 @@ std::vector<unsigned int> MeshBase::add_elem_integers(const std::vector<std::str
   for (auto i : index_range(names))
     {
       const std::string & name = names[i];
-      auto it = name_indices.find(name);
-      if (it != name_indices.end())
+      if (auto it = name_indices.find(name);
+          it != name_indices.end())
         {
           returnval[i] = it->second;
           _elem_integer_default_values[it->second] =
@@ -638,8 +635,8 @@ std::vector<unsigned int> MeshBase::add_node_integers(const std::vector<std::str
   for (auto i : index_range(names))
     {
       const std::string & name = names[i];
-      auto it = name_indices.find(name);
-      if (it != name_indices.end())
+      if (auto it = name_indices.find(name);
+          it != name_indices.end())
         {
           returnval[i] = it->second;
           _node_integer_default_values[it->second] =
@@ -889,8 +886,8 @@ void MeshBase::remove_ghosting_functor(GhostingFunctor & ghosting_functor)
 {
   _ghosting_functors.erase(&ghosting_functor);
 
-  auto it = _shared_functors.find(&ghosting_functor);
-  if (it != _shared_functors.end())
+  if (auto it = _shared_functors.find(&ghosting_functor);
+      it != _shared_functors.end())
     _shared_functors.erase(it);
 }
 
@@ -1626,8 +1623,8 @@ const std::string & MeshBase::subdomain_name(subdomain_id_type id) const
   // An empty string to return when no matching subdomain name is found
   static const std::string empty;
 
-  std::map<subdomain_id_type, std::string>::const_iterator iter = _block_id_to_name.find(id);
-  if (iter == _block_id_to_name.end())
+  if (auto iter = _block_id_to_name.find(id);
+      iter == _block_id_to_name.end())
     return empty;
   else
     return iter->second;
@@ -1639,13 +1636,9 @@ const std::string & MeshBase::subdomain_name(subdomain_id_type id) const
 subdomain_id_type MeshBase::get_id_by_name(std::string_view name) const
 {
   // Linear search over the map values.
-  std::map<subdomain_id_type, std::string>::const_iterator
-    iter = _block_id_to_name.begin(),
-    end_iter = _block_id_to_name.end();
-
-  for ( ; iter != end_iter; ++iter)
-    if (iter->second == name)
-      return iter->first;
+  for (const auto & [sbd_id, sbd_name] : _block_id_to_name)
+    if (sbd_name == name)
+      return sbd_id;
 
   // If we made it here without returning, we don't have a subdomain
   // with the requested name, so return Elem::invalid_subdomain_id.
@@ -1797,16 +1790,17 @@ void MeshBase::detect_interior_parents()
               found_interior_parents = false;
               for (auto n : make_range(1u, element->n_vertices()))
                 {
-                  if (neighbors[n].find(interior_parent_id)!=neighbors[n].end())
+                  if (neighbors[n].count(interior_parent_id))
                     {
-                      found_interior_parents=true;
+                      found_interior_parents = true;
                     }
                   else
                     {
-                      found_interior_parents=false;
+                      found_interior_parents = false;
                       break;
                     }
                 }
+
               if (found_interior_parents)
                 {
                   element->set_interior_parent(this->elem_ptr(interior_parent_id));
@@ -2048,8 +2042,7 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
   for (auto j : make_range(constraint_operator.n()))
     {
       // If we already have a good node for this then we're done
-      if (existing_unconstrained_columns.find(j) !=
-          existing_unconstrained_columns.end())
+      if (existing_unconstrained_columns.count(j))
         continue;
 
       // Get a half-decent spot to place a new NodeElem for
