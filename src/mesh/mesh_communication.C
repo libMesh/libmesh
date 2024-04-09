@@ -208,9 +208,9 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
         {
           for (const Node & node : elem->node_ref_range())
             {
-              auto it = constraint_rows.find(&node);
               // Retain all elements containing constraining nodes
-              if (it != constraint_rows.end())
+              if (auto it = constraint_rows.find(&node);
+                  it != constraint_rows.end())
                 for (auto & p : it->second)
                   {
                     const Elem * constraining_elem = p.first.first;
@@ -949,9 +949,8 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
       std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
       std::set<const Node *> nodes_to_send;
 
-      const ghost_map::const_iterator it =
-        coarsening_elements_to_ghost.find(p);
-      if (it != coarsening_elements_to_ghost.end())
+      if (auto it = coarsening_elements_to_ghost.find(p);
+          it != coarsening_elements_to_ghost.end())
         {
           const std::vector<Elem *> & elems = it->second;
           libmesh_assert(elems.size());
