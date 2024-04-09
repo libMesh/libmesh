@@ -445,8 +445,9 @@ Node * DistributedMesh::node_ptr (const dof_id_type i)
 
 const Node * DistributedMesh::query_node_ptr (const dof_id_type i) const
 {
-  auto it = _nodes.find(i);
-  if (it != _nodes.end())
+
+  if (auto it = _nodes.find(i);
+      it != _nodes.end())
     {
       const Node * n = *it;
       libmesh_assert (!n || n->id() == i);
@@ -461,8 +462,8 @@ const Node * DistributedMesh::query_node_ptr (const dof_id_type i) const
 
 Node * DistributedMesh::query_node_ptr (const dof_id_type i)
 {
-  auto it = _nodes.find(i);
-  if (it != _nodes.end())
+  if (auto it = _nodes.find(i);
+      it != _nodes.end())
     {
       Node * n = *it;
       libmesh_assert (!n || n->id() == i);
@@ -499,8 +500,8 @@ Elem * DistributedMesh::elem_ptr (const dof_id_type i)
 
 const Elem * DistributedMesh::query_elem_ptr (const dof_id_type i) const
 {
-  auto it = _elements.find(i);
-  if (it != _elements.end())
+  if (auto it = _elements.find(i);
+      it != _elements.end())
     {
       const Elem * e = *it;
       libmesh_assert (!e || e->id() == i);
@@ -515,8 +516,8 @@ const Elem * DistributedMesh::query_elem_ptr (const dof_id_type i) const
 
 Elem * DistributedMesh::query_elem_ptr (const dof_id_type i)
 {
-  auto it = _elements.find(i);
-  if (it != _elements.end())
+  if (auto it = _elements.find(i);
+      it != _elements.end())
     {
       Elem * e = _elements[i];
       libmesh_assert (!e || e->id() == i);
@@ -762,8 +763,8 @@ Node * DistributedMesh::add_point (const Point & p,
                                    const dof_id_type id,
                                    const processor_id_type proc_id)
 {
-  auto n_it = _nodes.find(id);
-  if (n_it != _nodes.end())
+  if (auto n_it = _nodes.find(id);
+      n_it != _nodes.end())
     {
       Node * n = *n_it;
       libmesh_assert (n);
@@ -1273,8 +1274,8 @@ DistributedMesh::renumber_dof_objects(dofobject_container<T> & objects)
   for (auto p : make_range(this->n_processors()))
     if (p != this->processor_id())
       {
-        const auto p_it = ghost_objects_from_proc.find(p);
-        if (p_it != ghost_end)
+        if (auto p_it = ghost_objects_from_proc.find(p);
+            p_it != ghost_end)
           requested_ids[p].reserve(p_it->second);
       }
 
@@ -1526,8 +1527,8 @@ void DistributedMesh::renumber_nodes_and_elements ()
               // else does, better figure out who should own it next.
               if (!used_nodes.count(n))
                 {
-                  auto it = repartitioned_node_pids.find(n);
-                  if (sender_could_become_owner)
+                  if (auto it = repartitioned_node_pids.find(n);
+                      sender_could_become_owner)
                     {
                       if (it != repartitioned_node_pids.end() &&
                           pid < it->second)
