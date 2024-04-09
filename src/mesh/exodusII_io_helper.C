@@ -2665,9 +2665,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
       // Error checking: make sure that all edges in this block are
       // the same geometric type.
-      auto check_it = edge_id_to_elem_type.find(b_id);
-
-      if (check_it == edge_id_to_elem_type.end())
+      if (auto check_it = edge_id_to_elem_type.find(b_id);
+          check_it == edge_id_to_elem_type.end())
         {
           // Keep track of the ElemType and number of nodes in this boundary id.
           edge_id_to_elem_type[b_id] = std::make_pair(edge->type(), edge->n_nodes());
@@ -3074,8 +3073,8 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
           sets[i].num_distribution_factor = 0;
           sets[i].distribution_factor_list = nullptr;
 
-          auto elem_it = elem_lists.find(ss_id);
-          if (elem_it == elem_lists.end())
+          if (auto elem_it = elem_lists.find(ss_id);
+              elem_it == elem_lists.end())
             {
               sets[i].num_entry = 0;
               sets[i].entry_list = nullptr;
