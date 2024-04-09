@@ -57,10 +57,11 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
     {
       ErrorVector system_error_per_cell;
       const System & sys = equation_systems.get_system(s);
-      if (error_norms.find(&sys) == error_norms.end())
+      if (auto it = error_norms.find(&sys);
+          it == error_norms.end())
         this->error_norm = old_error_norm;
       else
-        this->error_norm = error_norms.find(&sys)->second;
+        this->error_norm = it->second;
 
       const NumericVector<Number> * solution_vector = nullptr;
       if (solution_vectors &&
