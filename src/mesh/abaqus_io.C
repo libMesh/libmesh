@@ -942,14 +942,10 @@ void AbaqusIO::read_sideset(const std::string & sideset_name,
         {
           // Create a sideset from a nodeset. This is not currently
           // supported, so print a warning and keep going.
-          auto it = _nodeset_ids.find(elem_id_or_set);
-
-          if (it != _nodeset_ids.end())
-            {
-              libMesh::out << "Warning: skipped creating a sideset from a "
-                           << "nodeset, this is not yet supported."
-                           << std::endl;
-            }
+          if (_nodeset_ids.count(elem_id_or_set))
+            libMesh::out << "Warning: skipped creating a sideset from a "
+                         << "nodeset, this is not yet supported."
+                         << std::endl;
         }
 
       // Otherwise, we assume it's a sideset of the form: "391, S2" or "Elset_1, S3".
