@@ -166,28 +166,20 @@ void FroIO::write (const std::string & fname)
                   back_node  = node_list.back();
 
                 // look for front_pair in the backward_edges list
-                {
-                  auto pos = backward_edges.find(front_node);
-
-                  if (pos != backward_edges.end())
-                    {
-                      node_list.push_front(pos->second);
-
-                      backward_edges.erase(pos);
-                    }
-                }
+                if (auto pos = backward_edges.find(front_node);
+                    pos != backward_edges.end())
+                  {
+                    node_list.push_front(pos->second);
+                    backward_edges.erase(pos);
+                  }
 
                 // look for back_pair in the forward_edges list
-                {
-                  auto pos = forward_edges.find(back_node);
-
-                  if (pos != forward_edges.end())
-                    {
-                      node_list.push_back(pos->second);
-
-                      forward_edges.erase(pos);
-                    }
-                }
+                if (auto pos = forward_edges.find(back_node);
+                    pos != forward_edges.end())
+                  {
+                    node_list.push_back(pos->second);
+                    forward_edges.erase(pos);
+                  }
               }
 
             out_stream << ++bc_id << " " << node_list.size() << '\n';
