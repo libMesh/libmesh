@@ -418,7 +418,7 @@ unsigned int TriangulatorInterface::total_hole_points()
 void TriangulatorInterface::generate_auto_area_function(const Parallel::Communicator &comm,
                                                         const unsigned int num_nearest_pts,
                                                         const unsigned int power,
-                                                        const Number background_value,
+                                                        const Real background_value,
                                                         const Real  background_eff_dist)
 {
   // Get the hole mesh of the outer boundary

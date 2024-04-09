@@ -329,6 +329,14 @@ public:
   /**
    * Constructor. Takes the inverse distance power,
    * which defaults to 2.
+   * 
+   * In addition to the conventional inverse distance interpolation,
+   * the user can specify a background value and an effective distance
+   * for the background value. A background value is corresponding to a 
+   * virtual point that is always at a constant distance (which is set
+   * by background_eff_dist) from the target point. This is useful when
+   * the target point is far away from any source points and user wants
+   * an independent value for this kind of scenarios.
    */
   InverseDistanceInterpolation (const libMesh::Parallel::Communicator & comm_in,
                                 const unsigned int n_interp_pts = 8,

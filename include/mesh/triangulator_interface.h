@@ -254,11 +254,26 @@ public:
 
   /**
   *  Generate an auto area function based on spacing of boundary points.
+  *  The external boundary as well as the hole boundaries are taken into consideration
+  *  to generate the auto area function based on inverse distance interpolation.
+  *  For each EDGE element on these boundaries, its centroid (midpoint) is used as the point
+  *  position and the desired area is calculated as 1.5 times of the area of the equilateral
+  *  triangle with the edge length as the length of the EDGE element.
+  *  For a given position, the inverse distance interpolation only considers a number of nearest
+  *  points (set by num_nearest_pts) to calculate the desired area. The weight of the value at
+  *  each point is calculated as 1/distance^power.
+  * 
+  *  In addition to these conventional inverse distance interpolation features, a concept of
+  *  "background value" and "background effective distance" is introduced. The background value
+  *  belongs to a virtual point located at a constant distance (background effective distance)
+  *  from the given position. The weight of the value at this virtual point is calculated as
+  *  1/background_effective_distance^power. Effectively, the background value is the value when
+  *  the given position is far away from the boundary points.
   */
   void generate_auto_area_function(const Parallel::Communicator &comm,
                                    const unsigned int num_nearest_pts,
                                    const unsigned int power,
-                                   const Number background_value,
+                                   const Real background_value,
                                    const Real  background_eff_dist);
 
   /**
