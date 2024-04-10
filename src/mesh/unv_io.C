@@ -497,8 +497,8 @@ void UNVIO::groups_in (std::istream & in_file)
                            << std::endl;
 
             // Try to find this ID in the map from UNV element ids to libmesh ids.
-            auto it = _unv_elem_id_to_libmesh_elem_id.find(entity_tag);
-            if (it != _unv_elem_id_to_libmesh_elem_id.end())
+            if (auto it = _unv_elem_id_to_libmesh_elem_id.find(entity_tag);
+                it != _unv_elem_id_to_libmesh_elem_id.end())
               {
                 unsigned libmesh_elem_id = it->second;
 
@@ -1318,9 +1318,8 @@ void UNVIO::read_dataset(std::string file_name)
 const std::vector<Number> *
 UNVIO::get_data (Node * node) const
 {
-  auto it = _node_data.find(node);
-
-  if (it == _node_data.end())
+  if (auto it = _node_data.find(node);
+      it == _node_data.end())
     return nullptr;
   else
     return &(it->second);
