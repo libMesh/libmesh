@@ -346,8 +346,9 @@ void RBConstructionBase<Base>::initialize_training_parameters(const RBParameters
         {
           if (is_discrete_parameter(param_name))
             {
-              std::vector<Real> discrete_values =
-                get_discrete_parameter_values().find(param_name)->second;
+              const std::vector<Real> & discrete_values =
+                libmesh_map_find(get_discrete_parameter_values(), param_name);
+
               for (const auto sample_idx : index_range(sample_vector))
                 {
                   // Round all values to the closest discrete value.
