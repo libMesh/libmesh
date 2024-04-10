@@ -175,28 +175,36 @@ DTKAdapter::DTKAdapter(Teuchos::RCP<const Teuchos::Comm<int>> in_comm, EquationS
 DTKAdapter::RCP_Evaluator
 DTKAdapter::get_variable_evaluator(std::string var_name)
 {
-  if (evaluators.find(var_name) == evaluators.end()) // We haven't created an evaluator for the variable yet
+  // We try emplacing a nullptr into the "evaluators" map.
+  auto [it, emplaced] = evaluators.emplace(var_name, nullptr);
+
+  // If the emplace succeeded, that means it was a new entry in the
+  // map, so we need to actually construct the object.
+  if (emplaced)
     {
       System * sys = find_sys(var_name);
-
-      // Create the FieldEvaluator
-      evaluators[var_name] = Teuchos::rcp(new DTKEvaluator(*sys, var_name));
+      it->second = Teuchos::rcp(new DTKEvaluator(*sys, var_name));
     }
 
-  return evaluators[var_name];
+  return it->second;
 }
 
 Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType>>
 DTKAdapter::get_values_to_fill(std::string var_name)
 {
-  if (values_to_fill.find(var_name) == values_to_fill.end())
+  // We try emplacing a nullptr into the "values_to_fill" map.
+  auto [it, emplaced] = values_to_fill.emplace(var_name, nullptr);
+
+  // If the emplace succeeded, that means it was a new entry in the
+  // map, so we need to actually construct the object.
+  if (emplaced)
     {
       Teuchos::ArrayRCP<double> data_space(num_local_nodes);
       Teuchos::RCP<FieldContainerType> field_container = Teuchos::rcp(new FieldContainerType(data_space, 1));
-      values_to_fill[var_name] = Teuchos::rcp(new DataTransferKit::FieldManager<FieldContainerType>(field_container, comm));
+      it->second = Teuchos::rcp(new DataTransferKit::FieldManager<FieldContainerType>(field_container, comm));
     }
 
-  return values_to_fill[var_name];
+  return it->second;
 }
 
 void
