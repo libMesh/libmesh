@@ -190,9 +190,8 @@ double LinearSolver<T>::get_real_solver_setting (const std::string & setting_nam
     return setting.value();
   else if (_solver_configuration)
   {
-    auto it = this->_solver_configuration->real_valued_data.find(setting_name);
-
-    if (it != this->_solver_configuration->real_valued_data.end())
+    if (auto it = this->_solver_configuration->real_valued_data.find(setting_name);
+        it != this->_solver_configuration->real_valued_data.end())
       return it->second;
   }
   else if (default_value.has_value())
@@ -212,9 +211,8 @@ int LinearSolver<T>::get_int_solver_setting (const std::string & setting_name,
     return setting.value();
   else if (_solver_configuration)
   {
-    auto it = this->_solver_configuration->int_valued_data.find(setting_name);
-
-    if (it != this->_solver_configuration->int_valued_data.end())
+    if (auto it = this->_solver_configuration->int_valued_data.find(setting_name);
+        it != this->_solver_configuration->int_valued_data.end())
       return it->second;
   }
   else if (default_value.has_value())
