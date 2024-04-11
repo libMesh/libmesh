@@ -68,8 +68,8 @@ build_reverse_map (const MapType & forward)
       // preimage according to operator<; for std::string this will
       // give us the longest, hopefully most specific name
       // corresponding to an enum.
-      auto preimage = reverse.find(val);
-      if (preimage == reverse.end())
+      if (auto preimage = reverse.find(val);
+          preimage == reverse.end())
         reverse.emplace (val, key);
       else if (preimage->second < key)
         preimage->second = key;
