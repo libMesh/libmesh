@@ -759,8 +759,8 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
   libmesh_assert(this->comm().verify(projections));
 
   // Return the vector if it is already there.
-  auto it = this->_vectors.find(vec_name);
-  if (it != this->_vectors.end())
+  if (auto it = this->_vectors.find(vec_name);
+      it != this->_vectors.end())
     {
       // If the projection setting has *upgraded*, change it.
       if (projections) // only do expensive lookup if needed
@@ -847,42 +847,40 @@ void System::remove_vector (std::string_view vec_name)
 {
   parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
 
-  vectors_iterator pos = _vectors.find(vec_name);
+  if (auto pos = _vectors.find(vec_name);
+      pos != _vectors.end())
+    {
+      _vectors.erase(pos);
+      auto proj_it = _vector_projections.find(vec_name);
+      libmesh_assert(proj_it != _vector_projections.end());
+      _vector_projections.erase(proj_it);
 
-  //Return if the vector does not exist
-  if (pos == _vectors.end())
-    return;
-
-  _vectors.erase(pos);
-  auto proj_it = _vector_projections.find(vec_name);
-  libmesh_assert(proj_it != _vector_projections.end());
-  _vector_projections.erase(proj_it);
-
-  auto adj_it = _vector_is_adjoint.find(vec_name);
-  libmesh_assert(adj_it != _vector_is_adjoint.end());
-  _vector_is_adjoint.erase(adj_it);
+      auto adj_it = _vector_is_adjoint.find(vec_name);
+      libmesh_assert(adj_it != _vector_is_adjoint.end());
+      _vector_is_adjoint.erase(adj_it);
+    }
 }
 
 const NumericVector<Number> * System::request_vector (std::string_view vec_name) const
 {
-  const_vectors_iterator pos = _vectors.find(vec_name);
+  if (auto pos = _vectors.find(vec_name);
+      pos != _vectors.end())
+    return pos->second.get();
 
-  if (pos == _vectors.end())
-    return nullptr;
-
-  return pos->second.get();
+  // Otherwise, vec_name was not found
+  return nullptr;
 }
 
 
 
 NumericVector<Number> * System::request_vector (std::string_view vec_name)
 {
-  vectors_iterator pos = _vectors.find(vec_name);
+  if (auto pos = _vectors.find(vec_name);
+      pos != _vectors.end())
+    return pos->second.get();
 
-  if (pos == _vectors.end())
-    return nullptr;
-
-  return pos->second.get();
+  // Otherwise, vec_name was not found
+  return nullptr;
 }
 
 
@@ -993,8 +991,8 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
   libmesh_assert(this->comm().verify(int(mat_build_type)));
 
   // Return the matrix if it is already there.
-  auto it = this->_matrices.find(mat_name);
-  if (it != this->_matrices.end())
+  if (auto it = this->_matrices.find(mat_name);
+      it != this->_matrices.end())
     return *it->second;
 
   // Otherwise build the matrix to return.
@@ -1033,39 +1031,33 @@ void System::remove_matrix (std::string_view mat_name)
 {
   parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
 
-  matrices_iterator pos = _matrices.find(mat_name);
-
-  // Return if the matrix does not exist
-  if (pos == _matrices.end())
-    return;
-
-  _matrices.erase(pos); // erase()'d entries are destroyed
+  if (auto pos = _matrices.find(mat_name);
+      pos != _matrices.end())
+    _matrices.erase(pos); // erase()'d entries are destroyed
 }
 
 
 
 const SparseMatrix<Number> * System::request_matrix (std::string_view mat_name) const
 {
-  // Make sure the matrix exists
-  const_matrices_iterator pos = _matrices.find(mat_name);
+  if (auto pos = _matrices.find(mat_name);
+      pos != _matrices.end())
+    return pos->second.get();
 
-  if (pos == _matrices.end())
-    return nullptr;
-
-  return pos->second.get();
+  // Otherwise, mat_name does not exist
+  return nullptr;
 }
 
 
 
 SparseMatrix<Number> * System::request_matrix (std::string_view mat_name)
 {
-  // Make sure the matrix exists
-  matrices_iterator pos = _matrices.find(mat_name);
+  if (auto pos = _matrices.find(mat_name);
+      pos != _matrices.end())
+    return pos->second.get();
 
-  if (pos == _matrices.end())
-    return nullptr;
-
-  return pos->second.get();
+  // Otherwise, mat_name does not exist
+  return nullptr;
 }
 
 
@@ -1096,10 +1088,12 @@ void System::set_vector_preservation (const std::string & vec_name,
 
 bool System::vector_preservation (std::string_view vec_name) const
 {
-  if (_vector_projections.find(vec_name) == _vector_projections.end())
-    return false;
+  if (auto it = _vector_projections.find(vec_name);
+      it != _vector_projections.end())
+    return it->second;
 
-  return _vector_projections.find(vec_name)->second;
+  // vec_name was not in the map, return false
+  return false;
 }
 
 
@@ -1119,10 +1113,9 @@ void System::set_vector_as_adjoint (const std::string & vec_name,
 
 int System::vector_is_adjoint (std::string_view vec_name) const
 {
-  libmesh_assert(_vector_is_adjoint.find(vec_name) !=
-                 _vector_is_adjoint.end());
-
-  return _vector_is_adjoint.find(vec_name)->second;
+  auto it = _vector_is_adjoint.find(vec_name);
+  libmesh_assert(it != _vector_is_adjoint.end());
+  return it->second;
 }
 
 
