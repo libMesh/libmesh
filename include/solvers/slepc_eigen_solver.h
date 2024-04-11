@@ -256,6 +256,11 @@ public:
    */
   EPS eps() { this->init(); return _eps; }
 
+  /**
+   * Print the eigenvalues and associated error
+   */
+  void print_eigenvalues() const;
+
 private:
 
   /**
