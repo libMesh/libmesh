@@ -415,18 +415,35 @@ unsigned int TriangulatorInterface::total_hole_points()
   return n_hole_points;
 }
 
-void TriangulatorInterface::generate_auto_area_function(const Parallel::Communicator &comm,
-                                                        const unsigned int num_nearest_pts,
-                                                        const unsigned int power,
-                                                        const Real background_value,
-                                                        const Real  background_eff_dist)
+void TriangulatorInterface::set_auto_area_function(const Parallel::Communicator &comm,
+                                                   const unsigned int num_nearest_pts,
+                                                   const unsigned int power,
+                                                   const Real background_value,
+                                                   const Real  background_eff_dist)
+{
+   _auto_area_function = std::make_unique<AutoAreaFunction>(comm, num_nearest_pts, power, background_value, background_eff_dist);
+}
+
+FunctionBase<Real> * TriangulatorInterface::get_auto_area_function()
+{
+  if (!_auto_area_function->initialized())
+  {
+    // Points and target element sizes for the interpolation
+    std::vector<Point> function_points;
+    std::vector<Real> function_sizes;
+    calculate_auto_desired_area_samples(function_points, function_sizes);
+    _auto_area_function->init_mfi(function_points, function_sizes);
+  }
+  return _auto_area_function.get();
+}
+
+void TriangulatorInterface::calculate_auto_desired_area_samples(std::vector<Point> & function_points,
+                                                                std::vector<Real> & function_sizes,
+                                                                const Real & area_factor)
 {
   // Get the hole mesh of the outer boundary
   // Holes should already be attached if applicable when this function is called
   const TriangulatorInterface::MeshedHole bdry_mh { _mesh, this->_bdy_ids };
-  // Points and target element sizes for the interpolation
-  std::vector<Point> function_points;
-  std::vector<Real> function_sizes;
   // Collect all the centroid points of the outer boundary segments
   // and the corresponding element sizes
   for (unsigned int i = 0; i < bdry_mh.n_points(); i++)
@@ -449,33 +466,9 @@ void TriangulatorInterface::generate_auto_area_function(const Parallel::Communic
       }
     }
 
-  // We use the 150% area of the equilateral triangle with the same side length as the segment as the target size
-  // This might be adjusted in future versions
   std::for_each(
-      function_sizes.begin(), function_sizes.end(), [](Real & a) { a = a * a * 1.5 * std::sqrt(3.0) / 4.0; });
-  // Use the inverse distance interpolation to interpolate the target element size
-  _auto_area_function = std::make_unique<InverseDistanceInterpolation<3>>(
-    comm, std::min(function_points.size(), (unsigned long)num_nearest_pts), power, background_value, background_eff_dist);
-  std::vector<std::string> field_vars{"f"};
-  _auto_area_function->set_field_variables(field_vars);
-  _auto_area_function->get_source_points() = function_points;
-  _auto_area_function->get_source_vals() = function_sizes;
-  _auto_area_function->prepare_for_use();
+      function_sizes.begin(), function_sizes.end(), [&area_factor](Real & a) { a = a * a * area_factor * std::sqrt(3.0) / 4.0; });
+
 }
-
-Real TriangulatorInterface::get_auto_desired_area(const Point &p)
-{
-  libmesh_assert(_auto_area_function);
-  std::vector<Point> target_pts;
-  std::vector<Real> target_vals;
-
-  target_pts.push_back(p);
-  target_vals.resize(1);
-
-  _auto_area_function->interpolate_field_data(_auto_area_function->field_variables(), target_pts, target_vals);
-
-  return target_vals.front();
-}
-
 } // namespace libMesh
 

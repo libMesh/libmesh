@@ -27,6 +27,7 @@
 #include "libmesh/point.h"
 
 #include "libmesh/meshfree_interpolation.h"
+#include "libmesh/function_base.h"
 
 // C++ includes
 #include <set>
@@ -37,8 +38,84 @@ namespace libMesh
 
 // Forward Declarations
 class UnstructuredMesh;
-template <typename Output> class FunctionBase;
 enum ElemType : int;
+
+// Helper function for auto area calculation
+class AutoAreaFunction : public FunctionBase<Real>
+{
+public:
+  AutoAreaFunction (const Parallel::Communicator &comm,
+                    const unsigned int num_nearest_pts,
+                    const unsigned int power,
+                    const Real background_value,
+                    const Real  background_eff_dist) :
+    _comm(comm),
+    _num_nearest_pts(num_nearest_pts),
+    _power(power),
+    _background_value(background_value),
+    _background_eff_dist(background_eff_dist),
+    _auto_area_mfi(std::make_unique<InverseDistanceInterpolation<3>>(_comm, _num_nearest_pts, _power, _background_value, _background_eff_dist))
+  {
+    this->_initialized = false;
+    this->_is_time_dependent = false;
+  }
+
+  AutoAreaFunction (const AutoAreaFunction &);
+  AutoAreaFunction & operator= (const AutoAreaFunction &);
+
+  AutoAreaFunction (AutoAreaFunction &&) = delete;
+  AutoAreaFunction & operator= (AutoAreaFunction &&) = delete;
+  virtual ~AutoAreaFunction () = default;
+
+  void init_mfi (const std::vector<Point> & input_pts,
+                 const std::vector<Real> & input_vals)
+  {
+    std::vector<std::string> field_vars{"f"};
+    _auto_area_mfi->set_field_variables(field_vars);
+    _auto_area_mfi->get_source_points() = input_pts;
+    _auto_area_mfi->get_source_vals() = input_vals;
+    _auto_area_mfi->prepare_for_use();
+    this->_initialized = true;
+  }
+
+  virtual Real operator() (const Point & p,
+                             const Real /*time*/) override
+  {
+    libmesh_assert(this->_initialized);
+
+    std::vector<Point> target_pts;
+    std::vector<Real> target_vals;
+
+    target_pts.push_back(p);
+    target_vals.resize(1);
+
+    _auto_area_mfi->interpolate_field_data(_auto_area_mfi->field_variables(), target_pts, target_vals);
+
+    return target_vals.front();
+  }
+
+  virtual void operator() (const Point & p,
+                           const Real time,
+                           DenseVector<Real> & output) override
+  {
+    output.resize(1);
+    output(0) = (*this)(p,time);
+    return;
+  }
+
+  virtual std::unique_ptr<FunctionBase<Real>> clone() const override
+  {
+    return std::make_unique<AutoAreaFunction>(_comm, _num_nearest_pts, _power, _background_value, _background_eff_dist);
+  }
+
+private:
+  const Parallel::Communicator & _comm;
+  const unsigned int _num_nearest_pts;
+  const unsigned int _power;
+  const Real _background_value;
+  const Real _background_eff_dist;
+  std::unique_ptr<InverseDistanceInterpolation<3>> _auto_area_mfi;
+};
 
 class TriangulatorInterface
 {
@@ -262,7 +339,7 @@ public:
   *  For a given position, the inverse distance interpolation only considers a number of nearest
   *  points (set by num_nearest_pts) to calculate the desired area. The weight of the value at
   *  each point is calculated as 1/distance^power.
-  * 
+  *
   *  In addition to these conventional inverse distance interpolation features, a concept of
   *  "background value" and "background effective distance" is introduced. The background value
   *  belongs to a virtual point located at a constant distance (background effective distance)
@@ -270,21 +347,30 @@ public:
   *  1/background_effective_distance^power. Effectively, the background value is the value when
   *  the given position is far away from the boundary points.
   */
-  void generate_auto_area_function(const Parallel::Communicator &comm,
-                                   const unsigned int num_nearest_pts,
-                                   const unsigned int power,
-                                   const Real background_value,
-                                   const Real  background_eff_dist);
+  void set_auto_area_function(const Parallel::Communicator &comm,
+                              const unsigned int num_nearest_pts,
+                              const unsigned int power,
+                              const Real background_value,
+                              const Real  background_eff_dist);
 
   /**
-  *  Whether or not an auto area function has been generated.
+   * Whether or not an auto area function has been set
   */
   bool has_auto_area_function() {return _auto_area_function != nullptr;}
 
   /**
-  *  Calculate the local desired area based on the auto area function.
+   * Get the auto area function
+   */
+  FunctionBase<Real> * get_auto_area_function ();
+
+  /**
+   * The external boundary and all hole boundaries are collected. The centroid of each EDGE element is
+   * used as the point position and the desired area is calculated as the area of the equilateral triangle
+   * with the edge length as the length of the EDGE element times an area_factor (default is 1.5).
   */
-  Real get_auto_desired_area(const Point &p);
+  void calculate_auto_desired_area_samples(std::vector<Point> & function_points,
+                                           std::vector<Real> & function_sizes,
+                                           const Real & area_factor = 1.5);
 
   /**
    * A set of ids to allow on the outer boundary loop: interpreted as
@@ -417,7 +503,7 @@ protected:
   /**
   * The auto area function based on the spacing of boundary points
   */
-  std::unique_ptr<InverseDistanceInterpolation<3>> _auto_area_function;
+  std::unique_ptr<AutoAreaFunction> _auto_area_function;
 };
 
 } // namespace libMesh

@@ -346,7 +346,6 @@ unsigned int segment_intersection(const Elem & elem,
 
 namespace libMesh
 {
-
 //
 // Function definitions for the Poly2TriTriangulator class
 //
@@ -1479,7 +1478,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
 bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
 {
   const Real min_area_target = this->desired_area();
-  FunctionBase<Real> * area_func = this->get_desired_area_function();
+  FunctionBase<Real> *area_func = this->has_auto_area_function() ? this->get_auto_area_function() : this->get_desired_area_function();
 
   // If this isn't a question, why are we here?
   libmesh_assert(min_area_target > 0 ||
@@ -1500,7 +1499,7 @@ bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
   for (auto v : make_range(elem.n_vertices()))
     {
       // If we have an auto area function, we'll use it and override other area options
-      const Real local_area_target = this->has_auto_area_function() ? this->get_auto_desired_area(elem.point(v)) : (*area_func)(elem.point(v));
+      const Real local_area_target = (*area_func)(elem.point(v));
       libmesh_error_msg_if
         (local_area_target <= 0,
          "Non-positive desired element areas are unachievable");
