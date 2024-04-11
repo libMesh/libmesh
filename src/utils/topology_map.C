@@ -66,10 +66,8 @@ void TopologyMap::add_node(const Node & mid_node,
 
       // We should never be inserting inconsistent data
 #ifndef NDEBUG
-      map_type::iterator it =
-        _map.find(std::make_pair(lower_id, upper_id));
-
-      if (it != _map.end())
+      if (auto it = _map.find(std::make_pair(lower_id, upper_id));
+          it != _map.end())
         libmesh_assert_equal_to (it->second, mid_node_id);
 #endif
 
@@ -120,15 +118,15 @@ dof_id_type TopologyMap::find(dof_id_type bracket_node1,
   const dof_id_type lower_id = std::min(bracket_node1, bracket_node2);
   const dof_id_type upper_id = std::max(bracket_node1, bracket_node2);
 
-  map_type::const_iterator it =
-    _map.find(std::make_pair(lower_id, upper_id));
+  if (auto it = _map.find(std::make_pair(lower_id, upper_id));
+      it != _map.end())
+    {
+      libmesh_assert_not_equal_to (it->second, DofObject::invalid_id);
+      return it->second;
+    }
 
-  if (it == _map.end())
-    return DofObject::invalid_id;
-
-  libmesh_assert_not_equal_to (it->second, DofObject::invalid_id);
-
-  return it->second;
+  // If not found, return invalid_id
+  return DofObject::invalid_id;
 }
 
 
