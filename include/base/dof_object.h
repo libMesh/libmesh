@@ -156,8 +156,11 @@ public:
 
   /**
    * \returns The number of degrees of freedom associated with
-   * system \p s for this object. Optionally only counts degrees
-   * of freedom for variable number \p var
+   * system \p s directly stored on this object. Optionally only
+   * degrees of freedom for variable number \p var are counted.  Does
+   * not count degrees of freedom only indirectly associated with this
+   * object, such as those stored on an element's nodes when \p
+   * n_dofs() is called on the element itself.
    */
   unsigned int n_dofs (const unsigned int s,
                        const unsigned int var =
