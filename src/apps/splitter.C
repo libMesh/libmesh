@@ -51,6 +51,7 @@ int main (int argc, char ** argv)
                    << "--num-ghost-layers Number of layers to ghost when partitioning (Default: 1).\n"
                    << "--dry-run          Only test the partitioning, don't write any files.\n"
                    << "--ascii            Write ASCII cpa files rather than binary cpr files.\n"
+                   << "--gz               Compress written files in gzip format.\n"
                    << std::endl;
 
       return 0;
@@ -89,9 +90,11 @@ int main (int argc, char ** argv)
 
           const bool binary = !libMesh::on_command_line("--ascii");
 
+          const bool gzip = libMesh::on_command_line("--gz");
+
           cpr->binary() = binary;
           std::ostringstream outputname;
-          outputname << remove_extension(filename) << (binary ? ".cpr" : ".cpa");
+          outputname << remove_extension(filename) << (binary ? ".cpr" : ".cpa") << (gzip ? ".gz" : "");
           cpr->write(outputname.str());
         }
     }
