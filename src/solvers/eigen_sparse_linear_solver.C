@@ -209,14 +209,15 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
     case GMRES:
       {
         auto set_restart_and_solve = [this, &do_solve]
-          (auto & gm_solver, std::string_view msg) {
-        // If there is an int parameter called "gmres_restart" in the
-        // SolverConfiguration object, pass it to the Eigen GMRES
-        // solver.
-        if (this->_solver_configuration)
-          if (auto it = this->_solver_configuration->int_valued_data.find("gmres_restart");
-              it != this->_solver_configuration->int_valued_data.end())
-            gm_solver.set_restart(it->second);
+          (auto & gm_solver, std::string_view msg)
+        {
+          // If there is an int parameter called "gmres_restart" in the
+          // SolverConfiguration object, pass it to the Eigen GMRES
+          // solver.
+          if (this->_solver_configuration)
+            if (auto it = this->_solver_configuration->int_valued_data.find("gmres_restart");
+                it != this->_solver_configuration->int_valued_data.end())
+              gm_solver.set_restart(it->second);
 
           std::ostringstream full_msg;
           full_msg << msg << ", restart = " << gm_solver.get_restart();
