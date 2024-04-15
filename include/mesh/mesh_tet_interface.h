@@ -84,6 +84,13 @@ public:
   virtual void triangulate () = 0;
 
 protected:
+
+  /**
+   * Remove volume elements from the mesh, after converting their
+   * outer boundary faces to surface elements.
+   */
+  void volume_to_surface_mesh ();
+
   /**
    * This function checks the integrity of the current set of
    * elements in the Mesh to see if they comprise a hull,
