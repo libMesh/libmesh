@@ -1066,7 +1066,7 @@ void ExodusII_IO::copy_nodal_solution(System & system,
           values.resize(query_size);
           for (std::size_t i=0; i != query_size; ++i)
             {
-              if (auto it = node_var_value_map.find(ids[i]);
+              if (const auto it = node_var_value_map.find(ids[i]);
                   it != node_var_value_map.end())
                 {
                   values[i] = it->second;
@@ -1184,7 +1184,7 @@ void ExodusII_IO::copy_elemental_solution(System & system,
           values.resize(query_size);
           for (std::size_t i=0; i != query_size; ++i)
             {
-              if (auto it = elem_var_value_map.find(ids[i]);
+              if (const auto it = elem_var_value_map.find(ids[i]);
                   it != elem_var_value_map.end())
                 {
                   values[i] = it->second;

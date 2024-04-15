@@ -430,7 +430,7 @@ void RBEIMEvaluation::get_parametrized_function_values_at_qps(
 
   values.clear();
 
-  if (auto it = pf.find(elem_id);
+  if (const auto it = pf.find(elem_id);
       it != pf.end())
   {
     const auto & comps_and_qps_on_elem = it->second;
@@ -452,7 +452,7 @@ void RBEIMEvaluation::get_parametrized_function_side_values_at_qps(
 
   values.clear();
 
-  if (auto it = pf.find(std::make_pair(elem_id, side_index));
+  if (const auto it = pf.find(std::make_pair(elem_id, side_index));
       it != pf.end())
   {
     const auto & comps_and_qps_on_elem = it->second;

@@ -1947,7 +1947,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
     {
       // Don't try to grab a reference to the vector unless the current node is attached
       // to a local element.  Otherwise, another processor will be responsible for writing it in its nodeset.
-      if (auto it = this->libmesh_node_num_to_exodus.find(std::get<0>(t));
+      if (const auto it = this->libmesh_node_num_to_exodus.find(std::get<0>(t));
           it != this->libmesh_node_num_to_exodus.end())
         {
           // Get reference to the vector where this node ID will be inserted.  If it

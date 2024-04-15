@@ -2305,7 +2305,7 @@ void correct_node_proc_ids (MeshBase & mesh)
     {
       for (const auto & [id, pid] : data)
         {
-          if (auto it = new_proc_ids.find(id);
+          if (const auto it = new_proc_ids.find(id);
               it == new_proc_ids.end())
             new_proc_ids.emplace(id, pid);
           else
@@ -2325,7 +2325,7 @@ void correct_node_proc_ids (MeshBase & mesh)
   // lest we get them confused with nodes we newly own.
   std::unordered_set<Node *> ex_local_nodes;
   for (auto & node : mesh.local_node_ptr_range())
-    if (auto it = new_proc_ids.find(node->id());
+    if (const auto it = new_proc_ids.find(node->id());
         it != new_proc_ids.end() && it->second != mesh.processor_id())
       ex_local_nodes.insert(node);
 

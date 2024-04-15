@@ -288,7 +288,7 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
     }
 
   for (const auto & [elemset_code, elemset_ptr] : this->_elemset_codes)
-    if (auto it = other_mesh._elemset_codes.find(elemset_code);
+    if (const auto it = other_mesh._elemset_codes.find(elemset_code);
         it == other_mesh._elemset_codes.end() || *elemset_ptr != *it->second)
       return false;
 

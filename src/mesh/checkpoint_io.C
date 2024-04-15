@@ -446,7 +446,7 @@ void CheckpointIO::write (const std::string & name)
         {
           for (processor_id_type p : {my_pid, DofObject::invalid_processor_id})
             {
-              if (auto elements_vec_it = elements_on_pid.find(p);
+              if (const auto elements_vec_it = elements_on_pid.find(p);
                   elements_vec_it != elements_on_pid.end())
                 {
                   auto & p_elements = elements_vec_it->second;

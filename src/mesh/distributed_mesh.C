@@ -1274,7 +1274,7 @@ DistributedMesh::renumber_dof_objects(dofobject_container<T> & objects)
   for (auto p : make_range(this->n_processors()))
     if (p != this->processor_id())
       {
-        if (auto p_it = ghost_objects_from_proc.find(p);
+        if (const auto p_it = ghost_objects_from_proc.find(p);
             p_it != ghost_end)
           requested_ids[p].reserve(p_it->second);
       }
