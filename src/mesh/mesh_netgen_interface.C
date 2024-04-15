@@ -98,6 +98,8 @@ void NetGenMeshInterface::triangulate ()
   // nodes, so we can connect new elements to nodes correctly.
   std::unordered_map<int, dof_id_type> ng_to_libmesh_id;
 
+  this->volume_to_surface_mesh();
+
   auto create_surface_mesh = [this, &ng_to_libmesh_id](WrappedNgMesh & wngmesh,
                                                        bool invert_tris) {
     // Keep track of what nodes we've already added to the Netgen mesh

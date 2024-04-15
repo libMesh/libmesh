@@ -28,6 +28,61 @@
 #include "libmesh/elem.h"
 #include "libmesh/unstructured_mesh.h"
 
+namespace {
+  using namespace libMesh;
+
+  void flood_component (std::unordered_set<Elem *> & all_components,
+                        std::unordered_set<Elem *> & current_component,
+                        Elem * elem)
+  {
+    libmesh_assert(elem);
+
+    if (current_component.count(elem))
+      return;
+
+    libmesh_assert(!all_components.count(elem));
+
+    all_components.insert(elem);
+    current_component.insert(elem);
+
+    for (auto s : make_range(elem->n_sides()))
+      flood_component(all_components, current_component,
+                      elem->neighbor_ptr(s));
+  }
+
+  // Returns six times the signed volume of a tet formed by the given
+  // 3 points and the origin
+  Real six_times_signed_tet_volume (const Point & p1,
+                                    const Point & p2,
+                                    const Point & p3)
+  {
+    return p1(0)*p2(1)*p3(2)
+         - p1(0)*p3(1)*p2(2)
+         - p2(0)*p1(1)*p3(2)
+         + p2(0)*p3(1)*p1(2)
+         + p3(0)*p1(1)*p2(2)
+         - p3(0)*p2(1)*p1(2);
+  }
+
+  // Returns six times the signed volume of the space defined by the
+  // manifold of surface elements in component
+  Real six_times_signed_volume (const std::unordered_set<Elem *> component)
+  {
+    Real six_vol = 0;
+
+    for (const Elem * elem: component)
+      {
+        libmesh_assert_equal_to(elem->dim(), 2);
+        for (auto n : make_range(elem->n_vertices()-2))
+          six_vol += six_times_signed_tet_volume(elem->point(0),
+                                                 elem->point(n+1),
+                                                 elem->point(n+2));
+      }
+
+    return six_vol;
+  }
+}
+
 namespace libMesh
 {
 
@@ -39,6 +94,79 @@ MeshTetInterface::MeshTetInterface (UnstructuredMesh & mesh) :
 {
 }
 
+
+void MeshTetInterface::volume_to_surface_mesh()
+{
+  {
+    std::unordered_set<Elem *> elems_to_delete;
+
+    std::vector<std::unique_ptr<Elem>> elems_to_add;
+
+    // Convert all faces to surface elements
+    for (auto * elem : this->_mesh.element_ptr_range())
+      {
+        if (elem->dim() != 2)
+          elems_to_delete.insert(elem);
+        for (auto s : make_range(elem->n_sides()))
+          {
+            if (elem->neighbor_ptr(s))
+              continue;
+
+            elems_to_add.push_back(elem->build_side_ptr(s));
+          }
+      }
+
+    // Add the new elements outside the loop so we don't risk
+    // invalidating iterators.  Wipe their interior_parent pointers so
+    // those aren't dangling later.
+    for (auto & elem : elems_to_add)
+    {
+      elem->set_interior_parent(nullptr);
+      this->_mesh.add_elem(std::move(elem));
+    }
+
+    // Remove volume and edge elements
+    for (Elem * elem : elems_to_delete)
+      this->_mesh.delete_elem(elem);
+  }
+
+  // Fix up neighbor pointers, element counts, etc.
+  this->_mesh.prepare_for_use();
+
+  // Partition surface into connected components
+  std::vector<std::unordered_set<Elem *>> components;
+  std::unordered_set<Elem *> in_component;
+
+  for (auto * elem : this->_mesh.element_ptr_range())
+    if (!in_component.count(elem))
+      {
+        components.push_back({});
+        flood_component(in_component, components.back(), elem);
+      }
+
+  const std::unordered_set<Elem *> * biggest_component = nullptr;
+  Real biggest_six_vol = 0;
+  for (const auto & component : components)
+    {
+      Real six_vol = six_times_signed_volume(component);
+      if (six_vol > biggest_six_vol)
+        {
+          six_vol = biggest_six_vol;
+          biggest_component = &component;
+        }
+    }
+
+  if (!biggest_component)
+    libmesh_error_msg("No positive-volume component found among " <<
+                      components.size() << " boundary components");
+
+  for (const auto & component : components)
+    if (&component != biggest_component)
+      for (Elem * elem: component)
+        this->_mesh.delete_elem(elem);
+
+  this->_mesh.prepare_for_use();
+}
 
 
 unsigned MeshTetInterface::check_hull_integrity()
