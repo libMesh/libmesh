@@ -29,6 +29,7 @@ public:
 #ifdef LIBMESH_HAVE_NETGEN
   // The most basic test to start with
   CPPUNIT_TEST( testNetGen );
+  CPPUNIT_TEST( testNetGenTets );
 
   // We'll get to more advanced features later
   /*
@@ -111,8 +112,8 @@ public:
   }
 
 
-  void testTetInterface(MeshBase & mesh,
-                        MeshTetInterface & triangulator)
+  void testTrisToTets(MeshBase & mesh,
+                      MeshTetInterface & triangulator)
   {
     // An asymmetric octahedron, so we hopefully have an unambiguous
     // choice of shortest diagonal for a Delaunay algorithm to pick.
@@ -146,6 +147,39 @@ public:
   }
 
 
+  void testTetsToTets(MeshBase & mesh,
+                      MeshTetInterface & triangulator)
+  {
+    // An asymmetric octahedron, so we hopefully have an unambiguous
+    // choice of shortest diagonal for a Delaunay algorithm to pick.
+    mesh.add_point(Point(0,0,-0.1), 0);
+    mesh.add_point(Point(1,0,0), 1);
+    mesh.add_point(Point(0,1,0), 2);
+    mesh.add_point(Point(-1,0,0), 3);
+    mesh.add_point(Point(0,-1,0), 4);
+    mesh.add_point(Point(0,0,0.1), 5);
+
+    auto add_tet = [&mesh](std::array<dof_id_type,4> nodes)
+    {
+      auto elem = mesh.add_elem(Elem::build(TET4));
+      elem->set_node(0) = mesh.node_ptr(nodes[0]);
+      elem->set_node(1) = mesh.node_ptr(nodes[1]);
+      elem->set_node(2) = mesh.node_ptr(nodes[2]);
+      elem->set_node(3) = mesh.node_ptr(nodes[3]);
+    };
+
+    // Split along a different diagonal to start
+    add_tet({1,3,4,5});
+    add_tet({1,3,5,2});
+    add_tet({1,3,2,0});
+    add_tet({1,3,0,4});
+
+    mesh.prepare_for_use();
+
+    this->testTetInterfaceBase(mesh, triangulator);
+  }
+
+
 #ifdef LIBMESH_HAVE_TRIANGLE
   void testTetGen()
   {
@@ -153,7 +187,7 @@ public:
 
     Mesh mesh(*TestCommWorld);
     TetGenMeshInterface tet_tet(mesh);
-    testTetInterface(mesh, tet_tet);
+    testTrisToTets(mesh, tet_tet);
   }
 
 
@@ -164,7 +198,7 @@ public:
 
     Mesh mesh(*TestCommWorld);
     TetGenMeshInterface tet_tet(mesh);
-    testTetInterfaceInterp(mesh, tet_tet, 1, 6);
+    testTrisToTetsInterp(mesh, tet_tet, 1, 6);
   }
 
 
@@ -174,7 +208,7 @@ public:
 
     Mesh mesh(*TestCommWorld);
     TetGenMeshInterface tet_tet(mesh);
-    testTetInterfaceInterp(mesh, tet_tet, 2, 10);
+    testTrisToTetsInterp(mesh, tet_tet, 2, 10);
   }
   */
 
@@ -188,7 +222,17 @@ public:
 
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
-    testTetInterface(mesh, net_tet);
+    testTrisToTets(mesh, net_tet);
+  }
+
+
+ void testNetGenTets()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    NetGenMeshInterface net_tet(mesh);
+    testTetsToTets(mesh, net_tet);
   }
 
 
@@ -199,7 +243,7 @@ public:
 
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
-    testTetInterfaceInterp(mesh, net_tet, 1, 6);
+    testTrisToTetsInterp(mesh, net_tet, 1, 6);
   }
 
 
@@ -209,7 +253,7 @@ public:
 
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
-    testTetInterfaceInterp(mesh, net_tet, 2, 10);
+    testTrisToTetsInterp(mesh, net_tet, 2, 10);
   }
 
 
