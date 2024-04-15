@@ -161,7 +161,7 @@ Node * MeshRefinement::add_node(Elem & parent,
   // We'll leave the processor_id untouched in this case - if we're
   // repartitioning later or if this is a new unpartitioned node,
   // we'll update it then, and if not then we don't want to update it.
-  if (auto new_node_id = _new_nodes_map.find(bracketing_nodes);
+  if (const auto new_node_id = _new_nodes_map.find(bracketing_nodes);
       new_node_id != DofObject::invalid_id)
     return _mesh.node_ptr(new_node_id);
 

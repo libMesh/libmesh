@@ -580,7 +580,7 @@ void ExodusII_IO::read (const std::string & fname)
                         key.emplace_back(libmesh_node_id, coef);
                     }
 
-                  if (auto local_node_it = local_nodes.find(key);
+                  if (const auto local_node_it = local_nodes.find(key);
                       local_node_it != local_nodes.end())
                     elem->set_node(dyna_elem_defn.nodes[elem_node_index]) = local_node_it->second;
                   else

@@ -1089,7 +1089,7 @@ private:
         // current DirichletBoundary object.  In case the map does not
         // contain an entry for this DirichletBoundary object, it
         // means there are no boundary edges active.
-        if (auto is_boundary_edge_it = sebi.is_boundary_edge_map.find(&dirichlet);
+        if (const auto is_boundary_edge_it = sebi.is_boundary_edge_map.find(&dirichlet);
             is_boundary_edge_it != sebi.is_boundary_edge_map.end())
         {
         for (unsigned int e=0; e != sebi.n_edges; ++e)
@@ -1247,7 +1247,7 @@ private:
         // current DirichletBoundary object.  In case the map does not
         // contain an entry for this DirichletBoundary object, it
         // means there are no boundary sides active.
-        if (auto is_boundary_side_it = sebi.is_boundary_side_map.find(&dirichlet);
+        if (const auto is_boundary_side_it = sebi.is_boundary_side_map.find(&dirichlet);
             is_boundary_side_it != sebi.is_boundary_side_map.end())
         {
         for (unsigned int s=0; s != sebi.n_sides; ++s)
@@ -1404,7 +1404,7 @@ private:
         // current DirichletBoundary object.  In case the map does not
         // contain an entry for this DirichletBoundary object, it
         // means there are no boundary shellfaces active.
-        if (auto is_boundary_shellface_it = sebi.is_boundary_shellface_map.find(&dirichlet);
+        if (const auto is_boundary_shellface_it = sebi.is_boundary_shellface_map.find(&dirichlet);
             is_boundary_shellface_it != sebi.is_boundary_shellface_map.end())
         {
         for (unsigned int shellface=0; shellface != 2; ++shellface)
@@ -3325,7 +3325,7 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
       Number exact_value = 0;
       if (constraint_map)
         {
-          if (auto adjoint_constraint_it = constraint_map->find(constrained_dof);
+          if (const auto adjoint_constraint_it = constraint_map->find(constrained_dof);
               adjoint_constraint_it != constraint_map->end())
             exact_value = adjoint_constraint_it->second;
         }
@@ -3639,7 +3639,7 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
 
             if (rhs_values)
               {
-                if (auto rhsit = rhs_values->find(elem_dofs[i]);
+                if (const auto rhsit = rhs_values->find(elem_dofs[i]);
                     rhsit != rhs_values->end())
                   H(i) = rhsit->second;
               }

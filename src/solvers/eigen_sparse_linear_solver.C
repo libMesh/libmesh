@@ -215,7 +215,7 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
           // SolverConfiguration object, pass it to the Eigen GMRES
           // solver.
           if (this->_solver_configuration)
-            if (auto it = this->_solver_configuration->int_valued_data.find("gmres_restart");
+            if (const auto it = this->_solver_configuration->int_valued_data.find("gmres_restart");
                 it != this->_solver_configuration->int_valued_data.end())
               gm_solver.set_restart(it->second);
 

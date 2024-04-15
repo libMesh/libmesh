@@ -105,7 +105,7 @@ void PerfLog::push (const std::string & label,
   const char * label_c_str;
   const char * header_c_str;
 
-  if (auto label_it = non_temporary_strings.find(label);
+  if (const auto label_it = non_temporary_strings.find(label);
       label_it != non_temporary_strings.end())
     label_c_str = label_it->second.get();
   else
@@ -117,7 +117,7 @@ void PerfLog::push (const std::string & label,
       non_temporary_strings[label] = std::move(newcopy);
     }
 
-  if (auto header_it = non_temporary_strings.find(header);
+  if (const auto header_it = non_temporary_strings.find(header);
       header_it != non_temporary_strings.end())
     header_c_str = header_it->second.get();
   else

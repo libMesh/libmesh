@@ -57,7 +57,7 @@ void ErrorEstimator::estimate_errors(const EquationSystems & equation_systems,
     {
       ErrorVector system_error_per_cell;
       const System & sys = equation_systems.get_system(s);
-      if (auto it = error_norms.find(&sys);
+      if (const auto it = error_norms.find(&sys);
           it == error_norms.end())
         this->error_norm = old_error_norm;
       else

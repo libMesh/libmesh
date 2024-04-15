@@ -209,7 +209,7 @@ void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_
           for (const Node & node : elem->node_ref_range())
             {
               // Retain all elements containing constraining nodes
-              if (auto it = constraint_rows.find(&node);
+              if (const auto it = constraint_rows.find(&node);
                   it != constraint_rows.end())
                 for (auto & p : it->second)
                   {

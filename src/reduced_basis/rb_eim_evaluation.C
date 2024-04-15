@@ -470,7 +470,7 @@ Number RBEIMEvaluation::get_parametrized_function_node_local_value(
 {
   LOG_SCOPE("get_parametrized_function_node_local_value()", "RBEIMConstruction");
 
-  if (auto it = pf.find(node_id);
+  if (const auto it = pf.find(node_id);
       it != pf.end())
     {
       const std::vector<Number> & vec = it->second;

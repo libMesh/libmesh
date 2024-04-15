@@ -445,8 +445,7 @@ Node * DistributedMesh::node_ptr (const dof_id_type i)
 
 const Node * DistributedMesh::query_node_ptr (const dof_id_type i) const
 {
-
-  if (auto it = _nodes.find(i);
+  if (const auto it = _nodes.find(i);
       it != _nodes.end())
     {
       const Node * n = *it;
@@ -500,7 +499,7 @@ Elem * DistributedMesh::elem_ptr (const dof_id_type i)
 
 const Elem * DistributedMesh::query_elem_ptr (const dof_id_type i) const
 {
-  if (auto it = _elements.find(i);
+  if (const auto it = _elements.find(i);
       it != _elements.end())
     {
       const Elem * e = *it;
@@ -519,7 +518,7 @@ Elem * DistributedMesh::query_elem_ptr (const dof_id_type i)
   if (auto it = _elements.find(i);
       it != _elements.end())
     {
-      Elem * e = _elements[i];
+      Elem * e = *it;
       libmesh_assert (!e || e->id() == i);
       return e;
     }

@@ -76,7 +76,7 @@ void erase_if(std::multimap<Key,T> & map, Pred pred)
 template <typename Map, typename T>
 void renumber_name(Map & m, T old_id, T new_id)
 {
-  if (auto it = m.find(old_id);
+  if (const auto it = m.find(old_id);
       it != m.end())
     {
       m[new_id] = it->second;
@@ -379,7 +379,7 @@ void BoundaryInfo::regenerate_id_sets()
       const boundary_id_type id = pr.second;
       _boundary_ids.insert(id);
       _node_boundary_ids.insert(id);
-      if (auto it = old_ns_id_to_name.find(id);
+      if (const auto it = old_ns_id_to_name.find(id);
           it != old_ns_id_to_name.end())
         _ns_id_to_name.emplace(id, it->second);
     }
@@ -389,7 +389,7 @@ void BoundaryInfo::regenerate_id_sets()
       const boundary_id_type id = pr.second.second;
       _boundary_ids.insert(id);
       _edge_boundary_ids.insert(id);
-      if (auto it = old_es_id_to_name.find(id);
+      if (const auto it = old_es_id_to_name.find(id);
           it != old_es_id_to_name.end())
         _es_id_to_name.emplace(id, it->second);
     }
@@ -399,7 +399,7 @@ void BoundaryInfo::regenerate_id_sets()
       const boundary_id_type id = pr.second.second;
       _boundary_ids.insert(id);
       _side_boundary_ids.insert(id);
-      if (auto it = old_ss_id_to_name.find(id);
+      if (const auto it = old_ss_id_to_name.find(id);
           it != old_ss_id_to_name.end())
         _ss_id_to_name.emplace(id, it->second);
     }
@@ -2972,7 +2972,7 @@ void BoundaryInfo::print_summary(std::ostream & out_stream) const
 const std::string & BoundaryInfo::get_sideset_name(boundary_id_type id) const
 {
   static const std::string empty_string;
-  if (auto it = _ss_id_to_name.find(id);
+  if (const auto it = _ss_id_to_name.find(id);
       it == _ss_id_to_name.end())
     return empty_string;
   else
@@ -2988,7 +2988,7 @@ std::string & BoundaryInfo::sideset_name(boundary_id_type id)
 const std::string & BoundaryInfo::get_nodeset_name(boundary_id_type id) const
 {
   static const std::string empty_string;
-  if (auto it = _ns_id_to_name.find(id);
+  if (const auto it = _ns_id_to_name.find(id);
       it == _ns_id_to_name.end())
     return empty_string;
   else
@@ -3003,7 +3003,7 @@ std::string & BoundaryInfo::nodeset_name(boundary_id_type id)
 const std::string & BoundaryInfo::get_edgeset_name(boundary_id_type id) const
 {
   static const std::string empty_string;
-  if (auto it = _es_id_to_name.find(id);
+  if (const auto it = _es_id_to_name.find(id);
       it == _es_id_to_name.end())
     return empty_string;
   else

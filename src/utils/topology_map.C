@@ -66,7 +66,7 @@ void TopologyMap::add_node(const Node & mid_node,
 
       // We should never be inserting inconsistent data
 #ifndef NDEBUG
-      if (auto it = _map.find(std::make_pair(lower_id, upper_id));
+      if (const auto it = _map.find(std::make_pair(lower_id, upper_id));
           it != _map.end())
         libmesh_assert_equal_to (it->second, mid_node_id);
 #endif

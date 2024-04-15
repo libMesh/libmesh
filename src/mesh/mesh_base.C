@@ -380,7 +380,7 @@ void MeshBase::get_elemsets(dof_id_type elemset_code, MeshBase::elemset_type & i
   // If we don't recognize this elemset_code, hand back an empty set
   id_set_to_fill.clear();
 
-  if (auto it = _elemset_codes.find(elemset_code);
+  if (const auto it = _elemset_codes.find(elemset_code);
       it != _elemset_codes.end())
     id_set_to_fill.insert(it->second->begin(), it->second->end());
 }
@@ -546,7 +546,7 @@ std::vector<unsigned int> MeshBase::add_elem_integers(const std::vector<std::str
   for (auto i : index_range(names))
     {
       const std::string & name = names[i];
-      if (auto it = name_indices.find(name);
+      if (const auto it = name_indices.find(name);
           it != name_indices.end())
         {
           returnval[i] = it->second;
@@ -635,7 +635,7 @@ std::vector<unsigned int> MeshBase::add_node_integers(const std::vector<std::str
   for (auto i : index_range(names))
     {
       const std::string & name = names[i];
-      if (auto it = name_indices.find(name);
+      if (const auto it = name_indices.find(name);
           it != name_indices.end())
         {
           returnval[i] = it->second;
@@ -886,7 +886,7 @@ void MeshBase::remove_ghosting_functor(GhostingFunctor & ghosting_functor)
 {
   _ghosting_functors.erase(&ghosting_functor);
 
-  if (auto it = _shared_functors.find(&ghosting_functor);
+  if (const auto it = _shared_functors.find(&ghosting_functor);
       it != _shared_functors.end())
     _shared_functors.erase(it);
 }
@@ -1623,7 +1623,7 @@ const std::string & MeshBase::subdomain_name(subdomain_id_type id) const
   // An empty string to return when no matching subdomain name is found
   static const std::string empty;
 
-  if (auto iter = _block_id_to_name.find(id);
+  if (const auto iter = _block_id_to_name.find(id);
       iter == _block_id_to_name.end())
     return empty;
   else

@@ -602,7 +602,7 @@ void Poly2TriTriangulator::triangulate_current_points()
       for (auto & node : _mesh.node_ptr_range())
         {
           const p2t::Point pt = to_p2t(*node);
-          if (auto it = point_node_map.find(pt);
+          if (const auto it = point_node_map.find(pt);
               it == point_node_map.end())
             {
               steiner_points.insert(pt);
@@ -1112,7 +1112,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                     (Elem * new_neigh, boundary_id_type bcid)
                   {
                     // Set clockwise neighbor and vice-versa if possible
-                    if (auto CW_it = neighbors_CW.find(node_CW);
+                    if (const auto CW_it = neighbors_CW.find(node_CW);
                         CW_it == neighbors_CW.end())
                       {
                         libmesh_assert(!neighbors_CCW.count(node_CW));
@@ -1139,7 +1139,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                       }
 
                     // Set counter-CW neighbor and vice-versa if possible
-                    if (auto CCW_it = neighbors_CCW.find(node_CCW);
+                    if (const auto CCW_it = neighbors_CCW.find(node_CCW);
                         CCW_it == neighbors_CCW.end())
                       {
                         libmesh_assert(!neighbors_CW.count(node_CCW));
@@ -1219,7 +1219,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
       // elements!) it's safe to delete them.
       for (Elem * old_elem : cavity)
         {
-          if (auto it = new_elems.find(old_elem);
+          if (const auto it = new_elems.find(old_elem);
               it == new_elems.end())
             mesh.delete_elem(old_elem);
           else
@@ -1329,13 +1329,13 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
           auto old_it  = old_segments.begin();
 
-          Node * node = _mesh.node_ptr(old_it->first);
-          Node * const first_node = node;
+          const Node * node = _mesh.node_ptr(old_it->first);
+          const Node * const first_node = node;
 
           do
             {
               const dof_id_type node_id = node->id();
-              if (auto it = next_boundary_node.find(*node);
+              if (const auto it = next_boundary_node.find(*node);
                   it == next_boundary_node.end())
                 {
                   while (node_id != old_it->first)

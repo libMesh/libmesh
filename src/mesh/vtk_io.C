@@ -685,7 +685,7 @@ void VTKIO::get_local_node_values(std::vector<Number> & local_values,
   // loop over all nodes and get the solution for the current
   // variable, if the node is in the current partition
   for (dof_id_type k=0; k<num_nodes; ++k)
-    if (auto local_node_it = _local_node_map.find(k);
+    if (const auto local_node_it = _local_node_map.find(k);
         local_node_it != _local_node_map.end())
       local_values[local_node_it->second] = soln[k*num_vars + variable];
 }

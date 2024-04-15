@@ -847,7 +847,7 @@ void System::remove_vector (std::string_view vec_name)
 {
   parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
 
-  if (auto pos = _vectors.find(vec_name);
+  if (const auto pos = _vectors.find(vec_name);
       pos != _vectors.end())
     {
       _vectors.erase(pos);
@@ -863,7 +863,7 @@ void System::remove_vector (std::string_view vec_name)
 
 const NumericVector<Number> * System::request_vector (std::string_view vec_name) const
 {
-  if (auto pos = _vectors.find(vec_name);
+  if (const auto pos = _vectors.find(vec_name);
       pos != _vectors.end())
     return pos->second.get();
 
@@ -1031,7 +1031,7 @@ void System::remove_matrix (std::string_view mat_name)
 {
   parallel_object_only();  // Not strictly needed, but the only safe way to keep in sync
 
-  if (auto pos = _matrices.find(mat_name);
+  if (const auto pos = _matrices.find(mat_name);
       pos != _matrices.end())
     _matrices.erase(pos); // erase()'d entries are destroyed
 }
@@ -1040,7 +1040,7 @@ void System::remove_matrix (std::string_view mat_name)
 
 const SparseMatrix<Number> * System::request_matrix (std::string_view mat_name) const
 {
-  if (auto pos = _matrices.find(mat_name);
+  if (const auto pos = _matrices.find(mat_name);
       pos != _matrices.end())
     return pos->second.get();
 
@@ -1113,7 +1113,7 @@ void System::set_vector_as_adjoint (const std::string & vec_name,
 
 int System::vector_is_adjoint (std::string_view vec_name) const
 {
-  auto it = _vector_is_adjoint.find(vec_name);
+  const auto it = _vector_is_adjoint.find(vec_name);
   libmesh_assert(it != _vector_is_adjoint.end());
   return it->second;
 }

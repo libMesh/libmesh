@@ -2115,7 +2115,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
           // For that we will use the reverse mapping we created at
           // the same time as the forward mapping.
           for (auto & n : el->node_ref_range())
-            if (auto it = other_to_this_node_map.find(/*other_node_id=*/n.id());
+            if (const auto it = other_to_this_node_map.find(/*other_node_id=*/n.id());
                 it != other_to_this_node_map.end())
               node_to_elems_map[/*this_node_id=*/it->second].push_back( el->id() );
         }
@@ -2240,7 +2240,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
               // The same name with the same id means we're fine.  The
               // same name with another id means we remap their id to
               // ours
-              if (auto other_reverse_it = other_map_reversed.find(sname);
+              if (const auto other_reverse_it = other_map_reversed.find(sname);
                   other_reverse_it != other_map_reversed.end() && other_reverse_it->second != sid)
                 id_remapping[other_reverse_it->second] = sid;
 
@@ -2267,8 +2267,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
               // At this point we've figured out any remapping
               // necessary for an sname that we share.  And we don't
               // need to remap any sid we don't share.
-              if (auto reverse_it = this_map_reversed.find(sname);
-                  reverse_it == this_map_reversed.end())
+              if (!this_map_reversed.count(sname))
                 {
                   // But if we don't have this sname and we do have this
                   // sid then we can't just merge into that.
