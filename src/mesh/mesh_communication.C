@@ -949,7 +949,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
       std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
       std::set<const Node *> nodes_to_send;
 
-      if (auto it = coarsening_elements_to_ghost.find(p);
+      if (const auto it = std::as_const(coarsening_elements_to_ghost).find(p);
           it != coarsening_elements_to_ghost.end())
         {
           const std::vector<Elem *> & elems = it->second;

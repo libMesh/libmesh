@@ -2294,7 +2294,7 @@ void correct_node_proc_ids (MeshBase & mesh)
     ids_to_push;
 
   for (const auto & node : mesh.node_ptr_range())
-    if (const auto it = new_proc_ids.find(node->id());
+    if (const auto it = std::as_const(new_proc_ids).find(node->id());
         it != new_proc_ids.end() && node->processor_id() != DofObject::invalid_processor_id)
       ids_to_push[node->processor_id()].emplace_back(node->id(), /*pid=*/it->second);
 

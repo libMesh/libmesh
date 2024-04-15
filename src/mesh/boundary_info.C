@@ -76,7 +76,7 @@ void erase_if(std::multimap<Key,T> & map, Pred pred)
 template <typename Map, typename T>
 void renumber_name(Map & m, T old_id, T new_id)
 {
-  if (const auto it = m.find(old_id);
+  if (const auto it = std::as_const(m).find(old_id);
       it != m.end())
     {
       m[new_id] = it->second;

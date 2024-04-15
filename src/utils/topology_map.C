@@ -118,7 +118,7 @@ dof_id_type TopologyMap::find(dof_id_type bracket_node1,
   const dof_id_type lower_id = std::min(bracket_node1, bracket_node2);
   const dof_id_type upper_id = std::max(bracket_node1, bracket_node2);
 
-  if (auto it = _map.find(std::make_pair(lower_id, upper_id));
+  if (const auto it = _map.find(std::make_pair(lower_id, upper_id));
       it != _map.end())
     {
       libmesh_assert_not_equal_to (it->second, DofObject::invalid_id);
