@@ -290,9 +290,9 @@ void InverseDistanceInterpolation<KDDim>::interpolate (const Point              
   // If not, a "zero" weight is added
   if (_background_eff_dist > 0.0)
   {
-    const Number background_wt = _background_eff_dist * _background_eff_dist > std::numeric_limits<Real>::epsilon()
-                             ? 1.0 / std::pow(_background_eff_dist * _background_eff_dist, _half_power)
-                             : 0.0;
+    const Real background_wt = _background_eff_dist * _background_eff_dist > std::numeric_limits<Real>::epsilon()
+                           ? 1.0 / std::pow(_background_eff_dist * _background_eff_dist, _half_power)
+                           : 0.0;
     tot_weight += background_wt;
     std::fill (_vals.begin(), _vals.end(), Number(_background_value * background_wt));
   }

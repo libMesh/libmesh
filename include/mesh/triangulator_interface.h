@@ -73,25 +73,36 @@ public:
     std::vector<std::string> field_vars{"f"};
     _auto_area_mfi->set_field_variables(field_vars);
     _auto_area_mfi->get_source_points() = input_pts;
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+    std::vector<Number> input_complex_vals;
+    for (const auto & input_val : input_vals)
+      input_complex_vals.push_back(Complex (input_val, 0.0));
+    _auto_area_mfi->get_source_vals() = input_complex_vals;
+#else
     _auto_area_mfi->get_source_vals() = input_vals;
+#endif
     _auto_area_mfi->prepare_for_use();
     this->_initialized = true;
   }
 
   virtual Real operator() (const Point & p,
-                             const Real /*time*/) override
+                           const Real /*time*/) override
   {
     libmesh_assert(this->_initialized);
 
     std::vector<Point> target_pts;
-    std::vector<Real> target_vals;
+    std::vector<Number> target_vals;
 
     target_pts.push_back(p);
     target_vals.resize(1);
 
     _auto_area_mfi->interpolate_field_data(_auto_area_mfi->field_variables(), target_pts, target_vals);
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+    return target_vals.front().real();
+#else
     return target_vals.front();
+#endif
   }
 
   virtual void operator() (const Point & p,
