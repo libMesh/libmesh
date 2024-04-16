@@ -30,6 +30,7 @@ public:
   // The most basic test to start with
   CPPUNIT_TEST( testNetGen );
   CPPUNIT_TEST( testNetGenTets );
+  CPPUNIT_TEST( testNetGenFlippedTris );
 
   // We'll get to more advanced features later
   /*
@@ -113,7 +114,8 @@ public:
 
 
   void testTrisToTets(MeshBase & mesh,
-                      MeshTetInterface & triangulator)
+                      MeshTetInterface & triangulator,
+                      bool flip_tris = false)
   {
     // An asymmetric octahedron, so we hopefully have an unambiguous
     // choice of shortest diagonal for a Delaunay algorithm to pick.
@@ -124,12 +126,14 @@ public:
     mesh.add_point(Point(0,-1,0), 4);
     mesh.add_point(Point(0,0,0.1), 5);
 
-    auto add_tri = [&mesh](std::array<dof_id_type,3> nodes)
+    auto add_tri = [&mesh, flip_tris](std::array<dof_id_type,3> nodes)
     {
       auto elem = mesh.add_elem(Elem::build(TRI3));
       elem->set_node(0) = mesh.node_ptr(nodes[0]);
       elem->set_node(1) = mesh.node_ptr(nodes[1]);
       elem->set_node(2) = mesh.node_ptr(nodes[2]);
+      if (flip_tris)
+        elem->flip(&mesh.get_boundary_info());
     };
 
     add_tri({0,1,2});
@@ -233,6 +237,16 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testTetsToTets(mesh, net_tet);
+  }
+
+
+  void testNetGenFlippedTris()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    NetGenMeshInterface net_tet(mesh);
+    testTrisToTets(mesh, net_tet, true);
   }
 
 
