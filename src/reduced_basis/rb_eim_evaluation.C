@@ -430,8 +430,8 @@ void RBEIMEvaluation::get_parametrized_function_values_at_qps(
 
   values.clear();
 
-  const auto it = pf.find(elem_id);
-  if (it != pf.end())
+  if (const auto it = pf.find(elem_id);
+      it != pf.end())
   {
     const auto & comps_and_qps_on_elem = it->second;
     libmesh_error_msg_if(comp >= comps_and_qps_on_elem.size(),
@@ -452,8 +452,8 @@ void RBEIMEvaluation::get_parametrized_function_side_values_at_qps(
 
   values.clear();
 
-  const auto it = pf.find(std::make_pair(elem_id,side_index));
-  if (it != pf.end())
+  if (const auto it = pf.find(std::make_pair(elem_id, side_index));
+      it != pf.end())
   {
     const auto & comps_and_qps_on_elem = it->second;
     libmesh_error_msg_if(comp >= comps_and_qps_on_elem.size(),
@@ -470,8 +470,8 @@ Number RBEIMEvaluation::get_parametrized_function_node_local_value(
 {
   LOG_SCOPE("get_parametrized_function_node_local_value()", "RBEIMConstruction");
 
-  auto it = pf.find(node_id);
-  if (it != pf.end())
+  if (const auto it = pf.find(node_id);
+      it != pf.end())
     {
       const std::vector<Number> & vec = it->second;
       libmesh_error_msg_if (comp >= vec.size(), "Error: Invalid comp index");

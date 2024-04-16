@@ -107,10 +107,8 @@ struct CorrectProcIds
         processor_id_type & proc_id = node.processor_id();
         const processor_id_type new_proc_id = proc_ids[i];
 
-        auto it = bad_pids.find(ids[i]);
-
-        if ((new_proc_id != proc_id ||
-             it != bad_pids.end()) &&
+        if (const auto it = bad_pids.find(ids[i]);
+            (new_proc_id != proc_id || it != bad_pids.end()) &&
             new_proc_id != DofObject::invalid_processor_id)
           {
             if (it != bad_pids.end())
@@ -689,7 +687,7 @@ void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
         {
           mesh.node_ref(id).processor_id() = pmap.first.second;
 
-          if (visted_nodes.find(id) != visted_nodes.end())
+          if (visted_nodes.count(id))
             continue;
           else
             {
@@ -716,7 +714,7 @@ void Partitioner::set_interface_node_processor_ids_BFS(MeshBase & mesh)
                                     std::back_inserter(common_nodes));
 
               for (auto c_node : common_nodes)
-                if (visted_nodes.find(c_node) == visted_nodes.end())
+                if (!visted_nodes.count(c_node))
                   {
                     nodes_queue.push(c_node);
                     visted_nodes.insert(c_node);
@@ -987,8 +985,8 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
               {
                 Node & node = mesh.node_ref(pair.first);
                 processor_id_type & pid = node.processor_id();
-                auto it = bad_pids.find(pair.first);
-                if (it != bad_pids.end())
+                if (const auto it = bad_pids.find(pair.first);
+                    it != bad_pids.end())
                   {
                     pid = pair.second;
                     bad_pids.erase(it);
@@ -1139,9 +1137,9 @@ void Partitioner::build_graph (const MeshBase & mesh)
           std::set<const Elem *> constraining_elems;
           for (const Node & node : elem->node_ref_range())
             {
-              auto row_it = mesh_constrained_nodes.find(&node);
-              if (row_it != end_it)
-                for (auto [pr, coef] : row_it->second)
+              if (const auto row_it = mesh_constrained_nodes.find(&node);
+                  row_it != end_it)
+                for (const auto & [pr, coef] : row_it->second)
                   {
                     libmesh_ignore(coef); // avoid gcc 7 warning
                     constraining_elems.insert(pr.first);
@@ -1302,9 +1300,9 @@ void Partitioner::build_graph (const MeshBase & mesh)
           std::set<const Elem *> constraining_elems;
           for (const Node & node : elem->node_ref_range())
             {
-              auto row_it = mesh_constrained_nodes.find(&node);
-              if (row_it != end_it)
-                for (auto [pr, coef] : row_it->second)
+              if (const auto row_it = mesh_constrained_nodes.find(&node);
+                  row_it != end_it)
+                for (const auto & [pr, coef] : row_it->second)
                   {
                     libmesh_ignore(coef); // avoid gcc 7 warning
                     constraining_elems.insert(pr.first);

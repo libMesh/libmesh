@@ -156,15 +156,13 @@ Node * MeshRefinement::add_node(Elem & parent,
   // one pair of parent nodes
   libmesh_assert(bracketing_nodes.size());
 
-  const dof_id_type new_node_id =
-    _new_nodes_map.find(bracketing_nodes);
-
   // Return the node if it already exists.
   //
   // We'll leave the processor_id untouched in this case - if we're
   // repartitioning later or if this is a new unpartitioned node,
   // we'll update it then, and if not then we don't want to update it.
-  if (new_node_id != DofObject::invalid_id)
+  if (const auto new_node_id = _new_nodes_map.find(bracketing_nodes);
+      new_node_id != DofObject::invalid_id)
     return _mesh.node_ptr(new_node_id);
 
   // Otherwise we need to add a new node.

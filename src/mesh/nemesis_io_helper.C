@@ -1947,9 +1947,8 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
     {
       // Don't try to grab a reference to the vector unless the current node is attached
       // to a local element.  Otherwise, another processor will be responsible for writing it in its nodeset.
-      const auto it = this->libmesh_node_num_to_exodus.find(std::get<0>(t));
-
-      if (it != this->libmesh_node_num_to_exodus.end())
+      if (const auto it = this->libmesh_node_num_to_exodus.find(std::get<0>(t));
+          it != this->libmesh_node_num_to_exodus.end())
         {
           // Get reference to the vector where this node ID will be inserted.  If it
           // doesn't yet exist, this will create it.
@@ -2010,12 +2009,10 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
           */
 
           // Try to find this boundary ID in the local list we created
-          auto it =
-            local_node_boundary_id_lists.find (cast_int<boundary_id_type>(nodeset_id));
-
-          // No nodes found for this boundary ID on this processor
-          if (it == local_node_boundary_id_lists.end())
+          if (const auto it = local_node_boundary_id_lists.find (cast_int<boundary_id_type>(nodeset_id));
+              it == local_node_boundary_id_lists.end())
             {
+              // No nodes found for this boundary ID on this processor
               if (verbose)
                 libMesh::out << "[" << this->processor_id()
                              << "] No nodeset data for ID: " << nodeset_id
@@ -2032,7 +2029,7 @@ void Nemesis_IO_Helper::write_nodesets(const MeshBase & mesh)
           else // Boundary ID *was* found in list
             {
               // Get reference to the vector of node IDs
-              std::vector<int> & current_nodeset_ids = it->second;
+              const std::vector<int> & current_nodeset_ids = it->second;
 
               // Call the Exodus interface to write the parameters of this node set
               this->ex_err = exII::ex_put_node_set_param(this->ex_id,
@@ -2147,12 +2144,10 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
             }
 
           // Try to find this boundary ID in the local list we created
-          auto it =
-            local_elem_boundary_id_lists.find (cast_int<boundary_id_type>(exodus_id));
-
-          // No sides found for this boundary ID on this processor
-          if (it == local_elem_boundary_id_lists.end())
+          if (const auto it = local_elem_boundary_id_lists.find (cast_int<boundary_id_type>(exodus_id));
+              it == local_elem_boundary_id_lists.end())
             {
+              // No sides found for this boundary ID on this processor
               if (verbose)
                 libMesh::out << "[" << this->processor_id()
                              << "] No sideset data for ID: " << exodus_id
@@ -2169,7 +2164,7 @@ void Nemesis_IO_Helper::write_sidesets(const MeshBase & mesh)
           else // Boundary ID *was* found in list
             {
               // Get reference to the vector of elem IDs
-              std::vector<int> & current_sideset_elem_ids = it->second;
+              const std::vector<int> & current_sideset_elem_ids = it->second;
 
               // Get reference to the vector of side IDs
               std::vector<int> & current_sideset_side_ids =
@@ -2288,12 +2283,10 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
             (mesh.subdomain_name(cast_int<subdomain_id_type>(this->global_elem_blk_ids[i])));
 
           // Search for the current global block ID in the map
-          std::map<int, std::vector<int>>::iterator it =
-            this->block_id_to_elem_connectivity.find( this->global_elem_blk_ids[i] );
-
-          // If not found, write a zero to file....
-          if (it == this->block_id_to_elem_connectivity.end())
+          if (const auto it = this->block_id_to_elem_connectivity.find( this->global_elem_blk_ids[i] );
+              it == this->block_id_to_elem_connectivity.end())
             {
+              // If not found, write a zero to file....
               this->ex_err = exII::ex_put_elem_block(this->ex_id,
                                                      this->global_elem_blk_ids[i],
                                                      "Empty",
@@ -2309,7 +2302,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
             {
               subdomain_id_type block =
                 cast_int<subdomain_id_type>(it->first);
-              std::vector<int> & this_block_connectivity = it->second;
+              const std::vector<int> & this_block_connectivity = it->second;
               std::vector<dof_id_type> & elements_in_this_block = subdomain_map[block];
 
               // Use the first element in this block to get representative information.

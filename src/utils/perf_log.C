@@ -105,8 +105,8 @@ void PerfLog::push (const std::string & label,
   const char * label_c_str;
   const char * header_c_str;
 
-  auto label_it = non_temporary_strings.find(label);
-  if (label_it != non_temporary_strings.end())
+  if (const auto label_it = non_temporary_strings.find(label);
+      label_it != non_temporary_strings.end())
     label_c_str = label_it->second.get();
   else
     {
@@ -117,8 +117,8 @@ void PerfLog::push (const std::string & label,
       non_temporary_strings[label] = std::move(newcopy);
     }
 
-  auto header_it = non_temporary_strings.find(header);
-  if (header_it != non_temporary_strings.end())
+  if (const auto header_it = non_temporary_strings.find(header);
+      header_it != non_temporary_strings.end())
     header_c_str = header_it->second.get();
   else
     {
@@ -776,9 +776,8 @@ void PerfLog::split_on_whitespace(const std::string & input, std::vector<std::st
   while (true)
     {
       // Find next end location
-      size_t end_pos = input.find(split_on, current_pos);
-
-      if (end_pos != std::string::npos)
+      if (size_t end_pos = input.find(split_on, current_pos);
+          end_pos != std::string::npos)
         {
           // Create substring.  Note: the second argument to substr is
           // the *length* of string to create, not the ending position!

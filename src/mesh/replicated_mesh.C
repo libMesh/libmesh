@@ -805,7 +805,7 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
             Node * & nd = *in;
 
             // If this node is still connected to an elem, put it in the list
-            if (connected_nodes.find(nd) != connected_nodes.end())
+            if (connected_nodes.count(nd))
               {
                 *out_iter = nd;
                 ++out_iter;
@@ -1011,7 +1011,7 @@ ReplicatedMesh::get_boundary_points() const
     while (true)
     {
       std::pair<const Elem *, unsigned int> side(elem, s);
-      libmesh_assert(boundary_elements.find(side) != boundary_elements.end());
+      libmesh_assert(boundary_elements.count(side));
       boundary_elements.erase(side);
 
       // push all nodes on the side except the node on the other end of the side (index 1)

@@ -92,13 +92,9 @@ transfer_volume_boundary(const Variable & from_var, const Variable & to_var)
                                                                 from_var_number,
                                                                 from_n_comp - 1);
 
-              // See if we've already encountered this DOF in the loop
-              // over boundary elements.
-              DofMapping::iterator it = dof_mapping.find(from_dof);
-
               // If we've already mapped this dof, we don't need to map
               // it again or do floating point comparisons.
-              if (it == dof_mapping.end() &&
+              if (!dof_mapping.count(from_dof) &&
                   from_node.absolute_fuzzy_equals(to_node, TOLERANCE))
                 {
                   // Global dof_index for node in BoundaryMesh.

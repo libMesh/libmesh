@@ -610,7 +610,7 @@ void VTKIO::cells_to_vtk()
           // If the node ID is not found in the _local_node_map, we'll
           // add it to the _vtk_grid.  NOTE[JWP]: none of the examples
           // I have actually enters this section of code...
-          if (_local_node_map.find(conn[i]) == _local_node_map.end())
+          if (!_local_node_map.count(conn[i]))
             {
               dof_id_type global_node_id = elem->node_id(i);
 
@@ -685,13 +685,9 @@ void VTKIO::get_local_node_values(std::vector<Number> & local_values,
   // loop over all nodes and get the solution for the current
   // variable, if the node is in the current partition
   for (dof_id_type k=0; k<num_nodes; ++k)
-    {
-      std::map<dof_id_type, dof_id_type>::iterator local_node_it = _local_node_map.find(k);
-      if (local_node_it == _local_node_map.end())
-        continue; // not a local node
-
+    if (const auto local_node_it = _local_node_map.find(k);
+        local_node_it != _local_node_map.end())
       local_values[local_node_it->second] = soln[k*num_vars + variable];
-    }
 }
 
 

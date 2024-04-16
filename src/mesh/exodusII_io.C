@@ -580,11 +580,9 @@ void ExodusII_IO::read (const std::string & fname)
                         key.emplace_back(libmesh_node_id, coef);
                     }
 
-                  auto local_node_it = local_nodes.find(key);
-
-                  if (local_node_it != local_nodes.end())
-                    elem->set_node(dyna_elem_defn.nodes[elem_node_index]) =
-                      local_node_it->second;
+                  if (const auto local_node_it = local_nodes.find(key);
+                      local_node_it != local_nodes.end())
+                    elem->set_node(dyna_elem_defn.nodes[elem_node_index]) = local_node_it->second;
                   else
                     {
                       Point p(0);
@@ -1068,8 +1066,8 @@ void ExodusII_IO::copy_nodal_solution(System & system,
           values.resize(query_size);
           for (std::size_t i=0; i != query_size; ++i)
             {
-              const auto it = node_var_value_map.find(ids[i]);
-              if (it != node_var_value_map.end())
+              if (const auto it = node_var_value_map.find(ids[i]);
+                  it != node_var_value_map.end())
                 {
                   values[i] = it->second;
                   node_var_value_map.erase(it);
@@ -1186,8 +1184,8 @@ void ExodusII_IO::copy_elemental_solution(System & system,
           values.resize(query_size);
           for (std::size_t i=0; i != query_size; ++i)
             {
-              const auto it = elem_var_value_map.find(ids[i]);
-              if (it != elem_var_value_map.end())
+              if (const auto it = elem_var_value_map.find(ids[i]);
+                  it != elem_var_value_map.end())
                 {
                   values[i] = it->second;
                   elem_var_value_map.erase(it);

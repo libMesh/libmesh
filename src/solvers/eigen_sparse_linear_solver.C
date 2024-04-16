@@ -209,17 +209,15 @@ EigenSparseLinearSolver<T>::solve (SparseMatrix<T> & matrix_in,
     case GMRES:
       {
         auto set_restart_and_solve = [this, &do_solve]
-          (auto & gm_solver, std::string_view msg) {
-        // If there is an int parameter called "gmres_restart" in the
-        // SolverConfiguration object, pass it to the Eigen GMRES
-        // solver.
-        if (this->_solver_configuration)
-          {
-            auto it = this->_solver_configuration->int_valued_data.find("gmres_restart");
-
-            if (it != this->_solver_configuration->int_valued_data.end())
+          (auto & gm_solver, std::string_view msg)
+        {
+          // If there is an int parameter called "gmres_restart" in the
+          // SolverConfiguration object, pass it to the Eigen GMRES
+          // solver.
+          if (this->_solver_configuration)
+            if (const auto it = this->_solver_configuration->int_valued_data.find("gmres_restart");
+                it != this->_solver_configuration->int_valued_data.end())
               gm_solver.set_restart(it->second);
-          }
 
           std::ostringstream full_msg;
           full_msg << msg << ", restart = " << gm_solver.get_restart();
@@ -417,11 +415,10 @@ void EigenSparseLinearSolver<T>::set_eigen_preconditioner_type ()
 template <typename T>
 LinearConvergenceReason EigenSparseLinearSolver<T>::get_converged_reason() const
 {
-  auto it = _convergence_reasons.find(_comp_info);
-
   // If later versions of Eigen start returning new enumerations,
   // we'll need to add them to the map...
-  if (it == _convergence_reasons.end())
+  if (auto it = _convergence_reasons.find(_comp_info);
+      it == _convergence_reasons.end())
     {
       libmesh_warning("Warning: unknown Eigen::ComputationInfo: " \
                       << _comp_info \

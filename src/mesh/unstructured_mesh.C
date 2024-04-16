@@ -248,8 +248,8 @@ void transfer_elem(Elem & lo_elem,
   if (interior_p)
     hi_elem->set_interior_parent(interior_p);
 
-  auto parent_exterior_it = exterior_children_of.find(interior_p);
-  if (parent_exterior_it != exterior_children_of.end())
+  if (auto parent_exterior_it = exterior_children_of.find(interior_p);
+      parent_exterior_it != exterior_children_of.end())
     {
       auto & exteriors = parent_exterior_it->second;
       for (std::size_t i : index_range(exteriors))
@@ -264,8 +264,8 @@ void transfer_elem(Elem & lo_elem,
    * If we had interior_parent() links to the old element, transfer
    * them to the new element.
    */
-  auto exterior_it = exterior_children_of.find(&lo_elem);
-  if (exterior_it != exterior_children_of.end())
+  if (auto exterior_it = exterior_children_of.find(&lo_elem);
+      exterior_it != exterior_children_of.end())
     {
       for (Elem * exterior_elem : exterior_it->second)
         {
@@ -481,12 +481,9 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * need to upgrade later.
    */
   for (auto & elem : mesh.element_ptr_range())
-    {
-      Elem * interior_parent = elem->interior_parent();
-      auto exterior_map_it = exterior_children_of.find(interior_parent);
-      if (exterior_map_it != exterior_children_of.end())
-        exterior_map_it->second.push_back(elem);
-    }
+    if (auto exterior_map_it = exterior_children_of.find(elem->interior_parent());
+        exterior_map_it != exterior_children_of.end())
+      exterior_map_it->second.push_back(elem);
 
   /**
    * Loop over the low-ordered elements in the _elements vector.
@@ -2118,17 +2115,9 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
           // For that we will use the reverse mapping we created at
           // the same time as the forward mapping.
           for (auto & n : el->node_ref_range())
-            {
-              dof_id_type other_node_id = n.id();
-              std::map<dof_id_type, dof_id_type>::iterator it =
-                other_to_this_node_map.find(other_node_id);
-
-              if (it != other_to_this_node_map.end())
-                {
-                  dof_id_type this_node_id = it->second;
-                  node_to_elems_map[this_node_id].push_back( el->id() );
-                }
-            }
+            if (const auto it = other_to_this_node_map.find(/*other_node_id=*/n.id());
+                it != other_to_this_node_map.end())
+              node_to_elems_map[/*this_node_id=*/it->second].push_back( el->id() );
         }
 
       if (verbose)
@@ -2248,16 +2237,12 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
 
           for (auto & [sid, sname] : this_map)
             {
-              auto other_reverse_it = other_map_reversed.find(sname);
-
               // The same name with the same id means we're fine.  The
               // same name with another id means we remap their id to
               // ours
-              if (other_reverse_it != other_map_reversed.end())
-                {
-                  if (other_reverse_it->second != sid)
-                    id_remapping[other_reverse_it->second] = sid;
-                }
+              if (const auto other_reverse_it = other_map_reversed.find(sname);
+                  other_reverse_it != other_map_reversed.end() && other_reverse_it->second != sid)
+                id_remapping[other_reverse_it->second] = sid;
 
               // The same id with a different name, we'll get to
               // later.  The same id without any name means we don't
@@ -2279,12 +2264,10 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
 
           for (auto & [sid, sname] : other_map)
             {
-              auto reverse_it = this_map_reversed.find(sname);
-
               // At this point we've figured out any remapping
               // necessary for an sname that we share.  And we don't
               // need to remap any sid we don't share.
-              if (reverse_it == this_map_reversed.end())
+              if (!this_map_reversed.count(sname))
                 {
                   // But if we don't have this sname and we do have this
                   // sid then we can't just merge into that.
@@ -2472,7 +2455,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
           for (std::size_t i=0; i<n_elems; i++)
             {
               dof_id_type elem_id = pr.second[i];
-              if (fixed_elems.find(elem_id) == fixed_elems.end())
+              if (!fixed_elems.count(elem_id))
                 {
                   Elem * el = this->elem_ptr(elem_id);
                   fixed_elems.insert(elem_id);

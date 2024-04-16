@@ -392,8 +392,8 @@ void CheckpointIO::write (const std::string & name)
       for (auto & elem : mesh.element_ptr_range())
         {
           const processor_id_type p = elem->processor_id();
-          auto eop_it = elements_on_pid.find(p);
-          if (eop_it != eop_end)
+          if (auto eop_it = elements_on_pid.find(p);
+              eop_it != eop_end)
             eop_it->second.push_back(elem);
         }
     }
@@ -446,8 +446,8 @@ void CheckpointIO::write (const std::string & name)
         {
           for (processor_id_type p : {my_pid, DofObject::invalid_processor_id})
             {
-              const auto elements_vec_it = elements_on_pid.find(p);
-              if (elements_vec_it != elements_on_pid.end())
+              if (const auto elements_vec_it = elements_on_pid.find(p);
+                  elements_vec_it != elements_on_pid.end())
                 {
                   auto & p_elements = elements_vec_it->second;
 

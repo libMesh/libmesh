@@ -1089,12 +1089,12 @@ private:
         // current DirichletBoundary object.  In case the map does not
         // contain an entry for this DirichletBoundary object, it
         // means there are no boundary edges active.
-        auto is_boundary_edge_it = sebi.is_boundary_edge_map.find(&dirichlet);
-
+        if (const auto is_boundary_edge_it = sebi.is_boundary_edge_map.find(&dirichlet);
+            is_boundary_edge_it != sebi.is_boundary_edge_map.end())
+        {
         for (unsigned int e=0; e != sebi.n_edges; ++e)
           {
-            if (is_boundary_edge_it == sebi.is_boundary_edge_map.end() ||
-                !is_boundary_edge_it->second[e])
+            if (!is_boundary_edge_it->second[e])
               continue;
 
             FEInterface::dofs_on_edge(elem, dim, fe_type, e,
@@ -1211,6 +1211,7 @@ private:
                 dof_is_fixed[edge_dofs[free_dof[i]]] = true;
               }
           } // end for (e = 0..n_edges)
+        } // end if (is_boundary_edge_it != sebi.is_boundary_edge_map.end())
       } // end if (dim > 2 && cont != DISCONTINUOUS)
 
         // Project any side values (edges in 2D, faces in 3D)
@@ -1246,12 +1247,12 @@ private:
         // current DirichletBoundary object.  In case the map does not
         // contain an entry for this DirichletBoundary object, it
         // means there are no boundary sides active.
-        auto is_boundary_side_it = sebi.is_boundary_side_map.find(&dirichlet);
-
+        if (const auto is_boundary_side_it = sebi.is_boundary_side_map.find(&dirichlet);
+            is_boundary_side_it != sebi.is_boundary_side_map.end())
+        {
         for (unsigned int s=0; s != sebi.n_sides; ++s)
           {
-            if (is_boundary_side_it == sebi.is_boundary_side_map.end() ||
-                !is_boundary_side_it->second[s])
+            if (!is_boundary_side_it->second[s])
               continue;
 
             FEInterface::dofs_on_side(elem, dim, fe_type, s,
@@ -1370,6 +1371,7 @@ private:
                 dof_is_fixed[side_dofs[free_dof[i]]] = true;
               }
           } // end for (s = 0..n_sides)
+        } // end if (is_boundary_side_it != sebi.is_boundary_side_map.end())
       } // end if (dim > 1 && cont != DISCONTINUOUS)
 
         // Project any shellface values
@@ -1402,12 +1404,12 @@ private:
         // current DirichletBoundary object.  In case the map does not
         // contain an entry for this DirichletBoundary object, it
         // means there are no boundary shellfaces active.
-        auto is_boundary_shellface_it = sebi.is_boundary_shellface_map.find(&dirichlet);
-
+        if (const auto is_boundary_shellface_it = sebi.is_boundary_shellface_map.find(&dirichlet);
+            is_boundary_shellface_it != sebi.is_boundary_shellface_map.end())
+        {
         for (unsigned int shellface=0; shellface != 2; ++shellface)
           {
-            if (is_boundary_shellface_it == sebi.is_boundary_shellface_map.end() ||
-                !is_boundary_shellface_it->second[shellface])
+            if (!is_boundary_shellface_it->second[shellface])
               continue;
 
             // A shellface has the same dof indices as the element itself
@@ -1524,6 +1526,7 @@ private:
                 dof_is_fixed[shellface_dofs[free_dof[i]]] = true;
               }
           } // end for (shellface = 0..2)
+        } // end if (is_boundary_shellface_it != sebi.is_boundary_shellface_map.end())
       } // end if (dim == 2 && cont != DISCONTINUOUS)
 
     // Lock the DofConstraints since it is shared among threads.
@@ -3322,10 +3325,8 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
       Number exact_value = 0;
       if (constraint_map)
         {
-          const DofConstraintValueMap::const_iterator
-            adjoint_constraint_it =
-            constraint_map->find(constrained_dof);
-          if (adjoint_constraint_it != constraint_map->end())
+          if (const auto adjoint_constraint_it = constraint_map->find(constrained_dof);
+              adjoint_constraint_it != constraint_map->end())
             exact_value = adjoint_constraint_it->second;
         }
 
@@ -3638,9 +3639,8 @@ void DofMap::build_constraint_matrix_and_vector (DenseMatrix<Number> & C,
 
             if (rhs_values)
               {
-                DofConstraintValueMap::const_iterator rhsit =
-                  rhs_values->find(elem_dofs[i]);
-                if (rhsit != rhs_values->end())
+                if (const auto rhsit = rhs_values->find(elem_dofs[i]);
+                    rhsit != rhs_values->end())
                   H(i) = rhsit->second;
               }
           }

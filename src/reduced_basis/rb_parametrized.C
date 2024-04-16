@@ -362,9 +362,10 @@ void RBParametrized::read_discrete_parameter_values_from_file(const std::string 
 
 bool RBParametrized::is_discrete_parameter(const std::string & mu_name) const
 {
-  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::is_discrete_parameter");
+  libmesh_error_msg_if(!parameters_initialized,
+                       "Error: parameters not initialized in RBParametrized::is_discrete_parameter");
 
-  return (_discrete_parameter_values.find(mu_name) != _discrete_parameter_values.end());
+  return _discrete_parameter_values.count(mu_name);
 }
 
 const std::map<std::string, std::vector<Real>> & RBParametrized::get_discrete_parameter_values() const

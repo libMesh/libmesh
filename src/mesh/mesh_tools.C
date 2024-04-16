@@ -2118,7 +2118,7 @@ struct SyncNodeSet
         Node * node = mesh.node_ptr(id);
 
         // Return if the node is in the set.
-        data[i] = (node_set.find(node) != node_set.end());
+        data[i] = node_set.count(node);
       }
   }
 
@@ -2185,11 +2185,11 @@ struct SyncProcIdsFromMap
     for (auto i : index_range(ids))
       {
         const dof_id_type id = ids[i];
-        const proc_id_map_type::const_iterator it = new_proc_ids.find(id);
 
         // Return the node's new processor id if it has one, or its
         // old processor id if not.
-        if (it != new_proc_ids.end())
+        if (const auto it = new_proc_ids.find(id);
+            it != new_proc_ids.end())
           data[i] = it->second;
         else
           {
@@ -2281,8 +2281,8 @@ void correct_node_proc_ids (MeshBase & mesh)
       for (auto & node : elem->node_ref_range())
         {
           const dof_id_type id = node.id();
-          const proc_id_map_type::iterator it = new_proc_ids.find(id);
-          if (it == new_proc_ids.end())
+          if (auto it = new_proc_ids.find(id);
+              it == new_proc_ids.end())
             new_proc_ids.emplace(id, pid);
           else
             it->second = node.choose_processor_id(it->second, pid);
@@ -2294,15 +2294,9 @@ void correct_node_proc_ids (MeshBase & mesh)
     ids_to_push;
 
   for (const auto & node : mesh.node_ptr_range())
-    {
-      const dof_id_type id = node->id();
-      const proc_id_map_type::iterator it = new_proc_ids.find(id);
-      if (it == new_proc_ids.end())
-        continue;
-      const processor_id_type pid = it->second;
-      if (node->processor_id() != DofObject::invalid_processor_id)
-        ids_to_push[node->processor_id()].emplace_back(id, pid);
-    }
+    if (const auto it = std::as_const(new_proc_ids).find(node->id());
+        it != new_proc_ids.end() && node->processor_id() != DofObject::invalid_processor_id)
+      ids_to_push[node->processor_id()].emplace_back(node->id(), /*pid=*/it->second);
 
   auto action_functor =
     [& mesh, & new_proc_ids]
@@ -2311,8 +2305,8 @@ void correct_node_proc_ids (MeshBase & mesh)
     {
       for (const auto & [id, pid] : data)
         {
-          const proc_id_map_type::iterator it = new_proc_ids.find(id);
-          if (it == new_proc_ids.end())
+          if (const auto it = new_proc_ids.find(id);
+              it == new_proc_ids.end())
             new_proc_ids.emplace(id, pid);
           else
             {
@@ -2331,11 +2325,9 @@ void correct_node_proc_ids (MeshBase & mesh)
   // lest we get them confused with nodes we newly own.
   std::unordered_set<Node *> ex_local_nodes;
   for (auto & node : mesh.local_node_ptr_range())
-    {
-      const proc_id_map_type::iterator it = new_proc_ids.find(node->id());
-      if (it != new_proc_ids.end() && it->second != mesh.processor_id())
-        ex_local_nodes.insert(node);
-    }
+    if (const auto it = new_proc_ids.find(node->id());
+        it != new_proc_ids.end() && it->second != mesh.processor_id())
+      ex_local_nodes.insert(node);
 
   SyncProcIdsFromMap sync(new_proc_ids, mesh);
   if (repartition_all_nodes)

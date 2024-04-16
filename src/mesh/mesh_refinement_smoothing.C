@@ -181,19 +181,17 @@ bool MeshRefinement::limit_level_mismatch_at_edge (const unsigned int max_mismat
               std::pair<unsigned int, unsigned int> edge_key =
                 std::make_pair(node0, node1);
 
-              if (max_level_at_edge.find(edge_key) ==
-                  max_level_at_edge.end())
-                {
-                  max_level_at_edge[edge_key] = elem_level;
-                  max_p_level_at_edge[edge_key] = elem_p_level;
-                }
-              else
-                {
-                  max_level_at_edge[edge_key] =
-                    std::max (max_level_at_edge[edge_key], elem_level);
-                  max_p_level_at_edge[edge_key] =
-                    std::max (max_p_level_at_edge[edge_key], elem_p_level);
-                }
+              // Try emplacing (edge_key, elem_level) into max_level_at_edge map.
+              // If emplacing fails, it means the edge_key already existed, so
+              // we need to take the max of the previous and current values.
+              if (auto [it, emplaced] = max_level_at_edge.emplace(edge_key, elem_level);
+                  !emplaced)
+                it->second = std::max(it->second, elem_level);
+
+              // Same thing for p_level
+              if (auto [it, emplaced] = max_p_level_at_edge.emplace(edge_key, elem_p_level);
+                  !emplaced)
+                it->second = std::max(it->second, elem_p_level);
             }
         }
     }

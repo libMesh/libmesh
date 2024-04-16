@@ -44,7 +44,7 @@ bool
 SystemSubsetBySubdomain::SubdomainSelectionByList::
 operator()(const subdomain_id_type & subdomain_id)const
 {
-  return _list.find(subdomain_id)!=_list.end();
+  return _list.count(subdomain_id); // _list is actually a std::set
 }
 
 // ------------------------------------------------------------

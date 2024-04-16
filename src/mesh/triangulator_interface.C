@@ -356,8 +356,9 @@ void TriangulatorInterface::increase_triangle_order()
             continue;
 
           const Point & p = elem->point(n);
-          auto it = all_midpoints.find({p,0});
-          if (it != all_midpoints.end())
+
+          if (const auto it = all_midpoints.find({p,0});
+              it != all_midpoints.end())
             elem->point(n+3) = it->second;
         }
     }

@@ -436,8 +436,8 @@ void Build::join (const SparsityPattern::Build & other)
       // We should have no empty values in a map
       libmesh_assert (!their_row.empty());
 
-      NonlocalGraph::iterator my_it = nonlocal_pattern.find(p.first);
-      if (my_it == nonlocal_pattern.end())
+      if (auto my_it = nonlocal_pattern.find(p.first);
+          my_it == nonlocal_pattern.end())
         {
           //          nonlocal_pattern[it->first].swap(their_row);
           nonlocal_pattern[p.first] = their_row;

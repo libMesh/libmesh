@@ -76,25 +76,27 @@ DTKSolutionTransfer::transfer(const Variable & from_var,
   DTKAdapter * from_adapter = adapters[from_es].get();
   DTKAdapter * to_adapter = adapters[to_es].get();
 
-  std::pair<EquationSystems *, EquationSystems *> from_to(from_es, to_es);
+  // We first try emplacing a nullptr into the "dtk_maps" map with the desired key
+  auto [it, emplaced] = dtk_maps.emplace(std::make_pair(from_es, to_es), nullptr);
 
-  // If we haven't created a map for this pair of EquationSystems yet, do it now
-  if (dtk_maps.find(from_to) == dtk_maps.end())
+  // If the emplace succeeded, that means it was a new entry in the
+  // map, so we need to actually construct the object.
+  if (emplaced)
     {
       libmesh_assert(from_es->get_mesh().mesh_dimension() == to_es->get_mesh().mesh_dimension());
 
-      dtk_maps[from_to] = std::make_unique<shared_domain_map_type>(comm_default, from_es->get_mesh().mesh_dimension(), true);
+      it->second = std::make_unique<shared_domain_map_type>(comm_default, from_es->get_mesh().mesh_dimension(), true);
 
       // The tolerance here is for the "contains_point()" implementation in DTK.  Set a larger value for a looser tolerance...
-      dtk_maps[from_to]->setup(from_adapter->get_mesh_manager(), to_adapter->get_target_coords(), 30*Teuchos::ScalarTraits<double>::eps());
+      it->second->setup(from_adapter->get_mesh_manager(), to_adapter->get_target_coords(), 30*Teuchos::ScalarTraits<double>::eps());
     }
 
   DTKAdapter::RCP_Evaluator from_evaluator = from_adapter->get_variable_evaluator(from_var.name());
   Teuchos::RCP<DataTransferKit::FieldManager<DTKAdapter::FieldContainerType>> to_values = to_adapter->get_values_to_fill(to_var.name());
 
-  dtk_maps[from_to]->apply(from_evaluator, to_values);
+  it->second->apply(from_evaluator, to_values);
 
-  if (dtk_maps[from_to]->getMissedTargetPoints().size())
+  if (it->second->getMissedTargetPoints().size())
     libMesh::out << "Warning: Some points were missed in the transfer of " << from_var.name() << " to " << to_var.name() << "!" << std::endl;
 
   to_adapter->update_variable_values(to_var.name());
