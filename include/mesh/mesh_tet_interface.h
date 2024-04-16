@@ -79,6 +79,14 @@ public:
   ElemType & elem_type() {return _elem_type;}
 
   /**
+   * Attaches a vector of Mesh pointers defining holes which will be
+   * meshed around.  We use unique_ptr here because we expect that we
+   * may need to modify these meshes internally.
+   */
+  void attach_hole_list(std::unique_ptr<std::vector<std::unique_ptr<UnstructuredMesh>>> holes)
+  {_holes = std::move(holes);}
+
+  /**
    * This is the main public interface for this function.
    */
   virtual void triangulate () = 0;
@@ -86,10 +94,10 @@ public:
 protected:
 
   /**
-   * Remove volume elements from the mesh, after converting their
-   * outer boundary faces to surface elements.
+   * Remove volume elements from the given mesh, after converting
+   * their outer boundary faces to surface elements.
    */
-  void volume_to_surface_mesh ();
+  static void volume_to_surface_mesh (UnstructuredMesh & mesh);
 
   /**
    * This function checks the integrity of the current set of
@@ -140,6 +148,12 @@ protected:
    * Local reference to the mesh we are working with.
    */
   UnstructuredMesh & _mesh;
+
+  /**
+   * A pointer to a vector of meshes each defining a hole.  If this is
+   * nullptr, there are no holes!
+   */
+  std::unique_ptr<std::vector<std::unique_ptr<UnstructuredMesh>>> _holes;
 };
 
 } // namespace libMesh

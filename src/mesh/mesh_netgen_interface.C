@@ -79,8 +79,6 @@ void NetGenMeshInterface::triangulate ()
 
   this->check_hull_integrity();
 
-  WrappedNgMesh ngmesh;
-
   Ng_Meshing_Parameters params;
 
   // Override any default parameters we might need to
@@ -98,72 +96,102 @@ void NetGenMeshInterface::triangulate ()
   // nodes, so we can connect new elements to nodes correctly.
   std::unordered_map<int, dof_id_type> ng_to_libmesh_id;
 
-  this->volume_to_surface_mesh();
-
-  auto create_surface_mesh = [this, &ng_to_libmesh_id](WrappedNgMesh & wngmesh,
-                                                       bool invert_tris) {
-    // Keep track of what nodes we've already added to the Netgen mesh
-    // vs what nodes we need to add.  We'll keep track by id, not by
-    // point location.  I don't know if Netgen can handle multiple
-    // nodes with the same point location, but if they can it's not
-    // going to be *us* who breaks that feature.
-    std::unordered_map<dof_id_type, int> libmesh_to_ng_id;
-
+  auto create_surface_mesh = [this, &ng_to_libmesh_id](WrappedNgMesh & wngmesh) {
     // NetGen appears to use ONE-BASED numbering for its nodes, and
     // since it doesn't return an id when adding nodes we'll have to
     // track the numbering ourselves.
     int ng_id = 1;
 
-    // Use a separate array for passing points to NetGen, just in case
-    // we're not using double-precision ourselves.
-    std::array<double, 3> point_val;
+    // Nested lambdas!
+    auto create_surface_component =
+      [this, &ng_id, &ng_to_libmesh_id, &wngmesh]
+      (UnstructuredMesh & srcmesh, bool invert_tris)
+    {
+      // Keep track of what nodes we've already added to the Netgen
+      // mesh vs what nodes we need to add.  We'll keep track by id,
+      // not by point location.  I don't know if Netgen can handle
+      // multiple nodes with the same point location, but if they can
+      // it's not going to be *us* who breaks that feature.
+      std::unordered_map<dof_id_type, int> libmesh_to_ng_id;
 
-    // And an array for element vertices
-    std::array<int, 3> elem_nodes;
+      // Keep track of what nodes we've already added to the main
+      // mesh from a hole mesh.
+      std::unordered_map<dof_id_type, dof_id_type> hole_to_main_mesh_id;
 
-    for (const auto * elem : this->_mesh.element_ptr_range())
-      {
-        // If someone has triangles we can't triangulate, we have a
-        // problem
-        if (elem->type() == TRI6 ||
-            elem->type() == TRI7)
-          libmesh_not_implemented_msg
-            ("Netgen tetrahedralization currently only supports TRI3 boundaries");
+      // Use a separate array for passing points to NetGen, just in case
+      // we're not using double-precision ourselves.
+      std::array<double, 3> point_val;
 
-        // If someone has non-triangles, let's just ignore them.
-        if (elem->type() != TRI3)
-          continue;
+      // And an array for element vertices
+      std::array<int, 3> elem_nodes;
 
-        for (int ni : make_range(3))
-          {
-            // Just using the "invert_trigs" option in params doesn't
-            // work for me, so we'll try inverting them manually if
-            // need be.
-            auto & elem_node = invert_tris ? elem_nodes[2-ni] : elem_nodes[ni];
+      for (const auto * elem : srcmesh.element_ptr_range())
+        {
+          // If someone has triangles we can't triangulate, we have a
+          // problem
+          if (elem->type() == TRI6 ||
+              elem->type() == TRI7)
+            libmesh_not_implemented_msg
+              ("Netgen tetrahedralization currently only supports TRI3 boundaries");
 
-            const Node & n = elem->node_ref(ni);
-            auto it = libmesh_to_ng_id.find(n.id());
-            if (it == libmesh_to_ng_id.end())
-              {
-                for (auto i : make_range(3))
-                  point_val[i] = n(i);
+          // If someone has non-triangles, let's just ignore them.
+          if (elem->type() != TRI3)
+            continue;
 
-                Ng_AddPoint(wngmesh, point_val.data());
+          for (int ni : make_range(3))
+            {
+              // Just using the "invert_trigs" option in NetGen params
+              // doesn't work for me, so we'll have to have properly
+              // oriented the tris earlier.
+              auto & elem_node = invert_tris ? elem_nodes[2-ni] : elem_nodes[ni];
 
-                ng_to_libmesh_id[ng_id] = n.id();
-                libmesh_to_ng_id[n.id()] = ng_id;
-                elem_node = ng_id;
-                ++ng_id;
-              }
-            else
-              {
-                const int existing_ng_id = it->second;
-                elem_node = existing_ng_id;
-              }
-          }
+              const Node & n = elem->node_ref(ni);
+              auto n_id = n.id();
+              if (&srcmesh != &this->_mesh)
+                {
+                  if (auto it = hole_to_main_mesh_id.find(n_id);
+                      it != hole_to_main_mesh_id.end())
+                    {
+                      n_id = it->second;
+                    }
+                  else
+                    {
+                      Node * n_new = this->_mesh.add_point(n);
+                      const dof_id_type n_new_id = n_new->id();
+                      hole_to_main_mesh_id.emplace(n_id, n_new_id);
+                      n_id = n_new_id;
+                    }
+                }
 
-        Ng_AddSurfaceElement(wngmesh, NG_TRIG, elem_nodes.data());
-      }
+              if (auto it = libmesh_to_ng_id.find(n_id);
+                  it != libmesh_to_ng_id.end())
+                {
+                  const int existing_ng_id = it->second;
+                  elem_node = existing_ng_id;
+                }
+              else
+                {
+                  for (auto i : make_range(3))
+                    point_val[i] = n(i);
+
+                  Ng_AddPoint(wngmesh, point_val.data());
+
+                  ng_to_libmesh_id[ng_id] = n_id;
+                  libmesh_to_ng_id[n_id] = ng_id;
+                  elem_node = ng_id;
+                  ++ng_id;
+                }
+            }
+
+          Ng_AddSurfaceElement(wngmesh, NG_TRIG, elem_nodes.data());
+        }
+    };
+
+    create_surface_component(this->_mesh, false);
+
+    if (_holes)
+      for (const std::unique_ptr<UnstructuredMesh> & h : *_holes)
+        create_surface_component(*h, true);
   };
 
   auto handle_ng_result = [](Ng_Result result) {
@@ -182,25 +210,21 @@ void NetGenMeshInterface::triangulate ()
         ("Ng_GenerateVolumeMesh failed with an unknown error code");
   };
 
-  // We want to support any orientation of input triangles, but NetGen
-  // wants us to tell them the triangle orientation a priori or it
-  // won't generate any volume elements.  Let's just cheat and try
-  // twice.
-  create_surface_mesh(ngmesh, /* invert_tris = */ false);
+  WrappedNgMesh ngmesh;
+
+  this->volume_to_surface_mesh(this->_mesh);
+
+  if (_holes)
+    for (std::unique_ptr<UnstructuredMesh> & hole : *_holes)
+      {
+        this->volume_to_surface_mesh(*hole);
+      }
+
+  create_surface_mesh(ngmesh);
   auto result = Ng_GenerateVolumeMesh(ngmesh, &params);
   handle_ng_result(result);
 
-  int n_elem = Ng_GetNE(ngmesh);
-
-  if (!n_elem)
-    {
-      ngmesh.clear();
-      create_surface_mesh(ngmesh, /* invert_tris = */ true);
-      result = Ng_GenerateVolumeMesh(ngmesh, &params);
-      handle_ng_result(result);
-    }
-
-  n_elem = Ng_GetNE(ngmesh);
+  const int n_elem = Ng_GetNE(ngmesh);
 
   libmesh_error_msg_if (n_elem <= 0,
                         "NetGen failed to generate any tetrahedra");
