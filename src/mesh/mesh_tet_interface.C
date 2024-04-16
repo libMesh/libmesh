@@ -95,15 +95,18 @@ MeshTetInterface::MeshTetInterface (UnstructuredMesh & mesh) :
 }
 
 
-void MeshTetInterface::volume_to_surface_mesh()
+void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 {
+  // First convert all volume boundaries to surface elements; this
+  // gives us a manifold bounding the mesh, though it may not be a
+  // connected manifold even if the volume mesh was connected.
   {
     std::unordered_set<Elem *> elems_to_delete;
 
     std::vector<std::unique_ptr<Elem>> elems_to_add;
 
     // Convert all faces to surface elements
-    for (auto * elem : this->_mesh.element_ptr_range())
+    for (auto * elem : mesh.element_ptr_range())
       {
         if (elem->dim() != 2)
           elems_to_delete.insert(elem);
@@ -122,22 +125,22 @@ void MeshTetInterface::volume_to_surface_mesh()
     for (auto & elem : elems_to_add)
     {
       elem->set_interior_parent(nullptr);
-      this->_mesh.add_elem(std::move(elem));
+      mesh.add_elem(std::move(elem));
     }
 
     // Remove volume and edge elements
     for (Elem * elem : elems_to_delete)
-      this->_mesh.delete_elem(elem);
+      mesh.delete_elem(elem);
   }
 
   // Fix up neighbor pointers, element counts, etc.
-  this->_mesh.prepare_for_use();
+  mesh.prepare_for_use();
 
   // Partition surface into connected components
   std::vector<std::unordered_set<Elem *>> components;
   std::unordered_set<Elem *> in_component;
 
-  for (auto * elem : this->_mesh.element_ptr_range())
+  for (auto * elem : mesh.element_ptr_range())
     if (!in_component.count(elem))
       {
         components.push_back({});
@@ -149,23 +152,30 @@ void MeshTetInterface::volume_to_surface_mesh()
   for (const auto & component : components)
     {
       Real six_vol = six_times_signed_volume(component);
-      if (six_vol > biggest_six_vol)
+      if (std::abs(six_vol) > std::abs(biggest_six_vol))
         {
-          six_vol = biggest_six_vol;
+          biggest_six_vol = six_vol;
           biggest_component = &component;
         }
     }
 
   if (!biggest_component)
-    libmesh_error_msg("No positive-volume component found among " <<
+    libmesh_error_msg("No non-zero-volume component found among " <<
                       components.size() << " boundary components");
 
   for (const auto & component : components)
     if (&component != biggest_component)
-      for (Elem * elem: component)
-        this->_mesh.delete_elem(elem);
+      {
+        for (Elem * elem: component)
+          mesh.delete_elem(elem);
+      }
+    else if (biggest_six_vol < 0)
+      {
+        for (Elem * elem: component)
+          elem->flip(&mesh.get_boundary_info());
+      }
 
-  this->_mesh.prepare_for_use();
+  mesh.prepare_for_use();
 }
 
 
