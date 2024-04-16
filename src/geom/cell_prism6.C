@@ -522,6 +522,8 @@ Prism6::permute(unsigned int perm_num)
 void
 Prism6::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,1);
   swap2nodes(3,4);
   swap2neighbors(2,3);

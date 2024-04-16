@@ -613,6 +613,8 @@ void Tet4::permute(unsigned int perm_num)
 
 void Tet4::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,2);
   swap2neighbors(1,2);
   swap2boundarysides(1,2,boundary_info);

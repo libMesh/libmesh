@@ -473,6 +473,8 @@ void Quad9::permute(unsigned int perm_num)
 
 void Quad9::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,1);
   swap2nodes(2,3);
   swap2nodes(5,7);

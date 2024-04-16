@@ -300,6 +300,8 @@ dof_id_type Edge3::key () const
 
 void Edge3::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,1);
   swap2neighbors(0,1);
   swap2boundarysides(0,1,boundary_info);

@@ -758,6 +758,8 @@ Prism15::permute(unsigned int perm_num)
 void
 Prism15::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,1);
   swap2nodes(3,4);
   swap2nodes(7,8);

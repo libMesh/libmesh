@@ -457,6 +457,8 @@ void Tri7::permute(unsigned int perm_num)
 
 void Tri7::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,1);
   swap2nodes(4,5);
   swap2neighbors(1,2);
