@@ -17,6 +17,48 @@
 
 using namespace libMesh;
 
+namespace {
+
+void build_octahedron (MeshBase & mesh, bool flip_tris,
+                       Real xmin, Real xmax,
+                       Real ymin, Real ymax,
+                       Real zmin, Real zmax)
+{
+  const Real xavg = (xmin + xmax)/2;
+  const Real yavg = (ymin + ymax)/2;
+  const Real zavg = (zmin + zmax)/2;
+  mesh.add_point(Point(xavg,yavg,zmin), 0);
+  mesh.add_point(Point(xmax,yavg,zavg), 1);
+  mesh.add_point(Point(xavg,ymax,zavg), 2);
+  mesh.add_point(Point(xmin,yavg,zavg), 3);
+  mesh.add_point(Point(xavg,ymin,zavg), 4);
+  mesh.add_point(Point(xavg,yavg,zmax), 5);
+
+  auto add_tri = [&mesh, flip_tris](std::array<dof_id_type,3> nodes)
+  {
+    auto elem = mesh.add_elem(Elem::build(TRI3));
+    elem->set_node(0) = mesh.node_ptr(nodes[0]);
+    elem->set_node(1) = mesh.node_ptr(nodes[1]);
+    elem->set_node(2) = mesh.node_ptr(nodes[2]);
+    if (flip_tris)
+      elem->flip(&mesh.get_boundary_info());
+  };
+
+  add_tri({0,1,2});
+  add_tri({0,2,3});
+  add_tri({0,3,4});
+  add_tri({0,4,1});
+  add_tri({5,1,4});
+  add_tri({5,4,3});
+  add_tri({5,3,2});
+  add_tri({5,2,1});
+
+  mesh.prepare_for_use();
+}
+
+}
+
+
 class MeshTetTest : public CppUnit::TestCase
 {
   /**
@@ -31,6 +73,7 @@ public:
   CPPUNIT_TEST( testNetGen );
   CPPUNIT_TEST( testNetGenTets );
   CPPUNIT_TEST( testNetGenFlippedTris );
+  CPPUNIT_TEST( testNetGenHole );
 
   // We'll get to more advanced features later
   /*
@@ -95,14 +138,16 @@ public:
 
 
   void testTetInterfaceBase(MeshBase & mesh,
-                            MeshTetInterface & triangulator)
+                            MeshTetInterface & triangulator,
+                            dof_id_type expected_n_elem = 4,
+                            dof_id_type expected_n_nodes = 6)
   {
     commonSettings(triangulator);
 
     triangulator.triangulate();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), static_cast<dof_id_type>(4));
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), static_cast<dof_id_type>(6));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), expected_n_elem);
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), expected_n_nodes);
     for (const auto & elem : mesh.element_ptr_range())
       {
         CPPUNIT_ASSERT_EQUAL(elem->type(), TET4);
@@ -113,39 +158,37 @@ public:
   }
 
 
+  void testHole(UnstructuredMesh & mesh,
+                MeshTetInterface & triangulator)
+  {
+    std::unique_ptr<UnstructuredMesh> holemesh =
+      std::make_unique<Mesh>(*TestCommWorld);
+
+    MeshTools::Generation::build_cube (mesh, 1, 1, 1,
+                                       -2, 2, -2, 2, -2, 2);
+
+    build_octahedron(*holemesh, false,
+                     -1, 1, -1, 1, -1, 1);
+
+    auto holes =
+      std::make_unique<std::vector<std::unique_ptr<UnstructuredMesh>>>();
+
+    holes->push_back(std::move(holemesh));
+
+    triangulator.attach_hole_list(std::move(holes));
+
+    this->testTetInterfaceBase(mesh, triangulator, 32, 14);
+  }
+
+
   void testTrisToTets(MeshBase & mesh,
                       MeshTetInterface & triangulator,
                       bool flip_tris = false)
   {
     // An asymmetric octahedron, so we hopefully have an unambiguous
     // choice of shortest diagonal for a Delaunay algorithm to pick.
-    mesh.add_point(Point(0,0,-0.1), 0);
-    mesh.add_point(Point(1,0,0), 1);
-    mesh.add_point(Point(0,1,0), 2);
-    mesh.add_point(Point(-1,0,0), 3);
-    mesh.add_point(Point(0,-1,0), 4);
-    mesh.add_point(Point(0,0,0.1), 5);
-
-    auto add_tri = [&mesh, flip_tris](std::array<dof_id_type,3> nodes)
-    {
-      auto elem = mesh.add_elem(Elem::build(TRI3));
-      elem->set_node(0) = mesh.node_ptr(nodes[0]);
-      elem->set_node(1) = mesh.node_ptr(nodes[1]);
-      elem->set_node(2) = mesh.node_ptr(nodes[2]);
-      if (flip_tris)
-        elem->flip(&mesh.get_boundary_info());
-    };
-
-    add_tri({0,1,2});
-    add_tri({0,2,3});
-    add_tri({0,3,4});
-    add_tri({0,4,1});
-    add_tri({5,1,4});
-    add_tri({5,4,3});
-    add_tri({5,3,2});
-    add_tri({5,2,1});
-
-    mesh.prepare_for_use();
+    build_octahedron(mesh, false,
+                     -1, 1, -1, 1, -0.1, 0.1);
 
     this->testTetInterfaceBase(mesh, triangulator);
   }
@@ -247,6 +290,16 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testTrisToTets(mesh, net_tet, true);
+  }
+
+
+  void testNetGenHole()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    NetGenMeshInterface net_tet(mesh);
+    testHole(mesh, net_tet);
   }
 
 
