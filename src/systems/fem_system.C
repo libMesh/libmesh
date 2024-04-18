@@ -1345,7 +1345,7 @@ void FEMSystem::numerical_nonlocal_jacobian (FEMContext & context) const
 
 std::unique_ptr<DiffContext> FEMSystem::build_context ()
 {
-  FEMContext * fc = new FEMContext(*this);
+  auto fc = std::make_unique<FEMContext>(*this);
 
   DifferentiablePhysics * phys = this->get_physics();
 
@@ -1362,7 +1362,7 @@ std::unique_ptr<DiffContext> FEMSystem::build_context ()
   // If we are solving the adjoint problem, tell that to the Context
   fc->is_adjoint() = this->get_time_solver().is_adjoint();
 
-  return std::unique_ptr<DiffContext>(fc);
+  return fc;
 }
 
 
