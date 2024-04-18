@@ -472,9 +472,7 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
   auto ret = std::make_unique<PetscMatrix<T>>(copy, this->comm());
   ret->set_destroy_mat_on_exit(true);
 
-  // Work around an issue on older compilers.  We are able to simply
-  // "return ret;" on newer compilers
-  return std::unique_ptr<SparseMatrix<T>>(ret.release());
+  return ret;
 }
 
 
@@ -494,9 +492,7 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::clone () const
   auto ret = std::make_unique<PetscMatrix<T>>(copy, this->comm());
   ret->set_destroy_mat_on_exit(true);
 
-  // Work around an issue on older compilers.  We are able to simply
-  // "return ret;" on newer compilers
-  return std::unique_ptr<SparseMatrix<T>>(ret.release());
+  return ret;
 }
 
 template <typename T>

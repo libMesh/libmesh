@@ -42,9 +42,7 @@ LumpedMassMatrix<T>::zero_clone() const
   // zero values using fast == false.
   mat_copy->init(*this, /*fast=*/false);
 
-  // Work around an issue on older compilers.  We are able to simply
-  // "return mat_copy;" on newer compilers
-  return std::unique_ptr<SparseMatrix<T>>(mat_copy.release());
+  return mat_copy;
 }
 
 template <typename T>
@@ -60,9 +58,7 @@ LumpedMassMatrix<T>::clone() const
   // Swap diag_copy with diagonal in mat_copy
   *mat_copy = std::move(*diag_copy);
 
-  // Work around an issue on older compilers.  We are able to simply
-  // "return mat_copy;" on newer compilers
-  return std::unique_ptr<SparseMatrix<T>>(mat_copy.release());
+  return mat_copy;
 }
 
 template <typename T>

@@ -214,9 +214,7 @@ std::unique_ptr<SparseMatrix<T>> EpetraMatrix<T>::zero_clone () const
   mat_copy->init();
   mat_copy->zero();
 
-  // Work around an issue on older compilers.  We are able to simply
-  // "return mat_copy;" on newer compilers
-  return std::unique_ptr<SparseMatrix<T>>(mat_copy.release());
+  return mat_copy;
 }
 
 
@@ -229,9 +227,7 @@ std::unique_ptr<SparseMatrix<T>> EpetraMatrix<T>::clone () const
   auto mat_copy = this->zero_clone();
   mat_copy->add(1., *this);
 
-  // Work around an issue on older compilers.  We are able to simply
-  // "return mat_copy;" on newer compilers
-  return std::unique_ptr<SparseMatrix<T>>(mat_copy.release());
+  return mat_copy;
 }
 
 
