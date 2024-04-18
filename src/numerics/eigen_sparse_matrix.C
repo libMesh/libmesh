@@ -203,9 +203,7 @@ std::unique_ptr<SparseMatrix<T>> EigenSparseMatrix<T>::zero_clone () const
   auto ret = std::make_unique<EigenSparseMatrix<T>>(*this);
   ret->zero();
 
-  // Work around an issue on older compilers.  We are able to simply
-  // "return ret;" on newer compilers
-  return std::unique_ptr<SparseMatrix<T>>(ret.release());
+  return ret;
 }
 
 

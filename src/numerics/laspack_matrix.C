@@ -445,9 +445,7 @@ std::unique_ptr<SparseMatrix<T>> LaspackMatrix<T>::clone () const
   auto mat_copy = this->zero_clone();
   mat_copy->add(1., *this);
 
-  // Work around an issue on older compilers.  We are able to simply
-  // "return mat_copy;" on newer compilers
-  return std::unique_ptr<SparseMatrix<T>>(mat_copy.release());
+  return mat_copy;
 }
 
 template <typename T>
