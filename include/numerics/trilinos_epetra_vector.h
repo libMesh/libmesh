@@ -712,9 +712,10 @@ template <typename T>
 inline
 std::unique_ptr<NumericVector<T>> EpetraVector<T>::zero_clone () const
 {
-  NumericVector<T> * cloned_vector = new EpetraVector<T>(this->comm(), AUTOMATIC);
+  std::unique_ptr<NumericVector<T>> cloned_vector =
+    std::make_unique<EpetraVector<T>>(this->comm(), AUTOMATIC);
   cloned_vector->init(*this);
-  return std::unique_ptr<NumericVector<T>>(cloned_vector);
+  return cloned_vector;
 }
 
 
@@ -723,10 +724,11 @@ template <typename T>
 inline
 std::unique_ptr<NumericVector<T>> EpetraVector<T>::clone () const
 {
-  NumericVector<T> * cloned_vector = new EpetraVector<T>(this->comm(), AUTOMATIC);
+  std::unique_ptr<NumericVector<T>> cloned_vector =
+    std::make_unique<EpetraVector<T>>(this->comm(), AUTOMATIC);
   cloned_vector->init(*this, true);
   *cloned_vector = *this;
-  return std::unique_ptr<NumericVector<T>>(cloned_vector);
+  return cloned_vector;
 }
 
 
