@@ -484,9 +484,10 @@ template <typename T>
 inline
 std::unique_ptr<NumericVector<T>> DistributedVector<T>::zero_clone () const
 {
-  NumericVector<T> * cloned_vector = new DistributedVector<T>(this->comm());
+  std::unique_ptr<NumericVector<T>> cloned_vector =
+    std::make_unique<DistributedVector<T>>(this->comm());
   cloned_vector->init(*this);
-  return std::unique_ptr<NumericVector<T>>(cloned_vector);
+  return cloned_vector;
 }
 
 
@@ -495,10 +496,11 @@ template <typename T>
 inline
 std::unique_ptr<NumericVector<T>> DistributedVector<T>::clone () const
 {
-  NumericVector<T> * cloned_vector = new DistributedVector<T>(this->comm());
+  std::unique_ptr<NumericVector<T>> cloned_vector =
+    std::make_unique<DistributedVector<T>>(this->comm());
   cloned_vector->init(*this, true);
   *cloned_vector = *this;
-  return std::unique_ptr<NumericVector<T>>(cloned_vector);
+  return cloned_vector;
 }
 
 
