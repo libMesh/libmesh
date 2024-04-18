@@ -934,9 +934,10 @@ template <typename T>
 inline
 std::unique_ptr<NumericVector<T>> PetscVector<T>::zero_clone () const
 {
-  NumericVector<T> * cloned_vector = new PetscVector<T>(this->comm(), this->type());
+  std::unique_ptr<NumericVector<T>> cloned_vector =
+    std::make_unique<PetscVector<T>>(this->comm(), this->type());
   cloned_vector->init(*this);
-  return std::unique_ptr<NumericVector<T>>(cloned_vector);
+  return cloned_vector;
 }
 
 
@@ -945,10 +946,11 @@ template <typename T>
 inline
 std::unique_ptr<NumericVector<T>> PetscVector<T>::clone () const
 {
-  NumericVector<T> * cloned_vector = new PetscVector<T>(this->comm(), this->type());
+  std::unique_ptr<NumericVector<T>> cloned_vector =
+    std::make_unique<PetscVector<T>>(this->comm(), this->type());
   cloned_vector->init(*this, true);
   *cloned_vector = *this;
-  return std::unique_ptr<NumericVector<T>>(cloned_vector);
+  return cloned_vector;
 }
 
 
