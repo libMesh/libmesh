@@ -148,23 +148,23 @@ void DynaIO::read (const std::string & name)
   if (gzipped_file)
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
-      igzstream * inf = new igzstream;
+      auto inf = std::make_unique<igzstream>();
       libmesh_assert(inf);
-      in.reset(inf);
       inf->open(name.c_str(), std::ios::in);
+      in = std::move(inf);
 #else
       libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
     }
   else
     {
-      std::ifstream * inf = new std::ifstream;
+      auto inf = std::make_unique<std::ifstream>();
       libmesh_assert(inf);
-      in.reset(inf);
 
       std::string new_name = Utility::unzip_file(name);
 
       inf->open(new_name.c_str(), std::ios::in);
+      in = std::move(inf);
     }
 
   libmesh_assert(in.get());
