@@ -186,10 +186,9 @@ inline
 std::unique_ptr<FunctionBase<Output>>
 AnalyticFunction<Output>::clone () const
 {
-  return std::unique_ptr<FunctionBase<Output>>
-    ( _number_fptr ?
-      new AnalyticFunction<Output>(_number_fptr) :
-      new AnalyticFunction<Output>(_vector_fptr) );
+  return _number_fptr ?
+    std::make_unique<AnalyticFunction<Output>>(_number_fptr) :
+    std::make_unique<AnalyticFunction<Output>>(_vector_fptr);
 }
 
 
