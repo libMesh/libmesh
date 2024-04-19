@@ -839,7 +839,7 @@ protected:
   /*
    * Pre-evaluate the theta functions on the entire (local) training parameter set.
    */
-  void preevaluate_thetas();
+  virtual void preevaluate_thetas();
 
   /**
    * Reset the _preevaluate_thetas_completed flag to false. We can use this to force
