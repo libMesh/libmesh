@@ -1,5 +1,6 @@
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
+#include <libmesh/enum_norm_type.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/exact_solution.h>
 #include <libmesh/int_range.h>
@@ -39,6 +40,7 @@ void assemble_matrix_and_rhs(EquationSystems& es,
   c.get_element_fe(0, fe, dim);
 
   const std::vector<Real> & JxW = fe->get_JxW();
+  const std::vector<Point> & xyz = fe->get_xyz();
   const std::vector<std::vector<Real>> & phi = fe->get_phi();
   const std::vector<std::vector<RealGradient>> & dphi = fe->get_dphi();
 
@@ -68,8 +70,9 @@ void assemble_matrix_and_rhs(EquationSystems& es,
         {
           const Gradient grad_u = c.interior_gradient(0, qp);
           const Number u = c.interior_value(0, qp);
+          const Point p = xyz[qp];
 
-          Number forcing = 1;
+          const Number forcing = p(0);
 
           for (unsigned int i=0; i != n_dofs; i++)
             {
@@ -224,7 +227,8 @@ public:
 
   void testCoreform(const std::string & meshfile,
                     const std::string & matrixfile,
-                    const Order order = FIRST)
+                    Real expected_norm,
+                    Order order=FIRST)
   {
     Mesh mesh(*TestCommWorld);
     EquationSystems es(mesh);
@@ -251,27 +255,34 @@ public:
 
     es.init ();
     sys.solve();
+
+    // Skip norm calculations on NodeElems
+    std::set<unsigned int> skip_dimensions {0};
+    Real h1_norm = sys.calculate_norm(*sys.solution, 0, H1,
+                                      &skip_dimensions);
+
+    LIBMESH_ASSERT_FP_EQUAL(h1_norm, expected_norm, TOLERANCE*std::sqrt(TOLERANCE));
   }
 
 
   void testCoreformGeom2()
   {
     LOG_UNIT_TEST;
-    testCoreform("meshes/geom_2.exo", "matrices/geom_2_extraction_op.m");
+    testCoreform("meshes/geom_2.exo", "matrices/geom_2_extraction_op.m", 0.0959827039398013);
   }
 
 
   void testCoreformGeom4()
   {
     LOG_UNIT_TEST;
-    testCoreform("meshes/geom_4.exo", "matrices/geom_4_extraction_op.m");
+    testCoreform("meshes/geom_4.exo", "matrices/geom_4_extraction_op.m", 0.10404051279393);
   }
 
 
   void testCoreformGeom8()
   {
     LOG_UNIT_TEST;
-    testCoreform("meshes/geom_8.exo", "matrices/geom_8_extraction_op.m");
+    testCoreform("meshes/geom_8.exo", "matrices/geom_8_extraction_op.m", 0.103252835327016);
   }
 
 
