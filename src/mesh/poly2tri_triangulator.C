@@ -1491,6 +1491,8 @@ bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
   // decision quickly
   if (!area_func && !this->has_auto_area_function())
     return (area > min_area_target);
+  else if(area_func && this->has_auto_area_function())
+    libmesh_warning("WARNING:  both desired are function and automatic area function are set.  Using automatic area function.");
 
   // If we do?
   //
