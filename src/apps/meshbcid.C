@@ -44,7 +44,7 @@ void usage_error(const char * progname)
 
   exit(1);
 }
-std::map<std::string, int> bcids;
+
 int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
@@ -90,20 +90,7 @@ int main(int argc, char ** argv)
 
   BoundingBox normals(minpt, maxpt),
               points(minpt, maxpt);
-  std::string side_set_name;
-  std::string node_set_name;
-  if (cl.search("--sideSetName"))
-    {
-      side_set_name = cl.next("");
-      assert(bcids.find(side_set_name) == bcids.end());
-      bcids.insert(std::pair<std::string, int> (side_set_name, bcid));
-    }
-  else if (cl.search("--nodeSetName"))
-    {
-      node_set_name = cl.next("");
-      assert(bcids.find(node_set_name) == bcids.end());
-      bcids.insert(std::pair<std::string, int> (node_set_name, bcid));
-    }
+
   if (cl.search("--minnormalx"))
     normals.min()(0) = cl.next(normals.min()(0));
   if (cl.search("--maxnormalx"))
