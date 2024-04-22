@@ -266,24 +266,23 @@ void AbaqusIO::read (const std::string & fname)
   if (gzipped_file)
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
-      igzstream * inf = new igzstream;
+      auto inf = std::make_unique<igzstream>();
       libmesh_assert(inf);
-      _in.reset(inf);
       inf->open(fname.c_str(), std::ios::in);
+      _in = std::move(inf); // class takes ownership as base class pointer
 #else
       libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
     }
   else
     {
-      std::ifstream * inf = new std::ifstream;
+      auto inf = std::make_unique<std::ifstream>();
       libmesh_assert(inf);
-      _in.reset(inf);
 
       std::string new_name = Utility::unzip_file(fname);
-
       inf->open(new_name.c_str(), std::ios::in);
       libmesh_assert(inf->good());
+      _in = std::move(inf); // class takes ownership as base class pointer
     }
 
   // Initialize the elems_of_dimension array.  We will use this in a

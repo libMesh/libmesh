@@ -169,10 +169,10 @@ public:
 
   virtual std::unique_ptr<FunctionBase<Output>> clone() const override
   {
-    CompositeFunction * returnval = new CompositeFunction();
+    auto returnval = std::make_unique<CompositeFunction>();
     for (auto i : index_range(subfunctions))
       returnval->attach_subfunction(*subfunctions[i], index_maps[i]);
-    return std::unique_ptr<FunctionBase<Output>> (returnval);
+    return returnval;
   }
 
   unsigned int n_subfunctions () const

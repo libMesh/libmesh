@@ -34,6 +34,7 @@
 #include <pthread.h>
 #include <algorithm>
 #include <vector>
+#include <memory> // std::unique_ptr, std::make_unique
 
 #ifdef __APPLE__
 #  ifdef __MAC_10_12
@@ -281,7 +282,7 @@ void parallel_for (const Range & range, const Body & body)
 
   unsigned int n_threads = num_pthreads(range);
 
-  std::vector<Range *> ranges(n_threads);
+  std::vector<std::unique_ptr<Range>> ranges(n_threads);
   std::vector<RangeBody<const Range, const Body>> range_bodies(n_threads);
   std::vector<pthread_t> threads(n_threads);
 
@@ -297,7 +298,7 @@ void parallel_for (const Range & range, const Body & body)
       if (i+1 == n_threads)
         this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
 
-      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
+      ranges[i] = std::make_unique<Range>(range, current_beginning, current_beginning + this_range_size);
 
       current_beginning = current_beginning + this_range_size;
     }
@@ -305,7 +306,7 @@ void parallel_for (const Range & range, const Body & body)
   // Create the RangeBody arguments
   for (unsigned int i=0; i<n_threads; i++)
     {
-      range_bodies[i].range = ranges[i];
+      range_bodies[i].range = ranges[i].get();
       range_bodies[i].body = &body;
     }
 
@@ -337,10 +338,6 @@ void parallel_for (const Range & range, const Body & body)
   for (int i=0; i<static_cast<int>(n_threads); i++)
     pthread_join(threads[i], nullptr);
 #endif
-
-  // Clean up
-  for (unsigned int i=0; i<n_threads; i++)
-    delete ranges[i];
 }
 
 /**
@@ -375,14 +372,21 @@ void parallel_reduce (const Range & range, Body & body)
 
   unsigned int n_threads = num_pthreads(range);
 
-  std::vector<Range *> ranges(n_threads);
-  std::vector<Body *> bodies(n_threads);
+  std::vector<std::unique_ptr<Range>> ranges(n_threads);
+  std::vector<std::unique_ptr<Body>> managed_bodies(n_threads); // bodies we are responsible for
+  std::vector<Body *> bodies(n_threads); // dumb pointers to managed_bodies
   std::vector<RangeBody<Range, Body>> range_bodies(n_threads);
 
-  // Create copies of the body for each thread
-  bodies[0] = &body; // Use the original body for the first one
+  // Create n_threads-1 copies of "body". We manage the lifetime of
+  // these copies with std::unique_ptrs.
   for (unsigned int i=1; i<n_threads; i++)
-    bodies[i] = new Body(body, Threads::split());
+    managed_bodies[i] = std::make_unique<Body>(body, Threads::split());
+
+  // Set up the "bodies" vector. Use the passed in body for the first
+  // one, point to managed_bodies entries for the others.
+  bodies[0] = &body;
+  for (unsigned int i=1; i<n_threads; i++)
+    bodies[i] = managed_bodies[i].get();
 
   // Create the ranges for each thread
   std::size_t range_size = range.size() / n_threads;
@@ -396,7 +400,7 @@ void parallel_reduce (const Range & range, Body & body)
       if (i+1 == n_threads)
         this_range_size += range.size() % n_threads; // Give the last one the remaining work to do
 
-      ranges[i] = new Range(range, current_beginning, current_beginning + this_range_size);
+      ranges[i] = std::make_unique<Range>(range, current_beginning, current_beginning + this_range_size);
 
       current_beginning = current_beginning + this_range_size;
     }
@@ -404,7 +408,7 @@ void parallel_reduce (const Range & range, Body & body)
   // Create the RangeBody arguments
   for (unsigned int i=0; i<n_threads; i++)
     {
-      range_bodies[i].range = ranges[i];
+      range_bodies[i].range = ranges[i].get();
       range_bodies[i].body = bodies[i];
     }
 
@@ -441,12 +445,6 @@ void parallel_reduce (const Range & range, Body & body)
   // Join them all down to the original Body
   for (unsigned int i=n_threads-1; i != 0; i--)
     bodies[i-1]->join(*bodies[i]);
-
-  // Clean up
-  for (unsigned int i=1; i<n_threads; i++)
-    delete bodies[i];
-  for (unsigned int i=0; i<n_threads; i++)
-    delete ranges[i];
 }
 
 /**

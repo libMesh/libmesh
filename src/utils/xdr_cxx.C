@@ -204,23 +204,23 @@ void Xdr::open (std::string name)
         if (gzipped_file)
           {
 #ifdef LIBMESH_HAVE_GZSTREAM
-            igzstream * inf = new igzstream;
+            auto inf = std::make_unique<igzstream>();
             libmesh_assert(inf);
-            in.reset(inf);
             inf->open(file_name.c_str(), std::ios::in);
+            in = std::move(inf);
 #else
             libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
           }
         else
           {
-            std::ifstream * inf = new std::ifstream;
+            auto inf = std::make_unique<std::ifstream>();
             libmesh_assert(inf);
-            in.reset(inf);
 
             std::string new_name = Utility::unzip_file(file_name);
 
             inf->open(new_name.c_str(), std::ios::in);
+            in = std::move(inf);
           }
 
         libmesh_assert(in.get());
@@ -239,19 +239,18 @@ void Xdr::open (std::string name)
         if (gzipped_file)
           {
 #ifdef LIBMESH_HAVE_GZSTREAM
-            ogzstream * outf = new ogzstream;
+            auto outf = std::make_unique<ogzstream>();
             libmesh_assert(outf);
-            out.reset(outf);
             outf->open(file_name.c_str(), std::ios::out);
+            out = std::move(outf);
 #else
             libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
 #endif
           }
         else
           {
-            std::ofstream * outf = new std::ofstream;
+            auto outf = std::make_unique<std::ofstream>();
             libmesh_assert(outf);
-            out.reset(outf);
 
             std::string new_name = file_name;
 
@@ -262,6 +261,7 @@ void Xdr::open (std::string name)
               new_name.erase(new_name.end() - 3, new_name.end());
 
             outf->open(new_name.c_str(), std::ios::out);
+            out = std::move(outf);
           }
 
         libmesh_assert(out.get());
