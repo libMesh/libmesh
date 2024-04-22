@@ -270,8 +270,7 @@ void MeshFunction::operator() (const Point & p,
     }
   else
     {
-      // resize the output vector to the number of output values
-      // that the user told us
+      // resize the output vector to the _new_resize
       output.resize (_new_resize);
 
 
@@ -497,8 +496,7 @@ void MeshFunction::_gradient_on_elem (const Point & p,
 {
   libmesh_assert(element);
 
-  // resize the output vector to the number of output values
-  // that the user told us
+  // resize the output vector to the _new_resize
   output.resize (_new_resize);
 
   const unsigned int dim = element->dim();
@@ -614,8 +612,7 @@ void MeshFunction::hessian (const Point & p,
                         << " are not yet implemented!"
                         << std::endl);
 
-      // resize the output vector to the number of output values
-      // that the user told us
+      // resize the output vector to the _new_resize
       output.resize (_new_resize);
 
 
