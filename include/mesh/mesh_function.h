@@ -409,7 +409,7 @@ protected:
 
   /**
    * the new size to resize output to  
-  */
+   */
   int _new_resize;
 };
 
