@@ -144,6 +144,8 @@ for (int i = 0; i < total_variables; ++i)
   
 }
 
+_new_resize = vec_dim * n_vector_vars + n_scalar_vars;
+
 // ready for use
 this->_initialized = true;
 }
@@ -270,8 +272,7 @@ void MeshFunction::operator() (const Point & p,
     {
       // resize the output vector to the number of output values
       // that the user told us
-      output.resize (cast_int<unsigned int>
-                     (this->_system_vars.size()));
+      output.resize (_new_resize);
 
 
       {
@@ -498,7 +499,7 @@ void MeshFunction::_gradient_on_elem (const Point & p,
 
   // resize the output vector to the number of output values
   // that the user told us
-  output.resize (this->_system_vars.size());
+  output.resize (_new_resize);
 
   const unsigned int dim = element->dim();
 
@@ -615,7 +616,7 @@ void MeshFunction::hessian (const Point & p,
 
       // resize the output vector to the number of output values
       // that the user told us
-      output.resize (this->_system_vars.size());
+      output.resize (_new_resize);
 
 
       {
