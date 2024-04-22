@@ -772,16 +772,29 @@ void ExodusII_IO_Helper::read_qa_records()
 
   if (num_qa_rec > 0)
     {
-      // How to dynamically allocate an array of fixed-size char * arrays in C++.
-      // http://stackoverflow.com/questions/8529359/creating-a-dynamic-sized-array-of-fixed-sized-int-arrays-in-c
-      typedef char * inner_array_t[4];
-      inner_array_t * qa_record = new inner_array_t[num_qa_rec];
+      // Actual (num_qa_rec x 4) storage for strings. The object we
+      // pass to the Exodus API will just contain pointers into the
+      // qa_storage object, which will have all automatic memory
+      // management.
+      std::vector<std::vector<std::vector<char>>> qa_storage(num_qa_rec);
+      for (int i=0; i<num_qa_rec; i++)
+        {
+          qa_storage[i].resize(4);
+          for (int j=0; j<4; j++)
+            qa_storage[i][j].resize(MAX_STR_LENGTH+1);
+        }
 
+      // inner_array_t is a fixed-size array of 4 strings
+      typedef char * inner_array_t[4];
+
+      // Create data structure to be passed to Exodus API by setting
+      // pointers to the actual strings which are in qa_storage.
+      std::vector<inner_array_t> qa_record(num_qa_rec);
       for (int i=0; i<num_qa_rec; i++)
         for (int j=0; j<4; j++)
-          qa_record[i][j] = new char[MAX_STR_LENGTH+1];
+          qa_record[i][j] = qa_storage[i][j].data();
 
-      ex_err = exII::ex_get_qa (ex_id, qa_record);
+      ex_err = exII::ex_get_qa (ex_id, qa_record.data());
       EX_CHECK_ERR(ex_err, "Error reading the QA records.");
 
       // Print the QA records
@@ -794,14 +807,6 @@ void ExodusII_IO_Helper::read_qa_records()
                 libMesh::out << qa_record[i][j] << std::endl;
             }
         }
-
-
-      // Clean up dynamically-allocated memory
-      for (int i=0; i<num_qa_rec; i++)
-        for (int j=0; j<4; j++)
-          delete [] qa_record[i][j];
-
-      delete [] qa_record;
     }
 }
 
