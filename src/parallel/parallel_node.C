@@ -240,29 +240,31 @@ Packing<Node *>::unpack (std::vector<largest_id_type>::const_iterator in,
     }
   else
     {
-      // If we don't already have it, we need to allocate it
-      node = new Node();
+      // If we don't already have it, we need to allocate it.
+      // There is no Node::build() API that lets you defer setting
+      // the (x,y,z) values, so we just use the Node constructor.
+      auto unode = std::make_unique<Node>();
 
       for (unsigned int i=0; i != LIBMESH_DIM; ++i)
         {
           Real idtypes_as_Real;
           std::memcpy(&idtypes_as_Real, &(*in), sizeof(Real));
-          (*node)(i) = idtypes_as_Real;
+          (*unode)(i) = idtypes_as_Real;
           in += idtypes_per_Real;
         }
 
-      node->set_id() = id;
+      unode->set_id() = id;
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      node->set_unique_id(unique_id);
+      unode->set_unique_id(unique_id);
 #endif
-      node->processor_id() = processor_id;
+      unode->processor_id() = processor_id;
 
-      node->unpack_indexing(in);
+      unode->unpack_indexing(in);
       libmesh_assert_equal_to (DofObject::unpackable_indexing_size(in),
-                               node->packed_indexing_size());
-      in += node->packed_indexing_size();
+                               unode->packed_indexing_size());
+      in += unode->packed_indexing_size();
 
-      mesh->add_node(node);
+      node = mesh->add_node(std::move(unode));
     }
 
   // FIXME: We should add some debug mode tests to ensure that the
