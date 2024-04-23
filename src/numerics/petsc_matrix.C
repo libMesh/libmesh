@@ -1521,25 +1521,40 @@ template <typename T>
 PetscMatrix<T> & PetscMatrix<T>::operator= (const PetscMatrix<T> & v)
 {
   if (_mat)
-  {
-    MatInfo our_info, v_info;
+    {
+      PetscBool assembled;
+      auto ierr = MatAssembled(_mat, &assembled);
+      LIBMESH_CHKERR(ierr);
+      bool same_nonzero_pattern = false;
 
-    auto ierr = MatGetInfo(_mat, MAT_GLOBAL_SUM, &our_info);
-    LIBMESH_CHKERR(ierr);
-    ierr = MatGetInfo(v._mat, MAT_GLOBAL_SUM, &v_info);
-    LIBMESH_CHKERR(ierr);
-    if (our_info.nz_allocated == v_info.nz_allocated)
-      // Strong chance we have the same nonzero structure
-      ierr = MatCopy(v._mat, _mat, SAME_NONZERO_PATTERN);
-    else
-      ierr = MatCopy(v._mat, _mat, DIFFERENT_NONZERO_PATTERN);
-    LIBMESH_CHKERR(ierr);
-  }
+      if (assembled)
+        {
+          MatInfo our_info, v_info;
+
+          ierr = MatGetInfo(_mat, MAT_GLOBAL_SUM, &our_info);
+          LIBMESH_CHKERR(ierr);
+          ierr = MatGetInfo(v._mat, MAT_GLOBAL_SUM, &v_info);
+          LIBMESH_CHKERR(ierr);
+          if (our_info.nz_allocated == v_info.nz_allocated)
+            same_nonzero_pattern = true;
+        }
+      else
+        // MatCopy does not work with an unassembled matrix. We could use MatDuplicate but then we
+        // would have to destroy the matrix we manage and others might be relying on that data. So
+        // we just assemble here regardless of the preceding level of matrix fill
+        this->close();
+
+      if (same_nonzero_pattern)
+        ierr = MatCopy(v._mat, _mat, SAME_NONZERO_PATTERN);
+      else
+        ierr = MatCopy(v._mat, _mat, DIFFERENT_NONZERO_PATTERN);
+      LIBMESH_CHKERR(ierr);
+    }
   else
-  {
-    auto ierr = MatDuplicate(v._mat, MAT_COPY_VALUES, &_mat);
-    LIBMESH_CHKERR(ierr);
-  }
+    {
+      auto ierr = MatDuplicate(v._mat, MAT_COPY_VALUES, &_mat);
+      LIBMESH_CHKERR(ierr);
+    }
 
   this->_is_initialized = true;
 
