@@ -401,8 +401,10 @@ public:
 
   /**
    * Return the EIM error indicator values from the most recent call to rb_eim_solves().
+   * The first entry of each pair is the normalized error indicator, and the second
+   * entry is the normalization factor.
    */
-  const std::vector<Real> & get_rb_eim_error_indicators() const;
+  const std::vector<std::pair<Real,Real>> & get_rb_eim_error_indicators() const;
 
   /**
    * Set the data associated with EIM interpolation points.
@@ -717,7 +719,7 @@ private:
    * If we're using the EIM error indicator, then we store the error indicator
    * values corresponding to _rb_eim_solutions here.
    */
-  std::vector<Real> _rb_eim_error_indicators;
+  std::vector<std::pair<Real,Real>> _rb_eim_error_indicators;
 
   /**
    * Storage for EIM solutions from the training set. This is typically used in
