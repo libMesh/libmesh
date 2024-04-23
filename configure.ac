@@ -394,6 +394,7 @@ AS_IF([test "x$enableexamples" = "xyes"],
                          examples/eigenproblems/eigenproblems_ex1/Makefile
                          examples/eigenproblems/eigenproblems_ex2/Makefile
                          examples/eigenproblems/eigenproblems_ex3/Makefile
+                         examples/eigenproblems/eigenproblems_ex4/Makefile
                          examples/fem_system/fem_system_ex1/Makefile
                          examples/fem_system/fem_system_ex2/Makefile
                          examples/fem_system/fem_system_ex3/Makefile
