@@ -122,9 +122,9 @@ void DifferentiableSystem::init_data ()
 
 std::unique_ptr<DiffContext> DifferentiableSystem::build_context ()
 {
-  DiffContext * context = new DiffContext(*this);
+  auto context = std::make_unique<DiffContext>(*this);
   context->set_deltat_pointer( &this->deltat );
-  return std::unique_ptr<DiffContext>(context);
+  return context;
 }
 
 
