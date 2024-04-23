@@ -185,6 +185,13 @@ void CondensedEigenSystem::solve()
                                          local_non_condensed_dofs_vector,
                                          local_non_condensed_dofs_vector);
     }
+  else if (_condensed_precond_matrix.get() && !_condensed_precond_matrix->initialized())
+    {
+      const auto m = local_non_condensed_dofs_vector.size();
+      auto M = m;
+      _communicator.sum(M);
+      _condensed_precond_matrix->init(M, M, m, m);
+    }
 
   solve_helper(
       _condensed_matrix_A.get(), _condensed_matrix_B.get(), _condensed_precond_matrix.get());
