@@ -29,7 +29,7 @@
 // C++ includes
 #include <map>
 #include <sstream>
-
+#include <memory> // std::unique_ptr
 
 
 //-----------------------------------------------
@@ -62,27 +62,10 @@ Elem * ref_elem_map[INVALID_ELEM];
 class SingletonCache : public libMesh::Singleton
 {
 public:
-  ~SingletonCache()
-  {
-    for (auto & elem : elem_list)
-      {
-        delete elem;
-        elem = nullptr;
-      }
+  virtual ~SingletonCache() = default;
 
-    elem_list.clear();
-
-    for (auto & node : node_list)
-      {
-        delete node;
-        node = nullptr;
-      }
-
-    node_list.clear();
-  }
-
-  std::vector<Node *> node_list;
-  std::vector<Elem *> elem_list;
+  std::vector<std::unique_ptr<Node>> node_list;
+  std::vector<std::unique_ptr<Elem>> elem_list;
 };
 
 // singleton object, dynamically created and then
@@ -115,8 +98,8 @@ void read_ref_elem (const ElemType type_in,
   libmesh_assert_equal_to (elem_type_read, static_cast<unsigned int>(type_in));
   libmesh_assert_equal_to (n_nodes, Elem::type_to_n_nodes_map[elem_type_read]);
 
-  // Construct elem of appropriate type
-  std::unique_ptr<Elem> uelem = Elem::build(type_in);
+  // Construct elem of appropriate type, store in the elem_list
+  auto & uelem = singleton_cache->elem_list.emplace_back(Elem::build(type_in));
 
   // We are expecting an identity map, so assert it!
   for (unsigned int n=0; n<n_nodes; n++)
@@ -129,21 +112,18 @@ void read_ref_elem (const ElemType type_in,
     {
       in >> x >> y >> z;
 
-      Node * node = new Node(x,y,z,n);
-      singleton_cache->node_list.push_back(node);
+      auto & new_node =
+        singleton_cache->node_list.emplace_back(Node::build(x,y,z,n));
 
-      uelem->set_node(n) = node;
+      uelem->set_node(n) = new_node.get();
     }
 
   // it is entirely possible we ran out of file or encountered
   // another error.  If so, throw an error.
   libmesh_error_msg_if(!in, "ERROR while creating element singleton!");
 
-  // Release the pointer into the care of the singleton_cache
-  singleton_cache->elem_list.push_back (uelem.release());
-
-  // Also store it in the array.
-  ref_elem_map[type_in] = singleton_cache->elem_list.back();
+  // Also store a pointer to the newly created Elem in the ref_elem_map array.
+  ref_elem_map[type_in] = uelem.get();
 }
 
 
