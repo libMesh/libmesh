@@ -1326,7 +1326,7 @@ template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs(const ElemType t, const O
 template <> unsigned int FE<0,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return FE<0,LAGRANGE>::n_dofs_at_node(t,o,n); }
 template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return FE<1,LAGRANGE>::n_dofs_at_node(t,o,n); }
 template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 2*FE<2,LAGRANGE>::n_dofs_at_node(t,o,n); }
-template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 3*FE<2,LAGRANGE>::n_dofs_at_node(t,o,n); }
+template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 3*FE<3,LAGRANGE>::n_dofs_at_node(t,o,n); }
 
 template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
