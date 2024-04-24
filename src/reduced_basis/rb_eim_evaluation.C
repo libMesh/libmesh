@@ -279,7 +279,7 @@ void RBEIMEvaluation::rb_eim_solves(const std::vector<RBParameters> & mus,
             Number error_indicator_rhs = evaluated_values_at_err_indicator_point[counter];
             _rb_eim_error_indicators[counter] =
               get_eim_error_indicator(
-                error_indicator_rhs, _rb_eim_solutions[counter], EIM_rhs).first;
+                error_indicator_rhs, _rb_eim_solutions[counter], EIM_rhs);
           }
 
         counter++;
@@ -689,7 +689,7 @@ std::vector<DenseVector<Number>> & RBEIMEvaluation::get_eim_solutions_for_traini
   return _eim_solutions_for_training_set;
 }
 
-const std::vector<Real> & RBEIMEvaluation::get_rb_eim_error_indicators() const
+const std::vector<std::pair<Real,Real>> & RBEIMEvaluation::get_rb_eim_error_indicators() const
 {
   return _rb_eim_error_indicators;
 }
