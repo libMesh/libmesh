@@ -68,9 +68,32 @@ public:
   std::vector<std::unique_ptr<Elem>> elem_list;
 };
 
-// singleton object, dynamically created and then
-// removed at program exit
-SingletonCache * singleton_cache = nullptr;
+// From [0], regarding the lifetime of the singleton_cache variable:
+//
+//     "All variables at namespace level, including the anonymous
+//     namespace and function local static variable have static
+//     storage duration unless they are declared thread_local."
+//
+// Variables with static storage duration are destroyed at the end of
+// the program execution. From [1],
+//
+//     "If it is a pointer to the data which is static ... then like all
+//     other dynamically allocated data, it will only be destructed when
+//     you delete it.  There are two frequent solutions:
+//     * use a smart pointer, which has a destructor which deletes it, or
+//     * don't delete it; in most cases, there's really no reason to call the
+//       destructor, and if you happen to use the instance in the destructors
+//       of other static objects, you'll run into an order of destruction
+//       problem."
+//
+// Although this variable has never showed up as a leak on valgrind or any
+// other heap tracking software that I have used, in order to avoid the
+// use of an unmatched new/delete pair, we will use a smart pointer as in
+// the first suggestion above.
+//
+// [0]: https://stackoverflow.com/questions/24342393/how-anonymous-namespaces-avoids-making-global-static-variable
+// [1]: https://stackoverflow.com/questions/6850009/c-deleting-static-data
+std::unique_ptr<SingletonCache> singleton_cache = nullptr;
 
 
 
@@ -145,7 +168,7 @@ void init_ref_elem_table()
 
   // OK, if we get here we have the lock and we are not
   // initialized.  populate singleton.
-  singleton_cache = new SingletonCache;
+  singleton_cache = std::make_unique<SingletonCache>();
 
   // initialize the reference file table
   {
