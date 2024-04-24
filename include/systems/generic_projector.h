@@ -88,8 +88,17 @@ private:
   // For TBB compatibility and thread safety we'll copy these in
   // operator()
   FFunctor & master_f;
-  GFunctor * master_g;  // Needed for C1 type elements only
-  bool g_was_copied, map_was_created;
+
+  /**
+   * Needed for C1 type elements only. Either a shallow copy
+   * of a GFunctor pointer passed to the constructor, or to
+   * master_g_deepcopy.get(), depending on which constructor
+   * was called.
+   */
+  std::unique_ptr<GFunctor> master_g_deepcopy;
+  GFunctor * master_g;
+
+  bool map_was_created;
   ProjectionAction & master_action;
   const std::vector<unsigned int> & variables;
   std::unordered_map<dof_id_type, std::vector<dof_id_type>> * nodes_to_elem;
@@ -106,7 +115,6 @@ public:
     system(system_in),
     master_f(f_in),
     master_g(g_in),
-    g_was_copied(false),
     map_was_created(!nodes_to_elem_in),
     master_action(act_in),
     variables(variables_in),
@@ -123,8 +131,8 @@ public:
   GenericProjector (const GenericProjector & in) :
     system(in.system),
     master_f(in.master_f),
-    master_g(in.master_g ? new GFunctor(*in.master_g) : nullptr),
-    g_was_copied(in.master_g),
+    master_g_deepcopy(in.master_g ? std::make_unique<GFunctor>(*in.master_g) : nullptr),
+    master_g(in.master_g ? master_g_deepcopy.get() : nullptr),
     master_action(in.master_action),
     variables(in.variables),
     nodes_to_elem(in.nodes_to_elem)
@@ -132,8 +140,6 @@ public:
 
   ~GenericProjector()
   {
-    if (g_was_copied)
-      delete master_g;
     if (map_was_created)
       delete nodes_to_elem;
   }
