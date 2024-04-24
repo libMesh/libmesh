@@ -90,18 +90,26 @@ private:
   FFunctor & master_f;
 
   /**
-   * Needed for C1 type elements only. Either a shallow copy
-   * of a GFunctor pointer passed to the constructor, or to
-   * master_g_deepcopy.get(), depending on which constructor
-   * was called.
+   * Needed for C1 type elements only. master_g is either a shallow
+   * copy of a GFunctor pointer passed to the constructor, or to
+   * master_g_deepcopy.get(), depending on which constructor was
+   * called.
    */
   std::unique_ptr<GFunctor> master_g_deepcopy;
   GFunctor * master_g;
 
-  bool map_was_created;
   ProjectionAction & master_action;
   const std::vector<unsigned int> & variables;
-  std::unordered_map<dof_id_type, std::vector<dof_id_type>> * nodes_to_elem;
+
+  /**
+   * nodes_to_elem is either a shallow copy of a map passed in to
+   * the constructor, or points to nodes_to_elem_ourcopy, if no
+   * such map was provided.
+   */
+  typedef std::unordered_map<dof_id_type, std::vector<dof_id_type>> NodesToElemMap;
+  NodesToElemMap nodes_to_elem_ourcopy;
+  NodesToElemMap * nodes_to_elem;
+
   bool done_saving_ids;
 
 public:
@@ -110,21 +118,18 @@ public:
                     GFunctor * g_in,
                     ProjectionAction & act_in,
                     const std::vector<unsigned int> & variables_in,
-                    std::unordered_map<dof_id_type, std::vector<dof_id_type>> *
-                      nodes_to_elem_in = nullptr) :
+                    std::unordered_map<dof_id_type, std::vector<dof_id_type>> * nodes_to_elem_in = nullptr) :
     system(system_in),
     master_f(f_in),
     master_g(g_in),
-    map_was_created(!nodes_to_elem_in),
     master_action(act_in),
     variables(variables_in),
     nodes_to_elem(nodes_to_elem_in)
   {
-    if (map_was_created) // past tense misnomer here
+    if (!nodes_to_elem_in)
       {
-        nodes_to_elem = new
-          std::unordered_map<dof_id_type, std::vector<dof_id_type>>;
-        MeshTools::build_nodes_to_elem_map (system.get_mesh(), *nodes_to_elem);
+        MeshTools::build_nodes_to_elem_map (system.get_mesh(), nodes_to_elem_ourcopy);
+        nodes_to_elem = &nodes_to_elem_ourcopy;
       }
   }
 
@@ -138,11 +143,7 @@ public:
     nodes_to_elem(in.nodes_to_elem)
   {}
 
-  ~GenericProjector()
-  {
-    if (map_was_created)
-      delete nodes_to_elem;
-  }
+  ~GenericProjector() = default;
 
   // The single "project" function handles all the threaded projection
   // calculations and intervening MPI communications
