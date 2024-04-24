@@ -787,14 +787,20 @@ void ExodusII_IO_Helper::read_qa_records()
       // inner_array_t is a fixed-size array of 4 strings
       typedef char * inner_array_t[4];
 
+      // There is at least one compiler (Clang 12.0.1) that complains about
+      // "a non-scalar type used in a pseudo-destructor expression" when
+      // we try to instantiate a std::vector of inner_array_t objects as in:
+      // std::vector<inner_array_t> qa_record(num_qa_rec);
+      // So, we instead attempt to achieve the same effect with a std::unique_ptr.
+      auto qa_record = std::make_unique<inner_array_t[]>(num_qa_rec);
+
       // Create data structure to be passed to Exodus API by setting
       // pointers to the actual strings which are in qa_storage.
-      std::vector<inner_array_t> qa_record(num_qa_rec);
       for (auto i : make_range(num_qa_rec))
         for (auto j : make_range(4))
           qa_record[i][j] = qa_storage[i][j].data();
 
-      ex_err = exII::ex_get_qa (ex_id, qa_record.data());
+      ex_err = exII::ex_get_qa (ex_id, qa_record.get());
       EX_CHECK_ERR(ex_err, "Error reading the QA records.");
 
       // Print the QA records
