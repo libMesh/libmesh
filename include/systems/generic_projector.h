@@ -82,6 +82,13 @@ template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 class GenericProjector
 {
+public:
+  /**
+   * Convenience typedef for the Node-to-attached-Elem mapping that
+   * may be passed in to the constructor.
+   */
+  typedef std::unordered_map<dof_id_type, std::vector<dof_id_type>> NodesToElemMap;
+
 private:
   const System & system;
 
@@ -106,7 +113,6 @@ private:
    * the constructor, or points to nodes_to_elem_ourcopy, if no
    * such map was provided.
    */
-  typedef std::unordered_map<dof_id_type, std::vector<dof_id_type>> NodesToElemMap;
   NodesToElemMap nodes_to_elem_ourcopy;
   NodesToElemMap * nodes_to_elem;
 
@@ -118,7 +124,7 @@ public:
                     GFunctor * g_in,
                     ProjectionAction & act_in,
                     const std::vector<unsigned int> & variables_in,
-                    std::unordered_map<dof_id_type, std::vector<dof_id_type>> * nodes_to_elem_in = nullptr) :
+                    NodesToElemMap * nodes_to_elem_in = nullptr) :
     system(system_in),
     master_f(f_in),
     master_g(g_in),
