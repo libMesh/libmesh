@@ -50,6 +50,7 @@
 #include "libmesh/petsc_shell_matrix.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_refinement.h"
+#include "libmesh/slepc_macro.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -74,7 +75,10 @@ main(int argc, char ** argv)
 #endif
 
 #ifndef LIBMESH_HAVE_SLEPC
-  libmesh_example_requires(false, "--enable-slepc");
+  libmesh_example_requires(false, "--enable-slepc with a slepc version >=3.13");
+#else
+#if SLEPC_VERSION_LESS_THAN(3,13,0)
+  libmesh_example_requires(false, "--enable-slepc with a slepc version >=3.13");
 #else
   // Tell the user what we are doing.
   libMesh::out << "Running " << argv[0];
@@ -225,6 +229,7 @@ main(int argc, char ** argv)
 
   // All done.
   return 0;
+#endif // SLEPC version >= 3.13.0
 #endif // LIBMESH_HAVE_SLEPC
 }
 
