@@ -159,21 +159,28 @@ void EigenSystem::init_matrices ()
 {
   Parent::init_matrices();
 
+  const bool condense_constraints = condense_constrained_dofs();
   if (shell_matrix_A)
     {
       shell_matrix_A->attach_dof_map(this->get_dof_map());
+      if (condense_constraints)
+        shell_matrix_A->omit_constrained_dofs();
       shell_matrix_A->init();
     }
 
   if (shell_matrix_B)
     {
       shell_matrix_B->attach_dof_map(this->get_dof_map());
+      if (condense_constraints)
+        shell_matrix_B->omit_constrained_dofs();
       shell_matrix_B->init();
     }
 
   if (shell_precond_matrix)
     {
       shell_precond_matrix->attach_dof_map(this->get_dof_map());
+      if (condense_constraints)
+        shell_precond_matrix->omit_constrained_dofs();
       shell_precond_matrix->init();
     }
 }
@@ -204,26 +211,13 @@ void EigenSystem::reinit ()
     }
 }
 
-
-
-void EigenSystem::solve ()
+void
+EigenSystem::solve_helper(SparseMatrix<Number> * const A,
+                          SparseMatrix<Number> * const B,
+                          SparseMatrix<Number> * const P)
 {
-  if (get_dof_map().n_constrained_dofs())
-    libmesh_warning("EigenSystem does not have first-class support for constrained degrees of "
-                    "freedom. You may see spurious effects of the constrained degrees of freedom "
-                    "in a given eigenvector. If you wish to perform a reliable solve on a system "
-                    "with constraints, please use the CondensedEigenSystem class instead");
-
   // A reference to the EquationSystems
   EquationSystems & es = this->get_equation_systems();
-
-  // check that necessary parameters have been set
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
-
-  if (this->assemble_before_solve)
-    // Assemble the linear system
-    this->assemble ();
 
   // Get the tolerance for the solver and the maximum
   // number of iterations. Here, we simply adopt the linear solver
@@ -250,37 +244,61 @@ void EigenSystem::solve ()
     if (generalized())
       // Shell preconditioning matrix
       if (_use_shell_precond_matrix)
-        solve_data = eigen_solver->solve_generalized (*shell_matrix_A, *shell_matrix_B,*shell_precond_matrix, nev, ncv, tol, maxits);
+        solve_data = eigen_solver->solve_generalized(
+            *shell_matrix_A, *shell_matrix_B, *shell_precond_matrix, nev, ncv, tol, maxits);
       else
-        solve_data = eigen_solver->solve_generalized (*shell_matrix_A, *shell_matrix_B,*precond_matrix, nev, ncv, tol, maxits);
+        solve_data = eigen_solver->solve_generalized(
+            *shell_matrix_A, *shell_matrix_B, *P, nev, ncv, tol, maxits);
 
     // Standard eigenproblem
     else
-      {
-        libmesh_assert (!shell_matrix_B);
-        // Shell preconditioning matrix
-        if (_use_shell_precond_matrix)
-          solve_data = eigen_solver->solve_standard (*shell_matrix_A,*shell_precond_matrix, nev, ncv, tol, maxits);
-        else
-          solve_data = eigen_solver->solve_standard (*shell_matrix_A,*precond_matrix, nev, ncv, tol, maxits);
-      }
+    {
+      libmesh_assert(!shell_matrix_B);
+      // Shell preconditioning matrix
+      if (_use_shell_precond_matrix)
+        solve_data = eigen_solver->solve_standard(
+            *shell_matrix_A, *shell_precond_matrix, nev, ncv, tol, maxits);
+      else
+        solve_data = eigen_solver->solve_standard(*shell_matrix_A, *P, nev, ncv, tol, maxits);
+    }
   }
   else
   {
     // Generalized eigenproblem
     if (generalized())
-      solve_data = eigen_solver->solve_generalized (*matrix_A, *matrix_B, nev, ncv, tol, maxits);
+      solve_data = eigen_solver->solve_generalized(*A, *B, nev, ncv, tol, maxits);
 
     // Standard eigenproblem
     else
-      {
-        libmesh_assert (!matrix_B);
-        solve_data = eigen_solver->solve_standard (*matrix_A, nev, ncv, tol, maxits);
-      }
+    {
+      libmesh_assert(!matrix_B);
+      solve_data = eigen_solver->solve_standard(*A, nev, ncv, tol, maxits);
+    }
   }
 
   this->_n_converged_eigenpairs = solve_data.first;
   this->_n_iterations           = solve_data.second;
+}
+
+void EigenSystem::solve ()
+{
+  if (get_dof_map().n_constrained_dofs())
+    libmesh_warning("EigenSystem does not have first-class support for constrained degrees of "
+                    "freedom. You may see spurious effects of the constrained degrees of freedom "
+                    "in a given eigenvector. If you wish to perform a reliable solve on a system "
+                    "with constraints, please use the CondensedEigenSystem class instead");
+
+  // check that necessary parameters have been set
+  libmesh_assert(
+      this->get_equation_systems().parameters.have_parameter<unsigned int>("eigenpairs"));
+  libmesh_assert(
+      this->get_equation_systems().parameters.have_parameter<unsigned int>("basis vectors"));
+
+  if (this->assemble_before_solve)
+    // Assemble the linear system
+    this->assemble ();
+
+  solve_helper(matrix_A, matrix_B, precond_matrix);
 }
 
 std::pair<Real, Real> EigenSystem::get_eigenpair (dof_id_type i)

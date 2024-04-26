@@ -108,6 +108,8 @@ public:
    */
   virtual void solve() override;
 
+  virtual void clear () override;
+
   /**
    * Override \p get_eigenpair() to retrieve the eigenpair for
    * the condensed eigensolve. We only set the non-condensed
@@ -116,16 +118,57 @@ public:
    */
   virtual std::pair<Real, Real> get_eigenpair(dof_id_type i) override;
 
+  bool has_condensed_matrix_A() const { return _condensed_matrix_A.get(); }
+  bool has_condensed_matrix_B() const { return _condensed_matrix_B.get(); }
+  bool has_condensed_precond_matrix() const { return _condensed_precond_matrix.get(); }
+
   /**
    * \returns The system matrix used for standard eigenvalue problems
    */
-  SparseMatrix<Number> & get_condensed_matrix_A() const;
+  SparseMatrix<Number> & get_condensed_matrix_A();
 
   /**
    * \returns The second system matrix used for generalized eigenvalue problems.
    */
-  SparseMatrix<Number> & get_condensed_matrix_B() const;
+  SparseMatrix<Number> & get_condensed_matrix_B();
 
+  /**
+   * \returns The condensed preconditioning matrix
+   */
+  SparseMatrix<Number> & get_condensed_precond_matrix();
+
+  /**
+   * Copy a logically sub-vector into a super-vector. The sub-vector local size should correspond to
+   * the size of our \p local_non_condensed_dofs_vector, e.g. the sub-vector should represent
+   * non-condensed degree of freedom. The \p super should contain both condensed and non-condensed
+   * dofs
+   */
+  void copy_sub_to_super(const NumericVector<Number> & sub, NumericVector<Number> & super);
+
+  /**
+   * Copy a logically super-vector into a sub-vector. The \p super vector should represent all dofs,
+   * both condensed and non-condensed. The \p sub should contain only non-condensed dofs, e.g. its
+   * local size should match the size of our \p local_non_condensed_dofs_vector
+   */
+  void copy_super_to_sub(NumericVector<Number> & super, NumericVector<Number> & sub);
+
+  /**
+   * Copy a logically super-matrix into a sub-matrix. The \p super matrix should represent all dofs,
+   * both condensed and non-condensed. The \p sub should contain only non-condensed dofs, e.g. its
+   * local row ownership size should match the size of our \p local_non_condensed_dofs_vector
+   */
+  void copy_super_to_sub(const SparseMatrix<Number> & super, SparseMatrix<Number> & sub);
+
+  /**
+   * Instructs not to create the condensed submatrices from the global matrices right before the
+   * solve. This API should be used when assembly occurs during callbacks during the solve, e.g. for
+   * a nonlinear eigen problem, solved with a Newton-based solver to determine the fundamental mode,
+   * in which function and matrix evalations are liable to change with every nonlinear iteration.
+   * Moreover, calling \p create_submatrix wipes away callbacks associated with the condensed matrix
+   */
+  void dont_create_submatrices_in_solve() { _create_submatrices_in_solve = false; }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * The (condensed) system matrix for standard eigenvalue problems.
    *
@@ -141,6 +184,7 @@ public:
    * the future! Use get_condensed_matrix_B() instead.
    */
   SparseMatrix<Number> * condensed_matrix_B;
+#endif
 
   /**
    * Vector storing the local dof indices that will not be condensed.
@@ -149,13 +193,41 @@ public:
    */
   std::vector<dof_id_type> local_non_condensed_dofs_vector;
 
+protected:
+  virtual void add_matrices () override;
+
 private:
+  virtual bool condense_constrained_dofs() const override final { return true; }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  void set_raw_pointers();
+#endif
 
   /**
    * A private flag to indicate whether the condensed dofs
    * have been initialized.
    */
   bool condensed_dofs_initialized;
+
+  /**
+   * Denotes whether to create the condensed submatrices from the global matrices in the solve
+   */
+  bool _create_submatrices_in_solve;
+
+  /**
+   * The (condensed) system matrix for standard eigenvalue problems.
+   */
+  std::unique_ptr<SparseMatrix<Number>> _condensed_matrix_A;
+
+  /**
+   * A second (condensed) system matrix for generalized eigenvalue problems.
+   */
+  std::unique_ptr<SparseMatrix<Number>> _condensed_matrix_B;
+
+  /**
+   * The condensed preconditioning matrix
+   */
+  std::unique_ptr<SparseMatrix<Number>> _condensed_precond_matrix;
 };
 
 

@@ -119,7 +119,7 @@ public:
   virtual NumericVector<T> & operator= (const NumericVector<T> & v) = 0;
 
   /**
-   * The 5 special functions can be defaulted for this class, as it
+   * These 3 special functions can be defaulted for this class, as it
    * does not manage any memory itself.
    */
   NumericVector (NumericVector &&) = default;
@@ -724,6 +724,28 @@ public:
    */
   virtual void create_subvector(NumericVector<T> & ,
                                 const std::vector<numeric_index_type> &) const
+  {
+    libmesh_not_implemented();
+  }
+
+  /**
+   * Creates a view into this vector using the indices in \p
+   * rows.  Similar to the \p create_submatrix() routine for the
+   * SparseMatrix class, it is currently only implemented for
+   * PetscVectors.
+   */
+  virtual std::unique_ptr<NumericVector<T>>
+  get_subvector(const std::vector<numeric_index_type> &)
+  {
+    libmesh_not_implemented();
+  }
+
+  /**
+   * Restores a view into this vector using the indices in \p
+   * rows.  This  is currently only implemented for
+   * PetscVectors.
+   */
+  virtual void restore_subvector(NumericVector<T> &&, const std::vector<numeric_index_type> &)
   {
     libmesh_not_implemented();
   }

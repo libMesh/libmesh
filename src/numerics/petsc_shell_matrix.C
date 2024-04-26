@@ -72,10 +72,16 @@ void PetscShellMatrix<T>::init ()
   this->_is_initialized = true;
 
 
-  const numeric_index_type my_m = this->_dof_map->n_dofs();
+  numeric_index_type my_m = this->_dof_map->n_dofs();
+  numeric_index_type m_l = this->_dof_map->n_dofs_on_processor(this->processor_id());
+  if (this->_omit_constrained_dofs)
+    {
+      my_m -= this->_dof_map->n_constrained_dofs();
+      m_l -= this->_dof_map->n_local_constrained_dofs();
+    }
+
   const numeric_index_type my_n = my_m;
-  const numeric_index_type n_l  = this->_dof_map->n_dofs_on_processor(this->processor_id());
-  const numeric_index_type m_l  = n_l;
+  const numeric_index_type n_l  = m_l;
 
 
   PetscErrorCode ierr = 0;

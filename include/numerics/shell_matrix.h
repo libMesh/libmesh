@@ -109,11 +109,18 @@ public:
 
   virtual void init () { libmesh_error_msg ("Not implemented yet"); }
 
+  void omit_constrained_dofs() { _omit_constrained_dofs = true; }
+
 protected:
   /**
    * The \p DofMap object associated with this object.
    */
   DofMap const * _dof_map;
+
+  /**
+   * Whether to omit constrained dofs from this data structure
+   */
+  bool _omit_constrained_dofs;
 };
 
 
@@ -124,7 +131,8 @@ template <typename T>
 inline
 ShellMatrix<T>::ShellMatrix (const Parallel::Communicator & comm_in) :
   ParallelObject(comm_in),
-  _dof_map(nullptr)
+  _dof_map(nullptr),
+  _omit_constrained_dofs(false)
 {}
 
 

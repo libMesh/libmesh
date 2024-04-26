@@ -124,9 +124,11 @@ public:
    */
   PetscMatrix (PetscMatrix &&) = delete;
   PetscMatrix (const PetscMatrix &) = delete;
-  PetscMatrix & operator= (const PetscMatrix &) = delete;
   PetscMatrix & operator= (PetscMatrix &&) = delete;
   virtual ~PetscMatrix ();
+
+  PetscMatrix & operator= (const PetscMatrix &);
+  virtual SparseMatrix<T> & operator= (const SparseMatrix<T> & v) override;
 
   void set_matrix_type(PetscMatrixType mat_type);
 

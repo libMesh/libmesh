@@ -37,9 +37,8 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
                                             const std::string & name_in,
                                             const unsigned int number_in)
   : Parent(es, name_in, number_in),
-    condensed_matrix_A(&this->add_matrix("Condensed Eigen Matrix A")),
-    condensed_matrix_B(&this->add_matrix("Condensed Eigen Matrix B")),
-    condensed_dofs_initialized(false)
+    condensed_dofs_initialized(false),
+    _create_submatrices_in_solve(true)
 {
 }
 
@@ -49,6 +48,8 @@ void
 CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & global_dirichlet_dofs_set)
 {
   const DofMap & dof_map = this->get_dof_map();
+  if (global_dirichlet_dofs_set.empty() && !dof_map.n_constrained_dofs())
+    return;
 
   // First, put all unconstrained local dofs into non_dirichlet_dofs_set
   std::set<dof_id_type> local_non_condensed_dofs_set;
@@ -88,6 +89,52 @@ dof_id_type CondensedEigenSystem::n_global_non_condensed_dofs() const
     }
 }
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
+void
+CondensedEigenSystem::set_raw_pointers()
+{
+  condensed_matrix_A = _condensed_matrix_A.get();
+  condensed_matrix_B = _condensed_matrix_B.get();
+}
+#endif
+
+void
+CondensedEigenSystem::clear()
+{
+  Parent::clear();
+  _condensed_matrix_A = nullptr;
+  _condensed_matrix_B = nullptr;
+  _condensed_precond_matrix = nullptr;
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  set_raw_pointers();
+#endif
+}
+
+void
+CondensedEigenSystem::add_matrices()
+{
+  Parent::add_matrices();
+
+  if (!this->use_shell_matrices())
+  {
+    if (!_condensed_matrix_A)
+      _condensed_matrix_A = SparseMatrix<Number>::build(this->comm());
+    if (!_condensed_matrix_B)
+      _condensed_matrix_B = SparseMatrix<Number>::build(this->comm());
+
+    // When not using shell matrices we use A for P as well so we don't need to add P
+  }
+  // we *are* using shell matrices but we might not be using a shell matrix for P
+  else if (!this->use_shell_precond_matrix())
+  {
+    if (!_condensed_precond_matrix)
+      _condensed_precond_matrix = SparseMatrix<Number>::build(this->comm());
+  }
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  set_raw_pointers();
+#endif
+}
 
 void CondensedEigenSystem::solve()
 {
@@ -101,79 +148,54 @@ void CondensedEigenSystem::solve()
       return;
     }
 
-  // A reference to the EquationSystems
-  EquationSystems & es = this->get_equation_systems();
-
   // check that necessary parameters have been set
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("eigenpairs"));
-  libmesh_assert (es.parameters.have_parameter<unsigned int>("basis vectors"));
+  libmesh_assert(
+      this->get_equation_systems().parameters.have_parameter<unsigned int>("eigenpairs"));
+  libmesh_assert(
+      this->get_equation_systems().parameters.have_parameter<unsigned int>("basis vectors"));
 
   if (this->assemble_before_solve)
     {
       // Assemble the linear system
-      this->assemble ();
+      this->assemble();
 
       // And close the assembled matrices; using a non-closed matrix
       // with create_submatrix() is deprecated.
-      matrix_A->close();
-      if (generalized())
+      if (matrix_A)
+        matrix_A->close();
+      if (generalized() && matrix_B)
         matrix_B->close();
+      if (precond_matrix)
+        precond_matrix->close();
     }
 
   // If we reach here, then there should be some non-condensed dofs
   libmesh_assert(!local_non_condensed_dofs_vector.empty());
 
-  // Now condense the matrices
-  matrix_A->create_submatrix(*condensed_matrix_A,
-                             local_non_condensed_dofs_vector,
-                             local_non_condensed_dofs_vector);
-
-  if (generalized())
+  if (_create_submatrices_in_solve)
     {
-      matrix_B->create_submatrix(*condensed_matrix_B,
-                                 local_non_condensed_dofs_vector,
-                                 local_non_condensed_dofs_vector);
+      if (matrix_A)
+        matrix_A->create_submatrix(
+            *_condensed_matrix_A, local_non_condensed_dofs_vector, local_non_condensed_dofs_vector);
+      if (generalized() && matrix_B)
+        matrix_B->create_submatrix(
+            *_condensed_matrix_B, local_non_condensed_dofs_vector, local_non_condensed_dofs_vector);
+      if (precond_matrix)
+        precond_matrix->create_submatrix(*_condensed_precond_matrix,
+                                         local_non_condensed_dofs_vector,
+                                         local_non_condensed_dofs_vector);
+    }
+  else if (_condensed_precond_matrix.get() && !_condensed_precond_matrix->initialized())
+    {
+      const auto m = local_non_condensed_dofs_vector.size();
+      auto M = m;
+      _communicator.sum(M);
+      _condensed_precond_matrix->init(M, M, m, m);
     }
 
-
-  // Get the tolerance for the solver and the maximum
-  // number of iterations. Here, we simply adopt the linear solver
-  // specific parameters.
-  const double tol          =
-    double(es.parameters.get<Real>("linear solver tolerance"));
-
-  const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
-
-  const unsigned int nev    =
-    es.parameters.get<unsigned int>("eigenpairs");
-
-  const unsigned int ncv    =
-    es.parameters.get<unsigned int>("basis vectors");
-
-  std::pair<unsigned int, unsigned int> solve_data;
-
-  // call the solver depending on the type of eigenproblem
-  if (generalized())
-    {
-      //in case of a generalized eigenproblem
-      solve_data = eigen_solver->solve_generalized
-        (*condensed_matrix_A,*condensed_matrix_B, nev, ncv, tol, maxits);
-    }
-
-  else
-    {
-      libmesh_assert (!matrix_B);
-
-      //in case of a standard eigenproblem
-      solve_data = eigen_solver->solve_standard (*condensed_matrix_A, nev, ncv, tol, maxits);
-    }
-
-  set_n_converged(solve_data.first);
-  set_n_iterations(solve_data.second);
+  solve_helper(
+      _condensed_matrix_A.get(), _condensed_matrix_B.get(), _condensed_precond_matrix.get());
 }
-
-
 
 std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
 {
@@ -207,7 +229,10 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
       solution->set(index,(*temp)(temp->first_local_index()+j));
     }
 
+  // Enforcing constraints requires creating a ghosted version of the solution, which requires the
+  // solution be assembled
   solution->close();
+  get_dof_map().enforce_constraints_exactly(*this);
   this->update();
 
   return eval;
@@ -215,23 +240,60 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
 
 
 
-SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_A() const
+SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_A()
 {
-  libmesh_assert(condensed_matrix_A);
-  libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix A"), condensed_matrix_A);
-  return *condensed_matrix_A;
+  libmesh_assert(_condensed_matrix_A);
+  return *_condensed_matrix_A;
 }
 
-
-
-SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_B() const
+SparseMatrix<Number> & CondensedEigenSystem::get_condensed_matrix_B()
 {
-  libmesh_assert(condensed_matrix_B);
-  libmesh_assert_equal_to(&get_matrix("Condensed Eigen Matrix B"), condensed_matrix_B);
-  return *condensed_matrix_B;
+  libmesh_assert(_condensed_matrix_B);
+  return *_condensed_matrix_B;
 }
 
+SparseMatrix<Number> & CondensedEigenSystem::get_condensed_precond_matrix()
+{
+  libmesh_assert(_condensed_precond_matrix);
+  return *_condensed_precond_matrix;
+}
 
+void
+CondensedEigenSystem::copy_sub_to_super(const NumericVector<Number> & sub,
+                                        NumericVector<Number> & super)
+{
+  libmesh_assert_equal_to(sub.local_size(), local_non_condensed_dofs_vector.size());
+  libmesh_assert_equal_to(sub.local_size() + this->get_dof_map().n_local_constrained_dofs(),
+                          super.local_size());
+  auto super_sub_view = super.get_subvector(local_non_condensed_dofs_vector);
+  *super_sub_view = sub;
+  super.restore_subvector(std::move(*super_sub_view), local_non_condensed_dofs_vector);
+}
+
+void
+CondensedEigenSystem::copy_super_to_sub(NumericVector<Number> & super,
+                                        NumericVector<Number> & sub)
+{
+  libmesh_assert_equal_to(sub.local_size(), local_non_condensed_dofs_vector.size());
+  libmesh_assert_equal_to(sub.local_size() + this->get_dof_map().n_local_constrained_dofs(),
+                          super.local_size());
+  auto super_sub_view = super.get_subvector(local_non_condensed_dofs_vector);
+  sub = *super_sub_view;
+  super.restore_subvector(std::move(*super_sub_view), local_non_condensed_dofs_vector);
+}
+
+void
+CondensedEigenSystem::copy_super_to_sub(const SparseMatrix<Number> & super,
+                                        SparseMatrix<Number> & sub)
+{
+  libmesh_assert_equal_to(sub.local_m(), local_non_condensed_dofs_vector.size());
+  libmesh_assert_equal_to(sub.local_m() + this->get_dof_map().n_local_constrained_dofs(),
+                          super.local_m());
+  auto super_sub_view = SparseMatrix<Number>::build(super.comm());
+  super.create_submatrix(
+      *super_sub_view, local_non_condensed_dofs_vector, local_non_condensed_dofs_vector);
+  sub = *super_sub_view;
+}
 
 } // namespace libMesh
 

@@ -66,6 +66,12 @@ public:
    */
   DiagonalMatrix(DiagonalMatrix &&) = default;
   DiagonalMatrix & operator=(DiagonalMatrix &&) = default;
+  DiagonalMatrix & operator=(const DiagonalMatrix &) = delete;
+  virtual SparseMatrix<T> & operator=(const SparseMatrix<T> &) override
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   /**
    * Copy contents from vec into underlying diagonal storage

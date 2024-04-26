@@ -19,6 +19,7 @@ SUBDIRS = \
 	eigenproblems/eigenproblems_ex1 \
 	eigenproblems/eigenproblems_ex2 \
 	eigenproblems/eigenproblems_ex3 \
+	eigenproblems/eigenproblems_ex4 \
 	fem_system/fem_system_ex1 \
 	fem_system/fem_system_ex2 \
 	fem_system/fem_system_ex3 \

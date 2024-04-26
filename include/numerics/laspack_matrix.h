@@ -79,6 +79,11 @@ public:
   LaspackMatrix & operator= (const LaspackMatrix &) = delete;
   LaspackMatrix & operator= (LaspackMatrix &&) = delete;
   virtual ~LaspackMatrix ();
+  virtual SparseMatrix<T> & operator=(const SparseMatrix<T> &) override
+  {
+    libmesh_not_implemented();
+    return *this;
+  }
 
   /**
    * The \p LaspackMatrix needs the full sparsity pattern.
