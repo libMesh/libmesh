@@ -2082,6 +2082,8 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
       elem->subdomain_id() = new_sbd_id;
 
       Elem * added_elem = this->add_elem(std::move(elem));
+      this->_elem_dims.insert(0);
+      this->_mesh_subdomains.insert(new_sbd_id);
       node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
       existing_unconstrained_columns.emplace(j,n->id());
 
