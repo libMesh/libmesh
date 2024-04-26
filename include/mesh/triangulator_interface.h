@@ -98,11 +98,7 @@ public:
 
     _auto_area_mfi->interpolate_field_data(_auto_area_mfi->field_variables(), target_pts, target_vals);
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-    return target_vals.front().real();
-#else
-    return target_vals.front();
-#endif
+    return libmesh_real(target_vals.front());
   }
 
   virtual void operator() (const Point & p,
