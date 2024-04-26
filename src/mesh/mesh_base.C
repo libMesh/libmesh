@@ -2030,14 +2030,22 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
   std::unordered_map<const Node *, std::pair<dof_id_type, unsigned int>> node_to_elem_ptrs;
 
   // Find elements attached to any existing nodes that will stay
-  // unconstrained
+  // unconstrained.  We'll also build a subdomain set here so we don't
+  // have to assert that the mesh is already prepared before we pick a
+  // new subdomain for any NodeElems we need to add.
+  std::set<subdomain_id_type> subdomain_ids;
   for (const Elem * elem : this->element_ptr_range())
-    for (auto n : make_range(elem->n_nodes()))
-      {
-        const Node * node = elem->node_ptr(n);
-        if (existing_unconstrained_nodes.count(node->id()))
-          node_to_elem_ptrs.emplace(node, std::make_pair(elem->id(), n));
-      }
+    {
+      subdomain_ids.insert(elem->subdomain_id());
+      for (auto n : make_range(elem->n_nodes()))
+        {
+          const Node * node = elem->node_ptr(n);
+          if (existing_unconstrained_nodes.count(node->id()))
+            node_to_elem_ptrs.emplace(node, std::make_pair(elem->id(), n));
+        }
+    }
+
+  const subdomain_id_type new_sbd_id = *subdomain_ids.rbegin() + 1;
 
   for (auto j : make_range(constraint_operator.n()))
     {
@@ -2071,6 +2079,7 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
       Node *n = this->add_point(newpt);
       std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
       elem->set_node(0) = n;
+      elem->subdomain_id() = new_sbd_id;
 
       Elem * added_elem = this->add_elem(std::move(elem));
       node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
