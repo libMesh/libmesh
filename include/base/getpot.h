@@ -542,20 +542,39 @@ private:
   std::string _field_separator;
 
   /**
-   * helper functor for creating sets of C-style strings
-   */
-  struct ltstr
-  {
-    bool operator()(const char* s1, const char* s2) const { return strcmp(s1, s2) < 0; }
-  };
-
-  /**
    * we have some mutable non-thread-safe members, but we
    * want to be able to call const member functions from
    * multiple threads at once, so we'll wrap access to
    * mutable objects in a mutex.
    */
   GETPOT_MUTEX_DECLARE;
+
+  /**
+   * Transparent comparator object used for making std::sets that
+   * contain unique_ptrs.
+   */
+  struct ltstr
+  {
+    /**
+     * As of C++14, std::set::find() can be a templated overload.
+     * https://en.cppreference.com/w/cpp/container/set/find
+     * We enable this by defining is_transparent as a type.
+     * See also: the CompareUnderlying struct in libmesh/utility.h
+     */
+    using is_transparent = void;
+
+    bool operator()(const std::unique_ptr<const char[]> & s1,
+                    const std::unique_ptr<const char[]> & s2) const
+    { return strcmp(s1.get(), s2.get()) < 0; }
+
+    bool operator()(const std::unique_ptr<const char[]> & s1,
+                    const char * const & s2) const
+    { return strcmp(s1.get(), s2) < 0; }
+
+    bool operator()(const char * const & s1,
+                    const std::unique_ptr<const char[]> & s2) const
+    { return strcmp(s1, s2.get()) < 0; }
+  };
 
   /**
    * some functions return a char pointer to a string created on the fly.
@@ -565,7 +584,7 @@ private:
    * guaranteed to remain valid until a non-const string
    * method is called
    */
-  mutable std::set<const char*, ltstr> _internal_string_container;
+  mutable std::set<std::unique_ptr<const char[]>, ltstr> _internal_string_container;
 
   /**
    * some functions return a char pointer to a temporarily existing string
@@ -998,32 +1017,19 @@ GetPot::GetPot(const GetPot& Other) :
   _requested_sections(Other._requested_sections),
   request_recording_f(Other.request_recording_f)
 {
-  std::set<const char*,ltstr>::const_iterator it =
-    Other._internal_string_container.begin();
-
-  const std::set<const char*,ltstr>::const_iterator end =
-    Other._internal_string_container.end();
-
-  for (; it != end; ++it)
+  for (const auto & otherstr : Other._internal_string_container)
     {
-      const char* otherstr = *it;
-      char* newcopy = new char[strlen(otherstr)+1];
-      strncpy(newcopy, otherstr, strlen(otherstr)+1);
-      this->_internal_string_container.insert(newcopy);
+      auto newlen = strlen(otherstr.get()) + 1;
+      auto newcopy = std::make_unique<char[]>(newlen);
+      strncpy(newcopy.get(), otherstr.get(), newlen);
+      this->_internal_string_container.insert(std::move(newcopy));
     }
 }
 
 
 
 inline
-GetPot::~GetPot()
-{
-  // may be some return strings had to be created, delete now !
-  std::set<const char*, ltstr>::const_iterator        it = _internal_string_container.begin();
-  const std::set<const char*, ltstr>::const_iterator end = _internal_string_container.end();
-  for (; it != end; ++it)
-    delete [] *it;
-}
+GetPot::~GetPot() = default;
 
 
 
@@ -1055,28 +1061,15 @@ GetPot::operator=(const GetPot& Other)
   _requested_sections  = Other._requested_sections;
   request_recording_f  = Other.request_recording_f;
 
-  std::set<const char*, ltstr>::const_iterator        my_it =
-    _internal_string_container.begin();
-  const std::set<const char*, ltstr>::const_iterator my_end =
-    _internal_string_container.end();
-
-  for (; my_it != my_end; ++my_it)
-    delete [] *my_it;
-
+  // Clear existing strings
   _internal_string_container.clear();
 
-  std::set<const char*,ltstr>::const_iterator it =
-    Other._internal_string_container.begin();
-  const std::set<const char*,ltstr>::const_iterator end =
-    Other._internal_string_container.end();
-
-  for (; it != end; ++it)
+  for (const auto & otherstr : Other._internal_string_container)
     {
-      const char* otherstr = *it;
-      const std::size_t bufsize = strlen(otherstr)+1;
-      char* newcopy = new char[bufsize];
-      strncpy(newcopy, otherstr, bufsize);
-      this->_internal_string_container.insert(newcopy);
+      auto newlen = strlen(otherstr.get()) + 1;
+      auto newcopy = std::make_unique<char[]>(newlen);
+      strncpy(newcopy.get(), otherstr.get(), newlen);
+      this->_internal_string_container.insert(std::move(newcopy));
     }
 
   return *this;
@@ -1712,19 +1705,17 @@ GetPot::_internal_managed_copy(const std::string& Arg) const
   SCOPED_MUTEX;
 
   // See if there's already an identical string saved
-  std::set<const char*,ltstr>::const_iterator it =
-    _internal_string_container.find(arg);
-
   // If so, return it
-  if (it != _internal_string_container.end())
-    return *it;
+  if (auto it = _internal_string_container.find(arg);
+      it != _internal_string_container.end())
+    return it->get();
 
   // Otherwise, create a new one
   const std::size_t bufsize = strlen(arg)+1;
-  char* newcopy = new char[bufsize];
-  strncpy(newcopy, arg, bufsize);
-  _internal_string_container.insert(newcopy);
-  return newcopy;
+  auto newcopy = std::make_unique<char[]>(bufsize);
+  strncpy(newcopy.get(), arg, bufsize);
+  auto pr = _internal_string_container.insert(std::move(newcopy));
+  return pr.first->get();
 }
 
 
