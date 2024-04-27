@@ -70,6 +70,10 @@ RemoteElem::~RemoteElem()
 
 const Elem & RemoteElem::create ()
 {
+  // The RemoteElem constructor is private, and RemoteElem::create()
+  // is a static member function, so this makes it difficult to use
+  // std::make_unique<RemoteElem> here. Therefore we just resort to
+  // using the traditional "new" in this instance.
   if (remote_elem == nullptr)
     remote_elem = new RemoteElem;
 
