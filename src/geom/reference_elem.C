@@ -86,14 +86,15 @@ public:
 //       of other static objects, you'll run into an order of destruction
 //       problem."
 //
-// Although this variable has never showed up as a leak on valgrind or any
-// other heap tracking software that I have used, in order to avoid the
-// use of an unmatched new/delete pair, we will use a smart pointer as in
-// the first suggestion above.
+// I tried making the singleton_cache a std::unique_ptr, but this resulted
+// in a segfault during program shutdown which appeared to come from the
+// single_cache unique_ptr's destructor. I didn't investigate whether the
+// issue was caused by a double deletion or what, but it appears that the
+// first suggestion above may not be valid in general.
 //
 // [0]: https://stackoverflow.com/questions/24342393/how-anonymous-namespaces-avoids-making-global-static-variable
 // [1]: https://stackoverflow.com/questions/6850009/c-deleting-static-data
-std::unique_ptr<SingletonCache> singleton_cache = nullptr;
+SingletonCache * singleton_cache = nullptr;
 
 
 
@@ -167,8 +168,11 @@ void init_ref_elem_table()
     return;
 
   // OK, if we get here we have the lock and we are not
-  // initialized.  populate singleton.
-  singleton_cache = std::make_unique<SingletonCache>();
+  // initialized.  populate singleton. Note that we do not
+  // use a smart pointer to manage the singleton_cache variable
+  // since variables with static storage duration are destroyed
+  // automatically at the end of program execution.
+  singleton_cache = new SingletonCache;
 
   // initialize the reference file table
   {
