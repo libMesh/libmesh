@@ -106,12 +106,14 @@ main(int argc, char ** argv)
   // 2D grid on a square.
   MeshTools::Generation::build_square(mesh, nx, ny, -1., 1., -1., 1., QUAD4);
 
+#ifdef LIBMESH_ENABLE_AMR
   for (auto * elem : mesh.active_element_ptr_range())
     if (elem->vertex_average()(0) < 0)
       elem->set_refinement_flag(Elem::REFINE);
 
   MeshRefinement refinedmesh(mesh);
   refinedmesh.refine_elements();
+#endif
 
   // Print information about the mesh to the screen.
   mesh.print_info();
