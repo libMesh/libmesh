@@ -15,21 +15,17 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// <h1>Eigenproblems Example 4 - Solving an Eigen Problem</h1>
-// \author Steffen Petersen
-// \date 2005
+// <h1>Eigenproblems Example 4 - Constrained Eigen Problem Solved with Newton Method</h1>
+// \author Alexander Lindsay
+// \date 2024
 //
-// This example introduces the EigenSystem and shows
-// how libMesh can be used for eigenvalue analysis.
+// This example illustrates how to solve an eigen problem with constraints from hanging
+// nodes using Newton's method, which is implemented in SLEPc as a variant of the power method.
+// Unlike for the standard power method, the Bx function is computed using the current solution.
+// This example will only work if the library is compiled with SLEPc support enabled.
 //
-// For solving eigen problems, libMesh interfaces
-// SLEPc (www.grycap.upv.es/slepc/) which again is based on PETSc.
-// Hence, this example will only work if the library is compiled
-// with SLEPc support enabled.
-//
-// In this example some eigenvalues for a standard symmetric eigenvalue
-// problem A*x=lambda*x are computed, where the matrix A
-// is assembled according to a mass matrix.
+// The Ax function is composed of diffusion with vacuum boundary conditions (-n * grad u
+// = u). The Bx function corresponds to a mass term
 
 // libMesh include files.
 #include "libmesh/libmesh.h"
@@ -77,7 +73,7 @@ main(int argc, char ** argv)
 #ifndef LIBMESH_HAVE_SLEPC
   libmesh_example_requires(false, "--enable-slepc with a slepc version >=3.13");
 #else
-#if SLEPC_VERSION_LESS_THAN(3,13,0)
+#if SLEPC_VERSION_LESS_THAN(3, 13, 0)
   libmesh_example_requires(false, "--enable-slepc with a slepc version >=3.13");
 #else
   // Tell the user what we are doing.
@@ -92,8 +88,7 @@ main(int argc, char ** argv)
   constexpr int nev = 1;
 
   // Possibly get the mesh size from -nx and -ny
-  const int nx = libMesh::command_line_next("-nx", 20),
-            ny = libMesh::command_line_next("-ny", 20);
+  const int nx = libMesh::command_line_next("-nx", 20), ny = libMesh::command_line_next("-ny", 20);
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
@@ -393,20 +388,20 @@ form_functionA(SNES /*snes*/, Vec x, Vec Ax, void * ctx)
 
     for (const auto s : elem->side_index_range())
       if (!elem->neighbor_ptr(s))
+      {
+        const auto & phi_face = fe_face->get_phi();
+        const auto & JxW_face = fe_face->get_JxW();
+        // vacuum boundary condition
+        fe_face->reinit(elem, s);
+        for (const auto qp : make_range(qrule_face.n_points()))
         {
-          const auto & phi_face = fe_face->get_phi();
-          const auto & JxW_face = fe_face->get_JxW();
-          // vacuum boundary condition
-          fe_face->reinit(elem, s);
-          for (const auto qp : make_range(qrule_face.n_points()))
-            {
-              Number u_qp = 0;
-              for (const auto i : make_range(n_dofs))
-                u_qp += phi_face[i][qp] * Ue[i];
-              for (const auto i : make_range(n_dofs))
-                Ke(i) += JxW_face[qp] * phi_face[i][qp] * u_qp;
-            }
+          Number u_qp = 0;
+          for (const auto i : make_range(n_dofs))
+            u_qp += phi_face[i][qp] * Ue[i];
+          for (const auto i : make_range(n_dofs))
+            Ke(i) += JxW_face[qp] * phi_face[i][qp] * u_qp;
         }
+      }
 
     // On an unrefined mesh, constrain_element_vector does
     // nothing.  If the assembly function is
@@ -678,18 +673,18 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
 
     for (const auto s : elem->side_index_range())
       if (!elem->neighbor_ptr(s))
+      {
+        const auto & phi_face = fe_face->get_phi();
+        const auto & JxW_face = fe_face->get_JxW();
+        // vacuum boundary condition
+        fe_face->reinit(elem, s);
+        for (const auto qp : make_range(qrule_face.n_points()))
         {
-          const auto & phi_face = fe_face->get_phi();
-          const auto & JxW_face = fe_face->get_JxW();
-          // vacuum boundary condition
-          fe_face->reinit(elem, s);
-          for (const auto qp : make_range(qrule_face.n_points()))
-            {
-              for (const auto i : make_range(n_dofs))
-                for (const auto j : make_range(n_dofs))
-                  Ke(i, j) += JxW_face[qp] * phi_face[i][qp] * phi_face[j][qp];
-            }
+          for (const auto i : make_range(n_dofs))
+            for (const auto j : make_range(n_dofs))
+              Ke(i, j) += JxW_face[qp] * phi_face[i][qp] * phi_face[j][qp];
         }
+      }
 
     // On an unrefined mesh, constrain_element_vector does
     // nothing.  If the assembly function is
