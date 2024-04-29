@@ -91,7 +91,7 @@ public:
   virtual ElemType type () const override { return TET14; }
 
   /**
-   * \returns 10.
+   * \returns 14.
    */
   virtual unsigned int n_nodes() const override { return num_nodes; }
 
