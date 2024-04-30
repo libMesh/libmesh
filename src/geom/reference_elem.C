@@ -29,7 +29,7 @@
 // C++ includes
 #include <map>
 #include <sstream>
-
+#include <memory> // std::unique_ptr
 
 
 //-----------------------------------------------
@@ -62,31 +62,38 @@ Elem * ref_elem_map[INVALID_ELEM];
 class SingletonCache : public libMesh::Singleton
 {
 public:
-  ~SingletonCache()
-  {
-    for (auto & elem : elem_list)
-      {
-        delete elem;
-        elem = nullptr;
-      }
+  virtual ~SingletonCache() = default;
 
-    elem_list.clear();
-
-    for (auto & node : node_list)
-      {
-        delete node;
-        node = nullptr;
-      }
-
-    node_list.clear();
-  }
-
-  std::vector<Node *> node_list;
-  std::vector<Elem *> elem_list;
+  std::vector<std::unique_ptr<Node>> node_list;
+  std::vector<std::unique_ptr<Elem>> elem_list;
 };
 
-// singleton object, dynamically created and then
-// removed at program exit
+// From [0], regarding the lifetime of the singleton_cache variable:
+//
+//     "All variables at namespace level, including the anonymous
+//     namespace and function local static variable have static
+//     storage duration unless they are declared thread_local."
+//
+// Variables with static storage duration are destroyed at the end of
+// the program execution. From [1],
+//
+//     "If it is a pointer to the data which is static ... then like all
+//     other dynamically allocated data, it will only be destructed when
+//     you delete it.  There are two frequent solutions:
+//     * use a smart pointer, which has a destructor which deletes it, or
+//     * don't delete it; in most cases, there's really no reason to call the
+//       destructor, and if you happen to use the instance in the destructors
+//       of other static objects, you'll run into an order of destruction
+//       problem."
+//
+// I tried making the singleton_cache a std::unique_ptr, but this resulted
+// in a segfault during program shutdown which appeared to come from the
+// single_cache unique_ptr's destructor. I didn't investigate whether the
+// issue was caused by a double deletion or what, but it appears that the
+// first suggestion above may not be valid in general.
+//
+// [0]: https://stackoverflow.com/questions/24342393/how-anonymous-namespaces-avoids-making-global-static-variable
+// [1]: https://stackoverflow.com/questions/6850009/c-deleting-static-data
 SingletonCache * singleton_cache = nullptr;
 
 
@@ -115,8 +122,8 @@ void read_ref_elem (const ElemType type_in,
   libmesh_assert_equal_to (elem_type_read, static_cast<unsigned int>(type_in));
   libmesh_assert_equal_to (n_nodes, Elem::type_to_n_nodes_map[elem_type_read]);
 
-  // Construct elem of appropriate type
-  std::unique_ptr<Elem> uelem = Elem::build(type_in);
+  // Construct elem of appropriate type, store in the elem_list
+  auto & uelem = singleton_cache->elem_list.emplace_back(Elem::build(type_in));
 
   // We are expecting an identity map, so assert it!
   for (unsigned int n=0; n<n_nodes; n++)
@@ -129,21 +136,18 @@ void read_ref_elem (const ElemType type_in,
     {
       in >> x >> y >> z;
 
-      Node * node = new Node(x,y,z,n);
-      singleton_cache->node_list.push_back(node);
+      auto & new_node =
+        singleton_cache->node_list.emplace_back(Node::build(x,y,z,n));
 
-      uelem->set_node(n) = node;
+      uelem->set_node(n) = new_node.get();
     }
 
   // it is entirely possible we ran out of file or encountered
   // another error.  If so, throw an error.
   libmesh_error_msg_if(!in, "ERROR while creating element singleton!");
 
-  // Release the pointer into the care of the singleton_cache
-  singleton_cache->elem_list.push_back (uelem.release());
-
-  // Also store it in the array.
-  ref_elem_map[type_in] = singleton_cache->elem_list.back();
+  // Also store a pointer to the newly created Elem in the ref_elem_map array.
+  ref_elem_map[type_in] = uelem.get();
 }
 
 
@@ -164,7 +168,10 @@ void init_ref_elem_table()
     return;
 
   // OK, if we get here we have the lock and we are not
-  // initialized.  populate singleton.
+  // initialized.  populate singleton. Note that we do not
+  // use a smart pointer to manage the singleton_cache variable
+  // since variables with static storage duration are destroyed
+  // automatically at the end of program execution.
   singleton_cache = new SingletonCache;
 
   // initialize the reference file table

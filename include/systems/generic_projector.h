@@ -82,17 +82,40 @@ template <typename FFunctor, typename GFunctor,
           typename FValue, typename ProjectionAction>
 class GenericProjector
 {
+public:
+  /**
+   * Convenience typedef for the Node-to-attached-Elem mapping that
+   * may be passed in to the constructor.
+   */
+  typedef std::unordered_map<dof_id_type, std::vector<dof_id_type>> NodesToElemMap;
+
 private:
   const System & system;
 
   // For TBB compatibility and thread safety we'll copy these in
   // operator()
   FFunctor & master_f;
-  GFunctor * master_g;  // Needed for C1 type elements only
-  bool g_was_copied, map_was_created;
+
+  /**
+   * Needed for C1 type elements only. master_g is either a shallow
+   * copy of a GFunctor pointer passed to the constructor, or to
+   * master_g_deepcopy.get(), depending on which constructor was
+   * called.
+   */
+  std::unique_ptr<GFunctor> master_g_deepcopy;
+  GFunctor * master_g;
+
   ProjectionAction & master_action;
   const std::vector<unsigned int> & variables;
-  std::unordered_map<dof_id_type, std::vector<dof_id_type>> * nodes_to_elem;
+
+  /**
+   * nodes_to_elem is either a shallow copy of a map passed in to
+   * the constructor, or points to nodes_to_elem_ourcopy, if no
+   * such map was provided.
+   */
+  NodesToElemMap nodes_to_elem_ourcopy;
+  NodesToElemMap * nodes_to_elem;
+
   bool done_saving_ids;
 
 public:
@@ -101,42 +124,32 @@ public:
                     GFunctor * g_in,
                     ProjectionAction & act_in,
                     const std::vector<unsigned int> & variables_in,
-                    std::unordered_map<dof_id_type, std::vector<dof_id_type>> *
-                      nodes_to_elem_in = nullptr) :
+                    NodesToElemMap * nodes_to_elem_in = nullptr) :
     system(system_in),
     master_f(f_in),
     master_g(g_in),
-    g_was_copied(false),
-    map_was_created(!nodes_to_elem_in),
     master_action(act_in),
     variables(variables_in),
     nodes_to_elem(nodes_to_elem_in)
   {
-    if (map_was_created) // past tense misnomer here
+    if (!nodes_to_elem_in)
       {
-        nodes_to_elem = new
-          std::unordered_map<dof_id_type, std::vector<dof_id_type>>;
-        MeshTools::build_nodes_to_elem_map (system.get_mesh(), *nodes_to_elem);
+        MeshTools::build_nodes_to_elem_map (system.get_mesh(), nodes_to_elem_ourcopy);
+        nodes_to_elem = &nodes_to_elem_ourcopy;
       }
   }
 
   GenericProjector (const GenericProjector & in) :
     system(in.system),
     master_f(in.master_f),
-    master_g(in.master_g ? new GFunctor(*in.master_g) : nullptr),
-    g_was_copied(in.master_g),
+    master_g_deepcopy(in.master_g ? std::make_unique<GFunctor>(*in.master_g) : nullptr),
+    master_g(in.master_g ? master_g_deepcopy.get() : nullptr),
     master_action(in.master_action),
     variables(in.variables),
     nodes_to_elem(in.nodes_to_elem)
   {}
 
-  ~GenericProjector()
-  {
-    if (g_was_copied)
-      delete master_g;
-    if (map_was_created)
-      delete nodes_to_elem;
-  }
+  ~GenericProjector() = default;
 
   // The single "project" function handles all the threaded projection
   // calculations and intervening MPI communications

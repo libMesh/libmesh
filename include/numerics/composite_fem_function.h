@@ -149,10 +149,10 @@ public:
 
   virtual std::unique_ptr<FEMFunctionBase<Output>> clone() const override
   {
-    CompositeFEMFunction * returnval = new CompositeFEMFunction();
+    auto returnval = std::make_unique<CompositeFEMFunction>();
     for (auto i : index_range(subfunctions))
       returnval->attach_subfunction(*subfunctions[i], index_maps[i]);
-    return std::unique_ptr<FEMFunctionBase<Output>> (returnval);
+    return returnval;
   }
 
   unsigned int n_subfunctions () const

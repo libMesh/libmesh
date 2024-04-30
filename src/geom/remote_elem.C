@@ -49,10 +49,12 @@ class RemoteElemSetup : public Singleton::Setup
 namespace libMesh
 {
 
-// Pointer to singleton Remote Element (to be created in
-// libMesh::init()
-const RemoteElem * remote_elem;
-
+// Pointer to singleton RemoteElem. As an extern variable with static
+// storage duration, its initial value is nullptr, however we also
+// explicitly initialize it to nullptr to avoid any possible
+// confusion.  The actual remote_elem is constructed when
+// Singleton::setup() is called in the libMeshInit constructor.
+const RemoteElem * remote_elem = nullptr;
 
 RemoteElem::~RemoteElem()
 {
@@ -68,6 +70,10 @@ RemoteElem::~RemoteElem()
 
 const Elem & RemoteElem::create ()
 {
+  // The RemoteElem constructor is private, and RemoteElem::create()
+  // is a static member function, so this makes it difficult to use
+  // std::make_unique<RemoteElem> here. Therefore we just resort to
+  // using the traditional "new" in this instance.
   if (remote_elem == nullptr)
     remote_elem = new RemoteElem;
 
