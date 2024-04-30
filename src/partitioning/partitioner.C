@@ -1327,6 +1327,58 @@ void Partitioner::build_graph (const MeshBase & mesh)
           graph_row.push_back(constrained_global_index_by_pid);
         }
     }
+
+  // Parmetis can get confused, in hard-to-debug ways, if we fail to
+  // give it a symmetric adjacency matrix.  We should try to catch
+  // that earlier, but it's a global communication so we'll only do it
+  // in debug mode.
+#ifdef DEBUG
+  auto n_proc = mesh.n_processors();
+  std::vector<dof_id_type> first_local_index_on_proc(n_proc, 0);
+  for (auto pid : make_range(1u,n_proc))
+    first_local_index_on_proc[pid] = first_local_index_on_proc[pid-1] + _n_active_elem_on_proc[pid-1];
+
+  libmesh_assert_equal_to(first_local_index_on_proc[mesh.processor_id()],
+                          first_local_elem);
+
+  std::unordered_map<processor_id_type, std::vector<std::pair<dof_id_type, dof_id_type>>> entries_to_send;
+  for (auto il : index_range(_dual_graph))
+    {
+      const std::vector<dof_id_type> & graph_row = _dual_graph[il];
+
+      const auto i = il + first_local_elem;
+
+      for (auto j : graph_row)
+        {
+          // Stupid graph rows aren't sorted yet...
+          processor_id_type target_pid = 0;
+          while (target_pid+1 < n_proc &&
+                 j >= first_local_index_on_proc[target_pid+1])
+            ++target_pid;
+
+          entries_to_send[target_pid].emplace_back(i,j);
+        }
+    }
+
+  auto check_incoming_entries =
+    [this, first_local_elem]
+    (processor_id_type /* src_pid */,
+     const std::vector<std::pair<dof_id_type, dof_id_type>> & incoming_entries)
+    {
+      for (auto [i, j] : incoming_entries)
+        {
+          libmesh_assert_greater_equal(j, first_local_elem);
+          const std::size_t jl = j - first_local_elem;
+          libmesh_assert_less(jl, _dual_graph.size());
+          const std::vector<dof_id_type> & graph_row = _dual_graph[jl];
+          libmesh_assert(std::find(graph_row.begin(), graph_row.end(), i)
+                         != graph_row.end());
+        }
+    };
+
+  Parallel::push_parallel_vector_data
+    (mesh.comm(), entries_to_send, check_incoming_entries);
+#endif
 }
 
 void Partitioner::assign_partitioning (MeshBase & mesh, const std::vector<dof_id_type> & parts)
