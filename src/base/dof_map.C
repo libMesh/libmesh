@@ -1144,9 +1144,8 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
                 {
                   const dof_id_type index = node.dof_number(sys_num,var_num,i);
                   libmesh_assert (this->local_index(index));
-
-                  if (idx.empty() || index > idx.back())
-                    idx.push_back(index);
+                  libmesh_assert (idx.empty() || index > idx.back());
+                  idx.push_back(index);
                 }
             }
 
@@ -1155,8 +1154,8 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
           for (unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type index = elem->dof_number(sys_num,var_num,i);
-              if (idx.empty() || index > idx.back())
-                idx.push_back(index);
+              libmesh_assert (idx.empty() || index > idx.back());
+              idx.push_back(index);
             }
         } // done looping over elements
 
@@ -1177,8 +1176,8 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
           for (unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type index = node->dof_number(sys_num,var_num,i);
-              if (idx.empty() || index > idx.back())
-                idx.push_back(index);
+              libmesh_assert (idx.empty() || index > idx.back());
+              idx.push_back(index);
             }
         }
     }
@@ -1188,6 +1187,8 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
     {
       std::vector<dof_id_type> di_scalar;
       this->SCALAR_dof_indices(di_scalar,var_num);
+      if (!idx.empty() && !di_scalar.empty())
+        libmesh_assert (idx.back() < di_scalar.front());
       idx.insert( idx.end(), di_scalar.begin(), di_scalar.end());
     }
 }
