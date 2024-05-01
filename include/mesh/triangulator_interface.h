@@ -26,6 +26,8 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/point.h"
 
+#include "libmesh/function_base.h"
+
 // C++ includes
 #include <set>
 #include <vector>
@@ -35,8 +37,55 @@ namespace libMesh
 
 // Forward Declarations
 class UnstructuredMesh;
-template <typename Output> class FunctionBase;
+template <unsigned int KDDim>
+class InverseDistanceInterpolation;
 enum ElemType : int;
+
+// Helper function for auto area calculation
+class AutoAreaFunction : public FunctionBase<Real>
+{
+public:
+  AutoAreaFunction (const Parallel::Communicator &comm,
+                    const unsigned int num_nearest_pts,
+                    const unsigned int power,
+                    const Real background_value,
+                    const Real  background_eff_dist);
+
+  AutoAreaFunction (const AutoAreaFunction &);
+  AutoAreaFunction & operator= (const AutoAreaFunction &);
+
+  AutoAreaFunction (AutoAreaFunction &&) = delete;
+  AutoAreaFunction & operator= (AutoAreaFunction &&) = delete;
+  virtual ~AutoAreaFunction ();
+
+  void init_mfi (const std::vector<Point> & input_pts,
+                 const std::vector<Real> & input_vals);
+
+  virtual Real operator() (const Point & p,
+                           const Real /*time*/) override;
+
+  virtual void operator() (const Point & p,
+                           const Real time,
+                           DenseVector<Real> & output) override
+  {
+    output.resize(1);
+    output(0) = (*this)(p,time);
+    return;
+  }
+
+  virtual std::unique_ptr<FunctionBase<Real>> clone() const override
+  {
+    return std::make_unique<AutoAreaFunction>(_comm, _num_nearest_pts, _power, _background_value, _background_eff_dist);
+  }
+
+private:
+  const Parallel::Communicator & _comm;
+  const unsigned int _num_nearest_pts;
+  const unsigned int _power;
+  const Real _background_value;
+  const Real _background_eff_dist;
+  std::unique_ptr<InverseDistanceInterpolation<3>> _auto_area_mfi;
+};
 
 class TriangulatorInterface
 {
@@ -251,6 +300,49 @@ public:
   void attach_region_list(const std::vector<Region*> * regions) { _regions = regions; }
 
   /**
+  *  Generate an auto area function based on spacing of boundary points.
+  *  The external boundary as well as the hole boundaries are taken into consideration
+  *  to generate the auto area function based on inverse distance interpolation.
+  *  For each EDGE element on these boundaries, its centroid (midpoint) is used as the point
+  *  position and the desired area is calculated as 1.5 times of the area of the equilateral
+  *  triangle with the edge length as the length of the EDGE element.
+  *  For a given position, the inverse distance interpolation only considers a number of nearest
+  *  points (set by num_nearest_pts) to calculate the desired area. The weight of the value at
+  *  each point is calculated as 1/distance^power.
+  *
+  *  In addition to these conventional inverse distance interpolation features, a concept of
+  *  "background value" and "background effective distance" is introduced. The background value
+  *  belongs to a virtual point located at a constant distance (background effective distance)
+  *  from the given position. The weight of the value at this virtual point is calculated as
+  *  1/background_effective_distance^power. Effectively, the background value is the value when
+  *  the given position is far away from the boundary points.
+  */
+  void set_auto_area_function(const Parallel::Communicator &comm,
+                              const unsigned int num_nearest_pts,
+                              const unsigned int power,
+                              const Real background_value,
+                              const Real  background_eff_dist);
+
+  /**
+   * Whether or not an auto area function has been set
+  */
+  bool has_auto_area_function() {return _auto_area_function != nullptr;}
+
+  /**
+   * Get the auto area function
+   */
+  FunctionBase<Real> * get_auto_area_function ();
+
+  /**
+   * The external boundary and all hole boundaries are collected. The centroid of each EDGE element is
+   * used as the point position and the desired area is calculated as the area of the equilateral triangle
+   * with the edge length as the length of the EDGE element times an area_factor (default is 1.5).
+  */
+  void calculate_auto_desired_area_samples(std::vector<Point> & function_points,
+                                           std::vector<Real> & function_sizes,
+                                           const Real & area_factor = 1.5);
+
+  /**
    * A set of ids to allow on the outer boundary loop: interpreted as
    * boundary ids of 2D elements and/or subdomain ids of 1D edges.  If
    * this is empty, then the outer boundary may be constructed from
@@ -377,6 +469,11 @@ protected:
    * Flag which tells if we want to check hole geometry
    */
   bool _verify_hole_boundaries;
+
+  /**
+  * The auto area function based on the spacing of boundary points
+  */
+  std::unique_ptr<AutoAreaFunction> _auto_area_function;
 };
 
 } // namespace libMesh

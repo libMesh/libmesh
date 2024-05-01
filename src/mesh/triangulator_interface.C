@@ -33,12 +33,72 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/utility.h"
 
+#include "libmesh/meshfree_interpolation.h"
+
 // C/C++ includes
 #include <sstream>
 
 
 namespace libMesh
 {
+//
+// Function definitions for the AutoAreaFunction class
+//
+
+// Constructor
+AutoAreaFunction::AutoAreaFunction (const Parallel::Communicator &comm,
+                                    const unsigned int num_nearest_pts,
+                                    const unsigned int power,
+                                    const Real background_value,
+                                    const Real  background_eff_dist):
+  _comm(comm),
+  _num_nearest_pts(num_nearest_pts),
+  _power(power),
+  _background_value(background_value),
+  _background_eff_dist(background_eff_dist),
+  _auto_area_mfi(std::make_unique<InverseDistanceInterpolation<3>>(_comm, _num_nearest_pts, _power, _background_value, _background_eff_dist))
+{
+  this->_initialized = false;
+  this->_is_time_dependent = false;
+}
+
+// Destructor
+AutoAreaFunction::~AutoAreaFunction () = default;
+
+void AutoAreaFunction::init_mfi (const std::vector<Point> & input_pts,
+                                 const std::vector<Real> & input_vals)
+{
+  std::vector<std::string> field_vars{"f"};
+  _auto_area_mfi->set_field_variables(field_vars);
+  _auto_area_mfi->get_source_points() = input_pts;
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  std::vector<Number> input_complex_vals;
+  for (const auto & input_val : input_vals)
+    input_complex_vals.push_back(Complex (input_val, 0.0));
+  _auto_area_mfi->get_source_vals() = input_complex_vals;
+#else
+  _auto_area_mfi->get_source_vals() = input_vals;
+#endif
+  _auto_area_mfi->prepare_for_use();
+  this->_initialized = true;
+}
+
+Real AutoAreaFunction::operator() (const Point & p,
+                                   const Real /*time*/)
+{
+  libmesh_assert(this->_initialized);
+
+  std::vector<Point> target_pts;
+  std::vector<Number> target_vals;
+
+  target_pts.push_back(p);
+  target_vals.resize(1);
+
+  _auto_area_mfi->interpolate_field_data(_auto_area_mfi->field_variables(), target_pts, target_vals);
+
+  return libmesh_real(target_vals.front());
+}
+
 //
 // Function definitions for the TriangulatorInterface class
 //
@@ -55,7 +115,8 @@ TriangulatorInterface::TriangulatorInterface(UnstructuredMesh & mesh)
     _triangulation_type(GENERATE_CONVEX_HULL),
     _insert_extra_points(false),
     _smooth_after_generating(true),
-    _quiet(true)
+    _quiet(true),
+    _auto_area_function(nullptr)
 {}
 
 
@@ -414,5 +475,60 @@ unsigned int TriangulatorInterface::total_hole_points()
   return n_hole_points;
 }
 
+void TriangulatorInterface::set_auto_area_function(const Parallel::Communicator &comm,
+                                                   const unsigned int num_nearest_pts,
+                                                   const unsigned int power,
+                                                   const Real background_value,
+                                                   const Real  background_eff_dist)
+{
+   _auto_area_function = std::make_unique<AutoAreaFunction>(comm, num_nearest_pts, power, background_value, background_eff_dist);
+}
+
+FunctionBase<Real> * TriangulatorInterface::get_auto_area_function()
+{
+  if (!_auto_area_function->initialized())
+  {
+    // Points and target element sizes for the interpolation
+    std::vector<Point> function_points;
+    std::vector<Real> function_sizes;
+    calculate_auto_desired_area_samples(function_points, function_sizes);
+    _auto_area_function->init_mfi(function_points, function_sizes);
+  }
+  return _auto_area_function.get();
+}
+
+void TriangulatorInterface::calculate_auto_desired_area_samples(std::vector<Point> & function_points,
+                                                                std::vector<Real> & function_sizes,
+                                                                const Real & area_factor)
+{
+  // Get the hole mesh of the outer boundary
+  // Holes should already be attached if applicable when this function is called
+  const TriangulatorInterface::MeshedHole bdry_mh { _mesh, this->_bdy_ids };
+  // Collect all the centroid points of the outer boundary segments
+  // and the corresponding element sizes
+  for (unsigned int i = 0; i < bdry_mh.n_points(); i++)
+  {
+    function_points.push_back((bdry_mh.point(i) + bdry_mh.point((i + 1) % bdry_mh.n_points())) /
+                              2.0);
+    function_sizes.push_back(
+        (bdry_mh.point(i) - bdry_mh.point((i + 1) % bdry_mh.n_points())).norm());
+  }
+  // If holes are present, do the same for the hole boundaries
+  if(_holes)
+    for (const Hole * hole : *_holes)
+    {
+      for (unsigned int i = 0; i < hole->n_points(); i++)
+      {
+        function_points.push_back(
+            (hole->point(i) + hole->point((i + 1) % hole->n_points())) / 2.0);
+        function_sizes.push_back(
+            (hole->point(i) - hole->point((i + 1) % hole->n_points())).norm());
+      }
+    }
+
+  std::for_each(
+      function_sizes.begin(), function_sizes.end(), [&area_factor](Real & a) { a = a * a * area_factor * std::sqrt(3.0) / 4.0; });
+
+}
 } // namespace libMesh
 
