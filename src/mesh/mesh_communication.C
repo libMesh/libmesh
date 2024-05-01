@@ -405,6 +405,17 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   std::map<processor_id_type, std::vector<const Node *>> all_nodes_to_send;
   std::map<processor_id_type, std::vector<const Elem *>> all_elems_to_send;
 
+  // We may need to send constraint rows too.
+  auto & constraint_rows = mesh.get_constraint_rows();
+  bool have_constraint_rows = !constraint_rows.empty();
+  mesh.comm().broadcast(have_constraint_rows);
+
+  typedef std::vector<std::pair<std::pair<dof_id_type, unsigned int>, Real>>
+    serialized_row_type;
+  std::unordered_map<processor_id_type,
+                     std::vector<std::pair<dof_id_type, serialized_row_type>>>
+    all_constraint_rows_to_send;
+
   // If we don't have any just-coarsened elements to send to a
   // pid, then there won't be any nodes or any elements pulled
   // in by ghosting either, and we're done with this pid.
@@ -465,6 +476,21 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
       all_elems_to_send[pid].assign(elements_to_send.begin(),
                                     elements_to_send.end());
+
+      for (auto & [node, row] : constraint_rows)
+        {
+          if (!connected_nodes.count(node))
+            continue;
+
+          serialized_row_type serialized_row;
+          for (auto [elem_and_node, coef] : row)
+            serialized_row.emplace_back(std::make_pair(elem_and_node.first->id(),
+                                                       elem_and_node.second),
+                                        coef);
+
+          all_constraint_rows_to_send[pid].emplace_back
+            (node->id(), std::move(serialized_row));
+        }
     }
 
   // Elem/Node unpack() automatically adds them to the given mesh
@@ -480,12 +506,29 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
   // At this point we have all the nodes and elems we need, so we can
   // communicate any constraint rows that our targets will need.
-  auto & constraint_rows = mesh.get_constraint_rows();
-  bool have_constraint_rows = !constraint_rows.empty();
-  mesh.comm().broadcast(have_constraint_rows);
   if (have_constraint_rows)
     {
-      libmesh_not_implemented();
+      auto constraint_row_action =
+        [&mesh, &constraint_rows]
+        (processor_id_type /* src_pid */,
+         const std::vector<std::pair<dof_id_type, serialized_row_type>> rows)
+        {
+          for (auto & [node_id, serialized_row] : rows)
+            {
+              MeshBase::constraint_rows_mapped_type row;
+              for (auto [elem_and_node, coef] : serialized_row)
+                row.emplace_back(std::make_pair(mesh.elem_ptr(elem_and_node.first),
+                                                elem_and_node.second),
+                                 coef);
+
+              constraint_rows[mesh.node_ptr(node_id)] = row;
+            }
+        };
+
+      TIMPI::push_parallel_vector_data(mesh.comm(),
+                                       all_constraint_rows_to_send,
+                                       constraint_row_action);
+
     }
 
   // Check on the redistribution consistency
