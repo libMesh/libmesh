@@ -260,6 +260,11 @@ public:
   void set_constrained_sparsity_construction(bool use_constraints);
 
   /**
+   * Sets need_full_sparsity_pattern to true regardless of the requirements by matrices
+   */
+  void full_sparsity_pattern_needed();
+
+  /**
    * Returns true iff the current policy when constructing sparsity
    * patterns is to explicitly account for sparsity entries created by
    * constraint matrix pre- and post- application.
@@ -2306,7 +2311,11 @@ void DofMap::set_constrained_sparsity_construction(bool use_constraints)
   libmesh_ignore(use_constraints);
 }
 
-
+inline
+void DofMap::full_sparsity_pattern_needed()
+{
+  need_full_sparsity_pattern = true;
+}
 
 inline
 bool DofMap::constrained_sparsity_construction()
