@@ -1767,6 +1767,9 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
       {
       case HEX8:
       case HEX27:
+      case TET4:
+      case TET10:
+      case TET14:
         mesh.set_mesh_dimension(3);
         break;
       case TRI3:
@@ -1789,7 +1792,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
         // Just keep the existing dimension
         break;
       default:
-        libmesh_error_msg("build_sphere(): Please specify a mesh dimension or a valid ElemType (EDGE{2,3,4}, TRI{3,6,7}, QUAD{4,8,9}, HEX{8,27})");
+        libmesh_error_msg("build_sphere(): Please specify a mesh dimension or a valid ElemType (EDGE{2,3,4}, TRI{3,6,7}, QUAD{4,8,9}, HEX{8,27}, TET{4,10,14})");
       }
     }
 
@@ -1975,11 +1978,10 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
     case 3:
       {
         // (Currently) supported types
-        if (!((type == HEX8) || (type == HEX27)))
+        if (!((type == HEX8) || (type == HEX27) || (type == TET4) ||
+              (type == TET10) || (type == TET14)))
           {
-            // FIXME: We'd need an all_tet() routine (which could also be used by
-            // build_square()) to do Tets, or Prisms for that matter.
-            libmesh_error_msg("Error: Only HEX8/27 currently supported.");
+            libmesh_error_msg("Error: Only HEX8/27 and TET4/10/14 are currently supported in 3D.");
           }
 
 
@@ -2202,29 +2204,31 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // refinement trees) so
   MeshTools::Modification::flatten(mesh);
 
-  // In 2D, convert all the quads to triangles if requested
-  if (mesh.mesh_dimension()==2)
+  // Convert all the tensor product elements to simplices if requested
+  if ((type == TRI7) || (type == TRI6) || (type == TRI3) || 
+      (type == TET4) || (type == TET10) || (type == TET14))
     {
-      if ((type == TRI7) || (type == TRI6) || (type == TRI3))
-        {
-          // A DistributedMesh needs a little prep before all_tri()
-          if (is_replicated)
-            mesh.prepare_for_use();
+      // A DistributedMesh needs a little prep before all_tri()
+      if (is_replicated)
+        mesh.prepare_for_use();
 
-          MeshTools::Modification::all_tri(mesh);
-        }
+      MeshTools::Modification::all_tri(mesh);
     }
-
 
   // Convert to second-order elements if the user requested it.
   if (Elem::build(type)->default_order() != FIRST)
     {
-      // type is already a second-order, determine if it is the
-      // "full-ordered" second-order element, or the "serendipity"
-      // second order element.  Note also that all_second_order
-      // can't be called once the mesh has been refined.
-      bool full_ordered = !((type==QUAD8) || (type==HEX20));
-      mesh.all_second_order(full_ordered);
+      if (type == TET14)
+        mesh.all_complete_order();
+      else
+        {
+          // type is second-order, determine if it is the
+          // "full-ordered" second-order element, or the "serendipity"
+          // second order element.  Note also that all_second_order
+          // can't be called once the mesh has been refined.
+          bool full_ordered = !((type==QUAD8) || (type==HEX20));
+          mesh.all_second_order(full_ordered);
+        }
 
       // And pop to the boundary again...
       for (const auto & elem : mesh.active_element_ptr_range())
