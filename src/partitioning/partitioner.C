@@ -1360,24 +1360,53 @@ void Partitioner::build_graph (const MeshBase & mesh)
         }
     }
 
+  std::vector<std::pair<dof_id_type, dof_id_type>> bad_entries;
+
   auto check_incoming_entries =
-    [this, first_local_elem]
+    [this, first_local_elem, &bad_entries]
     (processor_id_type /* src_pid */,
      const std::vector<std::pair<dof_id_type, dof_id_type>> & incoming_entries)
     {
       for (auto [i, j] : incoming_entries)
         {
-          libmesh_assert_greater_equal(j, first_local_elem);
+          if (j < first_local_elem)
+            {
+              bad_entries.emplace_back(i,j);
+              continue;
+            }
           const std::size_t jl = j - first_local_elem;
-          libmesh_assert_less(jl, _dual_graph.size());
+          if (jl >= _dual_graph.size())
+            {
+              bad_entries.emplace_back(i,j);
+              continue;
+            }
           const std::vector<dof_id_type> & graph_row = _dual_graph[jl];
-          libmesh_assert(std::find(graph_row.begin(), graph_row.end(), i)
-                         != graph_row.end());
+          if (std::find(graph_row.begin(), graph_row.end(), i) ==
+              graph_row.end())
+            {
+              bad_entries.emplace_back(i,j);
+              continue;
+            }
         }
     };
 
+  // Keep any failures in sync in parallel, for easier debugging in
+  // unit tests where the failure exception will be caught.
   Parallel::push_parallel_vector_data
     (mesh.comm(), entries_to_send, check_incoming_entries);
+  bool bad_entries_exist = !bad_entries.empty();
+  mesh.comm().max(bad_entries_exist);
+  if (bad_entries_exist)
+    {
+      if (!bad_entries.empty())
+        {
+          std::cerr << "Bad entries on processor " << mesh.processor_id() << ": ";
+          for (auto [i, j] : bad_entries)
+            std::cerr << '(' << i << ", " << j << "), ";
+          std::cerr << std::endl;
+        }
+      libmesh_error_msg("Asymmetric partitioner graph detected");
+    }
 #endif
 }
 
