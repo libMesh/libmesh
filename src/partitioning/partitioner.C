@@ -1360,31 +1360,31 @@ void Partitioner::build_graph (const MeshBase & mesh)
         }
     }
 
-  std::vector<std::pair<dof_id_type, dof_id_type>> bad_entries;
+  std::vector<std::tuple<processor_id_type, dof_id_type, dof_id_type>> bad_entries;
 
   auto check_incoming_entries =
     [this, first_local_elem, &bad_entries]
-    (processor_id_type /* src_pid */,
+    (processor_id_type src_pid,
      const std::vector<std::pair<dof_id_type, dof_id_type>> & incoming_entries)
     {
       for (auto [i, j] : incoming_entries)
         {
           if (j < first_local_elem)
             {
-              bad_entries.emplace_back(i,j);
+              bad_entries.emplace_back(src_pid,i,j);
               continue;
             }
           const std::size_t jl = j - first_local_elem;
           if (jl >= _dual_graph.size())
             {
-              bad_entries.emplace_back(i,j);
+              bad_entries.emplace_back(src_pid,i,j);
               continue;
             }
           const std::vector<dof_id_type> & graph_row = _dual_graph[jl];
           if (std::find(graph_row.begin(), graph_row.end(), i) ==
               graph_row.end())
             {
-              bad_entries.emplace_back(i,j);
+              bad_entries.emplace_back(src_pid,i,j);
               continue;
             }
         }
@@ -1398,13 +1398,15 @@ void Partitioner::build_graph (const MeshBase & mesh)
   mesh.comm().max(bad_entries_exist);
   if (bad_entries_exist)
     {
+#if 0  // Optional verbosity for if this breaks again...
       if (!bad_entries.empty())
         {
           std::cerr << "Bad entries on processor " << mesh.processor_id() << ": ";
-          for (auto [i, j] : bad_entries)
-            std::cerr << '(' << i << ", " << j << "), ";
+          for (auto [p, i, j] : bad_entries)
+            std::cerr << '(' << p << ", " << i << ", " << j << "), ";
           std::cerr << std::endl;
         }
+#endif
       libmesh_error_msg("Asymmetric partitioner graph detected");
     }
 #endif
