@@ -3022,13 +3022,17 @@ std::pair<Real,Real> RBEIMEvaluation::get_eim_error_indicator(
   }
 
   // We avoid NaNs by setting normalization to 1 in the case that it is exactly 0.
+  // But we return the "original normalization" as well (as opposed to the modified
+  // normalization) since that can be useful information since it can indicate that
+  // the EIM approximation was identically zero, for example.
+  Real orig_normalization = normalization;
   if (normalization == 0.)
     normalization = 1.;
 
   // Return the relative error indicator, and the normalization that we used. By returning
   // the normalization, we can subsequently recover the absolute error indicator if
   // desired.
-  return std::make_pair(std::abs(error_indicator_val) / normalization, normalization);
+  return std::make_pair(std::abs(error_indicator_val) / normalization, orig_normalization);
 }
 
 const VectorizedEvalInput & RBEIMEvaluation::get_vec_eval_input() const
