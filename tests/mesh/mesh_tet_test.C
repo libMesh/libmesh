@@ -5,6 +5,7 @@
 #include <libmesh/mesh_netgen_interface.h>
 #include <libmesh/mesh_tetgen_interface.h>
 #include <libmesh/mesh_tet_interface.h>
+#include <libmesh/mesh_tools.h>
 #include <libmesh/parallel_implementation.h> // max()
 
 #include "test_comm.h"
@@ -19,7 +20,7 @@ using namespace libMesh;
 
 namespace {
 
-void build_octahedron (MeshBase & mesh, bool flip_tris,
+Real build_octahedron (MeshBase & mesh, bool flip_tris,
                        Real xmin, Real xmax,
                        Real ymin, Real ymax,
                        Real zmin, Real zmax)
@@ -54,6 +55,9 @@ void build_octahedron (MeshBase & mesh, bool flip_tris,
   add_tri({5,2,1});
 
   mesh.prepare_for_use();
+
+  // Octahedron volume
+  return (xmax-xmin)*(ymax-ymin)*(zmax-zmin)/6;
 }
 
 }
@@ -74,6 +78,7 @@ public:
   CPPUNIT_TEST( testNetGenTets );
   CPPUNIT_TEST( testNetGenFlippedTris );
   CPPUNIT_TEST( testNetGenHole );
+  CPPUNIT_TEST( testNetGenSphereShell );
 
   // We'll get to more advanced features later
   /*
@@ -101,13 +106,6 @@ public:
   void setUp() {}
 
   void tearDown() {}
-
-  void commonSettings (MeshTetInterface & tetinterface)
-  {
-    // Don't try to insert points unless we're requested to later
-    tetinterface.desired_volume() = 0;
-    tetinterface.smooth_after_generating() = false;
-  }
 
   void testExceptionBase(MeshBase & mesh,
                          MeshTetInterface & tetinterface,
@@ -139,15 +137,23 @@ public:
 
   void testTetInterfaceBase(MeshBase & mesh,
                             MeshTetInterface & triangulator,
-                            dof_id_type expected_n_elem = 4,
-                            dof_id_type expected_n_nodes = 6)
+                            dof_id_type expected_n_elem = DofObject::invalid_id,
+                            dof_id_type expected_n_nodes = DofObject::invalid_id,
+                            Real expected_volume = 0)
   {
-    commonSettings(triangulator);
-
     triangulator.triangulate();
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), expected_n_elem);
-    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), expected_n_nodes);
+    if (expected_n_elem != DofObject::invalid_id)
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), expected_n_elem);
+
+    if (expected_n_nodes != DofObject::invalid_id)
+      CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), expected_n_nodes);
+
+    if (expected_volume != 0)
+      LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(mesh),
+                              expected_volume,
+                              TOLERANCE*TOLERANCE);
+
     for (const auto & elem : mesh.element_ptr_range())
       {
         CPPUNIT_ASSERT_EQUAL(elem->type(), TET4);
@@ -167,8 +173,8 @@ public:
     MeshTools::Generation::build_cube (mesh, 1, 1, 1,
                                        -2, 2, -2, 2, -2, 2);
 
-    build_octahedron(*holemesh, false,
-                     -1, 1, -1, 1, -1, 1);
+    const Real hole_volume =
+      build_octahedron(*holemesh, false, -1, 1, -1, 1, -1, 1);
 
     auto holes =
       std::make_unique<std::vector<std::unique_ptr<UnstructuredMesh>>>();
@@ -177,7 +183,36 @@ public:
 
     triangulator.attach_hole_list(std::move(holes));
 
-    this->testTetInterfaceBase(mesh, triangulator, 32, 14);
+    const Real expected_volume =
+      MeshTools::volume(mesh) - hole_volume;
+    this->testTetInterfaceBase(mesh, triangulator, 32, 14,
+                               expected_volume);
+  }
+
+
+  void testSphereShell(UnstructuredMesh & mesh,
+                       MeshTetInterface & triangulator)
+  {
+    std::unique_ptr<UnstructuredMesh> holemesh =
+      std::make_unique<Mesh>(*TestCommWorld);
+
+    MeshTools::Generation::build_sphere (*holemesh, 1, 2, TET4);
+
+    MeshTools::Generation::build_sphere (mesh, 1.25, 2, TET4);
+
+    auto holes =
+      std::make_unique<std::vector<std::unique_ptr<UnstructuredMesh>>>();
+
+    holes->push_back(std::move(holemesh));
+
+    triangulator.attach_hole_list(std::move(holes));
+
+    // Netgen can't seem to triangulate this without inserting points,
+    // so let MeshNetgenInterface know that we're allowed to insert
+    // points
+    triangulator.desired_volume() = 1000;
+
+    this->testTetInterfaceBase(mesh, triangulator);
   }
 
 
@@ -187,10 +222,11 @@ public:
   {
     // An asymmetric octahedron, so we hopefully have an unambiguous
     // choice of shortest diagonal for a Delaunay algorithm to pick.
-    build_octahedron(mesh, false,
-                     -1, 1, -1, 1, -0.1, 0.1);
+    const Real expected_volume =
+      build_octahedron(mesh, false, -1, 1, -1, 1, -0.1, 0.1);
 
-    this->testTetInterfaceBase(mesh, triangulator);
+    this->testTetInterfaceBase(mesh, triangulator, /* n_elem = */ 4,
+                               /* n_nodes = */ 6, expected_volume);
   }
 
 
@@ -223,7 +259,10 @@ public:
 
     mesh.prepare_for_use();
 
-    this->testTetInterfaceBase(mesh, triangulator);
+    const Real expected_volume = MeshTools::volume(mesh);
+
+    this->testTetInterfaceBase(mesh, triangulator, /* n_elem = */ 4,
+                               /* n_nodes = */ 6, expected_volume);
   }
 
 
@@ -303,6 +342,16 @@ public:
   }
 
 
+  void testNetGenSphereShell()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    NetGenMeshInterface net_tet(mesh);
+    testSphereShell(mesh, net_tet);
+  }
+
+
   /*
   void testNetGenInterp()
   {
@@ -333,8 +382,6 @@ public:
      FunctionBase<Real> * area_func = nullptr)
   {
     NetGenMeshInterface triangulator(mesh);
-
-    commonSettings(triangulator);
 
     if (holes)
       triangulator.attach_hole_list(holes);
