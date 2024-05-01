@@ -26,6 +26,7 @@
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
+#include "libmesh/mesh_modification.h"
 #include "libmesh/unstructured_mesh.h"
 
 namespace {
@@ -135,6 +136,9 @@ void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 
   // Fix up neighbor pointers, element counts, etc.
   mesh.prepare_for_use();
+
+  // We're making tets; we need to start with tris
+  MeshTools::Modification::all_tri(mesh);
 
   // Partition surface into connected components
   std::vector<std::unordered_set<Elem *>> components;
