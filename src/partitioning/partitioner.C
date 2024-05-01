@@ -1180,6 +1180,11 @@ void Partitioner::build_graph (const MeshBase & mesh)
   _dual_graph.resize(n_active_local_elem);
   _local_id_to_elem.resize(n_active_local_elem);
 
+  // We may need to communicate constraint-row-based connections
+  // between processors
+  std::unordered_map<processor_id_type,
+    std::vector<std::pair<dof_id_type, dof_id_type>>> connections_to_push;
+
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
       libmesh_assert (_global_index_by_pid_map.count(elem->id()));
@@ -1314,6 +1319,13 @@ void Partitioner::build_graph (const MeshBase & mesh)
                 _global_index_by_pid_map[constraining_elem->id()];
 
               graph_row.push_back(constraining_global_index_by_pid);
+
+              // We can't be sure if the constraining element's owner sees
+              // the assembly element, so to get a symmetric connectivity
+              // graph we'll need to tell them about us to be safe.
+              if (constraining_elem->processor_id() != mesh.processor_id())
+                connections_to_push[constraining_elem->processor_id()].emplace_back
+                  (global_index_by_pid, constraining_global_index_by_pid);
             }
         }
 
@@ -1325,13 +1337,48 @@ void Partitioner::build_graph (const MeshBase & mesh)
             _global_index_by_pid_map[constrained->id()];
 
           graph_row.push_back(constrained_global_index_by_pid);
+
+          // We can't be sure if the constrained element's owner sees
+          // the assembly element, so to get a symmetric connectivity
+          // graph we'll need to tell them about us to be safe.
+          if (constrained->processor_id() != mesh.processor_id())
+            connections_to_push[constrained->processor_id()].emplace_back
+              (global_index_by_pid, constrained_global_index_by_pid);
         }
     }
 
-  // Parmetis can get confused, in hard-to-debug ways, if we fail to
-  // give it a symmetric adjacency matrix.  We should try to catch
-  // that earlier, but it's a global communication so we'll only do it
-  // in debug mode.
+  // Partitioners like Parmetis require a symmetric adjacency matrix,
+  // but if we have an assembly element constrained by a spline
+  // NodeElem owned by another processor, it's possible that that
+  // processor doesn't see our assembly element.  Let's push those
+  // entries, to ensure they're counted on both sides.
+  auto symmetrize_entries =
+    [this, first_local_elem]
+    (processor_id_type /*src_pid*/,
+     const std::vector<std::pair<dof_id_type, dof_id_type>> & incoming_entries)
+    {
+      for (auto [i, j] : incoming_entries)
+        {
+          libmesh_assert_greater_equal(j, first_local_elem);
+          const std::size_t jl = j - first_local_elem;
+          libmesh_assert_less(jl, _dual_graph.size());
+          std::vector<dof_id_type> & graph_row = _dual_graph[jl];
+          if (std::find(graph_row.begin(), graph_row.end(), i) == graph_row.end())
+          {
+//            std::cerr << "Pushing back (" << j << ", " << i << ") from " << src_pid << std::endl;
+            graph_row.push_back(i);
+          }
+        }
+    };
+
+  Parallel::push_parallel_vector_data(mesh.comm(),
+                                      connections_to_push,
+                                      symmetrize_entries);
+
+  // *Now* we should have a symmetric adjacency matrix.  Let's check
+  // that, so any failures get caught before they e.g. confuse
+  // Parmetis in hard-to-debug ways.  That's a global communication so
+  // we'll only do it in debug mode.
 #ifdef DEBUG
   auto n_proc = mesh.n_processors();
   std::vector<dof_id_type> first_local_index_on_proc(n_proc, 0);
