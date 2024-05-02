@@ -963,7 +963,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                               {
                                 neighbor->set_neighbor(ns,element);
                               }
-                            side_to_elem_map.erase (bounds.first);
 
                             // get out of this nested crap
                             goto next_side;
