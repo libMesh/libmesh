@@ -154,6 +154,10 @@ public:
                                        0., 1.,
                                        EDGE2);
 
+    // We should be prepared at this point
+    CPPUNIT_ASSERT(mesh.is_prepared());
+    CPPUNIT_ASSERT(MeshTools::valid_is_prepared(mesh));
+
     auto matrix = SparseMatrix<Number>::build (mesh.comm());
 
     // Create a projection matrix from 10 elements to 5.  We might as
@@ -179,7 +183,7 @@ public:
 
     mesh.copy_constraint_rows(*matrix);
 
-    // We should be prepared at this point
+    // We should still be prepared at this point
     CPPUNIT_ASSERT(mesh.is_prepared());
     CPPUNIT_ASSERT(MeshTools::valid_is_prepared(mesh));
 
@@ -324,6 +328,10 @@ public:
                                        0., 1.,
                                        EDGE2);
 
+    // We should be prepared at this point
+    CPPUNIT_ASSERT(mesh.is_prepared());
+    CPPUNIT_ASSERT(MeshTools::valid_is_prepared(mesh));
+
     auto matrix = SparseMatrix<Number>::build (mesh.comm());
 
     // Create a projection matrix from 10 elements to 4.  We'll only
@@ -333,7 +341,7 @@ public:
 
     mesh.copy_constraint_rows(*matrix);
 
-    // We should be prepared at this point
+    // We should still be prepared at this point
     CPPUNIT_ASSERT(mesh.is_prepared());
     CPPUNIT_ASSERT(MeshTools::valid_is_prepared(mesh));
 
