@@ -1764,6 +1764,11 @@ void DistributedMesh::delete_remote_elements()
   // elements; let's update our caches.
   this->update_parallel_id_counts();
 
+  // We may have deleted nodes or elements that were the only local
+  // representatives of some particular boundary id(s); let's update
+  // those caches.
+  this->get_boundary_info().regenerate_id_sets();
+
 #ifdef DEBUG
   // We might not have well-packed objects if the user didn't allow us
   // to renumber
