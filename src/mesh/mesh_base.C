@@ -221,38 +221,62 @@ bool MeshBase::operator== (const MeshBase & other_mesh) const
 
 bool MeshBase::locally_equals (const MeshBase & other_mesh) const
 {
-  // Check whether everything in the base is equal
-  if (_n_parts != other_mesh._n_parts ||
-      _default_mapping_type != other_mesh._default_mapping_type ||
-      _default_mapping_data != other_mesh._default_mapping_data ||
-      _is_prepared != other_mesh._is_prepared ||
-      _count_lower_dim_elems_in_point_locator !=
-        other_mesh._count_lower_dim_elems_in_point_locator ||
-      // We expect this to change in a DistributeMesh prepare_for_use();
-      // it's conceptually "mutable"...
-/*
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-      _next_unique_id != other_mesh._next_unique_id ||
-#endif
-*/
-      _skip_noncritical_partitioning != other_mesh._skip_noncritical_partitioning ||
-      _skip_all_partitioning != other_mesh._skip_all_partitioning ||
-      _skip_renumber_nodes_and_elements != other_mesh._skip_renumber_nodes_and_elements ||
-      _skip_find_neighbors != other_mesh._skip_find_neighbors ||
-      _allow_remote_element_removal != other_mesh._allow_remote_element_removal ||
-      _spatial_dimension != other_mesh._spatial_dimension ||
-      _point_locator_close_to_point_tol != other_mesh._point_locator_close_to_point_tol ||
-      _block_id_to_name != other_mesh._block_id_to_name ||
-      _elem_dims != other_mesh._elem_dims ||
-      _mesh_subdomains != other_mesh._mesh_subdomains ||
-      _all_elemset_ids != other_mesh._all_elemset_ids ||
-      _elem_integer_names != other_mesh._elem_integer_names ||
-      _elem_integer_default_values != other_mesh._elem_integer_default_values ||
-      _node_integer_names != other_mesh._node_integer_names ||
-      _node_integer_default_values != other_mesh._node_integer_default_values ||
-      bool(_default_ghosting) != bool(other_mesh._default_ghosting) ||
-      bool(_partitioner) != bool(other_mesh._partitioner) ||
-      *boundary_info != *other_mesh.boundary_info)
+  // Check whether (almost) everything in the base is equal
+  //
+  // We don't check _next_unique_id here, because it's expected to
+  // change in a DistributedMesh prepare_for_use(); it's conceptually
+  // "mutable".
+  //
+  // We use separate if statements instead of logical operators here,
+  // to make it easy to see the failing condition when using a
+  // debugger to figure out why a MeshTools::valid_is_prepared(mesh)
+  // is failing.
+  if (_n_parts != other_mesh._n_parts)
+    return false;
+  if (_default_mapping_type != other_mesh._default_mapping_type)
+    return false;
+  if (_default_mapping_data != other_mesh._default_mapping_data)
+    return false;
+  if (_is_prepared != other_mesh._is_prepared)
+    return false;
+  if (_count_lower_dim_elems_in_point_locator !=
+        other_mesh._count_lower_dim_elems_in_point_locator)
+    return false;
+  if (_skip_noncritical_partitioning != other_mesh._skip_noncritical_partitioning)
+    return false;
+  if (_skip_all_partitioning != other_mesh._skip_all_partitioning)
+    return false;
+  if (_skip_renumber_nodes_and_elements != other_mesh._skip_renumber_nodes_and_elements)
+    return false;
+  if (_skip_find_neighbors != other_mesh._skip_find_neighbors)
+    return false;
+  if (_allow_remote_element_removal != other_mesh._allow_remote_element_removal)
+    return false;
+  if (_spatial_dimension != other_mesh._spatial_dimension)
+    return false;
+  if (_point_locator_close_to_point_tol != other_mesh._point_locator_close_to_point_tol)
+    return false;
+  if (_block_id_to_name != other_mesh._block_id_to_name)
+    return false;
+  if (_elem_dims != other_mesh._elem_dims)
+    return false;
+  if (_mesh_subdomains != other_mesh._mesh_subdomains)
+    return false;
+  if (_all_elemset_ids != other_mesh._all_elemset_ids)
+    return false;
+  if (_elem_integer_names != other_mesh._elem_integer_names)
+    return false;
+  if (_elem_integer_default_values != other_mesh._elem_integer_default_values)
+    return false;
+  if (_node_integer_names != other_mesh._node_integer_names)
+    return false;
+  if (_node_integer_default_values != other_mesh._node_integer_default_values)
+    return false;
+  if (bool(_default_ghosting) != bool(other_mesh._default_ghosting))
+    return false;
+  if (bool(_partitioner) != bool(other_mesh._partitioner))
+    return false;
+  if (*boundary_info != *other_mesh.boundary_info)
     return false;
 
   const constraint_rows_type & other_rows =
