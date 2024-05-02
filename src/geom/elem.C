@@ -1219,26 +1219,37 @@ void Elem::libmesh_assert_valid_neighbors() const
           else
             {
               unsigned int rev = neigh->which_neighbor_am_i(elem);
-              libmesh_assert_less (rev, neigh->n_neighbors());
 
-              if (this->subactive() && !neigh->subactive())
+              // We relax the valid neighbor requirements for 1D elements
+              // since multiple 1D elements may be connected to the same
+              // node, and in this case, they do not satisfy the
+              // "A is a neighbor of B" -> "B is a neighbor of A"
+              // assumption.
+              libmesh_assert (rev < neigh->n_neighbors() ||
+                              this->dim() == 1);
+
+              if (rev < neigh->n_neighbors())
                 {
-                  while (neigh->neighbor_ptr(rev) != elem)
+                  if (this->subactive() && !neigh->subactive())
                     {
-                      libmesh_assert(elem->parent());
-                      elem = elem->parent();
+                      while (neigh->neighbor_ptr(rev) != elem)
+                        {
+                          libmesh_assert(elem->parent());
+                          elem = elem->parent();
+                        }
                     }
-                }
-              else
-                {
-                  const Elem * nn = neigh->neighbor_ptr(rev);
-                  libmesh_assert(nn);
+                  else
+                    {
+                      const Elem * nn = neigh->neighbor_ptr(rev);
+                      libmesh_assert(nn);
 
-                  for (; elem != nn; elem = elem->parent())
-                    libmesh_assert(elem);
+                      for (; elem != nn; elem = elem->parent())
+                        libmesh_assert(elem);
+                    }
                 }
             }
         }
+
       // If we don't have a neighbor and we're not subactive, our
       // ancestors shouldn't have any neighbors in this same
       // direction.
