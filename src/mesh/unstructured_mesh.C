@@ -1047,11 +1047,26 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                       // Let's make sure that "had children made remote"
                       // situation is actually the case
                       libmesh_assert(neigh->has_children());
+
+                      // This assert is overzealous in the case where
+                      // N 1D elements (N>2, even) meet in a common
+                      // node, but an odd number are flagged for
+                      // refinement. In that case, our parent may have
+                      // a coarse level neighbor on this side while we
+                      // do not, because there was no element for us to
+                      // pair up with. Libmesh currently assumes one
+                      // neighbor per side, and "A neighbor-of B" implies
+                      // "B neighbor-of A" so we can't currently handle
+                      // this case correctly. If we are in that case,
+                      // we therefore accept that the neighbor information
+                      // is incomplete/wrong rather than asserting for
+                      // an unrelated reason.
                       bool neigh_has_remote_children = false;
                       for (auto & child : neigh->child_ref_range())
                         if (&child == remote_elem)
                           neigh_has_remote_children = true;
-                      libmesh_assert(neigh_has_remote_children);
+                      libmesh_assert(neigh_has_remote_children ||
+                                     neigh->dim() == 1);
 
                       // And let's double-check that we don't have
                       // a remote_elem neighboring an active local element
