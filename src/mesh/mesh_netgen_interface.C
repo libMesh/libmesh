@@ -81,9 +81,9 @@ void NetGenMeshInterface::triangulate ()
 
   Ng_Meshing_Parameters params;
 
-  // Override any default parameters we might need to
+  // Override any default parameters we might need to, to avoid
+  // inserting nodes we don't want.
   params.uselocalh = false;
-  params.maxh = std::pow(_desired_volume, 1./3.);
   params.minh = 0;
   params.elementsperedge = 1;
   params.elementspercurve = 1;
@@ -92,20 +92,65 @@ void NetGenMeshInterface::triangulate ()
   params.minedgelenenable = false;
   params.minedgelen = 0;
 
+  // Try to get a no-extra-nodes mesh if we're asked to, or try to
+  // translate our desired volume into NetGen terms otherwise.
+  //
+  // Spoiler alert: all we can do is try; NetGen uses a marching front
+  // algorithm that can insert extra nodes despite all my best
+  // efforts.
+  if (_desired_volume == 0) // shorthand for "no refinement"
+    {
+      params.maxh = std::numeric_limits<double>::max();
+      params.fineness = 0; // "coarse" in the docs
+      params.grading = 1;  // "aggressive local grading" to avoid smoothing??
+
+      // Turning off optimization steps avoids another opportunity for
+      // Netgen to try to add more nodes.
+      params.optsteps_3d = 0;
+    }
+  else
+    params.maxh = std::pow(_desired_volume, 1./3.);
+
   // Keep track of how NetGen copies of nodes map back to our original
   // nodes, so we can connect new elements to nodes correctly.
   std::unordered_map<int, dof_id_type> ng_to_libmesh_id;
 
-  auto create_surface_mesh = [this, &ng_to_libmesh_id](WrappedNgMesh & wngmesh) {
+  auto handle_ng_result = [](Ng_Result result) {
+    static const std::vector<std::string> result_types =
+      {"Netgen error", "Netgen success", "Netgen surface input error",
+       "Netgen volume failure", "Netgen STL input error",
+       "Netgen surface failure", "Netgen file not found"};
+
+    if (result+1 >= 0 &&
+        std::size_t(result+1) < result_types.size())
+      libmesh_error_msg_if
+        (result, "Ng_GenerateVolumeMesh failed: " <<
+         result_types[result+1]);
+    else
+      libmesh_error_msg
+        ("Ng_GenerateVolumeMesh failed with an unknown error code");
+  };
+
+  WrappedNgMesh ngmesh;
+
+  this->volume_to_surface_mesh(this->_mesh);
+
+  if (_holes)
+    for (std::unique_ptr<UnstructuredMesh> & hole : *_holes)
+      {
+        this->volume_to_surface_mesh(*hole);
+      }
+
+  // Create surface mesh in the WrappedNgMesh
+  {
     // NetGen appears to use ONE-BASED numbering for its nodes, and
     // since it doesn't return an id when adding nodes we'll have to
     // track the numbering ourselves.
     int ng_id = 1;
 
-    // Nested lambdas!
     auto create_surface_component =
-      [this, &ng_id, &ng_to_libmesh_id, &wngmesh]
-      (UnstructuredMesh & srcmesh, bool invert_tris)
+      [this, &ng_id, &ng_to_libmesh_id, &ngmesh]
+      (UnstructuredMesh & srcmesh, bool hole_mesh)
     {
       // Keep track of what nodes we've already added to the Netgen
       // mesh vs what nodes we need to add.  We'll keep track by id,
@@ -143,11 +188,11 @@ void NetGenMeshInterface::triangulate ()
               // Just using the "invert_trigs" option in NetGen params
               // doesn't work for me, so we'll have to have properly
               // oriented the tris earlier.
-              auto & elem_node = invert_tris ? elem_nodes[2-ni] : elem_nodes[ni];
+              auto & elem_node = hole_mesh ? elem_nodes[2-ni] : elem_nodes[ni];
 
               const Node & n = elem->node_ref(ni);
               auto n_id = n.id();
-              if (&srcmesh != &this->_mesh)
+              if (hole_mesh)
                 {
                   if (auto it = hole_to_main_mesh_id.find(n_id);
                       it != hole_to_main_mesh_id.end())
@@ -174,7 +219,7 @@ void NetGenMeshInterface::triangulate ()
                   for (auto i : make_range(3))
                     point_val[i] = n(i);
 
-                  Ng_AddPoint(wngmesh, point_val.data());
+                  Ng_AddPoint(ngmesh, point_val.data());
 
                   ng_to_libmesh_id[ng_id] = n_id;
                   libmesh_to_ng_id[n_id] = ng_id;
@@ -183,7 +228,7 @@ void NetGenMeshInterface::triangulate ()
                 }
             }
 
-          Ng_AddSurfaceElement(wngmesh, NG_TRIG, elem_nodes.data());
+          Ng_AddSurfaceElement(ngmesh, NG_TRIG, elem_nodes.data());
         }
     };
 
@@ -192,35 +237,8 @@ void NetGenMeshInterface::triangulate ()
     if (_holes)
       for (const std::unique_ptr<UnstructuredMesh> & h : *_holes)
         create_surface_component(*h, true);
-  };
+  }
 
-  auto handle_ng_result = [](Ng_Result result) {
-    static const std::vector<std::string> result_types =
-      {"Netgen error", "Netgen success", "Netgen surface input error",
-       "Netgen volume failure", "Netgen STL input error",
-       "Netgen surface failure", "Netgen file not found"};
-
-    if (result+1 >= 0 &&
-        std::size_t(result+1) < result_types.size())
-      libmesh_error_msg_if
-        (result, "Ng_GenerateVolumeMesh failed: " <<
-         result_types[result+1]);
-    else
-      libmesh_error_msg
-        ("Ng_GenerateVolumeMesh failed with an unknown error code");
-  };
-
-  WrappedNgMesh ngmesh;
-
-  this->volume_to_surface_mesh(this->_mesh);
-
-  if (_holes)
-    for (std::unique_ptr<UnstructuredMesh> & hole : *_holes)
-      {
-        this->volume_to_surface_mesh(*hole);
-      }
-
-  create_surface_mesh(ngmesh);
   auto result = Ng_GenerateVolumeMesh(ngmesh, &params);
   handle_ng_result(result);
 
@@ -228,6 +246,39 @@ void NetGenMeshInterface::triangulate ()
 
   libmesh_error_msg_if (n_elem <= 0,
                         "NetGen failed to generate any tetrahedra");
+
+  const dof_id_type n_points = Ng_GetNP(ngmesh);
+  const dof_id_type old_nodes = this->_mesh.n_nodes();
+
+  // Netgen may have generated new interior nodes
+  if (n_points != old_nodes)
+    {
+      std::array<double, 3> point_val;
+
+      // We should only be getting new nodes if we asked for them
+      if (!_desired_volume)
+        {
+          std::cout <<
+            "NetGen output " << n_points <<
+            " points when we gave it " <<
+            old_nodes << " and disabled refinement\n" <<
+            "If new interior points are acceptable in your mesh, please set\n" <<
+            "a non-zero desired_volume to indicate that.  If new interior\n" <<
+            "points are not acceptable in your mesh, you may need a different\n" <<
+            "(non-advancing-front?) mesh generator." << std::endl;
+          libmesh_error();
+        }
+      else
+        for (auto i : make_range(old_nodes, n_points))
+          {
+            // i+1 since ng uses ONE-BASED numbering
+            Ng_GetPoint (ngmesh, i+1, point_val.data());
+            const Point p(point_val[0], point_val[1], point_val[2]);
+            Node * n_new = this->_mesh.add_point(p);
+            const dof_id_type n_new_id = n_new->id();
+            ng_to_libmesh_id[i+1] = n_new_id;
+          }
+    }
 
   for (auto * elem : this->_mesh.element_ptr_range())
     this->_mesh.delete_elem(elem);
