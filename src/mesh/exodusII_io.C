@@ -549,28 +549,42 @@ void ExodusII_IO::read (const std::string & fname)
 
                 }
 
+              // The tailing entries in each element's connectivity
+              // vector are indices to Exodus constraint coefficient
+              // rows.
+
+              // Concatenating these rows gives a matrix with
+              // all the constraints for the element nodes: each
+              // column of that matrix is the constraint coefficients
+              // for the node associated with that column (via the
+              // Exodus numbering, not the libMesh numbering).
+              const auto & my_constraint_rows = exio_helper->bex_cv_conn[elem_num];
+
               for (auto elem_node_index :
                    make_range(elem->n_nodes()))
                 {
-                  const auto & my_constraint_rows = exio_helper->bex_cv_conn[elem_num];
-
-                  // New finite element node data: dot product of
+                  // New finite element node data = dot product of
                   // constraint matrix columns with spline node data.
-                  // Store that column as a key.
+                  // Store each column's non-zero entries, along with
+                  // the global spline node indices, as a key to
+                  // identify shared finite element nodes.
                   std::vector<std::pair<dof_id_type, Real>> key;
 
                   for (auto spline_node_index :
                        make_range(exio_helper->bex_num_elem_cvs))
                     {
+                      // Pick out a row of the element constraint matrix
                       const unsigned long elem_coef_vec_index =
                         my_constraint_rows[spline_node_index] - 1; // Exodus isn't 0-based
 
                       auto & coef_vec =
                         bex_constraint_vec(elem_coef_vec_index, *exio_helper);
 
+                      // Get coef from this node's column intersect that row
                       const Real coef =
                         libmesh_vector_at(coef_vec, elem_node_index);
 
+                      // Get the libMesh node corresponding to that row
                       const int gi = (elem_num)*exio_helper->bex_num_elem_cvs +
                         spline_node_index;
                       const dof_id_type libmesh_node_id =
@@ -580,47 +594,31 @@ void ExodusII_IO::read (const std::string & fname)
                         key.emplace_back(libmesh_node_id, coef);
                     }
 
+                  // Have we already created this node?  Connect it.
                   if (const auto local_node_it = local_nodes.find(key);
                       local_node_it != local_nodes.end())
                     elem->set_node(dyna_elem_defn.nodes[elem_node_index]) = local_node_it->second;
+                  // Have we not yet created this node?  Construct it,
+                  // along with its weight and libMesh constraint row,
+                  // then connect it.
                   else
                     {
                       Point p(0);
                       Real w = 0;
                       std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>> constraint_row;
 
-                      for (auto spline_node_index :
-                           make_range(exio_helper->bex_num_elem_cvs))
+                      for (auto [libmesh_spline_node_id, coef] : key)
                         {
-                          // global => libMesh index, with crazy 1-based data - see comments above
-                          const int gi = (elem_num)*exio_helper->bex_num_elem_cvs +
-                            spline_node_index;
-                          const dof_id_type libmesh_node_id =
-                            exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
+                          const Node & spline_node = mesh.node_ref(libmesh_spline_node_id);
 
-                          const unsigned long elem_coef_vec_index =
-                            my_constraint_rows[spline_node_index] - 1; // Exodus isn't 0-based
+                          p.add_scaled(spline_node, coef);
+                          const Real spline_w = weights_exist ?
+                            spline_node.get_extra_datum<Real>(weight_index) : 1;
+                          w += coef * spline_w;
 
-                          const Node & spline_node = mesh.node_ref(libmesh_node_id);
-
-                          auto & coef_vec =
-                            bex_constraint_vec(elem_coef_vec_index, *exio_helper);
-                          const Real coef =
-                            libmesh_vector_at(coef_vec, elem_node_index);
-
-                          // We don't need to store 0 entries;
-                          // constraint_rows is a sparse structure.
-                          if (coef)
-                            {
-                              p.add_scaled(spline_node, coef);
-                              const Real spline_w = weights_exist ?
-                                spline_node.get_extra_datum<Real>(weight_index) : 1;
-                              w += coef * spline_w;
-
-                              const Elem * nodeelem =
-                                libmesh_map_find(spline_nodeelem_ptrs, &spline_node);
-                              constraint_row.emplace_back(std::make_pair(nodeelem, 0), coef);
-                            }
+                          const Elem * nodeelem =
+                            libmesh_map_find(spline_nodeelem_ptrs, &spline_node);
+                          constraint_row.emplace_back(std::make_pair(nodeelem, 0), coef);
                         }
 
                       Node *n = mesh.add_point(p, n_nodes++);
@@ -629,7 +627,9 @@ void ExodusII_IO::read (const std::string & fname)
 
                       // If we're building disconnected Bezier
                       // extraction elements then we don't want to
-                      // find the new nodes to reuse later.
+                      // find the new nodes to reuse later; each
+                      // finite element node will connect to only one
+                      // element.
                       if (!_disc_bex)
                         local_nodes[key] = n;
                       elem->set_node(dyna_elem_defn.nodes[elem_node_index]) = n;
