@@ -14,8 +14,9 @@ clean-local:
 	rm -f .buildstamp
 
 netgenincludedir=$(includedir)/netgen
-
 nglibincludedir=$(includedir)/netgen/nglib
+netgenlibdir=$(libdir)
+ngliblibdir=$(libdir)
 
 .PHONY : .buildstamp
 
@@ -31,20 +32,18 @@ nglibinclude_HEADERS = netgen/nglib/nglib.h
 BUILT_SOURCES = build/netgen/netgen_config.hpp \
                 build/netgen/netgen_version.hpp
 
+ngliblib_DATA = build/netgen/libnglib$(LIBMESH_LIBRARY_SUFFIX)
+netgenlib_DATA = build/netgen/libsrc/core/libngcore$(LIBMESH_LIBRARY_SUFFIX)
+
 build/netgen/netgen_config.hpp : .buildstamp
 build/netgen/netgen_version.hpp : .buildstamp
-endif
+build/netgen/libnglib$(LIBMESH_LIBRARY_SUFFIX): .buildstamp
+build/netgen/libsrc/core/libngcore$(LIBMESH_LIBRARY_SUFFIX) : .buildstamp
 
-#netgendir = $(libdir)
-#netgen_DATA = build/netgen/libnglib.so \
-#              build/netgen/libsrc/core/libngcore.so
+endif
 
 # Maybe useful later?
 #              build/netgen/libnggui.so \
 #              build/netgen/libsrc/core/pyngcore.cpython-310-x86_64-linux-gnu.so \
 #              build/netgen/ng/libngpy.so \
 #              build/netgen/ng/libngguipy.so
-
-#netgen_SOURCES = build/netgen/netgen_config.hpp \
-#                 build/netgen/netgen_version.hpp \
-#                 netgen/nglib/nglib.h
