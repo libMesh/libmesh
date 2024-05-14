@@ -83,8 +83,7 @@ public:
    * meshed around.  We use unique_ptr here because we expect that we
    * may need to modify these meshes internally.
    */
-  void attach_hole_list(std::unique_ptr<std::vector<std::unique_ptr<UnstructuredMesh>>> holes)
-  {_holes = std::move(holes);}
+  void attach_hole_list(std::unique_ptr<std::vector<std::unique_ptr<UnstructuredMesh>>> holes);
 
   /**
    * This is the main public interface for this function.
