@@ -99,6 +99,13 @@ MeshTetInterface::MeshTetInterface (UnstructuredMesh & mesh) :
 MeshTetInterface::~MeshTetInterface() = default;
 
 
+void MeshTetInterface::attach_hole_list
+  (std::unique_ptr<std::vector<std::unique_ptr<UnstructuredMesh>>> holes)
+{
+  _holes = std::move(holes);
+}
+
+
 void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 {
   // First convert all volume boundaries to surface elements; this
