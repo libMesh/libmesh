@@ -227,6 +227,20 @@ LT_INIT([disable-static])
 #-----------------------------------------------------
 AX_ALL_STATIC
 
+#-----------------------------------------------------
+# See if shared libraries are enabled, and if so what
+# the suffix for them should be.
+#-----------------------------------------------------
+AS_IF([test "x$enable_shared" = xyes],
+      [os_name=`uname -s`
+       AS_IF([test "x$os_name" = "xDarwin"],
+             [LIBMESH_LIBRARY_SUFFIX=.dylib],
+             [LIBMESH_LIBRARY_SUFFIX=.so])
+      ],
+      [LIBMESH_LIBRARY_SUFFIX=.a])
+
+AC_SUBST(LIBMESH_LIBRARY_SUFFIX)
+
 # --------------------------------------------------------------
 # Release versioning - after we find the C++ compiler
 # --------------------------------------------------------------
