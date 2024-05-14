@@ -96,6 +96,9 @@ MeshTetInterface::MeshTetInterface (UnstructuredMesh & mesh) :
 }
 
 
+MeshTetInterface::~MeshTetInterface() = default;
+
+
 void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 {
   // First convert all volume boundaries to surface elements; this
