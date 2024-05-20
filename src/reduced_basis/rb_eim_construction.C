@@ -733,13 +733,6 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   DenseMatrix<Number> VT( n_snapshots, n_snapshots );
   correlation_matrix.svd(sigma, U, VT );
 
-  // If the first singular value is zero then we exit with an empty basis
-  if (sigma(0) == 0.)
-  {
-    libMesh::out << "Terminating EIM POD with empty basis because correlation matrix is zero" << std::endl;
-    return 0.;
-  }
-
   // We use this boolean to indicate if we will run one more iteration
   // before exiting the loop below. We use this when computing the EIM
   // error indicator, which requires one extra EIM iteration.
@@ -756,7 +749,14 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   while (true)
     {
       bool exit_condition_satisfied = false;
-      if (j >= n_snapshots)
+
+      if ((j == 0) && (sigma(0) == 0.))
+      {
+        libMesh::out << "Terminating EIM POD with empty basis because first singular value is zero" << std::endl;
+        exit_condition_satisfied = true;
+        rel_err = 0.;
+      }
+      else if (j >= n_snapshots)
         {
           libMesh::out << "Number of basis functions equals number of training samples." << std::endl;
           exit_condition_satisfied = true;
