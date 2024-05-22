@@ -327,7 +327,8 @@ public:
   virtual void print_matlab(const std::string & name = "") const override;
 
   virtual void create_subvector(NumericVector<T> & subvector,
-                                const std::vector<numeric_index_type> & rows) const override;
+                                const std::vector<numeric_index_type> & rows,
+                                bool supplying_global_rows = true) const override;
 
   virtual void swap (NumericVector<T> & v) override;
 

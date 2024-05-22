@@ -723,7 +723,8 @@ public:
    * PetscVectors.
    */
   virtual void create_subvector(NumericVector<T> & ,
-                                const std::vector<numeric_index_type> &) const
+                                const std::vector<numeric_index_type> &,
+                                bool = true) const
   {
     libmesh_not_implemented();
   }
