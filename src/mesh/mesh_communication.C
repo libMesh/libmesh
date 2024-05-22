@@ -544,6 +544,11 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   bool have_constraint_rows = !constraint_rows.empty();
   mesh.comm().broadcast(have_constraint_rows);
 
+#ifdef DEBUG
+  const dof_id_type n_constraint_rows =
+    have_constraint_rows ? mesh.n_constraint_rows() : 0;
+#endif
+
   typedef std::vector<std::pair<std::pair<dof_id_type, unsigned int>, Real>>
     serialized_row_type;
   std::unordered_map<processor_id_type,
@@ -659,6 +664,13 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   MeshTools::libmesh_assert_equal_n_systems(mesh);
 
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
+
+  const dof_id_type new_n_constraint_rows =
+    have_constraint_rows ? mesh.n_constraint_rows() : 0;
+
+  libmesh_assert_equal_to(n_constraint_rows, new_n_constraint_rows);
+
+  MeshTools::libmesh_assert_valid_constraint_rows(mesh);
 #endif
 
   // If we had a point locator, it's invalid now that there are new
