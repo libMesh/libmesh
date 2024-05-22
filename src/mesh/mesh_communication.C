@@ -128,6 +128,194 @@ struct SyncNeighbors
   }
 };
 
+
+void connect_new_children(const MeshBase & mesh,
+                          const connected_elem_set_type & connected_elements,
+                          const connected_elem_set_type & new_connected_elements,
+                          connected_elem_set_type & newer_connected_elements)
+{
+  // None of these parameters are used when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(mesh, connected_elements, new_connected_elements,
+                 newer_connected_elements);
+
+#ifdef LIBMESH_ENABLE_AMR
+  // Our XdrIO output needs inactive local elements to not have any
+  // remote_elem children.  Let's make sure that doesn't happen.
+  //
+  for (const auto & elem : new_connected_elements)
+    {
+      if (elem->has_children())
+        for (auto & child : elem->child_ref_range())
+          if (&child != remote_elem &&
+              !connected_elements.count(&child) &&
+              !new_connected_elements.count(&child))
+            newer_connected_elements.insert(&child);
+    }
+#endif // LIBMESH_ENABLE_AMR
+}
+
+
+void
+connect_element_families(const connected_elem_set_type & connected_elements,
+                         const connected_elem_set_type & new_connected_elements,
+                         connected_elem_set_type & newer_connected_elements,
+                         const MeshBase * mesh)
+{
+  // mesh was an optional parameter for API backwards compatibility
+  if (mesh && !mesh->get_constraint_rows().empty())
+    {
+      // We start with the constraint connections, not ancestors,
+      // because we don't need constraining nodes of elements'
+      // ancestors' constrained nodes.
+      const auto & constraint_rows = mesh->get_constraint_rows();
+
+      std::unordered_set<const Elem *> constraining_nodes_elems;
+      for (const Elem * elem : connected_elements)
+        {
+          for (const Node & node : elem->node_ref_range())
+            {
+              // Retain all elements containing constraining nodes
+              if (const auto it = constraint_rows.find(&node);
+                  it != constraint_rows.end())
+                for (auto & p : it->second)
+                  {
+                    const Elem * constraining_elem = p.first.first;
+                    libmesh_assert(constraining_elem ==
+                                   mesh->elem_ptr(constraining_elem->id()));
+                    if (!connected_elements.count(constraining_elem) &&
+                        !new_connected_elements.count(constraining_elem))
+                      constraining_nodes_elems.insert(constraining_elem);
+                  }
+            }
+        }
+
+      newer_connected_elements.insert(constraining_nodes_elems.begin(),
+                                      constraining_nodes_elems.end());
+    }
+
+#ifdef LIBMESH_ENABLE_AMR
+
+  // Because our set is sorted by ascending level, we can traverse it
+  // in reverse order, adding parents as we go, and end up with all
+  // ancestors added.  This is safe for std::set where insert doesn't
+  // invalidate iterators.
+  //
+  // This only works because we do *not* cache
+  // connected_elements.rend(), whose value can change when we insert
+  // elements which are sorted before the original rend.
+  //
+  // We're also going to get subactive descendents here, when any
+  // exist.  We're iterating in the wrong direction to do that
+  // non-recursively, so we'll cop out and rely on total_family_tree.
+  // Iterating backwards does mean that we won't be querying the newly
+  // inserted subactive elements redundantly.
+
+  connected_elem_set_type::reverse_iterator
+    elem_rit  = new_connected_elements.rbegin();
+
+  for (; elem_rit != new_connected_elements.rend(); ++elem_rit)
+    {
+      const Elem * elem = *elem_rit;
+      libmesh_assert(elem);
+
+      // We let ghosting functors worry about only active elements,
+      // but the remote processor needs all its semilocal elements'
+      // ancestors and active semilocal elements' descendants too.
+      for (const Elem * parent = elem->parent(); parent;
+           parent = parent->parent())
+        if (!connected_elements.count(parent) &&
+            !new_connected_elements.count(parent))
+          newer_connected_elements.insert (parent);
+
+      auto total_family_insert =
+        [&connected_elements, &new_connected_elements,
+         &newer_connected_elements]
+        (const Elem * e)
+        {
+          if (e->active() && e->has_children())
+            {
+              std::vector<const Elem *> subactive_family;
+              e->total_family_tree(subactive_family);
+              for (const auto & f : subactive_family)
+                {
+                  libmesh_assert(f != remote_elem);
+                  if (!connected_elements.count(f) &&
+                      !new_connected_elements.count(f))
+                    newer_connected_elements.insert(f);
+                }
+            }
+        };
+
+      total_family_insert(elem);
+
+      // We also need any interior parents on this mesh, which will
+      // then need their own ancestors and descendants.
+      const Elem * interior_parent = elem->interior_parent();
+
+      // Don't try to grab interior parents from other meshes, e.g. if
+      // this was a BoundaryMesh associated with a separate Mesh.
+
+      // We can't test this if someone's using the pre-mesh-ptr API
+      libmesh_assert(!interior_parent || mesh);
+
+      if (interior_parent &&
+          interior_parent == mesh->query_elem_ptr(interior_parent->id()) &&
+          !connected_elements.count(interior_parent) &&
+          !new_connected_elements.count(interior_parent))
+        {
+          newer_connected_elements.insert (interior_parent);
+          total_family_insert(interior_parent);
+        }
+    }
+
+#  ifdef DEBUG
+  // Let's be paranoid and make sure that all our ancestors
+  // really did get inserted.  I screwed this up the first time
+  // by caching rend, and I can easily imagine screwing it up in
+  // the future by changing containers.
+  auto check_elem =
+    [&connected_elements,
+     &new_connected_elements,
+     &newer_connected_elements]
+    (const Elem * elem)
+    {
+      libmesh_assert(elem);
+      const Elem * parent = elem->parent();
+      if (parent)
+        libmesh_assert(connected_elements.count(parent) ||
+                       new_connected_elements.count(parent) ||
+                       newer_connected_elements.count(parent));
+    };
+
+  for (const auto & elem : connected_elements)
+    check_elem(elem);
+  for (const auto & elem : new_connected_elements)
+    check_elem(elem);
+  for (const auto & elem : newer_connected_elements)
+    check_elem(elem);
+#  endif // DEBUG
+
+#endif // LIBMESH_ENABLE_AMR
+}
+
+
+
+void connect_nodes (const connected_elem_set_type & new_connected_elements,
+                    const connected_node_set_type & connected_nodes,
+                    const connected_node_set_type & new_connected_nodes,
+                    connected_node_set_type & newer_connected_nodes)
+{
+  for (const auto & elem : new_connected_elements)
+    for (auto & n : elem->node_ref_range())
+      if (!connected_nodes.count(&n) &&
+          !new_connected_nodes.count(&n))
+        newer_connected_nodes.insert(&n);
+}
+
+
+
+
+
 } // anonymous namespace
 #endif // LIBMESH_HAVE_MPI
 
@@ -141,7 +329,7 @@ void query_ghosting_functors(const MeshBase & mesh,
                              processor_id_type pid,
                              MeshBase::const_element_iterator elem_it,
                              MeshBase::const_element_iterator elem_end,
-                             std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+                             connected_elem_set_type & connected_elements)
 {
   for (auto & gf :
          as_range(mesh.ghosting_functors_begin(),
@@ -172,154 +360,100 @@ void query_ghosting_functors(const MeshBase & mesh,
 void connect_children(const MeshBase & mesh,
                       MeshBase::const_element_iterator elem_it,
                       MeshBase::const_element_iterator elem_end,
-                      std::set<const Elem *, CompareElemIdsByLevel> & connected_elements)
+                      connected_elem_set_type & newer_connected_elements)
 {
-  // None of these parameters are used when !LIBMESH_ENABLE_AMR.
-  libmesh_ignore(mesh, elem_it, elem_end, connected_elements);
+  connected_elem_set_type new_connected_elements(elem_it, elem_end);
 
-#ifdef LIBMESH_ENABLE_AMR
-  // Our XdrIO output needs inactive local elements to not have any
-  // remote_elem children.  Let's make sure that doesn't happen.
-  //
-  for (const auto & elem : as_range(elem_it, elem_end))
-    {
-      if (elem->has_children())
-        for (auto & child : elem->child_ref_range())
-          if (&child != remote_elem)
-            connected_elements.insert(&child);
-    }
-#endif // LIBMESH_ENABLE_AMR
+  connect_new_children(mesh, new_connected_elements,
+                       new_connected_elements,
+                       newer_connected_elements);
 }
 
 
-void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+void connect_families(connected_elem_set_type & connected_elements,
                       const MeshBase * mesh)
 {
-  // mesh was an optional parameter for API backwards compatibility
-  if (mesh && !mesh->get_constraint_rows().empty())
-    {
-      // We start with the constraint connections, not ancestors,
-      // because we don't need constraining nodes of elements'
-      // ancestors' constrained nodes.
-      const auto & constraint_rows = mesh->get_constraint_rows();
+  // This old API won't be sufficient in cases (IGA meshes with
+  // non-NodeElem nodes acting as the unconstrained DoFs) that require
+  // recursion.
+  libmesh_deprecated();
 
-      std::unordered_set<const Elem *> constraining_nodes_elems;
-      for (const Elem * elem : connected_elements)
-        {
-          for (const Node & node : elem->node_ref_range())
-            {
-              // Retain all elements containing constraining nodes
-              if (const auto it = constraint_rows.find(&node);
-                  it != constraint_rows.end())
-                for (auto & p : it->second)
-                  {
-                    const Elem * constraining_elem = p.first.first;
-                    libmesh_assert(constraining_elem ==
-                                   mesh->elem_ptr(constraining_elem->id()));
-                    constraining_nodes_elems.insert(constraining_elem);
-                  }
-            }
-        }
-
-      connected_elements.insert(constraining_nodes_elems.begin(),
-                                constraining_nodes_elems.end());
-    }
-
-#ifdef LIBMESH_ENABLE_AMR
-
-  // Because our set is sorted by ascending level, we can traverse it
-  // in reverse order, adding parents as we go, and end up with all
-  // ancestors added.  This is safe for std::set where insert doesn't
-  // invalidate iterators.
-  //
-  // This only works because we do *not* cache
-  // connected_elements.rend(), whose value can change when we insert
-  // elements which are sorted before the original rend.
-  //
-  // We're also going to get subactive descendents here, when any
-  // exist.  We're iterating in the wrong direction to do that
-  // non-recursively, so we'll cop out and rely on total_family_tree.
-  // Iterating backwards does mean that we won't be querying the newly
-  // inserted subactive elements redundantly.
-
-  std::set<const Elem *, CompareElemIdsByLevel>::reverse_iterator
-    elem_rit  = connected_elements.rbegin();
-
-  for (; elem_rit != connected_elements.rend(); ++elem_rit)
-    {
-      const Elem * elem = *elem_rit;
-      libmesh_assert(elem);
-
-      // We let ghosting functors worry about only active elements,
-      // but the remote processor needs all its semilocal elements'
-      // ancestors and active semilocal elements' descendants too.
-      const Elem * parent = elem->parent();
-      if (parent)
-        connected_elements.insert (parent);
-
-      auto total_family_insert = [& connected_elements](const Elem * e)
-        {
-          if (e->active() && e->has_children())
-            {
-              std::vector<const Elem *> subactive_family;
-              e->total_family_tree(subactive_family);
-              for (const auto & f : subactive_family)
-                {
-                  libmesh_assert(f != remote_elem);
-                  connected_elements.insert(f);
-                }
-            }
-        };
-
-      total_family_insert(elem);
-
-      // We also need any interior parents on this mesh, which will
-      // then need their own ancestors and descendants.
-      const Elem * interior_parent = elem->interior_parent();
-
-      // Don't try to grab interior parents from other meshes, e.g. if
-      // this was a BoundaryMesh associated with a separate Mesh.
-
-      // We can't test this if someone's using the pre-mesh-ptr API
-      libmesh_assert(!interior_parent || mesh);
-
-      if (interior_parent &&
-          interior_parent == mesh->query_elem_ptr(interior_parent->id()) &&
-          !connected_elements.count(interior_parent))
-        {
-          connected_elements.insert (interior_parent);
-          total_family_insert(interior_parent);
-        }
-    }
-
-#  ifdef DEBUG
-  // Let's be paranoid and make sure that all our ancestors
-  // really did get inserted.  I screwed this up the first time
-  // by caching rend, and I can easily imagine screwing it up in
-  // the future by changing containers.
-  for (const auto & elem : connected_elements)
-    {
-      libmesh_assert(elem);
-      const Elem * parent = elem->parent();
-      if (parent)
-        libmesh_assert(connected_elements.count(parent));
-    }
-#  endif // DEBUG
-
-#endif // LIBMESH_ENABLE_AMR
+  // Just do everything in one fell swoop; this is adequate for most
+  // meshes.
+  connect_element_families(connected_elements, connected_elements,
+                           connected_elements, mesh);
 }
 
 
-void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+
+void reconnect_nodes (connected_elem_set_type & connected_elements,
                       connected_node_set_type & connected_nodes)
 {
   // We're done using the nodes list for element decisions; now
   // let's reuse it for nodes of the elements we've decided on.
   connected_nodes.clear();
 
-  for (const auto & elem : connected_elements)
-    for (auto & n : elem->node_ref_range())
-      connected_nodes.insert(&n);
+  // Use the newer API
+  connect_nodes(connected_elements, connected_nodes, connected_nodes,
+                connected_nodes);
+}
+
+
+void connect_element_dependencies(const MeshBase & mesh,
+                                  connected_node_set_type & connected_nodes,
+                                  connected_elem_set_type & connected_elements)
+{
+  // We haven't examined any of these inputs for dependencies yet, so
+  // let's mark them all as to be examined now.
+  connected_elem_set_type new_connected_elements;
+  connected_node_set_type new_connected_nodes;
+  new_connected_elements.swap(connected_elements);
+  new_connected_nodes.swap(connected_nodes);
+
+  while (!new_connected_elements.empty() ||
+         !new_connected_nodes.empty())
+    {
+      auto [newer_connected_elements,
+            newer_connected_nodes] =
+        connect_element_dependencies
+          (mesh, connected_elements, connected_nodes,
+           new_connected_elements, new_connected_nodes);
+
+      // These have now been examined
+      connected_elements.merge(new_connected_elements);
+      connected_nodes.merge(new_connected_nodes);
+
+      // merge() doesn't guarantee empty() unless there are no
+      // duplicates, which there shouldn't be
+      libmesh_assert(new_connected_elements.empty());
+      libmesh_assert(new_connected_nodes.empty());
+
+      // These now need to be examined
+      new_connected_elements.swap(newer_connected_elements);
+      new_connected_nodes.swap(newer_connected_nodes);
+    }
+}
+
+
+std::pair<connected_elem_set_type, connected_node_set_type>
+connect_element_dependencies(const MeshBase & mesh,
+                             const connected_elem_set_type & connected_elements,
+                             const connected_node_set_type & connected_nodes,
+                             const connected_elem_set_type & new_connected_elements,
+                             const connected_node_set_type & new_connected_nodes)
+{
+  std::pair<connected_elem_set_type, connected_node_set_type> returnval;
+  auto & [newer_connected_elements, newer_connected_nodes] = returnval;
+  connect_new_children(mesh, connected_elements,
+                       new_connected_elements,
+                       newer_connected_elements);
+  connect_element_families(connected_elements, new_connected_elements,
+                           newer_connected_elements, &mesh);
+
+  connect_nodes(new_connected_elements, connected_nodes,
+                new_connected_nodes, newer_connected_nodes);
+
+  return returnval;
 }
 
 
@@ -450,26 +584,15 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
         MeshBase::const_element_iterator
           (elemend, elemend, Predicates::NotNull<v_t *>());
 
-      std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
+      connected_elem_set_type elements_to_send;
 
       // See which to-be-ghosted elements we need to send
       query_ghosting_functors (mesh, pid, elem_it, elem_end,
                                elements_to_send);
 
-      // The inactive elements we need to send should have their
-      // immediate children present.
-      connect_children(mesh, mesh.pid_elements_begin(pid),
-                       mesh.pid_elements_end(pid),
-                       elements_to_send);
-
-      // The elements we need should have their ancestors and their
-      // subactive children present too.  If the mesh has any
-      // constraint rows, then elements with constrained nodes need
-      // elements with constraining nodes to remain present.
-      connect_families(elements_to_send, &mesh);
-
+      // And see which elements and nodes they depend on
       connected_node_set_type connected_nodes;
-      reconnect_nodes(elements_to_send, connected_nodes);
+      connect_element_dependencies(mesh, connected_nodes, elements_to_send);
 
       all_nodes_to_send[pid].assign(connected_nodes.begin(),
                                     connected_nodes.end());
@@ -768,7 +891,7 @@ void MeshCommunication::gather_neighboring_elements (DistributedMesh & mesh) con
           // We also ship any nodes connected to these elements.  Note
           // some of these nodes and elements may be replicated from
           // other processors, but that is OK.
-          std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
+          connected_elem_set_type elements_to_send;
 
           // Technically we're not doing reconnect_nodes on this, but
           // we might as well use the same data structure since the
@@ -989,7 +1112,7 @@ void MeshCommunication::send_coarse_ghosts(MeshBase & mesh) const
       if (p == proc_id)
         continue;
 
-      std::set<const Elem *, CompareElemIdsByLevel> elements_to_send;
+      connected_elem_set_type elements_to_send;
       std::set<const Node *> nodes_to_send;
 
       if (const auto it = std::as_const(coarsening_elements_to_ghost).find(p);
@@ -2037,7 +2160,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   libmesh_assert_equal_to (par_max_elem_id, mesh.max_elem_id());
 #endif
 
-  std::set<const Elem *, CompareElemIdsByLevel> elements_to_keep;
+  connected_elem_set_type elements_to_keep;
 
   // Don't delete elements that we were explicitly told not to
   for (const auto & elem : extra_ghost_elem_ids)
@@ -2077,16 +2200,9 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
                    mesh.pid_elements_end(DofObject::invalid_processor_id),
                    elements_to_keep);
 
-  // The elements we need should have their ancestors, their
-  // interior_parent links, and their subactive children present too.
-  // If the mesh has any constraint rows, then elements with
-  // constrained nodes need elements with constraining nodes to remain
-  // present.
-  connect_families(elements_to_keep, &mesh);
-
-  // Don't delete nodes that our semilocal elements need
+  // And see which elements and nodes they depend on
   connected_node_set_type connected_nodes;
-  reconnect_nodes(elements_to_keep, connected_nodes);
+  connect_element_dependencies(mesh, connected_nodes, elements_to_keep);
 
   // Delete all the elements we have no reason to save,
   // starting with the most refined so that the mesh
