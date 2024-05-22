@@ -1951,6 +1951,23 @@ bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh) const
 }
 
 
+dof_id_type MeshBase::n_constraint_rows() const
+{
+  dof_id_type n_local_rows=0, n_unpartitioned_rows=0;
+  for (const auto & [node, node_constraints] : _constraint_rows)
+    {
+      // Unpartitioned nodes
+      if (node->processor_id() == DofObject::invalid_processor_id)
+        n_unpartitioned_rows++;
+      else if (node->processor_id() == this->processor_id())
+        n_local_rows++;
+    }
+
+  this->comm().sum(n_local_rows);
+
+  return n_unpartitioned_rows + n_local_rows;
+}
+
 
 void
 MeshBase::copy_constraint_rows(const MeshBase & other_mesh)

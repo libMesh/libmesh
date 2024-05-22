@@ -1674,17 +1674,21 @@ public:
   typedef std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>> constraint_rows_mapped_type;
   typedef std::map<const Node *, constraint_rows_mapped_type> constraint_rows_type;
 
-
   /**
-   * Copy the constraints from the other mesh to this mesh
+   * Constraint rows accessors
    */
-  void copy_constraint_rows(const MeshBase & other_mesh);
-
   constraint_rows_type & get_constraint_rows()
   { return _constraint_rows; }
 
   const constraint_rows_type & get_constraint_rows() const
   { return _constraint_rows; }
+
+  dof_id_type n_constraint_rows() const;
+
+  /**
+   * Copy the constraints from the other mesh to this mesh
+   */
+  void copy_constraint_rows(const MeshBase & other_mesh);
 
   /**
    * Copy the constraints from the given matrix to this mesh.  The
