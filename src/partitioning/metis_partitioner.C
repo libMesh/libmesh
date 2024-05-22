@@ -27,6 +27,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/metis_csr_graph.h"
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"

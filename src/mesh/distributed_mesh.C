@@ -25,6 +25,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/string_to_enum.h"
 

@@ -23,10 +23,13 @@
 // Local Includes
 #include "libmesh/compare_elems_by_level.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_tools.h"
+#include "libmesh/mesh_base.h"
 
 // C++ Includes
+#include <set>
+#include <utility>
 #include <unordered_map>
+#include <vector>
 
 namespace libMesh
 {
