@@ -17,8 +17,10 @@
 
 
 
-// libMesh includes
 #include "libmesh/partitioner.h"
+
+// libMesh includes
+#include "libmesh/compare_elems_by_level.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/int_range.h"
@@ -1133,8 +1135,9 @@ void Partitioner::build_graph (const MeshBase & mesh)
         {
           const auto end_it = mesh_constrained_nodes.end();
 
-          // Use a set to avoid duplicates
-          std::set<const Elem *> constraining_elems;
+          // Use a set to avoid duplicates.  Use a well-defined method
+          // of ordering that set to make debugging easier.
+          std::set<const Elem *, CompareElemIdsByLevel> constraining_elems;
           for (const Node & node : elem->node_ref_range())
             {
               if (const auto row_it = mesh_constrained_nodes.find(&node);
@@ -1301,8 +1304,9 @@ void Partitioner::build_graph (const MeshBase & mesh)
         {
           const auto end_it = mesh_constrained_nodes.end();
 
-          // Use a set to avoid duplicates
-          std::set<const Elem *> constraining_elems;
+          // Use a set to avoid duplicates.  Use a well-defined method
+          // of ordering that set to make debugging easier.
+          std::set<const Elem *, CompareElemIdsByLevel> constraining_elems;
           for (const Node & node : elem->node_ref_range())
             {
               if (const auto row_it = mesh_constrained_nodes.find(&node);
