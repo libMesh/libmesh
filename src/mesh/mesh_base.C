@@ -2201,6 +2201,67 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
 }
 
 
+void MeshBase::print_constraint_rows(std::ostream & os,
+                                     bool print_nonlocal) const
+{
+  parallel_object_only();
+
+  std::string local_constraints =
+    this->get_local_constraints(print_nonlocal);
+
+  if (this->processor_id())
+    {
+      this->comm().send(0, local_constraints);
+    }
+  else
+    {
+      os << "Processor 0:\n";
+      os << local_constraints;
+
+      for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
+        {
+          this->comm().receive(p, local_constraints);
+          os << "Processor " << p << ":\n";
+          os << local_constraints;
+        }
+    }
+}
+
+
+
+std::string MeshBase::get_local_constraints(bool print_nonlocal) const
+{
+  std::ostringstream os;
+
+  if (print_nonlocal)
+    os << "All ";
+  else
+    os << "Local ";
+
+  os << "Mesh Constraint Rows:"
+     << std::endl;
+
+  for (const auto & [node, row] : _constraint_rows)
+    {
+      // Skip non-local dofs if requested
+      if (!print_nonlocal && node->processor_id() != this->processor_id())
+        continue;
+
+      os << "Constraints for Node " << node->id()
+         << ": \t";
+
+      for (const auto & [elem_and_node, coef] : row)
+        os << " ((" << elem_and_node.first->id() << ',' << elem_and_node.second << "), " << coef << ")\t";
+
+      os << std::endl;
+    }
+
+  return os.str();
+}
+
+
+
+
 // Explicit instantiations for our template function
 template LIBMESH_EXPORT void
 MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator);
