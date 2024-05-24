@@ -2246,32 +2246,16 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
     {
       libmesh_assert(node);
       if (!connected_nodes.count(node))
-        mesh.delete_node(node);
+        {
+          libmesh_assert_not_equal_to(node->processor_id(),
+                                      mesh.processor_id());
+          mesh.delete_node(node);
+        }
     }
 
   // If we had a point locator, it's invalid now that some of the
   // elements it pointed to have been deleted.
   mesh.clear_point_locator();
-
-  // Many of our constraint rows may have been for non-local parts of
-  // the mesh, which we don't need, and which we didn't specifically
-  // save dependencies for.  The mesh deleted rows for remote nodes
-  // when we deleted those, but let's delete rows for ghosted nodes.
-  //
-  // We can't do erasure inside a range for
-  for (auto it = mesh.get_constraint_rows().begin(),
-       end = mesh.get_constraint_rows().end();
-       it != end;)
-    {
-      auto & row = *it;
-      const Node * node = row.first;
-      libmesh_assert(node == mesh.node_ptr(node->id()));
-
-      if (node->processor_id() != mesh.processor_id())
-        mesh.get_constraint_rows().erase(it++);
-      else
-        ++it;
-    }
 
   // We now have all remote elements and nodes deleted; our ghosting
   // functors should be ready to delete any now-redundant cached data
