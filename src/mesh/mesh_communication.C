@@ -1395,7 +1395,7 @@ void MeshCommunication::gather (const processor_id_type root_id, MeshBase & mesh
   // elements may not exist at that point.
   auto & constraint_rows = mesh.get_constraint_rows();
   bool have_constraint_rows = !constraint_rows.empty();
-  mesh.comm().broadcast(have_constraint_rows);
+  mesh.comm().max(have_constraint_rows);
   if (have_constraint_rows)
     {
       std::map<dof_id_type,
