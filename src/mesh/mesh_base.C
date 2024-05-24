@@ -2243,11 +2243,13 @@ std::string MeshBase::get_local_constraints(bool print_nonlocal) const
 
   for (const auto & [node, row] : _constraint_rows)
     {
+      const bool local = (node->processor_id() == this->processor_id());
+
       // Skip non-local dofs if requested
-      if (!print_nonlocal && node->processor_id() != this->processor_id())
+      if (!print_nonlocal && !local)
         continue;
 
-      os << "Constraints for Node " << node->id()
+      os << "Constraints for " << (local ? "Local" : "Ghost") << " Node " << node->id()
          << ": \t";
 
       for (const auto & [elem_and_node, coef] : row)
