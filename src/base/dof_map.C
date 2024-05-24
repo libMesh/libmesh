@@ -1110,6 +1110,8 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
                                     const MeshBase & mesh,
                                     unsigned int var_num) const
 {
+  idx.clear();
+
   // Count dofs in the *exact* order that distribute_dofs numbered
   // them, so that we can assume ascending indices and use push_back
   // instead of find+insert.
