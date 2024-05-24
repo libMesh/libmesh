@@ -1518,7 +1518,14 @@ void libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
 
-  for (auto & row : mesh.get_constraint_rows())
+  const auto & constraint_rows = mesh.get_constraint_rows();
+
+  bool have_constraint_rows = !constraint_rows.empty();
+  mesh.comm().max(have_constraint_rows);
+  if (!have_constraint_rows)
+    return;
+
+  for (auto & row : constraint_rows)
     {
       const Node * node = row.first;
       libmesh_assert(node == mesh.node_ptr(node->id()));
@@ -1532,8 +1539,6 @@ void libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
 
   dof_id_type pmax_node_id = mesh.max_node_id();
   mesh.comm().max(pmax_node_id);
-
-  const auto & constraint_rows = mesh.get_constraint_rows();
 
   for (dof_id_type i=0; i != pmax_node_id; ++i)
     {
