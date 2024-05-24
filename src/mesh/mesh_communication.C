@@ -1442,6 +1442,9 @@ void MeshCommunication::gather (const processor_id_type root_id, MeshBase & mesh
               constraint_rows.emplace(node, deserialized_row);
             }
         }
+#ifdef DEBUG
+      MeshTools::libmesh_assert_valid_constraint_rows(mesh);
+#endif
     }
 
 
