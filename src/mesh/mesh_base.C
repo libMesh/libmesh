@@ -768,6 +768,12 @@ void MeshBase::prepare_for_use ()
 
   libmesh_assert(this->comm().verify(this->is_serial()));
 
+  // If we don't go into this method with valid constraint rows, we're
+  // only going to be able to make that worse.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_constraint_rows(*this);
+#endif
+
   // A distributed mesh may have processors with no elements (or
   // processors with no elements of higher dimension, if we ever
   // support mixed-dimension meshes), but we want consistent
