@@ -576,15 +576,6 @@ void EpetraVector<T>::localize_to_one (std::vector<T> &  v_local,
 }
 
 
-
-template <typename T>
-void EpetraVector<T>::create_subvector(NumericVector<T> & /* subvector */,
-                                       const std::vector<numeric_index_type> & /* rows */) const
-{
-  libmesh_not_implemented();
-}
-
-
 /*********************************************************************
  * The following were copied (and slightly modified) from
  * Epetra_FEVector.h in order to allow us to use a standard

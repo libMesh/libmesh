@@ -1187,9 +1187,14 @@ void PetscVector<T>::print_matlab (const std::string & name) const
 
 template <typename T>
 void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
-                                      const std::vector<numeric_index_type> & rows) const
+                                      const std::vector<numeric_index_type> & rows,
+                                      const bool supplying_global_rows) const
 {
   parallel_object_only();
+
+  libmesh_error_msg_if(
+      subvector.type() == GHOSTED,
+      "We do not support scattering parallel information to ghosts for subvectors");
 
   this->_restore_array();
 
@@ -1204,20 +1209,31 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
   // If not, we use the appropriate PETSc routines to initialize it.
   if (!petsc_subvector->initialized())
     {
-      // Initialize the petsc_subvector to have enough space to hold
-      // the entries which will be scattered into it.  Note: such an
-      // init() function (where we let PETSc decide the number of local
-      // entries) is not currently offered by the PetscVector
-      // class.  Should we differentiate here between sequential and
-      // parallel vector creation based on this->n_processors() ?
-      ierr = VecCreateMPI(this->comm().get(),
-                          PETSC_DECIDE,                    // n_local
-                          cast_int<PetscInt>(rows.size()), // n_global
-                          &(petsc_subvector->_vec));
+      libmesh_assert(petsc_subvector->_type == AUTOMATIC || petsc_subvector->_type == PARALLEL);
+
+      if (supplying_global_rows)
+        // Initialize the petsc_subvector to have enough space to hold
+        // the entries which will be scattered into it.  Note: such an
+        // init() function (where we let PETSc decide the number of local
+        // entries) is not currently offered by the PetscVector
+        // class.  Should we differentiate here between sequential and
+        // parallel vector creation based on this->n_processors() ?
+        ierr = VecCreateMPI(this->comm().get(),
+                            PETSC_DECIDE,                    // n_local
+                            cast_int<PetscInt>(rows.size()), // n_global
+                            &(petsc_subvector->_vec));
+      else
+        ierr = VecCreateMPI(this->comm().get(),
+                            cast_int<PetscInt>(rows.size()),
+                            PETSC_DETERMINE,
+                            &(petsc_subvector->_vec));
       LIBMESH_CHKERR(ierr);
 
       ierr = VecSetFromOptions (petsc_subvector->_vec);
       LIBMESH_CHKERR(ierr);
+
+      // We created a parallel vector
+      petsc_subvector->_type = PARALLEL;
 
       // Mark the subvector as initialized
       petsc_subvector->_is_initialized = true;
@@ -1227,9 +1243,16 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
       petsc_subvector->_restore_array();
     }
 
-  // Use iota to fill an array with entries [0,1,2,3,4,...rows.size()]
   std::vector<PetscInt> idx(rows.size());
-  std::iota (idx.begin(), idx.end(), 0);
+  if (supplying_global_rows)
+    std::iota (idx.begin(), idx.end(), 0);
+  else
+    {
+      PetscInt start;
+      ierr = VecGetOwnershipRange(petsc_subvector->_vec, &start, nullptr);
+      LIBMESH_CHKERR(ierr);
+      std::iota (idx.begin(), idx.end(), start);
+    }
 
   // Construct index sets
   WrappedPetsc<IS> parent_is;
@@ -1258,6 +1281,8 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
 
   // Actually perform the scatter
   VecScatterBeginEnd(this->comm(), scatter, this->_vec, petsc_subvector->_vec, INSERT_VALUES, SCATTER_FORWARD);
+
+  petsc_subvector->_is_closed = true;
 }
 
 

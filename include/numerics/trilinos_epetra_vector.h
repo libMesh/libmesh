@@ -253,9 +253,6 @@ public:
   virtual void pointwise_mult (const NumericVector<T> & vec1,
                                const NumericVector<T> & vec2) override;
 
-  virtual void create_subvector (NumericVector<T> & subvector,
-                                 const std::vector<numeric_index_type> & rows) const override;
-
   virtual void swap (NumericVector<T> & v) override;
 
   virtual std::size_t max_allowed_id() const override;
