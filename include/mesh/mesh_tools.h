@@ -425,13 +425,6 @@ void libmesh_assert_valid_amr_elem_ids (const MeshBase & mesh);
 void libmesh_assert_valid_amr_interior_parents (const MeshBase & mesh);
 
 /**
- * A function for verifying that all mesh constraint rows express
- * relations between nodes and elements that are semilocal (local or
- * ghosted) to the current processor's portion of the mesh.
- */
-void libmesh_assert_valid_constraint_rows (const MeshBase & mesh);
-
-/**
  * A function for verifying that degree of freedom indexes are
  * contiguous on each processor, as is required by libMesh numeric
  * classes.
@@ -505,6 +498,13 @@ void libmesh_assert_equal_connectivity (const MeshBase & mesh);
  * nodes.
  */
 void libmesh_assert_connected_nodes (const MeshBase & mesh);
+
+/**
+ * A function for verifying that all mesh constraint rows express
+ * relations between nodes and elements that are semilocal (local or
+ * ghosted) to the current processor's portion of the mesh.
+ */
+void libmesh_assert_valid_constraint_rows (const MeshBase & mesh);
 
 /**
  * A function for verifying that boundary condition ids match

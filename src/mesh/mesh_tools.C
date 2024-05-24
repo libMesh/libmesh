@@ -1246,44 +1246,6 @@ void libmesh_assert_valid_amr_interior_parents(const MeshBase & mesh)
 
 
 
-void libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
-{
-  libmesh_parallel_only(mesh.comm());
-
-  for (auto & row : mesh.get_constraint_rows())
-    {
-      const Node * node = row.first;
-      libmesh_assert(node == mesh.node_ptr(node->id()));
-
-      for (auto & pr : row.second)
-        {
-          const Elem * spline_elem = pr.first.first;
-          libmesh_assert(spline_elem == mesh.elem_ptr(spline_elem->id()));
-        }
-    }
-
-  dof_id_type pmax_node_id = mesh.max_node_id();
-  mesh.comm().max(pmax_node_id);
-
-  const auto & constraint_rows = mesh.get_constraint_rows();
-
-  for (dof_id_type i=0; i != pmax_node_id; ++i)
-    {
-      const Node * node = mesh.query_node_ptr(i);
-
-      bool have_constraint = constraint_rows.count(node);
-
-      const std::size_t my_n_constraints = have_constraint ?
-        libmesh_map_find(constraint_rows, node).size() : 0;
-      const std::size_t * n_constraints = have_constraint ?
-        &my_n_constraints : nullptr;
-
-      mesh.comm().semiverify(n_constraints);
-    }
-}
-
-
-
 void libmesh_assert_contiguous_dof_ids(const MeshBase & mesh, unsigned int sysnum)
 {
   LOG_SCOPE("libmesh_assert_contiguous_dof_ids()", "MeshTools");
@@ -1547,6 +1509,44 @@ void libmesh_assert_connected_nodes (const MeshBase & mesh)
     {
       libmesh_assert(node);
       libmesh_assert(used_nodes.count(node));
+    }
+}
+
+
+
+void libmesh_assert_valid_constraint_rows (const MeshBase & mesh)
+{
+  libmesh_parallel_only(mesh.comm());
+
+  for (auto & row : mesh.get_constraint_rows())
+    {
+      const Node * node = row.first;
+      libmesh_assert(node == mesh.node_ptr(node->id()));
+
+      for (auto & pr : row.second)
+        {
+          const Elem * spline_elem = pr.first.first;
+          libmesh_assert(spline_elem == mesh.elem_ptr(spline_elem->id()));
+        }
+    }
+
+  dof_id_type pmax_node_id = mesh.max_node_id();
+  mesh.comm().max(pmax_node_id);
+
+  const auto & constraint_rows = mesh.get_constraint_rows();
+
+  for (dof_id_type i=0; i != pmax_node_id; ++i)
+    {
+      const Node * node = mesh.query_node_ptr(i);
+
+      bool have_constraint = constraint_rows.count(node);
+
+      const std::size_t my_n_constraints = have_constraint ?
+        libmesh_map_find(constraint_rows, node).size() : std::size_t(-1);
+      const std::size_t * n_constraints = node ?
+        &my_n_constraints : nullptr;
+
+      libmesh_assert(mesh.comm().semiverify(n_constraints));
     }
 }
 
