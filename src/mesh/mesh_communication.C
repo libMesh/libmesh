@@ -2173,6 +2173,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
   const dof_id_type par_max_elem_id = mesh.parallel_max_elem_id();
   libmesh_assert_equal_to (par_max_node_id, mesh.max_node_id());
   libmesh_assert_equal_to (par_max_elem_id, mesh.max_elem_id());
+  const dof_id_type n_constraint_rows = mesh.n_constraint_rows();
 #endif
 
   connected_elem_set_type elements_to_keep;
@@ -2264,6 +2265,9 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
     gf->delete_remote_elements();
 
 #ifdef DEBUG
+  const dof_id_type n_new_constraint_rows = mesh.n_constraint_rows();
+  libmesh_assert_equal_to(n_constraint_rows, n_new_constraint_rows);
+
   MeshTools::libmesh_assert_valid_refinement_tree(mesh);
   MeshTools::libmesh_assert_valid_constraint_rows(mesh);
 #endif
