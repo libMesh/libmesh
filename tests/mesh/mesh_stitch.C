@@ -5,6 +5,7 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
+#include <libmesh/parallel_implementation.h>
 #include <libmesh/node.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/utility.h>
@@ -86,11 +87,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(mesh0.n_nodes(), static_cast<dof_id_type>(45));
 
     const BoundaryInfo & bi = mesh0.get_boundary_info();
-    const auto & sbi = bi.get_side_boundary_ids();
+    std::set<boundary_id_type> sbi = bi.get_side_boundary_ids();
+    TestCommWorld->set_union(sbi);
+
     typename std::decay<decltype(sbi.size())>::type expected_size = 10;
     CPPUNIT_ASSERT_EQUAL(expected_size, sbi.size());
 
-    const auto & nbi = bi.get_node_boundary_ids();
+    std::set<boundary_id_type> nbi = bi.get_node_boundary_ids();
+    TestCommWorld->set_union(nbi);
     CPPUNIT_ASSERT_EQUAL(expected_size, nbi.size());
 
     // We expect that the "zero_right" and "one_left" boundaries have
