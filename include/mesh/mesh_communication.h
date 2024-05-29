@@ -281,6 +281,10 @@ void connect_children(const MeshBase & mesh,
 // subactive descendants as well.  If a mesh is provided and has any
 // constraint rows, insert elements with the constraining nodes for
 // any constrained nodes in our set.
+//
+// This method is now deprecated, because it does not handle recursive
+// dependencies.  Use the new connect_element_dependencies method
+// instead.
 void connect_families(connected_elem_set_type & connected_elements,
                       const MeshBase * mesh = nullptr);
 
