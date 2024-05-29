@@ -410,6 +410,13 @@ void connect_element_dependencies(const MeshBase & mesh,
   new_connected_elements.swap(connected_elements);
   new_connected_nodes.swap(connected_nodes);
 
+  // We require that inactive local elements not have any remote_elem
+  // children, so we connect them here, but we do not require this of
+  // ghosted elements so we will not call it recursively.
+  connect_new_children(mesh, connected_elements,
+                       new_connected_elements,
+                       new_connected_elements);
+
   while (!new_connected_elements.empty() ||
          !new_connected_nodes.empty())
     {
@@ -444,9 +451,6 @@ connect_element_dependencies(const MeshBase & mesh,
 {
   std::pair<connected_elem_set_type, connected_node_set_type> returnval;
   auto & [newer_connected_elements, newer_connected_nodes] = returnval;
-  connect_new_children(mesh, connected_elements,
-                       new_connected_elements,
-                       newer_connected_elements);
   connect_element_families(connected_elements, new_connected_elements,
                            newer_connected_elements, &mesh);
 
