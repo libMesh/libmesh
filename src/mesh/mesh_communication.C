@@ -400,8 +400,8 @@ void reconnect_nodes (connected_elem_set_type & connected_elements,
 
 
 void connect_element_dependencies(const MeshBase & mesh,
-                                  connected_node_set_type & connected_nodes,
-                                  connected_elem_set_type & connected_elements)
+                                  connected_elem_set_type & connected_elements,
+                                  connected_node_set_type & connected_nodes)
 {
   // We haven't examined any of these inputs for dependencies yet, so
   // let's mark them all as to be examined now.
@@ -597,7 +597,7 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
       // And see which elements and nodes they depend on
       connected_node_set_type connected_nodes;
-      connect_element_dependencies(mesh, connected_nodes, elements_to_send);
+      connect_element_dependencies(mesh, elements_to_send, connected_nodes);
 
       all_nodes_to_send[pid].assign(connected_nodes.begin(),
                                     connected_nodes.end());
@@ -2218,7 +2218,7 @@ MeshCommunication::delete_remote_elements (DistributedMesh & mesh,
 
   // And see which elements and nodes they depend on
   connected_node_set_type connected_nodes;
-  connect_element_dependencies(mesh, connected_nodes, elements_to_keep);
+  connect_element_dependencies(mesh, elements_to_keep, connected_nodes);
 
   // Delete all the elements we have no reason to save,
   // starting with the most refined so that the mesh
