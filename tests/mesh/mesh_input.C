@@ -214,7 +214,7 @@ public:
     // Come up with some crazy numbering.  Make all the new ids higher
     // than the existing ids so we don't have to worry about conflicts
     // while renumbering.
-    const dof_id_type start_id = 10;
+    dof_id_type start_id;
 
     // first scope: write file
     {
@@ -222,8 +222,12 @@ public:
       mesh.allow_renumbering(false);
       MeshTools::Generation::build_square (mesh, 3, 3, 0., 1., 0., 1.);
 
-      CPPUNIT_ASSERT_LESS(start_id, mesh.max_elem_id());
-      for (const auto & elem : mesh.element_ptr_range())
+      start_id = mesh.max_elem_id();
+
+      // Use a separate container that won't invalidate iterators when
+      // we renumber
+      std::set<Elem *> elements {mesh.elements_begin(), mesh.elements_end()};
+      for (Elem * elem : elements)
       {
         const Point center = elem->vertex_average();
         const int xn = center(0)*3;
