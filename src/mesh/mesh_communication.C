@@ -129,32 +129,6 @@ struct SyncNeighbors
 };
 
 
-void connect_new_children(const MeshBase & mesh,
-                          const connected_elem_set_type & connected_elements,
-                          const connected_elem_set_type & new_connected_elements,
-                          connected_elem_set_type & newer_connected_elements)
-{
-  // None of these parameters are used when !LIBMESH_ENABLE_AMR.
-  libmesh_ignore(mesh, connected_elements, new_connected_elements,
-                 newer_connected_elements);
-
-#ifdef LIBMESH_ENABLE_AMR
-  // Our XdrIO output needs inactive local elements to not have any
-  // remote_elem children.  Let's make sure that doesn't happen.
-  //
-  for (const auto & elem : new_connected_elements)
-    {
-      if (elem->has_children())
-        for (auto & child : elem->child_ref_range())
-          if (&child != remote_elem &&
-              !connected_elements.count(&child) &&
-              !new_connected_elements.count(&child))
-            newer_connected_elements.insert(&child);
-    }
-#endif // LIBMESH_ENABLE_AMR
-}
-
-
 void
 connect_element_families(const connected_elem_set_type & connected_elements,
                          const connected_elem_set_type & new_connected_elements,
@@ -360,13 +334,23 @@ void query_ghosting_functors(const MeshBase & mesh,
 void connect_children(const MeshBase & mesh,
                       MeshBase::const_element_iterator elem_it,
                       MeshBase::const_element_iterator elem_end,
-                      connected_elem_set_type & newer_connected_elements)
+                      connected_elem_set_type & connected_elements)
 {
-  connected_elem_set_type new_connected_elements(elem_it, elem_end);
+  // None of these parameters are used when !LIBMESH_ENABLE_AMR.
+  libmesh_ignore(mesh, elem_it, elem_end, connected_elements);
 
-  connect_new_children(mesh, new_connected_elements,
-                       new_connected_elements,
-                       newer_connected_elements);
+#ifdef LIBMESH_ENABLE_AMR
+  // Our XdrIO output needs inactive local elements to not have any
+  // remote_elem children.  Let's make sure that doesn't happen.
+  //
+  for (const auto & elem : as_range(elem_it, elem_end))
+    {
+      if (elem->has_children())
+        for (auto & child : elem->child_ref_range())
+          if (&child != remote_elem)
+            connected_elements.insert(&child);
+    }
+#endif // LIBMESH_ENABLE_AMR
 }
 
 
@@ -409,13 +393,6 @@ void connect_element_dependencies(const MeshBase & mesh,
   connected_node_set_type new_connected_nodes;
   new_connected_elements.swap(connected_elements);
   new_connected_nodes.swap(connected_nodes);
-
-  // We require that inactive local elements not have any remote_elem
-  // children, so we connect them here, but we do not require this of
-  // ghosted elements so we will not call it recursively.
-  connect_new_children(mesh, connected_elements,
-                       new_connected_elements,
-                       new_connected_elements);
 
   while (!new_connected_elements.empty() ||
          !new_connected_nodes.empty())
@@ -599,9 +576,16 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
       query_ghosting_functors (mesh, pid, elem_it, elem_end,
                                elements_to_send);
 
-      // And see which elements and nodes they depend on
+      // The inactive elements we need to send should have their
+      // immediate children present.
+      connect_children(mesh, mesh.pid_elements_begin(pid),
+                       mesh.pid_elements_end(pid),
+                       elements_to_send);
+
+      // Now see which other elements and nodes they depend on
       connected_node_set_type connected_nodes;
-      connect_element_dependencies(mesh, elements_to_send, connected_nodes);
+      connect_element_dependencies(mesh, elements_to_send,
+                                   connected_nodes);
 
       all_nodes_to_send[pid].assign(connected_nodes.begin(),
                                     connected_nodes.end());

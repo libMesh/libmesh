@@ -471,6 +471,8 @@ void CheckpointIO::write (const std::string & name)
                   query_ghosting_functors
                     (mesh, p, active_pid_elements_begin,
                      active_pid_elements_end, elements);
+                  connect_children(mesh, pid_elements_begin,
+                                   pid_elements_end, elements);
                 }
             }
         }
