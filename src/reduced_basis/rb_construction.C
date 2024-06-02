@@ -1639,11 +1639,16 @@ Real RBConstruction::truth_solve(int plot_solution)
   return libmesh_real(truth_X_norm);
 }
 
+bool RBConstruction::is_serial_training_type(const std::string & RB_training_type_in)
+{
+  return (RB_training_type_in == "POD");
+}
+
 void RBConstruction::set_RB_training_type(const std::string & RB_training_type_in)
 {
   this->RB_training_type = RB_training_type_in;
 
-  if(this->RB_training_type == "POD")
+  if(is_serial_training_type(RB_training_type_in))
     {
       // We need to use a serial training set (so that the training
       // set is the same on all processes) if we're using POD
