@@ -1,4 +1,56 @@
 % MOOSE
+% "We have used the open-source finite element library, ... (MOOSE) for the phase field and plasticity simulations"
+@Article{Pai_2024,
+  author  = {Namit Pai and Indradev Samajdar and Anirban Patra},
+  title   = {{Microstructural and mechanistic insights into the tension-compression asymmetry of rapidly solidified Fe-Cr alloys: A phase field and strain gradient plasticity study}},
+  journal = {Journal of the Mechanics and Physics of Solids},
+  month   = aug,
+  year    = 2024,
+  volume  = 189,
+  pages   = {105695 (xx pages)},
+  note    = {\url{https://doi.org/10.1016/j.jmps.2024.105695}, ArXiv e-print: \url{https://arxiv.org/abs/2403.11080v1}}
+}
+
+% MOOSE/NIsoS
+% "The theoretical models are numerically implemented ... within the program NIsoS, developed by authors based on MOOSE ..."
+% https://www.researchgate.net/publication/379721401_Elasto-plastic_residual_stress_analysis_of_selective_laser_sintered_porous_materials_based_on_3D-multilayer_thermo-structural_phase-field_simulations
+@Article{YYang_2024,
+  author  = {Yangyiwei Yang and Somnath Bharech and Nick Finger and Xiandong Zhou and Joerg Schr{\"{o}}der and Bai-Xiang Xu},
+  title   = {{Elasto-plastic residual stress analysis of selective sintered porous materials based on 3D-multilayer thermo-structural phase-field simulations}},
+  journal = {npj Computational Materials},
+  month   = may,
+  year    = 2024,
+  volume  = 10,
+  pages   = {117 (17 pages)},
+  note    = {\url{https://doi.org/10.1038/s41524-024-01296-5}, ArXiv e-print: \url{https://arxiv.org/abs/2310.13351}}
+}
+
+% MOOSE
+% "The entire process model is implemented using MOOSE ... (FEA)."
+% https://tigerprints.clemson.edu/cgi/viewcontent.cgi?article=4616&context=all_dissertations
+@phdthesis{Zadeh_thesis,
+  author = {Cameron Zadeh},
+  school = {Clemson University},
+  title  = {{Multi-scale modeling of selective laser sintering: From manufacturing process and microstructure to mechanical performance in semi-crystalline thermoplastics}},
+  note   = {\url{https://tigerprints.clemson.edu/all_dissertations/3621}},
+  month  = may,
+  year   = 2024
+}
+
+% MOOSE
+% "Comparisons of these schemes' performances were performed ... using the MOOSE ... framework..."
+@Article{Shin_2024,
+  author  = {Wooseob Shin and Pierre-Cl{\'{e}}ment A. Simon and Kunok Chang},
+  title   = {{Comparison of excess free energy at an interface according to the applied interpolation scheme for elasticity: A phase-field method}},
+  journal = {Computational Materials Science},
+  month   = jul,
+  year    = 2024,
+  volume  = 243,
+  pages   = {113111 (xx pages)},
+  note    = {\url{https://doi.org/10.1016/j.commatsci.2024.113111}}
+}
+
+% MOOSE
 % "The governing equations describing a multiphysics involved system are implemented ... based on the MOOSE environment..."
 @Article{XTang_2024,
   author  = {XiaoJie Tang and ManMan Hu},
@@ -10,6 +62,21 @@
   number  = 5,
   pages   = {3095--3113},
   note    = {\url{https://doi.org/10.1007/s11440-024-02288-x}}
+}
+
+% libMesh
+% "OpenMC ... offers a wide range of capabilities, including the ability to perform cell and libMesh unstructured mesh tallies, ..."
+% I'm not sure what the coupling is between OpenMC and libMesh, or if this refers to a different tool with the same name.
+% See also: YuZhong_2024
+@Article{YuZhong_2024b,
+  author  = {Yu Zhong and Qi Wang and Chunyan Zou and Guifeng Zhu and Wei Guo and Zhichao Wang and Yong Wang},
+  title   = {Neutronics and thermal-hydraulics coupled analysis on dimensional change and lifespan of graphite components in small modular molten salt reactor},
+  journal = {Nuclear Engineering and Design},
+  month   = aug,
+  year    = 2024,
+  volume  = 425,
+  pages   = {113344 (xx pages)},
+  note    = {\url{https://doi.org/10.1016/j.nucengdes.2024.113344}}
 }
 
 % libMesh
@@ -107,6 +174,7 @@
 
 % MOOSE
 % "Subsequently, the FE simulations are conducted in the open-source FE software MOOSE..."
+% author:peng author:xu unraveling impacts
 @Misc{Peng_2024,
   author       = {Xiang-Long Peng and Bai-Xiang Xu},
   title        = {Unraveling impacts of polycrystalline microstructures on ionic conductivity of ceramic electrolytes by computational homogenization and machine learning},
@@ -235,6 +303,7 @@
 
 % libMesh/FEMuS
 % "This paper presents a coupling strategy ... to link the in-house FEMuS code with the well-established OpenFOAM software."
+% Note: the preprint has a different author ordering but the same title, I assume it's the same paper.
 @Article{Barbi_2024,
   author  = {Giacomo Barbi and Antonio Cervone and Federico Giangolini and Sandro Manservisi and Lucia Sirotti},
   title   = {{Numerical coupling between a FEM Code and the FVM code OpenFOAM using the MED library}},
@@ -244,7 +313,7 @@
   volume  = 14,
   number  = 9,
   pages   = {3744 (23 pages)},
-  note    = {\url{https://doi.org/10.3390/app14093744}}
+  note    = {\url{https://doi.org/10.3390/app14093744}, Preprints.org pre-print: \url{https://doi.org/10.20944/preprints202404.0229.v1}}
 }
 
 % MOOSE/Cardinal
@@ -473,17 +542,6 @@
   note    = {\url{https://doi.org/10.1016/j.jnucmat.2024.155036}}
 }
 
-% FEMuS/libMesh
-% "The ... finite element library FEMuS, a C++ code exploiting ... LibMesh ... for the creation and handling of a hierarchy of meshes."
-@Misc{Manservisi_2024,
-  author       = {Sandro Manservisi and Giacomo Barbi and Antonio Cervone and Federico Giangolini and Lucia Sirotti},
-  title        = {{Numerical coupling between a FEM code and the FVM code OpenFOAM by using the MED library}},
-  month        = apr,
-  year         = 2024,
-  howpublished = {Preprints.org},
-  note         = {\url{https://doi.org/10.20944/preprints202404.0229.v1}}
-}
-
 % MOOSE
 % "The numerical models ... are developed for the ... PorousFlow module ... within the MOOSE framework"
 @Article{GYan_2024,
@@ -677,6 +735,7 @@
 
 % MOOSE/Achlys
 % In this model, we consider macroscopic tritium transport processes ... using the Achlys software package, which is built on top of ... MOOSE"
+% author:seelinger author:reinarz democratizing uncertainty quantification
 @Misc{Seelinger_2024,
   author       = {Linus Seelinger and Anne Reinarz and Mikkel B. Lykkegaard and Amal Mohammed A. Alghamdi and David Aristoff and Wolfgang Bangerth and Jean B{\'{e}}n{\'{e}}zech and Matteo Diez and Kurt Frey and John D. Jakeman and Jakob Sauer J{\o}rgensen and Ki-Tae Kim and Massimiliano Martinelli and Matthew Parno and Riccardo Pellegrini and Noemi Petra and Nicolai A. B. Riis and Katherine Rosenfeld and Andrea Serani and Lorenzo Tamellini and Umberto Villa and Tim J. Dodwell and Robert Scheichl},
   title        = {{Democratizing Uncertainty Quantification}},
@@ -731,6 +790,7 @@
 
 % MOOSE/Ferret
 % "We ... used the FERRET module ... of (MOOSE)"
+% author:muraleedharan author:co ferroelectric texture
 @Misc{Muraleedharan_2024,
   author       = {Athulya Muraleedharan and Kevin Co and Maxime Vallet and Abdelali Zaki and Fabienne Karolak and Christine Bogicevic and Karen Perronet and Brahim Dkhil and Charles Paillard and C{\'{e}}line Fiorini-Debuisschert and Fran{\c{c}}ois Treussart},
   title        = {Ferroelectric texture of individual barium titanate nanocrystals},
