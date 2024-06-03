@@ -13,10 +13,28 @@ clean-local:
 	$(MAKE) -C build $(AM_MAKEFLAGS) clean
 	rm -f .buildstamp
 
+
 netgenincludedir=$(includedir)/netgen
 nglibincludedir=$(includedir)/netgen/nglib
 netgenlibdir=$(libdir)
 ngliblibdir=$(libdir)
+
+# Make sure the installed libnglib is linking to the installed
+# libngcore, not to the libngcore in the build directory
+#
+# Install-exec is automake speak for anything platform-dependent, not
+# just for executables
+install-exec-local:
+	if which install_name_tool 2>/dev/null; then \
+	  echo "install_name_tool exists on OSX but is unneeded for rpath-based libnglib there"; \
+	elif which patchelf 2>/dev/null; then \
+	  patchelf --set-rpath "$(libdir)" "$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
+	elif which chrpath 2>/dev/null; then \
+	  chrpath -r "$(libdir)" "$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
+	else \
+	  echo "No tools to change RPATH when installing libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
+	  echo "If linking fails we may need install_name_tool/patchelf/chrpath installed"; \
+	fi
 
 .PHONY : .buildstamp
 
