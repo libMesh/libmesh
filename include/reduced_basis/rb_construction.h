@@ -234,6 +234,13 @@ public:
   bool get_normalize_rb_bound_in_greedy() const { return normalize_rb_bound_in_greedy; }
 
   /**
+   * @return true if \p RB_training_type_in is a type of training that
+   * requires a serial training set. For example, POD training generally
+   * does require a serial training set.
+   */
+  virtual bool is_serial_training_type(const std::string & RB_training_type_in);
+
+  /**
    * Get/set the string that determines the training type.
    */
   void set_RB_training_type(const std::string & RB_training_type_in);
