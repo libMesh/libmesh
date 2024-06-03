@@ -187,6 +187,9 @@ AC_MSG_RESULT([configuring size of boundary_id... $boundary_bytes])
 
 # -------------------------------------------------------------
 # size of dof_id_type -- default 4 bytes
+#
+# We delay AC_DEFINE(DOF_ID_BYTES, etc) until later so we can
+# double-check PETSc compatibility first.
 # -------------------------------------------------------------
 AC_ARG_WITH([dof_id_bytes],
             AS_HELP_STRING([--with-dof-id-bytes=<1|2|4|8>],
@@ -196,19 +199,7 @@ AC_ARG_WITH([dof_id_bytes],
             [dof_bytes=4
              dof_bytes_setting="implicit"])
 
-AS_CASE("$dof_bytes",
-        [1], [AC_DEFINE(DOF_ID_BYTES, 1, [size of dof_id])],
-        [2], [AC_DEFINE(DOF_ID_BYTES, 2, [size of dof_id])],
-        [4], [AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])],
-        [8], [AC_DEFINE(DOF_ID_BYTES, 8, [size of dof_id])],
-        [
-          AC_MSG_RESULT([>>> unrecognized dof_id size: $dof_bytes - configuring size...4])
-          AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])
-          dof_bytes=4
-          dof_bytes_setting="implicit"
-        ])
-
-AC_MSG_RESULT([configuring size of dof_id... $dof_bytes])
+AC_MSG_RESULT([requested size of dof_id... $dof_bytes])
 # -------------------------------------------------------------
 
 

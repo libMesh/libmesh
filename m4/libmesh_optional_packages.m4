@@ -303,7 +303,7 @@ AM_CONDITIONAL(LIBMESH_ENABLE_PETSC, test x$enablepetsc = xyes)
 
 # -------------------------------------------------------------
 # Check for inconsistencies between PETSc and libmesh's scalar
-# and index datatypes.
+# and index datatypes, and override $dof_bytes if reasonable.
 # -------------------------------------------------------------
 AS_IF([test $enablepetsc != no],
       [
@@ -317,7 +317,6 @@ AS_IF([test $enablepetsc != no],
                      [AC_MSG_RESULT([>>> adopting PETSc dof_id size: 8])])
                dof_bytes=8
                dof_bytes_setting="explicit"
-               AC_DEFINE(DOF_ID_BYTES, 8, [size of dof_id])
               ])
         AS_IF([test $petsc_use_64bit_indices -gt 0 && test "$dof_bytes" != "8"],
               [AC_MSG_ERROR([<<< PETSc is using 64-bit indices, you must configure libmesh with --with-dof-id-bytes=8. >>>])])
