@@ -51,7 +51,7 @@ extern "C"
   {
     LOG_SCOPE("objective()", "TaoOptimizationSolver");
 
-    PetscErrorCode ierr = 0;
+    PetscErrorCode ierr = (PetscErrorCode)0;
 
     libmesh_assert(x);
     libmesh_assert(objective);
@@ -99,7 +99,7 @@ extern "C"
   {
     LOG_SCOPE("gradient()", "TaoOptimizationSolver");
 
-    PetscErrorCode ierr = 0;
+    PetscErrorCode ierr = (PetscErrorCode)0;
 
     libmesh_assert(x);
     libmesh_assert(g);
@@ -150,7 +150,7 @@ extern "C"
   {
     LOG_SCOPE("hessian()", "TaoOptimizationSolver");
 
-    PetscErrorCode ierr = 0;
+    PetscErrorCode ierr = (PetscErrorCode)0;
 
     libmesh_assert(x);
     libmesh_assert(h);
@@ -207,7 +207,7 @@ extern "C"
   {
     LOG_SCOPE("equality_constraints()", "TaoOptimizationSolver");
 
-    PetscErrorCode ierr = 0;
+    PetscErrorCode ierr = (PetscErrorCode)0;
 
     libmesh_assert(x);
     libmesh_assert(ce);
@@ -259,7 +259,7 @@ extern "C"
   {
     LOG_SCOPE("equality_constraints_jacobian()", "TaoOptimizationSolver");
 
-    PetscErrorCode ierr = 0;
+    PetscErrorCode ierr = (PetscErrorCode)0;
 
     libmesh_assert(x);
     libmesh_assert(J);
@@ -308,7 +308,7 @@ extern "C"
   {
     LOG_SCOPE("inequality_constraints()", "TaoOptimizationSolver");
 
-    PetscErrorCode ierr = 0;
+    PetscErrorCode ierr = (PetscErrorCode)0;
 
     libmesh_assert(x);
     libmesh_assert(cineq);
@@ -360,7 +360,7 @@ extern "C"
   {
     LOG_SCOPE("inequality_constraints_jacobian()", "TaoOptimizationSolver");
 
-    PetscErrorCode ierr = 0;
+    PetscErrorCode ierr = (PetscErrorCode)0;
 
     libmesh_assert(x);
     libmesh_assert(J);
@@ -449,7 +449,7 @@ void TaoOptimizationSolver<T>::init ()
     {
       this->_is_initialized = true;
 
-      PetscErrorCode ierr=0;
+      PetscErrorCode ierr = (PetscErrorCode)0;
 
       ierr = TaoCreate(this->comm().get(),&_tao);
       LIBMESH_CHKERR(ierr);
@@ -478,7 +478,7 @@ void TaoOptimizationSolver<T>::solve ()
   // Set the starting guess to zero.
   x->zero();
 
-  PetscErrorCode ierr = 0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
 
   // Workaround for bug where TaoSetFromOptions *reset*
   // programmatically set tolerance and max. function evaluation
@@ -635,7 +635,7 @@ void TaoOptimizationSolver<T>::get_dual_variables()
   Vec lambda_eq_petsc_vec = lambda_eq_petsc->vec();
   Vec lambda_ineq_petsc_vec = lambda_ineq_petsc->vec();
 
-  PetscErrorCode ierr = 0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
   ierr = TaoGetDualVariables(_tao,
                              &lambda_eq_petsc_vec,
                              &lambda_ineq_petsc_vec);
@@ -655,7 +655,7 @@ void TaoOptimizationSolver<T>::print_converged_reason()
 template <typename T>
 int TaoOptimizationSolver<T>::get_converged_reason()
 {
-  PetscErrorCode ierr=0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
 
   if (this->initialized())
     {

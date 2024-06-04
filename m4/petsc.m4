@@ -83,8 +83,10 @@ AC_DEFUN([CONFIGURE_PETSC],
 
           int main(int argc, char **argv)
           {
-            PetscInitialize(&argc, &argv, (char*)0,help);
-            PetscFinalize();
+            auto ierr = PetscInitialize(&argc, &argv, (char*)0,help);
+            CHKERRQ(ierr);
+            ierr = PetscFinalize();
+            CHKERRQ(ierr);
             return 0;
           }
           ]])],[

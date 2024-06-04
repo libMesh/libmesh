@@ -22,6 +22,7 @@
 // libMesh includes
 #include "libmesh/wrapped_petsc.h"
 #include "libmesh/petsc_macro.h"
+#include "libmesh/petsc_solver_exception.h"
 
 // PETSc includes
 #ifdef I
@@ -52,18 +53,18 @@ namespace libMesh
 
 // Specializations of the destroy() method for different PETSc classes
 // This could also be macro-ized, but maybe it's not necessary?
-template <> void WrappedPetsc<Vec>::destroy() { VecDestroy(&obj); }
-template <> void WrappedPetsc<KSP>::destroy() { KSPDestroy(&obj); }
-template <> void WrappedPetsc<IS>::destroy() { ISDestroy(&obj); }
-template <> void WrappedPetsc<Mat>::destroy() { MatDestroy(&obj); }
-template <> void WrappedPetsc<VecScatter>::destroy() { VecScatterDestroy(&obj); }
-template <> void WrappedPetsc<PetscViewer>::destroy() { PetscViewerDestroy(&obj); }
-template <> void WrappedPetsc<MatNullSpace>::destroy() { MatNullSpaceDestroy(&obj); }
-template <> void WrappedPetsc<DM>::destroy() { DMDestroy(&obj); }
-template <> void WrappedPetsc<MatPartitioning>::destroy() { MatPartitioningDestroy(&obj); }
-template <> void WrappedPetsc<SNES>::destroy() { SNESDestroy(&obj); }
-template <> void WrappedPetsc<PC>::destroy() { PCDestroy(&obj); }
-template <> void WrappedPetsc<PetscSection>::destroy() { PetscSectionDestroy(&obj); }
+template <> void WrappedPetsc<Vec>::destroy() { auto ierr = VecDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<KSP>::destroy() { auto ierr = KSPDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<IS>::destroy() { auto ierr = ISDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<Mat>::destroy() { auto ierr = MatDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<VecScatter>::destroy() { auto ierr = VecScatterDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<PetscViewer>::destroy() { auto ierr = PetscViewerDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<MatNullSpace>::destroy() { auto ierr = MatNullSpaceDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<DM>::destroy() { auto ierr = DMDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<MatPartitioning>::destroy() { auto ierr = MatPartitioningDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<SNES>::destroy() { auto ierr = SNESDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<PC>::destroy() { auto ierr = PCDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <> void WrappedPetsc<PetscSection>::destroy() { auto ierr = PetscSectionDestroy(&obj); LIBMESH_CHKERR(ierr); }
 
 }
 

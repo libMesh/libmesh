@@ -194,7 +194,7 @@ namespace libMesh
           CHKERRQ(ierr);
         }
 
-      return 0;
+      return PetscErrorCode(0);
     }
 
     //! Help PETSc identify the finer DM given a dmc
@@ -216,7 +216,7 @@ namespace libMesh
       libmesh_assert(*(p_ctx->finer_dm));
       *(dmf) = *(p_ctx->finer_dm);
 
-      return 0;
+      return PetscErrorCode(0);
     }
 
     //! Help PETSc identify the coarser DM dmc given the fine DM dmf
@@ -280,8 +280,9 @@ namespace libMesh
 
           // Next, for the found fields we create a subDM
           DM subdm;
-          libmesh_petsc_DMCreateSubDM(*(p_ctx_f->coarser_dm), nfieldsf,
-                                      p_ctx_f->subfields.data(), nullptr, &subdm);
+          ierr = libmesh_petsc_DMCreateSubDM(*(p_ctx_f->coarser_dm), nfieldsf,
+                                             p_ctx_f->subfields.data(), nullptr, &subdm);
+          CHKERRQ(ierr);
 
           // Extract our coarse context from the created subDM so we
           // can set its subfields for use in createInterp.
@@ -303,7 +304,7 @@ namespace libMesh
         *(dmc) = *(p_ctx_f->coarser_dm);
       }
 
-      return 0;
+      return PetscErrorCode(0);
     }
 
     //! Function to give PETSc that sets the Interpolation Matrix between two DMs
@@ -319,7 +320,8 @@ namespace libMesh
       // Get a communicator from incoming DM
       PetscErrorCode ierr;
       MPI_Comm comm;
-      PetscObjectGetComm((PetscObject)dmc, &comm);
+      ierr = PetscObjectGetComm((PetscObject)dmc, &comm);
+      CHKERRQ(ierr);
 
       // Extract our coarse context from the incoming DM
       void * ctx_c = nullptr;
@@ -393,7 +395,7 @@ namespace libMesh
       // Vec scaling isnt needed so were done.
       *(vec) = LIBMESH_PETSC_NULLPTR;
 
-      return 0;
+      return PetscErrorCode(0);
     } // end libmesh_petsc_DMCreateInterpolation
 
     //! Function to give PETSc that sets the Restriction Matrix between two DMs
@@ -408,7 +410,8 @@ namespace libMesh
 
       // get a communicator from incoming DM
       MPI_Comm comm;
-      PetscObjectGetComm((PetscObject)dmc, &comm);
+      ierr = PetscObjectGetComm((PetscObject)dmc, &comm);
+      CHKERRQ(ierr);
 
       // extract our fine context from the incoming DM
       void * ctx_f = nullptr;
@@ -420,7 +423,7 @@ namespace libMesh
       libmesh_assert(p_ctx_f->K_restrict_ptr);
       *(mat) = p_ctx_f->K_restrict_ptr->mat();
 
-      return 0;
+      return PetscErrorCode(0);
     }
 
   } // end extern C functions

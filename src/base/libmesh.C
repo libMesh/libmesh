@@ -481,7 +481,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 #endif
       )
     {
-      int ierr=0;
+      PetscErrorCode ierr = (PetscErrorCode)0;
 
 #ifdef LIBMESH_HAVE_MPI
       PETSC_COMM_WORLD = libMesh::GLOBAL_COMM_WORLD;
@@ -773,9 +773,13 @@ LibMeshInit::~LibMeshInit()
         // replicating; let's protect against trying to clear
         // already-used values
         PetscBool used = PETSC_FALSE;
-        PetscOptionsUsed(NULL, name.c_str(), &used);
+        auto ierr = PetscOptionsUsed(NULL, name.c_str(), &used);
+        CHKERRABORT(libMesh::GLOBAL_COMM_WORLD, ierr);
         if (used == PETSC_FALSE)
-          PetscOptionsClearValue(NULL, name.c_str());
+          {
+            ierr = PetscOptionsClearValue(NULL, name.c_str());
+            CHKERRABORT(libMesh::GLOBAL_COMM_WORLD, ierr);
+          }
       }
 
   // Allow the user to bypass PETSc finalization
@@ -785,13 +789,15 @@ LibMeshInit::~LibMeshInit()
 #endif
       )
     {
+      PetscErrorCode ierr = (PetscErrorCode)0;
 # if defined(LIBMESH_HAVE_SLEPC)
       if (libmesh_initialized_slepc)
-        SlepcFinalize();
+        ierr = SlepcFinalize();
 # else
       if (libmesh_initialized_petsc)
-        PetscFinalize();
+        ierr = PetscFinalize();
 # endif
+      CHKERRABORT(libMesh::GLOBAL_COMM_WORLD, ierr);
     }
 #endif
 
