@@ -149,8 +149,10 @@ AC_DEFUN([CONFIGURE_SLEPC],
 
                             int main(int argc, char **argv)
                             {
-                              SlepcInitialize(&argc, &argv, (char*)0, help);
-                              SlepcFinalize();
+                              auto ierr = SlepcInitialize(&argc, &argv, (char*)0, help);
+                              CHKERRQ(ierr);
+                              ierr = SlepcFinalize();
+                              CHKERRQ(ierr);
                               return 0;
                             }
                             ]])],[
