@@ -571,7 +571,7 @@ PetscVector<T>::PetscVector (Vec v,
 
   /* We need to ask PETSc about the (local to global) ghost value
      mapping and create the inverse mapping out of it.  */
-  PetscErrorCode ierr=0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
   PetscInt petsc_local_size=0;
   ierr = VecGetLocalSize(_vec, &petsc_local_size);
   LIBMESH_CHKERR(ierr);
@@ -678,7 +678,7 @@ void PetscVector<T>::init (const numeric_index_type n,
 {
   parallel_object_only();
 
-  PetscErrorCode ierr=0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
   PetscInt petsc_n=static_cast<PetscInt>(n);
 
   // Clear initialized vectors
@@ -757,7 +757,7 @@ void PetscVector<T>::init (const numeric_index_type n,
 {
   parallel_object_only();
 
-  PetscErrorCode ierr=0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
   PetscInt petsc_n=static_cast<PetscInt>(n);
   PetscInt petsc_n_local=static_cast<PetscInt>(n_local);
   PetscInt petsc_n_ghost=static_cast<PetscInt>(ghost.size());
@@ -908,7 +908,7 @@ void PetscVector<T>::zero ()
 
   this->_restore_array();
 
-  PetscErrorCode ierr=0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
 
   PetscScalar z=0.;
 
@@ -966,7 +966,7 @@ numeric_index_type PetscVector<T>::size () const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
   PetscInt petsc_size=0;
 
   if (!this->initialized())
@@ -986,7 +986,7 @@ numeric_index_type PetscVector<T>::local_size () const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr=0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
   PetscInt petsc_size=0;
 
   ierr = VecGetLocalSize(_vec, &petsc_size);
@@ -1009,7 +1009,7 @@ numeric_index_type PetscVector<T>::first_local_index () const
     first = _first;
   else
     {
-      PetscErrorCode ierr=0;
+      PetscErrorCode ierr = (PetscErrorCode)0;
       PetscInt petsc_first=0, petsc_last=0;
       ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
       LIBMESH_CHKERR(ierr);
@@ -1033,7 +1033,7 @@ numeric_index_type PetscVector<T>::last_local_index () const
     last = _last;
   else
     {
-      PetscErrorCode ierr=0;
+      PetscErrorCode ierr = (PetscErrorCode)0;
       PetscInt petsc_first=0, petsc_last=0;
       ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
       LIBMESH_CHKERR(ierr);
@@ -1061,7 +1061,7 @@ numeric_index_type PetscVector<T>::map_global_to_local_index (const numeric_inde
     }
   else
     {
-      PetscErrorCode ierr=0;
+      PetscErrorCode ierr = (PetscErrorCode)0;
       PetscInt petsc_first=0, petsc_last=0;
       ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
       LIBMESH_CHKERR(ierr);
@@ -1187,7 +1187,7 @@ Real PetscVector<T>::min () const
 
   this->_restore_array();
 
-  PetscErrorCode ierr=0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
   PetscInt index=0;
   PetscReal returnval=0.;
 
@@ -1208,7 +1208,7 @@ Real PetscVector<T>::max() const
 
   this->_restore_array();
 
-  PetscErrorCode ierr=0;
+  PetscErrorCode ierr = (PetscErrorCode)0;
   PetscInt index=0;
   PetscReal returnval=0.;
 

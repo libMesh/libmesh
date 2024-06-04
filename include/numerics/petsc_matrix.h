@@ -27,6 +27,7 @@
 // Local includes
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/petsc_macro.h"
+#include "libmesh/petsc_solver_exception.h"
 
 // C++ includes
 #include <algorithm>
@@ -45,11 +46,13 @@
 #include <cstring>
 
 #define semiparallel_only() do { if (this->initialized()) { const char * mytype; \
-      MatGetType(_mat,&mytype);                                         \
+      auto semiparallel_only_ierr = MatGetType(_mat,&mytype);           \
+      LIBMESH_CHKERR(semiparallel_only_ierr);                           \
       if (!strcmp(mytype, MATSEQAIJ))                                   \
         parallel_object_only(); } } while (0)
 #define exceptionless_semiparallel_only() do { if (this->initialized()) { const char * mytype; \
-      MatGetType(_mat,&mytype);                                         \
+      auto semiparallel_only_ierr = MatGetType(_mat,&mytype);           \
+      libmesh_ignore(semiparallel_only_ierr);                           \
       if (!strcmp(mytype, MATSEQAIJ))                                   \
         exceptionless_parallel_object_only(); } } while (0)
 #else

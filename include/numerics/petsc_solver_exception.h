@@ -59,9 +59,10 @@ public:
   {
     const char * text;
     char * specific;
-    // This is one scenario where we don't catch the error code
+    auto ierr = PetscErrorMessage(cast_int<PetscErrorCode>(error_code), &text, &specific);
+    // This is one scenario where we ignore the error code
     // returned by a PETSc function :)
-    PetscErrorMessage(error_code, &text, &specific);
+    libmesh_ignore(ierr);
 
     // Usually the "specific" error message string is more useful than
     // the generic text corresponding to the error_code, since many
@@ -112,7 +113,7 @@ public:
   inline                                                                \
   void Function ## BeginEnd(const Parallel::Communicator & comm, const Args&... args) \
   {                                                                     \
-    PetscErrorCode ierr = 0;                                            \
+    PetscErrorCode ierr = (PetscErrorCode)0;                            \
     ierr = Function ## Begin(args...);                                  \
     LIBMESH_CHKERR2(comm, ierr);                                        \
     ierr = Function ## End(args...);                                    \
