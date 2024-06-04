@@ -194,7 +194,7 @@ void VTKIO::read (const std::string & name)
   elems_of_dimension.resize(4, false);
 
   // Use a typedef, because these names are just crazy
-  typedef vtkSmartPointer<vtkXMLPUnstructuredGridReader> MyReader;
+  typedef vtkSmartPointer<vtkXMLUnstructuredGridReader> MyReader;
   MyReader reader = MyReader::New();
 
   // Pass the filename along to the reader

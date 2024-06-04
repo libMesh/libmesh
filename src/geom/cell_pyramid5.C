@@ -257,10 +257,10 @@ void Pyramid5::connectivity(const unsigned int libmesh_dbg_var(sc),
     case VTK:
       {
         conn.resize(5);
-        conn[0] = this->node_id(3);
-        conn[1] = this->node_id(2);
-        conn[2] = this->node_id(1);
-        conn[3] = this->node_id(0);
+        conn[0] = this->node_id(0);
+        conn[1] = this->node_id(1);
+        conn[2] = this->node_id(2);
+        conn[3] = this->node_id(3);
         conn[4] = this->node_id(4);
         return;
       }
