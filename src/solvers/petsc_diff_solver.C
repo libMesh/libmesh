@@ -54,7 +54,7 @@ extern "C"
                    << ", |residual|_2 = " << fnorm << std::endl;
     if (solver.linear_solution_monitor.get())
     {
-      PetscErrorCode ierr = (PetscErrorCode)0;
+      PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
 
       Vec petsc_delta_u;
       ierr = SNESGetSolutionUpdate(snes, &petsc_delta_u);
@@ -79,7 +79,7 @@ extern "C"
                                         u, u.l2_norm(),
                                         res, res.l2_norm(), its);
     }
-    return PetscErrorCode(0);
+    return static_cast<PetscErrorCode>(0);
   }
 
   // Functions to hand to PETSc's SNES,
@@ -127,7 +127,7 @@ extern "C"
     R_input.swap(R_system);
 
     // No errors, we hope
-    return PetscErrorCode(0);
+    return static_cast<PetscErrorCode>(0);
   }
 
 
@@ -181,7 +181,7 @@ extern "C"
     J_input.swap(J_system);
 
     // No errors, we hope
-    return PetscErrorCode(0);
+    return static_cast<PetscErrorCode>(0);
   }
 
 } // extern "C"
@@ -303,7 +303,7 @@ unsigned int PetscDiffSolver::solve()
   PetscVector<Number> & r =
     *(cast_ptr<PetscVector<Number> *>(_system.rhs));
 
-  PetscErrorCode ierr = (PetscErrorCode)0;
+  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
 
   ierr = SNESSetFunction (_snes, r.vec(),
                           __libmesh_petsc_diff_solver_residual, this);
@@ -342,7 +342,7 @@ unsigned int PetscDiffSolver::solve()
 
 void PetscDiffSolver::setup_petsc_data()
 {
-  PetscErrorCode ierr = (PetscErrorCode)0;
+  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
 
   ierr = SNESCreate(this->comm().get(), _snes.get());
   LIBMESH_CHKERR(ierr);

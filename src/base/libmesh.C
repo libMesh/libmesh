@@ -481,7 +481,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 #endif
       )
     {
-      PetscErrorCode ierr = (PetscErrorCode)0;
+      PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
 
 #ifdef LIBMESH_HAVE_MPI
       PETSC_COMM_WORLD = libMesh::GLOBAL_COMM_WORLD;
@@ -789,7 +789,7 @@ LibMeshInit::~LibMeshInit()
 #endif
       )
     {
-      PetscErrorCode ierr = (PetscErrorCode)0;
+      PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
 # if defined(LIBMESH_HAVE_SLEPC)
       if (libmesh_initialized_slepc)
         ierr = SlepcFinalize();
