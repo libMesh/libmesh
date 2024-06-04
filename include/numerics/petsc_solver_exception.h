@@ -113,7 +113,7 @@ public:
   inline                                                                \
   void Function ## BeginEnd(const Parallel::Communicator & comm, const Args&... args) \
   {                                                                     \
-    PetscErrorCode ierr = (PetscErrorCode)0;                            \
+    PetscErrorCode ierr = static_cast<PetscErrorCode>(0);               \
     ierr = Function ## Begin(args...);                                  \
     LIBMESH_CHKERR2(comm, ierr);                                        \
     ierr = Function ## End(args...);                                    \

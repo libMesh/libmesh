@@ -758,7 +758,7 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
 
   std::map<dof_id_type, dof_id_type> global_to_local;
 
-  PetscErrorCode ierr = (PetscErrorCode)0;
+  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
 
   for (auto & pmap : processor_pair_to_nodes)
     {
