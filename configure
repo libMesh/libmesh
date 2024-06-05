@@ -27722,6 +27722,7 @@ main (void)
 
       std::cout << std::is_void<char>::value
         // << std::is_null_pointer<char>::value                  // C++14
+        // << std::is_literal_type<char>::value                  // C++17
                 << std::is_integral<char>::value
                 << std::is_floating_point<char>::value
                 << std::is_array<char>::value
@@ -27746,7 +27747,6 @@ main (void)
                 << std::is_trivially_copyable<char>::value // Not supported by GCC 4.6.3 with -std=c++0x
                 << std::is_standard_layout<char>::value
                 << std::is_pod<char>::value
-                << std::is_literal_type<char>::value
                 << std::is_empty<char>::value
                 << std::is_polymorphic<char>::value
                 << std::is_abstract<char>::value
@@ -48612,6 +48612,9 @@ printf "%s\n" "configuring size of boundary_id... $boundary_bytes" >&6; }
 
 # -------------------------------------------------------------
 # size of dof_id_type -- default 4 bytes
+#
+# We delay AC_DEFINE(DOF_ID_BYTES, etc) until later so we can
+# double-check PETSc compatibility first.
 # -------------------------------------------------------------
 
 # Check whether --with-dof_id_bytes was given.
@@ -48625,37 +48628,8 @@ else $as_nop
 fi
 
 
-case "$dof_bytes" in #(
-  1) :
-
-printf "%s\n" "#define DOF_ID_BYTES 1" >>confdefs.h
- ;; #(
-  2) :
-
-printf "%s\n" "#define DOF_ID_BYTES 2" >>confdefs.h
- ;; #(
-  4) :
-
-printf "%s\n" "#define DOF_ID_BYTES 4" >>confdefs.h
- ;; #(
-  8) :
-
-printf "%s\n" "#define DOF_ID_BYTES 8" >>confdefs.h
- ;; #(
-  *) :
-
-          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: >>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&5
-printf "%s\n" ">>> unrecognized dof_id size: $dof_bytes - configuring size...4" >&6; }
-
-printf "%s\n" "#define DOF_ID_BYTES 4" >>confdefs.h
-
-          dof_bytes=4
-          dof_bytes_setting="implicit"
-         ;;
-esac
-
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: configuring size of dof_id... $dof_bytes" >&5
-printf "%s\n" "configuring size of dof_id... $dof_bytes" >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: requested size of dof_id... $dof_bytes" >&5
+printf "%s\n" "requested size of dof_id... $dof_bytes" >&6; }
 # -------------------------------------------------------------
 
 
@@ -51745,7 +51719,7 @@ fi
 
 # -------------------------------------------------------------
 # Check for inconsistencies between PETSc and libmesh's scalar
-# and index datatypes.
+# and index datatypes, and override $dof_bytes if reasonable.
 # -------------------------------------------------------------
 if test $enablepetsc != no
 then :
@@ -51761,9 +51735,6 @@ printf "%s\n" ">>> adopting PETSc dof_id size: 8" >&6; }
 fi
                dof_bytes=8
                dof_bytes_setting="explicit"
-
-printf "%s\n" "#define DOF_ID_BYTES 8" >>confdefs.h
-
 
 fi
         if test $petsc_use_64bit_indices -gt 0 && test "$dof_bytes" != "8"
@@ -59995,6 +59966,36 @@ fi
 
 
 
+
+# --------------------------------------------------------------
+# With both configure-requested (LIBMESH_CORE_FEATURES) and
+# PETSc-provided DOF_ID_BYTES information, we can finally set that
+# value with no risk we'll have to redefine it later - any
+# redefinition via AC_DEFINE breaks configure tests with e.g.
+# g++ and user-specified CXXFLAGS=-Werror
+# --------------------------------------------------------------
+case "$dof_bytes" in #(
+  1) :
+
+printf "%s\n" "#define DOF_ID_BYTES 1" >>confdefs.h
+ ;; #(
+  2) :
+
+printf "%s\n" "#define DOF_ID_BYTES 2" >>confdefs.h
+ ;; #(
+  4) :
+
+printf "%s\n" "#define DOF_ID_BYTES 4" >>confdefs.h
+ ;; #(
+  8) :
+
+printf "%s\n" "#define DOF_ID_BYTES 8" >>confdefs.h
+ ;; #(
+  *) :
+
+          as_fn_error $? ">>> unrecognized dof_id size: $dof_bytes - only 1,2,4,8 are supported" "$LINENO" 5
+         ;;
+esac
 
 # Query configuration environment
 

@@ -368,6 +368,22 @@ AX_SUBDIRS_CONFIGURE([contrib/timpi])
 LIBMESH_CONFIGURE_OPTIONAL_PACKAGES
 
 
+# --------------------------------------------------------------
+# With both configure-requested (LIBMESH_CORE_FEATURES) and
+# PETSc-provided DOF_ID_BYTES information, we can finally set that
+# value with no risk we'll have to redefine it later - any
+# redefinition via AC_DEFINE breaks configure tests with e.g.
+# g++ and user-specified CXXFLAGS=-Werror
+# --------------------------------------------------------------
+AS_CASE("$dof_bytes",
+        [1], [AC_DEFINE(DOF_ID_BYTES, 1, [size of dof_id])],
+        [2], [AC_DEFINE(DOF_ID_BYTES, 2, [size of dof_id])],
+        [4], [AC_DEFINE(DOF_ID_BYTES, 4, [size of dof_id])],
+        [8], [AC_DEFINE(DOF_ID_BYTES, 8, [size of dof_id])],
+        [
+          AC_MSG_ERROR([>>> unrecognized dof_id size: $dof_bytes - only 1,2,4,8 are supported])
+        ])
+
 # Query configuration environment
 ACSM_SUMMARIZE_ENV
 

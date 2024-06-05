@@ -1349,6 +1349,7 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
     ]], [[
       std::cout << std::is_void<char>::value
         // << std::is_null_pointer<char>::value                  // C++14
+        // << std::is_literal_type<char>::value                  // C++17
                 << std::is_integral<char>::value
                 << std::is_floating_point<char>::value
                 << std::is_array<char>::value
@@ -1373,7 +1374,6 @@ AC_DEFUN([LIBMESH_TEST_CXX11_TYPE_TRAITS],
                 << std::is_trivially_copyable<char>::value // Not supported by GCC 4.6.3 with -std=c++0x
                 << std::is_standard_layout<char>::value
                 << std::is_pod<char>::value
-                << std::is_literal_type<char>::value
                 << std::is_empty<char>::value
                 << std::is_polymorphic<char>::value
                 << std::is_abstract<char>::value
