@@ -899,7 +899,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
   void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
-  LIBMESH_CHKERR(ierr);
+  CHKERRQ(ierr);
 
   // Get user shell matrix object.
   const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
@@ -921,7 +921,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
   void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
-  LIBMESH_CHKERR(ierr);
+  CHKERRQ(ierr);
 
   // Get user shell matrix object.
   const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);

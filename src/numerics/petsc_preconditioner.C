@@ -114,7 +114,8 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
   // get the communicator from the PETSc object
   Parallel::communicator comm;
   ierr = PetscObjectGetComm((PetscObject)pc, & comm);
-  LIBMESH_CHKERR(ierr);
+  if (ierr != static_cast<PetscErrorCode>(0))
+    libmesh_error_msg("Error retrieving communicator");
   Parallel::Communicator communicator(comm);
 
   switch (preconditioner_type)
@@ -259,7 +260,8 @@ void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type,
   // get the communicator from the PETSc object
   Parallel::communicator comm;
   ierr = PetscObjectGetComm((PetscObject)pc, & comm);
-  LIBMESH_CHKERR(ierr);
+  if (ierr != static_cast<PetscErrorCode>(0))
+    libmesh_error_msg("Error retrieving communicator");
   Parallel::Communicator communicator(comm);
 
   // All docs say must call KSPSetUp or PCSetUp before calling PCBJacobiGetSubKSP.
