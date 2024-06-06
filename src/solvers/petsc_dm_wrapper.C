@@ -61,6 +61,8 @@ namespace libMesh
     PetscErrorCode libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, const PetscInt fields[], IS *is, DM *subdm)
 #endif
     {
+      PetscFunctionBegin;
+
       PetscErrorCode ierr;
       // Basically, we copy the PETSc ShellCreateSubDM implementation,
       // but also need to set the embedding dim and also propagate
@@ -200,6 +202,8 @@ namespace libMesh
     //! Help PETSc identify the finer DM given a dmc
     PetscErrorCode libmesh_petsc_DMRefine(DM dmc, MPI_Comm /*comm*/, DM * dmf)
     {
+      PetscFunctionBegin;
+
       libmesh_assert(dmc);
       libmesh_assert(dmf);
 
@@ -222,6 +226,8 @@ namespace libMesh
     //! Help PETSc identify the coarser DM dmc given the fine DM dmf
     PetscErrorCode libmesh_petsc_DMCoarsen(DM dmf, MPI_Comm /*comm*/, DM * dmc)
     {
+      PetscFunctionBegin;
+
       libmesh_assert(dmc);
       libmesh_assert(dmf);
 
@@ -312,6 +318,8 @@ namespace libMesh
     libmesh_petsc_DMCreateInterpolation (DM dmc /*coarse*/, DM dmf /*fine*/,
                                          Mat * mat ,Vec * vec)
     {
+      PetscFunctionBegin;
+
       libmesh_assert(dmc);
       libmesh_assert(dmf);
       libmesh_assert(mat);
@@ -402,6 +410,8 @@ namespace libMesh
     PetscErrorCode
     libmesh_petsc_DMCreateRestriction (DM dmc /*coarse*/, DM dmf/*fine*/, Mat * mat)
     {
+      PetscFunctionBegin;
+
       libmesh_assert(dmc);
       libmesh_assert(dmf);
       libmesh_assert(mat);

@@ -46,6 +46,8 @@ extern "C"
                                        PetscReal fnorm,
                                        void * ctx)
   {
+    PetscFunctionBegin;
+
     PetscDiffSolver & solver =
       *(static_cast<PetscDiffSolver *> (ctx));
 
@@ -87,6 +89,8 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void * ctx)
   {
+    PetscFunctionBegin;
+
     libmesh_assert(x);
     libmesh_assert(r);
     libmesh_assert(ctx);
@@ -138,6 +142,8 @@ extern "C"
                                         Mat pc,
                                         void * ctx)
   {
+    PetscFunctionBegin;
+
     libmesh_assert(x);
     libmesh_assert(j);
     //  libmesh_assert_equal_to (pc, j);  // We don't use separate preconditioners yet
