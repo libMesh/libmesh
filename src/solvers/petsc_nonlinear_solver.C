@@ -136,7 +136,7 @@ extern "C"
       ierr = SNESSetLagPreconditioner(snes, -2);
       LIBMESH_CHKERR2(solver->comm(),ierr);
     }
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //-------------------------------------------------------------------
@@ -153,7 +153,7 @@ extern "C"
                  << ", |residual|_2 = " << fnorm
                  << std::endl;
 
-    //return ierr;
+    //PetscFunctionReturn(ierr);
     PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
@@ -495,7 +495,7 @@ extern "C"
       if (pc && pc != sys_mat.mat())
         PC.close();
 
-      return ierr;
+      PetscFunctionReturn(ierr);
     }
 
     // Set the dof maps
@@ -539,7 +539,7 @@ extern "C"
 
     Jac.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   // This function gets called by PETSc in place of the standard Petsc line searches
@@ -608,7 +608,7 @@ extern "C"
     NonlinearImplicitSystem & sys = solver->system();
 
     if (!solver->postcheck && !solver->postcheck_object)
-      return ierr;
+      PetscFunctionReturn(ierr);
 
     // We definitely need to wrap at least "w"
     PetscVector<Number> petsc_w(w, sys.comm());
@@ -648,7 +648,7 @@ extern "C"
     if (changed_new_soln)
       *changed_w = PETSC_TRUE;
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -680,7 +680,7 @@ extern "C"
     // It's possible that we don't need to do anything at all, in
     // that case return early...
     if (!solver->precheck_object)
-      return ierr;
+      PetscFunctionReturn(ierr);
 
     // The user sets these flags in his/her postcheck function to
     // indicate whether they changed something.
@@ -715,7 +715,7 @@ extern "C"
     if (petsc_changed)
       *changed = PETSC_TRUE;
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 } // end extern "C"
 

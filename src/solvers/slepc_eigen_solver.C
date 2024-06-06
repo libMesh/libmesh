@@ -911,7 +911,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   // Call the user function.
   shell_matrix.vector_mult(dest_global,arg_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 template <typename T>
@@ -932,7 +932,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   // Call the user function.
   shell_matrix.get_diagonal(dest_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 //------------------------------------------------------------------

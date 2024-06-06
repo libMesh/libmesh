@@ -87,7 +87,7 @@ extern "C"
     else
       libmesh_error_msg("Objective function not defined in __libmesh_tao_objective");
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
 
@@ -140,7 +140,7 @@ extern "C"
 
     gradient.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //---------------------------------------------------------------
@@ -196,7 +196,7 @@ extern "C"
     PC.close();
     hessian.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
 
@@ -248,7 +248,7 @@ extern "C"
 
     eq_constraints.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //---------------------------------------------------------------
@@ -298,7 +298,7 @@ extern "C"
     J_petsc.close();
     Jpre_petsc.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //---------------------------------------------------------------
@@ -349,7 +349,7 @@ extern "C"
 
     ineq_constraints.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //---------------------------------------------------------------
@@ -399,7 +399,7 @@ extern "C"
     J_petsc.close();
     Jpre_petsc.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
 } // end extern "C"

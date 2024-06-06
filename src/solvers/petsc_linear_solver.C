@@ -994,7 +994,7 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, 
   // Call the user function.
   shell_matrix.vector_mult(dest_global,arg_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 
@@ -1024,7 +1024,7 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec a
   // Call the user function.
   shell_matrix.vector_mult_add(dest_global,arg_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 
@@ -1047,7 +1047,7 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, V
   // Call the user function.
   shell_matrix.get_diagonal(dest_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 
