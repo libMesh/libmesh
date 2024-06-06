@@ -56,7 +56,7 @@ extern "C"
 
     preconditioner->setup();
 
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
   PetscErrorCode libmesh_petsc_preconditioner_apply(PC pc, Vec x, Vec y)
@@ -70,7 +70,7 @@ extern "C"
 
     preconditioner->apply(x_vec,y_vec);
 
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED

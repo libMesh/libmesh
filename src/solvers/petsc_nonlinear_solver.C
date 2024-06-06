@@ -154,7 +154,7 @@ extern "C"
                  << std::endl;
 
     //return ierr;
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -429,7 +429,7 @@ extern "C"
 #endif
 #endif
 
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -557,7 +557,7 @@ extern "C"
     libmesh_parallel_only(solver->comm());
 
     solver->linesearch_object->linesearch(linesearch);
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED

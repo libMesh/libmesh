@@ -79,7 +79,7 @@ extern "C"
                                         u, u.l2_norm(),
                                         res, res.l2_norm(), its);
     }
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
   // Functions to hand to PETSc's SNES,
@@ -127,7 +127,7 @@ extern "C"
     R_input.swap(R_system);
 
     // No errors, we hope
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 
@@ -181,7 +181,7 @@ extern "C"
     J_input.swap(J_system);
 
     // No errors, we hope
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 } // extern "C"
