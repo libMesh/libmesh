@@ -26,7 +26,7 @@
 
 // PETSc includes
 #ifdef I
-# define LIBMESH_SAW_I
+#define LIBMESH_SAW_I
 #endif
 
 #include <petscksp.h>
@@ -40,32 +40,113 @@
 #include <petscsf.h>
 // PetscSection got its own header file in 3.12, prior to that it was
 // defined in petscis.h
-#if !PETSC_VERSION_LESS_THAN(3,12,0)
+#if !PETSC_VERSION_LESS_THAN(3, 12, 0)
 #include <petscsection.h>
 #endif
 
 #ifndef LIBMESH_SAW_I
-# undef I // Avoid complex.h contamination
+#undef I // Avoid complex.h contamination
 #endif
 
 namespace libMesh
 {
-
 // Specializations of the destroy() method for different PETSc classes
 // This could also be macro-ized, but maybe it's not necessary?
-template <> void WrappedPetsc<Vec>::destroy() { auto ierr = VecDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<KSP>::destroy() { auto ierr = KSPDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<IS>::destroy() { auto ierr = ISDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<Mat>::destroy() { auto ierr = MatDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<VecScatter>::destroy() { auto ierr = VecScatterDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<PetscViewer>::destroy() { auto ierr = PetscViewerDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<MatNullSpace>::destroy() { auto ierr = MatNullSpaceDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<DM>::destroy() { auto ierr = DMDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<MatPartitioning>::destroy() { auto ierr = MatPartitioningDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<SNES>::destroy() { auto ierr = SNESDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<PC>::destroy() { auto ierr = PCDestroy(&obj); LIBMESH_CHKERR(ierr); }
-template <> void WrappedPetsc<PetscSection>::destroy() { auto ierr = PetscSectionDestroy(&obj); LIBMESH_CHKERR(ierr); }
+template <>
+void
+WrappedPetsc<Vec>::destroy()
+{
+  auto ierr = VecDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
 
+template <>
+void
+WrappedPetsc<KSP>::destroy()
+{
+  auto ierr = KSPDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<IS>::destroy()
+{
+  auto ierr = ISDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<Mat>::destroy()
+{
+  auto ierr = MatDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<VecScatter>::destroy()
+{
+  auto ierr = VecScatterDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<PetscViewer>::destroy()
+{
+  auto ierr = PetscViewerDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<MatNullSpace>::destroy()
+{
+  auto ierr = MatNullSpaceDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<DM>::destroy()
+{
+  auto ierr = DMDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<MatPartitioning>::destroy()
+{
+  auto ierr = MatPartitioningDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<SNES>::destroy()
+{
+  auto ierr = SNESDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<PC>::destroy()
+{
+  auto ierr = PCDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
+
+template <>
+void
+WrappedPetsc<PetscSection>::destroy()
+{
+  auto ierr = PetscSectionDestroy(&obj);
+  CHKERRABORT(PETSC_COMM_SELF, ierr);
+}
 }
 
 #endif // LIBMESH_HAVE_PETSC

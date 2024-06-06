@@ -23,6 +23,7 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 #include "libmesh/libmesh_exceptions.h"
+#include "timpi/communicator.h"
 
 #ifdef I
 # define LIBMESH_SAW_I
@@ -38,12 +39,6 @@
 
 namespace libMesh
 {
-
-// Forward declarations
-namespace Parallel
-{
-class Communicator;
-}
 
 // The SolverException class is only defined when exceptions are enabled.
 #ifdef LIBMESH_ENABLE_EXCEPTIONS

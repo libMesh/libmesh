@@ -1075,7 +1075,7 @@ PetscLinearSolver<T>::restrict_solve_to_is_local_size() const
   libmesh_assert(_restrict_solve_to_is);
 
   PetscInt s;
-  int ierr = ISGetLocalSize(_restrict_solve_to_is, &s);
+  auto ierr = ISGetLocalSize(_restrict_solve_to_is, &s);
   LIBMESH_CHKERR(ierr);
 
   return s;
