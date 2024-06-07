@@ -38,7 +38,7 @@ noinst_PROGRAMS = # none, append below
 # parsed_function.h
 includedir = $(prefix)/include/libmesh
 
-include_HEADERS = fparser.hh fparser_ad.hh
+include_HEADERS = fparser.hh fparser_ad.hh fpconfig.hh
 
 
 EXTRA_DIST += util/bytecoderules.dat util/bytecoderules_header.txt

@@ -1106,7 +1106,7 @@ CLEANFILES = fpoptimizer/grammar_data.cc $(am__append_7)
 # in case they weren't conditionally cleaned:
 # DISTCLEANFILES += util/cpp_compress
 DISTCLEANFILES = util/bytecoderules_parser util/tree_grammar_parser
-include_HEADERS = fparser.hh fparser_ad.hh
+include_HEADERS = fparser.hh fparser_ad.hh fpconfig.hh
 FPOPTIMIZER_CC_FILES = \
 	    lib/crc32.hh \
 	    lib/autoptr.hh \

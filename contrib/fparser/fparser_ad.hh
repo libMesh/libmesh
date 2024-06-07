@@ -185,7 +185,7 @@ protected:
   // function ID for the erf function
   unsigned int mFErf;
 
-  // flags that control cache bahavior, optimization, and error reporting
+  // flags that control cache behavior, optimization, and error reporting
   int mADFlags;
 
   // registered derivative table, and entry structure
@@ -194,7 +194,7 @@ protected:
   };
   std::vector<VariableDerivative> mRegisteredDerivatives;
 
-  // private implementaion of the automatic differentiation algorithm
+  // private implementation of the automatic differentiation algorithm
   ADImplementation<Value_t> * ad;
 
   // the firewalled implementation class of the AD algorithm has full access to the FParser object

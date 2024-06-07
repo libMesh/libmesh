@@ -15,3 +15,10 @@ fp_opcode_add.inc: $(srcdir)/fp_opcode_add.inc.release
 	$(AM_V_GEN)$(LN_S) -f $< $@
 
 endif
+
+# We need to install some additional headers to permit
+# developers to derive from FParser to implement evaluation
+# on custom types.
+includedir = $(prefix)/include/libmesh/extrasrc
+
+include_HEADERS = fptypes.hh
