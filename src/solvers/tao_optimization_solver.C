@@ -49,6 +49,8 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_objective (Tao /*tao*/, Vec x, PetscReal * objective, void * ctx)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("objective()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -87,7 +89,7 @@ extern "C"
     else
       libmesh_error_msg("Objective function not defined in __libmesh_tao_objective");
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
 
@@ -97,6 +99,8 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_gradient(Tao /*tao*/, Vec x, Vec g, void * ctx)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("gradient()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -140,7 +144,7 @@ extern "C"
 
     gradient.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //---------------------------------------------------------------
@@ -148,6 +152,8 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_hessian(Tao /*tao*/, Vec x, Mat h, Mat pc, void * ctx)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("hessian()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -196,7 +202,7 @@ extern "C"
     PC.close();
     hessian.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
 
@@ -205,6 +211,8 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_equality_constraints(Tao /*tao*/, Vec x, Vec ce, void * ctx)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("equality_constraints()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -248,7 +256,7 @@ extern "C"
 
     eq_constraints.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //---------------------------------------------------------------
@@ -257,6 +265,8 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_equality_constraints_jacobian(Tao /*tao*/, Vec x, Mat J, Mat Jpre, void * ctx)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("equality_constraints_jacobian()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -298,7 +308,7 @@ extern "C"
     J_petsc.close();
     Jpre_petsc.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //---------------------------------------------------------------
@@ -306,6 +316,8 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_inequality_constraints(Tao /*tao*/, Vec x, Vec cineq, void * ctx)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("inequality_constraints()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -349,7 +361,7 @@ extern "C"
 
     ineq_constraints.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //---------------------------------------------------------------
@@ -358,6 +370,8 @@ extern "C"
   PetscErrorCode
   __libmesh_tao_inequality_constraints_jacobian(Tao /*tao*/, Vec x, Mat J, Mat Jpre, void * ctx)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("inequality_constraints_jacobian()", "TaoOptimizationSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -399,7 +413,7 @@ extern "C"
     J_petsc.close();
     Jpre_petsc.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
 } // end extern "C"

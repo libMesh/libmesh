@@ -46,6 +46,8 @@ extern "C"
                                        PetscReal fnorm,
                                        void * ctx)
   {
+    PetscFunctionBegin;
+
     PetscDiffSolver & solver =
       *(static_cast<PetscDiffSolver *> (ctx));
 
@@ -79,7 +81,7 @@ extern "C"
                                         u, u.l2_norm(),
                                         res, res.l2_norm(), its);
     }
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
   // Functions to hand to PETSc's SNES,
@@ -87,6 +89,8 @@ extern "C"
   PetscErrorCode
   __libmesh_petsc_diff_solver_residual (SNES, Vec x, Vec r, void * ctx)
   {
+    PetscFunctionBegin;
+
     libmesh_assert(x);
     libmesh_assert(r);
     libmesh_assert(ctx);
@@ -127,7 +131,7 @@ extern "C"
     R_input.swap(R_system);
 
     // No errors, we hope
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 
@@ -138,6 +142,8 @@ extern "C"
                                         Mat pc,
                                         void * ctx)
   {
+    PetscFunctionBegin;
+
     libmesh_assert(x);
     libmesh_assert(j);
     //  libmesh_assert_equal_to (pc, j);  // We don't use separate preconditioners yet
@@ -181,7 +187,7 @@ extern "C"
     J_input.swap(J_system);
 
     // No errors, we hope
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 } // extern "C"

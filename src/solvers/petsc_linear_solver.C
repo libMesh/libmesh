@@ -47,6 +47,8 @@ extern "C"
 {
   PetscErrorCode libmesh_petsc_preconditioner_setup (PC pc)
   {
+    PetscFunctionBegin;
+
     void * ctx;
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
@@ -56,11 +58,13 @@ extern "C"
 
     preconditioner->setup();
 
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
   PetscErrorCode libmesh_petsc_preconditioner_apply(PC pc, Vec x, Vec y)
   {
+    PetscFunctionBegin;
+
     void * ctx;
     PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
@@ -70,20 +74,22 @@ extern "C"
 
     preconditioner->apply(x_vec,y_vec);
 
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
   PetscErrorCode __libmesh_petsc_preconditioner_setup (PC pc)
   {
+    PetscFunctionBegin;
     libmesh_deprecated();
-    return libmesh_petsc_preconditioner_setup(pc);
+    PetscFunctionReturn(libmesh_petsc_preconditioner_setup(pc));
   }
 
   PetscErrorCode __libmesh_petsc_preconditioner_apply(PC pc, Vec x, Vec y)
   {
+    PetscFunctionBegin;
     libmesh_deprecated();
-    return libmesh_petsc_preconditioner_apply(pc, x, y);
+    PetscFunctionReturn(libmesh_petsc_preconditioner_apply(pc, x, y));
   }
 #endif
 } // end extern "C"
@@ -978,6 +984,8 @@ LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason() const
 template <typename T>
 PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest)
 {
+  PetscFunctionBegin;
+
   // Get the matrix context.
   PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
   void * ctx;
@@ -994,7 +1002,7 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, 
   // Call the user function.
   shell_matrix.vector_mult(dest_global,arg_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 
@@ -1002,6 +1010,8 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, 
 template <typename T>
 PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec arg, Vec add, Vec dest)
 {
+  PetscFunctionBegin;
+
   // Get the matrix context.
   PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
   void * ctx;
@@ -1024,7 +1034,7 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec a
   // Call the user function.
   shell_matrix.vector_mult_add(dest_global,arg_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 
@@ -1032,6 +1042,8 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec a
 template <typename T>
 PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Vec dest)
 {
+  PetscFunctionBegin;
+
   // Get the matrix context.
   PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
   void * ctx;
@@ -1047,7 +1059,7 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, V
   // Call the user function.
   shell_matrix.get_diagonal(dest_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 

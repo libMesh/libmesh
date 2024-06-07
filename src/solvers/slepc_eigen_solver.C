@@ -895,6 +895,8 @@ void SlepcEigenSolver<T>::set_initial_space(NumericVector<T> & initial_space_in)
 template <typename T>
 PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, Vec dest)
 {
+  PetscFunctionBegin;
+
   // Get the matrix context.
   PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
   void * ctx;
@@ -911,12 +913,14 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   // Call the user function.
   shell_matrix.vector_mult(dest_global,arg_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 template <typename T>
 PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Vec dest)
 {
+  PetscFunctionBegin;
+
   // Get the matrix context.
   PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
   void * ctx;
@@ -932,7 +936,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   // Call the user function.
   shell_matrix.get_diagonal(dest_global);
 
-  return ierr;
+  PetscFunctionReturn(ierr);
 }
 
 //------------------------------------------------------------------

@@ -61,6 +61,8 @@ namespace libMesh
     PetscErrorCode libmesh_petsc_DMCreateSubDM(DM dm, PetscInt numFields, const PetscInt fields[], IS *is, DM *subdm)
 #endif
     {
+      PetscFunctionBegin;
+
       PetscErrorCode ierr;
       // Basically, we copy the PETSc ShellCreateSubDM implementation,
       // but also need to set the embedding dim and also propagate
@@ -194,12 +196,14 @@ namespace libMesh
           CHKERRQ(ierr);
         }
 
-      return static_cast<PetscErrorCode>(0);
+      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
     }
 
     //! Help PETSc identify the finer DM given a dmc
     PetscErrorCode libmesh_petsc_DMRefine(DM dmc, MPI_Comm /*comm*/, DM * dmf)
     {
+      PetscFunctionBegin;
+
       libmesh_assert(dmc);
       libmesh_assert(dmf);
 
@@ -216,12 +220,14 @@ namespace libMesh
       libmesh_assert(*(p_ctx->finer_dm));
       *(dmf) = *(p_ctx->finer_dm);
 
-      return static_cast<PetscErrorCode>(0);
+      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
     }
 
     //! Help PETSc identify the coarser DM dmc given the fine DM dmf
     PetscErrorCode libmesh_petsc_DMCoarsen(DM dmf, MPI_Comm /*comm*/, DM * dmc)
     {
+      PetscFunctionBegin;
+
       libmesh_assert(dmc);
       libmesh_assert(dmf);
 
@@ -304,7 +310,7 @@ namespace libMesh
         *(dmc) = *(p_ctx_f->coarser_dm);
       }
 
-      return static_cast<PetscErrorCode>(0);
+      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
     }
 
     //! Function to give PETSc that sets the Interpolation Matrix between two DMs
@@ -312,6 +318,8 @@ namespace libMesh
     libmesh_petsc_DMCreateInterpolation (DM dmc /*coarse*/, DM dmf /*fine*/,
                                          Mat * mat ,Vec * vec)
     {
+      PetscFunctionBegin;
+
       libmesh_assert(dmc);
       libmesh_assert(dmf);
       libmesh_assert(mat);
@@ -395,13 +403,15 @@ namespace libMesh
       // Vec scaling isnt needed so were done.
       *(vec) = LIBMESH_PETSC_NULLPTR;
 
-      return static_cast<PetscErrorCode>(0);
+      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
     } // end libmesh_petsc_DMCreateInterpolation
 
     //! Function to give PETSc that sets the Restriction Matrix between two DMs
     PetscErrorCode
     libmesh_petsc_DMCreateRestriction (DM dmc /*coarse*/, DM dmf/*fine*/, Mat * mat)
     {
+      PetscFunctionBegin;
+
       libmesh_assert(dmc);
       libmesh_assert(dmf);
       libmesh_assert(mat);
@@ -423,7 +433,7 @@ namespace libMesh
       libmesh_assert(p_ctx_f->K_restrict_ptr);
       *(mat) = p_ctx_f->K_restrict_ptr->mat();
 
-      return static_cast<PetscErrorCode>(0);
+      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
     }
 
   } // end extern C functions

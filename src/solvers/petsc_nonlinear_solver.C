@@ -115,6 +115,8 @@ extern "C"
   PetscErrorCode
   libmesh_petsc_recalculate_monitor(SNES snes, PetscInt, PetscReal, void* ctx)
   {
+    PetscFunctionBegin;
+
     // No way to safety-check this cast, since we got a void *...
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
@@ -136,7 +138,7 @@ extern "C"
       ierr = SNESSetLagPreconditioner(snes, -2);
       LIBMESH_CHKERR2(solver->comm(),ierr);
     }
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   //-------------------------------------------------------------------
@@ -144,25 +146,22 @@ extern "C"
   PetscErrorCode
   libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *)
   {
-    //PetscErrorCode ierr=0;
-
-    //if (its > 0)
+    PetscFunctionBegin;
     libMesh::out << "  NL step "
                  << std::setw(2) << its
                  << std::scientific
                  << ", |residual|_2 = " << fnorm
                  << std::endl;
-
-    //return ierr;
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
   PetscErrorCode
   __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *)
   {
+    PetscFunctionBegin;
     libmesh_deprecated();
-    return libmesh_petsc_snes_monitor(nullptr, its, fnorm, nullptr);
+    PetscFunctionReturn(libmesh_petsc_snes_monitor(nullptr, its, fnorm, nullptr));
   }
 #endif
 
@@ -172,6 +171,8 @@ extern "C"
   PetscErrorCode
   libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
+    PetscFunctionBegin;
+
     ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
 
     libmesh_parallel_only(rc.sys.comm());
@@ -238,15 +239,16 @@ extern "C"
         R.close();
       }
 
-    return rc.ierr;
+    PetscFunctionReturn(rc.ierr);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
   PetscErrorCode
   __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
+    PetscFunctionBegin;
     libmesh_deprecated();
-    return libmesh_petsc_snes_residual(snes, x, r, ctx);
+    PetscFunctionReturn(libmesh_petsc_snes_residual(snes, x, r, ctx));
   }
 #endif
 
@@ -255,6 +257,8 @@ extern "C"
   PetscErrorCode
   libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
+    PetscFunctionBegin;
+
     ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
 
     libmesh_parallel_only(rc.sys.comm());
@@ -290,15 +294,16 @@ extern "C"
         R.close();
       }
 
-    return rc.ierr;
+    PetscFunctionReturn(rc.ierr);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
   PetscErrorCode
   __libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
+    PetscFunctionBegin;
     libmesh_deprecated();
-    return libmesh_petsc_snes_fd_residual(snes, x, r, ctx);
+    PetscFunctionReturn(libmesh_petsc_snes_fd_residual(snes, x, r, ctx));
   }
 #endif
 
@@ -308,6 +313,8 @@ extern "C"
   PetscErrorCode
   libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx)
   {
+    PetscFunctionBegin;
+
     ResidualContext rc = libmesh_petsc_snes_residual_helper(snes, x, ctx);
 
     libmesh_parallel_only(rc.sys.comm());
@@ -344,7 +351,7 @@ extern "C"
         R.close();
       }
 
-    return rc.ierr;
+    PetscFunctionReturn(rc.ierr);
   }
 
   //----------------------------------------------------------
@@ -429,15 +436,16 @@ extern "C"
 #endif
 #endif
 
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
   PetscErrorCode
   __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r)
   {
+    PetscFunctionBegin;
     libmesh_deprecated();
-    return libmesh_petsc_snes_mffd_interface(ctx, x, r);
+    PetscFunctionReturn(libmesh_petsc_snes_mffd_interface(ctx, x, r));
   }
 #endif
 
@@ -446,6 +454,8 @@ extern "C"
   PetscErrorCode
   libmesh_petsc_snes_jacobian(SNES snes, Vec x, Mat jac, Mat pc, void * ctx)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("jacobian()", "PetscNonlinearSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -495,7 +505,7 @@ extern "C"
       if (pc && pc != sys_mat.mat())
         PC.close();
 
-      return ierr;
+      PetscFunctionReturn(ierr);
     }
 
     // Set the dof maps
@@ -539,7 +549,7 @@ extern "C"
 
     Jac.close();
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
   // This function gets called by PETSc in place of the standard Petsc line searches
@@ -550,6 +560,8 @@ extern "C"
   // * "ctx" is the PetscNonlinearSolver context
   PetscErrorCode libmesh_petsc_linesearch_shellfunc (SNESLineSearch linesearch, void * ctx)
   {
+    PetscFunctionBegin;
+
     // No way to safety-check this cast, since we got a void *...
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
@@ -557,15 +569,16 @@ extern "C"
     libmesh_parallel_only(solver->comm());
 
     solver->linesearch_object->linesearch(linesearch);
-    return static_cast<PetscErrorCode>(0);
+    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
   PetscErrorCode
   __libmesh_petsc_snes_jacobian(SNES snes, Vec x, Mat jac, Mat pc, void * ctx)
   {
+    PetscFunctionBegin;
     libmesh_deprecated();
-    return libmesh_petsc_snes_jacobian(snes, x, jac, pc, ctx);
+    PetscFunctionReturn(libmesh_petsc_snes_jacobian(snes, x, jac, pc, ctx));
   }
 #endif
 
@@ -581,6 +594,8 @@ extern "C"
   // direction or solution vector was changed, respectively.
   PetscErrorCode libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("postcheck()", "PetscNonlinearSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -608,7 +623,7 @@ extern "C"
     NonlinearImplicitSystem & sys = solver->system();
 
     if (!solver->postcheck && !solver->postcheck_object)
-      return ierr;
+      PetscFunctionReturn(ierr);
 
     // We definitely need to wrap at least "w"
     PetscVector<Number> petsc_w(w, sys.comm());
@@ -648,19 +663,22 @@ extern "C"
     if (changed_new_soln)
       *changed_w = PETSC_TRUE;
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
   PetscErrorCode __libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context)
   {
+    PetscFunctionBegin;
     libmesh_deprecated();
-    return libmesh_petsc_snes_postcheck(nullptr, x, y, w, changed_y, changed_w, context);
+    PetscFunctionReturn(libmesh_petsc_snes_postcheck(nullptr, x, y, w, changed_y, changed_w, context));
   }
 #endif
 
   PetscErrorCode libmesh_petsc_snes_precheck(SNESLineSearch, Vec X, Vec Y, PetscBool * changed, void * context)
   {
+    PetscFunctionBegin;
+
     LOG_SCOPE("precheck()", "PetscNonlinearSolver");
 
     PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
@@ -680,7 +698,7 @@ extern "C"
     // It's possible that we don't need to do anything at all, in
     // that case return early...
     if (!solver->precheck_object)
-      return ierr;
+      PetscFunctionReturn(ierr);
 
     // The user sets these flags in his/her postcheck function to
     // indicate whether they changed something.
@@ -715,7 +733,7 @@ extern "C"
     if (petsc_changed)
       *changed = PETSC_TRUE;
 
-    return ierr;
+    PetscFunctionReturn(ierr);
   }
 } // end extern "C"
 
