@@ -36,7 +36,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/node.h"
 #include "libmesh/getpot.h"
-#include "meshless_interpolation_function.h"
+#include "libmesh/meshless_interpolation_function.h"
 
 // C++ includes
 #include <cstdlib>
