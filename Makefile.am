@@ -386,6 +386,26 @@ amr_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 amr_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 amr_dbg_LDADD    = libmesh_dbg.la
 
+# matrixconvert
+opt_programs           += matrixconvert-opt
+matrixconvert_opt_SOURCES    = src/apps/matrixconvert.C
+matrixconvert_opt_CPPFLAGS   = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+matrixconvert_opt_CXXFLAGS   = $(CXXFLAGS_OPT)
+matrixconvert_opt_LDADD      = libmesh_opt.la
+
+devel_programs         += matrixconvert-devel
+matrixconvert_devel_SOURCES  = src/apps/matrixconvert.C
+matrixconvert_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+matrixconvert_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+matrixconvert_devel_LDADD    = libmesh_devel.la
+
+dbg_programs           += matrixconvert-dbg
+matrixconvert_dbg_SOURCES    = src/apps/matrixconvert.C
+matrixconvert_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+matrixconvert_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
+matrixconvert_dbg_LDADD      = libmesh_dbg.la
+
+
 # meshtool
 opt_programs           += meshtool-opt
 meshtool_opt_SOURCES    = src/apps/meshtool.C
