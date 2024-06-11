@@ -23,8 +23,6 @@
 // demonstrated in this example.
 
 // Example include files
-#include "libmesh/equation_systems.h"
-#include "libmesh/getpot.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_refinement.h"
