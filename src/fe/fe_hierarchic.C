@@ -117,8 +117,6 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
     case QUAD9:
       return ((o+1)*(o+1));
     case HEX8:
-      libmesh_assert_less (o, 2);
-      libmesh_fallthrough();
     case HEX20:
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
