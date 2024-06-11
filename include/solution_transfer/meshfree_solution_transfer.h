@@ -15,11 +15,10 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-
 #ifndef MESHFREESOLUTIONTRANSFER_H
 #define MESHFREESOLUTIONTRANSFER_H
 
+#include "libmesh/meshless_interpolation_function.h"
 #include "libmesh/solution_transfer.h"
 
 #include <string>

@@ -29,12 +29,12 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/meshfree_interpolation.h"
+#include "libmesh/meshless_interpolation_function.h"
 #include "libmesh/node.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/radial_basis_interpolation.h"
 #include "libmesh/tecplot_io.h"
 #include "libmesh/threads.h"
-#include "meshless_interpolation_function.h"
 
 // C++ includes
 #include <cstdlib>

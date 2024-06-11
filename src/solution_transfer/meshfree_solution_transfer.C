@@ -15,17 +15,15 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-
 #include "libmesh/meshfree_solution_transfer.h"
 
-#include "libmesh/mesh.h"
-#include "libmesh/system.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/threads.h"
-#include "libmesh/meshfree_interpolation.h"
 #include "libmesh/function_base.h"
+#include "libmesh/mesh.h"
+#include "libmesh/meshfree_interpolation.h"
 #include "libmesh/node.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/system.h"
+#include "libmesh/threads.h"
 
 // C++ includes
 #include <cstddef>
@@ -34,75 +32,10 @@ namespace libMesh
 {
 
 // Forward Declarations
-template <typename T>
-class DenseVector;
+template <typename T> class DenseVector;
 
-// Helper function for doing the projection
-class MeshlessInterpolationFunction : public FunctionBase<Number>
-{
-public:
-  MeshlessInterpolationFunction (const MeshfreeInterpolation & mfi,
-                                 Threads::spin_mutex & mutex) :
-    _mfi(mfi),
-    _mutex(mutex)
-  {}
-
-  /**
-   * The move/copy ctor and destructor are defaulted for this class.
-   */
-  MeshlessInterpolationFunction (MeshlessInterpolationFunction &&) = default;
-  MeshlessInterpolationFunction (const MeshlessInterpolationFunction &) = default;
-  virtual ~MeshlessInterpolationFunction () = default;
-
-  /**
-   * This class contains const references so it can't be assigned.
-   */
-  MeshlessInterpolationFunction & operator= (const MeshlessInterpolationFunction &) = delete;
-  MeshlessInterpolationFunction & operator= (MeshlessInterpolationFunction &&) = delete;
-
-  void init () {}
-  void clear () {}
-
-  virtual std::unique_ptr<FunctionBase<Number>> clone () const
-  {
-    return std::make_unique<MeshlessInterpolationFunction>(_mfi, _mutex);
-  }
-
-  Number operator() (const Point & p,
-                     const Real /*time*/)
-  {
-    _pts.clear();
-    _pts.push_back(p);
-    _vals.resize(1);
-
-    Threads::spin_mutex::scoped_lock lock(_mutex);
-
-    _mfi.interpolate_field_data(_mfi.field_variables(), _pts, _vals);
-
-    return _vals.front();
-  }
-
-
-  void operator() (const Point & p,
-                   const Real time,
-                   DenseVector<Number> & output)
-  {
-    output.resize(1);
-    output(0) = (*this)(p,time);
-    return;
-  }
-
-private:
-  const MeshfreeInterpolation & _mfi;
-  mutable std::vector<Point> _pts;
-  mutable std::vector<Number> _vals;
-  Threads::spin_mutex & _mutex;
-};
-
-void
-MeshfreeSolutionTransfer::transfer(const Variable & from_var,
-                                   const Variable & to_var)
-{
+void MeshfreeSolutionTransfer::transfer(const Variable &from_var,
+                                        const Variable &to_var) {
   libmesh_experimental();
 
   System * from_sys = from_var.system();
