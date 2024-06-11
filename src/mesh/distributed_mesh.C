@@ -25,6 +25,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/string_to_enum.h"
 
@@ -1763,6 +1764,11 @@ void DistributedMesh::delete_remote_elements()
   // We may have deleted no-longer-connected nodes or coarsened-away
   // elements; let's update our caches.
   this->update_parallel_id_counts();
+
+  // We may have deleted nodes or elements that were the only local
+  // representatives of some particular boundary id(s); let's update
+  // those caches.
+  this->get_boundary_info().regenerate_id_sets();
 
 #ifdef DEBUG
   // We might not have well-packed objects if the user didn't allow us

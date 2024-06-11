@@ -17,8 +17,10 @@
 
 
 
-// libMesh includes
 #include "libmesh/partitioner.h"
+
+// libMesh includes
+#include "libmesh/compare_elems_by_level.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/int_range.h"
@@ -1147,8 +1149,9 @@ void Partitioner::build_graph (const MeshBase & mesh)
         {
           const auto end_it = mesh_constrained_nodes.end();
 
-          // Use a set to avoid duplicates
-          std::set<const Elem *> constraining_elems;
+          // Use a set to avoid duplicates.  Use a well-defined method
+          // of ordering that set to make debugging easier.
+          std::set<const Elem *, CompareElemIdsByLevel> constraining_elems;
           for (const Node & node : elem->node_ref_range())
             {
               if (const auto row_it = mesh_constrained_nodes.find(&node);
@@ -1193,6 +1196,11 @@ void Partitioner::build_graph (const MeshBase & mesh)
   _dual_graph.clear();
   _dual_graph.resize(n_active_local_elem);
   _local_id_to_elem.resize(n_active_local_elem);
+
+  // We may need to communicate constraint-row-based connections
+  // between processors
+  std::unordered_map<processor_id_type,
+    std::vector<std::pair<dof_id_type, dof_id_type>>> connections_to_push;
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
     {
@@ -1310,8 +1318,9 @@ void Partitioner::build_graph (const MeshBase & mesh)
         {
           const auto end_it = mesh_constrained_nodes.end();
 
-          // Use a set to avoid duplicates
-          std::set<const Elem *> constraining_elems;
+          // Use a set to avoid duplicates.  Use a well-defined method
+          // of ordering that set to make debugging easier.
+          std::set<const Elem *, CompareElemIdsByLevel> constraining_elems;
           for (const Node & node : elem->node_ref_range())
             {
               if (const auto row_it = mesh_constrained_nodes.find(&node);
@@ -1328,6 +1337,13 @@ void Partitioner::build_graph (const MeshBase & mesh)
                 _global_index_by_pid_map[constraining_elem->id()];
 
               graph_row.push_back(constraining_global_index_by_pid);
+
+              // We can't be sure if the constraining element's owner sees
+              // the assembly element, so to get a symmetric connectivity
+              // graph we'll need to tell them about us to be safe.
+              if (constraining_elem->processor_id() != mesh.processor_id())
+                connections_to_push[constraining_elem->processor_id()].emplace_back
+                  (global_index_by_pid, constraining_global_index_by_pid);
             }
         }
 
@@ -1339,13 +1355,48 @@ void Partitioner::build_graph (const MeshBase & mesh)
             _global_index_by_pid_map[constrained->id()];
 
           graph_row.push_back(constrained_global_index_by_pid);
+
+          // We can't be sure if the constrained element's owner sees
+          // the assembly element, so to get a symmetric connectivity
+          // graph we'll need to tell them about us to be safe.
+          if (constrained->processor_id() != mesh.processor_id())
+            connections_to_push[constrained->processor_id()].emplace_back
+              (global_index_by_pid, constrained_global_index_by_pid);
         }
     }
 
-  // Parmetis can get confused, in hard-to-debug ways, if we fail to
-  // give it a symmetric adjacency matrix.  We should try to catch
-  // that earlier, but it's a global communication so we'll only do it
-  // in debug mode.
+  // Partitioners like Parmetis require a symmetric adjacency matrix,
+  // but if we have an assembly element constrained by a spline
+  // NodeElem owned by another processor, it's possible that that
+  // processor doesn't see our assembly element.  Let's push those
+  // entries, to ensure they're counted on both sides.
+  auto symmetrize_entries =
+    [this, first_local_elem]
+    (processor_id_type /*src_pid*/,
+     const std::vector<std::pair<dof_id_type, dof_id_type>> & incoming_entries)
+    {
+      for (auto [i, j] : incoming_entries)
+        {
+          libmesh_assert_greater_equal(j, first_local_elem);
+          const std::size_t jl = j - first_local_elem;
+          libmesh_assert_less(jl, _dual_graph.size());
+          std::vector<dof_id_type> & graph_row = _dual_graph[jl];
+          if (std::find(graph_row.begin(), graph_row.end(), i) == graph_row.end())
+          {
+//            std::cerr << "Pushing back (" << j << ", " << i << ") from " << src_pid << std::endl;
+            graph_row.push_back(i);
+          }
+        }
+    };
+
+  Parallel::push_parallel_vector_data(mesh.comm(),
+                                      connections_to_push,
+                                      symmetrize_entries);
+
+  // *Now* we should have a symmetric adjacency matrix.  Let's check
+  // that, so any failures get caught before they e.g. confuse
+  // Parmetis in hard-to-debug ways.  That's a global communication so
+  // we'll only do it in debug mode.
 #ifdef DEBUG
   auto n_proc = mesh.n_processors();
   std::vector<dof_id_type> first_local_index_on_proc(n_proc, 0);
@@ -1374,24 +1425,55 @@ void Partitioner::build_graph (const MeshBase & mesh)
         }
     }
 
+  std::vector<std::tuple<processor_id_type, dof_id_type, dof_id_type>> bad_entries;
+
   auto check_incoming_entries =
-    [this, first_local_elem]
-    (processor_id_type /* src_pid */,
+    [this, first_local_elem, &bad_entries]
+    (processor_id_type src_pid,
      const std::vector<std::pair<dof_id_type, dof_id_type>> & incoming_entries)
     {
       for (auto [i, j] : incoming_entries)
         {
-          libmesh_assert_greater_equal(j, first_local_elem);
+          if (j < first_local_elem)
+            {
+              bad_entries.emplace_back(src_pid,i,j);
+              continue;
+            }
           const std::size_t jl = j - first_local_elem;
-          libmesh_assert_less(jl, _dual_graph.size());
+          if (jl >= _dual_graph.size())
+            {
+              bad_entries.emplace_back(src_pid,i,j);
+              continue;
+            }
           const std::vector<dof_id_type> & graph_row = _dual_graph[jl];
-          libmesh_assert(std::find(graph_row.begin(), graph_row.end(), i)
-                         != graph_row.end());
+          if (std::find(graph_row.begin(), graph_row.end(), i) ==
+              graph_row.end())
+            {
+              bad_entries.emplace_back(src_pid,i,j);
+              continue;
+            }
         }
     };
 
+  // Keep any failures in sync in parallel, for easier debugging in
+  // unit tests where the failure exception will be caught.
   Parallel::push_parallel_vector_data
     (mesh.comm(), entries_to_send, check_incoming_entries);
+  bool bad_entries_exist = !bad_entries.empty();
+  mesh.comm().max(bad_entries_exist);
+  if (bad_entries_exist)
+    {
+#if 0  // Optional verbosity for if this breaks again...
+      if (!bad_entries.empty())
+        {
+          std::cerr << "Bad entries on processor " << mesh.processor_id() << ": ";
+          for (auto [p, i, j] : bad_entries)
+            std::cerr << '(' << p << ", " << i << ", " << j << "), ";
+          std::cerr << std::endl;
+        }
+#endif
+      libmesh_error_msg("Asymmetric partitioner graph detected");
+    }
 #endif
 }
 

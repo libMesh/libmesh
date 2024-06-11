@@ -8,6 +8,7 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_function.h>
+#include <libmesh/mesh_tools.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/parallel.h>
 #include <libmesh/quadrature.h>
@@ -153,6 +154,10 @@ public:
                                        0., 1.,
                                        EDGE2);
 
+    // We should be prepared at this point
+    CPPUNIT_ASSERT(mesh.is_prepared());
+    CPPUNIT_ASSERT(MeshTools::valid_is_prepared(mesh));
+
     auto matrix = SparseMatrix<Number>::build (mesh.comm());
 
     // Create a projection matrix from 10 elements to 5.  We might as
@@ -177,6 +182,13 @@ public:
     matrix->close();
 
     mesh.copy_constraint_rows(*matrix);
+
+    // We should still be prepared at this point
+    CPPUNIT_ASSERT(mesh.is_prepared());
+    CPPUNIT_ASSERT(MeshTools::valid_is_prepared(mesh));
+
+    // Do a redundant prepare-for-use to catch any issues there
+    mesh.prepare_for_use();
 
     es.init ();
     sys.solve();
@@ -244,6 +256,8 @@ public:
 
     mesh.read(meshfile);
 
+    CPPUNIT_ASSERT(mesh.is_prepared());
+
     // For these matrices Coreform has been experimenting with PETSc
     // solvers which take the transpose of what we expect, so we'll
     // un-transpose here.
@@ -252,6 +266,13 @@ public:
     matrix->get_transpose(*matrix);
 
     mesh.copy_constraint_rows(*matrix);
+
+    // We should be prepared at this point
+    CPPUNIT_ASSERT(mesh.is_prepared());
+    CPPUNIT_ASSERT(MeshTools::valid_is_prepared(mesh));
+
+    // Do a redundant prepare-for-use to catch any issues there
+    mesh.prepare_for_use();
 
     es.init ();
     sys.solve();
@@ -307,6 +328,10 @@ public:
                                        0., 1.,
                                        EDGE2);
 
+    // We should be prepared at this point
+    CPPUNIT_ASSERT(mesh.is_prepared());
+    CPPUNIT_ASSERT(MeshTools::valid_is_prepared(mesh));
+
     auto matrix = SparseMatrix<Number>::build (mesh.comm());
 
     // Create a projection matrix from 10 elements to 4.  We'll only
@@ -315,6 +340,13 @@ public:
     matrix->read_matlab("meshes/constrain10to4.m");
 
     mesh.copy_constraint_rows(*matrix);
+
+    // We should still be prepared at this point
+    CPPUNIT_ASSERT(mesh.is_prepared());
+    CPPUNIT_ASSERT(MeshTools::valid_is_prepared(mesh));
+
+    // Do a redundant prepare-for-use to catch any issues there
+    mesh.prepare_for_use();
 
     es.init ();
     sys.solve();

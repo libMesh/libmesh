@@ -474,12 +474,11 @@ void CheckpointIO::write (const std::string & name)
                   connect_children(mesh, pid_elements_begin,
                                    pid_elements_end, elements);
                 }
-              connect_families(elements);
             }
         }
 
       connected_node_set_type connected_nodes;
-      reconnect_nodes(elements, connected_nodes);
+      connect_element_dependencies(mesh, elements, connected_nodes);
 
       // write the nodal locations
       this->write_nodes (io, connected_nodes);

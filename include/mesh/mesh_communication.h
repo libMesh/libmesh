@@ -23,10 +23,13 @@
 // Local Includes
 #include "libmesh/compare_elems_by_level.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/mesh_tools.h"
+#include "libmesh/mesh_base.h"
 
 // C++ Includes
+#include <set>
+#include <utility>
 #include <unordered_map>
+#include <vector>
 
 namespace libMesh
 {
@@ -253,6 +256,10 @@ public:
 
 // Related utilities
 
+// What to use to fill sets of connected nodes and elements
+typedef std::set<const Node *> connected_node_set_type;
+typedef std::set<const Elem *, CompareElemIdsByLevel> connected_elem_set_type;
+
 // Ask a mesh's ghosting functors to insert into a set all elements
 // that are either on or connected to processor id \p pid.  Ask only
 // for elements in the range from \p elem_it before \p elem_end;
@@ -261,30 +268,50 @@ void query_ghosting_functors(const MeshBase & mesh,
                              processor_id_type pid,
                              MeshBase::const_element_iterator elem_it,
                              MeshBase::const_element_iterator elem_end,
-                             std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
+                             connected_elem_set_type & connected_elements);
 
 // Take a set of elements and insert all immediate
 // children of elements in the given range
 void connect_children(const MeshBase & mesh,
                       MeshBase::const_element_iterator elem_it,
                       MeshBase::const_element_iterator elem_end,
-                      std::set<const Elem *, CompareElemIdsByLevel> & connected_elements);
+                      connected_elem_set_type & connected_elements);
 
 // Take a set of elements and insert all elements' ancestors and
 // subactive descendants as well.  If a mesh is provided and has any
 // constraint rows, insert elements with the constraining nodes for
 // any constrained nodes in our set.
-void connect_families(std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+//
+// This method is now deprecated, because it does not handle recursive
+// dependencies.  Use the new connect_element_dependencies method
+// instead.
+void connect_families(connected_elem_set_type & connected_elements,
                       const MeshBase * mesh = nullptr);
 
-// What to use to fill sets of connected nodes
-typedef std::set<const Node *> connected_node_set_type;
-
 // Take a set of elements and create a set of connected nodes.
-void reconnect_nodes (const std::set<const Elem *, CompareElemIdsByLevel> & connected_elements,
+void reconnect_nodes (connected_elem_set_type & connected_elements,
                       connected_node_set_type & connected_nodes);
 
+// Take a set of elements and of nodes, and insert all
+// libMesh-mandated element of them: ancestor elements,
+// immediate children, subactive descendents of active elements,
+// interior_parents, nodes of any of those elements, and elements used
+// to constrain any of those nodes.  This must be done recursively
+// (well, repeatedly; we unroll) in the general case, since a node
+// constraint can require a new element that can require other new
+// elements with new nodes with new constraints.
+void connect_element_dependencies(const MeshBase & mesh,
+                                  connected_elem_set_type & connected_elements,
+                                  connected_node_set_type & connected_nodes);
 
+// Takes already-examined sets and not-yet-examined sets, returns more sets
+// in need of examination (or empty sets if done).
+std::pair<connected_elem_set_type, connected_node_set_type>
+connect_element_dependencies(const MeshBase & mesh,
+                             const connected_elem_set_type & connected_elements,
+                             const connected_node_set_type & connected_nodes,
+                             const connected_elem_set_type & new_connected_elements,
+                             const connected_node_set_type & new_connected_nodes);
 
 //--------------------------------------------------------------
 // MeshCommunication inline members

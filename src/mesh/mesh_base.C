@@ -221,38 +221,62 @@ bool MeshBase::operator== (const MeshBase & other_mesh) const
 
 bool MeshBase::locally_equals (const MeshBase & other_mesh) const
 {
-  // Check whether everything in the base is equal
-  if (_n_parts != other_mesh._n_parts ||
-      _default_mapping_type != other_mesh._default_mapping_type ||
-      _default_mapping_data != other_mesh._default_mapping_data ||
-      _is_prepared != other_mesh._is_prepared ||
-      _count_lower_dim_elems_in_point_locator !=
-        other_mesh._count_lower_dim_elems_in_point_locator ||
-      // We expect this to change in a DistributeMesh prepare_for_use();
-      // it's conceptually "mutable"...
-/*
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-      _next_unique_id != other_mesh._next_unique_id ||
-#endif
-*/
-      _skip_noncritical_partitioning != other_mesh._skip_noncritical_partitioning ||
-      _skip_all_partitioning != other_mesh._skip_all_partitioning ||
-      _skip_renumber_nodes_and_elements != other_mesh._skip_renumber_nodes_and_elements ||
-      _skip_find_neighbors != other_mesh._skip_find_neighbors ||
-      _allow_remote_element_removal != other_mesh._allow_remote_element_removal ||
-      _spatial_dimension != other_mesh._spatial_dimension ||
-      _point_locator_close_to_point_tol != other_mesh._point_locator_close_to_point_tol ||
-      _block_id_to_name != other_mesh._block_id_to_name ||
-      _elem_dims != other_mesh._elem_dims ||
-      _mesh_subdomains != other_mesh._mesh_subdomains ||
-      _all_elemset_ids != other_mesh._all_elemset_ids ||
-      _elem_integer_names != other_mesh._elem_integer_names ||
-      _elem_integer_default_values != other_mesh._elem_integer_default_values ||
-      _node_integer_names != other_mesh._node_integer_names ||
-      _node_integer_default_values != other_mesh._node_integer_default_values ||
-      bool(_default_ghosting) != bool(other_mesh._default_ghosting) ||
-      bool(_partitioner) != bool(other_mesh._partitioner) ||
-      *boundary_info != *other_mesh.boundary_info)
+  // Check whether (almost) everything in the base is equal
+  //
+  // We don't check _next_unique_id here, because it's expected to
+  // change in a DistributedMesh prepare_for_use(); it's conceptually
+  // "mutable".
+  //
+  // We use separate if statements instead of logical operators here,
+  // to make it easy to see the failing condition when using a
+  // debugger to figure out why a MeshTools::valid_is_prepared(mesh)
+  // is failing.
+  if (_n_parts != other_mesh._n_parts)
+    return false;
+  if (_default_mapping_type != other_mesh._default_mapping_type)
+    return false;
+  if (_default_mapping_data != other_mesh._default_mapping_data)
+    return false;
+  if (_is_prepared != other_mesh._is_prepared)
+    return false;
+  if (_count_lower_dim_elems_in_point_locator !=
+        other_mesh._count_lower_dim_elems_in_point_locator)
+    return false;
+  if (_skip_noncritical_partitioning != other_mesh._skip_noncritical_partitioning)
+    return false;
+  if (_skip_all_partitioning != other_mesh._skip_all_partitioning)
+    return false;
+  if (_skip_renumber_nodes_and_elements != other_mesh._skip_renumber_nodes_and_elements)
+    return false;
+  if (_skip_find_neighbors != other_mesh._skip_find_neighbors)
+    return false;
+  if (_allow_remote_element_removal != other_mesh._allow_remote_element_removal)
+    return false;
+  if (_spatial_dimension != other_mesh._spatial_dimension)
+    return false;
+  if (_point_locator_close_to_point_tol != other_mesh._point_locator_close_to_point_tol)
+    return false;
+  if (_block_id_to_name != other_mesh._block_id_to_name)
+    return false;
+  if (_elem_dims != other_mesh._elem_dims)
+    return false;
+  if (_mesh_subdomains != other_mesh._mesh_subdomains)
+    return false;
+  if (_all_elemset_ids != other_mesh._all_elemset_ids)
+    return false;
+  if (_elem_integer_names != other_mesh._elem_integer_names)
+    return false;
+  if (_elem_integer_default_values != other_mesh._elem_integer_default_values)
+    return false;
+  if (_node_integer_names != other_mesh._node_integer_names)
+    return false;
+  if (_node_integer_default_values != other_mesh._node_integer_default_values)
+    return false;
+  if (bool(_default_ghosting) != bool(other_mesh._default_ghosting))
+    return false;
+  if (bool(_partitioner) != bool(other_mesh._partitioner))
+    return false;
+  if (*boundary_info != *other_mesh.boundary_info)
     return false;
 
   const constraint_rows_type & other_rows =
@@ -743,6 +767,12 @@ void MeshBase::prepare_for_use ()
   parallel_object_only();
 
   libmesh_assert(this->comm().verify(this->is_serial()));
+
+  // If we don't go into this method with valid constraint rows, we're
+  // only going to be able to make that worse.
+#ifdef DEBUG
+  MeshTools::libmesh_assert_valid_constraint_rows(*this);
+#endif
 
   // A distributed mesh may have processors with no elements (or
   // processors with no elements of higher dimension, if we ever
@@ -1927,6 +1957,23 @@ bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh) const
 }
 
 
+dof_id_type MeshBase::n_constraint_rows() const
+{
+  dof_id_type n_local_rows=0, n_unpartitioned_rows=0;
+  for (const auto & [node, node_constraints] : _constraint_rows)
+    {
+      // Unpartitioned nodes
+      if (node->processor_id() == DofObject::invalid_processor_id)
+        n_unpartitioned_rows++;
+      else if (node->processor_id() == this->processor_id())
+        n_local_rows++;
+    }
+
+  this->comm().sum(n_local_rows);
+
+  return n_unpartitioned_rows + n_local_rows;
+}
+
 
 void
 MeshBase::copy_constraint_rows(const MeshBase & other_mesh)
@@ -2030,14 +2077,22 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
   std::unordered_map<const Node *, std::pair<dof_id_type, unsigned int>> node_to_elem_ptrs;
 
   // Find elements attached to any existing nodes that will stay
-  // unconstrained
+  // unconstrained.  We'll also build a subdomain set here so we don't
+  // have to assert that the mesh is already prepared before we pick a
+  // new subdomain for any NodeElems we need to add.
+  std::set<subdomain_id_type> subdomain_ids;
   for (const Elem * elem : this->element_ptr_range())
-    for (auto n : make_range(elem->n_nodes()))
-      {
-        const Node * node = elem->node_ptr(n);
-        if (existing_unconstrained_nodes.count(node->id()))
-          node_to_elem_ptrs.emplace(node, std::make_pair(elem->id(), n));
-      }
+    {
+      subdomain_ids.insert(elem->subdomain_id());
+      for (auto n : make_range(elem->n_nodes()))
+        {
+          const Node * node = elem->node_ptr(n);
+          if (existing_unconstrained_nodes.count(node->id()))
+            node_to_elem_ptrs.emplace(node, std::make_pair(elem->id(), n));
+        }
+    }
+
+  const subdomain_id_type new_sbd_id = *subdomain_ids.rbegin() + 1;
 
   for (auto j : make_range(constraint_operator.n()))
     {
@@ -2071,8 +2126,11 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
       Node *n = this->add_point(newpt);
       std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
       elem->set_node(0) = n;
+      elem->subdomain_id() = new_sbd_id;
 
       Elem * added_elem = this->add_elem(std::move(elem));
+      this->_elem_dims.insert(0);
+      this->_mesh_subdomains.insert(new_sbd_id);
       node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
       existing_unconstrained_columns.emplace(j,n->id());
 
@@ -2147,6 +2205,69 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
                                      std::move(constraint_row));
     }
 }
+
+
+void MeshBase::print_constraint_rows(std::ostream & os,
+                                     bool print_nonlocal) const
+{
+  parallel_object_only();
+
+  std::string local_constraints =
+    this->get_local_constraints(print_nonlocal);
+
+  if (this->processor_id())
+    {
+      this->comm().send(0, local_constraints);
+    }
+  else
+    {
+      os << "Processor 0:\n";
+      os << local_constraints;
+
+      for (auto p : IntRange<processor_id_type>(1, this->n_processors()))
+        {
+          this->comm().receive(p, local_constraints);
+          os << "Processor " << p << ":\n";
+          os << local_constraints;
+        }
+    }
+}
+
+
+
+std::string MeshBase::get_local_constraints(bool print_nonlocal) const
+{
+  std::ostringstream os;
+
+  if (print_nonlocal)
+    os << "All ";
+  else
+    os << "Local ";
+
+  os << "Mesh Constraint Rows:"
+     << std::endl;
+
+  for (const auto & [node, row] : _constraint_rows)
+    {
+      const bool local = (node->processor_id() == this->processor_id());
+
+      // Skip non-local dofs if requested
+      if (!print_nonlocal && !local)
+        continue;
+
+      os << "Constraints for " << (local ? "Local" : "Ghost") << " Node " << node->id()
+         << ": \t";
+
+      for (const auto & [elem_and_node, coef] : row)
+        os << " ((" << elem_and_node.first->id() << ',' << elem_and_node.second << "), " << coef << ")\t";
+
+      os << std::endl;
+    }
+
+  return os.str();
+}
+
+
 
 
 // Explicit instantiations for our template function

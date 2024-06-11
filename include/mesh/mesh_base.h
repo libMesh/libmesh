@@ -1674,17 +1674,21 @@ public:
   typedef std::vector<std::pair<std::pair<const Elem *, unsigned int>, Real>> constraint_rows_mapped_type;
   typedef std::map<const Node *, constraint_rows_mapped_type> constraint_rows_type;
 
-
   /**
-   * Copy the constraints from the other mesh to this mesh
+   * Constraint rows accessors
    */
-  void copy_constraint_rows(const MeshBase & other_mesh);
-
   constraint_rows_type & get_constraint_rows()
   { return _constraint_rows; }
 
   const constraint_rows_type & get_constraint_rows() const
   { return _constraint_rows; }
+
+  dof_id_type n_constraint_rows() const;
+
+  /**
+   * Copy the constraints from the other mesh to this mesh
+   */
+  void copy_constraint_rows(const MeshBase & other_mesh);
 
   /**
    * Copy the constraints from the given matrix to this mesh.  The
@@ -1710,6 +1714,22 @@ public:
    */
   template <typename T>
   void copy_constraint_rows(const SparseMatrix<T> & constraint_operator);
+
+  /**
+   * Prints (from processor 0) all mesh constraint rows.  If \p
+   * print_nonlocal is true, then each constraint is printed once for
+   * each processor that knows about it, which may be useful for \p
+   * DistributedMesh debugging.
+   */
+  void print_constraint_rows(std::ostream & os=libMesh::out,
+                             bool print_nonlocal=false) const;
+
+  /**
+   * Gets a string reporting all mesh constraint rows local to
+   * this processor.  If \p print_nonlocal is true, then nonlocal
+   * constraints which are locally known are included.
+   */
+  std::string get_local_constraints(bool print_nonlocal=false) const;
 
   /**
    * \deprecated This method has ben replaced by \p cache_elem_data which
