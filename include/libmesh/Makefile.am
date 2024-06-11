@@ -357,6 +357,7 @@ BUILT_SOURCES = \
         meshfree_interpolation.h \
         meshfree_solution_transfer.h \
         meshfunction_solution_transfer.h \
+        meshless_interpolation_function.h \
         radial_basis_functions.h \
         radial_basis_interpolation.h \
         solution_transfer.h \
@@ -1643,6 +1644,9 @@ meshfree_solution_transfer.h: $(top_srcdir)/include/solution_transfer/meshfree_s
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 meshfunction_solution_transfer.h: $(top_srcdir)/include/solution_transfer/meshfunction_solution_transfer.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+meshless_interpolation_function.h: $(top_srcdir)/include/solution_transfer/meshless_interpolation_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 radial_basis_functions.h: $(top_srcdir)/include/solution_transfer/radial_basis_functions.h
