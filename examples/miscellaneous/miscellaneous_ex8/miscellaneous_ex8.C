@@ -36,7 +36,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/node.h"
 #include "libmesh/getpot.h"
-#include "libmesh/meshless_interpolation_function.h"
+#include "libmesh/meshfree_interpolation_function.h"
 
 // C++ includes
 #include <cstdlib>
@@ -291,12 +291,12 @@ int main(int argc, char ** argv)
       idi.prepare_for_use();
       rbi.prepare_for_use();
 
-      // Create a MeshlessInterpolationFunction that uses our InverseDistanceInterpolation
-      // object.  Since each MeshlessInterpolationFunction shares the same InverseDistanceInterpolation
+      // Create a MeshfreeInterpolationFunction that uses our InverseDistanceInterpolation
+      // object.  Since each MeshfreeInterpolationFunction shares the same InverseDistanceInterpolation
       // object in a threaded environment we must also provide a locking mechanism.
       {
         Threads::spin_mutex mutex;
-        MeshlessInterpolationFunction mif(idi, mutex);
+        MeshfreeInterpolationFunction mif(idi, mutex);
 
         // project the solution onto system b
         es_b.init();
@@ -307,12 +307,12 @@ int main(int argc, char ** argv)
                                                   es_b);
       }
 
-      // Create a MeshlessInterpolationFunction that uses our RadialBasisInterpolation
-      // object.  Since each MeshlessInterpolationFunction shares the same RadialBasisInterpolation
+      // Create a MeshfreeInterpolationFunction that uses our RadialBasisInterpolation
+      // object.  Since each MeshfreeInterpolationFunction shares the same RadialBasisInterpolation
       // object in a threaded environment we must also provide a locking mechanism.
       {
         Threads::spin_mutex mutex;
-        MeshlessInterpolationFunction mif(rbi, mutex);
+        MeshfreeInterpolationFunction mif(rbi, mutex);
 
         // project the solution onto system b
         sys_b.project_solution (&mif);

@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
-#define LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
+#ifndef LIBMESH_MESHFREE_INTERPOLATION_FUNCTION_H
+#define LIBMESH_MESHFREE_INTERPOLATION_FUNCTION_H
 
 // libMesh Includes
 #include "libmesh/function_base.h"
@@ -34,31 +34,31 @@ namespace libMesh {
 template <typename T> class DenseVector;
 
 // ------------------------------------------------------------
-// MeshlessInterpolationFunction class definition
-class MeshlessInterpolationFunction : public FunctionBase<Number> {
+// MeshfreeInterpolationFunction class definition
+class MeshfreeInterpolationFunction : public FunctionBase<Number> {
 public:
   /**
    * Constructor. Requires a MeshfreeInterpolation object.
    */
-  MeshlessInterpolationFunction(const MeshfreeInterpolation & mfi,
+  MeshfreeInterpolationFunction(const MeshfreeInterpolation & mfi,
                                 Threads::spin_mutex & mutex);
 
   /**
    * Move and copy constructors.
    */
-  MeshlessInterpolationFunction(MeshlessInterpolationFunction &&) = default;
-  MeshlessInterpolationFunction(const MeshlessInterpolationFunction &) = default;
+  MeshfreeInterpolationFunction(MeshfreeInterpolationFunction &&) = default;
+  MeshfreeInterpolationFunction(const MeshfreeInterpolationFunction &) = default;
 
   /**
    * Destructor.
    */
-  virtual ~MeshlessInterpolationFunction() = default;
+  virtual ~MeshfreeInterpolationFunction() = default;
 
   /**
    * Delete assignment operators.
    */
-  MeshlessInterpolationFunction & operator=(const MeshlessInterpolationFunction &) = delete;
-  MeshlessInterpolationFunction & operator=(MeshlessInterpolationFunction &&) = delete;
+  MeshfreeInterpolationFunction & operator=(const MeshfreeInterpolationFunction &) = delete;
+  MeshfreeInterpolationFunction & operator=(MeshfreeInterpolationFunction &&) = delete;
 
   /**
    * The actual initialization process.
@@ -96,4 +96,4 @@ private:
 
 } // namespace libMesh
 
-#endif // LIBMESH_MESHLESS_INTERPOLATION_FUNCTION_H
+#endif // LIBMESH_MESHFREE_INTERPOLATION_FUNCTION_H

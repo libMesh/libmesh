@@ -71,13 +71,13 @@ MeshfreeSolutionTransfer::transfer(const Variable & from_var,
   // We have only set local values - prepare for use by gathering remote data
   idi.prepare_for_use();
 
-  // Create a MeshlessInterpolationFunction that uses our
+  // Create a MeshfreeInterpolationFunction that uses our
   // InverseDistanceInterpolation object.  Since each
-  // MeshlessInterpolationFunction shares the same
+  // MeshfreeInterpolationFunction shares the same
   // InverseDistanceInterpolation object in a threaded environment we
   // must also provide a locking mechanism.
   Threads::spin_mutex mutex;
-  MeshlessInterpolationFunction mif(idi, mutex);
+  MeshfreeInterpolationFunction mif(idi, mutex);
 
   // project the solution
   to_sys->project_solution(&mif);

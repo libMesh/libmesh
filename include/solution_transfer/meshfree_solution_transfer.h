@@ -21,7 +21,7 @@
 #define MESHFREE_SOLUTION_TRANSFER_H
 
 #include "libmesh/solution_transfer.h"
-#include "libmesh/meshless_interpolation_function.h"
+#include "libmesh/meshfree_interpolation_function.h"
 
 #include <string>
 
