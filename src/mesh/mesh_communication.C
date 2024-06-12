@@ -48,7 +48,6 @@
 
 //-----------------------------------------------
 // anonymous namespace for implementation details
-#ifdef LIBMESH_HAVE_MPI
 namespace {
 
 using namespace libMesh;
@@ -287,11 +286,7 @@ void connect_nodes (const connected_elem_set_type & new_connected_elements,
 }
 
 
-
-
-
 } // anonymous namespace
-#endif // LIBMESH_HAVE_MPI
 
 
 
