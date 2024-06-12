@@ -26,6 +26,7 @@
 // C++ includes
 #include <cstddef>
 #include <memory>
+#include <vector>
 
 namespace libMesh {
 
@@ -35,18 +36,29 @@ template <typename T> class DenseVector;
 // ------------------------------------------------------------
 // MeshlessInterpolationFunction class definition
 class MeshlessInterpolationFunction : public FunctionBase<Number> {
-private:
-  const MeshfreeInterpolation &_mfi;
-  mutable std::vector<Point> _pts;
-  mutable std::vector<Number> _vals;
-  Threads::spin_mutex &_mutex;
-
 public:
   /**
-   * Constructor.  Requires a MeshlessInterpolation object.
+   * Constructor. Requires a MeshfreeInterpolation object.
    */
-  MeshlessInterpolationFunction(const MeshfreeInterpolation &mfi,
-                                Threads::spin_mutex &mutex);
+  MeshlessInterpolationFunction(const MeshfreeInterpolation & mfi,
+                                Threads::spin_mutex & mutex);
+
+  /**
+   * Move and copy constructors.
+   */
+  MeshlessInterpolationFunction(MeshlessInterpolationFunction &&) = default;
+  MeshlessInterpolationFunction(const MeshlessInterpolationFunction &) = default;
+
+  /**
+   * Destructor.
+   */
+  virtual ~MeshlessInterpolationFunction() = default;
+
+  /**
+   * Delete assignment operators.
+   */
+  MeshlessInterpolationFunction & operator=(const MeshlessInterpolationFunction &) = delete;
+  MeshlessInterpolationFunction & operator=(MeshlessInterpolationFunction &&) = delete;
 
   /**
    * The actual initialization process.
@@ -67,13 +79,19 @@ public:
    * @returns the value at point p and time
    * time, which defaults to zero.
    */
-  Number operator()(const Point &p, const Real time = 0.);
+  Number operator()(const Point & p, const Real time = 0.);
 
   /**
    * Like before, but returns the values in a
    * writable reference.
    */
-  void operator()(const Point &p, const Real time, DenseVector<Number> &output);
+  void operator()(const Point & p, const Real time, DenseVector<Number> & output);
+
+private:
+  const MeshfreeInterpolation & _mfi;
+  mutable std::vector<Point> _pts;
+  mutable std::vector<Number> _vals;
+  Threads::spin_mutex & _mutex;
 };
 
 } // namespace libMesh

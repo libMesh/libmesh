@@ -21,16 +21,17 @@
 // C++ includes
 #include <cstddef>
 #include <memory>
+#include <vector>
 
 namespace libMesh {
 
 // ------------------------------------------------------------
 // MeshlessInterpolationFunction implementation
 
-MeshlessInterpolationFunction::MeshlessInterpolationFunction(const MeshfreeInterpolation &mfi, Threads::spin_mutex &mutex)
+MeshlessInterpolationFunction::MeshlessInterpolationFunction(const MeshfreeInterpolation & mfi, Threads::spin_mutex & mutex)
     : _mfi(mfi), _mutex(mutex) {}
 
-Number MeshlessInterpolationFunction::operator()(const Point &p, const Real /* time */) {
+Number MeshlessInterpolationFunction::operator()(const Point & p, const Real /* time */) {
   _pts.clear();
   _pts.push_back(p);
   _vals.resize(1);
@@ -42,14 +43,19 @@ Number MeshlessInterpolationFunction::operator()(const Point &p, const Real /* t
   return _vals.front();
 }
 
-void MeshlessInterpolationFunction::operator()(const Point &p, const Real time, DenseVector<Number> &output) {
+void MeshlessInterpolationFunction::operator()(const Point & p, const Real time, DenseVector<Number> & output) {
   output.resize(1);
   output(0) = (*this)(p, time);
 }
 
-void MeshlessInterpolationFunction::init() {}
+void MeshlessInterpolationFunction::init() {
+  // Initialization logic if any
+}
 
-void MeshlessInterpolationFunction::clear() {}
+void MeshlessInterpolationFunction::clear() {
+  _pts.clear();
+  _vals.clear();
+}
 
 std::unique_ptr<FunctionBase<Number>> MeshlessInterpolationFunction::clone() const {
   return std::make_unique<MeshlessInterpolationFunction>(_mfi, _mutex);
