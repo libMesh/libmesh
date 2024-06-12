@@ -15,8 +15,8 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-#ifndef LIBMESH_MESHFREE_INTERPOLATION_FUNCTION_H
-#define LIBMESH_MESHFREE_INTERPOLATION_FUNCTION_H
+#ifndef MESHFREE_INTERPOLATION_FUNCTION_H
+#define MESHFREE_INTERPOLATION_FUNCTION_H
 
 // libMesh Includes
 #include "libmesh/function_base.h"
@@ -28,14 +28,16 @@
 #include <memory>
 #include <vector>
 
-namespace libMesh {
+namespace libMesh
+{
 
 // Forward Declarations
 template <typename T> class DenseVector;
 
 // ------------------------------------------------------------
 // MeshfreeInterpolationFunction class definition
-class MeshfreeInterpolationFunction : public FunctionBase<Number> {
+class MeshfreeInterpolationFunction : public FunctionBase<Number>
+{
 public:
   /**
    * Constructor. Requires a MeshfreeInterpolation object.
@@ -96,4 +98,4 @@ private:
 
 } // namespace libMesh
 
-#endif // LIBMESH_MESHFREE_INTERPOLATION_FUNCTION_H
+#endif // MESHFREE_INTERPOLATION_FUNCTION_H

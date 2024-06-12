@@ -23,15 +23,14 @@
 #include <memory>
 #include <vector>
 
-namespace libMesh {
-
-// ------------------------------------------------------------
-// MeshfreeInterpolationFunction implementation
+namespace libMesh
+{
 
 MeshfreeInterpolationFunction::MeshfreeInterpolationFunction(const MeshfreeInterpolation & mfi, Threads::spin_mutex & mutex)
     : _mfi(mfi), _mutex(mutex) {}
 
-Number MeshfreeInterpolationFunction::operator()(const Point & p, const Real /* time */) {
+Number MeshfreeInterpolationFunction::operator()(const Point & p, const Real /* time */)
+{
   _pts.clear();
   _pts.push_back(p);
   _vals.resize(1);
@@ -43,21 +42,25 @@ Number MeshfreeInterpolationFunction::operator()(const Point & p, const Real /* 
   return _vals.front();
 }
 
-void MeshfreeInterpolationFunction::operator()(const Point & p, const Real time, DenseVector<Number> & output) {
+void MeshfreeInterpolationFunction::operator()(const Point & p, const Real time, DenseVector<Number> & output)
+{
   output.resize(1);
   output(0) = (*this)(p, time);
 }
 
-void MeshfreeInterpolationFunction::init() {
+void MeshfreeInterpolationFunction::init()
+{
   // Initialization logic if any
 }
 
-void MeshfreeInterpolationFunction::clear() {
+void MeshfreeInterpolationFunction::clear()
+{
   _pts.clear();
   _vals.clear();
 }
 
-std::unique_ptr<FunctionBase<Number>> MeshfreeInterpolationFunction::clone() const {
+std::unique_ptr<FunctionBase<Number>> MeshfreeInterpolationFunction::clone() const
+{
   return std::make_unique<MeshfreeInterpolationFunction>(_mfi, _mutex);
 }
 
