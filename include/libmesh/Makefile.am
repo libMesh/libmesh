@@ -355,6 +355,7 @@ BUILT_SOURCES = \
         dtk_evaluator.h \
         dtk_solution_transfer.h \
         meshfree_interpolation.h \
+        meshfree_interpolation_function.h \
         meshfree_solution_transfer.h \
         meshfunction_solution_transfer.h \
         radial_basis_functions.h \
@@ -1637,6 +1638,9 @@ dtk_solution_transfer.h: $(top_srcdir)/include/solution_transfer/dtk_solution_tr
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 meshfree_interpolation.h: $(top_srcdir)/include/solution_transfer/meshfree_interpolation.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+meshfree_interpolation_function.h: $(top_srcdir)/include/solution_transfer/meshfree_interpolation_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 meshfree_solution_transfer.h: $(top_srcdir)/include/solution_transfer/meshfree_solution_transfer.h
