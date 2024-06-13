@@ -50,7 +50,6 @@ void EigenSparseMatrix<T>::init (const numeric_index_type m_in,
   // noz ignored...  only used for multiple processors!
   libmesh_assert_equal_to (m_in, m_l);
   libmesh_assert_equal_to (n_in, n_l);
-  libmesh_assert_equal_to (m_in, n_in);
   libmesh_assert_greater  (nnz, 0);
 
   _mat.resize(m_in, n_in);
@@ -85,8 +84,7 @@ void EigenSparseMatrix<T>::init (const ParallelType)
   const numeric_index_type m_l = n_l;
 #endif
 
-  // Laspack Matrices only work for uniprocessor cases
-  libmesh_assert_equal_to (n_rows, n_cols);
+  // Eigen Matrices only work for uniprocessor cases
   libmesh_assert_equal_to (m_l, n_rows);
   libmesh_assert_equal_to (n_l, n_cols);
 
