@@ -18,14 +18,16 @@
 
 
 // Local Includes
+#include "libmesh/sparse_matrix.h"
+
 #include "libmesh/dof_map.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/diagonal_matrix.h"
 #include "libmesh/laspack_matrix.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/eigen_sparse_matrix.h"
 #include "libmesh/parallel.h"
 #include "libmesh/petsc_matrix.h"
-#include "libmesh/sparse_matrix.h"
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/enum_solver_package.h"
@@ -552,6 +554,8 @@ void SparseMatrix<T>::read(const std::string & filename)
 template <typename T>
 void SparseMatrix<T>::read_matlab(const std::string & filename)
 {
+  LOG_SCOPE("read_matlab()", "SparseMatrix");
+
 #ifndef LIBMESH_HAVE_CXX11_REGEX
   libmesh_not_implemented();  // What is your compiler?!?  Email us!
   libmesh_ignore(filename);
