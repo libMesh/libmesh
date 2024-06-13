@@ -20,6 +20,7 @@
 // Local Includes
 #include "libmesh/sparse_matrix.h"
 
+// libMesh includes
 #include "libmesh/dof_map.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/diagonal_matrix.h"
@@ -31,7 +32,6 @@
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/enum_solver_package.h"
-
 
 // C++ includes
 #include <memory>
