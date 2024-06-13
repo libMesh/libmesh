@@ -26,6 +26,8 @@ namespace libMesh
 
 // An excellent discussion of Nedelec shape functions is given in
 // https://www.dealii.org/reports/nedelec/nedelec.pdf
+// An excellent summary of Nedelec shape functions is also given in
+// https://defelement.com/elements/nedelec1.html
 template <>
 RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
                                       const Order order,
@@ -37,7 +39,10 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
   libmesh_assert(elem);
 
   const Order total_order = static_cast<Order>(order + add_p_level * elem->p_level());
-  const short sign = elem->point(i) > elem->point((i+1) % elem->n_vertices()) ? 1 : -1;
+  libmesh_assert_less(i, n_dofs(elem->type(), total_order));
+
+  const char sign = i >= total_order * elem->n_edges() || elem->point(i / total_order) > elem->point((i / total_order + 1) % elem->n_vertices()) ? 1 : -1;
+  const unsigned int ii = sign > 0 ? i : (i / total_order * 2 + 1) * total_order - 1 - i;
 
   const Real xi  = p(0);
   const Real eta = p(1);
@@ -52,15 +57,13 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
           case QUAD8:
           case QUAD9:
             {
-              libmesh_assert_less (i, 4);
-
               // Even with a loose inverse_map tolerance we ought to
               // be nearly on the element interior in master
               // coordinates
               libmesh_assert_less_equal ( std::fabs(xi), 1.0+10*TOLERANCE );
               libmesh_assert_less_equal ( std::fabs(eta), 1.0+10*TOLERANCE );
 
-              switch(i)
+              switch(ii)
                 {
                 case 0:
                   return sign * RealGradient( -0.25*(1.0-eta), 0.0 );
@@ -74,16 +77,12 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
-
-              return RealGradient();
             }
 
           case TRI6:
           case TRI7:
             {
-              libmesh_assert_less (i, 3);
-
-              switch(i)
+              switch(ii)
                 {
                 case 0:
                   return sign * RealGradient( -1.0+eta, -xi );
@@ -141,7 +140,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                                             const Order order,
                                             const unsigned int i,
                                             const unsigned int j,
-                                            const Point &,
+                                            const Point & p,
                                             const bool add_p_level)
 {
 #if LIBMESH_DIM > 1
@@ -149,7 +148,13 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
   libmesh_assert_less (j, 2);
 
   const Order total_order = static_cast<Order>(order + add_p_level * elem->p_level());
-  const short sign = elem->point(i) > elem->point((i+1) % elem->n_vertices()) ? 1 : -1;
+  libmesh_assert_less(i, n_dofs(elem->type(), total_order));
+
+  const char sign = i >= total_order * elem->n_edges() || elem->point(i / total_order) > elem->point((i / total_order + 1) % elem->n_vertices()) ? 1 : -1;
+  const unsigned int ii = sign > 0 ? i : (i / total_order * 2 + 1) * total_order - 1 - i;
+
+  const Real xi  = p(0);
+  const Real eta = p(1);
 
   switch (total_order)
     {
@@ -161,14 +166,12 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
           case QUAD8:
           case QUAD9:
             {
-              libmesh_assert_less (i, 4);
-
               switch (j)
                 {
                   // d()/dxi
                 case 0:
                   {
-                    switch(i)
+                    switch(ii)
                       {
                       case 0:
                       case 2:
@@ -185,7 +188,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                   // d()/deta
                 case 1:
                   {
-                    switch(i)
+                    switch(ii)
                       {
                       case 1:
                       case 3:
@@ -207,8 +210,6 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
           case TRI6:
           case TRI7:
             {
-              libmesh_assert_less (i, 3);
-
               switch (j)
                 {
                   // d()/dxi
@@ -271,9 +272,9 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const FEType fet,
 template <>
 RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                                                    const Order order,
-                                                   const unsigned int libmesh_dbg_var(i),
-                                                   const unsigned int libmesh_dbg_var(j),
-                                                   const Point &,
+                                                   const unsigned int i,
+                                                   const unsigned int j,
+                                                   const Point & p,
                                                    const bool add_p_level)
 {
 #if LIBMESH_DIM > 1
@@ -285,6 +286,13 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
   libmesh_assert_less (j, 3);
 
   const Order total_order = static_cast<Order>(order + add_p_level * elem->p_level());
+  libmesh_assert_less(i, n_dofs(elem->type(), total_order));
+
+  const char sign = i >= total_order * elem->n_edges() || elem->point(i / total_order) > elem->point((i / total_order + 1) % elem->n_vertices()) ? 1 : -1;
+  const unsigned int ii = sign > 0 ? i : (i / total_order * 2 + 1) * total_order - 1 - i;
+
+  const Real xi  = p(0);
+  const Real eta = p(1);
 
   switch (total_order)
     {
@@ -295,19 +303,10 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
           {
           case QUAD8:
           case QUAD9:
-            {
-              libmesh_assert_less (i, 4);
-              // All second derivatives for linear quads are zero.
-              return RealGradient();
-            }
-
           case TRI6:
           case TRI7:
-            {
-              libmesh_assert_less (i, 3);
-              // All second derivatives for linear triangles are zero.
-              return RealGradient();
-            }
+            // All second derivatives for linear quads and triangles are zero.
+            return RealGradient();
 
           default:
             libmesh_error_msg("ERROR: Unsupported 2D element type!: " << Utility::enum_to_string(elem->type()));
