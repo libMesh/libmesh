@@ -39,6 +39,7 @@ enum SolverPackage : int
     SLEPC_SOLVERS,
     EIGEN_SOLVERS,
     NLOPT_SOLVERS,
+    DIAGONAL_MATRIX, // Only for SparseMatrix
     // Invalid
     INVALID_SOLVER_PACKAGE
   };

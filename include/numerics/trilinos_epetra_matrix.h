@@ -102,6 +102,11 @@ public:
     return *this;
   }
 
+  virtual SolverPackage solver_package() override
+  {
+    return TRILINOS_SOLVERS;
+  }
+
   /**
    * The \p EpetraMatrix needs the full sparsity pattern.
    */
