@@ -30,6 +30,7 @@
 #include "libmesh/exodusII_io.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
+#include "libmesh/mesh_modification.h"
 #include "libmesh/exact_solution.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_solver_package.h"
@@ -58,11 +59,14 @@ int main (int argc, char ** argv)
   // Parse the input file
   GetPot infile("vector_fe_ex3.in");
 
+  // But allow the command line to override it.
+  infile.parse_command_line(argc, argv);
+
   // Read in parameters from the input file
   const unsigned int grid_size = infile("grid_size", 2);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_requires(3 <= LIBMESH_DIM, "2D/3D support");
+  libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
   // Create a mesh, with dimension to be overridden later, on the
   // default MPI communicator.
@@ -71,9 +75,7 @@ int main (int argc, char ** argv)
   // Use the MeshTools::Generation mesh generator to create a uniform
   // grid on the square [-1,1]^D. We must use at least TRI6 or QUAD8 elements
   // for the Nedelec triangle or quadrilateral elements, respectively.
-  std::string elem_str =
-    command_line_value(std::string("element_type"),
-                       std::string("TRI6"));
+  const std::string elem_str = infile("element_type", std::string("TRI6"));
 
   libmesh_error_msg_if(elem_str != "TRI6" && elem_str != "TRI7" && elem_str != "QUAD8" && elem_str != "QUAD9",
                        "You selected: " << elem_str <<
@@ -86,6 +88,8 @@ int main (int argc, char ** argv)
                                        -1., 1.,
                                        Utility::string_to_enum<ElemType>(elem_str));
 
+  // Make sure the code is robust against nodal reorderings.
+  MeshTools::Modification::permute_elements(mesh);
 
   // Print information about the mesh to the screen.
   mesh.print_info();
@@ -96,6 +100,15 @@ int main (int argc, char ** argv)
   // Declare the system "CurlCurl" and its variables.
   CurlCurlSystem & system =
     equation_systems.add_system<CurlCurlSystem> ("CurlCurl");
+
+  // Set the FE approximation order.
+  const Order order = static_cast<Order>(infile("order", 1u));
+
+  libmesh_error_msg_if(order != FIRST && order != SECOND,
+                       "You selected: " << order <<
+                       " but this example must be run with either order 1 or 2.");
+
+  system.order(order);
 
   // This example only implements the steady-state problem
   system.time_solver = std::make_unique<SteadySolver>(system);
