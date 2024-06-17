@@ -1978,6 +1978,8 @@ dof_id_type MeshBase::n_constraint_rows() const
 void
 MeshBase::copy_constraint_rows(const MeshBase & other_mesh)
 {
+  LOG_SCOPE("copy_constraint_rows(mesh)", "MeshBase");
+
   _constraint_rows.clear();
 
   const auto & other_constraint_rows = other_mesh.get_constraint_rows();
@@ -2000,6 +2002,8 @@ template <typename T>
 void
 MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
 {
+  LOG_SCOPE("copy_constraint_rows(mat)", "MeshBase");
+
   this->_constraint_rows.clear();
 
   // We're not going to support doing this distributed yet; it'd be

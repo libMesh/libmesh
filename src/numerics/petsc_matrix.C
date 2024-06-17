@@ -23,8 +23,11 @@
 
 // Local includes
 #include "libmesh/petsc_matrix.h"
+
+// libMesh includes
 #include "libmesh/dof_map.h"
 #include "libmesh/dense_matrix.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"
@@ -793,6 +796,8 @@ void PetscMatrix<T>::print_petsc_hdf5(const std::string & filename)
 template <typename T>
 void PetscMatrix<T>::read_petsc_binary(const std::string & filename)
 {
+  LOG_SCOPE("read_petsc_binary()", "PetscMatrix");
+
   this->_petsc_viewer(filename, PETSCVIEWERBINARY, FILE_MODE_READ);
 }
 
@@ -801,6 +806,8 @@ void PetscMatrix<T>::read_petsc_binary(const std::string & filename)
 template <typename T>
 void PetscMatrix<T>::read_petsc_hdf5(const std::string & filename)
 {
+  LOG_SCOPE("read_petsc_hdf5()", "PetscMatrix");
+
   this->_petsc_viewer(filename, PETSCVIEWERHDF5, FILE_MODE_READ);
 }
 
