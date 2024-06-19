@@ -112,6 +112,15 @@ void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
   // gives us a manifold bounding the mesh, though it may not be a
   // connected manifold even if the volume mesh was connected.
   {
+    // Make sure ids are in sync and valid on a DistributedMesh
+    const dof_id_type max_orig_id = mesh.max_elem_id();
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+    const unique_id_type max_unique_id = mesh.parallel_max_unique_id();
+#endif
+
+    // Change this if we add arbitrary polyhedra...
+    const dof_id_type max_sides = 6;
+
     std::unordered_set<Elem *> elems_to_delete;
 
     std::vector<std::unique_ptr<Elem>> elems_to_add;
@@ -126,7 +135,17 @@ void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
             if (elem->neighbor_ptr(s))
               continue;
 
-            elems_to_add.push_back(elem->build_side_ptr(s));
+            std::unique_ptr<Elem> side_elem = elem->build_side_ptr(s);
+            // If the mesh is replicated then it's automatic id
+            // setting is fine.  If not, we need unambiguous ids
+            // independent of element traversal.
+            if (!mesh.is_replicated())
+              {
+                side_elem->set_id(max_orig_id + max_sides*elem->id() + s);
+                side_elem->set_unique_id(max_unique_id + max_sides*elem->id() + s);
+              }
+
+            elems_to_add.push_back(std::move(side_elem));
           }
       }
 
