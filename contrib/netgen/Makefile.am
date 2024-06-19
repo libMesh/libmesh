@@ -23,8 +23,15 @@ ngliblibdir=$(libdir)
 # libngcore, not to the libngcore in the build directory
 #
 # Install-exec is automake speak for anything platform-dependent, not
-# just for executables
-install-exec-local:
+# just for executables, so it should probably be what we use here, but
+# I'm not sure the best way to tell automake "this is
+# platform-dependent but we're building it ourselves", so I'm calling
+# these libraries _DATA for now.
+#
+# We manually add the install-ngliblibDATA dependency so patchelf etc.
+# definitely are looking at an existing correct file when we do `make
+# install` in parallel.
+install-data-local: install-ngliblibDATA
 	if which install_name_tool 2>/dev/null; then \
 	  echo "install_name_tool exists on OSX but is unneeded for rpath-based libnglib there"; \
 	elif which patchelf 2>/dev/null; then \
