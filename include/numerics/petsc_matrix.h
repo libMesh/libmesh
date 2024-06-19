@@ -133,6 +133,11 @@ public:
   PetscMatrix & operator= (const PetscMatrix &);
   virtual SparseMatrix<T> & operator= (const SparseMatrix<T> & v) override;
 
+  virtual SolverPackage solver_package() override
+  {
+    return PETSC_SOLVERS;
+  }
+
   void set_matrix_type(PetscMatrixType mat_type);
 
   virtual void init (const numeric_index_type m,

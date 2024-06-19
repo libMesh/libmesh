@@ -77,6 +77,11 @@ public:
   EigenSparseMatrix & operator= (EigenSparseMatrix &&) = default;
   virtual ~EigenSparseMatrix () = default;
 
+  virtual SolverPackage solver_package() override
+  {
+    return EIGEN_SOLVERS;
+  }
+
   virtual SparseMatrix<T> & operator=(const SparseMatrix<T> & v) override
   {
     *this = cast_ref<const EigenSparseMatrix<T> &>(v);

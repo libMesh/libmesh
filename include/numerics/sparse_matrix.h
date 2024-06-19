@@ -29,6 +29,7 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/enum_parallel_type.h" // PARALLEL
 #include "libmesh/enum_matrix_build_type.h" // AUTOMATIC
+#include "libmesh/enum_solver_package.h"
 
 // C++ includes
 #include <cstddef>
@@ -122,6 +123,8 @@ public:
   build(const Parallel::Communicator & comm,
         const SolverPackage solver_package = libMesh::default_solver_package(),
         const MatrixBuildType matrix_build_type = MatrixBuildType::AUTOMATIC);
+
+  virtual SolverPackage solver_package() = 0;
 
   /**
    * \returns \p true if the matrix has been initialized,

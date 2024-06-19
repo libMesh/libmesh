@@ -61,6 +61,11 @@ public:
    */
   virtual ~DiagonalMatrix() = default;
 
+  virtual SolverPackage solver_package() override
+  {
+    return DIAGONAL_MATRIX;
+  }
+
   /**
    * unique pointers can be moved but not copied
    */

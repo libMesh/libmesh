@@ -20,6 +20,9 @@
 
 #define SPARSEMATRIXTEST                     \
   CPPUNIT_TEST(testGetAndSet);               \
+  CPPUNIT_TEST(testReadMatlab1);             \
+  CPPUNIT_TEST(testReadMatlab2);             \
+  CPPUNIT_TEST(testReadMatlab4);             \
   CPPUNIT_TEST(testWriteAndRead);            \
   CPPUNIT_TEST(testClone);
 
@@ -138,6 +141,51 @@ public:
 
     testValues();
   }
+
+  void testReadMatlab(const std::string & filename)
+  {
+    // Laspack doesn't handle non-square matrices)
+    if (matrix->solver_package() == libMesh::LASPACK_SOLVERS)
+      return;
+
+    matrix->clear();
+
+    auto matrix2 = std::make_unique<DerivedClass>(*my_comm);
+
+    matrix->read(filename);
+
+#ifndef LIBMESH_HAVE_GZSTREAM
+    return;
+#endif
+
+    matrix2->read(std::string(filename)+".gz");
+
+    // We need some more SparseMatrix operators, but not today
+    CPPUNIT_ASSERT(matrix->l1_norm() == matrix2->l1_norm());
+    CPPUNIT_ASSERT(matrix->linfty_norm() == matrix2->linfty_norm());
+  }
+
+
+  void testReadMatlab1()
+  {
+    LOG_UNIT_TEST;
+    testReadMatlab("matrices/geom_1_extraction_op.m");
+  }
+
+
+  void testReadMatlab2()
+  {
+    LOG_UNIT_TEST;
+    testReadMatlab("matrices/geom_2_extraction_op.m");
+  }
+
+
+  void testReadMatlab4()
+  {
+    LOG_UNIT_TEST;
+    testReadMatlab("matrices/geom_4_extraction_op.m");
+  }
+
 
   void testWriteAndRead()
   {

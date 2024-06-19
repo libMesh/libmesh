@@ -85,6 +85,11 @@ public:
     return *this;
   }
 
+  virtual SolverPackage solver_package() override
+  {
+    return LASPACK_SOLVERS;
+  }
+
   /**
    * The \p LaspackMatrix needs the full sparsity pattern.
    */

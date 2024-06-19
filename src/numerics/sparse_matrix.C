@@ -33,6 +33,13 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/enum_solver_package.h"
 
+// gzstream for reading compressed files as a stream
+#ifdef LIBMESH_HAVE_GZSTREAM
+# include "libmesh/ignore_warnings.h" // shadowing in gzstream.h
+# include "gzstream.h"
+# include "libmesh/restore_warnings.h"
+#endif
+
 // C++ includes
 #include <memory>
 #include <fstream>
@@ -503,14 +510,19 @@ void SparseMatrix<T>::print_petsc_hdf5(const std::string &)
 template <typename T>
 void SparseMatrix<T>::read(const std::string & filename)
 {
-  const std::string_view basename = Utility::basename_of(filename);
-
   {
     std::ifstream in (filename.c_str());
     libmesh_error_msg_if
       (!in.good(), "ERROR: cannot read file:\n\t" <<
        filename);
   }
+
+  std::string_view basename = Utility::basename_of(filename);
+
+  const bool gzipped_file = (basename.rfind(".gz") == basename.size() - 3);
+
+  if (gzipped_file)
+    basename.remove_suffix(3);
 
   if (basename.rfind(".matlab") == basename.size() - 7 ||
       basename.rfind(".m") == basename.size() - 2)
@@ -562,6 +574,8 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
 #else
   parallel_object_only();
 
+  const bool gzipped_file = (filename.rfind(".gz") == filename.size() - 3);
+
   // The sizes we get from the file
   std::size_t m = 0,
               n = 0;
@@ -571,32 +585,69 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
   // processors), then again to get the sparsity to send to each
   // processor, then a final time to get the entries to send to each
   // processor.
-  std::unique_ptr<std::ifstream> file;
+  //
+  // We'll use an istream here; it might be an ifstream if we're
+  // opening a raw ASCII file or a gzstream if we're opening a
+  // compressed one.
+  std::unique_ptr<std::istream> file;
 
-  // We'll be using regular expressions to make ourselves slightly
-  // more robust to formatting.
-  const std::regex start_regex // assignment like "zzz = ["
-    ("\\s*\\w+\\s*=\\s*\\[");
-  const std::regex entry_regex // row/col/val like "1 1 -2.0e-4"
-    ("(\\d+)\\s+(\\d+)\\s+([+-]?(\\d+([.]\\d*)?([eE][+-]?\\d+)?|[.]\\d+([eE][+-]?\\d+)?))");
-  const std::regex end_regex // end of assignment
-    ("^[^%]*\\]");
+  // We'll need a temporary structure to cache matrix entries, because
+  // we need to read through the whole file before we know the size
+  // and sparsity structure with which we can init().
+  //
+  // Reading through the file three times via `seekg` doesn't work
+  // with our gzstream wrapper, and seems to take three times as long
+  // even with a plain ifstream.  What happened to disk caching!?
+  std::vector<std::tuple<numeric_index_type, numeric_index_type, T>> entries;
 
   // We'll read the matrix on processor 0 rather than try to juggle
-  // parallel I/O.  Start by reading to deduce the size.
+  // parallel I/O.
   if (this->processor_id() == 0)
     {
-      file = std::make_unique<std::ifstream>(filename.c_str());
+      // We'll be using regular expressions to make ourselves slightly
+      // more robust to formatting.
+      const std::regex start_regex // assignment like "zzz = ["
+        ("\\s*\\w+\\s*=\\s*\\[");
+      const std::regex entry_regex // row/col/val like "1 1 -2.0e-4"
+        ("(\\d+)\\s+(\\d+)\\s+([+-]?(\\d+([.]\\d*)?([eE][+-]?\\d+)?|[.]\\d+([eE][+-]?\\d+)?))");
+      const std::regex end_regex // end of assignment
+        ("^[^%]*\\]");
+
+      if (gzipped_file)
+        {
+#ifdef LIBMESH_HAVE_GZSTREAM
+          auto inf = std::make_unique<igzstream>();
+          libmesh_assert(inf);
+          inf->open(filename.c_str(), std::ios::in);
+          file = std::move(inf);
+#else
+          libmesh_error_msg("ERROR: need gzstream to handle .gz files!!!");
+#endif
+        }
+      else
+        {
+          auto inf = std::make_unique<std::ifstream>();
+          libmesh_assert(inf);
+
+          std::string new_name = Utility::unzip_file(filename);
+
+          inf->open(new_name.c_str(), std::ios::in);
+          file = std::move(inf);
+        }
 
       // If we have a matrix with all-zero trailing rows, the only
       // way to get the size is if it ended up in a comment
       const std::regex size_regex // comment like "% size = 8 8"
         ("%\\s*[Ss][Ii][Zz][Ee]\\s*=\\s*(\\d+)\\s+(\\d+)");
 
-      // Get the size
       bool have_started = false;
       bool have_ended = false;
       std::size_t largest_i_seen = 0, largest_j_seen = 0;
+
+      // Data for the row we're working on
+      // Use 1-based indexing for current_row, as in the file
+      std::size_t current_row = 1;
+
       for (std::string line; std::getline(*file, line);)
         {
           std::smatch sm;
@@ -619,10 +670,33 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
 
               const std::string istr = sm[1];
               const std::string jstr = sm[2];
+              const std::string cstr = sm[3];
 
               std::size_t i = std::stoull(istr);
-              largest_i_seen = std::max(i, largest_i_seen);
               std::size_t j = std::stoull(jstr);
+
+              // Try to be compatible with
+              // higher-than-double-precision T
+              std::stringstream ss(cstr);
+              T value;
+              ss >> value;
+
+              entries.emplace_back(cast_int<numeric_index_type>(i),
+                                   cast_int<numeric_index_type>(j),
+                                   value);
+
+              libmesh_error_msg_if
+                (!i || !j, "Expected 1-based indexing in matrix file "
+                 << filename);
+
+              current_row = std::max(current_row, i);
+
+              libmesh_error_msg_if
+                (i < current_row,
+                 "Can't handle out-of-order entries in matrix file "
+                 << filename);
+
+              largest_i_seen = std::max(i, largest_i_seen);
               largest_j_seen = std::max(j, largest_j_seen);
             }
 
@@ -703,71 +777,41 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
 
   if (this->processor_id() == 0)
     {
-      file->seekg(0);
-
-      bool have_started = false;
-
       // Data for the row we're working on
-
       // Use 1-based indexing for current_row, as in the file
       numeric_index_type current_row = 1;
       processor_id_type current_proc = 0;
       numeric_index_type current_on_diagonal_nonzeros = 0;
       numeric_index_type current_off_diagonal_nonzeros = 0;
 
-      for (std::string line; std::getline(*file, line);)
+      for (auto [i, j, value] : entries)
         {
-          std::smatch sm;
-
-          if (std::regex_search(line, start_regex))
-            have_started = true;
-
-          if (have_started && std::regex_search(line, sm, entry_regex))
+          if (i > current_row)
             {
-              const std::string istr = sm[1];
-              const std::string jstr = sm[2];
-
-              const numeric_index_type i = std::stoull(istr);
-              const numeric_index_type j = std::stoull(jstr);
-
-              libmesh_error_msg_if
-                (!i || !j, "Expected 1-based indexing in matrix file "
-                 << filename);
-
-              libmesh_error_msg_if
-                (i < current_row,
-                 "Can't handle out-of-order entries in matrix file "
-                 << filename);
-              if (i > current_row)
-                {
-                  current_row = i;
-                  // +1 for 1-based indexing in file
-                  while (current_row >= (new_row_stops[current_proc]+1))
-                    ++current_proc;
-                  current_on_diagonal_nonzeros = 0;
-                  current_off_diagonal_nonzeros = 0;
-                }
-
+              current_row = i;
               // +1 for 1-based indexing in file
-              if (j >= (new_col_starts[current_proc]+1) &&
-                  j < (new_col_stops[current_proc]+1))
-                {
-                  ++current_on_diagonal_nonzeros;
-                  on_diagonal_nonzeros =
-                    std::max(on_diagonal_nonzeros,
-                             current_on_diagonal_nonzeros);
-                }
-              else
-                {
-                  ++current_off_diagonal_nonzeros;
-                  off_diagonal_nonzeros =
-                    std::max(off_diagonal_nonzeros,
-                             current_off_diagonal_nonzeros);
-                }
+              while (current_row >= (new_row_stops[current_proc]+1))
+                ++current_proc;
+              current_on_diagonal_nonzeros = 0;
+              current_off_diagonal_nonzeros = 0;
             }
 
-          if (std::regex_search(line, end_regex))
-            break;
+          // +1 for 1-based indexing in file
+          if (j >= (new_col_starts[current_proc]+1) &&
+              j < (new_col_stops[current_proc]+1))
+            {
+              ++current_on_diagonal_nonzeros;
+              on_diagonal_nonzeros =
+                std::max(on_diagonal_nonzeros,
+                         current_on_diagonal_nonzeros);
+            }
+          else
+            {
+              ++current_off_diagonal_nonzeros;
+              off_diagonal_nonzeros =
+                std::max(off_diagonal_nonzeros,
+                         current_off_diagonal_nonzeros);
+            }
         }
     }
 
@@ -781,42 +825,12 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
              off_diagonal_nonzeros);
 
   // One last reread to set values
+  //
+  // Convert from 1-based to 0-based indexing
   if (this->processor_id() == 0)
-    {
-      file->seekg(0);
+    for (auto [i, j, value] : entries)
+      this->set(i-1, j-1, value);
 
-      bool have_started = false;
-
-      for (std::string line; std::getline(*file, line);)
-        {
-          std::smatch sm;
-
-          if (std::regex_search(line, start_regex))
-            have_started = true;
-
-          if (have_started && std::regex_search(line, sm, entry_regex))
-            {
-              const std::string istr = sm[1];
-              const std::string jstr = sm[2];
-              const std::string cstr = sm[3];
-
-              const numeric_index_type i = std::stoull(istr);
-              const numeric_index_type j = std::stoull(jstr);
-
-              // Try to be compatible with
-              // higher-than-double-precision T
-              std::stringstream ss(cstr);
-              T value;
-              ss >> value;
-
-              // Convert from 1-based to 0-based indexing
-              this->set(i-1, j-1, value);
-            }
-
-          if (std::regex_search(line, end_regex))
-            break;
-        }
-    }
   this->close();
 #endif
 }
