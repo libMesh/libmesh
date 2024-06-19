@@ -266,6 +266,7 @@ BUILT_SOURCES = \
         shell_matrix.h \
         sparse_matrix.h \
         sparse_shell_matrix.h \
+        static_condensation.h \
         sum_shell_matrix.h \
         tensor_shell_matrix.h \
         tensor_tools.h \
@@ -1375,6 +1376,9 @@ sparse_matrix.h: $(top_srcdir)/include/numerics/sparse_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sparse_shell_matrix.h: $(top_srcdir)/include/numerics/sparse_shell_matrix.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+static_condensation.h: $(top_srcdir)/include/numerics/static_condensation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sum_shell_matrix.h: $(top_srcdir)/include/numerics/sum_shell_matrix.h
