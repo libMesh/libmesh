@@ -2205,7 +2205,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   MeshTools::Modification::flatten(mesh);
 
   // Convert all the tensor product elements to simplices if requested
-  if ((type == TRI7) || (type == TRI6) || (type == TRI3) || 
+  if ((type == TRI7) || (type == TRI6) || (type == TRI3) ||
       (type == TET4) || (type == TET10) || (type == TET14))
     {
       // A DistributedMesh needs a little prep before all_tri()
