@@ -1,7 +1,7 @@
 example_name  = vector_fe_ex9
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/vector_fe/ex9
-data          = mixed_exact_solution.h solution_function.h vector_fe_ex9.C vector_fe_ex9.in run.sh
+data          = vector_fe_ex9.C vector_fe_ex9.in hdg_problem.h hdg_problem.C exact_soln.h run.sh
 sources       = $(data)
 
 CLEANFILES = out.e

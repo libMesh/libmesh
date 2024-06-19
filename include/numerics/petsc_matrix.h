@@ -83,7 +83,7 @@ public:
    */
   explicit
   PetscMatrix (Mat m,
-               const Parallel::Communicator & comm_in);
+                  const Parallel::Communicator & comm_in);
 
   /**
    * This class manages a C-style struct (Mat) manually, so we

@@ -77,7 +77,7 @@ void TimeSolver::init ()
     this->diff_solver() = DiffSolver::build(_system);
 
   if (this->linear_solver().get() == nullptr)
-    this->linear_solver() = LinearSolver<Number>::build(_system.comm());
+    this->linear_solver() = LinearSolver<Number>::build(_system);
 }
 
 void TimeSolver::init_adjoints ()

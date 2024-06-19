@@ -30,6 +30,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_sync.h"
 #include "libmesh/utility.h"
+#include "libmesh/static_condensation.h"
 
 // TIMPI includes
 #include "timpi/communicator.h"
@@ -93,7 +94,43 @@ void Build::sorted_connected_dofs(const Elem * elem,
                                   std::vector<dof_id_type> & dofs_vi,
                                   unsigned int vi)
 {
-  dof_map.dof_indices (elem, dofs_vi, vi);
+  if (dof_map.has_static_condensation())
+  {
+    const auto & sc = dof_map.get_static_condensation();
+    dofs_vi.clear();
+
+    auto total_and_uncondensed_from_scalar_dofs_functor =
+        [&dofs_vi](const Elem & /*elem*/,
+                   std::vector<dof_id_type> & dof_indices,
+                   const std::vector<dof_id_type> & scalar_dof_indices)
+    {
+      dof_indices.insert(dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+      dofs_vi.insert(dofs_vi.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+    };
+
+    auto total_and_uncondensed_from_field_dofs_functor =
+        [&dofs_vi, &sc](const Elem & functor_elem,
+                        const unsigned int node_num,
+                        const unsigned int var_num,
+                        std::vector<dof_id_type> & dof_indices,
+                        const dof_id_type field_dof)
+    {
+      dof_indices.push_back(field_dof);
+      if (sc.uncondensed_vars().count(var_num) ||
+          (node_num != invalid_uint && !functor_elem.is_internal(node_num)))
+        dofs_vi.push_back(field_dof);
+    };
+
+    dof_map.dof_indices(elem,
+                        dummy_vec,
+                        vi,
+                        total_and_uncondensed_from_scalar_dofs_functor,
+                        total_and_uncondensed_from_field_dofs_functor,
+                        elem->p_level());
+  }
+  else
+    dof_map.dof_indices (elem, dofs_vi, vi);
+
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   dof_map.find_connected_dofs (dofs_vi);
 #endif
@@ -243,8 +280,6 @@ void Build::operator()(const ConstElemRange & range)
   // in the (# of elements)*(# nodes per element)
   const processor_id_type proc_id     = dof_map.processor_id();
   const dof_id_type n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
-  const dof_id_type first_dof_on_proc = dof_map.first_dof(proc_id);
-  const dof_id_type end_dof_on_proc   = dof_map.end_dof(proc_id);
 
   sparsity_pattern.resize(n_dofs_on_proc);
 
@@ -324,38 +359,6 @@ void Build::operator()(const ConstElemRange & range)
             } // End ghosted element loop
       } // End range element loop
   } // End ghosting functor section
-
-  // Now a new chunk of sparsity structure is built for all of the
-  // DOFs connected to our rows of the matrix.
-
-  // If we're building a full sparsity pattern, then we've got
-  // complete rows to work with, so we can just count them from
-  // scratch.
-  if (need_full_sparsity_pattern)
-    {
-      n_nz.clear();
-      n_oz.clear();
-    }
-
-  n_nz.resize (n_dofs_on_proc, 0);
-  n_oz.resize (n_dofs_on_proc, 0);
-
-  for (dof_id_type i=0; i<n_dofs_on_proc; i++)
-    {
-      // Get the row of the sparsity pattern
-      SparsityPattern::Row & row = sparsity_pattern[i];
-
-      for (const auto & df : row)
-        if ((df < first_dof_on_proc) || (df >= end_dof_on_proc))
-          n_oz[i]++;
-        else
-          n_nz[i]++;
-
-      // If we're not building a full sparsity pattern, then we want
-      // to avoid overcounting these entries as much as possible.
-      if (!need_full_sparsity_pattern)
-        row.clear();
-    }
 }
 
 
@@ -363,58 +366,34 @@ void Build::operator()(const ConstElemRange & range)
 void Build::join (const SparsityPattern::Build & other)
 {
   const processor_id_type proc_id           = dof_map.processor_id();
-  const dof_id_type       n_global_dofs     = dof_map.n_dofs();
   const dof_id_type       n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
-  const dof_id_type       first_dof_on_proc = dof_map.first_dof(proc_id);
-  const dof_id_type       end_dof_on_proc   = dof_map.end_dof(proc_id);
 
   libmesh_assert_equal_to (sparsity_pattern.size(), other.sparsity_pattern.size());
-  libmesh_assert_equal_to (n_nz.size(), sparsity_pattern.size());
-  libmesh_assert_equal_to (n_oz.size(), sparsity_pattern.size());
 
   for (dof_id_type r=0; r<n_dofs_on_proc; r++)
     {
       // increment the number of on and off-processor nonzeros in this row
       // (note this will be an upper bound unless we need the full sparsity pattern)
-      if (need_full_sparsity_pattern)
-        {
-          SparsityPattern::Row       & my_row    = sparsity_pattern[r];
-          const SparsityPattern::Row & their_row = other.sparsity_pattern[r];
+      SparsityPattern::Row       & my_row    = sparsity_pattern[r];
+      const SparsityPattern::Row & their_row = other.sparsity_pattern[r];
 
-          // simple copy if I have no dofs
-          if (my_row.empty())
-            my_row = their_row;
+      // simple copy if I have no dofs
+      if (my_row.empty())
+        my_row = their_row;
 
-          // otherwise add their DOFs to mine, resort, and re-unique the row
-          else if (!their_row.empty()) // do nothing for the trivial case where
-            {                          // their row is empty
-              my_row.insert (my_row.end(),
-                             their_row.begin(),
-                             their_row.end());
+      // otherwise add their DOFs to mine, resort, and re-unique the row
+      else if (!their_row.empty()) // do nothing for the trivial case where
+        {                          // their row is empty
+          my_row.insert (my_row.end(),
+                         their_row.begin(),
+                         their_row.end());
 
-              // We cannot use SparsityPattern::sort_row() here because it expects
-              // the [begin,middle) [middle,end) to be non-overlapping.  This is not
-              // necessarily the case here, so use std::sort()
-              std::sort (my_row.begin(), my_row.end());
+          // We cannot use SparsityPattern::sort_row() here because it expects
+          // the [begin,middle) [middle,end) to be non-overlapping.  This is not
+          // necessarily the case here, so use std::sort()
+          std::sort (my_row.begin(), my_row.end());
 
-              my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
-            }
-
-          // fix the number of on and off-processor nonzeros in this row
-          n_nz[r] = n_oz[r] = 0;
-
-          for (const auto & df : my_row)
-            if ((df < first_dof_on_proc) || (df >= end_dof_on_proc))
-              n_oz[r]++;
-            else
-              n_nz[r]++;
-        }
-      else
-        {
-          n_nz[r] += other.n_nz[r];
-          n_nz[r] = std::min(n_nz[r], n_dofs_on_proc);
-          n_oz[r] += other.n_oz[r];
-          n_oz[r] =std::min(n_oz[r], static_cast<dof_id_type>(n_global_dofs-n_nz[r]));
+          my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
         }
     }
 
@@ -474,10 +453,8 @@ void Build::parallel_sync ()
   auto & comm = this->comm();
   auto my_pid = comm.rank();
 
-  const auto n_global_dofs   = dof_map.n_dofs();
   const auto n_dofs_on_proc  = dof_map.n_dofs_on_processor(my_pid);
   const auto local_first_dof = dof_map.first_dof();
-  const auto local_end_dof   = dof_map.end_dof();
 
   // The data to send
   std::map<processor_id_type, std::vector<dof_id_type>> ids_to_send;
@@ -519,10 +496,7 @@ void Build::parallel_sync ()
   auto rows_action_functor =
     [this,
      & received_ids_map,
-     n_global_dofs,
-     n_dofs_on_proc,
-     local_first_dof,
-     local_end_dof]
+     local_first_dof]
     (processor_id_type pid,
      const std::vector<Row> & received_rows)
     {
@@ -540,54 +514,31 @@ void Build::parallel_sync ()
 
           auto & their_row = received_rows[i];
 
-          if (need_full_sparsity_pattern)
+          auto & my_row = sparsity_pattern[my_r];
+
+          // They wouldn't have sent an empty row
+          libmesh_assert(!their_row.empty());
+
+          // We can end up with an empty row on a dof that touches our
+          // inactive elements but not our active ones
+          if (my_row.empty())
             {
-              auto & my_row = sparsity_pattern[my_r];
-
-              // They wouldn't have sent an empty row
-              libmesh_assert(!their_row.empty());
-
-              // We can end up with an empty row on a dof that touches our
-              // inactive elements but not our active ones
-              if (my_row.empty())
-              {
-                my_row.assign (their_row.begin(), their_row.end());
-              }
-              else
-              {
-                my_row.insert (my_row.end(),
-                               their_row.begin(),
-                               their_row.end());
-
-                // We cannot use SparsityPattern::sort_row() here because it expects
-                // the [begin,middle) [middle,end) to be non-overlapping.  This is not
-                // necessarily the case here, so use std::sort()
-                std::sort (my_row.begin(), my_row.end());
-
-                my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
-              }
-
-              // fix the number of on and off-processor nonzeros in this row
-              n_nz[my_r] = n_oz[my_r] = 0;
-
-              for (const auto & df : my_row)
-                if ((df < local_first_dof) || (df >= local_end_dof))
-                  n_oz[my_r]++;
-                else
-                  n_nz[my_r]++;
+              my_row.assign (their_row.begin(), their_row.end());
             }
           else
             {
-              for (const auto & df : their_row)
-                if ((df < local_first_dof) || (df >= local_end_dof))
-                  n_oz[my_r]++;
-                else
-                  n_nz[my_r]++;
+              my_row.insert (my_row.end(),
+                             their_row.begin(),
+                             their_row.end());
 
-              n_nz[my_r] = std::min(n_nz[my_r], n_dofs_on_proc);
-              n_oz[my_r] = std::min(n_oz[my_r],
-                                    static_cast<dof_id_type>(n_global_dofs-n_nz[my_r]));
+              // We cannot use SparsityPattern::sort_row() here because it expects
+              // the [begin,middle) [middle,end) to be non-overlapping.  This is not
+              // necessarily the case here, so use std::sort()
+              std::sort (my_row.begin(), my_row.end());
+
+              my_row.erase(std::unique (my_row.begin(), my_row.end()), my_row.end());
             }
+
         }
     };
 
@@ -596,6 +547,36 @@ void Build::parallel_sync ()
 
   // We should have sent everything at this point.
   libmesh_assert (nonlocal_pattern.empty());
+
+  // assert these are empty because std::vector::resize will only append the specified element value
+  // if the new size is greater than the current size. Elements whose indices are less than the
+  // current size are untouched
+  libmesh_assert(n_nz.empty());
+  libmesh_assert(n_oz.empty());
+  n_nz.resize (n_dofs_on_proc, 0);
+  n_oz.resize (n_dofs_on_proc, 0);
+
+  const dof_id_type first_dof_on_proc = dof_map.first_dof(my_pid);
+  const dof_id_type end_dof_on_proc   = dof_map.end_dof(my_pid);
+
+  for (dof_id_type i=0; i<n_dofs_on_proc; i++)
+    {
+      // Get the row of the sparsity pattern
+      SparsityPattern::Row & row = sparsity_pattern[i];
+
+      for (const auto & df : row)
+        if ((df < first_dof_on_proc) || (df >= end_dof_on_proc))
+          n_oz[i]++;
+        else
+          n_nz[i]++;
+
+      libmesh_assert(n_nz[i] <= n_dofs_on_proc);
+
+      // If we're not building a full sparsity pattern, then we want
+      // to avoid overcounting these entries as much as possible.
+      if (!need_full_sparsity_pattern)
+        row.clear();
+    }
 }
 
 
