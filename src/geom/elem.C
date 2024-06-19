@@ -3183,4 +3183,27 @@ void Elem::swap2boundaryedges(unsigned short e1,
     boundary_info->add_edge(this, e1, ids2);
 }
 
+bool
+Elem::is_internal(const unsigned int i) const
+{
+  switch (this->dim())
+  {
+    case 0:
+      return false;
+
+    case 1:
+      return !is_vertex(i);
+
+    case 2:
+      return !is_vertex(i) && !is_edge(i);
+
+    case 3:
+      return !is_vertex(i) && !is_edge(i) && !is_face(i);
+
+    default:
+      libmesh_error_msg("impossible element dimension " << std::to_string(this->dim()));
+      return 0;
+  }
+}
+
 } // namespace libMesh
