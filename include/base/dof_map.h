@@ -756,7 +756,9 @@ public:
   void dof_indices (const Elem * const elem,
                     std::vector<dof_id_type> & di,
                     const unsigned int vn,
-                    int p_level = -12345) const;
+                    int p_level = -12345,
+                    std::vector<dof_id_type> * dib = nullptr,
+                    std::vector<dof_id_type> * dii = nullptr) const;
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -1658,13 +1660,13 @@ private:
                      const unsigned int vg,
                      const unsigned int vig,
                      const Node * const * nodes,
-                     unsigned int       n_nodes
+                     unsigned int       n_nodes,
 #ifdef DEBUG
-                     ,
                      const unsigned int v,
-                     std::size_t & tot_size
+                     std::size_t & tot_size,
 #endif
-                     ) const;
+                     std::vector<dof_id_type> * dib = nullptr,
+                     std::vector<dof_id_type> * dii = nullptr) const;
 
   /**
    * Helper function that implements the element-nodal versions of

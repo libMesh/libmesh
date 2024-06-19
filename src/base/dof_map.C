@@ -2102,15 +2102,23 @@ void DofMap::dof_indices (const Elem * const elem,
 void DofMap::dof_indices (const Elem * const elem,
                           std::vector<dof_id_type> & di,
                           const unsigned int vn,
-                          int p_level) const
+                          int p_level,
+                          std::vector<dof_id_type> * const dib,
+                          std::vector<dof_id_type> * const dii) const
 {
   // We now allow elem==nullptr to request just SCALAR dofs
   // libmesh_assert(elem);
 
   LOG_SCOPE("dof_indices()", "DofMap");
 
+  libmesh_assert(dib == dii);
+
   // Clear the DOF indices vector
   di.clear();
+  if (dib)
+    dib->clear();
+  if (dii)
+    dii->clear();
 
   // Use the default p refinement level?
   if (p_level == -12345)
@@ -2138,11 +2146,11 @@ void DofMap::dof_indices (const Elem * const elem,
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
           _dof_indices(*elem, p_level, di, vg, vig, elem_nodes.data(),
-                       cast_int<unsigned int>(elem_nodes.size())
+                       cast_int<unsigned int>(elem_nodes.size()),
 #ifdef DEBUG
-                       , vn, tot_size
+                       vn, tot_size,
 #endif
-                       );
+                       dib, dii);
         }
 
       return;
@@ -2159,14 +2167,16 @@ void DofMap::dof_indices (const Elem * const elem,
       std::vector<dof_id_type> di_new;
       this->SCALAR_dof_indices(di_new,vn);
       di.insert( di.end(), di_new.begin(), di_new.end());
+      if (dib)
+        dib->insert(dib->end(), di_new.begin(), di_new.end());
     }
   else if (elem)
     _dof_indices(*elem, p_level, di, vg, vig, elem->get_nodes(),
-                 elem->n_nodes()
+                 elem->n_nodes(),
 #ifdef DEBUG
-                 , vn, tot_size
+                 vn, tot_size,
 #endif
-                 );
+                 dib, dii);
 
 #ifdef DEBUG
   libmesh_assert_equal_to (tot_size, di.size());
@@ -2384,14 +2394,16 @@ void DofMap::_dof_indices (const Elem & elem,
                            const unsigned int vg,
                            const unsigned int vig,
                            const Node * const * nodes,
-                           unsigned int       n_nodes
+                           unsigned int       n_nodes,
 #ifdef DEBUG
-                           ,
                            const unsigned int v,
-                           std::size_t & tot_size
+                           std::size_t & tot_size,
 #endif
-                           ) const
+                           std::vector<dof_id_type> * const dib,
+                           std::vector<dof_id_type> * const dii) const
 {
+  libmesh_assert(dib == dii);
+
   const VariableGroup & var = this->variable_group(vg);
 
   if (var.active_on_subdomain(elem.subdomain_id()))
@@ -2429,6 +2441,15 @@ void DofMap::_dof_indices (const Elem & elem,
       // below).
       const FEInterface::n_dofs_at_node_ptr ndan =
         FEInterface::n_dofs_at_node_function(fe_type, &elem);
+
+      auto add_to_dof_partition = [dii, dib, &elem](const unsigned int node_num, const dof_id_type dof)
+      {
+        libmesh_assert(dii);
+        if (elem.is_internal(node_num))
+          dii->push_back(dof);
+        else
+          dib->push_back(dof);
+      };
 
       // Get the node-based DOF numbers
       for (unsigned int n=0; n != n_nodes; n++)
@@ -2479,6 +2500,8 @@ void DofMap::_dof_indices (const Elem & elem,
                       node.dof_number(sys_num, vg, vig, i, n_comp);
                     libmesh_assert_not_equal_to (d, DofObject::invalid_id);
                     di.push_back(d);
+                    if (dii)
+                      add_to_dof_partition(n, d);
                   }
             }
           // If this is a vertex or an element without extra hanging
@@ -2497,6 +2520,8 @@ void DofMap::_dof_indices (const Elem & elem,
                   libmesh_assert_not_equal_to (d, DofObject::invalid_id);
                   libmesh_assert_less (d, this->n_dofs());
                   di.push_back(d);
+                  if (dii)
+                    add_to_dof_partition(n, d);
                 }
 
               // With fewer good component indices than we need, e.g.
@@ -2528,6 +2553,8 @@ void DofMap::_dof_indices (const Elem & elem,
                   libmesh_assert_not_equal_to (d, DofObject::invalid_id);
 
                   di.push_back(d);
+                  if (dii)
+                    dii->push_back(d);
                 }
             }
           else
