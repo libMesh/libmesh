@@ -55,6 +55,7 @@
 #include "libmesh/dense_vector.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/static_condensation.h"
 
 // Define the DofMap, which handles degree of freedom
 // indexing.
@@ -123,7 +124,7 @@ int main (int argc, char ** argv)
 
   // Declare the Poisson system and its variables.
   // The Poisson system is another example of a steady system.
-  equation_systems.add_system<LinearImplicitSystem> ("Poisson");
+  auto & sys = equation_systems.add_system<LinearImplicitSystem> ("Poisson");
 
   // Adds the variable "u" to "Poisson".  "u"
   // will be approximated using second-order approximation.
@@ -139,6 +140,11 @@ int main (int argc, char ** argv)
 
   // Prints information about the system to the screen.
   equation_systems.print_info();
+
+  // Initialize the static condensation structure
+  StaticCondensation sc(mesh, sys.get_dof_map());
+
+  equation_systems.parameters.set<StaticCondensation *>("sc") = &sc;
 
   // Solve the system "Poisson".  Note that calling this
   // member will assemble the linear system and invoke
@@ -156,6 +162,10 @@ int main (int argc, char ** argv)
   // if you linked against the appropriate X libraries when you
   // built PETSc.
   equation_systems.get_system("Poisson").solve();
+
+  // Do static condensation solve
+  sc.assemble_reduced_mat();
+  sc.solve(*sys.solution);
 
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 
@@ -183,6 +193,8 @@ void assemble_poisson(EquationSystems & es,
   // It is a good idea to make sure we are assembling
   // the proper system.
   libmesh_assert_equal_to (system_name, "Poisson");
+
+  auto & sc = *es.parameters.get<StaticCondensation *>("sc");
 
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
@@ -467,6 +479,7 @@ void assemble_poisson(EquationSystems & es,
       // and  NumericVector::add_vector() members do this for us.
       matrix.add_matrix (Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
+      sc.add_matrix(*elem, 0, 0, Ke);
     }
 
   // All done!

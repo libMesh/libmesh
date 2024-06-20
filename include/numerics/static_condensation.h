@@ -19,7 +19,12 @@
 #define LIBMESH_STATIC_CONDENSATION_H
 
 #include "libmesh/id_types.h"
+#include "libmesh/libmesh_common.h"
 #include <unordered_map>
+#include <memory>
+#include <vector>
+
+#include <Eigen/Dense>
 
 namespace libMesh
 {
@@ -28,34 +33,64 @@ class DofMap;
 class Elem;
 template <typename>
 class DenseMatrix;
+template <typename>
+class NumericVector;
+template <typename>
+class SparseMatrix;
 
-template <typename T>
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+typedef Eigen::MatrixXcd EigenMatrix;
+typedef Eigen::VectorXcd EigenVector;
+#else
+typedef Eigen::MatrixXd EigenMatrix;
+typedef Eigen::VectorXd EigenVector;
+#endif
+
 class StaticCondensation
 {
 public:
   StaticCondensation(const MeshBase & mesh, const DofMap & dof_map);
 
   /**
-   * Build the element global to local index maps
+   * Build the element global to local index maps and size the element matrices
    */
-  void build_idx_maps();
+  void init();
 
   void add_matrix(const Elem & elem,
                   const unsigned int i_var,
                   const unsigned int j_var,
-                  const DenseMatrix<T> & k);
+                  const DenseMatrix<Number> & k);
+
+  void assemble_reduced_mat();
+  void solve(const NumericVector<Number> & full_rhs);
 
 private:
+  void computeElemDofsScalar(const Elem & elem,
+                             const std::vector<dof_id_type> & scalar_dof_indices,
+                             std::vector<dof_id_type> & elem_dof_indices,
+                             std::vector<dof_id_type> & elem_interior_dofs,
+                             std::vector<dof_id_type> & elem_trace_dofs) const;
+
+  void computeElemDofsField(const Elem & elem,
+                            const unsigned int node_num,
+                            const dof_id_type field_dof,
+                            std::vector<dof_id_type> & elem_dof_indices,
+                            std::vector<dof_id_type> & elem_interior_dofs,
+                            std::vector<dof_id_type> & elem_trace_dofs) const;
+
   struct LocalData
   {
     /// interior-interior matrix entries
-    DenseMatrix<T> Aii;
+    EigenMatrix Aii;
     /// interior-boundary matrix entries
-    DenseMatrix<T> Aib;
+    EigenMatrix Aib;
     /// boundary-interior matrix entries
-    DenseMatrix<T> Abi;
+    EigenMatrix Abi;
     /// boundary-boundary matrix entries
-    DenseMatrix<T> Abb;
+    EigenMatrix Abb;
+
+    // Aii LU decompositions
+    typename std::remove_const<decltype(Aii.partialPivLu())>::type AiiFactor;
 
     struct VarData
     {
@@ -65,6 +100,11 @@ private:
       unsigned int num_interior_dofs;
     };
 
+    /// The trace degrees of freedom with global numbering corresponding to the the \emph reduced
+    /// system. Note that initially this will actually hold the indices corresponding to the fully
+    /// sized problem, but we will swap it out by the time we are done initializing
+    std::vector<dof_id_type> reduced_space_indices;
+
     std::unordered_map<unsigned int, VarData> var_to_data;
   };
 
@@ -72,6 +112,9 @@ private:
 
   const MeshBase & _mesh;
   const DofMap & _dof_map;
+  std::unique_ptr<SparseMatrix<Number>> _reduced_sys_mat;
+  std::unique_ptr<NumericVector<Number>> _reduced_sol;
+  std::unique_ptr<NumericVector<Number>> _reduced_rhs;
 };
 }
 

@@ -21,23 +21,116 @@
 #include "libmesh/elem.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/int_range.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/sparse_matrix.h"
+#include "timpi/parallel_sync.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/petsc_matrix.h"
+#include <unordered_set>
+#include <petscksp.h>
 
 namespace libMesh
 {
-template <typename T>
-StaticCondensation<T>::StaticCondensation(const MeshBase & mesh, const DofMap & dof_map)
+StaticCondensation::StaticCondensation(const MeshBase & mesh, const DofMap & dof_map)
   : _mesh(mesh), _dof_map(dof_map)
 {
-  build_idx_maps();
+  init();
 }
 
-template <typename T>
 void
-StaticCondensation<T>::build_idx_maps()
+StaticCondensation::computeElemDofsScalar(const Elem & /*elem*/,
+                                          const std::vector<dof_id_type> & scalar_dof_indices,
+                                          std::vector<dof_id_type> & elem_dof_indices,
+                                          std::vector<dof_id_type> & /*elem_interior_dofs*/,
+                                          std::vector<dof_id_type> & elem_trace_dofs) const
 {
-  std::vector<dof_id_type> di, dii, dib;
+  elem_dof_indices.insert(
+      elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+  elem_trace_dofs.insert(
+      elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+}
+
+void
+StaticCondensation::computeElemDofsField(const Elem & elem,
+                                         const unsigned int node_num,
+                                         const dof_id_type field_dof,
+                                         std::vector<dof_id_type> & elem_dof_indices,
+                                         std::vector<dof_id_type> & elem_interior_dofs,
+                                         std::vector<dof_id_type> & elem_trace_dofs) const
+{
+  elem_dof_indices.push_back(field_dof);
+  if (node_num != invalid_uint)
+  {
+    // This is a nodal dof
+    if (elem.is_internal(node_num))
+      elem_interior_dofs.push_back(field_dof);
+    else
+      elem_trace_dofs.push_back(field_dof);
+  }
+  else
+    elem_interior_dofs.push_back(field_dof);
+}
+
+void
+StaticCondensation::init()
+{
+  std::vector<dof_id_type> elem_dofs; // only used to satisfy API
+  std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs;
+  std::unordered_set<dof_id_type> local_trace_dofs;
+  std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> nonlocal_trace_dofs;
+
+  const Elem * first_elem = nullptr;
+  const auto first_elem_it = _mesh.active_local_elements_begin();
+  if (first_elem_it != _mesh.active_local_elements_end())
+    first_elem = *first_elem_it;
+
+  auto scalar_dofs_functor = [this,
+                              &local_trace_dofs,
+                              &nonlocal_trace_dofs,
+                              &elem_interior_dofs,
+                              &elem_trace_dofs,
+                              first_elem](const Elem & elem,
+                                          std::vector<dof_id_type> & dof_indices,
+                                          const std::vector<dof_id_type> & scalar_dof_indices)
+  {
+    computeElemDofsScalar(
+        elem, scalar_dof_indices, dof_indices, elem_interior_dofs, elem_trace_dofs);
+
+    // Only need to do this for the first element we encounter
+    if (&elem == first_elem)
+    {
+      const processor_id_type last_pid = _dof_map.comm().size() - 1;
+      if (_dof_map.comm().rank() == last_pid)
+        local_trace_dofs.insert(scalar_dof_indices.begin(), scalar_dof_indices.end());
+      else
+        nonlocal_trace_dofs[last_pid].insert(scalar_dof_indices.begin(), scalar_dof_indices.end());
+    }
+  };
+
+  auto field_dofs_functor =
+      [this, &local_trace_dofs, &nonlocal_trace_dofs, &elem_interior_dofs, &elem_trace_dofs](
+          const Elem & elem,
+          const unsigned int node_num,
+          std::vector<dof_id_type> & dof_indices,
+          const dof_id_type field_dof)
+  {
+    computeElemDofsField(
+        elem, node_num, field_dof, dof_indices, elem_interior_dofs, elem_trace_dofs);
+
+    if (node_num != invalid_uint && !elem.is_internal(node_num))
+    {
+      const auto & nd_ref = elem.node_ref(node_num);
+      if (nd_ref.processor_id() == _dof_map.processor_id())
+        local_trace_dofs.insert(field_dof);
+      else
+        nonlocal_trace_dofs[nd_ref.processor_id()].insert(field_dof);
+    }
+  };
+
   for (auto elem : _mesh.active_local_element_ptr_range())
   {
+    elem_interior_dofs.clear();
+    elem_trace_dofs.clear();
     unsigned int boundary_dof_size = 0;
     unsigned int interior_dof_size = 0;
     auto & local_data = _elem_to_local_data[elem->id()];
@@ -52,18 +145,15 @@ StaticCondensation<T>::build_idx_maps()
       for (const auto v : make_range(var_group.n_variables()))
       {
         auto & var_data = local_data.var_to_data[v];
-        _dof_map.dof_indices(elem, di, v, elem->p_level(), &dib, &dii);
-#ifdef DEBUG
-        auto merge_di = dib;
-        merge_di.insert(merge_di.end(), dii.begin(), dii.end());
-        libmesh_assert(merge_di == di);
-#endif
+        _dof_map.dof_indices(
+            elem, elem_dofs, v, scalar_dofs_functor, field_dofs_functor, elem->p_level());
         var_data.boundary_dofs_offset = boundary_dof_size;
         var_data.interior_dofs_offset = interior_dof_size;
-        var_data.num_boundary_dofs = dib.size();
-        var_data.num_interior_dofs = dii.size();
+        var_data.num_boundary_dofs = elem_trace_dofs.size();
+        var_data.num_interior_dofs = elem_interior_dofs.size();
         boundary_dof_size += var_data.num_boundary_dofs;
         interior_dof_size += var_data.num_interior_dofs;
+        local_data.reduced_space_indices = elem_trace_dofs;
       }
     }
 
@@ -72,58 +162,248 @@ StaticCondensation<T>::build_idx_maps()
     local_data.Abi.resize(boundary_dof_size, interior_dof_size);
     local_data.Abb.resize(boundary_dof_size, boundary_dof_size);
   }
+
+  //
+  // Build the reduced soln and rhs vectors and system mat
+  //
+
+  _reduced_sol = NumericVector<Number>::build(_dof_map.comm());
+  const dof_id_type n_local = local_trace_dofs.size();
+  dof_id_type n = n_local;
+  _dof_map.comm().sum(n);
+  _reduced_sol->init(n, n_local, /*fast=*/false, PARALLEL);
+  _reduced_rhs = _reduced_sol->clone();
+  _reduced_sys_mat = SparseMatrix<Number>::build(_dof_map.comm());
+  // // Make some assumptions about the sparsity pattern
+  // dof_id_type num_couplings = 0;
+  // if (_dof.comm().rank() == 0 && !_elem_to_local_data.empty())
+  //   num_couplings = _elem_to_local_data.begin()->second.Abb.n();
+  // _dof.comm().broadcast(num_couplings);
+  // // We multiply by 2 for process on-diagonal since the facet dofs are on faces between 2 elements
+  // // But actually for general static condensation we could be talking about continuous Galerkin.
+  // // For hex elements this would mean an 8x multiplier! So for now we just accept the libmesh
+  // // defaults and prepare ourselves for possible nonzero allocations to get started
+  _reduced_sys_mat->init(n, n, n_local, n_local /*, 2 * num_couplings, num_couplings*/);
+
+  // Build a map from the full size problem trace dof indices to the reduced problem (trace) dof
+  // indices
+  std::unordered_map<dof_id_type, dof_id_type> full_dof_to_reduced_dof;
+  auto set_it = local_trace_dofs.begin();
+  for (const auto i :
+       make_range(_reduced_sol->first_local_index(), _reduced_sol->last_local_index()))
+  {
+    full_dof_to_reduced_dof[*set_it] = i;
+    ++set_it;
+  }
+
+  //
+  // Now we need to pull our nonlocal data
+  //
+
+  // build our queries
+  std::unordered_map<processor_id_type, std::vector<dof_id_type>> nonlocal_trace_dofs_mapvec;
+  for (const auto & [pid, set] : nonlocal_trace_dofs)
+  {
+    auto & vec = nonlocal_trace_dofs_mapvec[pid];
+    vec.assign(set.begin(), set.end());
+  }
+  // clear no longer needed memory
+  nonlocal_trace_dofs.clear();
+
+  auto gather_functor = [&full_dof_to_reduced_dof](processor_id_type,
+                                                   const std::vector<dof_id_type> & full_dof_ids,
+                                                   std::vector<dof_id_type> & reduced_dof_ids)
+  {
+    reduced_dof_ids.resize(full_dof_ids.size());
+    for (const auto i : index_range(full_dof_ids))
+      reduced_dof_ids[i] = libmesh_map_find(full_dof_to_reduced_dof, full_dof_ids[i]);
+  };
+
+  auto action_functor = [&full_dof_to_reduced_dof](processor_id_type,
+                                                   const std::vector<dof_id_type> & full_dof_ids,
+                                                   const std::vector<dof_id_type> & reduced_dof_ids)
+  {
+    for (const auto i : index_range(full_dof_ids))
+    {
+      libmesh_assert(!full_dof_to_reduced_dof.count(full_dof_ids[i]));
+      full_dof_to_reduced_dof[full_dof_ids[i]] = reduced_dof_ids[i];
+    }
+  };
+
+  TIMPI::pull_parallel_vector_data(_dof_map.comm(),
+                                   nonlocal_trace_dofs_mapvec,
+                                   gather_functor,
+                                   action_functor,
+                                   &DofObject::invalid_id);
+  nonlocal_trace_dofs_mapvec.clear();
+
+  // Now we can finally set our element reduced dof indices
+  std::vector<dof_id_type> full_dof_indices;
+  for (auto & [elem, local_data] : _elem_to_local_data)
+  {
+    libmesh_ignore(elem);
+    full_dof_indices = local_data.reduced_space_indices;
+    local_data.reduced_space_indices.clear();
+    for (const auto full_dof : full_dof_indices)
+      local_data.reduced_space_indices.push_back(
+          libmesh_map_find(full_dof_to_reduced_dof, full_dof));
+  }
 }
 
-template <typename T>
 void
-StaticCondensation<T>::add_matrix(const Elem & elem,
-                                  const unsigned int i_var,
-                                  const unsigned int j_var,
-                                  const DenseMatrix<T> & k)
+StaticCondensation::add_matrix(const Elem & elem,
+                               const unsigned int i_var,
+                               const unsigned int j_var,
+                               const DenseMatrix<Number> & k_var_ij)
 {
   auto & local_data = libmesh_map_find(_elem_to_local_data, elem.id());
   auto & ivar_data = libmesh_map_find(local_data.var_to_data, i_var);
   auto & jvar_data = libmesh_map_find(local_data.var_to_data, j_var);
-  auto copy_mat = [&k](DenseMatrix<T> & dest_mat,
-                       const unsigned int i_offset,
-                       const unsigned int i_start,
-                       const unsigned int i_stop,
-                       const unsigned int j_offset,
-                       const unsigned int j_start,
-                       const unsigned int j_stop)
+  auto copy_mat = [&k_var_ij](EigenMatrix & k_sc,
+                              const unsigned int var_i_num_split_dofs,
+                              const unsigned int k_sc_i_offset,
+                              const unsigned int k_var_ij_i_offset,
+                              const unsigned int var_j_num_split_dofs,
+                              const unsigned int k_sc_j_offset,
+                              const unsigned int k_var_ij_j_offset)
   {
-    for (const auto i : make_range(i_start, i_stop))
-      for (const auto j : make_range(j_start, j_stop))
-        dest_mat(i_offset + i, j_offset + j) = k(i, j);
+    for (const auto i : make_range(var_i_num_split_dofs))
+      for (const auto j : make_range(var_j_num_split_dofs))
+        k_sc(k_sc_i_offset + i, k_sc_j_offset + j) =
+            k_var_ij(k_var_ij_i_offset + i, k_var_ij_j_offset + j);
   };
 
   copy_mat(local_data.Abb,
+           ivar_data.num_boundary_dofs,
            ivar_data.boundary_dofs_offset,
            0,
-           ivar_data.num_boundary_dofs,
+           jvar_data.num_boundary_dofs,
            jvar_data.boundary_dofs_offset,
-           0,
-           jvar_data.num_boundary_dofs);
+           0);
   copy_mat(local_data.Abi,
+           ivar_data.num_boundary_dofs,
            ivar_data.boundary_dofs_offset,
            0,
-           ivar_data.num_boundary_dofs,
+           jvar_data.num_interior_dofs,
            jvar_data.interior_dofs_offset,
-           jvar_data.num_boundary_dofs,
-           jvar_data.num_boundary_dofs + jvar_data.num_interior_dofs);
-  copy_mat(local_data.Aib,
-           ivar_data.interior_dofs_offset,
-           ivar_data.num_boundary_dofs,
-           ivar_data.num_boundary_dofs + ivar_data.num_interior_dofs,
-           jvar_data.boundary_dofs_offset,
-           0,
            jvar_data.num_boundary_dofs);
-  copy_mat(local_data.Aii,
+  copy_mat(local_data.Aib,
+           ivar_data.num_interior_dofs,
            ivar_data.interior_dofs_offset,
            ivar_data.num_boundary_dofs,
-           ivar_data.num_boundary_dofs + ivar_data.num_interior_dofs,
-           jvar_data.interior_dofs_offset,
            jvar_data.num_boundary_dofs,
-           jvar_data.num_boundary_dofs + jvar_data.num_interior_dofs);
+           jvar_data.boundary_dofs_offset,
+           0);
+  copy_mat(local_data.Aii,
+           ivar_data.num_interior_dofs,
+           ivar_data.interior_dofs_offset,
+           ivar_data.num_boundary_dofs,
+           jvar_data.num_interior_dofs,
+           jvar_data.interior_dofs_offset,
+           jvar_data.num_boundary_dofs);
+}
+
+void
+StaticCondensation::assemble_reduced_mat()
+{
+  for (auto & [elem_id, local_data] : _elem_to_local_data)
+  {
+    libmesh_ignore(elem_id);
+    local_data.AiiFactor = local_data.Aii.partialPivLu();
+    const auto S = local_data.Abb - local_data.Abi * local_data.AiiFactor.solve(local_data.Aib);
+    DenseMatrix<Number> shim(S.rows(), S.cols());
+    for (const auto i : make_range(S.rows()))
+      for (const auto j : make_range(S.cols()))
+        shim(i, j) = S(i, j);
+    _reduced_sys_mat->add_matrix(shim, local_data.reduced_space_indices);
+  }
+
+  _reduced_sys_mat->close();
+}
+
+void
+StaticCondensation::solve(const NumericVector<Number> & full_rhs)
+{
+  std::vector<dof_id_type> elem_dofs; // only used to satisfy API
+  std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs;
+  std::vector<Number> elem_interior_values_vec, elem_trace_values_vec;
+  EigenVector elem_interior_values, elem_trace_values;
+
+  _reduced_sol->zero();
+  _reduced_rhs->zero();
+
+  auto scalar_dofs_functor = [this, &elem_interior_dofs, &elem_trace_dofs](
+                                 const Elem & elem,
+                                 std::vector<dof_id_type> & dof_indices,
+                                 const std::vector<dof_id_type> & scalar_dof_indices)
+  {
+    computeElemDofsScalar(
+        elem, scalar_dof_indices, dof_indices, elem_interior_dofs, elem_trace_dofs);
+  };
+
+  auto field_dofs_functor =
+      [this, &elem_interior_dofs, &elem_trace_dofs](const Elem & elem,
+                                                    const unsigned int node_num,
+                                                    std::vector<dof_id_type> & dof_indices,
+                                                    const dof_id_type field_dof)
+  {
+    computeElemDofsField(
+        elem, node_num, field_dof, dof_indices, elem_interior_dofs, elem_trace_dofs);
+  };
+
+  for (auto elem : _mesh.active_local_element_ptr_range())
+  {
+    elem_interior_dofs.clear();
+    elem_trace_dofs.clear();
+    auto & local_data = _elem_to_local_data[elem->id()];
+
+    const auto sub_id = elem->subdomain_id();
+    for (const auto vg : make_range(_dof_map.n_variable_groups()))
+    {
+      const auto & var_group = _dof_map.variable_group(vg);
+      if (!var_group.active_on_subdomain(sub_id))
+        continue;
+
+      for (const auto v : make_range(var_group.n_variables()))
+        _dof_map.dof_indices(
+            elem, elem_dofs, v, scalar_dofs_functor, field_dofs_functor, elem->p_level());
+    }
+
+    auto set_local_vectors = [&full_rhs](const auto & elem_dof_indices,
+                                         auto & elem_dof_values_vec,
+                                         auto & elem_dof_values)
+    {
+      full_rhs.get(elem_dof_indices, elem_dof_values_vec);
+      elem_dof_values.resize(elem_dof_indices.size());
+      for (const auto i : index_range(elem_dof_indices))
+        elem_dof_values(i) = elem_dof_values_vec[i];
+    };
+
+    set_local_vectors(elem_interior_dofs, elem_interior_values_vec, elem_interior_values);
+    set_local_vectors(elem_trace_dofs, elem_trace_values_vec, elem_trace_values);
+
+    elem_trace_values -= local_data.Abi * local_data.AiiFactor.solve(elem_interior_values);
+
+    libmesh_assert(cast_int<std::size_t>(elem_trace_values.size()) ==
+                   local_data.reduced_space_indices.size());
+    _reduced_rhs->add_vector(elem_trace_values.data(), local_data.reduced_space_indices);
+  }
+  _reduced_rhs->close();
+
+  auto * const petsc_sol = dynamic_cast<PetscVector<Number> *>(_reduced_sol.get());
+  auto * const petsc_rhs = dynamic_cast<PetscVector<Number> *>(_reduced_rhs.get());
+  auto * const petsc_mat = dynamic_cast<PetscMatrix<Number> *>(_reduced_sys_mat.get());
+
+  KSP ksp;
+  auto ierr = KSPCreate(PETSC_COMM_WORLD, &ksp);
+  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
+  ierr = KSPSetOperators(ksp, petsc_mat->mat(), petsc_mat->mat());
+  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
+  ierr = KSPSetOptionsPrefix(ksp, "condensed_");
+  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
+  ierr = KSPSetFromOptions(ksp);
+  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
+  ierr = KSPSolve(ksp, petsc_rhs->vec(), petsc_sol->vec());
+  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
 }
 }
