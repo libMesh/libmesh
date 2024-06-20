@@ -27,6 +27,8 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/mesh_modification.h"
+#include "libmesh/mesh_serializer.h"
+#include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
 
 namespace {
@@ -126,41 +128,108 @@ void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
     std::vector<std::unique_ptr<Elem>> elems_to_add;
 
     // Convert all faces to surface elements
-    for (auto * elem : mesh.element_ptr_range())
+    for (auto * elem : mesh.active_element_ptr_range())
       {
         if (elem->dim() != 2)
           elems_to_delete.insert(elem);
         for (auto s : make_range(elem->n_sides()))
           {
+            // If there's a neighbor on this side then there's not a
+            // boundary
             if (elem->neighbor_ptr(s))
-              continue;
+              {
+                // We're not supporting AMR meshes here yet
+                if (elem->level() != elem->neighbor_ptr(s)->level())
+                  libmesh_not_implemented_msg
+                    ("Tetrahedralizaton of adapted meshes is not currently supported");
+                continue;
+              }
 
-            std::unique_ptr<Elem> side_elem = elem->build_side_ptr(s);
-            // If the mesh is replicated then it's automatic id
-            // setting is fine.  If not, we need unambiguous ids
+            elems_to_add.push_back(elem->build_side_ptr(s));
+            Elem * side_elem = elems_to_add.back().get();
+
+            // Wipe the interior_parent before it can become a
+            // dangling pointer later
+            side_elem->set_interior_parent(nullptr);
+
+            // If the mesh is replicated then its automatic id
+            // setting is fine.  If not, then we need unambiguous ids
             // independent of element traversal.
             if (!mesh.is_replicated())
               {
                 side_elem->set_id(max_orig_id + max_sides*elem->id() + s);
                 side_elem->set_unique_id(max_unique_id + max_sides*elem->id() + s);
               }
-
-            elems_to_add.push_back(std::move(side_elem));
           }
       }
 
-    // Add the new elements outside the loop so we don't risk
-    // invalidating iterators.  Wipe their interior_parent pointers so
-    // those aren't dangling later.
-    for (auto & elem : elems_to_add)
-    {
-      elem->set_interior_parent(nullptr);
-      mesh.add_elem(std::move(elem));
-    }
+    // If the mesh is replicated then its automatic neighbor finding
+    // is fine.  If not, then we need to insert them ourselves, but
+    // it's easy because we can use the fact (from our implementation
+    // above) that our new elements have no parents or children, plus
+    // the fact (from the tiny fraction of homology I understand) that
+    // a manifold boundary is a manifold with no boundary.
+    //
+    // See UnstructuredMesh::find_neighbors() for more explanation of
+    // (a more complicated version of) the algorithm here.
+    if (!mesh.is_replicated())
+      {
+        typedef dof_id_type                     key_type;
+        typedef std::pair<Elem *, unsigned char> val_type;
+        typedef std::unordered_multimap<key_type, val_type> map_type;
+        map_type side_to_elem_map;
+
+        std::unique_ptr<Elem> my_side, their_side;
+
+        for (auto & elem : elems_to_add)
+          {
+            for (auto s : elem->side_index_range())
+              {
+                if (elem->neighbor_ptr(s))
+                  continue;
+                const dof_id_type key = elem->low_order_key(s);
+                auto bounds = side_to_elem_map.equal_range(key);
+                if (bounds.first != bounds.second)
+                  {
+                    elem->side_ptr(my_side, s);
+                    while (bounds.first != bounds.second)
+                      {
+                        Elem * potential_neighbor = bounds.first->second.first;
+                        const unsigned int ns = bounds.first->second.second;
+                        potential_neighbor->side_ptr(their_side, ns);
+                        if (*my_side == *their_side)
+                          {
+                            elem->set_neighbor(s, potential_neighbor);
+                            potential_neighbor->set_neighbor(ns, elem.get());
+                            side_to_elem_map.erase (bounds.first);
+                            break;
+                          }
+                        ++bounds.first;
+                      }
+
+                    if (!elem->neighbor_ptr(s))
+                      side_to_elem_map.emplace
+                        (key, std::make_pair(elem.get(), cast_int<unsigned char>(s)));
+                  }
+              }
+          }
+
+        // At this point we *should* have a match for everything, so
+        // anything we don't have a match for is remote.
+        for (auto & elem : elems_to_add)
+          for (auto s : elem->side_index_range())
+            if (!elem->neighbor_ptr(s))
+              elem->set_neighbor(s, const_cast<RemoteElem*>(remote_elem));
+      }
 
     // Remove volume and edge elements
     for (Elem * elem : elems_to_delete)
       mesh.delete_elem(elem);
+
+    // Add the new elements outside the loop so we don't risk
+    // invalidating iterators.
+    for (auto & elem : elems_to_add)
+      mesh.add_elem(std::move(elem));
   }
 
   // Fix up neighbor pointers, element counts, etc.
@@ -169,7 +238,14 @@ void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
   // We're making tets; we need to start with tris
   MeshTools::Modification::all_tri(mesh);
 
-  // Partition surface into connected components
+  // Partition surface into connected components.  At this point I'm
+  // finally going to give up and serialize, because at least we got
+  // from 3D down to 2D first, and because I don't want to have to
+  // turn flood_component into a while loop with a parallel sync in
+  // the middle, and because we do have to serialize *eventually*
+  // anyways unless we get a parallel tetrahedralizer backend someday.
+  MeshSerializer mesh_serializer(mesh);
+
   std::vector<std::unordered_set<Elem *>> components;
   std::unordered_set<Elem *> in_component;
 
