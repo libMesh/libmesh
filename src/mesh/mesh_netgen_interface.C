@@ -135,10 +135,13 @@ void NetGenMeshInterface::triangulate ()
 
   this->volume_to_surface_mesh(this->_mesh);
 
+  std::vector<MeshSerializer> hole_serializers;
+
   if (_holes)
     for (std::unique_ptr<UnstructuredMesh> & hole : *_holes)
       {
         this->volume_to_surface_mesh(*hole);
+        hole_serializers.emplace_back(*hole);
       }
 
   // Create surface mesh in the WrappedNgMesh
