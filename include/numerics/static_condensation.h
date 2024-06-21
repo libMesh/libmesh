@@ -73,7 +73,8 @@ private:
 
   void assemble_reduced_mat();
   void forward_elimination(const NumericVector<Number> & full_rhs);
-  void backwards_substitution(NumericVector<Number> & full_sol);
+  void backwards_substitution(const NumericVector<Number> & full_rhs,
+                              NumericVector<Number> & full_sol);
 
   static auto computeElemDofsScalar(std::vector<dof_id_type> & elem_interior_dofs,
                                     std::vector<dof_id_type> & elem_trace_dofs) -> decltype(auto);

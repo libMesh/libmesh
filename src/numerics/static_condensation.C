@@ -388,7 +388,8 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
 }
 
 void
-StaticCondensation::backwards_substitution(NumericVector<Number> & full_sol)
+StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rhs,
+                                           NumericVector<Number> & full_sol)
 {
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
   std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs_full;
@@ -416,7 +417,20 @@ StaticCondensation::backwards_substitution(NumericVector<Number> & full_sol)
                              computeElemDofsField(elem_interior_dofs, elem_trace_dofs_full),
                              elem->p_level());
     }
+
+    set_local_vectors(full_rhs, elem_interior_dofs, elem_interior_rhs_vec, elem_interior_rhs);
+    set_local_vectors(
+        *_reduced_sol, local_data.reduced_space_indices, elem_trace_sol_vec, elem_trace_sol);
+
+    elem_interior_sol =
+        local_data.AiiFactor.solve(elem_interior_rhs - local_data.Aib * elem_trace_sol);
+    full_sol.insert(elem_interior_sol.data(), elem_interior_dofs);
+    // We are doing this redundantly since multiple elements share trace dofs. An alternative would
+    // be to hold a global reduced to full index map
+    full_sol.insert(elem_trace_sol.data(), elem_trace_dofs_full);
   }
+
+  full_sol.close();
 }
 
 void
@@ -426,6 +440,6 @@ StaticCondensation::solve(const NumericVector<Number> & full_rhs, NumericVector<
   forward_elimination(full_rhs);
   _reduced_sol->zero();
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
-  backwards_substitution(full_sol);
+  backwards_substitution(full_rhs, full_sol);
 }
 }

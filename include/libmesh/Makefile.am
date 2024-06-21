@@ -2058,4 +2058,3 @@ xdr_cxx.h: $(top_srcdir)/include/utils/xdr_cxx.h
 
 parallel_communicator_specializations: $(top_srcdir)/include/timpi_shims/parallel_communicator_specializations
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
