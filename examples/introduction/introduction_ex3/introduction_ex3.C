@@ -15,7 +15,6 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
 // <h1>Introduction Example 3 - Solving a Poisson Problem</h1>
 // \author Benjamin S. Kirk
 // \date 2003
@@ -56,6 +55,9 @@
 #include "libmesh/elem.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/static_condensation.h"
+#include "libmesh/fuzzy_equal.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/petsc_matrix.h"
 
 // Define the DofMap, which handles degree of freedom
 // indexing.
@@ -70,18 +72,16 @@ using namespace libMesh;
 // name of the system we are assembling as input.  From the
 //  EquationSystems object we have access to the  Mesh and
 // other objects we might need.
-void assemble_poisson(EquationSystems & es,
-                      const std::string & system_name);
+void assemble_poisson(EquationSystems & es, const std::string & system_name);
 
 // Function prototype for the exact solution.
-Real exact_solution (const Real x,
-                     const Real y,
-                     const Real z = 0.);
+Real exact_solution(const Real x, const Real y, const Real z = 0.);
 
-int main (int argc, char ** argv)
+int
+main(int argc, char ** argv)
 {
   // Initialize libraries, like in example 2.
-  LibMeshInit init (argc, argv);
+  LibMeshInit init(argc, argv);
 
   // This example requires a linear solver package.
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
@@ -91,7 +91,7 @@ int main (int argc, char ** argv)
   // and command line arguments.
   libMesh::out << "Running " << argv[0];
 
-  for (int i=1; i<argc; i++)
+  for (int i = 1; i < argc; i++)
     libMesh::out << " " << argv[i];
 
   libMesh::out << std::endl << std::endl;
@@ -108,11 +108,7 @@ int main (int argc, char ** argv)
   // to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
   // elements instead of the default QUAD4's we used in example 2
   // allow us to use higher-order approximation.
-  MeshTools::Generation::build_square (mesh,
-                                       15, 15,
-                                       -1., 1.,
-                                       -1., 1.,
-                                       QUAD9);
+  MeshTools::Generation::build_square(mesh, 2, 1, -1., 1., -1., 1., QUAD9);
 
   // Print information about the mesh to the screen.
   // Note that 5x5 QUAD9 elements actually has 11x11 nodes,
@@ -120,11 +116,11 @@ int main (int argc, char ** argv)
   mesh.print_info();
 
   // Create an equation systems object.
-  EquationSystems equation_systems (mesh);
+  EquationSystems equation_systems(mesh);
 
   // Declare the Poisson system and its variables.
   // The Poisson system is another example of a steady system.
-  auto & sys = equation_systems.add_system<LinearImplicitSystem> ("Poisson");
+  auto & sys = equation_systems.add_system<LinearImplicitSystem>("Poisson");
 
   // Adds the variable "u" to "Poisson".  "u"
   // will be approximated using second-order approximation.
@@ -133,7 +129,7 @@ int main (int argc, char ** argv)
   // Give the system a pointer to the matrix assembly
   // function.  This will be called when needed by the
   // library.
-  equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
+  equation_systems.get_system("Poisson").attach_assemble_function(assemble_poisson);
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -162,16 +158,46 @@ int main (int argc, char ** argv)
   // if you linked against the appropriate X libraries when you
   // built PETSc.
   equation_systems.get_system("Poisson").solve();
+  std::vector<PetscInt> trace_dofs = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13};
+  std::vector<PetscInt> interior_dofs = {8, 14};
+  IS trace, interior;
+  auto ierr = ISCreateGeneral(mesh.comm().get(), 13, trace_dofs.data(), PETSC_COPY_VALUES, &trace);
+  ierr = ISCreateGeneral(mesh.comm().get(), 2, interior_dofs.data(), PETSC_COPY_VALUES, &interior);
+  Mat A00, A11, A01, A10, S, Sp;
+  Mat sys_mat = static_cast<PetscMatrix<Number> &>(sys.get_system_matrix()).mat();
+  ierr = MatCreateSubMatrix(sys_mat, trace, trace, MAT_INITIAL_MATRIX, &A11);
+  ierr = MatCreateSubMatrix(sys_mat, trace, interior, MAT_INITIAL_MATRIX, &A10);
+  ierr = MatCreateSubMatrix(sys_mat, interior, trace, MAT_INITIAL_MATRIX, &A01);
+  ierr = MatCreateSubMatrix(sys_mat, interior, interior, MAT_INITIAL_MATRIX, &A00);
+  ierr = MatCreateSchurComplement(A00, A00, A01, A10, A11, &S);
+  ierr = MatSchurComplementSetAinvType(S, MAT_SCHUR_COMPLEMENT_AINV_FULL);
+  ierr = MatSchurComplementGetPmat(S, MAT_INITIAL_MATRIX, &Sp);
+  ierr = MatView(Sp, 0);
 
   // Do static condensation solve
   auto sc_soln = sys.solution->clone();
   sc.solve(*sys.rhs, *sc_soln);
 
+  auto & petsc_vec1 = static_cast<PetscVector<Number> &>(*sys.solution);
+  auto & petsc_vec2 = static_cast<PetscVector<Number> &>(*sc_soln);
+  ierr = VecView(petsc_vec1.vec(), 0);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecView(petsc_vec2.vec(), 0);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+
+  for (const auto i : make_range(sc_soln->first_local_index(), sc_soln->last_local_index()))
+  {
+    const auto val1 = (*sc_soln)(i);
+    const auto val2 = (*sys.solution)(i);
+    libmesh_error_msg_if(!relative_fuzzy_equal((*sc_soln)(i), (*sys.solution)(i)),
+                         "mismatching solution");
+  }
+
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 
   // After solving the system write the solution
   // to a VTK-formatted plot file.
-  VTKIO (mesh).write_equation_systems ("out.pvtu", equation_systems);
+  VTKIO(mesh).write_equation_systems("out.pvtu", equation_systems);
 
 #endif // #ifdef LIBMESH_HAVE_VTK
 
@@ -179,20 +205,18 @@ int main (int argc, char ** argv)
   return 0;
 }
 
-
-
 // We now define the matrix assembly function for the
 // Poisson system.  We need to first compute element
 // matrices and right-hand sides, and then take into
 // account the boundary conditions, which will be handled
 // via a penalty method.
-void assemble_poisson(EquationSystems & es,
-                      const std::string & libmesh_dbg_var(system_name))
+void
+assemble_poisson(EquationSystems & es, const std::string & libmesh_dbg_var(system_name))
 {
 
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert_equal_to (system_name, "Poisson");
+  libmesh_assert_equal_to(system_name, "Poisson");
 
   auto & sc = *es.parameters.get<StaticCondensation *>("sc");
 
@@ -203,7 +227,7 @@ void assemble_poisson(EquationSystems & es,
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the LinearImplicitSystem we are solving
-  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem> ("Poisson");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Poisson");
 
   // A reference to the  DofMap object for this system.  The  DofMap
   // object handles the index translation from node and element numbers
@@ -221,26 +245,26 @@ void assemble_poisson(EquationSystems & es,
   // of as a pointer that will clean up after itself.  Introduction Example 4
   // describes some advantages of  std::unique_ptr's in the context of
   // quadrature rules.
-  std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe(FEBase::build(dim, fe_type));
 
   // A 5th order Gauss quadrature rule for numerical integration.
-  QGauss qrule (dim, FIFTH);
+  QGauss qrule(dim, FIFTH);
 
   // Tell the finite element object to use our quadrature rule.
-  fe->attach_quadrature_rule (&qrule);
+  fe->attach_quadrature_rule(&qrule);
 
   // Declare a special finite element object for
   // boundary integration.
-  std::unique_ptr<FEBase> fe_face (FEBase::build(dim, fe_type));
+  std::unique_ptr<FEBase> fe_face(FEBase::build(dim, fe_type));
 
   // Boundary integration requires one quadrature rule,
   // with dimensionality one less than the dimensionality
   // of the element.
-  QGauss qface(dim-1, FIFTH);
+  QGauss qface(dim - 1, FIFTH);
 
   // Tell the finite element object to use our
   // quadrature rule.
-  fe_face->attach_quadrature_rule (&qface);
+  fe_face->attach_quadrature_rule(&qface);
 
   // Here we define some references to cell-specific data that
   // will be used to assemble the linear system.
@@ -291,196 +315,194 @@ void assemble_poisson(EquationSystems & es,
   // elements; hence we use a variant of the
   // active_local_element_ptr_range.
   for (const auto & elem : mesh.active_local_element_ptr_range())
+  {
+    // Get the degree of freedom indices for the
+    // current element.  These define where in the global
+    // matrix and right-hand-side this element will
+    // contribute to.
+    dof_map.dof_indices(elem, dof_indices);
+
+    // Cache the number of degrees of freedom on this element, for
+    // use as a loop bound later.  We use cast_int to explicitly
+    // convert from size() (which may be 64-bit) to unsigned int
+    // (which may be 32-bit but which is definitely enough to count
+    // *local* degrees of freedom.
+    const unsigned int n_dofs = cast_int<unsigned int>(dof_indices.size());
+
+    // Compute the element-specific data for the current
+    // element.  This involves computing the location of the
+    // quadrature points (q_point) and the shape functions
+    // (phi, dphi) for the current element.
+    fe->reinit(elem);
+
+    // With one variable, we should have the same number of degrees
+    // of freedom as shape functions.
+    libmesh_assert_equal_to(n_dofs, phi.size());
+
+    // Zero the element matrix and right-hand side before
+    // summing them.  We use the resize member here because
+    // the number of degrees of freedom might have changed from
+    // the last element.  Note that this will be the case if the
+    // element type is different (i.e. the last element was a
+    // triangle, now we are on a quadrilateral).
+
+    // The  DenseMatrix::resize() and the  DenseVector::resize()
+    // members will automatically zero out the matrix  and vector.
+    Ke.resize(n_dofs, n_dofs);
+
+    Fe.resize(n_dofs);
+
+    // Now loop over the quadrature points.  This handles
+    // the numeric integration.
+    for (unsigned int qp = 0; qp < qrule.n_points(); qp++)
     {
-      // Get the degree of freedom indices for the
-      // current element.  These define where in the global
-      // matrix and right-hand-side this element will
-      // contribute to.
-      dof_map.dof_indices (elem, dof_indices);
 
-      // Cache the number of degrees of freedom on this element, for
-      // use as a loop bound later.  We use cast_int to explicitly
-      // convert from size() (which may be 64-bit) to unsigned int
-      // (which may be 32-bit but which is definitely enough to count
-      // *local* degrees of freedom.
-      const unsigned int n_dofs =
-        cast_int<unsigned int>(dof_indices.size());
-
-      // Compute the element-specific data for the current
-      // element.  This involves computing the location of the
-      // quadrature points (q_point) and the shape functions
-      // (phi, dphi) for the current element.
-      fe->reinit (elem);
-
-      // With one variable, we should have the same number of degrees
-      // of freedom as shape functions.
-      libmesh_assert_equal_to (n_dofs, phi.size());
-
-      // Zero the element matrix and right-hand side before
-      // summing them.  We use the resize member here because
-      // the number of degrees of freedom might have changed from
-      // the last element.  Note that this will be the case if the
-      // element type is different (i.e. the last element was a
-      // triangle, now we are on a quadrilateral).
-
-      // The  DenseMatrix::resize() and the  DenseVector::resize()
-      // members will automatically zero out the matrix  and vector.
-      Ke.resize (n_dofs, n_dofs);
-
-      Fe.resize (n_dofs);
-
-      // Now loop over the quadrature points.  This handles
-      // the numeric integration.
-      for (unsigned int qp=0; qp<qrule.n_points(); qp++)
+      // Now we will build the element matrix.  This involves
+      // a double loop to integrate the test functions (i) against
+      // the trial functions (j).
+      for (unsigned int i = 0; i != n_dofs; i++)
+        for (unsigned int j = 0; j != n_dofs; j++)
         {
-
-          // Now we will build the element matrix.  This involves
-          // a double loop to integrate the test functions (i) against
-          // the trial functions (j).
-          for (unsigned int i=0; i != n_dofs; i++)
-            for (unsigned int j=0; j != n_dofs; j++)
-              {
-                Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]);
-              }
-
-          // This is the end of the matrix summation loop
-          // Now we build the element right-hand-side contribution.
-          // This involves a single loop in which we integrate the
-          // "forcing function" in the PDE against the test functions.
-          {
-            const Real x = q_point[qp](0);
-            const Real y = q_point[qp](1);
-            const Real eps = 1.e-3;
-
-
-            // "fxy" is the forcing function for the Poisson equation.
-            // In this case we set fxy to be a finite difference
-            // Laplacian approximation to the (known) exact solution.
-            //
-            // We will use the second-order accurate FD Laplacian
-            // approximation, which in 2D is
-            //
-            // u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
-            //                u(i-1,j) + u(i+1,j) +
-            //                -4*u(i,j))/h^2
-            //
-            // Since the value of the forcing function depends only
-            // on the location of the quadrature point (q_point[qp])
-            // we will compute it here, outside of the i-loop
-            const Real fxy = -(exact_solution(x, y-eps) +
-                               exact_solution(x, y+eps) +
-                               exact_solution(x-eps, y) +
-                               exact_solution(x+eps, y) -
-                               4.*exact_solution(x, y))/eps/eps;
-
-            for (unsigned int i=0; i != n_dofs; i++)
-              Fe(i) += JxW[qp]*fxy*phi[i][qp];
-          }
+          Ke(i, j) += JxW[qp] * (dphi[i][qp] * dphi[j][qp]);
         }
 
-      // We have now reached the end of the RHS summation,
-      // and the end of quadrature point loop, so
-      // the interior element integration has
-      // been completed.  However, we have not yet addressed
-      // boundary conditions.  For this example we will only
-      // consider simple Dirichlet boundary conditions.
-      //
-      // There are several ways Dirichlet boundary conditions
-      // can be imposed.  A simple approach, which works for
-      // interpolary bases like the standard Lagrange polynomials,
-      // is to assign function values to the
-      // degrees of freedom living on the domain boundary. This
-      // works well for interpolary bases, but is more difficult
-      // when non-interpolary (e.g Legendre or Hierarchic) bases
-      // are used.
-      //
-      // Dirichlet boundary conditions can also be imposed with a
-      // "penalty" method.  In this case essentially the L2 projection
-      // of the boundary values are added to the matrix. The
-      // projection is multiplied by some large factor so that, in
-      // floating point arithmetic, the existing (smaller) entries
-      // in the matrix and right-hand-side are effectively ignored.
-      //
-      // This amounts to adding a term of the form (in latex notation)
-      //
-      // \frac{1}{\epsilon} \int_{\delta \Omega} \phi_i \phi_j = \frac{1}{\epsilon} \int_{\delta \Omega} u \phi_i
-      //
-      // where
-      //
-      // \frac{1}{\epsilon} is the penalty parameter, defined such that \epsilon << 1
+      // This is the end of the matrix summation loop
+      // Now we build the element right-hand-side contribution.
+      // This involves a single loop in which we integrate the
+      // "forcing function" in the PDE against the test functions.
       {
+        const Real x = q_point[qp](0);
+        const Real y = q_point[qp](1);
+        const Real eps = 1.e-3;
 
-        // The following loop is over the sides of the element.
-        // If the element has no neighbor on a side then that
-        // side MUST live on a boundary of the domain.
-        for (auto side : elem->side_index_range())
-          if (elem->neighbor_ptr(side) == nullptr)
-            {
-              // The value of the shape functions at the quadrature
-              // points.
-              const std::vector<std::vector<Real>> & phi_face = fe_face->get_phi();
+        // "fxy" is the forcing function for the Poisson equation.
+        // In this case we set fxy to be a finite difference
+        // Laplacian approximation to the (known) exact solution.
+        //
+        // We will use the second-order accurate FD Laplacian
+        // approximation, which in 2D is
+        //
+        // u_xx + u_yy = (u(i,j-1) + u(i,j+1) +
+        //                u(i-1,j) + u(i+1,j) +
+        //                -4*u(i,j))/h^2
+        //
+        // Since the value of the forcing function depends only
+        // on the location of the quadrature point (q_point[qp])
+        // we will compute it here, outside of the i-loop
+        const Real fxy =
+            -(exact_solution(x, y - eps) + exact_solution(x, y + eps) + exact_solution(x - eps, y) +
+              exact_solution(x + eps, y) - 4. * exact_solution(x, y)) /
+            eps / eps;
 
-              // The Jacobian * Quadrature Weight at the quadrature
-              // points on the face.
-              const std::vector<Real> & JxW_face = fe_face->get_JxW();
-
-              // The XYZ locations (in physical space) of the
-              // quadrature points on the face.  This is where
-              // we will interpolate the boundary value function.
-              const std::vector<Point> & qface_point = fe_face->get_xyz();
-
-              // Compute the shape function values on the element
-              // face.
-              fe_face->reinit(elem, side);
-
-              // Some shape functions will be 0 on the face, but for
-              // ease of indexing and generality of code we loop over
-              // them anyway
-              libmesh_assert_equal_to (n_dofs, phi_face.size());
-
-              // Loop over the face quadrature points for integration.
-              for (unsigned int qp=0; qp<qface.n_points(); qp++)
-                {
-                  // The location on the boundary of the current
-                  // face quadrature point.
-                  const Real xf = qface_point[qp](0);
-                  const Real yf = qface_point[qp](1);
-
-                  // The penalty value.  \frac{1}{\epsilon}
-                  // in the discussion above.
-                  const Real penalty = 1.e10;
-
-                  // The boundary value.
-                  const Real value = exact_solution(xf, yf);
-
-                  // Matrix contribution of the L2 projection.
-                  for (unsigned int i=0; i != n_dofs; i++)
-                    for (unsigned int j=0; j != n_dofs; j++)
-                      Ke(i,j) += JxW_face[qp]*penalty*phi_face[i][qp]*phi_face[j][qp];
-
-                  // Right-hand-side contribution of the L2
-                  // projection.
-                  for (unsigned int i=0; i != n_dofs; i++)
-                    Fe(i) += JxW_face[qp]*penalty*value*phi_face[i][qp];
-                }
-            }
+        for (unsigned int i = 0; i != n_dofs; i++)
+          Fe(i) += JxW[qp] * fxy * phi[i][qp];
       }
-
-      // We have now finished the quadrature point loop,
-      // and have therefore applied all the boundary conditions.
-
-      // If this assembly program were to be used on an adaptive mesh,
-      // we would have to apply any hanging node constraint equations
-      dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
-
-      // The element matrix and right-hand-side are now built
-      // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The  SparseMatrix::add_matrix()
-      // and  NumericVector::add_vector() members do this for us.
-      matrix.add_matrix (Ke, dof_indices);
-      system.rhs->add_vector    (Fe, dof_indices);
-      sc.add_matrix(*elem, 0, 0, Ke);
     }
+
+    // We have now reached the end of the RHS summation,
+    // and the end of quadrature point loop, so
+    // the interior element integration has
+    // been completed.  However, we have not yet addressed
+    // boundary conditions.  For this example we will only
+    // consider simple Dirichlet boundary conditions.
+    //
+    // There are several ways Dirichlet boundary conditions
+    // can be imposed.  A simple approach, which works for
+    // interpolary bases like the standard Lagrange polynomials,
+    // is to assign function values to the
+    // degrees of freedom living on the domain boundary. This
+    // works well for interpolary bases, but is more difficult
+    // when non-interpolary (e.g Legendre or Hierarchic) bases
+    // are used.
+    //
+    // Dirichlet boundary conditions can also be imposed with a
+    // "penalty" method.  In this case essentially the L2 projection
+    // of the boundary values are added to the matrix. The
+    // projection is multiplied by some large factor so that, in
+    // floating point arithmetic, the existing (smaller) entries
+    // in the matrix and right-hand-side are effectively ignored.
+    //
+    // This amounts to adding a term of the form (in latex notation)
+    //
+    // \frac{1}{\epsilon} \int_{\delta \Omega} \phi_i \phi_j = \frac{1}{\epsilon} \int_{\delta
+    // \Omega} u \phi_i
+    //
+    // where
+    //
+    // \frac{1}{\epsilon} is the penalty parameter, defined such that \epsilon << 1
+    {
+
+      // The following loop is over the sides of the element.
+      // If the element has no neighbor on a side then that
+      // side MUST live on a boundary of the domain.
+      for (auto side : elem->side_index_range())
+        if (elem->neighbor_ptr(side) == nullptr)
+        {
+          // The value of the shape functions at the quadrature
+          // points.
+          const std::vector<std::vector<Real>> & phi_face = fe_face->get_phi();
+
+          // The Jacobian * Quadrature Weight at the quadrature
+          // points on the face.
+          const std::vector<Real> & JxW_face = fe_face->get_JxW();
+
+          // The XYZ locations (in physical space) of the
+          // quadrature points on the face.  This is where
+          // we will interpolate the boundary value function.
+          const std::vector<Point> & qface_point = fe_face->get_xyz();
+
+          // Compute the shape function values on the element
+          // face.
+          fe_face->reinit(elem, side);
+
+          // Some shape functions will be 0 on the face, but for
+          // ease of indexing and generality of code we loop over
+          // them anyway
+          libmesh_assert_equal_to(n_dofs, phi_face.size());
+
+          // Loop over the face quadrature points for integration.
+          for (unsigned int qp = 0; qp < qface.n_points(); qp++)
+          {
+            // The location on the boundary of the current
+            // face quadrature point.
+            const Real xf = qface_point[qp](0);
+            const Real yf = qface_point[qp](1);
+
+            // The penalty value.  \frac{1}{\epsilon}
+            // in the discussion above.
+            const Real penalty = 1.e10;
+
+            // The boundary value.
+            const Real value = exact_solution(xf, yf);
+
+            // Matrix contribution of the L2 projection.
+            for (unsigned int i = 0; i != n_dofs; i++)
+              for (unsigned int j = 0; j != n_dofs; j++)
+                Ke(i, j) += JxW_face[qp] * penalty * phi_face[i][qp] * phi_face[j][qp];
+
+            // Right-hand-side contribution of the L2
+            // projection.
+            for (unsigned int i = 0; i != n_dofs; i++)
+              Fe(i) += JxW_face[qp] * penalty * value * phi_face[i][qp];
+          }
+        }
+    }
+
+    // We have now finished the quadrature point loop,
+    // and have therefore applied all the boundary conditions.
+
+    // If this assembly program were to be used on an adaptive mesh,
+    // we would have to apply any hanging node constraint equations
+    dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
+
+    // The element matrix and right-hand-side are now built
+    // for this element.  Add them to the global matrix and
+    // right-hand-side vector.  The  SparseMatrix::add_matrix()
+    // and  NumericVector::add_vector() members do this for us.
+    matrix.add_matrix(Ke, dof_indices);
+    system.rhs->add_vector(Fe, dof_indices);
+    sc.add_matrix(*elem, 0, 0, Ke);
+  }
 
   // All done!
 }

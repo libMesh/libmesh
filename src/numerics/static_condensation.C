@@ -24,6 +24,8 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/linear_solver.h"
+#include "libmesh/petsc_vector.h"
+#include "libmesh/petsc_matrix.h"
 #include "timpi/parallel_sync.h"
 #include <unordered_set>
 
@@ -316,7 +318,8 @@ StaticCondensation::assemble_reduced_mat()
   {
     libmesh_ignore(elem_id);
     local_data.AiiFactor = local_data.Aii.partialPivLu();
-    const auto S = local_data.Abb - local_data.Abi * local_data.AiiFactor.solve(local_data.Aib);
+    const EigenMatrix S = local_data.Abb - local_data.Abi * local_data.AiiFactor.solve(local_data.Aib);
+    const EigenMatrix S2 = local_data.Abb - local_data.Abi * local_data.Aii.inverse() * local_data.Aib;
     DenseMatrix<Number> shim(S.rows(), S.cols());
     for (const auto i : make_range(S.rows()))
       for (const auto j : make_range(S.cols()))
@@ -325,6 +328,7 @@ StaticCondensation::assemble_reduced_mat()
   }
 
   _reduced_sys_mat->close();
+  auto ierr = MatView(static_cast<PetscMatrix<Number> &>(*_reduced_sys_mat).mat(), 0);
 }
 
 void
@@ -348,6 +352,8 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
   EigenVector elem_interior_rhs, elem_trace_rhs;
 
   _reduced_rhs->zero();
+
+  auto & petsc_vec = static_cast<const PetscVector<Number> &>(full_rhs);
 
   //
   // Forward elimination step
@@ -440,6 +446,7 @@ StaticCondensation::solve(const NumericVector<Number> & full_rhs, NumericVector<
   forward_elimination(full_rhs);
   _reduced_sol->zero();
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
+  auto & petsc_vec = static_cast<PetscVector<Number> & >(*_reduced_sol);
   backwards_substitution(full_rhs, full_sol);
 }
 }
