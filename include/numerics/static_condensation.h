@@ -63,22 +63,23 @@ public:
                   const unsigned int j_var,
                   const DenseMatrix<Number> & k);
 
-  void assemble_reduced_mat();
-  void solve(const NumericVector<Number> & full_rhs);
+  void solve(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol);
 
 private:
-  void computeElemDofsScalar(const Elem & elem,
-                             const std::vector<dof_id_type> & scalar_dof_indices,
-                             std::vector<dof_id_type> & elem_dof_indices,
-                             std::vector<dof_id_type> & elem_interior_dofs,
-                             std::vector<dof_id_type> & elem_trace_dofs) const;
+  static void set_local_vectors(const NumericVector<Number> & global_vector,
+                                const std::vector<dof_id_type> & elem_dof_indices,
+                                std::vector<Number> & elem_dof_values_vec,
+                                EigenVector & elem_dof_values);
 
-  void computeElemDofsField(const Elem & elem,
-                            const unsigned int node_num,
-                            const dof_id_type field_dof,
-                            std::vector<dof_id_type> & elem_dof_indices,
-                            std::vector<dof_id_type> & elem_interior_dofs,
-                            std::vector<dof_id_type> & elem_trace_dofs) const;
+  void assemble_reduced_mat();
+  void forward_elimination(const NumericVector<Number> & full_rhs);
+  void backwards_substitution(NumericVector<Number> & full_sol);
+
+  static auto computeElemDofsScalar(std::vector<dof_id_type> & elem_interior_dofs,
+                                    std::vector<dof_id_type> & elem_trace_dofs) -> decltype(auto);
+
+  static auto computeElemDofsField(std::vector<dof_id_type> & elem_interior_dofs,
+                                   std::vector<dof_id_type> & elem_trace_dofs) -> decltype(auto);
 
   struct LocalData
   {

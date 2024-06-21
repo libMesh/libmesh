@@ -164,8 +164,7 @@ int main (int argc, char ** argv)
   equation_systems.get_system("Poisson").solve();
 
   // Do static condensation solve
-  sc.assemble_reduced_mat();
-  sc.solve(*sys.solution);
+  sc.solve(*sys.rhs, *sys.solution);
 
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 

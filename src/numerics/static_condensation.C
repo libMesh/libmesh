@@ -35,38 +35,44 @@ StaticCondensation::StaticCondensation(const MeshBase & mesh, const DofMap & dof
   init();
 }
 
-void
-StaticCondensation::computeElemDofsScalar(const Elem & /*elem*/,
-                                          const std::vector<dof_id_type> & scalar_dof_indices,
-                                          std::vector<dof_id_type> & elem_dof_indices,
-                                          std::vector<dof_id_type> & /*elem_interior_dofs*/,
-                                          std::vector<dof_id_type> & elem_trace_dofs) const
+auto
+StaticCondensation::computeElemDofsScalar(std::vector<dof_id_type> & /*elem_interior_dofs*/,
+                                          std::vector<dof_id_type> & elem_trace_dofs)
+    -> decltype(auto)
 {
-  elem_dof_indices.insert(
-      elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
-  elem_trace_dofs.insert(
-      elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+  return [&elem_trace_dofs](const Elem &,
+                            std::vector<dof_id_type> & elem_dof_indices,
+                            const std::vector<dof_id_type> & scalar_dof_indices)
+  {
+    elem_dof_indices.insert(
+        elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+    elem_trace_dofs.insert(
+        elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+  };
 }
 
-void
-StaticCondensation::computeElemDofsField(const Elem & elem,
-                                         const unsigned int node_num,
-                                         const dof_id_type field_dof,
-                                         std::vector<dof_id_type> & elem_dof_indices,
-                                         std::vector<dof_id_type> & elem_interior_dofs,
-                                         std::vector<dof_id_type> & elem_trace_dofs) const
+auto
+StaticCondensation::computeElemDofsField(std::vector<dof_id_type> & elem_interior_dofs,
+                                         std::vector<dof_id_type> & elem_trace_dofs)
+    -> decltype(auto)
 {
-  elem_dof_indices.push_back(field_dof);
-  if (node_num != invalid_uint)
+  return [&elem_interior_dofs, &elem_trace_dofs](const Elem & elem,
+                                                 const unsigned int node_num,
+                                                 std::vector<dof_id_type> & elem_dof_indices,
+                                                 const dof_id_type field_dof)
   {
-    // This is a nodal dof
-    if (elem.is_internal(node_num))
-      elem_interior_dofs.push_back(field_dof);
+    elem_dof_indices.push_back(field_dof);
+    if (node_num != invalid_uint)
+    {
+      // This is a nodal dof
+      if (elem.is_internal(node_num))
+        elem_interior_dofs.push_back(field_dof);
+      else
+        elem_trace_dofs.push_back(field_dof);
+    }
     else
-      elem_trace_dofs.push_back(field_dof);
-  }
-  else
-    elem_interior_dofs.push_back(field_dof);
+      elem_interior_dofs.push_back(field_dof);
+  };
 }
 
 void
@@ -91,8 +97,8 @@ StaticCondensation::init()
                                           std::vector<dof_id_type> & dof_indices,
                                           const std::vector<dof_id_type> & scalar_dof_indices)
   {
-    computeElemDofsScalar(
-        elem, scalar_dof_indices, dof_indices, elem_interior_dofs, elem_trace_dofs);
+    computeElemDofsScalar(elem_interior_dofs,
+                          elem_trace_dofs)(elem, dof_indices, scalar_dof_indices);
 
     // Only need to do this for the first element we encounter
     if (&elem == first_elem)
@@ -112,8 +118,8 @@ StaticCondensation::init()
           std::vector<dof_id_type> & dof_indices,
           const dof_id_type field_dof)
   {
-    computeElemDofsField(
-        elem, node_num, field_dof, dof_indices, elem_interior_dofs, elem_trace_dofs);
+    computeElemDofsField(elem_interior_dofs,
+                         elem_trace_dofs)(elem, node_num, dof_indices, field_dof);
 
     if (node_num != invalid_uint && !elem.is_internal(node_num))
     {
@@ -322,39 +328,35 @@ StaticCondensation::assemble_reduced_mat()
 }
 
 void
-StaticCondensation::solve(const NumericVector<Number> & full_rhs)
+StaticCondensation::set_local_vectors(const NumericVector<Number> & global_vector,
+                                      const std::vector<dof_id_type> & elem_dof_indices,
+                                      std::vector<Number> & elem_dof_values_vec,
+                                      EigenVector & elem_dof_values)
+{
+  global_vector.get(elem_dof_indices, elem_dof_values_vec);
+  elem_dof_values.resize(elem_dof_indices.size());
+  for (const auto i : index_range(elem_dof_indices))
+    elem_dof_values(i) = elem_dof_values_vec[i];
+}
+
+void
+StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
 {
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
-  std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs;
-  std::vector<Number> elem_interior_values_vec, elem_trace_values_vec;
-  EigenVector elem_interior_values, elem_trace_values;
+  std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs_full;
+  std::vector<Number> elem_interior_rhs_vec, elem_trace_rhs_vec;
+  EigenVector elem_interior_rhs, elem_trace_rhs;
 
-  _reduced_sol->zero();
   _reduced_rhs->zero();
 
-  auto scalar_dofs_functor = [this, &elem_interior_dofs, &elem_trace_dofs](
-                                 const Elem & elem,
-                                 std::vector<dof_id_type> & dof_indices,
-                                 const std::vector<dof_id_type> & scalar_dof_indices)
-  {
-    computeElemDofsScalar(
-        elem, scalar_dof_indices, dof_indices, elem_interior_dofs, elem_trace_dofs);
-  };
-
-  auto field_dofs_functor =
-      [this, &elem_interior_dofs, &elem_trace_dofs](const Elem & elem,
-                                                    const unsigned int node_num,
-                                                    std::vector<dof_id_type> & dof_indices,
-                                                    const dof_id_type field_dof)
-  {
-    computeElemDofsField(
-        elem, node_num, field_dof, dof_indices, elem_interior_dofs, elem_trace_dofs);
-  };
+  //
+  // Forward elimination step
+  //
 
   for (auto elem : _mesh.active_local_element_ptr_range())
   {
     elem_interior_dofs.clear();
-    elem_trace_dofs.clear();
+    elem_trace_dofs_full.clear();
     auto & local_data = _elem_to_local_data[elem->id()];
 
     const auto sub_id = elem->subdomain_id();
@@ -365,31 +367,65 @@ StaticCondensation::solve(const NumericVector<Number> & full_rhs)
         continue;
 
       for (const auto v : make_range(var_group.n_variables()))
-        _dof_map.dof_indices(
-            elem, elem_dofs, v, scalar_dofs_functor, field_dofs_functor, elem->p_level());
+        _dof_map.dof_indices(elem,
+                             elem_dofs,
+                             v,
+                             computeElemDofsScalar(elem_interior_dofs, elem_trace_dofs_full),
+                             computeElemDofsField(elem_interior_dofs, elem_trace_dofs_full),
+                             elem->p_level());
     }
 
-    auto set_local_vectors = [&full_rhs](const auto & elem_dof_indices,
-                                         auto & elem_dof_values_vec,
-                                         auto & elem_dof_values)
-    {
-      full_rhs.get(elem_dof_indices, elem_dof_values_vec);
-      elem_dof_values.resize(elem_dof_indices.size());
-      for (const auto i : index_range(elem_dof_indices))
-        elem_dof_values(i) = elem_dof_values_vec[i];
-    };
+    set_local_vectors(full_rhs, elem_interior_dofs, elem_interior_rhs_vec, elem_interior_rhs);
+    set_local_vectors(full_rhs, elem_trace_dofs_full, elem_trace_rhs_vec, elem_trace_rhs);
 
-    set_local_vectors(elem_interior_dofs, elem_interior_values_vec, elem_interior_values);
-    set_local_vectors(elem_trace_dofs, elem_trace_values_vec, elem_trace_values);
+    elem_trace_rhs -= local_data.Abi * local_data.AiiFactor.solve(elem_interior_rhs);
 
-    elem_trace_values -= local_data.Abi * local_data.AiiFactor.solve(elem_interior_values);
-
-    libmesh_assert(cast_int<std::size_t>(elem_trace_values.size()) ==
+    libmesh_assert(cast_int<std::size_t>(elem_trace_rhs.size()) ==
                    local_data.reduced_space_indices.size());
-    _reduced_rhs->add_vector(elem_trace_values.data(), local_data.reduced_space_indices);
+    _reduced_rhs->add_vector(elem_trace_rhs.data(), local_data.reduced_space_indices);
   }
   _reduced_rhs->close();
+}
 
+void
+StaticCondensation::backwards_substitution(NumericVector<Number> & full_sol)
+{
+  std::vector<dof_id_type> elem_dofs; // only used to satisfy API
+  std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs_full;
+  std::vector<Number> elem_interior_rhs_vec, elem_trace_sol_vec;
+  EigenVector elem_interior_rhs, elem_trace_sol, elem_interior_sol;
+
+  for (auto elem : _mesh.active_local_element_ptr_range())
+  {
+    elem_interior_dofs.clear();
+    elem_trace_dofs_full.clear();
+    auto & local_data = _elem_to_local_data[elem->id()];
+
+    const auto sub_id = elem->subdomain_id();
+    for (const auto vg : make_range(_dof_map.n_variable_groups()))
+    {
+      const auto & var_group = _dof_map.variable_group(vg);
+      if (!var_group.active_on_subdomain(sub_id))
+        continue;
+
+      for (const auto v : make_range(var_group.n_variables()))
+        _dof_map.dof_indices(elem,
+                             elem_dofs,
+                             v,
+                             computeElemDofsScalar(elem_interior_dofs, elem_trace_dofs_full),
+                             computeElemDofsField(elem_interior_dofs, elem_trace_dofs_full),
+                             elem->p_level());
+    }
+  }
+}
+
+void
+StaticCondensation::solve(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol)
+{
+  assemble_reduced_mat();
+  forward_elimination(full_rhs);
+  _reduced_sol->zero();
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
+  backwards_substitution(full_sol);
 }
 }
