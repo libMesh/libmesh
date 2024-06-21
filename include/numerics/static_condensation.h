@@ -20,6 +20,12 @@
 
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
+// These next three includes are not strictly necessary but unique_ptr will error with incomplete
+// type if user code does not have these includes, which could be confusing for the user because
+// they're only making calls on the StaticCondensation class
+#include "libmesh/numeric_vector.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/linear_solver.h"
 #include <unordered_map>
 #include <memory>
 #include <vector>
@@ -33,10 +39,6 @@ class DofMap;
 class Elem;
 template <typename>
 class DenseMatrix;
-template <typename>
-class NumericVector;
-template <typename>
-class SparseMatrix;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 typedef Eigen::MatrixXcd EigenMatrix;
@@ -115,6 +117,7 @@ private:
   std::unique_ptr<SparseMatrix<Number>> _reduced_sys_mat;
   std::unique_ptr<NumericVector<Number>> _reduced_sol;
   std::unique_ptr<NumericVector<Number>> _reduced_rhs;
+  std::unique_ptr<LinearSolver<Number>> _reduced_solver;
 };
 }
 

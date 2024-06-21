@@ -23,11 +23,9 @@
 #include "libmesh/int_range.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/linear_solver.h"
 #include "timpi/parallel_sync.h"
-#include "libmesh/petsc_vector.h"
-#include "libmesh/petsc_matrix.h"
 #include <unordered_set>
-#include <petscksp.h>
 
 namespace libMesh
 {
@@ -184,6 +182,8 @@ StaticCondensation::init()
   // // For hex elements this would mean an 8x multiplier! So for now we just accept the libmesh
   // // defaults and prepare ourselves for possible nonzero allocations to get started
   _reduced_sys_mat->init(n, n, n_local, n_local /*, 2 * num_couplings, num_couplings*/);
+  _reduced_solver = LinearSolver<Number>::build(_dof_map.comm());
+  _reduced_solver->init("condensed_");
 
   // Build a map from the full size problem trace dof indices to the reduced problem (trace) dof
   // indices
@@ -390,20 +390,6 @@ StaticCondensation::solve(const NumericVector<Number> & full_rhs)
   }
   _reduced_rhs->close();
 
-  auto * const petsc_sol = dynamic_cast<PetscVector<Number> *>(_reduced_sol.get());
-  auto * const petsc_rhs = dynamic_cast<PetscVector<Number> *>(_reduced_rhs.get());
-  auto * const petsc_mat = dynamic_cast<PetscMatrix<Number> *>(_reduced_sys_mat.get());
-
-  KSP ksp;
-  auto ierr = KSPCreate(PETSC_COMM_WORLD, &ksp);
-  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
-  ierr = KSPSetOperators(ksp, petsc_mat->mat(), petsc_mat->mat());
-  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
-  ierr = KSPSetOptionsPrefix(ksp, "condensed_");
-  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
-  ierr = KSPSetFromOptions(ksp);
-  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
-  ierr = KSPSolve(ksp, petsc_rhs->vec(), petsc_sol->vec());
-  LIBMESH_CHKERR2(_dof_map.comm(), ierr);
+  _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
 }
 }
