@@ -65,6 +65,12 @@ public:
 
   void solve(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol);
 
+  const SparseMatrix<Number> & get_condensed_mat() const
+  {
+    libmesh_assert(_reduced_sys_mat);
+    return *_reduced_sys_mat;
+  }
+
 private:
   static void set_local_vectors(const NumericVector<Number> & global_vector,
                                 const std::vector<dof_id_type> & elem_dof_indices,

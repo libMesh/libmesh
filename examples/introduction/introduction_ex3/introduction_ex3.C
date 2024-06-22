@@ -158,7 +158,7 @@ main(int argc, char ** argv)
   // if you linked against the appropriate X libraries when you
   // built PETSc.
   equation_systems.get_system("Poisson").solve();
-  std::vector<PetscInt> trace_dofs = {0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13};
+  std::vector<PetscInt> trace_dofs = {12, 11, 10, 9, 7, 6, 5, 4, 3, 2, 1, 13, 0};
   std::vector<PetscInt> interior_dofs = {8, 14};
   IS trace, interior;
   auto ierr = ISCreateGeneral(mesh.comm().get(), 13, trace_dofs.data(), PETSC_COPY_VALUES, &trace);
@@ -178,6 +178,23 @@ main(int argc, char ** argv)
   auto sc_soln = sys.solution->clone();
   sc.solve(*sys.rhs, *sc_soln);
 
+  const auto & sc_mat = sc.get_condensed_mat();
+  PetscMatrix<Number> wrapped_sp(Sp, mesh.comm());
+  bool equiv = true;
+  for (const auto i : make_range(sc_mat.row_start(), sc_mat.row_stop()))
+  {
+    for (const auto j : make_range(sc_mat.row_start(), sc_mat.row_stop()))
+      if (!relative_fuzzy_equal(sc_mat(i, j), wrapped_sp(i, j)))
+      {
+        equiv = false;
+        break;
+      }
+    if (!equiv)
+      break;
+  }
+
+  libmesh_assert(equiv);
+
   auto & petsc_vec1 = static_cast<PetscVector<Number> &>(*sys.solution);
   auto & petsc_vec2 = static_cast<PetscVector<Number> &>(*sc_soln);
   ierr = VecView(petsc_vec1.vec(), 0);
@@ -185,13 +202,91 @@ main(int argc, char ** argv)
   ierr = VecView(petsc_vec2.vec(), 0);
   LIBMESH_CHKERR2(mesh.comm(), ierr);
 
+  Vec x, y, z;
+  ierr = VecDuplicate(petsc_vec1.vec(), &z);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecGetSubVector(z, trace, &x);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecGetSubVector(z, interior, &y);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+
+  Vec rhs = static_cast<PetscVector<Number> *>(sys.rhs)->vec();
+  Vec bx, by;
+  ierr = VecGetSubVector(rhs, trace, &bx);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecGetSubVector(rhs, interior, &by);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+
+  PC A00_inv;
+  ierr = PCCreate(mesh.comm().get(), &A00_inv);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCSetType(A00_inv, PCLU);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCSetOperators(A00_inv, A00, A00);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCFactorSetMatSolverType(A00_inv, MATSOLVERMUMPS);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCSetUp(A00_inv);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  PC S_inv;
+  ierr = PCCreate(mesh.comm().get(), &S_inv);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCSetType(S_inv, PCLU);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCSetOperators(S_inv, Sp, Sp);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCFactorSetMatSolverType(S_inv, MATSOLVERMUMPS);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCSetUp(S_inv);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+
+  Vec worky, workx;
+  ierr = VecCreate(mesh.comm().get(), &worky);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecSetType(worky, VECSEQ);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecSetSizes(worky, 2, 2);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+
+  ierr = VecCreate(mesh.comm().get(), &workx);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecSetType(workx, VECSEQ);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecSetSizes(workx, 13, 13);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCApply(A00_inv, by, worky);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = MatMult(A10, worky, workx);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecAXPY(bx, 1.0, workx);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCApply(S_inv, bx, x);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+
+  ierr = MatMult(A01, x, worky);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecAXPY(by, -1.0, worky);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = PCApply(A00_inv, by, y);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+
+  ierr = VecRestoreSubVector(z, trace, &x);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecRestoreSubVector(z, interior, &y);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+  ierr = VecView(z, 0);
+  LIBMESH_CHKERR2(mesh.comm(), ierr);
+
+  PetscVector<Number> wrapped_manual_schur(z, mesh.comm());
   for (const auto i : make_range(sc_soln->first_local_index(), sc_soln->last_local_index()))
-  {
-    const auto val1 = (*sc_soln)(i);
-    const auto val2 = (*sys.solution)(i);
-    libmesh_error_msg_if(!relative_fuzzy_equal((*sc_soln)(i), (*sys.solution)(i)),
+    libmesh_error_msg_if(!absolute_fuzzy_equal(wrapped_manual_schur(i), (*sys.solution)(i)) &&
+                             !relative_fuzzy_equal(wrapped_manual_schur(i), (*sys.solution)(i)),
+                         "mismatching solution in manual computation");
+
+  for (const auto i : make_range(sc_soln->first_local_index(), sc_soln->last_local_index()))
+    libmesh_error_msg_if(!absolute_fuzzy_equal((*sc_soln)(i), (*sys.solution)(i)) &&
+                             !relative_fuzzy_equal((*sc_soln)(i), (*sys.solution)(i)),
                          "mismatching solution");
-  }
 
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 
