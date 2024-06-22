@@ -27,6 +27,7 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/int_range.h"
+#include "libmesh/fuzzy_equal.h"
 
 
 // C++ includes
@@ -430,6 +431,29 @@ bool NumericVector<T>::compatible (const NumericVector<T> & v) const
 }
 
 
+template <typename T>
+bool NumericVector<T>::fuzzy_equal(const NumericVector<T> & v) const
+{
+  bool equiv = true;
+  if (this->local_size() != v.local_size())
+    equiv = false;
+
+  if (equiv)
+    for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
+    {
+      if (relative_fuzzy_equal((*this)(i), v(i)) || absolute_fuzzy_equal((*this)(i), v(i)))
+        continue;
+      else
+      {
+        equiv = false;
+        break;
+      }
+    }
+
+  this->comm().min(equiv);
+
+  return equiv;
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations

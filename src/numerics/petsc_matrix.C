@@ -32,6 +32,9 @@
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"
 #include "libmesh/wrapped_petsc.h"
+#include "libmesh/fuzzy_equal.h"
+
+#include <petscstring.h>
 
 // C++ includes
 #ifdef LIBMESH_HAVE_UNISTD_H
@@ -1575,6 +1578,100 @@ SparseMatrix<T> & PetscMatrix<T>::operator= (const SparseMatrix<T> & v)
   return *this;
 }
 
+template <typename T>
+bool
+PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other) const
+{
+  const auto * const petsc_other = dynamic_cast<const PetscMatrix<Number> *>(&other);
+  if (!petsc_other)
+    // This result should be the same on all procs
+    return false;
+
+  Mat petsc_other_mat = petsc_other->_mat;
+  const PetscScalar *petsc_row, *petsc_row_other;
+  const PetscInt *petsc_cols, *petsc_cols_other;
+
+  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscInt ncols = 0, ncols_other = 0;
+
+  bool equiv = true;
+  if ((this->local_m() != other.local_m()) || (this->local_n() != other.local_n()))
+  {
+    equiv = false;
+    goto endLoop;
+  }
+
+  for (const auto i : make_range(this->row_start(), this->row_stop()))
+  {
+    const auto i_val = static_cast<PetscInt>(i);
+
+    // the matrix needs to be closed for this to work
+    // this->close();
+    // but closing it is a semiparallel operation; we want operator()
+    // to run on one processor.
+    libmesh_assert(this->closed());
+    libmesh_assert(petsc_other->closed());
+
+    ierr = MatGetRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
+    LIBMESH_CHKERR(ierr);
+    ierr = MatGetRow(petsc_other_mat, i_val, &ncols_other, &petsc_cols_other, &petsc_row_other);
+    LIBMESH_CHKERR(ierr);
+
+    auto restore_rows = [this,
+                         i_val,
+                         petsc_other_mat,
+                         &ierr,
+                         &ncols,
+                         &petsc_cols,
+                         &petsc_row,
+                         &ncols_other,
+                         &petsc_cols_other,
+                         &petsc_row_other]()
+    {
+      ierr = MatRestoreRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
+      LIBMESH_CHKERR(ierr);
+      ierr =
+          MatRestoreRow(petsc_other_mat, i_val, &ncols_other, &petsc_cols_other, &petsc_row_other);
+      LIBMESH_CHKERR(ierr);
+    };
+
+    auto compared_false = [&equiv, restore_rows]()
+    {
+      restore_rows();
+      equiv = false;
+    };
+
+    if (ncols != ncols_other)
+    {
+      compared_false();
+      goto endLoop;
+    }
+
+    // No need for fuzzy comparison here
+    PetscBool petsc_equiv;
+    ierr = PetscArraycmp(petsc_cols, petsc_cols_other, ncols, &petsc_equiv);
+    LIBMESH_CHKERR(ierr);
+    if (petsc_equiv == PETSC_FALSE)
+      compared_false();
+
+    for (const auto j_val : make_range(ncols))
+      if (relative_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val]) ||
+          absolute_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val]))
+        continue;
+      else
+      {
+        compared_false();
+        goto endLoop;
+      }
+
+    restore_rows();
+  }
+
+endLoop:
+  this->comm().min(equiv);
+
+  return equiv;
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations

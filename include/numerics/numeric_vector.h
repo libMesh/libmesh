@@ -786,6 +786,11 @@ public:
    */
   bool compatible(const NumericVector<T> & v) const;
 
+  /**
+   * checks whether the vector \p v is fuzzy equal to this vector
+   */
+  bool fuzzy_equal(const NumericVector<T> & v) const;
+
 protected:
 
   /**

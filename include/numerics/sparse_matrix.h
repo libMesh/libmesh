@@ -573,8 +573,13 @@ public:
                        std::vector<numeric_index_type> & indices,
                        std::vector<T> & values) const = 0;
 
-protected:
 
+  /**
+   * checks whether the matrix \p other is fuzzy equal to this matrix
+   */
+  virtual bool fuzzy_equal(const SparseMatrix<T> & other) const;
+
+protected:
   /**
    * Protected implementation of the create_submatrix and reinit_submatrix
    * routines.
