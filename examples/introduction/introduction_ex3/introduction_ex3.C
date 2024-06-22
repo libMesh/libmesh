@@ -180,20 +180,7 @@ main(int argc, char ** argv)
 
   const auto & sc_mat = sc.get_condensed_mat();
   PetscMatrix<Number> wrapped_sp(Sp, mesh.comm());
-  bool equiv = true;
-  for (const auto i : make_range(sc_mat.row_start(), sc_mat.row_stop()))
-  {
-    for (const auto j : make_range(sc_mat.row_start(), sc_mat.row_stop()))
-      if (!relative_fuzzy_equal(sc_mat(i, j), wrapped_sp(i, j)))
-      {
-        equiv = false;
-        break;
-      }
-    if (!equiv)
-      break;
-  }
-
-  libmesh_assert(equiv);
+  libmesh_assert(sc_mat.fuzzy_equal(wrapped_sp));
 
   auto & petsc_vec1 = static_cast<PetscVector<Number> &>(*sys.solution);
   auto & petsc_vec2 = static_cast<PetscVector<Number> &>(*sc_soln);
@@ -278,15 +265,9 @@ main(int argc, char ** argv)
   LIBMESH_CHKERR2(mesh.comm(), ierr);
 
   PetscVector<Number> wrapped_manual_schur(z, mesh.comm());
-  for (const auto i : make_range(sc_soln->first_local_index(), sc_soln->last_local_index()))
-    libmesh_error_msg_if(!absolute_fuzzy_equal(wrapped_manual_schur(i), (*sys.solution)(i)) &&
-                             !relative_fuzzy_equal(wrapped_manual_schur(i), (*sys.solution)(i)),
-                         "mismatching solution in manual computation");
-
-  for (const auto i : make_range(sc_soln->first_local_index(), sc_soln->last_local_index()))
-    libmesh_error_msg_if(!absolute_fuzzy_equal((*sc_soln)(i), (*sys.solution)(i)) &&
-                             !relative_fuzzy_equal((*sc_soln)(i), (*sys.solution)(i)),
-                         "mismatching solution");
+  libmesh_error_msg_if(!wrapped_manual_schur.fuzzy_equal(*sys.solution),
+                       "mismatching solution in manual computation");
+  libmesh_error_msg_if(!sc_soln->fuzzy_equal(*sys.solution), "mismatching solution");
 
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 
