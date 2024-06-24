@@ -86,6 +86,7 @@ unsigned int idx(const ElemType type,
     case QUAD4:
     case QUADSHELL4:
     case TRI3:
+    case TRISHELL3:
       {
         return i + j*(nx+1);
       }
@@ -603,6 +604,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             }
 
           case TRI3:
+          case TRISHELL3:
           case TRI6:
           case TRI7:
             {
@@ -624,6 +626,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case QUAD4:
           case QUADSHELL4:
           case TRI3:
+          case TRISHELL3:
             {
               mesh.reserve_nodes( (nx+1)*(ny+1) );
               break;
@@ -660,6 +663,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case QUAD4:
           case QUADSHELL4:
           case TRI3:
+          case TRISHELL3:
             {
               for (unsigned int j=0; j<=ny; j++)
                 for (unsigned int i=0; i<=nx; i++)
@@ -772,12 +776,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
           case TRI3:
+          case TRISHELL3:
             {
               for (unsigned int j=0; j<ny; j++)
                 for (unsigned int i=0; i<nx; i++)
                   {
                     // Add first Tri3
-                    Elem * elem = mesh.add_elem(Elem::build_with_id(TRI3, elem_id++));
+                    Elem * elem = mesh.add_elem(Elem::build_with_id(type, elem_id++));
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j)  );
                     elem->set_node(2) = mesh.node_ptr(idx(type,nx,i+1,j+1));
@@ -789,7 +794,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                       boundary_info.add_side(elem, 1, 1);
 
                     // Add second Tri3
-                    elem = mesh.add_elem(Elem::build_with_id(TRI3, elem_id++));
+                    elem = mesh.add_elem(Elem::build_with_id(type, elem_id++));
                     elem->set_node(0) = mesh.node_ptr(idx(type,nx,i,j)    );
                     elem->set_node(1) = mesh.node_ptr(idx(type,nx,i+1,j+1));
                     elem->set_node(2) = mesh.node_ptr(idx(type,nx,i,j+1)  );
