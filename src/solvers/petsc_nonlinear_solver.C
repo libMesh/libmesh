@@ -55,7 +55,7 @@ libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
 {
   LOG_SCOPE("residual()", "PetscNonlinearSolver");
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   libmesh_assert(x);
   libmesh_assert(ctx);
@@ -121,7 +121,7 @@ extern "C"
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
-    PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
     KSP ksp;
     ierr = SNESGetKSP(snes, &ksp);
@@ -152,7 +152,7 @@ extern "C"
                  << std::scientific
                  << ", |residual|_2 = " << fnorm
                  << std::endl;
-    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -436,7 +436,7 @@ extern "C"
 #endif
 #endif
 
-    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -458,7 +458,7 @@ extern "C"
 
     LOG_SCOPE("jacobian()", "PetscNonlinearSolver");
 
-    PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
     libmesh_assert(ctx);
 
@@ -569,7 +569,7 @@ extern "C"
     libmesh_parallel_only(solver->comm());
 
     solver->linesearch_object->linesearch(linesearch);
-    PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -598,7 +598,7 @@ extern "C"
 
     LOG_SCOPE("postcheck()", "PetscNonlinearSolver");
 
-    PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
     // PETSc almost certainly initializes these to false already, but
     // it doesn't hurt to be explicit.
@@ -681,7 +681,7 @@ extern "C"
 
     LOG_SCOPE("precheck()", "PetscNonlinearSolver");
 
-    PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
     // PETSc almost certainly initializes these to false already, but
     // it doesn't hurt to be explicit.
@@ -799,7 +799,7 @@ void PetscNonlinearSolver<T>::init (const char * name)
     {
       this->_is_initialized = true;
 
-      PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+      PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
       // Make only if we don't already have a retained snes
       // hanging around from the last solve
@@ -985,7 +985,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
   PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt n_iterations =0;
   // Should actually be a PetscReal, but I don't know which version of PETSc first introduced PetscReal
   Real final_residual_norm=0.;
@@ -1227,7 +1227,7 @@ void PetscNonlinearSolver<T>::print_converged_reason()
 template <typename T>
 SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
 {
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   if (this->initialized())
     {

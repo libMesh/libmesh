@@ -84,7 +84,7 @@ void PetscShellMatrix<T>::init ()
   const numeric_index_type n_l  = m_l;
 
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt m_global   = static_cast<PetscInt>(my_m);
   PetscInt n_global   = static_cast<PetscInt>(my_n);
   PetscInt m_local    = static_cast<PetscInt>(m_l);
