@@ -24,8 +24,6 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/linear_solver.h"
-#include "libmesh/petsc_vector.h"
-#include "libmesh/petsc_matrix.h"
 #include "timpi/parallel_sync.h"
 #include <unordered_set>
 

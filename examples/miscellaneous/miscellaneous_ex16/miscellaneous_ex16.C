@@ -55,9 +55,6 @@
 #include "libmesh/elem.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/static_condensation.h"
-#include "libmesh/fuzzy_equal.h"
-#include "libmesh/petsc_vector.h"
-#include "libmesh/petsc_matrix.h"
 
 // Define the DofMap, which handles degree of freedom
 // indexing.
