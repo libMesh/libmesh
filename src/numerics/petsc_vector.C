@@ -1431,10 +1431,10 @@ PetscVector<T>::get_subvector(const std::vector<numeric_index_type> & rows)
 
 template <typename T>
 void
-PetscVector<T>::restore_subvector(NumericVector<T> && subvector,
+PetscVector<T>::restore_subvector(std::unique_ptr<NumericVector<T>> && subvector,
                                   const std::vector<numeric_index_type> & rows)
 {
-  auto * const petsc_subvector = cast_ptr<PetscVector<T> *>(&subvector);
+  auto * const petsc_subvector = cast_ptr<PetscVector<T> *>(subvector.get());
 
   // Construct index set
   WrappedPetsc<IS> parent_is;

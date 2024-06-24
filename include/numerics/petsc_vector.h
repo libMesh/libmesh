@@ -349,7 +349,7 @@ public:
   virtual std::unique_ptr<NumericVector<T>>
   get_subvector(const std::vector<numeric_index_type> & rows) override;
 
-  virtual void restore_subvector(NumericVector<T> && subvector,
+  virtual void restore_subvector(std::unique_ptr<NumericVector<T>> && subvector,
                                  const std::vector<numeric_index_type> & rows) override;
 
 private:

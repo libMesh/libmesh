@@ -267,7 +267,7 @@ CondensedEigenSystem::copy_sub_to_super(const NumericVector<Number> & sub,
                           super.local_size());
   auto super_sub_view = super.get_subvector(local_non_condensed_dofs_vector);
   *super_sub_view = sub;
-  super.restore_subvector(std::move(*super_sub_view), local_non_condensed_dofs_vector);
+  super.restore_subvector(std::move(super_sub_view), local_non_condensed_dofs_vector);
 }
 
 void
@@ -279,7 +279,7 @@ CondensedEigenSystem::copy_super_to_sub(NumericVector<Number> & super,
                           super.local_size());
   auto super_sub_view = super.get_subvector(local_non_condensed_dofs_vector);
   sub = *super_sub_view;
-  super.restore_subvector(std::move(*super_sub_view), local_non_condensed_dofs_vector);
+  super.restore_subvector(std::move(super_sub_view), local_non_condensed_dofs_vector);
 }
 
 void
