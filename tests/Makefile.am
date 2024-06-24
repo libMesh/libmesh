@@ -160,7 +160,8 @@ data = matrices/geom_1_extraction_op.m \
        meshes/mesh_with_low_order_edge_blocks.e \
        meshes/shark_tooth_tri6.xda.gz \
        meshes/tetgen_one_tet10.ele \
-       meshes/tetgen_one_tet10.node
+       meshes/tetgen_one_tet10.node \
+       meshes/find_neighbors_junction_1D_only.e
 
 unit_tests_data = $(data)
 

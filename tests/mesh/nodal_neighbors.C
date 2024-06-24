@@ -4,6 +4,7 @@
 #include <libmesh/mesh_tools.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/elem.h>
+#include <libmesh/mesh_refinement.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -37,6 +38,7 @@ public:
   CPPUNIT_TEST( testEdge3 );
   CPPUNIT_TEST( testEdge4 );
   CPPUNIT_TEST( testOrientation );
+  CPPUNIT_TEST( testMultiNeighborRefinement );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -241,6 +243,32 @@ public:
         //       libMesh::out << "No neighbor on side " << side_idx << std::endl;
         //   }
       }
+  }
+
+  void testMultiNeighborRefinement()
+  {
+    LOG_UNIT_TEST;
+
+    // The input mesh has a Node where 6 1D elements all meet.  Then,
+    // we flag three of those elements for refinement, refine the
+    // Mesh, and finally test that we can call MeshBase::prepare_for_use().
+    // Prior to the changes relaxing some assertions on 1D elements in
+    // #3853 (https://github.com/libMesh/libmesh/pull/3853) this test
+    // failed with a segfault.
+    ReplicatedMesh mesh(*TestCommWorld);
+    mesh.read("meshes/find_neighbors_junction_1D_only.e");
+
+    // Mark elements in subdomain 4 for refinement now:
+    for (const auto & elem : mesh.element_ptr_range())
+      if (elem->subdomain_id() == 4)
+        elem->set_refinement_flag(Elem::REFINE);
+
+    // Do the refinement
+    MeshRefinement mesh_refinement(mesh);
+    mesh_refinement.refine_elements();
+
+    // Trigger a new find_neighbors() call
+    mesh.prepare_for_use();
   }
 };
 
