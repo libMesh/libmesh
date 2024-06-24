@@ -634,7 +634,7 @@ inline Tnew libmesh_cast_int (Told oldvar)
 template <class T>
 constexpr std::false_type always_false{};
 
-static constexpr std::size_t max_dim = LIBMESH_DIM;
+static constexpr std::size_t max_mesh_dim = LIBMESH_DIM;
 
 // build a integer representation of version
 #define LIBMESH_VERSION_ID(major,minor,patch) (((major) << 16) | ((minor) << 8) | ((patch) & 0xFF))

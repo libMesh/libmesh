@@ -21,6 +21,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/compare_types.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -70,7 +71,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
           tol * (std::abs(MetaPhysicL::raw_value(var1)) + std::abs(MetaPhysicL::raw_value(var2))));
     else if constexpr (TensorTools::TensorTraits<T>::rank == 1)
     {
-      for (const auto i : make_range(max_dim))
+      for (const auto i : make_range(max_mesh_dim))
         if (!relativeFuzzyEqual(var1(i), var2(i), tol))
           return false;
 
@@ -78,8 +79,8 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     }
     else if constexpr (TensorTools::TensorTraits<T>::rank == 2)
     {
-      for (const auto i : make_range(max_dim))
-        for (const auto j : make_range(max_dim))
+      for (const auto i : make_range(max_mesh_dim))
+        for (const auto j : make_range(max_mesh_dim))
           if (!relativeFuzzyEqual(var1(i, j), var2(i, j), tol))
             return false;
 
@@ -138,7 +139,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
       return absolute_fuzzy_equal(var1, var2, tol * (std::abs(var1) + std::abs(var2)));
     else if constexpr (TensorTools::TensorTraits<T>::rank == 1)
     {
-      for (const auto i : make_range(max_dim))
+      for (const auto i : make_range(max_mesh_dim))
         if (!relativeFuzzyEqual(var1(i), var2(i), tol))
           return false;
 
@@ -146,8 +147,8 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     }
     else if constexpr (TensorTools::TensorTraits<T>::rank == 2)
     {
-      for (const auto i : make_range(max_dim))
-        for (const auto j : make_range(max_dim))
+      for (const auto i : make_range(max_mesh_dim))
+        for (const auto j : make_range(max_mesh_dim))
           if (!relativeFuzzyEqual(var1(i, j), var2(i, j), tol))
             return false;
 
