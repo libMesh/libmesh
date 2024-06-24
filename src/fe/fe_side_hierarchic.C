@@ -105,6 +105,7 @@ unsigned int side_hierarchic_n_dofs_at_node(const ElemType t,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       if (n > 3 && n < 8)
         return o+1;
       else
@@ -155,6 +156,7 @@ unsigned int side_hierarchic_n_dofs(const ElemType t, const Order o)
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       return ((o+1)*4); // o+1 per side
     case HEX27:
       return ((o+1)*(o+1)*6); // (o+1)^2 per side

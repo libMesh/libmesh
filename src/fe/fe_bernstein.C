@@ -133,6 +133,7 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
           libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for BERNSTEIN FE family!");
       }
     case QUAD9:
+    case QUADSHELL9:
       return ((o+1)*(o+1));
     case HEX8:
       libmesh_assert_less (o, 2);
@@ -367,6 +368,7 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
         return 0;
       libmesh_fallthrough();
     case QUAD9:
+    case QUADSHELL9:
       return 0;
     case HEX8:
       libmesh_assert_less (o, 2);

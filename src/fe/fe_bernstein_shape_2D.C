@@ -117,6 +117,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
     case QUAD4:
     case QUADSHELL4:
     case QUAD9:
+    case QUADSHELL9:
       {
         // Compute quad shape functions as a tensor-product
         auto [i0, i1] = quad_i0_i1(i, totalorder, *elem);
@@ -431,6 +432,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
       // Hierarchic shape functions on the quadrilateral.
     case QUAD4:
     case QUAD9:
+    case QUADSHELL9:
       {
         // Compute quad shape functions as a tensor-product
         auto [i0, i1] = quad_i0_i1(i, totalorder, *elem);
@@ -558,6 +560,7 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem * elem,
       // Hierarchic shape functions on the quadrilateral.
     case QUAD4:
     case QUAD9:
+    case QUADSHELL9:
       {
         // Compute quad shape functions as a tensor-product
         auto [i0, i1] = quad_i0_i1(i, totalorder, *elem);

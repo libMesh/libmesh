@@ -37,6 +37,7 @@
 #include "libmesh/face_quad8.h"
 #include "libmesh/face_quad8_shell.h"
 #include "libmesh/face_quad9.h"
+#include "libmesh/face_quad9_shell.h"
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/face_inf_quad6.h"
 #include "libmesh/cell_tet4.h"
@@ -154,6 +155,8 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     20, // PRISM20
     21, // PRISM21
     18, // PYRAMID18
+
+    9,  // QUADSHELL9
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -210,6 +213,8 @@ const unsigned int Elem::type_to_n_sides_map [] =
     5,  // PRISM20
     5,  // PRISM21
     5,  // PYRAMID18
+
+    4,  // QUADSHELL9
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -266,6 +271,8 @@ const unsigned int Elem::type_to_n_edges_map [] =
     9,  // PRISM20
     9,  // PRISM21
     8,  // PYRAMID18
+
+    4,  // QUADSHELL9
   };
 
 // ------------------------------------------------------------
@@ -308,6 +315,8 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return std::make_unique<QuadShell8>(p);
     case QUAD9:
       return std::make_unique<Quad9>(p);
+    case QUADSHELL9:
+      return std::make_unique<QuadShell9>(p);
 
       // 3D elements
     case TET4:
@@ -2711,6 +2720,7 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
       return QUAD4;
     case QUADSHELL4:
     case QUADSHELL8:
+    case QUADSHELL9:
       return QUADSHELL4;
     case TET4:
     case TET10:
@@ -2804,15 +2814,22 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
     case QUADSHELL4:
     case QUADSHELL8:
       {
-        // There is no QUADSHELL9, so in that sense QUADSHELL8 is the
-        // "full ordered" element.
-        return QUADSHELL8;
+        if (full_ordered)
+          return QUADSHELL9;
+        else
+          return QUADSHELL8;
       }
 
     case QUAD9:
       {
         // full_ordered not relevant
         return QUAD9;
+      }
+
+    case QUADSHELL9:
+      {
+        // full_ordered not relevant
+        return QUADSHELL9;
       }
 
     case TET4:
@@ -2964,11 +2981,8 @@ ElemType Elem::complete_order_equivalent_type (const ElemType et)
 
     case QUADSHELL4:
     case QUADSHELL8:
-      {
-        // There is no QUADSHELL9, so in that sense QUADSHELL8 is the
-        // "full ordered" element.
-        return QUADSHELL8;
-      }
+    case QUADSHELL9:
+      return QUADSHELL9;
 
     case TET4:
     case TET10:

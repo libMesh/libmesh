@@ -95,6 +95,7 @@ unsigned int hermite_n_dofs(const ElemType t, const Order o)
       libmesh_assert_less (o, 4);
       libmesh_fallthrough();
     case QUAD9:
+    case QUADSHELL9:
       return ((o+1)*(o+1));
 
     case HEX8:
@@ -150,6 +151,7 @@ unsigned int hermite_n_dofs_at_node(const ElemType t,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         switch (n)
           {
@@ -254,6 +256,7 @@ unsigned int hermite_n_dofs_per_elem(const ElemType t,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       return ((o-3)*(o-3));
     case HEX8:
       libmesh_assert_less (o, 4);

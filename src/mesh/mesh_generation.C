@@ -94,6 +94,7 @@ unsigned int idx(const ElemType type,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
     case TRI6:
     case TRI7:
       {
@@ -598,6 +599,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               mesh.reserve_elem (nx*ny);
               break;
@@ -635,6 +637,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
           case TRI6:
             {
               mesh.reserve_nodes( (2*nx+1)*(2*ny+1) );
@@ -689,6 +692,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
           case TRI6:
           case TRI7:
             {
@@ -813,6 +817,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               for (unsigned int j=0; j<(2*ny); j += 2)
                 for (unsigned int i=0; i<(2*nx); i += 2)
@@ -827,7 +832,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                     elem->set_node(6) = mesh.node_ptr(idx(type,nx,i+1,j+2));
                     elem->set_node(7) = mesh.node_ptr(idx(type,nx,i,j+1)  );
 
-                    if (type == QUAD9)
+                    if (type == QUAD9 || type == QUADSHELL9)
                       elem->set_node(8) = mesh.node_ptr(idx(type,nx,i+1,j+1));
 
                     if (j == 0)
@@ -1768,8 +1773,11 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
       case TRI6:
       case TRI7:
       case QUAD4:
+      case QUADSHELL4:
       case QUAD8:
+      case QUADSHELL8:
       case QUAD9:
+      case QUADSHELL9:
         mesh.set_mesh_dimension(2);
         break;
       case EDGE2:

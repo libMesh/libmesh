@@ -420,6 +420,7 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         return;
       }
     case QUAD9:
+    case QUADSHELL9:
       {
         nodes[8] = Point (0.,0.,0.);
         libmesh_fallthrough();
@@ -654,6 +655,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         // The reference quadrilateral element is [-1,1]^2.
         if ((xi  >= -1.-eps) &&
