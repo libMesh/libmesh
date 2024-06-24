@@ -38,30 +38,26 @@ StaticCondensation::StaticCondensation(const MeshBase & mesh, const DofMap & dof
 }
 
 auto
-StaticCondensation::computeElemDofsScalar(std::vector<dof_id_type> & /*elem_interior_dofs*/,
-                                          std::vector<dof_id_type> & elem_trace_dofs)
+StaticCondensation::computeElemInteriorDofsScalar(std::vector<dof_id_type> & /*elem_interior_dofs*/)
     -> decltype(auto)
 {
-  return [&elem_trace_dofs](const Elem &,
-                            std::vector<dof_id_type> & elem_dof_indices,
-                            const std::vector<dof_id_type> & scalar_dof_indices)
+  return [](const Elem &,
+            std::vector<dof_id_type> & elem_dof_indices,
+            const std::vector<dof_id_type> & scalar_dof_indices)
   {
     elem_dof_indices.insert(
-        elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
-    elem_trace_dofs.insert(
-        elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+        elem_dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
   };
 }
 
 auto
-StaticCondensation::computeElemDofsField(std::vector<dof_id_type> & elem_interior_dofs,
-                                         std::vector<dof_id_type> & elem_trace_dofs)
+StaticCondensation::computeElemInteriorDofsField(std::vector<dof_id_type> & elem_interior_dofs)
     -> decltype(auto)
 {
-  return [&elem_interior_dofs, &elem_trace_dofs](const Elem & elem,
-                                                 const unsigned int node_num,
-                                                 std::vector<dof_id_type> & elem_dof_indices,
-                                                 const dof_id_type field_dof)
+  return [&elem_interior_dofs](const Elem & elem,
+                               const unsigned int node_num,
+                               std::vector<dof_id_type> & elem_dof_indices,
+                               const dof_id_type field_dof)
   {
     elem_dof_indices.push_back(field_dof);
     if (node_num != invalid_uint)
@@ -69,8 +65,6 @@ StaticCondensation::computeElemDofsField(std::vector<dof_id_type> & elem_interio
       // This is a nodal dof
       if (elem.is_internal(node_num))
         elem_interior_dofs.push_back(field_dof);
-      else
-        elem_trace_dofs.push_back(field_dof);
     }
     else
       elem_interior_dofs.push_back(field_dof);
@@ -99,8 +93,9 @@ StaticCondensation::init()
                                           std::vector<dof_id_type> & dof_indices,
                                           const std::vector<dof_id_type> & scalar_dof_indices)
   {
-    computeElemDofsScalar(elem_interior_dofs,
-                          elem_trace_dofs)(elem, dof_indices, scalar_dof_indices);
+    computeElemInteriorDofsScalar(elem_interior_dofs)(elem, dof_indices, scalar_dof_indices);
+    elem_trace_dofs.insert(
+        elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
 
     // Only need to do this for the first element we encounter
     if (&elem == first_elem)
@@ -120,11 +115,11 @@ StaticCondensation::init()
           std::vector<dof_id_type> & dof_indices,
           const dof_id_type field_dof)
   {
-    computeElemDofsField(elem_interior_dofs,
-                         elem_trace_dofs)(elem, node_num, dof_indices, field_dof);
+    computeElemInteriorDofsField(elem_interior_dofs)(elem, node_num, dof_indices, field_dof);
 
     if (node_num != invalid_uint && !elem.is_internal(node_num))
     {
+      elem_trace_dofs.push_back(field_dof);
       const auto & nd_ref = elem.node_ref(node_num);
       if (nd_ref.processor_id() == _dof_map.processor_id())
         local_trace_dofs.insert(field_dof);
@@ -168,17 +163,16 @@ StaticCondensation::init()
     local_data.Abi.resize(boundary_dof_size, interior_dof_size);
     local_data.Abb.resize(boundary_dof_size, boundary_dof_size);
   }
+  _local_trace_dofs.assign(local_trace_dofs.begin(), local_trace_dofs.end());
+  local_trace_dofs.clear();
 
   //
-  // Build the reduced soln and rhs vectors and system mat
+  // Build the reduced system data
   //
 
-  _reduced_sol = NumericVector<Number>::build(_dof_map.comm());
-  const dof_id_type n_local = local_trace_dofs.size();
+  const dof_id_type n_local = _local_trace_dofs.size();
   dof_id_type n = n_local;
   _dof_map.comm().sum(n);
-  _reduced_sol->init(n, n_local, /*fast=*/false, PARALLEL);
-  _reduced_rhs = _reduced_sol->clone();
   _reduced_sys_mat = SparseMatrix<Number>::build(_dof_map.comm());
   // // Make some assumptions about the sparsity pattern
   // dof_id_type num_couplings = 0;
@@ -192,17 +186,13 @@ StaticCondensation::init()
   _reduced_sys_mat->init(n, n, n_local, n_local /*, 2 * num_couplings, num_couplings*/);
   _reduced_solver = LinearSolver<Number>::build(_dof_map.comm());
   _reduced_solver->init("condensed_");
+  _reduced_rhs = NumericVector<Number>::build(_dof_map.comm());
 
   // Build a map from the full size problem trace dof indices to the reduced problem (trace) dof
   // indices
   std::unordered_map<dof_id_type, dof_id_type> full_dof_to_reduced_dof;
-  auto set_it = local_trace_dofs.begin();
-  for (const auto i :
-       make_range(_reduced_sol->first_local_index(), _reduced_sol->last_local_index()))
-  {
-    full_dof_to_reduced_dof[*set_it] = i;
-    ++set_it;
-  }
+  for (const auto i : index_range(_local_trace_dofs))
+    full_dof_to_reduced_dof[_local_trace_dofs[i]] = i;
 
   //
   // Now we need to pull our nonlocal data
@@ -318,8 +308,10 @@ StaticCondensation::assemble_reduced_mat()
   {
     libmesh_ignore(elem_id);
     local_data.AiiFactor = local_data.Aii.partialPivLu();
-    const EigenMatrix S = local_data.Abb - local_data.Abi * local_data.AiiFactor.solve(local_data.Aib);
-    const EigenMatrix S2 = local_data.Abb - local_data.Abi * local_data.Aii.inverse() * local_data.Aib;
+    const EigenMatrix S =
+        local_data.Abb - local_data.Abi * local_data.AiiFactor.solve(local_data.Aib);
+    const EigenMatrix S2 =
+        local_data.Abb - local_data.Abi * local_data.Aii.inverse() * local_data.Aib;
     DenseMatrix<Number> shim(S.rows(), S.cols());
     for (const auto i : make_range(S.rows()))
       for (const auto j : make_range(S.cols()))
@@ -328,7 +320,7 @@ StaticCondensation::assemble_reduced_mat()
   }
 
   _reduced_sys_mat->close();
-  auto ierr = MatView(static_cast<PetscMatrix<Number> &>(*_reduced_sys_mat).mat(), 0);
+  _reduced_sys_mat->print();
 }
 
 void
@@ -347,13 +339,11 @@ void
 StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
 {
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
-  std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs_full;
-  std::vector<Number> elem_interior_rhs_vec, elem_trace_rhs_vec;
+  std::vector<dof_id_type> elem_interior_dofs;
+  std::vector<Number> elem_interior_rhs_vec;
   EigenVector elem_interior_rhs, elem_trace_rhs;
 
-  _reduced_rhs->zero();
-
-  auto & petsc_vec = static_cast<const PetscVector<Number> &>(full_rhs);
+  full_rhs.create_subvector(*_reduced_rhs, _local_trace_dofs, /*all_global_entries=*/false);
 
   //
   // Forward elimination step
@@ -362,7 +352,6 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
   for (auto elem : _mesh.active_local_element_ptr_range())
   {
     elem_interior_dofs.clear();
-    elem_trace_dofs_full.clear();
     auto & local_data = _elem_to_local_data[elem->id()];
 
     const auto sub_id = elem->subdomain_id();
@@ -376,15 +365,13 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
         _dof_map.dof_indices(elem,
                              elem_dofs,
                              v,
-                             computeElemDofsScalar(elem_interior_dofs, elem_trace_dofs_full),
-                             computeElemDofsField(elem_interior_dofs, elem_trace_dofs_full),
+                             computeElemInteriorDofsScalar(elem_interior_dofs),
+                             computeElemInteriorDofsField(elem_interior_dofs),
                              elem->p_level());
     }
 
     set_local_vectors(full_rhs, elem_interior_dofs, elem_interior_rhs_vec, elem_interior_rhs);
-    set_local_vectors(full_rhs, elem_trace_dofs_full, elem_trace_rhs_vec, elem_trace_rhs);
-
-    elem_trace_rhs -= local_data.Abi * local_data.AiiFactor.solve(elem_interior_rhs);
+    elem_trace_rhs = -local_data.Abi * local_data.AiiFactor.solve(elem_interior_rhs);
 
     libmesh_assert(cast_int<std::size_t>(elem_trace_rhs.size()) ==
                    local_data.reduced_space_indices.size());
@@ -398,14 +385,13 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
                                            NumericVector<Number> & full_sol)
 {
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
-  std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs_full;
+  std::vector<dof_id_type> elem_interior_dofs;
   std::vector<Number> elem_interior_rhs_vec, elem_trace_sol_vec;
   EigenVector elem_interior_rhs, elem_trace_sol, elem_interior_sol;
 
   for (auto elem : _mesh.active_local_element_ptr_range())
   {
     elem_interior_dofs.clear();
-    elem_trace_dofs_full.clear();
     auto & local_data = _elem_to_local_data[elem->id()];
 
     const auto sub_id = elem->subdomain_id();
@@ -419,8 +405,8 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
         _dof_map.dof_indices(elem,
                              elem_dofs,
                              v,
-                             computeElemDofsScalar(elem_interior_dofs, elem_trace_dofs_full),
-                             computeElemDofsField(elem_interior_dofs, elem_trace_dofs_full),
+                             computeElemInteriorDofsScalar(elem_interior_dofs),
+                             computeElemInteriorDofsField(elem_interior_dofs),
                              elem->p_level());
     }
 
@@ -431,9 +417,6 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
     elem_interior_sol =
         local_data.AiiFactor.solve(elem_interior_rhs - local_data.Aib * elem_trace_sol);
     full_sol.insert(elem_interior_sol.data(), elem_interior_dofs);
-    // We are doing this redundantly since multiple elements share trace dofs. An alternative would
-    // be to hold a global reduced to full index map
-    full_sol.insert(elem_trace_sol.data(), elem_trace_dofs_full);
   }
 
   full_sol.close();
@@ -444,9 +427,9 @@ StaticCondensation::solve(const NumericVector<Number> & full_rhs, NumericVector<
 {
   assemble_reduced_mat();
   forward_elimination(full_rhs);
-  _reduced_sol->zero();
+  _reduced_sol = full_sol.get_subvector(_local_trace_dofs);
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
-  auto & petsc_vec = static_cast<PetscVector<Number> & >(*_reduced_sol);
   backwards_substitution(full_rhs, full_sol);
+  full_sol.restore_subvector(std::move(_reduced_sol), _local_trace_dofs);
 }
 }

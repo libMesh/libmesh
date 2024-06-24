@@ -82,11 +82,11 @@ private:
   void backwards_substitution(const NumericVector<Number> & full_rhs,
                               NumericVector<Number> & full_sol);
 
-  static auto computeElemDofsScalar(std::vector<dof_id_type> & elem_interior_dofs,
-                                    std::vector<dof_id_type> & elem_trace_dofs) -> decltype(auto);
+  static auto
+  computeElemInteriorDofsScalar(std::vector<dof_id_type> & elem_interior_dofs) -> decltype(auto);
 
-  static auto computeElemDofsField(std::vector<dof_id_type> & elem_interior_dofs,
-                                   std::vector<dof_id_type> & elem_trace_dofs) -> decltype(auto);
+  static auto
+  computeElemInteriorDofsField(std::vector<dof_id_type> & elem_interior_dofs) -> decltype(auto);
 
   struct LocalData
   {
@@ -119,6 +119,7 @@ private:
   };
 
   std::unordered_map<dof_id_type, LocalData> _elem_to_local_data;
+  std::vector<dof_id_type> _local_trace_dofs;
 
   const MeshBase & _mesh;
   const DofMap & _dof_map;
