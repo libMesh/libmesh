@@ -108,7 +108,7 @@ main(int argc, char ** argv)
   // to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
   // elements instead of the default QUAD4's we used in example 2
   // allow us to use higher-order approximation.
-  MeshTools::Generation::build_square(mesh, 2, 1, -1., 1., -1., 1., QUAD9);
+  MeshTools::Generation::build_square(mesh, 15, 15, -1., 1., -1., 1., QUAD9);
 
   // Print information about the mesh to the screen.
   // Note that 5x5 QUAD9 elements actually has 11x11 nodes,
@@ -158,116 +158,13 @@ main(int argc, char ** argv)
   // if you linked against the appropriate X libraries when you
   // built PETSc.
   equation_systems.get_system("Poisson").solve();
-  std::vector<PetscInt> trace_dofs = {12, 11, 10, 9, 7, 6, 5, 4, 3, 2, 1, 13, 0};
-  std::vector<PetscInt> interior_dofs = {8, 14};
-  IS trace, interior;
-  auto ierr = ISCreateGeneral(mesh.comm().get(), 13, trace_dofs.data(), PETSC_COPY_VALUES, &trace);
-  ierr = ISCreateGeneral(mesh.comm().get(), 2, interior_dofs.data(), PETSC_COPY_VALUES, &interior);
-  Mat A00, A11, A01, A10, S, Sp;
-  Mat sys_mat = static_cast<PetscMatrix<Number> &>(sys.get_system_matrix()).mat();
-  ierr = MatCreateSubMatrix(sys_mat, trace, trace, MAT_INITIAL_MATRIX, &A11);
-  ierr = MatCreateSubMatrix(sys_mat, trace, interior, MAT_INITIAL_MATRIX, &A10);
-  ierr = MatCreateSubMatrix(sys_mat, interior, trace, MAT_INITIAL_MATRIX, &A01);
-  ierr = MatCreateSubMatrix(sys_mat, interior, interior, MAT_INITIAL_MATRIX, &A00);
-  ierr = MatCreateSchurComplement(A00, A00, A01, A10, A11, &S);
-  ierr = MatSchurComplementSetAinvType(S, MAT_SCHUR_COMPLEMENT_AINV_FULL);
-  ierr = MatSchurComplementGetPmat(S, MAT_INITIAL_MATRIX, &Sp);
-  ierr = MatView(Sp, 0);
 
   // Do static condensation solve
   auto sc_soln = sys.solution->clone();
   sc.solve(*sys.rhs, *sc_soln);
-
-  const auto & sc_mat = sc.get_condensed_mat();
-  PetscMatrix<Number> wrapped_sp(Sp, mesh.comm());
-  libmesh_assert(sc_mat.fuzzy_equal(wrapped_sp));
-
-  auto & petsc_vec1 = static_cast<PetscVector<Number> &>(*sys.solution);
-  auto & petsc_vec2 = static_cast<PetscVector<Number> &>(*sc_soln);
-  ierr = VecView(petsc_vec1.vec(), 0);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecView(petsc_vec2.vec(), 0);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-
-  Vec x, y, z;
-  ierr = VecDuplicate(petsc_vec1.vec(), &z);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecGetSubVector(z, trace, &x);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecGetSubVector(z, interior, &y);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-
-  Vec rhs = static_cast<PetscVector<Number> *>(sys.rhs)->vec();
-  Vec bx, by;
-  ierr = VecGetSubVector(rhs, trace, &bx);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecGetSubVector(rhs, interior, &by);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-
-  PC A00_inv;
-  ierr = PCCreate(mesh.comm().get(), &A00_inv);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCSetType(A00_inv, PCLU);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCSetOperators(A00_inv, A00, A00);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCFactorSetMatSolverType(A00_inv, MATSOLVERMUMPS);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCSetUp(A00_inv);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  PC S_inv;
-  ierr = PCCreate(mesh.comm().get(), &S_inv);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCSetType(S_inv, PCLU);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCSetOperators(S_inv, Sp, Sp);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCFactorSetMatSolverType(S_inv, MATSOLVERMUMPS);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCSetUp(S_inv);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-
-  Vec worky, workx;
-  ierr = VecCreate(mesh.comm().get(), &worky);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecSetType(worky, VECSEQ);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecSetSizes(worky, 2, 2);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-
-  ierr = VecCreate(mesh.comm().get(), &workx);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecSetType(workx, VECSEQ);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecSetSizes(workx, 13, 13);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCApply(A00_inv, by, worky);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = MatMult(A10, worky, workx);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecAXPY(bx, 1.0, workx);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCApply(S_inv, bx, x);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-
-  ierr = MatMult(A01, x, worky);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecAXPY(by, -1.0, worky);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = PCApply(A00_inv, by, y);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-
-  ierr = VecRestoreSubVector(z, trace, &x);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecRestoreSubVector(z, interior, &y);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-  ierr = VecView(z, 0);
-  LIBMESH_CHKERR2(mesh.comm(), ierr);
-
-  PetscVector<Number> wrapped_manual_schur(z, mesh.comm());
-  libmesh_error_msg_if(!wrapped_manual_schur.fuzzy_equal(*sys.solution),
-                       "mismatching solution in manual computation");
   libmesh_error_msg_if(!sc_soln->fuzzy_equal(*sys.solution), "mismatching solution");
+  libMesh::out << "Static condensation reduced problem size to " << sc.get_condensed_mat().m()
+               << std::endl;
 
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 

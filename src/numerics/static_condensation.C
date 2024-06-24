@@ -320,7 +320,6 @@ StaticCondensation::assemble_reduced_mat()
   }
 
   _reduced_sys_mat->close();
-  _reduced_sys_mat->print();
 }
 
 void
