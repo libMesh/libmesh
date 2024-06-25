@@ -1631,9 +1631,14 @@ public:
    * Can be told to calculate sparsity for the constrained matrix,
    * which may be necessary in the case of spline control node
    * constraints or sufficiently many user constraints.
+   *
+   * Can also be told to only include sparsity entries for the trace
+   * degrees of freedom via \p trace_dofs_only which is useful when the
+   * operator acts only on a statically condensed system
    */
   std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh,
-                                                         bool calculate_constrained = false) const;
+                                                         const bool calculate_constrained = false,
+                                                         const bool trace_dofs_only = false) const;
 
   /**
    * Describe whether the given variable group should be p-refined. If this API is not called with

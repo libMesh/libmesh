@@ -172,16 +172,13 @@ StaticCondensation::init()
   dof_id_type n = n_local;
   _dof_map.comm().sum(n);
   _reduced_sys_mat = SparseMatrix<Number>::build(_dof_map.comm());
-  // // Make some assumptions about the sparsity pattern
-  // dof_id_type num_couplings = 0;
-  // if (_dof.comm().rank() == 0 && !_elem_to_local_data.empty())
-  //   num_couplings = _elem_to_local_data.begin()->second.Abb.n();
-  // _dof.comm().broadcast(num_couplings);
-  // // We multiply by 2 for process on-diagonal since the facet dofs are on faces between 2 elements
-  // // But actually for general static condensation we could be talking about continuous Galerkin.
-  // // For hex elements this would mean an 8x multiplier! So for now we just accept the libmesh
-  // // defaults and prepare ourselves for possible nonzero allocations to get started
-  _reduced_sys_mat->init(n, n, n_local, n_local /*, 2 * num_couplings, num_couplings*/);
+  auto sp =
+      _dof_map.build_sparsity(_mesh, /*calculate_constrained=*/false, /*trace_dofs_only=*/true);
+  const auto & nnz = sp->get_n_nz();
+  const auto & noz = sp->get_n_oz();
+  const auto nz = nnz.empty() ? dof_id_type(0) : *std::max_element(nnz.begin(), nnz.end());
+  const auto oz = noz.empty() ? dof_id_type(0) : *std::max_element(noz.begin(), noz.end());
+  _reduced_sys_mat->init(n, n, n_local, n_local, nz, oz);
   _reduced_solver = LinearSolver<Number>::build(_dof_map.comm());
   _reduced_solver->init("condensed_");
   _reduced_rhs = NumericVector<Number>::build(_dof_map.comm());
