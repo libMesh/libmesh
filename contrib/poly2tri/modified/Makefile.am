@@ -2,8 +2,19 @@ pkg_sources = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc 
               $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
               $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
               $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
-              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/utils.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.h
 pkg_libs    =
+
+EXTRA_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/AUTHORS \
+             $(top_srcdir)/contrib/poly2tri/poly2tri/LICENSE \
+             $(top_srcdir)/contrib/poly2tri/poly2tri/README.md
 
 # import as much commonality as possible
 include $(top_srcdir)/contrib/Make.common
@@ -16,7 +27,9 @@ poly2tri_headers = poly2tri/poly2tri.h \
                    poly2tri/sweep/sweep_context.h \
                    poly2tri/sweep/sweep.h
 
-nobase_include_HEADERS = $(poly2tri_headers)
+nodist_include_HEADERS = $(poly2tri_headers)
+
+BUILT_SOURCES = $(poly2tri_headers)
 
 poly2tri/poly2tri.h : $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h
 	$(AM_V_GEN) $(MKDIR_P) poly2tri/
