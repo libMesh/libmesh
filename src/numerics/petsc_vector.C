@@ -1426,6 +1426,8 @@ PetscVector<T>::get_subvector(const std::vector<numeric_index_type> & rows)
   ierr = VecGetSubVector(_vec, parent_is, &subvec);
   LIBMESH_CHKERR(ierr);
 
+  this->_is_closed = false;
+
   return std::make_unique<PetscVector<T>>(subvec, this->comm());
 }
 
@@ -1448,6 +1450,11 @@ PetscVector<T>::restore_subvector(std::unique_ptr<NumericVector<T>> && subvector
   Vec subvec = petsc_subvector->vec();
   ierr = VecRestoreSubVector(_vec, parent_is, &subvec);
   LIBMESH_CHKERR(ierr);
+
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
+
+  this->_is_closed = true;
 }
 
 //------------------------------------------------------------------
