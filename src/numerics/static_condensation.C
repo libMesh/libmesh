@@ -186,8 +186,9 @@ StaticCondensation::init()
   // Build a map from the full size problem trace dof indices to the reduced problem (trace) dof
   // indices
   std::unordered_map<dof_id_type, dof_id_type> full_dof_to_reduced_dof;
+  const auto local_start = _reduced_sys_mat->row_start();
   for (const auto i : index_range(_local_trace_dofs))
-    full_dof_to_reduced_dof[_local_trace_dofs[i]] = i;
+    full_dof_to_reduced_dof[_local_trace_dofs[i]] = i + local_start;
 
   //
   // Now we need to pull our nonlocal data
