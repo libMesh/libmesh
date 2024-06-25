@@ -16,6 +16,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libmesh/static_condensation.h"
+
+#ifdef LIBMESH_HAVE_PETSC
+
 #include "libmesh/mesh_base.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
@@ -448,3 +451,5 @@ StaticCondensation::solve(const NumericVector<Number> & full_rhs, NumericVector<
   backwards_substitution(full_rhs, full_sol);
 }
 }
+
+#endif // LIBMESH_HAVE_PETSC

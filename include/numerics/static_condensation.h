@@ -18,6 +18,12 @@
 #ifndef LIBMESH_STATIC_CONDENSATION_H
 #define LIBMESH_STATIC_CONDENSATION_H
 
+#include "libmesh/libmesh_config.h"
+
+// subvectors currently only work with petsc
+
+#ifdef LIBMESH_HAVE_PETSC
+
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
 // These next three includes are not strictly necessary but unique_ptr will error with incomplete
@@ -130,4 +136,5 @@ private:
 };
 }
 
+#endif // LIBMESH_HAVE_PETSC
 #endif // LIBMESH_STATIC_CONDENSATION_H

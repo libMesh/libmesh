@@ -15,17 +15,21 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// <h1>Introduction Example 3 - Solving a Poisson Problem</h1>
-// \author Benjamin S. Kirk
-// \date 2003
+// <h1>Miscellaneous Example 16 - Static Condensation</h1>
+// \author Alexander D. Lindsay
+// \date 2024
 //
-// This is the third example program.  It builds on
-// the second example program by showing how to solve a simple
-// Poisson system.  This example also introduces the notion
-// of customized matrix assembly functions, working with an
-// exact solution, and using element iterators.
-// We will not comment on things that
-// were already explained in the second example.
+// This example is equivalent to the third introductory example except that
+// we add and use a StaticCondensation object. The StaticCondensation class
+// forward eliminates internal degrees of freedom and then performs a global
+// solve only with the trace degrees of freedom. We then perform backward
+// substitution to recover the solution for the internal degrees of freedom.
+// We verify that this solution matches the solution when the global solve
+// is performed on both interior and trace degrees of freedom
+
+#include "libmesh/libmesh_config.h"
+
+#ifdef LIBMESH_HAVE_PETSC
 
 // C++ include files that we need
 #include <iostream>
@@ -488,3 +492,12 @@ assemble_poisson(EquationSystems & es, const std::string & libmesh_dbg_var(syste
 
   // All done!
 }
+
+#else
+
+int main()
+{
+  return 0;
+}
+
+#endif
