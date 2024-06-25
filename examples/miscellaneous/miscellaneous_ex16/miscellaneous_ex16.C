@@ -168,7 +168,7 @@ main(int argc, char ** argv)
   equation_systems.get_system("Poisson").solve();
 
   // Do static condensation solve
-  auto sc_soln = sys.solution->clone();
+  auto sc_soln = sys.current_local_solution->clone();
   sc.solve(*sys.rhs, *sc_soln);
   libmesh_error_msg_if(!sc_soln->fuzzy_equal(*sys.solution), "mismatching solution");
   libMesh::out << "Static condensation reduced problem size to " << sc.get_condensed_mat().m()
