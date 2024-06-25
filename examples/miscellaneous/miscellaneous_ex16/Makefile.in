@@ -89,13 +89,14 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
+@LIBMESH_VPATH_BUILD_TRUE@am__append_1 = miscellaneous_ex16.in .linkstamp
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5)
-@LIBMESH_DBG_MODE_TRUE@am__append_1 = example-dbg
-@LIBMESH_DEVEL_MODE_TRUE@am__append_2 = example-devel
-@LIBMESH_OPT_MODE_TRUE@am__append_3 = example-opt
-@LIBMESH_PROF_MODE_TRUE@am__append_4 = example-prof
-@LIBMESH_OPROF_MODE_TRUE@am__append_5 = example-oprof
+@LIBMESH_DBG_MODE_TRUE@am__append_2 = example-dbg
+@LIBMESH_DEVEL_MODE_TRUE@am__append_3 = example-devel
+@LIBMESH_OPT_MODE_TRUE@am__append_4 = example-opt
+@LIBMESH_PROF_MODE_TRUE@am__append_5 = example-prof
+@LIBMESH_OPROF_MODE_TRUE@am__append_6 = example-oprof
 subdir = examples/miscellaneous/miscellaneous_ex16
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
@@ -169,7 +170,7 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = example-prof$(EXEEXT)
 @LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = example-oprof$(EXEEXT)
 am__example_dbg_SOURCES_DIST = miscellaneous_ex16.C exact_solution.C \
-	run.sh
+	miscellaneous_ex16.in run.sh
 am__objects_1 = example_dbg-miscellaneous_ex16.$(OBJEXT) \
 	example_dbg-exact_solution.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
@@ -185,7 +186,7 @@ example_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_dbg_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_devel_SOURCES_DIST = miscellaneous_ex16.C exact_solution.C \
-	run.sh
+	miscellaneous_ex16.in run.sh
 am__objects_3 = example_devel-miscellaneous_ex16.$(OBJEXT) \
 	example_devel-exact_solution.$(OBJEXT)
 am__objects_4 = $(am__objects_3)
@@ -198,7 +199,7 @@ example_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_oprof_SOURCES_DIST = miscellaneous_ex16.C exact_solution.C \
-	run.sh
+	miscellaneous_ex16.in run.sh
 am__objects_5 = example_oprof-miscellaneous_ex16.$(OBJEXT) \
 	example_oprof-exact_solution.$(OBJEXT)
 am__objects_6 = $(am__objects_5)
@@ -211,7 +212,7 @@ example_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(example_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__example_opt_SOURCES_DIST = miscellaneous_ex16.C exact_solution.C \
-	run.sh
+	miscellaneous_ex16.in run.sh
 am__objects_7 = example_opt-miscellaneous_ex16.$(OBJEXT) \
 	example_opt-exact_solution.$(OBJEXT)
 am__objects_8 = $(am__objects_7)
@@ -223,7 +224,7 @@ example_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(example_opt_CXXFLAGS) \
 	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__example_prof_SOURCES_DIST = miscellaneous_ex16.C exact_solution.C \
-	run.sh
+	miscellaneous_ex16.in run.sh
 am__objects_9 = example_prof-miscellaneous_ex16.$(OBJEXT) \
 	example_prof-exact_solution.$(OBJEXT)
 am__objects_10 = $(am__objects_9)
@@ -685,14 +686,17 @@ vtkversion = @vtkversion@
 example_name = miscellaneous_ex16
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/miscellaneous/ex16
-data = miscellaneous_ex16.C exact_solution.C run.sh
-sources = $(data) run.sh
+data = miscellaneous_ex16.C exact_solution.C miscellaneous_ex16.in run.sh
+sources = $(data)
 
 ######################################################################
 #
 # how to make documentation
 #
-CLEANFILES = out.pvtu $(example_name).html stdout.log
+CLEANFILES = out.pvtu $(am__append_1) $(example_name).html stdout.log
+
+# also need to link files for VPATH builds
+@LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
 
 ######################################################################
 #
@@ -754,7 +758,8 @@ TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir); export LIBMESH_DIR; \
 	METHODS="$(METHODS)"; export METHODS; petscmajor=@petscmajor@ \
 	petscminor=@petscminor@
 TESTS = $(check_SCRIPTS)
-all: all-am
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .C .lo .o .obj
@@ -1212,14 +1217,17 @@ distdir-am: $(DISTFILES)
 check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS) $(check_SCRIPTS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(DATA)
 installdirs:
 	for dir in "$(DESTDIR)$(datadir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
-install-exec: install-exec-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
+install-exec: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
 
@@ -1249,9 +1257,10 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
-clean-am: clean-checkPROGRAMS clean-generic clean-libtool clean-local \
+clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
@@ -1336,28 +1345,29 @@ ps-am:
 
 uninstall-am: uninstall-dataDATA
 
-.MAKE: check-am install-am install-strip
+.MAKE: all check check-am install install-am install-exec \
+	install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-TESTS \
 	check-am clean clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-local cscopelist-am ctags ctags-am distclean \
-	distclean-compile distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am \
-	install-dataDATA install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags tags-am uninstall uninstall-am uninstall-dataDATA
+	cscopelist-am ctags ctags-am distclean distclean-compile \
+	distclean-generic distclean-libtool distclean-tags distdir dvi \
+	dvi-am html html-am info info-am install install-am \
+	install-data install-data-am install-dataDATA install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-dataDATA
 
 .PRECIOUS: Makefile
 
-
-clean-local:
-	-rm -rf out_*.vtu
+@LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
+@LIBMESH_VPATH_BUILD_TRUE@	-rm -f miscellaneous_ex16.in && $(LN_S) -f $(srcdir)/miscellaneous_ex16.in .
+@LIBMESH_VPATH_BUILD_TRUE@	$(AM_V_GEN)touch .linkstamp
 
 # Convenience method: 'make run'
 run: $(check_PROGRAMS)
