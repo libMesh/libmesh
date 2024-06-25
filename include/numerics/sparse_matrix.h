@@ -577,7 +577,8 @@ public:
   /**
    * checks whether the matrix \p other is fuzzy equal to this matrix
    */
-  virtual bool fuzzy_equal(const SparseMatrix<T> & other) const;
+  virtual bool fuzzy_equal(const SparseMatrix<T> & other,
+                           const Real tol = TOLERANCE) const;
 
 protected:
   /**

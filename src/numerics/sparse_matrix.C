@@ -858,7 +858,7 @@ void SparseMatrix<T>::read_petsc_hdf5(const std::string &)
 
 
 template <typename T>
-bool SparseMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other) const
+bool SparseMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other, const Real tol) const
 {
   bool equiv = true;
   if ((this->local_m() != other.local_m()) || (this->local_n() != other.local_n()))
@@ -868,8 +868,8 @@ bool SparseMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other) const
     for (const auto i : make_range(this->row_start(), this->row_stop()))
       for (const auto j : make_range(this->col_start(), this->col_stop()))
       {
-        if (relative_fuzzy_equal((*this)(i, j), other(i, j)) ||
-            absolute_fuzzy_equal((*this)(i, j), other(i, j)))
+        if (relative_fuzzy_equal((*this)(i, j), other(i, j), tol) ||
+            absolute_fuzzy_equal((*this)(i, j), other(i, j), tol))
           continue;
         else
         {

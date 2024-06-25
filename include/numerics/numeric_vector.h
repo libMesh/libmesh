@@ -789,7 +789,7 @@ public:
   /**
    * checks whether the vector \p v is fuzzy equal to this vector
    */
-  bool fuzzy_equal(const NumericVector<T> & v) const;
+  bool fuzzy_equal(const NumericVector<T> & v, const Real tol = TOLERANCE) const;
 
 protected:
 

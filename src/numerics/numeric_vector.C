@@ -432,7 +432,7 @@ bool NumericVector<T>::compatible (const NumericVector<T> & v) const
 
 
 template <typename T>
-bool NumericVector<T>::fuzzy_equal(const NumericVector<T> & v) const
+bool NumericVector<T>::fuzzy_equal(const NumericVector<T> & v, const Real tol) const
 {
   bool equiv = true;
   if (this->local_size() != v.local_size())
@@ -441,7 +441,7 @@ bool NumericVector<T>::fuzzy_equal(const NumericVector<T> & v) const
   if (equiv)
     for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
     {
-      if (relative_fuzzy_equal((*this)(i), v(i)) || absolute_fuzzy_equal((*this)(i), v(i)))
+      if (relative_fuzzy_equal((*this)(i), v(i), tol) || absolute_fuzzy_equal((*this)(i), v(i), tol))
         continue;
       else
       {

@@ -1580,7 +1580,7 @@ SparseMatrix<T> & PetscMatrix<T>::operator= (const SparseMatrix<T> & v)
 
 template <typename T>
 bool
-PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other) const
+PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other, const Real tol) const
 {
   const auto * const petsc_other = dynamic_cast<const PetscMatrix<Number> *>(&other);
   if (!petsc_other)
@@ -1655,8 +1655,8 @@ PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other) const
       compared_false();
 
     for (const auto j_val : make_range(ncols))
-      if (relative_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val]) ||
-          absolute_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val]))
+      if (relative_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], tol) ||
+          absolute_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], tol))
         continue;
       else
       {
