@@ -36,7 +36,6 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
-#include "libmesh/vtk_io.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/equation_systems.h"
 
@@ -59,6 +58,10 @@
 // Define the DofMap, which handles degree of freedom
 // indexing.
 #include "libmesh/dof_map.h"
+
+// I/O utilities.
+#include "libmesh/getpot.h"
+#include "libmesh/vtk_io.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -96,6 +99,14 @@ main(int argc, char ** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
+  // Parse the input file.
+  GetPot infile("miscellaneous_ex16.in");
+
+  // But allow the command line to override it.
+  infile.parse_command_line(argc, argv);
+
+  const unsigned int grid_size = infile("grid_size", 15);
+
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
   Mesh mesh(init.comm());
@@ -105,7 +116,7 @@ main(int argc, char ** argv)
   // to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
   // elements instead of the default QUAD4's we used in example 2
   // allow us to use higher-order approximation.
-  MeshTools::Generation::build_square(mesh, 15, 15, -1., 1., -1., 1., QUAD9);
+  MeshTools::Generation::build_square(mesh, grid_size, grid_size, -1., 1., -1., 1., QUAD9);
 
   // Print information about the mesh to the screen.
   // Note that 5x5 QUAD9 elements actually has 11x11 nodes,
