@@ -144,7 +144,13 @@ unit_tests_sources = \
 # Make sure any data goes in "make dist"
 datadir = $(install_dir)
 data = matrices/geom_1_extraction_op.m \
+       matrices/geom_1_extraction_op.m.gz \
+       matrices/geom_2_extraction_op.m \
+       matrices/geom_2_extraction_op.m.gz \
+       matrices/geom_4_extraction_op.m \
+       matrices/geom_4_extraction_op.m.gz \
        matrices/geom_1_extraction_op.petsc32 \
+       matrices/geom_1_extraction_op.petsc64 \
        meshes/1_quad.bxt.gz \
        meshes/25_quad.bxt.gz \
        meshes/BlockWithHole_Patch9.bxt.gz \
