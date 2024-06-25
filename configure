@@ -58061,16 +58061,25 @@ fi
 # netCDF -- enabled by default (it is distributed in contrib)
 # --------------------------------------------------------------
 
+  configure_netcdf_v462=''
+  configure_netcdf_v492=''
   # Check whether --enable-netcdf was given.
 if test ${enable_netcdf+y}
 then :
   enableval=$enable_netcdf; case "${enableval}" in #(
   v492) :
     enablenetcdf=yes
-                                 netcdfversion="v4.9.2" ;; #(
+                                 netcdfversion="v4.9.2"
+                                 configure_netcdf_v492=yes ;; #(
   yes|new|v4|v462) :
     enablenetcdf=yes
-                                 netcdfversion="v4.6.2" ;; #(
+                                 netcdfversion="v4.6.2"
+                                 configure_netcdf_v462=yes ;; #(
+  all) :
+    enablenetcdf=yes
+                                 netcdfversion="v4.9.2"
+                                 configure_netcdf_v462=yes
+                                 configure_netcdf_v492=yes ;; #(
   old|v3) :
     enablenetcdf=yes
                                  netcdfversion=3 ;; #(
@@ -58081,13 +58090,17 @@ then :
     as_fn_error $? "bad value ${enableval} for --enable-netcdf" "$LINENO" 5 ;;
 esac
 else $as_nop
-  enablenetcdf=$enableoptional; netcdfversion="v4.6.2"
+  enablenetcdf=$enableoptional;
+                   netcdfversion="v4.6.2"
+                   configure_netcdf_v462=yes
 fi
 
 
     if test "x$enablenetcdf" = "xno"
 then :
-  netcdfversion=no
+  netcdfversion=no;
+         configure_netcdf_v462=''
+         configure_netcdf_v492=''
 fi
 
     if test "x$netcdfversion" = "x3"
@@ -58100,7 +58113,6 @@ printf "%s\n" "<<< Using netCDF 3.x is no longer supported, using version 4.x in
 fi
 
   netcdf_v4_arg=''
-  netcdf_v4_subdir=''
   case "${netcdfversion}" in #(
   3) :
 
@@ -58122,7 +58134,6 @@ then :
 fi
 
                                               libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
-                       netcdf_v4_subdir='contrib/netcdf/netcdf-c-4.6.2'
                        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4.6.2 support >>>" >&5
 printf "%s\n" "<<< Configuring library with NetCDF version 4.6.2 support >>>" >&6; } ;; #(
   "v4.9.2") :
@@ -58141,7 +58152,6 @@ then :
 fi
 
                                               libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
-                       netcdf_v4_subdir='contrib/netcdf/netcdf-c'
                        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NetCDF version 4.9.2 support >>>" >&5
 printf "%s\n" "<<< Configuring library with NetCDF version 4.9.2 support >>>" >&6; } ;; #(
   *) :
@@ -58187,9 +58197,11 @@ else $as_nop
                  netcdf_curl_arg=--disable-curl
                  netcdf_byterange_arg=--disable-byterange
 fi
-                    if test "x$netcdf_v4_subdir" = "xcontrib/netcdf/netcdf-c-4.6.2"
+                    if test "x$configure_netcdf_v462" = "xyes"
 then :
 
+                { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Configuring NetCDF v4.6.2" >&5
+printf "%s\n" "$as_me: Configuring NetCDF v4.6.2" >&6;}
 
 
   # Various preliminary checks.
@@ -58316,9 +58328,11 @@ printf "%s\n" "$as_me: WARNING: could not find source tree for $ax_dir" >&2;}
 
 
 fi
-          if test "x$netcdf_v4_subdir" = "xcontrib/netcdf/netcdf-c"
+          if test "x$configure_netcdf_v492" = "xyes"
 then :
 
+                { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Configuring NetCDF v4.9.2" >&5
+printf "%s\n" "$as_me: Configuring NetCDF v4.9.2" >&6;}
 
 
   # Various preliminary checks.

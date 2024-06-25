@@ -157,8 +157,7 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-DIST_COMMON = $(srcdir)/Makefile.am $(nobase_include_HEADERS) \
-	$(am__DIST_COMMON)
+DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
@@ -170,7 +169,14 @@ am__libdbg_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/co
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
-	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/utils.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.h
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_1 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdbg_la-shapes.lo \
 	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdbg_la-advancing_front.lo \
@@ -193,7 +199,14 @@ am__libdevel_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
-	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/utils.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.h
 am__objects_2 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libdevel_la-shapes.lo \
 	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-advancing_front.lo \
 	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libdevel_la-cdt.lo \
@@ -211,7 +224,14 @@ am__liboprof_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
-	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/utils.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.h
 am__objects_3 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/liboprof_la-shapes.lo \
 	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-advancing_front.lo \
 	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/liboprof_la-cdt.lo \
@@ -228,7 +248,14 @@ am__libopt_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/co
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
-	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/utils.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.h
 am__objects_4 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libopt_la-shapes.lo \
 	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-advancing_front.lo \
 	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libopt_la-cdt.lo \
@@ -246,7 +273,14 @@ am__libprof_la_SOURCES_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/c
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
 	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
-	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/utils.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.h \
+	$(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.h
 am__objects_5 = $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/libprof_la-shapes.lo \
 	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-advancing_front.lo \
 	$(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/libprof_la-cdt.lo \
@@ -317,6 +351,24 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
+	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
+	$(AM_CFLAGS) $(CFLAGS)
+AM_V_CC = $(am__v_CC_@AM_V@)
+am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
+am__v_CC_0 = @echo "  CC      " $@;
+am__v_CC_1 = 
+CCLD = $(CC)
+LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
+	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+AM_V_CCLD = $(am__v_CCLD_@AM_V@)
+am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
+am__v_CCLD_0 = @echo "  CCLD    " $@;
+am__v_CCLD_1 = 
 SOURCES = $(libdbg_la_SOURCES) $(libdevel_la_SOURCES) \
 	$(liboprof_la_SOURCES) $(libopt_la_SOURCES) \
 	$(libprof_la_SOURCES)
@@ -357,7 +409,7 @@ am__uninstall_files_from_dir = { \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
 am__installdirs = "$(DESTDIR)$(includedir)"
-HEADERS = $(nobase_include_HEADERS)
+HEADERS = $(nodist_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -695,9 +747,20 @@ pkg_sources = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc 
               $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.cc \
               $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.cc \
               $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.cc \
-              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.cc \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/utils.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/advancing_front.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/cdt.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.h \
+              $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.h
 
 pkg_libs = 
+EXTRA_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/AUTHORS \
+             $(top_srcdir)/contrib/poly2tri/poly2tri/LICENSE \
+             $(top_srcdir)/contrib/poly2tri/poly2tri/README.md
+
 
 ######################################################################
 #
@@ -753,8 +816,10 @@ poly2tri_headers = poly2tri/poly2tri.h \
                    poly2tri/sweep/sweep_context.h \
                    poly2tri/sweep/sweep.h
 
-nobase_include_HEADERS = $(poly2tri_headers)
-all: all-am
+nodist_include_HEADERS = $(poly2tri_headers)
+BUILT_SOURCES = $(poly2tri_headers)
+all: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
 .SUFFIXES: .cc .lo .o .obj
@@ -1125,29 +1190,26 @@ clean-libtool:
 	-rm -rf $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/.libs $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/_libs
 	-rm -rf $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/.libs $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/_libs
 	-rm -rf .libs _libs
-install-nobase_includeHEADERS: $(nobase_include_HEADERS)
+install-nodist_includeHEADERS: $(nodist_include_HEADERS)
 	@$(NORMAL_INSTALL)
-	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
 	if test -n "$$list"; then \
 	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
 	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
 	fi; \
-	$(am__nobase_list) | while read dir files; do \
-	  xfiles=; for file in $$files; do \
-	    if test -f "$$file"; then xfiles="$$xfiles $$file"; \
-	    else xfiles="$$xfiles $(srcdir)/$$file"; fi; done; \
-	  test -z "$$xfiles" || { \
-	    test "x$$dir" = x. || { \
-	      echo " $(MKDIR_P) '$(DESTDIR)$(includedir)/$$dir'"; \
-	      $(MKDIR_P) "$(DESTDIR)$(includedir)/$$dir"; }; \
-	    echo " $(INSTALL_HEADER) $$xfiles '$(DESTDIR)$(includedir)/$$dir'"; \
-	    $(INSTALL_HEADER) $$xfiles "$(DESTDIR)$(includedir)/$$dir" || exit $$?; }; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(includedir)'"; \
+	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
 	done
 
-uninstall-nobase_includeHEADERS:
+uninstall-nodist_includeHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
-	$(am__nobase_strip_setup); files=`$(am__nobase_strip)`; \
+	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
@@ -1235,14 +1297,17 @@ distdir-am: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: check-am
+check: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) check-am
 all-am: Makefile $(LTLIBRARIES) $(HEADERS)
 installdirs:
 	for dir in "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
-install-exec: install-exec-am
+install: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-am
+install-exec: $(BUILT_SOURCES)
+	$(MAKE) $(AM_MAKEFLAGS) install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
 
@@ -1275,6 +1340,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
@@ -1322,7 +1388,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-nobase_includeHEADERS
+install-data-am: install-nodist_includeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -1392,9 +1458,9 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-nobase_includeHEADERS
+uninstall-am: uninstall-nodist_includeHEADERS
 
-.MAKE: install-am install-strip
+.MAKE: all check install install-am install-exec install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
 	clean-generic clean-libtool clean-noinstLTLIBRARIES \
@@ -1404,13 +1470,13 @@ uninstall-am: uninstall-nobase_includeHEADERS
 	install-data install-data-am install-dvi install-dvi-am \
 	install-exec install-exec-am install-html install-html-am \
 	install-info install-info-am install-man \
-	install-nobase_includeHEADERS install-pdf install-pdf-am \
+	install-nodist_includeHEADERS install-pdf install-pdf-am \
 	install-ps install-ps-am install-strip installcheck \
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-am uninstall uninstall-am \
-	uninstall-nobase_includeHEADERS
+	uninstall-nodist_includeHEADERS
 
 .PRECIOUS: Makefile
 
