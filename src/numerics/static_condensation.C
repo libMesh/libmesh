@@ -380,13 +380,36 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
                                            NumericVector<Number> & full_sol)
 {
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
-  std::vector<dof_id_type> elem_interior_dofs;
+  std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs;
   std::vector<Number> elem_interior_rhs_vec, elem_trace_sol_vec;
   EigenVector elem_interior_rhs, elem_trace_sol, elem_interior_sol;
+
+  auto scalar_dofs_functor =
+      [&elem_interior_dofs, &elem_trace_dofs](const Elem & elem,
+                                              std::vector<dof_id_type> & dof_indices,
+                                              const std::vector<dof_id_type> & scalar_dof_indices)
+  {
+    computeElemInteriorDofsScalar(elem_interior_dofs)(elem, dof_indices, scalar_dof_indices);
+    elem_trace_dofs.insert(
+        elem_trace_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+  };
+
+  auto field_dofs_functor =
+      [&elem_interior_dofs, &elem_trace_dofs](const Elem & elem,
+                                              const unsigned int node_num,
+                                              std::vector<dof_id_type> & dof_indices,
+                                              const dof_id_type field_dof)
+  {
+    computeElemInteriorDofsField(elem_interior_dofs)(elem, node_num, dof_indices, field_dof);
+
+    if (node_num != invalid_uint && !elem.is_internal(node_num))
+      elem_trace_dofs.push_back(field_dof);
+  };
 
   for (auto elem : _mesh.active_local_element_ptr_range())
   {
     elem_interior_dofs.clear();
+    elem_trace_dofs.clear();
     auto & local_data = _elem_to_local_data[elem->id()];
 
     const auto sub_id = elem->subdomain_id();
@@ -397,17 +420,12 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
         continue;
 
       for (const auto v : make_range(var_group.n_variables()))
-        _dof_map.dof_indices(elem,
-                             elem_dofs,
-                             v,
-                             computeElemInteriorDofsScalar(elem_interior_dofs),
-                             computeElemInteriorDofsField(elem_interior_dofs),
-                             elem->p_level());
+        _dof_map.dof_indices(
+            elem, elem_dofs, v, scalar_dofs_functor, field_dofs_functor, elem->p_level());
     }
 
     set_local_vectors(full_rhs, elem_interior_dofs, elem_interior_rhs_vec, elem_interior_rhs);
-    set_local_vectors(
-        *_reduced_sol, local_data.reduced_space_indices, elem_trace_sol_vec, elem_trace_sol);
+    set_local_vectors(full_sol, elem_trace_dofs, elem_trace_sol_vec, elem_trace_sol);
 
     elem_interior_sol =
         local_data.AiiFactor.solve(elem_interior_rhs - local_data.Aib * elem_trace_sol);
@@ -424,7 +442,9 @@ StaticCondensation::solve(const NumericVector<Number> & full_rhs, NumericVector<
   forward_elimination(full_rhs);
   _reduced_sol = full_sol.get_subvector(_local_trace_dofs);
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
-  backwards_substitution(full_rhs, full_sol);
+  // Must restore to the full solution because during backwards substitution we will need to be able
+  // to read ghosted dofs and we don't support ghosting of subvectors
   full_sol.restore_subvector(std::move(_reduced_sol), _local_trace_dofs);
+  backwards_substitution(full_rhs, full_sol);
 }
 }
