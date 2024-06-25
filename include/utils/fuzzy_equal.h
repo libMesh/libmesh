@@ -72,7 +72,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     else if constexpr (TensorTools::TensorTraits<T>::rank == 1)
     {
       for (const auto i : make_range(max_mesh_dim))
-        if (!relativeFuzzyEqual(var1(i), var2(i), tol))
+        if (!relative_fuzzy_equal(var1(i), var2(i), tol))
           return false;
 
       return true;
@@ -81,7 +81,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     {
       for (const auto i : make_range(max_mesh_dim))
         for (const auto j : make_range(max_mesh_dim))
-          if (!relativeFuzzyEqual(var1(i, j), var2(i, j), tol))
+          if (!relative_fuzzy_equal(var1(i, j), var2(i, j), tol))
             return false;
 
       return true;
@@ -92,7 +92,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     // We dare to dream
     mooseAssert(var1.size() == var2.size(), "These must be the same size");
     for (const auto i : index_range(var1))
-      if (!relativeFuzzyEqual(var1(i), var2(i), tol))
+      if (!relative_fuzzy_equal(var1(i), var2(i), tol))
         return false;
 
     return true;
@@ -140,7 +140,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     else if constexpr (TensorTools::TensorTraits<T>::rank == 1)
     {
       for (const auto i : make_range(max_mesh_dim))
-        if (!relativeFuzzyEqual(var1(i), var2(i), tol))
+        if (!relative_fuzzy_equal(var1(i), var2(i), tol))
           return false;
 
       return true;
@@ -149,7 +149,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     {
       for (const auto i : make_range(max_mesh_dim))
         for (const auto j : make_range(max_mesh_dim))
-          if (!relativeFuzzyEqual(var1(i, j), var2(i, j), tol))
+          if (!relative_fuzzy_equal(var1(i, j), var2(i, j), tol))
             return false;
 
       return true;
@@ -160,7 +160,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     // We dare to dream
     mooseAssert(var1.size() == var2.size(), "These must be the same size");
     for (const auto i : index_range(var1))
-      if (!relativeFuzzyEqual(var1(i), var2(i), tol))
+      if (!relative_fuzzy_equal(var1(i), var2(i), tol))
         return false;
 
     return true;
