@@ -31,6 +31,9 @@ nodist_include_HEADERS = $(poly2tri_headers)
 
 BUILT_SOURCES = $(poly2tri_headers)
 
+clean-local:
+	rm -f $(BUILT_SOURCES)
+
 poly2tri/poly2tri.h : $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h
 	$(AM_V_GEN) $(MKDIR_P) poly2tri/
 	$(AM_V_GEN) $(SED) -e 's#include "#include "poly2tri/#' < $< > $@
