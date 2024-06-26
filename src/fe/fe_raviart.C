@@ -57,98 +57,42 @@ void raviart_thomas_nodal_soln(const Elem * elem,
 
   nodal_soln.resize(n_nodes*dim);
 
-  FEType fe_type(order, RAVIART_THOMAS);
   FEType p_refined_fe_type(totalorder, RAVIART_THOMAS);
 
-  switch (totalorder)
+  if (elem_type != TRI6  && elem_type != TRI7  &&
+      elem_type != QUAD8 && elem_type != QUAD9 &&
+      elem_type != TET14 && elem_type != HEX27)
+    libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(elem_type) << " selected for RAVIART_THOMAS FE family!");
+
+  libmesh_assert_equal_to (elem_soln.size(), FEInterface::n_dofs(p_refined_fe_type, elem, false));
+
+  const unsigned int n_sf = FEInterface::n_shape_functions(p_refined_fe_type, elem, false);
+
+  std::vector<Point> refspace_nodes;
+  FEVectorBase::get_refspace_nodes(elem_type,refspace_nodes);
+  libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
+
+  // Need to create new fe object so the shape function has the FETransformation
+  // applied to it.
+  std::unique_ptr<FEVectorBase> vis_fe = FEVectorBase::build(dim, p_refined_fe_type);
+
+  const std::vector<std::vector<RealGradient>> & vis_phi = vis_fe->get_phi();
+
+  vis_fe->reinit(elem,&refspace_nodes);
+
+  for (unsigned int n = 0; n < n_nodes; n++)
     {
-    case FIRST:
-      {
-        switch (elem_type)
-          {
-          case TRI6:
-          case TRI7:
-            {
-              libmesh_assert_equal_to (elem_soln.size(), 3);
+      libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
-              if (elem_type == TRI6)
-                libmesh_assert_equal_to (nodal_soln.size(), 6*2);
-              else
-                libmesh_assert_equal_to (nodal_soln.size(), 7*2);
-              break;
-            }
-          case QUAD8:
-          case QUAD9:
-            {
-              libmesh_assert_equal_to (elem_soln.size(), 4);
+      // Zero before summation
+      for (int d = 0; d < dim; d++)
+        nodal_soln[dim*n+d] = 0;
 
-              if (elem_type == QUAD8)
-                libmesh_assert_equal_to (nodal_soln.size(), 8*2);
-              else
-                libmesh_assert_equal_to (nodal_soln.size(), 9*2);
-              break;
-            }
-          case TET14:
-            {
-              libmesh_assert_equal_to (elem_soln.size(), 4);
-              libmesh_assert_equal_to (nodal_soln.size(), 14*3);
-              break;
-            }
-          case HEX27:
-            {
-              libmesh_assert_equal_to (elem_soln.size(), 6);
-              libmesh_assert_equal_to (nodal_soln.size(), 27*3);
-              break;
-            }
-
-          default:
-            libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(elem_type) << " selected for RAVIART_THOMAS FE family!");
-
-          } // switch(elem_type)
-
-        const unsigned int n_sf =
-          FEInterface::n_shape_functions(fe_type, elem);
-
-        std::vector<Point> refspace_nodes;
-        FEVectorBase::get_refspace_nodes(elem_type,refspace_nodes);
-        libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
-
-
-        // Need to create new fe object so the shape function has the FETransformation
-        // applied to it.
-        std::unique_ptr<FEVectorBase> vis_fe = FEVectorBase::build(dim, p_refined_fe_type);
-
-        const std::vector<std::vector<RealGradient>> & vis_phi = vis_fe->get_phi();
-
-        vis_fe->reinit(elem,&refspace_nodes);
-
-        for (unsigned int n = 0; n < n_nodes; n++)
-          {
-            libmesh_assert_equal_to (elem_soln.size(), n_sf);
-
-            // Zero before summation
-            for (int d = 0; d < dim; d++)
-              {
-                nodal_soln[dim*n+d] = 0;
-              }
-
-            // u = Sum (u_i phi_i)
-            for (unsigned int i=0; i<n_sf; i++)
-              {
-                for (int d = 0; d < dim; d++)
-                  {
-                    nodal_soln[dim*n+d]   += elem_soln[i]*(vis_phi[i][n](d));
-                  }
-              }
-          }
-
-        return;
-      } // case FIRST
-
-    default:
-      libmesh_error_msg("ERROR: Invalid total order " << Utility::enum_to_string(totalorder) << " selected for RAVIART_THOMAS FE family!");
-
-    }//switch (totalorder)
+      // u = Sum (u_i phi_i)
+      for (unsigned int i=0; i<n_sf; i++)
+        for (int d = 0; d < dim; d++)
+          nodal_soln[dim*n+d] += elem_soln[i]*(vis_phi[i][n](d));
+    }
 
   return;
 } // raviart_thomas_nodal_soln
@@ -156,203 +100,168 @@ void raviart_thomas_nodal_soln(const Elem * elem,
 
 unsigned int raviart_thomas_n_dofs(const ElemType t, const Order o)
 {
-  switch (o)
+  libmesh_assert_greater (o, 0);
+  switch (t)
     {
-    case FIRST:
-      {
-        switch (t)
-          {
-          case TRI6:
-          case TRI7:
-            return 3;
-
-          case QUAD8:
-          case QUAD9:
-            return 4;
-
-          case TET14:
-            return 4;
-
-          case HEX27:
-            return 6;
-
-          case INVALID_ELEM:
-            return 0;
-
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
-          }
-      }
-
+    case TRI6:
+    case TRI7:
+      return o*(o+2);
+    case QUAD8:
+    case QUAD9:
+      return 2*o*(o+1);
+    case TET14:
+      return o*(o+1)*(o+3)/2;
+    case HEX27:
+      return 3*o*o*(o+1);
+    case INVALID_ELEM:
+      return 0;
     default:
-      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for RAVIART_THOMAS FE family!");
+      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for RAVIART_THOMAS FE family!");
     }
 }
-
-
 
 
 unsigned int raviart_thomas_n_dofs_at_node(const ElemType t,
                                            const Order o,
                                            const unsigned int n)
 {
-  switch (o)
+  libmesh_assert_greater (o, 0);
+  switch (t)
     {
-    case FIRST:
+    case TRI6:
+    case TRI7:
       {
-        switch (t)
+        switch (n)
           {
-          case TRI6:
-            {
-              switch (n)
-                {
-                case 0:
-                case 1:
-                case 2:
-                  return 0;
-                case 3:
-                case 4:
-                case 5:
-                  return 1;
-
-                default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n);
-                }
-            }
-          case TRI7:
-            {
-              switch (n)
-                {
-                case 0:
-                case 1:
-                case 2:
-                case 6:
-                  return 0;
-                case 3:
-                case 4:
-                case 5:
-                  return 1;
-
-                default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n);
-                }
-            }
-          case QUAD8:
-            {
-              switch (n)
-                {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                  return 0;
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                  return 1;
-
-                default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n);
-                }
-            }
-          case QUAD9:
-            {
-              switch (n)
-                {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 8:
-                  return 0;
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                  return 1;
-
-                default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n);
-                }
-            }
-          case TET14:
-            {
-              switch (n)
-                {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                  return 0;
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                  return 1;
-
-                default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n);
-                }
-            }
-          case HEX27:
-            {
-              switch (n)
-                {
-                case 0:
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                case 11:
-                case 12:
-                case 13:
-                case 14:
-                case 15:
-                case 16:
-                case 17:
-                case 18:
-                case 19:
-                case 26:
-                  return 0;
-                case 20:
-                case 21:
-                case 22:
-                case 23:
-                case 24:
-                case 25:
-                  return 1;
-
-                default:
-                  libmesh_error_msg("ERROR: Invalid node ID " << n);
-                }
-            }
-
-          case INVALID_ELEM:
+          case 0:
+          case 1:
+          case 2:
             return 0;
-
+          case 3:
+          case 4:
+          case 5:
+            return o;
+          case 6:
+            libmesh_assert_equal_to(t, TRI7);
+            return 0;
           default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+            libmesh_error_msg("ERROR: Invalid node ID " << n);
           }
       }
-
+    case QUAD8:
+    case QUAD9:
+      {
+        switch (n)
+          {
+          case 0:
+          case 1:
+          case 2:
+          case 3:
+            return 0;
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+            return o;
+          case 8:
+            libmesh_assert_equal_to(t, QUAD9);
+            return 0;
+          default:
+            libmesh_error_msg("ERROR: Invalid node ID " << n);
+          }
+      }
+    case TET14:
+      {
+        switch (n)
+          {
+          case 0:
+          case 1:
+          case 2:
+          case 3:
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+          case 9:
+            return 0;
+          case 10:
+          case 11:
+          case 12:
+          case 13:
+            return o*(o+1)/2;
+          default:
+            libmesh_error_msg("ERROR: Invalid node ID " << n);
+          }
+      }
+    case HEX27:
+      {
+        switch (n)
+          {
+          case 0:
+          case 1:
+          case 2:
+          case 3:
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+          case 8:
+          case 9:
+          case 10:
+          case 11:
+          case 12:
+          case 13:
+          case 14:
+          case 15:
+          case 16:
+          case 17:
+          case 18:
+          case 19:
+            return 0;
+          case 20:
+          case 21:
+          case 22:
+          case 23:
+          case 24:
+          case 25:
+            return o*o;
+          case 26:
+            return 0;
+          default:
+            libmesh_error_msg("ERROR: Invalid node ID " << n);
+          }
+      }
+    case INVALID_ELEM:
+      return 0;
     default:
-      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for RAVIART_THOMAS FE family!");
+      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for RAVIART_THOMAS FE family!");
     }
 }
 
+
+unsigned int raviart_thomas_n_dofs_per_elem(const ElemType t,
+                                            const Order o)
+{
+  libmesh_assert_greater (o, 0);
+  switch (t)
+    {
+    case TRI6:
+    case TRI7:
+      return o*(o-1);
+    case QUAD8:
+    case QUAD9:
+      return 2*o*(o-1);
+    case TET14:
+      return (o+1)*o*(o-1)/2;
+    case HEX27:
+      return 3*o*o*(o-1);
+    case INVALID_ELEM:
+      return 0;
+    default:
+      libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for RAVIART_THOMAS FE family!");
+    }
+}
 
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -460,9 +369,6 @@ template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs(const ElemType, const O
 template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
 template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
 
-
-// Do full-specialization for every dimension, instead
-// of explicit instantiation at the end of this function.
 template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return raviart_thomas_n_dofs_at_node(t, o, n); }
@@ -472,12 +378,10 @@ template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType,
 template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 
-
-// Raviart-Thomas elements have no dofs per element
 template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
-template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
-template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
+template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType t, const Order o) { return raviart_thomas_n_dofs_per_elem(t, o); }
+template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType t, const Order o) { return raviart_thomas_n_dofs_per_elem(t, o); }
 
 // L2 Raviart-Thomas elements have all their dofs per element
 template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
