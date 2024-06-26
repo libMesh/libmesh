@@ -44,21 +44,21 @@
 <br><br><br> <h1> The console output of the program: </h1> 
 <pre>
   CXX      example_dbg-vector_fe_ex9.o
-  CXXLD    example-dbg
   CXX      example_devel-vector_fe_ex9.o
-  CXXLD    example-devel
   CXX      example_oprof-vector_fe_ex9.o
+  CXXLD    example-dbg
   CXXLD    example-oprof
+  CXXLD    example-devel
 ***************************************************************
 * Running Example vector_fe_ex9:
 *   ./example-opt cavity=true mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
 ***************************************************************
  
-  NL step  0, |residual|_2 = 6.295150e+00
-  NL step  1, |residual|_2 = 3.126070e-01
-  NL step  2, |residual|_2 = 1.039272e-03
-  NL step  3, |residual|_2 = 2.666132e-07
-  NL step  4, |residual|_2 = 1.617993e-11
+  NL step  0, |residual|_2 = 3.098088e+00
+  NL step  1, |residual|_2 = 4.645423e-01
+  NL step  2, |residual|_2 = 1.413344e-03
+  NL step  3, |residual|_2 = 3.386920e-07
+  NL step  4, |residual|_2 = 4.623737e-11
 L2 error for u is: 1.543638e-01
 L2 error for v is: 1.543638e-01
 L2 error for pressure is: 2.879229e-01
@@ -72,11 +72,11 @@ L2 error for pressure is: 2.879229e-01
 *   ./example-opt cavity=true mms=true dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
 ***************************************************************
  
-  NL step  0, |residual|_2 = 6.295150e+00
-  NL step  1, |residual|_2 = 3.136886e-01
-  NL step  2, |residual|_2 = 1.041671e-03
-  NL step  3, |residual|_2 = 1.243746e-07
-  NL step  4, |residual|_2 = 5.467456e-12
+  NL step  0, |residual|_2 = 3.098088e+00
+  NL step  1, |residual|_2 = 4.648720e-01
+  NL step  2, |residual|_2 = 1.413092e-03
+  NL step  3, |residual|_2 = 2.088199e-07
+  NL step  4, |residual|_2 = 4.085763e-11
 L2 error for u is: 1.543638e-01
 L2 error for v is: 1.543638e-01
 L2 error for pressure is: 2.879229e-01
@@ -90,11 +90,11 @@ L2 error for pressure is: 2.879229e-01
 *   ./example-opt cavity=false mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
 ***************************************************************
  
-  NL step  0, |residual|_2 = 8.150513e+00
-  NL step  1, |residual|_2 = 1.042579e+00
-  NL step  2, |residual|_2 = 1.804809e-02
-  NL step  3, |residual|_2 = 6.545479e-05
-  NL step  4, |residual|_2 = 2.872377e-09
+  NL step  0, |residual|_2 = 3.909782e+00
+  NL step  1, |residual|_2 = 1.058987e+00
+  NL step  2, |residual|_2 = 2.516098e-02
+  NL step  3, |residual|_2 = 9.010146e-05
+  NL step  4, |residual|_2 = 1.877749e-09
 L2 error for u is: 2.318716e-01
 L2 error for v is: 3.545995e-01
 L2 error for pressure is: 6.271178e-01
@@ -108,11 +108,11 @@ L2 error for pressure is: 6.271178e-01
 *   ./example-opt cavity=false mms=true dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
 ***************************************************************
  
-  NL step  0, |residual|_2 = 8.150513e+00
-  NL step  1, |residual|_2 = 1.042503e+00
-  NL step  2, |residual|_2 = 1.803634e-02
-  NL step  3, |residual|_2 = 6.537104e-05
-  NL step  4, |residual|_2 = 5.088925e-09
+  NL step  0, |residual|_2 = 3.909782e+00
+  NL step  1, |residual|_2 = 1.058987e+00
+  NL step  2, |residual|_2 = 2.516097e-02
+  NL step  3, |residual|_2 = 9.010147e-05
+  NL step  4, |residual|_2 = 1.877772e-09
 L2 error for u is: 2.318716e-01
 L2 error for v is: 3.545995e-01
 L2 error for pressure is: 6.271178e-01
@@ -126,10 +126,11 @@ L2 error for pressure is: 6.271178e-01
 *   ./example-opt cavity=true mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
 ***************************************************************
  
-  NL step  0, |residual|_2 = 4.107863e+00
-  NL step  1, |residual|_2 = 8.050505e-02
-  NL step  2, |residual|_2 = 2.762392e-04
-  NL step  3, |residual|_2 = 2.777466e-08
+  NL step  0, |residual|_2 = 1.414214e+00
+  NL step  1, |residual|_2 = 9.961639e-02
+  NL step  2, |residual|_2 = 4.125528e-04
+  NL step  3, |residual|_2 = 7.831231e-08
+  NL step  4, |residual|_2 = 3.726669e-12
  
 ***************************************************************
 * Done Running Example vector_fe_ex9:
@@ -140,10 +141,11 @@ L2 error for pressure is: 6.271178e-01
 *   ./example-opt cavity=true mms=false dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
 ***************************************************************
  
-  NL step  0, |residual|_2 = 4.107863e+00
-  NL step  1, |residual|_2 = 7.995115e-02
-  NL step  2, |residual|_2 = 2.757573e-04
-  NL step  3, |residual|_2 = 1.445120e-08
+  NL step  0, |residual|_2 = 1.414214e+00
+  NL step  1, |residual|_2 = 9.943571e-02
+  NL step  2, |residual|_2 = 4.124837e-04
+  NL step  3, |residual|_2 = 3.849449e-08
+  NL step  4, |residual|_2 = 1.866398e-12
  
 ***************************************************************
 * Done Running Example vector_fe_ex9:
@@ -154,11 +156,12 @@ L2 error for pressure is: 6.271178e-01
 *   ./example-opt cavity=false mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
 ***************************************************************
  
-  NL step  0, |residual|_2 = 4.584337e+00
-  NL step  1, |residual|_2 = 5.778978e-01
-  NL step  2, |residual|_2 = 2.706925e-02
-  NL step  3, |residual|_2 = 1.784930e-04
-  NL step  4, |residual|_2 = 8.985932e-09
+  NL step  0, |residual|_2 = 2.449490e+00
+  NL step  1, |residual|_2 = 1.148286e+00
+  NL step  2, |residual|_2 = 4.624937e-02
+  NL step  3, |residual|_2 = 3.054618e-04
+  NL step  4, |residual|_2 = 3.047391e-08
+  NL step  5, |residual|_2 = 3.399293e-12
  
 ***************************************************************
 * Done Running Example vector_fe_ex9:
@@ -169,11 +172,12 @@ L2 error for pressure is: 6.271178e-01
 *   ./example-opt cavity=false mms=false dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
 ***************************************************************
  
-  NL step  0, |residual|_2 = 4.584337e+00
-  NL step  1, |residual|_2 = 5.778969e-01
-  NL step  2, |residual|_2 = 2.706916e-02
-  NL step  3, |residual|_2 = 1.785058e-04
-  NL step  4, |residual|_2 = 8.835600e-09
+  NL step  0, |residual|_2 = 2.449490e+00
+  NL step  1, |residual|_2 = 1.148709e+00
+  NL step  2, |residual|_2 = 4.625137e-02
+  NL step  3, |residual|_2 = 3.056148e-04
+  NL step  4, |residual|_2 = 1.365401e-07
+  NL step  5, |residual|_2 = 8.665660e-13
  
 ***************************************************************
 * Done Running Example vector_fe_ex9:
