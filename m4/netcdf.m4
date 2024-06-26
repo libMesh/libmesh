@@ -114,11 +114,21 @@ AC_DEFUN([CONFIGURE_NETCDF],
           AS_IF([test "x$configure_netcdf_v462" = "xyes"],[
                 AC_MSG_NOTICE([Configuring NetCDF v4.6.2])
                 AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c-4.6.2],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
-          ])
+                ],
+                [mkdir -p contrib/netcdf/netcdf-c-4.6.2
+                 echo "distclean:" > contrib/netcdf/netcdf-c-4.6.2/Makefile
+                 echo "distdir:"  >> contrib/netcdf/netcdf-c-4.6.2/Makefile
+                 cat contrib/netcdf/netcdf-c-4.6.2/Makefile
+                ])
           AS_IF([test "x$configure_netcdf_v492" = "xyes"],[
                 AC_MSG_NOTICE([Configuring NetCDF v4.9.2])
                 AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
-          ])
+                ],
+                [mkdir -p contrib/netcdf/netcdf-c
+                 echo "distclean:" > contrib/netcdf/netcdf-c/Makefile
+                 echo "distdir:"  >> contrib/netcdf/netcdf-c/Makefile
+                 cat contrib/netcdf/netcdf-c/Makefile
+                ])
         ])
 
   AC_SUBST(NETCDF_INCLUDE)
