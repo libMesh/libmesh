@@ -479,6 +479,9 @@
 /* Flag indicating whether the library will be compiled with Netcdf support */
 #undef HAVE_NETCDF
 
+/* Flag indicating whether the library will be compiled with Netgen support */
+#undef HAVE_NETGEN
+
 /* Flag indicating whether the library will be compiled with NLOPT support */
 #undef HAVE_NLOPT
 

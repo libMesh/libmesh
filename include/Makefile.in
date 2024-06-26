@@ -140,17 +140,17 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/lt~obsolete.m4 $(top_srcdir)/m4/metis.m4 \
 	$(top_srcdir)/m4/namespaces.m4 $(top_srcdir)/m4/nanoflann.m4 \
 	$(top_srcdir)/m4/nemesis.m4 $(top_srcdir)/m4/netcdf.m4 \
-	$(top_srcdir)/m4/nlopt.m4 $(top_srcdir)/m4/parmetis.m4 \
-	$(top_srcdir)/m4/petsc.m4 $(top_srcdir)/m4/poly2tri.m4 \
-	$(top_srcdir)/m4/precision.m4 $(top_srcdir)/m4/qhull.m4 \
-	$(top_srcdir)/m4/sfc.m4 $(top_srcdir)/m4/slepc.m4 \
-	$(top_srcdir)/m4/sstream.m4 $(top_srcdir)/m4/strstream.m4 \
-	$(top_srcdir)/m4/tbb.m4 $(top_srcdir)/m4/tecio.m4 \
-	$(top_srcdir)/m4/tecplot.m4 $(top_srcdir)/m4/tetgen.m4 \
-	$(top_srcdir)/m4/threads.m4 $(top_srcdir)/m4/triangle.m4 \
-	$(top_srcdir)/m4/trilinos.m4 $(top_srcdir)/m4/unordered.m4 \
-	$(top_srcdir)/m4/vtk.m4 $(top_srcdir)/m4/xdr.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/netgen.m4 $(top_srcdir)/m4/nlopt.m4 \
+	$(top_srcdir)/m4/parmetis.m4 $(top_srcdir)/m4/petsc.m4 \
+	$(top_srcdir)/m4/poly2tri.m4 $(top_srcdir)/m4/precision.m4 \
+	$(top_srcdir)/m4/qhull.m4 $(top_srcdir)/m4/sfc.m4 \
+	$(top_srcdir)/m4/slepc.m4 $(top_srcdir)/m4/sstream.m4 \
+	$(top_srcdir)/m4/strstream.m4 $(top_srcdir)/m4/tbb.m4 \
+	$(top_srcdir)/m4/tecio.m4 $(top_srcdir)/m4/tecplot.m4 \
+	$(top_srcdir)/m4/tetgen.m4 $(top_srcdir)/m4/threads.m4 \
+	$(top_srcdir)/m4/triangle.m4 $(top_srcdir)/m4/trilinos.m4 \
+	$(top_srcdir)/m4/unordered.m4 $(top_srcdir)/m4/vtk.m4 \
+	$(top_srcdir)/m4/xdr.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(include_HEADERS) \
@@ -388,6 +388,7 @@ LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBHILBERT_INCLUDE = @LIBHILBERT_INCLUDE@
 LIBHILBERT_LIBRARY = @LIBHILBERT_LIBRARY@
+LIBMESH_LIBRARY_SUFFIX = @LIBMESH_LIBRARY_SUFFIX@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
@@ -417,6 +418,9 @@ MPI_LIBS = @MPI_LIBS@
 NANOFLANN_INCLUDE = @NANOFLANN_INCLUDE@
 NEMESIS_INCLUDE = @NEMESIS_INCLUDE@
 NETCDF_INCLUDE = @NETCDF_INCLUDE@
+NETGEN_BUILD_LDFLAGS = @NETGEN_BUILD_LDFLAGS@
+NETGEN_INCLUDE = @NETGEN_INCLUDE@
+NETGEN_LIBS = @NETGEN_LIBS@
 NLOPT_INCLUDE = @NLOPT_INCLUDE@
 NLOPT_LIBRARY = @NLOPT_LIBRARY@
 NM = @NM@
@@ -795,6 +799,7 @@ include_HEADERS = \
         mesh/mesh_input.h \
         mesh/mesh_inserter_iterator.h \
         mesh/mesh_modification.h \
+        mesh/mesh_netgen_interface.h \
         mesh/mesh_output.h \
         mesh/mesh_refinement.h \
         mesh/mesh_serializer.h \
@@ -802,6 +807,7 @@ include_HEADERS = \
         mesh/mesh_smoother_laplace.h \
         mesh/mesh_smoother_vsmoother.h \
         mesh/mesh_subdivision_support.h \
+        mesh/mesh_tet_interface.h \
         mesh/mesh_tetgen_interface.h \
         mesh/mesh_tetgen_wrapper.h \
         mesh/mesh_tools.h \
