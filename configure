@@ -58327,6 +58327,12 @@ printf "%s\n" "$as_me: WARNING: could not find source tree for $ax_dir" >&2;}
 
 
 
+else $as_nop
+  mkdir -p contrib/netcdf/netcdf-c-4.6.2
+                 echo "distclean:" > contrib/netcdf/netcdf-c-4.6.2/Makefile
+                 echo "distdir:"  >> contrib/netcdf/netcdf-c-4.6.2/Makefile
+                 cat contrib/netcdf/netcdf-c-4.6.2/Makefile
+
 fi
           if test "x$configure_netcdf_v492" = "xyes"
 then :
@@ -58457,6 +58463,12 @@ printf "%s\n" "$as_me: WARNING: could not find source tree for $ax_dir" >&2;}
 
 
 
+
+else $as_nop
+  mkdir -p contrib/netcdf/netcdf-c
+                 echo "distclean:" > contrib/netcdf/netcdf-c/Makefile
+                 echo "distdir:"  >> contrib/netcdf/netcdf-c/Makefile
+                 cat contrib/netcdf/netcdf-c/Makefile
 
 fi
 

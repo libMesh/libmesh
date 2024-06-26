@@ -1343,8 +1343,8 @@ maintainer-clean-generic:
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
-clean-am: clean-generic clean-libtool clean-noinstLTLIBRARIES \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local \
+	clean-noinstLTLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 		-rm -f $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/$(DEPDIR)/libdbg_la-shapes.Plo
@@ -1463,13 +1463,13 @@ uninstall-am: uninstall-nodist_includeHEADERS
 .MAKE: all check install install-am install-exec install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
-	clean-generic clean-libtool clean-noinstLTLIBRARIES \
-	cscopelist-am ctags ctags-am distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man \
+	clean-generic clean-libtool clean-local \
+	clean-noinstLTLIBRARIES cscopelist-am ctags ctags-am distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
 	install-nodist_includeHEADERS install-pdf install-pdf-am \
 	install-ps install-ps-am install-strip installcheck \
 	installcheck-am installdirs maintainer-clean \
@@ -1484,6 +1484,9 @@ uninstall-am: uninstall-nodist_includeHEADERS
 # Local Variables:
 # mode: makefile
 # End:
+
+clean-local:
+	rm -f $(BUILT_SOURCES)
 
 poly2tri/poly2tri.h : $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/poly2tri.h
 	$(AM_V_GEN) $(MKDIR_P) poly2tri/
