@@ -147,6 +147,7 @@ data = matrices/geom_1_extraction_op.m \
        matrices/geom_2_extraction_op.m.gz \
        matrices/geom_4_extraction_op.m \
        matrices/geom_4_extraction_op.m.gz \
+       matrices/geom_8_extraction_op.m \
        matrices/geom_1_extraction_op.petsc32 \
        matrices/geom_1_extraction_op.petsc64 \
        meshes/1_quad.bxt.gz \
