@@ -3,23 +3,37 @@ dnl netCDF
 dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_NETCDF],
 [
+  configure_netcdf_v462=''
+  configure_netcdf_v492=''
   AC_ARG_ENABLE(netcdf,
                 AS_HELP_STRING([--disable-netcdf],
                                [build without netCDF binary I/O]),
                 [AS_CASE("${enableval}",
-                  [v492],      [enablenetcdf=yes
-                                 netcdfversion="v4.9.2"],
-                  [yes|new|v4|v462], [enablenetcdf=yes
-                                 netcdfversion="v4.6.2"],
+                  [v492],       [enablenetcdf=yes
+                                 netcdfversion="v4.9.2"
+                                 configure_netcdf_v492=yes],
+                  [yes|new|v4|v462],
+                                [enablenetcdf=yes
+                                 netcdfversion="v4.6.2"
+                                 configure_netcdf_v462=yes],
+                  [all],        [enablenetcdf=yes
+                                 netcdfversion="v4.9.2"
+                                 configure_netcdf_v462=yes
+                                 configure_netcdf_v492=yes],
                   [old|v3],     [enablenetcdf=yes
                                  netcdfversion=3],
                   [no],         [enablenetcdf=no
                                  netcdfversion=no],
                   [AC_MSG_ERROR(bad value ${enableval} for --enable-netcdf)])],
-                [enablenetcdf=$enableoptional; netcdfversion="v4.6.2"])
+                  [enablenetcdf=$enableoptional;
+                   netcdfversion="v4.6.2"
+                   configure_netcdf_v462=yes])
 
   dnl fix for --disable-optional
-  AS_IF([test "x$enablenetcdf" = "xno"], [netcdfversion=no])
+  AS_IF([test "x$enablenetcdf" = "xno"],
+        [netcdfversion=no;
+         configure_netcdf_v462=''
+         configure_netcdf_v492=''])
 
   dnl netCDF3 is no longer distributed with libMesh
   AS_IF([test "x$netcdfversion" = "x3"],
@@ -29,7 +43,6 @@ AC_DEFUN([CONFIGURE_NETCDF],
         ])
 
   netcdf_v4_arg=''
-  netcdf_v4_subdir=''
   AS_CASE("${netcdfversion}",
           [3], [
                  dnl We shouldn't get here, see if test above.
@@ -45,7 +58,6 @@ AC_DEFUN([CONFIGURE_NETCDF],
 
                        dnl netcdf will install its own pkgconfig script, use this to get proper static linking
                        libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
-                       netcdf_v4_subdir='contrib/netcdf/netcdf-c-4.6.2'
                        AC_MSG_RESULT(<<< Configuring library with NetCDF version 4.6.2 support >>>)],
           ["v4.9.2"], [NETCDF_INCLUDE="-I\$(top_srcdir)/contrib/netcdf/netcdf-c/include -I\$(top_builddir)/contrib/netcdf/netcdf-c/include"
                        AC_DEFINE(HAVE_NETCDF, 1, [Flag indicating whether the library will be compiled with Netcdf support])
@@ -57,7 +69,6 @@ AC_DEFUN([CONFIGURE_NETCDF],
 
                        dnl netcdf will install its own pkgconfig script, use this to get proper static linking
                        libmesh_pkgconfig_requires="netcdf >= 4.2 $libmesh_pkgconfig_requires"
-                       netcdf_v4_subdir='contrib/netcdf/netcdf-c'
                        AC_MSG_RESULT(<<< Configuring library with NetCDF version 4.9.2 support >>>)],
           [
             NETCDF_INCLUDE=""
@@ -100,12 +111,24 @@ AC_DEFUN([CONFIGURE_NETCDF],
                  netcdf_curl_arg=--disable-curl
                  netcdf_byterange_arg=--disable-byterange])
           dnl AX_SUBDIRS_CONFIGURE now dislikes variables in $1
-          AS_IF([test "x$netcdf_v4_subdir" = "xcontrib/netcdf/netcdf-c-4.6.2"],[
+          AS_IF([test "x$configure_netcdf_v462" = "xyes"],[
+                AC_MSG_NOTICE([Configuring NetCDF v4.6.2])
                 AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c-4.6.2],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
-          ])
-          AS_IF([test "x$netcdf_v4_subdir" = "xcontrib/netcdf/netcdf-c"],[
+                ],
+                [mkdir -p contrib/netcdf/netcdf-c-4.6.2
+                 echo "distclean:" > contrib/netcdf/netcdf-c-4.6.2/Makefile
+                 echo "distdir:"  >> contrib/netcdf/netcdf-c-4.6.2/Makefile
+                 cat contrib/netcdf/netcdf-c-4.6.2/Makefile
+                ])
+          AS_IF([test "x$configure_netcdf_v492" = "xyes"],[
+                AC_MSG_NOTICE([Configuring NetCDF v4.9.2])
                 AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
-          ])
+                ],
+                [mkdir -p contrib/netcdf/netcdf-c
+                 echo "distclean:" > contrib/netcdf/netcdf-c/Makefile
+                 echo "distdir:"  >> contrib/netcdf/netcdf-c/Makefile
+                 cat contrib/netcdf/netcdf-c/Makefile
+                ])
         ])
 
   AC_SUBST(NETCDF_INCLUDE)

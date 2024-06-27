@@ -48,6 +48,8 @@ if LIBMESH_ENABLE_GZSTREAMS
   oprof_libs += gzstream/liboprof.la
 endif
 
+NETCDF_PLACEHOLDERS =
+
 if LIBMESH_ENABLE_NETCDF
 # NetCDF version 4, use their autotools package
 if LIBMESH_ENABLE_NETCDF_V462
@@ -57,6 +59,8 @@ if LIBMESH_ENABLE_NETCDF_V462
   devel_libs += netcdf/netcdf-c-4.6.2/liblib/libnetcdf.la
   prof_libs  += netcdf/netcdf-c-4.6.2/liblib/libnetcdf.la
   oprof_libs += netcdf/netcdf-c-4.6.2/liblib/libnetcdf.la
+else
+  NETCDF_PLACEHOLDERS += netcdf/netcdf-c-4.6.2/Makefile
 endif
 
 if LIBMESH_ENABLE_NETCDF_V492
@@ -66,9 +70,13 @@ if LIBMESH_ENABLE_NETCDF_V492
   devel_libs += netcdf/netcdf-c/liblib/libnetcdf.la
   prof_libs  += netcdf/netcdf-c/liblib/libnetcdf.la
   oprof_libs += netcdf/netcdf-c/liblib/libnetcdf.la
+else
+  NETCDF_PLACEHOLDERS += netcdf/netcdf-c/Makefile
 endif
 endif
 
+distclean-local:
+	for file in $(NETCDF_PLACEHOLDERS); do rm -f $$file; done
 
 if LIBMESH_ENABLE_EXODUS
 if LIBMESH_ENABLE_EXODUS_V509

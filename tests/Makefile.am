@@ -139,30 +139,71 @@ unit_tests_sources = \
   utils/vectormap_test.C \
   utils/xdr_test.C
 
-#EXTRA_DIST = base/getpot_test_input.in
-
 # Make sure any data goes in "make dist"
 datadir = $(install_dir)
 data = matrices/geom_1_extraction_op.m \
+       matrices/geom_1_extraction_op.m.gz \
+       matrices/geom_2_extraction_op.m \
+       matrices/geom_2_extraction_op.m.gz \
+       matrices/geom_4_extraction_op.m \
+       matrices/geom_4_extraction_op.m.gz \
+       matrices/geom_8_extraction_op.m \
        matrices/geom_1_extraction_op.petsc32 \
+       matrices/geom_1_extraction_op.petsc64 \
        meshes/1_quad.bxt.gz \
        meshes/25_quad.bxt.gz \
-       meshes/BlockWithHole_Patch9.bxt.gz \
-       meshes/PlateWithHole_Patch8.bxt.gz \
-       meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz \
-       meshes/PressurizedCyl_Patch6_256Elem.bxt.gz \
-       meshes/Cube_With_Sidesets.e \
-       meshes/PlateWithHole_Patch8.e \
-       meshes/PressurizedCyl3d_Patch1_8Elem.e \
        meshes/bad_64bit_elem_integers.e \
+       meshes/BlockWithHole_Patch9.bxt.gz \
+       meshes/constrain10to4.m \
+       meshes/Cube_With_Sidesets.e \
+       meshes/exodus_elements/read_exodus_EDGE2.e \
+       meshes/exodus_elements/read_exodus_EDGE3.e \
+       meshes/exodus_elements/read_exodus_EDGE4.e \
+       meshes/exodus_elements/read_exodus_HEX20.e \
+       meshes/exodus_elements/read_exodus_HEX27.e \
+       meshes/exodus_elements/read_exodus_HEX8.e \
+       meshes/exodus_elements/read_exodus_PRISM15.e \
+       meshes/exodus_elements/read_exodus_PRISM18.e \
+       meshes/exodus_elements/read_exodus_PRISM20.e \
+       meshes/exodus_elements/read_exodus_PRISM21.e \
+       meshes/exodus_elements/read_exodus_PRISM6.e \
+       meshes/exodus_elements/read_exodus_PYRAMID13.e \
+       meshes/exodus_elements/read_exodus_PYRAMID14.e \
+       meshes/exodus_elements/read_exodus_PYRAMID18.e \
+       meshes/exodus_elements/read_exodus_PYRAMID5.e \
+       meshes/exodus_elements/read_exodus_QUAD4.e \
+       meshes/exodus_elements/read_exodus_QUAD8.e \
+       meshes/exodus_elements/read_exodus_QUAD9.e \
+       meshes/exodus_elements/read_exodus_TET10.e \
+       meshes/exodus_elements/read_exodus_TET14.e \
+       meshes/exodus_elements/read_exodus_TET4.e \
+       meshes/exodus_elements/read_exodus_TRI3.e \
+       meshes/exodus_elements/read_exodus_TRI6.e \
+       meshes/exodus_elements/read_exodus_TRI7.e \
+       meshes/geom_2.exo \
+       meshes/geom_4.exo \
+       meshes/geom_8.exo \
        meshes/good_32bit_elem_integers.e \
        meshes/mesh_assign_test_mesh.xda \
        meshes/mesh_with_low_order_edge_blocks.e \
+       meshes/PlateWithHole_Patch8.bxt.gz \
+       meshes/PlateWithHole_Patch8.e \
+       meshes/poly_sample_test2.inp.gz \
+       meshes/PressurizedCyl3d_Patch1_8Elem.bxt.gz \
+       meshes/PressurizedCyl3d_Patch1_8Elem.e \
+       meshes/PressurizedCyl_Patch6_256Elem.bxt.gz \
        meshes/shark_tooth_tri6.xda.gz \
+       meshes/tensile_sample_test1.inp.gz \
        meshes/tetgen_one_tet10.ele \
-       meshes/tetgen_one_tet10.node
+       meshes/tetgen_one_tet10.node \
+       meshes/two_element_iga_in.e \
+       meshes/two_quads_two_blocks.e
+
 
 unit_tests_data = $(data)
+
+# Why isn't this working automatically?
+EXTRA_DIST = $(data)
 
 if LIBMESH_ENABLE_FPARSER
   unit_tests_sources += \

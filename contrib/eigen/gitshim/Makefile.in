@@ -1226,12 +1226,12 @@ nobase_include_HEADERS = \
         unsupported/README.txt
 
 EXTRA_DIST = \
-        COPYING.BSD \
-        COPYING.GPL \
-        COPYING.LGPL \
-        COPYING.MINPACK \
-        COPYING.MPL2 \
-        COPYING.README
+        root/COPYING.BSD \
+        root/COPYING.GPL \
+        root/COPYING.LGPL \
+        root/COPYING.MINPACK \
+        root/COPYING.MPL2 \
+        root/COPYING.README
 
 all: all-am
 
