@@ -158,7 +158,9 @@ void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
             if (!mesh.is_replicated())
               {
                 side_elem->set_id(max_orig_id + max_sides*elem->id() + s);
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
                 side_elem->set_unique_id(max_unique_id + max_sides*elem->id() + s);
+#endif
               }
           }
       }
