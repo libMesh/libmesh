@@ -2254,12 +2254,16 @@ data = matrices/geom_1_extraction_op.m \
        meshes/exodus_elements/read_exodus_PYRAMID18.e \
        meshes/exodus_elements/read_exodus_PYRAMID5.e \
        meshes/exodus_elements/read_exodus_QUAD4.e \
+       meshes/exodus_elements/read_exodus_QUADSHELL4.e \
        meshes/exodus_elements/read_exodus_QUAD8.e \
+       meshes/exodus_elements/read_exodus_QUADSHELL8.e \
        meshes/exodus_elements/read_exodus_QUAD9.e \
+       meshes/exodus_elements/read_exodus_QUADSHELL9.e \
        meshes/exodus_elements/read_exodus_TET10.e \
        meshes/exodus_elements/read_exodus_TET14.e \
        meshes/exodus_elements/read_exodus_TET4.e \
        meshes/exodus_elements/read_exodus_TRI3.e \
+       meshes/exodus_elements/read_exodus_TRISHELL3.e \
        meshes/exodus_elements/read_exodus_TRI6.e \
        meshes/exodus_elements/read_exodus_TRI7.e \
        meshes/geom_2.exo \
