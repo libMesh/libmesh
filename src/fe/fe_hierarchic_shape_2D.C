@@ -299,6 +299,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         libmesh_assert_less(i, 4*dofs_per_side);
 
@@ -594,6 +595,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         libmesh_assert_less(i, 4*dofs_per_side);
 
@@ -808,6 +810,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         libmesh_assert_less(i, 4*dofs_per_side);
 
@@ -1039,6 +1042,7 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         // Compute quad shape functions as a tensor-product
         auto [i0, i1, f] = quad_indices(elem, totalorder, i);
@@ -1090,6 +1094,7 @@ Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         // Compute quad shape functions as a tensor-product
         auto [i0, i1, f] = quad_indices(elem, totalorder, i);

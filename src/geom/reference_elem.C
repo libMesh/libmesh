@@ -258,6 +258,9 @@ const Elem & get (const ElemType type_in)
   if (type_in == QUADSHELL8)
     base_type = QUAD8;
 
+  if (type_in == QUADSHELL9)
+    base_type = QUAD9;
+
   init_ref_elem_table();
 
   // Throw an error if the user asked for an ElemType that we don't

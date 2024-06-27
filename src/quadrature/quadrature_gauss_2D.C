@@ -43,6 +43,7 @@ void QGauss::init_2D(const ElemType, unsigned int)
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         // We compute the 2D quadrature rule as a tensor
         // product of the 1D quadrature rule.

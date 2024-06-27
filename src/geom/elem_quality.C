@@ -356,6 +356,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         v.resize(13);
         v[0]  = ASPECT_RATIO;

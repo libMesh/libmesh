@@ -339,6 +339,7 @@ Real fe_lagrange_2D_shape(const ElemType type,
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -436,6 +437,7 @@ Real fe_lagrange_2D_shape(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case QUAD9:
+          case QUADSHELL9:
             {
 
               // Compute quad shape functions as a tensor-product
@@ -581,6 +583,7 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -770,6 +773,7 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -1023,6 +1027,7 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -1185,6 +1190,7 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
                                "High order on first order elements only supported for L2 families");
             libmesh_fallthrough();
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute QUAD9 second derivatives as tensor product
               const Real xi  = p(0);

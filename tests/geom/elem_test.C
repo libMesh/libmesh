@@ -382,7 +382,8 @@ public:
             CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s), elem->center_node_on_side(s));
           else if (elem->type() == TRI6 || elem->type() == TRI7)
             CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s + 3), elem->center_node_on_side(s));
-          else if (elem->type() == QUAD8 || elem->type() == QUAD9 || elem->type() == QUADSHELL8)
+          else if (elem->type() == QUAD8 || elem->type() == QUAD9 ||
+                   elem->type() == QUADSHELL8 || elem->type() == QUADSHELL9)
             CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s + 4), elem->center_node_on_side(s));
           else if (elem->type() == HEX27)
             CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(s + 20), elem->center_node_on_side(s));
@@ -676,12 +677,16 @@ INSTANTIATE_ELEMTEST(EDGE4);
 
 #if LIBMESH_DIM > 1
 INSTANTIATE_ELEMTEST(TRI3);
+INSTANTIATE_ELEMTEST(TRISHELL3);
 INSTANTIATE_ELEMTEST(TRI6);
 INSTANTIATE_ELEMTEST(TRI7);
 
 INSTANTIATE_ELEMTEST(QUAD4);
+INSTANTIATE_ELEMTEST(QUADSHELL4);
 INSTANTIATE_ELEMTEST(QUAD8);
+INSTANTIATE_ELEMTEST(QUADSHELL8);
 INSTANTIATE_ELEMTEST(QUAD9);
+INSTANTIATE_ELEMTEST(QUADSHELL9);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 INSTANTIATE_ELEMTEST(INFQUAD4);

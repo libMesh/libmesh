@@ -359,6 +359,9 @@ void ExodusII_IO_Helper::init_conversion_map()
   convert_type(QUADSHELL8, "SHELL8", nullptr, nullptr, nullptr,
                /* inverse_side_map = */ &quadshell4_inverse_edge_map,
                nullptr, nullptr, /* shellface_index_offset = */ 2);
+  convert_type(QUADSHELL9, "SHELL9", nullptr, nullptr, nullptr,
+               /* inverse_side_map = */ &quadshell4_inverse_edge_map,
+               nullptr, nullptr, /* shellface_index_offset = */ 2);
 
   convert_type(TRI3, "TRI3");
   convert_type(TRI6, "TRI6");
@@ -460,9 +463,11 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
 
   // QUAD9 equivalences
   element_equivalence_map["QUAD9"]  = QUAD9;
-  // element_equivalence_map["SHELL9"] = QUAD9;
   // This only supports p==2 IGA:
   element_equivalence_map["BEX_QUAD"]  = QUAD9;
+
+  // QUADSHELL9 equivalences
+  element_equivalence_map["SHELL9"] = QUADSHELL9;
 
   // TRI3 equivalences
   element_equivalence_map["TRI"]       = TRI3;

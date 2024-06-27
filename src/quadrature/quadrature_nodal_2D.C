@@ -136,6 +136,7 @@ void QNodal::init_2D(const ElemType, unsigned int)
       }
 
     case QUAD9:
+    case QUADSHELL9:
     case TRI6:
       {
         QSimpson rule(/*dim=*/2, /*ignored*/_order);

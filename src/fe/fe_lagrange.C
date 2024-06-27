@@ -460,6 +460,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 4;
 
           case TET4:
@@ -514,6 +515,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
             return 8;
 
           case QUAD9:
+          case QUADSHELL9:
             return 9;
 
           case TET10:
@@ -643,6 +645,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               switch (n)
                 {
@@ -756,6 +759,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
           case TET10:
           case HEX20:
           case HEX27:

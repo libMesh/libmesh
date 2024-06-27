@@ -77,6 +77,8 @@ enum ElemType : int {
                PRISM20 = 35,
                PRISM21 = 36,
                PYRAMID18 = 37,
+               // Another shell elem
+               QUADSHELL9 = 38,
                // Invalid
                INVALID_ELEM};   // should always be last
 

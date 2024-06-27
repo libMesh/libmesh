@@ -37,6 +37,7 @@ void QMonomial::init_2D(const ElemType, unsigned int)
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       {
         switch(get_order())
           {

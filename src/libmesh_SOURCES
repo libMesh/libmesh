@@ -168,6 +168,7 @@ libmesh_SOURCES =  \
         src/geom/face_quad8.C \
         src/geom/face_quad8_shell.C \
         src/geom/face_quad9.C \
+        src/geom/face_quad9_shell.C \
         src/geom/face_tri.C \
         src/geom/face_tri3.C \
         src/geom/face_tri3_shell.C \

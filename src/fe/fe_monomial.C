@@ -61,6 +61,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 3;
 
           case TET4:
@@ -112,6 +113,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 6;
 
           case TET4:
@@ -163,6 +165,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 10;
 
           case TET4:
@@ -213,6 +216,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 15;
 
           case TET4:
@@ -261,6 +265,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case QUAD8:
           case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return (order+1)*(order+2)/2;
 
           case TET4:

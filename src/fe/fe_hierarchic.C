@@ -115,6 +115,7 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       return ((o+1)*(o+1));
     case HEX8:
     case HEX20:
@@ -213,6 +214,7 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       switch (n)
         {
         case 0:
@@ -408,6 +410,7 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
     case QUAD8:
     case QUADSHELL8:
     case QUAD9:
+    case QUADSHELL9:
       return ((o-1)*(o-1));
     case HEX8:
     case HEX20:
