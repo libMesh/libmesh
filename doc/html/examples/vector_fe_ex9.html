@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/vector_fe/vector_fe_ex9" target="_blank">Open vector_fe_ex9 in new tab.</a>
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+  CXX      example_dbg-vector_fe_ex9.o
+  CXXLD    example-dbg
+  CXX      example_devel-vector_fe_ex9.o
+  CXXLD    example-devel
+  CXX      example_oprof-vector_fe_ex9.o
+  CXXLD    example-oprof
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+  NL step  0, |residual|_2 = 6.295150e+00
+  NL step  1, |residual|_2 = 3.126070e-01
+  NL step  2, |residual|_2 = 1.039272e-03
+  NL step  3, |residual|_2 = 2.666132e-07
+  NL step  4, |residual|_2 = 1.617993e-11
+L2 error for u is: 1.543638e-01
+L2 error for v is: 1.543638e-01
+L2 error for pressure is: 2.879229e-01
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=true dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+  NL step  0, |residual|_2 = 6.295150e+00
+  NL step  1, |residual|_2 = 3.136886e-01
+  NL step  2, |residual|_2 = 1.041671e-03
+  NL step  3, |residual|_2 = 1.243746e-07
+  NL step  4, |residual|_2 = 5.467456e-12
+L2 error for u is: 1.543638e-01
+L2 error for v is: 1.543638e-01
+L2 error for pressure is: 2.879229e-01
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=true dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+  NL step  0, |residual|_2 = 8.150513e+00
+  NL step  1, |residual|_2 = 1.042579e+00
+  NL step  2, |residual|_2 = 1.804809e-02
+  NL step  3, |residual|_2 = 6.545479e-05
+  NL step  4, |residual|_2 = 2.872377e-09
+L2 error for u is: 2.318716e-01
+L2 error for v is: 3.545995e-01
+L2 error for pressure is: 6.271178e-01
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=true dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+  NL step  0, |residual|_2 = 8.150513e+00
+  NL step  1, |residual|_2 = 1.042503e+00
+  NL step  2, |residual|_2 = 1.803634e-02
+  NL step  3, |residual|_2 = 6.537104e-05
+  NL step  4, |residual|_2 = 5.088925e-09
+L2 error for u is: 2.318716e-01
+L2 error for v is: 3.545995e-01
+L2 error for pressure is: 6.271178e-01
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=true dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+  NL step  0, |residual|_2 = 4.107863e+00
+  NL step  1, |residual|_2 = 8.050505e-02
+  NL step  2, |residual|_2 = 2.762392e-04
+  NL step  3, |residual|_2 = 2.777466e-08
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=false dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+  NL step  0, |residual|_2 = 4.107863e+00
+  NL step  1, |residual|_2 = 7.995115e-02
+  NL step  2, |residual|_2 = 2.757573e-04
+  NL step  3, |residual|_2 = 1.445120e-08
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=false dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+  NL step  0, |residual|_2 = 4.584337e+00
+  NL step  1, |residual|_2 = 5.778978e-01
+  NL step  2, |residual|_2 = 2.706925e-02
+  NL step  3, |residual|_2 = 1.784930e-04
+  NL step  4, |residual|_2 = 8.985932e-09
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=false dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+  NL step  0, |residual|_2 = 4.584337e+00
+  NL step  1, |residual|_2 = 5.778969e-01
+  NL step  2, |residual|_2 = 2.706916e-02
+  NL step  3, |residual|_2 = 1.785058e-04
+  NL step  4, |residual|_2 = 8.835600e-09
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=false dim=2 element_type=TRI7 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>
