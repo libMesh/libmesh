@@ -39,10 +39,6 @@ LIBMESH_DEFAULT_VECTORIZED_FE(3,NEDELEC_ONE)
 
 // Anonymous namespace for local helper functions
 namespace {
-// Forward-declare nedelec_one_n_dofs for immediate use
-unsigned int nedelec_one_n_dofs(const ElemType, const Order);
-
-
 void nedelec_one_nodal_soln(const Elem * elem,
                             const Order order,
                             const std::vector<Number> & elem_soln,
@@ -65,9 +61,9 @@ void nedelec_one_nodal_soln(const Elem * elem,
       elem_type != HEX20 && elem_type != HEX27)
     libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(elem_type) << " selected for NEDELEC_ONE FE family!");
 
-  libmesh_assert_equal_to (elem_soln.size(), nedelec_one_n_dofs(elem_type, totalorder));
+  libmesh_assert_equal_to (elem_soln.size(), FEInterface::n_dofs(p_refined_fe_type, elem, false));
 
-  const unsigned int n_sf = FEInterface::n_shape_functions(p_refined_fe_type, elem);
+  const unsigned int n_sf = FEInterface::n_shape_functions(p_refined_fe_type, elem, false);
 
   std::vector<Point> refspace_nodes;
   FEVectorBase::get_refspace_nodes(elem_type,refspace_nodes);

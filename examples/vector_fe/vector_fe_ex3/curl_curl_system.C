@@ -44,7 +44,7 @@ void CurlCurlSystem::init_data ()
   GetPot infile("vector_fe_ex3.in");
 
   // Add the solution variable
-  u_var = this->add_variable ("u", FIRST, NEDELEC_ONE);
+  u_var = this->add_variable ("u", u_order, NEDELEC_ONE);
 
   // The solution is evolving, with a first order time derivative
   this->time_evolving(u_var, 1);
