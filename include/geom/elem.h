@@ -739,7 +739,7 @@ public:
   virtual bool is_face(const unsigned int i) const = 0;
 
   /**
-   * \returns \p true if the specified (local) node number is an interior node.
+   * \returns \p true if the specified (local) node number is an internal node.
    */
   bool is_internal(const unsigned int i) const;
 
