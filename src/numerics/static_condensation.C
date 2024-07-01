@@ -72,8 +72,26 @@ StaticCondensation::computeElemInteriorDofsField(std::vector<dof_id_type> & elem
 }
 
 void
+StaticCondensation::clear()
+{
+  _elem_to_local_data.clear();
+  _local_trace_dofs.clear();
+  _reduced_sys_mat.reset();
+  _reduced_sol.reset();
+  _reduced_rhs.reset();
+  _reduced_solver.reset();
+}
+
+void
 StaticCondensation::init()
 {
+  if (_is_initialized)
+    return;
+
+  // Some APIs that mark the preconditioner as uninitialized may not clear data, so we do it to be
+  // safe
+  clear();
+
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
   std::vector<dof_id_type> elem_interior_dofs, elem_trace_dofs;
   std::unordered_set<dof_id_type> local_trace_dofs;
@@ -130,8 +148,6 @@ StaticCondensation::init()
 
   for (auto elem : _mesh.active_local_element_ptr_range())
   {
-    elem_interior_dofs.clear();
-    elem_trace_dofs.clear();
     unsigned int boundary_dof_size = 0;
     unsigned int interior_dof_size = 0;
     auto & local_data = _elem_to_local_data[elem->id()];
@@ -145,16 +161,20 @@ StaticCondensation::init()
 
       for (const auto v : make_range(var_group.n_variables()))
       {
-        auto & var_data = local_data.var_to_data[v];
+        const auto var_num = var_group.number(v);
+        auto & var_data = local_data.var_to_data[var_num];
+        elem_interior_dofs.clear();
+        elem_trace_dofs.clear();
         _dof_map.dof_indices(
-            elem, elem_dofs, v, scalar_dofs_functor, field_dofs_functor, elem->p_level());
+            elem, elem_dofs, var_num, scalar_dofs_functor, field_dofs_functor, elem->p_level());
         var_data.boundary_dofs_offset = boundary_dof_size;
         var_data.interior_dofs_offset = interior_dof_size;
         var_data.num_boundary_dofs = elem_trace_dofs.size();
         var_data.num_interior_dofs = elem_interior_dofs.size();
         boundary_dof_size += var_data.num_boundary_dofs;
         interior_dof_size += var_data.num_interior_dofs;
-        local_data.reduced_space_indices = elem_trace_dofs;
+        local_data.reduced_space_indices.insert(
+            local_data.reduced_space_indices.end(), elem_trace_dofs.begin(), elem_trace_dofs.end());
       }
     }
 
@@ -244,6 +264,8 @@ StaticCondensation::init()
       local_data.reduced_space_indices.push_back(
           libmesh_map_find(full_dof_to_reduced_dof, full_dof));
   }
+
+  _is_initialized = true;
 }
 
 void
@@ -302,14 +324,14 @@ StaticCondensation::add_matrix(const Elem & elem,
 void
 StaticCondensation::setup()
 {
+  _reduced_sys_mat->zero();
+
   for (auto & [elem_id, local_data] : _elem_to_local_data)
   {
     libmesh_ignore(elem_id);
     local_data.AiiFactor = local_data.Aii.partialPivLu();
     const EigenMatrix S =
         local_data.Abb - local_data.Abi * local_data.AiiFactor.solve(local_data.Aib);
-    const EigenMatrix S2 =
-        local_data.Abb - local_data.Abi * local_data.Aii.inverse() * local_data.Aib;
     DenseMatrix<Number> shim(S.rows(), S.cols());
     for (const auto i : make_range(S.rows()))
       for (const auto j : make_range(S.cols()))
@@ -361,7 +383,7 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
       for (const auto v : make_range(var_group.n_variables()))
         _dof_map.dof_indices(elem,
                              elem_dofs,
-                             v,
+                             var_group.number(v),
                              computeElemInteriorDofsScalar(elem_interior_dofs),
                              computeElemInteriorDofsField(elem_interior_dofs),
                              elem->p_level());
@@ -422,8 +444,12 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
         continue;
 
       for (const auto v : make_range(var_group.n_variables()))
-        _dof_map.dof_indices(
-            elem, elem_dofs, v, scalar_dofs_functor, field_dofs_functor, elem->p_level());
+        _dof_map.dof_indices(elem,
+                             elem_dofs,
+                             var_group.number(v),
+                             scalar_dofs_functor,
+                             field_dofs_functor,
+                             elem->p_level());
     }
 
     set_local_vectors(full_rhs, elem_interior_dofs, elem_interior_rhs_vec, elem_interior_rhs);

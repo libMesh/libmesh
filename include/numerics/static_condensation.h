@@ -71,6 +71,8 @@ public:
   virtual void apply(const NumericVector<Number> & full_rhs,
                      NumericVector<Number> & full_sol) override;
 
+  virtual void clear() override;
+
   void add_matrix(const Elem & elem,
                   const unsigned int i_var,
                   const unsigned int j_var,

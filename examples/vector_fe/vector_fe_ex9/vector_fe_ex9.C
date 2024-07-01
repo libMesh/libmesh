@@ -52,6 +52,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/nonlinear_solver.h"
+#include "libmesh/static_condensation.h"
 
 // The exact solution and error computation.
 #include "libmesh/exact_solution.h"
@@ -241,6 +242,7 @@ public:
   System * system;
   const MeshBase * mesh;
   const DofMap * dof_map;
+  StaticCondensation * sc;
   std::unique_ptr<FEVectorBase> vector_fe;
   std::unique_ptr<FEBase> scalar_fe;
   std::unique_ptr<QBase> qrule;
@@ -1054,11 +1056,9 @@ public:
   }
 
   virtual void jacobian(const NumericVector<Number> & X,
-                        SparseMatrix<Number> & J,
+                        SparseMatrix<Number> & /*J*/,
                         NonlinearImplicitSystem & S) override
   {
-    J.zero();
-
     const auto u_num = S.variable_number("vel_x");
     const auto v_num = S.variable_number("vel_y");
     const auto qu_num = S.variable_number("qu");
@@ -1230,46 +1230,43 @@ public:
         pressure_face_jacobian(Jp_lmu, Jp_lmv);
       }
 
-      J.add_matrix(Jqu_qu, qu_dof_indices);
-      J.add_matrix(Jqv_qv, qv_dof_indices);
-      J.add_matrix(Jqu_u, qu_dof_indices, u_dof_indices);
-      J.add_matrix(Jqv_v, qv_dof_indices, v_dof_indices);
-      J.add_matrix(Ju_qu, u_dof_indices, qu_dof_indices);
-      J.add_matrix(Jv_qv, v_dof_indices, qv_dof_indices);
-      J.add_matrix(Ju_p, u_dof_indices, p_dof_indices);
-      J.add_matrix(Jv_p, v_dof_indices, p_dof_indices);
-      J.add_matrix(Ju_u, u_dof_indices, u_dof_indices);
-      J.add_matrix(Jv_u, v_dof_indices, u_dof_indices);
-      J.add_matrix(Ju_v, u_dof_indices, v_dof_indices);
-      J.add_matrix(Jv_v, v_dof_indices, v_dof_indices);
-      J.add_matrix(Jp_u, p_dof_indices, u_dof_indices);
-      J.add_matrix(Jp_v, p_dof_indices, v_dof_indices);
-      J.add_matrix(Jp_glm, p_dof_indices, global_lm_dof_indices);
-      J.add_matrix(Jglm_p, global_lm_dof_indices, p_dof_indices);
-      J.add_matrix(Jp_lmu, p_dof_indices, lm_u_dof_indices);
-      J.add_matrix(Jp_lmv, p_dof_indices, lm_v_dof_indices);
-      J.add_matrix(Jqu_lmu, qu_dof_indices, lm_u_dof_indices);
-      J.add_matrix(Jqv_lmv, qv_dof_indices, lm_v_dof_indices);
-      J.add_matrix(Ju_lmu, u_dof_indices, lm_u_dof_indices);
-      J.add_matrix(Jv_lmv, v_dof_indices, lm_v_dof_indices);
-      J.add_matrix(Jv_lmu, v_dof_indices, lm_u_dof_indices);
-      J.add_matrix(Ju_lmv, u_dof_indices, lm_v_dof_indices);
-      J.add_matrix(Jlmu_qu, lm_u_dof_indices, qu_dof_indices);
-      J.add_matrix(Jlmv_qv, lm_v_dof_indices, qv_dof_indices);
-      J.add_matrix(Jlmu_p, lm_u_dof_indices, p_dof_indices);
-      J.add_matrix(Jlmv_p, lm_v_dof_indices, p_dof_indices);
-      J.add_matrix(Jlmu_u, lm_u_dof_indices, u_dof_indices);
-      J.add_matrix(Jlmv_v, lm_v_dof_indices, v_dof_indices);
-      J.add_matrix(Jlmu_lmu, lm_u_dof_indices, lm_u_dof_indices);
-      J.add_matrix(Jlmv_lmu, lm_v_dof_indices, lm_u_dof_indices);
-      J.add_matrix(Jlmu_lmv, lm_u_dof_indices, lm_v_dof_indices);
-      J.add_matrix(Jlmv_lmv, lm_v_dof_indices, lm_v_dof_indices);
-
-      // Some preconditioners depend on having allocation of diagonal entries
-      for (const auto i : p_dof_indices)
-        J.add(i, i, 0);
-      for (const auto i : global_lm_dof_indices)
-        J.add(i, i, 0);
+      sc->add_matrix(*elem, qu_num, qu_num, Jqu_qu);
+      sc->add_matrix(*elem, qv_num, qv_num, Jqv_qv);
+      sc->add_matrix(*elem, qu_num, u_num, Jqu_u);
+      sc->add_matrix(*elem, qv_num, v_num, Jqv_v);
+      sc->add_matrix(*elem, u_num, qu_num, Ju_qu);
+      sc->add_matrix(*elem, v_num, qv_num, Jv_qv);
+      sc->add_matrix(*elem, u_num, p_num, Ju_p);
+      sc->add_matrix(*elem, v_num, p_num, Jv_p);
+      sc->add_matrix(*elem, u_num, u_num, Ju_u);
+      sc->add_matrix(*elem, v_num, u_num, Jv_u);
+      sc->add_matrix(*elem, u_num, v_num, Ju_v);
+      sc->add_matrix(*elem, v_num, v_num, Jv_v);
+      sc->add_matrix(*elem, p_num, u_num, Jp_u);
+      sc->add_matrix(*elem, p_num, v_num, Jp_v);
+      if (global_lm_num != invalid_uint)
+        {
+          sc->add_matrix(*elem, p_num, global_lm_num, Jp_glm);
+          sc->add_matrix(*elem, global_lm_num, p_num, Jglm_p);
+        }
+      sc->add_matrix(*elem, p_num, lm_u_num, Jp_lmu);
+      sc->add_matrix(*elem, p_num, lm_v_num, Jp_lmv);
+      sc->add_matrix(*elem, qu_num, lm_u_num, Jqu_lmu);
+      sc->add_matrix(*elem, qv_num, lm_v_num, Jqv_lmv);
+      sc->add_matrix(*elem, u_num, lm_u_num, Ju_lmu);
+      sc->add_matrix(*elem, v_num, lm_v_num, Jv_lmv);
+      sc->add_matrix(*elem, v_num, lm_u_num, Jv_lmu);
+      sc->add_matrix(*elem, u_num, lm_v_num, Ju_lmv);
+      sc->add_matrix(*elem, lm_u_num, qu_num, Jlmu_qu);
+      sc->add_matrix(*elem, lm_v_num, qv_num, Jlmv_qv);
+      sc->add_matrix(*elem, lm_u_num, p_num, Jlmu_p);
+      sc->add_matrix(*elem, lm_v_num, p_num, Jlmv_p);
+      sc->add_matrix(*elem, lm_u_num, u_num, Jlmu_u);
+      sc->add_matrix(*elem, lm_v_num, v_num, Jlmv_v);
+      sc->add_matrix(*elem, lm_u_num, lm_u_num, Jlmu_lmu);
+      sc->add_matrix(*elem, lm_v_num, lm_u_num, Jlmv_lmu);
+      sc->add_matrix(*elem, lm_u_num, lm_v_num, Jlmu_lmv);
+      sc->add_matrix(*elem, lm_v_num, lm_v_num, Jlmv_lmv);
     }
   }
 
@@ -1421,6 +1418,8 @@ main(int argc, char ** argv)
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
   const FEType lm_fe_type(FIRST, SIDE_HIERARCHIC);
 
+  StaticCondensation sc(mesh, system.get_dof_map());
+
   HDGProblem hdg(nu, cavity);
   hdg.mesh = &mesh;
   hdg.system = &system;
@@ -1433,9 +1432,11 @@ main(int argc, char ** argv)
   hdg.scalar_fe_face = FEBase::build(dimension, scalar_fe_type);
   hdg.lm_fe_face = FEBase::build(dimension, lm_fe_type);
   hdg.mms = mms;
+  hdg.sc = &sc;
 
   system.nonlinear_solver->residual_object = &hdg;
   system.nonlinear_solver->jacobian_object = &hdg;
+  system.nonlinear_solver->attach_preconditioner(&sc);
 
   hdg.init();
 
