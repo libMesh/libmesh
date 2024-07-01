@@ -33,9 +33,8 @@
 namespace libMesh
 {
 StaticCondensation::StaticCondensation(const MeshBase & mesh, const DofMap & dof_map)
-  : _mesh(mesh), _dof_map(dof_map)
+  : Preconditioner<Number>(dof_map.comm()), _mesh(mesh), _dof_map(dof_map)
 {
-  init();
 }
 
 auto
@@ -301,7 +300,7 @@ StaticCondensation::add_matrix(const Elem & elem,
 }
 
 void
-StaticCondensation::assemble_reduced_mat()
+StaticCondensation::setup()
 {
   for (auto & [elem_id, local_data] : _elem_to_local_data)
   {
@@ -439,9 +438,8 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
 }
 
 void
-StaticCondensation::solve(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol)
+StaticCondensation::apply(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol)
 {
-  assemble_reduced_mat();
   forward_elimination(full_rhs);
   _reduced_sol = full_sol.get_subvector(_local_trace_dofs);
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);

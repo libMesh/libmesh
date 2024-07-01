@@ -151,6 +151,7 @@ main(int argc, char ** argv)
 
   // Initialize the static condensation structure
   StaticCondensation sc(mesh, sys.get_dof_map());
+  sc.init();
 
   equation_systems.parameters.set<StaticCondensation *>("sc") = &sc;
 
@@ -171,9 +172,10 @@ main(int argc, char ** argv)
   // built PETSc.
   equation_systems.get_system("Poisson").solve();
 
-  // Do static condensation solve
+  // Do static condensation setup and apply/solve
+  sc.setup();
   auto sc_soln = sys.current_local_solution->zero_clone();
-  sc.solve(*sys.rhs, *sc_soln);
+  sc.apply(*sys.rhs, *sc_soln);
   libmesh_error_msg_if(!libMesh::relative_fuzzy_equals(*sys.solution, *sc_soln, 1e-4),
                        "mismatching solution");
   libMesh::out << "Static condensation reduced problem size to " << sc.get_condensed_mat().m()

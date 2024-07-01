@@ -32,6 +32,8 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/linear_solver.h"
+#include "libmesh/preconditioner.h"
+
 #include <unordered_map>
 #include <memory>
 #include <vector>
@@ -54,7 +56,7 @@ typedef Eigen::MatrixXd EigenMatrix;
 typedef Eigen::VectorXd EigenVector;
 #endif
 
-class StaticCondensation
+class StaticCondensation : public Preconditioner<Number>
 {
 public:
   StaticCondensation(const MeshBase & mesh, const DofMap & dof_map);
@@ -62,14 +64,17 @@ public:
   /**
    * Build the element global to local index maps and size the element matrices
    */
-  void init();
+  virtual void init() override;
+
+  virtual void setup() override;
+
+  virtual void apply(const NumericVector<Number> & full_rhs,
+                     NumericVector<Number> & full_sol) override;
 
   void add_matrix(const Elem & elem,
                   const unsigned int i_var,
                   const unsigned int j_var,
                   const DenseMatrix<Number> & k);
-
-  void solve(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol);
 
   const SparseMatrix<Number> & get_condensed_mat() const
   {
@@ -83,7 +88,6 @@ private:
                                 std::vector<Number> & elem_dof_values_vec,
                                 EigenVector & elem_dof_values);
 
-  void assemble_reduced_mat();
   void forward_elimination(const NumericVector<Number> & full_rhs);
   void backwards_substitution(const NumericVector<Number> & full_rhs,
                               NumericVector<Number> & full_sol);
