@@ -107,7 +107,8 @@ public:
          const std::set<GhostingFunctor *> & coupling_functors_in,
          const bool implicit_neighbor_dofs_in,
          const bool need_full_sparsity_pattern_in,
-         const bool calculate_constrained_in = false);
+         const bool calculate_constrained_in = false,
+         const bool trace_dofs_only_in = false);
 
   /**
    * Special functions.
@@ -211,16 +212,23 @@ private:
   const bool need_full_sparsity_pattern;
   const bool calculate_constrained;
 
-  // If there are "spider" nodes in the mesh (i.e. a single node which
-  // is connected to many 1D elements) and Constraints, we can end up
-  // sorting the same set of DOFs multiple times in handle_vi_vj(),
-  // only to find that it has no net effect on the final sparsity. In
-  // such cases it is much faster to keep track of (element_dofs_i,
-  // element_dofs_j) pairs which have already been handled and not
-  // repeat the computation. We use this data structure to keep track
-  // of hashes of sets of dofs we have already seen, thus avoiding
-  // unnecessary calculations.
+  /// Whether to only include trace dofs in the sparsity pattern. This
+  /// is useful when static condensation will be performed
+  const bool trace_dofs_only;
+
+  /// If there are "spider" nodes in the mesh (i.e. a single node which
+  /// is connected to many 1D elements) and Constraints, we can end up
+  /// sorting the same set of DOFs multiple times in handle_vi_vj(),
+  /// only to find that it has no net effect on the final sparsity. In
+  /// such cases it is much faster to keep track of (element_dofs_i,
+  /// element_dofs_j) pairs which have already been handled and not
+  /// repeat the computation. We use this data structure to keep track
+  /// of hashes of sets of dofs we have already seen, thus avoiding
+  /// unnecessary calculations.
   std::unordered_set<dof_id_type> hashed_dof_sets;
+
+  /// A dummy work vector to avoid repeated memory allocations
+  std::vector<dof_id_type> dummy_vec;
 
   void handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,
                     const std::vector<dof_id_type> & element_dofs_j);

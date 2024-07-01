@@ -32,6 +32,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"
 #include "libmesh/wrapped_petsc.h"
+#include "libmesh/fuzzy_equal.h"
 
 // C++ includes
 #ifdef LIBMESH_HAVE_UNISTD_H
@@ -139,7 +140,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   this->_is_initialized = true;
 
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt m_global   = static_cast<PetscInt>(m_in);
   PetscInt n_global   = static_cast<PetscInt>(n_in);
   PetscInt m_local    = static_cast<PetscInt>(m_l);
@@ -260,7 +261,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   libmesh_assert_equal_to (n_nz.size(), m_l);
   libmesh_assert_equal_to (n_oz.size(), m_l);
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt m_global   = static_cast<PetscInt>(m_in);
   PetscInt n_global   = static_cast<PetscInt>(n_in);
   PetscInt m_local    = static_cast<PetscInt>(m_l);
@@ -423,7 +424,7 @@ void PetscMatrix<T>::zero ()
 
   semiparallel_only();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   PetscInt m_l, n_l;
 
@@ -444,7 +445,7 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
 
   semiparallel_only();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // As of petsc-dev at the time of 3.1.0, MatZeroRows now takes two additional
   // optional arguments.  The optional arguments (x,b) can be used to specify the
@@ -524,7 +525,7 @@ Real PetscMatrix<T>::l1_norm () const
 
   semiparallel_only();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscReal petsc_value;
   Real value;
 
@@ -547,7 +548,7 @@ Real PetscMatrix<T>::linfty_norm () const
 
   semiparallel_only();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscReal petsc_value;
   Real value;
 
@@ -578,7 +579,7 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
       const_cast<PetscMatrix<T> *>(this)->close();
     }
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   WrappedPetsc<PetscViewer> petsc_viewer;
   ierr = PetscViewerCreate (this->comm().get(),
@@ -653,7 +654,7 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
       const_cast<PetscMatrix<T> *>(this)->close();
     }
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Print to screen if ostream is stdout
   if (os.rdbuf() == std::cout.rdbuf())
@@ -740,7 +741,7 @@ void PetscMatrix<T>::_petsc_viewer(const std::string & filename,
 {
   parallel_object_only();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // We'll get matrix sizes from the file, but we need to at least
   // have a Mat object
@@ -826,7 +827,7 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
   libmesh_assert_equal_to (rows.size(), n_rows);
   libmesh_assert_equal_to (cols.size(), n_cols);
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   ierr = MatSetValues(_mat,
                       n_rows, numeric_petsc_cast(rows.data()),
                       n_cols, numeric_petsc_cast(cols.data()),
@@ -852,7 +853,7 @@ void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T> & dm,
   const numeric_index_type n_bcols =
     cast_int<numeric_index_type>(bcols.size());
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
 #ifndef NDEBUG
   const numeric_index_type n_rows  =
@@ -907,7 +908,7 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
     submatrix.clear();
 
   // Construct row and column index sets.
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   WrappedPetsc<IS> isrow;
   ierr = ISCreateGeneral(this->comm().get(),
@@ -951,7 +952,7 @@ void PetscMatrix<T>::create_submatrix_nosort(SparseMatrix<T> & submatrix,
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * petsc_submatrix = cast_ptr<PetscMatrix<T> *>(&submatrix);
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   ierr=MatZeroEntries(petsc_submatrix->_mat);
   LIBMESH_CHKERR(ierr);
@@ -1086,7 +1087,7 @@ numeric_index_type PetscMatrix<T>::m () const
   libmesh_assert (this->initialized());
 
   PetscInt petsc_m=0, petsc_n=0;
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   ierr = MatGetSize (_mat, &petsc_m, &petsc_n);
   LIBMESH_CHKERR(ierr);
@@ -1113,7 +1114,7 @@ numeric_index_type PetscMatrix<T>::n () const
   libmesh_assert (this->initialized());
 
   PetscInt petsc_m=0, petsc_n=0;
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   ierr = MatGetSize (_mat, &petsc_m, &petsc_n);
   LIBMESH_CHKERR(ierr);
@@ -1157,7 +1158,7 @@ numeric_index_type PetscMatrix<T>::row_start () const
   libmesh_assert (this->initialized());
 
   PetscInt start=0, stop=0;
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   ierr = MatGetOwnershipRange(_mat, &start, &stop);
   LIBMESH_CHKERR(ierr);
@@ -1173,7 +1174,7 @@ numeric_index_type PetscMatrix<T>::row_stop () const
   libmesh_assert (this->initialized());
 
   PetscInt start=0, stop=0;
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   ierr = MatGetOwnershipRange(_mat, &start, &stop);
   LIBMESH_CHKERR(ierr);
@@ -1189,7 +1190,7 @@ numeric_index_type PetscMatrix<T>::col_start () const
   libmesh_assert (this->initialized());
 
   PetscInt start=0, stop=0;
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   ierr = MatGetOwnershipRangeColumn(_mat, &start, &stop);
   LIBMESH_CHKERR(ierr);
@@ -1205,7 +1206,7 @@ numeric_index_type PetscMatrix<T>::col_stop () const
   libmesh_assert (this->initialized());
 
   PetscInt start=0, stop=0;
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   ierr = MatGetOwnershipRangeColumn(_mat, &start, &stop);
   LIBMESH_CHKERR(ierr);
@@ -1222,7 +1223,7 @@ void PetscMatrix<T>::set (const numeric_index_type i,
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt i_val=i, j_val=j;
 
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
@@ -1240,7 +1241,7 @@ void PetscMatrix<T>::add (const numeric_index_type i,
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt i_val=i, j_val=j;
 
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
@@ -1279,7 +1280,7 @@ void PetscMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 
   libmesh_assert (X);
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // the matrix from which we copy the values has to be assembled/closed
   libmesh_assert(X->closed());
@@ -1303,7 +1304,7 @@ void PetscMatrix<T>::matrix_matrix_mult (SparseMatrix<T> & X_in, SparseMatrix<T>
   const PetscMatrix<T> * X = cast_ptr<const PetscMatrix<T> *> (&X_in);
   PetscMatrix<T> * Y = cast_ptr<PetscMatrix<T> *> (&Y_out);
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // the matrix from which we copy the values has to be assembled/closed
   libmesh_assert(X->closed());
@@ -1345,7 +1346,7 @@ PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
   if (!this->closed())
     this->close();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   auto pscm = cast_ptr<const PetscMatrix<T> *>(&spm);
 
@@ -1396,7 +1397,7 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
   T value=0.;
 
   PetscErrorCode
-    ierr = static_cast<PetscErrorCode>(0);
+    ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt
     ncols=0,
     i_val=static_cast<PetscInt>(i_in),
@@ -1449,7 +1450,7 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
   const PetscScalar * petsc_row;
   const PetscInt    * petsc_cols;
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt
     ncols=0,
     i_val = static_cast<PetscInt>(i_in);
@@ -1501,7 +1502,7 @@ bool PetscMatrix<T>::closed() const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscBool assembled;
 
   ierr = MatAssembled(_mat, &assembled);
@@ -1575,6 +1576,101 @@ SparseMatrix<T> & PetscMatrix<T>::operator= (const SparseMatrix<T> & v)
   return *this;
 }
 
+template <typename T>
+bool
+PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other, const Real tol) const
+{
+  const auto * const petsc_other = dynamic_cast<const PetscMatrix<Number> *>(&other);
+  if (!petsc_other)
+    // This result should be the same on all procs
+    return false;
+
+  Mat petsc_other_mat = petsc_other->_mat;
+  const PetscScalar *petsc_row, *petsc_row_other;
+  const PetscInt *petsc_cols, *petsc_cols_other;
+
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
+  PetscInt ncols = 0, ncols_other = 0;
+
+  bool equiv = true;
+  if ((this->local_m() != other.local_m()) || (this->local_n() != other.local_n()))
+  {
+    equiv = false;
+    goto globalComm;
+  }
+
+  for (const auto i : make_range(this->row_start(), this->row_stop()))
+  {
+    const auto i_val = static_cast<PetscInt>(i);
+
+    // the matrix needs to be closed for this to work
+    // this->close();
+    // but closing it is a semiparallel operation; we want operator()
+    // to run on one processor.
+    libmesh_assert(this->closed());
+    libmesh_assert(petsc_other->closed());
+
+    ierr = MatGetRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
+    LIBMESH_CHKERR(ierr);
+    ierr = MatGetRow(petsc_other_mat, i_val, &ncols_other, &petsc_cols_other, &petsc_row_other);
+    LIBMESH_CHKERR(ierr);
+
+    auto restore_rows = [this,
+                         i_val,
+                         petsc_other_mat,
+                         &ierr,
+                         &ncols,
+                         &petsc_cols,
+                         &petsc_row,
+                         &ncols_other,
+                         &petsc_cols_other,
+                         &petsc_row_other]()
+    {
+      ierr = MatRestoreRow(_mat, i_val, &ncols, &petsc_cols, &petsc_row);
+      LIBMESH_CHKERR(ierr);
+      ierr =
+          MatRestoreRow(petsc_other_mat, i_val, &ncols_other, &petsc_cols_other, &petsc_row_other);
+      LIBMESH_CHKERR(ierr);
+    };
+
+    auto compared_false = [&equiv, restore_rows]()
+    {
+      restore_rows();
+      equiv = false;
+    };
+
+    if (ncols != ncols_other)
+    {
+      compared_false();
+      goto globalComm;
+    }
+
+    // No need for fuzzy comparison here
+    for (const auto j_val : make_range(ncols))
+      if (petsc_cols[j_val] != petsc_cols_other[j_val])
+      {
+        compared_false();
+        goto globalComm;
+      }
+
+    for (const auto j_val : make_range(ncols))
+      if (relative_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], tol) ||
+          absolute_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], tol))
+        continue;
+      else
+      {
+        compared_false();
+        goto globalComm;
+      }
+
+    restore_rows();
+  }
+
+globalComm:
+  this->comm().min(equiv);
+
+  return equiv;
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations

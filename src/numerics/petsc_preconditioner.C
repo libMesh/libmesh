@@ -109,12 +109,12 @@ PC PetscPreconditioner<T>::pc()
 template <typename T>
 void PetscPreconditioner<T>::set_petsc_preconditioner_type (const PreconditionerType & preconditioner_type, PC & pc)
 {
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // get the communicator from the PETSc object
   Parallel::communicator comm;
   ierr = PetscObjectGetComm((PetscObject)pc, & comm);
-  if (ierr != static_cast<PetscErrorCode>(0))
+  if (ierr != LIBMESH_PETSC_SUCCESS)
     libmesh_error_msg("Error retrieving communicator");
   Parallel::Communicator communicator(comm);
 
@@ -255,12 +255,12 @@ template <typename T>
 void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type, PC & pc)
 {
   // For catching PETSc error return codes
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // get the communicator from the PETSc object
   Parallel::communicator comm;
   ierr = PetscObjectGetComm((PetscObject)pc, & comm);
-  if (ierr != static_cast<PetscErrorCode>(0))
+  if (ierr != LIBMESH_PETSC_SUCCESS)
     libmesh_error_msg("Error retrieving communicator");
   Parallel::Communicator communicator(comm);
 

@@ -432,6 +432,7 @@ AS_IF([test "x$enableexamples" = "xyes"],
                          examples/miscellaneous/miscellaneous_ex13/Makefile
                          examples/miscellaneous/miscellaneous_ex14/Makefile
                          examples/miscellaneous/miscellaneous_ex15/Makefile
+                         examples/miscellaneous/miscellaneous_ex16/Makefile
                          examples/optimization/optimization_ex1/Makefile
                          examples/optimization/optimization_ex2/Makefile
                          examples/subdomains/subdomains_ex1/Makefile

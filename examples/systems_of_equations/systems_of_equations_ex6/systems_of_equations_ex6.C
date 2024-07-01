@@ -100,7 +100,7 @@ public:
 
   virtual void configure_solver()
   {
-    PetscErrorCode ierr = 0;
+    auto ierr = LIBMESH_PETSC_SUCCESS;
     ierr = KSPSetType (_petsc_linear_solver.ksp(), const_cast<KSPType>(KSPCG));
     CHKERRABORT(_petsc_linear_solver.comm().get(), ierr);
 

@@ -422,7 +422,7 @@ form_functionA(SNES /*snes*/, Vec x, Vec Ax, void * ctx)
     eigen_system.copy_super_to_sub(*AX, wrapped_Ax);
   }
 
-  PetscFunctionReturn(0);
+  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
 PetscErrorCode
@@ -551,7 +551,7 @@ form_functionB(SNES /*snes*/, Vec x, Vec Bx, void * ctx)
     eigen_system.copy_super_to_sub(*BX, wrapped_Bx);
   }
 
-  PetscFunctionReturn(0);
+  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
 PetscErrorCode
@@ -711,7 +711,7 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
   ierr = MatAssemblyEnd(jac, MAT_FINAL_ASSEMBLY);
   CHKERRQ(ierr);
 
-  PetscFunctionReturn(0);
+  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
 #endif

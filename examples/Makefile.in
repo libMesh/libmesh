@@ -623,6 +623,7 @@ SUBDIRS = \
 	miscellaneous/miscellaneous_ex13 \
 	miscellaneous/miscellaneous_ex14 \
 	miscellaneous/miscellaneous_ex15 \
+	miscellaneous/miscellaneous_ex16 \
 	optimization/optimization_ex1 \
 	optimization/optimization_ex2 \
 	subdomains/subdomains_ex1 \

@@ -23,6 +23,7 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 #include "libmesh/libmesh_exceptions.h"
+#include "libmesh/petsc_macro.h"
 #include "timpi/communicator.h"
 
 #ifdef I
@@ -108,7 +109,7 @@ public:
   inline                                                                \
   void Function ## BeginEnd(const Parallel::Communicator & comm, const Args&... args) \
   {                                                                     \
-    PetscErrorCode ierr = static_cast<PetscErrorCode>(0);               \
+    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;               \
     ierr = Function ## Begin(args...);                                  \
     LIBMESH_CHKERR2(comm, ierr);                                        \
     ierr = Function ## End(args...);                                    \

@@ -48,7 +48,8 @@ Build::Build (const DofMap & dof_map_in,
               const std::set<GhostingFunctor *> & coupling_functors_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in,
-              const bool calculate_constrained_in) :
+              const bool calculate_constrained_in,
+              const bool trace_dofs_only_in) :
   ParallelObject(dof_map_in),
   dof_map(dof_map_in),
   dof_coupling(dof_coupling_in),
@@ -56,6 +57,7 @@ Build::Build (const DofMap & dof_map_in,
   implicit_neighbor_dofs(implicit_neighbor_dofs_in),
   need_full_sparsity_pattern(need_full_sparsity_pattern_in),
   calculate_constrained(calculate_constrained_in),
+  trace_dofs_only(trace_dofs_only_in),
   sparsity_pattern(),
   nonlocal_pattern(),
   n_nz(),
@@ -72,6 +74,7 @@ Build::Build (Build & other, Threads::split) :
   implicit_neighbor_dofs(other.implicit_neighbor_dofs),
   need_full_sparsity_pattern(other.need_full_sparsity_pattern),
   calculate_constrained(other.calculate_constrained),
+  trace_dofs_only(other.trace_dofs_only),
   hashed_dof_sets(other.hashed_dof_sets),
   sparsity_pattern(),
   nonlocal_pattern(),
@@ -93,7 +96,31 @@ void Build::sorted_connected_dofs(const Elem * elem,
                                   std::vector<dof_id_type> & dofs_vi,
                                   unsigned int vi)
 {
-  dof_map.dof_indices (elem, dofs_vi, vi);
+  if (trace_dofs_only)
+  {
+    auto trace_dofs_scalar_functor = [&dofs_vi](const Elem & /*elem*/,
+                                                std::vector<dof_id_type> & dof_indices,
+                                                const std::vector<dof_id_type> & scalar_dof_indices)
+    {
+      dof_indices.insert(dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+      dofs_vi.insert(dofs_vi.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+    };
+    auto trace_dofs_field_functor = [&dofs_vi](const Elem & functor_elem,
+                                               const unsigned int node_num,
+                                               std::vector<dof_id_type> & dof_indices,
+                                               const dof_id_type field_dof)
+    {
+      dof_indices.push_back(field_dof);
+      if (node_num != invalid_uint && !functor_elem.is_internal(node_num))
+        dofs_vi.push_back(field_dof);
+    };
+
+    dof_map.dof_indices(
+        elem, dummy_vec, vi, trace_dofs_scalar_functor, trace_dofs_field_functor, elem->p_level());
+  }
+  else
+    dof_map.dof_indices (elem, dofs_vi, vi);
+
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   dof_map.find_connected_dofs (dofs_vi);
 #endif

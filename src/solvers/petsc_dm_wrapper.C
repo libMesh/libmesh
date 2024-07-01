@@ -196,7 +196,7 @@ namespace libMesh
           CHKERRQ(ierr);
         }
 
-      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
     }
 
     //! Help PETSc identify the finer DM given a dmc
@@ -220,7 +220,7 @@ namespace libMesh
       libmesh_assert(*(p_ctx->finer_dm));
       *(dmf) = *(p_ctx->finer_dm);
 
-      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
     }
 
     //! Help PETSc identify the coarser DM dmc given the fine DM dmf
@@ -310,7 +310,7 @@ namespace libMesh
         *(dmc) = *(p_ctx_f->coarser_dm);
       }
 
-      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
     }
 
     //! Function to give PETSc that sets the Interpolation Matrix between two DMs
@@ -403,7 +403,7 @@ namespace libMesh
       // Vec scaling isnt needed so were done.
       *(vec) = LIBMESH_PETSC_NULLPTR;
 
-      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
     } // end libmesh_petsc_DMCreateInterpolation
 
     //! Function to give PETSc that sets the Restriction Matrix between two DMs
@@ -433,7 +433,7 @@ namespace libMesh
       libmesh_assert(p_ctx_f->K_restrict_ptr);
       *(mat) = p_ctx_f->K_restrict_ptr->mat();
 
-      PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
     }
 
   } // end extern C functions
