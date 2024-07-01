@@ -1580,7 +1580,9 @@ SparseMatrix<T> & PetscMatrix<T>::operator= (const SparseMatrix<T> & v)
 
 template <typename T>
 bool
-PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other, const Real tol) const
+PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other,
+                            const Real rel_tol,
+                            const Real abs_tol) const
 {
   const auto * const petsc_other = dynamic_cast<const PetscMatrix<Number> *>(&other);
   if (!petsc_other)
@@ -1598,7 +1600,7 @@ PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other, const Real tol) const
   if ((this->local_m() != other.local_m()) || (this->local_n() != other.local_n()))
   {
     equiv = false;
-    goto endLoop;
+    goto globalComm;
   }
 
   for (const auto i : make_range(this->row_start(), this->row_stop()))
@@ -1644,7 +1646,7 @@ PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other, const Real tol) const
     if (ncols != ncols_other)
     {
       compared_false();
-      goto endLoop;
+      goto globalComm;
     }
 
     // No need for fuzzy comparison here
@@ -1655,19 +1657,19 @@ PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other, const Real tol) const
       compared_false();
 
     for (const auto j_val : make_range(ncols))
-      if (relative_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], tol) ||
-          absolute_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], tol))
+      if (relative_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], rel_tol) ||
+          absolute_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], abs_tol))
         continue;
       else
       {
         compared_false();
-        goto endLoop;
+        goto globalComm;
       }
 
     restore_rows();
   }
 
-endLoop:
+globalComm:
   this->comm().min(equiv);
 
   return equiv;

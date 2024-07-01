@@ -855,10 +855,11 @@ void SparseMatrix<T>::read_petsc_hdf5(const std::string &)
     ("libMesh cannot read PETSc HDF5-format files into non-PETSc matrices");
 }
 
-
-
 template <typename T>
-bool SparseMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other, const Real tol) const
+bool
+SparseMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other,
+                             const Real rel_tol,
+                             const Real abs_tol) const
 {
   bool equiv = true;
   if ((this->local_m() != other.local_m()) || (this->local_n() != other.local_n()))
@@ -868,22 +869,21 @@ bool SparseMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other, const Real tol)
     for (const auto i : make_range(this->row_start(), this->row_stop()))
       for (const auto j : make_range(this->col_start(), this->col_stop()))
       {
-        if (relative_fuzzy_equal((*this)(i, j), other(i, j), tol) ||
-            absolute_fuzzy_equal((*this)(i, j), other(i, j), tol))
+        if (relative_fuzzy_equal((*this)(i, j), other(i, j), rel_tol) ||
+            absolute_fuzzy_equal((*this)(i, j), other(i, j), abs_tol))
           continue;
         else
         {
           equiv = false;
-          goto endLoops;
+          goto globalComm;
         }
       }
 
-endLoops:
+globalComm:
   this->comm().min(equiv);
 
   return equiv;
 }
-
 
 //------------------------------------------------------------------
 // Explicit instantiations

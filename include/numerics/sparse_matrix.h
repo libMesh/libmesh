@@ -573,12 +573,14 @@ public:
                        std::vector<numeric_index_type> & indices,
                        std::vector<T> & values) const = 0;
 
-
   /**
-   * checks whether the matrix \p other is fuzzy equal to this matrix
+   * checks whether the matrix \p other is fuzzy equal to this matrix by doing element-wise
+   * comparisons. A given element will be deemed fuzzy equal if either a relative or absolute
+   * tolerance fuzzy equal comparison returns true
    */
   virtual bool fuzzy_equal(const SparseMatrix<T> & other,
-                           const Real tol = TOLERANCE) const;
+                           const Real rel_tol = TOLERANCE,
+                           const Real abs_tol = TOLERANCE) const;
 
 protected:
   /**

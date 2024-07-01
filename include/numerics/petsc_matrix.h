@@ -350,7 +350,8 @@ public:
                                         const std::vector<numeric_index_type> & cols) const override;
 
   virtual bool fuzzy_equal(const SparseMatrix<T> & other,
-                           const Real tol = TOLERANCE) const override;
+                           const Real rel_tol = TOLERANCE,
+                           const Real abs_tol = TOLERANCE) const override;
 
 protected:
 
