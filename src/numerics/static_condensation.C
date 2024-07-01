@@ -326,9 +326,17 @@ StaticCondensation::setup()
 {
   _reduced_sys_mat->zero();
 
+  const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "\n");
+  auto original_flags = libMesh::out.flags();
+  libMesh::out << std::fixed << std::setprecision(2);
+
   for (auto & [elem_id, local_data] : _elem_to_local_data)
   {
     libmesh_ignore(elem_id);
+    libMesh::out << "A Matrix in custom CSV format:\n"
+                  << local_data.Aii.format(CSVFormat) << std::endl;
+    libMesh::out << "For elem id " << elem_id << " the A determinant is "
+                 << local_data.Aii.determinant() << std::endl;
     local_data.AiiFactor = local_data.Aii.partialPivLu();
     const EigenMatrix S =
         local_data.Abb - local_data.Abi * local_data.AiiFactor.solve(local_data.Aib);
@@ -339,6 +347,7 @@ StaticCondensation::setup()
     _reduced_sys_mat->add_matrix(shim, local_data.reduced_space_indices);
   }
 
+  libMesh::out.flags(original_flags);
   _reduced_sys_mat->close();
 }
 
