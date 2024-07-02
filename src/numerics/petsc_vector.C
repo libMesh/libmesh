@@ -1426,15 +1426,17 @@ PetscVector<T>::get_subvector(const std::vector<numeric_index_type> & rows)
   ierr = VecGetSubVector(_vec, parent_is, &subvec);
   LIBMESH_CHKERR(ierr);
 
+  this->_is_closed = false;
+
   return std::make_unique<PetscVector<T>>(subvec, this->comm());
 }
 
 template <typename T>
 void
-PetscVector<T>::restore_subvector(NumericVector<T> && subvector,
+PetscVector<T>::restore_subvector(std::unique_ptr<NumericVector<T>> subvector,
                                   const std::vector<numeric_index_type> & rows)
 {
-  auto * const petsc_subvector = cast_ptr<PetscVector<T> *>(&subvector);
+  auto * const petsc_subvector = cast_ptr<PetscVector<T> *>(subvector.get());
 
   // Construct index set
   WrappedPetsc<IS> parent_is;
@@ -1448,6 +1450,11 @@ PetscVector<T>::restore_subvector(NumericVector<T> && subvector,
   Vec subvec = petsc_subvector->vec();
   ierr = VecRestoreSubVector(_vec, parent_is, &subvec);
   LIBMESH_CHKERR(ierr);
+
+  if (this->type() == GHOSTED)
+    VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
+
+  this->_is_closed = true;
 }
 
 //------------------------------------------------------------------
