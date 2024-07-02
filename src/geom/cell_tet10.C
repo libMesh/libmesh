@@ -780,6 +780,8 @@ void Tet10::permute(unsigned int perm_num)
 
 void Tet10::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,2);
   swap2nodes(4,5);
   swap2nodes(7,9);

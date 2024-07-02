@@ -306,9 +306,15 @@ dof_id_type n_nodes (const MeshBase::const_node_iterator & begin,
 
 
 /**
- * Find the maximum h-refinement level in a mesh.
+ * Find the total volume of a mesh (interpreting that as area for \p
+ * dim = 2, or total arc length for \p dim = 1, or number of NodeElem
+ * in the mesh for \p dim = 0).  By default the dimension chosen will
+ * be the mesh_dimension(), which if not manually overridden will be
+ * the largest dimension of elements in the mesh.
  */
-unsigned int max_level (const MeshBase & mesh);
+Real volume (const MeshBase & mesh,
+             unsigned int dim=libMesh::invalid_uint);
+
 
 /**
  * Given a mesh and a node in the mesh, the vector will be filled with

@@ -200,6 +200,7 @@ include_HEADERS =  \
         mesh/mesh_input.h \
         mesh/mesh_inserter_iterator.h \
         mesh/mesh_modification.h \
+        mesh/mesh_netgen_interface.h \
         mesh/mesh_output.h \
         mesh/mesh_refinement.h \
         mesh/mesh_serializer.h \
@@ -207,6 +208,7 @@ include_HEADERS =  \
         mesh/mesh_smoother_laplace.h \
         mesh/mesh_smoother_vsmoother.h \
         mesh/mesh_subdivision_support.h \
+        mesh/mesh_tet_interface.h \
         mesh/mesh_tetgen_interface.h \
         mesh/mesh_tetgen_wrapper.h \
         mesh/mesh_tools.h \

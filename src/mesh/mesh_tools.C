@@ -863,6 +863,35 @@ dof_id_type n_nodes (const MeshBase::const_node_iterator & begin,
 
 
 
+Real volume (const MeshBase & mesh,
+             unsigned int dim)
+{
+  libmesh_parallel_only(mesh.comm());
+
+  if (dim == libMesh::invalid_uint)
+    dim = mesh.mesh_dimension();
+
+  Real vol = 0;
+
+  // first my local elements
+  for (const auto & elem : as_range(mesh.local_elements_begin(),
+                                    mesh.local_elements_end()))
+    if (elem->dim() == dim)
+      vol += elem->volume();
+
+  // then count any unpartitioned objects, once
+  if (mesh.processor_id() == 0)
+    for (const auto & elem : as_range(mesh.unpartitioned_elements_begin(),
+                                      mesh.unpartitioned_elements_end()))
+      if (elem->dim() == dim)
+        vol += elem->volume();
+
+  mesh.comm().sum(vol);
+  return vol;
+}
+
+
+
 unsigned int n_p_levels (const MeshBase & mesh)
 {
   libmesh_parallel_only(mesh.comm());
