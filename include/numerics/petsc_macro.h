@@ -107,8 +107,10 @@
 // As of 3.19, PETSC_NULL is deprecated
 #if PETSC_VERSION_LESS_THAN(3,19,0)
 # define LIBMESH_PETSC_NULLPTR PETSC_NULL
+# define LIBMESH_PETSC_SUCCESS static_cast<PetscErrorCode>(0)
 #else
 # define LIBMESH_PETSC_NULLPTR PETSC_NULLPTR
+# define LIBMESH_PETSC_SUCCESS PETSC_SUCCESS
 #endif
 
 // If we're using quad precision, we need to disambiguate std

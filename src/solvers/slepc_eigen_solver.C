@@ -86,7 +86,7 @@ template <typename T>
 void SlepcEigenSolver<T>::init ()
 {
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Initialize the data structures if not done so already.
   if (!this->initialized())
@@ -143,7 +143,7 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
 
   this->init ();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Prepare the matrix.  Note that the const_cast is only necessary
   // because PETSc does not accept a const void *.  Inside the member
@@ -282,7 +282,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
 
   this->init ();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Prepare the matrix. Note that the const_cast is only necessary
   // because PETSc does not accept a const void *.  Inside the member
@@ -327,7 +327,7 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
 
   this->init ();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
 
@@ -373,7 +373,7 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
 
   this->init ();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Prepare the matrices.  Note that the const_casts are only
   // necessary because PETSc does not accept a const void *.  Inside
@@ -501,7 +501,7 @@ SlepcEigenSolver<T>::_solve_helper(Mat precond,
                                    const double tol,         // solver tolerance
                                    const unsigned int m_its) // maximum number of iterations
 {
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // converged eigen pairs and number of iterations
   PetscInt nconv=0;
@@ -639,7 +639,7 @@ void SlepcEigenSolver<T>::print_eigenvalues() const
 template <typename T>
 void SlepcEigenSolver<T>::set_slepc_solver_type()
 {
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   switch (this->_eigen_solver_type)
     {
@@ -671,7 +671,7 @@ void SlepcEigenSolver<T>::set_slepc_solver_type()
 template <typename T>
 void SlepcEigenSolver<T>:: set_slepc_problem_type()
 {
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   switch (this->_eigen_problem_type)
     {
@@ -701,7 +701,7 @@ void SlepcEigenSolver<T>:: set_slepc_problem_type()
 template <typename T>
 void SlepcEigenSolver<T>:: set_slepc_position_of_spectrum()
 {
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   switch (this->_position_of_spectrum)
     {
@@ -784,7 +784,7 @@ template <typename T>
 std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(dof_id_type i,
                                                          NumericVector<T> & solution_in)
 {
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   PetscReal re, im;
 
@@ -817,7 +817,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenpair(dof_id_type i,
 template <typename T>
 std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenvalue(dof_id_type i)
 {
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   PetscReal re, im;
 
@@ -842,7 +842,7 @@ std::pair<Real, Real> SlepcEigenSolver<T>::get_eigenvalue(dof_id_type i)
 template <typename T>
 Real SlepcEigenSolver<T>::get_relative_error(unsigned int i)
 {
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscReal error;
 
 #if SLEPC_VERSION_LESS_THAN(3,6,0)
@@ -861,7 +861,7 @@ void SlepcEigenSolver<T>::attach_deflation_space(NumericVector<T> & deflation_ve
 {
   this->init();
 
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Make sure the input vector is actually a PetscVector
   PetscVector<T> * deflation_vector_petsc_vec =
@@ -898,7 +898,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   PetscFunctionBegin;
 
   // Get the matrix context.
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
   CHKERRQ(ierr);
@@ -922,7 +922,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   PetscFunctionBegin;
 
   // Get the matrix context.
-  PetscErrorCode ierr = static_cast<PetscErrorCode>(0);
+  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   void * ctx;
   ierr = MatShellGetContext(mat,&ctx);
   CHKERRQ(ierr);

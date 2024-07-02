@@ -41,7 +41,7 @@ PetscErrorCode DMlibMeshSetSystem(DM dm, libMesh::NonlinearImplicitSystem & sys)
   ierr = PetscObjectQueryFunction((PetscObject)dm,"DMlibMeshSetSystem_C",&f);CHKERRQ(ierr);
   if (!f) SETERRQ(PETSC_COMM_SELF,PETSC_ERR_SUP, "DM has no implementation for DMlibMeshSetSystem");
   ierr = (*f)(dm,sys);CHKERRQ(ierr);
-  PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
 #undef  __FUNCT__
@@ -56,7 +56,7 @@ PetscErrorCode DMlibMeshGetSystem(DM dm, libMesh::NonlinearImplicitSystem *& sys
   ierr = PetscObjectQueryFunction((PetscObject)dm,"DMlibMeshGetSystem_C",&f);CHKERRQ(ierr);
   if (!f) SETERRQ(PETSC_COMM_SELF,PETSC_ERR_SUP, "DM has no implementation for DMlibMeshGetSystem");
   ierr = (*f)(dm,sys);CHKERRQ(ierr);
-  PetscFunctionReturn(static_cast<PetscErrorCode>(0));
+  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
 #endif // LIBMESH_HAVE_PETSC
