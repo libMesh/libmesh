@@ -749,7 +749,7 @@ public:
    * rows.  This  is currently only implemented for
    * PetscVectors.
    */
-  virtual void restore_subvector(std::unique_ptr<NumericVector<T>> &&,
+  virtual void restore_subvector(std::unique_ptr<NumericVector<T>>,
                                  const std::vector<numeric_index_type> &)
   {
     libmesh_not_implemented();
