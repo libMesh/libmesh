@@ -32,7 +32,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/utility.h"
 #include "libmesh/wrapped_petsc.h"
-#include "libmesh/fuzzy_equal.h"
+#include "libmesh/fuzzy_equals.h"
 
 // C++ includes
 #ifdef LIBMESH_HAVE_UNISTD_H
@@ -1578,9 +1578,9 @@ SparseMatrix<T> & PetscMatrix<T>::operator= (const SparseMatrix<T> & v)
 
 template <typename T>
 bool
-PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other,
-                            const Real rel_tol,
-                            const Real abs_tol) const
+PetscMatrix<T>::fuzzy_equals(const SparseMatrix<T> & other,
+                             const Real rel_tol,
+                             const Real abs_tol) const
 {
   const auto * const petsc_other = dynamic_cast<const PetscMatrix<Number> *>(&other);
   if (!petsc_other)
@@ -1656,8 +1656,8 @@ PetscMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other,
       }
 
     for (const auto j_val : make_range(ncols))
-      if (relative_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], rel_tol) ||
-          absolute_fuzzy_equal(petsc_row[j_val], petsc_row_other[j_val], abs_tol))
+      if (relative_fuzzy_equals(petsc_row[j_val], petsc_row_other[j_val], rel_tol) ||
+          absolute_fuzzy_equals(petsc_row[j_val], petsc_row_other[j_val], abs_tol))
         continue;
       else
       {

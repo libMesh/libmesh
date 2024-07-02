@@ -349,9 +349,9 @@ public:
                                         const std::vector<numeric_index_type> & rows,
                                         const std::vector<numeric_index_type> & cols) const override;
 
-  virtual bool fuzzy_equal(const SparseMatrix<T> & other,
-                           const Real rel_tol = TOLERANCE,
-                           const Real abs_tol = TOLERANCE) const override;
+  virtual bool fuzzy_equals(const SparseMatrix<T> & other,
+                            const Real rel_tol = TOLERANCE,
+                            const Real abs_tol = TOLERANCE) const override;
 
 protected:
 

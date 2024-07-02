@@ -32,7 +32,7 @@
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/enum_solver_package.h"
-#include "libmesh/fuzzy_equal.h"
+#include "libmesh/fuzzy_equals.h"
 
 
 // gzstream for reading compressed files as a stream
@@ -857,9 +857,9 @@ void SparseMatrix<T>::read_petsc_hdf5(const std::string &)
 
 template <typename T>
 bool
-SparseMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other,
-                             const Real rel_tol,
-                             const Real abs_tol) const
+SparseMatrix<T>::fuzzy_equals(const SparseMatrix<T> & other,
+                              const Real rel_tol,
+                              const Real abs_tol) const
 {
   bool equiv = true;
   if ((this->local_m() != other.local_m()) || (this->local_n() != other.local_n()))
@@ -869,8 +869,8 @@ SparseMatrix<T>::fuzzy_equal(const SparseMatrix<T> & other,
     for (const auto i : make_range(this->row_start(), this->row_stop()))
       for (const auto j : make_range(this->col_start(), this->col_stop()))
       {
-        if (relative_fuzzy_equal((*this)(i, j), other(i, j), rel_tol) ||
-            absolute_fuzzy_equal((*this)(i, j), other(i, j), abs_tol))
+        if (relative_fuzzy_equals((*this)(i, j), other(i, j), rel_tol) ||
+            absolute_fuzzy_equals((*this)(i, j), other(i, j), abs_tol))
           continue;
         else
         {

@@ -791,9 +791,9 @@ public:
    * A given element will be deemed fuzzy equal if either a relative or absolute tolerance fuzzy
    * equal comparison returns true
    */
-  bool fuzzy_equal(const NumericVector<T> & v,
-                   const Real rel_tol = TOLERANCE,
-                   const Real abs_tol = TOLERANCE) const;
+  bool fuzzy_equals(const NumericVector<T> & v,
+                    const Real rel_tol = TOLERANCE,
+                    const Real abs_tol = TOLERANCE) const;
 
 protected:
 

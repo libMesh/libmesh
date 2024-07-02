@@ -578,9 +578,9 @@ public:
    * comparisons. A given element will be deemed fuzzy equal if either a relative or absolute
    * tolerance fuzzy equal comparison returns true
    */
-  virtual bool fuzzy_equal(const SparseMatrix<T> & other,
-                           const Real rel_tol = TOLERANCE,
-                           const Real abs_tol = TOLERANCE) const;
+  virtual bool fuzzy_equals(const SparseMatrix<T> & other,
+                            const Real rel_tol = TOLERANCE,
+                            const Real abs_tol = TOLERANCE) const;
 
 protected:
   /**

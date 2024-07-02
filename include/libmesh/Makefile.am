@@ -454,7 +454,7 @@ BUILT_SOURCES = \
         compare_types.h \
         enum_to_string.h \
         error_vector.h \
-        fuzzy_equal.h \
+        fuzzy_equals.h \
         hashing.h \
         hashword.h \
         ignore_warnings.h \
@@ -1938,7 +1938,7 @@ enum_to_string.h: $(top_srcdir)/include/utils/enum_to_string.h
 error_vector.h: $(top_srcdir)/include/utils/error_vector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-fuzzy_equal.h: $(top_srcdir)/include/utils/fuzzy_equal.h
+fuzzy_equals.h: $(top_srcdir)/include/utils/fuzzy_equals.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 hashing.h: $(top_srcdir)/include/utils/hashing.h

@@ -38,7 +38,7 @@ template <typename T,
           typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
                                       ScalarTraits<T3>::value,
                                   int>::type = 0>
-bool absolute_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE * TOLERANCE);
+bool absolute_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE * TOLERANCE);
 
 /**
  * Function to check whether both the real and imaginary parts of two complex variables are equal
@@ -53,12 +53,12 @@ template <typename T,
           typename T3 = T,
           typename std::enable_if<ScalarTraits<T3>::value, int>::type = 0>
 bool
-absolute_fuzzy_equal(const std::complex<T> & var1,
+absolute_fuzzy_equals(const std::complex<T> & var1,
                      const std::complex<T2> & var2,
                      const T3 & tol = TOLERANCE * TOLERANCE)
 {
-  return absolute_fuzzy_equal(var1.real(), var2.real(), tol) &&
-         absolute_fuzzy_equal(var1.imag(), var2.imag(), tol);
+  return absolute_fuzzy_equals(var1.real(), var2.real(), tol) &&
+         absolute_fuzzy_equals(var1.imag(), var2.imag(), tol);
 }
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -79,7 +79,7 @@ template <typename T,
                                       ScalarTraits<T3>::value,
                                   int>::type>
 bool
-absolute_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol)
+absolute_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol)
 {
   return (std::abs(MetaPhysicL::raw_value(var1) - MetaPhysicL::raw_value(var2)) <=
           MetaPhysicL::raw_value(tol));
@@ -94,21 +94,21 @@ absolute_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol)
  */
 template <typename T, typename T2, typename T3 = Real>
 bool
-relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE * TOLERANCE)
+relative_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE * TOLERANCE)
 {
   if constexpr (ScalarTraits<T>::value || TensorTools::MathWrapperTraits<T>::value)
   {
     static_assert(TensorTools::TensorTraits<T>::rank == TensorTools::TensorTraits<T2>::rank,
                   "Mathematical types must be same for arguments to relativelyFuzzEqual");
     if constexpr (TensorTools::TensorTraits<T>::rank == 0)
-      return absolute_fuzzy_equal(
+      return absolute_fuzzy_equals(
           var1,
           var2,
           tol * (std::abs(MetaPhysicL::raw_value(var1)) + std::abs(MetaPhysicL::raw_value(var2))));
     else if constexpr (TensorTools::TensorTraits<T>::rank == 1)
     {
       for (const auto i : make_range(libmesh_dim))
-        if (!relative_fuzzy_equal(var1(i), var2(i), tol))
+        if (!relative_fuzzy_equals(var1(i), var2(i), tol))
           return false;
 
       return true;
@@ -117,7 +117,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     {
       for (const auto i : make_range(libmesh_dim))
         for (const auto j : make_range(libmesh_dim))
-          if (!relative_fuzzy_equal(var1(i, j), var2(i, j), tol))
+          if (!relative_fuzzy_equals(var1(i, j), var2(i, j), tol))
             return false;
 
       return true;
@@ -128,7 +128,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     // We dare to dream
     libmesh_assert(var1.size() == var2.size());
     for (const auto i : index_range(var1))
-      if (!relative_fuzzy_equal(var1(i), var2(i), tol))
+      if (!relative_fuzzy_equals(var1(i), var2(i), tol))
         return false;
 
     return true;
@@ -144,7 +144,7 @@ template <typename T,
                                       ScalarTraits<T3>::value,
                                   int>::type>
 bool
-absolute_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol)
+absolute_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol)
 {
   return (std::abs(var1 - var2) <= tol);
 }
@@ -158,18 +158,18 @@ absolute_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol)
  */
 template <typename T, typename T2, typename T3 = Real>
 bool
-relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE * TOLERANCE)
+relative_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE * TOLERANCE)
 {
   if constexpr (ScalarTraits<T>::value || TensorTools::MathWrapperTraits<T>::value)
   {
     static_assert(TensorTools::TensorTraits<T>::rank == TensorTools::TensorTraits<T2>::rank,
                   "Mathematical types must be same for arguments to relativelyFuzzEqual");
     if constexpr (TensorTools::TensorTraits<T>::rank == 0)
-      return absolute_fuzzy_equal(var1, var2, tol * (std::abs(var1) + std::abs(var2)));
+      return absolute_fuzzy_equals(var1, var2, tol * (std::abs(var1) + std::abs(var2)));
     else if constexpr (TensorTools::TensorTraits<T>::rank == 1)
     {
       for (const auto i : make_range(libmesh_dim))
-        if (!relative_fuzzy_equal(var1(i), var2(i), tol))
+        if (!relative_fuzzy_equals(var1(i), var2(i), tol))
           return false;
 
       return true;
@@ -178,7 +178,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     {
       for (const auto i : make_range(libmesh_dim))
         for (const auto j : make_range(libmesh_dim))
-          if (!relative_fuzzy_equal(var1(i, j), var2(i, j), tol))
+          if (!relative_fuzzy_equals(var1(i, j), var2(i, j), tol))
             return false;
 
       return true;
@@ -189,7 +189,7 @@ relative_fuzzy_equal(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE
     // We dare to dream
     mooseAssert(var1.size() == var2.size(), "These must be the same size");
     for (const auto i : index_range(var1))
-      if (!relative_fuzzy_equal(var1(i), var2(i), tol))
+      if (!relative_fuzzy_equals(var1(i), var2(i), tol))
         return false;
 
     return true;
