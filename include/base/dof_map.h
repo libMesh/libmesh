@@ -64,6 +64,7 @@ class PeriodicBoundaryBase;
 class PeriodicBoundaries;
 class System;
 class NonlinearImplicitSystem;
+class StaticCondensation;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -1632,13 +1633,13 @@ public:
    * which may be necessary in the case of spline control node
    * constraints or sufficiently many user constraints.
    *
-   * Can also be told to only include sparsity entries for the trace
-   * degrees of freedom via \p trace_dofs_only which is useful when the
+   * Can also be told to only include sparsity entries for uncondensed
+   * degrees of freedom via \p uncondensed_dofs_only which is useful when the
    * operator acts only on a statically condensed system
    */
   std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh,
                                                          const bool calculate_constrained = false,
-                                                         const bool trace_dofs_only = false) const;
+                                                         const bool uncondensed_dofs_only = false) const;
 
   /**
    * Describe whether the given variable group should be p-refined. If this API is not called with
@@ -1662,6 +1663,17 @@ public:
   bool should_p_refine(FEFamily) const = delete;
   bool should_p_refine(Order) const = delete;
 
+  /**
+   * Add a static condensation class (if it doesn't already exist) and return a reference to it
+   */
+  StaticCondensation & add_static_condensation();
+
+  /**
+   * @returns the static condensation class. This should have been already created with a call to \p
+   * add_static_condensation()
+   */
+  const StaticCondensation & get_static_condensation() const;
+
 private:
 
   /**
@@ -1680,10 +1692,10 @@ private:
                      const unsigned int vg,
                      const unsigned int vig,
                      const Node * const * nodes,
-                     unsigned int       n_nodes
+                     unsigned int       n_nodes,
+                     const unsigned int v
 #ifdef DEBUG
                      ,
-                     const unsigned int v,
                      std::size_t & tot_size
 #endif
                     ) const;
@@ -1696,8 +1708,8 @@ private:
                      const unsigned int vig,
                      const Node * const * nodes,
                      unsigned int       n_nodes,
-#ifdef DEBUG
                      const unsigned int v,
+#ifdef DEBUG
                      std::size_t & tot_size,
 #endif
                      PushBackFunctor pfunctor) const;
@@ -2128,6 +2140,9 @@ private:
    * objects stored.
    */
   bool _verify_dirichlet_bc_consistency;
+
+  /// Static condensation class. This may be built depending on the solver
+  std::unique_ptr<StaticCondensation> _sc;
 };
 
 
@@ -2418,8 +2433,8 @@ void DofMap::_dof_indices (const Elem & elem,
                            const unsigned int vig,
                            const Node * const * nodes,
                            unsigned int       n_nodes,
-#ifdef DEBUG
                            const unsigned int v,
+#ifdef DEBUG
                            std::size_t & tot_size,
 #endif
                            PushBackFunctor pfunctor) const
@@ -2510,7 +2525,7 @@ void DofMap::_dof_indices (const Elem & elem,
                     const dof_id_type d =
                       node.dof_number(sys_num, vg, vig, i, n_comp);
                     libmesh_assert_not_equal_to (d, DofObject::invalid_id);
-                    pfunctor(elem, n, di, d);
+                    pfunctor(elem, n, v, di, d);
                   }
             }
           // If this is a vertex or an element without extra hanging
@@ -2528,7 +2543,7 @@ void DofMap::_dof_indices (const Elem & elem,
                     node.dof_number(sys_num, vg, vig, i, n_comp);
                   libmesh_assert_not_equal_to (d, DofObject::invalid_id);
                   libmesh_assert_less (d, this->n_dofs());
-                  pfunctor(elem, n, di, d);
+                  pfunctor(elem, n, v, di, d);
                 }
 
               // With fewer good component indices than we need, e.g.
@@ -2559,7 +2574,7 @@ void DofMap::_dof_indices (const Elem & elem,
                     elem.dof_number(sys_num, vg, vig, i, n_comp);
                   libmesh_assert_not_equal_to (d, DofObject::invalid_id);
 
-                  pfunctor(elem, invalid_uint, di, d);
+                  pfunctor(elem, invalid_uint, v, di, d);
                 }
             }
           else
@@ -2615,9 +2630,9 @@ void DofMap::dof_indices (const Elem * const elem,
           MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
 
           _dof_indices(*elem, p_level, di, vg, vig, elem_nodes.data(),
-                       cast_int<unsigned int>(elem_nodes.size()),
+                       cast_int<unsigned int>(elem_nodes.size()), vn,
 #ifdef DEBUG
-                       vn, tot_size,
+                       tot_size,
 #endif
                        pfunctor);
         }
@@ -2639,15 +2654,22 @@ void DofMap::dof_indices (const Elem * const elem,
     }
   else if (elem)
     _dof_indices(*elem, p_level, di, vg, vig, elem->get_nodes(),
-                 elem->n_nodes(),
+                 elem->n_nodes(), vn,
 #ifdef DEBUG
-                 vn, tot_size,
+                 tot_size,
 #endif
                  pfunctor);
 
 #ifdef DEBUG
   libmesh_assert_equal_to (tot_size, di.size());
 #endif
+}
+
+inline
+const StaticCondensation & DofMap::get_static_condensation() const
+{
+  libmesh_assert(_sc);
+  return *_sc;
 }
 
 } // namespace libMesh

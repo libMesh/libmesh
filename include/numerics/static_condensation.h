@@ -26,12 +26,6 @@
 
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
-// These next three includes are not strictly necessary but unique_ptr will error with incomplete
-// type if user code does not have these includes, which could be confusing for the user because
-// they're only making calls on the StaticCondensation class
-#include "libmesh/numeric_vector.h"
-#include "libmesh/sparse_matrix.h"
-#include "libmesh/linear_solver.h"
 #include "libmesh/preconditioner.h"
 
 #include <unordered_map>
@@ -47,6 +41,12 @@ class DofMap;
 class Elem;
 template <typename>
 class DenseMatrix;
+template <typename>
+class LinearSolver;
+template <typename>
+class SparseMatrix;
+template <typename>
+class NumericVector;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 typedef Eigen::MatrixXcd EigenMatrix;
@@ -60,6 +60,7 @@ class StaticCondensation : public Preconditioner<Number>
 {
 public:
   StaticCondensation(const MeshBase & mesh, const DofMap & dof_map);
+  virtual ~StaticCondensation();
 
   /**
    * Build the element global to local index maps and size the element matrices
@@ -78,11 +79,19 @@ public:
                   const unsigned int j_var,
                   const DenseMatrix<Number> & k);
 
-  const SparseMatrix<Number> & get_condensed_mat() const
-  {
-    libmesh_assert(_reduced_sys_mat);
-    return *_reduced_sys_mat;
-  }
+  const SparseMatrix<Number> & get_condensed_mat() const;
+
+  /**
+   * Add \p vars to the list of variables not to condense. This can be useful when some variable's
+   * equation is discretized with a DG method or if including the variable in the condensed block
+   * diagonal would result in it being singular
+   */
+  void dont_condense_vars(const std::unordered_set<unsigned int> & vars);
+
+  /**
+   * @returns our list of variables for whom we do not condense out any dofs
+   */
+  const std::unordered_set<unsigned int> & uncondensed_vars() const { return _uncondensed_vars; }
 
 private:
   static void set_local_vectors(const NumericVector<Number> & global_vector,
@@ -95,34 +104,33 @@ private:
                               NumericVector<Number> & full_sol);
 
   static auto
-  computeElemInteriorDofsScalar(std::vector<dof_id_type> & elem_interior_dofs) -> decltype(auto);
+  total_and_condensed_from_scalar_dofs_functor(std::vector<dof_id_type> & elem_condensed_dofs);
 
-  static auto
-  computeElemInteriorDofsField(std::vector<dof_id_type> & elem_interior_dofs) -> decltype(auto);
+  auto total_and_condensed_from_field_dofs_functor(std::vector<dof_id_type> & elem_condensed_dofs);
 
   struct LocalData
   {
-    /// interior-interior matrix entries
-    EigenMatrix Aii;
-    /// interior-boundary matrix entries
-    EigenMatrix Aib;
-    /// boundary-interior matrix entries
-    EigenMatrix Abi;
-    /// boundary-boundary matrix entries
-    EigenMatrix Abb;
+    /// condensed-condensed matrix entries
+    EigenMatrix Acc;
+    /// condensed-uncondensed matrix entries
+    EigenMatrix Acu;
+    /// uncondensed-condensed matrix entries
+    EigenMatrix Auc;
+    /// uncondensed-uncondensed matrix entries
+    EigenMatrix Auu;
 
-    // Aii LU decompositions
-    typename std::remove_const<decltype(Aii.partialPivLu())>::type AiiFactor;
+    // Acc LU decompositions
+    typename std::remove_const<decltype(Acc.partialPivLu())>::type AccFactor;
 
     struct VarData
     {
-      unsigned int boundary_dofs_offset;
-      unsigned int interior_dofs_offset;
-      unsigned int num_boundary_dofs;
-      unsigned int num_interior_dofs;
+      unsigned int uncondensed_dofs_offset;
+      unsigned int condensed_dofs_offset;
+      unsigned int num_uncondensed_dofs;
+      unsigned int num_condensed_dofs;
     };
 
-    /// The trace degrees of freedom with global numbering corresponding to the the \emph reduced
+    /// The uncondensed degrees of freedom with global numbering corresponding to the the \emph reduced
     /// system. Note that initially this will actually hold the indices corresponding to the fully
     /// sized problem, but we will swap it out by the time we are done initializing
     std::vector<dof_id_type> reduced_space_indices;
@@ -131,7 +139,7 @@ private:
   };
 
   std::unordered_map<dof_id_type, LocalData> _elem_to_local_data;
-  std::vector<dof_id_type> _local_trace_dofs;
+  std::vector<dof_id_type> _local_uncondensed_dofs;
 
   const MeshBase & _mesh;
   const DofMap & _dof_map;
@@ -139,7 +147,24 @@ private:
   std::unique_ptr<NumericVector<Number>> _reduced_sol;
   std::unique_ptr<NumericVector<Number>> _reduced_rhs;
   std::unique_ptr<LinearSolver<Number>> _reduced_solver;
+
+  /// Variables for which we will keep all dofs
+  std::unordered_set<unsigned int> _uncondensed_vars;
 };
+
+inline const SparseMatrix<Number> &
+StaticCondensation::get_condensed_mat() const
+{
+  libmesh_assert(_reduced_sys_mat);
+  return *_reduced_sys_mat;
+}
+
+inline void
+StaticCondensation::dont_condense_vars(const std::unordered_set<unsigned int> & vars)
+{
+  _uncondensed_vars.insert(vars.begin(), vars.end());
+}
+
 }
 
 #endif // LIBMESH_HAVE_PETSC

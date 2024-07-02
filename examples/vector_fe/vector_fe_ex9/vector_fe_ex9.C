@@ -1410,7 +1410,7 @@ main(int argc, char ** argv)
   // Add our Lagrange multiplier to the implicit system
   system.add_variable("lm_u", FIRST, SIDE_HIERARCHIC);
   system.add_variable("lm_v", FIRST, SIDE_HIERARCHIC);
-  system.add_variable("pressure", FIRST, L2_LAGRANGE);
+  const auto p_num = system.add_variable("pressure", FIRST, L2_LAGRANGE);
   if (cavity)
     system.add_variable("global_lm", FIRST, SCALAR);
 
@@ -1418,7 +1418,8 @@ main(int argc, char ** argv)
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
   const FEType lm_fe_type(FIRST, SIDE_HIERARCHIC);
 
-  StaticCondensation sc(mesh, system.get_dof_map());
+  auto & sc = system.get_dof_map().add_static_condensation();
+  sc.dont_condense_vars({p_num});
 
   HDGProblem hdg(nu, cavity);
   hdg.mesh = &mesh;

@@ -39,6 +39,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
+#include "libmesh/static_condensation.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -59,7 +60,7 @@ namespace libMesh
 std::unique_ptr<SparsityPattern::Build>
 DofMap::build_sparsity (const MeshBase & mesh,
                         const bool calculate_constrained,
-                        const bool trace_dofs_only) const
+                        const bool uncondensed_dofs_only) const
 {
   libmesh_assert (mesh.is_prepared());
 
@@ -93,7 +94,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
      implicit_neighbor_dofs,
      need_full_sparsity_pattern,
      calculate_constrained,
-     trace_dofs_only);
+     uncondensed_dofs_only);
 
   Threads::parallel_reduce (ConstElemRange (mesh.active_local_elements_begin(),
                                             mesh.active_local_elements_end()), *sp);
@@ -2046,9 +2047,10 @@ void DofMap::dof_indices (const Elem * const elem,
                   {
                     _dof_indices(*elem, elem->p_level(), di, vg, vig,
                                  elem_nodes.data(),
-                                 cast_int<unsigned int>(elem_nodes.size())
+                                 cast_int<unsigned int>(elem_nodes.size()),
+                                 var.number(vig)
 #ifdef DEBUG
-                                 , var.number(vig), tot_size
+                                 , tot_size
 #endif
                                  );
                   }
@@ -2083,9 +2085,9 @@ void DofMap::dof_indices (const Elem * const elem,
         for (unsigned int vig=0; vig != vars_in_group; ++vig)
           {
             _dof_indices(*elem, elem->p_level(), di, vg, vig,
-                         elem->get_nodes(), n_nodes
+                         elem->get_nodes(), n_nodes, var.number(vig)
 #ifdef DEBUG
-                         , var.number(vig), tot_size
+                         , tot_size
 #endif
                      );
           }
@@ -2111,8 +2113,11 @@ void DofMap::dof_indices (const Elem * const elem,
          const std::vector<dof_id_type> & scalar_dof_indices) {
         dof_indices.insert(dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
       },
-      [](const Elem &, unsigned int, std::vector<dof_id_type> & dof_indices, const dof_id_type dof)
-      { dof_indices.push_back(dof); },
+      [](const Elem &,
+         unsigned int,
+         unsigned int,
+         std::vector<dof_id_type> & dof_indices,
+         const dof_id_type dof) { dof_indices.push_back(dof); },
       p_level);
 }
 
@@ -2318,20 +2323,20 @@ void DofMap::_node_dof_indices (const Elem & elem,
     }
 }
 
-
-void DofMap::_dof_indices (const Elem & elem,
-                           int p_level,
-                           std::vector<dof_id_type> & di,
-                           const unsigned int vg,
-                           const unsigned int vig,
-                           const Node * const * nodes,
-                           unsigned int       n_nodes
+void
+DofMap::_dof_indices(const Elem & elem,
+                     int p_level,
+                     std::vector<dof_id_type> & di,
+                     const unsigned int vg,
+                     const unsigned int vig,
+                     const Node * const * nodes,
+                     unsigned int n_nodes,
+                     const unsigned int v
 #ifdef DEBUG
-                           ,
-                           const unsigned int v,
-                           std::size_t & tot_size
+                     ,
+                     std::size_t & tot_size
 #endif
-                           ) const
+) const
 {
   _dof_indices(elem,
                p_level,
@@ -2340,12 +2345,15 @@ void DofMap::_dof_indices (const Elem & elem,
                vig,
                nodes,
                n_nodes,
-#ifdef DEBUG
                v,
+#ifdef DEBUG
                tot_size,
 #endif
-               [](const Elem &, unsigned int, std::vector<dof_id_type> & functor_di, const dof_id_type dof)
-               { functor_di.push_back(dof); });
+               [](const Elem &,
+                  unsigned int,
+                  unsigned int,
+                  std::vector<dof_id_type> & functor_di,
+                  const dof_id_type dof) { functor_di.push_back(dof); });
 }
 
 void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
@@ -2876,6 +2884,14 @@ std::string DofMap::get_info() const
   return os.str();
 }
 
+StaticCondensation &
+DofMap::add_static_condensation()
+{
+  if (!_sc)
+    _sc = std::make_unique<StaticCondensation>(_mesh, *this);
+
+  return *_sc;
+}
 
 template LIBMESH_EXPORT bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;
 template LIBMESH_EXPORT bool DofMap::is_evaluable<Node>(const Node &, unsigned int) const;
