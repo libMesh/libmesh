@@ -650,7 +650,7 @@ public:
             CPPUNIT_ASSERT(elem->is_internal(nd));
           else if (elem->type() == PRISM21 && nd == 20)
             CPPUNIT_ASSERT(elem->is_internal(nd));
-          else if (elem->type() == QUAD9 && nd == 8)
+          else if ((elem->type() == QUAD9 || elem->type() == QUADSHELL9) && nd == 8)
             CPPUNIT_ASSERT(elem->is_internal(nd));
           else if (elem->type() == TRI7 && nd == 6)
             CPPUNIT_ASSERT(elem->is_internal(nd));
