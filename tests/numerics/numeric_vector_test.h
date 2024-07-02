@@ -74,7 +74,11 @@ public:
     auto v_clone = v.clone();
     auto & vorig = *v_clone;
 
+    CPPUNIT_ASSERT(v.fuzzy_equals(vorig));
+
     v += v;
+
+    CPPUNIT_ASSERT(!v.fuzzy_equals(vorig));
 
     for (libMesh::dof_id_type n=first; n != last; n++)
       LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),

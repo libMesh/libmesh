@@ -353,6 +353,8 @@ public:
                             const Real rel_tol = TOLERANCE,
                             const Real abs_tol = TOLERANCE) const override;
 
+  virtual void scale(const T scale) override;
+
 protected:
 
   /**

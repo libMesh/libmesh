@@ -582,6 +582,11 @@ public:
                             const Real rel_tol = TOLERANCE,
                             const Real abs_tol = TOLERANCE) const;
 
+  /**
+   * Scales all elements of this matrix by \p scale
+   */
+  virtual void scale(const T scale);
+
 protected:
   /**
    * Protected implementation of the create_submatrix and reinit_submatrix

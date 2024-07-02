@@ -223,6 +223,8 @@ public:
   {
     LOG_UNIT_TEST;
 
+    setValues();
+
     // Matrix must be closed before it can be cloned.
     matrix->close();
 
@@ -239,6 +241,9 @@ public:
 
       // Check that copy has same values as original
       LIBMESH_ASSERT_FP_EQUAL(copy->l1_norm(), matrix->l1_norm(), _tolerance);
+      CPPUNIT_ASSERT(matrix->fuzzy_equals(*copy));
+      copy->scale(2);
+      CPPUNIT_ASSERT(!matrix->fuzzy_equals(*copy));
     }
 
     {

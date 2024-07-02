@@ -855,6 +855,8 @@ void SparseMatrix<T>::read_petsc_hdf5(const std::string &)
     ("libMesh cannot read PETSc HDF5-format files into non-PETSc matrices");
 }
 
+
+
 template <typename T>
 bool
 SparseMatrix<T>::fuzzy_equals(const SparseMatrix<T> & other,
@@ -883,6 +885,18 @@ globalComm:
   this->comm().min(equiv);
 
   return equiv;
+}
+
+
+
+template <typename T>
+void SparseMatrix<T>::scale(const T scale)
+{
+  libmesh_assert(this->closed());
+
+  for (const auto i : make_range(this->row_start(), this->row_stop()))
+    for (const auto j : make_range(this->col_start(), this->col_stop()))
+      this->set(i, j, (*this)(i, j) * scale);
 }
 
 //------------------------------------------------------------------
