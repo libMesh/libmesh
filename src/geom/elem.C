@@ -3206,13 +3206,13 @@ Elem::is_internal(const unsigned int i) const
       return false;
 
     case 1:
-      return !is_vertex(i);
+      return !this->is_vertex(i);
 
     case 2:
-      return !is_vertex(i) && !is_edge(i);
+      return !this->is_vertex(i) && !this->is_edge(i);
 
     case 3:
-      return !is_vertex(i) && !is_edge(i) && !is_face(i);
+      return !this->is_vertex(i) && !this->is_edge(i) && !this->is_face(i);
 
     default:
       libmesh_error_msg("impossible element dimension " << std::to_string(this->dim()));
