@@ -110,12 +110,12 @@ public:
   /**
    * We number edges next.
    */
-  virtual bool is_edge(const unsigned int i) const override final { return (i > 6 && i < 9); }
+  virtual bool is_edge(const unsigned int i) const override final { return (i >= 6 && i < 9); }
 
   /**
    * We number faces last.
    */
-  virtual bool is_face(const unsigned int i) const override final { return (i > 9 && i < 12); }
+  virtual bool is_face(const unsigned int i) const override final { return (i >= 9 && i < 12); }
 
   /**
    * \returns \p true if the specified (local) node number is a

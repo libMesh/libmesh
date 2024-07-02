@@ -654,6 +654,10 @@ public:
             CPPUNIT_ASSERT(elem->is_internal(nd));
           else if (elem->type() == TRI7 && nd == 6)
             CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if (elem->type() == INFHEX18 && nd == 17)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if (elem->type() == INFQUAD6 && nd == 5)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
           else
             CPPUNIT_ASSERT(!elem->is_internal(nd));
         }
