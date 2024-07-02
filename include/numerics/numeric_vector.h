@@ -786,6 +786,15 @@ public:
    */
   bool compatible(const NumericVector<T> & v) const;
 
+  /**
+   * checks whether the vector \p v is fuzzy equal to this vector by doing element-wise comparisons.
+   * A given element will be deemed fuzzy equal if either a relative or absolute tolerance fuzzy
+   * equal comparison returns true
+   */
+  bool fuzzy_equals(const NumericVector<T> & v,
+                    const Real rel_tol = TOLERANCE,
+                    const Real abs_tol = TOLERANCE) const;
+
 protected:
 
   /**

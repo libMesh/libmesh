@@ -32,6 +32,8 @@
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/enum_solver_package.h"
+#include "libmesh/fuzzy_equals.h"
+
 
 // gzstream for reading compressed files as a stream
 #ifdef LIBMESH_HAVE_GZSTREAM
@@ -854,6 +856,48 @@ void SparseMatrix<T>::read_petsc_hdf5(const std::string &)
 }
 
 
+
+template <typename T>
+bool
+SparseMatrix<T>::fuzzy_equals(const SparseMatrix<T> & other,
+                              const Real rel_tol,
+                              const Real abs_tol) const
+{
+  bool equiv = true;
+  if ((this->local_m() != other.local_m()) || (this->local_n() != other.local_n()))
+    equiv = false;
+
+  if (equiv)
+    for (const auto i : make_range(this->row_start(), this->row_stop()))
+      for (const auto j : make_range(this->col_start(), this->col_stop()))
+      {
+        if (relative_fuzzy_equals((*this)(i, j), other(i, j), rel_tol) ||
+            absolute_fuzzy_equals((*this)(i, j), other(i, j), abs_tol))
+          continue;
+        else
+        {
+          equiv = false;
+          goto globalComm;
+        }
+      }
+
+globalComm:
+  this->comm().min(equiv);
+
+  return equiv;
+}
+
+
+
+template <typename T>
+void SparseMatrix<T>::scale(const T scale)
+{
+  libmesh_assert(this->closed());
+
+  for (const auto i : make_range(this->row_start(), this->row_stop()))
+    for (const auto j : make_range(this->col_start(), this->col_stop()))
+      this->set(i, j, (*this)(i, j) * scale);
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations

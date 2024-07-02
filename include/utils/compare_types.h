@@ -279,6 +279,12 @@ struct ScalarTraits<MetaPhysicL::DualNumber<T, D, asd>>
 {
   static const bool value = ScalarTraits<T>::value;
 };
+template <typename T, typename D, bool asd>
+struct RealTraits<MetaPhysicL::DualNumber<T, D, asd>>
+{
+  static const bool value = RealTraits<T>::value;
+};
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_METAPHYSICL
