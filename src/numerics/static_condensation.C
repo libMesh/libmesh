@@ -341,13 +341,18 @@ StaticCondensation::setup()
 {
   _reduced_sys_mat->zero();
 
+  const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, 0, ", ", "\n");
+  auto original_flags = libMesh::out.flags();
+  libMesh::out << std::fixed << std::setprecision(2);
+
   for (auto & [elem_id, local_data] : _elem_to_local_data)
   {
     libmesh_ignore(elem_id);
-    Eigen::JacobiSVD<decltype(local_data.Acc)> svd(local_data.Acc);
-    const auto & singular_values = svd.singularValues();
-    libMesh::out << "For elem id " << elem_id << " the A condition number is "
-                 << singular_values(0) / singular_values(singular_values.size() - 1) << std::endl;
+    libMesh::out << "Matrix for elem ID " << elem_id << ":\n"
+                 << local_data.Acc.format(CSVFormat) << std::endl;
+    libMesh::out.flags(original_flags);
+    libMesh::out << "For elem id " << elem_id << " the A determinant is "
+                 << local_data.Acc.determinant() << std::endl;
     local_data.AccFactor = local_data.Acc.partialPivLu();
     const EigenMatrix S =
         local_data.Auu - local_data.Auc * local_data.AccFactor.solve(local_data.Acu);
