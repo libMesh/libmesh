@@ -32,7 +32,9 @@
 #include <memory>
 #include <vector>
 
+#include "libmesh/ignore_warnings.h"
 #include <Eigen/Dense>
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {
