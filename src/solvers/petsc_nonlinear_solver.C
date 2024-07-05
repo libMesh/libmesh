@@ -475,20 +475,25 @@ extern "C"
 
     PetscBool pisshell = PETSC_FALSE;
     if (pc)
-      {
-        ierr = PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &pisshell);
-        LIBMESH_CHKERR2(solver->comm(), ierr);
-      }
+      LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &pisshell));
 
     // We already computed the Jacobian during the residual evaluation
     if (solver->residual_and_jacobian_object)
     {
-      auto & sys_mat = static_cast<PetscMatrix<Number> &>(sys.get_system_matrix());
+      // We could be doing matrix-free in which case we cannot rely on closing of explicit matrices
+      // that occurs during the PETSc residual callback
+      if (jac)
+        {
+          PetscBool jisshell = PETSC_FALSE, jismffd = PETSC_FALSE;
+          LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATSHELL, &jisshell));
+          LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &jismffd));
+          if ((jisshell == PETSC_TRUE) || (jismffd == PETSC_TRUE))
+            // This is not an explicit/assembled matrix but we do this kind of abuse all over the place
+            Jac.close();
+        }
 
-      // We could be doing matrix-free
-      if (jac && jac != sys_mat.mat())
-        Jac.close();
-      if (pc && pc != sys_mat.mat())
+      if (pc && (pisshell == PETSC_TRUE))
+        // This is not an explicit/assembled matrix but we do this kind of abuse all over the place
         PC.close();
 
       PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
