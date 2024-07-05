@@ -198,11 +198,12 @@ StaticCondensation::init()
                                               elem_uncondensed_dofs.end());
     }
 
-    local_data.Acc.resize(condensed_dof_size, condensed_dof_size);
-    local_data.Acu.resize(condensed_dof_size, uncondensed_dof_size);
-    local_data.Auc.resize(uncondensed_dof_size, condensed_dof_size);
-    local_data.Auu.resize(uncondensed_dof_size, uncondensed_dof_size);
+    local_data.Acc.setZero(condensed_dof_size, condensed_dof_size);
+    local_data.Acu.setZero(condensed_dof_size, uncondensed_dof_size);
+    local_data.Auc.setZero(uncondensed_dof_size, condensed_dof_size);
+    local_data.Auu.setZero(uncondensed_dof_size, uncondensed_dof_size);
   }
+
   _local_uncondensed_dofs.assign(local_uncondensed_dofs.begin(), local_uncondensed_dofs.end());
   local_uncondensed_dofs.clear();
 
