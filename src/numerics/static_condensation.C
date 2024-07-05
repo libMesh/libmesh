@@ -151,6 +151,18 @@ StaticCondensation::init()
     total_and_condensed_from_field_dofs_functor(elem_condensed_dofs)(
         elem, node_num, var_num, dof_indices, field_dof);
 
+    if (_uncondensed_vars.count(var_num))
+    {
+      libmesh_assert_msg(
+          node_num == invalid_uint,
+          "Users should not be providing continuous FEM variables to the uncondensed vars API");
+      elem_uncondensed_dofs.push_back(field_dof);
+      if (elem.processor_id() == this->processor_id())
+        local_uncondensed_dofs.insert(field_dof);
+      else
+        nonlocal_uncondensed_dofs[elem.processor_id()].insert(field_dof);
+    }
+
     if (node_num != invalid_uint && !elem.is_internal(node_num))
     {
       elem_uncondensed_dofs.push_back(field_dof);
@@ -493,6 +505,14 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
   {
     total_and_condensed_from_field_dofs_functor(elem_condensed_dofs)(
         elem, node_num, var_num, dof_indices, field_dof);
+
+    if (_uncondensed_vars.count(var_num))
+    {
+      libmesh_assert_msg(
+          node_num == invalid_uint,
+          "Users should not be providing continuous FEM variables to the uncondensed vars API");
+      elem_uncondensed_dofs.push_back(field_dof);
+    }
 
     if (node_num != invalid_uint && !elem.is_internal(node_num))
       elem_uncondensed_dofs.push_back(field_dof);
