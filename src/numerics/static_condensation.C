@@ -28,13 +28,16 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/linear_solver.h"
+#include "libmesh/system.h"
 #include "timpi/parallel_sync.h"
 #include <unordered_set>
 
 namespace libMesh
 {
-StaticCondensation::StaticCondensation(const MeshBase & mesh, const DofMap & dof_map)
-  : Preconditioner<Number>(dof_map.comm()), _mesh(mesh), _dof_map(dof_map)
+StaticCondensation::StaticCondensation(const MeshBase & mesh,
+                                       const System & system,
+                                       const DofMap & dof_map)
+  : Preconditioner<Number>(dof_map.comm()), _mesh(mesh), _system(system), _dof_map(dof_map)
 {
 }
 
@@ -318,6 +321,9 @@ StaticCondensation::init()
           libmesh_map_find(full_dof_to_reduced_dof, full_dof));
   }
 
+  // Build ghosted full solution vector. Note that this is, in general, *not equal* to the system
+  // solution, e.g. this may correspond to the solution for the Newton *update*
+  _ghosted_full_sol = _system.current_local_solution->clone();
   _is_initialized = true;
 }
 
@@ -519,7 +525,7 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
 
     set_local_vectors(full_rhs, elem_condensed_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
     set_local_vectors(
-        full_sol, elem_uncondensed_dofs, elem_uncondensed_sol_vec, elem_uncondensed_sol);
+        *_ghosted_full_sol, elem_uncondensed_dofs, elem_uncondensed_sol_vec, elem_uncondensed_sol);
 
     elem_condensed_sol =
         local_data.AccFactor.solve(elem_condensed_rhs - local_data.Acu * elem_uncondensed_sol);
@@ -530,19 +536,21 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
 }
 
 void
-StaticCondensation::apply(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol)
+StaticCondensation::apply(const NumericVector<Number> & full_rhs,
+                          NumericVector<Number> & full_parallel_sol)
 {
   forward_elimination(full_rhs);
   // Apparently PETSc will send us the yvec without zeroing it ahead of time. This can be a poor
   // initial guess for the Krylov solve as well as lead to bewildered users who expect their initial
   // residual norm to equal the norm of the RHS
-  full_sol.zero();
-  _reduced_sol = full_sol.get_subvector(_local_uncondensed_dofs);
+  full_parallel_sol.zero();
+  _reduced_sol = full_parallel_sol.get_subvector(_local_uncondensed_dofs);
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
   // Must restore to the full solution because during backwards substitution we will need to be able
   // to read ghosted dofs and we don't support ghosting of subvectors
-  full_sol.restore_subvector(std::move(_reduced_sol), _local_uncondensed_dofs);
-  backwards_substitution(full_rhs, full_sol);
+  full_parallel_sol.restore_subvector(std::move(_reduced_sol), _local_uncondensed_dofs);
+  *_ghosted_full_sol = full_parallel_sol;
+  backwards_substitution(full_rhs, full_parallel_sol);
 }
 }
 

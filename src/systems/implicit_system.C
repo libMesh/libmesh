@@ -1261,7 +1261,7 @@ ImplicitSystem::add_static_condensation()
 {
   if (!_sc)
   {
-    _sc = std::make_unique<StaticCondensation>(this->get_mesh(), this->get_dof_map());
+    _sc = std::make_unique<StaticCondensation>(this->get_mesh(), *this, this->get_dof_map());
 
     if (this->have_matrix("System Matrix"))
       this->remove_matrix("System Matrix");

@@ -37,6 +37,7 @@
 namespace libMesh
 {
 class MeshBase;
+class System;
 class DofMap;
 class Elem;
 template <typename>
@@ -59,7 +60,7 @@ typedef Eigen::VectorXd EigenVector;
 class StaticCondensation : public Preconditioner<Number>
 {
 public:
-  StaticCondensation(const MeshBase & mesh, const DofMap & dof_map);
+  StaticCondensation(const MeshBase & mesh, const System & system, const DofMap & dof_map);
   virtual ~StaticCondensation();
 
   /**
@@ -142,11 +143,13 @@ private:
   std::vector<dof_id_type> _local_uncondensed_dofs;
 
   const MeshBase & _mesh;
+  const System & _system;
   const DofMap & _dof_map;
   std::unique_ptr<SparseMatrix<Number>> _reduced_sys_mat;
   std::unique_ptr<NumericVector<Number>> _reduced_sol;
   std::unique_ptr<NumericVector<Number>> _reduced_rhs;
   std::unique_ptr<LinearSolver<Number>> _reduced_solver;
+  std::unique_ptr<NumericVector<Number>> _ghosted_full_sol;
 
   /// Variables for which we will keep all dofs
   std::unordered_set<unsigned int> _uncondensed_vars;
