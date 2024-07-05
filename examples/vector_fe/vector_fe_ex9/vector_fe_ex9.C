@@ -66,6 +66,8 @@
 // The HDGProblem application context
 #include "hdg_problem.h"
 
+#include <gperftools/profiler.h>
+
 #if defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
 
 using namespace libMesh;
@@ -75,6 +77,8 @@ main(int argc, char ** argv)
 {
   // Initialize libMesh.
   LibMeshInit init(argc, argv);
+
+  ProfilerStart(("sc_mumps" + std::to_string(init.comm().rank()) + ".prof").c_str());
 
   // This example requires a linear solver package.
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
@@ -176,6 +180,9 @@ main(int argc, char ** argv)
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
+  // Prints information about the system to the screen.
+  equation_systems.print_info();
+
   // Solve the implicit system for the Lagrange multiplier
   system.solve();
 
@@ -209,6 +216,8 @@ main(int argc, char ** argv)
   ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
 
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
+
+  ProfilerStop();
 
   // All done.
   return 0;
