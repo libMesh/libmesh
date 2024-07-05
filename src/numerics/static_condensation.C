@@ -354,22 +354,14 @@ StaticCondensation::setup()
 {
   _reduced_sys_mat->zero();
 
-  const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, 0, ", ", "\n");
-  auto original_flags = libMesh::out.flags();
-  libMesh::out << std::fixed << std::setprecision(2);
-
+  DenseMatrix<Number> shim;
   for (auto & [elem_id, local_data] : _elem_to_local_data)
   {
     libmesh_ignore(elem_id);
-    libMesh::out << "Matrix for elem ID " << elem_id << ":\n"
-                 << local_data.Acc.format(CSVFormat) << std::endl;
-    libMesh::out.flags(original_flags);
-    libMesh::out << "For elem id " << elem_id << " the A determinant is "
-                 << local_data.Acc.determinant() << std::endl;
     local_data.AccFactor = local_data.Acc.partialPivLu();
     const EigenMatrix S =
         local_data.Auu - local_data.Auc * local_data.AccFactor.solve(local_data.Acu);
-    DenseMatrix<Number> shim(S.rows(), S.cols());
+    shim.resize(S.rows(), S.cols());
     for (const auto i : make_range(S.rows()))
       for (const auto j : make_range(S.cols()))
         shim(i, j) = S(i, j);
