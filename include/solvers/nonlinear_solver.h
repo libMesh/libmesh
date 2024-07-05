@@ -103,6 +103,17 @@ public:
                                                const unsigned int) = 0; // N. Iterations
 
   /**
+   * Solves a nonlinear system matrix-free
+   */
+  virtual std::pair<unsigned int, Real> solve (NumericVector<T> &, // Solution vector
+                                               NumericVector<T> &, // Residual vector
+                                               const double,      // Stopping tolerance
+                                               const unsigned int) // N. Iterations
+  {
+    libmesh_not_implemented();
+  }
+
+  /**
    * Prints a useful message about why the latest nonlinear solve
    * con(di)verged.
    */

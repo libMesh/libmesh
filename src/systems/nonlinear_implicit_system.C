@@ -198,11 +198,19 @@ void NonlinearImplicitSystem::solve ()
 
       // Solve the nonlinear system.
       // Store the number of nonlinear iterations required to
-      // solve and the final residual.
-      std::tie(_n_nonlinear_iterations, _final_nonlinear_residual) =
-        nonlinear_solver->solve (*matrix, *solution, *rhs,
-                                 nonlinear_solver->relative_residual_tolerance,
-                                 nonlinear_solver->max_linear_iterations);
+      // solve and the final residual. If we have are employing a static
+      // condensation preconditioner, then we are system matrix free
+      if (_sc)
+        std::tie(_n_nonlinear_iterations, _final_nonlinear_residual) =
+          nonlinear_solver->solve (*solution, *rhs,
+                                   nonlinear_solver->relative_residual_tolerance,
+                                   nonlinear_solver->max_linear_iterations);
+      else
+        std::tie(_n_nonlinear_iterations, _final_nonlinear_residual) =
+          nonlinear_solver->solve (*matrix, *solution, *rhs,
+                                   nonlinear_solver->relative_residual_tolerance,
+                                   nonlinear_solver->max_linear_iterations);
+
     }
 
   // Update the system after the solve

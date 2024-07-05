@@ -124,6 +124,15 @@ public:
          const unsigned int) override; // N. Iterations
 
   /**
+   * Call the Petsc solver matrix free
+   */
+  virtual std::pair<unsigned int, Real>
+  solve (NumericVector<T> &,                    // Solution vector
+         NumericVector<T> &,                    // Residual vector
+         const double,                         // Stopping tolerance
+         const unsigned int) override; // N. Iterations
+
+  /**
    * Prints a useful message about why the latest nonlinear solve
    * con(di)verged.
    */
@@ -289,6 +298,12 @@ protected:
   bool _setup_reuse;
 
 private:
+  std::pair<unsigned int, Real> solve_general(Mat J,                   // Operator
+                                              NumericVector<T> & x_in, // Solution vector
+                                              NumericVector<T> & r_in, // Residual vector
+                                              const double,            // Stopping tolerance
+                                              const unsigned int); // Maximum number of iterations
+
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);
