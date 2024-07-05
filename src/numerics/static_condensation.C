@@ -26,6 +26,7 @@
 #include "libmesh/int_range.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/petsc_matrix.h"
 #include "libmesh/linear_solver.h"
 #include "timpi/parallel_sync.h"
 #include <unordered_set>
@@ -221,24 +222,48 @@ StaticCondensation::init()
   const dof_id_type n_local = _local_uncondensed_dofs.size();
   dof_id_type n = n_local;
   this->comm().sum(n);
+  _reduced_solver = LinearSolver<Number>::build(this->comm());
+  _reduced_solver->init("condensed_");
+  _reduced_rhs = NumericVector<Number>::build(this->comm());
+  // Init the RHS vector so we can conveniently get processor row offsets
+  _reduced_rhs->init(n, n_local);
+
+  // Build a map from the full size problem uncondensed dof indices to the reduced problem
+  // (uncondensed) dof indices
+  std::unordered_map<dof_id_type, dof_id_type> full_dof_to_reduced_dof;
+  const auto local_start = _reduced_rhs->first_local_index();
+  for (const auto i : index_range(_local_uncondensed_dofs))
+    full_dof_to_reduced_dof[_local_uncondensed_dofs[i]] = i + local_start;
+
   _reduced_sys_mat = SparseMatrix<Number>::build(this->comm());
   auto sp = _dof_map.build_sparsity(
       _mesh, /*calculate_constrained=*/false, /*uncondensed_dofs_only=*/true);
   const auto & nnz = sp->get_n_nz();
   const auto & noz = sp->get_n_oz();
-  const auto nz = nnz.empty() ? dof_id_type(0) : *std::max_element(nnz.begin(), nnz.end());
-  const auto oz = noz.empty() ? dof_id_type(0) : *std::max_element(noz.begin(), noz.end());
-  _reduced_sys_mat->init(n, n, n_local, n_local, nz, oz);
-  _reduced_solver = LinearSolver<Number>::build(this->comm());
-  _reduced_solver->init("condensed_");
-  _reduced_rhs = NumericVector<Number>::build(this->comm());
-
-  // Build a map from the full size problem uncondensed dof indices to the reduced problem
-  // (uncondensed) dof indices
-  std::unordered_map<dof_id_type, dof_id_type> full_dof_to_reduced_dof;
-  const auto local_start = _reduced_sys_mat->row_start();
-  for (const auto i : index_range(_local_uncondensed_dofs))
-    full_dof_to_reduced_dof[_local_uncondensed_dofs[i]] = i + local_start;
+  libmesh_assert(nnz.size() == noz.size());
+  if (auto * const petsc_mat = dynamic_cast<PetscMatrix<Number> *>(_reduced_sys_mat.get()))
+  {
+    // Optimization for PETSc. This is critical for problems in which there are SCALAR dofs that
+    // introduce dense rows to avoid allocating a dense matrix
+    std::vector<dof_id_type> reduced_nnz, reduced_noz;
+    reduced_nnz.resize(_local_uncondensed_dofs.size());
+    reduced_noz.resize(_local_uncondensed_dofs.size());
+    for (const dof_id_type local_reduced_i : index_range(_local_uncondensed_dofs))
+    {
+      const dof_id_type full_i = _local_uncondensed_dofs[local_reduced_i];
+      const dof_id_type local_full_i = full_i - _dof_map.first_dof();
+      libmesh_assert(local_full_i < nnz.size());
+      reduced_nnz[local_reduced_i] = nnz[local_full_i];
+      reduced_noz[local_reduced_i] = noz[local_full_i];
+    }
+    petsc_mat->init(n, n, n_local, n_local, reduced_nnz, reduced_noz);
+  }
+  else
+  {
+    const auto nz = nnz.empty() ? dof_id_type(0) : *std::max_element(nnz.begin(), nnz.end());
+    const auto oz = noz.empty() ? dof_id_type(0) : *std::max_element(noz.begin(), noz.end());
+    _reduced_sys_mat->init(n, n, n_local, n_local, nz, oz);
+  }
 
   //
   // Now we need to pull our nonlocal data
