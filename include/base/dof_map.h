@@ -1664,12 +1664,12 @@ public:
   bool should_p_refine(Order) const = delete;
 
   /**
-   * Add a static condensation class (if it doesn't already exist) and return a reference to it
+   * Add a static condensation class
    */
-  StaticCondensation & add_static_condensation();
+  void add_static_condensation(const StaticCondensation & sc) { _sc = &sc; }
 
   /**
-   * @returns the static condensation class. This should have been already created with a call to \p
+   * @returns the static condensation class. This should have been already added with a call to \p
    * add_static_condensation()
    */
   const StaticCondensation & get_static_condensation() const;
@@ -2141,8 +2141,8 @@ private:
    */
   bool _verify_dirichlet_bc_consistency;
 
-  /// Static condensation class. This may be built depending on the solver
-  std::unique_ptr<StaticCondensation> _sc;
+  /// Static condensation class
+  const StaticCondensation * _sc;
 };
 
 

@@ -150,7 +150,8 @@ main(int argc, char ** argv)
   equation_systems.print_info();
 
   // Initialize the static condensation structure
-  StaticCondensation sc(mesh, sys.get_dof_map());
+  StaticCondensation sc(mesh, sys, sys.get_dof_map());
+  sys.get_dof_map().add_static_condensation(sc);
   sc.init();
 
   equation_systems.parameters.set<StaticCondensation *>("sc") = &sc;

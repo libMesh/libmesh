@@ -150,7 +150,7 @@ main(int argc, char ** argv)
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
   const FEType lm_fe_type(FIRST, SIDE_HIERARCHIC);
 
-  auto & sc = system.get_dof_map().add_static_condensation();
+  auto & sc = system.add_static_condensation();
   sc.dont_condense_vars({p_num});
 
   HDGProblem hdg(nu, cavity);

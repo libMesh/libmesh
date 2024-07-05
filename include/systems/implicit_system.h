@@ -32,6 +32,7 @@ namespace libMesh
 
 // Forward declarations
 template <typename T> class LinearSolver;
+class StaticCondensation;
 
 /**
  * \brief Manages consistently variables, degrees of freedom, coefficient
@@ -335,11 +336,19 @@ public:
    */
   mutable std::unique_ptr<LinearSolver<Number>> linear_solver;
 
+  /**
+   * Add a static condensation class (if it doesn't already exist) and return a reference to it
+   */
+  StaticCondensation & add_static_condensation();
+
 protected:
   /**
    * Adds the system matrix
    */
   virtual void add_matrices() override;
+
+  /// Static condensation class
+  std::unique_ptr<StaticCondensation> _sc;
 };
 
 

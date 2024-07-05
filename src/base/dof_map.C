@@ -182,7 +182,8 @@ DofMap::DofMap(const unsigned int number,
 #endif
   , _implicit_neighbor_dofs_initialized(false),
   _implicit_neighbor_dofs(false),
-  _verify_dirichlet_bc_consistency(true)
+  _verify_dirichlet_bc_consistency(true),
+  _sc(nullptr)
 {
   _matrices.clear();
 
@@ -2882,15 +2883,6 @@ std::string DofMap::get_info() const
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 
   return os.str();
-}
-
-StaticCondensation &
-DofMap::add_static_condensation()
-{
-  if (!_sc)
-    _sc = std::make_unique<StaticCondensation>(_mesh, *this);
-
-  return *_sc;
 }
 
 template LIBMESH_EXPORT bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;
