@@ -545,6 +545,10 @@ void
 StaticCondensation::apply(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol)
 {
   forward_elimination(full_rhs);
+  // Apparently PETSc will send us the yvec without zeroing it ahead of time. This can be a poor
+  // initial guess for the Krylov solve as well as lead to bewildered users who expect their initial
+  // residual norm to equal the norm of the RHS
+  full_sol.zero();
   _reduced_sol = full_sol.get_subvector(_local_uncondensed_dofs);
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
   // Must restore to the full solution because during backwards substitution we will need to be able
