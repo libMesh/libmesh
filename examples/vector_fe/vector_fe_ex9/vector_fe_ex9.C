@@ -135,8 +135,8 @@ main(int argc, char ** argv)
 
   // Adds the velocity variables and their gradients
   system.add_variable("qu", FIRST, L2_LAGRANGE_VEC);
-  system.add_variable("qv", FIRST, L2_LAGRANGE_VEC);
   system.add_variable("vel_x", FIRST, L2_LAGRANGE);
+  system.add_variable("qv", FIRST, L2_LAGRANGE_VEC);
   system.add_variable("vel_y", FIRST, L2_LAGRANGE);
 
   // Add our Lagrange multiplier to the implicit system
@@ -150,7 +150,7 @@ main(int argc, char ** argv)
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
   const FEType lm_fe_type(FIRST, SIDE_HIERARCHIC);
 
-  auto & sc = system.get_dof_map().add_static_condensation();
+  auto & sc = system.get_dof_map().add_static_condensation(system);
   sc.dont_condense_vars({p_num});
 
   HDGProblem hdg(nu, cavity);

@@ -1666,7 +1666,7 @@ public:
   /**
    * Add a static condensation class (if it doesn't already exist) and return a reference to it
    */
-  StaticCondensation & add_static_condensation();
+  StaticCondensation & add_static_condensation(System & sys);
 
   /**
    * @returns the static condensation class. This should have been already created with a call to \p

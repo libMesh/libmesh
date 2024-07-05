@@ -27,13 +27,15 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/linear_solver.h"
+#include "libmesh/system.h"
+#include "libmesh/petsc_vector.h"
 #include "timpi/parallel_sync.h"
-#include <unordered_set>
+#include <set>
 
 namespace libMesh
 {
-StaticCondensation::StaticCondensation(const MeshBase & mesh, const DofMap & dof_map)
-  : Preconditioner<Number>(dof_map.comm()), _mesh(mesh), _dof_map(dof_map)
+StaticCondensation::StaticCondensation(const MeshBase & mesh, System & sys, const DofMap & dof_map)
+  : Preconditioner<Number>(dof_map.comm()), _mesh(mesh), _sys(sys), _dof_map(dof_map)
 {
 }
 
@@ -102,8 +104,8 @@ StaticCondensation::init()
 
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
   std::vector<dof_id_type> elem_condensed_dofs, elem_uncondensed_dofs;
-  std::unordered_set<dof_id_type> local_uncondensed_dofs;
-  std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> nonlocal_uncondensed_dofs;
+  std::set<dof_id_type> local_uncondensed_dofs;
+  std::map<processor_id_type, std::set<dof_id_type>> nonlocal_uncondensed_dofs;
 
   const Elem * first_elem = nullptr;
   const auto first_elem_it = _mesh.active_local_elements_begin();
@@ -166,31 +168,22 @@ StaticCondensation::init()
     unsigned int condensed_dof_size = 0;
     auto & local_data = _elem_to_local_data[elem->id()];
 
-    const auto sub_id = elem->subdomain_id();
-    for (const auto vg : make_range(_dof_map.n_variable_groups()))
+    for (const auto var_num : make_range(_dof_map.n_variables()))
     {
-      const auto & var_group = _dof_map.variable_group(vg);
-      if (!var_group.active_on_subdomain(sub_id))
-        continue;
-
-      for (const auto v : make_range(var_group.n_variables()))
-      {
-        const auto var_num = var_group.number(v);
-        auto & var_data = local_data.var_to_data[var_num];
-        elem_condensed_dofs.clear();
-        elem_uncondensed_dofs.clear();
-        _dof_map.dof_indices(
-            elem, elem_dofs, var_num, scalar_dofs_functor, field_dofs_functor, elem->p_level());
-        var_data.uncondensed_dofs_offset = uncondensed_dof_size;
-        var_data.condensed_dofs_offset = condensed_dof_size;
-        var_data.num_uncondensed_dofs = elem_uncondensed_dofs.size();
-        var_data.num_condensed_dofs = elem_condensed_dofs.size();
-        uncondensed_dof_size += var_data.num_uncondensed_dofs;
-        condensed_dof_size += var_data.num_condensed_dofs;
-        local_data.reduced_space_indices.insert(local_data.reduced_space_indices.end(),
-                                                elem_uncondensed_dofs.begin(),
-                                                elem_uncondensed_dofs.end());
-      }
+      auto & var_data = local_data.var_to_data[var_num];
+      elem_condensed_dofs.clear();
+      elem_uncondensed_dofs.clear();
+      _dof_map.dof_indices(
+          elem, elem_dofs, var_num, scalar_dofs_functor, field_dofs_functor, elem->p_level());
+      var_data.uncondensed_dofs_offset = uncondensed_dof_size;
+      var_data.condensed_dofs_offset = condensed_dof_size;
+      var_data.num_uncondensed_dofs = elem_uncondensed_dofs.size();
+      var_data.num_condensed_dofs = elem_condensed_dofs.size();
+      uncondensed_dof_size += var_data.num_uncondensed_dofs;
+      condensed_dof_size += var_data.num_condensed_dofs;
+      local_data.reduced_space_indices.insert(local_data.reduced_space_indices.end(),
+                                              elem_uncondensed_dofs.begin(),
+                                              elem_uncondensed_dofs.end());
     }
 
     local_data.Acc.resize(condensed_dof_size, condensed_dof_size);
@@ -222,7 +215,7 @@ StaticCondensation::init()
 
   // Build a map from the full size problem uncondensed dof indices to the reduced problem
   // (uncondensed) dof indices
-  std::unordered_map<dof_id_type, dof_id_type> full_dof_to_reduced_dof;
+  std::map<dof_id_type, dof_id_type> full_dof_to_reduced_dof;
   const auto local_start = _reduced_sys_mat->row_start();
   for (const auto i : index_range(_local_uncondensed_dofs))
     full_dof_to_reduced_dof[_local_uncondensed_dofs[i]] = i + local_start;
@@ -232,7 +225,7 @@ StaticCondensation::init()
   //
 
   // build our queries
-  std::unordered_map<processor_id_type, std::vector<dof_id_type>> nonlocal_uncondensed_dofs_mapvec;
+  std::map<processor_id_type, std::vector<dof_id_type>> nonlocal_uncondensed_dofs_mapvec;
   for (const auto & [pid, set] : nonlocal_uncondensed_dofs)
   {
     auto & vec = nonlocal_uncondensed_dofs_mapvec[pid];
@@ -341,18 +334,57 @@ StaticCondensation::setup()
 {
   _reduced_sys_mat->zero();
 
-  const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, 0, ", ", "\n");
+  const bool print_global_mats = libMesh::on_command_line("--print-global-mats");
+  if (print_global_mats)
+  {
+    IS uncondensed, condensed;
+    auto ierr = ISCreateGeneral(this->comm().get(),
+                                cast_int<PetscInt>(_local_uncondensed_dofs.size()),
+                                numeric_petsc_cast(_local_uncondensed_dofs.data()),
+                                PETSC_COPY_VALUES,
+                                &uncondensed);
+    LIBMESH_CHKERR(ierr);
+    ierr = ISComplement(uncondensed, 0, _sys.solution->size(), &condensed);
+    LIBMESH_CHKERR(ierr);
+    Vec vec_condensed;
+    ierr = VecGetSubVector(
+        static_cast<PetscVector<Number> &>(*_sys.solution).vec(), condensed, &vec_condensed);
+    LIBMESH_CHKERR(ierr);
+    // ierr = VecView(vec_condensed, 0);
+    // LIBMESH_CHKERR(ierr);
+    {
+      PetscVector<Number> wrapped(vec_condensed, this->comm());
+      libMesh::out << "L2 norm is " << wrapped.l2_norm() << std::endl;
+    }
+    ierr = VecRestoreSubVector(
+        static_cast<PetscVector<Number> &>(*_sys.solution).vec(), condensed, &vec_condensed);
+    LIBMESH_CHKERR(ierr);
+    ierr = ISDestroy(&uncondensed);
+    LIBMESH_CHKERR(ierr);
+    ierr = ISDestroy(&condensed);
+    LIBMESH_CHKERR(ierr);
+  }
+
+  const bool print_mats = libMesh::on_command_line("--print-local-mats");
+  const static Eigen::IOFormat CSVFormat(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "\n");
   auto original_flags = libMesh::out.flags();
-  libMesh::out << std::fixed << std::setprecision(2);
+  if (print_mats)
+    libMesh::out << std::fixed << std::setprecision(2);
 
   for (auto & [elem_id, local_data] : _elem_to_local_data)
   {
     libmesh_ignore(elem_id);
-    libMesh::out << "Matrix for elem ID " << elem_id << ":\n"
-                 << local_data.Acc.format(CSVFormat) << std::endl;
-    libMesh::out.flags(original_flags);
-    libMesh::out << "For elem id " << elem_id << " the A determinant is "
-                 << local_data.Acc.determinant() << std::endl;
+    if (print_mats)
+    {
+      libMesh::out << "Acc Matrix for elem ID " << elem_id << ":\n"
+                   << local_data.Acc.format(CSVFormat) << std::endl;
+      libMesh::out << "Acu Matrix for elem ID " << elem_id << ":\n"
+                   << local_data.Acu.format(CSVFormat) << std::endl;
+      libMesh::out << "Auc Matrix for elem ID " << elem_id << ":\n"
+                   << local_data.Auc.format(CSVFormat) << std::endl;
+      libMesh::out << "Auu Matrix for elem ID " << elem_id << ":\n"
+                   << local_data.Auu.format(CSVFormat) << std::endl;
+    }
     local_data.AccFactor = local_data.Acc.partialPivLu();
     const EigenMatrix S =
         local_data.Auu - local_data.Auc * local_data.AccFactor.solve(local_data.Acu);
@@ -362,6 +394,7 @@ StaticCondensation::setup()
         shim(i, j) = S(i, j);
     _reduced_sys_mat->add_matrix(shim, local_data.reduced_space_indices);
   }
+  libMesh::out.flags(original_flags);
 
   _reduced_sys_mat->close();
 }
@@ -397,23 +430,26 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
     elem_condensed_dofs.clear();
     auto & local_data = _elem_to_local_data[elem->id()];
 
-    const auto sub_id = elem->subdomain_id();
-    for (const auto vg : make_range(_dof_map.n_variable_groups()))
-    {
-      const auto & var_group = _dof_map.variable_group(vg);
-      if (!var_group.active_on_subdomain(sub_id))
-        continue;
-
-      for (const auto v : make_range(var_group.n_variables()))
-        _dof_map.dof_indices(elem,
-                             elem_dofs,
-                             var_group.number(v),
-                             total_and_condensed_from_scalar_dofs_functor(elem_condensed_dofs),
-                             total_and_condensed_from_field_dofs_functor(elem_condensed_dofs),
-                             elem->p_level());
-    }
+    for (const auto v : make_range(_dof_map.n_variables()))
+      _dof_map.dof_indices(elem,
+                           elem_dofs,
+                           v,
+                           total_and_condensed_from_scalar_dofs_functor(elem_condensed_dofs),
+                           total_and_condensed_from_field_dofs_functor(elem_condensed_dofs),
+                           elem->p_level());
 
     set_local_vectors(full_rhs, elem_condensed_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
+    const bool print_mats = libMesh::on_command_line("--print-local-mats");
+    const static Eigen::IOFormat CSVFormat(
+        Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", "\n");
+    auto original_flags = libMesh::out.flags();
+    if (print_mats)
+    {
+      libMesh::out << std::fixed << std::setprecision(2);
+      libMesh::out << "MixedVec for elem ID " << elem->id() << " is "
+                   << elem_condensed_rhs.format(CSVFormat) << std::endl;
+      libMesh::out.flags(original_flags);
+    }
     elem_uncondensed_rhs = -local_data.Auc * local_data.AccFactor.solve(elem_condensed_rhs);
 
     libmesh_assert(cast_int<std::size_t>(elem_uncondensed_rhs.size()) ==
@@ -421,6 +457,11 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
     _reduced_rhs->add_vector(elem_uncondensed_rhs.data(), local_data.reduced_space_indices);
   }
   _reduced_rhs->close();
+  if (libMesh::on_command_line("--print-global-mats"))
+    {
+      // _reduced_rhs->print();
+      libMesh::out << "L2 norm for reduced RHS is " << _reduced_rhs->l2_norm() << std::endl;
+    }
 }
 
 void
@@ -463,21 +504,9 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
     elem_uncondensed_dofs.clear();
     auto & local_data = _elem_to_local_data[elem->id()];
 
-    const auto sub_id = elem->subdomain_id();
-    for (const auto vg : make_range(_dof_map.n_variable_groups()))
-    {
-      const auto & var_group = _dof_map.variable_group(vg);
-      if (!var_group.active_on_subdomain(sub_id))
-        continue;
-
-      for (const auto v : make_range(var_group.n_variables()))
-        _dof_map.dof_indices(elem,
-                             elem_dofs,
-                             var_group.number(v),
-                             scalar_dofs_functor,
-                             field_dofs_functor,
-                             elem->p_level());
-    }
+    for (const auto v : make_range(_dof_map.n_variables()))
+      _dof_map.dof_indices(
+          elem, elem_dofs, v, scalar_dofs_functor, field_dofs_functor, elem->p_level());
 
     set_local_vectors(full_rhs, elem_condensed_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
     set_local_vectors(

@@ -2885,10 +2885,10 @@ std::string DofMap::get_info() const
 }
 
 StaticCondensation &
-DofMap::add_static_condensation()
+DofMap::add_static_condensation(System & sys)
 {
   if (!_sc)
-    _sc = std::make_unique<StaticCondensation>(_mesh, *this);
+    _sc = std::make_unique<StaticCondensation>(_mesh, sys, *this);
 
   return *_sc;
 }

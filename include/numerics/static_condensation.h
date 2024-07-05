@@ -28,7 +28,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/preconditioner.h"
 
-#include <unordered_map>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -38,6 +38,7 @@ namespace libMesh
 {
 class MeshBase;
 class DofMap;
+class System;
 class Elem;
 template <typename>
 class DenseMatrix;
@@ -59,7 +60,7 @@ typedef Eigen::VectorXd EigenVector;
 class StaticCondensation : public Preconditioner<Number>
 {
 public:
-  StaticCondensation(const MeshBase & mesh, const DofMap & dof_map);
+  StaticCondensation(const MeshBase & mesh, System & sys, const DofMap & dof_map);
   virtual ~StaticCondensation();
 
   /**
@@ -86,12 +87,12 @@ public:
    * equation is discretized with a DG method or if including the variable in the condensed block
    * diagonal would result in it being singular
    */
-  void dont_condense_vars(const std::unordered_set<unsigned int> & vars);
+  void dont_condense_vars(const std::set<unsigned int> & vars);
 
   /**
    * @returns our list of variables for whom we do not condense out any dofs
    */
-  const std::unordered_set<unsigned int> & uncondensed_vars() const { return _uncondensed_vars; }
+  const std::set<unsigned int> & uncondensed_vars() const { return _uncondensed_vars; }
 
 private:
   static void set_local_vectors(const NumericVector<Number> & global_vector,
@@ -135,13 +136,14 @@ private:
     /// sized problem, but we will swap it out by the time we are done initializing
     std::vector<dof_id_type> reduced_space_indices;
 
-    std::unordered_map<unsigned int, VarData> var_to_data;
+    std::map<unsigned int, VarData> var_to_data;
   };
 
-  std::unordered_map<dof_id_type, LocalData> _elem_to_local_data;
+  std::map<dof_id_type, LocalData> _elem_to_local_data;
   std::vector<dof_id_type> _local_uncondensed_dofs;
 
   const MeshBase & _mesh;
+  const System & _sys;
   const DofMap & _dof_map;
   std::unique_ptr<SparseMatrix<Number>> _reduced_sys_mat;
   std::unique_ptr<NumericVector<Number>> _reduced_sol;
@@ -149,7 +151,7 @@ private:
   std::unique_ptr<LinearSolver<Number>> _reduced_solver;
 
   /// Variables for which we will keep all dofs
-  std::unordered_set<unsigned int> _uncondensed_vars;
+  std::set<unsigned int> _uncondensed_vars;
 };
 
 inline const SparseMatrix<Number> &
@@ -160,7 +162,7 @@ StaticCondensation::get_condensed_mat() const
 }
 
 inline void
-StaticCondensation::dont_condense_vars(const std::unordered_set<unsigned int> & vars)
+StaticCondensation::dont_condense_vars(const std::set<unsigned int> & vars)
 {
   _uncondensed_vars.insert(vars.begin(), vars.end());
 }
