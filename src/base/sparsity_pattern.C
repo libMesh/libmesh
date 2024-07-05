@@ -100,6 +100,7 @@ void Build::sorted_connected_dofs(const Elem * elem,
   if (uncondensed_dofs_only)
   {
     const auto & sc = dof_map.get_static_condensation();
+    dofs_vi.clear();
 
     auto total_and_uncondensed_from_scalar_dofs_functor =
         [&dofs_vi](const Elem & /*elem*/,
