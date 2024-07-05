@@ -129,8 +129,8 @@ StaticCondensation::init()
     // Only need to do this for the first element we encounter
     if (&elem == first_elem)
     {
-      const processor_id_type last_pid = _dof_map.comm().size() - 1;
-      if (_dof_map.comm().rank() == last_pid)
+      const processor_id_type last_pid = this->comm().size() - 1;
+      if (this->comm().rank() == last_pid)
         local_uncondensed_dofs.insert(scalar_dof_indices.begin(), scalar_dof_indices.end());
       else
         nonlocal_uncondensed_dofs[last_pid].insert(scalar_dof_indices.begin(),
@@ -155,7 +155,7 @@ StaticCondensation::init()
     {
       elem_uncondensed_dofs.push_back(field_dof);
       const auto & nd_ref = elem.node_ref(node_num);
-      if (nd_ref.processor_id() == _dof_map.processor_id())
+      if (nd_ref.processor_id() == this->processor_id())
         local_uncondensed_dofs.insert(field_dof);
       else
         nonlocal_uncondensed_dofs[nd_ref.processor_id()].insert(field_dof);
@@ -200,8 +200,8 @@ StaticCondensation::init()
 
   const dof_id_type n_local = _local_uncondensed_dofs.size();
   dof_id_type n = n_local;
-  _dof_map.comm().sum(n);
-  _reduced_sys_mat = SparseMatrix<Number>::build(_dof_map.comm());
+  this->comm().sum(n);
+  _reduced_sys_mat = SparseMatrix<Number>::build(this->comm());
   auto sp = _dof_map.build_sparsity(
       _mesh, /*calculate_constrained=*/false, /*uncondensed_dofs_only=*/true);
   const auto & nnz = sp->get_n_nz();
@@ -209,9 +209,9 @@ StaticCondensation::init()
   const auto nz = nnz.empty() ? dof_id_type(0) : *std::max_element(nnz.begin(), nnz.end());
   const auto oz = noz.empty() ? dof_id_type(0) : *std::max_element(noz.begin(), noz.end());
   _reduced_sys_mat->init(n, n, n_local, n_local, nz, oz);
-  _reduced_solver = LinearSolver<Number>::build(_dof_map.comm());
+  _reduced_solver = LinearSolver<Number>::build(this->comm());
   _reduced_solver->init("condensed_");
-  _reduced_rhs = NumericVector<Number>::build(_dof_map.comm());
+  _reduced_rhs = NumericVector<Number>::build(this->comm());
 
   // Build a map from the full size problem uncondensed dof indices to the reduced problem
   // (uncondensed) dof indices
@@ -254,7 +254,7 @@ StaticCondensation::init()
     }
   };
 
-  TIMPI::pull_parallel_vector_data(_dof_map.comm(),
+  TIMPI::pull_parallel_vector_data(this->comm(),
                                    nonlocal_uncondensed_dofs_mapvec,
                                    gather_functor,
                                    action_functor,
