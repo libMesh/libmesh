@@ -29,6 +29,7 @@
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/petsc_macro.h"
 #include "libmesh/wrapped_petsc.h"
+#include "libmesh/petsc_dm_wrapper.h"
 
 // PETSc includes
 #ifdef I
@@ -296,6 +297,15 @@ protected:
     * Whether we've triggered the preconditioner reuse
     */
   bool _setup_reuse;
+
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
+  /**
+   * Wrapper object for interacting with the "new" libMesh PETSc DM. The new libMesh PETSc DM
+   * implementation is capable of geometric multigrid while the old implementation is not. The new
+   * implementation can be activated from the command line with --use_petsc_dm
+   */
+  PetscDMWrapper _dm_wrapper;
+#endif
 
 private:
   std::pair<unsigned int, Real> solve_general(Mat J,                   // Operator
