@@ -104,9 +104,9 @@ int main (int argc, char ** argv)
   // Set the FE approximation order.
   const Order order = static_cast<Order>(infile("order", 1u));
 
-  libmesh_error_msg_if(order != FIRST && order != SECOND,
+  libmesh_error_msg_if(order < FIRST || order > FIFTH,
                        "You selected: " << order <<
-                       " but this example must be run with either order 1 or 2.");
+                       " but this example must be run with 1 <= order <= 5.");
 
   system.order(order);
 
