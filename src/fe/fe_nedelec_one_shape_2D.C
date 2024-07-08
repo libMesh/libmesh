@@ -182,6 +182,114 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
           }
       }
 
+      // cubic Nedelec (first kind) shape functions
+    case THIRD:
+      {
+        switch (elem->type())
+          {
+          case QUAD8:
+          case QUAD9:
+            {
+              switch(ii)
+                {
+                case 0:
+                  return sign * RealGradient(-20.25*eta - 9.0*xi + 162.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 33.75*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 81.0*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) + 22.5*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)*(eta + 1)) - 24.75 + 20.25*((eta + 1)*(eta + 1)) + 16.875*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 3.75*((xi + 1)*(xi + 1)) - 5.625*(eta + 1)*(eta + 1)*(eta + 1) - 4.6875*(eta + 1)*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1), 0);
+                case 1:
+                  return sign * RealGradient(3.375*eta + 3.75*xi - 67.5*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 16.875*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) + 33.75*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) - 9.375*(0.5*xi + 0.5)*(eta + 1)*(eta + 1)*(eta + 1) + 6.375 - 3.375*(eta + 1)*(eta + 1) - 8.4375*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 1.875*(xi + 1)*(xi + 1) + 0.9375*((eta + 1)*(eta + 1)*(eta + 1)) + 2.34375*((eta + 1)*(eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)), 0);
+                case 2:
+                  return sign * RealGradient(-6.75*eta - 6.0*xi + 108.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 33.75*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 54.0*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) + 15.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)*(eta + 1)) - 11.25 + 6.75*((eta + 1)*(eta + 1)) + 16.875*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 3.75*((xi + 1)*(xi + 1)) - 1.875*(eta + 1)*(eta + 1)*(eta + 1) - 4.6875*(eta + 1)*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1), 0);
+                case 3:
+                  return sign * RealGradient(0, 6.75*xi - 54.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 54.0*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) - 22.5*(0.5*eta + 0.5)*(xi + 1)*(xi + 1)*(xi + 1) + 11.25*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 6.75 - 11.25*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 13.5*(xi + 1)*(xi + 1) + 5.625*((xi + 1)*(xi + 1)*(xi + 1)) + 4.6875*((xi + 1)*(xi + 1)*(xi + 1))*((eta + 1)*(eta + 1)));
+                case 4:
+                  return sign * RealGradient(0, -1.125*xi + 22.5*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 22.5*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) + 9.375*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)*(xi + 1)) - 5.625*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) - 1.125 + 5.625*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 2.25*((xi + 1)*(xi + 1)) - 0.9375*(xi + 1)*(xi + 1)*(xi + 1) - 2.34375*(xi + 1)*(xi + 1)*(xi + 1)*(eta + 1)*(eta + 1));
+                case 5:
+                  return sign * RealGradient(0, 2.25*xi - 36.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 36.0*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) - 15.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1)*(xi + 1) + 11.25*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 2.25 - 11.25*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 4.5*(xi + 1)*(xi + 1) + 1.875*((xi + 1)*(xi + 1)*(xi + 1)) + 4.6875*((xi + 1)*(xi + 1)*(xi + 1))*((eta + 1)*(eta + 1)));
+                case 6:
+                  return sign * RealGradient(-2.25*eta + 36.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 11.25*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 36.0*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) + 15.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)*(eta + 1)) - 2.25 + 4.5*((eta + 1)*(eta + 1)) + 11.25*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) - 1.875*(eta + 1)*(eta + 1)*(eta + 1) - 4.6875*(eta + 1)*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1), 0);
+                case 7:
+                  return sign * RealGradient(1.125*eta - 22.5*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 5.625*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) + 22.5*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) - 9.375*(0.5*xi + 0.5)*(eta + 1)*(eta + 1)*(eta + 1) + 1.125 - 2.25*(eta + 1)*(eta + 1) - 5.625*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) + 0.9375*((eta + 1)*(eta + 1)*(eta + 1)) + 2.34375*((eta + 1)*(eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)), 0);
+                case 8:
+                  return sign * RealGradient(-6.75*eta + 54.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 11.25*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 54.0*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) + 22.5*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)*(eta + 1)) - 6.75 + 13.5*((eta + 1)*(eta + 1)) + 11.25*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) - 5.625*(eta + 1)*(eta + 1)*(eta + 1) - 4.6875*(eta + 1)*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1), 0);
+                case 9:
+                  return sign * RealGradient(0, 6.0*eta + 6.75*xi - 108.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 54.0*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) - 15.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1)*(xi + 1) + 33.75*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 11.25 - 3.75*(eta + 1)*(eta + 1) - 16.875*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 6.75*(xi + 1)*(xi + 1) + 1.875*((xi + 1)*(xi + 1)*(xi + 1)) + 4.6875*((xi + 1)*(xi + 1)*(xi + 1))*((eta + 1)*(eta + 1)));
+                case 10:
+                  return sign * RealGradient(0, -3.75*eta - 3.375*xi + 67.5*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 33.75*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) + 9.375*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)*(xi + 1)) - 16.875*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) - 6.375 + 1.875*((eta + 1)*(eta + 1)) + 8.4375*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 3.375*((xi + 1)*(xi + 1)) - 0.9375*(xi + 1)*(xi + 1)*(xi + 1) - 2.34375*(xi + 1)*(xi + 1)*(xi + 1)*(eta + 1)*(eta + 1));
+                case 11:
+                  return sign * RealGradient(0, 9.0*eta + 20.25*xi - 162.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 81.0*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) - 22.5*(0.5*eta + 0.5)*(xi + 1)*(xi + 1)*(xi + 1) + 33.75*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 24.75 - 3.75*(eta + 1)*(eta + 1) - 16.875*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 20.25*(xi + 1)*(xi + 1) + 5.625*((xi + 1)*(xi + 1)*(xi + 1)) + 4.6875*((xi + 1)*(xi + 1)*(xi + 1))*((eta + 1)*(eta + 1)));
+                case 12:
+                  return RealGradient(0, 18.0*xi - 144.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 81.0*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) - 22.5*(0.5*eta + 0.5)*(xi + 1)*(xi + 1)*(xi + 1) + 30.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 18.0 - 16.875*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 20.25*(xi + 1)*(xi + 1) + 5.625*((xi + 1)*(xi + 1)*(xi + 1)) + 4.6875*((xi + 1)*(xi + 1)*(xi + 1))*((eta + 1)*(eta + 1)));
+                case 13:
+                  return RealGradient(0, -4.5*xi + 36.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 54.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) + 22.5*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)*(xi + 1)) - 7.5*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) - 4.5 + 11.25*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 13.5*((xi + 1)*(xi + 1)) - 5.625*(xi + 1)*(xi + 1)*(xi + 1) - 4.6875*(xi + 1)*(xi + 1)*(xi + 1)*(eta + 1)*(eta + 1));
+                case 14:
+                  return RealGradient(-18.0*eta + 144.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 30.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 81.0*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) + 22.5*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)*(eta + 1)) - 18.0 + 20.25*((eta + 1)*(eta + 1)) + 16.875*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) - 5.625*(eta + 1)*(eta + 1)*(eta + 1) - 4.6875*(eta + 1)*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1), 0);
+                case 15:
+                  return RealGradient(4.5*eta - 36.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 7.5*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) + 54.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) - 22.5*(0.5*xi + 0.5)*(eta + 1)*(eta + 1)*(eta + 1) + 4.5 - 13.5*(eta + 1)*(eta + 1) - 11.25*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) + 5.625*((eta + 1)*(eta + 1)*(eta + 1)) + 4.6875*((eta + 1)*(eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)), 0);
+                case 16:
+                  return RealGradient(-6.0*eta + 96.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 30.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 54.0*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) + 15.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)*(eta + 1)) - 6.0 + 6.75*((eta + 1)*(eta + 1)) + 16.875*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) - 1.875*(eta + 1)*(eta + 1)*(eta + 1) - 4.6875*(eta + 1)*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1), 0);
+                case 17:
+                  return RealGradient(1.5*eta - 24.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 7.5*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) + 36.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) - 15.0*(0.5*xi + 0.5)*(eta + 1)*(eta + 1)*(eta + 1) + 1.5 - 4.5*(eta + 1)*(eta + 1) - 11.25*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) + 1.875*((eta + 1)*(eta + 1)*(eta + 1)) + 4.6875*((eta + 1)*(eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)), 0);
+                case 18:
+                  return RealGradient(0, 6.0*xi - 96.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) + 54.0*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) - 15.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1)*(xi + 1) + 30.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 6.0 - 16.875*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 6.75*(xi + 1)*(xi + 1) + 1.875*((xi + 1)*(xi + 1)*(xi + 1)) + 4.6875*((xi + 1)*(xi + 1)*(xi + 1))*((eta + 1)*(eta + 1)));
+                case 19:
+                  return RealGradient(0, -1.5*xi + 24.0*(0.5*eta + 0.5)*(0.5*xi + 0.5) - 36.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) + 15.0*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)*(xi + 1)) - 7.5*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) - 1.5 + 11.25*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 4.5*((xi + 1)*(xi + 1)) - 1.875*(xi + 1)*(xi + 1)*(xi + 1) - 4.6875*(xi + 1)*(xi + 1)*(xi + 1)*(eta + 1)*(eta + 1));
+                case 20:
+                  return RealGradient(2.0*eta + 2.0 - 2.25*(eta + 1)*(eta + 1) + 0.625*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                case 21:
+                  return RealGradient(0, 2.0*xi + 2.0 - 2.25*(xi + 1)*(xi + 1) + 0.625*((xi + 1)*(xi + 1)*(xi + 1)));
+                case 22:
+                  return RealGradient(0, -0.5*xi - 0.5 + 1.5*((xi + 1)*(xi + 1)) - 0.625*(xi + 1)*(xi + 1)*(xi + 1));
+                case 23:
+                  return RealGradient(-0.5*eta - 0.5 + 1.5*((eta + 1)*(eta + 1)) - 0.625*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                default:
+                  libmesh_error_msg("Invalid i = " << i);
+                }
+            }
+
+          case TRI6:
+          case TRI7:
+            {
+              switch(ii)
+                {
+                case 0:
+                  return sign * RealGradient(120.0*eta*xi - 54.0*eta - 45.0*eta*xi*xi - 36.0*xi - 90.0*xi*eta*eta + 9.0 + 90.0*(eta*eta) + 30.0*(xi*xi) - 45.0*eta*eta*eta, -60.0*eta*xi + 90.0*eta*(xi*xi) + 18.0*xi + 45.0*xi*(eta*eta) - 60.0*xi*xi + 45.0*(xi*xi*xi));
+                case 1:
+                  return sign * RealGradient(-37.5*eta*xi - 2.25*eta + 22.5*eta*(xi*xi) + 15.0*xi + 22.5*xi*(eta*eta) - 1.5 + 15.0*(eta*eta) - 15.0*xi*xi - 11.25*eta*eta*eta, -22.5*eta*xi*xi - 5.25*xi + 11.25*xi*(eta*eta) + 26.25*(xi*xi) - 22.5*xi*xi*xi);
+                case 2:
+                  return sign * RealGradient(30.0*eta*xi - 3.0*eta - 45.0*eta*xi*xi - 24.0*xi + 3.0 + 30.0*(xi*xi), 9.0*xi - 45.0*xi*xi + 45.0*(xi*xi*xi));
+                case 3:
+                  return sign * RealGradient(30.0*eta*xi - 3.0*eta - 45.0*eta*xi*xi, 9.0*xi - 45.0*xi*xi + 45.0*(xi*xi*xi));
+                case 4:
+                  return sign * RealGradient(22.5*eta*xi - 6.0*eta - 11.25*eta*xi*xi - 45.0*xi*eta*eta + 18.75*(eta*eta) - 11.25*eta*eta*eta, -22.5*eta*xi + 45.0*eta*(xi*xi) + 6.0*xi + 11.25*xi*(eta*eta) - 18.75*xi*xi + 11.25*(xi*xi*xi));
+                case 5:
+                  return sign * RealGradient(-9.0*eta + 45.0*(eta*eta) - 45.0*eta*eta*eta, -30.0*eta*xi + 3.0*xi + 45.0*xi*(eta*eta));
+                case 6:
+                  return sign * RealGradient(-9.0*eta + 45.0*(eta*eta) - 45.0*eta*eta*eta, -30.0*eta*xi + 24.0*eta + 3.0*xi + 45.0*xi*(eta*eta) - 3.0 - 30.0*eta*eta);
+                case 7:
+                  return sign * RealGradient(5.25*eta - 11.25*eta*xi*xi + 22.5*xi*(eta*eta) - 26.25*eta*eta + 22.5*(eta*eta*eta), 37.5*eta*xi - 15.0*eta - 22.5*eta*xi*xi + 2.25*xi - 22.5*xi*eta*eta + 1.5 + 15.0*(eta*eta) - 15.0*xi*xi + 11.25*(xi*xi*xi));
+                case 8:
+                  return sign * RealGradient(60.0*eta*xi - 18.0*eta - 45.0*eta*xi*xi - 90.0*xi*eta*eta + 60.0*(eta*eta) - 45.0*eta*eta*eta, -120.0*eta*xi + 36.0*eta + 90.0*eta*(xi*xi) + 54.0*xi + 45.0*xi*(eta*eta) - 9.0 - 30.0*eta*eta - 90.0*xi*xi + 45.0*(xi*xi*xi));
+                case 9:
+                  return RealGradient(-300.0*eta*xi + 180.0*eta + 90.0*eta*(xi*xi) + 360.0*xi*(eta*eta) - 450.0*eta*eta + 270.0*(eta*eta*eta), 300.0*eta*xi - 360.0*eta*xi*xi - 60.0*xi - 270.0*xi*eta*eta + 150.0*(xi*xi) - 90.0*xi*xi*xi);
+                case 10:
+                  return RealGradient(300.0*eta*xi - 60.0*eta - 270.0*eta*xi*xi - 360.0*xi*eta*eta + 150.0*(eta*eta) - 90.0*eta*eta*eta, -300.0*eta*xi + 360.0*eta*(xi*xi) + 180.0*xi + 90.0*xi*(eta*eta) - 450.0*xi*xi + 270.0*(xi*xi*xi));
+                case 11:
+                  return RealGradient(360.0*eta*xi - 60.0*eta - 180.0*eta*xi*xi - 360.0*xi*eta*eta + 60.0*(eta*eta), -120.0*eta*xi + 360.0*eta*(xi*xi) + 60.0*xi - 240.0*xi*xi + 180.0*(xi*xi*xi));
+                case 12:
+                  return RealGradient(-240.0*eta*xi + 30.0*eta + 270.0*eta*(xi*xi) + 180.0*xi*(eta*eta) - 30.0*eta*eta, 60.0*eta*xi - 180.0*eta*xi*xi - 90.0*xi + 360.0*(xi*xi) - 270.0*xi*xi*xi);
+                case 13:
+                  return RealGradient(60.0*eta*xi - 90.0*eta - 180.0*xi*eta*eta + 360.0*(eta*eta) - 270.0*eta*eta*eta, -240.0*eta*xi + 180.0*eta*(xi*xi) + 30.0*xi + 270.0*xi*(eta*eta) - 30.0*xi*xi);
+                case 14:
+                  return RealGradient(-120.0*eta*xi + 60.0*eta + 360.0*xi*(eta*eta) - 240.0*eta*eta + 180.0*(eta*eta*eta), 360.0*eta*xi - 360.0*eta*xi*xi - 60.0*xi - 180.0*xi*eta*eta + 60.0*(xi*xi));
+                default:
+                  libmesh_error_msg("Invalid i = " << i);
+                }
+            }
+
+          default:
+            libmesh_error_msg("ERROR: Unsupported 2D element type!: " << Utility::enum_to_string(elem->type()));
+          } // end switch (type)
+      } // end case THIRD
+
       // unsupported order
     default:
       libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
@@ -473,6 +581,232 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
             libmesh_error_msg("ERROR: Unsupported 2D element type!: " << Utility::enum_to_string(elem->type()));
           }
       }
+
+      // cubic Nedelec (first kind) shape function first derivatives
+    case THIRD:
+      {
+        switch (elem->type())
+          {
+          case QUAD8:
+          case QUAD9:
+            {
+              switch (j)
+                {
+                  // d()/dxi
+                case 0:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(40.5*eta + 7.5*xi - 33.75*(0.5*eta + 0.5)*(2*xi + 2) + 16.875*(2*xi + 2)*((eta + 1)*(eta + 1)) - 4.6875*(2*xi + 2)*(eta + 1)*(eta + 1)*(eta + 1) + 39.0 - 40.5*(eta + 1)*(eta + 1) + 11.25*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 1:
+                        return sign * RealGradient(-16.875*eta - 3.75*xi + 16.875*(0.5*eta + 0.5)*(2*xi + 2) - 8.4375*(2*xi + 2)*(eta + 1)*(eta + 1) + 2.34375*(2*xi + 2)*((eta + 1)*(eta + 1)*(eta + 1)) - 16.875 + 16.875*((eta + 1)*(eta + 1)) - 4.6875*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 2:
+                        return sign * RealGradient(27.0*eta + 7.5*xi - 33.75*(0.5*eta + 0.5)*(2*xi + 2) + 16.875*(2*xi + 2)*((eta + 1)*(eta + 1)) - 4.6875*(2*xi + 2)*(eta + 1)*(eta + 1)*(eta + 1) + 28.5 - 27.0*(eta + 1)*(eta + 1) + 7.5*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 3:
+                        return sign * RealGradient(0, -13.5*eta - 27.0*xi + 54.0*(0.5*eta + 0.5)*(2*xi + 2) - 67.5*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 11.25*(2*xi + 2)*(eta + 1)*(eta + 1) - 33.75 + 5.625*((eta + 1)*(eta + 1)) + 14.0625*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 16.875*((xi + 1)*(xi + 1)));
+                      case 4:
+                        return sign * RealGradient(0, 5.625*eta + 4.5*xi - 22.5*(0.5*eta + 0.5)*(2*xi + 2) + 28.125*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) + 5.625*(2*xi + 2)*((eta + 1)*(eta + 1)) + 9.0 - 2.8125*(eta + 1)*(eta + 1) - 7.03125*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 2.8125*(xi + 1)*(xi + 1));
+                      case 5:
+                        return sign * RealGradient(0, -9.0*eta - 9.0*xi + 36.0*(0.5*eta + 0.5)*(2*xi + 2) - 45.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 11.25*(2*xi + 2)*(eta + 1)*(eta + 1) - 15.75 + 5.625*((eta + 1)*(eta + 1)) + 14.0625*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 5.625*((xi + 1)*(xi + 1)));
+                      case 6:
+                        return sign * RealGradient(9.0*eta - 11.25*(0.5*eta + 0.5)*(2*xi + 2) + 11.25*(2*xi + 2)*((eta + 1)*(eta + 1)) - 4.6875*(2*xi + 2)*(eta + 1)*(eta + 1)*(eta + 1) + 9.0 - 18.0*(eta + 1)*(eta + 1) + 7.5*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 7:
+                        return sign * RealGradient(-5.625*eta + 5.625*(0.5*eta + 0.5)*(2*xi + 2) - 5.625*(2*xi + 2)*(eta + 1)*(eta + 1) + 2.34375*(2*xi + 2)*((eta + 1)*(eta + 1)*(eta + 1)) - 5.625 + 11.25*((eta + 1)*(eta + 1)) - 4.6875*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 8:
+                        return sign * RealGradient(13.5*eta - 11.25*(0.5*eta + 0.5)*(2*xi + 2) + 11.25*(2*xi + 2)*((eta + 1)*(eta + 1)) - 4.6875*(2*xi + 2)*(eta + 1)*(eta + 1)*(eta + 1) + 13.5 - 27.0*(eta + 1)*(eta + 1) + 11.25*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 9:
+                        return sign * RealGradient(0, -27.0*eta - 13.5*xi + 54.0*(0.5*eta + 0.5)*(2*xi + 2) - 45.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 16.875*(2*xi + 2)*(eta + 1)*(eta + 1) - 33.75 + 16.875*((eta + 1)*(eta + 1)) + 14.0625*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 5.625*((xi + 1)*(xi + 1)));
+                      case 10:
+                        return sign * RealGradient(0, 16.875*eta + 6.75*xi - 33.75*(0.5*eta + 0.5)*(2*xi + 2) + 28.125*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) + 8.4375*(2*xi + 2)*((eta + 1)*(eta + 1)) + 20.25 - 8.4375*(eta + 1)*(eta + 1) - 7.03125*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 2.8125*(xi + 1)*(xi + 1));
+                      case 11:
+                        return sign * RealGradient(0, -40.5*eta - 40.5*xi + 81.0*(0.5*eta + 0.5)*(2*xi + 2) - 67.5*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 16.875*(2*xi + 2)*(eta + 1)*(eta + 1) - 60.75 + 16.875*((eta + 1)*(eta + 1)) + 14.0625*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 16.875*((xi + 1)*(xi + 1)));
+                      case 12:
+                        return RealGradient(0, -36.0*eta - 40.5*xi + 81.0*(0.5*eta + 0.5)*(2*xi + 2) - 67.5*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 16.875*(2*xi + 2)*(eta + 1)*(eta + 1) - 58.5 + 15.0*((eta + 1)*(eta + 1)) + 14.0625*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 16.875*((xi + 1)*(xi + 1)));
+                      case 13:
+                        return RealGradient(0, 9.0*eta + 27.0*xi - 54.0*(0.5*eta + 0.5)*(2*xi + 2) + 67.5*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) + 11.25*(2*xi + 2)*((eta + 1)*(eta + 1)) + 31.5 - 3.75*(eta + 1)*(eta + 1) - 14.0625*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 16.875*(xi + 1)*(xi + 1));
+                      case 14:
+                        return RealGradient(36.0*eta - 30.0*(0.5*eta + 0.5)*(2*xi + 2) + 16.875*(2*xi + 2)*((eta + 1)*(eta + 1)) - 4.6875*(2*xi + 2)*(eta + 1)*(eta + 1)*(eta + 1) + 36.0 - 40.5*(eta + 1)*(eta + 1) + 11.25*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 15:
+                        return RealGradient(-9.0*eta + 7.5*(0.5*eta + 0.5)*(2*xi + 2) - 11.25*(2*xi + 2)*(eta + 1)*(eta + 1) + 4.6875*(2*xi + 2)*((eta + 1)*(eta + 1)*(eta + 1)) - 9.0 + 27.0*((eta + 1)*(eta + 1)) - 11.25*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 16:
+                        return RealGradient(24.0*eta - 30.0*(0.5*eta + 0.5)*(2*xi + 2) + 16.875*(2*xi + 2)*((eta + 1)*(eta + 1)) - 4.6875*(2*xi + 2)*(eta + 1)*(eta + 1)*(eta + 1) + 24.0 - 27.0*(eta + 1)*(eta + 1) + 7.5*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 17:
+                        return RealGradient(-6.0*eta + 7.5*(0.5*eta + 0.5)*(2*xi + 2) - 11.25*(2*xi + 2)*(eta + 1)*(eta + 1) + 4.6875*(2*xi + 2)*((eta + 1)*(eta + 1)*(eta + 1)) - 6.0 + 18.0*((eta + 1)*(eta + 1)) - 7.5*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 18:
+                        return RealGradient(0, -24.0*eta - 13.5*xi + 54.0*(0.5*eta + 0.5)*(2*xi + 2) - 45.0*(0.5*eta + 0.5)*(xi + 1)*(xi + 1) - 16.875*(2*xi + 2)*(eta + 1)*(eta + 1) - 31.5 + 15.0*((eta + 1)*(eta + 1)) + 14.0625*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 5.625*((xi + 1)*(xi + 1)));
+                      case 19:
+                        return RealGradient(0, 6.0*eta + 9.0*xi - 36.0*(0.5*eta + 0.5)*(2*xi + 2) + 45.0*(0.5*eta + 0.5)*((xi + 1)*(xi + 1)) + 11.25*(2*xi + 2)*((eta + 1)*(eta + 1)) + 13.5 - 3.75*(eta + 1)*(eta + 1) - 14.0625*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 5.625*(xi + 1)*(xi + 1));
+                      case 20:
+                        return RealGradient(0, 0);
+                      case 21:
+                        return RealGradient(0, -4.5*xi - 2.5 + 1.875*((xi + 1)*(xi + 1)));
+                      case 22:
+                        return RealGradient(0, 3.0*xi + 2.5 - 1.875*(xi + 1)*(xi + 1));
+                      case 23:
+                        return RealGradient(0, 0);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 0
+
+                  // d()/deta
+                case 1:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(40.5*eta + 40.5*xi - 81.0*(2*eta + 2)*(0.5*xi + 0.5) + 16.875*(2*eta + 2)*((xi + 1)*(xi + 1)) + 67.5*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 60.75 - 16.875*(eta + 1)*(eta + 1) - 14.0625*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 16.875*(xi + 1)*(xi + 1), 0);
+                      case 1:
+                        return sign * RealGradient(-6.75*eta - 16.875*xi + 33.75*(2*eta + 2)*(0.5*xi + 0.5) - 8.4375*(2*eta + 2)*(xi + 1)*(xi + 1) - 28.125*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) - 20.25 + 2.8125*((eta + 1)*(eta + 1)) + 7.03125*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 8.4375*((xi + 1)*(xi + 1)), 0);
+                      case 2:
+                        return sign * RealGradient(13.5*eta + 27.0*xi - 54.0*(2*eta + 2)*(0.5*xi + 0.5) + 16.875*(2*eta + 2)*((xi + 1)*(xi + 1)) + 45.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 33.75 - 5.625*(eta + 1)*(eta + 1) - 14.0625*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 16.875*(xi + 1)*(xi + 1), 0);
+                      case 3:
+                        return sign * RealGradient(0, -13.5*xi + 11.25*(2*eta + 2)*(0.5*xi + 0.5) - 11.25*(2*eta + 2)*(xi + 1)*(xi + 1) + 4.6875*(2*eta + 2)*((xi + 1)*(xi + 1)*(xi + 1)) - 13.5 + 27.0*((xi + 1)*(xi + 1)) - 11.25*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 4:
+                        return sign * RealGradient(0, 5.625*xi - 5.625*(2*eta + 2)*(0.5*xi + 0.5) + 5.625*(2*eta + 2)*((xi + 1)*(xi + 1)) - 2.34375*(2*eta + 2)*(xi + 1)*(xi + 1)*(xi + 1) + 5.625 - 11.25*(xi + 1)*(xi + 1) + 4.6875*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 5:
+                        return sign * RealGradient(0, -9.0*xi + 11.25*(2*eta + 2)*(0.5*xi + 0.5) - 11.25*(2*eta + 2)*(xi + 1)*(xi + 1) + 4.6875*(2*eta + 2)*((xi + 1)*(xi + 1)*(xi + 1)) - 9.0 + 18.0*((xi + 1)*(xi + 1)) - 7.5*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 6:
+                        return sign * RealGradient(9.0*eta + 9.0*xi - 36.0*(2*eta + 2)*(0.5*xi + 0.5) + 11.25*(2*eta + 2)*((xi + 1)*(xi + 1)) + 45.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 15.75 - 5.625*(eta + 1)*(eta + 1) - 14.0625*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 5.625*(xi + 1)*(xi + 1), 0);
+                      case 7:
+                        return sign * RealGradient(-4.5*eta - 5.625*xi + 22.5*(2*eta + 2)*(0.5*xi + 0.5) - 5.625*(2*eta + 2)*(xi + 1)*(xi + 1) - 28.125*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) - 9.0 + 2.8125*((eta + 1)*(eta + 1)) + 7.03125*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 2.8125*((xi + 1)*(xi + 1)), 0);
+                      case 8:
+                        return sign * RealGradient(27.0*eta + 13.5*xi - 54.0*(2*eta + 2)*(0.5*xi + 0.5) + 11.25*(2*eta + 2)*((xi + 1)*(xi + 1)) + 67.5*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 33.75 - 16.875*(eta + 1)*(eta + 1) - 14.0625*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 5.625*(xi + 1)*(xi + 1), 0);
+                      case 9:
+                        return sign * RealGradient(0, -7.5*eta - 27.0*xi + 33.75*(2*eta + 2)*(0.5*xi + 0.5) - 16.875*(2*eta + 2)*(xi + 1)*(xi + 1) + 4.6875*(2*eta + 2)*((xi + 1)*(xi + 1)*(xi + 1)) - 28.5 + 27.0*((xi + 1)*(xi + 1)) - 7.5*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 10:
+                        return sign * RealGradient(0, 3.75*eta + 16.875*xi - 16.875*(2*eta + 2)*(0.5*xi + 0.5) + 8.4375*(2*eta + 2)*((xi + 1)*(xi + 1)) - 2.34375*(2*eta + 2)*(xi + 1)*(xi + 1)*(xi + 1) + 16.875 - 16.875*(xi + 1)*(xi + 1) + 4.6875*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 11:
+                        return sign * RealGradient(0, -7.5*eta - 40.5*xi + 33.75*(2*eta + 2)*(0.5*xi + 0.5) - 16.875*(2*eta + 2)*(xi + 1)*(xi + 1) + 4.6875*(2*eta + 2)*((xi + 1)*(xi + 1)*(xi + 1)) - 39.0 + 40.5*((xi + 1)*(xi + 1)) - 11.25*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 12:
+                        return RealGradient(0, -36.0*xi + 30.0*(2*eta + 2)*(0.5*xi + 0.5) - 16.875*(2*eta + 2)*(xi + 1)*(xi + 1) + 4.6875*(2*eta + 2)*((xi + 1)*(xi + 1)*(xi + 1)) - 36.0 + 40.5*((xi + 1)*(xi + 1)) - 11.25*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 13:
+                        return RealGradient(0, 9.0*xi - 7.5*(2*eta + 2)*(0.5*xi + 0.5) + 11.25*(2*eta + 2)*((xi + 1)*(xi + 1)) - 4.6875*(2*eta + 2)*(xi + 1)*(xi + 1)*(xi + 1) + 9.0 - 27.0*(xi + 1)*(xi + 1) + 11.25*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 14:
+                        return RealGradient(40.5*eta + 36.0*xi - 81.0*(2*eta + 2)*(0.5*xi + 0.5) + 16.875*(2*eta + 2)*((xi + 1)*(xi + 1)) + 67.5*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 58.5 - 16.875*(eta + 1)*(eta + 1) - 14.0625*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 15.0*(xi + 1)*(xi + 1), 0);
+                      case 15:
+                        return RealGradient(-27.0*eta - 9.0*xi + 54.0*(2*eta + 2)*(0.5*xi + 0.5) - 11.25*(2*eta + 2)*(xi + 1)*(xi + 1) - 67.5*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) - 31.5 + 16.875*((eta + 1)*(eta + 1)) + 14.0625*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 3.75*((xi + 1)*(xi + 1)), 0);
+                      case 16:
+                        return RealGradient(13.5*eta + 24.0*xi - 54.0*(2*eta + 2)*(0.5*xi + 0.5) + 16.875*(2*eta + 2)*((xi + 1)*(xi + 1)) + 45.0*(0.5*xi + 0.5)*((eta + 1)*(eta + 1)) + 31.5 - 5.625*(eta + 1)*(eta + 1) - 14.0625*(eta + 1)*(eta + 1)*(xi + 1)*(xi + 1) - 15.0*(xi + 1)*(xi + 1), 0);
+                      case 17:
+                        return RealGradient(-9.0*eta - 6.0*xi + 36.0*(2*eta + 2)*(0.5*xi + 0.5) - 11.25*(2*eta + 2)*(xi + 1)*(xi + 1) - 45.0*(0.5*xi + 0.5)*(eta + 1)*(eta + 1) - 13.5 + 5.625*((eta + 1)*(eta + 1)) + 14.0625*((eta + 1)*(eta + 1))*((xi + 1)*(xi + 1)) + 3.75*((xi + 1)*(xi + 1)), 0);
+                      case 18:
+                        return RealGradient(0, -24.0*xi + 30.0*(2*eta + 2)*(0.5*xi + 0.5) - 16.875*(2*eta + 2)*(xi + 1)*(xi + 1) + 4.6875*(2*eta + 2)*((xi + 1)*(xi + 1)*(xi + 1)) - 24.0 + 27.0*((xi + 1)*(xi + 1)) - 7.5*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 19:
+                        return RealGradient(0, 6.0*xi - 7.5*(2*eta + 2)*(0.5*xi + 0.5) + 11.25*(2*eta + 2)*((xi + 1)*(xi + 1)) - 4.6875*(2*eta + 2)*(xi + 1)*(xi + 1)*(xi + 1) + 6.0 - 18.0*(xi + 1)*(xi + 1) + 7.5*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 20:
+                        return RealGradient(-4.5*eta - 2.5 + 1.875*((eta + 1)*(eta + 1)), 0);
+                      case 21:
+                        return RealGradient(0, 0);
+                      case 22:
+                        return RealGradient(0, 0);
+                      case 23:
+                        return RealGradient(3.0*eta + 2.5 - 1.875*(eta + 1)*(eta + 1), 0);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 1
+
+                default:
+                  libmesh_error_msg("Invalid j = " << j);
+                }
+            }
+
+          case TRI6:
+          case TRI7:
+            {
+              switch (j)
+                {
+                  // d()/dxi
+                case 0:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(-90.0*eta*xi + 120.0*eta + 60.0*xi - 36.0 - 90.0*eta*eta, 180.0*eta*xi - 60.0*eta - 120.0*xi + 18.0 + 45.0*(eta*eta) + 135.0*(xi*xi));
+                      case 1:
+                        return sign * RealGradient(45.0*eta*xi - 37.5*eta - 30.0*xi + 15.0 + 22.5*(eta*eta), -45.0*eta*xi + 52.5*xi - 5.25 + 11.25*(eta*eta) - 67.5*xi*xi);
+                      case 2:
+                        return sign * RealGradient(-90.0*eta*xi + 30.0*eta + 60.0*xi - 24.0, -90.0*xi + 9.0 + 135.0*(xi*xi));
+                      case 3:
+                        return sign * RealGradient(-90.0*eta*xi + 30.0*eta, -90.0*xi + 9.0 + 135.0*(xi*xi));
+                      case 4:
+                        return sign * RealGradient(-22.5*eta*xi + 22.5*eta - 45.0*eta*eta, 90.0*eta*xi - 22.5*eta - 37.5*xi + 6.0 + 11.25*(eta*eta) + 33.75*(xi*xi));
+                      case 5:
+                        return sign * RealGradient(0, -30.0*eta + 3.0 + 45.0*(eta*eta));
+                      case 6:
+                        return sign * RealGradient(0, -30.0*eta + 3.0 + 45.0*(eta*eta));
+                      case 7:
+                        return sign * RealGradient(-22.5*eta*xi + 22.5*(eta*eta), -45.0*eta*xi + 37.5*eta - 30.0*xi + 2.25 - 22.5*eta*eta + 33.75*(xi*xi));
+                      case 8:
+                        return sign * RealGradient(-90.0*eta*xi + 60.0*eta - 90.0*eta*eta, 180.0*eta*xi - 120.0*eta - 180.0*xi + 54.0 + 45.0*(eta*eta) + 135.0*(xi*xi));
+                      case 9:
+                        return RealGradient(180.0*eta*xi - 300.0*eta + 360.0*(eta*eta), -720.0*eta*xi + 300.0*eta + 300.0*xi - 60.0 - 270.0*eta*eta - 270.0*xi*xi);
+                      case 10:
+                        return RealGradient(-540.0*eta*xi + 300.0*eta - 360.0*eta*eta, 720.0*eta*xi - 300.0*eta - 900.0*xi + 180.0 + 90.0*(eta*eta) + 810.0*(xi*xi));
+                      case 11:
+                        return RealGradient(-360.0*eta*xi + 360.0*eta - 360.0*eta*eta, 720.0*eta*xi - 120.0*eta - 480.0*xi + 60.0 + 540.0*(xi*xi));
+                      case 12:
+                        return RealGradient(540.0*eta*xi - 240.0*eta + 180.0*(eta*eta), -360.0*eta*xi + 60.0*eta + 720.0*xi - 90.0 - 810.0*xi*xi);
+                      case 13:
+                        return RealGradient(60.0*eta - 180.0*eta*eta, 360.0*eta*xi - 240.0*eta - 60.0*xi + 30.0 + 270.0*(eta*eta));
+                      case 14:
+                        return RealGradient(-120.0*eta + 360.0*(eta*eta), -720.0*eta*xi + 360.0*eta + 120.0*xi - 60.0 - 180.0*eta*eta);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 0
+
+                  // d()/deta
+                case 1:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(-180.0*eta*xi + 180.0*eta + 120.0*xi - 54.0 - 135.0*eta*eta - 45.0*xi*xi, 90.0*eta*xi - 60.0*xi + 90.0*(xi*xi));
+                      case 1:
+                        return sign * RealGradient(45.0*eta*xi + 30.0*eta - 37.5*xi - 2.25 - 33.75*eta*eta + 22.5*(xi*xi), 22.5*eta*xi - 22.5*xi*xi);
+                      case 2:
+                        return sign * RealGradient(30.0*xi - 3.0 - 45.0*xi*xi, 0);
+                      case 3:
+                        return sign * RealGradient(30.0*xi - 3.0 - 45.0*xi*xi, 0);
+                      case 4:
+                        return sign * RealGradient(-90.0*eta*xi + 37.5*eta + 22.5*xi - 6.0 - 33.75*eta*eta - 11.25*xi*xi, 22.5*eta*xi - 22.5*xi + 45.0*(xi*xi));
+                      case 5:
+                        return sign * RealGradient(90.0*eta - 9.0 - 135.0*eta*eta, 90.0*eta*xi - 30.0*xi);
+                      case 6:
+                        return sign * RealGradient(90.0*eta - 9.0 - 135.0*eta*eta, 90.0*eta*xi - 60.0*eta - 30.0*xi + 24.0);
+                      case 7:
+                        return sign * RealGradient(45.0*eta*xi - 52.5*eta + 5.25 + 67.5*(eta*eta) - 11.25*xi*xi, -45.0*eta*xi + 30.0*eta + 37.5*xi - 15.0 - 22.5*xi*xi);
+                      case 8:
+                        return sign * RealGradient(-180.0*eta*xi + 120.0*eta + 60.0*xi - 18.0 - 135.0*eta*eta - 45.0*xi*xi, 90.0*eta*xi - 60.0*eta - 120.0*xi + 36.0 + 90.0*(xi*xi));
+                      case 9:
+                        return RealGradient(720.0*eta*xi - 900.0*eta - 300.0*xi + 180.0 + 810.0*(eta*eta) + 90.0*(xi*xi), -540.0*eta*xi + 300.0*xi - 360.0*xi*xi);
+                      case 10:
+                        return RealGradient(-720.0*eta*xi + 300.0*eta + 300.0*xi - 60.0 - 270.0*eta*eta - 270.0*xi*xi, 180.0*eta*xi - 300.0*xi + 360.0*(xi*xi));
+                      case 11:
+                        return RealGradient(-720.0*eta*xi + 120.0*eta + 360.0*xi - 60.0 - 180.0*xi*xi, -120.0*xi + 360.0*(xi*xi));
+                      case 12:
+                        return RealGradient(360.0*eta*xi - 60.0*eta - 240.0*xi + 30.0 + 270.0*(xi*xi), 60.0*xi - 180.0*xi*xi);
+                      case 13:
+                        return RealGradient(-360.0*eta*xi + 720.0*eta + 60.0*xi - 90.0 - 810.0*eta*eta, 540.0*eta*xi - 240.0*xi + 180.0*(xi*xi));
+                      case 14:
+                        return RealGradient(720.0*eta*xi - 480.0*eta - 120.0*xi + 60.0 + 540.0*(eta*eta), -360.0*eta*xi + 360.0*xi - 360.0*xi*xi);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 1
+
+                default:
+                  libmesh_error_msg("Invalid j = " << j);
+                }
+            }
+
+          default:
+            libmesh_error_msg("ERROR: Unsupported 2D element type!: " << Utility::enum_to_string(elem->type()));
+          } // end switch (type)
+      } // end case THIRD
 
       // unsupported order
     default:
@@ -769,6 +1103,330 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
 
           } // end switch (type)
       } // end case SECOND
+
+      // cubic Nedelec (first kind) shape function second derivatives
+    case THIRD:
+      {
+        switch (elem->type())
+          {
+          case QUAD8:
+          case QUAD9:
+            {
+              switch (j)
+                {
+                  // d^2()/dxi^2
+                case 0:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(-33.75*eta - 26.25 + 33.75*((eta + 1)*(eta + 1)) - 9.375*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 1:
+                        return sign * RealGradient(16.875*eta + 13.125 - 16.875*(eta + 1)*(eta + 1) + 4.6875*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 2:
+                        return sign * RealGradient(-33.75*eta - 26.25 + 33.75*((eta + 1)*(eta + 1)) - 9.375*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 3:
+                        return sign * RealGradient(0, 54.0*eta + 33.75*xi - 67.5*(eta + 1)*(xi + 1) + 28.125*(xi + 1)*((eta + 1)*(eta + 1)) + 60.75 - 22.5*(eta + 1)*(eta + 1));
+                      case 4:
+                        return sign * RealGradient(0, -22.5*eta - 5.625*xi + 28.125*(eta + 1)*(xi + 1) - 14.0625*(xi + 1)*(eta + 1)*(eta + 1) - 23.625 + 11.25*((eta + 1)*(eta + 1)));
+                      case 5:
+                        return sign * RealGradient(0, 36.0*eta + 11.25*xi - 45.0*(eta + 1)*(xi + 1) + 28.125*(xi + 1)*((eta + 1)*(eta + 1)) + 38.25 - 22.5*(eta + 1)*(eta + 1));
+                      case 6:
+                        return sign * RealGradient(-11.25*eta - 11.25 + 22.5*((eta + 1)*(eta + 1)) - 9.375*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 7:
+                        return sign * RealGradient(5.625*eta + 5.625 - 11.25*(eta + 1)*(eta + 1) + 4.6875*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 8:
+                        return sign * RealGradient(-11.25*eta - 11.25 + 22.5*((eta + 1)*(eta + 1)) - 9.375*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 9:
+                        return sign * RealGradient(0, 54.0*eta + 11.25*xi - 45.0*(eta + 1)*(xi + 1) + 28.125*(xi + 1)*((eta + 1)*(eta + 1)) + 51.75 - 33.75*(eta + 1)*(eta + 1));
+                      case 10:
+                        return sign * RealGradient(0, -33.75*eta - 5.625*xi + 28.125*(eta + 1)*(xi + 1) - 14.0625*(xi + 1)*(eta + 1)*(eta + 1) - 32.625 + 16.875*((eta + 1)*(eta + 1)));
+                      case 11:
+                        return sign * RealGradient(0, 81.0*eta + 33.75*xi - 67.5*(eta + 1)*(xi + 1) + 28.125*(xi + 1)*((eta + 1)*(eta + 1)) + 74.25 - 33.75*(eta + 1)*(eta + 1));
+                      case 12:
+                        return RealGradient(0, 81.0*eta + 33.75*xi - 67.5*(eta + 1)*(xi + 1) + 28.125*(xi + 1)*((eta + 1)*(eta + 1)) + 74.25 - 33.75*(eta + 1)*(eta + 1));
+                      case 13:
+                        return RealGradient(0, -54.0*eta - 33.75*xi + 67.5*(eta + 1)*(xi + 1) - 28.125*(xi + 1)*(eta + 1)*(eta + 1) - 60.75 + 22.5*((eta + 1)*(eta + 1)));
+                      case 14:
+                        return RealGradient(-30.0*eta - 30.0 + 33.75*((eta + 1)*(eta + 1)) - 9.375*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 15:
+                        return RealGradient(7.5*eta + 7.5 - 22.5*(eta + 1)*(eta + 1) + 9.375*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 16:
+                        return RealGradient(-30.0*eta - 30.0 + 33.75*((eta + 1)*(eta + 1)) - 9.375*(eta + 1)*(eta + 1)*(eta + 1), 0);
+                      case 17:
+                        return RealGradient(7.5*eta + 7.5 - 22.5*(eta + 1)*(eta + 1) + 9.375*((eta + 1)*(eta + 1)*(eta + 1)), 0);
+                      case 18:
+                        return RealGradient(0, 54.0*eta + 11.25*xi - 45.0*(eta + 1)*(xi + 1) + 28.125*(xi + 1)*((eta + 1)*(eta + 1)) + 51.75 - 33.75*(eta + 1)*(eta + 1));
+                      case 19:
+                        return RealGradient(0, -36.0*eta - 11.25*xi + 45.0*(eta + 1)*(xi + 1) - 28.125*(xi + 1)*(eta + 1)*(eta + 1) - 38.25 + 22.5*((eta + 1)*(eta + 1)));
+                      case 20:
+                        return RealGradient(0, 0);
+                      case 21:
+                        return RealGradient(0, 3.75*xi - 0.75);
+                      case 22:
+                        return RealGradient(0, -3.75*xi - 0.75);
+                      case 23:
+                        return RealGradient(0, 0);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 0
+
+                  // d^2()/dxideta
+                case 1:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(-81.0*eta - 33.75*xi + 16.875*(2*eta + 2)*(2*xi + 2) - 14.0625*(2*xi + 2)*(eta + 1)*(eta + 1) - 74.25 + 33.75*((eta + 1)*(eta + 1)), 0);
+                      case 1:
+                        return sign * RealGradient(33.75*eta + 16.875*xi - 8.4375*(2*eta + 2)*(2*xi + 2) + 7.03125*(2*xi + 2)*((eta + 1)*(eta + 1)) + 33.75 - 14.0625*(eta + 1)*(eta + 1), 0);
+                      case 2:
+                        return sign * RealGradient(-54.0*eta - 33.75*xi + 16.875*(2*eta + 2)*(2*xi + 2) - 14.0625*(2*xi + 2)*(eta + 1)*(eta + 1) - 60.75 + 22.5*((eta + 1)*(eta + 1)), 0);
+                      case 3:
+                        return sign * RealGradient(0, 11.25*eta + 54.0*xi - 11.25*(2*eta + 2)*(2*xi + 2) + 14.0625*(2*eta + 2)*((xi + 1)*(xi + 1)) + 51.75 - 33.75*(xi + 1)*(xi + 1));
+                      case 4:
+                        return sign * RealGradient(0, -5.625*eta - 22.5*xi + 5.625*(2*eta + 2)*(2*xi + 2) - 7.03125*(2*eta + 2)*(xi + 1)*(xi + 1) - 22.5 + 14.0625*((xi + 1)*(xi + 1)));
+                      case 5:
+                        return sign * RealGradient(0, 11.25*eta + 36.0*xi - 11.25*(2*eta + 2)*(2*xi + 2) + 14.0625*(2*eta + 2)*((xi + 1)*(xi + 1)) + 38.25 - 22.5*(xi + 1)*(xi + 1));
+                      case 6:
+                        return sign * RealGradient(-36.0*eta - 11.25*xi + 11.25*(2*eta + 2)*(2*xi + 2) - 14.0625*(2*xi + 2)*(eta + 1)*(eta + 1) - 38.25 + 22.5*((eta + 1)*(eta + 1)), 0);
+                      case 7:
+                        return sign * RealGradient(22.5*eta + 5.625*xi - 5.625*(2*eta + 2)*(2*xi + 2) + 7.03125*(2*xi + 2)*((eta + 1)*(eta + 1)) + 22.5 - 14.0625*(eta + 1)*(eta + 1), 0);
+                      case 8:
+                        return sign * RealGradient(-54.0*eta - 11.25*xi + 11.25*(2*eta + 2)*(2*xi + 2) - 14.0625*(2*xi + 2)*(eta + 1)*(eta + 1) - 51.75 + 33.75*((eta + 1)*(eta + 1)), 0);
+                      case 9:
+                        return sign * RealGradient(0, 33.75*eta + 54.0*xi - 16.875*(2*eta + 2)*(2*xi + 2) + 14.0625*(2*eta + 2)*((xi + 1)*(xi + 1)) + 60.75 - 22.5*(xi + 1)*(xi + 1));
+                      case 10:
+                        return sign * RealGradient(0, -16.875*eta - 33.75*xi + 8.4375*(2*eta + 2)*(2*xi + 2) - 7.03125*(2*eta + 2)*(xi + 1)*(xi + 1) - 33.75 + 14.0625*((xi + 1)*(xi + 1)));
+                      case 11:
+                        return sign * RealGradient(0, 33.75*eta + 81.0*xi - 16.875*(2*eta + 2)*(2*xi + 2) + 14.0625*(2*eta + 2)*((xi + 1)*(xi + 1)) + 74.25 - 33.75*(xi + 1)*(xi + 1));
+                      case 12:
+                        return RealGradient(0, 30.0*eta + 81.0*xi - 16.875*(2*eta + 2)*(2*xi + 2) + 14.0625*(2*eta + 2)*((xi + 1)*(xi + 1)) + 75.0 - 33.75*(xi + 1)*(xi + 1));
+                      case 13:
+                        return RealGradient(0, -7.5*eta - 54.0*xi + 11.25*(2*eta + 2)*(2*xi + 2) - 14.0625*(2*eta + 2)*(xi + 1)*(xi + 1) - 52.5 + 33.75*((xi + 1)*(xi + 1)));
+                      case 14:
+                        return RealGradient(-81.0*eta - 30.0*xi + 16.875*(2*eta + 2)*(2*xi + 2) - 14.0625*(2*xi + 2)*(eta + 1)*(eta + 1) - 75.0 + 33.75*((eta + 1)*(eta + 1)), 0);
+                      case 15:
+                        return RealGradient(54.0*eta + 7.5*xi - 11.25*(2*eta + 2)*(2*xi + 2) + 14.0625*(2*xi + 2)*((eta + 1)*(eta + 1)) + 52.5 - 33.75*(eta + 1)*(eta + 1), 0);
+                      case 16:
+                        return RealGradient(-54.0*eta - 30.0*xi + 16.875*(2*eta + 2)*(2*xi + 2) - 14.0625*(2*xi + 2)*(eta + 1)*(eta + 1) - 60.0 + 22.5*((eta + 1)*(eta + 1)), 0);
+                      case 17:
+                        return RealGradient(36.0*eta + 7.5*xi - 11.25*(2*eta + 2)*(2*xi + 2) + 14.0625*(2*xi + 2)*((eta + 1)*(eta + 1)) + 37.5 - 22.5*(eta + 1)*(eta + 1), 0);
+                      case 18:
+                        return RealGradient(0, 30.0*eta + 54.0*xi - 16.875*(2*eta + 2)*(2*xi + 2) + 14.0625*(2*eta + 2)*((xi + 1)*(xi + 1)) + 60.0 - 22.5*(xi + 1)*(xi + 1));
+                      case 19:
+                        return RealGradient(0, -7.5*eta - 36.0*xi + 11.25*(2*eta + 2)*(2*xi + 2) - 14.0625*(2*eta + 2)*(xi + 1)*(xi + 1) - 37.5 + 22.5*((xi + 1)*(xi + 1)));
+                      case 20:
+                        return RealGradient(0, 0);
+                      case 21:
+                        return RealGradient(0, 0);
+                      case 22:
+                        return RealGradient(0, 0);
+                      case 23:
+                        return RealGradient(0, 0);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 1
+
+                  // d^2()/deta^2
+                case 2:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(-33.75*eta - 81.0*xi + 67.5*(eta + 1)*(xi + 1) - 28.125*(eta + 1)*(xi + 1)*(xi + 1) - 74.25 + 33.75*((xi + 1)*(xi + 1)), 0);
+                      case 1:
+                        return sign * RealGradient(5.625*eta + 33.75*xi - 28.125*(eta + 1)*(xi + 1) + 14.0625*(eta + 1)*((xi + 1)*(xi + 1)) + 32.625 - 16.875*(xi + 1)*(xi + 1), 0);
+                      case 2:
+                        return sign * RealGradient(-11.25*eta - 54.0*xi + 45.0*(eta + 1)*(xi + 1) - 28.125*(eta + 1)*(xi + 1)*(xi + 1) - 51.75 + 33.75*((xi + 1)*(xi + 1)), 0);
+                      case 3:
+                        return sign * RealGradient(0, 11.25*xi + 11.25 - 22.5*(xi + 1)*(xi + 1) + 9.375*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 4:
+                        return sign * RealGradient(0, -5.625*xi - 5.625 + 11.25*((xi + 1)*(xi + 1)) - 4.6875*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 5:
+                        return sign * RealGradient(0, 11.25*xi + 11.25 - 22.5*(xi + 1)*(xi + 1) + 9.375*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 6:
+                        return sign * RealGradient(-11.25*eta - 36.0*xi + 45.0*(eta + 1)*(xi + 1) - 28.125*(eta + 1)*(xi + 1)*(xi + 1) - 38.25 + 22.5*((xi + 1)*(xi + 1)), 0);
+                      case 7:
+                        return sign * RealGradient(5.625*eta + 22.5*xi - 28.125*(eta + 1)*(xi + 1) + 14.0625*(eta + 1)*((xi + 1)*(xi + 1)) + 23.625 - 11.25*(xi + 1)*(xi + 1), 0);
+                      case 8:
+                        return sign * RealGradient(-33.75*eta - 54.0*xi + 67.5*(eta + 1)*(xi + 1) - 28.125*(eta + 1)*(xi + 1)*(xi + 1) - 60.75 + 22.5*((xi + 1)*(xi + 1)), 0);
+                      case 9:
+                        return sign * RealGradient(0, 33.75*xi + 26.25 - 33.75*(xi + 1)*(xi + 1) + 9.375*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 10:
+                        return sign * RealGradient(0, -16.875*xi - 13.125 + 16.875*((xi + 1)*(xi + 1)) - 4.6875*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 11:
+                        return sign * RealGradient(0, 33.75*xi + 26.25 - 33.75*(xi + 1)*(xi + 1) + 9.375*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 12:
+                        return RealGradient(0, 30.0*xi + 30.0 - 33.75*(xi + 1)*(xi + 1) + 9.375*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 13:
+                        return RealGradient(0, -7.5*xi - 7.5 + 22.5*((xi + 1)*(xi + 1)) - 9.375*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 14:
+                        return RealGradient(-33.75*eta - 81.0*xi + 67.5*(eta + 1)*(xi + 1) - 28.125*(eta + 1)*(xi + 1)*(xi + 1) - 74.25 + 33.75*((xi + 1)*(xi + 1)), 0);
+                      case 15:
+                        return RealGradient(33.75*eta + 54.0*xi - 67.5*(eta + 1)*(xi + 1) + 28.125*(eta + 1)*((xi + 1)*(xi + 1)) + 60.75 - 22.5*(xi + 1)*(xi + 1), 0);
+                      case 16:
+                        return RealGradient(-11.25*eta - 54.0*xi + 45.0*(eta + 1)*(xi + 1) - 28.125*(eta + 1)*(xi + 1)*(xi + 1) - 51.75 + 33.75*((xi + 1)*(xi + 1)), 0);
+                      case 17:
+                        return RealGradient(11.25*eta + 36.0*xi - 45.0*(eta + 1)*(xi + 1) + 28.125*(eta + 1)*((xi + 1)*(xi + 1)) + 38.25 - 22.5*(xi + 1)*(xi + 1), 0);
+                      case 18:
+                        return RealGradient(0, 30.0*xi + 30.0 - 33.75*(xi + 1)*(xi + 1) + 9.375*((xi + 1)*(xi + 1)*(xi + 1)));
+                      case 19:
+                        return RealGradient(0, -7.5*xi - 7.5 + 22.5*((xi + 1)*(xi + 1)) - 9.375*(xi + 1)*(xi + 1)*(xi + 1));
+                      case 20:
+                        return RealGradient(3.75*eta - 0.75, 0);
+                      case 21:
+                        return RealGradient(0, 0);
+                      case 22:
+                        return RealGradient(0, 0);
+                      case 23:
+                        return RealGradient(-3.75*eta - 0.75, 0);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 2
+
+                default:
+                  libmesh_error_msg("Invalid j = " << j);
+                }
+            }
+
+          case TRI6:
+          case TRI7:
+            {
+              switch (j)
+                {
+                  // d^2()/dxi^2
+                case 0:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(60.0 - 90.0*eta, 180.0*eta + 270.0*xi - 120.0);
+                      case 1:
+                        return sign * RealGradient(45.0*eta - 30.0, -45.0*eta - 135.0*xi + 52.5);
+                      case 2:
+                        return sign * RealGradient(60.0 - 90.0*eta, 270.0*xi - 90.0);
+                      case 3:
+                        return sign * RealGradient(-90.0*eta, 270.0*xi - 90.0);
+                      case 4:
+                        return sign * RealGradient(-22.5*eta, 90.0*eta + 67.5*xi - 37.5);
+                      case 5:
+                        return sign * RealGradient(0, 0);
+                      case 6:
+                        return sign * RealGradient(0, 0);
+                      case 7:
+                        return sign * RealGradient(-22.5*eta, -45.0*eta + 67.5*xi - 30.0);
+                      case 8:
+                        return sign * RealGradient(-90.0*eta, 180.0*eta + 270.0*xi - 180.0);
+                      case 9:
+                        return RealGradient(180.0*eta, -720.0*eta - 540.0*xi + 300.0);
+                      case 10:
+                        return RealGradient(-540.0*eta, 720.0*eta + 1620.0*xi - 900.0);
+                      case 11:
+                        return RealGradient(-360.0*eta, 720.0*eta + 1080.0*xi - 480.0);
+                      case 12:
+                        return RealGradient(540.0*eta, -360.0*eta - 1620.0*xi + 720.0);
+                      case 13:
+                        return RealGradient(0, 360.0*eta - 60.0);
+                      case 14:
+                        return RealGradient(0, 120.0 - 720.0*eta);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 0
+
+                  // d^2()/dxideta
+                case 1:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(-180.0*eta - 90.0*xi + 120.0, 90.0*eta + 180.0*xi - 60.0);
+                      case 1:
+                        return sign * RealGradient(45.0*eta + 45.0*xi - 37.5, 22.5*eta - 45.0*xi);
+                      case 2:
+                        return sign * RealGradient(30.0 - 90.0*xi, 0);
+                      case 3:
+                        return sign * RealGradient(30.0 - 90.0*xi, 0);
+                      case 4:
+                        return sign * RealGradient(-90.0*eta - 22.5*xi + 22.5, 22.5*eta + 90.0*xi - 22.5);
+                      case 5:
+                        return sign * RealGradient(0, 90.0*eta - 30.0);
+                      case 6:
+                        return sign * RealGradient(0, 90.0*eta - 30.0);
+                      case 7:
+                        return sign * RealGradient(45.0*eta - 22.5*xi, -45.0*eta - 45.0*xi + 37.5);
+                      case 8:
+                        return sign * RealGradient(-180.0*eta - 90.0*xi + 60.0, 90.0*eta + 180.0*xi - 120.0);
+                      case 9:
+                        return RealGradient(720.0*eta + 180.0*xi - 300.0, -540.0*eta - 720.0*xi + 300.0);
+                      case 10:
+                        return RealGradient(-720.0*eta - 540.0*xi + 300.0, 180.0*eta + 720.0*xi - 300.0);
+                      case 11:
+                        return RealGradient(-720.0*eta - 360.0*xi + 360.0, 720.0*xi - 120.0);
+                      case 12:
+                        return RealGradient(360.0*eta + 540.0*xi - 240.0, 60.0 - 360.0*xi);
+                      case 13:
+                        return RealGradient(60.0 - 360.0*eta, 540.0*eta + 360.0*xi - 240.0);
+                      case 14:
+                        return RealGradient(720.0*eta - 120.0, -360.0*eta - 720.0*xi + 360.0);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 1
+
+                  // d^2()/deta^2
+                case 2:
+                  {
+                    switch(ii)
+                      {
+                      case 0:
+                        return sign * RealGradient(-270.0*eta - 180.0*xi + 180.0, 90.0*xi);
+                      case 1:
+                        return sign * RealGradient(-67.5*eta + 45.0*xi + 30.0, 22.5*xi);
+                      case 2:
+                        return sign * RealGradient(0, 0);
+                      case 3:
+                        return sign * RealGradient(0, 0);
+                      case 4:
+                        return sign * RealGradient(-67.5*eta - 90.0*xi + 37.5, 22.5*xi);
+                      case 5:
+                        return sign * RealGradient(90.0 - 270.0*eta, 90.0*xi);
+                      case 6:
+                        return sign * RealGradient(90.0 - 270.0*eta, 90.0*xi - 60.0);
+                      case 7:
+                        return sign * RealGradient(135.0*eta + 45.0*xi - 52.5, 30.0 - 45.0*xi);
+                      case 8:
+                        return sign * RealGradient(-270.0*eta - 180.0*xi + 120.0, 90.0*xi - 60.0);
+                      case 9:
+                        return RealGradient(1620.0*eta + 720.0*xi - 900.0, -540.0*xi);
+                      case 10:
+                        return RealGradient(-540.0*eta - 720.0*xi + 300.0, 180.0*xi);
+                      case 11:
+                        return RealGradient(120.0 - 720.0*xi, 0);
+                      case 12:
+                        return RealGradient(360.0*xi - 60.0, 0);
+                      case 13:
+                        return RealGradient(-1620.0*eta - 360.0*xi + 720.0, 540.0*xi);
+                      case 14:
+                        return RealGradient(1080.0*eta + 720.0*xi - 480.0, -360.0*xi);
+                      default:
+                        libmesh_error_msg("Invalid i = " << i);
+                      }
+                  } // j = 2
+
+                default:
+                  libmesh_error_msg("Invalid j = " << j);
+                }
+            }
+
+          default:
+            libmesh_error_msg("ERROR: Unsupported 2D element type!: " << Utility::enum_to_string(elem->type()));
+          } // end switch (type)
+      } // end case THIRD
 
       // unsupported order
     default:
