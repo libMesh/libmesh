@@ -10,6 +10,8 @@ options="--verbose dim=1 N=1024 initial_state=strip initial_center=0.5 initial_w
 
 run_example "$example_name" "$options"
 run_example "$example_name" "$options" -snes_mf_operator
+run_example "$example_name" "$options" -snes_type vinewtonrsls
+run_example "$example_name" "$options" -snes_type vinewtonssls
 
 # No benchmark here - I can't seem to pick parameters that aren't
 # either way too easy or prone to solver convergence failure
