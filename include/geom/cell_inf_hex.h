@@ -127,7 +127,7 @@ public:
   /**
    * We number faces last.
    */
-  virtual bool is_face(const unsigned int i) const override final { return (i >= 12 && i < 16); }
+  virtual bool is_face(const unsigned int i) const override final { return (i >= 12 && i < 17); }
 
   /**
    * \returns \p true if the specified child is on the

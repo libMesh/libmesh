@@ -636,6 +636,34 @@ public:
     test_n_refinements(2);
   }
 
+  void test_is_internal()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
+      for (const auto nd : elem->node_index_range())
+        {
+          if ((elem->type() == EDGE3 || elem->type() == EDGE4) && nd >= 2)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if (elem->type() == HEX27 && nd == 26)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if (elem->type() == PRISM21 && nd == 20)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if ((elem->type() == QUAD9 || elem->type() == QUADSHELL9) && nd == 8)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if (elem->type() == TRI7 && nd == 6)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if (elem->type() == INFHEX18 && nd == 17)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if (elem->type() == INFQUAD6 && nd == 5)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
+          else
+            CPPUNIT_ASSERT(!elem->is_internal(nd));
+        }
+  }
+
+
 };
 
 #define ELEMTEST                                \
@@ -651,8 +679,9 @@ public:
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
   CPPUNIT_TEST( test_elem_side_builder );       \
-  CPPUNIT_TEST( test_refinement);               \
-  CPPUNIT_TEST( test_double_refinement);
+  CPPUNIT_TEST( test_refinement );              \
+  CPPUNIT_TEST( test_double_refinement );       \
+  CPPUNIT_TEST( test_is_internal )
 
 #define INSTANTIATE_ELEMTEST(elemtype)                          \
   class ElemTest_##elemtype : public ElemTest<elemtype> {       \

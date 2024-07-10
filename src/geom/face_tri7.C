@@ -128,7 +128,7 @@ bool Tri7::is_vertex(const unsigned int i) const
 
 bool Tri7::is_edge(const unsigned int i) const
 {
-  if (i < 3)
+  if (i < 3 || i == 6)
     return false;
   return true;
 }
