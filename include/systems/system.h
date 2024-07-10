@@ -287,7 +287,7 @@ public:
   /**
    * \returns \p true iff this system has been initialized.
    */
-  bool is_initialized();
+  bool is_initialized() const;
 
   /**
    * Update the local values to reflect the solution
@@ -2335,7 +2335,7 @@ void System::deactivate ()
 
 
 inline
-bool System::is_initialized ()
+bool System::is_initialized () const
 {
   return _is_initialized;
 }
