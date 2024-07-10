@@ -578,7 +578,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
 
               switch (j)
                 {
-                  //d^2 () / dxi^2
+                  // d^2()/dxi^2
                 case 0:
                   {
                     switch(ii)
@@ -608,7 +608,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                       }
                   } // j = 0
 
-                  // ^2()/dxi deta
+                  // d^2()/dxideta
                 case 1:
                   {
                     switch(ii)
@@ -643,7 +643,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                       }
                   } // j = 1
 
-                  //d^2 () / deta^2
+                  // d^2()/deta^2
                 case 2:
                   {
                     switch(ii)
@@ -683,7 +683,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
             {
               switch (j)
                 {
-                  //d^2 () / dxi^2
+                  // d^2()/dxi^2
                 case 0:
                   {
                     switch(ii)
@@ -708,7 +708,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                       }
                   } // j = 0
 
-                  // ^2()/dxi deta
+                  // d^2()/dxideta
                 case 1:
                   {
                     switch(ii)
@@ -734,7 +734,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                       }
                   } // j = 1
 
-                  //d^2 () / deta^2
+                  // d^2()/deta^2
                 case 2:
                   {
                     switch(ii)
