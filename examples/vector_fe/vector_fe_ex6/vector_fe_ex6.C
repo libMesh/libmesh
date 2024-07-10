@@ -155,9 +155,9 @@ int main (int argc, char ** argv)
   const Order vector_order = static_cast<Order>(infile("order", 1u));
   const Order scalar_order = static_cast<Order>(vector_order - 1u);
 
-  libmesh_error_msg_if(vector_order != FIRST && (vector_order != SECOND || dimension != 2),
+  libmesh_error_msg_if(vector_order < FIRST || vector_order > ((dimension == 3) ? FIRST : FIFTH),
                        "You selected: " << vector_order <<
-                       " but this example must be run with either order 1 or 2 in 2d"
+                       " but this example must be run with either 1 <= order <= 5 in 2d"
                        " or with order 1 in 3d.");
 
   // Adds the variables "u" and "p" to "DivGrad". "u" will be our vector field
