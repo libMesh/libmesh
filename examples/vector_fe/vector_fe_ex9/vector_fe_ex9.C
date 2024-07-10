@@ -126,6 +126,7 @@ main(int argc, char ** argv)
                                         -1,
                                         1.,
                                         Utility::string_to_enum<ElemType>(elem_str));
+  mesh.print_info();
 
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
@@ -175,6 +176,7 @@ main(int argc, char ** argv)
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
+  equation_systems.print_info();
 
   // Solve the implicit system for the Lagrange multiplier
   system.solve();
