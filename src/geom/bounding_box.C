@@ -150,4 +150,10 @@ void BoundingBox::scale(const Real factor)
   }
 }
 
+
+void BoundingBox::print(std::ostream & os) const
+{
+  os << "(min=" << this->min() << ", max=" << this->max() << ")";
+}
+
 } // namespace libMesh

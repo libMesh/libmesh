@@ -151,6 +151,25 @@ public:
    * constructor and by invalidate().
    */
   void scale(const Real factor);
+
+  /**
+   * Formatted print, by default to \p libMesh::out.
+   */
+  void print(std::ostream & os = libMesh::out) const;
+
+  /**
+   * Formatted print as above but supports the syntax:
+   *
+   * \code
+   * BoundingBox b;
+   * std::cout << b << std::endl;
+   * \endcode
+   */
+  friend std::ostream & operator << (std::ostream & os, const BoundingBox & b)
+  {
+    b.print(os);
+    return os;
+  }
 };
 
 
