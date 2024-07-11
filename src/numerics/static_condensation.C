@@ -28,14 +28,14 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/petsc_matrix.h"
 #include "libmesh/linear_solver.h"
-#include "libmesh/implicit_system.h"
+#include "libmesh/system.h"
 #include "timpi/parallel_sync.h"
 #include <unordered_set>
 
 namespace libMesh
 {
 StaticCondensation::StaticCondensation(const MeshBase & mesh,
-                                       ImplicitSystem & system,
+                                       const System & system,
                                        const DofMap & dof_map)
   : Preconditioner<Number>(dof_map.comm()), _mesh(mesh), _system(system), _dof_map(dof_map)
 {
@@ -138,17 +138,21 @@ StaticCondensation::init()
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
   std::vector<dof_id_type> elem_condensed_dofs, elem_uncondensed_dofs;
   std::unordered_set<dof_id_type> local_uncondensed_dofs;
+  std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> nonlocal_uncondensed_dofs;
 
   const Elem * first_elem = nullptr;
   const auto first_elem_it = _mesh.active_local_elements_begin();
   if (first_elem_it != _mesh.active_local_elements_end())
     first_elem = *first_elem_it;
 
-  auto scalar_dofs_functor =
-      [this, &local_uncondensed_dofs, &elem_condensed_dofs, &elem_uncondensed_dofs, first_elem](
-          const Elem & elem,
-          std::vector<dof_id_type> & dof_indices,
-          const std::vector<dof_id_type> & scalar_dof_indices)
+  auto scalar_dofs_functor = [this,
+                              &local_uncondensed_dofs,
+                              &nonlocal_uncondensed_dofs,
+                              &elem_condensed_dofs,
+                              &elem_uncondensed_dofs,
+                              first_elem](const Elem & elem,
+                                          std::vector<dof_id_type> & dof_indices,
+                                          const std::vector<dof_id_type> & scalar_dof_indices)
   {
     total_dofs_from_scalar_dofs(dof_indices, scalar_dof_indices);
     condensed_dofs_from_scalar_dofs(elem_condensed_dofs, scalar_dof_indices);
@@ -160,29 +164,41 @@ StaticCondensation::init()
       const processor_id_type last_pid = this->comm().size() - 1;
       if (this->comm().rank() == last_pid)
         local_uncondensed_dofs.insert(scalar_dof_indices.begin(), scalar_dof_indices.end());
+      else
+        nonlocal_uncondensed_dofs[last_pid].insert(scalar_dof_indices.begin(),
+                                                   scalar_dof_indices.end());
     }
   };
 
-  auto field_dofs_functor =
-      [this, &local_uncondensed_dofs, &elem_condensed_dofs, &elem_uncondensed_dofs](
-          const Elem & elem,
-          const unsigned int node_num,
-          const unsigned int var_num,
-          std::vector<dof_id_type> & dof_indices,
-          const dof_id_type field_dof)
+  auto field_dofs_functor = [this,
+                             &local_uncondensed_dofs,
+                             &nonlocal_uncondensed_dofs,
+                             &elem_condensed_dofs,
+                             &elem_uncondensed_dofs](const Elem & elem,
+                                                     const unsigned int node_num,
+                                                     const unsigned int var_num,
+                                                     std::vector<dof_id_type> & dof_indices,
+                                                     const dof_id_type field_dof)
   {
     total_dofs_from_field_dof(dof_indices, elem, node_num, var_num, field_dof);
     condensed_dofs_from_field_dof(elem_condensed_dofs, elem, node_num, var_num, field_dof);
     uncondensed_dofs_from_field_dof(elem_uncondensed_dofs, elem, node_num, var_num, field_dof);
 
-    if (_uncondensed_vars.count(var_num) && elem.processor_id() == this->processor_id())
-      local_uncondensed_dofs.insert(field_dof);
+    if (_uncondensed_vars.count(var_num))
+    {
+      if (elem.processor_id() == this->processor_id())
+        local_uncondensed_dofs.insert(field_dof);
+      else
+        nonlocal_uncondensed_dofs[elem.processor_id()].insert(field_dof);
+    }
 
     if (node_num != invalid_uint && !elem.is_internal(node_num))
     {
       const auto & nd_ref = elem.node_ref(node_num);
       if (nd_ref.processor_id() == this->processor_id())
         local_uncondensed_dofs.insert(field_dof);
+      else
+        nonlocal_uncondensed_dofs[nd_ref.processor_id()].insert(field_dof);
     }
   };
 
@@ -213,6 +229,9 @@ StaticCondensation::init()
         var_data.num_condensed_dofs = elem_condensed_dofs.size();
         uncondensed_dof_size += var_data.num_uncondensed_dofs;
         condensed_dof_size += var_data.num_condensed_dofs;
+        local_data.reduced_space_indices.insert(local_data.reduced_space_indices.end(),
+                                                elem_uncondensed_dofs.begin(),
+                                                elem_uncondensed_dofs.end());
       }
     }
 
@@ -229,17 +248,107 @@ StaticCondensation::init()
   // Build the reduced system data
   //
 
+  const dof_id_type n_local = _local_uncondensed_dofs.size();
+  dof_id_type n = n_local;
+  this->comm().sum(n);
   _reduced_solver = LinearSolver<Number>::build(this->comm());
   _reduced_solver->init("condensed_");
   _reduced_rhs = NumericVector<Number>::build(this->comm());
+  // Init the RHS vector so we can conveniently get processor row offsets
+  _reduced_rhs->init(n, n_local);
+
+  // Build a map from the full size problem uncondensed dof indices to the reduced problem
+  // (uncondensed) dof indices
+  std::unordered_map<dof_id_type, dof_id_type> full_dof_to_reduced_dof;
+  const auto local_start = _reduced_rhs->first_local_index();
+  for (const auto i : index_range(_local_uncondensed_dofs))
+    full_dof_to_reduced_dof[_local_uncondensed_dofs[i]] = i + local_start;
+
   _reduced_sys_mat = SparseMatrix<Number>::build(this->comm());
+  auto sp = _dof_map.build_sparsity(_mesh, /*calculate_constrained=*/false);
+  const auto & nnz = sp->get_n_nz();
+  const auto & noz = sp->get_n_oz();
+  libmesh_assert(nnz.size() == noz.size());
+  if (auto * const petsc_mat = dynamic_cast<PetscMatrix<Number> *>(_reduced_sys_mat.get()))
+  {
+    // Optimization for PETSc. This is critical for problems in which there are SCALAR dofs that
+    // introduce dense rows to avoid allocating a dense matrix
+    std::vector<dof_id_type> reduced_nnz, reduced_noz;
+    reduced_nnz.resize(_local_uncondensed_dofs.size());
+    reduced_noz.resize(_local_uncondensed_dofs.size());
+    for (const dof_id_type local_reduced_i : index_range(_local_uncondensed_dofs))
+    {
+      const dof_id_type full_i = _local_uncondensed_dofs[local_reduced_i];
+      const dof_id_type local_full_i = full_i - _dof_map.first_dof();
+      libmesh_assert(local_full_i < nnz.size());
+      reduced_nnz[local_reduced_i] = nnz[local_full_i];
+      reduced_noz[local_reduced_i] = noz[local_full_i];
+    }
+    petsc_mat->init(n, n, n_local, n_local, reduced_nnz, reduced_noz);
+  }
+  else
+  {
+    const auto nz = nnz.empty() ? dof_id_type(0) : *std::max_element(nnz.begin(), nnz.end());
+    const auto oz = noz.empty() ? dof_id_type(0) : *std::max_element(noz.begin(), noz.end());
+    _reduced_sys_mat->init(n, n, n_local, n_local, nz, oz);
+  }
+
+  //
+  // Now we need to pull our nonlocal data
+  //
+
+  // build our queries
+  std::unordered_map<processor_id_type, std::vector<dof_id_type>> nonlocal_uncondensed_dofs_mapvec;
+  for (const auto & [pid, set] : nonlocal_uncondensed_dofs)
+  {
+    auto & vec = nonlocal_uncondensed_dofs_mapvec[pid];
+    vec.assign(set.begin(), set.end());
+  }
+  // clear no longer needed memory
+  nonlocal_uncondensed_dofs.clear();
+
+  auto gather_functor = [&full_dof_to_reduced_dof](processor_id_type,
+                                                   const std::vector<dof_id_type> & full_dof_ids,
+                                                   std::vector<dof_id_type> & reduced_dof_ids)
+  {
+    reduced_dof_ids.resize(full_dof_ids.size());
+    for (const auto i : index_range(full_dof_ids))
+      reduced_dof_ids[i] = libmesh_map_find(full_dof_to_reduced_dof, full_dof_ids[i]);
+  };
+
+  auto action_functor = [&full_dof_to_reduced_dof](processor_id_type,
+                                                   const std::vector<dof_id_type> & full_dof_ids,
+                                                   const std::vector<dof_id_type> & reduced_dof_ids)
+  {
+    for (const auto i : index_range(full_dof_ids))
+    {
+      libmesh_assert(!full_dof_to_reduced_dof.count(full_dof_ids[i]));
+      full_dof_to_reduced_dof[full_dof_ids[i]] = reduced_dof_ids[i];
+    }
+  };
+
+  TIMPI::pull_parallel_vector_data(this->comm(),
+                                   nonlocal_uncondensed_dofs_mapvec,
+                                   gather_functor,
+                                   action_functor,
+                                   &DofObject::invalid_id);
+  nonlocal_uncondensed_dofs_mapvec.clear();
+
+  // Now we can finally set our element reduced dof indices
+  std::vector<dof_id_type> full_dof_indices;
+  for (auto & [elem, local_data] : _elem_to_local_data)
+  {
+    libmesh_ignore(elem);
+    full_dof_indices = local_data.reduced_space_indices;
+    local_data.reduced_space_indices.clear();
+    for (const auto full_dof : full_dof_indices)
+      local_data.reduced_space_indices.push_back(
+          libmesh_map_find(full_dof_to_reduced_dof, full_dof));
+  }
 
   // Build ghosted full solution vector. Note that this is, in general, *not equal* to the system
   // solution, e.g. this may correspond to the solution for the Newton *update*
   _ghosted_full_sol = _system.current_local_solution->clone();
-  // Need a RHS for storing the eliminated version that still has all the dof indices
-  _eliminated_rhs = _system.rhs->clone();
-
   _is_initialized = true;
 }
 
@@ -299,53 +408,12 @@ StaticCondensation::add_matrix(const Elem & elem,
 void
 StaticCondensation::setup()
 {
-  auto & full_mat = _system.get_system_matrix();
-  if (full_mat.closed())
-    full_mat.zero();
-
-  std::vector<dof_id_type> elem_dofs, elem_uncondensed_dofs;
-
-  auto scalar_dofs_functor =
-      [this, &elem_uncondensed_dofs](const Elem & /*elem*/,
-                                     std::vector<dof_id_type> & dof_indices,
-                                     const std::vector<dof_id_type> & scalar_dof_indices)
-  {
-    total_dofs_from_scalar_dofs(dof_indices, scalar_dof_indices);
-    uncondensed_dofs_from_scalar_dofs(elem_uncondensed_dofs, scalar_dof_indices);
-  };
-
-  auto field_dofs_functor = [this, &elem_uncondensed_dofs](const Elem & elem,
-                                                           const unsigned int node_num,
-                                                           const unsigned int var_num,
-                                                           std::vector<dof_id_type> & dof_indices,
-                                                           const dof_id_type field_dof)
-  {
-    total_dofs_from_field_dof(dof_indices, elem, node_num, var_num, field_dof);
-    uncondensed_dofs_from_field_dof(elem_uncondensed_dofs, elem, node_num, var_num, field_dof);
-  };
+  _reduced_sys_mat->zero();
 
   DenseMatrix<Number> shim;
-  for (auto elem : _mesh.active_local_element_ptr_range())
+  for (auto & [elem_id, local_data] : _elem_to_local_data)
   {
-    elem_uncondensed_dofs.clear();
-    auto & local_data = libmesh_map_find(_elem_to_local_data, elem->id());
-
-    const auto sub_id = elem->subdomain_id();
-    for (const auto vg : make_range(_dof_map.n_variable_groups()))
-    {
-      const auto & var_group = _dof_map.variable_group(vg);
-      if (!var_group.active_on_subdomain(sub_id))
-        continue;
-
-      for (const auto v : make_range(var_group.n_variables()))
-        _dof_map.dof_indices(elem,
-                             elem_dofs,
-                             var_group.number(v),
-                             scalar_dofs_functor,
-                             field_dofs_functor,
-                             elem->p_level());
-    }
-
+    libmesh_ignore(elem_id);
     local_data.AccFactor = local_data.Acc.partialPivLu();
     const EigenMatrix S =
         local_data.Auu - local_data.Auc * local_data.AccFactor.solve(local_data.Acu);
@@ -353,11 +421,10 @@ StaticCondensation::setup()
     for (const auto i : make_range(S.rows()))
       for (const auto j : make_range(S.cols()))
         shim(i, j) = S(i, j);
-    full_mat.add_matrix(shim, elem_uncondensed_dofs);
+    _reduced_sys_mat->add_matrix(shim, local_data.reduced_space_indices);
   }
 
-  full_mat.close();
-  full_mat.create_submatrix(*_reduced_sys_mat, _local_uncondensed_dofs, _local_uncondensed_dofs);
+  _reduced_sys_mat->close();
 }
 
 void
@@ -373,33 +440,32 @@ StaticCondensation::set_local_vectors(const NumericVector<Number> & global_vecto
 }
 
 void
-StaticCondensation::forward_elimination(NumericVector<Number> & rhs)
+StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
 {
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
-  std::vector<dof_id_type> elem_condensed_dofs, elem_uncondensed_dofs;
+  std::vector<dof_id_type> elem_condensed_dofs;
   std::vector<Number> elem_condensed_rhs_vec;
   EigenVector elem_condensed_rhs, elem_uncondensed_rhs;
 
-  auto scalar_dofs_functor = [this, &elem_condensed_dofs, &elem_uncondensed_dofs](
-                                 const Elem & /*elem*/,
-                                 std::vector<dof_id_type> & dof_indices,
-                                 const std::vector<dof_id_type> & scalar_dof_indices)
+  full_rhs.create_subvector(*_reduced_rhs, _local_uncondensed_dofs, /*all_global_entries=*/false);
+
+  auto scalar_dofs_functor =
+      [this, &elem_condensed_dofs](const Elem & /*elem*/,
+                                   std::vector<dof_id_type> & dof_indices,
+                                   const std::vector<dof_id_type> & scalar_dof_indices)
   {
     total_dofs_from_scalar_dofs(dof_indices, scalar_dof_indices);
     condensed_dofs_from_scalar_dofs(elem_condensed_dofs, scalar_dof_indices);
-    uncondensed_dofs_from_scalar_dofs(elem_uncondensed_dofs, scalar_dof_indices);
   };
 
-  auto field_dofs_functor =
-      [this, &elem_condensed_dofs, &elem_uncondensed_dofs](const Elem & elem,
-                                                           const unsigned int node_num,
-                                                           const unsigned int var_num,
-                                                           std::vector<dof_id_type> & dof_indices,
-                                                           const dof_id_type field_dof)
+  auto field_dofs_functor = [this, &elem_condensed_dofs](const Elem & elem,
+                                                         const unsigned int node_num,
+                                                         const unsigned int var_num,
+                                                         std::vector<dof_id_type> & dof_indices,
+                                                         const dof_id_type field_dof)
   {
     total_dofs_from_field_dof(dof_indices, elem, node_num, var_num, field_dof);
     condensed_dofs_from_field_dof(elem_condensed_dofs, elem, node_num, var_num, field_dof);
-    uncondensed_dofs_from_field_dof(elem_uncondensed_dofs, elem, node_num, var_num, field_dof);
   };
 
   //
@@ -409,7 +475,6 @@ StaticCondensation::forward_elimination(NumericVector<Number> & rhs)
   for (auto elem : _mesh.active_local_element_ptr_range())
   {
     elem_condensed_dofs.clear();
-    elem_uncondensed_dofs.clear();
     auto & local_data = _elem_to_local_data[elem->id()];
 
     const auto sub_id = elem->subdomain_id();
@@ -428,17 +493,19 @@ StaticCondensation::forward_elimination(NumericVector<Number> & rhs)
                              elem->p_level());
     }
 
-    set_local_vectors(rhs, elem_condensed_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
+    set_local_vectors(full_rhs, elem_condensed_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
     elem_uncondensed_rhs = -local_data.Auc * local_data.AccFactor.solve(elem_condensed_rhs);
 
-    rhs.add_vector(elem_uncondensed_rhs.data(), elem_uncondensed_dofs);
+    libmesh_assert(cast_int<std::size_t>(elem_uncondensed_rhs.size()) ==
+                   local_data.reduced_space_indices.size());
+    _reduced_rhs->add_vector(elem_uncondensed_rhs.data(), local_data.reduced_space_indices);
   }
-  rhs.close();
+  _reduced_rhs->close();
 }
 
 void
-StaticCondensation::backwards_substitution(const NumericVector<Number> & rhs,
-                                           NumericVector<Number> & sol)
+StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rhs,
+                                           NumericVector<Number> & full_sol)
 {
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
   std::vector<dof_id_type> elem_condensed_dofs, elem_uncondensed_dofs;
@@ -489,35 +556,32 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & rhs,
                              elem->p_level());
     }
 
-    set_local_vectors(rhs, elem_condensed_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
+    set_local_vectors(full_rhs, elem_condensed_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
     set_local_vectors(
         *_ghosted_full_sol, elem_uncondensed_dofs, elem_uncondensed_sol_vec, elem_uncondensed_sol);
 
     elem_condensed_sol =
         local_data.AccFactor.solve(elem_condensed_rhs - local_data.Acu * elem_uncondensed_sol);
-    sol.insert(elem_condensed_sol.data(), elem_condensed_dofs);
+    full_sol.insert(elem_condensed_sol.data(), elem_condensed_dofs);
   }
 
-  sol.close();
+  full_sol.close();
 }
 
 void
 StaticCondensation::apply(const NumericVector<Number> & full_rhs,
                           NumericVector<Number> & full_parallel_sol)
 {
-  *_eliminated_rhs = full_rhs;
-  forward_elimination(*_eliminated_rhs);
+  forward_elimination(full_rhs);
   // Apparently PETSc will send us the yvec without zeroing it ahead of time. This can be a poor
   // initial guess for the Krylov solve as well as lead to bewildered users who expect their initial
   // residual norm to equal the norm of the RHS
   full_parallel_sol.zero();
   _reduced_sol = full_parallel_sol.get_subvector(_local_uncondensed_dofs);
-  _reduced_rhs = _eliminated_rhs->get_subvector(_local_uncondensed_dofs);
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
   // Must restore to the full solution because during backwards substitution we will need to be able
   // to read ghosted dofs and we don't support ghosting of subvectors
   full_parallel_sol.restore_subvector(std::move(_reduced_sol), _local_uncondensed_dofs);
-  _eliminated_rhs->restore_subvector(std::move(_reduced_rhs), _local_uncondensed_dofs);
   *_ghosted_full_sol = full_parallel_sol;
   backwards_substitution(full_rhs, full_parallel_sol);
 }
