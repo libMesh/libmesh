@@ -49,8 +49,7 @@ Build::Build (const DofMap & dof_map_in,
               const std::set<GhostingFunctor *> & coupling_functors_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in,
-              const bool calculate_constrained_in,
-              const bool uncondensed_dofs_only_in) :
+              const bool calculate_constrained_in) :
   ParallelObject(dof_map_in),
   dof_map(dof_map_in),
   dof_coupling(dof_coupling_in),
@@ -58,7 +57,6 @@ Build::Build (const DofMap & dof_map_in,
   implicit_neighbor_dofs(implicit_neighbor_dofs_in),
   need_full_sparsity_pattern(need_full_sparsity_pattern_in),
   calculate_constrained(calculate_constrained_in),
-  uncondensed_dofs_only(uncondensed_dofs_only_in),
   sparsity_pattern(),
   nonlocal_pattern(),
   n_nz(),
@@ -75,7 +73,6 @@ Build::Build (Build & other, Threads::split) :
   implicit_neighbor_dofs(other.implicit_neighbor_dofs),
   need_full_sparsity_pattern(other.need_full_sparsity_pattern),
   calculate_constrained(other.calculate_constrained),
-  uncondensed_dofs_only(other.uncondensed_dofs_only),
   hashed_dof_sets(other.hashed_dof_sets),
   sparsity_pattern(),
   nonlocal_pattern(),
@@ -97,7 +94,7 @@ void Build::sorted_connected_dofs(const Elem * elem,
                                   std::vector<dof_id_type> & dofs_vi,
                                   unsigned int vi)
 {
-  if (uncondensed_dofs_only)
+  if (dof_map.has_static_condensation())
   {
     const auto & sc = dof_map.get_static_condensation();
     dofs_vi.clear();

@@ -1632,14 +1632,9 @@ public:
    * Can be told to calculate sparsity for the constrained matrix,
    * which may be necessary in the case of spline control node
    * constraints or sufficiently many user constraints.
-   *
-   * Can also be told to only include sparsity entries for uncondensed
-   * degrees of freedom via \p uncondensed_dofs_only which is useful when the
-   * operator acts only on a statically condensed system
    */
   std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh,
-                                                         const bool calculate_constrained = false,
-                                                         const bool uncondensed_dofs_only = false) const;
+                                                         const bool calculate_constrained = false) const;
 
   /**
    * Describe whether the given variable group should be p-refined. If this API is not called with
@@ -1667,6 +1662,11 @@ public:
    * Add a static condensation class
    */
   void add_static_condensation(const StaticCondensation & sc) { _sc = &sc; }
+
+  /**
+   * Checks whether we have static condensation
+   */
+  bool has_static_condensation() const { return _sc; }
 
   /**
    * @returns the static condensation class. This should have been already added with a call to \p

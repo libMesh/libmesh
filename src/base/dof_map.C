@@ -59,8 +59,7 @@ namespace libMesh
 // DofMap member functions
 std::unique_ptr<SparsityPattern::Build>
 DofMap::build_sparsity (const MeshBase & mesh,
-                        const bool calculate_constrained,
-                        const bool uncondensed_dofs_only) const
+                        const bool calculate_constrained) const
 {
   libmesh_assert (mesh.is_prepared());
 
@@ -93,8 +92,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
      this->_coupling_functors,
      implicit_neighbor_dofs,
      need_full_sparsity_pattern,
-     calculate_constrained,
-     uncondensed_dofs_only);
+     calculate_constrained);
 
   Threads::parallel_reduce (ConstElemRange (mesh.active_local_elements_begin(),
                                             mesh.active_local_elements_end()), *sp);

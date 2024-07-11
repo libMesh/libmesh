@@ -239,8 +239,7 @@ StaticCondensation::init()
     full_dof_to_reduced_dof[_local_uncondensed_dofs[i]] = i + local_start;
 
   _reduced_sys_mat = SparseMatrix<Number>::build(this->comm());
-  auto sp = _dof_map.build_sparsity(
-      _mesh, /*calculate_constrained=*/false, /*uncondensed_dofs_only=*/true);
+  auto sp = _dof_map.build_sparsity(_mesh, /*calculate_constrained=*/false);
   const auto & nnz = sp->get_n_nz();
   const auto & noz = sp->get_n_oz();
   libmesh_assert(nnz.size() == noz.size());
