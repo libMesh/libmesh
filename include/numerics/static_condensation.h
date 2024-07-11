@@ -37,7 +37,7 @@
 namespace libMesh
 {
 class MeshBase;
-class System;
+class ImplicitSystem;
 class DofMap;
 class Elem;
 template <typename>
@@ -60,7 +60,7 @@ typedef Eigen::VectorXd EigenVector;
 class StaticCondensation : public Preconditioner<Number>
 {
 public:
-  StaticCondensation(const MeshBase & mesh, const System & system, const DofMap & dof_map);
+  StaticCondensation(const MeshBase & mesh, ImplicitSystem & system, const DofMap & dof_map);
   virtual ~StaticCondensation();
 
   /**
@@ -100,9 +100,8 @@ private:
                                 std::vector<Number> & elem_dof_values_vec,
                                 EigenVector & elem_dof_values);
 
-  void forward_elimination(const NumericVector<Number> & full_rhs);
-  void backwards_substitution(const NumericVector<Number> & full_rhs,
-                              NumericVector<Number> & full_sol);
+  void forward_elimination(NumericVector<Number> & rhs);
+  void backwards_substitution(const NumericVector<Number> & rhs, NumericVector<Number> & sol);
 
   static void total_dofs_from_scalar_dofs(std::vector<dof_id_type> & dofs,
                                           const std::vector<dof_id_type> & scalar_dofs);
@@ -153,11 +152,6 @@ private:
       unsigned int num_condensed_dofs;
     };
 
-    /// The uncondensed degrees of freedom with global numbering corresponding to the the \emph reduced
-    /// system. Note that initially this will actually hold the indices corresponding to the fully
-    /// sized problem, but we will swap it out by the time we are done initializing
-    std::vector<dof_id_type> reduced_space_indices;
-
     std::unordered_map<unsigned int, VarData> var_to_data;
   };
 
@@ -165,12 +159,13 @@ private:
   std::vector<dof_id_type> _local_uncondensed_dofs;
 
   const MeshBase & _mesh;
-  const System & _system;
+  ImplicitSystem & _system;
   const DofMap & _dof_map;
   std::unique_ptr<SparseMatrix<Number>> _reduced_sys_mat;
   std::unique_ptr<NumericVector<Number>> _reduced_sol;
   std::unique_ptr<NumericVector<Number>> _reduced_rhs;
   std::unique_ptr<LinearSolver<Number>> _reduced_solver;
+  std::unique_ptr<NumericVector<Number>> _eliminated_rhs;
   std::unique_ptr<NumericVector<Number>> _ghosted_full_sol;
 
   /// Variables for which we will keep all dofs

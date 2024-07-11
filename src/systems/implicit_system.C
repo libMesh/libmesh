@@ -93,14 +93,6 @@ void ImplicitSystem::add_matrices ()
   if (this->n_matrices() == 0)
     matrix = nullptr;
 
-  // If performing static condensation we do not need nor want a system matrix
-  if (_sc)
-    {
-      if (matrix)
-        this->remove_matrix ("System Matrix");
-      return;
-    }
-
   // Only need to add the matrix if it isn't there
   // already!
   if (matrix == nullptr)
@@ -1238,8 +1230,6 @@ void ImplicitSystem::release_linear_solver(LinearSolver<Number> *) const
 
 const SparseMatrix<Number> & ImplicitSystem::get_system_matrix() const
 {
-  libmesh_error_msg_if(
-      _sc, "The system matrix is not created nor used when static condensation is present");
   libmesh_assert(matrix);
   libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
   return *matrix;
@@ -1249,8 +1239,6 @@ const SparseMatrix<Number> & ImplicitSystem::get_system_matrix() const
 
 SparseMatrix<Number> & ImplicitSystem::get_system_matrix()
 {
-  libmesh_error_msg_if(
-      _sc, "The system matrix is not created nor used when static condensation is present");
   libmesh_assert(matrix);
   libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
   return *matrix;
@@ -1262,10 +1250,6 @@ ImplicitSystem::add_static_condensation()
   if (!_sc)
   {
     _sc = std::make_unique<StaticCondensation>(this->get_mesh(), *this, this->get_dof_map());
-
-    if (this->have_matrix("System Matrix"))
-      this->remove_matrix("System Matrix");
-
     this->get_dof_map().add_static_condensation(*_sc);
   }
 
