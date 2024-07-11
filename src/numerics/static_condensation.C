@@ -43,44 +43,75 @@ StaticCondensation::StaticCondensation(const MeshBase & mesh,
 
 StaticCondensation::~StaticCondensation() = default;
 
-auto
-StaticCondensation::total_and_condensed_from_scalar_dofs_functor(
-    std::vector<dof_id_type> & /*elem_condensed_dofs*/)
+void
+StaticCondensation::total_dofs_from_scalar_dofs(std::vector<dof_id_type> & dofs,
+                                                const std::vector<dof_id_type> & scalar_dofs)
 {
-  return [](const Elem &,
-            std::vector<dof_id_type> & elem_dof_indices,
-            const std::vector<dof_id_type> & scalar_dof_indices)
-  {
-    elem_dof_indices.insert(
-        elem_dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
-  };
+  dofs.insert(dofs.end(), scalar_dofs.begin(), scalar_dofs.end());
 }
 
-auto
-StaticCondensation::total_and_condensed_from_field_dofs_functor(
-    std::vector<dof_id_type> & elem_condensed_dofs)
+void
+StaticCondensation::condensed_dofs_from_scalar_dofs(
+    std::vector<dof_id_type> & /*condensed_dofs*/, const std::vector<dof_id_type> & /*scalar_dofs*/)
 {
-  return [this, &elem_condensed_dofs](const Elem & elem,
-                                      const unsigned int node_num,
-                                      const unsigned int var_num,
-                                      std::vector<dof_id_type> & elem_dof_indices,
-                                      const dof_id_type field_dof)
-  {
-    elem_dof_indices.push_back(field_dof);
-    if (_uncondensed_vars.count(var_num))
-      // If we're going to keep all the dofs for this var (e.g. we don't want to condense any out)
-      // then we can return now
-      return;
+}
 
-    if (node_num != invalid_uint)
-    {
-      // This is a nodal dof
-      if (elem.is_internal(node_num))
-        elem_condensed_dofs.push_back(field_dof);
-    }
-    else
-      elem_condensed_dofs.push_back(field_dof);
-  };
+void
+StaticCondensation::uncondensed_dofs_from_scalar_dofs(std::vector<dof_id_type> & uncondensed_dofs,
+                                                      const std::vector<dof_id_type> & scalar_dofs)
+{
+  uncondensed_dofs.insert(uncondensed_dofs.end(), scalar_dofs.begin(), scalar_dofs.end());
+}
+
+void
+StaticCondensation::total_dofs_from_field_dof(std::vector<dof_id_type> & dofs,
+                                              const Elem & /*elem*/,
+                                              const unsigned int /*node_num*/,
+                                              const unsigned int /*var_num*/,
+                                              const dof_id_type field_dof)
+{
+  dofs.push_back(field_dof);
+}
+
+void
+StaticCondensation::condensed_dofs_from_field_dof(std::vector<dof_id_type> & condensed_dofs,
+                                                  const Elem & elem,
+                                                  const unsigned int node_num,
+                                                  const unsigned int var_num,
+                                                  const dof_id_type field_dof) const
+{
+  if (_uncondensed_vars.count(var_num))
+    // If we're going to keep all the dofs for this var (e.g. we don't want to condense any out)
+    // then we can return now
+    return;
+
+  if (node_num != invalid_uint)
+  {
+    // This is a nodal dof
+    if (elem.is_internal(node_num))
+      condensed_dofs.push_back(field_dof);
+  }
+  else
+    condensed_dofs.push_back(field_dof);
+}
+
+void
+StaticCondensation::uncondensed_dofs_from_field_dof(std::vector<dof_id_type> & uncondensed_dofs,
+                                                    const Elem & elem,
+                                                    const unsigned int node_num,
+                                                    const unsigned int var_num,
+                                                    const dof_id_type field_dof) const
+{
+  if (_uncondensed_vars.count(var_num))
+  {
+    libmesh_assert_msg(
+        node_num == invalid_uint,
+        "Users should not be providing continuous FEM variables to the uncondensed vars API");
+    uncondensed_dofs.push_back(field_dof);
+  }
+
+  if (node_num != invalid_uint && !elem.is_internal(node_num))
+    uncondensed_dofs.push_back(field_dof);
 }
 
 void
@@ -123,10 +154,9 @@ StaticCondensation::init()
                                           std::vector<dof_id_type> & dof_indices,
                                           const std::vector<dof_id_type> & scalar_dof_indices)
   {
-    total_and_condensed_from_scalar_dofs_functor(elem_condensed_dofs)(
-        elem, dof_indices, scalar_dof_indices);
-    elem_uncondensed_dofs.insert(
-        elem_uncondensed_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+    total_dofs_from_scalar_dofs(dof_indices, scalar_dof_indices);
+    condensed_dofs_from_scalar_dofs(elem_condensed_dofs, scalar_dof_indices);
+    uncondensed_dofs_from_scalar_dofs(elem_uncondensed_dofs, scalar_dof_indices);
 
     // Only need to do this for the first element we encounter
     if (&elem == first_elem)
@@ -150,15 +180,12 @@ StaticCondensation::init()
                                                      std::vector<dof_id_type> & dof_indices,
                                                      const dof_id_type field_dof)
   {
-    total_and_condensed_from_field_dofs_functor(elem_condensed_dofs)(
-        elem, node_num, var_num, dof_indices, field_dof);
+    total_dofs_from_field_dof(dof_indices, elem, node_num, var_num, field_dof);
+    condensed_dofs_from_field_dof(elem_condensed_dofs, elem, node_num, var_num, field_dof);
+    uncondensed_dofs_from_field_dof(elem_uncondensed_dofs, elem, node_num, var_num, field_dof);
 
     if (_uncondensed_vars.count(var_num))
     {
-      libmesh_assert_msg(
-          node_num == invalid_uint,
-          "Users should not be providing continuous FEM variables to the uncondensed vars API");
-      elem_uncondensed_dofs.push_back(field_dof);
       if (elem.processor_id() == this->processor_id())
         local_uncondensed_dofs.insert(field_dof);
       else
@@ -167,7 +194,6 @@ StaticCondensation::init()
 
     if (node_num != invalid_uint && !elem.is_internal(node_num))
     {
-      elem_uncondensed_dofs.push_back(field_dof);
       const auto & nd_ref = elem.node_ref(node_num);
       if (nd_ref.processor_id() == this->processor_id())
         local_uncondensed_dofs.insert(field_dof);
@@ -423,6 +449,25 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
 
   full_rhs.create_subvector(*_reduced_rhs, _local_uncondensed_dofs, /*all_global_entries=*/false);
 
+  auto scalar_dofs_functor =
+      [this, &elem_condensed_dofs](const Elem & /*elem*/,
+                                   std::vector<dof_id_type> & dof_indices,
+                                   const std::vector<dof_id_type> & scalar_dof_indices)
+  {
+    total_dofs_from_scalar_dofs(dof_indices, scalar_dof_indices);
+    condensed_dofs_from_scalar_dofs(elem_condensed_dofs, scalar_dof_indices);
+  };
+
+  auto field_dofs_functor = [this, &elem_condensed_dofs](const Elem & elem,
+                                                         const unsigned int node_num,
+                                                         const unsigned int var_num,
+                                                         std::vector<dof_id_type> & dof_indices,
+                                                         const dof_id_type field_dof)
+  {
+    total_dofs_from_field_dof(dof_indices, elem, node_num, var_num, field_dof);
+    condensed_dofs_from_field_dof(elem_condensed_dofs, elem, node_num, var_num, field_dof);
+  };
+
   //
   // Forward elimination step
   //
@@ -443,8 +488,8 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
         _dof_map.dof_indices(elem,
                              elem_dofs,
                              var_group.number(v),
-                             total_and_condensed_from_scalar_dofs_functor(elem_condensed_dofs),
-                             total_and_condensed_from_field_dofs_functor(elem_condensed_dofs),
+                             scalar_dofs_functor,
+                             field_dofs_functor,
                              elem->p_level());
     }
 
@@ -468,14 +513,13 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
   EigenVector elem_condensed_rhs, elem_uncondensed_sol, elem_condensed_sol;
 
   auto scalar_dofs_functor = [&elem_condensed_dofs, &elem_uncondensed_dofs](
-                                 const Elem & elem,
+                                 const Elem & /*elem*/,
                                  std::vector<dof_id_type> & dof_indices,
                                  const std::vector<dof_id_type> & scalar_dof_indices)
   {
-    total_and_condensed_from_scalar_dofs_functor(elem_condensed_dofs)(
-        elem, dof_indices, scalar_dof_indices);
-    elem_uncondensed_dofs.insert(
-        elem_uncondensed_dofs.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+    total_dofs_from_scalar_dofs(dof_indices, scalar_dof_indices);
+    condensed_dofs_from_scalar_dofs(elem_condensed_dofs, scalar_dof_indices);
+    uncondensed_dofs_from_scalar_dofs(elem_uncondensed_dofs, scalar_dof_indices);
   };
 
   auto field_dofs_functor =
@@ -485,19 +529,9 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
                                                            std::vector<dof_id_type> & dof_indices,
                                                            const dof_id_type field_dof)
   {
-    total_and_condensed_from_field_dofs_functor(elem_condensed_dofs)(
-        elem, node_num, var_num, dof_indices, field_dof);
-
-    if (_uncondensed_vars.count(var_num))
-    {
-      libmesh_assert_msg(
-          node_num == invalid_uint,
-          "Users should not be providing continuous FEM variables to the uncondensed vars API");
-      elem_uncondensed_dofs.push_back(field_dof);
-    }
-
-    if (node_num != invalid_uint && !elem.is_internal(node_num))
-      elem_uncondensed_dofs.push_back(field_dof);
+    total_dofs_from_field_dof(dof_indices, elem, node_num, var_num, field_dof);
+    condensed_dofs_from_field_dof(elem_condensed_dofs, elem, node_num, var_num, field_dof);
+    uncondensed_dofs_from_field_dof(elem_uncondensed_dofs, elem, node_num, var_num, field_dof);
   };
 
   for (auto elem : _mesh.active_local_element_ptr_range())
