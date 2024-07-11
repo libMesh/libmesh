@@ -153,6 +153,7 @@ data = matrices/geom_1_extraction_op.m \
        meshes/1_quad.bxt.gz \
        meshes/25_quad.bxt.gz \
        meshes/bad_64bit_elem_integers.e \
+       meshes/block.msh \
        meshes/BlockWithHole_Patch9.bxt.gz \
        meshes/constrain10to4.m \
        meshes/Cube_With_Sidesets.e \
