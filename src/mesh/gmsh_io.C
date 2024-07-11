@@ -19,6 +19,7 @@
 #include "libmesh/libmesh_config.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/bounding_box.h"
 #include "libmesh/elem.h"
 #include "libmesh/gmsh_io.h"
 #include "libmesh/mesh_base.h"
@@ -192,6 +193,9 @@ void GmshIO::read_mesh(std::istream & in)
   // the entity tag/id
   std::map<std::pair<unsigned, int>, int> entity_to_physical_id;
 
+  // Map from entities to bounding boxes.  The key is the same.
+  std::map<std::pair<unsigned, int>, BoundingBox> entity_to_bounding_box;
+
   // For reading the file line by line
   std::string s;
 
@@ -299,6 +303,9 @@ void GmshIO::read_mesh(std::istream & in)
                                      "Sorry, you cannot currently specify multiple subdomain or "
                                      "boundary ids for a given geometric entity");
 
+                entity_to_bounding_box[std::make_pair(0, point_tag)] =
+                  BoundingBox(Point(x,y,z),Point(x,y,z));
+
                 if (num_physical_tags)
                 {
                   in >> physical_tag;
@@ -315,6 +322,9 @@ void GmshIO::read_mesh(std::istream & in)
                 libmesh_error_msg_if(num_physical_tags > 1,
                                      "I don't believe that we can specify multiple subdomain or "
                                      "boundary ids for a given geometric entity");
+
+                entity_to_bounding_box[std::make_pair(1, curve_tag)] =
+                  BoundingBox(Point(minx,miny,minz),Point(maxx,maxy,maxz));
 
                 if (num_physical_tags)
                 {
@@ -336,6 +346,9 @@ void GmshIO::read_mesh(std::istream & in)
                                      "I don't believe that we can specify multiple subdomain or "
                                      "boundary ids for a given geometric entity");
 
+                entity_to_bounding_box[std::make_pair(2, surface_tag)] =
+                  BoundingBox(Point(minx,miny,minz),Point(maxx,maxy,maxz));
+
                 if (num_physical_tags)
                 {
                   in >> physical_tag;
@@ -355,6 +368,9 @@ void GmshIO::read_mesh(std::istream & in)
                 libmesh_error_msg_if(num_physical_tags > 1,
                                      "I don't believe that we can specify multiple subdomain or "
                                      "boundary ids for a given geometric entity");
+
+                entity_to_bounding_box[std::make_pair(3, volume_tag)] =
+                  BoundingBox(Point(minx,miny,minz),Point(maxx,maxy,maxz));
 
                 if (num_physical_tags)
                 {
@@ -625,19 +641,47 @@ void GmshIO::read_mesh(std::istream & in)
                     std::size_t gmsh_element_id;
                     in >> gmsh_element_id;
 
+                    // Make sure this element isn't somewhere
+                    // unexpected
+
+                    // A default bounding box is [inf,-inf] (empty);
+                    // swap that and we get [-inf,inf] (everything)
+                    BoundingBox expected_bounding_box;
+                    std::swap(expected_bounding_box.min(),
+                              expected_bounding_box.max());
+
+                    if (auto it = entity_to_bounding_box.find
+                          (std::make_pair(entity_dim, entity_tag));
+                        it != entity_to_bounding_box.end())
+                      expected_bounding_box = it->second;
+
                     // Get the remainder of the line that includes the nodes ids
                     std::getline(in, s);
                     std::istringstream is(s);
                     std::size_t local_node_counter = 0, gmsh_node_id;
                     while (is >> gmsh_node_id)
                     {
+                      Node * node = mesh.node_ptr(nodetrans[gmsh_node_id]);
+
+                      // Make sure the file is consistent about entity
+                      // placement
+                      libmesh_error_msg_if
+                        (!expected_bounding_box.contains_point(*node),
+                         "$Elements dim " << entity_dim << " element "
+                         << gmsh_element_id << " (entity " << entity_tag
+                         << ", " <<
+                         Utility::enum_to_string(eletype.type) <<
+                         ") has node at " << *static_cast<Node*>(node)
+                         << "\n outside entity physical bounding box " <<
+                         expected_bounding_box);
+
                       // Add node pointers to the elements.
                       // If there is a node translation table, use it.
                       if (eletype.nodes.size() > 0)
                           elem->set_node(eletype.nodes[local_node_counter++]) =
-                            mesh.node_ptr(nodetrans[gmsh_node_id]);
+                            node;
                       else
-                          elem->set_node(local_node_counter++) = mesh.node_ptr(nodetrans[gmsh_node_id]);
+                          elem->set_node(local_node_counter++) = node;
                     }
 
                     // Make sure that the libmesh element we added has nnodes nodes.
@@ -665,8 +709,33 @@ void GmshIO::read_mesh(std::istream & in)
                     std::size_t gmsh_element_id, gmsh_node_id;
                     in >> gmsh_element_id;
                     in >> gmsh_node_id;
+
+                    // Make sure the file is consistent about entity
+                    // placement
+
+                    // A default bounding box is [inf,-inf] (empty);
+                    // swap that and we get [-inf,inf] (everything)
+                    BoundingBox expected_bounding_box;
+                    std::swap(expected_bounding_box.min(),
+                              expected_bounding_box.max());
+
+                    if (auto it = entity_to_bounding_box.find
+                          (std::make_pair(entity_dim, entity_tag));
+                        it != entity_to_bounding_box.end())
+                      expected_bounding_box = it->second;
+
+                    Node * node = mesh.node_ptr(nodetrans[gmsh_node_id]);
+
+                    libmesh_error_msg_if
+                      (!expected_bounding_box.contains_point(*node),
+                       "$Elements dim " << entity_dim << " element "
+                       << gmsh_element_id << " (entity " << entity_tag <<
+                       ") has node at " << *static_cast<Node*>(node)
+                       << "\n outside entity physical bounding box " <<
+                       expected_bounding_box);
+
                     mesh.get_boundary_info().add_node(
-                      nodetrans[gmsh_node_id],
+                      node,
                       static_cast<boundary_id_type>(entity_to_physical_id[
                                                       std::make_pair(entity_dim, entity_tag)]));
                   } // end for (loop over elements in entity block)
