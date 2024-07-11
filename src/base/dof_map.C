@@ -1258,7 +1258,7 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
                                       next_free_dof);
 
                 next_free_dof += (vg_description.n_variables()*
-                                  elem->n_comp(sys_num,vg));
+                                  elem->n_comp_group(sys_num,vg));
               }
         }
     } // done looping over elements
