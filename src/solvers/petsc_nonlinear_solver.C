@@ -802,11 +802,12 @@ void PetscNonlinearSolver<T>::init (const char * name)
 
       // Attaching a DM to SNES.
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
-      bool use_petsc_dm = libMesh::on_command_line("--use_petsc_dm");
+      const auto prefix = name ? std::string(name) + "_" : std::string("");
+      bool use_petsc_dm = libMesh::on_command_line("--" + prefix + "use_petsc_dm");
 
       // This needs to be called before SNESSetFromOptions
       if (use_petsc_dm)
-        this->_dm_wrapper.init_and_attach_petscdm(this->system(), *_snes);
+        this->_dm_wrapper.init_and_attach_petscdm(this->system(), _snes);
       else
 #endif
       {

@@ -27,6 +27,7 @@
 #include "libmesh/petsc_macro.h"
 #include "libmesh/petsc_solver_exception.h"
 #include "libmesh/wrapped_petsc.h"
+#include "libmesh/petsc_dm_wrapper.h"
 
 // Petsc include files.
 #ifdef I
@@ -256,6 +257,16 @@ public:
    * \returns The solver's convergence flag
    */
   virtual LinearConvergenceReason get_converged_reason() const override;
+
+protected:
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
+  /**
+   * Wrapper object for interacting with the "new" libMesh PETSc DM. This DM can be used for
+   * geometric multigrid and field splits. The DM can be activated from the command line with
+   * --<prefix_>use_petsc_dm
+   */
+  PetscDMWrapper _dm_wrapper;
+#endif
 
 private:
 

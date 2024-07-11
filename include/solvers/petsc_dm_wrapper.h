@@ -105,9 +105,14 @@ namespace libMesh
     //! Destroys and clears all build DM-related data
     void clear();
 
-    void init_and_attach_petscdm(System & system, SNES & snes);
+    void init_and_attach_petscdm(System & system, SNES snes);
+    void init_and_attach_petscdm(System & system, KSP snes);
 
   private:
+    /**
+     * Initialize the PETSc DM and return the number of geometric multigrid levels
+     */
+    unsigned int init_petscdm(System & system);
 
     /**
      * Vector of DMs for all grid levels. These are PETSc objects
