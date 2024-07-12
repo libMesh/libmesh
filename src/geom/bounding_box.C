@@ -62,6 +62,21 @@ bool BoundingBox::contains_point (const Point & p) const
 }
 
 
+
+Real BoundingBox::max_size() const
+{
+  Real size = 0;
+  for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+    {
+      Real sized = this->second(d) - this->first(d);
+      if (!libmesh_isinf(sized))
+        size = std::max(size, sized);
+    }
+  return size;
+}
+
+
+
 void BoundingBox::intersect_with (const BoundingBox & other_box)
 {
   this->first(0)  = std::max(this->first(0),  other_box.first(0));

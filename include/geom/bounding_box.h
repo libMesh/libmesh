@@ -153,6 +153,15 @@ public:
   void scale(const Real factor);
 
   /**
+   * Returns the maximum size of a finite box extent.
+   *
+   * If the bounding box is infinite (or effectively so, e.g. using
+   * numeric_limits<Real>::max()) in some dimension, then that
+   * dimension is ignored.
+   */
+  Real max_size() const;
+
+  /**
    * Formatted print, by default to \p libMesh::out.
    */
   void print(std::ostream & os = libMesh::out) const;
