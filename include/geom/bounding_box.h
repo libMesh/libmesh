@@ -117,6 +117,17 @@ public:
   bool contains_point (const Point &) const;
 
   /**
+   * \returns \p true if the bounding box contains the given point,
+   * to within at least one of the given tolerance(s).  At least one
+   * tolerance should be set to greater than zero; otherwise use the
+   * other \p contains_point overload for efficiency.
+   *
+   * Relative tolerances are computed relative to the maximum finite
+   * extent of the bounding box, \p max_size()
+   */
+  bool contains_point (const Point &, Real abs_tol, Real rel_tol) const;
+
+  /**
    * Sets this bounding box to be the intersection with the other
    * bounding box.
    */
