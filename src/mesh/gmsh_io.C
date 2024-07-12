@@ -664,9 +664,12 @@ void GmshIO::read_mesh(std::istream & in)
                       Node * node = mesh.node_ptr(nodetrans[gmsh_node_id]);
 
                       // Make sure the file is consistent about entity
-                      // placement
+                      // placement.  Well, mostly consistent.  We have
+                      // files that claim a bounding box but still
+                      // have points epsilon outside it.
                       libmesh_error_msg_if
-                        (!expected_bounding_box.contains_point(*node),
+                        (!expected_bounding_box.contains_point
+                           (*node, 0, /* relative */ TOLERANCE),
                          "$Elements dim " << entity_dim << " element "
                          << gmsh_element_id << " (entity " << entity_tag
                          << ", " <<
@@ -711,7 +714,7 @@ void GmshIO::read_mesh(std::istream & in)
                     in >> gmsh_node_id;
 
                     // Make sure the file is consistent about entity
-                    // placement
+                    // placement.
 
                     // A default bounding box is [inf,-inf] (empty);
                     // swap that and we get [-inf,inf] (everything)
@@ -726,8 +729,12 @@ void GmshIO::read_mesh(std::istream & in)
 
                     Node * node = mesh.node_ptr(nodetrans[gmsh_node_id]);
 
+                    // We'll accept *mostly* consistent.  We have
+                    // files that claim a bounding box but still have
+                    // points epsilon outside it.
                     libmesh_error_msg_if
-                      (!expected_bounding_box.contains_point(*node),
+                      (!expected_bounding_box.contains_point
+                         (*node, 0, /* relative */ TOLERANCE),
                        "$Elements dim " << entity_dim << " element "
                        << gmsh_element_id << " (entity " << entity_tag <<
                        ") has node at " << *static_cast<Node*>(node)
