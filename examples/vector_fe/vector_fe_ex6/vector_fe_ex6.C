@@ -163,7 +163,7 @@ int main (int argc, char ** argv)
   // Adds the variables "u" and "p" to "DivGrad". "u" will be our vector field
   // whereas "p" will be the scalar field.
   system.add_variable("u", vector_order, RAVIART_THOMAS);
-  system.add_variable("p", scalar_order, scalar_order == CONSTANT ? MONOMIAL : L2_LAGRANGE);
+  system.add_variable("p", scalar_order, scalar_order == CONSTANT ? MONOMIAL : L2_HIERARCHIC);
 
   // Add a scalar Lagrange multiplier to remove the nullspace if imposing the Neumann condition.
   if (neumann)
