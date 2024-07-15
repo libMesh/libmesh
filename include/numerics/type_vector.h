@@ -25,6 +25,7 @@
 #include "libmesh/compare_types.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/int_range.h"
+#include "libmesh/fuzzy_equals.h"
 
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
@@ -342,14 +343,6 @@ public:
   auto l1_norm() const -> decltype(std::abs(T()));
 
   /**
-   * \returns The \f$ \ell_1 \f$-norm of \f$ \vec{u} - \vec{v} \f$, where
-   * \f$ \vec{u} \f$ is \p this.
-   */
-  template <typename T2>
-  auto l1_norm_diff(const TypeVector<T2> & other_vec) const
-      -> decltype(std::abs(typename CompareTypes<T, T2>::supertype{}));
-
-  /**
    * \returns True if all values in the vector are zero
    */
   bool is_zero() const;
@@ -453,9 +446,6 @@ protected:
    * The coordinates of the \p TypeVector.
    */
   T _coords[LIBMESH_DIM];
-
-  template <typename T2>
-  friend class TypeVector;
 };
 
 
@@ -1005,23 +995,10 @@ TypeVector<T>::l1_norm() const -> decltype(std::abs(T()))
 }
 
 template <typename T>
-template <typename T2>
-auto
-TypeVector<T>::l1_norm_diff(const TypeVector<T2> & other_vec) const
-    -> decltype(std::abs(typename CompareTypes<T, T2>::supertype{}))
-{
-  decltype(std::abs(typename CompareTypes<T, T2>::supertype{})) ret{};
-  for (const auto i : make_range(libmesh_dim))
-    ret += std::abs(_coords[i] - other_vec._coords[i]);
-
-  return ret;
-}
-
-template <typename T>
 inline
 bool TypeVector<T>::absolute_fuzzy_equals(const TypeVector<T> & rhs, Real tol) const
 {
-  return this->l1_norm_diff(rhs) <= tol;
+  return libMesh::absolute_fuzzy_equals(*this, rhs, tol);
 }
 
 
@@ -1030,7 +1007,7 @@ template <typename T>
 inline
 bool TypeVector<T>::relative_fuzzy_equals(const TypeVector<T> & rhs, Real tol) const
 {
-  return this->absolute_fuzzy_equals(rhs, tol * (this->l1_norm() + rhs.l1_norm()));
+  return libMesh::relative_fuzzy_equals(*this, rhs, tol);
 }
 
 
@@ -1189,16 +1166,16 @@ outer_product(const TypeVector<T> & a, const T2 & b)
 
 template <typename T>
 auto
-l1_norm(const TypeVector<T> & var) -> decltype(var.l1_norm())
+l1_norm(const TypeVector<T> & var)
 {
   return var.l1_norm();
 }
 
-template <typename T>
+template <typename T, typename T2>
 auto
-l1_norm_diff(const TypeVector<T> & var) -> decltype(var.l1_norm_diff())
+l1_norm_diff(const TypeVector<T> & vec1, const TypeVector<T2> & vec2)
 {
-  return var.l1_norm_diff();
+  return l1_norm(vec1 - vec2);
 }
 
 } // namespace libMesh

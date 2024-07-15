@@ -376,6 +376,22 @@ Real NumericVector<T>::l2_norm_diff (const NumericVector<T> & v) const
 
 
 
+template <class T>
+Real NumericVector<T>::l1_norm_diff (const NumericVector<T> & v) const
+{
+  libmesh_assert(this->compatible(v));
+
+  Real norm = 0;
+  for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
+    norm += libMesh::l1_norm_diff((*this)(i), v(i));
+
+  this->comm().sum(norm);
+
+  return norm;
+}
+
+
+
 template <typename T>
 void NumericVector<T>::add_vector (const T * v,
                                    const std::vector<numeric_index_type> & dof_indices)
@@ -428,34 +444,6 @@ bool NumericVector<T>::compatible (const NumericVector<T> & v) const
          this->local_size() == v.local_size() &&
          this->first_local_index() == v.first_local_index() &&
          this->last_local_index() == v.last_local_index();
-}
-
-template <typename T>
-bool
-NumericVector<T>::fuzzy_equals(const NumericVector<T> & v,
-                               const Real rel_tol,
-                               const Real abs_tol) const
-{
-  bool equiv = true;
-  if (this->local_size() != v.local_size())
-    equiv = false;
-
-  if (equiv)
-    for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
-    {
-      if (relative_fuzzy_equals((*this)(i), v(i), rel_tol) ||
-          absolute_fuzzy_equals((*this)(i), v(i), abs_tol))
-        continue;
-      else
-      {
-        equiv = false;
-        break;
-      }
-    }
-
-  this->comm().min(equiv);
-
-  return equiv;
 }
 
 //------------------------------------------------------------------

@@ -315,6 +315,12 @@ public:
   Real l2_norm_diff (const NumericVector<T> & other_vec) const;
 
   /**
+   * \returns The \f$ \ell_1 \f$-norm of \f$ \vec{u} - \vec{v} \f$, where
+   * \f$ \vec{u} \f$ is \p this.
+  */
+  Real l1_norm_diff (const NumericVector<T> & other_vec) const;
+
+  /**
    * \returns The size of the vector.
    */
   virtual numeric_index_type size () const = 0;
@@ -786,15 +792,6 @@ public:
    */
   bool compatible(const NumericVector<T> & v) const;
 
-  /**
-   * checks whether the vector \p v is fuzzy equal to this vector by doing element-wise comparisons.
-   * A given element will be deemed fuzzy equal if either a relative or absolute tolerance fuzzy
-   * equal comparison returns true
-   */
-  bool fuzzy_equals(const NumericVector<T> & v,
-                    const Real rel_tol = TOLERANCE,
-                    const Real abs_tol = TOLERANCE) const;
-
 protected:
 
   /**
@@ -1077,8 +1074,24 @@ void  NumericVector<T>::swap (NumericVector<T> & v)
 }
 
 
-} // namespace libMesh
 
+template <typename T>
+auto
+l1_norm(const NumericVector<T> & vec) -> decltype(vec.l1_norm())
+{
+  return vec.l1_norm();
+}
+
+
+
+template <typename T>
+auto
+l1_norm_diff(const NumericVector<T> & vec1,
+             const NumericVector<T> & vec2) -> decltype(vec1.l1_norm_diff(vec2))
+{
+  return vec1.l1_norm_diff(vec2);
+}
+} // namespace libMesh
 
 // Workaround for weird boost/NumericVector interaction bug
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION

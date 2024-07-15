@@ -6,6 +6,7 @@
 
 // libMesh includes
 #include <libmesh/parallel.h>
+#include <libmesh/fuzzy_equals.h>
 
 #include "libmesh_cppunit.h"
 
@@ -74,11 +75,11 @@ public:
     auto v_clone = v.clone();
     auto & vorig = *v_clone;
 
-    CPPUNIT_ASSERT(v.fuzzy_equals(vorig));
+    CPPUNIT_ASSERT(relative_fuzzy_equals(v, vorig));
 
     v += v;
 
-    CPPUNIT_ASSERT(!v.fuzzy_equals(vorig));
+    CPPUNIT_ASSERT(!relative_fuzzy_equals(v, vorig));
 
     for (libMesh::dof_id_type n=first; n != last; n++)
       LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),

@@ -32,16 +32,16 @@ namespace libMesh
 /**
  * Computes the L1 norm
  */
-template <typename T>
+template <typename T, typename std::enable_if<ScalarTraits<T>::value, int>::type = 0>
 auto
-l1_norm(const T & var) -> decltype(std::abs(T{}))
+l1_norm(const T & var)
 {
   return std::abs(var);
 }
 
 template <typename T>
 auto
-l1_norm(const std::complex<T> & var) -> decltype(std::abs(T{}))
+l1_norm(const std::complex<T> & var)
 {
   return std::abs(var.real()) + std::abs(var.imag());
 }
@@ -49,20 +49,13 @@ l1_norm(const std::complex<T> & var) -> decltype(std::abs(T{}))
 /**
  * Computes the L1 norm of the diff between \p var1 and \p var2
  */
-template <typename T, typename T2>
+template <typename T,
+          typename T2,
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value, int>::type = 0>
 auto
-l1_norm_diff(const T & var1,
-             const T2 & var2) -> decltype(std::abs(typename CompareTypes<T, T2>::supertype{}))
+l1_norm_diff(const T & var1, const T2 & var2)
 {
-  return std::abs(var1 - var2);
-}
-
-template <typename T, typename T2>
-auto
-l1_norm_diff(const std::complex<T> & var1, const std::complex<T2> & var2)
-    -> decltype(std::abs(typename CompareTypes<T, T2>::supertype{}))
-{
-  return std::abs(var1.real() - var2.real()) + std::abs(var1.imag() - var2.imag());
+  return l1_norm(var1 - var2);
 }
 
 #ifdef LIBMESH_HAVE_METAPHYSICL

@@ -7,6 +7,7 @@
 // libMesh includes
 #include <libmesh/dense_matrix.h>
 #include <libmesh/sparse_matrix.h>
+#include <libmesh/fuzzy_equals.h>
 
 #include "libmesh_cppunit.h"
 
@@ -241,9 +242,9 @@ public:
 
       // Check that copy has same values as original
       LIBMESH_ASSERT_FP_EQUAL(copy->l1_norm(), matrix->l1_norm(), _tolerance);
-      CPPUNIT_ASSERT(matrix->fuzzy_equals(*copy));
+      CPPUNIT_ASSERT(relative_fuzzy_equals(*matrix, *copy));
       copy->scale(2);
-      CPPUNIT_ASSERT(!matrix->fuzzy_equals(*copy));
+      CPPUNIT_ASSERT(!relative_fuzzy_equals(*matrix, *copy));
     }
 
     {
