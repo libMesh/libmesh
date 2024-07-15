@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/compare_types.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
@@ -73,6 +74,8 @@ namespace std
 {
 template <typename T>
 auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()));
+template <typename T>
+auto abs(const libMesh::TypeVector<T> & vector) -> decltype(std::abs(T()));
 }
 
 namespace libMesh
@@ -334,6 +337,19 @@ public:
   auto norm_sq() const -> decltype(std::norm(T()));
 
   /**
+   * \returns The L1 norm of the vector
+   */
+  auto l1_norm() const -> decltype(std::abs(T()));
+
+  /**
+   * \returns The \f$ \ell_1 \f$-norm of \f$ \vec{u} - \vec{v} \f$, where
+   * \f$ \vec{u} \f$ is \p this.
+   */
+  template <typename T2>
+  auto l1_norm_diff(const TypeVector<T2> & other_vec) const
+      -> decltype(std::abs(typename CompareTypes<T, T2>::supertype{}));
+
+  /**
    * \returns True if all values in the vector are zero
    */
   bool is_zero() const;
@@ -437,6 +453,9 @@ protected:
    * The coordinates of the \p TypeVector.
    */
   T _coords[LIBMESH_DIM];
+
+  template <typename T2>
+  friend class TypeVector;
 };
 
 
@@ -975,26 +994,34 @@ bool TypeVector<T>::is_zero() const
 }
 
 template <typename T>
+auto
+TypeVector<T>::l1_norm() const -> decltype(std::abs(T()))
+{
+  decltype(std::abs(T())) ret{};
+  for (const auto i : make_range(libmesh_dim))
+    ret += std::abs(_coords[i]);
+
+  return ret;
+}
+
+template <typename T>
+template <typename T2>
+auto
+TypeVector<T>::l1_norm_diff(const TypeVector<T2> & other_vec) const
+    -> decltype(std::abs(typename CompareTypes<T, T2>::supertype{}))
+{
+  decltype(std::abs(typename CompareTypes<T, T2>::supertype{})) ret{};
+  for (const auto i : make_range(libmesh_dim))
+    ret += std::abs(_coords[i] - other_vec._coords[i]);
+
+  return ret;
+}
+
+template <typename T>
 inline
 bool TypeVector<T>::absolute_fuzzy_equals(const TypeVector<T> & rhs, Real tol) const
 {
-#if LIBMESH_DIM == 1
-  return (std::abs(_coords[0] - rhs._coords[0])
-          <= tol);
-#endif
-
-#if LIBMESH_DIM == 2
-  return (std::abs(_coords[0] - rhs._coords[0]) +
-          std::abs(_coords[1] - rhs._coords[1])
-          <= tol);
-#endif
-
-#if LIBMESH_DIM == 3
-  return (std::abs(_coords[0] - rhs._coords[0]) +
-          std::abs(_coords[1] - rhs._coords[1]) +
-          std::abs(_coords[2] - rhs._coords[2])
-          <= tol);
-#endif
+  return this->l1_norm_diff(rhs) <= tol;
 }
 
 
@@ -1003,23 +1030,7 @@ template <typename T>
 inline
 bool TypeVector<T>::relative_fuzzy_equals(const TypeVector<T> & rhs, Real tol) const
 {
-#if LIBMESH_DIM == 1
-  return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0])));
-#endif
-
-#if LIBMESH_DIM == 2
-  return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
-                                      std::abs(_coords[1]) + std::abs(rhs._coords[1])));
-#endif
-
-#if LIBMESH_DIM == 3
-  return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
-                                      std::abs(_coords[1]) + std::abs(rhs._coords[1]) +
-                                      std::abs(_coords[2]) + std::abs(rhs._coords[2])));
-#endif
+  return this->absolute_fuzzy_equals(rhs, tol * (this->l1_norm() + rhs.l1_norm()));
 }
 
 
@@ -1181,6 +1192,13 @@ namespace std
 {
 template <typename T>
 auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()))
+{
+  // Yea I agree it's dumb that the standard returns the square of the Euclidean norm
+  return vector.norm_sq();
+}
+
+template <typename T>
+auto abs(const libMesh::TypeVector<T> & vector) -> decltype(std::abs(T()))
 {
   return vector.norm();
 }
