@@ -1186,6 +1186,21 @@ outer_product(const TypeVector<T> & a, const T2 & b)
 
   return ret;
 }
+
+template <typename T>
+auto
+l1_norm(const TypeVector<T> & var) -> decltype(var.l1_norm())
+{
+  return var.l1_norm();
+}
+
+template <typename T>
+auto
+l1_norm_diff(const TypeVector<T> & var) -> decltype(var.l1_norm_diff())
+{
+  return var.l1_norm_diff();
+}
+
 } // namespace libMesh
 
 namespace std
