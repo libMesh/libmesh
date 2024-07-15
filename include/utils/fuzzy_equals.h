@@ -34,28 +34,22 @@ namespace libMesh
  */
 template <typename T,
           typename T2,
-          typename T3 = T,
-          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
-                                      ScalarTraits<T3>::value,
-                                  int>::type = 0>
-bool absolute_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE * TOLERANCE);
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value, int>::type = 0>
+bool absolute_fuzzy_equals(const T & var1, const T2 & var2, const Real tol = TOLERANCE * TOLERANCE);
 
 /**
  * Function to check whether both the real and imaginary parts of two complex variables are equal
  * within an absolute tolerance
  * @param var1 The first complex variable to be checked
  * @param var2 The second complex variable to be checked
- * @param tol The real tolerance to be used for comparing both real and imgainary parts
+ * @param tol The real tolerance to be used for comparing both real and imaginary parts
  * @return true if both real and imginary parts are equal within tol
  */
-template <typename T,
-          typename T2,
-          typename T3 = T,
-          typename std::enable_if<ScalarTraits<T3>::value, int>::type = 0>
+template <typename T, typename T2>
 bool
 absolute_fuzzy_equals(const std::complex<T> & var1,
-                     const std::complex<T2> & var2,
-                     const T3 & tol = TOLERANCE * TOLERANCE)
+                      const std::complex<T2> & var2,
+                      const Real tol = TOLERANCE * TOLERANCE)
 {
   return absolute_fuzzy_equals(var1.real(), var2.real(), tol) &&
          absolute_fuzzy_equals(var1.imag(), var2.imag(), tol);
@@ -74,12 +68,9 @@ absolute_fuzzy_equals(const std::complex<T> & var1,
  */
 template <typename T,
           typename T2,
-          typename T3,
-          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
-                                      ScalarTraits<T3>::value,
-                                  int>::type>
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value, int>::type>
 bool
-absolute_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol)
+absolute_fuzzy_equals(const T & var1, const T2 & var2, const Real tol)
 {
   return (std::abs(MetaPhysicL::raw_value(var1) - MetaPhysicL::raw_value(var2)) <=
           MetaPhysicL::raw_value(tol));
@@ -92,9 +83,9 @@ absolute_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol)
  * @param tol The relative tolerance to be used
  * @return true if var1 and var2 are equal within relative tol
  */
-template <typename T, typename T2, typename T3 = Real>
+template <typename T, typename T2>
 bool
-relative_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE * TOLERANCE)
+relative_fuzzy_equals(const T & var1, const T2 & var2, const Real tol = TOLERANCE * TOLERANCE)
 {
   if constexpr (ScalarTraits<T>::value || TensorTools::MathWrapperTraits<T>::value)
   {
@@ -139,12 +130,9 @@ relative_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol = TOLERANC
 
 template <typename T,
           typename T2,
-          typename T3,
-          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value &&
-                                      ScalarTraits<T3>::value,
-                                  int>::type>
+          typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value, int>::type>
 bool
-absolute_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol)
+absolute_fuzzy_equals(const T & var1, const T2 & var2, const Real tol)
 {
   return (std::abs(var1 - var2) <= tol);
 }
@@ -156,9 +144,9 @@ absolute_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol)
  * @param tol The relative tolerance to be used
  * @return true if var1 and var2 are equal within relative tol
  */
-template <typename T, typename T2, typename T3 = Real>
+template <typename T, typename T2>
 bool
-relative_fuzzy_equals(const T & var1, const T2 & var2, const T3 & tol = TOLERANCE * TOLERANCE)
+relative_fuzzy_equals(const T & var1, const T2 & var2, const Real tol = TOLERANCE * TOLERANCE)
 {
   if constexpr (ScalarTraits<T>::value || TensorTools::MathWrapperTraits<T>::value)
   {
