@@ -760,8 +760,6 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
 
   std::map<dof_id_type, dof_id_type> global_to_local;
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   for (auto & pmap : processor_pair_to_nodes)
     {
       unsigned int i = 0;
@@ -799,10 +797,8 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
       WrappedPetsc<IS> is;
       {
         PetscInt *adj_i, *adj_j;
-        ierr = PetscCalloc1(rows.size(), &adj_i);
-        LIBMESH_CHKERR2(mesh.comm(), ierr);
-        ierr = PetscCalloc1(cols.size(), &adj_j);
-        LIBMESH_CHKERR2(mesh.comm(), ierr);
+        LibmeshPetscCall2(mesh.comm(), PetscCalloc1(rows.size(), &adj_i));
+        LibmeshPetscCall2(mesh.comm(), PetscCalloc1(cols.size(), &adj_j));
         PetscInt rows_size = cast_int<PetscInt>(rows.size());
         for (PetscInt ii=0; ii<rows_size; ii++)
           adj_i[ii] = rows[ii];
@@ -815,32 +811,24 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
 
         // Create sparse matrix representing an adjacency list
         WrappedPetsc<Mat> adj;
-        ierr = MatCreateMPIAdj(PETSC_COMM_SELF, sz, sz, adj_i, adj_j, nullptr, adj.get());
-        LIBMESH_CHKERR2(mesh.comm(), ierr);
+        LibmeshPetscCall2(mesh.comm(), MatCreateMPIAdj(PETSC_COMM_SELF, sz, sz, adj_i, adj_j, nullptr, adj.get()));
 
         // Create MatPartitioning object
         WrappedPetsc<MatPartitioning> part;
-        ierr = MatPartitioningCreate(PETSC_COMM_SELF, part.get());
-        LIBMESH_CHKERR2(mesh.comm(), ierr);
+        LibmeshPetscCall2(mesh.comm(), MatPartitioningCreate(PETSC_COMM_SELF, part.get()));
 
         // Apply MatPartitioning, storing results in "is"
-        ierr = MatPartitioningSetAdjacency(part, adj);
-        LIBMESH_CHKERR2(mesh.comm(), ierr);
-        ierr = MatPartitioningSetNParts(part, 2);
-        LIBMESH_CHKERR2(mesh.comm(), ierr);
-        ierr = PetscObjectSetOptionsPrefix((PetscObject)(*part), "balance_");
-        LIBMESH_CHKERR2(mesh.comm(), ierr);
-        ierr = MatPartitioningSetFromOptions(part);
-        LIBMESH_CHKERR2(mesh.comm(), ierr);
-        ierr = MatPartitioningApply(part, is.get());
+        LibmeshPetscCall2(mesh.comm(), MatPartitioningSetAdjacency(part, adj));
+        LibmeshPetscCall2(mesh.comm(), MatPartitioningSetNParts(part, 2));
+        LibmeshPetscCall2(mesh.comm(), PetscObjectSetOptionsPrefix((PetscObject)(*part), "balance_"));
+        LibmeshPetscCall2(mesh.comm(), MatPartitioningSetFromOptions(part));
+        LibmeshPetscCall2(mesh.comm(), MatPartitioningApply(part, is.get()));
       }
 
       PetscInt local_size;
       const PetscInt *indices;
-      ierr = ISGetLocalSize(is, &local_size);
-      LIBMESH_CHKERR2(mesh.comm(), ierr);
-      ierr = ISGetIndices(is, &indices);
-      LIBMESH_CHKERR2(mesh.comm(), ierr);
+      LibmeshPetscCall2(mesh.comm(), ISGetLocalSize(is, &local_size));
+      LibmeshPetscCall2(mesh.comm(), ISGetIndices(is, &indices));
 
       i = 0;
       for (auto id : pmap.second)
@@ -853,8 +841,7 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
 
           i++;
         }
-      ierr = ISRestoreIndices(is, &indices);
-      LIBMESH_CHKERR2(mesh.comm(), ierr);
+      LibmeshPetscCall2(mesh.comm(), ISRestoreIndices(is, &indices));
     }
 #else
   libmesh_error_msg("PETSc is required");

@@ -38,24 +38,19 @@ namespace libMesh
 class ResidualContext
 {
 public:
-  ResidualContext(PetscNonlinearSolver<Number> * solver_in, NonlinearImplicitSystem & sys_in,
-                  PetscErrorCode ierr_in) :
+  ResidualContext(PetscNonlinearSolver<Number> * solver_in, NonlinearImplicitSystem & sys_in) :
       solver(solver_in),
-      sys(sys_in),
-      ierr(ierr_in)
+      sys(sys_in)
     {}
 
   PetscNonlinearSolver<Number> * solver;
   NonlinearImplicitSystem & sys;
-  PetscErrorCode ierr;
 };
 
 ResidualContext
 libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
 {
   LOG_SCOPE("residual()", "PetscNonlinearSolver");
-
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   libmesh_assert(x);
   libmesh_assert(ctx);
@@ -71,8 +66,7 @@ libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
   // by the user's residual function.
   {
     PetscInt n_iterations = 0;
-    ierr = SNESGetIterationNumber(snes, &n_iterations);
-    LIBMESH_CHKERR2(solver->comm(),ierr);
+    LibmeshPetscCall2(solver->comm(), SNESGetIterationNumber(snes, &n_iterations));
     solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
   }
 
@@ -97,7 +91,7 @@ libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
   if (solver->_exact_constraint_enforcement)
     sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
-  return ResidualContext(solver, sys, ierr);
+  return ResidualContext(solver, sys);
 }
 
 //--------------------------------------------------------------------
@@ -121,24 +115,19 @@ extern "C"
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
-    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
     KSP ksp;
-    ierr = SNESGetKSP(snes, &ksp);
-    LIBMESH_CHKERR2(solver->comm(),ierr);
+    LibmeshPetscCall2(solver->comm(), SNESGetKSP(snes, &ksp));
 
     PetscInt niter;
-    ierr = KSPGetIterationNumber(ksp, &niter);
-    LIBMESH_CHKERR2(solver->comm(),ierr);
+    LibmeshPetscCall2(solver->comm(), KSPGetIterationNumber(ksp, &niter));
 
     if (niter > cast_int<PetscInt>(solver->reuse_preconditioner_max_linear_its()))
     {
       // -2 is a magic number for "recalculate next time you need it
       // and then not again"
-      ierr = SNESSetLagPreconditioner(snes, -2);
-      LIBMESH_CHKERR2(solver->comm(),ierr);
+      LibmeshPetscCall2(solver->comm(), SNESSetLagPreconditioner(snes, -2));
     }
-    PetscFunctionReturn(ierr);
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
   //-------------------------------------------------------------------
@@ -239,7 +228,7 @@ extern "C"
         R.close();
       }
 
-    PetscFunctionReturn(rc.ierr);
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -294,7 +283,7 @@ extern "C"
         R.close();
       }
 
-    PetscFunctionReturn(rc.ierr);
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -351,7 +340,7 @@ extern "C"
         R.close();
       }
 
-    PetscFunctionReturn(rc.ierr);
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
   //----------------------------------------------------------
@@ -366,8 +355,7 @@ extern "C"
     PetscNonlinearSolver<Number> * solver =
       static_cast<PetscNonlinearSolver<Number> *> (ctx);
 
-    PetscErrorCode ierr = libmesh_petsc_snes_mffd_residual(solver->snes(), x, r, ctx);
-    LIBMESH_CHKERR2(solver->comm(),ierr);
+    LibmeshPetscCall2(solver->comm(), libmesh_petsc_snes_mffd_residual(solver->snes(), x, r, ctx));
 
 #if !PETSC_VERSION_LESS_THAN(3,8,4)
 #ifndef NDEBUG
@@ -379,27 +367,22 @@ extern "C"
       SNES snes = solver->snes();
 
       KSP ksp;
-      ierr = SNESGetKSP(snes, &ksp);
-      LIBMESH_CHKERR2(solver->comm(),ierr);
+      LibmeshPetscCall2(solver->comm(), SNESGetKSP(snes, &ksp));
 
       PetscInt ksp_it;
-      ierr = KSPGetIterationNumber(ksp, &ksp_it);
-      LIBMESH_CHKERR2(solver->comm(),ierr);
+      LibmeshPetscCall2(solver->comm(), KSPGetIterationNumber(ksp, &ksp_it));
 
       SNESType snes_type;
-      ierr = SNESGetType(snes, &snes_type);
-      LIBMESH_CHKERR2(solver->comm(),ierr);
+      LibmeshPetscCall2(solver->comm(), SNESGetType(snes, &snes_type));
 
       libmesh_assert_msg(snes_type, "We're being called from SNES; snes_type should be non-null");
 
       Mat J;
-      ierr = SNESGetJacobian(snes, &J, NULL, NULL, NULL);
-      LIBMESH_CHKERR2(solver->comm(),ierr);
+      LibmeshPetscCall2(solver->comm(), SNESGetJacobian(snes, &J, NULL, NULL, NULL));
       libmesh_assert_msg(J, "We're being called from SNES; J should be non-null");
 
       MatType mat_type;
-      ierr = MatGetType(J, &mat_type);
-      LIBMESH_CHKERR2(solver->comm(),ierr);
+      LibmeshPetscCall2(solver->comm(), MatGetType(J, &mat_type));
       libmesh_assert_msg(mat_type, "We're being called from SNES; mat_type should be non-null");
 
       bool is_operator_mffd = strcmp(mat_type, MATMFFD) == 0;
@@ -412,12 +395,10 @@ extern "C"
         {
           Vec nonlinear_residual;
 
-          ierr = SNESGetFunction(snes, &nonlinear_residual, NULL, NULL);
-          LIBMESH_CHKERR2(solver->comm(),ierr);
+          LibmeshPetscCall2(solver->comm(), SNESGetFunction(snes, &nonlinear_residual, NULL, NULL));
 
           PetscBool vecs_equal;
-          ierr = VecEqual(r, nonlinear_residual, &vecs_equal);
-          LIBMESH_CHKERR2(solver->comm(),ierr);
+          LibmeshPetscCall2(solver->comm(), VecEqual(r, nonlinear_residual, &vecs_equal));
 
           libmesh_error_msg_if(!(vecs_equal == PETSC_TRUE),
                                "You requested to reuse the nonlinear residual vector as the base vector for "
@@ -458,8 +439,6 @@ extern "C"
 
     LOG_SCOPE("jacobian()", "PetscNonlinearSolver");
 
-    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
     libmesh_assert(ctx);
 
     // No way to safety-check this cast, since we got a void *...
@@ -473,8 +452,7 @@ extern "C"
     // by the user's Jacobian function.
     {
       PetscInt n_iterations = 0;
-      ierr = SNESGetIterationNumber(snes, &n_iterations);
-      LIBMESH_CHKERR2(solver->comm(),ierr);
+      LibmeshPetscCall2(solver->comm(), SNESGetIterationNumber(snes, &n_iterations));
       solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
     }
 
@@ -505,7 +483,7 @@ extern "C"
       if (pc && pc != sys_mat.mat())
         PC.close();
 
-      PetscFunctionReturn(ierr);
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
     }
 
     // Set the dof maps
@@ -549,7 +527,7 @@ extern "C"
 
     Jac.close();
 
-    PetscFunctionReturn(ierr);
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
   // This function gets called by PETSc in place of the standard Petsc line searches
@@ -598,8 +576,6 @@ extern "C"
 
     LOG_SCOPE("postcheck()", "PetscNonlinearSolver");
 
-    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
     // PETSc almost certainly initializes these to false already, but
     // it doesn't hurt to be explicit.
     *changed_w = PETSC_FALSE;
@@ -623,7 +599,7 @@ extern "C"
     NonlinearImplicitSystem & sys = solver->system();
 
     if (!solver->postcheck && !solver->postcheck_object)
-      PetscFunctionReturn(ierr);
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 
     // We definitely need to wrap at least "w"
     PetscVector<Number> petsc_w(w, sys.comm());
@@ -663,7 +639,7 @@ extern "C"
     if (changed_new_soln)
       *changed_w = PETSC_TRUE;
 
-    PetscFunctionReturn(ierr);
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -681,8 +657,6 @@ extern "C"
 
     LOG_SCOPE("precheck()", "PetscNonlinearSolver");
 
-    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
     // PETSc almost certainly initializes these to false already, but
     // it doesn't hurt to be explicit.
     *changed = PETSC_FALSE;
@@ -698,7 +672,7 @@ extern "C"
     // It's possible that we don't need to do anything at all, in
     // that case return early...
     if (!solver->precheck_object)
-      PetscFunctionReturn(ierr);
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 
     // The user sets these flags in his/her postcheck function to
     // indicate whether they changed something.
@@ -733,7 +707,7 @@ extern "C"
     if (petsc_changed)
       *changed = PETSC_TRUE;
 
-    PetscFunctionReturn(ierr);
+    PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 } // end extern "C"
 
@@ -799,13 +773,10 @@ void PetscNonlinearSolver<T>::init (const char * name)
     {
       this->_is_initialized = true;
 
-      PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
       // Make only if we don't already have a retained snes
       // hanging around from the last solve
       if (!_snes) {
-        ierr = SNESCreate(this->comm().get(), _snes.get());
-        LIBMESH_CHKERR(ierr);
+        LibmeshPetscCall(SNESCreate(this->comm().get(), _snes.get()));
       }
 
       // I believe all of the following can be safely repeated
@@ -813,23 +784,22 @@ void PetscNonlinearSolver<T>::init (const char * name)
 
       if (name)
         {
-          ierr = SNESSetOptionsPrefix(_snes, name);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(SNESSetOptionsPrefix(_snes, name));
         }
 
       // Attaching a DM to SNES.
       {
         WrappedPetsc<DM> dm;
-        ierr = DMCreate(this->comm().get(), dm.get()); LIBMESH_CHKERR(ierr);
-        ierr = DMSetType(dm, DMLIBMESH);               LIBMESH_CHKERR(ierr);
-        ierr = DMlibMeshSetSystem(dm, this->system()); LIBMESH_CHKERR(ierr);
+        LibmeshPetscCall(DMCreate(this->comm().get(), dm.get()));
+        LibmeshPetscCall(DMSetType(dm, DMLIBMESH));
+        LibmeshPetscCall(DMlibMeshSetSystem(dm, this->system()));
         if (name)
           {
-            ierr = DMSetOptionsPrefix(dm, name);       LIBMESH_CHKERR(ierr);
+            LibmeshPetscCall(DMSetOptionsPrefix(dm, name));
           }
-        ierr = DMSetFromOptions(dm);                   LIBMESH_CHKERR(ierr);
-        ierr = DMSetUp(dm);                            LIBMESH_CHKERR(ierr);
-        ierr = SNESSetDM(_snes, dm);                   LIBMESH_CHKERR(ierr);
+        LibmeshPetscCall(DMSetFromOptions(dm));
+        LibmeshPetscCall(DMSetUp(dm));
+        LibmeshPetscCall(SNESSetDM(_snes, dm));
         // SNES now owns the reference to dm.
       }
 
@@ -845,24 +815,18 @@ void PetscNonlinearSolver<T>::init (const char * name)
       if (this->_preconditioner)
         {
           KSP ksp;
-          ierr = SNESGetKSP (_snes, &ksp);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(SNESGetKSP (_snes, &ksp));
           PC pc;
-          ierr = KSPGetPC(ksp,&pc);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(KSPGetPC(ksp,&pc));
 
           this->_preconditioner->init();
 
-          ierr = PCSetType(pc, PCSHELL);
-          LIBMESH_CHKERR(ierr);
-          ierr = PCShellSetContext(pc,(void *)this->_preconditioner);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(PCSetType(pc, PCSHELL));
+          LibmeshPetscCall(PCShellSetContext(pc,(void *)this->_preconditioner));
 
           //Re-Use the shell functions from petsc_linear_solver
-          ierr = PCShellSetSetUp(pc,libmesh_petsc_preconditioner_setup);
-          LIBMESH_CHKERR(ierr);
-          ierr = PCShellSetApply(pc,libmesh_petsc_preconditioner_apply);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(PCShellSetSetUp(pc,libmesh_petsc_preconditioner_setup));
+          LibmeshPetscCall(PCShellSetApply(pc,libmesh_petsc_preconditioner_apply));
         }
     }
 
@@ -874,21 +838,17 @@ void PetscNonlinearSolver<T>::init (const char * name)
   if (this->postcheck || this->postcheck_object)
     {
       SNESLineSearch linesearch;
-      PetscErrorCode ierr = SNESGetLineSearch(_snes, &linesearch);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESGetLineSearch(_snes, &linesearch));
 
-      ierr = SNESLineSearchSetPostCheck(linesearch, libmesh_petsc_snes_postcheck, this);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESLineSearchSetPostCheck(linesearch, libmesh_petsc_snes_postcheck, this));
     }
 
   if (this->precheck_object)
     {
       SNESLineSearch linesearch;
-      PetscErrorCode ierr = SNESGetLineSearch(_snes, &linesearch);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESGetLineSearch(_snes, &linesearch));
 
-      ierr = SNESLineSearchSetPreCheck(linesearch, libmesh_petsc_snes_precheck, this);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESLineSearchSetPreCheck(linesearch, libmesh_petsc_snes_precheck, this));
     }
 }
 
@@ -910,7 +870,6 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
 {
   parallel_object_only();
 
-  PetscErrorCode ierr;
   std::vector<NumericVector<Number> *> sp;
   if (computeSubspaceObject)
     (*computeSubspaceObject)(sp, this->system());
@@ -929,40 +888,32 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
         {
           auto pv = cast_ptr<PetscVector<T> *>(sp[i]);
 
-          ierr = VecDuplicate(pv->vec(), &modes[i]);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecDuplicate(pv->vec(), &modes[i]));
 
-          ierr = VecCopy(pv->vec(), modes[i]);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecCopy(pv->vec(), modes[i]));
         }
 
       // Normalize.
-      ierr = VecNormalize(modes[0], LIBMESH_PETSC_NULLPTR);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecNormalize(modes[0], LIBMESH_PETSC_NULLPTR));
 
       for (PetscInt i=1; i<nmodes; i++)
         {
           // Orthonormalize vec[i] against vec[0:i-1]
-          ierr = VecMDot(modes[i], i, modes.data(), dots.data());
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecMDot(modes[i], i, modes.data(), dots.data()));
 
           for (PetscInt j=0; j<i; j++)
             dots[j] *= -1.;
 
-          ierr = VecMAXPY(modes[i], i, dots.data(), modes.data());
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecMAXPY(modes[i], i, dots.data(), modes.data()));
 
-          ierr = VecNormalize(modes[i], LIBMESH_PETSC_NULLPTR);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecNormalize(modes[i], LIBMESH_PETSC_NULLPTR));
         }
 
-      ierr = MatNullSpaceCreate(this->comm().get(), PETSC_FALSE, nmodes, modes.data(), msp);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatNullSpaceCreate(this->comm().get(), PETSC_FALSE, nmodes, modes.data(), msp));
 
       for (PetscInt i=0; i<nmodes; ++i)
         {
-          ierr = VecDestroy(&modes[i]);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecDestroy(&modes[i]));
         }
     }
 }
@@ -985,7 +936,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
   PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt n_iterations =0;
   // Should actually be a PetscReal, but I don't know which version of PETSc first introduced PetscReal
   Real final_residual_norm=0.;
@@ -995,43 +945,36 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   if ((reuse_preconditioner()) && (!_setup_reuse))
     {
       _setup_reuse = true;
-      ierr = SNESSetLagPreconditionerPersists(_snes, PETSC_TRUE);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESSetLagPreconditionerPersists(_snes, PETSC_TRUE));
       // According to the PETSC 3.16.5 docs -2 is a magic number which
       // means "recalculate the next time you need it and then not again"
-      ierr = SNESSetLagPreconditioner(_snes, -2);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESSetLagPreconditioner(_snes, -2));
       // Add in our callback which will trigger recalculating
       // the preconditioner when we hit reuse_preconditioner_max_linear_its
-      ierr = SNESMonitorSet(_snes, &libmesh_petsc_recalculate_monitor,
-                            this,
-                            NULL);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESMonitorSet(_snes, &libmesh_petsc_recalculate_monitor,
+                                      this,
+                                      NULL));
     }
   else if (!(reuse_preconditioner()))
     // This covers the case where it was enabled but was then disabled
     {
-      ierr = SNESSetLagPreconditionerPersists(_snes, PETSC_FALSE);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESSetLagPreconditionerPersists(_snes, PETSC_FALSE));
       if (_setup_reuse)
         {
           _setup_reuse = false;
-          ierr = SNESMonitorCancel(_snes);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(SNESMonitorCancel(_snes));
           // Readd default monitor
           setup_default_monitor();
         }
     }
 
-  ierr = SNESSetFunction (_snes, r->vec(), libmesh_petsc_snes_residual, this);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSetFunction (_snes, r->vec(), libmesh_petsc_snes_residual, this));
 
   // Only set the jacobian function if we've been provided with something to call.
   // This allows a user to set their own jacobian function if they want to
   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
     {
-      ierr = SNESSetJacobian (_snes, pre->mat(), pre->mat(), libmesh_petsc_snes_jacobian, this);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESSetJacobian (_snes, pre->mat(), pre->mat(), libmesh_petsc_snes_jacobian, this));
     }
 
 
@@ -1042,8 +985,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       this->build_mat_null_space(this->nullspace_object, this->nullspace, msp.get());
       if (msp)
         {
-          ierr = MatSetNullSpace(pre->mat(), msp);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatSetNullSpace(pre->mat(), msp));
         }
     }
 
@@ -1057,8 +999,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       this->build_mat_null_space(this->transpose_nullspace_object, this->transpose_nullspace, msp.get());
       if (msp)
         {
-          ierr = MatSetTransposeNullSpace(pre->mat(), msp);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatSetTransposeNullSpace(pre->mat(), msp));
         }
 #endif
     }
@@ -1071,40 +1012,37 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 
       if (msp)
         {
-          ierr = MatSetNearNullSpace(pre->mat(), msp);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatSetNearNullSpace(pre->mat(), msp));
         }
     }
 
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
-  ierr = SNESGetKSP (_snes, &ksp);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESGetKSP (_snes, &ksp));
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values
-  ierr = KSPSetTolerances (ksp, this->initial_linear_tolerance, PETSC_DEFAULT,
-                           PETSC_DEFAULT, this->max_linear_iterations);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(KSPSetTolerances (ksp, this->initial_linear_tolerance, PETSC_DEFAULT,
+                                     PETSC_DEFAULT, this->max_linear_iterations));
 
   // Set the tolerances for the non-linear solver.
-  ierr = SNESSetTolerances(_snes, this->absolute_residual_tolerance, this->relative_residual_tolerance,
-                           this->relative_step_tolerance, this->max_nonlinear_iterations, this->max_function_evaluations);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSetTolerances(_snes,
+                                     this->absolute_residual_tolerance,
+                                     this->relative_residual_tolerance,
+                                     this->relative_step_tolerance,
+                                     this->max_nonlinear_iterations,
+                                     this->max_function_evaluations));
 
   // Set the divergence tolerance for the non-linear solver
 #if !PETSC_VERSION_LESS_THAN(3,8,0)
-  ierr = SNESSetDivergenceTolerance(_snes, this->divergence_tolerance);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSetDivergenceTolerance(_snes, this->divergence_tolerance));
 #endif
 
   //Pull in command-line options
 #if PETSC_VERSION_LESS_THAN(3,7,0)
-  ierr = KSPSetFromOptions(ksp);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(KSPSetFromOptions(ksp));
 #endif
-  ierr = SNESSetFromOptions(_snes);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSetFromOptions(_snes));
 
   if (this->user_presolve)
     this->user_presolve(this->system());
@@ -1136,19 +1074,15 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   // (petsc/petsc@154060b), so this code block should be safe to use
   // in 3.5.0 and later.
 #if !PETSC_VERSION_LESS_THAN(3,6,0)
-  ierr = SNESSetSolution(_snes, x->vec());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSetSolution(_snes, x->vec()));
 #endif
-  ierr = SNESSetUp(_snes);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSetUp(_snes));
 
   Mat J;
-  ierr = SNESGetJacobian(_snes, &J, LIBMESH_PETSC_NULLPTR,
-                         LIBMESH_PETSC_NULLPTR,
-                         LIBMESH_PETSC_NULLPTR);
-  LIBMESH_CHKERR(ierr);
-  ierr = MatMFFDSetFunction(J, libmesh_petsc_snes_mffd_interface, this);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESGetJacobian(_snes, &J, LIBMESH_PETSC_NULLPTR,
+                                   LIBMESH_PETSC_NULLPTR,
+                                   LIBMESH_PETSC_NULLPTR));
+  LibmeshPetscCall(MatMFFDSetFunction(J, libmesh_petsc_snes_mffd_interface, this));
 #if !PETSC_VERSION_LESS_THAN(3,8,4)
 #ifndef NDEBUG
   // If we're in debug mode, do not reuse the nonlinear function evaluation as the base for doing
@@ -1156,51 +1090,41 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   // the base, we'll check the base function evaluation and compare it to the nonlinear residual
   // evaluation. If they are different, then we'll error and inform the user that it's unsafe to
   // reuse the base
-  ierr = MatSNESMFSetReuseBase(J, PETSC_FALSE);
+  LibmeshPetscCall(MatSNESMFSetReuseBase(J, PETSC_FALSE));
 #else
   // Resue the residual vector from SNES
-  ierr = MatSNESMFSetReuseBase(J, static_cast<PetscBool>(_snesmf_reuse_base));
+  LibmeshPetscCall(MatSNESMFSetReuseBase(J, static_cast<PetscBool>(_snesmf_reuse_base)));
 #endif
-  LIBMESH_CHKERR(ierr);
 #endif
 
   SNESLineSearch linesearch;
   if (linesearch_object)
   {
-    ierr = SNESGetLineSearch(_snes, &linesearch);
-    LIBMESH_CHKERR(ierr);
-    ierr = SNESLineSearchSetType(linesearch, SNESLINESEARCHSHELL);
-    LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(SNESGetLineSearch(_snes, &linesearch));
+    LibmeshPetscCall(SNESLineSearchSetType(linesearch, SNESLINESEARCHSHELL));
 #if PETSC_RELEASE_GREATER_EQUALS(3, 21, 0)
-    ierr = SNESLineSearchShellSetApply(linesearch, libmesh_petsc_linesearch_shellfunc, this);
+    LibmeshPetscCall(SNESLineSearchShellSetApply(linesearch, libmesh_petsc_linesearch_shellfunc, this));
 #else
-    ierr = SNESLineSearchShellSetUserFunc(linesearch, libmesh_petsc_linesearch_shellfunc, this);
+    LibmeshPetscCall(SNESLineSearchShellSetUserFunc(linesearch, libmesh_petsc_linesearch_shellfunc, this));
 #endif
-    LIBMESH_CHKERR(ierr);
   }
 
-  ierr = SNESSolve (_snes, LIBMESH_PETSC_NULLPTR, x->vec());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSolve (_snes, LIBMESH_PETSC_NULLPTR, x->vec()));
 
-  ierr = SNESGetIterationNumber(_snes, &n_iterations);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESGetIterationNumber(_snes, &n_iterations));
 
-  ierr = SNESGetLinearSolveIterations(_snes, &_n_linear_iterations);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESGetLinearSolveIterations(_snes, &_n_linear_iterations));
 
   // SNESGetFunction has been around forever and should work on all
   // versions of PETSc.  This is also now the recommended approach
   // according to the documentation for the PETSc 3.5.1 release:
   // http://www.mcs.anl.gov/petsc/documentation/changes/35.html
   Vec f;
-  ierr = SNESGetFunction(_snes, &f, 0, 0);
-  LIBMESH_CHKERR(ierr);
-  ierr = VecNorm(f, NORM_2, pPR(&final_residual_norm));
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESGetFunction(_snes, &f, 0, 0));
+  LibmeshPetscCall(VecNorm(f, NORM_2, pPR(&final_residual_norm)));
 
   // Get and store the reason for convergence
-  ierr = SNESGetConvergedReason(_snes, &_reason);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESGetConvergedReason(_snes, &_reason));
 
   //Based on Petsc 2.3.3 documentation all diverged reasons are negative
   this->converged = (_reason >= 0);
@@ -1227,12 +1151,9 @@ void PetscNonlinearSolver<T>::print_converged_reason()
 template <typename T>
 SNESConvergedReason PetscNonlinearSolver<T>::get_converged_reason()
 {
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   if (this->initialized())
     {
-      ierr = SNESGetConvergedReason(_snes, &_reason);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESGetConvergedReason(_snes, &_reason));
     }
 
   return _reason;
@@ -1249,9 +1170,8 @@ void PetscNonlinearSolver<T>::setup_default_monitor()
 {
   if (_default_monitor)
     {
-      PetscErrorCode ierr = SNESMonitorSet (_snes, libmesh_petsc_snes_monitor,
-                                            this, LIBMESH_PETSC_NULLPTR);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(
+          SNESMonitorSet(_snes, libmesh_petsc_snes_monitor, this, LIBMESH_PETSC_NULLPTR));
     }
 }
 
