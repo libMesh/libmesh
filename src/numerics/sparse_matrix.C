@@ -33,7 +33,6 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/enum_solver_package.h"
 
-
 // gzstream for reading compressed files as a stream
 #ifdef LIBMESH_HAVE_GZSTREAM
 # include "libmesh/ignore_warnings.h" // shadowing in gzstream.h

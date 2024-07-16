@@ -446,6 +446,8 @@ bool NumericVector<T>::compatible (const NumericVector<T> & v) const
          this->last_local_index() == v.last_local_index();
 }
 
+
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT NumericVector<Number>;

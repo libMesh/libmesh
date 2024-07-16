@@ -1089,6 +1089,7 @@ l1_norm_diff(const NumericVector<T> & vec1, const NumericVector<T> & vec2)
 
 } // namespace libMesh
 
+
 // Workaround for weird boost/NumericVector interaction bug
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 namespace boost { namespace multiprecision { namespace detail {
