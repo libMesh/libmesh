@@ -75,8 +75,6 @@ namespace std
 {
 template <typename T>
 auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()));
-template <typename T>
-auto abs(const libMesh::TypeVector<T> & vector) -> decltype(std::abs(T()));
 }
 
 namespace libMesh
@@ -1191,12 +1189,6 @@ auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()))
 {
   // Yea I agree it's dumb that the standard returns the square of the Euclidean norm
   return vector.norm_sq();
-}
-
-template <typename T>
-auto abs(const libMesh::TypeVector<T> & vector) -> decltype(std::abs(T()))
-{
-  return vector.norm();
 }
 } // namespace std
 
