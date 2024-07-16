@@ -80,11 +80,11 @@ Real BoundingBox::max_size() const
 bool BoundingBox::contains_point
   (const Point & p, Real abs_tol, Real rel_tol) const
 {
-  libmesh_assert_greater_equal(abs_tol, 0);
-  libmesh_assert_greater_equal(rel_tol, 0);
+  libmesh_assert_greater_equal(abs_tol, Real(0));
+  libmesh_assert_greater_equal(rel_tol, Real(0));
 
   // Just use the other contains_point overload
-  libmesh_assert_greater(rel_tol+abs_tol, 0);
+  libmesh_assert_greater(rel_tol+abs_tol, Real(0));
 
   // Find absolute tolerance from relative tolerance
   const Real tol = std::max(abs_tol, this->max_size()*rel_tol);
