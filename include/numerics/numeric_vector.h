@@ -1073,24 +1073,20 @@ void  NumericVector<T>::swap (NumericVector<T> & v)
   std::swap(_type, v._type);
 }
 
-
-
 template <typename T>
 auto
-l1_norm(const NumericVector<T> & vec) -> decltype(vec.l1_norm())
+l1_norm(const NumericVector<T> & vec)
 {
   return vec.l1_norm();
 }
 
-
-
 template <typename T>
 auto
-l1_norm_diff(const NumericVector<T> & vec1,
-             const NumericVector<T> & vec2) -> decltype(vec1.l1_norm_diff(vec2))
+l1_norm_diff(const NumericVector<T> & vec1, const NumericVector<T> & vec2)
 {
   return vec1.l1_norm_diff(vec2);
 }
+
 } // namespace libMesh
 
 // Workaround for weird boost/NumericVector interaction bug

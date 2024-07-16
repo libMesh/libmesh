@@ -637,15 +637,14 @@ std::ostream & operator << (std::ostream & os, const SparseMatrix<T> & m)
 
 template <typename T>
 auto
-l1_norm(const SparseMatrix<T> & mat) -> decltype(mat.l1_norm())
+l1_norm(const SparseMatrix<T> & mat)
 {
   return mat.l1_norm();
 }
 
 template <typename T>
 auto
-l1_norm_diff(const SparseMatrix<T> & mat1,
-             const SparseMatrix<T> & mat2) -> decltype(mat1.l1_norm_diff(mat2))
+l1_norm_diff(const SparseMatrix<T> & mat1, const SparseMatrix<T> & mat2)
 {
   return mat1.l1_norm_diff(mat2);
 }
