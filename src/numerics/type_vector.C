@@ -222,6 +222,19 @@ bool TypeVector<Complex>::operator >= (const TypeVector<Complex> & rhs) const
 
 
 
+template <>
+auto
+TypeVector<bool>::l1_norm() const
+{
+  bool ret{};
+  for (const auto i : make_range(libmesh_dim))
+    ret += _coords[i];
+
+  return ret;
+}
+
+
+
 // ------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT TypeVector<Real>;

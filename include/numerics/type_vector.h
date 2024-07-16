@@ -340,7 +340,7 @@ public:
   /**
    * \returns The L1 norm of the vector
    */
-  auto l1_norm() const -> decltype(std::abs(T()));
+  auto l1_norm() const;
 
   /**
    * \returns True if all values in the vector are zero
@@ -983,9 +983,13 @@ bool TypeVector<T>::is_zero() const
   return true;
 }
 
+template <>
+auto
+TypeVector<bool>::l1_norm() const;
+
 template <typename T>
 auto
-TypeVector<T>::l1_norm() const -> decltype(std::abs(T()))
+TypeVector<T>::l1_norm() const
 {
   decltype(std::abs(T())) ret{};
   for (const auto i : make_range(libmesh_dim))
