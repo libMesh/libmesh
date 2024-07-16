@@ -194,7 +194,8 @@ public:
 #endif // LIBMESH_DIM > 1
        //
 #if LIBMESH_DIM > 1
-  CPPUNIT_TEST( testGmsh );
+  CPPUNIT_TEST( testBadGmsh );
+  CPPUNIT_TEST( testGoodGmsh );
 #endif
 
 #ifdef LIBMESH_HAVE_TETGEN
@@ -1514,7 +1515,7 @@ public:
     helperTestingDynaQuad(mesh);
   }
 
-  void testGmsh ()
+  void testBadGmsh ()
   {
     LOG_UNIT_TEST;
 
@@ -1538,6 +1539,21 @@ public:
     std::regex msg_regex("outside entity physical bounding box");
     CPPUNIT_ASSERT(std::regex_search(what, msg_regex));
 #endif
+  }
+
+  void testGoodGmsh ()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    GmshIO gmsh_io(mesh);
+
+    if (mesh.processor_id() == 0)
+      gmsh_io.read("meshes/circle.msh");
+    MeshCommunication().broadcast(mesh);
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(14));
   }
 
   void testTetgenIO ()
