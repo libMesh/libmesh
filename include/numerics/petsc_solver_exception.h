@@ -121,6 +121,22 @@ PETSC_BEGIN_END(MatAssembly) // MatAssemblyBeginEnd
 PETSC_BEGIN_END(VecAssembly) // VecAssemblyBeginEnd
 PETSC_BEGIN_END(VecGhostUpdate) // VecGhostUpdateBeginEnd
 
+#define LibmeshPetscCall(...)                                                                      \
+  do                                                                                               \
+  {                                                                                                \
+    PetscErrorCode libmesh_petsc_call_ierr;                                                        \
+    libmesh_petsc_call_ierr = __VA_ARGS__;                                                         \
+    LIBMESH_CHKERR(libmesh_petsc_call_ierr);                                                       \
+  } while (0)
+
+#define LibmeshPetscCall2(comm, ...)                                                               \
+  do                                                                                               \
+  {                                                                                                \
+    PetscErrorCode libmesh_petsc_call_ierr;                                                        \
+    libmesh_petsc_call_ierr = __VA_ARGS__;                                                         \
+    LIBMESH_CHKERR2(comm, libmesh_petsc_call_ierr);                                                \
+  } while (0)
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_PETSC
