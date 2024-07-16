@@ -30,37 +30,6 @@
 #include <cmath>
 #include <complex>
 
-#ifdef LIBMESH_HAVE_EIGEN
-#include "libmesh/ignore_warnings.h"
-#include "Eigen/Core"
-#include "libmesh/restore_warnings.h"
-#endif
-
-#ifdef LIBMESH_HAVE_METAPHYSICL
-#include "metaphysicl/dualnumber_decl.h"
-
-namespace std
-{
-#ifdef LIBMESH_HAVE_EIGEN
-template <typename T, typename D, bool asd>
-using ADRealEigenVector = Eigen::Matrix<MetaPhysicL::DualNumber<T, D, asd>, Eigen::Dynamic, 1>;
-
-template <typename T, typename D, bool asd>
-ADRealEigenVector<T, D, asd> norm(const ADRealEigenVector<T, D, asd> &) {throw std::runtime_error("unimplemented");}
-template <typename T, typename D, bool asd>
-ADRealEigenVector<T, D, asd> norm(ADRealEigenVector<T, D, asd> &&) {throw std::runtime_error("unimplemented");}
-template <typename T, typename D, bool asd>
-ADRealEigenVector<T, D, asd> sqrt(const ADRealEigenVector<T, D, asd> &) {throw std::runtime_error("unimplemented");}
-template <typename T, typename D, bool asd>
-ADRealEigenVector<T, D, asd> sqrt(ADRealEigenVector<T, D, asd> &&) {throw std::runtime_error("unimplemented");}
-template <typename T, typename D, bool asd>
-ADRealEigenVector<T, D, asd> abs(const ADRealEigenVector<T, D, asd> &) {throw std::runtime_error("unimplemented");}
-template <typename T, typename D, bool asd>
-ADRealEigenVector<T, D, asd> abs(ADRealEigenVector<T, D, asd> &&) {throw std::runtime_error("unimplemented");}
-#endif
-}
-#endif
-
 namespace libMesh
 {
 // Forward declarations
