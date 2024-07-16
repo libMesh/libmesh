@@ -572,27 +572,22 @@ PetscVector<T>::PetscVector (Vec v,
 
   /* We need to ask PETSc about the (local to global) ghost value
      mapping and create the inverse mapping out of it.  */
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt petsc_local_size=0;
-  ierr = VecGetLocalSize(_vec, &petsc_local_size);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecGetLocalSize(_vec, &petsc_local_size));
 
   // Get the vector type from PETSc.
   VecType ptype;
-  ierr = VecGetType(_vec, &ptype);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecGetType(_vec, &ptype));
 
 #if PETSC_RELEASE_GREATER_EQUALS(3, 21, 0)
   // Fande only implemented VecGhostGetGhostIS for VECMPI
   if (std::strcmp(ptype, VECMPI) == 0)
     {
       IS ghostis;
-      ierr = VecGhostGetGhostIS(_vec, &ghostis);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecGhostGetGhostIS(_vec, &ghostis));
 
       Vec localrep;
-      ierr = VecGhostGetLocalForm(_vec, &localrep);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecGhostGetLocalForm(_vec, &localrep));
 
       // If is a sparsely stored vector, set up our new mapping
       // Only checking mapping is not enough to determine if a vec is ghosted
@@ -600,18 +595,15 @@ PetscVector<T>::PetscVector (Vec v,
       if (ghostis && localrep)
         {
           PetscInt ghost_size;
-          ierr = ISGetSize(ghostis, &ghost_size);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(ISGetSize(ghostis, &ghost_size));
 
           const PetscInt * indices;
-          ierr = ISGetIndices(ghostis, &indices);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(ISGetIndices(ghostis, &indices));
 
           for (const auto i : make_range(ghost_size))
             _global_to_local_map[indices[i]] = i;
           this->_type = GHOSTED;
-          ierr = ISRestoreIndices(ghostis, &indices);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(ISRestoreIndices(ghostis, &indices));
         }
     }
   else if (std::strcmp(ptype,VECSHARED) == 0)
@@ -620,12 +612,10 @@ PetscVector<T>::PetscVector (Vec v,
 #endif
     {
       ISLocalToGlobalMapping mapping;
-      ierr = VecGetLocalToGlobalMapping(_vec, &mapping);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecGetLocalToGlobalMapping(_vec, &mapping));
 
       Vec localrep;
-      ierr = VecGhostGetLocalForm(_vec,&localrep);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecGhostGetLocalForm(_vec,&localrep));
       // If is a sparsely stored vector, set up our new mapping
       // Only checking mapping is not enough to determine if a vec is ghosted
       // We need to check if vec has a local representation
@@ -634,25 +624,21 @@ PetscVector<T>::PetscVector (Vec v,
           const numeric_index_type my_local_size = static_cast<numeric_index_type>(petsc_local_size);
           const numeric_index_type ghost_begin = static_cast<numeric_index_type>(petsc_local_size);
           PetscInt n;
-          ierr = ISLocalToGlobalMappingGetSize(mapping, &n);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(ISLocalToGlobalMappingGetSize(mapping, &n));
 
           const numeric_index_type ghost_end = static_cast<numeric_index_type>(n);
           const PetscInt * indices;
-          ierr = ISLocalToGlobalMappingGetIndices(mapping,&indices);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(ISLocalToGlobalMappingGetIndices(mapping,&indices));
 
           for (numeric_index_type i=ghost_begin; i<ghost_end; i++)
             _global_to_local_map[indices[i]] = i-my_local_size;
           this->_type = GHOSTED;
-          ierr = ISLocalToGlobalMappingRestoreIndices(mapping, &indices);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(ISLocalToGlobalMappingRestoreIndices(mapping, &indices));
         }
       else
         this->_type = PARALLEL;
 
-      ierr = VecGhostRestoreLocalForm(_vec,&localrep);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecGhostRestoreLocalForm(_vec,&localrep));
     }
   else
     this->_type = SERIAL;
