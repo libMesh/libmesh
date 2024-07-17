@@ -39,13 +39,6 @@ l1_norm(const T & var)
   return std::abs(var);
 }
 
-template <typename T>
-auto
-l1_norm(const std::complex<T> & var)
-{
-  return std::abs(var.real()) + std::abs(var.imag());
-}
-
 /**
  * Computes the L1 norm of the diff between \p var1 and \p var2
  */
