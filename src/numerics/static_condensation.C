@@ -252,7 +252,7 @@ StaticCondensation::init()
   dof_id_type n = n_local;
   this->comm().sum(n);
   _reduced_solver = LinearSolver<Number>::build(this->comm());
-  _reduced_solver->init("condensed_");
+  _reduced_solver->init((_system.name() + "_condensed_").c_str());
   _reduced_rhs = NumericVector<Number>::build(this->comm());
   // Init the RHS vector so we can conveniently get processor row offsets
   _reduced_rhs->init(n, n_local);

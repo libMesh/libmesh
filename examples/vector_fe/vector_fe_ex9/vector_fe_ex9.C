@@ -151,8 +151,12 @@ main(int argc, char ** argv)
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
   const FEType lm_fe_type(FIRST, SIDE_HIERARCHIC);
 
-  auto & sc = system.add_static_condensation();
-  sc.dont_condense_vars({p_num});
+  StaticCondensation * sc = nullptr;
+  if (system.has_static_condensation())
+    {
+      sc = &system.get_static_condensation();
+      sc->dont_condense_vars({p_num});
+    }
 
   HDGProblem hdg(nu, cavity);
   hdg.mesh = &mesh;
@@ -166,11 +170,10 @@ main(int argc, char ** argv)
   hdg.scalar_fe_face = FEBase::build(dimension, scalar_fe_type);
   hdg.lm_fe_face = FEBase::build(dimension, lm_fe_type);
   hdg.mms = mms;
-  hdg.sc = &sc;
+  hdg.sc = sc;
 
   system.nonlinear_solver->residual_object = &hdg;
   system.nonlinear_solver->jacobian_object = &hdg;
-  system.nonlinear_solver->attach_preconditioner(&sc);
 
   hdg.init();
 

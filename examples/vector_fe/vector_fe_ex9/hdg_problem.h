@@ -82,6 +82,13 @@ public:
                         NonlinearImplicitSystem & S) override;
 
 private:
+  void add_matrix(const Elem & elem,
+                  const unsigned int ivar_num,
+                  const unsigned int jvar_num,
+                  const DenseMatrix<Number> & elem_mat);
+
+  void close();
+
   void create_identity_residual(const QBase & quadrature,
                                 const std::vector<Real> & JxW_local,
                                 const std::vector<std::vector<Real>> & phi,
@@ -204,17 +211,8 @@ private:
   const std::vector<std::vector<Real>> * lm_phi_face;
   const std::vector<Point> * normals;
 
-  // Containers for dof indices
-  std::vector<dof_id_type> qu_dof_indices;
-  std::vector<dof_id_type> u_dof_indices;
-  std::vector<dof_id_type> lm_u_dof_indices;
-  std::vector<dof_id_type> qv_dof_indices;
-  std::vector<dof_id_type> v_dof_indices;
-  std::vector<dof_id_type> lm_v_dof_indices;
-  std::vector<dof_id_type> p_dof_indices;
-  std::vector<dof_id_type> lm_dof_indices;
-  std::vector<dof_id_type> mixed_dof_indices;
-  std::vector<dof_id_type> global_lm_dof_indices;
+  // dof indices
+  std::unordered_map<unsigned int, std::vector<dof_id_type>> dof_indices;
 
   // local solutions at quadrature points
   std::vector<Gradient> qu_sol;
@@ -257,6 +255,9 @@ private:
 
   // Computed via the formula: \bar{q} = \frac{1}{|\partial K|} \int_{\partial K} q
   std::vector<Number> qbar;
+
+  // Global Jacobian
+  SparseMatrix<Number> * J;
 };
 
 } // namespace libMesh

@@ -337,9 +337,16 @@ public:
   mutable std::unique_ptr<LinearSolver<Number>> linear_solver;
 
   /**
-   * Add a static condensation class (if it doesn't already exist) and return a reference to it
+   * Retrieve the static condensation class. Errors if the user has not
+   * requested it on the command line, so calls to this should be guarded by
+   * checking \p has_static_condensation()
    */
-  StaticCondensation & add_static_condensation();
+  StaticCondensation & get_static_condensation();
+
+  /**
+   * @returns Whether this system will be statically condensed
+   */
+  bool has_static_condensation() const { return _sc.get(); }
 
 protected:
   /**
@@ -351,6 +358,15 @@ protected:
   std::unique_ptr<StaticCondensation> _sc;
 };
 
+inline
+StaticCondensation &
+ImplicitSystem::get_static_condensation()
+{
+  if (!_sc)
+    libmesh_error_msg("Static condensation was not requested by the user");
+
+  return *_sc;
+}
 
 } // namespace libMesh
 

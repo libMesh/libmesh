@@ -27,6 +27,7 @@
 //#include "libmesh/parameter_vector.h"
 #include "libmesh/sparse_matrix.h" // for get_transpose
 #include "libmesh/system_subset.h"
+#include "libmesh/static_condensation.h"
 
 namespace libMesh
 {
@@ -47,6 +48,8 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems & es,
   // going to keep using it basically the way we did before it was
   // moved.
   linear_solver = LinearSolver<Number>::build(es.comm());
+  if (_sc)
+    linear_solver->attach_preconditioner(_sc.get());
 }
 
 

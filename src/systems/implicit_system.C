@@ -46,9 +46,12 @@ ImplicitSystem::ImplicitSystem (EquationSystems & es,
   matrix            (nullptr),
   zero_out_matrix_and_rhs(true)
 {
+  if (libMesh::on_command_line("--" + name_in + "-static-condensation"))
+    {
+      _sc = std::make_unique<StaticCondensation>(this->get_mesh(), *this, this->get_dof_map());
+      this->get_dof_map().add_static_condensation(*_sc);
+    }
 }
-
-
 
 ImplicitSystem::~ImplicitSystem () = default;
 
@@ -1254,22 +1257,6 @@ SparseMatrix<Number> & ImplicitSystem::get_system_matrix()
   libmesh_assert(matrix);
   libmesh_assert_equal_to(&get_matrix("System Matrix"), matrix);
   return *matrix;
-}
-
-StaticCondensation &
-ImplicitSystem::add_static_condensation()
-{
-  if (!_sc)
-  {
-    _sc = std::make_unique<StaticCondensation>(this->get_mesh(), *this, this->get_dof_map());
-
-    if (this->have_matrix("System Matrix"))
-      this->remove_matrix("System Matrix");
-
-    this->get_dof_map().add_static_condensation(*_sc);
-  }
-
-  return *_sc;
 }
 
 } // namespace libMesh
