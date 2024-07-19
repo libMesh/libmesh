@@ -669,7 +669,7 @@ void GmshIO::read_mesh(std::istream & in)
                       // have points epsilon outside it.
                       libmesh_error_msg_if
                         (!expected_bounding_box.contains_point
-                           (*node, 0, /* relative */ TOLERANCE),
+                           (*node, /* abs */ 0, /* relative */ TOLERANCE),
                          "$Elements dim " << entity_dim << " element "
                          << gmsh_element_id << " (entity " << entity_tag
                          << ", " <<
@@ -734,7 +734,7 @@ void GmshIO::read_mesh(std::istream & in)
                     // points epsilon outside it.
                     libmesh_error_msg_if
                       (!expected_bounding_box.contains_point
-                         (*node, 0, /* relative */ TOLERANCE),
+                         (*node, /* abs */ 0, /* relative */ TOLERANCE),
                        "$Elements dim " << entity_dim << " element "
                        << gmsh_element_id << " (entity " << entity_tag <<
                        ") has node at " << *static_cast<Node*>(node)

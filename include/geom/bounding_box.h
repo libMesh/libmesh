@@ -125,7 +125,7 @@ public:
    * Relative tolerances are computed relative to the maximum finite
    * extent of the bounding box, \p max_size()
    */
-  bool contains_point (const Point &, Real abs_tol, Real rel_tol) const;
+  bool contains_point (const Point & p, Real abs_tol, Real rel_tol) const;
 
   /**
    * Sets this bounding box to be the intersection with the other

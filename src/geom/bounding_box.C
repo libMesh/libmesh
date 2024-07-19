@@ -92,14 +92,14 @@ bool BoundingBox::contains_point
   // Make local variables first to make things more clear in a moment
   const Real my_min_x = this->first(0) - tol;
   const Real my_max_x = this->second(0) + tol;
-  bool x_int = is_between(my_min_x, p(0), my_max_x);
+  const bool x_int = is_between(my_min_x, p(0), my_max_x);
 
   bool intersection_true = x_int;
 
 #if LIBMESH_DIM > 1
   const Real my_min_y = this->first(1) - tol;
   const Real my_max_y = this->second(1) + tol;
-  bool y_int = is_between(my_min_y, p(1), my_max_y);
+  const bool y_int = is_between(my_min_y, p(1), my_max_y);
 
   intersection_true = intersection_true && y_int;
 #endif
@@ -108,7 +108,7 @@ bool BoundingBox::contains_point
 #if LIBMESH_DIM > 2
   const Real my_min_z = this->first(2) - tol;
   const Real my_max_z = this->second(2) + tol;
-  bool z_int = is_between(my_min_z, p(2), my_max_z);
+  const bool z_int = is_between(my_min_z, p(2), my_max_z);
 
   intersection_true = intersection_true && z_int;
 #endif
