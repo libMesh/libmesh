@@ -55363,15 +55363,15 @@ if test ${enable_netgen_required+y}
 then :
   enableval=$enable_netgen_required; case "${enableval}" in #(
   yes) :
-    netgenrequired=yes
+    enablenetgenrequired=yes
                                  enablenetgen=yes ;; #(
   no) :
-    netgenrequired=no ;; #(
+    enablenetgenrequired=no ;; #(
   *) :
     as_fn_error $? "bad value ${enableval} for --enable-netgen-required" "$LINENO" 5 ;;
 esac
 else $as_nop
-  netgenrequired=no
+  enablenetgenrequired=no
 fi
 
 
