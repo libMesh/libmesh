@@ -69,7 +69,9 @@ Real BoundingBox::max_size() const
   for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
     {
       Real sized = this->second(d) - this->first(d);
-      if (!libmesh_isinf(sized))
+      if (!libmesh_isinf(sized) &&
+          this->second(d) != std::numeric_limits<Real>::max() &&
+          this->first(d) != -std::numeric_limits<Real>::max())
         size = std::max(size, sized);
     }
   return size;
