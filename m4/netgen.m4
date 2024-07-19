@@ -23,11 +23,11 @@ AC_DEFUN([CONFIGURE_NETGEN],
                 AS_HELP_STRING([--enable-netgen-required],
                                [Error if NetGen is not detected by configure]),
                 [AS_CASE("${enableval}",
-                         [yes], [netgenrequired=yes
+                         [yes], [enablenetgenrequired=yes
                                  enablenetgen=yes],
-                         [no],  [netgenrequired=no],
+                         [no],  [enablenetgenrequired=no],
                          [AC_MSG_ERROR(bad value ${enableval} for --enable-netgen-required)])],
-                [netgenrequired=no])
+                [enablenetgenrequired=no])
 
   dnl The Netgen API is distributed with libmesh, so we don't
   dnl currently have to guess where it might be installed, though we
