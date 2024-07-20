@@ -719,6 +719,8 @@ void Pyramid13::permute(unsigned int perm_num)
 
 void Pyramid13::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,1);
   swap2nodes(2,3);
   swap2nodes(6,8);

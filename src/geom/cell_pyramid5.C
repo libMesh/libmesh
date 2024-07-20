@@ -326,6 +326,8 @@ void Pyramid5::permute(unsigned int perm_num)
 
 void Pyramid5::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,1);
   swap2nodes(2,3);
   swap2neighbors(1,3);

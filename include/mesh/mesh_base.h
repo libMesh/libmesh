@@ -253,7 +253,7 @@ public:
 
   /**
    * \returns The logical dimension of the mesh; i.e. the manifold
-   * dimension of the elements in the mesh.  If we ever support
+   * dimension of the elements in the mesh.  When we have
    * multi-dimensional meshes (e.g. hexes and quads in the same mesh)
    * then this will return the largest such dimension.
    */

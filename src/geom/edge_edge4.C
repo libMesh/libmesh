@@ -339,6 +339,8 @@ Real Edge4::volume () const
 
 void Edge4::flip(BoundaryInfo * boundary_info)
 {
+  libmesh_assert(boundary_info);
+
   swap2nodes(0,1);
   swap2nodes(2,3);
   swap2neighbors(0,1);

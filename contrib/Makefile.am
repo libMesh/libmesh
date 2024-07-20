@@ -78,6 +78,10 @@ endif
 distclean-local:
 	for file in $(NETCDF_PLACEHOLDERS); do rm -f $$file; done
 
+if LIBMESH_ENABLE_NETGEN
+  SUBDIRS    += netgen
+endif
+
 if LIBMESH_ENABLE_EXODUS
 if LIBMESH_ENABLE_EXODUS_V509
   SUBDIRS    += exodusii/v5.09

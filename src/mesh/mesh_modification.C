@@ -45,7 +45,9 @@
 
 namespace
 {
-bool split_first_diagonal(const libMesh::Elem * elem,
+using namespace libMesh;
+
+bool split_first_diagonal(const Elem * elem,
                           unsigned int diag_1_node_1,
                           unsigned int diag_1_node_2,
                           unsigned int diag_2_node_1,
@@ -57,7 +59,78 @@ bool split_first_diagonal(const libMesh::Elem * elem,
            elem->node_id(diag_1_node_2) > elem->node_id(diag_2_node_2)));
 }
 
+
+// Return the local index of the vertex on \p elem with the highest
+// node id.
+unsigned int highest_vertex_on(const Elem * elem)
+{
+  unsigned int highest_n = 0;
+  dof_id_type highest_n_id = elem->node_id(0);
+  for (auto n : make_range(1u, elem->n_vertices()))
+    {
+      const dof_id_type n_id = elem->node_id(n);
+      if (n_id > highest_n_id)
+        {
+          highest_n = n;
+          highest_n_id = n_id;
+        }
+    }
+
+  return highest_n;
 }
+
+
+static const std::array<std::array<unsigned int, 3>, 8> opposing_nodes =
+{{ {2,5,7},{3,4,6},{0,5,7},{1,4,6},{1,3,6},{0,2,7},{1,3,4},{0,2,5} }};
+
+
+// Find the highest id on these side nodes of this element
+std::pair<unsigned int, unsigned int>
+split_diagonal(const Elem * elem,
+               const std::vector<unsigned int> & nodes_on_side)
+{
+  libmesh_assert_equal_to(elem->type(), HEX8);
+
+  unsigned int highest_n = nodes_on_side.front();
+  dof_id_type highest_n_id = elem->node_id(nodes_on_side.front());
+  for (auto n : nodes_on_side)
+    {
+      const dof_id_type n_id = elem->node_id(n);
+      if (n_id > highest_n_id)
+        {
+          highest_n = n;
+          highest_n_id = n_id;
+        }
+    }
+
+  for (auto n : nodes_on_side)
+    {
+      for (auto n2 : opposing_nodes[highest_n])
+        if (n2 == n)
+          return std::make_pair(highest_n, n2);
+    }
+
+  libmesh_error();
+
+  return std::make_pair(libMesh::invalid_uint, libMesh::invalid_uint);
+}
+
+
+// Reconstruct a C++20 feature in C++14
+template <typename T>
+struct reversion_wrapper { T& iterable; };
+
+template <typename T>
+auto begin (reversion_wrapper<T> w) {return std::rbegin(w.iterable);}
+
+template <typename T>
+auto end (reversion_wrapper<T> w) {return std::rend(w.iterable);}
+
+template <typename T>
+reversion_wrapper<T> reverse(T&& iterable) {return {iterable};}
+
+}
+
 
 namespace libMesh
 {
@@ -530,6 +603,183 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                   subelem[1]->set_node(4) = elem->node_ptr(6);
                   subelem[1]->set_node(5) = elem->node_ptr(8);
                 }
+
+              break;
+            }
+
+          case HEX8:
+            {
+              BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
+              // Hexes all split into six tetrahedra
+              subelem[0] = Elem::build(TET4);
+              subelem[1] = Elem::build(TET4);
+              subelem[2] = Elem::build(TET4);
+              subelem[3] = Elem::build(TET4);
+              subelem[4] = Elem::build(TET4);
+              subelem[5] = Elem::build(TET4);
+
+              // On faces, we choose the node with the highest
+              // global id, and we split on the diagonal which
+              // includes that node.  This ensures that (even in
+              // parallel, even on distributed meshes) the same
+              // diagonal split will be chosen for elements on either
+              // side of the same quad face.
+              const unsigned int highest_n = highest_vertex_on(elem);
+
+              // opposing_node[n] is the local node number of the node
+              // on the farthest corner of a hex8 from local node n
+              static const std::array<unsigned int, 8> opposing_node =
+                {6, 7, 4, 5, 2, 3, 0, 1};
+
+              static const std::vector<std::vector<unsigned int>> sides_opposing_highest =
+                {{2,3,5},{3,4,5},{1,4,5},{1,2,5},{0,2,3},{0,3,4},{0,1,4},{0,1,2}};
+              static const std::vector<std::vector<unsigned int>> nodes_neighboring_highest =
+                {{1,3,4},{0,2,5},{1,3,6},{0,2,7},{0,5,7},{1,4,6},{2,5,7},{3,4,6}};
+
+              // Start by looking in three directions away from the
+              // highest-id node.  In each direction there will be two
+              // different possibilities for the split depending on
+              // how the opposing face nodes are numbered.
+              //
+              // This is tricky enough that I'm not going to worry
+              // about manually keeping tets oriented; we'll just call
+              // orient() on each as we go.
+
+              unsigned int next_subelem = 0;
+              for (auto side : sides_opposing_highest[highest_n])
+                {
+                  const std::vector<unsigned int> nodes_on_side =
+                    elem->nodes_on_side(side);
+
+                  auto [dn, dn2] = split_diagonal(elem, nodes_on_side);
+
+                  unsigned int split_on_neighbor = false;
+                  for (auto n : nodes_neighboring_highest[highest_n])
+                    if (dn == n || dn2 == n)
+                      {
+                        split_on_neighbor = true;
+                        break;
+                      }
+
+                  // Add one or two elements for each opposing side,
+                  // depending on whether the diagonal split there
+                  // connects to the neighboring diagonal split or
+                  // not.
+                  if (split_on_neighbor)
+                    {
+                      subelem[next_subelem]->set_node(0) = elem->node_ptr(highest_n);
+                      subelem[next_subelem]->set_node(1) = elem->node_ptr(dn);
+                      subelem[next_subelem]->set_node(2) = elem->node_ptr(dn2);
+                      for (auto n : nodes_on_side)
+                        if (n != dn && n != dn2)
+                          {
+                            subelem[next_subelem]->set_node(3) = elem->node_ptr(n);
+                            break;
+                          }
+                      subelem[next_subelem]->orient(&boundary_info);
+                      ++next_subelem;
+
+                      subelem[next_subelem]->set_node(0) = elem->node_ptr(highest_n);
+                      subelem[next_subelem]->set_node(1) = elem->node_ptr(dn);
+                      subelem[next_subelem]->set_node(2) = elem->node_ptr(dn2);
+                      for (auto n : reverse(nodes_on_side))
+                        if (n != dn && n != dn2)
+                          {
+                            subelem[next_subelem]->set_node(3) = elem->node_ptr(n);
+                            break;
+                          }
+                      subelem[next_subelem]->orient(&boundary_info);
+                      ++next_subelem;
+                    }
+                  else
+                    {
+                      subelem[next_subelem]->set_node(0) = elem->node_ptr(highest_n);
+                      subelem[next_subelem]->set_node(1) = elem->node_ptr(dn);
+                      subelem[next_subelem]->set_node(2) = elem->node_ptr(dn2);
+                      for (auto n : nodes_on_side)
+                        for (auto n2 : nodes_neighboring_highest[highest_n])
+                          if (n == n2)
+                            {
+                              subelem[next_subelem]->set_node(3) = elem->node_ptr(n);
+                              goto break_both_loops;
+                            }
+
+                      break_both_loops:
+                      subelem[next_subelem]->orient(&boundary_info);
+                      ++next_subelem;
+                    }
+                }
+
+              // At this point we've created between 3 and 6 tets.
+              // What's left to do depends on how many.
+
+              // If we just chopped off three vertices into three
+              // tets, then the best way to split this hex would be
+              // the symmetric five-split.  Chop off the opposing
+              // vertex too, and then the remaining interior is our
+              // final tet.
+              if (next_subelem == 3)
+                {
+                  subelem[next_subelem]->set_node(0) = elem->node_ptr(opposing_nodes[highest_n][0]);
+                  subelem[next_subelem]->set_node(1) = elem->node_ptr(opposing_nodes[highest_n][1]);
+                  subelem[next_subelem]->set_node(2) = elem->node_ptr(opposing_nodes[highest_n][2]);
+                  subelem[next_subelem]->set_node(3) = elem->node_ptr(opposing_node[highest_n]);
+                  subelem[next_subelem]->orient(&boundary_info);
+                  ++next_subelem;
+
+                  subelem[next_subelem]->set_node(0) = elem->node_ptr(opposing_nodes[highest_n][0]);
+                  subelem[next_subelem]->set_node(1) = elem->node_ptr(opposing_nodes[highest_n][1]);
+                  subelem[next_subelem]->set_node(2) = elem->node_ptr(opposing_nodes[highest_n][2]);
+                  subelem[next_subelem]->set_node(3) = elem->node_ptr(highest_n);
+                  subelem[next_subelem]->orient(&boundary_info);
+                  ++next_subelem;
+
+                  // We don't need the 6th tet after all
+                  subelem[next_subelem].reset();
+                  ++next_subelem;
+                }
+
+              // If we just chopped off one (or two) vertices into
+              // tets, then the remaining gap is best (or only) filled
+              // by pairing another tet with each.
+              if (next_subelem == 4 ||
+                  next_subelem == 5)
+                {
+                  for (auto side : sides_opposing_highest[highest_n])
+                    {
+                      const std::vector<unsigned int> nodes_on_side =
+                        elem->nodes_on_side(side);
+
+                      auto [dn, dn2] = split_diagonal(elem, nodes_on_side);
+
+                      unsigned int split_on_neighbor = false;
+                      for (auto n : nodes_neighboring_highest[highest_n])
+                        if (dn == n || dn2 == n)
+                          {
+                            split_on_neighbor = true;
+                            break;
+                          }
+
+                      // The two !split_on_neighbor sides are where we
+                      // need the two remaining tets
+                      if (!split_on_neighbor)
+                        {
+                          subelem[next_subelem]->set_node(0) = elem->node_ptr(highest_n);
+                          subelem[next_subelem]->set_node(1) = elem->node_ptr(dn);
+                          subelem[next_subelem]->set_node(2) = elem->node_ptr(dn2);
+                          subelem[next_subelem]->set_node(3) = elem->node_ptr(opposing_node[highest_n]);
+                          subelem[next_subelem]->orient(&boundary_info);
+                          ++next_subelem;
+                        }
+                    }
+                }
+
+              // Whether we got there by creating six tets from the
+              // first for loop or by patching up the split afterward,
+              // we should have considered six tets (possibly
+              // including one deleted one...) at this point.
+              libmesh_assert(next_subelem == 6);
 
               break;
             }

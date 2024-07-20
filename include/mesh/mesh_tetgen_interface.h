@@ -25,6 +25,7 @@
 
 // Local includes
 #include "libmesh/mesh_serializer.h"
+#include "libmesh/mesh_tet_interface.h"
 #include "libmesh/point.h" // used for specifying holes
 
 // C++ includes
@@ -51,7 +52,7 @@ class Elem;
  * \author John W. Peterson
  * \date 2011
  */
-class TetGenMeshInterface
+class TetGenMeshInterface : public MeshTetInterface
 {
 public:
 
@@ -64,12 +65,17 @@ public:
   /**
    * Empty destructor.
    */
-  ~TetGenMeshInterface() = default;
+  virtual ~TetGenMeshInterface() override = default;
 
   /**
    * Method to set switches to tetgen, allowing for different behaviours
    */
   void set_switches(std::string new_switches);
+
+  /**
+   * Method invokes TetGen library to compute a Delaunay tetrahedralization
+   */
+  virtual void triangulate () override;
 
   /**
    * Method invokes TetGen library to compute a Delaunay tetrahedralization
@@ -116,39 +122,6 @@ protected:
    * array to 'elem'.
    */
   void assign_nodes_to_elem(unsigned * node_labels, Elem * elem);
-
-  /**
-   * This function checks the integrity of the current set of
-   * elements in the Mesh to see if they comprise a convex hull,
-   * that is:
-   * - If they are all TRI3 elements
-   * - They all have non-nullptr neighbors
-   *
-   * \returns
-   * - 0 if the mesh forms a valid convex hull
-   * - 1 if a non-TRI3 element is found
-   * - 2 if an element with a nullptr-neighbor is found
-   */
-  unsigned check_hull_integrity();
-
-  /**
-   * This function prints an informative message and
-   * crashes based on the output of the check_hull_integrity()
-   * function.  It is a separate function so that you
-   * can check hull integrity without crashing if you desire.
-   */
-  void process_hull_integrity_result(unsigned result);
-
-  /**
-   * Delete original convex hull elements from the Mesh
-   * after performing a Delaunay tetrahedralization.
-   */
-  void delete_2D_hull_elements();
-
-  /**
-   * Local reference to the mesh we are working with.
-   */
-  UnstructuredMesh & _mesh;
 
   /**
    * We should not assume libmesh nodes are numbered sequentially...
