@@ -62,6 +62,64 @@ bool BoundingBox::contains_point (const Point & p) const
 }
 
 
+
+Real BoundingBox::max_size() const
+{
+  Real size = 0;
+  for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+    {
+      Real sized = this->second(d) - this->first(d);
+      if (!libmesh_isinf(sized) &&
+          this->second(d) != std::numeric_limits<Real>::max() &&
+          this->first(d) != -std::numeric_limits<Real>::max())
+        size = std::max(size, sized);
+    }
+  return size;
+}
+
+
+
+bool BoundingBox::contains_point
+  (const Point & p, Real abs_tol, Real rel_tol) const
+{
+  libmesh_assert_greater_equal(abs_tol, Real(0));
+  libmesh_assert_greater_equal(rel_tol, Real(0));
+
+  // Just use the other contains_point overload
+  libmesh_assert_greater(rel_tol+abs_tol, Real(0));
+
+  // Find absolute tolerance from relative tolerance
+  const Real tol = std::max(abs_tol, this->max_size()*rel_tol);
+
+  // Make local variables first to make things more clear in a moment
+  const Real my_min_x = this->first(0) - tol;
+  const Real my_max_x = this->second(0) + tol;
+  const bool x_int = is_between(my_min_x, p(0), my_max_x);
+
+  bool intersection_true = x_int;
+
+#if LIBMESH_DIM > 1
+  const Real my_min_y = this->first(1) - tol;
+  const Real my_max_y = this->second(1) + tol;
+  const bool y_int = is_between(my_min_y, p(1), my_max_y);
+
+  intersection_true = intersection_true && y_int;
+#endif
+
+
+#if LIBMESH_DIM > 2
+  const Real my_min_z = this->first(2) - tol;
+  const Real my_max_z = this->second(2) + tol;
+  const bool z_int = is_between(my_min_z, p(2), my_max_z);
+
+  intersection_true = intersection_true && z_int;
+#endif
+
+  return intersection_true;
+}
+
+
+
 void BoundingBox::intersect_with (const BoundingBox & other_box)
 {
   this->first(0)  = std::max(this->first(0),  other_box.first(0));
@@ -148,6 +206,12 @@ void BoundingBox::scale(const Real factor)
       this->second(dim) += append;
     }
   }
+}
+
+
+void BoundingBox::print(std::ostream & os) const
+{
+  os << "(min=" << this->min() << ", max=" << this->max() << ")";
 }
 
 } // namespace libMesh

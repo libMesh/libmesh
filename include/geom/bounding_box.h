@@ -117,6 +117,17 @@ public:
   bool contains_point (const Point &) const;
 
   /**
+   * \returns \p true if the bounding box contains the given point,
+   * to within at least one of the given tolerance(s).  At least one
+   * tolerance should be set to greater than zero; otherwise use the
+   * other \p contains_point overload for efficiency.
+   *
+   * Relative tolerances are computed relative to the maximum finite
+   * extent of the bounding box, \p max_size()
+   */
+  bool contains_point (const Point & p, Real abs_tol, Real rel_tol) const;
+
+  /**
    * Sets this bounding box to be the intersection with the other
    * bounding box.
    */
@@ -151,6 +162,34 @@ public:
    * constructor and by invalidate().
    */
   void scale(const Real factor);
+
+  /**
+   * Returns the maximum size of a finite box extent.
+   *
+   * If the bounding box is infinite (or effectively so, e.g. using
+   * numeric_limits<Real>::max()) in some dimension, then that
+   * dimension is ignored.
+   */
+  Real max_size() const;
+
+  /**
+   * Formatted print, by default to \p libMesh::out.
+   */
+  void print(std::ostream & os = libMesh::out) const;
+
+  /**
+   * Formatted print as above but supports the syntax:
+   *
+   * \code
+   * BoundingBox b;
+   * std::cout << b << std::endl;
+   * \endcode
+   */
+  friend std::ostream & operator << (std::ostream & os, const BoundingBox & b)
+  {
+    b.print(os);
+    return os;
+  }
 };
 
 

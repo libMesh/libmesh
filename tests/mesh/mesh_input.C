@@ -13,6 +13,7 @@
 #include <libmesh/abaqus_io.h>
 #include <libmesh/dyna_io.h>
 #include <libmesh/exodusII_io.h>
+#include <libmesh/gmsh_io.h>
 #include <libmesh/nemesis_io.h>
 #include <libmesh/vtk_io.h>
 #include <libmesh/tetgen_io.h>
@@ -20,6 +21,7 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <regex>
 
 using namespace libMesh;
 
@@ -190,6 +192,11 @@ public:
   CPPUNIT_TEST( testDynaFileMappingsCyl3d);
 #endif // LIBMESH_HAVE_GZSTREAM
 #endif // LIBMESH_DIM > 1
+       //
+#if LIBMESH_DIM > 1
+  CPPUNIT_TEST( testBadGmsh );
+  CPPUNIT_TEST( testGoodGmsh );
+#endif
 
 #ifdef LIBMESH_HAVE_TETGEN
   CPPUNIT_TEST( testTetgenIO );
@@ -1506,6 +1513,47 @@ public:
     CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), static_cast<dof_id_type>(18));
 
     helperTestingDynaQuad(mesh);
+  }
+
+  void testBadGmsh ()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    GmshIO gmsh_io(mesh);
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    std::string what = "";
+    try
+    {
+      if (mesh.processor_id() == 0)
+        gmsh_io.read("meshes/block.msh");
+    }
+    catch (libMesh::LogicError & e)
+    {
+      what = e.what();
+    }
+
+    TestCommWorld->broadcast(what);
+    std::regex msg_regex("outside entity physical bounding box");
+    CPPUNIT_ASSERT(std::regex_search(what, msg_regex));
+#endif
+  }
+
+  void testGoodGmsh ()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    GmshIO gmsh_io(mesh);
+
+    if (mesh.processor_id() == 0)
+      gmsh_io.read("meshes/circle.msh");
+    MeshCommunication().broadcast(mesh);
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(14));
   }
 
   void testTetgenIO ()
