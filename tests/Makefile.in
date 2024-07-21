@@ -2267,6 +2267,7 @@ data = matrices/geom_1_extraction_op.m \
        meshes/bad_64bit_elem_integers.e \
        meshes/block.msh \
        meshes/BlockWithHole_Patch9.bxt.gz \
+       meshes/circle.msh \
        meshes/constrain10to4.m \
        meshes/Cube_With_Sidesets.e \
        meshes/exodus_elements/read_exodus_EDGE2.e \
@@ -2365,8 +2366,26 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	dist.nem.1.0 repl_with_elem_soln.e test_nemesis_read.nem.1.0 \
 	rep.e repl_with_nodal_soln.e repl_with_elem_vec.e \
 	extra_integers.xda extra_integers.xdr write_elemset_data.xda \
-	write_elemset_data.xdr test_helper.xdr $(am__append_12) \
-	$(am__append_13)
+	write_elemset_data.xdr test_helper.xdr \
+	SparseMatrixTest_matrix.m geom_1_extraction_op.petsc \
+	geom_1_extraction_op.petsc.info side_discontinuous_EDGE3.e \
+	side_discontinuous_EDGE3_disc.e side_discontinuous_HEX27.e \
+	side_discontinuous_HEX27_disc.e side_discontinuous_QUAD9.e \
+	side_discontinuous_QUAD9_disc.e side_discontinuous_TRI6.e \
+	side_discontinuous_TRI6_disc.e write_exodus_EDGE2.e \
+	write_exodus_EDGE3.e write_exodus_EDGE4.e write_exodus_HEX20.e \
+	write_exodus_HEX27.e write_exodus_HEX8.e \
+	write_exodus_PRISM15.e write_exodus_PRISM18.e \
+	write_exodus_PRISM20.e write_exodus_PRISM21.e \
+	write_exodus_PRISM6.e write_exodus_PYRAMID13.e \
+	write_exodus_PYRAMID14.e write_exodus_PYRAMID18.e \
+	write_exodus_PYRAMID5.e write_exodus_QUAD4.e \
+	write_exodus_QUAD8.e write_exodus_QUAD9.e \
+	write_exodus_QUADSHELL4.e write_exodus_QUADSHELL8.e \
+	write_exodus_QUADSHELL9.e write_exodus_TET10.e \
+	write_exodus_TET14.e write_exodus_TET4.e write_exodus_TRI3.e \
+	write_exodus_TRI6.e write_exodus_TRI7.e \
+	write_exodus_TRISHELL3.e $(am__append_12) $(am__append_13)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
