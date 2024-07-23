@@ -17,9 +17,9 @@ AC_REQUIRE([LIBMESH_SET_COMPILERS])
 # outside the libMesh source and installation tree, and will
 # be exported to the installation environment.
 #
-# By contrast, libmesh_contrib_INCLUDES point inside the
-# source tree for building contributed packages that do not
-# need to be exported as part of the installation environment.
+# By contrast, libmesh_contrib_INCLUDES and libmesh_contrib_LDFLAGS
+# point inside the source tree for building contributed packages that
+# do not need to be exported as part of the installation environment.
 #
 # libmesh_pkgconfig_requires is a list of pkgconfig requirements
 # we will add
@@ -30,6 +30,7 @@ AC_REQUIRE([LIBMESH_SET_COMPILERS])
 libmesh_optional_INCLUDES=""
 libmesh_optional_LIBS=""
 libmesh_contrib_INCLUDES=""
+libmesh_contrib_LDFLAGS=""
 libmesh_pkgconfig_requires=""
 libmesh_installed_LIBS=""
 
@@ -589,8 +590,8 @@ AC_CONFIG_FILES([contrib/poly2tri/modified/Makefile])
 CONFIGURE_NETGEN
 AS_IF([test $enablenetgen = yes],
       [libmesh_contrib_INCLUDES="$NETGEN_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_contrib_LDFLAGS="$NETGEN_BUILD_LDFLAGS $libmesh_contrib_LDFLAGS"
        libmesh_optional_LIBS="$NETGEN_LIBS $libmesh_optional_LIBS"
-       libmesh_LDFLAGS="$NETGEN_BUILD_LDFLAGS $libmesh_LDFLAGS"
       ])
 
 AM_CONDITIONAL(LIBMESH_ENABLE_NETGEN, test x$enablenetgen = xyes)
@@ -951,6 +952,7 @@ AS_IF([test -x $PERL],
 AC_SUBST(libmesh_optional_INCLUDES)
 AC_SUBST(libmesh_optional_LIBS)
 AC_SUBST(libmesh_contrib_INCLUDES)
+AC_SUBST(libmesh_contrib_LDFLAGS)
 AC_SUBST(libmesh_pkgconfig_requires)
 AC_SUBST(libmesh_installed_LIBS)
 ])
