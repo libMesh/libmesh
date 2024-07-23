@@ -339,10 +339,11 @@ TESTS = run_unit_tests.sh
 endif
 
 CLEANFILES = cube_mesh.xda \
-             slit_mesh.xda slit_solution.xda \
-	     out.e \
-	     mesh_with_soln.e \
-	     elemental_from_nodal.e \
+             slit_mesh.xda \
+             slit_solution.xda \
+             out.e \
+             mesh_with_soln.e \
+             elemental_from_nodal.e \
              write_elemset_data.e \
              write_sideset_data.e \
              write_nodeset_data.e \
@@ -375,7 +376,46 @@ CLEANFILES = cube_mesh.xda \
              extra_integers.xdr \
              write_elemset_data.xda \
              write_elemset_data.xdr \
-             test_helper.xdr
+             test_helper.xdr \
+             SparseMatrixTest_matrix.m \
+             geom_1_extraction_op.petsc \
+             geom_1_extraction_op.petsc.info \
+             side_discontinuous_EDGE3.e \
+             side_discontinuous_EDGE3_disc.e \
+             side_discontinuous_HEX27.e \
+             side_discontinuous_HEX27_disc.e \
+             side_discontinuous_QUAD9.e \
+             side_discontinuous_QUAD9_disc.e \
+             side_discontinuous_TRI6.e \
+             side_discontinuous_TRI6_disc.e \
+             write_exodus_EDGE2.e \
+             write_exodus_EDGE3.e \
+             write_exodus_EDGE4.e \
+             write_exodus_HEX20.e \
+             write_exodus_HEX27.e \
+             write_exodus_HEX8.e \
+             write_exodus_PRISM15.e \
+             write_exodus_PRISM18.e \
+             write_exodus_PRISM20.e \
+             write_exodus_PRISM21.e \
+             write_exodus_PRISM6.e \
+             write_exodus_PYRAMID13.e \
+             write_exodus_PYRAMID14.e \
+             write_exodus_PYRAMID18.e \
+             write_exodus_PYRAMID5.e \
+             write_exodus_QUAD4.e \
+             write_exodus_QUAD8.e \
+             write_exodus_QUAD9.e \
+             write_exodus_QUADSHELL4.e \
+             write_exodus_QUADSHELL8.e \
+             write_exodus_QUADSHELL9.e \
+             write_exodus_TET10.e \
+             write_exodus_TET14.e \
+             write_exodus_TET4.e \
+             write_exodus_TRI3.e \
+             write_exodus_TRI6.e \
+             write_exodus_TRI7.e \
+             write_exodus_TRISHELL3.e
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD

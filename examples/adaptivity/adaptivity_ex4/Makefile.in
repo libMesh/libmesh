@@ -687,10 +687,10 @@ sources = $(data) run.sh
 #
 # how to make documentation
 #
-CLEANFILES = 1D_hermite_adaptive.m 1D_hermite_adaptive.e \
-	2D_hermite_adaptive.m 2D_hermite_adaptive.e \
-	2D_clough_adaptive.m 2D_clough_adaptive.e $(am__append_1) \
-	$(example_name).html stdout.log
+CLEANFILES = 2D_clough_THIRD_adaptive.m 2D_clough_THIRD_adaptive.e \
+	2D_hermite_THIRD_adaptive.m 1D_hermite_FOURTH_adaptive.e \
+	2D_hermite_THIRD_adaptive.e 1D_hermite_FOURTH_adaptive.m \
+	$(am__append_1) $(example_name).html stdout.log
 
 # need to link files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
