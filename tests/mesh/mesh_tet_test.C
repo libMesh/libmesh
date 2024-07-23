@@ -78,7 +78,10 @@ public:
   CPPUNIT_TEST( testNetGenTets );
   CPPUNIT_TEST( testNetGenFlippedTris );
   CPPUNIT_TEST( testNetGenHole );
+
+#ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( testNetGenSphereShell );
+#endif
 
   // We'll get to more advanced features later
   /*
@@ -190,6 +193,7 @@ public:
   }
 
 
+#ifdef LIBMESH_ENABLE_AMR
   void testSphereShell(UnstructuredMesh & mesh,
                        MeshTetInterface & triangulator)
   {
@@ -214,6 +218,7 @@ public:
 
     this->testTetInterfaceBase(mesh, triangulator);
   }
+#endif
 
 
   void testTrisToTets(MeshBase & mesh,
@@ -342,6 +347,7 @@ public:
   }
 
 
+#ifdef LIBMESH_ENABLE_AMR
   void testNetGenSphereShell()
   {
     LOG_UNIT_TEST;
@@ -350,6 +356,7 @@ public:
     NetGenMeshInterface net_tet(mesh);
     testSphereShell(mesh, net_tet);
   }
+#endif
 
 
   /*
