@@ -649,6 +649,7 @@ libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
 libmesh_CXXFLAGS = @libmesh_CXXFLAGS@
 libmesh_LDFLAGS = @libmesh_LDFLAGS@
 libmesh_contrib_INCLUDES = @libmesh_contrib_INCLUDES@
+libmesh_contrib_LDFLAGS = @libmesh_contrib_LDFLAGS@
 libmesh_installed_LIBS = @libmesh_installed_LIBS@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
 libmesh_optional_LIBS = @libmesh_optional_LIBS@
