@@ -82,12 +82,10 @@ public:
                         NonlinearImplicitSystem & S) override;
 
 private:
-  void add_matrix(const Elem & elem,
+  void add_matrix(NonlinearImplicitSystem & sys,
                   const unsigned int ivar_num,
                   const unsigned int jvar_num,
                   const DenseMatrix<Number> & elem_mat);
-
-  void close();
 
   void create_identity_residual(const QBase & quadrature,
                                 const std::vector<Real> & JxW_local,
@@ -255,9 +253,6 @@ private:
 
   // Computed via the formula: \bar{q} = \frac{1}{|\partial K|} \int_{\partial K} q
   std::vector<Number> qbar;
-
-  // Global Jacobian
-  SparseMatrix<Number> * J;
 };
 
 } // namespace libMesh

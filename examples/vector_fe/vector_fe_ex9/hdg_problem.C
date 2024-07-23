@@ -882,31 +882,26 @@ HDGProblem::residual(const NumericVector<Number> & X,
 }
 
 void
-HDGProblem::add_matrix(const Elem & elem,
+HDGProblem::add_matrix(NonlinearImplicitSystem & sys,
                        const unsigned int ivar_num,
                        const unsigned int jvar_num,
                        const DenseMatrix<Number> & elem_mat)
 {
-  if (sc)
-    sc->add_matrix(elem, ivar_num, jvar_num, elem_mat);
-  else
-    J->add_matrix(
-        elem_mat, libmesh_map_find(dof_indices, ivar_num), libmesh_map_find(dof_indices, jvar_num));
+  sys.get_system_matrix().add_matrix(
+      elem_mat, libmesh_map_find(dof_indices, ivar_num), libmesh_map_find(dof_indices, jvar_num));
 }
 
 void
 HDGProblem::jacobian(const NumericVector<Number> & X,
-                     SparseMatrix<Number> & J_in,
+                     SparseMatrix<Number> &,
                      NonlinearImplicitSystem & S)
 {
-  J = &J_in;
+  auto * J = &S.get_system_matrix();
 
   if (!sc)
-  {
     // PETSc requires that the Jacobian matrix have a diagonal for some types of preconditioners
     for (const auto i : make_range(J->row_start(), J->row_stop()))
       J->add(i, i, 0);
-  }
 
   const auto u_num = S.variable_number("vel_x");
   const auto v_num = S.variable_number("vel_y");
@@ -937,6 +932,9 @@ HDGProblem::jacobian(const NumericVector<Number> & X,
 
   for (const auto & elem : mesh->active_local_element_ptr_range())
   {
+    if (sc)
+      sc->set_current_elem(*elem);
+
     // Retrive our dof indices for all fields
     dof_map->dof_indices(elem, qu_dof_indices, qu_num);
     dof_map->dof_indices(elem, u_dof_indices, u_num);
@@ -1089,53 +1087,46 @@ HDGProblem::jacobian(const NumericVector<Number> & X,
       pressure_face_jacobian(Jp_lmu, Jp_lmv);
     }
 
-    add_matrix(*elem, qu_num, qu_num, Jqu_qu);
-    add_matrix(*elem, qv_num, qv_num, Jqv_qv);
-    add_matrix(*elem, qu_num, u_num, Jqu_u);
-    add_matrix(*elem, qv_num, v_num, Jqv_v);
-    add_matrix(*elem, u_num, qu_num, Ju_qu);
-    add_matrix(*elem, v_num, qv_num, Jv_qv);
-    add_matrix(*elem, u_num, p_num, Ju_p);
-    add_matrix(*elem, v_num, p_num, Jv_p);
-    add_matrix(*elem, u_num, u_num, Ju_u);
-    add_matrix(*elem, v_num, u_num, Jv_u);
-    add_matrix(*elem, u_num, v_num, Ju_v);
-    add_matrix(*elem, v_num, v_num, Jv_v);
-    add_matrix(*elem, p_num, u_num, Jp_u);
-    add_matrix(*elem, p_num, v_num, Jp_v);
+    add_matrix(S, qu_num, qu_num, Jqu_qu);
+    add_matrix(S, qv_num, qv_num, Jqv_qv);
+    add_matrix(S, qu_num, u_num, Jqu_u);
+    add_matrix(S, qv_num, v_num, Jqv_v);
+    add_matrix(S, u_num, qu_num, Ju_qu);
+    add_matrix(S, v_num, qv_num, Jv_qv);
+    add_matrix(S, u_num, p_num, Ju_p);
+    add_matrix(S, v_num, p_num, Jv_p);
+    add_matrix(S, u_num, u_num, Ju_u);
+    add_matrix(S, v_num, u_num, Jv_u);
+    add_matrix(S, u_num, v_num, Ju_v);
+    add_matrix(S, v_num, v_num, Jv_v);
+    add_matrix(S, p_num, u_num, Jp_u);
+    add_matrix(S, p_num, v_num, Jp_v);
     if (global_lm_num != invalid_uint)
     {
-      add_matrix(*elem, p_num, global_lm_num, Jp_glm);
-      add_matrix(*elem, global_lm_num, p_num, Jglm_p);
+      add_matrix(S, p_num, global_lm_num, Jp_glm);
+      add_matrix(S, global_lm_num, p_num, Jglm_p);
     }
-    add_matrix(*elem, p_num, lm_u_num, Jp_lmu);
-    add_matrix(*elem, p_num, lm_v_num, Jp_lmv);
-    add_matrix(*elem, qu_num, lm_u_num, Jqu_lmu);
-    add_matrix(*elem, qv_num, lm_v_num, Jqv_lmv);
-    add_matrix(*elem, u_num, lm_u_num, Ju_lmu);
-    add_matrix(*elem, v_num, lm_v_num, Jv_lmv);
-    add_matrix(*elem, v_num, lm_u_num, Jv_lmu);
-    add_matrix(*elem, u_num, lm_v_num, Ju_lmv);
-    add_matrix(*elem, lm_u_num, qu_num, Jlmu_qu);
-    add_matrix(*elem, lm_v_num, qv_num, Jlmv_qv);
-    add_matrix(*elem, lm_u_num, p_num, Jlmu_p);
-    add_matrix(*elem, lm_v_num, p_num, Jlmv_p);
-    add_matrix(*elem, lm_u_num, u_num, Jlmu_u);
-    add_matrix(*elem, lm_v_num, v_num, Jlmv_v);
-    add_matrix(*elem, lm_u_num, lm_u_num, Jlmu_lmu);
-    add_matrix(*elem, lm_v_num, lm_u_num, Jlmv_lmu);
-    add_matrix(*elem, lm_u_num, lm_v_num, Jlmu_lmv);
-    add_matrix(*elem, lm_v_num, lm_v_num, Jlmv_lmv);
+    add_matrix(S, p_num, lm_u_num, Jp_lmu);
+    add_matrix(S, p_num, lm_v_num, Jp_lmv);
+    add_matrix(S, qu_num, lm_u_num, Jqu_lmu);
+    add_matrix(S, qv_num, lm_v_num, Jqv_lmv);
+    add_matrix(S, u_num, lm_u_num, Ju_lmu);
+    add_matrix(S, v_num, lm_v_num, Jv_lmv);
+    add_matrix(S, v_num, lm_u_num, Jv_lmu);
+    add_matrix(S, u_num, lm_v_num, Ju_lmv);
+    add_matrix(S, lm_u_num, qu_num, Jlmu_qu);
+    add_matrix(S, lm_v_num, qv_num, Jlmv_qv);
+    add_matrix(S, lm_u_num, p_num, Jlmu_p);
+    add_matrix(S, lm_v_num, p_num, Jlmv_p);
+    add_matrix(S, lm_u_num, u_num, Jlmu_u);
+    add_matrix(S, lm_v_num, v_num, Jlmv_v);
+    add_matrix(S, lm_u_num, lm_u_num, Jlmu_lmu);
+    add_matrix(S, lm_v_num, lm_u_num, Jlmv_lmu);
+    add_matrix(S, lm_u_num, lm_v_num, Jlmu_lmv);
+    add_matrix(S, lm_v_num, lm_v_num, Jlmv_lmv);
   }
 
-  close();
-}
-
-void
-HDGProblem::close()
-{
-  if (!sc)
-    J->close();
+  J->close();
 }
 
 } // namespace libMesh

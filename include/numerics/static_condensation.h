@@ -26,7 +26,8 @@
 
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/preconditioner.h"
+#include "libmesh/sparse_matrix.h"
+#include "libmesh/dense_matrix.h"
 
 #include <unordered_map>
 #include <memory>
@@ -41,13 +42,12 @@ class System;
 class DofMap;
 class Elem;
 template <typename>
-class DenseMatrix;
-template <typename>
 class LinearSolver;
 template <typename>
-class SparseMatrix;
-template <typename>
 class NumericVector;
+template <typename>
+class Preconditioner;
+class StaticCondensationPreconditioner;
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 typedef Eigen::MatrixXcd EigenMatrix;
@@ -57,28 +57,105 @@ typedef Eigen::MatrixXd EigenMatrix;
 typedef Eigen::VectorXd EigenVector;
 #endif
 
-class StaticCondensation : public Preconditioner<Number>
+class StaticCondensation : public SparseMatrix<Number>
 {
 public:
   StaticCondensation(const MeshBase & mesh, const System & system, const DofMap & dof_map);
   virtual ~StaticCondensation();
 
-  /**
-   * Build the element global to local index maps and size the element matrices
-   */
-  virtual void init() override;
+  //
+  // SparseMatrix overrides
+  //
 
-  virtual void setup() override;
+  virtual SparseMatrix<Number> & operator=(const SparseMatrix<Number> &) override;
 
-  virtual void apply(const NumericVector<Number> & full_rhs,
-                     NumericVector<Number> & full_sol) override;
+  virtual SolverPackage solver_package() override;
+
+  virtual void init(const numeric_index_type,
+                    const numeric_index_type,
+                    const numeric_index_type,
+                    const numeric_index_type,
+                    const numeric_index_type = 30,
+                    const numeric_index_type = 10,
+                    const numeric_index_type = 1) override;
+
+  virtual void init(ParallelType) override { this->init(); }
 
   virtual void clear() override;
 
-  void add_matrix(const Elem & elem,
-                  const unsigned int i_var,
-                  const unsigned int j_var,
-                  const DenseMatrix<Number> & k);
+  virtual void zero() override;
+
+  virtual std::unique_ptr<SparseMatrix<Number>> zero_clone() const override;
+
+  virtual std::unique_ptr<SparseMatrix<Number>> clone() const override;
+
+  virtual void close() override;
+
+  virtual numeric_index_type m() const override;
+
+  virtual numeric_index_type n() const override { return this->m(); }
+
+  virtual numeric_index_type row_start() const override;
+
+  virtual numeric_index_type row_stop() const override;
+
+  virtual numeric_index_type col_start() const override { return this->row_start(); }
+
+  virtual numeric_index_type col_stop() const override { return this->row_stop(); }
+
+  virtual void
+  set(const numeric_index_type i, const numeric_index_type j, const Number value) override;
+
+  virtual void
+  add(const numeric_index_type i, const numeric_index_type j, const Number value) override;
+
+  virtual void add_matrix(const DenseMatrix<Number> & dm,
+                          const std::vector<numeric_index_type> & rows,
+                          const std::vector<numeric_index_type> & cols) override;
+
+  virtual void add_matrix(const DenseMatrix<Number> & dm,
+                          const std::vector<numeric_index_type> & dof_indices) override;
+
+  virtual void add(const Number a, const SparseMatrix<Number> & X) override;
+
+  virtual Number operator()(const numeric_index_type i, const numeric_index_type j) const override;
+
+  virtual Real l1_norm() const override;
+
+  virtual Real linfty_norm() const override;
+
+  virtual bool closed() const override;
+
+  virtual void print_personal(std::ostream & os = libMesh::out) const override;
+
+  virtual void get_diagonal(NumericVector<Number> & dest) const override;
+
+  virtual void get_transpose(SparseMatrix<Number> & dest) const override;
+
+  virtual void get_row(numeric_index_type i,
+                       std::vector<numeric_index_type> & indices,
+                       std::vector<Number> & values) const override;
+
+  //
+  // Unique methods
+  //
+
+  /**
+   * Build the element global to local index maps and size the element matrices
+   */
+  void init();
+
+  /**
+   * A no-op to be consistent with shimming from the \p StaticCondenstionPreconditioner. "setup"
+   * should take place at the end of matrix assembly, e.g. during a call to \p close()
+   */
+  void setup();
+
+  /**
+   * Perform our three stages, \p forward_elimination(), a \p solve() on the condensed system, and
+   * finally a \p backwards_substitution()
+   */
+  void apply(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol);
 
   const SparseMatrix<Number> & get_condensed_mat() const;
 
@@ -93,6 +170,16 @@ public:
    * @returns our list of variables for whom we do not condense out any dofs
    */
   const std::unordered_set<unsigned int> & uncondensed_vars() const { return _uncondensed_vars; }
+
+  /**
+   * Set the current element. This enables fast lookups of local indices from global indices
+   */
+  void set_current_elem(const Elem & elem);
+
+  /**
+   * Get the preconditioning wrapper
+   */
+  StaticCondensationPreconditioner & get_preconditioner() { return *_scp; }
 
 private:
   static void set_local_vectors(const NumericVector<Number> & global_vector,
@@ -145,20 +232,13 @@ private:
     // Acc LU decompositions
     typename std::remove_const<decltype(Acc.partialPivLu())>::type AccFactor;
 
-    struct VarData
-    {
-      unsigned int uncondensed_dofs_offset;
-      unsigned int condensed_dofs_offset;
-      unsigned int num_uncondensed_dofs;
-      unsigned int num_condensed_dofs;
-    };
-
     /// The uncondensed degrees of freedom with global numbering corresponding to the the \emph reduced
     /// system. Note that initially this will actually hold the indices corresponding to the fully
     /// sized problem, but we will swap it out by the time we are done initializing
     std::vector<dof_id_type> reduced_space_indices;
 
-    std::unordered_map<unsigned int, VarData> var_to_data;
+    std::unordered_map<dof_id_type, dof_id_type> uncondensed_global_to_local_map;
+    std::unordered_map<dof_id_type, dof_id_type> condensed_global_to_local_map;
   };
 
   std::unordered_map<dof_id_type, LocalData> _elem_to_local_data;
@@ -175,6 +255,16 @@ private:
 
   /// Variables for which we will keep all dofs
   std::unordered_set<unsigned int> _uncondensed_vars;
+
+  /// The current element ID. This is one half of a key, along with the global index, that maps to a
+  /// local index
+  dof_id_type _current_elem_id;
+
+  /// Helper data member for adding individual matrix elements
+  DenseMatrix<Number> _size_one_mat;
+
+  /// Preconditioner object which will call back to us for the preconditioning action
+  std::unique_ptr<StaticCondensationPreconditioner> _scp;
 };
 
 inline const SparseMatrix<Number> &

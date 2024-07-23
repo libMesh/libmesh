@@ -490,10 +490,11 @@ assemble_poisson(EquationSystems & es, const std::string & libmesh_dbg_var(syste
     // and  NumericVector::add_vector() members do this for us.
     matrix.add_matrix(Ke, dof_indices);
     system.rhs->add_vector(Fe, dof_indices);
-    sc.add_matrix(*elem, 0, 0, Ke);
+    sc.set_current_elem(*elem);
+    sc.add_matrix(Ke, dof_indices);
   }
 
-  // All done!
+  sc.close();
 }
 
 #else

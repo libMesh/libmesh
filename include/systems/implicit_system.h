@@ -346,7 +346,7 @@ public:
   /**
    * @returns Whether this system will be statically condensed
    */
-  bool has_static_condensation() const { return _sc.get(); }
+  bool has_static_condensation() const { return _sc; }
 
 protected:
   /**
@@ -355,7 +355,7 @@ protected:
   virtual void add_matrices() override;
 
   /// Static condensation class
-  std::unique_ptr<StaticCondensation> _sc;
+  StaticCondensation * _sc;
 };
 
 inline

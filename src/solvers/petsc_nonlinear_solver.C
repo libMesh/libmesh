@@ -515,7 +515,7 @@ extern "C"
     if (solver->_exact_constraint_enforcement)
       sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
-    if (solver->_zero_out_jacobian && (pisshell != PETSC_TRUE))
+    if (solver->_zero_out_jacobian)
       PC.zero();
 
 
@@ -722,6 +722,18 @@ extern "C"
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
+
+PetscErrorCode libmesh_preconditioner_zero_entries(Mat mat)
+{
+  Preconditioner<Number> * pre;
+
+  PetscFunctionBegin;
+  auto ierr = MatShellGetContext(mat, &pre);
+  CHKERRQ(ierr);
+  pre->zero();
+  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
+}
+
 } // end extern "C"
 
 
@@ -1181,10 +1193,11 @@ PetscNonlinearSolver<T>::solve (NumericVector<T> & x_in,    // Solution vector
   PetscShellMatrix<T> shell(this->comm());
   shell.attach_dof_map(this->system().get_dof_map());
   shell.init();
+  LibmeshPetscCall(MatShellSetContext(shell.mat(), (void *)(this->_preconditioner)));
+  LibmeshPetscCall(MatShellSetOperation(
+      shell.mat(), MATOP_ZERO_ENTRIES, (void (*)(void))libmesh_preconditioner_zero_entries));
   return this->solve_general(shell.mat(), x_in, r_in, tol, max_its);
 }
-
-
 
 template <typename T>
 void PetscNonlinearSolver<T>::print_converged_reason()

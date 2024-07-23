@@ -25,6 +25,7 @@
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/static_condensation.h"
+#include "libmesh/static_condensation_preconditioner.h"
 
 namespace libMesh
 {
@@ -58,7 +59,7 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems & es,
   es.parameters.set<unsigned int>("reuse preconditioner maximum linear iterations") = 1;
 
   if (_sc)
-    nonlinear_solver->attach_preconditioner(_sc.get());
+    nonlinear_solver->attach_preconditioner(&_sc->get_preconditioner());
 }
 
 
