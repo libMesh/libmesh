@@ -199,6 +199,7 @@ int main (int argc, char ** argv)
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
+#ifdef LIBMESH_ENABLE_AMR
   // Do uniform refinement if requested
   const unsigned int nr = input("nr", 0);
   if (nr)
@@ -208,6 +209,7 @@ int main (int argc, char ** argv)
       equation_systems.reinit();
       equation_systems.print_info();
     }
+#endif
 
   // Print and solve the refined sysem
   equation_systems.get_system("Wave").solve();
