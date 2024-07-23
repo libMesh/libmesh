@@ -18,12 +18,6 @@
 #ifndef LIBMESH_STATIC_CONDENSATION_PRECONDITIONER_H
 #define LIBMESH_STATIC_CONDENSATION_PRECONDITIONER_H
 
-#include "libmesh/libmesh_config.h"
-
-// subvectors currently only work with petsc
-
-#ifdef LIBMESH_HAVE_PETSC
-
 #include "libmesh/preconditioner.h"
 #include "libmesh/static_condensation.h"
 
@@ -65,5 +59,4 @@ StaticCondensationPreconditioner::apply(const NumericVector<Number> & full_rhs,
 
 } // namespace libMesh
 
-#endif // LIBMESH_HAVE_PETSC
 #endif // LIBMESH_STATIC_CONDENSATION_PRECONDITIONER_H

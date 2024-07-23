@@ -17,7 +17,7 @@
 
 #include "libmesh/static_condensation.h"
 
-#ifdef LIBMESH_HAVE_PETSC
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_HAVE_PETSC)
 
 #include "libmesh/mesh_base.h"
 #include "libmesh/dof_map.h"
@@ -690,4 +690,18 @@ StaticCondensation::solver_package()
 
 }
 
-#endif // LIBMESH_HAVE_PETSC
+#else
+
+#include "libmesh/dof_map.h"
+
+namespace libMesh
+{
+StaticCondensation::StaticCondensation(const MeshBase &, const System &, const DofMap & dof_map)
+  : SparseMatrix<Number>(dof_map.comm())
+{
+  libmesh_error_msg(
+      "Static condensation requires configuring libMesh with PETSc and Eigen support");
+}
+}
+
+#endif // LIBMESH_HAVE_EIGEN && LIBMESH_HAVE_PETSC

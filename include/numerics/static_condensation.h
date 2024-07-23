@@ -19,21 +19,23 @@
 #define LIBMESH_STATIC_CONDENSATION_H
 
 #include "libmesh/libmesh_config.h"
+#include "libmesh/sparse_matrix.h"
 
-// subvectors currently only work with petsc
-
-#ifdef LIBMESH_HAVE_PETSC
+// subvectors currently only work with petsc and we rely on Eigen for local LU factorizations
+#if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_HAVE_PETSC)
 
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
-#include "libmesh/sparse_matrix.h"
 #include "libmesh/dense_matrix.h"
 
 #include <unordered_map>
 #include <memory>
 #include <vector>
 
+// Warnings about stack protection
+#include "libmesh/ignore_warnings.h"
 #include <Eigen/Dense>
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {
@@ -282,5 +284,104 @@ StaticCondensation::dont_condense_vars(const std::unordered_set<unsigned int> & 
 
 }
 
-#endif // LIBMESH_HAVE_PETSC
+#else
+
+#include <unordered_set>
+
+namespace libMesh
+{
+class MeshBase;
+class System;
+class DofMap;
+class StaticCondensationPreconditioner;
+
+class StaticCondensation : public SparseMatrix<Number>
+{
+public:
+  StaticCondensation(const MeshBase &, const System &, const DofMap & dof_map);
+
+  const std::unordered_set<unsigned int> & uncondensed_vars() const { libmesh_not_implemented(); }
+  StaticCondensationPreconditioner & get_preconditioner() { libmesh_not_implemented(); }
+  virtual SparseMatrix<Number> & operator=(const SparseMatrix<Number> &) override
+  {
+    libmesh_not_implemented();
+  }
+  virtual SolverPackage solver_package() override { libmesh_not_implemented(); }
+  virtual void init(const numeric_index_type,
+                    const numeric_index_type,
+                    const numeric_index_type,
+                    const numeric_index_type,
+                    const numeric_index_type = 30,
+                    const numeric_index_type = 10,
+                    const numeric_index_type = 1) override
+  {
+    libmesh_not_implemented();
+  }
+  virtual void init(ParallelType) override { libmesh_not_implemented(); }
+  virtual void clear() override { libmesh_not_implemented(); }
+  virtual void zero() override { libmesh_not_implemented(); }
+  virtual std::unique_ptr<SparseMatrix<Number>> zero_clone() const override
+  {
+    libmesh_not_implemented();
+  }
+  virtual std::unique_ptr<SparseMatrix<Number>> clone() const override
+  {
+    libmesh_not_implemented();
+  }
+  virtual void close() override { libmesh_not_implemented(); }
+  virtual numeric_index_type m() const override { libmesh_not_implemented(); }
+  virtual numeric_index_type n() const override { libmesh_not_implemented(); }
+  virtual numeric_index_type row_start() const override { libmesh_not_implemented(); }
+  virtual numeric_index_type row_stop() const override { libmesh_not_implemented(); }
+  virtual numeric_index_type col_start() const override { libmesh_not_implemented(); }
+  virtual numeric_index_type col_stop() const override { libmesh_not_implemented(); }
+  virtual void set(const numeric_index_type, const numeric_index_type, const Number) override
+  {
+    libmesh_not_implemented();
+  }
+  virtual void add(const numeric_index_type, const numeric_index_type, const Number) override
+  {
+    libmesh_not_implemented();
+  }
+  virtual void add_matrix(const DenseMatrix<Number> &,
+                          const std::vector<numeric_index_type> &,
+                          const std::vector<numeric_index_type> &) override
+  {
+    libmesh_not_implemented();
+  }
+  virtual void add_matrix(const DenseMatrix<Number> &,
+                          const std::vector<numeric_index_type> &) override
+  {
+    libmesh_not_implemented();
+  }
+  virtual void add(const Number, const SparseMatrix<Number> &) override
+  {
+    libmesh_not_implemented();
+  }
+  virtual Number operator()(const numeric_index_type, const numeric_index_type) const override
+  {
+    libmesh_not_implemented();
+  }
+  virtual Real l1_norm() const override { libmesh_not_implemented(); }
+  virtual Real linfty_norm() const override { libmesh_not_implemented(); }
+  virtual bool closed() const override { libmesh_not_implemented(); }
+  virtual void print_personal(std::ostream & = libMesh::out) const override
+  {
+    libmesh_not_implemented();
+  }
+  virtual void get_diagonal(NumericVector<Number> &) const override { libmesh_not_implemented(); }
+  virtual void get_transpose(SparseMatrix<Number> &) const override { libmesh_not_implemented(); }
+  virtual void get_row(numeric_index_type,
+                       std::vector<numeric_index_type> &,
+                       std::vector<Number> &) const override
+  {
+    libmesh_not_implemented();
+  }
+  void init() { libmesh_not_implemented(); }
+  void setup() { libmesh_not_implemented(); }
+  void apply(const NumericVector<Number> &, NumericVector<Number> &) { libmesh_not_implemented(); }
+};
+}
+
+#endif // LIBMESH_HAVE_EIGEN && LIBMESH_HAVE_PETSC
 #endif // LIBMESH_STATIC_CONDENSATION_H
