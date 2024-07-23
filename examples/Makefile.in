@@ -666,7 +666,7 @@ AM_CPPFLAGS = $(libmesh_CPPFLAGS) $(libmesh_optional_INCLUDES) \
 	-I$(top_builddir)/include
 AM_CFLAGS = $(libmesh_CFLAGS)
 AM_CXXFLAGS = $(libmesh_CXXFLAGS)
-AM_LDFLAGS = $(libmesh_LDFLAGS)
+AM_LDFLAGS = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
 examples_source_path = $(top_srcdir)/examples
 examples_install_path = $(prefix)/examples
 data_DATA = run_common.sh
