@@ -2,6 +2,7 @@
 #define TYPE_VECTOR_TEST_H
 
 #include <libmesh/type_vector.h>
+#include <libmesh/fuzzy_equals.h>
 
 #include "libmesh_cppunit.h"
 
@@ -364,6 +365,7 @@ public:
 
     CPPUNIT_ASSERT( (*basem_1_1_1) == (*basem_1_1_1) );
     CPPUNIT_ASSERT( !((*basem_1_1_1) == (*basem_n1_1_n1)) );
+    CPPUNIT_ASSERT( relative_fuzzy_equals(*basem_1_1_1, *basem_1_1_1) );
   }
 
   void testInEqualityBase()
@@ -372,6 +374,7 @@ public:
 
     CPPUNIT_ASSERT( !((*basem_1_1_1) != (*basem_1_1_1)) );
     CPPUNIT_ASSERT( (*basem_1_1_1) != (*basem_n1_1_n1) );
+    CPPUNIT_ASSERT( !relative_fuzzy_equals(*basem_1_1_1, *basem_n1_1_n1) );
   }
 
   void testAssignmentBase()

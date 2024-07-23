@@ -1575,6 +1575,14 @@ SparseMatrix<T> & PetscMatrix<T>::operator= (const SparseMatrix<T> & v)
   return *this;
 }
 
+template <typename T>
+void PetscMatrix<T>::scale(const T scale)
+{
+  libmesh_assert(this->closed());
+
+  const auto ierr = MatScale(this->_mat, scale);
+  LIBMESH_CHKERR(ierr);
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations

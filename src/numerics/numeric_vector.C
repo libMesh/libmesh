@@ -27,6 +27,7 @@
 #include "libmesh/tensor_tools.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/int_range.h"
+#include "libmesh/fuzzy_equals.h"
 
 
 // C++ includes
@@ -371,6 +372,22 @@ Real NumericVector<T>::l2_norm_diff (const NumericVector<T> & v) const
   this->comm().sum(norm);
 
   return std::sqrt(norm);
+}
+
+
+
+template <class T>
+Real NumericVector<T>::l1_norm_diff (const NumericVector<T> & v) const
+{
+  libmesh_assert(this->compatible(v));
+
+  Real norm = 0;
+  for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
+    norm += libMesh::l1_norm_diff((*this)(i), v(i));
+
+  this->comm().sum(norm);
+
+  return norm;
 }
 
 

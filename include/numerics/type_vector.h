@@ -24,6 +24,8 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/compare_types.h"
 #include "libmesh/tensor_tools.h"
+#include "libmesh/int_range.h"
+#include "libmesh/fuzzy_equals.h"
 
 // C++ includes
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
@@ -301,6 +303,11 @@ public:
    * element magnitudes squared.
    */
   auto norm_sq() const -> decltype(std::norm(T()));
+
+  /**
+   * \returns The L1 norm of the vector
+   */
+  auto l1_norm() const;
 
   /**
    * \returns True if all values in the vector are zero
@@ -943,27 +950,26 @@ bool TypeVector<T>::is_zero() const
   return true;
 }
 
+template <>
+auto
+TypeVector<bool>::l1_norm() const;
+
+template <typename T>
+auto
+TypeVector<T>::l1_norm() const
+{
+  decltype(std::abs(T())) ret{};
+  for (const auto i : make_range(libmesh_dim))
+    ret += std::abs(_coords[i]);
+
+  return ret;
+}
+
 template <typename T>
 inline
 bool TypeVector<T>::absolute_fuzzy_equals(const TypeVector<T> & rhs, Real tol) const
 {
-#if LIBMESH_DIM == 1
-  return (std::abs(_coords[0] - rhs._coords[0])
-          <= tol);
-#endif
-
-#if LIBMESH_DIM == 2
-  return (std::abs(_coords[0] - rhs._coords[0]) +
-          std::abs(_coords[1] - rhs._coords[1])
-          <= tol);
-#endif
-
-#if LIBMESH_DIM == 3
-  return (std::abs(_coords[0] - rhs._coords[0]) +
-          std::abs(_coords[1] - rhs._coords[1]) +
-          std::abs(_coords[2] - rhs._coords[2])
-          <= tol);
-#endif
+  return libMesh::absolute_fuzzy_equals(*this, rhs, tol);
 }
 
 
@@ -972,23 +978,7 @@ template <typename T>
 inline
 bool TypeVector<T>::relative_fuzzy_equals(const TypeVector<T> & rhs, Real tol) const
 {
-#if LIBMESH_DIM == 1
-  return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0])));
-#endif
-
-#if LIBMESH_DIM == 2
-  return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
-                                      std::abs(_coords[1]) + std::abs(rhs._coords[1])));
-#endif
-
-#if LIBMESH_DIM == 3
-  return this->absolute_fuzzy_equals(rhs, tol *
-                                     (std::abs(_coords[0]) + std::abs(rhs._coords[0]) +
-                                      std::abs(_coords[1]) + std::abs(rhs._coords[1]) +
-                                      std::abs(_coords[2]) + std::abs(rhs._coords[2])));
-#endif
+  return libMesh::relative_fuzzy_equals(*this, rhs, tol);
 }
 
 
@@ -1144,6 +1134,21 @@ outer_product(const TypeVector<T> & a, const T2 & b)
 
   return ret;
 }
+
+template <typename T>
+auto
+l1_norm(const TypeVector<T> & var)
+{
+  return var.l1_norm();
+}
+
+template <typename T, typename T2>
+auto
+l1_norm_diff(const TypeVector<T> & vec1, const TypeVector<T2> & vec2)
+{
+  return l1_norm(vec1 - vec2);
+}
+
 } // namespace libMesh
 
 namespace std
@@ -1151,7 +1156,8 @@ namespace std
 template <typename T>
 auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()))
 {
-  return vector.norm();
+  // Yea I agree it's dumb that the standard returns the square of the Euclidean norm
+  return vector.norm_sq();
 }
 } // namespace std
 

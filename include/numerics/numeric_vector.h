@@ -315,6 +315,12 @@ public:
   Real l2_norm_diff (const NumericVector<T> & other_vec) const;
 
   /**
+   * \returns The \f$ \ell_1 \f$-norm of \f$ \vec{u} - \vec{v} \f$, where
+   * \f$ \vec{u} \f$ is \p this.
+  */
+  Real l1_norm_diff (const NumericVector<T> & other_vec) const;
+
+  /**
    * \returns The size of the vector.
    */
   virtual numeric_index_type size () const = 0;
@@ -1068,6 +1074,19 @@ void  NumericVector<T>::swap (NumericVector<T> & v)
   std::swap(_type, v._type);
 }
 
+template <typename T>
+auto
+l1_norm(const NumericVector<T> & vec)
+{
+  return vec.l1_norm();
+}
+
+template <typename T>
+auto
+l1_norm_diff(const NumericVector<T> & vec1, const NumericVector<T> & vec2)
+{
+  return vec1.l1_norm_diff(vec2);
+}
 
 } // namespace libMesh
 

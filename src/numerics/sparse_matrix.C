@@ -855,6 +855,26 @@ void SparseMatrix<T>::read_petsc_hdf5(const std::string &)
 
 
 
+template <typename T>
+void SparseMatrix<T>::scale(const T scale)
+{
+  libmesh_assert(this->closed());
+
+  for (const auto i : make_range(this->row_start(), this->row_stop()))
+    for (const auto j : make_range(this->col_start(), this->col_stop()))
+      this->set(i, j, (*this)(i, j) * scale);
+}
+
+
+
+template <typename T>
+Real SparseMatrix<T>::l1_norm_diff(const SparseMatrix<T> & other_mat) const
+{
+  auto diff_mat = this->clone();
+  diff_mat->add(-1.0, other_mat);
+  return diff_mat->l1_norm();
+}
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT SparseMatrix<Number>;

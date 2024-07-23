@@ -386,6 +386,11 @@ public:
   virtual Real linfty_norm () const = 0;
 
   /**
+   * \returns The l1_norm() of the difference of \p this and \p other_mat
+   */
+  Real l1_norm_diff (const SparseMatrix<T> & other_mat) const;
+
+  /**
    * \returns \p true if the matrix has been assembled.
    */
   virtual bool closed() const = 0;
@@ -573,8 +578,12 @@ public:
                        std::vector<numeric_index_type> & indices,
                        std::vector<T> & values) const = 0;
 
-protected:
+  /**
+   * Scales all elements of this matrix by \p scale
+   */
+  virtual void scale(const T scale);
 
+protected:
   /**
    * Protected implementation of the create_submatrix and reinit_submatrix
    * routines.
@@ -626,6 +635,19 @@ std::ostream & operator << (std::ostream & os, const SparseMatrix<T> & m)
   return os;
 }
 
+template <typename T>
+auto
+l1_norm(const SparseMatrix<T> & mat)
+{
+  return mat.l1_norm();
+}
+
+template <typename T>
+auto
+l1_norm_diff(const SparseMatrix<T> & mat1, const SparseMatrix<T> & mat2)
+{
+  return mat1.l1_norm_diff(mat2);
+}
 
 } // namespace libMesh
 
