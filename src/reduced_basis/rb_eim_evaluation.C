@@ -48,7 +48,8 @@ namespace libMesh
 RBEIMEvaluation::RBEIMEvaluation(const Parallel::Communicator & comm)
 :
 ParallelObject(comm),
-eim_error_indicator_normalization(RBEIMEvaluation::RESIDUAL_TERMS),
+eim_error_indicator_normalization(RBEIMEvaluation::MAX_RHS),
+limit_eim_error_indicator_to_one(true),
 _rb_eim_solves_N(0),
 _preserve_rb_eim_solutions(false),
 _is_eim_error_indicator_active(false)
@@ -2998,12 +2999,19 @@ std::pair<Real,Real> RBEIMEvaluation::get_eim_error_indicator(
     std::real(error_indicator_rhs - EIM_val_at_error_indicator_pt);
 
   Real normalization = 0.;
-  if (eim_error_indicator_normalization == RESIDUAL_TERMS)
+  if (eim_error_indicator_normalization == RESIDUAL_SUM)
   {
-    // This normalization is based on the terms from the "EIM residual" calculation
-    // used in the calculation of error_indicator_val.
+    // This normalization is based on the sum of terms from the "EIM residual" calculation
+    // used in the calculation of error_indicator_val. This ensures that the error indicator
+    // will always be less than or equal to one, which is a useful property for an error
+    // indicator.
     normalization =
       std::abs(error_indicator_rhs) + std::abs(EIM_val_at_error_indicator_pt);
+  }
+  else if (eim_error_indicator_normalization == RESIDUAL_RHS)
+  {
+    // Normalize with respect to the right-hand side from the "EIM residual" calculation.
+    normalization = std::abs(error_indicator_rhs);
   }
   else if (eim_error_indicator_normalization == MAX_RHS)
   {
@@ -3032,7 +3040,14 @@ std::pair<Real,Real> RBEIMEvaluation::get_eim_error_indicator(
   // Return the relative error indicator, and the normalization that we used. By returning
   // the normalization, we can subsequently recover the absolute error indicator if
   // desired.
-  return std::make_pair(std::abs(error_indicator_val) / normalization, orig_normalization);
+  //
+  // We also optionally clamp the relative error indicator to 1.0 since this typically
+  // indicators 100% error and hence it may be the maximum value that we want to see.
+  Real rel_error_indicator = std::abs(error_indicator_val) / normalization;
+  if (limit_eim_error_indicator_to_one && (rel_error_indicator > 1.0))
+    rel_error_indicator = 1.0;
+
+  return std::make_pair(rel_error_indicator, orig_normalization);
 }
 
 const VectorizedEvalInput & RBEIMEvaluation::get_vec_eval_input() const

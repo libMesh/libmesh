@@ -627,15 +627,32 @@ public:
    * normalization that we use in get_eim_error_indicator(). The enum
    * is public so that it can be set in user code.
    *
-   * RESIDUAL_TERMS: Use the terms in the EIM residual to determine the
-   * error indicator normalization (default).
+   * RESIDUAL_SUM: Use the sum of the terms in the EIM residual to determine
+   * the error indicator normalization. This ensures that the error indicator
+   * value will be at most 1.0, which may be a desirable property of the
+   * indicator.
+   *
+   * RHS: Use only the right-hand side value for the EIM residual to
+   * determine the error indicator normalization.
    *
    * MAX_RHS: Use the maximum value in the EIM RHS vector to determine
-   * the error indicator normalization.
+   * the error indicator normalization (default). This is helpful when
+   * the values at some EIM points are much larger than others, since in
+   * this scenario we typically want to normalize the error indicator
+   * based on the largest values in order to avoid overestimating the
+   * error.
    */
-  enum EimErrorIndicatorNormalization { RESIDUAL_TERMS, MAX_RHS };
+  enum EimErrorIndicatorNormalization { RESIDUAL_SUM, RESIDUAL_RHS, MAX_RHS };
 
   EimErrorIndicatorNormalization eim_error_indicator_normalization;
+
+  /**
+   * If this boolean is true then we clamp EIM error indicator values to
+   * be at most 1. This is often desirable since we typically think of
+   * the error indicator as a percentage, and a value of 1 means 100%
+   * error. We set this to true by default.
+   */
+  bool limit_eim_error_indicator_to_one;
 
 protected:
 
