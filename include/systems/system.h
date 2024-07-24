@@ -761,6 +761,13 @@ public:
   void set_basic_system_only ();
 
   /**
+   * @returns Whether this system is "basic only": i.e. advanced system
+   * components such as ImplicitSystem matrices may not be
+   * initialized.
+   */
+  bool get_basic_system_only () const { return _basic_system_only; }
+
+  /**
    * Vector iterator typedefs.
    */
   typedef std::map<std::string, std::unique_ptr<NumericVector<Number>>, std::less<>>::iterator       vectors_iterator;
