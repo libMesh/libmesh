@@ -2141,6 +2141,7 @@ libmesh_CPPFLAGS = @libmesh_CPPFLAGS@
 libmesh_CXXFLAGS = @libmesh_CXXFLAGS@
 libmesh_LDFLAGS = @libmesh_LDFLAGS@
 libmesh_contrib_INCLUDES = @libmesh_contrib_INCLUDES@
+libmesh_contrib_LDFLAGS = @libmesh_contrib_LDFLAGS@
 libmesh_installed_LIBS = @libmesh_installed_LIBS@
 libmesh_optional_INCLUDES = @libmesh_optional_INCLUDES@
 libmesh_optional_LIBS = @libmesh_optional_LIBS@
@@ -2183,7 +2184,7 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
                $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS) \
 	       -DLIBMESH_IS_UNIT_TESTING
 
-AM_LDFLAGS = $(libmesh_LDFLAGS)
+AM_LDFLAGS = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
 unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	test_comm.h base/dof_object_test.h base/dof_map_test.C \
 	base/default_coupling_test.C base/getpot_test.C \

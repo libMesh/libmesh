@@ -6,7 +6,7 @@ SUBDIRS = include #src
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS  = -I m4 -I m4/autoconf-submodule
 AM_CFLAGS        = $(libmesh_CFLAGS)
-AM_LDFLAGS       = $(libmesh_LDFLAGS)
+AM_LDFLAGS       = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
 
 # We might have turned on -Werror and/or paranoid warnings
 CXXFLAGS_DBG += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
