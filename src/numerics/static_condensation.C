@@ -179,36 +179,39 @@ StaticCondensation::init()
   std::unordered_map<dof_id_type, dof_id_type> *condensed_global_to_local_map = nullptr,
                                                *uncondensed_global_to_local_map = nullptr;
 
-  const Elem * first_elem = nullptr;
-  const auto first_elem_it = _mesh.active_local_elements_begin();
-  if (first_elem_it != _mesh.active_local_elements_end())
-    first_elem = *first_elem_it;
+  // Handle SCALAR dofs
+  for (const auto vg : make_range(_dof_map.n_variable_groups()))
+    if (const auto & vg_description = _dof_map.variable_group(vg);
+        vg_description.type().family == SCALAR)
+    {
+      std::vector<dof_id_type> scalar_dof_indices;
+      const processor_id_type last_pid = this->comm().size() - 1;
+      for (const auto vg_vn : make_range(vg_description.n_variables()))
+      {
+        const auto vn = vg_description.number(vg_vn);
+        _dof_map.SCALAR_dof_indices(scalar_dof_indices, vn);
+        if (this->comm().rank() == last_pid)
+          local_uncondensed_dofs.insert(scalar_dof_indices.begin(), scalar_dof_indices.end());
+        else
+          nonlocal_uncondensed_dofs[last_pid].insert(scalar_dof_indices.begin(),
+                                                     scalar_dof_indices.end());
+      }
+    }
 
-  auto scalar_dofs_functor = [this,
-                              &local_uncondensed_dofs,
-                              &nonlocal_uncondensed_dofs,
-                              &elem_uncondensed_dofs,
-                              &uncondensed_local_dof_number,
-                              &uncondensed_global_to_local_map,
-                              first_elem](const Elem & elem,
-                                          std::vector<dof_id_type> & dof_indices,
-                                          const std::vector<dof_id_type> & scalar_dof_indices)
+  auto scalar_dofs_functor =
+      [this,
+       &local_uncondensed_dofs,
+       &nonlocal_uncondensed_dofs,
+       &elem_uncondensed_dofs,
+       &uncondensed_local_dof_number,
+       &uncondensed_global_to_local_map](const Elem & /*elem*/,
+                                         std::vector<dof_id_type> & dof_indices,
+                                         const std::vector<dof_id_type> & scalar_dof_indices)
   {
     total_dofs_from_scalar_dofs(dof_indices, scalar_dof_indices);
     uncondensed_dofs_from_scalar_dofs(elem_uncondensed_dofs, scalar_dof_indices);
     for (const auto global_dof : scalar_dof_indices)
       (*uncondensed_global_to_local_map)[global_dof] = uncondensed_local_dof_number++;
-
-    // Only need to do this for the first element we encounter
-    if (&elem == first_elem)
-    {
-      const processor_id_type last_pid = this->comm().size() - 1;
-      if (this->comm().rank() == last_pid)
-        local_uncondensed_dofs.insert(scalar_dof_indices.begin(), scalar_dof_indices.end());
-      else
-        nonlocal_uncondensed_dofs[last_pid].insert(scalar_dof_indices.begin(),
-                                                   scalar_dof_indices.end());
-    }
   };
 
   auto field_dofs_functor = [this,
