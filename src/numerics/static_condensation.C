@@ -316,9 +316,8 @@ StaticCondensation::init()
     full_dof_to_reduced_dof[_local_uncondensed_dofs[i]] = i + local_start;
 
   _reduced_sys_mat = SparseMatrix<Number>::build(this->comm());
-  auto sp = _dof_map.build_sparsity(_mesh, /*calculate_constrained=*/false);
-  const auto & nnz = sp->get_n_nz();
-  const auto & noz = sp->get_n_oz();
+  const auto & nnz = _sp->get_n_nz();
+  const auto & noz = _sp->get_n_oz();
   libmesh_assert(nnz.size() == noz.size());
   if (auto * const petsc_mat = dynamic_cast<PetscMatrix<Number> *>(_reduced_sys_mat.get()))
   {
