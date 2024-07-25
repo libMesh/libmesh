@@ -69,7 +69,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
   LOG_SCOPE("build_sparsity()", "DofMap");
 
   // Compute the sparsity structure of the global matrix.  This can be
-  // fed into a PetscMatrix to allocate exactly the number of nonzeros
+  // fed into a PetscMatrixBase to allocate exactly the number of nonzeros
   // necessary to store the matrix.  This algorithm should be linear
   // in the (# of elements)*(# nodes per element)
 

@@ -701,8 +701,16 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
 
   if (dof_map.n_constrained_dofs())
   {
+    // We create our libmesh matrix context using PetscObjectCompose, but versions of MatHeaderMerge
+    // in PETSc prior to 3.21.0 erase the composition list
+#if SLEPC_VERSION_LESS_THAN(3,21,0)
     PetscMatrix<Number> sub(pc, eigen_system.comm());
     eigen_system.copy_super_to_sub(pc_super, sub);
+#else
+    auto sub = PetscMatrixBase<Number>::get_context(pc);
+    libmesh_assert(sub);
+    eigen_system.copy_super_to_sub(pc_super, *sub);
+#endif
   }
 
   // The MFFD Jac still must have assemble called on it

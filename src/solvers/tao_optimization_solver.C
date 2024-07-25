@@ -181,7 +181,7 @@ extern "C"
     sys.update();
     X.swap(X_sys);
 
-    // Let's also wrap pc and h in PetscMatrix objects for convenience
+    // Let's also wrap pc and h in PetscMatrixBase objects for convenience
     PetscMatrix<Number> PC(pc, sys.comm());
     PetscMatrix<Number> hessian(h, sys.comm());
     PC.attach_dof_map(sys.get_dof_map());
@@ -293,7 +293,7 @@ extern "C"
     sys.update();
     X.swap(X_sys);
 
-    // Let's also wrap J and Jpre in PetscMatrix objects for convenience
+    // Let's also wrap J and Jpre in PetscMatrixBase objects for convenience
     PetscMatrix<Number> J_petsc(J, sys.comm());
     PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
@@ -398,7 +398,7 @@ extern "C"
     sys.update();
     X.swap(X_sys);
 
-    // Let's also wrap J and Jpre in PetscMatrix objects for convenience
+    // Let's also wrap J and Jpre in PetscMatrixBase objects for convenience
     PetscMatrix<Number> J_petsc(J, sys.comm());
     PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
@@ -479,13 +479,13 @@ void TaoOptimizationSolver<T>::solve ()
 
   this->system().solution->zero();
 
-  PetscMatrix<T> * hessian  = cast_ptr<PetscMatrix<T> *>(this->system().matrix);
+  PetscMatrixBase<T> * hessian  = cast_ptr<PetscMatrixBase<T> *>(this->system().matrix);
   // PetscVector<T> * gradient = cast_ptr<PetscVector<T> *>(this->system().rhs);
   PetscVector<T> * x         = cast_ptr<PetscVector<T> *>(this->system().solution.get());
   PetscVector<T> * ceq       = cast_ptr<PetscVector<T> *>(this->system().C_eq.get());
-  PetscMatrix<T> * ceq_jac   = cast_ptr<PetscMatrix<T> *>(this->system().C_eq_jac.get());
+  PetscMatrixBase<T> * ceq_jac   = cast_ptr<PetscMatrixBase<T> *>(this->system().C_eq_jac.get());
   PetscVector<T> * cineq     = cast_ptr<PetscVector<T> *>(this->system().C_ineq.get());
-  PetscMatrix<T> * cineq_jac = cast_ptr<PetscMatrix<T> *>(this->system().C_ineq_jac.get());
+  PetscMatrixBase<T> * cineq_jac = cast_ptr<PetscMatrixBase<T> *>(this->system().C_ineq_jac.get());
   PetscVector<T> * lb        = cast_ptr<PetscVector<T> *>(&this->system().get_vector("lower_bounds"));
   PetscVector<T> * ub        = cast_ptr<PetscVector<T> *>(&this->system().get_vector("upper_bounds"));
 

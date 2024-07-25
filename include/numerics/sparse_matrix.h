@@ -154,7 +154,7 @@ public:
    * \returns \p true if this sparse matrix format needs to be fed the
    * graph of the sparse matrix.
    *
-   * This is true for \p LaspackMatrix, but not \p PetscMatrix.  In
+   * This is true for \p LaspackMatrix, but not \p PetscMatrixBase.  In
    * the case where the full graph is not required, we can efficiently
    * approximate it to provide a good estimate of the required size of
    * the sparse matrix.
@@ -496,7 +496,7 @@ public:
   /**
    * This function creates a matrix called "submatrix" which is defined
    * by the row and column indices given in the "rows" and "cols" entries.
-   * Currently this operation is only defined for the PetscMatrix type.
+   * Currently this operation is only defined for the PetscMatrixBase type.
    * Note: The \p rows and \p cols vectors need to be sorted;
    *       Use the nosort version below if \p rows and \p cols vectors are not sorted;
    *       The \p rows and \p cols only contain indices that are owned by this processor.

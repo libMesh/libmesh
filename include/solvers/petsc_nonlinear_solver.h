@@ -29,6 +29,7 @@
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/petsc_macro.h"
 #include "libmesh/wrapped_petsc.h"
+#include "libmesh/petsc_mffd_matrix.h"
 
 // PETSc includes
 #ifdef I
@@ -287,6 +288,9 @@ protected:
     * Whether we've triggered the preconditioner reuse
     */
   bool _setup_reuse;
+
+  /// Wrapper for matrix-free finite-difference Jacobians
+  PetscMFFDMatrix<Number> _mffd_jac;
 
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);

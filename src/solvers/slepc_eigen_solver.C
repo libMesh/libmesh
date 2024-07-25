@@ -23,7 +23,7 @@
 
 // Local Includes
 #include "libmesh/libmesh_logging.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/slepc_eigen_solver.h"
 #include "libmesh/shell_matrix.h"
@@ -119,9 +119,9 @@ SlepcEigenSolver<T>::solve_standard (SparseMatrix<T> & matrix_A_in,
   this->init ();
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
+  PetscMatrixBase<T> * matrix_A = dynamic_cast<PetscMatrixBase<T> *>(&matrix_A_in);
 
-  libmesh_error_msg_if(!matrix_A, "Error: input matrix to solve_standard() must be a PetscMatrix.");
+  libmesh_error_msg_if(!matrix_A, "Error: input matrix to solve_standard() must be a PetscMatrixBase.");
 
   // Close the matrix and vectors in case this wasn't already done.
   if (this->_close_matrix_before_solve)
@@ -181,9 +181,9 @@ SlepcEigenSolver<T>::solve_standard (ShellMatrix<T> & shell_matrix,
   this->init ();
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T> * precond = dynamic_cast<PetscMatrix<T> *>(&precond_in);
+  PetscMatrixBase<T> * precond = dynamic_cast<PetscMatrixBase<T> *>(&precond_in);
 
-  libmesh_error_msg_if(!precond, "Error: input preconditioning matrix to solve_standard() must be a PetscMatrix.");
+  libmesh_error_msg_if(!precond, "Error: input preconditioning matrix to solve_standard() must be a PetscMatrixBase.");
 
   PetscShellMatrix<T> * matrix = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix);
 
@@ -253,11 +253,11 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
-  PetscMatrix<T> * matrix_B = dynamic_cast<PetscMatrix<T> *>(&matrix_B_in);
+  PetscMatrixBase<T> * matrix_A = dynamic_cast<PetscMatrixBase<T> *>(&matrix_A_in);
+  PetscMatrixBase<T> * matrix_B = dynamic_cast<PetscMatrixBase<T> *>(&matrix_B_in);
 
   libmesh_error_msg_if(!matrix_A || !matrix_B,
-                       "Error: inputs to solve_generalized() must be of type PetscMatrix.");
+                       "Error: inputs to solve_generalized() must be of type PetscMatrixBase.");
 
   // Close the matrix and vectors in case this wasn't already done.
   if (this->_close_matrix_before_solve)
@@ -298,9 +298,9 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
                         &mat_A);
   LIBMESH_CHKERR(ierr);
 
-  PetscMatrix<T> * matrix_B = dynamic_cast<PetscMatrix<T> *>(&matrix_B_in);
+  PetscMatrixBase<T> * matrix_B = dynamic_cast<PetscMatrixBase<T> *>(&matrix_B_in);
 
-  libmesh_error_msg_if(!matrix_B, "Error: inputs to solve_generalized() must be of type PetscMatrix.");
+  libmesh_error_msg_if(!matrix_B, "Error: inputs to solve_generalized() must be of type PetscMatrixBase.");
 
   // Close the matrix and vectors in case this wasn't already done.
   if (this->_close_matrix_before_solve)
@@ -329,9 +329,9 @@ SlepcEigenSolver<T>::solve_generalized (SparseMatrix<T> & matrix_A_in,
 
   PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
-  PetscMatrix<T> * matrix_A = dynamic_cast<PetscMatrix<T> *>(&matrix_A_in);
+  PetscMatrixBase<T> * matrix_A = dynamic_cast<PetscMatrixBase<T> *>(&matrix_A_in);
 
-  libmesh_error_msg_if(!matrix_A, "Error: inputs to solve_generalized() must be of type PetscMatrix.");
+  libmesh_error_msg_if(!matrix_A, "Error: inputs to solve_generalized() must be of type PetscMatrixBase.");
 
   // Close the matrix and vectors in case this wasn't already done.
   if (this->_close_matrix_before_solve)
@@ -427,9 +427,9 @@ SlepcEigenSolver<T>::solve_generalized (ShellMatrix<T> & shell_matrix_A,
   this->init ();
 
   // Make sure the SparseMatrix passed in is really a PetscMatrix
-  PetscMatrix<T> * precond = dynamic_cast<PetscMatrix<T> *>(&precond_in);
+  PetscMatrixBase<T> * precond = dynamic_cast<PetscMatrixBase<T> *>(&precond_in);
 
-  libmesh_error_msg_if(!precond, "Error: input preconditioning matrix to solve_generalized() must be of type PetscMatrix.");
+  libmesh_error_msg_if(!precond, "Error: input preconditioning matrix to solve_generalized() must be of type PetscMatrixBase.");
 
   PetscShellMatrix<T> * matrix_A = dynamic_cast<PetscShellMatrix<T> *> (&shell_matrix_A);
 

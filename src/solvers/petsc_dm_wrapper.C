@@ -40,6 +40,7 @@
 #include "libmesh/partitioner.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
+#include "libmesh/petsc_matrix.h"
 
 namespace libMesh
 {
