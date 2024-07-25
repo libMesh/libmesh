@@ -270,6 +270,11 @@ public:
    */
   void attach_system(System & sys);
 
+  /**
+   * @returns the attached system
+   */
+  System & system();
+
 protected:
   /**
    * The system this solver is solving
@@ -386,6 +391,15 @@ LinearSolver<T>::attach_system(System & sys)
 {
   libmesh_error_msg_if(_system, "System has already been attached");
   _system = &sys;
+}
+
+template <typename T>
+inline
+System &
+LinearSolver<T>::system()
+{
+  libmesh_error_msg_if(!this->_system, "System requested but it's not attached");
+  return *this->_system;
 }
 
 } // namespace libMesh
