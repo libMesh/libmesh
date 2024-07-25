@@ -199,14 +199,10 @@ StaticCondensation::init()
     }
 
   auto scalar_dofs_functor =
-      [this,
-       &local_uncondensed_dofs,
-       &nonlocal_uncondensed_dofs,
-       &elem_uncondensed_dofs,
-       &uncondensed_local_dof_number,
-       &uncondensed_global_to_local_map](const Elem & /*elem*/,
-                                         std::vector<dof_id_type> & dof_indices,
-                                         const std::vector<dof_id_type> & scalar_dof_indices)
+      [&elem_uncondensed_dofs, &uncondensed_local_dof_number, &uncondensed_global_to_local_map](
+          const Elem & /*elem*/,
+          std::vector<dof_id_type> & dof_indices,
+          const std::vector<dof_id_type> & scalar_dof_indices)
   {
     total_dofs_from_scalar_dofs(dof_indices, scalar_dof_indices);
     uncondensed_dofs_from_scalar_dofs(elem_uncondensed_dofs, scalar_dof_indices);
