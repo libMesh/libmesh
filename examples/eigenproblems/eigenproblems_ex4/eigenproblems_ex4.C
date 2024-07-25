@@ -70,11 +70,13 @@ main(int argc, char ** argv)
   libmesh_example_requires(false, "--disable-singleprecision");
 #endif
 
+  // We create our libmesh matrix context using PetscObjectCompose, but versions of MatHeaderMerge
+  // in PETSc prior to 3.21.0 erase the composition list
 #ifndef LIBMESH_HAVE_SLEPC
-  libmesh_example_requires(false, "--enable-slepc with a slepc version >=3.13");
+  libmesh_example_requires(false, "--enable-slepc with a slepc version >=3.21");
 #else
-#if SLEPC_VERSION_LESS_THAN(3, 13, 0)
-  libmesh_example_requires(false, "--enable-slepc with a slepc version >=3.13");
+#if SLEPC_VERSION_LESS_THAN(3, 21, 0)
+  libmesh_example_requires(false, "--enable-slepc with a slepc version >=3.21");
 #else
   // Tell the user what we are doing.
   libMesh::out << "Running " << argv[0];
@@ -701,8 +703,9 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
 
   if (dof_map.n_constrained_dofs())
   {
-    PetscMatrix<Number> sub(pc, eigen_system.comm());
-    eigen_system.copy_super_to_sub(pc_super, sub);
+    auto sub = PetscMatrix<Number>::get_context(pc);
+    libmesh_assert(sub);
+    eigen_system.copy_super_to_sub(pc_super, *sub);
   }
 
   // The MFFD Jac still must have assemble called on it

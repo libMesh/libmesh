@@ -139,7 +139,7 @@ extern "C"
   __libmesh_petsc_diff_solver_jacobian (SNES,
                                         Vec x,
                                         Mat libmesh_dbg_var(j),
-                                        Mat pc,
+                                        Mat libmesh_dbg_var(pc),
                                         void * ctx)
   {
     PetscFunctionBegin;
@@ -160,16 +160,15 @@ extern "C"
       *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_input(x, sys.comm());
 
-    PetscMatrix<Number> J_input(pc, sys.comm());
     PetscMatrix<Number> & J_system =
       *cast_ptr<PetscMatrix<Number> *>(sys.matrix);
+    libmesh_assert(J_system.mat() == pc);
 
     // DiffSystem assembles from the solution and into the jacobian, so
     // swap those with our input vectors before assembling.  They'll
     // probably already be references to the same vectors, but PETSc
     // might do something tricky.
     X_input.swap(X_system);
-    J_input.swap(J_system);
 
     // We may need to localize a parallel solution
     sys.update();
@@ -184,7 +183,6 @@ extern "C"
 
     // Swap back
     X_input.swap(X_system);
-    J_input.swap(J_system);
 
     // No errors, we hope
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);

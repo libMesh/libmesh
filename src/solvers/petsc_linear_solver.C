@@ -25,7 +25,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/shell_matrix.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_aij_matrix.h"
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/enum_to_string.h"
@@ -207,10 +207,10 @@ void PetscLinearSolver<T>::init (const char * name)
       LIBMESH_CHKERR(ierr);
 
       if (strcmp(ksp_type, "preonly"))
-        {
-          ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-          LIBMESH_CHKERR(ierr);
-        }
+      {
+        ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
+        LIBMESH_CHKERR(ierr);
+      }
 
       // Notify PETSc of location to store residual history.
       // This needs to be called before any solves, since
@@ -599,7 +599,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
 
       if (precond && this->_preconditioner)
         {
-          subprecond_matrix = std::make_unique<PetscMatrix<Number>>(subprecond, this->comm());
+          subprecond_matrix = std::make_unique<PetscAIJMatrix<Number>>(subprecond, this->comm());
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }

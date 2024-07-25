@@ -27,7 +27,7 @@
 // Local Includes
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/petsc_vector.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_aij_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/tao_optimization_solver.h"
 #include "libmesh/equation_systems.h"
@@ -182,8 +182,8 @@ extern "C"
     X.swap(X_sys);
 
     // Let's also wrap pc and h in PetscMatrix objects for convenience
-    PetscMatrix<Number> PC(pc, sys.comm());
-    PetscMatrix<Number> hessian(h, sys.comm());
+    PetscAIJMatrix<Number> PC(pc, sys.comm());
+    PetscAIJMatrix<Number> hessian(h, sys.comm());
     PC.attach_dof_map(sys.get_dof_map());
     hessian.attach_dof_map(sys.get_dof_map());
 
@@ -294,8 +294,8 @@ extern "C"
     X.swap(X_sys);
 
     // Let's also wrap J and Jpre in PetscMatrix objects for convenience
-    PetscMatrix<Number> J_petsc(J, sys.comm());
-    PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
+    PetscAIJMatrix<Number> J_petsc(J, sys.comm());
+    PetscAIJMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
     // Enforce constraints exactly on the current_local_solution.
     sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
@@ -399,8 +399,8 @@ extern "C"
     X.swap(X_sys);
 
     // Let's also wrap J and Jpre in PetscMatrix objects for convenience
-    PetscMatrix<Number> J_petsc(J, sys.comm());
-    PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
+    PetscAIJMatrix<Number> J_petsc(J, sys.comm());
+    PetscAIJMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
     // Enforce constraints exactly on the current_local_solution.
     sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());

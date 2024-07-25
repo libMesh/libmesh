@@ -28,6 +28,7 @@
 #include "libmesh/linear_solver.h"
 #include "libmesh/static_condensation_preconditioner.h"
 #include "libmesh/system.h"
+#include "libmesh/petsc_aij_matrix.h"
 #include "timpi/parallel_sync.h"
 #include <unordered_set>
 
@@ -36,11 +37,13 @@ namespace libMesh
 StaticCondensation::StaticCondensation(const MeshBase & mesh,
                                        const System & system,
                                        const DofMap & dof_map)
-  : SparseMatrix<Number>(dof_map.comm()),
+  : PetscMatrixShellMatrix<Number>(dof_map.comm()),
     _mesh(mesh),
     _system(system),
     _dof_map(dof_map),
-    _current_elem_id(DofObject::invalid_id)
+    _current_elem_id(DofObject::invalid_id),
+    _sc_is_initialized(false),
+    _have_cached_values(false)
 {
   _size_one_mat.resize(1, 1);
   _scp = std::make_unique<StaticCondensationPreconditioner>(*this);
@@ -138,8 +141,10 @@ StaticCondensation::uncondensed_dofs_from_field_dof(std::vector<dof_id_type> & u
 }
 
 void
-StaticCondensation::clear()
+StaticCondensation::clear() noexcept
 {
+  PetscMatrixShellMatrix<Number>::clear();
+
   _elem_to_local_data.clear();
   _local_uncondensed_dofs.clear();
   _reduced_sys_mat.reset();
@@ -147,29 +152,47 @@ StaticCondensation::clear()
   _reduced_rhs.reset();
   _reduced_solver.reset();
   _current_elem_id = DofObject::invalid_id;
+  _have_cached_values = false;
+  _sc_is_initialized = false;
 }
 
 void
-StaticCondensation::init(const numeric_index_type,
-                         const numeric_index_type,
-                         const numeric_index_type,
-                         const numeric_index_type,
-                         const numeric_index_type,
-                         const numeric_index_type,
-                         const numeric_index_type)
+StaticCondensation::init(const numeric_index_type m,
+                         const numeric_index_type n,
+                         const numeric_index_type m_l,
+                         const numeric_index_type n_l,
+                         const numeric_index_type nnz,
+                         const numeric_index_type noz,
+                         const numeric_index_type blocksize)
 {
-  this->init();
+  if (!this->initialized())
+  {
+    PetscMatrixShellMatrix<Number>::init(m, n, m_l, n_l, nnz, noz, blocksize);
+    this->init();
+  }
+}
+
+void
+StaticCondensation::init(const ParallelType type)
+{
+  if (!this->initialized())
+  {
+    PetscMatrixShellMatrix<Number>::init(type);
+    this->init();
+  }
+}
+
+bool
+StaticCondensation::initialized() const
+{
+  return PetscMatrixShellMatrix<Number>::initialized() && _sc_is_initialized;
 }
 
 void
 StaticCondensation::init()
 {
-  if (_is_initialized)
+  if (_sc_is_initialized)
     return;
-
-  // Some APIs that mark the preconditioner as uninitialized may not clear data, so we do it to be
-  // safe
-  clear();
 
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
   std::vector<dof_id_type> elem_uncondensed_dofs;
@@ -315,7 +338,7 @@ StaticCondensation::init()
   const auto & nnz = _sp->get_n_nz();
   const auto & noz = _sp->get_n_oz();
   libmesh_assert(nnz.size() == noz.size());
-  if (auto * const petsc_mat = dynamic_cast<PetscMatrix<Number> *>(_reduced_sys_mat.get()))
+  if (auto * const petsc_mat = dynamic_cast<PetscAIJMatrix<Number> *>(_reduced_sys_mat.get()))
   {
     // Optimization for PETSc. This is critical for problems in which there are SCALAR dofs that
     // introduce dense rows to avoid allocating a dense matrix
@@ -395,12 +418,24 @@ StaticCondensation::init()
   // Build ghosted full solution vector. Note that this is, in general, *not equal* to the system
   // solution, e.g. this may correspond to the solution for the Newton *update*
   _ghosted_full_sol = _system.current_local_solution->clone();
-  _is_initialized = true;
+  _sc_is_initialized = true;
 }
 
 void
 StaticCondensation::close()
 {
+  _communicator.max(_have_cached_values);
+  if (!_have_cached_values)
+  {
+    const bool closed = _reduced_sys_mat->closed();
+#ifndef NDEBUG
+    _communicator.verify(closed);
+#endif
+    if (!closed)
+      _reduced_sys_mat->close();
+    return;
+  }
+
   DenseMatrix<Number> shim;
   for (auto & [elem_id, local_data] : _elem_to_local_data)
   {
@@ -416,12 +451,14 @@ StaticCondensation::close()
   }
 
   _reduced_sys_mat->close();
+
+  _have_cached_values = false;
 }
 
 bool
 StaticCondensation::closed() const
 {
-  return _reduced_sys_mat->closed();
+  return _reduced_sys_mat->closed() && !_have_cached_values;
 }
 
 void
@@ -526,6 +563,8 @@ StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
       }
       (*mat)(local_i, local_j) += dm(i, j);
     }
+
+  _have_cached_values = true;
 }
 
 void

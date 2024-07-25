@@ -28,7 +28,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/eigen_sparse_matrix.h"
 #include "libmesh/parallel.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_aij_matrix.h"
 #include "libmesh/trilinos_epetra_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/enum_solver_package.h"
@@ -185,7 +185,7 @@ SparseMatrix<T>::build(const Parallel::Communicator & comm,
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return std::make_unique<PetscMatrix<T>>(comm);
+      return std::make_unique<PetscAIJMatrix<T>>(comm);
 #endif
 
 

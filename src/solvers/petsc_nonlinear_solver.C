@@ -27,7 +27,7 @@
 #include "libmesh/petsc_nonlinear_solver.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_vector.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_mffd_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/solver_configuration.h"
@@ -447,6 +447,9 @@ extern "C"
 
     libmesh_parallel_only(solver->comm());
 
+    // Wrapper for matrix-free finite-difference Jacobians
+    static PetscMFFDMatrix<Number> _mffd_jac(solver->comm());
+
     // Get the current iteration number from the snes object,
     // store it in the PetscNonlinearSolver object for possible use
     // by the user's Jacobian function.
@@ -467,40 +470,45 @@ extern "C"
 
     NonlinearImplicitSystem & sys = solver->system();
 
-    PetscMatrix<Number> PC(pc, sys.comm());
-    PetscMatrix<Number> Jac(jac, sys.comm());
+    PetscMatrix<Number> * PC = pc ? PetscMatrix<Number>::get_context(pc) : nullptr;
+    PetscMatrix<Number> * Jac = jac ? PetscMatrix<Number>::get_context(jac) : nullptr;
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
 
     PetscBool pisshell = PETSC_FALSE;
+    PetscBool jismffd = PETSC_FALSE;
+    PetscBool jisshell = PETSC_FALSE;
     if (pc)
       LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &pisshell));
+    libmesh_assert(jac);
+    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &jismffd));
+    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATSHELL, &jisshell));
+    if (jismffd == PETSC_TRUE)
+      {
+        libmesh_assert(!Jac);
+        Jac = &_mffd_jac;
+        _mffd_jac = jac;
+      }
 
     // We already computed the Jacobian during the residual evaluation
     if (solver->residual_and_jacobian_object)
     {
       // We could be doing matrix-free in which case we cannot rely on closing of explicit matrices
       // that occurs during the PETSc residual callback
-      if (jac)
-        {
-          PetscBool jisshell = PETSC_FALSE, jismffd = PETSC_FALSE;
-          LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATSHELL, &jisshell));
-          LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &jismffd));
-          if ((jisshell == PETSC_TRUE) || (jismffd == PETSC_TRUE))
-            // This is not an explicit/assembled matrix but we do this kind of abuse all over the place
-            Jac.close();
-        }
+      if ((jisshell == PETSC_TRUE) || (jismffd == PETSC_TRUE))
+        // This is not an explicit/assembled matrix but we do this kind of abuse all over the place
+        Jac->close();
 
       if (pc && (pisshell == PETSC_TRUE))
         // This is not an explicit/assembled matrix but we do this kind of abuse all over the place
-        PC.close();
+        PC->close();
 
       PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
     }
 
     // Set the dof maps
-    PC.attach_dof_map(sys.get_dof_map());
-    Jac.attach_dof_map(sys.get_dof_map());
+    PC->attach_dof_map(sys.get_dof_map());
+    Jac->attach_dof_map(sys.get_dof_map());
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
@@ -515,29 +523,35 @@ extern "C"
       sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     if (solver->_zero_out_jacobian)
-      PC.zero();
+      PC->zero();
 
 
     if (solver->jacobian != nullptr)
-      solver->jacobian(*sys.current_local_solution.get(), PC, sys);
+      solver->jacobian(*sys.current_local_solution.get(), *PC, sys);
 
     else if (solver->jacobian_object != nullptr)
-      solver->jacobian_object->jacobian(*sys.current_local_solution.get(), PC, sys);
+      solver->jacobian_object->jacobian(*sys.current_local_solution.get(), *PC, sys);
 
     else if (solver->matvec != nullptr)
-      solver->matvec(*sys.current_local_solution.get(), nullptr, &PC, sys);
+      solver->matvec(*sys.current_local_solution.get(), nullptr, PC, sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
-    PC.close();
+    PC->close();
     if (solver->_exact_constraint_enforcement)
       {
-        sys.get_dof_map().enforce_constraints_on_jacobian(sys, &PC);
-        PC.close();
+        sys.get_dof_map().enforce_constraints_on_jacobian(sys, PC);
+        PC->close();
       }
 
-    Jac.close();
+    if (Jac != PC)
+      {
+        // Assume that shells know what they're doing
+        libmesh_assert(!solver->_exact_constraint_enforcement || (jismffd == PETSC_TRUE) ||
+                       (jisshell == PETSC_TRUE));
+        Jac->close();
+      }
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }

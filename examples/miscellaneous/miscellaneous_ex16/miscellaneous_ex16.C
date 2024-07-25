@@ -67,6 +67,9 @@
 #include "libmesh/getpot.h"
 #include "libmesh/vtk_io.h"
 
+// For the solver for the system with static condensation
+#include "libmesh/petsc_linear_solver.h"
+
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
@@ -84,8 +87,13 @@ Real exact_solution(const Real x, const Real y, const Real z = 0.);
 int
 main(int argc, char ** argv)
 {
+  std::vector<char *> mod_argv(argv, argv + argc);
+  const char * sc_arg = "--Poisson2-static-condensation";
+  mod_argv.push_back(new char[std::strlen(sc_arg) + 1]);
+  std::strcpy(mod_argv.back(), sc_arg);
+
   // Initialize libraries, like in example 2.
-  LibMeshInit init(argc, argv);
+  LibMeshInit init(argc + 1, mod_argv.data());
 
   // This example requires a linear solver package.
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
@@ -97,7 +105,6 @@ main(int argc, char ** argv)
 
   for (int i = 1; i < argc; i++)
     libMesh::out << " " << argv[i];
-
   libMesh::out << std::endl << std::endl;
 
   // Skip this 2D example if libMesh was compiled as 1D-only.
@@ -136,12 +143,17 @@ main(int argc, char ** argv)
 
   // Adds the variable "u" to "Poisson".  "u"
   // will be approximated using second-order approximation.
-  equation_systems.get_system("Poisson").add_variable("u", SECOND);
+  sys.add_variable("u", SECOND);
 
   // Give the system a pointer to the matrix assembly
   // function.  This will be called when needed by the
   // library.
-  equation_systems.get_system("Poisson").attach_assemble_function(assemble_poisson);
+  sys.attach_assemble_function(assemble_poisson);
+
+  // Now perform same steps for system with static condensation enabled
+  auto & sc_sys = equation_systems.add_system<LinearImplicitSystem>("Poisson2");
+  sc_sys.add_variable("u", SECOND);
+  sc_sys.attach_assemble_function(assemble_poisson);
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -149,38 +161,19 @@ main(int argc, char ** argv)
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
-  // Initialize the static condensation structure
-  StaticCondensation sc(mesh, sys, sys.get_dof_map());
-  sys.get_dof_map().add_static_condensation(sc);
-  sc.init();
+  // Solve
+  sys.solve();
+  auto * sc_solver = dynamic_cast<PetscLinearSolver<Number> *>(sc_sys.get_linear_solver());
+  libmesh_assert(sc_solver);
+  KSP sc_ksp = sc_solver->ksp();
+  LibmeshPetscCall(KSPSetType(sc_ksp, KSPPREONLY));
+  LibmeshPetscCall(KSPSetInitialGuessNonzero(sc_ksp, PETSC_FALSE));
+  sc_sys.solve();
 
-  equation_systems.parameters.set<StaticCondensation *>("sc") = &sc;
-
-  // Solve the system "Poisson".  Note that calling this
-  // member will assemble the linear system and invoke
-  // the default numerical solver.  With PETSc the solver can be
-  // controlled from the command line.  For example,
-  // you can invoke conjugate gradient with:
-  //
-  // ./example-opt -ksp_type cg
-  //
-  // You can also get a nice X-window that monitors the solver
-  // convergence with:
-  //
-  // ./example-opt -ksp_xmonitor
-  //
-  // if you linked against the appropriate X libraries when you
-  // built PETSc.
-  equation_systems.get_system("Poisson").solve();
-
-  // Do static condensation setup and apply/solve
-  sc.setup();
-  auto sc_soln = sys.current_local_solution->zero_clone();
-  sc.apply(*sys.rhs, *sc_soln);
-  libmesh_error_msg_if(!libMesh::relative_fuzzy_equals(*sys.solution, *sc_soln, 1e-4),
+  libmesh_error_msg_if(!libMesh::relative_fuzzy_equals(*sys.solution, *sc_sys.solution, 1e-4),
                        "mismatching solution");
-  libMesh::out << "Static condensation reduced problem size to " << sc.get_condensed_mat().m()
-               << std::endl;
+  libMesh::out << "Static condensation reduced problem size to "
+               << sc_sys.get_static_condensation().get_condensed_mat().m() << std::endl;
 
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 
@@ -189,6 +182,9 @@ main(int argc, char ** argv)
   VTKIO(mesh).write_equation_systems("out.pvtu", equation_systems);
 
 #endif // #ifdef LIBMESH_HAVE_VTK
+
+  for (const auto i : make_range(argc, argc + 1))
+    delete[] mod_argv[i];
 
   // All done.
   return 0;
@@ -200,15 +196,8 @@ main(int argc, char ** argv)
 // account the boundary conditions, which will be handled
 // via a penalty method.
 void
-assemble_poisson(EquationSystems & es, const std::string & libmesh_dbg_var(system_name))
+assemble_poisson(EquationSystems & es, const std::string & system_name)
 {
-
-  // It is a good idea to make sure we are assembling
-  // the proper system.
-  libmesh_assert_equal_to(system_name, "Poisson");
-
-  auto & sc = *es.parameters.get<StaticCondensation *>("sc");
-
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
 
@@ -216,7 +205,12 @@ assemble_poisson(EquationSystems & es, const std::string & libmesh_dbg_var(syste
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the LinearImplicitSystem we are solving
-  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("Poisson");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>(system_name);
+
+  // Get a pointer to the StaticCondensation class if it exists
+  StaticCondensation * sc = nullptr;
+  if (system.has_static_condensation())
+    sc = &system.get_static_condensation();
 
   // A reference to the  DofMap object for this system.  The  DofMap
   // object handles the index translation from node and element numbers
@@ -484,22 +478,24 @@ assemble_poisson(EquationSystems & es, const std::string & libmesh_dbg_var(syste
     // we would have to apply any hanging node constraint equations
     dof_map.constrain_element_matrix_and_vector(Ke, Fe, dof_indices);
 
+    if (sc)
+      sc->set_current_elem(*elem);
+
     // The element matrix and right-hand-side are now built
     // for this element.  Add them to the global matrix and
     // right-hand-side vector.  The  SparseMatrix::add_matrix()
     // and  NumericVector::add_vector() members do this for us.
     matrix.add_matrix(Ke, dof_indices);
     system.rhs->add_vector(Fe, dof_indices);
-    sc.set_current_elem(*elem);
-    sc.add_matrix(Ke, dof_indices);
   }
 
-  sc.close();
+  matrix.close();
 }
 
 #else
 
-int main()
+int
+main()
 {
   return 0;
 }

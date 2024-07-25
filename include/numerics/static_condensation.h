@@ -19,11 +19,11 @@
 #define LIBMESH_STATIC_CONDENSATION_H
 
 #include "libmesh/libmesh_config.h"
-#include "libmesh/sparse_matrix.h"
 
 // subvectors currently only work with petsc and we rely on Eigen for local LU factorizations
 #if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_HAVE_PETSC)
 
+#include "libmesh/petsc_matrix_shell_matrix.h"
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_matrix.h"
@@ -59,7 +59,7 @@ typedef Eigen::MatrixXd EigenMatrix;
 typedef Eigen::VectorXd EigenVector;
 #endif
 
-class StaticCondensation : public SparseMatrix<Number>
+class StaticCondensation : public PetscMatrixShellMatrix<Number>
 {
 public:
   StaticCondensation(const MeshBase & mesh, const System & system, const DofMap & dof_map);
@@ -73,17 +73,19 @@ public:
 
   virtual SolverPackage solver_package() override;
 
-  virtual void init(const numeric_index_type,
-                    const numeric_index_type,
-                    const numeric_index_type,
-                    const numeric_index_type,
-                    const numeric_index_type = 30,
-                    const numeric_index_type = 10,
-                    const numeric_index_type = 1) override;
+  virtual void init(const numeric_index_type m,
+                    const numeric_index_type n,
+                    const numeric_index_type m_l,
+                    const numeric_index_type n_l,
+                    const numeric_index_type nnz = 30,
+                    const numeric_index_type noz = 10,
+                    const numeric_index_type blocksize = 1) override;
 
-  virtual void init(ParallelType) override { this->init(); }
+  virtual void init(const ParallelType type) override;
 
-  virtual void clear() override;
+  virtual bool initialized() const override;
+
+  virtual void clear() noexcept override;
 
   virtual void zero() override;
 
@@ -267,6 +269,12 @@ private:
 
   /// Preconditioner object which will call back to us for the preconditioning action
   std::unique_ptr<StaticCondensationPreconditioner> _scp;
+
+  /// Whether our object has been initialized
+  bool _sc_is_initialized;
+
+  /// Whether we have cached values via add_XXX()
+  bool _have_cached_values;
 };
 
 inline const SparseMatrix<Number> &
@@ -286,6 +294,7 @@ StaticCondensation::dont_condense_vars(const std::unordered_set<unsigned int> & 
 
 #else
 
+#include "libmesh/sparse_matrix.h"
 #include <unordered_set>
 
 namespace libMesh
