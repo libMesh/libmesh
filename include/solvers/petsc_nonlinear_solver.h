@@ -125,15 +125,6 @@ public:
          const unsigned int) override; // N. Iterations
 
   /**
-   * Call the Petsc solver matrix free
-   */
-  virtual std::pair<unsigned int, Real>
-  solve (NumericVector<T> &,                    // Solution vector
-         NumericVector<T> &,                    // Residual vector
-         const double,                         // Stopping tolerance
-         const unsigned int) override; // N. Iterations
-
-  /**
    * Prints a useful message about why the latest nonlinear solve
    * con(di)verged.
    */

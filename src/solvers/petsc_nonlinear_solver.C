@@ -1176,28 +1176,22 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   if (this->_preconditioner)
       this->_preconditioner->set_matrix(pre_in);
 
-  return this->solve_general(cast_ptr<PetscMatrix<T> *>(&pre_in)->mat(), x_in, r_in, tol, max_its);
-}
-
-template <typename T>
-std::pair<unsigned int, Real>
-PetscNonlinearSolver<T>::solve (NumericVector<T> & x_in,    // Solution vector
-                                NumericVector<T> & r_in,    // Residual vector
-                                const double tol,           // Stopping tolerance
-                                const unsigned int max_its)
-{
-  if (this->_preconditioner)
-  {
-    PetscShellMatrix<T> shell(this->comm());
-    shell.attach_dof_map(this->system().get_dof_map());
-    shell.init();
-    LibmeshPetscCall(MatShellSetContext(shell.mat(), (void *)(this->_preconditioner)));
-    LibmeshPetscCall(MatShellSetOperation(
-        shell.mat(), MATOP_ZERO_ENTRIES, (void (*)(void))libmesh_preconditioner_zero_entries));
-    return this->solve_general(shell.mat(), x_in, r_in, tol, max_its);
-  }
+  // Is our preconditioner based on a standard assembled matrix?
+  if (auto * const petsc_mat = dynamic_cast<PetscMatrix<T> *>(&pre_in))
+    return this->solve_general(petsc_mat->mat(), x_in, r_in, tol, max_its);
   else
-    return this->solve_general(nullptr, x_in, r_in, tol, max_its);
+    {
+      libmesh_error_msg_if(!this->_preconditioner,
+                           "If not building a preconditioner from a standard assembled matrix, "
+                           "then a user preconditioner must be supplied to the solver");
+      PetscShellMatrix<T> shell(this->comm());
+      shell.attach_dof_map(this->system().get_dof_map());
+      shell.init();
+      LibmeshPetscCall(MatShellSetContext(shell.mat(), (void *)(this->_preconditioner)));
+      LibmeshPetscCall(MatShellSetOperation(
+          shell.mat(), MATOP_ZERO_ENTRIES, (void (*)(void))libmesh_preconditioner_zero_entries));
+      return this->solve_general(shell.mat(), x_in, r_in, tol, max_its);
+    }
 }
 
 template <typename T>
