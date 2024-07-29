@@ -299,12 +299,6 @@ protected:
 #endif
 
 private:
-  std::pair<unsigned int, Real> solve_general(Mat J,                   // Operator
-                                              NumericVector<T> & x_in, // Solution vector
-                                              NumericVector<T> & r_in, // Residual vector
-                                              const double,            // Stopping tolerance
-                                              const unsigned int); // Maximum number of iterations
-
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);

@@ -28,7 +28,6 @@
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/petsc_matrix.h"
-#include "libmesh/petsc_shell_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/solver_configuration.h"
@@ -723,17 +722,6 @@ extern "C"
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
-PetscErrorCode libmesh_preconditioner_zero_entries(Mat mat)
-{
-  Preconditioner<Number> * pre;
-
-  PetscFunctionBegin;
-  auto ierr = MatShellGetContext(mat, &pre);
-  CHKERRQ(ierr);
-  pre->zero();
-  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
-}
-
 } // end extern "C"
 
 
@@ -954,11 +942,11 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
 
 template <typename T>
 std::pair<unsigned int, Real>
-PetscNonlinearSolver<T>::solve_general(Mat J_in,                // Operator
-                                       NumericVector<T> & x_in, // Solution vector
-                                       NumericVector<T> & r_in, // Residual vector
-                                       const double,            // Stopping tolerance
-                                       const unsigned int)      // Maximum number of iterations
+PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditioning Matrix
+                                NumericVector<T> & x_in,    // Solution vector
+                                NumericVector<T> & r_in,    // Residual vector
+                                const double,              // Stopping tolerance
+                                const unsigned int)
 {
   parallel_object_only();
 
@@ -966,6 +954,7 @@ PetscNonlinearSolver<T>::solve_general(Mat J_in,                // Operator
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
+  PetscMatrix<T> * pre = cast_ptr<PetscMatrix<T> *>(&pre_in);
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
   PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
 
@@ -1007,7 +996,7 @@ PetscNonlinearSolver<T>::solve_general(Mat J_in,                // Operator
   // This allows a user to set their own jacobian function if they want to
   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
     {
-      LibmeshPetscCall(SNESSetJacobian (_snes, J_in, J_in, libmesh_petsc_snes_jacobian, this));
+      LibmeshPetscCall(SNESSetJacobian (_snes, pre->mat(), pre->mat(), libmesh_petsc_snes_jacobian, this));
     }
 
 
@@ -1018,7 +1007,7 @@ PetscNonlinearSolver<T>::solve_general(Mat J_in,                // Operator
       this->build_mat_null_space(this->nullspace_object, this->nullspace, msp.get());
       if (msp)
         {
-          LibmeshPetscCall(MatSetNullSpace(J_in, msp));
+          LibmeshPetscCall(MatSetNullSpace(pre->mat(), msp));
         }
     }
 
@@ -1032,7 +1021,7 @@ PetscNonlinearSolver<T>::solve_general(Mat J_in,                // Operator
       this->build_mat_null_space(this->transpose_nullspace_object, this->transpose_nullspace, msp.get());
       if (msp)
         {
-          LibmeshPetscCall(MatSetTransposeNullSpace(J_in, msp));
+          LibmeshPetscCall(MatSetTransposeNullSpace(pre->mat(), msp));
         }
 #endif
     }
@@ -1045,7 +1034,7 @@ PetscNonlinearSolver<T>::solve_general(Mat J_in,                // Operator
 
       if (msp)
         {
-          LibmeshPetscCall(MatSetNearNullSpace(J_in, msp));
+          LibmeshPetscCall(MatSetNearNullSpace(pre->mat(), msp));
         }
     }
 
@@ -1082,7 +1071,10 @@ PetscNonlinearSolver<T>::solve_general(Mat J_in,                // Operator
 
   //Set the preconditioning matrix
   if (this->_preconditioner)
-    this->_preconditioner->init();
+    {
+      this->_preconditioner->set_matrix(pre_in);
+      this->_preconditioner->init();
+    }
 
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
@@ -1164,35 +1156,7 @@ PetscNonlinearSolver<T>::solve_general(Mat J_in,                // Operator
   return std::make_pair(n_iterations, final_residual_norm);
 }
 
-template <typename T>
-std::pair<unsigned int, Real>
-PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditioning Matrix
-                                NumericVector<T> & x_in,    // Solution vector
-                                NumericVector<T> & r_in,    // Residual vector
-                                const double tol,           // Stopping tolerance
-                                const unsigned int max_its)
-{
-  //Set the preconditioning matrix
-  if (this->_preconditioner)
-      this->_preconditioner->set_matrix(pre_in);
 
-  // Is our preconditioner based on a standard assembled matrix?
-  if (auto * const petsc_mat = dynamic_cast<PetscMatrix<T> *>(&pre_in))
-    return this->solve_general(petsc_mat->mat(), x_in, r_in, tol, max_its);
-  else
-    {
-      libmesh_error_msg_if(!this->_preconditioner,
-                           "If not building a preconditioner from a standard assembled matrix, "
-                           "then a user preconditioner must be supplied to the solver");
-      PetscShellMatrix<T> shell(this->comm());
-      shell.attach_dof_map(this->system().get_dof_map());
-      shell.init();
-      LibmeshPetscCall(MatShellSetContext(shell.mat(), (void *)(this->_preconditioner)));
-      LibmeshPetscCall(MatShellSetOperation(
-          shell.mat(), MATOP_ZERO_ENTRIES, (void (*)(void))libmesh_preconditioner_zero_entries));
-      return this->solve_general(shell.mat(), x_in, r_in, tol, max_its);
-    }
-}
 
 template <typename T>
 void PetscNonlinearSolver<T>::print_converged_reason()
