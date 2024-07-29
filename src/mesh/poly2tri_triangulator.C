@@ -61,7 +61,7 @@ p2t::Point to_p2t(const libMesh::Point & p)
      "Poly2TriTriangulator only supports point sets in the XY plane");
 #endif
 
-  return {p(0), p(1)};
+  return {double(p(0)), double(p(1))};
 }
 
 Real distance_from_circumcircle(const Elem & elem,
