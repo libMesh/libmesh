@@ -36,6 +36,7 @@
 #include <cstddef>
 #include <fstream>
 #include <iostream> // not every compiler distribution includes <iostream> with <fstream>
+#include <memory>
 #include <set>
 #include <sstream>
 #include <stdexcept>
