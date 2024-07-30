@@ -231,6 +231,7 @@ if LIBMESH_DBG_MODE
 if ACSM_ENABLE_GLIBCXX_DEBUGGING
 if ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT
   check_PROGRAMS         += unit_tests-dbg
+  noinst_PROGRAMS        += unit_tests-dbg
 else
   noinst_PROGRAMS        += unit_tests-dbg
 endif
@@ -288,6 +289,7 @@ endif
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_OPT_MODE
   check_PROGRAMS         += unit_tests-opt
+  noinst_PROGRAMS        += unit_tests-opt
   unit_tests_opt_SOURCES  = $(unit_tests_sources)
   unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
   unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
