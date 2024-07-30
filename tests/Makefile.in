@@ -95,8 +95,8 @@ target_triplet = @target@
 
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
-noinst_PROGRAMS = $(am__EXEEXT_7) $(am__EXEEXT_3) $(am__EXEEXT_4) \
-	$(am__EXEEXT_5)
+noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_7) $(am__EXEEXT_3) \
+	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
@@ -104,21 +104,23 @@ noinst_PROGRAMS = $(am__EXEEXT_7) $(am__EXEEXT_3) $(am__EXEEXT_4) \
 # GLIBCXX-debugging builds with cppunit unless specifically
 # configured to.
 @ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_2 = unit_tests-dbg
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_3 = unit_tests-dbg
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_4 = unit_tests-dbg
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_5 = unit_tests-devel
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_3 = unit_tests-dbg
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_4 = unit_tests-dbg
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_5 = unit_tests-dbg
 @LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_6 = unit_tests-devel
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_7 = unit_tests-prof
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_7 = unit_tests-devel
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_8 = unit_tests-prof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_9 = unit_tests-oprof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_9 = unit_tests-prof
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_10 = unit_tests-oprof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_11 = unit_tests-opt
-@LIBMESH_VPATH_BUILD_TRUE@am__append_12 = .linkstamp
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_11 = unit_tests-oprof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_12 = unit_tests-opt
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_13 = unit_tests-opt
+@LIBMESH_VPATH_BUILD_TRUE@am__append_14 = .linkstamp
 
 ######################################################################
 #
 # Don't leave code coverage outputs lying around
-@CODE_COVERAGE_ENABLED_TRUE@am__append_13 = */*.gcda */*.gcno
+@CODE_COVERAGE_ENABLED_TRUE@am__append_15 = */*.gcda */*.gcno
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
@@ -2386,7 +2388,7 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	write_exodus_QUADSHELL9.e write_exodus_TET10.e \
 	write_exodus_TET14.e write_exodus_TET4.e write_exodus_TRI3.e \
 	write_exodus_TRI6.e write_exodus_TRI7.e \
-	write_exodus_TRISHELL3.e $(am__append_12) $(am__append_13)
+	write_exodus_TRISHELL3.e $(am__append_14) $(am__append_15)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
