@@ -254,9 +254,9 @@ BUILT_SOURCES = \
         parsed_fem_function_parameter.h \
         parsed_function.h \
         parsed_function_parameter.h \
-        petsc_aij_matrix.h \
         petsc_macro.h \
         petsc_matrix.h \
+        petsc_matrix_base.h \
         petsc_matrix_shell_matrix.h \
         petsc_mffd_matrix.h \
         petsc_preconditioner.h \
@@ -1346,13 +1346,13 @@ parsed_function.h: $(top_srcdir)/include/numerics/parsed_function.h
 parsed_function_parameter.h: $(top_srcdir)/include/numerics/parsed_function_parameter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-petsc_aij_matrix.h: $(top_srcdir)/include/numerics/petsc_aij_matrix.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 petsc_macro.h: $(top_srcdir)/include/numerics/petsc_macro.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_matrix.h: $(top_srcdir)/include/numerics/petsc_matrix.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+petsc_matrix_base.h: $(top_srcdir)/include/numerics/petsc_matrix_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_matrix_shell_matrix.h: $(top_srcdir)/include/numerics/petsc_matrix_shell_matrix.h

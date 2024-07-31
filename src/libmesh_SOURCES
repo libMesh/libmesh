@@ -261,8 +261,8 @@ libmesh_SOURCES =  \
         src/numerics/laspack_vector.C \
         src/numerics/lumped_mass_matrix.C \
         src/numerics/numeric_vector.C \
-        src/numerics/petsc_aij_matrix.C \
         src/numerics/petsc_matrix.C \
+        src/numerics/petsc_matrix_base.C \
         src/numerics/petsc_matrix_shell_matrix.C \
         src/numerics/petsc_preconditioner.C \
         src/numerics/petsc_shell_matrix.C \

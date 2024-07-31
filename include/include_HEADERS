@@ -261,9 +261,9 @@ include_HEADERS =  \
         numerics/parsed_fem_function_parameter.h \
         numerics/parsed_function.h \
         numerics/parsed_function_parameter.h \
-        numerics/petsc_aij_matrix.h \
         numerics/petsc_macro.h \
         numerics/petsc_matrix.h \
+        numerics/petsc_matrix_base.h \
         numerics/petsc_matrix_shell_matrix.h \
         numerics/petsc_mffd_matrix.h \
         numerics/petsc_preconditioner.h \
