@@ -37,7 +37,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/dense_matrix.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/getpot.h"
@@ -703,7 +703,7 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
 
   if (dof_map.n_constrained_dofs())
   {
-    auto sub = PetscMatrix<Number>::get_context(pc);
+    auto sub = PetscMatrixBase<Number>::get_context(pc);
     libmesh_assert(sub);
     eigen_system.copy_super_to_sub(pc_super, *sub);
   }

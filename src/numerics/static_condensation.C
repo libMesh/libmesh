@@ -24,11 +24,11 @@
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/static_condensation_preconditioner.h"
 #include "libmesh/system.h"
-#include "libmesh/petsc_aij_matrix.h"
+#include "libmesh/petsc_matrix.h"
 #include "timpi/parallel_sync.h"
 #include <unordered_set>
 
@@ -338,7 +338,7 @@ StaticCondensation::init()
   const auto & nnz = _sp->get_n_nz();
   const auto & noz = _sp->get_n_oz();
   libmesh_assert(nnz.size() == noz.size());
-  if (auto * const petsc_mat = dynamic_cast<PetscAIJMatrix<Number> *>(_reduced_sys_mat.get()))
+  if (auto * const petsc_mat = dynamic_cast<PetscMatrix<Number> *>(_reduced_sys_mat.get()))
   {
     // Optimization for PETSc. This is critical for problems in which there are SCALAR dofs that
     // introduce dense rows to avoid allocating a dense matrix

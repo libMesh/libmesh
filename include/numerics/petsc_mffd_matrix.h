@@ -22,7 +22,7 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 
 namespace libMesh
 {
@@ -34,7 +34,7 @@ namespace libMesh
  * \date 2024
  */
 template <typename T>
-class PetscMFFDMatrix : public PetscMatrix<T>
+class PetscMFFDMatrix : public PetscMatrixBase<T>
 {
 public:
   /**
@@ -90,13 +90,13 @@ public:
 
 template <typename T>
 PetscMFFDMatrix<T>::PetscMFFDMatrix(Mat m, const Parallel::Communicator & comm_in)
-  : PetscMatrix<T>(m, comm_in)
+  : PetscMatrixBase<T>(m, comm_in)
 {
 }
 
 template <typename T>
 PetscMFFDMatrix<T>::PetscMFFDMatrix(const Parallel::Communicator & comm_in)
-  : PetscMatrix<T>(comm_in)
+  : PetscMatrixBase<T>(comm_in)
 {
 }
 

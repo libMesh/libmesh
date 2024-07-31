@@ -20,7 +20,7 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/petsc_diff_solver.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/petsc_auto_fieldsplit.h"
 #include "libmesh/boundary_info.h"
@@ -160,8 +160,8 @@ extern "C"
       *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_input(x, sys.comm());
 
-    PetscMatrix<Number> & J_system =
-      *cast_ptr<PetscMatrix<Number> *>(sys.matrix);
+    PetscMatrixBase<Number> & J_system =
+      *cast_ptr<PetscMatrixBase<Number> *>(sys.matrix);
     libmesh_assert(J_system.mat() == pc);
 
     // DiffSystem assembles from the solution and into the jacobian, so
@@ -302,8 +302,8 @@ unsigned int PetscDiffSolver::solve()
 
   PetscVector<Number> & x =
     *(cast_ptr<PetscVector<Number> *>(_system.solution.get()));
-  PetscMatrix<Number> & jac =
-    *(cast_ptr<PetscMatrix<Number> *>(_system.matrix));
+  PetscMatrixBase<Number> & jac =
+    *(cast_ptr<PetscMatrixBase<Number> *>(_system.matrix));
   PetscVector<Number> & r =
     *(cast_ptr<PetscVector<Number> *>(_system.rhs));
 

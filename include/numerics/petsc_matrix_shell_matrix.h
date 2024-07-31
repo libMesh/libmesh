@@ -22,7 +22,7 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petsc_shell_matrix.h"
 
 namespace libMesh
@@ -35,7 +35,7 @@ namespace libMesh
  * \date 2024
  */
 template <typename T>
-class PetscMatrixShellMatrix : public PetscMatrix<T>
+class PetscMatrixShellMatrix : public PetscMatrixBase<T>
 {
 public:
   explicit PetscMatrixShellMatrix(const Parallel::Communicator & comm_in);
@@ -54,12 +54,12 @@ public:
    */
   virtual void init(ParallelType = PARALLEL) override;
 
-  virtual SparseMatrix<T> & operator=(const SparseMatrix<T> &) override { libmesh_not_implemented(); }
+  virtual SparseMatrix<T> & operator=(const SparseMatrix<T> &) override;
 
 private:
   // Make this private because we mark as initialized after we've done our initialization, and we
   // don't want derived classes to mistakenly register their data as initialized (or not)
-  using PetscMatrix<T>::_is_initialized;
+  using PetscMatrixBase<T>::_is_initialized;
 
   /// Whether to omit constrained degrees of freedom
   const bool _omit_constrained_dofs;
@@ -76,9 +76,16 @@ private:
 //-----------------------------------------------------------------------
 // PetscMatrixShellMatrix inline members
 template <typename T>
-inline PetscMatrixShellMatrix<T>::PetscMatrixShellMatrix(const Parallel::Communicator & comm_in)
-  : PetscMatrix<T>(comm_in), _omit_constrained_dofs(false)
+PetscMatrixShellMatrix<T>::PetscMatrixShellMatrix(const Parallel::Communicator & comm_in)
+  : PetscMatrixBase<T>(comm_in), _omit_constrained_dofs(false)
 {
+}
+
+template <typename T>
+SparseMatrix<T> &
+PetscMatrixShellMatrix<T>::operator=(const SparseMatrix<T> &)
+{
+  libmesh_not_implemented();
 }
 
 } // namespace libMesh

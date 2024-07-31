@@ -25,7 +25,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/shell_matrix.h"
-#include "libmesh/petsc_aij_matrix.h"
+#include "libmesh/petsc_matrix.h"
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/enum_to_string.h"
@@ -241,7 +241,7 @@ void PetscLinearSolver<T>::init (const char * name)
 
 
 template <typename T>
-void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
+void PetscLinearSolver<T>::init (PetscMatrixBase<T> * matrix,
                                  const char * name)
 {
   // Initialize the data structures if not done so already.
@@ -361,8 +361,8 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
                                     ksp_solve_func_type solve_func)
 {
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T> * matrix   = cast_ptr<PetscMatrix<T> *>(&matrix_in);
-  PetscMatrix<T> * precond  = cast_ptr<PetscMatrix<T> *>(&precond_in);
+  PetscMatrixBase<T> * matrix   = cast_ptr<PetscMatrixBase<T> *>(&matrix_in);
+  PetscMatrixBase<T> * precond  = cast_ptr<PetscMatrixBase<T> *>(&precond_in);
 
   this->init (matrix);
 
@@ -416,10 +416,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   // Make sure the data passed in are really of Petsc types
-  const PetscMatrix<T> * precond  = cast_ptr<const PetscMatrix<T> *>(&precond_matrix);
+  const PetscMatrixBase<T> * precond  = cast_ptr<const PetscMatrixBase<T> *>(&precond_matrix);
 
   return this->shell_solve_common
-    (shell_matrix, const_cast<PetscMatrix<T> *>(precond), solution_in,
+    (shell_matrix, const_cast<PetscMatrixBase<T> *>(precond), solution_in,
      rhs_in, rel_tol, abs_tol, max_its);
 }
 
@@ -428,7 +428,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
 template <typename T>
 std::pair<unsigned int, Real>
 PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
-                                          PetscMatrix<T> * precond,
+                                          PetscMatrixBase<T> * precond,
                                           NumericVector<T> & solution_in,
                                           NumericVector<T> & rhs_in,
                                           const double rel_tol,
@@ -475,7 +475,7 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
 template <typename T>
 std::pair<unsigned int, Real>
 PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
-                                  PetscMatrix<T> * precond,
+                                  PetscMatrixBase<T> * precond,
                                   Mat mat,
                                   NumericVector<T> & solution_in,
                                   NumericVector<T> & rhs_in,
@@ -496,7 +496,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
   PetscInt its=0, max_its = static_cast<PetscInt>(m_its);
   PetscReal final_resid=0.;
 
-  std::unique_ptr<PetscMatrix<Number>> subprecond_matrix;
+  std::unique_ptr<PetscMatrixBase<Number>> subprecond_matrix;
   WrappedPetsc<Mat> subprecond;
 
   WrappedPetsc<Mat> submat;
@@ -539,7 +539,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
 
       if (precond)
         {
-          ierr = LibMeshCreateSubMatrix(const_cast<PetscMatrix<T> *>(precond)->mat(),
+          ierr = LibMeshCreateSubMatrix(const_cast<PetscMatrixBase<T> *>(precond)->mat(),
                                         _restrict_solve_to_is,
                                         _restrict_solve_to_is,
                                         MAT_INITIAL_MATRIX,
@@ -599,7 +599,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
 
       if (precond && this->_preconditioner)
         {
-          subprecond_matrix = std::make_unique<PetscAIJMatrix<Number>>(subprecond, this->comm());
+          subprecond_matrix = std::make_unique<PetscMatrix<Number>>(subprecond, this->comm());
           this->_preconditioner->set_matrix(*subprecond_matrix);
           this->_preconditioner->init();
         }
@@ -612,7 +612,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
 
       if (precond)
         {
-          ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat());
+          ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrixBase<T> *>(precond)->mat());
           LIBMESH_CHKERR(ierr);
         }
       else
@@ -626,7 +626,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
           if (matrix)
             this->_preconditioner->set_matrix(*matrix);
           else if (precond)
-            this->_preconditioner->set_matrix(const_cast<PetscMatrix<Number> &>(*precond));
+            this->_preconditioner->set_matrix(const_cast<PetscMatrixBase<Number> &>(*precond));
 
           this->_preconditioner->init();
         }

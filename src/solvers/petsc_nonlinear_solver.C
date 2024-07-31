@@ -467,8 +467,8 @@ extern "C"
 
     NonlinearImplicitSystem & sys = solver->system();
 
-    PetscMatrix<Number> * PC = pc ? PetscMatrix<Number>::get_context(pc) : nullptr;
-    PetscMatrix<Number> * Jac = jac ? PetscMatrix<Number>::get_context(jac) : nullptr;
+    PetscMatrixBase<Number> * PC = pc ? PetscMatrixBase<Number>::get_context(pc) : nullptr;
+    PetscMatrixBase<Number> * Jac = jac ? PetscMatrixBase<Number>::get_context(jac) : nullptr;
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
 
@@ -966,7 +966,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T> * pre = cast_ptr<PetscMatrix<T> *>(&pre_in);
+  PetscMatrixBase<T> * pre = cast_ptr<PetscMatrixBase<T> *>(&pre_in);
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
   PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
 

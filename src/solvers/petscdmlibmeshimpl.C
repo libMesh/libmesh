@@ -38,7 +38,7 @@
 #include "libmesh/petsc_nonlinear_solver.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_vector.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petscdmlibmesh.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
@@ -691,10 +691,10 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
 
   libmesh_assert(pc);
   libmesh_assert(jac);
-  PetscMatrix<Number> * the_pc = PetscMatrix<Number>::get_context(pc);
-  PetscMatrix<Number> * Jac = PetscMatrix<Number>::get_context(jac);
+  PetscMatrixBase<Number> * the_pc = PetscMatrixBase<Number>::get_context(pc);
+  PetscMatrixBase<Number> * Jac = PetscMatrixBase<Number>::get_context(jac);
   PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-  PetscMatrix<Number> & Jac_sys = *cast_ptr<PetscMatrix<Number> *>(sys.matrix);
+  PetscMatrixBase<Number> & Jac_sys = *cast_ptr<PetscMatrixBase<Number> *>(sys.matrix);
   PetscVector<Number> X_global(x, sys.comm());
 
   // Set the dof maps
@@ -843,7 +843,7 @@ static PetscErrorCode DMCreateMatrix_libMesh(DM dm, Mat * A)
   if (!dlm->sys)
     SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE, "No libMesh system set for DM_libMesh");
 
-  *A = (dynamic_cast<PetscMatrix<Number> *>(dlm->sys->matrix))->mat();
+  *A = (dynamic_cast<PetscMatrixBase<Number> *>(dlm->sys->matrix))->mat();
   ierr = PetscObjectReference((PetscObject)(*A)); CHKERRQ(ierr);
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
