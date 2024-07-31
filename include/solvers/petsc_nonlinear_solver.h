@@ -30,6 +30,7 @@
 #include "libmesh/petsc_macro.h"
 #include "libmesh/wrapped_petsc.h"
 #include "libmesh/petsc_dm_wrapper.h"
+#include "libmesh/petsc_mffd_matrix.h"
 
 // PETSc includes
 #ifdef I
@@ -297,6 +298,9 @@ protected:
    */
   PetscDMWrapper _dm_wrapper;
 #endif
+
+  /// Wrapper for matrix-free finite-difference Jacobians
+  PetscMFFDMatrix<Number> _mffd_jac;
 
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);

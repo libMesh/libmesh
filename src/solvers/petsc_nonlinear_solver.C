@@ -447,9 +447,6 @@ extern "C"
 
     libmesh_parallel_only(solver->comm());
 
-    // Wrapper for matrix-free finite-difference Jacobians
-    static PetscMFFDMatrix<Number> _mffd_jac(solver->comm());
-
     // Get the current iteration number from the snes object,
     // store it in the PetscNonlinearSolver object for possible use
     // by the user's Jacobian function.
@@ -486,8 +483,8 @@ extern "C"
     if (jismffd == PETSC_TRUE)
       {
         libmesh_assert(!Jac);
-        Jac = &_mffd_jac;
-        _mffd_jac = jac;
+        Jac = &solver->_mffd_jac;
+        solver->_mffd_jac = jac;
       }
 
     // We already computed the Jacobian during the residual evaluation
@@ -754,7 +751,8 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _default_monitor(true),
   _snesmf_reuse_base(true),
   _computing_base_vector(true),
-  _setup_reuse(false)
+  _setup_reuse(false),
+  _mffd_jac(this->_communicator)
 {
 }
 
