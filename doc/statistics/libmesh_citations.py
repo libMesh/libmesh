@@ -91,17 +91,17 @@ ax.set_xlim([0,N+1])
 title_string = 'Papers by People Using LibMesh, (' + str(sum(n_papers)) + ' Total)'
 fig.suptitle(title_string)
 
-# Save as PDF
-plt.savefig('libmesh_citations.pdf')
-
-# Also save png for uploading to wiki. On Ubuntu, you may need to run
-# the following command to get this working:
+# Write to PDF unless script was run with --png option.
+# On Ubuntu, you may need to run the following
+# command to get this working:
 # sudo apt-get install dvipng
 # To subsequently update the website,
 # cp *.png ~/projects/libMesh.github.io/images/
 # and then push the changes.
 if args.png:
   plt.savefig('libmesh_citations.png', format='png', dpi=200)
+else:
+  plt.savefig('libmesh_citations.pdf')
 
 # Local Variables:
 # python-indent: 2
