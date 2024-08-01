@@ -192,20 +192,99 @@ Real Quad::quality (const ElemQuality q) const
 {
   switch (q)
     {
-      // CUBIT 15.1 User Documentation:
-      // Aspect Ratio: Maximum edge length ratios
     case ASPECT_RATIO:
       {
-        Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
-        Real
-          max = *std::max_element(lengths, lengths+4),
-          min = *std::min_element(lengths, lengths+4);
+        // CUBIT 15.1 User Documentation:
+        // Aspect Ratio: Maximum edge length ratios
+        // Note: consider a "rhombus". All four side lengths are equal, so the
+        // aspect ratio of this element, according to the CUBIT formula, is always
+        // 1.0, regardless of the internal angle "theta" of the rhombus. A more
+        // sensitive aspect ratio should take this internal angle into account,
+        // so that very thin "diamond" Quads have a high aspect ratio.
 
-        // Return 0. instead of dividing by zero.
-        if (min == 0.)
+        // Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
+        // Real
+        //   max = *std::max_element(lengths, lengths+4),
+        //   min = *std::min_element(lengths, lengths+4);
+        //
+        // // Return 0. instead of dividing by zero.
+        // if (min == 0.)
+        //   return 0.;
+        // else
+        //   return max / min;
+
+        // Aspect Ratio definition from Ansys Theory Manual.
+        // Reference: Ansys, Inc. Theory Reference, Ansys Release 9.0, 2004 (Chapter: 13.7.3)
+        //
+        // For the rhombus case described above, the aspect ratio of
+        // the element using the Ansys Aspect Ratio metric is
+        // 1/sin(theta), where theta is the acute interior angle
+        // formed by the crossing of the "midlines" which adjoin the
+        // midpoints of opposite sides of the quadrilateral. The
+        // aspect ratio therefore has a maximum value of 1.0 when
+        // theta = pi/2, and blows up to infinity as sin(theta) -> 0,
+        // rather than remaining equal to 1.0 as in the CUBIT formula.
+
+        // Compute midpoint positions along each edge
+        Point m0 = 0.5 * (this->point(0) + this->point(1));
+        Point m1 = 0.5 * (this->point(1) + this->point(2));
+        Point m2 = 0.5 * (this->point(2) + this->point(3));
+        Point m3 = 0.5 * (this->point(3) + this->point(0));
+
+        libMesh::out << "m0 = " << m0 << std::endl;
+        libMesh::out << "m1 = " << m1 << std::endl;
+        libMesh::out << "m2 = " << m2 << std::endl;
+        libMesh::out << "m3 = " << m3 << std::endl;
+
+        // Compute vectors adjoining opposite side midpoints
+        Point v0 = m2 - m0;
+        Point v1 = m1 - m3;
+
+        libMesh::out << "v0 = " << v0 << std::endl;
+        libMesh::out << "v1 = " << v1 << std::endl;
+
+        // Compute the length of the midlines
+        Real v0_norm = v0.norm();
+        Real v1_norm = v1.norm();
+
+        libMesh::out << "v0_norm = " << v0_norm << std::endl;
+        libMesh::out << "v1_norm = " << v1_norm << std::endl;
+
+        // Instead of dividing by zero in the next step, just return
+        // 0.  The optimal aspect ratio is 1.0, and "high" aspect
+        // ratios are bad, but an aspect ratio of 0 should also be
+        // considered bad.
+        if (v0_norm == 0. || v1_norm == 0.)
           return 0.;
-        else
-          return max / min;
+
+        // Compute sine of the angle between v0, v1. For rectangular
+        // elements, sin_theta == 1.
+        Real sin_theta = cross_norm(v0, v1) / v0_norm / v1_norm;
+        Real v0s = v0_norm*sin_theta;
+        Real v1s = v1_norm*sin_theta;
+        libMesh::out << "sin_theta = " << sin_theta << std::endl;
+        libMesh::out << "v0_norm*sin_theta = " << v0s << std::endl;
+        libMesh::out << "v1_norm*sin_theta = " << v1s << std::endl;
+
+        // Determine the min, max of each midline length and its
+        // projection.
+        //
+        // Note: The return values min{0,1} and max{0,1} here are
+        // *references* and we cannot pass a temporary to
+        // std::minmax() since the reference returned becomes a
+        // dangling reference at "the end of the full expression that
+        // contains the call to std::minmax()"
+        // https://en.cppreference.com/w/cpp/algorithm/minmax
+        auto [min0, max0] = std::minmax(v0_norm, v1s);
+        auto [min1, max1] = std::minmax(v0s, v1_norm);
+
+        libMesh::out << "min0 = " << min0 << std::endl;
+        libMesh::out << "max0 = " << max0 << std::endl;
+        libMesh::out << "min1 = " << min1 << std::endl;
+        libMesh::out << "max1 = " << max1 << std::endl;
+
+        // Return the max of the two quotients
+        return std::max(max0/min0, max1/min1);
       }
 
       // Compute the min/max diagonal ratio.
