@@ -236,6 +236,7 @@ pub_2024 = [
   '2024-05-01', 85,
   '2024-06-01', 101,
   '2024-07-01', 122,
+  '2024-08-01', 136,
 ]
 
 """
@@ -283,13 +284,15 @@ ax1.set_xticklabels(['Year Start', 'Year End'])
 # Axis labels
 ax1.set_ylabel('N. Publications')
 ax1.legend(loc='upper left', prop=fontP)
-plt.savefig('libmesh_citations_monthly.pdf', format='pdf')
 
-# Also save png for uploading to wiki. On Ubuntu, you may need to run
-# the following command to get this working:
+# Write to PDF unless script was run with --png option.
+# On Ubuntu, you may need to run the following
+# command to get this working:
 # sudo apt-get install dvipng
 # To subsequently update the website,
 # cp *.png ~/projects/libMesh.github.io/images/
 # and then push the changes.
 if args.png:
     plt.savefig('libmesh_citations_monthly.png', format='png', dpi=200)
+else:
+    plt.savefig('libmesh_citations_monthly.pdf', format='pdf')
