@@ -238,7 +238,7 @@ void Build::handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,
 void Build::operator()(const ConstElemRange & range)
 {
   // Compute the sparsity structure of the global matrix.  This can be
-  // fed into a PetscMatrix to allocate exactly the number of nonzeros
+  // fed into a PetscMatrixBase to allocate exactly the number of nonzeros
   // necessary to store the matrix.  This algorithm should be linear
   // in the (# of elements)*(# nodes per element)
   const processor_id_type proc_id     = dof_map.processor_id();

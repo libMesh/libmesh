@@ -85,7 +85,7 @@ namespace libMesh
 {
 
 // forward declarations
-template <typename T> class PetscMatrix;
+template <typename T> class PetscMatrixBase;
 
 /**
  * This class provides an interface to PETSc
@@ -124,7 +124,7 @@ public:
   /**
    * Initialize data structures if not done so already plus much more
    */
-  void init (PetscMatrix<T> * matrix,
+  void init (PetscMatrixBase<T> * matrix,
              const char * name = nullptr);
 
   /**
@@ -280,7 +280,7 @@ private:
    */
   virtual std::pair<unsigned int, Real>
   shell_solve_common (const ShellMatrix<T> & shell_matrix,
-                      PetscMatrix<T> * precond_matrix,
+                      PetscMatrixBase<T> * precond_matrix,
                       NumericVector<T> & solution_in,
                       NumericVector<T> & rhs_in,
                       const double rel_tol,
@@ -292,7 +292,7 @@ private:
    */
   std::pair<unsigned int, Real>
   solve_base (SparseMatrix<T> * matrix,
-              PetscMatrix<T> * precond,
+              PetscMatrixBase<T> * precond,
               Mat mat,
               NumericVector<T> & solution_in,
               NumericVector<T> & rhs_in,

@@ -20,7 +20,7 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 // libMesh includes
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/dense_subvector.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/int_range.h"
@@ -244,7 +244,7 @@ void PetscVector<T>::add_vector (const NumericVector<T> & v_in,
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
-  const PetscMatrix<T> * A = cast_ptr<const PetscMatrix<T> *>(&A_in);
+  const PetscMatrixBase<T> * A = cast_ptr<const PetscMatrixBase<T> *>(&A_in);
 
   PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
@@ -254,12 +254,12 @@ void PetscVector<T>::add_vector (const NumericVector<T> & v_in,
       libmesh_warning("Matrix A must be assembled before calling PetscVector::add_vector(v, A).\n"
                       "Please update your code, as this warning will become an error in a future release.");
       libmesh_deprecated();
-      const_cast<PetscMatrix<T> *>(A)->close();
+      const_cast<PetscMatrixBase<T> *>(A)->close();
     }
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // expects a non-const Mat.
-  ierr = MatMultAdd(const_cast<PetscMatrix<T> *>(A)->mat(), v->_vec, _vec, _vec);
+  ierr = MatMultAdd(const_cast<PetscMatrixBase<T> *>(A)->mat(), v->_vec, _vec, _vec);
   LIBMESH_CHKERR(ierr);
 }
 
@@ -274,7 +274,7 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T> & v_in,
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
-  const PetscMatrix<T> * A = cast_ptr<const PetscMatrix<T> *>(&A_in);
+  const PetscMatrixBase<T> * A = cast_ptr<const PetscMatrixBase<T> *>(&A_in);
 
   PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
@@ -284,12 +284,12 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T> & v_in,
       libmesh_warning("Matrix A must be assembled before calling PetscVector::add_vector_transpose(v, A).\n"
                       "Please update your code, as this warning will become an error in a future release.");
       libmesh_deprecated();
-      const_cast<PetscMatrix<T> *>(A)->close();
+      const_cast<PetscMatrixBase<T> *>(A)->close();
     }
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // expects a non-const Mat.
-  ierr = MatMultTransposeAdd(const_cast<PetscMatrix<T> *>(A)->mat(), v->_vec, _vec, _vec);
+  ierr = MatMultTransposeAdd(const_cast<PetscMatrixBase<T> *>(A)->mat(), v->_vec, _vec, _vec);
   LIBMESH_CHKERR(ierr);
 }
 
@@ -304,7 +304,7 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & v_
   this->_restore_array();
   // Make sure the data passed in are really of Petsc types
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
-  const PetscMatrix<T> * A = cast_ptr<const PetscMatrix<T> *>(&A_in);
+  const PetscMatrixBase<T> * A = cast_ptr<const PetscMatrixBase<T> *>(&A_in);
 
   // We shouldn't close() the matrix for you, as that would potentially modify the state of a const object.
   if (!A->closed())
@@ -312,7 +312,7 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & v_
       libmesh_warning("Matrix A must be assembled before calling PetscVector::add_vector_conjugate_transpose(v, A).\n"
                       "Please update your code, as this warning will become an error in a future release.");
       libmesh_deprecated();
-      const_cast<PetscMatrix<T> *>(A)->close();
+      const_cast<PetscMatrixBase<T> *>(A)->close();
     }
 
   // Store a temporary copy since MatMultHermitianTransposeAdd doesn't seem to work
@@ -321,7 +321,7 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & v_
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // expects a non-const Mat.
-  PetscErrorCode ierr = MatMultHermitianTranspose(const_cast<PetscMatrix<T> *>(A)->mat(), v->_vec, _vec);
+  PetscErrorCode ierr = MatMultHermitianTranspose(const_cast<PetscMatrixBase<T> *>(A)->mat(), v->_vec, _vec);
   LIBMESH_CHKERR(ierr);
 
   // Add the temporary copy to the matvec result

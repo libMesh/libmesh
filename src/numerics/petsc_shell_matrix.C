@@ -20,6 +20,7 @@
 
 // Local includes
 #include "libmesh/petsc_shell_matrix.h"
+#include "libmesh/petsc_matrix_shell_matrix.h"
 
 namespace libMesh
 {
@@ -54,60 +55,71 @@ void PetscShellMatrix<T>::clear ()
 {
   if (this->initialized())
     {
-      _mat.destroy();
+      // If we encounter an error here, print a warning but otherwise
+      // keep going since we may be recovering from an exception.
+      PetscErrorCode ierr = MatDestroy (&_mat);
+      if (ierr)
+        libmesh_warning("Warning: MatDestroy returned a non-zero error code which we ignored.");
+
       this->_is_initialized = false;
     }
 }
 
-
-template <typename T>
-void PetscShellMatrix<T>::init ()
+template <typename Obj>
+void init_shell_mat(Obj & obj,
+                    const numeric_index_type m,
+                    const numeric_index_type n,
+                    const numeric_index_type m_l,
+                    const numeric_index_type n_l,
+                    const numeric_index_type blocksize_in)
 {
-  libmesh_assert(this->_dof_map);
-
   // Clear initialized matrices
-  if (this->initialized())
-    this->clear();
+  if (obj.initialized())
+    obj.clear();
 
-  this->_is_initialized = true;
+  PetscInt m_global   = static_cast<PetscInt>(m);
+  PetscInt n_global   = static_cast<PetscInt>(n);
+  PetscInt m_local    = static_cast<PetscInt>(m_l);
+  PetscInt n_local    = static_cast<PetscInt>(n_l);
+  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
 
+  LibmeshPetscCall2(obj.comm(), MatCreate(obj.comm().get(), &obj._mat));
+  LibmeshPetscCall2(obj.comm(), MatSetSizes(obj._mat, m_local, n_local, m_global, n_global));
+  LibmeshPetscCall2(obj.comm(), MatSetBlockSize(obj._mat, blocksize));
+  LibmeshPetscCall2(obj.comm(), MatSetType(obj._mat, MATSHELL));
 
-  numeric_index_type my_m = this->_dof_map->n_dofs();
-  numeric_index_type m_l = this->_dof_map->n_dofs_on_processor(this->processor_id());
-  if (this->_omit_constrained_dofs)
+  // Is prefix information available somewhere? Perhaps pass in the system name?
+  LibmeshPetscCall2(obj.comm(), MatSetOptionsPrefix(obj._mat, ""));
+  LibmeshPetscCall2(obj.comm(), MatSetFromOptions(obj._mat));
+  LibmeshPetscCall2(obj.comm(), MatSetUp(obj._mat));
+  LibmeshPetscCall2(obj.comm(), MatShellSetContext(obj._mat, &obj));
+
+  obj._is_initialized = true;
+}
+
+template <typename Obj>
+void init_shell_mat(Obj & obj)
+{
+  libmesh_assert(obj._dof_map);
+
+  numeric_index_type my_m = obj._dof_map->n_dofs();
+  numeric_index_type m_l = obj._dof_map->n_dofs_on_processor(obj.processor_id());
+  if (obj._omit_constrained_dofs)
     {
-      my_m -= this->_dof_map->n_constrained_dofs();
-      m_l -= this->_dof_map->n_local_constrained_dofs();
+      my_m -= obj._dof_map->n_constrained_dofs();
+      m_l -= obj._dof_map->n_local_constrained_dofs();
     }
 
   const numeric_index_type my_n = my_m;
   const numeric_index_type n_l  = m_l;
 
+  init_shell_mat(obj, my_m, my_n, m_l, n_l, obj._dof_map->block_size());
+}
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-  PetscInt m_global   = static_cast<PetscInt>(my_m);
-  PetscInt n_global   = static_cast<PetscInt>(my_n);
-  PetscInt m_local    = static_cast<PetscInt>(m_l);
-  PetscInt n_local    = static_cast<PetscInt>(n_l);
-
-  ierr = MatCreate(this->comm().get(), _mat.get());
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetSizes(_mat, m_local, n_local, m_global, n_global);
-  LIBMESH_CHKERR(ierr);
-  PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
-  ierr = MatSetBlockSize(_mat, blocksize);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = MatSetType(_mat, MATSHELL);
-  LIBMESH_CHKERR(ierr);
-
-  // Is prefix information available somewhere? Perhaps pass in the system name?
-  ierr = MatSetOptionsPrefix(_mat, "");
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetFromOptions(_mat);
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetUp(_mat);
-  LIBMESH_CHKERR(ierr);
+template <typename T>
+void PetscShellMatrix<T>::init ()
+{
+  init_shell_mat(*this);
 }
 
 template <typename T>
@@ -126,6 +138,20 @@ Mat PetscShellMatrix<T>::mat()
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT PetscShellMatrix<Number>;
+template void init_shell_mat(PetscShellMatrix<Number> & obj);
+template void init_shell_mat(PetscMatrixShellMatrix<Number> & obj);
+template void init_shell_mat(PetscShellMatrix<Number> & obj,
+                             const numeric_index_type m,
+                             const numeric_index_type n,
+                             const numeric_index_type m_l,
+                             const numeric_index_type n_l,
+                             const numeric_index_type blocksize_in);
+template void init_shell_mat(PetscMatrixShellMatrix<Number> & obj,
+                             const numeric_index_type m,
+                             const numeric_index_type n,
+                             const numeric_index_type m_l,
+                             const numeric_index_type n_l,
+                             const numeric_index_type blocksize_in);
 
 } // namespace libMesh
 

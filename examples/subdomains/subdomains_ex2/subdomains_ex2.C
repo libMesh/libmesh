@@ -577,7 +577,7 @@ void assemble_poisson(EquationSystems & es,
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
-      // right-hand-side vector.  The PetscMatrix::add_matrix()
+      // right-hand-side vector.  The PetscMatrixBase::add_matrix()
       // and PetscVector::add_vector() members do this for us.
       // Start logging the insertion of the local (element)
       // matrix and vector into the global matrix and vector

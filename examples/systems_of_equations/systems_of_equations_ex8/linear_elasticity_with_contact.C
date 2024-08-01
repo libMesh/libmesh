@@ -21,7 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/tensor_value.h"
