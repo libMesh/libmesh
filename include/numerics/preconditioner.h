@@ -81,7 +81,7 @@ public:
    * \returns \p true if the data structures are initialized, \p false
    * otherwise.
    */
-  bool initialized () const { return _is_initialized; }
+  virtual bool initialized () const { return _is_initialized; }
 
   /**
    * Computes the preconditioned vector \p y based on input vector \p
@@ -108,6 +108,11 @@ public:
    * This is where you need to fill in your preconditioning matrix.
    */
   virtual void setup () {}
+
+  /**
+   * Can be used to zero items relevant to the preconditioner
+   */
+  virtual void zero() {}
 
   /**
    * Sets the matrix to be preconditioned.

@@ -262,6 +262,8 @@ libmesh_SOURCES =  \
         src/numerics/lumped_mass_matrix.C \
         src/numerics/numeric_vector.C \
         src/numerics/petsc_matrix.C \
+        src/numerics/petsc_matrix_base.C \
+        src/numerics/petsc_matrix_shell_matrix.C \
         src/numerics/petsc_preconditioner.C \
         src/numerics/petsc_shell_matrix.C \
         src/numerics/petsc_vector.C \
@@ -269,6 +271,7 @@ libmesh_SOURCES =  \
         src/numerics/shell_matrix.C \
         src/numerics/sparse_matrix.C \
         src/numerics/sparse_shell_matrix.C \
+        src/numerics/static_condensation.C \
         src/numerics/sum_shell_matrix.C \
         src/numerics/tensor_shell_matrix.C \
         src/numerics/tensor_tools.C \

@@ -93,7 +93,7 @@ static void sort_row (const BidirectionalIterator begin,
  * the sparsity pattern (or graph) of the sparse matrix resulting
  * from the discretization.  This pattern may be used directly by
  * a particular sparse matrix format (e.g. \p LaspackMatrix)
- * or indirectly (e.g. \p PetscMatrix).  In the latter case the
+ * or indirectly (e.g. \p PetscMatrixBase).  In the latter case the
  * number of nonzeros per row of the matrix is needed for efficient
  * preallocation.  In this case it suffices to provide estimate
  * (but bounding) values, and in this case the threaded method can
@@ -211,16 +211,19 @@ private:
   const bool need_full_sparsity_pattern;
   const bool calculate_constrained;
 
-  // If there are "spider" nodes in the mesh (i.e. a single node which
-  // is connected to many 1D elements) and Constraints, we can end up
-  // sorting the same set of DOFs multiple times in handle_vi_vj(),
-  // only to find that it has no net effect on the final sparsity. In
-  // such cases it is much faster to keep track of (element_dofs_i,
-  // element_dofs_j) pairs which have already been handled and not
-  // repeat the computation. We use this data structure to keep track
-  // of hashes of sets of dofs we have already seen, thus avoiding
-  // unnecessary calculations.
+  /// If there are "spider" nodes in the mesh (i.e. a single node which
+  /// is connected to many 1D elements) and Constraints, we can end up
+  /// sorting the same set of DOFs multiple times in handle_vi_vj(),
+  /// only to find that it has no net effect on the final sparsity. In
+  /// such cases it is much faster to keep track of (element_dofs_i,
+  /// element_dofs_j) pairs which have already been handled and not
+  /// repeat the computation. We use this data structure to keep track
+  /// of hashes of sets of dofs we have already seen, thus avoiding
+  /// unnecessary calculations.
   std::unordered_set<dof_id_type> hashed_dof_sets;
+
+  /// A dummy work vector to avoid repeated memory allocations
+  std::vector<dof_id_type> dummy_vec;
 
   void handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,
                     const std::vector<dof_id_type> & element_dofs_j);

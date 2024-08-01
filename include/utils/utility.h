@@ -538,8 +538,7 @@ struct CompareUnderlying
   }
 };
 
-
-}
+} // namespace Utility
 
 } // namespace libMesh
 

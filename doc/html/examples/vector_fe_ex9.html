@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/vector_fe/vector_fe_ex9" target="_blank">Open vector_fe_ex9 in new tab.</a>
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt --HDG-static-condensation cavity=true mms=true element_type=TRI6 -ksp_type preonly -HDG_condensed_pc_type lu -HDG_condensed_pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=25
+    n_local_nodes()=25
+  n_elem()=8
+    n_local_elem()=8
+    n_active_elem()=8
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "HDG"
+    Type "NonlinearImplicit"
+    Variables={ "qu" "qv" } { "vel_x" "vel_y" } { "lm_u" "lm_v" } "pressure" "global_lm" 
+    Finite Element Types="L2_LAGRANGE_VEC" "L2_LAGRANGE" "SIDE_HIERARCHIC" "L2_LAGRANGE" "SCALAR" 
+    Approximation Orders="FIRST" "FIRST" "FIRST" "FIRST" "FIRST" 
+    n_dofs()=233
+    n_local_dofs()=233
+    max(n_local_dofs())=233
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=233
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.93562
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 89
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+  NL step  0, |residual|_2 = 3.098088e+00
+  NL step  1, |residual|_2 = 4.646853e-01
+  NL step  2, |residual|_2 = 1.414071e-03
+  NL step  3, |residual|_2 = 1.945238e-07
+  NL step  4, |residual|_2 = 1.496725e-11
+L2 error for u is: 1.543638e-01
+L2 error for v is: 1.543638e-01
+L2 error for pressure is: 2.879229e-01
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt --HDG-static-condensation cavity=true mms=true element_type=TRI6 -ksp_type preonly -HDG_condensed_pc_type lu -HDG_condensed_pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt --HDG-static-condensation cavity=false mms=true element_type=TRI6 -ksp_type preonly -HDG_condensed_pc_type lu -HDG_condensed_pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=25
+    n_local_nodes()=25
+  n_elem()=8
+    n_local_elem()=8
+    n_active_elem()=8
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "HDG"
+    Type "NonlinearImplicit"
+    Variables={ "qu" "qv" } { "vel_x" "vel_y" } { "lm_u" "lm_v" } "pressure" 
+    Finite Element Types="L2_LAGRANGE_VEC" "L2_LAGRANGE" "SIDE_HIERARCHIC" "L2_LAGRANGE" 
+    Approximation Orders="FIRST" "FIRST" "FIRST" "FIRST" 
+    n_dofs()=232
+    n_local_dofs()=232
+    max(n_local_dofs())=232
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=232
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.2069
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 26
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+  NL step  0, |residual|_2 = 3.909782e+00
+  NL step  1, |residual|_2 = 1.058792e+00
+  NL step  2, |residual|_2 = 2.515937e-02
+  NL step  3, |residual|_2 = 9.010639e-05
+  NL step  4, |residual|_2 = 1.295848e-08
+L2 error for u is: 2.318716e-01
+L2 error for v is: 3.545995e-01
+L2 error for pressure is: 6.271178e-01
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt --HDG-static-condensation cavity=false mms=true element_type=TRI6 -ksp_type preonly -HDG_condensed_pc_type lu -HDG_condensed_pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt --HDG-static-condensation cavity=true mms=false element_type=TRI6 -ksp_type preonly -HDG_condensed_pc_type lu -HDG_condensed_pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=25
+    n_local_nodes()=25
+  n_elem()=8
+    n_local_elem()=8
+    n_active_elem()=8
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "HDG"
+    Type "NonlinearImplicit"
+    Variables={ "qu" "qv" } { "vel_x" "vel_y" } { "lm_u" "lm_v" } "pressure" "global_lm" 
+    Finite Element Types="L2_LAGRANGE_VEC" "L2_LAGRANGE" "SIDE_HIERARCHIC" "L2_LAGRANGE" "SCALAR" 
+    Approximation Orders="FIRST" "FIRST" "FIRST" "FIRST" "FIRST" 
+    n_dofs()=233
+    n_local_dofs()=233
+    max(n_local_dofs())=233
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=233
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.93562
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 89
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+  NL step  0, |residual|_2 = 1.414214e+00
+  NL step  1, |residual|_2 = 9.949641e-02
+  NL step  2, |residual|_2 = 4.123721e-04
+  NL step  3, |residual|_2 = 2.724544e-08
+  NL step  4, |residual|_2 = 1.332948e-12
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt --HDG-static-condensation cavity=true mms=false element_type=TRI6 -ksp_type preonly -HDG_condensed_pc_type lu -HDG_condensed_pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt --HDG-static-condensation cavity=false mms=false element_type=TRI6 -ksp_type preonly -HDG_condensed_pc_type lu -HDG_condensed_pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=105
+    n_local_nodes()=105
+  n_elem()=40
+    n_local_elem()=40
+    n_active_elem()=40
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "HDG"
+    Type "NonlinearImplicit"
+    Variables={ "qu" "qv" } { "vel_x" "vel_y" } { "lm_u" "lm_v" } "pressure" 
+    Finite Element Types="L2_LAGRANGE_VEC" "L2_LAGRANGE" "SIDE_HIERARCHIC" "L2_LAGRANGE" 
+    Approximation Orders="FIRST" "FIRST" "FIRST" "FIRST" 
+    n_dofs()=1128
+    n_local_dofs()=1128
+    max(n_local_dofs())=1128
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=1128
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 7.29787
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 26
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+  NL step  0, |residual|_2 = 2.449490e+00
+  NL step  1, |residual|_2 = 1.148283e+00
+  NL step  2, |residual|_2 = 4.624845e-02
+  NL step  3, |residual|_2 = 3.055077e-04
+  NL step  4, |residual|_2 = 1.646051e-08
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt --HDG-static-condensation cavity=false mms=false element_type=TRI6 -ksp_type preonly -HDG_condensed_pc_type lu -HDG_condensed_pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=25
+    n_local_nodes()=25
+  n_elem()=8
+    n_local_elem()=8
+    n_active_elem()=8
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "HDG"
+    Type "NonlinearImplicit"
+    Variables={ "qu" "qv" } { "vel_x" "vel_y" } { "lm_u" "lm_v" } "pressure" "global_lm" 
+    Finite Element Types="L2_LAGRANGE_VEC" "L2_LAGRANGE" "SIDE_HIERARCHIC" "L2_LAGRANGE" "SCALAR" 
+    Approximation Orders="FIRST" "FIRST" "FIRST" "FIRST" "FIRST" 
+    n_dofs()=233
+    n_local_dofs()=233
+    max(n_local_dofs())=233
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=233
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 38.8369
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 233
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+  NL step  0, |residual|_2 = 3.098088e+00
+  NL step  1, |residual|_2 = 4.645423e-01
+  NL step  2, |residual|_2 = 1.413344e-03
+  NL step  3, |residual|_2 = 3.386920e-07
+  NL step  4, |residual|_2 = 4.623737e-11
+L2 error for u is: 1.543638e-01
+L2 error for v is: 1.543638e-01
+L2 error for pressure is: 2.879229e-01
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=25
+    n_local_nodes()=25
+  n_elem()=8
+    n_local_elem()=8
+    n_active_elem()=8
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "HDG"
+    Type "NonlinearImplicit"
+    Variables={ "qu" "qv" } { "vel_x" "vel_y" } { "lm_u" "lm_v" } "pressure" 
+    Finite Element Types="L2_LAGRANGE_VEC" "L2_LAGRANGE" "SIDE_HIERARCHIC" "L2_LAGRANGE" 
+    Approximation Orders="FIRST" "FIRST" "FIRST" "FIRST" 
+    n_dofs()=232
+    n_local_dofs()=232
+    max(n_local_dofs())=232
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=232
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 37
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 62
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+  NL step  0, |residual|_2 = 3.909782e+00
+  NL step  1, |residual|_2 = 1.058987e+00
+  NL step  2, |residual|_2 = 2.516098e-02
+  NL step  3, |residual|_2 = 9.010146e-05
+  NL step  4, |residual|_2 = 1.877749e-09
+L2 error for u is: 2.318716e-01
+L2 error for v is: 3.545995e-01
+L2 error for pressure is: 6.271178e-01
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=true element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=25
+    n_local_nodes()=25
+  n_elem()=8
+    n_local_elem()=8
+    n_active_elem()=8
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "HDG"
+    Type "NonlinearImplicit"
+    Variables={ "qu" "qv" } { "vel_x" "vel_y" } { "lm_u" "lm_v" } "pressure" "global_lm" 
+    Finite Element Types="L2_LAGRANGE_VEC" "L2_LAGRANGE" "SIDE_HIERARCHIC" "L2_LAGRANGE" "SCALAR" 
+    Approximation Orders="FIRST" "FIRST" "FIRST" "FIRST" "FIRST" 
+    n_dofs()=233
+    n_local_dofs()=233
+    max(n_local_dofs())=233
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=233
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 38.8369
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 233
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+  NL step  0, |residual|_2 = 1.414214e+00
+  NL step  1, |residual|_2 = 9.961639e-02
+  NL step  2, |residual|_2 = 4.125528e-04
+  NL step  3, |residual|_2 = 7.831231e-08
+  NL step  4, |residual|_2 = 3.726669e-12
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=true mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+ 
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=105
+    n_local_nodes()=105
+  n_elem()=40
+    n_local_elem()=40
+    n_active_elem()=40
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "HDG"
+    Type "NonlinearImplicit"
+    Variables={ "qu" "qv" } { "vel_x" "vel_y" } { "lm_u" "lm_v" } "pressure" 
+    Finite Element Types="L2_LAGRANGE_VEC" "L2_LAGRANGE" "SIDE_HIERARCHIC" "L2_LAGRANGE" 
+    Approximation Orders="FIRST" "FIRST" "FIRST" "FIRST" 
+    n_dofs()=1128
+    n_local_dofs()=1128
+    max(n_local_dofs())=1128
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=1128
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 37.9362
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 62
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+  NL step  0, |residual|_2 = 2.449490e+00
+  NL step  1, |residual|_2 = 1.148286e+00
+  NL step  2, |residual|_2 = 4.624937e-02
+  NL step  3, |residual|_2 = 3.054618e-04
+  NL step  4, |residual|_2 = 3.047391e-08
+  NL step  5, |residual|_2 = 3.399293e-12
+ 
+***************************************************************
+* Done Running Example vector_fe_ex9:
+*   ./example-opt cavity=false mms=false element_type=TRI6 -pc_type lu -pc_factor_shift_type NONZERO -snes_linesearch_type basic 
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

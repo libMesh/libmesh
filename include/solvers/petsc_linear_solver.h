@@ -27,6 +27,7 @@
 #include "libmesh/petsc_macro.h"
 #include "libmesh/petsc_solver_exception.h"
 #include "libmesh/wrapped_petsc.h"
+#include "libmesh/petsc_dm_wrapper.h"
 
 // Petsc include files.
 #ifdef I
@@ -85,7 +86,7 @@ namespace libMesh
 {
 
 // forward declarations
-template <typename T> class PetscMatrix;
+template <typename T> class PetscMatrixBase;
 
 /**
  * This class provides an interface to PETSc
@@ -124,7 +125,7 @@ public:
   /**
    * Initialize data structures if not done so already plus much more
    */
-  void init (PetscMatrix<T> * matrix,
+  void init (PetscMatrixBase<T> * matrix,
              const char * name = nullptr);
 
   /**
@@ -257,6 +258,16 @@ public:
    */
   virtual LinearConvergenceReason get_converged_reason() const override;
 
+protected:
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
+  /**
+   * Wrapper object for interacting with the "new" libMesh PETSc DM. This DM can be used for
+   * geometric multigrid and field splits. The DM can be activated from the command line with
+   * --<prefix_>use_petsc_dm
+   */
+  PetscDMWrapper _dm_wrapper;
+#endif
+
 private:
 
   typedef PetscErrorCode (*ksp_solve_func_type)(KSP,Vec,Vec);
@@ -280,7 +291,7 @@ private:
    */
   virtual std::pair<unsigned int, Real>
   shell_solve_common (const ShellMatrix<T> & shell_matrix,
-                      PetscMatrix<T> * precond_matrix,
+                      PetscMatrixBase<T> * precond_matrix,
                       NumericVector<T> & solution_in,
                       NumericVector<T> & rhs_in,
                       const double rel_tol,
@@ -292,7 +303,7 @@ private:
    */
   std::pair<unsigned int, Real>
   solve_base (SparseMatrix<T> * matrix,
-              PetscMatrix<T> * precond,
+              PetscMatrixBase<T> * precond,
               Mat mat,
               NumericVector<T> & solution_in,
               NumericVector<T> & rhs_in,

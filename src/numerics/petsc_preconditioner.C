@@ -22,7 +22,7 @@
 // Local Includes
 #include "libmesh/petsc_preconditioner.h"
 #include "libmesh/petsc_macro.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/enum_preconditioner_type.h"
@@ -68,7 +68,7 @@ void PetscPreconditioner<T>::init ()
       PetscErrorCode ierr = PCCreate(this->comm().get(), _pc.get());
       LIBMESH_CHKERR(ierr);
 
-      auto pmatrix = cast_ptr<PetscMatrix<T> *>(this->_matrix);
+      auto pmatrix = cast_ptr<PetscMatrixBase<T> *>(this->_matrix);
       _mat = pmatrix->mat();
     }
 

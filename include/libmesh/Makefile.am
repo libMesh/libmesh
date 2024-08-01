@@ -256,6 +256,9 @@ BUILT_SOURCES = \
         parsed_function_parameter.h \
         petsc_macro.h \
         petsc_matrix.h \
+        petsc_matrix_base.h \
+        petsc_matrix_shell_matrix.h \
+        petsc_mffd_matrix.h \
         petsc_preconditioner.h \
         petsc_shell_matrix.h \
         petsc_solver_exception.h \
@@ -266,6 +269,8 @@ BUILT_SOURCES = \
         shell_matrix.h \
         sparse_matrix.h \
         sparse_shell_matrix.h \
+        static_condensation.h \
+        static_condensation_preconditioner.h \
         sum_shell_matrix.h \
         tensor_shell_matrix.h \
         tensor_tools.h \
@@ -1347,6 +1352,15 @@ petsc_macro.h: $(top_srcdir)/include/numerics/petsc_macro.h
 petsc_matrix.h: $(top_srcdir)/include/numerics/petsc_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+petsc_matrix_base.h: $(top_srcdir)/include/numerics/petsc_matrix_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+petsc_matrix_shell_matrix.h: $(top_srcdir)/include/numerics/petsc_matrix_shell_matrix.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+petsc_mffd_matrix.h: $(top_srcdir)/include/numerics/petsc_mffd_matrix.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 petsc_preconditioner.h: $(top_srcdir)/include/numerics/petsc_preconditioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1375,6 +1389,12 @@ sparse_matrix.h: $(top_srcdir)/include/numerics/sparse_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sparse_shell_matrix.h: $(top_srcdir)/include/numerics/sparse_shell_matrix.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+static_condensation.h: $(top_srcdir)/include/numerics/static_condensation.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+static_condensation_preconditioner.h: $(top_srcdir)/include/numerics/static_condensation_preconditioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sum_shell_matrix.h: $(top_srcdir)/include/numerics/sum_shell_matrix.h

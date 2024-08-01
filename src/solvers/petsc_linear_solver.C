@@ -162,6 +162,19 @@ void PetscLinearSolver<T>::init (const char * name)
           LIBMESH_CHKERR(ierr);
         }
 
+      // Attaching a DM to KSP.
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
+      const auto prefix = name ? std::string(name) + "_" : std::string("");
+      const bool use_petsc_dm = libMesh::on_command_line("--" + prefix + "use_petsc_dm");
+
+      // This needs to be called before SNESSetFromOptions
+      if (use_petsc_dm)
+        {
+          libmesh_error_msg_if(!this->_system, "A System must be attached to use PETSc DM");
+          this->_dm_wrapper.init_and_attach_petscdm(*this->_system, _ksp);
+        }
+#endif
+
       // Create the preconditioner context
       ierr = KSPGetPC        (_ksp, &_pc);
       LIBMESH_CHKERR(ierr);
@@ -194,10 +207,10 @@ void PetscLinearSolver<T>::init (const char * name)
       LIBMESH_CHKERR(ierr);
 
       if (strcmp(ksp_type, "preonly"))
-        {
-          ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-          LIBMESH_CHKERR(ierr);
-        }
+      {
+        ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
+        LIBMESH_CHKERR(ierr);
+      }
 
       // Notify PETSc of location to store residual history.
       // This needs to be called before any solves, since
@@ -228,89 +241,20 @@ void PetscLinearSolver<T>::init (const char * name)
 
 
 template <typename T>
-void PetscLinearSolver<T>::init (PetscMatrix<T> * matrix,
+void PetscLinearSolver<T>::init (PetscMatrixBase<T> * matrix,
                                  const char * name)
 {
   // Initialize the data structures if not done so already.
   if (!this->initialized())
     {
-      this->_is_initialized = true;
+       if (this->_preconditioner)
+          this->_preconditioner->set_matrix(*matrix);
 
-      PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
-      ierr = KSPCreate (this->comm().get(), _ksp.get());
-      LIBMESH_CHKERR(ierr);
-
-      if (name)
-        {
-          ierr = KSPSetOptionsPrefix(_ksp, name);
-          LIBMESH_CHKERR(ierr);
-        }
-
-      // Create the preconditioner context
-      ierr = KSPGetPC        (_ksp, &_pc);
-      LIBMESH_CHKERR(ierr);
+       this->init(name);
 
       // Set operators. The input matrix works as the preconditioning matrix
-      ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat());
+      auto ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat());
       LIBMESH_CHKERR(ierr);
-
-      // Set user-specified  solver and preconditioner types
-      this->set_petsc_solver_type();
-
-      // If the SolverConfiguration object is provided, use it to set
-      // options during solver initialization.
-      if (this->_solver_configuration)
-        {
-          this->_solver_configuration->set_options_during_init();
-        }
-
-      // Set the options from user-input
-      // Set runtime options, e.g.,
-      //      -ksp_type <type> -pc_type <type> -ksp_monitor -ksp_rtol <rtol>
-      //  These options will override those specified above as long as
-      //  KSPSetFromOptions() is called _after_ any other customization
-      //  routines.
-      ierr = KSPSetFromOptions (_ksp);
-      LIBMESH_CHKERR(ierr);
-
-      // Have the Krylov subspace method use our good initial guess
-      // rather than 0, unless the user requested a KSPType of
-      // preonly, which complains if asked to use initial guesses.
-      KSPType ksp_type;
-
-      ierr = KSPGetType (_ksp, &ksp_type);
-      LIBMESH_CHKERR(ierr);
-
-      if (strcmp(ksp_type, "preonly"))
-        {
-          ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-          LIBMESH_CHKERR(ierr);
-        }
-
-      // Notify PETSc of location to store residual history.
-      // This needs to be called before any solves, since
-      // it sets the residual history length to zero.  The default
-      // behavior is for PETSc to allocate (internally) an array
-      // of size 1000 to hold the residual norm history.
-      ierr = KSPSetResidualHistory(_ksp,
-                                   LIBMESH_PETSC_NULLPTR, // pointer to the array which holds the history
-                                   PETSC_DECIDE, // size of the array holding the history
-                                   PETSC_TRUE);  // Whether or not to reset the history for each solve.
-      LIBMESH_CHKERR(ierr);
-
-      PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
-      if (this->_preconditioner)
-        {
-          this->_preconditioner->set_matrix(*matrix);
-          this->_preconditioner->init();
-          ierr = PCShellSetContext(_pc,(void *)this->_preconditioner);
-          LIBMESH_CHKERR(ierr);
-          ierr = PCShellSetSetUp(_pc,libmesh_petsc_preconditioner_setup);
-          LIBMESH_CHKERR(ierr);
-          ierr = PCShellSetApply(_pc,libmesh_petsc_preconditioner_apply);
-          LIBMESH_CHKERR(ierr);
-        }
     }
 }
 
@@ -417,8 +361,8 @@ PetscLinearSolver<T>::solve_common (SparseMatrix<T> &  matrix_in,
                                     ksp_solve_func_type solve_func)
 {
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T> * matrix   = cast_ptr<PetscMatrix<T> *>(&matrix_in);
-  PetscMatrix<T> * precond  = cast_ptr<PetscMatrix<T> *>(&precond_in);
+  PetscMatrixBase<T> * matrix   = cast_ptr<PetscMatrixBase<T> *>(&matrix_in);
+  PetscMatrixBase<T> * precond  = cast_ptr<PetscMatrixBase<T> *>(&precond_in);
 
   this->init (matrix);
 
@@ -472,10 +416,10 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   // Make sure the data passed in are really of Petsc types
-  const PetscMatrix<T> * precond  = cast_ptr<const PetscMatrix<T> *>(&precond_matrix);
+  const PetscMatrixBase<T> * precond  = cast_ptr<const PetscMatrixBase<T> *>(&precond_matrix);
 
   return this->shell_solve_common
-    (shell_matrix, const_cast<PetscMatrix<T> *>(precond), solution_in,
+    (shell_matrix, const_cast<PetscMatrixBase<T> *>(precond), solution_in,
      rhs_in, rel_tol, abs_tol, max_its);
 }
 
@@ -484,7 +428,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
 template <typename T>
 std::pair<unsigned int, Real>
 PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
-                                          PetscMatrix<T> * precond,
+                                          PetscMatrixBase<T> * precond,
                                           NumericVector<T> & solution_in,
                                           NumericVector<T> & rhs_in,
                                           const double rel_tol,
@@ -531,7 +475,7 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
 template <typename T>
 std::pair<unsigned int, Real>
 PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
-                                  PetscMatrix<T> * precond,
+                                  PetscMatrixBase<T> * precond,
                                   Mat mat,
                                   NumericVector<T> & solution_in,
                                   NumericVector<T> & rhs_in,
@@ -552,7 +496,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
   PetscInt its=0, max_its = static_cast<PetscInt>(m_its);
   PetscReal final_resid=0.;
 
-  std::unique_ptr<PetscMatrix<Number>> subprecond_matrix;
+  std::unique_ptr<PetscMatrixBase<Number>> subprecond_matrix;
   WrappedPetsc<Mat> subprecond;
 
   WrappedPetsc<Mat> submat;
@@ -595,7 +539,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
 
       if (precond)
         {
-          ierr = LibMeshCreateSubMatrix(const_cast<PetscMatrix<T> *>(precond)->mat(),
+          ierr = LibMeshCreateSubMatrix(const_cast<PetscMatrixBase<T> *>(precond)->mat(),
                                         _restrict_solve_to_is,
                                         _restrict_solve_to_is,
                                         MAT_INITIAL_MATRIX,
@@ -668,7 +612,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
 
       if (precond)
         {
-          ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrix<T> *>(precond)->mat());
+          ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrixBase<T> *>(precond)->mat());
           LIBMESH_CHKERR(ierr);
         }
       else
@@ -682,7 +626,7 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
           if (matrix)
             this->_preconditioner->set_matrix(*matrix);
           else if (precond)
-            this->_preconditioner->set_matrix(const_cast<PetscMatrix<Number> &>(*precond));
+            this->_preconditioner->set_matrix(const_cast<PetscMatrixBase<Number> &>(*precond));
 
           this->_preconditioner->init();
         }
