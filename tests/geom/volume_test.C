@@ -498,19 +498,24 @@ public:
       test_rectangle_quad(1e6);
     }
 
-    // Case 4) Degenerate case - all 4 points at same location. This
-    // zero-volume element does not have an invertible map.
-    // {
-    //   const Real alpha = std::log(2);
-    //
-    //   bool invertible =
-    //     test_elem_invertible({Point(alpha, alpha, alpha),
-    //                Point(alpha, alpha, alpha),
-    //                Point(alpha, alpha, alpha),
-    //                Point(alpha, alpha, alpha)}, QUAD4);
-    //
-    //   CPPUNIT_ASSERT(!invertible);
-    // }
+    // Case 4) Degenerate QUAD with zero length side. In the "old"
+    // aspect ratio metric we'd just get zero (as a stand-in for
+    // infinity) for this case since the minimum side length is zero,
+    // but using the new metric we get a non-zero value of 2.5. Thus,
+    // in the new metric it is possible to compare the aspect ratios
+    // of different degenerate QUAD elements rather than simply
+    // assigning all such elements a quality value of 0. Degenerate
+    // quadrilaterals are sometimes used as a "hack" to avoid having a
+    // separate subdomain of TRIs, and (surprisingly) many finite
+    // element operations just "work" on such elements.
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 0, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/2.5, /*actual=*/aspect_ratio, TOLERANCE);
+    }
   }
 
 protected:
