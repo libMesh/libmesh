@@ -476,16 +476,27 @@ public:
       test_rhombus_quad(libMesh::pi / 3);
     }
 
-    // Case 3) Top right corner is moved to (alpha, 1, 0). Element
-    // becomes non-invertible when alpha < 0.
-    // {
-    //   const Real alpha = -0.25;
-    //
-    //   bool invertible =
-    //     test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, 1, 0), Point(0, 1, 0)}, QUAD4);
-    //
-    //   CPPUNIT_ASSERT(!invertible);
-    // }
+    // Case 3) Rectangle QUAD4. The "old" and "new" aspect ratio metrics
+    // return the same result for this case, whih is simply the ratio of
+    // the longest to shortest side.
+    {
+      auto test_rectangle_quad = [this](Real a)
+      {
+        std::vector<Point> pts = {Point(0, 0, 0), Point(a, 0, 0), Point(a, 1, 0), Point(0, 1, 0)};
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        // The expected aspect ratio for the rectangle is "a"
+        Real aspect_ratio = elem->quality(ASPECT_RATIO);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/a, /*actual=*/aspect_ratio, TOLERANCE);
+      };
+
+      // 3a) Test case twice as long as it is tall
+      test_rectangle_quad(2.0);
+
+      // 3b) Test no funny numerical stuff with extremely stretched case
+      test_rectangle_quad(1e6);
+    }
 
     // Case 4) Degenerate case - all 4 points at same location. This
     // zero-volume element does not have an invertible map.
