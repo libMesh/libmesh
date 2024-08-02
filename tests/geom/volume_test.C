@@ -9,6 +9,7 @@
 #include <libmesh/node.h>
 #include <libmesh/enum_to_string.h>
 #include <libmesh/tensor_value.h>
+#include <libmesh/enum_elem_quality.h>
 
 // unit test includes
 #include "test_comm.h"
@@ -35,6 +36,7 @@ public:
   CPPUNIT_TEST( testHex8TrueCentroid );
   CPPUNIT_TEST( testPrism6TrueCentroid );
   CPPUNIT_TEST( testHex20PLevelTrueCentroid );
+  CPPUNIT_TEST( testQuad4AspectRatio );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -388,12 +390,108 @@ public:
     }
   }
 
+  void testQuad4AspectRatio()
+  {
+    LOG_UNIT_TEST;
+
+    // Case 1: Test that rigid body rotations of a unit square
+    // quadrilateral that have no effect on the quality of the
+    // element.
+    {
+      // 1a) The reference element rotated into various different different planes.
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+
+      // 1b) Rotate all points about x-axis by 90 degrees
+      Real cost = std::cos(.5*libMesh::pi);
+      Real sint = std::sin(.5*libMesh::pi);
+      RealTensorValue Rx(1, 0, 0,
+                         0, cost, sint,
+                         0, sint, cost);
+
+      for (auto & pt : pts)
+        pt = Rx * pt;
+
+      aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+
+      // 1c) Rotate all points about z-axis by 90 degrees
+      RealTensorValue Rz(cost, -sint, 0,
+                         sint,  cost, 0,
+                         0,        0, 1);
+
+      for (auto & pt : pts)
+        pt = Rz * pt;
+
+      aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+
+      // 1d) Rotate all points about y-axis by 270 degrees
+      RealTensorValue Ry(cost,  0, sint,
+                         0,     1, 0,
+                         -sint, 0, cost);
+
+      for (int cnt=0; cnt<3; ++cnt)
+        for (auto & pt : pts)
+          pt = Ry * pt;
+
+      aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+    }
+
+    // Case 2: Planar quad with top right vertex displaced to the position
+    // (alpha, alpha). Some different cases are described below.
+    // .) alpha==1: affine case, always invertible
+    // .) 1/2 < alpha < 1: planar case, invertible
+    // .) alpha<=1/2: planar case but node is now at center of the
+    //    element, should give a zero/negative Jacobian on the displaced
+    //    Node -> not invertible.
+    // {
+    //   const Real alpha = .5;
+    //
+    //   bool invertible =
+    //     test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, alpha, 0), Point(0, 1, 0)}, QUAD4);
+    //
+    //   CPPUNIT_ASSERT(!invertible);
+    // }
+
+    // Case 3) Top right corner is moved to (alpha, 1, 0). Element
+    // becomes non-invertible when alpha < 0.
+    // {
+    //   const Real alpha = -0.25;
+    //
+    //   bool invertible =
+    //     test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, 1, 0), Point(0, 1, 0)}, QUAD4);
+    //
+    //   CPPUNIT_ASSERT(!invertible);
+    // }
+
+    // Case 4) Degenerate case - all 4 points at same location. This
+    // zero-volume element does not have an invertible map.
+    // {
+    //   const Real alpha = std::log(2);
+    //
+    //   bool invertible =
+    //     test_elem({Point(alpha, alpha, alpha),
+    //                Point(alpha, alpha, alpha),
+    //                Point(alpha, alpha, alpha),
+    //                Point(alpha, alpha, alpha)}, QUAD4);
+    //
+    //   CPPUNIT_ASSERT(!invertible);
+    // }
+  }
+
 protected:
 
-  // Helper function that builds the specified type of Elem from a
-  // vector of Points and returns the value of has_invertible_map()
-  // for that Elem.
-  bool test_elem(const std::vector<Point> & pts,
+  // Helper function that is called by test_elem() to build an Elem
+  // of the requested elem_type from the provided Points. Note: the
+  // Nodes which are constructed in order to construct the Elem are
+  // also returned since
+  std::pair<std::unique_ptr<Elem>, std::vector<std::unique_ptr<Node>>>
+  construct_elem(const std::vector<Point> & pts,
                  ElemType elem_type)
   {
     const unsigned int n_points = pts.size();
@@ -415,6 +513,20 @@ protected:
 
     for (unsigned int i=0; i<n_points; i++)
       elem->set_node(i) = nodes[i].get();
+
+    // Return Elem we created
+    return std::make_pair(std::move(elem), std::move(nodes));
+  }
+
+  // Helper function that builds the specified type of Elem from a
+  // vector of Points and returns the value of has_invertible_map()
+  // for that Elem.
+  bool test_elem(const std::vector<Point> & pts,
+                 ElemType elem_type)
+  {
+    // Construct Elem of desired type
+    auto [elem, nodes] = this->construct_elem(pts, elem_type);
+    libmesh_ignore(nodes);
 
     // Return whether or not this Elem has an invertible map
     return elem->has_invertible_map();
