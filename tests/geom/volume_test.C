@@ -516,6 +516,26 @@ public:
       Real aspect_ratio = elem->quality(ASPECT_RATIO);
       CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/2.5, /*actual=*/aspect_ratio, TOLERANCE);
     }
+
+    // Case 5) Trapezoid QUAD
+    {
+      auto test_trapezoid_quad = [this](Real a)
+      {
+        // 0 <= a <= 1/2
+        std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1-a, 1, 0), Point(a, 1, 0)};
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        Real aspect_ratio = elem->quality(ASPECT_RATIO);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1./(1. - a), /*actual=*/aspect_ratio, TOLERANCE);
+      };
+
+      // 3a) Test "simple" trapezoid with expected aspect ratio 1.5
+      test_trapezoid_quad(1./3);
+
+      // 3b) Test "degenerate" trapezoid with one zero length base
+      test_trapezoid_quad(0.5);
+    }
   }
 
 protected:
