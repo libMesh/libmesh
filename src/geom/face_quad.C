@@ -231,24 +231,13 @@ Real Quad::quality (const ElemQuality q) const
         Point m2 = 0.5 * (this->point(2) + this->point(3));
         Point m3 = 0.5 * (this->point(3) + this->point(0));
 
-        libMesh::out << "m0 = " << m0 << std::endl;
-        libMesh::out << "m1 = " << m1 << std::endl;
-        libMesh::out << "m2 = " << m2 << std::endl;
-        libMesh::out << "m3 = " << m3 << std::endl;
-
         // Compute vectors adjoining opposite side midpoints
         Point v0 = m2 - m0;
         Point v1 = m1 - m3;
 
-        libMesh::out << "v0 = " << v0 << std::endl;
-        libMesh::out << "v1 = " << v1 << std::endl;
-
         // Compute the length of the midlines
         Real v0_norm = v0.norm();
         Real v1_norm = v1.norm();
-
-        libMesh::out << "v0_norm = " << v0_norm << std::endl;
-        libMesh::out << "v1_norm = " << v1_norm << std::endl;
 
         // Instead of dividing by zero in the next step, just return
         // 0.  The optimal aspect ratio is 1.0, and "high" aspect
@@ -262,9 +251,6 @@ Real Quad::quality (const ElemQuality q) const
         Real sin_theta = cross_norm(v0, v1) / v0_norm / v1_norm;
         Real v0s = v0_norm*sin_theta;
         Real v1s = v1_norm*sin_theta;
-        libMesh::out << "sin_theta = " << sin_theta << std::endl;
-        libMesh::out << "v0_norm*sin_theta = " << v0s << std::endl;
-        libMesh::out << "v1_norm*sin_theta = " << v1s << std::endl;
 
         // Determine the min, max of each midline length and its
         // projection.
@@ -277,11 +263,6 @@ Real Quad::quality (const ElemQuality q) const
         // https://en.cppreference.com/w/cpp/algorithm/minmax
         auto [min0, max0] = std::minmax(v0_norm, v1s);
         auto [min1, max1] = std::minmax(v0s, v1_norm);
-
-        libMesh::out << "min0 = " << min0 << std::endl;
-        libMesh::out << "max0 = " << max0 << std::endl;
-        libMesh::out << "min1 = " << min1 << std::endl;
-        libMesh::out << "max1 = " << max1 << std::endl;
 
         // Return the max of the two quotients
         return std::max(max0/min0, max1/min1);
