@@ -238,7 +238,7 @@ public:
     // 113.8428, so we can see that the middle node is closer to the
     // left endpoint. In this case, it is too close and the element is
     // not invertible.
-    bool invertible = test_elem({
+    bool invertible = test_elem_invertible({
       Point(-3.566160e1, -6.690970e-1, 1.100328e2),
       Point(-3.566160e1, -6.690970e-1, 1.176528e2),
       Point(-3.566160e1, -6.690970e-1, 1.115568e2)}, EDGE3);
@@ -246,7 +246,7 @@ public:
 
     // 2.) Just like case 1, but now node 2 is at the midpoint, so
     // this case is invertible.
-    invertible = test_elem({
+    invertible = test_elem_invertible({
       Point(-3.566160e1, -6.690970e-1, 1.100328e2),
       Point(-3.566160e1, -6.690970e-1, 1.176528e2),
       Point(-3.566160e1, -6.690970e-1, 113.8428)}, EDGE3);
@@ -254,7 +254,7 @@ public:
 
     // 3.) Non-collinear case where the mid-edge node is "above" and "way
     // past" the right endpoint. This case is not invertible
-    invertible = test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(3.5, 1.5, 0)}, EDGE3);
+    invertible = test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(3.5, 1.5, 0)}, EDGE3);
     CPPUNIT_ASSERT(!invertible);
   }
 
@@ -272,13 +272,13 @@ public:
     {
       // x2 > -5/9, the map is still invertible
       bool invertible =
-        test_elem({Point(-1, 0, 0), Point(1, 0, 0), Point(-0.5, 0, 0), Point(Real(1)/3, 0, 0)},
+        test_elem_invertible({Point(-1, 0, 0), Point(1, 0, 0), Point(-0.5, 0, 0), Point(Real(1)/3, 0, 0)},
                   EDGE4);
       CPPUNIT_ASSERT(invertible);
 
       // x2 < -5/9, it is too close to x0 now
       invertible =
-        test_elem({Point(-1, 0, 0), Point(1, 0, 0), Point(-0.57, 0, 0), Point(Real(1)/3, 0, 0)},
+        test_elem_invertible({Point(-1, 0, 0), Point(1, 0, 0), Point(-0.57, 0, 0), Point(Real(1)/3, 0, 0)},
                   EDGE4);
       CPPUNIT_ASSERT(!invertible);
     }
@@ -287,13 +287,13 @@ public:
     {
       // x2 < 5/21, the map should still be invertible
       bool invertible =
-        test_elem({Point(-1, 0, 0), Point(1, 0, 0), Point(Real(3)/21, 0, 0), Point(Real(1)/3, 0, 0)},
+        test_elem_invertible({Point(-1, 0, 0), Point(1, 0, 0), Point(Real(3)/21, 0, 0), Point(Real(1)/3, 0, 0)},
                   EDGE4);
       CPPUNIT_ASSERT(invertible);
 
       // x2 > 5/21, x2 is too close to x3 now
       invertible =
-        test_elem({Point(-1, 0, 0), Point(1, 0, 0), Point(Real(6)/21, 0, 0), Point(Real(1)/3, 0, 0)},
+        test_elem_invertible({Point(-1, 0, 0), Point(1, 0, 0), Point(Real(6)/21, 0, 0), Point(Real(1)/3, 0, 0)},
                   EDGE4);
       CPPUNIT_ASSERT(!invertible);
     }
@@ -308,7 +308,7 @@ public:
     {
       // 1a) The reference element rotated into various different different planes.
       std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
-      bool invertible = test_elem(pts, QUAD4);
+      bool invertible = test_elem_invertible(pts, QUAD4);
       CPPUNIT_ASSERT(invertible);
 
       // 1b) Rotate all points about x-axis by 90 degrees
@@ -321,7 +321,7 @@ public:
       for (auto & pt : pts)
         pt = Rx * pt;
 
-      invertible = test_elem(pts, QUAD4);
+      invertible = test_elem_invertible(pts, QUAD4);
       CPPUNIT_ASSERT(invertible);
 
       // 1c) Rotate all points about z-axis by 90 degrees
@@ -332,7 +332,7 @@ public:
       for (auto & pt : pts)
         pt = Rz * pt;
 
-      invertible = test_elem(pts, QUAD4);
+      invertible = test_elem_invertible(pts, QUAD4);
       CPPUNIT_ASSERT(invertible);
 
       // 1d) Rotate all points about y-axis by 270 degrees
@@ -344,7 +344,7 @@ public:
         for (auto & pt : pts)
           pt = Ry * pt;
 
-      invertible = test_elem(pts, QUAD4);
+      invertible = test_elem_invertible(pts, QUAD4);
       CPPUNIT_ASSERT(invertible);
     }
 
@@ -359,7 +359,7 @@ public:
       const Real alpha = .5;
 
       bool invertible =
-        test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, alpha, 0), Point(0, 1, 0)}, QUAD4);
+        test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, alpha, 0), Point(0, 1, 0)}, QUAD4);
 
       CPPUNIT_ASSERT(!invertible);
     }
@@ -370,7 +370,7 @@ public:
       const Real alpha = -0.25;
 
       bool invertible =
-        test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, 1, 0), Point(0, 1, 0)}, QUAD4);
+        test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, 1, 0), Point(0, 1, 0)}, QUAD4);
 
       CPPUNIT_ASSERT(!invertible);
     }
@@ -381,7 +381,7 @@ public:
       const Real alpha = std::log(2);
 
       bool invertible =
-        test_elem({Point(alpha, alpha, alpha),
+        test_elem_invertible({Point(alpha, alpha, alpha),
                    Point(alpha, alpha, alpha),
                    Point(alpha, alpha, alpha),
                    Point(alpha, alpha, alpha)}, QUAD4);
@@ -398,10 +398,12 @@ public:
     // quadrilateral that have no effect on the quality of the
     // element.
     {
-      // 1a) The reference element rotated into various different different planes.
+      // Construct unit square QUAD4
       std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
       auto [elem, nodes] = this->construct_elem(pts, QUAD4);
       libmesh_ignore(nodes);
+
+      // 1a) Unit square aspect ratio should be == 1
       Real aspect_ratio = elem->quality(ASPECT_RATIO);
       CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
 
@@ -453,7 +455,7 @@ public:
     //   const Real alpha = .5;
     //
     //   bool invertible =
-    //     test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, alpha, 0), Point(0, 1, 0)}, QUAD4);
+    //     test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, alpha, 0), Point(0, 1, 0)}, QUAD4);
     //
     //   CPPUNIT_ASSERT(!invertible);
     // }
@@ -464,7 +466,7 @@ public:
     //   const Real alpha = -0.25;
     //
     //   bool invertible =
-    //     test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, 1, 0), Point(0, 1, 0)}, QUAD4);
+    //     test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, 1, 0), Point(0, 1, 0)}, QUAD4);
     //
     //   CPPUNIT_ASSERT(!invertible);
     // }
@@ -475,7 +477,7 @@ public:
     //   const Real alpha = std::log(2);
     //
     //   bool invertible =
-    //     test_elem({Point(alpha, alpha, alpha),
+    //     test_elem_invertible({Point(alpha, alpha, alpha),
     //                Point(alpha, alpha, alpha),
     //                Point(alpha, alpha, alpha),
     //                Point(alpha, alpha, alpha)}, QUAD4);
@@ -486,7 +488,7 @@ public:
 
 protected:
 
-  // Helper function that is called by test_elem() to build an Elem
+  // Helper function that is called by test_elem_invertible() to build an Elem
   // of the requested elem_type from the provided Points. Note: the
   // Nodes which are constructed in order to construct the Elem are
   // also returned since
@@ -514,15 +516,15 @@ protected:
     for (unsigned int i=0; i<n_points; i++)
       elem->set_node(i) = nodes[i].get();
 
-    // Return Elem we created
+    // Return Elem and Nodes we created
     return std::make_pair(std::move(elem), std::move(nodes));
   }
 
   // Helper function that builds the specified type of Elem from a
   // vector of Points and returns the value of has_invertible_map()
   // for that Elem.
-  bool test_elem(const std::vector<Point> & pts,
-                 ElemType elem_type)
+  bool test_elem_invertible(const std::vector<Point> & pts,
+                            ElemType elem_type)
   {
     // Construct Elem of desired type
     auto [elem, nodes] = this->construct_elem(pts, elem_type);
