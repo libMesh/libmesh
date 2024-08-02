@@ -444,21 +444,37 @@ public:
       CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
     }
 
-    // Case 2: Planar quad with top right vertex displaced to the position
-    // (alpha, alpha). Some different cases are described below.
-    // .) alpha==1: affine case, always invertible
-    // .) 1/2 < alpha < 1: planar case, invertible
-    // .) alpha<=1/2: planar case but node is now at center of the
-    //    element, should give a zero/negative Jacobian on the displaced
-    //    Node -> not invertible.
-    // {
-    //   const Real alpha = .5;
-    //
-    //   bool invertible =
-    //     test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, alpha, 0), Point(0, 1, 0)}, QUAD4);
-    //
-    //   CPPUNIT_ASSERT(!invertible);
-    // }
+    // Case 2: Rhombus QUAD4. This case should have an aspect ratio of
+    // 1/sin(theta), where theta is the acute interior angle of the
+    // rhombus.
+    {
+      // Helper lambda function that constructs a rhombus quad with
+      // interior acute angle theta.
+      auto test_rhombus_quad = [this](Real theta)
+      {
+        Real ct = std::cos(theta);
+        Real st = std::sin(theta);
+        std::vector<Point> pts = {
+          Point(0, 0, 0),
+          Point(1, 0, 0),
+          Point(1. + ct, st, 0),
+          Point(     ct, st, 0)};
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        // The expected aspect ratio for the rhombus is 1/sin(theta)
+        Real aspect_ratio = elem->quality(ASPECT_RATIO);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0/st, /*actual=*/aspect_ratio, TOLERANCE);
+      };
+
+      // 2a) Rhombus with interior angle theta=pi/6. The expected
+      // aspect ratio in this case is 1/std::sin(pi/6) = 2
+      test_rhombus_quad(libMesh::pi / 6);
+
+      // 2b) Rhombus with interior angle theta=pi/3. The expected
+      // aspect ratio in this case is 1/std::sin(pi/3) = 2/sqrt(3) = 1.155
+      test_rhombus_quad(libMesh::pi / 3);
+    }
 
     // Case 3) Top right corner is moved to (alpha, 1, 0). Element
     // becomes non-invertible when alpha < 0.
