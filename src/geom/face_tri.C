@@ -151,6 +151,65 @@ Real Tri::quality (const ElemQuality q) const
 {
   switch (q)
     {
+    case ASPECT_RATIO:
+      {
+        // Aspect Ratio definition from Ansys Theory Manual.
+        // Reference: Ansys, Inc. Theory Reference, Ansys Release 9.0, 2004 (Chapter: 13.7.3)
+
+        // Compute midpoint positions along each edge
+        Point m[3] = {
+          0.5 * (this->point(0) + this->point(1)),  // side opposite vertex 2
+          0.5 * (this->point(1) + this->point(2)),  // side opposite vertex 0
+          0.5 * (this->point(2) + this->point(0))}; // side opposite vertex 1
+
+        // opposite[i] is the side index which is "opposite" vertex i
+        static const unsigned int opposite[3] = {1, 2, 0};
+
+        // other[i] is the side index which is _not_ i and _not_ opposite[i]
+        static const unsigned int other[3] = {2, 0, 1};
+
+        // Input is vertex index, i = 0, 1, 2
+        auto vertex_aspect_ratio = [&](unsigned int i) -> Real
+        {
+          // Debugging
+          libMesh::out << "i = " << i
+                       << ", opposite = " << opposite[i]
+                       << ", other = " << other[i]
+                       << std::endl;
+
+          // Compute vectors:
+          // v0: (vertex v, opposite midpoint)
+          // v1: (midpoint[i], last midpoint)
+          Point v0 = m[opposite[i]] - this->point(i);
+          Point v1 = m[other[i]] - m[i];
+
+          // Compute the length of the midlines
+          Real v0_norm = v0.norm();
+          Real v1_norm = v1.norm();
+
+          // Instead of dividing by zero in the next step, just return
+          // 0.  The optimal aspect ratio is 1.0, and "high" aspect
+          // ratios are bad, but an aspect ratio of 0 should also be
+          // considered bad.
+          if (v0_norm == 0. || v1_norm == 0.)
+            return 0.;
+
+          // Compute sine of the angle between v0, v1.
+          Real sin_theta = cross_norm(v0, v1) / v0_norm / v1_norm;
+          Real v0s = v0_norm*sin_theta;
+          Real v1s = v1_norm*sin_theta;
+
+          // Determine the min, max of each midline length and its
+          // projection.
+          auto [min0, max0] = std::minmax(v0_norm, v1s);
+          auto [min1, max1] = std::minmax(v0s, v1_norm);
+
+          // Return the max of the two quotients
+          return std::max(max0/min0, max1/min1);
+        };
+
+        return std::max(std::max(vertex_aspect_ratio(0), vertex_aspect_ratio(1)), vertex_aspect_ratio(2)) / std::sqrt(3);
+      }
 
       /**
        * Source: Netgen, meshtool.cpp, TriangleQualityInst
