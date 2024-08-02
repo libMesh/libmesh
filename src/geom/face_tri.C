@@ -171,12 +171,6 @@ Real Tri::quality (const ElemQuality q) const
         // Input is vertex index, i = 0, 1, 2
         auto vertex_aspect_ratio = [&](unsigned int i) -> Real
         {
-          // Debugging
-          libMesh::out << "i = " << i
-                       << ", opposite = " << opposite[i]
-                       << ", other = " << other[i]
-                       << std::endl;
-
           // Compute vectors:
           // v0: (vertex v, opposite midpoint)
           // v1: (midpoint[i], last midpoint)
