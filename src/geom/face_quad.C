@@ -192,38 +192,46 @@ Real Quad::quality (const ElemQuality q) const
 {
   switch (q)
     {
+    case EDGE_LENGTH_RATIO:
+      {
+        // The CUBIT 15.1 User Documentation refers to this as the
+        // "Aspect Ratio" metric, however, we prefer the slightly more
+        // robust aspect ratio formula employed by Ansys, and have
+        // designated that as our ASPECT_RATIO metric here. We
+        // therefore refer to this quality metric as EDGE_LENGTH_RATIO
+        // instead.
+        //
+        // Note: consider a "rhombus". All four side lengths are
+        // equal, so the aspect ratio of this element, according to
+        // the EDGE_LENGTH_RATIO formula, is always 1.0, regardless of
+        // the internal angle "theta" of the rhombus. A more sensitive
+        // aspect ratio should take this internal angle into account,
+        // so that very thin "diamond" Quads are considered to have a
+        // "high" aspect ratio.
+        Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
+        Real
+          max = *std::max_element(lengths, lengths+4),
+          min = *std::min_element(lengths, lengths+4);
+
+        // Return 0. instead of dividing by zero.
+        if (min == 0.)
+          return 0.;
+        else
+          return max / min;
+      }
+
     case ASPECT_RATIO:
       {
-        // CUBIT 15.1 User Documentation:
-        // Aspect Ratio: Maximum edge length ratios
-        // Note: consider a "rhombus". All four side lengths are equal, so the
-        // aspect ratio of this element, according to the CUBIT formula, is always
-        // 1.0, regardless of the internal angle "theta" of the rhombus. A more
-        // sensitive aspect ratio should take this internal angle into account,
-        // so that very thin "diamond" Quads have a high aspect ratio.
-
-        // Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
-        // Real
-        //   max = *std::max_element(lengths, lengths+4),
-        //   min = *std::min_element(lengths, lengths+4);
-        //
-        // // Return 0. instead of dividing by zero.
-        // if (min == 0.)
-        //   return 0.;
-        // else
-        //   return max / min;
-
         // Aspect Ratio definition from Ansys Theory Manual.
         // Reference: Ansys, Inc. Theory Reference, Ansys Release 9.0, 2004 (Chapter: 13.7.3)
         //
         // For the rhombus case described above, the aspect ratio of
         // the element using the Ansys Aspect Ratio metric is
-        // 1/sin(theta), where theta is the acute interior angle
-        // formed by the crossing of the "midlines" which adjoin the
-        // midpoints of opposite sides of the quadrilateral. The
-        // aspect ratio therefore has a maximum value of 1.0 when
-        // theta = pi/2, and blows up to infinity as sin(theta) -> 0,
-        // rather than remaining equal to 1.0 as in the CUBIT formula.
+        // 1/sin(theta), where theta is the acute interior angle of
+        // the rhombus. The aspect ratio therefore has a minimum value
+        // of 1.0 (when theta = pi/2), and blows up to infinity as
+        // sin(theta) -> 0, rather than remaining equal to 1.0 as in
+        // the CUBIT formula.
 
         // Compute midpoint positions along each edge
         Point m0 = 0.5 * (this->point(0) + this->point(1));

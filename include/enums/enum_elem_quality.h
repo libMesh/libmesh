@@ -48,7 +48,8 @@ enum ElemQuality : int {
                   ASPECT_RATIO_GAMMA,
                   SIZE,
                   JACOBIAN,
-                  TWIST};
+                  TWIST,
+                  EDGE_LENGTH_RATIO};
 }
 
 #endif
