@@ -1592,8 +1592,9 @@ Real Elem::quality (const ElemQuality q) const
 {
   switch (q)
     {
-      // Aspect Ratio: Maximum edge length ratios
-    case ASPECT_RATIO:
+      // Return the maximum ratio of edge lengths, or zero if that
+      // maximum would otherwise be infinity.
+    case EDGE_LENGTH_RATIO:
       {
         if (this->dim() < 2)
           return 1;
