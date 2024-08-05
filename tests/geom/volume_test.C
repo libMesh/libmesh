@@ -37,6 +37,7 @@ public:
   CPPUNIT_TEST( testPrism6TrueCentroid );
   CPPUNIT_TEST( testHex20PLevelTrueCentroid );
   CPPUNIT_TEST( testQuad4AspectRatio );
+  CPPUNIT_TEST( testQuad4Warpage );
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST_SUITE_END();
 
@@ -581,6 +582,86 @@ public:
       Real aspect_ratio = elem->quality(ASPECT_RATIO);
       // libMesh::out << "TRI3 with leg length L = " << L << ", aspect ratio = " << aspect_ratio << std::endl;
       CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1)/std::sqrt(Real(3)) * (Real(2)*L + Real(1)/(2*L)), /*actual=*/aspect_ratio, TOLERANCE);
+    }
+  }
+
+  void testQuad4Warpage()
+  {
+    LOG_UNIT_TEST;
+
+    // Case 1: Test that rigid body rotations of a unit square
+    // quadrilateral that have no effect on the quality of the
+    // element.
+    {
+      // Construct unit square QUAD4
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+
+      // 1a) Any flat element should have warp == 1
+      Real warpage = elem->quality(WARP);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
+
+      // 1b) Rotate all points about x-axis by 90 degrees
+      Real cost = std::cos(.5*libMesh::pi);
+      Real sint = std::sin(.5*libMesh::pi);
+      RealTensorValue Rx(1, 0, 0,
+                         0, cost, sint,
+                         0, sint, cost);
+
+      for (auto & pt : pts)
+        pt = Rx * pt;
+
+      warpage = elem->quality(WARP);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
+
+      // 1c) Rotate all points about z-axis by 90 degrees
+      RealTensorValue Rz(cost, -sint, 0,
+                         sint,  cost, 0,
+                         0,        0, 1);
+
+      for (auto & pt : pts)
+        pt = Rz * pt;
+
+      warpage = elem->quality(WARP);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
+
+      // 1d) Rotate all points about y-axis by 270 degrees
+      RealTensorValue Ry(cost,  0, sint,
+                         0,     1, 0,
+                         -sint, 0, cost);
+
+      for (int cnt=0; cnt<3; ++cnt)
+        for (auto & pt : pts)
+          pt = Ry * pt;
+
+      warpage = elem->quality(WARP);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
+    }
+
+    // Case 2: Unit square quadrilateral with Node 2 displaced by a distance h in the z-direction.
+    {
+      auto test_warped_quad = [this](Real h)
+      {
+        std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, h), Point(0, 1, 0)};
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        Real warpage = elem->quality(WARP);
+        // libMesh::out << "QUAD with node 3 displaced by h = "
+        //              << h << " in the z-direction , warpage = " << warpage
+        //              << std::endl;
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1) / (h*h + 1), /*actual=*/warpage, TOLERANCE);
+      };
+
+      // For h = 0.1, the expected warpage value is ~ 0.991, so not
+      // much different than the value of 1.0 for a flat element.
+      test_warped_quad(0.1);
+
+      // For h = 0.3, the expected warpage value is ~ 0.917431, which
+      // is pretty close to the lower bound (0.9) of "acceptable"
+      // warpage, as suggested in the Cubit manual.
+      test_warped_quad(0.3);
     }
   }
 
