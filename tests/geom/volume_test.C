@@ -37,6 +37,7 @@ public:
   CPPUNIT_TEST( testPrism6TrueCentroid );
   CPPUNIT_TEST( testHex20PLevelTrueCentroid );
   CPPUNIT_TEST( testQuad4AspectRatio );
+  CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -535,6 +536,51 @@ public:
 
       // 3b) Test "degenerate" trapezoid with one zero length base
       test_trapezoid_quad(0.5);
+    }
+  }
+
+  void testTri3AspectRatio()
+  {
+    LOG_UNIT_TEST;
+
+    // Case 1) Reference TRI3
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, TRI3);
+      libmesh_ignore(nodes);
+
+      // Compute the aspect ratio for the reference Tri
+      // The expected value is ~ 1.44338
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      // libMesh::out << "Unit TRI3 aspect ratio = " << aspect_ratio << std::endl;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(5)/2/std::sqrt(Real(3)), /*actual=*/aspect_ratio, TOLERANCE);
+    }
+
+    // Case 2) Equilateral TRI3
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(0.5, 0.5*std::sqrt(3), 0)};
+      auto [elem, nodes] = this->construct_elem(pts, TRI3);
+      libmesh_ignore(nodes);
+
+      // Compute the aspect ratio for the reference Tri
+      // The expected value is 1.0
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      // libMesh::out << "Equilateral TRI3 aspect ratio = " << aspect_ratio << std::endl;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1), /*actual=*/aspect_ratio, TOLERANCE);
+    }
+
+    // Case 3) Reference TRI3 with one leg length = L >> 1
+    {
+      Real L = 10.;
+      std::vector<Point> pts = {Point(0, 0, 0), Point(L, 0, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, TRI3);
+      libmesh_ignore(nodes);
+
+      // Compute the aspect ratio for the reference Tri
+      // The expected value is ~ 11.5759
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      // libMesh::out << "TRI3 with leg length L = " << L << ", aspect ratio = " << aspect_ratio << std::endl;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1)/std::sqrt(Real(3)) * (Real(2)*L + Real(1)/(2*L)), /*actual=*/aspect_ratio, TOLERANCE);
     }
   }
 
