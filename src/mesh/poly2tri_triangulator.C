@@ -582,7 +582,7 @@ void Poly2TriTriangulator::triangulate_current_points()
                                "Triangulator segments reference nonexistent node id " <<
                                segment_start);
 
-          outer_boundary_points.emplace_back((*node)(0), (*node)(1));
+          outer_boundary_points.emplace_back(double((*node)(0)), double((*node)(1)));
           p2t::Point * pt = &outer_boundary_points.back();
 
           // We're not going to support overlapping nodes on the boundary
