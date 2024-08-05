@@ -442,6 +442,26 @@ Real Quad::quality (const ElemQuality q) const
         return 1.;
       }
 
+    case WARP:
+      {
+        // We compute the angle between the two planes formed by
+        // drawing an imaginary diagonal separating opposite vertices
+        // A and B, where (A,B) = (0,2) and (1,3). The element warpage
+        // is then taken to be the smaller of these two angles. For a
+        // flat quadrilateral, the planes are parallel, thus the angle
+        // between them is zero, and the element warpage is therefore
+        // 1.
+        //
+        // Reference: https://cubit.sandia.gov/files/cubit/16.08/help_manual/WebHelp/mesh_generation/mesh_quality_assessment/quadrilateral_metrics.htm
+        Point
+          n0 = (this->point(1) - this->point(0)).cross(this->point(3) - this->point(0)).unit(),
+          n1 = (this->point(2) - this->point(1)).cross(this->point(0) - this->point(1)).unit(),
+          n2 = (this->point(3) - this->point(2)).cross(this->point(1) - this->point(2)).unit(),
+          n3 = (this->point(0) - this->point(3)).cross(this->point(2) - this->point(3)).unit();
+
+        return std::min(n0*n2, n1*n3);
+      }
+
     default:
       return Elem::quality(q);
     }
