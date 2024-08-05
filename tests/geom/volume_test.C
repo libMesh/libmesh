@@ -9,6 +9,7 @@
 #include <libmesh/node.h>
 #include <libmesh/enum_to_string.h>
 #include <libmesh/tensor_value.h>
+#include <libmesh/enum_elem_quality.h>
 
 // unit test includes
 #include "test_comm.h"
@@ -35,6 +36,8 @@ public:
   CPPUNIT_TEST( testHex8TrueCentroid );
   CPPUNIT_TEST( testPrism6TrueCentroid );
   CPPUNIT_TEST( testHex20PLevelTrueCentroid );
+  CPPUNIT_TEST( testQuad4AspectRatio );
+  CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -236,7 +239,7 @@ public:
     // 113.8428, so we can see that the middle node is closer to the
     // left endpoint. In this case, it is too close and the element is
     // not invertible.
-    bool invertible = test_elem({
+    bool invertible = test_elem_invertible({
       Point(-3.566160e1, -6.690970e-1, 1.100328e2),
       Point(-3.566160e1, -6.690970e-1, 1.176528e2),
       Point(-3.566160e1, -6.690970e-1, 1.115568e2)}, EDGE3);
@@ -244,7 +247,7 @@ public:
 
     // 2.) Just like case 1, but now node 2 is at the midpoint, so
     // this case is invertible.
-    invertible = test_elem({
+    invertible = test_elem_invertible({
       Point(-3.566160e1, -6.690970e-1, 1.100328e2),
       Point(-3.566160e1, -6.690970e-1, 1.176528e2),
       Point(-3.566160e1, -6.690970e-1, 113.8428)}, EDGE3);
@@ -252,7 +255,7 @@ public:
 
     // 3.) Non-collinear case where the mid-edge node is "above" and "way
     // past" the right endpoint. This case is not invertible
-    invertible = test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(3.5, 1.5, 0)}, EDGE3);
+    invertible = test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(3.5, 1.5, 0)}, EDGE3);
     CPPUNIT_ASSERT(!invertible);
   }
 
@@ -270,13 +273,13 @@ public:
     {
       // x2 > -5/9, the map is still invertible
       bool invertible =
-        test_elem({Point(-1, 0, 0), Point(1, 0, 0), Point(-0.5, 0, 0), Point(Real(1)/3, 0, 0)},
+        test_elem_invertible({Point(-1, 0, 0), Point(1, 0, 0), Point(-0.5, 0, 0), Point(Real(1)/3, 0, 0)},
                   EDGE4);
       CPPUNIT_ASSERT(invertible);
 
       // x2 < -5/9, it is too close to x0 now
       invertible =
-        test_elem({Point(-1, 0, 0), Point(1, 0, 0), Point(-0.57, 0, 0), Point(Real(1)/3, 0, 0)},
+        test_elem_invertible({Point(-1, 0, 0), Point(1, 0, 0), Point(-0.57, 0, 0), Point(Real(1)/3, 0, 0)},
                   EDGE4);
       CPPUNIT_ASSERT(!invertible);
     }
@@ -285,13 +288,13 @@ public:
     {
       // x2 < 5/21, the map should still be invertible
       bool invertible =
-        test_elem({Point(-1, 0, 0), Point(1, 0, 0), Point(Real(3)/21, 0, 0), Point(Real(1)/3, 0, 0)},
+        test_elem_invertible({Point(-1, 0, 0), Point(1, 0, 0), Point(Real(3)/21, 0, 0), Point(Real(1)/3, 0, 0)},
                   EDGE4);
       CPPUNIT_ASSERT(invertible);
 
       // x2 > 5/21, x2 is too close to x3 now
       invertible =
-        test_elem({Point(-1, 0, 0), Point(1, 0, 0), Point(Real(6)/21, 0, 0), Point(Real(1)/3, 0, 0)},
+        test_elem_invertible({Point(-1, 0, 0), Point(1, 0, 0), Point(Real(6)/21, 0, 0), Point(Real(1)/3, 0, 0)},
                   EDGE4);
       CPPUNIT_ASSERT(!invertible);
     }
@@ -306,7 +309,7 @@ public:
     {
       // 1a) The reference element rotated into various different different planes.
       std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
-      bool invertible = test_elem(pts, QUAD4);
+      bool invertible = test_elem_invertible(pts, QUAD4);
       CPPUNIT_ASSERT(invertible);
 
       // 1b) Rotate all points about x-axis by 90 degrees
@@ -319,7 +322,7 @@ public:
       for (auto & pt : pts)
         pt = Rx * pt;
 
-      invertible = test_elem(pts, QUAD4);
+      invertible = test_elem_invertible(pts, QUAD4);
       CPPUNIT_ASSERT(invertible);
 
       // 1c) Rotate all points about z-axis by 90 degrees
@@ -330,7 +333,7 @@ public:
       for (auto & pt : pts)
         pt = Rz * pt;
 
-      invertible = test_elem(pts, QUAD4);
+      invertible = test_elem_invertible(pts, QUAD4);
       CPPUNIT_ASSERT(invertible);
 
       // 1d) Rotate all points about y-axis by 270 degrees
@@ -342,7 +345,7 @@ public:
         for (auto & pt : pts)
           pt = Ry * pt;
 
-      invertible = test_elem(pts, QUAD4);
+      invertible = test_elem_invertible(pts, QUAD4);
       CPPUNIT_ASSERT(invertible);
     }
 
@@ -357,7 +360,7 @@ public:
       const Real alpha = .5;
 
       bool invertible =
-        test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, alpha, 0), Point(0, 1, 0)}, QUAD4);
+        test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, alpha, 0), Point(0, 1, 0)}, QUAD4);
 
       CPPUNIT_ASSERT(!invertible);
     }
@@ -368,7 +371,7 @@ public:
       const Real alpha = -0.25;
 
       bool invertible =
-        test_elem({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, 1, 0), Point(0, 1, 0)}, QUAD4);
+        test_elem_invertible({Point(0, 0, 0), Point(1, 0, 0), Point(alpha, 1, 0), Point(0, 1, 0)}, QUAD4);
 
       CPPUNIT_ASSERT(!invertible);
     }
@@ -379,7 +382,7 @@ public:
       const Real alpha = std::log(2);
 
       bool invertible =
-        test_elem({Point(alpha, alpha, alpha),
+        test_elem_invertible({Point(alpha, alpha, alpha),
                    Point(alpha, alpha, alpha),
                    Point(alpha, alpha, alpha),
                    Point(alpha, alpha, alpha)}, QUAD4);
@@ -388,12 +391,207 @@ public:
     }
   }
 
+  void testQuad4AspectRatio()
+  {
+    LOG_UNIT_TEST;
+
+    // Case 1: Test that rigid body rotations of a unit square
+    // quadrilateral that have no effect on the quality of the
+    // element.
+    {
+      // Construct unit square QUAD4
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+
+      // 1a) Unit square aspect ratio should be == 1
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+
+      // 1b) Rotate all points about x-axis by 90 degrees
+      Real cost = std::cos(.5*libMesh::pi);
+      Real sint = std::sin(.5*libMesh::pi);
+      RealTensorValue Rx(1, 0, 0,
+                         0, cost, sint,
+                         0, sint, cost);
+
+      for (auto & pt : pts)
+        pt = Rx * pt;
+
+      aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+
+      // 1c) Rotate all points about z-axis by 90 degrees
+      RealTensorValue Rz(cost, -sint, 0,
+                         sint,  cost, 0,
+                         0,        0, 1);
+
+      for (auto & pt : pts)
+        pt = Rz * pt;
+
+      aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+
+      // 1d) Rotate all points about y-axis by 270 degrees
+      RealTensorValue Ry(cost,  0, sint,
+                         0,     1, 0,
+                         -sint, 0, cost);
+
+      for (int cnt=0; cnt<3; ++cnt)
+        for (auto & pt : pts)
+          pt = Ry * pt;
+
+      aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+    }
+
+    // Case 2: Rhombus QUAD4. This case should have an aspect ratio of
+    // 1/sin(theta), where theta is the acute interior angle of the
+    // rhombus.
+    {
+      // Helper lambda function that constructs a rhombus quad with
+      // interior acute angle theta.
+      auto test_rhombus_quad = [this](Real theta)
+      {
+        Real ct = std::cos(theta);
+        Real st = std::sin(theta);
+        std::vector<Point> pts = {
+          Point(0, 0, 0),
+          Point(1, 0, 0),
+          Point(1. + ct, st, 0),
+          Point(     ct, st, 0)};
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        // The expected aspect ratio for the rhombus is 1/sin(theta)
+        Real aspect_ratio = elem->quality(ASPECT_RATIO);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0/st, /*actual=*/aspect_ratio, TOLERANCE);
+      };
+
+      // 2a) Rhombus with interior angle theta=pi/6. The expected
+      // aspect ratio in this case is 1/std::sin(pi/6) = 2
+      test_rhombus_quad(libMesh::pi / 6);
+
+      // 2b) Rhombus with interior angle theta=pi/3. The expected
+      // aspect ratio in this case is 1/std::sin(pi/3) = 2/sqrt(3) = 1.155
+      test_rhombus_quad(libMesh::pi / 3);
+    }
+
+    // Case 3) Rectangle QUAD4. The "old" and "new" aspect ratio metrics
+    // return the same result for this case, whih is simply the ratio of
+    // the longest to shortest side.
+    {
+      auto test_rectangle_quad = [this](Real a)
+      {
+        std::vector<Point> pts = {Point(0, 0, 0), Point(a, 0, 0), Point(a, 1, 0), Point(0, 1, 0)};
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        // The expected aspect ratio for the rectangle is "a"
+        Real aspect_ratio = elem->quality(ASPECT_RATIO);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/a, /*actual=*/aspect_ratio, TOLERANCE);
+      };
+
+      // 3a) Test case twice as long as it is tall
+      test_rectangle_quad(2.0);
+
+      // 3b) Test no funny numerical stuff with extremely stretched case
+      test_rectangle_quad(1e6);
+    }
+
+    // Case 4) Degenerate QUAD with zero length side. In the "old"
+    // aspect ratio metric we'd just get zero (as a stand-in for
+    // infinity) for this case since the minimum side length is zero,
+    // but using the new metric we get a non-zero value of 2.5. Thus,
+    // in the new metric it is possible to compare the aspect ratios
+    // of different degenerate QUAD elements rather than simply
+    // assigning all such elements a quality value of 0. Degenerate
+    // quadrilaterals are sometimes used as a "hack" to avoid having a
+    // separate subdomain of TRIs, and (surprisingly) many finite
+    // element operations just "work" on such elements.
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 0, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/2.5, /*actual=*/aspect_ratio, TOLERANCE);
+    }
+
+    // Case 5) Trapezoid QUAD
+    {
+      auto test_trapezoid_quad = [this](Real a)
+      {
+        // 0 <= a <= 1/2
+        std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1-a, 1, 0), Point(a, 1, 0)};
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        Real aspect_ratio = elem->quality(ASPECT_RATIO);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1./(1. - a), /*actual=*/aspect_ratio, TOLERANCE);
+      };
+
+      // 3a) Test "simple" trapezoid with expected aspect ratio 1.5
+      test_trapezoid_quad(1./3);
+
+      // 3b) Test "degenerate" trapezoid with one zero length base
+      test_trapezoid_quad(0.5);
+    }
+  }
+
+  void testTri3AspectRatio()
+  {
+    LOG_UNIT_TEST;
+
+    // Case 1) Reference TRI3
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, TRI3);
+      libmesh_ignore(nodes);
+
+      // Compute the aspect ratio for the reference Tri
+      // The expected value is ~ 1.44338
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      // libMesh::out << "Unit TRI3 aspect ratio = " << aspect_ratio << std::endl;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(5)/2/std::sqrt(Real(3)), /*actual=*/aspect_ratio, TOLERANCE);
+    }
+
+    // Case 2) Equilateral TRI3
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(0.5, 0.5*std::sqrt(3), 0)};
+      auto [elem, nodes] = this->construct_elem(pts, TRI3);
+      libmesh_ignore(nodes);
+
+      // Compute the aspect ratio for the reference Tri
+      // The expected value is 1.0
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      // libMesh::out << "Equilateral TRI3 aspect ratio = " << aspect_ratio << std::endl;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1), /*actual=*/aspect_ratio, TOLERANCE);
+    }
+
+    // Case 3) Reference TRI3 with one leg length = L >> 1
+    {
+      Real L = 10.;
+      std::vector<Point> pts = {Point(0, 0, 0), Point(L, 0, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, TRI3);
+      libmesh_ignore(nodes);
+
+      // Compute the aspect ratio for the reference Tri
+      // The expected value is ~ 11.5759
+      Real aspect_ratio = elem->quality(ASPECT_RATIO);
+      // libMesh::out << "TRI3 with leg length L = " << L << ", aspect ratio = " << aspect_ratio << std::endl;
+      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1)/std::sqrt(Real(3)) * (Real(2)*L + Real(1)/(2*L)), /*actual=*/aspect_ratio, TOLERANCE);
+    }
+  }
+
 protected:
 
-  // Helper function that builds the specified type of Elem from a
-  // vector of Points and returns the value of has_invertible_map()
-  // for that Elem.
-  bool test_elem(const std::vector<Point> & pts,
+  // Helper function that is called by test_elem_invertible() to build an Elem
+  // of the requested elem_type from the provided Points. Note: the
+  // Nodes which are constructed in order to construct the Elem are
+  // also returned since
+  std::pair<std::unique_ptr<Elem>, std::vector<std::unique_ptr<Node>>>
+  construct_elem(const std::vector<Point> & pts,
                  ElemType elem_type)
   {
     const unsigned int n_points = pts.size();
@@ -415,6 +613,20 @@ protected:
 
     for (unsigned int i=0; i<n_points; i++)
       elem->set_node(i) = nodes[i].get();
+
+    // Return Elem and Nodes we created
+    return std::make_pair(std::move(elem), std::move(nodes));
+  }
+
+  // Helper function that builds the specified type of Elem from a
+  // vector of Points and returns the value of has_invertible_map()
+  // for that Elem.
+  bool test_elem_invertible(const std::vector<Point> & pts,
+                            ElemType elem_type)
+  {
+    // Construct Elem of desired type
+    auto [elem, nodes] = this->construct_elem(pts, elem_type);
+    libmesh_ignore(nodes);
 
     // Return whether or not this Elem has an invertible map
     return elem->has_invertible_map();

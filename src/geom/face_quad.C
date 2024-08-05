@@ -192,10 +192,22 @@ Real Quad::quality (const ElemQuality q) const
 {
   switch (q)
     {
-      // CUBIT 15.1 User Documentation:
-      // Aspect Ratio: Maximum edge length ratios
-    case ASPECT_RATIO:
+    case EDGE_LENGTH_RATIO:
       {
+        // The CUBIT 15.1 User Documentation refers to this as the
+        // "Aspect Ratio" metric, however, we prefer the slightly more
+        // robust aspect ratio formula employed by Ansys, and have
+        // designated that as our ASPECT_RATIO metric here. We
+        // therefore refer to this quality metric as EDGE_LENGTH_RATIO
+        // instead.
+        //
+        // Note: consider a "rhombus". All four side lengths are
+        // equal, so the aspect ratio of this element, according to
+        // the EDGE_LENGTH_RATIO formula, is always 1.0, regardless of
+        // the internal angle "theta" of the rhombus. A more sensitive
+        // aspect ratio should take this internal angle into account,
+        // so that very thin "diamond" Quads are considered to have a
+        // "high" aspect ratio.
         Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
         Real
           max = *std::max_element(lengths, lengths+4),
@@ -206,6 +218,62 @@ Real Quad::quality (const ElemQuality q) const
           return 0.;
         else
           return max / min;
+      }
+
+    case ASPECT_RATIO:
+      {
+        // Aspect Ratio definition from Ansys Theory Manual.
+        // Reference: Ansys, Inc. Theory Reference, Ansys Release 9.0, 2004 (Chapter: 13.7.3)
+        //
+        // For the rhombus case described above, the aspect ratio of
+        // the element using the Ansys Aspect Ratio metric is
+        // 1/sin(theta), where theta is the acute interior angle of
+        // the rhombus. The aspect ratio therefore has a minimum value
+        // of 1.0 (when theta = pi/2), and blows up to infinity as
+        // sin(theta) -> 0, rather than remaining equal to 1.0 as in
+        // the CUBIT formula.
+
+        // Compute midpoint positions along each edge
+        Point m0 = 0.5 * (this->point(0) + this->point(1));
+        Point m1 = 0.5 * (this->point(1) + this->point(2));
+        Point m2 = 0.5 * (this->point(2) + this->point(3));
+        Point m3 = 0.5 * (this->point(3) + this->point(0));
+
+        // Compute vectors adjoining opposite side midpoints
+        Point v0 = m2 - m0;
+        Point v1 = m1 - m3;
+
+        // Compute the length of the midlines
+        Real v0_norm = v0.norm();
+        Real v1_norm = v1.norm();
+
+        // Instead of dividing by zero in the next step, just return
+        // 0.  The optimal aspect ratio is 1.0, and "high" aspect
+        // ratios are bad, but an aspect ratio of 0 should also be
+        // considered bad.
+        if (v0_norm == 0. || v1_norm == 0.)
+          return 0.;
+
+        // Compute sine of the angle between v0, v1. For rectangular
+        // elements, sin_theta == 1.
+        Real sin_theta = cross_norm(v0, v1) / v0_norm / v1_norm;
+        Real v0s = v0_norm*sin_theta;
+        Real v1s = v1_norm*sin_theta;
+
+        // Determine the min, max of each midline length and its
+        // projection.
+        //
+        // Note: The return values min{0,1} and max{0,1} here are
+        // *references* and we cannot pass a temporary to
+        // std::minmax() since the reference returned becomes a
+        // dangling reference at "the end of the full expression that
+        // contains the call to std::minmax()"
+        // https://en.cppreference.com/w/cpp/algorithm/minmax
+        auto [min0, max0] = std::minmax(v0_norm, v1s);
+        auto [min1, max1] = std::minmax(v0s, v1_norm);
+
+        // Return the max of the two quotients
+        return std::max(max0/min0, max1/min1);
       }
 
       // Compute the min/max diagonal ratio.
