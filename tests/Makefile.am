@@ -73,6 +73,7 @@ unit_tests_sources = \
   mesh/mesh_function_dfem.C \
   mesh/mesh_generation_test.C \
   mesh/mesh_input.C \
+  mesh/mesh_smoother_test.C \
   mesh/mesh_stitch.C \
   mesh/mesh_tet_test.C \
   mesh/mesh_triangulation.C \
