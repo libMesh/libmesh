@@ -155,6 +155,13 @@ public:
   static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
   /**
+   * This maps the \f$ j^{th} \f$ node to the (in this case) 2 side
+   * ids adjacent to the node. The side numbering matches the one used
+   * in the side_nodes_map.
+   */
+  static const unsigned int adjacent_sides_map[num_nodes][/*Quad4::max_adjacent_sides*/2];
+
+  /**
    * An optimized method for computing the centroid of a
    * 4-node quad with straight sides.
    */

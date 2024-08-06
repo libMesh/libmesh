@@ -43,6 +43,13 @@ const unsigned int Quad4::side_nodes_map[Quad4::num_sides][Quad4::nodes_per_side
     {3, 0}  // Side 3
   };
 
+const unsigned int Quad4::adjacent_sides_map[Quad4::num_nodes][/*Quad4::max_adjacent_sides*/2] =
+  {
+    {0, 3},  // Sides adjacent to node 0
+    {0, 1},  // Sides adjacent to node 1
+    {1, 2},  // Sides adjacent to node 2
+    {2, 3}   // Sides adjacent to node 3
+  };
 
 #ifdef LIBMESH_ENABLE_AMR
 

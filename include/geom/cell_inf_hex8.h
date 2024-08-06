@@ -167,6 +167,14 @@ public:
    */
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
+  /**
+   * This maps the \f$ j^{th} \f$ node to the 3 (or fewer) edge ids adjacent
+   * to the node. The edge numbering matches the one used in the
+   * edge_nodes_map. An edge index of 99 is used to indicate that
+   * there is no adjacent edge.
+   */
+  static const unsigned int adjacent_edges_map[num_nodes][/*InfHex8::max_adjacent_edges*/3];
+
   virtual void permute(unsigned int perm_num) override final;
 
   virtual void flip(BoundaryInfo *) override final;

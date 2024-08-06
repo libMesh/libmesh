@@ -69,6 +69,19 @@ const unsigned int Hex8::edge_nodes_map[Hex8::num_edges][Hex8::nodes_per_edge] =
     {4, 7}  // Edge 11
   };
 
+const unsigned int Hex8::adjacent_edges_map[Hex8::num_nodes][/*Hex8::max_adjacent_edges*/3] =
+  {
+    {0, 3, 4},  // Edges adjacent to node 0
+    {0, 1, 5},  // Edges adjacent to node 1
+    {1, 2, 6},  // Edges adjacent to node 2
+    {2, 3, 7},  // Edges adjacent to node 3
+    {4, 8, 11}, // Edges adjacent to node 4
+    {5, 8, 9},  // Edges adjacent to node 5
+    {6, 9, 10}, // Edges adjacent to node 6
+    {7, 10, 11} // Edges adjacent to node 7
+  };
+
+
 // ------------------------------------------------------------
 // Hex8 class member functions
 

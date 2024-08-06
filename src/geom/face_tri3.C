@@ -41,6 +41,12 @@ const unsigned int Tri3::side_nodes_map[Tri3::num_sides][Tri3::nodes_per_side] =
     {2, 0}  // Side 2
   };
 
+const unsigned int Tri3::adjacent_sides_map[Tri3::num_nodes][/*Tri3::max_adjacent_sides*/2] =
+  {
+    {0, 2},  // Sides adjacent to node 0
+    {0, 1},  // Sides adjacent to node 1
+    {1, 2}   // Sides adjacent to node 2
+  };
 
 #ifdef LIBMESH_ENABLE_AMR
 

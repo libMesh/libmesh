@@ -145,6 +145,16 @@ const unsigned int Prism6::edge_nodes_map[Prism6::num_edges][Prism6::nodes_per_e
     {3, 5}  // Edge 8
   };
 
+const unsigned int Prism6::adjacent_edges_map[Prism6::num_nodes][/*Prism6::max_adjacent_edges*/3] =
+  {
+    {0, 2, 3},  // Edges adjacent to node 0
+    {0, 1, 4},  // Edges adjacent to node 1
+    {1, 2, 5},  // Edges adjacent to node 2
+    {3, 6, 8},  // Edges adjacent to node 3
+    {4, 6, 7},  // Edges adjacent to node 4
+    {5, 7, 8},  // Edges adjacent to node 5
+  };
+
 // ------------------------------------------------------------
 // Prism6 class member functions
 

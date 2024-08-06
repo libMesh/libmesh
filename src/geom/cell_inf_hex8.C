@@ -64,6 +64,18 @@ const unsigned int InfHex8::edge_nodes_map[InfHex8::num_edges][InfHex8::nodes_pe
     {3, 7}  // Edge 7
   };
 
+const unsigned int InfHex8::adjacent_edges_map[InfHex8::num_nodes][/*InfHex8::max_adjacent_edges*/3] =
+  {
+    {0,  3,  4}, // Edges adjacent to node 0
+    {0,  1,  5}, // Edges adjacent to node 1
+    {1,  2,  6}, // Edges adjacent to node 2
+    {2,  3,  7}, // Edges adjacent to node 3
+    {4, 99, 99}, // Edges adjacent to node 4
+    {5, 99, 99}, // Edges adjacent to node 5
+    {6, 99, 99}, // Edges adjacent to node 6
+    {7, 99, 99}  // Edges adjacent to node 7
+  };
+
 // ------------------------------------------------------------
 // InfHex8 class member functions
 

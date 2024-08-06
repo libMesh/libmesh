@@ -57,6 +57,14 @@ const unsigned int Tet4::edge_nodes_map[Tet4::num_edges][Tet4::nodes_per_edge] =
     {2, 3}  // Edge 5
   };
 
+const unsigned int Tet4::adjacent_edges_map[Tet4::num_nodes][/*Tet4::max_adjacent_edges*/3] =
+  {
+    {0, 2, 3},  // Edges adjacent to node 0
+    {0, 1, 4},  // Edges adjacent to node 1
+    {1, 2, 5},  // Edges adjacent to node 2
+    {3, 4, 5},  // Edges adjacent to node 3
+  };
+
 // ------------------------------------------------------------
 // Tet4 class member functions
 

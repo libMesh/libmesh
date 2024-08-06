@@ -180,6 +180,13 @@ public:
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
+   * This maps the \f$ j^{th} \f$ node to the (in this case) 3 edge
+   * ids adjacent to the node. The edge numbering matches the one used
+   * in the edge_nodes_map.
+   */
+  static const unsigned int adjacent_edges_map[num_nodes][/*Hex8::max_adjacent_edges*/3];
+
+  /**
    * Class static helper function that computes the centroid of a
    * hexahedral region from a set of input points which are assumed to
    * be in the standard "Hex8" ordering, possibly with some duplicates

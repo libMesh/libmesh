@@ -51,6 +51,13 @@ const unsigned int InfQuad4::side_nodes_map[InfQuad4::num_sides][InfQuad4::nodes
     {0, 2}  // Side 2
   };
 
+const unsigned int InfQuad4::adjacent_sides_map[InfQuad4::num_nodes][/*InfQuad4::max_adjacent_sides*/2] =
+  {
+    {0,  2}, // Sides adjacent to node 0
+    {0,  1}, // Sides adjacent to node 1
+    {2, 99}, // Sides adjacent to node 2
+    {1, 99}  // Sides adjacent to node 3
+  };
 
 
 #ifdef LIBMESH_ENABLE_AMR
