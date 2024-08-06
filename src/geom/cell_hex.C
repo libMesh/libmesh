@@ -37,7 +37,6 @@ namespace libMesh
 // Hex class static member initializations
 
 
-// We need to require C++11...
 const Real Hex::_master_points[27][3] =
   {
     {-1, -1, -1},

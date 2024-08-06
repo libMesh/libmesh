@@ -43,7 +43,6 @@ namespace libMesh
 // InfHex class static member initializations
 
 
-// We need to require C++11...
 const Real InfHex::_master_points[18][3] =
   {
     {-1, -1, 0},

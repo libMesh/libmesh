@@ -32,7 +32,6 @@ namespace libMesh
 // Prism class static member initializations
 
 
-// We need to require C++11...
 const Real Prism::_master_points[18][3] =
   {
     {0, 0, -1},

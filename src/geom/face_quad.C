@@ -34,7 +34,6 @@ namespace libMesh
 // Quad class static member initializations
 
 
-// We need to require C++11...
 const Real Quad::_master_points[9][3] =
   {
     {-1, -1},

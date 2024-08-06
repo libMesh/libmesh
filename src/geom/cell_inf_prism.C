@@ -37,7 +37,6 @@ namespace libMesh
 // InfPrism class static member initializations
 
 
-// We need to require C++11...
 const Real InfPrism::_master_points[12][3] =
   {
     {0, 0, 0},
