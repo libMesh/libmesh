@@ -28,12 +28,10 @@
 namespace libMesh
 {
 
-
-
 // ------------------------------------------------------------
 // Quad class static member initializations
-
-
+// Note: we can omit initialization of the third entry of each row because
+// static variables are automatically zero-initialized.
 const Real Quad::_master_points[9][3] =
   {
     {-1, -1},
