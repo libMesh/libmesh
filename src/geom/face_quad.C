@@ -189,33 +189,21 @@ Real Quad::quality (const ElemQuality q) const
 {
   switch (q)
     {
-    case EDGE_LENGTH_RATIO:
-      {
-        // The CUBIT 15.1 User Documentation refers to this as the
-        // "Aspect Ratio" metric, however, we prefer the slightly more
-        // robust aspect ratio formula employed by Ansys, and have
-        // designated that as our ASPECT_RATIO metric here. We
-        // therefore refer to this quality metric as EDGE_LENGTH_RATIO
-        // instead.
-        //
-        // Note: consider a "rhombus". All four side lengths are
-        // equal, so the aspect ratio of this element, according to
-        // the EDGE_LENGTH_RATIO formula, is always 1.0, regardless of
-        // the internal angle "theta" of the rhombus. A more sensitive
-        // aspect ratio should take this internal angle into account,
-        // so that very thin "diamond" Quads are considered to have a
-        // "high" aspect ratio.
-        Real lengths[4] = {this->length(0,1), this->length(1,2), this->length(2,3), this->length(3,0)};
-        Real
-          max = *std::max_element(lengths, lengths+4),
-          min = *std::min_element(lengths, lengths+4);
-
-        // Return 0. instead of dividing by zero.
-        if (min == 0.)
-          return 0.;
-        else
-          return max / min;
-      }
+      // The EDGE_LENGTH_RATIO metric is handled by the base class.
+      //
+      // The CUBIT 15.1 User Documentation refers to the
+      // EDGE_LENGTH_RATIO as the "Aspect Ratio" metric for Quads,
+      // however, we prefer the slightly more robust aspect ratio
+      // formula employed by Ansys, and have therefore designated that
+      // as our ASPECT_RATIO metric here.
+      //
+      // As a counter-example for employing the EDGE_LENGTH_RATIO in
+      // Quads, consider a "rhombus". All four side lengths are equal,
+      // so the EDGE_LENGTH_RATIO of this element is always (the
+      // optimal value) 1.0, regardless of the internal angle "theta"
+      // of the rhombus. A more sensitive shape quality metric should
+      // take this internal angle into account, so that very thin
+      // rhombus-shaped Quads are not considered optimal.
 
     case ASPECT_RATIO:
       {
