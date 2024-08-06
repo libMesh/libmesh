@@ -60,8 +60,10 @@ std::string name (const ElemQuality q);
 std::string describe (const ElemQuality q);
 
 /**
- * \returns The valid \p ElemQuality metrics for a given
- * \p ElemType element type.
+ * \returns The "valid" \p ElemQuality metrics for a given \p ElemType
+ * element type. Valid metrics are those which have Elem::qual_bounds()
+ * defined. Not all "valid" metrics are actually implemented in the
+ * code.
  */
 std::vector<ElemQuality> valid (const ElemType t);
 }

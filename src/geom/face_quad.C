@@ -463,7 +463,7 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
 
   switch (q)
     {
-
+    case EDGE_LENGTH_RATIO:
     case ASPECT_RATIO:
       bounds.first  = 1.;
       bounds.second = 4.;
