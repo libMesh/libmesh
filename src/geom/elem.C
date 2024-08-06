@@ -1592,35 +1592,28 @@ Real Elem::quality (const ElemQuality q) const
 {
   switch (q)
     {
-      // Aspect Ratio: Maximum edge length ratios
-    case ASPECT_RATIO:
+      // Return the maximum ratio of edge lengths, or zero if that
+      // maximum would otherwise be infinity.
+    case EDGE_LENGTH_RATIO:
       {
         if (this->dim() < 2)
           return 1;
 
-        std::vector<Real> edge_lengths;
-        for (auto e : make_range(this->n_edges()))
-          {
-            const Point p0 = this->point(this->local_edge_node(e,0)),
-                        p1 = this->point(this->local_edge_node(e,1));
+        std::vector<Real> edge_lengths(this->n_edges());
+        for (auto e : index_range(edge_lengths))
+          edge_lengths[e] = (this->point(this->local_edge_node(e,1)) -
+                             this->point(this->local_edge_node(e,0))).norm();
 
-            edge_lengths.push_back((p1-p0).norm());
-          }
+        auto [min, max] =
+          std::minmax_element(edge_lengths.begin(), edge_lengths.end());
 
-        const Real max = *std::max_element(edge_lengths.begin(),
-                                           edge_lengths.end()),
-                   min = *std::min_element(edge_lengths.begin(),
-                                           edge_lengths.end());
-
-        if (min == 0.)
+        if (*min == 0.)
           return 0.;
         else
-          return max / min;
+          return *max / *min;
       }
-      /**
-       * I don't know what to do for any other metric in general;
-       * subclasses may have specific overrides.
-       */
+
+      // Return 1 if we made it here
     default:
       {
         libmesh_do_once( libmesh_here();

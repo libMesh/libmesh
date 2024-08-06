@@ -30,9 +30,8 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Tri class static member initializations
-
-
-// We need to require C++11...
+// Note: we can omit initialization of the third entry of each row because
+// static variables are automatically zero-initialized.
 const Real Tri::_master_points[6][3] =
   {
     {0, 0},
@@ -42,10 +41,6 @@ const Real Tri::_master_points[6][3] =
     {0.5, 0.5},
     {0, 0.5}
   };
-
-
-
-
 
 
 
