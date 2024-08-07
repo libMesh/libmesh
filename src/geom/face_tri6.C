@@ -18,6 +18,7 @@
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/edge_edge3.h"
+#include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
@@ -138,6 +139,25 @@ std::vector<unsigned>
 Tri6::nodes_on_edge(const unsigned int e) const
 {
   return nodes_on_side(e);
+}
+
+std::vector<unsigned int>
+Tri6::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, n_nodes());
+
+  // For vertices, we use the Tri3::adjacent_sides_map, otherwise each
+  // of the mid-edge nodes is adjacent only to the edge it is on.
+  //
+  // Note: we cannot call the virtual Tri3::edges_adjacent_to_node(n)
+  // directly because we do not have an object to call it on.
+  if (is_vertex(n))
+    return {std::begin(Tri3::adjacent_sides_map[n]), std::end(Tri3::adjacent_sides_map[n])};
+
+  // Tri6 has only vertex and edge nodes.
+  libmesh_assert(is_edge(n));
+
+  return {n - n_vertices()};
 }
 
 bool Tri6::has_affine_map() const

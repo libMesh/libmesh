@@ -159,6 +159,13 @@ Tet4::nodes_on_edge(const unsigned int e) const
   return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
+std::vector<unsigned int>
+Tet4::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, n_nodes());
+  return {std::begin(adjacent_edges_map[n]), std::end(adjacent_edges_map[n])};
+}
+
 Order Tet4::default_order() const
 {
   return FIRST;

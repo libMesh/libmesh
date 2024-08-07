@@ -111,6 +111,14 @@ InfQuad4::nodes_on_edge(const unsigned int e) const
   return nodes_on_side(e);
 }
 
+std::vector<unsigned int>
+InfQuad4::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, n_nodes());
+  auto trim = (n < 2) ? 0 : 1;
+  return {std::begin(adjacent_sides_map[n]), std::end(adjacent_sides_map[n]) - trim};
+}
+
 bool InfQuad4::contains_point (const Point & p, Real tol) const
 {
   /*

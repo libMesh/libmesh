@@ -129,6 +129,13 @@ Tri3::nodes_on_edge(const unsigned int e) const
   return nodes_on_side(e);
 }
 
+std::vector<unsigned int>
+Tri3::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, n_nodes());
+  return {std::begin(adjacent_sides_map[n]), std::end(adjacent_sides_map[n])};
+}
+
 Order Tri3::default_order() const
 {
   return FIRST;

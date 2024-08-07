@@ -113,6 +113,14 @@ Pyramid5::nodes_on_edge(const unsigned int e) const
   return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
 }
 
+std::vector<unsigned int>
+Pyramid5::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, n_nodes());
+  auto trim = (n < 4) ? 1 : 0;
+  return {std::begin(adjacent_edges_map[n]), std::end(adjacent_edges_map[n]) - trim};
+}
+
 bool Pyramid5::is_node_on_edge(const unsigned int n,
                                const unsigned int e) const
 {

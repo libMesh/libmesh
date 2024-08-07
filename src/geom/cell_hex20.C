@@ -19,6 +19,7 @@
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/cell_hex20.h"
+#include "libmesh/cell_hex8.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_quad8.h"
 #include "libmesh/enum_io_package.h"
@@ -107,6 +108,25 @@ Hex20::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
   return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
+}
+
+std::vector<unsigned int>
+Hex20::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, n_nodes());
+
+  // For vertices, we use the Hex8::adjacent_sides_map, otherwise each
+  // of the mid-edge nodes is adjacent only to the edge it is on.
+  //
+  // Note: we cannot call the virtual Hex8::edges_adjacent_to_node(n)
+  // directly because we do not have an object to call it on.
+  if (is_vertex(n))
+    return {std::begin(Hex8::adjacent_edges_map[n]), std::end(Hex8::adjacent_edges_map[n])};
+
+  // Hex20 has only vertex and edge nodes.
+  libmesh_assert(is_edge(n));
+
+  return {n - n_vertices()};
 }
 
 bool Hex20::is_node_on_edge(const unsigned int n,
