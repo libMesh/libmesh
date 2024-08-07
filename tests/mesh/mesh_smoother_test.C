@@ -72,7 +72,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    const unsigned int n_elems_per_side = 4;
+    constexpr unsigned int n_elems_per_side = 4;
 
     MeshTools::Generation::build_square(mesh, n_elems_per_side, n_elems_per_side,
                                         0.,1.,0.,1., type);
@@ -82,7 +82,7 @@ public:
     MeshTools::Modification::redistribute(mesh, ds);
 
     // Assert the distortion is as expected
-    auto center_distortion_is = [n_elems_per_side]
+    auto center_distortion_is = []
       (const Node & node, int d, bool distortion,
        Real distortion_tol=TOLERANCE) {
       const Real r = node(d);
