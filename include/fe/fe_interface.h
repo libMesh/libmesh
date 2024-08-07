@@ -136,10 +136,11 @@ public:
    * \returns The number of DOFs for \p elem for finite element type \p fe_t
    *
    * The p_level() of \p elem is accounted for internally by
-   * increasing the Order of the passed-in FEType as necessary.
+   * increasing the Order of the passed-in FEType if \p add_p_level is true.
    */
   static unsigned int n_dofs(const FEType & fe_t,
-                             const Elem * elem);
+                             const Elem * elem,
+                             const bool add_p_level = true);
 
   /**
    * \returns The number of DOFs for \p elem for finite element type \p fe_t
@@ -198,7 +199,7 @@ public:
   static unsigned int n_dofs_at_node(const FEType & fe_t,
                                      const Elem * elem,
                                      const unsigned int n,
-                                     bool add_p_level=true);
+                                     const bool add_p_level = true);
 
   /**
    * \returns The number of dofs at node n for a finite element
@@ -228,7 +229,7 @@ public:
    */
   static unsigned int n_dofs_per_elem(const FEType & fe_t,
                                       const Elem * elem,
-                                      bool add_p_level = true);
+                                      const bool add_p_level = true);
 
   /**
    * Same thing but internally elem->p_level() is ignored and extra_order is used instead.
@@ -252,7 +253,7 @@ public:
                            const FEType & fe_t,
                            unsigned int s,
                            std::vector<unsigned int> & di,
-                           bool add_p_level=true);
+                           const bool add_p_level = true);
 
   /**
    * Fills the vector di with the local degree of freedom indices
@@ -269,7 +270,7 @@ public:
                            const FEType & fe_t,
                            unsigned int e,
                            std::vector<unsigned int> & di,
-                           bool add_p_level=true);
+                           const bool add_p_level = true);
 
   /**
    * Build the nodal soln from the element soln.
@@ -292,7 +293,7 @@ public:
                          const Elem * elem,
                          const std::vector<Number> & elem_soln,
                          std::vector<Number> & nodal_soln,
-                         bool add_p_level = true);
+                         const bool add_p_level = true);
 
 
   /**
@@ -308,7 +309,7 @@ public:
                               const unsigned int side,
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln,
-                              bool add_p_level = true);
+                              const bool add_p_level = true);
 
   /**
    * This is now deprecated; use FEMap::map instead.

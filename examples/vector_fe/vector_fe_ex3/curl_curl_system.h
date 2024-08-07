@@ -40,6 +40,9 @@ public:
                  const std::string & name,
                  const unsigned int number);
 
+  // Setter for the FE approximation order.
+  void order(const Order & order) {u_order = order;};
+
   // System initialization
   virtual void init_data ();
 
@@ -57,6 +60,9 @@ public:
 protected:
   // Indices for each variable;
   unsigned int u_var;
+
+  // FE approximation order.
+  Order u_order;
 
   void init_dirichlet_bcs();
 

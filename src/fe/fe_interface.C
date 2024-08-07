@@ -631,7 +631,8 @@ FEInterface::n_dofs (const unsigned int dim,
 
 unsigned int
 FEInterface::n_dofs(const FEType & fe_t,
-                    const Elem * elem)
+                    const Elem * elem,
+                    const bool add_p_level)
 {
   // dim is required by the fe_with_vec_switch macro
   auto dim = elem->dim();
@@ -645,7 +646,7 @@ FEInterface::n_dofs(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + elem->p_level());
+  auto total_order = static_cast<Order>(fe_t.order + add_p_level*elem->p_level());
 
   fe_with_vec_switch(n_dofs(elem->type(), total_order));
 }
@@ -2860,6 +2861,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case TRI7:
         case QUAD8:
         case QUAD9:
+          return 5;
         case TET10:
         case TET14:
         case HEX20:
@@ -2877,6 +2879,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case TRI7:
         case QUAD8:
         case QUAD9:
+          return 5;
         case TET14:
         case HEX27:
           return 1;
