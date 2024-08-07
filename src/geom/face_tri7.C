@@ -133,8 +133,10 @@ bool Tri7::is_edge(const unsigned int i) const
   return true;
 }
 
-bool Tri7::is_face(const unsigned int) const
+bool Tri7::is_face(const unsigned int i) const
 {
+  if (i > 5)
+    return true;
   return false;
 }
 
