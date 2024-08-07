@@ -271,7 +271,7 @@ public:
   }
 
 
-#ifdef LIBMESH_HAVE_TRIANGLE
+#ifdef LIBMESH_HAVE_TETGEN
   void testTetGen()
   {
     LOG_UNIT_TEST;
