@@ -171,6 +171,9 @@ public:
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int) const override
   { remote_elem_error("nodes_on_edge"); return {0}; }
 
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int) const override
+  { remote_elem_error("edges_adjacent_to_node"); return {0};}
+
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override
   { remote_elem_error("sides_on_edge"); return {0}; }
 
