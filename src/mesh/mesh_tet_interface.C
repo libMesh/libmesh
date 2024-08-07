@@ -38,7 +38,10 @@ namespace {
                         std::unordered_set<Elem *> & current_component,
                         Elem * elem)
   {
-    libmesh_assert(elem);
+    libmesh_error_msg_if
+      (!elem,
+       "Missing element when trying to identify boundary component to mesh.\n"
+       "Perhaps a boundary element does not have all neighbor pointers set?\n");
 
     if (current_component.count(elem))
       return;
