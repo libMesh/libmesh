@@ -41,13 +41,6 @@ const unsigned int Tri3::side_nodes_map[Tri3::num_sides][Tri3::nodes_per_side] =
     {2, 0}  // Side 2
   };
 
-const unsigned int Tri3::adjacent_sides_map[Tri3::num_nodes][/*Tri3::max_adjacent_sides*/2] =
-  {
-    {0, 2},  // Sides adjacent to node 0
-    {0, 1},  // Sides adjacent to node 1
-    {1, 2}   // Sides adjacent to node 2
-  };
-
 #ifdef LIBMESH_ENABLE_AMR
 
 const Real Tri3::_embedding_matrix[Tri3::num_children][Tri3::num_nodes][Tri3::num_nodes] =
@@ -127,13 +120,6 @@ std::vector<unsigned>
 Tri3::nodes_on_edge(const unsigned int e) const
 {
   return nodes_on_side(e);
-}
-
-std::vector<unsigned int>
-Tri3::edges_adjacent_to_node(const unsigned int n) const
-{
-  libmesh_assert_less(n, n_nodes());
-  return {std::begin(adjacent_sides_map[n]), std::end(adjacent_sides_map[n])};
 }
 
 Order Tri3::default_order() const
