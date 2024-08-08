@@ -62,16 +62,6 @@ const unsigned int InfPrism6::edge_nodes_map[InfPrism6::num_edges][InfPrism6::no
     {2, 5}  // Edge 5
   };
 
-const unsigned int InfPrism6::adjacent_edges_map[InfPrism6::num_nodes][/*InfPrism6::max_adjacent_edges*/3] =
-  {
-    {0,  2,  3}, // Edges adjacent to node 0
-    {0,  1,  4}, // Edges adjacent to node 1
-    {1,  2,  5}, // Edges adjacent to node 2
-    {3, 99, 99}, // Edges adjacent to node 3
-    {4, 99, 99}, // Edges adjacent to node 4
-    {5, 99, 99}, // Edges adjacent to node 5
-  };
-
 // ------------------------------------------------------------
 // InfPrism6 class member functions
 
