@@ -43,14 +43,6 @@ const unsigned int Quad4::side_nodes_map[Quad4::num_sides][Quad4::nodes_per_side
     {3, 0}  // Side 3
   };
 
-const unsigned int Quad4::adjacent_sides_map[Quad4::num_nodes][/*Quad4::max_adjacent_sides*/2] =
-  {
-    {0, 3},  // Sides adjacent to node 0
-    {0, 1},  // Sides adjacent to node 1
-    {1, 2},  // Sides adjacent to node 2
-    {2, 3}   // Sides adjacent to node 3
-  };
-
 #ifdef LIBMESH_ENABLE_AMR
 
 const Real Quad4::_embedding_matrix[Quad4::num_children][Quad4::num_nodes][Quad4::num_nodes] =
@@ -136,13 +128,6 @@ std::vector<unsigned>
 Quad4::nodes_on_edge(const unsigned int e) const
 {
   return nodes_on_side(e);
-}
-
-std::vector<unsigned int>
-Quad4::edges_adjacent_to_node(const unsigned int n) const
-{
-  libmesh_assert_less(n, n_nodes());
-  return {std::begin(adjacent_sides_map[n]), std::end(adjacent_sides_map[n])};
 }
 
 bool Quad4::has_affine_map() const
