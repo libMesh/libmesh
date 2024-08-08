@@ -221,11 +221,12 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_deletions.C mesh/mesh_extruder.C \
 	mesh/mesh_function.C mesh/mesh_function_dfem.C \
 	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_stitch.C mesh/mesh_tet_test.C \
-	mesh/mesh_triangulation.C mesh/mixed_dim_mesh_test.C \
-	mesh/mixed_order_test.C mesh/nodal_neighbors.C \
-	mesh/libmesh_poly2tri.C mesh/libmesh_netgen.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
+	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
+	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
+	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -317,6 +318,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_input.$(OBJEXT) \
+	mesh/unit_tests_dbg-mesh_smoother_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_stitch.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_tet_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-mesh_triangulation.$(OBJEXT) \
@@ -415,11 +417,12 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_deletions.C mesh/mesh_extruder.C \
 	mesh/mesh_function.C mesh/mesh_function_dfem.C \
 	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_stitch.C mesh/mesh_tet_test.C \
-	mesh/mesh_triangulation.C mesh/mixed_dim_mesh_test.C \
-	mesh/mixed_order_test.C mesh/nodal_neighbors.C \
-	mesh/libmesh_poly2tri.C mesh/libmesh_netgen.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
+	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
+	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
+	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -510,6 +513,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_input.$(OBJEXT) \
+	mesh/unit_tests_devel-mesh_smoother_test.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_stitch.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_tet_test.$(OBJEXT) \
 	mesh/unit_tests_devel-mesh_triangulation.$(OBJEXT) \
@@ -604,11 +608,12 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_deletions.C mesh/mesh_extruder.C \
 	mesh/mesh_function.C mesh/mesh_function_dfem.C \
 	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_stitch.C mesh/mesh_tet_test.C \
-	mesh/mesh_triangulation.C mesh/mixed_dim_mesh_test.C \
-	mesh/mixed_order_test.C mesh/nodal_neighbors.C \
-	mesh/libmesh_poly2tri.C mesh/libmesh_netgen.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
+	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
+	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
+	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -699,6 +704,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_input.$(OBJEXT) \
+	mesh/unit_tests_oprof-mesh_smoother_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_stitch.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_tet_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-mesh_triangulation.$(OBJEXT) \
@@ -793,11 +799,12 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_deletions.C mesh/mesh_extruder.C \
 	mesh/mesh_function.C mesh/mesh_function_dfem.C \
 	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_stitch.C mesh/mesh_tet_test.C \
-	mesh/mesh_triangulation.C mesh/mixed_dim_mesh_test.C \
-	mesh/mixed_order_test.C mesh/nodal_neighbors.C \
-	mesh/libmesh_poly2tri.C mesh/libmesh_netgen.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
+	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
+	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
+	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -888,6 +895,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_input.$(OBJEXT) \
+	mesh/unit_tests_opt-mesh_smoother_test.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_stitch.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_tet_test.$(OBJEXT) \
 	mesh/unit_tests_opt-mesh_triangulation.$(OBJEXT) \
@@ -982,11 +990,12 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_deletions.C mesh/mesh_extruder.C \
 	mesh/mesh_function.C mesh/mesh_function_dfem.C \
 	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_stitch.C mesh/mesh_tet_test.C \
-	mesh/mesh_triangulation.C mesh/mixed_dim_mesh_test.C \
-	mesh/mixed_order_test.C mesh/nodal_neighbors.C \
-	mesh/libmesh_poly2tri.C mesh/libmesh_netgen.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
+	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
+	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
+	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -1077,6 +1086,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_function_dfem.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_generation_test.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_input.$(OBJEXT) \
+	mesh/unit_tests_prof-mesh_smoother_test.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_stitch.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_tet_test.$(OBJEXT) \
 	mesh/unit_tests_prof-mesh_triangulation.$(OBJEXT) \
@@ -1339,6 +1349,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po \
+	mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_tet_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mesh_triangulation.Po \
@@ -1375,6 +1386,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po \
+	mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_tet_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mesh_triangulation.Po \
@@ -1411,6 +1423,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po \
+	mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_tet_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mesh_triangulation.Po \
@@ -1447,6 +1460,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po \
+	mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_tet_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mesh_triangulation.Po \
@@ -1483,6 +1497,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po \
+	mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_tet_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mesh_triangulation.Po \
@@ -2212,11 +2227,12 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	mesh/mesh_deletions.C mesh/mesh_extruder.C \
 	mesh/mesh_function.C mesh/mesh_function_dfem.C \
 	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_stitch.C mesh/mesh_tet_test.C \
-	mesh/mesh_triangulation.C mesh/mixed_dim_mesh_test.C \
-	mesh/mixed_order_test.C mesh/nodal_neighbors.C \
-	mesh/libmesh_poly2tri.C mesh/libmesh_netgen.C \
-	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
+	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
+	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
+	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
+	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
+	mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -2568,6 +2584,8 @@ mesh/unit_tests_dbg-mesh_generation_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_dbg-mesh_smoother_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-mesh_stitch.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-mesh_tet_test.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -2852,6 +2870,8 @@ mesh/unit_tests_devel-mesh_generation_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_devel-mesh_smoother_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-mesh_stitch.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-mesh_tet_test.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -3088,6 +3108,8 @@ mesh/unit_tests_oprof-mesh_generation_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_oprof-mesh_smoother_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-mesh_stitch.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-mesh_tet_test.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -3324,6 +3346,8 @@ mesh/unit_tests_opt-mesh_generation_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_opt-mesh_smoother_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-mesh_stitch.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-mesh_tet_test.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -3560,6 +3584,8 @@ mesh/unit_tests_prof-mesh_generation_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-mesh_input.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_prof-mesh_smoother_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-mesh_stitch.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-mesh_tet_test.$(OBJEXT): mesh/$(am__dirstamp) \
@@ -3895,6 +3921,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_tet_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mesh_triangulation.Po@am__quote@ # am--include-marker
@@ -3931,6 +3958,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_tet_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mesh_triangulation.Po@am__quote@ # am--include-marker
@@ -3967,6 +3995,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_tet_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mesh_triangulation.Po@am__quote@ # am--include-marker
@@ -4003,6 +4032,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_tet_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mesh_triangulation.Po@am__quote@ # am--include-marker
@@ -4039,6 +4069,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_tet_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mesh_triangulation.Po@am__quote@ # am--include-marker
@@ -5012,6 +5043,20 @@ mesh/unit_tests_dbg-mesh_input.obj: mesh/mesh_input.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_dbg-mesh_input.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
+
+mesh/unit_tests_dbg-mesh_smoother_test.o: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_smoother_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Tpo -c -o mesh/unit_tests_dbg-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_dbg-mesh_smoother_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+
+mesh/unit_tests_dbg-mesh_smoother_test.obj: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_smoother_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Tpo -c -o mesh/unit_tests_dbg-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_dbg-mesh_smoother_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
 
 mesh/unit_tests_dbg-mesh_stitch.o: mesh/mesh_stitch.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-mesh_stitch.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-mesh_stitch.Tpo -c -o mesh/unit_tests_dbg-mesh_stitch.o `test -f 'mesh/mesh_stitch.C' || echo '$(srcdir)/'`mesh/mesh_stitch.C
@@ -6595,6 +6640,20 @@ mesh/unit_tests_devel-mesh_input.obj: mesh/mesh_input.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
 
+mesh/unit_tests_devel-mesh_smoother_test.o: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_smoother_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Tpo -c -o mesh/unit_tests_devel-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_devel-mesh_smoother_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+
+mesh/unit_tests_devel-mesh_smoother_test.obj: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_smoother_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Tpo -c -o mesh/unit_tests_devel-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_devel-mesh_smoother_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
+
 mesh/unit_tests_devel-mesh_stitch.o: mesh/mesh_stitch.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-mesh_stitch.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Tpo -c -o mesh/unit_tests_devel-mesh_stitch.o `test -f 'mesh/mesh_stitch.C' || echo '$(srcdir)/'`mesh/mesh_stitch.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Tpo mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Po
@@ -8176,6 +8235,20 @@ mesh/unit_tests_oprof-mesh_input.obj: mesh/mesh_input.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_input.C' object='mesh/unit_tests_oprof-mesh_input.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
+
+mesh/unit_tests_oprof-mesh_smoother_test.o: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_smoother_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Tpo -c -o mesh/unit_tests_oprof-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_oprof-mesh_smoother_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+
+mesh/unit_tests_oprof-mesh_smoother_test.obj: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_smoother_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Tpo -c -o mesh/unit_tests_oprof-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_oprof-mesh_smoother_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
 
 mesh/unit_tests_oprof-mesh_stitch.o: mesh/mesh_stitch.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-mesh_stitch.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-mesh_stitch.Tpo -c -o mesh/unit_tests_oprof-mesh_stitch.o `test -f 'mesh/mesh_stitch.C' || echo '$(srcdir)/'`mesh/mesh_stitch.C
@@ -9759,6 +9832,20 @@ mesh/unit_tests_opt-mesh_input.obj: mesh/mesh_input.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
 
+mesh/unit_tests_opt-mesh_smoother_test.o: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_smoother_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Tpo -c -o mesh/unit_tests_opt-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_opt-mesh_smoother_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+
+mesh/unit_tests_opt-mesh_smoother_test.obj: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_smoother_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Tpo -c -o mesh/unit_tests_opt-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_opt-mesh_smoother_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
+
 mesh/unit_tests_opt-mesh_stitch.o: mesh/mesh_stitch.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-mesh_stitch.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Tpo -c -o mesh/unit_tests_opt-mesh_stitch.o `test -f 'mesh/mesh_stitch.C' || echo '$(srcdir)/'`mesh/mesh_stitch.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Tpo mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Po
@@ -11341,6 +11428,20 @@ mesh/unit_tests_prof-mesh_input.obj: mesh/mesh_input.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mesh_input.obj `if test -f 'mesh/mesh_input.C'; then $(CYGPATH_W) 'mesh/mesh_input.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_input.C'; fi`
 
+mesh/unit_tests_prof-mesh_smoother_test.o: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_smoother_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Tpo -c -o mesh/unit_tests_prof-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_prof-mesh_smoother_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mesh_smoother_test.o `test -f 'mesh/mesh_smoother_test.C' || echo '$(srcdir)/'`mesh/mesh_smoother_test.C
+
+mesh/unit_tests_prof-mesh_smoother_test.obj: mesh/mesh_smoother_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_smoother_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Tpo -c -o mesh/unit_tests_prof-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/mesh_smoother_test.C' object='mesh/unit_tests_prof-mesh_smoother_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-mesh_smoother_test.obj `if test -f 'mesh/mesh_smoother_test.C'; then $(CYGPATH_W) 'mesh/mesh_smoother_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/mesh_smoother_test.C'; fi`
+
 mesh/unit_tests_prof-mesh_stitch.o: mesh/mesh_stitch.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-mesh_stitch.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Tpo -c -o mesh/unit_tests_prof-mesh_stitch.o `test -f 'mesh/mesh_stitch.C' || echo '$(srcdir)/'`mesh/mesh_stitch.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Tpo mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Po
@@ -12763,6 +12864,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_triangulation.Po
@@ -12799,6 +12901,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_triangulation.Po
@@ -12835,6 +12938,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_triangulation.Po
@@ -12871,6 +12975,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_triangulation.Po
@@ -12907,6 +13012,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_triangulation.Po
@@ -13375,6 +13481,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mesh_triangulation.Po
@@ -13411,6 +13518,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mesh_triangulation.Po
@@ -13447,6 +13555,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mesh_triangulation.Po
@@ -13483,6 +13592,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mesh_triangulation.Po
@@ -13519,6 +13629,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_function_dfem.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_generation_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_input.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_smoother_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_stitch.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_tet_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mesh_triangulation.Po
