@@ -92,8 +92,6 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
 
-  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int n) const override;
-
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge (== is_node_on_side in 2D).
@@ -146,14 +144,6 @@ public:
    * element node numbers.
    */
   static const unsigned int side_nodes_map[num_sides][nodes_per_side];
-
-  /**
-   * This maps the \f$ j^{th} \f$ node to the one or two side id(s)
-   * adjacent to the node. The side numbering matches the one used in
-   * the side_nodes_map. A side index of 99 is used to indicate that
-   * there is no adjacent side.
-   */
-  static const unsigned int adjacent_sides_map[num_nodes][/*InfQuad4::max_adjacent_sides*/2];
 
   ElemType side_type (const unsigned int s) const override final;
 

@@ -23,7 +23,6 @@
 
 // Local includes
 #include "libmesh/face_inf_quad6.h"
-#include "libmesh/face_inf_quad4.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/side.h"
 #include "libmesh/edge_inf_edge2.h"
@@ -75,27 +74,6 @@ std::vector<unsigned>
 InfQuad6::nodes_on_edge(const unsigned int e) const
 {
   return nodes_on_side(e);
-}
-
-std::vector<unsigned int>
-InfQuad6::edges_adjacent_to_node(const unsigned int n) const
-{
-  libmesh_assert_less(n, n_nodes());
-
-  // For vertices, we use the InfQuad4::adjacent_sides_map, otherwise node
-  // 4 is on side 0 and node 5 is not any any side.
-  //
-  // Note: we cannot call the virtual InfQuad4::edges_adjacent_to_node(n)
-  // directly because we do not have an object to call it on.
-  if (n < n_vertices())
-    {
-      auto trim = (n < 2) ? 0 : 1;
-      return {std::begin(InfQuad4::adjacent_sides_map[n]), std::end(InfQuad4::adjacent_sides_map[n]) - trim};
-    }
-  else if (n == 4)
-    return {0};
-  else
-    return {};
 }
 
 #ifdef LIBMESH_ENABLE_AMR
