@@ -19,7 +19,6 @@
 // Local includes
 #include "libmesh/side.h"
 #include "libmesh/cell_prism20.h"
-#include "libmesh/cell_prism6.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_quad9.h"
 #include "libmesh/face_tri7.h"
@@ -111,26 +110,6 @@ Prism20::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
   return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
-}
-
-std::vector<unsigned int>
-Prism20::edges_adjacent_to_node(const unsigned int n) const
-{
-  libmesh_assert_less(n, n_nodes());
-
-  // For vertices, we use the Prism6::adjacent_sides_map, otherwise each
-  // of the mid-edge nodes is adjacent only to the edge it is on, and
-  // face nodes are not adjacent to any edge.
-  //
-  // Note: we cannot call the virtual Prism6::edges_adjacent_to_node(n)
-  // directly because we do not have an object to call it on.
-  if (is_vertex(n))
-    return {std::begin(Prism6::adjacent_edges_map[n]), std::end(Prism6::adjacent_edges_map[n])};
-  else if (is_edge(n))
-    return {n - n_vertices()};
-
-  libmesh_assert(is_face(n));
-  return {};
 }
 
 bool Prism20::is_node_on_edge(const unsigned int n,
