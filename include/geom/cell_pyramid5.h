@@ -108,8 +108,6 @@ public:
 
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
 
-  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int n) const override;
-
   /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.
@@ -177,14 +175,6 @@ public:
    * element node numbers.
    */
   static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
-
-  /**
-   * This maps the \f$ j^{th} \f$ node to the 3 or 4 edge ids adjacent
-   * to the node. The edge numbering matches the one used in the
-   * edge_nodes_map. An edge index of 99 is used to indicate that
-   * there is no adjacent edge.
-   */
-  static const unsigned int adjacent_edges_map[num_nodes][/*Pyramid5::max_adjacent_edges*/4];
 
   /**
    * We compute the centroid of the Pyramid by treating it as a

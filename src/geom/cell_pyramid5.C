@@ -62,15 +62,6 @@ const unsigned int Pyramid5::edge_nodes_map[Pyramid5::num_edges][Pyramid5::nodes
     {3, 4}  // Edge 7
   };
 
-const unsigned int Pyramid5::adjacent_edges_map[Pyramid5::num_nodes][/*Pyramid5::max_adjacent_edges*/4] =
-  {
-    {0, 3, 4, 99},  // Edges adjacent to node 0
-    {0, 1, 5, 99},  // Edges adjacent to node 1
-    {1, 2, 6, 99},  // Edges adjacent to node 2
-    {2, 3, 7, 99},  // Edges adjacent to node 3
-    {4, 5, 6,  7}   // Edges adjacent to node 4
-  };
-
 // ------------------------------------------------------------
 // Pyramid5 class member functions
 
@@ -111,14 +102,6 @@ Pyramid5::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
   return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
-}
-
-std::vector<unsigned int>
-Pyramid5::edges_adjacent_to_node(const unsigned int n) const
-{
-  libmesh_assert_less(n, n_nodes());
-  auto trim = (n < 4) ? 1 : 0;
-  return {std::begin(adjacent_edges_map[n]), std::end(adjacent_edges_map[n]) - trim};
 }
 
 bool Pyramid5::is_node_on_edge(const unsigned int n,
