@@ -18,15 +18,17 @@
 
 
 // Local includes
+#include "libmesh/replicated_mesh.h"
+
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_communication.h"
+#include "libmesh/parallel_implementation.h"
 #include "libmesh/partitioner.h"
-#include "libmesh/replicated_mesh.h"
-#include "libmesh/utility.h"
-#include "libmesh/parallel.h"
 #include "libmesh/point.h"
 #include "libmesh/string_to_enum.h"
+#include "libmesh/utility.h"
 
 // C++ includes
 #include <unordered_map>
@@ -119,6 +121,11 @@ ReplicatedMesh::ReplicatedMesh (const UnstructuredMesh & other_mesh) :
   this_boundary_info = other_boundary_info;
 
   this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
+
+  // If other_mesh is distributed, then we've got parts of it on each
+  // processor but we're not replicated yet; fix that.
+  if (!other_mesh.is_serial())
+    MeshCommunication().allgather(*this);
 }
 
 ReplicatedMesh & ReplicatedMesh::operator= (ReplicatedMesh && other_mesh)
