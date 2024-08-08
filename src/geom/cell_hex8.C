@@ -69,19 +69,6 @@ const unsigned int Hex8::edge_nodes_map[Hex8::num_edges][Hex8::nodes_per_edge] =
     {4, 7}  // Edge 11
   };
 
-const unsigned int Hex8::adjacent_edges_map[Hex8::num_nodes][/*Hex8::max_adjacent_edges*/3] =
-  {
-    {0,  3,  4}, // Edges adjacent to node 0
-    {0,  1,  5}, // Edges adjacent to node 1
-    {1,  2,  6}, // Edges adjacent to node 2
-    {2,  3,  7}, // Edges adjacent to node 3
-    {4,  8, 11}, // Edges adjacent to node 4
-    {5,  8,  9}, // Edges adjacent to node 5
-    {6,  9, 10}, // Edges adjacent to node 6
-    {7, 10, 11}  // Edges adjacent to node 7
-  };
-
-
 // ------------------------------------------------------------
 // Hex8 class member functions
 
@@ -121,13 +108,6 @@ Hex8::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
   return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
-}
-
-std::vector<unsigned int>
-Hex8::edges_adjacent_to_node(const unsigned int n) const
-{
-  libmesh_assert_less(n, n_nodes());
-  return {std::begin(adjacent_edges_map[n]), std::end(adjacent_edges_map[n])};
 }
 
 bool Hex8::is_node_on_edge(const unsigned int n,
