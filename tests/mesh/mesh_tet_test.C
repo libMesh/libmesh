@@ -54,6 +54,8 @@ Real build_octahedron (MeshBase & mesh, bool flip_tris,
   add_tri({5,3,2});
   add_tri({5,2,1});
 
+  // Keep node ids unchanged so we can use them later
+  mesh.allow_renumbering(false);
   mesh.prepare_for_use();
 
   // Octahedron volume
