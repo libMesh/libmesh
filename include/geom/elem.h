@@ -730,11 +730,14 @@ public:
 
   /**
    * \returns \p true if the specified (local) node number is an edge node.
+   * For 1D elements, is_edge() is equivalent to is_internal().
    */
   virtual bool is_edge(const unsigned int i) const = 0;
 
   /**
    * \returns \p true if the specified (local) node number is a face node.
+   * For 2D elements, is_face() is equivalent to is_internal().
+   * For 1D elements, is_face() == false.
    */
   virtual bool is_face(const unsigned int i) const = 0;
 
