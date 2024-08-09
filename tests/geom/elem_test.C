@@ -684,12 +684,44 @@ public:
         }
   }
 
+  void test_node_edge_map_consistency()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        for (const auto nd : elem->node_index_range())
+          {
+            auto adjacent_edge_ids = elem->edges_adjacent_to_node(nd);
+
+            if (elem->dim() < 2)
+              {
+                // 0D elements don't have edges.
+                // 1D elements *are* "edges", but we don't consider
+                // them to *have* edges, so assert that here.
+                CPPUNIT_ASSERT(adjacent_edge_ids.empty());
+              }
+            else
+              {
+                // For 2D and 3D elements, on each edge which is
+                // claimed to be adjacent, check that "nd" is indeed
+                // on it
+                for (const auto & edge_id : adjacent_edge_ids)
+                  {
+                    auto node_ids_on_edge = elem->nodes_on_edge(edge_id);
+                    CPPUNIT_ASSERT(std::find(node_ids_on_edge.begin(), node_ids_on_edge.end(), nd) != node_ids_on_edge.end());
+                  }
+              }
+          }
+      }
+  }
 
 };
 
 #define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box );            \
   CPPUNIT_TEST( test_quality );                 \
+  CPPUNIT_TEST( test_node_edge_map_consistency ); \
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_static_data );             \
   CPPUNIT_TEST( test_permute );                 \
