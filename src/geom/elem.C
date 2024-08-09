@@ -1671,25 +1671,8 @@ Real Elem::quality (const ElemQuality q) const
                   // Track min and max angles seen
                   min_angle = std::min(theta, min_angle);
                   max_angle = std::max(theta, max_angle);
-
-                  // Debugging
-                  std::cout << "first = " << first << std::endl;
-                  std::cout << "second = " << second << std::endl;
-                  std::cout << "first_edge = " << first_edge << std::endl;
-                  std::cout << "second_edge = " << second_edge << std::endl;
-                  std::cout << "first_edge_node_0 = " << first_edge_node_0 << std::endl;
-                  std::cout << "first_edge_node_1 = " << first_edge_node_1 << std::endl;
-                  std::cout << "second_edge_node_0 = " << second_edge_node_0 << std::endl;
-                  std::cout << "second_edge_node_1 = " << second_edge_node_1 << std::endl;
-                  std::cout << "first_ev = " << first_ev << std::endl;
-                  std::cout << "second_ev = " << second_ev << std::endl;
-                  std::cout << "theta = " << theta << std::endl;
                 }
           }
-
-        // Debugging
-        std::cout << "min_angle = " << min_angle << std::endl;
-        std::cout << "max_angle = " << max_angle << std::endl;
 
         // Return requested extreme value (in degrees)
         return Real(180)/libMesh::pi * ((q == MIN_ANGLE) ? min_angle : max_angle);
