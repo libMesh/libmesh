@@ -51,8 +51,8 @@ namespace
                   const Point & p1,
                   const Point & p2)
   {
-    const double detleft  = (p0(0)-p2(0))*(p1(1)-p2(1));
-    const double detright = (p0(1)-p2(1))*(p1(0)-p2(0));
+    const Real detleft  = (p0(0)-p2(0))*(p1(1)-p2(1));
+    const Real detright = (p0(1)-p2(1))*(p1(0)-p2(0));
 
     return signof(detleft - detright);
   }
@@ -65,7 +65,7 @@ namespace
   {
     const Point rayvec = ray_target - source;
     const Point edgevec = p1 - p0;
-    const double det = edgevec(0)*rayvec(1)-edgevec(1)*rayvec(0);
+    const Real det = edgevec(0)*rayvec(1)-edgevec(1)*rayvec(0);
 
     return signof(det);
   }

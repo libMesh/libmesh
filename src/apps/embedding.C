@@ -179,7 +179,7 @@ int main(int argc, char ** argv)
             }
           else
             {
-              int oldnumerator = std::round(shape*denominator);
+              int oldnumerator = int(std::round(shape*denominator));
               int newnumerator = oldnumerator;
               int newdenominator = denominator;
 

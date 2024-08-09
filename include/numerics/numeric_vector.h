@@ -1093,6 +1093,8 @@ l1_norm_diff(const NumericVector<T> & vec1, const NumericVector<T> & vec2)
 
 // Workaround for weird boost/NumericVector interaction bug
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#include <boost/mpl/bool.hpp>
+
 namespace boost { namespace multiprecision { namespace detail {
 template <typename T, typename To>
 struct is_lossy_conversion<libMesh::NumericVector<T>, To> {

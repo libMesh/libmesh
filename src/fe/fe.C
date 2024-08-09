@@ -1434,5 +1434,5 @@ INSTANTIATE_FE(3);
 
 INSTANTIATE_SUBDIVISION_FE;
 
-template LIBMESH_EXPORT void rational_all_shape_derivs<double> (const Elem & elem, const FEType underlying_fe_type, const std::vector<Point> & p, std::vector<std::vector<Real>> * comps[3], const bool add_p_level);
+template LIBMESH_EXPORT void rational_all_shape_derivs<Real> (const Elem & elem, const FEType underlying_fe_type, const std::vector<Point> & p, std::vector<std::vector<Real>> * comps[3], const bool add_p_level);
 } // namespace libMesh

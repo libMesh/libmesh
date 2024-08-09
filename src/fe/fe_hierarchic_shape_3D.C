@@ -1298,7 +1298,7 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         const unsigned int dofs_per_side = (totalorder+1u)*(totalorder+2u)/2u;
         libmesh_assert_less(i, 4*dofs_per_side);
 
-        const Real zeta[4] = { 1. - p(0) - p(1) - p(2), p(0), p(1), p(2) };
+        const Real zeta[4] = { Real(1.) - p(0) - p(1) - p(2), p(0), p(1), p(2) };
 
         unsigned int face_num = 0;
         if (zeta[0] > zeta[3] &&
@@ -1385,7 +1385,7 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         unsigned int i_offset = 0;
 
         // Triangular coordinates
-        const Real zeta[3] = { 1. - p(0) - p(1), p(0), p(1) };
+        const Real zeta[3] = { Real(1.) - p(0) - p(1), p(0), p(1) };
 
         // Closeness to midplane
         const Real zmid = 1 - std::abs(p(2));

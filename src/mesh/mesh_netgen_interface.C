@@ -109,7 +109,7 @@ void NetGenMeshInterface::triangulate ()
       params.optsteps_3d = 0;
     }
   else
-    params.maxh = std::pow(_desired_volume, 1./3.);
+    params.maxh = double(std::pow(_desired_volume, 1./3.));
 
   // Keep track of how NetGen copies of nodes map back to our original
   // nodes, so we can connect new elements to nodes correctly.
@@ -220,7 +220,7 @@ void NetGenMeshInterface::triangulate ()
               else
                 {
                   for (auto i : make_range(3))
-                    point_val[i] = n(i);
+                    point_val[i] = double(n(i));
 
                   Ng_AddPoint(ngmesh, point_val.data());
 

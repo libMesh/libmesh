@@ -81,7 +81,7 @@ void get_hilbert_coords (const Point & p,
 {
   static const Hilbert::inttype max_inttype = static_cast<Hilbert::inttype>(-1);
 
-  const double // put (x,y,z) in [0,1]^3 (don't divide by 0)
+  const Real // put (x,y,z) in [0,1]^3 (don't divide by 0)
     x = (p(0)-bbox.first(0)) * bboxinv(0),
 
 #if LIBMESH_DIM > 1
