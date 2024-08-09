@@ -117,8 +117,8 @@ public:
         _mesh->prepare_for_use();
       }
     else
-#endif
-#endif
+#endif // LIBMESH_DIM > 1
+#endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
       {
         const unsigned int dim = test_elem->dim();
         const unsigned int use_y = dim > 1;
