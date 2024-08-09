@@ -45,6 +45,14 @@ const Real Quad::_master_points[9][3] =
     {0, 0}
   };
 
+const unsigned int Quad::adjacent_sides_map[/*num_vertices*/4][/*n_adjacent_sides*/2] =
+  {
+    {0, 3},  // Sides adjacent to node 0
+    {0, 1},  // Sides adjacent to node 1
+    {1, 2},  // Sides adjacent to node 2
+    {2, 3}   // Sides adjacent to node 3
+  };
+
 
 
 // ------------------------------------------------------------
@@ -184,6 +192,23 @@ bool Quad::is_flipped() const
            (this->point(1)(1)-this->point(0)(1))));
 }
 
+
+std::vector<unsigned int>
+Quad::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, this->n_nodes());
+
+  // For vertices, we use the Quad::adjacent_sides_map, otherwise each
+  // of the mid-edge nodes is adjacent only to the edge it is on, and the
+  // center node is not adjacent to any edge.
+  if (this->is_vertex(n))
+    return {std::begin(adjacent_sides_map[n]), std::end(adjacent_sides_map[n])};
+  else if (this->is_edge(n))
+    return {n - this->n_vertices()};
+
+  libmesh_assert(this->is_face(n));
+  return {};
+}
 
 Real Quad::quality (const ElemQuality q) const
 {
@@ -463,7 +488,7 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
 
   switch (q)
     {
-
+    case EDGE_LENGTH_RATIO:
     case ASPECT_RATIO:
       bounds.first  = 1.;
       bounds.second = 4.;

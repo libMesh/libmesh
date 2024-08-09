@@ -51,8 +51,6 @@ const unsigned int InfQuad4::side_nodes_map[InfQuad4::num_sides][InfQuad4::nodes
     {0, 2}  // Side 2
   };
 
-
-
 #ifdef LIBMESH_ENABLE_AMR
 
 const Real InfQuad4::_embedding_matrix[InfQuad4::num_children][InfQuad4::num_nodes][InfQuad4::num_nodes] =

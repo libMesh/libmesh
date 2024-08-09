@@ -41,7 +41,6 @@ const unsigned int Tri3::side_nodes_map[Tri3::num_sides][Tri3::nodes_per_side] =
     {2, 0}  // Side 2
   };
 
-
 #ifdef LIBMESH_ENABLE_AMR
 
 const Real Tri3::_embedding_matrix[Tri3::num_children][Tri3::num_nodes][Tri3::num_nodes] =

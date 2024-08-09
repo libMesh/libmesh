@@ -184,6 +184,8 @@ public:
 
   virtual bool is_flipped() const override final;
 
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int n) const override;
+
   /**
    * This maps each edge to the sides that contain said edge.
    */
@@ -212,6 +214,15 @@ protected:
 
 #endif
 
+  /**
+   * This maps the \f$ j^{th} \f$ node to the 3 or 4 edge ids adjacent
+   * to the node. The edge numbering matches the ones used in the
+   * derived classes' edge_nodes_map. An edge index of 99 is used to
+   * indicate that there is no adjacent edge. This data structure is
+   * used in the Pyramid::edges_adjacent_to_node() override and is
+   * shared by all the derived Hex types.
+   */
+  static const unsigned int adjacent_edges_map[/*num_vertices*/5][/*max_adjacent_edges*/4];
 };
 
 } // namespace libMesh

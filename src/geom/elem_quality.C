@@ -317,10 +317,6 @@ std::string Quality::describe (const ElemQuality q)
 }
 
 
-/**
- * Returns all valid quality metrics for
- * element type t.
- */
 std::vector<ElemQuality> Quality::valid(const ElemType t)
 {
   std::vector<ElemQuality> v;
@@ -340,14 +336,17 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case TRI6:
     case TRI7:
       {
-        v.resize(7);
-        v[0] = MAX_ANGLE;
-        v[1] = MIN_ANGLE;
-        v[2] = CONDITION;
-        v[3] = JACOBIAN;
-        v[4] = SIZE;
-        v[5] = SHAPE;
-        v[6] = DISTORTION;
+        v = {
+          CONDITION,
+          DISTORTION,
+          EDGE_LENGTH_RATIO,
+          JACOBIAN,
+          MAX_ANGLE,
+          MIN_ANGLE,
+          SHAPE,
+          SIZE
+        };
+
         break;
       }
 
@@ -358,20 +357,23 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case QUAD9:
     case QUADSHELL9:
       {
-        v.resize(13);
-        v[0]  = ASPECT_RATIO;
-        v[1]  = SKEW;
-        v[2]  = TAPER;
-        v[3]  = WARP;
-        v[4]  = STRETCH;
-        v[5]  = MIN_ANGLE;
-        v[6]  = MAX_ANGLE;
-        v[7]  = CONDITION;
-        v[8]  = JACOBIAN;
-        v[9]  = SHEAR;
-        v[10] = SHAPE;
-        v[11] = SIZE;
-        v[12] = DISTORTION;
+        v = {
+          ASPECT_RATIO,
+          CONDITION,
+          DISTORTION,
+          EDGE_LENGTH_RATIO,
+          JACOBIAN,
+          MAX_ANGLE,
+          MIN_ANGLE,
+          SHAPE,
+          SHEAR,
+          SIZE,
+          SKEW,
+          STRETCH,
+          TAPER,
+          WARP
+        };
+
         break;
       }
 
@@ -379,14 +381,16 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case TET10:
     case TET14:
       {
-        v.resize(7);
-        v[0]  = ASPECT_RATIO_BETA;
-        v[1]  = ASPECT_RATIO_GAMMA;
-        v[2]  = CONDITION;
-        v[3]  = JACOBIAN;
-        v[4]  = SHAPE;
-        v[5]  = SIZE;
-        v[6]  = DISTORTION;
+        v = {
+          ASPECT_RATIO_BETA,
+          ASPECT_RATIO_GAMMA,
+          CONDITION,
+          DISTORTION,
+          JACOBIAN,
+          SHAPE,
+          SIZE
+        };
+
         break;
       }
 
@@ -394,18 +398,20 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case HEX20:
     case HEX27:
       {
-        v.resize(11);
-        v[0]  = ASPECT_RATIO;
-        v[1]  = SKEW;
-        v[2]  = SHEAR;
-        v[3] = SHAPE;
-        v[4]  = CONDITION;
-        v[5]  = JACOBIAN;
-        v[6]  = DISTORTION;
-        v[7]  = TAPER;
-        v[8]  = STRETCH;
-        v[9]  = DIAGONAL;
-        v[10]  = SIZE;
+        v = {
+          ASPECT_RATIO,
+          CONDITION,
+          DIAGONAL,
+          DISTORTION,
+          JACOBIAN,
+          SHAPE,
+          SHEAR,
+          SIZE,
+          SKEW,
+          STRETCH,
+          TAPER
+        };
+
         break;
       }
 

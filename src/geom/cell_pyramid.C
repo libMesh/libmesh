@@ -61,6 +61,15 @@ const unsigned int Pyramid::edge_sides_map[8][2] =
     {2, 3}  // Edge 7
   };
 
+const unsigned int Pyramid::adjacent_edges_map[/*num_vertices*/5][/*max_adjacent_edges*/4] =
+  {
+    {0, 3, 4, 99},  // Edges adjacent to node 0
+    {0, 1, 5, 99},  // Edges adjacent to node 1
+    {1, 2, 6, 99},  // Edges adjacent to node 2
+    {2, 3, 7, 99},  // Edges adjacent to node 3
+    {4, 5, 6,  7}   // Edges adjacent to node 4
+  };
+
 // ------------------------------------------------------------
 // Pyramid class member functions
 dof_id_type Pyramid::key (const unsigned int s) const
@@ -263,7 +272,22 @@ Pyramid::is_flipped() const
                          this->point(4)-this->point(0)) < 0);
 }
 
+std::vector<unsigned int>
+Pyramid::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, this->n_nodes());
+  if (this->is_vertex(n))
+    {
+      auto trim = (n < 4) ? 1 : 0;
+      return {std::begin(adjacent_edges_map[n]), std::end(adjacent_edges_map[n]) - trim};
+    }
+  else if (this->is_edge(n))
+    return {n - this->n_vertices()};
 
+  // Not a vertex or edge node, so must be one of the face nodes.
+  libmesh_assert(this->is_face(n));
+  return {};
+}
 
 unsigned int Pyramid::local_singular_node(const Point & p, const Real tol) const
 {

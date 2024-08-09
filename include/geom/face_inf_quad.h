@@ -255,6 +255,8 @@ public:
 
   virtual bool is_flipped() const override final;
 
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int n) const override;
+
 protected:
 
   /**
@@ -266,6 +268,16 @@ protected:
    * Master element node locations
    */
   static const Real _master_points[6][3];
+
+  /**
+   * This maps the \f$ j^{th} \f$ node to the one or two side id(s)
+   * adjacent to the node. The side numbering matches the one used in
+   * the derived classes' side_nodes_map. A side index of 99 is used
+   * to indicate that there is no adjacent side. This data structure
+   * is used in the InfQuad::edges_adjacent_to_node() override and is
+   * shared by all the derived Quad types.
+   */
+  static const unsigned int adjacent_sides_map[/*num_vertices*/4][/*max_adjacent_sides*/2];
 };
 
 } // namespace libMesh

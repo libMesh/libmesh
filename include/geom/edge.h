@@ -196,6 +196,15 @@ public:
   { return {}; }
 
   /**
+   * 1D elements don't have any edges, but they are *themselves*
+   * edges, so I guess an argument could be made for returning "this"
+   * somehow. Since I don't know exactly how that should be done,
+   * return an empty vector for now.
+   */
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int /*n*/) const override final
+  { return {}; }
+
+  /**
    * \returns The "circumcenter of mass" (area-weighted average of
    * triangulation circumcenters) of the element.
    *

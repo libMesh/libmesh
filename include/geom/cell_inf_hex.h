@@ -212,6 +212,8 @@ public:
 
   virtual bool is_flipped() const override final;
 
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int n) const override;
+
   /**
    * This maps each edge to the sides that contain said edge.
    */
@@ -251,6 +253,16 @@ protected:
    * Master element node locations
    */
   static const Real _master_points[18][3];
+
+  /**
+   * This maps the \f$ j^{th} \f$ node to the 3 (or fewer) edge ids
+   * adjacent to the node. The edge numbering matches the one used in
+   * the derived classes' edge_nodes_map. An edge index of 99 is used
+   * to indicate that there is no adjacent edge. This data structure
+   * is used in the InfHex::edges_adjacent_to_node() override and is
+   * shared by all the derived InfHex types.
+   */
+  static const unsigned int adjacent_edges_map[/*num_vertices*/8][/*max_adjacent_edges*/3];
 };
 
 

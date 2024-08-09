@@ -205,6 +205,8 @@ public:
 
   virtual bool is_flipped() const override final;
 
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int n) const override;
+
   /**
    * This maps each edge to the sides that contain said edge.
    */
@@ -242,6 +244,15 @@ protected:
    * of the three.
    */
   void choose_diagonal() const;
+
+  /**
+   * This maps the \f$ j^{th} \f$ node to the (in this case) 3 edge
+   * ids adjacent to the node. The edge numbering matches the ones used
+   * in the derived classes' edge_nodes_map. This data structure
+   * is used in the Tet::edges_adjacent_to_node() override and is
+   * shared by all the derived Tet types.
+   */
+  static const unsigned int adjacent_edges_map[/*num_vertices*/4][/*n_adjacent_edges*/3];
 };
 
 } // namespace libMesh

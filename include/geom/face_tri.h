@@ -184,6 +184,8 @@ public:
 
   virtual bool is_flipped() const override final;
 
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int n) const override;
+
 protected:
 
   /**
@@ -195,6 +197,15 @@ protected:
    * Master element node locations
    */
   static const Real _master_points[6][3];
+
+  /**
+   * This maps the \f$ j^{th} \f$ node to the (in this case) 2 side
+   * ids adjacent to the node. The side numbering matches the one used
+   * in the derived classes' side_nodes_map. This data structure
+   * is used in the Tri::edges_adjacent_to_node() override and is
+   * shared by all the derived Tri types.
+   */
+  static const unsigned int adjacent_sides_map[/*num_vertices*/3][/*n_adjacent_sides*/2];
 };
 
 } // namespace libMesh

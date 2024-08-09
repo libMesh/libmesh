@@ -59,6 +59,14 @@ const unsigned int Tet::edge_sides_map[6][2] =
     {2, 3}  // Edge 5
   };
 
+const unsigned int Tet::adjacent_edges_map[/*num_vertices*/4][/*n_adjacent_edges*/3] =
+  {
+    {0, 2, 3},  // Edges adjacent to node 0
+    {0, 1, 4},  // Edges adjacent to node 1
+    {1, 2, 5},  // Edges adjacent to node 2
+    {3, 4, 5},  // Edges adjacent to node 3
+  };
+
 // ------------------------------------------------------------
 // Tet class member functions
 dof_id_type Tet::key (const unsigned int s) const
@@ -242,6 +250,24 @@ Tet::is_flipped() const
                         this->point(3)-this->point(0)) < 0);
 }
 
+
+std::vector<unsigned int>
+Tet::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, this->n_nodes());
+
+  // For vertices, we use the Tet::adjacent_sides_map, otherwise each
+  // of the mid-edge nodes is adjacent only to the edge it is on, and the
+  // mid-face nodes are not adjacent to any edges.
+  if (this->is_vertex(n))
+    return {std::begin(adjacent_edges_map[n]), std::end(adjacent_edges_map[n])};
+  else if (this->is_edge(n))
+    return {n - this->n_vertices()};
+
+  // Current Tets have only vertex, edge, and face nodes.
+  libmesh_assert(this->is_face(n));
+  return {};
+}
 
 
 Real Tet::quality(const ElemQuality q) const

@@ -197,6 +197,8 @@ public:
 
   virtual bool is_flipped() const override final;
 
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int n) const override;
+
 protected:
 
   /**
@@ -232,6 +234,15 @@ protected:
    * location" (a simple dictionary-index in a 5x5 grid)
    */
   static const int _child_node_lookup[4][9];
+
+  /**
+   * This maps the \f$ j^{th} \f$ node to the (in this case) 2 side
+   * ids adjacent to the node. The side numbering matches the one used
+   * in the derived classes' side_nodes_map.  This data structure
+   * is used in the Quad::edges_adjacent_to_node() override and is
+   * shared by all the derived Quad types.
+   */
+  static const unsigned int adjacent_sides_map[/*num_vertices*/4][/*n_adjacent_sides*/2];
 };
 
 } // namespace libMesh

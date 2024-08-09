@@ -45,6 +45,13 @@ const Real InfQuad::_master_points[6][3] =
     {0, 1}
   };
 
+const unsigned int InfQuad::adjacent_sides_map[/*num_vertices*/4][/*max_adjacent_sides*/2] =
+  {
+    {0,  2}, // Sides adjacent to node 0
+    {0,  1}, // Sides adjacent to node 1
+    {2, 99}, // Sides adjacent to node 2
+    {1, 99}  // Sides adjacent to node 3
+  };
 
 // ------------------------------------------------------------
 // InfQuad class member functions
@@ -191,6 +198,25 @@ InfQuad::is_flipped() const
            (this->point(2)(1)-this->point(0)(1)) >
            (this->point(2)(0)-this->point(0)(0))*
            (this->point(1)(1)-this->point(0)(1))));
+}
+
+
+std::vector<unsigned int>
+InfQuad::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, this->n_nodes());
+
+  // For vertices, we use the adjacent_sides_map, otherwise node
+  // 4 is on side 0 and node 5 is not any any side.
+  if (this->is_vertex(n))
+    {
+      auto trim = (n < 2) ? 0 : 1;
+      return {std::begin(adjacent_sides_map[n]), std::end(adjacent_sides_map[n]) - trim};
+    }
+  else if (n == 4)
+    return {0};
+  else
+    return {};
 }
 
 
