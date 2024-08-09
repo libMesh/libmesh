@@ -126,8 +126,6 @@ bool Pyramid14::is_node_on_edge(const unsigned int n,
                    n) != std::end(edge_nodes_map[e]);
 }
 
-
-
 bool Pyramid14::has_affine_map() const
 {
   // TODO: If the base is a parallelogram and all the triangular faces are planar,

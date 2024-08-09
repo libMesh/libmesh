@@ -42,6 +42,13 @@ const Real Tri::_master_points[6][3] =
     {0, 0.5}
   };
 
+const unsigned int Tri::adjacent_sides_map[/*num_vertices*/3][/*n_adjacent_sides*/2] =
+  {
+    {0, 2},  // Sides adjacent to node 0
+    {0, 1},  // Sides adjacent to node 1
+    {1, 2}   // Sides adjacent to node 2
+  };
+
 
 
 // ------------------------------------------------------------
@@ -140,6 +147,23 @@ bool Tri::is_flipped() const
            (this->point(1)(1)-this->point(0)(1))));
 }
 
+
+std::vector<unsigned int>
+Tri::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, this->n_nodes());
+
+  // For vertices, we use the Tri::adjacent_sides_map, otherwise each
+  // of the mid-edge nodes is adjacent only to the edge it is on, and the
+  // center node is not adjacent to any edge.
+  if (this->is_vertex(n))
+    return {std::begin(adjacent_sides_map[n]), std::end(adjacent_sides_map[n])};
+  else if (this->is_edge(n))
+    return {n - this->n_vertices()};
+
+  libmesh_assert(this->is_face(n));
+  return {};
+}
 
 
 Real Tri::quality (const ElemQuality q) const
@@ -291,6 +315,17 @@ std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
 
   switch (q)
     {
+      // A recent copy of the cubit manual [0] does not list bounds
+      // for EDGE_LENGTH_RATIO or ASPECT_RATIO quality metrics, so we
+      // have arbitrarily adopted the same values used for Quads here.
+      // I'm open to suggestions of other appropriate values.
+      //
+      // [0]: https://cubit.sandia.gov/files/cubit/16.08/help_manual/WebHelp/mesh_generation/mesh_quality_assessment/triangular_metrics.htm
+    case EDGE_LENGTH_RATIO:
+    case ASPECT_RATIO:
+      bounds.first  = 1.;
+      bounds.second = 4.;
+      break;
 
     case MAX_ANGLE:
       bounds.first  = 60.;

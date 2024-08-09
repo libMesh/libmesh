@@ -83,6 +83,17 @@ const unsigned int Hex::edge_sides_map[12][2] =
     {4, 5}  // Edge 11
   };
 
+const unsigned int Hex::adjacent_edges_map[/*num_vertices*/8][/*n_adjacent_edges*/3] =
+  {
+    {0,  3,  4}, // Edges adjacent to node 0
+    {0,  1,  5}, // Edges adjacent to node 1
+    {1,  2,  6}, // Edges adjacent to node 2
+    {2,  3,  7}, // Edges adjacent to node 3
+    {4,  8, 11}, // Edges adjacent to node 4
+    {5,  8,  9}, // Edges adjacent to node 5
+    {6,  9, 10}, // Edges adjacent to node 6
+    {7, 10, 11}  // Edges adjacent to node 7
+  };
 
 // ------------------------------------------------------------
 // Hex class member functions
@@ -245,6 +256,23 @@ Hex::is_flipped() const
                          this->point(4)-this->point(0)) < 0);
 }
 
+
+std::vector<unsigned int>
+Hex::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, this->n_nodes());
+
+  // For vertices, we use the Hex::adjacent_edges_map, otherwise each
+  // of the mid-edge nodes is adjacent only to the edge it is on, and
+  // face/internal nodes are not adjacent to any edge.
+  if (this->is_vertex(n))
+    return {std::begin(adjacent_edges_map[n]), std::end(adjacent_edges_map[n])};
+  else if (this->is_edge(n))
+    return {n - this->n_vertices()};
+
+  libmesh_assert(this->is_face(n) || this->is_internal(n));
+  return {};
+}
 
 
 Real Hex::quality (const ElemQuality q) const

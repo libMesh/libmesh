@@ -31,7 +31,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Prism class static member initializations
 
-
 const Real Prism::_master_points[18][3] =
   {
     {0, 0, -1},
@@ -66,6 +65,17 @@ const unsigned int Prism::edge_sides_map[9][2] =
     {2, 4}, // Edge 7
     {3, 4}  // Edge 8
   };
+
+const unsigned int Prism::adjacent_edges_map[/*num_vertices*/6][/*n_adjacent_edges*/3] =
+  {
+    {0, 2, 3},  // Edges adjacent to node 0
+    {0, 1, 4},  // Edges adjacent to node 1
+    {1, 2, 5},  // Edges adjacent to node 2
+    {3, 6, 8},  // Edges adjacent to node 3
+    {4, 6, 7},  // Edges adjacent to node 4
+    {5, 7, 8},  // Edges adjacent to node 5
+  };
+
 
 // ------------------------------------------------------------
 // Prism class member functions
@@ -268,6 +278,24 @@ Prism::is_flipped() const
   return (triple_product(this->point(1)-this->point(0),
                         this->point(2)-this->point(0),
                         this->point(3)-this->point(0)) < 0);
+}
+
+
+std::vector<unsigned int>
+Prism::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, this->n_nodes());
+
+  // For vertices, we use the Prism::adjacent_sides_map, otherwise each
+  // of the mid-edge nodes is adjacent only to the edge it is on, and
+  // face/internal nodes are not adjacent to any edge.
+  if (this->is_vertex(n))
+    return {std::begin(adjacent_edges_map[n]), std::end(adjacent_edges_map[n])};
+  else if (this->is_edge(n))
+    return {n - this->n_vertices()};
+
+  libmesh_assert(this->is_face(n) || this->is_internal(n));
+  return {};
 }
 
 

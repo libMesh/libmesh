@@ -769,6 +769,11 @@ public:
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int /*e*/) const = 0;
 
   /**
+   * \returns the (local) edge numbers that touch the specified node
+   */
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int /*n*/) const = 0;
+
+  /**
    * \returns \p true if the specified (local) node number is on the
    * specified edge.
    */

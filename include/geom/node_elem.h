@@ -201,6 +201,12 @@ public:
     return {0};
   }
 
+  virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int) const override
+  {
+    libmesh_not_implemented();
+    return {0};
+  }
+
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override
   {
     libmesh_not_implemented();

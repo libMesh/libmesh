@@ -77,8 +77,17 @@ const unsigned int InfHex::edge_sides_map[8][2] =
     {3, 4}  // Edge 7
   };
 
-
-
+const unsigned int InfHex::adjacent_edges_map[/*num_vertices*/8][/*max_adjacent_edges*/3] =
+  {
+    {0,  3,  4}, // Edges adjacent to node 0
+    {0,  1,  5}, // Edges adjacent to node 1
+    {1,  2,  6}, // Edges adjacent to node 2
+    {2,  3,  7}, // Edges adjacent to node 3
+    {4, 99, 99}, // Edges adjacent to node 4
+    {5, 99, 99}, // Edges adjacent to node 5
+    {6, 99, 99}, // Edges adjacent to node 6
+    {7, 99, 99}  // Edges adjacent to node 7
+  };
 
 // ------------------------------------------------------------
 // InfHex class member functions
@@ -266,6 +275,27 @@ InfHex::is_flipped() const
                          this->point(4)-this->point(0)) < 0);
 }
 
+std::vector<unsigned int>
+InfHex::edges_adjacent_to_node(const unsigned int n) const
+{
+  libmesh_assert_less(n, this->n_nodes());
+
+  // For vertices, we use the InfHex::adjacent_edges_map with
+  // appropriate "trimming" based on whether the vertices are "at
+  // infinity" or not.  Otherwise each of the mid-edge nodes is
+  // adjacent only to the edge it is on, and the remaining nodes are
+  // not adjacent to any edge.
+  if (this->is_vertex(n))
+    {
+      auto trim = (n < 4) ? 0 : 2;
+      return {std::begin(adjacent_edges_map[n]), std::end(adjacent_edges_map[n]) - trim};
+    }
+  else if (this->is_edge(n))
+    return {n - this->n_vertices()};
+
+  libmesh_assert(this->is_face(n) || this->is_internal(n));
+  return {};
+}
 
 Real InfHex::quality (const ElemQuality q) const
 {
