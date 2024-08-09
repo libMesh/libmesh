@@ -54,6 +54,8 @@ Real build_octahedron (MeshBase & mesh, bool flip_tris,
   add_tri({5,3,2});
   add_tri({5,2,1});
 
+  // Keep node ids unchanged so we can use them later
+  mesh.allow_renumbering(false);
   mesh.prepare_for_use();
 
   // Octahedron volume
@@ -75,6 +77,7 @@ public:
 #ifdef LIBMESH_HAVE_NETGEN
   // The most basic test to start with
   CPPUNIT_TEST( testNetGen );
+  CPPUNIT_TEST( testNetGenError );
   CPPUNIT_TEST( testNetGenTets );
   CPPUNIT_TEST( testNetGenFlippedTris );
   CPPUNIT_TEST( testNetGenHole );
@@ -98,6 +101,7 @@ public:
 #ifdef LIBMESH_HAVE_TETGEN
   /*
   CPPUNIT_TEST( testTetGen );
+  CPPUNIT_TEST( testTetGenError );
   CPPUNIT_TEST( testTetGenInterp );
   CPPUNIT_TEST( testTetGenInterp2 );
   */
@@ -235,6 +239,43 @@ public:
   }
 
 
+  void testTrisToTetsError(MeshBase & mesh,
+                           MeshTetInterface & triangulator,
+                           bool flip_tris = false)
+  {
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    const Real expected_volume =
+      build_octahedron(mesh, false, -1, 1, -1, 1, -0.1, 0.1);
+
+    // Remove one tri, breaking the mesh
+    for (auto elem : mesh.element_ptr_range())
+      if (elem->node_id(0) == 0 &&
+          elem->node_id(1) == 1 &&
+          elem->node_id(2) == 2)
+        mesh.delete_elem(elem);
+    mesh.prepare_for_use();
+
+    bool threw_desired_exception = false;
+    try {
+      this->testTetInterfaceBase(mesh, triangulator, /* n_elem = */ 4,
+                                 /* n_nodes = */ 6, expected_volume);
+    }
+    catch (libMesh::LogicError & e) {
+      std::regex msg_regex("neighbor pointers set");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+    catch (CppUnit::Exception & e) {
+      throw e;
+    }
+    catch (...) {
+      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
+    }
+    CPPUNIT_ASSERT(threw_desired_exception);
+#endif
+  }
+
+
   void testTetsToTets(MeshBase & mesh,
                       MeshTetInterface & triangulator)
   {
@@ -271,7 +312,7 @@ public:
   }
 
 
-#ifdef LIBMESH_HAVE_TRIANGLE
+#ifdef LIBMESH_HAVE_TETGEN
   void testTetGen()
   {
     LOG_UNIT_TEST;
@@ -280,6 +321,17 @@ public:
     TetGenMeshInterface tet_tet(mesh);
     testTrisToTets(mesh, tet_tet);
   }
+
+
+  void testTetGenError()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    TetGenMeshInterface tet_tet(mesh);
+      testTrisToTetsError(mesh, tet_tet);
+  }
+
 
 
   /*
@@ -314,6 +366,16 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testTrisToTets(mesh, net_tet);
+  }
+
+
+  void testNetGenError()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    NetGenMeshInterface net_tet(mesh);
+    testTrisToTetsError(mesh, net_tet);
   }
 
 
