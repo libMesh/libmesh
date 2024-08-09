@@ -11,6 +11,8 @@
 #include <libmesh/parallel.h>
 #include <libmesh/replicated_mesh.h>
 
+#include <timpi/parallel_implementation.h>
+
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
@@ -34,6 +36,10 @@ public:
   CPPUNIT_TEST( testMeshMoveAssignFromFile );
   CPPUNIT_TEST( testReplicatedMeshMoveAssignFromFile );
   CPPUNIT_TEST( testDistributedMeshMoveAssignFromFile );
+  CPPUNIT_TEST( testReplicatedMeshConstructFromReplicated );
+  CPPUNIT_TEST( testReplicatedMeshConstructFromDistributed );
+  CPPUNIT_TEST( testDistributedMeshConstructFromReplicated );
+  CPPUNIT_TEST( testDistributedMeshConstructFromDistributed );
 # endif
 #endif
 
@@ -211,6 +217,28 @@ public:
 #endif // LIBMESH_ENABLE_AMR
   }
 
+  template <class SrcClass, class DestClass>
+  void testCopyConstruct()
+  {
+    SrcClass src_mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_square(src_mesh, 4, 4);
+
+    DestClass dest_mesh(src_mesh);
+
+    // Check for consistency
+    CPPUNIT_ASSERT(TestCommWorld->verify(dest_mesh.n_elem()));
+    CPPUNIT_ASSERT(TestCommWorld->verify(dest_mesh.n_nodes()));
+    dof_id_type n_dest_elem = dest_mesh.n_local_elem();
+    TestCommWorld->sum(n_dest_elem);
+    dof_id_type n_dest_nodes = dest_mesh.n_local_nodes();
+    TestCommWorld->sum(n_dest_nodes);
+    CPPUNIT_ASSERT_EQUAL(n_dest_elem, dest_mesh.n_elem());
+    CPPUNIT_ASSERT_EQUAL(n_dest_nodes, dest_mesh.n_nodes());
+    CPPUNIT_ASSERT_EQUAL(src_mesh.n_elem(), dest_mesh.n_elem());
+    CPPUNIT_ASSERT_EQUAL(src_mesh.n_nodes(), dest_mesh.n_nodes());
+  }
+
   void testMeshMoveAssignFromMemory()
   { LOG_UNIT_TEST; testMeshMoveAssign("Mesh", "from_memory"); }
 
@@ -228,6 +256,18 @@ public:
 
   void testDistributedMeshMoveAssignFromFile()
   { LOG_UNIT_TEST; testMeshMoveAssign("distributed", "from_file"); }
+
+  void testReplicatedMeshConstructFromReplicated()
+  { LOG_UNIT_TEST; testCopyConstruct<ReplicatedMesh, ReplicatedMesh>(); }
+
+  void testReplicatedMeshConstructFromDistributed()
+  { LOG_UNIT_TEST; testCopyConstruct<DistributedMesh, ReplicatedMesh>(); }
+
+  void testDistributedMeshConstructFromReplicated()
+  { LOG_UNIT_TEST; testCopyConstruct<ReplicatedMesh, DistributedMesh>(); }
+
+  void testDistributedMeshConstructFromDistributed()
+  { LOG_UNIT_TEST; testCopyConstruct<DistributedMesh, DistributedMesh>(); }
 
 }; // End definition of class MeshAssignTest
 
