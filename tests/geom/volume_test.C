@@ -38,6 +38,7 @@ public:
   CPPUNIT_TEST( testHex20PLevelTrueCentroid );
   CPPUNIT_TEST( testQuad4AspectRatio );
   CPPUNIT_TEST( testQuad4Warpage );
+  CPPUNIT_TEST( testQuad4MinMaxAngle );
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST_SUITE_END();
 
@@ -663,6 +664,110 @@ public:
       // warpage, as suggested in the Cubit manual.
       test_warped_quad(0.3);
     }
+  }
+
+  void testQuad4MinMaxAngle()
+  {
+    LOG_UNIT_TEST;
+
+    // Case 1: Test that rigid body rotations of a unit square
+    // quadrilateral that have no effect on the quality of the
+    // element.
+    {
+      // Construct unit square QUAD4
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+
+      // 1a) Reference Elem should have min angle == max angle == pi/2
+      {
+        Real min_angle = elem->quality(MIN_ANGLE);
+        Real max_angle = elem->quality(MAX_ANGLE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+      }
+
+      // 1b) Rotate all points about x-axis by 90 degrees
+      Real cost = std::cos(.5*libMesh::pi);
+      Real sint = std::sin(.5*libMesh::pi);
+      RealTensorValue Rx(1, 0, 0,
+                         0, cost, sint,
+                         0, sint, cost);
+
+      for (auto & pt : pts)
+        pt = Rx * pt;
+
+      {
+        Real min_angle = elem->quality(MIN_ANGLE);
+        Real max_angle = elem->quality(MAX_ANGLE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+      }
+
+      // 1c) Rotate all points about z-axis by 90 degrees
+      RealTensorValue Rz(cost, -sint, 0,
+                         sint,  cost, 0,
+                         0,        0, 1);
+
+      for (auto & pt : pts)
+        pt = Rz * pt;
+
+      {
+        Real min_angle = elem->quality(MIN_ANGLE);
+        Real max_angle = elem->quality(MAX_ANGLE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+      }
+
+      // 1d) Rotate all points about y-axis by 270 degrees
+      RealTensorValue Ry(cost,  0, sint,
+                         0,     1, 0,
+                         -sint, 0, cost);
+
+      for (int cnt=0; cnt<3; ++cnt)
+        for (auto & pt : pts)
+          pt = Ry * pt;
+
+      {
+        Real min_angle = elem->quality(MIN_ANGLE);
+        Real max_angle = elem->quality(MAX_ANGLE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+      }
+    }
+
+    // Case 2: Rhombus QUAD4. This case should have an interior min
+    // angle of theta and an interior max angle of pi-theta, where
+    // "theta" is the specified amount that we "sheared" the element
+    // by on creation
+    {
+      // Helper lambda function that constructs a rhombus quad with
+      // interior acute angle theta.
+      auto test_rhombus_quad = [this](Real theta)
+      {
+        Real ct = std::cos(theta);
+        Real st = std::sin(theta);
+        std::vector<Point> pts = {
+          Point(0, 0, 0),
+          Point(1, 0, 0),
+          Point(1. + ct, st, 0),
+          Point(     ct, st, 0)};
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        Real min_angle = elem->quality(MIN_ANGLE);
+        Real max_angle = elem->quality(MAX_ANGLE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(180) / libMesh::pi * theta,                 /*actual=*/min_angle, TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(180) / libMesh::pi * (libMesh::pi - theta), /*actual=*/max_angle, TOLERANCE);
+      };
+
+      // 2a) Rhombus with interior angle theta=pi/6.
+      test_rhombus_quad(libMesh::pi / 6);
+
+      // 2b) Rhombus with interior angle theta=pi/3.
+      test_rhombus_quad(libMesh::pi / 3);
+    }
+
   }
 
 protected:
