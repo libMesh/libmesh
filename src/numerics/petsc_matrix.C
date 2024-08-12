@@ -94,7 +94,7 @@ PetscMatrix<T>::PetscMatrix(const Parallel::Communicator & comm_in) :
 // for destroying it
 template <typename T>
 PetscMatrix<T>::PetscMatrix(Mat mat_in,
-                                  const Parallel::Communicator & comm_in) :
+                            const Parallel::Communicator & comm_in) :
   PetscMatrixBase<T>(mat_in, comm_in)
 {
   MatType mat_type;
@@ -117,12 +117,12 @@ PetscMatrix<T>::~PetscMatrix() = default;
 
 template <typename T>
 void PetscMatrix<T>::init (const numeric_index_type m_in,
-                              const numeric_index_type n_in,
-                              const numeric_index_type m_l,
-                              const numeric_index_type n_l,
-                              const numeric_index_type nnz,
-                              const numeric_index_type noz,
-                              const numeric_index_type blocksize_in)
+                           const numeric_index_type n_in,
+                           const numeric_index_type m_l,
+                           const numeric_index_type n_l,
+                           const numeric_index_type nnz,
+                           const numeric_index_type noz,
+                           const numeric_index_type blocksize_in)
 {
   // So compilers don't warn when !LIBMESH_ENABLE_BLOCKED_STORAGE
   libmesh_ignore(blocksize_in);
@@ -234,12 +234,12 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 
 template <typename T>
 void PetscMatrix<T>::init (const numeric_index_type m_in,
-                              const numeric_index_type n_in,
-                              const numeric_index_type m_l,
-                              const numeric_index_type n_l,
-                              const std::vector<numeric_index_type> & n_nz,
-                              const std::vector<numeric_index_type> & n_oz,
-                              const numeric_index_type blocksize_in)
+                           const numeric_index_type n_in,
+                           const numeric_index_type m_l,
+                           const numeric_index_type n_l,
+                           const std::vector<numeric_index_type> & n_nz,
+                           const std::vector<numeric_index_type> & n_oz,
+                           const numeric_index_type blocksize_in)
 {
   // So compilers don't warn when !LIBMESH_ENABLE_BLOCKED_STORAGE
   libmesh_ignore(blocksize_in);
@@ -715,8 +715,8 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
 
 template <typename T>
 void PetscMatrix<T>::_petsc_viewer(const std::string & filename,
-                                      PetscViewerType viewertype,
-                                      PetscFileMode filemode)
+                                   PetscViewerType viewertype,
+                                   PetscFileMode filemode)
 {
   parallel_object_only();
 
@@ -795,8 +795,8 @@ void PetscMatrix<T>::read_petsc_hdf5(const std::string & filename)
 
 template <typename T>
 void PetscMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
-                                   const std::vector<numeric_index_type> & rows,
-                                   const std::vector<numeric_index_type> & cols)
+                                const std::vector<numeric_index_type> & rows,
+                                const std::vector<numeric_index_type> & cols)
 {
   libmesh_assert (this->initialized());
 
@@ -822,8 +822,8 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
 
 template <typename T>
 void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T> & dm,
-                                         const std::vector<numeric_index_type> & brows,
-                                         const std::vector<numeric_index_type> & bcols)
+                                      const std::vector<numeric_index_type> & brows,
+                                      const std::vector<numeric_index_type> & bcols)
 {
   libmesh_assert (this->initialized());
 
@@ -866,9 +866,9 @@ void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T> & dm,
 
 template <typename T>
 void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
-                                       const std::vector<numeric_index_type> & rows,
-                                       const std::vector<numeric_index_type> & cols,
-                                       const bool reuse_submatrix) const
+                                    const std::vector<numeric_index_type> & rows,
+                                    const std::vector<numeric_index_type> & cols,
+                                    const bool reuse_submatrix) const
 {
   if (!this->closed())
     {
@@ -917,8 +917,8 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
 
 template <typename T>
 void PetscMatrix<T>::create_submatrix_nosort(SparseMatrix<T> & submatrix,
-                                                const std::vector<numeric_index_type> & rows,
-                                                const std::vector<numeric_index_type> & cols) const
+                                             const std::vector<numeric_index_type> & rows,
+                                             const std::vector<numeric_index_type> & cols) const
 {
   if (!this->closed())
     {
@@ -1045,8 +1045,8 @@ void PetscMatrix<T>::flush ()
 
 template <typename T>
 void PetscMatrix<T>::set (const numeric_index_type i,
-                             const numeric_index_type j,
-                             const T value)
+                          const numeric_index_type j,
+                          const T value)
 {
   libmesh_assert (this->initialized());
 
@@ -1063,8 +1063,8 @@ void PetscMatrix<T>::set (const numeric_index_type i,
 
 template <typename T>
 void PetscMatrix<T>::add (const numeric_index_type i,
-                             const numeric_index_type j,
-                             const T value)
+                          const numeric_index_type j,
+                          const T value)
 {
   libmesh_assert (this->initialized());
 
@@ -1081,7 +1081,7 @@ void PetscMatrix<T>::add (const numeric_index_type i,
 
 template <typename T>
 void PetscMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
-                                   const std::vector<numeric_index_type> & dof_indices)
+                                const std::vector<numeric_index_type> & dof_indices)
 {
   this->add_matrix (dm, dof_indices, dof_indices);
 }
@@ -1157,9 +1157,9 @@ void PetscMatrix<T>::matrix_matrix_mult (SparseMatrix<T> & X_in, SparseMatrix<T>
 template <typename T>
 void
 PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
-                                      const std::map<numeric_index_type, numeric_index_type> & row_ltog,
-                                      const std::map<numeric_index_type, numeric_index_type> & col_ltog,
-                                      const T scalar)
+                                   const std::map<numeric_index_type, numeric_index_type> & row_ltog,
+                                   const std::map<numeric_index_type, numeric_index_type> & col_ltog,
+                                   const T scalar)
 {
   // size of spm is usually greater than row_ltog and col_ltog in parallel as the indices are owned by the processor
   // also, we should allow adding certain parts of spm to _mat
@@ -1212,7 +1212,7 @@ PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
 
 template <typename T>
 T PetscMatrix<T>::operator () (const numeric_index_type i_in,
-                                  const numeric_index_type j_in) const
+                               const numeric_index_type j_in) const
 {
   libmesh_assert (this->initialized());
 
@@ -1269,8 +1269,8 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
 
 template <typename T>
 void PetscMatrix<T>::get_row (numeric_index_type i_in,
-                                 std::vector<numeric_index_type> & indices,
-                                 std::vector<T> & values) const
+                              std::vector<numeric_index_type> & indices,
+                              std::vector<T> & values) const
 {
   libmesh_assert (this->initialized());
 
