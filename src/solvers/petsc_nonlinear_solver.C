@@ -32,6 +32,7 @@
 #include "libmesh/preconditioner.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/petscdmlibmesh.h"
+#include "libmesh/petsc_mffd_matrix.h"
 
 namespace libMesh
 {
@@ -472,6 +473,7 @@ extern "C"
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
 
+    PetscMFFDMatrix<Number> mffd_jac(sys.comm());
     PetscBool p_is_shell = PETSC_FALSE;
     PetscBool j_is_mffd = PETSC_FALSE;
     PetscBool j_is_shell = PETSC_FALSE;
@@ -483,8 +485,8 @@ extern "C"
     if (j_is_mffd == PETSC_TRUE)
       {
         libmesh_assert(!Jac);
-        Jac = &solver->_mffd_jac;
-        solver->_mffd_jac = jac;
+        Jac = &mffd_jac;
+        mffd_jac = jac;
       }
 
     // We already computed the Jacobian during the residual evaluation
@@ -748,8 +750,7 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _default_monitor(true),
   _snesmf_reuse_base(true),
   _computing_base_vector(true),
-  _setup_reuse(false),
-  _mffd_jac(this->_communicator)
+  _setup_reuse(false)
 {
 }
 
