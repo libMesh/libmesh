@@ -468,7 +468,7 @@ extern "C"
 
     NonlinearImplicitSystem & sys = solver->system();
 
-    PetscMatrixBase<Number> * PC = pc ? PetscMatrixBase<Number>::get_context(pc) : nullptr;
+    PetscMatrixBase<Number> * const PC = pc ? PetscMatrixBase<Number>::get_context(pc) : nullptr;
     PetscMatrixBase<Number> * Jac = jac ? PetscMatrixBase<Number>::get_context(jac) : nullptr;
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());

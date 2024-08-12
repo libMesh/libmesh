@@ -691,27 +691,27 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
 
   libmesh_assert(pc);
   libmesh_assert(jac);
-  PetscMatrixBase<Number> * the_pc = PetscMatrixBase<Number>::get_context(pc);
-  PetscMatrixBase<Number> * Jac = PetscMatrixBase<Number>::get_context(jac);
+  PetscMatrixBase<Number> & the_pc = *PetscMatrixBase<Number>::get_context(pc);
+  PetscMatrixBase<Number> & Jac = *PetscMatrixBase<Number>::get_context(jac);
   PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
   PetscMatrixBase<Number> & Jac_sys = *cast_ptr<PetscMatrixBase<Number> *>(sys.matrix);
   PetscVector<Number> X_global(x, sys.comm());
 
   // Set the dof maps
-  the_pc->attach_dof_map(sys.get_dof_map());
-  Jac->attach_dof_map(sys.get_dof_map());
+  the_pc.attach_dof_map(sys.get_dof_map());
+  Jac.attach_dof_map(sys.get_dof_map());
 
   // Use the systems update() to get a good local version of the parallel solution
   X_global.swap(X_sys);
-  Jac->swap(Jac_sys);
+  Jac.swap(Jac_sys);
 
   sys.get_dof_map().enforce_constraints_exactly(sys);
   sys.update();
 
   X_global.swap(X_sys);
-  Jac->swap(Jac_sys);
+  Jac.swap(Jac_sys);
 
-  the_pc->zero();
+  the_pc.zero();
 
   // if the user has provided both function pointers and objects only the pointer
   // will be used, so catch that as an error
@@ -722,22 +722,22 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
                        "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
 
   if (sys.nonlinear_solver->jacobian != nullptr)
-    sys.nonlinear_solver->jacobian(*(sys.current_local_solution.get()), *the_pc, sys);
+    sys.nonlinear_solver->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
 
   else if (sys.nonlinear_solver->jacobian_object != nullptr)
-    sys.nonlinear_solver->jacobian_object->jacobian(*(sys.current_local_solution.get()), *the_pc, sys);
+    sys.nonlinear_solver->jacobian_object->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
 
   else if (sys.nonlinear_solver->matvec != nullptr)
-    sys.nonlinear_solver->matvec(*(sys.current_local_solution.get()), nullptr, the_pc, sys);
+    sys.nonlinear_solver->matvec(*(sys.current_local_solution.get()), nullptr, &the_pc, sys);
 
   else if (sys.nonlinear_solver->residual_and_jacobian_object != nullptr)
-    sys.nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(sys.current_local_solution.get()), nullptr, the_pc, sys);
+    sys.nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(sys.current_local_solution.get()), nullptr, &the_pc, sys);
 
   else
     libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
-  the_pc->close();
-  Jac->close();
+  the_pc.close();
+  Jac.close();
   X_global.close();
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
