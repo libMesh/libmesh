@@ -135,6 +135,7 @@ std::string Quality::describe (const ElemQuality q)
   switch (q)
     {
 
+    case EDGE_LENGTH_RATIO:
     case ASPECT_RATIO:
       desc << "Max edge length ratio\n"
            << "at element center.\n"
@@ -181,7 +182,7 @@ std::string Quality::describe (const ElemQuality q)
       break;
 
     case MAX_ANGLE:
-      desc << "Largest included angle.\n"
+      desc << "Largest angle between all adjacent pairs of edges (in 2D, sides).\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (90 -> 135)\n"
@@ -189,7 +190,7 @@ std::string Quality::describe (const ElemQuality q)
       break;
 
     case MIN_ANGLE:
-      desc << "Smallest included angle.\n"
+      desc << "Smallest angle between all adjacent pairs of edges (in 2D, sides).\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (45 -> 90)\n"
