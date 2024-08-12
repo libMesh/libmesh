@@ -85,7 +85,7 @@ template <typename T>
 SparseMatrix<T> &
 PetscMatrixShellMatrix<T>::operator=(const SparseMatrix<T> &)
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 } // namespace libMesh

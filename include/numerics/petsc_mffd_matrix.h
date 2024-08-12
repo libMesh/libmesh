@@ -118,35 +118,35 @@ PetscMFFDMatrix<T>::init(const numeric_index_type,
                          const numeric_index_type,
                          const numeric_index_type)
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 void
 PetscMFFDMatrix<T>::init(ParallelType)
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 SparseMatrix<T> &
 PetscMFFDMatrix<T>::operator=(const SparseMatrix<T> &)
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 void
 PetscMFFDMatrix<T>::zero()
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 std::unique_ptr<SparseMatrix<T>>
 PetscMFFDMatrix<T>::zero_clone() const
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
@@ -160,14 +160,14 @@ template <typename T>
 void
 PetscMFFDMatrix<T>::set(const numeric_index_type, const numeric_index_type, const T)
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 void
 PetscMFFDMatrix<T>::add(const numeric_index_type, const numeric_index_type, const T)
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
@@ -176,63 +176,63 @@ PetscMFFDMatrix<T>::add_matrix(const DenseMatrix<T> &,
                                const std::vector<numeric_index_type> &,
                                const std::vector<numeric_index_type> &)
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 void
 PetscMFFDMatrix<T>::add_matrix(const DenseMatrix<T> &, const std::vector<numeric_index_type> &)
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 void
 PetscMFFDMatrix<T>::add(const T, const SparseMatrix<T> &)
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 T
 PetscMFFDMatrix<T>::operator()(const numeric_index_type, const numeric_index_type) const
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 Real
 PetscMFFDMatrix<T>::l1_norm() const
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 Real
 PetscMFFDMatrix<T>::linfty_norm() const
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 void
 PetscMFFDMatrix<T>::print_personal(std::ostream &) const
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 void
 PetscMFFDMatrix<T>::get_diagonal(NumericVector<T> &) const
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
 void
 PetscMFFDMatrix<T>::get_transpose(SparseMatrix<T> &) const
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 template <typename T>
@@ -241,7 +241,7 @@ PetscMFFDMatrix<T>::get_row(numeric_index_type,
                             std::vector<numeric_index_type> &,
                             std::vector<T> &) const
 {
-  libmesh_not_implemented();
+  libmesh_error();
 }
 
 } // namespace libMesh
