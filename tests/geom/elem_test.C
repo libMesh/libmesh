@@ -54,19 +54,40 @@ public:
 
     for (const auto & elem : this->_mesh->active_local_element_ptr_range())
       {
-        // We only have one metric defined on all elements
-        const Real q = elem->quality(ASPECT_RATIO);
+        // EDGE_LENGTH_RATIO is one metric that is defined on all elements
+        const Real edge_length_ratio = elem->quality(EDGE_LENGTH_RATIO);
 
         // We use "0" to mean infinity rather than inf or NaN, and
         // every quality other than that should be 1 or larger (worse)
-        CPPUNIT_ASSERT_LESSEQUAL(q, Real(1)); // 1 <= q
+        CPPUNIT_ASSERT_LESSEQUAL(edge_length_ratio, Real(1)); // 1 <= edge_length_ratio
 
         // We're building isotropic meshes, where even elements
         // dissected from cubes ought to have tolerable quality.
         //
         // Worst I see is 2 on tets, but let's add a little tolerance
         // in case we decide to play with rotated meshes here later
-        CPPUNIT_ASSERT_LESSEQUAL(Real(2+TOLERANCE), q); // q <= 2
+        CPPUNIT_ASSERT_LESSEQUAL(Real(2+TOLERANCE), edge_length_ratio); // edge_length_ratio <= 2
+
+        // The MIN_ANGLE and MAX_ANGLE quality metrics are also defined on all elements
+        const Real min_angle = elem->quality(MIN_ANGLE);
+        const Real max_angle = elem->quality(MAX_ANGLE);
+
+        // Reference Quads/Hexes have maximum internal angles of 90
+        // degrees, but pyramids actually have an obtuse interior
+        // angle of acos(-1/3) ~ 109.47 deg formed by edge pairs
+        // {(0, 4), (2, 4)} and {(1,4), (3,4)}.
+        CPPUNIT_ASSERT_LESSEQUAL((std::acos(Real(-1)/3) * 180 / libMesh::pi) + TOLERANCE, max_angle);
+
+        // Notes on minimum angle we expect to see:
+        // 1.) 1D Elements don't have interior angles, so the base
+        //     class implementation currently returns 0 for those
+        //     elements.
+        // 2.) Reference triangles/tetrahedra have min interior angle
+        //     of 45 degrees, however, here we are checking Tets in a
+        //     build_cube() mesh which have angles as small as
+        //     acos(2/sqrt(6)) so we use that as our lower bound here.
+        if (elem->dim() > 1)
+          CPPUNIT_ASSERT_GREATEREQUAL((std::acos(Real(2)/std::sqrt(Real(6))) * 180 / libMesh::pi) - TOLERANCE, min_angle);
       }
   }
 
@@ -663,12 +684,44 @@ public:
         }
   }
 
+  void test_node_edge_map_consistency()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        for (const auto nd : elem->node_index_range())
+          {
+            auto adjacent_edge_ids = elem->edges_adjacent_to_node(nd);
+
+            if (elem->dim() < 2)
+              {
+                // 0D elements don't have edges.
+                // 1D elements *are* "edges", but we don't consider
+                // them to *have* edges, so assert that here.
+                CPPUNIT_ASSERT(adjacent_edge_ids.empty());
+              }
+            else
+              {
+                // For 2D and 3D elements, on each edge which is
+                // claimed to be adjacent, check that "nd" is indeed
+                // on it
+                for (const auto & edge_id : adjacent_edge_ids)
+                  {
+                    auto node_ids_on_edge = elem->nodes_on_edge(edge_id);
+                    CPPUNIT_ASSERT(std::find(node_ids_on_edge.begin(), node_ids_on_edge.end(), nd) != node_ids_on_edge.end());
+                  }
+              }
+          }
+      }
+  }
 
 };
 
 #define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box );            \
   CPPUNIT_TEST( test_quality );                 \
+  CPPUNIT_TEST( test_node_edge_map_consistency ); \
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_static_data );             \
   CPPUNIT_TEST( test_permute );                 \

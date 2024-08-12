@@ -1008,7 +1008,19 @@ public:
 
   /**
    * \returns A quantitative assessment of element quality based on
-   * the quality metric \p q specified by the user.
+   * the quality metric \p q specified by the user. Not all ElemQuality
+   * metrics are supported for all Elem types; consult the Elem::quality()
+   * overrides for specific Elem types to determine which quality metrics
+   * are supported. The ElemQuality metrics with generic support for all
+   * Elems with dimension > 1 are:
+   * .) EDGE_LENGTH_RATIO - ratio of maximum to minimum edge (in 2D,
+   *    side) length, where the min/max is taken over all Elem edges.
+   * .) MIN,MAX_ANGLE - The minimum (respectively maximum) angle
+   *    between all pairs of adjacent Elem edges, in degrees. Note
+   *    that, in 3D, these are *not* the dihedral angles (angle
+   *    between adjacent planar faces of the element), which we plan to
+   *    add support for in the future. In 2D, we compute the angle
+   *    between adjacent sides for this metric.
    */
   virtual Real quality (const ElemQuality q) const;
 

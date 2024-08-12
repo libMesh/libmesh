@@ -1613,6 +1613,71 @@ Real Elem::quality (const ElemQuality q) const
           return *max / *min;
       }
 
+    case MIN_ANGLE:
+    case MAX_ANGLE:
+      {
+        // 1D elements don't have interior angles, so just return some
+        // dummy value in that case.
+        if (this->dim() < 2)
+          return 0.;
+
+        // Initialize return values
+        Real min_angle = std::numeric_limits<Real>::max();
+        Real max_angle = -std::numeric_limits<Real>::max();
+
+        for (auto n : this->node_index_range())
+          {
+            // Get list of edge ids adjacent to this node.
+            auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
+
+            // Skip any nodes with fewer than 2 adjacent edges. You
+            // need at least two adjacent edges to form an interior
+            // element angle.
+            auto N = adjacent_edge_ids.size();
+            if (N < 2)
+              continue;
+
+            // Consider all possible pairs of edges adjacent to node n
+            for (unsigned int first = 0; first < N-1; ++first)
+              for (unsigned int second = first+1; second < N; ++second)
+                {
+                  // Get ids of first and second edges
+                  auto first_edge = adjacent_edge_ids[first];
+                  auto second_edge = adjacent_edge_ids[second];
+
+                  // Get node ids of first and second edge
+                  auto first_edge_node_0 = this->local_edge_node(first_edge, 0);
+                  auto first_edge_node_1 = this->local_edge_node(first_edge, 1);
+                  auto second_edge_node_0 = this->local_edge_node(second_edge, 0);
+                  auto second_edge_node_1 = this->local_edge_node(second_edge, 1);
+
+                  // Orient both edges so that edge node 0 == n
+                  if (first_edge_node_0 != n)
+                    std::swap(first_edge_node_0, first_edge_node_1);
+                  if (second_edge_node_0 != n)
+                    std::swap(second_edge_node_0, second_edge_node_1);
+
+                  libmesh_assert_equal_to(first_edge_node_0, n);
+                  libmesh_assert_equal_to(second_edge_node_0, n);
+
+                  // Locally oriented edge vectors
+                  Point
+                    first_ev = this->point(first_edge_node_1) - this->point(first_edge_node_0),
+                    second_ev = this->point(second_edge_node_1) - this->point(second_edge_node_0);
+
+                  // Angle between them in the range [0, pi]
+                  Real theta = std::acos(first_ev.unit() * second_ev.unit());
+
+                  // Track min and max angles seen
+                  min_angle = std::min(theta, min_angle);
+                  max_angle = std::max(theta, max_angle);
+                }
+          }
+
+        // Return requested extreme value (in degrees)
+        return Real(180)/libMesh::pi * ((q == MIN_ANGLE) ? min_angle : max_angle);
+      }
+
       // Return 1 if we made it here
     default:
       {
