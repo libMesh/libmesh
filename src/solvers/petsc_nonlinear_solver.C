@@ -472,15 +472,15 @@ extern "C"
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
 
-    PetscBool pisshell = PETSC_FALSE;
-    PetscBool jismffd = PETSC_FALSE;
-    PetscBool jisshell = PETSC_FALSE;
+    PetscBool p_is_shell = PETSC_FALSE;
+    PetscBool j_is_mffd = PETSC_FALSE;
+    PetscBool j_is_shell = PETSC_FALSE;
     if (pc)
-      LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &pisshell));
+      LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &p_is_shell));
     libmesh_assert(jac);
-    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &jismffd));
-    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATSHELL, &jisshell));
-    if (jismffd == PETSC_TRUE)
+    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &j_is_mffd));
+    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATSHELL, &j_is_shell));
+    if (j_is_mffd == PETSC_TRUE)
       {
         libmesh_assert(!Jac);
         Jac = &solver->_mffd_jac;
@@ -492,10 +492,10 @@ extern "C"
     {
       // We could be doing matrix-free in which case we cannot rely on closing of explicit matrices
       // that occurs during the PETSc residual callback
-      if ((jisshell == PETSC_TRUE) || (jismffd == PETSC_TRUE))
+      if ((j_is_shell == PETSC_TRUE) || (j_is_mffd == PETSC_TRUE))
         Jac->close();
 
-      if (pc && (pisshell == PETSC_TRUE))
+      if (pc && (p_is_shell == PETSC_TRUE))
         PC->close();
 
       PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
@@ -543,8 +543,8 @@ extern "C"
     if (Jac != PC)
       {
         // Assume that shells know what they're doing
-        libmesh_assert(!solver->_exact_constraint_enforcement || (jismffd == PETSC_TRUE) ||
-                       (jisshell == PETSC_TRUE));
+        libmesh_assert(!solver->_exact_constraint_enforcement || (j_is_mffd == PETSC_TRUE) ||
+                       (j_is_shell == PETSC_TRUE));
         Jac->close();
       }
 
