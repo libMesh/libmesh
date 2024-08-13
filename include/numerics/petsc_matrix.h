@@ -25,7 +25,7 @@
 #ifdef LIBMESH_HAVE_PETSC
 
 // Local includes
-#include "libmesh/sparse_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petsc_macro.h"
 #include "libmesh/petsc_solver_exception.h"
 
@@ -34,40 +34,6 @@
 #ifdef LIBMESH_HAVE_CXX11_THREAD
 #include <atomic>
 #include <mutex>
-#endif
-
-// Macro to identify and debug functions which should be called in
-// parallel on parallel matrices but which may be called in serial on
-// serial matrices.  This macro will only be valid inside non-static
-// PetscMatrix methods
-#undef semiparallel_only
-#undef exceptionless_semiparallel_only
-#ifndef NDEBUG
-#include <cstring>
-
-#define semiparallel_only() do { if (this->initialized()) { const char * mytype; \
-      auto semiparallel_only_ierr = MatGetType(_mat,&mytype);           \
-      LIBMESH_CHKERR(semiparallel_only_ierr);                           \
-      if (!strcmp(mytype, MATSEQAIJ))                                   \
-        parallel_object_only(); } } while (0)
-#define exceptionless_semiparallel_only() do { if (this->initialized()) { const char * mytype; \
-      auto semiparallel_only_ierr = MatGetType(_mat,&mytype);           \
-      libmesh_ignore(semiparallel_only_ierr);                           \
-      if (!strcmp(mytype, MATSEQAIJ))                                   \
-        exceptionless_parallel_object_only(); } } while (0)
-#else
-#define semiparallel_only()
-#define exceptionless_semiparallel_only()
-#endif
-
-
-// Petsc include files.
-#ifdef I
-# define LIBMESH_SAW_I
-#endif
-#include <petscmat.h>
-#ifndef LIBMESH_SAW_I
-# undef I // Avoid complex.h contamination
 #endif
 
 
@@ -82,9 +48,8 @@ enum PetscMatrixType : int {
                  AIJ=0,
                  HYPRE};
 
-
 /**
- * This class provides a nice interface to the PETSc C-based data
+ * This class provides a nice interface to the PETSc C-based AIJ data
  * structures for parallel, sparse matrices. All overridden virtual
  * functions are documented in sparse_matrix.h.
  *
@@ -93,7 +58,7 @@ enum PetscMatrixType : int {
  * \brief SparseMatrix interface to PETSc Mat.
  */
 template <typename T>
-class PetscMatrix final : public SparseMatrix<T>
+class PetscMatrix final : public PetscMatrixBase<T>
 {
 public:
   /**
@@ -132,13 +97,6 @@ public:
 
   PetscMatrix & operator= (const PetscMatrix &);
   virtual SparseMatrix<T> & operator= (const SparseMatrix<T> & v) override;
-
-  virtual SolverPackage solver_package() override
-  {
-    return PETSC_SOLVERS;
-  }
-
-  void set_matrix_type(PetscMatrixType mat_type);
 
   virtual void init (const numeric_index_type m,
                      const numeric_index_type n,
@@ -181,11 +139,6 @@ public:
    */
   void reset_preallocation();
 
-  /**
-   * clear() is called from the destructor, so it should not throw.
-   */
-  virtual void clear () noexcept override;
-
   virtual void zero () override;
 
   virtual std::unique_ptr<SparseMatrix<T>> zero_clone () const override;
@@ -194,20 +147,7 @@ public:
 
   virtual void zero_rows (std::vector<numeric_index_type> & rows, T diag_value = 0.0) override;
 
-  virtual void close () override;
-
   virtual void flush () override;
-
-  virtual numeric_index_type m () const override;
-
-  virtual numeric_index_type local_m () const final;
-
-  virtual numeric_index_type n () const override;
-
-  /**
-   * Get the number of columns owned by this process
-   */
-  virtual numeric_index_type local_n () const final;
 
   /**
    * Get the number of rows and columns owned by this process
@@ -215,14 +155,6 @@ public:
    * @param j Column size
    */
   void get_local_size (numeric_index_type & m, numeric_index_type & n) const;
-
-  virtual numeric_index_type row_start () const override;
-
-  virtual numeric_index_type row_stop () const override;
-
-  virtual numeric_index_type col_start () const override;
-
-  virtual numeric_index_type col_stop () const override;
 
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,
@@ -286,14 +218,6 @@ public:
 
   virtual Real linfty_norm () const override;
 
-  virtual bool closed() const override;
-
-  /**
-   * If set to false, we don't delete the Mat on destruction and allow
-   * instead for \p PETSc to manage it.
-   */
-  virtual void set_destroy_mat_on_exit(bool destroy = true);
-
   /**
    * Print the contents of the matrix to the screen with the PETSc
    * viewer. This function only allows printing to standard out since
@@ -315,22 +239,6 @@ public:
   virtual void get_diagonal (NumericVector<T> & dest) const override;
 
   virtual void get_transpose (SparseMatrix<T> & dest) const override;
-
-  /**
-   * Swaps the internal data pointers of two PetscMatrices, no actual
-   * values are swapped.
-   */
-  void swap (PetscMatrix<T> &);
-
-  /**
-   * \returns The raw PETSc matrix pointer.
-   *
-   * \note This is generally not required in user-level code.
-   *
-   * \note Don't do anything crazy like calling MatDestroy() on
-   * it, or very bad things will likely happen!
-   */
-  Mat mat () { libmesh_assert (_mat); return _mat; }
 
   virtual
   void get_row(numeric_index_type i,
@@ -372,21 +280,9 @@ protected:
                      PetscViewerType viewertype,
                      PetscFileMode filemode);
 
-private:
-
-  /**
-   * PETSc matrix datatype to store values.
-   */
-  Mat _mat;
-
-  /**
-   * This boolean value should only be set to \p false for the
-   * constructor which takes a PETSc Mat object.
-   */
-  bool _destroy_mat_on_exit;
-
   PetscMatrixType _mat_type;
 
+private:
 #ifdef LIBMESH_HAVE_CXX11_THREAD
   mutable std::mutex _petsc_matrix_mutex;
 #else

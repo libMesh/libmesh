@@ -47,6 +47,23 @@ namespace libMesh
 {
 
 /**
+ * Initialize a shell matrix object
+ */
+template <typename Obj>
+void init_shell_mat(Obj & obj,
+                    const numeric_index_type m,
+                    const numeric_index_type n,
+                    const numeric_index_type m_l,
+                    const numeric_index_type n_l,
+                    const numeric_index_type blocksize_in);
+
+/**
+ * Initialize a shell matrix object using information from the \p DofMap
+ */
+template <typename Obj>
+void init_shell_mat(Obj & obj);
+
+/**
  * This class allows to use a PETSc shell matrix.
  * All overridden virtual functions are documented in
  * shell_matrix.h.
@@ -100,9 +117,17 @@ protected:
   /**
    * Petsc Shell Matrix
    */
-  WrappedPetsc<Mat> _mat;
+  Mat _mat;
 
   bool _is_initialized;
+
+  friend void init_shell_mat<PetscShellMatrix<T>>(PetscShellMatrix<T> & obj);
+  friend void init_shell_mat<PetscShellMatrix<T>>(PetscShellMatrix<T> & obj,
+                                                  const numeric_index_type m,
+                                                  const numeric_index_type n,
+                                                  const numeric_index_type m_l,
+                                                  const numeric_index_type n_l,
+                                                  const numeric_index_type blocksize_in);
 };
 
 

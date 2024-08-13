@@ -27,11 +27,12 @@
 #include "libmesh/petsc_nonlinear_solver.h"
 #include "libmesh/petsc_linear_solver.h"
 #include "libmesh/petsc_vector.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_mffd_matrix.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/petscdmlibmesh.h"
+#include "libmesh/petsc_mffd_matrix.h"
 
 namespace libMesh
 {
@@ -467,28 +468,44 @@ extern "C"
 
     NonlinearImplicitSystem & sys = solver->system();
 
-    PetscMatrix<Number> PC(pc, sys.comm());
-    PetscMatrix<Number> Jac(jac, sys.comm());
+    PetscMatrixBase<Number> * const PC = pc ? PetscMatrixBase<Number>::get_context(pc) : nullptr;
+    PetscMatrixBase<Number> * Jac = jac ? PetscMatrixBase<Number>::get_context(jac) : nullptr;
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
+
+    PetscMFFDMatrix<Number> mffd_jac(sys.comm());
+    PetscBool p_is_shell = PETSC_FALSE;
+    PetscBool j_is_mffd = PETSC_FALSE;
+    PetscBool j_is_shell = PETSC_FALSE;
+    if (pc)
+      LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &p_is_shell));
+    libmesh_assert(jac);
+    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &j_is_mffd));
+    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATSHELL, &j_is_shell));
+    if (j_is_mffd == PETSC_TRUE)
+      {
+        libmesh_assert(!Jac);
+        Jac = &mffd_jac;
+        mffd_jac = jac;
+      }
 
     // We already computed the Jacobian during the residual evaluation
     if (solver->residual_and_jacobian_object)
     {
-      auto & sys_mat = static_cast<PetscMatrix<Number> &>(sys.get_system_matrix());
+      // We could be doing matrix-free in which case we cannot rely on closing of explicit matrices
+      // that occurs during the PETSc residual callback
+      if ((j_is_shell == PETSC_TRUE) || (j_is_mffd == PETSC_TRUE))
+        Jac->close();
 
-      // We could be doing matrix-free
-      if (jac && jac != sys_mat.mat())
-        Jac.close();
-      if (pc && pc != sys_mat.mat())
-        PC.close();
+      if (pc && (p_is_shell == PETSC_TRUE))
+        PC->close();
 
       PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
     }
 
     // Set the dof maps
-    PC.attach_dof_map(sys.get_dof_map());
-    Jac.attach_dof_map(sys.get_dof_map());
+    PC->attach_dof_map(sys.get_dof_map());
+    Jac->attach_dof_map(sys.get_dof_map());
 
     // Use the systems update() to get a good local version of the parallel solution
     X_global.swap(X_sys);
@@ -503,29 +520,35 @@ extern "C"
       sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     if (solver->_zero_out_jacobian)
-      PC.zero();
+      PC->zero();
 
 
     if (solver->jacobian != nullptr)
-      solver->jacobian(*sys.current_local_solution.get(), PC, sys);
+      solver->jacobian(*sys.current_local_solution.get(), *PC, sys);
 
     else if (solver->jacobian_object != nullptr)
-      solver->jacobian_object->jacobian(*sys.current_local_solution.get(), PC, sys);
+      solver->jacobian_object->jacobian(*sys.current_local_solution.get(), *PC, sys);
 
     else if (solver->matvec != nullptr)
-      solver->matvec(*sys.current_local_solution.get(), nullptr, &PC, sys);
+      solver->matvec(*sys.current_local_solution.get(), nullptr, PC, sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
-    PC.close();
+    PC->close();
     if (solver->_exact_constraint_enforcement)
       {
-        sys.get_dof_map().enforce_constraints_on_jacobian(sys, &PC);
-        PC.close();
+        sys.get_dof_map().enforce_constraints_on_jacobian(sys, PC);
+        PC->close();
       }
 
-    Jac.close();
+    if (Jac != PC)
+      {
+        // Assume that shells know what they're doing
+        libmesh_assert(!solver->_exact_constraint_enforcement || (j_is_mffd == PETSC_TRUE) ||
+                       (j_is_shell == PETSC_TRUE));
+        Jac->close();
+      }
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
@@ -932,7 +955,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
-  PetscMatrix<T> * pre = cast_ptr<PetscMatrix<T> *>(&pre_in);
+  PetscMatrixBase<T> * pre = cast_ptr<PetscMatrixBase<T> *>(&pre_in);
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
   PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
 

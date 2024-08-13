@@ -26,7 +26,7 @@
 
 // libMesh includes
 #include "libmesh/petsc_macro.h"
-#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petsc_vector.h"
 #include "libmesh/wrapped_petsc.h"
 
@@ -59,9 +59,9 @@ namespace libMesh
     DM * coarser_dm;
     DM * finer_dm;
     DM * global_dm;
-    PetscMatrix<libMesh::Number> * K_interp_ptr;
-    PetscMatrix<libMesh::Number> * K_sub_interp_ptr;
-    PetscMatrix<libMesh::Number> * K_restrict_ptr;
+    PetscMatrixBase<libMesh::Number> * K_interp_ptr;
+    PetscMatrixBase<libMesh::Number> * K_sub_interp_ptr;
+    PetscMatrixBase<libMesh::Number> * K_restrict_ptr;
     PetscVector<libMesh::Number> * current_vec;
 
     //! Stores local dofs for each var for use in subprojection matrixes
@@ -140,14 +140,14 @@ namespace libMesh
      * C++ objects, they are cleaned up automatically by their
      * destructors.
      */
-    std::vector<std::unique_ptr<PetscMatrix<Number>>> _pmtx_vec;
+    std::vector<std::unique_ptr<PetscMatrixBase<Number>>> _pmtx_vec;
 
     /**
      * Vector of sub projection matrixes for all grid levels for
      * fieldsplit.  These are C++ objects, they are cleaned up
      * automatically by their destructors.
      */
-    std::vector<std::unique_ptr<PetscMatrix<Number>>> _subpmtx_vec;
+    std::vector<std::unique_ptr<PetscMatrixBase<Number>>> _subpmtx_vec;
 
     /**
      * Vector of internal PetscDM context structs for all grid levels

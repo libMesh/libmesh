@@ -18,7 +18,6 @@
 
 
 // Local Includes
-#include "libmesh/petsc_matrix.h"
 #include "libmesh/shell_matrix.h"
 #include "libmesh/petsc_shell_matrix.h"
 #include "libmesh/enum_solver_package.h"

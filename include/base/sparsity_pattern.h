@@ -93,7 +93,7 @@ static void sort_row (const BidirectionalIterator begin,
  * the sparsity pattern (or graph) of the sparse matrix resulting
  * from the discretization.  This pattern may be used directly by
  * a particular sparse matrix format (e.g. \p LaspackMatrix)
- * or indirectly (e.g. \p PetscMatrix).  In the latter case the
+ * or indirectly (e.g. \p PetscMatrixBase).  In the latter case the
  * number of nonzeros per row of the matrix is needed for efficient
  * preallocation.  In this case it suffices to provide estimate
  * (but bounding) values, and in this case the threaded method can
