@@ -1678,6 +1678,68 @@ Real Elem::quality (const ElemQuality q) const
         return Real(180)/libMesh::pi * ((q == MIN_ANGLE) ? min_angle : max_angle);
       }
 
+    case MIN_DIHEDRAL_ANGLE:
+    case MAX_DIHEDRAL_ANGLE:
+      {
+        // For 1D and 2D elements, just call this function with MIN,MAX_ANGLE instead.
+        if (this->dim() < 3)
+          return this->quality((q == MIN_DIHEDRAL_ANGLE) ? MIN_ANGLE : MAX_ANGLE);
+
+        // Initialize return values
+        Real min_angle = std::numeric_limits<Real>::max();
+        Real max_angle = -std::numeric_limits<Real>::max();
+
+        // Algorithm for computing dihedral angles:
+        // .) Loop over the edges, use the edge_sides_map to get the
+        //    two sides adjacent to the edge.
+        // .) For each adjacent side, use the side_nodes_map to get the
+        //    list of three (or more) node ids on that side.
+        // .) Use the node ids to compute the (approximate) inward
+        //    normal for the side.  Note: this is approximate since 3D
+        //    elements with four-sided faces and quadratic tetrahedra
+        //    do not necessarily have planar faces.
+        // .) Compute the dihedral angle for the current edge, compare
+        //    it to the current min and max dihedral angles.
+        for (auto e : this->edge_index_range())
+          {
+            // Get list of edge ids adjacent to this node.
+            auto adjacent_side_ids = this->sides_on_edge(e);
+
+            // All 3D elements should have exactly two sides adjacent to each edge.
+            libmesh_assert_equal_to(adjacent_side_ids.size(), 2);
+
+            // Get lists of node ids on each side
+            auto side_0_node_ids = this->nodes_on_side(adjacent_side_ids[0]);
+            auto side_1_node_ids = this->nodes_on_side(adjacent_side_ids[1]);
+
+            // All 3D elements have at least three nodes on each side
+            libmesh_assert_greater_equal(side_0_node_ids.size(), 3);
+            libmesh_assert_greater_equal(side_1_node_ids.size(), 3);
+
+            // Construct (approximate) inward normal on each adjacent side
+            auto side_0_normal =
+              (this->point(side_0_node_ids[2]) - this->point(side_0_node_ids[0])).cross
+              (this->point(side_0_node_ids[1]) - this->point(side_0_node_ids[0])).unit();
+            auto side_1_normal =
+              (this->point(side_1_node_ids[2]) - this->point(side_1_node_ids[0])).cross
+              (this->point(side_1_node_ids[1]) - this->point(side_1_node_ids[0])).unit();
+
+            // Compute dihedral angle between the planes.
+            // Using the absolute value ensures that we get the same result
+            // even if the orientation of one of the planes is flipped, i.e.
+            // it always gives us a value in the range [0, pi/2].
+            // https://en.wikipedia.org/wiki/Dihedral_angle
+            Real theta = std::acos(std::abs(side_0_normal * side_1_normal));
+
+            // Track min and max angles seen
+            min_angle = std::min(theta, min_angle);
+            max_angle = std::max(theta, max_angle);
+          }
+
+        // Return requested extreme value (in degrees)
+        return Real(180)/libMesh::pi * ((q == MIN_DIHEDRAL_ANGLE) ? min_angle : max_angle);
+      }
+
       // Return 1 if we made it here
     default:
       {
