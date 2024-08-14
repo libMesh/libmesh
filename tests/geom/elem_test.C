@@ -6,6 +6,7 @@
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/parallel_implementation.h>
+#include <libmesh/enum_to_string.h>
 
 using namespace libMesh;
 
@@ -88,6 +89,31 @@ public:
         //     acos(2/sqrt(6)) so we use that as our lower bound here.
         if (elem->dim() > 1)
           CPPUNIT_ASSERT_GREATEREQUAL((std::acos(Real(2)/std::sqrt(Real(6))) * 180 / libMesh::pi) - TOLERANCE, min_angle);
+
+        // MIN,MAX_DIHEDRAL_ANGLE are implemented for all 3D elements
+        if (elem->dim() > 2)
+          {
+            const Real min_dihedral_angle = elem->quality(MIN_DIHEDRAL_ANGLE);
+            const Real max_dihedral_angle = elem->quality(MAX_DIHEDRAL_ANGLE);
+
+            // Debugging
+            // libMesh::out << "Elem type: " << Utility::enum_to_string(elem->type())
+            //              << ", min_dihedral_angle = " << min_dihedral_angle
+            //              << ", max_dihedral_angle = " << max_dihedral_angle
+            //              << std::endl;
+
+            // Assert that we match expected values for build_cube() meshes.
+            // * build_cube() meshes of hexes, tetrahedra, and prisms have max_dihedral_angle == 90
+            // * build_cube() meshes of pyramids have max_dihedral_angle == 60 between adjacent triangular faces
+            CPPUNIT_ASSERT_LESSEQUAL   (90 + TOLERANCE, max_dihedral_angle);
+
+            // * build_cube() meshes of hexes have min_dihedral_angle == 90
+            // * build_cube() meshes of prisms, tets, and pyramids have min_dihedral_angle == 45
+            // * For the InfPrism tests, we construct a single
+            //   InfPrism by hand with interior angle ~53.13 deg. so that
+            //   is the minimum dihedral angle we expect in that case.
+            CPPUNIT_ASSERT_GREATEREQUAL(45 - TOLERANCE, min_dihedral_angle);
+          }
       }
   }
 
