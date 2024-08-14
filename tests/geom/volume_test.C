@@ -40,6 +40,7 @@ public:
   CPPUNIT_TEST( testQuad4Warpage );
   CPPUNIT_TEST( testQuad4MinMaxAngle );
   CPPUNIT_TEST( testTri3AspectRatio );
+  CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -767,8 +768,40 @@ public:
       // 2b) Rhombus with interior angle theta=pi/3.
       test_rhombus_quad(libMesh::pi / 3);
     }
-
   }
+
+  void testTet4DihedralAngle()
+  {
+    LOG_UNIT_TEST;
+
+    // Construct a tetrahedron whose projection into the x-y plane looks like the unit square,
+    // and where the apex node is just slightly out of the x-y plane. This element should have
+    // reasonable MIN,MAX_ANGLE values but MIN,MAX_DIHEDRAL angles of nearly 0. This is an
+    // example that demonstrates one should not solely use edge angles to determine Elem quality
+    // in 3D.
+    std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(0, 1, 0), Point(1, 1, 0.01)};
+    auto [elem, nodes] = this->construct_elem(pts, TET4);
+    libmesh_ignore(nodes);
+
+    Real min_angle = elem->quality(MIN_ANGLE);
+    Real max_angle = elem->quality(MAX_ANGLE);
+    Real min_dihedral_angle = elem->quality(MIN_DIHEDRAL_ANGLE);
+    Real max_dihedral_angle = elem->quality(MAX_DIHEDRAL_ANGLE);
+
+    // Debugging
+    // libMesh::out << "Squashed Tet4 min_angle = " << min_angle << " degrees" << std::endl;
+    // libMesh::out << "Squashed Tet4 max_angle = " << max_angle << " degrees"  << std::endl;
+    // libMesh::out << "Squashed Tet4 min_dihedral_angle = " << min_dihedral_angle << " degrees" << std::endl;
+    // libMesh::out << "Squashed Tet4 max_dihedral_angle = " << max_dihedral_angle << " degrees" << std::endl;
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/44.9985676771277, /*actual=*/min_angle, TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+
+    // Assert that both min and max dihedral angles are less than 1 degree (a very low quality element)
+    CPPUNIT_ASSERT_LESS(1.0, min_dihedral_angle);
+    CPPUNIT_ASSERT_LESS(1.0, max_dihedral_angle);
+  }
+
 
 protected:
 
