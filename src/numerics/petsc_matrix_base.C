@@ -116,11 +116,12 @@ PetscMatrixBase<T> * PetscMatrixBase<T>::get_context(Mat mat)
 {
   void * ctx;
   PetscContainer container;
-  LibmeshPetscCall(PetscObjectQuery((PetscObject)mat, "PetscMatrixCtx", (PetscObject *)&container));
+  TIMPI::Communicator world(PETSC_COMM_WORLD);
+  LibmeshPetscCall2(world, PetscObjectQuery((PetscObject)mat, "PetscMatrixCtx", (PetscObject *)&container));
   if (!container)
     return nullptr;
 
-  LibmeshPetscCall(PetscContainerGetPointer(container, &ctx));
+  LibmeshPetscCall2(world, PetscContainerGetPointer(container, &ctx));
   libmesh_assert(ctx);
   return static_cast<PetscMatrixBase<T> *>(ctx);
 }
