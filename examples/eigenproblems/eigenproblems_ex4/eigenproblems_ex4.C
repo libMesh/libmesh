@@ -707,7 +707,7 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
     PetscMatrix<Number> sub(pc, eigen_system.comm());
     eigen_system.copy_super_to_sub(pc_super, sub);
 #else
-    auto sub = PetscMatrixBase<Number>::get_context(pc);
+    auto sub = PetscMatrixBase<Number>::get_context(pc, eigen_system.comm());
     libmesh_assert(sub);
     eigen_system.copy_super_to_sub(pc_super, *sub);
 #endif

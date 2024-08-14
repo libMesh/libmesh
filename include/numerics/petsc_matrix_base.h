@@ -146,7 +146,7 @@ public:
   /**
    * @returns The context for \p mat if it exists, else a \p nullptr
    */
-  static PetscMatrixBase<T> * get_context(Mat mat);
+  static PetscMatrixBase<T> * get_context(Mat mat, const TIMPI::Communicator & comm);
 
   virtual numeric_index_type m () const override;
 
