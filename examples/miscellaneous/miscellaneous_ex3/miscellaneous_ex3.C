@@ -65,6 +65,7 @@
 #ifdef LIBMESH_HAVE_PETSC
 #include <petsc.h>
 #include "libmesh/petsc_macro.h"
+#include "libmesh/petsc_solver_exception.h"
 #endif
 
 // Bring in everything from the libMesh namespace
@@ -190,11 +191,11 @@ int main (int argc, char ** argv)
 #ifdef LIBMESH_HAVE_PETSC
       //Use the jacobian for preconditioning.
 #  if PETSC_VERSION_LESS_THAN(3,7,0)
-      PetscOptionsSetValue("-snes_mf_operator",
-                           LIBMESH_PETSC_NULLPTR);
+      LibmeshPetscCall2(init.comm(), PetscOptionsSetValue("-snes_mf_operator",
+                                                          LIBMESH_PETSC_NULLPTR));
 #  else
-      PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-snes_mf_operator",
-                           LIBMESH_PETSC_NULLPTR);
+      LibmeshPetscCall2(init.comm(), PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-snes_mf_operator",
+                                                          LIBMESH_PETSC_NULLPTR));
 #  endif
 #else
       libMesh::err << "Must be using PETSc to use jacobian based preconditioning" << std::endl;
