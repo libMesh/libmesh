@@ -222,6 +222,9 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
   std::pair<Real, Real> eval = eigen_solver->get_eigenpair (i, *temp);
 
   // Now map temp to solution. Loop over local entries of local_non_condensed_dofs_vector
+  libmesh_assert(this->comm().verify(this->solution->closed()));
+  if (!this->solution->closed())
+    this->solution->close();
   this->solution->zero();
   for (auto j : make_range(n_local))
     {
