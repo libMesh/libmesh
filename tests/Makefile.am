@@ -220,7 +220,6 @@ if LIBMESH_ENABLE_FPARSER
 endif
 
 check_PROGRAMS = # empty, append below
-noinst_PROGRAMS = # empty, append below
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
@@ -232,9 +231,6 @@ if LIBMESH_DBG_MODE
 if ACSM_ENABLE_GLIBCXX_DEBUGGING
 if ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT
   check_PROGRAMS         += unit_tests-dbg
-  noinst_PROGRAMS        += unit_tests-dbg
-else
-  noinst_PROGRAMS        += unit_tests-dbg
 endif
 else
   check_PROGRAMS         += unit_tests-dbg
@@ -251,7 +247,6 @@ endif
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_DEVEL_MODE
   check_PROGRAMS           += unit_tests-devel
-  noinst_PROGRAMS          += unit_tests-devel
   unit_tests_devel_SOURCES  = $(unit_tests_sources)
   unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
   unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
@@ -264,7 +259,6 @@ endif
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_PROF_MODE
   check_PROGRAMS          += unit_tests-prof
-  noinst_PROGRAMS         += unit_tests-prof
   unit_tests_prof_SOURCES  = $(unit_tests_sources)
   unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
   unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
@@ -277,7 +271,6 @@ endif
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_OPROF_MODE
   check_PROGRAMS           += unit_tests-oprof
-  noinst_PROGRAMS          += unit_tests-oprof
   unit_tests_oprof_SOURCES  = $(unit_tests_sources)
   unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
   unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
@@ -290,7 +283,6 @@ endif
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_OPT_MODE
   check_PROGRAMS         += unit_tests-opt
-  noinst_PROGRAMS        += unit_tests-opt
   unit_tests_opt_SOURCES  = $(unit_tests_sources)
   unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
   unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
