@@ -410,6 +410,8 @@ std::map<std::string, ElemQuality> elemquality_to_enum {
    {"SHAPE"              , SHAPE},
    {"MAX_ANGLE"          , MAX_ANGLE},
    {"MIN_ANGLE"          , MIN_ANGLE},
+   {"MAX_DIHEDRAL_ANGLE" , MAX_DIHEDRAL_ANGLE},
+   {"MIN_DIHEDRAL_ANGLE" , MIN_DIHEDRAL_ANGLE},
    {"CONDITION"          , CONDITION},
    {"DISTORTION"         , DISTORTION},
    {"TAPER"              , TAPER},

@@ -70,6 +70,14 @@ std::string Quality::name (const ElemQuality q)
       its_name = "Minimum Angle";
       break;
 
+    case MAX_DIHEDRAL_ANGLE:
+      its_name = "Maximum Dihedral Angle";
+      break;
+
+    case MIN_DIHEDRAL_ANGLE:
+      its_name = "Minimum Dihedral Angle";
+      break;
+
     case CONDITION:
       its_name = "Condition Number";
       break;
@@ -191,6 +199,22 @@ std::string Quality::describe (const ElemQuality q)
 
     case MIN_ANGLE:
       desc << "Smallest angle between all adjacent pairs of edges (in 2D, sides).\n"
+           << '\n'
+           << "Suggested ranges:\n"
+           << "Quads: (45 -> 90)\n"
+           << "Triangles: (30 -> 60)";
+      break;
+
+    case MAX_DIHEDRAL_ANGLE:
+      desc << "Largest angle between all adjacent pairs of sides (in 2D, equivalent to MAX_ANGLE).\n"
+           << '\n'
+           << "Suggested ranges:\n"
+           << "Quads: (90 -> 135)\n"
+           << "Triangles: (60 -> 90)";
+      break;
+
+    case MIN_DIHEDRAL_ANGLE:
+      desc << "Smallest angle between all adjacent pairs of sides (in 2D, equivalent to MIN_ANGLE).\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (45 -> 90)\n"
@@ -344,6 +368,8 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           JACOBIAN,
           MAX_ANGLE,
           MIN_ANGLE,
+          MAX_DIHEDRAL_ANGLE,
+          MIN_DIHEDRAL_ANGLE,
           SHAPE,
           SIZE
         };
@@ -366,6 +392,8 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           JACOBIAN,
           MAX_ANGLE,
           MIN_ANGLE,
+          MAX_DIHEDRAL_ANGLE,
+          MIN_DIHEDRAL_ANGLE,
           SHAPE,
           SHEAR,
           SIZE,
@@ -388,6 +416,10 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           CONDITION,
           DISTORTION,
           JACOBIAN,
+          MAX_ANGLE,
+          MIN_ANGLE,
+          MAX_DIHEDRAL_ANGLE,
+          MIN_DIHEDRAL_ANGLE,
           SHAPE,
           SIZE
         };
@@ -405,6 +437,10 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           DIAGONAL,
           DISTORTION,
           JACOBIAN,
+          MAX_ANGLE,
+          MIN_ANGLE,
+          MAX_DIHEDRAL_ANGLE,
+          MIN_DIHEDRAL_ANGLE,
           SHAPE,
           SHEAR,
           SIZE,
@@ -421,7 +457,14 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case PRISM20:
     case PRISM21:
       {
-        // None yet
+        v = {
+          EDGE_LENGTH_RATIO,
+          MAX_ANGLE,
+          MIN_ANGLE,
+          MAX_DIHEDRAL_ANGLE,
+          MIN_DIHEDRAL_ANGLE,
+        };
+
         break;
       }
 
@@ -430,7 +473,14 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case PYRAMID14:
     case PYRAMID18:
       {
-        // None yet
+        v = {
+          EDGE_LENGTH_RATIO,
+          MAX_ANGLE,
+          MIN_ANGLE,
+          MAX_DIHEDRAL_ANGLE,
+          MIN_DIHEDRAL_ANGLE,
+        };
+
         break;
       }
 
@@ -446,23 +496,19 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
 
     case INFQUAD4:
     case INFQUAD6:
-      {
-        // None yet
-        break;
-      }
-
     case INFHEX8:
     case INFHEX16:
     case INFHEX18:
-      {
-        // None yet
-        break;
-      }
-
     case INFPRISM6:
     case INFPRISM12:
       {
-        // None yet
+        v = {
+          MAX_ANGLE,
+          MIN_ANGLE,
+          MAX_DIHEDRAL_ANGLE,
+          MIN_DIHEDRAL_ANGLE,
+        };
+
         break;
       }
 

@@ -38,6 +38,8 @@ enum ElemQuality : int {
                   SHAPE,
                   MAX_ANGLE,
                   MIN_ANGLE,
+                  MAX_DIHEDRAL_ANGLE,
+                  MIN_DIHEDRAL_ANGLE,
                   CONDITION,
                   DISTORTION,
                   TAPER,
