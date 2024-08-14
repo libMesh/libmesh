@@ -1235,6 +1235,9 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   // Make sure mesh_dimension and elem_dimensions are consistent.
   mesh.cache_elem_data();
 
+  // Make sure mesh id counts are consistent.
+  mesh.update_parallel_id_counts();
+
   // We may have constraint rows on IsoGeometric Analysis meshes.  We
   // don't want to send these along with constrained nodes (like we
   // send boundary info for those nodes) because the associated rows'
