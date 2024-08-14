@@ -14,7 +14,6 @@
 
 @SET_MAKE@
 
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -95,8 +94,6 @@ target_triplet = @target@
 
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
 	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
-noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_7) $(am__EXEEXT_3) \
-	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
@@ -104,23 +101,17 @@ noinst_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_7) $(am__EXEEXT_3) \
 # GLIBCXX-debugging builds with cppunit unless specifically
 # configured to.
 @ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_2 = unit_tests-dbg
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_3 = unit_tests-dbg
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_4 = unit_tests-dbg
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_5 = unit_tests-dbg
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_6 = unit_tests-devel
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_7 = unit_tests-devel
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_8 = unit_tests-prof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_9 = unit_tests-prof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_10 = unit_tests-oprof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_11 = unit_tests-oprof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_12 = unit_tests-opt
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_13 = unit_tests-opt
-@LIBMESH_VPATH_BUILD_TRUE@am__append_14 = .linkstamp
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_3 = unit_tests-dbg
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_4 = unit_tests-devel
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_5 = unit_tests-prof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_6 = unit_tests-oprof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_7 = unit_tests-opt
+@LIBMESH_VPATH_BUILD_TRUE@am__append_8 = .linkstamp
 
 ######################################################################
 #
 # Don't leave code coverage outputs lying around
-@CODE_COVERAGE_ENABLED_TRUE@am__append_15 = */*.gcda */*.gcno
+@CODE_COVERAGE_ENABLED_TRUE@am__append_9 = */*.gcda */*.gcno
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
@@ -194,8 +185,6 @@ CONFIG_CLEAN_VPATH_FILES =
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_6 = unit_tests-opt$(EXEEXT)
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_FALSE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_7 = unit_tests-dbg$(EXEEXT)
-PROGRAMS = $(noinst_PROGRAMS)
 am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	stream_redirector.h test_comm.h base/dof_object_test.h \
 	base/dof_map_test.C base/default_coupling_test.C \
@@ -2404,7 +2393,7 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	write_exodus_QUADSHELL9.e write_exodus_TET10.e \
 	write_exodus_TET14.e write_exodus_TET4.e write_exodus_TRI3.e \
 	write_exodus_TRI6.e write_exodus_TRI7.e \
-	write_exodus_TRISHELL3.e $(am__append_14) $(am__append_15)
+	write_exodus_TRISHELL3.e $(am__append_8) $(am__append_9)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
@@ -2447,15 +2436,6 @@ run_unit_tests.sh: $(top_builddir)/config.status $(srcdir)/run_unit_tests.sh.in
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; test -n "$$list" || exit 0; \
-	echo " rm -f" $$list; \
-	rm -f $$list || exit $$?; \
-	test -n "$(EXEEXT)" || exit 0; \
-	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
-	echo " rm -f" $$list; \
-	rm -f $$list
-
-clean-noinstPROGRAMS:
-	@list='$(noinst_PROGRAMS)'; test -n "$$list" || exit 0; \
 	echo " rm -f" $$list; \
 	rm -f $$list || exit $$?; \
 	test -n "$(EXEEXT)" || exit 0; \
@@ -12617,7 +12597,7 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(PROGRAMS) $(DATA)
+all-am: Makefile $(DATA)
 installdirs:
 	for dir in "$(DESTDIR)$(unit_tests_dbgdir)" "$(DESTDIR)$(unit_tests_develdir)" "$(DESTDIR)$(unit_tests_oprofdir)" "$(DESTDIR)$(unit_tests_optdir)" "$(DESTDIR)$(unit_tests_profdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
@@ -12683,7 +12663,7 @@ maintainer-clean-generic:
 clean: clean-am
 
 clean-am: clean-checkPROGRAMS clean-generic clean-libtool clean-local \
-	clean-noinstPROGRAMS mostlyclean-am
+	mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/unit_tests_dbg-driver.Po
@@ -13898,23 +13878,23 @@ uninstall-am: uninstall-unit_tests_dbgDATA \
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-TESTS \
 	check-am clean clean-checkPROGRAMS clean-generic clean-libtool \
-	clean-local clean-noinstPROGRAMS cscopelist-am ctags ctags-am \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-data \
-	install-data-am install-dvi install-dvi-am install-exec \
-	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip \
-	install-unit_tests_dbgDATA install-unit_tests_develDATA \
-	install-unit_tests_oprofDATA install-unit_tests_optDATA \
-	install-unit_tests_profDATA installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-unit_tests_dbgDATA \
-	uninstall-unit_tests_develDATA uninstall-unit_tests_oprofDATA \
-	uninstall-unit_tests_optDATA uninstall-unit_tests_profDATA
+	clean-local cscopelist-am ctags ctags-am distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am install-dvi \
+	install-dvi-am install-exec install-exec-am install-html \
+	install-html-am install-info install-info-am install-man \
+	install-pdf install-pdf-am install-ps install-ps-am \
+	install-strip install-unit_tests_dbgDATA \
+	install-unit_tests_develDATA install-unit_tests_oprofDATA \
+	install-unit_tests_optDATA install-unit_tests_profDATA \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags tags-am uninstall uninstall-am \
+	uninstall-unit_tests_dbgDATA uninstall-unit_tests_develDATA \
+	uninstall-unit_tests_oprofDATA uninstall-unit_tests_optDATA \
+	uninstall-unit_tests_profDATA
 
 .PRECIOUS: Makefile
 
