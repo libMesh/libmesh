@@ -112,15 +112,15 @@ void PetscMatrixBase<T>::set_context()
 }
 
 template <typename T>
-PetscMatrixBase<T> * PetscMatrixBase<T>::get_context(Mat mat)
+PetscMatrixBase<T> * PetscMatrixBase<T>::get_context(Mat mat, const TIMPI::Communicator & comm)
 {
   void * ctx;
   PetscContainer container;
-  LibmeshPetscCall(PetscObjectQuery((PetscObject)mat, "PetscMatrixCtx", (PetscObject *)&container));
+  LibmeshPetscCall2(comm, PetscObjectQuery((PetscObject)mat, "PetscMatrixCtx", (PetscObject *)&container));
   if (!container)
     return nullptr;
 
-  LibmeshPetscCall(PetscContainerGetPointer(container, &ctx));
+  LibmeshPetscCall2(comm, PetscContainerGetPointer(container, &ctx));
   libmesh_assert(ctx);
   return static_cast<PetscMatrixBase<T> *>(ctx);
 }

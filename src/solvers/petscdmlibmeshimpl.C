@@ -691,8 +691,8 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
 
   libmesh_assert(pc);
   libmesh_assert(jac);
-  PetscMatrixBase<Number> & the_pc = *PetscMatrixBase<Number>::get_context(pc);
-  PetscMatrixBase<Number> & Jac = *PetscMatrixBase<Number>::get_context(jac);
+  PetscMatrixBase<Number> & the_pc = *PetscMatrixBase<Number>::get_context(pc, sys.comm());
+  PetscMatrixBase<Number> & Jac = *PetscMatrixBase<Number>::get_context(jac, sys.comm());
   PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
   PetscMatrixBase<Number> & Jac_sys = *cast_ptr<PetscMatrixBase<Number> *>(sys.matrix);
   PetscVector<Number> X_global(x, sys.comm());

@@ -468,8 +468,8 @@ extern "C"
 
     NonlinearImplicitSystem & sys = solver->system();
 
-    PetscMatrixBase<Number> * const PC = pc ? PetscMatrixBase<Number>::get_context(pc) : nullptr;
-    PetscMatrixBase<Number> * Jac = jac ? PetscMatrixBase<Number>::get_context(jac) : nullptr;
+    PetscMatrixBase<Number> * const PC = pc ? PetscMatrixBase<Number>::get_context(pc, sys.comm()) : nullptr;
+    PetscMatrixBase<Number> * Jac = jac ? PetscMatrixBase<Number>::get_context(jac, sys.comm()) : nullptr;
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
 
@@ -478,10 +478,10 @@ extern "C"
     PetscBool j_is_mffd = PETSC_FALSE;
     PetscBool j_is_shell = PETSC_FALSE;
     if (pc)
-      LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &p_is_shell));
+      LibmeshPetscCall2(sys.comm(), PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &p_is_shell));
     libmesh_assert(jac);
-    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &j_is_mffd));
-    LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)jac, MATSHELL, &j_is_shell));
+    LibmeshPetscCall2(sys.comm(), PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &j_is_mffd));
+    LibmeshPetscCall2(sys.comm(), PetscObjectTypeCompare((PetscObject)jac, MATSHELL, &j_is_shell));
     if (j_is_mffd == PETSC_TRUE)
       {
         libmesh_assert(!Jac);
