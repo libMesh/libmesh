@@ -787,6 +787,32 @@ public:
   const_vectors_iterator vectors_end () const;
 
   /**
+   * Matrix iterator typedefs.
+   */
+  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>, std::less<>>::iterator        matrices_iterator;
+  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>, std::less<>>::const_iterator  const_matrices_iterator;
+
+  /**
+   * Beginning of matrices container
+   */
+  matrices_iterator matrices_begin ();
+
+  /**
+   * Beginning of matrices container
+   */
+  const_matrices_iterator matrices_begin () const;
+
+  /**
+   * End of matrices container
+   */
+  matrices_iterator matrices_end ();
+
+  /**
+   * End of matrices container
+   */
+  const_matrices_iterator matrices_end () const;
+
+  /**
    * Adds the additional vector \p vec_name to this system.  All the
    * additional vectors are similarly distributed, like the \p
    * solution, and initialized to zero.
@@ -1804,12 +1830,6 @@ public:
 #endif // LIBMESH_HAVE_METAPHYSICL
 
   /**
-   * Matrix iterator typedefs.
-   */
-  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>, std::less<>>::iterator        matrices_iterator;
-  typedef std::map<std::string, std::unique_ptr<SparseMatrix<Number>>, std::less<>>::const_iterator  const_matrices_iterator;
-
-  /**
    * Adds the additional matrix \p mat_name to this system.  Only
    * allowed prior to \p assemble().  All additional matrices
    * have the same sparsity pattern as the matrix used during
@@ -2506,6 +2526,30 @@ inline
 System::const_vectors_iterator System::vectors_end () const
 {
   return _vectors.end();
+}
+
+inline
+System::matrices_iterator System::matrices_begin ()
+{
+  return _matrices.begin();
+}
+
+inline
+System::const_matrices_iterator System::matrices_begin () const
+{
+  return _matrices.begin();
+}
+
+inline
+System::matrices_iterator System::matrices_end ()
+{
+  return _matrices.end();
+}
+
+inline
+System::const_matrices_iterator System::matrices_end () const
+{
+  return _matrices.end();
 }
 
 inline
