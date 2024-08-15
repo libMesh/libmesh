@@ -28,6 +28,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/mesh_communication.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h" // libmesh_map_find
 
@@ -76,6 +77,40 @@ NetGenMeshInterface::NetGenMeshInterface (UnstructuredMesh & mesh) :
 void NetGenMeshInterface::triangulate ()
 {
   using namespace nglib;
+
+  // We're hoping to do volume_to_surface_mesh in parallel at least,
+  // but then we'll need to serialize any hole meshes to rank 0 so it
+  // can use them in serial.
+
+  this->volume_to_surface_mesh(this->_mesh);
+
+  std::vector<MeshSerializer> hole_serializers;
+  if (_holes)
+    for (std::unique_ptr<UnstructuredMesh> & hole : *_holes)
+      {
+        this->volume_to_surface_mesh(*hole);
+        hole_serializers.emplace_back
+          (*hole, /* need_serial */ true,
+           /* serial_only_needed_on_proc_0 */ true);
+      }
+
+  // If we're not rank 0, we're just going to wait for rank 0 to call
+  // Netgen, then receive its data afterward, we're not going to hope
+  // that Netgen does the exact same thing on every processor.
+  if (this->_mesh.processor_id() != 0)
+    {
+      // We don't need our holes anymore.  Delete their serializers
+      // first to avoid dereferencing dangling pointers.
+      hole_serializers.clear();
+      if (_holes)
+        _holes->clear();
+
+      // Receive the mesh data rank 0 will send later, then fix it up
+      // together
+      MeshCommunication().broadcast(this->_mesh);
+      this->_mesh.prepare_for_use();
+      return;
+    }
 
   this->check_hull_integrity();
 
@@ -132,17 +167,6 @@ void NetGenMeshInterface::triangulate ()
   };
 
   WrappedNgMesh ngmesh;
-
-  this->volume_to_surface_mesh(this->_mesh);
-
-  std::vector<MeshSerializer> hole_serializers;
-
-  if (_holes)
-    for (std::unique_ptr<UnstructuredMesh> & hole : *_holes)
-      {
-        this->volume_to_surface_mesh(*hole);
-        hole_serializers.emplace_back(*hole);
-      }
 
   // Create surface mesh in the WrappedNgMesh
   {
@@ -314,6 +338,14 @@ void NetGenMeshInterface::triangulate ()
     elem->orient(bi);
   }
 
+  // We don't need our holes anymore.  Delete their serializers
+  // first to avoid dereferencing dangling pointers.
+  hole_serializers.clear();
+  if (_holes)
+    _holes->clear();
+
+  // Send our data to other ranks, then fix it up together
+  MeshCommunication().broadcast(this->_mesh);
   this->_mesh.prepare_for_use();
 }
 
