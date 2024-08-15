@@ -49,7 +49,9 @@ enum ElemQuality : int {
                   SIZE,
                   JACOBIAN,
                   TWIST,
-                  EDGE_LENGTH_RATIO};
+                  EDGE_LENGTH_RATIO,
+                  MAX_DIHEDRAL_ANGLE,
+                  MIN_DIHEDRAL_ANGLE};
 }
 
 #endif
