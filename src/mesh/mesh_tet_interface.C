@@ -113,6 +113,11 @@ void MeshTetInterface::attach_hole_list
 
 void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 {
+  // If we've been handed an unprepared mesh then we need to fix that;
+  // we're relying on neighbor pointers here.
+  if (!mesh.is_prepared())
+    mesh.prepare_for_use();
+
   // First convert all volume boundaries to surface elements; this
   // gives us a manifold bounding the mesh, though it may not be a
   // connected manifold even if the volume mesh was connected.
