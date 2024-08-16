@@ -111,12 +111,15 @@ void MeshTetInterface::attach_hole_list
 }
 
 
-void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
+BoundingBox MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 {
   // If we've been handed an unprepared mesh then we need to fix that;
   // we're relying on neighbor pointers here.
   if (!mesh.is_prepared())
     mesh.prepare_for_use();
+
+  // We'll return a bounding box for use by subclasses in basic sanity checks.
+  BoundingBox surface_bb;
 
   // First convert all volume boundaries to surface elements; this
   // gives us a manifold bounding the mesh, though it may not be a
@@ -288,13 +291,21 @@ void MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
         for (Elem * elem: component)
           mesh.delete_elem(elem);
       }
-    else if (biggest_six_vol < 0)
+    else
       {
         for (Elem * elem: component)
-          elem->flip(&mesh.get_boundary_info());
+          {
+            if (biggest_six_vol < 0)
+              elem->flip(&mesh.get_boundary_info());
+
+            for (auto & node : elem->node_ref_range())
+              surface_bb.union_with(node);
+          }
       }
 
   mesh.prepare_for_use();
+
+  return surface_bb;
 }
 
 
