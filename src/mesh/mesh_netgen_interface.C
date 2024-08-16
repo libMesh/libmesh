@@ -82,13 +82,21 @@ void NetGenMeshInterface::triangulate ()
   // but then we'll need to serialize any hole meshes to rank 0 so it
   // can use them in serial.
 
-  this->volume_to_surface_mesh(this->_mesh);
+  const BoundingBox mesh_bb =
+    this->volume_to_surface_mesh(this->_mesh);
 
   std::vector<MeshSerializer> hole_serializers;
   if (_holes)
     for (std::unique_ptr<UnstructuredMesh> & hole : *_holes)
       {
-        this->volume_to_surface_mesh(*hole);
+        const BoundingBox hole_bb =
+          this->volume_to_surface_mesh(*hole);
+
+        libmesh_error_msg_if
+          (!mesh_bb.contains(hole_bb),
+           "Found hole with bounding box " << hole_bb <<
+           "\nextending outside of mesh bounding box " << mesh_bb);
+
         hole_serializers.emplace_back
           (*hole, /* need_serial */ true,
            /* serial_only_needed_on_proc_0 */ true);
