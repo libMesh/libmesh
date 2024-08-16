@@ -90,6 +90,12 @@ public:
   { return this->second; }
 
   /**
+   * \returns \p true if the other bounding box is contained in this
+   * bounding box. Exact floating point <= comparisons are performed.
+   */
+  bool contains (const BoundingBox &) const;
+
+  /**
    * \returns \p true if the other bounding box has a non-empty
    * intersection with this bounding box. Exact floating point <=
    * comparisons are performed.
@@ -197,6 +203,26 @@ public:
 
 // ------------------------------------------------------------
 // BoundingBox class member functions
+
+inline
+bool
+BoundingBox::contains(const BoundingBox & other_box) const
+{
+  const libMesh::Point & my_lower = this->first;
+  const libMesh::Point & my_upper = this->second;
+
+  const libMesh::Point & other_lower = other_box.first;
+  const libMesh::Point & other_upper = other_box.second;
+
+  for (unsigned int dir=0; dir<LIBMESH_DIM; ++dir)
+    if (my_lower(dir) > other_lower(dir) ||
+        other_upper(dir) > my_upper(dir))
+      return false;
+
+  return true;
+}
+
+
 
 // BoundingBox::intersects() is about 30% faster when inlined, so its definition
 // is here instead of in the source file.
