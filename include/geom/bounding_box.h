@@ -59,7 +59,8 @@ public:
   }
 
   /**
-   * Sets the bounding box to encompass the universe.
+   * Sets the bounding box to be "inverted".  This is a useful
+   * starting point for future \p union_with operations.
    */
   void invalidate ()
   {
