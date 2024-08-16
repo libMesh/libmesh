@@ -67,7 +67,7 @@ SimpleRange<IndexType> as_range(const std::pair<IndexType, IndexType> & p)
  */
 template<typename IndexType>
 SimpleRange<IndexType> as_range(const IndexType & first,
-                        const IndexType & second)
+                                const IndexType & second)
 {
   return {first, second};
 }
