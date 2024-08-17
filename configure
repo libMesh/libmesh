@@ -50531,10 +50531,10 @@ then :
           if test "x$install_internal_boost" = "xyes"
 then :
   libmesh_contrib_INCLUDES="$BOOST_INCLUDE $libmesh_contrib_INCLUDES"
-                 export timpi_CPPFLAGS="-I$(realpath $top_srcdir)/contrib/boost/include"
+                 export timpi_CPPFLAGS="$timpi_CPPFLAGS -I$(realpath $top_srcdir)/contrib/boost/include"
 else $as_nop
   libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
-                 export timpi_CPPFLAGS="$BOOST_CPPFLAGS"
+                 export timpi_CPPFLAGS="$timpi_CPPFLAGS $BOOST_CPPFLAGS"
 fi
 
 fi
