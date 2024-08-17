@@ -71,9 +71,9 @@ AC_DEFUN([CONFIGURE_BOOST],
         [
           AS_IF([test "x$install_internal_boost" = "xyes"],
                 [libmesh_contrib_INCLUDES="$BOOST_INCLUDE $libmesh_contrib_INCLUDES"
-                 export timpi_CPPFLAGS="-I$(realpath $top_srcdir)/contrib/boost/include"],
+                 export timpi_CPPFLAGS="$timpi_CPPFLAGS -I$(realpath $top_srcdir)/contrib/boost/include"],
                 [libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
-                 export timpi_CPPFLAGS="$BOOST_CPPFLAGS"])
+                 export timpi_CPPFLAGS="$timpi_CPPFLAGS $BOOST_CPPFLAGS"])
         ])
 
   AM_CONDITIONAL(LIBMESH_INSTALL_INTERNAL_BOOST, test x$install_internal_boost = xyes)
