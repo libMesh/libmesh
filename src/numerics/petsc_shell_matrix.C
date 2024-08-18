@@ -24,10 +24,15 @@
 
 namespace libMesh
 {
+template <typename T>
+PetscShellMatrix<T>::~PetscShellMatrix()
+{
+  this->clear();
+}
 
 template <typename T>
 void PetscShellMatrix<T>::vector_mult (NumericVector<T> & dest,
-                                        const NumericVector<T> & arg) const
+                                       const NumericVector<T> & arg) const
 {
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
   const PetscVector<T> & petsc_arg = cast_ref<const PetscVector<T> &>(arg);
@@ -40,7 +45,7 @@ void PetscShellMatrix<T>::vector_mult (NumericVector<T> & dest,
 
 template <typename T>
 void PetscShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
-                                            const NumericVector<T> & arg) const
+                                           const NumericVector<T> & arg) const
 {
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
   const PetscVector<T> & petsc_arg = cast_ref<const PetscVector<T> &>(arg);
