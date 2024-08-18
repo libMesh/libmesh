@@ -545,7 +545,7 @@ RBConstructionBase<Base>::generate_training_parameters_random(const Parallel::Co
               Real log_min   = std::log10(min_parameters.get_value(param_name));
               Real log_range = std::log10(max_parameters.get_value(param_name) / min_parameters.get_value(param_name));
 
-              sample_vector[i] = {std::pow(10., log_min + random_number*log_range )};
+              sample_vector[i] = {std::pow(Real(10.), log_min + random_number*log_range )};
             }
           // Generate linearly scaled training parameters
           else

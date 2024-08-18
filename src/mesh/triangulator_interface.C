@@ -509,7 +509,7 @@ void TriangulatorInterface::calculate_auto_desired_area_samples(std::vector<Poin
   for (unsigned int i = 0; i < bdry_mh.n_points(); i++)
   {
     function_points.push_back((bdry_mh.point(i) + bdry_mh.point((i + 1) % bdry_mh.n_points())) /
-                              2.0);
+                              Real(2.0));
     function_sizes.push_back(
         (bdry_mh.point(i) - bdry_mh.point((i + 1) % bdry_mh.n_points())).norm());
   }
@@ -520,7 +520,7 @@ void TriangulatorInterface::calculate_auto_desired_area_samples(std::vector<Poin
       for (unsigned int i = 0; i < hole->n_points(); i++)
       {
         function_points.push_back(
-            (hole->point(i) + hole->point((i + 1) % hole->n_points())) / 2.0);
+            (hole->point(i) + hole->point((i + 1) % hole->n_points())) / Real(2.0));
         function_sizes.push_back(
             (hole->point(i) - hole->point((i + 1) % hole->n_points())).norm());
       }

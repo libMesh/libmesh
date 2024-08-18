@@ -192,7 +192,7 @@ double LinearSolver<T>::get_real_solver_setting (const std::string & setting_nam
   {
     if (const auto it = this->_solver_configuration->real_valued_data.find(setting_name);
         it != this->_solver_configuration->real_valued_data.end())
-      return it->second;
+      return double(it->second);
   }
   else if (default_value.has_value())
     return default_value.value();

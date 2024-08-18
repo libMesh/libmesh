@@ -65,11 +65,15 @@ AC_DEFUN([CONFIGURE_BOOST],
   dnl which is not exported during install.  If we are using an external boost,
   dnl add its (absolute) path, as determined by AX_BOOST_BASE to the
   dnl libmesh_optional_INCLUDES variable.
+  dnl In either case, we also add Boost's absolute path to timpi_CPPFLAGS so
+  dnl that, if we are using quadruple precision, TIMPI can use Boost's headers.
   AS_IF([test "x$enableboost" = "xyes"],
         [
           AS_IF([test "x$install_internal_boost" = "xyes"],
-                [libmesh_contrib_INCLUDES="$BOOST_INCLUDE $libmesh_contrib_INCLUDES"],
-                [libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"])
+                [libmesh_contrib_INCLUDES="$BOOST_INCLUDE $libmesh_contrib_INCLUDES"
+                 export timpi_CPPFLAGS="$timpi_CPPFLAGS -I$(realpath $top_srcdir)/contrib/boost/include"],
+                [libmesh_optional_INCLUDES="$BOOST_CPPFLAGS $libmesh_optional_INCLUDES"
+                 export timpi_CPPFLAGS="$timpi_CPPFLAGS $BOOST_CPPFLAGS"])
         ])
 
   AM_CONDITIONAL(LIBMESH_INSTALL_INTERNAL_BOOST, test x$install_internal_boost = xyes)

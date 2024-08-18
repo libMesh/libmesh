@@ -61,7 +61,7 @@ p2t::Point to_p2t(const libMesh::Point & p)
      "Poly2TriTriangulator only supports point sets in the XY plane");
 #endif
 
-  return {p(0), p(1)};
+  return {double(p(0)), double(p(1))};
 }
 
 Real distance_from_circumcircle(const Elem & elem,
@@ -582,7 +582,7 @@ void Poly2TriTriangulator::triangulate_current_points()
                                "Triangulator segments reference nonexistent node id " <<
                                segment_start);
 
-          outer_boundary_points.emplace_back((*node)(0), (*node)(1));
+          outer_boundary_points.emplace_back(double((*node)(0)), double((*node)(1)));
           p2t::Point * pt = &outer_boundary_points.back();
 
           // We're not going to support overlapping nodes on the boundary
