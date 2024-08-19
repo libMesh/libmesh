@@ -22,6 +22,7 @@
 #include "libmesh/libmesh_config.h"
 
 // Local includes
+#include "libmesh/bounding_box.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/point.h" // used for specifying holes
 
@@ -96,8 +97,11 @@ protected:
   /**
    * Remove volume elements from the given mesh, after converting
    * their outer boundary faces to surface elements.
+   *
+   * Returns the bounding box of the mesh; this is useful for
+   * detecting misplaced holes later.
    */
-  static void volume_to_surface_mesh (UnstructuredMesh & mesh);
+  static BoundingBox volume_to_surface_mesh (UnstructuredMesh & mesh);
 
   /**
    * This function checks the integrity of the current set of
