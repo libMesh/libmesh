@@ -83,14 +83,14 @@ void NetGenMeshInterface::triangulate ()
   // can use them in serial.
 
   const BoundingBox mesh_bb =
-    this->volume_to_surface_mesh(this->_mesh);
+    MeshTetInterface::volume_to_surface_mesh(this->_mesh);
 
   std::vector<MeshSerializer> hole_serializers;
   if (_holes)
     for (std::unique_ptr<UnstructuredMesh> & hole : *_holes)
       {
         const BoundingBox hole_bb =
-          this->volume_to_surface_mesh(*hole);
+          MeshTetInterface::volume_to_surface_mesh(*hole);
 
         libmesh_error_msg_if
           (!mesh_bb.contains(hole_bb),
