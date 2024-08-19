@@ -78,7 +78,7 @@ public:
 
   PetscShellMatrix (const Parallel::Communicator & comm_in);
 
-  virtual ~PetscShellMatrix () = default;
+  virtual ~PetscShellMatrix ();
 
   virtual numeric_index_type m () const override;
 
