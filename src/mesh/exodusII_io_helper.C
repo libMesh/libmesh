@@ -250,11 +250,15 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
   // should get rid of this again when that's a distant memory, but
   // for now we have systems that don't have 1.14.4 available and that
   // are having problems with 1.14.2
-  struct HDF5FPEWorkaround {
-    HDF5FPEWorkaround() {
+  struct HDF5FPEWorkaround
+  {
+    HDF5FPEWorkaround()
+    {
       std::feholdexcept(&old_env);
     }
-    ~HDF5FPEWorkaround() {
+
+    ~HDF5FPEWorkaround()
+    {
       std::fesetenv(&old_env);
     }
 
