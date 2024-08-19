@@ -65,6 +65,9 @@ AC_DEFUN([CONFIGURE_NETGEN],
                 [
                   NETGEN_INCLUDE="-I\$(top_srcdir)/contrib/netgen/ -I\$(top_builddir)/contrib/netgen/build/"
                   NETGEN_LIBS="-lnglib -lngcore"
+                  AS_IF([test "x$GCC" = "xyes"],
+                        [AS_IF([test "$($CC -dumpversion | cut -d'.' -f1)" = "8"],
+                               [NETGEN_LIBS="$NETGEN_LIBS -lstdc++fs"])])
                   NETGEN_BUILD_LDFLAGS="-L\$(abs_top_builddir)/contrib/netgen/build/netgen/ -L\$(abs_top_builddir)/contrib/netgen/build/netgen/libsrc/core/"
                   AS_IF([test "x$RPATHFLAG" != "x"],
                         [NETGEN_BUILD_LDFLAGS="$NETGEN_BUILD_LDFLAGS ${RPATHFLAG}\$(abs_top_builddir)/contrib/netgen/build/netgen/ ${RPATHFLAG}\$(abs_top_builddir)/contrib/netgen/build/netgen/libsrc/core/"]);
