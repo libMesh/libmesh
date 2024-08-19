@@ -55401,6 +55401,13 @@ then :
 
                   NETGEN_INCLUDE="-I\$(top_srcdir)/contrib/netgen/ -I\$(top_builddir)/contrib/netgen/build/"
                   NETGEN_LIBS="-lnglib -lngcore"
+                  if test "x$GCC" = "xyes"
+then :
+  if test "$($CC -dumpversion | cut -d'.' -f1)" = "8"
+then :
+  NETGEN_LIBS="$NETGEN_LIBS -lstdc++fs"
+fi
+fi
                   NETGEN_BUILD_LDFLAGS="-L\$(abs_top_builddir)/contrib/netgen/build/netgen/ -L\$(abs_top_builddir)/contrib/netgen/build/netgen/libsrc/core/"
                   if test "x$RPATHFLAG" != "x"
 then :
