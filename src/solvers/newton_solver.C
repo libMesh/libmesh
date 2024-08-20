@@ -609,8 +609,9 @@ bool NewtonSolver::test_convergence(Real current_residual,
     }
 
   // Is our relative Newton step size small enough?
-  if (step_norm / max_solution_norm <
-      relative_step_tolerance)
+  if (max_solution_norm &&
+      (step_norm / max_solution_norm <
+       relative_step_tolerance))
     {
       _solve_result |= CONVERGED_RELATIVE_STEP;
       has_converged = true;
@@ -682,8 +683,9 @@ void NewtonSolver::print_convergence(unsigned int step_num,
     }
 
   // Is our relative Newton step size small enough?
-  if (step_norm / max_solution_norm <
-      relative_step_tolerance)
+  if (max_solution_norm &&
+      (step_norm / max_solution_norm <
+       relative_step_tolerance))
     {
       libMesh::out << "  Nonlinear solver converged, step " << step_num
                    << ", relative step size "
