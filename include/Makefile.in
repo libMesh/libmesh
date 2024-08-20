@@ -1064,6 +1064,7 @@ include_HEADERS = \
         utils/compare_types.h \
         utils/enum_to_string.h \
         utils/error_vector.h \
+        utils/fpe_disabler.h \
         utils/fuzzy_equals.h \
         utils/hashing.h \
         utils/hashword.h \
