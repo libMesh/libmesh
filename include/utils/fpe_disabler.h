@@ -24,6 +24,8 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 
+// C++ includes
+#include <cfenv>
 
 namespace libMesh
 {

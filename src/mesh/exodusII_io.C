@@ -27,6 +27,7 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io_helper.h"
+#include "libmesh/fpe_disabler.h"
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
@@ -468,6 +469,9 @@ void ExodusII_IO::read (const std::string & fname)
                 continue;
               }
 
+            // Ignore FE_INVALID here even if we've enabled FPEs; a
+            // thrown exception is preferred over an FPE signal.
+            FPEDisabler disable_fpes;
             const long long iv = std::llround(v);
 
             // Check if the real number is outside of the range we can
