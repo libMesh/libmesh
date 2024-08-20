@@ -643,13 +643,14 @@ namespace FPoptimizer_CodeTree
                         Value_t min = Value_t(0);
                         if(p0.min.known && p1.min.known)
                         {
-                            min = fp_pow(p0.min.val, p1.min.val);
-                            if(p0.min.val < Value_t(0) && (!p1.max.known || p1.max.val >= Value_t(0)) && min >= Value_t(0))
-                                min = Value_t(0);
-
-                            // we've already determined the result to be positive, but these boundaries would result in a min = inf
-                            if(p0.min.val == Value_t(0) || p1.min.val < Value_t(0))
-                                min = Value_t(0);
+                            if(p0.min.val < Value_t(0) && (!p1.max.known || p1.max.val != p1.min.val || p1.max.val != fp_ceil(p1.max.val)))
+                              p0.min = rangehalf<Value_t>();
+                            else if(p0.min.val != Value_t(0) && p1.min.val >= Value_t(0))
+                            {
+                                min = fp_pow(p0.min.val, p1.min.val);
+                                if(p0.min.val < Value_t(0) && (!p1.max.known || p1.max.val >= Value_t(0)) && min >= Value_t(0))
+                                    min = Value_t(0);
+                            }
                         }
                         if(p0.min.known && p0.min.val >= Value_t(0) && p0.max.known && p1.max.known)
                         {
