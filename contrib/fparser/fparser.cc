@@ -8,7 +8,7 @@
 |* (See lgpl.txt and gpl.txt for the license text.)                        *|
 \***************************************************************************/
 
-#include "libmesh_config.h"
+#include "libmesh/libmesh_config.h"
 // Communicate to fparser that threads are being utilized
 #ifdef LIBMESH_USING_THREADS
 #  define FP_USE_THREAD_SAFE_EVAL
