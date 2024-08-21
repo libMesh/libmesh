@@ -366,7 +366,6 @@ unsigned int NewtonSolver::solve()
 
       // Compute the l2 norm of the whole solution
       Real norm_total = newton_iterate.l2_norm();
-
       max_solution_norm = std::max(max_solution_norm, norm_total);
 
       if (verbose)
@@ -485,6 +484,17 @@ unsigned int NewtonSolver::solve()
                                linear_solve_finished &&
                                current_residual <= last_residual))
             {
+              // Make sure we have an up to date max_solution_norm if
+              // we're going to be verbose about it here.  We don't
+              // want to update it earlier because we don't want an
+              // excessive full Newton step to explode it if we're
+              // just going to line search that step back.
+              if (!quiet && verbose)
+                {
+                  norm_total = newton_iterate.l2_norm();
+                  max_solution_norm = std::max(max_solution_norm, norm_total);
+                }
+
               if (!quiet)
                 print_convergence(_outer_iterations, current_residual,
                                   norm_delta, linear_solve_finished &&
@@ -696,10 +706,13 @@ void NewtonSolver::print_convergence(unsigned int step_num,
   else if (relative_step_tolerance)
     {
       if (verbose)
-        libMesh::out << "  Nonlinear solver relative step size "
-                     << (step_norm / max_solution_norm)
-                     << " > " << relative_step_tolerance
-                     << std::endl;
+        {
+          if (max_solution_norm)
+            libMesh::out << "  Nonlinear solver relative step size "
+                         << (step_norm / max_solution_norm)
+                         << " > " << relative_step_tolerance
+                         << std::endl;
+        }
     }
 }
 
