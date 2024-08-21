@@ -47,6 +47,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/elem.h"
+#include "libmesh/fpe_disabler.h"
 #include "libmesh/boundary_info.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/getpot.h"
@@ -351,6 +352,12 @@ int main (int argc, char ** argv)
   // We need to close the matrix so that we can use it to store the
   // Hessian during the solve.
   system.get_system_matrix().close();
+
+  // We can get division-by-zero from ILU within the TAO solver, but
+  // they can recover from it, so if we have FPEs turned on we should
+  // turn them off.
+  FPEDisabler disable_fpes;
+
   system.solve();
 
   // Print convergence information
