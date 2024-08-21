@@ -28,6 +28,7 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/fpe_disabler.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/parameters.h"
@@ -136,12 +137,18 @@ main(int argc, char ** argv)
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
+  // A p=0 "solve" here is a hack to test ExodusII output; the
+  // solve() is stymied by division by zero.
+  std::unique_ptr<FPEDisabler> maybe_disable_fpe;
+  if (! approx_order) /* CONSTANT, MONOMIAL_VEC */
+    maybe_disable_fpe = std::make_unique<FPEDisabler>();
+
   nl_system.solve();
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   if (! approx_order) /* CONSTANT, MONOMIAL_VEC */
     {
-      // Warn about trivial solution for CONSTANT approximations (Poisson must be at least C1)
+      // Warn about failed solve for CONSTANT approximations (Poisson needs at least p=1)
       libMesh::out << "\nWARNING: The elemental vector order is CONSTANT. The solution" << std::endl
                    << "written out to 'out_constant.e' will be trivial." << std::endl;
 
