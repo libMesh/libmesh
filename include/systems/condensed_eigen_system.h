@@ -193,6 +193,18 @@ public:
    */
   std::vector<dof_id_type> local_non_condensed_dofs_vector;
 
+  /**
+   * Initializes the condensed matrices. This API should be used if the condensed matrices will be
+   * assembled during the solve as opposed to pre-solve
+   */
+  void initialize_condensed_matrices();
+
+  /**
+   * @returns Whether there are condensed degrees of freedom
+   */
+  bool have_condensed_dofs() const
+  { libmesh_assert(_condensed_dofs_initialized); return _have_condensed_dofs; }
+
 protected:
   virtual void add_matrices () override;
 
@@ -207,7 +219,12 @@ private:
    * A private flag to indicate whether the condensed dofs
    * have been initialized.
    */
-  bool condensed_dofs_initialized;
+  bool _condensed_dofs_initialized;
+
+  /**
+   * Whether there are any condensed degrees of freedom
+   */
+  bool _have_condensed_dofs;
 
   /**
    * Denotes whether to create the condensed submatrices from the global matrices in the solve

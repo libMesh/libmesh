@@ -198,7 +198,7 @@ main(int argc, char ** argv)
   eigen_system.get_eigen_solver().set_initial_space(wrapped_initial_space);
 
   // Solve the system "Condensed Eigensystem"
-  eigen_system.initialize_condensed_dofs();
+  eigen_system.initialize_condensed_matrices();
   eigen_system.dont_create_submatrices_in_solve();
   eigen_system.assemble_before_solve = false;
   eigen_system.get_eigen_solver().set_close_matrix_before_solve(false);
