@@ -37,7 +37,8 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
                                             const std::string & name_in,
                                             const unsigned int number_in)
   : Parent(es, name_in, number_in),
-    condensed_dofs_initialized(false),
+    _condensed_dofs_initialized(false),
+    _have_condensed_dofs(false),
     _create_submatrices_in_solve(true)
 {
 }
@@ -49,7 +50,11 @@ CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & gl
 {
   const DofMap & dof_map = this->get_dof_map();
   if (global_dirichlet_dofs_set.empty() && !dof_map.n_constrained_dofs())
-    return;
+    {
+      _have_condensed_dofs = false;
+      _condensed_dofs_initialized = true;
+      return;
+    }
 
   // First, put all unconstrained local dofs into non_dirichlet_dofs_set
   std::set<dof_id_type> local_non_condensed_dofs_set;
@@ -60,25 +65,54 @@ CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & gl
       local_non_condensed_dofs_set.insert(i);
 
   // Now erase the condensed dofs
-  for (const auto & dof : global_dirichlet_dofs_set)
+  for (const auto dof : global_dirichlet_dofs_set)
     if ((dof_map.first_dof() <= dof) && (dof < dof_map.end_dof()))
       local_non_condensed_dofs_set.erase(dof);
 
   // Finally, move local_non_condensed_dofs_set over to a vector for convenience in solve()
   this->local_non_condensed_dofs_vector.clear();
 
-  for (const auto & dof : local_non_condensed_dofs_set)
+  for (const auto dof : local_non_condensed_dofs_set)
     this->local_non_condensed_dofs_vector.push_back(dof);
 
-  condensed_dofs_initialized = true;
+  _have_condensed_dofs = true;
+  _condensed_dofs_initialized = true;
+}
+
+void
+CondensedEigenSystem::initialize_condensed_matrices()
+{
+  if (!_condensed_dofs_initialized)
+    this->initialize_condensed_dofs();
+
+  if (!_have_condensed_dofs)
+    return;
+
+  const auto m = cast_int<numeric_index_type>(this->local_non_condensed_dofs_vector.size());
+  auto M = m;
+  _communicator.sum(M);
+  if (this->has_condensed_matrix_A())
+  {
+    this->get_condensed_matrix_A().init(M, M, m, m);
+    // A bit ludicrously MatCopy requires the matrix being copied to to be assembled
+    this->get_condensed_matrix_A().close();
+  }
+  if (this->has_condensed_matrix_B())
+  {
+    this->get_condensed_matrix_B().init(M, M, m, m);
+    this->get_condensed_matrix_B().close();
+  }
+  if (this->has_condensed_precond_matrix())
+  {
+    this->get_condensed_precond_matrix().init(M, M, m, m);
+    this->get_condensed_precond_matrix().close();
+  }
 }
 
 dof_id_type CondensedEigenSystem::n_global_non_condensed_dofs() const
 {
-  if (!condensed_dofs_initialized)
-    {
-      return this->n_dofs();
-    }
+  if (!_have_condensed_dofs)
+    return this->n_dofs();
   else
     {
       dof_id_type n_global_non_condensed_dofs =
@@ -142,7 +176,7 @@ void CondensedEigenSystem::solve()
 
   // If we haven't initialized any condensed dofs,
   // just use the default eigen_system
-  if (!condensed_dofs_initialized)
+  if (!_have_condensed_dofs)
     {
       Parent::solve();
       return;
@@ -185,13 +219,6 @@ void CondensedEigenSystem::solve()
                                          local_non_condensed_dofs_vector,
                                          local_non_condensed_dofs_vector);
     }
-  else if (_condensed_precond_matrix.get() && !_condensed_precond_matrix->initialized())
-    {
-      const auto m = local_non_condensed_dofs_vector.size();
-      auto M = m;
-      _communicator.sum(M);
-      _condensed_precond_matrix->init(M, M, m, m);
-    }
 
   solve_helper(
       _condensed_matrix_A.get(), _condensed_matrix_B.get(), _condensed_precond_matrix.get());
@@ -203,7 +230,7 @@ std::pair<Real, Real> CondensedEigenSystem::get_eigenpair(dof_id_type i)
 
   // If we haven't initialized any condensed dofs,
   // just use the default eigen_system
-  if (!condensed_dofs_initialized)
+  if (!_have_condensed_dofs)
     return Parent::get_eigenpair(i);
 
   // If we reach here, then there should be some non-condensed dofs
