@@ -1740,6 +1740,70 @@ Real Elem::quality (const ElemQuality q) const
         return Real(180)/libMesh::pi * ((q == MIN_DIHEDRAL_ANGLE) ? min_angle : max_angle);
       }
 
+    case JACOBIAN:
+    case SCALED_JACOBIAN:
+      {
+        // 1D elements don't have interior corners, so this metric
+        // does not really apply to them.
+        const auto N = this->dim();
+        if (N < 2)
+          return 1.;
+
+        // Initialize return value
+        Real min_node_area = std::numeric_limits<Real>::max();
+
+        for (auto n : this->node_index_range())
+          {
+            // Get list of edge ids adjacent to this node.
+            auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
+
+            // Skip any nodes that don't have dim() adjacent edges. In 2D,
+            // you need at least two adjacent edges to compute the cross
+            // product, and in 3D, you need at least three adjacent edges
+            // to compute the scalar triple product. The only element
+            // type which has an unusual topology in this regard is the
+            // Pyramid element in 3D, where 4 edges meet at the apex node.
+            // For now, we just skip this node when computing the JACOBIAN
+            // metric for Pyramids.
+            if (adjacent_edge_ids.size() != N)
+              continue;
+
+            // Construct oriented edges
+            std::vector<Point> oriented_edges(N);
+            for (auto i : make_range(N))
+              {
+                auto node_0 = this->local_edge_node(adjacent_edge_ids[i], 0);
+                auto node_1 = this->local_edge_node(adjacent_edge_ids[i], 1);
+                if (node_0 != n)
+                  std::swap(node_0, node_1);
+                oriented_edges[i] = this->point(node_1) - this->point(node_0);
+              }
+
+            // Compute unscaled area (2D) or volume (3D) using the
+            // cross product (2D) or scalar triple product (3D) of the
+            // oriented edges. We take the absolute value so that we
+            // don't have to worry about the sign of the area.
+            Real node_area = (N == 2) ?
+              cross_norm(oriented_edges[0], oriented_edges[1]) :
+              std::abs(triple_product(oriented_edges[0], oriented_edges[1], oriented_edges[2]));
+
+            // Divide by (non-zero) edge lengths if computing scaled Jacobian.
+            // If any length is zero, then set node_area to zero. This means that
+            // e.g. degenerate quadrilaterals will have a zero SCALED_JACOBIAN metric.
+            if (q == SCALED_JACOBIAN)
+              for (auto i : make_range(N))
+                {
+                  Real len_i = oriented_edges[i].norm();
+                  node_area = (len_i == 0.) ? 0. : (node_area / len_i);
+                }
+
+            // Update minimum
+            min_node_area = std::min(node_area, min_node_area);
+          }
+
+        return min_node_area;
+      }
+
       // Return 1 if we made it here
     default:
       {
