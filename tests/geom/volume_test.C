@@ -41,6 +41,7 @@ public:
   CPPUNIT_TEST( testQuad4MinMaxAngle );
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
+  CPPUNIT_TEST( testTet4Jacobian );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -800,6 +801,29 @@ public:
     // Assert that both min and max dihedral angles are less than 1 degree (a very low quality element)
     CPPUNIT_ASSERT_LESS(1.0, min_dihedral_angle);
     CPPUNIT_ASSERT_LESS(1.0, max_dihedral_angle);
+  }
+
+  void testTet4Jacobian()
+  {
+    LOG_UNIT_TEST;
+
+    // Same element as in testTet4DihedralAngle(). Here we verify that
+    // the element is low quality since the SCALED_JACOBIAN is < O(h)
+    // as h -> 0, and h can be arbitrarily small in the squashed element.
+    Real h = 0.01;
+    std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(0, 1, 0), Point(1, 1, h)};
+    auto [elem, nodes] = this->construct_elem(pts, TET4);
+    libmesh_ignore(nodes);
+
+    Real jac = elem->quality(JACOBIAN);
+    Real scaled_jac = elem->quality(SCALED_JACOBIAN);
+
+    // Debugging
+    // libMesh::out << "Squashed Tet4 jac = " << jac << std::endl;
+    // libMesh::out << "Squashed Tet4 scaled_jac = " << scaled_jac << std::endl;
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/h, /*actual=*/jac, TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/h/std::sqrt(h*h + 2), /*actual=*/scaled_jac, TOLERANCE);
   }
 
 
