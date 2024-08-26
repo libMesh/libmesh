@@ -39,6 +39,7 @@ public:
   CPPUNIT_TEST( testQuad4AspectRatio );
   CPPUNIT_TEST( testQuad4Warpage );
   CPPUNIT_TEST( testQuad4MinMaxAngle );
+  CPPUNIT_TEST( testQuad4Jacobian );
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST( testTet4Jacobian );
@@ -761,6 +762,49 @@ public:
         Real max_angle = elem->quality(MAX_ANGLE);
         CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(180) / libMesh::pi * theta,                 /*actual=*/min_angle, TOLERANCE);
         CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(180) / libMesh::pi * (libMesh::pi - theta), /*actual=*/max_angle, TOLERANCE);
+      };
+
+      // 2a) Rhombus with interior angle theta=pi/6.
+      test_rhombus_quad(libMesh::pi / 6);
+
+      // 2b) Rhombus with interior angle theta=pi/3.
+      test_rhombus_quad(libMesh::pi / 3);
+    }
+  }
+
+  void testQuad4Jacobian()
+  {
+    LOG_UNIT_TEST;
+
+    // Rhombus QUAD4. This case should have a JACOBIAN and
+    // SCALED_JACOBIAN value of sin(theta), where "theta" is the
+    // specified amount that we "sheared" the element by on creation.
+    // The JACOBIAN and SCALED_JACOBIAN are the same for this element
+    // because the edge lengths are all = 1.
+    {
+      // Helper lambda function that constructs a rhombus quad with
+      // interior acute angle theta.
+      auto test_rhombus_quad = [this](Real theta)
+      {
+        Real ct = std::cos(theta);
+        Real st = std::sin(theta);
+        std::vector<Point> pts = {
+          Point(0, 0, 0),
+          Point(1, 0, 0),
+          Point(1. + ct, st, 0),
+          Point(     ct, st, 0)};
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        Real jac = elem->quality(JACOBIAN);
+        Real scaled_jac = elem->quality(SCALED_JACOBIAN);
+
+        // Debugging
+        // libMesh::out << "jac = " << jac << std::endl;
+        // libMesh::out << "scaled_jac = " << scaled_jac << std::endl;
+
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/std::abs(std::sin(theta)), /*actual=*/jac, TOLERANCE);
+        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/std::abs(std::sin(theta)), /*actual=*/scaled_jac, TOLERANCE);
       };
 
       // 2a) Rhombus with interior angle theta=pi/6.
