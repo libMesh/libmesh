@@ -421,23 +421,23 @@ void clough_compute_coefs(const Elem * elem, CloughCoefs & coefs)
 
   // Calculate nodal derivative scaling factors
 
-  coefs.d1xd1x = 1. / (d1xd1dx - d1xd1dy * d1yd1dx / d1yd1dy);
-  coefs.d1xd1y = 1. / (d1yd1dx - d1xd1dx * d1yd1dy / d1xd1dy);
+  coefs.d1xd1x = d1yd1dy / (d1yd1dy * d1xd1dx - d1xd1dy * d1yd1dx);
+  coefs.d1xd1y = d1xd1dy / (d1xd1dy * d1yd1dx - d1xd1dx * d1yd1dy);
   //  coefs.d1xd1y = - coefs.d1xd1x * (d1xd1dy / d1yd1dy);
-  coefs.d1yd1y = 1. / (d1yd1dy - d1yd1dx * d1xd1dy / d1xd1dx);
-  coefs.d1yd1x = 1. / (d1xd1dy - d1yd1dy * d1xd1dx / d1yd1dx);
+  coefs.d1yd1y = d1xd1dx / (d1xd1dx * d1yd1dy - d1yd1dx * d1xd1dy);
+  coefs.d1yd1x = d1yd1dx / (d1yd1dx * d1xd1dy - d1yd1dy * d1xd1dx);
   //  coefs.d1yd1x = - coefs.d1yd1y * (d1yd1dx / d1xd1dx);
-  coefs.d2xd2x = 1. / (d2xd2dx - d2xd2dy * d2yd2dx / d2yd2dy);
-  coefs.d2xd2y = 1. / (d2yd2dx - d2xd2dx * d2yd2dy / d2xd2dy);
+  coefs.d2xd2x = d2yd2dy / (d2yd2dy * d2xd2dx - d2xd2dy * d2yd2dx);
+  coefs.d2xd2y = d2xd2dy / (d2xd2dy * d2yd2dx - d2xd2dx * d2yd2dy);
   //  coefs.d2xd2y = - coefs.d2xd2x * (d2xd2dy / d2yd2dy);
-  coefs.d2yd2y = 1. / (d2yd2dy - d2yd2dx * d2xd2dy / d2xd2dx);
-  coefs.d2yd2x = 1. / (d2xd2dy - d2yd2dy * d2xd2dx / d2yd2dx);
+  coefs.d2yd2y = d2xd2dx / (d2xd2dx * d2yd2dy - d2yd2dx * d2xd2dy);
+  coefs.d2yd2x = d2yd2dx / (d2yd2dx * d2xd2dy - d2yd2dy * d2xd2dx);
   //  coefs.d2yd2x = - coefs.d2yd2y * (d2yd2dx / d2xd2dx);
-  coefs.d3xd3x = 1. / (d3xd3dx - d3xd3dy * d3yd3dx / d3yd3dy);
-  coefs.d3xd3y = 1. / (d3yd3dx - d3xd3dx * d3yd3dy / d3xd3dy);
+  coefs.d3xd3x = d3yd3dy / (d3yd3dy * d3xd3dx - d3xd3dy * d3yd3dx);
+  coefs.d3xd3y = d3xd3dy / (d3xd3dy * d3yd3dx - d3xd3dx * d3yd3dy);
   //  coefs.d3xd3y = - coefs.d3xd3x * (d3xd3dy / d3yd3dy);
-  coefs.d3yd3y = 1. / (d3yd3dy - d3yd3dx * d3xd3dy / d3xd3dx);
-  coefs.d3yd3x = 1. / (d3xd3dy - d3yd3dy * d3xd3dx / d3yd3dx);
+  coefs.d3yd3y = d3xd3dx / (d3xd3dx * d3yd3dy - d3yd3dx * d3xd3dy);
+  coefs.d3yd3x = d3yd3dx / (d3yd3dx * d3xd3dy - d3yd3dy * d3xd3dx);
   //  coefs.d3yd3x = - coefs.d3yd3y * (d3yd3dx / d3xd3dx);
 
   //  libMesh::err << d1xd1dx << ' ';

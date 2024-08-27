@@ -26,6 +26,7 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/elem.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/fpe_disabler.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/system.h"
 #include "libmesh/numeric_vector.h"
@@ -243,28 +244,6 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
 
     return subdomain_map;
   }
-
-
-  // Workaround for https://github.com/HDFGroup/hdf5/issues/4381
-  // (A floating point exception when initializing HDF5 1.14.4) We
-  // should get rid of this again when that's a distant memory, but
-  // for now we have systems that don't have 1.14.4 available and that
-  // are having problems with 1.14.2
-  struct HDF5FPEWorkaround
-  {
-    HDF5FPEWorkaround()
-    {
-      std::feholdexcept(&old_env);
-    }
-
-    ~HDF5FPEWorkaround()
-    {
-      std::fesetenv(&old_env);
-    }
-
-    std::fenv_t old_env;
-  };
-
 } // end anonymous namespace
 
 
@@ -701,7 +680,7 @@ void ExodusII_IO_Helper::open(const char * filename, bool read_only)
   int io_ws = 0;
 
   {
-    HDF5FPEWorkaround disable_fpes;
+    FPEDisabler disable_fpes;
     ex_id = exII::ex_open(filename,
                           read_only ? EX_READ : EX_WRITE,
                           &comp_ws,
@@ -2206,7 +2185,7 @@ void ExodusII_IO_Helper::create(std::string filename)
 #endif
 
       {
-        HDF5FPEWorkaround disable_fpes;
+        FPEDisabler disable_fpes;
         ex_id = exII::ex_create(filename.c_str(), mode, &comp_ws, &io_ws);
       }
 

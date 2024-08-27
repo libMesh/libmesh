@@ -460,6 +460,7 @@ BUILT_SOURCES = \
         compare_types.h \
         enum_to_string.h \
         error_vector.h \
+        fpe_disabler.h \
         fuzzy_equals.h \
         hashing.h \
         hashword.h \
@@ -1960,6 +1961,9 @@ enum_to_string.h: $(top_srcdir)/include/utils/enum_to_string.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 error_vector.h: $(top_srcdir)/include/utils/error_vector.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fpe_disabler.h: $(top_srcdir)/include/utils/fpe_disabler.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fuzzy_equals.h: $(top_srcdir)/include/utils/fuzzy_equals.h
