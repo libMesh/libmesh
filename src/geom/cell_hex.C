@@ -530,6 +530,7 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
       bounds.second = 8.;
       break;
 
+    case SCALED_JACOBIAN:
     case JACOBIAN:
       bounds.first  = 0.5;
       bounds.second = 1.;

@@ -412,73 +412,8 @@ std::pair<Real, Real> InfHex::qual_bounds (const ElemQuality) const
 {
   libmesh_not_implemented();
 
-  /*
-  std::pair<Real, Real> bounds;
-
-    switch (q)
-    {
-
-    case ASPECT_RATIO:
-    bounds.first  = 1.;
-    bounds.second = 4.;
-    break;
-
-    case SKEW:
-    bounds.first  = 0.;
-    bounds.second = 0.5;
-    break;
-
-    case SHEAR:
-    case SHAPE:
-    bounds.first  = 0.3;
-    bounds.second = 1.;
-    break;
-
-    case CONDITION:
-    bounds.first  = 1.;
-    bounds.second = 8.;
-    break;
-
-    case JACOBIAN:
-    bounds.first  = 0.5;
-    bounds.second = 1.;
-    break;
-
-    case DISTORTION:
-    bounds.first  = 0.6;
-    bounds.second = 1.;
-    break;
-
-    case TAPER:
-    bounds.first  = 0.;
-    bounds.second = 0.4;
-    break;
-
-    case STRETCH:
-    bounds.first  = 0.25;
-    bounds.second = 1.;
-    break;
-
-    case DIAGONAL:
-    bounds.first  = 0.65;
-    bounds.second = 1.;
-    break;
-
-    case SIZE:
-    bounds.first  = 0.5;
-    bounds.second = 1.;
-    break;
-
-    default:
-    libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
-    bounds.first  = -1;
-    bounds.second = -1;
-    }
-
-  return bounds;
-  */
-
-  return std::pair<Real,Real>();
+  // We'll never get here
+  return {0., 0.};
 }
 
 

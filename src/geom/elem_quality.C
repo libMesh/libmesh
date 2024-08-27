@@ -118,6 +118,10 @@ std::string Quality::name (const ElemQuality q)
       its_name = "Jacobian";
       break;
 
+    case SCALED_JACOBIAN:
+      its_name = "Scaled Jacobian";
+      break;
+
     default:
       its_name = "Unknown";
       break;
@@ -320,17 +324,15 @@ std::string Quality::describe (const ElemQuality q)
       break;
 
     case JACOBIAN:
-      desc << "Minimum Jacobian divided by\n"
-           << "the lengths of the LIBMESH_DIM\n"
-           << "largest edge vectors.\n"
+    case SCALED_JACOBIAN:
+      desc << "Minimum nodal Jacobian.\n"
+           << "The nodal Jacobians are computed by taking the cross product (2D) or scalar product (3D) of the adjacent edges that meet at that node.\n"
+           << "In the SCALED_JACOBIAN case, we also then divide by the lengths of each of the associated edges.\n"
+           << "For Pyramid elements where four edges meet at the apex node, special handling is required.\n"
            << '\n'
-           << "LIBMESH_DIM = element dimension.\n"
-           << '\n'
-           << "Suggested ranges:\n"
-           << "Quads: (0.5 -> 1)\n"
-           << "Hexes: (0.5 -> 1)\n"
-           << "Tris: (0.5 -> 1.155)\n"
-           << "Tets: (0.5 -> 1.414)";
+           << "Suggested acceptable ranges (from Cubit documentation) for SCALED_JACOBIAN metric:\n"
+           << "Quads/Hexes: (0.5 -> 1)\n"
+           << "Tris/Tets: (0.2 -> 1.0)";
       break;
 
     default:
@@ -366,6 +368,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           DISTORTION,
           EDGE_LENGTH_RATIO,
           JACOBIAN,
+          SCALED_JACOBIAN,
           MAX_ANGLE,
           MIN_ANGLE,
           MAX_DIHEDRAL_ANGLE,
@@ -390,6 +393,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           DISTORTION,
           EDGE_LENGTH_RATIO,
           JACOBIAN,
+          SCALED_JACOBIAN,
           MAX_ANGLE,
           MIN_ANGLE,
           MAX_DIHEDRAL_ANGLE,
@@ -416,6 +420,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           CONDITION,
           DISTORTION,
           JACOBIAN,
+          SCALED_JACOBIAN,
           MAX_ANGLE,
           MIN_ANGLE,
           MAX_DIHEDRAL_ANGLE,
@@ -437,6 +442,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           DIAGONAL,
           DISTORTION,
           JACOBIAN,
+          SCALED_JACOBIAN,
           MAX_ANGLE,
           MIN_ANGLE,
           MAX_DIHEDRAL_ANGLE,

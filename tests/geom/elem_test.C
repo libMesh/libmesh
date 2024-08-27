@@ -114,6 +114,43 @@ public:
             //   is the minimum dihedral angle we expect in that case.
             CPPUNIT_ASSERT_GREATEREQUAL(45 - TOLERANCE, min_dihedral_angle);
           }
+
+        // The JACOBIAN and SCALED_JACOBIAN quality metrics are also defined on all elements
+
+        // The largest non-infinite elements in this test (Hexes and
+        // Prisms) have a nodal Jacobian (volume) of 8, e.g. the 2x2x2
+        // reference Hex. The infinite elements that we construct for
+        // this testing have a max nodal area of 64 since they are
+        // created (see setUp()) with max side lengths of 4 (4*4*4=64).
+        const Real jac = elem->quality(JACOBIAN);
+        if (elem->infinite())
+          CPPUNIT_ASSERT_LESSEQUAL   (64 + TOLERANCE, jac);
+        else
+          CPPUNIT_ASSERT_LESSEQUAL   (8 + TOLERANCE, jac);
+
+        // The smallest actual nodal areas in this test are found in
+        // tetrahedra, which have a minimum value of 2.0. However, we
+        // return a default value of 1.0 for 1D elements here, so
+        // we also handle that case.
+        if (elem->dim() == 1)
+          CPPUNIT_ASSERT_GREATEREQUAL(1 - TOLERANCE, jac);
+        else
+          CPPUNIT_ASSERT_GREATEREQUAL(2 - TOLERANCE, jac);
+
+        // The scaled Jacobian should always be <= 1. The minimum
+        // scaled Jacobian value I observed was ~0.408248 for the
+        // tetrahedral meshes. This is consistent with the way that
+        // we generate Tet meshes with build_cube(), as we don't
+        // simply refine the reference tetrahedron in that case.
+        const Real scaled_jac = elem->quality(SCALED_JACOBIAN);
+        CPPUNIT_ASSERT_LESSEQUAL   (1 + TOLERANCE, scaled_jac);
+        CPPUNIT_ASSERT_GREATEREQUAL(          0.4, scaled_jac);
+
+        // Debugging
+        // libMesh::out << "elem->type() = " << Utility::enum_to_string(elem->type())
+        //              << ", jac = " << jac
+        //              << ", scaled_jac = " << scaled_jac
+        //              << std::endl;
       }
   }
 
