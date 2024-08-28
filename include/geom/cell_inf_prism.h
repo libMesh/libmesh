@@ -52,7 +52,7 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   InfPrism(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
-    InfCell(nn, InfPrism::n_sides(), p, _elemlinks_data, nodelinkdata)
+    InfCell(nn, num_sides, p, _elemlinks_data, nodelinkdata)
   {}
 
   InfPrism (InfPrism &&) = delete;
@@ -72,6 +72,13 @@ public:
                  _master_points[i][1],
                  _master_points[i][2]);
   }
+
+  /**
+   * Geometric constants for all InfPrisms.
+   */
+  static const int num_sides = 4;
+  static const int num_edges = 6;
+  static const int num_children = 4;
 
   /**
    * \returns 4.  Infinite elements have one side less

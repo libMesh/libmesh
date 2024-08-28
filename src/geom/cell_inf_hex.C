@@ -41,7 +41,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // InfHex class static member initializations
-
+const int InfHex::num_sides;
+const int InfHex::num_edges;
+const int InfHex::num_children;
 
 const Real InfHex::_master_points[18][3] =
   {

@@ -32,9 +32,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Tet10 class static member initializations
 const int Tet10::num_nodes;
-const int Tet10::num_sides;
-const int Tet10::num_edges;
-const int Tet10::num_children;
 const int Tet10::nodes_per_side;
 const int Tet10::nodes_per_edge;
 

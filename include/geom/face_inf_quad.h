@@ -64,7 +64,7 @@ public:
   InfQuad (const unsigned int nn,
            Elem * p,
            Node ** nodelinkdata) :
-    Elem(nn, InfQuad::n_sides(), p, _elemlinks_data, nodelinkdata)
+    Elem(nn, num_sides, p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
     if (LIBMESH_DIM > 2)
@@ -88,6 +88,12 @@ public:
                  _master_points[i][1],
                  _master_points[i][2]);
   }
+
+  /**
+   * Geometric constants for all InfQuads.
+   */
+  static const int num_sides = 3;
+  static const int num_children = 2;
 
   /**
    * \returns 2, the dimensionality of the object.

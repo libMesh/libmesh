@@ -47,9 +47,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Prism21 class static member initializations
 const int Prism21::num_nodes;
-const int Prism21::num_sides;
-const int Prism21::num_edges;
-const int Prism21::num_children;
 const int Prism21::nodes_per_side;
 const int Prism21::nodes_per_edge;
 

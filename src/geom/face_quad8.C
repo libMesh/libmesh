@@ -31,8 +31,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Quad8 class static member initializations
 const int Quad8::num_nodes;
-const int Quad8::num_sides;
-const int Quad8::num_children;
 const int Quad8::nodes_per_side;
 
 const unsigned int Quad8::side_nodes_map[Quad8::num_sides][Quad8::nodes_per_side] =

@@ -67,7 +67,7 @@ public:
    */
   explicit
   Tri7 (Elem * p=nullptr) :
-    Tri(Tri7::n_nodes(), p, _nodelinks_data) {}
+    Tri(num_nodes, p, _nodelinks_data) {}
 
   Tri7 (Tri7 &&) = delete;
   Tri7 (const Tri7 &) = delete;
@@ -200,8 +200,6 @@ public:
    * Geometric constants for Tri7.
    */
   static const int num_nodes = 7;
-  static const int num_sides = 3;
-  static const int num_children = 4;
   static const int nodes_per_side = 3;
 
   /**

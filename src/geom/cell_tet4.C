@@ -33,9 +33,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Tet4 class static member initializations
 const int Tet4::num_nodes;
-const int Tet4::num_sides;
-const int Tet4::num_edges;
-const int Tet4::num_children;
 const int Tet4::nodes_per_side;
 const int Tet4::nodes_per_edge;
 

@@ -58,13 +58,18 @@ public:
    */
   explicit
   InfEdge2 (Elem * p=nullptr) :
-    Edge(InfEdge2::n_nodes(), p, _nodelinks_data) {}
+    Edge(num_nodes, p, _nodelinks_data) {}
 
   InfEdge2 (InfEdge2 &&) = delete;
   InfEdge2 (const InfEdge2 &) = delete;
   InfEdge2 & operator= (const InfEdge2 &) = delete;
   InfEdge2 & operator= (InfEdge2 &&) = delete;
   virtual ~InfEdge2() = default;
+
+  /**
+   * Geometric constants for InfEdge2.
+   */
+  static const int num_nodes = 2;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,

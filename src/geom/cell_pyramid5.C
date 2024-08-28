@@ -35,9 +35,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Pyramid5 class static member initializations
 const int Pyramid5::num_nodes;
-const int Pyramid5::num_sides;
-const int Pyramid5::num_edges;
-const int Pyramid5::num_children;
 const int Pyramid5::nodes_per_side;
 const int Pyramid5::nodes_per_edge;
 

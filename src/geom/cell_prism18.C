@@ -34,9 +34,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Prism18 class static member initializations
 const int Prism18::num_nodes;
-const int Prism18::num_sides;
-const int Prism18::num_edges;
-const int Prism18::num_children;
 const int Prism18::nodes_per_side;
 const int Prism18::nodes_per_edge;
 

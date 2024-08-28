@@ -31,8 +31,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Quad4 class static member initialization
 const int Quad4::num_nodes;
-const int Quad4::num_sides;
-const int Quad4::num_children;
 const int Quad4::nodes_per_side;
 
 const unsigned int Quad4::side_nodes_map[Quad4::num_sides][Quad4::nodes_per_side] =

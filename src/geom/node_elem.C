@@ -25,6 +25,13 @@ namespace libMesh
 {
 
 
+// ------------------------------------------------------------
+// NodeElem class static member initializations
+const int NodeElem::num_nodes;
+const int NodeElem::num_sides;
+
+// ------------------------------------------------------------
+// NodeElem class member functions
 Order NodeElem::default_order() const
 {
   return FIRST;

@@ -35,7 +35,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Hex class static member initializations
-
+const int Hex::num_sides;
+const int Hex::num_edges;
+const int Hex::num_children;
 
 const Real Hex::_master_points[27][3] =
   {

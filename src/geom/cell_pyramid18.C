@@ -34,9 +34,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Pyramid18 class static member initializations
 const int Pyramid18::num_nodes;
-const int Pyramid18::num_sides;
-const int Pyramid18::num_edges;
-const int Pyramid18::num_children;
 const int Pyramid18::nodes_per_side;
 const int Pyramid18::nodes_per_edge;
 

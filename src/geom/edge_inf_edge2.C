@@ -29,6 +29,9 @@
 namespace libMesh
 {
 
+// ------------------------------------------------------------
+// InfEdge2 class static member initializations
+const int InfEdge2::num_nodes;
 
 // ------------------------------------------------------------
 // InfEdge2 class member functions

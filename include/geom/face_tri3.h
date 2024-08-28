@@ -67,7 +67,7 @@ public:
    */
   explicit
   Tri3 (Elem * p=nullptr) :
-    Tri(Tri3::n_nodes(), p, _nodelinks_data) {}
+    Tri(num_nodes, p, _nodelinks_data) {}
 
   Tri3 (Tri3 &&) = delete;
   Tri3 (const Tri3 &) = delete;
@@ -158,8 +158,6 @@ public:
    * Geometric constants for Tri3.
    */
   static const int num_nodes = 3;
-  static const int num_sides = 3;
-  static const int num_children = 4;
   static const int nodes_per_side = 2;
 
   /**

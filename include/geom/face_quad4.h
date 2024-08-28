@@ -59,7 +59,7 @@ public:
    */
   explicit
   Quad4 (Elem * p=nullptr) :
-    Quad(Quad4::n_nodes(), p, _nodelinks_data) {}
+    Quad(num_nodes, p, _nodelinks_data) {}
 
   Quad4 (Quad4 &&) = delete;
   Quad4 (const Quad4 &) = delete;
@@ -144,8 +144,6 @@ public:
    * Geometric constants for Quad4.
    */
   static const int num_nodes = 4;
-  static const int num_sides = 4;
-  static const int num_children = 4;
   static const int nodes_per_side = 2;
 
   /**

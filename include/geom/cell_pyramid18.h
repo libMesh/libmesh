@@ -88,7 +88,7 @@ public:
    */
   explicit
   Pyramid18 (Elem * p=nullptr) :
-    Pyramid(Pyramid18::n_nodes(), p, _nodelinks_data)
+    Pyramid(num_nodes, p, _nodelinks_data)
   {}
 
   Pyramid18 (Pyramid18 &&) = delete;
@@ -229,9 +229,6 @@ public:
    * Geometric constants for Pyramid18.
    */
   static const int num_nodes = 18;
-  static const int num_sides = 5;
-  static const int num_edges = 8;
-  static const int num_children = 0; // not implemented
   static const int nodes_per_side = 9;
   static const int nodes_per_edge = 3;
 

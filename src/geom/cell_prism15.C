@@ -33,9 +33,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Prism15 class static member initializations
 const int Prism15::num_nodes;
-const int Prism15::num_sides;
-const int Prism15::num_edges;
-const int Prism15::num_children;
 const int Prism15::nodes_per_side;
 const int Prism15::nodes_per_edge;
 

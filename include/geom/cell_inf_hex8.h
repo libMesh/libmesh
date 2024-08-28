@@ -61,7 +61,7 @@ public:
    */
   explicit
   InfHex8 (Elem * p=nullptr) :
-    InfHex(InfHex8::n_nodes(), p, _nodelinks_data)
+    InfHex(num_nodes, p, _nodelinks_data)
   {}
 
   InfHex8 (InfHex8 &&) = delete;
@@ -149,9 +149,6 @@ public:
    * Geometric constants for InfHex8.
    */
   static const int num_nodes = 8;
-  static const int num_sides = 5;
-  static const int num_edges = 8;
-  static const int num_children = 4;
   static const int nodes_per_side = 4;
   static const int nodes_per_edge = 2;
 

@@ -29,7 +29,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Pyramid class static member initializations
-
+const int Pyramid::num_sides;
+const int Pyramid::num_edges;
+const int Pyramid::num_children;
 
 const Real Pyramid::_master_points[14][3] =
   {

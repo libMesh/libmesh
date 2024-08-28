@@ -46,7 +46,7 @@ public:
    * Derived classes implement 'true' elements.
    */
   Pyramid(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
-    Cell(nn, Pyramid::n_sides(), p, _elemlinks_data, nodelinkdata)
+    Cell(nn, num_sides, p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
     if (LIBMESH_DIM > 3)
@@ -70,6 +70,13 @@ public:
                  _master_points[i][1],
                  _master_points[i][2]);
   }
+
+  /**
+   * Geometric constants for all Pyramids.
+   */
+  static const int num_sides = 5;
+  static const int num_edges = 8;
+  static const int num_children = 0; // not implemented
 
   /**
    * \returns 5.  All pyramid-derivatives are guaranteed to have at

@@ -31,8 +31,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Tri6 class static member initializations
 const int Tri6::num_nodes;
-const int Tri6::num_sides;
-const int Tri6::num_children;
 const int Tri6::nodes_per_side;
 
 const unsigned int Tri6::side_nodes_map[Tri6::num_sides][Tri6::nodes_per_side] =

@@ -53,7 +53,7 @@ public:
    */
   explicit
   Edge4 (Elem * p=nullptr) :
-    Edge(Edge4::n_nodes(), p, _nodelinks_data) {}
+    Edge(num_nodes, p, _nodelinks_data) {}
 
   Edge4 (Edge4 &&) = delete;
   Edge4 (const Edge4 &) = delete;
@@ -192,11 +192,6 @@ public:
    * Geometric constants for Edge4.
    */
   static const int num_nodes = 4;
-  static const int num_sides = 2;
-  static const int num_edges = 0;
-  static const int num_children = 2;
-  static const int nodes_per_side = 1;
-  static const int nodes_per_edge = invalid_int;
 
   virtual void flip(BoundaryInfo *) override final;
 

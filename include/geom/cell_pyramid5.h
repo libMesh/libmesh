@@ -63,7 +63,7 @@ public:
    */
   explicit
   Pyramid5 (Elem * p=nullptr) :
-    Pyramid(Pyramid5::n_nodes(), p, _nodelinks_data)
+    Pyramid(num_nodes, p, _nodelinks_data)
   {}
 
   Pyramid5 (Pyramid5 &&) = delete;
@@ -158,9 +158,6 @@ public:
    * Geometric constants for Pyramid5.
    */
   static const int num_nodes = 5;
-  static const int num_sides = 5;
-  static const int num_edges = 8;
-  static const int num_children = 0; // not implemented
   static const int nodes_per_side = 4;
   static const int nodes_per_edge = 2;
 

@@ -63,7 +63,7 @@ public:
    */
   explicit
   InfPrism6 (Elem * p=nullptr) :
-    InfPrism(InfPrism6::n_nodes(), p, _nodelinks_data)
+    InfPrism(num_nodes, p, _nodelinks_data)
   {}
 
   InfPrism6 (InfPrism6 &&) = delete;
@@ -148,9 +148,6 @@ public:
    * Geometric constants for InfPrism6.
    */
   static const int num_nodes = 6;
-  static const int num_sides = 4;
-  static const int num_edges = 6;
-  static const int num_children = 4;
   static const int nodes_per_side = 4;
   static const int nodes_per_edge = 2;
 

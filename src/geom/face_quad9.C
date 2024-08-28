@@ -31,8 +31,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Quad9 class static member initializations
 const int Quad9::num_nodes;
-const int Quad9::num_sides;
-const int Quad9::num_children;
 const int Quad9::nodes_per_side;
 
 const unsigned int Quad9::side_nodes_map[Quad9::num_sides][Quad9::nodes_per_side] =

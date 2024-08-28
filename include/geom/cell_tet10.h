@@ -70,7 +70,7 @@ public:
    */
   explicit
   Tet10 (Elem * p=nullptr) :
-    Tet(Tet10::n_nodes(), p, _nodelinks_data)
+    Tet(num_nodes, p, _nodelinks_data)
   {}
 
   Tet10 (Tet10 &&) = delete;
@@ -212,9 +212,6 @@ public:
    * Geometric constants for Tet10.
    */
   static const int num_nodes = 10;
-  static const int num_sides = 4;
-  static const int num_edges = 6;
-  static const int num_children = 8;
   static const int nodes_per_side = 6;
   static const int nodes_per_edge = 3;
 

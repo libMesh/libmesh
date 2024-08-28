@@ -54,7 +54,7 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   Quad (const unsigned int nn, Elem * p, Node ** nodelinkdata) :
-    Face(nn, Quad::n_sides(), p, _elemlinks_data, nodelinkdata)
+    Face(nn, num_sides, p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
     if (LIBMESH_DIM > 2)
@@ -78,6 +78,12 @@ public:
                  _master_points[i][1],
                  _master_points[i][2]);
   }
+
+  /**
+   * Geometric constants for Quad4.
+   */
+  static const int num_sides = 4;
+  static const int num_children = 4;
 
   /**
    * \returns 4.  All quad-derivatives are guaranteed to have at
