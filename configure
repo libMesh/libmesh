@@ -55395,7 +55395,7 @@ then :
                                         mkdir -p contrib/netgen/install
 
                                         if (cd contrib/netgen/build && \
-                   cmake -DUSE_PYTHON=OFF -DUSE_GUI=OFF -DUSE_OCC=OFF -DCMAKE_INSTALL_PREFIX:PATH=$my_top_builddir/contrib/netgen/install \
+                   cmake -DUSE_NATIVE_ARCH=OFF -DUSE_PYTHON=OFF -DUSE_GUI=OFF -DUSE_OCC=OFF -DCMAKE_INSTALL_PREFIX:PATH=$my_top_builddir/contrib/netgen/install \
                    $my_top_srcdir/contrib/netgen/netgen)
 then :
 
