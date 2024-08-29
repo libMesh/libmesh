@@ -5,11 +5,11 @@
 namespace nglib {
 #include "netgen/nglib/nglib.h"
 }
+
+using namespace nglib;
 #endif
 
 #include <numeric>
-
-using namespace nglib;
 
 class LibMeshNetgenTest : public CppUnit::TestCase {
 public:
