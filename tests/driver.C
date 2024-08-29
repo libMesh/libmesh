@@ -2,6 +2,8 @@
 #include <libmesh/ignore_warnings.h>
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
+#include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/TestResult.h>
 #include <libmesh/restore_warnings.h>
 
 // libMesh includes
@@ -143,7 +145,17 @@ int main(int argc, char ** argv)
   runner.addTest(registry.makeTest());
 #endif
 
-  // Actually run all the requested tests.
+  std::unique_ptr<CppUnit::TestResult> controller;
+  std::unique_ptr<CppUnit::BriefTestProgressListener> listener;
+
+  // Actually run all the requested tests, possibly with verbose
+  // output of test names as they are run
+  if (libMesh::on_command_line("--verbose"))
+    {
+      listener = std::make_unique<CppUnit::BriefTestProgressListener>();
+      runner.eventManager().addListener(listener.get());
+    }
+
   bool succeeded = runner.run();
 
   // Many users won't care at all about the PerfLog
