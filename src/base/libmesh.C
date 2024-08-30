@@ -626,16 +626,16 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // redirect libMesh::out to nothing on all
   // other processors unless explicitly told
   // not to via the --keep-cout command-line argument.
-  if (libMesh::global_processor_id() != 0)
-    if (!libMesh::on_command_line ("--keep-cout"))
+  if (!libMesh::on_command_line ("--keep-cout"))
+    if (libMesh::global_processor_id() != 0)
       libMesh::out.rdbuf (nullptr);
 
   // Similarly, the user can request to drop cerr on all non-0 ranks.
   // By default, errors are printed on all ranks, but this can lead to
   // interleaved/unpredictable outputs when doing parallel regression
   // testing, which this option is designed to support.
-  if (libMesh::global_processor_id() != 0)
-    if (libMesh::on_command_line ("--drop-cerr"))
+  if (libMesh::on_command_line ("--drop-cerr"))
+    if (libMesh::global_processor_id() != 0)
       libMesh::err.rdbuf (nullptr);
 
   // Check command line to override printing
