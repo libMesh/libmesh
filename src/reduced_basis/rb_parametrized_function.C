@@ -48,6 +48,7 @@ RBParametrizedFunction::RBParametrizedFunction()
 :
 requires_xyz_perturbations(false),
 requires_all_elem_qp_data(false),
+requires_all_elem_center_data(false),
 is_lookup_table(false),
 fd_delta(1.e-6),
 _is_nodal_boundary(false)
@@ -423,6 +424,11 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
       v.JxW_all_qp.resize(n_points);
       v.phi_i_all_qp.resize(n_points);
     }
+  if (requires_all_elem_center_data)
+    {
+      v.dxyzdxi_elem_center.resize(n_points);
+      v.dxyzdeta_elem_center.resize(n_points);
+    }
 
   // Empty vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -434,6 +440,8 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
       auto fe = con.get_element_fe(/*var=*/0, dim);
       fe->get_JxW();
       fe->get_phi();
+      fe->get_dxyzdxi();
+      fe->get_dxyzdeta();
     }
 
   unsigned int counter = 0;
@@ -452,8 +460,13 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
       auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
       const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
       const std::vector<Real> & JxW = elem_fe->get_JxW();
+      const auto & dxyzdxi = elem_fe->get_dxyzdxi();
+      const auto & dxyzdeta = elem_fe->get_dxyzdeta();
 
       elem_fe->reinit(&elem_ref);
+
+      bool elem_center_quantities_set = false;
+      Point dxyzdxi_buffer, dxyzdeta_buffer;
 
       for (auto qp : index_range(xyz_vec))
         {
@@ -498,6 +511,32 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
                   v.phi_i_all_qp[counter][i][j] = phi[i][j];
               }
             }
+            if (requires_all_elem_center_data)
+              {
+                // We try to minimize the number of reinit so we only do it once per elem for
+                // center quantities.
+                if (!elem_center_quantities_set)
+                  {
+                    // Get data derivatives at vertex average
+                    std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
+                    elem_fe->reinit (&elem_ref, &nodes);
+
+                    // Here we do an implicit conversion from RealGradient which is a VectorValue<Real>
+                    // which in turn is a TypeVector<T> to a Point which is a TypeVector<Real>.
+                    // They are essentially the same thing. This helps us limiting the number of includes
+                    // in serialization and deserialization as RealGradient is a typedef and we cannot
+                    // forward declare typedefs. As a result we leverage the fact that point.h is already
+                    // includes in most places we need RealGradient.
+                    dxyzdxi_buffer = dxyzdxi[0];
+                    dxyzdeta_buffer = dxyzdeta[0];
+
+                    elem_center_quantities_set = true;
+                    elem_fe->reinit(&elem_ref);
+                  }
+
+                v.dxyzdxi_elem_center[counter] = dxyzdxi_buffer;
+                v.dxyzdeta_elem_center[counter] = dxyzdeta_buffer;
+              }
 
           counter++;
         }

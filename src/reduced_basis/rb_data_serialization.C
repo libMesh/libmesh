@@ -778,6 +778,24 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  {
+    auto dxyzdxi_elem_center =
+      rb_eim_evaluation_builder.initInterpolationDxyzDxiElem(n_bfs);
+    for (auto i : make_range(n_bfs))
+      {
+        add_point_to_builder(rb_eim_evaluation.get_elem_center_dxyzdxi(i), dxyzdxi_elem_center[i]);
+      }
+  }
+
+  {
+    auto dxyzdeta_elem_center =
+      rb_eim_evaluation_builder.initInterpolationDxyzDetaElem(n_bfs);
+    for (auto i : make_range(n_bfs))
+      {
+        add_point_to_builder(rb_eim_evaluation.get_elem_center_dxyzdeta(i), dxyzdeta_elem_center[i]);
+      }
+  }
+
   // Element type for the element that contains each interpolation point
   {
     auto interpolation_points_elem_type_list =

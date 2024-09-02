@@ -902,6 +902,36 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  {
+    auto elem_center_dxyzdxi =
+      rb_eim_evaluation_reader.getInterpolationDxyzDxiElem();
+
+    libmesh_error_msg_if(elem_center_dxyzdxi.size() != n_bfs,
+                         "Size error while reading the eim interpolation points.");
+
+    Point dxyzdxi_buffer;
+    for (const auto i : make_range(n_bfs))
+      {
+        load_point(elem_center_dxyzdxi[i], dxyzdxi_buffer);
+        rb_eim_evaluation.add_elem_center_dxyzdxi(dxyzdxi_buffer);
+      }
+  }
+
+  {
+    auto elem_center_dxyzdeta =
+      rb_eim_evaluation_reader.getInterpolationDxyzDetaElem();
+
+    libmesh_error_msg_if(elem_center_dxyzdeta.size() != n_bfs,
+                         "Size error while reading the eim interpolation points.");
+
+    Point dxyzdeta_buffer;
+    for (const auto i : make_range(n_bfs))
+      {
+        load_point(elem_center_dxyzdeta[i], dxyzdeta_buffer);
+        rb_eim_evaluation.add_elem_center_dxyzdeta(dxyzdeta_buffer);
+      }
+  }
+
   // Interpolation points element types
   {
     auto interpolation_points_elem_type_list =
