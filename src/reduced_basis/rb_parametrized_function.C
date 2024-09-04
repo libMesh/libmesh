@@ -27,6 +27,7 @@
 #include "libmesh/system.h"
 #include "libmesh/elem.h"
 #include "libmesh/fem_context.h"
+#include "libmesh/quadrature.h"
 
 namespace libMesh
 {
@@ -428,6 +429,9 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
     {
       v.dxyzdxi_elem_center.resize(n_points);
       v.dxyzdeta_elem_center.resize(n_points);
+      // At the time of writing, the quadrature order is only used in conjunction with element
+      // center data so we should not compute it elsewhere for now.
+      v.qrule_orders.resize(n_points);
     }
 
   // Empty vector to be used when xyz perturbations are not required
@@ -513,6 +517,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
             }
             if (requires_all_elem_center_data)
               {
+                v.qrule_orders[counter] = con.get_element_qrule().get_order();
                 // We try to minimize the number of reinit so we only do it once per elem for
                 // center quantities.
                 if (!elem_center_quantities_set)

@@ -2589,6 +2589,7 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   ElemType optimal_elem_type = INVALID_ELEM;
   std::vector<Real> optimal_JxW_all_qp;
   std::vector<std::vector<Real>> optimal_phi_i_all_qp;
+  Order optimal_qrule_order = INVALID_ORDER;
   Point optimal_dxyzdxi_elem_center;
   Point optimal_dxyzdeta_elem_center;
 
@@ -2678,6 +2679,7 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
 
                   if (get_rb_eim_evaluation().get_parametrized_function().requires_all_elem_center_data)
                     {
+                        optimal_qrule_order = con.get_element_qrule().get_order();
                         // Get data derivatives at vertex average
                         std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
                         elem_fe->reinit (&elem_ref, &nodes);
@@ -2717,6 +2719,13 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
     optimal_elem_type = static_cast<ElemType>(optimal_elem_type_int);
   }
 
+  // Cast optimal_qrule_order to an int in order to broadcast it
+  {
+    int optimal_qrule_order_int = static_cast<int>(optimal_qrule_order);
+    this->comm().broadcast(optimal_qrule_order_int, proc_ID_index);
+    optimal_qrule_order = static_cast<Order>(optimal_qrule_order_int);
+  }
+
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
 
   if (add_basis_function)
@@ -2745,6 +2754,7 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                                   optimal_elem_type,
                                   optimal_JxW_all_qp,
                                   optimal_phi_i_all_qp,
+                                  optimal_qrule_order,
                                   optimal_dxyzdxi_elem_center,
                                   optimal_dxyzdeta_elem_center);
 

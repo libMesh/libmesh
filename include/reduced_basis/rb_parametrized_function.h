@@ -23,6 +23,7 @@
 // libMesh includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_order.h"
 
 // C++ includes
 #include <unordered_map>
@@ -84,6 +85,7 @@ struct VectorizedEvalInput
   std::vector<std::vector<std::vector<Real>>> phi_i_all_qp;
   std::vector<Point> dxyzdxi_elem_center;
   std::vector<Point> dxyzdeta_elem_center;
+  std::vector<Order> qrule_orders;
 };
 
 /**
