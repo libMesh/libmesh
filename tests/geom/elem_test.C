@@ -816,6 +816,8 @@ public:
                                                                 \
   CPPUNIT_TEST_SUITE_REGISTRATION( ElemTest_##elemtype )
 
+INSTANTIATE_ELEMTEST(NODEELEM);
+
 INSTANTIATE_ELEMTEST(EDGE2);
 INSTANTIATE_ELEMTEST(EDGE3);
 INSTANTIATE_ELEMTEST(EDGE4);
