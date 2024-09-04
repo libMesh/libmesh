@@ -41,7 +41,7 @@ public:
 
         wide_bbox.scale(1. / 3.);
 
-        if (!elem->infinite())
+        if (!elem->infinite() && elem->dim())
           {
             CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.min()));
             CPPUNIT_ASSERT(!bbox.contains_point(wide_bbox.max()));
@@ -130,9 +130,9 @@ public:
 
         // The smallest actual nodal areas in this test are found in
         // tetrahedra, which have a minimum value of 2.0. However, we
-        // return a default value of 1.0 for 1D elements here, so
-        // we also handle that case.
-        if (elem->dim() == 1)
+        // return a default value of 1.0 for 0D and 1D elements here,
+        // so we also handle that case.
+        if (elem->dim() < 2)
           CPPUNIT_ASSERT_GREATEREQUAL(1 - TOLERANCE, jac);
         else
           CPPUNIT_ASSERT_GREATEREQUAL(2 - TOLERANCE, jac);
@@ -293,7 +293,7 @@ public:
           CPPUNIT_ASSERT(elem->has_affine_map());
 
         // The neighbors and bcids should have flipped in a way
-        // consistently with the nodes.
+        // consistently with the nodes (unless this is a 0D NodeElem)
         bool something_changed = false;
         for (auto s : make_range(n_sides))
           {
@@ -319,7 +319,7 @@ public:
 
             CPPUNIT_ASSERT(bcids[old_side] == new_bcids);
           }
-        CPPUNIT_ASSERT(something_changed);
+        CPPUNIT_ASSERT(!elem->dim() || something_changed);
 
         const Point new_vertex_avg = elem->vertex_average();
         for (const auto d : make_range(LIBMESH_DIM))
