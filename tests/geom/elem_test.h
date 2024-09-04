@@ -121,11 +121,12 @@ public:
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
       {
         const unsigned int dim = test_elem->dim();
+        const unsigned int use_x = dim > 0;
         const unsigned int use_y = dim > 1;
         const unsigned int use_z = dim > 2;
 
         MeshTools::Generation::build_cube (*_mesh,
-                                           N, N*use_y, N*use_z,
+                                           N*use_x, N*use_y, N*use_z,
                                            minpos, maxpos,
                                            minpos, use_y*maxpos,
                                            minpos, use_z*maxpos,
