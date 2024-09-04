@@ -52,6 +52,23 @@ class Elem;
  */
 struct EIMVarGroupPlottingInfo
 {
+
+  /**
+   * Default constructor. Initialize values that would otherwise
+   * be uninitialized. We do not initialize the FEType or string
+   * members since they already have default constructors.
+   */
+  EIMVarGroupPlottingInfo()
+  :
+  first_eim_var_index(0),
+  n_eim_vars(0),
+  enforce_min_value(false),
+  enforce_max_value(false),
+  min_value(0.),
+  max_value(0.)
+  {
+  }
+
   /**
    * The index for the first EIM variable in this variable group.
    */
