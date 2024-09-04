@@ -80,6 +80,23 @@ struct EIMVarGroupPlottingInfo
    * or copy data from qps to nodes.
    */
   std::string plotting_type;
+
+  /**
+   * These booleans indicate if we should clamp the resulting output
+   * to be above a min value or below a max value. This can be relevant
+   * if we want to satisfy some physical constraints on the outputs, for
+   * example, since these constraints may not be exactly satisfied by
+   * the EIM output.
+   */
+  bool enforce_min_value;
+  bool enforce_max_value;
+
+  /**
+   * The min (resp. max) value that we enforce if enforce_min_value
+   * (resp. enforce_max_value) is true.
+   */
+  Real min_value;
+  Real max_value;
 };
 
 /**
