@@ -52,6 +52,23 @@ class Elem;
  */
 struct EIMVarGroupPlottingInfo
 {
+
+  /**
+   * Default constructor. Initialize values that would otherwise
+   * be uninitialized. We do not initialize the FEType or string
+   * members since they already have default constructors.
+   */
+  EIMVarGroupPlottingInfo()
+  :
+  first_eim_var_index(0),
+  n_eim_vars(0),
+  enforce_min_value(false),
+  enforce_max_value(false),
+  min_value(0.),
+  max_value(0.)
+  {
+  }
+
   /**
    * The index for the first EIM variable in this variable group.
    */
@@ -80,6 +97,23 @@ struct EIMVarGroupPlottingInfo
    * or copy data from qps to nodes.
    */
   std::string plotting_type;
+
+  /**
+   * These booleans indicate if we should clamp the resulting output
+   * to be above a min value or below a max value. This can be relevant
+   * if we want to satisfy some physical constraints on the outputs, for
+   * example, since these constraints may not be exactly satisfied by
+   * the EIM output.
+   */
+  bool enforce_min_value;
+  bool enforce_max_value;
+
+  /**
+   * The min (resp. max) value that we enforce if enforce_min_value
+   * (resp. enforce_max_value) is true.
+   */
+  Real min_value;
+  Real max_value;
 };
 
 /**
