@@ -2589,6 +2589,9 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   ElemType optimal_elem_type = INVALID_ELEM;
   std::vector<Real> optimal_JxW_all_qp;
   std::vector<std::vector<Real>> optimal_phi_i_all_qp;
+  Order optimal_qrule_order = INVALID_ORDER;
+  Point optimal_dxyzdxi_elem_center;
+  Point optimal_dxyzdeta_elem_center;
 
   // Initialize largest_abs_value to be negative so that it definitely gets updated.
   Real largest_abs_value = -1.;
@@ -2611,6 +2614,8 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
       auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
       const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
       const auto & JxW = elem_fe->get_JxW();
+      const auto & dxyzdxi = elem_fe->get_dxyzdxi();
+      const auto & dxyzdeta = elem_fe->get_dxyzdeta();
 
       elem_fe->reinit(&elem_ref);
 
@@ -2671,6 +2676,19 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                       optimal_JxW_all_qp = JxW;
                       optimal_phi_i_all_qp = phi;
                     }
+
+                  if (get_rb_eim_evaluation().get_parametrized_function().requires_all_elem_center_data)
+                    {
+                      optimal_qrule_order = con.get_element_qrule().get_order();
+                      // Get data derivatives at vertex average
+                      std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
+                      elem_fe->reinit (&elem_ref, &nodes);
+
+                      optimal_dxyzdxi_elem_center = dxyzdxi[0];
+                      optimal_dxyzdeta_elem_center = dxyzdeta[0];
+
+                      elem_fe->reinit(&elem_ref);
+                    }
                 }
             }
         }
@@ -2691,12 +2709,21 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
   this->comm().broadcast(optimal_point_phi_i_qp, proc_ID_index);
   this->comm().broadcast(optimal_JxW_all_qp, proc_ID_index);
   this->comm().broadcast(optimal_phi_i_all_qp, proc_ID_index);
+  this->comm().broadcast(optimal_dxyzdxi_elem_center, proc_ID_index);
+  this->comm().broadcast(optimal_dxyzdeta_elem_center, proc_ID_index);
 
   // Cast optimal_elem_type to an int in order to broadcast it
   {
     int optimal_elem_type_int = static_cast<int>(optimal_elem_type);
     this->comm().broadcast(optimal_elem_type_int, proc_ID_index);
     optimal_elem_type = static_cast<ElemType>(optimal_elem_type_int);
+  }
+
+  // Cast optimal_qrule_order to an int in order to broadcast it
+  {
+    int optimal_qrule_order_int = static_cast<int>(optimal_qrule_order);
+    this->comm().broadcast(optimal_qrule_order_int, proc_ID_index);
+    optimal_qrule_order = static_cast<Order>(optimal_qrule_order_int);
   }
 
   libmesh_error_msg_if(optimal_elem_id == DofObject::invalid_id, "Error: Invalid element ID");
@@ -2726,7 +2753,10 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                                   optimal_point_phi_i_qp,
                                   optimal_elem_type,
                                   optimal_JxW_all_qp,
-                                  optimal_phi_i_all_qp);
+                                  optimal_phi_i_all_qp,
+                                  optimal_qrule_order,
+                                  optimal_dxyzdxi_elem_center,
+                                  optimal_dxyzdeta_elem_center);
 
   // In this case we did not encounter a linearly dependent basis function, so return false
   return false;

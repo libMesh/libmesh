@@ -902,6 +902,55 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  // Dxyzdxi at the element center for the element that contains each interpolation point.
+  {
+    auto elem_center_dxyzdxi =
+      rb_eim_evaluation_reader.getInterpolationDxyzDxiElem();
+
+    libmesh_error_msg_if(elem_center_dxyzdxi.size() != n_bfs,
+                         "Size error while reading the eim interpolation points.");
+
+    Point dxyzdxi_buffer;
+    for (const auto i : make_range(n_bfs))
+      {
+        load_point(elem_center_dxyzdxi[i], dxyzdxi_buffer);
+        rb_eim_evaluation.add_elem_center_dxyzdxi(dxyzdxi_buffer);
+      }
+  }
+
+  // Dxyzdxi at the element center for the element that contains each interpolation point.
+  {
+    auto elem_center_dxyzdeta =
+      rb_eim_evaluation_reader.getInterpolationDxyzDetaElem();
+
+    libmesh_error_msg_if(elem_center_dxyzdeta.size() != n_bfs,
+                         "Size error while reading the eim interpolation points.");
+
+    Point dxyzdeta_buffer;
+    for (const auto i : make_range(n_bfs))
+      {
+        load_point(elem_center_dxyzdeta[i], dxyzdeta_buffer);
+        rb_eim_evaluation.add_elem_center_dxyzdeta(dxyzdeta_buffer);
+      }
+  }
+
+  // Quadrature rule order associated to the element that contains each interpolation point.
+  {
+    auto interpolation_points_qrule_order_list =
+      rb_eim_evaluation_reader.getInterpolationQruleOrder();
+
+    if (interpolation_points_qrule_order_list.size() > 0)
+      {
+        libmesh_error_msg_if(interpolation_points_qrule_order_list.size() != n_bfs,
+                            "Size error while reading the eim interpolation element types.");
+
+        for (unsigned int i=0; i<n_bfs; ++i)
+          {
+            rb_eim_evaluation.add_interpolation_points_qrule_order(static_cast<Order>(interpolation_points_qrule_order_list[i]));
+          }
+      }
+  }
+
   // Interpolation points element types
   {
     auto interpolation_points_elem_type_list =

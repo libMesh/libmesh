@@ -778,6 +778,35 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  // Dxyzdxi at the element center for the element that contains each interpolation point.
+  {
+    auto dxyzdxi_elem_center =
+      rb_eim_evaluation_builder.initInterpolationDxyzDxiElem(n_bfs);
+    for (auto i : make_range(n_bfs))
+      {
+        add_point_to_builder(rb_eim_evaluation.get_elem_center_dxyzdxi(i), dxyzdxi_elem_center[i]);
+      }
+  }
+
+  // Dxyzdeta at the element center for the element that contains each interpolation point.
+  {
+    auto dxyzdeta_elem_center =
+      rb_eim_evaluation_builder.initInterpolationDxyzDetaElem(n_bfs);
+    for (auto i : make_range(n_bfs))
+      {
+        add_point_to_builder(rb_eim_evaluation.get_elem_center_dxyzdeta(i), dxyzdeta_elem_center[i]);
+      }
+  }
+
+  // Quadrature rule order associated to the element that contains each interpolation point.
+  {
+    auto interpolation_points_qrule_order_list =
+      rb_eim_evaluation_builder.initInterpolationQruleOrder(n_bfs);
+    for (unsigned int i=0; i<n_bfs; ++i)
+      interpolation_points_qrule_order_list.set(i,
+                                                rb_eim_evaluation.get_interpolation_points_qrule_order(i));
+  }
+
   // Element type for the element that contains each interpolation point
   {
     auto interpolation_points_elem_type_list =

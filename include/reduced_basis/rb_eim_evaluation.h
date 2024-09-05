@@ -456,6 +456,9 @@ public:
   void add_interpolation_points_phi_i_qp(const std::vector<Real> & phi_i_qp);
   void add_interpolation_points_JxW_all_qp(const std::vector<Real> & JxW_all_qp);
   void add_interpolation_points_phi_i_all_qp(const std::vector<std::vector<Real>> & phi_i_all_qp);
+  void add_interpolation_points_qrule_order(Order qrule_order);
+  void add_elem_center_dxyzdxi(const Point & dxyzdxi);
+  void add_elem_center_dxyzdeta(const Point & dxyzdxi);
   void add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices);
 
   /**
@@ -474,6 +477,9 @@ public:
   const std::vector<Real> & get_interpolation_points_phi_i_qp(unsigned int index) const;
   const std::vector<Real> & get_interpolation_points_JxW_all_qp(unsigned int index) const;
   const std::vector<std::vector<Real>> & get_interpolation_points_phi_i_all_qp(unsigned int index) const;
+  Order get_interpolation_points_qrule_order(unsigned int index) const;
+  const Point & get_elem_center_dxyzdxi(unsigned int index) const;
+  const Point & get_elem_center_dxyzdeta(unsigned int index) const;
   const std::vector<unsigned int> & get_interpolation_points_spatial_indices(unsigned int index) const;
 
   /**
@@ -512,7 +518,10 @@ public:
     const std::vector<Real> & phi_i_qp,
     ElemType elem_type,
     const std::vector<Real> & JxW_all_qp,
-    const std::vector<std::vector<Real>> & phi_i_all_qp);
+    const std::vector<std::vector<Real>> & phi_i_all_qp,
+    Order qrule_order,
+    const Point & dxyz_dxi_elem_center,
+    const Point & dxyz_deta_elem_center);
 
   /**
    * Add \p side_bf to our EIM basis.

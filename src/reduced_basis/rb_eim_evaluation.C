@@ -760,6 +760,21 @@ void RBEIMEvaluation::add_interpolation_points_phi_i_qp(const std::vector<Real> 
   _vec_eval_input.phi_i_qp.emplace_back(phi_i_qp);
 }
 
+void RBEIMEvaluation::add_elem_center_dxyzdxi(const Point & dxyzdxi)
+{
+  _vec_eval_input.dxyzdxi_elem_center.emplace_back(dxyzdxi);
+}
+
+void RBEIMEvaluation::add_elem_center_dxyzdeta(const Point & dxyzdeta)
+{
+  _vec_eval_input.dxyzdeta_elem_center.emplace_back(dxyzdeta);
+}
+
+void RBEIMEvaluation::add_interpolation_points_qrule_order(Order qrule_order)
+{
+  _vec_eval_input.qrule_orders.emplace_back(qrule_order);
+}
+
 void RBEIMEvaluation::add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices)
 {
   _interpolation_points_spatial_indices.emplace_back(spatial_indices);
@@ -856,6 +871,27 @@ const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_phi_i_qp(uns
   return _vec_eval_input.phi_i_qp[index];
 }
 
+const Point & RBEIMEvaluation::get_elem_center_dxyzdxi(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _vec_eval_input.dxyzdxi_elem_center.size(), "Error: Invalid index");
+
+  return _vec_eval_input.dxyzdxi_elem_center[index];
+}
+
+const Point & RBEIMEvaluation::get_elem_center_dxyzdeta(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _vec_eval_input.dxyzdeta_elem_center.size(), "Error: Invalid index");
+
+  return _vec_eval_input.dxyzdeta_elem_center[index];
+}
+
+Order RBEIMEvaluation::get_interpolation_points_qrule_order(unsigned int index) const
+{
+  libmesh_error_msg_if(index >= _vec_eval_input.qrule_orders.size(), "Error: Invalid index");
+
+  return _vec_eval_input.qrule_orders[index];
+}
+
 const std::vector<unsigned int> & RBEIMEvaluation::get_interpolation_points_spatial_indices(unsigned int index) const
 {
   libmesh_error_msg_if(index >= _interpolation_points_spatial_indices.size(), "Error: Invalid index");
@@ -907,7 +943,10 @@ void RBEIMEvaluation::add_interpolation_data(
   const std::vector<Real> & phi_i_qp,
   ElemType elem_type,
   const std::vector<Real> & JxW_all_qp,
-  const std::vector<std::vector<Real>> & phi_i_all_qp)
+  const std::vector<std::vector<Real>> & phi_i_all_qp,
+  Order qrule_order,
+  const Point & dxyzdxi_elem_center,
+  const Point & dxyzdeta_elem_center)
 {
   _vec_eval_input.all_xyz.emplace_back(p);
   _interpolation_points_comp.emplace_back(comp);
@@ -919,6 +958,9 @@ void RBEIMEvaluation::add_interpolation_data(
   _vec_eval_input.elem_types.emplace_back(elem_type);
   _vec_eval_input.JxW_all_qp.emplace_back(JxW_all_qp);
   _vec_eval_input.phi_i_all_qp.emplace_back(phi_i_all_qp);
+  _vec_eval_input.qrule_orders.emplace_back(qrule_order);
+  _vec_eval_input.dxyzdxi_elem_center.emplace_back(dxyzdxi_elem_center);
+  _vec_eval_input.dxyzdeta_elem_center.emplace_back(dxyzdeta_elem_center);
 }
 
 void RBEIMEvaluation::add_side_basis_function(

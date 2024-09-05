@@ -27,6 +27,7 @@
 #include "libmesh/system.h"
 #include "libmesh/elem.h"
 #include "libmesh/fem_context.h"
+#include "libmesh/quadrature.h"
 
 namespace libMesh
 {
@@ -48,6 +49,7 @@ RBParametrizedFunction::RBParametrizedFunction()
 :
 requires_xyz_perturbations(false),
 requires_all_elem_qp_data(false),
+requires_all_elem_center_data(false),
 is_lookup_table(false),
 fd_delta(1.e-6),
 _is_nodal_boundary(false)
@@ -423,6 +425,14 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
       v.JxW_all_qp.resize(n_points);
       v.phi_i_all_qp.resize(n_points);
     }
+  if (requires_all_elem_center_data)
+    {
+      v.dxyzdxi_elem_center.resize(n_points);
+      v.dxyzdeta_elem_center.resize(n_points);
+      // At the time of writing, the quadrature order is only used in conjunction with element
+      // center data so we should not compute it elsewhere for now.
+      v.qrule_orders.resize(n_points);
+    }
 
   // Empty vector to be used when xyz perturbations are not required
   std::vector<Point> empty_perturbs;
@@ -434,6 +444,8 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
       auto fe = con.get_element_fe(/*var=*/0, dim);
       fe->get_JxW();
       fe->get_phi();
+      fe->get_dxyzdxi();
+      fe->get_dxyzdeta();
     }
 
   unsigned int counter = 0;
@@ -452,9 +464,12 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
       auto elem_fe = con.get_element_fe(/*var=*/0, elem_ref.dim());
       const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
       const std::vector<Real> & JxW = elem_fe->get_JxW();
+      const auto & dxyzdxi = elem_fe->get_dxyzdxi();
+      const auto & dxyzdeta = elem_fe->get_dxyzdeta();
 
       elem_fe->reinit(&elem_ref);
 
+      unsigned int counter_reset_value = counter;
       for (auto qp : index_range(xyz_vec))
         {
           mesh_to_preevaluated_values_map[elem_id][qp] = counter;
@@ -500,6 +515,35 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
             }
 
           counter++;
+        }
+
+      if (requires_all_elem_center_data)
+        {
+          // Here we reset the counter value as we do a second loop over xyz_vec
+          counter = counter_reset_value;
+
+          // Get data derivatives at vertex average
+          std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
+          elem_fe->reinit (&elem_ref, &nodes);
+          // Set qrule_order here to prevent calling getter multiple times.
+          Order qrule_order = con.get_element_qrule().get_order();
+
+          while (counter - counter_reset_value < xyz_vec.size())
+            {
+              // We add qrule_order in this loop as it is used in conjunction with elem center
+              // quantities for now.
+              v.qrule_orders[counter] = qrule_order;
+              // Here we do an implicit conversion from RealGradient which is a VectorValue<Real>
+              // which in turn is a TypeVector<T> to a Point which is a TypeVector<Real>.
+              // They are essentially the same thing. This helps us limiting the number of includes
+              // in serialization and deserialization as RealGradient is a typedef and we cannot
+              // forward declare typedefs. As a result we leverage the fact that point.h is already
+              // included in most places we need RealGradient.
+              v.dxyzdxi_elem_center[counter] = dxyzdxi[0];
+              v.dxyzdeta_elem_center[counter] = dxyzdeta[0];
+
+              counter++;
+            }
         }
     }
 

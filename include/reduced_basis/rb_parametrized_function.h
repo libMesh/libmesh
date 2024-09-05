@@ -23,6 +23,7 @@
 // libMesh includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/enum_order.h"
 
 // C++ includes
 #include <unordered_map>
@@ -82,6 +83,9 @@ struct VectorizedEvalInput
   std::vector<ElemType> elem_types;
   std::vector<std::vector<Real>> JxW_all_qp;
   std::vector<std::vector<std::vector<Real>>> phi_i_all_qp;
+  std::vector<Point> dxyzdxi_elem_center;
+  std::vector<Point> dxyzdeta_elem_center;
+  std::vector<Order> qrule_orders;
 };
 
 /**
@@ -401,6 +405,12 @@ public:
    * average" quantities.
    */
   bool requires_all_elem_qp_data;
+
+  /**
+   * Boolean to indicate whether this parametrized function requires data
+   * from the center on the current element.
+   */
+  bool requires_all_elem_center_data;
 
   /**
    * Boolean to indicate if this parametrized function is defined based on a lookup
