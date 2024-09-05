@@ -2111,6 +2111,7 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
       // get us a little uniqueness to make visualization reasonable.
       Point newpt;
       Real total_scaling = 0;
+      unsigned int total_entries = 0;
 
       // We'll get a decent initial pid choice here too, if only to
       // aid in later repartitioning.
@@ -2123,9 +2124,22 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
           const Point constrained_pt = constrained_node;
           newpt += r*constrained_pt;
           total_scaling += r;
+          ++total_entries;
           ++pids[constrained_node.processor_id()];
         }
-      newpt /= total_scaling;
+
+      libmesh_error_msg_if
+        (!total_entries,
+         "Empty column " << j <<
+         " found in constraint operator matrix");
+
+      // If we have *cancellation* here then we can end up dividing by
+      // zero; try just evenly scaling across all constrained node
+      // points instead.
+      if (total_scaling > TOLERANCE)
+        newpt /= total_scaling;
+      else
+        newpt /= total_entries;
 
       Node *n = this->add_point(newpt);
       std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
