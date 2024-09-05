@@ -203,8 +203,7 @@ public:
 
   virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int) const override
   {
-    libmesh_not_implemented();
-    return {0};
+    return {};
   }
 
   virtual std::vector<unsigned int> sides_on_edge(const unsigned int) const override
@@ -278,7 +277,7 @@ public:
 
   virtual void permute(unsigned int) override final { libmesh_error(); }
 
-  virtual void flip(BoundaryInfo *) override final { libmesh_error(); }
+  virtual void flip(BoundaryInfo *) override final { return; /* no-op */ }
   virtual bool is_flipped() const override final { return false; }
 
   virtual ElemType side_type (const unsigned int) const override
