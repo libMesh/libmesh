@@ -2679,15 +2679,15 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
 
                   if (get_rb_eim_evaluation().get_parametrized_function().requires_all_elem_center_data)
                     {
-                        optimal_qrule_order = con.get_element_qrule().get_order();
-                        // Get data derivatives at vertex average
-                        std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
-                        elem_fe->reinit (&elem_ref, &nodes);
+                      optimal_qrule_order = con.get_element_qrule().get_order();
+                      // Get data derivatives at vertex average
+                      std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
+                      elem_fe->reinit (&elem_ref, &nodes);
 
-                        optimal_dxyzdxi_elem_center = dxyzdxi[0];
-                        optimal_dxyzdeta_elem_center = dxyzdeta[0];
+                      optimal_dxyzdxi_elem_center = dxyzdxi[0];
+                      optimal_dxyzdeta_elem_center = dxyzdeta[0];
 
-                        elem_fe->reinit(&elem_ref);
+                      elem_fe->reinit(&elem_ref);
                     }
                 }
             }

@@ -469,9 +469,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 
       elem_fe->reinit(&elem_ref);
 
-      bool elem_center_quantities_set = false;
-      Point dxyzdxi_buffer, dxyzdeta_buffer;
-
+      unsigned int counter_reset_value = counter;
       for (auto qp : index_range(xyz_vec))
         {
           mesh_to_preevaluated_values_map[elem_id][qp] = counter;
@@ -515,35 +513,37 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
                   v.phi_i_all_qp[counter][i][j] = phi[i][j];
               }
             }
-            if (requires_all_elem_center_data)
-              {
-                v.qrule_orders[counter] = con.get_element_qrule().get_order();
-                // We try to minimize the number of reinit so we only do it once per elem for
-                // center quantities.
-                if (!elem_center_quantities_set)
-                  {
-                    // Get data derivatives at vertex average
-                    std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
-                    elem_fe->reinit (&elem_ref, &nodes);
-
-                    // Here we do an implicit conversion from RealGradient which is a VectorValue<Real>
-                    // which in turn is a TypeVector<T> to a Point which is a TypeVector<Real>.
-                    // They are essentially the same thing. This helps us limiting the number of includes
-                    // in serialization and deserialization as RealGradient is a typedef and we cannot
-                    // forward declare typedefs. As a result we leverage the fact that point.h is already
-                    // includes in most places we need RealGradient.
-                    dxyzdxi_buffer = dxyzdxi[0];
-                    dxyzdeta_buffer = dxyzdeta[0];
-
-                    elem_center_quantities_set = true;
-                    elem_fe->reinit(&elem_ref);
-                  }
-
-                v.dxyzdxi_elem_center[counter] = dxyzdxi_buffer;
-                v.dxyzdeta_elem_center[counter] = dxyzdeta_buffer;
-              }
 
           counter++;
+        }
+
+      if (requires_all_elem_center_data)
+        {
+          // Here we reset the counter value as we do a second loop over xyz_vec
+          counter = counter_reset_value;
+
+          // Get data derivatives at vertex average
+          std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
+          elem_fe->reinit (&elem_ref, &nodes);
+          // Set qrule_order here to prevent calling getter multiple times.
+          Order qrule_order = con.get_element_qrule().get_order();
+
+          while (counter - counter_reset_value < xyz_vec.size())
+            {
+              // We add qrule_order in this loop as it is used in conjunction with elem center
+              // quantities for now.
+              v.qrule_orders[counter] = qrule_order;
+              // Here we do an implicit conversion from RealGradient which is a VectorValue<Real>
+              // which in turn is a TypeVector<T> to a Point which is a TypeVector<Real>.
+              // They are essentially the same thing. This helps us limiting the number of includes
+              // in serialization and deserialization as RealGradient is a typedef and we cannot
+              // forward declare typedefs. As a result we leverage the fact that point.h is already
+              // included in most places we need RealGradient.
+              v.dxyzdxi_elem_center[counter] = dxyzdxi[0];
+              v.dxyzdeta_elem_center[counter] = dxyzdeta[0];
+
+              counter++;
+            }
         }
     }
 

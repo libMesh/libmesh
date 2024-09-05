@@ -804,7 +804,7 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
       rb_eim_evaluation_builder.initInterpolationQruleOrder(n_bfs);
     for (unsigned int i=0; i<n_bfs; ++i)
       interpolation_points_qrule_order_list.set(i,
-                                              rb_eim_evaluation.get_interpolation_points_qrule_order(i));
+                                                rb_eim_evaluation.get_interpolation_points_qrule_order(i));
   }
 
   // Element type for the element that contains each interpolation point
