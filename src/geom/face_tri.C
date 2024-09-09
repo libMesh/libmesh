@@ -30,6 +30,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Tri class static member initializations
+const int Tri::num_sides;
+const int Tri::num_children;
+
 // Note: we can omit initialization of the third entry of each row because
 // static variables are automatically zero-initialized.
 const Real Tri::_master_points[6][3] =

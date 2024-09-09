@@ -45,7 +45,7 @@ public:
   Edge (const unsigned int nn,
         Elem * p,
         Node ** nodelinkdata) :
-    Elem(nn, Edge::n_sides(), p, _elemlinks_data, nodelinkdata)
+    Elem(nn, num_sides, p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
     if (LIBMESH_DIM > 1)
@@ -57,6 +57,15 @@ public:
   Edge & operator= (const Edge &) = delete;
   Edge & operator= (Edge &&) = delete;
   virtual ~Edge() = default;
+
+  /**
+   * Geometric constants for all Edges.
+   */
+  static const int num_sides = 2;
+  static const int num_edges = 0;
+  static const int num_children = 2;
+  static const int nodes_per_side = 1;
+  static const int nodes_per_edge = invalid_int;
 
   /**
    * \returns 1, the dimensionality of the object.

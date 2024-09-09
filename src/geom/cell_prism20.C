@@ -34,9 +34,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Prism20 class static member initializations
 const int Prism20::num_nodes;
-const int Prism20::num_sides;
-const int Prism20::num_edges;
-const int Prism20::num_children;
 const int Prism20::nodes_per_side;
 const int Prism20::nodes_per_edge;
 

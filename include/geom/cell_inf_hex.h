@@ -52,7 +52,7 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   InfHex(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
-    InfCell(nn, InfHex::n_sides(), p, _elemlinks_data, nodelinkdata)
+    InfCell(nn, num_sides, p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
     if (LIBMESH_DIM > 3)
@@ -76,6 +76,13 @@ public:
                  _master_points[i][1],
                  _master_points[i][2]);
   }
+
+  /**
+   * Geometric constants for all InfHexes.
+   */
+  static const int num_sides = 5;
+  static const int num_edges = 8;
+  static const int num_children = 4;
 
   /**
    * \returns 5.  Infinite elements have one side less

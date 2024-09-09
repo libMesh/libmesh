@@ -61,7 +61,7 @@ public:
    */
   explicit
   Hex8 (Elem * p=nullptr) :
-    Hex(Hex8::n_nodes(), p, _nodelinks_data)
+    Hex(num_nodes, p, _nodelinks_data)
   {}
 
   Hex8 (Hex8 &&) = delete;
@@ -161,9 +161,6 @@ public:
    * Geometric constants for Hex8.
    */
   static const int num_nodes = 8;
-  static const int num_sides = 6;
-  static const int num_edges = 12;
-  static const int num_children = 8;
   static const int nodes_per_side = 4;
   static const int nodes_per_edge = 2;
 

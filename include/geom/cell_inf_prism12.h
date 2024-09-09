@@ -67,7 +67,7 @@ public:
    */
   explicit
   InfPrism12 (Elem * p=nullptr) :
-    InfPrism(InfPrism12::n_nodes(), p, _nodelinks_data)
+    InfPrism(num_nodes, p, _nodelinks_data)
   {}
 
   InfPrism12 (InfPrism12 &&) = delete;
@@ -187,9 +187,6 @@ public:
    * Geometric constants for InfPrism12.
    */
   static const int num_nodes = 12;
-  static const int num_sides = 4;
-  static const int num_edges = 6;
-  static const int num_children = 4;
   static const int nodes_per_side = 6;
   static const int nodes_per_edge = 3;
 

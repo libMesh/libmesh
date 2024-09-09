@@ -35,7 +35,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // InfPrism class static member initializations
-
+const int InfPrism::num_sides;
+const int InfPrism::num_edges;
+const int InfPrism::num_children;
 
 const Real InfPrism::_master_points[12][3] =
   {

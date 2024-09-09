@@ -57,7 +57,7 @@ public:
    */
   explicit
   Quad9 (Elem * p=nullptr) :
-    Quad(Quad9::n_nodes(), p, _nodelinks_data) {}
+    Quad(num_nodes, p, _nodelinks_data) {}
 
   Quad9 (Quad9 &&) = delete;
   Quad9 (const Quad9 &) = delete;
@@ -193,8 +193,6 @@ public:
    * Geometric constants for Quad9.
    */
   static const int num_nodes = 9;
-  static const int num_sides = 4;
-  static const int num_children = 4;
   static const int nodes_per_side = 3;
 
   /**

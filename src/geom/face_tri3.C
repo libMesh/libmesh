@@ -30,8 +30,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Tri3 class static member initializations
 const int Tri3::num_nodes;
-const int Tri3::num_sides;
-const int Tri3::num_children;
 const int Tri3::nodes_per_side;
 
 const unsigned int Tri3::side_nodes_map[Tri3::num_sides][Tri3::nodes_per_side] =

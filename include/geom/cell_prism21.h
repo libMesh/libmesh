@@ -88,7 +88,7 @@ public:
    */
   explicit
   Prism21 (Elem * p=nullptr) :
-    Prism(Prism21::n_nodes(), p, _nodelinks_data)
+    Prism(num_nodes, p, _nodelinks_data)
   {}
 
   Prism21 (Prism21 &&) = delete;
@@ -239,9 +239,6 @@ public:
    * Geometric constants for Prism21.
    */
   static const int num_nodes = 21;
-  static const int num_sides = 5;
-  static const int num_edges = 9;
-  static const int num_children = 8;
   static const int nodes_per_side = 9;
   static const int nodes_per_edge = 3;
 

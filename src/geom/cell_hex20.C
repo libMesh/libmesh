@@ -32,9 +32,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Hex20 class static member initializations
 const int Hex20::num_nodes;
-const int Hex20::num_sides;
-const int Hex20::num_edges;
-const int Hex20::num_children;
 const int Hex20::nodes_per_side;
 const int Hex20::nodes_per_edge;
 

@@ -32,9 +32,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Hex27 class static member initializations
 const int Hex27::num_nodes;
-const int Hex27::num_sides;
-const int Hex27::num_edges;
-const int Hex27::num_children;
 const int Hex27::nodes_per_side;
 const int Hex27::nodes_per_edge;
 

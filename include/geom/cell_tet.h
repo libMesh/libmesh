@@ -42,7 +42,7 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   Tet (const unsigned int nn, Elem * p, Node ** nodelinkdata) :
-    Cell(nn, Tet::n_sides(), p, _elemlinks_data, nodelinkdata),
+    Cell(nn, num_sides, p, _elemlinks_data, nodelinkdata),
     _diagonal_selection(INVALID_DIAG)
   {
     // Make sure the interior parent isn't undefined
@@ -67,6 +67,13 @@ public:
                  _master_points[i][1],
                  _master_points[i][2]);
   }
+
+  /**
+   * Geometric constants for all Tets
+   */
+  static const int num_sides = 4;
+  static const int num_edges = 6;
+  static const int num_children = 8;
 
   /**
    * \returns 4.

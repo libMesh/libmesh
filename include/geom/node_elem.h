@@ -43,7 +43,7 @@ public:
    */
   explicit
   NodeElem (Elem * p=nullptr) :
-    Elem(NodeElem::n_nodes(), NodeElem::n_sides(), p, _elemlinks_data,
+    Elem(num_nodes, num_sides, p, _elemlinks_data,
          _nodelinks_data)
   {
     // Make sure the interior parent isn't undefined
@@ -56,6 +56,12 @@ public:
   NodeElem & operator= (const NodeElem &) = delete;
   NodeElem & operator= (NodeElem &&) = delete;
   virtual ~NodeElem() = default;
+
+  /**
+   * Geometric constants for NodeElem;
+   */
+  static const int num_nodes = 1;
+  static const int num_sides = 0;
 
   /**
    * \returns The \p Point associated with local \p Node \p i,

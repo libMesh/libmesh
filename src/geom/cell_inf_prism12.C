@@ -36,9 +36,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfPrism12 class static member initializations
 const int InfPrism12::num_nodes;
-const int InfPrism12::num_sides;
-const int InfPrism12::num_edges;
-const int InfPrism12::num_children;
 const int InfPrism12::nodes_per_side;
 const int InfPrism12::nodes_per_edge;
 

@@ -42,7 +42,7 @@ public:
    * parent. Derived classes implement 'true' elements.
    */
   Prism(const unsigned int nn, Elem * p, Node ** nodelinkdata) :
-    Cell(nn, Prism::n_sides(), p, _elemlinks_data, nodelinkdata)
+    Cell(nn, num_sides, p, _elemlinks_data, nodelinkdata)
   {
     // Make sure the interior parent isn't undefined
     if (LIBMESH_DIM > 3)
@@ -66,6 +66,13 @@ public:
                  _master_points[i][1],
                  _master_points[i][2]);
   }
+
+  /**
+   * Geometric constants for all Prisms.
+   */
+  static const int num_sides = 5;
+  static const int num_edges = 9;
+  static const int num_children = 8;
 
   /**
    * \returns 6.  All prism-derivatives are guaranteed to have at

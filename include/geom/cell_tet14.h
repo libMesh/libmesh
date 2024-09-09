@@ -76,7 +76,7 @@ public:
    */
   explicit
   Tet14 (Elem * p=nullptr) :
-    Tet(Tet14::n_nodes(), p, _nodelinks_data)
+    Tet(num_nodes, p, _nodelinks_data)
   {}
 
   Tet14 (Tet14 &&) = delete;
@@ -217,9 +217,6 @@ public:
    * Geometric constants for Tet14.
    */
   static const int num_nodes = 14;
-  static const int num_sides = 4;
-  static const int num_edges = 6;
-  static const int num_children = 8;
   static const int nodes_per_side = 7;
   static const int nodes_per_edge = 3;
 

@@ -76,7 +76,7 @@ public:
    */
   explicit
   Hex27 (Elem * p=nullptr) :
-    Hex(Hex27::n_nodes(), p, _nodelinks_data)
+    Hex(num_nodes, p, _nodelinks_data)
   {}
 
   Hex27 (Hex27 &&) = delete;
@@ -226,9 +226,6 @@ public:
    * Geometric constants for Hex27.
    */
   static const int num_nodes = 27;
-  static const int num_sides = 6;
-  static const int num_edges = 12;
-  static const int num_children = 8;
   static const int nodes_per_side = 9;
   static const int nodes_per_edge = 3;
 

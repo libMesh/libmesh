@@ -37,9 +37,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Hex8 class static member initializations
 const int Hex8::num_nodes;
-const int Hex8::num_sides;
-const int Hex8::num_edges;
-const int Hex8::num_children;
 const int Hex8::nodes_per_side;
 const int Hex8::nodes_per_edge;
 

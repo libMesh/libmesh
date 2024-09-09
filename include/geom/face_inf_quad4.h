@@ -58,7 +58,7 @@ public:
    */
   explicit
   InfQuad4 (Elem * p=nullptr) :
-    InfQuad(InfQuad4::n_nodes(), p, _nodelinks_data) {}
+    InfQuad(num_nodes, p, _nodelinks_data) {}
 
   InfQuad4 (InfQuad4 &&) = delete;
   InfQuad4 (const InfQuad4 &) = delete;
@@ -135,8 +135,6 @@ public:
    * Geometric constants for InfQuad4.
    */
   static const int num_nodes = 4;
-  static const int num_sides = 3;
-  static const int num_children = 2;
   static const int nodes_per_side = 2;
 
   /**

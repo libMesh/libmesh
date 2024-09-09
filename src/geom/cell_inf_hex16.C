@@ -37,9 +37,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfHex16 class static member initializations
 const int InfHex16::num_nodes;
-const int InfHex16::num_sides;
-const int InfHex16::num_edges;
-const int InfHex16::num_children;
 const int InfHex16::nodes_per_side;
 const int InfHex16::nodes_per_edge;
 

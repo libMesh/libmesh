@@ -29,7 +29,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Tet class static member initializations
-
+const int Tet::num_sides;
+const int Tet::num_edges;
+const int Tet::num_children;
 
 const Real Tet::_master_points[14][3] =
   {

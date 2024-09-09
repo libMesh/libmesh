@@ -33,6 +33,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // InfQuad class static member initializations
+const int InfQuad::num_sides;
+const int InfQuad::num_children;
+
 // Note: we can omit initialization of the third entry of each row because
 // static variables are automatically zero-initialized.
 const Real InfQuad::_master_points[6][3] =

@@ -57,7 +57,7 @@ public:
    */
   explicit
   Quad8 (Elem * p=nullptr) :
-    Quad(Quad8::n_nodes(), p, _nodelinks_data) {}
+    Quad(num_nodes, p, _nodelinks_data) {}
 
   Quad8 (Quad8 &&) = delete;
   Quad8 (const Quad8 &) = delete;
@@ -186,8 +186,6 @@ public:
    * Geometric constants for Quad8.
    */
   static const int num_nodes = 8;
-  static const int num_sides = 4;
-  static const int num_children = 4;
   static const int nodes_per_side = 3;
 
   /**

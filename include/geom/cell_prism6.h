@@ -64,7 +64,7 @@ public:
    */
   explicit
   Prism6 (Elem * p=nullptr) :
-    Prism(Prism6::n_nodes(), p, _nodelinks_data)
+    Prism(num_nodes, p, _nodelinks_data)
   {}
 
   Prism6 (Prism6 &&) = delete;
@@ -160,9 +160,6 @@ public:
    * Geometric constants for Prism6.
    */
   static const int num_nodes = 6;
-  static const int num_sides = 5;
-  static const int num_edges = 9;
-  static const int num_children = 8;
   static const int nodes_per_side = 4;
   static const int nodes_per_edge = 2;
 

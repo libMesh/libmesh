@@ -82,7 +82,7 @@ public:
    */
   explicit
   Pyramid14 (Elem * p=nullptr) :
-    Pyramid(Pyramid14::n_nodes(), p, _nodelinks_data)
+    Pyramid(num_nodes, p, _nodelinks_data)
   {}
 
   Pyramid14 (Pyramid14 &&) = delete;
@@ -222,9 +222,6 @@ public:
    * Geometric constants for Pyramid14.
    */
   static const int num_nodes = 14;
-  static const int num_sides = 5;
-  static const int num_edges = 8;
-  static const int num_children = 0; // not implemented
   static const int nodes_per_side = 9;
   static const int nodes_per_edge = 3;
 

@@ -34,9 +34,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // Pyramid14 class static member initializations
 const int Pyramid14::num_nodes;
-const int Pyramid14::num_sides;
-const int Pyramid14::num_edges;
-const int Pyramid14::num_children;
 const int Pyramid14::nodes_per_side;
 const int Pyramid14::nodes_per_edge;
 

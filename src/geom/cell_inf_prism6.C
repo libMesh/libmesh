@@ -38,9 +38,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfPrism6 class static member initializations
 const int InfPrism6::num_nodes;
-const int InfPrism6::num_sides;
-const int InfPrism6::num_edges;
-const int InfPrism6::num_children;
 const int InfPrism6::nodes_per_side;
 const int InfPrism6::nodes_per_edge;
 

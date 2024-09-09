@@ -81,7 +81,7 @@ public:
    */
   explicit
   Prism18 (Elem * p=nullptr) :
-    Prism(Prism18::n_nodes(), p, _nodelinks_data)
+    Prism(num_nodes, p, _nodelinks_data)
   {}
 
   Prism18 (Prism18 &&) = delete;
@@ -231,9 +231,6 @@ public:
    * Geometric constants for Prism18.
    */
   static const int num_nodes = 18;
-  static const int num_sides = 5;
-  static const int num_edges = 9;
-  static const int num_children = 8;
   static const int nodes_per_side = 9;
   static const int nodes_per_edge = 3;
 

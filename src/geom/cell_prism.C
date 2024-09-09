@@ -30,6 +30,9 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Prism class static member initializations
+const int Prism::num_sides;
+const int Prism::num_edges;
+const int Prism::num_children;
 
 const Real Prism::_master_points[18][3] =
   {

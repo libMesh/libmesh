@@ -38,8 +38,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // InfQuad6 class static member initializations
 const int InfQuad6::num_nodes;
-const int InfQuad6::num_sides;
-const int InfQuad6::num_children;
 const int InfQuad6::nodes_per_side;
 
 const unsigned int InfQuad6::side_nodes_map[InfQuad6::num_sides][InfQuad6::nodes_per_side] =

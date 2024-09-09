@@ -81,7 +81,7 @@ public:
    */
   explicit
   Prism15 (Elem * p=nullptr) :
-    Prism(Prism15::n_nodes(), p, _nodelinks_data)
+    Prism(num_nodes, p, _nodelinks_data)
   {}
 
   Prism15 (Prism15 &&) = delete;
@@ -216,9 +216,6 @@ public:
    * Geometric constants for Prism15.
    */
   static const int num_nodes = 15;
-  static const int num_sides = 5;
-  static const int num_edges = 9;
-  static const int num_children = 8;
   static const int nodes_per_side = 8;
   static const int nodes_per_edge = 3;
 
