@@ -26497,6 +26497,8 @@ esac
 
                                 ACSM_NODEPRECATEDFLAG="-Wno-deprecated-declarations"
 
+                                                                                                ACSM_FPE_SAFETY_FLAGS="-Kieee -Mnovect"
+
                                 ACSM_CFLAGS_DBG="$ACSM_CFLAGS_DBG -O0 -g"
                                 ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_DEVEL -O2 -g"
                                 ACSM_CFLAGS_OPT="$ACSM_CFLAGS_OPT -O2"
@@ -27316,7 +27318,13 @@ then :
            { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Disabling extra paranoid compiler warnings >>>" >&5
 printf "%s\n" "<<< Disabling extra paranoid compiler warnings >>>" >&6; }
 else $as_nop
-  old_CXXFLAGS="$CXXFLAGS"
+  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+           old_CXXFLAGS="$CXXFLAGS"
            CXXFLAGS="$CXXFLAGS $WERROR_FLAGS $PARANOID_FLAGS"
            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -27342,6 +27350,12 @@ printf "%s\n" "<<< Disabling extra paranoid compiler warnings >>>" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
            CXXFLAGS="$old_CXXFLAGS"
+           ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
 fi
 
 
