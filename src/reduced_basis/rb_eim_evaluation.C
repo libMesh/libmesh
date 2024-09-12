@@ -995,6 +995,9 @@ void RBEIMEvaluation::add_side_interpolation_data(
   _vec_eval_input.elem_types.emplace_back(INVALID_ELEM);
   _vec_eval_input.JxW_all_qp.emplace_back();
   _vec_eval_input.phi_i_all_qp.emplace_back();
+  _vec_eval_input.qrule_orders.emplace_back(INVALID_ORDER);
+  _vec_eval_input.dxyzdxi_elem_center.emplace_back();
+  _vec_eval_input.dxyzdeta_elem_center.emplace_back();
 }
 
 void RBEIMEvaluation::add_node_basis_function(
@@ -1025,6 +1028,9 @@ void RBEIMEvaluation::add_node_interpolation_data(
   _vec_eval_input.elem_types.emplace_back(INVALID_ELEM);
   _vec_eval_input.JxW_all_qp.emplace_back();
   _vec_eval_input.phi_i_all_qp.emplace_back();
+  _vec_eval_input.qrule_orders.emplace_back(INVALID_ORDER);
+  _vec_eval_input.dxyzdxi_elem_center.emplace_back();
+  _vec_eval_input.dxyzdeta_elem_center.emplace_back();
 }
 
 void RBEIMEvaluation::

@@ -533,14 +533,19 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
               // We add qrule_order in this loop as it is used in conjunction with elem center
               // quantities for now.
               v.qrule_orders[counter] = qrule_order;
+              Point dxyzdxi_pt, dxyzdeta_pt;
+              if (con.get_elem_dim()>0)
+                dxyzdxi_pt = dxyzdxi[0];
+              if (con.get_elem_dim()>1)
+                dxyzdeta_pt = dxyzdeta[0];
               // Here we do an implicit conversion from RealGradient which is a VectorValue<Real>
               // which in turn is a TypeVector<T> to a Point which is a TypeVector<Real>.
               // They are essentially the same thing. This helps us limiting the number of includes
               // in serialization and deserialization as RealGradient is a typedef and we cannot
               // forward declare typedefs. As a result we leverage the fact that point.h is already
               // included in most places we need RealGradient.
-              v.dxyzdxi_elem_center[counter] = dxyzdxi[0];
-              v.dxyzdeta_elem_center[counter] = dxyzdeta[0];
+              v.dxyzdxi_elem_center[counter] = dxyzdxi_pt;
+              v.dxyzdeta_elem_center[counter] = dxyzdeta_pt;
 
               counter++;
             }
