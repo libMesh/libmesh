@@ -151,10 +151,19 @@ int main (int argc, char ** argv)
   // Declare the system  "DivGrad" and its variables.
   LinearImplicitSystem & system = equation_systems.add_system<LinearImplicitSystem>("DivGrad");
 
+  // Set the FE approximation order for the vector and field variables.
+  const Order vector_order = static_cast<Order>(infile("order", 1u));
+  const Order scalar_order = static_cast<Order>(vector_order - 1u);
+
+  libmesh_error_msg_if(vector_order < FIRST || vector_order > ((dimension == 3) ? FIRST : FIFTH),
+                       "You selected: " << vector_order <<
+                       " but this example must be run with either 1 <= order <= 5 in 2d"
+                       " or with order 1 in 3d.");
+
   // Adds the variables "u" and "p" to "DivGrad". "u" will be our vector field
   // whereas "p" will be the scalar field.
-  system.add_variable("u", FIRST, RAVIART_THOMAS);
-  system.add_variable("p", CONSTANT, MONOMIAL);
+  system.add_variable("u", vector_order, RAVIART_THOMAS);
+  system.add_variable("p", scalar_order, scalar_order == CONSTANT ? MONOMIAL : L2_HIERARCHIC);
 
   // Add a scalar Lagrange multiplier to remove the nullspace if imposing the Neumann condition.
   if (neumann)
@@ -285,8 +294,8 @@ void assemble_divgrad(EquationSystems & es,
   std::unique_ptr<FEVectorBase> vector_fe (FEVectorBase::build(dim, vector_fe_type));
   std::unique_ptr<FEBase> scalar_fe (FEBase::build(dim, scalar_fe_type));
 
-  // A 5th order Gauss quadrature rule for numerical integration.
-  QGauss qrule (dim, FIFTH);
+  // A just-high-enough Gauss quadrature rule for numerical integration.
+  QGauss qrule (dim, vector_fe_type.default_quadrature_order());
 
   // Tell the finite element objects to use our quadrature rule.
   vector_fe->attach_quadrature_rule (&qrule);
@@ -297,7 +306,7 @@ void assemble_divgrad(EquationSystems & es,
 
   // Boundary integration requires one quadrature rule with dimensionality one
   // less than the dimensionality of the element.
-  QGauss qface(dim-1, FIFTH);
+  QGauss qface(dim-1, vector_fe_type.default_quadrature_order());
 
   // Tell the finite element object to use our quadrature rule.
   vector_fe_face->attach_quadrature_rule (&qface);

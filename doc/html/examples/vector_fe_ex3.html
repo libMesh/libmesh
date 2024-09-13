@@ -40,14 +40,14 @@
 
 <br> <h1> Link to the source code for this example: </h1>
 <a href="https://github.com/libMesh/libmesh/tree/master/examples/vector_fe/vector_fe_ex3" target="_blank">Open vector_fe_ex3 in new tab.</a>
-<a name="output"></a> 
-<br><br><br> <h1> The console output of the program: </h1> 
+<a name="output"></a>
+<br><br><br> <h1> The console output of the program: </h1>
 <pre>
 ***************************************************************
 * Running Example vector_fe_ex3:
-*   example-opt element_type=TRI6 -pc_type jacobi 
+*   ./example-opt element_type=TRI6 -pc_type lu
 ***************************************************************
- 
+
  Mesh Information:
   elem_dimensions()={2}
   spatial_dimension()=2
@@ -57,23 +57,27 @@
     n_local_elem()=800
     n_active_elem()=800
   n_subdomains()=1
+  n_elemsets()=0
   n_partitions()=1
   n_processors()=1
   n_threads()=1
   processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
 
  EquationSystems
   n_systems()=1
    System #0, "CurlCurl"
     Type "Implicit"
-    Variables="u" 
-    Finite Element Types="NEDELEC_ONE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="FIRST", "THIRD" 
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="FIRST"
     n_dofs()=1240
     n_local_dofs()=1240
+    max(n_local_dofs())=1240
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=1240
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
@@ -87,124 +91,85 @@
 Assembling the System
 Nonlinear Residual: 23.6078
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 1051, residual 5.82313e-14
+Linear solve finished, step 1, residual 1.0869e-13
 Trying full Newton step
-  Current Residual: 2.34759e-11
-  Nonlinear solver converged, step 0, residual reduction 9.94413e-13 < 1e-06
+  Current Residual: 1.5625e-13
+  Nonlinear solver converged, step 0, residual reduction 6.61855e-15 < 1e-06
   Nonlinear solver relative step size inf > 1e-06
-WARNING: Shape function gradients for HCurl elements are not currently being computed!./include/libmesh/hcurl_fe_transformation.h, line 71, compiled Apr 12 2016 at 11:07:08 ***
-WARNING: Shape function Hessians for HCurl elements are not currently being computed!./include/libmesh/hcurl_fe_transformation.h, line 90, compiled Apr 12 2016 at 11:07:08 ***
-WARNING: Shape function divergences for HCurl elements are not currently being computed!./include/libmesh/hcurl_fe_transformation.h, line 117, compiled Apr 12 2016 at 11:07:08 ***
 L2-Error is: 0.128366
 HCurl semi-norm error is: 0.655952
 HCurl-Error is: 0.668394
 
- -------------------------------------------------------------------------------------------------------------------
-| Time:           Wed Apr 13 10:35:03 2016                                                                          |
-| OS:             Darwin                                                                                            |
-| HostName:       peterson-laptop.local                                                                             |
-| OS Release:     15.0.0                                                                                            |
-| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
-| Machine:        x86_64                                                                                            |
-| Username:       petejw                                                                                            |
-| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
-|  '--with-methods=opt dbg'                                                                                         |
-|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
-|  '--enable-perflog'                                                                                               |
-|  '--enable-tracefiles'                                                                                            |
-|  '--disable-blocked-storage'                                                                                      |
-|  '--enable-default-comm-world'                                                                                    |
-|  '--enable-tecio'                                                                                                 |
-|  '--enable-unique-ptr'                                                                                            |
-|  '--enable-ifem'                                                                                                  |
-|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
-|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
-|  'CPPFLAGS= '                                                                                                     |
-|  'LIBS= '                                                                                                         |
-|  'CPPFLAGS=  '                                                                                                    |
-|  'LIBS=  '                                                                                                        |
-|  '--disable-netcdf-4'                                                                                             |
-|  '--disable-testsets'                                                                                             |
-|  'CXX=mpicxx'                                                                                                     |
-|  'CC=mpicc'                                                                                                       |
-|  'F77=mpif77'                                                                                                     |
-|  'FC=mpif90'                                                                                                      |
-|  'CPPFLAGS=   '                                                                                                   |
-|  'LIBS=   '                                                                                                       |
- -------------------------------------------------------------------------------------------------------------------
- -----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.071198, Active time=0.057222                                                  |
- -----------------------------------------------------------------------------------------------------------------
-| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|-----------------------------------------------------------------------------------------------------------------|
-|                                                                                                                 |
-|                                                                                                                 |
-| DofMap                                                                                                          |
-|   add_neighbors_to_send_list()     1          0.0001      0.000128    0.0001      0.000128    0.22     0.22     |
-|   build_sparsity()                 1          0.0007      0.000666    0.0009      0.000852    1.16     1.49     |
-|   create_dof_constraints()         1          0.0000      0.000032    0.0000      0.000032    0.06     0.06     |
-|   distribute_dofs()                1          0.0002      0.000177    0.0010      0.000996    0.31     1.74     |
-|   dof_indices()                    5600       0.0010      0.000000    0.0010      0.000000    1.69     1.69     |
-|   prepare_send_list()              2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
-|   reinit()                         1          0.0008      0.000817    0.0008      0.000817    1.43     1.43     |
-|                                                                                                                 |
-| EquationSystems                                                                                                 |
-|   build_solution_vector()          1          0.0074      0.007362    0.0144      0.014404    12.87    25.17    |
-|                                                                                                                 |
-| ExodusII_IO                                                                                                     |
-|   write_nodal_data()               1          0.0018      0.001830    0.0018      0.001830    3.20     3.20     |
-|                                                                                                                 |
-| FE                                                                                                              |
-|   compute_shape_functions()        3360       0.0017      0.000001    0.0017      0.000001    2.99     2.99     |
-|   init_shape_functions()           3360       0.0019      0.000001    0.0019      0.000001    3.28     3.28     |
-|   inverse_map()                    320        0.0001      0.000000    0.0001      0.000000    0.19     0.19     |
-|                                                                                                                 |
-| FEMSystem                                                                                                       |
-|   assembly()                       1          0.0027      0.002699    0.0054      0.005406    4.72     9.45     |
-|   assembly(get_residual)           1          0.0020      0.002029    0.0047      0.004674    3.55     8.17     |
-|                                                                                                                 |
-| FEMap                                                                                                           |
-|   compute_affine_map()             3360       0.0031      0.000001    0.0031      0.000001    5.48     5.48     |
-|   compute_face_map()               160        0.0001      0.000001    0.0003      0.000002    0.20     0.45     |
-|   init_face_shape_functions()      160        0.0001      0.000000    0.0001      0.000000    0.11     0.11     |
-|   init_reference_to_physical_map() 3360       0.0060      0.000002    0.0060      0.000002    10.46    10.46    |
-|                                                                                                                 |
-| Mesh                                                                                                            |
-|   find_neighbors()                 1          0.0010      0.000975    0.0010      0.000975    1.70     1.70     |
-|   renumber_nodes_and_elem()        2          0.0000      0.000017    0.0000      0.000017    0.06     0.06     |
-|                                                                                                                 |
-| MeshOutput                                                                                                      |
-|   write_equation_systems()         1          0.0000      0.000017    0.0163      0.016251    0.03     28.40    |
-|                                                                                                                 |
-| MeshTools::Generation                                                                                           |
-|   build_cube()                     1          0.0004      0.000402    0.0004      0.000402    0.70     0.70     |
-|                                                                                                                 |
-| NewtonSolver                                                                                                    |
-|   solve()                          1          0.0002      0.000176    0.0361      0.036125    0.31     63.13    |
-|                                                                                                                 |
-| Parallel                                                                                                        |
-|   allgather()                      1          0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
-|                                                                                                                 |
-| Partitioner                                                                                                     |
-|   single_partition()               1          0.0000      0.000040    0.0000      0.000040    0.07     0.07     |
-|                                                                                                                 |
-| PetscLinearSolver                                                                                               |
-|   solve()                          1          0.0259      0.025869    0.0259      0.025869    45.21    45.21    |
- -----------------------------------------------------------------------------------------------------------------
-| Totals:                            19700      0.0572                                          100.00            |
- -----------------------------------------------------------------------------------------------------------------
-
- 
 ***************************************************************
 * Done Running Example vector_fe_ex3:
-*   example-opt element_type=TRI6 -pc_type jacobi 
+*   ./example-opt element_type=TRI6 -pc_type lu
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex3:
-*   example-opt element_type=QUAD8 -pc_type jacobi 
+*   ./example-opt element_type=TRI7 -pc_type lu
 ***************************************************************
- 
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=2481
+    n_local_nodes()=2481
+  n_elem()=800
+    n_local_elem()=800
+    n_active_elem()=800
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="FIRST"
+    n_dofs()=1240
+    n_local_dofs()=1240
+    max(n_local_dofs())=1240
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=1240
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 4.87097
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 5
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 23.6078
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 1, residual 1.07153e-13
+Trying full Newton step
+  Current Residual: 1.57019e-13
+  Nonlinear solver converged, step 0, residual reduction 6.65114e-15 < 1e-06
+  Nonlinear solver relative step size inf > 1e-06
+L2-Error is: 0.128366
+HCurl semi-norm error is: 0.655952
+HCurl-Error is: 0.668394
+
+***************************************************************
+* Done Running Example vector_fe_ex3:
+*   ./example-opt element_type=TRI7 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex3:
+*   ./example-opt element_type=QUAD8 -pc_type lu
+***************************************************************
+
  Mesh Information:
   elem_dimensions()={2}
   spatial_dimension()=2
@@ -214,23 +179,27 @@ HCurl-Error is: 0.668394
     n_local_elem()=400
     n_active_elem()=400
   n_subdomains()=1
+  n_elemsets()=0
   n_partitions()=1
   n_processors()=1
   n_threads()=1
   processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
 
  EquationSystems
   n_systems()=1
    System #0, "CurlCurl"
     Type "Implicit"
-    Variables="u" 
-    Finite Element Types="NEDELEC_ONE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="FIRST", "THIRD" 
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="FIRST"
     n_dofs()=840
     n_local_dofs()=840
+    max(n_local_dofs())=840
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=840
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
@@ -244,124 +213,24 @@ HCurl-Error is: 0.668394
 Assembling the System
 Nonlinear Residual: 28.9779
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 13, residual 1.22295e-13
+Linear solve finished, step 1, residual 3.95978e-14
 Trying full Newton step
-  Current Residual: 3.91723e-06
-  Nonlinear solver converged, step 0, residual reduction 1.3518e-07 < 1e-06
+  Current Residual: 7.02729e-14
+  Nonlinear solver converged, step 0, residual reduction 2.42505e-15 < 1e-06
   Nonlinear solver relative step size inf > 1e-06
-WARNING: Shape function gradients for HCurl elements are not currently being computed!./include/libmesh/hcurl_fe_transformation.h, line 71, compiled Apr 12 2016 at 11:07:08 ***
-WARNING: Shape function Hessians for HCurl elements are not currently being computed!./include/libmesh/hcurl_fe_transformation.h, line 90, compiled Apr 12 2016 at 11:07:08 ***
-WARNING: Shape function divergences for HCurl elements are not currently being computed!./include/libmesh/hcurl_fe_transformation.h, line 117, compiled Apr 12 2016 at 11:07:08 ***
 L2-Error is: 0.12862
 HCurl semi-norm error is: 0.802879
 HCurl-Error is: 0.813116
 
- -------------------------------------------------------------------------------------------------------------------
-| Time:           Wed Apr 13 10:35:03 2016                                                                          |
-| OS:             Darwin                                                                                            |
-| HostName:       peterson-laptop.local                                                                             |
-| OS Release:     15.0.0                                                                                            |
-| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
-| Machine:        x86_64                                                                                            |
-| Username:       petejw                                                                                            |
-| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
-|  '--with-methods=opt dbg'                                                                                         |
-|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
-|  '--enable-perflog'                                                                                               |
-|  '--enable-tracefiles'                                                                                            |
-|  '--disable-blocked-storage'                                                                                      |
-|  '--enable-default-comm-world'                                                                                    |
-|  '--enable-tecio'                                                                                                 |
-|  '--enable-unique-ptr'                                                                                            |
-|  '--enable-ifem'                                                                                                  |
-|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
-|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
-|  'CPPFLAGS= '                                                                                                     |
-|  'LIBS= '                                                                                                         |
-|  'CPPFLAGS=  '                                                                                                    |
-|  'LIBS=  '                                                                                                        |
-|  '--disable-netcdf-4'                                                                                             |
-|  '--disable-testsets'                                                                                             |
-|  'CXX=mpicxx'                                                                                                     |
-|  'CC=mpicc'                                                                                                       |
-|  'F77=mpif77'                                                                                                     |
-|  'FC=mpif90'                                                                                                      |
-|  'CPPFLAGS=   '                                                                                                   |
-|  'LIBS=   '                                                                                                       |
- -------------------------------------------------------------------------------------------------------------------
- -----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.02361, Active time=0.014587                                                   |
- -----------------------------------------------------------------------------------------------------------------
-| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|-----------------------------------------------------------------------------------------------------------------|
-|                                                                                                                 |
-|                                                                                                                 |
-| DofMap                                                                                                          |
-|   add_neighbors_to_send_list()     1          0.0001      0.000082    0.0001      0.000082    0.56     0.56     |
-|   build_sparsity()                 1          0.0004      0.000391    0.0005      0.000481    2.68     3.30     |
-|   create_dof_constraints()         1          0.0000      0.000018    0.0000      0.000018    0.12     0.12     |
-|   distribute_dofs()                1          0.0001      0.000120    0.0007      0.000654    0.82     4.48     |
-|   dof_indices()                    2800       0.0005      0.000000    0.0005      0.000000    3.41     3.41     |
-|   prepare_send_list()              2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
-|   reinit()                         1          0.0005      0.000534    0.0005      0.000534    3.66     3.66     |
-|                                                                                                                 |
-| EquationSystems                                                                                                 |
-|   build_solution_vector()          1          0.0035      0.003487    0.0072      0.007215    23.90    49.46    |
-|                                                                                                                 |
-| ExodusII_IO                                                                                                     |
-|   write_nodal_data()               1          0.0014      0.001426    0.0014      0.001426    9.78     9.78     |
-|                                                                                                                 |
-| FE                                                                                                              |
-|   compute_shape_functions()        563        0.0004      0.000001    0.0004      0.000001    2.63     2.63     |
-|   init_shape_functions()           563        0.0003      0.000001    0.0003      0.000001    1.94     1.94     |
-|   inverse_map()                    320        0.0001      0.000000    0.0001      0.000000    0.97     0.97     |
-|                                                                                                                 |
-| FEMSystem                                                                                                       |
-|   assembly()                       1          0.0010      0.001044    0.0018      0.001834    7.16     12.57    |
-|   assembly(get_residual)           1          0.0007      0.000742    0.0015      0.001499    5.09     10.28    |
-|                                                                                                                 |
-| FEMap                                                                                                           |
-|   compute_affine_map()             1760       0.0016      0.000001    0.0016      0.000001    11.13    11.13    |
-|   compute_face_map()               160        0.0001      0.000001    0.0003      0.000002    0.88     2.06     |
-|   init_face_shape_functions()      160        0.0000      0.000000    0.0000      0.000000    0.34     0.34     |
-|   init_reference_to_physical_map() 563        0.0022      0.000004    0.0022      0.000004    15.04    15.04    |
-|                                                                                                                 |
-| Mesh                                                                                                            |
-|   find_neighbors()                 1          0.0006      0.000613    0.0006      0.000613    4.20     4.20     |
-|   renumber_nodes_and_elem()        2          0.0000      0.000024    0.0000      0.000024    0.33     0.33     |
-|                                                                                                                 |
-| MeshOutput                                                                                                      |
-|   write_equation_systems()         1          0.0000      0.000013    0.0087      0.008654    0.09     59.33    |
-|                                                                                                                 |
-| MeshTools::Generation                                                                                           |
-|   build_cube()                     1          0.0003      0.000266    0.0003      0.000266    1.82     1.82     |
-|                                                                                                                 |
-| NewtonSolver                                                                                                    |
-|   solve()                          1          0.0001      0.000118    0.0038      0.003813    0.81     26.14    |
-|                                                                                                                 |
-| Parallel                                                                                                        |
-|   allgather()                      1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
-|                                                                                                                 |
-| Partitioner                                                                                                     |
-|   single_partition()               1          0.0000      0.000022    0.0000      0.000022    0.15     0.15     |
-|                                                                                                                 |
-| PetscLinearSolver                                                                                               |
-|   solve()                          1          0.0004      0.000362    0.0004      0.000362    2.48     2.48     |
- -----------------------------------------------------------------------------------------------------------------
-| Totals:                            6909       0.0146                                          100.00            |
- -----------------------------------------------------------------------------------------------------------------
-
- 
 ***************************************************************
 * Done Running Example vector_fe_ex3:
-*   example-opt element_type=QUAD8 -pc_type jacobi 
+*   ./example-opt element_type=QUAD8 -pc_type lu
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex3:
-*   example-opt element_type=QUAD9 -pc_type jacobi 
+*   ./example-opt element_type=QUAD9 -pc_type lu
 ***************************************************************
- 
+
  Mesh Information:
   elem_dimensions()={2}
   spatial_dimension()=2
@@ -371,23 +240,27 @@ HCurl-Error is: 0.813116
     n_local_elem()=400
     n_active_elem()=400
   n_subdomains()=1
+  n_elemsets()=0
   n_partitions()=1
   n_processors()=1
   n_threads()=1
   processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
 
  EquationSystems
   n_systems()=1
    System #0, "CurlCurl"
     Type "Implicit"
-    Variables="u" 
-    Finite Element Types="NEDELEC_ONE", "JACOBI_20_00" 
-    Infinite Element Mapping="CARTESIAN" 
-    Approximation Orders="FIRST", "THIRD" 
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="FIRST"
     n_dofs()=840
     n_local_dofs()=840
+    max(n_local_dofs())=840
     n_constrained_dofs()=0
     n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=840
     n_vectors()=1
     n_matrices()=1
     DofMap Sparsity
@@ -401,118 +274,262 @@ HCurl-Error is: 0.813116
 Assembling the System
 Nonlinear Residual: 28.9779
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 13, residual 9.0218e-14
+Linear solve finished, step 1, residual 3.99601e-14
 Trying full Newton step
-  Current Residual: 3.64329e-06
-  Nonlinear solver converged, step 0, residual reduction 1.25727e-07 < 1e-06
+  Current Residual: 7.14395e-14
+  Nonlinear solver converged, step 0, residual reduction 2.46531e-15 < 1e-06
   Nonlinear solver relative step size inf > 1e-06
-WARNING: Shape function gradients for HCurl elements are not currently being computed!./include/libmesh/hcurl_fe_transformation.h, line 71, compiled Apr 12 2016 at 11:07:08 ***
-WARNING: Shape function Hessians for HCurl elements are not currently being computed!./include/libmesh/hcurl_fe_transformation.h, line 90, compiled Apr 12 2016 at 11:07:08 ***
-WARNING: Shape function divergences for HCurl elements are not currently being computed!./include/libmesh/hcurl_fe_transformation.h, line 117, compiled Apr 12 2016 at 11:07:08 ***
 L2-Error is: 0.12862
 HCurl semi-norm error is: 0.802879
 HCurl-Error is: 0.813116
 
- -------------------------------------------------------------------------------------------------------------------
-| Time:           Wed Apr 13 10:35:03 2016                                                                          |
-| OS:             Darwin                                                                                            |
-| HostName:       peterson-laptop.local                                                                             |
-| OS Release:     15.0.0                                                                                            |
-| OS Version:     Darwin Kernel Version 15.0.0: Sat Sep 19 15:53:46 PDT 2015; root:xnu-3247.10.11~1/RELEASE_X86_64  |
-| Machine:        x86_64                                                                                            |
-| Username:       petejw                                                                                            |
-| Configuration:  ../configure  'INSTALL=/usr/bin/install -C'                                                       |
-|  '--with-methods=opt dbg'                                                                                         |
-|  '--prefix=/Users/petejw/projects/libmesh_git/installed'                                                          |
-|  '--enable-perflog'                                                                                               |
-|  '--enable-tracefiles'                                                                                            |
-|  '--disable-blocked-storage'                                                                                      |
-|  '--enable-default-comm-world'                                                                                    |
-|  '--enable-tecio'                                                                                                 |
-|  '--enable-unique-ptr'                                                                                            |
-|  '--enable-ifem'                                                                                                  |
-|  'PETSC_DIR=/opt/moose/petsc/mpich_petsc-3.6.1/clang-opt-superlu'                                                 |
-|  'SLEPC_DIR=/opt/petejw/slepc/3.6.1'                                                                              |
-|  'CPPFLAGS= '                                                                                                     |
-|  'LIBS= '                                                                                                         |
-|  'CPPFLAGS=  '                                                                                                    |
-|  'LIBS=  '                                                                                                        |
-|  '--disable-netcdf-4'                                                                                             |
-|  '--disable-testsets'                                                                                             |
-|  'CXX=mpicxx'                                                                                                     |
-|  'CC=mpicc'                                                                                                       |
-|  'F77=mpif77'                                                                                                     |
-|  'FC=mpif90'                                                                                                      |
-|  'CPPFLAGS=   '                                                                                                   |
-|  'LIBS=   '                                                                                                       |
- -------------------------------------------------------------------------------------------------------------------
- -----------------------------------------------------------------------------------------------------------------
-| libMesh Performance: Alive time=0.024319, Active time=0.016128                                                  |
- -----------------------------------------------------------------------------------------------------------------
-| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
-|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
-|-----------------------------------------------------------------------------------------------------------------|
-|                                                                                                                 |
-|                                                                                                                 |
-| DofMap                                                                                                          |
-|   add_neighbors_to_send_list()     1          0.0001      0.000089    0.0001      0.000089    0.55     0.55     |
-|   build_sparsity()                 1          0.0004      0.000428    0.0005      0.000543    2.65     3.37     |
-|   create_dof_constraints()         1          0.0000      0.000018    0.0000      0.000018    0.11     0.11     |
-|   distribute_dofs()                1          0.0001      0.000142    0.0008      0.000814    0.88     5.05     |
-|   dof_indices()                    2800       0.0006      0.000000    0.0006      0.000000    3.50     3.50     |
-|   prepare_send_list()              2          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
-|   reinit()                         1          0.0007      0.000671    0.0007      0.000671    4.16     4.16     |
-|                                                                                                                 |
-| EquationSystems                                                                                                 |
-|   build_solution_vector()          1          0.0034      0.003363    0.0080      0.008008    20.85    49.65    |
-|                                                                                                                 |
-| ExodusII_IO                                                                                                     |
-|   write_nodal_data()               1          0.0016      0.001599    0.0016      0.001599    9.91     9.91     |
-|                                                                                                                 |
-| FE                                                                                                              |
-|   compute_shape_functions()        563        0.0004      0.000001    0.0004      0.000001    2.41     2.41     |
-|   init_shape_functions()           563        0.0003      0.000000    0.0003      0.000000    1.68     1.68     |
-|   inverse_map()                    320        0.0002      0.000001    0.0002      0.000001    1.31     1.31     |
-|                                                                                                                 |
-| FEMSystem                                                                                                       |
-|   assembly()                       1          0.0011      0.001090    0.0020      0.002003    6.76     12.42    |
-|   assembly(get_residual)           1          0.0008      0.000780    0.0017      0.001668    4.84     10.34    |
-|                                                                                                                 |
-| FEMap                                                                                                           |
-|   compute_affine_map()             1760       0.0016      0.000001    0.0016      0.000001    9.80     9.80     |
-|   compute_face_map()               160        0.0002      0.000001    0.0004      0.000003    1.00     2.51     |
-|   init_face_shape_functions()      160        0.0000      0.000000    0.0000      0.000000    0.28     0.28     |
-|   init_reference_to_physical_map() 563        0.0033      0.000006    0.0033      0.000006    20.23    20.23    |
-|                                                                                                                 |
-| Mesh                                                                                                            |
-|   find_neighbors()                 1          0.0006      0.000624    0.0006      0.000624    3.87     3.87     |
-|   renumber_nodes_and_elem()        2          0.0000      0.000013    0.0000      0.000013    0.17     0.17     |
-|                                                                                                                 |
-| MeshOutput                                                                                                      |
-|   write_equation_systems()         1          0.0000      0.000012    0.0096      0.009620    0.07     59.65    |
-|                                                                                                                 |
-| MeshTools::Generation                                                                                           |
-|   build_cube()                     1          0.0003      0.000278    0.0003      0.000278    1.72     1.72     |
-|                                                                                                                 |
-| NewtonSolver                                                                                                    |
-|   solve()                          1          0.0001      0.000121    0.0042      0.004168    0.75     25.84    |
-|                                                                                                                 |
-| Parallel                                                                                                        |
-|   allgather()                      1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
-|                                                                                                                 |
-| Partitioner                                                                                                     |
-|   single_partition()               1          0.0000      0.000027    0.0000      0.000027    0.17     0.17     |
-|                                                                                                                 |
-| PetscLinearSolver                                                                                               |
-|   solve()                          1          0.0004      0.000376    0.0004      0.000376    2.33     2.33     |
- -----------------------------------------------------------------------------------------------------------------
-| Totals:                            6909       0.0161                                          100.00            |
- -----------------------------------------------------------------------------------------------------------------
-
- 
 ***************************************************************
 * Done Running Example vector_fe_ex3:
-*   example-opt element_type=QUAD9 -pc_type jacobi 
+*   ./example-opt element_type=QUAD9 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex3:
+*   ./example-opt order=2 element_type=TRI6 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=1681
+    n_local_nodes()=1681
+  n_elem()=800
+    n_local_elem()=800
+    n_active_elem()=800
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="SECOND"
+    n_dofs()=4080
+    n_local_dofs()=4080
+    max(n_local_dofs())=4080
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=4080
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 11.4118
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 14
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 47.591
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 1, residual 7.29357e-13
+Trying full Newton step
+  Current Residual: 1.77284e-12
+  Nonlinear solver converged, step 0, residual reduction 3.72517e-14 < 1e-06
+  Nonlinear solver relative step size inf > 1e-06
+L2-Error is: 0.00575821
+HCurl semi-norm error is: 0.0398913
+HCurl-Error is: 0.0403047
+
+***************************************************************
+* Done Running Example vector_fe_ex3:
+*   ./example-opt order=2 element_type=TRI6 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex3:
+*   ./example-opt order=2 element_type=TRI7 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=2481
+    n_local_nodes()=2481
+  n_elem()=800
+    n_local_elem()=800
+    n_active_elem()=800
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="SECOND"
+    n_dofs()=4080
+    n_local_dofs()=4080
+    max(n_local_dofs())=4080
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=4080
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 11.4118
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 14
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 47.591
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 1, residual 6.88575e-13
+Trying full Newton step
+  Current Residual: 1.77577e-12
+  Nonlinear solver converged, step 0, residual reduction 3.73131e-14 < 1e-06
+  Nonlinear solver relative step size inf > 1e-06
+L2-Error is: 0.00575821
+HCurl semi-norm error is: 0.0398913
+HCurl-Error is: 0.0403047
+
+***************************************************************
+* Done Running Example vector_fe_ex3:
+*   ./example-opt order=2 element_type=TRI7 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex3:
+*   ./example-opt order=2 element_type=QUAD8 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=1281
+    n_local_nodes()=1281
+  n_elem()=400
+    n_local_elem()=400
+    n_active_elem()=400
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="SECOND"
+    n_dofs()=3280
+    n_local_dofs()=3280
+    max(n_local_dofs())=3280
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=3280
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 16.6341
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 22
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 20.864
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 1, residual 6.17245e-13
+Trying full Newton step
+  Current Residual: 1.26787e-12
+  Nonlinear solver converged, step 0, residual reduction 6.07684e-14 < 1e-06
+  Nonlinear solver relative step size inf > 1e-06
+L2-Error is: 0.00520051
+HCurl semi-norm error is: 0.0326373
+HCurl-Error is: 0.0330491
+
+***************************************************************
+* Done Running Example vector_fe_ex3:
+*   ./example-opt order=2 element_type=QUAD8 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex3:
+*   ./example-opt order=2 element_type=QUAD9 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=1681
+    n_local_nodes()=1681
+  n_elem()=400
+    n_local_elem()=400
+    n_active_elem()=400
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="SECOND"
+    n_dofs()=3280
+    n_local_dofs()=3280
+    max(n_local_dofs())=3280
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=3280
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 16.6341
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 22
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 20.864
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 1, residual 6.17982e-13
+Trying full Newton step
+  Current Residual: 1.30813e-12
+  Nonlinear solver converged, step 0, residual reduction 6.2698e-14 < 1e-06
+  Nonlinear solver relative step size inf > 1e-06
+L2-Error is: 0.00520051
+HCurl semi-norm error is: 0.0326373
+HCurl-Error is: 0.0330491
+
+***************************************************************
+* Done Running Example vector_fe_ex3:
+*   ./example-opt order=2 element_type=QUAD9 -pc_type lu
 ***************************************************************
 </pre>
 </div>

@@ -93,7 +93,7 @@ L2 error is: 0.134373
 HDiv semi-norm error is: 0.344042
 HDiv error is: 0.369353
 ~~ Scalar field (p) ~~
-L2 error is: 0.0697862
+L2 error is: 0.0697863
 
 ***************************************************************
 * Done Running Example vector_fe_ex6:
@@ -149,7 +149,7 @@ L2 error is: 0.134373
 HDiv semi-norm error is: 0.344042
 HDiv error is: 0.369353
 ~~ Scalar field (p) ~~
-L2 error is: 0.0697862
+L2 error is: 0.0697863
 
 ***************************************************************
 * Done Running Example vector_fe_ex6:
@@ -269,7 +269,231 @@ L2 error is: 0.0854505
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex6:
-*   ./example-opt dim=3 element_type=TET14 grid_size=6 boundary_condition=neumann
+*   ./example-opt dim=2 order=2 element_type=TRI6 boundary_condition=neumann
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=961
+    n_local_nodes()=961
+  n_elem()=450
+    n_local_elem()=450
+    n_active_elem()=450
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "DivGrad"
+    Type "LinearImplicit"
+    Variables="u" "p" "l"
+    Finite Element Types="RAVIART_THOMAS" "L2_LAGRANGE" "SCALAR"
+    Approximation Orders="SECOND" "FIRST" "FIRST"
+    n_dofs()=3661
+    n_local_dofs()=3661
+    max(n_local_dofs())=3661
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=3661
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 16.168
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 3661
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.00401719
+HDiv semi-norm error is: 0.0139513
+HDiv error is: 0.0145182
+~~ Scalar field (p) ~~
+L2 error is: 0.00282793
+
+***************************************************************
+* Done Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=TRI6 boundary_condition=neumann
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=TRI7 boundary_condition=neumann
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=1411
+    n_local_nodes()=1411
+  n_elem()=450
+    n_local_elem()=450
+    n_active_elem()=450
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "DivGrad"
+    Type "LinearImplicit"
+    Variables="u" "p" "l"
+    Finite Element Types="RAVIART_THOMAS" "L2_LAGRANGE" "SCALAR"
+    Approximation Orders="SECOND" "FIRST" "FIRST"
+    n_dofs()=3661
+    n_local_dofs()=3661
+    max(n_local_dofs())=3661
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=3661
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 16.168
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 3661
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.00401719
+HDiv semi-norm error is: 0.0139513
+HDiv error is: 0.0145182
+~~ Scalar field (p) ~~
+L2 error is: 0.00282793
+
+***************************************************************
+* Done Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=TRI7 boundary_condition=neumann
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=QUAD8 boundary_condition=neumann
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=736
+    n_local_nodes()=736
+  n_elem()=225
+    n_local_elem()=225
+    n_active_elem()=225
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "DivGrad"
+    Type "LinearImplicit"
+    Variables="u" "p" "l"
+    Finite Element Types="RAVIART_THOMAS" "L2_LAGRANGE" "SCALAR"
+    Approximation Orders="SECOND" "FIRST" "FIRST"
+    n_dofs()=2761
+    n_local_dofs()=2761
+    max(n_local_dofs())=2761
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=2761
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 22.2532
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 2761
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.00363112
+HDiv semi-norm error is: 0.0114015
+HDiv error is: 0.0119658
+~~ Scalar field (p) ~~
+L2 error is: 0.00231062
+
+***************************************************************
+* Done Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=QUAD8 boundary_condition=neumann
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=QUAD9 boundary_condition=neumann
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=961
+    n_local_nodes()=961
+  n_elem()=225
+    n_local_elem()=225
+    n_active_elem()=225
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "DivGrad"
+    Type "LinearImplicit"
+    Variables="u" "p" "l"
+    Finite Element Types="RAVIART_THOMAS" "L2_LAGRANGE" "SCALAR"
+    Approximation Orders="SECOND" "FIRST" "FIRST"
+    n_dofs()=2761
+    n_local_dofs()=2761
+    max(n_local_dofs())=2761
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=2761
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 22.2532
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 2761
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.00363112
+HDiv semi-norm error is: 0.0114015
+HDiv error is: 0.0119658
+~~ Scalar field (p) ~~
+L2 error is: 0.00231062
+
+***************************************************************
+* Done Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=QUAD9 boundary_condition=neumann
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex6:
+*   ./example-opt dim=3 element_type=TET14 boundary_condition=neumann grid_size=6
 ***************************************************************
 
  Mesh Information:
@@ -313,15 +537,15 @@ L2 error is: 0.0854505
       Number of DoF Constraints = 0
 
 ~~ Vector field (u) ~~
-L2 error is: 0.334771
+L2 error is: 0.33477
 HDiv semi-norm error is: 0.836328
-HDiv error is: 0.900842
+HDiv error is: 0.900841
 ~~ Scalar field (p) ~~
 L2 error is: 0.113127
 
 ***************************************************************
 * Done Running Example vector_fe_ex6:
-*   ./example-opt dim=3 element_type=TET14 grid_size=6 boundary_condition=neumann
+*   ./example-opt dim=3 element_type=TET14 boundary_condition=neumann grid_size=6
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex6:
@@ -605,7 +829,231 @@ L2 error is: 0.0853821
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex6:
-*   ./example-opt dim=3 element_type=TET14 grid_size=6 boundary_condition=dirichlet
+*   ./example-opt dim=2 order=2 element_type=TRI6 boundary_condition=dirichlet
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=961
+    n_local_nodes()=961
+  n_elem()=450
+    n_local_elem()=450
+    n_active_elem()=450
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "DivGrad"
+    Type "LinearImplicit"
+    Variables="u" "p"
+    Finite Element Types="RAVIART_THOMAS" "L2_LAGRANGE"
+    Approximation Orders="SECOND" "FIRST"
+    n_dofs()=3660
+    n_local_dofs()=3660
+    max(n_local_dofs())=3660
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=3660
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 14.1721
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 20
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.00399517
+HDiv semi-norm error is: 0.0139513
+HDiv error is: 0.0145121
+~~ Scalar field (p) ~~
+L2 error is: 0.00282792
+
+***************************************************************
+* Done Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=TRI6 boundary_condition=dirichlet
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=TRI7 boundary_condition=dirichlet
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=1411
+    n_local_nodes()=1411
+  n_elem()=450
+    n_local_elem()=450
+    n_active_elem()=450
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "DivGrad"
+    Type "LinearImplicit"
+    Variables="u" "p"
+    Finite Element Types="RAVIART_THOMAS" "L2_LAGRANGE"
+    Approximation Orders="SECOND" "FIRST"
+    n_dofs()=3660
+    n_local_dofs()=3660
+    max(n_local_dofs())=3660
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=3660
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 14.1721
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 20
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.00399517
+HDiv semi-norm error is: 0.0139513
+HDiv error is: 0.0145121
+~~ Scalar field (p) ~~
+L2 error is: 0.00282792
+
+***************************************************************
+* Done Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=TRI7 boundary_condition=dirichlet
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=QUAD8 boundary_condition=dirichlet
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=736
+    n_local_nodes()=736
+  n_elem()=225
+    n_local_elem()=225
+    n_active_elem()=225
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "DivGrad"
+    Type "LinearImplicit"
+    Variables="u" "p"
+    Finite Element Types="RAVIART_THOMAS" "L2_LAGRANGE"
+    Approximation Orders="SECOND" "FIRST"
+    n_dofs()=2760
+    n_local_dofs()=2760
+    max(n_local_dofs())=2760
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=2760
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 20.2609
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 30
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.00363112
+HDiv semi-norm error is: 0.0114015
+HDiv error is: 0.0119658
+~~ Scalar field (p) ~~
+L2 error is: 0.00231062
+
+***************************************************************
+* Done Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=QUAD8 boundary_condition=dirichlet
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=QUAD9 boundary_condition=dirichlet
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=961
+    n_local_nodes()=961
+  n_elem()=225
+    n_local_elem()=225
+    n_active_elem()=225
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "DivGrad"
+    Type "LinearImplicit"
+    Variables="u" "p"
+    Finite Element Types="RAVIART_THOMAS" "L2_LAGRANGE"
+    Approximation Orders="SECOND" "FIRST"
+    n_dofs()=2760
+    n_local_dofs()=2760
+    max(n_local_dofs())=2760
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=2760
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 20.2609
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 30
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.00363112
+HDiv semi-norm error is: 0.0114015
+HDiv error is: 0.0119658
+~~ Scalar field (p) ~~
+L2 error is: 0.00231062
+
+***************************************************************
+* Done Running Example vector_fe_ex6:
+*   ./example-opt dim=2 order=2 element_type=QUAD9 boundary_condition=dirichlet
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex6:
+*   ./example-opt dim=3 element_type=TET14 boundary_condition=dirichlet grid_size=6
 ***************************************************************
 
  Mesh Information:
@@ -649,7 +1097,7 @@ L2 error is: 0.0853821
       Number of DoF Constraints = 0
 
 ~~ Vector field (u) ~~
-L2 error is: 0.33473
+L2 error is: 0.334729
 HDiv semi-norm error is: 0.836328
 HDiv error is: 0.900826
 ~~ Scalar field (p) ~~
@@ -657,7 +1105,7 @@ L2 error is: 0.113105
 
 ***************************************************************
 * Done Running Example vector_fe_ex6:
-*   ./example-opt dim=3 element_type=TET14 grid_size=6 boundary_condition=dirichlet
+*   ./example-opt dim=3 element_type=TET14 boundary_condition=dirichlet grid_size=6
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex6:
