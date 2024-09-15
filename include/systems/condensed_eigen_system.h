@@ -205,6 +205,8 @@ public:
   bool have_condensed_dofs() const
   { libmesh_assert(_condensed_dofs_initialized); return _have_condensed_dofs; }
 
+  virtual void reinit() override;
+
 protected:
   virtual void add_matrices () override;
 
