@@ -80,6 +80,13 @@ CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & gl
 }
 
 void
+CondensedEigenSystem::reinit()
+{
+  Parent::reinit();
+  _condensed_dofs_initialized = false;
+}
+
+void
 CondensedEigenSystem::initialize_condensed_matrices()
 {
   if (!_condensed_dofs_initialized)
