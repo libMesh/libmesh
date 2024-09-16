@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-// The 2d Raviart-Thomas shape functions are just the 2d Nédélec (first kind)
+// The 2d Raviart-Thomas shape functions are just the 2d Nedelec (first kind)
 // shape functions after a 90-degree counterclockwise rotation.
 template <>
 RealGradient FE<2,RAVIART_THOMAS>::shape(const Elem * elem,

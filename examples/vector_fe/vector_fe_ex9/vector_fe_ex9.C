@@ -1256,7 +1256,7 @@ private:
   // We will need "Eigen" versions of many of the matrices/vectors because the
   // libMesh DenseMatrix doesn't have an inverse API. Let's match the notation of Nguyen's "An
   // implicit high-order hybridizable discontinuous Galerkin method for nonlinear
-  // convection–diffusion equations" with the exception that instead of a fancy F we use P for
+  // convection-diffusion equations" with the exception that instead of a fancy F we use P for
   // the residual vector for the LMs post-elimination
   //
 
