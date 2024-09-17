@@ -2603,6 +2603,8 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
       auto fe = con.get_element_fe(/*var=*/0, dim);
       fe->get_phi();
       fe->get_JxW();
+      fe->get_dxyzdxi();
+      fe->get_dxyzdeta();
     }
 
   for (const auto & [elem_id, comp_and_qp] : local_pf)
@@ -2684,8 +2686,14 @@ bool RBEIMConstruction::enrich_eim_approximation_on_interiors(const QpDataMap & 
                       std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
                       elem_fe->reinit (&elem_ref, &nodes);
 
-                      optimal_dxyzdxi_elem_center = dxyzdxi[0];
-                      optimal_dxyzdeta_elem_center = dxyzdeta[0];
+                      Point dxyzdxi_pt, dxyzdeta_pt;
+                      if (con.get_elem_dim()>0)
+                        dxyzdxi_pt = dxyzdxi[0];
+                      if (con.get_elem_dim()>1)
+                        dxyzdeta_pt = dxyzdeta[0];
+
+                      optimal_dxyzdxi_elem_center = dxyzdxi_pt;
+                      optimal_dxyzdeta_elem_center = dxyzdeta_pt;
 
                       elem_fe->reinit(&elem_ref);
                     }
