@@ -232,7 +232,7 @@ public:
     // An asymmetric octahedron, so we hopefully have an unambiguous
     // choice of shortest diagonal for a Delaunay algorithm to pick.
     const Real expected_volume =
-      build_octahedron(mesh, false, -1, 1, -1, 1, -0.1, 0.1);
+      build_octahedron(mesh, flip_tris, -1, 1, -1, 1, -0.1, 0.1);
 
     this->testTetInterfaceBase(mesh, triangulator, /* n_elem = */ 4,
                                /* n_nodes = */ 6, expected_volume);
@@ -245,7 +245,7 @@ public:
   {
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
     const Real expected_volume =
-      build_octahedron(mesh, false, -1, 1, -1, 1, -0.1, 0.1);
+      build_octahedron(mesh, flip_tris, -1, 1, -1, 1, -0.1, 0.1);
 
     // Remove one tri, breaking the mesh
     for (auto elem : mesh.element_ptr_range())
