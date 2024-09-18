@@ -183,9 +183,8 @@ void FE<Dim,T>::reinit(const Elem * elem,
           this->shapes_need_reinit()            ||
           !this->shapes_on_quadrature)
         {
-          // Set the element type and p_level
+          // Set the element type
           this->elem_type = elem->type();
-          this->_elem_p_level = side_p_level;
 
           // Set the last_side
           last_side = side->type();
@@ -226,6 +225,8 @@ void FE<Dim,T>::reinit(const Elem * elem,
   this->reinit  (elem, &qp);
 
   this->shapes_on_quadrature = shapes_on_quadrature_side;
+
+  this->_elem_p_level = side_p_level;
 
   // copy back old data
   this->_fe_map->get_JxW() = JxW_int;
