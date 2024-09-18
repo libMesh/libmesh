@@ -258,7 +258,7 @@ public:
         mesh.delete_elem(elem);
     mesh.prepare_for_use();
 
-    this->testExceptionBase("neighbor pointers set", mesh, triangulator,
+    this->testExceptionBase("element with a null neighbor", mesh, triangulator,
                             /* n_elem = */ 4, /* n_nodes = */ 6,
                             expected_volume);
   }
