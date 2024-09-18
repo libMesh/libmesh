@@ -657,6 +657,19 @@ public:
   const VectorizedEvalInput & get_vec_eval_input() const;
 
   /**
+   * Get all interior basis functions in the form of std::vectors.
+   * This can provide a convenient format for processing the basis
+   * function data, or writing it to disk.
+   *
+   * Indexing is as follows:
+   *  basis function index --> variable index --> data at qps per elems
+   *
+   * In parallel we gather basis functions to processor 0 and hence
+   * we only return non-empty data on processor 0.
+   */
+  std::vector<std::vector<std::vector<Number>>> get_interior_basis_functions_as_vecs();
+
+  /**
    * Here we store an enum that defines the type of EIM error indicator
    * normalization that we use in get_eim_error_indicator(). The enum
    * is public so that it can be set in user code.
@@ -760,6 +773,22 @@ private:
   void read_in_node_basis_functions(const System & sys,
                                     const std::string & directory_name,
                                     bool read_binary_basis_functions);
+
+  /**
+   * Helper function called by write_out_interior_basis_functions() to
+   * determine the sizes of interior basis function data.
+   */
+  std::map<std::string,unsigned int>
+    get_interior_basis_function_sizes_helper(std::vector<unsigned int> & n_qp_per_elem);
+
+  /**
+   * Helper function called by write_out_interior_basis_functions() to
+   * get basis function \p bf_index stored as a std::vector per variable.
+   */
+  std::vector<std::vector<Number>> get_interior_basis_function_as_vec_helper(
+    unsigned int n_vars,
+    unsigned int n_qp_data,
+    unsigned int bf_index);
 
   /**
    * The EIM solution coefficients from the most recent call to rb_eim_solves().
