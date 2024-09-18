@@ -669,8 +669,8 @@ void DofMap::reinit(MeshBase & mesh)
                            << FEInterface::max_order(base_fe_type,type)
                            << std::endl;
 #  endif
-              elem->set_p_level(FEInterface::max_order(base_fe_type,type)
-                                - base_fe_type.order);
+              elem->set_p_level(int(FEInterface::max_order(base_fe_type,type))
+                                - int(base_fe_type.order));
             }
 #endif
 
