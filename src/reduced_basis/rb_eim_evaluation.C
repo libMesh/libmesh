@@ -1023,7 +1023,7 @@ write_out_interior_basis_functions(const std::string & directory_name,
     {
       std::vector<unsigned int> n_qp_per_elem;
       auto interior_basis_function_sizes =
-        get_interior_basis_function_sizes_helper(n_qp_per_elem);
+        get_interior_basis_function_sizes(n_qp_per_elem);
 
       // Make a directory to store all the data files
       Utility::mkdir(directory_name.c_str());
@@ -1079,7 +1079,7 @@ write_out_interior_basis_functions(const std::string & directory_name,
 }
 
 std::map<std::string,std::size_t> RBEIMEvaluation::
-get_interior_basis_function_sizes_helper(std::vector<unsigned int> & n_qp_per_elem)
+get_interior_basis_function_sizes(std::vector<unsigned int> & n_qp_per_elem)
 {
   std::map<std::string,std::size_t> interior_basis_function_sizes;
 
@@ -1193,7 +1193,7 @@ get_interior_basis_functions_as_vecs()
     {
       std::vector<unsigned int> n_qp_per_elem;
       std::map<std::string,std::size_t> interior_basis_function_sizes =
-        get_interior_basis_function_sizes_helper(n_qp_per_elem);
+        get_interior_basis_function_sizes(n_qp_per_elem);
 
       for (auto bf_index : index_range(_local_eim_basis_functions))
         interior_basis_functions.emplace_back(

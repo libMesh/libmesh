@@ -670,6 +670,12 @@ public:
   std::vector<std::vector<std::vector<Number>>> get_interior_basis_functions_as_vecs();
 
   /**
+   * Get data that defines the sizes of interior EIM basis functions.
+   */
+  std::map<std::string,std::size_t>
+    get_interior_basis_function_sizes(std::vector<unsigned int> & n_qp_per_elem);
+
+  /**
    * Here we store an enum that defines the type of EIM error indicator
    * normalization that we use in get_eim_error_indicator(). The enum
    * is public so that it can be set in user code.
@@ -773,13 +779,6 @@ private:
   void read_in_node_basis_functions(const System & sys,
                                     const std::string & directory_name,
                                     bool read_binary_basis_functions);
-
-  /**
-   * Helper function called by write_out_interior_basis_functions() to
-   * determine the sizes of interior basis function data.
-   */
-  std::map<std::string,std::size_t>
-    get_interior_basis_function_sizes_helper(std::vector<unsigned int> & n_qp_per_elem);
 
   /**
    * Helper function called by write_out_interior_basis_functions() to
