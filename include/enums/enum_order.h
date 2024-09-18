@@ -86,6 +86,13 @@ enum Order : int {
             // Invalid
             INVALID_ORDER};
 
+  // Standardize this so nvc++ and clang -fsanitize=integer don't
+  // complain about all the ways in which we might do it wrong
+  inline Order sum(Order o, int p)
+  {
+    return static_cast<Order>(static_cast<int>(o) + p);
+  }
+
 }
 
 #endif
