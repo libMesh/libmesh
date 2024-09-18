@@ -1078,10 +1078,10 @@ write_out_interior_basis_functions(const std::string & directory_name,
     }
 }
 
-std::map<std::string,unsigned int> RBEIMEvaluation::
+std::map<std::string,std::size_t> RBEIMEvaluation::
 get_interior_basis_function_sizes_helper(std::vector<unsigned int> & n_qp_per_elem)
 {
-  std::map<std::string,unsigned int> interior_basis_function_sizes;
+  std::map<std::string,std::size_t> interior_basis_function_sizes;
 
   // Write number of basis functions to file. Note: the
   // Xdr::data() function takes non-const references, so you can't
@@ -1192,7 +1192,7 @@ get_interior_basis_functions_as_vecs()
   if (this->processor_id() == 0)
     {
       std::vector<unsigned int> n_qp_per_elem;
-      std::map<std::string,unsigned int> interior_basis_function_sizes =
+      std::map<std::string,std::size_t> interior_basis_function_sizes =
         get_interior_basis_function_sizes_helper(n_qp_per_elem);
 
       for (auto bf_index : index_range(_local_eim_basis_functions))

@@ -778,7 +778,7 @@ private:
    * Helper function called by write_out_interior_basis_functions() to
    * determine the sizes of interior basis function data.
    */
-  std::map<std::string,unsigned int>
+  std::map<std::string,std::size_t>
     get_interior_basis_function_sizes_helper(std::vector<unsigned int> & n_qp_per_elem);
 
   /**
