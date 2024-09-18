@@ -49,7 +49,7 @@ void lagrange_nodal_soln(const Elem * elem,
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType type        = elem->type();
 
-  const Order totalorder = static_cast<Order>(order+add_p_level*elem->p_level());
+  const Order totalorder = sum(order, add_p_level*elem->p_level());
 
   nodal_soln.resize(n_nodes);
 

@@ -559,7 +559,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + add_p_level*elem->p_level());
+  auto total_order = sum(fe_t.order, add_p_level*elem->p_level());
 
   fe_with_vec_switch(n_shape_functions(elem->type(), total_order));
 }
@@ -587,7 +587,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
 #endif
 
   // Ignore Elem::p_level() and instead use extra_order to compute total_order.
-  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+  auto total_order = sum(fe_t.order, extra_order);
 
   fe_with_vec_switch(n_shape_functions(elem->type(), total_order));
 }
@@ -623,7 +623,7 @@ FEInterface::n_dofs (const unsigned int dim,
   libmesh_deprecated();
 
   FEType p_refined_fe_t = fe_t;
-  p_refined_fe_t.order = static_cast<Order>(p_refined_fe_t.order + elem->p_level());
+  p_refined_fe_t.order = sum(p_refined_fe_t.order, elem->p_level());
   return FEInterface::n_dofs(dim, p_refined_fe_t, elem->type());
 }
 
@@ -646,7 +646,7 @@ FEInterface::n_dofs(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + add_p_level*elem->p_level());
+  auto total_order = sum(fe_t.order, add_p_level*elem->p_level());
 
   fe_with_vec_switch(n_dofs(elem->type(), total_order));
 }
@@ -670,7 +670,7 @@ FEInterface::n_dofs(const FEType & fe_t,
 #endif
 
   // Elem::p_level() is ignored, extra_order is used instead.
-  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+  auto total_order = sum(fe_t.order, extra_order);
 
   fe_with_vec_switch(n_dofs(elem->type(), total_order));
 }
@@ -739,7 +739,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + add_p_level*elem->p_level());
+  auto total_order = sum(fe_t.order, add_p_level*elem->p_level());
 
   fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
 }
@@ -763,7 +763,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
 #endif
 
   // Ignore Elem::p_level() and instead use extra_order to compute total_order.
-  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+  auto total_order = sum(fe_t.order, extra_order);
 
   fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
 }
@@ -807,7 +807,7 @@ FEInterface::n_dofs_per_elem(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = static_cast<Order>(fe_t.order + add_p_level*elem->p_level());
+  auto total_order = sum(fe_t.order, add_p_level*elem->p_level());
 
   fe_with_vec_switch(n_dofs_per_elem(elem->type(), total_order));
 }
@@ -830,7 +830,7 @@ FEInterface::n_dofs_per_elem(const FEType & fe_t,
 #endif
 
   // Ignore Elem::p_level() and instead use extra_order to compute total_order.
-  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+  auto total_order = sum(fe_t.order, extra_order);
 
   fe_with_vec_switch(n_dofs_per_elem(elem->type(), total_order));
 }
@@ -1093,7 +1093,7 @@ FEInterface::shape(const FEType & fe_t,
   // with the last parameter set to "false" so that the
   // Elem::p_level() is not used internally and the "total_order" that
   // we compute is used instead. See fe.h for more details.
-  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+  auto total_order = sum(fe_t.order, extra_order);
 
   fe_switch(shape(elem, total_order, i, p, false));
 }
@@ -1254,7 +1254,7 @@ void FEInterface::shape<Real>(const FEType & fe_t,
 #endif
 
   // Ignore Elem::p_level() and instead use extra_order to compute total_order
-  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+  auto total_order = sum(fe_t.order, extra_order);
 
   // Below we call
   //
@@ -1297,7 +1297,7 @@ void FEInterface::shapes<Real>(const unsigned int dim,
   if (elem && is_InfFE_elem(elem->type()))
     {
       FEType elevated = fe_t;
-      elevated.order = static_cast<Order>(fe_t.order + add_p_level * elem->p_level());
+      elevated.order = sum(fe_t.order, add_p_level * elem->p_level());
       for (auto qpi : index_range(p))
         phi[qpi] = ifem_shape(elevated, elem, i, p[qpi]);
       return;
@@ -1484,7 +1484,7 @@ void FEInterface::shape<RealGradient>(const FEType & fe_t,
   // with the last parameter set to "false" so that the
   // Elem::p_level() is not used internally and the "total_order" that
   // we compute is used instead. See fe.h for more details.
-  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+  auto total_order = sum(fe_t.order, extra_order);
 
   switch(dim)
     {
@@ -1727,7 +1727,7 @@ Real FEInterface::shape_deriv(const FEType & fe_t,
 
   // Ignore Elem::p_level() when computing total order, use
   // extra_order instead.
-  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+  auto total_order = sum(fe_t.order, extra_order);
 
   // We call shape_deriv() with the final argument == false so that
   // the Elem::p_level() is ignored internally.
@@ -2025,7 +2025,7 @@ Real FEInterface::shape_second_deriv(const FEType & fe_t,
 
   // Ignore Elem::p_level() when computing total order, use
   // extra_order instead.
-  auto total_order = static_cast<Order>(fe_t.order + extra_order);
+  auto total_order = sum(fe_t.order, extra_order);
 
   // We are calling FE::shape_second_deriv() with the final argument
   // == false so that the Elem::p_level() is ignored and the

@@ -315,7 +315,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType fet,
   if (add_p_level)
     {
       FEType tmp_fet=fet;
-      tmp_fet = static_cast<Order>(fet.order + add_p_level * inf_elem->p_level());
+      tmp_fet = sum(fet.order, add_p_level * inf_elem->p_level());
       return InfFE<Dim,T_radial,T_map>::shape(tmp_fet, inf_elem, i, p);
     }
   return InfFE<Dim,T_radial,T_map>::shape(fet, inf_elem, i, p);
@@ -614,7 +614,7 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv(const FEType fet,
   if (add_p_level)
     {
       FEType tmp_fet=fet;
-      tmp_fet = static_cast<Order>(fet.order + add_p_level * inf_elem->p_level());
+      tmp_fet = sum(fet.order, add_p_level * inf_elem->p_level());
       return InfFE<Dim,T_radial,T_map>::shape_deriv(tmp_fet, inf_elem, i, j, p);
     }
   return InfFE<Dim,T_radial,T_map>::shape_deriv(fet, inf_elem, i, j, p);

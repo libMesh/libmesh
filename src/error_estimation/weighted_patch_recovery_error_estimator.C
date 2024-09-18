@@ -216,8 +216,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
           // The type of finite element to use for this variable
           const FEType & fe_type = dof_map.variable_type (var);
 
-          const Order element_order  = static_cast<Order>
-            (fe_type.order + elem->p_level());
+          const Order element_order = sum(fe_type.order, elem->p_level());
 
           // Finite element object for use in this patch
           std::unique_ptr<FEBase> fe (FEBase::build (dim, fe_type));
@@ -622,8 +621,7 @@ void WeightedPatchRecoveryErrorEstimator::EstimateError::operator()(const ConstE
               // Variable to hold the error on the current element
               Real element_error = 0;
 
-              const Order qorder =
-                static_cast<Order>(fe_type.order + e_p->p_level());
+              const Order qorder = sum(fe_type.order, e_p->p_level());
 
               // A quadrature rule for this element
               QGrid samprule (dim, qorder);

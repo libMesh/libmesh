@@ -77,7 +77,7 @@ Real FE<1,MONOMIAL>::shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return FE<1,MONOMIAL>::shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
+  return FE<1,MONOMIAL>::shape(elem->type(), sum(order, add_p_level*elem->p_level()), i, p);
 }
 
 
@@ -89,7 +89,7 @@ Real FE<1,MONOMIAL>::shape(const FEType fet,
                            const bool add_p_level)
 {
   libmesh_assert(elem);
-  return FE<1,MONOMIAL>::shape(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, p);
+  return FE<1,MONOMIAL>::shape(elem->type(), sum(fet.order, add_p_level*elem->p_level()), i, p);
 }
 
 
@@ -147,7 +147,7 @@ Real FE<1,MONOMIAL>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   return FE<1,MONOMIAL>::shape_deriv(elem->type(),
-                                     static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+                                     sum(order, add_p_level*elem->p_level()), i, j, p);
 }
 
 
@@ -160,7 +160,7 @@ Real FE<1,MONOMIAL>::shape_deriv(const FEType fet,
                                  const bool add_p_level)
 {
   libmesh_assert(elem);
-  return FE<1,MONOMIAL>::shape_deriv(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+  return FE<1,MONOMIAL>::shape_deriv(elem->type(), sum(fet.order, add_p_level*elem->p_level()), i, j, p);
 
 
 }
@@ -218,7 +218,7 @@ Real FE<1,MONOMIAL>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   return FE<1,MONOMIAL>::shape_second_deriv(elem->type(),
-                                            static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+                                            sum(order, add_p_level*elem->p_level()), i, j, p);
 }
 
 template <>
@@ -230,7 +230,7 @@ Real FE<1,MONOMIAL>::shape_second_deriv(const FEType fet,
                                         const bool add_p_level)
 {
   libmesh_assert(elem);
-  return FE<1,MONOMIAL>::shape_second_deriv(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+  return FE<1,MONOMIAL>::shape_second_deriv(elem->type(), sum(fet.order, add_p_level*elem->p_level()), i, j, p);
 }
 
 #endif
