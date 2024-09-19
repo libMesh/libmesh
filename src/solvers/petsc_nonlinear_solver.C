@@ -1085,7 +1085,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
       LibmeshPetscCall(VecGetArrayAndMemType(x->vec(), &dummyarray, &mtype));
       LibmeshPetscCall(VecRestoreArrayAndMemType(x->vec(), &dummyarray));
       if (PetscMemTypeHost(mtype))
-        PetscCallExternalAbort(HYPRE_SetMemoryLocation, HYPRE_MEMORY_HOST);
+        LibmeshPetscCallExternal(HYPRE_SetMemoryLocation, HYPRE_MEMORY_HOST);
     }
 #endif
 
