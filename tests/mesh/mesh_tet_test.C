@@ -114,9 +114,12 @@ public:
 
   void tearDown() {}
 
-  void testExceptionBase(MeshBase & mesh,
+  void testExceptionBase(const char * re,
+                         MeshBase & mesh,
                          MeshTetInterface & tetinterface,
-                         const char * re)
+                         dof_id_type expected_n_elem = DofObject::invalid_id,
+                         dof_id_type expected_n_nodes = DofObject::invalid_id,
+                         Real expected_volume = 0)
   {
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
     // We can't just CPPUNIT_ASSERT_THROW, because we want to make
@@ -124,7 +127,8 @@ public:
     // message!
     bool threw_desired_exception = false;
     try {
-      this->testTetInterfaceBase(mesh, tetinterface);
+      this->testTetInterfaceBase(mesh, tetinterface, expected_n_elem,
+                                 expected_n_nodes, expected_volume);
     }
     catch (libMesh::LogicError & e) {
       std::regex msg_regex(re);
@@ -243,7 +247,6 @@ public:
                            MeshTetInterface & triangulator,
                            bool flip_tris = false)
   {
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
     const Real expected_volume =
       build_octahedron(mesh, false, -1, 1, -1, 1, -0.1, 0.1);
 
@@ -255,24 +258,9 @@ public:
         mesh.delete_elem(elem);
     mesh.prepare_for_use();
 
-    bool threw_desired_exception = false;
-    try {
-      this->testTetInterfaceBase(mesh, triangulator, /* n_elem = */ 4,
-                                 /* n_nodes = */ 6, expected_volume);
-    }
-    catch (libMesh::LogicError & e) {
-      std::regex msg_regex("neighbor pointers set");
-      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
-      threw_desired_exception = true;
-    }
-    catch (CppUnit::Exception & e) {
-      throw e;
-    }
-    catch (...) {
-      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
-    }
-    CPPUNIT_ASSERT(threw_desired_exception);
-#endif
+    this->testExceptionBase("element with a null neighbor", mesh, triangulator,
+                            /* n_elem = */ 4, /* n_nodes = */ 6,
+                            expected_volume);
   }
 
 

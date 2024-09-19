@@ -40,8 +40,8 @@ namespace {
   {
     libmesh_error_msg_if
       (!elem,
-       "Missing element when trying to identify boundary component to mesh.\n"
-       "Perhaps a boundary element does not have all neighbor pointers set?\n");
+       "Tet generation encountered a 2D element with a null neighbor, but a\n"
+       "boundary must be a 2D closed manifold (surface).\n");
 
     if (current_component.count(elem))
       return;
