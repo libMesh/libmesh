@@ -108,7 +108,7 @@ ReplicatedMesh::ReplicatedMesh (const ReplicatedMesh & other_mesh) :
 }
 
 
-ReplicatedMesh::ReplicatedMesh (const UnstructuredMesh & other_mesh) :
+ReplicatedMesh::ReplicatedMesh (const MeshBase & other_mesh) :
   UnstructuredMesh (other_mesh),
   _n_nodes(0), _n_elem(0) // copy_* will increment this
 {

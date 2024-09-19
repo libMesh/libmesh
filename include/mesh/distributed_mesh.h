@@ -78,7 +78,7 @@ public:
    * Copy-constructor.  This should be able to take a
    * replicated or distributed mesh.
    */
-  DistributedMesh (const UnstructuredMesh & other_mesh);
+  DistributedMesh (const MeshBase & other_mesh);
 
   /**
    * Copy-constructor, possibly specialized for a
