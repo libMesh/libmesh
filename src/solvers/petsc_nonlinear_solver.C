@@ -1071,7 +1071,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 #endif
   LibmeshPetscCall(SNESSetFromOptions(_snes));
 
-#ifdef LIBMESH_HAVE_PETSC_HYPRE
+#if defined(LIBMESH_HAVE_PETSC_HYPRE) && !PETSC_VERSION_LESS_THAN(3,12,0)
   // The above call set our PC type. If we're a hypre type we have to ensure that hypre is deployed
   // in the same memory space as our vector types
   PC pc;
