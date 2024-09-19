@@ -45,7 +45,7 @@ void xyz_nodal_soln(const Elem * elem,
 
   nodal_soln.resize(n_nodes);
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {

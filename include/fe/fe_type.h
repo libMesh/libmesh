@@ -82,6 +82,20 @@ public:
     return _order;
   }
 
+  template <typename T>
+  inline OrderWrapper & operator+=(T p)
+  {
+    _order += int(p);
+    return *this;
+  }
+
+  template <typename T>
+  inline OrderWrapper & operator-=(T p)
+  {
+    _order -= int(p);
+    return *this;
+  }
+
 private:
 
   /**

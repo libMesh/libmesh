@@ -276,7 +276,7 @@ Real FE<3,XYZ>::shape_deriv(const Elem * elem,
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
   // we avoid declaring it when asserts are not active.
-  const unsigned int totalorder = sum(order, add_p_level*elem->p_level());
+  const unsigned int totalorder = order + add_p_level*elem->p_level();
 #endif
   libmesh_assert_less (i, (totalorder+1) * (totalorder+2) *
                        (totalorder+3)/6);
@@ -772,7 +772,7 @@ Real FE<3,XYZ>::shape_second_deriv(const Elem * elem,
 #ifndef NDEBUG
   // totalorder is only used in the assertion below, so
   // we avoid declaring it when asserts are not active.
-  const unsigned int totalorder = sum(order, add_p_level*elem->p_level());
+  const unsigned int totalorder = order + add_p_level*elem->p_level();
 #endif
   libmesh_assert_less (i, (totalorder+1) * (totalorder+2) *
                        (totalorder+3)/6);

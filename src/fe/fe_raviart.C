@@ -53,7 +53,7 @@ void raviart_thomas_nodal_soln(const Elem * elem,
   const unsigned int n_nodes = elem->n_nodes();
   const ElemType elem_type   = elem->type();
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   nodal_soln.resize(n_nodes*dim);
 

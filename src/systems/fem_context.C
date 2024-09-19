@@ -2033,9 +2033,9 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
       this->has_elem())
     {
       if (this->get_elem().p_refinement_flag() == Elem::JUST_REFINED)
-        fe_type.order = sum(fe_type.order, -add_p_level);
+        fe_type.order -= add_p_level;
       else if (this->get_elem().p_refinement_flag() == Elem::JUST_COARSENED)
-        fe_type.order = sum(fe_type.order, add_p_level);
+        fe_type.order += add_p_level;
     }
 #endif // LIBMESH_ENABLE_AMR
 

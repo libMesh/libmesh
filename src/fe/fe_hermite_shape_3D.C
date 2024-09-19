@@ -404,7 +404,7 @@ Real FE<3,HERMITE>::shape(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    sum(order, add_p_level*elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {
@@ -488,7 +488,7 @@ Real FE<3,HERMITE>::shape_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    sum(order, add_p_level*elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {
@@ -597,7 +597,7 @@ Real FE<3,HERMITE>::shape_second_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    sum(order, add_p_level*elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {

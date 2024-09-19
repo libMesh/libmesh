@@ -502,7 +502,7 @@ public:
    * \returns The approximation order of the finite element.
    */
   Order get_order() const
-  { return sum(fe_type.order, _p_level); }
+  { return fe_type.order + _p_level; }
 
   /**
    * Sets the *base* FE order of the finite element.

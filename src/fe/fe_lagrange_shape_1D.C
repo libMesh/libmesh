@@ -58,7 +58,7 @@ Real FE<1,LAGRANGE>::shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape(sum(order, add_p_level*elem->p_level()), i, p(0));
+  return fe_lagrange_1D_shape(order + add_p_level*elem->p_level(), i, p(0));
 }
 
 
@@ -71,7 +71,7 @@ Real FE<1,LAGRANGE>::shape(const FEType fet,
                            const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_1D_shape(sum(fet.order, add_p_level*elem->p_level()), i, p(0));
+  return fe_lagrange_1D_shape(fet.order + add_p_level*elem->p_level(), i, p(0));
 }
 
 template <>
@@ -83,7 +83,7 @@ Real FE<1,L2_LAGRANGE>::shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape(sum(order, add_p_level*elem->p_level()), i, p(0));
+  return fe_lagrange_1D_shape(order + add_p_level*elem->p_level(), i, p(0));
 }
 
 template <>
@@ -94,7 +94,7 @@ Real FE<1,L2_LAGRANGE>::shape(const FEType fet,
                               const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_1D_shape(sum(fet.order, add_p_level*elem->p_level()), i, p(0));
+  return fe_lagrange_1D_shape(fet.order + add_p_level*elem->p_level(), i, p(0));
 }
 
 
@@ -133,7 +133,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape_deriv(sum(order, add_p_level*elem->p_level()), i, j, p(0));
+  return fe_lagrange_1D_shape_deriv(order + add_p_level*elem->p_level(), i, j, p(0));
 }
 
 
@@ -148,7 +148,7 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape_deriv(sum(order, add_p_level*elem->p_level()), i, j, p(0));
+  return fe_lagrange_1D_shape_deriv(order + add_p_level*elem->p_level(), i, j, p(0));
 }
 
 
@@ -161,7 +161,7 @@ Real FE<1,LAGRANGE>::shape_deriv(const FEType fet,
                                  const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_1D_shape_deriv(sum(fet.order, add_p_level*elem->p_level()), i, j, p(0));
+  return fe_lagrange_1D_shape_deriv(fet.order + add_p_level*elem->p_level(), i, j, p(0));
 }
 
 
@@ -174,7 +174,7 @@ Real FE<1,L2_LAGRANGE>::shape_deriv(const FEType fet,
                                     const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_1D_shape_deriv(sum(fet.order, add_p_level*elem->p_level()), i, j, p(0));
+  return fe_lagrange_1D_shape_deriv(fet.order + add_p_level*elem->p_level(), i, j, p(0));
 }
 
 
@@ -214,7 +214,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape_second_deriv(sum(order, add_p_level*elem->p_level()), i, j, p(0));
+  return fe_lagrange_1D_shape_second_deriv(order + add_p_level*elem->p_level(), i, j, p(0));
 }
 
 
@@ -229,7 +229,7 @@ Real FE<1,L2_LAGRANGE>::shape_second_deriv(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_lagrange_1D_shape_second_deriv(sum(order, add_p_level*elem->p_level()), i, j, p(0));
+  return fe_lagrange_1D_shape_second_deriv(order + add_p_level*elem->p_level(), i, j, p(0));
 }
 
 
@@ -242,7 +242,7 @@ Real FE<1,LAGRANGE>::shape_second_deriv(const FEType fet,
                                         const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_1D_shape_second_deriv(sum(fet.order, add_p_level*elem->p_level()), i, j, p(0));
+  return fe_lagrange_1D_shape_second_deriv(fet.order + add_p_level*elem->p_level(), i, j, p(0));
 }
 
 
@@ -255,7 +255,7 @@ Real FE<1,L2_LAGRANGE>::shape_second_deriv(const FEType fet,
                                            const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_lagrange_1D_shape_second_deriv(sum(fet.order, add_p_level*elem->p_level()), i, j, p(0));
+  return fe_lagrange_1D_shape_second_deriv(fet.order + add_p_level*elem->p_level(), i, j, p(0));
 }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES

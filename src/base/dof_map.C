@@ -657,7 +657,7 @@ void DofMap::reinit(MeshBase & mesh)
 #ifdef LIBMESH_ENABLE_AMR
           // Make sure we haven't done more p refinement than we can
           // handle
-          if (sum(base_fe_type.order, add_p_level*elem->p_level()) >
+          if (base_fe_type.order + add_p_level*elem->p_level() >
               FEInterface::max_order(base_fe_type, type))
             {
 #  ifdef DEBUG
@@ -2454,7 +2454,7 @@ void DofMap::_dof_indices (const Elem & elem,
             is_inf ?
             FEInterface::n_dofs_at_node(fe_type, add_p_level*p_level, &elem, n) :
 #endif
-            ndan (type, sum(fe_type.order, add_p_level*p_level), n);
+            ndan (type, fe_type.order + add_p_level*p_level, n);
 
           // If this is a non-vertex on a hanging node with extra
           // degrees of freedom, we use the non-vertex dofs (which
@@ -2742,7 +2742,7 @@ void DofMap::old_dof_indices (const Elem * const elem,
                           is_inf ?
                           FEInterface::n_dofs_at_node(var.type(), extra_order, elem, n) :
 #endif
-                          ndan (type, sum(var.type().order, extra_order), n);
+                          ndan (type, var.type().order + extra_order, n);
 
                         const int n_comp = old_dof_obj.n_comp_group(sys_num,vg);
 

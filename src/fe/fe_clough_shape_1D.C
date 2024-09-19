@@ -236,7 +236,7 @@ Real FE<1,CLOUGH>::shape(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    sum(order, add_p_level*elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {
@@ -328,7 +328,7 @@ Real FE<1,CLOUGH>::shape_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    sum(order, add_p_level*elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {
@@ -396,7 +396,7 @@ Real FE<1,CLOUGH>::shape_second_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    sum(order, add_p_level*elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {

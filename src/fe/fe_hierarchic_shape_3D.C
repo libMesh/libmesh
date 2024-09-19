@@ -1257,7 +1257,7 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
   libmesh_assert(elem);
   const ElemType type = elem->type();
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   switch (type)
     {
@@ -1608,7 +1608,7 @@ Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
   const ElemType type = elem->type();
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
     return 0; // constants have zero derivative
@@ -1867,7 +1867,7 @@ Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
   const ElemType type = elem->type();
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
     return 0; // constants have zero derivative
@@ -2259,7 +2259,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
   libmesh_assert(elem);
   const ElemType type = elem->type();
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   switch (type)
     {

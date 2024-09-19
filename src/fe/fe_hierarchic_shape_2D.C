@@ -224,7 +224,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
   libmesh_assert(elem);
   const ElemType type = elem->type();
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   const unsigned int dofs_per_side = totalorder+1u;
 
@@ -500,7 +500,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
     return 0;
@@ -789,7 +789,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
   const ElemType type = elem->type();
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   if (totalorder == 0) // special case since raw HIERARCHIC lacks CONSTANTs
     return 0;
@@ -956,7 +956,7 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
   libmesh_assert_greater (totalorder, 0);
 
   switch (elem->type())
@@ -1067,7 +1067,7 @@ Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
 
   const ElemType type = elem->type();
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   libmesh_assert_greater (totalorder, 0);
 

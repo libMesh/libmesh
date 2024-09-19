@@ -105,7 +105,7 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    sum(order, add_p_level*elem->p_level());
+    order + add_p_level*elem->p_level();
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
@@ -425,7 +425,7 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    sum(order, add_p_level*elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (type)
     {
@@ -553,7 +553,7 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    sum(order, add_p_level*elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (type)
     {

@@ -45,7 +45,7 @@ void l2_hierarchic_nodal_soln(const Elem * elem,
 
   nodal_soln.resize(n_nodes);
 
-  const Order totalorder = sum(order, add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   // FEType object to be passed to various FEInterface functions below.
   FEType fe_type(order, L2_HIERARCHIC);

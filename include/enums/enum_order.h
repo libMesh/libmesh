@@ -88,9 +88,36 @@ enum Order : int {
 
   // Standardize this so nvc++ and clang -fsanitize=integer don't
   // complain about all the ways in which we might do it wrong
-  inline Order sum(Order o, int p)
+  template <typename T>
+  inline Order operator+(Order o, T p)
   {
-    return static_cast<Order>(static_cast<int>(o) + p);
+    return static_cast<Order>(static_cast<int>(o) + int(p));
+  }
+
+  template <typename T>
+  inline Order operator-(Order o, T p)
+  {
+    return static_cast<Order>(static_cast<int>(o) - int(p));
+  }
+
+  template <typename T>
+  inline Order operator+(T p, Order o)
+  {
+    return o + p;
+  }
+
+  template <typename T>
+  inline Order & operator+=(Order &o, T p)
+  {
+    o = o + p;
+    return o;
+  }
+
+  template <typename T>
+  inline Order & operator-=(Order &o, T p)
+  {
+    o = o - p;
+    return o;
   }
 
 }
