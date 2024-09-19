@@ -15,6 +15,7 @@
 #include <libmesh/exodusII_io.h>
 #include <libmesh/gmsh_io.h>
 #include <libmesh/nemesis_io.h>
+#include <libmesh/stl_io.h>
 #include <libmesh/vtk_io.h>
 #include <libmesh/tetgen_io.h>
 
@@ -198,8 +199,12 @@ public:
   CPPUNIT_TEST( testGoodGmsh );
 #endif
 
+#if LIBMESH_DIM > 2
+  CPPUNIT_TEST( testGoodSTL );
+
 #ifdef LIBMESH_HAVE_TETGEN
   CPPUNIT_TEST( testTetgenIO );
+#endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -1554,6 +1559,21 @@ public:
     MeshCommunication().broadcast(mesh);
 
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(14));
+  }
+
+  void testGoodSTL ()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    STLIO stl_io(mesh);
+
+    if (mesh.processor_id() == 0)
+      stl_io.read("meshes/Cluster_34.stl");
+    MeshCommunication().broadcast(mesh);
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(40));
   }
 
   void testTetgenIO ()
