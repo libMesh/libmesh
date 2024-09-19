@@ -34,7 +34,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem * elem,
 #if LIBMESH_DIM == 3
   libmesh_assert(elem);
 
-  const Order totalorder = static_cast<Order>(order + add_p_level * elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {
@@ -264,7 +264,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
   libmesh_assert_less (j, 3);
 
-  const Order totalorder = static_cast<Order>(order + add_p_level * elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {
@@ -744,7 +744,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
   // j = 5 ==> d^2 phi / dzeta^2
   libmesh_assert_less (j, 6);
 
-  const Order totalorder = static_cast<Order>(order + add_p_level * elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   switch (totalorder)
     {

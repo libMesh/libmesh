@@ -1138,8 +1138,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
   }
 
   FEType fe_type = base_fe_type, temp_fe_type;
-  fe_type.order = static_cast<Order>(fe_type.order +
-                                     elem->max_descendant_p_level());
+  fe_type.order = fe_type.order + elem->max_descendant_p_level();
 
   // In 3D, project any edge values next
   if (dim > 2 && cont != DISCONTINUOUS)
@@ -1182,9 +1181,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
               (child_dof_indices.size());
 
             temp_fe_type = base_fe_type;
-            temp_fe_type.order =
-              static_cast<Order>(temp_fe_type.order +
-                                 child->p_level());
+            temp_fe_type.order = temp_fe_type.order + child->p_level();
 
             FEInterface::dofs_on_edge(child, dim,
                                       temp_fe_type, e, old_side_dofs);
@@ -1322,9 +1319,7 @@ FEGenericBase<OutputType>::coarsened_dof_values(const NumericVector<Number> & ol
               (child_dof_indices.size());
 
             temp_fe_type = base_fe_type;
-            temp_fe_type.order =
-              static_cast<Order>(temp_fe_type.order +
-                                 child->p_level());
+            temp_fe_type.order = temp_fe_type.order + child->p_level();
 
             FEInterface::dofs_on_side(child, dim,
                                       temp_fe_type, s, old_side_dofs);

@@ -88,7 +88,7 @@ Real FE<1,SZABAB>::shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return FE<1,SZABAB>::shape(elem->type(), static_cast<Order>(order + add_p_level * add_p_level * elem->p_level()), i, p);
+  return FE<1,SZABAB>::shape(elem->type(), order + add_p_level*elem->p_level(), i, p);
 }
 
 
@@ -101,7 +101,7 @@ Real FE<1,SZABAB>::shape(const FEType fet,
 {
   libmesh_assert(elem);
 
-  return FE<1,SZABAB>::shape(elem->type(), static_cast<Order>(fet.order + add_p_level * add_p_level * elem->p_level()), i, p);
+  return FE<1,SZABAB>::shape(elem->type(), fet.order + add_p_level*elem->p_level(), i, p);
 }
 
 
@@ -163,7 +163,7 @@ Real FE<1,SZABAB>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   return FE<1,SZABAB>::shape_deriv(elem->type(),
-                                   static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+                                   order + add_p_level*elem->p_level(), i, j, p);
 }
 
 
@@ -179,7 +179,7 @@ Real FE<1,SZABAB>::shape_deriv(const FEType fet,
   libmesh_assert(elem);
 
   return FE<1,SZABAB>::shape_deriv(elem->type(),
-                                   static_cast<Order>(fet.order + add_p_level * add_p_level * elem->p_level()),
+                                   fet.order + add_p_level*elem->p_level(),
                                    i,
                                    j,
                                    p);
@@ -238,7 +238,7 @@ Real FE<1,SZABAB>::shape_second_deriv(const FEType fet,
   libmesh_assert(elem);
 
   return FE<1,SZABAB>::shape_second_deriv(elem->type(),
-                                          static_cast<Order>(fet.order + add_p_level * add_p_level * elem->p_level()),
+                                          fet.order + add_p_level*elem->p_level(),
                                           i,
                                           j,
                                           p);

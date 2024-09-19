@@ -86,6 +86,40 @@ enum Order : int {
             // Invalid
             INVALID_ORDER};
 
+  // Standardize this so nvc++ and clang -fsanitize=integer don't
+  // complain about all the ways in which we might do it wrong
+  template <typename T>
+  inline Order operator+(Order o, T p)
+  {
+    return static_cast<Order>(static_cast<int>(o) + int(p));
+  }
+
+  template <typename T>
+  inline Order operator-(Order o, T p)
+  {
+    return static_cast<Order>(static_cast<int>(o) - int(p));
+  }
+
+  template <typename T>
+  inline Order operator+(T p, Order o)
+  {
+    return o + p;
+  }
+
+  template <typename T>
+  inline Order & operator+=(Order &o, T p)
+  {
+    o = o + p;
+    return o;
+  }
+
+  template <typename T>
+  inline Order & operator-=(Order &o, T p)
+  {
+    o = o - p;
+    return o;
+  }
+
 }
 
 #endif

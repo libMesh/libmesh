@@ -106,7 +106,7 @@ Real FE<1,HIERARCHIC>::shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_hierarchic_1D_shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
+  return fe_hierarchic_1D_shape(elem->type(), order + add_p_level*elem->p_level(), i, p);
 }
 
 
@@ -119,7 +119,7 @@ Real FE<1,HIERARCHIC>::shape(const FEType fet,
                              const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_hierarchic_1D_shape(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, p);
+  return fe_hierarchic_1D_shape(elem->type(), fet.order + add_p_level*elem->p_level(), i, p);
 }
 
 
@@ -135,7 +135,7 @@ Real FE<1,L2_HIERARCHIC>::shape(const Elem * elem,
 {
   libmesh_assert(elem);
 
-  return fe_hierarchic_1D_shape(elem->type(), static_cast<Order>(order + add_p_level * elem->p_level()), i, p);
+  return fe_hierarchic_1D_shape(elem->type(), order + add_p_level*elem->p_level(), i, p);
 }
 
 template <>
@@ -146,7 +146,7 @@ Real FE<1,L2_HIERARCHIC>::shape(const FEType fet,
                                 const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_hierarchic_1D_shape(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, p);
+  return fe_hierarchic_1D_shape(elem->type(), fet.order + add_p_level*elem->p_level(), i, p);
 }
 
 
@@ -221,7 +221,7 @@ Real FE<1,HIERARCHIC>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   return fe_hierarchic_1D_shape_deriv(elem->type(),
-                                      static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+                                      order + add_p_level*elem->p_level(), i, j, p);
 }
 
 
@@ -235,7 +235,7 @@ Real FE<1,HIERARCHIC>::shape_deriv(const FEType fet,
                                    const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_hierarchic_1D_shape_deriv(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+  return fe_hierarchic_1D_shape_deriv(elem->type(), fet.order + add_p_level*elem->p_level(), i, j, p);
 }
 
 
@@ -252,7 +252,7 @@ Real FE<1,L2_HIERARCHIC>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   return fe_hierarchic_1D_shape_deriv(elem->type(),
-                                      static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+                                      order + add_p_level*elem->p_level(), i, j, p);
 }
 
 
@@ -266,7 +266,7 @@ Real FE<1,L2_HIERARCHIC>::shape_deriv(const FEType fet,
                                       const bool add_p_level)
 {
   libmesh_assert(elem);
-  return fe_hierarchic_1D_shape_deriv(elem->type(), static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+  return fe_hierarchic_1D_shape_deriv(elem->type(), fet.order + add_p_level*elem->p_level(), i, j, p);
 }
 
 
@@ -346,7 +346,7 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   return fe_hierarchic_1D_shape_second_deriv(elem->type(),
-                                             static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+                                             order + add_p_level*elem->p_level(), i, j, p);
 }
 
 
@@ -361,7 +361,7 @@ Real FE<1,HIERARCHIC>::shape_second_deriv(const FEType fet,
 {
   libmesh_assert(elem);
   return fe_hierarchic_1D_shape_second_deriv(elem->type(),
-                                             static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+                                             fet.order + add_p_level*elem->p_level(), i, j, p);
 }
 
 
@@ -376,7 +376,7 @@ Real FE<1,L2_HIERARCHIC>::shape_second_deriv(const Elem * elem,
   libmesh_assert(elem);
 
   return fe_hierarchic_1D_shape_second_deriv(elem->type(),
-                                             static_cast<Order>(order + add_p_level * elem->p_level()), i, j, p);
+                                             order + add_p_level*elem->p_level(), i, j, p);
 }
 
 
@@ -390,7 +390,7 @@ Real FE<1,L2_HIERARCHIC>::shape_second_deriv(const FEType fet,
 {
   libmesh_assert(elem);
   return fe_hierarchic_1D_shape_second_deriv(elem->type(),
-                                             static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+                                             fet.order + add_p_level*elem->p_level(), i, j, p);
 }
 
 

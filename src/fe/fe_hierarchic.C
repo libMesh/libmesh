@@ -45,7 +45,7 @@ void hierarchic_nodal_soln(const Elem * elem,
 
   nodal_soln.resize(n_nodes);
 
-  const Order totalorder = static_cast<Order>(order + add_p_level*elem->p_level());
+  const Order totalorder = order + add_p_level*elem->p_level();
 
   // FEType object to be passed to various FEInterface functions below.
   FEType fe_type(order, HIERARCHIC);

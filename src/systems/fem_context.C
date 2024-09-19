@@ -2028,14 +2028,14 @@ FEMContext::build_new_fe( const FEGenericBase<OutputShape>* fe,
   libmesh_assert(this->has_elem() || fe_type.family == SCALAR);
 
 #ifdef LIBMESH_ENABLE_AMR
-  const bool add_p_level = fe->add_p_level_in_reinit();
+  const int add_p_level = fe->add_p_level_in_reinit();
   if ((algebraic_type() == OLD) &&
       this->has_elem())
     {
       if (this->get_elem().p_refinement_flag() == Elem::JUST_REFINED)
-        fe_type.order = static_cast<Order>(fe_type.order - add_p_level);
+        fe_type.order -= add_p_level;
       else if (this->get_elem().p_refinement_flag() == Elem::JUST_COARSENED)
-        fe_type.order = static_cast<Order>(fe_type.order + add_p_level);
+        fe_type.order += add_p_level;
     }
 #endif // LIBMESH_ENABLE_AMR
 

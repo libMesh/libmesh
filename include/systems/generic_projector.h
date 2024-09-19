@@ -2383,8 +2383,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectEdge
           FEType fe_type = base_fe_type;
 
           // This may be a p refined element
-          fe_type.order =
-            libMesh::Order (fe_type.order + elem.p_level());
+          fe_type.order = fe_type.order + elem.p_level();
 
           // If this is a Lagrange element with DoFs on edges then by
           // convention we interpolate at the node rather than project
@@ -2566,8 +2565,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectSide
           const bool add_p_level = dof_map.should_p_refine_var(var);
 
           // This may be a p refined element
-          fe_type.order =
-            libMesh::Order (fe_type.order + add_p_level*elem.p_level());
+          fe_type.order = fe_type.order + add_p_level*elem.p_level();
 
           // If this is a Lagrange element with DoFs on sides then by
           // convention we interpolate at the node rather than project
@@ -2728,8 +2726,7 @@ void GenericProjector<FFunctor, GFunctor, FValue, ProjectionAction>::ProjectInte
           const bool add_p_level = dof_map.should_p_refine(vg);
 
           // This may be a p refined element
-          fe_type.order =
-            libMesh::Order (fe_type.order + add_p_level * elem->p_level());
+          fe_type.order = fe_type.order + add_p_level * elem->p_level();
 
           const unsigned int var_component =
             system.variable_scalar_number(var, 0);

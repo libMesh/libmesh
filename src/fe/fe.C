@@ -61,7 +61,7 @@ template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_shape_functions () const
 {
   return FE<Dim,T>::n_dofs (this->elem_type,
-                            static_cast<Order>(this->fe_type.order + this->_p_level));
+                            this->fe_type.order + this->_p_level);
 }
 
 

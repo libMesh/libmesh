@@ -215,7 +215,7 @@ Real FE<2,HERMITE>::shape(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    static_cast<Order>(order + add_p_level * elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (type)
     {
@@ -292,7 +292,7 @@ Real FE<2,HERMITE>::shape_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    static_cast<Order>(order + add_p_level * elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (type)
     {
@@ -386,7 +386,7 @@ Real FE<2,HERMITE>::shape_second_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    static_cast<Order>(order + add_p_level * elem->p_level());
+    order + add_p_level*elem->p_level();
 
   switch (type)
     {

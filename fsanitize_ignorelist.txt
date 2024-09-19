@@ -5,6 +5,9 @@
 # -fsanitize=integer on clang++ 14 with g++ 12.1.0 headers
 fun:*basic_string_view*rfind*
 fun:*basic_string*compare*
+fun:*CppUnit*
+fun:*suite*
+src:*netgen/*
 src:*hashing.h
 src:*hashword.h
 src:*libHilbert*SetBits*

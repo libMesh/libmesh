@@ -200,7 +200,7 @@ Real FE<1,BERNSTEIN>::shape(const Elem * elem,
 
   return FE<1,BERNSTEIN>::shape
     (elem->type(),
-     static_cast<Order>(order + add_p_level*elem->p_level()), i, p);
+     order + add_p_level*elem->p_level(), i, p);
 }
 
 
@@ -214,7 +214,7 @@ Real FE<1,BERNSTEIN>::shape(const FEType fet,
   libmesh_assert(elem);
   return FE<1,BERNSTEIN>::shape
     (elem->type(),
-     static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, p);
+     fet.order + add_p_level*elem->p_level(), i, p);
 }
 
 
@@ -388,7 +388,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const Elem * elem,
 
   return FE<1,BERNSTEIN>::shape_deriv
     (elem->type(),
-     static_cast<Order>(order + add_p_level*elem->p_level()), i, j, p);
+     order + add_p_level*elem->p_level(), i, j, p);
 }
 
 template <>
@@ -402,7 +402,7 @@ Real FE<1,BERNSTEIN>::shape_deriv(const FEType fet,
   libmesh_assert(elem);
   return FE<1,BERNSTEIN>::shape_deriv
     (elem->type(),
-     static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+     fet.order + add_p_level*elem->p_level(), i, j, p);
 }
 
 
@@ -601,7 +601,7 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const Elem * elem,
 
   return FE<1,BERNSTEIN>::shape_second_deriv
     (elem->type(),
-     static_cast<Order>(order + add_p_level*elem->p_level()), i, j, p);
+     order + add_p_level*elem->p_level(), i, j, p);
 }
 
 template <>
@@ -615,7 +615,7 @@ Real FE<1,BERNSTEIN>::shape_second_deriv(const FEType fet,
   libmesh_assert(elem);
   return FE<1,BERNSTEIN>::shape_second_deriv
     (elem->type(),
-     static_cast<Order>(fet.order + add_p_level * elem->p_level()), i, j, p);
+     fet.order + add_p_level*elem->p_level(), i, j, p);
 }
 
 #endif

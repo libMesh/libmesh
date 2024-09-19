@@ -77,7 +77,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    static_cast<Order>(order + add_p_level * elem->p_level());
+    order + add_p_level*elem->p_level();
 
   auto hex_remap = [i, elem] (const Point & p_in,
                               const unsigned int * hex_i0,
@@ -930,7 +930,7 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
   const ElemType type = elem->type();
 
   const Order totalorder =
-    static_cast<Order>(order + add_p_level * elem->p_level());
+    order + add_p_level*elem->p_level();
 
   libmesh_assert_less (j, 3);
 
