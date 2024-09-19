@@ -35,6 +35,7 @@
 #include "libmesh/nemesis_io.h"
 #include "libmesh/gmsh_io.h"
 #include "libmesh/fro_io.h"
+#include "libmesh/stl_io.h"
 #include "libmesh/xdr_io.h"
 #include "libmesh/vtk_io.h"
 #include "libmesh/abaqus_io.h"
@@ -234,6 +235,9 @@ void NameBasedIO::read (const std::string & name)
           else if (basename.rfind(".gmv") < basename.size())
             GMVIO(mymesh).read (new_name);
 
+          else if (basename.rfind(".stl") < basename.size())
+            STLIO(mymesh).read (new_name);
+
           else if (basename.rfind(".pvtu") < basename.size() ||
                    basename.rfind(".vtu") < basename.size())
             VTKIO(mymesh).read(new_name);
@@ -268,7 +272,8 @@ void NameBasedIO::read (const std::string & name)
                                 << "     *.off  -- OOGL OFF surface format\n" \
                                 << "     *.ogl  -- OOGL OFF surface format\n" \
                                 << "     *.oogl -- OOGL OFF surface format\n" \
-                                << "     *.pvtu  -- Paraview VTK format\n" \
+                                << "     *.pvtu -- Paraview VTK format\n" \
+                                << "     *.stl  -- STereoLithography triangulation format\n" \
                                 << "     *.ucd  -- AVS's ASCII UCD format\n" \
                                 << "     *.unv  -- I-deas Universal format\n" \
                                 << "     *.vtu  -- Paraview VTK format\n" \
@@ -393,6 +398,9 @@ void NameBasedIO::write (const std::string & name)
         else if (basename.rfind(".pvtu") < basename.size())
           VTKIO(mymesh).write (name);
 
+        else if (basename.rfind(".stl") < basename.size())
+          STLIO(mymesh).write (new_name);
+
         else
           {
             libMesh::err
@@ -411,7 +419,8 @@ void NameBasedIO::write (const std::string & name)
               << "     *.nem   -- Sandia's Nemesis format\n"
               << "     *.plt   -- Tecplot binary file\n"
               << "     *.poly  -- TetGen ASCII file\n"
-              << "     *.pvtu   -- VTK (paraview-readable) format\n"
+              << "     *.pvtu  -- VTK (paraview-readable) format\n"
+              << "     *.stl   -- STereoLithography triangulation format\n" \
               << "     *.ucd   -- AVS's ASCII UCD format\n"
               << "     *.unv   -- I-deas Universal format\n"
               << "     *.xda   -- libMesh ASCII format\n"
