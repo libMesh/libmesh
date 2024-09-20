@@ -2914,10 +2914,10 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
     } // if (rank == 0)
 }
 
-void RBEIMEvaluation::project_qp_data_vector_onto_system(System & sys,
-                                                         const std::vector<Number> & bf_data,
-                                                         const EIMVarGroupPlottingInfo & eim_vargroup,
-                                                         const std::map<std::string,std::string> & extra_options)
+void RBEIMEvaluation::project_qp_data_vector_onto_system(System & /*sys*/,
+                                                         const std::vector<Number> & /*bf_data*/,
+                                                         const EIMVarGroupPlottingInfo & /*eim_vargroup*/,
+                                                         const std::map<std::string,std::string> & /*extra_options*/)
 {
   // No-op by default, implement in subclasses if needed
 }
