@@ -594,11 +594,15 @@ public:
    * be used to provide \p bf_data after reading in data from disk,
    * for example.
    *
+   * \p extra_options can be used to pass extra information to this
+   * method, e.g. options related to how to perform the projection.
+   *
    * This is a no-op by default, implement in sub-classes if needed.
    */
   virtual void project_qp_data_vector_onto_system(System & sys,
                                                   const std::vector<Number> & bf_data,
-                                                  const EIMVarGroupPlottingInfo & eim_vargroup);
+                                                  const EIMVarGroupPlottingInfo & eim_vargroup,
+                                                  const std::map<std::string,std::string> & extra_options);
 
   /**
    * Get _eim_vars_to_project_and_write.
