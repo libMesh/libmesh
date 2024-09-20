@@ -707,8 +707,8 @@ public:
 protected:
 
   /**
-   * This vector specifies which EIM variables will be projected and written
-   * out in write_out_projected_basis_functions(). By default this is an empty
+   * This vector specifies which EIM variables we want to write to disk and/or
+   * project to nodes for plotting purposes. By default this is an empty
    * set, but can be updated in subclasses to specify the EIM variables that
    * are relevant for visualization.
    *
