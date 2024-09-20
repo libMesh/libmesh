@@ -587,25 +587,23 @@ public:
                                bool read_binary_basis_functions = true);
 
   /**
-   * Project the specified variable of \p bf_data into the solution
-   * vector of System. This method is virtual so that it can be overridden in
-   * sub-classes, e.g. to perform a specialized type of projection.
+   * Project the EIM basis function data stored in \p bf_data onto
+   * sys.solution. The intent of this function is to work with the
+   * data format provided by get_interior_basis_functions_as_vecs().
+   * That format can be easily serialized, if needed, and hence can
+   * be used to provide \p bf_data after reading in data from disk,
+   * for example.
+   *
+   * This is a no-op by default, implement in sub-classes if needed.
    */
-  virtual void project_qp_data_map_onto_system(System & sys,
-                                               const QpDataMap & bf_data,
-                                               const EIMVarGroupPlottingInfo & eim_vargroup);
+  virtual void project_qp_data_vector_onto_system(System & sys,
+                                                  const std::vector<Number> & bf_data,
+                                                  const EIMVarGroupPlottingInfo & eim_vargroup);
 
   /**
    * Get _eim_vars_to_project_and_write.
    */
   const std::vector<EIMVarGroupPlottingInfo> & get_eim_vars_to_project_and_write() const;
-
-  /**
-   * Project all basis functions using project_qp_data_map_onto_system() and
-   * then write out the resulting vectors.
-   */
-  void write_out_projected_basis_functions(EquationSystems & es,
-                                           const std::string & directory_name = "offline_data");
 
   /**
    * Get _scale_components_in_enrichment.
@@ -635,7 +633,6 @@ public:
    */
   const DenseVector<Number> & get_error_indicator_interpolation_row() const;
   void set_error_indicator_interpolation_row(const DenseVector<Number> & error_indicator_row);
-
 
   /**
    * Evaluates the EIM error indicator based on \p error_indicator_rhs, \p eim_solution,
