@@ -81,22 +81,9 @@ struct EIMVarGroupPlottingInfo
   unsigned int n_eim_vars;
 
   /**
-   * The FEType for the variables in this group.
-   */
-  FEType eim_var_fe_type;
-
-  /**
    * The name of the System we use for plotting this EIM variable group.
    */
   std::string eim_sys_name;
-
-  /**
-   * A string that specifies how we plot this variable. This string
-   * will be interpreted as needed in subclasses that perform the
-   * plotting. Some plotting options are whether we extrapolate data
-   * or copy data from qps to nodes.
-   */
-  std::string plotting_type;
 
   /**
    * These booleans indicate if we should clamp the resulting output
