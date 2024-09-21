@@ -215,6 +215,7 @@ BUILT_SOURCES = \
         postscript_io.h \
         replicated_mesh.h \
         serial_mesh.h \
+        stl_io.h \
         sync_refinement_flags.h \
         tecplot_io.h \
         tetgen_io.h \
@@ -1226,6 +1227,9 @@ replicated_mesh.h: $(top_srcdir)/include/mesh/replicated_mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 serial_mesh.h: $(top_srcdir)/include/mesh/serial_mesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+stl_io.h: $(top_srcdir)/include/mesh/stl_io.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sync_refinement_flags.h: $(top_srcdir)/include/mesh/sync_refinement_flags.h

@@ -60,7 +60,7 @@ public:
    * Copy-constructor.  This should be able to take a
    * serial or parallel mesh.
    */
-  ReplicatedMesh (const UnstructuredMesh & other_mesh);
+  ReplicatedMesh (const MeshBase & other_mesh);
 
   /**
    * Copy-constructor, possibly specialized for a

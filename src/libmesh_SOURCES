@@ -236,6 +236,7 @@ libmesh_SOURCES =  \
         src/mesh/poly2tri_triangulator.C \
         src/mesh/postscript_io.C \
         src/mesh/replicated_mesh.C \
+        src/mesh/stl_io.C \
         src/mesh/tecplot_io.C \
         src/mesh/tetgen_io.C \
         src/mesh/triangulator_interface.C \

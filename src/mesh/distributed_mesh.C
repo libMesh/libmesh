@@ -193,7 +193,7 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
 
 
 
-DistributedMesh::DistributedMesh (const UnstructuredMesh & other_mesh) :
+DistributedMesh::DistributedMesh (const MeshBase & other_mesh) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
   _is_serial_on_proc_0(other_mesh.is_serial()),
   _deleted_coarse_elements(true), // better safe than sorry...

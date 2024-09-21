@@ -64,6 +64,12 @@ public:
   UnstructuredMesh(const UnstructuredMesh &) = default;
 
   /**
+   * UnstructuredMesh constructor from arbitrary (e.g. Cartesian
+   * someday?) meshes
+   */
+  UnstructuredMesh(const MeshBase &);
+
+  /**
    * Move-constructor deleted in MeshBase.
    */
   UnstructuredMesh(UnstructuredMesh &&) = delete;
