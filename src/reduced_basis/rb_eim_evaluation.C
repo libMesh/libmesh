@@ -1069,6 +1069,10 @@ write_out_interior_basis_functions(const std::string & directory_name,
   // Write values from processor 0 only.
   if (this->processor_id() == 0)
     {
+      std::vector<unsigned int> n_qp_per_elem;
+      auto interior_basis_function_sizes =
+        get_interior_basis_function_sizes(n_qp_per_elem);
+
       // Make a directory to store all the data files
       Utility::mkdir(directory_name.c_str());
 
@@ -1083,82 +1087,171 @@ write_out_interior_basis_functions(const std::string & directory_name,
       // Write number of basis functions to file. Note: the
       // Xdr::data() function takes non-const references, so you can't
       // pass e.g. vec.size() to that interface.
-      auto n_bf = _local_eim_basis_functions.size();
+      auto n_bf = libmesh_map_find(interior_basis_function_sizes,"n_bf");
       xdr.data(n_bf, "# Number of basis functions");
 
       // We assume that each basis function has data for the same
       // number of elements as basis function 0, which is equal to the
       // size of the map.
-      auto n_elem = _local_eim_basis_functions[0].size();
+      auto n_elem = libmesh_map_find(interior_basis_function_sizes,"n_elem");
       xdr.data(n_elem, "# Number of elements");
 
       // We assume that each element has the same number of variables,
       // and we get the number of vars from the first element of the
       // first basis function.
-      auto n_vars = _local_eim_basis_functions[0].begin()->second.size();
+      auto n_vars = libmesh_map_find(interior_basis_function_sizes,"n_vars");
       xdr.data(n_vars, "# Number of variables");
 
       // We assume that the list of elements for each basis function
       // is the same as basis function 0. We also assume that all vars
       // have the same number of qps.
-      std::vector<unsigned int> n_qp_per_elem;
-      n_qp_per_elem.reserve(n_elem);
-      dof_id_type expected_elem_id = 0;
-      for (const auto & [actual_elem_id, array] : _local_eim_basis_functions[0])
-        {
-          // Note: Currently we require that the Elems are numbered
-          // contiguously from [0..n_elem).  This allows us to avoid
-          // writing the Elem ids to the Xdr file, but if we need to
-          // generalize this assumption later, we can.
-          libmesh_error_msg_if(actual_elem_id != expected_elem_id++,
-                               "RBEIMEvaluation currently assumes a contiguous Elem numbering starting from 0.");
-
-          // array[n_vars][n_qp] per Elem. We get the number of QPs
-          // for variable 0, assuming they are all the same.
-          n_qp_per_elem.push_back(array[0].size());
-        }
       xdr.data(n_qp_per_elem, "# Number of QPs per Elem");
 
       // The total amount of qp data for each var is the sum of the
       // entries in the "n_qp_per_elem" array.
-      auto n_qp_data =
-        std::accumulate(n_qp_per_elem.begin(),
-                        n_qp_per_elem.end(),
-                        0u);
-
-      // Reserve space to store contiguous vectors of qp data for each var
-      std::vector<std::vector<Number>> qp_data(n_vars);
-      for (auto var : index_range(qp_data))
-        qp_data[var].reserve(n_qp_data);
+      auto n_qp_data = libmesh_map_find(interior_basis_function_sizes,"n_qp_data");
 
       // Now we construct a vector for each basis function, for each
       // variable which is ordered according to:
       // [ [qp vals for Elem 0], [qp vals for Elem 1], ... [qp vals for Elem N] ]
       // and write it to file.
-      for (auto bf : index_range(_local_eim_basis_functions))
+      for (auto bf_index : index_range(_local_eim_basis_functions))
         {
-          // Clear any data from previous bf
-          for (auto var : index_range(qp_data))
-            qp_data[var].clear();
-
-          for (const auto & pr : _local_eim_basis_functions[bf])
-            {
-              // array[n_vars][n_qp] per Elem
-              const auto & array = pr.second;
-              for (auto var : index_range(array))
-                {
-                  // Insert all qp values for this var
-                  qp_data[var].insert(/*insert at*/qp_data[var].end(),
-                                      /*data start*/array[var].begin(),
-                                      /*data end*/array[var].end());
-                }
-            }
+          auto qp_data = get_interior_basis_function_as_vec_helper(n_vars, n_qp_data, bf_index);
 
           // Write all the var values for this bf
           for (auto var : index_range(qp_data))
             xdr.data_stream(qp_data[var].data(), qp_data[var].size(), /*line_break=*/qp_data[var].size());
         }
     }
+}
+
+std::map<std::string,std::size_t> RBEIMEvaluation::
+get_interior_basis_function_sizes(std::vector<unsigned int> & n_qp_per_elem)
+{
+  std::map<std::string,std::size_t> interior_basis_function_sizes;
+
+  // Write number of basis functions to file. Note: the
+  // Xdr::data() function takes non-const references, so you can't
+  // pass e.g. vec.size() to that interface.
+  auto n_bf = _local_eim_basis_functions.size();
+  interior_basis_function_sizes["n_bf"] = n_bf;
+
+  // We assume that each basis function has data for the same
+  // number of elements as basis function 0, which is equal to the
+  // size of the map.
+  auto n_elem = _local_eim_basis_functions[0].size();
+  interior_basis_function_sizes["n_elem"] = n_elem;
+
+  // We assume that each element has the same number of variables,
+  // and we get the number of vars from the first element of the
+  // first basis function.
+  auto n_vars = _local_eim_basis_functions[0].begin()->second.size();
+  interior_basis_function_sizes["n_vars"] = n_vars;
+
+  // We assume that the list of elements for each basis function
+  // is the same as basis function 0. We also assume that all vars
+  // have the same number of qps.
+  n_qp_per_elem.clear();
+  n_qp_per_elem.reserve(n_elem);
+  dof_id_type expected_elem_id = 0;
+  for (const auto & [actual_elem_id, array] : _local_eim_basis_functions[0])
+    {
+      // Note: Currently we require that the Elems are numbered
+      // contiguously from [0..n_elem).  This allows us to avoid
+      // writing the Elem ids to the Xdr file, but if we need to
+      // generalize this assumption later, we can.
+      libmesh_error_msg_if(actual_elem_id != expected_elem_id++,
+                            "RBEIMEvaluation currently assumes a contiguous Elem numbering starting from 0.");
+
+      // array[n_vars][n_qp] per Elem. We get the number of QPs
+      // for variable 0, assuming they are all the same.
+      n_qp_per_elem.push_back(array[0].size());
+    }
+
+  // The total amount of qp data for each var is the sum of the
+  // entries in the "n_qp_per_elem" array.
+  auto n_qp_data =
+    std::accumulate(n_qp_per_elem.begin(),
+                    n_qp_per_elem.end(),
+                    0u);
+  interior_basis_function_sizes["n_qp_data"] = n_qp_data;
+
+  return interior_basis_function_sizes;
+}
+
+std::vector<std::vector<Number>> RBEIMEvaluation::
+get_interior_basis_function_as_vec_helper(
+  unsigned int n_vars,
+  unsigned int n_qp_data,
+  unsigned int bf_index)
+{
+  LOG_SCOPE("get_interior_basis_function_as_vec_helper()", "RBEIMEvaluation");
+
+  std::vector<std::vector<Number>> qp_data(n_vars);
+
+  // Reserve enough capacity in qp_data in order to do the insertions below
+  // without further memory allocation.
+  for (auto var : index_range(qp_data))
+    qp_data[var].reserve(n_qp_data);
+
+  // Now we construct a vector for each basis function, for each
+  // variable which is ordered according to:
+  // [ [qp vals for Elem 0], [qp vals for Elem 1], ... [qp vals for Elem N] ]
+  // and write it to file.
+
+  libmesh_error_msg_if(bf_index >= _local_eim_basis_functions.size(), "bf_index not valid");
+  for (const auto & pr : _local_eim_basis_functions[bf_index])
+    {
+      // array[n_vars][n_qp] per Elem
+      const auto & array = pr.second;
+      for (auto var : index_range(array))
+        {
+          // Insert all qp values for this var
+          qp_data[var].insert(/*insert at*/qp_data[var].end(),
+                              /*data start*/array[var].begin(),
+                              /*data end*/array[var].end());
+        }
+    }
+
+  return qp_data;
+}
+
+std::vector<std::vector<std::vector<Number>>> RBEIMEvaluation::
+get_interior_basis_functions_as_vecs()
+{
+  LOG_SCOPE("get_interior_basis_function_as_vec()", "RBEIMEvaluation");
+
+  std::vector<std::vector<std::vector<Number>>> interior_basis_functions;
+
+  // Quick return if there is no work to do. Note: make sure all procs
+  // agree there is no work to do.
+  bool is_empty = _local_eim_basis_functions.empty();
+  this->comm().verify(is_empty);
+
+  if (is_empty)
+    return interior_basis_functions;
+
+  // Gather basis function data from other procs, storing it in
+  // _local_eim_basis_functions, so that we can then print everything
+  // from processor 0.
+  this->gather_bfs();
+
+  if (this->processor_id() == 0)
+    {
+      std::vector<unsigned int> n_qp_per_elem;
+      std::map<std::string,std::size_t> interior_basis_function_sizes =
+        get_interior_basis_function_sizes(n_qp_per_elem);
+
+      for (auto bf_index : index_range(_local_eim_basis_functions))
+        interior_basis_functions.emplace_back(
+          get_interior_basis_function_as_vec_helper(
+            libmesh_map_find(interior_basis_function_sizes,"n_vars"),
+            libmesh_map_find(interior_basis_function_sizes,"n_qp_data"),
+            bf_index));
+    }
+
+  return interior_basis_functions;
 }
 
 void RBEIMEvaluation::
@@ -2869,146 +2962,17 @@ void RBEIMEvaluation::node_distribute_bfs(const System & sys)
     } // if (rank == 0)
 }
 
-void RBEIMEvaluation::project_qp_data_map_onto_system(System & sys,
-                                                      const QpDataMap & qp_data_map,
-                                                      const EIMVarGroupPlottingInfo & eim_vargroup)
+void RBEIMEvaluation::project_qp_data_vector_onto_system(System & /*sys*/,
+                                                         const std::vector<Number> & /*bf_data*/,
+                                                         const EIMVarGroupPlottingInfo & /*eim_vargroup*/,
+                                                         const std::map<std::string,std::string> & /*extra_options*/)
 {
-  LOG_SCOPE("project_basis_function_onto_system()", "RBEIMEvaluation");
-
-  libmesh_error_msg_if(sys.n_vars() == 0, "System must have at least one variable");
-
-  // TODO: Currently only implemented for the case of one variable in a variable group
-  unsigned int var = eim_vargroup.first_eim_var_index;
-
-  FEMContext context(sys);
-  {
-    // Pre-request relevant data for all dimensions
-    for (unsigned int dim=1; dim<=3; ++dim)
-      if (sys.get_mesh().elem_dimensions().count(dim))
-        for (auto init_var : make_range(sys.n_vars()))
-        {
-          auto fe = context.get_element_fe(init_var, dim);
-          fe->get_JxW();
-          fe->get_phi();
-        }
-  }
-
-  FEBase * elem_fe = nullptr;
-  context.get_element_fe( 0, elem_fe );
-  const std::vector<Real> & JxW = elem_fe->get_JxW();
-  const std::vector<std::vector<Real>> & phi = elem_fe->get_phi();
-
-  // Get a reference to the current_local_solution vector, which has
-  // GHOSTED DOFs. Make sure it is initially zeroed, since we will now
-  // accumulate values into it.
-  auto & current_local_soln = *(sys.current_local_solution);
-  current_local_soln.zero();
-
-  // The repeat_count vector will store the number of times a
-  // projected value has been assigned to a node. We get a reference
-  // to it for convenience in the code below.
-  std::unique_ptr<NumericVector<Number>> repeat_count_ptr = current_local_soln.zero_clone();
-  auto & repeat_count = *repeat_count_ptr;
-
-  for (const auto & elem : sys.get_mesh().active_local_element_ptr_range())
-    {
-      context.pre_fe_reinit(sys, elem);
-      context.elem_fe_reinit();
-
-      const std::vector<dof_id_type> & dof_indices = context.get_dof_indices(/*var=*/0);
-      unsigned int n_proj_dofs = dof_indices.size();
-      unsigned int n_qpoints = context.get_element_qrule().n_points();
-
-      const std::vector<std::vector<Number>> & var_and_qp_data = libmesh_map_find(qp_data_map, elem->id());
-      libmesh_error_msg_if(var >= var_and_qp_data.size(), "Invalid EIM variable number: " << var);
-      const std::vector<Number> & qp_data = var_and_qp_data[var];
-
-      // If qp_data doesn't match n_qpoints then we skip this element since this means
-      // that the EIM basis function is not applicable on this element. This can happen,
-      // for example, if we have 1D and 3D elements in the same mesh and the EIM basis
-      // functions have been set up for the 3D elements only. Note that the EIM is
-      // necessarily dependent on the element dimension since it is based on the number
-      // of quad. points per element. If multiple dimensions need to be supported then
-      // one can add a separate EIM for each dimension.
-      if (qp_data.size() != n_qpoints)
-        continue;
-
-      DenseMatrix<Number> Me(n_proj_dofs, n_proj_dofs);
-      DenseVector<Number> Fe(n_proj_dofs);
-      for (auto qp : make_range(n_qpoints))
-        for (auto i : make_range(n_proj_dofs))
-          {
-            Fe(i) += JxW[qp] * qp_data[qp] * phi[i][qp];
-
-            for (auto j : make_range(n_proj_dofs))
-              Me(i,j) += JxW[qp] * phi[i][qp] * phi[j][qp];
-          }
-
-      DenseVector<Number> projected_data;
-      Me.cholesky_solve(Fe, projected_data);
-
-      for (auto i : make_range(n_proj_dofs))
-        {
-          current_local_soln.add(dof_indices[i], projected_data(i));
-          repeat_count.add(dof_indices[i], 1.);
-        }
-    }
-
-  current_local_soln.close();
-  repeat_count.close();
-
-  // Average the projected QP values to get nodal values
-  current_local_soln /= repeat_count;
-  current_local_soln.close();
-
-  // Copy values from the GHOSTED current_local_solution vector into
-  // sys.solution, since that is what will ultimately be plotted/used
-  // by other parts of the code.
-  (*sys.solution) = current_local_soln;
+  // No-op by default, implement in subclasses if needed
 }
 
 const std::vector<EIMVarGroupPlottingInfo> & RBEIMEvaluation::get_eim_vars_to_project_and_write() const
 {
   return _eim_vars_to_project_and_write;
-}
-
-void RBEIMEvaluation::write_out_projected_basis_functions(EquationSystems & es,
-                                                          const std::string & directory_name)
-{
-  if (get_eim_vars_to_project_and_write().empty())
-    return;
-
-  unsigned int var_group_idx = 0;
-  for (const auto & eim_vargroup : get_eim_vars_to_project_and_write())
-    {
-      std::vector<std::unique_ptr<NumericVector<Number>>> projected_bfs;
-
-      const auto & sys_name = eim_vargroup.eim_sys_name;
-      System & sys = es.get_system(sys_name);
-
-      for (unsigned int bf_index : make_range(get_n_basis_functions()))
-        {
-          project_qp_data_map_onto_system(
-            sys,
-            get_basis_function(bf_index),
-            eim_vargroup);
-
-          projected_bfs.emplace_back(sys.solution->clone());
-        }
-
-      // Create projected_bfs_ptrs so that we can call RBEvaluation::write_out_vectors()
-      std::vector<NumericVector<Number>*> projected_bfs_ptrs(projected_bfs.size());
-      for (unsigned int i : index_range(projected_bfs))
-        {
-          projected_bfs_ptrs[i] = projected_bfs[i].get();
-        }
-
-      RBEvaluation::write_out_vectors(sys,
-                                      projected_bfs_ptrs,
-                                      directory_name,
-                                      "projected_bf_vargroup_" + std::to_string(var_group_idx));
-      var_group_idx++;
-    }
 }
 
 const std::set<unsigned int> & RBEIMEvaluation::scale_components_in_enrichment() const

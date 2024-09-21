@@ -81,22 +81,9 @@ struct EIMVarGroupPlottingInfo
   unsigned int n_eim_vars;
 
   /**
-   * The FEType for the variables in this group.
-   */
-  FEType eim_var_fe_type;
-
-  /**
    * The name of the System we use for plotting this EIM variable group.
    */
   std::string eim_sys_name;
-
-  /**
-   * A string that specifies how we plot this variable. This string
-   * will be interpreted as needed in subclasses that perform the
-   * plotting. Some plotting options are whether we extrapolate data
-   * or copy data from qps to nodes.
-   */
-  std::string plotting_type;
 
   /**
    * These booleans indicate if we should clamp the resulting output
@@ -596,25 +583,27 @@ public:
                                bool read_binary_basis_functions = true);
 
   /**
-   * Project the specified variable of \p bf_data into the solution
-   * vector of System. This method is virtual so that it can be overridden in
-   * sub-classes, e.g. to perform a specialized type of projection.
+   * Project the EIM basis function data stored in \p bf_data onto
+   * sys.solution. The intent of this function is to work with the
+   * data format provided by get_interior_basis_functions_as_vecs().
+   * That format can be easily serialized, if needed, and hence can
+   * be used to provide \p bf_data after reading in data from disk,
+   * for example.
+   *
+   * \p extra_options can be used to pass extra information to this
+   * method, e.g. options related to how to perform the projection.
+   *
+   * This is a no-op by default, implement in sub-classes if needed.
    */
-  virtual void project_qp_data_map_onto_system(System & sys,
-                                               const QpDataMap & bf_data,
-                                               const EIMVarGroupPlottingInfo & eim_vargroup);
+  virtual void project_qp_data_vector_onto_system(System & sys,
+                                                  const std::vector<Number> & bf_data,
+                                                  const EIMVarGroupPlottingInfo & eim_vargroup,
+                                                  const std::map<std::string,std::string> & extra_options);
 
   /**
    * Get _eim_vars_to_project_and_write.
    */
   const std::vector<EIMVarGroupPlottingInfo> & get_eim_vars_to_project_and_write() const;
-
-  /**
-   * Project all basis functions using project_qp_data_map_onto_system() and
-   * then write out the resulting vectors.
-   */
-  void write_out_projected_basis_functions(EquationSystems & es,
-                                           const std::string & directory_name = "offline_data");
 
   /**
    * Get _scale_components_in_enrichment.
@@ -645,7 +634,6 @@ public:
   const DenseVector<Number> & get_error_indicator_interpolation_row() const;
   void set_error_indicator_interpolation_row(const DenseVector<Number> & error_indicator_row);
 
-
   /**
    * Evaluates the EIM error indicator based on \p error_indicator_rhs, \p eim_solution,
    * and _error_indicator_interpolation_row. We also pass in \p eim_rhs since this is
@@ -664,6 +652,25 @@ public:
    * Get the VectorizedEvalInput data.
    */
   const VectorizedEvalInput & get_vec_eval_input() const;
+
+  /**
+   * Get all interior basis functions in the form of std::vectors.
+   * This can provide a convenient format for processing the basis
+   * function data, or writing it to disk.
+   *
+   * Indexing is as follows:
+   *  basis function index --> variable index --> data at qps per elems
+   *
+   * In parallel we gather basis functions to processor 0 and hence
+   * we only return non-empty data on processor 0.
+   */
+  std::vector<std::vector<std::vector<Number>>> get_interior_basis_functions_as_vecs();
+
+  /**
+   * Get data that defines the sizes of interior EIM basis functions.
+   */
+  std::map<std::string,std::size_t>
+    get_interior_basis_function_sizes(std::vector<unsigned int> & n_qp_per_elem);
 
   /**
    * Here we store an enum that defines the type of EIM error indicator
@@ -700,8 +707,8 @@ public:
 protected:
 
   /**
-   * This vector specifies which EIM variables will be projected and written
-   * out in write_out_projected_basis_functions(). By default this is an empty
+   * This vector specifies which EIM variables we want to write to disk and/or
+   * project to nodes for plotting purposes. By default this is an empty
    * set, but can be updated in subclasses to specify the EIM variables that
    * are relevant for visualization.
    *
@@ -769,6 +776,15 @@ private:
   void read_in_node_basis_functions(const System & sys,
                                     const std::string & directory_name,
                                     bool read_binary_basis_functions);
+
+  /**
+   * Helper function called by write_out_interior_basis_functions() to
+   * get basis function \p bf_index stored as a std::vector per variable.
+   */
+  std::vector<std::vector<Number>> get_interior_basis_function_as_vec_helper(
+    unsigned int n_vars,
+    unsigned int n_qp_data,
+    unsigned int bf_index);
 
   /**
    * The EIM solution coefficients from the most recent call to rb_eim_solves().
