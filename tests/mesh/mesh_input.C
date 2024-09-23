@@ -201,6 +201,7 @@ public:
 
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testGoodSTL );
+  CPPUNIT_TEST( testGoodSTLBinary );
 
 #ifdef LIBMESH_HAVE_TETGEN
   CPPUNIT_TEST( testTetgenIO );
@@ -1574,6 +1575,22 @@ public:
     MeshCommunication().broadcast(mesh);
 
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(40));
+  }
+
+  void testGoodSTLBinary ()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    STLIO stl_io(mesh);
+
+    if (mesh.processor_id() == 0)
+      stl_io.read("meshes/engraving.stl");
+    MeshCommunication().broadcast(mesh);
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(426));
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(215));
   }
 
   void testTetgenIO ()
