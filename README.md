@@ -93,3 +93,7 @@ command line option is used at `configure` time.
 
 ## License
 LibMesh is open source software distributed under the LGPL license, version 2.1.
+
+### Contributors
+
+<img src="https://markupgo.com/github/libMesh/libmesh/contributors?count=0&circleSize=40&circleRadius=40&center=true" width="100%" /> 
