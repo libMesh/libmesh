@@ -106,7 +106,7 @@ namespace libMesh
     void clear();
 
     void init_and_attach_petscdm(System & system, SNES snes);
-    void init_and_attach_petscdm(System & system, KSP snes);
+    void init_and_attach_petscdm(System & system, KSP ksp);
 
   private:
     /**
