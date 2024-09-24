@@ -87,13 +87,8 @@ Real exact_solution(const Real x, const Real y, const Real z = 0.);
 int
 main(int argc, char ** argv)
 {
-  std::vector<char *> mod_argv(argv, argv + argc);
-  const char * sc_arg = "--Poisson2-static-condensation";
-  mod_argv.push_back(new char[std::strlen(sc_arg) + 1]);
-  std::strcpy(mod_argv.back(), sc_arg);
-
   // Initialize libraries, like in example 2.
-  LibMeshInit init(argc + 1, mod_argv.data());
+  LibMeshInit init(argc, argv);
 
   // This example requires a linear solver package.
   libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
@@ -154,6 +149,7 @@ main(int argc, char ** argv)
   auto & sc_sys = equation_systems.add_system<LinearImplicitSystem>("Poisson2");
   sc_sys.add_variable("u", SECOND);
   sc_sys.attach_assemble_function(assemble_poisson);
+  sc_sys.create_static_condensation();
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -182,9 +178,6 @@ main(int argc, char ** argv)
   VTKIO(mesh).write_equation_systems("out.pvtu", equation_systems);
 
 #endif // #ifdef LIBMESH_HAVE_VTK
-
-  for (const auto i : make_range(argc, argc + 1))
-    delete[] mod_argv[i];
 
   // All done.
   return 0;

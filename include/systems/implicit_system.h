@@ -337,9 +337,13 @@ public:
   mutable std::unique_ptr<LinearSolver<Number>> linear_solver;
 
   /**
-   * Retrieve the static condensation class. Errors if the user has not
-   * requested it on the command line, so calls to this should be guarded by
-   * checking \p has_static_condensation()
+   * Request that static condensation be performed for this system
+   */
+  virtual void create_static_condensation();
+
+  /**
+   * Retrieve the static condensation class. Errors if \p create_static_condensation() has not been
+   * called prior, so calls to this should be guarded by checking \p has_static_condensation()
    */
   StaticCondensation & get_static_condensation();
 

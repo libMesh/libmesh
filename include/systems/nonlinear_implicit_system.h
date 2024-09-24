@@ -316,6 +316,7 @@ public:
    */
   unsigned get_current_nonlinear_iteration_number() const;
 
+  virtual void create_static_condensation() override;
 
 protected:
 

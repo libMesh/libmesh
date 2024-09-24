@@ -181,6 +181,8 @@ public:
    */
   ShellMatrix<Number> * get_shell_matrix() { return _shell_matrix; }
 
+  virtual void create_static_condensation() override;
+
 protected:
 
   /**

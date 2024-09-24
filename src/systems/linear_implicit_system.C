@@ -49,13 +49,19 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems & es,
   // going to keep using it basically the way we did before it was
   // moved.
   linear_solver = LinearSolver<Number>::build(es.comm());
-  if (_sc)
-    linear_solver->attach_preconditioner(&_sc->get_preconditioner());
 }
 
 
 
 LinearImplicitSystem::~LinearImplicitSystem () = default;
+
+
+
+void LinearImplicitSystem::create_static_condensation()
+{
+  Parent::create_static_condensation();
+  linear_solver->attach_preconditioner(&_sc->get_preconditioner());
+}
 
 
 

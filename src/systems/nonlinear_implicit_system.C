@@ -68,6 +68,14 @@ NonlinearImplicitSystem::~NonlinearImplicitSystem () = default;
 
 
 
+void NonlinearImplicitSystem::create_static_condensation()
+{
+  Parent::create_static_condensation();
+  nonlinear_solver->attach_preconditioner(&_sc->get_preconditioner());
+}
+
+
+
 void NonlinearImplicitSystem::clear ()
 {
   // clear the nonlinear solver
