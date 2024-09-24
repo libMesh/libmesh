@@ -181,7 +181,7 @@ extern "C"
     sys.update();
     X.swap(X_sys);
 
-    // Let's also wrap pc and h in PetscMatrixBase objects for convenience
+    // Let's also wrap pc and h in PetscMatrix objects for convenience
     PetscMatrix<Number> PC(pc, sys.comm());
     PetscMatrix<Number> hessian(h, sys.comm());
     PC.attach_dof_map(sys.get_dof_map());
@@ -293,7 +293,7 @@ extern "C"
     sys.update();
     X.swap(X_sys);
 
-    // Let's also wrap J and Jpre in PetscMatrixBase objects for convenience
+    // Let's also wrap J and Jpre in PetscMatrix objects for convenience
     PetscMatrix<Number> J_petsc(J, sys.comm());
     PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
@@ -398,7 +398,7 @@ extern "C"
     sys.update();
     X.swap(X_sys);
 
-    // Let's also wrap J and Jpre in PetscMatrixBase objects for convenience
+    // Let's also wrap J and Jpre in PetscMatrix objects for convenience
     PetscMatrix<Number> J_petsc(J, sys.comm());
     PetscMatrix<Number> Jpre_petsc(Jpre, sys.comm());
 
