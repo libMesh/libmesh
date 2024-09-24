@@ -195,33 +195,6 @@ private:
   void backwards_substitution(const NumericVector<Number> & full_rhs,
                               NumericVector<Number> & full_sol);
 
-  static void total_dofs_from_scalar_dofs(std::vector<dof_id_type> & dofs,
-                                          const std::vector<dof_id_type> & scalar_dofs);
-
-  static void condensed_dofs_from_scalar_dofs(std::vector<dof_id_type> & /*condensed_dofs*/,
-                                              const std::vector<dof_id_type> & /*scalar_dofs*/);
-
-  static void uncondensed_dofs_from_scalar_dofs(std::vector<dof_id_type> & uncondensed_dofs,
-                                                const std::vector<dof_id_type> & scalar_dofs);
-
-  static void total_dofs_from_field_dof(std::vector<dof_id_type> & dofs,
-                                        const Elem & /*elem*/,
-                                        const unsigned int /*node_num*/,
-                                        const unsigned int /*var_num*/,
-                                        const dof_id_type field_dof);
-
-  void condensed_dofs_from_field_dof(std::vector<dof_id_type> & condensed_dofs,
-                                     const Elem & elem,
-                                     const unsigned int node_num,
-                                     const unsigned int var_num,
-                                     const dof_id_type field_dof) const;
-
-  void uncondensed_dofs_from_field_dof(std::vector<dof_id_type> & uncondensed_dofs,
-                                       const Elem & elem,
-                                       const unsigned int node_num,
-                                       const unsigned int var_num,
-                                       const dof_id_type field_dof) const;
-
   struct LocalData
   {
     /// condensed-condensed matrix entries
