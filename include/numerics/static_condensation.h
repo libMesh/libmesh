@@ -186,15 +186,35 @@ public:
   StaticCondensationPreconditioner & get_preconditioner() { return *_scp; }
 
 private:
+  /**
+   * Retrieves the degree of freedom values from \p global_vector corresponding to \p
+   * elem_dof_indices, filling both \p elem_dof_values_vec and \p elem_dof_values
+   */
   static void set_local_vectors(const NumericVector<Number> & global_vector,
                                 const std::vector<dof_id_type> & elem_dof_indices,
                                 std::vector<Number> & elem_dof_values_vec,
                                 EigenVector & elem_dof_values);
 
+  /**
+   * Takes an incoming "full" RHS from the solver, where full means the union of uncondensed and
+   * condennsed dofs, and condenses it down into the condensed \p _reduced_rhs data member using
+   * element Schur complements
+   */
   void forward_elimination(const NumericVector<Number> & full_rhs);
+
+  /**
+   * After performing the solve with the \p _reduced_rhs and Schur complement matrix (\p
+   * _reduced_sys_mat) to determine the \p _reduced_sol, we use the uncondensed \p full_rhs along
+   * with the \p _reduced_sol to back substitute into the \p full_sol, which is the final output
+   * data of the static condensation preconditioner application
+   */
   void backwards_substitution(const NumericVector<Number> & full_rhs,
                               NumericVector<Number> & full_sol);
 
+  /**
+   * Data stored on a per-element basis used to compute element Schur complements and their
+   * applications to vectors
+   */
   struct LocalData
   {
     /// condensed-condensed matrix entries
@@ -214,20 +234,43 @@ private:
     /// sized problem, but we will swap it out by the time we are done initializing
     std::vector<dof_id_type> reduced_space_indices;
 
+    /// A map from the global degree of freedom number for the full system (condensed + uncondensed)
+    /// to an element local number. If this map is queried with a condensed dof, nothing will be
+    /// found. The size of this container will be the number of uncondensed degrees of freedom whose
+    /// basis functions are nonzero on the element
     std::unordered_map<dof_id_type, dof_id_type> uncondensed_global_to_local_map;
+    /// A map from the global degree of freedom number for the full system (condensed + uncondensed)
+    /// to an element local number. If this map is queried with an uncondensed dof, nothing will be
+    /// found. The size of this container will be the number of condensed degrees of freedom whose
+    /// basis functions are nonzero on the element
     std::unordered_map<dof_id_type, dof_id_type> condensed_global_to_local_map;
   };
 
+  /// A map from element ID to Schur complement data
   std::unordered_map<dof_id_type, LocalData> _elem_to_local_data;
+
+  /// All the uncondensed degrees of freedom (numbered in the "full" uncondensed + condensed
+  /// space). This data member is used for creating subvectors corresponding to only uncondensed
+  /// dofs
   std::vector<dof_id_type> _local_uncondensed_dofs;
 
   const MeshBase & _mesh;
   const System & _system;
   const DofMap & _dof_map;
+
+  /// global sparse matrix for the uncondensed degrees of freedom
   std::unique_ptr<SparseMatrix<Number>> _reduced_sys_mat;
+  /// solution for the uncondensed degrees of freedom
   std::unique_ptr<NumericVector<Number>> _reduced_sol;
+  /// RHS corresponding to the uncondensed degrees of freedom. This is constructed by applying the
+  /// element Schur complements to an incoming RHS which contains both condensed and uncondensed
+  /// degrees of freedom
   std::unique_ptr<NumericVector<Number>> _reduced_rhs;
+  /// The solver for the uncondensed degrees of freedom
   std::unique_ptr<LinearSolver<Number>> _reduced_solver;
+  /// This is a ghosted representation of the full (uncondensed + condensed) solution. Note that
+  // this is, in general, *not equal* to the system solution, e.g. this may correspond to the
+  // solution for the Newton *update*
   std::unique_ptr<NumericVector<Number>> _ghosted_full_sol;
 
   /// Variables for which we will keep all dofs
