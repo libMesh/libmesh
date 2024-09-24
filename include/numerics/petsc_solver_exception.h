@@ -137,6 +137,22 @@ PETSC_BEGIN_END(VecGhostUpdate) // VecGhostUpdateBeginEnd
     LIBMESH_CHKERR2(comm, libmesh_petsc_call_ierr);                                                \
   } while (0)
 
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+#define LibmeshPetscCallExternal(func, ...)                             \
+  do {                                                                  \
+    const auto libmesh_petsc_call_external_ierr = cast_int<int>(func(__VA_ARGS__)); \
+    if (libmesh_petsc_call_external_ierr != 0)                          \
+      throw PetscSolverException(libmesh_petsc_call_external_ierr);     \
+  } while (0)
+#else
+#define LibmeshPetscCallExternal(func, ...)                             \
+  do {                                                                  \
+    const auto libmesh_petsc_call_external_ierr = cast_int<int>func(__VA_ARGS__); \
+    MPI_Abort(this->comm(), libmesh_petsc_call_external_ierr);          \
+  } while (0)
+#endif
+
+
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_PETSC
