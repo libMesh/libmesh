@@ -162,19 +162,6 @@ void PetscLinearSolver<T>::init (const char * name)
           LIBMESH_CHKERR(ierr);
         }
 
-      // Attaching a DM to KSP.
-#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
-      const auto prefix = name ? std::string(name) + "_" : std::string("");
-      const bool use_petsc_dm = libMesh::on_command_line("--" + prefix + "use_petsc_dm");
-
-      // This needs to be called before SNESSetFromOptions
-      if (use_petsc_dm)
-        {
-          libmesh_error_msg_if(!this->_system, "A System must be attached to use PETSc DM");
-          this->_dm_wrapper.init_and_attach_petscdm(*this->_system, _ksp);
-        }
-#endif
-
       // Create the preconditioner context
       ierr = KSPGetPC        (_ksp, &_pc);
       LIBMESH_CHKERR(ierr);

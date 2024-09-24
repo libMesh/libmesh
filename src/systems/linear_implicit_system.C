@@ -48,7 +48,7 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems & es,
   // linear_solver is now in the ImplicitSystem base class, but we are
   // going to keep using it basically the way we did before it was
   // moved.
-  linear_solver = LinearSolver<Number>::build(*this);
+  linear_solver = LinearSolver<Number>::build(es.comm());
   if (_sc)
     linear_solver->attach_preconditioner(&_sc->get_preconditioner());
 }

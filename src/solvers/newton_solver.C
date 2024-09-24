@@ -242,7 +242,7 @@ NewtonSolver::NewtonSolver (sys_type & s)
     track_linear_convergence(false),
     minsteplength(1e-5),
     linear_tolerance_multiplier(1e-3),
-    _linear_solver(LinearSolver<Number>::build(s))
+    _linear_solver(LinearSolver<Number>::build(s.comm()))
 {
 }
 

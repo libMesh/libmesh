@@ -79,14 +79,6 @@ public:
                                                 const SolverPackage solver_package = libMesh::default_solver_package());
 
   /**
-   * Builds a \p LinearSolver using the linear solver package specified by
-   * \p solver_package.
-   */
-  static std::unique_ptr<LinearSolver<T>> build(System & sys,
-                                                const SolverPackage solver_package = libMesh::default_solver_package());
-
-
-  /**
    * \returns \p true if the data structures are
    * initialized, false otherwise.
    */
@@ -265,22 +257,7 @@ public:
    */
   void set_solver_configuration(SolverConfiguration & solver_configuration);
 
-  /**
-   * Attach a system. This will error if if a system has already been attached
-   */
-  void attach_system(System & sys);
-
-  /**
-   * @returns the attached system
-   */
-  System & system();
-
 protected:
-  /**
-   * The system this solver is solving
-   */
-  System * _system;
-
   /**
    * Enum stating which type of iterative solver to use.
    */
@@ -383,24 +360,6 @@ LinearSolver<T>::solve (const ShellMatrix<T> & mat,
     return this->solve(mat, sol, rhs, tol, n_iter);
 }
 
-
-template <typename T>
-inline
-void
-LinearSolver<T>::attach_system(System & sys)
-{
-  libmesh_error_msg_if(_system, "System has already been attached");
-  _system = &sys;
-}
-
-template <typename T>
-inline
-System &
-LinearSolver<T>::system()
-{
-  libmesh_error_msg_if(!this->_system, "System requested but it's not attached");
-  return *this->_system;
-}
 
 } // namespace libMesh
 

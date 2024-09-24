@@ -44,7 +44,6 @@ namespace libMesh
 template <typename T>
 LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator & comm_in) :
   ParallelObject       (comm_in),
-  _system              (nullptr),
   _solver_type         (GMRES),
   _preconditioner_type (ILU_PRECOND),
   _is_initialized      (false),
@@ -95,16 +94,6 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator & comm,
     }
 
   return std::unique_ptr<LinearSolver<T>>();
-}
-
-template <typename T>
-std::unique_ptr<LinearSolver<T>>
-LinearSolver<T>::build(System & sys,
-                       const SolverPackage solver_package)
-{
-  auto solver = LinearSolver<T>::build(sys.comm(), solver_package);
-  solver->attach_system(sys);
-  return solver;
 }
 
 template <typename T>
