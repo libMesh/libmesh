@@ -740,11 +740,26 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  unsigned int n_elems = rb_eim_evaluation.get_n_elems();
+  rb_eim_evaluation_builder.setNElems(n_elems);
+  // Elem id to local index map
+  {
+    auto elem_id_to_local_index_list =
+      rb_eim_evaluation_builder.initElemIdToLocalIndex(n_elems);
+    unsigned int counter = 0;
+    for (auto const & [elem_id, local_index] : rb_eim_evaluation.get_elem_id_to_local_index_map())
+      {
+        elem_id_to_local_index_list[counter].setFirst(elem_id);
+        elem_id_to_local_index_list[counter].setSecond(local_index);
+        counter++;
+      }
+  }
+
   // Interpolation points JxW values at each qp
   {
     auto interpolation_points_list_outer =
-      rb_eim_evaluation_builder.initInterpolationJxWAllQp(n_bfs);
-    for (unsigned int i=0; i < n_bfs; ++i)
+      rb_eim_evaluation_builder.initInterpolationJxWAllQp(n_elems);
+    for (unsigned int i=0; i < n_elems; ++i)
       {
         const std::vector<Real> & JxW = rb_eim_evaluation.get_interpolation_points_JxW_all_qp(i);
         auto interpolation_points_list_inner = interpolation_points_list_outer.init(i, JxW.size());
@@ -761,9 +776,9 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
   // Interpolation points phi values at each qp
   {
     auto interpolation_points_list_outer =
-      rb_eim_evaluation_builder.initInterpolationPhiValuesAllQp(n_bfs);
+      rb_eim_evaluation_builder.initInterpolationPhiValuesAllQp(n_elems);
 
-    for (unsigned int i=0; i < n_bfs; ++i)
+    for (unsigned int i=0; i < n_elems; ++i)
       {
         const auto & phi_i_all_qp = rb_eim_evaluation.get_interpolation_points_phi_i_all_qp(i);
         auto interpolation_points_list_middle = interpolation_points_list_outer.init(i, phi_i_all_qp.size());
@@ -781,8 +796,8 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
   // Dxyzdxi at the element center for the element that contains each interpolation point.
   {
     auto dxyzdxi_elem_center =
-      rb_eim_evaluation_builder.initInterpolationDxyzDxiElem(n_bfs);
-    for (auto i : make_range(n_bfs))
+      rb_eim_evaluation_builder.initInterpolationDxyzDxiElem(n_elems);
+    for (auto i : make_range(n_elems))
       {
         add_point_to_builder(rb_eim_evaluation.get_elem_center_dxyzdxi(i), dxyzdxi_elem_center[i]);
       }
@@ -791,8 +806,8 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
   // Dxyzdeta at the element center for the element that contains each interpolation point.
   {
     auto dxyzdeta_elem_center =
-      rb_eim_evaluation_builder.initInterpolationDxyzDetaElem(n_bfs);
-    for (auto i : make_range(n_bfs))
+      rb_eim_evaluation_builder.initInterpolationDxyzDetaElem(n_elems);
+    for (auto i : make_range(n_elems))
       {
         add_point_to_builder(rb_eim_evaluation.get_elem_center_dxyzdeta(i), dxyzdeta_elem_center[i]);
       }
@@ -801,8 +816,8 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
   // Quadrature rule order associated to the element that contains each interpolation point.
   {
     auto interpolation_points_qrule_order_list =
-      rb_eim_evaluation_builder.initInterpolationQruleOrder(n_bfs);
-    for (unsigned int i=0; i<n_bfs; ++i)
+      rb_eim_evaluation_builder.initInterpolationQruleOrder(n_elems);
+    for (unsigned int i=0; i<n_elems; ++i)
       interpolation_points_qrule_order_list.set(i,
                                                 rb_eim_evaluation.get_interpolation_points_qrule_order(i));
   }
