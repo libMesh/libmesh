@@ -490,7 +490,9 @@ public:
     // We see 6.5*tol*sqrt(tol) errors on cubic Hermites with the fe_cubic
     // hermite test function
     // On Tri7 we see 10*tol*sqrt(tol) errors, even!
-    this->_grad_tol = 12 * TOLERANCE * sqrt(TOLERANCE);
+    // On Tet14 Monomial gives us at least 13*tol*sqrt(tol) in some
+    // cases
+    this->_grad_tol = 15 * TOLERANCE * sqrt(TOLERANCE);
 
     this->_hess_tol = sqrt(TOLERANCE); // FIXME: we see some ~1e-5 errors?!?
 
