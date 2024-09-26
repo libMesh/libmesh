@@ -348,9 +348,9 @@ void ExodusII_IO_Helper::init_conversion_map()
   };
 
   convert_type(NODEELEM, "SPHERE");
-  convert_type(EDGE2, "EDGE2");
-  convert_type(EDGE3, "EDGE3");
-  convert_type(EDGE4, "EDGE4");
+  convert_type(EDGE2, "BAR2");
+  convert_type(EDGE3, "BAR3");
+  convert_type(EDGE4, "BAR4");
   convert_type(QUAD4, "QUAD4");
   convert_type(QUAD8, "QUAD8");
   convert_type(QUAD9, "QUAD9");
