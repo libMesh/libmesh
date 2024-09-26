@@ -144,14 +144,10 @@ void STLIO::write (const std::string & fname)
 }
 
 
+
 void STLIO::read (const std::string & filename)
 {
   LOG_SCOPE("read()", "STLIO");
-
-#ifndef LIBMESH_HAVE_CXX11_REGEX
-  libmesh_not_implemented();  // What is your compiler?!?  Email us!
-  libmesh_ignore(filename);
-#else
 
   // This is a serial-only process for now;
   // the Mesh should be read on processor 0 and
@@ -163,6 +159,52 @@ void STLIO::read (const std::string & filename)
   mesh.clear();
   mesh.set_mesh_dimension(2);
 
+  std::unique_ptr<std::istream> fstream =
+    this->open_file(filename);
+
+  char c;
+  const char * expected_header = "solid!";
+  bool is_ascii_stl = false,
+       is_binary_stl = false;
+  while (fstream->get(c))
+    {
+      if (c == ' ')
+        continue;
+      if (c == *expected_header)
+        {
+          ++expected_header;
+          if (*expected_header == '!')
+          {
+            is_ascii_stl = true;
+            break;
+          }
+        }
+      else
+        {
+          is_binary_stl = true; // probably
+          break;
+        }
+    }
+
+  if (is_ascii_stl)
+    {
+      fstream->seekg(0);
+      this->read_ascii(*fstream);
+    }
+  else if (is_binary_stl)
+    {
+      fstream->seekg(0, std::ios_base::end);
+      std::size_t length = fstream->tellg();
+      fstream->seekg(0);
+      this->read_binary(*fstream, length);
+    }
+  else
+    libmesh_error_msg("Failed to read an STL header in " << filename);
+}
+
+
+std::unique_ptr<std::istream> STLIO::open_file (const std::string & filename)
+{
   std::string_view basename = Utility::basename_of(filename);
   const bool gzipped_file = (basename.rfind(".gz") == basename.size() - 3);
 
@@ -190,6 +232,22 @@ void STLIO::read (const std::string & filename)
       file = std::move(inf);
     }
 
+  return file;
+}
+
+
+
+void STLIO::read_ascii (std::istream & file)
+{
+  LOG_SCOPE("read_ascii()", "STLIO");
+
+#ifndef LIBMESH_HAVE_CXX11_REGEX
+  libmesh_not_implemented();  // What is your compiler?!?  Email us!
+  libmesh_ignore(file);
+#else
+
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
   const std::regex all_expected_chars
     ("^[\\w\\d\\-\\.\\^\\$]*$");
 
@@ -201,7 +259,7 @@ void STLIO::read (const std::string & filename)
   const std::regex start_facet_regex
     ("^\\s*facet");
 
-  // We'll ignore facets with normals for now
+  // We'll ignore facets' normals for now
   /*
   const std::regex facet_with_normal_regex
     ("^\\s*facet\\s+normal"
@@ -234,7 +292,7 @@ void STLIO::read (const std::string & filename)
 
   std::unordered_map<Point, Node *> mesh_points;
 
-  for (std::string line; std::getline(*file, line);)
+  for (std::string line; std::getline(file, line);)
     {
       ++line_num;
       std::smatch sm;
@@ -352,6 +410,91 @@ void STLIO::read (const std::string & filename)
     (in_vertex_loop,
      "File ended without ending an outer loop first.");
 #endif // LIBMESH_HAVE_CXX11_REGEX
+}
+
+
+
+void STLIO::read_binary (std::istream & file,
+                         std::size_t input_size)
+{
+  LOG_SCOPE("read_binary()", "STLIO");
+
+  MeshBase & mesh = MeshInput<MeshBase>::mesh();
+
+  char header_buffer[80];
+
+  // 80-character header which is generally ignored - Wikipedia
+  file.read(header_buffer, 80);
+
+  // What's our endianness here?  Input binary files are specified to
+  // be little endian, and we might need to do conversions.
+
+  uint32_t test_int = 0x87654321;
+  const bool big_endian = ((*reinterpret_cast<char *>(&test_int)) != 0x21);
+  const Utility::ReverseBytes endian_fix{big_endian};
+
+  // C++ doesn't specify a size for float, but we really need 4-byte
+  // floats here.  Fortunately basically every implementation ever
+  // uses exactly 4 bytes for float.
+  if constexpr (sizeof(float) != 4)
+    libmesh_error_msg("Trying to read 4 byte floats without 4-byte float?");
+
+  uint32_t n_elem = 0;
+
+  file.read(reinterpret_cast<char*>(&n_elem), 4);
+  endian_fix(n_elem);
+
+  libmesh_error_msg_if
+    (input_size &&
+     (input_size < 84+n_elem*50),
+     "Not enough data for " << n_elem << " STL triangles in " <<
+     input_size << " uncompressed bytes.");
+
+  std::unique_ptr<Tri3> triangle;
+  std::unordered_map<Point, Node *> mesh_points;
+
+  for (unsigned int e : make_range(n_elem))
+  {
+    libmesh_ignore(e);
+
+    triangle = std::make_unique<Tri3>();
+
+    // We'll ignore facets' normals for now
+    char ignored_buffer[12];
+    file.read(ignored_buffer, 12);
+
+    // Read vertex locations
+    for (int i : make_range(3))
+      {
+        float point_buffer[3];
+        file.read(reinterpret_cast<char*>(point_buffer), 12);
+        endian_fix(point_buffer[0]);
+        endian_fix(point_buffer[1]);
+        endian_fix(point_buffer[2]);
+        const Point p {point_buffer[0],
+                       point_buffer[1],
+                       point_buffer[2]};
+
+        Node * node;
+        if (auto it = mesh_points.find(p); it != mesh_points.end())
+          {
+            node = it->second;
+          }
+        else
+          {
+            node = mesh.add_point(p);
+            mesh_points[p] = node;
+          }
+
+        triangle->set_node(i) = node;
+      }
+
+    // The 2-byte "attribute byte count" is unstandardized; typically
+    // 0, or sometimes triangle color.  Ignore it.
+    file.read(ignored_buffer, 2);
+
+    mesh.add_elem(std::move(triangle));
+  }
 }
 
 

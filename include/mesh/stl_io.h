@@ -63,6 +63,7 @@ public:
 
   /**
    * This method implements writing a mesh to a specified file.
+   * We currently only support ASCII writes.
    */
   virtual void write (const std::string &) override;
 
@@ -72,7 +73,23 @@ public:
   virtual void read (const std::string & mesh_file) override;
 
   /**
-   * This method gets a name after a set or a read
+   * This method implements reading a mesh from a specified ASCII
+   * input stream.
+   */
+  virtual void read_ascii (std::istream & input);
+
+  /**
+   * This method implements reading a mesh from a specified binary
+   * input stream.
+   *
+   * If the size in bytes is known a priori then it can be passed in
+   * to allow for additional error checking.
+   */
+  virtual void read_binary (std::istream & input,
+                            std::size_t input_size = 0);
+
+  /**
+   * This method gets a name after a set or an ASCII read
    */
   const std::string & name () { return _name; }
 
@@ -83,7 +100,7 @@ public:
 
   /**
    * Flag indicating whether or not to subdivide second order
-   * elements
+   * elements when writing.  This option is not yet supported.
    */
   bool subdivide_second_order() { return _subdivide_second_order; }
 
@@ -91,6 +108,11 @@ public:
   { _subdivide_second_order = subdivide; }
 
 private:
+
+  /**
+   * Helper to open possibly-zipped files
+   */
+  std::unique_ptr<std::istream> open_file(const std::string & filename);
 
   /**
    * Flag to subdivide second order elements
