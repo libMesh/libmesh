@@ -117,7 +117,10 @@ void STLIO::write (const std::string & fname)
                            "Tried to write a non-triangle to an STL file");
 
       auto n = (elem->point(1)-elem->point(0)).cross(elem->point(2)-elem->point(0));
-      n = n.unit();
+
+      // Other STL files have slivers, I guess ours can too
+      if (auto length = n.norm())
+        n /= length;
 
       out_stream << "facet normal " <<
         n(0) << ' ' <<
