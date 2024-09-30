@@ -295,6 +295,7 @@ data = [
     '2024-06-04', 950, 226633, # bcb45774
     '2024-07-04', 955, 227078, # 9d64dd43
     '2024-08-04', 960, 227917, # 03d04dc2
+    '2024-09-04', 966, 228908, # cfdd6fbe
 ]
 
 # Extract the dates from the data array
@@ -337,11 +338,11 @@ ax1.grid(visible=True, axis='x', color='lightgray', linestyle='--', linewidth=1,
 ax2.grid(visible=True, axis='y', color='lightgray', linestyle='--', linewidth=1, alpha=0.25)
 
 # Plot number of files vs. time
-ax1.plot(date_nums, n_files, color=u'#4878cf', marker='o', linestyle='-', markersize=4, markevery=5)
-ax1.set_ylabel('Files (blue circles)')
+ax1.plot(date_nums, n_files, color=u'#4878cf', marker=None, linestyle='--', markersize=4, markevery=5)
+ax1.set_ylabel('Files (blue dashed)')
 
 # Set up x-tick locations
-ticks_names = ['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017', '2019', '2021', '2023']
+ticks_names = ['2003', '2007', '2011', '2015', '2019', '2023']
 
 # Get numerical values for the names
 tick_nums = []
@@ -353,8 +354,8 @@ ax1.set_xticks(tick_nums)
 ax1.set_xticklabels(ticks_names)
 
 # Plot lines of code vs. time
-ax2.plot(date_nums, np.divide(n_lines, 1000.), color=u'#6acc65', marker='s', linestyle='-', markersize=4, markevery=5)
-ax2.set_ylabel('Lines of code in thousands (green squares)')
+ax2.plot(date_nums, np.divide(n_lines, 1000.), color=u'#6acc65', marker=None, linestyle='-', markersize=4, markevery=5)
+ax2.set_ylabel('Lines of code in thousands (green solid)')
 
 # Trying to get the grid lines "under" the data using the method described here:
 # https://stackoverflow.com/questions/1726391/matplotlib-draw-grid-lines-behind-other-graph-elements
