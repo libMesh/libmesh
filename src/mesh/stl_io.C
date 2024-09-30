@@ -401,6 +401,10 @@ void STLIO::read_ascii (std::istream & file)
              "Found an 'endloop' line with no matching 'loop'.");
           in_vertex_loop = false;
 
+          if (triangle->volume() < TOLERANCE * TOLERANCE)
+            libmesh_warning
+              ("Warning: STL file contained sliver element with volume " <<
+               volume << "!\n");
           mesh.add_elem(std::move(triangle));
         }
     }
@@ -496,6 +500,10 @@ void STLIO::read_binary (std::istream & file,
     // 0, or sometimes triangle color.  Ignore it.
     file.read(ignored_buffer, 2);
 
+    if (triangle->volume() < TOLERANCE * TOLERANCE)
+      libmesh_warning
+        ("Warning: STL file contained sliver element with volume " <<
+         volume << "!\n");
     mesh.add_elem(std::move(triangle));
   }
 }
