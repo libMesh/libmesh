@@ -31,6 +31,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
+#include "libmesh/parallel_fe_type.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/point_locator_base.h"
 #include "libmesh/sparse_matrix.h"
@@ -106,6 +107,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
+  _elem_orders(other_mesh._elem_orders),
   _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
   _all_elemset_ids(other_mesh._all_elemset_ids),
   _spatial_dimension(other_mesh._spatial_dimension),
@@ -175,6 +177,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _allow_remote_element_removal = other_mesh.allow_remote_element_removal();
   _block_id_to_name = std::move(other_mesh._block_id_to_name);
   _elem_dims = std::move(other_mesh.elem_dimensions());
+  _elem_orders = std::move(other_mesh.elem_orders());
   _elemset_codes = std::move(other_mesh._elemset_codes);
   _elemset_codes_inverse_map = std::move(other_mesh._elemset_codes_inverse_map);
   _all_elemset_ids = std::move(other_mesh._all_elemset_ids),
@@ -259,6 +262,8 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (_block_id_to_name != other_mesh._block_id_to_name)
     return false;
   if (_elem_dims != other_mesh._elem_dims)
+    return false;
+  if (_elem_orders != other_mesh._elem_orders)
     return false;
   if (_mesh_subdomains != other_mesh._mesh_subdomains)
     return false;
@@ -898,8 +903,9 @@ void MeshBase::clear ()
   if (boundary_info)
     boundary_info->clear();
 
-  // Clear element dimensions
+  // Clear cached element data
   _elem_dims.clear();
+  _elem_orders.clear();
 
   _elemset_codes.clear();
   _elemset_codes_inverse_map.clear();
@@ -1059,6 +1065,18 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
                 --_elem_dims.end(), // --end() is valid if the set is non-empty
                 std::ostream_iterator<unsigned int>(oss, ", "));
       oss << cast_int<unsigned int>(*_elem_dims.rbegin());
+      oss << "}\n";
+    }
+
+  if (!_elem_orders.empty())
+    {
+      oss << "  elem_orders()={";
+      std::transform(_elem_orders.begin(),
+                     --_elem_orders.end(),
+                     std::ostream_iterator<std::string>(oss, ", "),
+                     [](Order o)
+                       { return Utility::enum_to_string<Order>(o); });
+      oss << cast_int<unsigned int>(*_elem_orders.rbegin());
       oss << "}\n";
     }
 
@@ -1687,14 +1705,16 @@ void MeshBase::cache_elem_data()
   // This requires an inspection on every processor
   parallel_object_only();
 
-  // Need to clear _elem_dims first in case all elements of a
-  // particular dimension have been deleted.
+  // Need to clear containers first in case all elements of a
+  // particular dimension/order/subdomain have been deleted.
   _elem_dims.clear();
+  _elem_orders.clear();
   _mesh_subdomains.clear();
 
   for (const auto & elem : this->active_element_ptr_range())
   {
     _elem_dims.insert(cast_int<unsigned char>(elem->dim()));
+    _elem_orders.insert(elem->default_order());
     _mesh_subdomains.insert(elem->subdomain_id());
   }
 
@@ -1702,6 +1722,7 @@ void MeshBase::cache_elem_data()
   {
     // Some different dimension elements may only live on other processors
     this->comm().set_union(_elem_dims);
+    this->comm().set_union(_elem_orders);
     this->comm().set_union(_mesh_subdomains);
   }
 

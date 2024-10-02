@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/dof_object.h" // for invalid_processor_id
+#include "libmesh/enum_order.h"
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/multi_predicates.h"
@@ -275,6 +276,13 @@ public:
    */
   const std::set<unsigned char> & elem_dimensions() const
   { return _elem_dims; }
+
+  /**
+   * \returns A const reference to a std::set of element default
+   * orders present in the mesh.
+   */
+  const std::set<Order> & elem_orders() const
+  { return _elem_orders; }
 
   /**
    * Most of the time you should not need to call this, as the element
@@ -1913,6 +1921,13 @@ protected:
    * will contain 1 and 2.
    */
   std::set<unsigned char> _elem_dims;
+
+  /**
+   * We cache the (default) order of the geometric elements present in
+   * the mesh.  E.g. if we have a mesh with TRI3 and TRI6 elements,
+   * this structure will contain FIRST and SECOND.
+   */
+  std::set<Order> _elem_orders;
 
   /**
    * We cache the subdomain ids of the elements present in the mesh.
