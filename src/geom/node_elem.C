@@ -32,9 +32,11 @@ const int NodeElem::num_sides;
 
 // ------------------------------------------------------------
 // NodeElem class member functions
+
+// We can support any "order" in 0D, really...
 Order NodeElem::default_order() const
 {
-  return FIRST;
+  return MAXIMUM;
 }
 
 
