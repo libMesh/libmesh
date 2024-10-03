@@ -166,6 +166,13 @@ bool initialized ();
 bool closed ();
 
 /**
+ * A terminate handler.  libMesh sets this to handle uncaught
+ * exceptions; it can also be called manually to print stack traces
+ * and perf logs and call MPI
+ */
+void libmesh_terminate_handler();
+
+/**
  * Toggle hardware trap floating point exceptions
  */
 void enableFPE(bool on);
