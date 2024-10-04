@@ -147,8 +147,9 @@ PETSC_BEGIN_END(VecGhostUpdate) // VecGhostUpdateBeginEnd
 #else
 #define LibmeshPetscCallExternal(func, ...)                             \
   do {                                                                  \
-    const auto libmesh_petsc_call_external_ierr = cast_int<int>func(__VA_ARGS__); \
-    MPI_Abort(this->comm(), libmesh_petsc_call_external_ierr);          \
+    const auto libmesh_petsc_call_external_ierr = cast_int<int>(func(__VA_ARGS__)); \
+    if (libmesh_petsc_call_external_ierr != 0)                          \
+      libmesh_terminate_handler();                                      \
   } while (0)
 #endif
 

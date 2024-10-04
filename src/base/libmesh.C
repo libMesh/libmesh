@@ -35,6 +35,7 @@
 #include "timpi/timpi_init.h"
 
 // C/C++ includes
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 
@@ -289,9 +290,11 @@ bool closed()
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 std::terminate_handler old_terminate_handler;
+#endif
 
 void libmesh_terminate_handler()
 {
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
   // If we have an active exception, it may have an error message that
   // we should print.
   libMesh::err << "libMesh terminating";
@@ -308,6 +311,7 @@ void libmesh_terminate_handler()
         }
     }
   libMesh::err << std::endl;
+#endif
 
   // If this got called then we're probably crashing; let's print a
   // stack trace.  The trace files that are ultimately written depend on:
@@ -350,13 +354,17 @@ void libmesh_terminate_handler()
 
   if (mpi_initialized)
     MPI_Abort(libMesh::GLOBAL_COMM_WORLD, 1);
-  else
 #endif
-    // The system terminate_handler may do useful things, or the user
-    // may have set their own terminate handler that we want to call.
-    old_terminate_handler();
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  // The system terminate_handler may do useful things, or the user
+  // may have set their own terminate handler that we want to call.
+  old_terminate_handler();
+#endif
+
+  // The last attempt to die if nothing else has killed us
+  std::abort();
 }
-#endif
 
 
 
