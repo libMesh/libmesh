@@ -44,6 +44,22 @@
 #include <regex>
 #endif
 
+namespace {
+
+void test_and_add(std::unique_ptr<libMesh::Elem> e,
+                  libMesh::MeshBase & mesh)
+{
+  const libMesh::Real volume = e->volume();
+  if (volume < libMesh::TOLERANCE * libMesh::TOLERANCE)
+    libmesh_warning
+      ("Warning: STL file contained sliver element with volume " <<
+       volume << "!\n");
+  mesh.add_elem(std::move(e));
+}
+
+}
+
+
 namespace libMesh
 {
 
@@ -401,11 +417,7 @@ void STLIO::read_ascii (std::istream & file)
              "Found an 'endloop' line with no matching 'loop'.");
           in_vertex_loop = false;
 
-          if (triangle->volume() < TOLERANCE * TOLERANCE)
-            libmesh_warning
-              ("Warning: STL file contained sliver element with volume " <<
-               volume << "!\n");
-          mesh.add_elem(std::move(triangle));
+          test_and_add(std::move(triangle), mesh);
         }
     }
 
@@ -500,11 +512,7 @@ void STLIO::read_binary (std::istream & file,
     // 0, or sometimes triangle color.  Ignore it.
     file.read(ignored_buffer, 2);
 
-    if (triangle->volume() < TOLERANCE * TOLERANCE)
-      libmesh_warning
-        ("Warning: STL file contained sliver element with volume " <<
-         volume << "!\n");
-    mesh.add_elem(std::move(triangle));
+    test_and_add(std::move(triangle), mesh);
   }
 }
 
