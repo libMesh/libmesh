@@ -20,43 +20,13 @@ using namespace libMesh;
 
 namespace {
 
-Real build_octahedron (MeshBase & mesh, bool flip_tris,
+Real build_octahedron (UnstructuredMesh & mesh, bool flip_tris,
                        Real xmin, Real xmax,
                        Real ymin, Real ymax,
                        Real zmin, Real zmax)
 {
-  const Real xavg = (xmin + xmax)/2;
-  const Real yavg = (ymin + ymax)/2;
-  const Real zavg = (zmin + zmax)/2;
-  mesh.add_point(Point(xavg,yavg,zmin), 0);
-  mesh.add_point(Point(xmax,yavg,zavg), 1);
-  mesh.add_point(Point(xavg,ymax,zavg), 2);
-  mesh.add_point(Point(xmin,yavg,zavg), 3);
-  mesh.add_point(Point(xavg,ymin,zavg), 4);
-  mesh.add_point(Point(xavg,yavg,zmax), 5);
-
-  auto add_tri = [&mesh, flip_tris](std::array<dof_id_type,3> nodes)
-  {
-    auto elem = mesh.add_elem(Elem::build(TRI3));
-    elem->set_node(0) = mesh.node_ptr(nodes[0]);
-    elem->set_node(1) = mesh.node_ptr(nodes[1]);
-    elem->set_node(2) = mesh.node_ptr(nodes[2]);
-    if (flip_tris)
-      elem->flip(&mesh.get_boundary_info());
-  };
-
-  add_tri({0,1,2});
-  add_tri({0,2,3});
-  add_tri({0,3,4});
-  add_tri({0,4,1});
-  add_tri({5,1,4});
-  add_tri({5,4,3});
-  add_tri({5,3,2});
-  add_tri({5,2,1});
-
-  // Keep node ids unchanged so we can use them later
-  mesh.allow_renumbering(false);
-  mesh.prepare_for_use();
+  MeshTools::Generation::surface_octahedron
+    (mesh, xmin, xmax, ymin, ymax, zmin, zmax);
 
   // Octahedron volume
   return (xmax-xmin)*(ymax-ymin)*(zmax-zmin)/6;
@@ -229,7 +199,7 @@ public:
 #endif
 
 
-  void testTrisToTets(MeshBase & mesh,
+  void testTrisToTets(UnstructuredMesh & mesh,
                       MeshTetInterface & triangulator,
                       bool flip_tris = false)
   {
@@ -243,7 +213,7 @@ public:
   }
 
 
-  void testTrisToTetsError(MeshBase & mesh,
+  void testTrisToTetsError(UnstructuredMesh & mesh,
                            MeshTetInterface & triangulator,
                            bool flip_tris = false)
   {
@@ -252,10 +222,13 @@ public:
 
     // Remove one tri, breaking the mesh
     for (auto elem : mesh.element_ptr_range())
-      if (elem->node_id(0) == 0 &&
-          elem->node_id(1) == 1 &&
-          elem->node_id(2) == 2)
-        mesh.delete_elem(elem);
+      {
+        Point center = elem->vertex_average();
+        if (center(0) > 0 &&
+            center(1) > 0 &&
+            center(2) > 0)
+          mesh.delete_elem(elem);
+      }
     mesh.prepare_for_use();
 
     this->testExceptionBase("element with a null neighbor", mesh, triangulator,

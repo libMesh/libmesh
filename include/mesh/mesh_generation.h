@@ -145,6 +145,18 @@ void build_delaunay_square(UnstructuredMesh & mesh,
 #endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_DIM > 1
 
 /**
+ * Meshes the surface of an octahedron with 8 Tri3 elements, with
+ * counter-clockwise (libMesh default) node ordering as viewed from
+ * the octahedron exterior if \p flip_tris is false or from the
+ * interior otherwise.
+ */
+void surface_octahedron (UnstructuredMesh & mesh,
+                         Real xmin, Real xmax,
+                         Real ymin, Real ymax,
+                         Real zmin, Real zmax,
+                         bool flip_tris = false);
+
+/**
  * Class for receiving the callback during extrusion generation and providing user-defined
  * subdomains based on the old (existing) element id and the current layer.
  */
