@@ -33,8 +33,15 @@ const int NodeElem::num_sides;
 // ------------------------------------------------------------
 // NodeElem class member functions
 
-// We can support any "order" in 0D, really...
+// If we're computing on a node, we only need CONSTANT approximation
+// to get the full function space
 Order NodeElem::default_order() const
+{
+  return CONSTANT;
+}
+
+// But we can "support" any order in 0D, really...
+Order NodeElem::max_nodal_order() const
 {
   return MAXIMUM;
 }
