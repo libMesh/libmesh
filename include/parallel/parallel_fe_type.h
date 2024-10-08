@@ -38,6 +38,7 @@ namespace TIMPI {
 
 TIMPI_STANDARD_TYPE(libMesh::Order,MPI_INT);
 TIMPI_STANDARD_TYPE(libMesh::FEFamily,MPI_INT);
+TIMPI_PARALLEL_INTEGER_OPS(libMesh::Order);
 
 // OpFunction<> specializations to return an MPI_Op version of the
 // reduction operations on FETypes
