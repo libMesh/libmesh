@@ -207,7 +207,8 @@ std::map<std::string, Order> order_to_enum {
 
    {"FORTYFIRST"   , FORTYFIRST},
    {"FORTYSECOND"  , FORTYSECOND},
-   {"FORTYTHIRD"   , FORTYTHIRD}
+   {"FORTYTHIRD"   , FORTYTHIRD},
+   {"MAXIMUM"      , MAXIMUM}
   };
 
 std::map<Order, std::string> enum_to_order =
