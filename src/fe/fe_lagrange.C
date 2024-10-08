@@ -434,6 +434,18 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
 {
   switch (o)
     {
+      // lagrange can only be constant on a single node
+    case CONSTANT:
+      {
+        switch (t)
+          {
+          case NODEELEM:
+            return 1;
+
+          default:
+            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          }
+      }
 
       // linear Lagrange shape functions
     case FIRST:
@@ -598,6 +610,18 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
 {
   switch (o)
     {
+      // lagrange can only be constant on a single node
+    case CONSTANT:
+      {
+        switch (t)
+          {
+          case NODEELEM:
+            return 1;
+
+          default:
+            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+          }
+      }
 
       // linear Lagrange shape functions
     case FIRST:
