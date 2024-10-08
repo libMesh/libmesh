@@ -281,8 +281,15 @@ public:
    * \returns A const reference to a std::set of element default
    * orders present in the mesh.
    */
-  const std::set<Order> & elem_orders() const
-  { return _elem_orders; }
+  const std::set<Order> & elem_default_orders() const
+  { return _elem_default_orders; }
+
+  /**
+   * \returns The smallest max_nodal_order() of any element present in
+   * the mesh.
+   */
+  Order max_nodal_order() const
+  { return _max_nodal_order; }
 
   /**
    * Most of the time you should not need to call this, as the element
@@ -1927,7 +1934,13 @@ protected:
    * the mesh.  E.g. if we have a mesh with TRI3 and TRI6 elements,
    * this structure will contain FIRST and SECOND.
    */
-  std::set<Order> _elem_orders;
+  std::set<Order> _elem_default_orders;
+
+  /**
+   * We cache the maximum nodal order supported by all the mesh's
+   * elements (the minimum max_nodal_order() of any element)
+   */
+  Order _max_nodal_order;
 
   /**
    * We cache the subdomain ids of the elements present in the mesh.
