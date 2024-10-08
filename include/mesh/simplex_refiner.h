@@ -109,11 +109,16 @@ protected:
    * it (bisecting it, removing it from the mesh to be replaced by the
    * two subelements, and recursing into those) if necessary.
    *
+   * The \p coarse_id specifies which coarse element this one is (or
+   * which this one was originally refined from), to make global
+   * communication easier after local refinement is done.
+   *
    * \returns the number of refinements done; this may be greater than
    * 1 if subelements were themselves refined.
    */
- 
-  std::size_t refine_via_edges(Elem & elem);
+
+  std::size_t refine_via_edges(Elem & elem,
+                               dof_id_type coarse_id);
 
 private:
 
@@ -136,13 +141,55 @@ private:
    * Keep track of new nodes on edges.  A new node x in between node y
    * and node z (with y<z) will be reflected by new_nodes[(y,z)]=x
    */
-  std::map<std::pair<Point *, Point *>, Node *> new_nodes;
+  std::map<std::pair<Node *, Node *>, Node *> new_nodes;
 
   /**
    * Keep track of elements to add so we don't invalidate iterators
    * during an iteration over elements.
    */
   std::vector<std::unique_ptr<Elem>> new_elements;
+
+  /**
+   * Keep track of coarse remote edges for which we should query about
+   * additional point splits
+   */
+  std::unordered_map
+    <processor_id_type,
+     std::vector<std::pair<dof_id_type, dof_id_type>>>
+    edge_queries;
+
+  // All the "refine first and second to get third" that was
+  // done to this edge, including the processor to assign the new node
+  // to.
+  typedef
+    std::vector<std::tuple<dof_id_type, dof_id_type,
+                           dof_id_type, processor_id_type>>
+    refinement_datum;
+
+  /**
+   * Helper for responding to edge queries
+   */
+  void fill_refinement_datum(std::pair<Node *, Node *> vertices,
+                             refinement_datum & vec);
+
+  /**
+   * Keep track of elements added within each original element, so we
+   * can answer queries about them from other processors.  If the
+   * element originally with id i is split, its replacements e1 and e2
+   * will be in added_elements[i][ei.vertex_average()]
+   */
+  std::unordered_map<dof_id_type, std::unordered_map<Point, Elem *>> added_elements;
+
+  /**
+   * Keep track of added elements' original coarse ids, so we get
+   * subsequent splits assigned to the correct coarse id.
+   */
+  std::unordered_map<Elem *, dof_id_type> coarse_parent;
+
+  /**
+   * Keep track of what processor an element's neighbors came from
+   */
+  std::unordered_map<processor_id_type, std::unique_ptr<Elem>> proxy_elements;
 };
 
 
