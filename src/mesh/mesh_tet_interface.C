@@ -34,26 +34,42 @@
 namespace {
   using namespace libMesh;
 
-  void flood_component (std::unordered_set<Elem *> & all_components,
-                        std::unordered_set<Elem *> & current_component,
+  std::unordered_set<Elem *>
+  flood_component (std::unordered_set<Elem *> & all_components,
                         Elem * elem)
   {
-    libmesh_error_msg_if
-      (!elem,
-       "Tet generation encountered a 2D element with a null neighbor, but a\n"
-       "boundary must be a 2D closed manifold (surface).\n");
-
-    if (current_component.count(elem))
-      return;
-
     libmesh_assert(!all_components.count(elem));
 
-    all_components.insert(elem);
-    current_component.insert(elem);
+    std::unordered_set<Elem *> current_component;
 
-    for (auto s : make_range(elem->n_sides()))
-      flood_component(all_components, current_component,
-                      elem->neighbor_ptr(s));
+    std::unordered_set<Elem *> elements_to_consider = {elem};
+
+    while (!elements_to_consider.empty())
+      {
+        std::unordered_set<Elem *> next_elements_to_consider;
+
+        for (Elem * considering : elements_to_consider)
+          {
+            all_components.insert(considering);
+            current_component.insert(considering);
+
+            for (auto s : make_range(considering->n_sides()))
+              {
+                Elem * neigh = considering->neighbor_ptr(s);
+
+                libmesh_error_msg_if
+                  (!neigh,
+                   "Tet generation encountered a 2D element with a null neighbor, but a\n"
+                   "boundary must be a 2D closed manifold (surface).\n");
+
+                if (all_components.find(neigh) == all_components.end())
+                  next_elements_to_consider.insert(neigh);
+              }
+          }
+        elements_to_consider = next_elements_to_consider;
+      }
+
+    return current_component;
   }
 
   // Returns six times the signed volume of a tet formed by the given
@@ -264,10 +280,7 @@ BoundingBox MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 
   for (auto * elem : mesh.element_ptr_range())
     if (!in_component.count(elem))
-      {
-        components.push_back({});
-        flood_component(in_component, components.back(), elem);
-      }
+      components.emplace_back(flood_component(in_component, elem));
 
   const std::unordered_set<Elem *> * biggest_component = nullptr;
   Real biggest_six_vol = 0;
