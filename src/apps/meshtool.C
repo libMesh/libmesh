@@ -295,7 +295,7 @@ int main (int argc, char ** argv)
 #endif
 
 
-  // Maybe Triangulate
+  // Maybe convert non-simplex elements into simplices
   if (triangulate)
     {
       if (verbose)
@@ -375,7 +375,7 @@ int main (int argc, char ** argv)
         }
     }
 
-   // Possibly convert all linear elements to second-order
+   // Possibly convert higher-order elements into first-order
    // counterparts
   if (convert_first_order)
     {
@@ -391,7 +391,7 @@ int main (int argc, char ** argv)
         }
     }
 
-  // Possibly convert all linear elements to second-order counterparts
+  // Possibly convert all linear elements into second-order counterparts
   if (convert_second_order > 0)
     {
       bool second_order_mode = true;
