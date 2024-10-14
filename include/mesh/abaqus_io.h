@@ -66,7 +66,7 @@ public:
    */
   bool build_sidesets_from_nodesets;
 
-private:
+protected:
   /**
    * The type of data structure used to store Node and Elemset IDs.
    */
@@ -219,6 +219,26 @@ private:
    * handle input files with multiple parts.
    */
   bool _already_seen_part;
+
+  /**
+   * Attempts to convert the input string to a numerical value using
+   * strtol.  If the conversion fails, 0 will be stored in the output,
+   * so you must check the return value, which will be true if the
+   * conversion succeeded, and false if it failed for any reason.
+   */
+  bool string_to_num(const std::string &input, dof_id_type &output) const;
+
+  /**
+   * Removes all whitespace characters from "line". Simpler than trying
+   * to remember the erase-remove-if idiom.
+   */
+  void strip_ws(std::string &line) const;
+
+  /**
+   * Override this callback to implement support for more sections in
+   * derived classes.
+   */
+  virtual void extended_parsing(const std::string & /*header*/) {}
 };
 
 } // namespace

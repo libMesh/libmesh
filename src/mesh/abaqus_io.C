@@ -43,32 +43,6 @@ namespace
 using namespace libMesh;
 
 /**
- * Attempts to convert the input string to a numerical value using
- * strtol.  If the conversion fails, 0 will be stored in the output,
- * so you must check the return value, which will be true if the
- * conversion succeeded, and false if it failed for any reason.
- */
-bool string_to_num(const std::string & input, dof_id_type & output)
-{
-  char * endptr;
-  output = cast_int<dof_id_type>
-    (std::strtol(input.c_str(), &endptr, /*base=*/10));
-
-  return (output != 0 || endptr != input.c_str());
-}
-
-/**
- * Removes all whitespace characters from "line". Simpler than trying
- * to remember the erase-remove-if idiom.
- */
-void strip_ws(std::string & line)
-{
-  line.erase(std::remove_if(line.begin(), line.end(),
-                            [](unsigned char const c){return std::isspace(c);}),
-             line.end());
-}
-
-/**
  * Data structure used for mapping Abaqus IDs to libMesh IDs, and
  * eventually (possibly) vice-versa.
  */
@@ -440,6 +414,9 @@ void AbaqusIO::read (const std::string & fname)
               // Read the sideset IDs
               this->read_sideset(sideset_name, sideset_type, _sideset_ids);
             }
+
+          // Derived classes could override this to add support for additional sections
+          extended_parsing(upper);
 
           continue;
         } // if (*_in)
@@ -1301,5 +1278,20 @@ unsigned char AbaqusIO::max_elem_dimension_seen ()
   return max_dim;
 }
 
+bool AbaqusIO::string_to_num(const std::string &input, dof_id_type &output) const
+{
+  char *endptr;
+  output = cast_int<dof_id_type>(std::strtol(input.c_str(), &endptr, /*base=*/10));
+
+  return (output != 0 || endptr != input.c_str());
+}
+
+void AbaqusIO::strip_ws(std::string &line) const
+{
+  line.erase(std::remove_if(line.begin(), line.end(),
+                            [](unsigned char const c)
+                            { return std::isspace(c); }),
+             line.end());
+}
 
 } // namespace
