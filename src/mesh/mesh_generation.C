@@ -2752,5 +2752,44 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
 #endif // LIBMESH_HAVE_TRIANGLE && LIBMESH_DIM > 1
 
 
+void MeshTools::Generation::surface_octahedron
+  (UnstructuredMesh & mesh,
+   Real xmin, Real xmax,
+   Real ymin, Real ymax,
+   Real zmin, Real zmax,
+   bool flip_tris)
+{
+  const Real xavg = (xmin + xmax)/2;
+  const Real yavg = (ymin + ymax)/2;
+  const Real zavg = (zmin + zmax)/2;
+  mesh.add_point(Point(xavg,yavg,zmin), 0);
+  mesh.add_point(Point(xmax,yavg,zavg), 1);
+  mesh.add_point(Point(xavg,ymax,zavg), 2);
+  mesh.add_point(Point(xmin,yavg,zavg), 3);
+  mesh.add_point(Point(xavg,ymin,zavg), 4);
+  mesh.add_point(Point(xavg,yavg,zmax), 5);
+
+  auto add_tri = [&mesh, flip_tris](std::array<dof_id_type,3> nodes)
+  {
+    auto elem = mesh.add_elem(Elem::build(TRI3));
+    elem->set_node(0) = mesh.node_ptr(nodes[0]);
+    elem->set_node(1) = mesh.node_ptr(nodes[1]);
+    elem->set_node(2) = mesh.node_ptr(nodes[2]);
+    if (flip_tris)
+      elem->flip(&mesh.get_boundary_info());
+  };
+
+  add_tri({0,2,1});
+  add_tri({0,3,2});
+  add_tri({0,4,3});
+  add_tri({0,1,4});
+  add_tri({5,4,1});
+  add_tri({5,3,4});
+  add_tri({5,2,3});
+  add_tri({5,1,2});
+
+  mesh.prepare_for_use();
+}
+
 
 } // namespace libMesh

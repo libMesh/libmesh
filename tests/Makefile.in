@@ -214,8 +214,8 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
-	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
-	mesh/spatial_dimension_test.C \
+	mesh/libmesh_netgen.C mesh/simplex_refinement_test.C \
+	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -316,6 +316,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	mesh/unit_tests_dbg-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_dbg-libmesh_poly2tri.$(OBJEXT) \
 	mesh/unit_tests_dbg-libmesh_netgen.$(OBJEXT) \
+	mesh/unit_tests_dbg-simplex_refinement_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-mapped_subdomain_partitioner_test.$(OBJEXT) \
@@ -410,8 +411,8 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
-	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
-	mesh/spatial_dimension_test.C \
+	mesh/libmesh_netgen.C mesh/simplex_refinement_test.C \
+	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -511,6 +512,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	mesh/unit_tests_devel-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_devel-libmesh_poly2tri.$(OBJEXT) \
 	mesh/unit_tests_devel-libmesh_netgen.$(OBJEXT) \
+	mesh/unit_tests_devel-simplex_refinement_test.$(OBJEXT) \
 	mesh/unit_tests_devel-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_devel-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_devel-mapped_subdomain_partitioner_test.$(OBJEXT) \
@@ -601,8 +603,8 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
-	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
-	mesh/spatial_dimension_test.C \
+	mesh/libmesh_netgen.C mesh/simplex_refinement_test.C \
+	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -702,6 +704,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	mesh/unit_tests_oprof-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_oprof-libmesh_poly2tri.$(OBJEXT) \
 	mesh/unit_tests_oprof-libmesh_netgen.$(OBJEXT) \
+	mesh/unit_tests_oprof-simplex_refinement_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-mapped_subdomain_partitioner_test.$(OBJEXT) \
@@ -792,8 +795,8 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
-	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
-	mesh/spatial_dimension_test.C \
+	mesh/libmesh_netgen.C mesh/simplex_refinement_test.C \
+	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -893,6 +896,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	mesh/unit_tests_opt-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_opt-libmesh_poly2tri.$(OBJEXT) \
 	mesh/unit_tests_opt-libmesh_netgen.$(OBJEXT) \
+	mesh/unit_tests_opt-simplex_refinement_test.$(OBJEXT) \
 	mesh/unit_tests_opt-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_opt-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_opt-mapped_subdomain_partitioner_test.$(OBJEXT) \
@@ -983,8 +987,8 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
-	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
-	mesh/spatial_dimension_test.C \
+	mesh/libmesh_netgen.C mesh/simplex_refinement_test.C \
+	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -1084,6 +1088,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	mesh/unit_tests_prof-nodal_neighbors.$(OBJEXT) \
 	mesh/unit_tests_prof-libmesh_poly2tri.$(OBJEXT) \
 	mesh/unit_tests_prof-libmesh_netgen.$(OBJEXT) \
+	mesh/unit_tests_prof-simplex_refinement_test.$(OBJEXT) \
 	mesh/unit_tests_prof-slit_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_prof-spatial_dimension_test.$(OBJEXT) \
 	mesh/unit_tests_prof-mapped_subdomain_partitioner_test.$(OBJEXT) \
@@ -1345,6 +1350,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-mixed_order_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-nodal_neighbors.Po \
+	mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-write_edgeset_data.Po \
@@ -1382,6 +1388,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-mixed_order_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-nodal_neighbors.Po \
+	mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-write_edgeset_data.Po \
@@ -1419,6 +1426,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-mixed_order_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-nodal_neighbors.Po \
+	mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-write_edgeset_data.Po \
@@ -1456,6 +1464,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-mixed_order_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-nodal_neighbors.Po \
+	mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-write_edgeset_data.Po \
@@ -1493,6 +1502,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-mixed_order_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-nodal_neighbors.Po \
+	mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-spatial_dimension_test.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-write_edgeset_data.Po \
@@ -2220,8 +2230,8 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
-	mesh/libmesh_netgen.C mesh/slit_mesh_test.C \
-	mesh/spatial_dimension_test.C \
+	mesh/libmesh_netgen.C mesh/simplex_refinement_test.C \
+	mesh/slit_mesh_test.C mesh/spatial_dimension_test.C \
 	mesh/mapped_subdomain_partitioner_test.C \
 	mesh/write_elemset_data.C mesh/write_sideset_data.C \
 	mesh/write_nodeset_data.C mesh/write_edgeset_data.C \
@@ -2582,6 +2592,8 @@ mesh/unit_tests_dbg-libmesh_poly2tri.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-libmesh_netgen.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_dbg-simplex_refinement_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-spatial_dimension_test.$(OBJEXT):  \
@@ -2868,6 +2880,8 @@ mesh/unit_tests_devel-libmesh_poly2tri.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-libmesh_netgen.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_devel-simplex_refinement_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-spatial_dimension_test.$(OBJEXT):  \
@@ -3106,6 +3120,8 @@ mesh/unit_tests_oprof-libmesh_poly2tri.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-libmesh_netgen.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_oprof-simplex_refinement_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-spatial_dimension_test.$(OBJEXT):  \
@@ -3344,6 +3360,8 @@ mesh/unit_tests_opt-libmesh_poly2tri.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-libmesh_netgen.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_opt-simplex_refinement_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-spatial_dimension_test.$(OBJEXT):  \
@@ -3582,6 +3600,8 @@ mesh/unit_tests_prof-libmesh_poly2tri.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-libmesh_netgen.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_prof-simplex_refinement_test.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-slit_mesh_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-spatial_dimension_test.$(OBJEXT):  \
@@ -3908,6 +3928,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-mixed_order_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-nodal_neighbors.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-write_edgeset_data.Po@am__quote@ # am--include-marker
@@ -3945,6 +3966,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-mixed_order_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-nodal_neighbors.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-write_edgeset_data.Po@am__quote@ # am--include-marker
@@ -3982,6 +4004,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-mixed_order_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-nodal_neighbors.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-write_edgeset_data.Po@am__quote@ # am--include-marker
@@ -4019,6 +4042,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-mixed_order_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-nodal_neighbors.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-write_edgeset_data.Po@am__quote@ # am--include-marker
@@ -4056,6 +4080,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-mixed_order_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-nodal_neighbors.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-spatial_dimension_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-write_edgeset_data.Po@am__quote@ # am--include-marker
@@ -5149,6 +5174,20 @@ mesh/unit_tests_dbg-libmesh_netgen.obj: mesh/libmesh_netgen.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/libmesh_netgen.C' object='mesh/unit_tests_dbg-libmesh_netgen.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-libmesh_netgen.obj `if test -f 'mesh/libmesh_netgen.C'; then $(CYGPATH_W) 'mesh/libmesh_netgen.C'; else $(CYGPATH_W) '$(srcdir)/mesh/libmesh_netgen.C'; fi`
+
+mesh/unit_tests_dbg-simplex_refinement_test.o: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-simplex_refinement_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Tpo -c -o mesh/unit_tests_dbg-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_dbg-simplex_refinement_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+
+mesh/unit_tests_dbg-simplex_refinement_test.obj: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-simplex_refinement_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Tpo -c -o mesh/unit_tests_dbg-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_dbg-simplex_refinement_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
 
 mesh/unit_tests_dbg-slit_mesh_test.o: mesh/slit_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-slit_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Tpo -c -o mesh/unit_tests_dbg-slit_mesh_test.o `test -f 'mesh/slit_mesh_test.C' || echo '$(srcdir)/'`mesh/slit_mesh_test.C
@@ -6746,6 +6785,20 @@ mesh/unit_tests_devel-libmesh_netgen.obj: mesh/libmesh_netgen.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-libmesh_netgen.obj `if test -f 'mesh/libmesh_netgen.C'; then $(CYGPATH_W) 'mesh/libmesh_netgen.C'; else $(CYGPATH_W) '$(srcdir)/mesh/libmesh_netgen.C'; fi`
 
+mesh/unit_tests_devel-simplex_refinement_test.o: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-simplex_refinement_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Tpo -c -o mesh/unit_tests_devel-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_devel-simplex_refinement_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+
+mesh/unit_tests_devel-simplex_refinement_test.obj: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-simplex_refinement_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Tpo -c -o mesh/unit_tests_devel-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_devel-simplex_refinement_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
+
 mesh/unit_tests_devel-slit_mesh_test.o: mesh/slit_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-slit_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Tpo -c -o mesh/unit_tests_devel-slit_mesh_test.o `test -f 'mesh/slit_mesh_test.C' || echo '$(srcdir)/'`mesh/slit_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po
@@ -8341,6 +8394,20 @@ mesh/unit_tests_oprof-libmesh_netgen.obj: mesh/libmesh_netgen.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/libmesh_netgen.C' object='mesh/unit_tests_oprof-libmesh_netgen.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-libmesh_netgen.obj `if test -f 'mesh/libmesh_netgen.C'; then $(CYGPATH_W) 'mesh/libmesh_netgen.C'; else $(CYGPATH_W) '$(srcdir)/mesh/libmesh_netgen.C'; fi`
+
+mesh/unit_tests_oprof-simplex_refinement_test.o: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-simplex_refinement_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Tpo -c -o mesh/unit_tests_oprof-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_oprof-simplex_refinement_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+
+mesh/unit_tests_oprof-simplex_refinement_test.obj: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-simplex_refinement_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Tpo -c -o mesh/unit_tests_oprof-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_oprof-simplex_refinement_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
 
 mesh/unit_tests_oprof-slit_mesh_test.o: mesh/slit_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-slit_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Tpo -c -o mesh/unit_tests_oprof-slit_mesh_test.o `test -f 'mesh/slit_mesh_test.C' || echo '$(srcdir)/'`mesh/slit_mesh_test.C
@@ -9938,6 +10005,20 @@ mesh/unit_tests_opt-libmesh_netgen.obj: mesh/libmesh_netgen.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-libmesh_netgen.obj `if test -f 'mesh/libmesh_netgen.C'; then $(CYGPATH_W) 'mesh/libmesh_netgen.C'; else $(CYGPATH_W) '$(srcdir)/mesh/libmesh_netgen.C'; fi`
 
+mesh/unit_tests_opt-simplex_refinement_test.o: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-simplex_refinement_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Tpo -c -o mesh/unit_tests_opt-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_opt-simplex_refinement_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+
+mesh/unit_tests_opt-simplex_refinement_test.obj: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-simplex_refinement_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Tpo -c -o mesh/unit_tests_opt-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_opt-simplex_refinement_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
+
 mesh/unit_tests_opt-slit_mesh_test.o: mesh/slit_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-slit_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Tpo -c -o mesh/unit_tests_opt-slit_mesh_test.o `test -f 'mesh/slit_mesh_test.C' || echo '$(srcdir)/'`mesh/slit_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po
@@ -11534,6 +11615,20 @@ mesh/unit_tests_prof-libmesh_netgen.obj: mesh/libmesh_netgen.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-libmesh_netgen.obj `if test -f 'mesh/libmesh_netgen.C'; then $(CYGPATH_W) 'mesh/libmesh_netgen.C'; else $(CYGPATH_W) '$(srcdir)/mesh/libmesh_netgen.C'; fi`
 
+mesh/unit_tests_prof-simplex_refinement_test.o: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-simplex_refinement_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Tpo -c -o mesh/unit_tests_prof-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_prof-simplex_refinement_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-simplex_refinement_test.o `test -f 'mesh/simplex_refinement_test.C' || echo '$(srcdir)/'`mesh/simplex_refinement_test.C
+
+mesh/unit_tests_prof-simplex_refinement_test.obj: mesh/simplex_refinement_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-simplex_refinement_test.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Tpo -c -o mesh/unit_tests_prof-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/simplex_refinement_test.C' object='mesh/unit_tests_prof-simplex_refinement_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-simplex_refinement_test.obj `if test -f 'mesh/simplex_refinement_test.C'; then $(CYGPATH_W) 'mesh/simplex_refinement_test.C'; else $(CYGPATH_W) '$(srcdir)/mesh/simplex_refinement_test.C'; fi`
+
 mesh/unit_tests_prof-slit_mesh_test.o: mesh/slit_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-slit_mesh_test.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Tpo -c -o mesh/unit_tests_prof-slit_mesh_test.o `test -f 'mesh/slit_mesh_test.C' || echo '$(srcdir)/'`mesh/slit_mesh_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Tpo mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po
@@ -12851,6 +12946,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_edgeset_data.Po
@@ -12888,6 +12984,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_edgeset_data.Po
@@ -12925,6 +13022,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_edgeset_data.Po
@@ -12962,6 +13060,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_edgeset_data.Po
@@ -12999,6 +13098,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_edgeset_data.Po
@@ -13468,6 +13568,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-write_edgeset_data.Po
@@ -13505,6 +13606,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-write_edgeset_data.Po
@@ -13542,6 +13644,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-write_edgeset_data.Po
@@ -13579,6 +13682,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-write_edgeset_data.Po
@@ -13616,6 +13720,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mixed_dim_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-mixed_order_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-nodal_neighbors.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-simplex_refinement_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-slit_mesh_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-spatial_dimension_test.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-write_edgeset_data.Po

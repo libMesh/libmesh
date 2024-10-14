@@ -40,6 +40,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_refinement.h"
+#include "libmesh/simplex_refiner.h"
 #include "libmesh/statistics.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_elem_quality.h"
@@ -60,6 +61,7 @@ int main (int argc, char ** argv)
 
   unsigned int n_subdomains = 1;
   unsigned int n_rsteps = 0;
+  Real simplex_refine = 0.;
   double dist_fact = 0.;
   bool verbose = false;
   BoundaryMeshWriteMode write_bndry = BM_DISABLED;
@@ -123,6 +125,10 @@ int main (int argc, char ** argv)
       tmp = command_line.next(tmp);
       n_rsteps = cast_int<unsigned int>(tmp);
     }
+
+  // Split edges to reach specified element volume
+  if (command_line.search(1, "-s"))
+    simplex_refine = command_line.next(simplex_refine);
 
   // Number of subdomains for partitioning
   if (command_line.search(1, "-p"))
@@ -423,6 +429,12 @@ int main (int argc, char ** argv)
         }
     }
 
+  if (simplex_refine)
+    {
+      SimplexRefiner simplex_refiner (mesh);
+      simplex_refiner.desired_volume() = simplex_refine;
+      simplex_refiner.refine_elements();
+    }
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -540,8 +552,9 @@ void usage(const std::string & prog_name)
            << "    -h                            Print help menu\n"
            << "    -p <count>                    Partition into <count> subdomains\n"
 #ifdef LIBMESH_ENABLE_AMR
-           << "    -r <count>                    Globally refine <count> times\n"
+           << "    -r <count>                    Uniformly refine <count> times\n"
 #endif
+           << "    -s <volume>                   Split-edge refine elements exceeding <volume>\n"
            << "    -t                            Convert to triangles/tetrahedra\n"
            << "    -v                            Verbose\n"
            << "    -q <metric>                   Evaluates the named element quality metric\n"
