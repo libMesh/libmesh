@@ -41,7 +41,7 @@ Order NodeElem::default_order() const
 }
 
 // But we can "support" any order in 0D, really...
-Order NodeElem::max_nodal_order() const
+Order NodeElem::supported_nodal_order() const
 {
   return MAXIMUM;
 }

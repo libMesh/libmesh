@@ -108,7 +108,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
   _elem_default_orders(other_mesh._elem_default_orders),
-  _max_nodal_order(other_mesh._max_nodal_order),
+  _supported_nodal_order(other_mesh._supported_nodal_order),
   _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
   _all_elemset_ids(other_mesh._all_elemset_ids),
   _spatial_dimension(other_mesh._spatial_dimension),
@@ -179,7 +179,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _block_id_to_name = std::move(other_mesh._block_id_to_name);
   _elem_dims = std::move(other_mesh.elem_dimensions());
   _elem_default_orders = std::move(other_mesh.elem_default_orders()),
-  _max_nodal_order = other_mesh.max_nodal_order(),
+  _supported_nodal_order = other_mesh.supported_nodal_order(),
   _elemset_codes = std::move(other_mesh._elemset_codes);
   _elemset_codes_inverse_map = std::move(other_mesh._elemset_codes_inverse_map);
   _all_elemset_ids = std::move(other_mesh._all_elemset_ids),
@@ -267,7 +267,7 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
     return false;
   if (_elem_default_orders != other_mesh._elem_default_orders)
     return false;
-  if (_max_nodal_order != other_mesh._max_nodal_order)
+  if (_supported_nodal_order != other_mesh._supported_nodal_order)
     return false;
   if (_mesh_subdomains != other_mesh._mesh_subdomains)
     return false;
@@ -910,7 +910,7 @@ void MeshBase::clear ()
   // Clear cached element data
   _elem_dims.clear();
   _elem_default_orders.clear();
-  _max_nodal_order = MAXIMUM;
+  _supported_nodal_order = MAXIMUM;
 
   _elemset_codes.clear();
   _elemset_codes_inverse_map.clear();
@@ -1085,7 +1085,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
       oss << "}\n";
     }
 
-  oss << "  max_nodal_order()="       << this->max_nodal_order()                              << '\n'
+  oss << "  supported_nodal_order()=" << this->supported_nodal_order()                        << '\n'
       << "  spatial_dimension()="     << this->spatial_dimension()                            << '\n'
       << "  n_nodes()="               << this->n_nodes()                                      << '\n'
       << "    n_local_nodes()="       << this->n_local_nodes()                                << '\n'
@@ -1716,17 +1716,17 @@ void MeshBase::cache_elem_data()
   _elem_dims.clear();
   _elem_default_orders.clear();
   _mesh_subdomains.clear();
-  _max_nodal_order = MAXIMUM;
+  _supported_nodal_order = MAXIMUM;
 
   for (const auto & elem : this->active_element_ptr_range())
   {
     _elem_dims.insert(cast_int<unsigned char>(elem->dim()));
     _elem_default_orders.insert(elem->default_order());
     _mesh_subdomains.insert(elem->subdomain_id());
-    _max_nodal_order =
+    _supported_nodal_order =
       static_cast<Order>
-        (std::min(static_cast<int>(_max_nodal_order),
-                  static_cast<int>(elem->max_nodal_order())));
+        (std::min(static_cast<int>(_supported_nodal_order),
+                  static_cast<int>(elem->supported_nodal_order())));
   }
 
   if (!this->is_serial())
@@ -1735,7 +1735,7 @@ void MeshBase::cache_elem_data()
     // on other processors
     this->comm().set_union(_elem_dims);
     this->comm().set_union(_elem_default_orders);
-    this->comm().min(_max_nodal_order);
+    this->comm().min(_supported_nodal_order);
     this->comm().set_union(_mesh_subdomains);
   }
 
@@ -2183,10 +2183,10 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
       Elem * added_elem = this->add_elem(std::move(elem));
       this->_elem_dims.insert(0);
       this->_elem_default_orders.insert(added_elem->default_order());
-      this->_max_nodal_order =
+      this->_supported_nodal_order =
         static_cast<Order>
-          (std::min(static_cast<int>(this->_max_nodal_order),
-                    static_cast<int>(added_elem->max_nodal_order())));
+          (std::min(static_cast<int>(this->_supported_nodal_order),
+                    static_cast<int>(added_elem->supported_nodal_order())));
       this->_mesh_subdomains.insert(new_sbd_id);
       node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
       existing_unconstrained_columns.emplace(j,n->id());

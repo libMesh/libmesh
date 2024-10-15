@@ -928,7 +928,7 @@ public:
    * (Lagrange or Rational Bezier-Bernstein) variables on this element
    * type.  This is usually the same as the default order.
    */
-  virtual Order max_nodal_order() const { return default_order(); }
+  virtual Order supported_nodal_order() const { return default_order(); }
 
   /**
    * \returns The default approximation order for side elements of
