@@ -664,7 +664,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
     {
     case 1:
       {
-        // A 1D finite element, currently assumed to be in 1D space
+        // A 1D finite element, potentially in 2D or 3D space.
         // This means the boundary is a "0D finite element", a
         // NODEELEM.
 
@@ -690,12 +690,18 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
         if (calculate_dxyz)
           {
             if (side->node_id(0) == elem->node_id(0))
-              normals[0] = Point(-1.);
+              {
+                const Point reference_point = Point(-1.);
+                Point dx_dxi = FEMap::map_deriv (1, elem, 0, reference_point);
+                normals[0] = -dx_dxi.unit();
+              }
             else
               {
                 libmesh_assert_equal_to (side->node_id(0),
                                          elem->node_id(1));
-                normals[0] = Point(1.);
+                const Point reference_point = Point(1.);
+                Point dx_dxi = FEMap::map_deriv (1, elem, 0, reference_point);
+                normals[0] = dx_dxi.unit();
               }
           }
 
