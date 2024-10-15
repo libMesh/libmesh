@@ -49,6 +49,13 @@ public:
   {
     FETestBase<order,family,elem_type,N_x>::setUp();
 
+    // If we're a 2D mesh on a 3D libMesh build we should be able to
+    // handle inverted elements just fine.  Let's test that.
+    BoundaryInfo & bdy_info = this->_mesh->get_boundary_info();
+    for (auto e : this->_mesh->element_ptr_range())
+      if (!(e->id() % 3) && e->dim() < LIBMESH_DIM)
+        e->flip(&bdy_info);
+
     FEType fe_type = this->_sys->variable_type(0);
     _fe_side = FEBase::build(this->_dim, fe_type);
 
