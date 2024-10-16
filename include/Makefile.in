@@ -877,6 +877,8 @@ include_HEADERS = \
         numerics/shell_matrix.h \
         numerics/sparse_matrix.h \
         numerics/sparse_shell_matrix.h \
+        numerics/static_condensation.h \
+        numerics/static_condensation_preconditioner.h \
         numerics/sum_shell_matrix.h \
         numerics/tensor_shell_matrix.h \
         numerics/tensor_tools.h \

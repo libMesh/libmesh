@@ -367,7 +367,7 @@ void PetscDiffSolver::setup_petsc_data()
 #if !PETSC_VERSION_LESS_THAN(3,7,3)
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
   if (use_petsc_dm)
-    this->_dm_wrapper.init_and_attach_petscdm(_system, *_snes);
+    this->_dm_wrapper.init_and_attach_petscdm(_system, _snes);
 #endif
 #endif
 

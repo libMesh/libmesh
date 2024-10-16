@@ -258,8 +258,6 @@ public:
   void set_solver_configuration(SolverConfiguration & solver_configuration);
 
 protected:
-
-
   /**
    * Enum stating which type of iterative solver to use.
    */
@@ -361,6 +359,7 @@ LinearSolver<T>::solve (const ShellMatrix<T> & mat,
   else
     return this->solve(mat, sol, rhs, tol, n_iter);
 }
+
 
 } // namespace libMesh
 
