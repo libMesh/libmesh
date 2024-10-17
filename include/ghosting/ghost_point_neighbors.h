@@ -34,8 +34,8 @@ class PeriodicBoundaries;
 
 /**
  * This class implements the original default geometry ghosting
- * requirements in libMesh: point neighbors on the same manifold, and
- * interior_parent elements.
+ * requirements in libMesh: point neighbors on the same manifold,
+ * including across periodic boundaries, and interior_parent elements.
  *
  * \author Roy H. Stogner
  * \date 2016
