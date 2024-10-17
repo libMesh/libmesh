@@ -34,9 +34,9 @@ class PeriodicBoundaries;
 
 
 /**
- * This class implements the default algebraic coupling in libMesh:
- * elements couple to themselves, but may also couple to neighbors
- * both locally and across periodic boundary conditions.
+ * This class implements ghosting of point neighbors (elements on the
+ * same manifold that share points), ghosting stencils out to a
+ * user-configurable number of levels of neighbors.
  *
  * \author Roy H. Stogner
  * \date 2016
