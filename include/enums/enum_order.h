@@ -83,6 +83,7 @@ enum Order : int {
             FORTYFIRST   = 41,
             FORTYSECOND  = 42,
             FORTYTHIRD   = 43,
+            MAXIMUM = 255,
             // Invalid
             INVALID_ORDER};
 

@@ -258,9 +258,14 @@ public:
   virtual ElemType type() const override { return NODEELEM; }
 
   /**
-   * \returns FIRST.
+   * \returns \p CONSTANT.
    */
   virtual Order default_order() const override;
+
+  /**
+   * \returns \p MAXIMUM.
+   */
+  virtual Order supported_nodal_order() const override;
 
   virtual void connectivity(const unsigned int sc,
                             const IOPackage iop,

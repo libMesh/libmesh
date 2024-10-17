@@ -924,6 +924,13 @@ public:
   virtual Order default_order () const = 0;
 
   /**
+   * \returns The maximum supported approximation order for nodal
+   * (Lagrange or Rational Bezier-Bernstein) variables on this element
+   * type.  This is usually the same as the default order.
+   */
+  virtual Order supported_nodal_order() const { return default_order(); }
+
+  /**
    * \returns The default approximation order for side elements of
    * this element type.  This may be lower for elements with 'bubble
    * functions' in the Lagrange basis.

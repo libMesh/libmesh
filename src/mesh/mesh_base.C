@@ -31,6 +31,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_algebra.h"
+#include "libmesh/parallel_fe_type.h"
 #include "libmesh/partitioner.h"
 #include "libmesh/point_locator_base.h"
 #include "libmesh/sparse_matrix.h"
@@ -106,6 +107,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _elem_dims(other_mesh._elem_dims),
+  _elem_default_orders(other_mesh._elem_default_orders),
+  _supported_nodal_order(other_mesh._supported_nodal_order),
   _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
   _all_elemset_ids(other_mesh._all_elemset_ids),
   _spatial_dimension(other_mesh._spatial_dimension),
@@ -175,6 +178,8 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _allow_remote_element_removal = other_mesh.allow_remote_element_removal();
   _block_id_to_name = std::move(other_mesh._block_id_to_name);
   _elem_dims = std::move(other_mesh.elem_dimensions());
+  _elem_default_orders = std::move(other_mesh.elem_default_orders()),
+  _supported_nodal_order = other_mesh.supported_nodal_order(),
   _elemset_codes = std::move(other_mesh._elemset_codes);
   _elemset_codes_inverse_map = std::move(other_mesh._elemset_codes_inverse_map);
   _all_elemset_ids = std::move(other_mesh._all_elemset_ids),
@@ -259,6 +264,10 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (_block_id_to_name != other_mesh._block_id_to_name)
     return false;
   if (_elem_dims != other_mesh._elem_dims)
+    return false;
+  if (_elem_default_orders != other_mesh._elem_default_orders)
+    return false;
+  if (_supported_nodal_order != other_mesh._supported_nodal_order)
     return false;
   if (_mesh_subdomains != other_mesh._mesh_subdomains)
     return false;
@@ -898,8 +907,10 @@ void MeshBase::clear ()
   if (boundary_info)
     boundary_info->clear();
 
-  // Clear element dimensions
+  // Clear cached element data
   _elem_dims.clear();
+  _elem_default_orders.clear();
+  _supported_nodal_order = MAXIMUM;
 
   _elemset_codes.clear();
   _elemset_codes_inverse_map.clear();
@@ -1062,7 +1073,20 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
       oss << "}\n";
     }
 
-  oss << "  spatial_dimension()="     << this->spatial_dimension()                            << '\n'
+  if (!_elem_default_orders.empty())
+    {
+      oss << "  elem_default_orders()={";
+      std::transform(_elem_default_orders.begin(),
+                     --_elem_default_orders.end(),
+                     std::ostream_iterator<std::string>(oss, ", "),
+                     [](Order o)
+                       { return Utility::enum_to_string<Order>(o); });
+      oss << cast_int<unsigned int>(*_elem_default_orders.rbegin());
+      oss << "}\n";
+    }
+
+  oss << "  supported_nodal_order()=" << this->supported_nodal_order()                        << '\n'
+      << "  spatial_dimension()="     << this->spatial_dimension()                            << '\n'
       << "  n_nodes()="               << this->n_nodes()                                      << '\n'
       << "    n_local_nodes()="       << this->n_local_nodes()                                << '\n'
       << "  n_elem()="                << this->n_elem()                                       << '\n'
@@ -1687,21 +1711,31 @@ void MeshBase::cache_elem_data()
   // This requires an inspection on every processor
   parallel_object_only();
 
-  // Need to clear _elem_dims first in case all elements of a
-  // particular dimension have been deleted.
+  // Need to clear containers first in case all elements of a
+  // particular dimension/order/subdomain have been deleted.
   _elem_dims.clear();
+  _elem_default_orders.clear();
   _mesh_subdomains.clear();
+  _supported_nodal_order = MAXIMUM;
 
   for (const auto & elem : this->active_element_ptr_range())
   {
     _elem_dims.insert(cast_int<unsigned char>(elem->dim()));
+    _elem_default_orders.insert(elem->default_order());
     _mesh_subdomains.insert(elem->subdomain_id());
+    _supported_nodal_order =
+      static_cast<Order>
+        (std::min(static_cast<int>(_supported_nodal_order),
+                  static_cast<int>(elem->supported_nodal_order())));
   }
 
   if (!this->is_serial())
   {
-    // Some different dimension elements may only live on other processors
+    // Some different dimension/order/subdomain elements may only live
+    // on other processors
     this->comm().set_union(_elem_dims);
+    this->comm().set_union(_elem_default_orders);
+    this->comm().min(_supported_nodal_order);
     this->comm().set_union(_mesh_subdomains);
   }
 
@@ -2148,6 +2182,11 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
 
       Elem * added_elem = this->add_elem(std::move(elem));
       this->_elem_dims.insert(0);
+      this->_elem_default_orders.insert(added_elem->default_order());
+      this->_supported_nodal_order =
+        static_cast<Order>
+          (std::min(static_cast<int>(this->_supported_nodal_order),
+                    static_cast<int>(added_elem->supported_nodal_order())));
       this->_mesh_subdomains.insert(new_sbd_id);
       node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
       existing_unconstrained_columns.emplace(j,n->id());
