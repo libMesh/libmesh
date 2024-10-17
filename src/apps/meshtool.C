@@ -40,6 +40,8 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_refinement.h"
+#include "libmesh/mesh_netgen_interface.h"
+#include "libmesh/poly2tri_triangulator.h"
 #include "libmesh/statistics.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_elem_quality.h"
@@ -66,6 +68,8 @@ int main (int argc, char ** argv)
   bool convert_first_order = false;
   unsigned int convert_second_order = 0;
   bool triangulate = false;
+  bool simplex_fill = false;
+  Real desired_measure = 1;
   bool do_quality = false;
   ElemQuality quality_type = DIAGONAL;
 
@@ -135,6 +139,13 @@ int main (int argc, char ** argv)
   // Should we call all_tri()?
   if (command_line.search(1, "-t"))
     triangulate = true;
+
+  // Should we triangulate/tetrahedralize a boundary interior?
+  if (command_line.search(1, "-T"))
+    {
+      simplex_fill = true;
+      desired_measure = command_line.next(desired_measure);
+    }
 
   // Should we calculate element quality?
   if (command_line.search(1, "-q"))
@@ -295,13 +306,40 @@ int main (int argc, char ** argv)
 #endif
 
 
-  // Maybe Triangulate
+  // Maybe convert non-simplex elements into simplices
   if (triangulate)
     {
       if (verbose)
         libMesh::out << "...Converting to all simplices...\n";
 
       MeshTools::Modification::all_tri(mesh);
+    }
+
+  // Maybe fill an interior mesh specified by an input boundary mesh
+  if (simplex_fill)
+    {
+      if (mesh.mesh_dimension() == 2)
+        {
+#ifdef LIBMESH_HAVE_NETGEN
+          NetGenMeshInterface ngint(mesh);
+          ngint.desired_volume() = desired_measure;
+          ngint.triangulate();
+#else
+          libmesh_error_msg("Requested triangulation of a 2D boundary without Poly2Tri enabled");
+#endif
+        }
+      else if (mesh.mesh_dimension() == 1)
+        {
+#ifdef LIBMESH_HAVE_POLY2TRI
+          Poly2TriTriangulator poly2tri(mesh);
+          poly2tri.triangulation_type() = TriangulatorInterface::PSLG;
+          poly2tri.desired_area() = desired_measure;
+          poly2tri.minimum_angle() = 0;
+          poly2tri.triangulate();
+#else
+          libmesh_error_msg("Requested triangulation of a 1D boundary without Poly2Tri enabled");
+#endif
+        }
     }
 
   // Compute Shape quality metrics
@@ -375,7 +413,7 @@ int main (int argc, char ** argv)
         }
     }
 
-   // Possibly convert all linear elements to second-order
+   // Possibly convert higher-order elements into first-order
    // counterparts
   if (convert_first_order)
     {
@@ -391,7 +429,7 @@ int main (int argc, char ** argv)
         }
     }
 
-  // Possibly convert all linear elements to second-order counterparts
+  // Possibly convert all linear elements into second-order counterparts
   if (convert_second_order > 0)
     {
       bool second_order_mode = true;
@@ -542,7 +580,8 @@ void usage(const std::string & prog_name)
 #ifdef LIBMESH_ENABLE_AMR
            << "    -r <count>                    Globally refine <count> times\n"
 #endif
-           << "    -t                            Convert to triangles/tetrahedra\n"
+           << "    -t                            Convert all elements to triangles/tets\n"
+           << "    -T <desired elem area/vol>    Triangulate/Tetrahedralize the interior\n"
            << "    -v                            Verbose\n"
            << "    -q <metric>                   Evaluates the named element quality metric\n"
            << "    -1                            Converts a mesh of higher order elements\n"
