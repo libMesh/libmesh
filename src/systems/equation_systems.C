@@ -79,25 +79,11 @@ void EquationSystems::clear ()
 
 void EquationSystems::init ()
 {
-  const unsigned int n_sys = this->n_systems();
+  libmesh_assert(std::all_of(make_range(this->n_systems()).begin(),
+                             make_range(this->n_systems()).end(),
+                             [&](unsigned i) { return !this->get_system(i).is_initialized(); }));
 
-  libmesh_assert_not_equal_to (n_sys, 0);
-
-  // Tell all the \p DofObject entities how many systems
-  // there are.
-  for (auto & node : _mesh.node_ptr_range())
-    node->set_n_systems(n_sys);
-
-  for (auto & elem : _mesh.element_ptr_range())
-    elem->set_n_systems(n_sys);
-
-  for (auto i : make_range(this->n_systems()))
-    this->get_system(i).init();
-
-#ifdef LIBMESH_ENABLE_AMR
-  MeshRefinement mesh_refine(_mesh);
-  mesh_refine.clean_refinement_flags();
-#endif
+  this->reinit_mesh();
 }
 
 
