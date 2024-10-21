@@ -31,7 +31,6 @@
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/enum_solver_type.h"
-#include "libmesh/system.h"
 
 // C++ Includes
 #include <memory>
