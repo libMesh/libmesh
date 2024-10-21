@@ -146,11 +146,9 @@ template <typename T>
 inline
 numeric_index_type PetscShellMatrix<T>::m () const
 {
-  PetscErrorCode ierr;
   PetscInt m;
 
-  ierr = MatGetSize(_mat, &m, nullptr);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetSize(_mat, &m, nullptr));
 
   return m;
 }
@@ -161,11 +159,9 @@ template <typename T>
 inline
 numeric_index_type PetscShellMatrix<T>::n () const
 {
-  PetscErrorCode ierr;
   PetscInt n;
 
-  ierr = MatGetSize(_mat, nullptr, &n);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetSize(_mat, nullptr, &n));
 
   return n;
 }
@@ -175,11 +171,9 @@ template <typename T>
 inline
 numeric_index_type PetscShellMatrix<T>::local_m () const
 {
-  PetscErrorCode ierr;
   PetscInt m;
 
-  ierr = MatGetLocalSize(_mat, &m, nullptr);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetLocalSize(_mat, &m, nullptr));
 
   return m;
 }
@@ -190,11 +184,9 @@ template <typename T>
 inline
 numeric_index_type PetscShellMatrix<T>::local_n () const
 {
-  PetscErrorCode ierr;
   PetscInt n;
 
-  ierr = MatGetLocalSize(_mat, nullptr, &n);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetLocalSize(_mat, nullptr, &n));
 
   return n;
 }
@@ -207,8 +199,7 @@ void PetscShellMatrix<T>::get_diagonal (NumericVector<T> & dest) const
   // Make sure the NumericVector passed in is really a PetscVector
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
 
-  PetscErrorCode ierr = MatGetDiagonal(_mat, petsc_dest.vec());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetDiagonal(_mat, petsc_dest.vec()));
 }
 
 

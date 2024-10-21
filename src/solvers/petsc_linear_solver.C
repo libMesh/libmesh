@@ -151,20 +151,13 @@ void PetscLinearSolver<T>::init (const char * name)
     {
       this->_is_initialized = true;
 
-      PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
-      ierr = KSPCreate (this->comm().get(), _ksp.get());
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPCreate(this->comm().get(), _ksp.get()));
 
       if (name)
-        {
-          ierr = KSPSetOptionsPrefix(_ksp, name);
-          LIBMESH_CHKERR(ierr);
-        }
+        LibmeshPetscCall(KSPSetOptionsPrefix(_ksp, name));
 
       // Create the preconditioner context
-      ierr = KSPGetPC        (_ksp, &_pc);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPGetPC(_ksp, &_pc));
 
       // Set user-specified  solver and preconditioner types
       this->set_petsc_solver_type();
@@ -182,33 +175,27 @@ void PetscLinearSolver<T>::init (const char * name)
       //  These options will override those specified above as long as
       //  KSPSetFromOptions() is called _after_ any other customization
       //  routines.
-      ierr = KSPSetFromOptions (_ksp);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetFromOptions(_ksp));
 
       // Have the Krylov subspace method use our good initial guess
       // rather than 0, unless the user requested a KSPType of
       // preonly, which complains if asked to use initial guesses.
       KSPType ksp_type;
 
-      ierr = KSPGetType (_ksp, &ksp_type);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPGetType(_ksp, &ksp_type));
 
       if (strcmp(ksp_type, "preonly"))
-        {
-          ierr = KSPSetInitialGuessNonzero(_ksp, PETSC_TRUE);
-          LIBMESH_CHKERR(ierr);
-        }
+        LibmeshPetscCall(KSPSetInitialGuessNonzero(_ksp, PETSC_TRUE));
 
       // Notify PETSc of location to store residual history.
       // This needs to be called before any solves, since
       // it sets the residual history length to zero.  The default
       // behavior is for PETSc to allocate (internally) an array
       // of size 1000 to hold the residual norm history.
-      ierr = KSPSetResidualHistory(_ksp,
-                                   LIBMESH_PETSC_NULLPTR, // pointer to the array which holds the history
-                                   PETSC_DECIDE, // size of the array holding the history
-                                   PETSC_TRUE);  // Whether or not to reset the history for each solve.
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetResidualHistory(_ksp,
+                                             LIBMESH_PETSC_NULLPTR, // pointer to the array which holds the history
+                                             PETSC_DECIDE, // size of the array holding the history
+                                             PETSC_TRUE)); // Whether or not to reset the history for each solve.
 
       PetscPreconditioner<T>::set_petsc_preconditioner_type(this->_preconditioner_type,_pc);
 
@@ -216,12 +203,9 @@ void PetscLinearSolver<T>::init (const char * name)
       if (this->_preconditioner)
         {
           this->_preconditioner->init();
-          ierr = PCShellSetContext(_pc,(void *)this->_preconditioner);
-          LIBMESH_CHKERR(ierr);
-          ierr = PCShellSetSetUp(_pc,libmesh_petsc_preconditioner_setup);
-          LIBMESH_CHKERR(ierr);
-          ierr = PCShellSetApply(_pc,libmesh_petsc_preconditioner_apply);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(PCShellSetContext(_pc,(void *)this->_preconditioner));
+          LibmeshPetscCall(PCShellSetSetUp(_pc,libmesh_petsc_preconditioner_setup));
+          LibmeshPetscCall(PCShellSetApply(_pc,libmesh_petsc_preconditioner_apply));
         }
     }
 }
@@ -234,14 +218,13 @@ void PetscLinearSolver<T>::init (PetscMatrixBase<T> * matrix,
   // Initialize the data structures if not done so already.
   if (!this->initialized())
     {
-       if (this->_preconditioner)
-          this->_preconditioner->set_matrix(*matrix);
+      if (this->_preconditioner)
+        this->_preconditioner->set_matrix(*matrix);
 
-       this->init(name);
+      this->init(name);
 
       // Set operators. The input matrix works as the preconditioning matrix
-      auto ierr = KSPSetOperators(_ksp, matrix->mat(), matrix->mat());
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetOperators(_ksp, matrix->mat(), matrix->mat()));
     }
 }
 
@@ -261,8 +244,6 @@ void
 PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int> * const dofs,
                                          const SubsetSolveMode subset_solve_mode)
 {
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   // The preconditioner (in particular if a default preconditioner)
   // will have to be reset.  We call this->clear() to do that.  This
   // call will also remove and free any previous subset that may have
@@ -274,8 +255,7 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int> * const
   if (dofs != nullptr)
     {
       PetscInt * petsc_dofs = nullptr;
-      ierr = PetscMalloc(dofs->size()*sizeof(PetscInt), &petsc_dofs);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(PetscMalloc(dofs->size()*sizeof(PetscInt), &petsc_dofs));
 
       for (auto i : index_range(*dofs))
         petsc_dofs[i] = (*dofs)[i];
@@ -283,11 +263,10 @@ PetscLinearSolver<T>::restrict_solve_to (const std::vector<unsigned int> * const
       // Create the IS
       // PETSc now takes over ownership of the "petsc_dofs"
       // array, so we don't have to worry about it any longer.
-      ierr = ISCreateGeneral(this->comm().get(),
-                             cast_int<PetscInt>(dofs->size()),
-                             petsc_dofs, PETSC_OWN_POINTER,
-                             _restrict_solve_to_is.get());
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(ISCreateGeneral(this->comm().get(),
+                                       cast_int<PetscInt>(dofs->size()),
+                                       petsc_dofs, PETSC_OWN_POINTER,
+                                       _restrict_solve_to_is.get()));
     }
 }
 
@@ -429,29 +408,23 @@ PetscLinearSolver<T>::shell_solve_common (const ShellMatrix<T> & shell_matrix,
 
   this->init ();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   // Prepare the matrix.
   WrappedPetsc<Mat> mat;
-  ierr = MatCreateShell(this->comm().get(),
-                        rhs_in.local_size(),
-                        solution_in.local_size(),
-                        rhs_in.size(),
-                        solution_in.size(),
-                        const_cast<void *>(static_cast<const void *>(&shell_matrix)),
-                        mat.get());
+  LibmeshPetscCall(MatCreateShell(this->comm().get(),
+                                  rhs_in.local_size(),
+                                  solution_in.local_size(),
+                                  rhs_in.size(),
+                                  solution_in.size(),
+                                  const_cast<void *>(static_cast<const void *>(&shell_matrix)),
+                                  mat.get()));
   // Note that the const_cast above is only necessary because PETSc
   // does not accept a const void *.  Inside the member function
   // _petsc_shell_matrix() below, the pointer is casted back to a
   // const ShellMatrix<T> *.
 
-  LIBMESH_CHKERR(ierr);
-  ierr = MatShellSetOperation(mat, MATOP_MULT, reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult));
-  LIBMESH_CHKERR(ierr);
-  ierr = MatShellSetOperation(mat, MATOP_MULT_ADD, reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult_add));
-  LIBMESH_CHKERR(ierr);
-  ierr = MatShellSetOperation(mat, MATOP_GET_DIAGONAL, reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal));
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatShellSetOperation(mat, MATOP_MULT, reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult)));
+  LibmeshPetscCall(MatShellSetOperation(mat, MATOP_MULT_ADD, reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_mult_add)));
+  LibmeshPetscCall(MatShellSetOperation(mat, MATOP_GET_DIAGONAL, reinterpret_cast<void(*)(void)>(_petsc_shell_matrix_get_diagonal)));
 
   return this->solve_base
     (matrix, precond, mat, solution_in, rhs_in, rel_tol, abs_tol, m_its, KSPSolve);
@@ -479,7 +452,6 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
   solution->close ();
   rhs->close ();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt its=0, max_its = static_cast<PetscInt>(m_its);
   PetscReal final_resid=0.;
 
@@ -497,42 +469,31 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
     {
       PetscInt is_local_size = this->restrict_solve_to_is_local_size();
 
-      ierr = VecCreate(this->comm().get(), subrhs.get());
-      LIBMESH_CHKERR(ierr);
-      ierr = VecSetSizes(subrhs, is_local_size, PETSC_DECIDE);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecSetFromOptions(subrhs);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecCreate(this->comm().get(), subrhs.get()));
+      LibmeshPetscCall(VecSetSizes(subrhs, is_local_size, PETSC_DECIDE));
+      LibmeshPetscCall(VecSetFromOptions(subrhs));
 
-      ierr = VecCreate(this->comm().get(), subsolution.get());
-      LIBMESH_CHKERR(ierr);
-      ierr = VecSetSizes(subsolution, is_local_size, PETSC_DECIDE);
-      LIBMESH_CHKERR(ierr);
-      ierr = VecSetFromOptions(subsolution);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecCreate(this->comm().get(), subsolution.get()));
+      LibmeshPetscCall(VecSetSizes(subsolution, is_local_size, PETSC_DECIDE));
+      LibmeshPetscCall(VecSetFromOptions(subsolution));
 
-      ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, scatter.get());
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecScatterCreate(rhs->vec(), _restrict_solve_to_is, subrhs, nullptr, scatter.get()));
 
       VecScatterBeginEnd(this->comm(), scatter, rhs->vec(), subrhs, INSERT_VALUES, SCATTER_FORWARD);
       VecScatterBeginEnd(this->comm(), scatter, solution->vec(), subsolution, INSERT_VALUES, SCATTER_FORWARD);
 
-      ierr = LibMeshCreateSubMatrix(mat,
-                                    _restrict_solve_to_is,
-                                    _restrict_solve_to_is,
-                                    MAT_INITIAL_MATRIX,
-                                    submat.get());
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(LibMeshCreateSubMatrix(mat,
+                                              _restrict_solve_to_is,
+                                              _restrict_solve_to_is,
+                                              MAT_INITIAL_MATRIX,
+                                              submat.get()));
 
       if (precond)
-        {
-          ierr = LibMeshCreateSubMatrix(const_cast<PetscMatrixBase<T> *>(precond)->mat(),
-                                        _restrict_solve_to_is,
-                                        _restrict_solve_to_is,
-                                        MAT_INITIAL_MATRIX,
-                                        subprecond.get());
-          LIBMESH_CHKERR(ierr);
-        }
+        LibmeshPetscCall(LibMeshCreateSubMatrix(const_cast<PetscMatrixBase<T> *>(precond)->mat(),
+                                                _restrict_solve_to_is,
+                                                _restrict_solve_to_is,
+                                                MAT_INITIAL_MATRIX,
+                                                subprecond.get()));
 
       // Since removing columns of the matrix changes the equation
       // system, we will now change the right hand side to compensate
@@ -545,44 +506,34 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
             cast_int<PetscInt>(rhs_in.local_size()-is_local_size);
 
           WrappedPetsc<Vec> subvec1;
-          ierr = VecCreate(this->comm().get(), subvec1.get());
-          LIBMESH_CHKERR(ierr);
-          ierr = VecSetSizes(subvec1, is_complement_local_size, PETSC_DECIDE);
-          LIBMESH_CHKERR(ierr);
-          ierr = VecSetFromOptions(subvec1);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecCreate(this->comm().get(), subvec1.get()));
+          LibmeshPetscCall(VecSetSizes(subvec1, is_complement_local_size, PETSC_DECIDE));
+          LibmeshPetscCall(VecSetFromOptions(subvec1));
 
           WrappedPetsc<VecScatter> scatter1;
-          ierr = VecScatterCreate(rhs->vec(), _restrict_solve_to_is_complement, subvec1, nullptr, scatter1.get());
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecScatterCreate(rhs->vec(), _restrict_solve_to_is_complement, subvec1, nullptr, scatter1.get()));
 
           VecScatterBeginEnd(this->comm(), scatter1, _subset_solve_mode==SUBSET_COPY_RHS ? rhs->vec() : solution->vec(), subvec1, INSERT_VALUES, SCATTER_FORWARD);
 
-          ierr = VecScale(subvec1, -1.0);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecScale(subvec1, -1.0));
 
           WrappedPetsc<Mat> submat1;
-          ierr = LibMeshCreateSubMatrix(mat,
-                                        _restrict_solve_to_is,
-                                        _restrict_solve_to_is_complement,
-                                        MAT_INITIAL_MATRIX,
-                                        submat1.get());
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(LibMeshCreateSubMatrix(mat,
+                                                  _restrict_solve_to_is,
+                                                  _restrict_solve_to_is_complement,
+                                                  MAT_INITIAL_MATRIX,
+                                                  submat1.get()));
 
-          ierr = MatMultAdd(submat1, subvec1, subrhs, subrhs);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatMultAdd(submat1, subvec1, subrhs, subrhs));
         }
 
       if (precond)
-        ierr = KSPSetOperators(_ksp, submat, subprecond);
+        LibmeshPetscCall(KSPSetOperators(_ksp, submat, subprecond));
       else
-        ierr = KSPSetOperators(_ksp, submat, submat);
-
-      LIBMESH_CHKERR(ierr);
+        LibmeshPetscCall(KSPSetOperators(_ksp, submat, submat));
 
       PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
-      ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner));
 
       if (precond && this->_preconditioner)
         {
@@ -594,19 +545,12 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
   else
     {
       PetscBool ksp_reuse_preconditioner = this->same_preconditioner ? PETSC_TRUE : PETSC_FALSE;
-      ierr = KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetReusePreconditioner(_ksp, ksp_reuse_preconditioner));
 
       if (precond)
-        {
-          ierr = KSPSetOperators(_ksp, mat, const_cast<PetscMatrixBase<T> *>(precond)->mat());
-          LIBMESH_CHKERR(ierr);
-        }
+        LibmeshPetscCall(KSPSetOperators(_ksp, mat, const_cast<PetscMatrixBase<T> *>(precond)->mat()));
       else
-        {
-          ierr = KSPSetOperators(_ksp, mat, mat);
-          LIBMESH_CHKERR(ierr);
-        }
+        LibmeshPetscCall(KSPSetOperators(_ksp, mat, mat));
 
       if (this->_preconditioner)
         {
@@ -621,13 +565,11 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
 
   // Set the tolerances for the iterative solver.  Use the user-supplied
   // tolerance for the relative residual & leave the others at default values.
-  ierr = KSPSetTolerances (_ksp, rel_tol, abs_tol,
-                           PETSC_DEFAULT, max_its);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(KSPSetTolerances(_ksp, rel_tol, abs_tol,
+                                    PETSC_DEFAULT, max_its));
 
   // Allow command line options to override anything set programmatically.
-  ierr = KSPSetFromOptions(_ksp);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(KSPSetFromOptions(_ksp));
 
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
@@ -638,36 +580,26 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
 
   // Solve the linear system
   if (_restrict_solve_to_is)
-    {
-      ierr = solve_func (_ksp, subrhs, subsolution);
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(solve_func (_ksp, subrhs, subsolution));
   else
-    {
-      ierr = solve_func (_ksp, rhs->vec(), solution->vec());
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(solve_func (_ksp, rhs->vec(), solution->vec()));
 
   // Get the number of iterations required for convergence
-  ierr = KSPGetIterationNumber (_ksp, &its);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(KSPGetIterationNumber (_ksp, &its));
 
   // Get the norm of the final residual to return to the user.
-  ierr = KSPGetResidualNorm (_ksp, &final_resid);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(KSPGetResidualNorm (_ksp, &final_resid));
 
   if (_restrict_solve_to_is)
     {
       switch(_subset_solve_mode)
         {
         case SUBSET_ZERO:
-          ierr = VecZeroEntries(solution->vec());
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecZeroEntries(solution->vec()));
           break;
 
         case SUBSET_COPY_RHS:
-          ierr = VecCopy(rhs->vec(),solution->vec());
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecCopy(rhs->vec(),solution->vec()));
           break;
 
         case SUBSET_DONT_TOUCH:
@@ -709,7 +641,6 @@ KSP PetscLinearSolver<T>::ksp()
 template <typename T>
 void PetscLinearSolver<T>::get_residual_history(std::vector<double> & hist)
 {
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt its  = 0;
 
   // Fill the residual history vector with the residual norms
@@ -727,8 +658,7 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double> & hist)
   const PetscReal * p;
 #endif
 
-  ierr = KSPGetResidualHistory(_ksp, &p, &its);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(KSPGetResidualHistory(_ksp, &p, &its));
 
   // Check for early return
   if (its == 0) return;
@@ -750,7 +680,6 @@ void PetscLinearSolver<T>::get_residual_history(std::vector<double> & hist)
 template <typename T>
 Real PetscLinearSolver<T>::get_initial_residual()
 {
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt its  = 0;
 
   // Fill the residual history vector with the residual norms
@@ -769,8 +698,7 @@ Real PetscLinearSolver<T>::get_initial_residual()
 #endif
 
 
-  ierr = KSPGetResidualHistory(_ksp, &p, &its);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(KSPGetResidualHistory(_ksp, &p, &its));
 
   // Check no residual history
   if (its == 0)
@@ -789,69 +717,55 @@ Real PetscLinearSolver<T>::get_initial_residual()
 template <typename T>
 void PetscLinearSolver<T>::set_petsc_solver_type()
 {
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   switch (this->_solver_type)
     {
 
     case CG:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCG));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPCG)));
       return;
 
     case CR:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCR));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPCR)));
       return;
 
     case CGS:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCGS));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPCGS)));
       return;
 
     case BICG:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPBICG));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPBICG)));
       return;
 
     case TCQMR:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPTCQMR));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPTCQMR)));
       return;
 
     case TFQMR:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPTFQMR));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPTFQMR)));
       return;
 
     case LSQR:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPLSQR));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPLSQR)));
       return;
 
     case BICGSTAB:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPBCGS));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPBCGS)));
       return;
 
     case MINRES:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPMINRES));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPMINRES)));
       return;
 
     case GMRES:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPGMRES));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPGMRES)));
       return;
 
     case RICHARDSON:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPRICHARDSON));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPRICHARDSON)));
       return;
 
     case CHEBYSHEV:
-      ierr = KSPSetType (_ksp, const_cast<KSPType>(KSPCHEBYSHEV));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPCHEBYSHEV)));
       return;
 
     default:
@@ -867,8 +781,7 @@ template <typename T>
 LinearConvergenceReason PetscLinearSolver<T>::get_converged_reason() const
 {
   KSPConvergedReason reason;
-  auto ierr = KSPGetConvergedReason(_ksp, &reason);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(KSPGetConvergedReason(_ksp, &reason));
 
   switch(reason)
     {
@@ -918,9 +831,8 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, 
   PetscFunctionBegin;
 
   // Get the matrix context.
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   void * ctx;
-  ierr = MatShellGetContext(mat,&ctx);
+  PetscErrorCode ierr = MatShellGetContext(mat,&ctx);
 
   // Get user shell matrix object.
   const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
@@ -944,9 +856,8 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_mult_add(Mat mat, Vec a
   PetscFunctionBegin;
 
   // Get the matrix context.
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   void * ctx;
-  ierr = MatShellGetContext(mat,&ctx);
+  PetscErrorCode ierr = MatShellGetContext(mat,&ctx);
 
   // Get user shell matrix object.
   const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
@@ -976,9 +887,8 @@ PetscErrorCode PetscLinearSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, V
   PetscFunctionBegin;
 
   // Get the matrix context.
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   void * ctx;
-  ierr = MatShellGetContext(mat,&ctx);
+  PetscErrorCode ierr = MatShellGetContext(mat,&ctx);
 
   // Get user shell matrix object.
   const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
@@ -1001,13 +911,10 @@ PetscLinearSolver<T>::create_complement_is (const NumericVector<T> & vec_in)
 {
   libmesh_assert(_restrict_solve_to_is);
   if (!_restrict_solve_to_is_complement)
-    {
-      PetscErrorCode ierr = ISComplement(_restrict_solve_to_is,
-                                         vec_in.first_local_index(),
-                                         vec_in.last_local_index(),
-                                         _restrict_solve_to_is_complement.get());
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(ISComplement(_restrict_solve_to_is,
+                                  vec_in.first_local_index(),
+                                  vec_in.last_local_index(),
+                                  _restrict_solve_to_is_complement.get()));
 }
 
 
@@ -1018,8 +925,7 @@ PetscLinearSolver<T>::restrict_solve_to_is_local_size() const
   libmesh_assert(_restrict_solve_to_is);
 
   PetscInt s;
-  auto ierr = ISGetLocalSize(_restrict_solve_to_is, &s);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(ISGetLocalSize(_restrict_solve_to_is, &s));
 
   return s;
 }

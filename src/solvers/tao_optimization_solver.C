@@ -463,10 +463,7 @@ void TaoOptimizationSolver<T>::init ()
     {
       this->_is_initialized = true;
 
-      PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
-      ierr = TaoCreate(this->comm().get(),&_tao);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(TaoCreate(this->comm().get(),&_tao));
     }
 }
 
@@ -492,15 +489,12 @@ void TaoOptimizationSolver<T>::solve ()
   // Set the starting guess to zero.
   x->zero();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   // Workaround for bug where TaoSetFromOptions *reset*
   // programmatically set tolerance and max. function evaluation
   // values when "-tao_type ipm" was specified on the command line: we
   // call TaoSetFromOptions twice (both before and after setting
   // custom options programmatically)
-  ierr = TaoSetFromOptions(_tao);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(TaoSetFromOptions(_tao));
 
   // Set convergence tolerances
   // f(X) - f(X*) (estimated)            <= fatol
@@ -509,120 +503,94 @@ void TaoOptimizationSolver<T>::solve ()
   // ||g(X)|| / |f(X)|                   <= grtol
   // ||g(X)|| / ||g(X0)||                <= gttol
   // Command line equivalents: -tao_fatol, -tao_frtol, -tao_gatol, -tao_grtol, -tao_gttol
-  ierr = TaoSetTolerances(_tao,
+  LibmeshPetscCall(TaoSetTolerances(_tao,
 #if PETSC_VERSION_LESS_THAN(3,7,0)
-                          // Releases up to 3.X.Y had fatol and frtol, after that they were removed.
-                          // Hopefully we'll be able to know X and Y soon. Guessing at 3.7.0.
-                          /*fatol=*/PETSC_DEFAULT,
-                          /*frtol=*/PETSC_DEFAULT,
+                                    // Releases up to 3.X.Y had fatol and frtol, after that they were removed.
+                                    // Hopefully we'll be able to know X and Y soon. Guessing at 3.7.0.
+                                    /*fatol=*/PETSC_DEFAULT,
+                                    /*frtol=*/PETSC_DEFAULT,
 #endif
-                          /*gatol=*/PETSC_DEFAULT,
-                          /*grtol=*/this->objective_function_relative_tolerance,
-                          /*gttol=*/PETSC_DEFAULT);
-  LIBMESH_CHKERR(ierr);
+                                    /*gatol=*/PETSC_DEFAULT,
+                                    /*grtol=*/this->objective_function_relative_tolerance,
+                                    /*gttol=*/PETSC_DEFAULT));
 
   // Set the max-allowed number of objective function evaluations
   // Command line equivalent: -tao_max_funcs
-  ierr = TaoSetMaximumFunctionEvaluations(_tao, this->max_objective_function_evaluations);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(TaoSetMaximumFunctionEvaluations(_tao, this->max_objective_function_evaluations));
 
   // Set the max-allowed number of optimization iterations.
   // Command line equivalent: -tao_max_it
   // Not implemented for now as it seems fairly similar to
-  // ierr = TaoSetMaximumIterations(_tao, 4);
-  // LIBMESH_CHKERR(ierr);
+  // LibmeshPetscCall(TaoSetMaximumIterations(_tao, 4));
 
   // Set solution vec and an initial guess
 #if PETSC_VERSION_LESS_THAN(3,17,0)
-  ierr = TaoSetInitialVector(_tao, x->vec());
+  LibmeshPetscCall(TaoSetInitialVector(_tao, x->vec()));
 #else
-  ierr = TaoSetSolution(_tao, x->vec());
+  LibmeshPetscCall(TaoSetSolution(_tao, x->vec()));
 #endif
-  LIBMESH_CHKERR(ierr);
 
   // We have to have an objective function
   libmesh_assert( this->objective_object );
 
   // Set routines for objective, gradient, hessian evaluation
 #if PETSC_VERSION_LESS_THAN(3,17,0)
-  ierr = TaoSetObjectiveRoutine(_tao, __libmesh_tao_objective, this);
+  LibmeshPetscCall(TaoSetObjectiveRoutine(_tao, __libmesh_tao_objective, this));
 #else
-  ierr = TaoSetObjective(_tao, __libmesh_tao_objective, this);
+  LibmeshPetscCall(TaoSetObjective(_tao, __libmesh_tao_objective, this));
 #endif
-  LIBMESH_CHKERR(ierr);
 
   if (this->gradient_object)
-    {
 #if PETSC_VERSION_LESS_THAN(3,17,0)
-      ierr = TaoSetGradientRoutine(_tao, __libmesh_tao_gradient, this);
+    LibmeshPetscCall(TaoSetGradientRoutine(_tao, __libmesh_tao_gradient, this));
 #else
-      ierr = TaoSetGradient(_tao, NULL, __libmesh_tao_gradient, this);
+    LibmeshPetscCall(TaoSetGradient(_tao, NULL, __libmesh_tao_gradient, this));
 #endif
-      LIBMESH_CHKERR(ierr);
-    }
 
   if (this->hessian_object)
-    {
 #if PETSC_VERSION_LESS_THAN(3,17,0)
-      ierr = TaoSetHessianRoutine(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this);
+    LibmeshPetscCall(TaoSetHessianRoutine(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this));
 #else
-      ierr = TaoSetHessian(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this);
+    LibmeshPetscCall(TaoSetHessian(_tao, hessian->mat(), hessian->mat(), __libmesh_tao_hessian, this));
 #endif
-      LIBMESH_CHKERR(ierr);
-    }
 
   if (this->lower_and_upper_bounds_object)
     {
       // Need to actually compute the bounds vectors first
       this->lower_and_upper_bounds_object->lower_and_upper_bounds(this->system());
 
-      ierr = TaoSetVariableBounds(_tao,
-                                  lb->vec(),
-                                  ub->vec());
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(TaoSetVariableBounds(_tao,
+                                            lb->vec(),
+                                            ub->vec()));
     }
 
   if (this->equality_constraints_object)
-    {
-      ierr = TaoSetEqualityConstraintsRoutine(_tao, ceq->vec(), __libmesh_tao_equality_constraints, this);
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(TaoSetEqualityConstraintsRoutine(_tao, ceq->vec(), __libmesh_tao_equality_constraints, this));
 
   if (this->equality_constraints_jacobian_object)
-    {
-      ierr = TaoSetJacobianEqualityRoutine(_tao,
-                                           ceq_jac->mat(),
-                                           ceq_jac->mat(),
-                                           __libmesh_tao_equality_constraints_jacobian,
-                                           this);
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(TaoSetJacobianEqualityRoutine(_tao,
+                                                   ceq_jac->mat(),
+                                                   ceq_jac->mat(),
+                                                   __libmesh_tao_equality_constraints_jacobian,
+                                                   this));
 
   // Optionally set inequality constraints
   if (this->inequality_constraints_object)
-    {
-      ierr = TaoSetInequalityConstraintsRoutine(_tao, cineq->vec(), __libmesh_tao_inequality_constraints, this);
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(TaoSetInequalityConstraintsRoutine(_tao, cineq->vec(), __libmesh_tao_inequality_constraints, this));
 
   // Optionally set inequality constraints Jacobian
   if (this->inequality_constraints_jacobian_object)
-    {
-      ierr = TaoSetJacobianInequalityRoutine(_tao,
-                                             cineq_jac->mat(),
-                                             cineq_jac->mat(),
-                                             __libmesh_tao_inequality_constraints_jacobian,
-                                             this);
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(TaoSetJacobianInequalityRoutine(_tao,
+                                                     cineq_jac->mat(),
+                                                     cineq_jac->mat(),
+                                                     __libmesh_tao_inequality_constraints_jacobian,
+                                                     this));
 
   // Check for Tao command line options
-  ierr = TaoSetFromOptions(_tao);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(TaoSetFromOptions(_tao));
 
   // Perform the optimization
-  ierr = TaoSolve(_tao);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(TaoSolve(_tao));
 
   // Enforce constraints exactly now that the solve is done.  We have
   // been enforcing them on the current_local_solution during the
@@ -631,8 +599,7 @@ void TaoOptimizationSolver<T>::solve ()
   this->system().get_dof_map().enforce_constraints_exactly(this->system());
 
   // Store the convergence/divergence reason
-  ierr = TaoGetConvergedReason(_tao, &_reason);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(TaoGetConvergedReason(_tao, &_reason));
 }
 
 
@@ -649,11 +616,9 @@ void TaoOptimizationSolver<T>::get_dual_variables()
   Vec lambda_eq_petsc_vec = lambda_eq_petsc->vec();
   Vec lambda_ineq_petsc_vec = lambda_ineq_petsc->vec();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-  ierr = TaoGetDualVariables(_tao,
-                             &lambda_eq_petsc_vec,
-                             &lambda_ineq_petsc_vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(TaoGetDualVariables(_tao,
+                                       &lambda_eq_petsc_vec,
+                                       &lambda_ineq_petsc_vec));
 }
 
 
@@ -669,13 +634,8 @@ void TaoOptimizationSolver<T>::print_converged_reason()
 template <typename T>
 int TaoOptimizationSolver<T>::get_converged_reason()
 {
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   if (this->initialized())
-    {
-      ierr = TaoGetConvergedReason(_tao, &_reason);
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(TaoGetConvergedReason(_tao, &_reason));
 
   return static_cast<int>(_reason);
 }

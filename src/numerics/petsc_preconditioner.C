@@ -46,8 +46,7 @@ void PetscPreconditioner<T>::apply(const NumericVector<T> & x, NumericVector<T> 
   Vec x_vec = x_pvec.vec();
   Vec y_vec = y_pvec.vec();
 
-  PetscErrorCode ierr = PCApply(_pc, x_vec, y_vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(PCApply(_pc, x_vec, y_vec));
 }
 
 
@@ -65,15 +64,13 @@ void PetscPreconditioner<T>::init ()
       if (_pc)
         _pc.destroy();
 
-      PetscErrorCode ierr = PCCreate(this->comm().get(), _pc.get());
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(PCCreate(this->comm().get(), _pc.get()));
 
       auto pmatrix = cast_ptr<PetscMatrixBase<T> *>(this->_matrix);
       _mat = pmatrix->mat();
     }
 
-  PetscErrorCode ierr = PCSetOperators(_pc, _mat, _mat);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(PCSetOperators(_pc, _mat, _mat));
 
   // Set the PCType.  Note: this used to be done *before* the call to
   // PCSetOperators(), and only when !_is_initialized, but

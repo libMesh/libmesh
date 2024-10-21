@@ -46,11 +46,9 @@ T PetscVector<T>::sum () const
   this->_restore_array();
   libmesh_assert(this->closed());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscScalar value=0.;
 
-  ierr = VecSum (_vec, &value);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecSum (_vec, &value));
 
   return static_cast<T>(value);
 }
@@ -62,11 +60,9 @@ Real PetscVector<T>::l1_norm () const
   this->_restore_array();
   libmesh_assert(this->closed());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscReal value=0.;
 
-  ierr = VecNorm (_vec, NORM_1, &value);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecNorm (_vec, NORM_1, &value));
 
   return static_cast<Real>(value);
 }
@@ -81,11 +77,9 @@ Real PetscVector<T>::l2_norm () const
   this->_restore_array();
   libmesh_assert(this->closed());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscReal value=0.;
 
-  ierr = VecNorm (_vec, NORM_2, &value);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecNorm (_vec, NORM_2, &value));
 
   return static_cast<Real>(value);
 }
@@ -101,11 +95,9 @@ Real PetscVector<T>::linfty_norm () const
   this->_restore_array();
   libmesh_assert(this->closed());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscReal value=0.;
 
-  ierr = VecNorm (_vec, NORM_INFINITY, &value);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecNorm (_vec, NORM_INFINITY, &value));
 
   return static_cast<Real>(value);
 }
@@ -151,13 +143,11 @@ void PetscVector<T>::set (const numeric_index_type i, const T value)
   this->_restore_array();
   libmesh_assert_less (i, size());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt i_val = static_cast<PetscInt>(i);
   PetscScalar petsc_value = PS(value);
 
   std::scoped_lock lock(this->_numeric_vector_mutex);
-  ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, INSERT_VALUES);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecSetValues (_vec, 1, &i_val, &petsc_value, INSERT_VALUES));
 
   this->_is_closed = false;
 }
@@ -169,11 +159,9 @@ void PetscVector<T>::reciprocal()
 {
   parallel_object_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // VecReciprocal has been in PETSc since at least 2.3.3 days
-  ierr = VecReciprocal(_vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecReciprocal(_vec));
 }
 
 
@@ -183,11 +171,9 @@ void PetscVector<T>::conjugate()
 {
   parallel_object_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // We just call the PETSc VecConjugate
-  ierr = VecConjugate(_vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecConjugate(_vec));
 }
 
 
@@ -198,13 +184,11 @@ void PetscVector<T>::add (const numeric_index_type i, const T value)
   this->_restore_array();
   libmesh_assert_less (i, size());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt i_val = static_cast<PetscInt>(i);
   PetscScalar petsc_value = PS(value);
 
   std::scoped_lock lock(this->_numeric_vector_mutex);
-  ierr = VecSetValues (_vec, 1, &i_val, &petsc_value, ADD_VALUES);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecSetValues (_vec, 1, &i_val, &petsc_value, ADD_VALUES));
 
   this->_is_closed = false;
 }
@@ -221,14 +205,12 @@ void PetscVector<T>::add_vector (const T * v,
 
   this->_restore_array();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   const PetscInt * i_val = reinterpret_cast<const PetscInt *>(dof_indices.data());
   const PetscScalar * petsc_value = pPS(v);
 
   std::scoped_lock lock(this->_numeric_vector_mutex);
-  ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
-                       i_val, petsc_value, ADD_VALUES);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
+                                 i_val, petsc_value, ADD_VALUES));
 
   this->_is_closed = false;
 }
@@ -246,7 +228,6 @@ void PetscVector<T>::add_vector (const NumericVector<T> & v_in,
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
   const PetscMatrixBase<T> * A = cast_ptr<const PetscMatrixBase<T> *>(&A_in);
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // We shouldn't close() the matrix for you, as that would potentially modify the state of a const object.
   if (!A->closed())
@@ -259,8 +240,7 @@ void PetscVector<T>::add_vector (const NumericVector<T> & v_in,
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // expects a non-const Mat.
-  ierr = MatMultAdd(const_cast<PetscMatrixBase<T> *>(A)->mat(), v->_vec, _vec, _vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatMultAdd(const_cast<PetscMatrixBase<T> *>(A)->mat(), v->_vec, _vec, _vec));
 }
 
 
@@ -276,7 +256,6 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T> & v_in,
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
   const PetscMatrixBase<T> * A = cast_ptr<const PetscMatrixBase<T> *>(&A_in);
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // We shouldn't close() the matrix for you, as that would potentially modify the state of a const object.
   if (!A->closed())
@@ -289,8 +268,7 @@ void PetscVector<T>::add_vector_transpose (const NumericVector<T> & v_in,
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // expects a non-const Mat.
-  ierr = MatMultTransposeAdd(const_cast<PetscMatrixBase<T> *>(A)->mat(), v->_vec, _vec, _vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatMultTransposeAdd(const_cast<PetscMatrixBase<T> *>(A)->mat(), v->_vec, _vec, _vec));
 }
 
 
@@ -321,8 +299,7 @@ void PetscVector<T>::add_vector_conjugate_transpose (const NumericVector<T> & v_
 
   // The const_cast<> is not elegant, but it is required since PETSc
   // expects a non-const Mat.
-  PetscErrorCode ierr = MatMultHermitianTranspose(const_cast<PetscMatrixBase<T> *>(A)->mat(), v->_vec, _vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatMultHermitianTranspose(const_cast<PetscMatrixBase<T> *>(A)->mat(), v->_vec, _vec));
 
   // Add the temporary copy to the matvec result
   this->add(1., *this_clone);
@@ -373,8 +350,7 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 
   libmesh_assert_equal_to (this->size(), v->size());
 
-  PetscErrorCode ierr = VecAXPY(_vec, a, v->vec());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecAXPY(_vec, a, v->vec()));
 
   libmesh_assert(this->comm().verify(int(this->type())));
 
@@ -395,12 +371,10 @@ void PetscVector<T>::insert (const T * v,
 
   this->_restore_array();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt * idx_values = numeric_petsc_cast(dof_indices.data());
   std::scoped_lock lock(this->_numeric_vector_mutex);
-  ierr = VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
-                       idx_values, pPS(v), INSERT_VALUES);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecSetValues (_vec, cast_int<PetscInt>(dof_indices.size()),
+                                 idx_values, pPS(v), INSERT_VALUES));
 
   this->_is_closed = false;
 }
@@ -416,8 +390,7 @@ void PetscVector<T>::scale (const T factor_in)
 
   PetscScalar factor = PS(factor_in);
 
-  PetscErrorCode ierr = VecScale(_vec, factor);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecScale(_vec, factor));
 
   libmesh_assert(this->comm().verify(int(this->type())));
 
@@ -430,12 +403,10 @@ NumericVector<T> & PetscVector<T>::operator *= (const NumericVector<T> & v)
 {
   parallel_object_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   const PetscVector<T> * v_vec = cast_ptr<const PetscVector<T> *>(&v);
 
-  ierr = VecPointwiseMult(_vec, _vec, v_vec->_vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecPointwiseMult(_vec, _vec, v_vec->_vec));
 
   return *this;
 }
@@ -445,12 +416,10 @@ NumericVector<T> & PetscVector<T>::operator /= (const NumericVector<T> & v)
 {
   parallel_object_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   const PetscVector<T> * v_vec = cast_ptr<const PetscVector<T> *>(&v);
 
-  ierr = VecPointwiseDivide(_vec, _vec, v_vec->_vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecPointwiseDivide(_vec, _vec, v_vec->_vec));
 
   return *this;
 }
@@ -462,8 +431,7 @@ void PetscVector<T>::abs()
 
   this->_restore_array();
 
-  PetscErrorCode ierr = VecAbs(_vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecAbs(_vec));
 
   libmesh_assert(this->comm().verify(int(this->type())));
 
@@ -479,7 +447,6 @@ T PetscVector<T>::dot (const NumericVector<T> & v_in) const
   this->_restore_array();
 
   // Error flag
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Return value
   PetscScalar value=0.;
@@ -488,8 +455,7 @@ T PetscVector<T>::dot (const NumericVector<T> & v_in) const
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
 
   // 2.3.x (at least) style.  Untested for previous versions.
-  ierr = VecDot(this->_vec, v->_vec, &value);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecDot(this->_vec, v->_vec, &value));
 
   return static_cast<T>(value);
 }
@@ -502,7 +468,6 @@ T PetscVector<T>::indefinite_dot (const NumericVector<T> & v_in) const
   this->_restore_array();
 
   // Error flag
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Return value
   PetscScalar value=0.;
@@ -511,8 +476,7 @@ T PetscVector<T>::indefinite_dot (const NumericVector<T> & v_in) const
   const PetscVector<T> * v = cast_ptr<const PetscVector<T> *>(&v_in);
 
   // 2.3.x (at least) style.  Untested for previous versions.
-  ierr = VecTDot(this->_vec, v->_vec, &value);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecTDot(this->_vec, v->_vec, &value));
 
   return static_cast<T>(value);
 }
@@ -531,8 +495,7 @@ PetscVector<T>::operator = (const T s_in)
 
   if (this->size() != 0)
     {
-      PetscErrorCode ierr = VecSet(_vec, s);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecSet(_vec, s));
 
       libmesh_assert(this->comm().verify(int(this->type())));
 
@@ -574,10 +537,8 @@ PetscVector<T>::operator = (const PetscVector<T> & v)
   libmesh_assert_equal_to (this->local_size(), v.local_size());
   libmesh_assert (v.closed());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
-  ierr = VecCopy (v._vec, this->_vec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecCopy (v._vec, this->_vec));
 
   libmesh_assert(this->comm().verify(int(this->type())));
 
@@ -650,26 +611,19 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
   // Cases 2) and 3) should be scalable
   libmesh_assert(this->size()==v_local->local_size() || this->local_size()==v_local->local_size());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   if (v_local->type() == SERIAL && this->size() == v_local->local_size())
   {
     WrappedPetsc<VecScatter> scatter;
-    ierr = VecScatterCreateToAll(_vec, scatter.get(), nullptr);
-    LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(VecScatterCreateToAll(_vec, scatter.get(), nullptr));
     VecScatterBeginEnd(this->comm(), scatter, _vec, v_local->_vec, INSERT_VALUES, SCATTER_FORWARD);
   }
   // Two vectors have the same size, and we should just do a simple copy.
   // v_local could be either a parallel or ghosted vector
   else if (this->local_size() == v_local->local_size())
-  {
-    ierr = VecCopy(_vec,v_local->_vec);
-    LIBMESH_CHKERR(ierr);
-  }
+    LibmeshPetscCall(VecCopy(_vec,v_local->_vec));
   else
-  {
     libmesh_error_msg("Vectors are inconsistent");
-  }
 
   // Make sure ghost dofs are up to date
   // We do not call "close" here to save a global reduction
@@ -709,7 +663,6 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
   libmesh_assert_equal_to (v_local->size(), this->size());
   libmesh_assert_less_equal (send_list.size(), v_local->size());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   const numeric_index_type n_sl =
     cast_int<numeric_index_type>(send_list.size());
 
@@ -722,16 +675,13 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in,
   // Create the index set & scatter objects
   WrappedPetsc<IS> is;
   PetscInt * idxptr = idx.empty() ? nullptr : idx.data();
-  ierr = ISCreateGeneral(this->comm().get(), n_sl+this->local_size(),
-                         idxptr, PETSC_USE_POINTER, is.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(ISCreateGeneral(this->comm().get(), n_sl+this->local_size(),
+                                   idxptr, PETSC_USE_POINTER, is.get()));
 
   WrappedPetsc<VecScatter> scatter;
-  ierr = VecScatterCreate(_vec,          is,
-                          v_local->_vec, is,
-                          scatter.get());
-  LIBMESH_CHKERR(ierr);
-
+  LibmeshPetscCall(VecScatterCreate(_vec,          is,
+                                    v_local->_vec, is,
+                                    scatter.get()));
 
   // Perform the scatter
   VecScatterBeginEnd(this->comm(), scatter, _vec, v_local->_vec, INSERT_VALUES, SCATTER_FORWARD);
@@ -750,12 +700,10 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   parallel_object_only();
 
   // Error code used to check the status of all PETSc function calls.
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Create a sequential destination Vec with the right number of entries on each proc.
   WrappedPetsc<Vec> dest;
-  ierr = VecCreateSeq(PETSC_COMM_SELF, cast_int<PetscInt>(indices.size()), dest.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecCreateSeq(PETSC_COMM_SELF, cast_int<PetscInt>(indices.size()), dest.get()));
 
   // Create an IS using the libmesh routine.  PETSc does not own the
   // IS memory in this case, it is automatically cleaned up by the
@@ -763,26 +711,23 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   PetscInt * idxptr =
     indices.empty() ? nullptr : numeric_petsc_cast(indices.data());
   WrappedPetsc<IS> is;
-  ierr = ISCreateGeneral(this->comm().get(), cast_int<PetscInt>(indices.size()), idxptr,
-                         PETSC_USE_POINTER, is.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(ISCreateGeneral(this->comm().get(), cast_int<PetscInt>(indices.size()), idxptr,
+                                   PETSC_USE_POINTER, is.get()));
 
   // Create the VecScatter object. "PETSC_NULL" means "use the identity IS".
   WrappedPetsc<VecScatter> scatter;
-  ierr = VecScatterCreate(_vec,
-                          /*src is=*/is,
-                          /*dest vec=*/dest,
-                          /*dest is=*/LIBMESH_PETSC_NULLPTR,
-                          scatter.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecScatterCreate(_vec,
+                                    /*src is=*/is,
+                                    /*dest vec=*/dest,
+                                    /*dest is=*/LIBMESH_PETSC_NULLPTR,
+                                    scatter.get()));
 
   // Do the scatter
   VecScatterBeginEnd(this->comm(), scatter, _vec, dest, INSERT_VALUES, SCATTER_FORWARD);
 
   // Get access to the values stored in dest.
   PetscScalar * values;
-  ierr = VecGetArray (dest, &values);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecGetArray (dest, &values));
 
   // Store values into the provided v_local. Make sure there is enough
   // space reserved and then clear out any existing entries before
@@ -792,8 +737,7 @@ void PetscVector<T>::localize (std::vector<T> & v_local,
   v_local.insert(v_local.begin(), values, values+indices.size());
 
   // We are done using it, so restore the array.
-  ierr = VecRestoreArray (dest, &values);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecRestoreArray (dest, &values));
 }
 
 
@@ -812,7 +756,6 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
 
   const numeric_index_type my_size       = this->size();
   const numeric_index_type my_local_size = (last_local_idx + 1 - first_local_idx);
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Don't bother for serial cases
   //  if ((first_local_idx == 0) &&
@@ -837,15 +780,13 @@ void PetscVector<T>::localize (const numeric_index_type first_local_idx,
 
     // Create the index set & scatter objects
     WrappedPetsc<IS> is;
-    ierr = ISCreateGeneral(this->comm().get(), my_local_size,
-                           my_local_size ? idx.data() : nullptr, PETSC_USE_POINTER, is.get());
-    LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(ISCreateGeneral(this->comm().get(), my_local_size,
+                                     my_local_size ? idx.data() : nullptr, PETSC_USE_POINTER, is.get()));
 
     WrappedPetsc<VecScatter> scatter;
-    ierr = VecScatterCreate(_vec,              is,
-                            parallel_vec._vec, is,
-                            scatter.get());
-    LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(VecScatterCreate(_vec,              is,
+                                      parallel_vec._vec, is,
+                                      scatter.get()));
 
     // Perform the scatter
     VecScatterBeginEnd(this->comm(), scatter, _vec, parallel_vec._vec, INSERT_VALUES, SCATTER_FORWARD);
@@ -869,7 +810,6 @@ void PetscVector<T>::localize (std::vector<T> & v_local) const
   // This function must be run on all processors at once
   parallel_object_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   const PetscInt n = this->size();
   const PetscInt nl = this->local_size();
   PetscScalar * values;
@@ -877,16 +817,14 @@ void PetscVector<T>::localize (std::vector<T> & v_local) const
   v_local.clear();
   v_local.resize(n, 0.);
 
-  ierr = VecGetArray (_vec, &values);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecGetArray (_vec, &values));
 
   numeric_index_type ioff = first_local_index();
 
   for (PetscInt i=0; i<nl; i++)
     v_local[i+ioff] = static_cast<T>(values[i]);
 
-  ierr = VecRestoreArray (_vec, &values);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecRestoreArray (_vec, &values));
 
   this->comm().sum(v_local);
 }
@@ -905,7 +843,6 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
 
   this->_restore_array();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   const PetscInt n  = size();
   PetscScalar * values;
 
@@ -914,14 +851,12 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
     {
       v_local.resize(n);
 
-      ierr = VecGetArray (_vec, &values);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecGetArray (_vec, &values));
 
       for (PetscInt i=0; i<n; i++)
         v_local[i] = static_cast<Real>(values[i]);
 
-      ierr = VecRestoreArray (_vec, &values);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecRestoreArray (_vec, &values));
     }
 
   // otherwise multiple processors
@@ -933,8 +868,7 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
           WrappedPetsc<Vec> vout;
           WrappedPetsc<VecScatter> ctx;
 
-          ierr = VecScatterCreateToZero(_vec, ctx.get(), vout.get());
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(VecScatterCreateToZero(_vec, ctx.get(), vout.get()));
 
           VecScatterBeginEnd(this->comm(), ctx, _vec, vout, INSERT_VALUES, SCATTER_FORWARD);
 
@@ -942,14 +876,12 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
             {
               v_local.resize(n);
 
-              ierr = VecGetArray (vout, &values);
-              LIBMESH_CHKERR(ierr);
+              LibmeshPetscCall(VecGetArray (vout, &values));
 
               for (PetscInt i=0; i<n; i++)
                 v_local[i] = static_cast<Real>(values[i]);
 
-              ierr = VecRestoreArray (vout, &values);
-              LIBMESH_CHKERR(ierr);
+              LibmeshPetscCall(VecRestoreArray (vout, &values));
             }
         }
       else
@@ -960,15 +892,13 @@ void PetscVector<Real>::localize_to_one (std::vector<Real> & v_local,
           std::vector<Real> local_values (n, 0.);
 
           {
-            ierr = VecGetArray (_vec, &values);
-            LIBMESH_CHKERR(ierr);
+            LibmeshPetscCall(VecGetArray (_vec, &values));
 
             const PetscInt nl = local_size();
             for (PetscInt i=0; i<nl; i++)
               local_values[i+ioff] = static_cast<Real>(values[i]);
 
-            ierr = VecRestoreArray (_vec, &values);
-            LIBMESH_CHKERR(ierr);
+            LibmeshPetscCall(VecRestoreArray (_vec, &values));
           }
 
 
@@ -995,7 +925,6 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex> & v_local,
 
   this->_restore_array();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   const PetscInt n  = size();
   const PetscInt nl = local_size();
   PetscScalar * values;
@@ -1010,14 +939,12 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex> & v_local,
   // only one processor
   if (n_processors() == 1)
     {
-      ierr = VecGetArray (_vec, &values);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecGetArray (_vec, &values));
 
       for (PetscInt i=0; i<n; i++)
         v_local[i] = static_cast<Complex>(values[i]);
 
-      ierr = VecRestoreArray (_vec, &values);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecRestoreArray (_vec, &values));
     }
 
   // otherwise multiple processors
@@ -1032,8 +959,7 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex> & v_local,
       std::vector<Real> imag_local_values(n, 0.);
 
       {
-        ierr = VecGetArray (_vec, &values);
-        LIBMESH_CHKERR(ierr);
+        LibmeshPetscCall(VecGetArray (_vec, &values));
 
         // provide my local share to the real and imag buffers
         for (PetscInt i=0; i<nl; i++)
@@ -1042,8 +968,7 @@ void PetscVector<Complex>::localize_to_one (std::vector<Complex> & v_local,
             imag_local_values[i+ioff] = static_cast<Complex>(values[i]).imag();
           }
 
-        ierr = VecRestoreArray (_vec, &values);
-        LIBMESH_CHKERR(ierr);
+        LibmeshPetscCall(VecRestoreArray (_vec, &values));
       }
 
       /* have buffers of the real and imaginary part of v_local.
@@ -1090,8 +1015,7 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
   const PetscVector<T> * vec2_petsc = cast_ptr<const PetscVector<T> *>(&vec2);
 
   // Call PETSc function.
-  PetscErrorCode ierr = VecPointwiseMult(_vec, vec1_petsc->vec(), vec2_petsc->vec());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecPointwiseMult(_vec, vec1_petsc->vec(), vec2_petsc->vec()));
 
   libmesh_assert(this->comm().verify(int(this->type())));
 
@@ -1114,8 +1038,7 @@ void PetscVector<T>::pointwise_divide (const NumericVector<T> & vec1,
   const PetscVector<T> * const vec2_petsc = cast_ptr<const PetscVector<T> *>(&vec2);
 
   // Call PETSc function.
-  PetscErrorCode ierr = VecPointwiseDivide(_vec, vec1_petsc->vec(), vec2_petsc->vec());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecPointwiseDivide(_vec, vec1_petsc->vec(), vec2_petsc->vec()));
 
   libmesh_assert(this->comm().verify(int(this->type())));
 
@@ -1133,33 +1056,27 @@ void PetscVector<T>::print_matlab (const std::string & name) const
   this->_restore_array();
   libmesh_assert (this->closed());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   WrappedPetsc<PetscViewer> petsc_viewer;
-  ierr = PetscViewerCreate (this->comm().get(), petsc_viewer.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(PetscViewerCreate (this->comm().get(), petsc_viewer.get()));
 
   // Create an ASCII file containing the matrix
   // if a filename was provided.
   if (name != "")
     {
-      ierr = PetscViewerASCIIOpen( this->comm().get(),
-                                   name.c_str(),
-                                   petsc_viewer.get());
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(PetscViewerASCIIOpen(this->comm().get(),
+                                            name.c_str(),
+                                            petsc_viewer.get()));
 
 #if PETSC_VERSION_LESS_THAN(3,7,0)
-      ierr = PetscViewerSetFormat (petsc_viewer,
-                                   PETSC_VIEWER_ASCII_MATLAB);
+      LibmeshPetscCall(PetscViewerSetFormat (petsc_viewer,
+                                             PETSC_VIEWER_ASCII_MATLAB));
 #else
-      ierr = PetscViewerPushFormat (petsc_viewer,
-                                    PETSC_VIEWER_ASCII_MATLAB);
+      LibmeshPetscCall(PetscViewerPushFormat (petsc_viewer,
+                                              PETSC_VIEWER_ASCII_MATLAB));
 #endif
 
-      LIBMESH_CHKERR(ierr);
-
-      ierr = VecView (_vec, petsc_viewer);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecView (_vec, petsc_viewer));
     }
 
   // Otherwise the matrix will be dumped to the screen.
@@ -1167,17 +1084,14 @@ void PetscVector<T>::print_matlab (const std::string & name) const
     {
 
 #if PETSC_VERSION_LESS_THAN(3,7,0)
-      ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-                                   PETSC_VIEWER_ASCII_MATLAB);
+      LibmeshPetscCall(PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+                                             PETSC_VIEWER_ASCII_MATLAB));
 #else
-      ierr = PetscViewerPushFormat (PETSC_VIEWER_STDOUT_WORLD,
-                                    PETSC_VIEWER_ASCII_MATLAB);
+      LibmeshPetscCall(PetscViewerPushFormat (PETSC_VIEWER_STDOUT_WORLD,
+                                              PETSC_VIEWER_ASCII_MATLAB));
 #endif
 
-      LIBMESH_CHKERR(ierr);
-
-      ierr = VecView (_vec, PETSC_VIEWER_STDOUT_WORLD);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecView (_vec, PETSC_VIEWER_STDOUT_WORLD));
     }
 }
 
@@ -1199,7 +1113,6 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
   this->_restore_array();
 
   // PETSc data structures
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
   // Make sure the passed in subvector is really a PetscVector
   PetscVector<T> * petsc_subvector = cast_ptr<PetscVector<T> *>(&subvector);
@@ -1218,19 +1131,17 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
         // entries) is not currently offered by the PetscVector
         // class.  Should we differentiate here between sequential and
         // parallel vector creation based on this->n_processors() ?
-        ierr = VecCreateMPI(this->comm().get(),
-                            PETSC_DECIDE,                    // n_local
-                            cast_int<PetscInt>(rows.size()), // n_global
-                            &(petsc_subvector->_vec));
+        LibmeshPetscCall(VecCreateMPI(this->comm().get(),
+                                      PETSC_DECIDE,                    // n_local
+                                      cast_int<PetscInt>(rows.size()), // n_global
+                                      &(petsc_subvector->_vec)));
       else
-        ierr = VecCreateMPI(this->comm().get(),
-                            cast_int<PetscInt>(rows.size()),
-                            PETSC_DETERMINE,
-                            &(petsc_subvector->_vec));
-      LIBMESH_CHKERR(ierr);
+        LibmeshPetscCall(VecCreateMPI(this->comm().get(),
+                                      cast_int<PetscInt>(rows.size()),
+                                      PETSC_DETERMINE,
+                                      &(petsc_subvector->_vec)));
 
-      ierr = VecSetFromOptions (petsc_subvector->_vec);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecSetFromOptions (petsc_subvector->_vec));
 
       // We created a parallel vector
       petsc_subvector->_type = PARALLEL;
@@ -1249,35 +1160,32 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
   else
     {
       PetscInt start;
-      ierr = VecGetOwnershipRange(petsc_subvector->_vec, &start, nullptr);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(VecGetOwnershipRange(petsc_subvector->_vec, &start, nullptr));
       std::iota (idx.begin(), idx.end(), start);
     }
 
   // Construct index sets
   WrappedPetsc<IS> parent_is;
-  ierr = ISCreateGeneral(this->comm().get(),
-                         cast_int<PetscInt>(rows.size()),
-                         numeric_petsc_cast(rows.data()),
-                         PETSC_USE_POINTER,
-                         parent_is.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(ISCreateGeneral(this->comm().get(),
+                                   cast_int<PetscInt>(rows.size()),
+                                   numeric_petsc_cast(rows.data()),
+                                   PETSC_USE_POINTER,
+                                   parent_is.get()));
 
   WrappedPetsc<IS> subvector_is;
-  ierr = ISCreateGeneral(this->comm().get(),
-                         cast_int<PetscInt>(rows.size()),
-                         idx.data(),
-                         PETSC_USE_POINTER,
-                         subvector_is.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(ISCreateGeneral(this->comm().get(),
+                                   cast_int<PetscInt>(rows.size()),
+                                   idx.data(),
+                                   PETSC_USE_POINTER,
+                                   subvector_is.get()));
 
   // Construct the scatter object
   WrappedPetsc<VecScatter> scatter;
-  ierr = VecScatterCreate(this->_vec,
-                          parent_is,
-                          petsc_subvector->_vec,
-                          subvector_is,
-                          scatter.get()); LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecScatterCreate(this->_vec,
+                                    parent_is,
+                                    petsc_subvector->_vec,
+                                    subvector_is,
+                                    scatter.get()));
 
   // Actually perform the scatter
   VecScatterBeginEnd(this->comm(), scatter, this->_vec, petsc_subvector->_vec, INSERT_VALUES, SCATTER_FORWARD);
@@ -1314,49 +1222,43 @@ void PetscVector<T>::_get_array(bool read_only) const
       std::scoped_lock lock(_petsc_get_restore_array_mutex);
       if (!_array_is_present.load(std::memory_order_relaxed))
         {
-          PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-          if (this->type() != GHOSTED)
+                  if (this->type() != GHOSTED)
             {
               if (read_only)
                 {
-                  ierr = VecGetArrayRead(_vec, &_read_only_values);
+                  LibmeshPetscCall(VecGetArrayRead(_vec, &_read_only_values));
                   _values_read_only = true;
                 }
               else
                 {
-                  ierr = VecGetArray(_vec, &_values);
+                  LibmeshPetscCall(VecGetArray(_vec, &_values));
                   _values_read_only = false;
                 }
-              LIBMESH_CHKERR(ierr);
               _local_size = this->local_size();
             }
           else
             {
-              ierr = VecGhostGetLocalForm (_vec,&_local_form);
-              LIBMESH_CHKERR(ierr);
+              LibmeshPetscCall(VecGhostGetLocalForm (_vec,&_local_form));
 
               if (read_only)
                 {
-                  ierr = VecGetArrayRead(_local_form, &_read_only_values);
+                  LibmeshPetscCall(VecGetArrayRead(_local_form, &_read_only_values));
                   _values_read_only = true;
                 }
               else
                 {
-                  ierr = VecGetArray(_local_form, &_values);
+                  LibmeshPetscCall(VecGetArray(_local_form, &_values));
                   _values_read_only = false;
                 }
-              LIBMESH_CHKERR(ierr);
 
               PetscInt my_local_size = 0;
-              ierr = VecGetLocalSize(_local_form, &my_local_size);
-              LIBMESH_CHKERR(ierr);
+              LibmeshPetscCall(VecGetLocalSize(_local_form, &my_local_size));
               _local_size = static_cast<numeric_index_type>(my_local_size);
             }
 
           { // cache ownership range
             PetscInt petsc_first=0, petsc_last=0;
-            ierr = VecGetOwnershipRange (_vec, &petsc_first, &petsc_last);
-            LIBMESH_CHKERR(ierr);
+            LibmeshPetscCall(VecGetOwnershipRange (_vec, &petsc_first, &petsc_last));
             _first = static_cast<numeric_index_type>(petsc_first);
             _last = static_cast<numeric_index_type>(petsc_last);
           }
@@ -1379,28 +1281,24 @@ void PetscVector<T>::_restore_array() const
       std::scoped_lock lock(_petsc_get_restore_array_mutex);
       if (_array_is_present.load(std::memory_order_relaxed))
         {
-          PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-          if (this->type() != GHOSTED)
+                  if (this->type() != GHOSTED)
             {
               if (_values_read_only)
-                ierr = VecRestoreArrayRead (_vec, &_read_only_values);
+                LibmeshPetscCall(VecRestoreArrayRead (_vec, &_read_only_values));
               else
-                ierr = VecRestoreArray (_vec, &_values);
+                LibmeshPetscCall(VecRestoreArray (_vec, &_values));
 
-              LIBMESH_CHKERR(ierr);
               _values = nullptr;
             }
           else
             {
               if (_values_read_only)
-                ierr = VecRestoreArrayRead (_local_form, &_read_only_values);
+                LibmeshPetscCall(VecRestoreArrayRead (_local_form, &_read_only_values));
               else
-                ierr = VecRestoreArray (_local_form, &_values);
+                LibmeshPetscCall(VecRestoreArray (_local_form, &_values));
 
-              LIBMESH_CHKERR(ierr);
               _values = nullptr;
-              ierr = VecGhostRestoreLocalForm (_vec,&_local_form);
-              LIBMESH_CHKERR(ierr);
+              LibmeshPetscCall(VecGhostRestoreLocalForm (_vec,&_local_form));
               _local_form = nullptr;
               _local_size = 0;
             }
@@ -1415,16 +1313,14 @@ PetscVector<T>::get_subvector(const std::vector<numeric_index_type> & rows)
 {
   // Construct index set
   WrappedPetsc<IS> parent_is;
-  auto ierr = ISCreateGeneral(this->comm().get(),
-                              cast_int<PetscInt>(rows.size()),
-                              numeric_petsc_cast(rows.data()),
-                              PETSC_USE_POINTER,
-                              parent_is.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(ISCreateGeneral(this->comm().get(),
+                                   cast_int<PetscInt>(rows.size()),
+                                   numeric_petsc_cast(rows.data()),
+                                   PETSC_USE_POINTER,
+                                   parent_is.get()));
 
   Vec subvec;
-  ierr = VecGetSubVector(_vec, parent_is, &subvec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecGetSubVector(_vec, parent_is, &subvec));
 
   this->_is_closed = false;
 
@@ -1440,16 +1336,14 @@ PetscVector<T>::restore_subvector(std::unique_ptr<NumericVector<T>> subvector,
 
   // Construct index set
   WrappedPetsc<IS> parent_is;
-  auto ierr = ISCreateGeneral(this->comm().get(),
-                              cast_int<PetscInt>(rows.size()),
-                              numeric_petsc_cast(rows.data()),
-                              PETSC_USE_POINTER,
-                              parent_is.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(ISCreateGeneral(this->comm().get(),
+                                   cast_int<PetscInt>(rows.size()),
+                                   numeric_petsc_cast(rows.data()),
+                                   PETSC_USE_POINTER,
+                                   parent_is.get()));
 
   Vec subvec = petsc_subvector->vec();
-  ierr = VecRestoreSubVector(_vec, parent_is, &subvec);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(VecRestoreSubVector(_vec, parent_is, &subvec));
 
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);

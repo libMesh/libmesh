@@ -37,8 +37,7 @@ void PetscShellMatrix<T>::vector_mult (NumericVector<T> & dest,
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
   const PetscVector<T> & petsc_arg = cast_ref<const PetscVector<T> &>(arg);
 
-  PetscErrorCode ierr = MatMult(_mat, petsc_arg.vec(), petsc_dest.vec());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatMult(_mat, petsc_arg.vec(), petsc_dest.vec()));
 }
 
 
@@ -50,8 +49,7 @@ void PetscShellMatrix<T>::vector_mult_add (NumericVector<T> & dest,
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
   const PetscVector<T> & petsc_arg = cast_ref<const PetscVector<T> &>(arg);
 
-  PetscErrorCode ierr = MatMultAdd(_mat, petsc_arg.vec(), petsc_dest.vec(), petsc_dest.vec());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatMultAdd(_mat, petsc_arg.vec(), petsc_dest.vec(), petsc_dest.vec()));
 }
 
 

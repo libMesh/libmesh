@@ -134,7 +134,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   this->_is_initialized = true;
 
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt m_global   = static_cast<PetscInt>(m_in);
   PetscInt n_global   = static_cast<PetscInt>(n_in);
   PetscInt m_local    = static_cast<PetscInt>(m_l);
@@ -142,13 +141,10 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   PetscInt n_nz       = static_cast<PetscInt>(nnz);
   PetscInt n_oz       = static_cast<PetscInt>(noz);
 
-  ierr = MatCreate(this->comm().get(), &this->_mat);
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetSizes(this->_mat, m_local, n_local, m_global, n_global);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatCreate(this->comm().get(), &this->_mat));
+  LibmeshPetscCall(MatSetSizes(this->_mat, m_local, n_local, m_global, n_global));
   PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
-  ierr = MatSetBlockSize(this->_mat,blocksize);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatSetBlockSize(this->_mat,blocksize));
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
   if (blocksize > 1)
@@ -162,58 +158,44 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       libmesh_assert_equal_to (n_nz     % blocksize, 0);
       libmesh_assert_equal_to (n_oz     % blocksize, 0);
 
-      ierr = MatSetType(this->_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatSetType(this->_mat, MATBAIJ)); // Automatically chooses seqbaij or mpibaij
 
       // MatSetFromOptions needs to happen before Preallocation routines
       // since MatSetFromOptions can change matrix type and remove incompatible
       // preallocation
-      ierr = MatSetOptionsPrefix(this->_mat, "");
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSetFromOptions(this->_mat);
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSeqBAIJSetPreallocation(this->_mat, blocksize, n_nz/blocksize, NULL);
-      LIBMESH_CHKERR(ierr);
-      ierr = MatMPIBAIJSetPreallocation(this->_mat, blocksize,
-                                        n_nz/blocksize, NULL,
-                                        n_oz/blocksize, NULL);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
+      LibmeshPetscCall(MatSetFromOptions(this->_mat));
+      LibmeshPetscCall(MatSeqBAIJSetPreallocation(this->_mat, blocksize, n_nz/blocksize, NULL));
+      LibmeshPetscCall(MatMPIBAIJSetPreallocation(this->_mat, blocksize,
+                                                  n_nz/blocksize, NULL,
+                                                  n_oz/blocksize, NULL));
     }
   else
 #endif
     {
       switch (this->_mat_type) {
         case AIJ:
-          ierr = MatSetType(this->_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatSetType(this->_mat, MATAIJ)); // Automatically chooses seqaij or mpiaij
 
           // MatSetFromOptions needs to happen before Preallocation routines
           // since MatSetFromOptions can change matrix type and remove incompatible
           // preallocation
-          ierr = MatSetOptionsPrefix(this->_mat, "");
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetFromOptions(this->_mat);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSeqAIJSetPreallocation(this->_mat, n_nz, NULL);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatMPIAIJSetPreallocation(this->_mat, n_nz, NULL, n_oz, NULL);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
+          LibmeshPetscCall(MatSetFromOptions(this->_mat));
+          LibmeshPetscCall(MatSeqAIJSetPreallocation(this->_mat, n_nz, NULL));
+          LibmeshPetscCall(MatMPIAIJSetPreallocation(this->_mat, n_nz, NULL, n_oz, NULL));
           break;
 
         case HYPRE:
 #if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
-          ierr = MatSetType(this->_mat, MATHYPRE);
+          LibmeshPetscCall(MatSetType(this->_mat, MATHYPRE));
 
           // MatSetFromOptions needs to happen before Preallocation routines
           // since MatSetFromOptions can change matrix type and remove incompatible
           // preallocation
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetOptionsPrefix(this->_mat, "");
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetFromOptions(this->_mat);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatHYPRESetPreallocation(this->_mat, n_nz, NULL, n_oz, NULL);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
+          LibmeshPetscCall(MatSetFromOptions(this->_mat));
+          LibmeshPetscCall(MatHYPRESetPreallocation(this->_mat, n_nz, NULL, n_oz, NULL));
 #else
           libmesh_error_msg("PETSc 3.9.4 or higher with hypre is required for MatHypre");
 #endif
@@ -224,8 +206,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
     }
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
-  ierr = MatSetOption(this->_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatSetOption(this->_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
 
   this->set_context ();
   this->zero ();
@@ -256,18 +237,14 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   libmesh_assert_equal_to (n_nz.size(), m_l);
   libmesh_assert_equal_to (n_oz.size(), m_l);
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt m_global   = static_cast<PetscInt>(m_in);
   PetscInt n_global   = static_cast<PetscInt>(n_in);
   PetscInt m_local    = static_cast<PetscInt>(m_l);
   PetscInt n_local    = static_cast<PetscInt>(n_l);
 
-  ierr = MatCreate(this->comm().get(), &this->_mat);
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetSizes(this->_mat, m_local, n_local, m_global, n_global);
-  LIBMESH_CHKERR(ierr);
-  ierr = MatSetBlockSize(this->_mat,blocksize);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatCreate(this->comm().get(), &this->_mat));
+  LibmeshPetscCall(MatSetSizes(this->_mat, m_local, n_local, m_global, n_global));
+  LibmeshPetscCall(MatSetBlockSize(this->_mat,blocksize));
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
   if (blocksize > 1)
@@ -279,17 +256,13 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       libmesh_assert_equal_to (m_global % blocksize, 0);
       libmesh_assert_equal_to (n_global % blocksize, 0);
 
-      ierr = MatSetType(this->_mat, MATBAIJ); // Automatically chooses seqbaij or mpibaij
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatSetType(this->_mat, MATBAIJ)); // Automatically chooses seqbaij or mpibaij
 
       // MatSetFromOptions needs to happen before Preallocation routines
       // since MatSetFromOptions can change matrix type and remove incompatible
       // preallocation
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSetOptionsPrefix(this->_mat, "");
-      LIBMESH_CHKERR(ierr);
-      ierr = MatSetFromOptions(this->_mat);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
+      LibmeshPetscCall(MatSetFromOptions(this->_mat));
       // transform the per-entry n_nz and n_oz arrays into their block counterparts.
       std::vector<numeric_index_type> b_n_nz, b_n_oz;
 
@@ -297,66 +270,54 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
                                       n_nz, n_oz,
                                       b_n_nz, b_n_oz);
 
-      ierr = MatSeqBAIJSetPreallocation (this->_mat,
-                                         blocksize,
-                                         0,
-                                         numeric_petsc_cast(b_n_nz.empty() ? nullptr : b_n_nz.data()));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatSeqBAIJSetPreallocation (this->_mat,
+                                                   blocksize,
+                                                   0,
+                                                   numeric_petsc_cast(b_n_nz.empty() ? nullptr : b_n_nz.data())));
 
-      ierr = MatMPIBAIJSetPreallocation (this->_mat,
-                                         blocksize,
-                                         0,
-                                         numeric_petsc_cast(b_n_nz.empty() ? nullptr : b_n_nz.data()),
-                                         0,
-                                         numeric_petsc_cast(b_n_oz.empty() ? nullptr : b_n_oz.data()));
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatMPIBAIJSetPreallocation (this->_mat,
+                                                   blocksize,
+                                                   0,
+                                                   numeric_petsc_cast(b_n_nz.empty() ? nullptr : b_n_nz.data()),
+                                                   0,
+                                                   numeric_petsc_cast(b_n_oz.empty() ? nullptr : b_n_oz.data())));
     }
   else
 #endif
     {
       switch (this->_mat_type) {
         case AIJ:
-          ierr = MatSetType(this->_mat, MATAIJ); // Automatically chooses seqaij or mpiaij
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatSetType(this->_mat, MATAIJ)); // Automatically chooses seqaij or mpiaij
 
           // MatSetFromOptions needs to happen before Preallocation routines
           // since MatSetFromOptions can change matrix type and remove incompatible
           // preallocation
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetOptionsPrefix(this->_mat, "");
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetFromOptions(this->_mat);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSeqAIJSetPreallocation (this->_mat,
-                                            0,
-                                            numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()));
-          LIBMESH_CHKERR(ierr);
-          ierr = MatMPIAIJSetPreallocation (this->_mat,
-                                            0,
-                                            numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()),
-                                            0,
-                                            numeric_petsc_cast(n_oz.empty() ? nullptr : n_oz.data()));
+          LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
+          LibmeshPetscCall(MatSetFromOptions(this->_mat));
+          LibmeshPetscCall(MatSeqAIJSetPreallocation (this->_mat,
+                                                      0,
+                                                      numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data())));
+          LibmeshPetscCall(MatMPIAIJSetPreallocation (this->_mat,
+                                                      0,
+                                                      numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()),
+                                                      0,
+                                                      numeric_petsc_cast(n_oz.empty() ? nullptr : n_oz.data())));
           break;
 
         case HYPRE:
 #if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
-          ierr = MatSetType(this->_mat, MATHYPRE);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatSetType(this->_mat, MATHYPRE));
 
           // MatSetFromOptions needs to happen before Preallocation routines
           // since MatSetFromOptions can change matrix type and remove incompatible
           // preallocation
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetOptionsPrefix(this->_mat, "");
-          LIBMESH_CHKERR(ierr);
-          ierr = MatSetFromOptions(this->_mat);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatHYPRESetPreallocation (this->_mat,
-                                           0,
-                                           numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()),
-                                           0,
-                                           numeric_petsc_cast(n_oz.empty() ? nullptr : n_oz.data()));
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
+          LibmeshPetscCall(MatSetFromOptions(this->_mat));
+          LibmeshPetscCall(MatHYPRESetPreallocation (this->_mat,
+                                                     0,
+                                                     numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()),
+                                                     0,
+                                                     numeric_petsc_cast(n_oz.empty() ? nullptr : n_oz.data())));
 #else
           libmesh_error_msg("PETSc 3.9.4 or higher with hypre is required for MatHypre");
 #endif
@@ -368,8 +329,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
     }
 
   // Make it an error for PETSc to allocate new nonzero entries during assembly
-  ierr = MatSetOption(this->_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatSetOption(this->_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
   this->set_context();
   this->zero();
 }
@@ -404,8 +364,7 @@ void PetscMatrix<T>::reset_preallocation()
 #if !PETSC_VERSION_LESS_THAN(3,9,0)
   libmesh_assert (this->initialized());
 
-  auto ierr = MatResetPreallocation(this->_mat);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatResetPreallocation(this->_mat));
 #else
   libmesh_warning("Your version of PETSc doesn't support resetting of "
                   "preallocation, so we will use your most recent sparsity "
@@ -420,18 +379,12 @@ void PetscMatrix<T>::zero ()
 
   semiparallel_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   PetscInt m_l, n_l;
 
-  ierr = MatGetLocalSize(this->_mat,&m_l,&n_l);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetLocalSize(this->_mat,&m_l,&n_l));
 
   if (n_l)
-    {
-      ierr = MatZeroEntries(this->_mat);
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(MatZeroEntries(this->_mat));
 }
 
 template <typename T>
@@ -441,20 +394,16 @@ void PetscMatrix<T>::zero_rows (std::vector<numeric_index_type> & rows, T diag_v
 
   semiparallel_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   // As of petsc-dev at the time of 3.1.0, MatZeroRows now takes two additional
   // optional arguments.  The optional arguments (x,b) can be used to specify the
   // solutions for the zeroed rows (x) and right hand side (b) to update.
   // Could be useful for setting boundary conditions...
   if (!rows.empty())
-    ierr = MatZeroRows(this->_mat, cast_int<PetscInt>(rows.size()),
-                       numeric_petsc_cast(rows.data()), PS(diag_value),
-                       NULL, NULL);
+    LibmeshPetscCall(MatZeroRows(this->_mat, cast_int<PetscInt>(rows.size()),
+                                 numeric_petsc_cast(rows.data()), PS(diag_value),
+                                 NULL, NULL));
   else
-    ierr = MatZeroRows(this->_mat, 0, NULL, PS(diag_value), NULL, NULL);
-
-  LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(MatZeroRows(this->_mat, 0, NULL, PS(diag_value), NULL, NULL));
 }
 
 template <typename T>
@@ -464,8 +413,7 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::zero_clone () const
 
   // Copy the nonzero pattern only
   Mat copy;
-  PetscErrorCode ierr = MatDuplicate(this->_mat, MAT_DO_NOT_COPY_VALUES, &copy);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatDuplicate(this->_mat, MAT_DO_NOT_COPY_VALUES, &copy));
 
   // Call wrapping PetscMatrix constructor, have it take over
   // ownership.
@@ -484,8 +432,7 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::clone () const
 
   // Copy the nonzero pattern and numerical values
   Mat copy;
-  PetscErrorCode ierr = MatDuplicate(this->_mat, MAT_COPY_VALUES, &copy);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatDuplicate(this->_mat, MAT_COPY_VALUES, &copy));
 
   // Call wrapping PetscMatrix constructor, have it take over
   // ownership.
@@ -504,14 +451,12 @@ Real PetscMatrix<T>::l1_norm () const
 
   semiparallel_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscReal petsc_value;
   Real value;
 
   libmesh_assert (this->closed());
 
-  ierr = MatNorm(this->_mat, NORM_1, &petsc_value);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatNorm(this->_mat, NORM_1, &petsc_value));
 
   value = static_cast<Real>(petsc_value);
 
@@ -527,14 +472,12 @@ Real PetscMatrix<T>::linfty_norm () const
 
   semiparallel_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscReal petsc_value;
   Real value;
 
   libmesh_assert (this->closed());
 
-  ierr = MatNorm(this->_mat, NORM_INFINITY, &petsc_value);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatNorm(this->_mat, NORM_INFINITY, &petsc_value));
 
   value = static_cast<Real>(petsc_value);
 
@@ -558,51 +501,41 @@ void PetscMatrix<T>::print_matlab (const std::string & name) const
       const_cast<PetscMatrix<T> *>(this)->close();
     }
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   WrappedPetsc<PetscViewer> petsc_viewer;
-  ierr = PetscViewerCreate (this->comm().get(),
-                            petsc_viewer.get());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(PetscViewerCreate (this->comm().get(),
+                                      petsc_viewer.get()));
 
   // Create an ASCII file containing the matrix
   // if a filename was provided.
   if (name != "")
     {
-      ierr = PetscViewerASCIIOpen( this->comm().get(),
-                                   name.c_str(),
-                                   petsc_viewer.get());
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(PetscViewerASCIIOpen( this->comm().get(),
+                                             name.c_str(),
+                                             petsc_viewer.get()));
 
 #if PETSC_VERSION_LESS_THAN(3,7,0)
-      ierr = PetscViewerSetFormat (petsc_viewer,
-                                   PETSC_VIEWER_ASCII_MATLAB);
+      LibmeshPetscCall(PetscViewerSetFormat (petsc_viewer,
+                                             PETSC_VIEWER_ASCII_MATLAB));
 #else
-      ierr = PetscViewerPushFormat (petsc_viewer,
-                                    PETSC_VIEWER_ASCII_MATLAB);
+      LibmeshPetscCall(PetscViewerPushFormat (petsc_viewer,
+                                              PETSC_VIEWER_ASCII_MATLAB));
 #endif
 
-      LIBMESH_CHKERR(ierr);
-
-      ierr = MatView (this->_mat, petsc_viewer);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatView (this->_mat, petsc_viewer));
     }
 
   // Otherwise the matrix will be dumped to the screen.
   else
     {
 #if PETSC_VERSION_LESS_THAN(3,7,0)
-      ierr = PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-                                   PETSC_VIEWER_ASCII_MATLAB);
+      LibmeshPetscCall(PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+                                             PETSC_VIEWER_ASCII_MATLAB));
 #else
-      ierr = PetscViewerPushFormat (PETSC_VIEWER_STDOUT_WORLD,
-                                    PETSC_VIEWER_ASCII_MATLAB);
+      LibmeshPetscCall(PetscViewerPushFormat (PETSC_VIEWER_STDOUT_WORLD,
+                                              PETSC_VIEWER_ASCII_MATLAB));
 #endif
 
-      LIBMESH_CHKERR(ierr);
-
-      ierr = MatView (this->_mat, PETSC_VIEWER_STDOUT_WORLD);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatView (this->_mat, PETSC_VIEWER_STDOUT_WORLD));
     }
 }
 
@@ -633,14 +566,9 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
       const_cast<PetscMatrix<T> *>(this)->close();
     }
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   // Print to screen if ostream is stdout
   if (os.rdbuf() == std::cout.rdbuf())
-    {
-      ierr = MatView(this->_mat, NULL);
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(MatView(this->_mat, NULL));
 
   // Otherwise, print to the requested file, in a roundabout way...
   else
@@ -682,10 +610,9 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
       // of the file internally.  Since print_personal() takes a reference to
       // an ostream, we have to do an extra step...  print_personal() should probably
       // have a version that takes a string to get rid of this problem.
-      ierr = PetscViewerASCIIOpen( this->comm().get(),
-                                   temp_filename.c_str(),
-                                   &petsc_viewer);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(PetscViewerASCIIOpen( this->comm().get(),
+                                             temp_filename.c_str(),
+                                             &petsc_viewer));
 
       // Probably don't need to set the format if it's default...
       //      ierr = PetscViewerSetFormat (petsc_viewer,
@@ -693,8 +620,7 @@ void PetscMatrix<T>::print_personal(std::ostream & os) const
       //      LIBMESH_CHKERR(ierr);
 
       // Finally print the matrix using the viewer
-      ierr = MatView (this->_mat, petsc_viewer);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatView (this->_mat, petsc_viewer));
 
       if (this->processor_id() == 0)
         {
@@ -720,35 +646,25 @@ void PetscMatrix<T>::_petsc_viewer(const std::string & filename,
 {
   parallel_object_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   // We'll get matrix sizes from the file, but we need to at least
   // have a Mat object
   if (!this->initialized())
     {
-      ierr = MatCreate(this->comm().get(), &this->_mat);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatCreate(this->comm().get(), &this->_mat));
       this->_is_initialized = true;
     }
 
   PetscViewer viewer;
-  ierr = PetscViewerCreate(this->comm().get(), &viewer);
-  LIBMESH_CHKERR(ierr);
-  ierr = PetscViewerSetType(viewer, viewertype);
-  LIBMESH_CHKERR(ierr);
-  ierr = PetscViewerSetFromOptions(viewer);
-  LIBMESH_CHKERR(ierr);
-  ierr = PetscViewerFileSetMode(viewer, filemode);
-  LIBMESH_CHKERR(ierr);
-  ierr = PetscViewerFileSetName(viewer, filename.c_str());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(PetscViewerCreate(this->comm().get(), &viewer));
+  LibmeshPetscCall(PetscViewerSetType(viewer, viewertype));
+  LibmeshPetscCall(PetscViewerSetFromOptions(viewer));
+  LibmeshPetscCall(PetscViewerFileSetMode(viewer, filemode));
+  LibmeshPetscCall(PetscViewerFileSetName(viewer, filename.c_str()));
   if (filemode == FILE_MODE_READ)
-    ierr = MatLoad(this->_mat, viewer);
+    LibmeshPetscCall(MatLoad(this->_mat, viewer));
   else
-    ierr = MatView(this->_mat, viewer);
-  LIBMESH_CHKERR(ierr);
-  ierr = PetscViewerDestroy(&viewer);
-  LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(MatView(this->_mat, viewer));
+  LibmeshPetscCall(PetscViewerDestroy(&viewer));
 }
 
 
@@ -806,13 +722,11 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
   libmesh_assert_equal_to (rows.size(), n_rows);
   libmesh_assert_equal_to (cols.size(), n_cols);
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-  ierr = MatSetValues(this->_mat,
-                      n_rows, numeric_petsc_cast(rows.data()),
-                      n_cols, numeric_petsc_cast(cols.data()),
-                      pPS(const_cast<T*>(dm.get_values().data())),
-                      ADD_VALUES);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatSetValues(this->_mat,
+                                n_rows, numeric_petsc_cast(rows.data()),
+                                n_cols, numeric_petsc_cast(cols.data()),
+                                pPS(const_cast<T*>(dm.get_values().data())),
+                                ADD_VALUES));
 }
 
 
@@ -832,8 +746,6 @@ void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T> & dm,
   const numeric_index_type n_bcols =
     cast_int<numeric_index_type>(bcols.size());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
 #ifndef NDEBUG
   const numeric_index_type n_rows  =
     cast_int<numeric_index_type>(dm.m());
@@ -846,18 +758,16 @@ void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T> & dm,
   libmesh_assert_equal_to (blocksize*n_bcols, n_cols);
 
   PetscInt petsc_blocksize;
-  ierr = MatGetBlockSize(this->_mat, &petsc_blocksize);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetBlockSize(this->_mat, &petsc_blocksize));
   libmesh_assert_equal_to (blocksize, static_cast<numeric_index_type>(petsc_blocksize));
 #endif
 
   // These casts are required for PETSc <= 2.1.5
-  ierr = MatSetValuesBlocked(this->_mat,
-                             n_brows, numeric_petsc_cast(brows.data()),
-                             n_bcols, numeric_petsc_cast(bcols.data()),
-                             pPS(const_cast<T*>(dm.get_values().data())),
-                             ADD_VALUES);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatSetValuesBlocked(this->_mat,
+                                       n_brows, numeric_petsc_cast(brows.data()),
+                                       n_bcols, numeric_petsc_cast(bcols.data()),
+                                       pPS(const_cast<T*>(dm.get_values().data())),
+                                       ADD_VALUES));
 }
 
 
@@ -887,28 +797,26 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
     submatrix.clear();
 
   // Construct row and column index sets.
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   WrappedPetsc<IS> isrow;
-  ierr = ISCreateGeneral(this->comm().get(),
-                         cast_int<PetscInt>(rows.size()),
-                         numeric_petsc_cast(rows.data()),
-                         PETSC_USE_POINTER,
-                         isrow.get()); LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(ISCreateGeneral(this->comm().get(),
+                                   cast_int<PetscInt>(rows.size()),
+                                   numeric_petsc_cast(rows.data()),
+                                   PETSC_USE_POINTER,
+                                   isrow.get()));
 
   WrappedPetsc<IS> iscol;
-  ierr = ISCreateGeneral(this->comm().get(),
-                         cast_int<PetscInt>(cols.size()),
-                         numeric_petsc_cast(cols.data()),
-                         PETSC_USE_POINTER,
-                         iscol.get()); LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(ISCreateGeneral(this->comm().get(),
+                                   cast_int<PetscInt>(cols.size()),
+                                   numeric_petsc_cast(cols.data()),
+                                   PETSC_USE_POINTER,
+                                   iscol.get()));
 
   // Extract submatrix
-  ierr = LibMeshCreateSubMatrix(this->_mat,
-                                isrow,
-                                iscol,
-                                (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
-                                (&petsc_submatrix->_mat));  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(LibMeshCreateSubMatrix(this->_mat,
+                                          isrow,
+                                          iscol,
+                                          (reuse_submatrix ? MAT_REUSE_MATRIX : MAT_INITIAL_MATRIX),
+                                          (&petsc_submatrix->_mat)));
 
   // Specify that the new submatrix is initialized and close it.
   petsc_submatrix->_is_initialized = true;
@@ -931,10 +839,7 @@ void PetscMatrix<T>::create_submatrix_nosort(SparseMatrix<T> & submatrix,
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * petsc_submatrix = cast_ptr<PetscMatrix<T> *>(&submatrix);
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
-  ierr=MatZeroEntries(petsc_submatrix->_mat);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatZeroEntries(petsc_submatrix->_mat));
 
   PetscInt pc_ncols = 0;
   const PetscInt * pc_cols;
@@ -952,8 +857,7 @@ void PetscMatrix<T>::create_submatrix_nosort(SparseMatrix<T> & submatrix,
     if (rows[i]>= this->row_start() && rows[i]< this->row_stop())
     {
       // get one row of data from the original matrix
-      ierr = MatGetRow(this->_mat, rid, &pc_ncols, &pc_cols, &pc_vals);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatGetRow(this->_mat, rid, &pc_ncols, &pc_cols, &pc_vals));
       // extract data from certain cols, save the indices and entries sub_cols and sub_vals
       for (auto j : index_range(cols))
       {
@@ -967,16 +871,14 @@ void PetscMatrix<T>::create_submatrix_nosort(SparseMatrix<T> & submatrix,
         }
       }
       // set values
-      ierr = MatSetValues(petsc_submatrix->_mat,
-                          1,
-                          sub_rid,
-                          static_cast<PetscInt>(sub_vals.size()),
-                          sub_cols.data(),
-                          sub_vals.data(),
-                          INSERT_VALUES);
-      LIBMESH_CHKERR(ierr);
-      ierr = MatRestoreRow(this->_mat, rid, &pc_ncols, &pc_cols, &pc_vals);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatSetValues(petsc_submatrix->_mat,
+                                    1,
+                                    sub_rid,
+                                    static_cast<PetscInt>(sub_vals.size()),
+                                    sub_cols.data(),
+                                    sub_vals.data(),
+                                    INSERT_VALUES));
+      LibmeshPetscCall(MatRestoreRow(this->_mat, rid, &pc_ncols, &pc_cols, &pc_vals));
       // clear data for this row
       sub_cols.clear();
       sub_vals.clear();
@@ -996,8 +898,7 @@ void PetscMatrix<T>::get_diagonal (NumericVector<T> & dest) const
   PetscVector<T> & petsc_dest = cast_ref<PetscVector<T> &>(dest);
 
   // Needs a const_cast since PETSc does not work with const.
-  PetscErrorCode ierr =
-    MatGetDiagonal(const_cast<PetscMatrix<T> *>(this)->mat(),petsc_dest.vec()); LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetDiagonal(const_cast<PetscMatrix<T> *>(this)->mat(),petsc_dest.vec()));
 }
 
 
@@ -1013,18 +914,16 @@ void PetscMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
   if (&petsc_dest != this)
     dest.clear();
 
-  PetscErrorCode ierr;
   if (&petsc_dest == this)
     // The MAT_REUSE_MATRIX flag was replaced by MAT_INPLACE_MATRIX
     // in PETSc 3.7.0
 #if PETSC_VERSION_LESS_THAN(3,7,0)
-    ierr = MatTranspose(this->_mat,MAT_REUSE_MATRIX, &petsc_dest._mat);
+    LibmeshPetscCall(MatTranspose(this->_mat,MAT_REUSE_MATRIX, &petsc_dest._mat));
 #else
-    ierr = MatTranspose(this->_mat, MAT_INPLACE_MATRIX, &petsc_dest._mat);
+    LibmeshPetscCall(MatTranspose(this->_mat, MAT_INPLACE_MATRIX, &petsc_dest._mat));
 #endif
   else
-    ierr = MatTranspose(this->_mat,MAT_INITIAL_MATRIX, &petsc_dest._mat);
-  LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(MatTranspose(this->_mat,MAT_INITIAL_MATRIX, &petsc_dest._mat));
 
   // Specify that the transposed matrix is initialized and close it.
   petsc_dest._is_initialized = true;
@@ -1050,13 +949,11 @@ void PetscMatrix<T>::set (const numeric_index_type i,
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt i_val=i, j_val=j;
 
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
-  ierr = MatSetValues(this->_mat, 1, &i_val, 1, &j_val,
-                      &petsc_value, INSERT_VALUES);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatSetValues(this->_mat, 1, &i_val, 1, &j_val,
+                                &petsc_value, INSERT_VALUES));
 }
 
 
@@ -1068,13 +965,11 @@ void PetscMatrix<T>::add (const numeric_index_type i,
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt i_val=i, j_val=j;
 
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
-  ierr = MatSetValues(this->_mat, 1, &i_val, 1, &j_val,
-                      &petsc_value, ADD_VALUES);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatSetValues(this->_mat, 1, &i_val, 1, &j_val,
+                                &petsc_value, ADD_VALUES));
 }
 
 
@@ -1107,15 +1002,12 @@ void PetscMatrix<T>::add (const T a_in, const SparseMatrix<T> & X_in)
 
   libmesh_assert (X);
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   // the matrix from which we copy the values has to be assembled/closed
   libmesh_assert(X->closed());
 
   semiparallel_only();
 
-  ierr = MatAXPY(this->_mat, a, X->_mat, DIFFERENT_NONZERO_PATTERN);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatAXPY(this->_mat, a, X->_mat, DIFFERENT_NONZERO_PATTERN));
 }
 
 
@@ -1131,23 +1023,17 @@ void PetscMatrix<T>::matrix_matrix_mult (SparseMatrix<T> & X_in, SparseMatrix<T>
   const PetscMatrix<T> * X = cast_ptr<const PetscMatrix<T> *> (&X_in);
   PetscMatrix<T> * Y = cast_ptr<PetscMatrix<T> *> (&Y_out);
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   // the matrix from which we copy the values has to be assembled/closed
   libmesh_assert(X->closed());
 
   semiparallel_only();
 
   if (reuse)
-  {
-    ierr = MatMatMult(this->_mat, X->_mat, MAT_REUSE_MATRIX, PETSC_DEFAULT, &Y->_mat);
-    LIBMESH_CHKERR(ierr);
-  }
+    LibmeshPetscCall(MatMatMult(this->_mat, X->_mat, MAT_REUSE_MATRIX, PETSC_DEFAULT, &Y->_mat));
   else
   {
     Y->clear();
-    ierr = MatMatMult(this->_mat, X->_mat, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &Y->_mat);
-    LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(MatMatMult(this->_mat, X->_mat, MAT_INITIAL_MATRIX, PETSC_DEFAULT, &Y->_mat));
   }
   // Specify that the new matrix is initialized
   // We do not close it here as `MatMatMult` ensures Y being closed
@@ -1173,8 +1059,6 @@ PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
   if (!this->closed())
     this->close();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
   auto pscm = cast_ptr<const PetscMatrix<T> *>(&spm);
 
   PetscInt ncols = 0;
@@ -1189,8 +1073,7 @@ PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
   {
     PetscInt grow[] = {static_cast<PetscInt>(ltog.second)}; // global row index
 
-    ierr = MatGetRow(pscm->_mat, static_cast<PetscInt>(ltog.first), &ncols, &lcols, &vals);
-    LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(MatGetRow(pscm->_mat, static_cast<PetscInt>(ltog.first), &ncols, &lcols, &vals));
 
     // get global indices (gcols) from lcols, increment values = vals*scalar
     gcols.resize(ncols);
@@ -1201,10 +1084,8 @@ PetscMatrix<T>::add_sparse_matrix (const SparseMatrix<T> & spm,
       values[i] = PS(scalar) * vals[i];
     }
 
-    ierr = MatSetValues(this->_mat, 1, grow, ncols, gcols.data(), values.data(), ADD_VALUES);
-    LIBMESH_CHKERR(ierr);
-    ierr = MatRestoreRow(pscm->_mat, static_cast<PetscInt>(ltog.first), &ncols, &lcols, &vals);
-    LIBMESH_CHKERR(ierr);
+    LibmeshPetscCall(MatSetValues(this->_mat, 1, grow, ncols, gcols.data(), values.data(), ADD_VALUES));
+    LibmeshPetscCall(MatRestoreRow(pscm->_mat, static_cast<PetscInt>(ltog.first), &ncols, &lcols, &vals));
   }
   // Note: We are not closing the matrix because it is expensive to do so when adding multiple sparse matrices.
   //       Remember to manually close the matrix once all changes to the matrix have been made.
@@ -1223,8 +1104,6 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
   // If the entry is not in the sparse matrix, it is 0.
   T value=0.;
 
-  PetscErrorCode
-    ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt
     ncols=0,
     i_val=static_cast<PetscInt>(i_in),
@@ -1237,8 +1116,7 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
   // to run on one processor.
   libmesh_assert(this->closed());
 
-  ierr = MatGetRow(this->_mat, i_val, &ncols, &petsc_cols, &petsc_row);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetRow(this->_mat, i_val, &ncols, &petsc_cols, &petsc_row));
 
   // Perform a binary search to find the contiguous index in
   // petsc_cols (resp. petsc_row) corresponding to global index j_val
@@ -1260,9 +1138,8 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
       value = static_cast<T> (petsc_row[j]);
     }
 
-  ierr  = MatRestoreRow(this->_mat, i_val,
-                        &ncols, &petsc_cols, &petsc_row);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatRestoreRow(this->_mat, i_val,
+                                 &ncols, &petsc_cols, &petsc_row));
 
   return value;
 }
@@ -1277,7 +1154,6 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
   const PetscScalar * petsc_row;
   const PetscInt    * petsc_cols;
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt
     ncols=0,
     i_val = static_cast<PetscInt>(i_in);
@@ -1305,8 +1181,7 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
 #endif
     lock(_petsc_matrix_mutex);
 
-  ierr = MatGetRow(this->_mat, i_val, &ncols, &petsc_cols, &petsc_row);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetRow(this->_mat, i_val, &ncols, &petsc_cols, &petsc_row));
 
   // Copy the data
   indices.resize(static_cast<std::size_t>(ncols));
@@ -1318,9 +1193,8 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
     values[i] = static_cast<T>(petsc_row[i]);
   }
 
-  ierr  = MatRestoreRow(this->_mat, i_val,
-                        &ncols, &petsc_cols, &petsc_row);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatRestoreRow(this->_mat, i_val,
+                                 &ncols, &petsc_cols, &petsc_row));
 }
 
 
@@ -1331,18 +1205,15 @@ PetscMatrix<T> & PetscMatrix<T>::operator= (const PetscMatrix<T> & v)
   if (this->_mat)
     {
       PetscBool assembled;
-      auto ierr = MatAssembled(this->_mat, &assembled);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(MatAssembled(this->_mat, &assembled));
       bool same_nonzero_pattern = false;
 
       if (assembled)
         {
           MatInfo our_info, v_info;
 
-          ierr = MatGetInfo(this->_mat, MAT_GLOBAL_SUM, &our_info);
-          LIBMESH_CHKERR(ierr);
-          ierr = MatGetInfo(v._mat, MAT_GLOBAL_SUM, &v_info);
-          LIBMESH_CHKERR(ierr);
+          LibmeshPetscCall(MatGetInfo(this->_mat, MAT_GLOBAL_SUM, &our_info));
+          LibmeshPetscCall(MatGetInfo(v._mat, MAT_GLOBAL_SUM, &v_info));
           if (our_info.nz_allocated == v_info.nz_allocated)
             same_nonzero_pattern = true;
         }
@@ -1353,16 +1224,12 @@ PetscMatrix<T> & PetscMatrix<T>::operator= (const PetscMatrix<T> & v)
         this->close();
 
       if (same_nonzero_pattern)
-        ierr = MatCopy(v._mat, this->_mat, SAME_NONZERO_PATTERN);
+        LibmeshPetscCall(MatCopy(v._mat, this->_mat, SAME_NONZERO_PATTERN));
       else
-        ierr = MatCopy(v._mat, this->_mat, DIFFERENT_NONZERO_PATTERN);
-      LIBMESH_CHKERR(ierr);
+        LibmeshPetscCall(MatCopy(v._mat, this->_mat, DIFFERENT_NONZERO_PATTERN));
     }
   else
-    {
-      auto ierr = MatDuplicate(v._mat, MAT_COPY_VALUES, &this->_mat);
-      LIBMESH_CHKERR(ierr);
-    }
+      LibmeshPetscCall(MatDuplicate(v._mat, MAT_COPY_VALUES, &this->_mat));
 
   this->_is_initialized = true;
 
@@ -1381,8 +1248,7 @@ void PetscMatrix<T>::scale(const T scale)
 {
   libmesh_assert(this->closed());
 
-  const auto ierr = MatScale(this->_mat, scale);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatScale(this->_mat, scale));
 }
 
 //------------------------------------------------------------------
