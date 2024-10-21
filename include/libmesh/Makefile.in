@@ -570,12 +570,12 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	plane.h point.h reference_elem.h remote_elem.h side.h sphere.h \
 	stored_range.h surface.h default_coupling.h \
 	ghost_point_neighbors.h ghosting_functor.h \
-	point_neighbor_coupling.h sibling_coupling.h abaqus_io.h \
-	boundary_info.h boundary_mesh.h checkpoint_io.h \
-	distributed_mesh.h dyna_io.h ensight_io.h exodusII_io.h \
-	exodusII_io_helper.h exodus_header_info.h fro_io.h gmsh_io.h \
-	gmv_io.h gnuplot_io.h inf_elem_builder.h matlab_io.h \
-	medit_io.h mesh.h mesh_base.h mesh_communication.h \
+	non_manifold_coupling.h point_neighbor_coupling.h \
+	sibling_coupling.h abaqus_io.h boundary_info.h boundary_mesh.h \
+	checkpoint_io.h distributed_mesh.h dyna_io.h ensight_io.h \
+	exodusII_io.h exodusII_io_helper.h exodus_header_info.h \
+	fro_io.h gmsh_io.h gmv_io.h gnuplot_io.h inf_elem_builder.h \
+	matlab_io.h medit_io.h mesh.h mesh_base.h mesh_communication.h \
 	mesh_function.h mesh_generation.h mesh_input.h \
 	mesh_inserter_iterator.h mesh_modification.h \
 	mesh_netgen_interface.h mesh_output.h mesh_refinement.h \
@@ -586,10 +586,11 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	mesh_triangle_interface.h mesh_triangle_wrapper.h \
 	namebased_io.h nemesis_io.h nemesis_io_helper.h off_io.h \
 	parallel_mesh.h patch.h poly2tri_triangulator.h \
-	postscript_io.h replicated_mesh.h serial_mesh.h stl_io.h \
-	sync_refinement_flags.h tecplot_io.h tetgen_io.h \
-	triangulator_interface.h ucd_io.h unstructured_mesh.h unv_io.h \
-	vtk_io.h xdr_io.h analytic_function.h composite_fem_function.h \
+	postscript_io.h replicated_mesh.h serial_mesh.h \
+	sides_to_elem_map.h stl_io.h sync_refinement_flags.h \
+	tecplot_io.h tetgen_io.h triangulator_interface.h ucd_io.h \
+	unstructured_mesh.h unv_io.h vtk_io.h xdr_io.h \
+	analytic_function.h composite_fem_function.h \
 	composite_function.h const_fem_function.h const_function.h \
 	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
 	dense_matrix_base_impl.h dense_matrix_impl.h dense_submatrix.h \
@@ -1409,6 +1410,9 @@ ghost_point_neighbors.h: $(top_srcdir)/include/ghosting/ghost_point_neighbors.h
 ghosting_functor.h: $(top_srcdir)/include/ghosting/ghosting_functor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+non_manifold_coupling.h: $(top_srcdir)/include/ghosting/non_manifold_coupling.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 point_neighbor_coupling.h: $(top_srcdir)/include/ghosting/point_neighbor_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1563,6 +1567,9 @@ replicated_mesh.h: $(top_srcdir)/include/mesh/replicated_mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 serial_mesh.h: $(top_srcdir)/include/mesh/serial_mesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+sides_to_elem_map.h: $(top_srcdir)/include/mesh/sides_to_elem_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 stl_io.h: $(top_srcdir)/include/mesh/stl_io.h
