@@ -232,3 +232,6 @@ single
 trilinos_only
 xcode
 installed
+
+# Allow developers to use .clang-format without dirtying git
+.clang-format
