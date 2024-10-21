@@ -503,16 +503,20 @@ void TaoOptimizationSolver<T>::solve ()
   // ||g(X)|| / |f(X)|                   <= grtol
   // ||g(X)|| / ||g(X0)||                <= gttol
   // Command line equivalents: -tao_fatol, -tao_frtol, -tao_gatol, -tao_grtol, -tao_gttol
-  LibmeshPetscCall(TaoSetTolerances(_tao,
+  // Releases up to 3.7.0 had fatol and frtol, after that they were removed.
 #if PETSC_VERSION_LESS_THAN(3,7,0)
-                                    // Releases up to 3.X.Y had fatol and frtol, after that they were removed.
-                                    // Hopefully we'll be able to know X and Y soon. Guessing at 3.7.0.
+  LibmeshPetscCall(TaoSetTolerances(_tao,
                                     /*fatol=*/PETSC_DEFAULT,
                                     /*frtol=*/PETSC_DEFAULT,
-#endif
                                     /*gatol=*/PETSC_DEFAULT,
                                     /*grtol=*/this->objective_function_relative_tolerance,
                                     /*gttol=*/PETSC_DEFAULT));
+#else
+  LibmeshPetscCall(TaoSetTolerances(_tao,
+                                    /*gatol=*/PETSC_DEFAULT,
+                                    /*grtol=*/this->objective_function_relative_tolerance,
+                                    /*gttol=*/PETSC_DEFAULT));
+#endif
 
   // Set the max-allowed number of objective function evaluations
   // Command line equivalent: -tao_max_funcs
