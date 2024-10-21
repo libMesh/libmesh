@@ -194,10 +194,10 @@ void PetscLinearSolver<T>::init (const char * name)
       LIBMESH_CHKERR(ierr);
 
       if (strcmp(ksp_type, "preonly"))
-      {
-        ierr = KSPSetInitialGuessNonzero (_ksp, PETSC_TRUE);
-        LIBMESH_CHKERR(ierr);
-      }
+        {
+          ierr = KSPSetInitialGuessNonzero(_ksp, PETSC_TRUE);
+          LIBMESH_CHKERR(ierr);
+        }
 
       // Notify PETSc of location to store residual history.
       // This needs to be called before any solves, since
