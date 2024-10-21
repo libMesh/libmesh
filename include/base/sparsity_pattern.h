@@ -211,15 +211,17 @@ private:
   const bool need_full_sparsity_pattern;
   const bool calculate_constrained;
 
-  /// If there are "spider" nodes in the mesh (i.e. a single node which
-  /// is connected to many 1D elements) and Constraints, we can end up
-  /// sorting the same set of DOFs multiple times in handle_vi_vj(),
-  /// only to find that it has no net effect on the final sparsity. In
-  /// such cases it is much faster to keep track of (element_dofs_i,
-  /// element_dofs_j) pairs which have already been handled and not
-  /// repeat the computation. We use this data structure to keep track
-  /// of hashes of sets of dofs we have already seen, thus avoiding
-  /// unnecessary calculations.
+  /**
+   * If there are "spider" nodes in the mesh (i.e. a single node which
+   * is connected to many 1D elements) and Constraints, we can end up
+   * sorting the same set of DOFs multiple times in handle_vi_vj(),
+   * only to find that it has no net effect on the final sparsity. In
+   * such cases it is much faster to keep track of (element_dofs_i,
+   * element_dofs_j) pairs which have already been handled and not
+   * repeat the computation. We use this data structure to keep track
+   * of hashes of sets of dofs we have already seen, thus avoiding
+   * unnecessary calculations.
+   */
   std::unordered_set<dof_id_type> hashed_dof_sets;
 
   /// A dummy work vector to avoid repeated memory allocations
