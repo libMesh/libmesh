@@ -89,6 +89,11 @@ public:
     LIBMESH_CHKERR(ierr);                       \
   } while (0)
 
+// Macro which we call in functions returning a datatype convertible
+// to PetscErrorCode after every PETSc function that returns an error code.
+#define LIBMESH_CHKERRQ(ierr)                   \
+  LIBMESH_CHKERR(ierr);
+
 #else
 
 // If we don't have exceptions enabled, just fall back on calling
@@ -98,6 +103,10 @@ public:
 // Two argument version of the function above where you pass in the comm
 // instead of relying on it being available from the "this" pointer.
 #define LIBMESH_CHKERR2(comm, ierr) CHKERRABORT(comm.get(), ierr);
+
+// Alternative macro to be used in functions returning a datatype convertible
+// to PetscErrorCode.
+#define LIBMESH_CHKERRQ(ierr) CHKERRQ(ierr);
 
 // Let's also be backwards-compatible with the old macro name.
 #define LIBMESH_CHKERRABORT(ierr) LIBMESH_CHKERR(ierr)
@@ -135,6 +144,14 @@ PETSC_BEGIN_END(VecGhostUpdate) // VecGhostUpdateBeginEnd
     PetscErrorCode libmesh_petsc_call_ierr;                                                        \
     libmesh_petsc_call_ierr = __VA_ARGS__;                                                         \
     LIBMESH_CHKERR2(comm, libmesh_petsc_call_ierr);                                                \
+  } while (0)
+
+#define LibmeshPetscCallQ(...)                                                                     \
+  do                                                                                               \
+  {                                                                                                \
+    PetscErrorCode libmesh_petsc_call_ierr;                                                        \
+    libmesh_petsc_call_ierr = __VA_ARGS__;                                                         \
+    LIBMESH_CHKERRQ(libmesh_petsc_call_ierr);                                                      \
   } while (0)
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
