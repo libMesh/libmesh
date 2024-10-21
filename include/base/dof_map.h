@@ -764,17 +764,41 @@ public:
                     int p_level = -12345) const;
 
   /**
-   * Fills the vector \p di with the global degree of freedom indices
-   * for the element.  For one variable, and potentially for a
-   * non-default element p refinement level
+   * Retrieves degree of freedom indices for a given \p elem and then performs actions for these
+   * indices defined by the user-provided functors \p scalar_dofs_functor and \p field_dofs_functor.
+   * This API is useful when a user wants to do more than simply fill a degree of freedom container
+   * @param elem The element to get degrees of freedom for
+   * @param di A container for degrees of freedom. It is up to the provided functors how this gets
+   *           filled
+   * @param vn The variable number to retrieve degrees of freedom for
+   * @param scalar_dofs_functor The functor that acts on scalar degrees of freedom. This functor has
+   *                            the interface:
+   *                            void scalar_dofs_functor(const Elem & elem,
+   *                                                    std::vector<dof_id_type> & di,
+   *                                                    const std::vector<dof_id_type> & scalar_dof_indices)
+   *                            where \p di is the degree of freedom container described above and
+   *                            \p scalar_dof_indices are the scalar dof indices available to
+   *                            \p elem
+   * @param field_dofs_functor The functor that acts on "field" (e.g. non-scalar, non-global)
+   *                           degrees of freedom. This functor has
+   *                           the interface:
+   *                           void field_dofs_functor(const Elem & elem,
+   *                                                   const unsigned int node_num,
+   *                                                   const unsigned int var_num,
+   *                                                   std::vector<dof_id_type> & di,
+   *                                                   const dof_id_type field_dof)
+   *                           where \p field_dof represents a field degree of freedom to act on and
+   *                           is associated with \p node_num and \p var_num. If the degree of
+   *                           freedom is elemental than \p node_num will be \p invalid_uint. \p di
+   *                           is again the degree of freedom container provided above
    */
-  template <typename InsertFunctor, typename PushBackFunctor>
-  void dof_indices (const Elem * const elem,
-                    std::vector<dof_id_type> & di,
-                    const unsigned int vn,
-                    InsertFunctor ifunctor,
-                    PushBackFunctor pfunctor,
-                    int p_level = -12345) const;
+  template <typename ScalarDofsFunctor, typename FieldDofsFunctor>
+  void dof_indices(const Elem * const elem,
+                   std::vector<dof_id_type> & di,
+                   const unsigned int vn,
+                   ScalarDofsFunctor scalar_dofs_functor,
+                   FieldDofsFunctor field_dofs_functor,
+                   int p_level = -12345) const;
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -1700,7 +1724,22 @@ private:
 #endif
                     ) const;
 
-  template <typename PushBackFunctor>
+  /**
+   * As above except a \p field_dofs_functor must be provided. This method is useful when the caller
+   * wants to do more than simply fill a degree of freedom container
+   * @param field_dofs_functor This functor has the interface:
+   *                           void field_dofs_functor(const Elem & elem,
+   *                                                   const unsigned int node_num,
+   *                                                   const unsigned int var_num,
+   *                                                   std::vector<dof_id_type> & di,
+   *                                                   const dof_id_type field_dof)
+   *                           where \p field_dof represents a field degree of freedom to act on and
+   *                           is associated with \p node_num and \p var_num. If the degree of
+   *                           freedom is elemental than \p node_num will be \p invalid_uint. \p di
+   *                           is the degree of freedom container provided to the \p _dof_indices
+   *                           method
+   */
+  template <typename FieldDofsFunctor>
   void _dof_indices (const Elem & elem,
                      int p_level,
                      std::vector<dof_id_type> & di,
@@ -1712,7 +1751,7 @@ private:
 #ifdef DEBUG
                      std::size_t & tot_size,
 #endif
-                     PushBackFunctor pfunctor) const;
+                     FieldDofsFunctor field_dofs_functor) const;
 
   /**
    * Helper function that implements the element-nodal versions of
@@ -2425,7 +2464,7 @@ bool DofMap::should_p_refine_var(const unsigned int var) const
 #endif
 }
 
-template <typename PushBackFunctor>
+template <typename FieldDofsFunctor>
 void DofMap::_dof_indices (const Elem & elem,
                            int p_level,
                            std::vector<dof_id_type> & di,
@@ -2437,7 +2476,7 @@ void DofMap::_dof_indices (const Elem & elem,
 #ifdef DEBUG
                            std::size_t & tot_size,
 #endif
-                           PushBackFunctor pfunctor) const
+                           FieldDofsFunctor field_dofs_functor) const
 {
   const VariableGroup & var = this->variable_group(vg);
 
@@ -2525,7 +2564,7 @@ void DofMap::_dof_indices (const Elem & elem,
                     const dof_id_type d =
                       node.dof_number(sys_num, vg, vig, i, n_comp);
                     libmesh_assert_not_equal_to (d, DofObject::invalid_id);
-                    pfunctor(elem, n, v, di, d);
+                    field_dofs_functor(elem, n, v, di, d);
                   }
             }
           // If this is a vertex or an element without extra hanging
@@ -2543,7 +2582,7 @@ void DofMap::_dof_indices (const Elem & elem,
                     node.dof_number(sys_num, vg, vig, i, n_comp);
                   libmesh_assert_not_equal_to (d, DofObject::invalid_id);
                   libmesh_assert_less (d, this->n_dofs());
-                  pfunctor(elem, n, v, di, d);
+                  field_dofs_functor(elem, n, v, di, d);
                 }
 
               // With fewer good component indices than we need, e.g.
@@ -2574,7 +2613,7 @@ void DofMap::_dof_indices (const Elem & elem,
                     elem.dof_number(sys_num, vg, vig, i, n_comp);
                   libmesh_assert_not_equal_to (d, DofObject::invalid_id);
 
-                  pfunctor(elem, invalid_uint, v, di, d);
+                  field_dofs_functor(elem, invalid_uint, v, di, d);
                 }
             }
           else
@@ -2588,12 +2627,12 @@ void DofMap::_dof_indices (const Elem & elem,
 
 
 
-template <typename InsertFunctor, typename PushBackFunctor>
+template <typename ScalarDofsFunctor, typename FieldDofsFunctor>
 void DofMap::dof_indices (const Elem * const elem,
                           std::vector<dof_id_type> & di,
                           const unsigned int vn,
-                          InsertFunctor ifunctor,
-                          PushBackFunctor pfunctor,
+                          ScalarDofsFunctor scalar_dofs_functor,
+                          FieldDofsFunctor field_dofs_functor,
                           int p_level) const
 {
   // We now allow elem==nullptr to request just SCALAR dofs
@@ -2634,7 +2673,7 @@ void DofMap::dof_indices (const Elem * const elem,
 #ifdef DEBUG
                        tot_size,
 #endif
-                       pfunctor);
+                       field_dofs_functor);
         }
 
       return;
@@ -2650,7 +2689,7 @@ void DofMap::dof_indices (const Elem * const elem,
 #endif
       std::vector<dof_id_type> di_new;
       this->SCALAR_dof_indices(di_new,vn);
-      ifunctor(*elem, di, di_new);
+      scalar_dofs_functor(*elem, di, di_new);
     }
   else if (elem)
     _dof_indices(*elem, p_level, di, vg, vig, elem->get_nodes(),
@@ -2658,7 +2697,7 @@ void DofMap::dof_indices (const Elem * const elem,
 #ifdef DEBUG
                  tot_size,
 #endif
-                 pfunctor);
+                 field_dofs_functor);
 
 #ifdef DEBUG
   libmesh_assert_equal_to (tot_size, di.size());
