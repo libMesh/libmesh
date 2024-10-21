@@ -29,8 +29,6 @@
 
 #include "libmesh/libmesh_config.h"
 
-#if defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
-
 // C++ include files that we need
 #include <iostream>
 #include <algorithm>
@@ -73,6 +71,7 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
+#if defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
 // Function prototype.  This is the function that will assemble
 // the linear system for our Poisson problem.  Note that the
 // function will take the  EquationSystems object and the
@@ -80,6 +79,7 @@ using namespace libMesh;
 //  EquationSystems object we have access to the  Mesh and
 // other objects we might need.
 void assemble_poisson(EquationSystems & es, const std::string & system_name);
+#endif
 
 // Function prototype for the exact solution.
 Real exact_solution(const Real x, const Real y, const Real z = 0.);
@@ -90,9 +90,11 @@ main(int argc, char ** argv)
   // Initialize libraries, like in example 2.
   LibMeshInit init(argc, argv);
 
-  // This example requires a linear solver package.
-  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
-                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+#if !defined(LIBMESH_HAVE_EIGEN_DENSE)
+  libmesh_examples_requires(false, "--enable-eigen");
+#elif !defined(LIBMESH_HAVE_PETSC)
+  libmesh_example_requires(false, "--enable-petsc");
+#else
 
   // Brief message to the user regarding the program name
   // and command line arguments.
@@ -178,10 +180,13 @@ main(int argc, char ** argv)
   VTKIO(mesh).write_equation_systems("out.pvtu", equation_systems);
 
 #endif // #ifdef LIBMESH_HAVE_VTK
+#endif // defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
 
   // All done.
   return 0;
 }
+
+#if defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
 
 // We now define the matrix assembly function for the
 // Poisson system.  We need to first compute element
@@ -485,12 +490,4 @@ assemble_poisson(EquationSystems & es, const std::string & system_name)
   matrix.close();
 }
 
-#else
-
-int
-main()
-{
-  return 0;
-}
-
-#endif
+#endif // defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
