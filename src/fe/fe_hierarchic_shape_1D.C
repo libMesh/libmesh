@@ -428,11 +428,15 @@ namespace
 using namespace libMesh;
 
 Real fe_hierarchic_1D_shape(const ElemType,
-                            const Order libmesh_dbg_var(order),
+                            const Order order,
                             const unsigned int i,
                             const Point & p)
 {
   libmesh_assert_less (i, order+1u);
+
+  // If we were to define p=0 here, it wouldn't be hierarchic
+  libmesh_error_msg_if (order <= 0,
+                        "HIERARCHIC FE families do not support p=0");
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
@@ -495,15 +499,18 @@ Real fe_hierarchic_1D_shape(const ElemType,
 
 
 Real fe_hierarchic_1D_shape_deriv(const ElemType,
-                                  const Order libmesh_dbg_var(order),
+                                  const Order order,
                                   const unsigned int i,
                                   const unsigned int libmesh_dbg_var(j),
                                   const Point & p)
 {
   // only d()/dxi in 1D!
-
   libmesh_assert_equal_to (j, 0);
   libmesh_assert_less (i, order+1u);
+
+  // If we were to define p=0 here, it wouldn't be hierarchic
+  libmesh_error_msg_if (order <= 0,
+                        "HIERARCHIC FE families do not support p=0");
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
@@ -567,15 +574,18 @@ Real fe_hierarchic_1D_shape_deriv(const ElemType,
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 Real fe_hierarchic_1D_shape_second_deriv(const ElemType,
-                                         const Order libmesh_dbg_var(order),
+                                         const Order order,
                                          const unsigned int i,
                                          const unsigned int libmesh_dbg_var(j),
                                          const Point & p)
 {
   // only d2()/d2xi in 1D!
-
   libmesh_assert_equal_to (j, 0);
   libmesh_assert_less (i, order+1u);
+
+  // If we were to define p=0 here, it wouldn't be hierarchic
+  libmesh_error_msg_if (order <= 0,
+                        "HIERARCHIC FE families do not support p=0");
 
   // Declare that we are using our own special power function
   // from the Utility namespace.  This saves typing later.
