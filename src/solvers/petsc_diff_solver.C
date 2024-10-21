@@ -56,23 +56,18 @@ extern "C"
                    << ", |residual|_2 = " << fnorm << std::endl;
     if (solver.linear_solution_monitor.get())
     {
-      PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
       Vec petsc_delta_u;
-      ierr = SNESGetSolutionUpdate(snes, &petsc_delta_u);
-      CHKERRABORT(solver.comm().get(), ierr);
+      LibmeshPetscCall2(solver.comm(), SNESGetSolutionUpdate(snes, &petsc_delta_u));
       PetscVector<Number> delta_u(petsc_delta_u, solver.comm());
       delta_u.close();
 
       Vec petsc_u;
-      ierr = SNESGetSolution(snes, &petsc_u);
-      CHKERRABORT(solver.comm().get(), ierr);
+      LibmeshPetscCall2(solver.comm(), SNESGetSolution(snes, &petsc_u));
       PetscVector<Number> u(petsc_u, solver.comm());
       u.close();
 
       Vec petsc_res;
-      ierr = SNESGetFunction(snes, &petsc_res, nullptr, nullptr);
-      CHKERRABORT(solver.comm().get(), ierr);
+      LibmeshPetscCall2(solver.comm(), SNESGetFunction(snes, &petsc_res, nullptr, nullptr));
       PetscVector<Number> res(petsc_res, solver.comm());
       res.close();
 

@@ -38,12 +38,10 @@ void indices_to_fieldsplit (const Parallel::Communicator & comm,
     idx = reinterpret_cast<const PetscInt *>(indices.data());
 
   IS is;
-  auto ierr = ISCreateGeneral(comm.get(), cast_int<PetscInt>(indices.size()),
-                              idx, PETSC_COPY_VALUES, &is);
-  CHKERRABORT(comm.get(), ierr);
+  LibmeshPetscCall2(comm, ISCreateGeneral(comm.get(), cast_int<PetscInt>(indices.size()),
+                                          idx, PETSC_COPY_VALUES, &is));
 
-  ierr = PCFieldSplitSetIS(my_pc, field_name.c_str(), is);
-  CHKERRABORT(comm.get(), ierr);
+  LibmeshPetscCall2(comm, PCFieldSplitSetIS(my_pc, field_name.c_str(), is));
 }
 
 }
