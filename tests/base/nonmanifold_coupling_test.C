@@ -169,6 +169,8 @@ public:
 
   CPPUNIT_TEST( verifySendListEntries0 );
   CPPUNIT_TEST( verifySendListEntries1 );
+  CPPUNIT_TEST( verifySendListEntries2 );
+  CPPUNIT_TEST( verifySendListEntries3 );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -183,6 +185,8 @@ public:
 
   void verifySendListEntries0() { this->verify_send_list_entries_helper("meshes/non_manifold_junction0.exo"); }
   void verifySendListEntries1() { this->verify_send_list_entries_helper("meshes/non_manifold_junction1.exo"); }
+  void verifySendListEntries2() { this->verify_send_list_entries_helper("meshes/non_manifold_junction2.exo"); }
+  void verifySendListEntries3() { this->verify_send_list_entries_helper("meshes/non_manifold_junction3.exo"); }
 
   // We call this helper function (which can take an argument) from
   // the CPPUNIT_TEST macro functions, (which I don't think can take an argument?)
