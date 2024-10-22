@@ -102,7 +102,7 @@ public:
 
 // Two argument version of the function above where you pass in the comm
 // instead of relying on it being available from the "this" pointer.
-#define LIBMESH_CHKERR2(comm, ierr) CHKERRABORT(comm.get(), ierr);
+#define LIBMESH_CHKERR2(comm, ierr) CHKERRABORT(comm, ierr);
 
 // Alternative macro to be used in functions returning a datatype convertible
 // to PetscErrorCode.
@@ -118,11 +118,11 @@ public:
   inline                                                                \
   void Function ## BeginEnd(const Parallel::Communicator & comm, const Args&... args) \
   {                                                                     \
-    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;               \
+    PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;                        \
     ierr = Function ## Begin(args...);                                  \
-    LIBMESH_CHKERR2(comm, ierr);                                        \
+    LIBMESH_CHKERR2(comm.get(), ierr);                                  \
     ierr = Function ## End(args...);                                    \
-    LIBMESH_CHKERR2(comm, ierr);                                        \
+    LIBMESH_CHKERR2(comm.get(), ierr);                                  \
   }
 
 PETSC_BEGIN_END(VecScatter) // VecScatterBeginEnd
@@ -139,6 +139,14 @@ PETSC_BEGIN_END(VecGhostUpdate) // VecGhostUpdateBeginEnd
   } while (0)
 
 #define LibmeshPetscCall2(comm, ...)                                                               \
+  do                                                                                               \
+  {                                                                                                \
+    PetscErrorCode libmesh_petsc_call_ierr;                                                        \
+    libmesh_petsc_call_ierr = __VA_ARGS__;                                                         \
+    LIBMESH_CHKERR2(comm.get(), libmesh_petsc_call_ierr);                                          \
+  } while (0)
+
+#define LibmeshPetscCallA(comm, ...)                                                               \
   do                                                                                               \
   {                                                                                                \
     PetscErrorCode libmesh_petsc_call_ierr;                                                        \
