@@ -76,14 +76,6 @@ public:
   const std::vector<const Elem *> &
   get_connected_elems(const Elem * elem, unsigned int side) const;
 
-  /**
-   * Debugging function used for development. Leave out of production
-   * code.
-   */
-  void print_statistics() const;
-  void print_info() const;
-  std::vector<std::pair<dof_id_type, dof_id_type>> search_for_separated_elems() const;
-
 private:
 
   /**
