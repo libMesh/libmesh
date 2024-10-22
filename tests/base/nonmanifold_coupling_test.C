@@ -15,6 +15,15 @@
 // C++ includes
 #include <memory>
 
+// The clang compiler incorrectly warns that "loop will run at most
+// once (loop increment never executed)" for a range-based for-loop in
+// this file. We need to avoid this warning so that -Werror builds
+// don't fail.
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunreachable-code-loop-increment"
+#endif
+
 using namespace libMesh;
 
 // We use a custom partioner for this test to help ensure we're
