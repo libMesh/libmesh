@@ -425,6 +425,10 @@ void ReplicatedMesh::delete_elem(Elem * e)
 void ReplicatedMesh::renumber_elem(const dof_id_type old_id,
                                    const dof_id_type new_id)
 {
+  // This could be a no-op
+  if (old_id == new_id)
+    return;
+
   // This doesn't get used in serial yet
   Elem * el = _elements[old_id];
   libmesh_assert (el);
@@ -642,6 +646,10 @@ void ReplicatedMesh::delete_node(Node * n)
 void ReplicatedMesh::renumber_node(const dof_id_type old_id,
                                    const dof_id_type new_id)
 {
+  // This could be a no-op
+  if (old_id == new_id)
+    return;
+
   // This doesn't get used in serial yet
   Node * nd = _nodes[old_id];
   libmesh_assert (nd);
