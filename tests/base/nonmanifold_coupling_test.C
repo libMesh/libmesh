@@ -49,9 +49,6 @@ protected:
   virtual void _do_partition (MeshBase & mesh,
                               const unsigned int n) override
   {
-    // Debugging
-    // libMesh::out << "Called _do_partition() with n = " << n << std::endl;
-
     // If we're on one partition, then everyone gets to be on that partition
     if (n == 1)
       this->single_partition_range (mesh.active_elements_begin(), mesh.active_elements_end());
@@ -119,13 +116,13 @@ protected:
 
   std::unique_ptr<EquationSystems> _es;
 
-  void read_mesh()
+  void read_mesh(const std::string & mesh_filename)
   {
     // We are making assumptions in various places about the presence
     // of the elements on the current processor so we're restricting to
     // ReplicatedMesh for now.
     _mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
-    _mesh->read("meshes/non_manifold_junction0.exo");
+    _mesh->read(mesh_filename);
 
     // Use our custom partitioner that assigns non-manifold edge
     // neighbors to different processors.
@@ -138,7 +135,7 @@ protected:
     //   libMesh::out << "Elem " << elem->id() << " is on processor " << elem->processor_id() << std::endl;
   }
 
-  void init()
+  void init_es()
   {
     _es = std::make_unique<EquationSystems>(*_mesh);
 
@@ -160,17 +157,9 @@ protected:
     // Initialize the DofMap, etc. for all Systems
     _es->init();
   }
-
-  void clear()
-  {
-    _es.reset();
-    _mesh.reset();
-  }
 };
 
-// Mainly just to sanity check the mesh construction and
-// the assumptions made in the NonManifoldGhostingFunctor
-// as well as the custom Partitioner.
+// This class defines the actual unit tests
 class NonManifoldGhostingFunctorTest : public CppUnit::TestCase,
                                        public NonManifoldCouplingTestBase
 {
@@ -178,36 +167,35 @@ public:
 
   LIBMESH_CPPUNIT_TEST_SUITE( NonManifoldGhostingFunctorTest );
 
-#ifdef LIBMESH_HAVE_SOLVER
-  CPPUNIT_TEST( verifySendListEntries );
-#endif
+  CPPUNIT_TEST( verifySendListEntries0 );
+  CPPUNIT_TEST( verifySendListEntries1 );
 
   CPPUNIT_TEST_SUITE_END();
 
 public:
-
-  public:
   void setUp()
   {
-    this->read_mesh();
-    this->init();
   }
 
   void tearDown()
-  { this->clear(); }
-
-  void verifySendListEntries()
   {
+  }
+
+  void verifySendListEntries0() { this->verify_send_list_entries_helper("meshes/non_manifold_junction0.exo"); }
+  void verifySendListEntries1() { this->verify_send_list_entries_helper("meshes/non_manifold_junction1.exo"); }
+
+  // We call this helper function (which can take an argument) from
+  // the CPPUNIT_TEST macro functions, (which I don't think can take an argument?)
+  void verify_send_list_entries_helper(const std::string & mesh_filename)
+  {
+    // Call base class implementations
+    this->read_mesh(mesh_filename);
+    this->init_es();
+
     // Get reference to the System, corresponding DofMap, and send_list for this processor
     System & system = _es->get_system("SimpleSystem");
     DofMap & dof_map = system.get_dof_map();
     const std::vector<dof_id_type> & send_list = dof_map.get_send_list();
-
-    // Debugging: print send_list entries
-    // libMesh::out << "send_list = ";
-    // for (const auto & dof : send_list)
-    //   libMesh::out << dof << " ";
-    // libMesh::out << std::endl;
 
     MeshTools::SidesToElemMap stem = MeshTools::SidesToElemMap::build(*_mesh);
 
@@ -243,12 +231,6 @@ public:
           {
             std::vector<dof_id_type> dof_indices;
             dof_map.dof_indices(elem, dof_indices);
-
-            // Debugging
-            // libMesh::out << "Elem " << elem->id() << ", dof_indices = ";
-            // for (const auto & dof : dof_indices)
-            //   libMesh::out << dof << " ";
-            // libMesh::out << std::endl;
 
             for (const auto & dof : dof_indices)
             {

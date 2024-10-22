@@ -412,7 +412,8 @@ CLEANFILES = cube_mesh.xda \
              write_exodus_TRI6.e \
              write_exodus_TRI7.e \
              write_exodus_TRISHELL3.e \
-             non_manifold_junction0.exo
+             non_manifold_junction0.exo \
+             non_manifold_junction1.exo
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD
