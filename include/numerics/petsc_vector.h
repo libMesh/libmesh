@@ -687,7 +687,6 @@ void PetscVector<T>::init (const numeric_index_type n,
 {
   parallel_object_only();
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscInt petsc_n=static_cast<PetscInt>(n);
 
   // Clear initialized vectors
@@ -710,9 +709,9 @@ void PetscVector<T>::init (const numeric_index_type n,
   // create a sequential vector if on only 1 processor
   if (this->_type == SERIAL)
     {
-      ierr = VecCreate(PETSC_COMM_SELF, &_vec); CHKERRABORT(PETSC_COMM_SELF,ierr);
-      ierr = VecSetSizes(_vec, petsc_n, petsc_n); CHKERRABORT(PETSC_COMM_SELF,ierr);
-      ierr = VecSetFromOptions (_vec); CHKERRABORT(PETSC_COMM_SELF,ierr);
+      LibmeshPetscCallA(PETSC_COMM_SELF, VecCreate(PETSC_COMM_SELF, &_vec));
+      LibmeshPetscCallA(PETSC_COMM_SELF, VecSetSizes(_vec, petsc_n, petsc_n));
+      LibmeshPetscCallA(PETSC_COMM_SELF, VecSetFromOptions (_vec));
     }
   // otherwise create an MPI-enabled vector
   else if (this->_type == PARALLEL)
@@ -725,8 +724,8 @@ void PetscVector<T>::init (const numeric_index_type n,
       LibmeshPetscCall(VecSetSizes(_vec, petsc_n_local, petsc_n));
 #else
       libmesh_assert_equal_to (n_local, n);
-      ierr = VecCreate(PETSC_COMM_SELF, &_vec); CHKERRABORT(PETSC_COMM_SELF,ierr);
-      ierr = VecSetSizes(_vec, petsc_n, petsc_n); CHKERRABORT(PETSC_COMM_SELF,ierr);
+      LibmeshPetscCallA(PETSC_COMM_SELF, VecCreate(PETSC_COMM_SELF, &_vec));
+      LibmeshPetscCallA(PETSC_COMM_SELF, VecSetSizes(_vec, petsc_n, petsc_n));
 #endif
       LibmeshPetscCall(VecSetFromOptions(_vec));
     }

@@ -67,7 +67,7 @@
 #endif // #if defined(LIBMESH_HAVE_MPI)
 
 #if defined(LIBMESH_HAVE_PETSC)
-# include "libmesh/petsc_macro.h"
+# include "libmesh/petsc_solver_exception.h"
 # include <petsc.h>
 # include <petscerror.h>
 # include "libmesh/petscdmlibmesh.h"
@@ -500,8 +500,6 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 #endif
       )
     {
-      PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
 #ifdef LIBMESH_HAVE_MPI
       PETSC_COMM_WORLD = libMesh::GLOBAL_COMM_WORLD;
 #else
@@ -512,8 +510,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       // Check whether the calling program has already initialized
       // PETSc, and avoid duplicate Initialize/Finalize
       PetscBool petsc_already_initialized;
-      ierr = PetscInitialized(&petsc_already_initialized);
-      CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
+      LibmeshPetscCallA(libMesh::GLOBAL_COMM_WORLD, PetscInitialized(&petsc_already_initialized));
       if (petsc_already_initialized != PETSC_TRUE)
         libmesh_initialized_petsc = true;
 # if defined(LIBMESH_HAVE_SLEPC)
@@ -525,19 +522,15 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       // which it does in the versions we've checked.
       if (!SlepcInitializeCalled)
         {
-          ierr = SlepcInitialize  (&argc, const_cast<char ***>(&argv), nullptr, nullptr);
-          CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
+          LibmeshPetscCallA(libMesh::GLOBAL_COMM_WORLD, SlepcInitialize  (&argc, const_cast<char ***>(&argv), nullptr, nullptr));
           libmesh_initialized_slepc = true;
         }
 # else
       if (libmesh_initialized_petsc)
-        {
-          ierr = PetscInitialize (&argc, const_cast<char ***>(&argv), nullptr, nullptr);
-          CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
-        }
+        LibmeshPetscCallA(libMesh::GLOBAL_COMM_WORLD, PetscInitialize (&argc, const_cast<char ***>(&argv), nullptr, nullptr));
 # endif
       // Register the reference implementation of DMlibMesh
-      ierr = DMRegister(DMLIBMESH, DMCreate_libMesh); CHKERRABORT(libMesh::GLOBAL_COMM_WORLD,ierr);
+      LibmeshPetscCallA(libMesh::GLOBAL_COMM_WORLD, DMRegister(DMLIBMESH, DMCreate_libMesh));
     }
 #endif
 
