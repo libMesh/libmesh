@@ -1,3 +1,29 @@
+% libMesh/SAMRAI
+% "This software relies on SAMRAI for its finite difference framework, libMesh for its finite element framework, ..."
+@Article{Davey_2024,
+  author  = {Marshall Davey and Charles Puelz and Simone Rossi and Margaret Anne Smith and David R. Wells and Greg Sturgeon and W. Paul Segars and John P. Vavalle and Charles S. Peskin and Boyce E. Griffith},
+  title   = {Simulating cardiac fluid dynamics in the human heart},
+  journal = {PNAS Nexus},
+  month   = oct,
+  year    = 2024,
+  volume  = 3,
+  number  = 10,
+  pages   = {pgae392 (xx pages)},
+  note    = {\url{https://doi.org/10.1093/pnasnexus/pgae392}, ArXiv e-print: \url{https://arxiv.org/abs/2307.02680}}
+}
+
+% libMesh/IBAMR
+% "All computations for were completed through IBAMR... IBAMR uses other libraries ... including ... libMesh"
+% author:facci author:koladouz immersed interface
+@Misc{Sacci_2024,
+  author       = {Michael J. Facci and Ebrahim M. Koladouz and Boyce E. Griffith},
+  title        = {An immersed interface method for incompressible flows and geometries with sharp features},
+  month        = oct,
+  year         = 2024,
+  howpublished = {ArXiv e-print},
+  note         = {\url{https://arxiv.org/abs/2410.16466}}
+}
+
 % MOOSE
 @TechReport{Wozniak_2024,
   author      = {Nicholas Wozniak and Gang Yang and Emily Shemon and Ahmed Abdelhameed},
@@ -91,6 +117,7 @@
 
 % MOOSE/GOLEM
 % "The numerical forward simulations are performed in GOLEM ... which is ... based on the MOOSE framework ..."
+% author:degen author:ziegler trustworthiness physics-based machine learning
 @Misc{Degen_2024,
   author       = {Denise Degen and Moritz Ziegler and Oliver Heidbach and Andreas Henk and Karsten Reiter and Florian Wellmann},
   title        = {{About the trustworthiness of physics-based machine learning --- A considerations for geomechanical applications}},
@@ -262,6 +289,20 @@
   note      = {\url{https://www.ans.org/pubs/proceedings/article-56369/}}
 }
 
+% MOOSE/SAM
+% https://www.ans.org/pubs/proceedings/article-56385/
+@InProceedings{Mui_2024,
+  author    = {Travis Mui and Rui Hu and Quan Zhou and Thanh Hua and Ling Zou},
+  title     = {{System-level tritium transport modeling capability in SAM}},
+  booktitle = {{Proceedings of the 2024 International Congress on Advances in Nuclear Power Plants (ICAPP)}},
+  address   = {Las Vegas, Nevada},
+  pages     = {941--950},
+  publisher = {American Nuclear Society},
+  month     = jun # {~16--19,},
+  year      = 2024,
+  note      = {\url{https://doi.org/10.13182/T130-44258}}
+}
+
 % MOOSE
 % "Simulations were carried out with a custom application built on the open-source ... (MOOSE) Framework."
 @Article{Isotta_2024,
@@ -302,8 +343,21 @@
   note    = {\url{https://doi.org/10.1016/j.nucengdes.2024.113589}}
 }
 
+% MOOSE
+% "All simulations were run using BlackBear ... which is ... based on ... (MOOSE) ..."
+% This has a very similar author list and title to Jain_2024, however it has different results and is a distinct paper.
+@Misc{Dahal_2024,
+  author       = {Albert Dahal},
+  title        = {Computational assessment of alkali-silica-reaction impact on the seismic capacity of nuclear containment vessels},
+  month        = oct,
+  year         = 2024,
+  howpublished = {engr$\chi$iv e-print},
+  note         = {\url{https://doi.org/10.31224/4042}}
+}
+
 % MOOSE/BlackBear
 % "... these models were implemented in BlackBear ... which is a code based on ... (MOOSE) ..."
+% author:jain author:spencer author:dahal multiphysics simulation
 @Misc{Jain_2024,
   author       = {Amit Jain and Benjamin Spencer and Albert Dahal and Sudipta Biswas and Somayajulu Dhulipala},
   title        = {Multiphysics simulation of recent experiments on alkali-silica reaction expansion in reinforced concrete members},
@@ -328,6 +382,7 @@
 
 % MOOSE
 % "Here, the tensor mechanics module of the highly parallel code MOOSE was used..."
+% author:ellis author:reali author:davis author:brooks mechanical model
 @Misc{Ellis_2024,
   author       = {W. M. E. Ellis and L. Reali and A. Davis and H. M. Brooks and I. Katramados and A. J. Thornton and R. A. Akers and S. L. Dudarev},
   title        = {Mechanical model for a full fusion tokamak enabled by supercomputing},
@@ -490,6 +545,7 @@
 
 % MOOSE
 % " ... (MOOSE) ... was adopted in the present study."
+% author:gao author:feng author:yu author:chen front propagation
 @Misc{Gao_2024,
   author       = {Yuan Gao and Yuqun Feng and Xiaotong Yu and Rong Chen and Philippe Geubelle},
   title        = {Front propagation accelerated by convection-driven symmetry breaking in frontal polymerization},
@@ -744,19 +800,6 @@
   volume  = 428,
   pages   = {113506 (xx pages)},
   note    = {\url{https://doi.org/10.1016/j.nucengdes.2024.113506}}
-}
-
-% MOOSE/FERRET
-% "Specifically, the FERRET package ... based on ... (MOOSE) ... was used to conduct all the FEM-based simulations ..."
-% https://www.researchgate.net/publication/382692341_Extrinsic_Dielectric_Response_due_to_Domain_Wall_Motion_in_Ferroelectric_BaTiO_3
-% author:gurung author:ishtiyaq extrinsic dielectric response
-@Misc{Gurung_2024,
-  author       = {Ashok Gurung and Mohammad Fatin Ishtiyaq and S. Pamir Alpay and John Mangeri and Serge Nakhmanson},
-  title        = {{Extrinsic dielectric response due to domain wall motion in ferroelectric BaTiO$_3$}},
-  month        = jul,
-  year         = 2024,
-  howpublished = {ArXiv e-print},
-  note         = {\url{https://arxiv.org/abs/2407.20354}}
 }
 
 % MOOSE/PorousFlow
@@ -2012,7 +2055,7 @@
   address   = {Stanford, California},
   pages     = {SGP-TR-227 (11 pages)},
   month     = feb # {~12--14,},
-  year      = 2022,
+  year      = 2024,
   note      = {\url{http://tinyurl.com/22c74z2b}}
 }
 
@@ -2026,7 +2069,7 @@
   address   = {Stanford, California},
   pages     = {SGP-TR-227 (9 pages)},
   month     = feb # {~12--14,},
-  year      = 2022,
+  year      = 2024,
   note      = {\url{http://tinyurl.com/26ns8957}}
 }
 
