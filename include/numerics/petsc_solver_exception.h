@@ -73,10 +73,10 @@ public:
 
 
 // Macro which we call after every PETSc function that returns an error code.
-#define LIBMESH_CHKERR(ierr)                    \
-  do {                                          \
-    if (ierr != 0) {                            \
-      throw PetscSolverException(ierr);         \
+#define LIBMESH_CHKERR(ierr)                     \
+  do {                                           \
+    if (ierr != 0) {                             \
+      throw libMesh::PetscSolverException(ierr); \
     } } while (0)
 
 // Two-argument CHKERR macro that takes both a comm and an error
