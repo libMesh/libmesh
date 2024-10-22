@@ -227,8 +227,8 @@ public:
     // For every pair of elements (e,f) on this edge owned by processors (proc_e, proc_f) respectively, check that:
     // 1.) The DOFs of e are either local to, or in the send-list of, proc_f
     // 2.) The DOFs of f are either local to, or in the send-list of, proc_e
-    for (auto e=0; e<non_manifold_neighbors.size(); ++e)
-      for (auto f=e+1; f<non_manifold_neighbors.size(); ++f)
+    for (auto e : index_range(non_manifold_neighbors))
+      for (auto f : make_range(e+1, non_manifold_neighbors.size()))
         {
           // Lambda to be used for error checking
           auto check_dofs = [&](const Elem * elem)
