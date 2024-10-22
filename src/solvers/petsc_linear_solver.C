@@ -50,7 +50,7 @@ extern "C"
     PetscFunctionBegin;
 
     void * ctx;
-    PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
+    LibmeshPetscCallQ(PCShellGetContext(pc,&ctx));
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
 
     libmesh_error_msg_if(!preconditioner->initialized(),
@@ -66,7 +66,7 @@ extern "C"
     PetscFunctionBegin;
 
     void * ctx;
-    PetscErrorCode ierr = PCShellGetContext(pc,&ctx);CHKERRQ(ierr);
+    LibmeshPetscCallQ(PCShellGetContext(pc,&ctx));
     Preconditioner<Number> * preconditioner = static_cast<Preconditioner<Number> *>(ctx);
 
     PetscVector<Number> x_vec(x, preconditioner->comm());

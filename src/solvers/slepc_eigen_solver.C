@@ -819,8 +819,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
 
   // Get the matrix context.
   void * ctx;
-  PetscErrorCode ierr = MatShellGetContext(mat,&ctx);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(MatShellGetContext(mat,&ctx));
 
   // Get user shell matrix object.
   const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
@@ -832,7 +831,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_mult(Mat mat, Vec arg, V
   // Call the user function.
   shell_matrix.vector_mult(dest_global,arg_global);
 
-  PetscFunctionReturn(ierr);
+  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
 template <typename T>
@@ -842,8 +841,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
 
   // Get the matrix context.
   void * ctx;
-  PetscErrorCode ierr = MatShellGetContext(mat,&ctx);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(MatShellGetContext(mat,&ctx));
 
   // Get user shell matrix object.
   const ShellMatrix<T> & shell_matrix = *static_cast<const ShellMatrix<T> *>(ctx);
@@ -854,7 +852,7 @@ PetscErrorCode SlepcEigenSolver<T>::_petsc_shell_matrix_get_diagonal(Mat mat, Ve
   // Call the user function.
   shell_matrix.get_diagonal(dest_global);
 
-  PetscFunctionReturn(ierr);
+  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
 //------------------------------------------------------------------

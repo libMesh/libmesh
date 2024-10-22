@@ -64,7 +64,6 @@ namespace libMesh
     {
       PetscFunctionBegin;
 
-      PetscErrorCode ierr;
       // Basically, we copy the PETSc ShellCreateSubDM implementation,
       // but also need to set the embedding dim and also propagate
       // the relevant function pointers to the subDM for GMG purposes.
@@ -73,19 +72,16 @@ namespace libMesh
 
       // First, retrieve our context
       void * ctx = nullptr;
-      ierr = DMShellGetContext(dm, & ctx);
-      CHKERRQ(ierr);
+      LibmeshPetscCallQ(DMShellGetContext(dm, & ctx));
       libmesh_assert(ctx);
       PetscDMContext * p_ctx = static_cast<PetscDMContext * >(ctx);
 
       if (subdm)
         {
-          ierr = DMShellCreate(PetscObjectComm((PetscObject) dm), subdm);
-          CHKERRQ(ierr);
+          LibmeshPetscCallQ(DMShellCreate(PetscObjectComm((PetscObject) dm), subdm));
 
           // Set the DM embedding dimension to help PetscDS (Discrete System)
-          ierr = DMSetCoordinateDim(*subdm, p_ctx->mesh_dim);
-          CHKERRQ(ierr);
+          LibmeshPetscCallQ(DMSetCoordinateDim(*subdm, p_ctx->mesh_dim));
 
           // Now set the function pointers for the subDM
           // Some DMShellGet* functions only exist with PETSc >= 3.12.0.
@@ -93,108 +89,69 @@ namespace libMesh
           // Set Coarsen function pointer
 #if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->coarsen)
-            {
-              ierr = DMShellSetCoarsen(*subdm, dm->ops->coarsen);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetCoarsen(*subdm, dm->ops->coarsen));
 #else
           PetscErrorCode (*coarsen)(DM,MPI_Comm,DM*) = nullptr;
-          ierr = DMShellGetCoarsen(dm, &coarsen);
-          CHKERRQ(ierr);
+          LibmeshPetscCallQ(DMShellGetCoarsen(dm, &coarsen));
           if (coarsen)
-            {
-              ierr = DMShellSetCoarsen(*subdm, coarsen);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetCoarsen(*subdm, coarsen));
 #endif
 
           // Set Refine function pointer
 #if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->refine)
-            {
-              ierr = DMShellSetRefine(*subdm, dm->ops->refine);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetRefine(*subdm, dm->ops->refine));
 #else
           PetscErrorCode (*refine)(DM,MPI_Comm,DM*) = nullptr;
-          ierr = DMShellGetRefine(dm, &refine);
-          CHKERRQ(ierr);
+          LibmeshPetscCallQ(DMShellGetRefine(dm, &refine));
 
           if (refine)
-            {
-              ierr = DMShellSetRefine(*subdm, refine);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetRefine(*subdm, refine));
 #endif
 
           // Set Interpolation function pointer
 #if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->createinterpolation)
-            {
-              ierr = DMShellSetCreateInterpolation(*subdm, dm->ops->createinterpolation);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetCreateInterpolation(*subdm, dm->ops->createinterpolation));
 #else
           PetscErrorCode (*interp)(DM,DM,Mat*,Vec*) = nullptr;
-          ierr = DMShellGetCreateInterpolation(dm, &interp);
-          CHKERRQ(ierr);
+          LibmeshPetscCallQ(DMShellGetCreateInterpolation(dm, &interp));
           if (interp)
-            {
-              ierr = DMShellSetCreateInterpolation(*subdm, interp);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetCreateInterpolation(*subdm, interp));
 #endif
 
           // Set Restriction function pointer
 #if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->createrestriction)
-            {
-              ierr = DMShellSetCreateRestriction(*subdm, dm->ops->createrestriction);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetCreateRestriction(*subdm, dm->ops->createrestriction));
 #else
           PetscErrorCode (*createrestriction)(DM,DM,Mat*) = nullptr;
-          ierr = DMShellGetCreateRestriction(dm, &createrestriction);
-          CHKERRQ(ierr);
+          LibmeshPetscCallQ(DMShellGetCreateRestriction(dm, &createrestriction));
           if (createrestriction)
-            {
-              ierr = DMShellSetCreateRestriction(*subdm, createrestriction);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetCreateRestriction(*subdm, createrestriction));
 #endif
 
           // Set CreateSubDM function pointer
 #if PETSC_VERSION_LESS_THAN(3,12,0)
           if (dm->ops->createsubdm)
-            {
-              ierr = DMShellSetCreateSubDM(*subdm, dm->ops->createsubdm);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetCreateSubDM(*subdm, dm->ops->createsubdm));
 #else
           PetscErrorCode (*createsubdm)(DM,PetscInt,const PetscInt[],IS*,DM*) = nullptr;
-          ierr = DMShellGetCreateSubDM(dm, &createsubdm);
-          CHKERRQ(ierr);
+          LibmeshPetscCallQ(DMShellGetCreateSubDM(dm, &createsubdm));
           if (createsubdm)
-            {
-              ierr = DMShellSetCreateSubDM(*subdm, createsubdm);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetCreateSubDM(*subdm, createsubdm));
 #endif
           // Set Context pointer
           if (ctx)
-            {
-              ierr = DMShellSetContext(*subdm, ctx);
-              CHKERRQ(ierr);
-            }
+            LibmeshPetscCallQ(DMShellSetContext(*subdm, ctx));
 #if PETSC_VERSION_LESS_THAN(3,11,0)
           // Lastly, Compute the subsection for the subDM
-          ierr = DMCreateSubDM_Section_Private(dm, numFields, fields, is, subdm);
+          LibmeshPetscCallQ(DMCreateSubDM_Section_Private(dm, numFields, fields, is, subdm));
 #elif PETSC_RELEASE_LESS_THAN(3, 21, 0)
-          ierr = DMCreateSectionSubDM(dm, numFields, fields, is, subdm);
+          LibmeshPetscCallQ(DMCreateSectionSubDM(dm, numFields, fields, is, subdm));
 #else
-          ierr = DMCreateSectionSubDM(dm, numFields, fields, NULL, NULL, is, subdm);
+          LibmeshPetscCallQ(DMCreateSectionSubDM(dm, numFields, fields, NULL, NULL, is, subdm));
 #endif
-          CHKERRQ(ierr);
         }
 
       PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
@@ -208,11 +165,9 @@ namespace libMesh
       libmesh_assert(dmc);
       libmesh_assert(dmf);
 
-      PetscErrorCode ierr;
-
       // extract our context from the incoming dmc
       void * ctx_c = nullptr;
-      ierr = DMShellGetContext(dmc, & ctx_c);CHKERRQ(ierr);
+      LibmeshPetscCallQ(DMShellGetContext(dmc, & ctx_c));
       libmesh_assert(ctx_c);
       PetscDMContext * p_ctx = static_cast<PetscDMContext * >(ctx_c);
 
@@ -232,11 +187,9 @@ namespace libMesh
       libmesh_assert(dmc);
       libmesh_assert(dmf);
 
-      PetscErrorCode ierr;
-
       // Extract our context from the incoming dmf
       void * ctx_f = nullptr;
-      ierr = DMShellGetContext(dmf, &ctx_f);CHKERRQ(ierr);
+      LibmeshPetscCallQ(DMShellGetContext(dmf, &ctx_f));
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
 
@@ -259,10 +212,8 @@ namespace libMesh
 
       libmesh_assert(p_ctx_f->global_dm);
       DM * globaldm = p_ctx_f->global_dm;
-      ierr = DMCreateFieldIS(dmf, &nfieldsf, &fieldnamesf, nullptr);
-      CHKERRQ(ierr);
-      ierr = DMCreateFieldIS(*globaldm, &nfieldsg, &fieldnamesg, nullptr);
-      CHKERRQ(ierr);
+      LibmeshPetscCallQ(DMCreateFieldIS(dmf, &nfieldsf, &fieldnamesf, nullptr));
+      LibmeshPetscCallQ(DMCreateFieldIS(*globaldm, &nfieldsg, &fieldnamesg, nullptr));
 
       // If the probed number of fields is less than the number of
       // global fields, this amounts to PETSc 'indicating' to us we
@@ -287,15 +238,13 @@ namespace libMesh
 
           // Next, for the found fields we create a subDM
           DM subdm;
-          ierr = libmesh_petsc_DMCreateSubDM(*(p_ctx_f->coarser_dm), nfieldsf,
-                                             p_ctx_f->subfields.data(), nullptr, &subdm);
-          CHKERRQ(ierr);
+          LibmeshPetscCallQ(libmesh_petsc_DMCreateSubDM(*(p_ctx_f->coarser_dm), nfieldsf,
+                                                        p_ctx_f->subfields.data(), nullptr, &subdm));
 
           // Extract our coarse context from the created subDM so we
           // can set its subfields for use in createInterp.
           void * ctx_c = nullptr;
-          ierr = DMShellGetContext(subdm, &ctx_c);
-          CHKERRQ(ierr);
+          LibmeshPetscCallQ(DMShellGetContext(subdm, &ctx_c));
           libmesh_assert(ctx_c);
           PetscDMContext * p_ctx_c = static_cast<PetscDMContext*>(ctx_c);
 
@@ -327,21 +276,18 @@ namespace libMesh
       libmesh_assert(vec); // Optional scaling (not needed for mg)
 
       // Get a communicator from incoming DM
-      PetscErrorCode ierr;
       MPI_Comm comm;
-      ierr = PetscObjectGetComm((PetscObject)dmc, &comm);
-      CHKERRQ(ierr);
+      LibmeshPetscCallQ(PetscObjectGetComm((PetscObject)dmc, &comm));
 
       // Extract our coarse context from the incoming DM
       void * ctx_c = nullptr;
-      ierr = DMShellGetContext(dmc, &ctx_c);
-      CHKERRQ(ierr);
+      LibmeshPetscCallQ(DMShellGetContext(dmc, &ctx_c));
       libmesh_assert(ctx_c);
       PetscDMContext * p_ctx_c = static_cast<PetscDMContext*>(ctx_c);
 
       // Extract our fine context from the incoming DM
       void * ctx_f = nullptr;
-      ierr = DMShellGetContext(dmf, &ctx_f);CHKERRQ(ierr);
+      LibmeshPetscCallQ(DMShellGetContext(dmf, &ctx_f));
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
 
@@ -356,10 +302,8 @@ namespace libMesh
       libmesh_assert(p_ctx_c->global_dm);
       DM * globaldm = p_ctx_c->global_dm;
 
-      ierr = DMCreateFieldIS(dmf, &nfieldsf, nullptr, nullptr);
-      CHKERRQ(ierr);
-      ierr = DMCreateFieldIS(*globaldm, &nfieldsg, nullptr, nullptr);
-      CHKERRQ(ierr);
+      LibmeshPetscCallQ(DMCreateFieldIS(dmf, &nfieldsf, nullptr, nullptr));
+      LibmeshPetscCallQ(DMCreateFieldIS(*globaldm, &nfieldsg, nullptr, nullptr));
 
       // If the probed number of fields is less than the number of
       // global fields, this amounts to PETSc 'indicating' to us we
@@ -417,16 +361,13 @@ namespace libMesh
       libmesh_assert(dmf);
       libmesh_assert(mat);
 
-      PetscErrorCode ierr;
-
       // get a communicator from incoming DM
       MPI_Comm comm;
-      ierr = PetscObjectGetComm((PetscObject)dmc, &comm);
-      CHKERRQ(ierr);
+      LibmeshPetscCallQ(PetscObjectGetComm((PetscObject)dmc, &comm));
 
       // extract our fine context from the incoming DM
       void * ctx_f = nullptr;
-      ierr = DMShellGetContext(dmf, &ctx_f);CHKERRQ(ierr);
+      LibmeshPetscCallQ(DMShellGetContext(dmf, &ctx_f));
       libmesh_assert(ctx_f);
       PetscDMContext * p_ctx_f = static_cast<PetscDMContext*>(ctx_f);
 

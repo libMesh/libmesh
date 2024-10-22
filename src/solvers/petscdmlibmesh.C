@@ -17,7 +17,7 @@
 
 
 
-#include "libmesh/petsc_macro.h"
+#include "libmesh/petsc_solver_exception.h"
 
 #ifdef LIBMESH_HAVE_PETSC
 
@@ -34,13 +34,12 @@
 PetscErrorCode DMlibMeshSetSystem(DM dm, libMesh::NonlinearImplicitSystem & sys)
 {
   PetscErrorCode (*f)(DM,libMesh::NonlinearImplicitSystem &) = nullptr;
-  PetscErrorCode ierr;
 
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
-  ierr = PetscObjectQueryFunction((PetscObject)dm,"DMlibMeshSetSystem_C",&f);CHKERRQ(ierr);
+  LibmeshPetscCallQ(PetscObjectQueryFunction((PetscObject)dm,"DMlibMeshSetSystem_C",&f));
   if (!f) SETERRQ(PETSC_COMM_SELF,PETSC_ERR_SUP, "DM has no implementation for DMlibMeshSetSystem");
-  ierr = (*f)(dm,sys);CHKERRQ(ierr);
+  LibmeshPetscCallQ((*f)(dm,sys));
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
@@ -49,13 +48,12 @@ PetscErrorCode DMlibMeshSetSystem(DM dm, libMesh::NonlinearImplicitSystem & sys)
 PetscErrorCode DMlibMeshGetSystem(DM dm, libMesh::NonlinearImplicitSystem *& sys)
 {
   PetscErrorCode (*f)(DM,libMesh::NonlinearImplicitSystem *&) = nullptr;
-  PetscErrorCode ierr;
 
   PetscFunctionBegin;
   PetscValidHeaderSpecific(dm,DM_CLASSID,1);
-  ierr = PetscObjectQueryFunction((PetscObject)dm,"DMlibMeshGetSystem_C",&f);CHKERRQ(ierr);
+  LibmeshPetscCallQ(PetscObjectQueryFunction((PetscObject)dm,"DMlibMeshGetSystem_C",&f));
   if (!f) SETERRQ(PETSC_COMM_SELF,PETSC_ERR_SUP, "DM has no implementation for DMlibMeshGetSystem");
-  ierr = (*f)(dm,sys);CHKERRQ(ierr);
+  LibmeshPetscCallQ((*f)(dm,sys));
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
