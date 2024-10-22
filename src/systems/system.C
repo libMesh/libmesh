@@ -1016,6 +1016,29 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
 
 
 
+SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
+                                           std::unique_ptr<SparseMatrix<Number>> matrix,
+                                           const ParallelType type)
+{
+  parallel_object_only();
+
+  libmesh_assert(this->comm().verify(std::string(mat_name)));
+  libmesh_assert(this->comm().verify(int(type)));
+
+  auto [it, inserted] = _matrices.emplace(mat_name, std::move(matrix));
+  libmesh_error_msg_if(!inserted,
+                       "Tried to add '" << mat_name << "' but the matrix already exists");
+
+  _matrix_types.emplace(mat_name, type);
+
+  SparseMatrix<Number> & mat = *(it->second);
+
+  // Initialize it first if we've already initialized the others.
+  this->late_matrix_init(mat, type);
+
+  return mat;
+}
+
 void System::late_matrix_init(SparseMatrix<Number> & mat,
                               ParallelType type)
 {

@@ -33,6 +33,11 @@
 #include "libmesh/parallel_object.h"
 #include "libmesh/point.h"
 #include "libmesh/utility.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/enum_elem_type.h"
+#include "libmesh/mesh_subdivision_support.h"
 
 // C++ Includes
 #include <algorithm>
@@ -53,13 +58,13 @@ class DirichletBoundary;
 class DirichletBoundaries;
 class DofMap;
 class DofObject;
-class Elem;
 class FEType;
 class MeshBase;
 class PeriodicBoundaryBase;
 class PeriodicBoundaries;
 class System;
 class NonlinearImplicitSystem;
+class StaticCondensation;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -757,6 +762,43 @@ public:
                     std::vector<dof_id_type> & di,
                     const unsigned int vn,
                     int p_level = -12345) const;
+
+  /**
+   * Retrieves degree of freedom indices for a given \p elem and then performs actions for these
+   * indices defined by the user-provided functors \p scalar_dofs_functor and \p field_dofs_functor.
+   * This API is useful when a user wants to do more than simply fill a degree of freedom container
+   * @param elem The element to get degrees of freedom for
+   * @param di A container for degrees of freedom. It is up to the provided functors how this gets
+   *           filled
+   * @param vn The variable number to retrieve degrees of freedom for
+   * @param scalar_dofs_functor The functor that acts on scalar degrees of freedom. This functor has
+   *                            the interface:
+   *                            void scalar_dofs_functor(const Elem & elem,
+   *                                                    std::vector<dof_id_type> & di,
+   *                                                    const std::vector<dof_id_type> & scalar_dof_indices)
+   *                            where \p di is the degree of freedom container described above and
+   *                            \p scalar_dof_indices are the scalar dof indices available to
+   *                            \p elem
+   * @param field_dofs_functor The functor that acts on "field" (e.g. non-scalar, non-global)
+   *                           degrees of freedom. This functor has
+   *                           the interface:
+   *                           void field_dofs_functor(const Elem & elem,
+   *                                                   const unsigned int node_num,
+   *                                                   const unsigned int var_num,
+   *                                                   std::vector<dof_id_type> & di,
+   *                                                   const dof_id_type field_dof)
+   *                           where \p field_dof represents a field degree of freedom to act on and
+   *                           is associated with \p node_num and \p var_num. If the degree of
+   *                           freedom is elemental than \p node_num will be \p invalid_uint. \p di
+   *                           is again the degree of freedom container provided above
+   */
+  template <typename ScalarDofsFunctor, typename FieldDofsFunctor>
+  void dof_indices(const Elem * const elem,
+                   std::vector<dof_id_type> & di,
+                   const unsigned int vn,
+                   ScalarDofsFunctor scalar_dofs_functor,
+                   FieldDofsFunctor field_dofs_functor,
+                   int p_level = -12345) const;
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -1640,6 +1682,22 @@ public:
   bool should_p_refine(FEFamily) const = delete;
   bool should_p_refine(Order) const = delete;
 
+  /**
+   * Add a static condensation class
+   */
+  void add_static_condensation(const StaticCondensation & sc) { _sc = &sc; }
+
+  /**
+   * Checks whether we have static condensation
+   */
+  bool has_static_condensation() const { return _sc; }
+
+  /**
+   * @returns the static condensation class. This should have been already added with a call to \p
+   * add_static_condensation()
+   */
+  const StaticCondensation & get_static_condensation() const;
+
 private:
 
   /**
@@ -1658,13 +1716,42 @@ private:
                      const unsigned int vg,
                      const unsigned int vig,
                      const Node * const * nodes,
-                     unsigned int       n_nodes
+                     unsigned int       n_nodes,
+                     const unsigned int v
 #ifdef DEBUG
                      ,
-                     const unsigned int v,
                      std::size_t & tot_size
 #endif
-                     ) const;
+                    ) const;
+
+  /**
+   * As above except a \p field_dofs_functor must be provided. This method is useful when the caller
+   * wants to do more than simply fill a degree of freedom container
+   * @param field_dofs_functor This functor has the interface:
+   *                           void field_dofs_functor(const Elem & elem,
+   *                                                   const unsigned int node_num,
+   *                                                   const unsigned int var_num,
+   *                                                   std::vector<dof_id_type> & di,
+   *                                                   const dof_id_type field_dof)
+   *                           where \p field_dof represents a field degree of freedom to act on and
+   *                           is associated with \p node_num and \p var_num. If the degree of
+   *                           freedom is elemental than \p node_num will be \p invalid_uint. \p di
+   *                           is the degree of freedom container provided to the \p _dof_indices
+   *                           method
+   */
+  template <typename FieldDofsFunctor>
+  void _dof_indices (const Elem & elem,
+                     int p_level,
+                     std::vector<dof_id_type> & di,
+                     const unsigned int vg,
+                     const unsigned int vig,
+                     const Node * const * nodes,
+                     unsigned int       n_nodes,
+                     const unsigned int v,
+#ifdef DEBUG
+                     std::size_t & tot_size,
+#endif
+                     FieldDofsFunctor field_dofs_functor) const;
 
   /**
    * Helper function that implements the element-nodal versions of
@@ -2092,6 +2179,9 @@ private:
    * objects stored.
    */
   bool _verify_dirichlet_bc_consistency;
+
+  /// Static condensation class
+  const StaticCondensation * _sc;
 };
 
 
@@ -2373,6 +2463,254 @@ bool DofMap::should_p_refine_var(const unsigned int var) const
   return false;
 #endif
 }
+
+template <typename FieldDofsFunctor>
+void DofMap::_dof_indices (const Elem & elem,
+                           int p_level,
+                           std::vector<dof_id_type> & di,
+                           const unsigned int vg,
+                           const unsigned int vig,
+                           const Node * const * nodes,
+                           unsigned int       n_nodes,
+                           const unsigned int v,
+#ifdef DEBUG
+                           std::size_t & tot_size,
+#endif
+                           FieldDofsFunctor field_dofs_functor) const
+{
+  const VariableGroup & var = this->variable_group(vg);
+
+  if (var.active_on_subdomain(elem.subdomain_id()))
+    {
+      const ElemType type        = elem.type();
+      const unsigned int sys_num = this->sys_number();
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      const bool is_inf          = elem.infinite();
+#endif
+
+      const bool extra_hanging_dofs =
+        FEInterface::extra_hanging_dofs(var.type());
+
+      FEType fe_type = var.type();
+
+      const bool add_p_level =
+#ifdef LIBMESH_ENABLE_AMR
+          !_dont_p_refine.count(vg);
+#else
+          false;
+#endif
+
+#ifdef DEBUG
+      // The number of dofs per element is non-static for subdivision FE
+      if (var.type().family == SUBDIVISION)
+        tot_size += n_nodes;
+      else
+        // FIXME: Is the passed-in p_level just elem.p_level()? If so,
+        // this seems redundant.
+        tot_size += FEInterface::n_dofs(fe_type, add_p_level*p_level, &elem);
+#endif
+
+      // The total Order is not required when getting the function
+      // pointer, it is only needed when the function is called (see
+      // below).
+      const FEInterface::n_dofs_at_node_ptr ndan =
+        FEInterface::n_dofs_at_node_function(fe_type, &elem);
+
+      // Get the node-based DOF numbers
+      for (unsigned int n=0; n != n_nodes; n++)
+        {
+          const Node & node = *nodes[n];
+
+          // Cache the intermediate lookups that are common to every
+          // component
+#ifdef DEBUG
+          const std::pair<unsigned int, unsigned int>
+            vg_and_offset = node.var_to_vg_and_offset(sys_num,v);
+          libmesh_assert_equal_to (vg, vg_and_offset.first);
+          libmesh_assert_equal_to (vig, vg_and_offset.second);
+#endif
+          const unsigned int n_comp = node.n_comp_group(sys_num,vg);
+
+          // There is a potential problem with h refinement.  Imagine a
+          // quad9 that has a linear FE on it.  Then, on the hanging side,
+          // it can falsely identify a DOF at the mid-edge node. This is why
+          // we go through FEInterface instead of node.n_comp() directly.
+          const unsigned int nc =
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+            is_inf ?
+            FEInterface::n_dofs_at_node(fe_type, add_p_level*p_level, &elem, n) :
+#endif
+            ndan (type, fe_type.order + add_p_level*p_level, n);
+
+          // If this is a non-vertex on a hanging node with extra
+          // degrees of freedom, we use the non-vertex dofs (which
+          // come in reverse order starting from the end, to
+          // simplify p refinement)
+          if (extra_hanging_dofs && !elem.is_vertex(n))
+            {
+              const int dof_offset = n_comp - nc;
+
+              // We should never have fewer dofs than necessary on a
+              // node unless we're getting indices on a parent element,
+              // and we should never need the indices on such a node
+              if (dof_offset < 0)
+                {
+                  libmesh_assert(!elem.active());
+                  di.resize(di.size() + nc, DofObject::invalid_id);
+                }
+              else
+                for (int i=int(n_comp)-1; i>=dof_offset; i--)
+                  {
+                    const dof_id_type d =
+                      node.dof_number(sys_num, vg, vig, i, n_comp);
+                    libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+                    field_dofs_functor(elem, n, v, di, d);
+                  }
+            }
+          // If this is a vertex or an element without extra hanging
+          // dofs, our dofs come in forward order coming from the
+          // beginning
+          else
+            {
+              // We have a good component index only if it's being
+              // used on this FE type (nc) *and* it's available on
+              // this DofObject (n_comp).
+              const unsigned int good_nc = std::min(n_comp, nc);
+              for (unsigned int i=0; i!=good_nc; ++i)
+                {
+                  const dof_id_type d =
+                    node.dof_number(sys_num, vg, vig, i, n_comp);
+                  libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+                  libmesh_assert_less (d, this->n_dofs());
+                  field_dofs_functor(elem, n, v, di, d);
+                }
+
+              // With fewer good component indices than we need, e.g.
+              // due to subdomain expansion, the remaining expected
+              // indices are marked invalid.
+              if (n_comp < nc)
+                for (unsigned int i=n_comp; i!=nc; ++i)
+                  di.push_back(DofObject::invalid_id);
+            }
+        }
+
+      // If there are any element-based DOF numbers, get them
+      const unsigned int nc = FEInterface::n_dofs_per_elem(fe_type, add_p_level*p_level, &elem);
+
+      // We should never have fewer dofs than necessary on an
+      // element unless we're getting indices on a parent element
+      // (and we should never need those indices) or off-domain for a
+      // subdomain-restricted variable (where invalid_id is the
+      // correct thing to return)
+      if (nc != 0)
+        {
+          const unsigned int n_comp = elem.n_comp_group(sys_num,vg);
+          if (elem.n_systems() > sys_num && nc <= n_comp)
+            {
+              for (unsigned int i=0; i<nc; i++)
+                {
+                  const dof_id_type d =
+                    elem.dof_number(sys_num, vg, vig, i, n_comp);
+                  libmesh_assert_not_equal_to (d, DofObject::invalid_id);
+
+                  field_dofs_functor(elem, invalid_uint, v, di, d);
+                }
+            }
+          else
+            {
+              libmesh_assert(!elem.active() || fe_type.family == LAGRANGE || fe_type.family == SUBDIVISION);
+              di.resize(di.size() + nc, DofObject::invalid_id);
+            }
+        }
+    }
+}
+
+
+
+template <typename ScalarDofsFunctor, typename FieldDofsFunctor>
+void DofMap::dof_indices (const Elem * const elem,
+                          std::vector<dof_id_type> & di,
+                          const unsigned int vn,
+                          ScalarDofsFunctor scalar_dofs_functor,
+                          FieldDofsFunctor field_dofs_functor,
+                          int p_level) const
+{
+  // We now allow elem==nullptr to request just SCALAR dofs
+  // libmesh_assert(elem);
+
+  LOG_SCOPE("dof_indices()", "DofMap");
+
+  // Clear the DOF indices vector
+  di.clear();
+
+  // Use the default p refinement level?
+  if (p_level == -12345)
+    p_level = elem ? elem->p_level() : 0;
+
+  const unsigned int vg = this->_variable_group_numbers[vn];
+  const VariableGroup & var = this->variable_group(vg);
+  const unsigned int vig = vn - var.number();
+
+#ifdef DEBUG
+  // Check that sizes match in DEBUG mode
+  std::size_t tot_size = 0;
+#endif
+
+  if (elem && elem->type() == TRI3SUBDIVISION)
+    {
+      // Subdivision surface FE require the 1-ring around elem
+      const Tri3Subdivision * sd_elem = static_cast<const Tri3Subdivision *>(elem);
+
+      // Ghost subdivision elements have no real dofs
+      if (!sd_elem->is_ghost())
+        {
+          // Determine the nodes contributing to element elem
+          std::vector<const Node *> elem_nodes;
+          MeshTools::Subdivision::find_one_ring(sd_elem, elem_nodes);
+
+          _dof_indices(*elem, p_level, di, vg, vig, elem_nodes.data(),
+                       cast_int<unsigned int>(elem_nodes.size()), vn,
+#ifdef DEBUG
+                       tot_size,
+#endif
+                       field_dofs_functor);
+        }
+
+      return;
+    }
+
+  // Get the dof numbers
+  if (var.type().family == SCALAR &&
+      (!elem ||
+       var.active_on_subdomain(elem->subdomain_id())))
+    {
+#ifdef DEBUG
+      tot_size += var.type().order;
+#endif
+      std::vector<dof_id_type> di_new;
+      this->SCALAR_dof_indices(di_new,vn);
+      scalar_dofs_functor(*elem, di, di_new);
+    }
+  else if (elem)
+    _dof_indices(*elem, p_level, di, vg, vig, elem->get_nodes(),
+                 elem->n_nodes(), vn,
+#ifdef DEBUG
+                 tot_size,
+#endif
+                 field_dofs_functor);
+
+#ifdef DEBUG
+  libmesh_assert_equal_to (tot_size, di.size());
+#endif
+}
+
+inline
+const StaticCondensation & DofMap::get_static_condensation() const
+{
+  libmesh_assert(_sc);
+  return *_sc;
+}
+
 } // namespace libMesh
 
 #endif // LIBMESH_DOF_MAP_H

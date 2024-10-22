@@ -27,6 +27,8 @@
 //#include "libmesh/parameter_vector.h"
 #include "libmesh/sparse_matrix.h" // for get_transpose
 #include "libmesh/system_subset.h"
+#include "libmesh/static_condensation.h"
+#include "libmesh/static_condensation_preconditioner.h"
 
 namespace libMesh
 {
@@ -52,6 +54,14 @@ LinearImplicitSystem::LinearImplicitSystem (EquationSystems & es,
 
 
 LinearImplicitSystem::~LinearImplicitSystem () = default;
+
+
+
+void LinearImplicitSystem::create_static_condensation()
+{
+  Parent::create_static_condensation();
+  linear_solver->attach_preconditioner(&_sc->get_preconditioner());
+}
 
 
 

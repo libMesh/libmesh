@@ -33,6 +33,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/diagonal_matrix.h"
 #include "libmesh/utility.h"
+#include "libmesh/static_condensation.h"
 
 namespace libMesh
 {
@@ -43,13 +44,24 @@ ImplicitSystem::ImplicitSystem (EquationSystems & es,
 
   Parent            (es, name_in, number_in),
   matrix            (nullptr),
-  zero_out_matrix_and_rhs(true)
+  zero_out_matrix_and_rhs(true),
+  _sc               (nullptr)
 {
+  if (libMesh::on_command_line("--" + name_in + "-static-condensation"))
+    this->create_static_condensation();
 }
 
-
-
 ImplicitSystem::~ImplicitSystem () = default;
+
+
+
+void ImplicitSystem::create_static_condensation ()
+{
+  auto sc = std::make_unique<StaticCondensation>(this->get_mesh(), *this, this->get_dof_map());
+  _sc = sc.get();
+  matrix = &(this->add_matrix ("System Matrix", std::move(sc)));
+  this->get_dof_map().add_static_condensation(*_sc);
+}
 
 
 
@@ -60,6 +72,7 @@ void ImplicitSystem::clear ()
 
   // Restore us to a "basic" state
   matrix = nullptr;
+  _sc = nullptr;
 }
 
 

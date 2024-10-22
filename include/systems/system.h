@@ -1834,7 +1834,7 @@ public:
    * allowed prior to \p assemble().  All additional matrices
    * have the same sparsity pattern as the matrix used during
    * solution.  When not \p System but the user wants to
-   * initialize the mayor matrix, then all the additional matrices,
+   * initialize the main/system matrix, then all the additional matrices,
    * if existent, have to be initialized by the user, too.
    *
    * This non-template method will add a derived matrix type corresponding to
@@ -1855,7 +1855,7 @@ public:
   * allowed prior to \p assemble().  All additional matrices
   * have the same sparsity pattern as the matrix used during
   * solution.  When not \p System but the user wants to
-  * initialize the mayor matrix, then all the additional matrices,
+  * initialize the main/system matrix, then all the additional matrices,
   * if existent, have to be initialized by the user, too.
   *
   * This method will create add a derived matrix of type
@@ -1867,6 +1867,23 @@ public:
   */
   template <template <typename> class>
   SparseMatrix<Number> & add_matrix (std::string_view mat_name, ParallelType = PARALLEL);
+
+  /**
+   * Adds the additional matrix \p mat_name to this system.  Only
+   * allowed prior to \p assemble().  All additional matrices
+   * have the same sparsity pattern as the matrix used during
+   * solution.  When not \p System but the user wants to
+   * initialize the main/system matrix, then all the additional matrices,
+   * if existent, have to be initialized by the user, too.
+   *
+   * @param mat_name A name for the matrix
+   * @param matrix The matrix we are handing over the \p System for ownership
+   * @param type The serial/parallel/ghosted type of the matrix
+   *
+   */
+  SparseMatrix<Number> & add_matrix (std::string_view mat_name,
+                                     std::unique_ptr<SparseMatrix<Number>> matrix,
+                                     ParallelType type = PARALLEL);
 
   /**
    * Removes the additional matrix \p mat_name from this system

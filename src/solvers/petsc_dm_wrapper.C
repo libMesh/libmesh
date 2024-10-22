@@ -463,7 +463,7 @@ namespace libMesh
     _mesh_dof_loc_sizes.clear();
   }
 
-  void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES & snes)
+  unsigned int PetscDMWrapper::init_petscdm(System & system)
   {
     LOG_SCOPE ("init_and_attach_petscdm()", "PetscDMWrapper");
 
@@ -719,9 +719,26 @@ namespace libMesh
           }
       } // End create transfer operators. System back at the finest grid
 
+    return n_levels;
+  }
+
+  void PetscDMWrapper::init_and_attach_petscdm(System & system, SNES snes)
+  {
+    const auto n_levels = this->init_petscdm(system);
+
     // Lastly, give SNES the finest level DM
     DM & dm = this->get_dm(n_levels-1);
-    ierr = SNESSetDM(snes, dm);
+    auto ierr = SNESSetDM(snes, dm);
+    CHKERRABORT(system.comm().get(),ierr);
+  }
+
+  void PetscDMWrapper::init_and_attach_petscdm(System & system, KSP ksp)
+  {
+    const auto n_levels = this->init_petscdm(system);
+
+    // Lastly, give KSP the finest level DM
+    DM & dm = this->get_dm(n_levels-1);
+    auto ierr = KSPSetDM(ksp, dm);
     CHKERRABORT(system.comm().get(),ierr);
   }
 

@@ -272,6 +272,7 @@ libmesh_SOURCES =  \
         src/numerics/shell_matrix.C \
         src/numerics/sparse_matrix.C \
         src/numerics/sparse_shell_matrix.C \
+        src/numerics/static_condensation.C \
         src/numerics/sum_shell_matrix.C \
         src/numerics/tensor_shell_matrix.C \
         src/numerics/tensor_tools.C \
