@@ -48,7 +48,27 @@ SidesToElemMap SidesToElemMap::build(const MeshBase & mesh)
   // allocations.
   std::vector<dof_id_type> sorted_vertex_ids;
 
+  // Flag which is used to check for hanging Nodes, a case not
+  // currently handled by the SidesToElemMap object.
+  unsigned int active_level_seen = libMesh::invalid_uint;
+
   for (const auto & elem : mesh.element_ptr_range())
+  {
+    // We currently don't handle meshes with hanging nodes. That is,
+    // if there is a refined element with a coarser neighbor, the
+    // SidesToElemMap won't contain any neighbor information (in
+    // either direction) about this. For now, we throw an error
+    // in this scenario.
+    if (elem->active())
+      {
+        if (active_level_seen == libMesh::invalid_uint)
+          active_level_seen = elem->level();
+        else
+          libmesh_error_msg_if(
+            active_level_seen != elem->level(),
+            "SidesToElemMap does not currently support hanging nodes.");
+      }
+
     for (auto s : elem->side_index_range())
     {
       ret.get_sorted_vertex_ids(elem, s, sorted_vertex_ids);
@@ -57,6 +77,7 @@ SidesToElemMap SidesToElemMap::build(const MeshBase & mesh)
       // associated with this list of vertex ids, and store "elem" in it.
       ret._sides_to_elem_map[sorted_vertex_ids].push_back(elem);
     }
+  }
 
   return ret;
 }
