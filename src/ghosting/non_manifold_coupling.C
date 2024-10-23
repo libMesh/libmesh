@@ -27,10 +27,10 @@ NonManifoldGhostingFunctor(const MeshBase & mesh) :
   GhostingFunctor(mesh),
   _stem(MeshTools::SidesToElemMap::build(mesh))
 {
-  // TODO: find out if we should build the cache here in the constructor
-  // or if there will always be at least one mesh_reinit() call before the
-  // NonManifoldGhostingFunctor is called. Roy's initial suggestion is to
-  // build the cache in both places.
+  // We call MeshBase::reinit_ghosting_functors() in MeshBase::prepare_for_use(),
+  // so it _should_ be safe to omit this call to SidesToElemMap::build() here,
+  // but to be on the safe side, we'll construct it both here and during any call
+  // to mesh_reinit().
 }
 
 std::unique_ptr<GhostingFunctor>
