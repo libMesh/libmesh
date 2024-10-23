@@ -61,13 +61,14 @@ SidesToElemMap SidesToElemMap::build(const MeshBase & mesh)
   return ret;
 }
 
-const std::vector<const Elem *> &
+std::pair<SidesToElemMap::ElemIter, SidesToElemMap::ElemIter>
 SidesToElemMap::get_connected_elems(const Elem * elem, unsigned int side) const
 {
   std::vector<dof_id_type> sorted_vertex_ids;
   this->get_sorted_vertex_ids(elem, side, sorted_vertex_ids);
 
-  return libmesh_map_find(_sides_to_elem_map, sorted_vertex_ids);
+  const auto & elem_vec = libmesh_map_find(_sides_to_elem_map, sorted_vertex_ids);
+  return std::make_pair(elem_vec.begin(), elem_vec.end());
 }
 
 void

@@ -16,8 +16,9 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // libMesh includes
-#include "libmesh/non_manifold_coupling.h"
 #include "libmesh/elem.h"
+#include "libmesh/non_manifold_coupling.h"
+#include "libmesh/simple_range.h" // as_range()
 
 namespace libMesh
 {
@@ -87,14 +88,9 @@ NonManifoldGhostingFunctor::operator() (
       // the SidesToElemMap and then add all the Elem pointers from
       // that list to the coupled_elements map.
       for (auto s : elem->side_index_range())
-        {
-          const std::vector<const Elem *> & side_neighbors =
-            _stem.get_connected_elems(elem, s);
-
-          for (const auto & neigh : side_neighbors)
-            if (neigh->processor_id() != p)
-              coupled_elements.emplace(neigh, nullcm);
-        }
+        for (const auto & neigh : as_range(_stem.get_connected_elems(elem, s)))
+          if (neigh->processor_id() != p)
+            coupled_elements.emplace(neigh, nullcm);
     }
 }
 

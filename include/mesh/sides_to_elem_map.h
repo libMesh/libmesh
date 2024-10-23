@@ -67,13 +67,19 @@ public:
   static SidesToElemMap build(const MeshBase & mesh);
 
   /**
-   * Return a const reference to the list of Elems connected to "side"
+   * Typedef for the iterator type returned by the
+   * SidesToeElemMap::get_connected_elems() function.
+   */
+  typedef std::vector<const Elem *>::const_iterator ElemIter;
+
+  /**
+   * Return an iterator pair defining the range of Elems connected to "side"
    * of "elem". The returned list of Elems will also include "elem"
    * itself. Throws an error if the requested (elem, side) combination
    * is not found in the map (this should not happen because every
    * side in the map should be attached to at least one Elem).
    */
-  const std::vector<const Elem *> &
+  std::pair<ElemIter, ElemIter>
   get_connected_elems(const Elem * elem, unsigned int side) const;
 
 private:

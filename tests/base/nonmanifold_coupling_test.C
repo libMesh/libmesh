@@ -68,11 +68,13 @@ protected:
           for (const auto & elem : mesh.element_ptr_range())
             for (auto s : elem->side_index_range())
               {
-                const auto & elem_vec = stem.get_connected_elems(elem, s);
+                const auto [side_neighbors_begin, side_neighbors_end] =
+                  stem.get_connected_elems(elem, s);
 
-                if (elem_vec.size() == 5)
+                if (std::distance(side_neighbors_begin, side_neighbors_end) == 5)
                   {
-                    for (auto e : index_range(elem_vec))
+                    for (auto [e, it] = std::make_tuple(0u, side_neighbors_begin);
+                         it != side_neighbors_end; ++e, ++it)
                       {
                         // If there are more Elems attached to the
                         // non-manifold edge than processors, just wrap
@@ -81,7 +83,7 @@ protected:
                         // has const pointers, but since we have a
                         // non-const reference to the mesh, we can work
                         // around that.
-                        Elem * elem = mesh.elem_ptr(elem_vec[e]->id());
+                        Elem * elem = mesh.elem_ptr((*it)->id());
                         elem->processor_id() = e % n;
 
                         // Debugging
@@ -205,32 +207,37 @@ public:
 
     MeshTools::SidesToElemMap stem = MeshTools::SidesToElemMap::build(*_mesh);
 
-    // Use the SidesToElemMap to get pointers to all Elems attached to
-    // the non-manifold edge that we purposely partitioned onto
+    // Use the SidesToElemMap to get a range of Elem pointers attached
+    // to the non-manifold edge that we intentionally partitioned onto
     // different processors.
-    auto non_manifold_neighbors = [&]() -> std::vector<const Elem *>
+    MeshTools::SidesToElemMap::ElemIter beg, end;
+    auto side_neighbors_found = [&]() -> bool
     {
       for (const auto & elem : _mesh->element_ptr_range())
         for (auto s : elem->side_index_range())
           {
-            const auto & elem_vec = stem.get_connected_elems(elem, s);
-
-            if (elem_vec.size() == 5)
-              return elem_vec;
+            auto range = stem.get_connected_elems(elem, s);
+            if (std::distance(range.first, range.second) == 5)
+              {
+                beg = range.first;
+                end = range.second;
+                return true;
+              }
           }
 
       // If we made it here, then we didn't find a Side shared by
       // 5 elements and we'll throw an error later
-      return {};
+      return false;
     }();
 
-    CPPUNIT_ASSERT_EQUAL(std::size_t(5), non_manifold_neighbors.size());
+    // Require that neighbors were found
+    CPPUNIT_ASSERT(side_neighbors_found);
 
     // For every pair of elements (e,f) on this edge owned by processors (proc_e, proc_f) respectively, check that:
     // 1.) The DOFs of e are either local to, or in the send-list of, proc_f
     // 2.) The DOFs of f are either local to, or in the send-list of, proc_e
-    for (auto e : index_range(non_manifold_neighbors))
-      for (auto f : make_range(e+1, non_manifold_neighbors.size()))
+    for (auto it_e = beg; it_e != end; ++it_e)
+      for (auto it_f = std::next(it_e); it_f != end; ++it_f)
         {
           // Lambda to be used for error checking
           auto check_dofs = [&](const Elem * elem)
@@ -246,8 +253,8 @@ public:
             }
           };
 
-          const Elem * elem_e = non_manifold_neighbors[e];
-          const Elem * elem_f = non_manifold_neighbors[f];
+          const Elem * elem_e = *it_e;
+          const Elem * elem_f = *it_f;
 
           if (_mesh->comm().rank() == elem_e->processor_id())
             check_dofs(elem_f);
@@ -255,7 +262,6 @@ public:
           if (_mesh->comm().rank() == elem_f->processor_id())
             check_dofs(elem_e);
         }
-
   }
 };
 
