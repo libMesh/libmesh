@@ -15,15 +15,6 @@
 // C++ includes
 #include <memory>
 
-// The clang compiler incorrectly warns that "loop will run at most
-// once (loop increment never executed)" for a range-based for-loop in
-// this file. We need to avoid this warning so that -Werror builds
-// don't fail.
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunreachable-code-loop-increment"
-#endif
-
 using namespace libMesh;
 
 // We use a custom partioner for this test to help ensure we're
@@ -80,29 +71,31 @@ protected:
                 const auto & elem_vec = stem.get_connected_elems(elem, s);
 
                 if (elem_vec.size() == 5)
-                  for (auto e : index_range(elem_vec))
                   {
-                    // If there are more Elems attached to the
-                    // non-manifold edge than processors, just wrap
-                    // around back to 0. Setting the processor id is a
-                    // bit convoluted because the SidesToElemMap only
-                    // has const pointers, but since we have a
-                    // non-const reference to the mesh, we can work
-                    // around that.
-                    Elem * elem = mesh.elem_ptr(elem_vec[e]->id());
-                    elem->processor_id() = e % n;
+                    for (auto e : index_range(elem_vec))
+                      {
+                        // If there are more Elems attached to the
+                        // non-manifold edge than processors, just wrap
+                        // around back to 0. Setting the processor id is a
+                        // bit convoluted because the SidesToElemMap only
+                        // has const pointers, but since we have a
+                        // non-const reference to the mesh, we can work
+                        // around that.
+                        Elem * elem = mesh.elem_ptr(elem_vec[e]->id());
+                        elem->processor_id() = e % n;
 
-                    // Debugging
-                    // libMesh::out << "Partitioning Elem " << elem->id()
-                    //              << " onto proc " << elem->processor_id()
-                    //              << std::endl;
+                        // Debugging
+                        // libMesh::out << "Partitioning Elem " << elem->id()
+                        //              << " onto proc " << elem->processor_id()
+                        //              << std::endl;
+                      }
+
+                    // Stop once we have partitioned elements attached to
+                    // the non-manifold Side with 5 neighbors. This should
+                    // effectively leave all other Elems assigned to
+                    // processor 0.
+                    return true;
                   }
-
-                // Stop once we have partitioned elements attached to
-                // the non-manifold Side with 5 neighbors. This should
-                // effectively leave all other Elems assigned to
-                // processor 0.
-                return true;
               }
 
           // If we made it here, then we didn't find a Side shared by
