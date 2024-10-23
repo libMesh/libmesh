@@ -141,18 +141,12 @@ main(int argc, char ** argv)
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
-  auto ierr = PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_type", "power");
-  CHKERRQ(ierr);
-  ierr = PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_power_update", "1");
-  CHKERRQ(ierr);
-  ierr = PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_power_nonlinear", "1");
-  CHKERRQ(ierr);
-  ierr = PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_max_it", "1");
-  CHKERRQ(ierr);
-  ierr = PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_power_snes_mf_operator", "1");
-  CHKERRQ(ierr);
-  ierr = PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_power_pc_type", "lu");
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_type", "power"));
+  LibmeshPetscCallQ(PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_power_update", "1"));
+  LibmeshPetscCallQ(PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_power_nonlinear", "1"));
+  LibmeshPetscCallQ(PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_max_it", "1"));
+  LibmeshPetscCallQ(PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_power_snes_mf_operator", "1"));
+  LibmeshPetscCallQ(PetscOptionsSetValue(LIBMESH_PETSC_NULLPTR, "-eps_power_pc_type", "lu"));
 
   //
   // Set function/operator callback functions
@@ -160,38 +154,28 @@ main(int argc, char ** argv)
 
   auto & A = static_cast<PetscShellMatrix<Number> &>(eigen_system.get_shell_matrix_A());
   auto Amat = A.mat();
-  ierr = PetscObjectComposeFunction((PetscObject)Amat, "formFunction", form_functionA);
-  CHKERRQ(ierr);
-  ierr = PetscObjectComposeFunction((PetscObject)Amat, "formJacobian", form_matrixA);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(PetscObjectComposeFunction((PetscObject)Amat, "formFunction", form_functionA));
+  LibmeshPetscCallQ(PetscObjectComposeFunction((PetscObject)Amat, "formJacobian", form_matrixA));
 
   auto & B = static_cast<PetscShellMatrix<Number> &>(eigen_system.get_shell_matrix_B());
   auto Bmat = B.mat();
-  ierr = PetscObjectComposeFunction((PetscObject)Bmat, "formFunction", form_functionB);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(PetscObjectComposeFunction((PetscObject)Bmat, "formFunction", form_functionB));
 
   //
   // Set function/operator callback function contexts
   //
 
   PetscContainer container;
-  ierr = PetscContainerCreate(equation_systems.comm().get(), &container);
-  CHKERRQ(ierr);
-  ierr = PetscContainerSetPointer(container, &equation_systems);
-  CHKERRQ(ierr);
-  ierr = PetscObjectCompose((PetscObject)Amat, "formFunctionCtx", (PetscObject)container);
-  CHKERRQ(ierr);
-  ierr = PetscObjectCompose((PetscObject)Amat, "formJacobianCtx", (PetscObject)container);
-  CHKERRQ(ierr);
-  ierr = PetscObjectCompose((PetscObject)Bmat, "formFunctionCtx", (PetscObject)container);
-  CHKERRQ(ierr);
-  ierr = PetscContainerDestroy(&container);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(PetscContainerCreate(equation_systems.comm().get(), &container));
+  LibmeshPetscCallQ(PetscContainerSetPointer(container, &equation_systems));
+  LibmeshPetscCallQ(PetscObjectCompose((PetscObject)Amat, "formFunctionCtx", (PetscObject)container));
+  LibmeshPetscCallQ(PetscObjectCompose((PetscObject)Amat, "formJacobianCtx", (PetscObject)container));
+  LibmeshPetscCallQ(PetscObjectCompose((PetscObject)Bmat, "formFunctionCtx", (PetscObject)container));
+  LibmeshPetscCallQ(PetscContainerDestroy(&container));
 
   // Set the initial space
   Vec initial_space;
-  ierr = MatCreateVecs(Amat, &initial_space, nullptr);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(MatCreateVecs(Amat, &initial_space, nullptr));
   PetscVector<Number> wrapped_initial_space(initial_space, equation_systems.comm());
   wrapped_initial_space.add(1);
   wrapped_initial_space.close();
@@ -221,8 +205,7 @@ main(int argc, char ** argv)
   else
     libMesh::out << "WARNING: Solver did not converge!\n" << nconv << std::endl;
 
-  ierr = VecDestroy(&initial_space);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(VecDestroy(&initial_space));
 
   // All done.
   return 0;
@@ -578,13 +561,11 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
 
   PetscBool pisshell, jismffd;
 
-  auto ierr = PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &pisshell);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(PetscObjectTypeCompare((PetscObject)pc, MATSHELL, &pisshell));
   if (pisshell)
     libmesh_error_msg("Generic preconditioning requires that an explicit matrix representation of "
                       "the preconditioner be formed");
-  ierr = PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &jismffd);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(PetscObjectTypeCompare((PetscObject)jac, MATMFFD, &jismffd));
   if (!jismffd)
     libmesh_error_msg("The operator should be formed matrix free");
 
@@ -714,10 +695,8 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
   }
 
   // The MFFD Jac still must have assemble called on it
-  ierr = MatAssemblyBegin(jac, MAT_FINAL_ASSEMBLY);
-  CHKERRQ(ierr);
-  ierr = MatAssemblyEnd(jac, MAT_FINAL_ASSEMBLY);
-  CHKERRQ(ierr);
+  LibmeshPetscCallQ(MatAssemblyBegin(jac, MAT_FINAL_ASSEMBLY));
+  LibmeshPetscCallQ(MatAssemblyEnd(jac, MAT_FINAL_ASSEMBLY));
 
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }

@@ -100,12 +100,8 @@ public:
 
   virtual void configure_solver()
   {
-    auto ierr = LIBMESH_PETSC_SUCCESS;
-    ierr = KSPSetType (_petsc_linear_solver.ksp(), const_cast<KSPType>(KSPCG));
-    CHKERRABORT(_petsc_linear_solver.comm().get(), ierr);
-
-    ierr = PCSetType (_petsc_linear_solver.pc(), const_cast<PCType>(PCBJACOBI));
-    CHKERRABORT(_petsc_linear_solver.comm().get(), ierr);
+    LibmeshPetscCall2(_petsc_linear_solver.comm(), KSPSetType(_petsc_linear_solver.ksp(), const_cast<KSPType>(KSPCG)));
+    LibmeshPetscCall2(_petsc_linear_solver.comm(), PCSetType(_petsc_linear_solver.pc(), const_cast<PCType>(PCBJACOBI)));
   }
 
   // The linear solver object that we are configuring
