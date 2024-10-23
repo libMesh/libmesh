@@ -94,13 +94,13 @@ public:
   /**
    * When the Mesh is redistributed, we may need to update the
    * information in the SidesToElemMap by removing pointers to
-   * non-local Elems. Currently calls mesh_refinit().
+   * non-local Elems. Currently calls mesh_reinit().
    */
   virtual void redistribute () override;
 
   /**
    * When remote elements are deleted, we should remove them from the
-   * information in the SidesToElemMap. Currently calls mesh_refinit().
+   * information in the SidesToElemMap. Currently calls mesh_reinit().
    */
   virtual void delete_remote_elements() override;
 
