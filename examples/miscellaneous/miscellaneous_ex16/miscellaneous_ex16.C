@@ -91,7 +91,7 @@ main(int argc, char ** argv)
   LibMeshInit init(argc, argv);
 
 #if !defined(LIBMESH_HAVE_EIGEN_DENSE)
-  libmesh_examples_requires(false, "--enable-eigen");
+  libmesh_example_requires(false, "--enable-eigen");
 #elif !defined(LIBMESH_HAVE_PETSC)
   libmesh_example_requires(false, "--enable-petsc");
 #else
@@ -164,8 +164,8 @@ main(int argc, char ** argv)
   auto * sc_solver = dynamic_cast<PetscLinearSolver<Number> *>(sc_sys.get_linear_solver());
   libmesh_assert(sc_solver);
   KSP sc_ksp = sc_solver->ksp();
-  LibmeshPetscCall(KSPSetType(sc_ksp, KSPPREONLY));
-  LibmeshPetscCall(KSPSetInitialGuessNonzero(sc_ksp, PETSC_FALSE));
+  LibmeshPetscCall2(sc_solver->comm(), KSPSetType(sc_ksp, KSPPREONLY));
+  LibmeshPetscCall2(sc_solver->comm(), KSPSetInitialGuessNonzero(sc_ksp, PETSC_FALSE));
   sc_sys.solve();
 
   libmesh_error_msg_if(!libMesh::relative_fuzzy_equals(*sys.solution, *sc_sys.solution, 1e-4),
