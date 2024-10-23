@@ -72,44 +72,29 @@ public:
 
 
 
-// Macro which we call after every PETSc function that returns an error code.
-#define LIBMESH_CHKERR(ierr)                     \
+// Macro which we call in functions returning a datatype convertible
+// to PetscErrorCode after every PETSc function that returns an error code.
+#define LIBMESH_CHKERRQ(ierr)                    \
   do {                                           \
-    if (ierr != 0) {                             \
+    if (ierr != 0)                               \
       throw libMesh::PetscSolverException(ierr); \
-    } } while (0)
+  } while (0)
 
 // Two-argument CHKERR macro that takes both a comm and an error
 // code. When exceptions are enabled, the comm is not used for
-// anything, so we libmesh_ignore() it.  This macro is useful when you
-// need to call LIBMESH_CHKERR but you're not in a ParallelObject.
-#define LIBMESH_CHKERR2(comm, ierr)             \
+// anything, so we libmesh_ignore() it.
+#define LIBMESH_CHKERRA(comm, ierr)             \
   do {                                          \
     libmesh_ignore(comm);                       \
-    LIBMESH_CHKERR(ierr);                       \
+    LIBMESH_CHKERRQ(ierr);                      \
   } while (0)
-
-// Macro which we call in functions returning a datatype convertible
-// to PetscErrorCode after every PETSc function that returns an error code.
-#define LIBMESH_CHKERRQ(ierr)                   \
-  LIBMESH_CHKERR(ierr);
 
 #else
 
 // If we don't have exceptions enabled, just fall back on calling
-// PETSc's CHKERRABORT macro.
-#define LIBMESH_CHKERR(ierr) CHKERRABORT(this->comm().get(), ierr);
-
-// Two argument version of the function above where you pass in the comm
-// instead of relying on it being available from the "this" pointer.
-#define LIBMESH_CHKERR2(comm, ierr) CHKERRABORT(comm, ierr);
-
-// Alternative macro to be used in functions returning a datatype convertible
-// to PetscErrorCode.
+// PETSc's CHKERRQ or CHKERRABORT macros.
 #define LIBMESH_CHKERRQ(ierr) CHKERRQ(ierr);
-
-// Let's also be backwards-compatible with the old macro name.
-#define LIBMESH_CHKERRABORT(ierr) LIBMESH_CHKERR(ierr)
+#define LIBMESH_CHKERRA(comm, ierr) CHKERRABORT(comm, ierr);
 
 #endif
 
@@ -120,9 +105,9 @@ public:
   {                                                                     \
     PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;                        \
     ierr = Function ## Begin(args...);                                  \
-    LIBMESH_CHKERR2(comm.get(), ierr);                                  \
+    LIBMESH_CHKERRA(comm.get(), ierr);                                  \
     ierr = Function ## End(args...);                                    \
-    LIBMESH_CHKERR2(comm.get(), ierr);                                  \
+    LIBMESH_CHKERRA(comm.get(), ierr);                                  \
   }
 
 PETSC_BEGIN_END(VecScatter) // VecScatterBeginEnd
@@ -130,37 +115,33 @@ PETSC_BEGIN_END(MatAssembly) // MatAssemblyBeginEnd
 PETSC_BEGIN_END(VecAssembly) // VecAssemblyBeginEnd
 PETSC_BEGIN_END(VecGhostUpdate) // VecGhostUpdateBeginEnd
 
-#define LibmeshPetscCall(...)                                                                      \
-  do                                                                                               \
-  {                                                                                                \
-    PetscErrorCode libmesh_petsc_call_ierr;                                                        \
-    libmesh_petsc_call_ierr = __VA_ARGS__;                                                         \
-    LIBMESH_CHKERR(libmesh_petsc_call_ierr);                                                       \
+// To use instead of PETSc idioms that'd call CHKERRQ or PetscCall().
+#define LibmeshPetscCallQ(...)                                          \
+  do                                                                    \
+  {                                                                     \
+    PetscErrorCode libmesh_petsc_call_ierr;                             \
+    libmesh_petsc_call_ierr = __VA_ARGS__;                              \
+    LIBMESH_CHKERRQ(libmesh_petsc_call_ierr);                           \
   } while (0)
 
-#define LibmeshPetscCall2(comm, ...)                                                               \
-  do                                                                                               \
-  {                                                                                                \
-    PetscErrorCode libmesh_petsc_call_ierr;                                                        \
-    libmesh_petsc_call_ierr = __VA_ARGS__;                                                         \
-    LIBMESH_CHKERR2(comm.get(), libmesh_petsc_call_ierr);                                          \
+// To use instead of PETSc idioms that'd call CHKERRABORT or PetscCallAbort().
+#define LibmeshPetscCallA(comm, ...)                                    \
+  do                                                                    \
+  {                                                                     \
+    PetscErrorCode libmesh_petsc_call_ierr;                             \
+    libmesh_petsc_call_ierr = __VA_ARGS__;                              \
+    LIBMESH_CHKERRA(comm, libmesh_petsc_call_ierr);                     \
   } while (0)
 
-#define LibmeshPetscCallA(comm, ...)                                                               \
-  do                                                                                               \
-  {                                                                                                \
-    PetscErrorCode libmesh_petsc_call_ierr;                                                        \
-    libmesh_petsc_call_ierr = __VA_ARGS__;                                                         \
-    LIBMESH_CHKERR2(comm, libmesh_petsc_call_ierr);                                                \
-  } while (0)
+// Shortcut for LibmeshPetscCallA for use within a ParallelObject, i.e. when
+// we can rely on the communicator being available from the "this" pointer.
+#define LibmeshPetscCall(...)                                           \
+  LibmeshPetscCallA(this->comm().get(), __VA_ARGS__)
 
-#define LibmeshPetscCallQ(...)                                                                     \
-  do                                                                                               \
-  {                                                                                                \
-    PetscErrorCode libmesh_petsc_call_ierr;                                                        \
-    libmesh_petsc_call_ierr = __VA_ARGS__;                                                         \
-    LIBMESH_CHKERRQ(libmesh_petsc_call_ierr);                                                      \
-  } while (0)
+// Shortcut for LibmeshPetscCallA for use when we have a Parallel::Communicator
+// available instead of just a bare MPI communicator.
+#define LibmeshPetscCall2(comm, ...)                                    \
+  LibmeshPetscCallA(comm.get(), __VA_ARGS__)
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 #define LibmeshPetscCallExternal(func, ...)                             \

@@ -49,8 +49,7 @@
 #include <cstring>
 
 #define semiparallel_only() do { if (this->initialized()) { const char * mytype; \
-      auto semiparallel_only_ierr = MatGetType(this->_mat,&mytype);     \
-      LIBMESH_CHKERR(semiparallel_only_ierr);                           \
+      LibmeshPetscCall(MatGetType(this->_mat,&mytype));                 \
       if (!strcmp(mytype, MATSEQAIJ))                                   \
         parallel_object_only(); } } while (0)
 #define exceptionless_semiparallel_only() do { if (this->initialized()) { const char * mytype; \
