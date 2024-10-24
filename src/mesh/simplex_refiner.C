@@ -51,7 +51,7 @@ SimplexRefiner::SimplexRefiner (UnstructuredMesh & mesh) :
 
 bool SimplexRefiner::refine_elements()
 {
-  if (_mesh.is_prepared())
+  if (!_mesh.is_prepared())
     _mesh.prepare_for_use();
 
   // We should add more options later: to refine via circumcenter
