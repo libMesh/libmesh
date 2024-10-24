@@ -317,6 +317,11 @@ unsigned int RBEIMEvaluation::get_n_interpolation_points() const
   return _vec_eval_input.all_xyz.size();
 }
 
+unsigned int RBEIMEvaluation::get_n_elems() const
+{
+  return _vec_eval_input.elem_id_to_local_index.size();
+}
+
 void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
 {
   if (get_parametrized_function().on_mesh_sides())
@@ -780,6 +785,13 @@ void RBEIMEvaluation::add_interpolation_points_spatial_indices(const std::vector
   _interpolation_points_spatial_indices.emplace_back(spatial_indices);
 }
 
+void RBEIMEvaluation::add_elem_id_local_index_map_entry(const dof_id_type & elem_id, const unsigned int local_index)
+{
+  libmesh_error_msg_if(_vec_eval_input.elem_id_to_local_index.count(elem_id) == 1, "Entry already added, duplicate detected.");
+
+  _vec_eval_input.elem_id_to_local_index[elem_id] = local_index;
+}
+
 Point RBEIMEvaluation::get_interpolation_points_xyz(unsigned int index) const
 {
   libmesh_error_msg_if(index >= _vec_eval_input.all_xyz.size(), "Error: Invalid index");
@@ -855,6 +867,11 @@ const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_JxW_all_qp(u
   libmesh_error_msg_if(index >= _vec_eval_input.JxW_all_qp.size(), "Error: Invalid index");
 
   return _vec_eval_input.JxW_all_qp[index];
+}
+
+const std::map<dof_id_type, unsigned int> & RBEIMEvaluation::get_elem_id_to_local_index_map() const
+{
+  return _vec_eval_input.elem_id_to_local_index;
 }
 
 const std::vector<std::vector<Real>> & RBEIMEvaluation::get_interpolation_points_phi_i_all_qp(unsigned int index) const
@@ -956,11 +973,21 @@ void RBEIMEvaluation::add_interpolation_data(
   _vec_eval_input.all_xyz_perturb.emplace_back(perturbs);
   _vec_eval_input.phi_i_qp.emplace_back(phi_i_qp);
   _vec_eval_input.elem_types.emplace_back(elem_type);
-  _vec_eval_input.JxW_all_qp.emplace_back(JxW_all_qp);
-  _vec_eval_input.phi_i_all_qp.emplace_back(phi_i_all_qp);
-  _vec_eval_input.qrule_orders.emplace_back(qrule_order);
-  _vec_eval_input.dxyzdxi_elem_center.emplace_back(dxyzdxi_elem_center);
-  _vec_eval_input.dxyzdeta_elem_center.emplace_back(dxyzdeta_elem_center);
+
+  // The following quantities are indexed by elem id to prevent duplicated data
+  // If an entry is already present then we should not need to add that data again as it is element
+  // based so it should be identical between 2 points if they refer to the same element id.
+  if (_vec_eval_input.elem_id_to_local_index.count(elem_id) == 0)
+  {
+    unsigned int local_index = _vec_eval_input.JxW_all_qp.size();
+    // Maybe check that getting local index from a a different source is still ok.
+    _vec_eval_input.elem_id_to_local_index[elem_id] = local_index;
+    _vec_eval_input.JxW_all_qp.emplace_back(JxW_all_qp);
+    _vec_eval_input.phi_i_all_qp.emplace_back(phi_i_all_qp);
+    _vec_eval_input.qrule_orders.emplace_back(qrule_order);
+    _vec_eval_input.dxyzdxi_elem_center.emplace_back(dxyzdxi_elem_center);
+    _vec_eval_input.dxyzdeta_elem_center.emplace_back(dxyzdeta_elem_center);
+  }
 }
 
 void RBEIMEvaluation::add_side_basis_function(

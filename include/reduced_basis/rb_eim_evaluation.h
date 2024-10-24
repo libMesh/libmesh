@@ -214,6 +214,11 @@ public:
   unsigned int get_n_interpolation_points() const;
 
   /**
+   * Return the number of unique elements containing interpolation points
+   */
+  unsigned int get_n_elems() const;
+
+  /**
    * Set the number of basis functions. Useful when reading in
    * stored data.
    */
@@ -447,6 +452,7 @@ public:
   void add_elem_center_dxyzdxi(const Point & dxyzdxi);
   void add_elem_center_dxyzdeta(const Point & dxyzdxi);
   void add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices);
+  void add_elem_id_local_index_map_entry(const dof_id_type & elem_id, const unsigned int local_index);
 
   /**
    * Get the data associated with EIM interpolation points.
@@ -468,6 +474,7 @@ public:
   const Point & get_elem_center_dxyzdxi(unsigned int index) const;
   const Point & get_elem_center_dxyzdeta(unsigned int index) const;
   const std::vector<unsigned int> & get_interpolation_points_spatial_indices(unsigned int index) const;
+  const std::map<dof_id_type, unsigned int> & get_elem_id_to_local_index_map() const;
 
   /**
    * _interpolation_points_spatial_indices is optional data, so we need to be able to

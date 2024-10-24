@@ -81,6 +81,11 @@ struct VectorizedEvalInput
   std::vector<boundary_id_type> boundary_ids;
   std::vector<dof_id_type> node_ids;
   std::vector<ElemType> elem_types;
+  /**
+   * The following containers are indexed by element id to avoid duplicated data.
+   * The elements have a local indexing as elem_ids might not always be contiguous.
+   */
+  std::map<dof_id_type, unsigned int> elem_id_to_local_index;
   std::vector<std::vector<Real>> JxW_all_qp;
   std::vector<std::vector<std::vector<Real>>> phi_i_all_qp;
   std::vector<Point> dxyzdxi_elem_center;
