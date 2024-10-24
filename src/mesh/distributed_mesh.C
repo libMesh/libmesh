@@ -747,6 +747,10 @@ void DistributedMesh::delete_elem(Elem * e)
 void DistributedMesh::renumber_elem(const dof_id_type old_id,
                                     const dof_id_type new_id)
 {
+  // This could be a no-op
+  if (old_id == new_id)
+    return;
+
   Elem * el = _elements[old_id];
   libmesh_assert (el);
   libmesh_assert_equal_to (el->id(), old_id);
@@ -956,6 +960,10 @@ void DistributedMesh::delete_node(Node * n)
 void DistributedMesh::renumber_node(const dof_id_type old_id,
                                     const dof_id_type new_id)
 {
+  // This could be a no-op
+  if (old_id == new_id)
+    return;
+
   Node * nd = _nodes[old_id];
   libmesh_assert (nd);
   libmesh_assert_equal_to (nd->id(), old_id);

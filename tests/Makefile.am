@@ -83,6 +83,7 @@ unit_tests_sources = \
   mesh/nodal_neighbors.C \
   mesh/libmesh_poly2tri.C \
   mesh/libmesh_netgen.C \
+  mesh/simplex_refinement_test.C \
   mesh/slit_mesh_test.C \
   mesh/spatial_dimension_test.C \
   mesh/mapped_subdomain_partitioner_test.C \

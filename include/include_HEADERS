@@ -226,6 +226,7 @@ include_HEADERS =  \
         mesh/replicated_mesh.h \
         mesh/serial_mesh.h \
         mesh/sides_to_elem_map.h \
+        mesh/simplex_refiner.h \
         mesh/stl_io.h \
         mesh/sync_refinement_flags.h \
         mesh/tecplot_io.h \

@@ -466,7 +466,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
         const ElemType etype = elem->type();
 
         // all_tri currently only works on coarse meshes
-        libmesh_assert (!elem->parent());
+        if (elem->parent())
+          libmesh_not_implemented_msg("Cannot convert a refined element into simplices\n");
 
         // The new elements we will split the quad into.
         // In 3D we may need as many as 6 tets per hex

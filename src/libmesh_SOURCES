@@ -238,6 +238,7 @@ libmesh_SOURCES =  \
         src/mesh/postscript_io.C \
         src/mesh/replicated_mesh.C \
         src/mesh/sides_to_elem_map.C \
+        src/mesh/simplex_refiner.C \
         src/mesh/stl_io.C \
         src/mesh/tecplot_io.C \
         src/mesh/tetgen_io.C \
