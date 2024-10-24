@@ -252,20 +252,16 @@ void MeshFunction::operator() (const Point & p,
         const unsigned int dim = element->dim();
 
 
-        /*
-         * Get local coordinates to feed these into compute_data().
-         * Note that the fe_type can safely be used from the 0-variable,
-         * since the inverse mapping is the same for all FEFamilies
-         */
+        // Get local coordinates to feed these into compute_data().
+        // Note that the fe_type can safely be used from the 0-variable,
+        // since the inverse mapping is the same for all FEFamilies
         const Point mapped_point (FEMap::inverse_map (dim, element,
                                                       p));
 
         // loop over all vars
         for (auto index : index_range(this->_system_vars))
           {
-            /*
-             * the data for this variable
-             */
+            // the data for this variable
             const unsigned int var = _system_vars[index];
 
             if (var == libMesh::invalid_uint)
@@ -278,10 +274,8 @@ void MeshFunction::operator() (const Point & p,
 
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
-            /**
-             * Build an FEComputeData that contains both input and output data
-             * for the specific compute_data method.
-             */
+            // Build an FEComputeData that contains both input and output data
+            // for the specific compute_data method.
             {
               FEComputeData data (this->_eqn_systems, mapped_point);
 
@@ -341,19 +335,15 @@ void MeshFunction::discontinuous_value (const Point & p,
       // define a temporary vector to store all values
       DenseVector<Number> temp_output (cast_int<unsigned int>(this->_system_vars.size()));
 
-      /*
-       * Get local coordinates to feed these into compute_data().
-       * Note that the fe_type can safely be used from the 0-variable,
-       * since the inverse mapping is the same for all FEFamilies
-       */
+      // Get local coordinates to feed these into compute_data().
+      // Note that the fe_type can safely be used from the 0-variable,
+      // since the inverse mapping is the same for all FEFamilies
       const Point mapped_point (FEMap::inverse_map (dim, element, p));
 
       // loop over all vars
       for (auto index : index_range(this->_system_vars))
         {
-          /*
-           * the data for this variable
-           */
+          // the data for this variable
           const unsigned int var = _system_vars[index];
 
           if (var == libMesh::invalid_uint)
@@ -366,10 +356,8 @@ void MeshFunction::discontinuous_value (const Point & p,
 
           const FEType & fe_type = this->_dof_map.variable_type(var);
 
-          /**
-           * Build an FEComputeData that contains both input and output data
-           * for the specific compute_data method.
-           */
+          // Build an FEComputeData that contains both input and output data
+          // for the specific compute_data method.
           {
             FEComputeData data (this->_eqn_systems, mapped_point);
 
@@ -476,11 +464,9 @@ void MeshFunction::_gradient_on_elem (const Point & p,
 
   const unsigned int dim = element->dim();
 
-  /*
-   * Get local coordinates to feed these into compute_data().
-   * Note that the fe_type can safely be used from the 0-variable,
-   * since the inverse mapping is the same for all FEFamilies
-   */
+  // Get local coordinates to feed these into compute_data().
+  // Note that the fe_type can safely be used from the 0-variable,
+  // since the inverse mapping is the same for all FEFamilies
   const Point mapped_point (FEMap::inverse_map (dim, element,
                                                 p));
 
@@ -489,9 +475,7 @@ void MeshFunction::_gradient_on_elem (const Point & p,
   // loop over all vars
   for (auto index : index_range(this->_system_vars))
     {
-      /*
-       * the data for this variable
-       */
+      // the data for this variable
       const unsigned int var = _system_vars[index];
 
       if (var == libMesh::invalid_uint)
@@ -527,15 +511,15 @@ void MeshFunction::_gradient_on_elem (const Point & p,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       else
         {
-          /**
-           * Build an FEComputeData that contains both input and output data
-           * for the specific compute_data method.
-           */
-          //TODO: enable this for a vector of points as well...
+          // Build an FEComputeData that contains both input and output data
+          // for the specific compute_data method.
+          //
+          // TODO: enable this for a vector of points as well...
           FEComputeData data (this->_eqn_systems, mapped_point);
           data.enable_derivative();
           FEInterface::compute_data (dim, fe_type, element, data);
-          //grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
+
+          // grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
           // sum over all indices
           for (auto i : index_range(dof_indices))
             {
@@ -596,11 +580,9 @@ void MeshFunction::hessian (const Point & p,
         const unsigned int dim = element->dim();
 
 
-        /*
-         * Get local coordinates to feed these into compute_data().
-         * Note that the fe_type can safely be used from the 0-variable,
-         * since the inverse mapping is the same for all FEFamilies
-         */
+        // Get local coordinates to feed these into compute_data().
+        // Note that the fe_type can safely be used from the 0-variable,
+        // since the inverse mapping is the same for all FEFamilies
         const Point mapped_point (FEMap::inverse_map (dim, element,
                                                       p));
 
@@ -609,9 +591,7 @@ void MeshFunction::hessian (const Point & p,
         // loop over all vars
         for (auto index : index_range(this->_system_vars))
           {
-            /*
-             * the data for this variable
-             */
+            // the data for this variable
             const unsigned int var = _system_vars[index];
 
             if (var == libMesh::invalid_uint)
@@ -648,11 +628,11 @@ void MeshFunction::hessian (const Point & p,
 const Elem * MeshFunction::find_element(const Point & p,
                                         const std::set<subdomain_id_type> * subdomain_ids) const
 {
-  /* Ensure that in the case of a master mesh function, the
-     out-of-mesh mode is enabled either for both or for none.  This is
-     important because the out-of-mesh mode is also communicated to
-     the point locator.  Since this is time consuming, enable it only
-     in debug mode.  */
+  // Ensure that in the case of a master mesh function, the
+  // out-of-mesh mode is enabled either for both or for none.  This is
+  // important because the out-of-mesh mode is also communicated to
+  // the point locator.  Since this is time consuming, enable it only
+  // in debug mode.
 #ifdef DEBUG
   if (this->_master != nullptr)
     {
@@ -707,11 +687,11 @@ const Elem * MeshFunction::find_element(const Point & p,
 std::set<const Elem *> MeshFunction::find_elements(const Point & p,
                                                    const std::set<subdomain_id_type> * subdomain_ids) const
 {
-  /* Ensure that in the case of a master mesh function, the
-     out-of-mesh mode is enabled either for both or for none.  This is
-     important because the out-of-mesh mode is also communicated to
-     the point locator.  Since this is time consuming, enable it only
-     in debug mode.  */
+  // Ensure that in the case of a master mesh function, the
+  // out-of-mesh mode is enabled either for both or for none.  This is
+  // important because the out-of-mesh mode is also communicated to
+  // the point locator.  Since this is time consuming, enable it only
+  // in debug mode.
 #ifdef DEBUG
   if (this->_master != nullptr)
     {
