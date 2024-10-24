@@ -354,6 +354,14 @@ protected:
                                        const std::set<subdomain_id_type> * subdomain_ids = nullptr) const;
 
   /**
+   * Helper function that is called by MeshFunction::find_element()
+   * and MeshFunction::find_elements() to ensure that Elems found by
+   * the PointLocator are actually "evaluable" on the processor where
+   * they are found.
+   */
+  const Elem * check_found_elem(const Elem * element, const Point & p) const;
+
+  /**
    * Helper function for finding a gradient as evaluated from a
    * specific element
    */
