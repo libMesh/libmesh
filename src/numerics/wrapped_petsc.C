@@ -56,96 +56,84 @@ template <>
 void
 WrappedPetsc<Vec>::destroy()
 {
-  auto ierr = VecDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, VecDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<KSP>::destroy()
 {
-  auto ierr = KSPDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, KSPDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<IS>::destroy()
 {
-  auto ierr = ISDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, ISDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<Mat>::destroy()
 {
-  auto ierr = MatDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, MatDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<VecScatter>::destroy()
 {
-  auto ierr = VecScatterDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, VecScatterDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<PetscViewer>::destroy()
 {
-  auto ierr = PetscViewerDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, PetscViewerDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<MatNullSpace>::destroy()
 {
-  auto ierr = MatNullSpaceDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, MatNullSpaceDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<DM>::destroy()
 {
-  auto ierr = DMDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, DMDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<MatPartitioning>::destroy()
 {
-  auto ierr = MatPartitioningDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, MatPartitioningDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<SNES>::destroy()
 {
-  auto ierr = SNESDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, SNESDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<PC>::destroy()
 {
-  auto ierr = PCDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, PCDestroy(&obj));
 }
 
 template <>
 void
 WrappedPetsc<PetscSection>::destroy()
 {
-  auto ierr = PetscSectionDestroy(&obj);
-  CHKERRABORT(PETSC_COMM_SELF, ierr);
+  LibmeshPetscCallA(PETSC_COMM_SELF, PetscSectionDestroy(&obj));
 }
 }
 

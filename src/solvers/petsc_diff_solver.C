@@ -56,23 +56,18 @@ extern "C"
                    << ", |residual|_2 = " << fnorm << std::endl;
     if (solver.linear_solution_monitor.get())
     {
-      PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
-
       Vec petsc_delta_u;
-      ierr = SNESGetSolutionUpdate(snes, &petsc_delta_u);
-      CHKERRABORT(solver.comm().get(), ierr);
+      LibmeshPetscCall2(solver.comm(), SNESGetSolutionUpdate(snes, &petsc_delta_u));
       PetscVector<Number> delta_u(petsc_delta_u, solver.comm());
       delta_u.close();
 
       Vec petsc_u;
-      ierr = SNESGetSolution(snes, &petsc_u);
-      CHKERRABORT(solver.comm().get(), ierr);
+      LibmeshPetscCall2(solver.comm(), SNESGetSolution(snes, &petsc_u));
       PetscVector<Number> u(petsc_u, solver.comm());
       u.close();
 
       Vec petsc_res;
-      ierr = SNESGetFunction(snes, &petsc_res, nullptr, nullptr);
-      CHKERRABORT(solver.comm().get(), ierr);
+      LibmeshPetscCall2(solver.comm(), SNESGetFunction(snes, &petsc_res, nullptr, nullptr));
       PetscVector<Number> res(petsc_res, solver.comm());
       res.close();
 
@@ -307,21 +302,15 @@ unsigned int PetscDiffSolver::solve()
   PetscVector<Number> & r =
     *(cast_ptr<PetscVector<Number> *>(_system.rhs));
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
+  LibmeshPetscCall(SNESSetFunction (_snes, r.vec(),
+                                    __libmesh_petsc_diff_solver_residual, this));
 
-  ierr = SNESSetFunction (_snes, r.vec(),
-                          __libmesh_petsc_diff_solver_residual, this);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSetJacobian (_snes, jac.mat(), jac.mat(),
+                                    __libmesh_petsc_diff_solver_jacobian, this));
 
-  ierr = SNESSetJacobian (_snes, jac.mat(), jac.mat(),
-                          __libmesh_petsc_diff_solver_jacobian, this);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSetFromOptions(_snes));
 
-  ierr = SNESSetFromOptions(_snes);
-  LIBMESH_CHKERR(ierr);
-
-  ierr = SNESSolve (_snes, LIBMESH_PETSC_NULLPTR, x.vec());
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESSolve (_snes, LIBMESH_PETSC_NULLPTR, x.vec()));
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   if (this->_exact_constraint_enforcement)
@@ -329,16 +318,13 @@ unsigned int PetscDiffSolver::solve()
 #endif
 
   SNESConvergedReason reason;
-  ierr = SNESGetConvergedReason(_snes, &reason);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESGetConvergedReason(_snes, &reason));
 
   PetscInt l_its, nl_its;
-  ierr = SNESGetLinearSolveIterations(_snes, &l_its);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESGetLinearSolveIterations(_snes, &l_its));
   this->_inner_iterations = l_its;
 
-  ierr = SNESGetIterationNumber(_snes, &nl_its);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESGetIterationNumber(_snes, &nl_its));
   this->_outer_iterations = nl_its;
 
   return convert_solve_result(reason);
@@ -346,20 +332,13 @@ unsigned int PetscDiffSolver::solve()
 
 void PetscDiffSolver::setup_petsc_data()
 {
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
+  LibmeshPetscCall(SNESCreate(this->comm().get(), _snes.get()));
 
-  ierr = SNESCreate(this->comm().get(), _snes.get());
-  LIBMESH_CHKERR(ierr);
-
-  ierr = SNESMonitorSet (_snes, __libmesh_petsc_diff_solver_monitor,
-                         this, LIBMESH_PETSC_NULLPTR);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(SNESMonitorSet (_snes, __libmesh_petsc_diff_solver_monitor,
+                                   this, LIBMESH_PETSC_NULLPTR));
 
   if (libMesh::on_command_line("--solver-system-names"))
-    {
-      ierr = SNESSetOptionsPrefix(_snes, (_system.name()+"_").c_str());
-      LIBMESH_CHKERR(ierr);
-    }
+    LibmeshPetscCall(SNESSetOptionsPrefix(_snes, (_system.name()+"_").c_str()));
 
   bool use_petsc_dm = libMesh::on_command_line("--use_petsc_dm");
 
@@ -375,16 +354,13 @@ void PetscDiffSolver::setup_petsc_data()
   // the old style for fieldsplit
   if (!use_petsc_dm)
     {
-      ierr = SNESSetFromOptions(_snes);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESSetFromOptions(_snes));
 
       KSP my_ksp;
-      ierr = SNESGetKSP(_snes, &my_ksp);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(SNESGetKSP(_snes, &my_ksp));
 
       PC my_pc;
-      ierr = KSPGetPC(my_ksp, &my_pc);
-      LIBMESH_CHKERR(ierr);
+      LibmeshPetscCall(KSPGetPC(my_ksp, &my_pc));
 
       petsc_auto_fieldsplit(my_pc, _system);
     }

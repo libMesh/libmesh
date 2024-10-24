@@ -131,10 +131,8 @@ numeric_index_type PetscMatrixBase<T>::m () const
   libmesh_assert (this->initialized());
 
   PetscInt petsc_m=0, petsc_n=0;
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
-  ierr = MatGetSize (this->_mat, &petsc_m, &petsc_n);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetSize (this->_mat, &petsc_m, &petsc_n));
 
   return static_cast<numeric_index_type>(petsc_m);
 }
@@ -146,8 +144,7 @@ numeric_index_type PetscMatrixBase<T>::local_m () const
 
   PetscInt m = 0;
 
-  auto ierr = MatGetLocalSize (this->_mat, &m, NULL);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetLocalSize (this->_mat, &m, NULL));
 
   return static_cast<numeric_index_type>(m);
 }
@@ -158,10 +155,8 @@ numeric_index_type PetscMatrixBase<T>::n () const
   libmesh_assert (this->initialized());
 
   PetscInt petsc_m=0, petsc_n=0;
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
-  ierr = MatGetSize (this->_mat, &petsc_m, &petsc_n);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetSize (this->_mat, &petsc_m, &petsc_n));
 
   return static_cast<numeric_index_type>(petsc_n);
 }
@@ -173,8 +168,7 @@ numeric_index_type PetscMatrixBase<T>::local_n () const
 
   PetscInt n = 0;
 
-  auto ierr = MatGetLocalSize (this->_mat, NULL, &n);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetLocalSize (this->_mat, NULL, &n));
 
   return static_cast<numeric_index_type>(n);
 }
@@ -185,10 +179,8 @@ numeric_index_type PetscMatrixBase<T>::row_start () const
   libmesh_assert (this->initialized());
 
   PetscInt start=0, stop=0;
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
-  ierr = MatGetOwnershipRange(this->_mat, &start, &stop);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetOwnershipRange(this->_mat, &start, &stop));
 
   return static_cast<numeric_index_type>(start);
 }
@@ -199,10 +191,8 @@ numeric_index_type PetscMatrixBase<T>::row_stop () const
   libmesh_assert (this->initialized());
 
   PetscInt start=0, stop=0;
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
-  ierr = MatGetOwnershipRange(this->_mat, &start, &stop);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetOwnershipRange(this->_mat, &start, &stop));
 
   return static_cast<numeric_index_type>(stop);
 }
@@ -213,10 +203,8 @@ numeric_index_type PetscMatrixBase<T>::col_start () const
   libmesh_assert (this->initialized());
 
   PetscInt start=0, stop=0;
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
-  ierr = MatGetOwnershipRangeColumn(this->_mat, &start, &stop);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetOwnershipRangeColumn(this->_mat, &start, &stop));
 
   return static_cast<numeric_index_type>(start);
 }
@@ -227,10 +215,8 @@ numeric_index_type PetscMatrixBase<T>::col_stop () const
   libmesh_assert (this->initialized());
 
   PetscInt start=0, stop=0;
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
 
-  ierr = MatGetOwnershipRangeColumn(this->_mat, &start, &stop);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatGetOwnershipRangeColumn(this->_mat, &start, &stop));
 
   return static_cast<numeric_index_type>(stop);
 }
@@ -255,11 +241,9 @@ bool PetscMatrixBase<T>::closed() const
 {
   libmesh_assert (this->initialized());
 
-  PetscErrorCode ierr = LIBMESH_PETSC_SUCCESS;
   PetscBool assembled;
 
-  ierr = MatAssembled(this->_mat, &assembled);
-  LIBMESH_CHKERR(ierr);
+  LibmeshPetscCall(MatAssembled(this->_mat, &assembled));
 
   return (assembled == PETSC_TRUE);
 }
