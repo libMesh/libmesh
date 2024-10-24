@@ -773,6 +773,7 @@ include_HEADERS = \
         ghosting/default_coupling.h \
         ghosting/ghost_point_neighbors.h \
         ghosting/ghosting_functor.h \
+        ghosting/non_manifold_coupling.h \
         ghosting/point_neighbor_coupling.h \
         ghosting/sibling_coupling.h \
         mesh/abaqus_io.h \
@@ -824,6 +825,7 @@ include_HEADERS = \
         mesh/postscript_io.h \
         mesh/replicated_mesh.h \
         mesh/serial_mesh.h \
+        mesh/sides_to_elem_map.h \
         mesh/stl_io.h \
         mesh/sync_refinement_flags.h \
         mesh/tecplot_io.h \

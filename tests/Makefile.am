@@ -26,6 +26,7 @@ unit_tests_sources = \
   base/getpot_test.C \
   base/point_neighbor_coupling_test.C \
   base/overlapping_coupling_test.C \
+  base/nonmanifold_coupling_test.C \
   base/multi_evaluable_pred_test.C \
   fe/fe_bernstein_test.C \
   fe/fe_clough_test.C \
@@ -410,7 +411,11 @@ CLEANFILES = cube_mesh.xda \
              write_exodus_TRI3.e \
              write_exodus_TRI6.e \
              write_exodus_TRI7.e \
-             write_exodus_TRISHELL3.e
+             write_exodus_TRISHELL3.e \
+             non_manifold_junction0.exo \
+             non_manifold_junction1.exo \
+             non_manifold_junction2.exo \
+             non_manifold_junction3.exo
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD

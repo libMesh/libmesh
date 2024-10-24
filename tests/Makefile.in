@@ -190,6 +190,7 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	base/dof_map_test.C base/default_coupling_test.C \
 	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C \
+	base/nonmanifold_coupling_test.C \
 	base/multi_evaluable_pred_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -263,6 +264,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	base/unit_tests_dbg-getpot_test.$(OBJEXT) \
 	base/unit_tests_dbg-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_dbg-overlapping_coupling_test.$(OBJEXT) \
+	base/unit_tests_dbg-nonmanifold_coupling_test.$(OBJEXT) \
 	base/unit_tests_dbg-multi_evaluable_pred_test.$(OBJEXT) \
 	fe/unit_tests_dbg-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_dbg-fe_clough_test.$(OBJEXT) \
@@ -386,6 +388,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	base/dof_map_test.C base/default_coupling_test.C \
 	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C \
+	base/nonmanifold_coupling_test.C \
 	base/multi_evaluable_pred_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -458,6 +461,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	base/unit_tests_devel-getpot_test.$(OBJEXT) \
 	base/unit_tests_devel-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_devel-overlapping_coupling_test.$(OBJEXT) \
+	base/unit_tests_devel-nonmanifold_coupling_test.$(OBJEXT) \
 	base/unit_tests_devel-multi_evaluable_pred_test.$(OBJEXT) \
 	fe/unit_tests_devel-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_devel-fe_clough_test.$(OBJEXT) \
@@ -577,6 +581,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	base/dof_map_test.C base/default_coupling_test.C \
 	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C \
+	base/nonmanifold_coupling_test.C \
 	base/multi_evaluable_pred_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -649,6 +654,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	base/unit_tests_oprof-getpot_test.$(OBJEXT) \
 	base/unit_tests_oprof-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_oprof-overlapping_coupling_test.$(OBJEXT) \
+	base/unit_tests_oprof-nonmanifold_coupling_test.$(OBJEXT) \
 	base/unit_tests_oprof-multi_evaluable_pred_test.$(OBJEXT) \
 	fe/unit_tests_oprof-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_oprof-fe_clough_test.$(OBJEXT) \
@@ -768,6 +774,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	base/dof_map_test.C base/default_coupling_test.C \
 	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C \
+	base/nonmanifold_coupling_test.C \
 	base/multi_evaluable_pred_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -840,6 +847,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	base/unit_tests_opt-getpot_test.$(OBJEXT) \
 	base/unit_tests_opt-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_opt-overlapping_coupling_test.$(OBJEXT) \
+	base/unit_tests_opt-nonmanifold_coupling_test.$(OBJEXT) \
 	base/unit_tests_opt-multi_evaluable_pred_test.$(OBJEXT) \
 	fe/unit_tests_opt-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_opt-fe_clough_test.$(OBJEXT) \
@@ -959,6 +967,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	base/dof_map_test.C base/default_coupling_test.C \
 	base/getpot_test.C base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C \
+	base/nonmanifold_coupling_test.C \
 	base/multi_evaluable_pred_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -1031,6 +1040,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	base/unit_tests_prof-getpot_test.$(OBJEXT) \
 	base/unit_tests_prof-point_neighbor_coupling_test.$(OBJEXT) \
 	base/unit_tests_prof-overlapping_coupling_test.$(OBJEXT) \
+	base/unit_tests_prof-nonmanifold_coupling_test.$(OBJEXT) \
 	base/unit_tests_prof-multi_evaluable_pred_test.$(OBJEXT) \
 	fe/unit_tests_prof-fe_bernstein_test.$(OBJEXT) \
 	fe/unit_tests_prof-fe_clough_test.$(OBJEXT) \
@@ -1169,30 +1179,35 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	base/$(DEPDIR)/unit_tests_dbg-dof_map_test.Po \
 	base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po \
 	base/$(DEPDIR)/unit_tests_dbg-multi_evaluable_pred_test.Po \
+	base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_dbg-overlapping_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_devel-default_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_devel-dof_map_test.Po \
 	base/$(DEPDIR)/unit_tests_devel-getpot_test.Po \
 	base/$(DEPDIR)/unit_tests_devel-multi_evaluable_pred_test.Po \
+	base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_devel-overlapping_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_oprof-default_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_oprof-dof_map_test.Po \
 	base/$(DEPDIR)/unit_tests_oprof-getpot_test.Po \
 	base/$(DEPDIR)/unit_tests_oprof-multi_evaluable_pred_test.Po \
+	base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_oprof-overlapping_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_opt-default_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_opt-dof_map_test.Po \
 	base/$(DEPDIR)/unit_tests_opt-getpot_test.Po \
 	base/$(DEPDIR)/unit_tests_opt-multi_evaluable_pred_test.Po \
+	base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_opt-overlapping_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_prof-default_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_prof-dof_map_test.Po \
 	base/$(DEPDIR)/unit_tests_prof-getpot_test.Po \
 	base/$(DEPDIR)/unit_tests_prof-multi_evaluable_pred_test.Po \
+	base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_prof-overlapping_coupling_test.Po \
 	base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po \
 	fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po \
@@ -2196,6 +2211,7 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	base/default_coupling_test.C base/getpot_test.C \
 	base/point_neighbor_coupling_test.C \
 	base/overlapping_coupling_test.C \
+	base/nonmanifold_coupling_test.C \
 	base/multi_evaluable_pred_test.C fe/fe_bernstein_test.C \
 	fe/fe_clough_test.C fe/fe_hermite_test.C \
 	fe/fe_hierarchic_test.C fe/inf_fe_radial_test.C \
@@ -2393,7 +2409,9 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	write_exodus_QUADSHELL9.e write_exodus_TET10.e \
 	write_exodus_TET14.e write_exodus_TET4.e write_exodus_TRI3.e \
 	write_exodus_TRI6.e write_exodus_TRI7.e \
-	write_exodus_TRISHELL3.e $(am__append_8) $(am__append_9)
+	write_exodus_TRISHELL3.e non_manifold_junction0.exo \
+	non_manifold_junction1.exo non_manifold_junction2.exo \
+	non_manifold_junction3.exo $(am__append_8) $(am__append_9)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
@@ -2457,6 +2475,8 @@ base/unit_tests_dbg-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 base/unit_tests_dbg-point_neighbor_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_dbg-overlapping_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_dbg-nonmanifold_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_dbg-multi_evaluable_pred_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
@@ -2762,6 +2782,8 @@ base/unit_tests_devel-point_neighbor_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_devel-overlapping_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_devel-nonmanifold_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_devel-multi_evaluable_pred_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_devel-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
@@ -2999,6 +3021,8 @@ base/unit_tests_oprof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 base/unit_tests_oprof-point_neighbor_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_oprof-overlapping_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_oprof-nonmanifold_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_oprof-multi_evaluable_pred_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
@@ -3238,6 +3262,8 @@ base/unit_tests_opt-point_neighbor_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_opt-overlapping_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_opt-nonmanifold_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_opt-multi_evaluable_pred_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 fe/unit_tests_opt-fe_bernstein_test.$(OBJEXT): fe/$(am__dirstamp) \
@@ -3475,6 +3501,8 @@ base/unit_tests_prof-getpot_test.$(OBJEXT): base/$(am__dirstamp) \
 base/unit_tests_prof-point_neighbor_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_prof-overlapping_coupling_test.$(OBJEXT):  \
+	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
+base/unit_tests_prof-nonmanifold_coupling_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_prof-multi_evaluable_pred_test.$(OBJEXT):  \
 	base/$(am__dirstamp) base/$(DEPDIR)/$(am__dirstamp)
@@ -3732,30 +3760,35 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-dof_map_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-multi_evaluable_pred_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-overlapping_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-default_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-dof_map_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-getpot_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-multi_evaluable_pred_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-overlapping_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-default_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-dof_map_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-getpot_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-multi_evaluable_pred_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-overlapping_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-default_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-dof_map_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-getpot_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-multi_evaluable_pred_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-overlapping_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-default_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-dof_map_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-getpot_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-multi_evaluable_pred_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-overlapping_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po@am__quote@ # am--include-marker
@@ -4407,6 +4440,20 @@ base/unit_tests_dbg-overlapping_coupling_test.obj: base/overlapping_coupling_tes
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/overlapping_coupling_test.C' object='base/unit_tests_dbg-overlapping_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-overlapping_coupling_test.obj `if test -f 'base/overlapping_coupling_test.C'; then $(CYGPATH_W) 'base/overlapping_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/overlapping_coupling_test.C'; fi`
+
+base/unit_tests_dbg-nonmanifold_coupling_test.o: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-nonmanifold_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_dbg-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_dbg-nonmanifold_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+
+base/unit_tests_dbg-nonmanifold_coupling_test.obj: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-nonmanifold_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_dbg-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_dbg-nonmanifold_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_dbg-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
 
 base/unit_tests_dbg-multi_evaluable_pred_test.o: base/multi_evaluable_pred_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_dbg-multi_evaluable_pred_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_dbg-multi_evaluable_pred_test.Tpo -c -o base/unit_tests_dbg-multi_evaluable_pred_test.o `test -f 'base/multi_evaluable_pred_test.C' || echo '$(srcdir)/'`base/multi_evaluable_pred_test.C
@@ -6004,6 +6051,20 @@ base/unit_tests_devel-overlapping_coupling_test.obj: base/overlapping_coupling_t
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-overlapping_coupling_test.obj `if test -f 'base/overlapping_coupling_test.C'; then $(CYGPATH_W) 'base/overlapping_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/overlapping_coupling_test.C'; fi`
 
+base/unit_tests_devel-nonmanifold_coupling_test.o: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-nonmanifold_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_devel-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_devel-nonmanifold_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+
+base/unit_tests_devel-nonmanifold_coupling_test.obj: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-nonmanifold_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_devel-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_devel-nonmanifold_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_devel-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
+
 base/unit_tests_devel-multi_evaluable_pred_test.o: base/multi_evaluable_pred_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_devel-multi_evaluable_pred_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_devel-multi_evaluable_pred_test.Tpo -c -o base/unit_tests_devel-multi_evaluable_pred_test.o `test -f 'base/multi_evaluable_pred_test.C' || echo '$(srcdir)/'`base/multi_evaluable_pred_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_devel-multi_evaluable_pred_test.Tpo base/$(DEPDIR)/unit_tests_devel-multi_evaluable_pred_test.Po
@@ -7599,6 +7660,20 @@ base/unit_tests_oprof-overlapping_coupling_test.obj: base/overlapping_coupling_t
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/overlapping_coupling_test.C' object='base/unit_tests_oprof-overlapping_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-overlapping_coupling_test.obj `if test -f 'base/overlapping_coupling_test.C'; then $(CYGPATH_W) 'base/overlapping_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/overlapping_coupling_test.C'; fi`
+
+base/unit_tests_oprof-nonmanifold_coupling_test.o: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-nonmanifold_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_oprof-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_oprof-nonmanifold_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+
+base/unit_tests_oprof-nonmanifold_coupling_test.obj: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-nonmanifold_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_oprof-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_oprof-nonmanifold_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_oprof-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
 
 base/unit_tests_oprof-multi_evaluable_pred_test.o: base/multi_evaluable_pred_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_oprof-multi_evaluable_pred_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_oprof-multi_evaluable_pred_test.Tpo -c -o base/unit_tests_oprof-multi_evaluable_pred_test.o `test -f 'base/multi_evaluable_pred_test.C' || echo '$(srcdir)/'`base/multi_evaluable_pred_test.C
@@ -9196,6 +9271,20 @@ base/unit_tests_opt-overlapping_coupling_test.obj: base/overlapping_coupling_tes
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-overlapping_coupling_test.obj `if test -f 'base/overlapping_coupling_test.C'; then $(CYGPATH_W) 'base/overlapping_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/overlapping_coupling_test.C'; fi`
 
+base/unit_tests_opt-nonmanifold_coupling_test.o: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-nonmanifold_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_opt-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_opt-nonmanifold_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+
+base/unit_tests_opt-nonmanifold_coupling_test.obj: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-nonmanifold_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_opt-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_opt-nonmanifold_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_opt-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
+
 base/unit_tests_opt-multi_evaluable_pred_test.o: base/multi_evaluable_pred_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_opt-multi_evaluable_pred_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_opt-multi_evaluable_pred_test.Tpo -c -o base/unit_tests_opt-multi_evaluable_pred_test.o `test -f 'base/multi_evaluable_pred_test.C' || echo '$(srcdir)/'`base/multi_evaluable_pred_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_opt-multi_evaluable_pred_test.Tpo base/$(DEPDIR)/unit_tests_opt-multi_evaluable_pred_test.Po
@@ -10791,6 +10880,20 @@ base/unit_tests_prof-overlapping_coupling_test.obj: base/overlapping_coupling_te
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/overlapping_coupling_test.C' object='base/unit_tests_prof-overlapping_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-overlapping_coupling_test.obj `if test -f 'base/overlapping_coupling_test.C'; then $(CYGPATH_W) 'base/overlapping_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/overlapping_coupling_test.C'; fi`
+
+base/unit_tests_prof-nonmanifold_coupling_test.o: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-nonmanifold_coupling_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_prof-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_prof-nonmanifold_coupling_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-nonmanifold_coupling_test.o `test -f 'base/nonmanifold_coupling_test.C' || echo '$(srcdir)/'`base/nonmanifold_coupling_test.C
+
+base/unit_tests_prof-nonmanifold_coupling_test.obj: base/nonmanifold_coupling_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-nonmanifold_coupling_test.obj -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Tpo -c -o base/unit_tests_prof-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Tpo base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='base/nonmanifold_coupling_test.C' object='base/unit_tests_prof-nonmanifold_coupling_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o base/unit_tests_prof-nonmanifold_coupling_test.obj `if test -f 'base/nonmanifold_coupling_test.C'; then $(CYGPATH_W) 'base/nonmanifold_coupling_test.C'; else $(CYGPATH_W) '$(srcdir)/base/nonmanifold_coupling_test.C'; fi`
 
 base/unit_tests_prof-multi_evaluable_pred_test.o: base/multi_evaluable_pred_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT base/unit_tests_prof-multi_evaluable_pred_test.o -MD -MP -MF base/$(DEPDIR)/unit_tests_prof-multi_evaluable_pred_test.Tpo -c -o base/unit_tests_prof-multi_evaluable_pred_test.o `test -f 'base/multi_evaluable_pred_test.C' || echo '$(srcdir)/'`base/multi_evaluable_pred_test.C
@@ -12675,30 +12778,35 @@ distclean: distclean-am
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po
@@ -13292,30 +13400,35 @@ maintainer-clean: maintainer-clean-am
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_dbg-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_dbg-point_neighbor_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_devel-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_devel-point_neighbor_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_oprof-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_oprof-point_neighbor_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_opt-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_opt-point_neighbor_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-default_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-dof_map_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-getpot_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-multi_evaluable_pred_test.Po
+	-rm -f base/$(DEPDIR)/unit_tests_prof-nonmanifold_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-overlapping_coupling_test.Po
 	-rm -f base/$(DEPDIR)/unit_tests_prof-point_neighbor_coupling_test.Po
 	-rm -f fe/$(DEPDIR)/unit_tests_dbg-dual_shape_verification_test.Po
