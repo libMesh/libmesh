@@ -1065,6 +1065,21 @@ public:
    */
   virtual bool close_to_point(const Point & p, Real tol) const;
 
+  /**
+   * \returns \p true if edge \p i is positively oriented. An edge is
+   * positively oriented iff its first vertex (i.e. zeroth node) is
+   * lexicographically greater than its second vertex (i.e. first node).
+   */
+  bool edge_orientation(const unsigned int i) const;
+
+  /**
+   * \returns \p true if face \p i is positively oriented. A face with N
+   * vertices is positively oriented iff its 3 lexicographically greatest
+   * vertices (i.e. 3 lexicographically greatest nodes amongst the N leading
+   * nodes) are an odd permutation relative to their lexicographic ordering.
+   */
+  bool face_orientation(const unsigned int i) const;
+
 private:
   /**
    * Shared private implementation used by the contains_point()

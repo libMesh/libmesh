@@ -35,6 +35,13 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem * elem,
   libmesh_assert(elem);
 
   const Order totalorder = order + add_p_level*elem->p_level();
+  libmesh_assert_less(i, n_dofs(elem->type(), totalorder));
+
+  const char sign = elem->edge_orientation(i) ? 1 : -1;
+
+  const Real xi   = p(0);
+  const Real eta  = p(1);
+  const Real zeta = p(2);
 
   switch (totalorder)
     {
@@ -46,12 +53,6 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem * elem,
           case HEX20:
           case HEX27:
             {
-              libmesh_assert_less (i, 12);
-
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
               // Even with a loose inverse_map tolerance we ought to
               // be nearly on the element interior in master
               // coordinates
@@ -62,154 +63,56 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem * elem,
               switch(i)
                 {
                 case 0:
-                  {
-                    if (elem->point(0) > elem->point(1))
-                      return RealGradient( -0.125*(1.0-eta-zeta+eta*zeta), 0.0, 0.0 );
-                    else
-                      return RealGradient(  0.125*(1.0-eta-zeta+eta*zeta), 0.0, 0.0 );
-                  }
+                  return sign * RealGradient( -0.125*(1.0-eta-zeta+eta*zeta), 0.0, 0.0 );
                 case 1:
-                  {
-                    if (elem->point(1) > elem->point(2))
-                      return RealGradient( 0.0, -0.125*(1.0+xi-zeta-xi*zeta), 0.0 );
-                    else
-                      return RealGradient( 0.0,  0.125*(1.0+xi-zeta-xi*zeta), 0.0 );
-                  }
+                  return sign * RealGradient( 0.0, -0.125*(1.0+xi-zeta-xi*zeta), 0.0 );
                 case 2:
-                  {
-                    if (elem->point(2) > elem->point(3))
-                      return RealGradient(  0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
-                    else
-                      return RealGradient( -0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
-                  }
+                  return sign * RealGradient( 0.125*(1.0+eta-zeta-eta*zeta), 0.0, 0.0 );
                 case 3:
-                  {
-                    if (elem->point(3) > elem->point(0))
-                      return RealGradient( 0.0,  0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
-                    else
-                      return RealGradient( 0.0, -0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
-                  }
+                  return sign * RealGradient( 0.0, -0.125*(1.0-xi-zeta+xi*zeta), 0.0 );
                 case 4:
-                  {
-                    if (elem->point(0) > elem->point(4))
-                      return RealGradient( 0.0, 0.0, -0.125*(1.0-xi-eta+xi*eta) );
-                    else
-                      return RealGradient( 0.0, 0.0,  0.125*(1.0-xi-eta+xi*eta) );
-                  }
+                  return sign * RealGradient( 0.0, 0.0, -0.125*(1.0-xi-eta+xi*eta) );
                 case 5:
-                  {
-                    if (elem->point(1) > elem->point(5))
-                      return RealGradient( 0.0, 0.0, -0.125*(1.0+xi-eta-xi*eta) );
-                    else
-                      return RealGradient( 0.0, 0.0,  0.125*(1.0+xi-eta-xi*eta) );
-                  }
+                  return sign * RealGradient( 0.0, 0.0, -0.125*(1.0+xi-eta-xi*eta) );
                 case 6:
-                  {
-                    if (elem->point(2) > elem->point(6))
-                      return RealGradient( 0.0, 0.0, -0.125*(1.0+xi+eta+xi*eta) );
-                    else
-                      return RealGradient( 0.0, 0.0,  0.125*(1.0+xi+eta+xi*eta) );
-                  }
+                  return sign * RealGradient( 0.0, 0.0, -0.125*(1.0+xi+eta+xi*eta) );
                 case 7:
-                  {
-                    if (elem->point(3) > elem->point(7))
-                      return RealGradient( 0.0, 0.0, -0.125*(1.0-xi+eta-xi*eta) );
-                    else
-                      return RealGradient( 0.0, 0.0,  0.125*(1.0-xi+eta-xi*eta) );
-                  }
+                  return sign * RealGradient( 0.0, 0.0, -0.125*(1.0-xi+eta-xi*eta) );
                 case 8:
-                  {
-                    if (elem->point(4) > elem->point(5))
-                      return RealGradient( -0.125*(1.0-eta+zeta-eta*zeta), 0.0, 0.0 );
-                    else
-                      return RealGradient(  0.125*(1.0-eta+zeta-eta*zeta), 0.0, 0.0 );
-                  }
+                  return sign * RealGradient( -0.125*(1.0-eta+zeta-eta*zeta), 0.0, 0.0 );
                 case 9:
-                  {
-                    if (elem->point(5) > elem->point(6))
-                      return RealGradient( 0.0, -0.125*(1.0+xi+zeta+xi*zeta), 0.0 );
-                    else
-                      return RealGradient( 0.0,  0.125*(1.0+xi+zeta+xi*zeta), 0.0 );
-                  }
+                  return sign * RealGradient( 0.0, -0.125*(1.0+xi+zeta+xi*zeta), 0.0 );
                 case 10:
-                  {
-                    if (elem->point(7) > elem->point(6))
-                      return RealGradient( -0.125*(1.0+eta+zeta+eta*zeta), 0.0, 0.0 );
-                    else
-                      return RealGradient(  0.125*(1.0+eta+zeta+eta*zeta), 0.0, 0.0 );
-                  }
+                  return sign * RealGradient( 0.125*(1.0+eta+zeta+eta*zeta), 0.0, 0.0 );
                 case 11:
-                  {
-                    if (elem->point(4) > elem->point(7))
-                      return RealGradient( 0.0, -0.125*(1.0-xi+zeta-xi*zeta), 0.0 );
-                    else
-                      return RealGradient( 0.0,  0.125*(1.0-xi+zeta-xi*zeta), 0.0 );
-                  }
+                  return sign * RealGradient( 0.0, -0.125*(1.0-xi+zeta-xi*zeta), 0.0 );
 
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
-
-              return RealGradient();
             }
 
           case TET10:
           case TET14:
             {
-              libmesh_assert_less (i, 6);
-
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
               switch(i)
                 {
                 case 0:
-                  {
-                    if (elem->point(0) > elem->point(1))
-                      return RealGradient( -1.0+eta+zeta, -xi, -xi );
-                    else
-                      return RealGradient( 1.0-eta-zeta, xi, xi );
-                  }
+                  return sign * RealGradient( -1.0+eta+zeta, -xi, -xi );
                 case 1:
-                  {
-                    if (elem->point(1) > elem->point(2))
-                      return RealGradient( eta,  -xi, 0.0 );
-                    else
-                      return RealGradient( -eta, xi, 0.0 );
-                  }
+                  return sign * RealGradient( eta, -xi, 0.0 );
                 case 2:
-                  {
-                    if (elem->point(0) > elem->point(2))
-                      return RealGradient( -eta, -1.0+xi+zeta, -eta );
-                    else
-                      return RealGradient( eta, 1.0-xi-zeta, eta );
-                  }
+                  return sign * RealGradient( -eta, -1.0+xi+zeta, -eta );
                 case 3:
-                  {
-                    if (elem->point(0) > elem->point(3))
-                      return RealGradient( -zeta, -zeta, -1.0+xi+eta );
-                    else
-                      return RealGradient( zeta, zeta, 1.0-xi-eta );
-                  }
+                  return sign * RealGradient( -zeta, -zeta, -1.0+xi+eta );
                 case 4:
-                  {
-                    if (elem->point(1) > elem->point(3))
-                      return RealGradient( zeta, 0.0, -xi );
-                    else
-                      return RealGradient( -zeta, 0.0, xi );
-                  }
+                  return sign * RealGradient( zeta, 0.0, -xi );
                 case 5:
-                  {
-                    if (elem->point(2) > elem->point(3))
-                      return RealGradient( 0.0, zeta, -eta );
-                    else
-                      return RealGradient( 0.0, -zeta, eta );
-                  }
+                  return sign * RealGradient( 0.0, zeta, -eta );
+
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
-              return RealGradient();
             }
 
           default:
@@ -221,12 +124,12 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
     }
+
 #else // LIBMESH_DIM != 3
   libmesh_ignore(elem, order, i, p, add_p_level);
   libmesh_not_implemented();
 #endif
 }
-
 
 
 template <>
@@ -238,7 +141,6 @@ RealGradient FE<3,NEDELEC_ONE>::shape(const ElemType,
   libmesh_error_msg("Nedelec elements require the element type \nbecause edge orientation is needed.");
   return RealGradient();
 }
-
 
 
 template <>
@@ -265,6 +167,13 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
   libmesh_assert_less (j, 3);
 
   const Order totalorder = order + add_p_level*elem->p_level();
+  libmesh_assert_less(i, n_dofs(elem->type(), totalorder));
+
+  const char sign = elem->edge_orientation(i) ? 1 : -1;
+
+  const Real xi   = p(0);
+  const Real eta  = p(1);
+  const Real zeta = p(2);
 
   switch (totalorder)
     {
@@ -276,18 +185,12 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
           case HEX20:
           case HEX27:
             {
-              libmesh_assert_less (i, 12);
-
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
               // Even with a loose inverse_map tolerance we ought to
               // be nearly on the element interior in master
               // coordinates
-              libmesh_assert_less_equal ( std::fabs(xi),   1.0+TOLERANCE );
-              libmesh_assert_less_equal ( std::fabs(eta),  1.0+TOLERANCE );
-              libmesh_assert_less_equal ( std::fabs(zeta), 1.0+TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(xi),   1.0+10*TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(eta),  1.0+10*TOLERANCE );
+              libmesh_assert_less_equal ( std::fabs(zeta), 1.0+10*TOLERANCE );
 
               switch (j)
                 {
@@ -302,61 +205,22 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                       case 10:
                         return RealGradient();
                       case 1:
-                        {
-                          if (elem->point(1) > elem->point(2))
-                            return RealGradient( 0.0, -0.125*(1.0-zeta) );
-                          else
-                            return RealGradient( 0.0, 0.125*(1.0-zeta) );
-                        }
+                        return sign * RealGradient( 0.0, -0.125*(1.0-zeta) );
                       case 3:
-                        {
-                          if (elem->point(3) > elem->point(0))
-                            return RealGradient( 0.0, 0.125*(-1.0+zeta) );
-                          else
-                            return RealGradient( 0.0, -0.125*(-1.0+zeta) );
-                        }
+                        return sign * RealGradient( 0.0, -0.125*(-1.0+zeta) );
                       case 4:
-                        {
-                          if (elem->point(0) > elem->point(4))
-                            return RealGradient( 0.0, 0.0, -0.125*(-1.0+eta) );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125*(-1.0+eta) );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -0.125*(-1.0+eta) );
                       case 5:
-                        {
-                          if (elem->point(1) > elem->point(5))
-                            return RealGradient( 0.0, 0.0, -0.125*(1.0-eta) );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125*(1.0-eta) );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -0.125*(1.0-eta) );
                       case 6:
-                        {
-                          if (elem->point(2) > elem->point(6))
-                            return RealGradient( 0.0, 0.0, -0.125*(1.0+eta) );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125*(1.0+eta) );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -0.125*(1.0+eta) );
                       case 7:
-                        {
-                          if (elem->point(3) > elem->point(7))
-                            return RealGradient( 0.0, 0.0, -0.125*(-1.0-eta) );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125*(-1.0-eta) );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -0.125*(-1.0-eta) );
                       case 9:
-                        {
-                          if (elem->point(5) > elem->point(6))
-                            return RealGradient( 0.0, -0.125*(1.0+zeta), 0.0 );
-                          else
-                            return RealGradient( 0.0,  0.125*(1.0+zeta), 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, -0.125*(1.0+zeta), 0.0 );
                       case 11:
-                        {
-                          if (elem->point(4) > elem->point(7))
-                            return RealGradient( 0.0, -0.125*(-1.0-zeta), 0.0 );
-                          else
-                            return RealGradient( 0.0,  0.125*(-1.0-zeta), 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, -0.125*(-1.0-zeta), 0.0 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
@@ -374,61 +238,22 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                       case 11:
                         return RealGradient();
                       case 0:
-                        {
-                          if (elem->point(0) > elem->point(1))
-                            return RealGradient( -0.125*(-1.0+zeta), 0.0, 0.0 );
-                          else
-                            return RealGradient(  0.125*(-1.0+zeta), 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( -0.125*(-1.0+zeta), 0.0, 0.0 );
                       case 2:
-                        {
-                          if (elem->point(2) > elem->point(3))
-                            return RealGradient( 0.125*(1.0-zeta), 0.0, 0.0 );
-                          else
-                            return RealGradient( -0.125*(1.0-zeta), 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( 0.125*(1.0-zeta), 0.0, 0.0 );
                       case 4:
-                        {
-                          if (elem->point(0) > elem->point(4))
-                            return RealGradient( 0.0, 0.0, -0.125*(-1.0+xi) );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125*(-1.0+xi) );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -0.125*(-1.0+xi) );
                       case 5:
-                        {
-                          if (elem->point(1) > elem->point(5))
-                            return RealGradient( 0.0, 0.0, -0.125*(-1.0-xi) );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125*(-1.0-xi) );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -0.125*(-1.0-xi) );
                       case 6:
-                        {
-                          if (elem->point(2) > elem->point(6))
-                            return RealGradient( 0.0, 0.0, -0.125*(1.0+xi) );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125*(1.0+xi) );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -0.125*(1.0+xi) );
                       case 7:
-                        {
-                          if (elem->point(3) > elem->point(7))
-                            return RealGradient( 0.0, 0.0, -0.125*(1.0-xi) );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125*(1.0-xi) );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -0.125*(1.0-xi) );
                       case 8:
-                        {
-                          if (elem->point(4) > elem->point(5))
-                            return RealGradient( -0.125*(-1.0-zeta), 0.0, 0.0 );
-                          else
-                            return RealGradient(  0.125*(-1.0-zeta), 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( -0.125*(-1.0-zeta), 0.0, 0.0 );
                       case 10:
-                        {
-                          if (elem->point(7) > elem->point(6))
-                            return RealGradient( -0.125*(1.0+zeta), 0.0, 0.0 );
-                          else
-                            return RealGradient(  0.125*(1.0+zeta), 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( 0.125*(1.0+zeta), 0.0, 0.0 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
@@ -445,63 +270,23 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                       case 6:
                       case 7:
                         return RealGradient();
-
                       case 0:
-                        {
-                          if (elem->point(0) > elem->point(1))
-                            return RealGradient( -0.125*(-1.0+eta), 0.0, 0.0 );
-                          else
-                            return RealGradient(  0.125*(-1.0+eta), 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( -0.125*(-1.0+eta), 0.0, 0.0 );
                       case 1:
-                        {
-                          if (elem->point(1) > elem->point(2))
-                            return RealGradient( 0.0, -0.125*(-1.0-xi), 0.0 );
-                          else
-                            return RealGradient( 0.0,  0.125*(-1.0-xi), 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, -0.125*(-1.0-xi), 0.0 );
                       case 2:
-                        {
-                          if (elem->point(2) > elem->point(3))
-                            return RealGradient( 0.125*(-1.0-eta), 0.0, 0.0 );
-                          else
-                            return RealGradient( -0.125*(-1.0-eta), 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( 0.125*(-1.0-eta), 0.0, 0.0 );
                       case 3:
-                        {
-                          if (elem->point(3) > elem->point(0))
-                            return RealGradient( 0.0, 0.125*(-1.0+xi), 0.0 );
-                          else
-                            return RealGradient( 0.0,  -0.125*(-1.0+xi), 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, -0.125*(-1.0+xi), 0.0 );
                       case 8:
-                        {
-                          if (elem->point(4) > elem->point(5))
-                            return RealGradient( -0.125*(1.0-eta), 0.0, 0.0 );
-                          else
-                            return RealGradient(  0.125*(1.0-eta), 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( -0.125*(1.0-eta), 0.0, 0.0 );
                       case 9:
-                        {
-                          if (elem->point(5) > elem->point(6))
-                            return RealGradient( 0.0, -0.125*(1.0+xi), 0.0 );
-                          else
-                            return RealGradient( 0.0,  0.125*(1.0+xi), 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, -0.125*(1.0+xi), 0.0 );
                       case 10:
-                        {
-                          if (elem->point(7) > elem->point(6))
-                            return RealGradient( -0.125*(1.0+eta), 0.0, 0.0 );
-                          else
-                            return RealGradient(  0.125*(1.0+eta), 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( 0.125*(1.0+eta), 0.0, 0.0 );
                       case 11:
-                        {
-                          if (elem->point(4) > elem->point(7))
-                            return RealGradient( 0.0, -0.125*(1.0-xi), 0.0 );
-                          else
-                            return RealGradient( 0.0,  0.125*(1.0-xi), 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, -0.125*(1.0-xi), 0.0 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
@@ -511,16 +296,11 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                 default:
                   libmesh_error_msg("Invalid j = " << j);
                 }
-
-              return RealGradient();
             }
 
           case TET10:
           case TET14:
             {
-              libmesh_assert_less (i, 6);
-
-
               switch (j)
                 {
                   // d()/dxi
@@ -529,44 +309,17 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                     switch(i)
                       {
                       case 0:
-                        {
-                          if (elem->point(0) > elem->point(1))
-                            return RealGradient( 0.0, -1.0, -1.0 );
-                          else
-                            return RealGradient( 0.0, 1.0, 1.0 );
-                        }
+                        return sign * RealGradient( 0.0, -1.0, -1.0 );
                       case 1:
-                        {
-                          if (elem->point(1) > elem->point(2))
-                            return RealGradient( 0.0,  -1.0, 0.0 );
-                          else
-                            return RealGradient( 0.0, 1.0, 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, -1.0, 0.0 );
                       case 2:
-                        {
-                          if (elem->point(0) > elem->point(2))
-                            return RealGradient( 0.0, 1.0, 0.0 );
-                          else
-                            return RealGradient( 0.0, -1.0, 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, 1.0, 0.0 );
                       case 3:
-                        {
-                          if (elem->point(0) > elem->point(3))
-                            return RealGradient( 0.0, 0.0, 1.0 );
-                          else
-                            return RealGradient( 0.0, 0.0, -1.0 );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, 1.0 );
                       case 4:
-                        {
-                          if (elem->point(1) > elem->point(3))
-                            return RealGradient( 0.0, 0.0, -1.0 );
-                          else
-                            return RealGradient( 0.0, 0.0, 1.0 );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -1.0 );
                       case 5:
-                        {
-                          return RealGradient();
-                        }
+                        return RealGradient();
 
                       default:
                         libmesh_error_msg("Invalid i = " << i);
@@ -579,45 +332,18 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                   {
                     switch(i)
                       {
-                        case 0:
-                          {
-                            if (elem->point(0) > elem->point(1))
-                              return RealGradient( 1.0, 0.0, 0.0 );
-                            else
-                              return RealGradient( -1.0, 0.0, 0.0 );
-                          }
-                        case 1:
-                          {
-                            if (elem->point(1) > elem->point(2))
-                              return RealGradient( 1.0,  0.0, 0.0 );
-                            else
-                              return RealGradient( -1.0, 0.0, 0.0 );
-                          }
-                        case 2:
-                          {
-                            if (elem->point(0) > elem->point(2))
-                              return RealGradient( -1.0, 0.0, -1.0 );
-                            else
-                              return RealGradient( 1.0, 0.0, 1.0 );
-                          }
-                        case 3:
-                          {
-                            if (elem->point(0) > elem->point(3))
-                              return RealGradient( 0.0, 0.0, 1.0 );
-                            else
-                              return RealGradient( 0.0, 0.0, -1.0 );
-                          }
-                        case 4:
-                          {
-                            return RealGradient();
-                          }
-                        case 5:
-                          {
-                            if (elem->point(2) > elem->point(3))
-                              return RealGradient( 0.0, 0.0, -1.0 );
-                            else
-                              return RealGradient( 0.0, 0.0, 1.0 );
-                          }
+                      case 0:
+                      case 1:
+                        return sign * RealGradient( 1.0, 0.0, 0.0 );
+                      case 2:
+                        return sign * RealGradient( -1.0, 0.0, -1.0 );
+                      case 3:
+                        return sign * RealGradient( 0.0, 0.0, 1.0 );
+                      case 4:
+                        return RealGradient();
+                      case 5:
+                        return sign * RealGradient( 0.0, 0.0, -1.0 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
@@ -630,53 +356,26 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
                     switch(i)
                       {
                         case 0:
-                          {
-                            if (elem->point(0) > elem->point(1))
-                              return RealGradient( 1.0, 0.0, 0.0 );
-                            else
-                              return RealGradient( -1.0, 0.0, 0.0 );
-                          }
+                          return sign * RealGradient( 1.0, 0.0, 0.0 );
                         case 1:
-                          {
-                            return RealGradient();
-                          }
+                          return RealGradient();
                         case 2:
-                          {
-                            if (elem->point(0) > elem->point(2))
-                              return RealGradient( 0.0, 1.0, 0.0 );
-                            else
-                              return RealGradient( 0.0, -1.0, 0.0 );
-                          }
-                        case 3:
-                          {
-                            if (elem->point(0) > elem->point(3))
-                              return RealGradient( -1.0, -1.0, 0.0 );
-                            else
-                              return RealGradient( 1.0, 1.0, 0.0 );
-                          }
-                        case 4:
-                          {
-                            if (elem->point(1) > elem->point(3))
-                              return RealGradient( 1.0, 0.0, 0.0 );
-                            else
-                              return RealGradient( -1.0, 0.0, 0.0 );
-                          }
                         case 5:
-                          {
-                            if (elem->point(2) > elem->point(3))
-                              return RealGradient( 0.0, 1.0, 0.0 );
-                            else
-                              return RealGradient( 0.0, -1.0, 0.0 );
-                          }
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
+                          return sign * RealGradient( 0.0, 1.0, 0.0 );
+                        case 3:
+                          return sign * RealGradient( -1.0, -1.0, 0.0 );
+                        case 4:
+                          return sign * RealGradient( 1.0, 0.0, 0.0 );
+
+                        default:
+                          libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
+
                   } // j = 2
 
                 default:
                   libmesh_error_msg("Invalid j = " << j);
                 }
-              return RealGradient();
             }
 
           default:
@@ -693,8 +392,6 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const Elem * elem,
   libmesh_not_implemented();
 #endif
 }
-
-
 
 
 template <>
@@ -721,7 +418,6 @@ RealGradient FE<3,NEDELEC_ONE>::shape_deriv(const FEType fet,
 }
 
 
-
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
@@ -729,7 +425,7 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                                                    const Order order,
                                                    const unsigned int i,
                                                    const unsigned int j,
-                                                   const Point & libmesh_dbg_var(p),
+                                                   const Point &,
                                                    const bool add_p_level)
 {
 #if LIBMESH_DIM == 3
@@ -745,6 +441,9 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
   libmesh_assert_less (j, 6);
 
   const Order totalorder = order + add_p_level*elem->p_level();
+  libmesh_assert_less(i, n_dofs(elem->type(), totalorder));
+
+  const char sign = elem->edge_orientation(i) ? 1 : -1;
 
   switch (totalorder)
     {
@@ -756,26 +455,13 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
           case HEX20:
           case HEX27:
             {
-              libmesh_assert_less (i, 12);
-
-#ifndef NDEBUG
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-#endif
-
-              libmesh_assert_less_equal ( std::fabs(xi),   1.0+TOLERANCE );
-              libmesh_assert_less_equal ( std::fabs(eta),  1.0+TOLERANCE );
-              libmesh_assert_less_equal ( std::fabs(zeta), 1.0+TOLERANCE );
-
               switch (j)
                 {
-                  // d^2()/dxi^2
+                  // d^2()/dxi^2, d^2()/deta^2, d^2()/dzeta^2
                 case 0:
-                  {
-                    // All d^2()/dxi^2 derivatives for linear hexes are zero.
-                    return RealGradient();
-                  } // j = 0
+                case 2:
+                case 5:
+                  return RealGradient();
 
                   // d^2()/dxideta
                 case 1:
@@ -792,45 +478,17 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                       case 11:
                         return RealGradient();
                       case 4:
-                        {
-                          if (elem->point(0) > elem->point(4))
-                            return RealGradient( 0.0, 0.0, -0.125 );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125 );
-                        }
-                      case 5:
-                        {
-                          if (elem->point(1) > elem->point(5))
-                            return RealGradient( 0.0, 0.0,  0.125 );
-                          else
-                            return RealGradient( 0.0, 0.0, -0.125 );
-                        }
                       case 6:
-                        {
-                          if (elem->point(2) > elem->point(6))
-                            return RealGradient( 0.0, 0.0, -0.125 );
-                          else
-                            return RealGradient( 0.0, 0.0,  0.125 );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, -0.125 );
+                      case 5:
                       case 7:
-                        {
-                          if (elem->point(3) > elem->point(7))
-                            return RealGradient( 0.0, 0.0,  0.125 );
-                          else
-                            return RealGradient( 0.0, 0.0, -0.125 );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, 0.125 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
                   } // j = 1
-
-                  // d^2()/deta^2
-                case 2:
-                  {
-                    // All d^2()/deta^2 derivatives for linear hexes are zero.
-                    return RealGradient();
-                  } // j = 2
 
                   // d^2()/dxidzeta
                 case 3:
@@ -846,35 +504,13 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                       case 8:
                       case 10:
                         return RealGradient();
-
                       case 1:
-                        {
-                          if (elem->point(1) > elem->point(2))
-                            return RealGradient( 0.0,  0.125 );
-                          else
-                            return RealGradient( 0.0, -0.125 );
-                        }
                       case 3:
-                        {
-                          if (elem->point(3) > elem->point(0))
-                            return RealGradient( 0.0, -0.125 );
-                          else
-                            return RealGradient( 0.0,  0.125 );
-                        }
-                      case 9:
-                        {
-                          if (elem->point(5) > elem->point(6))
-                            return RealGradient( 0.0, -0.125, 0.0 );
-                          else
-                            return RealGradient( 0.0,  0.125, 0.0 );
-                        }
                       case 11:
-                        {
-                          if (elem->point(4) > elem->point(7))
-                            return RealGradient( 0.0,  0.125, 0.0 );
-                          else
-                            return RealGradient( 0.0, -0.125, 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, 0.125 );
+                      case 9:
+                        return sign * RealGradient( 0.0, -0.125, 0.0 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
@@ -886,6 +522,8 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                   {
                     switch(i)
                       {
+                      case 0:
+                        return sign * RealGradient( -0.125, 0.0, 0.0 );
                       case 1:
                       case 3:
                       case 4:
@@ -895,69 +533,34 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
                       case 9:
                       case 11:
                         return RealGradient();
-
-                      case 0:
-                        {
-                          if (elem->point(0) > elem->point(1))
-                            return RealGradient( -0.125, 0.0, 0.0 );
-                          else
-                            return RealGradient(  0.125, 0.0, 0.0 );
-                        }
                       case 2:
-                        {
-                          if (elem->point(2) > elem->point(3))
-                            return RealGradient(  0.125, 0.0, 0.0 );
-                          else
-                            return RealGradient( -0.125, 0.0, 0.0 );
-                        }
                       case 8:
-                        {
-                          if (elem->point(4) > elem->point(5))
-                            return RealGradient(  0.125, 0.0, 0.0 );
-                          else
-                            return RealGradient( -0.125, 0.0, 0.0 );
-                        }
                       case 10:
-                        {
-                          if (elem->point(7) > elem->point(6))
-                            return RealGradient( -0.125, 0.0, 0.0 );
-                          else
-                            return RealGradient(  0.125, 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( 0.125, 0.0, 0.0 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
 
                   } // j = 4
 
-                  // d^2()/dzeta^2
-                case 5:
-                  {
-                    // All d^2()/dzeta^2 derivatives for linear hexes are zero.
-                    return RealGradient();
-                  } // j = 5
-
                 default:
                   libmesh_error_msg("Invalid j = " << j);
                 }
-
-              return RealGradient();
             }
 
+            // All second derivatives for linear tets are zero.
           case TET10:
           case TET14:
-            {
-              libmesh_assert_less (i, 6);
-              // All second derivatives for linear tets are zero.
-              return RealGradient();
-            }
+            return RealGradient();
 
           default:
             libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(elem->type()));
 
           } //switch(type)
 
-      } // case FIRST:
+      }
+
       // unsupported order
     default:
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
@@ -969,7 +572,6 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
   libmesh_not_implemented();
 #endif
 }
-
 
 
 template <>
@@ -984,7 +586,6 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const ElemType,
 }
 
 
-
 template <>
 RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const FEType fet,
                                                    const Elem * elem,
@@ -995,8 +596,6 @@ RealGradient FE<3,NEDELEC_ONE>::shape_second_deriv(const FEType fet,
 {
   return FE<3,NEDELEC_ONE>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
 }
-
-
 
 #endif
 

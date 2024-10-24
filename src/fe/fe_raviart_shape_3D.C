@@ -24,21 +24,6 @@
 namespace libMesh
 {
 
-
-template<size_t N>
-bool orientation(std::array<Point, N> & arr)
-{
-  if (N % 2 == 0)
-    std::rotate(arr.begin(), std::min_element(arr.begin(), arr.end()), arr.end());
-
-  size_t cnt = 0;
-    for(size_t i = 0; i < arr.size(); i++)
-        for(size_t j = i + 1; j < arr.size(); j++)
-            if (arr[i] > arr[j]) cnt++;
-  return cnt % 2;
-}
-
-
 template <>
 RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
                                          const Order order,
@@ -50,6 +35,13 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
   libmesh_assert(elem);
 
   const Order totalorder = order + add_p_level*elem->p_level();
+  libmesh_assert_less(i, n_dofs(elem->type(), totalorder));
+
+  const char sign = elem->face_orientation(i) ? 1 : -1;
+
+  const Real xi   = p(0);
+  const Real eta  = p(1);
+  const Real zeta = p(2);
 
   switch (totalorder)
     {
@@ -60,12 +52,6 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
           {
           case HEX27:
             {
-              libmesh_assert_less (i, 6);
-
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
               // Even with a loose inverse_map tolerance we ought to
               // be nearly on the element interior in master
               // coordinates
@@ -76,107 +62,39 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
               switch(i)
                 {
                 case 0:
-                  {
-                    std::array<Point, 4> arr = {elem->point(1), elem->point(0), elem->point(3), elem->point(2)};
-                    if (orientation(arr))
-                      return RealGradient( 0.0, 0.0,  0.125*(zeta-1.0) );
-                    else
-                      return RealGradient( 0.0, 0.0, -0.125*(zeta-1.0) );
-                  }
+                  return sign * RealGradient( 0.0, 0.0, 0.125*(zeta-1.0) );
                 case 1:
-                  {
-                    std::array<Point, 4> arr = {elem->point(4), elem->point(0), elem->point(1), elem->point(5)};
-                    if (orientation(arr))
-                      return RealGradient( 0.0,  0.125*(eta-1.0), 0.0 );
-                    else
-                      return RealGradient( 0.0, -0.125*(eta-1.0), 0.0 );
-                  }
+                  return sign * RealGradient( 0.0, 0.125*(eta-1.0), 0.0 );
                 case 2:
-                  {
-                    std::array<Point, 4> arr = {elem->point(6), elem->point(5), elem->point(1), elem->point(2)};
-                    if (orientation(arr))
-                      return RealGradient(  0.125*(xi+1.0), 0.0, 0.0 );
-                    else
-                      return RealGradient( -0.125*(xi+1.0), 0.0, 0.0 );
-                  }
+                  return sign * RealGradient( 0.125*(xi+1.0), 0.0, 0.0 );
                 case 3:
-                  {
-                    std::array<Point, 4> arr = {elem->point(7), elem->point(6), elem->point(2), elem->point(3)};
-                    if (orientation(arr))
-                      return RealGradient( 0.0,  0.125*(1.0+eta), 0.0 );
-                    else
-                      return RealGradient( 0.0, -0.125*(1.0+eta), 0.0 );
-                  }
+                  return sign * RealGradient( 0.0, 0.125*(1.0+eta), 0.0 );
                 case 4:
-                  {
-                    std::array<Point, 4> arr = {elem->point(7), elem->point(3), elem->point(0), elem->point(4)};
-                    if (orientation(arr))
-                      return RealGradient(  0.125*(xi-1.0), 0.0, 0.0 );
-                    else
-                      return RealGradient( -0.125*(xi-1.0), 0.0, 0.0 );
-                  }
+                  return sign * RealGradient( 0.125*(xi-1.0), 0.0, 0.0 );
                 case 5:
-                  {
-                    std::array<Point, 4> arr = {elem->point(5), elem->point(6), elem->point(7), elem->point(4)};
-                    if (orientation(arr))
-                      return RealGradient( 0.0, 0.0,  0.125*(1.0+zeta) );
-                    else
-                      return RealGradient( 0.0, 0.0, -0.125*(1.0+zeta) );
-                  }
+                  return sign * RealGradient( 0.0, 0.0, 0.125*(1.0+zeta) );
+
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
-
-              return RealGradient();
             }
 
           case TET14:
             {
-              libmesh_assert_less (i, 4);
-
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
               switch(i)
                 {
                 case 0:
-                  {
-                    std::array<Point, 3> arr = {elem->point(0), elem->point(2), elem->point(1)};
-                    if (orientation(arr))
-                      return RealGradient(  2.0*xi,  2.0*eta,  2.0*zeta-2.0 );
-                    else
-                      return RealGradient( -2.0*xi, -2.0*eta, -2.0*zeta+2.0 );
-                  }
+                  return sign * RealGradient( 2.0*xi, 2.0*eta, 2.0*zeta-2.0 );
                 case 1:
-                  {
-                    std::array<Point, 3> arr = {elem->point(1), elem->point(3), elem->point(0)};
-                    if (orientation(arr))
-                      return RealGradient(  2.0*xi,  2.0*eta-2.0,  2.0*zeta );
-                    else
-                      return RealGradient( -2.0*xi, -2.0*eta+2.0, -2.0*zeta );
-                  }
+                  return sign * RealGradient( 2.0*xi, 2.0*eta-2.0, 2.0*zeta );
                 case 2:
-                  {
-                    std::array<Point, 3> arr = {elem->point(1), elem->point(2), elem->point(3)};
-                    if (orientation(arr))
-                      return RealGradient(  2.0*xi,  2.0*eta,  2.0*zeta );
-                    else
-                      return RealGradient( -2.0*xi, -2.0*eta, -2.0*zeta );
-                  }
+                  return sign * RealGradient( 2.0*xi, 2.0*eta, 2.0*zeta );
                 case 3:
-                  {
-                    std::array<Point, 3> arr = {elem->point(0), elem->point(3), elem->point(2)};
-                    if (orientation(arr))
-                      return RealGradient(  2.0*xi-2.0,  2.0*eta,  2.0*zeta );
-                    else
-                      return RealGradient( -2.0*xi+2.0, -2.0*eta, -2.0*zeta );
-                  }
+                  return sign * RealGradient( 2.0*xi-2.0, 2.0*eta, 2.0*zeta );
+
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
-
-              return RealGradient();
             }
 
           default:
@@ -188,11 +106,13 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const Elem * elem,
     default:
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
     }
+
 #else // LIBMESH_DIM != 3
   libmesh_ignore(elem, order, i, p, add_p_level);
   libmesh_not_implemented();
 #endif
 }
+
 
 template <>
 RealGradient FE<3,L2_RAVIART_THOMAS>::shape(const Elem * elem,
@@ -215,6 +135,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const ElemType,
   return RealGradient();
 }
 
+
 template <>
 RealGradient FE<3,L2_RAVIART_THOMAS>::shape(const ElemType,
                                             const Order,
@@ -226,7 +147,6 @@ RealGradient FE<3,L2_RAVIART_THOMAS>::shape(const ElemType,
 }
 
 
-
 template <>
 RealGradient FE<3,RAVIART_THOMAS>::shape(const FEType fet,
                                          const Elem * elem,
@@ -236,6 +156,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape(const FEType fet,
 {
   return FE<3,RAVIART_THOMAS>::shape(elem, fet.order, i, p, add_p_level);
 }
+
 
 template <>
 RealGradient FE<3,L2_RAVIART_THOMAS>::shape(const FEType fet,
@@ -261,6 +182,9 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
   libmesh_assert_less (j, 3);
 
   const Order totalorder = order + add_p_level*elem->p_level();
+  libmesh_assert_less(i, n_dofs(elem->type(), totalorder));
+
+  const char sign = elem->face_orientation(i) ? 1 : -1;
 
   switch (totalorder)
     {
@@ -271,8 +195,6 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
           {
           case HEX27:
             {
-              libmesh_assert_less (i, 6);
-
               switch (j)
                 {
                   // d()/dxi
@@ -286,21 +208,9 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       case 5:
                         return RealGradient();
                       case 2:
-                        {
-                          std::array<Point, 4> arr = {elem->point(6), elem->point(5), elem->point(1), elem->point(2)};
-                          if (orientation(arr))
-                            return RealGradient(  0.125, 0.0, 0.0 );
-                          else
-                            return RealGradient( -0.125, 0.0, 0.0 );
-                        }
                       case 4:
-                        {
-                          std::array<Point, 4> arr = {elem->point(7), elem->point(3), elem->point(0), elem->point(4)};
-                          if (orientation(arr))
-                            return RealGradient(  0.125, 0.0, 0.0 );
-                          else
-                            return RealGradient( -0.125, 0.0, 0.0 );
-                        }
+                        return sign * RealGradient( 0.125, 0.0, 0.0 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
@@ -318,21 +228,9 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       case 5:
                         return RealGradient();
                       case 1:
-                        {
-                          std::array<Point, 4> arr = {elem->point(4), elem->point(0), elem->point(1), elem->point(5)};
-                          if (orientation(arr))
-                            return RealGradient( 0.0,  0.125, 0.0 );
-                          else
-                            return RealGradient( 0.0, -0.125, 0.0 );
-                        }
                       case 3:
-                        {
-                          std::array<Point, 4> arr = {elem->point(7), elem->point(6), elem->point(2), elem->point(3)};
-                          if (orientation(arr))
-                            return RealGradient( 0.0,  0.125, 0.0 );
-                          else
-                            return RealGradient( 0.0, -0.125, 0.0 );
-                        }
+                        return sign * RealGradient( 0.0, 0.125, 0.0 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
@@ -350,21 +248,9 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                       case 4:
                         return RealGradient();
                       case 0:
-                        {
-                          std::array<Point, 4> arr = {elem->point(1), elem->point(0), elem->point(3), elem->point(2)};
-                          if (orientation(arr))
-                            return RealGradient( 0.0, 0.0,  0.125 );
-                          else
-                            return RealGradient( 0.0, 0.0, -0.125 );
-                        }
                       case 5:
-                        {
-                          std::array<Point, 4> arr = {elem->point(5), elem->point(6), elem->point(7), elem->point(4)};
-                          if (orientation(arr))
-                            return RealGradient( 0.0, 0.0,  0.125 );
-                          else
-                            return RealGradient( 0.0, 0.0, -0.125 );
-                        }
+                        return sign * RealGradient( 0.0, 0.0, 0.125 );
+
                       default:
                         libmesh_error_msg("Invalid i = " << i);
                       } // switch(i)
@@ -374,14 +260,10 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                 default:
                   libmesh_error_msg("Invalid j = " << j);
                 }
-
-              return RealGradient();
             }
 
           case TET14:
             {
-              libmesh_assert_less (i, 4);
-
               switch (j)
                 {
                   // d()/dxi
@@ -390,37 +272,11 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                     switch(i)
                     {
                     case 0:
-                      {
-                        std::array<Point, 3> arr = {elem->point(0), elem->point(2), elem->point(1)};
-                        if (orientation(arr))
-                          return RealGradient(  2.0, 0.0, 0.0 );
-                        else
-                          return RealGradient( -2.0, 0.0, 0.0 );
-                      }
                     case 1:
-                      {
-                        std::array<Point, 3> arr = {elem->point(1), elem->point(3), elem->point(0)};
-                        if (orientation(arr))
-                          return RealGradient(  2.0, 0.0, 0.0 );
-                        else
-                          return RealGradient( -2.0, 0.0, 0.0 );
-                      }
                     case 2:
-                      {
-                        std::array<Point, 3> arr = {elem->point(1), elem->point(2), elem->point(3)};
-                        if (orientation(arr))
-                          return RealGradient(  2.0, 0.0, 0.0 );
-                        else
-                          return RealGradient( -2.0, 0.0, 0.0 );
-                      }
                     case 3:
-                      {
-                        std::array<Point, 3> arr = {elem->point(0), elem->point(3), elem->point(2)};
-                        if (orientation(arr))
-                          return RealGradient(  2.0, 0.0, 0.0 );
-                        else
-                          return RealGradient( -2.0, 0.0, 0.0 );
-                      }
+                      return sign * RealGradient( 2.0, 0.0, 0.0 );
+
                     default:
                       libmesh_error_msg("Invalid i = " << i);
                     } // switch(i)
@@ -433,37 +289,11 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                     switch(i)
                     {
                     case 0:
-                      {
-                        std::array<Point, 3> arr = {elem->point(0), elem->point(2), elem->point(1)};
-                        if (orientation(arr))
-                          return RealGradient( 0.0,  2.0, 0.0 );
-                        else
-                          return RealGradient( 0.0, -2.0, 0.0 );
-                      }
                     case 1:
-                      {
-                        std::array<Point, 3> arr = {elem->point(1), elem->point(3), elem->point(0)};
-                        if (orientation(arr))
-                          return RealGradient( 0.0,  2.0, 0.0 );
-                        else
-                          return RealGradient( 0.0, -2.0, 0.0 );
-                      }
                     case 2:
-                      {
-                        std::array<Point, 3> arr = {elem->point(1), elem->point(2), elem->point(3)};
-                        if (orientation(arr))
-                          return RealGradient( 0.0,  2.0, 0.0 );
-                        else
-                          return RealGradient( 0.0, -2.0, 0.0 );
-                      }
                     case 3:
-                      {
-                        std::array<Point, 3> arr = {elem->point(0), elem->point(3), elem->point(2)};
-                        if (orientation(arr))
-                          return RealGradient( 0.0,  2.0, 0.0 );
-                        else
-                          return RealGradient( 0.0, -2.0, 0.0 );
-                      }
+                      return sign * RealGradient( 0.0, 2.0, 0.0 );
+
                     default:
                       libmesh_error_msg("Invalid i = " << i);
                     } // switch(i)
@@ -476,37 +306,11 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                     switch(i)
                     {
                     case 0:
-                      {
-                        std::array<Point, 3> arr = {elem->point(0), elem->point(2), elem->point(1)};
-                        if (orientation(arr))
-                          return RealGradient( 0.0, 0.0,  2.0 );
-                        else
-                          return RealGradient( 0.0, 0.0, -2.0 );
-                      }
                     case 1:
-                      {
-                        std::array<Point, 3> arr = {elem->point(1), elem->point(3), elem->point(0)};
-                        if (orientation(arr))
-                          return RealGradient( 0.0, 0.0,  2.0 );
-                        else
-                          return RealGradient( 0.0, 0.0, -2.0 );
-                      }
                     case 2:
-                      {
-                        std::array<Point, 3> arr = {elem->point(1), elem->point(2), elem->point(3)};
-                        if (orientation(arr))
-                          return RealGradient( 0.0, 0.0,  2.0 );
-                        else
-                          return RealGradient( 0.0, 0.0, -2.0 );
-                      }
                     case 3:
-                      {
-                        std::array<Point, 3> arr = {elem->point(0), elem->point(3), elem->point(2)};
-                        if (orientation(arr))
-                          return RealGradient( 0.0, 0.0,  2.0 );
-                        else
-                          return RealGradient( 0.0, 0.0, -2.0 );
-                      }
+                      return sign * RealGradient( 0.0, 0.0, 2.0 );
+
                     default:
                       libmesh_error_msg("Invalid i = " << i);
                     } // switch(i)
@@ -516,8 +320,6 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                 default:
                   libmesh_error_msg("Invalid j = " << j);
                 }
-
-              return RealGradient();
             }
 
           default:
@@ -535,6 +337,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const Elem * elem,
 #endif
 }
 
+
 template <>
 RealGradient FE<3,L2_RAVIART_THOMAS>::shape_deriv(const Elem * elem,
                                                   const Order order,
@@ -547,7 +350,6 @@ RealGradient FE<3,L2_RAVIART_THOMAS>::shape_deriv(const Elem * elem,
 }
 
 
-
 template <>
 RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const ElemType,
                                                const Order,
@@ -558,6 +360,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const ElemType,
   libmesh_error_msg("Raviart-Thomas elements require the element type \nbecause face orientation is needed.");
   return RealGradient();
 }
+
 
 template <>
 RealGradient FE<3,L2_RAVIART_THOMAS>::shape_deriv(const ElemType,
@@ -582,6 +385,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_deriv(const FEType fet,
   return FE<3,RAVIART_THOMAS>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
 }
 
+
 template <>
 RealGradient FE<3,L2_RAVIART_THOMAS>::shape_deriv(const FEType fet,
                                                   const Elem * elem,
@@ -592,7 +396,6 @@ RealGradient FE<3,L2_RAVIART_THOMAS>::shape_deriv(const FEType fet,
 {
   return FE<3,L2_RAVIART_THOMAS>::shape_deriv(elem, fet.order, i, j, p, add_p_level);
 }
-
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
@@ -618,6 +421,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_second_deriv(const Elem * elem,
   libmesh_assert_less (j, 6);
 
   const Order totalorder = order + add_p_level*elem->p_level();
+  libmesh_assert_less(i, n_dofs(elem->type(), totalorder));
 
   switch (totalorder)
     {
@@ -626,26 +430,17 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_second_deriv(const Elem * elem,
       {
         switch (elem->type())
           {
+            // All second derivatives for linear hexes and tets are zero.
           case HEX27:
-            {
-              libmesh_assert_less (i, 6);
-              // All second derivatives for linear hexes are zero.
-              return RealGradient();
-            }
-
           case TET14:
-            {
-              libmesh_assert_less (i, 4);
-              // All second derivatives for linear tets are zero.
-              return RealGradient();
-            }
+            return RealGradient();
 
           default:
             libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(elem->type()));
 
           } //switch(type)
+      }
 
-      } // case FIRST:
       // unsupported order
     default:
       libmesh_error_msg("ERROR: Unsupported 3D FE order!: " << totalorder);
@@ -657,6 +452,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_second_deriv(const Elem * elem,
   libmesh_not_implemented();
 #endif
 }
+
 
 template <>
 RealGradient FE<3,L2_RAVIART_THOMAS>::shape_second_deriv(const Elem * elem,
@@ -681,6 +477,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_second_deriv(const ElemType,
   return RealGradient();
 }
 
+
 template <>
 RealGradient FE<3,L2_RAVIART_THOMAS>::shape_second_deriv(const ElemType,
                                                          const Order,
@@ -691,7 +488,6 @@ RealGradient FE<3,L2_RAVIART_THOMAS>::shape_second_deriv(const ElemType,
   libmesh_error_msg("Raviart-Thomas elements require the element type \nbecause face orientation is needed.");
   return RealGradient();
 }
-
 
 
 template <>
@@ -705,6 +501,7 @@ RealGradient FE<3,RAVIART_THOMAS>::shape_second_deriv(const FEType fet,
   return FE<3,RAVIART_THOMAS>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
 }
 
+
 template <>
 RealGradient FE<3,L2_RAVIART_THOMAS>::shape_second_deriv(const FEType fet,
                                                          const Elem * elem,
@@ -715,8 +512,6 @@ RealGradient FE<3,L2_RAVIART_THOMAS>::shape_second_deriv(const FEType fet,
 {
   return FE<3,L2_RAVIART_THOMAS>::shape_second_deriv(elem, fet.order, i, j, p, add_p_level);
 }
-
-
 
 #endif
 
