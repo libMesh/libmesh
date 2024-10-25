@@ -171,10 +171,13 @@ public:
 
   LIBMESH_CPPUNIT_TEST_SUITE( NonManifoldGhostingFunctorTest );
 
+  // These tests all require Exodus
+#if defined(LIBMESH_HAVE_EXODUS_API)
   CPPUNIT_TEST( verifySendListEntries0 );
   CPPUNIT_TEST( verifySendListEntries1 );
   CPPUNIT_TEST( verifySendListEntries2 );
   CPPUNIT_TEST( verifySendListEntries3 );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
