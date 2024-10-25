@@ -55,6 +55,12 @@ class IntRange
 public:
   class iterator {
   public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type = T;
+    using difference_type = T;
+    using pointer = T;
+    using reference = T&;
+
     iterator (T i) : _i(i) {}
 
     T operator* () const { return _i; }

@@ -188,27 +188,11 @@ void System::clear ()
 
 void System::init ()
 {
-  parallel_object_only();
-
   // Calling init() twice on the same system currently works evil
   // magic, whether done directly or via EquationSystems::read()
   libmesh_assert(!this->is_initialized());
 
-  // First initialize any required data:
-  // either only the basic System data
-  if (_basic_system_only)
-    System::init_data();
-  // or all the derived class' data too
-  else
-    this->init_data();
-
-  // If no variables have been added to this system
-  // don't do anything
-  if (!this->n_vars())
-    return;
-
-  // Then call the user-provided initialization function
-  this->user_initialization();
+  this->reinit_mesh();
 }
 
 

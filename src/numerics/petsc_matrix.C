@@ -108,6 +108,22 @@ PetscMatrix<T>::PetscMatrix(Mat mat_in,
 }
 
 
+// Constructor taking global and local dimensions and, optionally,
+// number of on- and off-diagonal non-zeros and a block size
+template <typename T>
+PetscMatrix<T>::PetscMatrix(const Parallel::Communicator & comm_in,
+                            const numeric_index_type m_in,
+                            const numeric_index_type n_in,
+                            const numeric_index_type m_l,
+                            const numeric_index_type n_l,
+                            const numeric_index_type n_nz,
+                            const numeric_index_type n_oz,
+                            const numeric_index_type blocksize_in) :
+  PetscMatrixBase<T>(comm_in), _mat_type(AIJ)
+{
+  this->init(m_in, n_in, m_l, n_l, n_nz, n_oz, blocksize_in);
+}
+
 
 // Destructor
 template <typename T>
