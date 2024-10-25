@@ -252,20 +252,16 @@ void MeshFunction::operator() (const Point & p,
         const unsigned int dim = element->dim();
 
 
-        /*
-         * Get local coordinates to feed these into compute_data().
-         * Note that the fe_type can safely be used from the 0-variable,
-         * since the inverse mapping is the same for all FEFamilies
-         */
+        // Get local coordinates to feed these into compute_data().
+        // Note that the fe_type can safely be used from the 0-variable,
+        // since the inverse mapping is the same for all FEFamilies
         const Point mapped_point (FEMap::inverse_map (dim, element,
                                                       p));
 
         // loop over all vars
         for (auto index : index_range(this->_system_vars))
           {
-            /*
-             * the data for this variable
-             */
+            // the data for this variable
             const unsigned int var = _system_vars[index];
 
             if (var == libMesh::invalid_uint)
@@ -278,10 +274,8 @@ void MeshFunction::operator() (const Point & p,
 
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
-            /**
-             * Build an FEComputeData that contains both input and output data
-             * for the specific compute_data method.
-             */
+            // Build an FEComputeData that contains both input and output data
+            // for the specific compute_data method.
             {
               FEComputeData data (this->_eqn_systems, mapped_point);
 
@@ -341,19 +335,15 @@ void MeshFunction::discontinuous_value (const Point & p,
       // define a temporary vector to store all values
       DenseVector<Number> temp_output (cast_int<unsigned int>(this->_system_vars.size()));
 
-      /*
-       * Get local coordinates to feed these into compute_data().
-       * Note that the fe_type can safely be used from the 0-variable,
-       * since the inverse mapping is the same for all FEFamilies
-       */
+      // Get local coordinates to feed these into compute_data().
+      // Note that the fe_type can safely be used from the 0-variable,
+      // since the inverse mapping is the same for all FEFamilies
       const Point mapped_point (FEMap::inverse_map (dim, element, p));
 
       // loop over all vars
       for (auto index : index_range(this->_system_vars))
         {
-          /*
-           * the data for this variable
-           */
+          // the data for this variable
           const unsigned int var = _system_vars[index];
 
           if (var == libMesh::invalid_uint)
@@ -366,10 +356,8 @@ void MeshFunction::discontinuous_value (const Point & p,
 
           const FEType & fe_type = this->_dof_map.variable_type(var);
 
-          /**
-           * Build an FEComputeData that contains both input and output data
-           * for the specific compute_data method.
-           */
+          // Build an FEComputeData that contains both input and output data
+          // for the specific compute_data method.
           {
             FEComputeData data (this->_eqn_systems, mapped_point);
 
@@ -476,11 +464,9 @@ void MeshFunction::_gradient_on_elem (const Point & p,
 
   const unsigned int dim = element->dim();
 
-  /*
-   * Get local coordinates to feed these into compute_data().
-   * Note that the fe_type can safely be used from the 0-variable,
-   * since the inverse mapping is the same for all FEFamilies
-   */
+  // Get local coordinates to feed these into compute_data().
+  // Note that the fe_type can safely be used from the 0-variable,
+  // since the inverse mapping is the same for all FEFamilies
   const Point mapped_point (FEMap::inverse_map (dim, element,
                                                 p));
 
@@ -489,9 +475,7 @@ void MeshFunction::_gradient_on_elem (const Point & p,
   // loop over all vars
   for (auto index : index_range(this->_system_vars))
     {
-      /*
-       * the data for this variable
-       */
+      // the data for this variable
       const unsigned int var = _system_vars[index];
 
       if (var == libMesh::invalid_uint)
@@ -527,15 +511,15 @@ void MeshFunction::_gradient_on_elem (const Point & p,
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
       else
         {
-          /**
-           * Build an FEComputeData that contains both input and output data
-           * for the specific compute_data method.
-           */
-          //TODO: enable this for a vector of points as well...
+          // Build an FEComputeData that contains both input and output data
+          // for the specific compute_data method.
+          //
+          // TODO: enable this for a vector of points as well...
           FEComputeData data (this->_eqn_systems, mapped_point);
           data.enable_derivative();
           FEInterface::compute_data (dim, fe_type, element, data);
-          //grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
+
+          // grad [x] = data.dshape[i](v) * dv/dx  * dof_index [i]
           // sum over all indices
           for (auto i : index_range(dof_indices))
             {
@@ -596,11 +580,9 @@ void MeshFunction::hessian (const Point & p,
         const unsigned int dim = element->dim();
 
 
-        /*
-         * Get local coordinates to feed these into compute_data().
-         * Note that the fe_type can safely be used from the 0-variable,
-         * since the inverse mapping is the same for all FEFamilies
-         */
+        // Get local coordinates to feed these into compute_data().
+        // Note that the fe_type can safely be used from the 0-variable,
+        // since the inverse mapping is the same for all FEFamilies
         const Point mapped_point (FEMap::inverse_map (dim, element,
                                                       p));
 
@@ -609,9 +591,7 @@ void MeshFunction::hessian (const Point & p,
         // loop over all vars
         for (auto index : index_range(this->_system_vars))
           {
-            /*
-             * the data for this variable
-             */
+            // the data for this variable
             const unsigned int var = _system_vars[index];
 
             if (var == libMesh::invalid_uint)
@@ -648,11 +628,11 @@ void MeshFunction::hessian (const Point & p,
 const Elem * MeshFunction::find_element(const Point & p,
                                         const std::set<subdomain_id_type> * subdomain_ids) const
 {
-  /* Ensure that in the case of a master mesh function, the
-     out-of-mesh mode is enabled either for both or for none.  This is
-     important because the out-of-mesh mode is also communicated to
-     the point locator.  Since this is time consuming, enable it only
-     in debug mode.  */
+  // Ensure that in the case of a master mesh function, the
+  // out-of-mesh mode is enabled either for both or for none.  This is
+  // important because the out-of-mesh mode is also communicated to
+  // the point locator.  Since this is time consuming, enable it only
+  // in debug mode.
 #ifdef DEBUG
   if (this->_master != nullptr)
     {
@@ -667,36 +647,18 @@ const Elem * MeshFunction::find_element(const Point & p,
   // locate the point in the other mesh
   const Elem * element = (*_point_locator)(p, subdomain_ids);
 
-  // If we have an element, but it's not a local element, then we
-  // either need to have a serialized vector or we need to find a
-  // local element sharing the same point.
-  if (element &&
-      (element->processor_id() != this->processor_id()) &&
-      _vector.type() != SERIAL)
-    {
-      // look for a local element containing the point
-      std::set<const Elem *> point_neighbors;
-      element->find_point_neighbors(p, point_neighbors);
-      element = nullptr;
-      for (const auto & elem : point_neighbors)
-        if (elem->processor_id() == this->processor_id())
-          {
-            element = elem;
-            break;
-          }
-    }
-
-  return element;
+  // Make sure that the element found is evaluable
+  return this->check_found_elem(element, p);
 }
 
 std::set<const Elem *> MeshFunction::find_elements(const Point & p,
                                                    const std::set<subdomain_id_type> * subdomain_ids) const
 {
-  /* Ensure that in the case of a master mesh function, the
-     out-of-mesh mode is enabled either for both or for none.  This is
-     important because the out-of-mesh mode is also communicated to
-     the point locator.  Since this is time consuming, enable it only
-     in debug mode.  */
+  // Ensure that in the case of a master mesh function, the
+  // out-of-mesh mode is enabled either for both or for none.  This is
+  // important because the out-of-mesh mode is also communicated to
+  // the point locator.  Since this is time consuming, enable it only
+  // in debug mode.
 #ifdef DEBUG
   if (this->_master != nullptr)
     {
@@ -712,30 +674,54 @@ std::set<const Elem *> MeshFunction::find_elements(const Point & p,
   std::set<const Elem *> candidate_elements;
   std::set<const Elem *> final_candidate_elements;
   (*_point_locator)(p, candidate_elements, subdomain_ids);
+
+  // For each candidate Elem, if it is evaluable, add it to the set of
+  // final candidate Elems.
   for (const auto & element : candidate_elements)
-    {
-      // If we have an element, but it's not a local element, then we
-      // either need to have a serialized vector or we need to find a
-      // local element sharing the same point.
-      if (element &&
-          (element->processor_id() != this->processor_id()) &&
-          _vector.type() != SERIAL)
-        {
-          // look for a local element containing the point
-          std::set<const Elem *> point_neighbors;
-          element->find_point_neighbors(p, point_neighbors);
-          for (const auto & elem : point_neighbors)
-            if (elem->processor_id() == this->processor_id())
-              {
-                final_candidate_elements.insert(elem);
-                break;
-              }
-        }
-      else
-        final_candidate_elements.insert(element);
-    }
+    final_candidate_elements.insert(this->check_found_elem(element, p));
 
   return final_candidate_elements;
+}
+
+const Elem *
+MeshFunction::check_found_elem(const Elem * element, const Point & p) const
+{
+  // If the PointLocator did not find an Element containing Point p,
+  // OR if the PointLocator found a local element containting Point p,
+  // we can simply return it.
+  if (!element || (element->processor_id() == this->processor_id()))
+    return element;
+
+  // Otherwise, the PointLocator returned a valid but non-local
+  // element.  Therefore, we have to do some further checks:
+  //
+  // 1.) If we have a SERIAL _vector, then we can just return the
+  //     non-local element, because all the DOFs are available.
+  if (_vector.type() == SERIAL)
+    return element;
+
+  // 2.) If we have a GHOSTED _vector, then we can return a non-local
+  //     Element provided that all of its DOFs are ghosted on this
+  //     processor. That should be faster than the other option, which
+  //     is to search through all the Elem's point_neighbors() for a
+  //     suitable local Elem.
+  if (_vector.type() == GHOSTED && _dof_map.is_evaluable(*element))
+    return element;
+
+  // 3.) If we have a PARALLEL vector, then we search the non-local
+  //     Elem's point neighbors for a local one to return instead. If
+  //     we don't eventually find one, we just return nullptr.
+  std::set<const Elem *> point_neighbors;
+  element->find_point_neighbors(p, point_neighbors);
+  element = nullptr;
+  for (const auto & elem : point_neighbors)
+    if (elem->processor_id() == this->processor_id())
+      {
+        element = elem;
+        break;
+      }
+
+  return element;
 }
 
 const PointLocatorBase & MeshFunction::get_point_locator () const
