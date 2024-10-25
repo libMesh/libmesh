@@ -404,6 +404,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 {
   mesh_to_preevaluated_values_map.clear();
 
+  unsigned int n_elems = all_xyz.size();
   unsigned int n_points = 0;
   for (const auto & xyz_pair : all_xyz)
   {
@@ -422,16 +423,17 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 
   if (requires_all_elem_qp_data)
     {
-      v.JxW_all_qp.resize(n_points);
-      v.phi_i_all_qp.resize(n_points);
+      v.elem_id_to_local_index.clear();
+      v.JxW_all_qp.resize(n_elems);
+      v.phi_i_all_qp.resize(n_elems);
     }
   if (requires_all_elem_center_data)
     {
-      v.dxyzdxi_elem_center.resize(n_points);
-      v.dxyzdeta_elem_center.resize(n_points);
+      v.dxyzdxi_elem_center.resize(n_elems);
+      v.dxyzdeta_elem_center.resize(n_elems);
       // At the time of writing, the quadrature order is only used in conjunction with element
       // center data so we should not compute it elsewhere for now.
-      v.qrule_orders.resize(n_points);
+      v.qrule_orders.resize(n_elems);
     }
 
   // Empty vector to be used when xyz perturbations are not required
@@ -449,6 +451,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
     }
 
   unsigned int counter = 0;
+  unsigned int elem_counter = 0;
   for (const auto & [elem_id, xyz_vec] : all_xyz)
     {
       subdomain_id_type subdomain_id = libmesh_map_find(sbd_ids, elem_id);
@@ -469,7 +472,6 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 
       elem_fe->reinit(&elem_ref);
 
-      unsigned int counter_reset_value = counter;
       for (auto qp : index_range(xyz_vec))
         {
           mesh_to_preevaluated_values_map[elem_id][qp] = counter;
@@ -499,57 +501,57 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
 
           if (requires_all_elem_qp_data)
             {
-              // In this case we store data for all qps on this element
-              // at each point.
-              v.JxW_all_qp[counter].resize(JxW.size());
-              for(auto i : index_range(JxW))
-                v.JxW_all_qp[counter][i] = JxW[i];
+              if (v.elem_id_to_local_index.count(elem_id) == 0)
+                {
+                  // In this case we store data for all qps on this element
+                  // at each point.
+                  v.JxW_all_qp[elem_counter].resize(JxW.size());
+                  for(auto i : index_range(JxW))
+                    v.JxW_all_qp[elem_counter][i] = JxW[i];
 
-              v.phi_i_all_qp[counter].resize(phi.size());
-              for(auto i : index_range(phi))
-              {
-                v.phi_i_all_qp[counter][i].resize(phi[i].size());
-                for(auto j : index_range(phi[i]))
-                  v.phi_i_all_qp[counter][i][j] = phi[i][j];
-              }
+                  v.phi_i_all_qp[elem_counter].resize(phi.size());
+                  for(auto i : index_range(phi))
+                  {
+                    v.phi_i_all_qp[elem_counter][i].resize(phi[i].size());
+                    for(auto j : index_range(phi[i]))
+                      v.phi_i_all_qp[elem_counter][i][j] = phi[i][j];
+                  }
+                  v.elem_id_to_local_index[elem_id] = elem_counter;
+                }
             }
 
           counter++;
         }
 
+      // Here we presume that if requires_all_elem_center_data is set to true
+      // then requires_all_elem_qp_data is also set to true so that elem_id_to_local_index entry
+      // for this elem has already been set.
       if (requires_all_elem_center_data)
         {
-          // Here we reset the counter value as we do a second loop over xyz_vec
-          counter = counter_reset_value;
-
           // Get data derivatives at vertex average
           std::vector<Point> nodes = { elem_ref.reference_elem()->vertex_average() };
           elem_fe->reinit (&elem_ref, &nodes);
           // Set qrule_order here to prevent calling getter multiple times.
           Order qrule_order = con.get_element_qrule().get_order();
 
-          while (counter - counter_reset_value < xyz_vec.size())
-            {
-              // We add qrule_order in this loop as it is used in conjunction with elem center
-              // quantities for now.
-              v.qrule_orders[counter] = qrule_order;
-              Point dxyzdxi_pt, dxyzdeta_pt;
-              if (con.get_elem_dim()>0)
-                dxyzdxi_pt = dxyzdxi[0];
-              if (con.get_elem_dim()>1)
-                dxyzdeta_pt = dxyzdeta[0];
-              // Here we do an implicit conversion from RealGradient which is a VectorValue<Real>
-              // which in turn is a TypeVector<T> to a Point which is a TypeVector<Real>.
-              // They are essentially the same thing. This helps us limiting the number of includes
-              // in serialization and deserialization as RealGradient is a typedef and we cannot
-              // forward declare typedefs. As a result we leverage the fact that point.h is already
-              // included in most places we need RealGradient.
-              v.dxyzdxi_elem_center[counter] = dxyzdxi_pt;
-              v.dxyzdeta_elem_center[counter] = dxyzdeta_pt;
-
-              counter++;
-            }
+          // We add qrule_order in this loop as it is used in conjunction with elem center
+          // quantities for now.
+          v.qrule_orders[elem_counter] = qrule_order;
+          Point dxyzdxi_pt, dxyzdeta_pt;
+          if (con.get_elem_dim()>0)
+            dxyzdxi_pt = dxyzdxi[0];
+          if (con.get_elem_dim()>1)
+            dxyzdeta_pt = dxyzdeta[0];
+          // Here we do an implicit conversion from RealGradient which is a VectorValue<Real>
+          // which in turn is a TypeVector<T> to a Point which is a TypeVector<Real>.
+          // They are essentially the same thing. This helps us limiting the number of includes
+          // in serialization and deserialization as RealGradient is a typedef and we cannot
+          // forward declare typedefs. As a result we leverage the fact that point.h is already
+          // included in most places we need RealGradient.
+          v.dxyzdxi_elem_center[elem_counter] = dxyzdxi_pt;
+          v.dxyzdeta_elem_center[elem_counter] = dxyzdeta_pt;
         }
+      elem_counter++;
     }
 
   std::vector<RBParameters> mus {mu};

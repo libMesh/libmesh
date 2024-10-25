@@ -40,6 +40,11 @@ struct Point3D @0xde7dfcf8ecccaa90 {
   z @2 :Real;
 }
 
+struct IntPair @0xa9e786708685aed5 {
+  first  @0 :Integer;
+  second @1 :Integer;
+}
+
 struct RBSCMEvaluation @0xb8dd038628a64b16 {
   parameterRanges    @0 :ParameterRanges;
   discreteParameters @1 :DiscreteParameterList;
@@ -133,6 +138,8 @@ struct RBEIMEvaluationReal @0xf8121d2237427a80 {
   interpolationDxyzDxiElem    @23 :List(Point3D);
   interpolationDxyzDetaElem   @24 :List(Point3D);
   interpolationDxyzDzetaElem  @25 :List(Point3D);
+  nElems                      @26 :Integer;
+  elemIdToLocalIndex          @27 :List(IntPair);
 }
 struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   nBfs                        @0  :Integer;
@@ -161,4 +168,6 @@ struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   interpolationDxyzDxiElem    @23 :List(Point3D);
   interpolationDxyzDetaElem   @24 :List(Point3D);
   interpolationDxyzDzetaElem  @25 :List(Point3D);
+  nElems                      @26 :Integer;
+  elemIdToLocalIndex          @27 :List(IntPair);
 }

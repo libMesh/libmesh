@@ -850,6 +850,24 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  unsigned int n_elems = rb_eim_evaluation_reader.getNElems();
+  // Elem id to local index map
+  {
+    auto elem_id_to_local_index_list =
+      rb_eim_evaluation_reader.getElemIdToLocalIndex();
+
+    if (elem_id_to_local_index_list.size() > 0)
+      {
+        libmesh_error_msg_if(elem_id_to_local_index_list.size() != n_elems,
+                             "Size error while reading the eim elem id to local index map.");
+
+        for (unsigned int i=0; i<n_elems; ++i)
+          {
+            rb_eim_evaluation.add_elem_id_local_index_map_entry(elem_id_to_local_index_list[i].getFirst(), elem_id_to_local_index_list[i].getSecond());
+          }
+      }
+  }
+
   // Interpolation points JxW all qp values
   {
     auto interpolation_points_list_outer =
@@ -857,10 +875,10 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
     if (interpolation_points_list_outer.size() > 0)
       {
-        libmesh_error_msg_if(interpolation_points_list_outer.size() != n_bfs,
-                            "Size error while reading the eim JxW values.");
+        libmesh_error_msg_if(interpolation_points_list_outer.size() != n_elems,
+                             "Size error while reading the eim JxW values.");
 
-        for (unsigned int i=0; i<n_bfs; ++i)
+        for (unsigned int i=0; i<n_elems; ++i)
           {
             auto interpolation_points_list_inner = interpolation_points_list_outer[i];
 
@@ -881,10 +899,10 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
     if (interpolation_points_list_outer.size() > 0)
       {
-        libmesh_error_msg_if(interpolation_points_list_outer.size() != n_bfs,
-                            "Size error while reading the eim phi_i all qp values.");
+        libmesh_error_msg_if(interpolation_points_list_outer.size() != n_elems,
+                             "Size error while reading the eim phi_i all qp values.");
 
-        for (unsigned int i=0; i<n_bfs; ++i)
+        for (unsigned int i=0; i<n_elems; ++i)
           {
             auto interpolation_points_list_middle = interpolation_points_list_outer[i];
 
@@ -909,11 +927,11 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
     if (elem_center_dxyzdxi.size() > 0)
       {
-        libmesh_error_msg_if(elem_center_dxyzdxi.size() != n_bfs,
-                             "Size error while reading the eim interpolation points.");
+        libmesh_error_msg_if(elem_center_dxyzdxi.size() != n_elems,
+                             "Size error while reading the eim elem center tangent derivative dxyzdxi.");
 
         Point dxyzdxi_buffer;
-        for (const auto i : make_range(n_bfs))
+        for (const auto i : make_range(n_elems))
           {
             load_point(elem_center_dxyzdxi[i], dxyzdxi_buffer);
             rb_eim_evaluation.add_elem_center_dxyzdxi(dxyzdxi_buffer);
@@ -928,11 +946,11 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
     if (elem_center_dxyzdeta.size() > 0)
       {
-        libmesh_error_msg_if(elem_center_dxyzdeta.size() != n_bfs,
-                             "Size error while reading the eim interpolation points.");
+        libmesh_error_msg_if(elem_center_dxyzdeta.size() != n_elems,
+                             "Size error while reading the eim elem center tangent derivative dxyzdeta.");
 
         Point dxyzdeta_buffer;
-        for (const auto i : make_range(n_bfs))
+        for (const auto i : make_range(n_elems))
           {
             load_point(elem_center_dxyzdeta[i], dxyzdeta_buffer);
             rb_eim_evaluation.add_elem_center_dxyzdeta(dxyzdeta_buffer);
@@ -947,10 +965,10 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
     if (interpolation_points_qrule_order_list.size() > 0)
       {
-        libmesh_error_msg_if(interpolation_points_qrule_order_list.size() != n_bfs,
-                            "Size error while reading the eim interpolation element types.");
+        libmesh_error_msg_if(interpolation_points_qrule_order_list.size() != n_elems,
+                             "Size error while reading the eim elem qrule order.");
 
-        for (unsigned int i=0; i<n_bfs; ++i)
+        for (unsigned int i=0; i<n_elems; ++i)
           {
             rb_eim_evaluation.add_interpolation_points_qrule_order(static_cast<Order>(interpolation_points_qrule_order_list[i]));
           }
@@ -965,7 +983,7 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
     if (interpolation_points_elem_type_list.size() > 0)
       {
         libmesh_error_msg_if(interpolation_points_elem_type_list.size() != n_bfs,
-                            "Size error while reading the eim interpolation element types.");
+                             "Size error while reading the eim interpolation element types.");
 
         for (unsigned int i=0; i<n_bfs; ++i)
           {
