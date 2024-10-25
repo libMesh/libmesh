@@ -1070,7 +1070,7 @@ public:
    * positively oriented iff its first vertex (i.e. zeroth node) is
    * lexicographically greater than its second vertex (i.e. first node).
    */
-  bool edge_orientation(const unsigned int i) const;
+  bool positive_edge_orientation(const unsigned int i) const;
 
   /**
    * \returns \p true if face \p i is positively oriented. A face with N
@@ -1078,7 +1078,7 @@ public:
    * vertices (i.e. 3 lexicographically greatest nodes amongst the N leading
    * nodes) are an odd permutation relative to their lexicographic ordering.
    */
-  bool face_orientation(const unsigned int i) const;
+  bool positive_face_orientation(const unsigned int i) const;
 
 private:
   /**

@@ -79,9 +79,10 @@ void EquationSystems::clear ()
 
 void EquationSystems::init ()
 {
-  libmesh_assert(std::all_of(make_range(this->n_systems()).begin(),
-                             make_range(this->n_systems()).end(),
-                             [&](unsigned i) { return !this->get_system(i).is_initialized(); }));
+#ifndef NDEBUG
+  for (auto i : make_range(this->n_systems()))
+    libmesh_assert(!this->get_system(i).is_initialized());
+#endif
 
   this->reinit_mesh();
 }
