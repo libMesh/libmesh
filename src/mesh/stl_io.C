@@ -44,6 +44,22 @@
 #include <regex>
 #endif
 
+namespace {
+
+void test_and_add(std::unique_ptr<libMesh::Elem> e,
+                  libMesh::MeshBase & mesh)
+{
+  const libMesh::Real volume = e->volume();
+  if (volume < libMesh::TOLERANCE * libMesh::TOLERANCE)
+    libmesh_warning
+      ("Warning: STL file contained sliver element with volume " <<
+       volume << "!\n");
+  mesh.add_elem(std::move(e));
+}
+
+}
+
+
 namespace libMesh
 {
 
@@ -117,7 +133,10 @@ void STLIO::write (const std::string & fname)
                            "Tried to write a non-triangle to an STL file");
 
       auto n = (elem->point(1)-elem->point(0)).cross(elem->point(2)-elem->point(0));
-      n = n.unit();
+
+      // Other STL files have slivers, I guess ours can too
+      if (auto length = n.norm())
+        n /= length;
 
       out_stream << "facet normal " <<
         n(0) << ' ' <<
@@ -398,7 +417,7 @@ void STLIO::read_ascii (std::istream & file)
              "Found an 'endloop' line with no matching 'loop'.");
           in_vertex_loop = false;
 
-          mesh.add_elem(std::move(triangle));
+          test_and_add(std::move(triangle), mesh);
         }
     }
 
@@ -493,7 +512,7 @@ void STLIO::read_binary (std::istream & file,
     // 0, or sometimes triangle color.  Ignore it.
     file.read(ignored_buffer, 2);
 
-    mesh.add_elem(std::move(triangle));
+    test_and_add(std::move(triangle), mesh);
   }
 }
 

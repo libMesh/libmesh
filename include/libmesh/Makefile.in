@@ -587,10 +587,10 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	namebased_io.h nemesis_io.h nemesis_io_helper.h off_io.h \
 	parallel_mesh.h patch.h poly2tri_triangulator.h \
 	postscript_io.h replicated_mesh.h serial_mesh.h \
-	sides_to_elem_map.h stl_io.h sync_refinement_flags.h \
-	tecplot_io.h tetgen_io.h triangulator_interface.h ucd_io.h \
-	unstructured_mesh.h unv_io.h vtk_io.h xdr_io.h \
-	analytic_function.h composite_fem_function.h \
+	sides_to_elem_map.h simplex_refiner.h stl_io.h \
+	sync_refinement_flags.h tecplot_io.h tetgen_io.h \
+	triangulator_interface.h ucd_io.h unstructured_mesh.h unv_io.h \
+	vtk_io.h xdr_io.h analytic_function.h composite_fem_function.h \
 	composite_function.h const_fem_function.h const_function.h \
 	coupling_matrix.h dense_matrix.h dense_matrix_base.h \
 	dense_matrix_base_impl.h dense_matrix_impl.h dense_submatrix.h \
@@ -1571,6 +1571,9 @@ serial_mesh.h: $(top_srcdir)/include/mesh/serial_mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sides_to_elem_map.h: $(top_srcdir)/include/mesh/sides_to_elem_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+simplex_refiner.h: $(top_srcdir)/include/mesh/simplex_refiner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 stl_io.h: $(top_srcdir)/include/mesh/stl_io.h

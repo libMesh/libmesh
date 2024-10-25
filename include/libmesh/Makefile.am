@@ -217,6 +217,7 @@ BUILT_SOURCES = \
         replicated_mesh.h \
         serial_mesh.h \
         sides_to_elem_map.h \
+        simplex_refiner.h \
         stl_io.h \
         sync_refinement_flags.h \
         tecplot_io.h \
@@ -1237,6 +1238,9 @@ serial_mesh.h: $(top_srcdir)/include/mesh/serial_mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sides_to_elem_map.h: $(top_srcdir)/include/mesh/sides_to_elem_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+simplex_refiner.h: $(top_srcdir)/include/mesh/simplex_refiner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 stl_io.h: $(top_srcdir)/include/mesh/stl_io.h

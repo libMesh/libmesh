@@ -132,12 +132,12 @@ void scale (MeshBase & mesh,
             const Real xs, const Real ys=0., const Real zs=0.);
 
 /**
- * Converts the 2D quadrilateral elements of a Mesh into
- * triangular elements.
+ * Subdivides any non-simplex elements in a Mesh to produce simplex
+ * (triangular in 2D, tetrahedral in 3D) elements.
  *
- * \note Only works for 2D elements!  3D elements are ignored.
- * \note Probably won't do the right thing for meshes which
- * have been refined previously.
+ * \note Only supports coarse / unrefined meshes.  A uniformly
+ * refined mesh can be used only after a \p flatten() removes its
+ * coarser layers.
  */
 void all_tri (MeshBase & mesh);
 
