@@ -86,6 +86,20 @@ public:
                const Parallel::Communicator & comm_in);
 
   /**
+   * Constructor. Creates and initializes a PetscMatrix with the given
+   * structure. See \p init(...) for a description of the parameters.
+   */
+  explicit
+  PetscMatrix (const Parallel::Communicator & comm_in,
+               const numeric_index_type m,
+               const numeric_index_type n,
+               const numeric_index_type m_l,
+               const numeric_index_type n_l,
+               const numeric_index_type n_nz=30,
+               const numeric_index_type n_oz=10,
+               const numeric_index_type blocksize=1);
+
+  /**
    * This class manages a C-style struct (Mat) manually, so we
    * don't want to allow any automatic copy/move functions to be
    * generated, and we can't default the destructor.
@@ -98,12 +112,23 @@ public:
   PetscMatrix & operator= (const PetscMatrix &);
   virtual SparseMatrix<T> & operator= (const SparseMatrix<T> & v) override;
 
+  /**
+   * Initialize a PETSc matrix.
+   *
+   * \param m The global number of rows.
+   * \param n The global number of columns.
+   * \param m_l The local number of rows.
+   * \param n_l The local number of columns.
+   * \param n_nz The number of nonzeros in each row of the DIAGONAL portion of the local submatrix.
+   * \param n_oz The number of nonzeros in each row of the OFF-DIAGONAL portion of the local submatrix.
+   * \param blocksize Optional value indicating dense coupled blocks for systems with multiple variables all of the same type.
+   */
   virtual void init (const numeric_index_type m,
                      const numeric_index_type n,
                      const numeric_index_type m_l,
                      const numeric_index_type n_l,
-                     const numeric_index_type nnz=30,
-                     const numeric_index_type noz=10,
+                     const numeric_index_type n_nz=30,
+                     const numeric_index_type n_oz=10,
                      const numeric_index_type blocksize=1) override;
 
   /**
