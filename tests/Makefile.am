@@ -208,7 +208,13 @@ data = matrices/geom_1_extraction_op.m \
        meshes/tetgen_one_tet10.ele \
        meshes/tetgen_one_tet10.node \
        meshes/two_element_iga_in.e \
-       meshes/two_quads_two_blocks.e
+       meshes/two_quads_two_blocks.e \
+       meshes/non_manifold_junction0.exo \
+       meshes/non_manifold_junction1.exo \
+       meshes/non_manifold_junction2.exo \
+       meshes/non_manifold_junction3.exo \
+       meshes/Cluster_34.stl \
+       meshes/engraving.stl
 
 
 unit_tests_data = $(data)
@@ -412,11 +418,7 @@ CLEANFILES = cube_mesh.xda \
              write_exodus_TRI3.e \
              write_exodus_TRI6.e \
              write_exodus_TRI7.e \
-             write_exodus_TRISHELL3.e \
-             non_manifold_junction0.exo \
-             non_manifold_junction1.exo \
-             non_manifold_junction2.exo \
-             non_manifold_junction3.exo
+             write_exodus_TRISHELL3.e
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD
