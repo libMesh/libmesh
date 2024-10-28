@@ -59,6 +59,8 @@ public:
 
   void testTriRefinement()
   {
+    LOG_UNIT_TEST;
+
     Mesh trimesh(*TestCommWorld);
 
     MeshTools::Generation::build_square (trimesh, 2, 2,
@@ -75,6 +77,8 @@ public:
     // in CI.
     if (TestCommWorld->size() > 8)
       return;
+
+    LOG_UNIT_TEST;
 
     Mesh trimesh(*TestCommWorld);
 
