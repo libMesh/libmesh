@@ -1,14 +1,32 @@
 1.7.3 -> 1.8.0
+  * AbaqusIO
+    - Add Abaqus element maps for TRI6 and QUAD8 elements
+    - Make nodeset/sideset counter types in Abaqus mesh reader consistent with other boundaries
   * Elem
     - Add Tri7 element and associated library support
     - Add Tet14 element and associated library support
     - Add ElemSideBuilder
     - Add Elem::side_type()
     - Add Elem::quasicircumcenter()
+    - Add Prism20, Prism21 elements
+    - Add NodeElem contains_point() and close_to_point() implementations
+    - Add Pyramid18 element and associated library support
+    - Add subdomain_id to elem info output (#3487)
+    - Add Elem::topologically_equal()
   * ExodusII
     - Add ExodusII_IO::get_{side,node}set_data_indices()
     - Fix for writing write Exodus from multiple procs at once
     - Add new BEX element types to ExodusII helper
+    - Add ExodusII_IO::write_elemsets()
+    - Add/use ExodusII_IO_Helper::read_elemset_info()
+    - Add/use ExodusII_IO_Helper::read_elemset()
+    - Add ExodusII_IO::{write,read}_elemset_data()
+    - Fix deprecated Exodus calls (e.g. exII::ex_get_var_param() -> exII::ex_get_variable_param())
+    - Add ExodusII_IO_Helper::set_add_sides(), ExodusII::write_added_sides()
+    - Add named block, sideset, and nodeset support for Nemesis meshes
+    - Fixes for edge block reading
+    - Do not throw from ExodusII_IO_Helper::close()
+    - Fix for Exodus writer when sideset and shellface set have same id
   * IGA
     - Update 3D IGA projection regression test values
     - Add MeshTools::clear_spline_nodes()
@@ -20,6 +38,22 @@
     - Add fe_fdm_deriv(), fe_fdm_second_deriv() support for derivatives of Bernstein, Szabo-Babushka, HIERARCHIC basis functions
     - Fixes/improvements for single, quad-precision Real
     - Remove caching from FE<CLOUGH>, Clough-Tocher should work multithreaded now
+    - Factor out common code in BERNSTEIN p=3,4
+    - Factor out edge flip calculation on Sza-Bab quads
+  * Mesh
+    - Move stitching from Replicated->Unstructured Mesh
+    - Add MeshBase::change_elemset_code(), MeshBase::get_elemset_codes()
+    - Add MeshBase::active_unpartitioned_element_ptr_range()
+    - Support Laplace smoothing of unpartitioned meshes
+    - Add support for reading/writing elemset codes in Xdr files
+    - Add BoundaryInfo::renumber_id()
+    - Add MeshBase::reinit_ghosting_functors() API
+    - Add QUADSHELL{4,8} support to MeshTools::Generation::build_square()
+    - Add MeshTools::Modification::orient_elements()
+    - Allow child elements to have BoundaryInfo associated with them
+    - Add MeshBase::operator==()
+    - Add BoundaryInfo::operator==()
+    - Add MeshBase::copy_constraint_rows()
   * Miscellaneous
     - C++17 support is now required
     - Add/use exceptionless_{semi}parallel_object_only() macro
@@ -30,23 +64,60 @@
     - Eliminate valgrind errors using a condition_variable
     - Add TypeVector::outer_product()
     - Implement doubly-checked lock for _get_array()
-    - Add Poly2TriTriangulator, subclass of TriangulatorInterface
     - Add static_assert(is_trivially_copyable<TypeVector>)
     - Add static TensorValue::rotation_matrix() helper
     - Lock against concurrent read-write in PetscVector::add()
     - Add std::hash<Point> overload
     - Increased constness in {const_,} elem_iterator
+    - Add PerfLog for our unit tests
+    - Add unit test for MeshBase::all_second_order_range()
+    - Use std::make_unique everywhere, deprecate libmesh_make_unique
+    - Use std::string_view in place of std::string references
+    - Remove long-deprecated overload MeshTools::find_boundary_nodes()
+    - Remove deprected UniquePtr workaround for std::unique_ptr
+    - Use C++17 structured bindings in many for-loops
+    - Implement many clang-tidy suggestions
+    - Add Utility::CompareUnderlying helper struct
+    - Avoid using AC_CHECK_HEADER to search for petscversion.h
+    - Don't lock in libmesh_singleton.C
+    - Give a warning if an Exodus variable name will be truncated
+    - Remove __SUNPRO_CC specific code
+    - Avoid manual memory management in variant_iterator
+    - Use std::stack for managing DiffPhysics, DiffQoI lifetimes
+    - Require support for enum forward declarations
+    - Add unit test of find_neighbors() on mesh of 1D elements with different orientations
+    - Add more generic index_range() support (for any container that has a size() method) (#3377)
+    - Factor out common {left,right}_multiply_transpose() code
+    - Fix for VTK 9.2 linking to libvtksys
+    - Add allow_nodal_pyramid_quadrature flag, use in unit tests
+    - Prefer std::to_string over sprintf
+    - Don't call setenv on Windows builds
+    - Use NBX algorithm in send_coarse_ghosts(), redistribute()
+    - Add System::has_constraint_object()
+    - Fix NumericVector::compare()
+    - Add NonlinearSolver::set_exact_constraint_enforcement()
+    - Prefer using std::make_unique to new whenever possible
+    - Change unsigned int to size_t in CouplingMatrix to prevent overflow for large number of variables (#3541)
+  * Poly2TriTriangulator
+    - Add Poly2TriTriangulator, a subclass of TriangulatorInterface
+    - Add Poly2TriBadMultiBoundary unit test
+    - Don't let DistributedMesh number poly2tri nodes
   * Submodules
     - Update MetaPhysicL to 1.4.0+
     - Update TIMPI to 1.8.5+
     - Update autoconf-submodule, add support for Nvidia, gcc11, icc21 compilers
     - Add poly2tri submodule
     - Update nanoflann (#3121)
+    - Add Eigen submodule, update to version 3.4.0
   * PerfLog
     - PerfLog::fast_pop() should be noexcept
   * Petsc
     - Add SVD in preconditioner type
     - Allow use of matrix-free when computing residual and jacobian together
+    - Fixes for petscdmlibmesh PETSc 3.18 compatibility
+    - Workaround for PETSc 3.18 losing %D support
+    - Add pointwise_divide() to PetscVector
+    - PETSc 3.19 deprecated some convergence reasons
   * Reduced Basis
     - Add interpolationPhiValues to RBEIMEvaluation capnproto schema
     - Update to how observation points for EIM basis functions are evaluated
@@ -56,7 +127,15 @@
     - Update to RBConstructionBase<Base>::get_n_training_samples() (#3115)
     - Use best_fit_type_flag to switch between POD and Greedy EIM training
     - Add virtual methods for specifying index maps for the RBParametrizedFunction in EIM approximations
-    
+    - Add support for EIM on nodesets
+    - Fix to apply constraints and scaling inside node assembly in add_scaled_matrix_and_vector()
+    - Allow empty EIM basis in RBEIMConstruction::train_eim_approximation_with_POD()
+    - RBConstruction: Re-throw exceptions on all procs in parallel
+    - Add RBParameters::has_value(), has_extra_value() APIs
+    - Deprecate RBParameters::get_parameters_map()
+    - RBParameters: store std::vector<Real> instead of single Real
+    - Add RBParameters::set_value(name, index, value) and RBParameters::push_back_value() APIs
+
 1.7.1 -> 1.7.3
   * PETSc support
     - Full compatibility with PETSc 3.18 and 3.19
