@@ -1,3 +1,62 @@
+1.7.3 -> 1.8.0
+  * Elem
+    - Add Tri7 element and associated library support
+    - Add Tet14 element and associated library support
+    - Add ElemSideBuilder
+    - Add Elem::side_type()
+    - Add Elem::quasicircumcenter()
+  * ExodusII
+    - Add ExodusII_IO::get_{side,node}set_data_indices()
+    - Fix for writing write Exodus from multiple procs at once
+    - Add new BEX element types to ExodusII helper
+  * IGA
+    - Update 3D IGA projection regression test values
+    - Add MeshTools::clear_spline_nodes()
+    - Optimize 1D, 2D, 3D IGA derivative calculations
+    - Add support for Bezier elements in VTK output
+  * FE
+    - Add HIERARCHIC FE support for tets
+    - Add SIDE_HIERARCHIC support for triangles
+    - Add fe_fdm_deriv(), fe_fdm_second_deriv() support for derivatives of Bernstein, Szabo-Babushka, HIERARCHIC basis functions
+    - Fixes/improvements for single, quad-precision Real
+    - Remove caching from FE<CLOUGH>, Clough-Tocher should work multithreaded now
+  * Miscellaneous
+    - C++17 support is now required
+    - Add/use exceptionless_{semi}parallel_object_only() macro
+    - Add plain integrals to calculator app
+    - Fix FParser JIT compilation on Apple M1
+    - Add configure --enable-hdf5-required option
+    - Fix all_second_order() bug with extra integers
+    - Eliminate valgrind errors using a condition_variable
+    - Add TypeVector::outer_product()
+    - Implement doubly-checked lock for _get_array()
+    - Add Poly2TriTriangulator, subclass of TriangulatorInterface
+    - Add static_assert(is_trivially_copyable<TypeVector>)
+    - Add static TensorValue::rotation_matrix() helper
+    - Lock against concurrent read-write in PetscVector::add()
+    - Add std::hash<Point> overload
+    - Increased constness in {const_,} elem_iterator
+  * Submodules
+    - Update MetaPhysicL to 1.4.0+
+    - Update TIMPI to 1.8.5+
+    - Update autoconf-submodule, add support for Nvidia, gcc11, icc21 compilers
+    - Add poly2tri submodule
+    - Update nanoflann (#3121)
+  * PerfLog
+    - PerfLog::fast_pop() should be noexcept
+  * Petsc
+    - Add SVD in preconditioner type
+    - Allow use of matrix-free when computing residual and jacobian together
+  * Reduced Basis
+    - Add interpolationPhiValues to RBEIMEvaluation capnproto schema
+    - Update to how observation points for EIM basis functions are evaluated
+    - Fix race condition in writing header in RBEvaluation::write_out_vectors()
+    - Update RBEIMConstruction::enrich_eim_approximation()
+    - Fix for shellfaces in RBEIMEvaluation::side_distribute_bfs()
+    - Update to RBConstructionBase<Base>::get_n_training_samples() (#3115)
+    - Use best_fit_type_flag to switch between POD and Greedy EIM training
+    - Add virtual methods for specifying index maps for the RBParametrizedFunction in EIM approximations
+    
 1.7.1 -> 1.7.3
   * PETSc support
     - Full compatibility with PETSc 3.18 and 3.19
