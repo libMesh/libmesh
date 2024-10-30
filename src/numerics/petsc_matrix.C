@@ -94,8 +94,9 @@ PetscMatrix<T>::PetscMatrix(const Parallel::Communicator & comm_in) :
 // for destroying it
 template <typename T>
 PetscMatrix<T>::PetscMatrix(Mat mat_in,
-                            const Parallel::Communicator & comm_in) :
-  PetscMatrixBase<T>(mat_in, comm_in)
+                            const Parallel::Communicator & comm_in,
+                            const bool destroy_on_exit) :
+  PetscMatrixBase<T>(mat_in, comm_in, destroy_on_exit)
 {
   MatType mat_type;
   LibmeshPetscCall(MatGetType(mat_in, &mat_type));
