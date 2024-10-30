@@ -9,7 +9,7 @@ ReflowComments: true
 AlignTrailingComments: true
 SpacesBeforeTrailingComments: 1
 
-SpaceBeforeParens: ControlStatements
+SpaceBeforeParens: Always
 SpacesInSquareBrackets: false
 PointerAlignment: Middle
 
