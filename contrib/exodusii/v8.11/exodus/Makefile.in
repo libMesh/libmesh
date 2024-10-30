@@ -4448,7 +4448,9 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-include_HEADERS = include/exodusII.h
+include_HEADERS = include/exodusII.h \
+                  sierra/exodus_config.h
+
 pkg_cppflags = -I$(srcdir)/include -I$(srcdir)/sierra $(NETCDF_INCLUDE) $(EXODUS_NOT_NETCDF4_FLAG)
 pkg_sources = \
 	include/doxygen.h \
