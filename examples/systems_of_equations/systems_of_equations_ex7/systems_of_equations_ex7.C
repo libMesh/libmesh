@@ -563,6 +563,7 @@ int main (int argc, char ** argv)
 
   NonlinearImplicitSystem & system =
     equation_systems.add_system<NonlinearImplicitSystem> ("NonlinearElasticity");
+  system.preallocate_matrix_memory(false);
 
   unsigned int u_var =
     system.add_variable("u",
