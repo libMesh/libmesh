@@ -97,7 +97,8 @@ System::System (EquationSystems & es,
   _additional_data_written          (false),
   adjoint_already_solved            (false),
   _hide_output                      (false),
-  project_with_constraints          (true)
+  project_with_constraints          (true),
+  _preallocate_matrix_memory        (true)
 {
 }
 
@@ -347,13 +348,19 @@ void System::init_matrices ()
   // Compute the sparsity pattern for the current
   // mesh and DOF distribution.  This also updates
   // additional matrices, \p DofMap now knows them
-  this->get_dof_map().compute_sparsity(this->get_mesh());
+  if (_preallocate_matrix_memory)
+    this->get_dof_map().compute_sparsity(this->get_mesh());
 
   // Initialize matrices and set to zero
-  for (auto & pr : _matrices)
+  for (auto & [name, mat] : _matrices)
     {
-      pr.second->init(_matrix_types[pr.first]);
-      pr.second->zero();
+      if (_preallocate_matrix_memory)
+        {
+          mat->init(_matrix_types[name]);
+          mat->zero();
+        }
+      else
+        mat->init_hash(_matrix_types[name]);
     }
 }
 

@@ -196,6 +196,14 @@ public:
   virtual void init (ParallelType type = PARALLEL) = 0;
 
   /**
+   * Initialize this matrix using global and local size information from the \p dof_map. The
+   * sparsity structure/preallocation is not determined up front but rather deterrmined on-the-fly
+   * using hash table structures (if the backend supports it)
+   * @param type The serial/parallel/ghosted type of the matrix
+   */
+  virtual void init_hash (ParallelType /*type*/ = PARALLEL) { libmesh_not_implemented (); }
+
+  /**
    * Restores the \p SparseMatrix<T> to a pristine state.
    */
   virtual void clear () = 0;

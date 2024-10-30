@@ -129,16 +129,13 @@ PetscMatrix<T>::PetscMatrix(const Parallel::Communicator & comm_in,
 template <typename T>
 PetscMatrix<T>::~PetscMatrix() = default;
 
-
-
 template <typename T>
-void PetscMatrix<T>::init (const numeric_index_type m_in,
-                           const numeric_index_type n_in,
-                           const numeric_index_type m_l,
-                           const numeric_index_type n_l,
-                           const numeric_index_type nnz,
-                           const numeric_index_type noz,
-                           const numeric_index_type blocksize_in)
+void
+PetscMatrix<T>::init_without_preallocation (const numeric_index_type m_in,
+                                            const numeric_index_type n_in,
+                                            const numeric_index_type m_l,
+                                            const numeric_index_type n_l,
+                                            const numeric_index_type blocksize_in)
 {
   // So compilers don't warn when !LIBMESH_ENABLE_BLOCKED_STORAGE
   libmesh_ignore(blocksize_in);
@@ -147,20 +144,16 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   if (this->initialized())
     this->clear();
 
-  this->_is_initialized = true;
-
-
   PetscInt m_global   = static_cast<PetscInt>(m_in);
   PetscInt n_global   = static_cast<PetscInt>(n_in);
   PetscInt m_local    = static_cast<PetscInt>(m_l);
   PetscInt n_local    = static_cast<PetscInt>(n_l);
-  PetscInt n_nz       = static_cast<PetscInt>(nnz);
-  PetscInt n_oz       = static_cast<PetscInt>(noz);
 
   LibmeshPetscCall(MatCreate(this->comm().get(), &this->_mat));
   LibmeshPetscCall(MatSetSizes(this->_mat, m_local, n_local, m_global, n_global));
   PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
   LibmeshPetscCall(MatSetBlockSize(this->_mat,blocksize));
+  LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
   if (blocksize > 1)
@@ -179,12 +172,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       // MatSetFromOptions needs to happen before Preallocation routines
       // since MatSetFromOptions can change matrix type and remove incompatible
       // preallocation
-      LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
       LibmeshPetscCall(MatSetFromOptions(this->_mat));
-      LibmeshPetscCall(MatSeqBAIJSetPreallocation(this->_mat, blocksize, n_nz/blocksize, NULL));
-      LibmeshPetscCall(MatMPIBAIJSetPreallocation(this->_mat, blocksize,
-                                                  n_nz/blocksize, NULL,
-                                                  n_oz/blocksize, NULL));
     }
   else
 #endif
@@ -196,10 +184,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
           // MatSetFromOptions needs to happen before Preallocation routines
           // since MatSetFromOptions can change matrix type and remove incompatible
           // preallocation
-          LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
           LibmeshPetscCall(MatSetFromOptions(this->_mat));
-          LibmeshPetscCall(MatSeqAIJSetPreallocation(this->_mat, n_nz, NULL));
-          LibmeshPetscCall(MatMPIAIJSetPreallocation(this->_mat, n_nz, NULL, n_oz, NULL));
           break;
 
         case HYPRE:
@@ -209,9 +194,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
           // MatSetFromOptions needs to happen before Preallocation routines
           // since MatSetFromOptions can change matrix type and remove incompatible
           // preallocation
-          LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
           LibmeshPetscCall(MatSetFromOptions(this->_mat));
-          LibmeshPetscCall(MatHYPRESetPreallocation(this->_mat, n_nz, NULL, n_oz, NULL));
 #else
           libmesh_error_msg("PETSc 3.9.4 or higher with hypre is required for MatHypre");
 #endif
@@ -225,8 +208,57 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   LibmeshPetscCall(MatSetOption(this->_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
 
   this->set_context ();
-  this->zero ();
 }
+
+
+
+template <typename T>
+void PetscMatrix<T>::init (const numeric_index_type m_in,
+                           const numeric_index_type n_in,
+                           const numeric_index_type m_l,
+                           const numeric_index_type n_l,
+                           const numeric_index_type nnz,
+                           const numeric_index_type noz,
+                           const numeric_index_type blocksize_in)
+{
+  this->init_without_preallocation(m_in, n_in, m_l, n_l, blocksize_in);
+
+  PetscInt n_nz       = static_cast<PetscInt>(nnz);
+  PetscInt n_oz       = static_cast<PetscInt>(noz);
+
+#ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+  if (blocksize > 1)
+    {
+      LibmeshPetscCall(MatSeqBAIJSetPreallocation(this->_mat, blocksize, n_nz/blocksize, NULL));
+      LibmeshPetscCall(MatMPIBAIJSetPreallocation(this->_mat, blocksize,
+                                                  n_nz/blocksize, NULL,
+                                                  n_oz/blocksize, NULL));
+    }
+  else
+#endif
+    {
+      switch (this->_mat_type) {
+        case AIJ:
+          LibmeshPetscCall(MatSeqAIJSetPreallocation(this->_mat, n_nz, NULL));
+          LibmeshPetscCall(MatMPIAIJSetPreallocation(this->_mat, n_nz, NULL, n_oz, NULL));
+          break;
+
+        case HYPRE:
+#if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
+          LibmeshPetscCall(MatHYPRESetPreallocation(this->_mat, n_nz, NULL, n_oz, NULL));
+#else
+          libmesh_error_msg("PETSc 3.9.4 or higher with hypre is required for MatHypre");
+#endif
+          break;
+
+        default: libmesh_error_msg("Unsupported petsc matrix type");
+      }
+    }
+
+  this->zero ();
+  this->_is_initialized = true;
+}
+
 
 
 template <typename T>
@@ -238,47 +270,17 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
                            const std::vector<numeric_index_type> & n_oz,
                            const numeric_index_type blocksize_in)
 {
-  // So compilers don't warn when !LIBMESH_ENABLE_BLOCKED_STORAGE
-  libmesh_ignore(blocksize_in);
-
-  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
-
-  // Clear initialized matrices
-  if (this->initialized())
-    this->clear();
-
-  this->_is_initialized = true;
+  this->init_without_preallocation(m_in, n_in, m_l, n_l, blocksize_in);
 
   // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
   libmesh_assert_equal_to (n_nz.size(), m_l);
   libmesh_assert_equal_to (n_oz.size(), m_l);
 
-  PetscInt m_global   = static_cast<PetscInt>(m_in);
-  PetscInt n_global   = static_cast<PetscInt>(n_in);
-  PetscInt m_local    = static_cast<PetscInt>(m_l);
-  PetscInt n_local    = static_cast<PetscInt>(n_l);
-
-  LibmeshPetscCall(MatCreate(this->comm().get(), &this->_mat));
-  LibmeshPetscCall(MatSetSizes(this->_mat, m_local, n_local, m_global, n_global));
-  LibmeshPetscCall(MatSetBlockSize(this->_mat,blocksize));
-
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
+  PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
+
   if (blocksize > 1)
     {
-      // specified blocksize, bs>1.
-      // double check sizes.
-      libmesh_assert_equal_to (m_local  % blocksize, 0);
-      libmesh_assert_equal_to (n_local  % blocksize, 0);
-      libmesh_assert_equal_to (m_global % blocksize, 0);
-      libmesh_assert_equal_to (n_global % blocksize, 0);
-
-      LibmeshPetscCall(MatSetType(this->_mat, MATBAIJ)); // Automatically chooses seqbaij or mpibaij
-
-      // MatSetFromOptions needs to happen before Preallocation routines
-      // since MatSetFromOptions can change matrix type and remove incompatible
-      // preallocation
-      LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
-      LibmeshPetscCall(MatSetFromOptions(this->_mat));
       // transform the per-entry n_nz and n_oz arrays into their block counterparts.
       std::vector<numeric_index_type> b_n_nz, b_n_oz;
 
@@ -303,13 +305,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
     {
       switch (this->_mat_type) {
         case AIJ:
-          LibmeshPetscCall(MatSetType(this->_mat, MATAIJ)); // Automatically chooses seqaij or mpiaij
-
-          // MatSetFromOptions needs to happen before Preallocation routines
-          // since MatSetFromOptions can change matrix type and remove incompatible
-          // preallocation
-          LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
-          LibmeshPetscCall(MatSetFromOptions(this->_mat));
           LibmeshPetscCall(MatSeqAIJSetPreallocation (this->_mat,
                                                       0,
                                                       numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data())));
@@ -322,13 +317,6 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 
         case HYPRE:
 #if !PETSC_VERSION_LESS_THAN(3,9,4) && LIBMESH_HAVE_PETSC_HYPRE
-          LibmeshPetscCall(MatSetType(this->_mat, MATHYPRE));
-
-          // MatSetFromOptions needs to happen before Preallocation routines
-          // since MatSetFromOptions can change matrix type and remove incompatible
-          // preallocation
-          LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
-          LibmeshPetscCall(MatSetFromOptions(this->_mat));
           LibmeshPetscCall(MatHYPRESetPreallocation (this->_mat,
                                                      0,
                                                      numeric_petsc_cast(n_nz.empty() ? nullptr : n_nz.data()),
@@ -344,10 +332,8 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
 
     }
 
-  // Make it an error for PETSc to allocate new nonzero entries during assembly
-  LibmeshPetscCall(MatSetOption(this->_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
-  this->set_context();
   this->zero();
+  this->_is_initialized = true;
 }
 
 
@@ -365,6 +351,21 @@ void PetscMatrix<T>::init (const ParallelType)
   PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
 
   this->init(m_in, m_in, m_l, m_l, n_nz, n_oz, blocksize);
+}
+
+
+template <typename T>
+void PetscMatrix<T>::init_hash (const ParallelType)
+{
+  libmesh_assert(this->_dof_map);
+
+  const numeric_index_type m_in = this->_dof_map->n_dofs();
+  const numeric_index_type m_l  = this->_dof_map->n_dofs_on_processor(this->processor_id());
+
+  PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
+
+  this->init_without_preallocation(m_in, m_in, m_l, m_l, blocksize);
+  this->_is_initialized = true;
 }
 
 

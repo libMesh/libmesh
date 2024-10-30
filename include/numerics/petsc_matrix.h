@@ -284,7 +284,22 @@ public:
 
   virtual void scale(const T scale) override;
 
+  virtual void init_hash (ParallelType type = PARALLEL) override;
+
 protected:
+  /**
+   * Perform matrix initialization steps sans preallocation
+   * @param m The global number of rows
+   * @param n The global number of columns
+   * @param m_l The local number of rows
+   * @param n_l The local number of columns
+   * @param blocksize The matrix block size
+   */
+  void init_without_preallocation (numeric_index_type m,
+                                   numeric_index_type n,
+                                   numeric_index_type m_l,
+                                   numeric_index_type n_l,
+                                   numeric_index_type blocksize);
 
   /**
    * This function either creates or re-initializes a matrix called \p

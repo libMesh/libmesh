@@ -1923,6 +1923,14 @@ public:
   SparseMatrix<Number> & get_matrix (std::string_view mat_name);
 
 
+  /**
+   * Sets whether matrix memory should be preallocated or not. The default is to preallocate. If
+   * matrix memory is not to be preallocated, then we will not compute a sparsity pattern. For a
+   * PETSc backend, if matrix memory is not preallocated, then a hash table is used until the matrix
+   * is assembled
+   */
+  void preallocate_matrix_memory(bool preallocate);
+
 protected:
 
   /**
@@ -2293,6 +2301,12 @@ private:
    * Do we want to apply constraints while projecting vectors ?
    */
   bool project_with_constraints;
+
+  /**
+   * Whether matrix memory should be preallocated. This coincides with whether we will compute a
+   * sparsity pattern
+   */
+  bool _preallocate_matrix_memory;
 };
 
 
@@ -2685,6 +2699,14 @@ System::add_matrix (std::string_view mat_name,
   return mat;
 }
 
+inline void
+System::preallocate_matrix_memory(const bool preallocate)
+{
+  libmesh_error_msg_if(
+      _matrices_initialized,
+      "System::preallocate_matrix_memory() should be called before matrices are initialized");
+  _preallocate_matrix_memory = preallocate;
+}
 
 } // namespace libMesh
 
