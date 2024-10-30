@@ -1269,6 +1269,20 @@ void PetscMatrix<T>::scale(const T scale)
   LibmeshPetscCall(MatScale(this->_mat, scale));
 }
 
+#if PETSC_RELEASE_GREATER_EQUALS(3,23,0)
+template <typename T>
+PetscMatrix<T>
+PetscMatrix<T>::copy_from_hash ()
+{
+  Mat xaij;
+  libmesh_assert(this->initialized());
+  libmesh_assert(!this->closed());
+  LibmeshPetscCall(MatDuplicate(this->_mat, MAT_DO_NOT_COPY_VALUES, &xaij));
+  LibmeshPetscCall(MatCopyHashToXAIJ(this->_mat, xaij));
+  return PetscMatrix<T>{xaij, this->comm(), /*destroy_on_exit=*/true};
+}
+#endif
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT PetscMatrix<Number>;

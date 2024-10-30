@@ -287,6 +287,10 @@ public:
 
   virtual void init_hash (ParallelType type = PARALLEL) override;
 
+#if PETSC_RELEASE_GREATER_EQUALS(3,23,0)
+  PetscMatrix<T> copy_from_hash();
+#endif
+
 protected:
   /**
    * Perform matrix initialization steps sans preallocation
