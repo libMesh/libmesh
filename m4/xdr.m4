@@ -55,7 +55,7 @@ AC_DEFUN([CONFIGURE_XDR],
   # not specify this option, we assume the desired RPC libraries are
   # already in the user's linker path.
   AC_ARG_WITH(xdr-libdir,
-              AS_HELP_STRING([--with-xdr-libdir=/foo/bar],[Specify directory of the XDR library to be appended to -L when linking]),
+              AS_HELP_STRING([--with-xdr-libdir=/foo/bar],[Specify XDR library directory to be searched when linking]),
               withxdrlibdir=$withval,
               withxdrlibdir=no)
 
@@ -80,7 +80,7 @@ AC_DEFUN([CONFIGURE_XDR],
           AS_IF([test "x$withxdrlibname" = "xno"],
                 [AC_MSG_ERROR([xdr-libdir was set to $withxdrlibdir, but no xdr-libname was set])
                 ])
-          XDRLINKLIBS="-L$withxdrlibdir $XDRLINKLIBS"
+          XDRLINKLIBS="${RPATHFLAG}$withxdrlibdir $XDRLINKLIBS"
         ])
 
   dnl If there is a user-provided XDR include/library provided, then we only
