@@ -2206,8 +2206,8 @@ Optional Packages:
                           objects per DistributedMesh mapvector chunk [1]
   --with-xdr-include=PATH Specify the path for RPC headers required by XDR
   --with-xdr-libdir=/foo/bar
-                          Specify directory of the XDR library to be appended
-                          to -L when linking
+                          Specify XDR library directory to be searched when
+                          linking
   --with-xdr-libname=foo  Specify name of the XDR library to be appended to -l
                           when linking
   --with-boost[=ARG]      use Boost library from a standard location
@@ -49749,9 +49749,8 @@ fi
 
 
   # Support for --with-xdr-libname configure option.  If the user does
-  # not specify this option, it defaults to "tirpc" since that seems
-  # to be the current standard way of linking "external" RPC
-  # libraries.
+  # not specify this option, we do check "tirpc" since that seems to
+  # be the most common way of linking "external" RPC libraries.
 
 # Check whether --with-xdr-libname was given.
 if test ${with_xdr_libname+y}
@@ -49779,7 +49778,7 @@ then :
   as_fn_error $? "xdr-libdir was set to $withxdrlibdir, but no xdr-libname was set" "$LINENO" 5
 
 fi
-          XDRLINKLIBS="-L$withxdrlibdir $XDRLINKLIBS"
+          XDRLINKLIBS="${RPATHFLAG}$withxdrlibdir $XDRLINKLIBS"
 
 fi
 
@@ -49964,6 +49963,62 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
     CPPFLAGS="$old_CPPFLAGS"
   LIBS="$old_LIBS"
 
+
+                    if test "x$enablexdr" = "xno" && test "x$withxdrlibname" = "xno"
+then :
+
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR support via libtirpc" >&5
+printf %s "checking for XDR support via libtirpc... " >&6; }
+                  XDRLINKLIBS="-ltirpc"
+
+
+  old_CPPFLAGS="$CPPFLAGS"
+  old_LIBS="$LIBS"
+  CPPFLAGS="$CPPFLAGS $XDRINCLUDES"
+  LIBS="$LIBS $XDRLINKLIBS"
+
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+                                   #include <rpc/rpc.h>
+                                   #include <rpc/xdr.h>
+int
+main (void)
+{
+
+                                    XDR * xdr;
+                                    FILE * fp;
+                                    xdrstdio_create(xdr, fp, XDR_ENCODE);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+
+                   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+
+printf "%s\n" "#define HAVE_XDR 1" >>confdefs.h
+
+                   enablexdr=yes
+
+else $as_nop
+
+                   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+                   enablexdr=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+
+    CPPFLAGS="$old_CPPFLAGS"
+  LIBS="$old_LIBS"
+
+
+fi
 
                     if test "x$enablexdr" = "xno" && test "x$withxdrlibdir" = "xno"
 then :
