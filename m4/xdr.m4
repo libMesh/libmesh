@@ -60,9 +60,8 @@ AC_DEFUN([CONFIGURE_XDR],
               withxdrlibdir=no)
 
   # Support for --with-xdr-libname configure option.  If the user does
-  # not specify this option, it defaults to "tirpc" since that seems
-  # to be the current standard way of linking "external" RPC
-  # libraries.
+  # not specify this option, we do check "tirpc" since that seems to
+  # be the most common way of linking "external" RPC libraries.
   AC_ARG_WITH(xdr-libname,
               AS_HELP_STRING([--with-xdr-libname=foo],[Specify name of the XDR library to be appended to -l when linking]),
               withxdrlibname=$withval,
