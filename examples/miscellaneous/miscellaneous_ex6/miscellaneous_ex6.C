@@ -155,8 +155,10 @@ void triangulate_domain(const Parallel::Communicator & comm)
   // Triangulate!
   t.triangulate();
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   // Write the result to file
   mesh.write("delaunay_l_shaped_hole.e");
+#endif
 
 #else
   // Avoid compiler warnings
@@ -228,7 +230,10 @@ void tetrahedralize_domain(const Parallel::Communicator & comm)
   mesh.prepare_for_use();
 
   // Finally, write out the result
+#ifdef LIBMESH_HAVE_EXODUS_API
   mesh.write("hole_3D.e");
+#endif
+
 #else
   // Avoid compiler warnings
   libmesh_ignore(comm);
