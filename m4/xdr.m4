@@ -119,6 +119,15 @@ AC_DEFUN([CONFIGURE_XDR],
 
           TEST_XDR
 
+          dnl Check again for an explicitly named library.
+          AS_IF([test "x$enablexdr" = "xno" && test "x$withxdrlibname" = "xno"],
+                [
+                  AC_MSG_CHECKING([for XDR support via libtirpc])
+                  XDRLINKLIBS="-ltirpc"
+
+                  TEST_XDR
+               ])
+
           dnl Check again for headers in /usr/include/tirpc. (Fedora 28 does this.)
           AS_IF([test "x$enablexdr" = "xno" && test "x$withxdrlibdir" = "xno"],
                 [
