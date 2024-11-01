@@ -81,7 +81,7 @@ run_example() {
 
         message_running "$example_name" "$executable" "$common_run_example_options"
 
-        $LIBMESH_RUN ./"$executable" "$common_run_example_options" "$LIBMESH_OPTIONS"
+        $LIBMESH_RUN ./"$executable" $common_run_example_options $LIBMESH_OPTIONS
         RETVAL=$?
         # If we don't return 'success' or 'skip', quit
         if [ $RETVAL -ne 0 ] && [ $RETVAL -ne 77 ]; then
@@ -126,7 +126,7 @@ benchmark_example() {
 
     message_running "$example_name" "$executable" "$common_benchmark_example_options"
 
-    $LIBMESH_RUN ./"$executable" "$common_benchmark_example_options" "$LIBMESH_OPTIONS"
+    $LIBMESH_RUN ./"$executable" $common_benchmark_example_options $LIBMESH_OPTIONS
     RETVAL=$?
     # If we don't return 'success' or 'skip', quit
     if [ $RETVAL -ne 0 ] && [ $RETVAL -ne 77 ]; then
