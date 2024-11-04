@@ -1264,6 +1264,7 @@ enable_nested
 enable_xdr_required
 enable_xdr
 with_xdr_include
+with_xdr_libdir
 with_xdr_libname
 enable_boost
 with_boost
@@ -2204,6 +2205,9 @@ Optional Packages:
   --with-mapvector-chunk-size=<uint, e.g. 64>
                           objects per DistributedMesh mapvector chunk [1]
   --with-xdr-include=PATH Specify the path for RPC headers required by XDR
+  --with-xdr-libdir=/foo/bar
+                          Specify XDR library directory to be searched when
+                          linking
   --with-xdr-libname=foo  Specify name of the XDR library to be appended to -l
                           when linking
   --with-boost[=ARG]      use Boost library from a standard location
@@ -49709,14 +49713,18 @@ else $as_nop
 fi
 
 
-if test "x${TIRPC_DIR}" != "x"
+if test "x$enablexdr" != "xno"
+then :
+
+
+      if test "x${TIRPC_DIR}" != "x"
 then :
   withxdrinc_default=${TIRPC_DIR}
 else $as_nop
   withxdrinc_default=no
 fi
 
-# Support for --with-xdr-include configure option
+  # Support for --with-xdr-include configure option
 
 # Check whether --with-xdr-include was given.
 if test ${with_xdr_include+y}
@@ -49727,34 +49735,72 @@ else $as_nop
 fi
 
 
-# Support for --with-xdr-libname configure option. Note that we currently
-# do not provide a way to specify a library PATH, but that could potentially
-# be added. If the user does not specify this option, it defaults to "tirpc"
-# since that seems to be the current standard way of linking "external" RPC
-# libraries.
+  # Support for --with-xdr-libdir configure option.  If the user does
+  # not specify this option, we assume the desired RPC libraries are
+  # already in the user's linker path.
+
+# Check whether --with-xdr-libdir was given.
+if test ${with_xdr_libdir+y}
+then :
+  withval=$with_xdr_libdir; withxdrlibdir=$withval
+else $as_nop
+  withxdrlibdir=no
+fi
+
+
+  # Support for --with-xdr-libname configure option.  If the user does
+  # not specify this option, we do check "tirpc" since that seems to
+  # be the most common way of linking "external" RPC libraries.
 
 # Check whether --with-xdr-libname was given.
 if test ${with_xdr_libname+y}
 then :
   withval=$with_xdr_libname; withxdrlibname=$withval
 else $as_nop
-  withxdrlibname=tirpc
+  withxdrlibname=no
 fi
 
 
-if test "$enablexdr" != no
+  XDRINCLUDES=''
+  XDRLINKLIBS=''
+  if test "x$withxdrlibname" != "xno"
 then :
 
-                        if test "x$withxdrinc" != "xno"
+          XDRLINKLIBS="-l$withxdrlibname"
+
+fi
+
+  if test "x$withxdrlibdir" != "xno"
 then :
 
-              { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR support in $withxdrinc" >&5
+          if test "x$withxdrlibname" = "xno"
+then :
+  as_fn_error $? "xdr-libdir was set to $withxdrlibdir, but no xdr-libname was set" "$LINENO" 5
+
+fi
+          XDRLINKLIBS="${RPATHFLAG}$withxdrlibdir $XDRLINKLIBS"
+
+fi
+
+        if test "x$withxdrinc" != "xno"
+then :
+
+          XDRINCLUDES="-I$withxdrinc"
+
+          if test "x$withxdrlibdir" != "xno"
+then :
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR support in $withxdrinc and $withxdrlibdir" >&5
+printf %s "checking for XDR support in $withxdrinc and $withxdrlibdir... " >&6; }
+else $as_nop
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR support in $withxdrinc" >&5
 printf %s "checking for XDR support in $withxdrinc... " >&6; }
-              old_CPPFLAGS="$CPPFLAGS"
-              old_LIBS="$LIBS"
-              CPPFLAGS="$CPPFLAGS -I$withxdrinc"
-              LIBS="$LIBS -l$withxdrlibname"
+fi
 
+
+  old_CPPFLAGS="$CPPFLAGS"
+  old_LIBS="$LIBS"
+  CPPFLAGS="$CPPFLAGS $XDRINCLUDES"
+  LIBS="$LIBS $XDRLINKLIBS"
 
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -49793,23 +49839,89 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
 
+    CPPFLAGS="$old_CPPFLAGS"
+  LIBS="$old_LIBS"
 
-                            if test "x$enablexdr" = "xyes"
+
+                              if test "x$withxdrlibname" = "xno"
 then :
 
-                      libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I$withxdrinc"
-                      libmesh_optional_LIBS="$libmesh_optional_LIBS -l$withxdrlibname"
+                  if test "x$withxdrlibdir" != "xno"
+then :
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR support in $withxdrinc and $withxdrlibdir with -ltirpc" >&5
+printf %s "checking for XDR support in $withxdrinc and $withxdrlibdir with -ltirpc... " >&6; }
+else $as_nop
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR support in $withxdrinc with -ltirpc" >&5
+printf %s "checking for XDR support in $withxdrinc with -ltirpc... " >&6; }
+fi
+                  XDRLINKLIBS="$XDRLINKLIBS -ltirpc"
+
+
+  old_CPPFLAGS="$CPPFLAGS"
+  old_LIBS="$LIBS"
+  CPPFLAGS="$CPPFLAGS $XDRINCLUDES"
+  LIBS="$LIBS $XDRLINKLIBS"
+
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+                                   #include <rpc/rpc.h>
+                                   #include <rpc/xdr.h>
+int
+main (void)
+{
+
+                                    XDR * xdr;
+                                    FILE * fp;
+                                    xdrstdio_create(xdr, fp, XDR_ENCODE);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+
+                   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+
+printf "%s\n" "#define HAVE_XDR 1" >>confdefs.h
+
+                   enablexdr=yes
+
+else $as_nop
+
+                   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+                   enablexdr=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+
+    CPPFLAGS="$old_CPPFLAGS"
+  LIBS="$old_LIBS"
+
 
 fi
 
-                            CPPFLAGS="$old_CPPFLAGS"
-              LIBS="$old_LIBS"
+else $as_nop
 
-elif test "x$withxdrinc" = "xno"
+
+          if test "x$withxdrlibdir" != "xno"
 then :
-
-                                                                      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for built-in XDR support" >&5
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR library in $withxdrlibdir" >&5
+printf %s "checking for XDR library in $withxdrlibdir... " >&6; }
+else $as_nop
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for built-in XDR support" >&5
 printf %s "checking for built-in XDR support... " >&6; }
+fi
+
+
+  old_CPPFLAGS="$CPPFLAGS"
+  old_LIBS="$LIBS"
+  CPPFLAGS="$CPPFLAGS $XDRINCLUDES"
+  LIBS="$LIBS $XDRLINKLIBS"
 
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -49848,17 +49960,79 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
 
+    CPPFLAGS="$old_CPPFLAGS"
+  LIBS="$old_LIBS"
 
-                            if test "x$enablexdr" = "xno"
+
+                    if test "x$enablexdr" = "xno" && test "x$withxdrlibname" = "xno"
 then :
 
-                      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR support in /usr/include/tirpc" >&5
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR support via libtirpc" >&5
+printf %s "checking for XDR support via libtirpc... " >&6; }
+                  XDRLINKLIBS="-ltirpc"
+
+
+  old_CPPFLAGS="$CPPFLAGS"
+  old_LIBS="$LIBS"
+  CPPFLAGS="$CPPFLAGS $XDRINCLUDES"
+  LIBS="$LIBS $XDRLINKLIBS"
+
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+                                   #include <rpc/rpc.h>
+                                   #include <rpc/xdr.h>
+int
+main (void)
+{
+
+                                    XDR * xdr;
+                                    FILE * fp;
+                                    xdrstdio_create(xdr, fp, XDR_ENCODE);
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+
+                   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+
+printf "%s\n" "#define HAVE_XDR 1" >>confdefs.h
+
+                   enablexdr=yes
+
+else $as_nop
+
+                   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+                   enablexdr=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+
+    CPPFLAGS="$old_CPPFLAGS"
+  LIBS="$old_LIBS"
+
+
+fi
+
+                    if test "x$enablexdr" = "xno" && test "x$withxdrlibdir" = "xno"
+then :
+
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for XDR support in /usr/include/tirpc" >&5
 printf %s "checking for XDR support in /usr/include/tirpc... " >&6; }
-                      old_CPPFLAGS="$CPPFLAGS"
-                      old_LIBS="$LIBS"
-                      CPPFLAGS="$CPPFLAGS -I/usr/include/tirpc"
-                      LIBS="$LIBS -ltirpc"
+                  XDRINCLUDES="-I/usr/include/tirpc"
+                  XDRLINKLIBS="-ltirpc"
 
+
+  old_CPPFLAGS="$CPPFLAGS"
+  old_LIBS="$LIBS"
+  CPPFLAGS="$CPPFLAGS $XDRINCLUDES"
+  LIBS="$LIBS $XDRLINKLIBS"
 
   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -49897,21 +50071,30 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
 
+    CPPFLAGS="$old_CPPFLAGS"
+  LIBS="$old_LIBS"
 
-                                            if test "x$enablexdr" = "xyes"
+
+fi
+
+fi
+
+    if test "x$enablexdr" = "xno"
 then :
 
-                              libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I/usr/include/tirpc"
-                              libmesh_optional_LIBS="$libmesh_optional_LIBS -ltirpc"
+          XDRINCLUDES=''
+          XDRLINKLIBS=''
 
 fi
 
-                                            CPPFLAGS="$old_CPPFLAGS"
-                      LIBS="$old_LIBS"
 
 fi
 
-fi
+if test "x$enablexdr" != "xno"
+then :
+
+        libmesh_optional_INCLUDES="$XDRINCLUDES $libmesh_optional_INCLUDES"
+        libmesh_optional_LIBS="$XDRLINKLIBS $libmesh_optional_LIBS"
 
 fi
 
