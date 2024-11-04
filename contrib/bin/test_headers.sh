@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script assumes you have libMesh installed at $LIBMESH_DIR, and
 # calls test_installed_headers.sh with specific arguments.
