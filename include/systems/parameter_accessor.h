@@ -112,7 +112,7 @@ public:
   /**
    * Setter: change the value of the parameter we access.
    */
-  ParameterProxy & operator = (const ParameterProxy<T> & new_value) { _accessor.set(new_value.get()); }
+  ParameterProxy & operator = (const ParameterProxy<T> & new_value) { _accessor.set(new_value._accessor.get()); return *this; }
 
   /**
    * Setter: change the value of the parameter we access.
@@ -143,6 +143,11 @@ public:
    * Getter: get the value of the parameter we access.
    */
   operator T () const { return _accessor.get(); }
+
+  /**
+   * Getter: get the value of the parameter we access.
+   */
+  T get() const { return _accessor.get(); }
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
   operator boost::multiprecision::backends::float128_backend () const { return _accessor.get().backend(); }
