@@ -6,10 +6,10 @@
 # libMesh installed in $LIBMESH_DIR.
 
 # You can run the script on a single header file by doing:
-# test_CXXFLAGS="`$LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include`" HEADERS_TO_TEST=exact_solution.h ./contrib/bin/test_installed_headers.sh
+# CXX=$($LIBMESH_DIR/bin/libmesh-config --cxx) test_CXXFLAGS="$($LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include)" HEADERS_TO_TEST=exact_solution.h ./contrib/bin/test_installed_headers.sh
 
 # To run this script on *every* header file in an installed libMesh:
-# test_CXXFLAGS="`$LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include`" HEADERS_TO_TEST="`find $LIBMESH_DIR/include/libmesh -name "*.h" -type f -exec basename {} \;`" ./contrib/bin/test_installed_headers.sh
+# CXX=$($LIBMESH_DIR/bin/libmesh-config --cxx) test_CXXFLAGS="$($LIBMESH_DIR/bin/libmesh-config --cppflags --cxxflags --include)" HEADERS_TO_TEST="$(find $LIBMESH_DIR/include/libmesh -name "*.h" -type f -exec basename {} \;)" ./contrib/bin/test_installed_headers.sh
 
 # Respect the JOBS environment variable, if it is set
 if [ -n "$JOBS" ]; then
@@ -39,14 +39,10 @@ if (test "X$TERM" != Xdumb && { test -t 1; } 2>/dev/null); then
   colorreset="\033[m"; # Terminal command to reset to terminal default
 fi
 
-# If $CXX is not set in the environment, then get it from libmesh-config script
+# Throw an error If $CXX is not set
 if test "$CXX" = ""; then
-    if test -x $LIBMESH_DIR/bin/libmesh-config; then
-        CXX=$($LIBMESH_DIR/bin/libmesh-config --cxx)
-    else
-        echo "You must set a valid compiler in the environment variable \$CXX"
-        exit 1
-    fi
+    echo "You must set a valid compiler in the environment variable \$CXX"
+    exit 1
 fi
 
 #echo "CXX=$CXX"
