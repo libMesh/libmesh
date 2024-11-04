@@ -31,7 +31,7 @@ echo ""
 echo ""
 } >> include_HEADERS
 
-headers=`find base enums error_estimation fe geom mesh numerics parallel partitioning timpi_shims physics quadrature reduced_basis solution_transfer solvers systems utils -name "*.h" -o -name "*specializations" -type f | LC_COLLATE=POSIX sort`
+headers=$(find base enums error_estimation fe geom mesh numerics parallel partitioning timpi_shims physics quadrature reduced_basis solution_transfer solvers systems utils -name "*.h" -o -name "*specializations" -type f | LC_COLLATE=POSIX sort)
 headers="libmesh_config.h $headers"
 
 {
