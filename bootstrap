@@ -1,5 +1,4 @@
-#! /bin/bash
-# $Id$
+#!/bin/bash
 #
 # bootstrap: Utility to easy autoconf/automake toolchain setup on
 #            checkout from revision control.
@@ -21,10 +20,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-dir=`echo "$0" | sed 's,[^/]*$,,'`
-test "x${dir}" = "x" && dir='.'
+dir=$(echo "$0" | sed 's,[^/]*$,,')
+test "${dir}" = "" && dir='.'
 
-if (test "x`cd "${dir}" 2>/dev/null && pwd`" != "x`pwd`"); then
+if test "$(cd "${dir}" 2>/dev/null && pwd)" != "$(pwd)"; then
     echo "This script must be executed directly from the source directory."
     exit 1
 fi
@@ -43,72 +42,71 @@ function check_autotool_prerequisites ()
 
     build_autotools=0
 
-
-    autoreconf=`which autoreconf 2>/dev/null`
-    if (test "x$autoreconf" != "x"); then
-	if (test -x $autoreconf); then
-	    autoconf_version=`$autoreconf --version | grep " $autoconf_major\." | cut -d"." -f2`
-	    if (test $autoconf_version -lt $autoconf_minor); then
-		echo "Autoconf Version $autoconf_major.$autoconf_version too old, building a new one..."
-		build_autotools=1
-	    else
-		version_id=`$autoreconf --version 2>&1 | grep "(GNU Autoconf)"`
-		echo "Using autoconf ($version_id)"
-	    fi
-	else
-	    build_autotools=1
-	fi
+    autoreconf=$(which autoreconf 2>/dev/null)
+    if test "$autoreconf" != ""; then
+        if test -x $autoreconf; then
+            autoconf_version=$($autoreconf --version | grep " $autoconf_major\." | cut -d"." -f2)
+            if test $autoconf_version -lt $autoconf_minor; then
+                echo "Autoconf Version $autoconf_major.$autoconf_version too old, building a new one..."
+                build_autotools=1
+            else
+                version_id=$($autoreconf --version 2>&1 | grep "(GNU Autoconf)")
+                echo "Using autoconf ($version_id)"
+            fi
+        else
+            build_autotools=1
+        fi
     else
-	build_autotools=1
+        build_autotools=1
     fi
 
 
-    libtool=`which glibtool 2>/dev/null`
-    if (test "x$libtool" = "x"); then
-	libtool=`which libtool 2>/dev/null`
+    libtool=$(which glibtool 2>/dev/null)
+    if test "$libtool" = ""; then
+        libtool=$(which libtool 2>/dev/null)
     fi
-    if (test "x$libtool" != "x"); then
-	if (test -x $libtool); then
-	    libtool_version=`$libtool --version 2>&1 | grep "(GNU libtool)"`
+    if test "$libtool" != ""; then
+        if test -x $libtool; then
+            libtool_version=$($libtool --version 2>&1 | grep "(GNU libtool)")
 
-	    case "$libtool_version" in
-		*2.4* | *2.2*)
-		    echo "Using libtool ($libtool_version)"
-		    ;;
-		*)
-	            echo "Indaequate Libtool ($libtool_version), building a new one..."
-		    build_autotools=1
-	    esac
-	else
-	    build_autotools=1
-	fi
+            case "$libtool_version" in
+                *2.4* | *2.2*)
+                    echo "Using libtool ($libtool_version)"
+                    ;;
+                *)
+                    echo "Indaequate Libtool ($libtool_version), building a new one..."
+                    build_autotools=1
+            esac
+        else
+            build_autotools=1
+        fi
     else
-	build_autotools=1
+        build_autotools=1
     fi
 
 
-    automake=`which automake 2>/dev/null`
-    if (test "x$automake" != "x"); then
-	if (test -x $automake); then
-	    automake_minor_version=`$automake --version | grep " $automake_major\." | cut -d"." -f2`
-	    if (test $automake_minor_version -lt $automake_minor); then
-		echo "Automake Version $automake_major.$automake_minor_version too old, building a new one..."
-		build_autotools=1
-	    else
-	        automake_subminor_version=`$automake --version | grep " $automake_major\." | cut -d"." -f3`
-		version_id=`$automake --version 2>&1 | grep "(GNU automake)"`
-	        if (test $automake_subminor_version -lt $automake_subminor); then
-		    echo "Automake Version $version_id too old, building a new one..."
-		    build_autotools=1
-	        else
-		    echo "Using automake ($version_id)"
-	        fi
-	    fi
-	else
-	    build_autotools=1
-	fi
+    automake=$(which automake 2>/dev/null)
+    if test "$automake" != ""; then
+        if test -x $automake; then
+            automake_minor_version=$($automake --version | grep " $automake_major\." | cut -d"." -f2)
+            if test $automake_minor_version -lt $automake_minor; then
+                echo "Automake Version $automake_major.$automake_minor_version too old, building a new one..."
+                build_autotools=1
+            else
+                automake_subminor_version=$($automake --version | grep " $automake_major\." | cut -d"." -f3)
+                version_id=$($automake --version 2>&1 | grep "(GNU automake)")
+                if test $automake_subminor_version -lt $automake_subminor; then
+                    echo "Automake Version $version_id too old, building a new one..."
+                    build_autotools=1
+                else
+                    echo "Using automake ($version_id)"
+                fi
+            fi
+        else
+            build_autotools=1
+        fi
     else
-	build_autotools=1
+        build_autotools=1
     fi
 
 
@@ -123,56 +121,56 @@ build_autotools=$?
 
 #########################################################################################
 for arg in $@; do
-    if (test "x$arg" = "x--build-autotools"); then
-	echo "building autotools at user request"
-	build_autotools=1
+    if test "x$arg" = "x--build-autotools"; then
+        echo "building autotools at user request"
+        build_autotools=1
     fi
 done
 
 
 #########################################################################################
-if (test "x$build_autotools" = "x1"); then
+if test "$build_autotools" = "1"; then
     # when there is no autoreconf try to actually build one.
     echo "Inadequate autotools in your path, I'll build new ones..."
 
-    top_srcdir=`pwd`
+    top_srcdir=$(pwd)
     autotools_distdir=$top_srcdir/contrib/autotools
 
 
-    if (test -d $autotools_distdir); then
+    if test -d $autotools_distdir; then
     # set the path to use the new tools as they are installed.
     # for example, the new autoconf is needed to build automake.
-	PATH=$autotools_distdir/bin:$PATH
-	for tool in autoconf-2.71 automake-1.16.5 libtool-2.4.7 ; do
-	    cd $autotools_distdir
-	    echo "  building $tool in $autotools_distdir"
-	    tar zxf $tool.tar.gz
-	    cd $tool && ./configure --prefix=$autotools_distdir >/dev/null && make install >/dev/null
-	    cd .. && rm -rf $tool
-	done
+        PATH=$autotools_distdir/bin:$PATH
+        for tool in autoconf-2.71 automake-1.16.5 libtool-2.4.7 ; do
+            cd $autotools_distdir
+            echo "  building $tool in $autotools_distdir"
+            tar zxf $tool.tar.gz
+            cd $tool && ./configure --prefix=$autotools_distdir >/dev/null && make install >/dev/null
+            cd .. && rm -rf $tool
+        done
 
-	cd $top_srcdir
+        cd $top_srcdir
 
-	if (test -x $autotools_distdir/bin/autoreconf -a -x $autotools_distdir/bin/automake -a -x $autotools_distdir/bin/libtool); then
-	    echo " "
-	    echo " --> successfully installed autoreconf in $autotools_distdir/bin - please update your PATH and try again!"
-	    echo " "
-	    PATH=$autotools_distdir/bin:$PATH ./$0
-	    exit 0
-	fi
+        if test -x $autotools_distdir/bin/autoreconf -a -x $autotools_distdir/bin/automake -a -x $autotools_distdir/bin/libtool; then
+            echo " "
+            echo " --> successfully installed autoreconf in $autotools_distdir/bin - please update your PATH and try again!"
+            echo " "
+            PATH=$autotools_distdir/bin:$PATH ./$0
+            exit 0
+        fi
     fi
 fi
 #########################################################################################
 
 
 
-autoreconf=`which autoreconf 2>/dev/null`
+autoreconf=$(which autoreconf 2>/dev/null)
 # prefer autoreconf when it is available
-if (test "x$autoreconf" != "x"); then
-    if (test -x $autoreconf); then
-	$autoreconf -iv --force
-	patch -p1 <build-aux/compile.patch
-	exit 0
+if test "$autoreconf" != ""; then
+    if test -x $autoreconf; then
+        $autoreconf -iv --force
+        patch -p1 <build-aux/compile.patch
+        exit 0
     fi
 fi
 
