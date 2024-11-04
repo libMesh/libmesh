@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 python3 libmesh_pagehits.py
 python3 libmesh_citations.py
