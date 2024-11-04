@@ -1,4 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# This script requires bash because it stores the output of a command
+# in an array using bash array syntax. We get bash from the user's PATH
+# rather than assuming it will always be found in /bin.
 
 # This script detabs (and reindents) a file using emacs-style indentation.
 if test $# -lt 1; then
