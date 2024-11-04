@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # these specific headers are required to build libMesh
 # but we do not want to install them!
