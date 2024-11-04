@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # This is a wrapper for dot to create pretty class diagrams
 # corresponding to the libMesh web page style
