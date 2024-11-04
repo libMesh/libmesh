@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Write pretty status message
 message_running() {
