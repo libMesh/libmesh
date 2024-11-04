@@ -38,15 +38,16 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
 #if LIBMESH_DIM > 1
   libmesh_assert(elem);
 
-  const Order total_order = order + add_p_level*elem->p_level();
-  libmesh_assert_less(i, n_dofs(elem->type(), total_order));
-  const char sign = i >= total_order * elem->n_edges() || elem->point(i / total_order) > elem->point((i / total_order + 1) % elem->n_vertices()) ? 1 : -1;
-  const unsigned int ii = sign > 0 ? i : (i / total_order * 2 + 1) * total_order - 1 - i;
+  const Order totalorder = order + add_p_level*elem->p_level();
+  libmesh_assert_less(i, n_dofs(elem->type(), totalorder));
+
+  const char sign = i >= totalorder * elem->n_edges() || elem->positive_edge_orientation(i / totalorder) ? 1 : -1;
+  const unsigned int ii = sign > 0 ? i : (i / totalorder * 2 + 1) * totalorder - 1 - i;
 
   const Real xi  = p(0);
   const Real eta = p(1);
 
-  switch (total_order)
+  switch (totalorder)
     {
       // linear Nedelec (first kind) shape functions
     case FIRST:
@@ -669,7 +670,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape(const Elem * elem,
 
       // unsupported order
     default:
-      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
+      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << totalorder);
     }
 #else // LIBMESH_DIM > 1
   libmesh_ignore(elem, order, i, p, add_p_level);
@@ -713,16 +714,16 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
   libmesh_assert(elem);
   libmesh_assert_less (j, 2);
 
-  const Order total_order = order + add_p_level*elem->p_level();
-  libmesh_assert_less(i, n_dofs(elem->type(), total_order));
+  const Order totalorder = order + add_p_level*elem->p_level();
+  libmesh_assert_less(i, n_dofs(elem->type(), totalorder));
 
-  const char sign = i >= total_order * elem->n_edges() || elem->point(i / total_order) > elem->point((i / total_order + 1) % elem->n_vertices()) ? 1 : -1;
-  const unsigned int ii = sign > 0 ? i : (i / total_order * 2 + 1) * total_order - 1 - i;
+  const char sign = i >= totalorder * elem->n_edges() || elem->positive_edge_orientation(i / totalorder) ? 1 : -1;
+  const unsigned int ii = sign > 0 ? i : (i / totalorder * 2 + 1) * totalorder - 1 - i;
 
   const Real xi  = p(0);
   const Real eta = p(1);
 
-  switch (total_order)
+  switch (totalorder)
     {
       // linear Nedelec (first kind) shape function first derivatives
     case FIRST:
@@ -1963,7 +1964,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_deriv(const Elem * elem,
 
       // unsupported order
     default:
-      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
+      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << totalorder);
     }
 #else // LIBMESH_DIM > 1
   libmesh_ignore(elem, order, i, j, add_p_level);
@@ -2017,16 +2018,16 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
   // j = 2 ==> d^2 phi / deta^2
   libmesh_assert_less (j, 3);
 
-  const Order total_order = order + add_p_level*elem->p_level();
-  libmesh_assert_less(i, n_dofs(elem->type(), total_order));
+  const Order totalorder = order + add_p_level*elem->p_level();
+  libmesh_assert_less(i, n_dofs(elem->type(), totalorder));
 
-  const char sign = i >= total_order * elem->n_edges() || elem->point(i / total_order) > elem->point((i / total_order + 1) % elem->n_vertices()) ? 1 : -1;
-  const unsigned int ii = sign > 0 ? i : (i / total_order * 2 + 1) * total_order - 1 - i;
+  const char sign = i >= totalorder * elem->n_edges() || elem->positive_edge_orientation(i / totalorder) ? 1 : -1;
+  const unsigned int ii = sign > 0 ? i : (i / totalorder * 2 + 1) * totalorder - 1 - i;
 
   const Real xi  = p(0);
   const Real eta = p(1);
 
-  switch (total_order)
+  switch (totalorder)
     {
       // linear Nedelec (first kind) shape function second derivatives
     case FIRST:
@@ -3717,7 +3718,7 @@ RealGradient FE<2,NEDELEC_ONE>::shape_second_deriv(const Elem * elem,
 
       // unsupported order
     default:
-      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << total_order);
+      libmesh_error_msg("ERROR: Unsupported 2D FE order!: " << totalorder);
 
     } // end switch (order)
 
