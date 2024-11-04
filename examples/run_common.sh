@@ -6,7 +6,7 @@ message_running() {
     shift
     executable=$1
     shift
-    options=$@
+    options=$*
 
     echo "***************************************************************"
     echo "* Running Example $example_name:"
@@ -22,7 +22,7 @@ message_done_running() {
     shift
     executable=$1
     shift
-    options=$@
+    options=$*
 
     echo " "
     echo "***************************************************************"
@@ -33,22 +33,22 @@ message_done_running() {
 
 run_example() {
     # when benchmarking we only run specific benchmark examples
-    if (test "x${LIBMESH_BENCHMARK}" != "x"); then
+    if test "${LIBMESH_BENCHMARK}" != ""; then
       return
     fi
 
     example_name=$1
     shift
-    options=$@
+    options=$*
 
     # when run outside of the automake envionment make sure we get METHODS set
     # to something useful
-    if (test "x${METHODS}" = "x"); then
-	if (test "x${METHOD}" = "x"); then
-	    METHODS=opt
-	else
-	    METHODS="$METHOD"
-	fi
+    if test "${METHODS}" = ""; then
+        if test "${METHOD}" = ""; then
+            METHODS=opt
+        else
+            METHODS="$METHOD"
+        fi
     fi
 
     # Run executables from most-debugging-enabled to least-, so if
@@ -57,43 +57,43 @@ run_example() {
     MY_METHODS=""
     for method in ${ORDERED_METHODS}; do
         for mymethod in ${METHODS}; do
-            if (test "x${mymethod}" = "x${method}"); then
+            if test "${mymethod}" = "${method}"; then
                 MY_METHODS="${MY_METHODS} ${mymethod}"
             fi
         done
     done
 
     for method in ${MY_METHODS}; do
-	
-	case "${method}" in
-	    optimized|opt)      executable=example-opt   ;;
-	    debug|dbg)          executable=example-dbg   ;;
-	    devel)              executable=example-devel ;;
-	    profiling|pro|prof) executable=example-prof  ;;
-	    oprofile|oprof)     executable=example-oprof ;;
-	    *) echo "ERROR: unknown method: ${method}!" ; exit 1 ;;
-	esac
 
-	if (test ! -x ${executable}); then
-	    echo "ERROR: cannot find ${executable}!"
-	    exit 1
-	fi
-	
-	message_running $example_name $executable $options
+        case "${method}" in
+            optimized|opt)      executable=example-opt   ;;
+            debug|dbg)          executable=example-dbg   ;;
+            devel)              executable=example-devel ;;
+            profiling|pro|prof) executable=example-prof  ;;
+            oprofile|oprof)     executable=example-oprof ;;
+            *) echo "ERROR: unknown method: ${method}!" ; exit 1 ;;
+        esac
 
-	$LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS
+        if test ! -x ${executable}; then
+            echo "ERROR: cannot find ${executable}!"
+            exit 1
+        fi
+
+        message_running $example_name $executable $options
+
+        $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS
         RETVAL=$?
         # If we don't return 'success' or 'skip', quit
-        if [ $RETVAL -ne 0 -a $RETVAL -ne 77 ]; then
+        if [ $RETVAL -ne 0 ] && [ $RETVAL -ne 77 ]; then
           exit $RETVAL
         fi
-	
-	message_done_running $example_name $executable $options
+
+        message_done_running $example_name $executable $options
     done
 }
 
 run_example_no_extra_options() {
-  LIBMESH_OPTIONS='' run_example $@
+  LIBMESH_OPTIONS='' run_example "$@"
 }
 
 
@@ -102,24 +102,24 @@ benchmark_example() {
     shift
     example_name=$1
     shift
-    options=$@
+    options=$*
 
     # when benchmarking we only run specific benchmark examples
-    if (test "x${LIBMESH_BENCHMARK}" = "x"); then
+    if test "${LIBMESH_BENCHMARK}" = ""; then
       return
     fi
 
-    if (test ${LIBMESH_BENCHMARK} -lt ${benchmark_level}); then
+    if test ${LIBMESH_BENCHMARK} -lt ${benchmark_level}; then
       return
     fi
 
-    if (test "x${METHOD}" = "x"); then
+    if test "${METHOD}" = ""; then
         METHOD=opt
     fi
 
     executable=example-${METHOD}
 
-    if (test ! -x ${executable}); then
+    if test ! -x ${executable}; then
         echo "ERROR: cannot find ${executable}!"
         exit 1
     fi
@@ -129,7 +129,7 @@ benchmark_example() {
     $LIBMESH_RUN ./$executable $options $LIBMESH_OPTIONS
     RETVAL=$?
     # If we don't return 'success' or 'skip', quit
-    if [ $RETVAL -ne 0 -a $RETVAL -ne 77 ]; then
+    if [ $RETVAL -ne 0 ] && [ $RETVAL -ne 77 ]; then
       exit $RETVAL
     fi
 
