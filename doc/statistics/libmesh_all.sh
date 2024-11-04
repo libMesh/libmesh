@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ./libmesh_pagehits.py
 ./libmesh_citations.py
