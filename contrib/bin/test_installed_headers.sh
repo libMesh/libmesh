@@ -39,6 +39,15 @@ if (test "X$TERM" != Xdumb && { test -t 1; } 2>/dev/null); then
   colorreset="\033[m"; # Terminal command to reset to terminal default
 fi
 
+# If $CXX is not set in the environment, then get it from libmesh-config script
+if test "$CXX" = ""; then
+    if test -x $LIBMESH_DIR/bin/libmesh-config; then
+        CXX=$($LIBMESH_DIR/bin/libmesh-config --cxx)
+    else
+        echo "You must set a valid compiler in the environment variable \$CXX"
+        exit 1
+    fi
+fi
 
 #echo "CXX=$CXX"
 
