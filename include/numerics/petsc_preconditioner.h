@@ -31,6 +31,7 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/petsc_macro.h"
 #include "libmesh/wrapped_petsc.h"
+#include "libmesh/system.h"
 
 // Petsc includes
 #include "petscpc.h"
@@ -80,6 +81,15 @@ public:
    * Tells PETSc to use the user-specified preconditioner.
    */
   static void set_petsc_preconditioner_type (const PreconditionerType & preconditioner_type, PC & pc);
+
+  /**
+   * Builds PETSc auxiliary data needed by preconditioners such as hypre ams/ads.
+   */
+#ifdef LIBMESH_HAVE_PETSC_HYPRE
+  static void set_petsc_aux_data (PC & pc, System & sys, const unsigned v = 0);
+#else
+  static void set_petsc_aux_data (PC &, System &, const unsigned) {}
+#endif
 
 protected:
 

@@ -153,6 +153,14 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
 
 
 
+#ifdef LIBMESH_HAVE_PETSC_HYPRE
+template <typename T>
+void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const unsigned v)
+{
+}
+#endif
+
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT PetscPreconditioner<Number>;
