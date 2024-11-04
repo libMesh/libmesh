@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # This script reindents files according to the libmesh style, which is
 # the standard emacs style with no indentation in namespaces.
@@ -34,7 +34,7 @@ for i in "$@"; do
     --eval="(c++-mode)" \
     --eval="(c-set-offset 'innamespace 0)" \
     --eval="(indent-region (point-min) (point-max) nil)" \
-    -f save-buffer &> /dev/null
+    -f save-buffer > /dev/null 2>&1
 done
 
 
