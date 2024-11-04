@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 orig_pwd=$(pwd)
 base=$1
