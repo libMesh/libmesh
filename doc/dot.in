@@ -1,6 +1,5 @@
 #!/bin/bash
 #
-# $Id$
 # This is a wrapper for dot to create pretty class diagrams
 # corresponding to the libMesh web page style
 
@@ -10,19 +9,19 @@ if test -x $DOT ; then
     #
     # Redefine defaults if the user has not
     # specified any in these environment variables
-    if [ "x$DOTBGCOLOR" = "x" ]; then
+    if [ "$DOTBGCOLOR" = "" ]; then
 	DOTBGCOLOR=transparent
     fi
 
-    if [ "x$DOTFILLCOLOR" = "x" ]; then
+    if [ "$DOTFILLCOLOR" = "" ]; then
 	DOTFILLCOLOR=#BBBBBB
     fi
 
-    if [ "x$DOTFONTCOLOR" = "x" ]; then
+    if [ "$DOTFONTCOLOR" = "" ]; then
 	DOTFONTCOLOR=black
     fi
 
-    if [ "x$DOTCOLOR" = "x" ]; then
+    if [ "$DOTCOLOR" = "" ]; then
 	DOTCOLOR=black
     fi
 
