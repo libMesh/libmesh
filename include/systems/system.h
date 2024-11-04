@@ -1922,14 +1922,10 @@ public:
    */
   SparseMatrix<Number> & get_matrix (std::string_view mat_name);
 
-
   /**
-   * Sets whether matrix memory should be preallocated or not. The default is to preallocate. If
-   * matrix memory is not to be preallocated, then we will not compute a sparsity pattern. For a
-   * PETSc backend, if matrix memory is not preallocated, then a hash table is used until the matrix
-   * is assembled
+   * Sets whether to use hash table matrix assembly if the matrix sub-classes support it
    */
-  void preallocate_matrix_memory(bool preallocate);
+  void prefer_hash_table_matrix_assembly(bool preference);
 
 protected:
 
@@ -2303,10 +2299,14 @@ private:
   bool project_with_constraints;
 
   /**
-   * Whether matrix memory should be preallocated. This coincides with whether we will compute a
-   * sparsity pattern
+   * Whether to use hash table matrix assembly if the matrix sub-classes support it
    */
-  bool _preallocate_matrix_memory;
+  bool _prefer_hash_table_matrix_assembly;
+
+  /**
+   * Whether any of our matrices require an initial sparsity pattern computation in order to determine preallocation
+   */
+  bool _require_sparsity_pattern;
 };
 
 
@@ -2700,12 +2700,12 @@ System::add_matrix (std::string_view mat_name,
 }
 
 inline void
-System::preallocate_matrix_memory(const bool preallocate)
+System::prefer_hash_table_matrix_assembly(const bool preference)
 {
   libmesh_error_msg_if(
       _matrices_initialized,
-      "System::preallocate_matrix_memory() should be called before matrices are initialized");
-  _preallocate_matrix_memory = preallocate;
+      "System::prefer_hash_table_matrix_assembly() should be called before matrices are initialized");
+  _prefer_hash_table_matrix_assembly = preference;
 }
 
 } // namespace libMesh

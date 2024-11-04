@@ -249,6 +249,19 @@ bool PetscMatrixBase<T>::closed() const
   return (assembled == PETSC_TRUE);
 }
 
+#if PETSC_RELEASE_GREATER_EQUALS(3,23,0)
+template <typename T>
+void
+PetscMatrixBase<T>::reset()
+{
+  if (this->_use_hash_table)
+    // This performs MatReset plus re-establishes the hash table
+    LibmeshPetscCall(MatResetHash(this->_mat));
+  else
+    LibmeshPetscCall(MatReset(this->_mat));
+}
+#endif
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT PetscMatrixBase<Number>;

@@ -285,11 +285,11 @@ public:
 
   virtual void scale(const T scale) override;
 
-  virtual void init_hash (ParallelType type = PARALLEL) override;
-
 #if PETSC_RELEASE_GREATER_EQUALS(3,23,0)
-  PetscMatrix<T> copy_from_hash();
+  std::unique_ptr<PetscMatrix<T>> copy_from_hash();
 #endif
+
+  virtual bool supports_hash_table() const override { return true; }
 
 protected:
   /**
@@ -305,6 +305,17 @@ protected:
                                    numeric_index_type m_l,
                                    numeric_index_type n_l,
                                    numeric_index_type blocksize);
+
+  /*
+   * Performs matrix preallcation
+   * \param m_l The local number of rows.
+   * \param n_nz array containing the number of nonzeros in each row of the DIAGONAL portion of the local submatrix.
+   * \param n_oz Array containing the number of nonzeros in each row of the OFF-DIAGONAL portion of the local submatrix.
+   * \param blocksize Optional value indicating dense coupled blocks for systems with multiple variables all of the same    */
+  void preallocate(numeric_index_type m_l,
+                   const std::vector<numeric_index_type> & n_nz,
+                   const std::vector<numeric_index_type> & n_oz,
+                   numeric_index_type blocksize);
 
   /**
    * This function either creates or re-initializes a matrix called \p

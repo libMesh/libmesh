@@ -98,7 +98,8 @@ System::System (EquationSystems & es,
   adjoint_already_solved            (false),
   _hide_output                      (false),
   project_with_constraints          (true),
-  _preallocate_matrix_memory        (true)
+  _prefer_hash_table_matrix_assembly(true),
+  _require_sparsity_pattern         (false)
 {
 }
 
@@ -343,24 +344,28 @@ void System::init_matrices ()
       // want to attach the same matrix to the DofMap twice
       if (!this->get_dof_map().is_attached(m))
         this->get_dof_map().attach_matrix(m);
+
+      if (!pr.second->assembly_preference_set())
+        {
+          const bool use_hash =
+              this->_prefer_hash_table_matrix_assembly && pr.second->supports_hash_table();
+          pr.second->use_hash_table(use_hash);
+          if (!use_hash)
+            this->_require_sparsity_pattern = true;
+        }
     }
 
   // Compute the sparsity pattern for the current
   // mesh and DOF distribution.  This also updates
   // additional matrices, \p DofMap now knows them
-  if (_preallocate_matrix_memory)
+  if (this->_require_sparsity_pattern)
     this->get_dof_map().compute_sparsity(this->get_mesh());
 
   // Initialize matrices and set to zero
   for (auto & [name, mat] : _matrices)
     {
-      if (_preallocate_matrix_memory)
-        {
-          mat->init(_matrix_types[name]);
-          mat->zero();
-        }
-      else
-        mat->init_hash(_matrix_types[name]);
+      mat->init(_matrix_types[name]);
+      mat->zero();
     }
 }
 
@@ -450,13 +455,16 @@ void System::reinit ()
           pr.second->attach_dof_map(this->get_dof_map());
         }
 
-      // Clear the sparsity pattern
-      this->get_dof_map().clear_sparsity();
+      if (this->_require_sparsity_pattern)
+        {
+          // Clear the sparsity pattern
+          this->get_dof_map().clear_sparsity();
 
-      // Compute the sparsity pattern for the current
-      // mesh and DOF distribution.  This also updates
-      // additional matrices, \p DofMap now knows them
-      this->get_dof_map().compute_sparsity (this->get_mesh());
+          // Compute the sparsity pattern for the current
+          // mesh and DOF distribution.  This also updates
+          // additional matrices, \p DofMap now knows them
+          this->get_dof_map().compute_sparsity (this->get_mesh());
+        }
 
       // Initialize matrices and set to zero
       for (auto & pr : _matrices)

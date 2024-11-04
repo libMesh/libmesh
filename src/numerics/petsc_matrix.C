@@ -256,26 +256,21 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       }
     }
 
-  this->zero ();
   this->_is_initialized = true;
+  this->zero ();
 }
 
-
-
 template <typename T>
-void PetscMatrix<T>::init (const numeric_index_type m_in,
-                           const numeric_index_type n_in,
-                           const numeric_index_type m_l,
-                           const numeric_index_type n_l,
-                           const std::vector<numeric_index_type> & n_nz,
-                           const std::vector<numeric_index_type> & n_oz,
-                           const numeric_index_type blocksize_in)
+void PetscMatrix<T>::preallocate(const numeric_index_type libmesh_dbg_var(m_l),
+                                 const std::vector<numeric_index_type> & n_nz,
+                                 const std::vector<numeric_index_type> & n_oz,
+                                 const numeric_index_type blocksize_in)
 {
-  this->init_without_preallocation(m_in, n_in, m_l, n_l, blocksize_in);
-
   // Make sure the sparsity pattern isn't empty unless the matrix is 0x0
   libmesh_assert_equal_to (n_nz.size(), m_l);
   libmesh_assert_equal_to (n_oz.size(), m_l);
+  // Avoid unused warnings when not configured with block storage
+  libmesh_ignore(blocksize_in);
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
   PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
@@ -332,9 +327,22 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       }
 
     }
+}
 
-  this->zero();
+template <typename T>
+void PetscMatrix<T>::init (const numeric_index_type m_in,
+                           const numeric_index_type n_in,
+                           const numeric_index_type m_l,
+                           const numeric_index_type n_l,
+                           const std::vector<numeric_index_type> & n_nz,
+                           const std::vector<numeric_index_type> & n_oz,
+                           const numeric_index_type blocksize_in)
+{
+  this->init_without_preallocation(m_in, n_in, m_l, n_l, blocksize_in);
+  this->preallocate(m_l, n_nz, n_oz, blocksize_in);
+
   this->_is_initialized = true;
+  this->zero ();
 }
 
 
@@ -346,27 +354,20 @@ void PetscMatrix<T>::init (const ParallelType)
   const numeric_index_type m_in = this->_dof_map->n_dofs();
   const numeric_index_type m_l  = this->_dof_map->n_local_dofs();
 
-  const std::vector<numeric_index_type> & n_nz = this->_sp->get_n_nz();
-  const std::vector<numeric_index_type> & n_oz = this->_sp->get_n_oz();
-
-  PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
-
-  this->init(m_in, m_in, m_l, m_l, n_nz, n_oz, blocksize);
-}
-
-
-template <typename T>
-void PetscMatrix<T>::init_hash (const ParallelType)
-{
-  libmesh_assert(this->_dof_map);
-
-  const numeric_index_type m_in = this->_dof_map->n_dofs();
-  const numeric_index_type m_l  = this->_dof_map->n_dofs_on_processor(this->processor_id());
-
-  PetscInt blocksize  = static_cast<PetscInt>(this->_dof_map->block_size());
+  const auto blocksize = this->_dof_map->block_size();
 
   this->init_without_preallocation(m_in, m_in, m_l, m_l, blocksize);
+  if (!this->_use_hash_table)
+    {
+      const std::vector<numeric_index_type> & n_nz = this->_sp->get_n_nz();
+      const std::vector<numeric_index_type> & n_oz = this->_sp->get_n_oz();
+
+      this->preallocate(m_l, n_nz, n_oz, blocksize);
+    }
+
   this->_is_initialized = true;
+  if (!this->_use_hash_table)
+    this->zero();
 }
 
 
@@ -1271,7 +1272,7 @@ void PetscMatrix<T>::scale(const T scale)
 
 #if PETSC_RELEASE_GREATER_EQUALS(3,23,0)
 template <typename T>
-PetscMatrix<T>
+std::unique_ptr<PetscMatrix<T>>
 PetscMatrix<T>::copy_from_hash ()
 {
   Mat xaij;
@@ -1279,7 +1280,7 @@ PetscMatrix<T>::copy_from_hash ()
   libmesh_assert(!this->closed());
   LibmeshPetscCall(MatDuplicate(this->_mat, MAT_DO_NOT_COPY_VALUES, &xaij));
   LibmeshPetscCall(MatCopyHashToXAIJ(this->_mat, xaij));
-  return PetscMatrix<T>{xaij, this->comm(), /*destroy_on_exit=*/true};
+  return std::make_unique<PetscMatrix<T>>(xaij, this->comm(), /*destroy_on_exit=*/true);
 }
 #endif
 

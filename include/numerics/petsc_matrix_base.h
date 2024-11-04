@@ -171,6 +171,10 @@ public:
 
   virtual bool closed() const override;
 
+#if PETSC_RELEASE_GREATER_EQUALS(3,23,0)
+  virtual void reset () override;
+#endif
+
 protected:
 
   /**

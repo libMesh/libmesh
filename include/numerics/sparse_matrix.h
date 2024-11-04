@@ -196,14 +196,6 @@ public:
   virtual void init (ParallelType type = PARALLEL) = 0;
 
   /**
-   * Initialize this matrix using global and local size information from the \p dof_map. The
-   * sparsity structure/preallocation is not determined up front but rather deterrmined on-the-fly
-   * using hash table structures (if the backend supports it)
-   * @param type The serial/parallel/ghosted type of the matrix
-   */
-  virtual void init_hash (ParallelType /*type*/ = PARALLEL) { libmesh_not_implemented (); }
-
-  /**
    * Restores the \p SparseMatrix<T> to a pristine state.
    */
   virtual void clear () = 0;
@@ -591,6 +583,35 @@ public:
    */
   virtual void scale(const T scale);
 
+  /**
+   * @returns Whether the matrix supports hash table assembly
+   */
+  virtual bool supports_hash_table() const { return false; }
+
+  /**
+   * @returns Whether a preference for hash table vs. preallocation has been set
+   */
+  bool assembly_preference_set() const { return _assembly_preference_set; }
+
+  /**
+   * Sets whether to use hash table assembly. This will error if the passed-in value is true and the
+   * matrix type does not support hash tables
+   */
+  void use_hash_table(bool use_hash);
+
+  /**
+   * @returns Whether this matrix is using hash table assembly
+   */
+  bool use_hash_table() const { return _use_hash_table; }
+
+  /**
+   * Reset the state of the matrix. The default implementation calls \p clear() but this is meant to
+   * be more nuanced in that it can reset the state of the matrix without deallocating core data
+   * structures. As an example, this would not destroy the \p Mat data member for PETSc matrix
+   * derived classes
+   */
+  virtual void reset() { this->clear(); }
+
 protected:
   /**
    * Protected implementation of the create_submatrix and reinit_submatrix
@@ -624,12 +645,33 @@ protected:
    * Flag indicating whether or not the matrix has been initialized.
    */
   bool _is_initialized;
+
+  /**
+   * Flag indicating whether the matrix is assembled using a hash table
+   */
+  bool _use_hash_table;
+
+  /**
+   * Whether a preference for hash table vs. preallocation has been set
+   */
+  bool _assembly_preference_set;
 };
 
 
 
 //-----------------------------------------------------------------------
 // SparseMatrix inline members
+template <typename T>
+void
+SparseMatrix<T>::use_hash_table(const bool use_hash)
+{
+  libmesh_error_msg_if(use_hash && !this->supports_hash_table(),
+                       "This matrix class does not support hash table assembly");
+  libmesh_error_msg_if(this->_assembly_preference_set,
+                       "The use_hash_table API should only be called once");
+  this->_use_hash_table = use_hash;
+  this->_assembly_preference_set = true;
+}
 
 // For SGI MIPSpro this implementation must occur after
 // the full specialization of the print() member.
