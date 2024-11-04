@@ -227,10 +227,9 @@ void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type,
 {
   // get the communicator from the PETSc object
   Parallel::communicator comm;
-  PetscErrorCode ierr = PetscObjectGetComm((PetscObject)pc, & comm);
+  PetscErrorCode ierr = PetscObjectGetComm((PetscObject)pc, &comm);
   if (ierr != LIBMESH_PETSC_SUCCESS)
     libmesh_error_msg("Error retrieving communicator");
-  Parallel::Communicator communicator(comm);
 
   // All docs say must call KSPSetUp or PCSetUp before calling PCBJacobiGetSubKSP.
   // You must call PCSetUp after the preconditioner operators have been set, otherwise you get the:
@@ -239,7 +238,7 @@ void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type,
   // "Matrix must be set first."
   //
   // error messages...
-  LibmeshPetscCall2(communicator, PCSetUp(pc));
+  LibmeshPetscCallA(comm, PCSetUp(pc));
 
   // To store array of local KSP contexts on this processor
   KSP * subksps;
@@ -252,18 +251,17 @@ void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type,
   // int first_local;
 
   // Fill array of local KSP contexts
-  LibmeshPetscCall2(communicator, PCBJacobiGetSubKSP(pc, &n_local, LIBMESH_PETSC_NULLPTR,
-                                                     &subksps));
+  LibmeshPetscCallA(comm, PCBJacobiGetSubKSP(pc, &n_local, LIBMESH_PETSC_NULLPTR, &subksps));
 
   // Loop over sub-ksp objects, set ILU preconditioner
   for (PetscInt i=0; i<n_local; ++i)
     {
       // Get pointer to sub KSP object's PC
       PC subpc;
-      LibmeshPetscCall2(communicator, KSPGetPC(subksps[i], &subpc));
+      LibmeshPetscCallA(comm, KSPGetPC(subksps[i], &subpc));
 
       // Set requested type on the sub PC
-      LibmeshPetscCall2(communicator, PCSetType(subpc, type));
+      LibmeshPetscCallA(comm, PCSetType(subpc, type));
     }
 }
 
