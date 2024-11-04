@@ -20,6 +20,7 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/linear_solver.h"
+#include "libmesh/newton_solver.h"
 #include "libmesh/no_solution_history.h"
 
 #include "libmesh/adjoint_refinement_estimator.h"
@@ -57,6 +58,7 @@ void TimeSolver::reinit ()
   libmesh_assert_equal_to (&(this->diff_solver()->system()), &(this->system()));
   this->diff_solver()->reinit();
 
+/*
   libmesh_assert(this->linear_solver().get());
   this->linear_solver()->clear();
   if (libMesh::on_command_line("--solver-system-names"))
@@ -65,6 +67,7 @@ void TimeSolver::reinit ()
     this->linear_solver()->init();
 
   this->_linear_solver->init_names(_system);
+*/
 }
 
 
@@ -77,7 +80,7 @@ void TimeSolver::init ()
     this->diff_solver() = DiffSolver::build(_system);
 
   if (this->linear_solver().get() == nullptr)
-    this->linear_solver() = LinearSolver<Number>::build(_system.comm());
+    this->linear_solver() = std::unique_ptr<LinearSolver<Number>>(&dynamic_cast<NewtonSolver*>(this->diff_solver().get())->get_linear_solver());
 }
 
 void TimeSolver::init_adjoints ()
@@ -98,12 +101,14 @@ void TimeSolver::init_data ()
 {
   this->diff_solver()->init();
 
+/*
   if (libMesh::on_command_line("--solver-system-names"))
     this->linear_solver()->init((_system.name()+"_").c_str());
   else
     this->linear_solver()->init();
 
   this->linear_solver()->init_names(_system);
+*/
 }
 
 

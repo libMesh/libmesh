@@ -222,7 +222,7 @@ public:
   /**
    * An implicit linear solver to use for adjoint and sensitivity problems.
    */
-  virtual std::unique_ptr<LinearSolver<Number>> & linear_solver() { return _linear_solver; }
+  virtual LinearSolver<Number>* & linear_solver() { return _linear_solver; }
 
   /**
    * Print extra debugging information if quiet ==  false.
@@ -304,7 +304,7 @@ protected:
   /**
    * An implicit linear solver to use for adjoint problems.
    */
-  std::unique_ptr<LinearSolver<Number>> _linear_solver;
+  LinearSolver<Number> * _linear_solver;
 
   /**
    * A reference to the system we are solving.
