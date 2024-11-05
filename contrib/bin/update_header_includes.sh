@@ -1,7 +1,4 @@
-#!/bin/bash
-
-# Note: script was /bin/sh but I don't think -n, -e are POSIX
-# arguments to echo
+#!/bin/sh
 
 # LIBMESH_ROOT should be set to the location of the libmesh source tree
 if test "$LIBMESH_ROOT" = ""; then
