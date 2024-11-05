@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Respect the JOBS environment variable, if it is set
 if [ -n "$JOBS" ]; then
