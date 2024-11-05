@@ -21,23 +21,23 @@ fi
 #echo MAKEFLAGS=$MAKEFLAGS
 
 # Terminal commands to goto specific columns
-rescol=65;
+# rescol=65;
 
 # Terminal commands for setting the color
-gotocolumn=;
-white=;
-green=;
-red=;
-grey=;
-colorreset=;
-if (test "X$TERM" != Xdumb && { test -t 1; } 2>/dev/null); then
-  gotocolumn="\033["$rescol"G";
-  white="\033[01;37m";
-  green="\033[01;32m";
-  red="\033[01;31m";
-  grey="\033[00;37m";
-  colorreset="\033[m"; # Terminal command to reset to terminal default
-fi
+# gotocolumn=;
+# white=;
+# green=;
+# red=;
+# grey=;
+# colorreset=;
+# if test "$TERM" != "dumb" && { test -t 1; } 2>/dev/null; then
+#   gotocolumn="\033["$rescol"G";
+#   white="\033[01;37m";
+#   green="\033[01;32m";
+#   red="\033[01;31m";
+#   grey="\033[00;37m";
+#   colorreset="\033[m"; # Terminal command to reset to terminal default
+# fi
 
 # Throw an error If $CXX is not set
 if test "$CXX" = ""; then
@@ -47,17 +47,18 @@ fi
 
 #echo "CXX=$CXX"
 
-testing_installed_tree="no"
+# Variable is set but not used
+# testing_installed_tree="no"
 
-if (test "x$test_CXXFLAGS" = "x"); then
+if test "$test_CXXFLAGS" = ""; then
 
-    testing_installed_tree="yes"
+    # testing_installed_tree="yes"
 
-    if (test "x$PKG_CONFIG" != "xno"); then
-        test_CXXFLAGS=`pkg-config libmesh --cflags`
+    if test "$PKG_CONFIG" != "no"; then
+        test_CXXFLAGS=$(pkg-config libmesh --cflags)
 
-    elif (test -x $LIBMESH_CONFIG_PATH/libmesh-config); then
-        test_CXXFLAGS=`$LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include`
+    elif test -x $LIBMESH_CONFIG_PATH/libmesh-config; then
+        test_CXXFLAGS=$($LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include)
 
     else
         echo "Cannot query package installation!!"
@@ -73,16 +74,18 @@ function test_header()
 {
     myreturn=0
     header_to_test=$1
-    header_name=`basename $header_to_test`
-    app_file=`mktemp -t $header_name.XXXXXXXXXX`
+    header_name=$(basename $header_to_test)
+    app_file=$(mktemp -t $header_name.XXXXXXXXXX)
     source_file=$app_file.cxx
     object_file=$app_file.o
     errlog=$app_file.log
     stdout=$app_file.stdout
 
-    printf '%s' "Testing Header $header_to_test ... " > $stdout
-    echo "#include \"libmesh/$header_name\"" >> $source_file
-    echo "int foo () { return 0; }" >> $source_file
+    printf '%s' "Testing Header $header_to_test ... " > "$stdout"
+    {
+    echo "#include \"libmesh/$header_name\""
+    echo "int foo () { return 0; }"
+    } >> "$source_file"
 
     #echo $CXX $test_CXXFLAGS $source_file -o $app_file
     if $CXX $test_CXXFLAGS $CXXFLAGS $source_file -c -o $object_file >$errlog 2>&1 ; then
@@ -93,30 +96,32 @@ function test_header()
         # .) print ] in white
         # .) reset the terminal color
         # .) print a newline
-        printf '\e[65G\e[1;37m[\e[1;32m%s\e[1;37m]\e[m\e[m\n' "   OK   " >> $stdout
+        printf '\e[65G\e[1;37m[\e[1;32m%s\e[1;37m]\e[m\e[m\n' "   OK   " >> "$stdout"
     else
         # See comment above for OK status
-        printf '\e[65G\e[1;37m[\e[1;31m%s\e[1;37m]\e[m\e[m\n' " FAILED " >> $stdout
-        echo "Source file:" >> $stdout
-        cat $source_file  >> $stdout
-        echo ""  >> $stdout
-        echo "Command line:" >> $stdout
-        echo $CXX $test_CXXFLAGS $CXXFLAGS $source_file -c -o $object_file  >> $stdout
-        echo ""  >> $stdout
-        echo "Output:" >> $stdout
-        cat $errlog >> $stdout
-        echo "" >> $stdout
+        {
+        printf '\e[65G\e[1;37m[\e[1;31m%s\e[1;37m]\e[m\e[m\n' " FAILED "
+        echo "Source file:"
+        cat "$source_file"
+        echo ""
+        echo "Command line:"
+        echo $CXX $test_CXXFLAGS $CXXFLAGS $source_file -c -o $object_file
+        echo ""
+        echo "Output:"
+        cat "$errlog"
+        echo ""
+        } >> "$stdout"
         myreturn=1
     fi
 
-    cat $stdout
-    rm -f $source_file $app_file $object_file $errlog $stdout
+    cat "$stdout"
+    rm -f "$source_file" "$app_file" "$object_file" "$errlog" "$stdout"
 
     return $myreturn
 }
 
 
-if [ "x$HEADERS_TO_TEST" = "x" ]; then
+if test "$HEADERS_TO_TEST" = ""; then
     HEADERS_TO_TEST=$DEFAULT_HEADERS_TO_TEST
 fi
 
@@ -129,23 +134,23 @@ runninglist=""
 for header_to_test in $HEADERS_TO_TEST ; do
     if [ $nrunning -ge $n_concurrent ]; then
         for pid in $runninglist ; do
-            wait $pid
+            wait "$pid"
             # accumulate the number of failed tests
-            returnval=$(($returnval+$?))
+            returnval=$((returnval + $?))
         done
         nrunning=0
         runninglist=""
     fi
 
-    test_header $header_to_test &
+    test_header "$header_to_test" &
     runninglist="$runninglist $!"
-    nrunning=$(($nrunning+1))
-    ntotal=$(($ntotal+1))
+    nrunning=$((nrunning + 1))
+    ntotal=$((ntotal + 1))
 done
 
 for pid in $runninglist ; do
-    wait $pid
-    returnval=$(($returnval+$?))
+    wait "$pid"
+    returnval=$((returnval + $?))
 done
 
 echo "$returnval failed tests of $ntotal header files"
