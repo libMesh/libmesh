@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # The purpose of this script is to automatically test .C files
 # for unnecessary includes by attempting to compile the source
@@ -81,7 +81,7 @@ for i in $inc_line_nums; do
   cat $1 | sed "${i}d" > $temp_file.C;
 
   # Attempt to compile $temp_file
-  $compiler_name $compile_flags -c $temp_file.C &> /dev/null
+  $compiler_name $compile_flags -c $temp_file.C > /dev/null 2>&1
 
   # If an object file is successfully created, the compilation succeeds!
   if [ -f $temp_file.o ]; then
