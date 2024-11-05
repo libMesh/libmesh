@@ -1,5 +1,4 @@
-#!/bin/bash
-#set -e
+#!/bin/sh
 
 # This script is designed to be run as part of "make installcheck"
 # but you can also run it manually from the source tree if you have a
@@ -70,7 +69,7 @@ fi
 # this function handles the I/O and compiling of a particular header file
 # by encapsulating this in a function we can fork it and run multiple builds
 # simultaneously
-function test_header()
+test_header()
 {
     myreturn=0
     header_to_test=$1
