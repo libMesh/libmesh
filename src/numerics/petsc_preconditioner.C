@@ -28,6 +28,7 @@
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/elem.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/dof_map.h"
 
 namespace libMesh
 {
@@ -233,10 +234,33 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
   lagrange_sys.reinit_mesh();
 
   // Global (i.e. total) and local (i.e. to this processor) number of edges and vertices
-  const dof_id_type n_glb_edges = sys.n_dofs();
-  const dof_id_type n_loc_edges = sys.n_local_dofs();
+  const std::vector<dof_id_type> n_all_edges = sys.get_dof_map().n_dofs_per_processor(v);
+  const dof_id_type n_glb_edges = std::reduce(n_all_edges.begin(), n_all_edges.end());
+  const dof_id_type n_loc_edges = n_all_edges[global_processor_id()];
   const dof_id_type n_glb_verts = lagrange_sys.n_dofs();
   const dof_id_type n_loc_verts = lagrange_sys.n_local_dofs();
+
+  // We require contiguous indexing through the edges: if the system has multiple
+  // variables/splits, we therefore effectively need to find local dof numbers
+
+  // The number of edges in all preceding processors
+  dof_id_signed_type edge_offset = std::reduce(n_all_edges.begin(),
+                                               n_all_edges.begin() + global_processor_id());
+
+  // Whether dofs are in variable-major or node-major order
+  bool var_major = !libMesh::on_command_line("--node-major-dofs");
+
+  // If variable-major order, we need only subtract all the preceding dofs; but
+  // if node-major order, we need to enumerate the dofs on this processor
+  std::vector<dof_id_type> idx_edges;
+  if (var_major)
+  {
+    edge_offset -= sys.get_dof_map().first_dof();
+    for (auto i : make_range(v))
+      edge_offset -= sys.get_dof_map().n_local_dofs(i);
+  }
+  else
+    sys.get_dof_map().local_variable_indices(idx_edges, sys.get_mesh(), v);
 
   // Create the discrete grandient matrix, representing the edges in terms of its vertices
   // Preallocate 2 diagonal + 2 off-diagonal nonzeros as the vertices could fall on either
@@ -284,10 +308,15 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
 
       if (edge_node.processor_id() == global_processor_id())
       {
+        const dof_id_type seq_edge_dof = edge_offset +
+          (var_major ? edge_dof
+                     : std::distance(idx_edges.begin(),
+                       std::find(idx_edges.begin(), idx_edges.end(), edge_dof)));
+
         const Real sign = elem->positive_edge_orientation(edge) ? 1 : -1;
 
-        G.set(edge_dof, vert_dof,  sign);
-        G.set(edge_dof, wert_dof, -sign);
+        G.set(seq_edge_dof, vert_dof,  sign);
+        G.set(seq_edge_dof, wert_dof, -sign);
       }
     }
 
