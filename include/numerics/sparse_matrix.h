@@ -605,12 +605,9 @@ public:
   bool use_hash_table() const { return _use_hash_table; }
 
   /**
-   * Reset the state of the matrix. The default implementation calls \p clear() but this is meant to
-   * be more nuanced in that it can reset the state of the matrix without deallocating core data
-   * structures. As an example, this would not destroy the \p Mat data member for PETSc matrix
-   * derived classes
+   * Reset the memory storage of the matrix
    */
-  virtual void reset() { this->clear(); }
+  virtual void reset_memory() { libmesh_not_implemented(); }
 
 protected:
   /**

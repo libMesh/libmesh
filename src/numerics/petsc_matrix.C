@@ -1284,6 +1284,21 @@ PetscMatrix<T>::copy_from_hash ()
 }
 #endif
 
+template <typename T>
+void
+PetscMatrix<T>::reset_memory()
+{
+  if (this->_use_hash_table)
+#if PETSC_RELEASE_GREATER_EQUALS(3, 23, 0)
+    // This performs MatReset plus re-establishes the hash table
+    LibmeshPetscCall(MatResetHash(this->_mat));
+#else
+    libmesh_error_msg("Hash tables not fully supported until PETSc version 3.23");
+#endif
+  else
+    this->reset_preallocation();
+}
+
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT PetscMatrix<Number>;

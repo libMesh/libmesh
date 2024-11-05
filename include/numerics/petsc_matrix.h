@@ -291,6 +291,8 @@ public:
 
   virtual bool supports_hash_table() const override { return true; }
 
+  virtual void reset_memory() override;
+
 protected:
   /**
    * Perform matrix initialization steps sans preallocation
