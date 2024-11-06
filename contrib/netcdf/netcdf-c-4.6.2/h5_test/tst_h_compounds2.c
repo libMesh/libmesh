@@ -48,7 +48,11 @@ main()
       hsize_t dims[1];
       hsize_t num_obj, i_obj;
       char obj_name[STR_LEN + 1];
+#if H5_VERSION_GE(1,12,0)
+      H5O_info2_t obj_info;
+#else
       H5O_info_t obj_info;
+#endif
       hid_t fapl_id, fcpl_id;
       htri_t equal;
       char file_in[STR_LEN * 2];
@@ -131,8 +135,13 @@ main()
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i_obj = 0; i_obj < num_obj; i_obj++)
       {
+#if H5_VERSION_GE(1, 12, 0)
+	 if (H5Oget_info_by_idx3(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
+				i_obj, &obj_info, H5O_INFO_BASIC, H5P_DEFAULT) < 0) ERR;
+#else
 	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
 				i_obj, &obj_info, H5P_DEFAULT) < 0) ERR;
+#endif
 	 if (H5Lget_name_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
 				i_obj, obj_name, STR_LEN + 1, H5P_DEFAULT) < 0) ERR;
 
@@ -194,8 +203,13 @@ main()
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i_obj = 0; i_obj < num_obj; i_obj++)
       {
+#if H5_VERSION_GE(1,12,0)
+	 if (H5Oget_info_by_idx3(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i_obj, &obj_info, 
+				H5O_INFO_BASIC, H5P_DEFAULT) < 0) ERR;
+#else
 	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i_obj, &obj_info, 
 				H5P_DEFAULT) < 0) ERR;
+#endif
 	 if (H5Lget_name_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i_obj, obj_name, 
 				STR_LEN + 1, H5P_DEFAULT) < 0) ERR;
 
