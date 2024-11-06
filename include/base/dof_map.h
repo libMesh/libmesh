@@ -39,6 +39,10 @@
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/mesh_subdivision_support.h"
 
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
+
 // C++ Includes
 #include <algorithm>
 #include <cstddef>
@@ -669,6 +673,17 @@ public:
   dof_id_type n_dofs() const { return _n_dfs; }
 
   /**
+   * \returns The total number of degrees of freedom for a particular
+   * variable \p vn.
+   */
+  dof_id_type n_dofs(const unsigned int vn) const
+  {
+    dof_id_type n = this->n_local_dofs(vn);
+    this->comm().sum(n);
+    return n;
+  }
+
+  /**
    * \returns The number of SCALAR dofs.
    */
   dof_id_type n_SCALAR_dofs() const { return _n_SCALAR_dofs; }
@@ -680,12 +695,34 @@ public:
   { return this->n_dofs_on_processor (this->processor_id()); }
 
   /**
+   * \returns The number of degrees of freedom on this processor for a
+   * particular variable \p vn.
+   */
+  dof_id_type n_local_dofs(const unsigned int vn) const
+  {
+    std::vector<dof_id_type> var_idx;
+    this->local_variable_indices(var_idx, _mesh, vn);
+    return var_idx.size();
+  }
+
+  /**
    * \returns The number of degrees of freedom on partition \p proc.
    */
   dof_id_type n_dofs_on_processor(const processor_id_type proc) const
   {
     libmesh_assert_less (proc, _first_df.size());
     return cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
+  }
+
+  /**
+   * \returns The number of degrees of freedom on each partition for a
+   * particular variable \p vn.
+   */
+  std::vector<dof_id_type> n_dofs_on_each_processor(const unsigned int vn) const
+  {
+    std::vector<dof_id_type> n_local_dofs(this->n_processors(), 0);
+    this->comm().allgather(this->n_local_dofs(vn), n_local_dofs);
+    return n_local_dofs;
   }
 
   /**
