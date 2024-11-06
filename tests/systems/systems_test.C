@@ -1394,9 +1394,9 @@ public:
 
     // local and global projection_matrix sizes infos
     int n_new_dofs = sys.n_dofs();
-    int n_new_dofs_local = sys.get_dof_map().n_dofs_on_processor(sys.processor_id());
-    int ndofs_old_first = sys.get_dof_map().first_old_dof(sys.processor_id());
-    int ndofs_old_end   = sys.get_dof_map().end_old_dof(sys.processor_id());
+    int n_new_dofs_local = sys.get_dof_map().n_local_dofs();
+    int ndofs_old_first = sys.get_dof_map().first_old_dof();
+    int ndofs_old_end   = sys.get_dof_map().end_old_dof();
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector
@@ -1543,9 +1543,9 @@ public:
 
     // local and global projection_matrix sizes infos
     int n_new_dofs = sys.n_dofs();
-    int n_new_dofs_local = sys.get_dof_map().n_dofs_on_processor(sys.processor_id());
-    int ndofs_old_first = sys.get_dof_map().first_old_dof(sys.processor_id());
-    int ndofs_old_end   = sys.get_dof_map().end_old_dof(sys.processor_id());
+    int n_new_dofs_local = sys.get_dof_map().n_local_dofs();
+    int ndofs_old_first = sys.get_dof_map().first_old_dof();
+    int ndofs_old_end   = sys.get_dof_map().end_old_dof();
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector

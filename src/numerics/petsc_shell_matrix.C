@@ -106,7 +106,7 @@ void init_shell_mat(Obj & obj)
   libmesh_assert(obj._dof_map);
 
   numeric_index_type my_m = obj._dof_map->n_dofs();
-  numeric_index_type m_l = obj._dof_map->n_dofs_on_processor(obj.processor_id());
+  numeric_index_type m_l = obj._dof_map->n_local_dofs();
   if (obj._omit_constrained_dofs)
     {
       my_m -= obj._dof_map->n_constrained_dofs();

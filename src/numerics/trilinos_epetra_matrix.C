@@ -52,7 +52,7 @@ void EpetraMatrix<T>::update_sparsity_pattern (const SparsityPattern::Graph & sp
 
   const numeric_index_type m   = this->_dof_map->n_dofs();
   const numeric_index_type n   = m;
-  const numeric_index_type n_l = this->_dof_map->n_dofs_on_processor(this->processor_id());
+  const numeric_index_type n_l = this->_dof_map->n_local_dofs();
   const numeric_index_type m_l = n_l;
 
   // error checking

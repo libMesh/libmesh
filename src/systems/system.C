@@ -149,7 +149,7 @@ dof_id_type System::n_local_constrained_dofs() const
 
 dof_id_type System::n_local_dofs() const
 {
-  return _dof_map->n_dofs_on_processor (this->processor_id());
+  return _dof_map->n_local_dofs();
 }
 
 

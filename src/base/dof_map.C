@@ -99,12 +99,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
 
   sp->parallel_sync();
 
-#ifndef NDEBUG
-  // Avoid declaring these variables unless asserts are enabled.
-  const processor_id_type proc_id        = mesh.processor_id();
-  const dof_id_type n_dofs_on_proc = this->n_dofs_on_processor(proc_id);
-#endif
-  libmesh_assert_equal_to (sp->get_sparsity_pattern().size(), n_dofs_on_proc);
+  libmesh_assert_equal_to (sp->get_sparsity_pattern().size(), this->n_local_dofs());
 
   // Check to see if we have any extra stuff to add to the sparsity_pattern
   if (_extra_sparsity_function)
