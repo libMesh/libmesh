@@ -31,7 +31,11 @@ main()
       hsize_t num_obj;
       hid_t fileid, grpid, spaceid;
       int i;
+#if H5_VERSION_GE(1,12,0)
+      H5O_info2_t obj_info;
+#else
       H5O_info_t obj_info;
+#endif
       char names[NUM_ELEMENTS][MAX_SYMBOL_LEN + 1] = {"H", "He", "Li", "Be", "B", "C"};
       char name[MAX_SYMBOL_LEN + 1];
       ssize_t size;
@@ -79,8 +83,13 @@ main()
       if (num_obj != NUM_ELEMENTS) ERR;
       for (i = 0; i < num_obj; i++)
       {
+#if H5_VERSION_GE(1,12,0)
+	 if (H5Oget_info_by_idx3(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
+                                 i, &obj_info, H5O_INFO_BASIC, H5P_DEFAULT) < 0) ERR;
+#else
 	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
 				i, &obj_info, H5P_DEFAULT) < 0) ERR;
+#endif
 	 if (obj_info.type != H5O_TYPE_DATASET) ERR;
 	 if ((size = H5Lget_name_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i,
 					NULL, 0, H5P_DEFAULT)) < 0) ERR;
@@ -106,7 +115,11 @@ main()
       hid_t fileid, grpid;
       hsize_t num_obj;
       int i;
+#if H5_VERSION_GE(1,12,0)
+      H5O_info2_t obj_info;
+#else
       H5O_info_t obj_info;
+#endif
       char names[NUM_DIMSCALES][MAX_SYMBOL_LEN + 1] = {"b", "a"};
       char name[MAX_SYMBOL_LEN + 1];
       hid_t dimscaleid;
@@ -152,8 +165,13 @@ main()
       if (num_obj != NUM_DIMSCALES) ERR;
       for (i = 0; i < num_obj; i++)
       {
+#if H5_VERSION_GE(1,12,0)
+	 if (H5Oget_info_by_idx3(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
+				 i, &obj_info, H5O_INFO_BASIC, H5P_DEFAULT) < 0) ERR;
+#else
 	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
 				i, &obj_info, H5P_DEFAULT) < 0) ERR;
+#endif
 	 if (obj_info.type != H5O_TYPE_DATASET) ERR;
 	 if ((size = H5Lget_name_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, i,
                                 	 NULL, 0, H5P_DEFAULT)) < 0) ERR;
@@ -178,7 +196,11 @@ main()
       hsize_t num_obj;
       hid_t fileid, grpid, spaceid;
       float val = 3.1495;
+#if H5_VERSION_GE(1,12,0)
+      H5O_info2_t obj_info;
+#else
       H5O_info_t obj_info;
+#endif
       char name[MAX_NAME_LEN + 1];
       ssize_t size;
 
@@ -238,8 +260,14 @@ main()
 
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       if (num_obj != 1) ERR;
+
+#if H5_VERSION_GE(1,12,0)
+      if (H5Oget_info_by_idx3(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
+			      0, &obj_info, H5O_INFO_BASIC, H5P_DEFAULT) < 0) ERR;
+#else
       if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
 			     0, &obj_info, H5P_DEFAULT) < 0) ERR;
+#endif
       if (obj_info.type != H5O_TYPE_DATASET) ERR;
       if ((size = H5Lget_name_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 0,
 				     NULL, 0, H5P_DEFAULT)) < 0) ERR;

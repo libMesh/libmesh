@@ -44,14 +44,23 @@ with the H5Lvisit function call
 
 */
 herr_t
-op_func (hid_t g_id, const char *name, const H5L_info_t *info, 
+op_func (hid_t g_id, const char *name, 
+#if H5_VERSION_GE(1,12,0)
+         const H5L_info2_t *info,
+#else
+         const H5L_info_t *info,
+#endif
 	 void *op_data)  
 {
    hid_t id;
    H5I_type_t obj_type;
 
    strcpy((char *)op_data, name);
+#if H5_VERSION_GE(1,12,0)
+   if ((id = H5Oopen_by_token(g_id, info->u.token)) < 0) ERR;
+#else
    if ((id = H5Oopen_by_addr(g_id, info->u.address)) < 0) ERR;
+#endif
 
 /* Using H5Ovisit is really slow. Use H5Iget_type for a fast
  * answer. */
@@ -169,7 +178,11 @@ main()
    {
       hid_t fapl_id, fileid, grpid;
       H5_index_t idx_field = H5_INDEX_CRT_ORDER;
+#if H5_VERSION_GE(1,12,0)
+      H5O_info2_t obj_info;
+#else
       H5O_info_t obj_info;
+#endif
       hsize_t num_obj;
       ssize_t size;
       char obj_name[STR_LEN + 1];
@@ -186,8 +199,13 @@ main()
       if (H5Gget_num_objs(grpid, &num_obj) < 0) ERR;
       for (i = 0; i < num_obj; i++)
       {
+#if H5_VERSION_GE(1,12,0)
+	 if (H5Oget_info_by_idx3(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
+                                 i, &obj_info, H5O_INFO_BASIC, H5P_DEFAULT)) ERR;
+#else
 	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC, 
 				i, &obj_info, H5P_DEFAULT)) ERR;
+#endif
 	 if ((size = H5Lget_name_by_idx(grpid, ".", idx_field, H5_ITER_INC, i,
 					NULL, 0, H5P_DEFAULT)) < 0) ERR;
 	 if (H5Lget_name_by_idx(grpid, ".", idx_field, H5_ITER_INC, i,

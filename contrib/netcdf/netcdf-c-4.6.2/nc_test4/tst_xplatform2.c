@@ -564,7 +564,11 @@ main(int argc, char **argv)
       hid_t file_typeid1[NUM_OBJ], native_typeid1[NUM_OBJ];
       hid_t file_typeid2, native_typeid2;
       hsize_t num_obj, i;
+#if H5_VERSION_GE(1,12,0)
+      H5O_info2_t obj_info;
+#else
       H5O_info_t obj_info;
+#endif
       char obj_name[NC_MAX_NAME + 1];
 
       /* Open one of the netCDF test files. */
@@ -579,8 +583,13 @@ main(int argc, char **argv)
       for (i = 0; i < num_obj; i++)
       {
 	 /* Get the name. */
+#if H5_VERSION_GE(1,12,0)
+	 if (H5Oget_info_by_idx3(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
+                                 i, &obj_info, H5O_INFO_BASIC, H5P_DEFAULT) < 0) ERR_RET;
+#else
 	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
 				i, &obj_info, H5P_DEFAULT) < 0) ERR_RET;
+#endif
 	 if (H5Lget_name_by_idx(grpid, ".", H5_INDEX_NAME, H5_ITER_INC, i,
 				obj_name, NC_MAX_NAME + 1, H5P_DEFAULT) < 0) ERR_RET;
 	 printf(" reading type %s ", obj_name);
