@@ -23,6 +23,8 @@
     - Better error message for RemoteElem:: methods
     - Add Elem::low_order_key()
     - Don't die in Elem::volume() on a twisted element
+    - Add QUADSHELL9 element and shell elem unit tests
+    - Add Elem::is_internal() API for identifying internal (non-vertex/edge/side) nodes
 * ExodusII
     - Add ExodusII_IO::get_{side,node}set_data_indices()
     - Fix for writing write Exodus from multiple procs at once
@@ -39,6 +41,7 @@
     - Fix for Exodus writer when sideset and shellface set have same id
     - Add Exodus EDGE4 support
     - Add "WEDGE6" to ExodusII helper
+    - Avoid manual memory allocation in ExodusII_IO_Helper::read_qa_records()
   * IGA
     - Update 3D IGA projection regression test values
     - Add MeshTools::clear_spline_nodes()
@@ -86,6 +89,14 @@
     - Add BoundaryInfo::libmesh_assert_valid_multimaps()
     - Add MeshBase::copy_constraint_rows(Matrix) function
     - Support TRI7 in build_sphere()
+    - Add MeshBase::n_constraint_rows(), print_constraint_rows()
+    - Use connect_element_dependencies() in CheckpointIO
+    - Fix VTK unit test with DistributedMesh
+    - Add MeshTools::MeshGeneration::build_square(TRISHELL3) support
+    - Add entities BoundingBox testing in GmshIO
+    - Add MeshTetInterface::volume_to_surface_mesh()
+    - Add tet support to MeshTools::MeshGeneration::build_sphere()
+    - Add MeshTools::volume()
   * Miscellaneous
     - C++17 support is now required
     - Add/use exceptionless_{semi}parallel_object_only() macro
@@ -146,6 +157,12 @@
     - Fix Eigen preconditioning in 64-bit builds
     - Only do CPPUNIT_ASSERT_THROW tests if libmesh exceptions are enabled
     - Initialize variables within if-statements when possible
+    - Add a DofMap API to set need_full_sparsity_pattern
+    - Add CLI option --print-constraints
+    - Add MeshfreeInterpolationFunction class derived from FunctionBase<Number>
+    - Various "make dist" fixes
+    - Fix elem dof distribution for --node-major-dofs
+    - Make System::is_initialized() const
   * Numerics
     - Add SVD in preconditioner type
     - Allow use of matrix-free when computing residual and jacobian together
@@ -163,6 +180,14 @@
     - Add SparseMatrix::read_matlab()
     - Add SparseMatrix::col_start()/stop()
     - Add PetscMatrix read_petsc_* methods
+    - Add shell matrix support for CondensedEigenSystem
+    - Fixes for strict petsc error code checking
+    - Make sure every PetscFunctionBegin has a matching PetscFunctionReturn
+    - Add matrixconvert app
+    - Add SparseMatrix::solver_package()
+    - Add SparseMatrix read support from zipped .m files
+    - Add LIBMESH_PETSC_SUCCESS wrapping PETSC_SUCCESS macro
+    - Pass unique_ptr by value to NumericVector::restore_subvector()
   * PerfLog
     - PerfLog::fast_pop() should be noexcept
   * Poly2TriTriangulator
@@ -198,6 +223,7 @@
     - Add support for storing each RB parameter as a vector quantity
     - Handle the case where we encounter linearly dependent data in EIM
     - Add EIMVarGroupPlottingInfo struct, update EIM plotting functions
+    - Make preevaluate_thetas() virtual, it should be overridden in derived classes
   * Submodules
     - Update MetaPhysicL to 1.4.0+
     - Update TIMPI to 1.8.5+
@@ -206,6 +232,7 @@
     - Update nanoflann (#3121)
     - Add Eigen submodule, update to version 3.4.0
     - Add NetCDF submodule at version 4.9.2
+    - Add Netgen submodule currently at version 69f2ea56
   * TypeVector/TypeTensor
     - Add TypeVector::outer_product()
     - Add a column() API to TypeTensor
