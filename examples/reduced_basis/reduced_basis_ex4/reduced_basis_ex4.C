@@ -150,39 +150,6 @@ int main (int argc, char ** argv)
 
         // Write out the EIM basis functions
         eim_rb_eval.write_out_basis_functions("eim_data", eim_binary_io);
-
-#ifdef LIBMESH_HAVE_EXODUS_API
-
-        // Inputs needed by our RBEIMEvaluation::project_qp_data_vector_onto_system() override
-        std::vector<Number> bf_data;
-        EIMVarGroupPlottingInfo eim_vargroup;
-        std::map<std::string, std::string> extra_options;
-        std::set<std::string> system_names = {eim_construction.name()};
-
-        // Plot one of the parametrized functions from the training set
-        // FIXME: Set up the inputs correctly to plot f_qp
-        const RBEIMEvaluation::QpDataMap & f_qp =
-          eim_construction.get_parametrized_function_from_training_set(eim_training_function_to_plot);
-        eim_rb_eval.project_qp_data_vector_onto_system(
-          eim_construction,
-          bf_data,
-          eim_vargroup,
-          extra_options);
-
-        ExodusII_IO(mesh).write_equation_systems("eim_parametrized_function.e", equation_systems, &system_names);
-
-        // Plot one of the basis functions
-        // FIXME: Set up the inputs correctly to plot bf_qp
-        const RBEIMEvaluation::QpDataMap & bf_qp =
-          eim_rb_eval.get_basis_function(eim_basis_function_to_plot);
-        eim_rb_eval.project_qp_data_vector_onto_system(
-          eim_construction,
-          bf_data,
-          eim_vargroup,
-          extra_options);
-
-        ExodusII_IO(mesh).write_equation_systems("eim_basis_function.e", equation_systems, &system_names);
-#endif
       }
 
       {
