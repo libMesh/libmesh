@@ -992,6 +992,28 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
       }
   }
 
+  // Property map used to store generic properties by flaging entites like elements, nodes etc...
+  {
+    auto interpolation_points_property_list =
+      rb_eim_evaluation_reader.getPropertyMap();
+
+    if (interpolation_points_property_list.size() > 0)
+      {
+        unsigned int n_properties = interpolation_points_property_list.size();
+        for (unsigned int i=0; i<n_properties; ++i)
+          {
+            std::string property_name = interpolation_points_property_list[i].getName();
+            const auto entity_ids_list = interpolation_points_property_list[i].getEntityIds();
+            std::set<dof_id_type> entity_ids_set;
+            for (unsigned int j=0; j<entity_ids_list.size(); ++j)
+            {
+              entity_ids_set.insert(static_cast<dof_id_type>(entity_ids_list[j]));
+            }
+            rb_eim_evaluation.add_rb_property_map_entry(property_name, entity_ids_set);
+          }
+      }
+  }
+
   // Interpolation points perturbations
   {
     auto interpolation_points_list_outer =

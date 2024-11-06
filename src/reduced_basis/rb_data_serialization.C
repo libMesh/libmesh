@@ -831,6 +831,27 @@ void add_rb_eim_evaluation_data_to_builder(RBEIMEvaluation & rb_eim_evaluation,
                                               rb_eim_evaluation.get_interpolation_points_elem_type(i));
   }
 
+  unsigned int n_properties = rb_eim_evaluation.get_n_properties();
+  // Property map used to store generic properties by flaging entites like elements, nodes etc...
+  {
+    auto interpolation_points_property_list =
+      rb_eim_evaluation_builder.initPropertyMap(n_properties);
+    unsigned int property_counter = 0;
+    for (const auto& [property_name, entity_ids] : rb_eim_evaluation.get_rb_property_map())
+      {
+        interpolation_points_property_list[property_counter].setName(property_name);
+
+        unsigned int entity_counter = 0;
+        auto property_entity_ids = interpolation_points_property_list[property_counter].initEntityIds(entity_ids.size());
+        for (const auto entity_id : entity_ids)
+        {
+          property_entity_ids.set(entity_counter, entity_id);
+          entity_counter++;
+        }
+        property_counter++;
+      }
+  }
+
   // Optionally store EIM solutions for the training set
   if (rb_eim_evaluation.get_parametrized_function().is_lookup_table)
     {

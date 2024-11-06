@@ -28,6 +28,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/quadrature.h"
+#include "timpi/parallel_implementation.h"
 
 namespace libMesh
 {
@@ -43,6 +44,16 @@ void VectorizedEvalInput::clear()
   side_indices.clear();
   boundary_ids.clear();
   node_ids.clear();
+  elem_types.clear();
+
+  elem_id_to_local_index.clear();
+  JxW_all_qp.clear();
+  phi_i_all_qp.clear();
+  dxyzdxi_elem_center.clear();
+  dxyzdeta_elem_center.clear();
+  qrule_orders.clear();
+
+  rb_property_map.clear();
 }
 
 RBParametrizedFunction::RBParametrizedFunction()
@@ -52,7 +63,8 @@ requires_all_elem_qp_data(false),
 requires_all_elem_center_data(false),
 is_lookup_table(false),
 fd_delta(1.e-6),
-_is_nodal_boundary(false)
+_is_nodal_boundary(false),
+_rb_property_map(nullptr)
 {}
 
 RBParametrizedFunction::~RBParametrizedFunction() = default;
@@ -557,6 +569,9 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
   std::vector<RBParameters> mus {mu};
   vectorized_evaluate(mus, v, preevaluated_values);
 
+  // Transfer from VectorizedEvaluate to RBParametrizedFunction as v will go out of scope after this function.
+  this->_rb_property_map = std::make_unique<std::unordered_map<std::string, std::set<dof_id_type>>>(v.rb_property_map);
+
   preevaluate_parametrized_function_cleanup();
 }
 
@@ -815,6 +830,19 @@ void RBParametrizedFunction::initialize_spatial_indices(const std::vector<std::v
 }
 
 void RBParametrizedFunction::preevaluate_parametrized_function_cleanup()
+{
+  // No-op by default
+}
+
+const std::unordered_map<std::string, std::set<dof_id_type>> * RBParametrizedFunction::get_rb_property_map() const
+{
+  return _rb_property_map.get();
+};
+
+void RBParametrizedFunction::add_interpolation_data_to_rb_property_map(
+  const Parallel::Communicator & /*comm*/,
+  std::unordered_map<std::string, std::set<dof_id_type>> & /*rb_property_map*/,
+  dof_id_type /*elem_id*/)
 {
   // No-op by default
 }
