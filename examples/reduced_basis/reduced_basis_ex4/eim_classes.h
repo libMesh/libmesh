@@ -16,6 +16,8 @@
 using libMesh::EquationSystems;
 using libMesh::RBEIMEvaluation;
 using libMesh::RBEIMConstruction;
+using libMesh::System;
+using libMesh::EIMVarGroupPlottingInfo;
 
 // A simple subclass of RBEIMEvaluation. Overload
 // evaluate_parametrized_function to define the
@@ -34,6 +36,18 @@ public:
   {
     // Indicate that we do use the EIM error indicator here.
     return true;
+  }
+
+  /**
+   * Project the specified variable of \p bf_data into the solution
+   * vector of System.
+   */
+  virtual void project_qp_data_vector_onto_system(
+    System & sys,
+    const std::vector<Number> & bf_data,
+    const EIMVarGroupPlottingInfo & eim_vargroup,
+    const std::map<std::string, std::string> & extra_options) override
+  {
   }
 };
 
