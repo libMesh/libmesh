@@ -1664,6 +1664,10 @@ void RBEIMConstruction::initialize_parametrized_functions_in_training_set()
             _component_scaling_in_training_set[i] = _max_abs_value_in_training_set / max_abs_value_per_component_in_training_set[i];
         }
     }
+    // This function does nothing if rb_property_map from VectorizedEvalInput in RBParametrizedFunction
+    // is empty (= nullptr because ownership has not been transfered from VectorizedEvalInput of
+    // pre-evaluation to RBParametrizedFunction).
+    eim_eval.initialize_rb_property_map();
 }
 
 void RBEIMConstruction::initialize_qp_data()

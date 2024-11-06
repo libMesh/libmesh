@@ -38,6 +38,10 @@ class RBParameters;
 class Point;
 class System;
 
+namespace Parallel {
+  class Communicator;
+}
+
 /**
  * Define a struct for the input to the "vectorized evaluate" functions below.
  * This encapsulates the arguments into a class to prevent having many function
@@ -91,6 +95,13 @@ struct VectorizedEvalInput
   std::vector<Point> dxyzdxi_elem_center;
   std::vector<Point> dxyzdeta_elem_center;
   std::vector<Order> qrule_orders;
+
+  /**
+   * Generic map that can be used to store any list of ids (elements, nodes, elemsets, subdomains...)
+   * corresponding to a property (string) that can be used to apply a specific treatment to a group
+   * of entities.
+   */
+  std::unordered_map<std::string, std::set<dof_id_type>> rb_property_map;
 };
 
 /**
@@ -365,6 +376,21 @@ public:
   virtual void preevaluate_parametrized_function_cleanup();
 
   /**
+   * Function that returns a pointer to the rb_property_map stored in the RBParametrizedFunction.
+   * Note: We use the fact that rb_property_map can be set to nullptr when it is not used.
+   */
+  const std::unordered_map<std::string, std::set<dof_id_type>> * get_rb_property_map() const;
+
+  /**
+   * Virtual function that can be overridden in RBParametrizedFunction subclasses to store
+   * properties in the rb_property_map.
+   */
+  virtual void add_interpolation_data_to_rb_property_map(
+    const Parallel::Communicator & comm,
+    std::unordered_map<std::string, std::set<dof_id_type>> & rb_property_map,
+    dof_id_type elem_id);
+
+  /**
    * Storage for pre-evaluated values. The indexing is given by:
    *   parameter index --> point index --> component index --> value.
    */
@@ -460,6 +486,14 @@ protected:
    */
   bool _is_nodal_boundary;
 
+  /**
+   * Generic property map used to store data during mesh pre-evaluation. It should be initialized
+   * from a VectorizedEvalInput rb_property_map during the mesh pre-evaluation stage as VectorizedEvalInput
+   * goes out of scope quickly after pre-evluation. Then this RBParametrizedFunction rb_property_map
+   * is used to fill the RBEIMEvaluation VectorizedEvalInput rb_property_map with the same properties but
+   * interpolation point data only instead of the entire mesh.
+   */
+  std::unique_ptr<std::unordered_map<std::string, std::set<dof_id_type>>> _rb_property_map;
 };
 
 }

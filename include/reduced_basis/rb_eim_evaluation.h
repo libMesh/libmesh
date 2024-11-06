@@ -219,6 +219,11 @@ public:
   unsigned int get_n_elems() const;
 
   /**
+   * Return the number of properties stored in the rb_property_map
+   */
+  unsigned int get_n_properties() const;
+
+  /**
    * Set the number of basis functions. Useful when reading in
    * stored data.
    */
@@ -453,6 +458,7 @@ public:
   void add_elem_center_dxyzdeta(const Point & dxyzdxi);
   void add_interpolation_points_spatial_indices(const std::vector<unsigned int> & spatial_indices);
   void add_elem_id_local_index_map_entry(dof_id_type elem_id, unsigned int local_index);
+  void add_rb_property_map_entry(std::string & property_name, std::set<dof_id_type> & entity_ids);
 
   /**
    * Get the data associated with EIM interpolation points.
@@ -475,6 +481,7 @@ public:
   const Point & get_elem_center_dxyzdeta(unsigned int index) const;
   const std::vector<unsigned int> & get_interpolation_points_spatial_indices(unsigned int index) const;
   const std::map<dof_id_type, unsigned int> & get_elem_id_to_local_index_map() const;
+  const std::unordered_map<std::string, std::set<dof_id_type>> & get_rb_property_map() const;
 
   /**
    * _interpolation_points_spatial_indices is optional data, so we need to be able to
@@ -659,6 +666,12 @@ public:
    * Get the VectorizedEvalInput data.
    */
   const VectorizedEvalInput & get_vec_eval_input() const;
+
+  /**
+   * Initialize the rb_property_map of RBEIMEvaluation (this) from the rb_property_map stored in
+   * RBParametrizedFunction with empty entries but identical keys.
+   */
+  void initialize_rb_property_map();
 
   /**
    * Get all interior basis functions in the form of std::vectors.
