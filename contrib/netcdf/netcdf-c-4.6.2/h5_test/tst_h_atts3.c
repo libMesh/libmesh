@@ -46,7 +46,11 @@ main()
       hid_t file_typeid1[NUM_OBJ], native_typeid1[NUM_OBJ];
       hid_t file_typeid2, native_typeid2;
       hsize_t num_obj;
+#if H5_VERSION_GE(1,12,0)
+      H5O_info2_t obj_info;
+#else
       H5O_info_t obj_info;
+#endif
       char obj_name[STR_LEN + 1];
       hsize_t dims[1] = {ATT_LEN}; /* netcdf attributes always 1-D. */
       struct s1
@@ -148,8 +152,14 @@ main()
       for (i = 0; i < num_obj; i++)
       {
 	 /* Get the name, and make sure this is a type. */
+
+#if H5_VERSION_GE(1,12,0)
+	 if (H5Oget_info_by_idx3(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
+				 i, &obj_info, H5O_INFO_BASIC, H5P_DEFAULT) < 0) ERR;
+#else
 	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
 				i, &obj_info, H5P_DEFAULT) < 0) ERR;
+#endif
 	 if (H5Lget_name_by_idx(grpid, ".", H5_INDEX_NAME, H5_ITER_INC, i,
 				obj_name, STR_LEN + 1, H5P_DEFAULT) < 0) ERR;
 	 if (obj_info.type != H5O_TYPE_NAMED_DATATYPE) ERR;
@@ -267,8 +277,13 @@ main()
       for (i = 0; i < num_obj; i++)
       {
 	 /* Get the name, and make sure this is a type. */
+#if H5_VERSION_GE(1,12,0)
+       	 if (H5Oget_info_by_idx3(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
+                                 i, &obj_info, H5O_INFO_BASIC, H5P_DEFAULT) < 0) ERR; 
+#else
 	 if (H5Oget_info_by_idx(grpid, ".", H5_INDEX_CRT_ORDER, H5_ITER_INC,
 				i, &obj_info, H5P_DEFAULT) < 0) ERR;
+#endif
 	 if (H5Lget_name_by_idx(grpid, ".", H5_INDEX_NAME, H5_ITER_INC, i,
 				obj_name, STR_LEN + 1, H5P_DEFAULT) < 0) ERR;
 	 if (obj_info.type != H5O_TYPE_NAMED_DATATYPE) ERR;
