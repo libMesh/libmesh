@@ -405,7 +405,8 @@ void MeshTools::Modification::scale (MeshBase & mesh,
 
 void MeshTools::Modification::all_tri (MeshBase & mesh)
 {
-  libmesh_assert(mesh.is_prepared() || mesh.is_replicated());
+  if (!mesh.is_replicated() && !mesh.is_prepared())
+    mesh.prepare_for_use();
 
   // The number of elements in the original mesh before any additions
   // or deletions.
