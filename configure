@@ -2140,6 +2140,8 @@ Optional Features:
   --enable-hdf5-required  Error if HDF5 is not detected by configure
   --disable-xmltest       Do not try to compile and run a test LIBXML program
   --disable-netcdf        build without netCDF binary I/O
+  --enable-netcdf=all     build with multiple netCDF, for source distribution
+  --enable-netcdf=v492    build with netCDF v4.9.2 binary I/O
   --disable-exodus        build without ExodusII API support
   --enable-exodus-fortran build with ExodusII Fortran API support
   --disable-nemesis       build without NemesisII API support
@@ -58239,6 +58241,7 @@ fi
 
   configure_netcdf_v462=''
   configure_netcdf_v492=''
+
   # Check whether --enable-netcdf was given.
 if test ${enable_netcdf+y}
 then :
