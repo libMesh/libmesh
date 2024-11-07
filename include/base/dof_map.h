@@ -696,7 +696,8 @@ public:
 
   /**
    * \returns The number of degrees of freedom on this processor for a
-   * particular variable \p vn.
+   * particular variable \p vn.  This is an O(N) operation on serialized or
+   * O(N/Nproc) operation on distributed meshes.
    */
   dof_id_type n_local_dofs(const unsigned int vn) const
   {
