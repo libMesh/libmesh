@@ -594,15 +594,19 @@ public:
     sys.add_variables(var_names, FIRST);
 
     MeshTools::Generation::build_line (mesh,
-                                       1,
+                                       4,
                                        0., 1.,
                                        EDGE3);
 
     es.init();
 
-    CPPUNIT_ASSERT_EQUAL(sys.n_dofs(), n_dofs*2);
+    CPPUNIT_ASSERT_EQUAL(sys.n_dofs(), n_dofs*5);
     for (const Node * node : mesh.node_ptr_range())
       CPPUNIT_ASSERT_EQUAL(dof_id_type(node->n_vars(0)), n_dofs);
+
+    std::vector<dof_id_type> each = sys.get_dof_map().n_dofs_on_each_processor(888);
+    CPPUNIT_ASSERT_EQUAL(std::accumulate(each.begin(), each.end(), dof_id_type(0)), dof_id_type(5));
+    CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_dofs(888), dof_id_type(5));
   }
 
 
