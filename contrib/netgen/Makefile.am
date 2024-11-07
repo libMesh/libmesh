@@ -67,6 +67,8 @@ build/netgen/libsrc/core/libngcore$(LIBMESH_LIBRARY_SUFFIX) : .buildstamp
 
 endif
 
+EXTRA_DIST = netgen
+
 # Maybe useful later?
 #              build/netgen/libnggui.so \
 #              build/netgen/libsrc/core/pyngcore.cpython-310-x86_64-linux-gnu.so \
