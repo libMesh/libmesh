@@ -5,9 +5,16 @@ AC_DEFUN([CONFIGURE_NETCDF],
 [
   configure_netcdf_v462=''
   configure_netcdf_v492=''
+
+dnl The extra help strings here need to have no indentation.  Yes this
+dnl is a gross hack.
   AC_ARG_ENABLE(netcdf,
                 AS_HELP_STRING([--disable-netcdf],
-                               [build without netCDF binary I/O]),
+                               [build without netCDF binary I/O])
+AS_HELP_STRING([--enable-netcdf=all],
+[build with multiple netCDF, for source distribution])
+AS_HELP_STRING([--enable-netcdf=v492],
+[build with netCDF v4.9.2 binary I/O]),
                 [AS_CASE("${enableval}",
                   [v492],       [enablenetcdf=yes
                                  netcdfversion="v4.9.2"
