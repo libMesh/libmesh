@@ -561,6 +561,7 @@ vtkversion = @vtkversion@
 
 @LIBMESH_ENABLE_NETGEN_TRUE@ngliblib_DATA = build/netgen/libnglib$(LIBMESH_LIBRARY_SUFFIX)
 @LIBMESH_ENABLE_NETGEN_TRUE@netgenlib_DATA = build/netgen/libsrc/core/libngcore$(LIBMESH_LIBRARY_SUFFIX)
+EXTRA_DIST = netgen
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
