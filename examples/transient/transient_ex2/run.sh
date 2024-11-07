@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 #set -x
 
-source $LIBMESH_DIR/examples/run_common.sh
+. "$LIBMESH_DIR"/examples/run_common.sh
 
 example_name=transient_ex2
 example_dir=examples/transient/$example_name

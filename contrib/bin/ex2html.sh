@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 
-orig_pwd=`pwd`
+orig_pwd=$(pwd)
 base=$1
 output_file=$orig_pwd/$base.html
-cd $2
+cd "$2" || exit
 
 # First we put our special headings in
-cat <<EOF > $output_file
+cat <<EOF > "$output_file"
 <!doctype html>
 <html lang="en-US">
 <head>
@@ -60,21 +60,23 @@ one_path_stripped=$(dirname "$orig_pwd")
 # $one_path_stripped is just the name of ".."
 last_two_paths=$(basename "$one_path_stripped")/$(basename "$orig_pwd")
 
-echo "<br> <h1> Link to the source code for this example: </h1>" >> $output_file
-echo "<a href=\"https://github.com/libMesh/libmesh/tree/master/examples/$last_two_paths\" target=\"_blank\">Open $base in new tab.</a>" >> $output_file
+echo "<br> <h1> Link to the source code for this example: </h1>" >> "$output_file"
+echo "<a href=\"https://github.com/libMesh/libmesh/tree/master/examples/$last_two_paths\" target=\"_blank\">Open $base in new tab.</a>" >> "$output_file"
 
 # Now add the stdout.log if it exists
-cd $orig_pwd
-if (test -f stdout.log); then
-    echo "<a name=\"output\"></a> "                           >> $output_file;
-    echo "<br><br><br> <h1> The console output of the program: </h1> " >> $output_file;
-    echo "<pre>" >> $output_file;
-    cat stdout.log >> $output_file;
-    echo "</pre>" >> $output_file;
+cd "$orig_pwd" || exit
+if test -f stdout.log; then
+    {
+    echo "<a name=\"output\"></a> "
+    echo "<br><br><br> <h1> The console output of the program: </h1> "
+    echo "<pre>"
+    cat stdout.log
+    echo "</pre>"
+    } >> "$output_file"
 fi;
 
 # Now put our special php footer in
-cat <<EOF  >> $output_file
+cat <<EOF  >> "$output_file"
 </div>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>

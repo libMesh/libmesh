@@ -1,10 +1,15 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # This script creates a single html file of all the .bib files
 # passed in the year_names array below.  Make sure there is a
 # corresponding entry in the year_numbers array as well.  Why
 # not just name the bib files 2009.bib etc?  For some reason
 # multibib can't handle filenames with numbers in them.
+#
+# This script uses arrays, so we explicitly specify that the
+# bash shell should be used. We also use the bash from the
+# user's environment rather than assuming that bash will
+# always be found in /bin.
 
 # This script requires bibtex2html (see associated Makefile and
 # libmesh_html rule)
