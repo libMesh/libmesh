@@ -3121,12 +3121,11 @@ const VectorizedEvalInput & RBEIMEvaluation::get_vec_eval_input() const
 
 void RBEIMEvaluation::initialize_rb_property_map()
 {
-  const auto * rb_property_map_ptr = get_parametrized_function().get_rb_property_map();
+  const auto & rb_property_map = get_parametrized_function().get_rb_property_map();
   // Initialize rb_eim_eval VectorizedEvaluateInput from the one in rb_parametrized_function with
   // empty sets as it will be filled by subclasses virtual functions.
-  if (rb_property_map_ptr)
-    for (auto const& [key, val] : *rb_property_map_ptr)
-      _vec_eval_input.rb_property_map[key] = {};
+  for (const auto & [key, val] : rb_property_map)
+    _vec_eval_input.rb_property_map[key] = {};
 }
 
 const DenseVector<Number> & RBEIMEvaluation::get_error_indicator_interpolation_row() const

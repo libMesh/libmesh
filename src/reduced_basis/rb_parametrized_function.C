@@ -63,8 +63,7 @@ requires_all_elem_qp_data(false),
 requires_all_elem_center_data(false),
 is_lookup_table(false),
 fd_delta(1.e-6),
-_is_nodal_boundary(false),
-_rb_property_map(nullptr)
+_is_nodal_boundary(false)
 {}
 
 RBParametrizedFunction::~RBParametrizedFunction() = default;
@@ -570,7 +569,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
   vectorized_evaluate(mus, v, preevaluated_values);
 
   // Transfer from VectorizedEvaluate to RBParametrizedFunction as v will go out of scope after this function.
-  this->_rb_property_map = std::make_unique<std::unordered_map<std::string, std::set<dof_id_type>>>(v.rb_property_map);
+  this->_rb_property_map = std::move(v.rb_property_map);
 
   preevaluate_parametrized_function_cleanup();
 }
@@ -834,10 +833,10 @@ void RBParametrizedFunction::preevaluate_parametrized_function_cleanup()
   // No-op by default
 }
 
-const std::unordered_map<std::string, std::set<dof_id_type>> * RBParametrizedFunction::get_rb_property_map() const
+const std::unordered_map<std::string, std::set<dof_id_type>> & RBParametrizedFunction::get_rb_property_map() const
 {
-  return _rb_property_map.get();
-};
+  return _rb_property_map;
+}
 
 void RBParametrizedFunction::add_interpolation_data_to_rb_property_map(
   const Parallel::Communicator & /*comm*/,

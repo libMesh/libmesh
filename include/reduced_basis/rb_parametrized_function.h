@@ -376,10 +376,10 @@ public:
   virtual void preevaluate_parametrized_function_cleanup();
 
   /**
-   * Function that returns a pointer to the rb_property_map stored in the RBParametrizedFunction.
+   * Function that returns a reference to the rb_property_map stored in the RBParametrizedFunction.
    * Note: We use the fact that rb_property_map can be set to nullptr when it is not used.
    */
-  const std::unordered_map<std::string, std::set<dof_id_type>> * get_rb_property_map() const;
+  const std::unordered_map<std::string, std::set<dof_id_type>> &  get_rb_property_map() const;
 
   /**
    * Virtual function that can be overridden in RBParametrizedFunction subclasses to store
@@ -493,7 +493,7 @@ protected:
    * is used to fill the RBEIMEvaluation VectorizedEvalInput rb_property_map with the same properties but
    * interpolation point data only instead of the entire mesh.
    */
-  std::unique_ptr<std::unordered_map<std::string, std::set<dof_id_type>>> _rb_property_map;
+  std::unordered_map<std::string, std::set<dof_id_type>> _rb_property_map;
 };
 
 }
