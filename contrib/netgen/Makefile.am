@@ -32,7 +32,7 @@ ngliblibdir=$(libdir)
 # definitely are looking at an existing correct file when we do `make
 # install` in parallel.
 install-data-local: install-ngliblibDATA
-	if which install_name_tool 2>/dev/null; then \
+	@if which install_name_tool 2>/dev/null; then \
 	  echo "install_name_tool exists on OSX but is unneeded for rpath-based libnglib there"; \
 	elif which patchelf 2>/dev/null; then \
 	  patchelf --set-rpath "$(libdir)" "$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
