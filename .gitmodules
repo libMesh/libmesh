@@ -21,4 +21,4 @@
 	url = https://github.com/jlblancoc/nanoflann.git
 [submodule "contrib/netgen/netgen"]
 	path = contrib/netgen/netgen
-	url = ../../NGSolve/netgen.git
+	url = ../../libMesh/netgen.git
