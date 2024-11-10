@@ -1099,17 +1099,25 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
 }
 
 
-void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
+template <typename T, std::enable_if_t<std::is_same_v<T, dof_id_type> ||
+                                       std::is_same_v<T, std::vector<dof_id_type>>, int>>
+void DofMap::local_variable_indices(T & idx,
                                     const MeshBase & mesh,
                                     unsigned int var_num) const
 {
-  idx.clear();
+  // Only used if T == dof_id_type to keep track of the greatest dof we've seen
+  dof_id_type greatest = 0;
+
+  if constexpr (std::is_same_v<T, dof_id_type>)
+    idx = 0;
+  else if constexpr (std::is_same_v<T, std::vector<dof_id_type>>)
+    idx.clear();
 
   // Count dofs in the *exact* order that distribute_dofs numbered
   // them, so that we can assume ascending indices and use push_back
   // instead of find+insert.
 
-  const unsigned int sys_num       = this->sys_number();
+  const unsigned int sys_num = this->sys_number();
 
   // If this isn't a SCALAR variable, we need to find all its field
   // dofs on the mesh
@@ -1140,8 +1148,16 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
                   const dof_id_type index = node.dof_number(sys_num,var_num,i);
                   libmesh_assert (this->local_index(index));
 
-                  if (idx.empty() || index > idx.back())
-                    idx.push_back(index);
+                  if constexpr (std::is_same_v<T, dof_id_type>)
+                    {
+                      if (idx == 0 || index > greatest)
+                        { idx++; greatest = index; }
+                    }
+                  else if constexpr (std::is_same_v<T, std::vector<dof_id_type>>)
+                    {
+                      if (idx.empty() || index > idx.back())
+                        idx.push_back(index);
+                    }
                 }
             }
 
@@ -1150,8 +1166,17 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
           for (unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type index = elem->dof_number(sys_num,var_num,i);
-              if (idx.empty() || index > idx.back())
-                idx.push_back(index);
+
+              if constexpr (std::is_same_v<T, dof_id_type>)
+                {
+                  if (idx == 0 || index > greatest)
+                    { idx++; greatest = index; }
+                }
+              else if constexpr (std::is_same_v<T, std::vector<dof_id_type>>)
+                {
+                  if (idx.empty() || index > idx.back())
+                    idx.push_back(index);
+                }
             }
         } // done looping over elements
 
@@ -1172,8 +1197,17 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
           for (unsigned int i=0; i<n_comp; i++)
             {
               const dof_id_type index = node->dof_number(sys_num,var_num,i);
-              if (idx.empty() || index > idx.back())
-                idx.push_back(index);
+
+              if constexpr (std::is_same_v<T, dof_id_type>)
+                {
+                  if (idx == 0 || index > greatest)
+                    { idx++; greatest = index; }
+                }
+              else if constexpr (std::is_same_v<T, std::vector<dof_id_type>>)
+                {
+                  if (idx.empty() || index > idx.back())
+                    idx.push_back(index);
+                }
             }
         }
     }
@@ -1183,9 +1217,21 @@ void DofMap::local_variable_indices(std::vector<dof_id_type> & idx,
     {
       std::vector<dof_id_type> di_scalar;
       this->SCALAR_dof_indices(di_scalar,var_num);
-      idx.insert( idx.end(), di_scalar.begin(), di_scalar.end());
+
+      if constexpr (std::is_same_v<T, dof_id_type>)
+        idx += std::distance(di_scalar.begin(), di_scalar.end());
+      else if constexpr (std::is_same_v<T, std::vector<dof_id_type>>)
+        idx.insert(idx.end(), di_scalar.begin(), di_scalar.end());
     }
 }
+
+template void DofMap::local_variable_indices(dof_id_type &,
+                                             const MeshBase &,
+                                             unsigned int) const;
+
+template void DofMap::local_variable_indices(std::vector<dof_id_type> &,
+                                             const MeshBase &,
+                                             unsigned int) const;
 
 
 void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,

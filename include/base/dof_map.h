@@ -701,9 +701,9 @@ public:
    */
   dof_id_type n_local_dofs(const unsigned int vn) const
   {
-    std::vector<dof_id_type> var_idx;
-    this->local_variable_indices(var_idx, _mesh, vn);
-    return var_idx.size();
+    dof_id_type n;
+    this->local_variable_indices(n, _mesh, vn);
+    return n;
   }
 
   /**
@@ -962,10 +962,13 @@ public:
                              DenseVectorBase<Number> & Ue) const;
 
   /**
-   * Fills an array of those dof indices which belong to the given
-   * variable number and live on the current processor.
+   * If T == dof_id_type, counts, if T == std::vector<dof_id_type>, fills an
+   * array of, those dof indices which belong to the given variable number and
+   * live on the current processor.
    */
-  void local_variable_indices(std::vector<dof_id_type> & idx,
+  template <typename T, std::enable_if_t<std::is_same_v<T, dof_id_type> ||
+                                         std::is_same_v<T, std::vector<dof_id_type>>, int> = 0>
+  void local_variable_indices(T & idx,
                               const MeshBase & mesh,
                               unsigned int var_num) const;
 
