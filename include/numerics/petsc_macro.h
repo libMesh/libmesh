@@ -23,22 +23,15 @@
 
 #ifdef LIBMESH_HAVE_PETSC
 
+#include <petscversion.h>
+
 // A convenient macro for comparing PETSc versions.  Returns 1 if the
 // current PETSc version is < major.minor.subminor and zero otherwise.
-//
-// This macro does not require petscversion.h to be included for it to work correctly.
-// It instead relies on the PETSc version numbers detected during configure.  Note that if
-// LIBMESH_HAVE_PETSC is not defined, none of the LIBMESH_DETECTED_PETSC_VERSION_* variables will
-// be defined either.
-#define PETSC_VERSION_LESS_THAN(major,minor,subminor)                   \
-  ((LIBMESH_DETECTED_PETSC_VERSION_MAJOR < (major) ||                   \
-    (LIBMESH_DETECTED_PETSC_VERSION_MAJOR == (major) && (LIBMESH_DETECTED_PETSC_VERSION_MINOR < (minor) || \
-                                                         (LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor) && \
-                                                          LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR < (subminor))))))
-#define PETSC_VERSION_EQUALS(major,minor,subminor)              \
-  ((LIBMESH_DETECTED_PETSC_VERSION_MAJOR == (major)) &&         \
-   (LIBMESH_DETECTED_PETSC_VERSION_MINOR == (minor)) &&         \
-   (LIBMESH_DETECTED_PETSC_VERSION_SUBMINOR == (subminor)))
+#define PETSC_VERSION_LESS_THAN(major,minor,subminor) \
+  PETSC_VERSION_LT(major,minor,subminor)
+
+#define PETSC_VERSION_EQUALS(major,minor,subminor) \
+  PETSC_VERSION_EQ(major,minor,subminor)
 
 // We used to have workarounds for missing extern "C" in old PETSc
 // versions.  We no longer support PETSc versions so old, but we do
@@ -239,22 +232,10 @@ const PetscReal * pPR(const T * ptr)
 
 #endif // LIBMESH_HAVE_PETSC
 
-// The PETSC_VERSION_RELEASE constant was introduced just prior to 2.3.0 (ca. Apr 22 2005),
-// so fall back to using PETSC_VERSION_LESS_THAN in case it doesn't exist.
-#ifdef LIBMESH_DETECTED_PETSC_VERSION_RELEASE
-
 #define PETSC_RELEASE_LESS_THAN(major, minor, subminor) \
-  (PETSC_VERSION_LESS_THAN(major, minor, subminor) && LIBMESH_DETECTED_PETSC_VERSION_RELEASE)
+  PETSC_VERSION_LESS_THAN(major, minor, subminor)
 #define PETSC_RELEASE_EQUALS(major, minor, subminor) \
-  (PETSC_VERSION_EQUALS(major, minor, subminor) && LIBMESH_DETECTED_PETSC_VERSION_RELEASE)
-
-#else
-
-#define PETSC_RELEASE_LESS_THAN(major, minor, subminor) \
-  (PETSC_VERSION_LESS_THAN(major, minor, subminor))
-#define PETSC_RELEASE_EQUALS(major, minor, subminor) (PETSC_VERSION_EQUALS(major, minor, subminor))
-
-#endif
+  PETSC_VERSION_EQUALS(major, minor, subminor)
 
 #define PETSC_RELEASE_LESS_EQUALS(major, minor, subminor) \
   (PETSC_RELEASE_LESS_THAN(major, minor, subminor) || PETSC_RELEASE_EQUALS(major, minor, subminor))
