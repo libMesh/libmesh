@@ -18,7 +18,7 @@
 
 // Open the input mesh and corresponding solution file named in command line
 // arguments, parse the function specified in a command line argument,
-// L2-project its value onto the mesh, and output the new solution.
+// Project its value onto the mesh, and output the new solution.
 
 
 // libMesh includes
@@ -52,16 +52,18 @@ using namespace libMesh;
 void usage_error(const char * progname)
 {
   libMesh::out << "Options: " << progname << '\n'
-               << " --dim d               mesh dimension           [default: autodetect]\n"
+               << " --dim d               mesh dimension            [default: autodetect]\n"
                << " --inmesh    filename  input mesh file\n"
                << " --insoln    filename  input solution file\n"
                << " --calc      func      function to calculate\n"
-               << " --insys     num       input system number      [default: 0]\n"
-               << " --outsoln   filename  output solution file     [default: out_<insoln>]\n"
-               << " --family    famname   output FEM family        [default: LAGRANGE]\n"
-               << " --order     num       output FEM order         [default: 1]\n"
-               << " --subdomain num       subdomain id restriction [default: all subdomains]\n"
-               << " --integral            only calculate integral, not projection\n"
+               << " --insys     sysnum    input system number       [default: 0]\n"
+               << " --outsoln   filename  output solution file      [default: out_<insoln>]\n"
+               << " --family    famname   output FEM family         [default: LAGRANGE]\n"
+               << " --order     p         output FEM order          [default: 1]\n"
+               << " --subdomain sbd_id    subdomain id restriction  [default: all subdomains]\n"
+               << " --hilbert   order     Hilbert space to use      [default: 0 => H0]\n"
+               << " --fdm_eps   eps       Central diff for dfunc/dx [default: " << TOLERANCE << "]\n"
+               << " --integral            only calculate func integral, not projection\n"
                << std::endl;
 
   exit(1);
@@ -181,7 +183,7 @@ int main(int argc, char ** argv)
   const std::string family =
     cl.follow(std::string("LAGRANGE"), "--family");
 
-  const int order = cl.follow(1, "--order");
+  const unsigned int order = cl.follow(1u, "--order");
 
   std::unique_ptr<FEMFunctionBase<Number>> goal_function;
 
@@ -253,7 +255,9 @@ int main(int argc, char ** argv)
 
       EquationSystems new_es(new_mesh);
 
-      L2System & new_sys = new_es.add_system<L2System>(current_sys_name);
+      HilbertSystem & new_sys = new_es.add_system<HilbertSystem>(current_sys_name);
+
+      new_sys.hilbert_order() = cl.follow(0u, "--hilbert");
 
       new_sys.subdomains_list() = std::move(subdomains_list);
 
@@ -264,6 +268,8 @@ int main(int argc, char ** argv)
       new_sys.fe_order() = order;
 
       new_sys.goal_func = goal_function->clone();
+
+      new_sys.fdm_eps() = cl.follow(Real(TOLERANCE), "--fdm_eps");
 
       if (solnname != "")
         new_sys.input_system = &old_es.get_system(current_sys_name);

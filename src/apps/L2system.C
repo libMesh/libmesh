@@ -29,9 +29,9 @@
 
 using namespace libMesh;
 
-L2System::~L2System () = default;
+HilbertSystem::~HilbertSystem () = default;
 
-void L2System::init_data ()
+void HilbertSystem::init_data ()
 {
   this->add_variable ("u", static_cast<Order>(_fe_order),
                       Utility::string_to_enum<FEFamily>(_fe_family));
@@ -42,7 +42,7 @@ void L2System::init_data ()
 
 
 
-void L2System::init_context(DiffContext & context)
+void HilbertSystem::init_context(DiffContext & context)
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
 
@@ -63,6 +63,9 @@ void L2System::init_context(DiffContext & context)
       my_fe->get_phi();
       my_fe->get_xyz();
 
+      if (this->_hilbert_order > 0)
+        my_fe->get_dphi();
+
       c.get_side_fe( 0, my_fe, dim );
       my_fe->get_nothing();
     }
@@ -82,8 +85,8 @@ void L2System::init_context(DiffContext & context)
 }
 
 
-bool L2System::element_time_derivative (bool request_jacobian,
-                                        DiffContext & context)
+bool HilbertSystem::element_time_derivative (bool request_jacobian,
+                                             DiffContext & context)
 {
   FEMContext & c = cast_ref<FEMContext &>(context);
 
@@ -121,12 +124,39 @@ bool L2System::element_time_derivative (bool request_jacobian,
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
-      Number u = c.interior_value(0, qp);
-
-      Number ufunc = (*goal_func)(input_c, xyz[qp]);
+      const Number u = c.interior_value(0, qp);
+      const Number ufunc = (*goal_func)(input_c, xyz[qp]);
+      const Number err_u = u - ufunc;
 
       for (unsigned int i=0; i != n_u_dofs; i++)
-        F(i) += JxW[qp] * ((u - ufunc) * phi[i][qp]);
+        F(i) += JxW[qp] * (err_u * phi[i][qp]);
+
+      if (_hilbert_order > 0)
+        {
+          const std::vector<std::vector<RealGradient>> & dphi =
+            c.get_element_fe(0)->get_dphi();
+
+          const Gradient grad_u = c.interior_gradient(0, qp);
+          Gradient ufuncgrad;
+          ufuncgrad(0) = ((*goal_func)(input_c, xyz[qp]+Point(_fdm_eps)) -
+                          (*goal_func)(input_c, xyz[qp]+Point(_fdm_eps))) /
+                         2 / _fdm_eps;
+#if LIBMESH_DIM > 1
+          ufuncgrad(1) = ((*goal_func)(input_c, xyz[qp]+Point(0,_fdm_eps)) -
+                          (*goal_func)(input_c, xyz[qp]+Point(0,_fdm_eps))) /
+                         2 / _fdm_eps;
+#endif
+#if LIBMESH_DIM > 2
+          ufuncgrad(2) = ((*goal_func)(input_c, xyz[qp]+Point(0,0,_fdm_eps)) -
+                          (*goal_func)(input_c, xyz[qp]+Point(0,0,_fdm_eps))) /
+                         2 / _fdm_eps;
+#endif
+          const Gradient err_grad_u = grad_u - ufuncgrad;
+
+          for (unsigned int i=0; i != n_u_dofs; i++)
+            F(i) += JxW[qp] * (err_grad_u * dphi[i][qp]);
+        }
+
       if (request_jacobian)
         {
           const Number JxWxD = JxW[qp] *
@@ -135,6 +165,16 @@ bool L2System::element_time_derivative (bool request_jacobian,
           for (unsigned int i=0; i != n_u_dofs; i++)
             for (unsigned int j=0; j != n_u_dofs; ++j)
               K(i,j) += JxWxD * (phi[i][qp] * phi[j][qp]);
+
+          if (_hilbert_order > 0)
+            {
+              const std::vector<std::vector<RealGradient>> & dphi =
+                c.get_element_fe(0)->get_dphi();
+
+              for (unsigned int i=0; i != n_u_dofs; i++)
+                for (unsigned int j=0; j != n_u_dofs; ++j)
+                  K(i,j) += JxWxD * (dphi[i][qp] * dphi[j][qp]);
+            }
         }
     } // end of the quadrature point qp-loop
 

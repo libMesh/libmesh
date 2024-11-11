@@ -19,6 +19,7 @@
 #include "libmesh/enum_fe_family.h"
 #include "libmesh/fem_function_base.h"
 #include "libmesh/fem_system.h"
+#include "libmesh/libmesh_common.h"
 
 // C++ includes
 #include <map>
@@ -26,25 +27,30 @@
 
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
-class L2System : public libMesh::FEMSystem
+class HilbertSystem : public libMesh::FEMSystem
 {
 public:
   // Constructor
-  L2System(libMesh::EquationSystems & es,
-           const std::string & name,
-           const unsigned int number)
+  HilbertSystem(libMesh::EquationSystems & es,
+                const std::string & name,
+                const unsigned int number)
   : libMesh::FEMSystem(es, name, number),
     input_system(nullptr),
     _fe_family("LAGRANGE"),
     _fe_order(1),
+    _hilbert_order(0),
+    _fdm_eps(libMesh::TOLERANCE),
     _subdomains_list() {}
 
-  // Destructor; deletes extra context objects
-  ~L2System();
+  // Default destructor
+  ~HilbertSystem();
 
-  std::string & fe_family() { return _fe_family;  }
-  unsigned int & fe_order() { return _fe_order;  }
+  std::string & fe_family() { return _fe_family; }
+  unsigned int & fe_order() { return _fe_order; }
   std::set<libMesh::subdomain_id_type> & subdomains_list() { return _subdomains_list; }
+
+  unsigned int & hilbert_order() { return _hilbert_order; }
+  libMesh::Real & fdm_eps() { return _fdm_eps; }
 
   // We want to be able to project functions based on *other* systems'
   // values.  For that we need not only a FEMFunction but also a
@@ -55,10 +61,10 @@ public:
 
   libMesh::System * input_system;
 
+protected:
   std::map<libMesh::FEMContext *, std::unique_ptr<libMesh::FEMContext>>
     input_contexts;
 
-protected:
   // System initialization
   virtual void init_data ();
 
@@ -73,6 +79,13 @@ protected:
   // The FE type to use
   std::string _fe_family;
   unsigned int _fe_order;
+
+  // The Hilbert order our subclass will project with
+  unsigned int _hilbert_order;
+
+  // The perturbation we will use when finite differencing our goal
+  // function
+  libMesh::Real _fdm_eps;
 
   // Which subdomains to integrate on (all subdomains, if empty())
   std::set<libMesh::subdomain_id_type> _subdomains_list;
