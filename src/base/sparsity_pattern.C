@@ -278,10 +278,7 @@ void Build::operator()(const ConstElemRange & range)
   // fed into a PetscMatrixBase to allocate exactly the number of nonzeros
   // necessary to store the matrix.  This algorithm should be linear
   // in the (# of elements)*(# nodes per element)
-  const processor_id_type proc_id     = dof_map.processor_id();
-  const dof_id_type n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
-
-  sparsity_pattern.resize(n_dofs_on_proc);
+  sparsity_pattern.resize(dof_map.n_local_dofs());
 
   // Handle dof coupling specified by library and user coupling functors
   {
@@ -365,12 +362,9 @@ void Build::operator()(const ConstElemRange & range)
 
 void Build::join (const SparsityPattern::Build & other)
 {
-  const processor_id_type proc_id           = dof_map.processor_id();
-  const dof_id_type       n_dofs_on_proc    = dof_map.n_dofs_on_processor(proc_id);
-
   libmesh_assert_equal_to (sparsity_pattern.size(), other.sparsity_pattern.size());
 
-  for (dof_id_type r=0; r<n_dofs_on_proc; r++)
+  for (dof_id_type r=0; r<dof_map.n_local_dofs(); r++)
     {
       // increment the number of on and off-processor nonzeros in this row
       // (note this will be an upper bound unless we need the full sparsity pattern)
@@ -450,10 +444,7 @@ void Build::parallel_sync ()
   parallel_object_only();
   libmesh_assert(this->comm().verify(need_full_sparsity_pattern));
 
-  auto & comm = this->comm();
-  auto my_pid = comm.rank();
-
-  const auto n_dofs_on_proc  = dof_map.n_dofs_on_processor(my_pid);
+  const auto n_dofs_on_proc  = dof_map.n_local_dofs();
   const auto local_first_dof = dof_map.first_dof();
 
   // The data to send
@@ -556,8 +547,8 @@ void Build::parallel_sync ()
   n_nz.resize (n_dofs_on_proc, 0);
   n_oz.resize (n_dofs_on_proc, 0);
 
-  const dof_id_type first_dof_on_proc = dof_map.first_dof(my_pid);
-  const dof_id_type end_dof_on_proc   = dof_map.end_dof(my_pid);
+  const dof_id_type first_dof_on_proc = dof_map.first_dof();
+  const dof_id_type end_dof_on_proc   = dof_map.end_dof();
 
   for (dof_id_type i=0; i<n_dofs_on_proc; i++)
     {

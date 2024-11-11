@@ -613,9 +613,9 @@ namespace libMesh
             _ctx_vec[i-1].K_interp_ptr = _pmtx_vec[i-1].get();
             _ctx_vec[i-1].K_sub_interp_ptr = _subpmtx_vec[i-1].get();
 
-            unsigned int ndofs_local     = system.get_dof_map().n_dofs_on_processor(system.processor_id());
-            unsigned int ndofs_old_first = system.get_dof_map().first_old_dof(system.processor_id());
-            unsigned int ndofs_old_end   = system.get_dof_map().end_old_dof(system.processor_id());
+            unsigned int ndofs_local     = system.get_dof_map().n_local_dofs();
+            unsigned int ndofs_old_first = system.get_dof_map().first_old_dof();
+            unsigned int ndofs_old_end   = system.get_dof_map().end_old_dof();
             unsigned int ndofs_old_size  = ndofs_old_end - ndofs_old_first;
 
             // Init and zero the matrix

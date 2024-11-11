@@ -357,7 +357,7 @@ void PetscMatrix<T>::init (const ParallelType)
   libmesh_assert(this->_dof_map);
 
   const numeric_index_type m_in = this->_dof_map->n_dofs();
-  const numeric_index_type m_l  = this->_dof_map->n_dofs_on_processor(this->processor_id());
+  const numeric_index_type m_l  = this->_dof_map->n_local_dofs();
 
   const std::vector<numeric_index_type> & n_nz = this->_sp->get_n_nz();
   const std::vector<numeric_index_type> & n_oz = this->_sp->get_n_oz();

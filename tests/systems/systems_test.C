@@ -594,15 +594,19 @@ public:
     sys.add_variables(var_names, FIRST);
 
     MeshTools::Generation::build_line (mesh,
-                                       1,
+                                       4,
                                        0., 1.,
                                        EDGE3);
 
     es.init();
 
-    CPPUNIT_ASSERT_EQUAL(sys.n_dofs(), n_dofs*2);
+    CPPUNIT_ASSERT_EQUAL(sys.n_dofs(), n_dofs*5);
     for (const Node * node : mesh.node_ptr_range())
       CPPUNIT_ASSERT_EQUAL(dof_id_type(node->n_vars(0)), n_dofs);
+
+    std::vector<dof_id_type> each = sys.get_dof_map().n_dofs_on_each_processor(888);
+    CPPUNIT_ASSERT_EQUAL(std::accumulate(each.begin(), each.end(), dof_id_type(0)), dof_id_type(5));
+    CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_dofs(888), dof_id_type(5));
   }
 
 
@@ -1394,9 +1398,9 @@ public:
 
     // local and global projection_matrix sizes infos
     int n_new_dofs = sys.n_dofs();
-    int n_new_dofs_local = sys.get_dof_map().n_dofs_on_processor(sys.processor_id());
-    int ndofs_old_first = sys.get_dof_map().first_old_dof(sys.processor_id());
-    int ndofs_old_end   = sys.get_dof_map().end_old_dof(sys.processor_id());
+    int n_new_dofs_local = sys.get_dof_map().n_local_dofs();
+    int ndofs_old_first = sys.get_dof_map().first_old_dof();
+    int ndofs_old_end   = sys.get_dof_map().end_old_dof();
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector
@@ -1543,9 +1547,9 @@ public:
 
     // local and global projection_matrix sizes infos
     int n_new_dofs = sys.n_dofs();
-    int n_new_dofs_local = sys.get_dof_map().n_dofs_on_processor(sys.processor_id());
-    int ndofs_old_first = sys.get_dof_map().first_old_dof(sys.processor_id());
-    int ndofs_old_end   = sys.get_dof_map().end_old_dof(sys.processor_id());
+    int n_new_dofs_local = sys.get_dof_map().n_local_dofs();
+    int ndofs_old_first = sys.get_dof_map().first_old_dof();
+    int ndofs_old_end   = sys.get_dof_map().end_old_dof();
     int n_old_dofs_local = ndofs_old_end - ndofs_old_first;
 
     // init and compute the projection matrix using GenericProjector
