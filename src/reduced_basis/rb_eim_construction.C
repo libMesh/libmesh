@@ -2974,7 +2974,11 @@ EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
   if (comm().size() > 1)
   {
     global_v = v;
-    comm().set_union(global_v);
+
+    // We only use global_v on proc 0, so we set the second argument of
+    // set_union() to zero here to indicate that we only need the result
+    // on proc 0.
+    comm().set_union(global_v, 0);
     v_ptr = &global_v;
   }
   else
@@ -3064,7 +3068,11 @@ EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
   if (comm().size() > 1)
   {
     global_v = v;
-    comm().set_union(global_v);
+
+    // We only use global_v on proc 0, so we set the second argument of
+    // set_union() to zero here to indicate that we only need the result
+    // on proc 0.
+    comm().set_union(global_v, 0);
     v_ptr = &global_v;
   }
   else
@@ -3152,7 +3160,11 @@ EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v)
   if (comm().size() > 1)
   {
     global_v = v;
-    comm().set_union(global_v);
+
+    // We only use global_v on proc 0, so we set the second argument of
+    // set_union() to zero here to indicate that we only need the result
+    // on proc 0.
+    comm().set_union(global_v, 0);
     v_ptr = &global_v;
   }
   else
