@@ -482,8 +482,10 @@ namespace libMesh
         this->build_section(system, section);
 #if PETSC_VERSION_LESS_THAN(3,10,0)
         LibmeshPetscCall2(system.comm(), DMSetDefaultSection(dm, section));
-#else
+#elif PETSC_VERSION_LESS_THAN(3,23,0)
         LibmeshPetscCall2(system.comm(), DMSetSection(dm, section));
+#else
+        LibmeshPetscCall2(system.comm(), DMSetLocalSection(dm, section));
 #endif
 
         // We only need to build the star forest if we're in a parallel environment
