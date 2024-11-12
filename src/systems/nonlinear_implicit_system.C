@@ -118,40 +118,53 @@ void NonlinearImplicitSystem::set_solver_parameters ()
     this->get_equation_systems();
 
   // Get the user-specified nonlinear solver tolerances
-  const unsigned int maxits =
+  const unsigned int maxits = parameters.have_parameter<unsigned int>("nonlinear solver maximum iterations") ?
+    parameters.get<unsigned int>("nonlinear solver maximum iterations") :
     es.parameters.get<unsigned int>("nonlinear solver maximum iterations");
 
-  const unsigned int maxfuncs =
+  const unsigned int maxfuncs = parameters.have_parameter<unsigned int>("nonlinear solver maximum function evaluations") ?
+    parameters.get<unsigned int>("nonlinear solver maximum function evaluations") :
     es.parameters.get<unsigned int>("nonlinear solver maximum function evaluations");
 
-  const double abs_resid_tol =
+  const double abs_resid_tol = parameters.have_parameter<Real>("nonlinear solver absolute residual tolerance") ?
+    double(parameters.get<Real>("nonlinear solver absolute residual tolerance")) :
     double(es.parameters.get<Real>("nonlinear solver absolute residual tolerance"));
 
-  const double rel_resid_tol =
+  const double rel_resid_tol = parameters.have_parameter<Real>("nonlinear solver relative residual tolerance") ?
+    double(parameters.get<Real>("nonlinear solver relative residual tolerance")) :
     double(es.parameters.get<Real>("nonlinear solver relative residual tolerance"));
 
-  const double div_tol =
+  const double div_tol = parameters.have_parameter<Real>("nonlinear solver divergence tolerance") ?
+    double(parameters.get<Real>("nonlinear solver divergence tolerance")) :
     double(es.parameters.get<Real>("nonlinear solver divergence tolerance"));
 
-  const double abs_step_tol =
+  const double abs_step_tol = parameters.have_parameter<Real>("nonlinear solver absolute step tolerance") ?
+    double(parameters.get<Real>("nonlinear solver absolute step tolerance")) :
     double(es.parameters.get<Real>("nonlinear solver absolute step tolerance"));
 
-  const double rel_step_tol =
+  const double rel_step_tol = parameters.have_parameter<Real>("nonlinear solver relative step tolerance")?
+    double(parameters.get<Real>("nonlinear solver relative step tolerance")) :
     double(es.parameters.get<Real>("nonlinear solver relative step tolerance"));
 
   // Get the user-specified linear solver tolerances
-  const unsigned int maxlinearits =
+  const unsigned int maxlinearits = parameters.have_parameter<unsigned int>("linear solver maximum iterations") ?
+    parameters.get<unsigned int>("linear solver maximum iterations") :
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-  const double linear_tol =
+  const double linear_tol = parameters.have_parameter<Real>("linear solver tolerance") ?
+    double(parameters.get<Real>("linear solver tolerance")) :
     double(es.parameters.get<Real>("linear solver tolerance"));
 
-  const double linear_min_tol =
+  const double linear_min_tol = parameters.have_parameter<Real>("linear solver minimum tolerance") ?
+    double(parameters.get<Real>("linear solver minimum tolerance")) :
     double(es.parameters.get<Real>("linear solver minimum tolerance"));
 
-  const bool reuse_preconditioner =
+  const bool reuse_preconditioner = parameters.have_parameter<unsigned int>("reuse preconditioner") ?
+    parameters.get<unsigned int>("reuse preconditioner") :
       es.parameters.get<bool>("reuse preconditioner");
   const unsigned int reuse_preconditioner_max_linear_its =
+    parameters.have_parameter<unsigned int>("reuse preconditioner maximum linear iterations") ?
+    parameters.get<unsigned int>("reuse preconditioner maximum linear iterations") :
       es.parameters.get<unsigned int>("reuse preconditioner maximum linear iterations");
 
   // Set all the parameters on the NonlinearSolver

@@ -131,11 +131,13 @@ void LinearImplicitSystem::solve ()
   linear_solver->init_names(*this);
 
   // Get the user-specified linear solver tolerance
-  const double tol =
+  const double tol = parameters.have_parameter<Real>("linear solver tolerance") ?
+    double(parameters.get<Real>("linear solver tolerance")) :
     double(es.parameters.get<Real>("linear solver tolerance"));
 
   // Get the user-specified maximum # of linear solver iterations
-  const unsigned int maxits =
+  const unsigned int maxits = parameters.have_parameter<unsigned int>("linear solver maximum iterations") ?
+    parameters.get<unsigned int>("linear solver maximum iterations") :
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
   if (_subset != nullptr)

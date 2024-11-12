@@ -112,6 +112,10 @@ void FrequencySystem::init_data ()
   // make sure we have frequencies to solve for
   if (!_finished_set_frequencies)
     {
+      // not supported for now
+      if (parameters.have_parameter<unsigned int> ("n_frequencies"))
+        libmesh_not_implemented_msg("ERROR: Setting the n_frequencies parameter on the system is not supported");
+
       // when this system was read from file, check
       // if this has a "n_frequencies" parameter,
       // and initialize us with these.
@@ -119,7 +123,7 @@ void FrequencySystem::init_data ()
         {
 #ifndef NDEBUG
           const unsigned int n_freq =
-            es.parameters.get<unsigned int>("n_frequencies");
+            es.parameters:<unsigned int>("n_frequencies");
 
           libmesh_assert_greater (n_freq, 0);
 #endif
@@ -304,7 +308,7 @@ void FrequencySystem::set_frequencies (const std::vector<Number> & frequencies,
 unsigned int FrequencySystem::n_frequencies () const
 {
   libmesh_assert(_finished_set_frequencies);
-  return this->get_equation_systems().parameters.get<unsigned int>("n_frequencies");
+  return this->get_equation_systems().parameters:<unsigned int>("n_frequencies");
 }
 
 
@@ -339,9 +343,11 @@ void FrequencySystem::solve (const unsigned int n_start,
   // Get the user-specified linear solver tolerance,
   //     the user-specified maximum # of linear solver iterations,
   //     the user-specified wave speed
-  const Real tol            =
+  const Real tol            = parameters.have_parameter<Real>("linear solver tolerance") ?
+    double(parameters.get<Real>("linear solver tolerance")) :
     es.parameters.get<Real>("linear solver tolerance");
-  const unsigned int maxits =
+  const unsigned int maxits = parameters.have_parameter<unsigned int>("linear solver maximum iterations") ?
+    parameters.get<unsigned int>("linear solver maximum iterations") :
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
   // start solver loop
