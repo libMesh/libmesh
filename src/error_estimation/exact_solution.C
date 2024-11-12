@@ -120,12 +120,34 @@ void ExactSolution::attach_exact_values (const std::vector<FunctionBase<Number> 
   _exact_values.clear();
 
   for (auto ptr : f)
+    _exact_values.emplace_back(ptr ? WrappedFunctor<Number>(*ptr) : nullptr);
+}
+
+
+void ExactSolution::attach_exact_values (const std::vector<FEMFunctionBase<Number> *> & f)
+{
+  // Automatically delete any previous _exact_values entries, then add a new
+  // entry for each system.
+  _exact_values.clear();
+
+  for (auto ptr : f)
     _exact_values.emplace_back(ptr ? ptr->clone() : nullptr);
 }
 
 
 void ExactSolution::attach_exact_value (unsigned int sys_num,
                                         FunctionBase<Number> * f)
+{
+  if (_exact_values.size() <= sys_num)
+    _exact_values.resize(sys_num+1);
+
+  if (f)
+    _exact_values[sys_num] = std::make_unique<WrappedFunctor<Number>>(*f);
+}
+
+
+void ExactSolution::attach_exact_value (unsigned int sys_num,
+                                        FEMFunctionBase<Number> * f)
 {
   if (_exact_values.size() <= sys_num)
     _exact_values.resize(sys_num+1);
@@ -161,12 +183,34 @@ void ExactSolution::attach_exact_derivs (const std::vector<FunctionBase<Gradient
   _exact_derivs.clear();
 
   for (auto ptr : g)
+    _exact_derivs.emplace_back(ptr ? WrappedFunctor<Gradient>(*ptr) : nullptr);
+}
+
+
+void ExactSolution::attach_exact_derivs (const std::vector<FEMFunctionBase<Gradient> *> & g)
+{
+  // Automatically delete any previous _exact_derivs entries, then add a new
+  // entry for each system.
+  _exact_derivs.clear();
+
+  for (auto ptr : g)
     _exact_derivs.emplace_back(ptr ? ptr->clone() : nullptr);
 }
 
 
 void ExactSolution::attach_exact_deriv (unsigned int sys_num,
                                         FunctionBase<Gradient> * g)
+{
+  if (_exact_derivs.size() <= sys_num)
+    _exact_derivs.resize(sys_num+1);
+
+  if (g)
+    _exact_values[sys_num] = std::make_unique<WrappedFunctor<Gradient>>(*g);
+}
+
+
+void ExactSolution::attach_exact_deriv (unsigned int sys_num,
+                                        FEMFunctionBase<Gradient> * g)
 {
   if (_exact_derivs.size() <= sys_num)
     _exact_derivs.resize(sys_num+1);
@@ -202,12 +246,34 @@ void ExactSolution::attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h
   _exact_hessians.clear();
 
   for (auto ptr : h)
+    _exact_hessians.emplace_back(ptr ? WrappedFunctor<Tensor>(*ptr) : nullptr);
+}
+
+
+void ExactSolution::attach_exact_hessians (std::vector<FEMFunctionBase<Tensor> *> h)
+{
+  // Automatically delete any previous _exact_hessians entries, then add a new
+  // entry for each system.
+  _exact_hessians.clear();
+
+  for (auto ptr : h)
     _exact_hessians.emplace_back(ptr ? ptr->clone() : nullptr);
 }
 
 
 void ExactSolution::attach_exact_hessian (unsigned int sys_num,
                                           FunctionBase<Tensor> * h)
+{
+  if (_exact_hessians.size() <= sys_num)
+    _exact_hessians.resize(sys_num+1);
+
+  if (h)
+    _exact_hessians[sys_num] = std::make_unique<WrappedFunctor<Tensor>>(*h);
+}
+
+
+void ExactSolution::attach_exact_hessian (unsigned int sys_num,
+                                          FEMFunctionBase<Tensor> * h)
 {
   if (_exact_hessians.size() <= sys_num)
     _exact_hessians.resize(sys_num+1);
