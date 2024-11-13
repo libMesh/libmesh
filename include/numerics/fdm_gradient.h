@@ -21,6 +21,7 @@
 // libMesh includes
 #include "libmesh/fem_function_base.h"
 #include "libmesh/libmesh_common.h"
+#include "libmesh/tensor_tools.h"
 
 namespace libMesh
 {
@@ -29,7 +30,7 @@ template <typename GradType>
 class FDMGradient : public FEMFunctionBase<GradType>
 {
 public:
-  typedef typename DecrementRank<GradType>::type ValType;
+  typedef typename TensorTools::DecrementRank<GradType>::type ValType;
 
   FDMGradient (FEMFunctionBase<ValType> & value_func,
                Real eps) :
@@ -37,10 +38,10 @@ public:
   {}
 
   virtual void init_context (const FEMContext & c) override
-  { _val->init_context(c); }
+  { _val_func->init_context(c); }
 
   virtual std::unique_ptr<FEMFunctionBase<GradType>> clone () const override
-  { return std::make_unique<FDMGradient>(*_val); }
+  { return std::make_unique<FDMGradient<GradType>>(*_val_func, _eps); }
 
   virtual GradType operator() (const FEMContext & c,
                                const Point & p,
@@ -50,17 +51,17 @@ public:
 
     auto & val = *_val_func;
 
-    g(0) = (val(input_c, xyz[qp]+Point(_eps), time) -
-            val(input_c, xyz[qp]+Point(-_eps), time)) /
+    g(0) = (val(c, p+Point(_eps), time) -
+            val(c, p+Point(-_eps), time)) /
            2 / _eps;
 #if LIBMESH_DIM > 1
-    g(1) = (val(input_c, xyz[qp]+Point(0,_eps), time) -
-            val(input_c, xyz[qp]+Point(0,-_eps), time)) /
+    g(1) = (val(c, p+Point(0,_eps), time) -
+            val(c, p+Point(0,-_eps), time)) /
            2 / _eps;
 #endif
 #if LIBMESH_DIM > 2
-    g(2) = (val(input_c, xyz[qp]+Point(0,0,_eps), time) -
-            val(input_c, xyz[qp]+Point(0,0,-_eps), time)) /
+    g(2) = (val(c, p+Point(0,0,_eps), time) -
+            val(c, p+Point(0,0,-_eps), time)) /
            2 / _eps;
 #endif
 
@@ -69,62 +70,19 @@ public:
 
   virtual void operator() (const FEMContext & c,
                            const Point & p,
-                           const DenseVector<GradType> & output) override
-  {
-    auto sz = output.size();
-    DenseVector<ValType> v(sz);
-
-    val(input_c, xyz[qp]+Point(_eps), v);
-    for (auto i : make_range(sz))
-      output(i)(0) = v(i);
-
-    val(input_c, xyz[qp]+Point(-_eps), v);
-    for (auto i : make_range(sz))
-      {
-        output(i)(0) -= v(i);
-        output(i)(0) /= 2;
-      }
-
-#if LIBMESH_DIM > 1
-    val(input_c, xyz[qp]+Point(0,_eps), v);
-    for (auto i : make_range(sz))
-      output(i)(1) = v(i);
-
-    val(input_c, xyz[qp]+Point(0,-_eps), v);
-    for (auto i : make_range(sz))
-      {
-        output(i)(1) -= v(i);
-        output(i)(1) /= 2;
-      }
-#endif
-#if LIBMESH_DIM > 2
-    val(input_c, xyz[qp]+Point(0,0,_eps), v);
-    for (auto i : make_range(sz))
-      output(i)(2) = v(i);
-
-    val(input_c, xyz[qp]+Point(0,0,-_eps), v);
-    for (auto i : make_range(sz))
-      {
-        output(i)(2) -= v(i);
-        output(i)(2) /= 2;
-      }
-#endif
-  }
-
-
-  virtual void operator() (const FEMContext & c,
-                           const Point & p,
                            const Real time,
-                           const DenseVector<GradType> & output) override
+                           DenseVector<GradType> & output) override
   {
     auto sz = output.size();
     DenseVector<ValType> v(sz);
 
-    val(input_c, xyz[qp]+Point(_eps), time, v);
+    auto & val = *_val_func;
+
+    val(c, p+Point(_eps), time, v);
     for (auto i : make_range(sz))
       output(i)(0) = v(i);
 
-    val(input_c, xyz[qp]+Point(-_eps), time, v);
+    val(c, p+Point(-_eps), time, v);
     for (auto i : make_range(sz))
       {
         output(i)(0) -= v(i);
@@ -132,11 +90,11 @@ public:
       }
 
 #if LIBMESH_DIM > 1
-    val(input_c, xyz[qp]+Point(0,_eps), time, v);
+    val(c, p+Point(0,_eps), time, v);
     for (auto i : make_range(sz))
       output(i)(1) = v(i);
 
-    val(input_c, xyz[qp]+Point(0,-_eps), time, v);
+    val(c, p+Point(0,-_eps), time, v);
     for (auto i : make_range(sz))
       {
         output(i)(1) -= v(i);
@@ -144,11 +102,11 @@ public:
       }
 #endif
 #if LIBMESH_DIM > 2
-    val(input_c, xyz[qp]+Point(0,0,_eps), time, v);
+    val(c, p+Point(0,0,_eps), time, v);
     for (auto i : make_range(sz))
       output(i)(2) = v(i);
 
-    val(input_c, xyz[qp]+Point(0,0,-_eps), time, v);
+    val(c, p+Point(0,0,-_eps), time, v);
     for (auto i : make_range(sz))
       {
         output(i)(2) -= v(i);
@@ -167,17 +125,17 @@ public:
 
     auto & val = *_val_func;
 
-    g(0) = (val(input_c, i, xyz[qp]+Point(_eps), time) -
-            val(input_c, i, xyz[qp]+Point(-_eps), time)) /
+    g(0) = (val.component(c, i, p+Point(_eps), time) -
+            val.component(c, i, p+Point(-_eps), time)) /
            2 / _eps;
 #if LIBMESH_DIM > 1
-    g(1) = (val(input_c, i, xyz[qp]+Point(0,_eps), time) -
-            val(input_c, i, xyz[qp]+Point(0,-_eps), time)) /
+    g(1) = (val.component(c, i, p+Point(0,_eps), time) -
+            val.component(c, i, p+Point(0,-_eps), time)) /
            2 / _eps;
 #endif
 #if LIBMESH_DIM > 2
-    g(2) = (val(input_c, i, xyz[qp]+Point(0,0,_eps), time) -
-            val(input_c, i, xyz[qp]+Point(0,0,-_eps), time)) /
+    g(2) = (val.component(c, i, p+Point(0,0,_eps), time) -
+            val.component(c, i, p+Point(0,0,-_eps), time)) /
            2 / _eps;
 #endif
 
