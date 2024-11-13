@@ -24,6 +24,7 @@
 #include "libmesh/fem_function_base.h"
 #include "libmesh/function_base.h"
 #include "libmesh/point.h"
+#include "libmesh/wrapped_function.h"
 
 // C++ includes
 #include <cstddef>
@@ -53,6 +54,18 @@ public:
   WrappedFunctor (const FunctionBase<Output> & func)
     : _func(func.clone())
   { }
+
+  /**
+   * Constructor to wrap scalar-valued function pointers.
+   */
+  WrappedFunctor (const System & sys,
+                  Output fptr(const Point & p,
+                              const Parameters & parameters,
+                              const std::string & sys_name,
+                              const std::string & unknown_name) = nullptr,
+                  const Parameters * parameters = nullptr,
+                  unsigned int varnum=0) :
+    _func(std::make_unique<WrappedFunction<Output>>(sys, fptr, parameters, varnum)) {}
 
   /**
    * This class can't be copy constructed or assigned because it
