@@ -26,6 +26,7 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/exact_solution.h"
 #include "libmesh/getpot.h"
 #include "libmesh/mesh.h"
 #include "libmesh/newton_solver.h"
@@ -63,6 +64,8 @@ void usage_error(const char * progname)
                << " --subdomain sbd_id    each subdomain to check   [default: all subdomains]\n"
                << " --hilbert   order     Hilbert space to use      [default: 0 => H0]\n"
                << " --fdm_eps   eps       Central diff for dfunc/dx [default: " << TOLERANCE << "]\n"
+               << " --error_q   extra_q   integrate projection error, with adjusted\n"
+               << "                       (extra) quadrature order  [default: off, suggested: 0]\n"
                << " --integral            only calculate func integral, not projection\n"
                << std::endl;
 
@@ -284,6 +287,34 @@ int main(int argc, char ** argv)
       solver.relative_step_tolerance = 1e-10;
 
       new_sys.solve();
+
+      // Calculate the error if requested
+      if (cl.search(1, "--error_q"))
+        {
+          const unsigned int error_q = cl.next(0u);
+
+          // We just add "u" now but maybe we'll change that
+          for (auto v : make_range(new_sys.n_vars()))
+            {
+              ExactSolution exact_sol(new_es);
+              exact_sol.attach_exact_value(0, goal_function.get());
+              FDMGradient<Gradient> fdm_gradient(*goal_function, fdm_eps);
+              exact_sol.attach_exact_deriv(0, &fdm_gradient);
+              exact_sol.extra_quadrature_order(error_q);
+
+              const std::string var_name = new_sys.variable_name(v);
+              exact_sol.compute_error(current_sys_name, var_name);
+
+              libMesh::out << "L2-error in " << var_name << ": " <<
+                  exact_sol.l2_error(current_sys_name, var_name) <<
+                  std::endl;
+
+              if (new_sys.hilbert_order() > 0)
+                libMesh::out << "L2-error in " << var_name << ": " <<
+                    exact_sol.h1_error(current_sys_name, var_name) <<
+                    std::endl;
+            }
+        }
 
       // Write out the new solution file
       new_es.write(outsolnname.c_str(),
