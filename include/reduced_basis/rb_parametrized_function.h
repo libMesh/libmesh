@@ -377,9 +377,14 @@ public:
 
   /**
    * Function that returns a reference to the rb_property_map stored in the RBParametrizedFunction.
-   * Note: We use the fact that rb_property_map can be set to nullptr when it is not used.
    */
   const std::unordered_map<std::string, std::set<dof_id_type>> &  get_rb_property_map() const;
+
+  /**
+   * Function that adds a property to the RBParametrizedFunction rb_property_map.
+   * The function checks that there is no duplicated properties before adding the property to the map.
+   */
+  void add_rb_property_map_entry(std::string & property_name, std::set<dof_id_type> & entity_ids);
 
   /**
    * Virtual function that can be overridden in RBParametrizedFunction subclasses to store

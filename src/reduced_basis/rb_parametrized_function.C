@@ -838,6 +838,12 @@ const std::unordered_map<std::string, std::set<dof_id_type>> & RBParametrizedFun
   return _rb_property_map;
 }
 
+void RBParametrizedFunction::add_rb_property_map_entry(std::string & property_name, std::set<dof_id_type> & entity_ids)
+{
+  bool insert_succeed = _rb_property_map.insert({property_name, entity_ids}).second;
+  libmesh_error_msg_if(!insert_succeed, "Entry already added, duplicate detected.");
+}
+
 void RBParametrizedFunction::add_interpolation_data_to_rb_property_map(
   const Parallel::Communicator & /*comm*/,
   std::unordered_map<std::string, std::set<dof_id_type>> & /*rb_property_map*/,
