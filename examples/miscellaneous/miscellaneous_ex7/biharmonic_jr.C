@@ -99,18 +99,18 @@ void Biharmonic::JR::initialize()
   if (_biharmonic._verbose)
     libMesh::out << ">>> Initializing Biharmonic::JR\n";
 
-  Parameters parameters;
-  parameters.set<Point>("center") = _biharmonic._initialCenter;
-  parameters.set<Real>("width")   = _biharmonic._initialWidth;
+  Parameters params;
+  params.set<Point>("center") = _biharmonic._initialCenter;
+  params.set<Real>("width")   = _biharmonic._initialWidth;
 
   if (_biharmonic._initialState == Biharmonic::BALL)
-    project_solution(Biharmonic::JR::InitialDensityBall, Biharmonic::JR::InitialGradientZero, parameters);
+    project_solution(Biharmonic::JR::InitialDensityBall, Biharmonic::JR::InitialGradientZero, params);
 
   if (_biharmonic._initialState == Biharmonic::ROD)
-    project_solution(Biharmonic::JR::InitialDensityRod, Biharmonic::JR::InitialGradientZero, parameters);
+    project_solution(Biharmonic::JR::InitialDensityRod, Biharmonic::JR::InitialGradientZero, params);
 
   if (_biharmonic._initialState == Biharmonic::STRIP)
-    project_solution(Biharmonic::JR::InitialDensityStrip, Biharmonic::JR::InitialGradientZero, parameters);
+    project_solution(Biharmonic::JR::InitialDensityStrip, Biharmonic::JR::InitialGradientZero, params);
 
   // both states are equal
   *(old_local_solution) = *(current_local_solution);
@@ -125,13 +125,13 @@ void Biharmonic::JR::initialize()
 
 
 Number Biharmonic::JR::InitialDensityBall(const Point & p,
-                                          const Parameters & parameters,
+                                          const Parameters & params,
                                           const std::string &,
                                           const std::string &)
 {
   // Initialize with a ball in the middle, which is a segment in 1D, a disk in 2D and a ball in 3D.
-  Point center = parameters.get<Point>("center");
-  Real width = parameters.get<Real>("width");
+  Point center = params.get<Point>("center");
+  Real width = params.get<Real>("width");
   Point pc = p-center;
   Real r = pc.norm();
   return (r < width) ? 1.0 : -0.5;
@@ -141,13 +141,13 @@ Number Biharmonic::JR::InitialDensityBall(const Point & p,
 
 
 Number Biharmonic::JR::InitialDensityRod(const Point & p,
-                                         const Parameters & parameters,
+                                         const Parameters & params,
                                          const std::string &,
                                          const std::string &)
 {
   // Initialize with a rod in the middle so that we have a z-homogeneous system to model the 2D disk.
-  Point center = parameters.get<Point>("center");
-  Real width = parameters.get<Real>("width");
+  Point center = params.get<Point>("center");
+  Real width = params.get<Real>("width");
   Point pc = p-center;
 #if LIBMESH_DIM > 2
   pc(2) = 0;
@@ -161,13 +161,13 @@ Number Biharmonic::JR::InitialDensityRod(const Point & p,
 
 
 Number Biharmonic::JR::InitialDensityStrip(const Point & p,
-                                           const Parameters & parameters,
+                                           const Parameters & params,
                                            const std::string &,
                                            const std::string &)
 {
   // Initialize with a wide strip in the middle so that we have a yz-homogeneous system to model the 1D.
-  Point center = parameters.get<Point>("center");
-  Real width = parameters.get<Real>("width");
+  Point center = params.get<Point>("center");
+  Real width = params.get<Real>("width");
   Real r = sqrt((p(0)-center(0))*(p(0)-center(0)));
   return (r < width) ? 1.0 : -0.5;
 }
