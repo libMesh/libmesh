@@ -2964,6 +2964,28 @@ EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
 {
   EimPointData eim_point_data;
 
+  // If we have more than one process, then we need to do a parallel union
+  // of v to make sure that we have data from all processors. Our approach
+  // here is to set v_ptr to either v or global_v, depending on whether we
+  // are in parallel or serial. The purpose of this approach is to avoid
+  // making a copy of v in the case that this is a serial job.
+  QpDataMap const * v_ptr = nullptr;
+  QpDataMap global_v;
+  if (comm().size() > 1)
+  {
+    global_v = v;
+
+    // We only use global_v on proc 0, so we set the second argument of
+    // set_union() to zero here to indicate that we only need the result
+    // on proc 0.
+    comm().set_union(global_v, 0);
+    v_ptr = &global_v;
+  }
+  else
+  {
+    v_ptr = &v;
+  }
+
   bool error_finding_new_element = false;
   if (comm().rank() == 0)
     {
@@ -2976,7 +2998,7 @@ EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
         // by setting up new_elem_ids to contain only elements that are not in
         // previous_elem_ids, and then selecting the elem_id at random from new_elem_ids.
         // We give an error if there are no elements in new_elem_ids. This is potentially
-        // an overzealous assertion since we could pick and element that has already
+        // an overzealous assertion since we could pick an element that has already
         // been selected as long as we pick a (comp_index, qp_index) that has not already
         // been selected for that element.
         //
@@ -2987,7 +3009,7 @@ EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
         // is typically desirable if we want EIM evaluations that are independent from
         // the EIM points (e.g. for EIM error indicator purposes).
         std::set<dof_id_type> new_elem_ids;
-        for (const auto & v_pair : v)
+        for (const auto & v_pair : *v_ptr)
           if (previous_elem_ids.count(v_pair.first) == 0)
             new_elem_ids.insert(v_pair.first);
 
@@ -3010,12 +3032,12 @@ EimPointData RBEIMConstruction::get_random_point(const QpDataMap & v)
       if (!error_finding_new_element)
         {
           {
-            const auto & vars_and_qps = libmesh_map_find(v,eim_point_data.elem_id);
+            const auto & vars_and_qps = libmesh_map_find(*v_ptr,eim_point_data.elem_id);
             eim_point_data.comp_index = get_random_int_0_to_n(vars_and_qps.size()-1);
           }
 
           {
-            const auto & qps = libmesh_map_find(v,eim_point_data.elem_id)[eim_point_data.comp_index];
+            const auto & qps = libmesh_map_find(*v_ptr,eim_point_data.elem_id)[eim_point_data.comp_index];
             eim_point_data.qp_index = get_random_int_0_to_n(qps.size()-1);
           }
         }
@@ -3036,6 +3058,28 @@ EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
 {
   EimPointData eim_point_data;
 
+  // If we have more than one process, then we need to do a parallel union
+  // of v to make sure that we have data from all processors. Our approach
+  // here is to set v_ptr to either v or global_v, depending on whether we
+  // are in parallel or serial. The purpose of this approach is to avoid
+  // making a copy of v in the case that this is a serial job.
+  SideQpDataMap const * v_ptr = nullptr;
+  SideQpDataMap global_v;
+  if (comm().size() > 1)
+  {
+    global_v = v;
+
+    // We only use global_v on proc 0, so we set the second argument of
+    // set_union() to zero here to indicate that we only need the result
+    // on proc 0.
+    comm().set_union(global_v, 0);
+    v_ptr = &global_v;
+  }
+  else
+  {
+    v_ptr = &v;
+  }
+
   bool error_finding_new_element_and_side = false;
   if (comm().rank() == 0)
     {
@@ -3054,7 +3098,7 @@ EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
         // See discussion above in the QpDataMap case for the justification
         // of how we set up new_elem_and_side_ids below.
         std::set<std::pair<dof_id_type,unsigned int>> new_elem_and_side_ids;
-        for (const auto & v_pair : v)
+        for (const auto & v_pair : *v_ptr)
           if (previous_elem_and_side_ids.count(v_pair.first) == 0)
             new_elem_and_side_ids.insert(v_pair.first);
 
@@ -3079,12 +3123,12 @@ EimPointData RBEIMConstruction::get_random_point(const SideQpDataMap & v)
       if (!error_finding_new_element_and_side)
         {
           {
-            const auto & vars_and_qps = libmesh_map_find(v,elem_and_side);
+            const auto & vars_and_qps = libmesh_map_find(*v_ptr,elem_and_side);
             eim_point_data.comp_index = get_random_int_0_to_n(vars_and_qps.size()-1);
           }
 
           {
-            const auto & qps = libmesh_map_find(v,elem_and_side)[eim_point_data.comp_index];
+            const auto & qps = libmesh_map_find(*v_ptr,elem_and_side)[eim_point_data.comp_index];
             eim_point_data.qp_index = get_random_int_0_to_n(qps.size()-1);
           }
         }
@@ -3106,6 +3150,28 @@ EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v)
 {
   EimPointData eim_point_data;
 
+  // If we have more than one process, then we need to do a parallel union
+  // of v to make sure that we have data from all processors. Our approach
+  // here is to set v_ptr to either v or global_v, depending on whether we
+  // are in parallel or serial. The purpose of this approach is to avoid
+  // making a copy of v in the case that this is a serial job.
+  NodeDataMap const * v_ptr = nullptr;
+  NodeDataMap global_v;
+  if (comm().size() > 1)
+  {
+    global_v = v;
+
+    // We only use global_v on proc 0, so we set the second argument of
+    // set_union() to zero here to indicate that we only need the result
+    // on proc 0.
+    comm().set_union(global_v, 0);
+    v_ptr = &global_v;
+  }
+  else
+  {
+    v_ptr = &v;
+  }
+
   bool error_finding_new_node = false;
   if (comm().rank() == 0)
     {
@@ -3117,7 +3183,7 @@ EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v)
         // See discussion above in the QpDataMap case for the justification
         // of how we set up new_node_ids below.
         std::set<dof_id_type> new_node_ids;
-        for (const auto & v_pair : v)
+        for (const auto & v_pair : *v_ptr)
           if (previous_node_ids.count(v_pair.first) == 0)
             new_node_ids.insert(v_pair.first);
 
@@ -3139,7 +3205,7 @@ EimPointData RBEIMConstruction::get_random_point(const NodeDataMap & v)
 
       if (!error_finding_new_node)
         {
-          const auto & vars = libmesh_map_find(v,eim_point_data.node_id);
+          const auto & vars = libmesh_map_find(*v_ptr,eim_point_data.node_id);
           eim_point_data.comp_index = get_random_int_0_to_n(vars.size()-1);
         }
     }
