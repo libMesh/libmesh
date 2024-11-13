@@ -267,9 +267,11 @@ int main(int argc, char ** argv)
       new_sys.fe_family() = family;
       new_sys.fe_order() = order;
 
-      new_sys.goal_func = goal_function->clone();
+      new_sys.set_goal_func(*goal_function);
 
-      new_sys.fdm_eps() = cl.follow(Real(TOLERANCE), "--fdm_eps");
+      Real fdm_eps = cl.follow(Real(TOLERANCE), "--fdm_eps");
+
+      new_sys.set_fdm_eps(fdm_eps);
 
       if (solnname != "")
         new_sys.input_system = &old_es.get_system(current_sys_name);
