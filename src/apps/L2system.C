@@ -77,8 +77,8 @@ void HilbertSystem::init_context(DiffContext & context)
     {
       input_context = std::make_unique<FEMContext>(*input_system);
 
-      libmesh_assert(goal_func.get());
-      goal_func->init_context(*input_context);
+      libmesh_assert(_goal_func.get());
+      _goal_func->init_context(*input_context);
     }
 
   FEMSystem::init_context(context);
@@ -125,7 +125,7 @@ bool HilbertSystem::element_time_derivative (bool request_jacobian,
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       const Number u = c.interior_value(0, qp);
-      const Number ufunc = (*goal_func)(input_c, xyz[qp]);
+      const Number ufunc = (*_goal_func)(input_c, xyz[qp]);
       const Number err_u = u - ufunc;
 
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -137,20 +137,7 @@ bool HilbertSystem::element_time_derivative (bool request_jacobian,
             c.get_element_fe(0)->get_dphi();
 
           const Gradient grad_u = c.interior_gradient(0, qp);
-          Gradient ufuncgrad;
-          ufuncgrad(0) = ((*goal_func)(input_c, xyz[qp]+Point(_fdm_eps)) -
-                          (*goal_func)(input_c, xyz[qp]+Point(_fdm_eps))) /
-                         2 / _fdm_eps;
-#if LIBMESH_DIM > 1
-          ufuncgrad(1) = ((*goal_func)(input_c, xyz[qp]+Point(0,_fdm_eps)) -
-                          (*goal_func)(input_c, xyz[qp]+Point(0,_fdm_eps))) /
-                         2 / _fdm_eps;
-#endif
-#if LIBMESH_DIM > 2
-          ufuncgrad(2) = ((*goal_func)(input_c, xyz[qp]+Point(0,0,_fdm_eps)) -
-                          (*goal_func)(input_c, xyz[qp]+Point(0,0,_fdm_eps))) /
-                         2 / _fdm_eps;
-#endif
+          Gradient ufuncgrad = (*_goal_grad)(input_c, xyz[qp]);
           const Gradient err_grad_u = grad_u - ufuncgrad;
 
           for (unsigned int i=0; i != n_u_dofs; i++)
