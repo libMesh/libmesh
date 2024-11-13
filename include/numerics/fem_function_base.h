@@ -64,6 +64,11 @@ public:
   virtual ~FEMFunctionBase () = default;
 
   /**
+   * Any post-construction initialization
+   */
+  virtual void init () {}
+
+  /**
    * Prepares a context object for use.
    *
    * Most problems will want to reimplement this for efficiency, in

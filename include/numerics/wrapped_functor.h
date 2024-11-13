@@ -68,6 +68,11 @@ public:
   WrappedFunctor & operator= (WrappedFunctor &&) = default;
   virtual ~WrappedFunctor () = default;
 
+  /**
+   * Any post-construction initialization
+   */
+  virtual void init () override { _func->init(); }
+
   virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const override
   {
     return std::make_unique<WrappedFunctor<Output>>(*_func);
