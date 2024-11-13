@@ -123,7 +123,7 @@ void FrequencySystem::init_data ()
         {
 #ifndef NDEBUG
           const unsigned int n_freq =
-            es.parameters:<unsigned int>("n_frequencies");
+            es.parameters.get<unsigned int>("n_frequencies");
 
           libmesh_assert_greater (n_freq, 0);
 #endif
@@ -308,7 +308,7 @@ void FrequencySystem::set_frequencies (const std::vector<Number> & frequencies,
 unsigned int FrequencySystem::n_frequencies () const
 {
   libmesh_assert(_finished_set_frequencies);
-  return this->get_equation_systems().parameters:<unsigned int>("n_frequencies");
+  return this->get_equation_systems().parameters.get<unsigned int>("n_frequencies");
 }
 
 
