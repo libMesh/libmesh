@@ -60,7 +60,7 @@ void usage_error(const char * progname)
                << " --outsoln   filename  output solution file      [default: out_<insoln>]\n"
                << " --family    famname   output FEM family         [default: LAGRANGE]\n"
                << " --order     p         output FEM order          [default: 1]\n"
-               << " --subdomain sbd_id    subdomain id restriction  [default: all subdomains]\n"
+               << " --subdomain sbd_id    each subdomain to check   [default: all subdomains]\n"
                << " --hilbert   order     Hilbert space to use      [default: 0 => H0]\n"
                << " --fdm_eps   eps       Central diff for dfunc/dx [default: " << TOLERANCE << "]\n"
                << " --integral            only calculate func integral, not projection\n"
