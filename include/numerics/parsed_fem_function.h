@@ -396,14 +396,26 @@ ParsedFEMFunction<Output>::init_context (const FEMContext & c)
     {
       FEBase * elem_fe;
       c.get_element_fe(v, elem_fe);
+      bool request_nothing = true;
       if (_n_requested_vars)
-        elem_fe->get_phi();
+        {
+          elem_fe->get_phi();
+          request_nothing = false;
+        }
       if (_n_requested_grad_components)
-        elem_fe->get_dphi();
+        {
+          elem_fe->get_dphi();
+          request_nothing = false;
+        }
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
       if (_n_requested_hess_components)
-        elem_fe->get_d2phi();
+        {
+          elem_fe->get_d2phi();
+          request_nothing = false;
+        }
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+      if (request_nothing)
+        elem_fe->get_nothing();
     }
 
   if (_requested_normals)
