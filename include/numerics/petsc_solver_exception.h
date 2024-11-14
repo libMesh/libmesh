@@ -92,6 +92,13 @@ public:
 // Remove me: for backward compatibility with MOOSE only
 #define LIBMESH_CHKERR(ierr) LIBMESH_CHKERRQ(ierr)
 #define LIBMESH_CHKERR2(comm, ierr) LIBMESH_CHKERRA(comm, ierr)
+#define LibmeshPetscCall(...)                                           \
+  do                                                                    \
+  {                                                                     \
+    PetscErrorCode libmesh_petsc_call_ierr;                             \
+    libmesh_petsc_call_ierr = __VA_ARGS__;                              \
+    LIBMESH_CHKERRQ(libmesh_petsc_call_ierr);                           \
+  } while (0)
 
 #else
 
@@ -139,8 +146,10 @@ PETSC_BEGIN_END(VecGhostUpdate) // VecGhostUpdateBeginEnd
 
 // Shortcut for LibmeshPetscCallA for use within a ParallelObject, i.e. when
 // we can rely on the communicator being available from the "this" pointer.
+/*
 #define LibmeshPetscCall(...)                                           \
   LibmeshPetscCallA(this->comm().get(), __VA_ARGS__)
+*/
 
 // Shortcut for LibmeshPetscCallA for use when we have a Parallel::Communicator
 // available instead of just a bare MPI communicator.
