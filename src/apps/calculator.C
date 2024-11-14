@@ -25,6 +25,7 @@
 #include "L2system.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/enum_norm_type.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exact_solution.h"
 #include "libmesh/getpot.h"
@@ -305,14 +306,24 @@ int main(int argc, char ** argv)
               const std::string var_name = new_sys.variable_name(v);
               exact_sol.compute_error(current_sys_name, var_name);
 
-              libMesh::out << "L2-error in " << var_name << ": " <<
+              libMesh::out << "L2 norm of " << var_name << ": " <<
+                new_sys.calculate_norm(*new_sys.solution, v, L2) <<
+                std::endl;
+
+              libMesh::out << "L2 error in " << var_name << ": " <<
                   exact_sol.l2_error(current_sys_name, var_name) <<
                   std::endl;
 
               if (new_sys.hilbert_order() > 0)
-                libMesh::out << "L2-error in " << var_name << ": " <<
-                    exact_sol.h1_error(current_sys_name, var_name) <<
+                {
+                  libMesh::out << "H1 norm of " << var_name << ": " <<
+                    new_sys.calculate_norm(*new_sys.solution, v, H1) <<
                     std::endl;
+
+                  libMesh::out << "L2 error in " << var_name << ": " <<
+                      exact_sol.h1_error(current_sys_name, var_name) <<
+                      std::endl;
+                }
             }
         }
 
