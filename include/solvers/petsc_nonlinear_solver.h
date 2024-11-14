@@ -110,9 +110,10 @@ public:
   virtual void init (const char * name = nullptr) override;
 
   /**
-   * \returns The raw PETSc snes context pointer.
+   * \returns The raw PETSc snes context pointer. This method calls init() so in that vein, we have
+   * an optional name prefix argument that if provided will be given to the SNES context
    */
-  SNES snes();
+  SNES snes(const char * name = nullptr);
 
   /**
    * Call the Petsc solver.  It calls the method below, using the

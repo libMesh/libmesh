@@ -811,12 +811,16 @@ void PetscNonlinearSolver<T>::init (const char * name)
       // even on an old snes instance from the last solve
 
       if (name)
-        LibmeshPetscCall(SNESSetOptionsPrefix(_snes, name));
+        {
+          libmesh_assert(std::string(name).front() != '-');
+          libmesh_assert(std::string(name).back() == '_');
+          LibmeshPetscCall(SNESSetOptionsPrefix(_snes, name));
+        }
 
       // Attaching a DM to SNES.
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
-      const auto prefix = name ? std::string(name) + "_" : std::string("");
-      bool use_petsc_dm = libMesh::on_command_line("--" + prefix + "use_petsc_dm");
+      bool use_petsc_dm = libMesh::on_command_line(
+          "--" + (name ? std::string(name) : std::string("")) + "use_petsc_dm");
 
       // This needs to be called before SNESSetFromOptions
       if (use_petsc_dm)
@@ -889,9 +893,9 @@ void PetscNonlinearSolver<T>::init (const char * name)
 
 
 template <typename T>
-SNES PetscNonlinearSolver<T>::snes()
+SNES PetscNonlinearSolver<T>::snes(const char * name)
 {
-  this->init();
+  this->init(name);
   return _snes;
 }
 
