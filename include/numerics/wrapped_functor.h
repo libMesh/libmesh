@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/fem_function_base.h"
 #include "libmesh/function_base.h"
+#include "libmesh/int_range.h"
 #include "libmesh/point.h"
 #include "libmesh/wrapped_function.h"
 
@@ -86,6 +87,11 @@ public:
    */
   virtual void init () override { _func->init(); }
 
+  /**
+   * Tell the context we don't need anything from it
+   */
+  virtual void init_context (const FEMContext & c) override;
+
   virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const override
   {
     return std::make_unique<WrappedFunctor<Output>>(*_func);
@@ -113,6 +119,20 @@ protected:
   std::unique_ptr<FunctionBase<Output>> _func;
 };
 
+
+template <typename Output>
+void WrappedFunctor<Output>::init_context (const FEMContext & c)
+{
+  for (auto dim : c.elem_dimensions())
+    {
+      for (auto v : make_range(c.n_vars()))
+        {
+          FEAbstract * fe;
+          c.get_element_fe(v, fe, dim);
+          fe->get_nothing();
+        }
+    }
+}
 
 
 } // namespace libMesh
