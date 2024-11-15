@@ -931,12 +931,12 @@ uninstall-am: uninstall-netgenincludeHEADERS uninstall-netgenlibDATA \
 # definitely are looking at an existing correct file when we do `make
 # install` in parallel.
 @LIBMESH_ENABLE_NETGEN_TRUE@install-data-local: install-ngliblibDATA
-@LIBMESH_ENABLE_NETGEN_TRUE@	if which install_name_tool 2>/dev/null; then \
+@LIBMESH_ENABLE_NETGEN_TRUE@	@if which install_name_tool 2>/dev/null; then \
 @LIBMESH_ENABLE_NETGEN_TRUE@	  echo "install_name_tool exists on OSX but is unneeded for rpath-based libnglib there"; \
 @LIBMESH_ENABLE_NETGEN_TRUE@	elif which patchelf 2>/dev/null; then \
-@LIBMESH_ENABLE_NETGEN_TRUE@	  patchelf --set-rpath "$(libdir)" "$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
+@LIBMESH_ENABLE_NETGEN_TRUE@	  patchelf --set-rpath "$(libdir)" "$(DESTDIR)$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
 @LIBMESH_ENABLE_NETGEN_TRUE@	elif which chrpath 2>/dev/null; then \
-@LIBMESH_ENABLE_NETGEN_TRUE@	  chrpath -r "$(libdir)" "$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
+@LIBMESH_ENABLE_NETGEN_TRUE@	  chrpath -r "$(libdir)" "$(DESTDIR)$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
 @LIBMESH_ENABLE_NETGEN_TRUE@	else \
 @LIBMESH_ENABLE_NETGEN_TRUE@	  echo "No tools to change RPATH when installing libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
 @LIBMESH_ENABLE_NETGEN_TRUE@	  echo "If linking fails we may need install_name_tool/patchelf/chrpath installed"; \
