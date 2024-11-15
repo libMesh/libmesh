@@ -568,9 +568,6 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
   std::vector<RBParameters> mus {mu};
   vectorized_evaluate(mus, v, preevaluated_values);
 
-  // Transfer from VectorizedEvaluate to RBParametrizedFunction as v will go out of scope after this function.
-  this->_rb_property_map = std::move(v.rb_property_map);
-
   preevaluate_parametrized_function_cleanup();
 }
 

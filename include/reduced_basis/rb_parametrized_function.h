@@ -493,9 +493,8 @@ protected:
 
   /**
    * Generic property map used to store data during mesh pre-evaluation. It should be initialized
-   * from a VectorizedEvalInput rb_property_map during the mesh pre-evaluation stage as VectorizedEvalInput
-   * goes out of scope quickly after pre-evluation. Then this RBParametrizedFunction rb_property_map
-   * is used to fill the RBEIMEvaluation VectorizedEvalInput rb_property_map with the same properties but
+   * from a vectorized_evaluate() call during the mesh pre-evaluation. Then this RBParametrizedFunction
+   * rb_property_map is used to fill the RBEIMEvaluation VectorizedEvalInput rb_property_map with the same properties but
    * interpolation point data only instead of the entire mesh.
    */
   std::unordered_map<std::string, std::set<dof_id_type>> _rb_property_map;
