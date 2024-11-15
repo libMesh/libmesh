@@ -35,6 +35,7 @@
 #include "libmesh/parsed_fem_function.h"
 #include "libmesh/parsed_function.h"
 #include "libmesh/point.h"
+#include "libmesh/sparse_matrix.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/wrapped_functor.h"
 #include "libmesh/elem.h"
@@ -56,6 +57,7 @@ void usage_error(const char * progname)
   libMesh::out << "Options: " << progname << '\n'
                << " --dim d               mesh dimension            [default: autodetect]\n"
                << " --inmesh    filename  input mesh file\n"
+               << " --inmat     filename  input constraint matrix   [default: none]\n"
                << " --insoln    filename  input solution file\n"
                << " --calc      func      function to calculate\n"
                << " --insys     sysnum    input system number       [default: 0]\n"
@@ -167,14 +169,30 @@ int main(int argc, char ** argv)
   const std::string meshname =
     assert_argument(cl, "--inmesh", argv[0], std::string(""));
 
-  const std::string solnname = cl.follow(std::string(""), "--insoln");
+  std::cout << "Reading mesh " << meshname << std::endl;
+  old_mesh.read(meshname);
 
-  if (meshname != "")
+  const std::string matname =
+    cl.follow(std::string(""), "--inmat");
+
+  if (matname != "")
     {
-      old_mesh.read(meshname);
-      std::cout << "Old Mesh:" << std::endl;
-      old_mesh.print_info();
+      std::cout << "Reading matrix " << matname << std::endl;
+
+      // For extraction matrices Coreform has been experimenting with
+      // PETSc solvers which take the transpose of what we expect, so
+      // we'll un-transpose here.
+      auto matrix = SparseMatrix<Number>::build (old_mesh.comm());
+      matrix->read(matname);
+      matrix->get_transpose(*matrix);
+
+      old_mesh.copy_constraint_rows(*matrix);
     }
+
+  std::cout << "Mesh:" << std::endl;
+  old_mesh.print_info();
+
+  const std::string solnname = cl.follow(std::string(""), "--insoln");
 
   // Load the old solution from --insoln filename, if that's been
   // specified.
@@ -193,6 +211,8 @@ int main(int argc, char ** argv)
 
   if (solnname != "")
     {
+      std::cout << "Reading solution " << solnname << std::endl;
+
       old_es.read(solnname,
                   EquationSystems::READ_HEADER |
                   EquationSystems::READ_DATA |
