@@ -13,6 +13,7 @@
 #include <libmesh/cell_tet4.h>
 #include <libmesh/zero_function.h>
 #include <libmesh/linear_implicit_system.h>
+#include <libmesh/nonlinear_implicit_system.h>
 #include <libmesh/transient_system.h>
 #include <libmesh/quadrature_gauss.h>
 #include <libmesh/node_elem.h>
@@ -1257,6 +1258,78 @@ public:
     Real ref_l1_norm = static_cast<Real>(mesh.n_nodes() * system.n_vars());
 
     LIBMESH_ASSERT_FP_EQUAL(system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
+  }
+
+
+  void testSetSystemParameterOverEquationSystem()
+  {
+    LOG_UNIT_TEST;
+
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_cube (mesh,
+                                      1,
+                                      0,
+                                      0,
+                                      0., 1.,
+                                      0., 0.,
+                                      0., 0.,
+                                      EDGE2);
+
+    Point new_point_a(2.);
+    Point new_point_b(3.);
+    Node* new_node_a = mesh.add_point( new_point_a );
+    Node* new_node_b = mesh.add_point( new_point_b );
+    auto new_edge_elem = mesh.add_elem(Elem::build(EDGE2));
+    new_edge_elem->set_node(0) = new_node_a;
+    new_edge_elem->set_node(1) = new_node_b;
+
+    mesh.elem_ref(0).subdomain_id() = 10;
+    mesh.elem_ref(1).subdomain_id() = 10;
+
+    mesh.prepare_for_use();
+
+    // Create an equation systems object.
+    EquationSystems equation_systems (mesh);
+
+    // Set some parameters to the equation system that would cause a failed solve
+    equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 0;
+
+    // Setup Linear Implicit system
+    LinearImplicitSystem & li_system =
+      equation_systems.add_system<LinearImplicitSystem> ("test");
+    li_system.add_variable ("u", libMesh::FIRST);
+    li_system.add_variable ("v", libMesh::FIRST);
+    li_system.add_variable ("w", libMesh::FIRST);
+    li_system.attach_assemble_function (assemble_matrix_and_rhs);
+    li_system.get_linear_solver()->set_solver_type(JACOBI);
+    li_system.get_linear_solver()->set_preconditioner_type(IDENTITY_PRECOND);
+
+    // Setup nonlinear Implicit system
+    NonlinearImplicitSystem & nli_system =
+      equation_systems.add_system<NonlinearImplicitSystem> ("test");
+    nli_system.add_variable ("u", libMesh::FIRST);
+    nli_system.add_variable ("v", libMesh::FIRST);
+    nli_system.add_variable ("w", libMesh::FIRST);
+    nli_system.attach_assemble_function (assemble_matrix_and_rhs);
+    nli_system.get_linear_solver()->set_solver_type(JACOBI);
+    nli_system.get_linear_solver()->set_preconditioner_type(IDENTITY_PRECOND);
+
+    // Set some parameters to the system that work for the solve
+    li_system.parameters.set<unsigned int>("linear solver maximum iterations") = 100;
+    nli_system.parameters.set<unsigned int>("linear solver maximum iterations") = 100;
+
+    // See the solve pass, indicating system parameters are used over equation system parameters
+    equation_systems.init ();
+    li_system.solve();
+    nli_system.solve();
+
+    // We set the solution to be 1 everywhere, so the final l1 norm of the
+    // solution is the product of the number of variables and number of nodes.
+    Real ref_l1_norm = static_cast<Real>(mesh.n_nodes() * li_system.n_vars());
+
+    LIBMESH_ASSERT_FP_EQUAL(li_system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(nli_system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
   }
 
   void testAssemblyWithDgFemContext()
