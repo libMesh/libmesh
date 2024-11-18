@@ -13,6 +13,10 @@ clean-local:
 	$(MAKE) -C build $(AM_MAKEFLAGS) clean
 	rm -f .buildstamp
 
+distclean-local:
+	rm -rf build
+	rm -f .buildstamp
+
 
 netgenincludedir=$(includedir)/netgen
 nglibincludedir=$(includedir)/netgen/nglib
