@@ -13,6 +13,10 @@ clean-local:
 	$(MAKE) -C build $(AM_MAKEFLAGS) clean
 	rm -f .buildstamp
 
+distclean-local:
+	rm -rf build
+	rm -f .buildstamp
+
 
 netgenincludedir=$(includedir)/netgen
 nglibincludedir=$(includedir)/netgen/nglib
@@ -32,12 +36,12 @@ ngliblibdir=$(libdir)
 # definitely are looking at an existing correct file when we do `make
 # install` in parallel.
 install-data-local: install-ngliblibDATA
-	if which install_name_tool 2>/dev/null; then \
+	@if which install_name_tool 2>/dev/null; then \
 	  echo "install_name_tool exists on OSX but is unneeded for rpath-based libnglib there"; \
 	elif which patchelf 2>/dev/null; then \
-	  patchelf --set-rpath "$(libdir)" "$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
+	  patchelf --set-rpath "$(libdir)" "$(DESTDIR)$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
 	elif which chrpath 2>/dev/null; then \
-	  chrpath -r "$(libdir)" "$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
+	  chrpath -r "$(libdir)" "$(DESTDIR)$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
 	else \
 	  echo "No tools to change RPATH when installing libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
 	  echo "If linking fails we may need install_name_tool/patchelf/chrpath installed"; \
@@ -66,6 +70,8 @@ build/netgen/libnglib$(LIBMESH_LIBRARY_SUFFIX): .buildstamp
 build/netgen/libsrc/core/libngcore$(LIBMESH_LIBRARY_SUFFIX) : .buildstamp
 
 endif
+
+EXTRA_DIST = netgen
 
 # Maybe useful later?
 #              build/netgen/libnggui.so \
