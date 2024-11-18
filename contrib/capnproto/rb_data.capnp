@@ -45,6 +45,11 @@ struct IntPair @0xa9e786708685aed5 {
   second @1 :Integer;
 }
 
+struct GenericProperty @0xb5dd548f04016706 {
+  name       @0 : Text;
+  entityIds  @1 : List(Integer);
+}
+
 struct RBSCMEvaluation @0xb8dd038628a64b16 {
   parameterRanges    @0 :ParameterRanges;
   discreteParameters @1 :DiscreteParameterList;
@@ -140,6 +145,7 @@ struct RBEIMEvaluationReal @0xf8121d2237427a80 {
   interpolationDxyzDzetaElem  @25 :List(Point3D);
   nElems                      @26 :Integer;
   elemIdToLocalIndex          @27 :List(IntPair);
+  propertyMap                 @28 :List(GenericProperty);
 }
 struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   nBfs                        @0  :Integer;
@@ -170,4 +176,5 @@ struct RBEIMEvaluationComplex @0xc35a5eb004965455 {
   interpolationDxyzDzetaElem  @25 :List(Point3D);
   nElems                      @26 :Integer;
   elemIdToLocalIndex          @27 :List(IntPair);
+  propertyMap                 @28 :List(GenericProperty);
 }

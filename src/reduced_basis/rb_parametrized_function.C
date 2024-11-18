@@ -28,6 +28,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/quadrature.h"
+#include "timpi/parallel_implementation.h"
 
 namespace libMesh
 {
@@ -43,6 +44,16 @@ void VectorizedEvalInput::clear()
   side_indices.clear();
   boundary_ids.clear();
   node_ids.clear();
+  elem_types.clear();
+
+  elem_id_to_local_index.clear();
+  JxW_all_qp.clear();
+  phi_i_all_qp.clear();
+  dxyzdxi_elem_center.clear();
+  dxyzdeta_elem_center.clear();
+  qrule_orders.clear();
+
+  rb_property_map.clear();
 }
 
 RBParametrizedFunction::RBParametrizedFunction()
@@ -815,6 +826,25 @@ void RBParametrizedFunction::initialize_spatial_indices(const std::vector<std::v
 }
 
 void RBParametrizedFunction::preevaluate_parametrized_function_cleanup()
+{
+  // No-op by default
+}
+
+const std::unordered_map<std::string, std::set<dof_id_type>> & RBParametrizedFunction::get_rb_property_map() const
+{
+  return _rb_property_map;
+}
+
+void RBParametrizedFunction::add_rb_property_map_entry(std::string & property_name, std::set<dof_id_type> & entity_ids)
+{
+  bool insert_succeed = _rb_property_map.insert({property_name, entity_ids}).second;
+  libmesh_error_msg_if(!insert_succeed, "Entry already added, duplicate detected.");
+}
+
+void RBParametrizedFunction::add_interpolation_data_to_rb_property_map(
+  const Parallel::Communicator & /*comm*/,
+  std::unordered_map<std::string, std::set<dof_id_type>> & /*rb_property_map*/,
+  dof_id_type /*elem_id*/)
 {
   // No-op by default
 }

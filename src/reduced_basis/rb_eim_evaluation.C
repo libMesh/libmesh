@@ -322,6 +322,11 @@ unsigned int RBEIMEvaluation::get_n_elems() const
   return _vec_eval_input.elem_id_to_local_index.size();
 }
 
+unsigned int RBEIMEvaluation::get_n_properties() const
+{
+  return _vec_eval_input.rb_property_map.size();
+}
+
 void RBEIMEvaluation::set_n_basis_functions(unsigned int n_bfs)
 {
   if (get_parametrized_function().on_mesh_sides())
@@ -787,9 +792,15 @@ void RBEIMEvaluation::add_interpolation_points_spatial_indices(const std::vector
 
 void RBEIMEvaluation::add_elem_id_local_index_map_entry(dof_id_type elem_id, unsigned int local_index)
 {
-  libmesh_error_msg_if(_vec_eval_input.elem_id_to_local_index.count(elem_id) == 1, "Entry already added, duplicate detected.");
+  // Try to insert object and return an error if object already inserted as duplicated should not happen.
+  bool insert_succeed = _vec_eval_input.elem_id_to_local_index.insert({elem_id, local_index}).second;
+  libmesh_error_msg_if(!insert_succeed, "Entry already added, duplicate detected.");
+}
 
-  _vec_eval_input.elem_id_to_local_index[elem_id] = local_index;
+void RBEIMEvaluation::add_rb_property_map_entry(std::string & property_name, std::set<dof_id_type> & entity_ids)
+{
+  bool insert_succeed = _vec_eval_input.rb_property_map.insert({property_name, entity_ids}).second;
+  libmesh_error_msg_if(!insert_succeed, "Entry already added, duplicate detected.");
 }
 
 Point RBEIMEvaluation::get_interpolation_points_xyz(unsigned int index) const
@@ -872,6 +883,11 @@ const std::vector<Real> & RBEIMEvaluation::get_interpolation_points_JxW_all_qp(u
 const std::map<dof_id_type, unsigned int> & RBEIMEvaluation::get_elem_id_to_local_index_map() const
 {
   return _vec_eval_input.elem_id_to_local_index;
+}
+
+const std::unordered_map<std::string, std::set<dof_id_type>> & RBEIMEvaluation::get_rb_property_map() const
+{
+  return _vec_eval_input.rb_property_map;
 }
 
 const std::vector<std::vector<Real>> & RBEIMEvaluation::get_interpolation_points_phi_i_all_qp(unsigned int index) const
@@ -988,6 +1004,15 @@ void RBEIMEvaluation::add_interpolation_data(
     _vec_eval_input.dxyzdxi_elem_center.emplace_back(dxyzdxi_elem_center);
     _vec_eval_input.dxyzdeta_elem_center.emplace_back(dxyzdeta_elem_center);
   }
+
+  // add_interpolation_data_to_property_map is a virtual function that aims to add only the property data
+  // required by the corresponding rb_parametrized_function.
+  // Right now, only elem_ids are supported but if subdomain_ids need to be stored for a property
+  // it can be added to the list of arguments and used in the overridden subclass function, the map type
+  // might also required an update to support various id types.
+  get_parametrized_function().add_interpolation_data_to_rb_property_map(this->comm(),
+                                                                        _vec_eval_input.rb_property_map,
+                                                                        elem_id);
 }
 
 void RBEIMEvaluation::add_side_basis_function(
@@ -3092,6 +3117,15 @@ std::pair<Real,Real> RBEIMEvaluation::get_eim_error_indicator(
 const VectorizedEvalInput & RBEIMEvaluation::get_vec_eval_input() const
 {
   return _vec_eval_input;
+}
+
+void RBEIMEvaluation::initialize_rb_property_map()
+{
+  const auto & rb_property_map = get_parametrized_function().get_rb_property_map();
+  // Initialize rb_eim_eval VectorizedEvaluateInput from the one in rb_parametrized_function with
+  // empty sets as it will be filled by subclasses virtual functions.
+  for (const auto & [key, val] : rb_property_map)
+    _vec_eval_input.rb_property_map[key] = {};
 }
 
 const DenseVector<Number> & RBEIMEvaluation::get_error_indicator_interpolation_row() const
