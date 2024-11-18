@@ -107,6 +107,15 @@ public:
 #define LIBMESH_CHKERRQ(ierr) CHKERRQ(ierr);
 #define LIBMESH_CHKERRA(comm, ierr) CHKERRABORT(comm, ierr);
 
+// Remove me: for backward compatibility with MOOSE only
+#define LibmeshPetscCall(...)                                           \
+  do                                                                    \
+  {                                                                     \
+    PetscErrorCode libmesh_petsc_call_ierr;                             \
+    libmesh_petsc_call_ierr = __VA_ARGS__;                              \
+    LIBMESH_CHKERRA(this->comm().get(), libmesh_petsc_call_ierr);       \
+  } while (0)
+
 #endif
 
 #define PETSC_BEGIN_END(Function)                                       \
