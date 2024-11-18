@@ -561,6 +561,7 @@ vtkversion = @vtkversion@
 
 @LIBMESH_ENABLE_NETGEN_TRUE@ngliblib_DATA = build/netgen/libnglib$(LIBMESH_LIBRARY_SUFFIX)
 @LIBMESH_ENABLE_NETGEN_TRUE@netgenlib_DATA = build/netgen/libsrc/core/libngcore$(LIBMESH_LIBRARY_SUFFIX)
+EXTRA_DIST = netgen
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
@@ -812,6 +813,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 @LIBMESH_ENABLE_NETGEN_FALSE@clean-local:
+@LIBMESH_ENABLE_NETGEN_FALSE@distclean-local:
 @LIBMESH_ENABLE_NETGEN_FALSE@install-data-local:
 clean: clean-am
 
@@ -819,7 +821,8 @@ clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-tags
+distclean-am: clean-am distclean-generic distclean-local \
+	distclean-tags
 
 dvi: dvi-am
 
@@ -887,8 +890,8 @@ uninstall-am: uninstall-netgenincludeHEADERS uninstall-netgenlibDATA \
 .PHONY: CTAGS GTAGS TAGS all all-am all-local check check-am clean \
 	clean-generic clean-libtool clean-local cscopelist-am ctags \
 	ctags-am distclean distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am \
+	distclean-local distclean-tags distdir dvi dvi-am html html-am \
+	info info-am install install-am install-data install-data-am \
 	install-data-local install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-man install-netgenincludeHEADERS \
@@ -917,6 +920,10 @@ uninstall-am: uninstall-netgenincludeHEADERS uninstall-netgenlibDATA \
 @LIBMESH_ENABLE_NETGEN_TRUE@	$(MAKE) -C build $(AM_MAKEFLAGS) clean
 @LIBMESH_ENABLE_NETGEN_TRUE@	rm -f .buildstamp
 
+@LIBMESH_ENABLE_NETGEN_TRUE@distclean-local:
+@LIBMESH_ENABLE_NETGEN_TRUE@	rm -rf build
+@LIBMESH_ENABLE_NETGEN_TRUE@	rm -f .buildstamp
+
 # Make sure the installed libnglib is linking to the installed
 # libngcore, not to the libngcore in the build directory
 #
@@ -930,12 +937,12 @@ uninstall-am: uninstall-netgenincludeHEADERS uninstall-netgenlibDATA \
 # definitely are looking at an existing correct file when we do `make
 # install` in parallel.
 @LIBMESH_ENABLE_NETGEN_TRUE@install-data-local: install-ngliblibDATA
-@LIBMESH_ENABLE_NETGEN_TRUE@	if which install_name_tool 2>/dev/null; then \
+@LIBMESH_ENABLE_NETGEN_TRUE@	@if which install_name_tool 2>/dev/null; then \
 @LIBMESH_ENABLE_NETGEN_TRUE@	  echo "install_name_tool exists on OSX but is unneeded for rpath-based libnglib there"; \
 @LIBMESH_ENABLE_NETGEN_TRUE@	elif which patchelf 2>/dev/null; then \
-@LIBMESH_ENABLE_NETGEN_TRUE@	  patchelf --set-rpath "$(libdir)" "$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
+@LIBMESH_ENABLE_NETGEN_TRUE@	  patchelf --set-rpath "$(libdir)" "$(DESTDIR)$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
 @LIBMESH_ENABLE_NETGEN_TRUE@	elif which chrpath 2>/dev/null; then \
-@LIBMESH_ENABLE_NETGEN_TRUE@	  chrpath -r "$(libdir)" "$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
+@LIBMESH_ENABLE_NETGEN_TRUE@	  chrpath -r "$(libdir)" "$(DESTDIR)$(libdir)/libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
 @LIBMESH_ENABLE_NETGEN_TRUE@	else \
 @LIBMESH_ENABLE_NETGEN_TRUE@	  echo "No tools to change RPATH when installing libnglib$(LIBMESH_LIBRARY_SUFFIX)"; \
 @LIBMESH_ENABLE_NETGEN_TRUE@	  echo "If linking fails we may need install_name_tool/patchelf/chrpath installed"; \
