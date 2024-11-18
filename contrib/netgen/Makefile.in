@@ -813,6 +813,7 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 @LIBMESH_ENABLE_NETGEN_FALSE@clean-local:
+@LIBMESH_ENABLE_NETGEN_FALSE@distclean-local:
 @LIBMESH_ENABLE_NETGEN_FALSE@install-data-local:
 clean: clean-am
 
@@ -820,7 +821,8 @@ clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-am
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-tags
+distclean-am: clean-am distclean-generic distclean-local \
+	distclean-tags
 
 dvi: dvi-am
 
@@ -888,8 +890,8 @@ uninstall-am: uninstall-netgenincludeHEADERS uninstall-netgenlibDATA \
 .PHONY: CTAGS GTAGS TAGS all all-am all-local check check-am clean \
 	clean-generic clean-libtool clean-local cscopelist-am ctags \
 	ctags-am distclean distclean-generic distclean-libtool \
-	distclean-tags distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am \
+	distclean-local distclean-tags distdir dvi dvi-am html html-am \
+	info info-am install install-am install-data install-data-am \
 	install-data-local install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
 	install-info-am install-man install-netgenincludeHEADERS \
@@ -916,6 +918,10 @@ uninstall-am: uninstall-netgenincludeHEADERS uninstall-netgenlibDATA \
 # This doesn't seem to be cleaning...
 @LIBMESH_ENABLE_NETGEN_TRUE@clean-local:
 @LIBMESH_ENABLE_NETGEN_TRUE@	$(MAKE) -C build $(AM_MAKEFLAGS) clean
+@LIBMESH_ENABLE_NETGEN_TRUE@	rm -f .buildstamp
+
+@LIBMESH_ENABLE_NETGEN_TRUE@distclean-local:
+@LIBMESH_ENABLE_NETGEN_TRUE@	rm -rf build
 @LIBMESH_ENABLE_NETGEN_TRUE@	rm -f .buildstamp
 
 # Make sure the installed libnglib is linking to the installed
