@@ -581,6 +581,14 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
   std::size_t m = 0,
               n = 0;
 
+  // If we don't already have this size, we'll need to reinit, and
+  // determine which rows+columns each processor is in charge of.
+  std::vector<numeric_index_type> new_row_starts, new_row_stops,
+                                  new_col_starts, new_col_stops;
+
+  numeric_index_type new_row_start, new_row_stop,
+                     new_col_start, new_col_stop;
+
   // We'll read through the file three times: once to get a reliable
   // value for the matrix size (so we can divvy it up among
   // processors), then again to get the sparsity to send to each
@@ -601,6 +609,8 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
   // even with a plain ifstream.  What happened to disk caching!?
   std::vector<std::tuple<numeric_index_type, numeric_index_type, T>> entries;
 
+  // First read through the file, saving size and entry data
+  {
   // We'll read the matrix on processor 0 rather than try to juggle
   // parallel I/O.
   if (this->processor_id() == 0)
@@ -653,17 +663,6 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
         {
           std::smatch sm;
 
-          if (std::regex_search(line, sm, size_regex))
-            {
-              const std::string msize = sm[1];
-              const std::string nsize = sm[2];
-              m = std::stoull(msize);
-              n = std::stoull(nsize);
-            }
-
-          if (std::regex_search(line, start_regex))
-            have_started = true;
-
           if (std::regex_search(line, sm, entry_regex))
             {
               libmesh_error_msg_if
@@ -701,7 +700,18 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
               largest_j_seen = std::max(j, largest_j_seen);
             }
 
-          if (std::regex_search(line, end_regex))
+          else if (std::regex_search(line, sm, size_regex))
+            {
+              const std::string msize = sm[1];
+              const std::string nsize = sm[2];
+              m = std::stoull(msize);
+              n = std::stoull(nsize);
+            }
+
+          else if (std::regex_search(line, start_regex))
+            have_started = true;
+
+          else if (std::regex_search(line, end_regex))
             {
               have_ended = true;
               break;
@@ -741,17 +751,6 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
       this->comm().broadcast(n);
     }
 
-  // If we don't already have this size, we'll need to reinit later,
-  // and we'll need to redetermine which rows each processor is in
-  // charge of.
-
-  numeric_index_type
-    new_row_start =     this->processor_id() * m / this->n_processors(),
-    new_row_stop  = (this->processor_id()+1) * m / this->n_processors();
-  numeric_index_type
-    new_col_start =     this->processor_id() * n / this->n_processors(),
-    new_col_stop  = (this->processor_id()+1) * n / this->n_processors();
-
   if (this->initialized() &&
       m == this->m() &&
       n == this->n())
@@ -762,17 +761,27 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
       new_col_start = this->col_start(),
       new_col_stop  = this->col_stop();
     }
+  else
+    {
+      // Determine which rows/columns each processor will be in charge of
+      new_row_start =     this->processor_id() * m / this->n_processors(),
+      new_row_stop  = (this->processor_id()+1) * m / this->n_processors();
 
-  std::vector<numeric_index_type> new_row_starts, new_row_stops,
-                                  new_col_starts, new_col_stops;
+      new_col_start =     this->processor_id() * n / this->n_processors(),
+      new_col_stop  = (this->processor_id()+1) * n / this->n_processors();
+    }
 
   this->comm().gather(0, new_row_start, new_row_starts);
   this->comm().gather(0, new_row_stop, new_row_stops);
   this->comm().gather(0, new_col_start, new_col_starts);
   this->comm().gather(0, new_col_stop, new_col_stops);
 
-  // Reread to deduce the sparsity pattern, or at least the maximum
-  // number of on- and off- diagonal non-zeros per row.
+  } // Done reading entry data and broadcasting matrix size
+
+  // Calculate the matrix sparsity and initialize it second
+  {
+  // Deduce the sparsity pattern, or at least the maximum number of
+  // on- and off- diagonal non-zeros per row.
   numeric_index_type  on_diagonal_nonzeros =0,
                      off_diagonal_nonzeros =0;
 
@@ -824,9 +833,9 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
              new_col_stop-new_col_start,
              on_diagonal_nonzeros,
              off_diagonal_nonzeros);
+  }
 
-  // One last reread to set values
-  //
+  // Set the matrix values last.
   // Convert from 1-based to 0-based indexing
   if (this->processor_id() == 0)
     for (auto [i, j, value] : entries)
