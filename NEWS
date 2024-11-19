@@ -1,3 +1,284 @@
+1.7.3 -> 1.8.0
+  * AbaqusIO
+    - Add Abaqus element maps for TRI6 and QUAD8 elements
+    - Make nodeset/sideset counter types in Abaqus mesh reader consistent with other boundaries
+    - Do a better job of respecting Abaqus node and element numbers
+    - Add file compression support to Abaqus reads
+    - Fix off-by-one error in Abaqus element renumbering
+    - Make AbaqusIO extendable to enable parsing of UMATs (#3969)
+  * Elem
+    - Add Tri7 element and associated library support
+    - Add Tet14 element and associated library support
+    - Add ElemSideBuilder
+    - Add Elem::side_type()
+    - Add Elem::quasicircumcenter()
+    - Add Prism20, Prism21 elements
+    - Add NodeElem contains_point() and close_to_point() implementations
+    - Add Pyramid18 element and associated library support
+    - Add subdomain_id to elem info output (#3487)
+    - Add Elem::topologically_equal()
+    - Add Elem::is_flipped()
+    - Add generic Elem::quality(ASPECT_RATIO), add unit tests for Elem quality metrics
+    - Reorder InfHex children
+    - Add Elem::complete_order_equivalent_type()
+    - Better error message for RemoteElem:: methods
+    - Add Elem::low_order_key()
+    - Don't die in Elem::volume() on a twisted element
+    - Add QUADSHELL9 element and shell elem unit tests
+    - Add Elem::is_internal() API for identifying internal (non-vertex/edge/side) nodes
+    - Add improved ASPECT_RATIO quality metric for Quad elements with unit tests
+    - Add Tri::quality(ASPECT_RATIO) implementation and unit tests
+    - Rename existing, generic ASPECT_RATIO metric to EDGE_LENGTH_RATIO
+    - Add pure virtual Elem::edges_adjacent_to_node() function and overrides
+    - Add generic Elem::quality(MIN,MAX_ANGLE) implementation
+    - Add generic Elem::quality(MIN,MAX_DIHEDRAL_ANGLE) implementation
+    - Add generic Elem::quality(JACOBIAN, SCALED_JACOBIAN) implementation
+    - Add Elem::max_nodal_order() API
+    - Add Elem::positive_{edge,face}_orientation() APIs
+* ExodusII
+    - Add ExodusII_IO::get_{side,node}set_data_indices()
+    - Fix for writing write Exodus from multiple procs at once
+    - Add new BEX element types to ExodusII helper
+    - Add ExodusII_IO::write_elemsets()
+    - Add/use ExodusII_IO_Helper::read_elemset_info()
+    - Add/use ExodusII_IO_Helper::read_elemset()
+    - Add ExodusII_IO::{write,read}_elemset_data()
+    - Fix deprecated Exodus calls (e.g. exII::ex_get_var_param() -> exII::ex_get_variable_param())
+    - Add ExodusII_IO_Helper::set_add_sides(), ExodusII::write_added_sides()
+    - Add named block, sideset, and nodeset support for Nemesis meshes
+    - Fixes for edge block reading
+    - Do not throw from ExodusII_IO_Helper::close()
+    - Fix for Exodus writer when sideset and shellface set have same id
+    - Add Exodus EDGE4 support
+    - Add "WEDGE6" to ExodusII helper
+    - Avoid manual memory allocation in ExodusII_IO_Helper::read_qa_records()
+  * IGA
+    - Update 3D IGA projection regression test values
+    - Add MeshTools::clear_spline_nodes()
+    - Optimize 1D, 2D, 3D IGA derivative calculations
+    - Add support for Bezier elements in VTK output
+    - Weight spline nodes heavily when partitioning
+    - Always number IGA nodes consecutively
+  * FE
+    - Add HIERARCHIC FE support for tets
+    - Add SIDE_HIERARCHIC support for triangles
+    - Add fe_fdm_deriv(), fe_fdm_second_deriv() support for derivatives of Bernstein, Szabo-Babushka, HIERARCHIC basis functions
+    - Fixes/improvements for single, quad-precision Real
+    - Remove caching from FE<CLOUGH>, Clough-Tocher should work multithreaded now
+    - Factor out common code in BERNSTEIN p=3,4
+    - Factor out edge flip calculation on Sza-Bab quads
+    - Add L2_HIERARCHIC support on Tets and Prisms
+    - Add _elem_p_level variable in FEAbstract
+    - Add Raviart-Thomas 2D, 3D support
+    - Introduce H_DIV FEContinuity enumeration
+    - Add vector_fe_ex{6,7,8,9}
+    - Create L2_RAVIART_THOMAS FE Family
+    - Error if mismatched p-levels for Lagrange between neighbors
+    - Create L2_LAGRANGE_VEC FE Family
+    - Add FEInterface::is_hierarchic()
+    - Add HIERARCHIC_VEC and L2_HIERARCHIC_VEC FE Families
+    - Add support for 2D Nedelec shape functions, 2nd-5th order
+    - Instantiate FIFTH order unit tests for MONOMIAL FEs
+    - Throw an error in opt mode for HIERARCHIC p=0
+    - Average side nodal solutions for H_DIV elements
+  * Mesh
+    - Move stitching from Replicated->Unstructured Mesh
+    - Add MeshBase::change_elemset_code(), MeshBase::get_elemset_codes()
+    - Add MeshBase::active_unpartitioned_element_ptr_range()
+    - Support Laplace smoothing of unpartitioned meshes
+    - Add support for reading/writing elemset codes in Xdr files
+    - Add BoundaryInfo::renumber_id()
+    - Add MeshBase::reinit_ghosting_functors() API
+    - Add QUADSHELL{4,8} support to MeshTools::Generation::build_square()
+    - Add MeshTools::Modification::orient_elements()
+    - Allow child elements to have BoundaryInfo associated with them
+    - Add MeshBase::operator==()
+    - Add BoundaryInfo::operator==()
+    - Add MeshBase::copy_constraint_rows()
+    - Add MeshRefinement::_allow_unrefined_patches flag and accessor
+    - Macroify all the mesh iterators
+    - Add option for removing global boundary ID in remove_id()
+    - Add remap_subdomain_ids capability in stitch_meshes
+    - Preserve id(), subdomain_id() when reading VTK elements
+    - Add BoundaryInfo::libmesh_assert_valid_multimaps()
+    - Add MeshBase::copy_constraint_rows(Matrix) function
+    - Support TRI7 in build_sphere()
+    - Add MeshBase::n_constraint_rows(), print_constraint_rows()
+    - Use connect_element_dependencies() in CheckpointIO
+    - Fix VTK unit test with DistributedMesh
+    - Add MeshTools::MeshGeneration::build_square(TRISHELL3) support
+    - Add entities BoundingBox testing in GmshIO
+    - Add MeshTetInterface::volume_to_surface_mesh()
+    - Add tet support to MeshTools::MeshGeneration::build_sphere()
+    - Add MeshTools::volume()
+    - Add unit tests for MeshSmoother subclasses
+    - Fix ReplicatedMesh(DistributedMesh&) construction
+    - Update id counts in MeshCommunication::broadcast()
+    - Add STLIO class, add .stl support to NameBasedIO
+    - MeshBase::elem_orders() API
+    - Add triangulation, tetrahedralization options to meshtool app
+    - Allow MeshFunction::find_element() to return a non-local Elem provided that it is evaluable
+    - Add SimplexRefiner class
+    - Add MeshTools::Generation::surface_octahedron()
+  * Miscellaneous
+    - C++17 support is now required
+    - Add/use exceptionless_{semi}parallel_object_only() macro
+    - Add plain integrals to calculator app
+    - Fix FParser JIT compilation on Apple M1
+    - Add configure --enable-hdf5-required option
+    - Fix all_second_order() bug with extra integers
+    - Eliminate valgrind errors using a condition_variable
+    - Implement doubly-checked lock for _get_array()
+    - Add static TensorValue::rotation_matrix() helper
+    - Lock against concurrent read-write in PetscVector::add()
+    - Add std::hash<Point> overload
+    - Increased constness in {const_,} elem_iterator
+    - Add PerfLog for our unit tests
+    - Add unit test for MeshBase::all_second_order_range()
+    - Use std::make_unique everywhere, deprecate libmesh_make_unique
+    - Use std::string_view in place of std::string references
+    - Remove long-deprecated overload MeshTools::find_boundary_nodes()
+    - Remove deprected UniquePtr workaround for std::unique_ptr
+    - Use C++17 structured bindings in many for-loops
+    - Implement many clang-tidy suggestions
+    - Add Utility::CompareUnderlying helper struct
+    - Avoid using AC_CHECK_HEADER to search for petscversion.h
+    - Don't lock in libmesh_singleton.C
+    - Give a warning if an Exodus variable name will be truncated
+    - Remove __SUNPRO_CC specific code
+    - Avoid manual memory management in variant_iterator
+    - Use std::stack for managing DiffPhysics, DiffQoI lifetimes
+    - Require support for enum forward declarations
+    - Add unit test of find_neighbors() on mesh of 1D elements with different orientations
+    - Add more generic index_range() support (for any container that has a size() method) (#3377)
+    - Factor out common {left,right}_multiply_transpose() code
+    - Fix for VTK 9.2 linking to libvtksys
+    - Add allow_nodal_pyramid_quadrature flag, use in unit tests
+    - Prefer std::to_string over sprintf
+    - Don't call setenv on Windows builds
+    - Use NBX algorithm in send_coarse_ghosts(), redistribute()
+    - Fix NumericVector::compare()
+    - Add NonlinearSolver::set_exact_constraint_enforcement()
+    - Prefer using std::make_unique to new whenever possible
+    - Change unsigned int to size_t in CouplingMatrix to prevent overflow for large number of variables (#3541)
+    - Various fixes related to fsanitize=integer
+    - Add way to disable use of p-refinement when doing FE::reinit
+    - Fix parallel bounding box union in get_info()
+    - Output any plain *FLAGS (from environment) in config_summary
+    - Avoid partially merging boundary nodes when stitching, return number of merged nodes
+    - Factor divisions out of hilbert index calculations
+    - Add DiffContext allocate_local_matrices option
+    - Upgrade to autoconf 2.71
+    - Don't include vtkConfigure.h when compiling with VTK 9.3
+    - Add clone method to QBase
+    - Add more general matrix packing (#3662)
+    - Add unit test of writing an XDR file for a refined mesh with extra elem integers
+    - Add support for --with-xdr-include and --with-xdr-libname configure flags
+    - Make enum_to_string() and string_to_enum() thread-safe
+    - Fix Eigen preconditioning in 64-bit builds
+    - Only do CPPUNIT_ASSERT_THROW tests if libmesh exceptions are enabled
+    - Initialize variables within if-statements when possible
+    - Add a DofMap API to set need_full_sparsity_pattern
+    - Add CLI option --print-constraints
+    - Add MeshfreeInterpolationFunction class derived from FunctionBase<Number>
+    - Various "make dist" fixes
+    - Fix elem dof distribution for --node-major-dofs
+    - Fix missing <memory> include in getpot.h
+    - Add BoundingBox::contains(BoundingBox) unit test
+    - Add FPEDisabler class, fix several cases where potential FPEs were detected
+    - Make libmesh_terminate_handler() API available in libmesh.h
+    - Add NonManifoldGhostingFunctor, SidesToElemMap classes
+  * Numerics
+    - Add SVD in preconditioner type
+    - Allow use of matrix-free when computing residual and jacobian together
+    - Fixes for petscdmlibmesh PETSc 3.18 compatibility
+    - Workaround for PETSc 3.18 losing %D support
+    - Add pointwise_divide() to PetscVector
+    - PETSc 3.19 deprecated some convergence reasons
+    - Convert PETSC_RELEASE_LESS_THAN macro usage to PETSC_VERSION_LESS_THAN
+    - Add in-place L2 norm difference method
+    - Add PETSc versioning macros that imitate PETSc's own macros
+    - Add ability to specify absolute tolerance for linear solvers
+    - Use VecGhostGetGhostIS instead of VecGetLocalToGlobalMapping
+    - Clear used CLI args pre-PetscFinalize
+    - Fix swap of init with non-init DistributedVector
+    - Add SparseMatrix::read_matlab()
+    - Add SparseMatrix::col_start()/stop()
+    - Add PetscMatrix read_petsc_* methods
+    - Fixes for strict petsc error code checking
+    - Make sure every PetscFunctionBegin has a matching PetscFunctionReturn
+    - Add matrixconvert app
+    - Add SparseMatrix::solver_package()
+    - Add SparseMatrix read support from zipped .m files
+    - Add LIBMESH_PETSC_SUCCESS wrapping PETSC_SUCCESS macro
+    - Pass unique_ptr by value to NumericVector::restore_subvector()
+    - Add {NumericVector,SparseMatrix}::fuzzy_equals()
+    - Add {absolute,relative}_fuzzy_equals() support for TypeVectors/TypeTensors of MetaPhysicL types
+    - Add PetscMatrixBase<T>, base class for PetscMatrix<T> and PetscMatrixShellMatrix<T>
+    - Initialize PetscVector private members consistently
+    - Add StaticCondensation class, derived from PetscMatrixShellMatrix<T>
+    - Add LibmeshPetscCallA(), LibmeshPetscCallQ() macros
+  * PerfLog
+    - PerfLog::fast_pop() should be noexcept
+  * Poly2TriTriangulator
+    - Add Poly2TriTriangulator, a subclass of TriangulatorInterface
+    - Add Poly2TriBadMultiBoundary unit test
+    - Don't let DistributedMesh number poly2tri nodes
+    - Add distance_from_circumcircle() API
+    - Support converting Edge3 to triangulator segments
+  * Reduced Basis
+    - Add interpolationPhiValues to RBEIMEvaluation capnproto schema
+    - Update to how observation points for EIM basis functions are evaluated
+    - Fix race condition in writing header in RBEvaluation::write_out_vectors()
+    - Update RBEIMConstruction::enrich_eim_approximation()
+    - Fix for shellfaces in RBEIMEvaluation::side_distribute_bfs()
+    - Update to RBConstructionBase<Base>::get_n_training_samples() (#3115)
+    - Use best_fit_type_flag to switch between POD and Greedy EIM training
+    - Add virtual methods for specifying index maps for the RBParametrizedFunction in EIM approximations
+    - Add support for EIM on nodesets
+    - Fix to apply constraints and scaling inside node assembly in add_scaled_matrix_and_vector()
+    - Allow empty EIM basis in RBEIMConstruction::train_eim_approximation_with_POD()
+    - RBConstruction: Re-throw exceptions on all procs in parallel
+    - Add RBParameters::has_value(), has_extra_value() APIs
+    - Deprecate RBParameters::get_parameters_map()
+    - RBParameters: store std::vector<Real> instead of single Real
+    - Add RBParameters::set_value(name, index, value) and RBParameters::push_back_value() APIs
+    - Provide STL iterator typedefs for RBParameters::const_iterator
+    - const correctness updates for RBThetaExpansion, RBConstruction APIs
+    - Add RBParameters::push_back_extra_value(), RBParameters::get_extra_step_value()
+    - Add EIM error indicator based on using one extra EIM iteration
+    - Add VectorizedEvalInput struct to encapsulate inputs to vectorized_evaluate() functions
+    - Introduce scaling option into RBEIMConstruction inner products
+    - Replace NumericVector with std::vector in RBConstructionBase
+    - Add support for storing each RB parameter as a vector quantity
+    - Handle the case where we encounter linearly dependent data in EIM
+    - Add EIMVarGroupPlottingInfo struct, update EIM plotting functions
+    - Make preevaluate_thetas() virtual, it should be overridden in derived classes
+    - Add elem center tangent derivative storage for VectorizedEvalInput in EIM
+    - Add virtual RBEIMEvaluation::project_qp_data_vector_onto_system() API
+    - Remove previous EIM bf projection methods that are not needed
+  * Submodules
+    - Update MetaPhysicL to 1.4.0+
+    - Update TIMPI to 1.8.5+
+    - Update autoconf-submodule, add support for Nvidia, gcc11, icc21 compilers
+    - Add poly2tri submodule
+    - Update nanoflann (#3121)
+    - Add Eigen submodule, update to version 3.4.0
+    - Add NetCDF submodule at version 4.9.2
+    - Add Netgen submodule currently at version 69f2ea56
+  * System
+    - Throw an error in EigenSystem::solve if we have constraints
+    - Add shell matrix support for CondensedEigenSystem
+    - Add System::has_constraint_object()
+    - Make System::is_initialized() const
+    - Add System matrix iterator APIs to match vector iterator APIs
+    - Add CondensedEigenSystem::initialize_condensed_matrices(), have_condensed_dofs() APIs
+    - Implement (Equation)System(s)::init() in terms of reinit_mesh()
+  * TypeVector/TypeTensor
+    - Add TypeVector::outer_product()
+    - Add a column() API to TypeTensor
+    - Add static_assert(is_trivially_copyable<TypeVector>)
+
 1.7.1 -> 1.7.3
   * PETSc support
     - Full compatibility with PETSc 3.18 and 3.19
