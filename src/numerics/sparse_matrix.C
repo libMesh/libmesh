@@ -619,8 +619,6 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
       // more robust to formatting.
       const std::regex start_regex // assignment like "zzz = ["
         ("\\s*\\w+\\s*=\\s*\\[");
-      const std::regex entry_regex // row/col/val like "1 1 -2.0e-4"
-        ("(\\d+)\\s+(\\d+)\\s+([+-]?(\\d+([.]\\d*)?([eE][+-]?\\d+)?|[.]\\d+([eE][+-]?\\d+)?))");
       const std::regex end_regex // end of assignment
         ("^[^%]*\\]");
 
@@ -650,6 +648,7 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
       // way to get the size is if it ended up in a comment
       const std::regex size_regex // comment like "% size = 8 8"
         ("%\\s*[Ss][Ii][Zz][Ee]\\s*=\\s*(\\d+)\\s+(\\d+)");
+      const std::string whitespace = " \t";
 
       bool have_started = false;
       bool have_ended = false;
@@ -663,23 +662,23 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
         {
           std::smatch sm;
 
-          if (std::regex_search(line, sm, entry_regex))
+          // First, try to match an entry.  This is the most common
+          // case so we won't rely on slow std::regex for it.
+          // stringstream is at least an improvement over that.
+
+          // Look for row/col/val like "1 1 -2.0e-4"
+
+          std::istringstream l(line);
+
+          std::size_t i, j;
+          T value;
+
+          l >> i >> j >> value;
+
+          if (!l.fail())
             {
               libmesh_error_msg_if
                 (!have_started, "Confused by premature entries in matrix file " << filename);
-
-              const std::string istr = sm[1];
-              const std::string jstr = sm[2];
-              const std::string cstr = sm[3];
-
-              std::size_t i = std::stoull(istr);
-              std::size_t j = std::stoull(jstr);
-
-              // Try to be compatible with
-              // higher-than-double-precision T
-              std::stringstream ss(cstr);
-              T value;
-              ss >> value;
 
               entries.emplace_back(cast_int<numeric_index_type>(i),
                                    cast_int<numeric_index_type>(j),
