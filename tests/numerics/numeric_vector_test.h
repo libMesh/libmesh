@@ -13,6 +13,7 @@
 #include <memory>
 
 #define NUMERICVECTORTEST                       \
+  CPPUNIT_TEST( testCasting );                  \
   CPPUNIT_TEST( testLocalize );                 \
   CPPUNIT_TEST( testLocalizeBase );             \
   CPPUNIT_TEST( testLocalizeIndices );          \
@@ -57,6 +58,25 @@ public:
 
   void tearDown()
   {}
+
+#ifdef LIBMESH_HAVE_RTTI
+  template <class Base, class Derived>
+  void Casting()
+  {
+    // https://stackoverflow.com/questions/79192304/macos-xcode-16-breaks-dynamic-cast-for-final-types-defined-in-shared-library
+    //
+    // XCode 16.1 has a bug where a subclass declared final cannot be
+    // dynamically cast to a parent class.  Let's make sure that
+    // doesn't affect this build.
+
+    auto v_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
+
+    Derived * d_ptr = dynamic_cast<Derived *>(v_ptr.get());
+    libmesh_assert_msg(d_ptr,
+                       "Dynamic cast failed on this system.  XCode 16 bug?");
+    CPPUNIT_ASSERT(d_ptr);
+  }
+#endif
 
   template <class Base, class Derived>
   void Operations()
@@ -353,6 +373,15 @@ public:
     LOG_UNIT_TEST;
 
     Norms<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
+  }
+
+  void testCasting()
+  {
+    LOG_UNIT_TEST;
+
+#ifdef LIBMESH_HAVE_RTTI
+    Casting<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
+#endif // LIBMESH_HAVE_RTTI
   }
 
   void testOperations()
