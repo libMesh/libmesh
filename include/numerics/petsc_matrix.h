@@ -320,6 +320,15 @@ protected:
                    numeric_index_type blocksize);
 
   /**
+   * Finish up the initialization process. This method does a few things which include
+   * - Setting the option to make new nonzeroes an error (otherwise users will just have a silent
+       (often huge) performance penalty
+   * - Marking the matrix as initialized
+   * - Zeroing the matrix
+   */
+  void finish_initialization();
+
+  /**
    * This function either creates or re-initializes a matrix called \p
    * submatrix which is defined by the indices given in the \p rows
    * and \p cols vectors.

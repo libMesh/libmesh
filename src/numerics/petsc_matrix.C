@@ -205,9 +205,6 @@ PetscMatrix<T>::init_without_preallocation (const numeric_index_type m_in,
       }
     }
 
-  // Make it an error for PETSc to allocate new nonzero entries during assembly
-  LibmeshPetscCall(MatSetOption(this->_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
-
   this->set_context ();
 }
 
@@ -256,8 +253,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
       }
     }
 
-  this->_is_initialized = true;
-  this->zero ();
+  this->finish_initialization();
 }
 
 template <typename T>
@@ -330,6 +326,18 @@ void PetscMatrix<T>::preallocate(const numeric_index_type libmesh_dbg_var(m_l),
 }
 
 template <typename T>
+void PetscMatrix<T>::finish_initialization()
+{
+  // Make it an error for PETSc to allocate new nonzero entries during assembly. For old PETSc
+  // versions this option must be set after preallocation for MPIAIJ matrices
+  LibmeshPetscCall(MatSetOption(this->_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
+
+  this->_is_initialized = true;
+  if (!this->_use_hash_table)
+    this->zero();
+}
+
+template <typename T>
 void PetscMatrix<T>::init (const numeric_index_type m_in,
                            const numeric_index_type n_in,
                            const numeric_index_type m_l,
@@ -341,8 +349,7 @@ void PetscMatrix<T>::init (const numeric_index_type m_in,
   this->init_without_preallocation(m_in, n_in, m_l, n_l, blocksize_in);
   this->preallocate(m_l, n_nz, n_oz, blocksize_in);
 
-  this->_is_initialized = true;
-  this->zero ();
+  this->finish_initialization();
 }
 
 
@@ -365,9 +372,7 @@ void PetscMatrix<T>::init (const ParallelType)
       this->preallocate(m_l, n_nz, n_oz, blocksize);
     }
 
-  this->_is_initialized = true;
-  if (!this->_use_hash_table)
-    this->zero();
+  this->finish_initialization();
 }
 
 
