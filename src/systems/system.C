@@ -98,7 +98,7 @@ System::System (EquationSystems & es,
   adjoint_already_solved            (false),
   _hide_output                      (false),
   project_with_constraints          (true),
-  _prefer_hash_table_matrix_assembly(true),
+  _prefer_hash_table_matrix_assembly(false),
   _require_sparsity_pattern         (false)
 {
 }
