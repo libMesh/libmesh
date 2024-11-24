@@ -2386,6 +2386,7 @@ bool RBEIMConstruction::enrich_eim_approximation_on_sides(const SideQpDataMap & 
   this->comm().broadcast(optimal_point, proc_ID_index);
   this->comm().broadcast(optimal_comp, proc_ID_index);
   this->comm().broadcast(optimal_elem_id, proc_ID_index);
+  this->comm().broadcast(optimal_side_index, proc_ID_index);
   this->comm().broadcast(optimal_subdomain_id, proc_ID_index);
   this->comm().broadcast(optimal_boundary_id, proc_ID_index);
   this->comm().broadcast(optimal_qp, proc_ID_index);
