@@ -1308,7 +1308,7 @@ PetscMatrix<T>::reset_memory()
     // This performs MatReset plus re-establishes the hash table
     LibmeshPetscCall(MatResetHash(this->_mat));
 #else
-    libmesh_error_msg("Hash tables not fully supported until PETSc version 3.23");
+    libmesh_error_msg("Resetting hash tables not supported until PETSc version 3.23");
 #endif
   else
     this->reset_preallocation();
