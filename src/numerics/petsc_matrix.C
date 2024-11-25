@@ -1275,6 +1275,16 @@ void PetscMatrix<T>::scale(const T scale)
   LibmeshPetscCall(MatScale(this->_mat, scale));
 }
 
+template <typename T>
+bool PetscMatrix<T>::supports_hash_table() const
+{
+#if PETSC_RELEASE_LESS_THAN(3,19,0)
+  return false;
+#else
+  return true;
+#endif
+}
+
 #if PETSC_RELEASE_GREATER_EQUALS(3,23,0)
 template <typename T>
 std::unique_ptr<PetscMatrix<T>>

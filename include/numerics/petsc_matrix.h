@@ -289,7 +289,7 @@ public:
   std::unique_ptr<PetscMatrix<T>> copy_from_hash();
 #endif
 
-  virtual bool supports_hash_table() const override { return true; }
+  virtual bool supports_hash_table() const override;
 
   virtual void reset_memory() override;
 
