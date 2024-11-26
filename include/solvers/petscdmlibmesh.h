@@ -21,7 +21,11 @@
 // (does it get installed?  should it? is this public, but
 // developer-facing only?)
 
+#include "libmesh/libmesh_config.h"
+
 #include "libmesh/petsc_macro.h"
+
+#ifdef LIBMESH_HAVE_PETSC
 
 #ifdef I
 # define LIBMESH_SAW_I
@@ -48,5 +52,7 @@ PETSC_EXTERN PetscErrorCode DMlibMeshGetSystem(DM,libMesh::NonlinearImplicitSyst
 EXTERN_C_BEGIN
 PETSC_EXTERN PetscErrorCode DMCreate_libMesh(DM);
 EXTERN_C_END
+
+#endif // LIBMESH_HAVE_PETSC
 
 #endif // #ifdef PETSCDMLIBEMSH_H
