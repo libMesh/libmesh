@@ -68,6 +68,9 @@ void stop(const char * file, int line, const char * date, const char * time)
 
 void report_error(const char * file, int line, const char * date, const char * time, std::ostream & os)
 {
+  // Avoid a race condition on that static bool
+  libMesh::Threads::lock_singleton_spin_mutex();                      \
+
   // It is possible to have an error *inside* report_error; e.g. from
   // print_trace.  We don't want to infinitely recurse.
   static bool reporting_error = false;
@@ -88,6 +91,7 @@ void report_error(const char * file, int line, const char * date, const char * t
   libMesh::MacroFunctions::here(file, line, date, time, os);
 
   reporting_error = false;
+  libMesh::Threads::unlock_singleton_spin_mutex();                    \
 }
 
 } // namespace MacroFunctions
