@@ -89,6 +89,17 @@ AC_DEFUN([LIBMESH_SET_COMPILERS],
                       [FC="$withval"],
                       [])
 
+          dnl See whether we are using PETSC_FC. Unfortunately PETSC_FC may
+          dnl be prefixed with a PATH, and its not straightforward to strip it off.
+          dnl If FC is not set AC_PROG_FC will call AC_CHECK_TOOLS which will prefix
+          dnl every argument in FC_TRY_LIST with values in $PATH, so we will
+          dnl not find something like PATH/PETSC_PREFIX/mpicxx. The solution
+          dnl then is just to set FC to PETSC_FC so that AC_CHECK_TOOLS
+          dnl never gets called
+          AS_IF([test -z "$FC" && test x"$PETSC_HAVE_MPI" = x1 && test x"$PETSC_FC" != x],
+                [FC="$PETSC_FC"
+                 F77="$PETSC_FC"])
+
           dnl --------------------------------------------------------------
           dnl Determine a F90+ compiler to use.
           dnl --------------------------------------------------------------
