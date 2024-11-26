@@ -25,6 +25,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/function_base.h"
 
+#include <unordered_map>
 #include <map>
 #include <memory>
 
