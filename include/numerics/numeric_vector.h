@@ -153,6 +153,14 @@ public:
   ParallelType type() const { return _type; }
 
   /**
+   * If this vector's type() is PARALLEL and it is not yet
+   * initialized, change the type() to GHOSTED.
+   *
+   * \returns \p true if the upgrade was performed, false otherwise.
+   */
+  bool upgrade_to_ghosted();
+
+  /**
    * \returns \p true if the vector is closed and ready for
    * computation, false otherwise.
    */

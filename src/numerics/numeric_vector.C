@@ -81,6 +81,27 @@ NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage
 
 
 template <typename T>
+bool NumericVector<T>::upgrade_to_ghosted()
+{
+  // Can't upgrade to GHOSTED if libMesh was configured with --disable-ghosted
+#ifndef LIBMESH_ENABLE_GHOSTED
+  return false;
+#endif
+
+  // We can only upgrade NumericVectors that are currently PARALLEL type
+  // and not yet initialized.
+  if (this->type() == PARALLEL && !this->initialized())
+  {
+    _type = GHOSTED;
+    return true;
+  }
+
+  // If we made it here, then the upgrade to GHOSTED could not be
+  // performed for some reason, so return false.
+  return false;
+}
+
+template <typename T>
 void NumericVector<T>::insert (const T * v,
                                const std::vector<numeric_index_type> & dof_indices)
 {
