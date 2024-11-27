@@ -792,8 +792,9 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
                   vec.swap(*new_vec);
                 }
               else
-                // The PARALLEL vec is not yet initialized, so we can just "upgrade" it to GHOSTED
-                vec.upgrade_to_ghosted();
+                // The PARALLEL vec is not yet initialized, so we can
+                // just "upgrade" it to GHOSTED.
+                vec.set_type(type);
             }
         }
 

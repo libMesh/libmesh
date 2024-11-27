@@ -83,24 +83,34 @@ NumericVector<T>::build(const Parallel::Communicator & comm,
 
 
 template <typename T>
-bool NumericVector<T>::upgrade_to_ghosted()
+void NumericVector<T>::set_type(ParallelType t)
 {
-  // Can't upgrade to GHOSTED if libMesh was configured with --disable-ghosted
+  // Check for no-op
+  if (_type == t)
+    return;
+
+  // If the NumericVector is not yet initialized, then it is generally
+  // safe to change the ParallelType, with minor restrictions.
+  if (!this->initialized())
+    {
+      // If ghosted vectors are not enabled and the user requested a
+      // GHOSTED vector, fall back on SERIAL.
 #ifndef LIBMESH_ENABLE_GHOSTED
-  return false;
+      if (t == GHOSTED)
+        {
+          _type = SERIAL;
+          return;
+        }
 #endif
 
-  // We can only upgrade NumericVectors that are currently PARALLEL type
-  // and not yet initialized.
-  if (this->type() == PARALLEL && !this->initialized())
-  {
-    _type = GHOSTED;
-    return true;
-  }
+      _type = t;
+      return;
+    }
 
-  // If we made it here, then the upgrade to GHOSTED could not be
-  // performed for some reason, so return false.
-  return false;
+  // If we made it here, then the NumericVector was already
+  // initialized and we don't currently allow the ParallelType to be
+  // changed, although this could potentially be added later.
+  libmesh_not_implemented();
 }
 
 template <typename T>

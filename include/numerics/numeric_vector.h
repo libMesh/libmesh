@@ -154,12 +154,15 @@ public:
   ParallelType type() const { return _type; }
 
   /**
-   * If this vector's type() is PARALLEL and it is not yet
-   * initialized, change the type() to GHOSTED.
-   *
-   * \returns \p true if the upgrade was performed, false otherwise.
+   * Allow the user to change the ParallelType of the NumericVector
+   * under some circumstances. If the NumericVector has not been
+   * initialized yet, then it is generally safe to change the
+   * ParallelType. otherwise, if the NumericVector has already been
+   * initialized with a specific type, we cannot change it without
+   * doing some extra copying/reinitialization work, and we currently
+   * throw an error if this is requested.
    */
-  bool upgrade_to_ghosted();
+  void set_type(ParallelType t);
 
   /**
    * \returns \p true if the vector is closed and ready for
