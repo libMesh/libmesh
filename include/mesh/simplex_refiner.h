@@ -27,6 +27,10 @@
 
 #include <map>
 #include <memory>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace libMesh
 {
