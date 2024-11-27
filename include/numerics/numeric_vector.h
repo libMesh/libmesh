@@ -139,7 +139,8 @@ public:
    */
   static std::unique_ptr<NumericVector<T>>
   build(const Parallel::Communicator & comm,
-        const SolverPackage solver_package = libMesh::default_solver_package());
+        SolverPackage solver_package = libMesh::default_solver_package(),
+        ParallelType parallel_type = AUTOMATIC);
 
   /**
    * \returns \p true if the vector has been initialized,
