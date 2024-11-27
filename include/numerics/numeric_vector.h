@@ -153,11 +153,6 @@ public:
   ParallelType type() const { return _type; }
 
   /**
-   * \returns The type (SERIAL, PARALLEL, GHOSTED) of the vector.
-   */
-  ParallelType & type() { return _type; }
-
-  /**
    * \returns \p true if the vector is closed and ready for
    * computation, false otherwise.
    */
