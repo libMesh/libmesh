@@ -154,6 +154,17 @@ public:
   ParallelType type() const { return _type; }
 
   /**
+   * \returns The type (SERIAL, PARALLEL, GHOSTED) of the vector.
+   *
+   * \deprecated because it is dangerous to change the ParallelType
+   * of an already-initialized NumericVector. See NumericVector::set_type()
+   * for a safer, non-deprecated setter.
+   */
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  ParallelType & type() { return _type; }
+#endif
+
+  /**
    * Allow the user to change the ParallelType of the NumericVector
    * under some circumstances. If the NumericVector has not been
    * initialized yet, then it is generally safe to change the
