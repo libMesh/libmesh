@@ -1222,16 +1222,14 @@ LinearSolver<Number> * ImplicitSystem::get_linear_solver() const
 
 std::pair<unsigned int, Real> ImplicitSystem::get_linear_solve_parameters() const
 {
-  if (parameters.have_parameter<unsigned int>("linear solver maximum iterations") &&
-     parameters.have_parameter<Real>("linear solver tolerance"))
-    return std::make_pair(parameters.get<unsigned int>("linear solver maximum iterations"),
-                          parameters.get<Real>("linear solver tolerance"));
-  else if (!parameters.have_parameter<unsigned int>("linear solver maximum iterations") &&
-     !parameters.have_parameter<Real>("linear solver tolerance"))
-    return std::make_pair(this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations"),
-                          this->get_equation_systems().parameters.get<Real>("linear solver tolerance"));
-  else
-    libmesh_error_msg("ERROR: Insufficient linear solver parameters");
+  return std::make_pair(
+      parameters.have_parameter<unsigned int>("linear solver maximum iterations")
+          ? parameters.get<unsigned int>("linear solver maximum iterations")
+          : this->get_equation_systems().parameters.get<unsigned int>(
+                "linear solver maximum iterations"),
+      parameters.have_parameter<Real>("linear solver tolerance")
+          ? parameters.get<Real>("linear solver tolerance")
+          : this->get_equation_systems().parameters.get<Real>("linear solver tolerance"));
 }
 
 
