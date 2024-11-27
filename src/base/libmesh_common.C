@@ -20,6 +20,7 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/print_trace.h"
+#include "libmesh/threads.h"
 
 // C/C++ includes
 #ifdef LIBMESH_HAVE_SYS_TYPES_H
@@ -66,10 +67,12 @@ void stop(const char * file, int line, const char * date, const char * time)
 }
 
 
+Threads::spin_mutex report_error_spin_mtx;
+
 void report_error(const char * file, int line, const char * date, const char * time, std::ostream & os)
 {
   // Avoid a race condition on that static bool
-  libMesh::Threads::lock_singleton_spin_mutex();                      \
+  Threads::spin_mutex::scoped_lock lock(report_error_spin_mtx);
 
   // It is possible to have an error *inside* report_error; e.g. from
   // print_trace.  We don't want to infinitely recurse.
@@ -91,7 +94,6 @@ void report_error(const char * file, int line, const char * date, const char * t
   libMesh::MacroFunctions::here(file, line, date, time, os);
 
   reporting_error = false;
-  libMesh::Threads::unlock_singleton_spin_mutex();                    \
 }
 
 } // namespace MacroFunctions
