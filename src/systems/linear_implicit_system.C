@@ -118,10 +118,6 @@ void LinearImplicitSystem::solve ()
     // Assemble the linear system
     this->assemble ();
 
-  // Get a reference to the EquationSystems
-  const EquationSystems & es =
-    this->get_equation_systems();
-
   // If the linear solver hasn't been initialized, we do so here.
   if (this->prefix_with_name())
     linear_solver->init(this->prefix().c_str());
@@ -131,14 +127,7 @@ void LinearImplicitSystem::solve ()
   linear_solver->init_names(*this);
 
   // Get the user-specified linear solver tolerance
-  const double tol = parameters.have_parameter<Real>("linear solver tolerance") ?
-    double(parameters.get<Real>("linear solver tolerance")) :
-    double(es.parameters.get<Real>("linear solver tolerance"));
-
-  // Get the user-specified maximum # of linear solver iterations
-  const unsigned int maxits = parameters.have_parameter<unsigned int>("linear solver maximum iterations") ?
-    parameters.get<unsigned int>("linear solver maximum iterations") :
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
+  const auto [maxits, tol] = this->get_linear_solve_parameters();
 
   if (_subset != nullptr)
     linear_solver->restrict_solve_to(&_subset->dof_ids(),_subset_solve_mode);

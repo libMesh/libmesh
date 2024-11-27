@@ -343,12 +343,7 @@ void FrequencySystem::solve (const unsigned int n_start,
   // Get the user-specified linear solver tolerance,
   //     the user-specified maximum # of linear solver iterations,
   //     the user-specified wave speed
-  const Real tol            = parameters.have_parameter<Real>("linear solver tolerance") ?
-    double(parameters.get<Real>("linear solver tolerance")) :
-    es.parameters.get<Real>("linear solver tolerance");
-  const unsigned int maxits = parameters.have_parameter<unsigned int>("linear solver maximum iterations") ?
-    parameters.get<unsigned int>("linear solver maximum iterations") :
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
+  const auto [maxits, tol] = this->get_linear_solve_parameters();
 
   // start solver loop
   for (unsigned int n=n_start; n<= n_stop; n++)
