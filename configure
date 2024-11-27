@@ -5730,6 +5730,7 @@ then :
                   PETSCINCLUDEDIRS=`make -s -C ${PETSC_DIR} SHELL=/bin/sh getincludedirs`
                   PETSC_CXX=`make -s -C $PETSC_DIR SHELL=/bin/sh getcxxcompiler`
                   PETSC_CC=`make -s -C $PETSC_DIR SHELL=/bin/sh getccompiler`
+                  PETSC_FC=`make -s -C $PETSC_DIR SHELL=/bin/sh getfortrancompiler`
                   PETSC_MPI_INCLUDE_DIRS=`make -s -C $PETSC_DIR SHELL=/bin/sh getmpiincludedirs`
                   PETSC_MPI_LINK_LIBS=`make -s -C $PETSC_DIR SHELL=/bin/sh getmpilinklibs`
                   printf '%s\n' "include $PETSC_VARS_FILE" > Makefile_config_petsc
@@ -5765,6 +5766,8 @@ fi
                   printf '\t%s\n' "echo \$(CXX)" >> Makefile_config_petsc
                   printf '%s\n' "getccompiler:" >> Makefile_config_petsc
                   printf '\t%s\n' "echo \$(CC)" >> Makefile_config_petsc
+                  printf '%s\n' "getfortrancompiler:" >> Makefile_config_petsc
+                  printf '\t%s\n' "echo \$(FC)" >> Makefile_config_petsc
                   printf '%s\n' "getmpiincludedirs:" >> Makefile_config_petsc
                   printf '\t%s\n' "echo \$(MPI_INCLUDE)" >> Makefile_config_petsc
                   printf '%s\n' "getmpilinklibs:" >> Makefile_config_petsc
@@ -5775,6 +5778,7 @@ fi
                   PETSC_FC_INCLUDES=`make -s -f Makefile_config_petsc SHELL=/bin/sh getPETSC_FC_INCLUDES`
                   PETSC_CXX=`make -s -f Makefile_config_petsc SHELL=/bin/sh getcxxcompiler`
                   PETSC_CC=`make -s -f Makefile_config_petsc SHELL=/bin/sh getccompiler`
+                  PETSC_FC=`make -s -f Makefile_config_petsc SHELL=/bin/sh getfortrancompiler`
                   PETSC_MPI_INCLUDE_DIRS=`make -s -f Makefile_config_petsc SHELL=/bin/sh getmpiincludedirs`
                   PETSC_MPI_LINK_LIBS=`make -s -f Makefile_config_petsc SHELL=/bin/sh getmpilinklibs`
                   rm -f Makefile_config_petsc
@@ -6891,6 +6895,12 @@ then :
   withval=$with_fc; FC="$withval"
 fi
 
+
+                                                                                if test -z "$FC" && test x"$PETSC_HAVE_MPI" = x1 && test x"$PETSC_FC" != x
+then :
+  FC="$PETSC_FC"
+                 F77="$PETSC_FC"
+fi
 
                                         ac_ext=${ac_fc_srcext-f}
 ac_compile='$FC -c $FCFLAGS $ac_fcflags_srcext conftest.$ac_ext >&5'
