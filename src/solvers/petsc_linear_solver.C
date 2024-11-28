@@ -715,6 +715,41 @@ Real PetscLinearSolver<T>::get_initial_residual()
 
 
 template <typename T>
+Real PetscLinearSolver<T>::get_final_residual()
+{
+  PetscInt its  = 0;
+
+  // Fill the residual history vector with the residual norms
+  // Note that GetResidualHistory() does not copy any values, it
+  // simply sets the pointer p.  Note that for some Krylov subspace
+  // methods, the number of residuals returned in the history
+  // vector may be different from what you are expecting.  For
+  // example, TFQMR returns two residual values per iteration step.
+
+  // Recent versions of PETSc require the residual
+  // history vector pointer to be declared as const.
+#if PETSC_VERSION_LESS_THAN(3,15,0)
+  PetscReal * p;
+#else
+  const PetscReal * p;
+#endif
+
+
+  LibmeshPetscCall(KSPGetResidualHistory(_ksp, &p, &its));
+
+  // Check no residual history
+  if (its == 0)
+    {
+      libMesh::err << "No iterations have been performed, returning 0." << std::endl;
+      return 0.;
+    }
+  return *p[its];
+}
+
+
+
+
+template <typename T>
 void PetscLinearSolver<T>::set_petsc_solver_type()
 {
   switch (this->_solver_type)

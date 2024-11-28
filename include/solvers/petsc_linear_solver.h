@@ -253,6 +253,12 @@ public:
   Real get_initial_residual();
 
   /**
+   * \returns The final residual for the solve just
+   * completed with this interface.
+   */
+  Real get_final_residual();
+
+  /**
    * \returns The solver's convergence flag
    */
   virtual LinearConvergenceReason get_converged_reason() const override;
