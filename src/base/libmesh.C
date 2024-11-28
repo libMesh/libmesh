@@ -948,8 +948,12 @@ std::vector<std::string> command_line_names()
 
 bool on_command_line (std::string arg)
 {
-  // Make sure the command line parser is ready for use
-  libmesh_assert(command_line.get());
+  // Make sure the command line parser is ready for use.  If it's not,
+  // then we'll have to treat the command line as empty, for maximum
+  // compatibility with programs that don't use LibMeshInit but
+  // indirectly (e.g. via error handling code) query the command line.
+  if (!command_line.get())
+    return false;
 
   // Keep track of runtime queries, for later
   add_command_line_name(arg);
