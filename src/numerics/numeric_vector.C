@@ -47,7 +47,9 @@ namespace libMesh
 // Full specialization for Real datatypes
 template <typename T>
 std::unique_ptr<NumericVector<T>>
-NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage solver_package)
+NumericVector<T>::build(const Parallel::Communicator & comm,
+                        SolverPackage solver_package,
+                        ParallelType parallel_type)
 {
   // Build the appropriate vector
   switch (solver_package)
@@ -55,30 +57,61 @@ NumericVector<T>::build(const Parallel::Communicator & comm, const SolverPackage
 
 #ifdef LIBMESH_HAVE_LASPACK
     case LASPACK_SOLVERS:
-      return std::make_unique<LaspackVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<LaspackVector<T>>(comm, parallel_type);
 #endif
 
 #ifdef LIBMESH_HAVE_PETSC
     case PETSC_SOLVERS:
-      return std::make_unique<PetscVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<PetscVector<T>>(comm, parallel_type);
 #endif
 
 #ifdef LIBMESH_TRILINOS_HAVE_EPETRA
     case TRILINOS_SOLVERS:
-      return std::make_unique<EpetraVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<EpetraVector<T>>(comm, parallel_type);
 #endif
 
 #ifdef LIBMESH_HAVE_EIGEN
     case EIGEN_SOLVERS:
-      return std::make_unique<EigenSparseVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<EigenSparseVector<T>>(comm, parallel_type);
 #endif
 
     default:
-      return std::make_unique<DistributedVector<T>>(comm, AUTOMATIC);
+      return std::make_unique<DistributedVector<T>>(comm, parallel_type);
     }
 }
 
 
+
+template <typename T>
+void NumericVector<T>::set_type(ParallelType t)
+{
+  // Check for no-op
+  if (_type == t)
+    return;
+
+  // If the NumericVector is not yet initialized, then it is generally
+  // safe to change the ParallelType, with minor restrictions.
+  if (!this->initialized())
+    {
+      // If ghosted vectors are not enabled and the user requested a
+      // GHOSTED vector, fall back on SERIAL.
+#ifndef LIBMESH_ENABLE_GHOSTED
+      if (t == GHOSTED)
+        {
+          _type = SERIAL;
+          return;
+        }
+#endif
+
+      _type = t;
+      return;
+    }
+
+  // If we made it here, then the NumericVector was already
+  // initialized and we don't currently allow the ParallelType to be
+  // changed, although this could potentially be added later.
+  libmesh_not_implemented();
+}
 
 template <typename T>
 void NumericVector<T>::insert (const T * v,

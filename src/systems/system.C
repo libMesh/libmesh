@@ -792,7 +792,9 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
                   vec.swap(*new_vec);
                 }
               else
-                vec.type() = type;
+                // The PARALLEL vec is not yet initialized, so we can
+                // just "upgrade" it to GHOSTED.
+                vec.set_type(type);
             }
         }
 
@@ -800,11 +802,19 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
       return vec;
     }
 
-  // Otherwise build the vector
-  auto pr = _vectors.emplace(vec_name, NumericVector<Number>::build(this->comm()));
+  // Otherwise, build the vector. The following emplace() is
+  // guaranteed to succeed because, if we made it here, we don't
+  // already have a vector named "vec_name". We pass the user's
+  // requested ParallelType directly to NumericVector::build() so
+  // that, even if the vector is not initialized now, it will get the
+  // right type when it is initialized later.
+  auto pr =
+    _vectors.emplace(vec_name,
+                     NumericVector<Number>::build(this->comm(),
+                                                  libMesh::default_solver_package(),
+                                                  type));
   auto buf = pr.first->second.get();
   _vector_projections.emplace(vec_name, projections);
-  buf->type() = type;
 
   // Vectors are primal by default
   _vector_is_adjoint.emplace(vec_name, -1);

@@ -139,7 +139,8 @@ public:
    */
   static std::unique_ptr<NumericVector<T>>
   build(const Parallel::Communicator & comm,
-        const SolverPackage solver_package = libMesh::default_solver_package());
+        SolverPackage solver_package = libMesh::default_solver_package(),
+        ParallelType parallel_type = AUTOMATIC);
 
   /**
    * \returns \p true if the vector has been initialized,
@@ -154,8 +155,25 @@ public:
 
   /**
    * \returns The type (SERIAL, PARALLEL, GHOSTED) of the vector.
+   *
+   * \deprecated because it is dangerous to change the ParallelType
+   * of an already-initialized NumericVector. See NumericVector::set_type()
+   * for a safer, non-deprecated setter.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   ParallelType & type() { return _type; }
+#endif
+
+  /**
+   * Allow the user to change the ParallelType of the NumericVector
+   * under some circumstances. If the NumericVector has not been
+   * initialized yet, then it is generally safe to change the
+   * ParallelType. otherwise, if the NumericVector has already been
+   * initialized with a specific type, we cannot change it without
+   * doing some extra copying/reinitialization work, and we currently
+   * throw an error if this is requested.
+   */
+  void set_type(ParallelType t);
 
   /**
    * \returns \p true if the vector is closed and ready for
