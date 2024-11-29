@@ -222,16 +222,20 @@ EigenSystem::solve_helper(SparseMatrix<Number> * const A,
   // Get the tolerance for the solver and the maximum
   // number of iterations. Here, we simply adopt the linear solver
   // specific parameters.
-  const double tol          =
+  const double tol          =  parameters.have_parameter<Real>("linear solver tolerance") ?
+    double(parameters.get<Real>("linear solver tolerance")) :
     double(es.parameters.get<Real>("linear solver tolerance"));
 
-  const unsigned int maxits =
+  const unsigned int maxits = parameters.have_parameter<unsigned int>("linear solver maximum iterations") ?
+    parameters.get<unsigned int>("linear solver maximum iterations") :
     es.parameters.get<unsigned int>("linear solver maximum iterations");
 
-  const unsigned int nev    =
+  const unsigned int nev    = parameters.have_parameter<unsigned int>("eigenpairs") ?
+    parameters.get<unsigned int>("eigenpairs") :
     es.parameters.get<unsigned int>("eigenpairs");
 
-  const unsigned int ncv    =
+  const unsigned int ncv    = parameters.have_parameter<unsigned int>("basis vectors") ?
+    parameters.get<unsigned int>("basis vectors") :
     es.parameters.get<unsigned int>("basis vectors");
 
   std::pair<unsigned int, unsigned int> solve_data;

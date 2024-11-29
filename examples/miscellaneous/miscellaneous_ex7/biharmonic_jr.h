@@ -46,17 +46,17 @@ public:
    * Static functions to be used for initialization
    */
   static Number InitialDensityBall(const Point & p,
-                                   const Parameters & parameters,
+                                   const Parameters & params,
                                    const std::string &,
                                    const std::string &);
 
   static Number InitialDensityRod(const Point & p,
-                                  const Parameters & parameters,
+                                  const Parameters & params,
                                   const std::string &,
                                   const std::string &);
 
   static Number InitialDensityStrip(const Point & p,
-                                    const Parameters & parameters,
+                                    const Parameters & params,
                                     const std::string &,
                                     const std::string &);
 
