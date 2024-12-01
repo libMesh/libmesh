@@ -583,6 +583,32 @@ public:
    */
   virtual void scale(const T scale);
 
+  /**
+   * @returns Whether the matrix supports hash table assembly
+   */
+  virtual bool supports_hash_table() const { return false; }
+
+  /**
+   * @returns Whether a preference for hash table vs. preallocation has been set
+   */
+  bool assembly_preference_set() const { return _assembly_preference_set; }
+
+  /**
+   * Sets whether to use hash table assembly. This will error if the passed-in value is true and the
+   * matrix type does not support hash tables
+   */
+  void use_hash_table(bool use_hash);
+
+  /**
+   * @returns Whether this matrix is using hash table assembly
+   */
+  bool use_hash_table() const { return _use_hash_table; }
+
+  /**
+   * Reset the memory storage of the matrix
+   */
+  virtual void reset_memory() { libmesh_not_implemented(); }
+
 protected:
   /**
    * Protected implementation of the create_submatrix and reinit_submatrix
@@ -616,12 +642,33 @@ protected:
    * Flag indicating whether or not the matrix has been initialized.
    */
   bool _is_initialized;
+
+  /**
+   * Flag indicating whether the matrix is assembled using a hash table
+   */
+  bool _use_hash_table;
+
+  /**
+   * Whether a preference for hash table vs. preallocation has been set
+   */
+  bool _assembly_preference_set;
 };
 
 
 
 //-----------------------------------------------------------------------
 // SparseMatrix inline members
+template <typename T>
+void
+SparseMatrix<T>::use_hash_table(const bool use_hash)
+{
+  libmesh_error_msg_if(use_hash && !this->supports_hash_table(),
+                       "This matrix class does not support hash table assembly");
+  libmesh_error_msg_if(this->_assembly_preference_set,
+                       "The use_hash_table API should only be called once");
+  this->_use_hash_table = use_hash;
+  this->_assembly_preference_set = true;
+}
 
 // For SGI MIPSpro this implementation must occur after
 // the full specialization of the print() member.

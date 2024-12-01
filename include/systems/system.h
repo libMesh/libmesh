@@ -1922,6 +1922,10 @@ public:
    */
   SparseMatrix<Number> & get_matrix (std::string_view mat_name);
 
+  /**
+   * Sets whether to use hash table matrix assembly if the matrix sub-classes support it
+   */
+  void prefer_hash_table_matrix_assembly(bool preference);
 
 protected:
 
@@ -2293,6 +2297,16 @@ private:
    * Do we want to apply constraints while projecting vectors ?
    */
   bool project_with_constraints;
+
+  /**
+   * Whether to use hash table matrix assembly if the matrix sub-classes support it
+   */
+  bool _prefer_hash_table_matrix_assembly;
+
+  /**
+   * Whether any of our matrices require an initial sparsity pattern computation in order to determine preallocation
+   */
+  bool _require_sparsity_pattern;
 };
 
 
@@ -2685,6 +2699,14 @@ System::add_matrix (std::string_view mat_name,
   return mat;
 }
 
+inline void
+System::prefer_hash_table_matrix_assembly(const bool preference)
+{
+  libmesh_error_msg_if(
+      _matrices_initialized,
+      "System::prefer_hash_table_matrix_assembly() should be called before matrices are initialized");
+  _prefer_hash_table_matrix_assembly = preference;
+}
 
 } // namespace libMesh
 
