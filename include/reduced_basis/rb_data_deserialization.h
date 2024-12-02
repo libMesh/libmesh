@@ -80,9 +80,13 @@ public:
   virtual ~RBEvaluationDeserialization();
 
   /**
-   * Write the Cap'n'Proto buffer to disk.
+   * Read the Cap'n'Proto buffer from disk.
+   * If \p use_packing is true, the file is read using the "packed"
+   * scheme, which can reduce the filesize on disk.
    */
-  void read_from_file(const std::string & path, bool read_error_bound_data);
+  void read_from_file(const std::string & path,
+                      bool read_error_bound_data,
+                      bool use_packing = false);
 
 private:
 
@@ -121,9 +125,13 @@ public:
   virtual ~TransientRBEvaluationDeserialization();
 
   /**
-   * Write the Cap'n'Proto buffer to disk.
+   * Read the Cap'n'Proto buffer from disk.
+   * If \p use_packing is true, the file is read using the "packed"
+   * scheme, which can reduce the filesize on disk.
    */
-  void read_from_file(const std::string & path, bool read_error_bound_data);
+  void read_from_file(const std::string &path,
+                      bool read_error_bound_data,
+                      bool use_packing = false);
 
 private:
 
@@ -162,9 +170,12 @@ public:
   virtual ~RBEIMEvaluationDeserialization();
 
   /**
-   * Write the Cap'n'Proto buffer to disk.
+   * Read the Cap'n'Proto buffer from disk.
+   * If \p use_packing is true, the file is read using the "packed"
+   * scheme, which can reduce the filesize on disk.
    */
-  void read_from_file(const std::string & path);
+  void read_from_file(const std::string & path,
+                      bool use_packing = false);
 
 private:
 
@@ -207,9 +218,12 @@ public:
   virtual ~RBSCMEvaluationDeserialization();
 
   /**
-   * Write the Cap'n'Proto buffer to disk.
+   * Read the Cap'n'Proto buffer from disk.
+   * If \p use_packing is true, the file is read using the "packed"
+   * scheme, which can reduce the filesize on disk.
    */
-  void read_from_file(const std::string & path);
+  void read_from_file(const std::string & path,
+                      bool use_packing = false);
 
 private:
 
