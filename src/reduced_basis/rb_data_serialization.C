@@ -36,6 +36,7 @@
 
 // Cap'n'Proto includes
 #include <capnp/serialize.h>
+#include <capnp/serialize-packed.h>   // for writePackedMessageToFd()
 
 // C++ includes
 #include <iostream>
@@ -81,7 +82,7 @@ RBEvaluationSerialization::RBEvaluationSerialization(RBEvaluation & rb_eval)
 
 RBEvaluationSerialization::~RBEvaluationSerialization() = default;
 
-void RBEvaluationSerialization::write_to_file(const std::string & path)
+void RBEvaluationSerialization::write_to_file(const std::string & path, bool use_packing)
 {
   LOG_SCOPE("write_to_file()", "RBEvaluationSerialization");
 
@@ -102,7 +103,10 @@ void RBEvaluationSerialization::write_to_file(const std::string & path)
       int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
       libmesh_error_msg_if(!fd, "Error opening a write-only file descriptor to " + path);
 
-      capnp::writeMessageToFd(fd, message);
+      if(use_packing)
+        capnp::writePackedMessageToFd(fd, message);
+      else
+        capnp::writeMessageToFd(fd, message);
 
       int error = close(fd);
       libmesh_error_msg_if(error, "Error closing a write-only file descriptor to " + path);
@@ -122,7 +126,7 @@ TransientRBEvaluationSerialization(TransientRBEvaluation & trans_rb_eval) :
 
 TransientRBEvaluationSerialization::~TransientRBEvaluationSerialization() = default;
 
-void TransientRBEvaluationSerialization::write_to_file(const std::string & path)
+void TransientRBEvaluationSerialization::write_to_file(const std::string & path, bool use_packing)
 {
   LOG_SCOPE("write_to_file()", "TransientRBEvaluationSerialization");
 
@@ -149,7 +153,10 @@ void TransientRBEvaluationSerialization::write_to_file(const std::string & path)
       int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
       libmesh_error_msg_if(!fd, "Error opening a write-only file descriptor to " + path);
 
-      capnp::writeMessageToFd(fd, message);
+      if(use_packing)
+        capnp::writePackedMessageToFd(fd, message);
+      else
+        capnp::writeMessageToFd(fd, message);
 
       int error = close(fd);
       libmesh_error_msg_if(error, "Error closing a write-only file descriptor to " + path);
@@ -169,8 +176,7 @@ RBEIMEvaluationSerialization::RBEIMEvaluationSerialization(RBEIMEvaluation & rb_
 
 RBEIMEvaluationSerialization::~RBEIMEvaluationSerialization() = default;
 
-void RBEIMEvaluationSerialization::write_to_file(const std::string & path)
-{
+void RBEIMEvaluationSerialization::write_to_file(const std::string & path, bool use_packing) {
   LOG_SCOPE("write_to_file()", "RBEIMEvaluationSerialization");
 
   if (_rb_eim_eval.comm().rank() == 0)
@@ -191,7 +197,10 @@ void RBEIMEvaluationSerialization::write_to_file(const std::string & path)
       int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
       libmesh_error_msg_if(!fd, "Error opening a write-only file descriptor to " + path);
 
-      capnp::writeMessageToFd(fd, message);
+      if(use_packing)
+        capnp::writePackedMessageToFd(fd, message);
+      else
+        capnp::writeMessageToFd(fd, message);
 
       int error = close(fd);
       libmesh_error_msg_if(error, "Error closing a write-only file descriptor to " + path);
@@ -213,7 +222,7 @@ RBSCMEvaluationSerialization::RBSCMEvaluationSerialization(RBSCMEvaluation & rb_
 
 RBSCMEvaluationSerialization::~RBSCMEvaluationSerialization() = default;
 
-void RBSCMEvaluationSerialization::write_to_file(const std::string & path)
+void RBSCMEvaluationSerialization::write_to_file(const std::string & path, bool use_packing)
 {
   LOG_SCOPE("write_to_file()", "RBSCMEvaluationSerialization");
 
@@ -229,7 +238,10 @@ void RBSCMEvaluationSerialization::write_to_file(const std::string & path)
       int fd = open(path.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
       libmesh_error_msg_if(!fd, "Error opening a write-only file descriptor to " + path);
 
-      capnp::writeMessageToFd(fd, message);
+      if(use_packing)
+        capnp::writePackedMessageToFd(fd, message);
+      else
+        capnp::writeMessageToFd(fd, message);
 
       int error = close(fd);
       libmesh_error_msg_if(error, "Error closing a write-only file descriptor to " + path);

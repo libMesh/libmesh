@@ -79,8 +79,10 @@ public:
 
   /**
    * Write the Cap'n'Proto buffer to disk.
+   * If \p use_packing is true, the file is written using the "packed"
+   * scheme, which can reduce the filesize on disk.
    */
-  void write_to_file(const std::string & path);
+  void write_to_file(const std::string & path, bool use_packing = false);
 
 private:
 
@@ -120,8 +122,10 @@ public:
 
   /**
    * Write the Cap'n'Proto buffer to disk.
+   * If \p use_packing is true, the file is written using the "packed"
+   * scheme, which can reduce the filesize on disk.
    */
-  void write_to_file(const std::string & path);
+  void write_to_file(const std::string & path, bool use_packing = false);
 
 private:
 
@@ -161,8 +165,10 @@ public:
 
   /**
    * Write the Cap'n'Proto buffer to disk.
+   * If \p use_packing is true, the file is written using the "packed"
+   * scheme, which can reduce the filesize on disk.
    */
-  void write_to_file(const std::string & path);
+  void write_to_file(const std::string & path, bool use_packing = false);
 
 private:
 
@@ -206,8 +212,10 @@ public:
 
   /**
    * Write the Cap'n'Proto buffer to disk.
+   * If \p use_packing is true, the file is written using the "packed"
+   * scheme, which can reduce the filesize on disk.
    */
-  void write_to_file(const std::string & path);
+  void write_to_file(const std::string & path, bool use_packing = false);
 
 private:
 
