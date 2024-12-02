@@ -16,7 +16,9 @@ AC_LANG([C++])
 # --------------------------------------------------------------
 # Real precision - double by default
 # --------------------------------------------------------------
-ACX_CHOOSE_PRECISION
+ACSM_CHOOSE_PRECISION
+libmesh_precision_LIBS="$acsm_precision_LIBS"
+AC_SUBST(libmesh_precision_LIBS)
 
 # --------------------------------------------------------------
 # Determine support for the C99 "restrict" keyword in the C++
