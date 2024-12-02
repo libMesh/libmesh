@@ -49,6 +49,13 @@ public:
   {
     FETestBase<order,family,elem_type,N_x>::setUp();
 
+    // If we're a 2D mesh on a 3D libMesh build we should be able to
+    // handle inverted elements just fine.  Let's test that.
+    BoundaryInfo & bdy_info = this->_mesh->get_boundary_info();
+    for (auto e : this->_mesh->element_ptr_range())
+      if (!(e->id() % 3) && e->dim() < LIBMESH_DIM)
+        e->flip(&bdy_info);
+
     FEType fe_type = this->_sys->variable_type(0);
     _fe_side = FEBase::build(this->_dim, fe_type);
 
@@ -199,6 +206,8 @@ public:
       auto normals = this->_fe_side->get_normals();
       CPPUNIT_ASSERT_EQUAL(n_qp, normals.size());
 
+      const Point c =  this->_elem->vertex_average();
+
       for (auto qp : index_range(dphi[0]))
         {
           Gradient grad_u = 0;
@@ -206,6 +215,17 @@ public:
             grad_u += dphi[d][qp] * (*this->_sys->current_local_solution)(this->_dof_indices[d]);
 
           const Point p = xyz[qp];
+          const Point n = normals[qp];
+
+          // All our normals should be unit normals.
+          LIBMESH_ASSERT_FP_EQUAL(Real(n.norm()),
+                                  Real(1),
+                                  this->_grad_tol);
+
+          // All our normals should be outward-facing.  For the simple
+          // meshes here this is sufficient to make sure they're not
+          // flipped:
+          CPPUNIT_ASSERT_GREATER(Real(0), (p-c)*n);
 
           // We can only trust the tangential component of gradient to
           // match!  The gradient in the normal direction should be 0
@@ -213,7 +233,6 @@ public:
           // transformation, and could be just about anything for a
           // skew transformation (as occurs when we build meshes with
           // triangles, tets, prisms, pyramids...)
-          Point n = normals[qp];
 
           const Gradient tangential_grad_u = grad_u - ((grad_u * n) * n);
 
