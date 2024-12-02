@@ -169,7 +169,7 @@ int main(int argc, char ** argv)
   const std::string meshname =
     assert_argument(cl, "--inmesh", argv[0], std::string(""));
 
-  std::cout << "Reading mesh " << meshname << std::endl;
+  libMesh::out << "Reading mesh " << meshname << std::endl;
   old_mesh.read(meshname);
 
   const std::string matname =
@@ -177,7 +177,7 @@ int main(int argc, char ** argv)
 
   if (matname != "")
     {
-      std::cout << "Reading matrix " << matname << std::endl;
+      libMesh::out << "Reading matrix " << matname << std::endl;
 
       // For extraction matrices Coreform has been experimenting with
       // PETSc solvers which take the transpose of what we expect, so
@@ -189,7 +189,7 @@ int main(int argc, char ** argv)
       old_mesh.copy_constraint_rows(*matrix);
     }
 
-  std::cout << "Mesh:" << std::endl;
+  libMesh::out << "Mesh:" << std::endl;
   old_mesh.print_info();
 
   const std::string solnname = cl.follow(std::string(""), "--insoln");
@@ -211,7 +211,7 @@ int main(int argc, char ** argv)
 
   if (solnname != "")
     {
-      std::cout << "Reading solution " << solnname << std::endl;
+      libMesh::out << "Reading solution " << solnname << std::endl;
 
       old_es.read(solnname,
                   EquationSystems::READ_HEADER |
@@ -270,6 +270,9 @@ int main(int argc, char ** argv)
     default_outsolnname = "out_"+solnname;
   const std::string outsolnname =
     cl.follow(default_outsolnname, "--outsoln");
+
+  // Output results in high precision
+  libMesh::out << std::setprecision(std::numeric_limits<Real>::max_digits10);
 
   if (!cl.search("--integral"))
     {
@@ -369,7 +372,7 @@ int main(int argc, char ** argv)
 
       Number integral = integrate.integral();
       old_mesh.comm().sum(integral);
-      std::cout << "Integral is " << integral << std::endl;
+      libMesh::out << "Integral is " << integral << std::endl;
     }
 
   return 0;
