@@ -51,13 +51,8 @@ template <typename>
 class Preconditioner;
 class StaticCondensationPreconditioner;
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-typedef Eigen::MatrixXcd EigenMatrix;
-typedef Eigen::VectorXcd EigenVector;
-#else
-typedef Eigen::MatrixXd EigenMatrix;
-typedef Eigen::VectorXd EigenVector;
-#endif
+typedef Eigen::Matrix<Number, Eigen::Dynamic, Eigen::Dynamic> EigenMatrix;
+typedef Eigen::Matrix<Number, Eigen::Dynamic, 1> EigenVector;
 
 class StaticCondensation : public PetscMatrixShellMatrix<Number>
 {
