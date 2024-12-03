@@ -35,6 +35,7 @@
 
 // Cap'n'Proto includes
 #include "capnp/serialize.h"
+#include "capnp/serialize-packed.h"   // for PackedFdMessageReader()
 
 // C++ includes
 #ifdef LIBMESH_HAVE_UNISTD_H
@@ -78,8 +79,9 @@ RBEvaluationDeserialization::RBEvaluationDeserialization(RBEvaluation & rb_eval)
 
 RBEvaluationDeserialization::~RBEvaluationDeserialization() = default;
 
-void RBEvaluationDeserialization::read_from_file(const std::string & path,
-                                                 bool read_error_bound_data)
+void RBEvaluationDeserialization::read_from_file(const std::string &path,
+                                                 bool read_error_bound_data,
+                                                 bool use_packing)
 {
   LOG_SCOPE("read_from_file()", "RBEvaluationDeserialization");
 
@@ -90,10 +92,14 @@ void RBEvaluationDeserialization::read_from_file(const std::string & path,
   capnp::ReaderOptions reader_options;
   reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
 
-  std::unique_ptr<capnp::StreamFdMessageReader> message;
+  std::unique_ptr<capnp::InputStreamMessageReader> message;
   libmesh_try
     {
-      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      // Define the reader type, based on whether or not packing is used.
+      if(use_packing)
+        message = std::make_unique<capnp::PackedFdMessageReader>(fd, reader_options);
+      else
+        message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -127,7 +133,8 @@ TransientRBEvaluationDeserialization(TransientRBEvaluation & trans_rb_eval) :
 TransientRBEvaluationDeserialization::~TransientRBEvaluationDeserialization() = default;
 
 void TransientRBEvaluationDeserialization::read_from_file(const std::string & path,
-                                                          bool read_error_bound_data)
+                                                          bool read_error_bound_data,
+                                                          bool use_packing)
 {
   LOG_SCOPE("read_from_file()", "TransientRBEvaluationDeserialization");
 
@@ -138,10 +145,13 @@ void TransientRBEvaluationDeserialization::read_from_file(const std::string & pa
   capnp::ReaderOptions reader_options;
   reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
 
-  std::unique_ptr<capnp::StreamFdMessageReader> message;
+  std::unique_ptr<capnp::InputStreamMessageReader> message;
   libmesh_try
     {
-      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      if(use_packing)
+        message = std::make_unique<capnp::PackedFdMessageReader>(fd, reader_options);
+      else
+        message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -181,7 +191,8 @@ RBEIMEvaluationDeserialization(RBEIMEvaluation & rb_eim_eval) :
 
 RBEIMEvaluationDeserialization::~RBEIMEvaluationDeserialization() = default;
 
-void RBEIMEvaluationDeserialization::read_from_file(const std::string & path)
+void RBEIMEvaluationDeserialization::read_from_file(const std::string & path,
+                                                    bool use_packing)
 {
   LOG_SCOPE("read_from_file()", "RBEIMEvaluationDeserialization");
 
@@ -192,10 +203,13 @@ void RBEIMEvaluationDeserialization::read_from_file(const std::string & path)
   capnp::ReaderOptions reader_options;
   reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
 
-  std::unique_ptr<capnp::StreamFdMessageReader> message;
+  std::unique_ptr<capnp::InputStreamMessageReader> message;
   libmesh_try
     {
-      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      if(use_packing)
+        message = std::make_unique<capnp::PackedFdMessageReader>(fd, reader_options);
+      else
+        message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
@@ -233,7 +247,8 @@ RBSCMEvaluationDeserialization(RBSCMEvaluation & rb_scm_eval) :
 
 RBSCMEvaluationDeserialization::~RBSCMEvaluationDeserialization() = default;
 
-void RBSCMEvaluationDeserialization::read_from_file(const std::string & path)
+void RBSCMEvaluationDeserialization::read_from_file(const std::string & path,
+                                                    bool use_packing)
 {
   LOG_SCOPE("read_from_file()", "RBSCMEvaluationDeserialization");
 
@@ -244,10 +259,13 @@ void RBSCMEvaluationDeserialization::read_from_file(const std::string & path)
   capnp::ReaderOptions reader_options;
   reader_options.traversalLimitInWords = std::numeric_limits<uint64_t>::max();
 
-  std::unique_ptr<capnp::StreamFdMessageReader> message;
+  std::unique_ptr<capnp::InputStreamMessageReader> message;
   libmesh_try
     {
-      message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
+      if(use_packing)
+        message = std::make_unique<capnp::PackedFdMessageReader>(fd, reader_options);
+      else
+        message = std::make_unique<capnp::StreamFdMessageReader>(fd, reader_options);
     }
   libmesh_catch(...)
     {
