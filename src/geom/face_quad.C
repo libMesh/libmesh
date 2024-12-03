@@ -247,10 +247,10 @@ Real Quad::quality (const ElemQuality q) const
         // the CUBIT formula.
 
         // Compute midpoint positions along each edge
-        Point m0 = 0.5 * (this->point(0) + this->point(1));
-        Point m1 = 0.5 * (this->point(1) + this->point(2));
-        Point m2 = 0.5 * (this->point(2) + this->point(3));
-        Point m3 = 0.5 * (this->point(3) + this->point(0));
+        Point m0 = Real(0.5) * (this->point(0) + this->point(1));
+        Point m1 = Real(0.5) * (this->point(1) + this->point(2));
+        Point m2 = Real(0.5) * (this->point(2) + this->point(3));
+        Point m3 = Real(0.5) * (this->point(3) + this->point(0));
 
         // Compute vectors adjoining opposite side midpoints
         Point v0 = m2 - m0;

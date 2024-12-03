@@ -180,9 +180,9 @@ Real Tri::quality (const ElemQuality q) const
 
         // Compute midpoint positions along each edge
         Point m[3] = {
-          0.5 * (this->point(0) + this->point(1)),  // side opposite vertex 2
-          0.5 * (this->point(1) + this->point(2)),  // side opposite vertex 0
-          0.5 * (this->point(2) + this->point(0))}; // side opposite vertex 1
+          Real(0.5) * (this->point(0) + this->point(1)),  // side opposite vertex 2
+          Real(0.5) * (this->point(1) + this->point(2)),  // side opposite vertex 0
+          Real(0.5) * (this->point(2) + this->point(0))}; // side opposite vertex 1
 
         // opposite[i] is the side index which is "opposite" vertex i
         static const unsigned int opposite[3] = {1, 2, 0};
