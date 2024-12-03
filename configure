@@ -913,6 +913,7 @@ CFLAGS_DVL
 CXXFLAGS_DVL
 GXX_VERSION
 libmesh_precision_LIBS
+acsm_precision_LIBS
 PKG_CONFIG
 LIBMESH_LIBRARY_SUFFIX
 libmesh_LDFLAGS
@@ -46342,7 +46343,7 @@ else $as_nop
 fi
 
 
-libmesh_precision_LIBS=""
+acsm_precision_LIBS=""
 
 if test "x$enablesingleprecision" != "xno"
 then :
@@ -46406,7 +46407,7 @@ printf %s "checking whether we can build a trivial quad precision program... " >
         saveLIBS="$LIBS"
         if test "x$REAL_GXX" != "x"
 then :
-  libmesh_precision_LIBS="-lquadmath"
+  acsm_precision_LIBS="-lquadmath"
                LIBS="$saveLIBS -lquadmath"
                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -46438,7 +46439,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 
 elif test "x$is_intel_icc" != "x"
 then :
-  libmesh_precision_LIBS=""
+  acsm_precision_LIBS=""
                cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -46485,6 +46486,8 @@ printf "%s\n" "<<< Default floating point is double precision (double) >>>" >&6;
 fi
 
 
+
+libmesh_precision_LIBS="$acsm_precision_LIBS"
 
 
 # --------------------------------------------------------------
