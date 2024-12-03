@@ -18,14 +18,16 @@
 
 // Open the input mesh and corresponding solution file named in command line
 // arguments, parse the function specified in a command line argument,
-// L2-project its value onto the mesh, and output the new solution.
+// Project its value onto the mesh, and output the new solution.
 
 
 // libMesh includes
 #include "L2system.h"
 #include "libmesh/libmesh.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/enum_norm_type.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/exact_solution.h"
 #include "libmesh/getpot.h"
 #include "libmesh/mesh.h"
 #include "libmesh/newton_solver.h"
@@ -33,6 +35,7 @@
 #include "libmesh/parsed_fem_function.h"
 #include "libmesh/parsed_function.h"
 #include "libmesh/point.h"
+#include "libmesh/sparse_matrix.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/wrapped_functor.h"
 #include "libmesh/elem.h"
@@ -52,16 +55,21 @@ using namespace libMesh;
 void usage_error(const char * progname)
 {
   libMesh::out << "Options: " << progname << '\n'
-               << " --dim d               mesh dimension           [default: autodetect]\n"
+               << " --dim d               mesh dimension            [default: autodetect]\n"
                << " --inmesh    filename  input mesh file\n"
+               << " --inmat     filename  input constraint matrix   [default: none]\n"
                << " --insoln    filename  input solution file\n"
                << " --calc      func      function to calculate\n"
-               << " --insys     num       input system number      [default: 0]\n"
-               << " --outsoln   filename  output solution file     [default: out_<insoln>]\n"
-               << " --family    famname   output FEM family        [default: LAGRANGE]\n"
-               << " --order     num       output FEM order         [default: 1]\n"
-               << " --subdomain num       subdomain id restriction [default: all subdomains]\n"
-               << " --integral            only calculate integral, not projection\n"
+               << " --insys     sysnum    input system number       [default: 0]\n"
+               << " --outsoln   filename  output solution file      [default: out_<insoln>]\n"
+               << " --family    famname   output FEM family         [default: LAGRANGE]\n"
+               << " --order     p         output FEM order          [default: 1]\n"
+               << " --subdomain sbd_id    each subdomain to check   [default: all subdomains]\n"
+               << " --hilbert   order     Hilbert space to use      [default: 0 => H0]\n"
+               << " --fdm_eps   eps       Central diff for dfunc/dx [default: " << TOLERANCE << "]\n"
+               << " --error_q   extra_q   integrate projection error, with adjusted\n"
+               << "                       (extra) quadrature order  [default: off, suggested: 0]\n"
+               << " --integral            only calculate func integral, not projection\n"
                << std::endl;
 
   exit(1);
@@ -161,14 +169,30 @@ int main(int argc, char ** argv)
   const std::string meshname =
     assert_argument(cl, "--inmesh", argv[0], std::string(""));
 
-  const std::string solnname = cl.follow(std::string(""), "--insoln");
+  libMesh::out << "Reading mesh " << meshname << std::endl;
+  old_mesh.read(meshname);
 
-  if (meshname != "")
+  const std::string matname =
+    cl.follow(std::string(""), "--inmat");
+
+  if (matname != "")
     {
-      old_mesh.read(meshname);
-      std::cout << "Old Mesh:" << std::endl;
-      old_mesh.print_info();
+      libMesh::out << "Reading matrix " << matname << std::endl;
+
+      // For extraction matrices Coreform has been experimenting with
+      // PETSc solvers which take the transpose of what we expect, so
+      // we'll un-transpose here.
+      auto matrix = SparseMatrix<Number>::build (old_mesh.comm());
+      matrix->read(matname);
+      matrix->get_transpose(*matrix);
+
+      old_mesh.copy_constraint_rows(*matrix);
     }
+
+  libMesh::out << "Mesh:" << std::endl;
+  old_mesh.print_info();
+
+  const std::string solnname = cl.follow(std::string(""), "--insoln");
 
   // Load the old solution from --insoln filename, if that's been
   // specified.
@@ -181,12 +205,14 @@ int main(int argc, char ** argv)
   const std::string family =
     cl.follow(std::string("LAGRANGE"), "--family");
 
-  const int order = cl.follow(1, "--order");
+  const unsigned int order = cl.follow(1u, "--order");
 
   std::unique_ptr<FEMFunctionBase<Number>> goal_function;
 
   if (solnname != "")
     {
+      libMesh::out << "Reading solution " << solnname << std::endl;
+
       old_es.read(solnname,
                   EquationSystems::READ_HEADER |
                   EquationSystems::READ_DATA |
@@ -245,6 +271,9 @@ int main(int argc, char ** argv)
   const std::string outsolnname =
     cl.follow(default_outsolnname, "--outsoln");
 
+  // Output results in high precision
+  libMesh::out << std::setprecision(std::numeric_limits<Real>::max_digits10);
+
   if (!cl.search("--integral"))
     {
       // Create a new mesh and a new EquationSystems
@@ -253,7 +282,9 @@ int main(int argc, char ** argv)
 
       EquationSystems new_es(new_mesh);
 
-      L2System & new_sys = new_es.add_system<L2System>(current_sys_name);
+      HilbertSystem & new_sys = new_es.add_system<HilbertSystem>(current_sys_name);
+
+      new_sys.hilbert_order() = cl.follow(0u, "--hilbert");
 
       new_sys.subdomains_list() = std::move(subdomains_list);
 
@@ -263,7 +294,11 @@ int main(int argc, char ** argv)
       new_sys.fe_family() = family;
       new_sys.fe_order() = order;
 
-      new_sys.goal_func = goal_function->clone();
+      new_sys.set_goal_func(*goal_function);
+
+      Real fdm_eps = cl.follow(Real(TOLERANCE), "--fdm_eps");
+
+      new_sys.set_fdm_eps(fdm_eps);
 
       if (solnname != "")
         new_sys.input_system = &old_es.get_system(current_sys_name);
@@ -276,6 +311,44 @@ int main(int argc, char ** argv)
       solver.relative_step_tolerance = 1e-10;
 
       new_sys.solve();
+
+      // Calculate the error if requested
+      if (cl.search(1, "--error_q"))
+        {
+          const unsigned int error_q = cl.next(0u);
+
+          // We just add "u" now but maybe we'll change that
+          for (auto v : make_range(new_sys.n_vars()))
+            {
+              ExactSolution exact_sol(new_es);
+              exact_sol.attach_exact_value(0, goal_function.get());
+              FDMGradient<Gradient> fdm_gradient(*goal_function, fdm_eps);
+              exact_sol.attach_exact_deriv(0, &fdm_gradient);
+              exact_sol.extra_quadrature_order(error_q);
+
+              const std::string var_name = new_sys.variable_name(v);
+              exact_sol.compute_error(current_sys_name, var_name);
+
+              libMesh::out << "L2 norm of " << var_name << ": " <<
+                new_sys.calculate_norm(*new_sys.solution, v, L2) <<
+                std::endl;
+
+              libMesh::out << "L2 error in " << var_name << ": " <<
+                  exact_sol.l2_error(current_sys_name, var_name) <<
+                  std::endl;
+
+              if (new_sys.hilbert_order() > 0)
+                {
+                  libMesh::out << "H1 norm of " << var_name << ": " <<
+                    new_sys.calculate_norm(*new_sys.solution, v, H1) <<
+                    std::endl;
+
+                  libMesh::out << "L2 error in " << var_name << ": " <<
+                      exact_sol.h1_error(current_sys_name, var_name) <<
+                      std::endl;
+                }
+            }
+        }
 
       // Write out the new solution file
       new_es.write(outsolnname.c_str(),
@@ -299,7 +372,7 @@ int main(int argc, char ** argv)
 
       Number integral = integrate.integral();
       old_mesh.comm().sum(integral);
-      std::cout << "Integral is " << integral << std::endl;
+      libMesh::out << "Integral is " << integral << std::endl;
     }
 
   return 0;
