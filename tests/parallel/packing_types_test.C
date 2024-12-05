@@ -141,7 +141,7 @@ public:
         for (const auto col: make_range(cols))
         {
           CPPUNIT_ASSERT_EQUAL( recv_data[0](row, col).size(), static_cast<std::size_t>(row + col + 1) );
-          for (const auto val : recv_data[0](row, col))
+          for (const auto & val : recv_data[0](row, col))
             CPPUNIT_ASSERT_EQUAL( val, static_cast<Real>(j + 10.0 * i) );
         }
     };

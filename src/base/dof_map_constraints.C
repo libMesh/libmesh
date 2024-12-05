@@ -2347,7 +2347,7 @@ std::string DofMap::get_local_constraints(bool print_nonlocal) const
 
       if (auto adjoint_map_it = _adjoint_constraint_values.find(qoi_index);
           adjoint_map_it != _adjoint_constraint_values.end())
-        for (const auto [i, rhs] : adjoint_map_it->second)
+        for (const auto & [i, rhs] : adjoint_map_it->second)
           {
             // Skip non-local dofs if requested
             if (!print_nonlocal && !this->local_index(i))
