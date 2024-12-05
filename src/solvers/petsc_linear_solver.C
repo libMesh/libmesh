@@ -291,7 +291,7 @@ PetscLinearSolver<T>::solve (SparseMatrix<T> &  matrix_in,
   const double rel_tol = this->get_real_solver_setting("rel_tol", tol);
   const double abs_tol = this->get_real_solver_setting("abs_tol",
                                                        std::nullopt,
-                                                       static_cast<Real>(PETSC_DEFAULT));
+                                                       static_cast<double>(PETSC_DEFAULT));
   const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   return this->solve_common(matrix_in, precond_in, solution_in,
@@ -311,7 +311,7 @@ PetscLinearSolver<T>::adjoint_solve (SparseMatrix<T> &  matrix_in,
   const double rel_tol = this->get_real_solver_setting("rel_tol", tol);
   const double abs_tol = this->get_real_solver_setting("abs_tol",
                                                        std::nullopt,
-                                                       static_cast<Real>(PETSC_DEFAULT));
+                                                       static_cast<double>(PETSC_DEFAULT));
   const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   // Note that the matrix and precond matrix are the same
@@ -362,7 +362,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   const double rel_tol = this->get_real_solver_setting("rel_tol", tol);
   const double abs_tol = this->get_real_solver_setting("abs_tol",
                                                        std::nullopt,
-                                                       static_cast<Real>(PETSC_DEFAULT));
+                                                       static_cast<double>(PETSC_DEFAULT));
   const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   return this->shell_solve_common(shell_matrix, nullptr, solution_in,
@@ -383,7 +383,7 @@ PetscLinearSolver<T>::solve (const ShellMatrix<T> & shell_matrix,
   const double rel_tol = this->get_real_solver_setting("rel_tol", tol);
   const double abs_tol = this->get_real_solver_setting("abs_tol",
                                                        std::nullopt,
-                                                       static_cast<Real>(PETSC_DEFAULT));
+                                                       static_cast<double>(PETSC_DEFAULT));
   const double max_its = this->get_int_solver_setting("max_its", m_its);
 
   // Make sure the data passed in are really of Petsc types
