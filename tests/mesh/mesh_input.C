@@ -1765,7 +1765,7 @@ public:
     sys.project_solution(sin_x_plus_cos_y, nullptr, es.parameters);
 
     // Make this easy to tweak in the future
-    const double my_tolerance = TOLERANCE;
+    const Real my_tolerance = TOLERANCE;
 
     // Calculate some norms, skipping the spline points, and compare
     // to regression standard values
