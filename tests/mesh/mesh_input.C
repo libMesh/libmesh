@@ -1652,7 +1652,7 @@ public:
     if (elem)
       {
         const Real vol = elem->volume();
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(vol, 1./6, TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(vol, 1./6, TOLERANCE*TOLERANCE);
       }
 #endif
   }
