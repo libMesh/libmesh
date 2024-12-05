@@ -848,8 +848,8 @@ public:
     CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
 
     // Assert that both min and max dihedral angles are less than 1 degree (a very low quality element)
-    CPPUNIT_ASSERT_LESS(1.0, min_dihedral_angle);
-    CPPUNIT_ASSERT_LESS(1.0, max_dihedral_angle);
+    CPPUNIT_ASSERT_LESS(Real(1), min_dihedral_angle);
+    CPPUNIT_ASSERT_LESS(Real(1), max_dihedral_angle);
   }
 
   void testTet4Jacobian()
