@@ -576,9 +576,9 @@ void SlepcEigenSolver<T>::print_eigenvalues() const
 #endif
 
       if (im != .0)
-        LibmeshPetscCall(PetscPrintf(this->comm().get()," %9f%+9f i %12f\n", re, im, error));
+        LibmeshPetscCall(PetscPrintf(this->comm().get()," %9f%+9f i %12f\n", double(re), double(im), double(error)));
       else
-        LibmeshPetscCall(PetscPrintf(this->comm().get(),"   %12f       %12f\n", re, error));
+        LibmeshPetscCall(PetscPrintf(this->comm().get(),"   %12f       %12f\n", double(re), double(error)));
     }
 
   LibmeshPetscCall(PetscPrintf(this->comm().get(),"\n" ));
