@@ -844,8 +844,8 @@ public:
     // libMesh::out << "Squashed Tet4 min_dihedral_angle = " << min_dihedral_angle << " degrees" << std::endl;
     // libMesh::out << "Squashed Tet4 max_dihedral_angle = " << max_dihedral_angle << " degrees" << std::endl;
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/44.9985676771277, /*actual=*/min_angle, TOLERANCE);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/44.9985676771277, /*actual=*/min_angle, TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
 
     // Assert that both min and max dihedral angles are less than 1 degree (a very low quality element)
     CPPUNIT_ASSERT_LESS(Real(1), min_dihedral_angle);
