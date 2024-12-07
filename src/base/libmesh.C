@@ -383,6 +383,11 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       libMesh::perflog.disable_logging();
   }
 
+  auto check_empty_command_line_value = [](auto & cl, const std::string & option) {
+    libmesh_error_msg_if(cl.search(option),
+                         "Detected option " << option << " with no value.  Did you forget '='?");
+  };
+
   // Build a task scheduler
   {
     // Get the requested number of threads, defaults to 1 to avoid MPI and
@@ -398,9 +403,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     if (libMesh::libMeshPrivateData::_n_threads == -1)
       {
         for (auto & option : n_threads_opt)
-          libmesh_error_msg_if(command_line->search(option),
-                               "Detected option " << option <<
-                               " with no value.  Did you forget '='?");
+          check_empty_command_line_value(*command_line, option);
 
         libMesh::libMeshPrivateData::_n_threads = 1;
       }
@@ -438,8 +441,37 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // Allow the user to bypass MPI initialization
   if (!libMesh::on_command_line ("--disable-mpi"))
     {
+      int mpi_thread_request = using_threads;
+      const auto mpi_thread_type = libMesh::command_line_value("--mpi-thread-type", std::string(""));
+      if (mpi_thread_type.empty())
+        check_empty_command_line_value(*command_line, "--mpi-thread-type");
+      else
+        {
+          int cli_mpi_thread_request;
+          if (mpi_thread_type == "single")
+            {
+              if (using_threads)
+                libmesh_error_msg("We are using threads, so we require more mpi thread support "
+                                  "than '--mpi-thread-type=single'");
+              cli_mpi_thread_request = 0;
+            }
+          else if (mpi_thread_type == "funneled")
+            cli_mpi_thread_request = 1;
+          else if (mpi_thread_type == "serialized")
+            cli_mpi_thread_request = 2;
+          else if (mpi_thread_type == "multiple")
+            cli_mpi_thread_request = 3;
+          else
+            libmesh_error_msg(
+                "Unsupported mpi thread type '"
+                << mpi_thread_type
+                << "'. Allowed options are 'single', 'funneled', 'serialized', and 'multiple'");
+
+          mpi_thread_request = cli_mpi_thread_request;
+        }
+
       this->_timpi_init =
-        new TIMPI::TIMPIInit(argc, argv, using_threads,
+        new TIMPI::TIMPIInit(argc, argv, mpi_thread_request,
                              handle_mpi_errors, COMM_WORLD_IN);
       _comm = new Parallel::Communicator(this->_timpi_init->comm().get());
 
