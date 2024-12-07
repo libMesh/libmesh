@@ -913,7 +913,6 @@ CFLAGS_DVL
 CXXFLAGS_DVL
 GXX_VERSION
 libmesh_precision_LIBS
-acsm_precision_LIBS
 PKG_CONFIG
 LIBMESH_LIBRARY_SUFFIX
 libmesh_LDFLAGS
@@ -8147,7 +8146,7 @@ fi
     if test "x$compiler_brand_detected" = "xno"
 then :
 
-          is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler'`"
+          is_intel_icc="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler' | grep -v 'oneAPI'`"
           if test "x$is_intel_icc" != "x"
 then :
 
@@ -8189,6 +8188,39 @@ printf "%s\n" "<<< C++ compiler is Intel(R) icc 14 >>>" >&6; }
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icc 13 >>>" >&5
 printf "%s\n" "<<< C++ compiler is Intel(R) icc 13 >>>" >&6; }
                             ACSM_GXX_VERSION=intel_icc_v13.x ;; #(
+  *) :
+    as_fn_error $? "Unsupported Intel compiler detected" "$LINENO" 5 ;;
+esac
+                  compiler_brand_detected=yes
+
+fi
+
+          is_intel_icx="`($CXX -V 2>&1) | grep 'Intel(R)' | grep 'Compiler' | grep 'oneAPI'`"
+          if test "x$is_intel_icx" != "x"
+then :
+
+                  ACSM_GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
+                  case "$ACSM_GXX_VERSION_STRING" in #(
+  *25.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icx 25 >>>" >&5
+printf "%s\n" "<<< C++ compiler is Intel(R) icx 25 >>>" >&6; }
+                            ACSM_GXX_VERSION=intel_icx_v25.x ;; #(
+  *24.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icx 24 >>>" >&5
+printf "%s\n" "<<< C++ compiler is Intel(R) icx 24 >>>" >&6; }
+                            ACSM_GXX_VERSION=intel_icx_v24.x ;; #(
+  *23.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icx 23 >>>" >&5
+printf "%s\n" "<<< C++ compiler is Intel(R) icx 23 >>>" >&6; }
+                            ACSM_GXX_VERSION=intel_icx_v23.x ;; #(
+  *22.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icx 22 >>>" >&5
+printf "%s\n" "<<< C++ compiler is Intel(R) icx 22 >>>" >&6; }
+                            ACSM_GXX_VERSION=intel_icx_v22.x ;; #(
+  *21.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icx 21 >>>" >&5
+printf "%s\n" "<<< C++ compiler is Intel(R) icx 21 >>>" >&6; }
+                            ACSM_GXX_VERSION=intel_icx_v21.x ;; #(
   *) :
     as_fn_error $? "Unsupported Intel compiler detected" "$LINENO" 5 ;;
 esac
@@ -26490,7 +26522,7 @@ else $as_nop
                           ACSM_PARANOID_FLAGS="$ACSM_PARANOID_FLAGS -Wwrite-strings"
 
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         case "$ACSM_GXX_VERSION" in #(
-  intel_icc_v13.x | intel_icc_v14.x | intel_icc_v15.x | intel_icc_v16.x | intel_icc_v17.x | intel_icc_v18.x | intel_icc_v19.x | intel_icc_v20.x) :
+  intel_icc_*) :
 
                                     ACSM_PROFILING_FLAGS="-p"
                                     ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -w1 -g -wd175 -wd1476 -wd1505 -wd1572 -wd488 -wd161"
@@ -26500,9 +26532,19 @@ else $as_nop
                                     ACSM_CFLAGS_OPT="$ACSM_CFLAGS_OPT -O3 -unroll -w0 -ftz"
                                     ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_DBG"
                                    ;; #(
+  intel_icx_*) :
+
+                                    ACSM_PROFILING_FLAGS=""
+                                    ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -O0 -g"
+                                    ACSM_CXXFLAGS_OPT="$ACSM_CXXFLAGS_OPT -O3 -w0"
+                                    ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DEVEL -O2 -g"
+                                    ACSM_CFLAGS_DBG="$ACSM_CFLAGS_DBG -O0 -g"
+                                    ACSM_CFLAGS_OPT="$ACSM_CFLAGS_OPT -O3 -w0"
+                                    ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_DEVEL -O2 -g"
+                                   ;; #(
   *) :
-    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Unknown Intel compiler" >&5
-printf "%s\n" "Unknown Intel compiler" >&6; } ;;
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Unknown Intel compiler \"$ACSM_GXX_VERSION\"" >&5
+printf "%s\n" "Unknown Intel compiler \"$ACSM_GXX_VERSION\"" >&6; } ;;
 esac
                         ;; #(
   nvidia) :
@@ -46484,8 +46526,6 @@ printf "%s\n" "#define DEFAULT_SCALAR_TYPE double" >>confdefs.h
 printf "%s\n" "<<< Default floating point is double precision (double) >>>" >&6; }
 
 fi
-
-
 
 libmesh_precision_LIBS="$acsm_precision_LIBS"
 
