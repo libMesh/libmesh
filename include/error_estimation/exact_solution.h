@@ -38,6 +38,7 @@ class EquationSystems;
 class Parameters;
 class Mesh;
 template <typename Output> class FunctionBase;
+template <typename Output> class FEMFunctionBase;
 enum FEMNormType : int;
 
 // Is there any way to simplify this?
@@ -113,11 +114,24 @@ public:
   void attach_exact_values (const std::vector<FunctionBase<Number> *> & f);
 
   /**
+   * Clone and attach arbitrary functors which compute the exact
+   * values of the EquationSystems' solutions at any point.
+   */
+  void attach_exact_values (const std::vector<FEMFunctionBase<Number> *> & f);
+
+  /**
    * Clone and attach an arbitrary functor which computes the exact
    * value of the system \p sys_num solution at any point.
    */
   void attach_exact_value (unsigned int sys_num,
                            FunctionBase<Number> * f);
+
+  /**
+   * Clone and attach an arbitrary functor which computes the exact
+   * value of the system \p sys_num solution at any point.
+   */
+  void attach_exact_value (unsigned int sys_num,
+                           FEMFunctionBase<Number> * f);
 
   /**
    * Attach an arbitrary function which computes the exact value of
@@ -136,11 +150,24 @@ public:
   void attach_exact_derivs (const std::vector<FunctionBase<Gradient> *> & g);
 
   /**
+   * Clone and attach arbitrary functors which compute the exact
+   * gradients of the EquationSystems' solutions at any point.
+   */
+  void attach_exact_derivs (const std::vector<FEMFunctionBase<Gradient> *> & g);
+
+  /**
    * Clone and attach an arbitrary functor which computes the exact
    * gradient of the system \p sys_num solution at any point.
    */
   void attach_exact_deriv (unsigned int sys_num,
                            FunctionBase<Gradient> * g);
+
+  /**
+   * Clone and attach an arbitrary functor which computes the exact
+   * gradient of the system \p sys_num solution at any point.
+   */
+  void attach_exact_deriv (unsigned int sys_num,
+                           FEMFunctionBase<Gradient> * g);
 
   /**
    * Attach an arbitrary function which computes the exact gradient of
@@ -157,6 +184,11 @@ public:
    * second derivatives of the EquationSystems' solutions at any point.
    */
   void attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h);
+  /**
+   * Clone and attach arbitrary functors which compute the exact
+   * second derivatives of the EquationSystems' solutions at any point.
+   */
+  void attach_exact_hessians (std::vector<FEMFunctionBase<Tensor> *> h);
 
   /**
    * Clone and attach an arbitrary functor which computes the exact
@@ -164,6 +196,13 @@ public:
    */
   void attach_exact_hessian (unsigned int sys_num,
                              FunctionBase<Tensor> * h);
+
+  /**
+   * Clone and attach an arbitrary functor which computes the exact
+   * second derivatives of the system \p sys_num solution at any point.
+   */
+  void attach_exact_hessian (unsigned int sys_num,
+                             FEMFunctionBase<Tensor> * h);
 
   /**
    * Attach an arbitrary function which computes the exact second
@@ -315,19 +354,19 @@ private:
    * User-provided functors which compute the exact value of the
    * solution for each system.
    */
-  std::vector<std::unique_ptr<FunctionBase<Number>>> _exact_values;
+  std::vector<std::unique_ptr<FEMFunctionBase<Number>>> _exact_values;
 
   /**
    * User-provided functors which compute the exact derivative of the
    * solution for each system.
    */
-  std::vector<std::unique_ptr<FunctionBase<Gradient>>> _exact_derivs;
+  std::vector<std::unique_ptr<FEMFunctionBase<Gradient>>> _exact_derivs;
 
   /**
    * User-provided functors which compute the exact hessians of the
    * solution for each system.
    */
-  std::vector<std::unique_ptr<FunctionBase<Tensor>>> _exact_hessians;
+  std::vector<std::unique_ptr<FEMFunctionBase<Tensor>>> _exact_hessians;
 
   /**
    * Data structure which stores the errors:
