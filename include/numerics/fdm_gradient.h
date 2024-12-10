@@ -51,18 +51,17 @@ public:
 
     auto & val = *_val_func;
 
+    Real one_over_dim = Real(0.5) / _eps;
+
     g(0) = (val(c, p+Point(_eps), time) -
-            val(c, p+Point(-_eps), time)) /
-           2 / _eps;
+            val(c, p+Point(-_eps), time)) * one_over_dim;
 #if LIBMESH_DIM > 1
     g(1) = (val(c, p+Point(0,_eps), time) -
-            val(c, p+Point(0,-_eps), time)) /
-           2 / _eps;
+            val(c, p+Point(0,-_eps), time)) * one_over_dim;
 #endif
 #if LIBMESH_DIM > 2
     g(2) = (val(c, p+Point(0,0,_eps), time) -
-            val(c, p+Point(0,0,-_eps), time)) /
-           2 / _eps;
+            val(c, p+Point(0,0,-_eps), time)) * one_over_dim;
 #endif
 
     return g;
@@ -125,18 +124,17 @@ public:
 
     auto & val = *_val_func;
 
+    Real one_over_dim = Real(0.5) / _eps;
+
     g(0) = (val.component(c, i, p+Point(_eps), time) -
-            val.component(c, i, p+Point(-_eps), time)) /
-           2 / _eps;
+            val.component(c, i, p+Point(-_eps), time)) * one_over_dim;
 #if LIBMESH_DIM > 1
     g(1) = (val.component(c, i, p+Point(0,_eps), time) -
-            val.component(c, i, p+Point(0,-_eps), time)) /
-           2 / _eps;
+            val.component(c, i, p+Point(0,-_eps), time)) * one_over_dim;
 #endif
 #if LIBMESH_DIM > 2
     g(2) = (val.component(c, i, p+Point(0,0,_eps), time) -
-            val.component(c, i, p+Point(0,0,-_eps), time)) /
-           2 / _eps;
+            val.component(c, i, p+Point(0,0,-_eps), time)) * one_over_dim;
 #endif
 
     return g;
