@@ -114,18 +114,18 @@ private:
 
   void vector_volume_jacobian(DenseMatrix<Number> & Jqq, DenseMatrix<Number> & Jqs);
 
-  RealVectorValue vel_cross_vel_residual(const std::vector<Number> & u_sol_local,
-                                         const std::vector<Number> & v_sol_local,
-                                         const unsigned int qp,
-                                         const unsigned int vel_component) const;
+  NumberVectorValue vel_cross_vel_residual(const std::vector<Number> & u_sol_local,
+                                           const std::vector<Number> & v_sol_local,
+                                           const unsigned int qp,
+                                           const unsigned int vel_component) const;
 
-  RealVectorValue vel_cross_vel_jacobian(const std::vector<Number> & u_sol_local,
-                                         const std::vector<Number> & v_sol_local,
-                                         const unsigned int qp,
-                                         const unsigned int vel_component,
-                                         const unsigned int vel_j_component,
-                                         const std::vector<std::vector<Real>> & phi,
-                                         const unsigned int j) const;
+  NumberVectorValue vel_cross_vel_jacobian(const std::vector<Number> & u_sol_local,
+                                           const std::vector<Number> & v_sol_local,
+                                           const unsigned int qp,
+                                           const unsigned int vel_component,
+                                           const unsigned int vel_j_component,
+                                           const std::vector<std::vector<Real>> & phi,
+                                           const unsigned int j) const;
 
   void scalar_volume_residual(const std::vector<Gradient> & vel_gradient,
                               const unsigned int vel_component,

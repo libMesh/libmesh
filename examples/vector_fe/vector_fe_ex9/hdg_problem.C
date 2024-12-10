@@ -175,17 +175,17 @@ HDGProblem::vector_volume_jacobian(DenseMatrix<Number> & Jqq, DenseMatrix<Number
     }
 }
 
-RealVectorValue
+NumberVectorValue
 HDGProblem::vel_cross_vel_residual(const std::vector<Number> & u_sol_local,
                                    const std::vector<Number> & v_sol_local,
                                    const unsigned int qp,
                                    const unsigned int vel_component) const
 {
-  const RealVectorValue U(u_sol_local[qp], v_sol_local[qp]);
+  const NumberVectorValue U(u_sol_local[qp], v_sol_local[qp]);
   return U * U(vel_component);
 }
 
-RealVectorValue
+NumberVectorValue
 HDGProblem::vel_cross_vel_jacobian(const std::vector<Number> & u_sol_local,
                                    const std::vector<Number> & v_sol_local,
                                    const unsigned int qp,
@@ -194,8 +194,8 @@ HDGProblem::vel_cross_vel_jacobian(const std::vector<Number> & u_sol_local,
                                    const std::vector<std::vector<Real>> & phi,
                                    const unsigned int j) const
 {
-  const RealVectorValue U(u_sol_local[qp], v_sol_local[qp]);
-  RealVectorValue vector_phi_local;
+  const NumberVectorValue U(u_sol_local[qp], v_sol_local[qp]);
+  NumberVectorValue vector_phi_local;
   vector_phi_local(vel_j_component) = phi[j][qp];
   auto ret = vector_phi_local * U(vel_component);
   if (vel_component == vel_j_component)
@@ -318,11 +318,11 @@ HDGProblem::pressure_volume_jacobian(DenseMatrix<Number> & Jpu,
       for (const auto j : make_range(scalar_n_dofs))
       {
         {
-          const Gradient phi((*scalar_phi)[j][qp], 0);
+          const Gradient phi((*scalar_phi)[j][qp], Number(0));
           Jpu(i, j) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * phi);
         }
         {
-          const Gradient phi(0, (*scalar_phi)[j][qp]);
+          const Gradient phi(Number(0), (*scalar_phi)[j][qp]);
           Jpv(i, j) -= (*JxW)[qp] * ((*grad_scalar_phi)[i][qp] * phi);
         }
       }
@@ -359,11 +359,11 @@ HDGProblem::pressure_face_jacobian(DenseMatrix<Number> & Jplm_u, DenseMatrix<Num
       for (const auto j : make_range(lm_n_dofs))
       {
         {
-          const Gradient phi((*lm_phi_face)[j][qp], 0);
+          const Gradient phi((*lm_phi_face)[j][qp], Number(0));
           Jplm_u(i, j) += (*JxW_face)[qp] * phi * (*normals)[qp] * (*scalar_phi_face)[i][qp];
         }
         {
-          const Gradient phi(0, (*lm_phi_face)[j][qp]);
+          const Gradient phi(Number(0), (*lm_phi_face)[j][qp]);
           Jplm_v(i, j) += (*JxW_face)[qp] * phi * (*normals)[qp] * (*scalar_phi_face)[i][qp];
         }
       }
