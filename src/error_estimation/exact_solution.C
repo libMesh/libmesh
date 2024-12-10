@@ -578,6 +578,9 @@ void ExactSolution::_compute_error(std::string_view sys_name,
       coarse_values->init();
     }
 
+  // Grab which element dimensions are present in the mesh
+  const std::set<unsigned char> & elem_dims = mesh.elem_dimensions();
+
   // Initialize any functors we're going to use
   for (auto & ev : _exact_values)
     if (ev)
@@ -600,11 +603,24 @@ void ExactSolution::_compute_error(std::string_view sys_name,
         eh->init_context(context);
       }
 
+  // If we have *no* functors we intend to use (because we're using a
+  // fine system, or because our exact solution is zero and we're just
+  // computing norms in an outdated way) then let our FE objects know
+  // we don't actually need anything from them, so they don't think
+  // we've just invoked them in a deprecated "compute everything"
+  // fashion.
+  if (_exact_values.empty() && _exact_derivs.empty() &&
+      _exact_hessians.empty())
+    for (auto dim : elem_dims)
+      for (auto v : make_range(computed_system.n_vars()))
+        {
+          FEAbstract * fe;
+          context.get_element_fe(v, fe, dim);
+          fe->get_nothing();
+        }
+
   // Get a reference to the dofmap and mesh for that system
   const DofMap & computed_dof_map = computed_system.get_dof_map();
-
-  // Grab which element dimensions are present in the mesh
-  const std::set<unsigned char> & elem_dims = mesh.elem_dimensions();
 
   // Zero the error before summation
   // 0 - sum of square of function error (L2)
