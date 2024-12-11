@@ -65,8 +65,26 @@ private:
       const Elem * e1c = (*locator)(*n1);
       Node * n2 = nullptr;
       for (const Node & n : e1c->node_ref_range())
-        if (Point(*n1) == Point(n))
-          n2 = other_mesh.node_ptr(n.id());
+        {
+          const Point diff = Point(*n1)-Point(n);
+#if LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+          // We're testing against ExodusII input, and if we're in
+          // triple or quadruple precision that means our lovely
+          // higher-precision node coordinates got truncated to double
+          // to be written.  We need to adjust ours or they won't
+          // satisfy operator== later.
+
+          // We're *also* testing against gold files that were
+          // calculated at double precision, so just casting a higher
+          // precision calculation to double won't give the exact same
+          // result, we have to account for error.
+          if (diff.norm() < 1e-15)
+            for (auto d : make_range(LIBMESH_DIM))
+              (*n1)(d) = double(n(d));
+#endif
+          if (Point(*n1) == Point(n))
+            n2 = other_mesh.node_ptr(n.id());
+        }
       CPPUNIT_ASSERT(n2);
       n1->processor_id() = 0;
       n2->processor_id() = 0;
