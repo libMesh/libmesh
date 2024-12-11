@@ -44,10 +44,13 @@ public:
     CPPUNIT_ASSERT_EQUAL(dual_coeff.m(), unsigned(2));
     CPPUNIT_ASSERT_EQUAL(dual_coeff.n(), unsigned(2));
 
-    LIBMESH_ASSERT_FP_EQUAL(2, dual_coeff(0,0), TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(-1, dual_coeff(0,1), TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(-1, dual_coeff(1,0), TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(2, dual_coeff(1,1), TOLERANCE*TOLERANCE);
+    // TOLERANCE*TOLERANCE works with double but not float128
+    Real my_tol = TOLERANCE*std::sqrt(TOLERANCE);
+
+    LIBMESH_ASSERT_FP_EQUAL(2, dual_coeff(0,0), my_tol);
+    LIBMESH_ASSERT_FP_EQUAL(-1, dual_coeff(0,1), my_tol);
+    LIBMESH_ASSERT_FP_EQUAL(-1, dual_coeff(1,0), my_tol);
+    LIBMESH_ASSERT_FP_EQUAL(2, dual_coeff(1,1), my_tol);
 
     const auto & dual_phi = _fe->get_dual_phi();
 
@@ -59,13 +62,13 @@ public:
 
     for (auto qp : index_range(dual_phi[0]))
       LIBMESH_ASSERT_FP_EQUAL(1./2. * (1. - 3.*qpoints[qp](0)), dual_phi[0][qp],
-        TOLERANCE*TOLERANCE);
+        my_tol);
 
     CPPUNIT_ASSERT_EQUAL(qpoints.size(), dual_phi[1].size());
 
     for (auto qp : index_range(dual_phi[1]))
       LIBMESH_ASSERT_FP_EQUAL(1./2. * (1. + 3.*qpoints[qp](0)), dual_phi[1][qp],
-        TOLERANCE*TOLERANCE);
+        my_tol);
   }
 
   void setUp()
