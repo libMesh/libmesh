@@ -1073,22 +1073,17 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 #endif
   LibmeshPetscCall(SNESSetFromOptions(_snes));
 
-#if defined(LIBMESH_HAVE_PETSC_HYPRE) && !PETSC_VERSION_LESS_THAN(3,12,0)
-  // The above call set our PC type. If we're a hypre type we have to ensure that hypre is deployed
-  // in the same memory space as our vector types
-  PC pc;
-  LibmeshPetscCall(KSPGetPC(ksp, &pc));
-  PetscBool is_hypre;
-  LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)pc, PCHYPRE, &is_hypre));
-  if (is_hypre == PETSC_TRUE)
-    {
-      PetscScalar * dummyarray;
-      PetscMemType mtype;
-      LibmeshPetscCall(VecGetArrayAndMemType(x->vec(), &dummyarray, &mtype));
-      LibmeshPetscCall(VecRestoreArrayAndMemType(x->vec(), &dummyarray));
-      if (PetscMemTypeHost(mtype))
-        LibmeshPetscCallExternal(HYPRE_SetMemoryLocation, HYPRE_MEMORY_HOST);
-    }
+#if defined(LIBMESH_HAVE_PETSC_HYPRE) && !PETSC_VERSION_LESS_THAN(3,12,0) && defined(PETSC_HAVE_HYPRE_DEVICE)
+  {
+    // Make sure hypre has been initialized
+    LibmeshPetscCallExternal(HYPRE_Initialize);
+    PetscScalar * dummyarray;
+    PetscMemType mtype;
+    LibmeshPetscCall(VecGetArrayAndMemType(x->vec(), &dummyarray, &mtype));
+    LibmeshPetscCall(VecRestoreArrayAndMemType(x->vec(), &dummyarray));
+    if (PetscMemTypeHost(mtype))
+      LibmeshPetscCallExternal(HYPRE_SetMemoryLocation, HYPRE_MEMORY_HOST);
+  }
 #endif
 
   if (this->user_presolve)
