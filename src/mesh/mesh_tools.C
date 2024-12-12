@@ -23,6 +23,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/mesh_serializer.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/node_range.h"
 #include "libmesh/parallel.h"
@@ -832,6 +833,112 @@ unsigned int paranoid_n_levels(const MeshBase & mesh)
 
   mesh.comm().max(nl);
   return nl;
+}
+
+
+
+dof_id_type n_connected_components(const MeshBase & mesh)
+{
+  // Yes, I'm being lazy.  This is for mesh analysis before a
+  // simulation, not anything going in any loops.
+  if (!mesh.is_serial_on_zero())
+    libmesh_not_implemented();
+
+  dof_id_type n_components = 0;
+
+  if (mesh.processor_id())
+  {
+    mesh.comm().broadcast(n_components);
+    return n_components;
+  }
+
+  // All nodes in a set here are connected (at least indirectly) to
+  // all other nodes in the same set, but have not yet been discovered
+  // to be connected to nodes in other sets.
+  std::vector<std::unordered_set<const Node *>> components;
+
+  auto find_component = [&mesh, &components](const Node * n) {
+    std::unordered_set<const Node *> * component = nullptr;
+
+    for (auto & c: components)
+      if (c.find(n) != c.end())
+        {
+          libmesh_assert(component == nullptr);
+          component = &c;
+        }
+
+    return component;
+  };
+
+  auto add_to_component =
+    [&mesh, &components, &find_component]
+    (std::unordered_set<const Node *> & component, const Node * n) {
+
+    auto current_component = find_component(n);
+    // We may already know we're in the desired component
+    if (&component == current_component)
+      return;
+          
+    // If we're unknown, we should be in the desired component
+    else if (!current_component)
+      component.insert(n);
+
+    // If we think we're in another component, it should actually be
+    // part of the desired component
+    else
+      {
+        component.merge(*current_component);
+        libmesh_assert(current_component->empty());
+      }
+  };
+
+  auto & constraint_rows = mesh.get_constraint_rows();
+
+  for (const auto & elem : mesh.element_ptr_range())
+    {
+      const Node * first_node = elem->node_ptr(0);
+
+      auto component = find_component(first_node);
+
+      // If we didn't find one, make a new one, reusing an existing
+      // slot if possible or growing our vector if necessary
+      if (!component)
+        for (auto & c: components)
+          if (c.empty())
+            component = &c;
+
+      if (!component)
+        component = &components.emplace_back();
+
+      for (const Node & n : elem->node_ref_range())
+        {
+          add_to_component(*component, &n);
+
+          auto it = constraint_rows.find(&n);
+          if (it == constraint_rows.end())
+            continue;
+
+          for (const auto & [pr, val] : it->second)
+            {
+              const Elem * spline_elem = pr.first;
+              libmesh_assert(spline_elem == mesh.elem_ptr(spline_elem->id()));
+
+              const Node * spline_node =
+                spline_elem->node_ptr(pr.second);
+
+              add_to_component(*component, spline_node);
+            }
+        }
+    }
+
+  for (auto & component : components)
+    if (!component.empty())
+      ++n_components;
+
+  // We calculated this on proc 0; now let everyone else know too
+  mesh.comm().broadcast(n_components);
+
+  return n_components;
 }
 
 
