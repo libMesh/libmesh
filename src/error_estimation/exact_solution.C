@@ -29,6 +29,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/wrapped_function.h"
+#include "libmesh/wrapped_functor.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/raw_accessor.h"
 #include "libmesh/tensor_tools.h"
@@ -105,7 +106,7 @@ void ExactSolution::attach_exact_value (ValueFunctionPointer fptr)
   for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_values.emplace_back(std::make_unique<WrappedFunction<Number>>(system, fptr, &_equation_systems.parameters));
+      _exact_values.emplace_back(std::make_unique<WrappedFunctor<Number>>(system, fptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -120,12 +121,34 @@ void ExactSolution::attach_exact_values (const std::vector<FunctionBase<Number> 
   _exact_values.clear();
 
   for (auto ptr : f)
+    _exact_values.emplace_back(ptr ? std::make_unique<WrappedFunctor<Number>>(*ptr) : nullptr);
+}
+
+
+void ExactSolution::attach_exact_values (const std::vector<FEMFunctionBase<Number> *> & f)
+{
+  // Automatically delete any previous _exact_values entries, then add a new
+  // entry for each system.
+  _exact_values.clear();
+
+  for (auto ptr : f)
     _exact_values.emplace_back(ptr ? ptr->clone() : nullptr);
 }
 
 
 void ExactSolution::attach_exact_value (unsigned int sys_num,
                                         FunctionBase<Number> * f)
+{
+  if (_exact_values.size() <= sys_num)
+    _exact_values.resize(sys_num+1);
+
+  if (f)
+    _exact_values[sys_num] = std::make_unique<WrappedFunctor<Number>>(*f);
+}
+
+
+void ExactSolution::attach_exact_value (unsigned int sys_num,
+                                        FEMFunctionBase<Number> * f)
 {
   if (_exact_values.size() <= sys_num)
     _exact_values.resize(sys_num+1);
@@ -146,7 +169,7 @@ void ExactSolution::attach_exact_deriv (GradientFunctionPointer gptr)
   for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_derivs.emplace_back(std::make_unique<WrappedFunction<Gradient>>(system, gptr, &_equation_systems.parameters));
+      _exact_derivs.emplace_back(std::make_unique<WrappedFunctor<Gradient>>(system, gptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -161,12 +184,34 @@ void ExactSolution::attach_exact_derivs (const std::vector<FunctionBase<Gradient
   _exact_derivs.clear();
 
   for (auto ptr : g)
+    _exact_derivs.emplace_back(ptr ? std::make_unique<WrappedFunctor<Gradient>>(*ptr) : nullptr);
+}
+
+
+void ExactSolution::attach_exact_derivs (const std::vector<FEMFunctionBase<Gradient> *> & g)
+{
+  // Automatically delete any previous _exact_derivs entries, then add a new
+  // entry for each system.
+  _exact_derivs.clear();
+
+  for (auto ptr : g)
     _exact_derivs.emplace_back(ptr ? ptr->clone() : nullptr);
 }
 
 
 void ExactSolution::attach_exact_deriv (unsigned int sys_num,
                                         FunctionBase<Gradient> * g)
+{
+  if (_exact_derivs.size() <= sys_num)
+    _exact_derivs.resize(sys_num+1);
+
+  if (g)
+    _exact_derivs[sys_num] = std::make_unique<WrappedFunctor<Gradient>>(*g);
+}
+
+
+void ExactSolution::attach_exact_deriv (unsigned int sys_num,
+                                        FEMFunctionBase<Gradient> * g)
 {
   if (_exact_derivs.size() <= sys_num)
     _exact_derivs.resize(sys_num+1);
@@ -187,7 +232,7 @@ void ExactSolution::attach_exact_hessian (HessianFunctionPointer hptr)
   for (auto sys : make_range(_equation_systems.n_systems()))
     {
       const System & system = _equation_systems.get_system(sys);
-      _exact_hessians.emplace_back(std::make_unique<WrappedFunction<Tensor>>(system, hptr, &_equation_systems.parameters));
+      _exact_hessians.emplace_back(std::make_unique<WrappedFunctor<Tensor>>(system, hptr, &_equation_systems.parameters));
     }
 
   // If we're using exact values, we're not using a fine grid solution
@@ -202,12 +247,34 @@ void ExactSolution::attach_exact_hessians (std::vector<FunctionBase<Tensor> *> h
   _exact_hessians.clear();
 
   for (auto ptr : h)
+    _exact_hessians.emplace_back(ptr ? std::make_unique<WrappedFunctor<Tensor>>(*ptr) : nullptr);
+}
+
+
+void ExactSolution::attach_exact_hessians (std::vector<FEMFunctionBase<Tensor> *> h)
+{
+  // Automatically delete any previous _exact_hessians entries, then add a new
+  // entry for each system.
+  _exact_hessians.clear();
+
+  for (auto ptr : h)
     _exact_hessians.emplace_back(ptr ? ptr->clone() : nullptr);
 }
 
 
 void ExactSolution::attach_exact_hessian (unsigned int sys_num,
                                           FunctionBase<Tensor> * h)
+{
+  if (_exact_hessians.size() <= sys_num)
+    _exact_hessians.resize(sys_num+1);
+
+  if (h)
+    _exact_hessians[sys_num] = std::make_unique<WrappedFunctor<Tensor>>(*h);
+}
+
+
+void ExactSolution::attach_exact_hessian (unsigned int sys_num,
+                                          FEMFunctionBase<Tensor> * h)
 {
   if (_exact_hessians.size() <= sys_num)
     _exact_hessians.resize(sys_num+1);
@@ -469,6 +536,8 @@ void ExactSolution::_compute_error(std::string_view sys_name,
     _equation_systems_fine->get_system(sys_name) :
     _equation_systems.get_system (sys_name);
 
+  FEMContext context(computed_system);
+
   const MeshBase & mesh = computed_system.get_mesh();
 
   const Real time = _equation_systems.get_system(sys_name).time;
@@ -509,24 +578,49 @@ void ExactSolution::_compute_error(std::string_view sys_name,
       coarse_values->init();
     }
 
+  // Grab which element dimensions are present in the mesh
+  const std::set<unsigned char> & elem_dims = mesh.elem_dimensions();
+
   // Initialize any functors we're going to use
   for (auto & ev : _exact_values)
     if (ev)
-      ev->init();
+      {
+        ev->init();
+        ev->init_context(context);
+      }
 
   for (auto & ed : _exact_derivs)
     if (ed)
-      ed->init();
+      {
+        ed->init();
+        ed->init_context(context);
+      }
 
   for (auto & eh : _exact_hessians)
     if (eh)
-      eh->init();
+      {
+        eh->init();
+        eh->init_context(context);
+      }
+
+  // If we have *no* functors we intend to use (because we're using a
+  // fine system, or because our exact solution is zero and we're just
+  // computing norms in an outdated way) then let our FE objects know
+  // we don't actually need anything from them, so they don't think
+  // we've just invoked them in a deprecated "compute everything"
+  // fashion.
+  if (_exact_values.empty() && _exact_derivs.empty() &&
+      _exact_hessians.empty())
+    for (auto dim : elem_dims)
+      for (auto v : make_range(computed_system.n_vars()))
+        {
+          FEAbstract * fe;
+          context.get_element_fe(v, fe, dim);
+          fe->get_nothing();
+        }
 
   // Get a reference to the dofmap and mesh for that system
   const DofMap & computed_dof_map = computed_system.get_dof_map();
-
-  // Grab which element dimensions are present in the mesh
-  const std::set<unsigned char> & elem_dims = mesh.elem_dimensions();
 
   // Zero the error before summation
   // 0 - sum of square of function error (L2)
@@ -652,6 +746,9 @@ void ExactSolution::_compute_error(std::string_view sys_name,
       // for the current element
       fe->reinit (elem);
 
+      context.pre_fe_reinit(computed_system, elem);
+      context.elem_fe_reinit();
+
       // Get the local to global degree of freedom maps
       computed_dof_map.dof_indices    (elem, dof_indices, var);
 
@@ -709,7 +806,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
               for (unsigned int c = 0; c < n_vec_dim; c++)
                 exact_val_accessor(c) =
                   _exact_values[sys_num]->
-                  component(var_component+c, q_point[qp], time);
+                  component(context, var_component+c, q_point[qp], time);
             }
           else if (_equation_systems_fine)
             {
@@ -739,7 +836,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
                 for (unsigned int d = 0; d < LIBMESH_DIM; d++)
                   exact_grad_accessor(d + c*LIBMESH_DIM) =
                     _exact_derivs[sys_num]->
-                    component(var_component+c, q_point[qp], time)(d);
+                    component(context, var_component+c, q_point[qp], time)(d);
             }
           else if (_equation_systems_fine)
             {
@@ -809,7 +906,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
                   for (unsigned int e =0; e < dim; e++)
                     exact_hess_accessor(d + e*dim + c*dim*dim) =
                       _exact_hessians[sys_num]->
-                      component(var_component+c, q_point[qp], time)(d,e);
+                      component(context, var_component+c, q_point[qp], time)(d,e);
 
               // FIXME: operator- is not currently implemented for TypeNTensor
               const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;

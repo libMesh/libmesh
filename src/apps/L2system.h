@@ -17,48 +17,65 @@
 
 // libMesh includes
 #include "libmesh/enum_fe_family.h"
+#include "libmesh/fdm_gradient.h"
 #include "libmesh/fem_function_base.h"
 #include "libmesh/fem_system.h"
+#include "libmesh/libmesh_common.h"
 
 // C++ includes
 #include <map>
 #include <memory>
 
+
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
-class L2System : public libMesh::FEMSystem
+class HilbertSystem : public libMesh::FEMSystem
 {
 public:
   // Constructor
-  L2System(libMesh::EquationSystems & es,
-           const std::string & name,
-           const unsigned int number)
+  HilbertSystem(libMesh::EquationSystems & es,
+                const std::string & name,
+                const unsigned int number)
   : libMesh::FEMSystem(es, name, number),
     input_system(nullptr),
     _fe_family("LAGRANGE"),
     _fe_order(1),
+    _hilbert_order(0),
     _subdomains_list() {}
 
-  // Destructor; deletes extra context objects
-  ~L2System();
+  // Default destructor
+  ~HilbertSystem();
 
-  std::string & fe_family() { return _fe_family;  }
-  unsigned int & fe_order() { return _fe_order;  }
+  std::string & fe_family() { return _fe_family; }
+  unsigned int & fe_order() { return _fe_order; }
   std::set<libMesh::subdomain_id_type> & subdomains_list() { return _subdomains_list; }
+
+  unsigned int & hilbert_order() { return _hilbert_order; }
+  void set_fdm_eps(libMesh::Real eps) {
+    _fdm_eps = eps;
+    if (_goal_func.get())
+      _goal_grad = std::make_unique<libMesh::FDMGradient<libMesh::Gradient>>(*_goal_func, _fdm_eps);
+  }
+
+  void set_goal_func(libMesh::FEMFunctionBase<libMesh::Number> & goal)
+  {
+    _goal_func = goal.clone();
+    _goal_grad = std::make_unique<libMesh::FDMGradient<libMesh::Gradient>>(*_goal_func, _fdm_eps);
+  }
 
   // We want to be able to project functions based on *other* systems'
   // values.  For that we need not only a FEMFunction but also a
   // reference to the system where it applies and a separate context
   // object (or multiple separate context objects, in the threaded
   // case) for that system.
-  std::unique_ptr<libMesh::FEMFunctionBase<libMesh::Number> > goal_func;
-
   libMesh::System * input_system;
+
+protected:
+  std::unique_ptr<libMesh::FEMFunctionBase<libMesh::Number> > _goal_func;
 
   std::map<libMesh::FEMContext *, std::unique_ptr<libMesh::FEMContext>>
     input_contexts;
 
-protected:
   // System initialization
   virtual void init_data ();
 
@@ -73,6 +90,17 @@ protected:
   // The FE type to use
   std::string _fe_family;
   unsigned int _fe_order;
+
+  // The Hilbert order our subclass will project with
+  unsigned int _hilbert_order;
+
+  // The function we will call to finite difference our goal
+  // function
+  std::unique_ptr<libMesh::FDMGradient<libMesh::Gradient>> _goal_grad;
+
+  // The perturbation we will use when finite differencing our goal
+  // function
+  libMesh::Real _fdm_eps;
 
   // Which subdomains to integrate on (all subdomains, if empty())
   std::set<libMesh::subdomain_id_type> _subdomains_list;

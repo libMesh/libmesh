@@ -23,7 +23,9 @@
 // Local Includes
 #include "libmesh/fem_function_base.h"
 #include "libmesh/function_base.h"
+#include "libmesh/int_range.h"
 #include "libmesh/point.h"
+#include "libmesh/wrapped_function.h"
 
 // C++ includes
 #include <cstddef>
@@ -55,6 +57,18 @@ public:
   { }
 
   /**
+   * Constructor to wrap scalar-valued function pointers.
+   */
+  WrappedFunctor (const System & sys,
+                  Output fptr(const Point & p,
+                              const Parameters & parameters,
+                              const std::string & sys_name,
+                              const std::string & unknown_name) = nullptr,
+                  const Parameters * parameters = nullptr,
+                  unsigned int varnum=0) :
+    _func(std::make_unique<WrappedFunction<Output>>(sys, fptr, parameters, varnum)) {}
+
+  /**
    * This class can't be copy constructed or assigned because it
    * contains a unique_ptr member.
    */
@@ -67,6 +81,16 @@ public:
   WrappedFunctor (WrappedFunctor &&) = default;
   WrappedFunctor & operator= (WrappedFunctor &&) = default;
   virtual ~WrappedFunctor () = default;
+
+  /**
+   * Any post-construction initialization
+   */
+  virtual void init () override { _func->init(); }
+
+  /**
+   * Tell the context we don't need anything from it
+   */
+  virtual void init_context (const FEMContext & c) override;
 
   virtual std::unique_ptr<FEMFunctionBase<Output>> clone () const override
   {
@@ -95,6 +119,20 @@ protected:
   std::unique_ptr<FunctionBase<Output>> _func;
 };
 
+
+template <typename Output>
+void WrappedFunctor<Output>::init_context (const FEMContext & c)
+{
+  for (auto dim : c.elem_dimensions())
+    {
+      for (auto v : make_range(c.n_vars()))
+        {
+          FEAbstract * fe;
+          c.get_element_fe(v, fe, dim);
+          fe->get_nothing();
+        }
+    }
+}
 
 
 } // namespace libMesh

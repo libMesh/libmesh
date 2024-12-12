@@ -858,6 +858,7 @@ include_HEADERS = \
         numerics/eigen_preconditioner.h \
         numerics/eigen_sparse_matrix.h \
         numerics/eigen_sparse_vector.h \
+        numerics/fdm_gradient.h \
         numerics/fem_function_base.h \
         numerics/function_base.h \
         numerics/lumped_mass_matrix.h \

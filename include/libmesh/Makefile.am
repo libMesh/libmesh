@@ -248,6 +248,7 @@ BUILT_SOURCES = \
         eigen_preconditioner.h \
         eigen_sparse_matrix.h \
         eigen_sparse_vector.h \
+        fdm_gradient.h \
         fem_function_base.h \
         function_base.h \
         laspack_matrix.h \
@@ -1331,6 +1332,9 @@ eigen_sparse_matrix.h: $(top_srcdir)/include/numerics/eigen_sparse_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 eigen_sparse_vector.h: $(top_srcdir)/include/numerics/eigen_sparse_vector.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fdm_gradient.h: $(top_srcdir)/include/numerics/fdm_gradient.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fem_function_base.h: $(top_srcdir)/include/numerics/fem_function_base.h
