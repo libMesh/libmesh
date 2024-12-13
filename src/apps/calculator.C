@@ -30,6 +30,7 @@
 #include "libmesh/exact_solution.h"
 #include "libmesh/getpot.h"
 #include "libmesh/mesh.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/newton_solver.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parsed_fem_function.h"
@@ -191,6 +192,14 @@ int main(int argc, char ** argv)
 
   libMesh::out << "Mesh:" << std::endl;
   old_mesh.print_info();
+
+  // If we're not using a distributed mesh, this is cheap info to add
+  if (old_mesh.is_serial_on_zero())
+    {
+      const dof_id_type n_components =
+        MeshTools::n_connected_components(old_mesh);
+      libMesh::out << "Mesh has " << n_components << " connected components." << std::endl;
+    }
 
   const std::string solnname = cl.follow(std::string(""), "--insoln");
 
