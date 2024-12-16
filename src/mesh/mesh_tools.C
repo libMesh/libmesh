@@ -837,7 +837,8 @@ unsigned int paranoid_n_levels(const MeshBase & mesh)
 
 
 
-dof_id_type n_connected_components(const MeshBase & mesh)
+dof_id_type n_connected_components(const MeshBase & mesh,
+                                   Real constraint_tol)
 {
   // Yes, I'm being lazy.  This is for mesh analysis before a
   // simulation, not anything going in any loops.
@@ -920,6 +921,11 @@ dof_id_type n_connected_components(const MeshBase & mesh)
 
           for (const auto & [pr, val] : it->second)
             {
+              // Ignore too-trivial constraint coefficients if
+              // we get a non-default-0 constraint_tol
+              if (std::abs(val) < constraint_tol)
+                continue;
+
               const Elem * spline_elem = pr.first;
               libmesh_assert(spline_elem == mesh.elem_ptr(spline_elem->id()));
 
