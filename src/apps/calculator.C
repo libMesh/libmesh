@@ -59,7 +59,7 @@ void usage_error(const char * progname)
                << " --dim d               mesh dimension            [default: autodetect]\n"
                << " --inmesh    filename  input mesh file\n"
                << " --inmat     filename  input constraint matrix   [default: none]\n"
-               << " --insoln    filename  input solution file\n"
+               << " --insoln    filename  input solution file\n     [default: none]\n"
                << " --calc      func      function to calculate\n"
                << " --insys     sysnum    input system number       [default: 0]\n"
                << " --outsoln   filename  output solution file      [default: out_<insoln>]\n"
