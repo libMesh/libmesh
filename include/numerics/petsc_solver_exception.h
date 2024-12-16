@@ -89,10 +89,6 @@ public:
     LIBMESH_CHKERRQ(ierr);                      \
   } while (0)
 
-// Remove me: for backward compatibility with MOOSE only
-#define LIBMESH_CHKERR(ierr) LIBMESH_CHKERRQ(ierr)
-#define LIBMESH_CHKERR2(comm, ierr) LIBMESH_CHKERRA(comm, ierr)
-
 #else
 
 // If we don't have exceptions enabled, just fall back on calling
