@@ -145,8 +145,6 @@ AS_IF([test "x$enablexdr" = "xno" && test "x$xdrrequired" = "xyes"],
 # Boost -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_BOOST
-LIBMESH_TEST_BOOST_MOVELIB_UNIQUE_PTR
-AC_CONFIG_FILES([contrib/boost/include/Makefile])
 # --------------------------------------------------------------
 
 # -------------------------------------------------------------
