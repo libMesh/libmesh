@@ -59,6 +59,8 @@ void usage_error(const char * progname)
                << " --dim d               mesh dimension            [default: autodetect]\n"
                << " --inmesh    filename  input mesh file\n"
                << " --inmat     filename  input constraint matrix   [default: none]\n"
+               << " --mattol    filename  constraint tolerance when testing mesh connectivity\n"
+               << "                                                 [default: 0]\n"
                << " --insoln    filename  input solution file\n     [default: none]\n"
                << " --calc      func      function to calculate\n"
                << " --insys     sysnum    input system number       [default: 0]\n"
@@ -196,8 +198,10 @@ int main(int argc, char ** argv)
   // If we're not using a distributed mesh, this is cheap info to add
   if (old_mesh.is_serial_on_zero())
     {
+      const Real mat_tol = cl.follow(Real(0), "--mattol");
+
       const dof_id_type n_components =
-        MeshTools::n_connected_components(old_mesh);
+        MeshTools::n_connected_components(old_mesh, mat_tol);
       libMesh::out << "Mesh has " << n_components << " connected components." << std::endl;
     }
 
