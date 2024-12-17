@@ -421,6 +421,8 @@ void BoundaryInfo::regenerate_id_sets()
       _communicator.set_union(_es_id_to_name);
       _communicator.set_union(_global_boundary_ids);
     }
+
+  _mesh->_preparation.has_boundary_id_sets = true;
 }
 
 
