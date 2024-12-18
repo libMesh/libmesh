@@ -879,7 +879,7 @@ dof_id_type n_connected_components(const MeshBase & mesh,
     // We may already know we're in the desired component
     if (&component == current_component)
       return;
-          
+
     // If we're unknown, we should be in the desired component
     else if (!current_component)
       component.insert(n);
