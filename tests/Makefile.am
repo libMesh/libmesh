@@ -61,6 +61,7 @@ unit_tests_sources = \
   mesh/boundary_info.C \
   mesh/boundary_points.C \
   mesh/checkpoint.C \
+  mesh/connected_components.C \
   mesh/contains_point.C \
   mesh/distributed_mesh_test.C \
   mesh/extra_integers.C \

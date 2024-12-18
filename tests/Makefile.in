@@ -206,13 +206,13 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	geom/which_node_am_i_test.C mesh/all_second_order.C \
 	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
 	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/distributed_mesh_test.C \
-	mesh/extra_integers.C mesh/exodus_test.C mesh/mesh_assign.C \
-	mesh/mesh_base_test.C mesh/mesh_collection.C \
-	mesh/mesh_deletions.C mesh/mesh_extruder.C \
-	mesh/mesh_function.C mesh/mesh_function_dfem.C \
-	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/connected_components.C mesh/contains_point.C \
+	mesh/distributed_mesh_test.C mesh/extra_integers.C \
+	mesh/exodus_test.C mesh/mesh_assign.C mesh/mesh_base_test.C \
+	mesh/mesh_collection.C mesh/mesh_deletions.C \
+	mesh/mesh_extruder.C mesh/mesh_function.C \
+	mesh/mesh_function_dfem.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
@@ -297,6 +297,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	mesh/unit_tests_dbg-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_dbg-boundary_points.$(OBJEXT) \
 	mesh/unit_tests_dbg-checkpoint.$(OBJEXT) \
+	mesh/unit_tests_dbg-connected_components.$(OBJEXT) \
 	mesh/unit_tests_dbg-contains_point.$(OBJEXT) \
 	mesh/unit_tests_dbg-distributed_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_dbg-extra_integers.$(OBJEXT) \
@@ -405,13 +406,13 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	geom/which_node_am_i_test.C mesh/all_second_order.C \
 	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
 	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/distributed_mesh_test.C \
-	mesh/extra_integers.C mesh/exodus_test.C mesh/mesh_assign.C \
-	mesh/mesh_base_test.C mesh/mesh_collection.C \
-	mesh/mesh_deletions.C mesh/mesh_extruder.C \
-	mesh/mesh_function.C mesh/mesh_function_dfem.C \
-	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/connected_components.C mesh/contains_point.C \
+	mesh/distributed_mesh_test.C mesh/extra_integers.C \
+	mesh/exodus_test.C mesh/mesh_assign.C mesh/mesh_base_test.C \
+	mesh/mesh_collection.C mesh/mesh_deletions.C \
+	mesh/mesh_extruder.C mesh/mesh_function.C \
+	mesh/mesh_function_dfem.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
@@ -495,6 +496,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	mesh/unit_tests_devel-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_devel-boundary_points.$(OBJEXT) \
 	mesh/unit_tests_devel-checkpoint.$(OBJEXT) \
+	mesh/unit_tests_devel-connected_components.$(OBJEXT) \
 	mesh/unit_tests_devel-contains_point.$(OBJEXT) \
 	mesh/unit_tests_devel-distributed_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_devel-extra_integers.$(OBJEXT) \
@@ -599,13 +601,13 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	geom/which_node_am_i_test.C mesh/all_second_order.C \
 	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
 	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/distributed_mesh_test.C \
-	mesh/extra_integers.C mesh/exodus_test.C mesh/mesh_assign.C \
-	mesh/mesh_base_test.C mesh/mesh_collection.C \
-	mesh/mesh_deletions.C mesh/mesh_extruder.C \
-	mesh/mesh_function.C mesh/mesh_function_dfem.C \
-	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/connected_components.C mesh/contains_point.C \
+	mesh/distributed_mesh_test.C mesh/extra_integers.C \
+	mesh/exodus_test.C mesh/mesh_assign.C mesh/mesh_base_test.C \
+	mesh/mesh_collection.C mesh/mesh_deletions.C \
+	mesh/mesh_extruder.C mesh/mesh_function.C \
+	mesh/mesh_function_dfem.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
@@ -689,6 +691,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	mesh/unit_tests_oprof-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_oprof-boundary_points.$(OBJEXT) \
 	mesh/unit_tests_oprof-checkpoint.$(OBJEXT) \
+	mesh/unit_tests_oprof-connected_components.$(OBJEXT) \
 	mesh/unit_tests_oprof-contains_point.$(OBJEXT) \
 	mesh/unit_tests_oprof-distributed_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_oprof-extra_integers.$(OBJEXT) \
@@ -793,13 +796,13 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	geom/which_node_am_i_test.C mesh/all_second_order.C \
 	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
 	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/distributed_mesh_test.C \
-	mesh/extra_integers.C mesh/exodus_test.C mesh/mesh_assign.C \
-	mesh/mesh_base_test.C mesh/mesh_collection.C \
-	mesh/mesh_deletions.C mesh/mesh_extruder.C \
-	mesh/mesh_function.C mesh/mesh_function_dfem.C \
-	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/connected_components.C mesh/contains_point.C \
+	mesh/distributed_mesh_test.C mesh/extra_integers.C \
+	mesh/exodus_test.C mesh/mesh_assign.C mesh/mesh_base_test.C \
+	mesh/mesh_collection.C mesh/mesh_deletions.C \
+	mesh/mesh_extruder.C mesh/mesh_function.C \
+	mesh/mesh_function_dfem.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
@@ -883,6 +886,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	mesh/unit_tests_opt-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_opt-boundary_points.$(OBJEXT) \
 	mesh/unit_tests_opt-checkpoint.$(OBJEXT) \
+	mesh/unit_tests_opt-connected_components.$(OBJEXT) \
 	mesh/unit_tests_opt-contains_point.$(OBJEXT) \
 	mesh/unit_tests_opt-distributed_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_opt-extra_integers.$(OBJEXT) \
@@ -987,13 +991,13 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	geom/which_node_am_i_test.C mesh/all_second_order.C \
 	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
 	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/distributed_mesh_test.C \
-	mesh/extra_integers.C mesh/exodus_test.C mesh/mesh_assign.C \
-	mesh/mesh_base_test.C mesh/mesh_collection.C \
-	mesh/mesh_deletions.C mesh/mesh_extruder.C \
-	mesh/mesh_function.C mesh/mesh_function_dfem.C \
-	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/connected_components.C mesh/contains_point.C \
+	mesh/distributed_mesh_test.C mesh/extra_integers.C \
+	mesh/exodus_test.C mesh/mesh_assign.C mesh/mesh_base_test.C \
+	mesh/mesh_collection.C mesh/mesh_deletions.C \
+	mesh/mesh_extruder.C mesh/mesh_function.C \
+	mesh/mesh_function_dfem.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
@@ -1077,6 +1081,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	mesh/unit_tests_prof-boundary_info.$(OBJEXT) \
 	mesh/unit_tests_prof-boundary_points.$(OBJEXT) \
 	mesh/unit_tests_prof-checkpoint.$(OBJEXT) \
+	mesh/unit_tests_prof-connected_components.$(OBJEXT) \
 	mesh/unit_tests_prof-contains_point.$(OBJEXT) \
 	mesh/unit_tests_prof-distributed_mesh_test.$(OBJEXT) \
 	mesh/unit_tests_prof-extra_integers.$(OBJEXT) \
@@ -1342,6 +1347,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-boundary_mesh.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-boundary_points.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-checkpoint.Po \
+	mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-contains_point.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-distort.Po \
 	mesh/$(DEPDIR)/unit_tests_dbg-distributed_mesh_test.Po \
@@ -1380,6 +1386,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-boundary_points.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-checkpoint.Po \
+	mesh/$(DEPDIR)/unit_tests_devel-connected_components.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-contains_point.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-distort.Po \
 	mesh/$(DEPDIR)/unit_tests_devel-distributed_mesh_test.Po \
@@ -1418,6 +1425,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-boundary_mesh.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-boundary_points.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-checkpoint.Po \
+	mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-contains_point.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-distort.Po \
 	mesh/$(DEPDIR)/unit_tests_oprof-distributed_mesh_test.Po \
@@ -1456,6 +1464,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-boundary_points.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-checkpoint.Po \
+	mesh/$(DEPDIR)/unit_tests_opt-connected_components.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-contains_point.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-distort.Po \
 	mesh/$(DEPDIR)/unit_tests_opt-distributed_mesh_test.Po \
@@ -1494,6 +1503,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-boundary_mesh.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-boundary_points.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-checkpoint.Po \
+	mesh/$(DEPDIR)/unit_tests_prof-connected_components.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-contains_point.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-distort.Po \
 	mesh/$(DEPDIR)/unit_tests_prof-distributed_mesh_test.Po \
@@ -2237,13 +2247,13 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	geom/which_node_am_i_test.C mesh/all_second_order.C \
 	mesh/all_tri.C mesh/distort.C mesh/boundary_mesh.C \
 	mesh/boundary_info.C mesh/boundary_points.C mesh/checkpoint.C \
-	mesh/contains_point.C mesh/distributed_mesh_test.C \
-	mesh/extra_integers.C mesh/exodus_test.C mesh/mesh_assign.C \
-	mesh/mesh_base_test.C mesh/mesh_collection.C \
-	mesh/mesh_deletions.C mesh/mesh_extruder.C \
-	mesh/mesh_function.C mesh/mesh_function_dfem.C \
-	mesh/mesh_generation_test.C mesh/mesh_input.C \
-	mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
+	mesh/connected_components.C mesh/contains_point.C \
+	mesh/distributed_mesh_test.C mesh/extra_integers.C \
+	mesh/exodus_test.C mesh/mesh_assign.C mesh/mesh_base_test.C \
+	mesh/mesh_collection.C mesh/mesh_deletions.C \
+	mesh/mesh_extruder.C mesh/mesh_function.C \
+	mesh/mesh_function_dfem.C mesh/mesh_generation_test.C \
+	mesh/mesh_input.C mesh/mesh_smoother_test.C mesh/mesh_stitch.C \
 	mesh/mesh_tet_test.C mesh/mesh_triangulation.C \
 	mesh/mixed_dim_mesh_test.C mesh/mixed_order_test.C \
 	mesh/nodal_neighbors.C mesh/libmesh_poly2tri.C \
@@ -2573,6 +2583,8 @@ mesh/unit_tests_dbg-boundary_points.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_dbg-connected_components.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-distributed_mesh_test.$(OBJEXT):  \
@@ -2863,6 +2875,8 @@ mesh/unit_tests_devel-boundary_points.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_devel-connected_components.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_devel-distributed_mesh_test.$(OBJEXT):  \
@@ -3105,6 +3119,8 @@ mesh/unit_tests_oprof-boundary_points.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_oprof-connected_components.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_oprof-distributed_mesh_test.$(OBJEXT):  \
@@ -3347,6 +3363,8 @@ mesh/unit_tests_opt-boundary_points.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_opt-connected_components.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_opt-distributed_mesh_test.$(OBJEXT):  \
@@ -3589,6 +3607,8 @@ mesh/unit_tests_prof-boundary_points.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-checkpoint.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
+mesh/unit_tests_prof-connected_components.$(OBJEXT):  \
+	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-contains_point.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_prof-distributed_mesh_test.$(OBJEXT):  \
@@ -3942,6 +3962,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-boundary_mesh.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-boundary_points.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-checkpoint.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-contains_point.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-distort.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_dbg-distributed_mesh_test.Po@am__quote@ # am--include-marker
@@ -3980,6 +4001,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-boundary_points.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-checkpoint.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-connected_components.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-contains_point.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-distort.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_devel-distributed_mesh_test.Po@am__quote@ # am--include-marker
@@ -4018,6 +4040,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-boundary_mesh.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-boundary_points.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-checkpoint.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-contains_point.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-distort.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_oprof-distributed_mesh_test.Po@am__quote@ # am--include-marker
@@ -4056,6 +4079,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-boundary_points.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-checkpoint.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-connected_components.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-contains_point.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-distort.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_opt-distributed_mesh_test.Po@am__quote@ # am--include-marker
@@ -4094,6 +4118,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-boundary_mesh.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-boundary_points.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-checkpoint.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-connected_components.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-contains_point.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-distort.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@mesh/$(DEPDIR)/unit_tests_prof-distributed_mesh_test.Po@am__quote@ # am--include-marker
@@ -4918,6 +4943,20 @@ mesh/unit_tests_dbg-checkpoint.obj: mesh/checkpoint.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/checkpoint.C' object='mesh/unit_tests_dbg-checkpoint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-checkpoint.obj `if test -f 'mesh/checkpoint.C'; then $(CYGPATH_W) 'mesh/checkpoint.C'; else $(CYGPATH_W) '$(srcdir)/mesh/checkpoint.C'; fi`
+
+mesh/unit_tests_dbg-connected_components.o: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-connected_components.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Tpo -c -o mesh/unit_tests_dbg-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_dbg-connected_components.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+
+mesh/unit_tests_dbg-connected_components.obj: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-connected_components.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Tpo -c -o mesh/unit_tests_dbg-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_dbg-connected_components.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_dbg-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
 
 mesh/unit_tests_dbg-contains_point.o: mesh/contains_point.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_dbg-contains_point.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_dbg-contains_point.Tpo -c -o mesh/unit_tests_dbg-contains_point.o `test -f 'mesh/contains_point.C' || echo '$(srcdir)/'`mesh/contains_point.C
@@ -6543,6 +6582,20 @@ mesh/unit_tests_devel-checkpoint.obj: mesh/checkpoint.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-checkpoint.obj `if test -f 'mesh/checkpoint.C'; then $(CYGPATH_W) 'mesh/checkpoint.C'; else $(CYGPATH_W) '$(srcdir)/mesh/checkpoint.C'; fi`
 
+mesh/unit_tests_devel-connected_components.o: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-connected_components.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-connected_components.Tpo -c -o mesh/unit_tests_devel-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_devel-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_devel-connected_components.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+
+mesh/unit_tests_devel-connected_components.obj: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-connected_components.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-connected_components.Tpo -c -o mesh/unit_tests_devel-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_devel-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_devel-connected_components.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_devel-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
+
 mesh/unit_tests_devel-contains_point.o: mesh/contains_point.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_devel-contains_point.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_devel-contains_point.Tpo -c -o mesh/unit_tests_devel-contains_point.o `test -f 'mesh/contains_point.C' || echo '$(srcdir)/'`mesh/contains_point.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_devel-contains_point.Tpo mesh/$(DEPDIR)/unit_tests_devel-contains_point.Po
@@ -8166,6 +8219,20 @@ mesh/unit_tests_oprof-checkpoint.obj: mesh/checkpoint.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/checkpoint.C' object='mesh/unit_tests_oprof-checkpoint.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-checkpoint.obj `if test -f 'mesh/checkpoint.C'; then $(CYGPATH_W) 'mesh/checkpoint.C'; else $(CYGPATH_W) '$(srcdir)/mesh/checkpoint.C'; fi`
+
+mesh/unit_tests_oprof-connected_components.o: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-connected_components.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Tpo -c -o mesh/unit_tests_oprof-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_oprof-connected_components.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+
+mesh/unit_tests_oprof-connected_components.obj: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-connected_components.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Tpo -c -o mesh/unit_tests_oprof-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_oprof-connected_components.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_oprof-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
 
 mesh/unit_tests_oprof-contains_point.o: mesh/contains_point.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_oprof-contains_point.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_oprof-contains_point.Tpo -c -o mesh/unit_tests_oprof-contains_point.o `test -f 'mesh/contains_point.C' || echo '$(srcdir)/'`mesh/contains_point.C
@@ -9791,6 +9858,20 @@ mesh/unit_tests_opt-checkpoint.obj: mesh/checkpoint.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-checkpoint.obj `if test -f 'mesh/checkpoint.C'; then $(CYGPATH_W) 'mesh/checkpoint.C'; else $(CYGPATH_W) '$(srcdir)/mesh/checkpoint.C'; fi`
 
+mesh/unit_tests_opt-connected_components.o: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-connected_components.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-connected_components.Tpo -c -o mesh/unit_tests_opt-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_opt-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_opt-connected_components.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+
+mesh/unit_tests_opt-connected_components.obj: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-connected_components.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-connected_components.Tpo -c -o mesh/unit_tests_opt-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_opt-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_opt-connected_components.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_opt-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
+
 mesh/unit_tests_opt-contains_point.o: mesh/contains_point.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_opt-contains_point.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_opt-contains_point.Tpo -c -o mesh/unit_tests_opt-contains_point.o `test -f 'mesh/contains_point.C' || echo '$(srcdir)/'`mesh/contains_point.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_opt-contains_point.Tpo mesh/$(DEPDIR)/unit_tests_opt-contains_point.Po
@@ -11415,6 +11496,20 @@ mesh/unit_tests_prof-checkpoint.obj: mesh/checkpoint.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-checkpoint.obj `if test -f 'mesh/checkpoint.C'; then $(CYGPATH_W) 'mesh/checkpoint.C'; else $(CYGPATH_W) '$(srcdir)/mesh/checkpoint.C'; fi`
 
+mesh/unit_tests_prof-connected_components.o: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-connected_components.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-connected_components.Tpo -c -o mesh/unit_tests_prof-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_prof-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_prof-connected_components.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-connected_components.o `test -f 'mesh/connected_components.C' || echo '$(srcdir)/'`mesh/connected_components.C
+
+mesh/unit_tests_prof-connected_components.obj: mesh/connected_components.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-connected_components.obj -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-connected_components.Tpo -c -o mesh/unit_tests_prof-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-connected_components.Tpo mesh/$(DEPDIR)/unit_tests_prof-connected_components.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mesh/connected_components.C' object='mesh/unit_tests_prof-connected_components.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o mesh/unit_tests_prof-connected_components.obj `if test -f 'mesh/connected_components.C'; then $(CYGPATH_W) 'mesh/connected_components.C'; else $(CYGPATH_W) '$(srcdir)/mesh/connected_components.C'; fi`
+
 mesh/unit_tests_prof-contains_point.o: mesh/contains_point.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT mesh/unit_tests_prof-contains_point.o -MD -MP -MF mesh/$(DEPDIR)/unit_tests_prof-contains_point.Tpo -c -o mesh/unit_tests_prof-contains_point.o `test -f 'mesh/contains_point.C' || echo '$(srcdir)/'`mesh/contains_point.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) mesh/$(DEPDIR)/unit_tests_prof-contains_point.Tpo mesh/$(DEPDIR)/unit_tests_prof-contains_point.Po
@@ -13035,6 +13130,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-distributed_mesh_test.Po
@@ -13073,6 +13169,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-distributed_mesh_test.Po
@@ -13111,6 +13208,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-distributed_mesh_test.Po
@@ -13149,6 +13247,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-distributed_mesh_test.Po
@@ -13187,6 +13286,7 @@ distclean: distclean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-distributed_mesh_test.Po
@@ -13662,6 +13762,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_dbg-distributed_mesh_test.Po
@@ -13700,6 +13801,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_devel-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_devel-distributed_mesh_test.Po
@@ -13738,6 +13840,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_oprof-distributed_mesh_test.Po
@@ -13776,6 +13879,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_opt-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_opt-distributed_mesh_test.Po
@@ -13814,6 +13918,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-boundary_mesh.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-boundary_points.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-checkpoint.Po
+	-rm -f mesh/$(DEPDIR)/unit_tests_prof-connected_components.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-contains_point.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-distort.Po
 	-rm -f mesh/$(DEPDIR)/unit_tests_prof-distributed_mesh_test.Po
