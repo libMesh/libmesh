@@ -165,6 +165,13 @@ public:
   virtual void print_info();
 
   /**
+   * Rescale solution snapshots so that they all have unity norm. This is relevant
+   * if training samples have differing magnitudes and we want to approximate them
+   * all with equal accuracy.
+   */
+  void apply_normalization_to_solution_snapshots();
+
+  /**
    * Generate the EIM approximation for the specified parametrized function
    * using either POD or the Greedy Algorithm. Return the final tolerance.
    */

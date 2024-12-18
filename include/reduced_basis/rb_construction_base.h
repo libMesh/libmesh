@@ -267,6 +267,14 @@ protected:
   bool serial_training_set;
 
   /**
+   * Set this boolean to true if we want to normalize solution snapshots
+   * used in training to have norm of 1. This is relevant if snapshots
+   * have differing magnitudes and we want to approximate them all with
+   * equal accuracy.
+   */
+  bool normalize_solution_snapshots;
+
+  /**
    * We keep an extra temporary vector that is useful for
    * performing inner products (avoids unnecessary memory
    * allocation/deallocation).

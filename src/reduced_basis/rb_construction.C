@@ -1453,6 +1453,20 @@ void RBConstruction::train_reduced_basis_with_POD()
     }
   libMesh::out << std::endl;
 
+  if (normalize_solution_snapshots)
+  {
+    std::cout << "Normalizing solution snapshots" << std::endl;
+    for (unsigned int i=0; i<n_snapshots; i++)
+      {
+        get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(
+          *inner_product_storage_vector, *POD_snapshots[i]);
+        Real norm = std::sqrt(std::real(POD_snapshots[i]->dot(*inner_product_storage_vector)));
+
+        if (norm > 0.)
+          POD_snapshots[i]->scale(1./norm);
+      }
+  }
+
   // Set up the "correlation matrix"
   DenseMatrix<Number> correlation_matrix(n_snapshots,n_snapshots);
   for (unsigned int i=0; i<n_snapshots; i++)
