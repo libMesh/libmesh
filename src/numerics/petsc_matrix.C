@@ -331,10 +331,7 @@ void PetscMatrix<T>::finish_initialization()
   // Make it an error for PETSc to allocate new nonzero entries during assembly. For old PETSc
   // versions this option must be set after preallocation for MPIAIJ matrices
   LibmeshPetscCall(MatSetOption(this->_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
-
   this->_is_initialized = true;
-  if (!this->_use_hash_table)
-    this->zero();
 }
 
 template <typename T>

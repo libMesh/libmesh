@@ -345,14 +345,11 @@ void System::init_matrices ()
       if (!this->get_dof_map().is_attached(m))
         this->get_dof_map().attach_matrix(m);
 
-      if (!pr.second->assembly_preference_set())
-        {
-          const bool use_hash =
-              this->_prefer_hash_table_matrix_assembly && pr.second->supports_hash_table();
-          pr.second->use_hash_table(use_hash);
-          if (!use_hash)
-            this->_require_sparsity_pattern = true;
-        }
+      const bool use_hash =
+          this->_prefer_hash_table_matrix_assembly && pr.second->supports_hash_table();
+      pr.second->use_hash_table(use_hash);
+      if (!use_hash)
+        this->_require_sparsity_pattern = true;
     }
 
   // Compute the sparsity pattern for the current

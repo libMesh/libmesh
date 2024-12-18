@@ -36,7 +36,7 @@
 #include <mutex>
 #endif
 
-
+class PetscMatrixTest;
 
 namespace libMesh
 {
@@ -285,7 +285,12 @@ public:
 
   virtual void scale(const T scale) override;
 
-#if PETSC_RELEASE_GREATER_EQUALS(3,23,0)
+#if PETSC_RELEASE_GREATER_EQUALS(3, 23, 0)
+  /**
+   * Creates a copy of the current hash table matrix and then performs assembly. This is very useful
+   * in cases where you are not done filling this matrix but want to be able to read the current
+   * state of it
+   */
   std::unique_ptr<PetscMatrix<T>> copy_from_hash();
 #endif
 
@@ -324,7 +329,6 @@ protected:
    * - Setting the option to make new nonzeroes an error (otherwise users will just have a silent
        (often huge) performance penalty
    * - Marking the matrix as initialized
-   * - Zeroing the matrix
    */
   void finish_initialization();
 
@@ -355,6 +359,8 @@ private:
 #else
   mutable Threads::spin_mutex _petsc_matrix_mutex;
 #endif
+
+  friend class ::PetscMatrixTest;
 };
 
 } // namespace libMesh

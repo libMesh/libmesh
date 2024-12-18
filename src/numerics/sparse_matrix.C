@@ -65,8 +65,7 @@ SparseMatrix<T>::SparseMatrix (const Parallel::Communicator & comm_in) :
   _dof_map(nullptr),
   _sp(nullptr),
   _is_initialized(false),
-  _use_hash_table(false),
-  _assembly_preference_set(false)
+  _use_hash_table(false)
 {}
 
 

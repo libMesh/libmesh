@@ -589,23 +589,24 @@ public:
   virtual bool supports_hash_table() const { return false; }
 
   /**
-   * @returns Whether a preference for hash table vs. preallocation has been set
-   */
-  bool assembly_preference_set() const { return _assembly_preference_set; }
-
-  /**
    * Sets whether to use hash table assembly. This will error if the passed-in value is true and the
-   * matrix type does not support hash tables
+   * matrix type does not support hash tables. Hash table or hash map assembly means storing maps
+   * from i-j locations in the matrix to values. Because it is a hash map as opposed to a contiguous
+   * array of data, no preallocation is required to use it
    */
   void use_hash_table(bool use_hash);
 
   /**
-   * @returns Whether this matrix is using hash table assembly
+   * @returns Whether this matrix is using hash table assembly. Hash table or hash map assembly
+   * means storing maps from i-j locations in the matrix to values. Because it is a hash map as
+   * opposed to a contiguous array of data, no preallocation is required to use it
    */
   bool use_hash_table() const { return _use_hash_table; }
 
   /**
-   * Reset the memory storage of the matrix
+   * Reset the memory storage of the matrix. Unlike \p clear(), this does not destroy the matrix but
+   * rather will reset the matrix to use the original preallocation or when using hash table matrix
+   * assembly (see \p use_hash_table()) will reset (clear) the hash table used for assembly
    */
   virtual void reset_memory() { libmesh_not_implemented(); }
 
@@ -647,11 +648,6 @@ protected:
    * Flag indicating whether the matrix is assembled using a hash table
    */
   bool _use_hash_table;
-
-  /**
-   * Whether a preference for hash table vs. preallocation has been set
-   */
-  bool _assembly_preference_set;
 };
 
 
@@ -664,10 +660,7 @@ SparseMatrix<T>::use_hash_table(const bool use_hash)
 {
   libmesh_error_msg_if(use_hash && !this->supports_hash_table(),
                        "This matrix class does not support hash table assembly");
-  libmesh_error_msg_if(this->_assembly_preference_set,
-                       "The use_hash_table API should only be called once");
   this->_use_hash_table = use_hash;
-  this->_assembly_preference_set = true;
 }
 
 // For SGI MIPSpro this implementation must occur after
