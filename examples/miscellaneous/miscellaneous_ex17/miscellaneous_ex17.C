@@ -128,15 +128,37 @@ int main (int argc, char ** argv)
 #ifdef LIBMESH_HAVE_PETSC
   auto & sys_matrix = cast_ref<PetscMatrix<Number> &>(system.get_system_matrix());
   auto & pre_matrix = cast_ref<PetscMatrix<Number> &>(pre_sparse_matrix);
-  KSP ksp;
-  LibmeshPetscCall2(system.comm(), KSPCreate(system.comm().get(), &ksp));
-  LibmeshPetscCall2(system.comm(), KSPSetOperators(ksp, sys_matrix.mat(), pre_matrix.mat()));
-  LibmeshPetscCall2(system.comm(), KSPSetFromOptions(ksp));
-  LibmeshPetscCall2(
-      system.comm(),
-      KSPSolve(ksp,
-               cast_ptr<PetscVector<Number> *>(sys.current_local_solution.get())->vec(),
-               cast_ptr<PetscVector<Number> *>(sys.rhs)->vec()));
+
+  auto solve = [&sys_matrix, &pre_matrix, &system]() {
+    // Make sure our matrices are closed
+    sys_matrix.close();
+    pre_matrix.close();
+    system.rhs->close();
+    KSP ksp;
+    LibmeshPetscCall2(system.comm(), KSPCreate(system.comm().get(), &ksp));
+    LibmeshPetscCall2(system.comm(), KSPSetOperators(ksp, sys_matrix.mat(), pre_matrix.mat()));
+    LibmeshPetscCall2(system.comm(), KSPSetFromOptions(ksp));
+    LibmeshPetscCall2(system.comm(),
+                      KSPSolve(ksp,
+                               cast_ptr<PetscVector<Number> *>(system.rhs)->vec(),
+                               cast_ptr<PetscVector<Number> *>(system.solution.get())->vec()));
+  };
+
+  // solve
+  solve();
+  // reset the memory
+  sys_matrix.reset_memory();
+  pre_matrix.reset_memory();
+  // zero
+  sys_matrix.zero();
+  pre_matrix.zero();
+  system.rhs->zero();
+  system.solution->zero();
+  system.update();
+  // re-assemble
+  system.assemble();
+  // resolve
+  solve();
 #endif
 
   // All done.
