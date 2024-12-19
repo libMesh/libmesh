@@ -858,7 +858,7 @@ dof_id_type n_connected_components(const MeshBase & mesh,
   // to be connected to nodes in other sets.
   std::vector<std::unordered_set<const Node *>> components;
 
-  auto find_component = [&mesh, &components](const Node * n) {
+  auto find_component = [&components](const Node * n) {
     std::unordered_set<const Node *> * component = nullptr;
 
     for (auto & c: components)
@@ -872,7 +872,7 @@ dof_id_type n_connected_components(const MeshBase & mesh,
   };
 
   auto add_to_component =
-    [&mesh, &components, &find_component]
+    [&mesh, &find_component]
     (std::unordered_set<const Node *> & component, const Node * n) {
 
     auto current_component = find_component(n);
