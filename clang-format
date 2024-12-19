@@ -24,7 +24,7 @@ AllowShortLoopsOnASingleLine: false
 SortIncludes: false
 IndentCaseLabels: true
 ConstructorInitializerIndentWidth: 2
-AlwaysBreakAfterDefinitionReturnType: TopLevel
+AlwaysBreakAfterDefinitionReturnType: false
 AlwaysBreakTemplateDeclarations: true
 
 FixNamespaceComments: false

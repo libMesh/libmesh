@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/miscellaneous/miscellaneous_ex17" target="_blank">Open miscellaneous_ex17 in new tab.</a>
+<a name="output"></a> 
+<br><br><br> <h1> The console output of the program: </h1> 
+<pre>
+  CXX      example_dbg-miscellaneous_ex17.o
+  CXXLD    example-dbg
+  CXX      example_devel-miscellaneous_ex17.o
+  CXXLD    example-devel
+  CXX      example_oprof-miscellaneous_ex17.o
+  CXXLD    example-oprof
+***************************************************************
+* Running Example miscellaneous_ex17:
+*   ./example-opt  
+***************************************************************
+ 
+Running /data/lindad/libmesh-worktrees/libmesh/build/examples/miscellaneous/miscellaneous_ex17/.libs/example-opt
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={1}
+  supported_nodal_order()=1
+  spatial_dimension()=2
+  n_nodes()=9
+    n_local_nodes()=9
+  n_elem()=4
+    n_local_elem()=4
+    n_active_elem()=4
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "Poisson"
+    Type "LinearImplicit"
+    Variables="u" 
+    Finite Element Types="LAGRANGE" 
+    Approximation Orders="FIRST" 
+    n_dofs()=9
+    n_local_dofs()=9
+    max(n_local_dofs())=9
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=9
+    n_vectors()=1
+    n_matrices()=2
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 5.44444
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 9
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+  0 KSP Residual norm 1.688435532300e+00
+  1 KSP Residual norm 4.775853068521e-03
+  2 KSP Residual norm 8.773680887473e-05
+  3 KSP Residual norm 2.605740036645e-06
+  0 KSP Residual norm 1.688435532300e+00
+  1 KSP Residual norm 4.775853068521e-03
+  2 KSP Residual norm 8.773680887473e-05
+  3 KSP Residual norm 2.605740036645e-06
+ 
+***************************************************************
+* Done Running Example miscellaneous_ex17:
+*   ./example-opt  
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

@@ -48,9 +48,10 @@ PetscMatrixBase<T>::PetscMatrixBase(const Parallel::Communicator & comm_in) :
 // for destroying it
 template <typename T>
 PetscMatrixBase<T>::PetscMatrixBase(Mat mat_in,
-                                    const Parallel::Communicator & comm_in) :
+                                    const Parallel::Communicator & comm_in,
+                                    const bool destroy_on_exit) :
   SparseMatrix<T>(comm_in),
-  _destroy_mat_on_exit(false)
+  _destroy_mat_on_exit(destroy_on_exit)
 {
   this->_mat = mat_in;
   this->_is_initialized = true;
