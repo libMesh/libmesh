@@ -128,6 +128,7 @@ int main (int argc, char ** argv)
 #ifdef LIBMESH_HAVE_PETSC
   auto & sys_matrix = cast_ref<PetscMatrix<Number> &>(system.get_system_matrix());
   auto & pre_matrix = cast_ref<PetscMatrix<Number> &>(pre_sparse_matrix);
+  LibmeshPetscCall2(system.comm(), PetscOptionsSetValue(NULL, "-ksp_monitor", NULL));
 
   auto solve = [&sys_matrix, &pre_matrix, &system]() {
     // Make sure our matrices are closed
