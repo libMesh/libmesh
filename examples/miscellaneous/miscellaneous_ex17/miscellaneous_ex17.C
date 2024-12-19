@@ -89,11 +89,7 @@ int main (int argc, char ** argv)
   // to build a mesh of 15x15 QUAD9 elements.  Building QUAD9
   // elements instead of the default QUAD4's we used in example 2
   // allow us to use higher-order approximation.
-  MeshTools::Generation::build_square (mesh,
-                                       15, 15,
-                                       -1., 1.,
-                                       -1., 1.,
-                                       QUAD9);
+  MeshTools::Generation::build_square(mesh, 2, 2, -1., 1., -1., 1., QUAD4);
 
   // Print information about the mesh to the screen.
   // Note that 5x5 QUAD9 elements actually has 11x11 nodes,
@@ -109,7 +105,7 @@ int main (int argc, char ** argv)
 
   // Adds the variable "u" to "Poisson".  "u"
   // will be approximated using second-order approximation.
-  system.add_variable("u", SECOND);
+  system.add_variable("u", FIRST);
 
   // Give the system a pointer to the matrix assembly
   // function.  This will be called when needed by the
