@@ -345,8 +345,11 @@ void System::init_matrices ()
       if (!this->get_dof_map().is_attached(m))
         this->get_dof_map().attach_matrix(m);
 
+      // If the user has already explicitly requested that this matrix use a hash table, then we
+      // always honor that
       const bool use_hash =
-          this->_prefer_hash_table_matrix_assembly && pr.second->supports_hash_table();
+          pr.second->use_hash_table() ||
+          (this->_prefer_hash_table_matrix_assembly && pr.second->supports_hash_table());
       pr.second->use_hash_table(use_hash);
       if (!use_hash)
         this->_require_sparsity_pattern = true;
