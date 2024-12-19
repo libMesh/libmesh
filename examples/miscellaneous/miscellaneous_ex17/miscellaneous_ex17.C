@@ -15,29 +15,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-
-// <h1>Introduction Example 3 - Solving a Poisson Problem</h1>
-// \author Benjamin S. Kirk
-// \date 2003
-//
-// This is the third example program.  It builds on
-// the second example program by showing how to solve a simple
-// Poisson system.  This example also introduces the notion
-// of customized matrix assembly functions, working with an
-// exact solution, and using element iterators.
-// We will not comment on things that
-// were already explained in the second example.
-
-// C++ include files that we need
-#include <iostream>
-#include <algorithm>
-#include <math.h>
+// <h1>Miscennaleous Example 17 - Demonstrating mix of preallocated/hash-table matrix
+// assemblies</h1> \author Alexander D. Lindsay \date 2024
 
 // Basic include files needed for the mesh functionality.
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
-#include "libmesh/vtk_io.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/equation_systems.h"
 
@@ -45,11 +29,13 @@
 #include "libmesh/fe.h"
 
 // Define Gauss quadrature rules.
+#include "libmesh/petsc_solver_exception.h"
+#include "libmesh/petsc_vector.h"
 #include "libmesh/quadrature_gauss.h"
 
 // Define useful datatypes for finite element
 // matrix and vector components.
-#include "libmesh/sparse_matrix.h"
+#include "libmesh/petsc_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
@@ -59,16 +45,13 @@
 // Define the DofMap, which handles degree of freedom
 // indexing.
 #include "libmesh/dof_map.h"
+#include "petscksp.h"
+
+#include <iostream>
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-// Function prototype.  This is the function that will assemble
-// the linear system for our Poisson problem.  Note that the
-// function will take the  EquationSystems object and the
-// name of the system we are assembling as input.  From the
-//  EquationSystems object we have access to the  Mesh and
-// other objects we might need.
 void assemble_poisson(EquationSystems & es,
                       const std::string & system_name);
 
@@ -83,8 +66,7 @@ int main (int argc, char ** argv)
   LibMeshInit init (argc, argv);
 
   // This example requires a linear solver package.
-  libmesh_example_requires(libMesh::default_solver_package() != INVALID_SOLVER_PACKAGE,
-                           "--enable-petsc, --enable-trilinos, or --enable-eigen");
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // Brief message to the user regarding the program name
   // and command line arguments.
@@ -123,16 +105,20 @@ int main (int argc, char ** argv)
 
   // Declare the Poisson system and its variables.
   // The Poisson system is another example of a steady system.
-  equation_systems.add_system<LinearImplicitSystem> ("Poisson");
+  auto & system = equation_systems.add_system<LinearImplicitSystem>("Poisson");
 
   // Adds the variable "u" to "Poisson".  "u"
   // will be approximated using second-order approximation.
-  equation_systems.get_system("Poisson").add_variable("u", SECOND);
+  system.add_variable("u", SECOND);
 
   // Give the system a pointer to the matrix assembly
   // function.  This will be called when needed by the
   // library.
-  equation_systems.get_system("Poisson").attach_assemble_function (assemble_poisson);
+  system.attach_assemble_function(assemble_poisson);
+
+  // Add the preconditioner matrix
+  auto & pre_sparse_matrix = system.add_matrix("preconditioner");
+  pre_sparse_matrix.use_hash_table(true);
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -140,30 +126,22 @@ int main (int argc, char ** argv)
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
-  // Solve the system "Poisson".  Note that calling this
-  // member will assemble the linear system and invoke
-  // the default numerical solver.  With PETSc the solver can be
-  // controlled from the command line.  For example,
-  // you can invoke conjugate gradient with:
-  //
-  // ./miscellaneous_ex17 -ksp_type cg
-  //
-  // You can also get a nice X-window that monitors the solver
-  // convergence with:
-  //
-  // ./introduction-ex3 -ksp_xmonitor
-  //
-  // if you linked against the appropriate X libraries when you
-  // built PETSc.
-  equation_systems.get_system("Poisson").solve();
+  // assemble the operators and RHS
+  system.assemble();
 
-#if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
-
-  // After solving the system write the solution
-  // to a VTK-formatted plot file.
-  VTKIO (mesh).write_equation_systems ("out.pvtu", equation_systems);
-
-#endif // #ifdef LIBMESH_HAVE_VTK
+#ifdef LIBMESH_HAVE_PETSC
+  auto & sys_matrix = cast_ref<PetscMatrix<Number> &>(system.get_system_matrix());
+  auto & pre_matrix = cast_ref<PetscMatrix<Number> &>(pre_sparse_matrix);
+  KSP ksp;
+  LibmeshPetscCall2(system.comm(), KSPCreate(system.comm().get(), &ksp));
+  LibmeshPetscCall2(system.comm(), KSPSetOperators(ksp, sys_matrix.mat(), pre_matrix.mat()));
+  LibmeshPetscCall2(system.comm(), KSPSetFromOptions(ksp));
+  LibmeshPetscCall2(
+      system.comm(),
+      KSPSolve(ksp,
+               cast_ptr<PetscVector<Number> *>(sys.current_local_solution.get())->vec(),
+               cast_ptr<PetscVector<Number> *>(sys.rhs)->vec()));
+#endif
 
   // All done.
   return 0;
@@ -264,6 +242,8 @@ void assemble_poisson(EquationSystems & es,
 
   // The global system matrix
   SparseMatrix<Number> & matrix = system.get_system_matrix();
+  // The preconditioning matrix
+  auto & pre_matrix = system.get_matrix("preconditioner");
 
   // Now we will loop over all the elements in the mesh.
   // We will compute the element matrix and right-hand-side
@@ -465,7 +445,8 @@ void assemble_poisson(EquationSystems & es,
       // for this element.  Add them to the global matrix and
       // right-hand-side vector.  The  SparseMatrix::add_matrix()
       // and  NumericVector::add_vector() members do this for us.
-      matrix.add_matrix (Ke, dof_indices);
+      matrix.add_matrix(Ke, dof_indices);
+      pre_matrix.add_matrix(Ke, dof_indices);
       system.rhs->add_vector    (Fe, dof_indices);
     }
 
