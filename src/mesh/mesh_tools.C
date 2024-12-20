@@ -872,7 +872,7 @@ dof_id_type n_connected_components(const MeshBase & mesh,
   };
 
   auto add_to_component =
-    [&mesh, &find_component]
+    [&find_component]
     (std::unordered_set<const Node *> & component, const Node * n) {
 
     auto current_component = find_component(n);
