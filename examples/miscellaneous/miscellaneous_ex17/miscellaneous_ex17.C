@@ -148,7 +148,7 @@ int main (int argc, char ** argv)
   // solve
   solve();
   // reset the memory
-  sys_matrix.reset_memory();
+  // sys_matrix.reset_memory(); # See https://gitlab.com/petsc/petsc/-/merge_requests/8063
   pre_matrix.reset_memory();
   // zero
   sys_matrix.zero();
