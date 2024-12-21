@@ -147,6 +147,7 @@ int main (int argc, char ** argv)
 
   // solve
   solve();
+#if !PETSC_VERSION_LESS_THAN(3, 23, 0)
   // reset the memory
   // sys_matrix.reset_memory(); # See https://gitlab.com/petsc/petsc/-/merge_requests/8063
   pre_matrix.reset_memory();
@@ -160,6 +161,7 @@ int main (int argc, char ** argv)
   system.assemble();
   // resolve
   solve();
+#endif
 #endif
 
   // All done.
