@@ -29,14 +29,12 @@
 #include "libmesh/fe.h"
 
 // Define Gauss quadrature rules.
-#include "libmesh/petsc_solver_exception.h"
-#include "libmesh/petsc_vector.h"
 #include "libmesh/quadrature_gauss.h"
 
 // Define useful datatypes for finite element
 // matrix and vector components.
-#include "libmesh/petsc_matrix.h"
 #include "libmesh/numeric_vector.h"
+#include "libmesh/sparse_matrix.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/elem.h"
@@ -45,7 +43,13 @@
 // Define the DofMap, which handles degree of freedom
 // indexing.
 #include "libmesh/dof_map.h"
+
+#ifdef LIBMESH_HAVE_PETSC
+// include PETSc headers
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_vector.h"
 #include "petscksp.h"
+#endif
 
 #include <iostream>
 
@@ -64,9 +68,6 @@ int main (int argc, char ** argv)
 {
   // Initialize libraries, like in example 2.
   LibMeshInit init (argc, argv);
-
-  // This example requires a linear solver package.
-  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
   // Brief message to the user regarding the program name
   // and command line arguments.
@@ -113,8 +114,12 @@ int main (int argc, char ** argv)
   system.attach_assemble_function(assemble_poisson);
 
   // Add the preconditioner matrix
-  auto & pre_sparse_matrix = system.add_matrix("preconditioner");
-  pre_sparse_matrix.use_hash_table(true);
+  system.add_matrix("preconditioner");
+#ifdef LIBMESH_HAVE_PETSC
+#if PETSC_RELEASE_GREATER_EQUALS(3, 19, 0)
+  system.get_matrix("preconditioner").use_hash_table(true);
+#endif
+#endif
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -127,7 +132,7 @@ int main (int argc, char ** argv)
 
 #ifdef LIBMESH_HAVE_PETSC
   auto & sys_matrix = cast_ref<PetscMatrix<Number> &>(system.get_system_matrix());
-  auto & pre_matrix = cast_ref<PetscMatrix<Number> &>(pre_sparse_matrix);
+  auto & pre_matrix = cast_ref<PetscMatrix<Number> &>(system.get_matrix("preconditioner"));
   LibmeshPetscCall2(system.comm(), PetscOptionsSetValue(NULL, "-ksp_monitor", NULL));
 
   auto solve = [&sys_matrix, &pre_matrix, &system]() {
@@ -147,6 +152,9 @@ int main (int argc, char ** argv)
 
   // solve
   solve();
+
+  // MatResetHash added in PETSc version 3.23
+#if !PETSC_VERSION_LESS_THAN(3, 23, 0)
   // reset the memory
   // sys_matrix.reset_memory(); # See https://gitlab.com/petsc/petsc/-/merge_requests/8063
   pre_matrix.reset_memory();
@@ -160,6 +168,7 @@ int main (int argc, char ** argv)
   system.assemble();
   // resolve
   solve();
+#endif
 #endif
 
   // All done.
