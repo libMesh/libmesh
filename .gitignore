@@ -235,3 +235,7 @@ installed
 
 # Allow developers to use .clang-format without dirtying git
 .clang-format
+
+# VSCode related things
+.cache
+.vscode
