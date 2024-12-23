@@ -37,6 +37,10 @@ protected:
   {
     Mesh mesh(*TestCommWorld);
 
+    // We don't yet support n_connected_components() on distributed
+    // meshes
+    mesh.allow_remote_element_removal(false);
+
     MeshTools::Generation::build_line(mesh,
                                       n_elem,
                                       /*xmin=*/0.,
