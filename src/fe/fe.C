@@ -762,7 +762,7 @@ OutputShape fe_fdm_deriv(const Elem * elem,
   libmesh_assert_less (j, LIBMESH_DIM);
 
   // cheat by using finite difference approximations:
-  const Real eps = 1.e-6;
+  const Real eps = TOLERANCE;
   Point pp = p, pm = p;
 
   switch (j)
