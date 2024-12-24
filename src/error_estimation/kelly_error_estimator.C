@@ -101,8 +101,6 @@ KellyErrorEstimator::internal_side_integration ()
   Real error = 1.e-30;
   unsigned int n_qp = fe_fine->n_quadrature_points();
 
-  const std::vector<std::vector<RealGradient>> & dphi_coarse = fe_coarse->get_dphi();
-  const std::vector<std::vector<RealGradient>> & dphi_fine = fe_fine->get_dphi();
   const std::vector<Point> & face_normals = fe_fine->get_normals();
   const std::vector<Real> & JxW_face = fe_fine->get_JxW();
 
@@ -142,7 +140,6 @@ KellyErrorEstimator::boundary_side_integration ()
   const std::string & var_name =
     fine_context->get_system().variable_name(var);
 
-  const std::vector<std::vector<RealGradient>> & dphi_fine = fe_fine->get_dphi();
   const std::vector<Point> & face_normals = fe_fine->get_normals();
   const std::vector<Real> & JxW_face = fe_fine->get_JxW();
   const std::vector<Point> & qface_point = fe_fine->get_xyz();

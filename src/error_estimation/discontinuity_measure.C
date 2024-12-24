@@ -97,8 +97,6 @@ DiscontinuityMeasure::internal_side_integration ()
   Real error = 1.e-30;
   unsigned int n_qp = fe_fine->n_quadrature_points();
 
-  const std::vector<std::vector<Real>> & phi_coarse = fe_coarse->get_phi();
-  const std::vector<std::vector<Real>> & phi_fine = fe_fine->get_phi();
   const std::vector<Real> & JxW_face = fe_fine->get_JxW();
 
   for (unsigned int qp=0; qp != n_qp; ++qp)
@@ -136,7 +134,6 @@ DiscontinuityMeasure::boundary_side_integration ()
   const std::string & var_name =
     fine_context->get_system().variable_name(var);
 
-  const std::vector<std::vector<Real>> & phi_fine = fe_fine->get_phi();
   const std::vector<Real> & JxW_face = fe_fine->get_JxW();
   const std::vector<Point> & qface_point = fe_fine->get_xyz();
 
