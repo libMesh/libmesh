@@ -27,7 +27,6 @@
 #include "libmesh/dof_map.h"
 #include "libmesh/enum_norm_type.h"
 #include "libmesh/equation_systems.h"
-#include "libmesh/exact_solution.h"
 #include "libmesh/getpot.h"
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_tools.h"
@@ -43,6 +42,12 @@
 #include "libmesh/parallel_implementation.h"
 #include "libmesh/string_to_enum.h"
 
+// For error integration
+#include "libmesh/error_vector.h"
+#include "libmesh/exact_solution.h"
+#include "libmesh/discontinuity_measure.h"
+#include "libmesh/kelly_error_estimator.h"
+#include "libmesh/fourth_error_estimators.h"
 
 // C++ includes
 #include <memory>
@@ -56,22 +61,24 @@ using namespace libMesh;
 void usage_error(const char * progname)
 {
   libMesh::out << "Options: " << progname << '\n'
-               << " --dim d               mesh dimension            [default: autodetect]\n"
-               << " --inmesh    filename  input mesh file\n"
-               << " --inmat     filename  input constraint matrix   [default: none]\n"
-               << " --mattol    filename  constraint tolerance when testing mesh connectivity\n"
-               << "                                                 [default: 0]\n"
-               << " --insoln    filename  input solution file\n     [default: none]\n"
-               << " --calc      func      function to calculate\n"
-               << " --insys     sysnum    input system number       [default: 0]\n"
-               << " --outsoln   filename  output solution file      [default: out_<insoln>]\n"
-               << " --family    famname   output FEM family         [default: LAGRANGE]\n"
-               << " --order     p         output FEM order          [default: 1]\n"
-               << " --subdomain sbd_id    each subdomain to check   [default: all subdomains]\n"
-               << " --hilbert   order     Hilbert space to use      [default: 0 => H0]\n"
-               << " --fdm_eps   eps       Central diff for dfunc/dx [default: " << TOLERANCE << "]\n"
-               << " --error_q   extra_q   integrate projection error, with adjusted\n"
-               << "                       (extra) quadrature order  [default: off, suggested: 0]\n"
+               << " --dim d                mesh dimension              [default: autodetect]\n"
+               << " --inmesh     filename  input mesh file\n"
+               << " --inmat      filename  input constraint matrix     [default: none]\n"
+               << " --mattol     filename  constraint tolerance when testing mesh connectivity\n"
+               << "                                                    [default: 0]\n"
+               << " --insoln     filename  input solution file\n"
+               << " --calc       func      function to calculate\n"
+               << " --insys      sysnum    input system number         [default: 0]\n"
+               << " --outsoln    filename  output solution file        [default: out_<insoln>]\n"
+               << " --family     famname   output FEM family           [default: LAGRANGE]\n"
+               << " --order      p         output FEM order            [default: 1]\n"
+               << " --subdomain  sbd_id    each subdomain to check     [default: all subdomains]\n"
+               << " --hilbert    order     Hilbert space to project in [default: 0 => H0]\n"
+               << " --fdm_eps    eps       Central diff for dfunc/dx   [default: " << TOLERANCE << "]\n"
+               << " --error_q    extra_q   integrate projection error, with adjusted\n"
+               << "                       (extra) quadrature order     [default: off, suggested: 0]\n"
+               << " --jump_error order     calculate jump error indicator, for specified\n"
+               << "                       Hilbert order                [default: off]\n"
                << " --integral            only calculate func integral, not projection\n"
                << std::endl;
 
@@ -327,7 +334,7 @@ int main(int argc, char ** argv)
 
       new_sys.solve();
 
-      // Calculate the error if requested
+      // Integrate the error if requested
       if (cl.search(1, "--error_q"))
         {
           const unsigned int error_q = cl.next(0u);
@@ -362,6 +369,48 @@ int main(int argc, char ** argv)
                       exact_sol.h1_error(current_sys_name, var_name) <<
                       std::endl;
                 }
+            }
+        }
+
+      // Calculate the jump error indicator if requested
+      if (cl.search(1, "--jump_error"))
+        {
+          const unsigned int jump_error_hilbert = cl.next(0u);
+
+          for (auto v : make_range(new_sys.n_vars()))
+            {
+              std::unique_ptr<JumpErrorEstimator> error_estimator;
+              SystemNorm error_norm;
+              error_norm.set_weight(0,0);
+              error_norm.set_weight(v+1,0);
+              error_norm.set_weight(v,1.0);
+
+              if (jump_error_hilbert == 0)
+                {
+                  error_estimator = std::make_unique<DiscontinuityMeasure>();
+                  error_norm.set_type(v, L2);
+                }
+              else if (jump_error_hilbert == 1)
+                {
+                  error_estimator = std::make_unique<KellyErrorEstimator>();
+                  error_norm.set_type(v, H1_SEMINORM);
+                }
+              else if (jump_error_hilbert == 2)
+                {
+                  error_estimator = std::make_unique<LaplacianErrorEstimator>();
+                  error_norm.set_type(v, H2_SEMINORM);
+                }
+              else
+                libmesh_not_implemented();
+
+              ErrorVector error_per_cell;
+              error_estimator->error_norm = error_norm;
+              error_estimator->estimate_error(new_sys, error_per_cell);
+
+              const std::string var_name = new_sys.variable_name(v);
+              libMesh::out << "H" << jump_error_hilbert << " norm of " << var_name << ": " <<
+                std::reduce(error_per_cell.begin(), error_per_cell.end()) <<
+                std::endl;
             }
         }
 
