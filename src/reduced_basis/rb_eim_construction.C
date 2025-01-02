@@ -2959,8 +2959,12 @@ void RBEIMConstruction::scale_node_parametrized_function(NodeDataMap & local_pf,
 
 unsigned int RBEIMConstruction::get_random_int_0_to_n(unsigned int n)
 {
-  std::random_device seed;
-  std::mt19937 gen{seed()};
+  // std::random_device seed;
+  // std::mt19937 gen{seed()};
+  // We do not use a random seed here, since we generally prefer our results
+  // to reproducible, rather than fully random. If desired we could provide an
+  // option to use the random seed approach (commented out above).
+  std::default_random_engine gen;
   std::uniform_int_distribution<> dist{0, static_cast<int>(n)};
   return dist(gen);
 }
