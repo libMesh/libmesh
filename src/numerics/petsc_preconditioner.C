@@ -111,98 +111,28 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
   PetscErrorCode ierr = PetscObjectGetComm((PetscObject)pc, & comm);
   if (ierr != LIBMESH_PETSC_SUCCESS)
     libmesh_error_msg("Error retrieving communicator");
-  Parallel::Communicator communicator(comm);
+
+  #define CasePCSetType(PreconditionerType, PCType)                       \
+  case PreconditionerType:                                                \
+    LibmeshPetscCallA(comm, PCSetType (pc, const_cast<KSPType>(PCType))); \
+    break;
 
   switch (preconditioner_type)
     {
-    case IDENTITY_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCNONE)));
-      break;
-
-    case CHOLESKY_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCCHOLESKY)));
-      break;
-
-    case ICC_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCICC)));
-      break;
-
-    case ILU_PRECOND:
-      {
-        // In serial, just set the ILU preconditioner type
-        if (communicator.size())
-          LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCILU)));
-        else
-          {
-            // But PETSc has no truly parallel ILU, instead you have to set
-            // an actual parallel preconditioner (e.g. block Jacobi) and then
-            // assign ILU sub-preconditioners.
-            LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCBJACOBI)));
-
-            // Set ILU as the sub preconditioner type
-            set_petsc_subpreconditioner_type(PCILU, pc);
-          }
-        break;
-      }
-
-    case LU_PRECOND:
-      {
-        // In serial, just set the LU preconditioner type
-        if (communicator.size())
-          LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCLU)));
-        else
-          {
-            // But PETSc has no truly parallel LU, instead you have to set
-            // an actual parallel preconditioner (e.g. block Jacobi) and then
-            // assign LU sub-preconditioners.
-            LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCBJACOBI)));
-
-            // Set ILU as the sub preconditioner type
-            set_petsc_subpreconditioner_type(PCLU, pc);
-          }
-        break;
-      }
-
-    case ASM_PRECOND:
-      {
-        // In parallel, I think ASM uses ILU by default as the sub-preconditioner...
-        // I tried setting a different sub-preconditioner here, but apparently the matrix
-        // is not in the correct state (at this point) to call PCSetUp().
-        LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCASM)));
-        break;
-      }
-
-    case JACOBI_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCJACOBI)));
-      break;
-
-    case BLOCK_JACOBI_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCBJACOBI)));
-      break;
-
-    case SOR_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCSOR)));
-      break;
-
-    case EISENSTAT_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCEISENSTAT)));
-      break;
-
-    case AMG_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCHYPRE)));
-      break;
-
-    case SVD_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCSVD)));
-      break;
-
-    case USER_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCMAT)));
-      break;
-
-    case SHELL_PRECOND:
-      LibmeshPetscCall2(communicator, PCSetType (pc, const_cast<KSPType>(PCSHELL)));
-      break;
+    CasePCSetType(IDENTITY_PRECOND,     PCNONE)
+    CasePCSetType(CHOLESKY_PRECOND,     PCCHOLESKY)
+    CasePCSetType(ICC_PRECOND,          PCICC)
+    CasePCSetType(ILU_PRECOND,          PCILU)
+    CasePCSetType(LU_PRECOND,           PCLU)
+    CasePCSetType(ASM_PRECOND,          PCASM)
+    CasePCSetType(JACOBI_PRECOND,       PCJACOBI)
+    CasePCSetType(BLOCK_JACOBI_PRECOND, PCBJACOBI)
+    CasePCSetType(SOR_PRECOND,          PCSOR)
+    CasePCSetType(EISENSTAT_PRECOND,    PCEISENSTAT)
+    CasePCSetType(AMG_PRECOND,          PCHYPRE)
+    CasePCSetType(SVD_PRECOND,          PCSVD)
+    CasePCSetType(USER_PRECOND,         PCMAT)
+    CasePCSetType(SHELL_PRECOND,        PCSHELL)
 
     default:
       libMesh::err << "ERROR:  Unsupported PETSC Preconditioner: "
@@ -214,57 +144,12 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
   // HYPRE is available
 #ifdef LIBMESH_HAVE_PETSC_HYPRE
   if (preconditioner_type == AMG_PRECOND)
-    LibmeshPetscCall2(communicator, PCHYPRESetType(pc, "boomeramg"));
+    LibmeshPetscCallA(comm, PCHYPRESetType(pc, "boomeramg"));
 #endif
 
   // Let the commandline override stuff
-  LibmeshPetscCall2(communicator, PCSetFromOptions(pc));
+  LibmeshPetscCallA(comm, PCSetFromOptions(pc));
 }
-
-
-template <typename T>
-void PetscPreconditioner<T>::set_petsc_subpreconditioner_type(const PCType type, PC & pc)
-{
-  // get the communicator from the PETSc object
-  Parallel::communicator comm;
-  PetscErrorCode ierr = PetscObjectGetComm((PetscObject)pc, &comm);
-  if (ierr != LIBMESH_PETSC_SUCCESS)
-    libmesh_error_msg("Error retrieving communicator");
-
-  // All docs say must call KSPSetUp or PCSetUp before calling PCBJacobiGetSubKSP.
-  // You must call PCSetUp after the preconditioner operators have been set, otherwise you get the:
-  //
-  // "Object is in wrong state!"
-  // "Matrix must be set first."
-  //
-  // error messages...
-  LibmeshPetscCallA(comm, PCSetUp(pc));
-
-  // To store array of local KSP contexts on this processor
-  KSP * subksps;
-
-  // the number of blocks on this processor
-  PetscInt n_local;
-
-  // The global number of the first block on this processor.
-  // This is not used, so we just pass null instead.
-  // int first_local;
-
-  // Fill array of local KSP contexts
-  LibmeshPetscCallA(comm, PCBJacobiGetSubKSP(pc, &n_local, LIBMESH_PETSC_NULLPTR, &subksps));
-
-  // Loop over sub-ksp objects, set ILU preconditioner
-  for (PetscInt i=0; i<n_local; ++i)
-    {
-      // Get pointer to sub KSP object's PC
-      PC subpc;
-      LibmeshPetscCallA(comm, KSPGetPC(subksps[i], &subpc));
-
-      // Set requested type on the sub PC
-      LibmeshPetscCallA(comm, PCSetType(subpc, type));
-    }
-}
-
 
 
 
