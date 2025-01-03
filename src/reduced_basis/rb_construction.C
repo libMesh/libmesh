@@ -1478,7 +1478,8 @@ void RBConstruction::train_reduced_basis_with_POD()
   DenseMatrix<Number> VT( n_snapshots, n_snapshots );
   correlation_matrix.svd(sigma, U, VT );
 
-  libmesh_error_msg_if(sigma(0) == 0., "Zero singular value encountered in POD construction");
+  if (sigma(0) == 0.)
+    return;
 
   // Add dominant vectors from the POD as basis functions.
   unsigned int j = 0;
