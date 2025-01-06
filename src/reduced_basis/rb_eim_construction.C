@@ -624,7 +624,7 @@ void RBEIMConstruction::apply_normalization_to_solution_snapshots()
 {
   LOG_SCOPE("apply_normalization_to_solution_snapshots()", "RBEIMConstruction");
 
-  std::cout << "Normalizing solution snapshots" << std::endl;
+  libMesh::out << "Normalizing solution snapshots" << std::endl;
 
   bool apply_comp_scaling = !get_rb_eim_evaluation().scale_components_in_enrichment().empty();
   unsigned int n_snapshots = get_n_training_samples();

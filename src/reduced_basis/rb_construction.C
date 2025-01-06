@@ -1455,7 +1455,7 @@ void RBConstruction::train_reduced_basis_with_POD()
 
   if (normalize_solution_snapshots)
   {
-    std::cout << "Normalizing solution snapshots" << std::endl;
+    libMesh::out << "Normalizing solution snapshots" << std::endl;
     for (unsigned int i=0; i<n_snapshots; i++)
       {
         get_non_dirichlet_inner_product_matrix_if_avail()->vector_mult(
