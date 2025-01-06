@@ -72,7 +72,7 @@ void usage_error(const char * progname)
                << " --outsoln    filename  output solution file         [default: out_<insoln>]\n"
                << " --family     famname   output FEM family            [default: LAGRANGE]\n"
                << " --order      p         output FEM order             [default: 1]\n"
-               << " --subdomain  sbd_id    each subdomain to check      [default: all subdomains]\n"
+               << " --subdomain  \"sbd_ids\" each subdomain to check      [default: all subdomains]\n"
                << " --hilbert    order     Hilbert space to project in  [default: 0 => H0]\n"
                << " --fdm_eps    eps       Central diff for dfunc/dx    [default: " << TOLERANCE << "]\n"
                << " --error_q    extra_q   integrate projection error, with adjusted\n"
@@ -88,17 +88,16 @@ void usage_error(const char * progname)
 
 // Get an input argument, or print a help message if it's missing
 template <typename T>
-T assert_argument (GetPot & cl,
-                   const std::string & argname,
+T assert_argument (const std::string & argname,
                    const char * progname,
                    const T & defaultarg)
 {
-  if (!cl.search(argname))
+  if (!libMesh::on_command_line(argname))
     {
       libMesh::err << ("No " + argname + " argument found!") << std::endl;
       usage_error(progname);
     }
-  return cl.next(defaultarg);
+  return libMesh::command_line_next(argname, defaultarg);
 }
 
 
@@ -165,12 +164,10 @@ int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
-  GetPot cl(argc, argv);
-
   // In case the mesh file doesn't let us auto-infer dimension, we let
   // the user specify it on the command line
   const unsigned char requested_dim =
-    cast_int<unsigned char>(cl.follow(3, "--dim"));
+    cast_int<unsigned char>(libMesh::command_line_next("--dim", 3));
 
   // Load the old mesh from --inmesh filename.
   // Keep it serialized; we don't want elements on the new mesh to be
@@ -178,13 +175,13 @@ int main(int argc, char ** argv)
   Mesh old_mesh(init.comm(), requested_dim);
 
   const std::string meshname =
-    assert_argument(cl, "--inmesh", argv[0], std::string(""));
+    assert_argument("--inmesh", argv[0], std::string(""));
 
   libMesh::out << "Reading mesh " << meshname << std::endl;
   old_mesh.read(meshname);
 
   const std::string matname =
-    cl.follow(std::string(""), "--inmat");
+    libMesh::command_line_next("--inmat", std::string(""));
 
   if (matname != "")
     {
@@ -206,14 +203,16 @@ int main(int argc, char ** argv)
   // If we're not using a distributed mesh, this is cheap info to add
   if (old_mesh.is_serial_on_zero())
     {
-      const Real mat_tol = cl.follow(Real(0), "--mattol");
+      const Real mat_tol =
+        libMesh::command_line_next("--mattol", Real(0));
 
       const dof_id_type n_components =
         MeshTools::n_connected_components(old_mesh, mat_tol);
       libMesh::out << "Mesh has " << n_components << " connected components." << std::endl;
     }
 
-  const std::string solnname = cl.follow(std::string(""), "--insoln");
+  const std::string solnname =
+    libMesh::command_line_next("--insoln", std::string(""));
 
   // Load the old solution from --insoln filename, if that's been
   // specified.
@@ -221,12 +220,12 @@ int main(int argc, char ** argv)
   std::string current_sys_name = "new_sys";
 
   const std::string calcfunc =
-    assert_argument(cl, "--calc", argv[0], std::string(""));
+    assert_argument("--calc", argv[0], std::string(""));
 
   const std::string family =
-    cl.follow(std::string("LAGRANGE"), "--family");
+    libMesh::command_line_next("--family", std::string("LAGRANGE"));
 
-  const unsigned int order = cl.follow(1u, "--order");
+  const unsigned int order = libMesh::command_line_next("--order", 1u);
 
   std::unique_ptr<FEMFunctionBase<Number>> goal_function;
 
@@ -243,7 +242,7 @@ int main(int argc, char ** argv)
       old_es.print_info();
 
       const unsigned int sysnum =
-        cl.follow(0, "--insys");
+        libMesh::command_line_next("--insys", 0);
 
       libmesh_assert_less(sysnum, old_es.n_systems());
 
@@ -278,26 +277,21 @@ int main(int argc, char ** argv)
   libMesh::out << "Calculating with system " << current_sys_name << std::endl;
 
   // Subdomains to integrate on
-  std::set<libMesh::subdomain_id_type> subdomains_list;
-  cl.disable_loop();
-  while (cl.search(1, "--subdomain"))
-    {
-      subdomain_id_type tmp = Elem::invalid_subdomain_id;
-      tmp = cl.next(tmp);
-      subdomains_list.insert(tmp);
-    }
-  cl.enable_loop();
+  std::vector<libMesh::subdomain_id_type> subdomain_vec;
+  libMesh::command_line_vector("--subdomain", subdomain_vec);
+  std::set<libMesh::subdomain_id_type> subdomains_list(subdomain_vec.begin(),
+                                                       subdomain_vec.end());
 
   std::string default_outsolnname = "out_soln.xda";
   if (solnname != "")
     default_outsolnname = "out_"+solnname;
   const std::string outsolnname =
-    cl.follow(default_outsolnname, "--outsoln");
+    libMesh::command_line_next("--outsoln", default_outsolnname);
 
   // Output results in high precision
   libMesh::out << std::setprecision(std::numeric_limits<Real>::max_digits10);
 
-  if (!cl.search("--integral"))
+  if (!libMesh::on_command_line("--integral"))
     {
       // Create a new mesh and a new EquationSystems
       Mesh new_mesh(init.comm(), requested_dim);
@@ -307,7 +301,7 @@ int main(int argc, char ** argv)
 
       HilbertSystem & new_sys = new_es.add_system<HilbertSystem>(current_sys_name);
 
-      new_sys.hilbert_order() = cl.follow(0u, "--hilbert");
+      new_sys.hilbert_order() = libMesh::command_line_next("--hilbert", 0u);
 
       new_sys.subdomains_list() = std::move(subdomains_list);
 
@@ -319,7 +313,7 @@ int main(int argc, char ** argv)
 
       new_sys.set_goal_func(*goal_function);
 
-      Real fdm_eps = cl.follow(Real(TOLERANCE), "--fdm_eps");
+      const Real fdm_eps = libMesh::command_line_next("--fdm_eps", Real(TOLERANCE));
 
       new_sys.set_fdm_eps(fdm_eps);
 
@@ -336,9 +330,10 @@ int main(int argc, char ** argv)
       new_sys.solve();
 
       // Integrate the error if requested
-      if (cl.search(1, "--error_q"))
+      if (libMesh::on_command_line("--error_q"))
         {
-          const unsigned int error_q = cl.next(0u);
+          const unsigned int error_q =
+            libMesh::command_line_next("--error_q", 0u);
 
           // We just add "u" now but maybe we'll change that
           for (auto v : make_range(new_sys.n_vars()))
@@ -374,9 +369,10 @@ int main(int argc, char ** argv)
         }
 
       // Calculate the jump error indicator if requested
-      if (cl.search(1, "--jump_error"))
+      if (libMesh::on_command_line("--jump_error"))
         {
-          const unsigned int jump_error_hilbert = cl.next(0u);
+          const unsigned int jump_error_hilbert =
+            libMesh::command_line_next("--jump_error", 0u);
 
           for (auto v : make_range(new_sys.n_vars()))
             {
@@ -404,7 +400,7 @@ int main(int argc, char ** argv)
               else
                 libmesh_not_implemented();
 
-              if (cl.search(1, "--jump_slits"))
+              if (libMesh::on_command_line("--jump_slits"))
                 error_estimator->integrate_slits = true;
 
               ErrorVector error_per_cell;
