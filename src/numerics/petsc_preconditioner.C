@@ -227,6 +227,9 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
                        "Error retrieving communicator");
   Parallel::Communicator Comm(comm);
 
+  // The mesh/problem dimension
+  const unsigned dim = sys.get_mesh().mesh_dimension();
+
   // Dummy Lagrange system defined over the same mesh so we can enumerate the vertices
   System & lagrange_sys = sys.get_equation_systems().add_system<System>("__hypre_ams_vertices");
   lagrange_sys.hide_output() = true;
@@ -240,12 +243,17 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
   const dof_id_type n_glb_verts = lagrange_sys.n_dofs();
   const dof_id_type n_loc_verts = lagrange_sys.n_local_dofs();
 
-  // We require contiguous indexing through the edges: if the system has multiple
-  // variables/splits, we therefore effectively need to find local dof numbers
+  // We require local indexing through the vertices and contiguous indexing
+  // through the edges: since the vertices are enumerated on their own system,
+  // a local index can simply be obtained by subtracting those vertices in all
+  // preceding processors; for the edges, if the system we are given by the
+  // user has multiple variables/splits, we effectively need to add local edge
+  // numbers to those edges in all preceding processors
 
-  // The number of edges in all preceding processors
-  dof_id_signed_type edge_offset = std::reduce(n_all_edges.begin(),
-                                               n_all_edges.begin() + global_processor_id());
+  // The number of vertices and edges in all preceding processors
+  dof_id_signed_type vert_offset = -lagrange_sys.get_dof_map().first_dof();
+  dof_id_signed_type edge_offset =
+    std::reduce(n_all_edges.begin(), n_all_edges.begin() + global_processor_id());
 
   // Whether dofs are in variable-major or node-major order
   bool var_major = !libMesh::on_command_line("--node-major-dofs");
@@ -266,74 +274,62 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
   // Preallocate 2 diagonal + 2 off-diagonal nonzeros as the vertices could fall on either
   PetscMatrix<Real> G(Comm, n_glb_edges, n_glb_verts, n_loc_edges, n_loc_verts, 2, 2);
 
-  // Create vectors for the coordinates of the vertices
-  PetscVector<Real> x(Comm, n_glb_verts, n_loc_verts);
-  PetscVector<Real> y(Comm, n_glb_verts, n_loc_verts);
-  PetscVector<Real> z(Comm, n_glb_verts, n_loc_verts);
+  // Create array for the coordinates of the local vertices
+  PetscReal * coords;
+  LibmeshPetscCallA(comm, PetscMalloc1(dim * n_loc_verts, &coords));
 
-  // Create vectors for the mat-vec products, representing const vector fields in the Nédélec basis
-  PetscVector<Real> Gx(Comm, n_glb_edges, n_loc_edges);
-  PetscVector<Real> Gy(Comm, n_glb_edges, n_loc_edges);
-  PetscVector<Real> Gz(Comm, n_glb_edges, n_loc_edges);
-
-  // Populate the discrete gradient matrix and the coordinate vectors
+  // Populate the discrete gradient matrix and the coordinates array
   for (const auto & elem : sys.get_mesh().active_local_element_ptr_range())
     for (auto edge : make_range(elem->n_edges()))
     {
-      // The edge's first vertex: if owned, populate coordinate vectors
-      const Node & vert_node = elem->node_ref(elem->local_edge_node(edge, 0));
-      const dof_id_type vert_dof = vert_node.dof_number(lagrange_sys.number(), 0, 0);
-
-      if (vert_node.processor_id() == global_processor_id())
+      // The edge's two vertices
+      dof_id_type vert_dofs[2];
+      for (auto vert : make_range(2))
       {
-        x.set(vert_dof, vert_node(0));
-        y.set(vert_dof, vert_node(1));
-        z.set(vert_dof, vert_node(2));
+        const unsigned loc_vert_node_id = elem->local_edge_node(edge, vert);
+        const Node & vert_node = elem->node_ref(local_vert_node_id);
+        vert_dofs[vert] = vert_node.dof_number(lagrange_sys.number(), 0, 0);
+
+        // If owned, populate coordinates array
+        if (vert_node.processor_id() == global_processor_id())
+        {
+          const dof_id_type loc_vert_dof = vert_offset + vert_dofs[vert];
+
+          for (auto d : make_range(dim))
+            coords[dim * loc_vert_dof + d] = vert_node(d);
+        }
       }
 
-      // The edge's second vertex: if owned, populate coordinate vectors
-      const Node & wert_node = elem->node_ref(elem->local_edge_node(edge, 1));
-      const dof_id_type wert_dof = wert_node.dof_number(lagrange_sys.number(), 0, 0);
+      // The edge's (middle) node
+      const unsigned loc_edge_node_id = elem->local_edge_node(edge, 2);
+      const Node & edge_node = elem->node_ref(loc_edge_node_id);
 
-      if (wert_node.processor_id() == global_processor_id())
-      {
-        x.set(wert_dof, wert_node(0));
-        y.set(wert_dof, wert_node(1));
-        z.set(wert_dof, wert_node(2));
-      }
-
-      // The edge's (middle) node: if owned, populate discrete gradient matrix
-      const Node & edge_node = elem->node_ref(elem->local_edge_node(edge, 2));
-      const dof_id_type edge_dof = edge_node.dof_number(sys.number(), v, 0);
-
+      // If owned, populate discrete gradient matrix
       if (edge_node.processor_id() == global_processor_id())
       {
-        const dof_id_type seq_edge_dof = edge_offset +
+        const dof_id_type edge_dof = edge_node.dof_number(sys.number(), v, 0);
+
+        const dof_id_type cont_edge_dof = edge_offset +
           (var_major ? edge_dof
                      : std::distance(idx_edges.begin(),
                        std::find(idx_edges.begin(), idx_edges.end(), edge_dof)));
 
         const Real sign = elem->positive_edge_orientation(edge) ? 1 : -1;
 
-        G.set(seq_edge_dof, vert_dof,  sign);
-        G.set(seq_edge_dof, wert_dof, -sign);
+        G.set(cont_edge_dof, vert_dofs[0],  sign);
+        G.set(cont_edge_dof, vert_dofs[1], -sign);
       }
     }
 
-  // Assemble the discrete gradient matrix and the coordinate vectors
+  // Assemble the discrete gradient matrix
   G.close();
-  x.close();
-  y.close();
-  z.close();
 
-  // Compute the matrix-vector products
-  G.vector_mult(Gx, x);
-  G.vector_mult(Gy, y);
-  G.vector_mult(Gz, z);
-
-  // Hand over the matrix and vectors
+  // Hand over the matrix and coordinates array
   LibmeshPetscCallA(comm, PCHYPRESetDiscreteGradient(pc, G.mat()));
-  LibmeshPetscCallA(comm, PCHYPRESetEdgeConstantVectors(pc, Gx.vec(), Gy.vec(), Gz.vec()));
+  LibmeshPetscCallA(comm, PCSetCoordinates(pc, dim, n_loc_verts, coords));
+
+  // Free allocated memory for the coordinates array
+  LibmeshPetscCallA(comm, PetscFree(coords));
 }
 
 
