@@ -659,6 +659,11 @@ void ExactSolution::_compute_error(std::string_view sys_name,
       // Build a quadrature rule.
       q_rules[dim] = fe_type.default_quadrature_rule (dim, _extra_order);
 
+      // Disallow rules with negative weights.  That will use more
+      // quadrature points, but we're going to be taking square roots
+      // of element integral results here!
+      q_rules[dim]->allow_rules_with_negative_weights = false;
+
       // Construct finite element object
       fe_ptrs[dim] = FEGenericBase<OutputShape>::build(dim, fe_type);
 

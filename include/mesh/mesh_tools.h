@@ -281,6 +281,19 @@ unsigned int n_p_levels (const MeshBase & mesh);
 unsigned int paranoid_n_levels(const MeshBase & mesh);
 
 /**
+ * \returns The number of topologically connected components in the
+ * mesh, where a local connection is defined as two nodes connected to
+ * the same element, two elements connected to the same node, and/or
+ * two nodes connected by a constraint row; thus a connection can be
+ * made at a single vertex, not just at an element side.
+ *
+ * To count sufficiently weak constraint row coefficients as a
+ * lack-of-connection, set a constraint_tol greater than 0.
+ */
+dof_id_type n_connected_components(const MeshBase & mesh,
+                                   Real constraint_tol = 0);
+
+/**
  * Builds a set of node IDs for nodes which belong to non-subactive
  * elements.  Non-subactive elements are those which are either active
  * or inactive.  This is useful for determining which nodes should be
