@@ -61,25 +61,26 @@ using namespace libMesh;
 void usage_error(const char * progname)
 {
   libMesh::out << "Options: " << progname << '\n'
-               << " --dim d                mesh dimension              [default: autodetect]\n"
+               << " --dim        d         mesh dimension               [default: autodetect]\n"
                << " --inmesh     filename  input mesh file\n"
-               << " --inmat      filename  input constraint matrix     [default: none]\n"
+               << " --inmat      filename  input constraint matrix      [default: none]\n"
                << " --mattol     filename  constraint tolerance when testing mesh connectivity\n"
-               << "                                                    [default: 0]\n"
+               << "                                                     [default: 0]\n"
                << " --insoln     filename  input solution file\n"
                << " --calc       func      function to calculate\n"
-               << " --insys      sysnum    input system number         [default: 0]\n"
-               << " --outsoln    filename  output solution file        [default: out_<insoln>]\n"
-               << " --family     famname   output FEM family           [default: LAGRANGE]\n"
-               << " --order      p         output FEM order            [default: 1]\n"
-               << " --subdomain  sbd_id    each subdomain to check     [default: all subdomains]\n"
-               << " --hilbert    order     Hilbert space to project in [default: 0 => H0]\n"
-               << " --fdm_eps    eps       Central diff for dfunc/dx   [default: " << TOLERANCE << "]\n"
+               << " --insys      sysnum    input system number          [default: 0]\n"
+               << " --outsoln    filename  output solution file         [default: out_<insoln>]\n"
+               << " --family     famname   output FEM family            [default: LAGRANGE]\n"
+               << " --order      p         output FEM order             [default: 1]\n"
+               << " --subdomain  sbd_id    each subdomain to check      [default: all subdomains]\n"
+               << " --hilbert    order     Hilbert space to project in  [default: 0 => H0]\n"
+               << " --fdm_eps    eps       Central diff for dfunc/dx    [default: " << TOLERANCE << "]\n"
                << " --error_q    extra_q   integrate projection error, with adjusted\n"
-               << "                       (extra) quadrature order     [default: off, suggested: 0]\n"
+               << "                       (extra) quadrature order      [default: off, suggested: 0]\n"
                << " --jump_error order     calculate jump error indicator, for specified\n"
-               << "                       Hilbert order                [default: off]\n"
-               << " --integral            only calculate func integral, not projection\n"
+               << "                       Hilbert order                 [default: off]\n"
+               << " --jump_slits           calculate jumps across slits [default: off]\n"
+               << " --integral             only calculate func integral, not projection\n"
                << std::endl;
 
   exit(1);
@@ -403,12 +404,15 @@ int main(int argc, char ** argv)
               else
                 libmesh_not_implemented();
 
+              if (cl.search(1, "--jump_slits"))
+                error_estimator->integrate_slits = true;
+
               ErrorVector error_per_cell;
               error_estimator->error_norm = error_norm;
               error_estimator->estimate_error(new_sys, error_per_cell);
 
               const std::string var_name = new_sys.variable_name(v);
-              libMesh::out << "H" << jump_error_hilbert << " norm of " << var_name << ": " <<
+              libMesh::out << "H" << jump_error_hilbert << " error estimate for " << var_name << ": " <<
                 std::reduce(error_per_cell.begin(), error_per_cell.end()) <<
                 std::endl;
             }
