@@ -8,6 +8,10 @@
 #include <libmesh/linear_implicit_system.h>
 #include <libmesh/mesh_refinement.h>
 
+#include <libmesh/discontinuity_measure.h>
+#include <libmesh/error_vector.h>
+#include <libmesh/overlap_coupling.h>
+
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
@@ -302,6 +306,13 @@ public:
     _sys = &_es->add_system<System> ("SimpleSystem");
     _sys->add_variable("u", FIRST);
 
+    // We're going to be integrating across the slit in the mesh, so
+    // let's make sure we can *see* elements and data across the slit.
+    _mesh->allgather();
+    _sys->get_dof_map().add_algebraic_ghosting_functor
+      (std::make_shared<OverlapCoupling>());
+    _mesh->delete_remote_elements();
+
     _es->init();
     SlitFunc slitfunc;
     _sys->project_solution(&slitfunc);
@@ -365,6 +376,22 @@ public:
                                     TOLERANCE*TOLERANCE);
           }
       }
+
+    // We should have no discontinuities (beyond floating-point error)
+    // between topologically connected elements
+    DiscontinuityMeasure connected_dm;
+    ErrorVector connected_err;
+    connected_dm.estimate_error(*_sys, connected_err);
+    const Real mean_connected_disc = connected_err.mean();
+    CPPUNIT_ASSERT_LESS(1e-14, mean_connected_disc);
+
+    // We should be able to see the discontinuity along the slit
+    DiscontinuityMeasure slit_dm;
+    slit_dm.integrate_slits = true;
+    ErrorVector slit_disc;
+    slit_dm.estimate_error(*_sys, slit_disc);
+    const Real mean_slit_disc = slit_disc.mean();
+    CPPUNIT_ASSERT_GREATER(1e-3, mean_slit_disc);
   }
 
   void testRestart()
