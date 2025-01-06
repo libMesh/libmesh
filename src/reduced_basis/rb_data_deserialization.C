@@ -869,6 +869,135 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
   }
 
   unsigned int n_elems = rb_eim_evaluation_reader.getNElems();
+  bool build_elem_id_to_local_index_map = false;
+  // Interpolation points JxW all qp values
+  {
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_reader.getInterpolationJxWAllQp();
+
+    if (interpolation_points_list_outer.size() > 0)
+      {
+        if (n_elems != 0)
+          {
+            libmesh_error_msg_if(interpolation_points_list_outer.size() != n_elems,
+                                 "Size error while reading the eim JxW values.");
+
+            for (unsigned int i=0; i<n_elems; ++i)
+              {
+                auto interpolation_points_list_inner = interpolation_points_list_outer[i];
+
+                std::vector<Real> JxW(interpolation_points_list_inner.size());
+                for (unsigned int j=0; j<JxW.size(); j++)
+                  {
+                    JxW[j] = interpolation_points_list_inner[j];
+                  }
+                rb_eim_evaluation.add_interpolation_points_JxW_all_qp(JxW);
+              }
+          }
+        // Backward compatibility for existing qp based training data
+        // As we read in data for all qp, we only select the first one for elems
+        // (when we encounter the elem for the first time).
+        else
+          {
+            // We use the JxW_all_qp to determine whether or not we need to build
+            // the elem_id_to_local_index_map in backward compatibility mode as the map
+            // will be empty when deserializing (old training data format) and it
+            // is not always needed (optional). If JxW is provided then elem_id_to_local_index_map
+            // is needed. This flag is only used in backward compatibility mode but not
+            // in the most recent training data format.
+            build_elem_id_to_local_index_map = true;
+
+            auto interpolation_points_elem_id_list =
+              rb_eim_evaluation_reader.getInterpolationElemId();
+            std::set<dof_id_type> added_elem_id;
+
+            libmesh_error_msg_if(interpolation_points_list_outer.size() != n_bfs,
+                                 "Size error while reading the eim JxW values.");
+
+            for (unsigned int i=0; i<n_bfs; ++i)
+              {
+                dof_id_type elem_id = interpolation_points_elem_id_list[i];
+                if (const auto lookup = added_elem_id.find(elem_id); lookup == added_elem_id.end())
+                  {
+                    added_elem_id.emplace(elem_id);
+
+                    auto interpolation_points_list_inner = interpolation_points_list_outer[i];
+                    std::vector<Real> JxW(interpolation_points_list_inner.size());
+                    for (unsigned int j=0; j<JxW.size(); j++)
+                      {
+                        JxW[j] = interpolation_points_list_inner[j];
+                      }
+                    rb_eim_evaluation.add_interpolation_points_JxW_all_qp(JxW);
+                  }
+              }
+          }
+      }
+  }
+
+  // Interpolation points phi_i all qp values
+  {
+    auto interpolation_points_list_outer =
+      rb_eim_evaluation_reader.getInterpolationPhiValuesAllQp();
+
+    if (interpolation_points_list_outer.size() > 0)
+      {
+        if (n_elems != 0)
+          {
+            libmesh_error_msg_if(interpolation_points_list_outer.size() != n_elems,
+                                 "Size error while reading the eim phi_i all qp values.");
+
+            for (unsigned int i=0; i<n_elems; ++i)
+              {
+                auto interpolation_points_list_middle = interpolation_points_list_outer[i];
+
+                std::vector<std::vector<Real>> phi_i_all_qp(interpolation_points_list_middle.size());
+                for (auto j : index_range(phi_i_all_qp))
+                  {
+                    auto interpolation_points_list_inner = interpolation_points_list_middle[j];
+
+                    phi_i_all_qp[j].resize(interpolation_points_list_inner.size());
+                    for (auto k : index_range(phi_i_all_qp[j]))
+                      phi_i_all_qp[j][k] = interpolation_points_list_inner[k];
+                  }
+                rb_eim_evaluation.add_interpolation_points_phi_i_all_qp(phi_i_all_qp);
+              }
+          }
+        // Backward compatibility for existing qp based training data
+        // As we read in data for all qp, we only select the first one for elems
+        // (when we encounter the elem for the first time).
+        else
+          {
+            auto interpolation_points_elem_id_list =
+              rb_eim_evaluation_reader.getInterpolationElemId();
+            std::set<dof_id_type> added_elem_id;
+
+            libmesh_error_msg_if(interpolation_points_list_outer.size() != n_bfs,
+                                 "Size error while reading the eim JxW values.");
+
+            for (unsigned int i=0; i<n_bfs; ++i)
+              {
+                dof_id_type elem_id = interpolation_points_elem_id_list[i];
+                if (const auto lookup = added_elem_id.find(elem_id); lookup == added_elem_id.end())
+                  {
+                    added_elem_id.emplace(elem_id);
+
+                    auto interpolation_points_list_middle = interpolation_points_list_outer[i];
+                    std::vector<std::vector<Real>> phi_i_all_qp(interpolation_points_list_middle.size());
+                    for (auto j : index_range(phi_i_all_qp))
+                      {
+                        auto interpolation_points_list_inner = interpolation_points_list_middle[j];
+
+                        phi_i_all_qp[j].resize(interpolation_points_list_inner.size());
+                        for (auto k : index_range(phi_i_all_qp[j]))
+                          phi_i_all_qp[j][k] = interpolation_points_list_inner[k];
+                      }
+                    rb_eim_evaluation.add_interpolation_points_phi_i_all_qp(phi_i_all_qp);
+                  }
+              }
+          }
+      }
+  }
+
   // Elem id to local index map
   {
     auto elem_id_to_local_index_list =
@@ -884,56 +1013,27 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
             rb_eim_evaluation.add_elem_id_local_index_map_entry(elem_id_to_local_index_list[i].getFirst(), elem_id_to_local_index_list[i].getSecond());
           }
       }
-  }
-
-  // Interpolation points JxW all qp values
-  {
-    auto interpolation_points_list_outer =
-      rb_eim_evaluation_reader.getInterpolationJxWAllQp();
-
-    if (interpolation_points_list_outer.size() > 0)
+    // Create elem id to local index map if non-existent in training data set but
+    // required for backward compatibility purposes.
+    else if (build_elem_id_to_local_index_map)
       {
-        libmesh_error_msg_if(interpolation_points_list_outer.size() != n_elems,
-                             "Size error while reading the eim JxW values.");
+        auto interpolation_points_elem_id_list =
+          rb_eim_evaluation_reader.getInterpolationElemId();
+        std::set<dof_id_type> added_elem_id;
+        unsigned int local_index = 0;
 
-        for (unsigned int i=0; i<n_elems; ++i)
+        libmesh_error_msg_if(interpolation_points_elem_id_list.size() != n_bfs,
+                             "Size error while creating the eim elem id to local index map.");
+
+        for (unsigned int i=0; i<n_bfs; ++i)
           {
-            auto interpolation_points_list_inner = interpolation_points_list_outer[i];
-
-            std::vector<Real> JxW(interpolation_points_list_inner.size());
-            for (unsigned int j=0; j<JxW.size(); j++)
+            dof_id_type elem_id = interpolation_points_elem_id_list[i];
+            if (const auto lookup = added_elem_id.find(elem_id); lookup == added_elem_id.end())
               {
-                JxW[j] = interpolation_points_list_inner[j];
+                added_elem_id.emplace(elem_id);
+                rb_eim_evaluation.add_elem_id_local_index_map_entry(elem_id, local_index);
+                ++local_index;
               }
-            rb_eim_evaluation.add_interpolation_points_JxW_all_qp(JxW);
-          }
-      }
-  }
-
-  // Interpolation points phi_i all qp values
-  {
-    auto interpolation_points_list_outer =
-      rb_eim_evaluation_reader.getInterpolationPhiValuesAllQp();
-
-    if (interpolation_points_list_outer.size() > 0)
-      {
-        libmesh_error_msg_if(interpolation_points_list_outer.size() != n_elems,
-                             "Size error while reading the eim phi_i all qp values.");
-
-        for (unsigned int i=0; i<n_elems; ++i)
-          {
-            auto interpolation_points_list_middle = interpolation_points_list_outer[i];
-
-            std::vector<std::vector<Real>> phi_i_all_qp(interpolation_points_list_middle.size());
-            for (auto j : index_range(phi_i_all_qp))
-              {
-                auto interpolation_points_list_inner = interpolation_points_list_middle[j];
-
-                phi_i_all_qp[j].resize(interpolation_points_list_inner.size());
-                for (auto k : index_range(phi_i_all_qp[j]))
-                  phi_i_all_qp[j][k] = interpolation_points_list_inner[k];
-              }
-            rb_eim_evaluation.add_interpolation_points_phi_i_all_qp(phi_i_all_qp);
           }
       }
   }
@@ -945,33 +1045,89 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
     if (elem_center_dxyzdxi.size() > 0)
       {
-        libmesh_error_msg_if(elem_center_dxyzdxi.size() != n_elems,
-                             "Size error while reading the eim elem center tangent derivative dxyzdxi.");
-
-        Point dxyzdxi_buffer;
-        for (const auto i : make_range(n_elems))
+        if (n_elems != 0)
           {
-            load_point(elem_center_dxyzdxi[i], dxyzdxi_buffer);
-            rb_eim_evaluation.add_elem_center_dxyzdxi(dxyzdxi_buffer);
+            libmesh_error_msg_if(elem_center_dxyzdxi.size() != n_elems,
+                                 "Size error while reading the eim elem center tangent derivative dxyzdxi.");
+
+            Point dxyzdxi_buffer;
+            for (const auto i : make_range(n_elems))
+              {
+                load_point(elem_center_dxyzdxi[i], dxyzdxi_buffer);
+                rb_eim_evaluation.add_elem_center_dxyzdxi(dxyzdxi_buffer);
+              }
+          }
+        // Backward compatibility for existing qp based training data
+        // As we read in data for all qp, we only select the first one for elems
+        // (when we encounter the elem for the first time).
+        else
+          {
+            auto interpolation_points_elem_id_list =
+              rb_eim_evaluation_reader.getInterpolationElemId();
+            std::set<dof_id_type> added_elem_id;
+
+            libmesh_error_msg_if(elem_center_dxyzdxi.size() != n_bfs,
+                                 "Size error while reading the eim elem center tangent derivative dxyzdxi.");
+
+            Point dxyzdxi_buffer;
+            for (unsigned int i=0; i<n_bfs; ++i)
+              {
+                dof_id_type elem_id = interpolation_points_elem_id_list[i];
+                if (const auto lookup = added_elem_id.find(elem_id); lookup == added_elem_id.end())
+                  {
+                    added_elem_id.emplace(elem_id);
+
+                    load_point(elem_center_dxyzdxi[i], dxyzdxi_buffer);
+                    rb_eim_evaluation.add_elem_center_dxyzdxi(dxyzdxi_buffer);
+                  }
+              }
           }
       }
   }
 
-  // Dxyzdxi at the element center for the element that contains each interpolation point.
+  // Dxyzdeta at the element center for the element that contains each interpolation point.
   {
     auto elem_center_dxyzdeta =
       rb_eim_evaluation_reader.getInterpolationDxyzDetaElem();
 
     if (elem_center_dxyzdeta.size() > 0)
       {
-        libmesh_error_msg_if(elem_center_dxyzdeta.size() != n_elems,
-                             "Size error while reading the eim elem center tangent derivative dxyzdeta.");
-
-        Point dxyzdeta_buffer;
-        for (const auto i : make_range(n_elems))
+        if (n_elems != 0)
           {
-            load_point(elem_center_dxyzdeta[i], dxyzdeta_buffer);
-            rb_eim_evaluation.add_elem_center_dxyzdeta(dxyzdeta_buffer);
+            libmesh_error_msg_if(elem_center_dxyzdeta.size() != n_elems,
+                                 "Size error while reading the eim elem center tangent derivative dxyzdeta.");
+
+            Point dxyzdeta_buffer;
+            for (const auto i : make_range(n_elems))
+              {
+                load_point(elem_center_dxyzdeta[i], dxyzdeta_buffer);
+                rb_eim_evaluation.add_elem_center_dxyzdeta(dxyzdeta_buffer);
+              }
+          }
+        // Backward compatibility for existing qp based training data
+        // As we read in data for all qp, we only select the first one for elems
+        // (when we encounter the elem for the first time).
+        else
+          {
+            auto interpolation_points_elem_id_list =
+              rb_eim_evaluation_reader.getInterpolationElemId();
+            std::set<dof_id_type> added_elem_id;
+
+            libmesh_error_msg_if(elem_center_dxyzdeta.size() != n_bfs,
+                                 "Size error while reading the eim elem center tangent derivative dxyzdeta.");
+
+            Point dxyzdeta_buffer;
+            for (unsigned int i=0; i<n_bfs; ++i)
+              {
+                dof_id_type elem_id = interpolation_points_elem_id_list[i];
+                if (const auto lookup = added_elem_id.find(elem_id); lookup == added_elem_id.end())
+                  {
+                    added_elem_id.emplace(elem_id);
+
+                    load_point(elem_center_dxyzdeta[i], dxyzdeta_buffer);
+                    rb_eim_evaluation.add_elem_center_dxyzdeta(dxyzdeta_buffer);
+                  }
+              }
           }
       }
   }
@@ -983,12 +1139,38 @@ void load_rb_eim_evaluation_data(RBEIMEvaluation & rb_eim_evaluation,
 
     if (interpolation_points_qrule_order_list.size() > 0)
       {
-        libmesh_error_msg_if(interpolation_points_qrule_order_list.size() != n_elems,
-                             "Size error while reading the eim elem qrule order.");
-
-        for (unsigned int i=0; i<n_elems; ++i)
+        if (n_elems != 0)
           {
-            rb_eim_evaluation.add_interpolation_points_qrule_order(static_cast<Order>(interpolation_points_qrule_order_list[i]));
+            libmesh_error_msg_if(interpolation_points_qrule_order_list.size() != n_elems,
+                                 "Size error while reading the eim elem qrule order.");
+
+            for (unsigned int i=0; i<n_elems; ++i)
+              {
+                rb_eim_evaluation.add_interpolation_points_qrule_order(static_cast<Order>(interpolation_points_qrule_order_list[i]));
+              }
+          }
+        // Backward compatibility for existing qp based training data.
+        // As we read in data for all qp, we only select the first one for elems
+        // (when we encounter the elem for the first time).
+        else
+          {
+            auto interpolation_points_elem_id_list =
+              rb_eim_evaluation_reader.getInterpolationElemId();
+            std::set<dof_id_type> added_elem_id;
+
+            libmesh_error_msg_if(interpolation_points_qrule_order_list.size() != n_bfs,
+                                 "Size error while reading the eim elem qrule order.");
+
+            for (unsigned int i=0; i<n_bfs; ++i)
+              {
+                dof_id_type elem_id = interpolation_points_elem_id_list[i];
+                if (const auto lookup = added_elem_id.find(elem_id); lookup == added_elem_id.end())
+                  {
+                    added_elem_id.emplace(elem_id);
+
+                    rb_eim_evaluation.add_interpolation_points_qrule_order(static_cast<Order>(interpolation_points_qrule_order_list[i]));
+                  }
+              }
           }
       }
   }
