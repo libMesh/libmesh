@@ -74,8 +74,13 @@ DiscontinuityMeasure::init_context(FEMContext & c)
         {
           c.get_side_fe( v, side_fe, dim );
 
-          // We'll need values on both sides for discontinuity computation
+          // We'll need values and mapping Jacobians on both sides for
+          // discontinuity computation
           side_fe->get_phi();
+
+          // But we only need mapping Jacobians from one side
+          if (&c != coarse_context.get())
+            side_fe->get_JxW();
         }
     }
 }
