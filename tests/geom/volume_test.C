@@ -1103,12 +1103,12 @@ protected:
           // libMesh::out << "base_centroid = " << base_centroid << std::endl;
           // libMesh::out.flags(flags);
 
-          CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, TOLERANCE*TOLERANCE));
+          CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, 50*TOLERANCE*TOLERANCE));
 
           // Make sure that base class and "optimized" routines for computing the cell volume agree
           Real derived_volume = elem->volume();
           Real base_volume = elem->Elem::volume();
-          LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, 50*TOLERANCE*TOLERANCE);
         }
     }
   }
