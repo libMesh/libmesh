@@ -51,7 +51,6 @@
 
 // C++ includes
 #include <memory>
-#include <numeric>  // std::reduce
 #include <string>
 
 
@@ -409,9 +408,16 @@ int main(int argc, char ** argv)
               error_estimator->estimate_error(new_sys, error_per_cell);
 
               const std::string var_name = new_sys.variable_name(v);
+
+              // I really want to just stop supporting libstdc++-8.
+              // const Real total_error = std::reduce(error_per_cell.begin(), error_per_cell.end());
+
+              ErrorVectorReal total_error = 0;
+              for (auto cell_error : error_per_cell)
+                total_error += cell_error;
+
               libMesh::out << "H" << jump_error_hilbert << " error estimate for " << var_name << ": " <<
-                std::reduce(error_per_cell.begin(), error_per_cell.end()) <<
-                std::endl;
+                total_error << std::endl;
             }
         }
 
