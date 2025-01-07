@@ -180,6 +180,15 @@ void JumpErrorEstimator::estimate_error (const System & system,
   this->init_context(*fine_context);
   this->init_context(*coarse_context);
 
+  // If we're integrating jumps across mesh slits, then we'll need a
+  // point locator to find slits, and we'll need to integrate point by
+  // point on sides.
+  std::unique_ptr<PointLocatorBase> point_locator;
+  std::unique_ptr<const Elem> side_ptr;
+
+  if (integrate_slits)
+    point_locator = mesh.sub_point_locator();
+
   // Iterate over all the active elements in the mesh
   // that live on this processor.
   for (const auto & e : mesh.active_local_element_ptr_range())
@@ -364,6 +373,97 @@ void JumpErrorEstimator::estimate_error (const System & system,
                 } // end if (case1 || case2)
             } // if (e->neighbor(n_e) != nullptr)
 
+          // e might not have a neighbor_ptr, but might still have
+          // another element sharing its side.  This can happen in a
+          // mesh where solution continuity is maintained via nodal
+          // constraint rows.
+          else if (integrate_slits)
+            {
+              side_ptr = e->build_side_ptr(n_e);
+              std::set<const Elem *> candidate_elements;
+              (*point_locator)(side_ptr->vertex_average(), candidate_elements);
+
+              // We should have at least found ourselves...
+              libmesh_assert(candidate_elements.count(e));
+
+              // If we only found ourselves, this probably isn't a
+              // slit; we don't yet support meshes so non-conforming
+              // as to have overlap of part of an element side without
+              // overlap of its center.
+              if (candidate_elements.size() < 2)
+                continue;
+
+              FEType hardest_fe_type = fine_context->find_hardest_fe_type();
+
+              auto dim = e->dim();
+
+              auto side_qrule =
+                hardest_fe_type.unweighted_quadrature_rule
+                (dim-1, system.extra_quadrature_order);
+              auto side_fe = FEAbstract::build(dim, hardest_fe_type);
+              side_fe->attach_quadrature_rule(side_qrule.get());
+              const std::vector<Point> & qface_point = side_fe->get_xyz();
+              side_fe->reinit(e, n_e);
+
+              for (auto qp : make_range(side_qrule->n_points()))
+                {
+                  const Point p = qface_point[qp];
+                  const std::vector<Point> qp_pointvec(1, p);
+                  std::set<const Elem *> side_elements;
+                  (*point_locator)(side_ptr->vertex_average(), side_elements);
+
+                  // If we have multiple neighbors meeting here we'll just
+                  // take weighted jumps from all of them.
+                  //
+                  // We'll also do integrations from both sides of slits,
+                  // rather than try to figure out a disambiguation rule
+                  // that makes sense for non-conforming slits in general.
+                  // This means we want an extra factor of 0.5 on the
+                  // integrals to compensate for doubling them.
+                  const std::size_t n_neighbors = side_elements.size() - 1;
+                  const Real neighbor_frac = Real(1)/n_neighbors;
+
+                  const std::vector<Real>
+                    qp_weightvec(1, neighbor_frac * side_qrule->w(qp));
+
+                  for (const Elem * f : side_elements)
+                    {
+                      if (f == e)
+                        continue;
+
+                      coarse_context->pre_fe_reinit(system, f);
+                      fine_context->pre_fe_reinit(system, e);
+                      std::vector<Point> qp_coarse, qp_fine;
+                      for (unsigned int v=0; v<n_vars; v++)
+                        if (error_norm.weight(v) != 0.0 &&
+                            fine_context->get_system().variable_type(v).family != SCALAR)
+                          {
+                            FEBase * coarse_fe = coarse_context->get_side_fe(v, dim);
+                            if (qp_coarse.empty())
+                              FEMap::inverse_map (dim, f, qp_pointvec, qp_coarse);
+                            coarse_fe->reinit(f, &qp_coarse, &qp_weightvec);
+                            FEBase * fine_fe = fine_context->get_side_fe(v, dim);
+                            if (qp_fine.empty())
+                              FEMap::inverse_map (dim, e, qp_pointvec, qp_fine);
+                            fine_fe->reinit(e, &qp_fine, &qp_weightvec);
+                          }
+
+                      // Loop over all significant variables in the system
+                      for (var=0; var<n_vars; var++)
+                        if (error_norm.weight(var) != 0.0 &&
+                            system.variable_type(var).family != SCALAR)
+                          {
+                            this->internal_side_integration();
+
+                            error_per_cell[fine_context->get_elem().id()] +=
+                              static_cast<ErrorVectorReal>(fine_error);
+                            error_per_cell[coarse_context->get_elem().id()] +=
+                              static_cast<ErrorVectorReal>(coarse_error);
+                          }
+                    }
+                }
+            }
+
           // Otherwise, e is on the boundary.  If it happens to
           // be on a Dirichlet boundary, we need not do anything.
           // On the other hand, if e is on a Neumann (flux) boundary
@@ -374,6 +474,9 @@ void JumpErrorEstimator::estimate_error (const System & system,
           // BC function.
           else if (integrate_boundary_sides)
             {
+              if (integrate_slits)
+                libmesh_not_implemented();
+
               bool found_boundary_flux = false;
 
               for (var=0; var<n_vars; var++)
