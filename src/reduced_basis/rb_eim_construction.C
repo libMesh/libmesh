@@ -87,21 +87,6 @@ void add(DataMap & u, const Number k, const DataMap & v)
     }
 }
 
-// Implement u <- k*u
-template <typename DataMap>
-void scale(DataMap & u, const Number k)
-{
-  for (auto & it : u)
-    {
-      std::vector<std::vector<Number>> & outer_vec = it.second;
-      for (auto & inner_vec : outer_vec)
-        for (auto & value : inner_vec)
-          {
-            value *= k;
-          }
-    }
-}
-
 void add_node_data_map(RBEIMConstruction::NodeDataMap & u, const Number k, const RBEIMConstruction::NodeDataMap & v)
 {
   for (auto & [key, vec_u] : u)
@@ -113,18 +98,6 @@ void add_node_data_map(RBEIMConstruction::NodeDataMap & u, const Number k, const
       for (auto i : index_range(vec_u))
         {
           vec_u[i] += k*vec_v[i];
-        }
-    }
-}
-
-void scale_node_data_map(RBEIMConstruction::NodeDataMap & u, const Number k)
-{
-  for (auto & it : u)
-    {
-      std::vector<Number> & vec = it.second;
-      for (auto & value : vec)
-        {
-          value *= k;
         }
     }
 }
@@ -434,6 +407,9 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
 
 Real RBEIMConstruction::train_eim_approximation()
 {
+  if (_normalize_solution_snapshots)
+    apply_normalization_to_solution_snapshots();
+
   if(best_fit_type_flag == POD_BEST_FIT)
     {
       train_eim_approximation_with_POD();
@@ -644,6 +620,51 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
   return greedy_error;
 }
 
+void RBEIMConstruction::apply_normalization_to_solution_snapshots()
+{
+  LOG_SCOPE("apply_normalization_to_solution_snapshots()", "RBEIMConstruction");
+
+  libMesh::out << "Normalizing solution snapshots" << std::endl;
+
+  bool apply_comp_scaling = !get_rb_eim_evaluation().scale_components_in_enrichment().empty();
+  unsigned int n_snapshots = get_n_training_samples();
+  RBEIMEvaluation & rbe = get_rb_eim_evaluation();
+
+  for (unsigned int i=0; i<n_snapshots; i++)
+    {
+      if (rbe.get_parametrized_function().on_mesh_sides())
+        {
+          Real norm_val = std::sqrt(std::real(side_inner_product(
+            _local_side_parametrized_functions_for_training[i],
+            _local_side_parametrized_functions_for_training[i],
+            apply_comp_scaling)));
+
+          if (norm_val > 0.)
+            scale_parametrized_function(_local_side_parametrized_functions_for_training[i], 1./norm_val);
+        }
+      else if (rbe.get_parametrized_function().on_mesh_nodes())
+        {
+          Real norm_val = std::sqrt(std::real(node_inner_product(
+            _local_node_parametrized_functions_for_training[i],
+            _local_node_parametrized_functions_for_training[i],
+            apply_comp_scaling)));
+
+          if (norm_val > 0.)
+            scale_node_parametrized_function(_local_node_parametrized_functions_for_training[i], 1./norm_val);
+        }
+      else
+        {
+          Real norm_val = std::sqrt(std::real(inner_product(
+            _local_parametrized_functions_for_training[i],
+            _local_parametrized_functions_for_training[i],
+            apply_comp_scaling)));
+
+          if (norm_val > 0.)
+            scale_parametrized_function(_local_parametrized_functions_for_training[i], 1./norm_val);
+        }
+    }
+}
+
 Real RBEIMConstruction::train_eim_approximation_with_POD()
 {
   LOG_SCOPE("train_eim_approximation_with_POD()", "RBEIMConstruction");
@@ -823,13 +844,13 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           if (!is_zero_bf)
             {
-              scale(v, 0.);
+              scale_parametrized_function(v, 0.);
 
               for ( unsigned int i=0; i<n_snapshots; ++i )
                 add(v, U.el(i, j), _local_side_parametrized_functions_for_training[i] );
 
               Real norm_v = std::sqrt(sigma(j));
-              scale(v, 1./norm_v);
+              scale_parametrized_function(v, 1./norm_v);
             }
 
           libmesh_try
@@ -889,13 +910,13 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           if (!is_zero_bf)
             {
-              scale_node_data_map(v, 0.);
+              scale_node_parametrized_function(v, 0.);
 
               for ( unsigned int i=0; i<n_snapshots; ++i )
                 add_node_data_map(v, U.el(i, j), _local_node_parametrized_functions_for_training[i] );
 
               Real norm_v = std::sqrt(sigma(j));
-              scale_node_data_map(v, 1./norm_v);
+              scale_node_parametrized_function(v, 1./norm_v);
             }
 
           libmesh_try
@@ -955,13 +976,13 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
           if (!is_zero_bf)
             {
-              scale(v, 0.);
+              scale_parametrized_function(v, 0.);
 
               for ( unsigned int i=0; i<n_snapshots; ++i )
                 add(v, U.el(i, j), _local_parametrized_functions_for_training[i] );
 
               Real norm_v = std::sqrt(sigma(j));
-              scale(v, 1./norm_v);
+              scale_parametrized_function(v, 1./norm_v);
             }
 
           libmesh_try

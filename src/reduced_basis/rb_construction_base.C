@@ -98,6 +98,7 @@ RBConstructionBase<Base>::RBConstructionBase (EquationSystems & es,
   : Base(es, name_in, number_in),
     quiet_mode(true),
     serial_training_set(false),
+    _normalize_solution_snapshots(false),
     _training_parameters_initialized(false),
     _first_local_index(0),
     _n_local_training_samples(0),
@@ -140,6 +141,12 @@ void RBConstructionBase<Base>::get_global_max_error_pair(const Parallel::Communi
 
   // Then broadcast error_pair.first from proc_ID_index
   communicator.broadcast(error_pair.first, proc_ID_index);
+}
+
+template <class Base>
+void RBConstructionBase<Base>::set_normalize_solution_snapshots(bool value)
+{
+  _normalize_solution_snapshots = value;
 }
 
 template <class Base>

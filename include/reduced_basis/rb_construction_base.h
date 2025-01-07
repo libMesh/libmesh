@@ -107,6 +107,12 @@ public:
   { return this->quiet_mode; }
 
   /**
+   * Set the boolean option that indicates if we normalization
+   * solution snapshots or not.
+   */
+  void set_normalize_solution_snapshots(bool value);
+
+  /**
    * Get the number of global training samples.
    */
   numeric_index_type get_n_training_samples() const;
@@ -265,6 +271,14 @@ protected:
    * for example, we need the training set to be identical on all processors.
    */
   bool serial_training_set;
+
+  /**
+   * Set this boolean to true if we want to normalize solution snapshots
+   * used in training to have norm of 1. This is relevant if snapshots
+   * have differing magnitudes and we want to approximate them all with
+   * equal accuracy.
+   */
+  bool _normalize_solution_snapshots;
 
   /**
    * We keep an extra temporary vector that is useful for
