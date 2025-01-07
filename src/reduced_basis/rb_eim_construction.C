@@ -644,7 +644,7 @@ void RBEIMConstruction::apply_normalization_to_solution_snapshots()
         }
       else if (rbe.get_parametrized_function().on_mesh_nodes())
         {
-          Number norm_val = std::sqrt(std::real(node_inner_product(
+          Real norm_val = std::sqrt(std::real(node_inner_product(
             _local_node_parametrized_functions_for_training[i],
             _local_node_parametrized_functions_for_training[i],
             apply_comp_scaling)));
