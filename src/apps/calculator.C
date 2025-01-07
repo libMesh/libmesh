@@ -51,6 +51,7 @@
 
 // C++ includes
 #include <memory>
+#include <numeric>  // std::reduce
 #include <string>
 
 
