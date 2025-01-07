@@ -107,6 +107,12 @@ public:
   { return this->quiet_mode; }
 
   /**
+   * Set the boolean option that indicates if we normalization
+   * solution snapshots or not.
+   */
+  void set_normalize_solution_snapshots(bool value);
+
+  /**
    * Get the number of global training samples.
    */
   numeric_index_type get_n_training_samples() const;
@@ -272,7 +278,7 @@ protected:
    * have differing magnitudes and we want to approximate them all with
    * equal accuracy.
    */
-  bool normalize_solution_snapshots;
+  bool _normalize_solution_snapshots;
 
   /**
    * We keep an extra temporary vector that is useful for

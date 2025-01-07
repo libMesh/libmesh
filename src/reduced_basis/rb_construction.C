@@ -1453,7 +1453,7 @@ void RBConstruction::train_reduced_basis_with_POD()
     }
   libMesh::out << std::endl;
 
-  if (normalize_solution_snapshots)
+  if (_normalize_solution_snapshots)
   {
     libMesh::out << "Normalizing solution snapshots" << std::endl;
     for (unsigned int i=0; i<n_snapshots; i++)

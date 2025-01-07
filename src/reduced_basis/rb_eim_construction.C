@@ -407,7 +407,7 @@ void RBEIMConstruction::set_rb_construction_parameters(unsigned int n_training_s
 
 Real RBEIMConstruction::train_eim_approximation()
 {
-  if (normalize_solution_snapshots)
+  if (_normalize_solution_snapshots)
     apply_normalization_to_solution_snapshots();
 
   if(best_fit_type_flag == POD_BEST_FIT)
