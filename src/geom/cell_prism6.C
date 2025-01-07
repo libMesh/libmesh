@@ -623,8 +623,8 @@ void cell_integral(const Elem * elem, T & t)
   // Points of the 1D quadrature rule
   static const Real zeta[N1D] =
     {
-      -std::sqrt(3.)/3,
-      std::sqrt(3.)/3.
+      -std::sqrt(Real(3))/3,
+      std::sqrt(Real(3))/3.
     };
 
   for (int i=0; i<N2D; ++i)

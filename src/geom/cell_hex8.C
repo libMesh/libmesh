@@ -373,7 +373,7 @@ Point Hex8::centroid_from_points(
   // function (as defined on the [-1,1]^3 reference domain). We use
   // a quadrature rule which is exact for tri-cubics. The weights for
   // this rule are all equal to 1.
-  static const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
+  static const Real q[2] = {-std::sqrt(Real(3))/3, std::sqrt(Real(3))/3.};
 
   // Indices for computing tensor product basis functions. This is
   // copied from fe_lagrange_shape_3D.C
