@@ -44,7 +44,7 @@ void QJacobi::init_1D()
             _points.resize (1);
             _weights.resize(1);
 
-            _points[0](0)  = 1./3.;
+            _points[0](0)  = 1/Real(3);
 
             _weights[0]    = 0.5;
 
