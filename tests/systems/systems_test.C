@@ -604,7 +604,7 @@ public:
     for (const Node * node : mesh.node_ptr_range())
       CPPUNIT_ASSERT_EQUAL(dof_id_type(node->n_vars(0)), n_dofs);
 
-    std::vector<dof_id_type> each = sys.get_dof_map().n_dofs_on_each_processor(888);
+    std::vector<dof_id_type> each = sys.get_dof_map().n_dofs_per_processor(888);
     CPPUNIT_ASSERT_EQUAL(std::accumulate(each.begin(), each.end(), dof_id_type(0)), dof_id_type(5));
     CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_dofs(888), dof_id_type(5));
   }
