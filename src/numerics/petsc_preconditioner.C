@@ -287,6 +287,8 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
       for (auto vert : make_range(2))
       {
         const unsigned loc_vert_node_id = elem->local_edge_node(edge, vert);
+        libmesh_assert(elem->is_vertex(loc_vert_node_id));
+
         const Node & vert_node = elem->node_ref(loc_vert_node_id);
         vert_dofs[vert] = vert_node.dof_number(lagrange_sys.number(), 0, 0);
 
@@ -294,6 +296,7 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
         if (vert_node.processor_id() == global_processor_id())
         {
           const dof_id_type loc_vert_dof = vert_offset + vert_dofs[vert];
+          libmesh_assert(loc_vert_dof <  n_loc_verts);
 
           for (auto d : make_range(dim))
             coords[dim * loc_vert_dof + d] = vert_node(d);
@@ -302,6 +305,8 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
 
       // The edge's (middle) node
       const unsigned loc_edge_node_id = elem->local_edge_node(edge, 2);
+      libmesh_assert(elem->is_edge(loc_edge_node_id));
+
       const Node & edge_node = elem->node_ref(loc_edge_node_id);
 
       // If owned, populate discrete gradient matrix
@@ -316,6 +321,8 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
 
         const Real sign = elem->positive_edge_orientation(edge) ? 1 : -1;
 
+        libmesh_assert(cont_edge_dof >= G.row_start());
+        libmesh_assert(cont_edge_dof <  G.row_stop());
         G.set(cont_edge_dof, vert_dofs[0],  sign);
         G.set(cont_edge_dof, vert_dofs[1], -sign);
       }
@@ -423,12 +430,15 @@ void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const uns
         // Convert from face-wise to element-wise edge id
         const unsigned edge = elem->local_side_node(face, n_face_edges + face_edge)
                             - elem->n_vertices();
+        libmesh_assert(elem->is_edge_on_side(edge, face));
 
         // The edge's two vertices
         dof_id_type vert_dofs[2];
         for (auto vert : make_range(2))
         {
           const unsigned loc_vert_node_id = elem->local_edge_node(edge, vert);
+          libmesh_assert(elem->is_vertex(loc_vert_node_id));
+
           const Node & vert_node = elem->node_ref(loc_vert_node_id);
           vert_dofs[vert] = vert_node.dof_number(lagrange_sys.number(), 0, 0);
 
@@ -436,6 +446,7 @@ void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const uns
           if (vert_node.processor_id() == global_processor_id())
           {
             const dof_id_type loc_vert_dof = vert_offset + vert_dofs[vert];
+            libmesh_assert(loc_vert_dof <  n_loc_verts);
 
             for (auto d : make_range(dim))
               coords[dim * loc_vert_dof + d] = vert_node(d);
@@ -444,6 +455,8 @@ void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const uns
 
         // The edge's (middle) node
         const unsigned loc_edge_node_id = elem->local_edge_node(edge, 2);
+        libmesh_assert(elem->is_edge(loc_edge_node_id));
+
         const Node & edge_node = elem->node_ref(loc_edge_node_id);
         edge_dofs[face_edge] = edge_node.dof_number(nedelec_sys.number(), 0, 0);
         edge_orients[face_edge] = elem->positive_edge_orientation(edge) ^
@@ -454,6 +467,8 @@ void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const uns
         {
           const Real sign = elem->positive_edge_orientation(edge) ? 1 : -1;
 
+          libmesh_assert(edge_dofs[face_edge] >= G.row_start());
+          libmesh_assert(edge_dofs[face_edge] <  G.row_stop());
           G.set(edge_dofs[face_edge], vert_dofs[0],  sign);
           G.set(edge_dofs[face_edge], vert_dofs[1], -sign);
         }
@@ -461,6 +476,8 @@ void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const uns
 
       // The faces's (middle) node
       const unsigned loc_face_node_id = elem->local_side_node(face, 2 * n_face_edges);
+      libmesh_assert(elem->is_face(loc_face_node_id));
+
       const Node & face_node = elem->node_ref(loc_face_node_id);
 
       // If owned, populate discrete curl matrix
@@ -479,6 +496,8 @@ void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const uns
         {
           const Real sign = face_orient ^ edge_orients[face_edge] ? 1 : -1;
 
+          libmesh_assert(cont_face_dof >= C.row_start());
+          libmesh_assert(cont_face_dof <  C.row_stop());
           C.set(cont_face_dof, edge_dofs[face_edge], sign);
         }
       }
@@ -487,6 +506,13 @@ void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const uns
   // Assemble the discrete gradient and discrete curl matrices
   G.close();
   C.close();
+
+#ifndef NDEBUG
+  // The product CG of the two matrices should be the zero matrix
+  PetscMatrix<Real> CG(Comm);
+  C.matrix_matrix_mult(G, CG);
+  libmesh_assert(CG.linfty_norm() == 0);
+#endif
 
   // Hand over the matrices and coordinates array
   LibmeshPetscCallA(comm, PCHYPRESetDiscreteGradient(pc, G.mat()));
