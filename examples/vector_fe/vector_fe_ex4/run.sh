@@ -6,17 +6,17 @@
 
 example_name=vector_fe_ex4
 
-# Note: these problems are particularly ill-conditioned, and common
-# preconditioners like ILU don't all work very well.  We currently
-# force Jacobi in these examples.
+# Note: these problems are particularly ill-conditioned, so we use a robust
+# preconditioner, hypre AMS.
 
-options="element_type=TET10 -pc_type jacobi"
+options="element_type=TET10 -pc_type hypre -pc_hypre_type ams"
 run_example_no_extra_options "$example_name" "$options"
 
-options="element_type=HEX20 -pc_type jacobi"
+options="element_type=TET14 -pc_type hypre -pc_hypre_type ams"
 run_example_no_extra_options "$example_name" "$options"
 
-options="element_type=HEX27 -pc_type jacobi"
+options="element_type=HEX20 -pc_type hypre -pc_hypre_type ams"
 run_example_no_extra_options "$example_name" "$options"
 
-# No benchmark until we decide what to do about no_extra_options there
+options="element_type=HEX27 -pc_type hypre -pc_hypre_type ams"
+run_example_no_extra_options "$example_name" "$options"

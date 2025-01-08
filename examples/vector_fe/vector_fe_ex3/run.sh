@@ -6,19 +6,19 @@
 
 example_name=vector_fe_ex3
 
-# Note: these problems are particularly ill-conditioned, so we currently
-# resort to a direct solver.
+# Note: these problems are particularly ill-conditioned, so we use a robust
+# preconditioner, hypre AMS, or a direct solver, LU, for higher order.
 
-options="element_type=TRI6 -pc_type lu"
+options="element_type=TRI6 -pc_type hypre -pc_hypre_type ams"
 run_example_no_extra_options "$example_name" "$options"
 
-options="element_type=TRI7 -pc_type lu"
+options="element_type=TRI7 -pc_type hypre -pc_hypre_type ams"
 run_example_no_extra_options "$example_name" "$options"
 
-options="element_type=QUAD8 -pc_type lu"
+options="element_type=QUAD8 -pc_type hypre -pc_hypre_type ams"
 run_example_no_extra_options "$example_name" "$options"
 
-options="element_type=QUAD9 -pc_type lu"
+options="element_type=QUAD9 -pc_type hypre -pc_hypre_type ams"
 run_example_no_extra_options "$example_name" "$options"
 
 options="element_type=QUAD9 grid_size=5 refine=2 -pc_type lu"
