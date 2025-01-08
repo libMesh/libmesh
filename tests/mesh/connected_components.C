@@ -5,6 +5,7 @@
 #include <libmesh/mesh.h>
 #include <libmesh/node.h>
 #include <libmesh/sparse_matrix.h>
+#include <libmesh/system.h>
 
 #include <timpi/parallel_implementation.h>
 
@@ -24,9 +25,16 @@ class ConnectedComponentsTest : public CppUnit::TestCase
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( ConnectedComponentsTest );
 
+  /**
+   * These tests require a valid solver package to be enabled because
+   * they build a SparseMatrix.
+   * Note: LIBMESH_HAVE_SOLVER is actually defined in libmesh/system.h
+   */
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testEdge2 );
   CPPUNIT_TEST( testEdge3 );
   CPPUNIT_TEST( testEdge4 );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
