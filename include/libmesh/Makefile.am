@@ -136,6 +136,8 @@ BUILT_SOURCES = \
         face_inf_quad.h \
         face_inf_quad4.h \
         face_inf_quad6.h \
+        face_polygon.h \
+        face_polygon1.h \
         face_quad.h \
         face_quad4.h \
         face_quad4_shell.h \
@@ -997,6 +999,12 @@ face_inf_quad4.h: $(top_srcdir)/include/geom/face_inf_quad4.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_inf_quad6.h: $(top_srcdir)/include/geom/face_inf_quad6.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_polygon.h: $(top_srcdir)/include/geom/face_polygon.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_polygon1.h: $(top_srcdir)/include/geom/face_polygon1.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad.h: $(top_srcdir)/include/geom/face_quad.h

@@ -146,6 +146,8 @@ include_HEADERS =  \
         geom/face_inf_quad.h \
         geom/face_inf_quad4.h \
         geom/face_inf_quad6.h \
+        geom/face_polygon.h \
+        geom/face_polygon1.h \
         geom/face_quad.h \
         geom/face_quad4.h \
         geom/face_quad4_shell.h \
