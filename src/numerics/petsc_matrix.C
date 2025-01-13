@@ -466,7 +466,8 @@ std::unique_ptr<SparseMatrix<T>> PetscMatrix<T>::clone () const
 
 
 template <typename T>
-Real PetscMatrix<T>::l1_norm () const
+template <NormType N>
+Real PetscMatrix<T>::norm () const
 {
   libmesh_assert (this->initialized());
 
@@ -477,32 +478,26 @@ Real PetscMatrix<T>::l1_norm () const
 
   libmesh_assert (this->closed());
 
-  LibmeshPetscCall(MatNorm(this->_mat, NORM_1, &petsc_value));
+  LibmeshPetscCall(MatNorm(this->_mat, N, &petsc_value));
 
   value = static_cast<Real>(petsc_value);
 
   return value;
 }
-
-
-
+template <typename T>
+Real PetscMatrix<T>::l1_norm () const
+{
+  return PetscMatrix<T>::norm<NORM_1>();
+}
+template <typename T>
+Real PetscMatrix<T>::frobenius_norm () const
+{
+  return PetscMatrix<T>::norm<NORM_FROBENIUS>();
+}
 template <typename T>
 Real PetscMatrix<T>::linfty_norm () const
 {
-  libmesh_assert (this->initialized());
-
-  semiparallel_only();
-
-  PetscReal petsc_value;
-  Real value;
-
-  libmesh_assert (this->closed());
-
-  LibmeshPetscCall(MatNorm(this->_mat, NORM_INFINITY, &petsc_value));
-
-  value = static_cast<Real>(petsc_value);
-
-  return value;
+  return PetscMatrix<T>::norm<NORM_INFINITY>();
 }
 
 

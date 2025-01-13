@@ -54,54 +54,37 @@ T PetscVector<T>::sum () const
 }
 
 
+
+template <typename T>
+template <NormType N>
+Real PetscVector<T>::norm () const
+{
+  parallel_object_only();
+
+  this->_restore_array();
+  libmesh_assert(this->closed());
+
+  PetscReal value=0.;
+
+  LibmeshPetscCall(VecNorm (_vec, N, &value));
+
+  return static_cast<Real>(value);
+}
 template <typename T>
 Real PetscVector<T>::l1_norm () const
 {
-  this->_restore_array();
-  libmesh_assert(this->closed());
-
-  PetscReal value=0.;
-
-  LibmeshPetscCall(VecNorm (_vec, NORM_1, &value));
-
-  return static_cast<Real>(value);
+  return PetscVector<T>::norm<NORM_1>();
 }
-
-
-
 template <typename T>
 Real PetscVector<T>::l2_norm () const
 {
-  parallel_object_only();
-
-  this->_restore_array();
-  libmesh_assert(this->closed());
-
-  PetscReal value=0.;
-
-  LibmeshPetscCall(VecNorm (_vec, NORM_2, &value));
-
-  return static_cast<Real>(value);
+  return PetscVector<T>::norm<NORM_2>();
 }
-
-
-
-
 template <typename T>
 Real PetscVector<T>::linfty_norm () const
 {
-  parallel_object_only();
-
-  this->_restore_array();
-  libmesh_assert(this->closed());
-
-  PetscReal value=0.;
-
-  LibmeshPetscCall(VecNorm (_vec, NORM_INFINITY, &value));
-
-  return static_cast<Real>(value);
+  return PetscVector<T>::norm<NORM_INFINITY>();
 }
-
 
 
 

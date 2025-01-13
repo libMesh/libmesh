@@ -242,6 +242,8 @@ public:
 
   virtual Real l1_norm () const override;
 
+  virtual Real frobenius_norm () const;
+
   virtual Real linfty_norm () const override;
 
   /**
@@ -359,6 +361,14 @@ private:
 #else
   mutable Threads::spin_mutex _petsc_matrix_mutex;
 #endif
+
+  /**
+   * \returns A norm of the matrix, where the type of norm to compute is
+   * determined by the template parameter N of the PETSc-defined type NormType.
+   * The valid template arguments are NORM_1, NORM_FROBENIUS and NORM_INFINITY,
+   * as used to define l1_norm(), frobenius_norm() and linfty_norm().
+   */
+  template <NormType N> Real norm () const;
 
   friend class ::PetscMatrixTest;
 };
