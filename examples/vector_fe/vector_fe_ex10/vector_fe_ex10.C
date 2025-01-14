@@ -1,5 +1,5 @@
 // The libMesh Finite Element Library.
-// Copyright (C) 2002-2025 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+// Copyright (C) 2002-2024 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
 
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -16,14 +16,12 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// <h1>Vector Finite Elements Example 6 - Raviart-Thomas elements (div-grad)</h1>
+// <h1>Vector Finite Elements Example 10 - Raviart-Thomas elements (grad-div)</h1>
 // \author Nuno Nobre
-// \date 2023
+// \date 2025
 //
-// This example uses Raviart-Thomas elements to solve a model div-grad problem
-// in H(div) in both 2d and 3d. The problem is simply a div-grad formulation,
-// \vec{u} = -\nabla p, and \nabla \cdot \vec{u} = f, of the Poisson
-// problem in Introduction Example 3, \nabla^2 p = -f.
+// This example uses Raviart-Thomas elements to solve a model grad-div problem
+// in H(div) in both 2d and 3d: -\nabla (\nabla \cdot \vec{u}) + \vec{u} = f.
 
 // Basic utilities.
 #include "libmesh/string_to_enum.h"
@@ -70,12 +68,12 @@
 using namespace libMesh;
 
 // Function prototype. This is the function that will assemble
-// the linear system for our div-grad problem. Note that the
+// the linear system for our grad-div problem. Note that the
 // function will take the EquationSystems object and the
 // name of the system we are assembling as input. From the
 // EquationSystems object we have access to the Mesh and
 // other objects we might need.
-void assemble_divgrad(EquationSystems & es,
+void assemble_graddiv(EquationSystems & es,
                       const std::string & system_name);
 
 int main (int argc, char ** argv)
@@ -88,7 +86,7 @@ int main (int argc, char ** argv)
                            "--enable-petsc, --enable-trilinos, or --enable-eigen");
 
   // Parse the input file.
-  GetPot infile("vector_fe_ex6.in");
+  GetPot infile("vector_fe_ex10.in");
 
   // But allow the command line to override it.
   infile.parse_command_line(argc, argv);
@@ -115,12 +113,6 @@ int main (int argc, char ** argv)
                        " but this example must be run with TRI6, TRI7, QUAD8, or QUAD9 in 2d" <<
                        " or with TET14, or HEX27 in 3d.");
 
-  const std::string bc_str = infile("boundary_condition", std::string("neumann"));
-  libmesh_error_msg_if(
-      (bc_str != "neumann") && (bc_str != "dirichlet"),
-      "You selected '" << bc_str << "', however, the valid options are 'dirichlet' or 'neumann'");
-  const bool neumann = (bc_str == "neumann");
-
   if (dimension == 2)
     MeshTools::Generation::build_square (mesh,
                                          grid_size,
@@ -146,32 +138,24 @@ int main (int argc, char ** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  equation_systems.parameters.set<bool>("neumann") = neumann;
 
-  // Declare the system  "DivGrad" and its variables.
-  LinearImplicitSystem & system = equation_systems.add_system<LinearImplicitSystem>("DivGrad");
+  // Declare the system  "GradDiv" and its variable.
+  LinearImplicitSystem & system = equation_systems.add_system<LinearImplicitSystem>("GradDiv");
 
-  // Set the FE approximation order for the vector and field variables.
+  // Set the FE approximation order for the vector field variable.
   const Order vector_order = static_cast<Order>(infile("order", 1u));
-  const Order scalar_order = static_cast<Order>(vector_order - 1u);
 
   libmesh_error_msg_if(vector_order < FIRST || vector_order > ((dimension == 3) ? FIRST : FIFTH),
                        "You selected: " << vector_order <<
                        " but this example must be run with either 1 <= order <= 5 in 2d"
                        " or with order 1 in 3d.");
 
-  // Adds the variables "u" and "p" to "DivGrad". "u" will be our vector field
-  // whereas "p" will be the scalar field.
+  // Adds the variable "u" to "GradDiv". "u" will be our vector field.
   system.add_variable("u", vector_order, RAVIART_THOMAS);
-  system.add_variable("p", scalar_order, scalar_order == CONSTANT ? MONOMIAL : L2_HIERARCHIC);
-
-  // Add a scalar Lagrange multiplier to remove the nullspace if imposing the Neumann condition.
-  if (neumann)
-    system.add_variable("l", FIRST, SCALAR);
 
   // Give the system a pointer to the matrix assembly
   // function. This will be called when needed by the library.
-  system.attach_assemble_function(assemble_divgrad);
+  system.attach_assemble_function(assemble_graddiv);
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
@@ -179,62 +163,41 @@ int main (int argc, char ** argv)
   // Prints information about the system to the screen.
   equation_systems.print_info();
 
-  // Solve the system "DivGrad". Note that calling this
+  // Solve the system "GradDiv". Note that calling this
   // member will assemble the linear system and invoke
   // the default numerical solver.
   system.solve();
 
   ExactSolution exact_sol(equation_systems);
 
-  if (dimension == 2)
-    {
-      SolutionFunction<2> soln_func;
-      SolutionGradient<2> soln_grad;
+  SolutionFunction soln_func;
+  SolutionGradient soln_grad;
 
-      // Build FunctionBase* containers to attach to the ExactSolution object.
-      std::vector<FunctionBase<Number> *> sols(1, &soln_func);
-      std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
+  // Build FunctionBase* containers to attach to the ExactSolution object.
+  std::vector<FunctionBase<Number> *> sols(1, &soln_func);
+  std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
 
-      exact_sol.attach_exact_values(sols);
-      exact_sol.attach_exact_derivs(grads);
-    }
-  else if (dimension == 3)
-    {
-      SolutionFunction<3> soln_func;
-      SolutionGradient<3> soln_grad;
-
-      // Build FunctionBase* containers to attach to the ExactSolution object.
-      std::vector<FunctionBase<Number> *> sols(1, &soln_func);
-      std::vector<FunctionBase<Gradient> *> grads(1, &soln_grad);
-
-      exact_sol.attach_exact_values(sols);
-      exact_sol.attach_exact_derivs(grads);
-    }
+  exact_sol.attach_exact_values(sols);
+  exact_sol.attach_exact_derivs(grads);
 
   // Use higher quadrature order for more accurate error results.
   int extra_error_quadrature = infile("extra_error_quadrature", 2);
   exact_sol.extra_quadrature_order(extra_error_quadrature);
 
   // Compute the error.
-  exact_sol.compute_error("DivGrad", "u");
-  exact_sol.compute_error("DivGrad", "p");
+  exact_sol.compute_error("GradDiv", "u");
 
   // Print out the error values.
   libMesh::out << "~~ Vector field (u) ~~"
                << std::endl;
   libMesh::out << "L2 error is: "
-               << exact_sol.l2_error("DivGrad", "u")
+               << exact_sol.l2_error("GradDiv", "u")
                << std::endl;
   libMesh::out << "HDiv semi-norm error is: "
-               << exact_sol.error_norm("DivGrad", "u", HDIV_SEMINORM)
+               << exact_sol.error_norm("GradDiv", "u", HDIV_SEMINORM)
                << std::endl;
   libMesh::out << "HDiv error is: "
-               << exact_sol.hdiv_error("DivGrad", "u")
-               << std::endl;
-  libMesh::out << "~~ Scalar field (p) ~~"
-               << std::endl;
-  libMesh::out << "L2 error is: "
-               << exact_sol.l2_error("DivGrad", "p")
+               << exact_sol.hdiv_error("GradDiv", "u")
                << std::endl;
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -251,20 +214,17 @@ int main (int argc, char ** argv)
 
 
 // We now define the matrix assembly function for the
-// div-grad system. We need to first compute element
+// grad-div system. We need to first compute element
 // matrices and right-hand sides, and then take into
 // account the boundary conditions, which will be handled
 // via a penalty method.
-void assemble_divgrad(EquationSystems & es,
+void assemble_graddiv(EquationSystems & es,
                       const std::string & libmesh_dbg_var(system_name))
 {
 
   // It is a good idea to make sure we are assembling
   // the proper system.
-  libmesh_assert_equal_to (system_name, "DivGrad");
-
-  // Retrieve our boundary condition type. If not Neumann, then it is Dirichlet.
-  const bool neumann = es.parameters.get<bool>("neumann");
+  libmesh_assert_equal_to (system_name, "GradDiv");
 
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
@@ -273,7 +233,7 @@ void assemble_divgrad(EquationSystems & es,
   const unsigned int dim = mesh.mesh_dimension();
 
   // Get a reference to the LinearImplicitSystem we are solving.
-  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("DivGrad");
+  LinearImplicitSystem & system = es.get_system<LinearImplicitSystem>("GradDiv");
 
   // A reference to the  DofMap object for this system.  The  DofMap
   // object handles the index translation from node and element numbers
@@ -281,25 +241,22 @@ void assemble_divgrad(EquationSystems & es,
   const DofMap & dof_map = system.get_dof_map();
 
   // Get a constant reference to the Finite Element type
-  // for the two variables in the system.
+  // for the variable in the system.
   FEType vector_fe_type = dof_map.variable_type(system.variable_number("u"));
-  FEType scalar_fe_type = dof_map.variable_type(system.variable_number("p"));
 
-  // Build two Finite Element objects, one of each specified type. Since the
+  // Build the Finite Element object. Since the
   // FEBase::build() member dynamically creates memory we will
   // store the object as a std::unique_ptr<FEBase>. This can be thought
   // of as a pointer that will clean up after itself. Introduction Example 4
   // describes some advantages of  std::unique_ptr's in the context of
   // quadrature rules.
   std::unique_ptr<FEVectorBase> vector_fe (FEVectorBase::build(dim, vector_fe_type));
-  std::unique_ptr<FEBase> scalar_fe (FEBase::build(dim, scalar_fe_type));
 
   // A just-high-enough Gauss quadrature rule for numerical integration.
   QGauss qrule (dim, vector_fe_type.default_quadrature_order());
 
-  // Tell the finite element objects to use our quadrature rule.
+  // Tell the finite element object to use our quadrature rule.
   vector_fe->attach_quadrature_rule (&qrule);
-  scalar_fe->attach_quadrature_rule (&qrule);
 
   // Declare a special finite element object for boundary integration.
   std::unique_ptr<FEVectorBase> vector_fe_face (FEVectorBase::build(dim, vector_fe_type));
@@ -324,7 +281,6 @@ void assemble_divgrad(EquationSystems & es,
 
   // The element shape functions evaluated at the quadrature points.
   const std::vector<std::vector<RealGradient>> & vector_phi = vector_fe->get_phi();
-  const std::vector<std::vector<Real>> & scalar_phi = scalar_fe->get_phi();
 
   // The divergence of the element vector shape functions evaluated at the
   // quadrature points.
@@ -343,9 +299,6 @@ void assemble_divgrad(EquationSystems & es,
   // the element.  These define where in the global system
   // the element degrees of freedom get mapped.
   std::vector<dof_id_type> dof_indices;
-  std::vector<dof_id_type> vector_dof_indices;
-  std::vector<dof_id_type> scalar_dof_indices;
-  std::vector<dof_id_type> lambda_dof_indices;
 
   // The global system matrix
   SparseMatrix<Number> & matrix = system.get_system_matrix();
@@ -370,38 +323,24 @@ void assemble_divgrad(EquationSystems & es,
       // matrix and right-hand-side this element will
       // contribute to.
       dof_map.dof_indices (elem, dof_indices);
-      dof_map.dof_indices (elem, vector_dof_indices, system.variable_number("u"));
-      dof_map.dof_indices (elem, scalar_dof_indices, system.variable_number("p"));
-      if (neumann)
-        dof_map.dof_indices (elem, lambda_dof_indices, system.variable_number("l"));
 
-      // Cache the number of degrees of freedom, in total and for each
-      // variable, on this element, for use as array and loop bounds later.
+      // Cache the total number of degrees of freedom on this element,
+      // for use as array and loop bounds later.
       // We use cast_int to explicitly convert from size() (which may be
       // 64-bit) to unsigned int (which may be 32-bit but which is definitely
       // enough to count *local* degrees of freedom.
       const unsigned int n_dofs =
         cast_int<unsigned int>(dof_indices.size());
-      const unsigned int vector_n_dofs =
-        cast_int<unsigned int>(vector_dof_indices.size());
-      const unsigned int scalar_n_dofs =
-        cast_int<unsigned int>(scalar_dof_indices.size());
-      const unsigned int lambda_n_dofs =
-        cast_int<unsigned int>(lambda_dof_indices.size());
 
       // Compute the element-specific data for the current
       // element.  This involves computing the location of the
       // quadrature points (q_point) and the shape functions
       // and their divergences for the current element.
       vector_fe->reinit (elem);
-      scalar_fe->reinit (elem);
 
-      // The total number of degrees of freedom is just the sum of the number
-      // of degrees of freedom per variable. We should also have the same
-      // number of degrees of freedom as shape functions for each variable.
-      libmesh_assert_equal_to (n_dofs, vector_n_dofs + scalar_n_dofs + lambda_n_dofs);
-      libmesh_assert_equal_to (vector_n_dofs, vector_phi.size());
-      libmesh_assert_equal_to (scalar_n_dofs, scalar_phi.size());
+      // We should also have the same number of degrees of freedom as
+      // shape functions for our variable.
+      libmesh_assert_equal_to (n_dofs, vector_phi.size());
 
       // Zero the element matrix and right-hand side before
       // summing them.  We use the resize member here because
@@ -421,108 +360,41 @@ void assemble_divgrad(EquationSystems & es,
         {
 
           // Now we will build the element matrix.
-          // The upper-left block involves a double loop to integrate the
-          // vector test functions (i) against the vector trial functions (j).
-          for (unsigned int i = 0; i != vector_n_dofs; i++)
-            for (unsigned int j = 0; j != vector_n_dofs; j++)
+          // This a double loop to integrate the vector test functions (i)
+          // against the vector trial functions (j) and their divergences
+          for (unsigned int i = 0; i != n_dofs; i++)
+            for (unsigned int j = 0; j != n_dofs; j++)
               {
-                Ke(i, j) += JxW[qp]*(vector_phi[i][qp]*vector_phi[j][qp]);
-              }
-
-          // The upper-right block involves a double loop to integrate the
-          // divergence of the vector test functions (i) against the scalar
-          // trial functions (l).
-          for (unsigned int i = 0; i != vector_n_dofs; i++)
-            for (unsigned int l = 0; l != scalar_n_dofs; l++)
-              {
-                Ke(i, l + vector_n_dofs) -= JxW[qp]*(div_vector_phi[i][qp]*scalar_phi[l][qp]);
-              }
-
-          // The lower-left block involves a double loop to integrate the
-          // scalar test functions (k) against the divergence of the vector
-          // trial functions (j).
-          for (unsigned int k = 0; k != scalar_n_dofs; k++)
-            for (unsigned int j = 0; j != vector_n_dofs; j++)
-              {
-                Ke(k + vector_n_dofs, j) += JxW[qp]*(div_vector_phi[j][qp]*scalar_phi[k][qp]);
+                Ke(i, j) += JxW[qp]*(div_vector_phi[i][qp]*div_vector_phi[j][qp]+
+                                     vector_phi[i][qp]*vector_phi[j][qp]);
               }
 
           // This is the end of the matrix summation loop
           // Now we build the element right-hand-side contribution.
           // This involves a single loop in which we integrate the "forcing
-          // function" in the PDE against the scalar test functions (k).
+          // function" in the PDE against the vector test functions (k).
           {
             // The location of the current quadrature point.
             const Real x = q_point[qp](0);
             const Real y = q_point[qp](1);
             const Real z = q_point[qp](2);
 
-            // "f" is the forcing function for the Poisson equation, which is
-            // just the divergence of the exact solution for the vector field.
-            // This is the well-known "method of manufactured solutions".
-            Real f = 0;
-            if (dim == 2)
-              f = DivGradExactSolution().forcing(x, y);
-            else if (dim == 3)
-              f = DivGradExactSolution().forcing(x, y, z);
+            // "f" is the forcing function, given by the well-known
+            // "method of manufactured solutions".
+            RealGradient f = GradDivExactSolution().forcing(x, y, z);
 
-            // Loop to integrate the scalar test functions (k) against the
+            // Loop to integrate the vector test functions (k) against the
             // forcing function.
-            for (unsigned int k = 0; k != scalar_n_dofs; k++)
+            for (unsigned int k = 0; k != n_dofs; k++)
               {
-                Fe(k + vector_n_dofs) += JxW[qp]*f*scalar_phi[k][qp];
-              }
-          }
-
-          // We have now reached the end of the RHS summation. In addition,
-          // however, since the scalar variable is defined only up
-          // to an additive constant with purely Neumann boundary conditions, we
-          // constrain the integral of the scalar variable to the integral
-          // of the exact solution we seek.
-          {
-            // The location of the current quadrature point.
-            const Real x = q_point[qp](0);
-            const Real y = q_point[qp](1);
-            const Real z = q_point[qp](2);
-
-            // The value of the scalar variable.
-            Real scalar_value = 0;
-            if (dim == 2)
-              scalar_value = DivGradExactSolution().scalar(x, y);
-            else if (dim == 3)
-              scalar_value = DivGradExactSolution().scalar(x, y, z);
-
-            // A double loop to integrate the
-            // scalar test functions (k) against the Lagrange dof (n).
-            for (unsigned int k = 0; k != scalar_n_dofs; k++)
-              for (unsigned int n = 0; n != lambda_n_dofs; n++)
-                {
-                  Ke(k + vector_n_dofs, n + vector_n_dofs + scalar_n_dofs) += JxW[qp]*scalar_phi[k][qp];
-                }
-
-            // A double loop to integrate the Lagrange dof (m) against the
-            // scalar trial functions (l).
-            for (unsigned int m = 0; m != lambda_n_dofs; m++)
-              for (unsigned int l = 0; l != scalar_n_dofs; l++)
-                {
-                  Ke(m + vector_n_dofs + scalar_n_dofs, l + vector_n_dofs) += JxW[qp]*scalar_phi[l][qp];
-                }
-
-            // Loop to integrate the exact solution for the scalar variable.
-            for (unsigned int m = 0; m != lambda_n_dofs; m++)
-              {
-                Fe(m + vector_n_dofs + scalar_n_dofs) += JxW[qp]*scalar_value;
+                Fe(k) += JxW[qp]*f*vector_phi[k][qp];
               }
           }
         }
 
       // We have now reached the end of the quadrature point loop, so
-      // the interior element integration has
-      // been completed.  However, we have not yet addressed
-      // boundary conditions.  For this Poisson example, we consider either
-      // Dirichlet or Neumann for the scalar solution field p. Note that in
-      // the mixed formulation a Neumann condition for p corresponds to a
-      // Dirichlet condition for u.
+      // the interior element integration has been completed. However, we have
+      // not yet addressed boundary conditions.
       {
 
         // The following loop is over the sides of the element.
@@ -549,7 +421,7 @@ void assemble_divgrad(EquationSystems & es,
 
               // Some shape functions will be 0 on the face, but for ease of
               // indexing and generality of code we loop over them anyway.
-              libmesh_assert_equal_to (vector_n_dofs, vector_phi_face.size());
+              libmesh_assert_equal_to (n_dofs, vector_phi_face.size());
 
               // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
@@ -560,53 +432,30 @@ void assemble_divgrad(EquationSystems & es,
                   const Real yf = qface_point[qp](1);
                   const Real zf = qface_point[qp](2);
 
-                  if (neumann)
+                  // The boundary value for the vector variable.
+                  RealGradient vector_value = GradDivExactSolution()(xf, yf, zf);
+
+                  // We use the penalty method to set the flux of the vector
+                  // variable at the boundary, i.e. the RT vector boundary dof.
+                  const Real penalty = 1.e10;
+
+                  // A double loop to integrate the normal component of the
+                  // vector test functions (i) against the normal component of
+                  // the vector trial functions (j).
+                  for (unsigned int i = 0; i != n_dofs; i++)
+                    for (unsigned int j = 0; j != n_dofs; j++)
+                      {
+                        Ke(i, j) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*
+                                    normals[qp]*vector_phi_face[j][qp]*normals[qp];
+                      }
+
+                  // Loop to integrate the normal component of the vector test
+                  // functions (i) against the normal component of the
+                  // exact solution for the vector variable.
+                  for (unsigned int i = 0; i != n_dofs; i++)
                     {
-                      // The boundary value for the vector variable.
-                      RealGradient vector_value;
-                      if (dim == 2)
-                        vector_value = DivGradExactSolution()(xf, yf);
-                      else if (dim == 3)
-                        vector_value = DivGradExactSolution()(xf, yf, zf);
-
-                      // We use the penalty method to set the flux of the vector
-                      // variable at the boundary, i.e. the RT vector boundary dof.
-                      const Real penalty = 1.e10;
-
-                      // A double loop to integrate the normal component of the
-                      // vector test functions (i) against the normal component of
-                      // the vector trial functions (j).
-                      for (unsigned int i = 0; i != vector_n_dofs; i++)
-                        for (unsigned int j = 0; j != vector_n_dofs; j++)
-                          {
-                            Ke(i, j) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*
-                                        normals[qp]*vector_phi_face[j][qp]*normals[qp];
-                          }
-
-                      // Loop to integrate the normal component of the vector test
-                      // functions (i) against the normal component of the
-                      // exact solution for the vector variable.
-                      for (unsigned int i = 0; i != vector_n_dofs; i++)
-                        {
-                          Fe(i) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*normals[qp]*
-                                   vector_value*normals[qp];
-                        }
-                    }
-                  else
-                    {
-                      // The boundary value for scalar field.
-                      Real scalar_value = 0;
-                      if (dim == 2)
-                        scalar_value = DivGradExactSolution().scalar(xf, yf);
-                      else if (dim == 3)
-                        scalar_value = DivGradExactSolution().scalar(xf, yf, zf);
-
-                      // Loop to integrate the normal component of the vector test
-                      // functions (i) against the exact solution for the scalar variable.
-                      for (unsigned int i = 0; i != vector_n_dofs; i++)
-                        {
-                          Fe(i) += -JxW_face[qp]*vector_phi_face[i][qp]*normals[qp]*scalar_value;
-                        }
+                      Fe(i) += JxW_face[qp]*penalty*vector_phi_face[i][qp]*normals[qp]*
+                                vector_value*normals[qp];
                     }
                 }
             }
