@@ -25,6 +25,9 @@ public:
 
   CPPUNIT_TEST(testPetscBinaryRead);
   CPPUNIT_TEST(testPetscBinaryWrite);
+#if PETSC_RELEASE_GREATER_EQUALS(3, 23, 0)
+  CPPUNIT_TEST(testPetscCopyFromHash);
+#endif
   // CPPUNIT_TEST(testPetscHDF5Read);
   // CPPUNIT_TEST(testPetscHDF5Write);
 
@@ -99,6 +102,26 @@ public:
     CPPUNIT_ASSERT_LESS(TOLERANCE, mat_to_read->l1_norm());
   }
 
+#if PETSC_RELEASE_GREATER_EQUALS(3, 23, 0)
+  void testPetscCopyFromHash()
+  {
+    PetscMatrix<Number> mat(*my_comm);
+    const numeric_index_type M = my_comm->size();
+    const numeric_index_type m = 1;
+    const numeric_index_type blocksize = 1;
+    mat.use_hash_table(true);
+    mat.init_without_preallocation(M, M, m, m, blocksize);
+    mat.finish_initialization();
+
+    // We'll just write a dense row
+    for (const auto j : make_range(my_comm->size()))
+      mat.add(my_comm->rank(), j, my_comm->rank() * j);
+
+    auto copy = mat.copy_from_hash();
+    for (const auto j : make_range(my_comm->size()))
+      CPPUNIT_ASSERT_EQUAL((*copy)(my_comm->rank(), j), static_cast<Number>(my_comm->rank() * j));
+  }
+#endif
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(PetscMatrixTest);
