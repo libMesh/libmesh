@@ -2310,7 +2310,8 @@ Elem::Elem(const unsigned int nn,
   // If this ever legitimately fails we need to increase max_n_nodes
   libmesh_assert_less_equal(nn, max_n_nodes);
 
-  // Initialize the nodes data structure
+  // Initialize the nodes data structure if we're given a pointer to
+  // memory for it.
   if (_nodes)
     {
       for (unsigned int n=0; n<nn; n++)
@@ -2320,27 +2321,31 @@ Elem::Elem(const unsigned int nn,
   // Initialize the neighbors/parent data structure
   // _elemlinks = new Elem *[ns+1];
 
-  // We now require that we get allocated data from a subclass
-  libmesh_assert (_elemlinks);
-
-  _elemlinks[0] = p;
-
-  for (unsigned int n=1; n<ns+1; n++)
-    _elemlinks[n] = nullptr;
-
-  // Optionally initialize data from the parent
-  if (this->parent() != nullptr)
+  // Initialize the elements data structure if we're given a pointer
+  // to memory for it.  If we *weren't* given memory for it, e.g.
+  // because a subclass like an arbitrary Polygon needs to
+  // heap-allocate this memory, then that subclass will have to handle
+  // this initialization too.
+  if (_elemlinks)
     {
-      this->subdomain_id() = this->parent()->subdomain_id();
-      this->processor_id() = this->parent()->processor_id();
-      _map_type = this->parent()->_map_type;
-      _map_data = this->parent()->_map_data;
-    }
+      _elemlinks[0] = p;
+
+      for (unsigned int n=1; n<ns+1; n++)
+        _elemlinks[n] = nullptr;
+
+      // Optionally initialize data from the parent
+      if (this->parent())
+        {
+          this->subdomain_id() = this->parent()->subdomain_id();
+          this->processor_id() = this->parent()->processor_id();
+          _map_type = this->parent()->_map_type;
+          _map_data = this->parent()->_map_data;
 
 #ifdef LIBMESH_ENABLE_AMR
-  if (this->parent())
-    this->set_p_level(this->parent()->p_level());
+          this->set_p_level(this->parent()->p_level());
 #endif
+        }
+    }
 }
 
 
