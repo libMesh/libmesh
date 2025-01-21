@@ -121,6 +121,16 @@ public:
    */
   T & operator() (const unsigned int i);
 
+  /**
+   * \returns Entry \p i of the vector as a const reference.
+   */
+  const T & operator[] (const unsigned int i) const { return (*this)(i); }
+
+  /**
+   * \returns Entry \p i of the vector as a writable reference.
+   */
+  T & operator[] (const unsigned int i) { return (*this)(i); }
+
   virtual T el(const unsigned int i) const override final
   { return (*this)(i); }
 
