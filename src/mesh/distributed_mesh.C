@@ -290,6 +290,8 @@ void DistributedMesh::update_parallel_id_counts()
     ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
     (this->n_processors() + 1) + this->processor_id();
 #endif
+
+  this->_preparation.has_synched_id_counts = true;
 }
 
 
@@ -1629,6 +1631,8 @@ void DistributedMesh::renumber_nodes_and_elements ()
       }
   }
 
+  this->_preparation.has_removed_orphaned_nodes = true;
+
   if (_skip_renumber_nodes_and_elements)
     {
       this->update_parallel_id_counts();
@@ -1794,6 +1798,8 @@ void DistributedMesh::delete_remote_elements()
   this->libmesh_assert_valid_parallel_ids();
   this->libmesh_assert_valid_parallel_flags();
 #endif
+
+  this->_preparation.has_removed_remote_elements = true;
 }
 
 
