@@ -74,9 +74,6 @@ void SlepcEigenSolver<T>::clear () noexcept
       PetscErrorCode ierr = LibMeshEPSDestroy(&_eps);
       if (ierr)
         libmesh_warning("Warning: EPSDestroy returned a non-zero error code which we ignored.");
-
-      // SLEPc default eigenproblem solver
-      this->_eigen_solver_type = KRYLOVSCHUR;
     }
 }
 
