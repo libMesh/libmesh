@@ -1844,14 +1844,12 @@ public:
 
 #endif
 
-
-
-
   /**
    * \returns An Elem of type \p type wrapped in a smart pointer.
    */
   static std::unique_ptr<Elem> build (const ElemType type,
                                       Elem * p=nullptr);
+
   /**
    * Calls the build() method above with a nullptr parent, and
    * additionally sets the newly-created Elem's id. This can be useful
@@ -1859,6 +1857,20 @@ public:
    */
   static std::unique_ptr<Elem> build_with_id (const ElemType type,
                                               dof_id_type id);
+
+  /**
+   * \returns An Elem of the same type as \p this, wrapped in a smart
+   * pointer.
+   *
+   * This is not a complete clone() method (since e.g. it does not set
+   * node pointers; the standard use case reassigns node pointers from
+   * a different mesh), but it is necessary to use this instead of
+   * build() for more runtime-polymorphic elements like Polygon1 whose
+   * "type" depends on more than their type(), and it is useful to use
+   * this for elements whose id, unique_id, extra integers, etc.
+   * should be preserved in the near-clone.
+   */
+  virtual std::unique_ptr<Elem> disconnected_clone () const;
 
   /**
    * Returns the number of independent permutations of element nodes -

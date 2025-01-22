@@ -27,6 +27,7 @@
 #include "libmesh/edge_edge3.h"
 #include "libmesh/edge_edge4.h"
 #include "libmesh/edge_inf_edge2.h"
+#include "libmesh/face_polygon1.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/face_tri3_shell.h"
@@ -277,6 +278,40 @@ const unsigned int Elem::type_to_n_edges_map [] =
 
 // ------------------------------------------------------------
 // Elem class member functions
+std::unique_ptr<Elem> Elem::disconnected_clone() const
+{
+  std::unique_ptr<Elem> returnval;
+
+  switch (this->type())
+    {
+    case POLYGON1:
+      returnval = std::make_unique<Polygon1>(this->n_sides());
+      break;
+
+    default:
+      returnval = Elem::build(this->type());
+    }
+
+  returnval->set_id() = this->id();
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  returnval->set_unique_id(this->unique_id());
+#endif
+  returnval->subdomain_id() = this->subdomain_id();
+  returnval->processor_id() = this->processor_id();
+
+  const auto n_elem_ints = this->n_extra_integers();
+  returnval->add_extra_integers(n_elem_ints);
+  for (unsigned int i = 0; i != n_elem_ints; ++i)
+    returnval->set_extra_integer(i, this->get_extra_integer(i));
+
+  returnval->set_mapping_type(this->mapping_type());
+  returnval->set_mapping_data(this->mapping_data());
+
+  return returnval;
+}
+
+
+
 std::unique_ptr<Elem> Elem::build(const ElemType type,
                                   Elem * p)
 {
@@ -317,6 +352,10 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return std::make_unique<Quad9>(p);
     case QUADSHELL9:
       return std::make_unique<QuadShell9>(p);
+
+    // Well, a hexagon is *a* polygon...
+    case POLYGON1:
+      return std::make_unique<Polygon1>(6, p);
 
       // 3D elements
     case TET4:
