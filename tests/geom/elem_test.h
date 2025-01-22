@@ -5,6 +5,9 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 
+// Avoiding Elem::build() here because we can't pass an n_sides to it
+#include <libmesh/face_polygon1.h>
+
 #include "libmesh_cppunit.h"
 
 #include <memory>
@@ -119,6 +122,26 @@ public:
     else
 #endif // LIBMESH_DIM > 1
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
+    if (elem_type == POLYGON1)
+      {
+        // We're not going to implement build_square for e.g.
+        // pentagons any time soon.
+
+        _mesh->add_point(Point(0, 0), 0);
+        _mesh->add_point(Point(1, 0), 1);
+        _mesh->add_point(Point(1.5, 0.5), 2);
+        _mesh->add_point(Point(1, 1), 3);
+        _mesh->add_point(Point(0, 1), 4);
+
+        std::unique_ptr<Elem> polygon = std::make_unique<Polygon1>(5);
+        for (auto i : make_range(5))
+          polygon->set_node(i) = _mesh->node_ptr(i);
+        polygon->set_id() = 0;
+
+        _mesh->add_elem(std::move(polygon));
+        _mesh->prepare_for_use();
+      }
+    else
       {
         const unsigned int dim = test_elem->dim();
         const unsigned int use_x = dim > 0;
