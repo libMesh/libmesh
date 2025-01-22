@@ -81,6 +81,10 @@ int main (int argc, char ** argv)
   // Skip this 2D example if libMesh was compiled as 1D-only.
   libmesh_example_requires(2 <= LIBMESH_DIM, "2D support");
 
+  // This example is meant to test a PETSc-specific feature, so let's just skip it if
+  // libmesh is not built with Petsc support.
+  libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
+
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
   Mesh mesh(init.comm());
