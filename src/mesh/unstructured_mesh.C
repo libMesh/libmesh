@@ -721,7 +721,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
         Elem * newparent = old->parent() ?
           this->elem_ptr(old->parent()->id() + element_id_offset) :
           nullptr;
-        auto el = Elem::build(old->type(), newparent);
+        auto el = old->disconnected_clone();
+        el->set_parent(newparent);
 
         subdomain_id_type sbd_id = old->subdomain_id();
         if (id_remapping)
@@ -780,9 +781,6 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         el->set_unique_id(old->unique_id() + unique_id_offset);
 #endif
-
-        el->set_mapping_type(old->mapping_type());
-        el->set_mapping_data(old->mapping_data());
 
         //Hold onto it
         if (!skip_find_neighbors)
