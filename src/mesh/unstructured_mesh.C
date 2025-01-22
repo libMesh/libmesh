@@ -1332,30 +1332,14 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
 
   // Put any extra integers on the new mesh too
   new_mesh.merge_extra_integer_names(*this);
-  const unsigned int n_node_ints = _node_integer_names.size(),
-                     n_elem_ints = _elem_integer_names.size();
+  const unsigned int n_node_ints = _node_integer_names.size();
 
   for (const auto & old_elem : as_range(it, it_end))
     {
       // Add an equivalent element type to the new_mesh.
-      // Copy ids for this element.
-      auto uelem = Elem::build(old_elem->type());
-      uelem->set_id() = old_elem->id();
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-      uelem->set_unique_id(old_elem->unique_id());
-#endif
-      uelem->subdomain_id() = old_elem->subdomain_id();
-      uelem->processor_id() = old_elem->processor_id();
-
-      uelem->add_extra_integers(n_elem_ints);
-      for (unsigned int i = 0; i != n_elem_ints; ++i)
-        uelem->set_extra_integer(i, old_elem->get_extra_integer(i));
-
-      uelem->set_mapping_type(old_elem->mapping_type());
-      uelem->set_mapping_data(old_elem->mapping_data());
-
+      // disconnected_clone() copies ids, extra element integers, etc.
+      auto uelem = old_elem->disconnected_clone();
       Elem * new_elem = new_mesh.add_elem(std::move(uelem));
-
       libmesh_assert(new_elem);
 
       // Loop over the nodes on this element.
