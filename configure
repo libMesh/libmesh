@@ -26533,15 +26533,24 @@ else $as_nop
 
                                     ACSM_PROFILING_FLAGS=""
                                     ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -O0 -g"
-                                    ACSM_CXXFLAGS_OPT="$ACSM_CXXFLAGS_OPT -O3 -w0"
+                                    ACSM_CXXFLAGS_OPT="$ACSM_CXXFLAGS_OPT -O3"
                                     ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DEVEL -O2 -g"
                                     ACSM_CFLAGS_DBG="$ACSM_CFLAGS_DBG -O0 -g"
-                                    ACSM_CFLAGS_OPT="$ACSM_CFLAGS_OPT -O3 -w0"
+                                    ACSM_CFLAGS_OPT="$ACSM_CFLAGS_OPT -O3"
                                     ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_DEVEL -O2 -g"
                                    ;; #(
   *) :
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Unknown Intel compiler \"$ACSM_GXX_VERSION\"" >&5
 printf "%s\n" "Unknown Intel compiler \"$ACSM_GXX_VERSION\"" >&6; } ;;
+esac
+                                                                                                        case "$ACSM_GXX_VERSION" in #(
+  intel_icx_v21.x | intel_icx_v22.x | intel_icx_v23.x) :
+     ;; #(
+  *) :
+
+                                    CXXFLAGS="$CXXFLAGS -Werror=recommended-option"
+                                    CFLAGS="$CFLAGS -Werror=recommended-option"
+                                   ;;
 esac
                         ;; #(
   nvidia) :
