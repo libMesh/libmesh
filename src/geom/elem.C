@@ -498,7 +498,8 @@ Point Elem::true_centroid() const
   // having that order incorrectly boosted by p_level.
   if (this->p_level())
     {
-      auto elem_copy = Elem::build(this->type());
+      auto elem_copy = this->disconnected_clone();
+      elem_copy->set_p_level(0);
 
       // Set node pointers
       for (auto n : this->node_index_range())
