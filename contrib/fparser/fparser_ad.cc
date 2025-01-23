@@ -989,9 +989,9 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
         unsigned long ip = ByteCode[++i] + 1;
 
         if (op == cIf)
-          ccout << "if (std::abs(s[" << sp-- << "]) < 0.5) ";
-        if (op == cAbsIf)
           ccout << "if (s[" << sp-- << "] < 0.5) ";
+        if (op == cAbsIf)
+          ccout << "if (std::abs(s[" << sp-- << "]) < 0.5) ";
 
         if (ip >= ByteCode.size())
           ccout << "*ret = s[" << sp << "]; return;\n";
