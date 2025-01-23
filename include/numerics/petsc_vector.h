@@ -465,6 +465,14 @@ private:
    * Whether or not the data array is for read only access
    */
   mutable bool _values_read_only;
+
+  /**
+   * \returns A norm of the vector, where the type of norm to compute is
+   * determined by the template parameter N of the PETSc-defined type NormType.
+   * The valid template arguments are NORM_1, NORM_2 and NORM_INFINITY, as used
+   * to define l1_norm(), l2_norm() and linfty_norm().
+   */
+  template <NormType N> Real norm () const;
 };
 
 

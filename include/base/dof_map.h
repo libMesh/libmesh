@@ -719,7 +719,7 @@ public:
    * \returns The number of degrees of freedom on each partition for a
    * particular variable \p vn.
    */
-  std::vector<dof_id_type> n_dofs_on_each_processor(const unsigned int vn) const
+  std::vector<dof_id_type> n_dofs_per_processor(const unsigned int vn) const
   {
     std::vector<dof_id_type> n_local_dofs(this->n_processors(), 0);
     this->comm().allgather(this->n_local_dofs(vn), n_local_dofs);
