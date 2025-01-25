@@ -43,6 +43,7 @@ void nedelec_one_nodal_soln(const Elem * elem,
                             const Order order,
                             const std::vector<Number> & elem_soln,
                             const int dim,
+                            const int vdim,
                             std::vector<Number> & nodal_soln,
                             const bool add_p_level)
 {
@@ -51,7 +52,7 @@ void nedelec_one_nodal_soln(const Elem * elem,
 
   const Order totalorder = order + add_p_level*elem->p_level();
 
-  nodal_soln.resize(n_nodes*dim);
+  nodal_soln.resize(n_nodes*vdim);
 
   FEType p_refined_fe_type(totalorder, NEDELEC_ONE);
 
@@ -82,8 +83,8 @@ void nedelec_one_nodal_soln(const Elem * elem,
   for (unsigned int n = 0; n < n_nodes; n++)
     // u = Sum (u_i phi_i)
     for (unsigned int i=0; i<n_sf; i++)
-      for (int d = 0; d < dim; d++)
-        nodal_soln[dim*n+d] += elem_soln[i]*(vis_phi[i][n](d));
+      for (int d = 0; d < vdim; d++)
+        nodal_soln[vdim*n+d] += elem_soln[i]*(vis_phi[i][n](d));
 
   return;
 } // nedelec_one_nodal_soln
@@ -337,7 +338,8 @@ void FE<0,NEDELEC_ONE>::nodal_soln(const Elem *,
                                    const Order,
                                    const std::vector<Number> &,
                                    std::vector<Number> &,
-                                   bool)
+                                   bool,
+                                   const unsigned)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 template <>
@@ -345,7 +347,8 @@ void FE<1,NEDELEC_ONE>::nodal_soln(const Elem *,
                                    const Order,
                                    const std::vector<Number> &,
                                    std::vector<Number> &,
-                                   bool)
+                                   bool,
+                                   const unsigned)
 { NEDELEC_LOW_D_ERROR_MESSAGE }
 
 template <>
@@ -353,16 +356,18 @@ void FE<2,NEDELEC_ONE>::nodal_soln(const Elem * elem,
                                    const Order order,
                                    const std::vector<Number> & elem_soln,
                                    std::vector<Number> & nodal_soln,
-                                   const bool add_p_level)
-{ nedelec_one_nodal_soln(elem, order, elem_soln, 2 /*dim*/, nodal_soln, add_p_level); }
+                                   const bool add_p_level,
+                                   const unsigned vdim)
+{ nedelec_one_nodal_soln(elem, order, elem_soln, 2 /*dim*/, vdim, nodal_soln, add_p_level); }
 
 template <>
 void FE<3,NEDELEC_ONE>::nodal_soln(const Elem * elem,
                                    const Order order,
                                    const std::vector<Number> & elem_soln,
                                    std::vector<Number> & nodal_soln,
-                                   const bool add_p_level)
-{ nedelec_one_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln, add_p_level); }
+                                   const bool add_p_level,
+                                   const unsigned)
+{ nedelec_one_nodal_soln(elem, order, elem_soln, 3 /*dim*/, 3 /*vdim*/, nodal_soln, add_p_level); }
 
 LIBMESH_FE_SIDE_NODAL_SOLN(NEDELEC_ONE)
 

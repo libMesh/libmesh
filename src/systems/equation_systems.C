@@ -839,7 +839,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                                            elem,
                                            elem_soln,
                                            nodal_soln,
-                                           add_p_level);
+                                           add_p_level,
+                                           n_vec_dim);
 
                   // infinite elements should be skipped...
                   if (!elem->infinite())
@@ -875,7 +876,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                               // side nodes
                               FEInterface::side_nodal_soln
                                 (fe_type, elem, s, elem_soln,
-                                 nodal_soln, add_p_level);
+                                 nodal_soln, add_p_level, n_vec_dim);
 
 #ifdef DEBUG
                               const std::vector<unsigned int> side_nodes =
@@ -1399,7 +1400,8 @@ EquationSystems::build_discontinuous_solution_vector
                                                elem,
                                                soln_coeffs,
                                                nodal_soln,
-                                               add_p_level);
+                                               add_p_level,
+                                               FEInterface::n_vec_dim(_mesh, fe_type));
 
                       // infinite elements should be skipped...
                       if (!elem->infinite())
@@ -1463,7 +1465,8 @@ EquationSystems::build_discontinuous_solution_vector
                                 // vertices_only == true.
                                 FEInterface::side_nodal_soln
                                   (fe_type, elem, s, soln_coeffs,
-                                   nodal_soln, add_p_level);
+                                   nodal_soln, add_p_level,
+                                   FEInterface::n_vec_dim(_mesh, fe_type));
 
                                 libmesh_assert_equal_to
                                     (nodal_soln.size(),
@@ -1496,7 +1499,8 @@ EquationSystems::build_discontinuous_solution_vector
                                     std::vector<Number> neigh_soln;
                                     FEInterface::side_nodal_soln
                                       (fe_type, neigh, s_neigh,
-                                       neigh_coeffs, neigh_soln, add_p_level);
+                                       neigh_coeffs, neigh_soln, add_p_level,
+                                       FEInterface::n_vec_dim(_mesh, fe_type));
 
                                     const std::vector<unsigned int> neigh_nodes =
                                       neigh->nodes_on_side(s_neigh);
