@@ -2966,7 +2966,7 @@ unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
     case MONOMIAL_VEC:
     case RAVIART_THOMAS:
     case L2_RAVIART_THOMAS:
-      return mesh.mesh_dimension();
+      return mesh.spatial_dimension();
     default:
       return 1;
     }
