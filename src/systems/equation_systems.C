@@ -481,10 +481,10 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
 
     // Here, we're assuming the number of vector components is the same
     // as the mesh dimension. Will break for mixed dimension meshes.
-    unsigned int dim = this->get_mesh().mesh_dimension();
+    unsigned int dim = this->get_mesh().spatial_dimension();
     unsigned int nv = n_scalar_vars + dim*n_vector_vars;
 
-    // We'd better not have more than dim*his->n_vars() (all vector variables)
+    // We'd better not have more than dim*this->n_vars() (all vector variables)
     // Treat the NodeElem-only mesh case as dim=1
     libmesh_assert_less_equal ( nv, (dim > 0 ? dim : 1)*this->n_vars() );
 
@@ -577,7 +577,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   // This function must be run on all processors at once
   parallel_object_only();
 
-  const unsigned int dim = _mesh.mesh_dimension();
+  const unsigned int dim = _mesh.spatial_dimension();
   const dof_id_type max_nn   = _mesh.max_node_id();
 
   // allocate vector storage to hold
@@ -1063,7 +1063,7 @@ EquationSystems::find_variable_numbers
   std::string name;
 
   const std::vector<std::string> component_suffix = {"_x", "_y", "_z"};
-  unsigned int dim = _mesh.mesh_dimension();
+  unsigned int dim = _mesh.spatial_dimension();
   libmesh_error_msg_if(dim > 3, "Invalid dim in find_variable_numbers");
 
   // Now filter through the variables in each system and store the system index and their index
@@ -1215,7 +1215,7 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
       // Even for the case where a variable is not active on any subdomain belonging to the
       // processor, we still need to know this number to update 'var_ctr'.
       const unsigned int n_comps =
-        (system.variable_type(var) == type[1]) ? _mesh.mesh_dimension() : 1;
+        (system.variable_type(var) == type[1]) ? _mesh.spatial_dimension() : 1;
 
       // Loop over all elements in the mesh and index all components of the variable if it's active
       for (const auto & elem : _mesh.active_local_element_ptr_range())

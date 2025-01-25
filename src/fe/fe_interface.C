@@ -2640,7 +2640,7 @@ unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
 {
   //FIXME: We currently assume that the number of vector components is tied
   //       to the mesh dimension. This will break for mixed-dimension meshes.
-  return field_type(fe_type.family) == TYPE_VECTOR ? mesh.mesh_dimension() : 1;
+  return field_type(fe_type.family) == TYPE_VECTOR ? mesh.spatial_dimension() : 1;
 }
 
 
