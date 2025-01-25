@@ -349,6 +349,8 @@ MeshTools::Modification::rotate (MeshBase & mesh,
 #if LIBMESH_DIM == 3
   const auto R = RealTensorValue::intrinsic_rotation_matrix(phi, theta, psi);
 
+  mesh.set_spatial_dimension(3);
+
   for (auto & node : mesh.node_ptr_range())
     {
       Point & pt = *node;
