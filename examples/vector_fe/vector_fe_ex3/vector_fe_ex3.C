@@ -91,6 +91,13 @@ int main (int argc, char ** argv)
   // Make sure the code is robust against nodal reorderings.
   MeshTools::Modification::permute_elements(mesh);
 
+  // The code is robust against solves on 2d meshes rotated out of the xy
+  // plane. By default, however, so the output file has meaningful information,
+  // we do nothing and keep the mesh in the xy plane.
+  MeshTools::Modification::rotate(mesh, CurlCurlExactSolution::phi,
+                                        CurlCurlExactSolution::theta,
+                                        CurlCurlExactSolution::psi);
+
   // Print information about the mesh to the screen.
   mesh.print_info();
 
@@ -132,6 +139,7 @@ int main (int argc, char ** argv)
   // Print information about the system to the screen.
   equation_systems.print_info();
 
+  // Solve the system.
   system.solve();
 
   ExactSolution exact_sol(equation_systems);
