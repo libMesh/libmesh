@@ -865,8 +865,8 @@ void FEInterface::dofs_on_edge(const Elem * const elem,
 
 
 
-
 void FEInterface::nodal_soln(const unsigned int dim,
+                             const unsigned int vdim,
                              const FEType & fe_t,
                              const Elem * elem,
                              const std::vector<Number> & elem_soln,
@@ -885,12 +885,13 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
   const Order order = fe_t.order;
 
-  void_fe_with_vec_switch(nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level));
+  void_fe_with_vec_switch(nodal_soln(vdim, elem, order, elem_soln, nodal_soln, add_p_level));
 }
 
 
 
-void FEInterface::side_nodal_soln(const FEType & fe_t,
+void FEInterface::side_nodal_soln(const unsigned int vdim,
+                                  const FEType & fe_t,
                                   const Elem * elem,
                                   const unsigned int side,
                                   const std::vector<Number> & elem_soln,
@@ -910,7 +911,7 @@ void FEInterface::side_nodal_soln(const FEType & fe_t,
   const Order order = fe_t.order;
   const unsigned int dim = elem->dim();
 
-  void_fe_with_vec_switch(side_nodal_soln(elem, order, side, elem_soln, nodal_soln, add_p_level));
+  void_fe_with_vec_switch(side_nodal_soln(vdim, elem, order, side, elem_soln, nodal_soln, add_p_level));
 }
 
 

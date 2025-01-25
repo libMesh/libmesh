@@ -835,6 +835,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                   sys_soln.get(dof_indices, elem_soln);
 
                   FEInterface::nodal_soln (elem->dim(),
+                                           n_vec_dim,
                                            fe_type,
                                            elem,
                                            elem_soln,
@@ -874,7 +875,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                               // Compute the FE solution at all the
                               // side nodes
                               FEInterface::side_nodal_soln
-                                (fe_type, elem, s, elem_soln,
+                                (n_vec_dim, fe_type, elem, s, elem_soln,
                                  nodal_soln, add_p_level);
 
 #ifdef DEBUG
@@ -1393,6 +1394,7 @@ EquationSystems::build_discontinuous_solution_vector
                       // only use the first n_vertices() entries if
                       // vertices_only == true.
                       FEInterface::nodal_soln (elem->dim(),
+                                               FEInterface::n_vec_dim(_mesh, fe_type),
                                                fe_type,
                                                elem,
                                                soln_coeffs,
@@ -1460,7 +1462,8 @@ EquationSystems::build_discontinuous_solution_vector
                                 // which is_vertex() == true if
                                 // vertices_only == true.
                                 FEInterface::side_nodal_soln
-                                  (fe_type, elem, s, soln_coeffs,
+                                  (FEInterface::n_vec_dim(_mesh, fe_type),
+                                   fe_type, elem, s, soln_coeffs,
                                    nodal_soln, add_p_level);
 
                                 libmesh_assert_equal_to
@@ -1493,7 +1496,8 @@ EquationSystems::build_discontinuous_solution_vector
                                       neigh->which_neighbor_am_i(elem);
                                     std::vector<Number> neigh_soln;
                                     FEInterface::side_nodal_soln
-                                      (fe_type, neigh, s_neigh,
+                                      (FEInterface::n_vec_dim(_mesh, fe_type),
+                                       fe_type, neigh, s_neigh,
                                        neigh_coeffs, neigh_soln, add_p_level);
 
                                     const std::vector<unsigned int> neigh_nodes =

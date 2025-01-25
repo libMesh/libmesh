@@ -128,29 +128,32 @@ monomial_vec_nodal_soln(const Elem * elem,
 // This could be macro-ified so that it fits on one line...
 template <>
 void
-FE<0, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
+FE<0, MONOMIAL_VEC>::nodal_soln(const unsigned vdim,
+                                const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
                                 std::vector<Number> & nodal_soln,
                                 const bool add_p_level)
 {
-  FE<0, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level);
+  FE<0, MONOMIAL>::nodal_soln(vdim, elem, order, elem_soln, nodal_soln, add_p_level);
 }
 
 template <>
 void
-FE<1, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
+FE<1, MONOMIAL_VEC>::nodal_soln(const unsigned vdim,
+                                const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
                                 std::vector<Number> & nodal_soln,
                                 const bool add_p_level)
 {
-  FE<1, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level);
+  FE<1, MONOMIAL>::nodal_soln(vdim, elem, order, elem_soln, nodal_soln, add_p_level);
 }
 
 template <>
 void
-FE<2, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
+FE<2, MONOMIAL_VEC>::nodal_soln(const unsigned,
+                                const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
                                 std::vector<Number> & nodal_soln,
@@ -161,7 +164,8 @@ FE<2, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
 
 template <>
 void
-FE<3, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
+FE<3, MONOMIAL_VEC>::nodal_soln(const unsigned,
+                                const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
                                 std::vector<Number> & nodal_soln,

@@ -289,6 +289,7 @@ public:
    * should be updated so that it does not take a \p dim argument.
    */
   static void nodal_soln(const unsigned int dim,
+                         const unsigned int vdim,
                          const FEType & fe_t,
                          const Elem * elem,
                          const std::vector<Number> & elem_soln,
@@ -304,7 +305,8 @@ public:
    * order of the element. The Elem::p_level(), if any, is accounted
    * for internally by this routine.
    */
-  static void side_nodal_soln(const FEType & fe_t,
+  static void side_nodal_soln(const unsigned int vdim,
+                              const FEType & fe_t,
                               const Elem * elem,
                               const unsigned int side,
                               const std::vector<Number> & elem_soln,
