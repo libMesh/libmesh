@@ -132,7 +132,8 @@ FE<0, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
                                 std::vector<Number> & nodal_soln,
-                                const bool add_p_level)
+                                const bool add_p_level,
+                                const unsigned)
 {
   FE<0, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level);
 }
@@ -143,7 +144,8 @@ FE<1, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
                                 std::vector<Number> & nodal_soln,
-                                const bool add_p_level)
+                                const bool add_p_level,
+                                const unsigned)
 {
   FE<1, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level);
 }
@@ -154,7 +156,8 @@ FE<2, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
                                 std::vector<Number> & nodal_soln,
-                                const bool add_p_level)
+                                const bool add_p_level,
+                                const unsigned)
 {
   monomial_vec_nodal_soln(elem, order, elem_soln, 2 /*dimension*/, nodal_soln, add_p_level);
 }
@@ -165,7 +168,8 @@ FE<3, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 const Order order,
                                 const std::vector<Number> & elem_soln,
                                 std::vector<Number> & nodal_soln,
-                                const bool add_p_level)
+                                const bool add_p_level,
+                                const unsigned)
 {
   monomial_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln, add_p_level);
 }

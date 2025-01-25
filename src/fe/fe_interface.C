@@ -621,13 +621,13 @@ void FEInterface::dofs_on_edge(const Elem * const elem,
 
 
 
-
 void FEInterface::nodal_soln(const unsigned int dim,
                              const FEType & fe_t,
                              const Elem * elem,
                              const std::vector<Number> & elem_soln,
                              std::vector<Number> &       nodal_soln,
-                             const bool add_p_level)
+                             const bool add_p_level,
+                             const unsigned int vdim)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -641,7 +641,7 @@ void FEInterface::nodal_soln(const unsigned int dim,
 
   const Order order = fe_t.order;
 
-  void_fe_with_vec_switch(nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level));
+  void_fe_with_vec_switch(nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level, vdim));
 }
 
 
@@ -651,7 +651,8 @@ void FEInterface::side_nodal_soln(const FEType & fe_t,
                                   const unsigned int side,
                                   const std::vector<Number> & elem_soln,
                                   std::vector<Number> &       nodal_soln,
-                                  const bool add_p_level)
+                                  const bool add_p_level,
+                                  const unsigned int vdim)
 {
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -666,7 +667,7 @@ void FEInterface::side_nodal_soln(const FEType & fe_t,
   const Order order = fe_t.order;
   const unsigned int dim = elem->dim();
 
-  void_fe_with_vec_switch(side_nodal_soln(elem, order, side, elem_soln, nodal_soln, add_p_level));
+  void_fe_with_vec_switch(side_nodal_soln(elem, order, side, elem_soln, nodal_soln, add_p_level, vdim));
 }
 
 
