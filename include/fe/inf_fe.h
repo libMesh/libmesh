@@ -213,6 +213,9 @@ public:
  * components is such that the radial shapes have highest
  * priority, followed by the base shapes.
  *
+ * For the derivation and some background of the implemented algorithm
+ * see https://arxiv.org/abs/2501.05568.
+ *
  * \author Daniel Dreyer
  * \date 2003
  * \brief Base class for all the infinite geometric element types.
