@@ -80,6 +80,9 @@ void HDivFETransformation<OutputShape>::map_phi(const unsigned int dim,
               Real dy_dxi   = dxyz_dxi[p](1);
               Real dy_deta  = dxyz_deta[p](1);
 
+              Real dz_dxi   = dxyz_dxi[p](2);
+              Real dz_deta  = dxyz_deta[p](2);
+
               // Need to temporarily cache reference shape functions
               // We are computing mapping basis functions, so we explicitly ignore
               // any non-zero p_level() the Elem might have.
@@ -88,6 +91,7 @@ void HDivFETransformation<OutputShape>::map_phi(const unsigned int dim,
 
               phi[i][p](0) = (dx_dxi*phi_ref(0) + dx_deta*phi_ref(1))/J[p];
               phi[i][p](1) = (dy_dxi*phi_ref(0) + dy_deta*phi_ref(1))/J[p];
+              phi[i][p](2) = (dz_dxi*phi_ref(0) + dz_deta*phi_ref(1))/J[p];
             }
 
         break;
