@@ -44,7 +44,7 @@ void QGrid::init_2D()
         // We compute the 2D quadrature rule as a tensor
         // product of the 1D quadrature rule.
         QGrid q1D(1, _order);
-        q1D.init(EDGE2);
+        q1D.init(EDGE2, _p_level, true);
         tensor_product_quad( q1D );
         return;
       }

@@ -43,7 +43,7 @@ void QGauss::init_3D()
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule.
         QGauss q1D(1, _order);
-        q1D.init(EDGE2, _p_level);
+        q1D.init(EDGE2, _p_level, true);
         tensor_product_hex( q1D );
         return;
       }
@@ -516,8 +516,8 @@ void QGauss::init_3D()
         QGauss q2D(2,_order);
 
         // Initialize
-        q1D.init(EDGE2, _p_level);
-        q2D.init(TRI3, _p_level);
+        q1D.init(EDGE2, _p_level, true);
+        q2D.init(TRI3, _p_level, true);
 
         tensor_product_prism(q1D, q2D);
 

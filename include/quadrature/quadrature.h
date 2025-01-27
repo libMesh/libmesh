@@ -212,7 +212,8 @@ public:
    * \p simple_type_only flag to avoid being identified as deprecated.
    */
   virtual void init (const ElemType type=INVALID_ELEM,
-                     unsigned int p_level=0);
+                     unsigned int p_level=0,
+                     bool simple_type_only=false);
 
   /**
    * Initializes the data structures for a quadrature rule based on
