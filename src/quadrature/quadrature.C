@@ -158,6 +158,16 @@ void QBase::init(const ElemType t,
 
 
 
+void QBase::init(const QBase & other_rule)
+{
+  if (other_rule._elem)
+    this->init(*other_rule._elem, other_rule._p_level);
+  else
+    this->init(other_rule._type, other_rule._p_level);
+}
+
+
+
 void QBase::init (const Elem & elem,
                   const std::vector<Real> & /* vertex_distance_func */,
                   unsigned int p_level)
