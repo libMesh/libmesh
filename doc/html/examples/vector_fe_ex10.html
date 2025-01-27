@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <title>libMesh - A C++ Finite Element Library</title>
+  <meta name="author" content="libMesh development team">
+  <link rel="stylesheet" type="text/css" media="all" href="../styles.css">
+  <link rel="stylesheet" type="text/css" media="all" href="../doxygen_stylesheet.css">
+</head>
+
+<body>
+  <nav id="fixedbar">
+    <ul id="fixednav">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../support.html">About Us</a></li>
+      <li><a href="../publications.html">Publications</a></li>
+      <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+      <li><a href="../installation.html">Installation</a></li>
+      <li><a href="../examples.html">Examples</a></li>
+     <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+    </ul>
+  </nav>
+
+  <div id="w">
+    <header id="logo"><a href="../index.html"><span id="logobg">SomeWebsiteLogo</span></a></header>
+
+    <nav id="navigation">
+      <ul>
+        <li><a href="../index.html">Home</a></li>
+        <li><a href="../support.html">About Us</a></li>
+        <li><a href="../publications.html">Publications</a></li>
+        <li><a href="https://github.com/libMesh/libmesh/graphs/contributors">Developers</a></li>
+        <li><a href="../installation.html">Installation</a></li>
+        <li><a href="../examples.html">Examples</a></li>
+        <li><a href="https://mooseframework.inl.gov/docs/doxygen/libmesh/index.html">Documentation</a></li>
+      </ul>
+    </nav>
+
+<div id="content">
+
+<br> <h1> Link to the source code for this example: </h1>
+<a href="https://github.com/libMesh/libmesh/tree/master/examples/vector_fe/vector_fe_ex10" target="_blank">Open vector_fe_ex10 in new tab.</a>
+<a name="output"></a>
+<br><br><br> <h1> The console output of the program: </h1>
+<pre>
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=2 element_type=TRI6 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={2}
+  supported_nodal_order()=2
+  spatial_dimension()=2
+  n_nodes()=961
+    n_local_nodes()=961
+  n_elem()=450
+    n_local_elem()=450
+    n_active_elem()=450
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="FIRST"
+    n_dofs()=705
+    n_local_dofs()=705
+    max(n_local_dofs())=705
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=705
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 4.82979
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 5
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.171261
+HDiv semi-norm error is: 0.872515
+HDiv error is: 0.889164
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=2 element_type=TRI6 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=2 element_type=TRI7 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={3}
+  supported_nodal_order()=3
+  spatial_dimension()=2
+  n_nodes()=1411
+    n_local_nodes()=1411
+  n_elem()=450
+    n_local_elem()=450
+    n_active_elem()=450
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="FIRST"
+    n_dofs()=705
+    n_local_dofs()=705
+    max(n_local_dofs())=705
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=705
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 4.82979
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 5
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.171261
+HDiv semi-norm error is: 0.872515
+HDiv error is: 0.889164
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=2 element_type=TRI7 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=2 element_type=QUAD8 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={2}
+  supported_nodal_order()=2
+  spatial_dimension()=2
+  n_nodes()=736
+    n_local_nodes()=736
+  n_elem()=225
+    n_local_elem()=225
+    n_active_elem()=225
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="FIRST"
+    n_dofs()=480
+    n_local_dofs()=480
+    max(n_local_dofs())=480
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=480
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 6.625
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 7
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.171869
+HDiv semi-norm error is: 1.06744
+HDiv error is: 1.08118
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=2 element_type=QUAD8 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=2 element_type=QUAD9 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={2}
+  supported_nodal_order()=2
+  spatial_dimension()=2
+  n_nodes()=961
+    n_local_nodes()=961
+  n_elem()=225
+    n_local_elem()=225
+    n_active_elem()=225
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="FIRST"
+    n_dofs()=480
+    n_local_dofs()=480
+    max(n_local_dofs())=480
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=480
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 6.625
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 7
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.171869
+HDiv semi-norm error is: 1.06744
+HDiv error is: 1.08118
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=2 element_type=QUAD9 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=2 order=3 element_type=TRI6 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={2}
+  supported_nodal_order()=2
+  spatial_dimension()=2
+  n_nodes()=961
+    n_local_nodes()=961
+  n_elem()=450
+    n_local_elem()=450
+    n_active_elem()=450
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="THIRD"
+    n_dofs()=4815
+    n_local_dofs()=4815
+    max(n_local_dofs())=4815
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=4815
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 19.8224
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 27
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.000476859
+HDiv semi-norm error is: 0.00418619
+HDiv error is: 0.00421326
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=2 order=3 element_type=TRI6 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=2 order=3 element_type=TRI7 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={3}
+  supported_nodal_order()=3
+  spatial_dimension()=2
+  n_nodes()=1411
+    n_local_nodes()=1411
+  n_elem()=450
+    n_local_elem()=450
+    n_active_elem()=450
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="THIRD"
+    n_dofs()=4815
+    n_local_dofs()=4815
+    max(n_local_dofs())=4815
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=4815
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 19.8224
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 27
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.000476859
+HDiv semi-norm error is: 0.00418619
+HDiv error is: 0.00421326
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=2 order=3 element_type=TRI7 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=2 order=3 element_type=QUAD8 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={2}
+  supported_nodal_order()=2
+  spatial_dimension()=2
+  n_nodes()=736
+    n_local_nodes()=736
+  n_elem()=225
+    n_local_elem()=225
+    n_active_elem()=225
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="THIRD"
+    n_dofs()=4140
+    n_local_dofs()=4140
+    max(n_local_dofs())=4140
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=4140
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 30.3913
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 45
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.000327013
+HDiv semi-norm error is: 0.00205269
+HDiv error is: 0.00207857
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=2 order=3 element_type=QUAD8 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=2 order=3 element_type=QUAD9 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={2}
+  supported_nodal_order()=2
+  spatial_dimension()=2
+  n_nodes()=961
+    n_local_nodes()=961
+  n_elem()=225
+    n_local_elem()=225
+    n_active_elem()=225
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="THIRD"
+    n_dofs()=4140
+    n_local_dofs()=4140
+    max(n_local_dofs())=4140
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=4140
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 30.3913
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 45
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.000327013
+HDiv semi-norm error is: 0.00205269
+HDiv error is: 0.00207857
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=2 order=3 element_type=QUAD9 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=3 element_type=TET14 grid_size=6 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={3}
+  elem_default_orders()={3}
+  supported_nodal_order()=3
+  spatial_dimension()=3
+  n_nodes()=19045
+    n_local_nodes()=19045
+  n_elem()=5184
+    n_local_elem()=5184
+    n_active_elem()=5184
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="FIRST"
+    n_dofs()=10800
+    n_local_dofs()=10800
+    max(n_local_dofs())=10800
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=10800
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 6.76
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 7
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.399985
+HDiv semi-norm error is: 1.63
+HDiv error is: 1.67836
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=3 element_type=TET14 grid_size=6 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex10:
+*   ./example-opt dim=3 element_type=HEX27 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={3}
+  elem_default_orders()={2}
+  supported_nodal_order()=2
+  spatial_dimension()=3
+  n_nodes()=29791
+    n_local_nodes()=29791
+  n_elem()=3375
+    n_local_elem()=3375
+    n_active_elem()=3375
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "GradDiv"
+    Type "LinearImplicit"
+    Variables="u"
+    Finite Element Types="RAVIART_THOMAS"
+    Approximation Orders="FIRST"
+    n_dofs()=10800
+    n_local_dofs()=10800
+    max(n_local_dofs())=10800
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=10800
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 10.375
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 11
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+~~ Vector field (u) ~~
+L2 error is: 0.243059
+HDiv semi-norm error is: 1.50958
+HDiv error is: 1.52903
+
+***************************************************************
+* Done Running Example vector_fe_ex10:
+*   ./example-opt dim=3 element_type=HEX27 -pc_type lu
+***************************************************************
+</pre>
+</div>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $(window).on('scroll',function() {
+    var scrolltop = $(this).scrollTop();
+
+    if(scrolltop >= 215) {
+      $('#fixedbar').fadeIn(250);
+    }
+
+    else if(scrolltop <= 210) {
+      $('#fixedbar').fadeOut(250);
+    }
+  });
+});
+</script>
+
+<!-- Google Analytics stuff -->
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-24978333-1']);
+  _gaq.push(['_trackPageview']);
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+
+</body>
+</html>

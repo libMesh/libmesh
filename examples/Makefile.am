@@ -74,7 +74,8 @@ SUBDIRS = \
 	vector_fe/vector_fe_ex6 \
 	vector_fe/vector_fe_ex7 \
 	vector_fe/vector_fe_ex8 \
-	vector_fe/vector_fe_ex9
+	vector_fe/vector_fe_ex9 \
+	vector_fe/vector_fe_ex10
 
 AUTOMAKE_OPTIONS = subdir-objects
 
