@@ -135,6 +135,13 @@ int main (int argc, char ** argv)
   // Make sure the code is robust against nodal reorderings.
   MeshTools::Modification::permute_elements(mesh);
 
+  // The code is robust against solves on rotated meshes.
+  // By default, however, so the output file has meaningful information,
+  // we do nothing and keep the mesh aligned with the Cartesian axes.
+  MeshTools::Modification::rotate(mesh, GradDivExactSolution::phi,
+                                        GradDivExactSolution::theta,
+                                        GradDivExactSolution::psi);
+
   // Print information about the mesh to the screen.
   mesh.print_info();
 
@@ -376,14 +383,9 @@ void assemble_graddiv(EquationSystems & es,
           // This involves a single loop in which we integrate the "forcing
           // function" in the PDE against the vector test functions (k).
           {
-            // The location of the current quadrature point.
-            const Real x = q_point[qp](0);
-            const Real y = q_point[qp](1);
-            const Real z = q_point[qp](2);
-
             // "f" is the forcing function, given by the well-known
             // "method of manufactured solutions".
-            RealGradient f = GradDivExactSolution().forcing(x, y, z);
+            RealGradient f = GradDivExactSolution().forcing(q_point[qp]);
 
             // Loop to integrate the vector test functions (k) against the
             // forcing function.
@@ -428,14 +430,8 @@ void assemble_graddiv(EquationSystems & es,
               // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
-                  // The location on the boundary of the current
-                  // face quadrature point.
-                  const Real xf = qface_point[qp](0);
-                  const Real yf = qface_point[qp](1);
-                  const Real zf = qface_point[qp](2);
-
                   // The boundary value for the vector variable.
-                  RealGradient vector_value = GradDivExactSolution()(xf, yf, zf);
+                  RealGradient vector_value = GradDivExactSolution()(qface_point[qp]);
 
                   // We use the penalty method to set the flux of the vector
                   // variable at the boundary, i.e. the RT vector boundary dof.

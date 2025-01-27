@@ -45,10 +45,9 @@ public:
                            DenseVector<Number> & output)
   {
     output.zero();
-    const Real x=p(0), y=p(1), z=p(2);
-    output(0) = soln(x, y, z)(0);
-    output(1) = soln(x, y, z)(1);
-    output(2) = soln(x, y, z)(2);
+    output(0) = soln(p)(0);
+    output(1) = soln(p)(1);
+    output(2) = soln(p)(2);
   }
 
   virtual Number component(unsigned int component_in,
@@ -83,10 +82,9 @@ public:
                            DenseVector<Gradient> & output)
   {
     output.zero();
-    const Real x=p(0), y=p(1), z=p(2);
-    output(0) = soln.grad(x, y, z).row(0);
-    output(1) = soln.grad(x, y, z).row(1);
-    output(2) = soln.grad(x, y, z).row(2);
+    output(0) = soln.grad(p).row(0);
+    output(1) = soln.grad(p).row(1);
+    output(2) = soln.grad(p).row(2);
   }
 
   virtual Gradient component(unsigned int component_in,
