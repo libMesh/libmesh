@@ -31,6 +31,7 @@ QBase::QBase(unsigned int d,
   _dim(d),
   _order(o),
   _type(INVALID_ELEM),
+  _elem(nullptr),
   _p_level(0)
 {}
 
@@ -61,15 +62,77 @@ void QBase::print_info(std::ostream & os) const
 
 
 
+void QBase::init(const Elem & elem,
+                 unsigned int p)
+{
+  libmesh_assert_equal_to(elem.dim(), _dim);
+
+  // Default to the element p_level() value
+  if (p == invalid_uint)
+    p = elem.p_level();
+
+  ElemType t = elem.type();
+
+  // check to see if we have already
+  // done the work for this quadrature rule
+  //
+  // If we have a POLYGON1 then we're going to need to recompute to be
+  // safe; even if we're using the same element, it might have been
+  // distorted enough that its subtriangle triangulation has been
+  // changed.
+  if (t == _type && p == _p_level && t != POLYGON1)
+    return;
+  else
+    {
+      _elem = &elem;
+      _type = t;
+      _p_level = p;
+    }
+
+  switch(_elem->dim())
+    {
+    case 0:
+      this->init_0D();
+
+      return;
+
+    case 1:
+      this->init_1D();
+
+      return;
+
+    case 2:
+      this->init_2D();
+
+      return;
+
+    case 3:
+      this->init_3D();
+
+      return;
+
+    default:
+      libmesh_error_msg("Invalid dimension _dim = " << _dim);
+    }
+}
+
+
+
 void QBase::init(const ElemType t,
                  unsigned int p)
 {
+  // Some element types require data from a specific element, so can
+  // only be used with newer APIs.
+  if (t == POLYGON1)
+    libmesh_error();
+
   // check to see if we have already
   // done the work for this quadrature rule
   if (t == _type && p == _p_level)
     return;
   else
     {
+      _elem = nullptr;
       _type = t;
       _p_level = p;
     }
