@@ -469,7 +469,7 @@ public:
                                                         static_cast<Order>(order));
 
             // Initialize on a 1D element, EDGE2/3/4 should not matter...
-            qrule->init (EDGE2);
+            qrule->init (EDGE2, 0, true);
 
             // Test the sum of the weights for this order
             Real sumw = 0.;
