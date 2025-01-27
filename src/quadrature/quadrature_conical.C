@@ -62,7 +62,9 @@ void QConical::conical_product_tri()
   libmesh_assert_equal_to (this->get_dim(), 2);
 
   QGauss  gauss1D(1, get_order());
+  gauss1D.init(EDGE2, 0, true);
   QJacobi jac1D(1, get_order(), 1, 0);
+  jac1D.init(EDGE2, 0, true);
 
   // The Gauss rule needs to be scaled to [0,1]
   std::pair<Real, Real> old_range(-1.0L, 1.0L);
@@ -113,8 +115,11 @@ void QConical::conical_product_tet()
   libmesh_assert_equal_to (this->get_dim(), 3);
 
   QGauss  gauss1D(1, get_order());
+  gauss1D.init(EDGE2, 0, true);
   QJacobi jacA1D(1, get_order(), /*alpha=*/1, /*beta=*/0);
+  jacA1D.init(EDGE2, 0, true);
   QJacobi jacB1D(1, get_order(), /*alpha=*/2, /*beta=*/0);
+  jacB1D.init(EDGE2, 0, true);
 
   // The Gauss rule needs to be scaled to [0,1]
   std::pair<Real, Real> old_range(-1.0L, 1.0L);
@@ -190,7 +195,9 @@ void QConical::conical_product_pyramid()
   libmesh_assert_equal_to (this->get_dim(), 3);
 
   QGauss  gauss1D(1, get_order());
+  gauss1D.init(EDGE2, 0, true);
   QJacobi jac1D(1, get_order(), 2, 0);
+  jac1D.init(EDGE2, 0, true);
 
   // These rules should have the same number of points
   libmesh_assert_equal_to (gauss1D.n_points(), jac1D.n_points());

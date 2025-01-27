@@ -48,14 +48,6 @@ QComposite<QSubCell>::QComposite(unsigned int d,
   _q_subcell(d,o),
   _lagrange_fe(FEBase::build (d, FEType (FIRST, LAGRANGE)))
 {
-  // explicitly call the init function in 1D since the
-  // other tensor-product rules require this one.
-  // note that EDGE will not be used internally, however
-  // if we called the function with INVALID_ELEM it would try to
-  // be smart and return, thinking it had already done the work.
-  if (_dim == 1)
-    QSubCell::init(EDGE2);
-
   libmesh_assert (_lagrange_fe.get() != nullptr);
 
   _lagrange_fe->attach_quadrature_rule (&_q_subcell);

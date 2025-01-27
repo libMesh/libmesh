@@ -61,8 +61,6 @@ public:
     _alpha(a),
     _beta(b)
   {
-    if (_dim == 1)
-      init(EDGE2);
   }
 
   /**
