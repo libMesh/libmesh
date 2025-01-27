@@ -110,6 +110,8 @@ RBEIMConstruction::RBEIMConstruction (EquationSystems & es,
   : RBConstructionBase(es, name_in, number_in),
     best_fit_type_flag(PROJECTION_BEST_FIT),
     _Nmax(0),
+    _set_Nmax_from_n_snapshots(false),
+    _Nmax_from_n_snapshots_increment(0),
     _rel_training_tolerance(1.e-4),
     _abs_training_tolerance(1.e-12),
     _max_abs_value_in_training_set(0.),
@@ -188,6 +190,12 @@ void RBEIMConstruction::print_info()
   libMesh::out << std::endl << "RBEIMConstruction parameters:" << std::endl;
   libMesh::out << "system name: " << this->name() << std::endl;
   libMesh::out << "Nmax: " << get_Nmax() << std::endl;
+  if (_set_Nmax_from_n_snapshots)
+  {
+    libMesh::out << "Overruling Nmax based on number of snapshots, with increment set to "
+      << _Nmax_from_n_snapshots_increment
+      << std::endl;
+  }
   libMesh::out << "Greedy relative error tolerance: " << get_rel_training_tolerance() << std::endl;
   libMesh::out << "Greedy absolute error tolerance: " << get_abs_training_tolerance() << std::endl;
   libMesh::out << "Number of parameters: " << get_n_params() << std::endl;
@@ -671,6 +679,19 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
 
   RBEIMEvaluation & rbe = get_rb_eim_evaluation();
 
+  unsigned int n_snapshots = get_n_training_samples();
+
+  // If _set_Nmax_from_n_snapshots=true, then we overrule Nmax.
+  if (_set_Nmax_from_n_snapshots)
+  {
+    int updated_Nmax = (static_cast<int>(n_snapshots) + _Nmax_from_n_snapshots_increment);
+
+    // We only overrule _Nmax if updated_Nmax is positive, since if Nmax=0 then we'll skip
+    // training here entirely, which is typically not what we want.
+    if (updated_Nmax > 0)
+      _Nmax = static_cast<unsigned int>(updated_Nmax);
+  }
+
   // _eim_projection_matrix is not used in the POD case, but we resize it here in any case
   // to be consistent with what we do in train_eim_approximation_with_greedy().
   // We need space for one extra interpolation point if we're using the
@@ -689,7 +710,6 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
   // Set up the POD "correlation matrix". This enables us to compute the POD via the
   // "method of snapshots", in which we compute a low rank representation of the
   // n_snapshots x n_snapshots matrix.
-  unsigned int n_snapshots = get_n_training_samples();
   DenseMatrix<Number> correlation_matrix(n_snapshots,n_snapshots);
 
   std::cout << "Start computing correlation matrix" << std::endl;
@@ -1117,6 +1137,18 @@ unsigned int RBEIMConstruction::get_Nmax() const
 void RBEIMConstruction::set_Nmax(unsigned int Nmax)
 {
   _Nmax = Nmax;
+}
+
+void RBEIMConstruction::enable_set_Nmax_from_n_snapshots(int increment)
+{
+  _set_Nmax_from_n_snapshots = true;
+  _Nmax_from_n_snapshots_increment = increment;
+}
+
+void RBEIMConstruction::disable_set_Nmax_from_n_snapshots()
+{
+  _set_Nmax_from_n_snapshots = false;
+  _Nmax_from_n_snapshots_increment = 0;
 }
 
 Real RBEIMConstruction::get_max_abs_value_in_training_set() const
