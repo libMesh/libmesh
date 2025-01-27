@@ -21,9 +21,11 @@
 // \date 2023
 //
 // This example uses Raviart-Thomas elements to solve a model div-grad problem
-// in H(div) in both 2d and 3d. The problem is simply a div-grad formulation,
-// \vec{u} = -\nabla p, and \nabla \cdot \vec{u} = f, of the Poisson
-// problem in Introduction Example 3, \nabla^2 p = -f.
+// in H(div) in both 2d and 3d. The problem is simply a mixed div-grad
+// formulation, \vec{u} = -\nabla p, and \nabla \cdot \vec{u} = f, of the
+// Poisson problem in Introduction Example 3, \nabla^2 p = -f. In particular,
+// unlike in Introduction Example 3, where we solve solely for the scalar field
+// p, here we solve for both the vector field \vec{u} and the scalar field p.
 
 // Basic utilities.
 #include "libmesh/string_to_enum.h"
@@ -151,7 +153,7 @@ int main (int argc, char ** argv)
   // Declare the system  "DivGrad" and its variables.
   LinearImplicitSystem & system = equation_systems.add_system<LinearImplicitSystem>("DivGrad");
 
-  // Set the FE approximation order for the vector and field variables.
+  // Set the FE approximation order for the vector and scalar field variables.
   const Order vector_order = static_cast<Order>(infile("order", 1u));
   const Order scalar_order = static_cast<Order>(vector_order - 1u);
 

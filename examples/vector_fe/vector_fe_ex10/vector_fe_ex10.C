@@ -22,6 +22,8 @@
 //
 // This example uses Raviart-Thomas elements to solve a model grad-div problem
 // in H(div) in both 2d and 3d: -\nabla (\nabla \cdot \vec{u}) + \vec{u} = f.
+// Note that, unlike the problem in Vector Finite Elements Example 6, this is
+// _not_ an elliptic problem.
 
 // Basic utilities.
 #include "libmesh/string_to_enum.h"
