@@ -322,7 +322,7 @@ void QMonomial::init_3D()
     default:
       {
         QGauss gauss_rule(3, _order);
-        gauss_rule.init(_type, _p_level);
+        gauss_rule.init(*this);
 
         // Swap points and weights with the about-to-be destroyed rule.
         _points.swap (gauss_rule.get_points() );
