@@ -215,6 +215,12 @@ public:
                      unsigned int p_level=0);
 
   /**
+   * Initializes the data structures for a quadrature rule based on
+   * the element, element type, and p_level settings of \p other_rule
+   */
+  virtual void init (const QBase & other_rule);
+
+  /**
    * Initializes the data structures for an element potentially "cut"
    * by a signed distance function.  The array \p vertex_distance_func
    * contains vertex values of the signed distance function.  If the
