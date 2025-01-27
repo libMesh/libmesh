@@ -76,9 +76,9 @@ private:
    * In 2D, the conical product rule is only defined for Tris.
    * In 3D, the conical product rule is only defined for Tets.
    */
-  virtual void init_1D (const ElemType, unsigned int) override;
-  virtual void init_2D (const ElemType, unsigned int) override;
-  virtual void init_3D (const ElemType, unsigned int) override;
+  virtual void init_1D () override;
+  virtual void init_2D () override;
+  virtual void init_3D () override;
 
   /**
    * Implementation of conical product rule for a Tri in 2D of

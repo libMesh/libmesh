@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-void QClough::init_3D(const ElemType, unsigned int)
+void QClough::init_3D()
 {
 #if LIBMESH_DIM == 3
   // QClough not supported on any 3D elements

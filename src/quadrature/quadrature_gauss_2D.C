@@ -26,7 +26,7 @@ namespace libMesh
 {
 
 
-void QGauss::init_2D(const ElemType, unsigned int)
+void QGauss::init_2D()
 {
 #if LIBMESH_DIM > 1
 
