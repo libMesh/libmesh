@@ -22,6 +22,8 @@
 #include "libmesh/quadrature_conical.h"
 #include "libmesh/enum_to_string.h"
 
+#include "libmesh/face_polygon1.h"
+
 namespace libMesh
 {
 
@@ -1298,6 +1300,53 @@ void QGauss::init_2D()
           }
       }
 
+
+      //---------------------------------------------
+      // Arbitrary polygon quadrature rules
+    case POLYGON1:
+      {
+        QGauss tri_rule(2, _order);
+        tri_rule.init(TRI3, _p_level);
+
+        std::vector<Point> & tripoints = tri_rule.get_points();
+        std::vector<Real> & triweights = tri_rule.get_weights();
+
+        std::size_t numtripts = tripoints.size();
+
+        // Polygon1 requires the newer Quadrature API
+        if (!_elem)
+          libmesh_error();
+
+        libmesh_assert(_elem->type() == POLYGON1);
+
+        const Polygon1 & poly = *cast_ptr<const Polygon1 *>(_elem);
+
+        std::size_t numtris = poly.n_subtriangles();
+        _points.resize(numtripts*numtris);
+        _weights.resize(numtripts*numtris);
+        for (std::size_t t = 0; t != numtris; ++t)
+          {
+            auto master_points = poly.master_subtriangle(t);
+
+            for (std::size_t i = 0; i != numtripts; ++i)
+              {
+                _points[numtripts*t+i](0) =
+                  master_points[0](0) +
+                  (master_points[1](0) -
+                   master_points[0](0)) * tripoints[i](0) +
+                  (master_points[2](0) -
+                   master_points[0](0)) * tripoints[i](1);
+                _points[numtripts*t+i](1) =
+                  master_points[0](1) +
+                  (master_points[1](1) -
+                   master_points[0](1)) * tripoints[i](0) +
+                  (master_points[2](1) -
+                   master_points[0](1)) * tripoints[i](1);
+                _weights[numtripts*t+i] = triweights[i] / numtris;
+              }
+          }
+        return;
+      }
 
       //---------------------------------------------
       // Unsupported type
