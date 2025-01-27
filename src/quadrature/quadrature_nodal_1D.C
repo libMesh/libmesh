@@ -26,7 +26,7 @@
 namespace libMesh
 {
 
-void QNodal::init_1D(const ElemType, unsigned int)
+void QNodal::init_1D()
 {
   switch (_type)
     {

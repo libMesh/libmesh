@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-void QSimpson::init_3D(const ElemType, unsigned int)
+void QSimpson::init_3D()
 {
 #if LIBMESH_DIM == 3
 

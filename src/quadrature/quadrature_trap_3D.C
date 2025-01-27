@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-void QTrap::init_3D(const ElemType, unsigned int)
+void QTrap::init_3D()
 {
 #if LIBMESH_DIM == 3
 

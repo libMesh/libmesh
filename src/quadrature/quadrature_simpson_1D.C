@@ -23,7 +23,7 @@
 namespace libMesh
 {
 
-void QSimpson::init_1D(const ElemType, unsigned int)
+void QSimpson::init_1D()
 {
   _points.resize(3);
   _weights.resize(3);

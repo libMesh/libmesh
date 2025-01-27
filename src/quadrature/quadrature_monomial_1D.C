@@ -26,7 +26,7 @@
 namespace libMesh
 {
 
-void QMonomial::init_1D(const ElemType, unsigned int)
+void QMonomial::init_1D()
 {
   QGauss gauss_rule(1, _order);
   gauss_rule.init(_type, _p_level);

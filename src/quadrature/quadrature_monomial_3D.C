@@ -25,7 +25,7 @@ namespace libMesh
 {
 
 
-void QMonomial::init_3D(const ElemType, unsigned int)
+void QMonomial::init_3D()
 {
 
   switch (_type)
