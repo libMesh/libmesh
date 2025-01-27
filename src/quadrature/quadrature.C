@@ -119,12 +119,18 @@ void QBase::init(const Elem & elem,
 
 
 void QBase::init(const ElemType t,
-                 unsigned int p)
+                 unsigned int p,
+                 bool simple_type_only)
 {
   // Some element types require data from a specific element, so can
   // only be used with newer APIs.
   if (t == POLYGON1)
     libmesh_error();
+
+  // This API is thus dangerous to use on general meshes
+  // if (!simple_type_only)
+  //   libmesh_deprecated();
+  libmesh_ignore(simple_type_only);
 
   // check to see if we have already
   // done the work for this quadrature rule
@@ -173,7 +179,7 @@ void QBase::init(const QBase & other_rule)
   if (other_rule._elem)
     this->init(*other_rule._elem, other_rule._p_level);
   else
-    this->init(other_rule._type, other_rule._p_level);
+    this->init(other_rule._type, other_rule._p_level, true);
 }
 
 
