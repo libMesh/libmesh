@@ -26,7 +26,7 @@
 namespace libMesh
 {
 
-void QNodal::init_3D(const ElemType, unsigned int)
+void QNodal::init_3D()
 {
 #if LIBMESH_DIM == 3
 

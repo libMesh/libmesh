@@ -40,7 +40,7 @@ std::unique_ptr<QBase> QConical::clone() const
   return std::make_unique<QConical>(*this);
 }
 
-void QConical::init_1D(const ElemType, unsigned int)
+void QConical::init_1D()
 {
   QGauss gauss1D(1, get_order());
 

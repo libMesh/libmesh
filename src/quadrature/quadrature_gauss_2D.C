@@ -22,11 +22,13 @@
 #include "libmesh/quadrature_conical.h"
 #include "libmesh/enum_to_string.h"
 
+#include "libmesh/face_polygon1.h"
+
 namespace libMesh
 {
 
 
-void QGauss::init_2D(const ElemType, unsigned int)
+void QGauss::init_2D()
 {
 #if LIBMESH_DIM > 1
 
