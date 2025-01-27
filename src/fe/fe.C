@@ -185,7 +185,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
       else
         {
           libmesh_assert(this->qrule);
-          this->qrule->init(elem->type(), elem->p_level());
+          this->qrule->init(*elem);
 
           if (this->qrule->shapes_need_reinit())
             this->shapes_on_quadrature = false;
@@ -352,7 +352,7 @@ void FE<Dim,T>::reinit_default_dual_shape_coeffs (const Elem * elem)
 
   FEType default_fe_type(this->get_order(), T);
   QGauss default_qrule(elem->dim(), default_fe_type.default_quadrature_order());
-  default_qrule.init(elem->type(), elem->p_level());
+  default_qrule.init(*elem);
   // In preparation of computing dual_coeff, we compute the default shape
   // function values and use these to compute the dual shape coefficients.
   // The TRUE dual_phi values are computed in compute_dual_shape_functions()

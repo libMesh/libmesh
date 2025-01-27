@@ -50,7 +50,7 @@ void QGaussLobatto::init_3D()
                         "for unsupported Elem type: " << Utility::enum_to_string(_type));
 
         QGauss gauss_rule(_dim, _order);
-        gauss_rule.init(_type, _p_level);
+        gauss_rule.init(*this);
 
         // Swap points and weights with the about-to-be destroyed rule.
         _points.swap (gauss_rule.get_points() );

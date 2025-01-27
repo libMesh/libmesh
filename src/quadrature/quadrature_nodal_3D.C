@@ -40,7 +40,7 @@ void QNodal::init_3D()
         // Construct QTrap rule that matches our own nodal pyramid quadrature permissions
         QTrap rule(/*dim=*/3, /*ignored*/_order);
         rule.allow_nodal_pyramid_quadrature = this->allow_nodal_pyramid_quadrature;
-        rule.init(_type, /*ignored*/_p_level);
+        rule.init(*this);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());
         return;
@@ -112,7 +112,7 @@ void QNodal::init_3D()
         // Construct QSimpson rule that matches our own nodal pyramid quadrature permissions
         QSimpson rule(/*dim=*/3, /*ignored*/_order);
         rule.allow_nodal_pyramid_quadrature = this->allow_nodal_pyramid_quadrature;
-        rule.init(_type, /*ignored*/_p_level);
+        rule.init(*this);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());
 
