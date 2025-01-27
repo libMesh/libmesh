@@ -169,7 +169,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
   else
     {
       // initialize quadrature rule
-      this->qrule->init(side->type(), side_p_level);
+      this->qrule->init(*side, side_p_level);
 
       if (this->qrule->shapes_need_reinit())
         this->shapes_on_quadrature = false;
@@ -283,7 +283,7 @@ void FE<Dim,T>::edge_reinit(const Elem * elem,
   else
     {
       // initialize quadrature rule
-      this->qrule->init(edge->type(), elem->p_level());
+      this->qrule->init(*edge, elem->p_level());
 
       if (this->qrule->shapes_need_reinit())
         this->shapes_on_quadrature = false;

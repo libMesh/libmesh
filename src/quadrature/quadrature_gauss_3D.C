@@ -168,7 +168,7 @@ void QGauss::init_3D()
                   // product rule is third-order accurate and has less points than
                   // the next-available positive-weight rule at FIFTH order.
                   QConical conical_rule(3, _order);
-                  conical_rule.init(_type, _p_level);
+                  conical_rule.init(*this);
 
                   // Swap points and weights with the about-to-be destroyed rule.
                   _points.swap (conical_rule.get_points() );
@@ -468,7 +468,7 @@ void QGauss::init_3D()
                   // to round-off error.  Safest is to disallow rules with negative
                   // weights, but this decision should be made on a case-by-case basis.
                   QGrundmann_Moller gm_rule(3, _order);
-                  gm_rule.init(_type, _p_level);
+                  gm_rule.init(*this);
 
                   // Swap points and weights with the about-to-be destroyed rule.
                   _points.swap (gm_rule.get_points() );
@@ -486,7 +486,7 @@ void QGauss::init_3D()
                   // automatically generate using a 1D Gauss rule on
                   // [0,1] and two 1D Jacobi-Gauss rules on [0,1].
                   QConical conical_rule(3, _order);
-                  conical_rule.init(_type, _p_level);
+                  conical_rule.init(*this);
 
                   // Swap points and weights with the about-to-be destroyed rule.
                   _points.swap (conical_rule.get_points() );
@@ -539,7 +539,7 @@ void QGauss::init_3D()
         // from: Stroud, A.H. "Approximate Calculation of Multiple
         // Integrals."
         QConical conical_rule(3, _order);
-        conical_rule.init(_type, _p_level);
+        conical_rule.init(*this);
 
         // Swap points and weights with the about-to-be destroyed rule.
         _points.swap (conical_rule.get_points() );

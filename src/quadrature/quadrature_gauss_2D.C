@@ -1282,7 +1282,7 @@ void QGauss::init_2D()
               // automatically generate using a 1D Gauss rule on
               // [0,1] and two 1D Jacobi-Gauss rules on [0,1].
               QConical conical_rule(2, _order);
-              conical_rule.init(_type, _p_level);
+              conical_rule.init(*this);
 
               // Swap points and weights with the about-to-be destroyed rule.
               _points.swap (conical_rule.get_points() );
