@@ -61,7 +61,7 @@ void QGauss::init_2D()
         //    yx^2   xy^2
         //       x^2y^2
         QGauss q1D(1,_order);
-        q1D.init(EDGE2, _p_level);
+        q1D.init(EDGE2, _p_level, true);
         tensor_product_quad( q1D );
         return;
       }
