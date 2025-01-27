@@ -192,8 +192,24 @@ public:
   }
 
   /**
+   * Initializes the data structures for a quadrature rule for the
+   * element \p e.  If \p p_level is specified it overrides the element
+   * p_level() elevation to use.
+   */
+  virtual void init (const Elem & e,
+                     unsigned int p_level=invalid_uint);
+
+  /**
    * Initializes the data structures for a quadrature rule for an
-   * element of type \p type.
+   * element of type \p type.  Some types, such as POLYGON1, might
+   * require more detailed element information and so might not be
+   * compatible with this API.
+   *
+   * New code should use the Elem-based API for most use cases, but
+   * some code may initialize quadrature rules with simple ElemType
+   * values like triangles and edges for use in tensor product or
+   * conical product constructions; this code can set the
+   * \p simple_type_only flag to avoid being identified as deprecated.
    */
   virtual void init (const ElemType type=INVALID_ELEM,
                      unsigned int p_level=0);
@@ -357,6 +373,12 @@ protected:
    * computed.
    */
   ElemType _type;
+
+  /**
+   * The element for which the current values were computed, or
+   * nullptr if values were computed without a specific element.
+   */
+  const Elem * _elem;
 
   /**
    * The p-level of the element for which the current values have
