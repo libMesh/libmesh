@@ -99,6 +99,11 @@ public:
   virtual bool is_face(const unsigned int i) const override;
 
   /**
+   * Polygon1 polygons have only vertex nodes, two per side/edge
+   */
+  virtual unsigned int n_nodes_per_side() const override { return 2;}
+
+  /**
    * \returns \p true if the specified (local) node number is on the
    * specified side.
    */

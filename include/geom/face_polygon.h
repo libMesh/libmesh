@@ -120,6 +120,12 @@ public:
   virtual unsigned int n_edges() const override final { return _elemlinks_data.size()-2; }
 
   /**
+   * \returns the number of nodes on each side.  All polygons have the
+   * same number of nodes on each side.
+   */
+  virtual unsigned int n_nodes_per_side() const = 0;
+
+  /**
    * \returns num_children.
    */
   virtual unsigned int n_children() const override final { return num_children; }
