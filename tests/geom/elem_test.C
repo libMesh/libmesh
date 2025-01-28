@@ -571,7 +571,8 @@ public:
         elem_type == PYRAMID5 ||
         elem_type == PYRAMID13 ||
         elem_type == PYRAMID14 ||
-        elem_type == PYRAMID18)
+        elem_type == PYRAMID18 ||
+        elem_type == POLYGON1)
       return;
 
     auto refining_mesh = this->_mesh->clone();
