@@ -158,6 +158,20 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     18, // PYRAMID18
 
     9,  // QUADSHELL9
+
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+
+    invalid_uint,  // POLYGON1
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -216,6 +230,20 @@ const unsigned int Elem::type_to_n_sides_map [] =
     5,  // PYRAMID18
 
     4,  // QUADSHELL9
+
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+
+    invalid_uint,  // POLYGON1
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -274,6 +302,20 @@ const unsigned int Elem::type_to_n_edges_map [] =
     8,  // PYRAMID18
 
     4,  // QUADSHELL9
+
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+
+    invalid_uint,  // POLYGON1
   };
 
 // ------------------------------------------------------------
@@ -3465,7 +3507,8 @@ Elem::positive_face_orientation(const unsigned int i) const
   // Get the number of vertices N of face i. Note that for 3d elements, i.e.
   // elements for which this->n_faces() > 0, the number of vertices on any of
   // its sides (or faces) is just the number of that face's sides (or edges).
-  const unsigned int N = Elem::type_to_n_sides_map[this->side_type(i)];
+  auto side_i = this->side_ptr(i);
+  const unsigned int N = side_i->n_sides();
 
   const std::vector<unsigned int> nodes = this->nodes_on_side(i);
   std::vector<Point> vertices(N);

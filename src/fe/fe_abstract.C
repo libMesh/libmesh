@@ -396,6 +396,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> & nodes)
 {
+  if (Elem::type_to_n_nodes_map[itemType] == invalid_uint)
+    libmesh_error();
+
   nodes.resize(Elem::type_to_n_nodes_map[itemType]);
   switch(itemType)
     {

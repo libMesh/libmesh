@@ -608,6 +608,10 @@ public:
   /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of nodes in the element.
+   *
+   * This is only usable for simple types for which the node number
+   * is fixed; for more general types like POLYGON1 an actual
+   * instantiated Elem must be queried.
    */
   static const unsigned int type_to_n_nodes_map[INVALID_ELEM];
 
@@ -639,6 +643,10 @@ public:
   /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of sides on the element.
+   *
+   * This is only usable for simple types for which the node number
+   * is fixed; for more general types like POLYGON1 an actual
+   * instantiated Elem must be queried.
    */
   static const unsigned int type_to_n_sides_map[INVALID_ELEM];
 
@@ -693,6 +701,10 @@ public:
   /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of edges on the element.
+   *
+   * This is only usable for simple types for which the node number
+   * is fixed; for more general types like POLYGON1 an actual
+   * instantiated Elem must be queried.
    */
   static const unsigned int type_to_n_edges_map[INVALID_ELEM];
 
