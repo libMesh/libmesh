@@ -164,9 +164,14 @@ public:
   second_order_child_vertex (const unsigned int n) const override;
 
   /**
-   * An optimized method for calculating the area of a POLYGON.
+   * An optimized method for calculating the area of a POLYGON1.
    */
   virtual Real volume () const override;
+
+  /**
+   * An optimized method for calculating the centroid of a POLYGON1.
+   */
+  virtual Point true_centroid () const override;
 
   virtual void permute(unsigned int perm_num) override final;
 

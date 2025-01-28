@@ -231,6 +231,41 @@ Real Polygon1::volume () const
 
 
 
+Point Polygon1::true_centroid () const
+{
+  // This specialization is good for Lagrange mappings only
+  if (this->mapping_type() != LAGRANGE_MAP)
+    return this->Elem::true_centroid();
+
+  // We use a triangulation to calculate here; assert that it's as
+  // consistent as possible.
+  libmesh_assert_equal_to (this->_triangulation.size(),
+                           this->n_nodes() - 2);
+
+  Real double_area = 0;
+  Point double_area_weighted_centroid;
+  for (const auto & triangle : this->_triangulation)
+    {
+      Point v01 = this->point(triangle[1]) -
+                  this->point(triangle[0]);
+      Point v02 = this->point(triangle[2]) -
+                  this->point(triangle[0]);
+
+      const Real  double_tri_area = std::sqrt(cross_norm_sq(v01, v02));
+      const Point tri_centroid = (this->point(triangle[0]) +
+                                  this->point(triangle[1]) +
+                                  this->point(triangle[2]))/3;
+
+      double_area += double_tri_area;
+
+      double_area_weighted_centroid += double_tri_area * tri_centroid;
+    }
+
+  return double_area_weighted_centroid / double_area;
+}
+
+
+
 std::pair<unsigned short int, unsigned short int>
 Polygon1::second_order_child_vertex (const unsigned int /*n*/) const
 {
