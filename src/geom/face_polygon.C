@@ -85,7 +85,7 @@ unsigned int Polygon::local_side_node(unsigned int side,
 {
   const auto ns = this->n_sides();
   libmesh_assert_less (side, ns);
-  libmesh_assert_less (side_node, this->n_nodes()/ns + 1);
+  libmesh_assert_less (side_node, this->n_nodes_per_side());
 
   if (!side_node)
     return side;
@@ -197,6 +197,9 @@ std::vector<unsigned int>
 Polygon::edges_adjacent_to_node(const unsigned int n) const
 {
   libmesh_assert_less(n, this->n_nodes());
+
+  // For mid-face nodes, the subclass had better have overridden this.
+  libmesh_assert_less(n, this->n_sides() * (this->n_nodes_per_side() + 1));
 
   const unsigned int ns = this->n_sides();
 
