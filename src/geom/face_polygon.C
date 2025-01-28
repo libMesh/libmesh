@@ -39,6 +39,11 @@ Point Polygon::master_point (const unsigned int i) const
 {
   const unsigned int ns = this->n_sides();
 
+  // Non-vertex points need to be handled by a subclass overriding
+  // this.
+  if (i > ns)
+    libmesh_not_implemented();
+
   // Center-to-midside to center-to-vertex angle
   const Real pi_over_ns = libMesh::pi / ns;
 
