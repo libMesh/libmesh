@@ -1306,7 +1306,7 @@ void QGauss::init_2D()
     case POLYGON1:
       {
         QGauss tri_rule(2, _order);
-        tri_rule.init(TRI3, _p_level);
+        tri_rule.init(TRI3, _p_level, true);
 
         std::vector<Point> & tripoints = tri_rule.get_points();
         std::vector<Real> & triweights = tri_rule.get_weights();
