@@ -188,9 +188,23 @@ public:
          this->_mesh->active_local_element_ptr_range())
       {
         CPPUNIT_ASSERT(elem->n_nodes() <= Elem::max_n_nodes);
-        CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), Elem::type_to_n_nodes_map[elem->type()]);
-        CPPUNIT_ASSERT_EQUAL(elem->n_sides(), Elem::type_to_n_sides_map[elem->type()]);
-        CPPUNIT_ASSERT_EQUAL(elem->n_edges(), Elem::type_to_n_edges_map[elem->type()]);
+
+        // If we have an element type with topology defined solely by
+        // the type, then that should match the runtime topology.  If
+        // not, then we should be aware of it.
+        const ElemType etype = elem->type();
+        if (etype != POLYGON1)
+          {
+            CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), Elem::type_to_n_nodes_map[etype]);
+            CPPUNIT_ASSERT_EQUAL(elem->n_sides(), Elem::type_to_n_sides_map[etype]);
+            CPPUNIT_ASSERT_EQUAL(elem->n_edges(), Elem::type_to_n_edges_map[etype]);
+          }
+        else
+          {
+            CPPUNIT_ASSERT_EQUAL(invalid_uint, Elem::type_to_n_nodes_map[etype]);
+            CPPUNIT_ASSERT_EQUAL(invalid_uint, Elem::type_to_n_sides_map[etype]);
+            CPPUNIT_ASSERT_EQUAL(invalid_uint, Elem::type_to_n_edges_map[etype]);
+          }
       }
   }
 
