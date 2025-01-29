@@ -684,7 +684,7 @@ void RBEIMConstruction::apply_normalization_to_solution_snapshots()
       // error tolerance in the Greedy training, and the L2-norm-scaled value of
       // _max_abs_value_in_training_set that we obtain here should be sufficient
       // for that purpose.
-      if (i == _max_abs_value_in_training_set_index)
+      if ((i == _max_abs_value_in_training_set_index) && (norm_val > 0.))
         _max_abs_value_in_training_set /= norm_val;
     }
 
