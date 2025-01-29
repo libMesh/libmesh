@@ -77,7 +77,12 @@ public:
         // degrees, but pyramids actually have an obtuse interior
         // angle of acos(-1/3) ~ 109.47 deg formed by edge pairs
         // {(0, 4), (2, 4)} and {(1,4), (3,4)}.
-        CPPUNIT_ASSERT_LESSEQUAL((std::acos(Real(-1)/3) * 180 / libMesh::pi) + TOLERANCE, max_angle);
+        if (elem->type() != POLYGON1)
+          CPPUNIT_ASSERT_LESSEQUAL((std::acos(Real(-1)/3) * 180 / libMesh::pi) + TOLERANCE, max_angle);
+
+        // We're doing some polygon testing with a squashed pentagon
+        // that has a 135 degree angle
+        CPPUNIT_ASSERT_LESSEQUAL(135 + TOLERANCE, max_angle);
 
         // Notes on minimum angle we expect to see:
         // 1.) 1D Elements don't have interior angles, so the base
@@ -128,12 +133,16 @@ public:
         else
           CPPUNIT_ASSERT_LESSEQUAL   (8 + TOLERANCE, jac);
 
-        // The smallest actual nodal areas in this test are found in
-        // tetrahedra, which have a minimum value of 2.0. However, we
-        // return a default value of 1.0 for 0D and 1D elements here,
-        // so we also handle that case.
+        // The smallest 2D/3D nodal areas for regular elements in this
+        // test are found in tetrahedra, which have a minimum value of
+        // 2.0. However, we return a default value of 1.0 for 0D and
+        // 1D elements here, and we have a custom distorted-pentagon
+        // Polygon1 with a 0.5 at 2 nodes, so we handle those cases
+        // too.
         if (elem->dim() < 2)
           CPPUNIT_ASSERT_GREATEREQUAL(1 - TOLERANCE, jac);
+        else if (elem->type() == POLYGON1)
+          CPPUNIT_ASSERT_GREATEREQUAL(0.5 - TOLERANCE, jac);
         else
           CPPUNIT_ASSERT_GREATEREQUAL(2 - TOLERANCE, jac);
 
@@ -218,6 +227,11 @@ public:
         if (elem->infinite())
           continue;
 
+        // Disable for polygons temporarily until we get FE updated
+        // for them; we need that for mapping calculations.
+        if (elem->type() == POLYGON1)
+          continue;
+
         for (const auto n : elem->node_index_range())
 #ifndef LIBMESH_ENABLE_EXCEPTIONS
           // If this node has a singular Jacobian, we need exceptions in order
@@ -251,7 +265,8 @@ public:
         for (const auto p : IntRange<unsigned int>(0, elem->n_permutations()))
           {
             elem->permute(p);
-            CPPUNIT_ASSERT(elem->has_invertible_map());
+            if (elem_type != POLYGON1) // Not yet implemented
+              CPPUNIT_ASSERT(elem->has_invertible_map());
             const Point new_centroid = elem->true_centroid();
             const Point new_vertex_avg = elem->vertex_average();
             Point new_quasicc;
@@ -302,9 +317,13 @@ public:
         // We should just be flipped, not twisted, so our map should
         // still be affine.
         // ... except for stupid singular pyramid maps
-        if (elem->dim() < 3 ||
-            elem->n_vertices() != 5)
+        // ... or the polygons we're deliberately testing non-affine
+        if ((elem->dim() < 3 ||
+             elem->n_vertices() != 5) &&
+            elem_type != POLYGON1)
           CPPUNIT_ASSERT(elem->has_affine_map());
+        else if (elem_type == POLYGON1)
+          CPPUNIT_ASSERT(!elem->has_affine_map());
 
         // The neighbors and bcids should have flipped in a way
         // consistently with the nodes (unless this is a 0D NodeElem)
@@ -381,9 +400,13 @@ public:
 
         // Our map should still be affine.
         // ... except for stupid singular pyramid maps
-        if (elem->dim() < 3 ||
-            elem->n_vertices() != 5)
+        // ... or the polygons we're deliberately testing non-affine
+        if ((elem->dim() < 3 ||
+             elem->n_vertices() != 5) &&
+            elem_type != POLYGON1)
           CPPUNIT_ASSERT(elem->has_affine_map());
+        else if (elem_type == POLYGON1)
+          CPPUNIT_ASSERT(!elem->has_affine_map());
 
         // The neighbors and bcids should have flipped back to where
         // they were.
