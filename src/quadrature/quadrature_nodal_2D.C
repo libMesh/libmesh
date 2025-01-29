@@ -19,9 +19,11 @@
 
 // Local includes
 #include "libmesh/quadrature_nodal.h"
+
+#include "libmesh/enum_to_string.h"
+#include "libmesh/face_polygon1.h"
 #include "libmesh/quadrature_trap.h"
 #include "libmesh/quadrature_simpson.h"
-#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
@@ -162,6 +164,28 @@ void QNodal::init_2D()
         Real wv = Real(1)/40;
         Real we = Real(1)/15;
         _weights = {wv, wv, wv, we, we, we, Real(9)/40};
+        return;
+      }
+
+      //---------------------------------------------
+      // Arbitrary polygon quadrature rules
+    case POLYGON1:
+      {
+        // Polygon1 requires the newer Quadrature API
+        if (!_elem)
+          libmesh_error();
+
+        libmesh_assert(_elem->type() == POLYGON1);
+
+        const Polygon1 & poly = *cast_ptr<const Polygon1 *>(_elem);
+
+        const unsigned int nn = poly.n_nodes();
+        _weights.resize(nn, Real(1)/nn);
+
+        _points.resize(poly.n_nodes());
+        for (auto n : make_range(nn))
+          _points[n] = poly.master_point(n);
+
         return;
       }
 
