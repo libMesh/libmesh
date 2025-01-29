@@ -21,6 +21,7 @@
 #include "libmesh/edge_edge2.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/side.h"
+#include "libmesh/tensor_value.h"
 
 // C++ headers
 #include <numeric> // std::iota
@@ -116,10 +117,45 @@ Polygon1::nodes_on_edge(const unsigned int e) const
 
 bool Polygon1::has_affine_map() const
 {
-  // For now we'll just disable this optimization
-  libmesh_experimental();
+  const unsigned int ns = this->n_sides();
 
-  return false;
+  // Get a good tolerance to use
+  Real perimeter_l1 = 0;
+  for (auto s : make_range(ns))
+    perimeter_l1 += (this->point((s+1)%ns) - this->point(s)).l1_norm();
+  const Real tol = perimeter_l1 * affine_tol;
+
+  // Find the map we expect to have
+  const Point veci = this->point(1) - this->point(0);
+  const Point vec12 = this->point(2) - this->point(1);
+
+  // Exterior angle
+  const Real theta = 2 * libMesh::pi / ns;
+  const Real costheta = cos(theta);
+  const Real sintheta = sin(theta);
+
+  RealTensor map;
+  map(0, 0) = veci(0);
+  map(1, 0) = veci(1);
+  map(2, 0) = veci(2);
+  map(0, 1) = (vec12(0) - veci(0)*costheta)/sintheta;
+  map(1, 1) = (vec12(1) - veci(1)*costheta)/sintheta;
+  map(2, 1) = (vec12(2) - veci(2)*costheta)/sintheta;
+
+  libmesh_assert_less((map * this->master_point(1) -
+                       (this->point(1) - this->point(0))).l1_norm(),
+                      tol);
+  libmesh_assert_less((map * this->master_point(2) -
+                       (this->point(2) - this->point(0))).l1_norm(),
+                      tol);
+
+  for (auto i : make_range(3u, ns))
+    if ((map * this->master_point(i) -
+                     (this->point(i) - this->point(0))).l1_norm() >
+        tol)
+      return false;
+
+  return true;
 }
 
 
