@@ -640,9 +640,10 @@ void RBEIMConstruction::apply_normalization_to_solution_snapshots()
 
   for (unsigned int i=0; i<n_snapshots; i++)
     {
+      Real norm_val = 0.;
       if (rbe.get_parametrized_function().on_mesh_sides())
         {
-          Real norm_val = std::sqrt(std::real(side_inner_product(
+          norm_val = std::sqrt(std::real(side_inner_product(
             _local_side_parametrized_functions_for_training[i],
             _local_side_parametrized_functions_for_training[i],
             apply_comp_scaling)));
@@ -652,7 +653,7 @@ void RBEIMConstruction::apply_normalization_to_solution_snapshots()
         }
       else if (rbe.get_parametrized_function().on_mesh_nodes())
         {
-          Real norm_val = std::sqrt(std::real(node_inner_product(
+          norm_val = std::sqrt(std::real(node_inner_product(
             _local_node_parametrized_functions_for_training[i],
             _local_node_parametrized_functions_for_training[i],
             apply_comp_scaling)));
@@ -662,7 +663,7 @@ void RBEIMConstruction::apply_normalization_to_solution_snapshots()
         }
       else
         {
-          Real norm_val = std::sqrt(std::real(inner_product(
+          norm_val = std::sqrt(std::real(inner_product(
             _local_parametrized_functions_for_training[i],
             _local_parametrized_functions_for_training[i],
             apply_comp_scaling)));
@@ -670,7 +671,25 @@ void RBEIMConstruction::apply_normalization_to_solution_snapshots()
           if (norm_val > 0.)
             scale_parametrized_function(_local_parametrized_functions_for_training[i], 1./norm_val);
         }
+
+      // Since we're rescaling the training samples, we should also rescale
+      // _max_abs_value_in_training_set in the same way. We obtained the
+      // _max_abs_value_in_training_set value from the sample with index
+      // _max_abs_value_in_training_set_index, so we rescale using the norm
+      // of this sample here. Note that the value we obtain may not be exactly
+      // equal to the max value we would obtain after looping over all the
+      // normalized samples, because we normalized in the L2 norm rather than
+      // in the max norm, but it should be close to this "true max" value. The
+      // main use-case of _max_abs_value_in_training_set is to scale the relative
+      // error tolerance in the Greedy training, and the L2-norm-scaled value of
+      // _max_abs_value_in_training_set that we obtain here should be sufficient
+      // for that purpose.
+      if ((i == _max_abs_value_in_training_set_index) && (norm_val > 0.))
+        _max_abs_value_in_training_set /= norm_val;
     }
+
+  libMesh::out << "Maximum absolute value in the training set after normalization: "
+    << _max_abs_value_in_training_set << std::endl << std::endl;
 }
 
 Real RBEIMConstruction::train_eim_approximation_with_POD()
