@@ -55,6 +55,7 @@ for method in ${METHODS}; do
      dnl blank line
      AS_ECHO([])
 done
+AS_ECHO(["LDFLAGS............................ : $LDFLAGS"])
 AS_ECHO(["Any warnings-to-errors flags....... : $ACSM_ANY_WERROR_FLAG"])
 AS_ECHO(["Any extra paranoid warning flags... : $ACSM_ANY_PARANOID_FLAGS"])
 AS_ECHO(["Install dir........................ : $prefix"])
