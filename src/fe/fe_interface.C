@@ -272,8 +272,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
                                             const FEType & fe_t,
                                             const ElemType t)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /*
@@ -438,8 +437,7 @@ unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
                                          const ElemType t,
                                          const unsigned int n)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -530,8 +528,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
                                           const FEType & fe_t,
                                           const ElemType t)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -760,8 +757,7 @@ Real FEInterface::shape(const unsigned int dim,
                         const unsigned int i,
                         const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -781,8 +777,7 @@ Real FEInterface::shape(const unsigned int dim,
                         const unsigned int i,
                         const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -864,8 +859,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
                               const Point & p,
                               Real & phi)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -908,8 +902,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
                               const Point & p,
                               Real & phi)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -1137,8 +1130,7 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const Point & p,
                                       RealGradient & phi)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   // This API does not currently support infinite elements.
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1342,8 +1334,7 @@ FEInterface::shape_function(const unsigned int dim,
                             const FEType & fe_t,
                             const ElemType libmesh_inf_var(t))
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
@@ -1378,8 +1369,7 @@ Real FEInterface::shape_deriv(const unsigned int dim,
                               const unsigned int j,
                               const Point & p)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_greater (dim,j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1403,8 +1393,7 @@ Real FEInterface::shape_deriv(const unsigned int dim,
                               const unsigned int j,
                               const Point & p)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_greater (dim,j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1626,8 +1615,7 @@ FEInterface::shape_deriv_function(const unsigned int dim,
                                   const FEType & fe_t,
                                   const ElemType libmesh_inf_var(t))
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
@@ -1665,8 +1653,7 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const unsigned int j,
                                      const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_greater_equal (dim*(dim-1),j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1700,8 +1687,7 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const unsigned int j,
                                      const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_greater_equal (dim*(dim-1),j);
 
@@ -1811,8 +1797,7 @@ FEInterface::shape_second_deriv_function(const unsigned int dim,
                                          const FEType & fe_t,
                                          const ElemType libmesh_inf_var(t))
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
@@ -1847,8 +1832,7 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const Point & p,
                                       RealGradient & phi)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   // This is actually an issue for infinite elements: They require type 'Gradient'!
   if (elem->infinite())
