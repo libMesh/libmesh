@@ -873,7 +873,8 @@ Real FE<2,SUBDIVISION>::shape_second_deriv(const FEType fet,
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
-void FE<2,SUBDIVISION>::nodal_soln(const Elem * elem,
+void FE<2,SUBDIVISION>::nodal_soln(const unsigned,
+                                   const Elem * elem,
                                    const Order,
                                    const std::vector<Number> & elem_soln,
                                    std::vector<Number> & nodal_soln,

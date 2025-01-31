@@ -187,7 +187,8 @@ LIBMESH_FE_NODAL_SOLN(SIDE_HIERARCHIC, side_hierarchic_nodal_soln)
 // isn't well-defined so we can't fall back on it.
 template <>
 void FE<0, SIDE_HIERARCHIC>::side_nodal_soln
-  (const Elem *, const Order,
+  (const unsigned,
+   const Elem *, const Order,
    const unsigned int,
    const std::vector<Number> &,
    std::vector<Number> &,
@@ -198,7 +199,8 @@ void FE<0, SIDE_HIERARCHIC>::side_nodal_soln
 
 template <>
 void FE<1, SIDE_HIERARCHIC>::side_nodal_soln
-  (const Elem *, const Order,
+  (const unsigned,
+   const Elem *, const Order,
    const unsigned int side,
    const std::vector<Number> & elem_soln,
    std::vector<Number> & nodal_soln_on_side,
@@ -212,7 +214,8 @@ void FE<1, SIDE_HIERARCHIC>::side_nodal_soln
 
 template <>
 void FE<2, SIDE_HIERARCHIC>::side_nodal_soln
-  (const Elem * elem, const Order o,
+  (const unsigned,
+   const Elem * elem, const Order o,
    const unsigned int side,
    const std::vector<Number> & elem_soln,
    std::vector<Number> & nodal_soln_on_side,
@@ -227,7 +230,8 @@ void FE<2, SIDE_HIERARCHIC>::side_nodal_soln
 
 template <>
 void FE<3, SIDE_HIERARCHIC>::side_nodal_soln
-  (const Elem * elem, const Order o,
+  (const unsigned,
+   const Elem * elem, const Order o,
    const unsigned int side,
    const std::vector<Number> & elem_soln,
    std::vector<Number> & nodal_soln_on_side,

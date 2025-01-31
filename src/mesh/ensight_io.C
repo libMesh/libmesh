@@ -381,7 +381,7 @@ void EnsightIO::write_scalar_ascii(std::string_view sys,
       for (auto i : index_range(dof_indices_scl))
         elem_soln[i] = system.current_solution(dof_indices_scl[i]);
 
-      FEInterface::nodal_soln (dim, fe_type, elem, elem_soln, nodal_soln);
+      FEInterface::nodal_soln (1, dim, fe_type, elem, elem_soln, nodal_soln);
 
       libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
 
@@ -479,10 +479,10 @@ void EnsightIO::write_vector_ascii(std::string_view sys,
             elem_soln_w[i] = system.current_solution(dof_indices_w[i]);
         }
 
-      FEInterface::nodal_soln (dim, fe_type, elem, elem_soln_u, nodal_soln_u);
-      FEInterface::nodal_soln (dim, fe_type, elem, elem_soln_v, nodal_soln_v);
+      FEInterface::nodal_soln (1, dim, fe_type, elem, elem_soln_u, nodal_soln_u);
+      FEInterface::nodal_soln (1, dim, fe_type, elem, elem_soln_v, nodal_soln_v);
       if (dim == 3)
-        FEInterface::nodal_soln (dim, fe_type, elem, elem_soln_w, nodal_soln_w);
+        FEInterface::nodal_soln (1, dim, fe_type, elem, elem_soln_w, nodal_soln_w);
 
       libmesh_assert_equal_to (nodal_soln_u.size(), elem->n_nodes());
       libmesh_assert_equal_to (nodal_soln_v.size(), elem->n_nodes());

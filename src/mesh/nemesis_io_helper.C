@@ -2527,6 +2527,7 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
                       elem_soln[i] = sys_soln(dof_indices[i]);
 
                     FEInterface::nodal_soln (elem->dim(),
+                                             FEInterface::n_vec_dim(mesh, type),
                                              type,
                                              elem,
                                              elem_soln,

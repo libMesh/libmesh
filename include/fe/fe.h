@@ -386,7 +386,8 @@ public:
    *
    * On a p-refined element, \p o should be the base order of the element.
    */
-  static void nodal_soln(const Elem * elem, const Order o,
+  static void nodal_soln(const unsigned vdim,
+                         const Elem * elem, const Order o,
                          const std::vector<Number> & elem_soln,
                          std::vector<Number> & nodal_soln,
                          bool add_p_level = true);
@@ -397,7 +398,8 @@ public:
    *
    * On a p-refined element, \p o should be the base order of the element.
    */
-  static void side_nodal_soln(const Elem * elem, const Order o,
+  static void side_nodal_soln(const unsigned vdim,
+                              const Elem * elem, const Order o,
                               const unsigned int side,
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln_on_side,
@@ -739,7 +741,8 @@ protected:
   /**
    * A default implementation for side_nodal_soln
    */
-  static void default_side_nodal_soln(const Elem * elem, const Order o,
+  static void default_side_nodal_soln(const unsigned vdim,
+                                      const Elem * elem, const Order o,
                                       const unsigned int side,
                                       const std::vector<Number> & elem_soln,
                                       std::vector<Number> & nodal_soln_on_side,
