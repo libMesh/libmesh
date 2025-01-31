@@ -67,18 +67,20 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
       {
         const std::vector<Real> & dxidx_map = fe.get_fe_map().get_dxidx();
         const std::vector<Real> & dxidy_map = fe.get_fe_map().get_dxidy();
+        const std::vector<Real> & dxidz_map = fe.get_fe_map().get_dxidz();
 
         const std::vector<Real> & detadx_map = fe.get_fe_map().get_detadx();
         const std::vector<Real> & detady_map = fe.get_fe_map().get_detady();
+        const std::vector<Real> & detadz_map = fe.get_fe_map().get_detadz();
 
-        // FIXME: Need to update for 2D elements in 3D space
         // phi = (dx/dxi)^-T * \hat{phi}
-        // In 2D:
-        // (dx/dxi)^{-1} = [  dxi/dx   dxi/dy
-        // deta/dx  deta/dy ]
+        // In 2D (embedded in 3D):
+        // (dx/dxi)^{-1} = [ dxi/dx  dxi/dy  dxi/dz
+        //                   deta/dx deta/dy deta/dz ]
         //
-        // so: dxi/dx^{-T} * \hat{phi} = [ dxi/dx  deta/dx   [ \hat{phi}_xi
-        // dxi/dy  deta/dy ]   \hat{phi}_eta ]
+        // so: dxi/dx^{-T} * \hat{phi} = [ dxi/dx deta/dx   [ \hat{phi}_xi
+        //                                 dxi/dy deta/dy     \hat{phi}_eta ]
+        //                                 dxi/dz deta/dz ]
         //
         // or in indicial notation:  phi_j = xi_{i,j}*\hat{phi}_i
         for (auto i : index_range(phi))
@@ -95,6 +97,8 @@ void HCurlFETransformation<OutputShape>::map_phi(const unsigned int dim,
               phi[i][p](0) = dxidx_map[p]*phi_ref.slice(0) + detadx_map[p]*phi_ref.slice(1);
 
               phi[i][p](1) = dxidy_map[p]*phi_ref.slice(0) + detady_map[p]*phi_ref.slice(1);
+
+              phi[i][p](2) = dxidz_map[p]*phi_ref.slice(0) + detadz_map[p]*phi_ref.slice(1);
             }
 
         break;
@@ -168,18 +172,27 @@ void HCurlFETransformation<OutputShape>::map_curl(const unsigned int dim,
 
     case 2:
       {
+        const std::vector<Real> & dxidx_map = fe.get_fe_map().get_dxidx();
+        const std::vector<Real> & dxidy_map = fe.get_fe_map().get_dxidy();
+        const std::vector<Real> & dxidz_map = fe.get_fe_map().get_dxidz();
+
+        const std::vector<Real> & detadx_map = fe.get_fe_map().get_detadx();
+        const std::vector<Real> & detady_map = fe.get_fe_map().get_detady();
+        const std::vector<Real> & detadz_map = fe.get_fe_map().get_detadz();
+
         const std::vector<std::vector<OutputShape>> & dphi_dxi = fe.get_dphidxi();
         const std::vector<std::vector<OutputShape>> & dphi_deta = fe.get_dphideta();
 
-        const std::vector<Real> & J = fe.get_fe_map().get_jacobian();
-
-        // FIXME: I don't think this is valid for 2D elements in 3D space
-        // In 2D: curl(phi) = J^{-1} * curl(\hat{phi})
+        // In 2D (embedded in 3D): curl(phi)_j = C(j) * curl(\hat{phi}) where C(j)
+        // is the jth column cofactor of (dx/dxi)^{-1} = [ dxi/dx  dxi/dy  dxi/dz
+        //                                                 deta/dx deta/dy deta/dz ]
         for (auto i : index_range(curl_phi))
           for (auto p : index_range(curl_phi[i]))
             {
-              curl_phi[i][p].slice(0) = curl_phi[i][p].slice(1) = 0.0;
-              curl_phi[i][p].slice(2) = ( dphi_dxi[i][p].slice(1) - dphi_deta[i][p].slice(0) )/J[p];
+              const Real curl_ref = dphi_dxi[i][p].slice(1) - dphi_deta[i][p].slice(0);
+              curl_phi[i][p].slice(0) = curl_ref *  (dxidy_map[p]*detadz_map[p] - dxidz_map[p]*detady_map[p]);
+              curl_phi[i][p].slice(1) = curl_ref * -(dxidx_map[p]*detadz_map[p] - dxidz_map[p]*detadx_map[p]);
+              curl_phi[i][p].slice(2) = curl_ref *  (dxidx_map[p]*detady_map[p] - dxidy_map[p]*detadx_map[p]);
             }
 
         break;
