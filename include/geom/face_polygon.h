@@ -88,6 +88,12 @@ public:
   virtual ~Polygon() = default;
 
   /**
+   * \returns true - polygon subclasses can have numbers of sides and
+   * nodes which vary at runtime.
+   */
+  virtual bool runtime_topology() const { return true; }
+
+  /**
    * \returns The \p Point associated with local \p Node \p i,
    * in master element rather than physical coordinates.
    *
