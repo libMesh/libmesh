@@ -89,6 +89,7 @@ void side_hierarchic_side_nodal_soln
 }
 
 
+
 unsigned int side_hierarchic_n_dofs_at_node(const ElemType t,
                                             const Order o,
                                             const unsigned int n)
@@ -145,6 +146,15 @@ unsigned int side_hierarchic_n_dofs_at_node(const ElemType t,
 
 
 
+unsigned int side_hierarchic_n_dofs_at_node(const Elem & e,
+                                            const Order o,
+                                            const unsigned int n)
+{
+  return side_hierarchic_n_dofs_at_node(e.type(), o, n);
+}
+
+
+
 unsigned int side_hierarchic_n_dofs(const ElemType t, const Order o)
 {
   switch (t)
@@ -175,6 +185,13 @@ unsigned int side_hierarchic_n_dofs(const ElemType t, const Order o)
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for HIERARCHIC FE family!");
     }
 } // side_hierarchic_n_dofs()
+
+
+
+unsigned int side_hierarchic_n_dofs(const Elem * e, const Order o)
+{
+  return side_hierarchic_n_dofs(e->type(), o);
+}
 
 
 } // anonymous namespace
@@ -247,17 +264,32 @@ template <> unsigned int FE<1,SIDE_HIERARCHIC>::n_dofs(const ElemType t, const O
 template <> unsigned int FE<2,SIDE_HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return side_hierarchic_n_dofs(t, o); }
 template <> unsigned int FE<3,SIDE_HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return side_hierarchic_n_dofs(t, o); }
 
+template <> unsigned int FE<0,SIDE_HIERARCHIC>::n_dofs(const Elem * e, const Order o) { return side_hierarchic_n_dofs(e, o); }
+template <> unsigned int FE<1,SIDE_HIERARCHIC>::n_dofs(const Elem * e, const Order o) { return side_hierarchic_n_dofs(e, o); }
+template <> unsigned int FE<2,SIDE_HIERARCHIC>::n_dofs(const Elem * e, const Order o) { return side_hierarchic_n_dofs(e, o); }
+template <> unsigned int FE<3,SIDE_HIERARCHIC>::n_dofs(const Elem * e, const Order o) { return side_hierarchic_n_dofs(e, o); }
+
 // Full specialization of n_dofs_at_node() function for every dimension.
 template <> unsigned int FE<0,SIDE_HIERARCHIC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return side_hierarchic_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<1,SIDE_HIERARCHIC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return side_hierarchic_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<2,SIDE_HIERARCHIC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return side_hierarchic_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<3,SIDE_HIERARCHIC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return side_hierarchic_n_dofs_at_node(t, o, n); }
 
+template <> unsigned int FE<0,SIDE_HIERARCHIC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return side_hierarchic_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<1,SIDE_HIERARCHIC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return side_hierarchic_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<2,SIDE_HIERARCHIC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return side_hierarchic_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<3,SIDE_HIERARCHIC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return side_hierarchic_n_dofs_at_node(e, o, n); }
+
 // Full specialization of n_dofs_per_elem() function for every dimension.
 template <> unsigned int FE<0,SIDE_HIERARCHIC>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<1,SIDE_HIERARCHIC>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<2,SIDE_HIERARCHIC>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<3,SIDE_HIERARCHIC>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
+
+template <> unsigned int FE<0,SIDE_HIERARCHIC>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<1,SIDE_HIERARCHIC>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<2,SIDE_HIERARCHIC>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<3,SIDE_HIERARCHIC>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
 
 // Side FEMs are discontinuous from side to side
 template <> FEContinuity FE<0,SIDE_HIERARCHIC>::get_continuity() const { return SIDE_DISCONTINUOUS; }
