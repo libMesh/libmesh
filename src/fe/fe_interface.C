@@ -70,229 +70,94 @@ FEInterface::is_InfFE_elem(const ElemType et)
     case INFHEX18:
     case INFPRISM6:
     case INFPRISM12:
-      {
-        return true;
-      }
+      return true;
 
     default:
-      {
-        return false;
-      }
+      return false;
     }
 }
 
 #endif //ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
+#define fe_family_case_func(family, dim, func_and_args, prefix, suffix) \
+  case family:                                                          \
+    prefix FE<dim,family>::func_and_args suffix                         \
 
+#define fe_family_case(family) \
+  case family:
+
+#define fe_family_scalar_case_func(dim, func_and_args, prefix, suffix)     \
+  fe_family_case_func(CLOUGH, dim, func_and_args, prefix, suffix)          \
+  fe_family_case_func(HERMITE, dim, func_and_args, prefix, suffix)         \
+  fe_family_case_func(HIERARCHIC, dim, func_and_args, prefix, suffix)      \
+  fe_family_case_func(L2_HIERARCHIC, dim, func_and_args, prefix, suffix)   \
+  fe_family_case_func(SIDE_HIERARCHIC, dim, func_and_args, prefix, suffix) \
+  fe_family_case_func(LAGRANGE, dim, func_and_args, prefix, suffix)        \
+  fe_family_case_func(L2_LAGRANGE, dim, func_and_args, prefix, suffix)     \
+  fe_family_case_func(MONOMIAL, dim, func_and_args, prefix, suffix)        \
+  fe_family_case_func(SCALAR, dim, func_and_args, prefix, suffix)          \
+  fe_family_case_func(XYZ, dim, func_and_args, prefix, suffix)             \
+  fe_family_case_func(SUBDIVISION, 2, func_and_args,                       \
+                      libmesh_assert_equal_to (dim, 2); prefix, suffix)
+
+#define fe_family_scalar_case()   \
+  fe_family_case(CLOUGH)          \
+  fe_family_case(HERMITE)         \
+  fe_family_case(HIERARCHIC)      \
+  fe_family_case(L2_HIERARCHIC)   \
+  fe_family_case(SIDE_HIERARCHIC) \
+  fe_family_case(LAGRANGE)        \
+  fe_family_case(L2_LAGRANGE)     \
+  fe_family_case(MONOMIAL)        \
+  fe_family_case(SCALAR)          \
+  fe_family_case(XYZ)             \
+  fe_family_case(SUBDIVISION)     \
 
 #ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-#define fe_family_switch(dim, func_and_args, prefix, suffix)            \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
-      {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case SIDE_HIERARCHIC:                                             \
-        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case BERNSTEIN:                                                   \
-        prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
-      case SZABAB:                                                      \
-        prefix FE<dim,SZABAB>::func_and_args suffix                     \
-      case RATIONAL_BERNSTEIN:                                          \
-        prefix FE<dim,RATIONAL_BERNSTEIN>::func_and_args suffix         \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
-      }                                                                 \
-  } while (0)
 
-#define fe_family_with_vec_switch(dim, func_and_args, prefix, suffix)   \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
-      {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case HIERARCHIC_VEC:                                              \
-        prefix FEHierarchicVec<dim>::func_and_args suffix               \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case L2_HIERARCHIC_VEC:                                           \
-        prefix FEL2HierarchicVec<dim>::func_and_args suffix             \
-      case SIDE_HIERARCHIC:                                             \
-        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case LAGRANGE_VEC:                                                \
-        prefix FELagrangeVec<dim>::func_and_args suffix                 \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case L2_LAGRANGE_VEC:                                             \
-        prefix FEL2LagrangeVec<dim>::func_and_args suffix               \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case MONOMIAL_VEC:                                                \
-        prefix FEMonomialVec<dim>::func_and_args suffix                 \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case BERNSTEIN:                                                   \
-        prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
-      case SZABAB:                                                      \
-        prefix FE<dim,SZABAB>::func_and_args suffix                     \
-      case RATIONAL_BERNSTEIN:                                          \
-        prefix FE<dim,RATIONAL_BERNSTEIN>::func_and_args suffix         \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
-      case NEDELEC_ONE:                                                 \
-        prefix FENedelecOne<dim>::func_and_args suffix                  \
-      case RAVIART_THOMAS:                                              \
-        prefix FERaviartThomas<dim>::func_and_args suffix               \
-      case L2_RAVIART_THOMAS:                                           \
-        prefix FEL2RaviartThomas<dim>::func_and_args suffix             \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
-      }                                                                 \
-  } while (0)
+#define fe_family_horder_case_func(dim, func_and_args, prefix, suffix)        \
+  fe_family_case_func(BERNSTEIN, dim, func_and_args, prefix, suffix)          \
+  fe_family_case_func(SZABAB, dim, func_and_args, prefix, suffix)             \
+  fe_family_case_func(RATIONAL_BERNSTEIN, dim, func_and_args, prefix, suffix) \
 
-#define fe_scalar_vec_error_switch(dim, func_and_args, prefix, suffix)  \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
-      {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case SIDE_HIERARCHIC:                                             \
-        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case BERNSTEIN:                                                   \
-        prefix FE<dim,BERNSTEIN>::func_and_args suffix                  \
-      case RATIONAL_BERNSTEIN:                                          \
-        prefix FE<dim,RATIONAL_BERNSTEIN>::func_and_args suffix         \
-      case SZABAB:                                                      \
-        prefix FE<dim,SZABAB>::func_and_args suffix                     \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
-      case HIERARCHIC_VEC:                                              \
-      case L2_HIERARCHIC_VEC:                                           \
-      case LAGRANGE_VEC:                                                \
-      case L2_LAGRANGE_VEC:                                             \
-      case NEDELEC_ONE:                                                 \
-      case MONOMIAL_VEC:                                                \
-      case RAVIART_THOMAS:                                              \
-      case L2_RAVIART_THOMAS:                                           \
-        libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
-      }                                                                 \
-  } while (0)
-
-
-#define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
-      {                                                                 \
-      case HIERARCHIC_VEC:                                              \
-        prefix FEHierarchicVec<dim>::func_and_args suffix               \
-      case L2_HIERARCHIC_VEC:                                           \
-        prefix FEL2HierarchicVec<dim>::func_and_args suffix             \
-      case LAGRANGE_VEC:                                                \
-        prefix FELagrangeVec<dim>::func_and_args suffix                 \
-      case L2_LAGRANGE_VEC:                                             \
-        prefix FEL2LagrangeVec<dim>::func_and_args suffix               \
-      case NEDELEC_ONE:                                                 \
-        prefix FENedelecOne<dim>::func_and_args suffix                  \
-      case MONOMIAL_VEC:                                                \
-        prefix FEMonomialVec<dim>::func_and_args suffix                 \
-      case RAVIART_THOMAS:                                              \
-        prefix FERaviartThomas<dim>::func_and_args suffix               \
-      case L2_RAVIART_THOMAS:                                           \
-        prefix FEL2RaviartThomas<dim>::func_and_args suffix             \
-      case HERMITE:                                                     \
-      case HIERARCHIC:                                                  \
-      case L2_HIERARCHIC:                                               \
-      case SIDE_HIERARCHIC:                                             \
-      case LAGRANGE:                                                    \
-      case L2_LAGRANGE:                                                 \
-      case MONOMIAL:                                                    \
-      case SCALAR:                                                      \
-      case BERNSTEIN:                                                   \
-      case SZABAB:                                                      \
-      case RATIONAL_BERNSTEIN:                                          \
-      case XYZ:                                                         \
-      case SUBDIVISION:                                                 \
-        libmesh_error_msg("Error: Can only request vector valued elements for RealGradient FEInterface::shape"); \
-      default:                                                          \
-        libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
-      }                                                                 \
-  } while (0)
+#define fe_family_horder_case()      \
+  fe_family_case(BERNSTEIN)          \
+  fe_family_case(SZABAB)             \
+  fe_family_case(RATIONAL_BERNSTEIN) \
 
 #else
+
+#define fe_family_horder_case_func(dim, func_and_args, prefix, suffix)
+#define fe_family_horder_case()
+
+#endif
+
+#define fe_family_vector_case_func(dim, func_and_args, prefix, suffix)       \
+  fe_family_case_func(HIERARCHIC_VEC, dim, func_and_args, prefix, suffix)    \
+  fe_family_case_func(L2_HIERARCHIC_VEC, dim, func_and_args, prefix, suffix) \
+  fe_family_case_func(LAGRANGE_VEC, dim, func_and_args, prefix, suffix)      \
+  fe_family_case_func(L2_LAGRANGE_VEC, dim, func_and_args, prefix, suffix)   \
+  fe_family_case_func(MONOMIAL_VEC, dim, func_and_args, prefix, suffix)      \
+  fe_family_case_func(NEDELEC_ONE, dim, func_and_args, prefix, suffix)       \
+  fe_family_case_func(RAVIART_THOMAS, dim, func_and_args, prefix, suffix)    \
+  fe_family_case_func(L2_RAVIART_THOMAS, dim, func_and_args, prefix, suffix) \
+
+#define fe_family_vector_case()     \
+  fe_family_case(HIERARCHIC_VEC)    \
+  fe_family_case(L2_HIERARCHIC_VEC) \
+  fe_family_case(LAGRANGE_VEC)      \
+  fe_family_case(L2_LAGRANGE_VEC)   \
+  fe_family_case(MONOMIAL_VEC)      \
+  fe_family_case(NEDELEC_ONE)       \
+  fe_family_case(RAVIART_THOMAS)    \
+  fe_family_case(L2_RAVIART_THOMAS) \
+
 #define fe_family_switch(dim, func_and_args, prefix, suffix)            \
   do {                                                                  \
     switch (fe_t.family)                                                \
       {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case SIDE_HIERARCHIC:                                             \
-        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
+      fe_family_scalar_case_func(dim, func_and_args, prefix, suffix)    \
+      fe_family_horder_case_func(dim, func_and_args, prefix, suffix)    \
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
@@ -302,45 +167,9 @@ FEInterface::is_InfFE_elem(const ElemType et)
   do {                                                                  \
     switch (fe_t.family)                                                \
       {                                                                 \
-      case CLOUGH:                                                      \
-        prefix FE<dim,CLOUGH>::func_and_args suffix                     \
-      case HERMITE:                                                     \
-        prefix FE<dim,HERMITE>::func_and_args suffix                    \
-      case HIERARCHIC:                                                  \
-        prefix FE<dim,HIERARCHIC>::func_and_args suffix                 \
-      case HIERARCHIC_VEC:                                              \
-        prefix FEHierarchicVec<dim>::func_and_args suffix               \
-      case L2_HIERARCHIC:                                               \
-        prefix FE<dim,L2_HIERARCHIC>::func_and_args suffix              \
-      case L2_HIERARCHIC_VEC:                                           \
-        prefix FEL2HierarchicVec<dim>::func_and_args suffix             \
-      case SIDE_HIERARCHIC:                                             \
-        prefix FE<dim,SIDE_HIERARCHIC>::func_and_args suffix            \
-      case LAGRANGE:                                                    \
-        prefix FE<dim,LAGRANGE>::func_and_args suffix                   \
-      case LAGRANGE_VEC:                                                \
-        prefix FELagrangeVec<dim>::func_and_args suffix                 \
-      case L2_LAGRANGE:                                                 \
-        prefix FE<dim,L2_LAGRANGE>::func_and_args suffix                \
-      case L2_LAGRANGE_VEC:                                             \
-        prefix FEL2LagrangeVec<dim>::func_and_args suffix               \
-      case MONOMIAL:                                                    \
-        prefix FE<dim,MONOMIAL>::func_and_args suffix                   \
-      case MONOMIAL_VEC:                                                \
-        prefix FEMonomialVec<dim>::func_and_args suffix                 \
-      case SCALAR:                                                      \
-        prefix FE<dim,SCALAR>::func_and_args suffix                     \
-      case XYZ:                                                         \
-        prefix FEXYZ<dim>::func_and_args suffix                         \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix FE<2,SUBDIVISION>::func_and_args suffix                  \
-      case NEDELEC_ONE:                                                 \
-        prefix FENedelecOne<dim>::func_and_args suffix                  \
-      case RAVIART_THOMAS:                                              \
-        prefix FERaviartThomas<dim>::func_and_args suffix               \
-      case L2_RAVIART_THOMAS:                                           \
-        prefix FEL2RaviartThomas<dim>::func_and_args suffix             \
+      fe_family_scalar_case_func(dim, func_and_args, prefix, suffix)    \
+      fe_family_horder_case_func(dim, func_and_args, prefix, suffix)    \
+      fe_family_vector_case_func(dim, func_and_args, prefix, suffix)    \
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
       }                                                                 \
@@ -350,36 +179,9 @@ FEInterface::is_InfFE_elem(const ElemType et)
   do {                                                                  \
     switch (fe_t.family)                                                \
       {                                                                 \
-      case CLOUGH:                                                      \
-        prefix  FE<dim,CLOUGH>::func_and_args suffix                    \
-      case HERMITE:                                                     \
-        prefix  FE<dim,HERMITE>::func_and_args suffix                   \
-      case HIERARCHIC:                                                  \
-        prefix  FE<dim,HIERARCHIC>::func_and_args suffix                \
-      case L2_HIERARCHIC:                                               \
-        prefix  FE<dim,L2_HIERARCHIC>::func_and_args suffix             \
-      case SIDE_HIERARCHIC:                                             \
-        prefix  FE<dim,SIDE_HIERARCHIC>::func_and_args suffix           \
-      case LAGRANGE:                                                    \
-        prefix  FE<dim,LAGRANGE>::func_and_args suffix                  \
-      case L2_LAGRANGE:                                                 \
-        prefix  FE<dim,L2_LAGRANGE>::func_and_args suffix               \
-      case MONOMIAL:                                                    \
-        prefix  FE<dim,MONOMIAL>::func_and_args suffix                  \
-      case SCALAR:                                                      \
-        prefix  FE<dim,SCALAR>::func_and_args suffix                    \
-      case XYZ:                                                         \
-        prefix  FEXYZ<dim>::func_and_args suffix                        \
-      case SUBDIVISION:                                                 \
-        libmesh_assert_equal_to (dim, 2);                               \
-        prefix  FE<2,SUBDIVISION>::func_and_args suffix                 \
-      case HIERARCHIC_VEC:                                              \
-      case LAGRANGE_VEC:                                                \
-      case L2_LAGRANGE_VEC:                                             \
-      case NEDELEC_ONE:                                                 \
-      case MONOMIAL_VEC:                                                \
-      case RAVIART_THOMAS:                                              \
-      case L2_RAVIART_THOMAS:                                           \
+      fe_family_scalar_case_func(dim, func_and_args, prefix, suffix)    \
+      fe_family_horder_case_func(dim, func_and_args, prefix, suffix)    \
+      fe_family_vector_case()                                           \
         libmesh_error_msg("Error: Can only request scalar valued elements for Real FEInterface::func_and_args"); \
       default:                                                          \
         libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
@@ -388,41 +190,17 @@ FEInterface::is_InfFE_elem(const ElemType et)
 
 
 #define fe_vector_scalar_error_switch(dim, func_and_args, prefix, suffix) \
-  do {                                                                  \
-    switch (fe_t.family)                                                \
-      {                                                                 \
-      case HIERARCHIC_VEC:                                              \
-        prefix FEHierarchicVec<dim>::func_and_args suffix               \
-      case L2_HIERARCHIC_VEC:                                           \
-        prefix FEL2HierarchicVec<dim>::func_and_args suffix             \
-      case LAGRANGE_VEC:                                                \
-        prefix FELagrangeVec<dim>::func_and_args suffix                 \
-      case L2_LAGRANGE_VEC:                                             \
-        prefix FEL2LagrangeVec<dim>::func_and_args suffix               \
-      case NEDELEC_ONE:                                                 \
-        prefix FENedelecOne<dim>::func_and_args suffix                  \
-      case MONOMIAL_VEC:                                                \
-        prefix FEMonomialVec<dim>::func_and_args suffix                 \
-      case RAVIART_THOMAS:                                              \
-        prefix FERaviartThomas<dim>::func_and_args suffix               \
-      case L2_RAVIART_THOMAS:                                           \
-        prefix FEL2RaviartThomas<dim>::func_and_args suffix             \
-      case HERMITE:                                                     \
-      case HIERARCHIC:                                                  \
-      case L2_HIERARCHIC:                                               \
-      case SIDE_HIERARCHIC:                                             \
-      case LAGRANGE:                                                    \
-      case L2_LAGRANGE:                                                 \
-      case MONOMIAL:                                                    \
-      case SCALAR:                                                      \
-      case XYZ:                                                         \
-      case SUBDIVISION:                                                 \
+  do {                                                                    \
+    switch (fe_t.family)                                                  \
+      {                                                                   \
+      fe_family_vector_case_func(dim, func_and_args, prefix, suffix)      \
+      fe_family_scalar_case()                                             \
+      fe_family_horder_case()                                             \
         libmesh_error_msg("Error: Can only request vector valued elements for RealGradient FEInterface::func_and_args"); \
-      default:                                                          \
+      default:                                                            \
         libmesh_error_msg("Unsupported family = " << Utility::enum_to_string(fe_t.family)); \
-      }                                                                 \
+      }                                                                   \
   } while (0)
-#endif
 
 
 #define fe_switch(func_and_args)                        \
@@ -467,44 +245,22 @@ FEInterface::is_InfFE_elem(const ElemType et)
       }                                                                 \
   } while (0)
 
-
-#define void_fe_switch(func_and_args)                           \
-  do {                                                          \
-    switch (dim)                                                \
-      {                                                         \
-        /* 0D */                                                \
-      case 0:                                                   \
-        fe_family_switch (0, func_and_args, ;, ; return;);      \
-        /* 1D */                                                \
-      case 1:                                                   \
-        fe_family_switch (1, func_and_args, ;, ; return;);      \
-        /* 2D */                                                \
-      case 2:                                                   \
-        fe_family_switch (2, func_and_args, ;, ; return;);      \
-        /* 3D */                                                \
-      case 3:                                                   \
-        fe_family_switch (3, func_and_args, ;, ; return;);      \
-      default:                                                  \
-        libmesh_error_msg("Invalid dim = " << dim);             \
-      }                                                         \
-  } while (0)
-
 #define void_fe_with_vec_switch(func_and_args)                          \
   do {                                                                  \
     switch (dim)                                                        \
       {                                                                 \
         /* 0D */                                                        \
       case 0:                                                           \
-        fe_family_with_vec_switch (0, func_and_args, ;, ; return;);     \
+        fe_family_with_vec_switch (0, func_and_args, , ; return;);      \
         /* 1D */                                                        \
       case 1:                                                           \
-        fe_family_with_vec_switch (1, func_and_args, ;, ; return;);     \
+        fe_family_with_vec_switch (1, func_and_args, , ; return;);      \
         /* 2D */                                                        \
       case 2:                                                           \
-        fe_family_with_vec_switch (2, func_and_args, ;, ; return;);     \
+        fe_family_with_vec_switch (2, func_and_args, , ; return;);      \
         /* 3D */                                                        \
       case 3:                                                           \
-        fe_family_with_vec_switch (3, func_and_args, ;, ; return;);     \
+        fe_family_with_vec_switch (3, func_and_args, , ; return;);      \
       default:                                                          \
         libmesh_error_msg("Invalid dim = " << dim);                     \
       }                                                                 \
@@ -2248,18 +2004,6 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                        variable_number,
                                                        elem); return;
 
-          case L2_HIERARCHIC_VEC:
-            FE<2,L2_HIERARCHIC_VEC>::compute_constraints (constraints,
-                                                          dof_map,
-                                                          variable_number,
-                                                          elem); return;
-
-          case L2_HIERARCHIC:
-            FE<2,L2_HIERARCHIC>::compute_constraints (constraints,
-                                                      dof_map,
-                                                      variable_number,
-                                                      elem); return;
-
           case SIDE_HIERARCHIC:
             FE<2,SIDE_HIERARCHIC>::compute_constraints (constraints,
                                                         dof_map,
@@ -2272,33 +2016,10 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                      variable_number,
                                                      elem); return;
 
-          case L2_LAGRANGE_VEC:
-            FE<2,L2_LAGRANGE_VEC>::compute_constraints (constraints,
-                                                        dof_map,
-                                                        variable_number,
-                                                        elem); return;
-
-
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-          case SZABAB:
-            FE<2,SZABAB>::compute_constraints (constraints,
-                                               dof_map,
-                                               variable_number,
-                                               elem); return;
-
-          case BERNSTEIN:
-            FE<2,BERNSTEIN>::compute_constraints (constraints,
-                                                  dof_map,
-                                                  variable_number,
-                                                  elem); return;
-
-          case RATIONAL_BERNSTEIN:
-            FE<2,RATIONAL_BERNSTEIN>::compute_constraints (constraints,
-                                                           dof_map,
-                                                           variable_number,
-                                                           elem); return;
-
-#endif
+          fe_family_horder_case_func(2, compute_constraints (constraints,
+                                                             dof_map,
+                                                             variable_number,
+                                                             elem), , ; return;)
           default:
             return;
           }
@@ -2327,12 +2048,6 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                    variable_number,
                                                    elem); return;
 
-          case L2_HIERARCHIC:
-            FE<3,L2_HIERARCHIC>::compute_constraints (constraints,
-                                                      dof_map,
-                                                      variable_number,
-                                                      elem); return;
-
           case SIDE_HIERARCHIC:
             FE<3,SIDE_HIERARCHIC>::compute_constraints (constraints,
                                                         dof_map,
@@ -2345,44 +2060,16 @@ void FEInterface::compute_constraints (DofConstraints & constraints,
                                                      variable_number,
                                                      elem); return;
 
-          case L2_LAGRANGE_VEC:
-            FE<3,L2_LAGRANGE_VEC>::compute_constraints (constraints,
-                                                        dof_map,
-                                                        variable_number,
-                                                        elem); return;
-
           case HIERARCHIC_VEC:
             FE<3,HIERARCHIC_VEC>::compute_constraints (constraints,
                                                        dof_map,
                                                        variable_number,
                                                        elem); return;
 
-          case L2_HIERARCHIC_VEC:
-            FE<3,L2_HIERARCHIC_VEC>::compute_constraints (constraints,
-                                                          dof_map,
-                                                          variable_number,
-                                                          elem); return;
-
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-          case SZABAB:
-            FE<3,SZABAB>::compute_constraints (constraints,
-                                               dof_map,
-                                               variable_number,
-                                               elem); return;
-
-          case BERNSTEIN:
-            FE<3,BERNSTEIN>::compute_constraints (constraints,
-                                                  dof_map,
-                                                  variable_number,
-                                                  elem); return;
-
-          case RATIONAL_BERNSTEIN:
-            FE<3,RATIONAL_BERNSTEIN>::compute_constraints (constraints,
-                                                           dof_map,
-                                                           variable_number,
-                                                           elem); return;
-
-#endif
+          fe_family_horder_case_func(3, compute_constraints (constraints,
+                                                             dof_map,
+                                                             variable_number,
+                                                             elem), , ; return;)
           default:
             return;
           }
@@ -2918,11 +2605,7 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
     case HIERARCHIC:
     case HIERARCHIC_VEC:
     case L2_HIERARCHIC_VEC:
-#ifdef LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
-    case BERNSTEIN:
-    case SZABAB:
-    case RATIONAL_BERNSTEIN:
-#endif
+    fe_family_horder_case()
     default:
       return true;
     }
@@ -2937,14 +2620,7 @@ FEFieldType FEInterface::field_type (const FEFamily & fe_family)
 {
   switch (fe_family)
     {
-    case HIERARCHIC_VEC:
-    case L2_HIERARCHIC_VEC:
-    case LAGRANGE_VEC:
-    case L2_LAGRANGE_VEC:
-    case NEDELEC_ONE:
-    case MONOMIAL_VEC:
-    case RAVIART_THOMAS:
-    case L2_RAVIART_THOMAS:
+    fe_family_vector_case()
       return TYPE_VECTOR;
     default:
       return TYPE_SCALAR;
@@ -2954,22 +2630,9 @@ FEFieldType FEInterface::field_type (const FEFamily & fe_family)
 unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
                                      const FEType & fe_type)
 {
-  switch (fe_type.family)
-    {
-      //FIXME: We currently assume that the number of vector components is tied
-      //       to the mesh dimension. This will break for mixed-dimension meshes.
-    case HIERARCHIC_VEC:
-    case L2_HIERARCHIC_VEC:
-    case LAGRANGE_VEC:
-    case L2_LAGRANGE_VEC:
-    case NEDELEC_ONE:
-    case MONOMIAL_VEC:
-    case RAVIART_THOMAS:
-    case L2_RAVIART_THOMAS:
-      return mesh.mesh_dimension();
-    default:
-      return 1;
-    }
+  //FIXME: We currently assume that the number of vector components is tied
+  //       to the mesh dimension. This will break for mixed-dimension meshes.
+  return field_type(fe_type.family) == TYPE_VECTOR ? mesh.mesh_dimension() : 1;
 }
 
 
