@@ -182,6 +182,7 @@ membership_data = [
     'Nov 2024', 46, 130,
     'Dec 2024', 46, 130,
     'Jan 2025', 46, 130,
+    'Feb 2025', 46, 130,
 ]
 
 # Strip out the dates from membership_data
@@ -280,6 +281,7 @@ devel_data = [
     '2022',    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     '2023',    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
     '2024',    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    '2025',    0,
 ]
 
 # libmesh-users starts in Sept 2003!
@@ -308,6 +310,7 @@ users_data = [
     '2022',    0,   0,   2,   8,   0,   0,   0,   3,   0,   3,   0,   0,
     '2023',    2,   0,   0,   0,   0,   0,   0,   7,   3,   0,   0,   1,
     '2024',    0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+    '2025',    0,
 ]
 
 # Make plot of monthly data
@@ -398,15 +401,15 @@ ax.bar(x, combined_devel_users_number, width, color=primary, label='libmesh-user
 # Plot the libmesh-devel data alone
 ax.bar(x, devel_numbers, width, color=secondary, label='libmesh-devel')
 
-# Set bi-yearly xticklabels
-year_labels = ['2003', '2005', '2007', '2009', '2011', '2013', '2015', '2017', '2019', '2021', '2023']
+# Set xticklabels year strings
+year_labels = ['2003', '2007', '2011', '2015', '2019', '2023']
 
 # Set up the corresponding tick locations. This starting point was chosen by
 # trial and error because it lined up the tick marks fairly well, but I don't
 # understand the logic behind it.
 xticks = [.55]
 for i in range(1, len(year_labels)):
-  xticks.append(xticks[i-1] + 24) # 2 years = 24 months
+  xticks.append(xticks[i-1] + 48) # 2 years = 24 months
 
 # Center the ticks slightly
 xticks = [x+width/2. for x in xticks]
