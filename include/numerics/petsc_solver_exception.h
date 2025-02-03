@@ -89,32 +89,12 @@ public:
     LIBMESH_CHKERRQ(ierr);                      \
   } while (0)
 
-// Remove me: for backward compatibility with MOOSE only
-#define LIBMESH_CHKERR(ierr) LIBMESH_CHKERRQ(ierr)
-#define LIBMESH_CHKERR2(comm, ierr) LIBMESH_CHKERRA(comm, ierr)
-#define LibmeshPetscCall(...)                                           \
-  do                                                                    \
-  {                                                                     \
-    PetscErrorCode libmesh_petsc_call_ierr;                             \
-    libmesh_petsc_call_ierr = __VA_ARGS__;                              \
-    LIBMESH_CHKERRQ(libmesh_petsc_call_ierr);                           \
-  } while (0)
-
 #else
 
 // If we don't have exceptions enabled, just fall back on calling
 // PETSc's CHKERRQ or CHKERRABORT macros.
 #define LIBMESH_CHKERRQ(ierr) CHKERRQ(ierr);
 #define LIBMESH_CHKERRA(comm, ierr) CHKERRABORT(comm, ierr);
-
-// Remove me: for backward compatibility with MOOSE only
-#define LibmeshPetscCall(...)                                           \
-  do                                                                    \
-  {                                                                     \
-    PetscErrorCode libmesh_petsc_call_ierr;                             \
-    libmesh_petsc_call_ierr = __VA_ARGS__;                              \
-    LIBMESH_CHKERRA(this->comm().get(), libmesh_petsc_call_ierr);       \
-  } while (0)
 
 #endif
 
@@ -155,10 +135,8 @@ PETSC_BEGIN_END(VecGhostUpdate) // VecGhostUpdateBeginEnd
 
 // Shortcut for LibmeshPetscCallA for use within a ParallelObject, i.e. when
 // we can rely on the communicator being available from the "this" pointer.
-/*
 #define LibmeshPetscCall(...)                                           \
   LibmeshPetscCallA(this->comm().get(), __VA_ARGS__)
-*/
 
 // Shortcut for LibmeshPetscCallA for use when we have a Parallel::Communicator
 // available instead of just a bare MPI communicator.
