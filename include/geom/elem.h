@@ -238,12 +238,24 @@ public:
   static const subdomain_id_type invalid_subdomain_id;
 
   /**
+   * \returns true iff this element type can vary in topology (e.g.
+   * have different numbers of sides and/or nodes) at runtime.  For
+   * such general polygons or polyhedra, APIs which assume a fixed
+   * topology are not safe to use.
+   */
+  virtual bool runtime_topology() const { return false; }
+
+  /**
    * \returns A pointer to the "reference element" associated
    * with this element.  The reference element is the image of this
    * element in reference parametric space. Importantly, it is *not*
    * an actual element in the mesh, but rather a Singleton-type
    * object, so for example all \p Quad4 elements share the same
    * \p reference_elem().
+   *
+   * If the element is of a type that can admit multiple topologies,
+   * such as a Polygon1, then there is no reference element; for such
+   * types this method should not be used.
    */
   const Elem * reference_elem () const;
 
