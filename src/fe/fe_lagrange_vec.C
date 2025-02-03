@@ -1309,16 +1309,25 @@ template <> RealGradient FE<3,L2_LAGRANGE_VEC>::shape_second_deriv(const Elem * 
 
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this function.
-// This could be macro-ified.
 template <> unsigned int FE<0,LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return FE<0,LAGRANGE>::n_dofs(t,o); }
 template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return FE<1,LAGRANGE>::n_dofs(t,o); }
 template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return 2*FE<2,LAGRANGE>::n_dofs(t,o); }
 template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return 3*FE<3,LAGRANGE>::n_dofs(t,o); }
 
+template <> unsigned int FE<0,LAGRANGE_VEC>::n_dofs(const Elem * e, const Order o) { return FE<0,LAGRANGE>::n_dofs(e,o); }
+template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs(const Elem * e, const Order o) { return FE<1,LAGRANGE>::n_dofs(e,o); }
+template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs(const Elem * e, const Order o) { return 2*FE<2,LAGRANGE>::n_dofs(e,o); }
+template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs(const Elem * e, const Order o) { return 3*FE<3,LAGRANGE>::n_dofs(e,o); }
+
 template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return FE<0,L2_LAGRANGE>::n_dofs(t,o); }
 template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return FE<1,L2_LAGRANGE>::n_dofs(t,o); }
 template <> unsigned int FE<2,L2_LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return 2*FE<2,L2_LAGRANGE>::n_dofs(t,o); }
 template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs(const ElemType t, const Order o) { return 3*FE<3,L2_LAGRANGE>::n_dofs(t,o); }
+
+template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs(const Elem * e, const Order o) { return FE<0,L2_LAGRANGE>::n_dofs(e,o); }
+template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs(const Elem * e, const Order o) { return FE<1,L2_LAGRANGE>::n_dofs(e,o); }
+template <> unsigned int FE<2,L2_LAGRANGE_VEC>::n_dofs(const Elem * e, const Order o) { return 2*FE<2,L2_LAGRANGE>::n_dofs(e,o); }
+template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs(const Elem * e, const Order o) { return 3*FE<3,L2_LAGRANGE>::n_dofs(e,o); }
 
 
 // Do full-specialization for every dimension, instead
@@ -1328,10 +1337,20 @@ template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, co
 template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 2*FE<2,LAGRANGE>::n_dofs_at_node(t,o,n); }
 template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 3*FE<3,LAGRANGE>::n_dofs_at_node(t,o,n); }
 
+template <> unsigned int FE<0,LAGRANGE_VEC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return FE<0,LAGRANGE>::n_dofs_at_node(e,o,n); }
+template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return FE<1,LAGRANGE>::n_dofs_at_node(e,o,n); }
+template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return 2*FE<2,LAGRANGE>::n_dofs_at_node(e,o,n); }
+template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return 3*FE<3,LAGRANGE>::n_dofs_at_node(e,o,n); }
+
 template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<2,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+
+template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<2,L2_LAGRANGE_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
 
 
 // Lagrange elements have no dofs per element
@@ -1341,11 +1360,21 @@ template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs_per_elem(const ElemType, con
 template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 
+template <> unsigned int FE<0,LAGRANGE_VEC>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<1,LAGRANGE_VEC>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<2,LAGRANGE_VEC>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<3,LAGRANGE_VEC>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+
 // L2 Lagrange elements have all their dofs on the element
 template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<0,L2_LAGRANGE_VEC>::n_dofs(t, o); }
 template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<1,L2_LAGRANGE_VEC>::n_dofs(t, o); }
 template <> unsigned int FE<2,L2_LAGRANGE_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<2,L2_LAGRANGE_VEC>::n_dofs(t, o); }
 template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<3,L2_LAGRANGE_VEC>::n_dofs(t, o); }
+
+template <> unsigned int FE<0,L2_LAGRANGE_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<0,L2_LAGRANGE_VEC>::n_dofs(&e, o); }
+template <> unsigned int FE<1,L2_LAGRANGE_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<1,L2_LAGRANGE_VEC>::n_dofs(&e, o); }
+template <> unsigned int FE<2,L2_LAGRANGE_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<2,L2_LAGRANGE_VEC>::n_dofs(&e, o); }
+template <> unsigned int FE<3,L2_LAGRANGE_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<3,L2_LAGRANGE_VEC>::n_dofs(&e, o); }
 
 // Lagrange FEMs are always C^0 continuous
 template <> FEContinuity FE<0,LAGRANGE_VEC>::get_continuity() const { return C_ZERO; }

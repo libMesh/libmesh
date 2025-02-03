@@ -97,8 +97,7 @@ void hierarchic_nodal_soln(const Elem * elem,
 
 
 
-
-unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
+unsigned int HIERARCHIC_n_dofs(const ElemType t, const Order o)
 {
   libmesh_assert_greater (o, 0);
   switch (t)
@@ -152,12 +151,19 @@ unsigned int hierarchic_n_dofs(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for HIERARCHIC FE family!");
     }
-} // hierarchic_n_dofs()
+} // HIERARCHIC_n_dofs()
 
 
 
+unsigned int HIERARCHIC_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return HIERARCHIC_n_dofs(e->type(), o);
+}
 
-unsigned int hierarchic_n_dofs_at_node(const ElemType t,
+
+
+unsigned int HIERARCHIC_n_dofs_at_node(const ElemType t,
                                        const Order o,
                                        const unsigned int n)
 {
@@ -382,12 +388,20 @@ unsigned int hierarchic_n_dofs_at_node(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
-} // hierarchic_n_dofs_at_node()
+} // HIERARCHIC_n_dofs_at_node()
 
 
 
+unsigned int HIERARCHIC_n_dofs_at_node(const Elem & e,
+                                       const Order o,
+                                       const unsigned int n)
+{
+  return HIERARCHIC_n_dofs_at_node(e.type(), o, n);
+}
 
-unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
+
+
+unsigned int HIERARCHIC_n_dofs_per_elem(const ElemType t,
                                         const Order o)
 {
   libmesh_assert_greater (o, 0);
@@ -442,7 +456,15 @@ unsigned int hierarchic_n_dofs_per_elem(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
-} // hierarchic_n_dofs_per_elem()
+} // HIERARCHIC_n_dofs_per_elem()
+
+
+
+unsigned int HIERARCHIC_n_dofs_per_elem(const Elem & e,
+                                        const Order o)
+{
+  return HIERARCHIC_n_dofs_per_elem(e.type(), o);
+}
 
 } // anonymous namespace
 
@@ -452,23 +474,9 @@ LIBMESH_FE_NODAL_SOLN(HIERARCHIC, hierarchic_nodal_soln)
 LIBMESH_FE_SIDE_NODAL_SOLN(HIERARCHIC)
 
 
-// Full specialization of n_dofs() function for every dimension
-template <> unsigned int FE<0,HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return hierarchic_n_dofs(t, o); }
-template <> unsigned int FE<1,HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return hierarchic_n_dofs(t, o); }
-template <> unsigned int FE<2,HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return hierarchic_n_dofs(t, o); }
-template <> unsigned int FE<3,HIERARCHIC>::n_dofs(const ElemType t, const Order o) { return hierarchic_n_dofs(t, o); }
+// Instantiate n_dofs*() functions for every dimension
+LIBMESH_DEFAULT_NDOFS(HIERARCHIC)
 
-// Full specialization of n_dofs_at_node() function for every dimension.
-template <> unsigned int FE<0,HIERARCHIC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return hierarchic_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<1,HIERARCHIC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return hierarchic_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<2,HIERARCHIC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return hierarchic_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<3,HIERARCHIC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return hierarchic_n_dofs_at_node(t, o, n); }
-
-// Full specialization of n_dofs_per_elem() function for every dimension.
-template <> unsigned int FE<0,HIERARCHIC>::n_dofs_per_elem(const ElemType t, const Order o) { return hierarchic_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<1,HIERARCHIC>::n_dofs_per_elem(const ElemType t, const Order o) { return hierarchic_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<2,HIERARCHIC>::n_dofs_per_elem(const ElemType t, const Order o) { return hierarchic_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<3,HIERARCHIC>::n_dofs_per_elem(const ElemType t, const Order o) { return hierarchic_n_dofs_per_elem(t, o); }
 
 // Hierarchic FEMs are C^0 continuous
 template <> FEContinuity FE<0,HIERARCHIC>::get_continuity() const { return C_ZERO; }
