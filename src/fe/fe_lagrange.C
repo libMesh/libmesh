@@ -1003,8 +1003,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
                     const dof_id_type their_dof_g =
                       parent_dof_indices[their_dof];
 
-                    const Real their_dof_value = FEInterface::shape(Dim-1,
-                                                                    side_fe_type,
+                    const Real their_dof_value = FEInterface::shape(side_fe_type,
                                                                     parent_side.get(),
                                                                     their_dof,
                                                                     mapped_point);
