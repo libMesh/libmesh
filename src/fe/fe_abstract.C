@@ -34,7 +34,6 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/threads.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_to_string.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -61,7 +60,7 @@ FEAbstract::FEAbstract(const unsigned int d,
   calculate_div_phi(false),
   calculate_dphiref(false),
   fe_type(fet),
-  elem_type(INVALID_ELEM),
+  _elem(nullptr),
   _elem_p_level(0),
   _p_level(0),
   qrule(nullptr),
@@ -393,6 +392,13 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
       libmesh_error_msg("Invalid dimension dim = " << dim);
     }
 }
+
+
+ElemType FEAbstract::get_type() const
+{
+  return _elem ? _elem->type() : INVALID_ELEM;
+}
+
 
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> & nodes)
 {
