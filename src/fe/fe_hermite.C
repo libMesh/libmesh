@@ -54,19 +54,17 @@ void hermite_nodal_soln(const Elem * elem,
   std::vector<Point> refspace_nodes;
   FEBase::get_refspace_nodes(elem_type,refspace_nodes);
   libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
+  libmesh_assert_equal_to (elem_soln.size(), n_sf);
+
+  // Zero before summation
+  std::fill(nodal_soln.begin(), nodal_soln.end(), 0);
 
   for (unsigned int n=0; n<n_nodes; n++)
-    {
-      libmesh_assert_equal_to (elem_soln.size(), n_sf);
+    // u_i = Sum (alpha_i phi_i)
+    for (unsigned int i=0; i<n_sf; i++)
+      nodal_soln[n] += elem_soln[i] *
+        FEInterface::shape(fe_type, elem, i, refspace_nodes[n], add_p_level);
 
-      // Zero before summation
-      nodal_soln[n] = 0;
-
-      // u_i = Sum (alpha_i phi_i)
-      for (unsigned int i=0; i<n_sf; i++)
-        nodal_soln[n] += elem_soln[i] *
-          FEInterface::shape(fe_type, elem, i, refspace_nodes[n], add_p_level);
-    }
 } // hermite_nodal_soln()
 
 
