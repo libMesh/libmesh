@@ -80,7 +80,7 @@ void QBase::init(const Elem & elem,
   // recompute to be safe; even if we're using the same element, it
   // might have been distorted enough that its subtriangle
   // triangulation has been changed.
-  if (t == _type && p == _p_level && !elem->runtime_topology())
+  if (t == _type && p == _p_level && !elem.runtime_topology())
     return;
   else
     {
