@@ -93,7 +93,7 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
       this->shapes_on_quadrature = false;
 
       // Set the element type
-      this->elem_type = elem->type();
+      this->_elem = elem;
 
       // Initialize the face shape functions
       this->_fe_map->template init_face_shape_functions<Dim>(*pts,  side.get());
@@ -114,8 +114,8 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
       this->qrule->init(*side, side_p_level);
 
       {
-        // Set the element type
-        this->elem_type = elem->type();
+        // Set the element
+        this->_elem = elem;
 
         // Initialize the face shape functions
         this->_fe_map->template init_face_shape_functions<Dim>(this->qrule->get_points(),  side.get());

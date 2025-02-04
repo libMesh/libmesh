@@ -489,11 +489,19 @@ public:
   virtual unsigned int n_quadrature_points () const = 0;
 
   /**
-   * \returns The element type that the current shape functions
-   * have been calculated for.  Useful in determining when shape
-   * functions must be recomputed.
+   * \returns The element that the current shape functions have been
+   * calculated for.  Useful in determining when shape functions must
+   * be recomputed.
    */
-  ElemType get_type()  const { return elem_type; }
+  const Elem * get_elem()  const { return _elem; }
+
+  /**
+   * \returns The element type that the current shape functions
+   * have been calculated for, or \p INVALID_ELEM if no such element
+   * exists.  Useful in determining when shape functions must be
+   * recomputed.
+   */
+  ElemType get_type() const;
 
   /**
    * \returns The p refinement level that the current shape
@@ -717,10 +725,9 @@ protected:
   FEType fe_type;
 
   /**
-   * The element type the current data structures are
-   * set up for.
+   * The element the current data structures were set up for.
    */
-  ElemType elem_type;
+  const Elem * _elem;
 
   /**
    * The element p-refinement level the current data structures are
