@@ -647,7 +647,7 @@ TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx,
                           const TypeVector<T2> & vy)
 {
   libmesh_assert_equal_to (LIBMESH_DIM, 2);
-#if LIBMESH_DIM > 2
+#if LIBMESH_DIM > 1
   _coords[0] = vx(0);
   _coords[1] = vx(1);
   _coords[2] = vy(0);
