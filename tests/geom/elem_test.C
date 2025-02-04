@@ -202,7 +202,7 @@ public:
         // the type, then that should match the runtime topology.  If
         // not, then we should be aware of it.
         const ElemType etype = elem->type();
-        if (etype != POLYGON1)
+        if (!elem->runtime_topology())
           {
             CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), Elem::type_to_n_nodes_map[etype]);
             CPPUNIT_ASSERT_EQUAL(elem->n_sides(), Elem::type_to_n_sides_map[etype]);
