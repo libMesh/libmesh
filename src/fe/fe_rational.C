@@ -59,10 +59,7 @@ void rational_nodal_soln(const Elem * elem,
       {
         libmesh_assert_equal_to (elem_soln.size(), 1);
 
-        const Number val = elem_soln[0];
-
-        for (unsigned int n=0; n<n_nodes; n++)
-          nodal_soln[n] = val;
+        std::fill(nodal_soln.begin(), nodal_soln.end(), elem_soln[0]);
 
         return;
       }
@@ -89,6 +86,9 @@ void rational_nodal_soln(const Elem * elem,
           node_weights[n] =
             elem->node_ref(n).get_extra_datum<Real>(weight_index);
 
+        // Zero before summation
+        std::fill(nodal_soln.begin(), nodal_soln.end(), 0);
+
         for (unsigned int n=0; n<n_nodes; n++)
           {
             std::vector<Real> weighted_shape(n_sf);
@@ -100,9 +100,6 @@ void rational_nodal_soln(const Elem * elem,
                   FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
                 weighted_sum += weighted_shape[i];
               }
-
-            // Zero before summation
-            nodal_soln[n] = 0;
 
             // u_i = Sum (alpha_i w_i phi_i) / Sum (w_j phi_j)
             for (unsigned int i=0; i<n_sf; i++)

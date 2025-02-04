@@ -74,18 +74,16 @@ void hierarchic_vec_nodal_soln(const Elem * elem,
   libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
   libmesh_assert_equal_to (elem_soln.size(), n_sf*dim);
 
+  // Zero before summation
+  std::fill(nodal_soln.begin(), nodal_soln.end(), 0);
+
   for (unsigned int n=0; n<n_nodes; n++)
     for (int d=0; d != dim; ++d)
-      {
-        const unsigned int ni=n*dim+d;
-        nodal_soln[ni] = 0;
-
-        // u_i = Sum (alpha_i phi_i); we're here only looking
-        // at vector components in direction d
-        for (unsigned int i=0; i<n_sf; i++)
-          nodal_soln[ni] += elem_soln[i*dim+d] *
-            FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
-      }
+      // u_i = Sum (alpha_i phi_i); we're here only looking
+      // at vector components in direction d
+      for (unsigned int i=0; i<n_sf; i++)
+        nodal_soln[n*dim+d] += elem_soln[i*dim+d] *
+          FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
 
 }// void hierarchic_vec_nodal_soln
 
