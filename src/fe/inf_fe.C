@@ -510,7 +510,8 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & 
   // initialize most of the things related to physical approximation
   unsigned int n_base_approx_shape_functions;
   if (Dim > 1)
-    n_base_approx_shape_functions = base_fe->n_shape_functions();
+    n_base_approx_shape_functions =
+      FEInterface::n_dofs(base_fe->get_fe_type(), base_elem.get());
   else
     n_base_approx_shape_functions = 1;
 
@@ -819,7 +820,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
 
 
   _n_total_approx_sf = InfFERadial::n_dofs(fe_type.radial_order) *
-    base_fe->n_shape_functions();
+    FEInterface::n_dofs(base_fe->get_fe_type(), base_elem.get());
 
 
 
