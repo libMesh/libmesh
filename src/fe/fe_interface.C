@@ -1938,11 +1938,11 @@ void FEInterface::compute_data(const unsigned int dim,
       // shape_deriv() functions since they have access to the elem
       // pointer. Note that we are already using the n_dof value
       // appropriate to the elevated p-level.
-      data.shape[n] = shape(dim, fe_t, elem, n, p);
+      data.shape[n] = shape(fe_t, elem, n, p);
       if (data.need_derivative())
         {
           for (unsigned int j=0; j<dim; j++)
-            data.dshape[n](j) = shape_deriv(dim, fe_t, elem, n, j, p);
+            data.dshape[n](j) = shape_deriv(fe_t, elem, n, j, p);
         }
     }
 }
