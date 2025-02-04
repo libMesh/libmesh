@@ -621,9 +621,7 @@ FEInterface::n_dofs (const unsigned int dim,
 {
   libmesh_deprecated();
 
-  FEType p_refined_fe_t = fe_t;
-  p_refined_fe_t.order = p_refined_fe_t.order + elem->p_level();
-  return FEInterface::n_dofs(dim, p_refined_fe_t, elem->type());
+  fe_with_vec_switch(n_dofs(elem, fe_t.order + elem->p_level()));
 }
 
 
@@ -645,9 +643,7 @@ FEInterface::n_dofs(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = fe_t.order + add_p_level*elem->p_level();
-
-  fe_with_vec_switch(n_dofs(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs(elem, fe_t.order + add_p_level*elem->p_level()));
 }
 
 
@@ -671,7 +667,7 @@ FEInterface::n_dofs(const FEType & fe_t,
   // Elem::p_level() is ignored, extra_order is used instead.
   auto total_order = fe_t.order + extra_order;
 
-  fe_with_vec_switch(n_dofs(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs(elem, total_order));
 }
 
 
@@ -739,7 +735,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
   // Account for Elem::p_level() when computing total_order
   auto total_order = fe_t.order + add_p_level*elem->p_level();
 
-  fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
+  fe_with_vec_switch(n_dofs_at_node(*elem, total_order, n));
 }
 
 
@@ -763,7 +759,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
   // Ignore Elem::p_level() and instead use extra_order to compute total_order.
   auto total_order = fe_t.order + extra_order;
 
-  fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
+  fe_with_vec_switch(n_dofs_at_node(*elem, total_order, n));
 }
 
 
@@ -806,7 +802,7 @@ FEInterface::n_dofs_per_elem(const FEType & fe_t,
   // Account for Elem::p_level() when computing total_order
   auto total_order = fe_t.order + add_p_level*elem->p_level();
 
-  fe_with_vec_switch(n_dofs_per_elem(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs_per_elem(*elem, total_order));
 }
 
 
@@ -829,7 +825,7 @@ FEInterface::n_dofs_per_elem(const FEType & fe_t,
   // Ignore Elem::p_level() and instead use extra_order to compute total_order.
   auto total_order = fe_t.order + extra_order;
 
-  fe_with_vec_switch(n_dofs_per_elem(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs_per_elem(*elem, total_order));
 }
 
 
