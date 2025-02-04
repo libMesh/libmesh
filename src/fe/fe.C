@@ -333,8 +333,7 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
   this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
   const unsigned int n_shapes =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+    this->n_dofs(elem, this->get_order());
 
   std::vector<std::vector<OutputShape>> phi_vals;
   phi_vals.resize(n_shapes);
@@ -405,8 +404,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
   // Number of shape functions in the finite element approximation
   // space.
   const unsigned int n_approx_shape_functions =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+    this->n_dofs(elem, this->get_order());
 
   // Maybe we already have correctly-sized data?  Check data sizes,
   // and get ready to break out of a "loop" if all these resize()

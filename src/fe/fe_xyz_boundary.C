@@ -146,8 +146,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem * elem,
   // Number of shape functions in the finite element approximation
   // space.
   const unsigned int n_approx_shape_functions =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+    this->n_dofs(elem, this->get_order());
 
   // Resize the shape functions and their gradients
   this->phi.resize    (n_approx_shape_functions);
