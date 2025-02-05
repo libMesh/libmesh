@@ -293,7 +293,8 @@ public:
                          const Elem * elem,
                          const std::vector<Number> & elem_soln,
                          std::vector<Number> & nodal_soln,
-                         const bool add_p_level = true);
+                         const bool add_p_level = true,
+                         const unsigned int vdim = 1);
 
 
   /**
@@ -309,7 +310,8 @@ public:
                               const unsigned int side,
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln,
-                              const bool add_p_level = true);
+                              const bool add_p_level = true,
+                              const unsigned int vdim = 1);
 
   /**
    * This is now deprecated; use FEMap::map instead.
