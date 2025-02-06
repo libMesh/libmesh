@@ -60,10 +60,12 @@ FE<Dim,T>::FE (const FEType & fet) :
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_shape_functions () const
 {
-  libmesh_deprecated(); // Use n_dofs(Elem *)
+  if (this->_elem)
+    return this->n_dofs (this->_elem,
+                         this->fe_type.order + this->_p_level);
 
-  return FE<Dim,T>::n_dofs (this->get_type(),
-                            this->fe_type.order + this->_p_level);
+  return this->n_dofs (this->get_type(),
+                       this->fe_type.order + this->_p_level);
 }
 
 
