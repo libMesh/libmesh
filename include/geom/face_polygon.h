@@ -238,9 +238,34 @@ public:
    */
   virtual void retriangulate() = 0;
 
+  /**
+   * \returns the size of the triangulation of the polygon
+   */
   unsigned int n_subtriangles() const { return cast_int<unsigned int>(this->_triangulation.size()); }
 
+  /**
+   * \returns the local indices of points on a subtriangle of the polygon
+   */
+  virtual std::array<int, 3> subtriangle (unsigned int i) const
+  {
+    libmesh_assert_less(i, this->_triangulation.size());
+    return this->_triangulation[i];
+  }
+
+  /**
+   * \returns the master-space points of a subtriangle of the polygon
+   */
   virtual std::array<Point, 3> master_subtriangle (unsigned int i) const;
+
+  /**
+   * \returns the index of a subtriangle containing the master-space
+   * point \p p, along with barycentric coordinates for \p, or return
+   * invalid_uint if no subtriangle contains p to within tolerance \p
+   * tol.
+   */
+  std::tuple<unsigned int, Real, Real>
+    subtriangle_coordinates (const Point & p,
+                             Real tol = TOLERANCE*TOLERANCE) const;
 
 protected:
 
