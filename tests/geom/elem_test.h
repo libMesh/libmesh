@@ -126,6 +126,10 @@ public:
       {
         // We're not going to implement build_square for e.g.
         // pentagons any time soon.
+        //
+        // We should probably implement build_dual_mesh, though, and
+        // run it on a perturbed or triangle input so we don't just
+        // get quads in the output...
 
         _mesh->add_point(Point(0, 0), 0);
         _mesh->add_point(Point(1, 0), 1);
