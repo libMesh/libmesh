@@ -266,4 +266,55 @@ std::array<Point, 3> Polygon::master_subtriangle (unsigned int i) const
 }
 
 
+std::tuple<unsigned int, Real, Real>
+Polygon::subtriangle_coordinates (const Point & p, Real tol) const
+{
+  std::tuple<unsigned int, Real, Real> returnval = {libMesh::invalid_uint, -1, -1};
+
+  Real best_bad_coord = -1;
+
+  for (auto s : make_range(this->n_subtriangles()))
+    {
+      const std::array<Point, 3> subtri =
+        this->master_subtriangle (s);
+
+      // Find barycentric coordinates in subtri.
+      // Hand coding these since we don't need a full 3D cross product
+      // in 2D
+      const Real twice_area = (- subtri[1](1) * subtri[2](0)
+                               - subtri[0](1) * subtri[1](0)
+                               + subtri[0](1) * subtri[2](0)
+                               + subtri[0](0) * subtri[1](1)
+                               - subtri[0](0) * subtri[2](1)
+                               + subtri[1](0) * subtri[2](1));
+
+      const Real xi =  (  subtri[0](1)*subtri[2](0)
+                        - subtri[0](0)*subtri[2](1)
+                        + (subtri[2](1)-subtri[0](1))*p(0)
+                        + (subtri[0](0)-subtri[2](0))*p(1)) / twice_area;
+
+      const Real eta = (  subtri[0](0)*subtri[1](1)
+                        - subtri[0](1)*subtri[1](0)
+                        + (subtri[0](1)-subtri[1](1))*p(0)
+                        + (subtri[1](0)-subtri[0](0))*p(1)) / twice_area;
+
+      if (xi>=0 && eta>=0 && xi+eta<=1)
+        return { s, xi, eta };
+
+      Real my_best_bad_coord = std::min(std::min(xi, eta), 1-xi-eta);
+
+      if (my_best_bad_coord > best_bad_coord)
+        {
+          best_bad_coord = my_best_bad_coord;
+          returnval = { s, xi, eta };
+        }
+    }
+
+  if (best_bad_coord > -tol)
+    return returnval;
+
+  return {libMesh::invalid_uint, -1, -1};
+}
+
+
 } // namespace libMesh
