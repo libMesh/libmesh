@@ -514,6 +514,12 @@ extern "C"
         Jac->close();
       }
 
+    KSP kspc;
+    PC pcc;
+    LibmeshPetscCall2(sys.comm(), SNESGetKSP(snes, &kspc));
+    LibmeshPetscCall2(sys.comm(), KSPGetPC(kspc, &pcc));
+    PetscPreconditioner<Number>::set_petsc_aux_data(pcc, sys);
+
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
@@ -984,10 +990,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LibmeshPetscCall(KSPSetFromOptions(ksp));
 #endif
   LibmeshPetscCall(SNESSetFromOptions(_snes));
-
-  PC pc;
-  LibmeshPetscCall(KSPGetPC(ksp, &pc));
-  PetscPreconditioner<T>::set_petsc_aux_data(pc, this->system());
 
 #if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
     !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)
