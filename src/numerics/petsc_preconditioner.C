@@ -183,10 +183,6 @@ void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const uns
     // If not ams/ads, we quit with nothing to do
     if (std::string(hypre_type) == "ams")
     {
-      // If multiple variables, we error out as senseless
-      libmesh_error_msg_if(sys.n_vars() > 1,
-                           "Error applying hypre AMS to a system with multiple "
-                           "variables");
       // If not a 1st order Nédélec or a 2d 1st order Raviart-Thomas system, we
       // error out as we do not support anything else at the moment
       libmesh_error_msg_if(sys.variable(v).type() != FEType(1, NEDELEC_ONE) &&
@@ -199,10 +195,6 @@ void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const uns
     }
     else if (std::string(hypre_type) == "ads")
     {
-      // If multiple variables, we error out as senseless
-      libmesh_error_msg_if(sys.n_vars() > 1,
-                           "Error applying hypre ADS to a system with multiple "
-                           "variables");
       // If not a 3d 1st order Raviart-Thomas system, we error out as we do not
       // support anything else at the moment
       libmesh_error_msg_if(sys.variable(v).type() != FEType(1, RAVIART_THOMAS) ||
@@ -212,6 +204,31 @@ void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const uns
                            "order Raviart-Thomas on a 3d mesh");
       set_hypre_ads_data(pc, sys, v);
     }
+  }
+  else if (pc_type && std::string(pc_type) == PCFIELDSPLIT)
+  {
+    // Annoyingly, if using Schur complement preconditioning, we need to call PCSetUp()
+    auto pmatrix = cast_ptr<PetscMatrixBase<T> *>(sys.request_matrix("System Matrix"));
+    pmatrix->close();
+    Mat mat = pmatrix->mat();
+    LibmeshPetscCallA(comm, PCSetOperators(pc, mat, mat));
+    LibmeshPetscCallA(comm, PCSetUp(pc));
+
+    // Get sub KSP contexts for all splits
+    PetscInt n_splits;
+    KSP * subksps;
+    LibmeshPetscCallA(comm, PCFieldSplitGetSubKSP(pc, &n_splits, &subksps));
+
+    // Get the sub PC context for each split and recursively call this function
+    for (auto s : make_range(n_splits))
+    {
+      PC subpc;
+      LibmeshPetscCallA(comm, KSPGetPC(subksps[s], &subpc));
+      set_petsc_aux_data(subpc, sys, s);
+    }
+
+    // Free the array of sub KSP contexts
+    LibmeshPetscCallA(comm, PetscFree(subksps));
   }
 }
 
