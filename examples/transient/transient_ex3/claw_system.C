@@ -36,9 +36,9 @@
 namespace libMesh
 {
 
-ClawSystem::ClawSystem (EquationSystems& es,
-		        const std::string& name,
-		        const unsigned int number)
+ClawSystem::ClawSystem (EquationSystems & es,
+                        const std::string & name,
+                        const unsigned int number)
   : Parent(es, name, number),
     _mass_matrix(SparseMatrix<Number>::build(es.comm())),
     _jump_matrix(SparseMatrix<Number>::build(es.comm())),
@@ -983,6 +983,3 @@ void ClawSystem::init_data ()
 }
 
 } // namespace libMesh
-
-
-

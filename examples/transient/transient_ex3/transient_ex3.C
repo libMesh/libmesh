@@ -141,4 +141,3 @@ Number initial_condition (const Point& p,
 
   return std::exp( -100.*(std::pow(x-0.5,2.) + std::pow(y-0.5,2.)) );
 }
-

@@ -29,9 +29,9 @@
 namespace libMesh
 {
 
-AdvectionSystem::AdvectionSystem (EquationSystems& es,
-		                  const std::string& name,
-		                  const unsigned int number)
+AdvectionSystem::AdvectionSystem (EquationSystems & es,
+                                  const std::string & name,
+                                  const unsigned int number)
   : Parent(es, name, number),
     _q1_var(0),
     _fe_order(CONSTANT),
@@ -149,6 +149,3 @@ void AdvectionSystem::print_info ()
 }
 
 } // namespace libMesh
-
-
-
