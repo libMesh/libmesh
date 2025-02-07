@@ -471,6 +471,7 @@ AS_IF([test "x$enableexamples" = "xyes"],
                          examples/reduced_basis/reduced_basis_ex7/Makefile
                          examples/transient/transient_ex1/Makefile
                          examples/transient/transient_ex2/Makefile
+                         examples/transient/transient_ex3/Makefile
                          examples/vector_fe/vector_fe_ex1/Makefile
                          examples/vector_fe/vector_fe_ex2/Makefile
                          examples/vector_fe/vector_fe_ex3/Makefile
