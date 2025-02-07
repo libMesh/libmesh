@@ -1,3 +1,41 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2025 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+// <h1>Transient Example 3 - DG/FV formulation of the 2D Advection Equation with Explicit timestepping</h1>
+// \author David Knezevic
+// \date 2012
+// \author John W. Peterson
+// \date 2025 (modernization and libmesh example)
+//
+// This example program demonstrates one way to implement an explicit
+// timestepping Discontinous Galerkin/Finite Volume formulation of the
+// 2D advection equation. The example comes with an input file which
+// is set up as a finite volume model by default, but it can be
+// changed into a DG formulation by changing the fe_order and
+// fe_family parameters in the input file appropriately. The example
+// uses the Lax-Friedrichs numerical flux. This is known to be more
+// diffusive than e.g. upwinding, but it is also relatively simple
+// to implement since one does not need to consider the advective
+// velocity direction during assembly. Finally, the example comes
+// with two different time discretization options: explicit "forward"
+// Euler and explicit fourth-order Runge-Kutta (RK4). The latter
+// is used by default, but the "temporal_discretization_type" can
+// be changed to ForwardEuler in the input file to test that option.
+
 // Basic include file needed for the mesh functionality.
 #include "libmesh/libmesh.h"
 #include "libmesh/mesh.h"
