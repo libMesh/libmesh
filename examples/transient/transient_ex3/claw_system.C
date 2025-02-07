@@ -305,7 +305,7 @@ void ClawSystem::assemble_mass_matrix()
 
   // DofMap reference and vector used for getting dof_indices on each Elem
   const DofMap & dof_map = get_dof_map();
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
   {
@@ -377,7 +377,7 @@ void ClawSystem::assemble_advection_matrices()
 
   // DofMap reference and vector used for getting dof_indices on each Elem
   const DofMap & dof_map = get_dof_map();
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
   {
@@ -469,8 +469,8 @@ void ClawSystem::assemble_avg_coupling_matrices()
 
   // DofMap reference and vectors used for getting dof_indices on each Elem
   const DofMap & dof_map = get_dof_map();
-  std::vector<unsigned int> dof_indices;
-  std::vector<unsigned int> neighbor_dof_indices;
+  std::vector<dof_id_type> dof_indices;
+  std::vector<dof_id_type> neighbor_dof_indices;
 
   for (const auto * elem : mesh.active_local_element_ptr_range())
   {
@@ -639,8 +639,8 @@ void ClawSystem::assemble_jump_coupling_matrix()
 
   // DofMap reference and vectors used for storing dof_indices
   const DofMap & dof_map = get_dof_map();
-  std::vector<unsigned int> dof_indices;
-  std::vector<unsigned int> neighbor_dof_indices;
+  std::vector<dof_id_type> dof_indices;
+  std::vector<dof_id_type> neighbor_dof_indices;
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
   {
@@ -783,7 +783,7 @@ void ClawSystem::assemble_boundary_condition_matrices()
 
   // DofMap reference and vector used for getting dof_indices on each Elem
   const DofMap & dof_map = get_dof_map();
-  std::vector<unsigned int> dof_indices;
+  std::vector<dof_id_type> dof_indices;
 
   for (const auto & elem : mesh.active_local_element_ptr_range())
   {
