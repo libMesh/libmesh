@@ -27,6 +27,7 @@
 #include "libmesh/fem_function_base.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/parameters.h"
 #include "libmesh/qoi_set.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/tensor_value.h" // For point_hessian
@@ -60,7 +61,6 @@ class MeshBase;
 class Xdr;
 class DofMap;
 template <typename Output> class FunctionBase;
-class Parameters;
 class ParameterVector;
 class Point;
 class SensitivityData;
@@ -510,8 +510,6 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
    */
   void project_solution (FunctionBase<Number> * f,
                          FunctionBase<Gradient> * g = nullptr) const;
@@ -522,8 +520,6 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
    */
   void project_solution (FEMFunctionBase<Number> * f,
                          FEMFunctionBase<Gradient> * g = nullptr) const;
@@ -554,8 +550,6 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -572,8 +566,6 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -611,8 +603,6 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
    */
   void boundary_project_solution (const std::set<boundary_id_type> & b,
                                   const std::vector<unsigned int> & variables,
@@ -648,8 +638,6 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
-   * If non-default \p Parameters are to be used, they can be provided
-   * in the \p parameters argument.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -1530,6 +1518,9 @@ public:
    * Prolong vectors after the mesh has refined
    */
   virtual void prolong_vectors ();
+
+  /// Parameters for the system. If a parameter is not provided, it should be retrieved from the EquationSystems
+  Parameters parameters;
 
   /**
    * Flag which tells the system to whether or not to
