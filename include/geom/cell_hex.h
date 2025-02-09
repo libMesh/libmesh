@@ -195,6 +195,9 @@ public:
    */
   static const unsigned int edge_sides_map[12][2];
 
+  virtual bool on_reference_element(const Point & p,
+                                    const Real eps = TOLERANCE) const override final;
+
 protected:
 
   /**

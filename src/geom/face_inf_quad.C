@@ -305,6 +305,23 @@ std::pair<Real, Real> InfQuad::qual_bounds (const ElemQuality q) const
   return bounds;
 }
 
+
+
+bool InfQuad::on_reference_element(const Point & p,
+                                   const Real eps) const
+{
+  const Real & xi = p(0);
+  const Real & eta = p(1);
+
+  // The reference infquad is [-1,1]^2.
+  return ((xi  >= -1.-eps) &&
+          (xi  <=  1.+eps) &&
+          (eta >= -1.-eps) &&
+          (eta <=  1.+eps));
+}
+
+
+
 } // namespace libMesh
 
 

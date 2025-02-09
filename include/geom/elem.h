@@ -1068,6 +1068,17 @@ public:
   virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const;
 
   /**
+   * \returns \p true if the master-space point p is contained in the
+   * reference element corresponding to this element, false otherwise.
+   *
+   * Since we are doing floating point comparisons here the parameter
+   * \p eps can be specified to indicate a tolerance.  For example,
+   * \f$ x \le 1 \f$  becomes \f$ x \le 1 + \epsilon \f$.
+   */
+  virtual bool on_reference_element(const Point & p,
+                                    const Real eps = TOLERANCE) const = 0;
+
+  /**
    * \returns \p true if this element is "close" to the point p, where
    * "close" is determined by the tolerance tol.
    */

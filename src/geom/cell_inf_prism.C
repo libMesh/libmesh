@@ -371,6 +371,25 @@ InfPrism::edges_adjacent_to_node(const unsigned int n) const
 }
 
 
+
+bool InfPrism::on_reference_element(const Point & p,
+                                    const Real eps) const
+{
+  const Real & xi = p(0);
+  const Real & eta = p(1);
+  const Real & zeta = p(2);
+
+  // inside the reference triangle with zeta in [-1,1]
+  return ((xi   >=  0.-eps) &&
+          (eta  >=  0.-eps) &&
+          (zeta >= -1.-eps) &&
+          (zeta <=  1.+eps) &&
+          ((xi + eta) <= 1.+eps));
+}
+
+
+
+
 } // namespace libMesh
 
 

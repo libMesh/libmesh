@@ -315,6 +315,9 @@ public:
    */
   virtual bool close_to_point(const Point & p, Real tol) const override;
 
+  virtual bool on_reference_element(const Point & p,
+                                    const Real eps = TOLERANCE) const override final;
+
 protected:
 
   /**
