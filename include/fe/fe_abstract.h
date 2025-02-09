@@ -207,6 +207,10 @@ public:
    * point comparisons here the parameter \p eps can be specified to
    * indicate a tolerance.  For example, \f$ x \le 1 \f$  becomes
    * \f$ x \le 1 + \epsilon \f$.
+   *
+   * This method overload does not support all finite element types;
+   * e.g. the Polygon1 type may differ from element to element.  Use
+   * \p Elem::on_reference_element() instead.
    */
   static bool on_reference_element(const Point & p,
                                    const ElemType t,
