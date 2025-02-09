@@ -415,8 +415,8 @@ public:
    *
    * On a p-refined element, \p o should be the total order of the element.
    *
-   * This method does not support all finite element types; e.g. the
-   * Polygon1 type may differ from element to element.
+   * This method overload does not support all finite element types;
+   * e.g. the Polygon1 type may differ from element to element.
    */
   static unsigned int n_shape_functions (const ElemType t,
                                          const Order o)
@@ -428,8 +428,8 @@ public:
    *
    * On a p-refined element, \p o should be the total order of the element.
    *
-   * This method does not support all finite element types; e.g. the
-   * Polygon1 type may differ from element to element.
+   * This method overload does not support all finite element types;
+   * e.g. the Polygon1 type may differ from element to element.
    */
   static unsigned int n_dofs(const ElemType t,
                              const Order o);
@@ -452,8 +452,8 @@ public:
    *
    * On a p-refined element, \p o should be the total order of the element.
    *
-   * This method does not support all finite element types; e.g. the
-   * Polygon1 type may differ from element to element.
+   * This method overload does not support all finite element types;
+   * e.g. the Polygon1 type may differ from element to element.
    */
   static unsigned int n_dofs_at_node(const ElemType t,
                                      const Order o,
@@ -475,8 +475,8 @@ public:
    *
    * On a p-refined element, \p o should be the total order of the element.
    *
-   * This method may not support all finite element types, e.g. higher
-   * order polygons or polyhedra may differ from element to element.
+   * This method overload does not support all finite element types;
+   * e.g. the Polygon1 type may differ from element to element.
    */
   static unsigned int n_dofs_per_elem(const ElemType t,
                                       const Order o);
