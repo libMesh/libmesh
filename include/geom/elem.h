@@ -1081,8 +1081,8 @@ public:
   { libmesh_not_implemented(); return std::make_pair(0.,0.); }
 
   /**
-   * \returns \p true if the point p is contained in this element,
-   * false otherwise.
+   * \returns \p true if the physical point p is contained in this
+   * element, false otherwise.
    *
    * For linear elements, performs an initial tight bounding box check
    * (as an optimization step) and (if that passes) then uses the
