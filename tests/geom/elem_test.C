@@ -227,11 +227,6 @@ public:
         if (elem->infinite())
           continue;
 
-        // Disable for polygons temporarily until we get FE updated
-        // for them; we need that for mapping calculations.
-        if (elem->type() == POLYGON1)
-          continue;
-
         for (const auto n : elem->node_index_range())
 #ifndef LIBMESH_ENABLE_EXCEPTIONS
           // If this node has a singular Jacobian, we need exceptions in order
@@ -265,8 +260,7 @@ public:
         for (const auto p : IntRange<unsigned int>(0, elem->n_permutations()))
           {
             elem->permute(p);
-            if (elem_type != POLYGON1) // Not yet implemented
-              CPPUNIT_ASSERT(elem->has_invertible_map());
+            CPPUNIT_ASSERT(elem->has_invertible_map());
             const Point new_centroid = elem->true_centroid();
             const Point new_vertex_avg = elem->vertex_average();
             Point new_quasicc;
