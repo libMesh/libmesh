@@ -2684,14 +2684,12 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
       // If dist is larger than some fraction of the tolerance, then return false.
       // This can happen when e.g. a 2D element is living in 3D, and
       // FEMap::inverse_map() maps p onto the projection of the element,
-      // effectively "tricking" FEInterface::on_reference_element().
+      // effectively "tricking" on_reference_element().
       if (dist > this->hmax() * map_tol)
         return false;
     }
 
-
-
-  return FEInterface::on_reference_element(mapped_point, this->type(), map_tol);
+  return this->on_reference_element(mapped_point, map_tol);
 }
 
 

@@ -148,7 +148,7 @@ bool InfQuad4::contains_point (const Point & p, Real tol) const
       const Point mapped_point = InfFEMap::inverse_map(dim(), this, p,
                                                        tol, false);
 
-      return FEInterface::on_reference_element(mapped_point, this->type(), tol);
+      return this->on_reference_element(mapped_point, tol);
     }
 }
 
