@@ -316,7 +316,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
   // Account for Elem::p_level() when computing total_order
   auto total_order = fe_t.order + add_p_level*elem->p_level();
 
-  fe_with_vec_switch(n_shape_functions(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs(elem, total_order));
 }
 
 
@@ -344,7 +344,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
   // Ignore Elem::p_level() and instead use extra_order to compute total_order.
   auto total_order = fe_t.order + extra_order;
 
-  fe_with_vec_switch(n_shape_functions(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs(elem, total_order));
 }
 
 
