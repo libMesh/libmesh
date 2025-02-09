@@ -536,6 +536,26 @@ bool InfHex::contains_point (const Point & p, Real tol) const
   return FEInterface::on_reference_element(mapped_point, this->type(), tol);
 }
 
+
+
+bool InfHex::on_reference_element(const Point & p,
+                                  const Real eps) const
+{
+  const Real & xi = p(0);
+  const Real & eta = p(1);
+  const Real & zeta = p(2);
+
+  // The reference infhex is a [-1,1]^3.
+  return ((xi   >= -1.-eps) &&
+          (xi   <=  1.+eps) &&
+          (eta  >= -1.-eps) &&
+          (eta  <=  1.+eps) &&
+          (zeta >= -1.-eps) &&
+          (zeta <=  1.+eps));
+}
+
+
+
 } // namespace libMesh
 
 

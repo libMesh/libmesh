@@ -234,6 +234,9 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  virtual bool on_reference_element(const Point & p,
+                                    const Real eps = TOLERANCE) const override final;
+
 protected:
 
   /**

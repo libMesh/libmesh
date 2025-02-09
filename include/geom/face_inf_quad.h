@@ -263,6 +263,9 @@ public:
 
   virtual std::vector<unsigned int> edges_adjacent_to_node(const unsigned int n) const override;
 
+  virtual bool on_reference_element(const Point & p,
+                                    const Real eps = TOLERANCE) const override final;
+
 protected:
 
   /**

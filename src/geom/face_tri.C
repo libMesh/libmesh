@@ -371,4 +371,16 @@ std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
   return bounds;
 }
 
+
+bool Tri::on_reference_element(const Point & p,
+                               const Real eps) const
+{
+  const Real & xi = p(0);
+  const Real & eta = p(1);
+  return ((xi  >= 0.-eps) &&
+          (eta >= 0.-eps) &&
+          ((xi + eta) <= 1.+eps));
+}
+
+
 } // namespace libMesh
