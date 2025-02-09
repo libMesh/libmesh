@@ -63,6 +63,50 @@ Point Polygon::master_point (const unsigned int i) const
 }
 
 
+
+bool Polygon::on_reference_element(const Point & p,
+                                   const Real eps) const
+{
+  const unsigned int ns = this->n_sides();
+
+  // Center-to-midside to center-to-vertex angle
+  const Real pi_over_ns = libMesh::pi / ns;
+
+  // Center-to-midside distance
+  const Real min_r = 0.5/tan(pi_over_ns);
+
+  // Center-to-vertex distance
+  const Real max_r = std::sqrt(min_r*min_r + 0.25);
+
+  const Point center(0.5, min_r);
+
+  // Check that the point is on the same side of all the faces by
+  // testing whether:
+  //
+  // n_i.(p - x_i) <= 0
+  //
+  // for each i, where:
+  //   n_i is the outward normal of face i,
+  //   x_i is a point on face i.
+
+  for (auto i : make_range(ns))
+    {
+      const Point x_i =
+        center + Point(max_r*sin((int(i)*2-1)*pi_over_ns),
+                       -max_r*cos((int(i)*2-1)*pi_over_ns));
+      const Point n_i =
+        Point(sin(int(i)*2*pi_over_ns),
+              -cos(int(i)*2*pi_over_ns));
+
+      if (n_i * (p - x_i) > eps)
+        return false;
+    }
+
+  return true;
+}
+
+
+
 dof_id_type Polygon::key (const unsigned int s) const
 {
   const int ns = this->n_sides();
