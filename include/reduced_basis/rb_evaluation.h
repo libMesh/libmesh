@@ -150,6 +150,7 @@ public:
    */
   virtual Real residual_scaling_denom(Real alpha_LB);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * Evaluate the dual norm of output \p n for the current parameters.
    *
@@ -161,6 +162,7 @@ public:
    * theta values.
    */
   Real eval_output_dual_norm(unsigned int n, const RBParameters & mu);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * Evaluate the dual norm of output \p n for the current parameters,

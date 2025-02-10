@@ -141,6 +141,7 @@ public:
   virtual std::pair<unsigned int, Real>
   get_linear_solve_parameters() const;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * Currently a no-op.
    *
@@ -149,6 +150,7 @@ public:
    * pointer.
    */
   virtual void release_linear_solver(LinearSolver<Number> *) const;
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
