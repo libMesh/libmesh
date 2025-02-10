@@ -1646,8 +1646,7 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
                        parent_base_dof != n_base_dofs; parent_base_dof++)
                     {
 
-                      const Real parent_base_dof_value = FEInterface::shape(Dim-1,
-                                                                            fe_type,
+                      const Real parent_base_dof_value = FEInterface::shape(fe_type,
                                                                             parent_base.get(),
                                                                             parent_base_dof,
                                                                             mapped_point);
