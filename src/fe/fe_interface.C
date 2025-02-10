@@ -669,6 +669,7 @@ Point FEInterface::map(unsigned int dim,
                        const Elem * elem,
                        const Point & p)
 {
+  libmesh_deprecated();
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(elem->type()))
     return ifem_map(dim, fe_t, elem, p);
@@ -687,6 +688,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
                                 const Real tolerance,
                                 const bool secure)
 {
+  libmesh_deprecated();
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type()))
@@ -708,6 +710,8 @@ void FEInterface::inverse_map (const unsigned int dim,
                                const Real tolerance,
                                const bool secure)
 {
+  libmesh_deprecated();
+
   const std::size_t n_pts = physical_points.size();
 
   // Resize the vector

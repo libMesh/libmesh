@@ -40,8 +40,7 @@ unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
                                                  const FEType & fe_t,
                                                  const ElemType t)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   switch (dim)
     {
@@ -165,8 +164,7 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
                                               const ElemType t,
                                               const unsigned int n)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   switch (dim)
     {
@@ -230,8 +228,7 @@ unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
                                                const FEType & fe_t,
                                                const ElemType t)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   switch (dim)
     {
@@ -740,8 +737,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
                              const unsigned int i,
                              const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   inf_fe_switch(shape(fe_t, t, i, p));
 }
@@ -755,8 +751,7 @@ Real FEInterface::ifem_shape(const unsigned int dim,
                              const unsigned int i,
                              const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   inf_fe_switch( shape(fe_t, elem, i, p));
 }
@@ -779,11 +774,11 @@ Real FEInterface::ifem_shape_deriv (const unsigned int dim,
                                     const unsigned int j,
                                     const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   inf_fe_switch(shape_deriv(fe_t, elem, i, j, p));
 }
+
 
 
 Real FEInterface::ifem_shape_deriv(const unsigned int dim,
@@ -793,8 +788,7 @@ Real FEInterface::ifem_shape_deriv(const unsigned int dim,
                                    const unsigned int j,
                                    const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   inf_fe_switch(shape_deriv(fe_t, t, i, j, p));
 }
