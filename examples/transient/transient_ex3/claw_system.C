@@ -55,7 +55,7 @@ ClawSystem::ClawSystem (EquationSystems & es,
 
   // Allocate SparseMatrices. I could not figure out how to do
   // this in the initialization list, I don't think it's possible.
-  for (auto i : make_range(2))
+  for (unsigned int i=0; i<2; ++i)
   {
     _advection_matrices.push_back(SparseMatrix<Number>::build(es.comm()));
     _avg_matrices.push_back(SparseMatrix<Number>::build(es.comm()));
@@ -622,7 +622,6 @@ void ClawSystem::assemble_jump_coupling_matrix()
   // Data for surface integrals on the element boundary
   const std::vector<std::vector<Real>> & phi_face = fe_elem_face->get_phi();
   const std::vector<Real> & JxW_face = fe_elem_face->get_JxW();
-  const std::vector<Point> & qface_normals = fe_elem_face->get_normals();
   const std::vector<Point> & qface_points = fe_elem_face->get_xyz();
 
   // Data for surface integrals on the neighbor boundary

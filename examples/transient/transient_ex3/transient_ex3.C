@@ -80,7 +80,6 @@ int main (int argc, char** argv)
   // Read mesh options from the input file
   GetPot infile(parameters_filename);
   unsigned int n_elem = infile("n_elem", 1);       // Determines the number of elements in the "truth" mesh
-  const unsigned int dim = 2;                      // The number of spatial dimensions
 
   // Build a mesh
   Mesh mesh (init.comm());
