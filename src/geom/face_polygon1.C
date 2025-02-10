@@ -176,12 +176,7 @@ std::unique_ptr<Elem> Polygon1::build_side_ptr (const unsigned int i,
   std::unique_ptr<Elem> sidep;
   if (proxy)
     {
-#ifdef LIBMESH_ENABLE_DEPRECATED
-      sidep = std::make_unique<Side<Edge2,Polygon1>>(this,i);
-      libmesh_deprecated();
-#else
       libmesh_error();
-#endif
     }
   else
     {
@@ -190,10 +185,7 @@ std::unique_ptr<Elem> Polygon1::build_side_ptr (const unsigned int i,
       sidep->set_node(1) = this->node_ptr((i+1)%ns);
     }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  if (!proxy) // proxy sides used to leave parent() set
-#endif
-    sidep->set_parent(nullptr);
+  sidep->set_parent(nullptr);
   sidep->set_interior_parent(this);
 
   sidep->set_mapping_type(this->mapping_type());
