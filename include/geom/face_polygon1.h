@@ -31,10 +31,18 @@ namespace libMesh
  * The \p POLYGON1 is an element in 2D with an arbitrary (but fixed)
  * number of first-order (EDGE2) sides.
  *
- * Sides and vertices are numbered clockwise starting from 0.
+ * In master space, side 0 of a Polygon1 has point 0 at (0,0), point 1
+ * at (0,1), and subsequent sides continue in a counter-clockwise loop
+ * to form a regular polygon of side length 1.  E.g. a master hexagon
+ * would look like:
  *
- * In master space, a POLYGON1 has point 0 at (0,0) and is a regular
- * polygon of side length 1.
+ *    (0,2*sqrt(3))  o----o  (1,2*sqrt(3))
+ *                  /      \
+ *                 /        \
+ * (-.5, sqrt(3)) o          o (1.5, sqrt(3))
+ *                 \        /
+ *                  \      /
+ *            (0,0)  o----o  (1,0)
  *
  * \author Roy H. Stogner
  * \date 2025
