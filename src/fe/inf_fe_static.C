@@ -102,8 +102,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
                                                         const ElemType inf_elem_type,
                                                         const unsigned int n)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
@@ -152,8 +151,7 @@ template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType & fet,
                                                          const ElemType inf_elem_type)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
@@ -225,8 +223,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
                                       const unsigned int i,
                                       const Point & p)
 {
-  // TODO - if possible, not sure if we can easily fully remove this function.
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_not_equal_to (Dim, 0);
 
@@ -329,8 +326,7 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
                                              const unsigned int j,
                                              const Point & p)
 {
-  // TODO - if possible, not sure if we can easily fully remove this function.
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_not_equal_to (Dim, 0);
   libmesh_assert_greater (Dim,j);
