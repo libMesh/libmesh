@@ -99,6 +99,7 @@ public:
    */
   unsigned int get_n_discrete_params() const;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * Get a set that stores the parameter names.
    *
@@ -108,6 +109,7 @@ public:
    * loop over the keys directly.
    */
   std::set<std::string> get_parameter_names() const;
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * Get the current parameters.

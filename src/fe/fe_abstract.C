@@ -623,6 +623,9 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
     }
 }
 
+
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
 bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const Real eps)
 {
   // Use Elem::on_reference_element() instead
@@ -828,6 +831,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
 
   return false;
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

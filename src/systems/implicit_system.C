@@ -1228,6 +1228,7 @@ std::pair<unsigned int, Real> ImplicitSystem::get_linear_solve_parameters() cons
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void ImplicitSystem::release_linear_solver(LinearSolver<Number> *) const
 {
   // This function was originally paired with get_linear_solver()
@@ -1237,6 +1238,7 @@ void ImplicitSystem::release_linear_solver(LinearSolver<Number> *) const
   // longer needs to do any cleanup.
   libmesh_deprecated();
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

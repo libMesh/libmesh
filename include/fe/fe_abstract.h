@@ -201,6 +201,7 @@ public:
                          const std::vector<Point> & reference_side_points,
                          std::vector<Point> &       reference_points) = 0;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \returns \p true if the point p is located on the reference element
    * for element type t, false otherwise.  Since we are doing floating
@@ -208,13 +209,15 @@ public:
    * indicate a tolerance.  For example, \f$ x \le 1 \f$  becomes
    * \f$ x \le 1 + \epsilon \f$.
    *
-   * This method overload does not support all finite element types;
-   * e.g. the Polygon1 type may differ from element to element.  Use
-   * \p Elem::on_reference_element() instead.
+   * This method overload is now deprecated, since it cannot support
+   * all finite element types; e.g. the Polygon1 type may differ from
+   * element to element.  Use \p Elem::on_reference_element() instead.
    */
   static bool on_reference_element(const Point & p,
                                    const ElemType t,
                                    const Real eps = TOLERANCE);
+#endif // LIBMESH_ENABLE_DEPRECATED
+
   /**
    * \returns The reference space coordinates of \p nodes based on the
    * element type.

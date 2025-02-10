@@ -737,6 +737,7 @@ void MeshBase::remove_orphaned_nodes ()
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors)
 {
   libmesh_deprecated();
@@ -768,6 +769,9 @@ void MeshBase::prepare_for_use (const bool skip_renumber_nodes_and_elements)
 
   this->prepare_for_use();
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+
 
 void MeshBase::prepare_for_use ()
 {
@@ -1699,12 +1703,14 @@ subdomain_id_type MeshBase::get_id_by_name(std::string_view name) const
   return Elem::invalid_subdomain_id;
 }
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void MeshBase::cache_elem_dims()
 {
   libmesh_deprecated();
 
   this->cache_elem_data();
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 void MeshBase::cache_elem_data()
 {

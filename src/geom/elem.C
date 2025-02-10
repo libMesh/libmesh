@@ -400,6 +400,7 @@ const Elem * Elem::reference_elem () const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 Point Elem::centroid() const
 {
   libmesh_do_once(libMesh::err
@@ -412,6 +413,9 @@ Point Elem::centroid() const
 
   return Elem::vertex_average();
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+
 
 Point Elem::true_centroid() const
 {
@@ -739,12 +743,14 @@ unsigned int Elem::which_side_am_i (const Elem * e) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int Elem::which_node_am_i(unsigned int side,
                                    unsigned int side_node) const
 {
   libmesh_deprecated();
   return local_side_node(side, side_node);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

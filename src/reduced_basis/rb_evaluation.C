@@ -471,6 +471,7 @@ Real RBEvaluation::residual_scaling_denom(Real alpha_LB)
   return alpha_LB;
 }
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters & /*mu*/)
 {
   libmesh_deprecated();
@@ -478,6 +479,7 @@ Real RBEvaluation::eval_output_dual_norm(unsigned int n, const RBParameters & /*
   // Call non-deprecated version of this function, ignoring input mu
   return this->eval_output_dual_norm(n, nullptr);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 Real RBEvaluation::eval_output_dual_norm(unsigned int n,
                                          const std::vector<Number> * evaluated_thetas)
