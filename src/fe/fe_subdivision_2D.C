@@ -690,7 +690,7 @@ void FESubdivision::reinit(const Elem * elem,
   // no custom quadrature support
   libmesh_assert(pts == nullptr);
   libmesh_assert(qrule);
-  qrule->init(elem->type());
+  qrule->init(*elem);
 
   // Initialize the shape functions
   this->init_shape_functions(this->qrule->get_points(), elem);
