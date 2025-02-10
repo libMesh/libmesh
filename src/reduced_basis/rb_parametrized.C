@@ -126,6 +126,7 @@ unsigned int RBParametrized::get_n_discrete_params() const
     (get_discrete_parameter_values().size());
 }
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 std::set<std::string> RBParametrized::get_parameter_names() const
 {
   libmesh_deprecated();
@@ -137,6 +138,7 @@ std::set<std::string> RBParametrized::get_parameter_names() const
 
   return parameter_names;
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 bool RBParametrized::set_parameters(const RBParameters & params)
 {

@@ -62,6 +62,7 @@ bool InfFE<Dim,T_radial,T_map>::_warned_for_dshape     = false;
 
 // ------------------------------------------------------------
 // InfFE static class members
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
                                                 const ElemType inf_elem_type)
@@ -76,6 +77,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
   else
     return InfFERadial::n_dofs(fet.radial_order);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -97,6 +99,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType & fet,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
                                                         const ElemType inf_elem_type,
@@ -122,6 +125,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
   else
     return InfFERadial::n_dofs_at_node(fet.radial_order, n_radial);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -147,6 +151,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType & fet,
                                                          const ElemType inf_elem_type)
@@ -161,6 +166,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType & fet,
   else
     return InfFERadial::n_dofs_per_elem(fet.radial_order);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -217,6 +223,7 @@ void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType & /* fet */,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
                                       const ElemType inf_elem_type,
@@ -257,9 +264,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
     return InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
       * InfFERadial::decay(Dim,v);
 }
-
-
-
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -319,6 +324,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType fet,
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
                                              const ElemType inf_elem_type,
@@ -363,6 +369,7 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
     * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
     * InfFERadial::decay(Dim,v);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
@@ -1169,6 +1176,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
                                                        const ElemType inf_elem_type,
@@ -1378,6 +1386,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
 
   return;
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -1706,48 +1715,51 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
 //#include "libmesh/inf_fe_instantiate_2D.h"
 //#include "libmesh/inf_fe_instantiate_3D.h"
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_node_indices(const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_node_indices(const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_node_indices(const ElemType, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType, const Elem *, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType, const Elem *, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType, const Elem *, const unsigned int, const Point &, const bool));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType &, const Elem *, const unsigned int, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType &, const Elem *, const unsigned int, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const Elem *, const unsigned int, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType, const Elem *, const unsigned int, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType, const Elem *, const unsigned int, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType, const Elem *, const unsigned int, const unsigned int, const Point &, const bool));
