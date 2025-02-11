@@ -91,7 +91,7 @@ public:
    * \returns true - polygon subclasses can have numbers of sides and
    * nodes which vary at runtime.
    */
-  virtual bool runtime_topology() const { return true; }
+  virtual bool runtime_topology() const override { return true; }
 
   /**
    * \returns The \p Point associated with local \p Node \p i,
