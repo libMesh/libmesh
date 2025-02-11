@@ -51,16 +51,7 @@ ClawSystem::ClawSystem (EquationSystems & es,
 {
   // set assemble_before_solve flag to false
   // so that we control matrix assembly.
-  assemble_before_solve = false;
-
-  // Allocate SparseMatrices. I could not figure out how to do
-  // this in the initialization list, I don't think it's possible.
-  for (unsigned int i=0; i<2; ++i)
-  {
-    _advection_matrices.push_back(SparseMatrix<Number>::build(es.comm()));
-    _avg_matrices.push_back(SparseMatrix<Number>::build(es.comm()));
-    _boundary_condition_matrices.push_back(SparseMatrix<Number>::build(es.comm()));
-  }
+  this->assemble_before_solve = false;
 
 }
 
@@ -950,9 +941,18 @@ void ClawSystem::write_out_discretization_matrices()
     _boundary_condition_matrices[i]->print_matlab("boundary_condition_matrix_" + std::to_string(i+1) + ".m");
 }
 
-void ClawSystem::init_data ()
+void ClawSystem::init_data()
 {
   Parent::init_data();
+
+  // Allocate SparseMatrices before attaching them to the DofMap so
+  // that they all use the same sparsity pattern.
+  for (unsigned int i=0; i<2; ++i)
+  {
+    _advection_matrices.push_back(SparseMatrix<Number>::build(this->comm()));
+    _avg_matrices.push_back(SparseMatrix<Number>::build(this->comm()));
+    _boundary_condition_matrices.push_back(SparseMatrix<Number>::build(this->comm()));
+  }
 
   DofMap & dof_map = this->get_dof_map();
 
