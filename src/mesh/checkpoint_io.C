@@ -1168,7 +1168,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
 
       unsigned int n_nodes = Elem::type_to_n_nodes_map[elem_data[1]];
       if (n_nodes == invalid_uint)
-        libmesh_not_implemented_msg("Support for POLYGON1 not yet implemented");
+        libmesh_not_implemented_msg("Support for C0POLYGON not yet implemented");
 
       // Snag the node ids this element was connected to
       std::vector<file_id_type> conn_data(n_nodes);

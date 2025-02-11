@@ -76,9 +76,9 @@ void QBase::init(const Elem & elem,
   // check to see if we have already
   // done the work for this quadrature rule
   //
-  // If we have something like a POLYGON1 then we're going to need to
-  // recompute to be safe; even if we're using the same element, it
-  // might have been distorted enough that its subtriangle
+  // If we have something like a Polygon subclass then we're going to
+  // need to recompute to be safe; even if we're using the same
+  // element, it might have been distorted enough that its subtriangle
   // triangulation has been changed.
   if (t == _type && p == _p_level && !elem.runtime_topology())
     return;
@@ -124,7 +124,7 @@ void QBase::init(const ElemType t,
 {
   // Some element types require data from a specific element, so can
   // only be used with newer APIs.
-  if (t == POLYGON1)
+  if (t == C0POLYGON)
     libmesh_error();
 
   // This API is dangerous to use on general meshes, which may include

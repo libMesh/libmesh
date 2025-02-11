@@ -1,7 +1,7 @@
 // libmesh includes
 #include <libmesh/elem.h>
 #include <libmesh/enum_elem_type.h>
-#include <libmesh/face_polygon1.h>
+#include <libmesh/face_c0polygon.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh.h>
@@ -44,8 +44,8 @@ public:
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST( testTet4Jacobian );
-  CPPUNIT_TEST( testPolygon1Pentagon );
-  CPPUNIT_TEST( testPolygon1Hexagon );
+  CPPUNIT_TEST( testC0PolygonPentagon );
+  CPPUNIT_TEST( testC0PolygonHexagon );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -904,7 +904,7 @@ public:
 
 
 
-  void testPolygon1Pentagon()
+  void testC0PolygonPentagon()
   {
     LOG_UNIT_TEST;
 
@@ -915,7 +915,7 @@ public:
     mesh.add_point(Point(1, 1), 3);
     mesh.add_point(Point(0, 1), 4);
 
-    std::unique_ptr<Elem> polygon = std::make_unique<Polygon1>(5);
+    std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(5);
     for (auto i : make_range(5))
       polygon->set_node(i) = mesh.node_ptr(i);
     polygon->set_id() = 0;
@@ -925,12 +925,12 @@ public:
     const Real derived_volume = elem->volume();
     LIBMESH_ASSERT_FP_EQUAL(derived_volume, 1.25, TOLERANCE*TOLERANCE);
 
-    this->testPolygon1Methods(mesh, 5);
+    this->testC0PolygonMethods(mesh, 5);
   }
 
 
 
-  void testPolygon1Hexagon()
+  void testC0PolygonHexagon()
   {
     LOG_UNIT_TEST;
 
@@ -942,7 +942,7 @@ public:
     mesh.add_point(Point(0, 1), 4);
     mesh.add_point(Point(-0.5, 0.5), 5);
 
-    std::unique_ptr<Elem> polygon = std::make_unique<Polygon1>(6);
+    std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(6);
     for (auto i : make_range(6))
       polygon->set_node(i) = mesh.node_ptr(i);
     polygon->set_id() = 0;
@@ -952,7 +952,7 @@ public:
     const Real derived_volume = elem->volume();
     LIBMESH_ASSERT_FP_EQUAL(derived_volume, 1.5, TOLERANCE*TOLERANCE);
 
-    this->testPolygon1Methods(mesh, 6);
+    this->testC0PolygonMethods(mesh, 6);
   }
 
 
@@ -993,7 +993,7 @@ protected:
 
 
   // Helper function to factor out common tests
-  void testPolygon1Methods(MeshBase & mesh,
+  void testC0PolygonMethods(MeshBase & mesh,
                            unsigned int n_sides)
   {
     Elem * elem = mesh.query_elem_ptr(0);
@@ -1004,7 +1004,7 @@ protected:
     if (!elem)
       return;
 
-    CPPUNIT_ASSERT_EQUAL(elem->type(), POLYGON1);
+    CPPUNIT_ASSERT_EQUAL(elem->type(), C0POLYGON);
     CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), n_sides);
     CPPUNIT_ASSERT_EQUAL(elem->n_sub_elem(), n_sides);
     CPPUNIT_ASSERT_EQUAL(elem->n_sides(), n_sides);

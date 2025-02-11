@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "libmesh/face_polygon1.h"
+#include "libmesh/face_c0polygon.h"
 
 #include "libmesh/edge_edge2.h"
 #include "libmesh/enum_order.h"
@@ -30,7 +30,7 @@ namespace libMesh
 {
 
 
-Polygon1::Polygon1 (const unsigned int num_sides, Elem * p) :
+C0Polygon::C0Polygon (const unsigned int num_sides, Elem * p) :
   Polygon(num_sides, num_sides, p)
 {
   // A default triangulation is better than nothing
@@ -39,8 +39,8 @@ Polygon1::Polygon1 (const unsigned int num_sides, Elem * p) :
 }
 
 
-unsigned int Polygon1::opposite_node(const unsigned int node_in,
-                                     const unsigned int side_in) const
+unsigned int C0Polygon::opposite_node(const unsigned int node_in,
+                                      const unsigned int side_in) const
 {
   const auto ns = this->n_sides();
   if (ns % 2)
@@ -61,31 +61,31 @@ unsigned int Polygon1::opposite_node(const unsigned int node_in,
 
 
 // ------------------------------------------------------------
-// Polygon1 class member functions
+// C0Polygon class member functions
 
-bool Polygon1::is_vertex(const unsigned int libmesh_dbg_var(i)) const
+bool C0Polygon::is_vertex(const unsigned int libmesh_dbg_var(i)) const
 {
   libmesh_assert (i < this->n_nodes());
 
   return true;
 }
 
-bool Polygon1::is_edge(const unsigned int libmesh_dbg_var(i)) const
+bool C0Polygon::is_edge(const unsigned int libmesh_dbg_var(i)) const
 {
   libmesh_assert (i < this->n_nodes());
 
   return false;
 }
 
-bool Polygon1::is_face(const unsigned int libmesh_dbg_var(i)) const
+bool C0Polygon::is_face(const unsigned int libmesh_dbg_var(i)) const
 {
   libmesh_assert (i < this->n_nodes());
 
   return false;
 }
 
-bool Polygon1::is_node_on_side(const unsigned int n,
-                               const unsigned int s) const
+bool C0Polygon::is_node_on_side(const unsigned int n,
+                                const unsigned int s) const
 {
   const auto ns = this->n_sides();
   libmesh_assert_less (s, ns);
@@ -96,7 +96,7 @@ bool Polygon1::is_node_on_side(const unsigned int n,
 }
 
 std::vector<unsigned int>
-Polygon1::nodes_on_side(const unsigned int s) const
+C0Polygon::nodes_on_side(const unsigned int s) const
 {
   const auto ns = this->n_sides();
   libmesh_assert(!(this->n_nodes() % ns));
@@ -110,12 +110,12 @@ Polygon1::nodes_on_side(const unsigned int s) const
 }
 
 std::vector<unsigned int>
-Polygon1::nodes_on_edge(const unsigned int e) const
+C0Polygon::nodes_on_edge(const unsigned int e) const
 {
   return this->nodes_on_side(e);
 }
 
-bool Polygon1::has_affine_map() const
+bool C0Polygon::has_affine_map() const
 {
   const unsigned int ns = this->n_sides();
 
@@ -160,15 +160,15 @@ bool Polygon1::has_affine_map() const
 
 
 
-Order Polygon1::default_order() const
+Order C0Polygon::default_order() const
 {
   return FIRST;
 }
 
 
 
-std::unique_ptr<Elem> Polygon1::build_side_ptr (const unsigned int i,
-                                                bool proxy)
+std::unique_ptr<Elem> C0Polygon::build_side_ptr (const unsigned int i,
+                                                 bool proxy)
 {
   const auto ns = this->n_sides();
   libmesh_assert_less (i, ns);
@@ -199,8 +199,8 @@ std::unique_ptr<Elem> Polygon1::build_side_ptr (const unsigned int i,
 
 
 
-void Polygon1::build_side_ptr (std::unique_ptr<Elem> & side,
-                               const unsigned int i)
+void C0Polygon::build_side_ptr (std::unique_ptr<Elem> & side,
+                                const unsigned int i)
 {
   const auto ns = this->n_sides();
   libmesh_assert_less (i, ns);
@@ -224,16 +224,16 @@ void Polygon1::build_side_ptr (std::unique_ptr<Elem> & side,
 
 
 
-void Polygon1::connectivity(const unsigned int /*sf*/,
-                            const IOPackage /*iop*/,
-                            std::vector<dof_id_type> & /*conn*/) const
+void C0Polygon::connectivity(const unsigned int /*sf*/,
+                             const IOPackage /*iop*/,
+                             std::vector<dof_id_type> & /*conn*/) const
 {
   libmesh_not_implemented();
 }
 
 
 
-Real Polygon1::volume () const
+Real C0Polygon::volume () const
 {
   // This specialization is good for Lagrange mappings only
   if (this->mapping_type() != LAGRANGE_MAP)
@@ -259,7 +259,7 @@ Real Polygon1::volume () const
 
 
 
-Point Polygon1::true_centroid () const
+Point C0Polygon::true_centroid () const
 {
   // This specialization is good for Lagrange mappings only
   if (this->mapping_type() != LAGRANGE_MAP)
@@ -295,14 +295,14 @@ Point Polygon1::true_centroid () const
 
 
 std::pair<unsigned short int, unsigned short int>
-Polygon1::second_order_child_vertex (const unsigned int /*n*/) const
+C0Polygon::second_order_child_vertex (const unsigned int /*n*/) const
 {
   libmesh_not_implemented();
   return std::pair<unsigned short int, unsigned short int> (0,0);
 }
 
 
-void Polygon1::permute(unsigned int perm_num)
+void C0Polygon::permute(unsigned int perm_num)
 {
   const auto ns = this->n_sides();
   libmesh_assert_less (perm_num, ns);
@@ -331,7 +331,7 @@ void Polygon1::permute(unsigned int perm_num)
 }
 
 
-void Polygon1::flip(BoundaryInfo * boundary_info)
+void C0Polygon::flip(BoundaryInfo * boundary_info)
 {
   libmesh_assert(boundary_info);
 
@@ -349,7 +349,7 @@ void Polygon1::flip(BoundaryInfo * boundary_info)
 
 
 
-ElemType Polygon1::side_type (const unsigned int libmesh_dbg_var(s)) const
+ElemType C0Polygon::side_type (const unsigned int libmesh_dbg_var(s)) const
 {
   libmesh_assert_less (s, this->n_sides());
   return EDGE2;
@@ -357,7 +357,7 @@ ElemType Polygon1::side_type (const unsigned int libmesh_dbg_var(s)) const
 
 
 
-void Polygon1::retriangulate()
+void C0Polygon::retriangulate()
 {
   this->_triangulation.clear();
 

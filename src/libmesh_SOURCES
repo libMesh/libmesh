@@ -159,11 +159,11 @@ libmesh_SOURCES =  \
         src/geom/elem_refinement.C \
         src/geom/elem_side_builder.C \
         src/geom/face.C \
+        src/geom/face_c0polygon.C \
         src/geom/face_inf_quad.C \
         src/geom/face_inf_quad4.C \
         src/geom/face_inf_quad6.C \
         src/geom/face_polygon.C \
-        src/geom/face_polygon1.C \
         src/geom/face_quad.C \
         src/geom/face_quad4.C \
         src/geom/face_quad4_shell.C \

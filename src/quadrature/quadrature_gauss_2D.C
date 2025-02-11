@@ -22,7 +22,7 @@
 #include "libmesh/quadrature_conical.h"
 #include "libmesh/enum_to_string.h"
 
-#include "libmesh/face_polygon1.h"
+#include "libmesh/face_c0polygon.h"
 
 namespace libMesh
 {
@@ -1303,7 +1303,7 @@ void QGauss::init_2D()
 
       //---------------------------------------------
       // Arbitrary polygon quadrature rules
-    case POLYGON1:
+    case C0POLYGON:
       {
         QGauss tri_rule(2, _order);
         tri_rule.init(TRI3, _p_level, true);
@@ -1313,13 +1313,13 @@ void QGauss::init_2D()
 
         std::size_t numtripts = tripoints.size();
 
-        // Polygon1 requires the newer Quadrature API
+        // C0Polygon requires the newer Quadrature API
         if (!_elem)
           libmesh_error();
 
-        libmesh_assert(_elem->type() == POLYGON1);
+        libmesh_assert(_elem->type() == C0POLYGON);
 
-        const Polygon1 & poly = *cast_ptr<const Polygon1 *>(_elem);
+        const C0Polygon & poly = *cast_ptr<const C0Polygon *>(_elem);
 
         std::size_t numtris = poly.n_subtriangles();
         _points.resize(numtripts*numtris);

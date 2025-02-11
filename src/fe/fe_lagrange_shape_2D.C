@@ -21,7 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/fe_lagrange_shape_1D.h"
 #include "libmesh/enum_to_string.h"
-#include "libmesh/face_polygon1.h"
+#include "libmesh/face_c0polygon.h"
 
 // Anonymous namespace for functions shared by LAGRANGE and
 // L2_LAGRANGE implementations. Implementations appear at the bottom
@@ -386,15 +386,15 @@ Real fe_lagrange_2D_shape(const ElemType type,
                 }
             }
 
-          case POLYGON1:
+          case C0POLYGON:
             {
-              // Polygon1 requires using newer FE APIs
+              // C0Polygon requires using newer FE APIs
               if (!elem)
                 libmesh_error();
 
-              libmesh_assert(elem->type() == POLYGON1);
+              libmesh_assert(elem->type() == C0POLYGON);
 
-              const Polygon1 & poly = *cast_ptr<const Polygon1 *>(elem);
+              const C0Polygon & poly = *cast_ptr<const C0Polygon *>(elem);
 
               // We can't use a small tolerance here, because in
               // inverse_map() Newton might hand us intermediate
@@ -708,15 +708,15 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
                 }
             }
 
-          case POLYGON1:
+          case C0POLYGON:
             {
-              // Polygon1 requires using newer FE APIs
+              // C0Polygon requires using newer FE APIs
               if (!elem)
                 libmesh_error();
 
-              libmesh_assert(elem->type() == POLYGON1);
+              libmesh_assert(elem->type() == C0POLYGON);
 
-              const Polygon1 & poly = *cast_ptr<const Polygon1 *>(elem);
+              const C0Polygon & poly = *cast_ptr<const C0Polygon *>(elem);
 
               // We can't use a small tolerance here, because in
               // inverse_map() Newton might hand us intermediate
@@ -1178,7 +1178,7 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
           // All second derivatives for piecewise-linear polygons are
           // zero or dirac-type distributions, but we can't put the
           // latter in a Real, so beware when integrating...
-          case POLYGON1:
+          case C0POLYGON:
             {
               return 0.;
             }

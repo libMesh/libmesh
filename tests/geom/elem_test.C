@@ -77,7 +77,7 @@ public:
         // degrees, but pyramids actually have an obtuse interior
         // angle of acos(-1/3) ~ 109.47 deg formed by edge pairs
         // {(0, 4), (2, 4)} and {(1,4), (3,4)}.
-        if (elem->type() != POLYGON1)
+        if (elem->type() != C0POLYGON)
           CPPUNIT_ASSERT_LESSEQUAL((std::acos(Real(-1)/3) * 180 / libMesh::pi) + TOLERANCE, max_angle);
 
         // We're doing some polygon testing with a squashed pentagon
@@ -137,11 +137,11 @@ public:
         // test are found in tetrahedra, which have a minimum value of
         // 2.0. However, we return a default value of 1.0 for 0D and
         // 1D elements here, and we have a custom distorted-pentagon
-        // Polygon1 with a 0.5 at 2 nodes, so we handle those cases
+        // C0Polygon with a 0.5 at 2 nodes, so we handle those cases
         // too.
         if (elem->dim() < 2)
           CPPUNIT_ASSERT_GREATEREQUAL(1 - TOLERANCE, jac);
-        else if (elem->type() == POLYGON1)
+        else if (elem->type() == C0POLYGON)
           CPPUNIT_ASSERT_GREATEREQUAL(0.5 - TOLERANCE, jac);
         else
           CPPUNIT_ASSERT_GREATEREQUAL(2 - TOLERANCE, jac);
@@ -314,9 +314,9 @@ public:
         // ... or the polygons we're deliberately testing non-affine
         if ((elem->dim() < 3 ||
              elem->n_vertices() != 5) &&
-            elem_type != POLYGON1)
+            elem_type != C0POLYGON)
           CPPUNIT_ASSERT(elem->has_affine_map());
-        else if (elem_type == POLYGON1)
+        else if (elem_type == C0POLYGON)
           CPPUNIT_ASSERT(!elem->has_affine_map());
 
         // The neighbors and bcids should have flipped in a way
@@ -397,9 +397,9 @@ public:
         // ... or the polygons we're deliberately testing non-affine
         if ((elem->dim() < 3 ||
              elem->n_vertices() != 5) &&
-            elem_type != POLYGON1)
+            elem_type != C0POLYGON)
           CPPUNIT_ASSERT(elem->has_affine_map());
-        else if (elem_type == POLYGON1)
+        else if (elem_type == C0POLYGON)
           CPPUNIT_ASSERT(!elem->has_affine_map());
 
         // The neighbors and bcids should have flipped back to where
@@ -589,7 +589,7 @@ public:
         elem_type == PYRAMID13 ||
         elem_type == PYRAMID14 ||
         elem_type == PYRAMID18 ||
-        elem_type == POLYGON1)
+        elem_type == C0POLYGON)
       return;
 
     auto refining_mesh = this->_mesh->clone();
@@ -892,7 +892,7 @@ INSTANTIATE_ELEMTEST(QUAD9);
 INSTANTIATE_ELEMTEST(QUADSHELL9);
 
 // This just tests with one pentagon, but better than nothing
-INSTANTIATE_ELEMTEST(POLYGON1);
+INSTANTIATE_ELEMTEST(C0POLYGON);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 INSTANTIATE_ELEMTEST(INFQUAD4);

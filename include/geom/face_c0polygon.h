@@ -17,8 +17,8 @@
 
 
 
-#ifndef LIBMESH_FACE_POLYGON1_H
-#define LIBMESH_FACE_POLYGON1_H
+#ifndef LIBMESH_FACE_C0POLYGON_H
+#define LIBMESH_FACE_C0POLYGON_H
 
 // Local includes
 #include "libmesh/libmesh_common.h"
@@ -28,10 +28,10 @@ namespace libMesh
 {
 
 /**
- * The \p POLYGON1 is an element in 2D with an arbitrary (but fixed)
+ * The \p C0Polygon is an element in 2D with an arbitrary (but fixed)
  * number of first-order (EDGE2) sides.
  *
- * In master space, side 0 of a Polygon1 has point 0 at (0,0), point 1
+ * In master space, side 0 of a C0Polygon has point 0 at (0,0), point 1
  * at (0,1), and subsequent sides continue in a counter-clockwise loop
  * to form a regular polygon of side length 1.  E.g. a master hexagon
  * would look like:
@@ -48,7 +48,7 @@ namespace libMesh
  * \date 2025
  * \brief A 2D element with an arbitrary number of first-order sides.
  */
-class Polygon1 : public Polygon
+class C0Polygon : public Polygon
 {
 public:
 
@@ -64,18 +64,18 @@ public:
    * after setting up its nodes.
    */
   explicit
-  Polygon1 (const unsigned int num_sides, Elem * p=nullptr);
+  C0Polygon (const unsigned int num_sides, Elem * p=nullptr);
 
-  Polygon1 (Polygon1 &&) = delete;
-  Polygon1 (const Polygon1 &) = delete;
-  Polygon1 & operator= (const Polygon1 &) = delete;
-  Polygon1 & operator= (Polygon1 &&) = delete;
-  virtual ~Polygon1() = default;
+  C0Polygon (C0Polygon &&) = delete;
+  C0Polygon (const C0Polygon &) = delete;
+  C0Polygon & operator= (const C0Polygon &) = delete;
+  C0Polygon & operator= (C0Polygon &&) = delete;
+  virtual ~C0Polygon() = default;
 
   /**
-   * \returns \p POLYGON1.
+   * \returns \p C0POLYGON.
    */
-  virtual ElemType type () const override final { return POLYGON1; }
+  virtual ElemType type () const override final { return C0POLYGON; }
 
   /**
    * \returns the number of triangles to break this into for
@@ -107,7 +107,7 @@ public:
   virtual bool is_face(const unsigned int i) const override;
 
   /**
-   * Polygon1 polygons have only vertex nodes, two per side/edge
+   * C0Polygon elements have only vertex nodes, two per side/edge
    */
   virtual unsigned int n_nodes_per_side() const override { return 2;}
 
@@ -172,12 +172,12 @@ public:
   second_order_child_vertex (const unsigned int n) const override;
 
   /**
-   * An optimized method for calculating the area of a POLYGON1.
+   * An optimized method for calculating the area of a C0Polygon.
    */
   virtual Real volume () const override;
 
   /**
-   * An optimized method for calculating the centroid of a POLYGON1.
+   * An optimized method for calculating the centroid of a C0Polygon.
    */
   virtual Point true_centroid () const override;
 

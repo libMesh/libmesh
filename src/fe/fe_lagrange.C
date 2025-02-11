@@ -503,8 +503,8 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
           case INVALID_ELEM:
             return 0;
 
-          case POLYGON1:
-            // Polygon1 requires using newer FE APIs
+          case C0POLYGON:
+            // C0Polygon requires using newer FE APIs
             if (!e)
               libmesh_error();
             return e->n_nodes();
@@ -691,7 +691,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
                 }
             }
 
-          case POLYGON1:
+          case C0POLYGON:
             return 1;
 
 

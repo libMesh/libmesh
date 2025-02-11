@@ -30,8 +30,8 @@ INSTANTIATE_FETEST(FIFTH, MONOMIAL, QUAD8);
 INSTANTIATE_FETEST(FIFTH, MONOMIAL, QUAD9);
 
 // This only is an exact projection because we're using a test
-// Polygon1 with an affine map
-INSTANTIATE_FETEST(FIRST, MONOMIAL, POLYGON1);
+// C0Polygon with an affine map
+INSTANTIATE_FETEST(FIRST, MONOMIAL, C0POLYGON);
 #endif
 
 #if LIBMESH_DIM > 2

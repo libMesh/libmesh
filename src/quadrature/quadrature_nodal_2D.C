@@ -21,7 +21,7 @@
 #include "libmesh/quadrature_nodal.h"
 
 #include "libmesh/enum_to_string.h"
-#include "libmesh/face_polygon1.h"
+#include "libmesh/face_c0polygon.h"
 #include "libmesh/quadrature_trap.h"
 #include "libmesh/quadrature_simpson.h"
 
@@ -169,15 +169,15 @@ void QNodal::init_2D()
 
       //---------------------------------------------
       // Arbitrary polygon quadrature rules
-    case POLYGON1:
+    case C0POLYGON:
       {
-        // Polygon1 requires the newer Quadrature API
+        // C0Polygon requires the newer Quadrature API
         if (!_elem)
           libmesh_error();
 
-        libmesh_assert(_elem->type() == POLYGON1);
+        libmesh_assert(_elem->type() == C0POLYGON);
 
-        const Polygon1 & poly = *cast_ptr<const Polygon1 *>(_elem);
+        const C0Polygon & poly = *cast_ptr<const C0Polygon *>(_elem);
 
         const unsigned int nn = poly.n_nodes();
         _weights.resize(nn, Real(1)/nn);
