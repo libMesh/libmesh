@@ -500,8 +500,13 @@ public:
    * have been calculated for, or \p INVALID_ELEM if no such element
    * exists.  Useful in determining when shape functions must be
    * recomputed.
+   *
+   * This is generally redundant with _elem->type(), but must be
+   * cached separately for cases (such as internal FE use in
+   * QComposite) where _elem might be a dangling pointer to a
+   * temporary.
    */
-  ElemType get_type() const;
+  ElemType get_type() const { return _elem_type; }
 
   /**
    * \returns The p refinement level that the current shape
@@ -723,6 +728,11 @@ protected:
    * \note This should be constant for the object.
    */
   FEType fe_type;
+
+  /**
+   * The element type the current data structures were set up for.
+   */
+  ElemType _elem_type;
 
   /**
    * The element the current data structures were set up for.

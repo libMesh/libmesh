@@ -660,6 +660,7 @@ void FESubdivision::attach_quadrature_rule(QBase * q)
   qrule = q;
   // make sure we don't cache results from a previous quadrature rule
   this->_elem = nullptr;
+  this->_elem_type = INVALID_ELEM;
   return;
 }
 

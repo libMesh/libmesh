@@ -60,6 +60,7 @@ FEAbstract::FEAbstract(const unsigned int d,
   calculate_div_phi(false),
   calculate_dphiref(false),
   fe_type(fet),
+  _elem_type(INVALID_ELEM),
   _elem(nullptr),
   _elem_p_level(0),
   _p_level(0),
@@ -393,11 +394,6 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
     }
 }
 
-
-ElemType FEAbstract::get_type() const
-{
-  return _elem ? _elem->type() : INVALID_ELEM;
-}
 
 
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> & nodes)
