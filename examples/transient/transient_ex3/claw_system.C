@@ -499,12 +499,11 @@ void ClawSystem::assemble_avg_coupling_matrices()
 
           // Find their locations on the neighbor
           std::vector<Point> qface_neighbor_points;
-          FEInterface::inverse_map(
-            elem->dim(),
-            fe_type,
+          FEMap::inverse_map(
+            neighbor->dim(),
             neighbor,
-            qface_points,
-            qface_neighbor_points);
+            /*physical_points*/qface_points,
+            /*reference_points*/qface_neighbor_points);
 
           // Calculate the neighbor element shape functions at those locations
           fe_neighbor_face->reinit(neighbor, &qface_neighbor_points);
@@ -668,12 +667,11 @@ void ClawSystem::assemble_jump_coupling_matrix()
 
           // Find side QP locations in neighbor side reference space
           std::vector<Point> qface_neighbor_points;
-          FEInterface::inverse_map(
-            elem->dim(),
-            fe_type,
+          FEMap::inverse_map(
+            neighbor->dim(),
             neighbor,
-            qface_points,
-            qface_neighbor_points);
+            /*physical_points*/qface_points,
+            /*reference_points*/qface_neighbor_points);
 
           // Calculate the neighbor element shape functions at those locations
           fe_neighbor_face->reinit(neighbor, &qface_neighbor_points);
