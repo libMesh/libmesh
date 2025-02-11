@@ -37,13 +37,6 @@ AdvectionSystem::AdvectionSystem (EquationSystems & es,
     _fe_order(CONSTANT),
     _fe_family(MONOMIAL)
 {
-  // Allocate NumericVectors in _Fh. I could not figure out
-  // how to do this in the initialization list, I don't think it's
-  // possible.
-  // TODO: the number of problem dimensions is hard-coded here, we should
-  // make this depend on the input file parameters instead.
-  for (unsigned int i=0; i<2; ++i)
-    _Fh.push_back(NumericVector<Number>::build(es.comm()));
 }
 
 
@@ -117,8 +110,14 @@ void AdvectionSystem::init_data ()
 
   Parent::init_data();
 
-  for (auto & vec : _Fh)
-    vec->init (this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  // Allocate NumericVectors in _Fh.
+  // TODO: the number of spatial dimensions is hard-coded here, we should
+  // make this depend on the input file parameters instead.
+  for (unsigned int i=0; i<2; ++i)
+  {
+    auto & vec = _Fh.emplace_back(NumericVector<Number>::build(this->comm()));
+    vec->init(this->n_dofs(), this->n_local_dofs(), false, libMeshEnums::PARALLEL);
+  }
 }
 
 void AdvectionSystem::process_parameters_file (const std::string& parameters_filename)
