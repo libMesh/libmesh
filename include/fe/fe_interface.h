@@ -346,7 +346,7 @@ public:
    * \f$ \xi \le 1 \f$ becomes \f$ \xi \le 1 + \epsilon \f$.
    *
    * \deprecated This method overload does not support all finite
-   * element types; e.g. the Polygon1 type may differ from element to
+   * element types; e.g. a Polygon subtype may differ from element to
    * element.  Use \p Elem::on_reference_element() instead.
    */
   static bool on_reference_element(const Point & p,

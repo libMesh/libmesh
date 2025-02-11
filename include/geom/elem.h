@@ -254,8 +254,8 @@ public:
    * \p reference_elem().
    *
    * If the element is of a type that can admit multiple topologies,
-   * such as a Polygon1, then there is no reference element; for such
-   * types this method should not be used.
+   * such as a Polygon subtype, then there is no reference element;
+   * for such types this method should not be used.
    */
   const Elem * reference_elem () const;
 
@@ -1881,10 +1881,10 @@ public:
    * This is not a complete clone() method (since e.g. it does not set
    * node pointers; the standard use case reassigns node pointers from
    * a different mesh), but it is necessary to use this instead of
-   * build() for more runtime-polymorphic elements like Polygon1 whose
-   * "type" depends on more than their type(), and it is useful to use
-   * this for elements whose id, unique_id, extra integers, etc.
-   * should be preserved in the near-clone.
+   * build() for runtime-polymorphic elements like Polygon subtypes
+   * whose "type" depends on more than their type(), and it is useful
+   * to use this for elements whose id, unique_id, extra integers,
+   * etc. should be preserved in the near-clone.
    */
   virtual std::unique_ptr<Elem> disconnected_clone () const;
 

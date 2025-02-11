@@ -27,7 +27,7 @@
 #include "libmesh/edge_edge3.h"
 #include "libmesh/edge_edge4.h"
 #include "libmesh/edge_inf_edge2.h"
-#include "libmesh/face_polygon1.h"
+#include "libmesh/face_c0polygon.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/face_tri3_shell.h"
@@ -171,7 +171,7 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     invalid_uint,  // unused
     invalid_uint,  // unused
 
-    invalid_uint,  // POLYGON1
+    invalid_uint,  // C0POLYGON
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -243,7 +243,7 @@ const unsigned int Elem::type_to_n_sides_map [] =
     invalid_uint,  // unused
     invalid_uint,  // unused
 
-    invalid_uint,  // POLYGON1
+    invalid_uint,  // C0POLYGON
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -315,7 +315,7 @@ const unsigned int Elem::type_to_n_edges_map [] =
     invalid_uint,  // unused
     invalid_uint,  // unused
 
-    invalid_uint,  // POLYGON1
+    invalid_uint,  // C0POLYGON
   };
 
 // ------------------------------------------------------------
@@ -326,8 +326,8 @@ std::unique_ptr<Elem> Elem::disconnected_clone() const
 
   switch (this->type())
     {
-    case POLYGON1:
-      returnval = std::make_unique<Polygon1>(this->n_sides());
+    case C0POLYGON:
+      returnval = std::make_unique<C0Polygon>(this->n_sides());
       break;
 
     default:
@@ -396,8 +396,8 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return std::make_unique<QuadShell9>(p);
 
     // Well, a hexagon is *a* polygon...
-    case POLYGON1:
-      return std::make_unique<Polygon1>(6, p);
+    case C0POLYGON:
+      return std::make_unique<C0Polygon>(6, p);
 
       // 3D elements
     case TET4:

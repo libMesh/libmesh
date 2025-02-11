@@ -6,7 +6,7 @@
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
-#include <libmesh/face_polygon1.h>
+#include <libmesh/face_c0polygon.h>
 #include <libmesh/fe.h>
 #include <libmesh/fe_base.h>
 #include <libmesh/fe_interface.h>
@@ -375,7 +375,7 @@ public:
         _mesh->set_default_mapping_data(weight_index);
       }
 
-    if (elem_type == POLYGON1)
+    if (elem_type == C0POLYGON)
       {
         // Build a pentagon by hand for testing purposes.  Make this
         // one non-skewed so a MONOMIAL basis will be able to exactly
@@ -387,7 +387,7 @@ public:
         _mesh->add_point(Point(0.5, sin(2*libMesh::pi/5)+sin(libMesh::pi/5)), 3);
         _mesh->add_point(Point(-cos(2*libMesh::pi/5), sin(2*libMesh::pi/5)), 4);
 
-        std::unique_ptr<Elem> polygon = std::make_unique<Polygon1>(5);
+        std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(5);
         for (auto i : make_range(5))
           polygon->set_node(i) = _mesh->node_ptr(i);
         polygon->set_id() = 0;

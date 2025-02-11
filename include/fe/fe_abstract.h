@@ -210,7 +210,7 @@ public:
    * \f$ x \le 1 + \epsilon \f$.
    *
    * This method overload is now deprecated, since it cannot support
-   * all finite element types; e.g. the Polygon1 type may differ from
+   * all finite element types; e.g. a Polygon subtype may differ from
    * element to element.  Use \p Elem::on_reference_element() instead.
    */
   static bool on_reference_element(const Point & p,
