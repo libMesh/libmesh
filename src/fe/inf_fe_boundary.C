@@ -55,8 +55,9 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
   // Build the side of interest
   const std::unique_ptr<const Elem> side(inf_elem->build_side_ptr(s));
 
-  // set the element
+  // set the element and type
   this->_elem = inf_elem;
+  this->_elem_type = inf_elem->type();
 
   // eventually initialize radial quadrature rule
   bool radial_qrule_initialized = false;
