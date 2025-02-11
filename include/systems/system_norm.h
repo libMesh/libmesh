@@ -39,6 +39,10 @@ enum FEMNormType : int;
  * Discrete vector norms and weighted l2 combinations of Sobolev norms and
  * seminorms are representable.
  *
+ * For ease of use, if a norm or weight is queried for variable n but
+ * has not been set for variable n, then the norm or weight set for
+ * the highest-numbered variable below n is returned.
+ *
  * \author Roy H. Stogner
  * \date 2008
  */
@@ -47,7 +51,7 @@ class SystemNorm
 public:
 
   /**
-   * Constructor, defaults to DISCRETE_L2
+   * Constructor, defaults to DISCRETE_L2 with weight of 1.0.
    */
   SystemNorm();
 
@@ -125,21 +129,31 @@ public:
 
   /**
    * \returns The type of the norm in variable \p var
+   *
+   * If no norm has been explicitly set for \p var, then the
+   * highest-index norm explicitly set is returned, or DISCRETE_L2
+   * is returned if no norms have been explicitly set.
    */
   FEMNormType type(unsigned int var) const;
 
   /**
-   * Sets the type of the norm in variable \p var
+   * Sets the type of the norm in variable \p var, as well as for any
+   * unset variables with index less than \p var
    */
   void set_type(unsigned int var, const FEMNormType & t);
 
   /**
    * \returns The weight corresponding to the norm in variable \p var
+   *
+   * If no weight has been explicitly set for \p var, then the
+   * highest-index weight explicitly set is returned, or 1.0 is
+   * returned if no weights have been explicitly set.
    */
   Real weight(unsigned int var) const;
 
   /**
-   * Sets the weight corresponding to the norm in variable \p var
+   * Sets the weight corresponding to the norm in variable \p var, as
+   * well as for any unset variables with index less than \p var.
    */
   void set_weight(unsigned int var, Real w);
 
