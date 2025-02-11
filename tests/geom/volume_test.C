@@ -1,7 +1,7 @@
 // libmesh includes
 #include <libmesh/elem.h>
 #include <libmesh/enum_elem_type.h>
-#include <libmesh/face_polygon1.h>
+#include <libmesh/face_c0polygon.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh.h>

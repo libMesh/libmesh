@@ -108,7 +108,7 @@ DynaIO::ElementDefinition::ElementDefinition
 {
   const unsigned int n_nodes = Elem::type_to_n_nodes_map[type_in];
   if (n_nodes == invalid_uint)
-    libmesh_not_implemented_msg("Support for POLYGON1 not yet implemented");
+    libmesh_not_implemented_msg("Support for C0POLYGON not yet implemented");
   nodes.resize(n_nodes);
   std::iota(nodes.begin(), nodes.end(), 0);
 }

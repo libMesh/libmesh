@@ -2465,7 +2465,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return 3;
         case TRI3:
         case TRISHELL3:
-        case POLYGON1:
+        case C0POLYGON:
           return 1;
         case TRI6:
           return 2;
@@ -2520,7 +2520,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case EDGE2:
         case EDGE3:
         case EDGE4:
-        case POLYGON1:
+        case C0POLYGON:
         case TRI3:
         case TRISHELL3:
         case TRI6:
@@ -2585,7 +2585,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return 2;
         case HEX27:
           return 4;
-        case POLYGON1:
+        case C0POLYGON:
         case PRISM6:
         case PRISM15:
         case PRISM18:
@@ -2622,7 +2622,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case QUAD9:
         case QUADSHELL9:
           return 7;
-        case POLYGON1:
+        case C0POLYGON:
         case TET4:
         case TET10:
         case TET14:
@@ -2650,7 +2650,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case EDGE2:
         case EDGE3:
         case EDGE4:
-        case POLYGON1:
+        case C0POLYGON:
         case TRI3:
         case TRISHELL3:
         case TRI6:
@@ -2694,7 +2694,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case TRI6:
         case TRI7:
           return 3;
-        case POLYGON1:
+        case C0POLYGON:
         case QUAD4:
         case QUADSHELL4:
         case QUAD8:
@@ -2750,7 +2750,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case HEX20:
         case HEX27:
           return unlimited;
-        case POLYGON1:
+        case C0POLYGON:
         case PRISM6:
         case PRISM15:
         case PRISM18:
@@ -2804,7 +2804,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PRISM20:
         case PRISM21:
           return unlimited;
-        case POLYGON1:
+        case C0POLYGON:
         case PYRAMID5:
         case PYRAMID13:
         case PYRAMID14:
@@ -2827,7 +2827,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case TRI6:
         case TRI7:
           return unlimited;
-        case POLYGON1:
+        case C0POLYGON:
         case QUAD4:
         case QUADSHELL4:
           return 0;
