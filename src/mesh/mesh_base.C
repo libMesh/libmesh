@@ -2034,7 +2034,8 @@ MeshBase::copy_constraint_rows(const MeshBase & other_mesh)
 
 template <typename T>
 void
-MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
+MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
+                               bool precondition_constraint_operator)
 {
   LOG_SCOPE("copy_constraint_rows(mat)", "MeshBase");
 
@@ -2069,6 +2070,14 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
                        std::vector<std::pair<dof_id_type, Real>>>
     columns_type;
   columns_type columns(constraint_operator.n());
+
+  // If we need to precondition the constraint operator (e.g.  it's an
+  // unpreconditioned extraction operator for a Flex IGA matrix),
+  // we'll want to keep track of the sum of each column, because we'll
+  // be dividing each column by that sum (Jacobi preconditioning on
+  // the right, which then leads to symmetric preconditioning on a
+  // physics Jacobian).
+  std::unordered_map<dof_id_type, Real> column_sums;
 
   // Work in parallel, though we'll have to sync shortly
   for (auto i : make_range(constraint_operator.row_start(),
@@ -2174,6 +2183,9 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
           ++pids[constrained_node.processor_id()];
         }
 
+      if (precondition_constraint_operator)
+        column_sums[j] = total_scaling;
+
       libmesh_error_msg_if
         (!total_entries,
          "Empty column " << j <<
@@ -2246,8 +2258,23 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator)
 
           auto p = node_to_elem_ptrs[&constraining_node];
 
-          const Real coef = libmesh_real(values[jj]);
+          Real coef = libmesh_real(values[jj]);
           libmesh_assert_equal_to(coef, values[jj]);
+
+          // If we're preconditioning and we created a nodeelem then
+          // we can scale the meaning of that nodeelem's value to give
+          // us a better-conditioned matrix after the constraints are
+          // applied.
+          if (precondition_constraint_operator)
+            if (auto sum_it = column_sums.find(indices[jj]);
+                sum_it != column_sums.end())
+              {
+                const Real scaling = sum_it->second;
+
+                if (scaling > TOLERANCE)
+                  coef /= scaling;
+              }
+
           constraint_row.emplace_back(std::make_pair(p, coef));
         }
 
@@ -2341,11 +2368,13 @@ std::string MeshBase::get_local_constraints(bool print_nonlocal) const
 
 // Explicit instantiations for our template function
 template LIBMESH_EXPORT void
-MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator);
+MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator,
+                               bool precondition_constraint_operator);
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template LIBMESH_EXPORT void
-MeshBase::copy_constraint_rows(const SparseMatrix<Complex> & constraint_operator);
+MeshBase::copy_constraint_rows(const SparseMatrix<Complex> & constraint_operator,
+                               bool precondition_constraint_operator);
 #endif
 
 
