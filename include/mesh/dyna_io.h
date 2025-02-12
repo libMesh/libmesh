@@ -99,12 +99,16 @@ public:
                               unsigned int sys_num,
                               unsigned int var_num);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * Removes any spline nodes (both NodeElem and Node), leaving only
    * the FE mesh generated from those splines.  Also removes node
    * constraints to the now-missing nodes.
+   *
+   * \p deprecated - use MeshTools::clear_spline_nodes(mesh) instead.
    */
   void clear_spline_nodes();
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * The integer type DYNA uses

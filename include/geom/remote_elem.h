@@ -256,6 +256,10 @@ public:
   virtual ElemType side_type (const unsigned int) const override
   { remote_elem_error("side_type"); return INVALID_ELEM; }
 
+  virtual bool on_reference_element(const Point & /*p*/,
+                                    const Real /*eps*/ = TOLERANCE) const override
+  { remote_elem_error("on_reference_element"); return false; }
+
 protected:
 
   /**

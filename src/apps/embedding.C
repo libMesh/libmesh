@@ -41,7 +41,6 @@ using namespace libMesh;
 void usage_error(const char * progname)
 {
   libMesh::out << "Options: " << progname << '\n'
-               << " --dim d               elem dimension\n"
                << " --elem type           elem type (e.g. TET14)\n"
                << " --childnum num        child number\n"
                << " --denominator num     denominator to use\n"
@@ -73,9 +72,6 @@ int main(int argc, char ** argv)
   LibMeshInit init(argc, argv);
 
   GetPot cl(argc, argv);
-
-  const int dim =
-    assert_argument(cl, "--dim", argv[0], 0);
 
   const std::string elem_type_string =
     assert_argument(cl, "--elem", argv[0], std::string(""));
@@ -162,7 +158,7 @@ int main(int argc, char ** argv)
       std::cout << "      {";
       for (auto j : make_range(n_nodes))
         {
-          Real shape = FEInterface::shape(dim, fe_type, elem_type, j, pt);
+          Real shape = FEInterface::shape(fe_type, elem.get(), j, pt);
 
           // Don't print -0 or 1e-17; we don't tolerate FP error at 0
           if (std::abs(shape) < TOLERANCE*std::sqrt(TOLERANCE))

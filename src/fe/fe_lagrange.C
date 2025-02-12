@@ -603,6 +603,13 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
 
 
 
+unsigned int lagrange_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return lagrange_n_dofs(e->type(), o);
+}
+
+
 
 unsigned int lagrange_n_dofs_at_node(const ElemType t,
                                      const Order o,
@@ -841,6 +848,15 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
 }
 
 
+
+unsigned int lagrange_n_dofs_at_node(const Elem & e,
+                                     const Order o,
+                                     const unsigned int n)
+{
+  return lagrange_n_dofs_at_node(e.type(), o, n);
+}
+
+
 #ifdef LIBMESH_ENABLE_AMR
 void lagrange_compute_constraints (DofConstraints & constraints,
                                    DofMap & dof_map,
@@ -1003,8 +1019,7 @@ void lagrange_compute_constraints (DofConstraints & constraints,
                     const dof_id_type their_dof_g =
                       parent_dof_indices[their_dof];
 
-                    const Real their_dof_value = FEInterface::shape(Dim-1,
-                                                                    side_fe_type,
+                    const Real their_dof_value = FEInterface::shape(side_fe_type,
                                                                     parent_side.get(),
                                                                     their_dof,
                                                                     mapped_point);
@@ -1058,6 +1073,11 @@ template <> unsigned int FE<1,LAGRANGE>::n_dofs(const ElemType t, const Order o)
 template <> unsigned int FE<2,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
 template <> unsigned int FE<3,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
 
+template <> unsigned int FE<0,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e, o); }
+template <> unsigned int FE<1,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e, o); }
+template <> unsigned int FE<2,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e, o); }
+template <> unsigned int FE<3,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e, o); }
+
 
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this function.
@@ -1066,6 +1086,11 @@ template <> unsigned int FE<1,LAGRANGE>::n_dofs_at_node(const ElemType t, const 
 template <> unsigned int FE<2,LAGRANGE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<3,LAGRANGE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(t, o, n); }
 
+template <> unsigned int FE<0,LAGRANGE>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<1,LAGRANGE>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<2,LAGRANGE>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<3,LAGRANGE>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return lagrange_n_dofs_at_node(e, o, n); }
+
 
 // Lagrange elements have no dofs per element
 // (just at the nodes)
@@ -1073,6 +1098,11 @@ template <> unsigned int FE<0,LAGRANGE>::n_dofs_per_elem(const ElemType, const O
 template <> unsigned int FE<1,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<2,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<3,LAGRANGE>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
+
+template <> unsigned int FE<0,LAGRANGE>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<1,LAGRANGE>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<2,LAGRANGE>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<3,LAGRANGE>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
 
 // Lagrange FEMs are always C^0 continuous
 template <> FEContinuity FE<0,LAGRANGE>::get_continuity() const { return C_ZERO; }

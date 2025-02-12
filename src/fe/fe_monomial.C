@@ -27,6 +27,13 @@
 namespace libMesh
 {
 
+unsigned int monomial_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return monomial_n_dofs(e->type(), o);
+}
+
+
 unsigned int monomial_n_dofs(const ElemType t, const Order o)
 {
   switch (o)
@@ -377,6 +384,11 @@ template <> unsigned int FE<1,MONOMIAL>::n_dofs(const ElemType t, const Order o)
 template <> unsigned int FE<2,MONOMIAL>::n_dofs(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
 template <> unsigned int FE<3,MONOMIAL>::n_dofs(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
 
+template <> unsigned int FE<0,MONOMIAL>::n_dofs(const Elem * e, const Order o) { return monomial_n_dofs(e, o); }
+template <> unsigned int FE<1,MONOMIAL>::n_dofs(const Elem * e, const Order o) { return monomial_n_dofs(e, o); }
+template <> unsigned int FE<2,MONOMIAL>::n_dofs(const Elem * e, const Order o) { return monomial_n_dofs(e, o); }
+template <> unsigned int FE<3,MONOMIAL>::n_dofs(const Elem * e, const Order o) { return monomial_n_dofs(e, o); }
+
 // Full specialization of n_dofs_at_node() function for every dimension.
 // Monomials have no dofs at nodes, only element dofs.
 template <> unsigned int FE<0,MONOMIAL>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
@@ -384,11 +396,21 @@ template <> unsigned int FE<1,MONOMIAL>::n_dofs_at_node(const ElemType, const Or
 template <> unsigned int FE<2,MONOMIAL>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<3,MONOMIAL>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 
+template <> unsigned int FE<0,MONOMIAL>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<1,MONOMIAL>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<2,MONOMIAL>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3,MONOMIAL>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+
 // Full specialization of n_dofs_per_elem() function for every dimension.
 template <> unsigned int FE<0,MONOMIAL>::n_dofs_per_elem(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
 template <> unsigned int FE<1,MONOMIAL>::n_dofs_per_elem(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
 template <> unsigned int FE<2,MONOMIAL>::n_dofs_per_elem(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
 template <> unsigned int FE<3,MONOMIAL>::n_dofs_per_elem(const ElemType t, const Order o) { return monomial_n_dofs(t, o); }
+
+template <> unsigned int FE<0,MONOMIAL>::n_dofs_per_elem(const Elem & e, const Order o) { return monomial_n_dofs(&e, o); }
+template <> unsigned int FE<1,MONOMIAL>::n_dofs_per_elem(const Elem & e, const Order o) { return monomial_n_dofs(&e, o); }
+template <> unsigned int FE<2,MONOMIAL>::n_dofs_per_elem(const Elem & e, const Order o) { return monomial_n_dofs(&e, o); }
+template <> unsigned int FE<3,MONOMIAL>::n_dofs_per_elem(const Elem & e, const Order o) { return monomial_n_dofs(&e, o); }
 
 
 // Full specialization of get_continuity() function for every dimension.

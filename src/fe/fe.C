@@ -60,7 +60,9 @@ FE<Dim,T>::FE (const FEType & fet) :
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_shape_functions () const
 {
-  return FE<Dim,T>::n_dofs (this->elem_type,
+  libmesh_deprecated(); // Use n_dofs(Elem *)
+
+  return FE<Dim,T>::n_dofs (this->get_type(),
                             this->fe_type.order + this->_p_level);
 }
 
@@ -100,7 +102,7 @@ void FE<Dim,T>::dofs_on_side(const Elem * const elem,
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
       const unsigned int n_dofs =
-          n_dofs_at_node(elem->type(), static_cast<Order>(o + add_p_level*elem->p_level()), n);
+          n_dofs_at_node(*elem, static_cast<Order>(o + add_p_level*elem->p_level()), n);
       if (elem->is_node_on_side(n, s))
         for (unsigned int i = 0; i != n_dofs; ++i)
           di.push_back(nodenum++);
@@ -127,7 +129,7 @@ void FE<Dim,T>::dofs_on_edge(const Elem * const elem,
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
       const unsigned int n_dofs =
-          n_dofs_at_node(elem->type(), static_cast<Order>(o + add_p_level*elem->p_level()), n);
+          n_dofs_at_node(*elem, static_cast<Order>(o + add_p_level*elem->p_level()), n);
       if (elem->is_node_on_edge(n, e))
         for (unsigned int i = 0; i != n_dofs; ++i)
           di.push_back(nodenum++);
@@ -333,8 +335,7 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
   this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
   const unsigned int n_shapes =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+    this->n_dofs(elem, this->get_order());
 
   std::vector<std::vector<OutputShape>> phi_vals;
   phi_vals.resize(n_shapes);
@@ -405,8 +406,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
   // Number of shape functions in the finite element approximation
   // space.
   const unsigned int n_approx_shape_functions =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+    this->n_dofs(elem, this->get_order());
 
   // Maybe we already have correctly-sized data?  Check data sizes,
   // and get ready to break out of a "loop" if all these resize()

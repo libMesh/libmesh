@@ -71,7 +71,7 @@ void hermite_nodal_soln(const Elem * elem,
 
 
 
-unsigned int hermite_n_dofs(const ElemType t, const Order o)
+unsigned int HERMITE_n_dofs(const ElemType t, const Order o)
 {
 #ifdef DEBUG
   libmesh_error_msg_if(o < 3, "Error: Hermite elements require order>=3, but you asked for order=" << o);
@@ -111,12 +111,19 @@ unsigned int hermite_n_dofs(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
-} // hermite_n_dofs()
+} // HERMITE_n_dofs()
 
 
 
+unsigned int HERMITE_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return HERMITE_n_dofs(e->type(), o);
+}
 
-unsigned int hermite_n_dofs_at_node(const ElemType t,
+
+
+unsigned int HERMITE_n_dofs_at_node(const ElemType t,
                                     const Order o,
                                     const unsigned int n)
 {
@@ -233,11 +240,20 @@ unsigned int hermite_n_dofs_at_node(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
-} // hermite_n_dofs_at_node()
+} // HERMITE_n_dofs_at_node()
 
 
 
-unsigned int hermite_n_dofs_per_elem(const ElemType t,
+unsigned int HERMITE_n_dofs_at_node(const Elem & e,
+                                    const Order o,
+                                    const unsigned int n)
+{
+  return HERMITE_n_dofs_at_node(e.type(), o, n);
+}
+
+
+
+unsigned int HERMITE_n_dofs_per_elem(const ElemType t,
                                      const Order o)
 {
   libmesh_assert_greater (o, 2);
@@ -271,7 +287,15 @@ unsigned int hermite_n_dofs_per_elem(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
     }
-} // hermite_n_dofs_per_elem()
+} // HERMITE_n_dofs_per_elem()
+
+
+
+unsigned int HERMITE_n_dofs_per_elem(const Elem & e,
+                                     const Order o)
+{
+  return HERMITE_n_dofs_per_elem(e.type(), o);
+}
 
 
 } // anonymous namespace
@@ -282,26 +306,9 @@ LIBMESH_FE_NODAL_SOLN(HERMITE, hermite_nodal_soln)
 LIBMESH_FE_SIDE_NODAL_SOLN(HERMITE)
 
 
-// Do full-specialization for every dimension, instead
-// of explicit instantiation at the end of this function.
-// This could be macro-ified.
-template <> unsigned int FE<0,HERMITE>::n_dofs(const ElemType t, const Order o) { return hermite_n_dofs(t, o); }
-template <> unsigned int FE<1,HERMITE>::n_dofs(const ElemType t, const Order o) { return hermite_n_dofs(t, o); }
-template <> unsigned int FE<2,HERMITE>::n_dofs(const ElemType t, const Order o) { return hermite_n_dofs(t, o); }
-template <> unsigned int FE<3,HERMITE>::n_dofs(const ElemType t, const Order o) { return hermite_n_dofs(t, o); }
+// Instantiate n_dofs*() functions for every dimension
+LIBMESH_DEFAULT_NDOFS(HERMITE)
 
-// Do full-specialization for every dimension, instead
-// of explicit instantiation at the end of this function.
-template <> unsigned int FE<0,HERMITE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return hermite_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<1,HERMITE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return hermite_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<2,HERMITE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return hermite_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<3,HERMITE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return hermite_n_dofs_at_node(t, o, n); }
-
-// Full specialization of n_dofs_per_elem() function for every dimension.
-template <> unsigned int FE<0,HERMITE>::n_dofs_per_elem(const ElemType t, const Order o) { return hermite_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<1,HERMITE>::n_dofs_per_elem(const ElemType t, const Order o) { return hermite_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<2,HERMITE>::n_dofs_per_elem(const ElemType t, const Order o) { return hermite_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<3,HERMITE>::n_dofs_per_elem(const ElemType t, const Order o) { return hermite_n_dofs_per_elem(t, o); }
 
 // Hermite FEMs are C^1 continuous
 template <> FEContinuity FE<0,HERMITE>::get_continuity() const { return C_ONE; }

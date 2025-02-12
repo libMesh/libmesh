@@ -1002,12 +1002,14 @@ void EquationSystems::get_vars_active_subdomains(const std::vector<std::string> 
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void EquationSystems::get_solution (std::vector<Number> & soln,
                                     std::vector<std::string> & names) const
 {
   libmesh_deprecated();
   this->build_elemental_solution_vector(soln, names);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

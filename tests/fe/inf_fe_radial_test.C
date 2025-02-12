@@ -436,9 +436,9 @@ public:
 
         const Point b = base_point(_qpoint[qp], infinite_elem) - infinite_elem->origin();
         const Point p = _qpoint[qp] - infinite_elem ->origin();
-        const Point rp = FEInterface::inverse_map(3, fe_type, infinite_elem, _qpoint[qp] );
-        const Point again_qp = FEInterface::map(3, fe_type, infinite_elem, rp);
-        //const Point rb = FEInterface::inverse_map(3, fe_type, infinite_elem, b+infinite_elem->origin());
+        const Point rp = FEMap::inverse_map(3, infinite_elem, _qpoint[qp]);
+        const Point again_qp = FEMap::map(3, infinite_elem, rp);
+        //const Point rb = FEMap::inverse_map(3, infinite_elem, b+infinite_elem->origin());
         const Real v=rp(2);
 
         // check that map() does the opposite from inverse_map
@@ -900,7 +900,7 @@ public:
 
           const std::vector<std::vector<Real> >&          phi = cfe->get_phi();
 
-          const Point node_internal = FEInterface::inverse_map(3, fe_type, some_elem, *node);
+          const Point node_internal = FEMap::inverse_map(3, some_elem, *node);
           std::vector<Point> eval_pt(1, node_internal);
           cfe->reinit(some_elem, &eval_pt);
 
@@ -932,7 +932,7 @@ public:
                 cfe = fe.get();
 
               const std::vector<std::vector<Real> >&          phi1 = cfe->get_phi();
-              eval_pt[0]=FEInterface::inverse_map(3, fe_type, elem, *node);
+              eval_pt[0]=FEMap::inverse_map(3, elem, *node);
 
               cfe->reinit(elem, &eval_pt);
 

@@ -346,6 +346,7 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics )
 {
   // This isn't safe if users aren't very careful about memory
@@ -391,6 +392,7 @@ void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics
   // rather than just transposing
   this->disable_cache();
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
