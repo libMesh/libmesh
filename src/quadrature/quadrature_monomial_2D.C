@@ -25,7 +25,7 @@ namespace libMesh
 {
 
 
-void QMonomial::init_2D(const ElemType, unsigned int)
+void QMonomial::init_2D()
 {
 
   switch (_type)
@@ -530,7 +530,7 @@ void QMonomial::init_2D(const ElemType, unsigned int)
     default:
       {
         QGauss gauss_rule(2, _order);
-        gauss_rule.init(_type, _p_level);
+        gauss_rule.init(*this);
 
         // Swap points and weights with the about-to-be destroyed rule.
         _points.swap (gauss_rule.get_points() );

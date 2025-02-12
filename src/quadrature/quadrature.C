@@ -31,6 +31,7 @@ QBase::QBase(unsigned int d,
   _dim(d),
   _order(o),
   _type(INVALID_ELEM),
+  _elem(nullptr),
   _p_level(0)
 {}
 
@@ -61,15 +62,72 @@ void QBase::print_info(std::ostream & os) const
 
 
 
-void QBase::init(const ElemType t,
+void QBase::init(const Elem & elem,
                  unsigned int p)
 {
+  libmesh_assert_equal_to(elem.dim(), _dim);
+
+  // Default to the element p_level() value
+  if (p == invalid_uint)
+    p = elem.p_level();
+
+  ElemType t = elem.type();
+
   // check to see if we have already
   // done the work for this quadrature rule
   if (t == _type && p == _p_level)
     return;
   else
     {
+      _elem = &elem;
+      _type = t;
+      _p_level = p;
+    }
+
+  switch(_elem->dim())
+    {
+    case 0:
+      this->init_0D();
+
+      return;
+
+    case 1:
+      this->init_1D();
+
+      return;
+
+    case 2:
+      this->init_2D();
+
+      return;
+
+    case 3:
+      this->init_3D();
+
+      return;
+
+    default:
+      libmesh_error_msg("Invalid dimension _dim = " << _dim);
+    }
+}
+
+
+
+void QBase::init(const ElemType t,
+                 unsigned int p,
+                 bool simple_type_only)
+{
+  // This API is thus dangerous to use on general meshes
+  if (!simple_type_only)
+    libmesh_deprecated();
+
+  // check to see if we have already
+  // done the work for this quadrature rule
+  if (t == _type && p == _p_level)
+    return;
+  else
+    {
+      _elem = nullptr;
       _type = t;
       _p_level = p;
     }
@@ -105,6 +163,16 @@ void QBase::init(const ElemType t,
 
 
 
+void QBase::init(const QBase & other_rule)
+{
+  if (other_rule._elem)
+    this->init(*other_rule._elem, other_rule._p_level);
+  else
+    this->init(other_rule._type, other_rule._p_level, true);
+}
+
+
+
 void QBase::init (const Elem & elem,
                   const std::vector<Real> & /* vertex_distance_func */,
                   unsigned int p_level)
@@ -115,7 +183,7 @@ void QBase::init (const Elem & elem,
 
 
 
-void QBase::init_0D(const ElemType, unsigned int)
+void QBase::init_0D()
 {
   _points.resize(1);
   _weights.resize(1);
@@ -125,14 +193,14 @@ void QBase::init_0D(const ElemType, unsigned int)
 
 
 
-void QBase::init_2D (const ElemType, unsigned int)
+void QBase::init_2D ()
 {
   libmesh_not_implemented();
 }
 
 
 
-void QBase::init_3D (const ElemType, unsigned int)
+void QBase::init_3D ()
 {
   libmesh_not_implemented();
 }
