@@ -1,0 +1,30 @@
+# The number of elements in each dimension in the mesh
+n_elem = 30
+
+# The advection velocity vector
+u1 = 1
+u2 = 1
+
+# The Lax-Friedrichs flux constant
+# We guarantee stability for the advection problem if C >= |u|
+LxF_constant = 1.414
+
+# The time-step size
+delta_t = 0.001
+
+# The number of time-steps
+n_time_steps = 500
+
+# The time-step interval at which we write out solutions
+write_interval = 50
+
+# The temporal discretization type
+temporal_discretization_type = RK4
+
+# Equivalent to a Finite Volume (FV) formulation
+fe_order = CONSTANT
+fe_family = MONOMIAL
+
+# Discontinuous Galerkin (DG) formulation
+# fe_order = SECOND
+# fe_family = L2_LAGRANGE
