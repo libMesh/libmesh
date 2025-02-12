@@ -1723,13 +1723,19 @@ public:
    * existing node, a new NodeElem will be added to the mesh on which
    * to store the new unconstrained degree(s) of freedom.
    *
+   * If \p precondition_constraint_operator is true, then the values
+   * of those new unconstrained degrees of freedom may be scaled to
+   * improve the conditioning of typical PDE matrices integrated on
+   * constrained mesh elements.
+   *
    * \p T for the constraint_operator in this function should be \p
    * Real or \p Number ... and the data should be \p Real - we just
    * allow complex \p T for the sake of subclasses which have to be
    * configured and compiled with only one runtime option.
    */
   template <typename T>
-  void copy_constraint_rows(const SparseMatrix<T> & constraint_operator);
+  void copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
+                            bool precondition_constraint_operator = true);
 
   /**
    * Prints (from processor 0) all mesh constraint rows.  If \p
