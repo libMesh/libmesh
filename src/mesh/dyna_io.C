@@ -107,6 +107,8 @@ DynaIO::ElementDefinition::ElementDefinition
   p(p_in)
 {
   const unsigned int n_nodes = Elem::type_to_n_nodes_map[type_in];
+  if (n_nodes == invalid_uint)
+    libmesh_not_implemented_msg("Support for C0POLYGON not yet implemented");
   nodes.resize(n_nodes);
   std::iota(nodes.begin(), nodes.end(), 0);
 }
@@ -740,12 +742,14 @@ void DynaIO::add_spline_constraints(DofMap &,
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void DynaIO::clear_spline_nodes()
 {
   libmesh_deprecated();
 
   MeshTools::clear_spline_nodes(MeshInput<MeshBase>::mesh());
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

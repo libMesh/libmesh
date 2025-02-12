@@ -61,8 +61,6 @@ public:
     _alpha(a),
     _beta(b)
   {
-    if (_dim == 1)
-      init(EDGE2);
   }
 
   /**
@@ -87,7 +85,7 @@ private:
   unsigned int _alpha;
   unsigned int _beta;
 
-  virtual void init_1D (const ElemType, unsigned int) override;
+  virtual void init_1D () override;
 };
 
 } // namespace libMesh

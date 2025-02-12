@@ -145,7 +145,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           // Watch out: this call to QBase->init() only works for
           // current_fe_type = const!   To allow variable Order,
           // the init() of QBase has to be modified...
-          radial_qrule->init(EDGE2);
+          radial_qrule->init(EDGE2, 0, true);
 
           // initialize the radial shape functions
           this->init_radial_shape_functions(inf_elem);
@@ -167,15 +167,18 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           // store the new element type, update base_elem
           // here.  Through \p update_base_elem_required,
           // remember whether it has to be updated (see below).
-          elem_type = inf_elem->type();
+          this->_elem = inf_elem;
+          this->_elem_type = inf_elem->type();
           this->update_base_elem(inf_elem);
           update_base_elem_required=false;
 
           // initialize the base quadrature rule for the new element
-          base_qrule->init(base_elem->type());
+          base_qrule->init(*base_elem);
           init_shape_functions_required=true;
 
         }
+      else
+        this->_elem = inf_elem;
 
       // computing the reference-to-physical map and coordinates works
       // only, if we have the current base_elem stored.
@@ -214,8 +217,9 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 
   else // if pts != nullptr
     {
-      // update the elem_type
-      elem_type = inf_elem->type();
+      // update the elem
+      this->_elem = inf_elem;
+      this->_elem_type = inf_elem->type();
 
       // We'll assume that pts is a tensor product mesh of points.
       // pts[i] = pts[ angular_index + n_angular_pts * radial_index]
@@ -510,7 +514,8 @@ void InfFE<Dim,T_radial,T_map>::init_shape_functions(const std::vector<Point> & 
   // initialize most of the things related to physical approximation
   unsigned int n_base_approx_shape_functions;
   if (Dim > 1)
-    n_base_approx_shape_functions = base_fe->n_shape_functions();
+    n_base_approx_shape_functions =
+      FEInterface::n_dofs(base_fe->get_fe_type(), base_elem.get());
   else
     n_base_approx_shape_functions = 1;
 
@@ -819,7 +824,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
 
 
   _n_total_approx_sf = InfFERadial::n_dofs(fe_type.radial_order) *
-    base_fe->n_shape_functions();
+    FEInterface::n_dofs(base_fe->get_fe_type(), base_elem.get());
 
 
 

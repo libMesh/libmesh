@@ -65,6 +65,23 @@ bool NodeElem::close_to_point(const Point & p, Real tol) const
   return this->contains_point(p, tol);
 }
 
+
+bool NodeElem::on_reference_element(const Point & p,
+                                    const Real eps) const
+{
+  // Debatably `return true;` would make sense here; we shouldn't ever
+  // pass p!=0 in.
+  return (std::abs(p(0)) < eps
+#if LIBMESH_DIM > 1
+          && std::abs(p(1)) < eps
+#endif
+#if LIBMESH_DIM > 2
+          && std::abs(p(2)) < eps
+#endif
+         );
+}
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
 const Real NodeElem::_embedding_matrix[1][1][1] =

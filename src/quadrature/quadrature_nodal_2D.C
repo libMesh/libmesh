@@ -19,14 +19,16 @@
 
 // Local includes
 #include "libmesh/quadrature_nodal.h"
+
+#include "libmesh/enum_to_string.h"
+#include "libmesh/face_c0polygon.h"
 #include "libmesh/quadrature_trap.h"
 #include "libmesh/quadrature_simpson.h"
-#include "libmesh/enum_to_string.h"
 
 namespace libMesh
 {
 
-void QNodal::init_2D(const ElemType, unsigned int)
+void QNodal::init_2D()
 {
 #if LIBMESH_DIM > 1
 
@@ -39,7 +41,7 @@ void QNodal::init_2D(const ElemType, unsigned int)
     case TRISHELL3:
       {
         QTrap rule(/*dim=*/2, /*ignored*/_order);
-        rule.init(_type, /*ignored*/_p_level);
+        rule.init(*this);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());
         return;
@@ -140,7 +142,7 @@ void QNodal::init_2D(const ElemType, unsigned int)
     case TRI6:
       {
         QSimpson rule(/*dim=*/2, /*ignored*/_order);
-        rule.init(_type, /*ignored*/_p_level);
+        rule.init(*this);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());
         return;
@@ -162,6 +164,28 @@ void QNodal::init_2D(const ElemType, unsigned int)
         Real wv = Real(1)/40;
         Real we = Real(1)/15;
         _weights = {wv, wv, wv, we, we, we, Real(9)/40};
+        return;
+      }
+
+      //---------------------------------------------
+      // Arbitrary polygon quadrature rules
+    case C0POLYGON:
+      {
+        // C0Polygon requires the newer Quadrature API
+        if (!_elem)
+          libmesh_error();
+
+        libmesh_assert(_elem->type() == C0POLYGON);
+
+        const C0Polygon & poly = *cast_ptr<const C0Polygon *>(_elem);
+
+        const unsigned int nn = poly.n_nodes();
+        _weights.resize(nn, Real(1)/nn);
+
+        _points.resize(poly.n_nodes());
+        for (auto n : make_range(nn))
+          _points[n] = poly.master_point(n);
+
         return;
       }
 

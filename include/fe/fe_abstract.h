@@ -201,16 +201,23 @@ public:
                          const std::vector<Point> & reference_side_points,
                          std::vector<Point> &       reference_points) = 0;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \returns \p true if the point p is located on the reference element
    * for element type t, false otherwise.  Since we are doing floating
    * point comparisons here the parameter \p eps can be specified to
    * indicate a tolerance.  For example, \f$ x \le 1 \f$  becomes
    * \f$ x \le 1 + \epsilon \f$.
+   *
+   * This method overload is now deprecated, since it cannot support
+   * all finite element types; e.g. a Polygon subtype may differ from
+   * element to element.  Use \p Elem::on_reference_element() instead.
    */
   static bool on_reference_element(const Point & p,
                                    const ElemType t,
                                    const Real eps = TOLERANCE);
+#endif // LIBMESH_ENABLE_DEPRECATED
+
   /**
    * \returns The reference space coordinates of \p nodes based on the
    * element type.
@@ -481,11 +488,24 @@ public:
   virtual unsigned int n_quadrature_points () const = 0;
 
   /**
-   * \returns The element type that the current shape functions
-   * have been calculated for.  Useful in determining when shape
-   * functions must be recomputed.
+   * \returns The element that the current shape functions have been
+   * calculated for.  Useful in determining when shape functions must
+   * be recomputed.
    */
-  ElemType get_type()  const { return elem_type; }
+  const Elem * get_elem()  const { return _elem; }
+
+  /**
+   * \returns The element type that the current shape functions
+   * have been calculated for, or \p INVALID_ELEM if no such element
+   * exists.  Useful in determining when shape functions must be
+   * recomputed.
+   *
+   * This is generally redundant with _elem->type(), but must be
+   * cached separately for cases (such as internal FE use in
+   * QComposite) where _elem might be a dangling pointer to a
+   * temporary.
+   */
+  ElemType get_type() const { return _elem_type; }
 
   /**
    * \returns The p refinement level that the current shape
@@ -709,10 +729,14 @@ protected:
   FEType fe_type;
 
   /**
-   * The element type the current data structures are
-   * set up for.
+   * The element type the current data structures were set up for.
    */
-  ElemType elem_type;
+  ElemType _elem_type;
+
+  /**
+   * The element the current data structures were set up for.
+   */
+  const Elem * _elem;
 
   /**
    * The element p-refinement level the current data structures are

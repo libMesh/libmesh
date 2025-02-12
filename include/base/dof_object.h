@@ -181,12 +181,14 @@ public:
    */
   unique_id_type unique_id () const;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \returns The globally \p unique_id for this \p DofObject as a
    * writable reference.  Deprecated; use the API taking an input
    * instead.
    */
   unique_id_type & set_unique_id ();
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * Sets the \p unique_id for this \p DofObject
@@ -851,6 +853,7 @@ unique_id_type DofObject::unique_id () const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 unique_id_type & DofObject::set_unique_id ()
 {
@@ -861,6 +864,7 @@ unique_id_type & DofObject::set_unique_id ()
   libmesh_not_implemented();
 #endif
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

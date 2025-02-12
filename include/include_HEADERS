@@ -143,9 +143,11 @@ include_HEADERS =  \
         geom/elem_range.h \
         geom/elem_side_builder.h \
         geom/face.h \
+        geom/face_c0polygon.h \
         geom/face_inf_quad.h \
         geom/face_inf_quad4.h \
         geom/face_inf_quad6.h \
+        geom/face_polygon.h \
         geom/face_quad.h \
         geom/face_quad4.h \
         geom/face_quad4_shell.h \

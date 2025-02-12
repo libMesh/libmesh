@@ -109,7 +109,6 @@ void szabab_nodal_soln(const Elem * elem,
 
 
 
-
 unsigned int szabab_n_dofs(const ElemType t, const Order o)
 {
   switch (o)
@@ -325,6 +324,12 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
 } // szabab_n_dofs()
 
 
+
+unsigned int szabab_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return szabab_n_dofs(e->type(), o);
+}
 
 
 
@@ -966,6 +971,15 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
 
 
 
+unsigned int szabab_n_dofs_at_node(const Elem & e,
+                                   const Order o,
+                                   const unsigned int n)
+{
+  return szabab_n_dofs_at_node(e.type(), o, n);
+}
+
+
+
 unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
 {
   switch (o)
@@ -1265,6 +1279,13 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
     }
 } // szabab_n_dofs_per_elem
 
+
+
+unsigned int szabab_n_dofs_per_elem(const Elem & e, const Order o)
+{
+  return szabab_n_dofs_per_elem(e.type(), o);
+}
+
 } // anonymous namespace
 
 
@@ -1279,17 +1300,32 @@ template <> unsigned int FE<1,SZABAB>::n_dofs(const ElemType t, const Order o) {
 template <> unsigned int FE<2,SZABAB>::n_dofs(const ElemType t, const Order o) { return szabab_n_dofs(t, o); }
 template <> unsigned int FE<3,SZABAB>::n_dofs(const ElemType t, const Order o) { return szabab_n_dofs(t, o); }
 
+template <> unsigned int FE<0,SZABAB>::n_dofs(const Elem * e, const Order o) { return szabab_n_dofs(e, o); }
+template <> unsigned int FE<1,SZABAB>::n_dofs(const Elem * e, const Order o) { return szabab_n_dofs(e, o); }
+template <> unsigned int FE<2,SZABAB>::n_dofs(const Elem * e, const Order o) { return szabab_n_dofs(e, o); }
+template <> unsigned int FE<3,SZABAB>::n_dofs(const Elem * e, const Order o) { return szabab_n_dofs(e, o); }
+
 // Full specialization of n_dofs_at_node() function for every dimension.
 template <> unsigned int FE<0,SZABAB>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return szabab_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<1,SZABAB>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return szabab_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<2,SZABAB>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return szabab_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<3,SZABAB>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return szabab_n_dofs_at_node(t, o, n); }
 
+template <> unsigned int FE<0,SZABAB>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return szabab_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<1,SZABAB>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return szabab_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<2,SZABAB>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return szabab_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<3,SZABAB>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return szabab_n_dofs_at_node(e, o, n); }
+
 // Full specialization of n_dofs_per_elem() function for every dimension.
 template <> unsigned int FE<0,SZABAB>::n_dofs_per_elem(const ElemType t, const Order o) { return szabab_n_dofs_per_elem(t, o); }
 template <> unsigned int FE<1,SZABAB>::n_dofs_per_elem(const ElemType t, const Order o) { return szabab_n_dofs_per_elem(t, o); }
 template <> unsigned int FE<2,SZABAB>::n_dofs_per_elem(const ElemType t, const Order o) { return szabab_n_dofs_per_elem(t, o); }
 template <> unsigned int FE<3,SZABAB>::n_dofs_per_elem(const ElemType t, const Order o) { return szabab_n_dofs_per_elem(t, o); }
+
+template <> unsigned int FE<0,SZABAB>::n_dofs_per_elem(const Elem & e, const Order o) { return szabab_n_dofs_per_elem(e, o); }
+template <> unsigned int FE<1,SZABAB>::n_dofs_per_elem(const Elem & e, const Order o) { return szabab_n_dofs_per_elem(e, o); }
+template <> unsigned int FE<2,SZABAB>::n_dofs_per_elem(const Elem & e, const Order o) { return szabab_n_dofs_per_elem(e, o); }
+template <> unsigned int FE<3,SZABAB>::n_dofs_per_elem(const Elem & e, const Order o) { return szabab_n_dofs_per_elem(e, o); }
 
 // Szabab FEMs are C^0 continuous
 template <> FEContinuity FE<0,SZABAB>::get_continuity() const { return C_ZERO; }

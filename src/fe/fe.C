@@ -60,8 +60,12 @@ FE<Dim,T>::FE (const FEType & fet) :
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_shape_functions () const
 {
-  return FE<Dim,T>::n_dofs (this->elem_type,
-                            this->fe_type.order + this->_p_level);
+  if (this->_elem)
+    return this->n_dofs (this->_elem,
+                         this->fe_type.order + this->_p_level);
+
+  return this->n_dofs (this->get_type(),
+                       this->fe_type.order + this->_p_level);
 }
 
 
@@ -71,7 +75,8 @@ void FE<Dim,T>::attach_quadrature_rule (QBase * q)
   libmesh_assert(q);
   this->qrule = q;
   // make sure we don't cache results from a previous quadrature rule
-  this->elem_type = INVALID_ELEM;
+  this->_elem = nullptr;
+  this->_elem_type = INVALID_ELEM;
   return;
 }
 
@@ -100,7 +105,7 @@ void FE<Dim,T>::dofs_on_side(const Elem * const elem,
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
       const unsigned int n_dofs =
-          n_dofs_at_node(elem->type(), static_cast<Order>(o + add_p_level*elem->p_level()), n);
+          n_dofs_at_node(*elem, static_cast<Order>(o + add_p_level*elem->p_level()), n);
       if (elem->is_node_on_side(n, s))
         for (unsigned int i = 0; i != n_dofs; ++i)
           di.push_back(nodenum++);
@@ -127,7 +132,7 @@ void FE<Dim,T>::dofs_on_edge(const Elem * const elem,
   for (unsigned int n = 0; n != n_nodes; ++n)
     {
       const unsigned int n_dofs =
-          n_dofs_at_node(elem->type(), static_cast<Order>(o + add_p_level*elem->p_level()), n);
+          n_dofs_at_node(*elem, static_cast<Order>(o + add_p_level*elem->p_level()), n);
       if (elem->is_node_on_edge(n, e))
         for (unsigned int i = 0; i != n_dofs; ++i)
           di.push_back(nodenum++);
@@ -162,7 +167,8 @@ void FE<Dim,T>::reinit(const Elem * elem,
       if (pts != nullptr)
         {
           // Set the type and p level for this element
-          this->elem_type = elem->type();
+          this->_elem = elem;
+          this->_elem_type = elem->type();
           this->_elem_p_level = elem->p_level();
           this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
@@ -185,20 +191,23 @@ void FE<Dim,T>::reinit(const Elem * elem,
       else
         {
           libmesh_assert(this->qrule);
-          this->qrule->init(elem->type(), elem->p_level());
+          this->qrule->init(*elem);
 
           if (this->qrule->shapes_need_reinit())
             this->shapes_on_quadrature = false;
 
           // We're not going to bother trying to cache nodal
           // points *and* weights for fancier mapping types.
-          if (this->elem_type != elem->type() ||
+          if (this->get_type() != elem->type()       ||
+              (elem->runtime_topology() &&
+               this->_elem != elem)                  ||
               this->_elem_p_level != elem->p_level() ||
-              !this->shapes_on_quadrature ||
+              !this->shapes_on_quadrature            ||
               elem->mapping_type() != LAGRANGE_MAP)
             {
               // Set the type and p level for this element
-              this->elem_type = elem->type();
+              this->_elem = elem;
+              this->_elem_type = elem->type();
               this->_elem_p_level = elem->p_level();
               this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
               // Initialize the shape functions
@@ -216,6 +225,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
           else
             {
               // libmesh_assert_greater (elem->n_nodes(), 1);
+              this->_elem = elem;
 
               cached_nodes_still_fit = true;
               if (cached_nodes.size() != elem->n_nodes())
@@ -250,7 +260,8 @@ void FE<Dim,T>::reinit(const Elem * elem,
        // be done, and our "quadrature rule" is one point for nonlocal
        // (SCALAR) variables and zero points for local variables.
     {
-      this->elem_type = INVALID_ELEM;
+      this->_elem = nullptr;
+      this->_elem_type = INVALID_ELEM;
       this->_elem_p_level = 0;
       this->_p_level = 0;
 
@@ -328,13 +339,13 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
                                          const std::vector<Real> & JxW)
 {
   // Set the type and p level for this element
-  this->elem_type = elem->type();
+  this->_elem = elem;
+  this->_elem_type = elem->type();
   this->_elem_p_level = elem->p_level();
   this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
   const unsigned int n_shapes =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+    this->n_dofs(elem, this->get_order());
 
   std::vector<std::vector<OutputShape>> phi_vals;
   phi_vals.resize(n_shapes);
@@ -352,7 +363,7 @@ void FE<Dim,T>::reinit_default_dual_shape_coeffs (const Elem * elem)
 
   FEType default_fe_type(this->get_order(), T);
   QGauss default_qrule(elem->dim(), default_fe_type.default_quadrature_order());
-  default_qrule.init(elem->type(), elem->p_level());
+  default_qrule.init(*elem);
   // In preparation of computing dual_coeff, we compute the default shape
   // function values and use these to compute the dual shape coefficients.
   // The TRUE dual_phi values are computed in compute_dual_shape_functions()
@@ -405,8 +416,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
   // Number of shape functions in the finite element approximation
   // space.
   const unsigned int n_approx_shape_functions =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+    this->n_dofs(elem, this->get_order());
 
   // Maybe we already have correctly-sized data?  Check data sizes,
   // and get ready to break out of a "loop" if all these resize()
@@ -732,7 +742,8 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_base_shape_functions(const std::vector<Point> & qp,
                                           const Elem * e)
 {
-  this->elem_type = e->type();
+  this->_elem = e;
+  this->_elem_type = e->type();
   this->_fe_map->template init_reference_to_physical_map<Dim>(qp, e);
   init_shape_functions(qp, e);
 }

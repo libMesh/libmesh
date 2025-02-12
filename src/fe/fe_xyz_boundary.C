@@ -87,7 +87,8 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
       this->shapes_on_quadrature = false;
 
       // Set the element type
-      this->elem_type = elem->type();
+      this->_elem = elem;
+      this->_elem_type = elem->type();
 
       // Initialize the face shape functions
       this->_fe_map->template init_face_shape_functions<Dim>(*pts,  side.get());
@@ -105,11 +106,12 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
   else
     {
       // initialize quadrature rule
-      this->qrule->init(side->type(), elem->p_level());
+      this->qrule->init(*side, elem->p_level());
 
       {
-        // Set the element type
-        this->elem_type = elem->type();
+        // Set the element
+        this->_elem = elem;
+        this->_elem_type = elem->type();
 
         // Initialize the face shape functions
         this->_fe_map->template init_face_shape_functions<Dim>(this->qrule->get_points(),  side.get());
@@ -140,8 +142,7 @@ void FEXYZ<Dim>::compute_face_values(const Elem * elem,
   // Number of shape functions in the finite element approximation
   // space.
   const unsigned int n_approx_shape_functions =
-    this->n_shape_functions(this->get_type(),
-                            this->get_order());
+    this->n_dofs(elem, this->get_order());
 
   // Resize the shape functions and their gradients
   this->phi.resize    (n_approx_shape_functions);

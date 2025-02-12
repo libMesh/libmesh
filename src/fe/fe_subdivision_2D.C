@@ -659,7 +659,8 @@ void FESubdivision::attach_quadrature_rule(QBase * q)
 
   qrule = q;
   // make sure we don't cache results from a previous quadrature rule
-  elem_type = INVALID_ELEM;
+  this->_elem = nullptr;
+  this->_elem_type = INVALID_ELEM;
   return;
 }
 
@@ -690,7 +691,7 @@ void FESubdivision::reinit(const Elem * elem,
   // no custom quadrature support
   libmesh_assert(pts == nullptr);
   libmesh_assert(qrule);
-  qrule->init(elem->type());
+  qrule->init(*elem);
 
   // Initialize the shape functions
   this->init_shape_functions(this->qrule->get_points(), elem);
@@ -954,12 +955,15 @@ void FE<2,SUBDIVISION>::inverse_map(const Elem *,
 
 // The number of dofs per subdivision element depends on the valence of its nodes, so it is non-static
 template <> unsigned int FE<2,SUBDIVISION>::n_dofs(const ElemType, const Order) { libmesh_not_implemented(); return 0; }
+template <> unsigned int FE<2,SUBDIVISION>::n_dofs(const Elem *, const Order) { libmesh_not_implemented(); return 0; }
 
 // Loop subdivision elements have only a single dof per node
 template <> unsigned int FE<2,SUBDIVISION>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 1; }
+template <> unsigned int FE<2,SUBDIVISION>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 1; }
 
 // Subdivision FEMs have dofs only at the nodes
 template <> unsigned int FE<2,SUBDIVISION>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
+template <> unsigned int FE<2,SUBDIVISION>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
 
 // Subdivision FEMs have dofs only at the nodes
 template <> void FE<2,SUBDIVISION>::dofs_on_side(const Elem * const, const Order, unsigned int, std::vector<unsigned int> & di, bool) { di.resize(0); }

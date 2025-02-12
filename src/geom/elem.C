@@ -27,6 +27,7 @@
 #include "libmesh/edge_edge3.h"
 #include "libmesh/edge_edge4.h"
 #include "libmesh/edge_inf_edge2.h"
+#include "libmesh/face_c0polygon.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri3_subdivision.h"
 #include "libmesh/face_tri3_shell.h"
@@ -157,6 +158,20 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     18, // PYRAMID18
 
     9,  // QUADSHELL9
+
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+
+    invalid_uint,  // C0POLYGON
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -215,6 +230,20 @@ const unsigned int Elem::type_to_n_sides_map [] =
     5,  // PYRAMID18
 
     4,  // QUADSHELL9
+
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+
+    invalid_uint,  // C0POLYGON
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -273,10 +302,58 @@ const unsigned int Elem::type_to_n_edges_map [] =
     8,  // PYRAMID18
 
     4,  // QUADSHELL9
+
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+    invalid_uint,  // unused
+
+    invalid_uint,  // C0POLYGON
   };
 
 // ------------------------------------------------------------
 // Elem class member functions
+std::unique_ptr<Elem> Elem::disconnected_clone() const
+{
+  std::unique_ptr<Elem> returnval;
+
+  switch (this->type())
+    {
+    case C0POLYGON:
+      returnval = std::make_unique<C0Polygon>(this->n_sides());
+      break;
+
+    default:
+      returnval = Elem::build(this->type());
+    }
+
+  returnval->set_id() = this->id();
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  returnval->set_unique_id(this->unique_id());
+#endif
+  returnval->subdomain_id() = this->subdomain_id();
+  returnval->processor_id() = this->processor_id();
+
+  const auto n_elem_ints = this->n_extra_integers();
+  returnval->add_extra_integers(n_elem_ints);
+  for (unsigned int i = 0; i != n_elem_ints; ++i)
+    returnval->set_extra_integer(i, this->get_extra_integer(i));
+
+  returnval->set_mapping_type(this->mapping_type());
+  returnval->set_mapping_data(this->mapping_data());
+
+  return returnval;
+}
+
+
+
 std::unique_ptr<Elem> Elem::build(const ElemType type,
                                   Elem * p)
 {
@@ -317,6 +394,10 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return std::make_unique<Quad9>(p);
     case QUADSHELL9:
       return std::make_unique<QuadShell9>(p);
+
+    // Well, a hexagon is *a* polygon...
+    case C0POLYGON:
+      return std::make_unique<C0Polygon>(6, p);
 
       // 3D elements
     case TET4:
@@ -400,6 +481,7 @@ const Elem * Elem::reference_elem () const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 Point Elem::centroid() const
 {
   libmesh_do_once(libMesh::err
@@ -412,6 +494,9 @@ Point Elem::centroid() const
 
   return Elem::vertex_average();
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+
 
 Point Elem::true_centroid() const
 {
@@ -455,7 +540,8 @@ Point Elem::true_centroid() const
   // having that order incorrectly boosted by p_level.
   if (this->p_level())
     {
-      auto elem_copy = Elem::build(this->type());
+      auto elem_copy = this->disconnected_clone();
+      elem_copy->set_p_level(0);
 
       // Set node pointers
       for (auto n : this->node_index_range())
@@ -739,12 +825,14 @@ unsigned int Elem::which_side_am_i (const Elem * e) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int Elem::which_node_am_i(unsigned int side,
                                    unsigned int side_node) const
 {
   libmesh_deprecated();
   return local_side_node(side, side_node);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -2684,14 +2772,12 @@ bool Elem::point_test(const Point & p, Real box_tol, Real map_tol) const
       // If dist is larger than some fraction of the tolerance, then return false.
       // This can happen when e.g. a 2D element is living in 3D, and
       // FEMap::inverse_map() maps p onto the projection of the element,
-      // effectively "tricking" FEInterface::on_reference_element().
+      // effectively "tricking" on_reference_element().
       if (dist > this->hmax() * map_tol)
         return false;
     }
 
-
-
-  return FEInterface::on_reference_element(mapped_point, this->type(), map_tol);
+  return this->on_reference_element(mapped_point, map_tol);
 }
 
 
@@ -2706,7 +2792,7 @@ bool Elem::has_invertible_map(Real /*tol*/) const
   // We have a separate check for is_singular_node() below, so in this
   // case its "OK" to do nodal quadrature on pyramids.
   qnodal.allow_nodal_pyramid_quadrature = true;
-  qnodal.init(this->type());
+  qnodal.init(*this);
   auto & qp = qnodal.get_points();
   libmesh_assert_equal_to(qp.size(), this->n_nodes());
 
@@ -3421,7 +3507,8 @@ Elem::positive_face_orientation(const unsigned int i) const
   // Get the number of vertices N of face i. Note that for 3d elements, i.e.
   // elements for which this->n_faces() > 0, the number of vertices on any of
   // its sides (or faces) is just the number of that face's sides (or edges).
-  const unsigned int N = Elem::type_to_n_sides_map[this->side_type(i)];
+  auto side_i = this->side_ptr(i);
+  const unsigned int N = side_i->n_sides();
 
   const std::vector<unsigned int> nodes = this->nodes_on_side(i);
   std::vector<Point> vertices(N);

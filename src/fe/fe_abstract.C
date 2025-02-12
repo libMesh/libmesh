@@ -34,7 +34,6 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/threads.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_to_string.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -61,7 +60,8 @@ FEAbstract::FEAbstract(const unsigned int d,
   calculate_div_phi(false),
   calculate_dphiref(false),
   fe_type(fet),
-  elem_type(INVALID_ELEM),
+  _elem_type(INVALID_ELEM),
+  _elem(nullptr),
   _elem_p_level(0),
   _p_level(0),
   qrule(nullptr),
@@ -394,8 +394,13 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
     }
 }
 
+
+
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> & nodes)
 {
+  if (Elem::type_to_n_nodes_map[itemType] == invalid_uint)
+    libmesh_error();
+
   nodes.resize(Elem::type_to_n_nodes_map[itemType]);
   switch(itemType)
     {
@@ -623,8 +628,14 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
     }
 }
 
+
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
 bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const Real eps)
 {
+  // Use Elem::on_reference_element() instead
+  libmesh_deprecated();
+
   libmesh_assert_greater_equal (eps, 0.);
 
   const Real xi   = p(0);
@@ -825,6 +836,7 @@ bool FEAbstract::on_reference_element(const Point & p, const ElemType t, const R
 
   return false;
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

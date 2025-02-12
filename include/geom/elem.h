@@ -238,12 +238,24 @@ public:
   static const subdomain_id_type invalid_subdomain_id;
 
   /**
+   * \returns true iff this element type can vary in topology (e.g.
+   * have different numbers of sides and/or nodes) at runtime.  For
+   * such general polygons or polyhedra, APIs which assume a fixed
+   * topology are not safe to use.
+   */
+  virtual bool runtime_topology() const { return false; }
+
+  /**
    * \returns A pointer to the "reference element" associated
    * with this element.  The reference element is the image of this
    * element in reference parametric space. Importantly, it is *not*
    * an actual element in the mesh, but rather a Singleton-type
    * object, so for example all \p Quad4 elements share the same
    * \p reference_elem().
+   *
+   * If the element is of a type that can admit multiple topologies,
+   * such as a Polygon subtype, then there is no reference element;
+   * for such types this method should not be used.
    */
   const Elem * reference_elem () const;
 
@@ -442,11 +454,13 @@ public:
   virtual unsigned int local_edge_node(unsigned int edge,
                                        unsigned int edge_node) const = 0;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * This function is deprecated, call local_side_node(side, side_node) instead.
    */
   unsigned int which_node_am_i(unsigned int side,
                                unsigned int side_node) const;
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * \returns \p true if a vertex of \p e is contained
@@ -606,6 +620,10 @@ public:
   /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of nodes in the element.
+   *
+   * This is only usable for simple types for which the node number
+   * is fixed; for more general types like Polygon subclasses an actual
+   * instantiated Elem must be queried.
    */
   static const unsigned int type_to_n_nodes_map[INVALID_ELEM];
 
@@ -637,6 +655,10 @@ public:
   /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of sides on the element.
+   *
+   * This is only usable for simple types for which the node number
+   * is fixed; for more general types like Polygon subclasses an actual
+   * instantiated Elem must be queried.
    */
   static const unsigned int type_to_n_sides_map[INVALID_ELEM];
 
@@ -691,6 +713,10 @@ public:
   /**
    * This array maps the integer representation of the \p ElemType enum
    * to the number of edges on the element.
+   *
+   * This is only usable for simple types for which the node number
+   * is fixed; for more general types like Polygon subclasses an actual
+   * instantiated Elem must be queried.
    */
   static const unsigned int type_to_n_edges_map[INVALID_ELEM];
 
@@ -937,14 +963,18 @@ public:
    */
   virtual Order default_side_order () const { return default_order(); }
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
-   * Calls Elem::vertex_average() for backwards compatibility. This
-   * method has now been deprecated, so it will be removed at some
-   * point in the future.  Calls to Elem::centroid() in user code
-   * should be updated to either call Elem::vertex_average() or
-   * Elem::true_centroid() on a case by case basis.
+   * Calls Elem::vertex_average() for backwards compatibility.
+   *
+   * \deprecated This method has now been deprecated, so it will be
+   * removed at some point in the future.  Calls to Elem::centroid()
+   * in user code should be updated to either call
+   * Elem::vertex_average() or Elem::true_centroid() on a case by case
+   * basis.
    */
   virtual Point centroid () const;
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * \returns The "true" geometric centroid of the element, c=(cx, cy,
@@ -1043,8 +1073,8 @@ public:
   { libmesh_not_implemented(); return std::make_pair(0.,0.); }
 
   /**
-   * \returns \p true if the point p is contained in this element,
-   * false otherwise.
+   * \returns \p true if the physical point p is contained in this
+   * element, false otherwise.
    *
    * For linear elements, performs an initial tight bounding box check
    * (as an optimization step) and (if that passes) then uses the
@@ -1058,6 +1088,17 @@ public:
    * use Elem::close_to_point() instead.
    */
   virtual bool contains_point (const Point & p, Real tol=TOLERANCE) const;
+
+  /**
+   * \returns \p true if the master-space point p is contained in the
+   * reference element corresponding to this element, false otherwise.
+   *
+   * Since we are doing floating point comparisons here the parameter
+   * \p eps can be specified to indicate a tolerance.  For example,
+   * \f$ x \le 1 \f$  becomes \f$ x \le 1 + \epsilon \f$.
+   */
+  virtual bool on_reference_element(const Point & p,
+                                    const Real eps = TOLERANCE) const = 0;
 
   /**
    * \returns \p true if this element is "close" to the point p, where
@@ -1819,14 +1860,12 @@ public:
 
 #endif
 
-
-
-
   /**
    * \returns An Elem of type \p type wrapped in a smart pointer.
    */
   static std::unique_ptr<Elem> build (const ElemType type,
                                       Elem * p=nullptr);
+
   /**
    * Calls the build() method above with a nullptr parent, and
    * additionally sets the newly-created Elem's id. This can be useful
@@ -1834,6 +1873,20 @@ public:
    */
   static std::unique_ptr<Elem> build_with_id (const ElemType type,
                                               dof_id_type id);
+
+  /**
+   * \returns An Elem of the same type as \p this, wrapped in a smart
+   * pointer.
+   *
+   * This is not a complete clone() method (since e.g. it does not set
+   * node pointers; the standard use case reassigns node pointers from
+   * a different mesh), but it is necessary to use this instead of
+   * build() for runtime-polymorphic elements like Polygon subtypes
+   * whose "type" depends on more than their type(), and it is useful
+   * to use this for elements whose id, unique_id, extra integers,
+   * etc. should be preserved in the near-clone.
+   */
+  virtual std::unique_ptr<Elem> disconnected_clone () const;
 
   /**
    * Returns the number of independent permutations of element nodes -
@@ -2285,7 +2338,8 @@ Elem::Elem(const unsigned int nn,
   // If this ever legitimately fails we need to increase max_n_nodes
   libmesh_assert_less_equal(nn, max_n_nodes);
 
-  // Initialize the nodes data structure
+  // Initialize the nodes data structure if we're given a pointer to
+  // memory for it.
   if (_nodes)
     {
       for (unsigned int n=0; n<nn; n++)
@@ -2295,27 +2349,31 @@ Elem::Elem(const unsigned int nn,
   // Initialize the neighbors/parent data structure
   // _elemlinks = new Elem *[ns+1];
 
-  // We now require that we get allocated data from a subclass
-  libmesh_assert (_elemlinks);
-
-  _elemlinks[0] = p;
-
-  for (unsigned int n=1; n<ns+1; n++)
-    _elemlinks[n] = nullptr;
-
-  // Optionally initialize data from the parent
-  if (this->parent() != nullptr)
+  // Initialize the elements data structure if we're given a pointer
+  // to memory for it.  If we *weren't* given memory for it, e.g.
+  // because a subclass like an arbitrary Polygon needs to
+  // heap-allocate this memory, then that subclass will have to handle
+  // this initialization too.
+  if (_elemlinks)
     {
-      this->subdomain_id() = this->parent()->subdomain_id();
-      this->processor_id() = this->parent()->processor_id();
-      _map_type = this->parent()->_map_type;
-      _map_data = this->parent()->_map_data;
-    }
+      _elemlinks[0] = p;
+
+      for (unsigned int n=1; n<ns+1; n++)
+        _elemlinks[n] = nullptr;
+
+      // Optionally initialize data from the parent
+      if (this->parent())
+        {
+          this->subdomain_id() = this->parent()->subdomain_id();
+          this->processor_id() = this->parent()->processor_id();
+          _map_type = this->parent()->_map_type;
+          _map_data = this->parent()->_map_data;
 
 #ifdef LIBMESH_ENABLE_AMR
-  if (this->parent())
-    this->set_p_level(this->parent()->p_level());
+          this->set_p_level(this->parent()->p_level());
 #endif
+        }
+    }
 }
 
 

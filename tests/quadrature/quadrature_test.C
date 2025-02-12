@@ -173,7 +173,8 @@ private:
                        const std::function<Real(int,int,int)> & true_value,
                        int exactorder)
   {
-    unsigned int dim = Elem::build(elem_type)->dim();
+    auto elem = Elem::build(elem_type);
+    unsigned int dim = elem->dim();
     std::unique_ptr<QBase> qrule =
       QBase::build(qtype, dim, static_cast<Order>(order));
 
@@ -184,7 +185,7 @@ private:
         elem_type == PYRAMID14 || elem_type == PYRAMID18)
       qrule->allow_nodal_pyramid_quadrature = true;
 
-    qrule->init (elem_type);
+    qrule->init (*elem);
 
     const int max_y_order = dim>1 ? 0 : exactorder;
     const int max_z_order = dim>2 ? 0 : exactorder;
@@ -468,7 +469,7 @@ public:
                                                         static_cast<Order>(order));
 
             // Initialize on a 1D element, EDGE2/3/4 should not matter...
-            qrule->init (EDGE2);
+            qrule->init (EDGE2, 0, true);
 
             // Test the sum of the weights for this order
             Real sumw = 0.;
