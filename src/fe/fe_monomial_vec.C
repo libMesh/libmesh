@@ -61,27 +61,14 @@ monomial_vec_nodal_soln(const Elem * elem,
       // Constant shape functions
     case CONSTANT:
     {
+      libmesh_assert_equal_to(elem_soln.size(), static_cast<unsigned int>(dim));
       switch (dim)
       {
         case 2:
-        {
-          libmesh_assert_equal_to(elem_soln.size(), 2);
-          for (unsigned int n = 0; n < n_nodes; n++)
-          {
-            nodal_soln[2 * n] = elem_soln[0];
-            nodal_soln[1 + 2 * n] = elem_soln[1];
-          }
-          return;
-        }
         case 3:
         {
-          libmesh_assert_equal_to(elem_soln.size(), 3);
           for (unsigned int n = 0; n < n_nodes; n++)
-          {
-            nodal_soln[3 * n] = elem_soln[0];
-            nodal_soln[1 + 3 * n] = elem_soln[1];
-            nodal_soln[2 + 3 * n] = elem_soln[2];
-          }
+            std::copy(elem_soln.begin(), elem_soln.end(), nodal_soln.begin() + dim*n);
           return;
         }
         default:
@@ -104,18 +91,15 @@ monomial_vec_nodal_soln(const Elem * elem,
       libmesh_assert_equal_to(refspace_nodes.size(), n_nodes);
       libmesh_assert_equal_to(elem_soln.size(), n_sf * dim);
 
+      // Zero before summation
+      std::fill(nodal_soln.begin(), nodal_soln.end(), 0);
+
       for (unsigned int d = 0; d < static_cast<unsigned int>(dim); d++)
         for (unsigned int n = 0; n < n_nodes; n++)
-        {
-
-          // Zero before summation
-          nodal_soln[d + dim * n] = 0;
-
           // u_i = Sum (alpha_i phi_i)
           for (unsigned int i = 0; i < n_sf; i++)
             nodal_soln[d + dim * n] += elem_soln[d + dim * i] *
                                        FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
-        }
 
       return;
     } // default
@@ -126,27 +110,8 @@ monomial_vec_nodal_soln(const Elem * elem,
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this file.
 // This could be macro-ified so that it fits on one line...
-template <>
-void
-FE<0, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln,
-                                const bool add_p_level)
-{
-  FE<0, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level);
-}
-
-template <>
-void
-FE<1, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
-                                const Order order,
-                                const std::vector<Number> & elem_soln,
-                                std::vector<Number> & nodal_soln,
-                                const bool add_p_level)
-{
-  FE<1, MONOMIAL>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level);
-}
+LIBMESH_FE_NODAL_SOLN_DIM(MONOMIAL_VEC, (FE<0, MONOMIAL>::nodal_soln), 0)
+LIBMESH_FE_NODAL_SOLN_DIM(MONOMIAL_VEC, (FE<1, MONOMIAL>::nodal_soln), 1)
 
 template <>
 void
@@ -156,7 +121,7 @@ FE<2, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 std::vector<Number> & nodal_soln,
                                 const bool add_p_level)
 {
-  monomial_vec_nodal_soln(elem, order, elem_soln, 2 /*dimension*/, nodal_soln, add_p_level);
+  monomial_vec_nodal_soln(elem, order, elem_soln, 2 /*dim*/, nodal_soln, add_p_level);
 }
 
 template <>
@@ -167,7 +132,7 @@ FE<3, MONOMIAL_VEC>::nodal_soln(const Elem * elem,
                                 std::vector<Number> & nodal_soln,
                                 const bool add_p_level)
 {
-  monomial_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln, add_p_level);
+  monomial_vec_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln, add_p_level);
 }
 
 LIBMESH_FE_SIDE_NODAL_SOLN(MONOMIAL_VEC)

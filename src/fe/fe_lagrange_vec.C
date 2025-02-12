@@ -633,21 +633,8 @@ void lagrange_vec_nodal_soln(const Elem * elem,
   // Do full-specialization for every dimension, instead
   // of explicit instantiation at the end of this file.
   // This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
-                                    const Order order,
-                                    const std::vector<Number> & elem_soln,
-                                    std::vector<Number> & nodal_soln,
-                                    const bool add_p_level)
-{ FE<0,LAGRANGE>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
-
-template <>
-void FE<1,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
-                                    const Order order,
-                                    const std::vector<Number> & elem_soln,
-                                    std::vector<Number> & nodal_soln,
-                                    const bool add_p_level)
-{ FE<1,LAGRANGE>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
+LIBMESH_FE_NODAL_SOLN_DIM(LAGRANGE_VEC, (FE<0, LAGRANGE>::nodal_soln), 0)
+LIBMESH_FE_NODAL_SOLN_DIM(LAGRANGE_VEC, (FE<1, LAGRANGE>::nodal_soln), 1)
 
 template <>
 void FE<2,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
@@ -655,7 +642,7 @@ void FE<2,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const std::vector<Number> & elem_soln,
                                     std::vector<Number> & nodal_soln,
                                     const bool add_p_level)
-{ lagrange_vec_nodal_soln(elem, order, elem_soln, 2 /*dimension*/, nodal_soln, add_p_level); }
+{ lagrange_vec_nodal_soln(elem, order, elem_soln, 2 /*dim*/, nodal_soln, add_p_level); }
 
 template <>
 void FE<3,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
@@ -663,41 +650,14 @@ void FE<3,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const std::vector<Number> & elem_soln,
                                     std::vector<Number> & nodal_soln,
                                     const bool add_p_level)
-{ lagrange_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln, add_p_level); }
+{ lagrange_vec_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln, add_p_level); }
 
 LIBMESH_FE_SIDE_NODAL_SOLN(LAGRANGE_VEC)
 
-template <>
-void FE<0,L2_LAGRANGE_VEC>::nodal_soln(const Elem * elem,
-                                       const Order order,
-                                       const std::vector<Number> & elem_soln,
-                                       std::vector<Number> & nodal_soln,
-                                       const bool add_p_level)
-{ FE<0,LAGRANGE_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
-
-template <>
-void FE<1,L2_LAGRANGE_VEC>::nodal_soln(const Elem * elem,
-                                       const Order order,
-                                       const std::vector<Number> & elem_soln,
-                                       std::vector<Number> & nodal_soln,
-                                       const bool add_p_level)
-{ FE<1,LAGRANGE_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
-
-template <>
-void FE<2,L2_LAGRANGE_VEC>::nodal_soln(const Elem * elem,
-                                       const Order order,
-                                       const std::vector<Number> & elem_soln,
-                                       std::vector<Number> & nodal_soln,
-                                       const bool add_p_level)
-{ FE<2,LAGRANGE_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
-
-template <>
-void FE<3,L2_LAGRANGE_VEC>::nodal_soln(const Elem * elem,
-                                       const Order order,
-                                       const std::vector<Number> & elem_soln,
-                                       std::vector<Number> & nodal_soln,
-                                       const bool add_p_level)
-{ FE<3,LAGRANGE_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
+LIBMESH_FE_NODAL_SOLN_DIM(L2_LAGRANGE_VEC, (FE<0, LAGRANGE_VEC>::nodal_soln), 0)
+LIBMESH_FE_NODAL_SOLN_DIM(L2_LAGRANGE_VEC, (FE<1, LAGRANGE_VEC>::nodal_soln), 1)
+LIBMESH_FE_NODAL_SOLN_DIM(L2_LAGRANGE_VEC, (FE<2, LAGRANGE_VEC>::nodal_soln), 2)
+LIBMESH_FE_NODAL_SOLN_DIM(L2_LAGRANGE_VEC, (FE<3, LAGRANGE_VEC>::nodal_soln), 3)
 
 LIBMESH_FE_SIDE_NODAL_SOLN(L2_LAGRANGE_VEC)
 

@@ -61,13 +61,12 @@ void nedelec_one_nodal_soln(const Elem * elem,
       elem_type != HEX20 && elem_type != HEX27)
     libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(elem_type) << " selected for NEDELEC_ONE FE family!");
 
-  libmesh_assert_equal_to (elem_soln.size(), FEInterface::n_dofs(p_refined_fe_type, elem, false));
-
   const unsigned int n_sf = FEInterface::n_shape_functions(p_refined_fe_type, elem, false);
 
   std::vector<Point> refspace_nodes;
   FEVectorBase::get_refspace_nodes(elem_type,refspace_nodes);
   libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
+  libmesh_assert_equal_to (elem_soln.size(), n_sf);
 
   // Need to create new fe object so the shape function has the FETransformation
   // applied to it.
@@ -77,19 +76,14 @@ void nedelec_one_nodal_soln(const Elem * elem,
 
   vis_fe->reinit(elem,&refspace_nodes);
 
+  // Zero before summation
+  std::fill(nodal_soln.begin(), nodal_soln.end(), 0);
+
   for (unsigned int n = 0; n < n_nodes; n++)
-    {
-      libmesh_assert_equal_to (elem_soln.size(), n_sf);
-
-      // Zero before summation
+    // u = Sum (u_i phi_i)
+    for (unsigned int i=0; i<n_sf; i++)
       for (int d = 0; d < dim; d++)
-        nodal_soln[dim*n+d] = 0;
-
-      // u = Sum (u_i phi_i)
-      for (unsigned int i=0; i<n_sf; i++)
-        for (int d = 0; d < dim; d++)
-          nodal_soln[dim*n+d] += elem_soln[i]*(vis_phi[i][n](d));
-    }
+        nodal_soln[dim*n+d] += elem_soln[i]*(vis_phi[i][n](d));
 
   return;
 } // nedelec_one_nodal_soln
