@@ -2164,6 +2164,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
               node_to_elems_map.clear();
             }
         }
+      libmesh_error_msg_if(node_to_node_map.empty(), "Error: Stitch failed, no matching nodes found. Ensure boundaries are properly aligned before trying again.");
     }
   else
     {
