@@ -1735,7 +1735,7 @@ public:
    */
   template <typename T>
   void copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
-                            bool precondition_constraint_operator = true);
+                            bool precondition_constraint_operator = false);
 
   /**
    * Prints (from processor 0) all mesh constraint rows.  If \p
