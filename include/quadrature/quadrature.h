@@ -33,6 +33,14 @@
 #include <utility>
 #include <memory>
 
+// We used to have additional arguments to the init_0D, init_1D, etc.
+// classes, but they became unused after QBase members made them
+// redundant, so they were deprecated and eventually removed.  Users'
+// derived classes that need to compile against both old and new
+// libMesh version can test this macro to determine what signature
+// their overrides should have.
+#define LIBMESH_QBASE_INIT_ARGUMENTS_REMOVED
+
 namespace libMesh
 {
 
