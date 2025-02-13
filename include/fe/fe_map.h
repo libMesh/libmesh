@@ -1042,6 +1042,11 @@ private:
    * Work vector for compute_affine_map()
    */
   std::vector<const Node *> _elem_nodes;
+
+  /**
+   * A mutex for locking the error stream for failed point inversions
+   */
+  static Threads::spin_mutex _point_inv_err_mutex;
 };
 
 

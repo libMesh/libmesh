@@ -40,6 +40,7 @@
 
 namespace libMesh
 {
+Threads::spin_mutex FEMap::_point_inv_err_mutex;
 
 FEFamily
 FEMap::map_fe_type(const Elem & elem)
@@ -892,10 +893,11 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 // Don't call print_info() recursively if we're already
                 // failing.  print_info() calls Elem::volume() which may
                 // call FE::reinit() and trigger the same failure again.
-                static bool failing = false;
+                thread_local bool failing = false;
                 if (!failing)
                   {
                     failing = true;
+                    Threads::spin_mutex::scoped_lock lock(_point_inv_err_mutex);
                     elem->print_info(libMesh::err);
                     failing = false;
                     if (calculate_xyz)
