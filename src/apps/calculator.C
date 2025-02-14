@@ -261,6 +261,8 @@ int main(int argc, char ** argv)
 
       old_es.init();
 
+      old_es.print_info();
+
       goal_function =
         std::make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
     }
