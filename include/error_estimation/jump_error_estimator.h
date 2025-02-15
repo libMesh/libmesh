@@ -121,6 +121,11 @@ public:
    * This may only be useful for flex-IGA meshes, where
    * highly-nonconforming meshes are given pseudo-conforming solutions
    * via nodal constraints.
+   *
+   * Note that, to safely use this option in parallel, it is also
+   * necessary to expand the default algebraic ghosting requirements
+   * to include elements on the opposite sides of slits from local
+   * elements.
    */
   bool integrate_slits;
 
