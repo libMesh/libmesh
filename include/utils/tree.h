@@ -88,7 +88,7 @@ public:
                                     Real relative_tol = TOLERANCE) const override;
 
   /**
-   * Fills \p candidate_elements with any elements containing the
+   * Adds to \p candidate_elements any elements containing the
    * specified point \p p,
    * optionally restricted to a set of allowed subdomains,
    * optionally using a non-zero relative tolerance for searches.
