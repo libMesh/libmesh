@@ -30,7 +30,7 @@ void QClough::init_2D()
 {
 #if LIBMESH_DIM > 1
   QGauss gauss_rule(2, _order);
-  gauss_rule.init(TRI6, _p_level, true);
+  gauss_rule.init(TRI6, _p_level, /*simple_type_only=*/true);
 
   //-----------------------------------------------------------------------
   // 2D quadrature rules

@@ -36,7 +36,7 @@ void QGaussLobatto::init_3D()
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule.
         QGaussLobatto q1D(1, _order);
-        q1D.init(EDGE2, _p_level, true);
+        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
         tensor_product_hex(q1D);
         return;
       }

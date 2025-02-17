@@ -145,7 +145,7 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           // Watch out: this call to QBase->init() only works for
           // current_fe_type = const!   To allow variable Order,
           // the init() of QBase has to be modified...
-          radial_qrule->init(EDGE2, 0, true);
+          radial_qrule->init(EDGE2, 0, /*simple_type_only=*/true);
 
           // initialize the radial shape functions
           this->init_radial_shape_functions(inf_elem);

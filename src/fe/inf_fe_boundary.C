@@ -78,13 +78,13 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
       if (s > 0)
         {
           current_fe_type.radial_order = fe_type.radial_order;
-          radial_qrule->init(EDGE2, inf_elem->p_level(), true);
+          radial_qrule->init(EDGE2, inf_elem->p_level(), /*simple_type_only=*/true);
         }
       else
         {
           // build a new 0-dimensional quadrature-rule:
           radial_qrule=QBase::build(QGAUSS, 0, fe_type.radial_order);
-          radial_qrule->init(NODEELEM, 0, true);
+          radial_qrule->init(NODEELEM, 0, /*simple_type_only=*/true);
 
           //the base_qrule is set up with dim-1, but apparently we need dim, so we replace it:
           base_qrule=QBase::build(qrule->type(), side->dim(), qrule->get_order());
