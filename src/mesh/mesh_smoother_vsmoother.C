@@ -2458,15 +2458,15 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
   {
       std::vector<boundary_id_type> boundary_ids;
       boundary_info.boundary_ids(boundary_node, boundary_ids);
-      bool has_common_bid = false;
+      bool common_bid = false;
       for (const auto & bid : boundary_ids)
         if (boundary_info.has_boundary_id(neighbor_node, bid))
         {
-          has_common_bid = true;
+          common_bid = true;
           break;
         }
 
-      return has_common_bid;
+      return common_bid;
   };
 
   for (int I=0; I<NCN; I++)
