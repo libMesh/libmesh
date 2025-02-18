@@ -8,6 +8,7 @@
 #include <libmesh/mesh_tools.h>
 #include <libmesh/node.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -38,6 +39,52 @@ class DistortSquare : public FunctionBase<Real>
   }
 };
 
+class SquareToParallelogram : public FunctionBase<Real>
+{
+  std::unique_ptr<FunctionBase<Real>> clone () const override
+  { return std::make_unique<SquareToParallelogram>(); }
+
+  Real operator() (const Point &,
+                   const Real = 0.) override
+  { libmesh_not_implemented(); } // scalar-only API
+
+  // Has the effect that a square, meshed into right triangles with diagonals
+  // rising from lower-left to upper-right, is transformed into a left-leaning
+  // parallelogram of eqilateral triangles.
+  void operator() (const Point & p,
+                   const Real,
+                   DenseVector<Real> & output)
+  {
+    output.resize(3);
+    output(0) = p(0) - 0.5 * p(1);
+    output(1) = 0.5 * std::sqrt(3) * p(1);
+    output(2) = 0;
+  }
+};
+
+class ParallelogramToSquare : public FunctionBase<Real>
+{
+  std::unique_ptr<FunctionBase<Real>> clone () const override
+  { return std::make_unique<ParallelogramToSquare>(); }
+
+  Real operator() (const Point &,
+                   const Real = 0.) override
+  { libmesh_not_implemented(); } // scalar-only API
+
+  // Has the effect that a left-leaning parallelogram of equilateral triangles is transformed
+  // into a square of right triangle with diagonals rising from lower-left to upper-right.
+  // This is the inversion of the SquareToParallelogram mapping.
+  void operator() (const Point & p,
+                   const Real,
+                   DenseVector<Real> & output)
+  {
+    output.resize(3);
+    output(0) = p(0) + p(1) / std::sqrt(3.);
+    output(1) = (2. / std::sqrt(3)) * p(1);
+    output(2) = 0;
+  }
+};
+
 }
 
 using namespace libMesh;
@@ -55,9 +102,8 @@ public:
   CPPUNIT_TEST( testLaplaceQuad );
   CPPUNIT_TEST( testLaplaceTri );
 #  ifdef LIBMESH_ENABLE_VSMOOTHER
-// Yeah we'd like to but this segfaults
-//     CPPUNIT_TEST( testVariationalQuad );
-//     CPPUNIT_TEST( testVariationalTri );
+  CPPUNIT_TEST( testVariationalQuad );
+  CPPUNIT_TEST( testVariationalTri );
 #  endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
 
@@ -81,51 +127,97 @@ public:
     DistortSquare ds;
     MeshTools::Modification::redistribute(mesh, ds);
 
-    // Assert the distortion is as expected
-    auto center_distortion_is = []
+    const auto & boundary_info = mesh.get_boundary_info();
+
+    // Function to assert the distortion is as expected
+    auto center_distortion_is = [&boundary_info]
       (const Node & node, int d, bool distortion,
        Real distortion_tol=TOLERANCE) {
       const Real r = node(d);
       const Real R = r * n_elems_per_side;
-      CPPUNIT_ASSERT_GREATER(-TOLERANCE*TOLERANCE, r);
-      CPPUNIT_ASSERT_GREATER(-TOLERANCE*TOLERANCE, 1-r);
-
-      // If we're at the boundaries we should *never* be distorted
-      if (std::abs(node(0)) < TOLERANCE*TOLERANCE ||
-          std::abs(node(0)-1) < TOLERANCE*TOLERANCE)
-        {
-          const Real R1 = node(1) * n_elems_per_side;
-          CPPUNIT_ASSERT_LESS(TOLERANCE*TOLERANCE, std::abs(R1-std::round(R1)));
-          return true;
-        }
-
-      if (std::abs(node(1)) < TOLERANCE*TOLERANCE ||
-          std::abs(node(1)-1) < TOLERANCE*TOLERANCE)
-        {
-          const Real R0 = node(0) * n_elems_per_side;
-          CPPUNIT_ASSERT_LESS(TOLERANCE*TOLERANCE, std::abs(R0-std::round(R0)));
-
-          return true;
-        }
+      CPPUNIT_ASSERT_GREATER(-distortion_tol*distortion_tol, r);
+      CPPUNIT_ASSERT_GREATER(-distortion_tol*distortion_tol, 1-r);
 
       // If we're at the center we're fine
-      if (std::abs(r-0.5) < TOLERANCE*TOLERANCE)
+      if (std::abs(r-0.5) < distortion_tol*distortion_tol)
         return true;
 
-      return ((std::abs(R-std::round(R)) > distortion_tol) == distortion);
+      // Boundary nodes are allowed to slide along the boundary.
+      // However, nodes that are part of more than one boundary (i.e., corners) should remain fixed.
+
+      // Get boundary ids associated with the node
+      std::vector<boundary_id_type> boundary_ids;
+      boundary_info.boundary_ids(&node, boundary_ids);
+
+      switch (boundary_ids.size())
+      {
+        // Internal node
+        case 0:
+          return ((std::abs(R-std::round(R)) > distortion_tol) == distortion);
+          break;
+        // Sliding boundary node
+        case 1:
+          // Since sliding boundary nodes may or may not already be in the optimal
+          // position, they may or may not be different from the originally distorted
+          // mesh. Return true here to avoid issues.
+          return true;
+          break;
+        // Fixed boundary node, should not have moved
+        case 2:
+          if (std::abs(node(0)) < distortion_tol*distortion_tol ||
+              std::abs(node(0)-1) < distortion_tol*distortion_tol)
+            {
+              const Real R1 = node(1) * n_elems_per_side;
+              CPPUNIT_ASSERT_LESS(distortion_tol*distortion_tol, std::abs(R1-std::round(R1)));
+              return true;
+            }
+
+          if (std::abs(node(1)) < distortion_tol*distortion_tol ||
+              std::abs(node(1)-1) < distortion_tol*distortion_tol)
+            {
+              const Real R0 = node(0) * n_elems_per_side;
+              CPPUNIT_ASSERT_LESS(distortion_tol*distortion_tol, std::abs(R0-std::round(R0)));
+
+              return true;
+            }
+            return false;
+          break;
+          default:
+            libmesh_error_msg("Node has unsupported number of boundary ids = " << boundary_ids.size());
+      }
     };
 
+    // Make sure our DistortSquare transformation has distorted the mesh
     for (auto node : mesh.node_ptr_range())
       {
         CPPUNIT_ASSERT(center_distortion_is(*node, 0, true));
         CPPUNIT_ASSERT(center_distortion_is(*node, 1, true));
       }
 
+    // Transform the square mesh of triangles to a parallelogram mesh of triangles.
+    // This will allow the Variational Smoother to smooth the mesh to the optimal case
+    // of equilateral triangles
+   const bool is_variational_smoother_type = (dynamic_cast<VariationalMeshSmoother*>(&smoother) != nullptr);
+   if (type == TRI3 && is_variational_smoother_type)
+    {
+      SquareToParallelogram stp;
+      MeshTools::Modification::redistribute(mesh, stp);
+    }
+
     // Enough iterations to mostly fix us up.  Laplace seems to be at 1e-3
     // tolerance by iteration 6, so hopefully everything is there on any
     // system by 8.
     for (unsigned int i=0; i != 8; ++i)
       smoother.smooth();
+
+    // Transform the parallelogram mesh back to a square mesh. In the case of the
+    // Variational Smoother, equilateral triangular elements will be transformed
+    // into right triangular elements that align with the original undistorted mesh.
+    if (type == TRI3 && is_variational_smoother_type)
+    {
+      ParallelogramToSquare pts;
+      MeshTools::Modification::redistribute(mesh, pts);
+    }
 
     // Make sure we're not too distorted anymore.
     for (auto node : mesh.node_ptr_range())

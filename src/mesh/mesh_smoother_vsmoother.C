@@ -24,6 +24,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h"
+#include "libmesh/boundary_info.h"
 
 // C++ includes
 #include <time.h> // for clock_t, clock()
@@ -49,7 +50,6 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  unsigned miniterBC) :
   MeshSmoother(mesh),
   _percent_to_move(1),
-  _dist_norm(0.),
   _adapt_data(nullptr),
   _dim(mesh.mesh_dimension()),
   _miniter(miniter),
@@ -77,7 +77,6 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  Real percent_to_move) :
   MeshSmoother(mesh),
   _percent_to_move(percent_to_move),
-  _dist_norm(0.),
   _adapt_data(adapt_data),
   _dim(mesh.mesh_dimension()),
   _miniter(miniter),
@@ -105,7 +104,6 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  Real percent_to_move) :
   MeshSmoother(mesh),
   _percent_to_move(percent_to_move),
-  _dist_norm(0.),
   _adapt_data(adapt_data),
   _dim(mesh.mesh_dimension()),
   _miniter(miniter),
@@ -125,6 +123,11 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
 
 Real VariationalMeshSmoother::smooth(unsigned int)
 {
+  // Update the mesh dimension, since the mesh may have changed since initialization
+  _dim = _mesh.mesh_dimension();
+  // Records the relative "distance moved"
+  Real dist_norm = 0.;
+
   // If the log file is already open, for example on subsequent calls
   // to smooth() on the same object, we'll just keep writing to it,
   // otherwise we'll open it...
@@ -176,7 +179,7 @@ Real VariationalMeshSmoother::smooth(unsigned int)
   if (vms_err < 0)
     {
       _logfile << "Error reading input mesh file" << std::endl;
-      return _dist_norm;
+      return dist_norm;
     }
 
   if (me > 1)
@@ -185,7 +188,7 @@ Real VariationalMeshSmoother::smooth(unsigned int)
   if (vms_err < 0)
     {
       _logfile << "Error reading metric file" << std::endl;
-      return _dist_norm;
+      return dist_norm;
     }
 
   std::vector<int> iter(4);
@@ -211,23 +214,21 @@ Real VariationalMeshSmoother::smooth(unsigned int)
 
   // save result
   _logfile << "Saving Result" << std::endl;
-  writegr(R);
+  dist_norm = writegr(R);
 
-  libmesh_assert_greater (_dist_norm, 0.);
-  return _dist_norm;
+  return dist_norm;
 }
 
 
 
 // save grid
-int VariationalMeshSmoother::writegr(const Array2D<Real> & R)
+Real VariationalMeshSmoother::writegr(const Array2D<Real> & R)
 {
   libMesh::out << "Starting writegr" << std::endl;
 
+  Real dist_norm = 0.;
   // Adjust nodal coordinates to new positions
   {
-    libmesh_assert_equal_to(_dist_norm, 0.);
-    _dist_norm = 0;
     int i = 0;
     for (auto & node : _mesh.node_ptr_range())
       {
@@ -250,17 +251,17 @@ int VariationalMeshSmoother::writegr(const Array2D<Real> & R)
         libmesh_assert_greater_equal (total_dist, 0.);
 
         // Add the distance this node moved to the global distance
-        _dist_norm += total_dist;
+        dist_norm += total_dist;
 
         i++;
       }
 
     // Relative "error"
-    _dist_norm = std::sqrt(_dist_norm/_mesh.n_nodes());
+    dist_norm = std::sqrt(dist_norm/_mesh.n_nodes());
   }
 
   libMesh::out << "Finished writegr" << std::endl;
-  return 0;
+  return dist_norm;
 }
 
 
@@ -2404,6 +2405,8 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
   // assembler of constraints
   const Real eps = std::sqrt(vol)*1e-9;
 
+  const auto & boundary_info = _mesh.get_boundary_info();
+
   for (int i=0; i<4*NCN; i++)
     constr[i] = 1./eps;
 
@@ -2417,6 +2420,50 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
         }
   }
 
+  // Utility function to determine whether two nodes share a boundary ID.
+  // The motivation for this is that a sliding boundary node on a triangular
+  // element can have a neighbor boundary node in the same element that is not
+  // part of the same boundary
+  // Consider the below example with nodes A, C, D, F, G that comprise elements
+  // E1, E2, E3, with boundaries B1, B2, B3, B4. To determine the constraint
+  // equations for the sliding node C, the neighboring nodes A and D need to
+  // be identified to construct the line that C is allowed to slide along.
+  // Note that neighbors A and D both share the boundary B1 with C.
+  // Without ensuring that neighbors share the same boundary as the current
+  // node, a neighboring node that does not lie on the same boundary
+  // (i.e. F and G) might be selected to define the constraining line,
+  // resulting in an incorrect constraint.
+  // Note that if, for example, boundaries B1 and B2 were to be combined
+  // into boundary B12, the node F would share a boundary id with node C
+  // and result in an incorrect constraint. It would be useful to design
+  // additional checks to detect cases like this.
+
+  //         B3
+  //    G-----------F
+  //    | \       / |
+  // B4 |  \  E2 /  | B2
+  //    |   \   /   |
+  //    | E1 \ / E3 |
+  //    A-----C-----D
+  //         B1
+  auto has_common_bid = [&boundary_info](
+    const Node * boundary_node,
+    const Node * neighbor_node
+  ) -> bool
+  {
+      std::vector<boundary_id_type> boundary_ids;
+      boundary_info.boundary_ids(boundary_node, boundary_ids);
+      bool has_common_bid = false;
+      for (const auto & bid : boundary_ids)
+        if (boundary_info.has_boundary_id(neighbor_node, bid))
+        {
+          has_common_bid = true;
+          break;
+        }
+
+      return has_common_bid;
+  };
+
   for (int I=0; I<NCN; I++)
     {
       // The boundary connectivity loop sets up the j and k indices
@@ -2429,6 +2476,8 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
         j = 0,
         k = 0,
         ind = 0;
+
+      const auto * boundary_node = _mesh.node_ptr(Bind[I]);
 
       // boundary connectivity
       for (dof_id_type l=0; l<_n_cells; l++)
@@ -2445,20 +2494,28 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
                 {
                   if (mask[cells[l][1]] > 0)
                     {
-                      if (ind == 0)
-                        j = cells[l][1];
-                      else
-                        k = cells[l][1];
-                      ind++;
+                      const auto * neighbor_node = _mesh.node_ptr(cells[l][1]);
+                      if (has_common_bid(boundary_node, neighbor_node))
+                      {
+                        if (ind == 0)
+                          j = cells[l][1];
+                        else
+                          k = cells[l][1];
+                        ind++;
+                      }
                     }
 
                   if (mask[cells[l][2]] > 0)
                     {
-                      if (ind == 0)
-                        j = cells[l][2];
-                      else
-                        k = cells[l][2];
-                      ind++;
+                      const auto * neighbor_node = _mesh.node_ptr(cells[l][2]);
+                      if (has_common_bid(boundary_node, neighbor_node))
+                      {
+                        if (ind == 0)
+                          j = cells[l][2];
+                        else
+                          k = cells[l][2];
+                        ind++;
+                      }
                     }
                 }
 
@@ -2466,20 +2523,28 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
                 {
                   if (mask[cells[l][0]] > 0)
                     {
-                      if (ind == 0)
-                        j = cells[l][0];
-                      else
-                        k = cells[l][0];
-                      ind++;
+                      const auto * neighbor_node = _mesh.node_ptr(cells[l][0]);
+                      if (has_common_bid(boundary_node, neighbor_node))
+                      {
+                        if (ind == 0)
+                          j = cells[l][0];
+                        else
+                          k = cells[l][0];
+                        ind++;
+                      }
                     }
 
                   if (mask[cells[l][2]] > 0)
                     {
-                      if (ind == 0)
-                        j = cells[l][2];
-                      else
-                        k = cells[l][2];
-                      ind++;
+                      const auto * neighbor_node = _mesh.node_ptr(cells[l][2]);
+                      if (has_common_bid(boundary_node, neighbor_node))
+                      {
+                        if (ind == 0)
+                          j = cells[l][2];
+                        else
+                          k = cells[l][2];
+                        ind++;
+                      }
                     }
                 }
 
@@ -2487,20 +2552,28 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
                 {
                   if (mask[cells[l][1]] > 0)
                     {
-                      if (ind == 0)
-                        j = cells[l][1];
-                      else
-                        k = cells[l][1];
-                      ind++;
+                      const auto * neighbor_node = _mesh.node_ptr(cells[l][1]);
+                      if (has_common_bid(boundary_node, neighbor_node))
+                      {
+                        if (ind == 0)
+                          j = cells[l][1];
+                        else
+                          k = cells[l][1];
+                        ind++;
+                      }
                     }
 
                   if (mask[cells[l][0]] > 0)
                     {
-                      if (ind == 0)
-                        j = cells[l][0];
-                      else
-                        k = cells[l][0];
-                      ind++;
+                      const auto * neighbor_node = _mesh.node_ptr(cells[l][0]);
+                      if (has_common_bid(boundary_node, neighbor_node))
+                      {
+                        if (ind == 0)
+                          j = cells[l][0];
+                        else
+                          k = cells[l][0];
+                        ind++;
+                      }
                     }
                 }
               break;
