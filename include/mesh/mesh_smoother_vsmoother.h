@@ -253,6 +253,12 @@ private:
   };
 
 
+  /**
+   * Updates the _mesh attribute with the smoothed mesh.
+   * \param R array of smoothed points to update the mesh.
+   *
+   * \return dist_norm average distance that each node was moved.
+  */
   Real writegr(const Array2D<Real> & R);
 
   int readgr(Array2D<Real> & R,

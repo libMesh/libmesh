@@ -125,6 +125,11 @@ Real VariationalMeshSmoother::smooth(unsigned int)
 {
   // Update the mesh dimension, since the mesh may have changed since initialization
   _dim = _mesh.mesh_dimension();
+
+  // Check for multiple dimensions
+  if (_mesh.elem_dimensions().size() > 1)
+    libmesh_not_implemented_msg("Meshes containing elements of differing dimension are not yet supported.");
+
   // Records the relative "distance moved"
   Real dist_norm = 0.;
 
