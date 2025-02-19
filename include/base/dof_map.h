@@ -1646,7 +1646,10 @@ public:
   /**
    * Reinitialize the underlying data structures conformal to the current mesh.
    */
-  void reinit (MeshBase & mesh);
+  void reinit
+    (MeshBase & mesh,
+     const std::map<const Node *, std::set<subdomain_id_type>> &
+       constraining_subdomains);
 
   /**
    * Free all new memory associated with the object, but restore its
@@ -1858,9 +1861,16 @@ private:
    * variable in the system.
    * Starts at index next_free_dof, and increments it to
    * the post-final index.
+   *
+   * Uses the provided constraining_subdomains map from
+   * calculate_constraining_subdomains() to ensure allocation of all
+   * DoFs on constraining nodes.
    */
-  void distribute_local_dofs_var_major (dof_id_type & next_free_dof,
-                                        MeshBase & mesh);
+  void distribute_local_dofs_var_major
+    (dof_id_type & next_free_dof,
+     MeshBase & mesh,
+     const std::map<const Node *, std::set<subdomain_id_type>> &
+       constraining_subdomains);
 
   /**
    * Distributes the global degrees of freedom for dofs on this
@@ -1870,11 +1880,18 @@ private:
    * build_send_list is \p true, builds the send list.  If \p false,
    * clears and reserves the send list.
    *
+   * Uses the provided constraining_subdomains map from
+   * calculate_constraining_subdomains() to ensure allocation of all
+   * DoFs on constraining nodes.
+   *
    * \note The degrees of freedom for a given variable are not in
    * contiguous blocks, as in the case of \p distribute_local_dofs_var_major.
    */
-  void distribute_local_dofs_node_major (dof_id_type & next_free_dof,
-                                         MeshBase & mesh);
+  void distribute_local_dofs_node_major
+    (dof_id_type & next_free_dof,
+     MeshBase & mesh,
+     const std::map<const Node *, std::set<subdomain_id_type>> &
+       constraining_subdomains);
 
   /*
    * Helper method for the above two to count + distriubte SCALAR dofs

@@ -496,11 +496,18 @@ void DofMap::set_nonlocal_dof_objects(iterator_type objects_begin,
 
 
 
-void DofMap::reinit(MeshBase & mesh)
+void DofMap::reinit
+  (MeshBase & mesh,
+   const std::map<const Node *, std::set<subdomain_id_type>> &
+     constraining_subdomains)
 {
   libmesh_assert (mesh.is_prepared());
 
   LOG_SCOPE("reinit()", "DofMap");
+
+  // This is the common case and we want to optimize for it
+  const bool constraining_subdomains_empty =
+    constraining_subdomains.empty();
 
   // We ought to reconfigure our default coupling functor.
   //
@@ -627,9 +634,16 @@ void DofMap::reinit(MeshBase & mesh)
         {
           libmesh_assert(elem);
 
-          // Skip the numbering if this variable is
-          // not active on this element's subdomain
-          if (!vg_description.active_on_subdomain(elem->subdomain_id()))
+          // Only number dofs connected to active elements on this
+          // processor and only for variables which are active on on
+          // this element's subdomain or which are active on the
+          // subdomain of a node constrained by this node.
+          const bool active_on_elem =
+            vg_description.active_on_subdomain(elem->subdomain_id());
+
+          // If there's no way we're active on this element then we're
+          // done
+          if (!active_on_elem && constraining_subdomains_empty)
             continue;
 
           FEType fe_type = base_fe_type;
@@ -672,6 +686,23 @@ void DofMap::reinit(MeshBase & mesh)
             {
               Node & node = elem->node_ref(n);
 
+              // If we're active on the element then we're active on
+              // its nodes.  If we're not then we might *still* be
+              // active on particular constraining nodes.
+              bool active_on_node = active_on_elem;
+              if (!active_on_node)
+                if (auto it = constraining_subdomains.find(&node);
+                    it != constraining_subdomains.end())
+                  for (auto s : it->second)
+                    if (vg_description.active_on_subdomain(s))
+                      {
+                        active_on_node = true;
+                        break;
+                      }
+
+              if (!active_on_node)
+                continue;
+
               if (elem->is_vertex(n))
                 {
                   const unsigned int old_node_dofs =
@@ -711,15 +742,39 @@ void DofMap::reinit(MeshBase & mesh)
         {
           libmesh_assert(elem);
 
-          // Skip the numbering if this variable is
-          // not active on this element's subdomain
-          if (!vg_description.active_on_subdomain(elem->subdomain_id()))
+          // Only number dofs connected to active elements on this
+          // processor and only for variables which are active on on
+          // this element's subdomain or which are active on the
+          // subdomain of a node constrained by this node.
+          const bool active_on_elem =
+            vg_description.active_on_subdomain(elem->subdomain_id());
+
+          // If there's no way we're active on this element then we're
+          // done
+          if (!active_on_elem && constraining_subdomains_empty)
             continue;
 
           // Allocate the edge and face DOFs
           for (auto n : elem->node_index_range())
             {
               Node & node = elem->node_ref(n);
+
+              // If we're active on the element then we're active on
+              // its nodes.  If we're not then we might *still* be
+              // active on particular constraining nodes.
+              bool active_on_node = active_on_elem;
+              if (!active_on_node)
+                if (auto it = constraining_subdomains.find(&node);
+                    it != constraining_subdomains.end())
+                  for (auto s : it->second)
+                    if (vg_description.active_on_subdomain(s))
+                      {
+                        active_on_node = true;
+                        break;
+                      }
+
+              if (!active_on_node)
+                continue;
 
               const unsigned int old_node_dofs =
                 node.n_comp_group(sys_num, vg);
@@ -933,8 +988,16 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   //  libmesh_assert_greater (this->n_variables(), 0);
   libmesh_assert_less (proc_id, n_proc);
 
+  // Data structure to ensure we can correctly combine
+  // subdomain-restricted variables with constraining nodes from
+  // different subdomains
+  const std::map<const Node *, std::set<subdomain_id_type>>
+    constraining_subdomains =
+    this->calculate_constraining_subdomains();
+
   // re-init in case the mesh has changed
-  this->reinit(mesh);
+  this->reinit(mesh,
+               constraining_subdomains);
 
   // By default distribute variables in a
   // var-major fashion, but allow run-time
@@ -950,9 +1013,11 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
 
   // Set temporary DOF indices on this processor
   if (node_major_dofs)
-    this->distribute_local_dofs_node_major (next_free_dof, mesh);
+    this->distribute_local_dofs_node_major
+      (next_free_dof, mesh, constraining_subdomains);
   else
-    this->distribute_local_dofs_var_major (next_free_dof, mesh);
+    this->distribute_local_dofs_var_major
+      (next_free_dof, mesh, constraining_subdomains);
 
   // Get DOF counts on all processors
   std::vector<dof_id_type> dofs_on_proc(n_proc, 0);
@@ -981,9 +1046,11 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
 
   // Set permanent DOF indices on this processor
   if (node_major_dofs)
-    this->distribute_local_dofs_node_major (next_free_dof, mesh);
+    this->distribute_local_dofs_node_major
+      (next_free_dof, mesh, constraining_subdomains);
   else
-    this->distribute_local_dofs_var_major (next_free_dof, mesh);
+    this->distribute_local_dofs_var_major
+      (next_free_dof, mesh, constraining_subdomains);
 
   libmesh_assert_equal_to (next_free_dof, _end_df[proc_id]);
 
@@ -1268,11 +1335,18 @@ DofMap::calculate_constraining_subdomains()
 }
 
 
-void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
-                                              MeshBase & mesh)
+void DofMap::distribute_local_dofs_node_major
+  (dof_id_type & next_free_dof,
+   MeshBase & mesh,
+   const std::map<const Node *, std::set<subdomain_id_type>> &
+     constraining_subdomains)
 {
   const unsigned int sys_num       = this->sys_number();
   const unsigned int n_var_groups  = this->n_variable_groups();
+
+  // This is the common case and we want to optimize for it
+  const bool constraining_subdomains_empty =
+    constraining_subdomains.empty();
 
   // Our numbering here must be kept consistent with the numbering
   // scheme assumed by DofMap::local_variable_indices!
@@ -1285,6 +1359,8 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
       // elements on this processor.
       const unsigned int n_nodes = elem->n_nodes();
 
+      const subdomain_id_type sbdid = elem->subdomain_id();
+
       // First number the nodal DOFS
       for (unsigned int n=0; n<n_nodes; n++)
         {
@@ -1294,8 +1370,24 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
             {
               const VariableGroup & vg_description(this->variable_group(vg));
 
-              if ((vg_description.type().family != SCALAR) &&
-                  (vg_description.active_on_subdomain(elem->subdomain_id())))
+              if (vg_description.type().family == SCALAR)
+                continue;
+
+              bool active_on_node =
+                vg_description.active_on_subdomain(sbdid);
+
+              // Are we at least active indirectly here?
+              if (!active_on_node && !constraining_subdomains_empty)
+                if (auto it = constraining_subdomains.find(&node);
+                    it != constraining_subdomains.end())
+                  for (auto s : it->second)
+                    if (vg_description.active_on_subdomain(s))
+                      {
+                        active_on_node = true;
+                        break;
+                      }
+
+              if (active_on_node)
                 {
                   // assign dof numbers (all at once) if this is
                   // our node and if they aren't already there
@@ -1371,11 +1463,18 @@ void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
 
 
 
-void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
-                                             MeshBase & mesh)
+void DofMap::distribute_local_dofs_var_major
+  (dof_id_type & next_free_dof,
+   MeshBase & mesh,
+   const std::map<const Node *, std::set<subdomain_id_type>> &
+     constraining_subdomains)
 {
   const unsigned int sys_num      = this->sys_number();
   const unsigned int n_var_groups = this->n_variable_groups();
+
+  // This is the common case and we want to optimize for it
+  const bool constraining_subdomains_empty =
+    constraining_subdomains.empty();
 
   // Our numbering here must be kept consistent with the numbering
   // scheme assumed by DofMap::local_variable_indices!
@@ -1395,9 +1494,15 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
       for (auto & elem : mesh.active_local_element_ptr_range())
         {
           // Only number dofs connected to active elements on this
-          // processor and only variables which are active on on this
-          // element's subdomain.
-          if (!vg_description.active_on_subdomain(elem->subdomain_id()))
+          // processor and only for variables which are active on on
+          // this element's subdomain or which are active on the
+          // subdomain of a node constrained by this node.
+          const bool active_on_elem =
+            vg_description.active_on_subdomain(elem->subdomain_id());
+
+          // If there's no way we're active on this element then we're
+          // done
+          if (!active_on_elem && constraining_subdomains_empty)
             continue;
 
           const unsigned int n_nodes = elem->n_nodes();
@@ -1406,6 +1511,20 @@ void DofMap::distribute_local_dofs_var_major(dof_id_type & next_free_dof,
           for (unsigned int n=0; n<n_nodes; n++)
             {
               Node & node = elem->node_ref(n);
+
+              bool active_on_node = active_on_elem;
+              if (!active_on_node)
+                if (auto it = constraining_subdomains.find(&node);
+                    it != constraining_subdomains.end())
+                  for (auto s : it->second)
+                    if (vg_description.active_on_subdomain(s))
+                      {
+                        active_on_node = true;
+                        break;
+                      }
+
+              if (!active_on_node)
+                continue;
 
               // assign dof numbers (all at once) if this is
               // our node and if they aren't already there
