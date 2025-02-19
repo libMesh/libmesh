@@ -1835,6 +1835,23 @@ private:
                                 dofobject_accessor objects);
 
   /**
+   * We may have mesh constraint rows with dependent nodes in one
+   * subdomain but dependency nodes in another subdomain, and we may
+   * have variables whose subdomain restriction includes the dependent
+   * subdomain but not the dependency.  In those cases we need to
+   * place degrees of freedom on dependency nodes anyway.
+   *
+   * The set value for node n will include all subdomain ids of
+   * elements with nodes in subdomains constrained by n.
+   *
+   * We use a map<set> rather than a multimap here because we expect
+   * to be inserting the same subdomain multiple times and we don't
+   * need duplicate values.
+   */
+  std::map<const Node *, std::set<subdomain_id_type>>
+  calculate_constraining_subdomains();
+
+  /**
    * Distributes the global degrees of freedom, for dofs on
    * this processor.  In this format the local
    * degrees of freedom are in a contiguous block for each

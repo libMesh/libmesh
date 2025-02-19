@@ -1234,6 +1234,40 @@ template void DofMap::local_variable_indices(std::vector<dof_id_type> &,
                                              unsigned int) const;
 
 
+std::map<const Node *, std::set<subdomain_id_type>>
+DofMap::calculate_constraining_subdomains()
+{
+  std::map<const Node *, std::set<subdomain_id_type>> constraining_subdomains;
+  const auto & constraint_rows = _mesh.get_constraint_rows();
+
+  // We can't just loop over constraint rows here because we need
+  // element subdomain ids for the constrained nodes, but we don't
+  // want an extra loop if there are no constraint rows.
+  if (!constraint_rows.empty())
+    for (auto & elem : _mesh.active_element_ptr_range())
+      {
+        const subdomain_id_type sbdid = elem->subdomain_id();
+
+        for (const Node & node : elem->node_ref_range())
+          {
+            if (auto it = constraint_rows.find(&node);
+                it != constraint_rows.end())
+              {
+                for (const auto & [pr, val] : it->second)
+                  {
+                    const Node * spline_node =
+                      pr.first->node_ptr(pr.second);
+
+                    constraining_subdomains[spline_node].insert(sbdid);
+                  }
+              }
+          }
+      }
+
+  return constraining_subdomains;
+}
+
+
 void DofMap::distribute_local_dofs_node_major(dof_id_type & next_free_dof,
                                               MeshBase & mesh)
 {
