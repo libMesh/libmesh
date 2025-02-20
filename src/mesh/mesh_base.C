@@ -1081,7 +1081,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
                      std::ostream_iterator<std::string>(oss, ", "),
                      [](Order o)
                        { return Utility::enum_to_string<Order>(o); });
-      oss << cast_int<unsigned int>(*_elem_default_orders.rbegin());
+      oss << Utility::enum_to_string<Order>(*_elem_default_orders.rbegin());
       oss << "}\n";
     }
 
