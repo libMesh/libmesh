@@ -2453,20 +2453,34 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
   //         B1
   auto has_common_bid = [&boundary_info](
     const Node * boundary_node,
-    const Node * neighbor_node
+    const Node * neighbor_node,
+    const Elem * containing_elem
   ) -> bool
   {
-      std::vector<boundary_id_type> boundary_ids;
-      boundary_info.boundary_ids(boundary_node, boundary_ids);
-      bool common_bid = false;
-      for (const auto & bid : boundary_ids)
-        if (boundary_info.has_boundary_id(neighbor_node, bid))
-        {
-          common_bid = true;
-          break;
-        }
+    bool common_bid = false;
 
-      return common_bid;
+    // Node ids local to containing_elem
+    const auto node_id = containing_elem->get_node_index(boundary_node);
+    const auto neighbor_id = containing_elem->get_node_index(neighbor_node);
+
+    for (const auto side_id : containing_elem->side_index_range())
+    {
+      // We don't care about this side if it doesn't contain our boundary and neighbor nodes
+      if (!(containing_elem->is_node_on_side(node_id, side_id) && containing_elem->is_node_on_side(neighbor_id, side_id)))
+        continue;
+
+      // If the current side, containing boundary_node and neighbor_node, lies on a boundary,
+      // we can say that boundary_node and neighbor_node have a common boundary id.
+      std::vector<boundary_id_type> boundary_ids;
+      boundary_info.boundary_ids(containing_elem, side_id, boundary_ids);
+      if (boundary_ids.size())
+      {
+        common_bid = true;
+        break;
+      }
+    }
+
+    return common_bid;
   };
 
   for (int I=0; I<NCN; I++)
@@ -2485,7 +2499,8 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
       const auto * boundary_node = _mesh.node_ptr(Bind[I]);
 
       // boundary connectivity
-      for (dof_id_type l=0; l<_n_cells; l++)
+      dof_id_type l = 0;
+      for (const auto * elem : _mesh.active_element_ptr_range())
         {
           int nvert = 0;
 
@@ -2500,7 +2515,7 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
                   if (mask[cells[l][1]] > 0)
                     {
                       const auto * neighbor_node = _mesh.node_ptr(cells[l][1]);
-                      if (has_common_bid(boundary_node, neighbor_node))
+                      if (has_common_bid(boundary_node, neighbor_node, elem))
                       {
                         if (ind == 0)
                           j = cells[l][1];
@@ -2513,7 +2528,7 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
                   if (mask[cells[l][2]] > 0)
                     {
                       const auto * neighbor_node = _mesh.node_ptr(cells[l][2]);
-                      if (has_common_bid(boundary_node, neighbor_node))
+                      if (has_common_bid(boundary_node, neighbor_node, elem))
                       {
                         if (ind == 0)
                           j = cells[l][2];
@@ -2529,7 +2544,7 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
                   if (mask[cells[l][0]] > 0)
                     {
                       const auto * neighbor_node = _mesh.node_ptr(cells[l][0]);
-                      if (has_common_bid(boundary_node, neighbor_node))
+                      if (has_common_bid(boundary_node, neighbor_node, elem))
                       {
                         if (ind == 0)
                           j = cells[l][0];
@@ -2542,7 +2557,7 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
                   if (mask[cells[l][2]] > 0)
                     {
                       const auto * neighbor_node = _mesh.node_ptr(cells[l][2]);
-                      if (has_common_bid(boundary_node, neighbor_node))
+                      if (has_common_bid(boundary_node, neighbor_node, elem))
                       {
                         if (ind == 0)
                           j = cells[l][2];
@@ -2558,7 +2573,7 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
                   if (mask[cells[l][1]] > 0)
                     {
                       const auto * neighbor_node = _mesh.node_ptr(cells[l][1]);
-                      if (has_common_bid(boundary_node, neighbor_node))
+                      if (has_common_bid(boundary_node, neighbor_node, elem))
                       {
                         if (ind == 0)
                           j = cells[l][1];
@@ -2571,7 +2586,7 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
                   if (mask[cells[l][0]] > 0)
                     {
                       const auto * neighbor_node = _mesh.node_ptr(cells[l][0]);
-                      if (has_common_bid(boundary_node, neighbor_node))
+                      if (has_common_bid(boundary_node, neighbor_node, elem))
                       {
                         if (ind == 0)
                           j = cells[l][0];
@@ -2715,6 +2730,7 @@ Real VariationalMeshSmoother::minJ_BC(Array2D<Real> & R,
             default:
               libmesh_error_msg("Unrecognized nvert = " << nvert);
             }
+          ++l;
         } // end boundary connectivity
 
       // lines
