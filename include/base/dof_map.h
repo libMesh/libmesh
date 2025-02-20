@@ -1646,7 +1646,10 @@ public:
   /**
    * Reinitialize the underlying data structures conformal to the current mesh.
    */
-  void reinit (MeshBase & mesh);
+  void reinit
+    (MeshBase & mesh,
+     const std::map<const Node *, std::set<subdomain_id_type>> &
+       constraining_subdomains);
 
   /**
    * Free all new memory associated with the object, but restore its
@@ -1835,15 +1838,39 @@ private:
                                 dofobject_accessor objects);
 
   /**
+   * We may have mesh constraint rows with dependent nodes in one
+   * subdomain but dependency nodes in another subdomain, and we may
+   * have variables whose subdomain restriction includes the dependent
+   * subdomain but not the dependency.  In those cases we need to
+   * place degrees of freedom on dependency nodes anyway.
+   *
+   * The set value for node n will include all subdomain ids of
+   * elements with nodes in subdomains constrained by n.
+   *
+   * We use a map<set> rather than a multimap here because we expect
+   * to be inserting the same subdomain multiple times and we don't
+   * need duplicate values.
+   */
+  std::map<const Node *, std::set<subdomain_id_type>>
+  calculate_constraining_subdomains();
+
+  /**
    * Distributes the global degrees of freedom, for dofs on
    * this processor.  In this format the local
    * degrees of freedom are in a contiguous block for each
    * variable in the system.
    * Starts at index next_free_dof, and increments it to
    * the post-final index.
+   *
+   * Uses the provided constraining_subdomains map from
+   * calculate_constraining_subdomains() to ensure allocation of all
+   * DoFs on constraining nodes.
    */
-  void distribute_local_dofs_var_major (dof_id_type & next_free_dof,
-                                        MeshBase & mesh);
+  void distribute_local_dofs_var_major
+    (dof_id_type & next_free_dof,
+     MeshBase & mesh,
+     const std::map<const Node *, std::set<subdomain_id_type>> &
+       constraining_subdomains);
 
   /**
    * Distributes the global degrees of freedom for dofs on this
@@ -1853,11 +1880,18 @@ private:
    * build_send_list is \p true, builds the send list.  If \p false,
    * clears and reserves the send list.
    *
+   * Uses the provided constraining_subdomains map from
+   * calculate_constraining_subdomains() to ensure allocation of all
+   * DoFs on constraining nodes.
+   *
    * \note The degrees of freedom for a given variable are not in
    * contiguous blocks, as in the case of \p distribute_local_dofs_var_major.
    */
-  void distribute_local_dofs_node_major (dof_id_type & next_free_dof,
-                                         MeshBase & mesh);
+  void distribute_local_dofs_node_major
+    (dof_id_type & next_free_dof,
+     MeshBase & mesh,
+     const std::map<const Node *, std::set<subdomain_id_type>> &
+       constraining_subdomains);
 
   /*
    * Helper method for the above two to count + distriubte SCALAR dofs
