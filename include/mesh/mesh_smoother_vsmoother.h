@@ -159,11 +159,6 @@ private:
   const Real _percent_to_move;
 
   /**
-   * Records a relative "distance moved"
-   */
-  Real _dist_norm;
-
-  /**
    * Map for hanging_nodes
    */
   std::map<dof_id_type, std::vector<dof_id_type>> _hanging_nodes;
@@ -176,7 +171,7 @@ private:
   /**
    * Smoother control variables
    */
-  const unsigned _dim;
+  unsigned _dim;
   const unsigned _miniter;
   const unsigned _maxiter;
   const unsigned _miniterBC;
@@ -258,7 +253,13 @@ private:
   };
 
 
-  int writegr(const Array2D<Real> & R);
+  /**
+   * Updates the _mesh attribute with the smoothed mesh.
+   * \param R array of smoothed points to update the mesh.
+   *
+   * \return dist_norm average distance that each node was moved.
+  */
+  Real writegr(const Array2D<Real> & R);
 
   int readgr(Array2D<Real> & R,
              std::vector<int> & mask,
