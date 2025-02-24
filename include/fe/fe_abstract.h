@@ -209,9 +209,10 @@ public:
    * indicate a tolerance.  For example, \f$ x \le 1 \f$  becomes
    * \f$ x \le 1 + \epsilon \f$.
    *
-   * This method overload is now deprecated, since it cannot support
-   * all finite element types; e.g. the Polygon1 type may differ from
-   * element to element.  Use \p Elem::on_reference_element() instead.
+   * \deprecated This method overload does not support all finite
+   * element types; e.g. the reference element for an arbitrary
+   * polygon or polyhedron type may differ from element to element.
+   * Use \p Elem::on_reference_element() instead.
    */
   static bool on_reference_element(const Point & p,
                                    const ElemType t,
