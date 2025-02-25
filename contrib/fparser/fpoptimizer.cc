@@ -698,7 +698,7 @@ namespace FPoptimizer_Grammar
 
     extern "C" {
         extern const Rule      grammar_rules[];
-        /* 
+        /*
         extern const Grammar   grammar_optimize_round1;
         extern const Grammar   grammar_optimize_round2;
         extern const Grammar   grammar_optimize_round3;
@@ -2139,7 +2139,7 @@ namespace FPoptimizer_ByteCode
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_ByteCode
 {
@@ -4933,7 +4933,7 @@ namespace FPoptimizer_CodeTree
 #endif
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
@@ -5093,7 +5093,7 @@ namespace FPoptimizer_Grammar
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 #include <complex>
 namespace FPoptimizer_Grammar
@@ -5113,7 +5113,7 @@ namespace FPoptimizer_Grammar
 // line removed for fpoptimizer.cc: #include "extrasrc/fptypes.hh"
 #include <algorithm>
 
-/* 
+/*
 #define grammar_optimize_abslogical grammar_optimize_abslogical_tweak
 #define grammar_optimize_ignore_if_sideeffects grammar_optimize_ignore_if_sideeffects_tweak
 #define grammar_optimize_nonshortcut_logical_evaluation grammar_optimize_nonshortcut_logical_evaluation_tweak
@@ -6694,7 +6694,7 @@ namespace FPoptimizer_Grammar
         return ParamSpec(ParamHolder,(const void*)&plist_p[index]);
     }
 }
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_Grammar
 {
@@ -7142,7 +7142,7 @@ namespace FPoptimizer_Optimize
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_Optimize
 {
@@ -7900,7 +7900,7 @@ namespace FPoptimizer_Optimize
 }
 
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_Optimize
 {
@@ -8047,7 +8047,7 @@ namespace FPoptimizer_Optimize
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_Optimize
 {
@@ -8144,7 +8144,7 @@ namespace FPoptimizer_Grammar
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_Grammar
 {
@@ -8410,7 +8410,7 @@ namespace FPoptimizer_CodeTree
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
@@ -8896,7 +8896,7 @@ namespace
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
@@ -9674,7 +9674,7 @@ namespace FPoptimizer_CodeTree
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
@@ -10620,7 +10620,7 @@ namespace FPoptimizer_CodeTree
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
@@ -10714,7 +10714,7 @@ namespace FPoptimizer_CodeTree
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
@@ -11384,7 +11384,13 @@ namespace FPoptimizer_CodeTree
                                     min = Value_t(0);
                             }
                         }
-                        if(p0.min.known && p0.min.val >= Value_t(0) && p0.max.known && p1.max.known)
+                        // D.Schwen 2/25/25  0 < p0 < 1 and p1 < 0
+                        else if(p0.min.known && p0.min.val > Value_t(0) && p0.max.val < Value_t(1) && p1.max.known && p1.max.val == Value_t(0))
+                        {
+                            min = Value_t(1);
+                        }
+                        // D.Schwen 2/25/25 (min.val >= Value_t(0) -> p0.min.val >= Value_t(1))
+                        if(p0.min.known && p0.min.val >= Value_t(1) && p0.max.known && p1.max.known)
                         {
                             Value_t max = fp_pow(p0.max.val, p1.max.val);
                             if(min > max) std::swap(min, max);
@@ -11692,7 +11698,7 @@ namespace FPoptimizer_CodeTree
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
@@ -12665,7 +12671,7 @@ namespace FPoptimizer_CodeTree
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {
@@ -13167,7 +13173,7 @@ namespace FPoptimizer_CodeTree
     }
 }
 
-/* 
+/*
 // line removed for fpoptimizer.cc: #include "instantiate.hh"
 namespace FPoptimizer_CodeTree
 {

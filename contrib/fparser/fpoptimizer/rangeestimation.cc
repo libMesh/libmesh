@@ -652,7 +652,13 @@ namespace FPoptimizer_CodeTree
                                     min = Value_t(0);
                             }
                         }
-                        if(p0.min.known && p0.min.val >= Value_t(0) && p0.max.known && p1.max.known)
+                        // D.Schwen 2/25/25  0 < p0 < 1 and p1 < 0
+                        else if(p0.min.known && p0.min.val > Value_t(0) && p0.max.val < Value_t(1) && p1.max.known && p1.max.val == Value_t(0))
+                        {
+                            min = Value_t(1);
+                        }
+                        // D.Schwen 2/25/25 (min.val >= Value_t(0) -> p0.min.val >= Value_t(1))
+                        if(p0.min.known && p0.min.val >= Value_t(1) && p0.max.known && p1.max.known)
                         {
                             Value_t max = fp_pow(p0.max.val, p1.max.val);
                             if(min > max) std::swap(min, max);
