@@ -123,8 +123,8 @@ void LinearImplicitSystem::solve ()
     this->get_equation_systems();
 
   // If the linear solver hasn't been initialized, we do so here.
-  if (libMesh::on_command_line("--solver-system-names"))
-    linear_solver->init((this->name()+"_").c_str());
+  if (this->prefix_with_name())
+    linear_solver->init(this->prefix().c_str());
   else
     linear_solver->init();
 

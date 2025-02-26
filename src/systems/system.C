@@ -99,8 +99,11 @@ System::System (EquationSystems & es,
   _hide_output                      (false),
   project_with_constraints          (true),
   _prefer_hash_table_matrix_assembly(false),
-  _require_sparsity_pattern         (false)
+  _require_sparsity_pattern         (false),
+  _prefix_with_name                 (false)
 {
+  if (libMesh::on_command_line("--solver-system-names"))
+    this->prefix_with_name(true);
 }
 
 

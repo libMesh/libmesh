@@ -201,8 +201,8 @@ void NonlinearImplicitSystem::solve ()
     }
   else
     {
-      if (libMesh::on_command_line("--solver-system-names"))
-        nonlinear_solver->init((this->name()+"_").c_str());
+      if (this->prefix_with_name())
+        nonlinear_solver->init(this->prefix().c_str());
       else
         nonlinear_solver->init();
 

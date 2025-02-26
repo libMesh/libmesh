@@ -1927,6 +1927,22 @@ public:
    */
   void prefer_hash_table_matrix_assembly(bool preference);
 
+  /**
+   * Instructs this system to prefix solve options with its name for solvers that leverage prefixes
+   */
+  void prefix_with_name(bool value) { _prefix_with_name = value; }
+
+  /**
+   * @returns Whether we are name prefixing
+   */
+  [[nodiscard]] bool prefix_with_name() const { return _prefix_with_name; }
+
+  /**
+   * @returns A prefix that may be applied to solver options. Note that this
+   * prefix is only used if \p prefix_with_name()
+   */
+  std::string prefix() const { return this->name() + "_"; }
+
 protected:
 
   /**
@@ -2307,6 +2323,11 @@ private:
    * Whether any of our matrices require an initial sparsity pattern computation in order to determine preallocation
    */
   bool _require_sparsity_pattern;
+
+  /**
+   * Whether we are name prefixing solver options
+   */
+  bool _prefix_with_name;
 };
 
 
