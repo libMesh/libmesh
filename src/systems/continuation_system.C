@@ -65,8 +65,8 @@ ContinuationSystem::ContinuationSystem (EquationSystems & es,
   // moved.
   linear_solver = LinearSolver<Number>::build(es.comm());
 
-  if (libMesh::on_command_line("--solver-system-names"))
-    linear_solver->init((this->name()+"_").c_str());
+  if (this->prefix_with_name())
+    linear_solver->init(this->prefix().c_str());
   else
     linear_solver->init();
 

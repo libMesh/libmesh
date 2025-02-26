@@ -1208,8 +1208,8 @@ LinearSolver<Number> * ImplicitSystem::get_linear_solver() const
 
   linear_solver = LinearSolver<Number>::build(this->comm());
 
-  if (libMesh::on_command_line("--solver-system-names"))
-    linear_solver->init((this->name() + "_").c_str());
+  if (this->prefix_with_name())
+    linear_solver->init(this->prefix().c_str());
   else
     linear_solver->init();
 
