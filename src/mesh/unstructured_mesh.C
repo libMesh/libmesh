@@ -662,11 +662,12 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
                      n_old_elem_ints = extra_int_maps.first.size(),
                      n_new_elem_ints = _elem_integer_names.size();
 
-  // If we are partitioned into fewer parts than the incoming mesh,
-  // then we need to "wrap" the other Mesh's processor ids to fit
-  // within our range. This can happen, for example, while stitching
-  // meshes with small numbers of elements in parallel...
-  bool wrap_proc_ids = (this->n_partitions() <
+  // If we are partitioned into fewer parts than the incoming mesh has
+  // processors to handle, then we need to "wrap" the other Mesh's
+  // processor ids to fit within our range. This can happen, for
+  // example, while stitching meshes with small numbers of elements in
+  // parallel...
+  bool wrap_proc_ids = (this->n_processors() <
                         other_mesh.n_partitions());
 
   // We're assuming the other mesh has proper element number ordering,
@@ -685,7 +686,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
     for (const auto & oldn : other_mesh.node_ptr_range())
       {
         processor_id_type added_pid = cast_int<processor_id_type>
-          (wrap_proc_ids ? oldn->processor_id() % _n_parts : oldn->processor_id());
+          (wrap_proc_ids ? oldn->processor_id() % this->n_processors() : oldn->processor_id());
 
         // Add new nodes in old node Point locations
         Node * newn =
@@ -766,7 +767,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
 
         // And start it off with the same processor id (mod _n_parts).
         el->processor_id() = cast_int<processor_id_type>
-          (wrap_proc_ids ? old->processor_id() % _n_parts : old->processor_id());
+          (wrap_proc_ids ? old->processor_id() % this->n_processors() : old->processor_id());
 
         // Give it the same element and unique ids
         el->set_id(old->id() + element_id_offset);
