@@ -339,13 +339,6 @@ all_increased_order_range (UnstructuredMesh & mesh,
   libmesh_assert(mesh.comm().verify(mesh.max_elem_id()));
 
   /*
-   * When the mesh is not prepared, at least renumber the nodes and
-   * elements, so that the node ids are correct
-   */
-  if (!mesh.is_prepared())
-    mesh.renumber_nodes_and_elements ();
-
-  /*
    * If the mesh is empty then we have nothing to do
    */
   if (!mesh.n_elem())
@@ -1471,15 +1464,6 @@ bool UnstructuredMesh::contract ()
 void UnstructuredMesh::all_first_order ()
 {
   LOG_SCOPE("all_first_order()", "Mesh");
-
-  /*
-   * when the mesh is not prepared,
-   * at least renumber the nodes and
-   * elements, so that the node ids
-   * are correct
-   */
-  if (!this->_is_prepared)
-    this->renumber_nodes_and_elements ();
 
   /**
    * Prepare to identify (and then delete) a bunch of no-longer-used nodes.
