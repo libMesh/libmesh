@@ -76,7 +76,7 @@ void QGaussLobatto::init_1D()
         _weights.resize(4);
 
         _points[ 0](0) = -1.0L;
-        _points[ 1](0) = -std::sqrt(Real(1)/5);
+        _points[ 1](0) = -std::sqrt(Real(1)/5); // ~ -0.4472135955
         _points[ 2]    = -_points[1];
         _points[ 3]    = -_points[0];
 
@@ -97,7 +97,7 @@ void QGaussLobatto::init_1D()
         _weights.resize(5);
 
         _points[ 0](0) = -1.0L;
-        _points[ 1](0) = -std::sqrt(Real(3)/7);
+        _points[ 1](0) = -std::sqrt(Real(3)/7); // ~ -0.6546536707
         _points[ 2](0) = 0.;
         _points[ 3]    = -_points[1];
         _points[ 4]    = -_points[0];
