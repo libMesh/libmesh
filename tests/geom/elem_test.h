@@ -132,5 +132,15 @@ public:
                                            minpos, use_z*maxpos,
                                            elem_type);
       }
+
+    // Use non-default subdomain ids so we can properly test their
+    // preservation
+    for (const auto & elem :
+         this->_mesh->element_ptr_range())
+      elem->subdomain_id() = 10 + (elem->id() % 10);
+
+    // And make sure our mesh's cache knows about them all for later
+    // tests comparisons
+    this->_mesh->cache_elem_data();
   }
 };
