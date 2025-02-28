@@ -26,7 +26,7 @@
 namespace libMesh
 {
 
-void QNodal::init_2D(const ElemType, unsigned int)
+void QNodal::init_2D()
 {
 #if LIBMESH_DIM > 1
 
@@ -39,7 +39,7 @@ void QNodal::init_2D(const ElemType, unsigned int)
     case TRISHELL3:
       {
         QTrap rule(/*dim=*/2, /*ignored*/_order);
-        rule.init(_type, /*ignored*/_p_level);
+        rule.init(*this);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());
         return;
@@ -140,7 +140,7 @@ void QNodal::init_2D(const ElemType, unsigned int)
     case TRI6:
       {
         QSimpson rule(/*dim=*/2, /*ignored*/_order);
-        rule.init(_type, /*ignored*/_p_level);
+        rule.init(*this);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());
         return;

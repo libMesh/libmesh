@@ -33,6 +33,14 @@
 #include <utility>
 #include <memory>
 
+// We used to have additional arguments to the init_0D, init_1D, etc.
+// classes, but they became unused after QBase members made them
+// redundant, so they were deprecated and eventually removed.  Users'
+// derived classes that need to compile against both old and new
+// libMesh version can test this macro to determine what signature
+// their overrides should have.
+#define LIBMESH_QBASE_INIT_ARGUMENTS_REMOVED
+
 namespace libMesh
 {
 
@@ -184,11 +192,34 @@ public:
   }
 
   /**
+   * Initializes the data structures for a quadrature rule for the
+   * element \p e.  If \p p_level is specified it overrides the element
+   * p_level() elevation to use.
+   */
+  virtual void init (const Elem & e,
+                     unsigned int p_level=invalid_uint);
+
+  /**
    * Initializes the data structures for a quadrature rule for an
-   * element of type \p type.
+   * element of type \p type.  Some types, such as POLYGON1, might
+   * require more detailed element information and so might not be
+   * compatible with this API.
+   *
+   * New code should use the Elem-based API for most use cases, but
+   * some code may initialize quadrature rules with simple ElemType
+   * values like triangles and edges for use in tensor product or
+   * conical product constructions; this code can set the
+   * \p simple_type_only flag to avoid being identified as deprecated.
    */
   virtual void init (const ElemType type=INVALID_ELEM,
-                     unsigned int p_level=0);
+                     unsigned int p_level=0,
+                     bool simple_type_only=false);
+
+  /**
+   * Initializes the data structures for a quadrature rule based on
+   * the element, element type, and p_level settings of \p other_rule
+   */
+  virtual void init (const QBase & other_rule);
 
   /**
    * Initializes the data structures for an element potentially "cut"
@@ -280,13 +311,8 @@ protected:
    * Initializes the 0D quadrature rule by filling the points and
    * weights vectors with the appropriate values.  Generally this
    * is just one point with weight 1.
-   *
-   * \note The arguments should no longer be used for anything in
-   * derived classes, they are only maintained for backwards
-   * compatibility and will eventually be removed.
    */
-  virtual void init_0D (const ElemType type=INVALID_ELEM,
-                        unsigned int p_level=0);
+  virtual void init_0D ();
 
   /**
    * Initializes the 1D quadrature rule by filling the points and
@@ -294,13 +320,8 @@ protected:
    * the rule will be defined by the implementing class.
    * It is assumed that derived quadrature rules will at least
    * define the init_1D function, therefore it is pure virtual.
-   *
-   * \note The arguments should no longer be used for anything in
-   * derived classes, they are only maintained for backwards
-   * compatibility and will eventually be removed.
    */
-  virtual void init_1D (const ElemType type=INVALID_ELEM,
-                        unsigned int p_level=0) = 0;
+  virtual void init_1D () = 0;
 
   /**
    * Initializes the 2D quadrature rule by filling the points and
@@ -309,13 +330,8 @@ protected:
    * Should not be pure virtual since a derived quadrature rule
    * may only be defined in 1D.  If not overridden, throws an
    * error.
-   *
-   * \note The arguments should no longer be used for anything in
-   * derived classes, they are only maintained for backwards
-   * compatibility and will eventually be removed.
    */
-  virtual void init_2D (const ElemType type=INVALID_ELEM,
-                        unsigned int p_level=0);
+  virtual void init_2D ();
 
   /**
    * Initializes the 3D quadrature rule by filling the points and
@@ -324,13 +340,8 @@ protected:
    * Should not be pure virtual since a derived quadrature rule
    * may only be defined in 1D.  If not overridden, throws an
    * error.
-   *
-   * \note The arguments should no longer be used for anything in
-   * derived classes, they are only maintained for backwards
-   * compatibility and will eventually be removed.
    */
-  virtual void init_3D (const ElemType type=INVALID_ELEM,
-                        unsigned int p_level=0);
+  virtual void init_3D ();
 
   /**
    * Constructs a 2D rule from the tensor product of \p q1D with
@@ -369,6 +380,12 @@ protected:
    * computed.
    */
   ElemType _type;
+
+  /**
+   * The element for which the current values were computed, or
+   * nullptr if values were computed without a specific element.
+   */
+  const Elem * _elem;
 
   /**
    * The p-level of the element for which the current values have

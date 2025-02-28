@@ -23,7 +23,7 @@
 namespace libMesh
 {
 
-void QJacobi::init_1D(const ElemType, unsigned int)
+void QJacobi::init_1D()
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules

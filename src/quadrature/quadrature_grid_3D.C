@@ -25,7 +25,7 @@ namespace libMesh
 {
 
 
-void QGrid::init_3D(const ElemType, unsigned int)
+void QGrid::init_3D()
 {
 #if LIBMESH_DIM == 3
 
@@ -40,7 +40,7 @@ void QGrid::init_3D(const ElemType, unsigned int)
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule.
         QGrid q1D(1,_order);
-        q1D.init(EDGE2);
+        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
 
         tensor_product_hex( q1D );
 
@@ -96,8 +96,8 @@ void QGrid::init_3D(const ElemType, unsigned int)
         QGrid q2D(2,_order);
 
         // Initialize
-        q1D.init(EDGE2);
-        q2D.init(TRI3);
+        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
+        q2D.init(TRI3, _p_level, /*simple_type_only=*/true);
 
         tensor_product_prism(q1D, q2D);
 

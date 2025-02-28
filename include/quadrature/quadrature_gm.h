@@ -129,9 +129,9 @@ private:
    * In 2D, the GM product rule is only defined for Tris.
    * In 3D, the GM product rule is only defined for Tets.
    */
-  virtual void init_1D (const ElemType, unsigned int) override;
-  virtual void init_2D (const ElemType, unsigned int) override;
-  virtual void init_3D (const ElemType, unsigned int) override;
+  virtual void init_1D () override;
+  virtual void init_2D () override;
+  virtual void init_3D () override;
 
   /**
    * This routine is called from init_2D() and init_3D().  It actually

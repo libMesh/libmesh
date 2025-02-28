@@ -41,7 +41,7 @@ std::unique_ptr<QBase> QGrundmann_Moller::clone() const
 }
 
 
-void QGrundmann_Moller::init_1D(const ElemType, unsigned int)
+void QGrundmann_Moller::init_1D()
 {
   QGauss gauss1D(1, get_order());
 

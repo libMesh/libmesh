@@ -78,13 +78,13 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
       if (s > 0)
         {
           current_fe_type.radial_order = fe_type.radial_order;
-          radial_qrule->init(EDGE2, inf_elem->p_level());
+          radial_qrule->init(EDGE2, inf_elem->p_level(), /*simple_type_only=*/true);
         }
       else
         {
           // build a new 0-dimensional quadrature-rule:
           radial_qrule=QBase::build(QGAUSS, 0, fe_type.radial_order);
-          radial_qrule->init(NODEELEM, 0);
+          radial_qrule->init(NODEELEM, 0, /*simple_type_only=*/true);
 
           //the base_qrule is set up with dim-1, but apparently we need dim, so we replace it:
           base_qrule=QBase::build(qrule->type(), side->dim(), qrule->get_order());
@@ -92,7 +92,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
           unsigned int side_p_level = inf_elem->p_level();
           if (inf_elem->neighbor_ptr(s) != nullptr)
             side_p_level = std::max(side_p_level, inf_elem->neighbor_ptr(s)->p_level());
-          base_qrule->init(side->type(), side_p_level);
+          base_qrule->init(*side, side_p_level);
         }
       radial_qrule_initialized = true;
     }
@@ -150,7 +150,7 @@ void InfFE<Dim,T_radial,T_base>::init_face_shape_functions(const std::vector<Poi
     this->update_base_elem(inf_side->interior_parent());
 
   // Initialize the base quadrature rule
-  base_qrule->init(base_elem->type(), inf_side->p_level());
+  base_qrule->init(*base_elem, inf_side->p_level());
 
   // base_fe still corresponds to the (dim-1)-dimensional base of the InfFE object,
   // so update the fe_base.

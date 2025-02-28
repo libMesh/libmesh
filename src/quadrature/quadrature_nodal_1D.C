@@ -26,7 +26,7 @@
 namespace libMesh
 {
 
-void QNodal::init_1D(const ElemType, unsigned int)
+void QNodal::init_1D()
 {
   switch (_type)
     {
@@ -34,7 +34,7 @@ void QNodal::init_1D(const ElemType, unsigned int)
       {
         // Nodal quadrature on an Edge2 is QTrap
         QTrap rule(/*dim=*/1, /*ignored*/_order);
-        rule.init(_type, /*ignored*/_p_level);
+        rule.init(*this);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());
         return;
@@ -43,7 +43,7 @@ void QNodal::init_1D(const ElemType, unsigned int)
       {
         // Nodal quadrature on an Edge3 is QSimpson
         QSimpson rule(/*dim=*/1, /*ignored*/_order);
-        rule.init(_type, /*ignored*/_p_level);
+        rule.init(*this);
         _points.swap (rule.get_points());
         _weights.swap(rule.get_weights());
         return;

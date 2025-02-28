@@ -90,9 +90,9 @@ private:
    * Uses a Gauss rule in 1D.  More efficient rules for non tensor
    * product bases on quadrilaterals and hexahedra.
    */
-  virtual void init_1D (const ElemType, unsigned int) override;
-  virtual void init_2D (const ElemType, unsigned int) override;
-  virtual void init_3D (const ElemType, unsigned int) override;
+  virtual void init_1D () override;
+  virtual void init_2D () override;
+  virtual void init_3D () override;
 
   /**
    * Wissmann published three interesting "partially symmetric" rules

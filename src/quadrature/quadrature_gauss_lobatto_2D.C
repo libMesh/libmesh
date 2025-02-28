@@ -25,7 +25,7 @@
 namespace libMesh
 {
 
-void QGaussLobatto::init_2D(const ElemType, unsigned int)
+void QGaussLobatto::init_2D()
 {
   switch (_type)
     {
@@ -39,7 +39,7 @@ void QGaussLobatto::init_2D(const ElemType, unsigned int)
         // We compute the 2D quadrature rule as a tensor
         // product of the 1D quadrature rule.
         QGaussLobatto q1D(1, _order);
-        q1D.init(EDGE2, _p_level);
+        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
         tensor_product_quad(q1D);
         return;
       }
@@ -53,7 +53,7 @@ void QGaussLobatto::init_2D(const ElemType, unsigned int)
                         "for unsupported Elem type: " << Utility::enum_to_string(_type));
 
         QGauss gauss_rule(_dim, _order);
-        gauss_rule.init(_type, _p_level);
+        gauss_rule.init(*this);
 
         // Swap points and weights with the about-to-be destroyed rule.
         _points.swap (gauss_rule.get_points() );

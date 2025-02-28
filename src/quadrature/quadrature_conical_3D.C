@@ -23,7 +23,7 @@
 namespace libMesh
 {
 
-void QConical::init_3D(const ElemType, unsigned int)
+void QConical::init_3D()
 {
   switch (_type)
     {

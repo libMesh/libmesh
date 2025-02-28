@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-void QSimpson::init_3D(const ElemType, unsigned int)
+void QSimpson::init_3D()
 {
 #if LIBMESH_DIM == 3
 
@@ -41,7 +41,7 @@ void QSimpson::init_3D(const ElemType, unsigned int)
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule.
         QSimpson q1D(1);
-        q1D.init(EDGE2);
+        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
 
         tensor_product_hex( q1D );
 
@@ -125,8 +125,8 @@ void QSimpson::init_3D(const ElemType, unsigned int)
         QSimpson q2D(2);
 
         // Initialize
-        q1D.init(EDGE2);
-        q2D.init(TRI3);
+        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
+        q2D.init(TRI3, _p_level, /*simple_type_only=*/true);
 
         tensor_product_prism(q1D, q2D);
 

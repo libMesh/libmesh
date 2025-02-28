@@ -40,9 +40,10 @@ std::unique_ptr<QBase> QConical::clone() const
   return std::make_unique<QConical>(*this);
 }
 
-void QConical::init_1D(const ElemType, unsigned int)
+void QConical::init_1D()
 {
   QGauss gauss1D(1, get_order());
+  gauss1D.init(*this);
 
   // Swap points and weights with the about-to-be destroyed rule.
   _points.swap(gauss1D.get_points());

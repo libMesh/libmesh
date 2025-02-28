@@ -24,7 +24,7 @@
 namespace libMesh
 {
 
-void QSimpson::init_2D(const ElemType, unsigned int)
+void QSimpson::init_2D()
 {
 #if LIBMESH_DIM > 1
 
@@ -46,7 +46,7 @@ void QSimpson::init_2D(const ElemType, unsigned int)
         // We compute the 2D quadrature rule as a tensor
         // product of the 1D quadrature rule.
         QSimpson q1D(1);
-        q1D.init(EDGE2);
+        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
         tensor_product_quad( q1D );
         return;
       }

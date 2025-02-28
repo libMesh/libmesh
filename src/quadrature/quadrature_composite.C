@@ -78,7 +78,7 @@ void QComposite<QSubCell>::init (const Elem & elem,
   // if we are not cut, revert to simple base class init() method.
   if (!_elem_cutter.is_cut (elem, vertex_distance_func))
     {
-      _q_subcell.init (elem.type(), p_level);
+      _q_subcell.init (elem, p_level);
       _points  = _q_subcell.get_points();
       _weights = _q_subcell.get_weights();
 
