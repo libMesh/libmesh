@@ -295,6 +295,12 @@ void Prism6::build_side_ptr (std::unique_ptr<Elem> & side,
                              const unsigned int i)
 {
   this->side_ptr(side, i);
+  side->set_interior_parent(this);
+  side->subdomain_id() = this->subdomain_id();
+  side->set_mapping_type(this->mapping_type());
+#ifdef LIBMESH_ENABLE_AMR
+  side->set_p_level(this->p_level());
+#endif
 }
 
 

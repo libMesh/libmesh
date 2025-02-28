@@ -808,14 +808,16 @@ public:
   virtual unsigned int n_sub_elem () const = 0;
 
   /**
-   * \returns A proxy element coincident with side \p i.
+   * \returns A temporary/proxy element coincident with side \p i.
    *
-   * \note This method returns the _minimum_ element necessary to
-   * uniquely identify the side.  For example, the side of a
-   * hexahedron is always returned as a 4-noded quadrilateral,
-   * regardless of what type of hex you are dealing with.  If you want
-   * the full-ordered face (i.e. a 9-noded quad face for a 27-noded
-   * hexahedron) use the build_side method.
+   * This method returns the _minimum_ element necessary to uniquely
+   * identify the side.  For example, the side of a hexahedron is
+   * always returned as a 4-noded quadrilateral, regardless of what
+   * type of hex you are dealing with.  Important data like subdomain
+   * id, p level, or mapping type may be omitted from the proxy
+   * element.  If you want a first-class full-ordered face (i.e. a
+   * 9-noded quad face for a 27-noded hexahedron), use the
+   * build_side_ptr method.
    *
    * \note The const version of this function is non-virtual; it
    * simply calls the virtual non-const version and const_casts the
@@ -843,14 +845,20 @@ public:
   void side_ptr (std::unique_ptr<const Elem> & side, const unsigned int i) const;
 
   /**
-   * \returns An element coincident with side \p i wrapped in a smart pointer.
+   * \returns An temporary element coincident with side \p i wrapped
+   * in a smart pointer.
    *
-   * The element returned is full-ordered, in contrast to the side
-   * method.  For example, calling build_side_ptr(0) on a 20-noded hex
-   * will build a 8-noded quadrilateral coincident with face 0 and
-   * pass back the pointer.  A \p std::unique_ptr<Elem> is returned to
-   * prevent a memory leak.  This way the user need not remember to
-   * delete the object.
+   * The element returned is full-ordered and full-featured, in
+   * contrast to the side method.  For example, calling
+   * build_side_ptr(0) on a 20-noded hex in subdomain 5 will build a
+   * 8-noded quadrilateral coincident with face 0, assign it subdomain
+   * id 5, and pass back the pointer.
+   *
+   * The side element's id() is undefined; it is a temporary element
+   * not added to any mesh.
+   *
+   * A \p std::unique_ptr<Elem> is returned to prevent a memory leak.
+   * This way the user need not remember to delete the object.
    *
    * The second argument, which is true by default, specifies that a
    * "proxy" element (of type Side) will be returned.  This option is

@@ -503,6 +503,29 @@ public:
         CPPUNIT_ASSERT_EQUAL(elem->build_side_ptr(s)->type(), elem->side_type(s));
   }
 
+  void test_side_subdomain()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
+      {
+        std::unique_ptr<const Elem> side;
+
+        for (const auto s : elem->side_index_range())
+          {
+            CPPUNIT_ASSERT_EQUAL(elem->build_side_ptr(s)->subdomain_id(), elem->subdomain_id());
+
+            elem->build_side_ptr(side, s);
+            CPPUNIT_ASSERT_EQUAL(side->subdomain_id(), elem->subdomain_id());
+
+            // We don't require that the "lightweight" side_ptr work
+            // the same way
+            // CPPUNIT_ASSERT_EQUAL(elem->side_ptr(s)->subdomain_id(), elem->subdomain_id());
+          }
+      }
+  }
+
   void test_elem_side_builder()
   {
     LOG_UNIT_TEST;
@@ -794,6 +817,7 @@ public:
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
+  CPPUNIT_TEST( test_side_subdomain );          \
   CPPUNIT_TEST( test_elem_side_builder );       \
   CPPUNIT_TEST( test_refinement );              \
   CPPUNIT_TEST( test_double_refinement );       \
