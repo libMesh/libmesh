@@ -105,7 +105,7 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
   else
     {
       // initialize quadrature rule
-      this->qrule->init(side->type(), elem->p_level());
+      this->qrule->init(*side, elem->p_level());
 
       {
         // Set the element type
