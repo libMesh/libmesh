@@ -78,6 +78,12 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
   // Build the side of interest
   const std::unique_ptr<const Elem> side(elem->build_side_ptr(s));
 
+  // Find the max p_level to select
+  // the right quadrature rule for side integration
+  unsigned int side_p_level = elem->p_level();
+  if (elem->neighbor_ptr(s) != nullptr)
+    side_p_level = std::max(side_p_level, elem->neighbor_ptr(s)->p_level());
+
   // Initialize the shape functions at the user-specified
   // points
   if (pts != nullptr)
@@ -105,7 +111,7 @@ void FEXYZ<Dim>::reinit(const Elem * elem,
   else
     {
       // initialize quadrature rule
-      this->qrule->init(*side, elem->p_level());
+      this->qrule->init(*side, side_p_level);
 
       {
         // Set the element type
