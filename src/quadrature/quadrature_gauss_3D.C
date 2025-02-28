@@ -42,8 +42,13 @@ void QGauss::init_3D()
       {
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule.
-        QGauss q1D(1, _order);
-        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
+        //
+        // Rather than construct a 1D quadrature rule (which inits it)
+        // and then reinit it with a potentially-elevated p-level, we
+        // add twice that p-level (as is our standard behavior,
+        // sensible for typical inner product integrals) to the order
+        // to get the desired p-elevated order.
+        QGauss q1D(1, _order + 2*_p_level);
         tensor_product_hex( q1D );
         return;
       }
@@ -512,11 +517,15 @@ void QGauss::init_3D()
         // product of the 1D quadrature rule and a 2D
         // triangle quadrature rule
 
-        QGauss q1D(1,_order);
+        // Rather than construct a 1D quadrature rule (which inits it)
+        // and then reinit it with a potentially-elevated p-level, we
+        // add twice that p-level (as is our standard behavior,
+        // sensible for typical inner product integrals) to the order
+        // to get the desired p-elevated order.
+        QGauss q1D(1,_order + 2*_p_level);
         QGauss q2D(2,_order);
 
-        // Initialize
-        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
+        // Initialize the 2D rule (1D is pre-initialized)
         q2D.init(TRI3, _p_level, /*simple_type_only=*/true);
 
         tensor_product_prism(q1D, q2D);

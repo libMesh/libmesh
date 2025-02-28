@@ -78,7 +78,7 @@ void InfFE<Dim,T_radial,T_base>::reinit(const Elem * inf_elem,
       if (s > 0)
         {
           current_fe_type.radial_order = fe_type.radial_order;
-          radial_qrule->init(EDGE2, inf_elem->p_level(), /*simple_type_only=*/true);
+          radial_qrule->init(EDGE2, inf_elem->p_level());
         }
       else
         {
