@@ -117,8 +117,11 @@ void QBase::init(const ElemType t,
                  unsigned int p,
                  bool simple_type_only)
 {
-  // This API is thus dangerous to use on general meshes
-  if (!simple_type_only)
+  // This API is dangerous to use on general meshes, which may include
+  // element types where the desired quadrature depends on the
+  // physical element, but we still want to be able to initialize
+  // based on only a type for certain simple cases
+  if (t != EDGE2 && !simple_type_only)
     libmesh_deprecated();
 
   // check to see if we have already
