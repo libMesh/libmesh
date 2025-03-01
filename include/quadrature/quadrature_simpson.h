@@ -53,7 +53,7 @@ public:
             Order order=THIRD) :
     QBase(dim, order)
   {
-    if (_dim == 1)
+    if (dim == 1)
       init(EDGE2);
   }
 

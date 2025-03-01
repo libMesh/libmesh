@@ -54,7 +54,10 @@ public:
   QGrid (unsigned int dim,
          Order order=INVALID_ORDER) :
     QBase(dim, order)
-  {}
+  {
+    if (dim == 1)
+      init(EDGE2);
+  }
 
   /**
    * Copy/move ctor, copy/move assignment operator, and destructor are

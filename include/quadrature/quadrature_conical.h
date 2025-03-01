@@ -50,7 +50,10 @@ public:
   QConical (unsigned int d,
             Order o=INVALID_ORDER) :
     QBase(d,o)
-  {}
+  {
+    if (d == 1)
+      init(EDGE2);
+  }
 
   /**
    * Copy/move ctor, copy/move assignment operator, and destructor are
