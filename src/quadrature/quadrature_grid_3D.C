@@ -39,8 +39,11 @@ void QGrid::init_3D()
       {
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule.
+        //
+        // We ignore p_level in QGrid, since the "order" here is a
+        // user-requested number of grid points, nothing to do with
+        // the order of exactly-integrated polynomial spaces
         QGrid q1D(1,_order);
-        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
 
         tensor_product_hex( q1D );
 
@@ -91,13 +94,15 @@ void QGrid::init_3D()
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule and a 2D
         // triangle quadrature rule
-
+        //
+        // We ignore p_level in QGrid, since the "order" here is a
+        // user-requested number of grid points, nothing to do with
+        // the order of exactly-integrated polynomial spaces
         QGrid q1D(1,_order);
         QGrid q2D(2,_order);
 
-        // Initialize
-        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
-        q2D.init(TRI3, _p_level, /*simple_type_only=*/true);
+        // Initialize the 2D rule (1D is pre-initialized)
+        q2D.init(TRI3, 0, /*simple_type_only=*/true);
 
         tensor_product_prism(q1D, q2D);
 

@@ -38,8 +38,13 @@ void QGaussLobatto::init_2D()
       {
         // We compute the 2D quadrature rule as a tensor
         // product of the 1D quadrature rule.
-        QGaussLobatto q1D(1, _order);
-        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
+        //
+        // Rather than construct a 1D quadrature rule (which inits it)
+        // and then reinit it with a potentially-elevated p-level, we
+        // add twice that p-level (as is our standard behavior,
+        // sensible for typical inner product integrals) to the order
+        // to get the desired p-elevated order.
+        QGaussLobatto q1D(1, _order + 2*_p_level);
         tensor_product_quad(q1D);
         return;
       }

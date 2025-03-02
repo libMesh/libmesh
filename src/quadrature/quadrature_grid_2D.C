@@ -43,8 +43,11 @@ void QGrid::init_2D()
       {
         // We compute the 2D quadrature rule as a tensor
         // product of the 1D quadrature rule.
+        //
+        // We ignore p_level in QGrid, since the "order" here is a
+        // user-requested number of grid points, nothing to do with
+        // the order of exactly-integrated polynomial spaces
         QGrid q1D(1, _order);
-        q1D.init(EDGE2, _p_level, /*simple_type_only=*/true);
         tensor_product_quad( q1D );
         return;
       }
