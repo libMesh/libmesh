@@ -36,12 +36,12 @@ namespace libMesh
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
                                                  const FEType & fe_t,
                                                  const ElemType t)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   switch (dim)
     {
@@ -66,6 +66,7 @@ unsigned int FEInterface::ifem_n_shape_functions(const unsigned int dim,
       libmesh_error_msg("Unsupported dim = " << dim);
     }
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -98,6 +99,7 @@ unsigned int FEInterface::ifem_n_shape_functions(const FEType & fe_t,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
                                       const FEType & fe_t,
                                       const ElemType t)
@@ -127,6 +129,7 @@ unsigned int FEInterface::ifem_n_dofs(const unsigned int dim,
       libmesh_error_msg("Unsupported dim = " << dim);
     }
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -160,13 +163,13 @@ FEInterface::ifem_n_dofs(const FEType & fe_t,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
                                               const FEType & fe_t,
                                               const ElemType t,
                                               const unsigned int n)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   switch (dim)
     {
@@ -191,6 +194,7 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const unsigned int dim,
       libmesh_error_msg("Unsupported dim = " << dim);
     }
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -226,12 +230,12 @@ unsigned int FEInterface::ifem_n_dofs_at_node(const FEType & fe_t,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
                                                const FEType & fe_t,
                                                const ElemType t)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   switch (dim)
     {
@@ -256,6 +260,7 @@ unsigned int FEInterface::ifem_n_dofs_per_elem(const unsigned int dim,
       libmesh_error_msg("Unsupported dim = " << dim);
     }
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -724,7 +729,7 @@ void FEInterface::ifem_inverse_map (const unsigned int dim,
 
 
 
-
+#ifdef LIBMESH_ENABLE_DEPRECATED
 bool FEInterface::ifem_on_reference_element(const Point & p,
                                             const ElemType t,
                                             const Real eps)
@@ -740,12 +745,10 @@ Real FEInterface::ifem_shape(const unsigned int dim,
                              const unsigned int i,
                              const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   inf_fe_switch(shape(fe_t, t, i, p));
 }
-
 
 
 
@@ -755,11 +758,13 @@ Real FEInterface::ifem_shape(const unsigned int dim,
                              const unsigned int i,
                              const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   inf_fe_switch( shape(fe_t, elem, i, p));
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+
 
 Real FEInterface::ifem_shape(const FEType & fe_t,
                              const Elem * elem,
@@ -772,6 +777,9 @@ Real FEInterface::ifem_shape(const FEType & fe_t,
   inf_fe_switch( shape(fe_t, elem, i, p));
 }
 
+
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
 Real FEInterface::ifem_shape_deriv (const unsigned int dim,
                                     const FEType & fe_t,
                                     const Elem * elem,
@@ -779,11 +787,11 @@ Real FEInterface::ifem_shape_deriv (const unsigned int dim,
                                     const unsigned int j,
                                     const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   inf_fe_switch(shape_deriv(fe_t, elem, i, j, p));
 }
+
 
 
 Real FEInterface::ifem_shape_deriv(const unsigned int dim,
@@ -793,11 +801,11 @@ Real FEInterface::ifem_shape_deriv(const unsigned int dim,
                                    const unsigned int j,
                                    const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   inf_fe_switch(shape_deriv(fe_t, t, i, j, p));
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

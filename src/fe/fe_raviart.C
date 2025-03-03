@@ -92,6 +92,7 @@ void raviart_thomas_nodal_soln(const Elem * elem,
 } // raviart_thomas_nodal_soln
 
 
+
 unsigned int raviart_thomas_n_dofs(const ElemType t, const Order o)
 {
   libmesh_assert_greater (o, 0);
@@ -113,6 +114,15 @@ unsigned int raviart_thomas_n_dofs(const ElemType t, const Order o)
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for RAVIART_THOMAS FE family!");
     }
 }
+
+
+
+unsigned int raviart_thomas_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return raviart_thomas_n_dofs(e->type(), o);
+}
+
 
 
 unsigned int raviart_thomas_n_dofs_at_node(const ElemType t,
@@ -234,6 +244,16 @@ unsigned int raviart_thomas_n_dofs_at_node(const ElemType t,
 }
 
 
+
+unsigned int raviart_thomas_n_dofs_at_node(const Elem & e,
+                                           const Order o,
+                                           const unsigned int n)
+{
+  return raviart_thomas_n_dofs_at_node(e.type(), o, n);
+}
+
+
+
 unsigned int raviart_thomas_n_dofs_per_elem(const ElemType t,
                                             const Order o)
 {
@@ -255,6 +275,14 @@ unsigned int raviart_thomas_n_dofs_per_elem(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for RAVIART_THOMAS FE family!");
     }
+}
+
+
+
+unsigned int raviart_thomas_n_dofs_per_elem(const Elem & e,
+                                            const Order o)
+{
+  return raviart_thomas_n_dofs_per_elem(e.type(), o);
 }
 
 
@@ -358,30 +386,62 @@ template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs(const ElemType, const Orde
 template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
 template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
+
+template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs(const Elem *, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs(const Elem *, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs(const Elem * e, const Order o) { return raviart_thomas_n_dofs(e, o); }
+template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs(const Elem * e, const Order o) { return raviart_thomas_n_dofs(e, o); }
+
 template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
 template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs(const ElemType t, const Order o) { return raviart_thomas_n_dofs(t, o); }
 
+template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs(const Elem *, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs(const Elem *, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs(const Elem * e, const Order o) { return raviart_thomas_n_dofs(e, o); }
+template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs(const Elem * e, const Order o) { return raviart_thomas_n_dofs(e, o); }
+
 template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return raviart_thomas_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return raviart_thomas_n_dofs_at_node(t, o, n); }
+
+template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return raviart_thomas_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return raviart_thomas_n_dofs_at_node(e, o, n); }
+
 template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+
+template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
 
 template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType t, const Order o) { return raviart_thomas_n_dofs_per_elem(t, o); }
 template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs_per_elem(const ElemType t, const Order o) { return raviart_thomas_n_dofs_per_elem(t, o); }
 
+template <> unsigned int FE<0,RAVIART_THOMAS>::n_dofs_per_elem(const Elem &, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,RAVIART_THOMAS>::n_dofs_per_elem(const Elem &, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,RAVIART_THOMAS>::n_dofs_per_elem(const Elem & e, const Order o) { return raviart_thomas_n_dofs_per_elem(e, o); }
+template <> unsigned int FE<3,RAVIART_THOMAS>::n_dofs_per_elem(const Elem & e, const Order o) { return raviart_thomas_n_dofs_per_elem(e, o); }
+
 // L2 Raviart-Thomas elements have all their dofs per element
 template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs_per_elem(const ElemType, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs_per_elem(const ElemType t, const Order o) { return n_dofs(t, o); }
 template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs_per_elem(const ElemType t, const Order o) { return n_dofs(t, o); }
+
+template <> unsigned int FE<0,L2_RAVIART_THOMAS>::n_dofs_per_elem(const Elem &, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,L2_RAVIART_THOMAS>::n_dofs_per_elem(const Elem &, const Order) { RAVIART_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,L2_RAVIART_THOMAS>::n_dofs_per_elem(const Elem & e, const Order o) { return n_dofs(&e, o); }
+template <> unsigned int FE<3,L2_RAVIART_THOMAS>::n_dofs_per_elem(const Elem & e, const Order o) { return n_dofs(&e, o); }
 
 // Raviart-Thomas FEMs are always normally continuous
 template <> FEContinuity FE<0,RAVIART_THOMAS>::get_continuity() const { RAVIART_LOW_D_ERROR_MESSAGE }

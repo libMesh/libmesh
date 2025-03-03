@@ -175,4 +175,11 @@ Edge::is_flipped() const
 }
 
 
+
+bool Edge::on_reference_element(const Point & p,
+                                const Real eps) const
+{
+  return ((p(0) >= -1-eps) && (p(0) <= 1+eps));
+}
+
 } // namespace libMesh

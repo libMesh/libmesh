@@ -268,12 +268,12 @@ FEInterface::is_InfFE_elem(const ElemType et)
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int FEInterface::n_shape_functions(const unsigned int dim,
                                             const FEType & fe_t,
                                             const ElemType t)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   /*
@@ -291,6 +291,7 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
 
   fe_with_vec_switch(n_shape_functions(t, o));
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -317,7 +318,7 @@ FEInterface::n_shape_functions(const FEType & fe_t,
   // Account for Elem::p_level() when computing total_order
   auto total_order = fe_t.order + add_p_level*elem->p_level();
 
-  fe_with_vec_switch(n_shape_functions(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs(elem, total_order));
 }
 
 
@@ -345,11 +346,12 @@ FEInterface::n_shape_functions(const FEType & fe_t,
   // Ignore Elem::p_level() and instead use extra_order to compute total_order.
   auto total_order = fe_t.order + extra_order;
 
-  fe_with_vec_switch(n_shape_functions(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs(elem, total_order));
 }
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int FEInterface::n_dofs(const unsigned int dim,
                                  const FEType & fe_t,
                                  const ElemType t)
@@ -378,10 +380,9 @@ FEInterface::n_dofs (const unsigned int dim,
 {
   libmesh_deprecated();
 
-  FEType p_refined_fe_t = fe_t;
-  p_refined_fe_t.order = p_refined_fe_t.order + elem->p_level();
-  return FEInterface::n_dofs(dim, p_refined_fe_t, elem->type());
+  fe_with_vec_switch(n_dofs(elem, fe_t.order + elem->p_level()));
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -402,9 +403,7 @@ FEInterface::n_dofs(const FEType & fe_t,
 #endif
 
   // Account for Elem::p_level() when computing total_order
-  auto total_order = fe_t.order + add_p_level*elem->p_level();
-
-  fe_with_vec_switch(n_dofs(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs(elem, fe_t.order + add_p_level*elem->p_level()));
 }
 
 
@@ -428,18 +427,18 @@ FEInterface::n_dofs(const FEType & fe_t,
   // Elem::p_level() is ignored, extra_order is used instead.
   auto total_order = fe_t.order + extra_order;
 
-  fe_with_vec_switch(n_dofs(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs(elem, total_order));
 }
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int FEInterface::n_dofs_at_node(const unsigned int dim,
                                          const FEType & fe_t,
                                          const ElemType t,
                                          const unsigned int n)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -463,6 +462,7 @@ FEInterface::n_dofs_at_node_function(const unsigned int dim,
 
   fe_with_vec_switch(n_dofs_at_node);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -497,7 +497,7 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
   // Account for Elem::p_level() when computing total_order
   auto total_order = fe_t.order + add_p_level*elem->p_level();
 
-  fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
+  fe_with_vec_switch(n_dofs_at_node(*elem, total_order, n));
 }
 
 
@@ -521,17 +521,17 @@ FEInterface::n_dofs_at_node(const FEType & fe_t,
   // Ignore Elem::p_level() and instead use extra_order to compute total_order.
   auto total_order = fe_t.order + extra_order;
 
-  fe_with_vec_switch(n_dofs_at_node(elem->type(), total_order, n));
+  fe_with_vec_switch(n_dofs_at_node(*elem, total_order, n));
 }
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
                                           const FEType & fe_t,
                                           const ElemType t)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -544,6 +544,7 @@ unsigned int FEInterface::n_dofs_per_elem(const unsigned int dim,
 
   fe_with_vec_switch(n_dofs_per_elem(t, o));
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -565,7 +566,7 @@ FEInterface::n_dofs_per_elem(const FEType & fe_t,
   // Account for Elem::p_level() when computing total_order
   auto total_order = fe_t.order + add_p_level*elem->p_level();
 
-  fe_with_vec_switch(n_dofs_per_elem(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs_per_elem(*elem, total_order));
 }
 
 
@@ -588,7 +589,7 @@ FEInterface::n_dofs_per_elem(const FEType & fe_t,
   // Ignore Elem::p_level() and instead use extra_order to compute total_order.
   auto total_order = fe_t.order + extra_order;
 
-  fe_with_vec_switch(n_dofs_per_elem(elem->type(), total_order));
+  fe_with_vec_switch(n_dofs_per_elem(*elem, total_order));
 }
 
 
@@ -671,19 +672,19 @@ void FEInterface::side_nodal_soln(const FEType & fe_t,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 Point FEInterface::map(unsigned int dim,
                        const FEType & fe_t,
                        const Elem * elem,
                        const Point & p)
 {
+  libmesh_deprecated();
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(elem->type()))
     return ifem_map(dim, fe_t, elem, p);
 #endif
   fe_with_vec_switch(map(elem, p));
 }
-
-
 
 
 
@@ -694,6 +695,7 @@ Point FEInterface::inverse_map (const unsigned int dim,
                                 const Real tolerance,
                                 const bool secure)
 {
+  libmesh_deprecated();
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   if (is_InfFE_elem(elem->type()))
@@ -706,7 +708,6 @@ Point FEInterface::inverse_map (const unsigned int dim,
 
 
 
-
 void FEInterface::inverse_map (const unsigned int dim,
                                const FEType & fe_t,
                                const Elem * elem,
@@ -715,6 +716,8 @@ void FEInterface::inverse_map (const unsigned int dim,
                                const Real tolerance,
                                const bool secure)
 {
+  libmesh_deprecated();
+
   const std::size_t n_pts = physical_points.size();
 
   // Resize the vector
@@ -753,15 +756,13 @@ bool FEInterface::on_reference_element(const Point & p,
 
 
 
-
 Real FEInterface::shape(const unsigned int dim,
                         const FEType & fe_t,
                         const ElemType t,
                         const unsigned int i,
                         const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -781,8 +782,7 @@ Real FEInterface::shape(const unsigned int dim,
                         const unsigned int i,
                         const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -795,6 +795,7 @@ Real FEInterface::shape(const unsigned int dim,
 
   fe_switch(shape(elem,o,i,p));
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -856,6 +857,7 @@ FEInterface::shape(const FEType & fe_t,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template<>
 void FEInterface::shape<Real>(const unsigned int dim,
                               const FEType & fe_t,
@@ -864,8 +866,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
                               const Point & p,
                               Real & phi)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -900,6 +901,8 @@ void FEInterface::shape<Real>(const unsigned int dim,
   return;
 }
 
+
+
 template<>
 void FEInterface::shape<Real>(const unsigned int dim,
                               const FEType & fe_t,
@@ -908,8 +911,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
                               const Point & p,
                               Real & phi)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
@@ -942,6 +944,7 @@ void FEInterface::shape<Real>(const unsigned int dim,
 
   return;
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -1127,8 +1130,7 @@ void FEInterface::all_shapes<Real>(const unsigned int dim,
 
 
 
-
-
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const FEType & fe_t,
@@ -1137,8 +1139,7 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const Point & p,
                                       RealGradient & phi)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   // This API does not currently support infinite elements.
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1167,6 +1168,7 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
       libmesh_error_msg("Invalid dimension = " << dim);
     }
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -1337,13 +1339,13 @@ void FEInterface::all_shapes<RealGradient>(const unsigned int dim,
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 FEInterface::shape_ptr
 FEInterface::shape_function(const unsigned int dim,
                             const FEType & fe_t,
                             const ElemType libmesh_inf_var(t))
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
@@ -1353,6 +1355,7 @@ FEInterface::shape_function(const unsigned int dim,
 #endif
   fe_switch(shape);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -1371,6 +1374,8 @@ FEInterface::shape_function(const FEType & fe_t,
 }
 
 
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
 Real FEInterface::shape_deriv(const unsigned int dim,
                               const FEType & fe_t,
                               const ElemType t,
@@ -1378,8 +1383,7 @@ Real FEInterface::shape_deriv(const unsigned int dim,
                               const unsigned int j,
                               const Point & p)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_greater (dim,j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1403,8 +1407,7 @@ Real FEInterface::shape_deriv(const unsigned int dim,
                               const unsigned int j,
                               const Point & p)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_greater (dim,j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1432,6 +1435,7 @@ Real FEInterface::shape_deriv(const unsigned int dim,
     }
   return 0;
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -1621,13 +1625,13 @@ void FEInterface::shape_derivs<RealGradient>(const FEType & fe_t,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 FEInterface::shape_deriv_ptr
 FEInterface::shape_deriv_function(const unsigned int dim,
                                   const FEType & fe_t,
                                   const ElemType libmesh_inf_var(t))
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
@@ -1637,6 +1641,7 @@ FEInterface::shape_deriv_function(const unsigned int dim,
 #endif
   fe_switch(shape_deriv);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -1658,6 +1663,7 @@ FEInterface::shape_deriv_function(const FEType & fe_t,
 
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+#ifdef LIBMESH_ENABLE_DEPRECATED
 Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const FEType & fe_t,
                                      const ElemType t,
@@ -1665,8 +1671,7 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const unsigned int j,
                                      const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_greater_equal (dim*(dim-1),j);
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -1700,8 +1705,7 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
                                      const unsigned int j,
                                      const Point & p)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_greater_equal (dim*(dim-1),j);
 
@@ -1725,6 +1729,7 @@ Real FEInterface::shape_second_deriv(const unsigned int dim,
     }
   return 0;
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -1806,13 +1811,13 @@ Real FEInterface::shape_second_deriv(const FEType & fe_t,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 FEInterface::shape_second_deriv_ptr
 FEInterface::shape_second_deriv_function(const unsigned int dim,
                                          const FEType & fe_t,
                                          const ElemType libmesh_inf_var(t))
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
   if (is_InfFE_elem(t))
@@ -1820,6 +1825,7 @@ FEInterface::shape_second_deriv_function(const unsigned int dim,
 #endif
   fe_switch(shape_second_deriv);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -1839,6 +1845,7 @@ FEInterface::shape_second_deriv_function(const FEType & fe_t,
 #endif //LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template<>
 void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const FEType & fe_t,
@@ -1847,8 +1854,7 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
                                       const Point & p,
                                       RealGradient & phi)
 {
-  // TODO
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   // This is actually an issue for infinite elements: They require type 'Gradient'!
   if (elem->infinite())
@@ -1876,6 +1882,8 @@ void FEInterface::shape<RealGradient>(const unsigned int dim,
 
   return;
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
+
 
 void FEInterface::compute_data(const unsigned int dim,
                                const FEType & fe_t,
@@ -1938,11 +1946,11 @@ void FEInterface::compute_data(const unsigned int dim,
       // shape_deriv() functions since they have access to the elem
       // pointer. Note that we are already using the n_dof value
       // appropriate to the elevated p-level.
-      data.shape[n] = shape(dim, fe_t, elem, n, p);
+      data.shape[n] = shape(fe_t, elem, n, p);
       if (data.need_derivative())
         {
           for (unsigned int j=0; j<dim; j++)
-            data.dshape[n](j) = shape_deriv(dim, fe_t, elem, n, j, p);
+            data.dshape[n](j) = shape_deriv(fe_t, elem, n, j, p);
         }
     }
 }

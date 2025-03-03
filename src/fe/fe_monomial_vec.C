@@ -659,80 +659,35 @@ FE<3, MONOMIAL_VEC>::shape_second_deriv(const Elem * elem,
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this function.
 // This could be macro-ified.
-template <>
-unsigned int
-FE<0, MONOMIAL_VEC>::n_dofs(const ElemType t, const Order o)
-{
-  return FE<0, MONOMIAL>::n_dofs(t, o);
-}
-template <>
-unsigned int
-FE<1, MONOMIAL_VEC>::n_dofs(const ElemType t, const Order o)
-{
-  return FE<1, MONOMIAL>::n_dofs(t, o);
-}
-template <>
-unsigned int
-FE<2, MONOMIAL_VEC>::n_dofs(const ElemType t, const Order o)
-{
-  return 2 * FE<2, MONOMIAL>::n_dofs(t, o);
-}
-template <>
-unsigned int
-FE<3, MONOMIAL_VEC>::n_dofs(const ElemType t, const Order o)
-{
-  return 3 * FE<3, MONOMIAL>::n_dofs(t, o);
-}
+template <> unsigned int FE<0, MONOMIAL_VEC>::n_dofs(const ElemType t, const Order o) { return FE<0, MONOMIAL>::n_dofs(t, o); }
+template <> unsigned int FE<1, MONOMIAL_VEC>::n_dofs(const ElemType t, const Order o) { return FE<1, MONOMIAL>::n_dofs(t, o); }
+template <> unsigned int FE<2, MONOMIAL_VEC>::n_dofs(const ElemType t, const Order o) { return 2 * FE<2, MONOMIAL>::n_dofs(t, o); }
+template <> unsigned int FE<3, MONOMIAL_VEC>::n_dofs(const ElemType t, const Order o) { return 3 * FE<3, MONOMIAL>::n_dofs(t, o); }
 
-template <>
-unsigned int
-FE<0, MONOMIAL_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int)
-{
-  return 0;
-}
-template <>
-unsigned int
-FE<1, MONOMIAL_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int)
-{
-  return 0;
-}
-template <>
-unsigned int
-FE<2, MONOMIAL_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int)
-{
-  return 0;
-}
-template <>
-unsigned int
-FE<3, MONOMIAL_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int)
-{
-  return 0;
-}
+template <> unsigned int FE<0, MONOMIAL_VEC>::n_dofs(const Elem * e, const Order o) { return FE<0, MONOMIAL>::n_dofs(e, o); }
+template <> unsigned int FE<1, MONOMIAL_VEC>::n_dofs(const Elem * e, const Order o) { return FE<1, MONOMIAL>::n_dofs(e, o); }
+template <> unsigned int FE<2, MONOMIAL_VEC>::n_dofs(const Elem * e, const Order o) { return 2 * FE<2, MONOMIAL>::n_dofs(e, o); }
+template <> unsigned int FE<3, MONOMIAL_VEC>::n_dofs(const Elem * e, const Order o) { return 3 * FE<3, MONOMIAL>::n_dofs(e, o); }
 
-template <>
-unsigned int
-FE<0, MONOMIAL_VEC>::n_dofs_per_elem(const ElemType t, const Order o)
-{
-  return FE<0, MONOMIAL>::n_dofs_per_elem(t, o);
-}
-template <>
-unsigned int
-FE<1, MONOMIAL_VEC>::n_dofs_per_elem(const ElemType t, const Order o)
-{
-  return FE<1, MONOMIAL>::n_dofs_per_elem(t, o);
-}
-template <>
-unsigned int
-FE<2, MONOMIAL_VEC>::n_dofs_per_elem(const ElemType t, const Order o)
-{
-  return 2 * FE<2, MONOMIAL>::n_dofs_per_elem(t, o);
-}
-template <>
-unsigned int
-FE<3, MONOMIAL_VEC>::n_dofs_per_elem(const ElemType t, const Order o)
-{
-  return 3 * FE<3, MONOMIAL>::n_dofs_per_elem(t, o);
-}
+template <> unsigned int FE<0, MONOMIAL_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<1, MONOMIAL_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<2, MONOMIAL_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3, MONOMIAL_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
+
+template <> unsigned int FE<0, MONOMIAL_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<1, MONOMIAL_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<2, MONOMIAL_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3, MONOMIAL_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+
+template <> unsigned int FE<0, MONOMIAL_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<0, MONOMIAL>::n_dofs_per_elem(t, o); }
+template <> unsigned int FE<1, MONOMIAL_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<1, MONOMIAL>::n_dofs_per_elem(t, o); }
+template <> unsigned int FE<2, MONOMIAL_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return 2 * FE<2, MONOMIAL>::n_dofs_per_elem(t, o); }
+template <> unsigned int FE<3, MONOMIAL_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return 3 * FE<3, MONOMIAL>::n_dofs_per_elem(t, o); }
+
+template <> unsigned int FE<0, MONOMIAL_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<0, MONOMIAL>::n_dofs_per_elem(e, o); }
+template <> unsigned int FE<1, MONOMIAL_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<1, MONOMIAL>::n_dofs_per_elem(e, o); }
+template <> unsigned int FE<2, MONOMIAL_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return 2 * FE<2, MONOMIAL>::n_dofs_per_elem(e, o); }
+template <> unsigned int FE<3, MONOMIAL_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return 3 * FE<3, MONOMIAL>::n_dofs_per_elem(e, o); }
 
 // Monomial FEMs are always C^0 continuous
 template <>

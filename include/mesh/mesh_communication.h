@@ -282,11 +282,13 @@ void connect_children(const MeshBase & mesh,
 // constraint rows, insert elements with the constraining nodes for
 // any constrained nodes in our set.
 //
-// This method is now deprecated, because it does not handle recursive
-// dependencies.  Use the new connect_element_dependencies method
-// instead.
+// \deprecated This method is now deprecated, because it does not
+// handle recursive dependencies.  Use the new
+// connect_element_dependencies method instead.
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void connect_families(connected_elem_set_type & connected_elements,
                       const MeshBase * mesh = nullptr);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 // Take a set of elements and create a set of connected nodes.
 void reconnect_nodes (connected_elem_set_type & connected_elements,

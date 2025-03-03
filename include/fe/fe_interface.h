@@ -78,21 +78,21 @@ public:
    */
   virtual ~FEInterface() = default;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
-   * \returns The number of shape functions associated with this
-   * finite element of type \p fe_t.
-   * Automatically decides which finite element class to use.
-   *
-   * On a p-refined element, \p fe_t.order should be the total order of the element.
-   *
    * \deprecated Call the version of this function taking an Elem* instead.
    */
   static unsigned int n_shape_functions(const unsigned int dim,
                                         const FEType & fe_t,
                                         const ElemType t);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
-   * Non-deprecated version of function above.
+   * \returns The number of shape functions associated with this
+   * finite element \p elem of type \p fe_t.
+   * Automatically decides which finite element class to use.
+   *
+   * On a p-refined element, \p fe_t.order should be the total order of the element.
    */
   static unsigned int n_shape_functions(const FEType & fe_t,
                                         const Elem * elem,
@@ -106,13 +106,8 @@ public:
                                         const int extra_order,
                                         const Elem * elem);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
-   * \returns The number of shape functions associated with this
-   * finite element.
-   * Automatically decides which finite element class to use.
-   *
-   * On a p-refined element, \p fe_t.order should be the total order of the element.
-   *
    * \deprecated Use n_dofs(const FEType &, Elem*) or n_dofs(const FEType &, int, Elem*) instead.
    */
   static unsigned int n_dofs(const unsigned int dim,
@@ -131,6 +126,7 @@ public:
   static unsigned int n_dofs(const unsigned int dim,
                              const FEType & fe_t,
                              const Elem * elem);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * \returns The number of DOFs for \p elem for finite element type \p fe_t
@@ -152,6 +148,11 @@ public:
                              int extra_order,
                              const Elem * elem);
 
+  typedef unsigned int (*n_dofs_at_node_ptr) (const ElemType,
+                                              const Order,
+                                              const unsigned int);
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \returns The number of dofs at node n for a finite element
    * of type \p fe_t.
@@ -168,14 +169,7 @@ public:
                                      const ElemType t,
                                      const unsigned int n);
 
-  typedef unsigned int (*n_dofs_at_node_ptr) (const ElemType,
-                                              const Order,
-                                              const unsigned int);
-
   /**
-   * \returns A function which evaluates n_dofs_at_node for the
-   * requested FE type and dimension.
-   *
    * \deprecated Use the version of this function that takes an Elem*
    * for consistency. The behavior is otherwise exactly the same,
    * since this function does not depend on the Elem::p_level().
@@ -183,9 +177,11 @@ public:
   static n_dofs_at_node_ptr
   n_dofs_at_node_function(const unsigned int dim,
                           const FEType & fe_t);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
-   * Non-deprecated version of function above.
+   * \returns A function which evaluates n_dofs_at_node for the
+   * requested FE type and element.
    */
   static n_dofs_at_node_ptr
   n_dofs_at_node_function(const FEType & fe_t,
@@ -211,21 +207,21 @@ public:
                                      const Elem * elem,
                                      const unsigned int n);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  /**
+   * \deprecated Call the version of this function that takes an Elem* instead.
+   */
+  static unsigned int n_dofs_per_elem(const unsigned int dim,
+                                      const FEType & fe_t,
+                                      const ElemType t);
+#endif // LIBMESH_ENABLE_DEPRECATED
+
   /**
    * \returns The number of dofs interior to the element,
    * not associated with any interior nodes.
    * Automatically decides which finite element class to use.
    *
    * On a p-refined element, \p fe_t.order should be the total order of the element.
-   *
-   * \deprecated Call the version of this function that takes an Elem* instead.
-   */
-  static unsigned int n_dofs_per_elem(const unsigned int dim,
-                                      const FEType & fe_t,
-                                      const ElemType t);
-
-  /**
-   * The non-deprecated version of the function above.
    */
   static unsigned int n_dofs_per_elem(const FEType & fe_t,
                                       const Elem * elem,
@@ -311,6 +307,7 @@ public:
                               std::vector<Number> & nodal_soln,
                               const bool add_p_level = true);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * This is now deprecated; use FEMap::map instead.
    */
@@ -347,10 +344,16 @@ public:
    * Since we are doing floating point comparisons, the parameter
    * \p eps can be specified to indicate a tolerance.  For example,
    * \f$ \xi \le 1 \f$ becomes \f$ \xi \le 1 + \epsilon \f$.
+   *
+   * \deprecated This method overload does not support all finite
+   * element types; e.g. the reference element for an arbitrary
+   * polygon or polyhedron type may differ from element to element.
+   * Use \p Elem::on_reference_element() instead.
    */
   static bool on_reference_element(const Point & p,
                                    const ElemType t,
                                    const Real eps=TOLERANCE);
+
   /**
    * \returns The value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
@@ -388,8 +391,12 @@ public:
                     const Elem * elem,
                     const unsigned int i,
                     const Point & p);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
+   * \returns The value of the \f$ i^{th} \f$ shape function at
+   * point \p p.
+   *
    * Non-deprecated version of the shape() function. The
    * Elem::p_level() is accounted for internally if \p add_p_level
    */
@@ -400,6 +407,9 @@ public:
                     const bool add_p_level = true);
 
   /**
+   * \returns The value of the \f$ i^{th} \f$ shape function at
+   * point \p p.
+   *
    * Non-deprecated version of the shape() function. The
    * Elem::p_level() is ignored and extra_order is used instead.
    */
@@ -409,6 +419,7 @@ public:
                     const unsigned int i,
                     const Point & p);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \returns The value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
@@ -450,8 +461,14 @@ public:
                     const unsigned int i,
                     const Point & p,
                     OutputType & phi);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
+   * \returns The value of the \f$ i^{th} \f$ shape function at
+   * point \p p. This method allows you to specify the dimension,
+   * element type, and order directly. Automatically passes the
+   * request to the appropriate *scalar* finite element class member.
+   *
    * Non-deprecated version of templated shape() function that
    * accounts for Elem::p_level() internally.
    */
@@ -463,6 +480,11 @@ public:
                     OutputType & phi);
 
   /**
+   * \returns The value of the \f$ i^{th} \f$ shape function at
+   * point \p p. This method allows you to specify the dimension,
+   * element type, and order directly. Automatically passes the
+   * request to the appropriate *scalar* finite element class member.
+   *
    * Non-deprecated version of templated shape() function that ignores
    * Elem::p_level() and instead uses extra_order internally.
    */
@@ -520,24 +542,25 @@ public:
                              const Point & p,
                              const bool add_p_level);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
-   * \returns A function which evaluates shape for the
-   * requested FE type and dimension.
-   *
    * \deprecated Call the version of this function taking an Elem* instead.
    */
   static shape_ptr
   shape_function(const unsigned int dim,
                  const FEType & fe_t,
                  const ElemType t);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
-   * Non-deprecated version of function above.
+   * \returns A function which evaluates shape for the
+   * requested FE type and element.
    */
   static shape_ptr
   shape_function(const FEType & fe_t,
                  const Elem * elem);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \returns The \f$ j^{th} \f$ coordinate of the gradient of
    * the \f$ i^{th} \f$ shape function at point \p p.
@@ -558,15 +581,6 @@ public:
                           const Point & p);
 
   /**
-   * \returns The \f$ j^{th} \f$ coordinate of the gradient of
-   * the \f$ i^{th} \f$ shape function at point \p p.
-   * This method allows you to specify the dimension,
-   * element type, and order directly. Automatically passes the
-   * request to the appropriate *scalar* finite element class member.
-   *
-   * \note On a p-refined element, \p fe_t.order should be the total
-   * order of the element.
-   *
    * \deprecated Call the version of this function taking an Elem* instead.
    */
   static Real shape_deriv (const unsigned int dim,
@@ -575,9 +589,17 @@ public:
                            const unsigned int i,
                            const unsigned int j,
                            const Point & p);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
-   * Non-deprecated version of function above.
+   * \returns The \f$ j^{th} \f$ coordinate of the gradient of
+   * the \f$ i^{th} \f$ shape function at point \p p.
+   * This method allows you to specify the dimension,
+   * element, and order directly. Automatically passes the
+   * request to the appropriate *scalar* finite element class member.
+   *
+   * \note On a p-refined element, \p fe_t.order should be the total
+   * order of the element.
    */
   static Real shape_deriv(const FEType & fe_t,
                           const Elem * elem,
@@ -647,6 +669,8 @@ public:
                        const Elem * elem);
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at the point \p p.
@@ -677,6 +701,18 @@ public:
                                  const Point & p);
 
   /**
+   * \deprecated Call version of this function which does not require
+   * \p dim and takes an Elem * instead.
+   */
+  static Real shape_second_deriv (const unsigned int dim,
+                                  const FEType & fe_t,
+                                  const Elem *elem,
+                                  const unsigned int i,
+                                  const unsigned int j,
+                                  const Point & p);
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+  /**
    * \returns The second \f$ j^{th} \f$ derivative of the \f$ i^{th} \f$
    * shape function at the point \p p.
    *
@@ -690,19 +726,6 @@ public:
    *
    * \note On a p-refined element, \p fe_t.order should be the total
    * order of the element.
-   *
-   * \deprecated Call version of this function which does not require
-   * \p dim and takes an Elem * instead.
-   */
-  static Real shape_second_deriv (const unsigned int dim,
-                                  const FEType & fe_t,
-                                  const Elem *elem,
-                                  const unsigned int i,
-                                  const unsigned int j,
-                                  const Point & p);
-
-  /**
-   * Non-deprecated version of function above.
    */
   static Real shape_second_deriv(const FEType & fe_t,
                                  const Elem * elem,
@@ -732,19 +755,19 @@ public:
                                           const Point & p,
                                           const bool add_p_level);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
-   * \returns A function which evaluates shape for the
-   * requested FE type and dimension.
-   *
    * \deprecated Call the version of this function that takes an Elem * instead.
    */
   static shape_second_deriv_ptr
   shape_second_deriv_function(const unsigned int dim,
                               const FEType & fe_t,
                               const ElemType t);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
-   * Non-deprecated version of the function above.
+   * \returns A function which evaluates shape for the
+   * requested FE type and dimension.
    */
   static shape_second_deriv_ptr
   shape_second_deriv_function(const FEType & fe_t,
@@ -862,6 +885,7 @@ private:
    * the calls to \p FE and \p InfFE.
    */
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \deprecated Call the version of ifem_n_shape_functions() which
    * takes a pointer-to-Elem instead.
@@ -869,10 +893,12 @@ private:
   static unsigned int ifem_n_shape_functions(const unsigned int dim,
                                              const FEType & fe_t,
                                              const ElemType t);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   static unsigned int ifem_n_shape_functions(const FEType & fe_t,
                                              const Elem * elem);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \deprecated Call the version of ifem_n_dofs() which takes a
    * pointer-to-Elem instead.
@@ -880,10 +906,12 @@ private:
   static unsigned int ifem_n_dofs(const unsigned int dim,
                                   const FEType & fe_t,
                                   const ElemType t);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   static unsigned int ifem_n_dofs(const FEType & fe_t,
                                   const Elem * elem);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \deprecated Call the version of ifem_n_dofs_at_node() which takes
    * a pointer-to-Elem instead.
@@ -892,11 +920,13 @@ private:
                                           const FEType & fe_t,
                                           const ElemType t,
                                           const unsigned int n);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   static unsigned int ifem_n_dofs_at_node(const FEType & fe_t,
                                           const Elem * elem,
                                           const unsigned int n);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \deprecated Call the version of ifem_n_dofs_per_elem() which
    * takes a pointer-to-Elem instead.
@@ -904,6 +934,7 @@ private:
   static unsigned int ifem_n_dofs_per_elem(const unsigned int dim,
                                            const FEType & fe_t,
                                            const ElemType t);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   static unsigned int ifem_n_dofs_per_elem(const FEType & fe_t,
                                            const Elem * elem);
@@ -934,7 +965,11 @@ private:
                                 const Real tolerance = TOLERANCE,
                                 const bool secure = true);
 
-
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  /*
+   * \deprecated This method overload may not support all finite
+   * element types.  Use \p Elem::on_reference_element() instead.
+   */
   static bool ifem_on_reference_element(const Point & p,
                                         const ElemType t,
                                         const Real eps);
@@ -958,12 +993,14 @@ private:
                          const Elem * elem,
                          const unsigned int i,
                          const Point & p);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   static Real ifem_shape(const FEType & fe_t,
                          const Elem * t,
                          const unsigned int i,
                          const Point & p);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \deprecated Call version that takes a pointer-to-Elem and does
    * not require an explicit dim parameter instead.
@@ -985,6 +1022,7 @@ private:
                                const unsigned int i,
                                const unsigned int j,
                                const Point & p);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   static Real ifem_shape_deriv(const FEType & fe_t,
                                const Elem * elem,

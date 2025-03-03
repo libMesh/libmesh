@@ -62,6 +62,11 @@ template <> unsigned int FE<1,SCALAR>::n_dofs(const ElemType, const Order o) { r
 template <> unsigned int FE<2,SCALAR>::n_dofs(const ElemType, const Order o) { return o; }
 template <> unsigned int FE<3,SCALAR>::n_dofs(const ElemType, const Order o) { return o; }
 
+template <> unsigned int FE<0,SCALAR>::n_dofs(const Elem *, const Order o) { return o; }
+template <> unsigned int FE<1,SCALAR>::n_dofs(const Elem *, const Order o) { return o; }
+template <> unsigned int FE<2,SCALAR>::n_dofs(const Elem *, const Order o) { return o; }
+template <> unsigned int FE<3,SCALAR>::n_dofs(const Elem *, const Order o) { return o; }
+
 // Full specialization of n_dofs_at_node() function for every dimension.
 // SCALARs have no dofs at nodes
 template <> unsigned int FE<0,SCALAR>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
@@ -69,12 +74,22 @@ template <> unsigned int FE<1,SCALAR>::n_dofs_at_node(const ElemType, const Orde
 template <> unsigned int FE<2,SCALAR>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<3,SCALAR>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 
+template <> unsigned int FE<0,SCALAR>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<1,SCALAR>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<2,SCALAR>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3,SCALAR>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+
 // Full specialization of n_dofs_per_elem() function for every dimension.
 // SCALARs have no dofs per element
 template <> unsigned int FE<0,SCALAR>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<1,SCALAR>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<2,SCALAR>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
 template <> unsigned int FE<3,SCALAR>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
+
+template <> unsigned int FE<0,SCALAR>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<1,SCALAR>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<2,SCALAR>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
+template <> unsigned int FE<3,SCALAR>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
 
 // Scalar FEMs are discontinuous
 template <> FEContinuity FE<0,SCALAR>::get_continuity() const { return DISCONTINUOUS; }

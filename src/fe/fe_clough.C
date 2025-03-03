@@ -84,8 +84,7 @@ void clough_nodal_soln(const Elem * elem,
 
 
 
-
-unsigned int clough_n_dofs(const ElemType t, const Order o)
+unsigned int CLOUGH_n_dofs(const ElemType t, const Order o)
 {
   if (t == INVALID_ELEM)
     return 0;
@@ -122,13 +121,19 @@ unsigned int clough_n_dofs(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for CLOUGH FE family!");
     }
-} // clough_n_dofs()
+} // CLOUGH_n_dofs()
 
 
 
+unsigned int CLOUGH_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return CLOUGH_n_dofs(e->type(), o);
+}
 
 
-unsigned int clough_n_dofs_at_node(const ElemType t,
+
+unsigned int CLOUGH_n_dofs_at_node(const ElemType t,
                                    const Order o,
                                    const unsigned int n)
 {
@@ -201,12 +206,20 @@ unsigned int clough_n_dofs_at_node(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for CLOUGH FE family!");
     }
-} // clough_n_dofs_at_node()
+} // CLOUGH_n_dofs_at_node()
 
 
 
+unsigned int CLOUGH_n_dofs_at_node(const Elem & e,
+                                   const Order o,
+                                   const unsigned int n)
+{
+  return CLOUGH_n_dofs_at_node(e.type(), o, n);
+}
 
-unsigned int clough_n_dofs_per_elem(const ElemType t, const Order o)
+
+
+unsigned int CLOUGH_n_dofs_per_elem(const ElemType t, const Order o)
 {
   switch (o)
     {
@@ -230,7 +243,14 @@ unsigned int clough_n_dofs_per_elem(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for CLOUGH FE family!");
     }
-} // clough_n_dofs_per_elem()
+} // CLOUGH_n_dofs_per_elem()
+
+
+
+unsigned int CLOUGH_n_dofs_per_elem(const Elem & e, const Order o)
+{
+  return CLOUGH_n_dofs_per_elem(e.type(), o);
+}
 
 } // anonymous
 
@@ -242,24 +262,9 @@ LIBMESH_FE_NODAL_SOLN(CLOUGH, clough_nodal_soln)
 LIBMESH_FE_SIDE_NODAL_SOLN(CLOUGH)
 
 
-// Full specialization of n_dofs() function for every dimension
-template <> unsigned int FE<0,CLOUGH>::n_dofs(const ElemType t, const Order o) { return clough_n_dofs(t, o); }
-template <> unsigned int FE<1,CLOUGH>::n_dofs(const ElemType t, const Order o) { return clough_n_dofs(t, o); }
-template <> unsigned int FE<2,CLOUGH>::n_dofs(const ElemType t, const Order o) { return clough_n_dofs(t, o); }
-template <> unsigned int FE<3,CLOUGH>::n_dofs(const ElemType t, const Order o) { return clough_n_dofs(t, o); }
+// Instantiate n_dofs*() functions for every dimension
+LIBMESH_DEFAULT_NDOFS(CLOUGH)
 
-
-// Full specialization of n_dofs_at_node() function for every dimension.
-template <> unsigned int FE<0,CLOUGH>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return clough_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<1,CLOUGH>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return clough_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<2,CLOUGH>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return clough_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<3,CLOUGH>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return clough_n_dofs_at_node(t, o, n); }
-
-// Full specialization of n_dofs_per_elem() function for every dimension.
-template <> unsigned int FE<0,CLOUGH>::n_dofs_per_elem(const ElemType t, const Order o) { return clough_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<1,CLOUGH>::n_dofs_per_elem(const ElemType t, const Order o) { return clough_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<2,CLOUGH>::n_dofs_per_elem(const ElemType t, const Order o) { return clough_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<3,CLOUGH>::n_dofs_per_elem(const ElemType t, const Order o) { return clough_n_dofs_per_elem(t, o); }
 
 // Clough FEMs are C^1 continuous
 template <> FEContinuity FE<0,CLOUGH>::get_continuity() const { return C_ONE; }

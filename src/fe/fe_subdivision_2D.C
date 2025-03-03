@@ -954,12 +954,15 @@ void FE<2,SUBDIVISION>::inverse_map(const Elem *,
 
 // The number of dofs per subdivision element depends on the valence of its nodes, so it is non-static
 template <> unsigned int FE<2,SUBDIVISION>::n_dofs(const ElemType, const Order) { libmesh_not_implemented(); return 0; }
+template <> unsigned int FE<2,SUBDIVISION>::n_dofs(const Elem *, const Order) { libmesh_not_implemented(); return 0; }
 
 // Loop subdivision elements have only a single dof per node
 template <> unsigned int FE<2,SUBDIVISION>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 1; }
+template <> unsigned int FE<2,SUBDIVISION>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 1; }
 
 // Subdivision FEMs have dofs only at the nodes
 template <> unsigned int FE<2,SUBDIVISION>::n_dofs_per_elem(const ElemType, const Order) { return 0; }
+template <> unsigned int FE<2,SUBDIVISION>::n_dofs_per_elem(const Elem &, const Order) { return 0; }
 
 // Subdivision FEMs have dofs only at the nodes
 template <> void FE<2,SUBDIVISION>::dofs_on_side(const Elem * const, const Order, unsigned int, std::vector<unsigned int> & di, bool) { di.resize(0); }

@@ -103,7 +103,7 @@ void bernstein_nodal_soln(const Elem * elem,
 
 
 
-unsigned int bernstein_n_dofs(const ElemType t, const Order o)
+unsigned int BERNSTEIN_n_dofs(const ElemType t, const Order o)
 {
   switch (t)
     {
@@ -162,12 +162,19 @@ unsigned int bernstein_n_dofs(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
-} // bernstein_n_dofs()
+} // BERNSTEIN_n_dofs()
 
 
 
+unsigned int BERNSTEIN_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return BERNSTEIN_n_dofs(e->type(), o);
+}
 
-unsigned int bernstein_n_dofs_at_node(const ElemType t,
+
+
+unsigned int BERNSTEIN_n_dofs_at_node(const ElemType t,
                                       const Order o,
                                       const unsigned int n)
 {
@@ -334,12 +341,20 @@ unsigned int bernstein_n_dofs_at_node(const ElemType t,
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
-} // bernstein_n_dofs_at_node()
+} // BERNSTEIN_n_dofs_at_node()
 
 
 
+unsigned int BERNSTEIN_n_dofs_at_node(const Elem & e,
+                                      const Order o,
+                                      const unsigned int n)
+{
+  return BERNSTEIN_n_dofs_at_node(e.type(), o, n);
+}
 
-unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
+
+
+unsigned int BERNSTEIN_n_dofs_per_elem(const ElemType t, const Order o)
 {
   switch (t)
     {
@@ -384,7 +399,14 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
     default:
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for BERNSTEIN FE family!");
     }
-} // bernstein_n_dofs_per_elem
+} // BERNSTEIN_n_dofs_per_elem
+
+
+
+unsigned int BERNSTEIN_n_dofs_per_elem(const Elem & e, const Order o)
+{
+  return BERNSTEIN_n_dofs_per_elem(e.type(), o);
+}
 
 } // anonymous namespace
 
@@ -393,24 +415,8 @@ unsigned int bernstein_n_dofs_per_elem(const ElemType t, const Order o)
 LIBMESH_FE_NODAL_SOLN(BERNSTEIN, bernstein_nodal_soln)
 LIBMESH_FE_SIDE_NODAL_SOLN(BERNSTEIN)
 
-
-// Full specialization of n_dofs() function for every dimension
-template <> unsigned int FE<0,BERNSTEIN>::n_dofs(const ElemType t, const Order o) { return bernstein_n_dofs(t, o); }
-template <> unsigned int FE<1,BERNSTEIN>::n_dofs(const ElemType t, const Order o) { return bernstein_n_dofs(t, o); }
-template <> unsigned int FE<2,BERNSTEIN>::n_dofs(const ElemType t, const Order o) { return bernstein_n_dofs(t, o); }
-template <> unsigned int FE<3,BERNSTEIN>::n_dofs(const ElemType t, const Order o) { return bernstein_n_dofs(t, o); }
-
-// Full specialization of n_dofs_at_node() function for every dimension.
-template <> unsigned int FE<0,BERNSTEIN>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return bernstein_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<1,BERNSTEIN>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return bernstein_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<2,BERNSTEIN>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return bernstein_n_dofs_at_node(t, o, n); }
-template <> unsigned int FE<3,BERNSTEIN>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return bernstein_n_dofs_at_node(t, o, n); }
-
-// Full specialization of n_dofs_per_elem() function for every dimension.
-template <> unsigned int FE<0,BERNSTEIN>::n_dofs_per_elem(const ElemType t, const Order o) { return bernstein_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<1,BERNSTEIN>::n_dofs_per_elem(const ElemType t, const Order o) { return bernstein_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<2,BERNSTEIN>::n_dofs_per_elem(const ElemType t, const Order o) { return bernstein_n_dofs_per_elem(t, o); }
-template <> unsigned int FE<3,BERNSTEIN>::n_dofs_per_elem(const ElemType t, const Order o) { return bernstein_n_dofs_per_elem(t, o); }
+// Instantiate n_dofs*() functions for every dimension
+LIBMESH_DEFAULT_NDOFS(BERNSTEIN)
 
 // Bernstein FEMs are C^0 continuous
 template <> FEContinuity FE<0,BERNSTEIN>::get_continuity() const { return C_ZERO; }

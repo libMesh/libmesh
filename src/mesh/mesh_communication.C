@@ -349,6 +349,7 @@ void connect_children(const MeshBase & mesh,
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 void connect_families(connected_elem_set_type & connected_elements,
                       const MeshBase * mesh)
 {
@@ -362,6 +363,7 @@ void connect_families(connected_elem_set_type & connected_elements,
   connect_element_families(connected_elements, connected_elements,
                            connected_elements, mesh);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 

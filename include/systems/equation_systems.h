@@ -326,6 +326,7 @@ public:
   void get_vars_active_subdomains(const std::vector<std::string> & names,
                                   std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * Retrieve the solution data for CONSTANT MONOMIALs and/or components of
    * CONSTANT MONOMIAL_VECs. If 'names' is populated, only the variables
@@ -337,6 +338,7 @@ public:
    */
   void get_solution (std::vector<Number> & soln,
                      std::vector<std::string> & names) const;
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * Retrieve the solution data for CONSTANT MONOMIALs and/or components of

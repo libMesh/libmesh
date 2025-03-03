@@ -297,4 +297,27 @@ unsigned int Pyramid::local_singular_node(const Point & p, const Real tol) const
 }
 
 
+bool Pyramid::on_reference_element(const Point & p,
+                                   const Real eps) const
+{
+  const Real & xi = p(0);
+  const Real & eta = p(1);
+  const Real & zeta = p(2);
+
+  // Check that the point is on the same side of all the faces
+  // by testing whether:
+  //
+  // n_i.(x - x_i) <= 0
+  //
+  // for each i, where:
+  //   n_i is the outward normal of face i,
+  //   x_i is a point on face i.
+  return ((-eta - 1. + zeta <= 0.+eps) &&
+          (  xi - 1. + zeta <= 0.+eps) &&
+          ( eta - 1. + zeta <= 0.+eps) &&
+          ( -xi - 1. + zeta <= 0.+eps) &&
+          (            zeta >= 0.-eps));
+}
+
+
 } // namespace libMesh

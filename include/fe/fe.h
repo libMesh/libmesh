@@ -414,6 +414,11 @@ public:
    * a finite element of type \p t and approximation order \p o.
    *
    * On a p-refined element, \p o should be the total order of the element.
+   *
+   * This method does not support all finite element types; e.g. for an
+   * arbitrary polygon or polyhedron type the number of shape
+   * functions may depend on an individual element and not just its
+   * type.
    */
   static unsigned int n_shape_functions (const ElemType t,
                                          const Order o)
@@ -424,8 +429,25 @@ public:
    * finite element.
    *
    * On a p-refined element, \p o should be the total order of the element.
+   *
+   * This method does not support all finite element types; e.g. for an
+   * arbitrary polygon or polyhedron type the number of shape
+   * functions may depend on an individual element and not just its
+   * type.
    */
   static unsigned int n_dofs(const ElemType t,
+                             const Order o);
+
+  /**
+   * \returns The number of shape functions associated with this
+   * finite element.
+   *
+   * On a p-refined element, \p o should be the total order of the element.
+   *
+   * \p e should only be a null pointer if using a FE family like
+   * SCALAR that has degrees of freedom independent of any element.
+   */
+  static unsigned int n_dofs(const Elem * e,
                              const Order o);
 
   /**
@@ -433,8 +455,22 @@ public:
    * of type \p t and order \p o.
    *
    * On a p-refined element, \p o should be the total order of the element.
+   *
+   * This method does not support all finite element types; e.g. for an
+   * arbitrary polygon or polyhedron type the meaning of a node index
+   * \p n may depend on an individual element and not just its type.
    */
   static unsigned int n_dofs_at_node(const ElemType t,
+                                     const Order o,
+                                     const unsigned int n);
+
+  /**
+   * \returns The number of dofs at node \p n for a finite element
+   * of type \p t and order \p o.
+   *
+   * On a p-refined element, \p o should be the total order of the element.
+   */
+  static unsigned int n_dofs_at_node(const Elem & e,
                                      const Order o,
                                      const unsigned int n);
 
@@ -443,8 +479,20 @@ public:
    * not associated with any interior nodes.
    *
    * On a p-refined element, \p o should be the total order of the element.
+   *
+   * This method may not support all finite element types, e.g. higher
+   * order polygons or polyhedra may differ from element to element.
    */
   static unsigned int n_dofs_per_elem(const ElemType t,
+                                      const Order o);
+
+  /**
+   * \returns The number of dofs interior to the element,
+   * not associated with any interior nodes.
+   *
+   * On a p-refined element, \p o should be the total order of the element.
+   */
+  static unsigned int n_dofs_per_elem(const Elem & e,
                                       const Order o);
 
   /**
@@ -1528,6 +1576,8 @@ void lagrange_nodal_soln(const Elem * elem,
  */
 unsigned int monomial_n_dofs(const ElemType t, const Order o);
 
+unsigned int monomial_n_dofs(const Elem * e, const Order o);
+
 /**
  * Helper functions for rational basis functions.
  */
@@ -1581,6 +1631,73 @@ void rational_all_shape_derivs (const Elem & elem,
                                 const bool add_p_level);
 
 } // namespace libMesh
+
+
+// Full specialization of all n_dofs type functions, for every
+// dimension, with both original ElemType and new Elem signatures
+#define LIBMESH_DEFAULT_NDOFS(MyType) \
+template <> unsigned int FE<0,MyType>::n_dofs(const ElemType t, const Order o) { return MyType##_n_dofs(t, o); } \
+template <> unsigned int FE<1,MyType>::n_dofs(const ElemType t, const Order o) { return MyType##_n_dofs(t, o); } \
+template <> unsigned int FE<2,MyType>::n_dofs(const ElemType t, const Order o) { return MyType##_n_dofs(t, o); } \
+template <> unsigned int FE<3,MyType>::n_dofs(const ElemType t, const Order o) { return MyType##_n_dofs(t, o); } \
+ \
+template <> unsigned int FE<0,MyType>::n_dofs(const Elem * e, const Order o) { return MyType##_n_dofs(e, o); } \
+template <> unsigned int FE<1,MyType>::n_dofs(const Elem * e, const Order o) { return MyType##_n_dofs(e, o); } \
+template <> unsigned int FE<2,MyType>::n_dofs(const Elem * e, const Order o) { return MyType##_n_dofs(e, o); } \
+template <> unsigned int FE<3,MyType>::n_dofs(const Elem * e, const Order o) { return MyType##_n_dofs(e, o); } \
+ \
+template <> unsigned int FE<0,MyType>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return MyType##_n_dofs_at_node(t, o, n); } \
+template <> unsigned int FE<1,MyType>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return MyType##_n_dofs_at_node(t, o, n); } \
+template <> unsigned int FE<2,MyType>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return MyType##_n_dofs_at_node(t, o, n); } \
+template <> unsigned int FE<3,MyType>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return MyType##_n_dofs_at_node(t, o, n); } \
+ \
+template <> unsigned int FE<0,MyType>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return MyType##_n_dofs_at_node(e, o, n); } \
+template <> unsigned int FE<1,MyType>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return MyType##_n_dofs_at_node(e, o, n); } \
+template <> unsigned int FE<2,MyType>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return MyType##_n_dofs_at_node(e, o, n); } \
+template <> unsigned int FE<3,MyType>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return MyType##_n_dofs_at_node(e, o, n); } \
+ \
+template <> unsigned int FE<0,MyType>::n_dofs_per_elem(const ElemType t, const Order o) { return MyType##_n_dofs_per_elem(t, o); } \
+template <> unsigned int FE<1,MyType>::n_dofs_per_elem(const ElemType t, const Order o) { return MyType##_n_dofs_per_elem(t, o); } \
+template <> unsigned int FE<2,MyType>::n_dofs_per_elem(const ElemType t, const Order o) { return MyType##_n_dofs_per_elem(t, o); } \
+template <> unsigned int FE<3,MyType>::n_dofs_per_elem(const ElemType t, const Order o) { return MyType##_n_dofs_per_elem(t, o); } \
+ \
+template <> unsigned int FE<0,MyType>::n_dofs_per_elem(const Elem & e, const Order o) { return MyType##_n_dofs_per_elem(e, o); } \
+template <> unsigned int FE<1,MyType>::n_dofs_per_elem(const Elem & e, const Order o) { return MyType##_n_dofs_per_elem(e, o); } \
+template <> unsigned int FE<2,MyType>::n_dofs_per_elem(const Elem & e, const Order o) { return MyType##_n_dofs_per_elem(e, o); } \
+template <> unsigned int FE<3,MyType>::n_dofs_per_elem(const Elem & e, const Order o) { return MyType##_n_dofs_per_elem(e, o); }
+
+
+#define LIBMESH_DEFAULT_VEC_NDOFS(MyType) \
+template <> unsigned int FE<0,MyType##_VEC>::n_dofs(const ElemType t, const Order o) { return FE<0,MyType>::n_dofs(t, o); } \
+template <> unsigned int FE<1,MyType##_VEC>::n_dofs(const ElemType t, const Order o) { return FE<1,MyType>::n_dofs(t, o); } \
+template <> unsigned int FE<2,MyType##_VEC>::n_dofs(const ElemType t, const Order o) { return 2*FE<2,MyType>::n_dofs(t, o); } \
+template <> unsigned int FE<3,MyType##_VEC>::n_dofs(const ElemType t, const Order o) { return 3*FE<3,MyType>::n_dofs(t, o); } \
+ \
+template <> unsigned int FE<0,MyType##_VEC>::n_dofs(const Elem * e, const Order o) { return FE<0,MyType>::n_dofs(e, o); } \
+template <> unsigned int FE<1,MyType##_VEC>::n_dofs(const Elem * e, const Order o) { return FE<1,MyType>::n_dofs(e, o); } \
+template <> unsigned int FE<2,MyType##_VEC>::n_dofs(const Elem * e, const Order o) { return 2*FE<2,MyType>::n_dofs(e, o); } \
+template <> unsigned int FE<3,MyType##_VEC>::n_dofs(const Elem * e, const Order o) { return 3*FE<3,MyType>::n_dofs(e, o); } \
+ \
+template <> unsigned int FE<0,MyType##_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return FE<0,MyType>::n_dofs_at_node(t, o, n); } \
+template <> unsigned int FE<1,MyType##_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return FE<1,MyType>::n_dofs_at_node(t, o, n); } \
+template <> unsigned int FE<2,MyType##_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 2*FE<2,MyType>::n_dofs_at_node(t, o, n); } \
+template <> unsigned int FE<3,MyType##_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 3*FE<3,MyType>::n_dofs_at_node(t, o, n); } \
+ \
+template <> unsigned int FE<0,MyType##_VEC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return FE<0,MyType>::n_dofs_at_node(e.type(), o, n); } \
+template <> unsigned int FE<1,MyType##_VEC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return FE<1,MyType>::n_dofs_at_node(e.type(), o, n); } \
+template <> unsigned int FE<2,MyType##_VEC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return 2*FE<2,MyType>::n_dofs_at_node(e.type(), o, n); } \
+template <> unsigned int FE<3,MyType##_VEC>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return 3*FE<3,MyType>::n_dofs_at_node(e.type(), o, n); } \
+ \
+template <> unsigned int FE<0,MyType##_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<0,MyType>::n_dofs_per_elem(t, o); } \
+template <> unsigned int FE<1,MyType##_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<1,MyType>::n_dofs_per_elem(t, o); } \
+template <> unsigned int FE<2,MyType##_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return 2*FE<2,MyType>::n_dofs_per_elem(t, o); } \
+template <> unsigned int FE<3,MyType##_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return 3*FE<3,MyType>::n_dofs_per_elem(t, o); } \
+ \
+template <> unsigned int FE<0,MyType##_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<0,MyType>::n_dofs_per_elem(e.type(), o); } \
+template <> unsigned int FE<1,MyType##_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<1,MyType>::n_dofs_per_elem(e.type(), o); } \
+template <> unsigned int FE<2,MyType##_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return 2*FE<2,MyType>::n_dofs_per_elem(e.type(), o); } \
+template <> unsigned int FE<3,MyType##_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return 3*FE<3,MyType>::n_dofs_per_elem(e.type(), o); }
+
 
 #define LIBMESH_DEFAULT_VECTORIZED_FE(MyDim, MyType) \
 template<>                                           \

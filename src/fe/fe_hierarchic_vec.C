@@ -731,42 +731,41 @@ template <> RealGradient FE<3,L2_HIERARCHIC_VEC>::shape_second_deriv(const Elem 
 
 #endif
 
-// Do full-specialization for every dimension, instead
-// of explicit instantiation at the end of this function.
-// This could be macro-ified.
-template <> unsigned int FE<0,HIERARCHIC_VEC>::n_dofs(const ElemType t, const Order o) { return FE<0,HIERARCHIC>::n_dofs(t,o); }
-template <> unsigned int FE<1,HIERARCHIC_VEC>::n_dofs(const ElemType t, const Order o) { return FE<1,HIERARCHIC>::n_dofs(t,o); }
-template <> unsigned int FE<2,HIERARCHIC_VEC>::n_dofs(const ElemType t, const Order o) { return 2*FE<2,HIERARCHIC>::n_dofs(t,o); }
-template <> unsigned int FE<3,HIERARCHIC_VEC>::n_dofs(const ElemType t, const Order o) { return 3*FE<3,HIERARCHIC>::n_dofs(t,o); }
 
+// Instantiate n_dofs*() functions for every dimension
+LIBMESH_DEFAULT_VEC_NDOFS(HIERARCHIC)
+
+// L2 Hierarchic has a simpler but non-default implementation, with
+// all their dofs on the element
 template <> unsigned int FE<0,L2_HIERARCHIC_VEC>::n_dofs(const ElemType t, const Order o) { return FE<0,L2_HIERARCHIC>::n_dofs(t,o); }
 template <> unsigned int FE<1,L2_HIERARCHIC_VEC>::n_dofs(const ElemType t, const Order o) { return FE<1,L2_HIERARCHIC>::n_dofs(t,o); }
 template <> unsigned int FE<2,L2_HIERARCHIC_VEC>::n_dofs(const ElemType t, const Order o) { return 2*FE<2,L2_HIERARCHIC>::n_dofs(t,o); }
 template <> unsigned int FE<3,L2_HIERARCHIC_VEC>::n_dofs(const ElemType t, const Order o) { return 3*FE<3,L2_HIERARCHIC>::n_dofs(t,o); }
 
-
-// Do full-specialization for every dimension, instead
-// of explicit instantiation at the end of this function.
-template <> unsigned int FE<0,HIERARCHIC_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return FE<0,HIERARCHIC>::n_dofs_at_node(t,o,n); }
-template <> unsigned int FE<1,HIERARCHIC_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return FE<1,HIERARCHIC>::n_dofs_at_node(t,o,n); }
-template <> unsigned int FE<2,HIERARCHIC_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 2*FE<2,HIERARCHIC>::n_dofs_at_node(t,o,n); }
-template <> unsigned int FE<3,HIERARCHIC_VEC>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return 3*FE<3,HIERARCHIC>::n_dofs_at_node(t,o,n); }
+template <> unsigned int FE<0,L2_HIERARCHIC_VEC>::n_dofs(const Elem * e, const Order o) { return FE<0,L2_HIERARCHIC>::n_dofs(e,o); }
+template <> unsigned int FE<1,L2_HIERARCHIC_VEC>::n_dofs(const Elem * e, const Order o) { return FE<1,L2_HIERARCHIC>::n_dofs(e,o); }
+template <> unsigned int FE<2,L2_HIERARCHIC_VEC>::n_dofs(const Elem * e, const Order o) { return 2*FE<2,L2_HIERARCHIC>::n_dofs(e,o); }
+template <> unsigned int FE<3,L2_HIERARCHIC_VEC>::n_dofs(const Elem * e, const Order o) { return 3*FE<3,L2_HIERARCHIC>::n_dofs(e,o); }
 
 template <> unsigned int FE<0,L2_HIERARCHIC_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<1,L2_HIERARCHIC_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<2,L2_HIERARCHIC_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<3,L2_HIERARCHIC_VEC>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 
-template <> unsigned int FE<0,HIERARCHIC_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<0,HIERARCHIC>::n_dofs_per_elem(t,o); }
-template <> unsigned int FE<1,HIERARCHIC_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<1,HIERARCHIC>::n_dofs_per_elem(t,o); }
-template <> unsigned int FE<2,HIERARCHIC_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return 2*FE<2,HIERARCHIC>::n_dofs_per_elem(t,o); }
-template <> unsigned int FE<3,HIERARCHIC_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return 3*FE<3,HIERARCHIC>::n_dofs_per_elem(t,o); }
+template <> unsigned int FE<0,L2_HIERARCHIC_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<1,L2_HIERARCHIC_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<2,L2_HIERARCHIC_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3,L2_HIERARCHIC_VEC>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
 
-// L2 Hierarchic elements have all their dofs on the element
 template <> unsigned int FE<0,L2_HIERARCHIC_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<0,L2_HIERARCHIC_VEC>::n_dofs(t, o); }
 template <> unsigned int FE<1,L2_HIERARCHIC_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<1,L2_HIERARCHIC_VEC>::n_dofs(t, o); }
 template <> unsigned int FE<2,L2_HIERARCHIC_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<2,L2_HIERARCHIC_VEC>::n_dofs(t, o); }
 template <> unsigned int FE<3,L2_HIERARCHIC_VEC>::n_dofs_per_elem(const ElemType t, const Order o) { return FE<3,L2_HIERARCHIC_VEC>::n_dofs(t, o); }
+
+template <> unsigned int FE<0,L2_HIERARCHIC_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<0,L2_HIERARCHIC_VEC>::n_dofs(&e, o); }
+template <> unsigned int FE<1,L2_HIERARCHIC_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<1,L2_HIERARCHIC_VEC>::n_dofs(&e, o); }
+template <> unsigned int FE<2,L2_HIERARCHIC_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<2,L2_HIERARCHIC_VEC>::n_dofs(&e, o); }
+template <> unsigned int FE<3,L2_HIERARCHIC_VEC>::n_dofs_per_elem(const Elem & e, const Order o) { return FE<3,L2_HIERARCHIC_VEC>::n_dofs(&e, o); }
 
 // Hierarchic FEMs are always C^0 continuous
 template <> FEContinuity FE<0,HIERARCHIC_VEC>::get_continuity() const { return C_ZERO; }

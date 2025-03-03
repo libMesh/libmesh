@@ -6,6 +6,7 @@
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
+#include <libmesh/fe.h>
 #include <libmesh/fe_base.h>
 #include <libmesh/fe_interface.h>
 #include <libmesh/function_base.h>
@@ -666,9 +667,29 @@ public:
 
     const FEType fe_type = this->_sys->variable_type(0);
 
+    unsigned int my_n_dofs = 0;
+
+    switch (this->_elem->dim())
+    {
+    case 0:
+      my_n_dofs = FE<0,family>::n_dofs(this->_elem, order);
+      break;
+    case 1:
+      my_n_dofs = FE<1,family>::n_dofs(this->_elem, order);
+      break;
+    case 2:
+      my_n_dofs = FE<2,family>::n_dofs(this->_elem, order);
+      break;
+    case 3:
+      my_n_dofs = FE<3,family>::n_dofs(this->_elem, order);
+      break;
+    default:
+      libmesh_error();
+    }
+
     CPPUNIT_ASSERT_EQUAL(
       FEInterface::n_shape_functions(fe_type, this->_elem),
-      this->_fe->n_shape_functions());
+      my_n_dofs);
 
     CPPUNIT_ASSERT_EQUAL(
       FEInterface::get_continuity(fe_type),

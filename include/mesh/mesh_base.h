@@ -1143,8 +1143,10 @@ public:
    * will be deleted here - to keep those elements replicated during
    * preparation, set allow_remote_element_removal(false).
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   void prepare_for_use (const bool skip_renumber_nodes_and_elements, const bool skip_find_neighbors);
   void prepare_for_use (const bool skip_renumber_nodes_and_elements);
+#endif // LIBMESH_ENABLE_DEPRECATED
   void prepare_for_use ();
 
   /**
@@ -1753,6 +1755,7 @@ public:
    */
   std::string get_local_constraints(bool print_nonlocal=false) const;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \deprecated This method has ben replaced by \p cache_elem_data which
    * caches data in addition to elem dimensions (e.g. elem subdomain ids)
@@ -1761,6 +1764,7 @@ public:
    * be done manually by other classes after major mesh modifications.
    */
   void cache_elem_dims();
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /*
    * Search the mesh and cache data for the elements

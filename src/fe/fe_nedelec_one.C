@@ -89,6 +89,7 @@ void nedelec_one_nodal_soln(const Elem * elem,
 } // nedelec_one_nodal_soln
 
 
+
 unsigned int nedelec_one_n_dofs(const ElemType t, const Order o)
 {
   libmesh_assert_greater (o, 0);
@@ -116,6 +117,15 @@ unsigned int nedelec_one_n_dofs(const ElemType t, const Order o)
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for NEDELEC_ONE FE family!");
     }
 }
+
+
+
+unsigned int nedelec_one_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return nedelec_one_n_dofs(e->type(), o);
+}
+
 
 
 unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
@@ -248,6 +258,16 @@ unsigned int nedelec_one_n_dofs_at_node(const ElemType t,
 }
 
 
+
+unsigned int nedelec_one_n_dofs_at_node(const Elem & e,
+                                        const Order o,
+                                        const unsigned int n)
+{
+  return nedelec_one_n_dofs_at_node(e.type(), o, n);
+}
+
+
+
 unsigned int nedelec_one_n_dofs_per_elem(const ElemType t,
                                          const Order o)
 {
@@ -276,6 +296,15 @@ unsigned int nedelec_one_n_dofs_per_elem(const ElemType t,
       libmesh_error_msg("ERROR: Invalid ElemType " << Utility::enum_to_string(t) << " selected for NEDELEC_ONE FE family!");
     }
 }
+
+
+
+unsigned int nedelec_one_n_dofs_per_elem(const Elem & e,
+                                         const Order o)
+{
+  return nedelec_one_n_dofs_per_elem(e.type(), o);
+}
+
 
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -340,21 +369,35 @@ LIBMESH_FE_SIDE_NODAL_SOLN(NEDELEC_ONE)
 
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this function.
-// This could be macro-ified.
 template <> unsigned int FE<0,NEDELEC_ONE>::n_dofs(const ElemType, const Order) { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,NEDELEC_ONE>::n_dofs(const ElemType, const Order) { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,NEDELEC_ONE>::n_dofs(const ElemType t, const Order o) { return nedelec_one_n_dofs(t, o); }
 template <> unsigned int FE<3,NEDELEC_ONE>::n_dofs(const ElemType t, const Order o) { return nedelec_one_n_dofs(t, o); }
+
+template <> unsigned int FE<0,NEDELEC_ONE>::n_dofs(const Elem *, const Order) { NEDELEC_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,NEDELEC_ONE>::n_dofs(const Elem *, const Order) { NEDELEC_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,NEDELEC_ONE>::n_dofs(const Elem * e, const Order o) { return nedelec_one_n_dofs(e, o); }
+template <> unsigned int FE<3,NEDELEC_ONE>::n_dofs(const Elem * e, const Order o) { return nedelec_one_n_dofs(e, o); }
 
 template <> unsigned int FE<0,NEDELEC_ONE>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,NEDELEC_ONE>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,NEDELEC_ONE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return nedelec_one_n_dofs_at_node(t, o, n); }
 template <> unsigned int FE<3,NEDELEC_ONE>::n_dofs_at_node(const ElemType t, const Order o, const unsigned int n) { return nedelec_one_n_dofs_at_node(t, o, n); }
 
+template <> unsigned int FE<0,NEDELEC_ONE>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { NEDELEC_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,NEDELEC_ONE>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { NEDELEC_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,NEDELEC_ONE>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return nedelec_one_n_dofs_at_node(e, o, n); }
+template <> unsigned int FE<3,NEDELEC_ONE>::n_dofs_at_node(const Elem & e, const Order o, const unsigned int n) { return nedelec_one_n_dofs_at_node(e, o, n); }
+
 template <> unsigned int FE<0,NEDELEC_ONE>::n_dofs_per_elem(const ElemType, const Order) { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<1,NEDELEC_ONE>::n_dofs_per_elem(const ElemType, const Order) { NEDELEC_LOW_D_ERROR_MESSAGE }
 template <> unsigned int FE<2,NEDELEC_ONE>::n_dofs_per_elem(const ElemType t, const Order o) { return nedelec_one_n_dofs_per_elem(t, o); }
 template <> unsigned int FE<3,NEDELEC_ONE>::n_dofs_per_elem(const ElemType t, const Order o) { return nedelec_one_n_dofs_per_elem(t, o); }
+
+template <> unsigned int FE<0,NEDELEC_ONE>::n_dofs_per_elem(const Elem &, const Order) { NEDELEC_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<1,NEDELEC_ONE>::n_dofs_per_elem(const Elem &, const Order) { NEDELEC_LOW_D_ERROR_MESSAGE }
+template <> unsigned int FE<2,NEDELEC_ONE>::n_dofs_per_elem(const Elem & e, const Order o) { return nedelec_one_n_dofs_per_elem(e, o); }
+template <> unsigned int FE<3,NEDELEC_ONE>::n_dofs_per_elem(const Elem & e, const Order o) { return nedelec_one_n_dofs_per_elem(e, o); }
 
 // Nedelec first type FEMs are always tangentially continuous
 template <> FEContinuity FE<0,NEDELEC_ONE>::get_continuity() const { NEDELEC_LOW_D_ERROR_MESSAGE }

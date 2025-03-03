@@ -201,6 +201,14 @@ unsigned int l2_lagrange_n_dofs(const ElemType t, const Order o)
     }
 }
 
+
+
+unsigned int l2_lagrange_n_dofs(const Elem * e, const Order o)
+{
+  libmesh_assert(e);
+  return l2_lagrange_n_dofs(e->type(), o);
+}
+
 } // anonymous namespace
 
 
@@ -217,6 +225,10 @@ template <> unsigned int FE<1,L2_LAGRANGE>::n_dofs(const ElemType t, const Order
 template <> unsigned int FE<2,L2_LAGRANGE>::n_dofs(const ElemType t, const Order o) { return l2_lagrange_n_dofs(t, o); }
 template <> unsigned int FE<3,L2_LAGRANGE>::n_dofs(const ElemType t, const Order o) { return l2_lagrange_n_dofs(t, o); }
 
+template <> unsigned int FE<0,L2_LAGRANGE>::n_dofs(const Elem * e, const Order o) { return l2_lagrange_n_dofs(e, o); }
+template <> unsigned int FE<1,L2_LAGRANGE>::n_dofs(const Elem * e, const Order o) { return l2_lagrange_n_dofs(e, o); }
+template <> unsigned int FE<2,L2_LAGRANGE>::n_dofs(const Elem * e, const Order o) { return l2_lagrange_n_dofs(e, o); }
+template <> unsigned int FE<3,L2_LAGRANGE>::n_dofs(const Elem * e, const Order o) { return l2_lagrange_n_dofs(e, o); }
 
 // L2 Lagrange elements have all dofs on elements (hence none on nodes)
 template <> unsigned int FE<0,L2_LAGRANGE>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
@@ -224,12 +236,21 @@ template <> unsigned int FE<1,L2_LAGRANGE>::n_dofs_at_node(const ElemType, const
 template <> unsigned int FE<2,L2_LAGRANGE>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 template <> unsigned int FE<3,L2_LAGRANGE>::n_dofs_at_node(const ElemType, const Order, const unsigned int) { return 0; }
 
+template <> unsigned int FE<0,L2_LAGRANGE>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<1,L2_LAGRANGE>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<2,L2_LAGRANGE>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
+template <> unsigned int FE<3,L2_LAGRANGE>::n_dofs_at_node(const Elem &, const Order, const unsigned int) { return 0; }
 
 // L2 Lagrange elements have all dofs on elements
 template <> unsigned int FE<0,L2_LAGRANGE>::n_dofs_per_elem(const ElemType t, const Order o) { return l2_lagrange_n_dofs(t, o); }
 template <> unsigned int FE<1,L2_LAGRANGE>::n_dofs_per_elem(const ElemType t, const Order o) { return l2_lagrange_n_dofs(t, o); }
 template <> unsigned int FE<2,L2_LAGRANGE>::n_dofs_per_elem(const ElemType t, const Order o) { return l2_lagrange_n_dofs(t, o); }
 template <> unsigned int FE<3,L2_LAGRANGE>::n_dofs_per_elem(const ElemType t, const Order o) { return l2_lagrange_n_dofs(t, o); }
+
+template <> unsigned int FE<0,L2_LAGRANGE>::n_dofs_per_elem(const Elem & e, const Order o) { return l2_lagrange_n_dofs(&e, o); }
+template <> unsigned int FE<1,L2_LAGRANGE>::n_dofs_per_elem(const Elem & e, const Order o) { return l2_lagrange_n_dofs(&e, o); }
+template <> unsigned int FE<2,L2_LAGRANGE>::n_dofs_per_elem(const Elem & e, const Order o) { return l2_lagrange_n_dofs(&e, o); }
+template <> unsigned int FE<3,L2_LAGRANGE>::n_dofs_per_elem(const Elem & e, const Order o) { return l2_lagrange_n_dofs(&e, o); }
 
 // L2 Lagrange FEMs are DISCONTINUOUS
 template <> FEContinuity FE<0,L2_LAGRANGE>::get_continuity() const { return DISCONTINUOUS; }

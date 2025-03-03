@@ -62,6 +62,7 @@ bool InfFE<Dim,T_radial,T_map>::_warned_for_dshape     = false;
 
 // ------------------------------------------------------------
 // InfFE static class members
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
                                                 const ElemType inf_elem_type)
@@ -76,6 +77,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
   else
     return InfFERadial::n_dofs(fet.radial_order);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -97,13 +99,13 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType & fet,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
                                                         const ElemType inf_elem_type,
                                                         const unsigned int n)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
@@ -123,6 +125,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
   else
     return InfFERadial::n_dofs_at_node(fet.radial_order, n_radial);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -148,12 +151,12 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType & fet,
                                                          const ElemType inf_elem_type)
 {
-  // TODO:
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
 
@@ -163,6 +166,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType & fet,
   else
     return InfFERadial::n_dofs_per_elem(fet.radial_order);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -219,14 +223,14 @@ void InfFE<Dim,T_radial,T_map>::nodal_soln(const FEType & /* fet */,
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
                                       const ElemType inf_elem_type,
                                       const unsigned int i,
                                       const Point & p)
 {
-  // TODO - if possible, not sure if we can easily fully remove this function.
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_not_equal_to (Dim, 0);
 
@@ -260,9 +264,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType & fet,
     return InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
       * InfFERadial::decay(Dim,v);
 }
-
-
-
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
@@ -322,6 +324,7 @@ Real InfFE<Dim,T_radial,T_map>::shape(const FEType fet,
 }
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
                                              const ElemType inf_elem_type,
@@ -329,8 +332,7 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
                                              const unsigned int j,
                                              const Point & p)
 {
-  // TODO - if possible, not sure if we can easily fully remove this function.
-  // libmesh_deprecated();
+  libmesh_deprecated();
 
   libmesh_assert_not_equal_to (Dim, 0);
   libmesh_assert_greater (Dim,j);
@@ -367,6 +369,7 @@ Real InfFE<Dim,T_radial,T_map>::shape_deriv (const FEType & fe_t,
     * InfFE<Dim,T_radial,T_map>::eval(v, o_radial, i_radial)
     * InfFERadial::decay(Dim,v);
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
@@ -948,27 +951,6 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
                                                        unsigned int & base_shape,
                                                        unsigned int & radial_shape)
 {
-  // (Temporarily) call version of this function taking an
-  // ElemType. Eventually there should only be one version of this
-  // function that takes an Elem*.
-  compute_shape_indices(fet, inf_elem->type(), i, base_shape, radial_shape);
-}
-
-
-
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
-                                                       const ElemType inf_elem_type,
-                                                       const unsigned int i,
-                                                       unsigned int & base_shape,
-                                                       unsigned int & radial_shape)
-{
-  // TODO: eventually figure out a way to deprecated this
-  // function. Note that we can't go the other way around and have
-  // this function call the Elem* version because there's not really a
-  // clean way to create the required Elem object on the fly...
-  // libmesh_deprecated();
-
   // An example is provided:  the numbers in comments refer to
   // a fictitious InfHex18.  The numbers are chosen as exemplary
   // values.  There is currently no base approximation that
@@ -991,6 +973,220 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
   //    then the base approximation shapes
   // 7. element-associated dof in the base
   // 8. element-associated dof further out
+
+  const unsigned int radial_order       = static_cast<unsigned int>(fet.radial_order.get_order()); // 4
+  const unsigned int radial_order_p_one = radial_order+1;                                          // 5
+
+  std::unique_ptr<const Elem> base_elem = InfFEBase::build_elem(inf_elem);                         // QUAD9
+
+  // assume that the number of dof is the same for all vertices
+  unsigned int n_base_vertices         = libMesh::invalid_uint;                                    // 4
+  const unsigned int n_base_vertex_dof = FEInterface::n_dofs_at_node  (fet, base_elem.get(), 0);   // 2
+
+  unsigned int n_base_side_nodes       = libMesh::invalid_uint;                                    // 4
+  unsigned int n_base_side_dof         = libMesh::invalid_uint;                                    // 3
+
+  unsigned int n_base_face_nodes       = libMesh::invalid_uint;                                    // 1
+  unsigned int n_base_face_dof         = libMesh::invalid_uint;                                    // 5
+
+  const unsigned int n_base_elem_dof   = FEInterface::n_dofs_per_elem (fet, base_elem.get());      // 9
+
+  const ElemType inf_elem_type = inf_elem->type();
+
+  switch (inf_elem_type)
+    {
+    case INFEDGE2:
+      {
+        n_base_vertices   = 1;
+        n_base_side_nodes = 0;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = 0;
+        n_base_face_dof   = 0;
+        break;
+      }
+
+    case INFQUAD4:
+      {
+        n_base_vertices   = 2;
+        n_base_side_nodes = 0;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = 0;
+        n_base_face_dof   = 0;
+        break;
+      }
+
+    case INFQUAD6:
+      {
+        n_base_vertices   = 2;
+        n_base_side_nodes = 1;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = FEInterface::n_dofs_at_node (fet, base_elem.get(), n_base_vertices);
+        n_base_face_dof   = 0;
+        break;
+      }
+
+    case INFHEX8:
+      {
+        n_base_vertices   = 4;
+        n_base_side_nodes = 0;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = 0;
+        n_base_face_dof   = 0;
+        break;
+      }
+
+    case INFHEX16:
+      {
+        n_base_vertices   = 4;
+        n_base_side_nodes = 4;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = FEInterface::n_dofs_at_node (fet, base_elem.get(), n_base_vertices);
+        n_base_face_dof   = 0;
+        break;
+      }
+
+    case INFHEX18:
+      {
+        n_base_vertices   = 4;
+        n_base_side_nodes = 4;
+        n_base_face_nodes = 1;
+        n_base_side_dof   = FEInterface::n_dofs_at_node (fet, base_elem.get(), n_base_vertices);
+        n_base_face_dof   = FEInterface::n_dofs_at_node (fet, base_elem.get(), 8);
+        break;
+      }
+
+
+    case INFPRISM6:
+      {
+        n_base_vertices   = 3;
+        n_base_side_nodes = 0;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = 0;
+        n_base_face_dof   = 0;
+        break;
+      }
+
+    case INFPRISM12:
+      {
+        n_base_vertices   = 3;
+        n_base_side_nodes = 3;
+        n_base_face_nodes = 0;
+        n_base_side_dof   = FEInterface::n_dofs_at_node (fet, base_elem.get(), n_base_vertices);
+        n_base_face_dof   = 0;
+        break;
+      }
+
+    default:
+      libmesh_error_msg("Unrecognized inf_elem type = " << Utility::enum_to_string(inf_elem_type));
+    }
+
+
+  {
+    // these are the limits describing the intervals where the shape function lies
+    const unsigned int n_dof_at_base_vertices = n_base_vertices*n_base_vertex_dof;                 // 8
+    const unsigned int n_dof_at_all_vertices  = n_dof_at_base_vertices*radial_order_p_one;         // 40
+
+    const unsigned int n_dof_at_base_sides    = n_base_side_nodes*n_base_side_dof;                 // 12
+    const unsigned int n_dof_at_all_sides     = n_dof_at_base_sides*radial_order_p_one;            // 60
+
+    const unsigned int n_dof_at_base_face     = n_base_face_nodes*n_base_face_dof;                 // 5
+    const unsigned int n_dof_at_all_faces     = n_dof_at_base_face*radial_order_p_one;             // 25
+
+
+    // start locating the shape function
+    if (i < n_dof_at_base_vertices)                                              // range of i: 0..7
+      {
+        // belongs to vertex in the base
+        radial_shape = 0;
+        base_shape   = i;
+      }
+
+    else if (i < n_dof_at_all_vertices)                                          // range of i: 8..39
+      {
+        /* belongs to vertex in the outer shell
+         *
+         * subtract the number of dof already counted,
+         * so that i_offset contains only the offset for the base
+         */
+        const unsigned int i_offset = i - n_dof_at_base_vertices;                // 0..31
+
+        // first the radial dof are counted, then the base dof
+        radial_shape = (i_offset % radial_order) + 1;
+        base_shape   = i_offset / radial_order;
+      }
+
+    else if (i < n_dof_at_all_vertices+n_dof_at_base_sides)                      // range of i: 40..51
+      {
+        // belongs to base, is a side node
+        radial_shape = 0;
+        base_shape = i - radial_order * n_dof_at_base_vertices;                  //  8..19
+      }
+
+    else if (i < n_dof_at_all_vertices+n_dof_at_all_sides)                       // range of i: 52..99
+      {
+        // belongs to side node in the outer shell
+        const unsigned int i_offset = i - (n_dof_at_all_vertices
+                                           + n_dof_at_base_sides);               // 0..47
+        radial_shape = (i_offset % radial_order) + 1;
+        base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices;
+      }
+
+    else if (i < n_dof_at_all_vertices+n_dof_at_all_sides+n_dof_at_base_face)    // range of i: 100..104
+      {
+        // belongs to the node in the base face
+        radial_shape = 0;
+        base_shape = i - radial_order*(n_dof_at_base_vertices
+                                       + n_dof_at_base_sides);                   //  20..24
+      }
+
+    else if (i < n_dof_at_all_vertices+n_dof_at_all_sides+n_dof_at_all_faces)    // range of i: 105..124
+      {
+        // belongs to the node in the outer face
+        const unsigned int i_offset = i - (n_dof_at_all_vertices
+                                           + n_dof_at_all_sides
+                                           + n_dof_at_base_face);                // 0..19
+        radial_shape = (i_offset % radial_order) + 1;
+        base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices + n_dof_at_base_sides;
+      }
+
+    else if (i < n_dof_at_all_vertices+n_dof_at_all_sides+n_dof_at_all_faces+n_base_elem_dof)      // range of i: 125..133
+      {
+        // belongs to the base and is an element associated shape
+        radial_shape = 0;
+        base_shape = i - (n_dof_at_all_vertices
+                          + n_dof_at_all_sides
+                          + n_dof_at_all_faces);                                 // 0..8
+      }
+
+    else                                                                         // range of i: 134..169
+      {
+        libmesh_assert_less (i, n_dofs(fet, inf_elem));
+        // belongs to the outer shell and is an element associated shape
+        const unsigned int i_offset = i - (n_dof_at_all_vertices
+                                           + n_dof_at_all_sides
+                                           + n_dof_at_all_faces
+                                           + n_base_elem_dof);                   // 0..19
+        radial_shape = (i_offset % radial_order) + 1;
+        base_shape   = (i_offset / radial_order) + n_dof_at_base_vertices + n_dof_at_base_sides + n_dof_at_base_face;
+      }
+  }
+
+  return;
+}
+
+
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
+void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
+                                                       const ElemType inf_elem_type,
+                                                       const unsigned int i,
+                                                       unsigned int & base_shape,
+                                                       unsigned int & radial_shape)
+{
+  // This is basically cut-and-paste copy of the non-deprecated code
+  // above, and should be removed eventually.
+  libmesh_deprecated();
 
   const unsigned int radial_order       = static_cast<unsigned int>(fet.radial_order.get_order()); // 4
   const unsigned int radial_order_p_one = radial_order+1;                                          // 5
@@ -1190,6 +1386,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
 
   return;
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -1454,8 +1651,7 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
                        parent_base_dof != n_base_dofs; parent_base_dof++)
                     {
 
-                      const Real parent_base_dof_value = FEInterface::shape(Dim-1,
-                                                                            fe_type,
+                      const Real parent_base_dof_value = FEInterface::shape(fe_type,
                                                                             parent_base.get(),
                                                                             parent_base_dof,
                                                                             mapped_point);
@@ -1519,48 +1715,51 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
 //#include "libmesh/inf_fe_instantiate_2D.h"
 //#include "libmesh/inf_fe_instantiate_3D.h"
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const ElemType, const unsigned int));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_shape_indices(const FEType &, const ElemType, const unsigned int, unsigned int &, unsigned int &));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_node_indices(const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_node_indices(const ElemType, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_node_indices(const ElemType, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const Elem*));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const Elem *));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_at_node(const FEType &, const Elem *, const unsigned int));
+INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
+INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, void, compute_shape_indices(const FEType &, const Elem *, const unsigned int, unsigned int &, unsigned int &));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const Elem *, const unsigned int, const Point & p));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType, const Elem *, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType, const Elem *, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType, const Elem *, const unsigned int, const Point &, const bool));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape(const FEType &, const ElemType, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType &, const Elem *, const unsigned int, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType &, const Elem *, const unsigned int, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const Elem *, const unsigned int, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType &, const ElemType, const unsigned int, const unsigned int, const Point &));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, Real, shape_deriv(const FEType, const Elem *, const unsigned int, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, Real, shape_deriv(const FEType, const Elem *, const unsigned int, const unsigned int, const Point &, const bool));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, Real, shape_deriv(const FEType, const Elem *, const unsigned int, const unsigned int, const Point &, const bool));
