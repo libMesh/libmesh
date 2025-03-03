@@ -74,18 +74,16 @@ void hierarchic_vec_nodal_soln(const Elem * elem,
   libmesh_assert_equal_to (refspace_nodes.size(), n_nodes);
   libmesh_assert_equal_to (elem_soln.size(), n_sf*dim);
 
+  // Zero before summation
+  std::fill(nodal_soln.begin(), nodal_soln.end(), 0);
+
   for (unsigned int n=0; n<n_nodes; n++)
     for (int d=0; d != dim; ++d)
-      {
-        const unsigned int ni=n*dim+d;
-        nodal_soln[ni] = 0;
-
-        // u_i = Sum (alpha_i phi_i); we're here only looking
-        // at vector components in direction d
-        for (unsigned int i=0; i<n_sf; i++)
-          nodal_soln[ni] += elem_soln[i*dim+d] *
-            FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
-      }
+      // u_i = Sum (alpha_i phi_i); we're here only looking
+      // at vector components in direction d
+      for (unsigned int i=0; i<n_sf; i++)
+        nodal_soln[n*dim+d] += elem_soln[i*dim+d] *
+          FEInterface::shape(fe_type, elem, i, refspace_nodes[n]);
 
 }// void hierarchic_vec_nodal_soln
 
@@ -95,21 +93,8 @@ void hierarchic_vec_nodal_soln(const Elem * elem,
   // Do full-specialization for every dimension, instead
   // of explicit instantiation at the end of this file.
   // This could be macro-ified so that it fits on one line...
-template <>
-void FE<0,HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
-                                      const Order order,
-                                      const std::vector<Number> & elem_soln,
-                                      std::vector<Number> & nodal_soln,
-                                      const bool add_p_level)
-{ FE<0,HIERARCHIC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
-
-template <>
-void FE<1,HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
-                                      const Order order,
-                                      const std::vector<Number> & elem_soln,
-                                      std::vector<Number> & nodal_soln,
-                                      const bool add_p_level)
-{ FE<1,HIERARCHIC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
+LIBMESH_FE_NODAL_SOLN_DIM(HIERARCHIC_VEC, (FE<0, HIERARCHIC>::nodal_soln), 0)
+LIBMESH_FE_NODAL_SOLN_DIM(HIERARCHIC_VEC, (FE<1, HIERARCHIC>::nodal_soln), 1)
 
 template <>
 void FE<2,HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
@@ -117,7 +102,7 @@ void FE<2,HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
                                       const std::vector<Number> & elem_soln,
                                       std::vector<Number> & nodal_soln,
                                       const bool add_p_level)
-{ hierarchic_vec_nodal_soln(elem, order, elem_soln, 2 /*dimension*/, nodal_soln, add_p_level); }
+{ hierarchic_vec_nodal_soln(elem, order, elem_soln, 2 /*dim*/, nodal_soln, add_p_level); }
 
 template <>
 void FE<3,HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
@@ -125,41 +110,14 @@ void FE<3,HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
                                       const std::vector<Number> & elem_soln,
                                       std::vector<Number> & nodal_soln,
                                       const bool add_p_level)
-{ hierarchic_vec_nodal_soln(elem, order, elem_soln, 3 /*dimension*/, nodal_soln, add_p_level); }
+{ hierarchic_vec_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln, add_p_level); }
 
 LIBMESH_FE_SIDE_NODAL_SOLN(HIERARCHIC_VEC)
 
-template <>
-void FE<0,L2_HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
-                                         const Order order,
-                                         const std::vector<Number> & elem_soln,
-                                         std::vector<Number> & nodal_soln,
-                                         const bool add_p_level)
-{ FE<0,HIERARCHIC_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
-
-template <>
-void FE<1,L2_HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
-                                         const Order order,
-                                         const std::vector<Number> & elem_soln,
-                                         std::vector<Number> & nodal_soln,
-                                         const bool add_p_level)
-{ FE<1,HIERARCHIC_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
-
-template <>
-void FE<2,L2_HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
-                                         const Order order,
-                                         const std::vector<Number> & elem_soln,
-                                         std::vector<Number> & nodal_soln,
-                                         const bool add_p_level)
-{ FE<2,HIERARCHIC_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
-
-template <>
-void FE<3,L2_HIERARCHIC_VEC>::nodal_soln(const Elem * elem,
-                                         const Order order,
-                                         const std::vector<Number> & elem_soln,
-                                         std::vector<Number> & nodal_soln,
-                                         const bool add_p_level)
-{ FE<3,HIERARCHIC_VEC>::nodal_soln(elem, order, elem_soln, nodal_soln, add_p_level); }
+LIBMESH_FE_NODAL_SOLN_DIM(L2_HIERARCHIC_VEC, (FE<0, HIERARCHIC_VEC>::nodal_soln), 0)
+LIBMESH_FE_NODAL_SOLN_DIM(L2_HIERARCHIC_VEC, (FE<1, HIERARCHIC_VEC>::nodal_soln), 1)
+LIBMESH_FE_NODAL_SOLN_DIM(L2_HIERARCHIC_VEC, (FE<2, HIERARCHIC_VEC>::nodal_soln), 2)
+LIBMESH_FE_NODAL_SOLN_DIM(L2_HIERARCHIC_VEC, (FE<3, HIERARCHIC_VEC>::nodal_soln), 3)
 
 LIBMESH_FE_SIDE_NODAL_SOLN(L2_HIERARCHIC_VEC)
 

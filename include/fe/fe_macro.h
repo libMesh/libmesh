@@ -118,6 +118,7 @@
 
 #endif //LIBMESH_ENABLE_HIGHER_ORDER_SHAPES
 
+#define UNPACK( ... ) __VA_ARGS__
 
 #define LIBMESH_FE_NODAL_SOLN_DIM(_fetype, _funcname, _dim)             \
 template <>                                                             \
@@ -126,13 +127,13 @@ void FE<_dim,_fetype>::nodal_soln(const Elem * elem,                    \
                                   const std::vector<Number> & elem_soln,\
                                   std::vector<Number> & nodal_soln,     \
                                   const bool add_p_level)               \
-{ _funcname(elem, order, elem_soln, nodal_soln, add_p_level); }
+{ UNPACK _funcname(elem, order, elem_soln, nodal_soln, add_p_level); }
 
 #define LIBMESH_FE_NODAL_SOLN(fetype, _funcname)                        \
-LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 0)                         \
-LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 1)                         \
-LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 2)                         \
-LIBMESH_FE_NODAL_SOLN_DIM(fetype, _funcname, 3)
+LIBMESH_FE_NODAL_SOLN_DIM(fetype, (_funcname), 0)                       \
+LIBMESH_FE_NODAL_SOLN_DIM(fetype, (_funcname), 1)                       \
+LIBMESH_FE_NODAL_SOLN_DIM(fetype, (_funcname), 2)                       \
+LIBMESH_FE_NODAL_SOLN_DIM(fetype, (_funcname), 3)
 
 
 #define LIBMESH_FE_SIDE_NODAL_SOLN_DIM(_fetype, _dim)                   \

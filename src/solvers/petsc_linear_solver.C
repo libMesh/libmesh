@@ -734,56 +734,25 @@ Real PetscLinearSolver<T>::get_initial_residual()
 template <typename T>
 void PetscLinearSolver<T>::set_petsc_solver_type()
 {
+  #define CaseKSPSetType(SolverType, KSPT)                          \
+  case SolverType:                                                  \
+    LibmeshPetscCall(KSPSetType (_ksp, const_cast<KSPType>(KSPT))); \
+    return;
+
   switch (this->_solver_type)
     {
-
-    case CG:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPCG)));
-      return;
-
-    case CR:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPCR)));
-      return;
-
-    case CGS:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPCGS)));
-      return;
-
-    case BICG:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPBICG)));
-      return;
-
-    case TCQMR:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPTCQMR)));
-      return;
-
-    case TFQMR:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPTFQMR)));
-      return;
-
-    case LSQR:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPLSQR)));
-      return;
-
-    case BICGSTAB:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPBCGS)));
-      return;
-
-    case MINRES:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPMINRES)));
-      return;
-
-    case GMRES:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPGMRES)));
-      return;
-
-    case RICHARDSON:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPRICHARDSON)));
-      return;
-
-    case CHEBYSHEV:
-      LibmeshPetscCall(KSPSetType(_ksp, const_cast<KSPType>(KSPCHEBYSHEV)));
-      return;
+    CaseKSPSetType(CG,         KSPCG)
+    CaseKSPSetType(CR,         KSPCR)
+    CaseKSPSetType(CGS,        KSPCGS)
+    CaseKSPSetType(BICG,       KSPBICG)
+    CaseKSPSetType(TCQMR,      KSPTCQMR)
+    CaseKSPSetType(TFQMR,      KSPTFQMR)
+    CaseKSPSetType(LSQR,       KSPLSQR)
+    CaseKSPSetType(BICGSTAB,   KSPBCGS)
+    CaseKSPSetType(MINRES,     KSPMINRES)
+    CaseKSPSetType(GMRES,      KSPGMRES)
+    CaseKSPSetType(RICHARDSON, KSPRICHARDSON)
+    CaseKSPSetType(CHEBYSHEV,  KSPCHEBYSHEV)
 
     default:
       libMesh::err << "ERROR:  Unsupported PETSC Solver: "

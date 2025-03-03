@@ -136,7 +136,7 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
 
     default:
       libMesh::err << "ERROR:  Unsupported PETSC Preconditioner: "
-                   << preconditioner_type       << std::endl
+                   << Utility::enum_to_string(preconditioner_type) << std::endl
                    << "Continuing with PETSC defaults" << std::endl;
     }
 
