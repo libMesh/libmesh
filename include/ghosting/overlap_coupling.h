@@ -61,14 +61,7 @@ public:
   /**
    * Copy constructor.
    */
-  OverlapCoupling(const OverlapCoupling & other) :
-    GhostingFunctor(other),
-    _dof_coupling(other._dof_coupling)
-  {
-    for (auto i : make_range(2))
-      if (other._q_rules[i].get())
-        _q_rules[i] = other._q_rules[i]->clone();
-  }
+  OverlapCoupling(const OverlapCoupling & other);
 
   /**
    * A clone() is needed because GhostingFunctor can not be shared between
@@ -84,12 +77,7 @@ public:
   // Change quadrature rule after construction.  This function takes
   // ownership of the rule object and uses it for elements of the
   // appropriate dimension.
-  void set_quadrature_rule(std::unique_ptr<QBase> new_q_rule)
-  {
-    libmesh_assert(new_q_rule.get());
-    const unsigned int dim = new_q_rule->get_dim();
-    _q_rules[dim-1] = std::move(new_q_rule);
-  }
+  void set_quadrature_rule(std::unique_ptr<QBase> new_q_rule);
 
   /**
    * We need an updated point locator to see what other elements might
