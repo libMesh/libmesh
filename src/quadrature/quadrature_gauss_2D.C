@@ -240,16 +240,16 @@ void QGauss::init_2D()
               const unsigned int n_wts = 3;
               const Real wts[n_wts] =
                 {
-                  Real(9)/80,
-                  Real(31)/480 + std::sqrt(Real(15.0L))/2400,
-                  Real(31)/480 - std::sqrt(Real(15.0L))/2400
+                  Real(9)/80,                              // ~0.1125
+                  Real(31)/480 + std::sqrt(Real(15))/2400, // ~0.06619707639
+                  Real(31)/480 - std::sqrt(Real(15))/2400  // ~0.06296959027
                 };
 
               const Real a[n_wts] =
                 {
                   0., // 'a' parameter not used for origin permutation
-                  Real(2)/7 + std::sqrt(Real(15.0L))/21,
-                  Real(2)/7 - std::sqrt(Real(15.0L))/21
+                  Real(2)/7 + std::sqrt(Real(15))/21, // ~0.4701420641
+                  Real(2)/7 - std::sqrt(Real(15))/21  // ~0.1012865073
                 };
 
               const Real b[n_wts] = {0., 0., 0.}; // not used

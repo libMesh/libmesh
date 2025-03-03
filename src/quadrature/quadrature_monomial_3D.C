@@ -53,7 +53,7 @@ void QMonomial::init_3D()
               // would be a 2x2x2 Gauss product rule.
               const Real data[1][4] =
                 {
-                  {1.0L, 0.0L, 0.0L, Real(4)/3}
+                  {Real(1), Real(0), Real(0), Real(4)/3}
                 };
 
               const unsigned int rule_id[1] = {
@@ -79,30 +79,30 @@ void QMonomial::init_3D()
               // the n=3 case.  The analytical values given here were computed by me [JWP] in Maple.
 
               // Convenient intermediate values.
-              const Real sqrt19 = Real(std::sqrt(19.L));
-              const Real tp     = Real(std::sqrt(71440 + 6802*sqrt19));
+              const Real sqrt19 = std::sqrt(Real(19));            // ~4.35889894354
+              const Real tp     = std::sqrt(71440 + 6802*sqrt19); // ~317.945326454
 
               // Point data for permutations.
               const Real eta    =  0;
 
-              const Real lambda =  Real(std::sqrt(1919.L/3285.L - 148.L*sqrt19/3285.L + 4.L*tp/3285.L));
+              const Real lambda =  std::sqrt(Real(1919)/3285 - 148*sqrt19/3285 + 4*tp/3285);
               // 8.8030440669930978047737818209860e-01L;
 
-              const Real xi     = Real(-std::sqrt(1121.L/3285.L +  74.L*sqrt19/3285.L - 2.L*tp/3285.L));
+              const Real xi     = -std::sqrt(Real(1121)/3285 +  74*sqrt19/3285 - 2*tp/3285);
               // -4.9584817142571115281421242364290e-01L;
 
-              const Real mu     =  Real(std::sqrt(1121.L/3285.L +  74.L*sqrt19/3285.L + 2.L*tp/3285.L));
+              const Real mu     =  std::sqrt(Real(1121)/3285 +  74*sqrt19/3285 + 2*tp/3285);
               // 7.9562142216409541542982482567580e-01L;
 
-              const Real gamma  =  Real(std::sqrt(1919.L/3285.L - 148.L*sqrt19/3285.L - 4.L*tp/3285.L));
+              const Real gamma  =  std::sqrt(Real(1919)/3285 - 148*sqrt19/3285 - 4*tp/3285);
               // 2.5293711744842581347389255929324e-02L;
 
               // Weights: the centroid weight is given analytically.  Weight B (resp C) goes
               // with the {lambda,xi} (resp {gamma,mu}) permutation.  The single-precision
               // results reported by Stroud are given for reference.
 
-              const Real A      = Real(32)/19;
-              // Stroud: 0.21052632  * 8.0 = 1.684210560;
+              const Real A      = Real(32)/19; // ~1.684210560
+              // Stroud: 0.21052632  * 8.0;
 
               const Real B      = Real(1) / (Real(260072)/133225  - 1520*sqrt19/133225 + (133 - 37*sqrt19)*tp/133225);
               // 5.4498735127757671684690782180890e-01L; // Stroud: 0.068123420 * 8.0 = 0.544987360;
@@ -219,13 +219,13 @@ void QMonomial::init_3D()
               // (which integrates tri-7th order polynomials) would
               // have 4^3=64 points.
               const Real
-                r  = Real(std::sqrt(6.L/7.L)),
-                s  = Real(std::sqrt((960.L - 3.L*std::sqrt(28798.L)) / 2726.L)),
-                t  = Real(std::sqrt((960.L + 3.L*std::sqrt(28798.L)) / 2726.L)),
-                B1 = Real(8624)/29160,
-                B2 = Real(2744)/29160,
-                B3 = 8*(774*t*t - 230)/(9720*(t*t-s*s)),
-                B4 = 8*(230 - 774*s*s)/(9720*(t*t-s*s));
+                r  = std::sqrt(Real(6)/7),                                     // ~0.92582009977
+                s  = std::sqrt((Real(960) - 3*std::sqrt(Real(28798))) / 2726), // ~0.40670318642
+                t  = std::sqrt((Real(960) + 3*std::sqrt(Real(28798))) / 2726), // ~0.73411252875
+                B1 = Real(8624)/29160,                                         // ~0.29574759945
+                B2 = Real(2744)/29160,                                         // ~0.09410150891
+                B3 = 8*(774*t*t - 230)/(9720*(t*t-s*s)),                       // ~0.41233386227
+                B4 = 8*(230 - 774*s*s)/(9720*(t*t-s*s));                       // ~0.22470317477
 
               const Real data[4][4] =
                 {

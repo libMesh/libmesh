@@ -54,8 +54,8 @@ void QMonomial::init_2D()
               // Luckily it's fairly easy to derive, which is what I've done
               // here [JWP].
               const Real
-                s=std::sqrt(Real(1)/3),
-                t=std::sqrt(Real(2)/3);
+                s=std::sqrt(Real(1)/3), // ~0.57735026919
+                t=std::sqrt(Real(2)/3); // ~0.81649658092
 
               const Real data[2][3] =
                 {
@@ -128,6 +128,9 @@ void QMonomial::init_2D()
               //
               // This rule is provably minimal in the number of points.
               // A tensor-product rule accurate for "bi-quintic" polynomials would have 9 points.
+              //              0,              0, ~1.14285714286
+              //              0, ~0.96609178307, ~0.31746031746
+              // ~0.77459666924, ~0.57735026919, ~0.55555555555
               const Real data[3][3] =
                 {
                   {                 0.L,                    0.L, Real(8)/7  }, // 1
@@ -207,12 +210,12 @@ void QMonomial::init_2D()
               // This rule is fully-symmetric and provably minimal in the number of points.
               // A tensor-product rule accurate for "bi-septic" polynomials would have 16 points.
               const Real
-                r  = std::sqrt(Real(6)/7),
-                s  = std::sqrt( (114 - 3*std::sqrt(Real(583))) / 287 ),
-                t  = std::sqrt( (114 + 3*std::sqrt(Real(583))) / 287 ),
-                B1 = Real(196)/810,
-                B2 = 4 * (178981 + 2769*std::sqrt(Real(583))) / 1888920,
-                B3 = 4 * (178981 - 2769*std::sqrt(Real(583))) / 1888920;
+                r  = std::sqrt(Real(6)/7),                                    // ~0.92582009977
+                s  = std::sqrt( (Real(114) - 3*std::sqrt(Real(583))) / 287 ), // ~0.38055443320
+                t  = std::sqrt( (Real(114) + 3*std::sqrt(Real(583))) / 287 ), // ~0.80597978291
+                B1 = Real(196)/810,                                           // ~0.24197530864
+                B2 = 4 * (178981 + 2769*std::sqrt(Real(583))) / 1888920,      // ~0.52059291666
+                B3 = 4 * (178981 - 2769*std::sqrt(Real(583))) / 1888920;      // ~0.23743177469
 
               const Real data[3][3] =
                 {
