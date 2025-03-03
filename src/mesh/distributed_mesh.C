@@ -767,17 +767,14 @@ Node * DistributedMesh::add_point (const Point & p,
                                    const dof_id_type id,
                                    const processor_id_type proc_id)
 {
-  if (auto n_it = _nodes.find(id);
-      n_it != _nodes.end())
+  Node * old_n = this->query_node_ptr(id);
+
+  if (old_n)
     {
-      Node * n = *n_it;
-      libmesh_assert (n);
-      libmesh_assert_equal_to (n->id(), id);
+      *old_n = p;
+      old_n->processor_id() = proc_id;
 
-      *n = p;
-      n->processor_id() = proc_id;
-
-      return n;
+      return old_n;
     }
 
   Node * n = Node::build(p, id).release();
