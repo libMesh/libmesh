@@ -1328,6 +1328,14 @@ void QGauss::init_2D()
           {
             auto master_points = poly.master_subtriangle(t);
 
+            const Real twice_master_tri_area =
+              (- master_points[1](1) * master_points[2](0)
+               - master_points[0](1) * master_points[1](0)
+               + master_points[0](1) * master_points[2](0)
+               + master_points[0](0) * master_points[1](1)
+               - master_points[0](0) * master_points[2](1)
+               + master_points[1](0) * master_points[2](1));
+
             for (std::size_t i = 0; i != numtripts; ++i)
               {
                 _points[numtripts*t+i](0) =
@@ -1342,7 +1350,8 @@ void QGauss::init_2D()
                    master_points[0](1)) * tripoints[i](0) +
                   (master_points[2](1) -
                    master_points[0](1)) * tripoints[i](1);
-                _weights[numtripts*t+i] = triweights[i] / numtris;
+                _weights[numtripts*t+i] = triweights[i] *
+                                          twice_master_tri_area;
               }
           }
         return;

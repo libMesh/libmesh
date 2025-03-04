@@ -179,8 +179,13 @@ void QNodal::init_2D()
 
         const C0Polygon & poly = *cast_ptr<const C0Polygon *>(_elem);
 
+        const unsigned int ns = poly.n_sides();
+        const Real pi_over_ns = libMesh::pi / ns;
+        const Real master_poly_area = ns * 0.25 / tan(pi_over_ns);
+
         const unsigned int nn = poly.n_nodes();
-        _weights.resize(nn, Real(1)/nn);
+        const Real weight = master_poly_area / nn;
+        _weights.resize(nn, weight);
 
         _points.resize(poly.n_nodes());
         for (auto n : make_range(nn))
