@@ -22,6 +22,8 @@
 #include "libmesh/quadrature_conical.h"
 #include "libmesh/enum_to_string.h"
 
+#include "libmesh/face_c0polygon.h"
+
 namespace libMesh
 {
 
@@ -1298,6 +1300,62 @@ void QGauss::init_2D()
           }
       }
 
+
+      //---------------------------------------------
+      // Arbitrary polygon quadrature rules
+    case C0POLYGON:
+      {
+        QGauss tri_rule(2, _order);
+        tri_rule.init(TRI3, _p_level, true);
+
+        std::vector<Point> & tripoints = tri_rule.get_points();
+        std::vector<Real> & triweights = tri_rule.get_weights();
+
+        std::size_t numtripts = tripoints.size();
+
+        // C0Polygon requires the newer Quadrature API
+        if (!_elem)
+          libmesh_error();
+
+        libmesh_assert(_elem->type() == C0POLYGON);
+
+        const C0Polygon & poly = *cast_ptr<const C0Polygon *>(_elem);
+
+        std::size_t numtris = poly.n_subtriangles();
+        _points.resize(numtripts*numtris);
+        _weights.resize(numtripts*numtris);
+        for (std::size_t t = 0; t != numtris; ++t)
+          {
+            auto master_points = poly.master_subtriangle(t);
+
+            const Real twice_master_tri_area =
+              (- master_points[1](1) * master_points[2](0)
+               - master_points[0](1) * master_points[1](0)
+               + master_points[0](1) * master_points[2](0)
+               + master_points[0](0) * master_points[1](1)
+               - master_points[0](0) * master_points[2](1)
+               + master_points[1](0) * master_points[2](1));
+
+            for (std::size_t i = 0; i != numtripts; ++i)
+              {
+                _points[numtripts*t+i](0) =
+                  master_points[0](0) +
+                  (master_points[1](0) -
+                   master_points[0](0)) * tripoints[i](0) +
+                  (master_points[2](0) -
+                   master_points[0](0)) * tripoints[i](1);
+                _points[numtripts*t+i](1) =
+                  master_points[0](1) +
+                  (master_points[1](1) -
+                   master_points[0](1)) * tripoints[i](0) +
+                  (master_points[2](1) -
+                   master_points[0](1)) * tripoints[i](1);
+                _weights[numtripts*t+i] = triweights[i] *
+                                          twice_master_tri_area;
+              }
+          }
+        return;
+      }
 
       //---------------------------------------------
       // Unsupported type
