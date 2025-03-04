@@ -389,7 +389,8 @@ public:
   static void nodal_soln(const Elem * elem, const Order o,
                          const std::vector<Number> & elem_soln,
                          std::vector<Number> & nodal_soln,
-                         bool add_p_level = true);
+                         bool add_p_level = true,
+                         const unsigned vdim = 1);
 
   /**
    * Build the nodal soln on one side from the (full) element soln.
@@ -401,7 +402,8 @@ public:
                               const unsigned int side,
                               const std::vector<Number> & elem_soln,
                               std::vector<Number> & nodal_soln_on_side,
-                              bool add_p_level = true);
+                              bool add_p_level = true,
+                              const unsigned vdim = 1);
 
   /**
    * \returns The number of shape functions associated with
@@ -791,7 +793,8 @@ protected:
                                       const unsigned int side,
                                       const std::vector<Number> & elem_soln,
                                       std::vector<Number> & nodal_soln_on_side,
-                                      bool add_p_level = true);
+                                      bool add_p_level = true,
+                                      const unsigned vdim = 1);
 
   /**
    * An array of the node locations on the last
