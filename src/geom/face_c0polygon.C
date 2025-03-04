@@ -298,7 +298,7 @@ std::pair<unsigned short int, unsigned short int>
 C0Polygon::second_order_child_vertex (const unsigned int /*n*/) const
 {
   libmesh_not_implemented();
-  return std::pair<unsigned short int, unsigned short int> (0,0);
+  return std::pair<unsigned short int, unsigned short int> (0, 0);
 }
 
 
@@ -340,10 +340,10 @@ void C0Polygon::flip(BoundaryInfo * boundary_info)
   // Reorder nodes in such a way as to keep side ns-1 the same
   for (auto s : make_range(0u, ns/2))
     {
-      swap2nodes(s,ns-1-s);
-      swap2neighbors(s,ns-2-s);
-      swap2boundarysides(s,ns-2-s,boundary_info);
-      swap2boundaryedges(s,ns-2-s,boundary_info);
+      swap2nodes(s, ns-1-s);
+      swap2neighbors(s, ns-2-s);
+      swap2boundarysides(s, ns-2-s, boundary_info);
+      swap2boundaryedges(s, ns-2-s, boundary_info);
     }
 }
 
