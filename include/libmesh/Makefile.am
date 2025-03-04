@@ -164,6 +164,7 @@ BUILT_SOURCES = \
         ghost_point_neighbors.h \
         ghosting_functor.h \
         non_manifold_coupling.h \
+        overlap_coupling.h \
         point_neighbor_coupling.h \
         sibling_coupling.h \
         abaqus_io.h \
@@ -1080,6 +1081,9 @@ ghosting_functor.h: $(top_srcdir)/include/ghosting/ghosting_functor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 non_manifold_coupling.h: $(top_srcdir)/include/ghosting/non_manifold_coupling.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+overlap_coupling.h: $(top_srcdir)/include/ghosting/overlap_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point_neighbor_coupling.h: $(top_srcdir)/include/ghosting/point_neighbor_coupling.h

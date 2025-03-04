@@ -187,6 +187,7 @@ libmesh_SOURCES =  \
         src/ghosting/default_coupling.C \
         src/ghosting/ghost_point_neighbors.C \
         src/ghosting/non_manifold_coupling.C \
+        src/ghosting/overlap_coupling.C \
         src/ghosting/point_neighbor_coupling.C \
         src/ghosting/sibling_coupling.C \
         src/mesh/abaqus_io.C \

@@ -98,8 +98,9 @@ public:
                                    const std::set<subdomain_id_type> * allowed_subdomains = nullptr) const = 0;
 
   /**
-   * Locates a set of elements in proximity to the point with global coordinates
-   * \p p  Pure virtual. Optionally allows the user to restrict the subdomains searched.
+   * Finds elements in proximity to the point with global coordinates
+   * \p p and adds them to a set of candidate elements.  Pure virtual.
+   * Optionally allows the user to restrict the subdomains searched.
    */
   virtual void operator() (const Point & p,
                            std::set<const Elem *> & candidate_elements,

@@ -56,6 +56,7 @@ public:
     : ErrorEstimator(),
       scale_by_n_flux_faces(false),
       use_unweighted_quadrature_rules(false),
+      integrate_slits(false),
       integrate_boundary_sides(false),
       fine_context(),
       coarse_context(),
@@ -111,6 +112,22 @@ public:
    * want to use the feature.
    */
   bool use_unweighted_quadrature_rules;
+
+  /**
+   * A boolean flag, by default false, to be set to true if integrations
+   * should be performed on "slits" where two elements' faces overlap
+   * even if those elements are not connected by neighbor links.
+   *
+   * This may only be useful for flex-IGA meshes, where
+   * highly-nonconforming meshes are given pseudo-conforming solutions
+   * via nodal constraints.
+   *
+   * Note that, to safely use this option in parallel, it is also
+   * necessary to expand the default algebraic ghosting requirements
+   * to include elements on the opposite sides of slits from local
+   * elements.
+   */
+  bool integrate_slits;
 
 protected:
   /**

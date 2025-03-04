@@ -775,6 +775,7 @@ include_HEADERS = \
         ghosting/ghost_point_neighbors.h \
         ghosting/ghosting_functor.h \
         ghosting/non_manifold_coupling.h \
+        ghosting/overlap_coupling.h \
         ghosting/point_neighbor_coupling.h \
         ghosting/sibling_coupling.h \
         mesh/abaqus_io.h \
