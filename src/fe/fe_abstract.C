@@ -398,10 +398,12 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> & nodes)
 {
-  if (Elem::type_to_n_nodes_map[itemType] == invalid_uint)
-    libmesh_error();
+  const unsigned int n_nodes = Elem::type_to_n_nodes_map[itemType];
+  if (n_nodes == invalid_uint)
+    libmesh_error_msg("Number of nodes is not well-defined for " <<
+                      Utility::enum_to_string(itemType));
 
-  nodes.resize(Elem::type_to_n_nodes_map[itemType]);
+  nodes.resize(n_nodes);
   switch(itemType)
     {
     case NODEELEM:

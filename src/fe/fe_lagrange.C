@@ -506,7 +506,8 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
           case C0POLYGON:
             // C0Polygon requires using newer FE APIs
             if (!e)
-              libmesh_error();
+              libmesh_error_msg("Code (see stack trace) used an outdated FE function overload.\n"
+                                "n_dofs() on a C0Polygon is not defined by its ElemType alone.");
             return e->n_nodes();
 
           default:

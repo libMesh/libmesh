@@ -390,7 +390,8 @@ Real fe_lagrange_2D_shape(const ElemType type,
             {
               // C0Polygon requires using newer FE APIs
               if (!elem)
-                libmesh_error();
+                libmesh_error_msg("Code (see stack trace) used an outdated FE function overload.\n"
+                                  "Shape functions on a C0Polygon are not defined by its ElemType alone.");
 
               libmesh_assert(elem->type() == C0POLYGON);
 
@@ -712,7 +713,8 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
             {
               // C0Polygon requires using newer FE APIs
               if (!elem)
-                libmesh_error();
+                libmesh_error_msg("Code (see stack trace) used an outdated FE function overload.\n"
+                                  "Shape functions on a C0Polygon are not defined by its ElemType alone.");
 
               libmesh_assert(elem->type() == C0POLYGON);
 
