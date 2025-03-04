@@ -44,6 +44,8 @@ public:
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST( testTet4Jacobian );
+  CPPUNIT_TEST( testC0PolygonSquare );
+  CPPUNIT_TEST( testC0PolygonQuad );
   CPPUNIT_TEST( testC0PolygonPentagon );
   CPPUNIT_TEST( testC0PolygonHexagon );
   CPPUNIT_TEST_SUITE_END();
@@ -904,58 +906,53 @@ public:
 
 
 
-  void testC0PolygonPentagon()
+  void testC0Polygon(const std::vector<Point> & points,
+                     Real expected_volume)
   {
-    LOG_UNIT_TEST;
-
     Mesh mesh(*TestCommWorld);
-    mesh.add_point(Point(0, 0), 0);
-    mesh.add_point(Point(1, 0), 1);
-    mesh.add_point(Point(1.5, 0.5), 2);
-    mesh.add_point(Point(1, 1), 3);
-    mesh.add_point(Point(0, 1), 4);
 
-    std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(5);
-    for (auto i : make_range(5))
-      polygon->set_node(i) = mesh.node_ptr(i);
+    const auto np = points.size();
+    std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(np);
+
+    for (auto p : make_range(np))
+      polygon->set_node(p) = mesh.add_point(points[p], p);
+
     polygon->set_id() = 0;
-
     Elem * elem = mesh.add_elem(std::move(polygon));
 
     const Real derived_volume = elem->volume();
-    LIBMESH_ASSERT_FP_EQUAL(derived_volume, 1.25, TOLERANCE*TOLERANCE);
+    const Real base_volume = elem->Elem::volume();
+    LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(derived_volume, expected_volume, TOLERANCE*TOLERANCE);
 
-    this->testC0PolygonMethods(mesh, 5);
+    this->testC0PolygonMethods(mesh, np);
   }
 
 
+
+  void testC0PolygonSquare()
+  {
+    LOG_UNIT_TEST;
+    testC0Polygon({{0,0}, {1,0}, {1,1}, {0,1}}, 1);
+  }
+
+  void testC0PolygonQuad()
+  {
+    LOG_UNIT_TEST;
+    testC0Polygon({{0,0}, {1,0}, {1,2}, {-1,1}}, 2.5);
+  }
+
+  void testC0PolygonPentagon()
+  {
+    LOG_UNIT_TEST;
+    testC0Polygon({{0,0}, {1,0}, {1.5,0.5}, {1,1}, {0,1}}, 1.25);
+  }
 
   void testC0PolygonHexagon()
   {
     LOG_UNIT_TEST;
-
-    Mesh mesh(*TestCommWorld);
-    mesh.add_point(Point(0, 0), 0);
-    mesh.add_point(Point(1, 0), 1);
-    mesh.add_point(Point(1.5, 0.5), 2);
-    mesh.add_point(Point(1, 1), 3);
-    mesh.add_point(Point(0, 1), 4);
-    mesh.add_point(Point(-0.5, 0.5), 5);
-
-    std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(6);
-    for (auto i : make_range(6))
-      polygon->set_node(i) = mesh.node_ptr(i);
-    polygon->set_id() = 0;
-
-    Elem * elem = mesh.add_elem(std::move(polygon));
-
-    const Real derived_volume = elem->volume();
-    LIBMESH_ASSERT_FP_EQUAL(derived_volume, 1.5, TOLERANCE*TOLERANCE);
-
-    this->testC0PolygonMethods(mesh, 6);
+    testC0Polygon({{0,0}, {1,0}, {1.5,0.5}, {1,1}, {0,1}, {-0.5, 0.5}}, 1.5);
   }
-
-
 
 protected:
 
