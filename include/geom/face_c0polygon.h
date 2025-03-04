@@ -137,7 +137,7 @@ public:
   virtual bool has_affine_map () const override;
 
   /**
-   * \returns SECOND.
+   * \returns FIRST
    */
   virtual Order default_order() const override;
 
