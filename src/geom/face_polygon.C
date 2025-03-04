@@ -31,10 +31,52 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // Polygon class static member initializations
+
 const int Polygon::num_children;
 
 // ------------------------------------------------------------
 // Polygon class member functions
+
+
+/**
+ * We heap-allocate our element and node links, but we can't do that
+ * until *after* we've intitialized our parent class, which means
+ * we need to do a little initialization of those links manually too.
+ */
+Polygon::Polygon (const unsigned int nn,
+                  const unsigned int ns,
+                  Elem * p) :
+  Face(nn, ns, p, nullptr, nullptr),
+  _elemlinks_data(ns+2), // neighbors + parent + interior_parent
+  _nodelinks_data(nn)
+{
+  // Do the manual initialization that Elem::Elem couldn't.  No need
+  // to manually set nullptr, though, since std::vector does that.
+  this->_elemlinks = _elemlinks_data.data();
+  this->_nodes = _nodelinks_data.data();
+  this->_elemlinks[0] = p;
+
+  // Is this likely to ever be used?  We may do refinement with
+  // polygons but it's probably not going to have a hierarchy...
+  if (p)
+    {
+      this->subdomain_id() = p->subdomain_id();
+      this->processor_id() = p->processor_id();
+      _map_type = p->mapping_type();
+      _map_data = p->mapping_data();
+
+#ifdef LIBMESH_ENABLE_AMR
+      this->set_p_level(p->p_level());
+#endif
+    }
+
+  // Make sure the interior parent isn't undefined
+  if (LIBMESH_DIM > 2)
+    this->set_interior_parent(nullptr);
+}
+
+
+
 Point Polygon::master_point (const unsigned int i) const
 {
   const unsigned int ns = this->n_sides();
