@@ -17,18 +17,15 @@
 
 
 #include "libmesh/libmesh_config.h"
+
+#include "libmesh/fourth_error_estimators.h"
+
+#include "libmesh/enum_error_estimator_type.h"
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-
-
-// C++ includes
-#include <algorithm> // for std::fill
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath>    // for sqrt
-
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/fourth_error_estimators.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/libmesh_logging.h"
@@ -36,8 +33,12 @@
 #include "libmesh/system.h"
 #include "libmesh/dense_vector.h"
 #include "libmesh/tensor_tools.h"
-#include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_norm_type.h"
+
+// C++ includes
+#include <algorithm> // for std::fill
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath>    // for sqrt
 
 namespace libMesh
 {
@@ -157,27 +158,28 @@ LaplacianErrorEstimator::internal_side_integration ()
 
 #else // defined (LIBMESH_ENABLE_SECOND_DERIVATIVES)
 
-#include "libmesh/fourth_error_estimators.h"
-
 namespace libMesh
 {
 
-void
-LaplacianErrorEstimator::init_context (FEMContext &)
+LaplacianErrorEstimator::LaplacianErrorEstimator() :
+  JumpErrorEstimator()
 {
   libmesh_error_msg("Error: LaplacianErrorEstimator requires second " \
                     << "derivative support; try configuring libmesh with " \
                     << "--enable-second");
 }
 
-
-void
-LaplacianErrorEstimator::internal_side_integration ()
+ErrorEstimatorType
+LaplacianErrorEstimator::type() const
 {
-  libmesh_error_msg("Error: LaplacianErrorEstimator requires second "   \
-                    << "derivative support; try configuring libmesh with " \
-                    << "--enable-second");
+  return LAPLACIAN;
 }
+
+
+
+void LaplacianErrorEstimator::init_context (FEMContext &) {}
+
+void LaplacianErrorEstimator::internal_side_integration () {}
 
 } // namespace libMesh
 
