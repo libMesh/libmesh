@@ -132,41 +132,6 @@ uint64_t fnv_64_buf(const void * buf, size_t len)
   return hval;
 }
 
-/**
- * Same hash as fnv_64_buf(), but specialized for exactly two inputs.
- * This function is called from the "hashword2()" overload for 64-bit
- * integers, and lets us avoid constructing a temporary array in order
- * to call the "buffer" version of the algorithm.
- */
-uint64_t fnv_64_2(const void * a, const void * b)
-{
-  // Initializing hval with this value corresponds to the FNV-1 hash algorithm.
-  uint64_t hval = static_cast<uint64_t>(0xcbf29ce484222325ULL);
-
-  for (int i=0; i!=2; ++i)
-    {
-      // char pointers to (start, end) of either a or b. We interpret
-      // the 64 bits of each input 64-bit integer as 8 8-byte
-      // characters.
-      const unsigned char * beg = static_cast<const unsigned char *>(i==0 ? a : b);
-      const unsigned char * end = beg + sizeof(uint64_t)/sizeof(char);
-
-      // FNV-1 hash each octet of the buffer
-      while (beg < end)
-        {
-          hval +=
-            (hval << 1) + (hval << 4) + (hval << 5) +
-            (hval << 7) + (hval << 8) + (hval << 40);
-
-          // xor the bottom with the current octet
-          hval ^= static_cast<uint64_t>(*beg++);
-        }
-    }
-
-  // return our new hash value
-  return hval;
-}
-
 } // end anonymous namespace
 
 
@@ -257,13 +222,39 @@ uint32_t hashword2(const uint32_t & first, const uint32_t & second, uint32_t ini
 }
 
 /**
- * Call the 64-bit FNV hash function that is specialized for two inputs.
+ * Computes the same hash as calling fnv_64_buf() with exactly two entries.
+ * This function allows the compiler to optimize by unrolling loops whose
+ * number of iterations are known at compile time. By inspecting the assembly
+ * generated for different optimization levels, we observed that the compiler
+ * sometimes chooses to unroll only the outer loop, but may also choose to
+ * unroll both the outer and inner loops.
  */
 inline
 uint64_t hashword2(const uint64_t first, const uint64_t second)
 {
+  // Initializing hval with this value corresponds to the FNV-1 hash algorithm.
+  uint64_t hval = static_cast<uint64_t>(0xcbf29ce484222325ULL);
 
-  return fnv_64_2(&first, &second);
+  for (int i=0; i!=2; ++i)
+    {
+      // char pointers to (start, end) of either "first" or "second". We interpret
+      // the 64 bits of each input 64-bit integer as 8 8-byte characters.
+      auto beg = reinterpret_cast<const unsigned char *>(i==0 ? &first : &second);
+      auto end = beg + sizeof(uint64_t)/sizeof(unsigned char); // beg+8
+
+      // FNV-1 hash each octet of the buffer
+      while (beg < end)
+        {
+          hval +=
+            (hval << 1) + (hval << 4) + (hval << 5) +
+            (hval << 7) + (hval << 8) + (hval << 40);
+
+          // xor the bottom with the current octet
+          hval ^= static_cast<uint64_t>(*beg++);
+        }
+    }
+
+  return hval;
 }
 
 inline
