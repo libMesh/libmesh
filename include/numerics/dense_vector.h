@@ -282,6 +282,18 @@ public:
    */
   const std::vector<T> & get_values() const { return _val; }
 
+  /**
+   * \returns An iterator pointing to the beginning of the vector
+   */
+  auto begin() const { return _val.begin(); }
+  auto begin() { return _val.begin(); }
+
+  /**
+   * \returns An iterator pointing to the end of the vector
+   */
+   auto end() const { return _val.end(); }
+   auto end() { return _val.end(); }
+
 private:
 
   /**
