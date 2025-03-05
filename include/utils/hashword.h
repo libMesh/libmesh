@@ -120,6 +120,11 @@ uint64_t fnv_64_buf(const void * buf, size_t len)
   // FNV-1 hash each octet of the buffer
   while (bp < be)
     {
+      // This line computes hval *= FNV_Prime, where
+      // FNV_Prime := 1099511628211
+      //            = 2^40 + 2^8 + 179
+      // is the prime number used for for 64-bit hashes.
+      // See also: https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
       hval +=
         (hval << 1) + (hval << 4) + (hval << 5) +
         (hval << 7) + (hval << 8) + (hval << 40);
@@ -222,18 +227,39 @@ uint32_t hashword2(const uint32_t & first, const uint32_t & second, uint32_t ini
 }
 
 /**
- * Call the 64-bit FNV hash function.
+ * Computes the same hash as calling fnv_64_buf() with exactly two entries.
+ * This function allows the compiler to optimize by unrolling loops whose
+ * number of iterations are known at compile time. By inspecting the assembly
+ * generated for different optimization levels, we observed that the compiler
+ * sometimes chooses to unroll only the outer loop, but may also choose to
+ * unroll both the outer and inner loops.
  */
 inline
 uint64_t hashword2(const uint64_t first, const uint64_t second)
 {
-  // This isn't optimal (it would be nice to avoid this packing step)
-  // but we are going to go ahead and conform to the 32-bit
-  // hashword2() interface.
-  uint64_t k[2] = {first, second};
+  // Initializing hval with this value corresponds to the FNV-1 hash algorithm.
+  uint64_t hval = static_cast<uint64_t>(0xcbf29ce484222325ULL);
 
-  // len is the total number of bytes in two 64-bit ints
-  return fnv_64_buf(k, /*len=*/8*2);
+  for (int i=0; i!=2; ++i)
+    {
+      // char pointers to (start, end) of either "first" or "second". We interpret
+      // the 64 bits of each input 64-bit integer as 8 8-byte characters.
+      auto beg = reinterpret_cast<const unsigned char *>(i==0 ? &first : &second);
+      auto end = beg + sizeof(uint64_t)/sizeof(unsigned char); // beg+8
+
+      // FNV-1 hash each octet of the buffer
+      while (beg < end)
+        {
+          hval +=
+            (hval << 1) + (hval << 4) + (hval << 5) +
+            (hval << 7) + (hval << 8) + (hval << 40);
+
+          // xor the bottom with the current octet
+          hval ^= static_cast<uint64_t>(*beg++);
+        }
+    }
+
+  return hval;
 }
 
 inline
