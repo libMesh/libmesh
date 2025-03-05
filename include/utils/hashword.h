@@ -120,6 +120,11 @@ uint64_t fnv_64_buf(const void * buf, size_t len)
   // FNV-1 hash each octet of the buffer
   while (bp < be)
     {
+      // This line computes hval *= FNV_Prime, where
+      // FNV_Prime := 1099511628211
+      //            = 2^40 + 2^8 + 179
+      // is the prime number used for for 64-bit hashes.
+      // See also: https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function
       hval +=
         (hval << 1) + (hval << 4) + (hval << 5) +
         (hval << 7) + (hval << 8) + (hval << 40);
