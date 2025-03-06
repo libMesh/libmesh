@@ -80,7 +80,7 @@ void mix(uint32_t & a, uint32_t & b, uint32_t & c)
  * http://burtleburtle.net/bob/hash/index.html
  */
 inline
-void final(uint32_t & a, uint32_t & b, uint32_t & c)
+void final_mix(uint32_t & a, uint32_t & b, uint32_t & c)
 {
   c ^= b; c -= rot(b,14);
   a ^= c; a -= rot(c,11);
@@ -181,7 +181,7 @@ uint32_t hashword(const uint32_t * k, size_t length, uint32_t initval=0)
     case 2 : b+=k[1];
       libmesh_fallthrough();
     case 1 : a+=k[0];
-      final(a,b,c);
+      final_mix(a,b,c);
       libmesh_fallthrough();
     default:     // case 0: nothing left to add
       break;
@@ -221,7 +221,7 @@ uint32_t hashword2(const uint32_t & first, const uint32_t & second, uint32_t ini
 
   b+=second;
   a+=first;
-  final(a,b,c);
+  final_mix(a,b,c);
 
   return c;
 }
@@ -281,14 +281,14 @@ uint64_t hashword(const uint64_t * k, size_t length)
 
 /**
  * In a personal communication from Bob Jenkins, he recommended using
- * "Probably final() from lookup3.c... You could hash up to 6 16-bit
+ * "Probably final_mix() from lookup3.c... You could hash up to 6 16-bit
  * integers that way.  The output is c, or the top or bottom 16 bits
  * of c if you only need 16 bit hash values." [JWP]
  */
 inline
 uint16_t hashword(const uint16_t * k, size_t length)
 {
-  // Three values that will be passed to final() after they are initialized.
+  // Three values that will be passed to final_mix() after they are initialized.
   uint32_t a = 0;
   uint32_t b = 0;
   uint32_t c = 0;
@@ -297,7 +297,7 @@ uint16_t hashword(const uint16_t * k, size_t length)
     {
     case 3:
       {
-        // Cast the inputs to 32 bit integers and call final().
+        // Cast the inputs to 32 bit integers and call final_mix().
         a = k[0];
         b = k[1];
         c = k[2];
@@ -306,7 +306,7 @@ uint16_t hashword(const uint16_t * k, size_t length)
     case 4:
       {
         // Combine the 4 16-bit inputs, "w, x, y, z" into two 32-bit
-        // inputs "wx" and "yz" using bit operations and call final.
+        // inputs "wx" and "yz" using bit operations and call final_mix.
         a = ((k[0]<<16) | (k[1] & 0xffff)); // wx
         b = ((k[2]<<16) | (k[3] & 0xffff)); // yz
         break;
@@ -316,7 +316,7 @@ uint16_t hashword(const uint16_t * k, size_t length)
     }
 
   // Result is returned in c
-  final(a,b,c);
+  final_mix(a,b,c);
   return static_cast<uint16_t>(c);
 }
 
