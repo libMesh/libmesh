@@ -285,14 +285,14 @@ public:
   /**
    * \returns An iterator pointing to the beginning of the vector
    */
-  auto begin() const { return _val.begin(); }
-  auto begin() { return _val.begin(); }
+  typename std::vector<T>::const_iterator begin() const { return _val.begin(); }
+  typename std::vector<T>::iterator begin() { return _val.begin(); }
 
   /**
    * \returns An iterator pointing to the end of the vector
    */
-   auto end() const { return _val.end(); }
-   auto end() { return _val.end(); }
+  typename std::vector<T>::const_iterator end() const { return _val.end(); }
+  typename std::vector<T>::iterator end() { return _val.end(); }
 
 private:
 
