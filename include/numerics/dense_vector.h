@@ -282,6 +282,18 @@ public:
    */
   const std::vector<T> & get_values() const { return _val; }
 
+  /**
+   * \returns An iterator pointing to the beginning of the vector
+   */
+  typename std::vector<T>::const_iterator begin() const { return _val.begin(); }
+  typename std::vector<T>::iterator begin() { return _val.begin(); }
+
+  /**
+   * \returns An iterator pointing to the end of the vector
+   */
+  typename std::vector<T>::const_iterator end() const { return _val.end(); }
+  typename std::vector<T>::iterator end() { return _val.end(); }
+
 private:
 
   /**
