@@ -65,9 +65,11 @@
 #include "libmesh/getpot.h"
 #include "libmesh/exodusII_io.h"
 
-
 // Bring in everything from the libMesh namespace.
 using namespace libMesh;
+
+// Define static data member holding (optional) rotation matrix
+RealTensor GradDivExactSolution::R;
 
 // Function prototype. This is the function that will assemble
 // the linear system for our grad-div problem. Note that the
@@ -134,6 +136,12 @@ int main (int argc, char ** argv)
 
   // Make sure the code is robust against nodal reorderings.
   MeshTools::Modification::permute_elements(mesh);
+
+  // Make sure the code is robust against solves on 2d meshes rotated out of
+  // the xy plane. By default, all Euler angles are zero, the rotation matrix
+  // is the identity, and the mesh stays in place.
+  const Real phi = infile("phi", 0.), theta = infile("theta", 0.), psi = infile("psi", 0.);
+  GradDivExactSolution::RM(MeshTools::Modification::rotate(mesh, phi, theta, psi));
 
   // Print information about the mesh to the screen.
   mesh.print_info();
@@ -376,14 +384,9 @@ void assemble_graddiv(EquationSystems & es,
           // This involves a single loop in which we integrate the "forcing
           // function" in the PDE against the vector test functions (k).
           {
-            // The location of the current quadrature point.
-            const Real x = q_point[qp](0);
-            const Real y = q_point[qp](1);
-            const Real z = q_point[qp](2);
-
             // "f" is the forcing function, given by the well-known
             // "method of manufactured solutions".
-            RealGradient f = GradDivExactSolution().forcing(x, y, z);
+            RealGradient f = GradDivExactSolution().forcing(q_point[qp]);
 
             // Loop to integrate the vector test functions (k) against the
             // forcing function.
@@ -428,14 +431,8 @@ void assemble_graddiv(EquationSystems & es,
               // Loop over the face quadrature points for integration.
               for (unsigned int qp=0; qp<qface.n_points(); qp++)
                 {
-                  // The location on the boundary of the current
-                  // face quadrature point.
-                  const Real xf = qface_point[qp](0);
-                  const Real yf = qface_point[qp](1);
-                  const Real zf = qface_point[qp](2);
-
                   // The boundary value for the vector variable.
-                  RealGradient vector_value = GradDivExactSolution()(xf, yf, zf);
+                  RealGradient vector_value = GradDivExactSolution()(qface_point[qp]);
 
                   // We use the penalty method to set the flux of the vector
                   // variable at the boundary, i.e. the RT vector boundary dof.
