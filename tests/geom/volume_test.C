@@ -1,6 +1,7 @@
 // libmesh includes
 #include <libmesh/elem.h>
 #include <libmesh/enum_elem_type.h>
+#include <libmesh/face_c0polygon.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh.h>
@@ -43,6 +44,10 @@ public:
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST( testTet4Jacobian );
+  CPPUNIT_TEST( testC0PolygonSquare );
+  CPPUNIT_TEST( testC0PolygonQuad );
+  CPPUNIT_TEST( testC0PolygonPentagon );
+  CPPUNIT_TEST( testC0PolygonHexagon );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -900,6 +905,55 @@ public:
   }
 
 
+
+  void testC0Polygon(const std::vector<Point> & points,
+                     Real expected_volume)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    const auto np = points.size();
+    std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(np);
+
+    for (auto p : make_range(np))
+      polygon->set_node(p) = mesh.add_point(points[p], p);
+
+    polygon->set_id() = 0;
+    Elem * elem = mesh.add_elem(std::move(polygon));
+
+    const Real derived_volume = elem->volume();
+    const Real base_volume = elem->Elem::volume();
+    LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(derived_volume, expected_volume, TOLERANCE*TOLERANCE);
+
+    this->testC0PolygonMethods(mesh, np);
+  }
+
+
+
+  void testC0PolygonSquare()
+  {
+    LOG_UNIT_TEST;
+    testC0Polygon({{0,0}, {1,0}, {1,1}, {0,1}}, 1);
+  }
+
+  void testC0PolygonQuad()
+  {
+    LOG_UNIT_TEST;
+    testC0Polygon({{0,0}, {1,0}, {1,2}, {-1,1}}, 2.5);
+  }
+
+  void testC0PolygonPentagon()
+  {
+    LOG_UNIT_TEST;
+    testC0Polygon({{0,0}, {1,0}, {1.5,0.5}, {1,1}, {0,1}}, 1.25);
+  }
+
+  void testC0PolygonHexagon()
+  {
+    LOG_UNIT_TEST;
+    testC0Polygon({{0,0}, {1,0}, {1.5,0.5}, {1,1}, {0,1}, {-0.5, 0.5}}, 1.5);
+  }
+
 protected:
 
   // Helper function that is called by test_elem_invertible() to build an Elem
@@ -933,6 +987,74 @@ protected:
     // Return Elem and Nodes we created
     return std::make_pair(std::move(elem), std::move(nodes));
   }
+
+
+  // Helper function to factor out common tests
+  void testC0PolygonMethods(MeshBase & mesh,
+                           unsigned int n_sides)
+  {
+    Elem * elem = mesh.query_elem_ptr(0);
+    bool found_elem = elem;
+    mesh.comm().max(found_elem);
+    CPPUNIT_ASSERT(found_elem);
+
+    if (!elem)
+      return;
+
+    CPPUNIT_ASSERT_EQUAL(elem->type(), C0POLYGON);
+    CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), n_sides);
+    CPPUNIT_ASSERT_EQUAL(elem->n_sub_elem(), n_sides);
+    CPPUNIT_ASSERT_EQUAL(elem->n_sides(), n_sides);
+    CPPUNIT_ASSERT_EQUAL(elem->n_vertices(), n_sides);
+    CPPUNIT_ASSERT_EQUAL(elem->n_edges(), n_sides);
+
+    // Even number of sides
+    if (!(n_sides%2))
+      {
+        const unsigned int nsover2 = n_sides/2;
+        for (auto i : make_range(nsover2))
+          {
+            CPPUNIT_ASSERT_EQUAL(elem->opposite_side(i), i+nsover2);
+            CPPUNIT_ASSERT_EQUAL(elem->opposite_side(i+nsover2), i);
+          }
+      }
+
+    for (unsigned int i : make_range(n_sides))
+      {
+        CPPUNIT_ASSERT(elem->is_vertex(i));
+        CPPUNIT_ASSERT(!elem->is_edge(i));
+        CPPUNIT_ASSERT(!elem->is_face(i));
+        CPPUNIT_ASSERT(elem->is_node_on_side(i,i));
+        CPPUNIT_ASSERT(elem->is_node_on_edge(i,i));
+        CPPUNIT_ASSERT(elem->is_node_on_side((i+1)%n_sides,i));
+        CPPUNIT_ASSERT(elem->is_node_on_edge((i+1)%n_sides,i));
+        std::vector<unsigned int> nodes = elem->nodes_on_side(i);
+        CPPUNIT_ASSERT_EQUAL(nodes.size(), std::size_t(2));
+        CPPUNIT_ASSERT(nodes[0] == i ||
+                       nodes[1] == i);
+        CPPUNIT_ASSERT(nodes[0] == (i+1)%n_sides ||
+                       nodes[1] == (i+1)%n_sides);
+        std::vector<unsigned int> edge_nodes = elem->nodes_on_edge(i);
+        CPPUNIT_ASSERT(nodes == edge_nodes);
+
+
+        CPPUNIT_ASSERT_EQUAL(elem->local_side_node(i,0), i);
+        CPPUNIT_ASSERT_EQUAL(elem->local_side_node(i,1), (i+1)%n_sides);
+        CPPUNIT_ASSERT_EQUAL(elem->local_edge_node(i,0), i);
+        CPPUNIT_ASSERT_EQUAL(elem->local_edge_node(i,1), (i+1)%n_sides);
+
+        auto edge = elem->side_ptr(i);
+        CPPUNIT_ASSERT_EQUAL(edge->type(), EDGE2);
+        CPPUNIT_ASSERT_EQUAL(edge->node_ptr(0), mesh.node_ptr(i));
+        CPPUNIT_ASSERT_EQUAL(edge->node_ptr(1), mesh.node_ptr((i+1)%n_sides));
+      }
+
+    CPPUNIT_ASSERT(!elem->is_flipped());
+    elem->flip(&mesh.get_boundary_info());
+    CPPUNIT_ASSERT(elem->is_flipped());
+    elem->flip(&mesh.get_boundary_info());
+  }
+
 
   // Helper function that builds the specified type of Elem from a
   // vector of Points and returns the value of has_invertible_map()
