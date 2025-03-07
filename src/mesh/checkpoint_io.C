@@ -884,6 +884,14 @@ void CheckpointIO::read (const std::string & input_name)
   // knows that
   else if (mesh.n_processors() > 1)
     mesh.set_distributed();
+
+  // If the mesh isn't getting even critical partitioning then we
+  // should update cached data from the partitioning we just read in
+  if (mesh.skip_partitioning())
+    {
+      mesh.recalculate_n_partitions();
+      mesh.update_post_partitioning();
+    }
 }
 
 

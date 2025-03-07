@@ -44,7 +44,7 @@ public:
 
   // Test that we can write multiple checkpoint files from a single processor.
   template <typename MeshA, typename MeshB>
-  void testSplitter(bool binary, bool using_distmesh)
+  void testSplitter(bool binary, bool using_distmesh, bool skip_partition = false)
   {
     // The CheckpointIO-based splitter requires XDR.
 #ifdef LIBMESH_HAVE_XDR
@@ -98,10 +98,19 @@ public:
     // same total number of elements.
     {
       MeshB mesh(*TestCommWorld);
+      if (skip_partition)
+        mesh.skip_partitioning(true);
+
       CheckpointIO cpr(mesh);
       cpr.current_n_processors() = n_procs;
       cpr.binary() = binary;
       cpr.read(filename);
+
+      // If we decided to skip partitioning, then we shouldn't be
+      // waiting for a partition() call to get our n_partitions()
+      // cache in order
+      if (skip_partition)
+        CPPUNIT_ASSERT_EQUAL(mesh.n_partitions(), n_procs);
 
       std::size_t read_in_elements = 0;
 
@@ -173,6 +182,14 @@ public:
 
     testSplitter<DistributedMesh, DistributedMesh>(true, true);
   }
+
+  void testAsciiDistDistSplitterCache()
+  {
+    LOG_UNIT_TEST;
+
+    testSplitter<DistributedMesh, DistributedMesh>(false, true, true);
+  }
+
 
 };
 
