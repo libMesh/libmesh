@@ -78,6 +78,11 @@ public:
   virtual void build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i) override final
   { build_side_ptr(edge, i); }
 
+  /**
+   * For the const build_edge_ptr we use the parent method
+   */
+  using Elem::build_edge_ptr;
+
  /**
    * is_edge_on_side is trivial in 2D.
    */
