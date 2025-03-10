@@ -174,13 +174,6 @@ public:
 
   virtual void flush () override;
 
-  /**
-   * Get the number of rows and columns owned by this process
-   * @param i Row size
-   * @param j Column size
-   */
-  void get_local_size (numeric_index_type & m, numeric_index_type & n) const;
-
   virtual void set (const numeric_index_type i,
                     const numeric_index_type j,
                     const T value) override;
