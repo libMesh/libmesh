@@ -29,34 +29,42 @@ public:
   GradDivExactSolution() = default;
   ~GradDivExactSolution() = default;
 
-  RealGradient operator() (Real x, Real y, Real z)
+  RealGradient operator() (Point p)
   {
-    libmesh_ignore(z);
+    Point pp = R.transpose()*p;
+    Real x = pp(0), y = pp(1);
 
     const Real ux = cos(k*x)*sin(k*y);
     const Real uy = sin(k*x)*cos(k*y);
 
-    return RealGradient(ux, uy);
+    return R*RealGradient(ux, uy)/R.det();
   }
 
-  RealTensor grad(Real x, Real y, Real z)
+  RealTensor grad(Point p)
   {
-    libmesh_ignore(z);
+    Point pp = R.transpose()*p;
+    Real x = pp(0), y = pp(1);
 
     const Real dux_dx = -k*sin(k*x)*sin(k*y);
     const Real dux_dy =  k*cos(k*x)*cos(k*y);
     const Real duy_dx = dux_dy;
     const Real duy_dy = dux_dx;
 
-    return RealTensor(dux_dx, dux_dy, Real(0), duy_dx, duy_dy);
+    return R*RealTensor(dux_dx, dux_dy, Real(0), duy_dx, duy_dy)*R.transpose()/R.det();
   }
 
-  RealGradient forcing(Real x, Real y, Real z)
+  RealGradient forcing(Point p)
   {
-    return (2*k*k + 1)*operator()(x, y, z);
+    return (2*k*k + 1)*operator()(p);
+  }
+
+  static void RM(RealTensor T)
+  {
+    R = T;
   }
 
 private:
+  static RealTensor R;
   const Real k = pi;
 };
 
