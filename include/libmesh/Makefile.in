@@ -563,15 +563,15 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	edge.h edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h \
 	elem.h elem_cutter.h elem_hash.h elem_internal.h \
 	elem_quality.h elem_range.h elem_side_builder.h face.h \
-	face_inf_quad.h face_inf_quad4.h face_inf_quad6.h face_quad.h \
-	face_quad4.h face_quad4_shell.h face_quad8.h \
-	face_quad8_shell.h face_quad9.h face_quad9_shell.h face_tri.h \
-	face_tri3.h face_tri3_shell.h face_tri3_subdivision.h \
-	face_tri6.h face_tri7.h node.h node_elem.h node_range.h \
-	plane.h point.h reference_elem.h remote_elem.h side.h sphere.h \
-	stored_range.h surface.h default_coupling.h \
-	ghost_point_neighbors.h ghosting_functor.h \
-	non_manifold_coupling.h overlap_coupling.h \
+	face_c0polygon.h face_inf_quad.h face_inf_quad4.h \
+	face_inf_quad6.h face_polygon.h face_quad.h face_quad4.h \
+	face_quad4_shell.h face_quad8.h face_quad8_shell.h \
+	face_quad9.h face_quad9_shell.h face_tri.h face_tri3.h \
+	face_tri3_shell.h face_tri3_subdivision.h face_tri6.h \
+	face_tri7.h node.h node_elem.h node_range.h plane.h point.h \
+	reference_elem.h remote_elem.h side.h sphere.h stored_range.h \
+	surface.h default_coupling.h ghost_point_neighbors.h \
+	ghosting_functor.h non_manifold_coupling.h overlap_coupling.h \
 	point_neighbor_coupling.h sibling_coupling.h abaqus_io.h \
 	boundary_info.h boundary_mesh.h checkpoint_io.h \
 	distributed_mesh.h dyna_io.h ensight_io.h exodusII_io.h \
@@ -1323,6 +1323,9 @@ elem_side_builder.h: $(top_srcdir)/include/geom/elem_side_builder.h
 face.h: $(top_srcdir)/include/geom/face.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+face_c0polygon.h: $(top_srcdir)/include/geom/face_c0polygon.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 face_inf_quad.h: $(top_srcdir)/include/geom/face_inf_quad.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1330,6 +1333,9 @@ face_inf_quad4.h: $(top_srcdir)/include/geom/face_inf_quad4.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_inf_quad6.h: $(top_srcdir)/include/geom/face_inf_quad6.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_polygon.h: $(top_srcdir)/include/geom/face_polygon.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad.h: $(top_srcdir)/include/geom/face_quad.h
