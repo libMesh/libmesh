@@ -2436,7 +2436,8 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	write_exodus_QUADSHELL9.e write_exodus_TET10.e \
 	write_exodus_TET14.e write_exodus_TET4.e write_exodus_TRI3.e \
 	write_exodus_TRI6.e write_exodus_TRI7.e \
-	write_exodus_TRISHELL3.e $(am__append_8) $(am__append_9)
+	write_exodus_TRISHELL3.e smoother.out $(am__append_8) \
+	$(am__append_9)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
