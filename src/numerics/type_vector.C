@@ -22,8 +22,6 @@
 #include "libmesh/type_vector.h"
 
 // C++ includes
-#include <iostream>
-#include <iomanip> // for std::setw, std::setiosflags
 #include <type_traits> // std::is_trivially_copyable
 
 
@@ -43,32 +41,6 @@ namespace libMesh
 
 // ------------------------------------------------------------
 // TypeVector<T> class member functions
-template <typename T>
-void TypeVector<T>::print(std::ostream & os) const
-{
-#if LIBMESH_DIM == 1
-
-  os << "x=" << (*this)(0);
-
-#endif
-#if LIBMESH_DIM == 2
-
-  os << "(x,y)=("
-     << std::setw(8) << (*this)(0) << ", "
-     << std::setw(8) << (*this)(1) << ")";
-
-#endif
-#if LIBMESH_DIM == 3
-
-  os <<  "(x,y,z)=("
-     << std::setw(8) << (*this)(0) << ", "
-     << std::setw(8) << (*this)(1) << ", "
-     << std::setw(8) << (*this)(2) << ")";
-#endif
-}
-
-
-
 
 
 template <typename T>

@@ -31,6 +31,8 @@
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath>
 #include <complex>
+#include <iostream>
+#include <iomanip> // for std::setw, std::setiosflags
 
 namespace libMesh
 {
@@ -1098,6 +1100,30 @@ TypeVector<T> TypeVector<T>::unit() const
                        _coords[2]/length);
 #endif
 
+}
+
+template <typename T>
+void TypeVector<T>::print(std::ostream & os) const
+{
+#if LIBMESH_DIM == 1
+
+  os << "x=" << (*this)(0);
+
+#endif
+#if LIBMESH_DIM == 2
+
+  os << "(x,y)=("
+     << std::setw(8) << (*this)(0) << ", "
+     << std::setw(8) << (*this)(1) << ")";
+
+#endif
+#if LIBMESH_DIM == 3
+
+  os <<  "(x,y,z)=("
+     << std::setw(8) << (*this)(0) << ", "
+     << std::setw(8) << (*this)(1) << ", "
+     << std::setw(8) << (*this)(2) << ")";
+#endif
 }
 
 template <typename T>
