@@ -47,8 +47,6 @@ install-data-local: install-ngliblibDATA
 	  echo "If linking fails we may need install_name_tool/patchelf/chrpath installed"; \
 	fi
 
-.PHONY : .buildstamp
-
 .buildstamp:
 	$(MAKE) -C build $(AM_MAKEFLAGS)
 	touch .buildstamp

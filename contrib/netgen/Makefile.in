@@ -949,8 +949,6 @@ uninstall-am: uninstall-netgenincludeHEADERS uninstall-netgenlibDATA \
 @LIBMESH_ENABLE_NETGEN_TRUE@	  echo "If linking fails we may need install_name_tool/patchelf/chrpath installed"; \
 @LIBMESH_ENABLE_NETGEN_TRUE@	fi
 
-@LIBMESH_ENABLE_NETGEN_TRUE@.PHONY : .buildstamp
-
 @LIBMESH_ENABLE_NETGEN_TRUE@.buildstamp:
 @LIBMESH_ENABLE_NETGEN_TRUE@	$(MAKE) -C build $(AM_MAKEFLAGS)
 @LIBMESH_ENABLE_NETGEN_TRUE@	touch .buildstamp
