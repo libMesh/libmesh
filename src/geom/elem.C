@@ -159,18 +159,6 @@ const unsigned int Elem::type_to_n_nodes_map [] =
 
     9,  // QUADSHELL9
 
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-
     invalid_uint,  // C0POLYGON
   };
 
@@ -231,18 +219,6 @@ const unsigned int Elem::type_to_n_sides_map [] =
 
     4,  // QUADSHELL9
 
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-
     invalid_uint,  // C0POLYGON
   };
 
@@ -302,18 +278,6 @@ const unsigned int Elem::type_to_n_edges_map [] =
     8,  // PYRAMID18
 
     4,  // QUADSHELL9
-
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
-    invalid_uint,  // unused
 
     invalid_uint,  // C0POLYGON
   };
