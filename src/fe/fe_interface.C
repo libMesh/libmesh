@@ -2639,8 +2639,7 @@ FEFieldType FEInterface::field_type (const FEFamily & fe_family)
 unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
                                      const FEType & fe_type)
 {
-  //FIXME: We currently assume that the number of vector components is tied
-  //       to the mesh dimension. This will break for mixed-dimension meshes.
+  // We assume the number of vector components is the mesh spatial dimension.
   return field_type(fe_type.family) == TYPE_VECTOR ? mesh.spatial_dimension() : 1;
 }
 

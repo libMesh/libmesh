@@ -480,7 +480,7 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
       }
 
     // Here, we're assuming the number of vector components is the same
-    // as the mesh dimension. Will break for mixed dimension meshes.
+    // as the mesh spatial dimension.
     unsigned int dim = this->get_mesh().spatial_dimension();
     unsigned int nv = n_scalar_vars + dim*n_vector_vars;
 
@@ -615,7 +615,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
           }
       }
     // Here, we're assuming the number of vector components is the same
-    // as the mesh dimension. Will break for mixed dimension meshes.
+    // as the mesh spatial dimension.
     nv = n_scalar_vars + dim*n_vector_vars;
   }
 
@@ -793,7 +793,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         }
 
       // Here, we're assuming the number of vector components is the same
-      // as the mesh dimension. Will break for mixed dimension meshes.
+      // as the mesh spatial dimension.
       unsigned int nv_sys_split = n_scalar_vars + dim*n_vector_vars;
 
       // Update the current_local_solution
@@ -1212,7 +1212,7 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
       const DofMap & dof_map = system.get_dof_map();
 
       // We need to check if the constant monomial is a scalar or a vector and set the number of
-      // components as the mesh dimension for the latter case as per 'find_variable_numbers()'.
+      // components as the mesh spatial dimension for the latter as per es.find_variable_numbers().
       // Even for the case where a variable is not active on any subdomain belonging to the
       // processor, we still need to know this number to update 'var_ctr'.
       const unsigned int n_comps =
