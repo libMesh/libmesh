@@ -50,7 +50,8 @@ MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
   _vector              (vec),
   _dof_map             (dof_map),
   _system_vars         (std::move(vars)),
-  _out_of_mesh_mode    (false)
+  _out_of_mesh_mode    (false),
+  _new_resize          (0)
 {
 }
 
@@ -67,7 +68,8 @@ MeshFunction::MeshFunction (const EquationSystems & eqn_systems,
   _vector              (vec),
   _dof_map             (dof_map),
   _system_vars         (1,var),
-  _out_of_mesh_mode    (false)
+  _out_of_mesh_mode    (false),
+  _new_resize          (0)
 {
 }
 
@@ -78,7 +80,8 @@ MeshFunction::MeshFunction (const MeshFunction & mf):
   _vector              (mf._vector),
   _dof_map             (mf._dof_map),
   _system_vars         (mf._system_vars),
-  _out_of_mesh_mode    (mf._out_of_mesh_mode)
+  _out_of_mesh_mode    (mf._out_of_mesh_mode),
+  _new_resize          (0)
 {
   // Initialize the mf and set the point locator if the
   // input mf had done so.
@@ -118,8 +121,33 @@ void MeshFunction::init ()
   const MeshBase & mesh = this->_eqn_systems.get_mesh();
   _point_locator = mesh.sub_point_locator();
 
-  // ready for use
-  this->_initialized = true;
+int vec_dim = 0;
+int n_vector_vars = 0;
+int n_scalar_vars = 0;
+
+int total_variables = _dof_map.n_variables();
+const MeshBase & mesh = this->_eqn_systems.get_mesh();
+_point_locator = mesh.sub_point_locator();
+
+for (int i = 0; i < total_variables; ++i) 
+{
+  FEType fe_type = _dof_map.variable_type(i);
+  if (fe_type != SCALAR) 
+  { 
+    n_vector_vars++;
+    int vector_dim = FEInterface::n_vec_dim(mesh, fe_type); 
+    if (vector_dim > vec_dim)
+      vec_dim = vector_dim;
+  } 
+  else 
+    n_scalar_vars++;
+  
+}
+
+_new_resize = vec_dim * n_vector_vars + n_scalar_vars;
+
+// ready for use
+this->_initialized = true;
 }
 
 
@@ -244,10 +272,8 @@ void MeshFunction::operator() (const Point & p,
     }
   else
     {
-      // resize the output vector to the number of output values
-      // that the user told us
-      output.resize (cast_int<unsigned int>
-                     (this->_system_vars.size()));
+      // resize the output vector to the _new_resize
+      output.resize (_new_resize);
 
 
       {
@@ -460,9 +486,8 @@ void MeshFunction::_gradient_on_elem (const Point & p,
 {
   libmesh_assert(element);
 
-  // resize the output vector to the number of output values
-  // that the user told us
-  output.resize (this->_system_vars.size());
+  // resize the output vector to the _new_resize
+  output.resize (_new_resize);
 
   const unsigned int dim = element->dim();
 
@@ -573,9 +598,8 @@ void MeshFunction::hessian (const Point & p,
                         << " are not yet implemented!"
                         << std::endl);
 
-      // resize the output vector to the number of output values
-      // that the user told us
-      output.resize (this->_system_vars.size());
+      // resize the output vector to the _new_resize
+      output.resize (_new_resize);
 
 
       {
