@@ -249,6 +249,15 @@ public:
   Order get_order() const { return static_cast<Order>(_order + 2 * _p_level); }
 
   /**
+   * \returns The "base" order of the quadrature rule, independent of
+   * element.
+   *
+   * This function should be used when comparing quadrature objects
+   * independently of their last initialization.
+   */
+  Order get_base_order() const { return static_cast<Order>(_order); }
+
+  /**
    * Prints information relevant to the quadrature rule, by default to
    * libMesh::out.
    */
