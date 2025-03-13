@@ -512,7 +512,7 @@ public:
     CPPUNIT_ASSERT_EQUAL ( qtype, qrule2D->type() );
     CPPUNIT_ASSERT_EQUAL ( qtype, qrule3D->type() );
 
-    // Simpson's Rule is inherently second-order
+    // Simpson's Rule is inherently third-order
     if (qtype != QSIMPSON)
       {
         CPPUNIT_ASSERT_EQUAL ( order, qrule1D->get_base_order() );
