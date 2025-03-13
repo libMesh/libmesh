@@ -42,9 +42,11 @@
 #include "libmesh/steady_solver.h"
 #include "solution_function.h"
 
-
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
+
+// Define static data member holding (optional) rotation matrix
+RealTensor CurlCurlExactSolution::R;
 
 // The main program.
 int main (int argc, char ** argv)
@@ -91,6 +93,12 @@ int main (int argc, char ** argv)
   // Make sure the code is robust against nodal reorderings.
   MeshTools::Modification::permute_elements(mesh);
 
+  // Make sure the code is robust against solves on 2d meshes rotated out of
+  // the xy plane. By default, all Euler angles are zero, the rotation matrix
+  // is the identity, and the mesh stays in place.
+  const Real phi = infile("phi", 0.), theta = infile("theta", 0.), psi = infile("psi", 0.);
+  CurlCurlExactSolution::RM(MeshTools::Modification::rotate(mesh, phi, theta, psi));
+
   // Print information about the mesh to the screen.
   mesh.print_info();
 
@@ -132,6 +140,7 @@ int main (int argc, char ** argv)
   // Print information about the system to the screen.
   equation_systems.print_info();
 
+  // Solve the system.
   system.solve();
 
   ExactSolution exact_sol(equation_systems);

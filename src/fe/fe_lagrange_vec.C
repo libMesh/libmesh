@@ -641,7 +641,8 @@ void FE<2,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
                                     const std::vector<Number> & elem_soln,
                                     std::vector<Number> & nodal_soln,
-                                    const bool add_p_level)
+                                    const bool add_p_level,
+                                    const unsigned)
 { lagrange_vec_nodal_soln(elem, order, elem_soln, 2 /*dim*/, nodal_soln, add_p_level); }
 
 template <>
@@ -649,7 +650,8 @@ void FE<3,LAGRANGE_VEC>::nodal_soln(const Elem * elem,
                                     const Order order,
                                     const std::vector<Number> & elem_soln,
                                     std::vector<Number> & nodal_soln,
-                                    const bool add_p_level)
+                                    const bool add_p_level,
+                                    const unsigned)
 { lagrange_vec_nodal_soln(elem, order, elem_soln, 3 /*dim*/, nodal_soln, add_p_level); }
 
 LIBMESH_FE_SIDE_NODAL_SOLN(LAGRANGE_VEC)

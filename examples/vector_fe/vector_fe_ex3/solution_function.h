@@ -47,19 +47,18 @@ public:
                            DenseVector<Number> & output)
   {
     output.zero();
-    const Real x=p(0), y=p(1);
     // libMesh assumes each component of the vector-valued variable is stored
     // contiguously.
-    output(_u_var)   = soln(x, y)(0);
-    output(_u_var+1) = soln(x, y)(1);
+    output(_u_var)   = soln(p)(0);
+    output(_u_var+1) = soln(p)(1);
+    output(_u_var+2) = soln(p)(2);
   }
 
   virtual Number component(unsigned int component_in,
                            const Point & p,
                            const Real)
   {
-    const Real x=p(0), y=p(1);
-    return soln(x, y)(component_in);
+    return soln(p)(component_in);
   }
 
   virtual std::unique_ptr<FunctionBase<Number>> clone() const
@@ -88,16 +87,15 @@ public:
                            DenseVector<Gradient> & output)
   {
     output.zero();
-    const Real x=p(0), y=p(1);
-    output(_u_var)   = soln.grad(x, y).row(0);
-    output(_u_var+1) = soln.grad(x, y).row(1);
+    output(_u_var)   = soln.grad(p).row(0);
+    output(_u_var+1) = soln.grad(p).row(1);
+    output(_u_var+2) = soln.grad(p).row(2);
   }
 
   virtual Gradient component(unsigned int component_in, const Point & p,
                              const Real)
   {
-    const Real x=p(0), y=p(1);
-    return soln.grad(x, y).row(component_in);
+    return soln.grad(p).row(component_in);
   }
 
   virtual std::unique_ptr<FunctionBase<Gradient>> clone() const

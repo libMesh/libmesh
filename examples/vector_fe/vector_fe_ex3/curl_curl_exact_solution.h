@@ -29,39 +29,43 @@ public:
   CurlCurlExactSolution() = default;
   ~CurlCurlExactSolution() = default;
 
-  RealGradient operator() (Real x, Real y)
+  RealGradient operator() (Point p)
   {
-    const Real ux =  cos(pi*x)*sin(pi*y);
-    const Real uy = -sin(pi*x)*cos(pi*y);
+    Point pp = R.transpose()*p;
+    Real x = pp(0), y = pp(1);
 
-    return RealGradient(ux, uy);
+    const Real ux =  cos(k*x)*sin(k*y);
+    const Real uy = -sin(k*x)*cos(k*y);
+
+    return R*RealGradient(ux, uy);
   }
 
-  RealTensor grad(Real x, Real y)
+  RealTensor grad(Point p)
   {
-    const Real dux_dx = -pi*sin(pi*x)*sin(pi*y);
-    const Real dux_dy = pi*cos(pi*x)*cos(pi*y);
-    const Real duy_dx = -pi*cos(pi*x)*cos(pi*y);
-    const Real duy_dy = pi*sin(pi*x)*sin(pi*y);
+    Point pp = R.transpose()*p;
+    Real x = pp(0), y = pp(1);
 
-    return RealTensor(dux_dx, dux_dy, Real(0), duy_dx, duy_dy);
+    const Real dux_dx = -k*sin(k*x)*sin(k*y);
+    const Real dux_dy =  k*cos(k*x)*cos(k*y);
+    const Real duy_dx = -k*cos(k*x)*cos(k*y);
+    const Real duy_dy =  k*sin(k*x)*sin(k*y);
+
+    return R*RealTensor(dux_dx, dux_dy, Real(0), duy_dx, duy_dy)*R.transpose();
   }
 
-  RealGradient curl(Real x, Real y)
+  RealGradient forcing(Point p)
   {
-    const Real dux_dy =  pi*cos(pi*x)*cos(pi*y);
-    const Real duy_dx = -pi*cos(pi*x)*cos(pi*y);
-
-    return RealGradient(Real(0), Real(0), duy_dx - dux_dy);
+    return (2*k*k + 1)*operator()(p);
   }
 
-  RealGradient forcing(Real x, Real y)
+  static void RM(RealTensor T)
   {
-    const Real fx =  (2*pi*pi + 1)*cos(pi*x)*sin(pi*y);
-    const Real fy = -(2*pi*pi + 1)*sin(pi*x)*cos(pi*y);
-
-    return RealGradient(fx, fy);
+    R = T;
   }
+
+private:
+  static RealTensor R;
+  const Real k = pi;
 };
 
 #endif // CURL_CURL_EXACT_SOLUTION_H
