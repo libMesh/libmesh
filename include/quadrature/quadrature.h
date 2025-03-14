@@ -201,9 +201,9 @@ public:
 
   /**
    * Initializes the data structures for a quadrature rule for an
-   * element of type \p type.  Some types, such as POLYGON1, might
-   * require more detailed element information and so might not be
-   * compatible with this API.
+   * element of type \p type.  Some types, such as Polygon subclasses,
+   * might require more detailed element information and so might not
+   * be compatible with this API.
    *
    * New code should use the Elem-based API for most use cases, but
    * some code may initialize quadrature rules with simple ElemType
