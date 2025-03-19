@@ -23,7 +23,11 @@ public:
 
   SPARSEMATRIXTEST
 
+  // Our repo's test files use PetscScalar==double
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
   CPPUNIT_TEST(testPetscBinaryRead);
+#endif
+
   CPPUNIT_TEST(testPetscBinaryWrite);
 #if PETSC_RELEASE_GREATER_EQUALS(3, 23, 0)
   CPPUNIT_TEST(testPetscCopyFromHash);
