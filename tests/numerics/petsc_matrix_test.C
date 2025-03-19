@@ -24,8 +24,10 @@ public:
   SPARSEMATRIXTEST
 
   // Our repo's test files use PetscScalar==double
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
+#ifdef LIBMESH_DEFAULT_DOUBLE_PRECISION
   CPPUNIT_TEST(testPetscBinaryRead);
+#endif
 #endif
 
   CPPUNIT_TEST(testPetscBinaryWrite);
