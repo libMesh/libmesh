@@ -438,7 +438,8 @@ void assemble_wave(EquationSystems & es,
           // points, the number of shape functions may also be obtained
           // in a different manner.  This offers the great advantage
           // of being valid for both finite and infinite elements.
-          const unsigned int n_sf = cfe->n_shape_functions();
+          const unsigned int n_sf =
+            FEInterface::n_dofs(cfe->get_fe_type(), elem);
 
           // Now we will build the element matrices.  Since the infinite
           // elements are based on a Petrov-Galerkin scheme, the

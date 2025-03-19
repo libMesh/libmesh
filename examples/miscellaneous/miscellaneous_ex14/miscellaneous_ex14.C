@@ -465,7 +465,8 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
           Number potval=-1./(q_point[qp]).norm();
 
           // Now, get number of shape functions that are nonzero at this point::
-          unsigned int n_sf = cfe->n_shape_functions();
+          const unsigned int n_sf =
+            FEInterface::n_dofs(cfe->get_fe_type(), elem);
           // loop over them:
           for (unsigned int i=0; i<n_sf; i++)
             {
@@ -539,7 +540,8 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
          // the base side always has number 0
          const unsigned int side=0;
          face_fe->reinit (elem, side);
-         unsigned int n_sf = face_fe->n_shape_functions();
+         const unsigned int n_sf =
+           FEInterface::n_dofs(face_fe->get_fe_type(), elem);
 
          H.resize (dof_indices.size(), dof_indices.size());
 
@@ -639,7 +641,8 @@ void assemble_SchroedingerEquation(EquationSystems &es, const std::string &syste
             //out<<"neighbor id: "<<relevant_neighbor->id();
             //out<<"  this id: "<<elem->id()<<std::endl;
             face_fe->reinit (elem, side);
-            unsigned int n_sf = face_fe->n_shape_functions();
+            const unsigned int n_sf =
+              FEInterface::n_dofs(face_fe->get_fe_type(), elem);
 
             H.resize (dof_indices.size(), dof_indices.size());
 
