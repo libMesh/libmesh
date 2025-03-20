@@ -123,7 +123,8 @@ void assemble_func(EquationSystems & es, const std::string & system_name)
       const unsigned int max_qp = cfe->n_quadrature_points();
       for (unsigned int qp=0; qp<max_qp; ++qp)
         {
-          const unsigned int n_sf = cfe->n_shape_functions();
+          const unsigned int n_sf =
+            FEInterface::n_dofs(cfe->get_fe_type(), elem);
           for (unsigned int i=0; i<n_sf; ++i)
             {
               if (rho > 0)
@@ -168,17 +169,6 @@ int main (int argc, char** argv)
 #ifndef LIBMESH_ENABLE_INFINITE_ELEMENTS
   libmesh_example_requires(false, "--enable-ifem");
 #else
-
-#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
-  // Node constraints are not yet implemented for infinite elements.
-  libmesh_example_requires(false, "--disable-node-constraints");
-#endif
-
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  // UniformRefinement uses second derivatives if they are enabled,
-  // but for infinite elements they are not implemented.
-  libmesh_example_requires(false, "--disable-second");
-#endif
 
   // Skip this example if libMesh was compiled with <3 dimensions.
   // INFINITE ELEMENTS ARE IMPLEMENTED ONLY FOR 3 DIMENSIONS AT THE MOMENT.
