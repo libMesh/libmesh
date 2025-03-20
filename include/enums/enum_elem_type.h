@@ -79,6 +79,8 @@ enum ElemType : int {
                PYRAMID18 = 37,
                // Another shell elem
                QUADSHELL9 = 38,
+               // An arbitrary polygon with N EDGE2 sides
+               C0POLYGON = 39,
                // Invalid
                INVALID_ELEM};   // should always be last
 
