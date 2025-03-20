@@ -738,6 +738,7 @@ void PetscMatrix<T>::add_matrix(const DenseMatrix<T> & dm,
   libmesh_assert_equal_to (rows.size(), n_rows);
   libmesh_assert_equal_to (cols.size(), n_cols);
 
+  std::scoped_lock lock(this->_petsc_matrix_mutex);
   LibmeshPetscCall(MatSetValues(this->_mat,
                                 n_rows, numeric_petsc_cast(rows.data()),
                                 n_cols, numeric_petsc_cast(cols.data()),
@@ -778,6 +779,7 @@ void PetscMatrix<T>::add_block_matrix(const DenseMatrix<T> & dm,
   libmesh_assert_equal_to (blocksize, static_cast<numeric_index_type>(petsc_blocksize));
 #endif
 
+  std::scoped_lock lock(this->_petsc_matrix_mutex);
   // These casts are required for PETSc <= 2.1.5
   LibmeshPetscCall(MatSetValuesBlocked(this->_mat,
                                        n_brows, numeric_petsc_cast(brows.data()),
@@ -968,6 +970,7 @@ void PetscMatrix<T>::set (const numeric_index_type i,
   PetscInt i_val=i, j_val=j;
 
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
+  std::scoped_lock lock(this->_petsc_matrix_mutex);
   LibmeshPetscCall(MatSetValues(this->_mat, 1, &i_val, 1, &j_val,
                                 &petsc_value, INSERT_VALUES));
 }
@@ -984,6 +987,7 @@ void PetscMatrix<T>::add (const numeric_index_type i,
   PetscInt i_val=i, j_val=j;
 
   PetscScalar petsc_value = static_cast<PetscScalar>(value);
+  std::scoped_lock lock(this->_petsc_matrix_mutex);
   LibmeshPetscCall(MatSetValues(this->_mat, 1, &i_val, 1, &j_val,
                                 &petsc_value, ADD_VALUES));
 }
@@ -1190,12 +1194,7 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
   // (through petsc_cols) during data copy in another thread. So
   // the safe thing to do is to lock the whole method
 
-#ifdef LIBMESH_HAVE_CXX11_THREAD
-  std::lock_guard<std::mutex>
-#else
-  Threads::spin_mutex::scoped_lock
-#endif
-    lock(_petsc_matrix_mutex);
+  std::lock_guard<std::mutex> lock(_petsc_matrix_mutex);
 
   LibmeshPetscCall(MatGetRow(this->_mat, i_val, &ncols, &petsc_cols, &petsc_row));
 
