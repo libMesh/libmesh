@@ -2191,7 +2191,9 @@ std::size_t System::read_serialized_vectors (Xdr & io,
       // Get the buffer size
       io.data(vector_length);
 
-      libmesh_error_msg_if (num_vecs != vectors.size(), "Unexpected value of num_vecs");
+      libmesh_error_msg_if
+        (num_vecs != vectors.size(),
+         "Xdr file header declares " << num_vecs << " vectors, but we were asked to read " << vectors.size());
 
       if (num_vecs != 0)
         {
