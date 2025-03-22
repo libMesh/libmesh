@@ -17,13 +17,14 @@
 #include "fpconfig.hh"
 #include "fparser.hh"
 
-#include <set>
-#include <cstdlib>
-#include <cstring>
+#include <cassert>
 #include <cctype>
 #include <cmath>
-#include <cassert>
+#include <cstdlib>
+#include <cstring>
 #include <limits>
+#include <mutex>
+#include <set>
 
 #include "extrasrc/fptypes.hh"
 #include "extrasrc/fpaux.hh"
@@ -931,6 +932,8 @@ Value_t FunctionParserBase<Value_t>::epsilon()
 template<typename Value_t>
 void FunctionParserBase<Value_t>::setEpsilon(Value_t value)
 {
+    static std::mutex epsilon_mutex;
+    std::lock_guard<std::mutex> lock(epsilon_mutex);
     Epsilon<Value_t>::value = value;
 }
 
