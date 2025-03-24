@@ -393,7 +393,7 @@ void RBConstructionBase<Base>::load_training_set(const std::map<std::string, std
   // Check that (new_training_set.size() == get_n_params()) is the same on all processes so that
   // we go into the same branch of the "if" statement below on all processes.
   const bool size_matches = (new_training_set.size() == n_params);
-  this->comm().verify(size_matches);
+  libmesh_assert(this->comm().verify(size_matches));
 
   if (size_matches)
     {

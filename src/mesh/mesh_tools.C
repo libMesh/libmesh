@@ -1607,7 +1607,7 @@ void libmesh_assert_equal_points (const MeshBase & mesh)
     {
       const Point * p = mesh.query_node_ptr(i);
 
-      mesh.comm().semiverify(p);
+      libmesh_assert(mesh.comm().semiverify(p));
     }
 }
 
@@ -1628,7 +1628,7 @@ void libmesh_assert_equal_connectivity (const MeshBase & mesh)
         for (auto n : e->node_index_range())
           nodes.push_back(e->node_id(n));
 
-      mesh.comm().semiverify(e ? &nodes : nullptr);
+      libmesh_assert(mesh.comm().semiverify(e ? &nodes : nullptr));
     }
 }
 
