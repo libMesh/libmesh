@@ -176,6 +176,9 @@ public:
 
   const NumericVector<T> & diagonal() const;
 
+  // Our nonzero pattern hasn't changed; it's always just the diagonal!
+  virtual void reset_memory() override {}
+
 protected:
   /// Underlying diagonal matrix storage
   std::unique_ptr<NumericVector<T>> _diagonal;

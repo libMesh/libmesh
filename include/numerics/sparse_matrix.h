@@ -606,7 +606,9 @@ public:
   /**
    * Reset the memory storage of the matrix. Unlike \p clear(), this does not destroy the matrix but
    * rather will reset the matrix to use the original preallocation or when using hash table matrix
-   * assembly (see \p use_hash_table()) will reset (clear) the hash table used for assembly
+   * assembly (see \p use_hash_table()) will reset (clear) the hash table used for assembly. An
+   * important note: if using preallocation based matrix memory and if the nonzero structure of the
+   * matrix has not changed from what was preallocated, then this will be a no-op!
    */
   virtual void reset_memory() { libmesh_not_implemented(); }
 
