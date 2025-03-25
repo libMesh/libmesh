@@ -806,6 +806,8 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
       const_cast<PetscMatrix<T> *>(this)->close();
     }
 
+  semiparallel_only();
+
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * petsc_submatrix = cast_ptr<PetscMatrix<T> *>(&submatrix);
 
@@ -1217,6 +1219,8 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
 template <typename T>
 PetscMatrix<T> & PetscMatrix<T>::operator= (const PetscMatrix<T> & v)
 {
+  semiparallel_only();
+
   if (this->_mat)
     {
       PetscBool assembled;
