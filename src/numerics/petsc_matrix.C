@@ -380,17 +380,13 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
 }
 
 template <typename T>
-void PetscMatrix<T>::reset_preallocation()
+bool PetscMatrix<T>::reset_preallocation()
 {
-#if !PETSC_VERSION_LESS_THAN(3,9,0)
   libmesh_assert (this->initialized());
 
-  LibmeshPetscCall(MatResetPreallocation(this->_mat));
-#else
-  libmesh_warning("Your version of PETSc doesn't support resetting of "
-                  "preallocation, so we will use your most recent sparsity "
-                  "pattern. This may result in a degradation of performance\n");
-#endif
+  PetscBool memoryreset;
+  LibmeshPetscCall(MatResetPreallocation(this->_mat, &memoryreset));
+  return memoryreset;
 }
 
 template <typename T>
@@ -1285,18 +1281,23 @@ PetscMatrix<T>::copy_from_hash ()
 #endif
 
 template <typename T>
-void
+bool
 PetscMatrix<T>::reset_memory()
 {
+  semiparallel_only();
+
   if (this->_use_hash_table)
 #if PETSC_RELEASE_GREATER_EQUALS(3, 23, 0)
+    {
     // This performs MatReset plus re-establishes the hash table
     LibmeshPetscCall(MatResetHash(this->_mat));
+    return true;
+    }
 #else
     libmesh_error_msg("Resetting hash tables not supported until PETSc version 3.23");
 #endif
   else
-    this->reset_preallocation();
+    return this->reset_preallocation();
 }
 
 //------------------------------------------------------------------

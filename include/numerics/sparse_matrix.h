@@ -609,8 +609,9 @@ public:
    * assembly (see \p use_hash_table()) will reset (clear) the hash table used for assembly. An
    * important note: if using preallocation based matrix memory and if the nonzero structure of the
    * matrix has not changed from what was preallocated, then this will be a no-op!
+   * @returns Whether memory has changed
    */
-  virtual void reset_memory() { libmesh_not_implemented(); }
+  virtual bool reset_memory() { libmesh_not_implemented(); }
 
 protected:
   /**
