@@ -382,6 +382,8 @@ void PetscMatrix<T>::update_preallocation_and_zero ()
 template <typename T>
 void PetscMatrix<T>::reset_preallocation()
 {
+  semiparallel_only();
+
 #if !PETSC_VERSION_LESS_THAN(3,9,0)
   libmesh_assert (this->initialized());
 
@@ -1288,6 +1290,8 @@ template <typename T>
 void
 PetscMatrix<T>::reset_memory()
 {
+  semiparallel_only();
+
   if (this->_use_hash_table)
 #if PETSC_RELEASE_GREATER_EQUALS(3, 23, 0)
     // This performs MatReset plus re-establishes the hash table
