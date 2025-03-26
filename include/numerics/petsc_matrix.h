@@ -162,10 +162,8 @@ public:
 
   /**
    * Reset matrix to use the original nonzero pattern provided by users
-   * @returns Whether the memory was touched. Memory will be untouched if previous assemblies
-   * matched the preallocated sparsity pattern
    */
-  bool reset_preallocation();
+  void reset_preallocation();
 
   virtual void zero () override;
 
@@ -293,7 +291,7 @@ public:
 
   virtual bool supports_hash_table() const override;
 
-  virtual bool reset_memory() override;
+  virtual void reset_memory() override;
 
 protected:
   /**

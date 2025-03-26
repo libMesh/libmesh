@@ -177,7 +177,7 @@ public:
   const NumericVector<T> & diagonal() const;
 
   // Our nonzero pattern hasn't changed; it's always just the diagonal!
-  virtual bool reset_memory() override { return false; }
+  virtual void reset_memory() override {}
 
 protected:
   /// Underlying diagonal matrix storage
