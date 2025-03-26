@@ -323,6 +323,8 @@ void
 CondensedEigenSystem::copy_super_to_sub(const SparseMatrix<Number> & super,
                                         SparseMatrix<Number> & sub)
 {
+  parallel_object_only();
+
   libmesh_assert_equal_to(sub.local_m(), local_non_condensed_dofs_vector.size());
   libmesh_assert_equal_to(sub.local_m() + this->get_dof_map().n_local_constrained_dofs(),
                           super.local_m());

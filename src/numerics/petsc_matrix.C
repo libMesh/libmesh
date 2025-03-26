@@ -806,6 +806,8 @@ void PetscMatrix<T>::_get_submatrix(SparseMatrix<T> & submatrix,
       const_cast<PetscMatrix<T> *>(this)->close();
     }
 
+  semiparallel_only();
+
   // Make sure the SparseMatrix passed in is really a PetscMatrix
   PetscMatrix<T> * petsc_submatrix = cast_ptr<PetscMatrix<T> *>(&submatrix);
 
@@ -1217,31 +1219,23 @@ void PetscMatrix<T>::get_row (numeric_index_type i_in,
 template <typename T>
 PetscMatrix<T> & PetscMatrix<T>::operator= (const PetscMatrix<T> & v)
 {
+  semiparallel_only();
+
   if (this->_mat)
     {
       PetscBool assembled;
       LibmeshPetscCall(MatAssembled(this->_mat, &assembled));
-      bool same_nonzero_pattern = false;
+#ifndef NDEBUG
+      const bool cxx_assembled = (assembled == PETSC_TRUE) ? true : false;
+      libmesh_assert(this->_communicator.verify(cxx_assembled));
+#endif
 
-      if (assembled)
-        {
-          MatInfo our_info, v_info;
-
-          LibmeshPetscCall(MatGetInfo(this->_mat, MAT_GLOBAL_SUM, &our_info));
-          LibmeshPetscCall(MatGetInfo(v._mat, MAT_GLOBAL_SUM, &v_info));
-          if (our_info.nz_allocated == v_info.nz_allocated)
-            same_nonzero_pattern = true;
-        }
-      else
+      if (!assembled)
         // MatCopy does not work with an unassembled matrix. We could use MatDuplicate but then we
         // would have to destroy the matrix we manage and others might be relying on that data. So
         // we just assemble here regardless of the preceding level of matrix fill
         this->close();
-
-      if (same_nonzero_pattern)
-        LibmeshPetscCall(MatCopy(v._mat, this->_mat, SAME_NONZERO_PATTERN));
-      else
-        LibmeshPetscCall(MatCopy(v._mat, this->_mat, DIFFERENT_NONZERO_PATTERN));
+      LibmeshPetscCall(MatCopy(v._mat, this->_mat, DIFFERENT_NONZERO_PATTERN));
     }
   else
       LibmeshPetscCall(MatDuplicate(v._mat, MAT_COPY_VALUES, &this->_mat));
