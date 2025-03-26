@@ -363,9 +363,7 @@ StaticCondensation::close()
   if (!_have_cached_values)
     {
       const bool closed = _reduced_sys_mat->closed();
-#ifndef NDEBUG
-      _communicator.verify(closed);
-#endif
+      libmesh_assert(_communicator.verify(closed));
       if (!closed)
         _reduced_sys_mat->close();
       return;

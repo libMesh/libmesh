@@ -1108,7 +1108,7 @@ write_out_interior_basis_functions(const std::string & directory_name,
   // Quick return if there is no work to do. Note: make sure all procs
   // agree there is no work to do.
   bool is_empty = _local_eim_basis_functions.empty();
-  this->comm().verify(is_empty);
+  libmesh_assert(this->comm().verify(is_empty));
 
   if (is_empty)
     return;
@@ -1279,7 +1279,7 @@ get_interior_basis_functions_as_vecs()
   // Quick return if there is no work to do. Note: make sure all procs
   // agree there is no work to do.
   bool is_empty = _local_eim_basis_functions.empty();
-  this->comm().verify(is_empty);
+  libmesh_assert(this->comm().verify(is_empty));
 
   if (is_empty)
     return interior_basis_functions;
@@ -1315,7 +1315,7 @@ write_out_side_basis_functions(const std::string & directory_name,
   // Quick return if there is no work to do. Note: make sure all procs
   // agree there is no work to do.
   bool is_empty = _local_side_eim_basis_functions.empty();
-  this->comm().verify(is_empty);
+  libmesh_assert(this->comm().verify(is_empty));
 
   if (is_empty)
     return;
@@ -1431,7 +1431,7 @@ write_out_node_basis_functions(const std::string & directory_name,
   // Quick return if there is no work to do. Note: make sure all procs
   // agree there is no work to do.
   bool is_empty = _local_node_eim_basis_functions.empty();
-  this->comm().verify(is_empty);
+  libmesh_assert(this->comm().verify(is_empty));
 
   if (is_empty)
     return;
@@ -1899,7 +1899,7 @@ void RBEIMEvaluation::gather_bfs()
   // each processor is the same, the only thing that differs is the number
   // of elements, so make sure that is the case now.
   auto n_bf = _local_eim_basis_functions.size();
-  this->comm().verify(n_bf);
+  libmesh_assert(this->comm().verify(n_bf));
 
   // This function should never be called if there are no basis
   // functions, so if it was, something went wrong.
@@ -2047,7 +2047,7 @@ void RBEIMEvaluation::side_gather_bfs()
   // each processor is the same, the only thing that differs is the number
   // of elements, so make sure that is the case now.
   auto n_bf = _local_side_eim_basis_functions.size();
-  this->comm().verify(n_bf);
+  libmesh_assert(this->comm().verify(n_bf));
 
   // This function should never be called if there are no basis
   // functions, so if it was, something went wrong.
@@ -2195,7 +2195,7 @@ void RBEIMEvaluation::node_gather_bfs()
   // each processor is the same, the only thing that differs is the number
   // of elements, so make sure that is the case now.
   auto n_bf = _local_node_eim_basis_functions.size();
-  this->comm().verify(n_bf);
+  libmesh_assert(this->comm().verify(n_bf));
 
   // This function should never be called if there are no basis
   // functions, so if it was, something went wrong.

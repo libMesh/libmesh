@@ -144,11 +144,11 @@ struct TypeVectorAttributes
   static const bool has_min_max = true;
   static void set_lowest(V & x) {
     for (int d=0; d != LIBMESH_DIM; ++d)
-      TIMPI::Attributes<decltype(x(d))>::set_lowest(x(d));
+      TIMPI::Attributes<typename std::remove_reference<decltype(x(d))>::type>::set_lowest(x(d));
   }
   static void set_highest(V & x) {
     for (int d=0; d != LIBMESH_DIM; ++d)
-      TIMPI::Attributes<decltype(x(d))>::set_highest(x(d));
+      TIMPI::Attributes<typename std::remove_reference<decltype(x(d))>::type>::set_highest(x(d));
   }
 };
 
