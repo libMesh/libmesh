@@ -34,7 +34,6 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/threads.h"
-#include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_to_string.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
@@ -61,7 +60,8 @@ FEAbstract::FEAbstract(const unsigned int d,
   calculate_div_phi(false),
   calculate_dphiref(false),
   fe_type(fet),
-  elem_type(INVALID_ELEM),
+  _elem_type(INVALID_ELEM),
+  _elem(nullptr),
   _elem_p_level(0),
   _p_level(0),
   qrule(nullptr),
@@ -394,9 +394,16 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
     }
 }
 
+
+
 void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> & nodes)
 {
-  nodes.resize(Elem::type_to_n_nodes_map[itemType]);
+  const unsigned int n_nodes = Elem::type_to_n_nodes_map[itemType];
+  if (n_nodes == invalid_uint)
+    libmesh_error_msg("Number of nodes is not well-defined for " <<
+                      Utility::enum_to_string(itemType));
+
+  nodes.resize(n_nodes);
   switch(itemType)
     {
     case NODEELEM:
