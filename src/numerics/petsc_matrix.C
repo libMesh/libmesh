@@ -1288,7 +1288,7 @@ PetscMatrix<T>::copy_from_hash ()
 
 template <typename T>
 void
-PetscMatrix<T>::reset_memory()
+PetscMatrix<T>::restore_original_nonzero_pattern()
 {
   semiparallel_only();
 
