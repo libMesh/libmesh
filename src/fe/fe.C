@@ -47,6 +47,7 @@ namespace libMesh
 template <unsigned int Dim, FEFamily T>
 FE<Dim,T>::FE (const FEType & fet) :
   FEGenericBase<typename FEOutputType<T>::type> (Dim,fet),
+  caching(!libMesh::on_command_line("--disable-caching")),
   last_side(INVALID_ELEM),
   last_edge(INVALID_ELEM)
 {
@@ -207,13 +208,6 @@ void FE<Dim,T>::reinit(const Elem * elem,
               this->_fe_map->template init_reference_to_physical_map<Dim>
                 (this->qrule->get_points(), elem);
               this->init_shape_functions (this->qrule->get_points(), elem);
-
-              if (this->shapes_need_reinit())
-                {
-                  cached_nodes.resize(elem->n_nodes());
-                  for (auto n : elem->node_index_range())
-                    cached_nodes[n] = elem->point(n);
-                }
             }
           else
             {
@@ -238,10 +232,14 @@ void FE<Dim,T>::reinit(const Elem * elem,
                   this->_fe_map->template init_reference_to_physical_map<Dim>
                     (this->qrule->get_points(), elem);
                   this->init_shape_functions (this->qrule->get_points(), elem);
-                  cached_nodes.resize(elem->n_nodes());
-                  for (auto n : elem->node_index_range())
-                    cached_nodes[n] = elem->point(n);
                 }
+            }
+
+          if (this->shapes_need_reinit() && caching && !cached_nodes_still_fit)
+            {
+              cached_nodes.resize(elem->n_nodes());
+              for (auto n : elem->node_index_range())
+                cached_nodes[n] = elem->point(n);
             }
 
           // The shape functions correspond to the qrule
