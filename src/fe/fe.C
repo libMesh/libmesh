@@ -213,19 +213,11 @@ void FE<Dim,T>::reinit(const Elem * elem,
             {
               // libmesh_assert_greater (elem->n_nodes(), 1);
 
-              cached_nodes_still_fit = true;
-              if (cached_nodes.size() != elem->n_nodes())
-                cached_nodes_still_fit = false;
-              else
-                for (auto n : make_range(1u, elem->n_nodes()))
-                  {
-                    if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals
-                        ((cached_nodes[n] - cached_nodes[0]), 1e-13))
-                      {
-                        cached_nodes_still_fit = false;
-                        break;
-                      }
-                  }
+              cached_nodes_still_fit = cached_nodes.size() == elem->n_nodes();
+              for (unsigned n = 1; cached_nodes_still_fit && n < elem->n_nodes(); n++)
+                cached_nodes_still_fit =
+                  ((elem->point(n) - elem->point(0)).relative_fuzzy_equals
+                  ((cached_nodes[n] - cached_nodes[0]), 1e-13));
 
               if (this->shapes_need_reinit() && !cached_nodes_still_fit)
                 {
