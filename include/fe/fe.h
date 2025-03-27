@@ -794,6 +794,13 @@ protected:
                                       bool add_p_level = true);
 
   /**
+   * Whether we cache the node locations on the last
+   * element we computed on to try to avoid calling
+   * init_shape_functions and compute_shape_functions
+   */
+  bool caching;
+
+  /**
    * An array of the node locations on the last
    * element we computed on
    */
