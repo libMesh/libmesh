@@ -31,6 +31,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_modification.h"
+#include "libmesh/mesh_refinement.h"
 #include "libmesh/exact_solution.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_solver_package.h"
@@ -90,6 +91,10 @@ int main (int argc, char ** argv)
 
   // Make sure the code is robust against nodal reorderings.
   MeshTools::Modification::permute_elements(mesh);
+
+  // Make sure the code is robust against mesh refinements.
+  MeshRefinement mesh_refinement(mesh);
+  mesh_refinement.uniformly_refine(infile("refine", 0));
 
   // Print information about the mesh to the screen.
   mesh.print_info();
