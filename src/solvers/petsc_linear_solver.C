@@ -36,10 +36,6 @@
 #include "libmesh/enum_solver_type.h"
 #include "libmesh/enum_convergence_flags.h"
 
-#ifdef LIBMESH_HAVE_PETSC_HYPRE
-#include <HYPRE_utilities.h>
-#endif
-
 // C++ includes
 #include <memory>
 #include <string.h>
@@ -574,19 +570,6 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
 
   // Allow command line options to override anything set programmatically.
   LibmeshPetscCall(KSPSetFromOptions(_ksp));
-
-#if defined(LIBMESH_HAVE_PETSC_HYPRE) && !PETSC_VERSION_LESS_THAN(3,12,0) && defined(PETSC_HAVE_HYPRE_DEVICE)
-  {
-    // Make sure hypre has been initialized
-    LibmeshPetscCallExternal(HYPRE_Initialize);
-    PetscScalar * dummyarray;
-    PetscMemType mtype;
-    LibmeshPetscCall(VecGetArrayAndMemType(solution->vec(), &dummyarray, &mtype));
-    LibmeshPetscCall(VecRestoreArrayAndMemType(solution->vec(), &dummyarray));
-    if (PetscMemTypeHost(mtype))
-      LibmeshPetscCallExternal(HYPRE_SetMemoryLocation, HYPRE_MEMORY_HOST);
-  }
-#endif
 
   // If the SolverConfiguration object is provided, use it to override
   // solver options.
