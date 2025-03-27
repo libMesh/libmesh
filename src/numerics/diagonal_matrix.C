@@ -331,5 +331,12 @@ DiagonalMatrix<T>::diagonal() const
   return *_diagonal;
 }
 
+template <typename T>
+void
+DiagonalMatrix<T>::restore_original_nonzero_pattern()
+{
+  _diagonal->zero();
+}
+
 template class LIBMESH_EXPORT DiagonalMatrix<Number>;
 }

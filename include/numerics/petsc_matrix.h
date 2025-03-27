@@ -291,7 +291,7 @@ public:
 
   virtual bool supports_hash_table() const override;
 
-  virtual void reset_memory() override;
+  virtual void restore_original_nonzero_pattern() override;
 
 protected:
   /**

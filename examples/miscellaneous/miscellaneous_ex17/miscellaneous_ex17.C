@@ -160,8 +160,8 @@ int main (int argc, char ** argv)
   // MatResetHash added in PETSc version 3.23
 #if !PETSC_VERSION_LESS_THAN(3, 23, 0)
   // reset the memory
-  // sys_matrix.reset_memory(); # See https://gitlab.com/petsc/petsc/-/merge_requests/8063
-  pre_matrix.reset_memory();
+  // sys_matrix.restore_original_nonzero_pattern(); # See https://gitlab.com/petsc/petsc/-/merge_requests/8063
+  pre_matrix.restore_original_nonzero_pattern();
   // zero
   sys_matrix.zero();
   pre_matrix.zero();
