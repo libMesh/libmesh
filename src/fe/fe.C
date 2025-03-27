@@ -206,42 +206,30 @@ void FE<Dim,T>::reinit(const Elem * elem,
               this->_fe_map->template init_reference_to_physical_map<Dim>
                 (this->qrule->get_points(), elem);
               this->init_shape_functions (this->qrule->get_points(), elem);
-
-              if (this->shapes_need_reinit())
-                {
-                  cached_nodes.resize(elem->n_nodes());
-                  for (auto n : elem->node_index_range())
-                    cached_nodes[n] = elem->point(n);
-                }
             }
           else
             {
-              // libmesh_assert_greater (elem->n_nodes(), 1);
               this->_elem = elem;
-
-              cached_nodes_still_fit = true;
-              if (cached_nodes.size() != elem->n_nodes())
-                cached_nodes_still_fit = false;
-              else
-                for (auto n : make_range(1u, elem->n_nodes()))
-                  {
-                    if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals
-                        ((cached_nodes[n] - cached_nodes[0]), 1e-13))
-                      {
-                        cached_nodes_still_fit = false;
-                        break;
-                      }
-                  }
-
+              // Check if cached elem geometry is sufficiently similar
+              cached_nodes_still_fit = cached_nodes.size() == elem->n_nodes();
+              for (unsigned n = 1; cached_nodes_still_fit && n < elem->n_nodes(); n++)
+                cached_nodes_still_fit = (elem->point(n) - elem->point(0)).relative_fuzzy_equals
+                                         (cached_nodes[n] - cached_nodes[0]);
+              // Initialize the shape functions if needed
               if (this->shapes_need_reinit() && !cached_nodes_still_fit)
                 {
                   this->_fe_map->template init_reference_to_physical_map<Dim>
                     (this->qrule->get_points(), elem);
                   this->init_shape_functions (this->qrule->get_points(), elem);
-                  cached_nodes.resize(elem->n_nodes());
-                  for (auto n : elem->node_index_range())
-                    cached_nodes[n] = elem->point(n);
                 }
+            }
+
+          // Replace cached nodes if no longer fitting
+          if (this->shapes_need_reinit() && !cached_nodes_still_fit)
+            {
+              cached_nodes.resize(elem->n_nodes());
+              for (auto n : elem->node_index_range())
+                cached_nodes[n] = elem->point(n);
             }
 
           // The shape functions correspond to the qrule
