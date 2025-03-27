@@ -141,6 +141,7 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
   _global_boundary_ids = other_boundary_info._global_boundary_ids;
   _side_boundary_ids = other_boundary_info._side_boundary_ids;
   _node_boundary_ids = other_boundary_info._node_boundary_ids;
+  _sideset_to_nodeset_conversion = other_boundary_info._sideset_to_nodeset_conversion;
   _edge_boundary_ids = other_boundary_info._edge_boundary_ids;
   _shellface_boundary_ids = other_boundary_info._shellface_boundary_ids;
 
@@ -348,6 +349,7 @@ void BoundaryInfo::clear()
   _boundary_ids.clear();
   _side_boundary_ids.clear();
   _node_boundary_ids.clear();
+  _sideset_to_nodeset_conversion.clear();
   _edge_boundary_ids.clear();
   _shellface_boundary_ids.clear();
   _ss_id_to_name.clear();
@@ -1188,6 +1190,12 @@ void BoundaryInfo::add_side(const Elem * elem,
   _boundary_side_id.emplace(elem, std::make_pair(side, id));
   _boundary_ids.insert(id);
   _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
+
+  // create temp side and check if sideset has a matching nodeset
+  ElemSideBuilder side_builder;
+  const Elem * new_side = &side_builder(*elem, side);
+  if (has_equivalent_nodeset(new_side, id))
+    _sideset_to_nodeset_conversion.emplace(id, id);
 }
 
 
@@ -1258,6 +1266,12 @@ void BoundaryInfo::add_side(const Elem * elem,
       _boundary_side_id.emplace(elem, std::make_pair(side, id));
       _boundary_ids.insert(id);
       _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
+      
+      // create temp side and check if sideset has a matching nodeset
+      ElemSideBuilder side_builder;
+      const Elem * new_side = &side_builder(*elem, side);
+      if (has_equivalent_nodeset(new_side, id))
+        _sideset_to_nodeset_conversion.emplace(id, id);
     }
 }
 
@@ -1902,7 +1916,51 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   this->libmesh_assert_valid_multimaps();
 }
 
+boundary_id_type BoundaryInfo::check_renumber_nodeset(boundary_id_type bc_id)
+{
+  if (_sideset_to_nodeset_conversion.find(bc_id) != _sideset_to_nodeset_conversion.end())
+    // A new bc ID has already been created for this nodeset. Return that
+    return _sideset_to_nodeset_conversion[bc_id];
+  else
+    {
+      // Find a suitable id and add to map
+      boundary_id_type new_id = _node_boundary_ids.size() + 1;
+      while (_node_boundary_ids.find(new_id) != _node_boundary_ids.end())
+        new_id++;
+      _sideset_to_nodeset_conversion.emplace(bc_id, new_id);
+      return new_id;
+    }
+}
 
+bool BoundaryInfo::has_equivalent_nodeset(const Elem * side, boundary_id_type bc_id)
+{
+  bool equivalent_nodeset = false;
+  if (_sideset_to_nodeset_conversion.find(bc_id) != _sideset_to_nodeset_conversion.end())
+    // The appropriate sideset->nodeset conversion has already been found and we can skip this check
+    return equivalent_nodeset;
+  const auto * n_list = side->get_nodes();
+  for (unsigned int i = 0; i < side->n_nodes(); i++)
+  {
+    const auto node = n_list[i];
+    //auto bc_ids = _boundary_node_id.equal_range(node);
+    for (const auto & itr : as_range(_boundary_node_id.equal_range(node)))
+    {
+      if (itr.second == bc_id)
+      {
+        equivalent_nodeset = true;
+        break;
+      }
+      else
+        equivalent_nodeset = false;
+      // no equivalent nodeset exists
+      //equivalent_nodeset = false;
+      //break;
+    }
+    if (!equivalent_nodeset)
+      break;  
+  }
+  return equivalent_nodeset;
+}
 
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
                                                  const boundary_id_type boundary_id_in) const
@@ -2358,20 +2416,28 @@ BoundaryInfo::build_node_list_from_side_list()
       for (const auto & cur_elem : family)
         {
           side = &side_builder(*cur_elem, id_pair.first);
-
+          // Check for equivalent nodeset here. If it has one the next portion can be skipped
           // Add each node node on the side with the side's boundary id
+          //if (has_equivalent_nodeset(side, id_pair.second))
+            //_sideset_to_nodeset_conversion.emplace(id_pair.second, id_pair.second);
           for (auto i : side->node_index_range())
+          {
+            const boundary_id_type bcid = id_pair.second;
+            auto bcid_renum = bcid;
+            // Check that bcid is not the same as a sideset id
+            if (_node_boundary_ids.find(bcid) != _node_boundary_ids.end())
+              // Check that the nodeset and sideset don't cover the same area
+              bcid_renum = check_renumber_nodeset(bcid_renum);
+            this->add_node(side->node_ptr(i), bcid_renum);
+            _sideset_to_nodeset_conversion.emplace(bcid, bcid_renum);
+            if (!mesh_is_serial)
             {
-              const boundary_id_type bcid = id_pair.second;
-              this->add_node(side->node_ptr(i), bcid);
-              if (!mesh_is_serial)
-                {
-                  const processor_id_type proc_id =
-                    side->node_ptr(i)->processor_id();
-                  if (proc_id != my_proc_id)
-                    nodes_to_push[proc_id].emplace(side->node_id(i), bcid);
-                }
+              const processor_id_type proc_id =
+              side->node_ptr(i)->processor_id();
+              if (proc_id != my_proc_id)
+              nodes_to_push[proc_id].emplace(side->node_id(i), bcid);
             }
+          }
         }
     }
 
