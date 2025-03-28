@@ -62,8 +62,10 @@ const unsigned int Pyramid5::edge_nodes_map[Pyramid5::num_edges][Pyramid5::nodes
 // ------------------------------------------------------------
 // Pyramid5 class member functions
 
-bool Pyramid5::is_vertex(const unsigned int) const
+bool Pyramid5::is_vertex(const unsigned int n) const
 {
+  libmesh_ignore(n);
+  libmesh_assert_not_equal_to (n, invalid_uint);
   return true;
 }
 

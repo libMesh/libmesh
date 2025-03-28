@@ -51,8 +51,10 @@ const Real Edge2::_embedding_matrix[Edge2::num_children][Edge2::num_nodes][Edge2
 
 #endif
 
-bool Edge2::is_vertex(const unsigned int) const
+bool Edge2::is_vertex(const unsigned int n) const
 {
+  libmesh_ignore(n);
+  libmesh_assert_not_equal_to (n, invalid_uint);
   return true;
 }
 
