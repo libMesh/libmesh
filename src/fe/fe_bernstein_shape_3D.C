@@ -97,73 +97,73 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
       // Edge 0
       if ((hex_i0[i] >= 2) && (hex_i1[i] == 0) && (hex_i2[i] == 0))
         {
-          if (elem->point(0) != std::min(elem->point(0), elem->point(1)))
+          if (elem->positive_edge_orientation(0))
             xi_mapped = -xi;
         }
       // Edge 1
       else if ((hex_i0[i] == 1) && (hex_i1[i] >= 2) && (hex_i2[i] == 0))
         {
-          if (elem->point(1) != std::min(elem->point(1), elem->point(2)))
+          if (elem->positive_edge_orientation(1))
             eta_mapped = -eta;
         }
       // edge 2
       else if ((hex_i0[i] >= 2) && (hex_i1[i] == 1) && (hex_i2[i] == 0))
         {
-          if (elem->point(3) != std::min(elem->point(3), elem->point(2)))
+          if (!elem->positive_edge_orientation(2))
             xi_mapped = -xi;
         }
       // edge 3
       else if ((hex_i0[i] == 0) && (hex_i1[i] >= 2) && (hex_i2[i] == 0))
         {
-          if (elem->point(0) != std::min(elem->point(0), elem->point(3)))
+          if (elem->positive_edge_orientation(3))
             eta_mapped = -eta;
         }
       // edge 4
       else if ((hex_i0[i] == 0) && (hex_i1[i] == 0) && (hex_i2[i] >=2 ))
         {
-          if (elem->point(0) != std::min(elem->point(0), elem->point(4)))
+          if (elem->positive_edge_orientation(4))
             zeta_mapped = -zeta;
         }
       // edge 5
       else if ((hex_i0[i] == 1) && (hex_i1[i] == 0) && (hex_i2[i] >=2 ))
         {
-          if (elem->point(1) != std::min(elem->point(1), elem->point(5)))
+          if (elem->positive_edge_orientation(5))
             zeta_mapped = -zeta;
         }
       // edge 6
       else if ((hex_i0[i] == 1) && (hex_i1[i] == 1) && (hex_i2[i] >=2 ))
         {
-          if (elem->point(2) != std::min(elem->point(2), elem->point(6)))
+          if (elem->positive_edge_orientation(6))
             zeta_mapped = -zeta;
         }
       // edge 7
       else if ((hex_i0[i] == 0) && (hex_i1[i] == 1) && (hex_i2[i] >=2 ))
         {
-          if (elem->point(3) != std::min(elem->point(3), elem->point(7)))
+          if (elem->positive_edge_orientation(7))
             zeta_mapped = -zeta;
         }
       // edge 8
       else if ((hex_i0[i] >=2 ) && (hex_i1[i] == 0) && (hex_i2[i] == 1))
         {
-          if (elem->point(4) != std::min(elem->point(4), elem->point(5)))
+          if (elem->positive_edge_orientation(8))
             xi_mapped = -xi;
         }
       // edge 9
       else if ((hex_i0[i] == 1) && (hex_i1[i] >=2 ) && (hex_i2[i] == 1))
         {
-          if (elem->point(5) != std::min(elem->point(5), elem->point(6)))
+          if (elem->positive_edge_orientation(9))
             eta_mapped = -eta;
         }
       // edge 10
       else if ((hex_i0[i] >=2 ) && (hex_i1[i] == 1) && (hex_i2[i] == 1))
         {
-          if (elem->point(7) != std::min(elem->point(7), elem->point(6)))
+          if (!elem->positive_edge_orientation(10))
             xi_mapped = -xi;
         }
       // edge 11
       else if ((hex_i0[i] == 0) && (hex_i1[i] >=2 ) && (hex_i2[i] == 1))
         {
-          if (elem->point(4) != std::min(elem->point(4), elem->point(7)))
+          if (elem->positive_edge_orientation(11))
             eta_mapped = -eta;
         }
     }

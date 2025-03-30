@@ -208,9 +208,9 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
             unsigned int shape=i;
 
 
-            if ((i==3||i==4) && elem->point(0) > elem->point(1)) shape=7-i;
-            if ((i==5||i==6) && elem->point(1) > elem->point(2)) shape=11-i;
-            if ((i==7||i==8) && elem->point(0) > elem->point(2)) shape=15-i;
+            if ((i==3||i==4) &&  elem->positive_edge_orientation(0)) shape=7-i;
+            if ((i==5||i==6) &&  elem->positive_edge_orientation(1)) shape=11-i;
+            if ((i==7||i==8) && !elem->positive_edge_orientation(2)) shape=15-i;
 
             switch(shape)
               {
@@ -242,9 +242,9 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
 
             libmesh_assert_less (i, 15);
 
-            if ((i==3||i== 5) && elem->point(0) > elem->point(1)) shape=8-i;
-            if ((i==6||i== 8) && elem->point(1) > elem->point(2)) shape=14-i;
-            if ((i==9||i==11) && elem->point(0) > elem->point(2)) shape=20-i;
+            if ((i==3||i== 5) &&  elem->positive_edge_orientation(0)) shape=8-i;
+            if ((i==6||i== 8) &&  elem->positive_edge_orientation(1)) shape=14-i;
+            if ((i==9||i==11) && !elem->positive_edge_orientation(2)) shape=20-i;
 
 
             switch(shape)
@@ -285,9 +285,9 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
 
             libmesh_assert_less (i, 21);
 
-            if ((i>= 3&&i<= 6) && elem->point(0) > elem->point(1)) shape=9-i;
-            if ((i>= 7&&i<=10) && elem->point(1) > elem->point(2)) shape=17-i;
-            if ((i>=11&&i<=14) && elem->point(0) > elem->point(2)) shape=25-i;
+            if ((i>= 3&&i<= 6) &&  elem->positive_edge_orientation(0)) shape=9-i;
+            if ((i>= 7&&i<=10) &&  elem->positive_edge_orientation(1)) shape=17-i;
+            if ((i>=11&&i<=14) && !elem->positive_edge_orientation(2)) shape=25-i;
 
             switch(shape)
               {
@@ -333,9 +333,9 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
 
             libmesh_assert_less (i, 28);
 
-            if ((i>= 3&&i<= 7) && elem->point(0) > elem->point(1)) shape=10-i;
-            if ((i>= 8&&i<=12) && elem->point(1) > elem->point(2)) shape=20-i;
-            if ((i>=13&&i<=17) && elem->point(0) > elem->point(2)) shape=30-i;
+            if ((i>= 3&&i<= 7) &&  elem->positive_edge_orientation(0)) shape=10-i;
+            if ((i>= 8&&i<=12) &&  elem->positive_edge_orientation(1)) shape=20-i;
+            if ((i>=13&&i<=17) && !elem->positive_edge_orientation(2)) shape=30-i;
 
             switch(shape)
               {

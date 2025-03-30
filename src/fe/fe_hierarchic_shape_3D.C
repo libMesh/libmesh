@@ -245,7 +245,7 @@ void cube_indices(const Elem * elem,
       i0 = i - 6;
       i1 = 0;
       i2 = 0;
-      if (elem->point(0) > elem->point(1))
+      if (elem->positive_edge_orientation(0))
         xi = -xi_saved;
     }
   // Edge 1
@@ -254,7 +254,7 @@ void cube_indices(const Elem * elem,
       i0 = 1;
       i1 = i - e - 6;
       i2 = 0;
-      if (elem->point(1) > elem->point(2))
+      if (elem->positive_edge_orientation(1))
         eta = -eta_saved;
     }
   // Edge 2
@@ -263,7 +263,7 @@ void cube_indices(const Elem * elem,
       i0 = i - 2*e - 6;
       i1 = 1;
       i2 = 0;
-      if (elem->point(3) > elem->point(2))
+      if (!elem->positive_edge_orientation(2))
         xi = -xi_saved;
     }
   // Edge 3
@@ -272,7 +272,7 @@ void cube_indices(const Elem * elem,
       i0 = 0;
       i1 = i - 3*e - 6;
       i2 = 0;
-      if (elem->point(0) > elem->point(3))
+      if (elem->positive_edge_orientation(3))
         eta = -eta_saved;
     }
   // Edge 4
@@ -281,7 +281,7 @@ void cube_indices(const Elem * elem,
       i0 = 0;
       i1 = 0;
       i2 = i - 4*e - 6;
-      if (elem->point(0) > elem->point(4))
+      if (elem->positive_edge_orientation(4))
         zeta = -zeta_saved;
     }
   // Edge 5
@@ -290,7 +290,7 @@ void cube_indices(const Elem * elem,
       i0 = 1;
       i1 = 0;
       i2 = i - 5*e - 6;
-      if (elem->point(1) > elem->point(5))
+      if (elem->positive_edge_orientation(5))
         zeta = -zeta_saved;
     }
   // Edge 6
@@ -299,7 +299,7 @@ void cube_indices(const Elem * elem,
       i0 = 1;
       i1 = 1;
       i2 = i - 6*e - 6;
-      if (elem->point(2) > elem->point(6))
+      if (elem->positive_edge_orientation(6))
         zeta = -zeta_saved;
     }
   // Edge 7
@@ -308,7 +308,7 @@ void cube_indices(const Elem * elem,
       i0 = 0;
       i1 = 1;
       i2 = i - 7*e - 6;
-      if (elem->point(3) > elem->point(7))
+      if (elem->positive_edge_orientation(7))
         zeta = -zeta_saved;
     }
   // Edge 8
@@ -317,7 +317,7 @@ void cube_indices(const Elem * elem,
       i0 = i - 8*e - 6;
       i1 = 0;
       i2 = 1;
-      if (elem->point(4) > elem->point(5))
+      if (elem->positive_edge_orientation(8))
         xi = -xi_saved;
     }
   // Edge 9
@@ -326,7 +326,7 @@ void cube_indices(const Elem * elem,
       i0 = 1;
       i1 = i - 9*e - 6;
       i2 = 1;
-      if (elem->point(5) > elem->point(6))
+      if (elem->positive_edge_orientation(9))
         eta = -eta_saved;
     }
   // Edge 10
@@ -335,7 +335,7 @@ void cube_indices(const Elem * elem,
       i0 = i - 10*e - 6;
       i1 = 1;
       i2 = 1;
-      if (elem->point(7) > elem->point(6))
+      if (!elem->positive_edge_orientation(10))
         xi = -xi_saved;
     }
   // Edge 11
@@ -344,7 +344,7 @@ void cube_indices(const Elem * elem,
       i0 = 0;
       i1 = i - 11*e - 6;
       i2 = 1;
-      if (elem->point(4) > elem->point(7))
+      if (elem->positive_edge_orientation(11))
         eta = -eta_saved;
     }
   // Face 0
@@ -820,7 +820,7 @@ void prism_indices(const Elem * elem,
       i01 = (i - 6 - 3*e)/e; // which tri DoF are we?
       i2 = (i - 6 - 3*e)%e+2; // edge DoF? +2 to skip endpoints
       // EDGE evaluations don't flip, so handle that here
-      if (elem->point(i01) > elem->point(i01+3))
+      if (elem->positive_edge_orientation(i01+3))
         zeta = -zeta;
     }
   // Edge 6,7,8 (vertices 12,13,14)
@@ -2387,8 +2387,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             // Get factors to account for edge-flipping
             Real flip = 1;
             if (basisorder%2 &&
-                (elem->point(edgevertex0) >
-                 elem->point(edgevertex1)))
+                elem->positive_edge_orientation(edge_num))
               flip = -1;
 
             const Real crossval = zeta[edgevertex0] + zeta[edgevertex1];
