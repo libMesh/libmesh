@@ -52,6 +52,13 @@ namespace {
   static const Real hex20_scal25[] =     {0,     0,     0,     0,     -0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5};
   static const Real hex20_scal26[] =     {-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, 0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25};
 
+  Point get_min_point(const Elem * elem,
+                      unsigned int a, unsigned int b,
+                      unsigned int c, unsigned int d)
+  {
+    return std::min(std::min(elem->point(a),elem->point(b)),
+                    std::min(elem->point(c),elem->point(d)));
+  }
 } // anonymous namespace
 
 
@@ -174,10 +181,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
       // face 0
       if ((hex_i2[i] == 0) && (hex_i0[i] >= 2) && (hex_i1[i] >= 2))
         {
-          const Point min_point = std::min(elem->point(1),
-                                           std::min(elem->point(2),
-                                                    std::min(elem->point(0),
-                                                             elem->point(3))));
+          const Point min_point = get_min_point(elem, 1, 2, 0, 3);
+
           if (elem->point(0) == min_point)
             if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
               {
@@ -241,10 +246,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
       // Face 1
       else if ((hex_i1[i] == 0) && (hex_i0[i] >= 2) && (hex_i2[i] >= 2))
         {
-          const Point min_point = std::min(elem->point(0),
-                                           std::min(elem->point(1),
-                                                    std::min(elem->point(5),
-                                                             elem->point(4))));
+          const Point min_point = get_min_point(elem, 0, 1, 5, 4);
+
           if (elem->point(0) == min_point)
             if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
               {
@@ -308,10 +311,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
       // Face 2
       else if ((hex_i0[i] == 1) && (hex_i1[i] >= 2) && (hex_i2[i] >= 2))
         {
-          const Point min_point = std::min(elem->point(1),
-                                           std::min(elem->point(2),
-                                                    std::min(elem->point(6),
-                                                             elem->point(5))));
+          const Point min_point = get_min_point(elem, 1, 2, 6, 5);
+
           if (elem->point(1) == min_point)
             if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
               {
@@ -375,10 +376,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
       // Face 3
       else if ((hex_i1[i] == 1) && (hex_i0[i] >= 2) && (hex_i2[i] >= 2))
         {
-          const Point min_point = std::min(elem->point(2),
-                                           std::min(elem->point(3),
-                                                    std::min(elem->point(7),
-                                                             elem->point(6))));
+          const Point min_point = get_min_point(elem, 2, 3, 7, 6);
+
           if (elem->point(3) == min_point)
             if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
               {
@@ -442,10 +441,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
       // Face 4
       else if ((hex_i0[i] == 0) && (hex_i1[i] >= 2) && (hex_i2[i] >= 2))
         {
-          const Point min_point = std::min(elem->point(3),
-                                           std::min(elem->point(0),
-                                                    std::min(elem->point(4),
-                                                             elem->point(7))));
+          const Point min_point = get_min_point(elem, 3, 0, 4, 7);
+
           if (elem->point(0) == min_point)
             if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
               {
@@ -509,10 +506,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
       // Face 5
       else if ((hex_i2[i] == 1) && (hex_i0[i] >= 2) && (hex_i1[i] >= 2))
         {
-          const Point min_point = std::min(elem->point(4),
-                                           std::min(elem->point(5),
-                                                    std::min(elem->point(6),
-                                                             elem->point(7))));
+          const Point min_point = get_min_point(elem, 4, 5, 6, 7);
+
           if (elem->point(4) == min_point)
             if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
                         {
