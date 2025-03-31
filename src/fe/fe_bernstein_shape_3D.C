@@ -184,7 +184,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
           const Point min_point = get_min_point(elem, 1, 2, 0, 3);
 
           if (elem->point(0) == min_point)
-            if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
+            if (elem->positive_face_orientation(0))
               {
                 // case 1
                 xi_mapped  = xi;
@@ -198,7 +198,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(3) == min_point)
-            if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
+            if (elem->positive_face_orientation(0))
               {
                 // case 3
                 xi_mapped  = -eta;
@@ -212,7 +212,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(2) == min_point)
-            if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
+            if (elem->positive_face_orientation(0))
               {
                 // case 5
                 xi_mapped  = -xi;
@@ -227,7 +227,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
 
           else if (elem->point(1) == min_point)
             {
-              if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
+              if (elem->positive_face_orientation(0))
                 {
                   // case 7
                   xi_mapped  = eta;
@@ -249,7 +249,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
           const Point min_point = get_min_point(elem, 0, 1, 5, 4);
 
           if (elem->point(0) == min_point)
-            if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
+            if (!elem->positive_face_orientation(1))
               {
                 // Case 1
                 xi_mapped   = xi;
@@ -263,7 +263,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(1) == min_point)
-            if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
+            if (!elem->positive_face_orientation(1))
               {
                 // Case 3
                 xi_mapped   = zeta;
@@ -277,7 +277,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(5) == min_point)
-            if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
+            if (!elem->positive_face_orientation(1))
               {
                 // Case 5
                 xi_mapped   = -xi;
@@ -292,7 +292,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
 
           else if (elem->point(4) == min_point)
             {
-              if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+              if (!elem->positive_face_orientation(1))
                 {
                   // Case 7
                   xi_mapped   = -xi;
@@ -314,7 +314,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
           const Point min_point = get_min_point(elem, 1, 2, 6, 5);
 
           if (elem->point(1) == min_point)
-            if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
+            if (!elem->positive_face_orientation(2))
               {
                 // Case 1
                 eta_mapped  = eta;
@@ -328,7 +328,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(2) == min_point)
-            if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
+            if (!elem->positive_face_orientation(2))
               {
                 // Case 3
                 eta_mapped  = zeta;
@@ -342,7 +342,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(6) == min_point)
-            if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
+            if (!elem->positive_face_orientation(2))
               {
                 // Case 5
                 eta_mapped  = -eta;
@@ -357,7 +357,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
 
           else if (elem->point(5) == min_point)
             {
-              if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
+              if (!elem->positive_face_orientation(2))
                 {
                   // Case 7
                   eta_mapped  = -zeta;
@@ -379,7 +379,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
           const Point min_point = get_min_point(elem, 2, 3, 7, 6);
 
           if (elem->point(3) == min_point)
-            if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
+            if (elem->positive_face_orientation(3))
               {
                 // Case 1
                 xi_mapped   = xi;
@@ -393,7 +393,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(7) == min_point)
-            if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
+            if (elem->positive_face_orientation(3))
               {
                 // Case 3
                 xi_mapped   = -zeta;
@@ -407,7 +407,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(6) == min_point)
-            if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
+            if (elem->positive_face_orientation(3))
               {
                 // Case 5
                 xi_mapped   = -xi;
@@ -422,7 +422,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
 
           else if (elem->point(2) == min_point)
             {
-              if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
+              if (elem->positive_face_orientation(3))
                 {
                   // Case 7
                   xi_mapped   = zeta;
@@ -444,21 +444,21 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
           const Point min_point = get_min_point(elem, 3, 0, 4, 7);
 
           if (elem->point(0) == min_point)
-            if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
+            if (elem->positive_face_orientation(4))
               {
                 // Case 1
                 eta_mapped  = eta;
                 zeta_mapped = zeta;
               }
             else
-                        {
+              {
                 // Case 2
                 eta_mapped  = zeta;
                 zeta_mapped = eta;
               }
 
           else if (elem->point(4) == min_point)
-            if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
+            if (elem->positive_face_orientation(4))
               {
                 // Case 3
                 eta_mapped  = -zeta;
@@ -472,7 +472,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(7) == min_point)
-            if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
+            if (elem->positive_face_orientation(4))
               {
                 // Case 5
                 eta_mapped  = -eta;
@@ -487,7 +487,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
 
           else if (elem->point(3) == min_point)
             {
-              if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
+              if (elem->positive_face_orientation(4))
                 {
                   // Case 7
                   eta_mapped   = zeta;
@@ -509,8 +509,8 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
           const Point min_point = get_min_point(elem, 4, 5, 6, 7);
 
           if (elem->point(4) == min_point)
-            if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
-                        {
+            if (!elem->positive_face_orientation(5))
+              {
                 // Case 1
                 xi_mapped  = xi;
                 eta_mapped = eta;
@@ -523,7 +523,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
 
           else if (elem->point(5) == min_point)
-            if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
+            if (!elem->positive_face_orientation(5))
               {
                 // Case 3
                 xi_mapped  = eta;
@@ -531,13 +531,13 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               }
             else
               {
-                          // Case 4
+                // Case 4
                 xi_mapped  = -xi;
                 eta_mapped = eta;
               }
 
           else if (elem->point(6) == min_point)
-            if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
+            if (!elem->positive_face_orientation(5))
               {
                 // Case 5
                 xi_mapped  = -xi;
@@ -552,7 +552,7 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
 
           else if (elem->point(7) == min_point)
             {
-                        if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
+              if (!elem->positive_face_orientation(5))
                 {
                   // Case 7
                   xi_mapped  = -eta;
