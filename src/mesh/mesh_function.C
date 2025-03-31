@@ -305,6 +305,84 @@ void MeshFunction::operator() (const Point & p,
     }
 }
 
+void MeshFunction::operator() (const Point & p,
+                               const Real,
+                               DenseVector<Gradient> & output,
+                               const std::set<subdomain_id_type> * subdomain_ids)
+{
+  libmesh_assert (this->initialized());
+
+  const Elem * element = this->find_element(p,subdomain_ids);
+
+  if (!element)
+    {
+      // We'd better be in out_of_mesh_mode if we couldn't find an
+      // element in the mesh
+      libmesh_assert (_out_of_mesh_mode);
+      output = _out_of_mesh_value;
+    }
+  else
+    {
+      // resize the output vector to the number of output values
+      // that the user told us
+      output.resize (cast_int<unsigned int>
+                     (this->_system_vars.size()));
+
+
+      {
+        unsigned int dim = element->dim();
+
+
+        // Get local coordinates to feed these into compute_data().
+        // Note that the fe_type can safely be used from the 0-variable,
+        // since the inverse mapping is the same for all FEFamilies
+        const Point mapped_point (FEMap::inverse_map (dim, element,
+                                                      p));
+
+        // loop over all vars
+        for (auto index : index_range(this->_system_vars))
+          {
+            // the data for this variable
+            const unsigned int var = _system_vars[index];
+
+            if (var == libMesh::invalid_uint)
+              {
+                libmesh_assert (_out_of_mesh_mode &&
+                                index < _out_of_mesh_value.size());
+                output(index) = _out_of_mesh_value(index);
+                continue;
+              }
+
+            const FEType & fe_type = this->_dof_map.variable_type(var);
+
+            // Instead of using 'FEInterface::compute_data' (as for scalar field variables),
+            // the vector field shape functions is called directly using 'FEInterface::vectorshape'
+            {
+              // Calling the physical mesh point needed for the shape function
+              FEComputeData data (this->_eqn_systems, mapped_point);
+              const Point & pt = data.p;
+
+              // where the solution values for the var-th variable are stored
+              std::vector<dof_id_type> dof_indices;
+              this->_dof_map.dof_indices (element, dof_indices, var);
+
+              // interpolate the solution
+              {
+                RealGradient value = 0.;
+
+                for (auto i : index_range(dof_indices))
+                  value += this->_vector(dof_indices[i]) * FEInterface::vectorshape(dim, fe_type, element, i, pt);
+
+                output(index) = value;
+              }
+
+            }
+
+            // next variable
+          }
+      }
+    }
+}
 
 void MeshFunction::discontinuous_value (const Point & p,
                                         const Real time,

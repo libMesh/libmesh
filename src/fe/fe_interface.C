@@ -756,6 +756,23 @@ bool FEInterface::on_reference_element(const Point & p,
 }
 
 
+RealGradient FEInterface::vectorshape(const unsigned int dim,
+                                      const FEType & fe_t,
+                                      const Elem * elem,
+                                      const unsigned int i,
+                                      const Point & p)
+{
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+
+if (elem && is_InfFE_elem(elem->type()))
+return ifem_shape(fe_t, elem, i, p);
+
+#endif
+
+const Order o = fe_t.order;
+
+fe_with_vec_switch(shape(elem,o,i,p));
+}
 
 Real FEInterface::shape(const unsigned int dim,
                         const FEType & fe_t,

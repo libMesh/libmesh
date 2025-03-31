@@ -27,6 +27,7 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/tree_base.h"
 #include "libmesh/parallel_object.h"
+#include "libmesh/fe.h"
 
 // C++ includes
 #include <cstddef>
@@ -199,6 +200,16 @@ public:
                    const Real time,
                    DenseVector<Number> & output,
                    const std::set<subdomain_id_type> * subdomain_ids);
+
+  /**
+   * Computes vector values at coordinate \p p and for time \p time,
+   * restricting the point to the passed subdomain_ids, which
+   * parameter overrides the internal subdomain_ids.
+   */
+  void operator() (const Point & p,
+    const Real time,
+    DenseVector<Gradient> & output,
+    const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
    * Similar to operator() with the same parameter list, but with the difference
