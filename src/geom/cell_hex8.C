@@ -69,9 +69,8 @@ const unsigned int Hex8::edge_nodes_map[Hex8::num_edges][Hex8::nodes_per_edge] =
 // ------------------------------------------------------------
 // Hex8 class member functions
 
-bool Hex8::is_vertex(const unsigned int n) const
+bool Hex8::is_vertex(const unsigned int libmesh_dbg_var(n)) const
 {
-  libmesh_ignore(n);
   libmesh_assert_not_equal_to (n, invalid_uint);
   return true;
 }

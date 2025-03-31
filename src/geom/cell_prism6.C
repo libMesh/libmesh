@@ -145,9 +145,8 @@ const unsigned int Prism6::edge_nodes_map[Prism6::num_edges][Prism6::nodes_per_e
 // ------------------------------------------------------------
 // Prism6 class member functions
 
-bool Prism6::is_vertex(const unsigned int n) const
+bool Prism6::is_vertex(const unsigned int libmesh_dbg_var(n)) const
 {
-  libmesh_ignore(n);
   libmesh_assert_not_equal_to (n, invalid_uint);
   return true;
 }

@@ -179,8 +179,8 @@ public:
   /**
    * \returns \p true if the specified (local) node number is a vertex.
    */
-  virtual bool is_vertex(const unsigned int n) const override
-  { libmesh_ignore(n); libmesh_assert_not_equal_to (n, invalid_uint); return true; }
+  virtual bool is_vertex(const unsigned int libmesh_dbg_var(n)) const override
+  { libmesh_assert_not_equal_to (n, invalid_uint); return true; }
 
   /**
    * NodeElem objects don't have faces or sides.

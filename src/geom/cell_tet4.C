@@ -57,9 +57,8 @@ const unsigned int Tet4::edge_nodes_map[Tet4::num_edges][Tet4::nodes_per_edge] =
 // ------------------------------------------------------------
 // Tet4 class member functions
 
-bool Tet4::is_vertex(const unsigned int n) const
+bool Tet4::is_vertex(const unsigned int libmesh_dbg_var(n)) const
 {
-  libmesh_ignore(n);
   libmesh_assert_not_equal_to (n, invalid_uint);
   return true;
 }
