@@ -371,7 +371,7 @@ void MeshFunction::operator() (const Point & p,
                 RealGradient value = 0.;
 
                 for (auto i : index_range(dof_indices))
-                  value += this->_vector(dof_indices[i]) * FEInterface::vectorshape(dim, fe_type, element, i, pt);
+                  value += this->_vector(dof_indices[i]) * FEInterface::correct_vectorshape(dim, fe_type, element, i, pt);
 
                 output(index) = value;
               }
