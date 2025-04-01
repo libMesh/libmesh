@@ -34,7 +34,8 @@
 #include "libmesh/petscdmlibmesh.h"
 #include "libmesh/petsc_mffd_matrix.h"
 
-#ifdef LIBMESH_HAVE_PETSC_HYPRE
+#if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
+    !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)
 #include <HYPRE_utilities.h>
 #endif
 
@@ -1073,7 +1074,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 #endif
   LibmeshPetscCall(SNESSetFromOptions(_snes));
 
-#if defined(LIBMESH_HAVE_PETSC_HYPRE) && !PETSC_VERSION_LESS_THAN(3,12,0) && defined(PETSC_HAVE_HYPRE_DEVICE)
+#if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
+    !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)
   {
     // Make sure hypre has been initialized
     LibmeshPetscCallExternal(HYPRE_Initialize);

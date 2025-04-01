@@ -36,7 +36,8 @@
 #include "libmesh/enum_solver_type.h"
 #include "libmesh/enum_convergence_flags.h"
 
-#ifdef LIBMESH_HAVE_PETSC_HYPRE
+#if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
+    !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)
 #include <HYPRE_utilities.h>
 #endif
 
@@ -575,7 +576,8 @@ PetscLinearSolver<T>::solve_base (SparseMatrix<T> * matrix,
   // Allow command line options to override anything set programmatically.
   LibmeshPetscCall(KSPSetFromOptions(_ksp));
 
-#if defined(LIBMESH_HAVE_PETSC_HYPRE) && !PETSC_VERSION_LESS_THAN(3,12,0) && defined(PETSC_HAVE_HYPRE_DEVICE)
+#if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
+    !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)
   {
     // Make sure hypre has been initialized
     LibmeshPetscCallExternal(HYPRE_Initialize);
