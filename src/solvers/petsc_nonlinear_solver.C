@@ -1008,39 +1008,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
     LibmeshPetscCall(SNESSetJacobian (_snes, pre->mat(), pre->mat(), libmesh_petsc_snes_jacobian, this));
 
-
-  // Only set the nullspace if we have a way of computing it and the result is non-empty.
-  if (this->nullspace || this->nullspace_object)
-    {
-      WrappedPetsc<MatNullSpace> msp;
-      this->build_mat_null_space(this->nullspace_object, this->nullspace, msp.get());
-      if (msp)
-        LibmeshPetscCall(MatSetNullSpace(pre->mat(), msp));
-    }
-
-  // Only set the transpose nullspace if we have a way of computing it and the result is non-empty.
-  if (this->transpose_nullspace || this->transpose_nullspace_object)
-    {
-#if PETSC_VERSION_LESS_THAN(3,6,0)
-      libmesh_warning("MatSetTransposeNullSpace is only supported for PETSc >= 3.6, transpose nullspace will be ignored.");
-#else
-      WrappedPetsc<MatNullSpace> msp;
-      this->build_mat_null_space(this->transpose_nullspace_object, this->transpose_nullspace, msp.get());
-      if (msp)
-        LibmeshPetscCall(MatSetTransposeNullSpace(pre->mat(), msp));
-#endif
-    }
-
-  // Only set the nearnullspace if we have a way of computing it and the result is non-empty.
-  if (this->nearnullspace || this->nearnullspace_object)
-    {
-      WrappedPetsc<MatNullSpace> msp;
-      this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, msp.get());
-
-      if (msp)
-        LibmeshPetscCall(MatSetNearNullSpace(pre->mat(), msp));
-    }
-
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
   LibmeshPetscCall(SNESGetKSP (_snes, &ksp));
@@ -1101,8 +1068,8 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
 #endif
   LibmeshPetscCall(SNESSetUp(_snes));
 
-  Mat J;
-  LibmeshPetscCall(SNESGetJacobian(_snes, &J, LIBMESH_PETSC_NULLPTR,
+  Mat J, P;
+  LibmeshPetscCall(SNESGetJacobian(_snes, &J, &P,
                                    LIBMESH_PETSC_NULLPTR,
                                    LIBMESH_PETSC_NULLPTR));
   LibmeshPetscCall(MatMFFDSetFunction(J, libmesh_petsc_snes_mffd_interface, this));
@@ -1119,6 +1086,50 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LibmeshPetscCall(MatSNESMFSetReuseBase(J, static_cast<PetscBool>(_snesmf_reuse_base)));
 #endif
 #endif
+
+  // Only set the nullspace if we have a way of computing it and the result is non-empty.
+  if (this->nullspace || this->nullspace_object)
+    {
+      WrappedPetsc<MatNullSpace> msp;
+      this->build_mat_null_space(this->nullspace_object, this->nullspace, msp.get());
+      if (msp)
+        {
+          LibmeshPetscCall(MatSetNullSpace(J, msp));
+          if (P != J)
+            LibmeshPetscCall(MatSetNullSpace(P, msp));
+        }
+    }
+
+  // Only set the transpose nullspace if we have a way of computing it and the result is non-empty.
+  if (this->transpose_nullspace || this->transpose_nullspace_object)
+    {
+#if PETSC_VERSION_LESS_THAN(3,6,0)
+      libmesh_warning("MatSetTransposeNullSpace is only supported for PETSc >= 3.6, transpose nullspace will be ignored.");
+#else
+      WrappedPetsc<MatNullSpace> msp;
+      this->build_mat_null_space(this->transpose_nullspace_object, this->transpose_nullspace, msp.get());
+      if (msp)
+        {
+          LibmeshPetscCall(MatSetTransposeNullSpace(J, msp));
+          if (P != J)
+            LibmeshPetscCall(MatSetTransposeNullSpace(P, msp));
+        }
+#endif
+    }
+
+  // Only set the nearnullspace if we have a way of computing it and the result is non-empty.
+  if (this->nearnullspace || this->nearnullspace_object)
+    {
+      WrappedPetsc<MatNullSpace> msp;
+      this->build_mat_null_space(this->nearnullspace_object, this->nearnullspace, msp.get());
+
+      if (msp)
+        {
+          LibmeshPetscCall(MatSetNearNullSpace(J, msp));
+          if (P != J)
+            LibmeshPetscCall(MatSetNearNullSpace(P, msp));
+        }
+    }
 
   SNESLineSearch linesearch;
   if (linesearch_object)
