@@ -27,6 +27,7 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/libmesh_singleton.h"
 
 namespace {
   // Put this outside a templated class, so we only get 1 warning
@@ -40,6 +41,18 @@ namespace {
 
 namespace libMesh
 {
+// ------------------------------------------------------------
+// Whether we cache the node locations on the last element we computed on
+// to try to avoid calling init_shape_functions and compute_shape_functions
+static const bool * caching = nullptr;
+
+class CachingSetup: public Singleton::Setup
+{
+  private:
+    void setup() { caching = new bool(!on_command_line("--disable-caching")); }
+  public:
+    ~CachingSetup() { caching = nullptr; }
+} caching_setup;
 
 
 // ------------------------------------------------------------
@@ -47,7 +60,6 @@ namespace libMesh
 template <unsigned int Dim, FEFamily T>
 FE<Dim,T>::FE (const FEType & fet) :
   FEGenericBase<typename FEOutputType<T>::type> (Dim,fet),
-  caching(!libMesh::on_command_line("--disable-caching")),
   last_side(INVALID_ELEM),
   last_edge(INVALID_ELEM)
 {
@@ -227,7 +239,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
                 }
             }
 
-          if (this->shapes_need_reinit() && caching && !cached_nodes_still_fit)
+          if (this->shapes_need_reinit() && *caching && !cached_nodes_still_fit)
             {
               cached_nodes.resize(elem->n_nodes());
               for (auto n : elem->node_index_range())
