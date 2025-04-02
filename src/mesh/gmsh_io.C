@@ -175,14 +175,13 @@ void GmshIO::read_mesh(std::istream & in)
   // actually blocks of lower-dimensional elements.
   std::set<subdomain_id_type> lower_dimensional_blocks;
 
-  // Mapping from physical id -> (physical dim, physical name) pairs.
+  // Mapping from (physical id, physical dim) -> physical name.
   // These can refer to either "sidesets" or "subdomains"; we need to
   // wait until the Mesh has been read to know which is which.  Note
-  // that we are using 'int' as the key here rather than
+  // that we are using ptrdiff_t as the key here rather than
   // subdomain_id_type or boundary_id_type, since at this point, it
   // could be either.
-  typedef std::pair<unsigned, std::string> GmshPhysical;
-  std::map<int, GmshPhysical> gmsh_physicals;
+  std::map<std::pair<std::ptrdiff_t, unsigned>, std::string> gmsh_physicals;
 
   // map to hold the node numbers for translation
   // note the the nodes can be non-consecutive
@@ -267,7 +266,7 @@ void GmshIO::read_mesh(std::istream & in)
                   phys_name.erase(std::remove(phys_name.begin(), phys_name.end(), '"'), phys_name.end());
 
                   // Record this ID for later assignment of subdomain/sideset names.
-                  gmsh_physicals[phys_id] = std::make_pair(phys_dim, phys_name);
+                  gmsh_physicals[std::make_pair(phys_id, phys_dim)] = phys_name;
 
                   // If 's' also contains the libmesh-specific string
                   // "lower_dimensional_block", add this block ID to
@@ -790,9 +789,8 @@ void GmshIO::read_mesh(std::istream & in)
             for (const auto & pr : gmsh_physicals)
             {
               // Extract data
-              int phys_id = pr.first;
-              unsigned phys_dim = pr.second.first;
-              const std::string & phys_name = pr.second.second;
+              auto [phys_id, phys_dim] = pr.first;
+              const std::string & phys_name = pr.second;
 
               // If the physical's dimension matches the largest
               // dimension we've seen, it's a subdomain name.
