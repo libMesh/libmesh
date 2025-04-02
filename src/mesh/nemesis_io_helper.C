@@ -2644,11 +2644,11 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
       const System & system = es.get_system(sys_num);
 
       // We need to check if the constant monomial is a scalar or a vector and set the number of
-      // components as the mesh dimension for the latter case as per es.find_variable_numbers().
+      // components as the mesh spatial dimension for the latter as per es.find_variable_numbers().
       // Even for the case where a variable is not active on any subdomain belonging to the
       // processor, we still need to know this number to update 'var_ctr'.
       const unsigned int n_comps =
-        (system.variable_type(var) == FEType(CONSTANT, MONOMIAL_VEC)) ? mesh.mesh_dimension() : 1;
+        (system.variable_type(var) == FEType(CONSTANT, MONOMIAL_VEC)) ? mesh.spatial_dimension() : 1;
 
       // Get list of active subdomains for variable v
       const auto & active_subdomains = vars_active_subdomains[v];
