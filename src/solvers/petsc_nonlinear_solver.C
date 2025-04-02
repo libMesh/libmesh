@@ -34,6 +34,11 @@
 #include "libmesh/petscdmlibmesh.h"
 #include "libmesh/petsc_mffd_matrix.h"
 
+#if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
+    !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)
+#include <HYPRE_utilities.h>
+#endif
+
 namespace libMesh
 {
 class ResidualContext
@@ -1068,6 +1073,20 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LibmeshPetscCall(KSPSetFromOptions(ksp));
 #endif
   LibmeshPetscCall(SNESSetFromOptions(_snes));
+
+#if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
+    !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)
+  {
+    // Make sure hypre has been initialized
+    LibmeshPetscCallExternal(HYPRE_Initialize);
+    PetscScalar * dummyarray;
+    PetscMemType mtype;
+    LibmeshPetscCall(VecGetArrayAndMemType(x->vec(), &dummyarray, &mtype));
+    LibmeshPetscCall(VecRestoreArrayAndMemType(x->vec(), &dummyarray));
+    if (PetscMemTypeHost(mtype))
+      LibmeshPetscCallExternal(HYPRE_SetMemoryLocation, HYPRE_MEMORY_HOST);
+  }
+#endif
 
   if (this->user_presolve)
     this->user_presolve(this->system());
