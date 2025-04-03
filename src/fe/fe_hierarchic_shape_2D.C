@@ -109,13 +109,13 @@ quad_indices(const Elem * elem,
   Real f = 1.;
 
   if ((i0%2) && (i0 > 2) && (i1 == 0))
-    f = (elem->point(0) > elem->point(1))?-1.:1.;
+    f =  elem->positive_edge_orientation(0)?-1.:1.;
   else if ((i0%2) && (i0>2) && (i1 == 1))
-    f = (elem->point(3) > elem->point(2))?-1.:1.;
+    f = !elem->positive_edge_orientation(2)?-1.:1.;
   else if ((i0 == 0) && (i1%2) && (i1>2))
-    f = (elem->point(0) > elem->point(3))?-1.:1.;
+    f = !elem->positive_edge_orientation(3)?-1.:1.;
   else if ((i0 == 1) && (i1%2) && (i1>2))
-    f = (elem->point(1) > elem->point(2))?-1.:1.;
+    f =  elem->positive_edge_orientation(1)?-1.:1.;
 
   return {i0, i1, f};
 }
@@ -254,7 +254,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
               return 1;
 
             if ((i < 2 || i % 2) &&
-                elem->point(0) > elem->point(1))
+                elem->positive_edge_orientation(0))
               f = -1;
 
             return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i, f*(zeta1-zeta0));
@@ -271,7 +271,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
             const unsigned int side_i = i - dofs_per_side;
 
             if ((side_i < 2 || side_i % 2) &&
-                elem->point(1) > elem->point(2))
+                elem->positive_edge_orientation(1))
               f = -1;
 
             return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, side_i, f*(zeta2-zeta1));
@@ -289,7 +289,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
             const unsigned int side_i = i - 2*dofs_per_side;
 
             if ((side_i < 2 || side_i % 2) &&
-                elem->point(2) > elem->point(0))
+                elem->positive_edge_orientation(2))
               f = -1;
 
             return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, side_i, f*(zeta0-zeta2));
@@ -320,7 +320,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
                   return 1;
 
                 if ((i < 2 || i % 2) &&
-                    elem->point(0) > elem->point(1))
+                    elem->positive_edge_orientation(0))
                   f = -1;
 
                 return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, i, f*xi);
@@ -337,7 +337,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
                 const unsigned int side_i = i - dofs_per_side;
 
                 if ((side_i < 2 || side_i % 2) &&
-                    elem->point(1) > elem->point(2))
+                    elem->positive_edge_orientation(1))
                   f = -1;
 
                 return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, side_i, f*eta);
@@ -357,7 +357,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
                 const unsigned int side_i = i - 2*dofs_per_side;
 
                 if ((side_i < 2 || side_i % 2) &&
-                    elem->point(3) > elem->point(2))
+                    !elem->positive_edge_orientation(2))
                   f = -1;
 
                 return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, side_i, f*xi);
@@ -373,7 +373,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape(const Elem * elem,
                 const unsigned int side_i = i - 3*dofs_per_side;
 
                 if ((side_i < 2 || side_i % 2) &&
-                    elem->point(0) > elem->point(3))
+                    !elem->positive_edge_orientation(3))
                   f = -1;
 
                 return FE<1,HIERARCHIC>::shape(EDGE3, totalorder, side_i, f*eta);
@@ -541,7 +541,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
               return 0;
 
             if ((i < 2 || i % 2) &&
-                elem->point(0) > elem->point(1))
+                elem->positive_edge_orientation(0))
               f = -1;
 
             return f*FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i, 0, f*(zeta1-zeta0));
@@ -558,7 +558,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
             const unsigned int side_i = i - dofs_per_side;
 
             if ((side_i < 2 || side_i % 2) &&
-                elem->point(1) > elem->point(2))
+                elem->positive_edge_orientation(1))
               f = -1;
 
             Real g = 1;
@@ -583,7 +583,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
             const unsigned int side_i = i - 2*dofs_per_side;
 
             if ((side_i < 2 || side_i % 2) &&
-                elem->point(2) > elem->point(0))
+                elem->positive_edge_orientation(2))
               f = -1;
 
             return -f*FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, side_i, 0, f*(zeta0-zeta2));
@@ -613,7 +613,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
                 if (j != 0)
                   return 0;
                 if ((i < 2 || i % 2) &&
-                    elem->point(0) > elem->point(1))
+                    elem->positive_edge_orientation(0))
                   f = -1;
 
                 return f*FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, i, 0, f*xi);
@@ -629,7 +629,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
                 const unsigned int side_i = i - dofs_per_side;
 
                 if ((side_i < 2 || side_i % 2) &&
-                    elem->point(1) > elem->point(2))
+                    elem->positive_edge_orientation(1))
                   f = -1;
 
                 return f*FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, side_i, 0, f*eta);
@@ -648,7 +648,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
                 const unsigned int side_i = i - 2*dofs_per_side;
 
                 if ((side_i < 2 || side_i % 2) &&
-                    elem->point(3) > elem->point(2))
+                    !elem->positive_edge_orientation(2))
                   f = -1;
 
                 return f*FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, side_i, 0, f*xi);
@@ -663,7 +663,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
                 const unsigned int side_i = i - 3*dofs_per_side;
 
                 if ((side_i < 2 || side_i % 2) &&
-                    elem->point(0) > elem->point(3))
+                    !elem->positive_edge_orientation(3))
                   f = -1;
 
                 return f*FE<1,HIERARCHIC>::shape_deriv(EDGE3, totalorder, side_i, 0, f*eta);
@@ -827,7 +827,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                 if (j != 0)
                   return 0;
                 if ((i < 2 || i % 2) &&
-                    elem->point(0) > elem->point(1))
+                    elem->positive_edge_orientation(0))
                   f = -1;
 
                 return FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, i, 0, f*xi);
@@ -843,7 +843,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                 const unsigned int side_i = i - dofs_per_side;
 
                 if ((side_i < 2 || side_i % 2) &&
-                    elem->point(1) > elem->point(2))
+                    elem->positive_edge_orientation(1))
                   f = -1;
 
                 return FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, side_i, 0, f*eta);
@@ -862,7 +862,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                 const unsigned int side_i = i - 2*dofs_per_side;
 
                 if ((side_i < 2 || side_i % 2) &&
-                    elem->point(3) > elem->point(2))
+                    !elem->positive_edge_orientation(2))
                   f = -1;
 
                 return FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, side_i, 0, f*xi);
@@ -877,7 +877,7 @@ Real FE<2,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
                 const unsigned int side_i = i - 3*dofs_per_side;
 
                 if ((side_i < 2 || side_i % 2) &&
-                    elem->point(0) > elem->point(3))
+                    !elem->positive_edge_orientation(3))
                   f = -1;
 
                 return FE<1,HIERARCHIC>::shape_second_deriv(EDGE3, totalorder, side_i, 0, f*eta);

@@ -3428,22 +3428,14 @@ Elem::positive_face_orientation(const unsigned int i) const
   const unsigned int N = Elem::type_to_n_sides_map[this->side_type(i)];
 
   const std::vector<unsigned int> nodes = this->nodes_on_side(i);
-  std::vector<Point> vertices(N);
-  std::transform(nodes.begin(), nodes.begin() + N, vertices.begin(),
-                 [&](unsigned int n) { return this->point(n); });
 
-  for (unsigned int j = 0; j < N - 3; j++)
-    std::rotate(vertices.begin() + j,
-                std::min_element(vertices.begin() + j, vertices.end()),
-                vertices.end());
+  auto cmp = [&](const unsigned int & m, const unsigned int & n) -> bool
+             { return this->point(m) < this->point(n); };
 
-  unsigned int cnt = 0;
-  for (unsigned int j = N - 3; j < N; j++)
-    for (unsigned int k = j + 1; k < N; k++)
-      if (vertices[j] > vertices[k])
-        cnt++;
+  const unsigned int V = std::distance(nodes.begin(),
+                         std::min_element(nodes.begin(), nodes.begin() + N, cmp));
 
-  return cnt % 2;
+  return cmp(nodes[(V + N - 1) % N], nodes[(V + 1) % N]);
 }
 
 } // namespace libMesh

@@ -59,14 +59,12 @@ Real quad_flip(const Elem * elem,
   libmesh_assert_less(edge, 4);
   libmesh_assert_greater_equal(edge, 0);
 
-  const int edge_end = (edge+1)%4;
-
   const int edge_i = i - 4 - edge*(totalorder-1);
 
   // The "natural" orientation is p1>p0 on edge 0,
   // p2>p1 on e1, p2>p3 on e2, p3>p0 on e3
   if (edge_i%2 &&
-      ((elem->point(edge) > elem->point(edge_end)) ==
+      (elem->positive_edge_orientation(edge) ==
        (edge < 2)))
     return -1;
 
@@ -181,9 +179,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               libmesh_assert_less (i, 10);
 
 
-              if (i==4 && (elem->point(0) > elem->point(1)))f=-1;
-              if (i==6 && (elem->point(1) > elem->point(2)))f=-1;
-              if (i==8 && (elem->point(2) > elem->point(0)))f=-1;
+              if (i==4 && elem->positive_edge_orientation(0))f=-1;
+              if (i==6 && elem->positive_edge_orientation(1))f=-1;
+              if (i==8 && elem->positive_edge_orientation(2))f=-1;
 
 
               switch (i)
@@ -258,9 +256,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               libmesh_assert_less (i, 15);
 
 
-              if (i== 4 && (elem->point(0) > elem->point(1)))f=-1;
-              if (i== 7 && (elem->point(1) > elem->point(2)))f=-1;
-              if (i==10 && (elem->point(2) > elem->point(0)))f=-1;
+              if (i== 4 && elem->positive_edge_orientation(0))f=-1;
+              if (i== 7 && elem->positive_edge_orientation(1))f=-1;
+              if (i==10 && elem->positive_edge_orientation(2))f=-1;
 
 
               switch (i)
@@ -344,9 +342,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               libmesh_assert_less (i, 21);
 
 
-              if ((i== 4||i== 6) && (elem->point(0) > elem->point(1)))f=-1;
-              if ((i== 8||i==10) && (elem->point(1) > elem->point(2)))f=-1;
-              if ((i==12||i==14) && (elem->point(2) > elem->point(0)))f=-1;
+              if ((i== 4||i== 6) && elem->positive_edge_orientation(0))f=-1;
+              if ((i== 8||i==10) && elem->positive_edge_orientation(1))f=-1;
+              if ((i==12||i==14) && elem->positive_edge_orientation(2))f=-1;
 
 
               switch (i)
@@ -436,9 +434,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               libmesh_assert_less (i, 28);
 
 
-              if ((i== 4||i== 6) && (elem->point(0) > elem->point(1)))f=-1;
-              if ((i== 9||i==11) && (elem->point(1) > elem->point(2)))f=-1;
-              if ((i==14||i==16) && (elem->point(2) > elem->point(0)))f=-1;
+              if ((i== 4||i== 6) && elem->positive_edge_orientation(0))f=-1;
+              if ((i== 9||i==11) && elem->positive_edge_orientation(1))f=-1;
+              if ((i==14||i==16) && elem->positive_edge_orientation(2))f=-1;
 
 
               switch (i)
@@ -540,9 +538,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
               libmesh_assert_less (i, 36);
 
 
-              if ((i>= 4&&i<= 8) && (elem->point(0) > elem->point(1)))f=-1;
-              if ((i>=10&&i<=14) && (elem->point(1) > elem->point(2)))f=-1;
-              if ((i>=16&&i<=20) && (elem->point(2) > elem->point(0)))f=-1;
+              if ((i>= 4&&i<= 8) && elem->positive_edge_orientation(0))f=-1;
+              if ((i>=10&&i<=14) && elem->positive_edge_orientation(1))f=-1;
+              if ((i>=16&&i<=20) && elem->positive_edge_orientation(2))f=-1;
 
 
               switch (i)
