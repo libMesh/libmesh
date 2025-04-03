@@ -1387,6 +1387,46 @@ bool TypeTensor<T>::operator == (const TypeTensor<T> & rhs) const
 
 }
 
+template <typename T>
+void TypeTensor<T>::print(std::ostream & os) const
+{
+#if LIBMESH_DIM == 1
+
+  os << "x=" << (*this)(0,0) << std::endl;
+
+#endif
+#if LIBMESH_DIM == 2
+
+  os << "(xx,xy)=("
+     << std::setw(8) << (*this)(0,0) << ", "
+     << std::setw(8) << (*this)(0,1) << ")"
+     << std::endl;
+  os << "(yx,yy)=("
+     << std::setw(8) << (*this)(1,0) << ", "
+     << std::setw(8) << (*this)(1,1) << ")"
+     << std::endl;
+
+#endif
+#if LIBMESH_DIM == 3
+
+  os <<  "(xx,xy,xz)=("
+     << std::setw(8) << (*this)(0,0) << ", "
+     << std::setw(8) << (*this)(0,1) << ", "
+     << std::setw(8) << (*this)(0,2) << ")"
+     << std::endl;
+  os <<  "(yx,yy,yz)=("
+     << std::setw(8) << (*this)(1,0) << ", "
+     << std::setw(8) << (*this)(1,1) << ", "
+     << std::setw(8) << (*this)(1,2) << ")"
+     << std::endl;
+  os <<  "(zx,zy,zz)=("
+     << std::setw(8) << (*this)(2,0) << ", "
+     << std::setw(8) << (*this)(2,1) << ", "
+     << std::setw(8) << (*this)(2,2) << ")"
+     << std::endl;
+#endif
+}
+
 template <typename T, typename T2>
 inline
 TypeTensor<typename CompareTypes<T, T2>::supertype>
