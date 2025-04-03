@@ -23,6 +23,7 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/int_range.h"
 
 // C++ includes
 
@@ -104,6 +105,15 @@ public:
    */
   void print_scientific(std::ostream & os, unsigned precision=8) const;
 };
+
+template<typename T>
+void DenseVectorBase<T>::print (std::ostream & os) const
+{
+  for (auto i : make_range(this->size()))
+    os << std::setw(8)
+       << this->el(i)
+       << std::endl;
+}
 
 } // namespace libMesh
 
