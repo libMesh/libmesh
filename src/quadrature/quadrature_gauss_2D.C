@@ -60,13 +60,7 @@ void QGauss::init_2D()
         // x^2    xy     y^2
         //    yx^2   xy^2
         //       x^2y^2
-        //
-        // Rather than construct a 1D quadrature rule (which inits it)
-        // and then reinit it with a potentially-elevated p-level, we
-        // add twice that p-level (as is our standard behavior,
-        // sensible for typical inner product integrals) to the order
-        // to get the desired p-elevated order.
-        QGauss q1D(1,_order + 2*_p_level);
+        QGauss q1D(1,get_order());
         tensor_product_quad( q1D );
         return;
       }
