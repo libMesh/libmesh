@@ -1,10 +1,11 @@
 #ifndef TYPE_VECTOR_TEST_H
 #define TYPE_VECTOR_TEST_H
 
-#include <libmesh/type_vector.h>
-#include <libmesh/fuzzy_equals.h>
-
 #include "libmesh_cppunit.h"
+
+#include <libmesh/fuzzy_equals.h>
+#include <libmesh/libmesh.h>
+#include <libmesh/type_vector.h>
 
 #define TYPEVECTORTEST                          \
   CPPUNIT_TEST( testNorm );                     \
@@ -33,8 +34,8 @@
   CPPUNIT_TEST( testNormSqBase );               \
   CPPUNIT_TEST( testValueBase );                \
   CPPUNIT_TEST( testZeroBase );                 \
-                                                \
   CPPUNIT_TEST( testIsZero );                   \
+  CPPUNIT_TEST( testSolidAngle );               \
                                                 \
   CPPUNIT_TEST( testEqualityBase );             \
   CPPUNIT_TEST( testInEqualityBase );           \
@@ -343,6 +344,50 @@ public:
 #endif
       CPPUNIT_ASSERT(!avector.is_zero());
     }
+  }
+
+  void testSolidAngle()
+  {
+    LOG_UNIT_TEST;
+
+    const DerivedClass xvec(1.3);
+    LIBMESH_ASSERT_NUMBERS_EQUAL( solid_angle(xvec, xvec, xvec), 0, TOLERANCE*TOLERANCE );
+
+#if LIBMESH_DIM > 1
+    // This is ambiguous with --enable-complex builds?  We really need
+    // to make the vector-from-scalar constructor explicit.
+    // const DerivedClass yvec(0.,2.7),
+    //                    xydiag(3.1,3.1),
+    //                    xypdiag(.8,-.8);
+
+    DerivedClass yvec, xydiag, xypdiag;
+    yvec(1) = 2.7;
+    xydiag(0)  = 3.1; xydiag(1)  = 3.1;
+    xypdiag(0) = 0.8; xypdiag(1) = -.8;
+
+    // Yeah, nothing subtends a non-zero solid angle in 2D either.
+    LIBMESH_ASSERT_NUMBERS_EQUAL( solid_angle(xvec, xvec, yvec), 0, TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_NUMBERS_EQUAL( solid_angle(xvec, yvec, xydiag), 0, TOLERANCE*TOLERANCE );
+#endif
+
+#if LIBMESH_DIM > 2
+    const DerivedClass zvec(0.,0.,1.1),
+                       xzdiag(0.,.7,.7);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(solid_angle(xydiag, yvec, zvec),
+                                libMesh::pi/4, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(solid_angle(xvec, yvec, xzdiag),
+                                libMesh::pi/4, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(solid_angle(xypdiag, xydiag, zvec),
+                                libMesh::pi/2, TOLERANCE*TOLERANCE);
+
+    // Icosahedron coordinates are a nice analytic test
+    const Real golden = (1 + std::sqrt(Real(5)))/2;
+    const DerivedClass icosa1(1., golden, 0.),
+                       icosa2(-1., golden, 0.),
+                       icosa3(0., 1., golden);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(solid_angle(icosa1, icosa2, icosa3),
+                                libMesh::pi/5, TOLERANCE*TOLERANCE);
+#endif
   }
 
   void testNormBase()
