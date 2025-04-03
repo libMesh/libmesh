@@ -83,8 +83,9 @@ const Real Tri3::_embedding_matrix[Tri3::num_children][Tri3::num_nodes][Tri3::nu
 // ------------------------------------------------------------
 // Tri3 class member functions
 
-bool Tri3::is_vertex(const unsigned int) const
+bool Tri3::is_vertex(const unsigned int libmesh_dbg_var(n)) const
 {
+  libmesh_assert_not_equal_to (n, invalid_uint);
   return true;
 }
 
