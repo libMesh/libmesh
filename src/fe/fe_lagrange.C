@@ -430,8 +430,10 @@ void lagrange_nodal_soln(const Elem * elem,
 
 // Anonymous namespace for local helper functions
 namespace {
-unsigned int lagrange_n_dofs(const ElemType t, const Order o)
+unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
 {
+  libmesh_assert(!e || e->type() == t);
+
   switch (o)
     {
       // lagrange can only be constant on a single node
@@ -500,6 +502,13 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
 
           case INVALID_ELEM:
             return 0;
+
+          case C0POLYGON:
+            // C0Polygon requires using newer FE APIs
+            if (!e)
+              libmesh_error_msg("Code (see stack trace) used an outdated FE function overload.\n"
+                                "n_dofs() on a C0Polygon is not defined by its ElemType alone.");
+            return e->n_nodes();
 
           default:
             libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
@@ -603,14 +612,6 @@ unsigned int lagrange_n_dofs(const ElemType t, const Order o)
 
 
 
-unsigned int lagrange_n_dofs(const Elem * e, const Order o)
-{
-  libmesh_assert(e);
-  return lagrange_n_dofs(e->type(), o);
-}
-
-
-
 unsigned int lagrange_n_dofs_at_node(const ElemType t,
                                      const Order o,
                                      const unsigned int n)
@@ -690,6 +691,9 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
                   return 0;
                 }
             }
+
+          case C0POLYGON:
+            return 1;
 
 
           case TET4:
@@ -1068,15 +1072,15 @@ LIBMESH_FE_SIDE_NODAL_SOLN(LAGRANGE)
 // Do full-specialization for every dimension, instead
 // of explicit instantiation at the end of this function.
 // This could be macro-ified.
-template <> unsigned int FE<0,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
-template <> unsigned int FE<1,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
-template <> unsigned int FE<2,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
-template <> unsigned int FE<3,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, o); }
+template <> unsigned int FE<0,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, nullptr, o); }
+template <> unsigned int FE<1,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, nullptr, o); }
+template <> unsigned int FE<2,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, nullptr, o); }
+template <> unsigned int FE<3,LAGRANGE>::n_dofs(const ElemType t, const Order o) { return lagrange_n_dofs(t, nullptr, o); }
 
-template <> unsigned int FE<0,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e, o); }
-template <> unsigned int FE<1,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e, o); }
-template <> unsigned int FE<2,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e, o); }
-template <> unsigned int FE<3,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e, o); }
+template <> unsigned int FE<0,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e->type(), e, o); }
+template <> unsigned int FE<1,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e->type(), e, o); }
+template <> unsigned int FE<2,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e->type(), e, o); }
+template <> unsigned int FE<3,LAGRANGE>::n_dofs(const Elem * e, const Order o) { return lagrange_n_dofs(e->type(), e, o); }
 
 
 // Do full-specialization for every dimension, instead

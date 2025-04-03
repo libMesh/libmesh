@@ -167,7 +167,8 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           // store the new element type, update base_elem
           // here.  Through \p update_base_elem_required,
           // remember whether it has to be updated (see below).
-          elem_type = inf_elem->type();
+          this->_elem = inf_elem;
+          this->_elem_type = inf_elem->type();
           this->update_base_elem(inf_elem);
           update_base_elem_required=false;
 
@@ -176,6 +177,8 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
           init_shape_functions_required=true;
 
         }
+      else
+        this->_elem = inf_elem;
 
       // computing the reference-to-physical map and coordinates works
       // only, if we have the current base_elem stored.
@@ -214,8 +217,9 @@ void InfFE<Dim,T_radial,T_map>::reinit(const Elem * inf_elem,
 
   else // if pts != nullptr
     {
-      // update the elem_type
-      elem_type = inf_elem->type();
+      // update the elem
+      this->_elem = inf_elem;
+      this->_elem_type = inf_elem->type();
 
       // We'll assume that pts is a tensor product mesh of points.
       // pts[i] = pts[ angular_index + n_angular_pts * radial_index]
