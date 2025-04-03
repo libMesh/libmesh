@@ -1919,25 +1919,42 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
 boundary_id_type BoundaryInfo::check_renumber_nodeset(boundary_id_type bc_id)
 {
   if (_sideset_to_nodeset_conversion.find(bc_id) != _sideset_to_nodeset_conversion.end())
-    // A new bc ID has already been created for this nodeset. Return that
+    // The appropriate sideset->nodeset conversion has already been found and we can skip this check
     return _sideset_to_nodeset_conversion[bc_id];
-  else
+  // Else search for a nodeset name that matches this sideset's name
+  std::string sideset_name = _ss_id_to_name[bc_id];
+  for (const auto & ns_id : _node_boundary_ids)
+  {
+    if (_ns_id_to_name[ns_id] == sideset_name)
     {
-      // Find a suitable id and add to map
-      boundary_id_type new_id = _node_boundary_ids.size() + 1;
-      while (_node_boundary_ids.find(new_id) != _node_boundary_ids.end())
-        new_id++;
-      _sideset_to_nodeset_conversion.emplace(bc_id, new_id);
-      return new_id;
+      // This sideset and nodeset should be treated the same
+      _sideset_to_nodeset_conversion.emplace(bc_id, ns_id);
+      return ns_id;
     }
+  }
+  // Find a suitable id and add to map
+  boundary_id_type new_id = _node_boundary_ids.size() + 1;
+  while (_node_boundary_ids.find(new_id) != _node_boundary_ids.end())
+    new_id++;
+  _sideset_to_nodeset_conversion.emplace(bc_id, new_id);
+  return new_id;
 }
 
 bool BoundaryInfo::has_equivalent_nodeset(const Elem * side, boundary_id_type bc_id)
 {
   bool equivalent_nodeset = false;
   if (_sideset_to_nodeset_conversion.find(bc_id) != _sideset_to_nodeset_conversion.end())
+  {
     // The appropriate sideset->nodeset conversion has already been found and we can skip this check
+    equivalent_nodeset = true;
     return equivalent_nodeset;
+  }
+  // If there is no nodeset with the same ID then we don't have to worry about overwriting
+  if (_node_boundary_ids.find(bc_id) == _node_boundary_ids.end())
+  {
+    equivalent_nodeset = true;
+    return equivalent_nodeset;
+  }
   const auto * n_list = side->get_nodes();
   for (unsigned int i = 0; i < side->n_nodes(); i++)
   {
@@ -2424,12 +2441,13 @@ BoundaryInfo::build_node_list_from_side_list()
           {
             const boundary_id_type bcid = id_pair.second;
             auto bcid_renum = bcid;
-            // Check that bcid is not the same as a sideset id
-            if (_node_boundary_ids.find(bcid) != _node_boundary_ids.end())
-              // Check that the nodeset and sideset don't cover the same area
-              bcid_renum = check_renumber_nodeset(bcid_renum);
+            // If grouping by name check if nodeset id needs to be renumbered
+            if (_node_boundary_ids.find(bcid) != _node_boundary_ids.end() && !has_equivalent_nodeset(side, bcid))
+              // This sideset overlaps with a nodeset. Throw an error
+              libmesh_error_msg("Sideset " << bcid << " has the same ID as a preexisting nodeset. Rename one in order to build a nodeset from this sideset");
             this->add_node(side->node_ptr(i), bcid_renum);
-            _sideset_to_nodeset_conversion.emplace(bcid, bcid_renum);
+            _sideset_to_nodeset_conversion.emplace(bcid, bcid);
+            // _sideset_to_nodeset_conversion.emplace(bcid, bcid_renum);
             if (!mesh_is_serial)
             {
               const processor_id_type proc_id =
