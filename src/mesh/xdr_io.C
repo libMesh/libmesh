@@ -1822,12 +1822,16 @@ XdrIO::read_serialized_connectivity (Xdr & io,
             else
               input_buffer[pos++] = 0;
 
+            const unsigned int n_nodes0 = Elem::type_to_n_nodes_map[input_buffer[0]];
+            if (n_nodes0 == invalid_uint)
+              libmesh_not_implemented();
+
             // and all the nodes
-            libmesh_assert_less (pos+Elem::type_to_n_nodes_map[input_buffer[0]], input_buffer.size());
-            io.data_stream (&input_buffer[pos], Elem::type_to_n_nodes_map[input_buffer[0]]);
+            libmesh_assert_less (pos+n_nodes0, input_buffer.size());
+            io.data_stream (&input_buffer[pos], n_nodes0);
 
             // Advance input_buffer cursor by number of nodes in this element
-            pos += Elem::type_to_n_nodes_map[input_buffer[0]];
+            pos += n_nodes0;
 
             // and all the elem "extra" integers
             libmesh_assert_less (pos + n_elem_integers, input_buffer.size());

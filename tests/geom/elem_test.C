@@ -77,7 +77,12 @@ public:
         // degrees, but pyramids actually have an obtuse interior
         // angle of acos(-1/3) ~ 109.47 deg formed by edge pairs
         // {(0, 4), (2, 4)} and {(1,4), (3,4)}.
-        CPPUNIT_ASSERT_LESSEQUAL((std::acos(Real(-1)/3) * 180 / libMesh::pi) + TOLERANCE, max_angle);
+        if (elem->type() != C0POLYGON)
+          CPPUNIT_ASSERT_LESSEQUAL((std::acos(Real(-1)/3) * 180 / libMesh::pi) + TOLERANCE, max_angle);
+
+        // We're doing some polygon testing with a squashed pentagon
+        // that has a 135 degree angle
+        CPPUNIT_ASSERT_LESSEQUAL(135 + TOLERANCE, max_angle);
 
         // Notes on minimum angle we expect to see:
         // 1.) 1D Elements don't have interior angles, so the base
@@ -128,12 +133,16 @@ public:
         else
           CPPUNIT_ASSERT_LESSEQUAL   (8 + TOLERANCE, jac);
 
-        // The smallest actual nodal areas in this test are found in
-        // tetrahedra, which have a minimum value of 2.0. However, we
-        // return a default value of 1.0 for 0D and 1D elements here,
-        // so we also handle that case.
+        // The smallest 2D/3D nodal areas for regular elements in this
+        // test are found in tetrahedra, which have a minimum value of
+        // 2.0. However, we return a default value of 1.0 for 0D and
+        // 1D elements here, and we have a custom distorted-pentagon
+        // C0Polygon with a 0.5 at 2 nodes, so we handle those cases
+        // too.
         if (elem->dim() < 2)
           CPPUNIT_ASSERT_GREATEREQUAL(1 - TOLERANCE, jac);
+        else if (elem->type() == C0POLYGON)
+          CPPUNIT_ASSERT_GREATEREQUAL(0.5 - TOLERANCE, jac);
         else
           CPPUNIT_ASSERT_GREATEREQUAL(2 - TOLERANCE, jac);
 
@@ -188,9 +197,23 @@ public:
          this->_mesh->active_local_element_ptr_range())
       {
         CPPUNIT_ASSERT(elem->n_nodes() <= Elem::max_n_nodes);
-        CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), Elem::type_to_n_nodes_map[elem->type()]);
-        CPPUNIT_ASSERT_EQUAL(elem->n_sides(), Elem::type_to_n_sides_map[elem->type()]);
-        CPPUNIT_ASSERT_EQUAL(elem->n_edges(), Elem::type_to_n_edges_map[elem->type()]);
+
+        // If we have an element type with topology defined solely by
+        // the type, then that should match the runtime topology.  If
+        // not, then we should be aware of it.
+        const ElemType etype = elem->type();
+        if (!elem->runtime_topology())
+          {
+            CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), Elem::type_to_n_nodes_map[etype]);
+            CPPUNIT_ASSERT_EQUAL(elem->n_sides(), Elem::type_to_n_sides_map[etype]);
+            CPPUNIT_ASSERT_EQUAL(elem->n_edges(), Elem::type_to_n_edges_map[etype]);
+          }
+        else
+          {
+            CPPUNIT_ASSERT_EQUAL(invalid_uint, Elem::type_to_n_nodes_map[etype]);
+            CPPUNIT_ASSERT_EQUAL(invalid_uint, Elem::type_to_n_sides_map[etype]);
+            CPPUNIT_ASSERT_EQUAL(invalid_uint, Elem::type_to_n_edges_map[etype]);
+          }
       }
   }
 
@@ -288,9 +311,13 @@ public:
         // We should just be flipped, not twisted, so our map should
         // still be affine.
         // ... except for stupid singular pyramid maps
-        if (elem->dim() < 3 ||
-            elem->n_vertices() != 5)
+        // ... or the polygons we're deliberately testing non-affine
+        if ((elem->dim() < 3 ||
+             elem->n_vertices() != 5) &&
+            elem_type != C0POLYGON)
           CPPUNIT_ASSERT(elem->has_affine_map());
+        else if (elem_type == C0POLYGON)
+          CPPUNIT_ASSERT(!elem->has_affine_map());
 
         // The neighbors and bcids should have flipped in a way
         // consistently with the nodes (unless this is a 0D NodeElem)
@@ -367,9 +394,13 @@ public:
 
         // Our map should still be affine.
         // ... except for stupid singular pyramid maps
-        if (elem->dim() < 3 ||
-            elem->n_vertices() != 5)
+        // ... or the polygons we're deliberately testing non-affine
+        if ((elem->dim() < 3 ||
+             elem->n_vertices() != 5) &&
+            elem_type != C0POLYGON)
           CPPUNIT_ASSERT(elem->has_affine_map());
+        else if (elem_type == C0POLYGON)
+          CPPUNIT_ASSERT(!elem->has_affine_map());
 
         // The neighbors and bcids should have flipped back to where
         // they were.
@@ -557,7 +588,8 @@ public:
         elem_type == PYRAMID5 ||
         elem_type == PYRAMID13 ||
         elem_type == PYRAMID14 ||
-        elem_type == PYRAMID18)
+        elem_type == PYRAMID18 ||
+        elem_type == C0POLYGON)
       return;
 
     auto refining_mesh = this->_mesh->clone();
@@ -858,6 +890,9 @@ INSTANTIATE_ELEMTEST(QUAD8);
 INSTANTIATE_ELEMTEST(QUADSHELL8);
 INSTANTIATE_ELEMTEST(QUAD9);
 INSTANTIATE_ELEMTEST(QUADSHELL9);
+
+// This just tests with one pentagon, but better than nothing
+INSTANTIATE_ELEMTEST(C0POLYGON);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 INSTANTIATE_ELEMTEST(INFQUAD4);

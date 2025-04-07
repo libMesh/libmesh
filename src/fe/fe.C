@@ -60,10 +60,12 @@ FE<Dim,T>::FE (const FEType & fet) :
 template <unsigned int Dim, FEFamily T>
 unsigned int FE<Dim,T>::n_shape_functions () const
 {
-  libmesh_deprecated(); // Use n_dofs(Elem *)
+  if (this->_elem)
+    return this->n_dofs (this->_elem,
+                         this->fe_type.order + this->_p_level);
 
-  return FE<Dim,T>::n_dofs (this->get_type(),
-                            this->fe_type.order + this->_p_level);
+  return this->n_dofs (this->get_type(),
+                       this->fe_type.order + this->_p_level);
 }
 
 
@@ -73,7 +75,8 @@ void FE<Dim,T>::attach_quadrature_rule (QBase * q)
   libmesh_assert(q);
   this->qrule = q;
   // make sure we don't cache results from a previous quadrature rule
-  this->elem_type = INVALID_ELEM;
+  this->_elem = nullptr;
+  this->_elem_type = INVALID_ELEM;
   return;
 }
 
@@ -164,7 +167,8 @@ void FE<Dim,T>::reinit(const Elem * elem,
       if (pts != nullptr)
         {
           // Set the type and p level for this element
-          this->elem_type = elem->type();
+          this->_elem = elem;
+          this->_elem_type = elem->type();
           this->_elem_p_level = elem->p_level();
           this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
@@ -194,13 +198,16 @@ void FE<Dim,T>::reinit(const Elem * elem,
 
           // We're not going to bother trying to cache nodal
           // points *and* weights for fancier mapping types.
-          if (this->elem_type != elem->type() ||
+          if (this->get_type() != elem->type()       ||
+              (elem->runtime_topology() &&
+               this->_elem != elem)                  ||
               this->_elem_p_level != elem->p_level() ||
-              !this->shapes_on_quadrature ||
+              !this->shapes_on_quadrature            ||
               elem->mapping_type() != LAGRANGE_MAP)
             {
               // Set the type and p level for this element
-              this->elem_type = elem->type();
+              this->_elem = elem;
+              this->_elem_type = elem->type();
               this->_elem_p_level = elem->p_level();
               this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
               // Initialize the shape functions
@@ -218,6 +225,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
           else
             {
               // libmesh_assert_greater (elem->n_nodes(), 1);
+              this->_elem = elem;
 
               cached_nodes_still_fit = true;
               if (cached_nodes.size() != elem->n_nodes())
@@ -252,7 +260,8 @@ void FE<Dim,T>::reinit(const Elem * elem,
        // be done, and our "quadrature rule" is one point for nonlocal
        // (SCALAR) variables and zero points for local variables.
     {
-      this->elem_type = INVALID_ELEM;
+      this->_elem = nullptr;
+      this->_elem_type = INVALID_ELEM;
       this->_elem_p_level = 0;
       this->_p_level = 0;
 
@@ -330,7 +339,8 @@ void FE<Dim,T>::reinit_dual_shape_coeffs(const Elem * elem,
                                          const std::vector<Real> & JxW)
 {
   // Set the type and p level for this element
-  this->elem_type = elem->type();
+  this->_elem = elem;
+  this->_elem_type = elem->type();
   this->_elem_p_level = elem->p_level();
   this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
 
@@ -732,7 +742,8 @@ template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::init_base_shape_functions(const std::vector<Point> & qp,
                                           const Elem * e)
 {
-  this->elem_type = e->type();
+  this->_elem = e;
+  this->_elem_type = e->type();
   this->_fe_map->template init_reference_to_physical_map<Dim>(qp, e);
   init_shape_functions(qp, e);
 }

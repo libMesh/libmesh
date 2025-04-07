@@ -6,6 +6,7 @@
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
+#include <libmesh/face_c0polygon.h>
 #include <libmesh/fe.h>
 #include <libmesh/fe_base.h>
 #include <libmesh/fe_interface.h>
@@ -374,10 +375,33 @@ public:
         _mesh->set_default_mapping_data(weight_index);
       }
 
-    MeshTools::Generation::build_cube (*_mesh,
-                                       build_nx, build_ny, build_nz,
-                                       0., 1., 0., 1., 0., 1.,
-                                       elem_type);
+    if (elem_type == C0POLYGON)
+      {
+        // Build a pentagon by hand for testing purposes.  Make this
+        // one non-skewed so a MONOMIAL basis will be able to exactly
+        // represent the polynomials we're projecting.
+
+        _mesh->add_point(Point(0, 0), 0);
+        _mesh->add_point(Point(1, 0), 1);
+        _mesh->add_point(Point(1+cos(2*libMesh::pi/5), sin(2*libMesh::pi/5)), 2);
+        _mesh->add_point(Point(0.5, sin(2*libMesh::pi/5)+sin(libMesh::pi/5)), 3);
+        _mesh->add_point(Point(-cos(2*libMesh::pi/5), sin(2*libMesh::pi/5)), 4);
+
+        std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(5);
+        for (auto i : make_range(5))
+          polygon->set_node(i) = _mesh->node_ptr(i);
+        polygon->set_id() = 0;
+
+        _mesh->add_elem(std::move(polygon));
+        _mesh->prepare_for_use();
+      }
+    else
+      {
+        MeshTools::Generation::build_cube (*_mesh,
+                                           build_nx, build_ny, build_nz,
+                                           0., 1., 0., 1., 0., 1.,
+                                           elem_type);
+      }
 
     // For debugging purposes it can be helpful to only consider one
     // element even when we're using an element type that requires

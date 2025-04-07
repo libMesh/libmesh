@@ -2603,6 +2603,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // We are using that same assumption here!
       const auto & conv = get_conversion(elem_t);
       num_nodes_per_elem = Elem::type_to_n_nodes_map[elem_t];
+      if (Elem::type_to_n_nodes_map[elem_t] == invalid_uint)
+        libmesh_not_implemented_msg("Support for C0POLYGON not yet implemented");
 
       elem_blk_id.push_back(subdomain_id);
       elem_type_table.push_back_entry(conv.exodus_elem_type().c_str());
@@ -2831,6 +2833,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
       const auto & conv = get_conversion(elem_t);
       num_nodes_per_elem = Elem::type_to_n_nodes_map[elem_t];
+      if (Elem::type_to_n_nodes_map[elem_t] == invalid_uint)
+        libmesh_not_implemented_msg("Support for C0POLYGON not yet implemented");
 
       // If this is a *real* block, we just loop over vectors of
       // element ids to add.
