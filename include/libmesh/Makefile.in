@@ -552,26 +552,27 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	h1_fe_transformation.h hcurl_fe_transformation.h \
 	hdiv_fe_transformation.h inf_fe.h inf_fe_instantiate_1D.h \
 	inf_fe_instantiate_2D.h inf_fe_instantiate_3D.h inf_fe_macro.h \
-	inf_fe_map.h bounding_box.h cell.h cell_hex.h cell_hex20.h \
-	cell_hex27.h cell_hex8.h cell_inf.h cell_inf_hex.h \
-	cell_inf_hex16.h cell_inf_hex18.h cell_inf_hex8.h \
-	cell_inf_prism.h cell_inf_prism12.h cell_inf_prism6.h \
-	cell_prism.h cell_prism15.h cell_prism18.h cell_prism20.h \
-	cell_prism21.h cell_prism6.h cell_pyramid.h cell_pyramid13.h \
-	cell_pyramid14.h cell_pyramid18.h cell_pyramid5.h cell_tet.h \
-	cell_tet10.h cell_tet14.h cell_tet4.h compare_elems_by_level.h \
-	edge.h edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h \
-	elem.h elem_cutter.h elem_hash.h elem_internal.h \
-	elem_quality.h elem_range.h elem_side_builder.h face.h \
-	face_c0polygon.h face_inf_quad.h face_inf_quad4.h \
-	face_inf_quad6.h face_polygon.h face_quad.h face_quad4.h \
-	face_quad4_shell.h face_quad8.h face_quad8_shell.h \
-	face_quad9.h face_quad9_shell.h face_tri.h face_tri3.h \
-	face_tri3_shell.h face_tri3_subdivision.h face_tri6.h \
-	face_tri7.h node.h node_elem.h node_range.h plane.h point.h \
-	reference_elem.h remote_elem.h side.h sphere.h stored_range.h \
-	surface.h default_coupling.h ghost_point_neighbors.h \
-	ghosting_functor.h non_manifold_coupling.h overlap_coupling.h \
+	inf_fe_map.h bounding_box.h cell.h cell_c0polyhedron.h \
+	cell_hex.h cell_hex20.h cell_hex27.h cell_hex8.h cell_inf.h \
+	cell_inf_hex.h cell_inf_hex16.h cell_inf_hex18.h \
+	cell_inf_hex8.h cell_inf_prism.h cell_inf_prism12.h \
+	cell_inf_prism6.h cell_polyhedron.h cell_prism.h \
+	cell_prism15.h cell_prism18.h cell_prism20.h cell_prism21.h \
+	cell_prism6.h cell_pyramid.h cell_pyramid13.h cell_pyramid14.h \
+	cell_pyramid18.h cell_pyramid5.h cell_tet.h cell_tet10.h \
+	cell_tet14.h cell_tet4.h compare_elems_by_level.h edge.h \
+	edge_edge2.h edge_edge3.h edge_edge4.h edge_inf_edge2.h elem.h \
+	elem_cutter.h elem_hash.h elem_internal.h elem_quality.h \
+	elem_range.h elem_side_builder.h face.h face_c0polygon.h \
+	face_inf_quad.h face_inf_quad4.h face_inf_quad6.h \
+	face_polygon.h face_quad.h face_quad4.h face_quad4_shell.h \
+	face_quad8.h face_quad8_shell.h face_quad9.h \
+	face_quad9_shell.h face_tri.h face_tri3.h face_tri3_shell.h \
+	face_tri3_subdivision.h face_tri6.h face_tri7.h node.h \
+	node_elem.h node_range.h plane.h point.h reference_elem.h \
+	remote_elem.h side.h sphere.h stored_range.h surface.h \
+	default_coupling.h ghost_point_neighbors.h ghosting_functor.h \
+	non_manifold_coupling.h overlap_coupling.h \
 	point_neighbor_coupling.h sibling_coupling.h abaqus_io.h \
 	boundary_info.h boundary_mesh.h checkpoint_io.h \
 	distributed_mesh.h dyna_io.h ensight_io.h exodusII_io.h \
@@ -1200,6 +1201,9 @@ bounding_box.h: $(top_srcdir)/include/geom/bounding_box.h
 cell.h: $(top_srcdir)/include/geom/cell.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_c0polyhedron.h: $(top_srcdir)/include/geom/cell_c0polyhedron.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_hex.h: $(top_srcdir)/include/geom/cell_hex.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1234,6 +1238,9 @@ cell_inf_prism12.h: $(top_srcdir)/include/geom/cell_inf_prism12.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf_prism6.h: $(top_srcdir)/include/geom/cell_inf_prism6.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_polyhedron.h: $(top_srcdir)/include/geom/cell_polyhedron.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_prism.h: $(top_srcdir)/include/geom/cell_prism.h

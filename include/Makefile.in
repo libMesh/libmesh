@@ -703,6 +703,7 @@ include_HEADERS = \
         fe/inf_fe_map.h \
         geom/bounding_box.h \
         geom/cell.h \
+        geom/cell_c0polyhedron.h \
         geom/cell_hex.h \
         geom/cell_hex20.h \
         geom/cell_hex27.h \
@@ -715,6 +716,7 @@ include_HEADERS = \
         geom/cell_inf_prism.h \
         geom/cell_inf_prism12.h \
         geom/cell_inf_prism6.h \
+        geom/cell_polyhedron.h \
         geom/cell_prism.h \
         geom/cell_prism15.h \
         geom/cell_prism18.h \
