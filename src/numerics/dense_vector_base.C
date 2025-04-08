@@ -46,17 +46,6 @@ void DenseVectorBase<T>::print_scientific (std::ostream & os, unsigned precision
 }
 
 
-
-template<typename T>
-void DenseVectorBase<T>::print (std::ostream & os) const
-{
-  for (auto i : make_range(this->size()))
-    os << std::setw(8)
-       << this->el(i)
-       << std::endl;
-}
-
-
 //--------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT DenseVectorBase<Real>;
