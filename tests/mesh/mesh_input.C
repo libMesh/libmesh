@@ -203,6 +203,8 @@ public:
   CPPUNIT_TEST( testGoodSTL );
   CPPUNIT_TEST( testGoodSTLBinary );
 
+  CPPUNIT_TEST( testGmshBCIDOverlap );
+
 #ifdef LIBMESH_HAVE_TETGEN
   CPPUNIT_TEST( testTetgenIO );
 #endif
@@ -1560,6 +1562,32 @@ public:
     MeshCommunication().broadcast(mesh);
 
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(14));
+  }
+
+  void testGmshBCIDOverlap ()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    GmshIO gmsh_io(mesh);
+
+    if (mesh.processor_id() == 0)
+      gmsh_io.read("meshes/bcid_overlap.msh");
+    MeshCommunication().broadcast(mesh);
+
+    CPPUNIT_ASSERT_EQUAL(mesh.get_boundary_info().get_sideset_name_map().size(),
+                         std::size_t(2));
+    CPPUNIT_ASSERT_EQUAL(mesh.get_boundary_info().sideset_name(1),
+                         std::string("srfBC4A"));
+    CPPUNIT_ASSERT_EQUAL(mesh.get_boundary_info().sideset_name(2),
+                         std::string("srfBC4B"));
+    CPPUNIT_ASSERT_EQUAL(mesh.get_subdomain_name_map().size(),
+                         std::size_t(2));
+    CPPUNIT_ASSERT_EQUAL(mesh.subdomain_name(1),
+                         std::string("volBC3A"));
+    CPPUNIT_ASSERT_EQUAL(mesh.subdomain_name(2),
+                         std::string("volBC3B"));
   }
 
   void testGoodSTL ()
