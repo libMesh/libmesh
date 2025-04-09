@@ -505,7 +505,9 @@ Point Elem::true_centroid() const
   if (this->p_level())
     {
       auto elem_copy = this->disconnected_clone();
+#ifdef LIBMESH_ENABLE_AMR
       elem_copy->set_p_level(0);
+#endif
 
       // Set node pointers
       for (auto n : this->node_index_range())
