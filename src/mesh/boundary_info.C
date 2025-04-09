@@ -1195,7 +1195,7 @@ void BoundaryInfo::add_side(const Elem * elem,
   ElemSideBuilder side_builder;
   const Elem * new_side = &side_builder(*elem, side);
   if (has_equivalent_nodeset(new_side, id))
-    _sideset_to_nodeset_conversion.emplace(id, id);
+    _sideset_to_nodeset_conversion.insert(id);
 }
 
 
@@ -1271,7 +1271,7 @@ void BoundaryInfo::add_side(const Elem * elem,
       ElemSideBuilder side_builder;
       const Elem * new_side = &side_builder(*elem, side);
       if (has_equivalent_nodeset(new_side, id))
-        _sideset_to_nodeset_conversion.emplace(id, id);
+        _sideset_to_nodeset_conversion.insert(id);
     }
 }
 
@@ -1916,30 +1916,6 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   this->libmesh_assert_valid_multimaps();
 }
 
-boundary_id_type BoundaryInfo::check_renumber_nodeset(boundary_id_type bc_id)
-{
-  if (_sideset_to_nodeset_conversion.find(bc_id) != _sideset_to_nodeset_conversion.end())
-    // The appropriate sideset->nodeset conversion has already been found and we can skip this check
-    return _sideset_to_nodeset_conversion[bc_id];
-  // Else search for a nodeset name that matches this sideset's name
-  std::string sideset_name = _ss_id_to_name[bc_id];
-  for (const auto & ns_id : _node_boundary_ids)
-  {
-    if (_ns_id_to_name[ns_id] == sideset_name)
-    {
-      // This sideset and nodeset should be treated the same
-      _sideset_to_nodeset_conversion.emplace(bc_id, ns_id);
-      return ns_id;
-    }
-  }
-  // Find a suitable id and add to map
-  boundary_id_type new_id = _node_boundary_ids.size() + 1;
-  while (_node_boundary_ids.find(new_id) != _node_boundary_ids.end())
-    new_id++;
-  _sideset_to_nodeset_conversion.emplace(bc_id, new_id);
-  return new_id;
-}
-
 bool BoundaryInfo::has_equivalent_nodeset(const Elem * side, boundary_id_type bc_id)
 {
   bool equivalent_nodeset = false;
@@ -1959,7 +1935,6 @@ bool BoundaryInfo::has_equivalent_nodeset(const Elem * side, boundary_id_type bc
   for (unsigned int i = 0; i < side->n_nodes(); i++)
   {
     const auto node = n_list[i];
-    //auto bc_ids = _boundary_node_id.equal_range(node);
     for (const auto & itr : as_range(_boundary_node_id.equal_range(node)))
     {
       if (itr.second == bc_id)
@@ -1969,9 +1944,6 @@ bool BoundaryInfo::has_equivalent_nodeset(const Elem * side, boundary_id_type bc
       }
       else
         equivalent_nodeset = false;
-      // no equivalent nodeset exists
-      //equivalent_nodeset = false;
-      //break;
     }
     if (!equivalent_nodeset)
       break;  
@@ -2435,8 +2407,6 @@ BoundaryInfo::build_node_list_from_side_list()
           side = &side_builder(*cur_elem, id_pair.first);
           // Check for equivalent nodeset here. If it has one the next portion can be skipped
           // Add each node node on the side with the side's boundary id
-          //if (has_equivalent_nodeset(side, id_pair.second))
-            //_sideset_to_nodeset_conversion.emplace(id_pair.second, id_pair.second);
           for (auto i : side->node_index_range())
           {
             const boundary_id_type bcid = id_pair.second;
@@ -2446,8 +2416,7 @@ BoundaryInfo::build_node_list_from_side_list()
               // This sideset overlaps with a nodeset. Throw an error
               libmesh_error_msg("Sideset " << bcid << " has the same ID as a preexisting nodeset. Rename one in order to build a nodeset from this sideset");
             this->add_node(side->node_ptr(i), bcid_renum);
-            _sideset_to_nodeset_conversion.emplace(bcid, bcid);
-            // _sideset_to_nodeset_conversion.emplace(bcid, bcid_renum);
+            _sideset_to_nodeset_conversion.insert(bcid);
             if (!mesh_is_serial)
             {
               const processor_id_type proc_id =
