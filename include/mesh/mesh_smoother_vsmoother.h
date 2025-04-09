@@ -71,7 +71,8 @@ public:
                           Real theta=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
-                          unsigned miniterBC=5);
+                          unsigned miniterBC=5,
+                          const bool preserve_subdomain_boundaries=true);
 
   /**
    * Slightly more complicated constructor for mesh redistribution based on adapt_data
@@ -82,7 +83,8 @@ public:
                           unsigned miniter=2,
                           unsigned maxiter=5,
                           unsigned miniterBC=5,
-                          Real percent_to_move=1);
+                          Real percent_to_move=1,
+                          const bool preserve_subdomain_boundaries=true);
 
   /**
    * Even more complicated constructor for mesh redistribution based on adapt_data with an
@@ -95,7 +97,8 @@ public:
                           unsigned miniter=2,
                           unsigned maxiter=5,
                           unsigned miniterBC=5,
-                          Real percent_to_move=1);
+                          Real percent_to_move=1,
+                          const bool preserve_subdomain_boundaries=true);
 
   enum MetricType
     {
@@ -210,6 +213,9 @@ private:
    * Area of Interest Mesh
    */
   const UnstructuredMesh * _area_of_interest;
+
+  /// Whether subdomain boundaries are subject to change via smoothing
+  const bool _preserve_subdomain_boundaries;
 
   void adjust_adapt_data();
   float adapt_minimum() const;
