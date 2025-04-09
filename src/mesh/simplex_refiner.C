@@ -225,8 +225,8 @@ std::size_t SimplexRefiner::refine_via_edges(Elem & elem,
   // (which can't reconstruct them from scratch), and we need at least
   // placeholder neighbors to make sure we'll have good processor_id()
   // options for new nodes in future splits of the same edge.
-  subelem[0]->set_neighbor(1, subelem[1].get());
-  subelem[1]->set_neighbor(0, subelem[0].get());
+  subelem[0]->set_neighbor(1, proxy_elements[elem.processor_id()].get());
+  subelem[1]->set_neighbor(0, proxy_elements[elem.processor_id()].get());
 
   BoundaryInfo & boundary_info = _mesh.get_boundary_info();
   std::vector<boundary_id_type> bc_ids;
