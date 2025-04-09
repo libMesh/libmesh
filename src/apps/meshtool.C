@@ -47,6 +47,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_elem_quality.h"
 #include "libmesh/getpot.h"
+#include <libmesh/mesh_smoother_vsmoother.h>
 
 using namespace libMesh;
 
@@ -62,6 +63,7 @@ int main (int argc, char ** argv)
   LibMeshInit init(argc, argv);
 
   unsigned int n_subdomains = 1;
+  bool vsmooth = false;
   unsigned int n_rsteps = 0;
   Real simplex_refine = 0.;
   double dist_fact = 0.;
@@ -141,6 +143,10 @@ int main (int argc, char ** argv)
       tmp = command_line.next(tmp);
       n_subdomains = cast_int<unsigned int>(tmp);
     }
+
+  // Whether to apply variational smoother
+  if (command_line.search(1, "-V"))
+      vsmooth = true;
 
   // Should we call all_tri()?
   if (command_line.search(1, "-t"))
@@ -513,6 +519,12 @@ int main (int argc, char ** argv)
   if (n_subdomains > 1)
     mesh.partition(n_subdomains);
 
+  // Possibly smooth the mesh
+  if (vsmooth)
+  {
+    VariationalMeshSmoother vsmoother(mesh);
+    vsmoother.smooth();
+  }
 
   // Possibly write the mesh
   if (output_names.size())
@@ -589,6 +601,7 @@ void usage(const std::string & prog_name)
            << "    -D <factor>                   Randomly move interior nodes by D*hmin\n"
            << "    -h                            Print help menu\n"
            << "    -p <count>                    Partition into <count> subdomains\n"
+           << "    -V                            Apply the variational mesh smoother\n"
 #ifdef LIBMESH_ENABLE_AMR
            << "    -r <count>                    Uniformly refine <count> times\n"
 #endif
