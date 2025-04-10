@@ -1266,7 +1266,7 @@ void BoundaryInfo::add_side(const Elem * elem,
       _boundary_side_id.emplace(elem, std::make_pair(side, id));
       _boundary_ids.insert(id);
       _side_boundary_ids.insert(id); // Also add this ID to the set of side boundary IDs
-      
+
       // create temp side and check if sideset has a matching nodeset
       ElemSideBuilder side_builder;
       const Elem * new_side = &side_builder(*elem, side);
