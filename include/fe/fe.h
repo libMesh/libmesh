@@ -634,13 +634,6 @@ public:
    */
   virtual void attach_quadrature_rule (QBase * q) override;
 
-  /**
-   * \returns The total number of quadrature points.  Call this
-   * to get an upper bound for the \p for loop in your simulation
-   * for matrix assembly of the current element.
-   */
-  virtual unsigned int n_quadrature_points () const override;
-
 #ifdef LIBMESH_ENABLE_AMR
   /**
    * Computes the constraint matrix contributions (for
