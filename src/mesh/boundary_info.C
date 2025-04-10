@@ -1946,7 +1946,7 @@ bool BoundaryInfo::has_equivalent_nodeset(const Elem * side, boundary_id_type bc
         equivalent_nodeset = false;
     }
     if (!equivalent_nodeset)
-      break;  
+      break;
   }
   return equivalent_nodeset;
 }
