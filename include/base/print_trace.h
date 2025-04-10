@@ -33,11 +33,6 @@ namespace libMesh
 void print_trace(std::ostream & out_stream = std::cerr);
 
 /**
- * Mostly system independent demangler
- */
-std::string demangle(const char * name);
-
-/**
  * Writes a stack trace to a uniquely named file if
  * --enable-tracefiles has been set by configure, otherwise does
  * nothing.
