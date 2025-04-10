@@ -49,7 +49,6 @@ InfFE<Dim,T_radial,T_map>::InfFE (const FEType & fet) :
   calculate_xyz(false),
   calculate_jxw(false),
   _n_total_approx_sf (0),
-  _n_total_qp        (0),
 
   // initialize the current_fe_type to all the same
   // values as \p fet (since the FE families and coordinate

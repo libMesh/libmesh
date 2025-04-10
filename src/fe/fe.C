@@ -77,14 +77,6 @@ void FE<Dim,T>::attach_quadrature_rule (QBase * q)
 
 
 template <unsigned int Dim, FEFamily T>
-unsigned int FE<Dim,T>::n_quadrature_points () const
-{
-  libmesh_assert(this->qrule);
-  return this->qrule->n_points();
-}
-
-
-template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::dofs_on_side(const Elem * const elem,
                              const Order o,
                              unsigned int s,
@@ -401,6 +393,7 @@ void FE<Dim,T>::init_shape_functions(const std::vector<Point> & qp,
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qp.size());
+  this->_n_total_qp = n_qp;
 
   // Number of shape functions in the finite element approximation
   // space.

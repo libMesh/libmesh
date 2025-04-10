@@ -45,7 +45,6 @@
   template LIBMESH_EXPORT FE<2,SUBDIVISION>::FE(const FEType & fet); \
   template LIBMESH_EXPORT unsigned int FE<2,SUBDIVISION>::n_shape_functions () const;  \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase *); \
-  template LIBMESH_EXPORT unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::reinit(const Elem *,const std::vector<Point> * const,const std::vector<Real> * const); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_base_shape_functions(const std::vector<Point> &, const Elem *); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *); \
@@ -59,7 +58,6 @@
   template LIBMESH_EXPORT FE<2,SUBDIVISION>::FE(const FEType & fet);                     \
   template LIBMESH_EXPORT unsigned int FE<2,SUBDIVISION>::n_shape_functions () const;  \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::attach_quadrature_rule (QBase *); \
-  template LIBMESH_EXPORT unsigned int FE<2,SUBDIVISION>::n_quadrature_points () const; \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::reinit(const Elem *,const std::vector<Point> * const,const std::vector<Real> * const); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_shape_functions(const std::vector<Point> &, const Elem *); \
   template LIBMESH_EXPORT void         FE<2,SUBDIVISION>::init_dual_shape_functions(unsigned int, unsigned int); \

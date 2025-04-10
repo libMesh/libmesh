@@ -475,10 +475,10 @@ public:
   virtual unsigned int n_shape_functions () const = 0;
 
   /**
-   * \returns The total number of quadrature points.  Useful
-   * during matrix assembly.  Implement this in derived classes.
+   * \returns The total number of quadrature points with which this
+   * was last reinitialized.  Useful during matrix assembly.
    */
-  virtual unsigned int n_quadrature_points () const = 0;
+  virtual unsigned int n_quadrature_points () const;
 
   /**
    * \returns The element type that the current shape functions
@@ -741,6 +741,12 @@ protected:
    * correspond to quadrature rule points
    */
   bool shapes_on_quadrature;
+
+  /**
+   * The total number of quadrature points
+   * for the current configuration
+   */
+  unsigned int _n_total_qp;
 
   /**
    * \returns \p true when the shape functions (for

@@ -559,8 +559,7 @@ public:
    * for matrix assembly of the current element.
    */
   virtual unsigned int n_quadrature_points () const override
-  { libmesh_assert(radial_qrule); return _n_total_qp; }
-
+  { libmesh_assert(radial_qrule); return this->_n_total_qp; }
 
   /**
    * \returns the \p xyz spatial locations of the quadrature
@@ -1170,12 +1169,6 @@ protected:
    * the current configuration
    */
   unsigned int _n_total_approx_sf;
-
-  /**
-   * The total number of quadrature points
-   * for the current configuration
-   */
-  unsigned int _n_total_qp;
 
   /**
    * this vector contains the combined integration weights, so
