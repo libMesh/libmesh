@@ -55270,7 +55270,8 @@ then :
 
                               my_top_builddir="$(pwd)"
 
-                              rm -rf contrib/netgen/build
+                                                  rm -f contrib/netgen/.buildstamp
+          rm -rf contrib/netgen/build
           mkdir -p contrib/netgen/build
 
                                         mkdir -p contrib/netgen/install

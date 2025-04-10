@@ -46,8 +46,11 @@ AC_DEFUN([CONFIGURE_NETGEN],
           dnl apparently not?
           my_top_builddir="$(pwd)"
 
-          dnl Wipe the old build directory, because it can corrupt a
-          dnl "fresh" cmake, because cmake sucks
+          dnl Wipe the old build directory (along with our .buildstamp
+          dnl that lets us know a build is complete there), because an
+          dnl old build can corrupt a "fresh" cmake, because cmake
+          dnl sucks
+          rm -f contrib/netgen/.buildstamp
           rm -rf contrib/netgen/build
           mkdir -p contrib/netgen/build
 
