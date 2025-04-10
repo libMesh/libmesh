@@ -9,6 +9,7 @@ BUILT_SOURCES = \
         auto_ptr.h \
         dirichlet_boundaries.h \
         dof_map.h \
+        dof_map_base.h \
         dof_object.h \
         factory.h \
         float128_shims.h \
@@ -620,6 +621,9 @@ dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_map.h: $(top_srcdir)/include/base/dof_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+dof_map_base.h: $(top_srcdir)/include/base/dof_map_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_object.h: $(top_srcdir)/include/base/dof_object.h
