@@ -7,6 +7,7 @@
 #include <libmesh/mesh_smoother_vsmoother.h>
 #include <libmesh/mesh_tools.h>
 #include <libmesh/node.h>
+#include <libmesh/elem.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/boundary_info.h>
 
@@ -104,6 +105,7 @@ public:
 #  ifdef LIBMESH_ENABLE_VSMOOTHER
   CPPUNIT_TEST( testVariationalQuad );
   CPPUNIT_TEST( testVariationalTri );
+  CPPUNIT_TEST( testVariationalQuadMultipleSubdomains );
 #  endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
 
@@ -114,7 +116,7 @@ public:
 
   void tearDown() {}
 
-  void testSmoother(ReplicatedMesh & mesh, MeshSmoother & smoother, ElemType type)
+  void testSmoother(ReplicatedMesh & mesh, MeshSmoother & smoother, const ElemType type, const bool multiple_subdomains=false)
   {
     LOG_UNIT_TEST;
 
@@ -126,6 +128,32 @@ public:
     // Move it around so we have something that needs smoothing
     DistortSquare ds;
     MeshTools::Modification::redistribute(mesh, ds);
+
+    std::unordered_map<dof_id_type, Point> subdomain_boundary_node_id_to_point;
+    if (multiple_subdomains)
+    {
+      // Increment the subdomain id on the right half by 1
+      for (auto * elem : mesh.active_element_ptr_range())
+        if (elem->vertex_average()(0) > 0.5)
+          ++elem->subdomain_id();
+
+      // This loop should NOT be combined with the one above because we need to
+      // finish checking and updating subdomain ids for all elements before
+      // recording the final subdomain boundary.
+      for (auto * elem : mesh.active_element_ptr_range())
+        for (const auto & s : elem->side_index_range())
+        {
+          const auto* neighbor = elem->neighbor_ptr(s);
+          if (neighbor == nullptr)
+            continue;
+
+          if (elem->subdomain_id() != neighbor->subdomain_id())
+            // This side is part of a subdomain boundary, record the
+            // corresponding node locations
+            for (const auto & n : elem->nodes_on_side(s))
+              subdomain_boundary_node_id_to_point[elem->node_id(n)] = Point(*(elem->get_nodes()[n]));
+        }
+      }
 
     const auto & boundary_info = mesh.get_boundary_info();
 
@@ -187,6 +215,17 @@ public:
       }
     };
 
+    // Function to check if a given node has changed based on previous mapping
+    auto is_internal_subdomain_boundary_node_the_same = [&subdomain_boundary_node_id_to_point]
+      (const Node & node) {
+      auto it = subdomain_boundary_node_id_to_point.find(node.id());
+      if (it != subdomain_boundary_node_id_to_point.end())
+        return (Point(node) == subdomain_boundary_node_id_to_point[node.id()]);
+      else
+        // node is not an internal subdomain boundary node, just return true
+        return true;
+    };
+
     // Make sure our DistortSquare transformation has distorted the mesh
     for (auto node : mesh.node_ptr_range())
       {
@@ -219,11 +258,18 @@ public:
       MeshTools::Modification::redistribute(mesh, pts);
     }
 
-    // Make sure we're not too distorted anymore.
+    // Make sure we're not too distorted anymore OR that interval subdomain boundary nodes did not change.
     for (auto node : mesh.node_ptr_range())
       {
-        CPPUNIT_ASSERT(center_distortion_is(*node, 0, false, 1e-3));
-        CPPUNIT_ASSERT(center_distortion_is(*node, 1, false, 1e-3));
+        if (multiple_subdomains)
+        {
+          CPPUNIT_ASSERT(is_internal_subdomain_boundary_node_the_same(*node));
+        }
+        else
+        {
+          CPPUNIT_ASSERT(center_distortion_is(*node, 0, false, 1e-3));
+          CPPUNIT_ASSERT(center_distortion_is(*node, 1, false, 1e-3));
+        }
       }
   }
 
@@ -262,6 +308,14 @@ public:
     VariationalMeshSmoother variational(mesh);
 
     testSmoother(mesh, variational, TRI3);
+  }
+
+  void testVariationalQuadMultipleSubdomains()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testSmoother(mesh, variational, QUAD4, true);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
