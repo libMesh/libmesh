@@ -2445,7 +2445,7 @@ unsigned int System::n_components() const
     return 0;
 
   const Variable & last = _variables.back();
-  return last.first_scalar_number() + last.n_components();
+  return last.first_scalar_number() + last.n_components(this->get_mesh());
 }
 
 
