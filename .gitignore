@@ -239,3 +239,4 @@ installed
 # VSCode related things
 .cache
 .vscode
+compile_commands.json
