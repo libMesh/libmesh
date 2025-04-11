@@ -51,26 +51,22 @@ StaticCondensation::StaticCondensation(const MeshBase & mesh,
 
 StaticCondensation::~StaticCondensation() = default;
 
-SparseMatrix<Number> &
-StaticCondensation::operator=(const SparseMatrix<Number> &)
+SparseMatrix<Number> & StaticCondensation::operator=(const SparseMatrix<Number> &)
 {
   libmesh_not_implemented();
 }
 
-std::unique_ptr<SparseMatrix<Number>>
-StaticCondensation::zero_clone() const
+std::unique_ptr<SparseMatrix<Number>> StaticCondensation::zero_clone() const
 {
   libmesh_not_implemented();
 }
 
-std::unique_ptr<SparseMatrix<Number>>
-StaticCondensation::clone() const
+std::unique_ptr<SparseMatrix<Number>> StaticCondensation::clone() const
 {
   libmesh_not_implemented();
 }
 
-void
-StaticCondensation::clear() noexcept
+void StaticCondensation::clear() noexcept
 {
   PetscMatrixShellMatrix<Number>::clear();
 
@@ -85,14 +81,13 @@ StaticCondensation::clear() noexcept
   _sc_is_initialized = false;
 }
 
-void
-StaticCondensation::init(const numeric_index_type m,
-                         const numeric_index_type n,
-                         const numeric_index_type m_l,
-                         const numeric_index_type n_l,
-                         const numeric_index_type nnz,
-                         const numeric_index_type noz,
-                         const numeric_index_type blocksize)
+void StaticCondensation::init(const numeric_index_type m,
+                              const numeric_index_type n,
+                              const numeric_index_type m_l,
+                              const numeric_index_type n_l,
+                              const numeric_index_type nnz,
+                              const numeric_index_type noz,
+                              const numeric_index_type blocksize)
 {
   if (!this->initialized())
     {
@@ -101,8 +96,7 @@ StaticCondensation::init(const numeric_index_type m,
     }
 }
 
-void
-StaticCondensation::init(const ParallelType type)
+void StaticCondensation::init(const ParallelType type)
 {
   if (!this->initialized())
     {
@@ -111,14 +105,12 @@ StaticCondensation::init(const ParallelType type)
     }
 }
 
-bool
-StaticCondensation::initialized() const
+bool StaticCondensation::initialized() const
 {
   return PetscMatrixShellMatrix<Number>::initialized() && _sc_is_initialized;
 }
 
-void
-StaticCondensation::init()
+void StaticCondensation::init()
 {
   if (_sc_is_initialized)
     return;
@@ -130,6 +122,7 @@ StaticCondensation::init()
   dof_id_type condensed_local_dof_number = 0, uncondensed_local_dof_number = 0;
   std::unordered_map<dof_id_type, dof_id_type> *condensed_global_to_local_map = nullptr,
                                                *uncondensed_global_to_local_map = nullptr;
+  std::set<unsigned int> full_vars_present_in_reduced_sys;
 
   // Handle SCALAR dofs
   for (const auto vg : make_range(_dof_map.n_variable_groups()))
@@ -225,6 +218,7 @@ StaticCondensation::init()
           for (const auto v : make_range(var_group.n_variables()))
             {
               const auto var_num = var_group.number(v);
+              local_data.reduced_space_indices.resize(var_num + 1);
               elem_uncondensed_dofs.clear();
               _dof_map.dof_indices(elem,
                                    elem_dofs,
@@ -232,9 +226,14 @@ StaticCondensation::init()
                                    scalar_dofs_functor,
                                    field_dofs_functor,
                                    elem->p_level());
-              local_data.reduced_space_indices.insert(local_data.reduced_space_indices.end(),
-                                                      elem_uncondensed_dofs.begin(),
-                                                      elem_uncondensed_dofs.end());
+              if (!elem_uncondensed_dofs.empty())
+                {
+                  auto & var_reduced_space_indices = local_data.reduced_space_indices[var_num];
+                  var_reduced_space_indices.insert(var_reduced_space_indices.end(),
+                                                   elem_uncondensed_dofs.begin(),
+                                                   elem_uncondensed_dofs.end());
+                  full_vars_present_in_reduced_sys.insert(var_num);
+                }
             }
         }
 
@@ -338,16 +337,48 @@ StaticCondensation::init()
                                    &DofObject::invalid_id);
   nonlocal_uncondensed_dofs_mapvec.clear();
 
+  // Determine the variables with any degrees of freedom present in the reduced system
+  _communicator.set_union(full_vars_present_in_reduced_sys);
+  _reduced_vars.reserve(full_vars_present_in_reduced_sys.size());
+  unsigned int first_local_number = 0;
+  for (const auto i : index_range(full_vars_present_in_reduced_sys))
+    {
+      const auto full_var_num = *std::next(full_vars_present_in_reduced_sys.begin(), i);
+      const auto & full_var = _dof_map.variable(full_var_num);
+      _reduced_vars.push_back(Variable{nullptr,
+                                       full_var.name(),
+                                       cast_int<unsigned int>(i),
+                                       first_local_number,
+                                       full_var.type()});
+      first_local_number += _reduced_vars.back().n_components(_mesh);
+    }
+
   // Now we can finally set our element reduced dof indices
-  std::vector<dof_id_type> full_dof_indices;
+  std::vector<dof_id_type> var_full_dof_indices;
   for (auto & [elem, local_data] : _elem_to_local_data)
     {
       libmesh_ignore(elem);
-      full_dof_indices = local_data.reduced_space_indices;
-      local_data.reduced_space_indices.clear();
-      for (const auto full_dof : full_dof_indices)
-        local_data.reduced_space_indices.push_back(
-            libmesh_map_find(full_dof_to_reduced_dof, full_dof));
+      auto & reduced_space_indices = local_data.reduced_space_indices;
+      // Start erasing from the back to reduce the number of copy assignment operations
+      if (reduced_space_indices.size())
+        for (typename std::vector<dof_id_type>::difference_type i =
+                 reduced_space_indices.size() - 1;
+             i >= 0;
+             --i)
+          if (!full_vars_present_in_reduced_sys.count(i))
+            reduced_space_indices.erase(reduced_space_indices.begin() + i);
+      // It is theoretically possible that we have an element that doesn't have dofs for one of the
+      // variables present in our reduced system, which is why the assertion below is not an
+      // equality assertion
+      libmesh_assert(reduced_space_indices.size() <= full_vars_present_in_reduced_sys.size());
+
+      for (auto & var_dof_indices : reduced_space_indices)
+        {
+          var_full_dof_indices = var_dof_indices;
+          var_dof_indices.clear();
+          for (const auto full_dof : var_full_dof_indices)
+            var_dof_indices.push_back(libmesh_map_find(full_dof_to_reduced_dof, full_dof));
+        }
     }
 
   // Build ghosted full solution vector. Note that this is, in general, *not equal* to the system
@@ -356,8 +387,7 @@ StaticCondensation::init()
   _sc_is_initialized = true;
 }
 
-void
-StaticCondensation::close()
+void StaticCondensation::close()
 {
   _communicator.max(_have_cached_values);
   if (!_have_cached_values)
@@ -370,9 +400,11 @@ StaticCondensation::close()
     }
 
   DenseMatrix<Number> shim;
+  std::vector<dof_id_type> reduced_space_indices;
   for (auto & [elem_id, local_data] : _elem_to_local_data)
     {
       libmesh_ignore(elem_id);
+      reduced_space_indices.clear();
       local_data.AccFactor = local_data.Acc.partialPivLu();
       const EigenMatrix S =
           local_data.Auu - local_data.Auc * local_data.AccFactor.solve(local_data.Acu);
@@ -380,7 +412,11 @@ StaticCondensation::close()
       for (const auto i : make_range(S.rows()))
         for (const auto j : make_range(S.cols()))
           shim(i, j) = S(i, j);
-      _reduced_sys_mat->add_matrix(shim, local_data.reduced_space_indices);
+      for (const auto & var_reduced_space_indices : local_data.reduced_space_indices)
+        reduced_space_indices.insert(reduced_space_indices.end(),
+                                     var_reduced_space_indices.begin(),
+                                     var_reduced_space_indices.end());
+      _reduced_sys_mat->add_matrix(shim, reduced_space_indices);
     }
 
   _reduced_sys_mat->close();
@@ -388,14 +424,12 @@ StaticCondensation::close()
   _have_cached_values = false;
 }
 
-bool
-StaticCondensation::closed() const
+bool StaticCondensation::closed() const
 {
   return _reduced_sys_mat->closed() && !_have_cached_values;
 }
 
-void
-StaticCondensation::zero()
+void StaticCondensation::zero()
 {
   _reduced_sys_mat->zero();
   for (auto & [elem_id, local_data] : _elem_to_local_data)
@@ -408,66 +442,70 @@ StaticCondensation::zero()
     }
 }
 
-void
-StaticCondensation::setup()
-{
-  libmesh_assert(this->closed());
-}
+void StaticCondensation::setup() { libmesh_assert(this->closed()); }
 
-numeric_index_type
-StaticCondensation::m() const
-{
-  return _dof_map.n_dofs();
-}
+numeric_index_type StaticCondensation::m() const { return _dof_map.n_dofs(); }
 
-numeric_index_type
-StaticCondensation::row_start() const
-{
-  return _dof_map.first_dof();
-}
+numeric_index_type StaticCondensation::row_start() const { return _dof_map.first_dof(); }
 
-numeric_index_type
-StaticCondensation::row_stop() const
-{
-  return _dof_map.end_dof();
-}
+numeric_index_type StaticCondensation::row_stop() const { return _dof_map.end_dof(); }
 
-void
-StaticCondensation::set(const numeric_index_type, const numeric_index_type, const Number)
+void StaticCondensation::set(const numeric_index_type, const numeric_index_type, const Number)
 {
   libmesh_not_implemented();
 }
 
-void
-StaticCondensation::set_current_elem(const Elem & elem)
+void StaticCondensation::set_current_elem(const Elem & elem)
 {
   libmesh_assert(!Threads::in_threads || libMesh::n_threads() == 1);
   _current_elem_id = elem.id();
 }
 
-void
-StaticCondensation::add(const numeric_index_type i, const numeric_index_type j, const Number value)
+void StaticCondensation::add(const numeric_index_type i,
+                             const numeric_index_type j,
+                             const Number value)
 {
   _size_one_mat(0, 0) = value;
   this->add_matrix(_size_one_mat, {i}, {j});
 }
 
-void
-StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
-                               const std::vector<numeric_index_type> & rows,
-                               const std::vector<numeric_index_type> & cols)
+void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
+                                    const std::vector<numeric_index_type> & rows,
+                                    const std::vector<numeric_index_type> & cols)
 {
   libmesh_assert(_current_elem_id != DofObject::invalid_id);
   auto & local_data = libmesh_map_find(_elem_to_local_data, _current_elem_id);
   EigenMatrix * mat;
+#ifdef DEBUG
+  std::vector<dof_id_type> local_to_global_reduced_indices;
+  for (const auto & var_reduced_space_indices : local_data.reduced_space_indices)
+    local_to_global_reduced_indices.insert(local_to_global_reduced_indices.end(),
+                                           var_reduced_space_indices.begin(),
+                                           var_reduced_space_indices.end());
+#endif
 
-  auto info_from_index = [&local_data](const auto global_index) {
+  auto info_from_index = [&local_data
+#ifdef DEBUG
+                          ,
+                          &local_to_global_reduced_indices,
+                          this
+#endif
+  ](const auto global_index) {
     auto index_it = local_data.condensed_global_to_local_map.find(global_index);
     const bool index_is_condensed = index_it != local_data.condensed_global_to_local_map.end();
     if (!index_is_condensed)
       {
         index_it = local_data.uncondensed_global_to_local_map.find(global_index);
         libmesh_assert(index_it != local_data.uncondensed_global_to_local_map.end());
+#ifdef DEBUG
+        const auto element_local_dof = index_it->second;
+        const auto reduced_space_global_index = local_to_global_reduced_indices[element_local_dof];
+        const auto process_local_reduced_space_index =
+            cast_int<dof_id_type>(reduced_space_global_index - this->row_start());
+        const auto unreduced_space_global_index =
+            _local_uncondensed_dofs[process_local_reduced_space_index];
+        libmesh_assert(unreduced_space_global_index == global_index);
+#endif
       }
     return std::make_pair(index_is_condensed, index_it->second);
   };
@@ -499,68 +537,43 @@ StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
   _have_cached_values = true;
 }
 
-void
-StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
-                               const std::vector<numeric_index_type> & dof_indices)
+void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
+                                    const std::vector<numeric_index_type> & dof_indices)
 {
   this->add_matrix(dm, dof_indices, dof_indices);
 }
 
-void
-StaticCondensation::add(const Number, const SparseMatrix<Number> &)
+void StaticCondensation::add(const Number, const SparseMatrix<Number> &)
 {
   libmesh_not_implemented();
 }
 
-Number
-StaticCondensation::operator()(const numeric_index_type, const numeric_index_type) const
+Number StaticCondensation::operator()(const numeric_index_type, const numeric_index_type) const
 {
   libmesh_not_implemented();
 }
 
-Real
-StaticCondensation::l1_norm() const
+Real StaticCondensation::l1_norm() const { libmesh_not_implemented(); }
+
+Real StaticCondensation::linfty_norm() const { libmesh_not_implemented(); }
+
+void StaticCondensation::print_personal(std::ostream &) const { libmesh_not_implemented(); }
+
+void StaticCondensation::get_diagonal(NumericVector<Number> &) const { libmesh_not_implemented(); }
+
+void StaticCondensation::get_transpose(SparseMatrix<Number> &) const { libmesh_not_implemented(); }
+
+void StaticCondensation::get_row(numeric_index_type,
+                                 std::vector<numeric_index_type> &,
+                                 std::vector<Number> &) const
 {
   libmesh_not_implemented();
 }
 
-Real
-StaticCondensation::linfty_norm() const
-{
-  libmesh_not_implemented();
-}
-
-void
-StaticCondensation::print_personal(std::ostream &) const
-{
-  libmesh_not_implemented();
-}
-
-void
-StaticCondensation::get_diagonal(NumericVector<Number> &) const
-{
-  libmesh_not_implemented();
-}
-
-void
-StaticCondensation::get_transpose(SparseMatrix<Number> &) const
-{
-  libmesh_not_implemented();
-}
-
-void
-StaticCondensation::get_row(numeric_index_type,
-                            std::vector<numeric_index_type> &,
-                            std::vector<Number> &) const
-{
-  libmesh_not_implemented();
-}
-
-void
-StaticCondensation::set_local_vectors(const NumericVector<Number> & global_vector,
-                                      const std::vector<dof_id_type> & elem_dof_indices,
-                                      std::vector<Number> & elem_dof_values_vec,
-                                      EigenVector & elem_dof_values)
+void StaticCondensation::set_local_vectors(const NumericVector<Number> & global_vector,
+                                           const std::vector<dof_id_type> & elem_dof_indices,
+                                           std::vector<Number> & elem_dof_values_vec,
+                                           EigenVector & elem_dof_values)
 {
   global_vector.get(elem_dof_indices, elem_dof_values_vec);
   elem_dof_values.resize(elem_dof_indices.size());
@@ -568,8 +581,7 @@ StaticCondensation::set_local_vectors(const NumericVector<Number> & global_vecto
     elem_dof_values(i) = elem_dof_values_vec[i];
 }
 
-void
-StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
+void StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
 {
   std::vector<dof_id_type> elem_condensed_dofs;
   std::vector<Number> elem_condensed_rhs_vec;
@@ -577,9 +589,15 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
 
   full_rhs.create_subvector(*_reduced_rhs, _local_uncondensed_dofs, /*all_global_entries=*/false);
 
+  std::vector<dof_id_type> reduced_space_indices;
   for (auto elem : _mesh.active_local_element_ptr_range())
     {
-      auto & local_data = _elem_to_local_data[elem->id()];
+      auto & local_data = libmesh_map_find(_elem_to_local_data, elem->id());
+      reduced_space_indices.clear();
+      for (const auto & var_reduced_space_indices : local_data.reduced_space_indices)
+        reduced_space_indices.insert(reduced_space_indices.end(),
+                                     var_reduced_space_indices.begin(),
+                                     var_reduced_space_indices.end());
       elem_condensed_dofs.resize(local_data.condensed_global_to_local_map.size());
       for (const auto & [global_dof, local_dof] : local_data.condensed_global_to_local_map)
         {
@@ -591,15 +609,14 @@ StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
       elem_uncondensed_rhs = -local_data.Auc * local_data.AccFactor.solve(elem_condensed_rhs);
 
       libmesh_assert(cast_int<std::size_t>(elem_uncondensed_rhs.size()) ==
-                     local_data.reduced_space_indices.size());
-      _reduced_rhs->add_vector(elem_uncondensed_rhs.data(), local_data.reduced_space_indices);
+                     reduced_space_indices.size());
+      _reduced_rhs->add_vector(elem_uncondensed_rhs.data(), reduced_space_indices);
     }
   _reduced_rhs->close();
 }
 
-void
-StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rhs,
-                                           NumericVector<Number> & full_sol)
+void StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rhs,
+                                                NumericVector<Number> & full_sol)
 {
   std::vector<dof_id_type> elem_condensed_dofs, elem_uncondensed_dofs;
   std::vector<Number> elem_condensed_rhs_vec, elem_uncondensed_sol_vec;
@@ -635,9 +652,8 @@ StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rh
   full_sol.close();
 }
 
-void
-StaticCondensation::apply(const NumericVector<Number> & full_rhs,
-                          NumericVector<Number> & full_parallel_sol)
+void StaticCondensation::apply(const NumericVector<Number> & full_rhs,
+                               NumericVector<Number> & full_parallel_sol)
 {
   forward_elimination(full_rhs);
   // Apparently PETSc will send us the yvec without zeroing it ahead of time. This can be a poor
@@ -653,14 +669,33 @@ StaticCondensation::apply(const NumericVector<Number> & full_rhs,
   backwards_substitution(full_rhs, full_parallel_sol);
 }
 
-SolverPackage
-StaticCondensation::solver_package()
+SolverPackage StaticCondensation::solver_package() { return libMesh::default_solver_package(); }
+
+unsigned int StaticCondensation::n_variables() const { return _reduced_vars.size(); }
+
+const Variable & StaticCondensation::variable(const unsigned int c) const
 {
-  return libMesh::default_solver_package();
+  return _reduced_vars[c];
+}
+
+void StaticCondensation::dof_indices(const Elem * const elem,
+                                     std::vector<dof_id_type> & di,
+                                     const unsigned int vn,
+                                     int /*p_level*/) const
+{
+  di.clear();
+  di = libmesh_map_find(_elem_to_local_data, elem->id()).reduced_space_indices[vn];
+}
+
+void StaticCondensation::dof_indices(const Node * const,
+                                     std::vector<dof_id_type> &,
+                                     const unsigned int) const
+{
+  libmesh_error_msg(
+      "StaticCondensation dof indices are only meant to be queried with elements, not nodes");
 }
 
 }
-
 #else
 
 #include "libmesh/dof_map.h"
