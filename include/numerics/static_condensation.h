@@ -27,6 +27,8 @@
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_matrix.h"
+#include "libmesh/dof_map_base.h"
+#include "libmesh/variable.h"
 
 #include <unordered_map>
 #include <memory>
@@ -54,7 +56,7 @@ class StaticCondensationPreconditioner;
 typedef Eigen::Matrix<Number, Eigen::Dynamic, Eigen::Dynamic> EigenMatrix;
 typedef Eigen::Matrix<Number, Eigen::Dynamic, 1> EigenVector;
 
-class StaticCondensation : public PetscMatrixShellMatrix<Number>
+class StaticCondensation : public PetscMatrixShellMatrix<Number>, public DofMapBase
 {
 public:
   StaticCondensation(const MeshBase & mesh, const System & system, const DofMap & dof_map);
@@ -180,6 +182,23 @@ public:
    */
   StaticCondensationPreconditioner & get_preconditioner() { return *_scp; }
 
+  virtual unsigned int n_variables() const override;
+
+  virtual const Variable & variable(const unsigned int c) const override;
+
+  virtual dof_id_type first_dof() const override { return this->row_start(); }
+
+  virtual dof_id_type end_dof() const override { return this->row_stop(); }
+
+  virtual void dof_indices(const Elem * const elem,
+                           std::vector<dof_id_type> & di,
+                           const unsigned int vn,
+                           int p_level = -12345) const override;
+
+  virtual void dof_indices(const Node * const node,
+                           std::vector<dof_id_type> & di,
+                           const unsigned int vn) const override;
+
 private:
   /**
    * Retrieves the degree of freedom values from \p global_vector corresponding to \p
@@ -227,7 +246,7 @@ private:
     /// The uncondensed degrees of freedom with global numbering corresponding to the the \emph reduced
     /// system. Note that initially this will actually hold the indices corresponding to the fully
     /// sized problem, but we will swap it out by the time we are done initializing
-    std::vector<dof_id_type> reduced_space_indices;
+    std::vector<std::vector<dof_id_type>> reduced_space_indices;
 
     /// A map from the global degree of freedom number for the full system (condensed + uncondensed)
     /// to an element local number. If this map is queried with a condensed dof, nothing will be
@@ -286,17 +305,18 @@ private:
 
   /// Whether we have cached values via add_XXX()
   bool _have_cached_values;
+
+  /// The variables in the reduced system
+  std::vector<Variable> _reduced_vars;
 };
 
-inline const SparseMatrix<Number> &
-StaticCondensation::get_condensed_mat() const
+inline const SparseMatrix<Number> & StaticCondensation::get_condensed_mat() const
 {
   libmesh_assert(_reduced_sys_mat);
   return *_reduced_sys_mat;
 }
 
-inline void
-StaticCondensation::dont_condense_vars(const std::unordered_set<unsigned int> & vars)
+inline void StaticCondensation::dont_condense_vars(const std::unordered_set<unsigned int> & vars)
 {
   _uncondensed_vars.insert(vars.begin(), vars.end());
 }
