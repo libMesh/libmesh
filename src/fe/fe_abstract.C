@@ -66,6 +66,7 @@ FEAbstract::FEAbstract(const unsigned int d,
   _p_level(0),
   qrule(nullptr),
   shapes_on_quadrature(false),
+  _n_total_qp(0),
   _add_p_level_in_reinit(true)
 {
 }
@@ -1274,5 +1275,16 @@ void FEAbstract::compute_periodic_node_constraints (NodeConstraints & constraint
 
 #endif // LIBMESH_ENABLE_PERIODIC
 
+
+unsigned int FEAbstract::n_quadrature_points () const
+{
+  if (this->shapes_on_quadrature)
+    {
+      libmesh_assert(this->qrule);
+      libmesh_assert_equal_to(this->qrule->n_points(),
+                              this->_n_total_qp);
+    }
+  return this->_n_total_qp;
+}
 
 } // namespace libMesh

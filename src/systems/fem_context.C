@@ -320,6 +320,7 @@ void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType & u) c
 
   // Get current local coefficients
   const DenseSubVector<Number> & coef = (this->*subsolution_getter)(var);
+  libmesh_assert_equal_to(coef.size(), n_dofs);
 
   // Get finite element object
   typename FENeeded<OutputType>::value_base * fe = nullptr;
@@ -328,12 +329,16 @@ void FEMContext::some_value(unsigned int var, unsigned int qp, OutputType & u) c
   // Get shape function values at quadrature point
   const std::vector<std::vector
                     <typename FENeeded<OutputType>::value_shape>> & phi = fe->get_phi();
+  libmesh_assert_equal_to(phi.size(), n_dofs);
 
   // Accumulate solution value
   u = 0.;
 
   for (unsigned int l=0; l != n_dofs; l++)
-    u += phi[l][qp] * coef(l);
+    {
+      libmesh_assert_less(qp, phi[l].size());
+      u += phi[l][qp] * coef(l);
+    }
 }
 
 
