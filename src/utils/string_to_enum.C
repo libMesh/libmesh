@@ -102,6 +102,8 @@ std::map<std::string, ElemType> elem_type_to_enum {
 
    {"C0POLYGON"      , C0POLYGON},
 
+   {"C0POLYHEDRON"   , C0POLYHEDRON},
+
    {"TET"            , TET4},
    {"TET4"           , TET4},
    {"TET10"          , TET10},
