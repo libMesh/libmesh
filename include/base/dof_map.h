@@ -38,6 +38,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/mesh_subdivision_support.h"
+#include "libmesh/dof_map_base.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -175,7 +176,8 @@ class NodeConstraints : public std::map<const Node *,
  * \date 2002-2007
  * \brief Manages the degrees of freedom (DOFs) in a simulation.
  */
-class DofMap : public ReferenceCountedObject<DofMap>,
+class DofMap : public DofMapBase,
+               public ReferenceCountedObject<DofMap>,
                public ParallelObject
 {
 public:
@@ -594,10 +596,7 @@ public:
    */
   const VariableGroup & variable_group (const unsigned int c) const;
 
-  /**
-   * \returns The variable description object for variable \p c.
-   */
-  const Variable & variable (const unsigned int c) const;
+  const Variable & variable (const unsigned int c) const override;
 
   /**
    * \returns The approximation order for variable \p c.
@@ -627,12 +626,7 @@ public:
   unsigned int n_variable_groups() const
   { return cast_int<unsigned int>(_variable_groups.size()); }
 
-  /**
-   * \returns The number of variables in the global solution vector. Defaults
-   * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
-   * Stokes (u,v,p), etc...
-   */
-  unsigned int n_variables() const
+  unsigned int n_variables() const override
   { return cast_int<unsigned int>(_variables.size()); }
 
   /**
@@ -726,13 +720,10 @@ public:
     return n_local_dofs;
   }
 
-  /**
-   * \returns The first dof index that is local to partition \p proc.
-   */
   dof_id_type first_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _first_df.size()); return _first_df[proc]; }
 
-  dof_id_type first_dof() const
+  dof_id_type first_dof() const override
   { return this->first_dof(this->processor_id()); }
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -747,16 +738,10 @@ public:
 
 #endif //LIBMESH_ENABLE_AMR
 
-  /**
-   * \returns The first dof index that is after all indices local to
-   * processor \p proc.
-   *
-   * Analogous to the end() member function of STL containers.
-   */
   dof_id_type end_dof(const processor_id_type proc) const
   { libmesh_assert_less (proc, _end_df.size()); return _end_df[proc]; }
 
-  dof_id_type end_dof() const
+  dof_id_type end_dof() const override
   { return this->end_dof(this->processor_id()); }
 
   /**
@@ -784,10 +769,6 @@ public:
 
 #endif //LIBMESH_ENABLE_AMR
 
-  /**
-   * Fills the vector \p di with the global degree of freedom indices
-   * for the element.
-   */
   void dof_indices (const Elem * const elem,
                     std::vector<dof_id_type> & di) const;
 
@@ -799,7 +780,7 @@ public:
   void dof_indices (const Elem * const elem,
                     std::vector<dof_id_type> & di,
                     const unsigned int vn,
-                    int p_level = -12345) const;
+                    int p_level = -12345) const override;
 
   /**
    * Retrieves degree of freedom indices for a given \p elem and then performs actions for these
@@ -851,7 +832,7 @@ public:
    */
   void dof_indices (const Node * const node,
                     std::vector<dof_id_type> & di,
-                    const unsigned int vn) const;
+                    const unsigned int vn) const override;
 
   /**
    * Appends to the vector \p di the global degree of freedom indices
