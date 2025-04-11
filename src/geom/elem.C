@@ -489,6 +489,12 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
     case C0POLYGON:
       return std::make_unique<C0Polygon>(6, p);
 
+    // Building a polyhedron can't currently be done without creating
+    // its nodes first
+    case C0POLYHEDRON:
+      libmesh_not_implemented_msg
+        ("Polyhedra cannot be built via Elem::build()");
+
       // 3D elements
     case TET4:
       return std::make_unique<Tet4>(p);
