@@ -54,6 +54,7 @@
 #include <typeinfo> // std::bad_cast
 #include <type_traits> // std::decay
 #include <functional> // std::less, etc
+#include <string>
 
 // Include the MPI definition
 #ifdef LIBMESH_HAVE_MPI
@@ -528,6 +529,10 @@ void libmesh_merge_move(T & target, T & source)
 }
 #endif // LIBMESH_HAVE_CXX17_SPLICING
 
+/**
+ * Mostly system independent demangler
+ */
+ std::string demangle(const char * name);
 
 // cast_ref and cast_ptr do a dynamic cast and assert
 // the result, if we have RTTI enabled and we're in debug or
@@ -547,12 +552,12 @@ inline Tnew cast_ref(Told & oldvar)
     }
   catch (std::bad_cast &)
     {
-      libMesh::err << "Failed to convert " << typeid(Told).name()
-                   << " reference to " << typeid(Tnew).name()
+      libMesh::err << "Failed to convert " << demangle(typeid(Told).name())
+                   << " reference to " << demangle(typeid(Tnew).name())
                    << std::endl;
-      libMesh::err << "The " << typeid(Told).name()
+      libMesh::err << "The " << demangle(typeid(Told).name())
                    << " appears to be a "
-                   << typeid(*(&oldvar)).name() << std::endl;
+                   << demangle(typeid(*(&oldvar)).name()) << std::endl;
       libmesh_error();
     }
 #else
@@ -569,12 +574,12 @@ inline Tnew cast_ptr (Told * oldvar)
   Tnew newvar = dynamic_cast<Tnew>(oldvar);
   if (!newvar)
     {
-      libMesh::err << "Failed to convert " << typeid(Told).name()
-                   << " pointer to " << typeid(Tnew).name()
+      libMesh::err << "Failed to convert " << demangle(typeid(Told).name())
+                   << " pointer to " << demangle(typeid(Tnew).name())
                    << std::endl;
-      libMesh::err << "The " << typeid(Told).name()
+      libMesh::err << "The " << demangle(typeid(Told).name())
                    << " appears to be a "
-                   << typeid(*oldvar).name() << std::endl;
+                   << demangle(typeid(*oldvar).name()) << std::endl;
       libmesh_error();
     }
   return newvar;

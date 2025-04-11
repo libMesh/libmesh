@@ -68,10 +68,6 @@
 #include <execinfo.h>
 #endif
 
-#if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE)
-#include <cxxabi.h>
-#endif
-
 // Anonymous namespace for print_trace() helper functions
 namespace
 {
@@ -250,34 +246,5 @@ void write_traceout()
   libMesh::print_trace(traceout);
 #endif
 }
-
-
-
-// demangle() is used by the process_trace() helper function.  It is
-// also used by the Parameters class for demangling typeid's.  If
-// configure determined that your compiler does not support
-// demangling, it simply returns the input string.
-#if defined(LIBMESH_HAVE_GCC_ABI_DEMANGLE)
-std::string demangle(const char * name)
-{
-  int status = 0;
-  std::string ret = name;
-
-  // Actually do the demangling
-  char * demangled_name = abi::__cxa_demangle(name, 0, 0, &status);
-
-  // If demangling returns non-nullptr, save the result in a string.
-  if (demangled_name)
-    ret = demangled_name;
-
-  // According to cxxabi.h docs, the caller is responsible for
-  // deallocating memory.
-  std::free(demangled_name);
-
-  return ret;
-}
-#else
-std::string demangle(const char * name) { return std::string(name); }
-#endif
 
 } // namespace libMesh
