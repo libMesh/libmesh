@@ -476,36 +476,14 @@ void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
   libmesh_assert(_current_elem_id != DofObject::invalid_id);
   auto & local_data = libmesh_map_find(_elem_to_local_data, _current_elem_id);
   EigenMatrix * mat;
-#ifdef DEBUG
-  std::vector<dof_id_type> local_to_global_reduced_indices;
-  for (const auto & var_reduced_space_indices : local_data.reduced_space_indices)
-    local_to_global_reduced_indices.insert(local_to_global_reduced_indices.end(),
-                                           var_reduced_space_indices.begin(),
-                                           var_reduced_space_indices.end());
-#endif
 
-  auto info_from_index = [&local_data
-#ifdef DEBUG
-                          ,
-                          &local_to_global_reduced_indices,
-                          this
-#endif
-  ](const auto global_index) {
+  auto info_from_index = [&local_data](const auto global_index) {
     auto index_it = local_data.condensed_global_to_local_map.find(global_index);
     const bool index_is_condensed = index_it != local_data.condensed_global_to_local_map.end();
     if (!index_is_condensed)
       {
         index_it = local_data.uncondensed_global_to_local_map.find(global_index);
         libmesh_assert(index_it != local_data.uncondensed_global_to_local_map.end());
-#ifdef DEBUG
-        const auto element_local_dof = index_it->second;
-        const auto reduced_space_global_index = local_to_global_reduced_indices[element_local_dof];
-        const auto process_local_reduced_space_index =
-            cast_int<dof_id_type>(reduced_space_global_index - this->row_start());
-        const auto unreduced_space_global_index =
-            _local_uncondensed_dofs[process_local_reduced_space_index];
-        libmesh_assert(unreduced_space_global_index == global_index);
-#endif
       }
     return std::make_pair(index_is_condensed, index_it->second);
   };
