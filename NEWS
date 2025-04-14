@@ -4,6 +4,10 @@
   * Fix SimplexRefiner dangling pointer bug (#4136)
   * Move n_quadrature_points() to FEAbstract, fix it (#4137)
   * Update autoconf-submodule to get Clang/OSX fix (#4014, #4139)
+  * Fix TypeVector (and subclass) TIMPI Attributes (#4116)
+  * Add mutex to setEpsilon (#4111)
+  * Lock at PetscMatrix level when doing add/set (#4113)
+  * Prepare parallel caches in CheckpointIO if needed (#4099)
 1.7.3 -> 1.8.0
   * AbaqusIO
     - Add Abaqus element maps for TRI6 and QUAD8 elements
