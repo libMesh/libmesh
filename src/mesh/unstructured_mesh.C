@@ -2017,20 +2017,22 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
           Real ret_dist_sqr;
 
           // Loop over other mesh. For each node, find its nearest neighbor in this mesh, and fill in the maps.
-          for (auto node : other_boundary_node_ids)
+          for (const auto & node_id : other_boundary_node_ids)
           {
-            const Real query_pt[] = {other_mesh->point(node)(0), other_mesh->point(node)(1), other_mesh->point(node)(2)};
+            const auto & p = other_mesh->point(node_id);
+            const Real query_pt[] = {p(0), p(1), p(2)};
             this_kd_tree.knnSearch(&query_pt[0], 1, &ret_index, &ret_dist_sqr);
             if (ret_dist_sqr < TOLERANCE*TOLERANCE)
             {
-              node_to_node_map[this_mesh_nodes[ret_index].second] = node;
-              other_to_this_node_map[node] = this_mesh_nodes[ret_index].second;
+              node_to_node_map[this_mesh_nodes[ret_index].second] = node_id;
+              other_to_this_node_map[node_id] = this_mesh_nodes[ret_index].second;
             }
           }
 
-          // If the 2 maps don't have the same size, it means we have overwritten a value in node_to_node_map
-          // It means one node in this mesh is the nearest neighbor of several nodes in other mesh.
-          // Not possible !
+          // If the two maps don't have the same size, it means one
+          // node in this mesh is the nearest neighbor of several
+          // nodes in other mesh. Since the stitching is ambiguous in
+          // this case, we throw an error.
           libmesh_error_msg_if(node_to_node_map.size() != other_to_this_node_map.size(),
                                "Error: Found multiple matching nodes in stitch_meshes");
 #endif
