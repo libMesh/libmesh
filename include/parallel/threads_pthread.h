@@ -317,7 +317,7 @@ void parallel_for (const Range & range, const Body & body)
 #ifdef LIBMESH_HAVE_OPENMP
 #pragma omp parallel for schedule (static)
 #endif
-  for (unsigned int i=0; i<n_threads; i++)
+  for (int i=0; i<static_cast<int>(n_threads); i++)
     {
 #if !LIBMESH_HAVE_OPENMP
       pthread_create(&threads[i], nullptr, &run_body<Range, Body>, (void *)&range_bodies[i]);
