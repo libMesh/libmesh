@@ -189,9 +189,20 @@ public:
   Node & node_ref (const unsigned int i);
 
   /**
-   * \returns The pointer to local \p Node \p i as a writable reference.
+   * \returns The pointer to the \p Node with local number \p i as a
+   * writable reference.
+   *
+   * \deprecated This setter cannot update the multiple node pointers
+   * used in a general polyhedron; use the \p set_node overload that
+   * takes an argument.
    */
   virtual Node * & set_node (const unsigned int i);
+
+  /**
+   * Sets local \p Node \p i to refer to \p node.
+   */
+  virtual void set_node (const unsigned int i,
+                         Node * node);
 
   /**
    * Nested classes for use iterating over all nodes of an element.
@@ -2497,6 +2508,17 @@ Node * & Elem::set_node (const unsigned int i)
   libmesh_assert_less (i, this->n_nodes());
 
   return _nodes[i];
+}
+
+
+
+inline
+void Elem::set_node (const unsigned int i,
+                     Node * node)
+{
+  libmesh_assert_less (i, this->n_nodes());
+
+  _nodes[i] = node;
 }
 
 
