@@ -300,7 +300,8 @@ std::unique_ptr<Elem> Elem::disconnected_clone() const
 
   returnval->set_id() = this->id();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  returnval->set_unique_id(this->unique_id());
+  if (this->valid_unique_id())
+    returnval->set_unique_id(this->unique_id());
 #endif
   returnval->subdomain_id() = this->subdomain_id();
   returnval->processor_id() = this->processor_id();
