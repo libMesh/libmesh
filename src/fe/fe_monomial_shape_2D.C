@@ -99,12 +99,12 @@ Real FE<2,MONOMIAL>::shape(const ElemType,
     default:
       unsigned int o = 0;
       for (; i >= (o+1)*(o+2)/2; o++) { }
-      unsigned int ny = i - (o*(o+1)/2);
-      unsigned int nx = o - ny;
+      const int ny = i - (o*(o+1)/2);
+      const int nx = o - ny;
       Real val = 1.;
-      for (unsigned int index=0; index != nx; index++)
+      for (int index=0; index != nx; index++)
         val *= xi;
-      for (unsigned int index=0; index != ny; index++)
+      for (int index=0; index != ny; index++)
         val *= eta;
       return val;
     }
@@ -226,12 +226,12 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
+            const int ny = i - (o*(o+1)/2);
+            const int nx = o - ny;
             Real val = nx;
-            for (unsigned int index=1; index < nx; index++)
+            for (int index=1; index < nx; index++)
               val *= xi;
-            for (unsigned int index=0; index != ny; index++)
+            for (int index=0; index != ny; index++)
               val *= eta;
             return val;
           }
@@ -296,12 +296,12 @@ Real FE<2,MONOMIAL>::shape_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
+            const int ny = i - (o*(o+1)/2);
+            const int nx = o - ny;
             Real val = ny;
-            for (unsigned int index=0; index != nx; index++)
+            for (int index=0; index != nx; index++)
               val *= xi;
-            for (unsigned int index=1; index < ny; index++)
+            for (int index=1; index < ny; index++)
               val *= eta;
             return val;
           }
@@ -422,12 +422,12 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
+            const int ny = i - (o*(o+1)/2);
+            const int nx = o - ny;
             Real val = nx * (nx - 1);
-            for (unsigned int index=2; index < nx; index++)
+            for (int index=2; index < nx; index++)
               val *= xi;
-            for (unsigned int index=0; index != ny; index++)
+            for (int index=0; index != ny; index++)
               val *= eta;
             return val;
           }
@@ -487,12 +487,12 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
+            const int ny = i - (o*(o+1)/2);
+            const int nx = o - ny;
             Real val = nx * ny;
-            for (unsigned int index=1; index < nx; index++)
+            for (int index=1; index < nx; index++)
               val *= xi;
-            for (unsigned int index=1; index < ny; index++)
+            for (int index=1; index < ny; index++)
               val *= eta;
             return val;
           }
@@ -549,12 +549,12 @@ Real FE<2,MONOMIAL>::shape_second_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)/2; o++) { }
-            unsigned int ny = i - (o*(o+1)/2);
-            unsigned int nx = o - ny;
+            const int ny = i - (o*(o+1)/2);
+            const int nx = o - ny;
             Real val = ny * (ny - 1);
-            for (unsigned int index=0; index != nx; index++)
+            for (int index=0; index != nx; index++)
               val *= xi;
-            for (unsigned int index=2; index < ny; index++)
+            for (int index=2; index < ny; index++)
               val *= eta;
             return val;
           }
