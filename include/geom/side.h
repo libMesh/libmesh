@@ -88,6 +88,12 @@ public:
     return this->parent()->set_node (ParentType::side_nodes_map[_side_number][i]);
   }
 
+  virtual void set_node (const unsigned int i, Node * node) override
+  {
+    libmesh_assert_less (i, this->n_nodes());
+    this->parent()->set_node (ParentType::side_nodes_map[_side_number][i], node);
+  }
+
 private:
 
   /**
