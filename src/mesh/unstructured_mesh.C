@@ -1839,18 +1839,11 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
 
         for (unsigned i=0; i<2; ++i)
           {
-            // Determine an h_min for mesh_array[i]. We previously
-            // used the first non-zero Elem::hmin() value encountered
-            // in the entire Mesh for this, while updating hmin as
-            // necessary while processing faces and edges on the
-            // actual boundary in question. This doesn't work well for
-            // the case where the boundary nodeset is comprised
-            // entirely (or almost entirely) of NodeElems, since
-            // NodeElems don't have sides or edges.
-
-            // First we deal with node boundary IDs.
-            // We only enter this loop if we have at least one
-            // nodeset.
+            // First we deal with node boundary IDs.  We only enter
+            // this loop if we have at least one nodeset. Note that we
+            // do not attempt to make an h_min determination here.
+            // This is done while looping over the Elems and checking
+            // their sides and edges for boundary information, below.
             if (mesh_array[i]->get_boundary_info().n_nodeset_conds() > 0)
               {
                 // build_node_list() returns a vector of (node-id, bc-id) tuples
@@ -1861,41 +1854,19 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                       {
                         dof_id_type this_node_id = std::get<0>(t);
                         set_array[i]->insert( this_node_id );
-
-                        // We need to set h_min to some value. It's too expensive to
-                        // search for the element that actually contains this node,
-                        // since that would require a PointLocator. As a result, we
-                        // just use the first (non-NodeElem!) element in the mesh to
-                        // give us hmin if it's never been set before.
-                        if (!h_min_updated)
-                          {
-                            for (const auto & elem : mesh_array[i]->active_element_ptr_range())
-                              {
-                                Real current_h_min = elem->hmin();
-                                if (current_h_min > 0.)
-                                  {
-                                    h_min = current_h_min;
-                                    h_min_updated = true;
-                                    break;
-                                  }
-                              }
-
-                            // If, after searching all the active elements, we did not update
-                            // h_min, give up and set h_min to 1 so that we don't repeat this
-                            // fruitless search. Note: this can happen if the mesh contains
-                            // only NodeElems, since in that case all Elems have h_min == 0.
-                            if (!h_min_updated)
-                              {
-                                h_min_updated = true;
-                                h_min = 1.0;
-                              }
-                          }
                       }
                   }
               }
 
             // Container to catch boundary IDs passed back from BoundaryInfo.
             std::vector<boundary_id_type> bc_ids;
+
+            // Pointers to boundary NodeElems encountered while looping over the entire Mesh
+            // and checking side and edge boundary ids. The Nodes associated with NodeElems
+            // may be in a boundary nodeset, but not connected to any other Elems. In this
+            // case, we also consider the "minimum node separation distance" amongst all
+            // NodeElems when determining the relevant h_min value for this mesh.
+            std::vector<const Elem *> boundary_node_elems;
 
             for (auto & el : mesh_array[i]->element_ptr_range())
               {
@@ -1959,14 +1930,34 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                     mesh_array[i]->get_boundary_info().boundary_ids(el->node_ptr(0), bc_ids);
                     if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                       {
+                        boundary_node_elems.push_back(el);
+
+                        // Debugging:
                         libMesh::out << "Elem " << el->id() << " is a NodeElem on boundary " << id_array[i] << std::endl;
-                      }
-                    else
-                      {
-                        libMesh::out << "Elem " << el->id() << " is a NodeElem NOT on boundary " << id_array[i] << std::endl;
                       }
                   }
               } // end for (el)
+
+            // Compute the minimum node separation distance amongst
+            // all boundary NodeElem pairs.
+            {
+              const auto N = boundary_node_elems.size();
+              for (auto node_elem_i : make_range(N))
+                for (auto node_elem_j : make_range(node_elem_i+1, N))
+                  {
+                    Real node_sep =
+                      (boundary_node_elems[node_elem_i]->point(0) - boundary_node_elems[node_elem_j]->point(0)).norm();
+
+                    // We only want to consider non-coincident
+                    // boundary NodeElem pairs when determining the
+                    // minimum node separation distance.
+                    if (node_sep > 0.)
+                      {
+                        h_min = std::min(h_min, node_sep);
+                        h_min_updated = true;
+                      }
+                  } // end for (node_elem_j)
+            } // end minimum NodeElem separation scope
           } // end for (i)
       } // end scope
 
@@ -1988,7 +1979,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
             }
           else
             {
-              libMesh::out << "No elements on specified surfaces." << std::endl;
+              libMesh::out << "No minimum edge length determined on specified surfaces." << std::endl;
             }
         }
 
@@ -2049,6 +2040,10 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
             const auto & p = other_mesh->point(node_id);
             const Real query_pt[] = {p(0), p(1), p(2)};
             this_kd_tree.knnSearch(&query_pt[0], 1, &ret_index, &ret_dist_sqr);
+
+            // TODO: here we should use the user's specified tolerance
+            // and the previously determined value of h_min in the
+            // distance comparison, not just TOLERANCE^2.
             if (ret_dist_sqr < TOLERANCE*TOLERANCE)
             {
               node_to_node_map[this_mesh_nodes[ret_index].second] = node_id;
