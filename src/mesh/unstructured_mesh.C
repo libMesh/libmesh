@@ -1842,8 +1842,9 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
             // First we deal with node boundary IDs.  We only enter
             // this loop if we have at least one nodeset. Note that we
             // do not attempt to make an h_min determination here.
-            // This is done while looping over the Elems and checking
-            // their sides and edges for boundary information, below.
+            // The h_min determination is done while looping over the
+            // Elems and checking their sides and edges for boundary
+            // information, below.
             if (mesh_array[i]->get_boundary_info().n_nodeset_conds() > 0)
               {
                 // build_node_list() returns a vector of (node-id, bc-id) tuples
@@ -1924,7 +1925,11 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                         } // end for (edge_id)
                     } // end if (side == nullptr)
 
-                // Alternatively, is this a boundary NodeElem?
+                // Alternatively, is this a boundary NodeElem? If so,
+                // add it to a list of NodeElems that will later be
+                // used to set h_min based on the minimum node
+                // separation distance between all pairs of boundary
+                // NodeElems.
                 if (el->type() == NODEELEM)
                   {
                     mesh_array[i]->get_boundary_info().boundary_ids(el->node_ptr(0), bc_ids);
@@ -1933,7 +1938,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                         boundary_node_elems.push_back(el);
 
                         // Debugging:
-                        libMesh::out << "Elem " << el->id() << " is a NodeElem on boundary " << id_array[i] << std::endl;
+                        // libMesh::out << "Elem " << el->id() << " is a NodeElem on boundary " << id_array[i] << std::endl;
                       }
                   }
               } // end for (el)
@@ -2004,9 +2009,6 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
 #endif
         }
 
-      // Debugging
-      std::cout << "use_binary_search = " << use_binary_search << std::endl;
-
       if (!this_boundary_node_ids.empty())
       {
         if (use_binary_search)
@@ -2051,14 +2053,6 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
             }
           }
 
-          // Debugging: print more information if node_to_node_map and
-          // other_to_this_node_map have different sizes
-          if (node_to_node_map.size() != other_to_this_node_map.size())
-          {
-            libMesh::out << "node_to_node_map.size() = " << node_to_node_map.size() << std::endl;
-            libMesh::out << "other_to_this_node_map.size() = " << other_to_this_node_map.size() << std::endl;
-          }
-
           // If the two maps don't have the same size, it means one
           // node in this mesh is the nearest neighbor of several
           // nodes in other mesh. Since the stitching is ambiguous in
@@ -2081,9 +2075,6 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                               "absolute distance check in the N^2 search algorithm.");
               h_min = 1.;
             }
-
-          // Debugging:
-          std::cout << "Using h_min = " << h_min << std::endl;
 
           // Otherwise, use a simple N^2 search to find the closest matching points. This can be helpful
           // in the case that we have tolerance issues which cause mismatch between the two surfaces
