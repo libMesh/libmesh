@@ -282,12 +282,12 @@ public:
 
     // construct a 'side' element (specific to the current geometry):
     Tri6 side_elem;
-    side_elem.set_node(0)=finite_elem->node_ptr(0);
-    side_elem.set_node(1)=finite_elem->node_ptr(2);
-    side_elem.set_node(2)=finite_elem->node_ptr(1);
-    side_elem.set_node(3)=finite_elem->node_ptr(8);
-    side_elem.set_node(4)=finite_elem->node_ptr(7);
-    side_elem.set_node(5)=finite_elem->node_ptr(6);
+    side_elem.set_node(0, finite_elem->node_ptr(0));
+    side_elem.set_node(1, finite_elem->node_ptr(2));
+    side_elem.set_node(2, finite_elem->node_ptr(1));
+    side_elem.set_node(3, finite_elem->node_ptr(8));
+    side_elem.set_node(4, finite_elem->node_ptr(7));
+    side_elem.set_node(5, finite_elem->node_ptr(6));
 
     const std::vector<Point>& i_qpoint = inf_fe->get_xyz();
     const std::vector<Real> & i_weight = inf_fe->get_Sobolev_weight();
@@ -833,7 +833,7 @@ public:
       mesh.add_point(Point( 0.8,-0.8,-0.8),7);
       Elem * elem = mesh.add_elem(Elem::build_with_id(HEX8, 0));
       for (unsigned int i=0; i< 8; ++i)
-        elem->set_node(i) = mesh.node_ptr(i);
+        elem->set_node(i, mesh.node_ptr(i));
 
       InfElemBuilder builder(mesh);
       builder.build_inf_elem();

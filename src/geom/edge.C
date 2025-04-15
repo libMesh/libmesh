@@ -57,7 +57,7 @@ std::unique_ptr<Elem> Edge::side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, 2);
   std::unique_ptr<Elem> nodeelem = std::make_unique<NodeElem>(this);
-  nodeelem->set_node(0) = this->node_ptr(i);
+  nodeelem->set_node(0, this->node_ptr(i));
   return nodeelem;
 }
 
@@ -74,7 +74,7 @@ void Edge::side_ptr (std::unique_ptr<Elem> & side,
       side->subdomain_id() = this->subdomain_id();
       side->set_mapping_type(this->mapping_type());
 
-      side->set_node(0) = this->node_ptr(i);
+      side->set_node(0, this->node_ptr(i));
     }
 }
 
@@ -85,7 +85,7 @@ std::unique_ptr<Elem> Edge::build_side_ptr (const unsigned int i, bool)
 {
   libmesh_assert_less (i, 2);
   std::unique_ptr<Elem> nodeelem = std::make_unique<NodeElem>(this);
-  nodeelem->set_node(0) = this->node_ptr(i);
+  nodeelem->set_node(0, this->node_ptr(i));
 
 #ifndef LIBMESH_ENABLE_DEPRECATED
   nodeelem->set_parent(nullptr);

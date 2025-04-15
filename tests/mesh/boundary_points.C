@@ -76,88 +76,88 @@ protected:
 
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 0));
-      elem->set_node(0) = _mesh->node_ptr(0);
-      elem->set_node(1) = _mesh->node_ptr(1);
-      elem->set_node(2) = _mesh->node_ptr(2);
-      elem->set_node(3) = _mesh->node_ptr(3);
+      elem->set_node(0, _mesh->node_ptr(0));
+      elem->set_node(1, _mesh->node_ptr(1));
+      elem->set_node(2, _mesh->node_ptr(2));
+      elem->set_node(3, _mesh->node_ptr(3));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 1));
-      elem->set_node(0) = _mesh->node_ptr(4);
-      elem->set_node(1) = _mesh->node_ptr(5);
-      elem->set_node(2) = _mesh->node_ptr(1);
-      elem->set_node(3) = _mesh->node_ptr(0);
+      elem->set_node(0, _mesh->node_ptr(4));
+      elem->set_node(1, _mesh->node_ptr(5));
+      elem->set_node(2, _mesh->node_ptr(1));
+      elem->set_node(3, _mesh->node_ptr(0));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 2));
-      elem->set_node(0) = _mesh->node_ptr(7);
-      elem->set_node(1) = _mesh->node_ptr(2);
-      elem->set_node(2) = _mesh->node_ptr(1);
-      elem->set_node(3) = _mesh->node_ptr(6);
+      elem->set_node(0, _mesh->node_ptr(7));
+      elem->set_node(1, _mesh->node_ptr(2));
+      elem->set_node(2, _mesh->node_ptr(1));
+      elem->set_node(3, _mesh->node_ptr(6));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 3));
-      elem->set_node(0) = _mesh->node_ptr(5);
-      elem->set_node(1) = _mesh->node_ptr(8);
-      elem->set_node(2) = _mesh->node_ptr(6);
-      elem->set_node(3) = _mesh->node_ptr(1);
+      elem->set_node(0, _mesh->node_ptr(5));
+      elem->set_node(1, _mesh->node_ptr(8));
+      elem->set_node(2, _mesh->node_ptr(6));
+      elem->set_node(3, _mesh->node_ptr(1));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 4));
-      elem->set_node(0) = _mesh->node_ptr(9);
-      elem->set_node(1) = _mesh->node_ptr(13);
-      elem->set_node(2) = _mesh->node_ptr(14);
-      elem->set_node(3) = _mesh->node_ptr(10);
+      elem->set_node(0, _mesh->node_ptr(9));
+      elem->set_node(1, _mesh->node_ptr(13));
+      elem->set_node(2, _mesh->node_ptr(14));
+      elem->set_node(3, _mesh->node_ptr(10));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 5));
-      elem->set_node(0) = _mesh->node_ptr(10);
-      elem->set_node(1) = _mesh->node_ptr(14);
-      elem->set_node(2) = _mesh->node_ptr(15);
-      elem->set_node(3) = _mesh->node_ptr(11);
+      elem->set_node(0, _mesh->node_ptr(10));
+      elem->set_node(1, _mesh->node_ptr(14));
+      elem->set_node(2, _mesh->node_ptr(15));
+      elem->set_node(3, _mesh->node_ptr(11));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 6));
-      elem->set_node(0) = _mesh->node_ptr(11);
-      elem->set_node(1) = _mesh->node_ptr(15);
-      elem->set_node(2) = _mesh->node_ptr(16);
-      elem->set_node(3) = _mesh->node_ptr(12);
+      elem->set_node(0, _mesh->node_ptr(11));
+      elem->set_node(1, _mesh->node_ptr(15));
+      elem->set_node(2, _mesh->node_ptr(16));
+      elem->set_node(3, _mesh->node_ptr(12));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 7));
-      elem->set_node(0) = _mesh->node_ptr(13);
-      elem->set_node(1) = _mesh->node_ptr(17);
-      elem->set_node(2) = _mesh->node_ptr(18);
-      elem->set_node(3) = _mesh->node_ptr(14);
+      elem->set_node(0, _mesh->node_ptr(13));
+      elem->set_node(1, _mesh->node_ptr(17));
+      elem->set_node(2, _mesh->node_ptr(18));
+      elem->set_node(3, _mesh->node_ptr(14));
     }
     // skip one element here
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 8));
-      elem->set_node(0) = _mesh->node_ptr(15);
-      elem->set_node(1) = _mesh->node_ptr(19);
-      elem->set_node(2) = _mesh->node_ptr(20);
-      elem->set_node(3) = _mesh->node_ptr(16);
+      elem->set_node(0, _mesh->node_ptr(15));
+      elem->set_node(1, _mesh->node_ptr(19));
+      elem->set_node(2, _mesh->node_ptr(20));
+      elem->set_node(3, _mesh->node_ptr(16));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 9));
-      elem->set_node(0) = _mesh->node_ptr(17);
-      elem->set_node(1) = _mesh->node_ptr(21);
-      elem->set_node(2) = _mesh->node_ptr(22);
-      elem->set_node(3) = _mesh->node_ptr(18);
+      elem->set_node(0, _mesh->node_ptr(17));
+      elem->set_node(1, _mesh->node_ptr(21));
+      elem->set_node(2, _mesh->node_ptr(22));
+      elem->set_node(3, _mesh->node_ptr(18));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 10));
-      elem->set_node(0) = _mesh->node_ptr(18);
-      elem->set_node(1) = _mesh->node_ptr(22);
-      elem->set_node(2) = _mesh->node_ptr(23);
-      elem->set_node(3) = _mesh->node_ptr(19);
+      elem->set_node(0, _mesh->node_ptr(18));
+      elem->set_node(1, _mesh->node_ptr(22));
+      elem->set_node(2, _mesh->node_ptr(23));
+      elem->set_node(3, _mesh->node_ptr(19));
     }
     {
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 11));
-      elem->set_node(0) = _mesh->node_ptr(19);
-      elem->set_node(1) = _mesh->node_ptr(23);
-      elem->set_node(2) = _mesh->node_ptr(24);
-      elem->set_node(3) = _mesh->node_ptr(20);
+      elem->set_node(0, _mesh->node_ptr(19));
+      elem->set_node(1, _mesh->node_ptr(23));
+      elem->set_node(2, _mesh->node_ptr(24));
+      elem->set_node(3, _mesh->node_ptr(20));
     }
 
     // libMesh shouldn't renumber, or our based-on-initial-id

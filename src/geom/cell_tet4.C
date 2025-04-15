@@ -479,7 +479,7 @@ Real Tet4::embedding_matrix (const unsigned int i,
 //   for (unsigned int nc=0; nc<child->n_nodes(); nc++)
 //     {
 //       /* Unassign the current node.  */
-//       child->set_node(nc) = nullptr;
+//       child->set_node(nc, nullptr);
 //
 //       /* We have to find the correct new node now.  We know
 //  that it exists somewhere.  We make use of the fact
@@ -507,7 +507,7 @@ Real Tet4::embedding_matrix (const unsigned int i,
 // {
 //   /* Second time, so we know now which node to
 //      use.  */
-//   child->set_node(nc) = this->child_ptr(n)->node_ptr(first_05_in_embedding_matrix);
+//   child->set_node(nc, this->child_ptr(n)->node_ptr(first_05_in_embedding_matrix));
 // }
 //
 //     }

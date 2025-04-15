@@ -915,7 +915,7 @@ public:
     std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(np);
 
     for (auto p : make_range(np))
-      polygon->set_node(p) = mesh.add_point(points[p], p);
+      polygon->set_node(p, mesh.add_point(points[p], p));
 
     polygon->set_id() = 0;
     Elem * elem = mesh.add_elem(std::move(polygon));
@@ -982,7 +982,7 @@ protected:
                          << Utility::enum_to_string(elem_type));
 
     for (unsigned int i=0; i<n_points; i++)
-      elem->set_node(i) = nodes[i].get();
+      elem->set_node(i, nodes[i].get());
 
     // Return Elem and Nodes we created
     return std::make_pair(std::move(elem), std::move(nodes));

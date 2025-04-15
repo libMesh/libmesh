@@ -133,7 +133,7 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input
             Elem * elem = mesh_output.add_elem(Elem::build(TRI3));
 
             for (unsigned int n=0; n<3; ++n)
-              elem->set_node(n) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*3 + n]);
+              elem->set_node(n, mesh_output.node_ptr(triangle_data_input.trianglelist[i*3 + n]));
 
             // use the first attribute to set the subdomain ID
             if (triangle_data_input.triangleattributelist)
@@ -148,12 +148,12 @@ void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input
             Elem * elem = mesh_output.add_elem(Elem::build(TRI6));
 
             // Triangle number TRI6 nodes in a different way to libMesh
-            elem->set_node(0) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 0]);
-            elem->set_node(1) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 1]);
-            elem->set_node(2) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 2]);
-            elem->set_node(3) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 5]);
-            elem->set_node(4) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 3]);
-            elem->set_node(5) = mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 4]);
+            elem->set_node(0, mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 0]));
+            elem->set_node(1, mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 1]));
+            elem->set_node(2, mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 2]));
+            elem->set_node(3, mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 5]));
+            elem->set_node(4, mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 3]));
+            elem->set_node(5, mesh_output.node_ptr(triangle_data_input.trianglelist[i*6 + 4]));
 
             // use the first attribute to set the subdomain ID
             if (triangle_data_input.triangleattributelist)

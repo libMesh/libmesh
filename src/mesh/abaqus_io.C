@@ -732,7 +732,7 @@ void AbaqusIO::read_elements(std::string upper, std::string elset_name)
                     eledef.abaqus_zero_based_node_id_to_libmesh_node_id[id_count];
 
                   // Set this node pointer within the element.
-                  elem->set_node(libmesh_elem_local_node_id) = node;
+                  elem->set_node(libmesh_elem_local_node_id, node);
 
                   // Increment the count of IDs read for this element
                   id_count++;

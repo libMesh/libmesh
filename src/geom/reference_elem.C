@@ -139,7 +139,7 @@ void read_ref_elem (const ElemType type_in,
       auto & new_node =
         singleton_cache->node_list.emplace_back(Node::build(x,y,z,n));
 
-      uelem->set_node(n) = new_node.get();
+      uelem->set_node(n, new_node.get());
     }
 
   // it is entirely possible we ran out of file or encountered

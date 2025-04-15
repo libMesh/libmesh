@@ -511,7 +511,7 @@ Point Elem::true_centroid() const
 
       // Set node pointers
       for (auto n : this->node_index_range())
-        elem_copy->set_node(n) = _nodes[n];
+        elem_copy->set_node(n, _nodes[n]);
 
       return elem_copy->true_centroid();
     }

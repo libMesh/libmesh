@@ -634,29 +634,29 @@ public:
 
     // Edges, also out of order, but enough to put them in order
     auto edge13 = mesh.add_elem(Elem::build(elem_type));
-    edge13->set_node(0) = node1;
-    edge13->set_node(1) = node3;
+    edge13->set_node(0, node1);
+    edge13->set_node(1, node3);
     auto edge02 = mesh.add_elem(Elem::build(elem_type));
-    edge02->set_node(0) = node0;
-    edge02->set_node(1) = node2;
+    edge02->set_node(0, node0);
+    edge02->set_node(1, node2);
     auto edge30 = mesh.add_elem(Elem::build(elem_type));
-    edge30->set_node(0) = node3;
-    edge30->set_node(1) = node0;
+    edge30->set_node(0, node3);
+    edge30->set_node(1, node0);
     auto edge21 = mesh.add_elem(Elem::build(elem_type));
-    edge21->set_node(0) = node2;
-    edge21->set_node(1) = node1;
+    edge21->set_node(0, node2);
+    edge21->set_node(1, node1);
 
     // Add mid-edge nodes if asked to
     if (elem_type == EDGE3)
       {
         auto node4 = mesh.add_point(Point(.5,1.5), 4);
-        edge13->set_node(2) = node4;
+        edge13->set_node(2, node4);
         auto node5 = mesh.add_point(Point(.5,0), 5);
-        edge02->set_node(2) = node5;
+        edge02->set_node(2, node5);
         auto node6 = mesh.add_point(Point(0,.5), 6);
-        edge30->set_node(2) = node6;
+        edge30->set_node(2, node6);
         auto node7 = mesh.add_point(Point(1,1), 7);
-        edge21->set_node(2) = node7;
+        edge21->set_node(2, node7);
       }
     else
       libmesh_assert(elem_type == EDGE2);
@@ -681,38 +681,38 @@ public:
     auto node8 = mesh.add_point(Point(2,1), 8+off);
 
     auto edge45 = mesh.add_elem(Elem::build(elem_type));
-    edge45->set_node(0) = node4;
-    edge45->set_node(1) = node5;
+    edge45->set_node(0, node4);
+    edge45->set_node(1, node5);
     edge45->subdomain_id() = 1;
     auto edge56 = mesh.add_elem(Elem::build(elem_type));
-    edge56->set_node(0) = node5;
-    edge56->set_node(1) = node6;
+    edge56->set_node(0, node5);
+    edge56->set_node(1, node6);
     edge56->subdomain_id() = 1;
     auto edge67 = mesh.add_elem(Elem::build(elem_type));
-    edge67->set_node(0) = node6;
-    edge67->set_node(1) = node7;
+    edge67->set_node(0, node6);
+    edge67->set_node(1, node7);
     edge67->subdomain_id() = 1;
     auto edge78 = mesh.add_elem(Elem::build(elem_type));
-    edge78->set_node(0) = node7;
-    edge78->set_node(1) = node8;
+    edge78->set_node(0, node7);
+    edge78->set_node(1, node8);
     edge78->subdomain_id() = 1;
     auto edge84 = mesh.add_elem(Elem::build(elem_type));
-    edge84->set_node(0) = node8;
-    edge84->set_node(1) = node4;
+    edge84->set_node(0, node8);
+    edge84->set_node(1, node4);
     edge84->subdomain_id() = 1;
 
     if (elem_type == EDGE3)
       {
         auto node9 = mesh.add_point(Point(2.5,0), 9+off);
-        edge45->set_node(2) = node9;
+        edge45->set_node(2, node9);
         auto node10 = mesh.add_point(Point(3,1), 10+off);
-        edge56->set_node(2) = node10;
+        edge56->set_node(2, node10);
         auto node11 = mesh.add_point(Point(2.5,2), 11+off);
-        edge67->set_node(2) = node11;
+        edge67->set_node(2, node11);
         auto node12 = mesh.add_point(Point(2,1.5), 12+off);
-        edge78->set_node(2) = node12;
+        edge78->set_node(2, node12);
         auto node13 = mesh.add_point(Point(2,.5), 13+off);
-        edge84->set_node(2) = node13;
+        edge84->set_node(2, node13);
       }
     else
       libmesh_assert(elem_type == EDGE2);
@@ -944,14 +944,14 @@ public:
 
     // Edges, but not enough to complete the quad
     auto edge13 = mesh.add_elem(Elem::build(EDGE2));
-    edge13->set_node(0) = node1;
-    edge13->set_node(1) = node3;
+    edge13->set_node(0, node1);
+    edge13->set_node(1, node3);
     auto edge02 = mesh.add_elem(Elem::build(EDGE2));
-    edge02->set_node(0) = node0;
-    edge02->set_node(1) = node2;
+    edge02->set_node(0, node0);
+    edge02->set_node(1, node2);
     auto edge30 = mesh.add_elem(Elem::build(EDGE2));
-    edge30->set_node(0) = node3;
-    edge30->set_node(1) = node0;
+    edge30->set_node(0, node3);
+    edge30->set_node(1, node0);
 
     mesh.prepare_for_use();
 
@@ -976,24 +976,24 @@ public:
     auto node5 = mesh.add_point(Point(3,0), 5);
 
     auto edge01 = mesh.add_elem(Elem::build(EDGE2));
-    edge01->set_node(0) = node0;
-    edge01->set_node(1) = node1;
+    edge01->set_node(0, node0);
+    edge01->set_node(1, node1);
     auto edge12 = mesh.add_elem(Elem::build(EDGE2));
-    edge12->set_node(0) = node1;
-    edge12->set_node(1) = node2;
+    edge12->set_node(0, node1);
+    edge12->set_node(1, node2);
     auto edge20 = mesh.add_elem(Elem::build(EDGE2));
-    edge20->set_node(0) = node2;
-    edge20->set_node(1) = node0;
+    edge20->set_node(0, node2);
+    edge20->set_node(1, node0);
 
     auto edge34 = mesh.add_elem(Elem::build(EDGE2));
-    edge34->set_node(0) = node3;
-    edge34->set_node(1) = node4;
+    edge34->set_node(0, node3);
+    edge34->set_node(1, node4);
     auto edge45 = mesh.add_elem(Elem::build(EDGE2));
-    edge45->set_node(0) = node4;
-    edge45->set_node(1) = node5;
+    edge45->set_node(0, node4);
+    edge45->set_node(1, node5);
     auto edge53 = mesh.add_elem(Elem::build(EDGE2));
-    edge53->set_node(0) = node5;
-    edge53->set_node(1) = node3;
+    edge53->set_node(0, node5);
+    edge53->set_node(1, node3);
 
     mesh.prepare_for_use();
 
@@ -1017,13 +1017,13 @@ public:
     auto node5 = mesh.add_point(Point(2,1), 5);
 
     auto tri012 = mesh.add_elem(Elem::build(TRI3));
-    tri012->set_node(0) = node0;
-    tri012->set_node(1) = node1;
-    tri012->set_node(2) = node2;
+    tri012->set_node(0, node0);
+    tri012->set_node(1, node1);
+    tri012->set_node(2, node2);
     auto tri345 = mesh.add_elem(Elem::build(TRI3));
-    tri345->set_node(0) = node3;
-    tri345->set_node(1) = node4;
-    tri345->set_node(2) = node5;
+    tri345->set_node(0, node3);
+    tri345->set_node(1, node4);
+    tri345->set_node(2, node5);
 
     mesh.prepare_for_use();
 

@@ -339,7 +339,7 @@ void DynaIO::read_mesh(std::istream & in)
               Node *n = spline_node_ptrs[n_nodes_read] =
                 mesh.add_point(Point(xyzw[0], xyzw[1], xyzw[2]));
               Elem * elem = mesh.add_elem(Elem::build(NODEELEM));
-              elem->set_node(0) = n;
+              elem->set_node(0, n);
               elem->subdomain_id() = 1; // Separate id to ease Exodus output
               spline_nodeelem_ptrs[n] = elem;
             }
@@ -678,8 +678,8 @@ void DynaIO::read_mesh(std::istream & in)
 
               if (const auto local_node_it = local_nodes.find(key);
                   local_node_it != local_nodes.end())
-                elem->set_node(elem_defn.nodes[elem_node_index]) =
-                  local_node_it->second;
+                elem->set_node(elem_defn.nodes[elem_node_index],
+                  local_node_it->second);
               else
                 {
                   Point p(0);
@@ -720,7 +720,7 @@ void DynaIO::read_mesh(std::istream & in)
                   if (weight_control_flag)
                     n->set_extra_datum<Real>(weight_index, w);
                   local_nodes[key] = n;
-                  elem->set_node(elem_defn.nodes[elem_node_index]) = n;
+                  elem->set_node(elem_defn.nodes[elem_node_index], n);
 
                   constraint_rows[n] = constraint_row;
                 }

@@ -242,8 +242,8 @@ void restore_delaunay(Container & check_delaunay_on,
               boundary_info.add_side(&elem, (n+1)%3, bcids);
             }
 
-          elem.set_node((n+2)%3) = nodes[2];
-          neigh->set_node((nn+2)%3) = nodes[0];
+          elem.set_node((n+2)%3, nodes[2]);
+          neigh->set_node((nn+2)%3, nodes[0]);
 
           // No need for a temporary array to swap these around, if we
           // do it in the right order.
@@ -755,7 +755,7 @@ void Poly2TriTriangulator::triangulate_current_points()
 
           Node * node = libmesh_map_find(point_node_map, vertex);
           libmesh_assert(node);
-          elem->set_node(v) = node;
+          elem->set_node(v, node);
         }
 
       // We expect a consistent triangle orientation
@@ -1179,9 +1179,9 @@ bool Poly2TriTriangulator::insert_refinement_points()
                     }
 
                   auto new_elem = Elem::build_with_id(TRI3, ne++);
-                  new_elem->set_node(0) = new_node;
-                  new_elem->set_node(1) = node_CW;
-                  new_elem->set_node(2) = node_CCW;
+                  new_elem->set_node(0, new_node);
+                  new_elem->set_node(1, node_CW);
+                  new_elem->set_node(2, node_CCW);
                   libmesh_assert(!new_elem->is_flipped());
 
                   // Set in-and-out-of-cavity neighbor pointers

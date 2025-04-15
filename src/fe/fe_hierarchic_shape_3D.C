@@ -1341,9 +1341,9 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
 
         // We pinky swear not to modify these nodes
         Elem & e = const_cast<Elem &>(*elem);
-        side.set_node(0) = e.node_ptr(face_vertex[0]);
-        side.set_node(1) = e.node_ptr(face_vertex[1]);
-        side.set_node(2) = e.node_ptr(face_vertex[2]);
+        side.set_node(0, e.node_ptr(face_vertex[0]));
+        side.set_node(1, e.node_ptr(face_vertex[1]));
+        side.set_node(2, e.node_ptr(face_vertex[2]));
 
         const unsigned int basisnum = i - face_num*dofs_per_side;
 
@@ -1438,11 +1438,11 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         const std::array<unsigned int, 4> face_vertex =
           oriented_prism_nodes(*elem, face_num);
 
-        side->set_node(0) = e.node_ptr(face_vertex[0]);
-        side->set_node(1) = e.node_ptr(face_vertex[1]);
-        side->set_node(2) = e.node_ptr(face_vertex[2]);
+        side->set_node(0, e.node_ptr(face_vertex[0]));
+        side->set_node(1, e.node_ptr(face_vertex[1]));
+        side->set_node(2, e.node_ptr(face_vertex[2]));
         if (face_vertex[3] < 21)
-          side->set_node(3) = e.node_ptr(face_vertex[3]);
+          side->set_node(3, e.node_ptr(face_vertex[3]));
 
         if (face_num == 0 || face_num == 4)
           sidep = {zeta[face_vertex[1]%3], zeta[face_vertex[2]%3]};
@@ -2313,15 +2313,15 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
         Elem & e = const_cast<Elem &>(*elem);
         if (i2 == 0)
           {
-            tri.set_node(0) = e.node_ptr(0);
-            tri.set_node(1) = e.node_ptr(1);
-            tri.set_node(2) = e.node_ptr(2);
+            tri.set_node(0, e.node_ptr(0));
+            tri.set_node(1, e.node_ptr(1));
+            tri.set_node(2, e.node_ptr(2));
           }
         else if (i2 == 1)
           {
-            tri.set_node(0) = e.node_ptr(3);
-            tri.set_node(1) = e.node_ptr(4);
-            tri.set_node(2) = e.node_ptr(5);
+            tri.set_node(0, e.node_ptr(3));
+            tri.set_node(1, e.node_ptr(4));
+            tri.set_node(2, e.node_ptr(5));
           }
         else
           {
@@ -2329,9 +2329,9 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             // can just evaluate on any triangle ... but *not* the
             // obvious 9,10,11 triangle, because that might not exist
             // if we have L2_HIERARCHIC on Prism6.
-            tri.set_node(0) = e.node_ptr(0);
-            tri.set_node(1) = e.node_ptr(1);
-            tri.set_node(2) = e.node_ptr(2);
+            tri.set_node(0, e.node_ptr(0));
+            tri.set_node(1, e.node_ptr(1));
+            tri.set_node(2, e.node_ptr(2));
 
             // For square face DoFs, prism_indices handles flipping,
             // and we *can't* override that in the tri shape call.
@@ -2347,8 +2347,8 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
                     if (tri.point(tri_edge) > tri.point((tri_edge+1)%3))
                       {
                         Node * n = tri.node_ptr(tri_edge);
-                        tri.set_node(tri_edge) = tri.node_ptr((tri_edge+1)%3);
-                        tri.set_node((tri_edge+1)%3) = n;
+                        tri.set_node(tri_edge, tri.node_ptr((tri_edge+1)%3));
+                        tri.set_node((tri_edge+1)%3, n);
                       }
                   }
               }

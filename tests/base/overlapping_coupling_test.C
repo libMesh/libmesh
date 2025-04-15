@@ -254,7 +254,7 @@ protected:
       elem->subdomain_id() = 1;
 
       for (unsigned int n=0; n<4; n++)
-        elem->set_node(n) = _mesh->node_ptr(n);
+        elem->set_node(n, _mesh->node_ptr(n));
     }
 
     _mesh->add_point( Point(1.0,2.0),4 );
@@ -264,10 +264,10 @@ protected:
       Elem * elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 1));
       elem->subdomain_id() = 1;
 
-      elem->set_node(0) = _mesh->node_ptr(3);
-      elem->set_node(1) = _mesh->node_ptr(2);
-      elem->set_node(2) = _mesh->node_ptr(4);
-      elem->set_node(3) = _mesh->node_ptr(5);
+      elem->set_node(0, _mesh->node_ptr(3));
+      elem->set_node(1, _mesh->node_ptr(2));
+      elem->set_node(2, _mesh->node_ptr(4));
+      elem->set_node(3, _mesh->node_ptr(5));
     }
 
     _mesh->add_point( Point(0.0,0.0),6 );
@@ -279,10 +279,10 @@ protected:
       Elem* elem = _mesh->add_elem(Elem::build_with_id(QUAD4, 2));
       elem->subdomain_id() = 2;
 
-      elem->set_node(0) = _mesh->node_ptr(6);
-      elem->set_node(1) = _mesh->node_ptr(7);
-      elem->set_node(2) = _mesh->node_ptr(8);
-      elem->set_node(3) = _mesh->node_ptr(9);
+      elem->set_node(0, _mesh->node_ptr(6));
+      elem->set_node(1, _mesh->node_ptr(7));
+      elem->set_node(2, _mesh->node_ptr(8));
+      elem->set_node(3, _mesh->node_ptr(9));
     }
 
     _mesh->partitioner() = std::make_unique<OverlappingTestPartitioner>();

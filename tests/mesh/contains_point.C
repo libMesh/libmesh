@@ -35,7 +35,7 @@ public:
   {
     Node node  (1., 1., 1., /*id=*/0);
     std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
-    elem->set_node(0) = &node;
+    elem->set_node(0, &node);
 
     Real epsilon = 1.e-4;
     CPPUNIT_ASSERT(elem->contains_point(Point(1.+epsilon/2, 1.-epsilon/2, 1+epsilon/2), /*tol=*/epsilon));
@@ -75,10 +75,10 @@ public:
       Node three (0., 0., 1., 3);
 
       std::unique_ptr<Elem> elem = Elem::build(TET4);
-      elem->set_node(0) = &zero;
-      elem->set_node(1) = &one;
-      elem->set_node(2) = &two;
-      elem->set_node(3) = &three;
+      elem->set_node(0, &zero);
+      elem->set_node(1, &one);
+      elem->set_node(2, &two);
+      elem->set_node(3, &three);
 
       // The centroid (equal to vertex average for Tet4) must be inside the element.
       CPPUNIT_ASSERT (elem->contains_point(elem->vertex_average()));
@@ -108,10 +108,10 @@ public:
       Node three (0., 0., 1., 3);
 
       std::unique_ptr<Elem> elem = Elem::build(TET4);
-      elem->set_node(0) = &zero;
-      elem->set_node(1) = &one;
-      elem->set_node(2) = &two;
-      elem->set_node(3) = &three;
+      elem->set_node(0, &zero);
+      elem->set_node(1, &one);
+      elem->set_node(2, &two);
+      elem->set_node(3, &three);
 
       // The centroid (equal to vertex average for Tet4) must be inside the element.
       CPPUNIT_ASSERT (elem->contains_point(elem->vertex_average()));
@@ -145,9 +145,9 @@ protected:
     // Build the test Elem
     std::unique_ptr<Elem> elem = Elem::build(TRI3);
 
-    elem->set_node(0) = &a;
-    elem->set_node(1) = &b;
-    elem->set_node(2) = &c;
+    elem->set_node(0, &a);
+    elem->set_node(1, &b);
+    elem->set_node(2, &c);
 
     // helper vectors to span the tri and point out of plane
     Point va(a-c);

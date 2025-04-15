@@ -181,8 +181,8 @@ std::unique_ptr<Elem> C0Polygon::build_side_ptr (const unsigned int i,
   else
     {
       sidep = std::make_unique<Edge2>(this);
-      sidep->set_node(0) = this->node_ptr(i);
-      sidep->set_node(1) = this->node_ptr((i+1)%ns);
+      sidep->set_node(0, this->node_ptr(i));
+      sidep->set_node(1, this->node_ptr((i+1)%ns));
     }
 
   sidep->set_parent(nullptr);
@@ -217,8 +217,8 @@ void C0Polygon::build_side_ptr (std::unique_ptr<Elem> & side,
       side->set_p_level(this->p_level());
 #endif
 
-      side->set_node(0) = this->node_ptr(i);
-      side->set_node(1) = this->node_ptr((i+1)%ns);
+      side->set_node(0, this->node_ptr(i));
+      side->set_node(1, this->node_ptr((i+1)%ns));
     }
 }
 
@@ -316,10 +316,10 @@ void C0Polygon::permute(unsigned int perm_num)
       Elem * tempneigh = this->neighbor_ptr(0);
       for (unsigned int s : make_range(ns-1))
         {
-          this->set_node(s) = this->node_ptr((s+1)%ns);
+          this->set_node(s, this->node_ptr((s+1)%ns));
           this->set_neighbor(s, this->neighbor_ptr(s+1));
         }
-      this->set_node(ns-1) = tempnode;
+      this->set_node(ns-1, tempnode);
       this->set_neighbor(ns-1, tempneigh);
 
       // Keep the same triangulation, just with permuted node order,

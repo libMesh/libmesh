@@ -296,7 +296,7 @@ void VTKIO::read (const std::string & name)
           const dof_id_type libmesh_node_id = node_id ?
             vtk_node_to_libmesh[vtk_point_id] : vtk_point_id;
 
-          elem->set_node(j) = mesh.node_ptr(libmesh_node_id);
+          elem->set_node(j, mesh.node_ptr(libmesh_node_id));
         }
 
       // then get the connectivity
@@ -308,7 +308,7 @@ void VTKIO::read (const std::string & name)
       for (unsigned int j=0,
            n_conn = cast_int<unsigned int>(conn.size());
            j != n_conn; ++j)
-        elem->set_node(j) = mesh.node_ptr(conn[j]);
+        elem->set_node(j, mesh.node_ptr(conn[j]));
 
       if (elem_id)
         {

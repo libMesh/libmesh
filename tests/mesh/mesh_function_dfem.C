@@ -93,16 +93,16 @@ protected:
 
     {
       Elem * elem_top = _mesh->add_elem(Elem::build(QUAD4));
-      elem_top->set_node(0) = _mesh->node_ptr(0);
-      elem_top->set_node(1) = _mesh->node_ptr(1);
-      elem_top->set_node(2) = _mesh->node_ptr(2);
-      elem_top->set_node(3) = _mesh->node_ptr(3);
+      elem_top->set_node(0, _mesh->node_ptr(0));
+      elem_top->set_node(1, _mesh->node_ptr(1));
+      elem_top->set_node(2, _mesh->node_ptr(2));
+      elem_top->set_node(3, _mesh->node_ptr(3));
 
       Elem * elem_bottom = _mesh->add_elem(Elem::build(QUAD4));
-      elem_bottom->set_node(0) = _mesh->node_ptr(4);
-      elem_bottom->set_node(1) = _mesh->node_ptr(5);
-      elem_bottom->set_node(2) = _mesh->node_ptr(1);
-      elem_bottom->set_node(3) = _mesh->node_ptr(0);
+      elem_bottom->set_node(0, _mesh->node_ptr(4));
+      elem_bottom->set_node(1, _mesh->node_ptr(5));
+      elem_bottom->set_node(2, _mesh->node_ptr(1));
+      elem_bottom->set_node(3, _mesh->node_ptr(0));
     }
 
     _mesh->allow_renumbering(true);

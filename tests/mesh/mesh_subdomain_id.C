@@ -38,8 +38,8 @@ public:
     mesh->add_point(Point(1, 0, 0), 1);
 
     Elem * elem = mesh.add_elem(Elem::build(EDGE2));
-    elem->set_node(0) = mesh.node_ptr(0);
-    elem->set_node(1) = mesh.node_ptr(1);
+    elem->set_node(0, mesh.node_ptr(0));
+    elem->set_node(1, mesh.node_ptr(1));
 
     std::set<subdomain_id_type> ids;
     mesh->subdomain_ids(ids);

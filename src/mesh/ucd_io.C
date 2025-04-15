@@ -217,7 +217,7 @@ void UCDIO::read_implementation (std::istream & in)
             libmesh_assert_less (node, mesh.n_nodes());
 
             // assign the node
-            elem->set_node(n) = mesh.node_ptr(node);
+            elem->set_node(n, mesh.node_ptr(node));
           }
 
         elems_of_dimension[elem->dim()] = true;

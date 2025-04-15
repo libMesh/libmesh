@@ -95,7 +95,7 @@ void MatlabIO::read_stream(std::istream & in)
         for (unsigned int n=0; n<3; n++)  // Always read three 3 nodes
           {
             in >> node;
-            elem->set_node(n) = the_mesh.node_ptr(node-1);  // Assign the node number
+            elem->set_node(n, the_mesh.node_ptr(node-1));  // Assign the node number
           }
 
         // There is an additional subdomain number here,

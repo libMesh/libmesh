@@ -1935,7 +1935,7 @@ XdrIO::read_serialized_connectivity (Xdr & io,
               Node *node = mesh.query_node_ptr(global_node_number);
 
               if (node)
-                elem->set_node(n) = node;
+                elem->set_node(n, node);
               else
                 {
                   std::unique_ptr<Node> new_node = Node::build(Point(), global_node_number);
@@ -1943,7 +1943,7 @@ XdrIO::read_serialized_connectivity (Xdr & io,
                   // If we have to overwrite this it'll happen later
                   new_node->set_unique_id(n_elem + global_node_number);
 #endif
-                  elem->set_node(n) = mesh.add_node(std::move(new_node));
+                  elem->set_node(n, mesh.add_node(std::move(new_node)));
                 }
             }
 

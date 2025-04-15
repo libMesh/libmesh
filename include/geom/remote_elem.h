@@ -101,6 +101,9 @@ public:
   virtual Node * & set_node (const unsigned int i) override
   { remote_elem_error("set_node"); return Elem::set_node(i); }
 
+  virtual void set_node (const unsigned int /*i*/, Node * /*node*/) override
+  { remote_elem_error("set_node"); }
+
   /**
    * Don't hide Elem::key() defined in the base class.
    */

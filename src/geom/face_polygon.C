@@ -215,8 +215,8 @@ std::unique_ptr<Elem> Polygon::side_ptr (const unsigned int i)
 
   std::unique_ptr<Elem> edge = std::make_unique<Edge2>();
 
-  edge->set_node(0) = this->node_ptr(i);
-  edge->set_node(1) = this->node_ptr((i+1)%ns);
+  edge->set_node(0, this->node_ptr(i));
+  edge->set_node(1, this->node_ptr((i+1)%ns));
 
   return edge;
 }
@@ -234,8 +234,8 @@ void Polygon::side_ptr (std::unique_ptr<Elem> & side,
 
   side->subdomain_id() = this->subdomain_id();
 
-  side->set_node(0) = this->node_ptr(i);
-  side->set_node(1) = this->node_ptr((i+1)%ns);
+  side->set_node(0, this->node_ptr(i));
+  side->set_node(1, this->node_ptr((i+1)%ns));
 }
 
 

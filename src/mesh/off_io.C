@@ -126,7 +126,7 @@ void OFFIO::read_stream(std::istream & in)
       for (unsigned int i=0; i<nv; i++)
         {
           in >> nid;
-          elem->set_node(i) = the_mesh.node_ptr(nid);
+          elem->set_node(i, the_mesh.node_ptr(nid));
         }
 
       the_mesh.add_elem(std::move(elem));

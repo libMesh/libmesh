@@ -389,7 +389,7 @@ public:
 
         std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(5);
         for (auto i : make_range(5))
-          polygon->set_node(i) = _mesh->node_ptr(i);
+          polygon->set_node(i, _mesh->node_ptr(i));
         polygon->set_id() = 0;
 
         _mesh->add_elem(std::move(polygon));

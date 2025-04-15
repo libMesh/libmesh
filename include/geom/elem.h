@@ -2053,8 +2053,8 @@ protected:
   void swap2nodes(unsigned int n1, unsigned int n2)
   {
     Node * temp = this->node_ptr(n1);
-    this->set_node(n1) = this->node_ptr(n2);
-    this->set_node(n2) = temp;
+    this->set_node(n1, this->node_ptr(n2));
+    this->set_node(n2, temp);
   }
 
   /**
@@ -2726,7 +2726,7 @@ Elem::simple_build_side_ptr (const unsigned int i,
     {
       face = std::make_unique<Sideclass>(this);
       for (auto n : face->node_index_range())
-        face->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
+        face->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
     }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -2768,7 +2768,7 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
       side->set_p_level(this->p_level());
 #endif
       for (auto n : side->node_index_range())
-        side->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
+        side->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
     }
 }
 
@@ -2793,7 +2793,7 @@ Elem::simple_side_ptr (std::unique_ptr<Elem> & side,
       side->subdomain_id() = this->subdomain_id();
 
       for (auto n : side->node_index_range())
-        side->set_node(n) = this->node_ptr(Mapclass::side_nodes_map[i][n]);
+        side->set_node(n, this->node_ptr(Mapclass::side_nodes_map[i][n]));
     }
 }
 
@@ -2835,7 +2835,7 @@ Elem::simple_build_edge_ptr (const unsigned int i)
   std::unique_ptr<Elem> edge = std::make_unique<Edgeclass>(this);
 
   for (auto n : edge->node_index_range())
-    edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);
+    edge->set_node(n, this->node_ptr(Subclass::edge_nodes_map[i][n]));
 
   edge->set_interior_parent(this);
   edge->set_mapping_type(this->mapping_type());
@@ -2872,7 +2872,7 @@ Elem::simple_build_edge_ptr (std::unique_ptr<Elem> & edge,
       edge->set_p_level(this->p_level());
 #endif
       for (auto n : edge->node_index_range())
-        edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);
+        edge->set_node(n, this->node_ptr(Subclass::edge_nodes_map[i][n]));
     }
 }
 

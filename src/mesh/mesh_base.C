@@ -2218,7 +2218,7 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
 
       Node *n = this->add_point(newpt);
       std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
-      elem->set_node(0) = n;
+      elem->set_node(0, n);
       elem->subdomain_id() = new_sbd_id;
 
       Elem * added_elem = this->add_elem(std::move(elem));

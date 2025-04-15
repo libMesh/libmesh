@@ -363,7 +363,7 @@ void ExodusII_IO::read (const std::string & fname)
           // existing ids in the file for other elements
           elem->set_id() = exio_helper->end_elem_id() + i;
 
-          elem->set_node(0) = added_node;
+          elem->set_node(0, added_node);
           Elem * added_elem = mesh.add_elem(std::move(elem));
           spline_nodeelem_ptrs[added_node] = added_elem;
         }
@@ -541,7 +541,7 @@ void ExodusII_IO::read (const std::string & fname)
                   int libmesh_node_id = exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
 
                   // Set the node pointer in the Elem
-                  elem->set_node(k) = mesh.node_ptr(libmesh_node_id);
+                  elem->set_node(k, mesh.node_ptr(libmesh_node_id));
                 }
             }
           else // We have Bezier Extraction data
@@ -621,7 +621,7 @@ void ExodusII_IO::read (const std::string & fname)
                   // Have we already created this node?  Connect it.
                   if (const auto local_node_it = local_nodes.find(key);
                       local_node_it != local_nodes.end())
-                    elem->set_node(dyna_elem_defn.nodes[elem_node_index]) = local_node_it->second;
+                    elem->set_node(dyna_elem_defn.nodes[elem_node_index], local_node_it->second);
                   // Have we not yet created this node?  Construct it,
                   // along with its weight and libMesh constraint row,
                   // then connect it.
@@ -656,7 +656,7 @@ void ExodusII_IO::read (const std::string & fname)
                       // element.
                       if (!_disc_bex)
                         local_nodes[key] = n;
-                      elem->set_node(dyna_elem_defn.nodes[elem_node_index]) = n;
+                      elem->set_node(dyna_elem_defn.nodes[elem_node_index], n);
 
                       constraint_rows[n] = constraint_row;
                     }

@@ -533,7 +533,7 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
                                    node_id_map[new_elem->node_id(nn)]);
 
           // Assign the new node pointer
-          new_elem->set_node(nn) = new_node;
+          new_elem->set_node(nn, new_node);
         }
     }
 

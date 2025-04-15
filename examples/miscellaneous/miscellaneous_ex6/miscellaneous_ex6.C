@@ -325,7 +325,7 @@ void add_cube_convex_hull_to_mesh(MeshBase & mesh,
             unsigned int new_node_id = libmesh_map_find(node_id_map, old_elem->node_id(i));
 
             // Node pointer assigned from input mesh
-            new_elem->set_node(i) = mesh.node_ptr(new_node_id);
+            new_elem->set_node(i, mesh.node_ptr(new_node_id));
           }
       }
 #else

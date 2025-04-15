@@ -1206,17 +1206,17 @@ public:
     Node* new_node_a = mesh.add_point( new_point_a );
     Node* new_node_b = mesh.add_point( new_point_b );
     auto new_edge_elem = mesh.add_elem(Elem::build(EDGE2));
-    new_edge_elem->set_node(0) = new_node_a;
-    new_edge_elem->set_node(1) = new_node_b;
+    new_edge_elem->set_node(0, new_node_a);
+    new_edge_elem->set_node(1, new_node_b);
 
     mesh.elem_ref(0).subdomain_id() = 10;
     mesh.elem_ref(1).subdomain_id() = 10;
 
     // Add NodeElems for coupling purposes
     auto node_elem_1 = mesh.add_elem(Elem::build(NODEELEM));
-    node_elem_1->set_node(0) = mesh.elem_ref(0).node_ptr(1);
+    node_elem_1->set_node(0, mesh.elem_ref(0).node_ptr(1));
     auto node_elem_2 = mesh.add_elem(Elem::build(NODEELEM));
-    node_elem_2->set_node(0) = new_node_a;
+    node_elem_2->set_node(0, new_node_a);
 
     mesh.prepare_for_use();
 
@@ -1642,10 +1642,10 @@ public:
         mesh.add_point( Point(1./3.,1./3.,1), 3 );
 
         Elem * elem = mesh.add_elem(Elem::build_with_id(TET4, 0));
-        elem->set_node(0) = mesh.node_ptr(0);
-        elem->set_node(1) = mesh.node_ptr(1);
-        elem->set_node(2) = mesh.node_ptr(2);
-        elem->set_node(3) = mesh.node_ptr(3);
+        elem->set_node(0, mesh.node_ptr(0));
+        elem->set_node(1, mesh.node_ptr(1));
+        elem->set_node(2, mesh.node_ptr(2));
+        elem->set_node(3, mesh.node_ptr(3));
 
         mesh.prepare_for_use();
       }

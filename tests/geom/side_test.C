@@ -71,7 +71,7 @@ public:
     for (auto i : elem.node_index_range())
       {
         nodes.push_back(std::make_unique<Node>(dummy, /*id=*/i));
-        elem.set_node(i) = nodes[i].get();
+        elem.set_node(i, nodes[i].get());
       }
   }
 
