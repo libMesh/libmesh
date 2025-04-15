@@ -1989,7 +1989,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
 #endif
         }
 
-      if (this_boundary_node_ids.size())
+      if (!this_boundary_node_ids.empty())
       {
         if (use_binary_search)
         {
@@ -1999,12 +1999,12 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
 
           // Create the dataset needed to build the kd tree with nanoflann
           std::vector<std::pair<Point, dof_id_type>> this_mesh_nodes(this_boundary_node_ids.size());
-          std::set<dof_id_type>::iterator current_node = this_boundary_node_ids.begin(),
-                                          node_ids_end = this_boundary_node_ids.end();
-          for (unsigned int ctr = 0; current_node != node_ids_end; ++current_node, ++ctr)
+
+          for (auto [it, ctr] = std::make_tuple(this_boundary_node_ids.begin(), 0u);
+               it != this_boundary_node_ids.end(); ++it, ++ctr)
           {
-            this_mesh_nodes[ctr].first = this->point(*current_node);
-            this_mesh_nodes[ctr].second = *current_node;
+            this_mesh_nodes[ctr].first = this->point(*it);
+            this_mesh_nodes[ctr].second = *it;
           }
 
           VectorOfNodesAdaptor vec_nodes_adaptor(this_mesh_nodes);
