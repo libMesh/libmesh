@@ -188,6 +188,7 @@ public:
    */
   Node & node_ref (const unsigned int i);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * \returns The pointer to the \p Node with local number \p i as a
    * writable reference.
@@ -197,6 +198,7 @@ public:
    * takes an argument.
    */
   virtual Node * & set_node (const unsigned int i);
+#endif // LIBMESH_ENABLE_DEPRECATED
 
   /**
    * Sets local \p Node \p i to refer to \p node.
@@ -2502,13 +2504,17 @@ unsigned int Elem::get_node_index (const Node * node_ptr) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 Node * & Elem::set_node (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_nodes());
 
+  libmesh_deprecated();
+
   return _nodes[i];
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 
