@@ -158,6 +158,7 @@ const unsigned int Elem::type_to_dim_map [] =
     2,  // QUADSHELL9
 
     2,  // C0POLYGON
+    3,  // C0POLYHEDRON
   };
 
 const unsigned int Elem::max_n_nodes;
@@ -220,6 +221,7 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     9,  // QUADSHELL9
 
     invalid_uint,  // C0POLYGON
+    invalid_uint,  // C0POLYHEDRON
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -280,6 +282,7 @@ const unsigned int Elem::type_to_n_sides_map [] =
     4,  // QUADSHELL9
 
     invalid_uint,  // C0POLYGON
+    invalid_uint,  // C0POLYHEDRON
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -340,6 +343,7 @@ const unsigned int Elem::type_to_n_edges_map [] =
     4,  // QUADSHELL9
 
     invalid_uint,  // C0POLYGON
+    invalid_uint,  // C0POLYHEDRON
   };
 
 const Order Elem::type_to_default_order_map [] =
@@ -400,6 +404,7 @@ const Order Elem::type_to_default_order_map [] =
     SECOND,   // QUADSHELL9
 
     FIRST,    // C0POLYGON
+    FIRST,    // C0POLYHEDRON
   };
 
 // ------------------------------------------------------------
