@@ -504,10 +504,11 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
             return 0;
 
           case C0POLYGON:
-            // C0Polygon requires using newer FE APIs
+          case C0POLYHEDRON:
+            // Polygons and polyhedra require using newer FE APIs
             if (!e)
               libmesh_error_msg("Code (see stack trace) used an outdated FE function overload.\n"
-                                "n_dofs() on a C0Polygon is not defined by its ElemType alone.");
+                                "n_dofs() on a polygon or polyhedron is not defined by ElemType alone.");
             return e->n_nodes();
 
           default:
@@ -693,6 +694,7 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
             }
 
           case C0POLYGON:
+          case C0POLYHEDRON:
             return 1;
 
 
