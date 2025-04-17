@@ -47,7 +47,8 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  Real theta,
                                                  unsigned miniter,
                                                  unsigned maxiter,
-                                                 unsigned miniterBC) :
+                                                 unsigned miniterBC,
+                                                 const bool preserve_subdomain_boundaries) :
   MeshSmoother(mesh),
   _percent_to_move(1),
   _adapt_data(nullptr),
@@ -62,7 +63,8 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   _n_nodes(0),
   _n_cells(0),
   _n_hanging_edges(0),
-  _area_of_interest(nullptr)
+  _area_of_interest(nullptr),
+  _preserve_subdomain_boundaries(preserve_subdomain_boundaries)
 {}
 
 
@@ -74,7 +76,8 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  unsigned miniter,
                                                  unsigned maxiter,
                                                  unsigned miniterBC,
-                                                 Real percent_to_move) :
+                                                 Real percent_to_move,
+                                                 const bool preserve_subdomain_boundaries) :
   MeshSmoother(mesh),
   _percent_to_move(percent_to_move),
   _adapt_data(adapt_data),
@@ -89,7 +92,8 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   _n_nodes(0),
   _n_cells(0),
   _n_hanging_edges(0),
-  _area_of_interest(nullptr)
+  _area_of_interest(nullptr),
+  _preserve_subdomain_boundaries(preserve_subdomain_boundaries)
 {}
 
 
@@ -101,7 +105,8 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  unsigned miniter,
                                                  unsigned maxiter,
                                                  unsigned miniterBC,
-                                                 Real percent_to_move) :
+                                                 Real percent_to_move,
+                                                 const bool preserve_subdomain_boundaries) :
   MeshSmoother(mesh),
   _percent_to_move(percent_to_move),
   _adapt_data(adapt_data),
@@ -116,7 +121,8 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   _n_nodes(0),
   _n_cells(0),
   _n_hanging_edges(0),
-  _area_of_interest(area_of_interest)
+  _area_of_interest(area_of_interest),
+  _preserve_subdomain_boundaries(preserve_subdomain_boundaries)
 {}
 
 
@@ -287,6 +293,7 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
     MeshTools::find_boundary_nodes (_mesh);
 
   // Grab node coordinates and set mask
+  std::unordered_map<dof_id_type, dof_id_type> global_to_local_node_id_map;
   {
     // Only compute the node to elem map once
     std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
@@ -297,6 +304,8 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
       {
         // Get a reference to the node
         Node & node_ref = *node;
+
+        global_to_local_node_id_map[node_ref.id()] = i;
 
         // For each node grab its X Y [Z] coordinates
         for (unsigned int j=0; j<_dim; j++)
@@ -377,6 +386,9 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
   // Grab the connectivity
   // FIXME: Generalize this!
   {
+    // Keep track of which subdomains each node belongs to
+    std::vector<std::set<subdomain_id_type>> nodal_subdomain_ids(_n_nodes);
+
     int i = 0;
     for (const auto & elem : _mesh.active_element_ptr_range())
       {
@@ -458,6 +470,30 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
         // FIXME: Could be something other than zero
         mcells[i] = 0;
         i++;
+
+        // Fill nodal subdomain ids for this element
+        const auto & subdomain_id = elem->subdomain_id();
+        for (const auto & n : make_range(elem->n_nodes()))
+        {
+          const auto & local_node_id = global_to_local_node_id_map[elem->node_id(n)];
+          nodal_subdomain_ids[local_node_id].insert(subdomain_id);
+        }
+      }
+
+      if (_preserve_subdomain_boundaries)
+      {
+        // If preserving subdomain boundaries, we don't want to let the smoother
+        // adjust nodes that are on the internal boundaries of subdomains. Such
+        // "internal boundary" nodes will belong to more than one subdomain.
+        // Mark these nodes as fixed (mask = 1).
+        for (const auto n: make_range(_n_nodes))
+        {
+          const bool node_on_internal_subdomain_boundary = (nodal_subdomain_ids[n].size() > 1);
+          // TODO: these should be made movable internal "boundary" nodes,
+          // constrained to stay on the boundary between subdomains.
+          if (node_on_internal_subdomain_boundary)
+            mask[n] = 1;
+        }
       }
   }
 
