@@ -1534,6 +1534,19 @@ OutputShape fe_fdm_deriv(const ElemType type,
                             const unsigned int, const Point &));
 
 template <typename OutputShape>
+OutputShape fe_fdm_deriv(const ElemType type,
+                         const Order order,
+                         const Elem * elem,
+                         const unsigned int i,
+                         const unsigned int j,
+                         const Point & p,
+                         OutputShape(*shape_func)
+                           (const ElemType type, const Order,
+                            const Elem *, const unsigned int,
+                            const Point &));
+
+
+template <typename OutputShape>
 OutputShape
 fe_fdm_second_deriv(const Elem * elem,
                     const Order order,
@@ -1554,6 +1567,20 @@ OutputShape fe_fdm_second_deriv(const ElemType type,
                                 const Point & p,
                                 OutputShape(*deriv_func)
                                   (const ElemType, const Order,
+                                   const unsigned int,
+                                   const unsigned int,
+                                   const Point &));
+
+template <typename OutputShape>
+OutputShape fe_fdm_second_deriv(const ElemType type,
+                                const Order order,
+                                const Elem * elem,
+                                const unsigned int i,
+                                const unsigned int j,
+                                const Point & p,
+                                OutputShape(*deriv_func)
+                                  (const ElemType, const Order,
+                                   const Elem *,
                                    const unsigned int,
                                    const unsigned int,
                                    const Point &));
