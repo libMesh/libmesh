@@ -287,6 +287,14 @@ public:
   std::vector<Point> segment_midpoints;
 
   /**
+   * When saving the midpoint location data, we need to save the
+   * corresponding segment information too. Here the first point
+   * of the segment is saved so that it can be used as a key to
+   * find the corresponding segment midpoint.
+   */
+  std::vector<Point> segment_midpoints_keys;
+
+  /**
    * Attaches boundary markers.
    * If segments is set, the number of markers must be equal to the size of segments,
    * otherwise, it is equal to the number of points.
