@@ -26,6 +26,8 @@
 // Local Includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_smoother.h"
+#include "libmesh/variational_smoother_system.h"
+#include "petsc_diff_solver.h"
 
 // C++ Includes
 #include <cstddef>
@@ -68,7 +70,7 @@ public:
    * Simple constructor to use for smoothing purposes
    */
   VariationalMeshSmoother(UnstructuredMesh & mesh,
-                          Real theta=0.5,
+                          Real dilation_weight=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
                           unsigned miniterBC=5,
@@ -79,7 +81,7 @@ public:
    */
   VariationalMeshSmoother(UnstructuredMesh & mesh,
                           std::vector<float> * adapt_data,
-                          Real theta=0.5,
+                          Real dilation_weight=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
                           unsigned miniterBC=5,
@@ -93,7 +95,7 @@ public:
   VariationalMeshSmoother(UnstructuredMesh & mesh,
                           const UnstructuredMesh * area_of_interest,
                           std::vector<float> * adapt_data,
-                          Real theta=0.5,
+                          Real dilation_weight=0.5,
                           unsigned miniter=2,
                           unsigned maxiter=5,
                           unsigned miniterBC=5,
@@ -180,7 +182,7 @@ private:
   const unsigned _miniterBC;
   MetricType _metric;
   AdaptType _adaptive_func;
-  const Real _theta;
+  const Real _dilation_weight;
   bool _generate_data;
 
   /**
@@ -274,6 +276,9 @@ private:
              std::vector<int> & edges,
              std::vector<int> & hnodes);
 
+  /// Reads system solution into an array
+  void readNodesIntoArray(Array2D<Real> & R, const VariationalSmootherSystem & system) const;
+
   int readmetr(std::string name,
                Array3D<Real> & H);
 
@@ -299,14 +304,14 @@ private:
 
   void full_smooth(Array2D<Real> & R,
                    const std::vector<int> & mask,
-                   const Array2D<int> & cells,
-                   const std::vector<int> & mcells,
-                   const std::vector<int> & edges,
-                   const std::vector<int> & hnodes,
+                   //const Array2D<int> & cells,
+                   //const std::vector<int> & mcells,
+                   //const std::vector<int> & edges,
+                   //const std::vector<int> & hnodes,
                    Real w,
-                   const std::vector<int> & iter,
-                   int me,
-                   const Array3D<Real> & H,
+                   //const std::vector<int> & iter,
+                   //int me,
+                   //const Array3D<Real> & H,
                    int adp,
                    int gr);
 

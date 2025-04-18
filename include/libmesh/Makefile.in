@@ -676,9 +676,11 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	parameter_multipointer.h parameter_pointer.h \
 	parameter_vector.h qoi_set.h sensitivity_data.h \
 	steady_system.h system.h system_norm.h system_subset.h \
-	system_subset_by_subdomain.h transient_system.h attributes.h \
-	communicator.h data_type.h message_tag.h op_function.h \
-	packing.h parallel_implementation.h parallel_sync.h \
+	system_subset_by_subdomain.h transient_system.h \
+	variational_smoother_constraint.h \
+	variational_smoother_system.h attributes.h communicator.h \
+	data_type.h message_tag.h op_function.h packing.h \
+	parallel_implementation.h parallel_sync.h \
 	post_wait_copy_buffer.h post_wait_delete_buffer.h \
 	post_wait_dereference_shared_ptr.h post_wait_dereference_tag.h \
 	post_wait_free_buffer.h post_wait_unpack_buffer.h \
@@ -2280,6 +2282,12 @@ system_subset_by_subdomain.h: $(top_srcdir)/include/systems/system_subset_by_sub
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 transient_system.h: $(top_srcdir)/include/systems/transient_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+variational_smoother_constraint.h: $(top_srcdir)/include/systems/variational_smoother_constraint.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+variational_smoother_system.h: $(top_srcdir)/include/systems/variational_smoother_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 attributes.h: $(top_srcdir)/include/timpi_shims/attributes.h

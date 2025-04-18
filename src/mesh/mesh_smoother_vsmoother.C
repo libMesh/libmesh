@@ -25,6 +25,11 @@
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/equation_systems.h"
+#include "libmesh/distributed_mesh.h"
+#include "libmesh/steady_solver.h"
+#include "libmesh/diff_solver.h"
+#include "libmesh/variational_smoother_constraint.h"
 
 // C++ includes
 #include <time.h> // for clock_t, clock()
@@ -44,7 +49,7 @@ namespace libMesh
 
 // Member functions for the Variational Smoother
 VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
-                                                 Real theta,
+                                                 Real dilation_weight,
                                                  unsigned miniter,
                                                  unsigned maxiter,
                                                  unsigned miniterBC,
@@ -58,7 +63,7 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   _miniterBC(miniterBC),
   _metric(UNIFORM),
   _adaptive_func(NONE),
-  _theta(theta),
+  _dilation_weight(dilation_weight),
   _generate_data(false),
   _n_nodes(0),
   _n_cells(0),
@@ -72,7 +77,7 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
 
 VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  std::vector<float> * adapt_data,
-                                                 Real theta,
+                                                 Real dilation_weight,
                                                  unsigned miniter,
                                                  unsigned maxiter,
                                                  unsigned miniterBC,
@@ -87,7 +92,7 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   _miniterBC(miniterBC),
   _metric(UNIFORM),
   _adaptive_func(CELL),
-  _theta(theta),
+  _dilation_weight(dilation_weight),
   _generate_data(false),
   _n_nodes(0),
   _n_cells(0),
@@ -101,7 +106,7 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
 VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  const UnstructuredMesh * area_of_interest,
                                                  std::vector<float> * adapt_data,
-                                                 Real theta,
+                                                 Real dilation_weight,
                                                  unsigned miniter,
                                                  unsigned maxiter,
                                                  unsigned miniterBC,
@@ -116,7 +121,7 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   _miniterBC(miniterBC),
   _metric(UNIFORM),
   _adaptive_func(CELL),
-  _theta(theta),
+  _dilation_weight(dilation_weight),
   _generate_data(false),
   _n_nodes(0),
   _n_cells(0),
@@ -153,7 +158,7 @@ Real VariationalMeshSmoother::smooth(unsigned int)
     maxiter = _maxiter,
     miniterBC = _miniterBC;
 
-  Real theta = _theta;
+  Real dilation_weight = _dilation_weight;
 
   // Metric file name
   std::string metric_filename = "smoother.metric";
@@ -210,7 +215,8 @@ Real VariationalMeshSmoother::smooth(unsigned int)
   // grid optimization
   _logfile << "Starting Grid Optimization" << std::endl;
   clock_t ticks1 = clock();
-  full_smooth(R, mask, cells, mcells, edges, hnodes, theta, iter, me, H, adp, gr);
+  //full_smooth(R, mask, cells, mcells, edges, hnodes, dilation_weight, iter, me, H, adp, gr);
+  full_smooth(R, mask, dilation_weight, adp, gr);
   clock_t ticks2 = clock();
   _logfile << "full_smooth took ("
            << ticks2
@@ -307,7 +313,7 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
 
         global_to_local_node_id_map[node_ref.id()] = i;
 
-        // For each node grab its X Y [Z] coordinates
+        // For each node grab its X [Y] [Z] coordinates
         for (unsigned int j=0; j<_dim; j++)
           R[i][j] = node_ref(j);
 
@@ -317,8 +323,13 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
         // Movable boundary nodes are 2
         if (boundary_node_ids.count(i))
           {
+            if (_dim == 1)
+            {
+              // For 1D meshes, set all boundary nodes as immovable
+              mask[i] = 1;
+            }
             // Only look for sliding edge nodes in 2D
-            if (_dim == 2)
+            else if (_dim == 2)
               {
                 // Find all the nodal neighbors... that is the nodes directly connected
                 // to this node through one edge
@@ -407,7 +418,12 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
           num_necessary = 10;
         */
 
-        if (_dim == 2)
+        if (_dim == 1)
+        {
+          for (auto k : make_range(elem->n_vertices()))
+            cells[i][k] = elem->node_id(k);
+        }
+        else if (_dim == 2)
           {
             switch (elem->n_vertices())
               {
@@ -524,6 +540,20 @@ int VariationalMeshSmoother::readgr(Array2D<Real> & R,
   libMesh::out << "Finished readgr" << std::endl;
 
   return 0;
+}
+
+
+void VariationalMeshSmoother::readNodesIntoArray(Array2D<Real> & R, const VariationalSmootherSystem & system) const
+{
+  unsigned int i = 0;
+  for (auto * node : system.get_mesh().node_ptr_range())
+  {
+    // For each node grab its X Y [Z] coordinates
+    for (unsigned int j=0; j < system.get_dim(); j++)
+      R[i][j] = (*node)(j);
+
+    ++i;
+  }
 }
 
 
@@ -921,14 +951,14 @@ void VariationalMeshSmoother::adp_renew(const Array2D<Real> & R,
 // Preprocess mesh data and control smoothing/untangling iterations
 void VariationalMeshSmoother::full_smooth(Array2D<Real> & R,
                                           const std::vector<int> & mask,
-                                          const Array2D<int> & cells,
-                                          const std::vector<int> & mcells,
-                                          const std::vector<int> & edges,
-                                          const std::vector<int> & hnodes,
-                                          Real w,
-                                          const std::vector<int> & iter,
-                                          int me,
-                                          const Array3D<Real> & H,
+                                          //const Array2D<int> & cells,
+                                          //const std::vector<int> & mcells,
+                                          //const std::vector<int> & edges,
+                                          //const std::vector<int> & hnodes,
+                                          Real dilation_weight,
+                                          //const std::vector<int> & iter,
+                                          //int me,
+                                          //const Array3D<Real> & H,
                                           int adp,
                                           int gr)
 {
@@ -985,143 +1015,184 @@ void VariationalMeshSmoother::full_smooth(Array2D<Real> & R,
     }
 
   // determination of min jacobian
-  Real vol, Vmin;
-  Real qmin = minq(R, cells, mcells, me, H, vol, Vmin);
+  //Real vol, Vmin;
+  Real vol = 1.;
+  //Real qmin = minq(R, cells, mcells, me, H, vol, Vmin);
 
-  if (me > 1)
-    vol = 1.;
+  //if (me > 1)
+  //  vol = 1.;
 
-  if (msglev >= 1)
-    _logfile << "vol=" << vol
-             << " qmin=" << qmin
-             << " min volume = " << Vmin
-             << std::endl;
+  //if (msglev >= 1)
+  //  _logfile << "vol=" << vol
+  //           << " qmin=" << qmin
+  //           << " min volume = " << Vmin
+  //           << std::endl;
 
-  libmesh_error_msg_if(Vmin <= 0., "Found element(s) with negative volume.");
+  //libmesh_error_msg_if(Vmin <= 0., "Found element(s) with negative volume.");
 
   // compute max distortion measure over all cells
-  Real epsilon = 1.e-9;
-  Real eps = qmin < 0 ? std::sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol) : epsilon;
-  Real emax = maxE(R, cells, mcells, me, H, vol, eps, w, Gamma, qmin);
+  Real epsilon = 0.;//1.e-5;
+  //Real eps = qmin < 0 ? std::sqrt(epsilon*epsilon+0.004*qmin*qmin*vol*vol) : epsilon;
+  //Real emax = maxE(R, cells, mcells, me, H, vol, eps, w, Gamma, qmin);
 
-  if (msglev >= 1)
-    _logfile << " emax=" << emax << std::endl;
+  //if (msglev >= 1)
+  //  _logfile << " emax=" << emax << std::endl;
 
   // unfolding/smoothing
 
   // iteration tolerance
-  Real Enm1 = 1.;
+  //Real Enm1 = 1.;
 
   // read adaptive function from file
   if (adp*gr != 0)
     read_adp(afun);
+ 
+  // Create a new mesh, EquationSystems, and System
+  DistributedMesh mesh(_mesh);
+  EquationSystems es(mesh);
+  VariationalSmootherSystem & sys = es.add_system<VariationalSmootherSystem>("variational_smoother_system");
+  //sys.print_element_solutions=true;
+  //sys.print_element_residuals=true;
+  //sys.print_element_jacobians=true;
+  sys.extra_quadrature_order = 0;
 
-  {
-    int
-      counter = 0,
-      ii = 0;
+  // Add boundary node and hanging node constraints
+  VariationalSmootherConstraint constraint(sys);
+  sys.attach_constraint_object(constraint);
 
-    while (((qmin <= 0) || (counter < iter[0]) || (std::abs(emax-Enm1) > 1e-3)) &&
-           (ii < iter[1]) &&
-           (counter < iter[1]))
-      {
-        libmesh_assert_less (counter, iter[1]);
+  // Set system parameters
+  sys.get_epsilon_squared() = epsilon*epsilon;
+  sys.get_ref_vol() = vol;
+  sys.get_dilation_weight() = dilation_weight;
+  sys.get_dim() = _dim;
 
-        Enm1 = emax;
+  // Set up solver
+  sys.time_solver =
+    std::make_unique<SteadySolver>(sys);
+  // Uncomment this line and use -snes_test_jacobian and -snes_test_jacobian_view
+  // flags to compare the hand-coded jacobian in VariationalSmootherSystem
+  // to finite difference jacobians.
+  //sys.time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(sys);
 
-        if ((ii >= 0) && (ii % 2 == 0))
-          {
-            if (qmin < 0)
-              eps = std::sqrt(epsilon*epsilon + 0.004*qmin*qmin*vol*vol);
-            else
-              eps = epsilon;
-          }
+  es.init();
 
-        int ladp = adp;
+  DiffSolver & solver = *(sys.time_solver->diff_solver().get());
+  solver.quiet = false;
+  solver.verbose = true;
+  solver.relative_step_tolerance = 1e-10;
 
-        if ((qmin <= 0) || (counter < ii))
-          ladp = 0;
+  sys.solve();
 
-        // update adaptation function before each iteration
-        if ((ladp != 0) && (gr == 0))
-          adp_renew(R, cells, afun, adp);
+  // Update _mesh with solution
+  readNodesIntoArray(R, sys);
 
-        Real Jk = minJ(R, maskf, cells, mcells, eps, w, me, H, vol, edges, hnodes,
-                         msglev, Vmin, emax, qmin, ladp, afun);
 
-        if (qmin > 0)
-          counter++;
-        else
-          ii++;
+  //{
+  //  int
+  //    counter = 0,
+  //    ii = 0;
 
-        if (msglev >= 1)
-          _logfile << "niter=" << counter
-                   << ", qmin*G/vol=" << qmin
-                   << ", Vmin=" << Vmin
-                   << ", emax=" << emax
-                   << ", Jk=" << Jk
-                   << ", Enm1=" << Enm1
-                   << std::endl;
-      }
-  }
+  //  while (((qmin <= 0) || (counter < iter[0]) || (std::abs(emax-Enm1) > 1e-3)) &&
+  //         (ii < iter[1]) &&
+  //         (counter < iter[1]))
+  //    {
+  //      libmesh_assert_less (counter, iter[1]);
 
-  // BN correction - 2D only!
-  epsilon = 1.e-9;
-  if (NBN > 0)
-    for (int counter=0; counter<iter[2]; counter++)
-      {
-        // update adaptation function before each iteration
-        if ((adp != 0) && (gr == 0))
-          adp_renew(R, cells, afun, adp);
+  //      Enm1 = emax;
 
-        Real Jk = minJ_BC(R, mask, cells, mcells, eps, w, me, H, vol, msglev, Vmin, emax, qmin, adp, afun, NBN);
+  //      if ((ii >= 0) && (ii % 2 == 0))
+  //        {
+  //          if (qmin < 0)
+  //            eps = std::sqrt(epsilon*epsilon + 0.004*qmin*qmin*vol*vol);
+  //          else
+  //            eps = epsilon;
+  //        }
 
-        if (msglev >= 1)
-          _logfile << "NBC niter=" << counter
-                   << ", qmin*G/vol=" << qmin
-                   << ", Vmin=" << Vmin
-                   << ", emax=" << emax
-                   << std::endl;
+  //      int ladp = adp;
 
-        // Outrageous Enm1 to make sure we hit this at least once
-        Enm1 = 99999;
+  //      if ((qmin <= 0) || (counter < ii))
+  //        ladp = 0;
 
-        // Now that we've moved the boundary nodes (or not) we need to resmooth
-        for (int j=0; j<iter[1]; j++)
-          {
-            if (std::abs(emax-Enm1) < 1e-2)
-              break;
+  //      // update adaptation function before each iteration
+  //      if ((ladp != 0) && (gr == 0))
+  //        adp_renew(R, cells, afun, adp);
 
-            // Save off the error from the previous smoothing step
-            Enm1 = emax;
+  //      Real Jk = minJ(R, maskf, cells, mcells, eps, w, me, H, vol, edges, hnodes,
+  //                       msglev, Vmin, emax, qmin, ladp, afun);
 
-            // update adaptation function before each iteration
-            if ((adp != 0) && (gr == 0))
-              adp_renew(R, cells, afun, adp);
+  //      if (qmin > 0)
+  //        counter++;
+  //      else
+  //        ii++;
 
-            Jk = minJ(R, maskf, cells, mcells, eps, w, me, H, vol, edges, hnodes, msglev, Vmin, emax, qmin, adp, afun);
+  //      if (msglev >= 1)
+  //        _logfile << "niter=" << counter
+  //                 << ", qmin*G/vol=" << qmin
+  //                 << ", Vmin=" << Vmin
+  //                 << ", emax=" << emax
+  //                 << ", Jk=" << Jk
+  //                 << ", Enm1=" << Enm1
+  //                 << std::endl;
+  //    }
+  //}
 
-            if (msglev >= 1)
-              _logfile << "  Re-smooth: niter=" << j
-                       << ", qmin*G/vol=" << qmin
-                       << ", Vmin=" << Vmin
-                       << ", emax=" << emax
-                       << ", Jk=" << Jk
-                       << std::endl;
-          }
+  //// BN correction - 2D only!
+  //epsilon = 1.e-9;
+  //if (NBN > 0)
+  //  for (int counter=0; counter<iter[2]; counter++)
+  //    {
+  //      // update adaptation function before each iteration
+  //      if ((adp != 0) && (gr == 0))
+  //        adp_renew(R, cells, afun, adp);
 
-        if (msglev >= 1)
-          _logfile << "NBC smoothed niter=" << counter
-                   << ", qmin*G/vol=" << qmin
-                   << ", Vmin=" << Vmin
-                   << ", emax=" << emax
-                   << std::endl;
-      }
+  //      Real Jk = minJ_BC(R, mask, cells, mcells, eps, w, me, H, vol, msglev, Vmin, emax, qmin, adp, afun, NBN);
+
+  //      if (msglev >= 1)
+  //        _logfile << "NBC niter=" << counter
+  //                 << ", qmin*G/vol=" << qmin
+  //                 << ", Vmin=" << Vmin
+  //                 << ", emax=" << emax
+  //                 << std::endl;
+
+  //      // Outrageous Enm1 to make sure we hit this at least once
+  //      Enm1 = 99999;
+
+  //      // Now that we've moved the boundary nodes (or not) we need to resmooth
+  //      for (int j=0; j<iter[1]; j++)
+  //        {
+  //          if (std::abs(emax-Enm1) < 1e-2)
+  //            break;
+
+  //          // Save off the error from the previous smoothing step
+  //          Enm1 = emax;
+
+  //          // update adaptation function before each iteration
+  //          if ((adp != 0) && (gr == 0))
+  //            adp_renew(R, cells, afun, adp);
+
+  //          Jk = minJ(R, maskf, cells, mcells, eps, w, me, H, vol, edges, hnodes, msglev, Vmin, emax, qmin, adp, afun);
+
+  //          if (msglev >= 1)
+  //            _logfile << "  Re-smooth: niter=" << j
+  //                     << ", qmin*G/vol=" << qmin
+  //                     << ", Vmin=" << Vmin
+  //                     << ", emax=" << emax
+  //                     << ", Jk=" << Jk
+  //                     << std::endl;
+  //        }
+
+  //      if (msglev >= 1)
+  //        _logfile << "NBC smoothed niter=" << counter
+  //                 << ", qmin*G/vol=" << qmin
+  //                 << ", Vmin=" << Vmin
+  //                 << ", emax=" << emax
+  //                 << std::endl;
+  //    }
 }
 
 
 
-// Determines the values of maxE_theta
+// Determines the values of maxE
 Real VariationalMeshSmoother::maxE(Array2D<Real> & R,
                                      const Array2D<int> & cells,
                                      const std::vector<int> & mcells,

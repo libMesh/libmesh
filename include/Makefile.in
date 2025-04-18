@@ -1056,6 +1056,8 @@ include_HEADERS = \
         systems/system_subset.h \
         systems/system_subset_by_subdomain.h \
         systems/transient_system.h \
+        systems/variational_smoother_constraint.h \
+        systems/variational_smoother_system.h \
         timpi_shims/attributes.h \
         timpi_shims/communicator.h \
         timpi_shims/data_type.h \
