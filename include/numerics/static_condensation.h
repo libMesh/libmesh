@@ -199,6 +199,11 @@ public:
                            std::vector<dof_id_type> & di,
                            const unsigned int vn) const override;
 
+  /**
+   * @returns The reduced system linear solver
+   */
+  LinearSolver<Number> & reduced_system_solver();
+
 private:
   /**
    * Retrieves the degree of freedom values from \p global_vector corresponding to \p
@@ -319,6 +324,12 @@ inline const SparseMatrix<Number> & StaticCondensation::get_condensed_mat() cons
 inline void StaticCondensation::dont_condense_vars(const std::unordered_set<unsigned int> & vars)
 {
   _uncondensed_vars.insert(vars.begin(), vars.end());
+}
+
+inline LinearSolver<Number> & StaticCondensation::reduced_system_solver()
+{
+  libmesh_assert_msg(_reduced_solver, "Reduced system solver not built yet");
+  return *_reduced_solver;
 }
 
 }
