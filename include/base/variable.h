@@ -33,6 +33,7 @@ namespace libMesh
 
 // Forward Declaration
 class System;
+class MeshBase;
 
 /**
  * This class defines the notion of a variable in the system.
@@ -128,8 +129,11 @@ public:
   { return _number; }
 
   /**
-   * \returns The index of the first scalar component of this variable in the
-   * system.
+   * \returns The index of the first scalar component of this variable in the system.  Say you've
+   * got a flow problem that's (u,v,w,p,T) - p will be at first_scalar_number 3 regardless of
+   * whether p is variable number 1 in the case that u,v,w is represented by a single vector-valued
+   * variable at number 0, or p is variable number 3 in the case that u,v,w are three scalar-valued
+   * variables with variable numbers 0,1,2
    */
   unsigned int first_scalar_number() const
   { return _first_scalar_number; }
@@ -141,10 +145,16 @@ public:
   { return _type; }
 
   /**
-   * \returns The number of components of this variable.
+   * \returns The number of components of this variable if the \p FEFamily is \p SCALAR or if the
+   * associated \p FEFieldType is \p TYPE_SCALAR. Otherwise this will error because determination of
+   * the number of components for a \p TYPE_VECTOR requires the mesh
    */
-  unsigned int n_components() const
-  { return type().family == SCALAR ? _type.order.get_order() : 1; }
+  unsigned int n_components() const;
+
+  /**
+   * \returns The number of components of this variable
+   */
+  unsigned int n_components(const MeshBase & mesh) const;
 
   /**
    * \returns \p true if this variable is active on subdomain \p sid,
