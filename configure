@@ -56132,14 +56132,21 @@ fi
                      if test "x$enablevtk" = "xyes"
 then :
 
-                              if test -r $VTK_INC/vtkVersionMacros.h
+               if                                                                                                                               test -r $VTK_INC/vtkVersionQuick.h
+then :
+
+                       vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkVersionQuick.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
+                       vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkVersionQuick.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
+                       vtkbuild=`grep "define VTK_EPOCH_VERSION" $VTK_INC/vtkVersionQuick.h | sed -e "s/.*#define VTK_EPOCH_VERSION[ ]*//g"`
+
+elif                      test "x$vtkmajor" = "x" && test -r $VTK_INC/vtkVersionMacros.h
 then :
 
                        vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
                        vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
                        vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
 
-elif                      test -r $VTK_INC/vtkConfigure.h
+elif                      test "x$vtkmajor" = "x" && test -r $VTK_INC/vtkConfigure.h
 then :
 
                        vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
@@ -56149,6 +56156,15 @@ then :
 fi
                vtkversion=$vtkmajor.$vtkminor.$vtkbuild
                vtkmajorminor=$vtkmajor.$vtkminor
+
+               if test "x$vtkmajor" = "x" || test "x$vtkminor" = "x"
+then :
+
+                       { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Cannot parse version macro from VTK header files!" >&5
+printf "%s\n" "Cannot parse version macro from VTK header files!" >&6; }
+                       enablevtk=no;
+
+fi
 
 fi
 
