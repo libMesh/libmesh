@@ -135,6 +135,12 @@ AC_DEFUN([CONFIGURE_VTK],
                      ])
                vtkversion=$vtkmajor.$vtkminor.$vtkbuild
                vtkmajorminor=$vtkmajor.$vtkminor
+
+               AS_IF([test "x$vtkmajor" = "x" || test "x$vtkminor" = "x"],
+                     [
+                       AC_MSG_RESULT(Cannot parse version macro from VTK header files!)
+                       enablevtk=no;
+                     ])
              ])
 
        AS_IF([test "x$enablevtk" = "xyes"],
