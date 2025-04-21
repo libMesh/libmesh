@@ -119,15 +119,28 @@ AC_DEFUN([CONFIGURE_VTK],
        dnl vtkConfigure.h and vtkVersionMacros.h
        AS_IF([test "x$enablevtk" = "xyes"],
              [
-               dnl If we have the vtkVersionMacros.h (VTK 6.x) find the version there
-               AS_IF([test -r $VTK_INC/vtkVersionMacros.h],
+               AS_IF(
+                     dnl If we have vtkVersionQuick.h (VTK 9.4), look
+                     dnl for the version there.  Note that their
+                     dnl vocabulary has now fixed the "subminor/patch
+                     dnl numbers are not build numbers" problem, by
+                     dnl replacing it with a "subminor/patch numbers
+                     dnl are not epoch numbers" problem.
+                     [test -r $VTK_INC/vtkVersionQuick.h],
+                     [
+                       vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkVersionQuick.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
+                       vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkVersionQuick.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
+                       vtkbuild=`grep "define VTK_EPOCH_VERSION" $VTK_INC/vtkVersionQuick.h | sed -e "s/.*#define VTK_EPOCH_VERSION[ ]*//g"`
+                     ],
+                     dnl If we have the vtkVersionMacros.h (VTK 6.x) and have yet to find the version, look there
+                     [test "x$vtkmajor" = "x" && test -r $VTK_INC/vtkVersionMacros.h],
                      [
                        vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
                        vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
                        vtkbuild=`grep "define VTK_BUILD_VERSION" $VTK_INC/vtkVersionMacros.h | sed -e "s/.*#define VTK_BUILD_VERSION[ ]*//g"`
                      ],
                      dnl Otherwise (VTK 5.x) find the version numbers in vtkConfigure.h
-                     [test -r $VTK_INC/vtkConfigure.h],
+                     [test "x$vtkmajor" = "x" && test -r $VTK_INC/vtkConfigure.h],
                      [
                        vtkmajor=`grep "define VTK_MAJOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_MAJOR_VERSION[ ]*//g"`
                        vtkminor=`grep "define VTK_MINOR_VERSION" $VTK_INC/vtkConfigure.h | sed -e "s/.*#define VTK_MINOR_VERSION[ ]*//g"`
@@ -135,6 +148,12 @@ AC_DEFUN([CONFIGURE_VTK],
                      ])
                vtkversion=$vtkmajor.$vtkminor.$vtkbuild
                vtkmajorminor=$vtkmajor.$vtkminor
+
+               AS_IF([test "x$vtkmajor" = "x" || test "x$vtkminor" = "x"],
+                     [
+                       AC_MSG_RESULT(Cannot parse version macro from VTK header files!)
+                       enablevtk=no;
+                     ])
              ])
 
        AS_IF([test "x$enablevtk" = "xyes"],
