@@ -74,6 +74,15 @@ public:
   virtual void dof_indices(const Node * const node,
                            std::vector<dof_id_type> & di,
                            const unsigned int vn) const = 0;
+  /**
+   * \returns The total number of degrees of freedom in the problem.
+   */
+  virtual dof_id_type n_dofs() const = 0;
+
+  /**
+   * \returns The number of degrees of freedom on this processor.
+   */
+  virtual dof_id_type n_local_dofs() const = 0;
 };
 
 }

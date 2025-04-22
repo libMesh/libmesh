@@ -661,10 +661,7 @@ public:
     return (this->has_blocked_representation() ? this->n_variables() : 1);
   }
 
-  /**
-   * \returns The total number of degrees of freedom in the problem.
-   */
-  dof_id_type n_dofs() const { return _n_dfs; }
+  dof_id_type n_dofs() const override { return _n_dfs; }
 
   /**
    * \returns The total number of degrees of freedom for a particular
@@ -682,10 +679,7 @@ public:
    */
   dof_id_type n_SCALAR_dofs() const { return _n_SCALAR_dofs; }
 
-  /**
-   * \returns The number of degrees of freedom on this processor.
-   */
-  dof_id_type n_local_dofs () const
+  dof_id_type n_local_dofs () const override
   { return this->n_dofs_on_processor (this->processor_id()); }
 
   /**
