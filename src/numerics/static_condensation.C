@@ -24,18 +24,18 @@
 #include "libmesh/elem.h"
 #include "libmesh/int_range.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/petsc_matrix_base.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/static_condensation_preconditioner.h"
 #include "libmesh/system.h"
 #include "libmesh/petsc_matrix.h"
+#include "libmesh/equation_systems.h"
 #include "timpi/parallel_sync.h"
 #include <unordered_set>
 
 namespace libMesh
 {
 StaticCondensation::StaticCondensation(const MeshBase & mesh,
-                                       const System & system,
+                                       System & system,
                                        const DofMap & dof_map)
   : PetscMatrixShellMatrix<Number>(dof_map.comm()),
     _mesh(mesh),
@@ -384,6 +384,20 @@ void StaticCondensation::init()
   // Build ghosted full solution vector. Note that this is, in general, *not equal* to the system
   // solution, e.g. this may correspond to the solution for the Newton *update*
   _ghosted_full_sol = _system.current_local_solution->clone();
+
+  // Prevent querying Nodes for dof indices
+  std::vector<unsigned int> nvpg(_reduced_vars.size());
+  for (auto & elem : nvpg)
+    elem = 1;
+
+  _reduced_system = &_system.get_equation_systems().add_system("Basic", "reduced");
+  _reduced_system->init();
+  for (auto * const nd : _mesh.active_node_ptr_range())
+    {
+      nd->set_n_vars_per_group(_reduced_system->number(), nvpg);
+      for (const auto g : index_range(nvpg))
+        nd->set_n_comp_group(_reduced_system->number(), g, 0);
+    }
   _sc_is_initialized = true;
 }
 
@@ -672,6 +686,14 @@ void StaticCondensation::dof_indices(const Node * const,
   libmesh_error_msg(
       "StaticCondensation dof indices are only meant to be queried with elements, not nodes");
 }
+
+dof_id_type StaticCondensation::first_dof() const { return _reduced_sys_mat->row_start(); }
+
+dof_id_type StaticCondensation::end_dof() const { return _reduced_sys_mat->row_stop(); }
+
+dof_id_type StaticCondensation::n_dofs() const { return _reduced_sys_mat->m(); }
+
+dof_id_type StaticCondensation::n_local_dofs() const { return _reduced_sys_mat->local_m(); }
 
 }
 #else

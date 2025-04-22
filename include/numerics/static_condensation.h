@@ -64,7 +64,7 @@ typedef Eigen::VectorXd EigenVector;
 class StaticCondensation : public PetscMatrixShellMatrix<Number>, public DofMapBase
 {
 public:
-  StaticCondensation(const MeshBase & mesh, const System & system, const DofMap & dof_map);
+  StaticCondensation(const MeshBase & mesh, System & system, const DofMap & dof_map);
   virtual ~StaticCondensation();
 
   //
@@ -191,10 +191,6 @@ public:
 
   virtual const Variable & variable(const unsigned int c) const override;
 
-  virtual dof_id_type first_dof() const override { return this->row_start(); }
-
-  virtual dof_id_type end_dof() const override { return this->row_stop(); }
-
   virtual void dof_indices(const Elem * const elem,
                            std::vector<dof_id_type> & di,
                            const unsigned int vn,
@@ -204,10 +200,20 @@ public:
                            std::vector<dof_id_type> & di,
                            const unsigned int vn) const override;
 
+  virtual dof_id_type first_dof() const override;
+  virtual dof_id_type end_dof() const override;
+  virtual dof_id_type n_dofs() const override;
+  virtual dof_id_type n_local_dofs() const override;
+
   /**
    * @returns The reduced system linear solver
    */
   LinearSolver<Number> & reduced_system_solver();
+
+  /*
+   * @returns The dummyish reduced system
+   */
+  const System & reduced_system() const;
 
 private:
   /**
@@ -279,7 +285,7 @@ private:
   std::vector<dof_id_type> _local_uncondensed_dofs;
 
   const MeshBase & _mesh;
-  const System & _system;
+  System & _system;
   const DofMap & _dof_map;
 
   /// global sparse matrix for the uncondensed degrees of freedom
@@ -318,6 +324,9 @@ private:
 
   /// The variables in the reduced system
   std::vector<Variable> _reduced_vars;
+
+  /// A dummyish system to help with DofObjects
+  System * _reduced_system;
 };
 
 inline const SparseMatrix<Number> & StaticCondensation::get_condensed_mat() const
@@ -335,6 +344,12 @@ inline LinearSolver<Number> & StaticCondensation::reduced_system_solver()
 {
   libmesh_assert_msg(_reduced_solver, "Reduced system solver not built yet");
   return *_reduced_solver;
+}
+
+inline const System & StaticCondensation::reduced_system() const
+{
+  libmesh_assert(_reduced_system);
+  return *_reduced_system;
 }
 
 }
