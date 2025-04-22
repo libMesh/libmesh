@@ -954,7 +954,7 @@ public:
                            ny = added_sides_nxyz[1],
                            nz = added_sides_nxyz[2];
 
-    const unsigned int dim = Elem::build(elem_type)->dim();
+    const unsigned int dim = Elem::type_to_dim_map[elem_type];
     const bool is_tensor = (Elem::build(elem_type)->n_sides() == dim * 2);
 
     // Figure out how many fake and true elements to expect

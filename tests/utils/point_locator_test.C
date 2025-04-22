@@ -42,9 +42,9 @@ public:
     Mesh mesh(*TestCommWorld);
 
     const unsigned int n_elem_per_side = 5;
-    const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
-    const unsigned int ymax = test_elem->dim() > 1;
-    const unsigned int zmax = test_elem->dim() > 2;
+    const unsigned int dim = Elem::type_to_dim_map[elem_type];
+    const unsigned int ymax = dim > 1;
+    const unsigned int zmax = dim > 2;
     const unsigned int ny = ymax * n_elem_per_side;
     const unsigned int nz = zmax * n_elem_per_side;
 
