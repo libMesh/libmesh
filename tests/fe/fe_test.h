@@ -3,6 +3,7 @@
 
 #include "test_comm.h"
 
+#include <libmesh/cell_c0polyhedron.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
@@ -392,6 +393,47 @@ public:
         polygon->set_id() = 0;
 
         _mesh->add_elem(std::move(polygon));
+        _mesh->prepare_for_use();
+      }
+    else if (elem_type == C0POLYHEDRON)
+      {
+        // Build a plain cube by hand for testing purposes.  We could
+        // upgrade this, but it should be to something non-skewed so a
+        // MONOMIAL basis will be able to exactly represent the
+        // polynomials we're projecting.
+        //
+        // See elem_test.h for the limitations here.
+
+        _mesh->add_point(Point(0, 0, 0), 0);
+        _mesh->add_point(Point(1, 0, 0), 1);
+        _mesh->add_point(Point(1, 1, 0), 2);
+        _mesh->add_point(Point(0, 1, 0), 3);
+        _mesh->add_point(Point(0, 0, 1), 4);
+        _mesh->add_point(Point(1, 0, 1), 5);
+        _mesh->add_point(Point(1, 1, 1), 6);
+        _mesh->add_point(Point(0, 1, 1), 7);
+
+        const std::vector<std::vector<unsigned int>> nodes_on_side =
+          { {0, 1, 2, 3},   // min z
+            {0, 1, 5, 4},   // min y
+            {2, 6, 5, 1},   // max x
+            {2, 3, 7, 6},   // max y
+            {0, 4, 7, 3},   // min x
+            {5, 6, 7, 4} }; // max z
+
+        // Build all the sides.
+        std::vector<std::shared_ptr<Polygon>> sides(nodes_on_side.size());
+
+        for (auto s : index_range(nodes_on_side))
+          {
+            const auto & nodes_on_s = nodes_on_side[s];
+            sides[s] = std::make_shared<C0Polygon>(nodes_on_s.size());
+            for (auto i : index_range(nodes_on_s))
+              sides[s]->set_node(i, _mesh->node_ptr(nodes_on_s[i]));
+          }
+
+        std::unique_ptr<Elem> polyhedron = std::make_unique<C0Polyhedron>(sides);
+        _mesh->add_elem(std::move(polyhedron));
         _mesh->prepare_for_use();
       }
     else
