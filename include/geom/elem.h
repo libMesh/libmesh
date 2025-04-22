@@ -626,6 +626,15 @@ public:
   virtual ElemType type () const = 0;
 
   /**
+   * This array maps the integer representation of the \p ElemType enum
+   * to the geometric dimension of the element.
+   *
+   * This is currently usable even for complicated subclasses with
+   * runtime-varying topology.
+   */
+  static const unsigned int type_to_dim_map[INVALID_ELEM];
+
+  /**
    * \returns The dimensionality of the object.
    */
   virtual unsigned short dim () const = 0;
@@ -964,8 +973,17 @@ public:
   void build_edge_ptr (std::unique_ptr<const Elem> & edge, const unsigned int i) const;
 
   /**
-   * \returns The default approximation order for this element type.
-   * This is the order that will be used to compute the map to the
+   * This array maps the integer representation of the \p ElemType enum
+   * to the default approximation order of elements of that type.
+   *
+   * This is currently usable even for complicated subclasses with
+   * runtime-varying topology.
+   */
+  static const Order type_to_default_order_map[INVALID_ELEM];
+
+  /**
+   * \returns The default approximation order for this element.  This
+   * is the order that will be used to compute the map to the
    * reference element.
    */
   virtual Order default_order () const = 0;
