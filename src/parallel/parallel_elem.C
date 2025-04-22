@@ -77,7 +77,7 @@ Packing<const Elem *>::packed_size (std::vector<largest_id_type>::const_iterator
     Elem::type_to_n_nodes_map[type];
 
   if (n_nodes == invalid_uint)
-    libmesh_not_implemented_msg("Support for C0POLYGON not yet implemented");
+    libmesh_not_implemented_msg("Support for Polygons/Polyhedra not yet implemented");
 
   const unsigned int n_sides =
     Elem::type_to_n_sides_map[type];
