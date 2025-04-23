@@ -157,8 +157,18 @@ BoundingBox MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
     // Convert all faces to surface elements
     for (auto * elem : mesh.active_element_ptr_range())
       {
-        if (elem->dim() != 2)
-          elems_to_delete.insert(elem);
+        libmesh_error_msg_if (elem->dim() < 2,
+          "Cannot use meshes with 0D or 1D elements to define a volume");
+
+        // If we've already got 2D elements then those are (part of)
+        // our surface.
+        if (elem->dim() == 2)
+          continue;
+
+        // 3D elements will be removed after we've extracted their
+        // surface faces.
+        elems_to_delete.insert(elem);
+
         for (auto s : make_range(elem->n_sides()))
           {
             // If there's a neighbor on this side then there's not a
