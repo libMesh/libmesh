@@ -805,7 +805,7 @@ void ExactSolution::_compute_error(std::string_view sys_name,
 
           // Compute the value of the error at this quadrature point
           typename FEGenericBase<OutputShape>::OutputNumber exact_val(0);
-          RawAccessor<typename FEGenericBase<OutputShape>::OutputNumber> exact_val_accessor( exact_val, dim );
+          RawAccessor<typename FEGenericBase<OutputShape>::OutputNumber> exact_val_accessor( exact_val, n_vec_dim );
           if (_exact_values.size() > sys_num && _exact_values[sys_num])
             {
               for (unsigned int c = 0; c < n_vec_dim; c++)

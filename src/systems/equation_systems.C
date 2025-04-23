@@ -480,11 +480,11 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
       }
 
     // Here, we're assuming the number of vector components is the same
-    // as the mesh dimension. Will break for mixed dimension meshes.
-    unsigned int dim = this->get_mesh().mesh_dimension();
+    // as the mesh spatial dimension.
+    unsigned int dim = this->get_mesh().spatial_dimension();
     unsigned int nv = n_scalar_vars + dim*n_vector_vars;
 
-    // We'd better not have more than dim*his->n_vars() (all vector variables)
+    // We'd better not have more than dim*this->n_vars() (all vector variables)
     // Treat the NodeElem-only mesh case as dim=1
     libmesh_assert_less_equal ( nv, (dim > 0 ? dim : 1)*this->n_vars() );
 
@@ -577,7 +577,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
   // This function must be run on all processors at once
   parallel_object_only();
 
-  const unsigned int dim = _mesh.mesh_dimension();
+  const unsigned int dim = _mesh.spatial_dimension();
   const dof_id_type max_nn   = _mesh.max_node_id();
 
   // allocate vector storage to hold
@@ -615,7 +615,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
           }
       }
     // Here, we're assuming the number of vector components is the same
-    // as the mesh dimension. Will break for mixed dimension meshes.
+    // as the mesh spatial dimension.
     nv = n_scalar_vars + dim*n_vector_vars;
   }
 
@@ -793,7 +793,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
         }
 
       // Here, we're assuming the number of vector components is the same
-      // as the mesh dimension. Will break for mixed dimension meshes.
+      // as the mesh spatial dimension.
       unsigned int nv_sys_split = n_scalar_vars + dim*n_vector_vars;
 
       // Update the current_local_solution
@@ -839,7 +839,8 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                                            elem,
                                            elem_soln,
                                            nodal_soln,
-                                           add_p_level);
+                                           add_p_level,
+                                           n_vec_dim);
 
                   // infinite elements should be skipped...
                   if (!elem->infinite())
@@ -875,7 +876,7 @@ EquationSystems::build_parallel_solution_vector(const std::set<std::string> * sy
                               // side nodes
                               FEInterface::side_nodal_soln
                                 (fe_type, elem, s, elem_soln,
-                                 nodal_soln, add_p_level);
+                                 nodal_soln, add_p_level, n_vec_dim);
 
 #ifdef DEBUG
                               const std::vector<unsigned int> side_nodes =
@@ -1063,7 +1064,7 @@ EquationSystems::find_variable_numbers
   std::string name;
 
   const std::vector<std::string> component_suffix = {"_x", "_y", "_z"};
-  unsigned int dim = _mesh.mesh_dimension();
+  unsigned int dim = _mesh.spatial_dimension();
   libmesh_error_msg_if(dim > 3, "Invalid dim in find_variable_numbers");
 
   // Now filter through the variables in each system and store the system index and their index
@@ -1211,11 +1212,11 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
       const DofMap & dof_map = system.get_dof_map();
 
       // We need to check if the constant monomial is a scalar or a vector and set the number of
-      // components as the mesh dimension for the latter case as per 'find_variable_numbers()'.
+      // components as the mesh spatial dimension for the latter as per es.find_variable_numbers().
       // Even for the case where a variable is not active on any subdomain belonging to the
       // processor, we still need to know this number to update 'var_ctr'.
       const unsigned int n_comps =
-        (system.variable_type(var) == type[1]) ? _mesh.mesh_dimension() : 1;
+        (system.variable_type(var) == type[1]) ? _mesh.spatial_dimension() : 1;
 
       // Loop over all elements in the mesh and index all components of the variable if it's active
       for (const auto & elem : _mesh.active_local_element_ptr_range())
@@ -1399,7 +1400,8 @@ EquationSystems::build_discontinuous_solution_vector
                                                elem,
                                                soln_coeffs,
                                                nodal_soln,
-                                               add_p_level);
+                                               add_p_level,
+                                               FEInterface::n_vec_dim(_mesh, fe_type));
 
                       // infinite elements should be skipped...
                       if (!elem->infinite())
@@ -1463,7 +1465,8 @@ EquationSystems::build_discontinuous_solution_vector
                                 // vertices_only == true.
                                 FEInterface::side_nodal_soln
                                   (fe_type, elem, s, soln_coeffs,
-                                   nodal_soln, add_p_level);
+                                   nodal_soln, add_p_level,
+                                   FEInterface::n_vec_dim(_mesh, fe_type));
 
                                 libmesh_assert_equal_to
                                     (nodal_soln.size(),
@@ -1496,7 +1499,8 @@ EquationSystems::build_discontinuous_solution_vector
                                     std::vector<Number> neigh_soln;
                                     FEInterface::side_nodal_soln
                                       (fe_type, neigh, s_neigh,
-                                       neigh_coeffs, neigh_soln, add_p_level);
+                                       neigh_coeffs, neigh_soln, add_p_level,
+                                       FEInterface::n_vec_dim(_mesh, fe_type));
 
                                     const std::vector<unsigned int> neigh_nodes =
                                       neigh->nodes_on_side(s_neigh);
