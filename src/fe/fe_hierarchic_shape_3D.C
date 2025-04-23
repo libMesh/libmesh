@@ -245,7 +245,7 @@ void cube_indices(const Elem * elem,
       i0 = i - 6;
       i1 = 0;
       i2 = 0;
-      if (elem->point(0) > elem->point(1))
+      if (elem->positive_edge_orientation(0))
         xi = -xi_saved;
     }
   // Edge 1
@@ -254,7 +254,7 @@ void cube_indices(const Elem * elem,
       i0 = 1;
       i1 = i - e - 6;
       i2 = 0;
-      if (elem->point(1) > elem->point(2))
+      if (elem->positive_edge_orientation(1))
         eta = -eta_saved;
     }
   // Edge 2
@@ -263,7 +263,7 @@ void cube_indices(const Elem * elem,
       i0 = i - 2*e - 6;
       i1 = 1;
       i2 = 0;
-      if (elem->point(3) > elem->point(2))
+      if (!elem->positive_edge_orientation(2))
         xi = -xi_saved;
     }
   // Edge 3
@@ -272,7 +272,7 @@ void cube_indices(const Elem * elem,
       i0 = 0;
       i1 = i - 3*e - 6;
       i2 = 0;
-      if (elem->point(0) > elem->point(3))
+      if (elem->positive_edge_orientation(3))
         eta = -eta_saved;
     }
   // Edge 4
@@ -281,7 +281,7 @@ void cube_indices(const Elem * elem,
       i0 = 0;
       i1 = 0;
       i2 = i - 4*e - 6;
-      if (elem->point(0) > elem->point(4))
+      if (elem->positive_edge_orientation(4))
         zeta = -zeta_saved;
     }
   // Edge 5
@@ -290,7 +290,7 @@ void cube_indices(const Elem * elem,
       i0 = 1;
       i1 = 0;
       i2 = i - 5*e - 6;
-      if (elem->point(1) > elem->point(5))
+      if (elem->positive_edge_orientation(5))
         zeta = -zeta_saved;
     }
   // Edge 6
@@ -299,7 +299,7 @@ void cube_indices(const Elem * elem,
       i0 = 1;
       i1 = 1;
       i2 = i - 6*e - 6;
-      if (elem->point(2) > elem->point(6))
+      if (elem->positive_edge_orientation(6))
         zeta = -zeta_saved;
     }
   // Edge 7
@@ -308,7 +308,7 @@ void cube_indices(const Elem * elem,
       i0 = 0;
       i1 = 1;
       i2 = i - 7*e - 6;
-      if (elem->point(3) > elem->point(7))
+      if (elem->positive_edge_orientation(7))
         zeta = -zeta_saved;
     }
   // Edge 8
@@ -317,7 +317,7 @@ void cube_indices(const Elem * elem,
       i0 = i - 8*e - 6;
       i1 = 0;
       i2 = 1;
-      if (elem->point(4) > elem->point(5))
+      if (elem->positive_edge_orientation(8))
         xi = -xi_saved;
     }
   // Edge 9
@@ -326,7 +326,7 @@ void cube_indices(const Elem * elem,
       i0 = 1;
       i1 = i - 9*e - 6;
       i2 = 1;
-      if (elem->point(5) > elem->point(6))
+      if (elem->positive_edge_orientation(9))
         eta = -eta_saved;
     }
   // Edge 10
@@ -335,7 +335,7 @@ void cube_indices(const Elem * elem,
       i0 = i - 10*e - 6;
       i1 = 1;
       i2 = 1;
-      if (elem->point(7) > elem->point(6))
+      if (!elem->positive_edge_orientation(10))
         xi = -xi_saved;
     }
   // Edge 11
@@ -344,7 +344,7 @@ void cube_indices(const Elem * elem,
       i0 = 0;
       i1 = i - 11*e - 6;
       i2 = 1;
-      if (elem->point(4) > elem->point(7))
+      if (elem->positive_edge_orientation(11))
         eta = -eta_saved;
     }
   // Face 0
@@ -357,7 +357,7 @@ void cube_indices(const Elem * elem,
       const Point min_point = get_min_point(elem, 1, 2, 0, 3);
 
       if (elem->point(0) == min_point)
-        if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
+        if (elem->positive_face_orientation(0))
           {
             // Case 1
             xi  = xi_saved;
@@ -371,7 +371,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(3) == min_point)
-        if (elem->point(0) == std::min(elem->point(0), elem->point(2)))
+        if (elem->positive_face_orientation(0))
           {
             // Case 3
             xi  = -eta_saved;
@@ -385,7 +385,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(2) == min_point)
-        if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
+        if (elem->positive_face_orientation(0))
           {
             // Case 5
             xi  = -xi_saved;
@@ -400,7 +400,7 @@ void cube_indices(const Elem * elem,
 
       else if (elem->point(1) == min_point)
         {
-          if (elem->point(2) == std::min(elem->point(2), elem->point(0)))
+          if (elem->positive_face_orientation(0))
             {
               // Case 7
               xi  = eta_saved;
@@ -424,7 +424,7 @@ void cube_indices(const Elem * elem,
       const Point min_point = get_min_point(elem, 0, 1, 5, 4);
 
       if (elem->point(0) == min_point)
-        if (elem->point(1) == std::min(elem->point(1), elem->point(4)))
+        if (!elem->positive_face_orientation(1))
           {
             // Case 1
             xi   = xi_saved;
@@ -438,7 +438,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(1) == min_point)
-        if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
+        if (!elem->positive_face_orientation(1))
           {
             // Case 3
             xi   = zeta_saved;
@@ -452,7 +452,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(5) == min_point)
-        if (elem->point(4) == std::min(elem->point(4), elem->point(1)))
+        if (!elem->positive_face_orientation(1))
           {
             // Case 5
             xi   = -xi_saved;
@@ -467,7 +467,7 @@ void cube_indices(const Elem * elem,
 
       else if (elem->point(4) == min_point)
         {
-          if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+          if (!elem->positive_face_orientation(1))
             {
               // Case 7
               xi   = -xi_saved;
@@ -491,7 +491,7 @@ void cube_indices(const Elem * elem,
       const Point min_point = get_min_point(elem, 1, 2, 6, 5);
 
       if (elem->point(1) == min_point)
-        if (elem->point(2) == std::min(elem->point(2), elem->point(5)))
+        if (!elem->positive_face_orientation(2))
           {
             // Case 1
             eta  = eta_saved;
@@ -505,7 +505,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(2) == min_point)
-        if (elem->point(6) == std::min(elem->point(6), elem->point(1)))
+        if (!elem->positive_face_orientation(2))
           {
             // Case 3
             eta  = zeta_saved;
@@ -519,7 +519,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(6) == min_point)
-        if (elem->point(5) == std::min(elem->point(5), elem->point(2)))
+        if (!elem->positive_face_orientation(2))
           {
             // Case 5
             eta  = -eta_saved;
@@ -534,7 +534,7 @@ void cube_indices(const Elem * elem,
 
       else if (elem->point(5) == min_point)
         {
-          if (elem->point(1) == std::min(elem->point(1), elem->point(6)))
+          if (!elem->positive_face_orientation(2))
             {
               // Case 7
               eta  = -zeta_saved;
@@ -558,7 +558,7 @@ void cube_indices(const Elem * elem,
       const Point min_point = get_min_point(elem, 2, 3, 7, 6);
 
       if (elem->point(3) == min_point)
-        if (elem->point(2) == std::min(elem->point(2), elem->point(7)))
+        if (elem->positive_face_orientation(3))
           {
             // Case 1
             xi   = xi_saved;
@@ -572,7 +572,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(7) == min_point)
-        if (elem->point(3) == std::min(elem->point(3), elem->point(6)))
+        if (elem->positive_face_orientation(3))
           {
             // Case 3
             xi   = -zeta_saved;
@@ -586,7 +586,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(6) == min_point)
-        if (elem->point(7) == std::min(elem->point(7), elem->point(2)))
+        if (elem->positive_face_orientation(3))
           {
             // Case 5
             xi   = -xi_saved;
@@ -601,7 +601,7 @@ void cube_indices(const Elem * elem,
 
       else if (elem->point(2) == min_point)
         {
-          if (elem->point(6) == std::min(elem->point(3), elem->point(6)))
+          if (elem->positive_face_orientation(3))
             {
               // Case 7
               xi   = zeta_saved;
@@ -625,7 +625,7 @@ void cube_indices(const Elem * elem,
       const Point min_point = get_min_point(elem, 3, 0, 4, 7);
 
       if (elem->point(0) == min_point)
-        if (elem->point(3) == std::min(elem->point(3), elem->point(4)))
+        if (elem->positive_face_orientation(4))
           {
             // Case 1
             eta  = eta_saved;
@@ -639,7 +639,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(4) == min_point)
-        if (elem->point(0) == std::min(elem->point(0), elem->point(7)))
+        if (elem->positive_face_orientation(4))
           {
             // Case 3
             eta  = -zeta_saved;
@@ -653,7 +653,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(7) == min_point)
-        if (elem->point(4) == std::min(elem->point(4), elem->point(3)))
+        if (elem->positive_face_orientation(4))
           {
             // Case 5
             eta  = -eta_saved;
@@ -668,7 +668,7 @@ void cube_indices(const Elem * elem,
 
       else if (elem->point(3) == min_point)
         {
-          if (elem->point(7) == std::min(elem->point(7), elem->point(0)))
+          if (elem->positive_face_orientation(4))
             {
               // Case 7
               eta   = zeta_saved;
@@ -692,7 +692,7 @@ void cube_indices(const Elem * elem,
       const Point min_point = get_min_point(elem, 4, 5, 6, 7);
 
       if (elem->point(4) == min_point)
-        if (elem->point(5) == std::min(elem->point(5), elem->point(7)))
+        if (!elem->positive_face_orientation(5))
           {
             // Case 1
             xi  = xi_saved;
@@ -706,7 +706,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(5) == min_point)
-        if (elem->point(6) == std::min(elem->point(6), elem->point(4)))
+        if (!elem->positive_face_orientation(5))
           {
             // Case 3
             xi  = eta_saved;
@@ -720,7 +720,7 @@ void cube_indices(const Elem * elem,
           }
 
       else if (elem->point(6) == min_point)
-        if (elem->point(7) == std::min(elem->point(7), elem->point(5)))
+        if (!elem->positive_face_orientation(5))
           {
             // Case 5
             xi  = -xi_saved;
@@ -735,7 +735,7 @@ void cube_indices(const Elem * elem,
 
       else if (elem->point(7) == min_point)
         {
-          if (elem->point(4) == std::min(elem->point(4), elem->point(6)))
+          if (!elem->positive_face_orientation(5))
             {
               // Case 7
               xi  = -eta_saved;
@@ -820,7 +820,7 @@ void prism_indices(const Elem * elem,
       i01 = (i - 6 - 3*e)/e; // which tri DoF are we?
       i2 = (i - 6 - 3*e)%e+2; // edge DoF? +2 to skip endpoints
       // EDGE evaluations don't flip, so handle that here
-      if (elem->point(i01) > elem->point(i01+3))
+      if (elem->positive_edge_orientation(i01+3))
         zeta = -zeta;
     }
   // Edge 6,7,8 (vertices 12,13,14)
@@ -850,7 +850,7 @@ void prism_indices(const Elem * elem,
 
       if (elem->point(0) == min_point)
         {
-          if (elem->point(1) == std::min(elem->point(1), elem->point(3)))
+          if (!elem->positive_face_orientation(1))
             {
               // Case 1: no flips needed
               i01 = s0+1; // edge to triangle side 0 numbering
@@ -867,7 +867,7 @@ void prism_indices(const Elem * elem,
         }
       else if (elem->point(3) == min_point)
         {
-          if (elem->point(0) == std::min(elem->point(0), elem->point(4)))
+          if (!elem->positive_face_orientation(1))
             {
               // Case 3: 0->3->4->1->0 rotation
               i01 = s1+1;
@@ -883,10 +883,9 @@ void prism_indices(const Elem * elem,
               zeta = -zeta_saved;
             }
         }
-
       else if (elem->point(1) == min_point)
         {
-          if (elem->point(4) == std::min(elem->point(4), elem->point(0)))
+          if (!elem->positive_face_orientation(1))
             {
               // Case 5: 0->1->4->3->0 rotation
               i01 = s1+1;
@@ -904,7 +903,7 @@ void prism_indices(const Elem * elem,
         }
       else if (elem->point(4) == min_point)
         {
-          if (elem->point(3) == std::min(elem->point(3), elem->point(1)))
+          if (!elem->positive_face_orientation(1))
             {
               // Case 7: 180 degree rotation
               i01 = s0+1;
@@ -942,7 +941,7 @@ void prism_indices(const Elem * elem,
 
       if (elem->point(1) == min_point)
         {
-          if (elem->point(2) == std::min(elem->point(2), elem->point(4)))
+          if (!elem->positive_face_orientation(2))
             {
               // Case 1: no flips needed
               i01 = s0+1+3; // edge to triangle side 1 numbering
@@ -961,7 +960,7 @@ void prism_indices(const Elem * elem,
         }
       else if (elem->point(4) == min_point)
         {
-          if (elem->point(1) == std::min(elem->point(1), elem->point(5)))
+          if (!elem->positive_face_orientation(2))
             {
               // Case 3: 1->4->5->2->1 rotation
               i01 = s1+1+e;
@@ -979,10 +978,9 @@ void prism_indices(const Elem * elem,
               zeta = -zeta_saved;
             }
         }
-
       else if (elem->point(2) == min_point)
         {
-          if (elem->point(5) == std::min(elem->point(5), elem->point(1)))
+          if (!elem->positive_face_orientation(2))
             {
               // Case 5: 1->2->5->4->1 rotation
               i01 = s1+1+e;
@@ -1004,7 +1002,7 @@ void prism_indices(const Elem * elem,
         }
       else if (elem->point(5) == min_point)
         {
-          if (elem->point(4) == std::min(elem->point(4), elem->point(2)))
+          if (!elem->positive_face_orientation(2))
             {
               // Case 7: 180 degree rotation
               i01 = s0+1+e;
@@ -1046,7 +1044,7 @@ void prism_indices(const Elem * elem,
 
       if (elem->point(2) == min_point)
         {
-          if (elem->point(0) == std::min(elem->point(0), elem->point(5)))
+          if (!elem->positive_face_orientation(3))
             {
               // Case 1: no flips needed
               i01 = s0+1+2*e; // edge to triangle side 2 numbering
@@ -1064,7 +1062,7 @@ void prism_indices(const Elem * elem,
         }
       else if (elem->point(5) == min_point)
         {
-          if (elem->point(2) == std::min(elem->point(2), elem->point(3)))
+          if (!elem->positive_face_orientation(3))
             {
               // Case 3: 2->5->3->0->2 rotation
               i01 = s1+1+2*e;
@@ -1083,7 +1081,7 @@ void prism_indices(const Elem * elem,
         }
       else if (elem->point(0) == min_point)
         {
-          if (elem->point(3) == std::min(elem->point(3), elem->point(2)))
+          if (!elem->positive_face_orientation(3))
             {
               // Case 5: 2->0->3->5->2 rotation
               i01 = s1+1+2*e;
@@ -1103,7 +1101,7 @@ void prism_indices(const Elem * elem,
         }
       else if (elem->point(3) == min_point)
         {
-          if (elem->point(5) == std::min(elem->point(5), elem->point(0)))
+          if (!elem->positive_face_orientation(3))
             {
               // Case 7: 180 degree rotation
               i01 = s0+1+2*e;
@@ -2387,8 +2385,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             // Get factors to account for edge-flipping
             Real flip = 1;
             if (basisorder%2 &&
-                (elem->point(edgevertex0) >
-                 elem->point(edgevertex1)))
+                elem->positive_edge_orientation(edge_num))
               flip = -1;
 
             const Real crossval = zeta[edgevertex0] + zeta[edgevertex1];

@@ -1122,10 +1122,11 @@ public:
   bool positive_edge_orientation(const unsigned int i) const;
 
   /**
-   * \returns \p true if face \p i is positively oriented. A face with N
-   * vertices is positively oriented iff its 3 lexicographically greatest
-   * vertices (i.e. 3 lexicographically greatest nodes amongst the N leading
-   * nodes) are an odd permutation relative to their lexicographic ordering.
+   * \returns \p true if face \p i is positively oriented. A face is
+   * positively oriented iff the triangle defined by the lexicographically
+   * least vertex and its two adjacent vertices on the same face is
+   * positively oriented. Said triangle is positively oriented iff its
+   * vertices are an odd permutation of their lexicographic ordering.
    */
   bool positive_face_orientation(const unsigned int i) const;
 
