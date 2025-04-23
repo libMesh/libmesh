@@ -203,23 +203,17 @@ bool Tet::is_child_on_side_helper(const unsigned int /*c*/,
 
 void Tet::choose_diagonal() const
 {
-  // Check for uninitialized diagonal selection
+  // If uninitialized diagonal selection, select the shortest octahedron diagonal
   if (this->_diagonal_selection==INVALID_DIAG)
     {
       Real diag_01_23 = (this->point(0) + this->point(1) - this->point(2) - this->point(3)).norm_sq();
       Real diag_02_13 = (this->point(0) - this->point(1) + this->point(2) - this->point(3)).norm_sq();
       Real diag_03_12 = (this->point(0) - this->point(1) - this->point(2) + this->point(3)).norm_sq();
 
-      this->_diagonal_selection=DIAG_02_13;
+      std::array<Real, 3> D = {diag_02_13, diag_03_12, diag_01_23};
 
-      if (diag_01_23 < diag_02_13 || diag_03_12 < diag_02_13)
-        {
-          if (diag_01_23 < diag_03_12)
-            this->_diagonal_selection=DIAG_01_23;
-
-          else
-            this->_diagonal_selection=DIAG_03_12;
-        }
+      this->_diagonal_selection =
+        Diagonal(std::distance(D.begin(), std::min_element(D.begin(), D.end())));
     }
 }
 
