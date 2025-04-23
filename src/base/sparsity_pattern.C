@@ -49,7 +49,8 @@ Build::Build (const DofMap & dof_map_in,
               const std::set<GhostingFunctor *> & coupling_functors_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in,
-              const bool calculate_constrained_in) :
+              const bool calculate_constrained_in,
+              const StaticCondensation * const sc_in) :
   ParallelObject(dof_map_in),
   dof_map(dof_map_in),
   dof_coupling(dof_coupling_in),
@@ -57,6 +58,7 @@ Build::Build (const DofMap & dof_map_in,
   implicit_neighbor_dofs(implicit_neighbor_dofs_in),
   need_full_sparsity_pattern(need_full_sparsity_pattern_in),
   calculate_constrained(calculate_constrained_in),
+  sc(sc_in),
   sparsity_pattern(),
   nonlocal_pattern(),
   n_nz(),
@@ -73,6 +75,7 @@ Build::Build (Build & other, Threads::split) :
   implicit_neighbor_dofs(other.implicit_neighbor_dofs),
   need_full_sparsity_pattern(other.need_full_sparsity_pattern),
   calculate_constrained(other.calculate_constrained),
+  sc(other.sc),
   hashed_dof_sets(other.hashed_dof_sets),
   sparsity_pattern(),
   nonlocal_pattern(),
@@ -94,13 +97,10 @@ void Build::sorted_connected_dofs(const Elem * elem,
                                   std::vector<dof_id_type> & dofs_vi,
                                   unsigned int vi)
 {
-  if (dof_map.has_static_condensation())
+  if (this->sc)
   {
     // We build a sparsity pattern that will match the size of the condensed system. This is so that
-    // we have the data necessary to init the reduced system matrix because that's the only matrix
-    // we will have in our system...unless users have auxiliary matrices that are of the full system
-    // size...
-    const auto & sc = dof_map.get_static_condensation();
+    // we have the data necessary to init the reduced system matrix
     dofs_vi.clear();
 
     auto total_and_uncondensed_from_scalar_dofs_functor =
@@ -113,14 +113,14 @@ void Build::sorted_connected_dofs(const Elem * elem,
     };
 
     auto total_and_uncondensed_from_field_dofs_functor =
-        [&dofs_vi, &sc](const Elem & functor_elem,
+        [&dofs_vi, this](const Elem & functor_elem,
                         const unsigned int node_num,
                         const unsigned int var_num,
                         std::vector<dof_id_type> & dof_indices,
                         const dof_id_type field_dof)
     {
       dof_indices.push_back(field_dof);
-      if (sc.uncondensed_vars().count(var_num) ||
+      if (this->sc->uncondensed_vars().count(var_num) ||
           (node_num != invalid_uint && !functor_elem.is_internal(node_num)))
         dofs_vi.push_back(field_dof);
     };

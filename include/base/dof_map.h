@@ -1677,7 +1677,8 @@ public:
    * constraints or sufficiently many user constraints.
    */
   std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh,
-                                                         bool calculate_constrained = false) const;
+                                                         bool calculate_constrained = false,
+                                                         bool use_condensed_system = false) const;
 
   /**
    * Describe whether the given variable group should be p-refined. If this API is not called with

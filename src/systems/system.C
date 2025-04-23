@@ -354,7 +354,8 @@ void System::init_matrices ()
           pr.second->use_hash_table() ||
           (this->_prefer_hash_table_matrix_assembly && pr.second->supports_hash_table());
       pr.second->use_hash_table(use_hash);
-      if (!use_hash)
+      // Make this call after we've determined whether the matrix is using a hash table
+      if (pr.second->require_sparsity_pattern())
         this->_require_sparsity_pattern = true;
     }
 
