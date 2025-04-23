@@ -96,6 +96,10 @@ void Build::sorted_connected_dofs(const Elem * elem,
 {
   if (dof_map.has_static_condensation())
   {
+    // We build a sparsity pattern that will match the size of the condensed system. This is so that
+    // we have the data necessary to init the reduced system matrix because that's the only matrix
+    // we will have in our system...unless users have auxiliary matrices that are of the full system
+    // size...
     const auto & sc = dof_map.get_static_condensation();
     dofs_vi.clear();
 
