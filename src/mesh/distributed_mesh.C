@@ -149,17 +149,12 @@ DistributedMesh::~DistributedMesh ()
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
 DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
-  UnstructuredMesh (other_mesh), _is_serial(other_mesh._is_serial),
-  _is_serial_on_proc_0(other_mesh._is_serial_on_proc_0),
-  _deleted_coarse_elements(other_mesh._deleted_coarse_elements),
-  _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
-  _next_free_local_node_id(this->processor_id()),
-  _next_free_local_elem_id(this->processor_id()),
-  _next_free_unpartitioned_node_id(this->n_processors()),
-  _next_free_unpartitioned_elem_id(this->n_processors())
+  DistributedMesh(static_cast<const MeshBase &>(other_mesh))
 {
-  this->copy_nodes_and_elements(other_mesh, true);
-  this->copy_constraint_rows(other_mesh);
+  _is_serial = other_mesh._is_serial;
+  _is_serial_on_proc_0 = other_mesh._is_serial_on_proc_0;
+  _deleted_coarse_elements = other_mesh._deleted_coarse_elements;
+
   _n_nodes = other_mesh.n_nodes();
   _n_elem  = other_mesh.n_elem();
   _max_node_id = other_mesh.max_node_id();
@@ -178,13 +173,6 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
   _next_unpartitioned_unique_id =
     other_mesh._next_unpartitioned_unique_id;
 #endif
-
-  auto & this_boundary_info = this->get_boundary_info();
-  const auto & other_boundary_info = other_mesh.get_boundary_info();
-
-  this_boundary_info = other_boundary_info;
-
-  this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
 
   // Need to copy extra_ghost_elems
   for (auto & elem : other_mesh._extra_ghost_elems)

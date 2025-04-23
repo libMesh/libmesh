@@ -89,19 +89,8 @@ ReplicatedMesh::~ReplicatedMesh ()
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
 ReplicatedMesh::ReplicatedMesh (const ReplicatedMesh & other_mesh) :
-  UnstructuredMesh (other_mesh),
-  _n_nodes(0), _n_elem(0) // copy_* will increment this
+  ReplicatedMesh(static_cast<const MeshBase&>(other_mesh))
 {
-  this->copy_nodes_and_elements(other_mesh, true);
-  this->copy_constraint_rows(other_mesh);
-
-  auto & this_boundary_info = this->get_boundary_info();
-  const auto & other_boundary_info = other_mesh.get_boundary_info();
-
-  this_boundary_info = other_boundary_info;
-
-  this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
-
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   this->_next_unique_id = other_mesh._next_unique_id;
 #endif
