@@ -1818,6 +1818,12 @@ protected:
   void post_dofobject_moves(MeshBase && other_mesh);
 
   /**
+   * Helper class to copy cached data, to synchronize with a possibly
+   * unprepared \p other_mesh
+   */
+  void copy_cached_data (const MeshBase & other_mesh);
+
+  /**
    * Shim to allow operator == (&) to behave like a virtual function
    * without having to be one.
    */

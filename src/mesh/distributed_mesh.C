@@ -192,6 +192,12 @@ DistributedMesh::DistributedMesh (const MeshBase & other_mesh) :
   _next_free_unpartitioned_elem_id(this->n_processors())
 {
   this->copy_nodes_and_elements(other_mesh, true);
+
+  // The prepare_for_use() in copy_nodes_and_elements() is going to be
+  // tricky to remove without breaking backwards compatibility, but it
+  // updates some things we want to just copy.
+  this->copy_cached_data(other_mesh);
+
   this->copy_constraint_rows(other_mesh);
 
   auto & this_boundary_info = this->get_boundary_info();
