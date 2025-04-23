@@ -29,6 +29,7 @@
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dof_map_base.h"
 #include "libmesh/variable.h"
+#include "libmesh/sparsity_pattern.h"
 
 #include <unordered_map>
 #include <memory>
@@ -210,6 +211,8 @@ public:
    */
   const System & reduced_system() const;
 
+  virtual bool require_sparsity_pattern() const override { return false; }
+
 private:
   /**
    * Retrieves the degree of freedom values from \p global_vector corresponding to \p
@@ -322,6 +325,9 @@ private:
 
   /// A dummyish system to help with DofObjects
   System * _reduced_system;
+
+  /// Owned storage of the reduced system sparsity pattern. Note that the \p SparseMatrix \p _sp data member is set to point to this
+  std::unique_ptr<SparsityPattern::Build> _reduced_sp;
 };
 
 inline const SparseMatrix<Number> & StaticCondensation::get_condensed_mat() const

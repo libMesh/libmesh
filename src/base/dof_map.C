@@ -59,7 +59,8 @@ namespace libMesh
 // DofMap member functions
 std::unique_ptr<SparsityPattern::Build>
 DofMap::build_sparsity (const MeshBase & mesh,
-                        const bool calculate_constrained) const
+                        const bool calculate_constrained,
+                        const bool use_condensed_system) const
 {
   libmesh_assert (mesh.is_prepared());
 
@@ -78,6 +79,13 @@ DofMap::build_sparsity (const MeshBase & mesh,
   // between neighbor dofs
   bool implicit_neighbor_dofs = this->use_coupled_neighbor_dofs(mesh);
 
+  const StaticCondensation * sc = nullptr;
+  if (use_condensed_system)
+    {
+      libmesh_assert(this->has_static_condensation());
+      sc = &this->get_static_condensation();
+    }
+
   // We can compute the sparsity pattern in parallel on multiple
   // threads.  The goal is for each thread to compute the full sparsity
   // pattern for a subset of elements.  These sparsity patterns can
@@ -92,7 +100,8 @@ DofMap::build_sparsity (const MeshBase & mesh,
      this->_coupling_functors,
      implicit_neighbor_dofs,
      need_full_sparsity_pattern,
-     calculate_constrained);
+     calculate_constrained,
+     sc);
 
   Threads::parallel_reduce (ConstElemRange (mesh.active_local_elements_begin(),
                                             mesh.active_local_elements_end()), *sp);
