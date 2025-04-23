@@ -28,6 +28,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_serializer.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
 
@@ -129,8 +130,10 @@ void MeshTetInterface::attach_hole_list
 
 BoundingBox MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 {
-  // If we've been handed an unprepared mesh then we need to fix that;
-  // we're relying on neighbor pointers here.
+  // If we've been handed an unprepared mesh then we need to be made
+  // aware of that and fix that; we're relying on neighbor pointers.
+  libmesh_assert(MeshTools::valid_is_prepared(mesh));
+
   if (!mesh.is_prepared())
     mesh.prepare_for_use();
 
