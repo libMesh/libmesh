@@ -1796,6 +1796,10 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
   MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
 
+  // We can't even afford any unset neighbor links here.
+  if (!this->is_prepared())
+    this->find_neighbors();
+
   // FIXME: make distributed mesh support efficient.
   // Yes, we currently suck.
   MeshSerializer serialize(*this);
