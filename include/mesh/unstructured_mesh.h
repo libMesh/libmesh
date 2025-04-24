@@ -114,7 +114,7 @@ public:
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.
    */
-  virtual void write (const std::string & name) override;
+  virtual void write (const std::string & name) const override;
 
   /**
    * Write to the file specified by \p name.  Attempts to figure out the
@@ -122,7 +122,7 @@ public:
    */
   void write (const std::string & name,
               const std::vector<Number> & values,
-              const std::vector<std::string> & variable_names);
+              const std::vector<std::string> & variable_names) const;
 
   /**
    * Converts a mesh with higher-order
