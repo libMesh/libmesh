@@ -120,12 +120,7 @@ namespace libMesh
 // ------------------------------------------------------------
 // ExodusII_IO class members
 ExodusII_IO::ExodusII_IO (MeshBase & mesh,
-#ifdef LIBMESH_HAVE_EXODUS_API
-                          bool single_precision
-#else
-                          bool
-#endif
-                          ) :
+                          bool single_precision) :
   MeshInput<MeshBase> (mesh),
   MeshOutput<MeshBase> (mesh,
                         /* is_parallel_format = */ false,
@@ -141,6 +136,31 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
   _write_complex_abs(true),
   _disc_bex(false)
 {
+  // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
+  libmesh_ignore(single_precision);
+}
+
+
+
+ExodusII_IO::ExodusII_IO (const MeshBase & mesh,
+                          bool single_precision) :
+  MeshInput<MeshBase> (),
+  MeshOutput<MeshBase> (mesh,
+                        /* is_parallel_format = */ false,
+                        /* serial_only_needed_on_proc_0 = */ true),
+  ParallelObject(mesh),
+#ifdef LIBMESH_HAVE_EXODUS_API
+  exio_helper(std::make_unique<ExodusII_IO_Helper>(*this, false, true, single_precision)),
+  _timestep(1),
+  _verbose(false),
+  _append(false),
+#endif
+  _allow_empty_variables(false),
+  _write_complex_abs(true),
+  _disc_bex(false)
+{
+  // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
+  libmesh_ignore(single_precision);
 }
 
 
@@ -2166,7 +2186,9 @@ void ExodusII_IO::write (const std::string & fname)
   // We may need to gather a DistributedMesh to output it, making that
   // const qualifier in our constructor a dirty lie
   // The "true" specifies that we only need the mesh serialized to processor 0
-  MeshSerializer serialize(MeshInput<MeshBase>::mesh(), !MeshOutput<MeshBase>::_is_parallel_format, true);
+  MeshSerializer serialize
+    (const_cast<MeshBase &>(mesh),
+     !MeshOutput<MeshBase>::_is_parallel_format, true);
 
   libmesh_assert( !exio_helper->opened_for_writing );
 

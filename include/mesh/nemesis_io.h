@@ -63,6 +63,13 @@ public:
   Nemesis_IO (MeshBase & mesh, bool single_precision=false);
 
   /**
+   * Constructor.  Takes a const reference to a mesh object.
+   * This constructor is acceptable to write meshes.
+   */
+  explicit
+  Nemesis_IO (const MeshBase & mesh, bool single_precision=false);
+
+  /**
    * Destructor.
    */
   virtual ~Nemesis_IO ();
