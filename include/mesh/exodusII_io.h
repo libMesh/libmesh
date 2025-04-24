@@ -64,6 +64,14 @@ public:
                bool single_precision=false);
 
   /**
+   * Constructor.  Takes a const reference to a mesh object.
+   * This constructor is acceptable to write meshes.
+   */
+  explicit
+  ExodusII_IO (const MeshBase & mesh,
+               bool single_precision=false);
+
+  /**
    * ExodusII_IO special functions:
    * - Can't be (default) copy constructed or assigned since they
    *   contain a unique_ptr member.

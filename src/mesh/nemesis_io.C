@@ -92,12 +92,7 @@ inline bool global_idx_mapping_equality (const std::pair<unsigned int, unsigned 
 // ------------------------------------------------------------
 // Nemesis_IO class members
 Nemesis_IO::Nemesis_IO (MeshBase & mesh,
-#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-                        bool single_precision
-#else
-                        bool
-#endif
-                        ) :
+                        bool single_precision) :
   MeshInput<MeshBase> (mesh, /*is_parallel_format=*/true),
   MeshOutput<MeshBase> (mesh, /*is_parallel_format=*/true),
   ParallelObject (mesh),
@@ -109,6 +104,27 @@ Nemesis_IO::Nemesis_IO (MeshBase & mesh,
   _append(false),
   _allow_empty_variables(false)
 {
+  // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
+  libmesh_ignore(single_precision);
+}
+
+
+
+Nemesis_IO::Nemesis_IO (const MeshBase & mesh,
+                        bool single_precision) :
+  MeshInput<MeshBase> (),
+  MeshOutput<MeshBase> (mesh, /*is_parallel_format=*/true),
+  ParallelObject (mesh),
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+  nemhelper(std::make_unique<Nemesis_IO_Helper>(*this, false, single_precision)),
+  _timestep(1),
+#endif
+  _verbose (false),
+  _append(false),
+  _allow_empty_variables(false)
+{
+  // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
+  libmesh_ignore(single_precision);
 }
 
 
