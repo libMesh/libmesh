@@ -1381,7 +1381,7 @@ public:
                       void * mesh_data=nullptr,
                       bool skip_renumber_nodes_and_elements=false,
                       bool skip_find_neighbors=false) = 0;
-  virtual void write (const std::string & name) = 0;
+  virtual void write (const std::string & name) const = 0;
 
   /**
    * Converts a mesh with higher-order

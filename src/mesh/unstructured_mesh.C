@@ -1247,7 +1247,7 @@ void UnstructuredMesh::read (const std::string & name,
 
 
 
-void UnstructuredMesh::write (const std::string & name)
+void UnstructuredMesh::write (const std::string & name) const
 {
   LOG_SCOPE("write()", "Mesh");
 
@@ -1258,7 +1258,7 @@ void UnstructuredMesh::write (const std::string & name)
 
 void UnstructuredMesh::write (const std::string & name,
                               const std::vector<Number> & v,
-                              const std::vector<std::string> & vn)
+                              const std::vector<std::string> & vn) const
 {
   LOG_SCOPE("write()", "Mesh");
 
