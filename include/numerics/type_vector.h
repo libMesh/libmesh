@@ -1055,7 +1055,7 @@ T solid_angle(const TypeVector<T> & v01,
   const Real norm01 = v01.norm(),
              norm02 = v02.norm(),
              norm03 = v03.norm();
-  const Real tan_half_angle =
+  const T tan_half_angle =
     triple_product(v01, v02, v03) /
     ((v01*v02)*norm03 + (v01*v03)*norm02 + (v02*v03)*norm01 +
      norm01*norm02*norm03);
