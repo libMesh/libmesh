@@ -302,7 +302,7 @@ void NameBasedIO::read (const std::string & name)
 
 void NameBasedIO::write (const std::string & name)
 {
-  MeshBase & mymesh = MeshInput<MeshBase>::mesh();
+  const MeshBase & mymesh = MeshOutput<MeshBase>::mesh();
 
   const std::string_view basename = Utility::basename_of(name);
 
@@ -465,7 +465,7 @@ void NameBasedIO::write_nodal_data (const std::string & name,
                                     const std::vector<Number> & v,
                                     const std::vector<std::string> & vn)
 {
-  MeshBase & mymesh = MeshInput<MeshBase>::mesh();
+  const MeshBase & mymesh = MeshOutput<MeshBase>::mesh();
 
   // Write the file based on extension
   if (name.rfind(".dat") < name.size())

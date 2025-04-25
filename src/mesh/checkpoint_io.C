@@ -174,10 +174,12 @@ CheckpointIO::CheckpointIO (MeshBase & mesh, const bool binary_in) :
 }
 
 CheckpointIO::CheckpointIO (const MeshBase & mesh, const bool binary_in) :
+  MeshInput<MeshBase> (), // write-only
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
   ParallelObject      (mesh),
   _binary             (binary_in),
   _parallel           (false),
+  _version            ("checkpoint-1.5"),
   _my_processor_ids   (1, processor_id()),
   _my_n_processors    (mesh.is_replicated() ? 1 : n_processors())
 {

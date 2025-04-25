@@ -96,9 +96,24 @@ XdrIO::XdrIO (MeshBase & mesh, const bool binary_in) :
 
 
 XdrIO::XdrIO (const MeshBase & mesh, const bool binary_in) :
+  MeshInput<MeshBase> (), // write-only
   MeshOutput<MeshBase>(mesh,/* is_parallel_format = */ true),
   ParallelObject      (mesh),
-  _binary (binary_in)
+  _binary             (binary_in),
+  _legacy             (false),
+  _write_serial       (false),
+  _write_parallel     (false),
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _write_unique_id    (true),
+#else
+  _write_unique_id    (false),
+#endif
+  _field_width        (4),   // In 0.7.0, all fields are 4 bytes, in 0.9.2+ they can vary
+  _version            ("libMesh-1.8.0"),
+  _bc_file_name       ("n/a"),
+  _partition_map_file ("n/a"),
+  _subdomain_map_file ("n/a"),
+  _p_level_file       ("n/a")
 {
 }
 
