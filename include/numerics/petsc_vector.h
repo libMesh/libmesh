@@ -229,7 +229,7 @@ public:
    * \note This MUST be called after get_array() or get_array_read()
    * and before using any other interface functions on PetscVector.
    */
-  void restore_array();
+  void restore_array() const;
 
   virtual NumericVector<T> & operator += (const NumericVector<T> & v) override;
 
@@ -1160,7 +1160,7 @@ const PetscScalar * PetscVector<T>::get_array_read() const
 
 template <typename T>
 inline
-void PetscVector<T>::restore_array()
+void PetscVector<T>::restore_array() const
 {
   // \note \p _values_manually_retrieved needs to be set to \p false
   // \e before calling \p _restore_array()!
