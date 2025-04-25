@@ -132,9 +132,9 @@ public:
 
                   Point p = n3->vertex_average();
 
-                  LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p,n3)),
-                                          libmesh_real(cubic_point_neighbor_coupling_test(p,es.parameters,"","")),
-                                          TOLERANCE*TOLERANCE);
+                  LIBMESH_ASSERT_NUMBERS_EQUAL(sys.point_value(0,p,n3),
+                                              cubic_point_neighbor_coupling_test(p,es.parameters,"",""),
+                                              TOLERANCE*TOLERANCE);
                 }
             }
         }

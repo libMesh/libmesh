@@ -117,16 +117,16 @@ public:
     v_working.pointwise_mult(v1, *v2);
 
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v_working(n)),
-                              libMesh::Real((n+1)*2*(n+1)),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v_working(n), libMesh::Real((n+1)*2*(n+1)),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v_working.pointwise_divide(v1, *v2);
 
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v_working(n)),
-                              libMesh::Real(0.5),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v_working(n), libMesh::Real(0.5),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
   }
 
 };

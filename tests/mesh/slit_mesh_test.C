@@ -371,9 +371,8 @@ public:
 
             const Number discrete_val = context.interior_value(0, qp);
 
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(exact_val),
-                                    libmesh_real(discrete_val),
-                                    TOLERANCE*TOLERANCE);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (exact_val, discrete_val, TOLERANCE*TOLERANCE);
           }
       }
 
@@ -457,9 +456,8 @@ public:
 
             const Number discrete_val = context.interior_value(0, qp);
 
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(exact_val),
-                                    libmesh_real(discrete_val),
-                                    TOLERANCE*TOLERANCE);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (exact_val, discrete_val, TOLERANCE*TOLERANCE);
           }
       }
   }

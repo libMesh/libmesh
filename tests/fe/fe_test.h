@@ -750,8 +750,7 @@ public:
         else
           true_u = p(0) + 0.25*p(1) + 0.0625*p(2);
 
-        LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(true_u), libmesh_real(u), this->_value_tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL (true_u, u, this->_value_tol);
       };
 
     testLoop(f);
@@ -787,14 +786,14 @@ public:
 
         RealGradient true_grad = this->true_gradient(p);
 
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(0)),
-                                true_grad(0), this->_grad_tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL
+          (grad_u(0), true_grad(0), this->_grad_tol);
         if (this->_dim > 1)
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(1)),
-                                  true_grad(1), this->_grad_tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL
+           (grad_u(1), true_grad(1), this->_grad_tol);
         if (this->_dim > 2)
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u(2)),
-                                  true_grad(2), this->_grad_tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL
+           (grad_u(2), true_grad(2), this->_grad_tol);
       };
 
     testLoop(f);
@@ -822,14 +821,14 @@ public:
 
         RealGradient true_grad = this->true_gradient(p);
 
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_x),
+        LIBMESH_ASSERT_NUMBERS_EQUAL(grad_u_x,
                                 true_grad(0), this->_grad_tol);
         if (this->_dim > 1)
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_y),
-                                  true_grad(1), this->_grad_tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL
+            (grad_u_y, true_grad(1), this->_grad_tol);
         if (this->_dim > 2)
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(grad_u_z),
-                                  true_grad(2), this->_grad_tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL
+            (grad_u_z, true_grad(2), this->_grad_tol);
       };
 
     testLoop(f);
@@ -857,29 +856,29 @@ public:
 
         RealTensor true_hess = this->true_hessian(p);
 
-        LIBMESH_ASSERT_FP_EQUAL(true_hess(0,0), libmesh_real(hess_u(0,0)),
-                                this->_hess_tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL
+          (true_hess(0,0), hess_u(0,0), this->_hess_tol);
         if (this->_dim > 1)
           {
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), libmesh_real(hess_u(1,0)),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(0,1), libmesh_real(hess_u(0,1)),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(1,1), libmesh_real(hess_u(1,1)),
-                                    this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (hess_u(0,1), hess_u(1,0), this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(0,1), hess_u(0,1), this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(1,1), hess_u(1,1), this->_hess_tol);
           }
         if (this->_dim > 2)
           {
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), libmesh_real(hess_u(2,0)),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), libmesh_real(hess_u(2,1)),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(0,2), libmesh_real(hess_u(0,2)),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(1,2), libmesh_real(hess_u(1,2)),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(2,2), libmesh_real(hess_u(2,2)),
-                                    this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (hess_u(0,2), hess_u(2,0), this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (hess_u(1,2), hess_u(2,1), this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(0,2), hess_u(0,2), this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(1,2), hess_u(1,2), this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(2,2), hess_u(2,2), this->_hess_tol);
           }
       };
 
@@ -920,23 +919,23 @@ public:
 
         RealTensor true_hess = this->true_hessian(p);
 
-        LIBMESH_ASSERT_FP_EQUAL(true_hess(0,0), libmesh_real(hess_u_xx),
-                                this->_hess_tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL
+          (true_hess(0,0), hess_u_xx, this->_hess_tol);
         if (this->_dim > 1)
           {
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(0,1), libmesh_real(hess_u_xy),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(1,1), libmesh_real(hess_u_yy),
-                                    this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(0,1), hess_u_xy, this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(1,1), hess_u_yy, this->_hess_tol);
           }
         if (this->_dim > 2)
           {
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(0,2), libmesh_real(hess_u_xz),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(1,2), libmesh_real(hess_u_yz),
-                                    this->_hess_tol);
-            LIBMESH_ASSERT_FP_EQUAL(true_hess(2,2), libmesh_real(hess_u_zz),
-                                    this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(0,2), hess_u_xz, this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(1,2), hess_u_yz, this->_hess_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (true_hess(2,2), hess_u_zz, this->_hess_tol);
           }
       };
 

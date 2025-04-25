@@ -176,12 +176,12 @@ public:
 
     DerivedClass avector = 0;
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , avector(i) , TOLERANCE*TOLERANCE );
 
     DerivedClass bvector = 2.0;
-    LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(bvector(0)) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , bvector(0) , TOLERANCE*TOLERANCE );
     for (int i = 1; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(bvector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , bvector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMult()
@@ -190,9 +190,9 @@ public:
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
     {
-      LIBMESH_ASSERT_FP_EQUAL( 5.0 , libmesh_real(((*m_1_1_1)*5.0)(i)) , TOLERANCE*TOLERANCE );
-      LIBMESH_ASSERT_FP_EQUAL( 5.0 , libmesh_real(outer_product(*m_1_1_1,5.0)(i)) , TOLERANCE*TOLERANCE );
-      LIBMESH_ASSERT_FP_EQUAL( 5.0 , libmesh_real(outer_product(5.0,*m_1_1_1)(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , ((*m_1_1_1)*5.0)(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , outer_product(*m_1_1_1,5.0)(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , outer_product(5.0,*m_1_1_1)(i) , TOLERANCE*TOLERANCE );
     }
   }
 
@@ -201,7 +201,7 @@ public:
     LOG_UNIT_TEST;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 1/Real(5) , libmesh_real(((*m_1_1_1)/5.0)(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 1/Real(5) , ((*m_1_1_1)/5.0)(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMultAssign()
@@ -212,7 +212,7 @@ public:
     avector*=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 5.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivAssign()
@@ -223,18 +223,18 @@ public:
     avector/=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 1/Real(5) , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 1/Real(5) , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAdd()
   {
     LOG_UNIT_TEST;
 
-    LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*m_1_1_1)+(*m_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*m_1_1_1)+(*m_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)+(*m_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*m_1_1_1)+(*m_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddScaled()
@@ -245,18 +245,18 @@ public:
     avector.add_scaled((*m_1_1_1),0.5);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 1.5 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 1.5 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSub()
   {
     LOG_UNIT_TEST;
 
-    LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*m_1_1_1)-(*m_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*m_1_1_1)-(*m_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*m_1_1_1)-(*m_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*m_1_1_1)-(*m_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorMult()
@@ -264,9 +264,9 @@ public:
     LOG_UNIT_TEST;
 
     if (LIBMESH_DIM == 2)
-      LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real((*m_1_1_1)*(*m_n1_1_n1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , (*m_1_1_1)*(*m_n1_1_n1) , TOLERANCE*TOLERANCE );
     else
-      LIBMESH_ASSERT_FP_EQUAL( -1.0 , libmesh_real((*m_1_1_1)*(*m_n1_1_n1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( -1.0 , (*m_1_1_1)*(*m_n1_1_n1) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddAssign()
@@ -277,7 +277,7 @@ public:
     avector+=(*m_1_1_1);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSubAssign()
@@ -287,11 +287,11 @@ public:
     DerivedClass avector {*basem_1_1_1};
     avector-=(*m_n1_1_n1);
 
-    LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , avector(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );
   }
 
   void testValueBase()
@@ -392,7 +392,7 @@ public:
     LOG_UNIT_TEST;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 5.0 , libmesh_real(((*basem_1_1_1)*5.0)(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , ((*basem_1_1_1)*5.0)(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivBase()
@@ -400,7 +400,7 @@ public:
     LOG_UNIT_TEST;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 1/Real(5) , libmesh_real(((*basem_1_1_1)/5.0)(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 1/Real(5) , ((*basem_1_1_1)/5.0)(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMultAssignBase()
@@ -411,7 +411,7 @@ public:
     avector*=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 5.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivAssignBase()
@@ -422,18 +422,18 @@ public:
     avector/=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 1/Real(5) , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 1/Real(5) , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddBase()
   {
     LOG_UNIT_TEST;
 
-    LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*basem_1_1_1)+(*basem_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*basem_1_1_1)+(*basem_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)+(*basem_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*basem_1_1_1)+(*basem_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddScaledBase()
@@ -444,18 +444,18 @@ public:
     avector.add_scaled((*basem_1_1_1),0.5);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 1.5 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 1.5 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSubBase()
   {
     LOG_UNIT_TEST;
 
-    LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(0)) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*basem_1_1_1)-(*basem_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*basem_1_1_1)-(*basem_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(((*basem_1_1_1)-(*basem_n1_1_n1))(2)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*basem_1_1_1)-(*basem_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorMultBase()
@@ -463,9 +463,9 @@ public:
     LOG_UNIT_TEST;
 
     if (LIBMESH_DIM == 2)
-      LIBMESH_ASSERT_FP_EQUAL(  0.0 , libmesh_real((*basem_1_1_1)*(*basem_n1_1_n1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL(  0.0 , (*basem_1_1_1)*(*basem_n1_1_n1) , TOLERANCE*TOLERANCE );
     else
-      LIBMESH_ASSERT_FP_EQUAL( -1.0 , libmesh_real((*basem_1_1_1)*(*basem_n1_1_n1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( -1.0 , (*basem_1_1_1)*(*basem_n1_1_n1) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddAssignBase()
@@ -476,7 +476,7 @@ public:
     avector+=(*basem_1_1_1);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(avector(i)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSubAssignBase()
@@ -486,11 +486,11 @@ public:
     TypeVector<T> avector(*m_1_1_1);
     avector-=(*basem_n1_1_n1);
 
-    LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(avector(0)) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_FP_EQUAL( 0.0 , libmesh_real(avector(1)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , avector(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_FP_EQUAL( 2.0 , libmesh_real(avector(2)) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );
   }
 
   void testReplaceAlgebraicType()
