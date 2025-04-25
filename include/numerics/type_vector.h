@@ -1060,7 +1060,7 @@ T solid_angle(const TypeVector<T> & v01,
     ((v01*v02)*norm03 + (v01*v03)*norm02 + (v02*v03)*norm01 +
      norm01*norm02*norm03);
 
-  return 2*std::atan(tan_half_angle);
+  return Real(2)*std::atan(tan_half_angle);
 }
 
 
