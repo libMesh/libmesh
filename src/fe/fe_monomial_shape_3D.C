@@ -162,17 +162,17 @@ Real FE<3,MONOMIAL>::shape(const ElemType,
     default:
       unsigned int o = 0;
       for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-      unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-      unsigned int block=o, nz = 0;
+      const int i2 = i - (o*(o+1)*(o+2)/6);
+      int block=o, nz = 0;
       for (; block < i2; block += (o-nz+1)) { nz++; }
-      const unsigned int nx = block - i2;
-      const unsigned int ny = o - nx - nz;
+      const int nx = block - i2;
+      const int ny = o - nx - nz;
       Real val = 1.;
-      for (unsigned int index=0; index != nx; index++)
+      for (int index=0; index != nx; index++)
         val *= xi;
-      for (unsigned int index=0; index != ny; index++)
+      for (int index=0; index != ny; index++)
         val *= eta;
-      for (unsigned int index=0; index != nz; index++)
+      for (int index=0; index != nz; index++)
         val *= zeta;
       return val;
     }
@@ -356,17 +356,17 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
+            const int i2 = i - (o*(o+1)*(o+2)/6);
+            int block=o, nz = 0;
             for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
+            const int nx = block - i2;
+            const int ny = o - nx - nz;
             Real val = nx;
-            for (unsigned int index=1; index < nx; index++)
+            for (int index=1; index < nx; index++)
               val *= xi;
-            for (unsigned int index=0; index != ny; index++)
+            for (int index=0; index != ny; index++)
               val *= eta;
-            for (unsigned int index=0; index != nz; index++)
+            for (int index=0; index != nz; index++)
               val *= zeta;
             return val;
           }
@@ -491,17 +491,17 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
+            const int i2 = i - (o*(o+1)*(o+2)/6);
+            int block=o, nz = 0;
             for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
+            const int nx = block - i2;
+            const int ny = o - nx - nz;
             Real val = ny;
-            for (unsigned int index=0; index != nx; index++)
+            for (int index=0; index != nx; index++)
               val *= xi;
-            for (unsigned int index=1; index < ny; index++)
+            for (int index=1; index < ny; index++)
               val *= eta;
-            for (unsigned int index=0; index != nz; index++)
+            for (int index=0; index != nz; index++)
               val *= zeta;
             return val;
           }
@@ -626,17 +626,17 @@ Real FE<3,MONOMIAL>::shape_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
+            const int i2 = i - (o*(o+1)*(o+2)/6);
+            int block=o, nz = 0;
             for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
+            const int nx = block - i2;
+            const int ny = o - nx - nz;
             Real val = nz;
-            for (unsigned int index=0; index != nx; index++)
+            for (int index=0; index != nx; index++)
               val *= xi;
-            for (unsigned int index=0; index != ny; index++)
+            for (int index=0; index != ny; index++)
               val *= eta;
-            for (unsigned int index=1; index < nz; index++)
+            for (int index=1; index < nz; index++)
               val *= zeta;
             return val;
           }
@@ -791,17 +791,17 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
+            const int i2 = i - (o*(o+1)*(o+2)/6);
+            int block=o, nz = 0;
             for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
+            const int nx = block - i2;
+            const int ny = o - nx - nz;
             Real val = nx * (nx - 1);
-            for (unsigned int index=2; index < nx; index++)
+            for (int index=2; index < nx; index++)
               val *= xi;
-            for (unsigned int index=0; index != ny; index++)
+            for (int index=0; index != ny; index++)
               val *= eta;
-            for (unsigned int index=0; index != nz; index++)
+            for (int index=0; index != nz; index++)
               val *= zeta;
             return val;
           }
@@ -897,17 +897,17 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
+            const int i2 = i - (o*(o+1)*(o+2)/6);
+            int block=o, nz = 0;
             for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
+            const int nx = block - i2;
+            const int ny = o - nx - nz;
             Real val = nx * ny;
-            for (unsigned int index=1; index < nx; index++)
+            for (int index=1; index < nx; index++)
               val *= xi;
-            for (unsigned int index=1; index < ny; index++)
+            for (int index=1; index < ny; index++)
               val *= eta;
-            for (unsigned int index=0; index != nz; index++)
+            for (int index=0; index != nz; index++)
               val *= zeta;
             return val;
           }
@@ -1002,17 +1002,17 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
+            const int i2 = i - (o*(o+1)*(o+2)/6);
+            int block=o, nz = 0;
             for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
+            const int nx = block - i2;
+            const int ny = o - nx - nz;
             Real val = ny * (ny - 1);
-            for (unsigned int index=0; index != nx; index++)
+            for (int index=0; index != nx; index++)
               val *= xi;
-            for (unsigned int index=2; index < ny; index++)
+            for (int index=2; index < ny; index++)
               val *= eta;
-            for (unsigned int index=0; index != nz; index++)
+            for (int index=0; index != nz; index++)
               val *= zeta;
             return val;
           }
@@ -1108,17 +1108,17 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
+            const int i2 = i - (o*(o+1)*(o+2)/6);
+            int block=o, nz = 0;
             for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
+            const int nx = block - i2;
+            const int ny = o - nx - nz;
             Real val = nx * nz;
-            for (unsigned int index=1; index < nx; index++)
+            for (int index=1; index < nx; index++)
               val *= xi;
-            for (unsigned int index=0; index != ny; index++)
+            for (int index=0; index != ny; index++)
               val *= eta;
-            for (unsigned int index=1; index < nz; index++)
+            for (int index=1; index < nz; index++)
               val *= zeta;
             return val;
           }
@@ -1213,17 +1213,17 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
+            const int i2 = i - (o*(o+1)*(o+2)/6);
+            int block=o, nz = 0;
             for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
+            const int nx = block - i2;
+            const int ny = o - nx - nz;
             Real val = ny * nz;
-            for (unsigned int index=0; index != nx; index++)
+            for (int index=0; index != nx; index++)
               val *= xi;
-            for (unsigned int index=1; index < ny; index++)
+            for (int index=1; index < ny; index++)
               val *= eta;
-            for (unsigned int index=1; index < nz; index++)
+            for (int index=1; index < nz; index++)
               val *= zeta;
             return val;
           }
@@ -1307,17 +1307,17 @@ Real FE<3,MONOMIAL>::shape_second_deriv(const ElemType,
           default:
             unsigned int o = 0;
             for (; i >= (o+1)*(o+2)*(o+3)/6; o++) { }
-            unsigned int i2 = i - (o*(o+1)*(o+2)/6);
-            unsigned int block=o, nz = 0;
+            const int i2 = i - (o*(o+1)*(o+2)/6);
+            int block=o, nz = 0;
             for (; block < i2; block += (o-nz+1)) { nz++; }
-            const unsigned int nx = block - i2;
-            const unsigned int ny = o - nx - nz;
+            const int nx = block - i2;
+            const int ny = o - nx - nz;
             Real val = nz * (nz - 1);
-            for (unsigned int index=0; index != nx; index++)
+            for (int index=0; index != nx; index++)
               val *= xi;
-            for (unsigned int index=0; index != ny; index++)
+            for (int index=0; index != ny; index++)
               val *= eta;
-            for (unsigned int index=2; index < nz; index++)
+            for (int index=2; index < nz; index++)
               val *= zeta;
             return val;
           }
