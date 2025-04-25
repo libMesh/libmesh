@@ -19,6 +19,17 @@
          CPPUNIT_ASSERT_DOUBLES_EQUAL(expected,actual,tolerance)
 #endif
 
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+# define LIBMESH_ASSERT_NUMBERS_EQUAL(expected,actual,tolerance) \
+  do { \
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(expected),libMesh::libmesh_real(actual),tolerance); \
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_imag(expected),libMesh::libmesh_imag(actual),tolerance); \
+  } while (0)
+#else
+# define LIBMESH_ASSERT_NUMBERS_EQUAL(expected,actual,tolerance) \
+         LIBMESH_ASSERT_FP_EQUAL(expected,actual,tolerance)
+#endif
+
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations
 // warnings.  These can be ignored in GCC as long as we wrap the
