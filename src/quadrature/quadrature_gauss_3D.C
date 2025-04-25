@@ -82,8 +82,10 @@ void QGauss::init_3D()
               _weights.resize(4);
 
 
-              const Real a = .585410196624969;
-              const Real b = .138196601125011;
+              // Can't be constexpr with my version of Boost quad
+              // precision
+              const Real b = 0.25*(1-std::sqrt(Real(5))/5);
+              const Real a = 1-3*b;
 
               _points[0](0) = a;
               _points[0](1) = b;
