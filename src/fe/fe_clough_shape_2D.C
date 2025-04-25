@@ -672,9 +672,9 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
             case 0:
               return 0;
             case 1:
-              return std::sqrt(2.) * (8 - 10*xi - 14*eta);
+              return std::sqrt(Real(2)) * (8 - 10*xi - 14*eta);
             case 2:
-              return std::sqrt(2.) * (-2*xi + 2*eta);
+              return std::sqrt(Real(2)) * (-2*xi + 2*eta);
 
             default:
               libmesh_error_msg("Invalid subtriangle lookup = " <<
@@ -849,11 +849,11 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
           switch (subtriangle_lookup(p))
             {
             case 0:
-              return std::sqrt(2.) * (2*eta);
+              return std::sqrt(Real(2)) * (2*eta);
             case 1:
-              return std::sqrt(2.) * (10 - 14*xi - 14*eta);
+              return std::sqrt(Real(2)) * (10 - 14*xi - 14*eta);
             case 2:
-              return std::sqrt(2.) * (2*xi);
+              return std::sqrt(Real(2)) * (2*xi);
 
             default:
               libmesh_error_msg("Invalid subtriangle lookup = " <<
@@ -1027,9 +1027,9 @@ Real clough_raw_shape_second_deriv(const unsigned int basis_num,
           switch (subtriangle_lookup(p))
             {
             case 0:
-              return std::sqrt(2.) * (2*xi - 2*eta);
+              return std::sqrt(Real(2)) * (2*xi - 2*eta);
             case 1:
-              return std::sqrt(2.) * (8 - 14*xi - 10*eta);
+              return std::sqrt(Real(2)) * (8 - 14*xi - 10*eta);
             case 2:
               return 0;
 
@@ -1257,13 +1257,13 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
           switch (subtriangle_lookup(p))
             {
             case 0:
-              return std::sqrt(2.) * eta*eta;
+              return std::sqrt(Real(2)) * eta*eta;
             case 1:
-              return std::sqrt(2.) * (-3 + 8*xi - 5*xi*xi
+              return std::sqrt(Real(2)) * (-3 + 8*xi - 5*xi*xi
                                       + 10*eta - 14*xi*eta
                                       - 7*eta*eta);
             case 2:
-              return std::sqrt(2.) * (-xi*xi + 2*xi*eta);
+              return std::sqrt(Real(2)) * (-xi*xi + 2*xi*eta);
 
             default:
               libmesh_error_msg("Invalid subtriangle lookup = " <<
@@ -1461,12 +1461,12 @@ Real clough_raw_shape_deriv(const unsigned int basis_num,
           switch (subtriangle_lookup(p))
             {
             case 0:
-              return std::sqrt(2.) * (2*xi*eta - eta*eta);
+              return std::sqrt(Real(2)) * (2*xi*eta - eta*eta);
             case 1:
-              return std::sqrt(2.) * (- 3 + 10*xi - 7*xi*xi
+              return std::sqrt(Real(2)) * (- 3 + 10*xi - 7*xi*xi
                                       + 8*eta - 14*xi*eta - 5*eta*eta);
             case 2:
-              return std::sqrt(2.) * (xi*xi);
+              return std::sqrt(Real(2)) * (xi*xi);
 
             default:
               libmesh_error_msg("Invalid subtriangle lookup = " <<
@@ -1584,13 +1584,13 @@ Real clough_raw_shape(const unsigned int basis_num,
         {
         case 0:
           return xi - 2*xi*xi + xi*xi*xi
-            - 3./2.*eta*eta - 1./2.*xi*eta*eta + 7./3.*eta*eta*eta;
+            - 3./2.*eta*eta - 1./2.*xi*eta*eta + 7./Real(3)*eta*eta*eta;
         case 1:
-          return -1./6. + 5./2.*xi - 9./2.*xi*xi + 13./6.*xi*xi*xi
+          return -1./Real(6) + 5./2.*xi - 9./2.*xi*xi + 13./Real(6)*xi*xi*xi
             - 4*xi*eta + 4*xi*xi*eta
-            + 1./2.*eta*eta + 3./2.*xi*eta*eta - 1./3.*eta*eta*eta;
+            + 1./2.*eta*eta + 3./2.*xi*eta*eta - 1./Real(3)*eta*eta*eta;
         case 2:
-          return xi - 1./2.*xi*xi - 7./6.*xi*xi*xi
+          return xi - 1./2.*xi*xi - 7./Real(6)*xi*xi*xi
             - 3*xi*eta + 2*xi*xi*eta
             + 2*xi*eta*eta;
 
@@ -1603,13 +1603,13 @@ Real clough_raw_shape(const unsigned int basis_num,
         {
         case 0:
           return eta - 3*xi*eta + 2*xi*xi*eta
-            - 1./2.*eta*eta + 2*xi*eta*eta - 7./6.*eta*eta*eta;
+            - 1./2.*eta*eta + 2*xi*eta*eta - 7./Real(6)*eta*eta*eta;
         case 1:
-          return -1./6. + 1./2.*xi*xi - 1./3.*xi*xi*xi
+          return -1./Real(6) + 1./2.*xi*xi - 1./Real(3)*xi*xi*xi
             + 5./2.*eta - 4*xi*eta + 3./2.*xi*xi*eta
-            - 9./2.*eta*eta + 4*xi*eta*eta + 13./6.*eta*eta*eta;
+            - 9./2.*eta*eta + 4*xi*eta*eta + 13./Real(6)*eta*eta*eta;
         case 2:
-          return -3./2.*xi*xi + 7./3.*xi*xi*xi
+          return -3./2.*xi*xi + 7./Real(3)*xi*xi*xi
             + eta - 1./2.*xi*xi*eta - 2*eta*eta + eta*eta*eta;
 
         default:
@@ -1621,13 +1621,13 @@ Real clough_raw_shape(const unsigned int basis_num,
         {
         case 0:
           return -xi*xi + xi*xi*xi
-            - 1./4.*xi*eta*eta + 1./12.*eta*eta*eta;
+            - 1./4.*xi*eta*eta + 1./Real(12)*eta*eta*eta;
         case 1:
-          return -1./6. + 3./4.*xi - 2*xi*xi + 17./12.*xi*xi*xi
+          return -1./Real(6) + 3./4.*xi - 2*xi*xi + 17./Real(12)*xi*xi*xi
             + 3./4.*eta - 5./2.*xi*eta + 7./4.*xi*xi*eta
-            - eta*eta + 7./4.*xi*eta*eta + 5./12.*eta*eta*eta;
+            - eta*eta + 7./4.*xi*eta*eta + 5./Real(12)*eta*eta*eta;
         case 2:
-          return -xi*xi + 13./12.*xi*xi*xi
+          return -xi*xi + 13./Real(12)*xi*xi*xi
             - 1./4.*xi*xi*eta;
 
         default:
@@ -1639,13 +1639,13 @@ Real clough_raw_shape(const unsigned int basis_num,
         {
         case 0:
           return -xi*eta + 2*xi*xi*eta
-            + 1./2.*eta*eta + 7./4.*xi*eta*eta - 13./12.*eta*eta*eta;
+            + 1./2.*eta*eta + 7./4.*xi*eta*eta - 13./Real(12)*eta*eta*eta;
         case 1:
-          return 2./3. - 13./4.*xi + 9./2.*xi*xi - 23./12.*xi*xi*xi
+          return 2./Real(3) - 13./4.*xi + 9./2.*xi*xi - 23./Real(12)*xi*xi*xi
             - 11./4.*eta + 19./2.*xi*eta - 23./4.*xi*xi*eta
-            + 7./2.*eta*eta - 25./4.*xi*eta*eta - 17./12.*eta*eta*eta;
+            + 7./2.*eta*eta - 25./4.*xi*eta*eta - 17./Real(12)*eta*eta*eta;
         case 2:
-          return -1./2.*xi*xi + 5./12.*xi*xi*xi
+          return -1./2.*xi*xi + 5./Real(12)*xi*xi*xi
             + 9./4.*xi*xi*eta;
 
         default:
@@ -1656,13 +1656,13 @@ Real clough_raw_shape(const unsigned int basis_num,
       switch (subtriangle_lookup(p))
         {
         case 0:
-          return -1./2.*eta*eta + 9./4.*xi*eta*eta + 5./12.*eta*eta*eta;
+          return -1./2.*eta*eta + 9./4.*xi*eta*eta + 5./Real(12)*eta*eta*eta;
         case 1:
-          return 2./3. - 11./4.*xi + 7./2.*xi*xi - 17./12.*xi*xi*xi
+          return 2./Real(3) - 11./4.*xi + 7./2.*xi*xi - 17./Real(12)*xi*xi*xi
             - 13./4.*eta + 19./2.*xi*eta - 25./4.*xi*xi*eta
-            + 9./2.*eta*eta - 23./4.*xi*eta*eta - 23./12.*eta*eta*eta;
+            + 9./2.*eta*eta - 23./4.*xi*eta*eta - 23./Real(12)*eta*eta*eta;
         case 2:
-          return 1./2.*xi*xi - 13./12.*xi*xi*xi
+          return 1./2.*xi*xi - 13./Real(12)*xi*xi*xi
             - xi*eta + 7./4.*xi*xi*eta + 2*xi*eta*eta;
 
         default:
@@ -1673,13 +1673,13 @@ Real clough_raw_shape(const unsigned int basis_num,
       switch (subtriangle_lookup(p))
         {
         case 0:
-          return -eta*eta - 1./4.*xi*eta*eta + 13./12.*eta*eta*eta;
+          return -eta*eta - 1./4.*xi*eta*eta + 13./Real(12)*eta*eta*eta;
         case 1:
-          return -1./6. + 3./4.*xi - xi*xi + 5./12.*xi*xi*xi
+          return -1./Real(6) + 3./4.*xi - xi*xi + 5./Real(12)*xi*xi*xi
             + 3./4.*eta - 5./2.*xi*eta + 7./4.*xi*xi*eta
-            - 2*eta*eta + 7./4.*xi*eta*eta + 17./12.*eta*eta*eta;
+            - 2*eta*eta + 7./4.*xi*eta*eta + 17./Real(12)*eta*eta*eta;
         case 2:
-          return 1./12.*xi*xi*xi
+          return 1./Real(12)*xi*xi*xi
             - 1./4.*xi*xi*eta
             - eta*eta + eta*eta*eta;
 
@@ -1691,13 +1691,13 @@ Real clough_raw_shape(const unsigned int basis_num,
       switch (subtriangle_lookup(p))
         {
         case 0:
-          return std::sqrt(2.) * (xi*eta*eta - 1./3.*eta*eta*eta);
+          return std::sqrt(Real(2)) * (xi*eta*eta - 1./Real(3)*eta*eta*eta);
         case 1:
-          return std::sqrt(2.) * (2./3. - 3*xi + 4*xi*xi - 5./3.*xi*xi*xi
+          return std::sqrt(Real(2)) * (2./Real(3) - 3*xi + 4*xi*xi - 5./Real(3)*xi*xi*xi
                                   - 3*eta + 10*xi*eta - 7*xi*xi*eta
-                                  + 4*eta*eta - 7*xi*eta*eta - 5./3.*eta*eta*eta);
+                                  + 4*eta*eta - 7*xi*eta*eta - 5./Real(3)*eta*eta*eta);
         case 2:
-          return std::sqrt(2.) * (-1./3.*xi*xi*xi + xi*xi*eta);
+          return std::sqrt(Real(2)) * (-1./Real(3)*xi*xi*xi + xi*xi*eta);
 
         default:
           libmesh_error_msg("Invalid subtriangle lookup = " <<
@@ -1707,13 +1707,13 @@ Real clough_raw_shape(const unsigned int basis_num,
       switch (subtriangle_lookup(p))
         {
         case 0:
-          return 2*eta*eta - 2*xi*eta*eta - 8./3.*eta*eta*eta;
+          return 2*eta*eta - 2*xi*eta*eta - 8./Real(3)*eta*eta*eta;
         case 1:
-          return -2./3. + 2*xi - 2*xi*xi + 2./3.*xi*xi*xi
+          return -2./Real(3) + 2*xi - 2*xi*xi + 2./Real(3)*xi*xi*xi
             + 4*eta - 8*xi*eta + 4*xi*xi*eta
-            - 6*eta*eta + 6*xi*eta*eta + 8./3.*eta*eta*eta;
+            - 6*eta*eta + 6*xi*eta*eta + 8./Real(3)*eta*eta*eta;
         case 2:
-          return -2*xi*xi + 10./3.*xi*xi*xi
+          return -2*xi*xi + 10./Real(3)*xi*xi*xi
             + 4*xi*eta - 4*xi*xi*eta
             - 4*xi*eta*eta;
 
@@ -1726,13 +1726,13 @@ Real clough_raw_shape(const unsigned int basis_num,
         {
         case 0:
           return 4*xi*eta - 4*xi*xi*eta
-            - 2*eta*eta - 4*xi*eta*eta + 10./3.*eta*eta*eta;
+            - 2*eta*eta - 4*xi*eta*eta + 10./Real(3)*eta*eta*eta;
         case 1:
-          return -2./3. + 4*xi - 6*xi*xi + 8./3.*xi*xi*xi
+          return -2./Real(3) + 4*xi - 6*xi*xi + 8./Real(3)*xi*xi*xi
             + 2*eta - 8*xi*eta + 6*xi*xi*eta
-            - 2*eta*eta + 4*xi*eta*eta + 2./3.*eta*eta*eta;
+            - 2*eta*eta + 4*xi*eta*eta + 2./Real(3)*eta*eta*eta;
         case 2:
-          return 2*xi*xi - 8./3.*xi*xi*xi
+          return 2*xi*xi - 8./Real(3)*xi*xi*xi
             - 2*xi*xi*eta;
 
         default:
