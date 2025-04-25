@@ -798,7 +798,7 @@ void QJacobi::init_1D()
 
             _points[0](0)  = 0.25;
 
-            _weights[0]    = 1./3.;
+            _weights[0]    = 1/Real(3);
 
             return;
           }
