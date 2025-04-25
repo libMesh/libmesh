@@ -840,6 +840,8 @@ unsigned int paranoid_n_levels(const MeshBase & mesh)
 dof_id_type n_connected_components(const MeshBase & mesh,
                                    Real constraint_tol)
 {
+  LOG_SCOPE("n_connected_components()", "MeshTools");
+
   // Yes, I'm being lazy.  This is for mesh analysis before a
   // simulation, not anything going in any loops.
   if (!mesh.is_serial_on_zero())
@@ -858,6 +860,10 @@ dof_id_type n_connected_components(const MeshBase & mesh,
   // to be connected to nodes in other sets.
   std::vector<std::unordered_set<const Node *>> components;
 
+  // With a typical mesh with few components and somewhat-contiguous
+  // ordering, vector performance should be fine.  With a mesh with
+  // many components or completely scrambled ordering, performance
+  // can be a disaster.
   auto find_component = [&components](const Node * n) {
     std::unordered_set<const Node *> * component = nullptr;
 
