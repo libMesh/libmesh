@@ -827,6 +827,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
 
   //Finally prepare the new Mesh for use.  Keep the same numbering and
   //partitioning for now.
+  const bool was_prepared = this->is_prepared();
   this->allow_renumbering(false);
   this->allow_remote_element_removal(false);
   this->allow_find_neighbors(!skip_find_neighbors);
@@ -843,6 +844,13 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
   this->allow_renumbering(other_mesh.allow_renumbering());
   this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
   this->skip_partitioning(other_mesh.skip_partitioning());
+
+  // That prepare_for_use() call marked us as prepared, but we
+  // specifically avoided some important preparation, so we might not
+  // actually be prepared now.
+  if (skip_find_neighbors &&
+      (!was_prepared || !other_mesh.is_prepared()))
+    this->set_isnt_prepared();
 }
 
 
@@ -1787,6 +1795,10 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
   // We rely on neighbor links here
   MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
+
+  // We can't even afford any unset neighbor links here.
+  if (!this->is_prepared())
+    this->find_neighbors();
 
   // FIXME: make distributed mesh support efficient.
   // Yes, we currently suck.

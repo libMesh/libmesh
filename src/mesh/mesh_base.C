@@ -1967,6 +1967,17 @@ MeshBase::post_dofobject_moves(MeshBase && other_mesh)
 }
 
 
+void
+MeshBase::copy_cached_data(const MeshBase & other_mesh)
+{
+  this->_spatial_dimension = other_mesh._spatial_dimension;
+  this->_elem_dims = other_mesh._elem_dims;
+  this->_elem_default_orders = other_mesh._elem_default_orders;
+  this->_supported_nodal_order = other_mesh._supported_nodal_order;
+  this->_mesh_subdomains = other_mesh._mesh_subdomains;
+}
+
+
 bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh) const
 {
   for (const auto & other_node : other_mesh.node_ptr_range())

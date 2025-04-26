@@ -123,6 +123,10 @@ public:
    * different Elem/Node addresses in memory) but not others (we do
    * not accept different subclass types, nor even different Elem/Node
    * ids).
+   *
+   * Though this method is non-virtual, its implementation calls the
+   * virtual function \p subclass_locally_equals() to test for
+   * equality of subclass-specific data as well.
    */
   bool operator== (const MeshBase & other_mesh) const;
 
@@ -138,9 +142,10 @@ public:
    */
   bool locally_equals (const MeshBase & other_mesh) const;
 
-
   /**
-   * Virtual "copy constructor"
+   * Virtual "copy constructor".  The copy will be of the same
+   * subclass as \p this, and will satisfy "copy == this" when it is
+   * created.
    */
   virtual std::unique_ptr<MeshBase> clone() const = 0;
 
@@ -1816,6 +1821,12 @@ protected:
    * operators.
    */
   void post_dofobject_moves(MeshBase && other_mesh);
+
+  /**
+   * Helper class to copy cached data, to synchronize with a possibly
+   * unprepared \p other_mesh
+   */
+  void copy_cached_data (const MeshBase & other_mesh);
 
   /**
    * Shim to allow operator == (&) to behave like a virtual function

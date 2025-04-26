@@ -103,7 +103,13 @@ public:
    * Virtual copy-constructor, creates a copy of this mesh
    */
   virtual std::unique_ptr<MeshBase> clone () const override
-  { return std::make_unique<ReplicatedMesh>(*this); }
+  {
+    auto returnval = std::make_unique<ReplicatedMesh>(*this);
+#ifdef DEBUG
+    libmesh_assert(*returnval == *this);
+#endif
+    return returnval;
+  }
 
   /**
    * Destructor.
