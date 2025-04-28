@@ -86,8 +86,9 @@ protected:
           2 + (sizeof(Real)-1)/sizeof(dof_id_type);
         CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), expected_extra_ints);
         CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), DofObject::invalid_id);
-        elem->set_extra_integer(i1, dof_id_type(elem->point(0)(0)*100));
-        CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(elem->point(0)(0)*100));
+        elem->set_extra_integer(i1, dof_id_type(std::round(elem->point(0)(0)*100)));
+        CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1),
+                             dof_id_type(std::round(elem->point(0)(0)*100)));
         elem->set_extra_datum<Real>(r1, elem->point(0)(0)*1000);
         CPPUNIT_ASSERT_EQUAL(elem->get_extra_datum<Real>(r1), elem->point(0)(0)*1000);
       }
@@ -128,7 +129,8 @@ protected:
         const unsigned int expected_extra_ints =
           2 + (sizeof(Real)-1)/sizeof(dof_id_type);
         CPPUNIT_ASSERT_EQUAL(elem->n_extra_integers(), expected_extra_ints);
-        CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1), dof_id_type(top_parent->point(0)(0)*100));
+        CPPUNIT_ASSERT_EQUAL(elem->get_extra_integer(i1),
+                             dof_id_type(std::round(top_parent->point(0)(0)*100)));
       }
   }
 
