@@ -40,6 +40,7 @@ public:
   CPPUNIT_TEST( testPoly2TriInterp2 );
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriMeshedHoles );
+  CPPUNIT_TEST( testPoly2TriEdge3ToTri6 );
 #  ifdef LIBMESH_ENABLE_AMR
     CPPUNIT_TEST( testPoly2TriRoundHole );
 #  endif
@@ -76,6 +77,7 @@ public:
 #  endif
   CPPUNIT_TEST( testTriangleEdges );
   CPPUNIT_TEST( testTriangleSegments );
+  CPPUNIT_TEST( testTriangleEdge3ToTri6 );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -334,6 +336,38 @@ public:
       }
   }
 
+  void testEdge3ToTri6Base(MeshBase & mesh,
+                           TriangulatorInterface & triangulator)
+  {
+    commonSettings(triangulator);
+
+    triangulator.elem_type() = TRI6;
+    triangulator.triangulate();
+    const Real hsq2 = std::sqrt(2) / 2.0;
+
+    // Check element number
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), (dof_id_type)2);
+    for (const auto & elem : mesh.element_ptr_range())
+    {
+      // Check element type
+      CPPUNIT_ASSERT_EQUAL(elem->type(), TRI6);
+
+      for (const auto & i_side : make_range(elem->n_sides()))
+      {
+        // We only want to check the sides on the external boundary
+        if (elem->neighbor_ptr(i_side) == nullptr)
+        {
+          const Point & side_pt_0 = *(elem->node_ptr(i_side));
+          const Point & side_pt_1 = *(elem->node_ptr((i_side + 1) % 3));
+          const Point & side_pt_2 = *(elem->node_ptr(i_side + 3));
+          const bool x_sign = (side_pt_0(0) == 1 || side_pt_1(0) == 1);
+          const bool y_sign = (side_pt_0(1) == 1 || side_pt_1(1) == 1);
+          const Point ref_side_pt_2 = Point (x_sign ? hsq2 : -hsq2, y_sign ? hsq2 : -hsq2);
+          CPPUNIT_ASSERT_EQUAL(ref_side_pt_2, side_pt_2);
+        }
+      }
+    }
+  }
 
   void testTriangulator(MeshBase & mesh,
                         TriangulatorInterface & triangulator)
@@ -664,6 +698,38 @@ public:
     mesh.prepare_for_use();
   }
 
+  void testEdge3Mesh(MeshBase & mesh)
+  {
+    const Real hsq2 = std::sqrt(2) / 2.0;
+    auto node0 = mesh.add_point(Point(1,0), 0);
+    auto node1 = mesh.add_point(Point(hsq2,hsq2), 1);
+    auto node2 = mesh.add_point(Point(0,1), 2);
+    auto node3 = mesh.add_point(Point(-hsq2,hsq2), 3);
+    auto node4 = mesh.add_point(Point(-1,0), 4);
+    auto node5 = mesh.add_point(Point(-hsq2,-hsq2), 5);
+    auto node6 = mesh.add_point(Point(0,-1), 6);
+    auto node7 = mesh.add_point(Point(hsq2,-hsq2), 7);
+
+    auto edge021 = mesh.add_elem(Elem::build(EDGE3));
+    edge021->set_node(0) = node0;
+    edge021->set_node(1) = node2;
+    edge021->set_node(2) = node1;
+    auto edge243 = mesh.add_elem(Elem::build(EDGE3));
+    edge243->set_node(0) = node2;
+    edge243->set_node(1) = node4;
+    edge243->set_node(2) = node3;
+    auto edge465 = mesh.add_elem(Elem::build(EDGE3));
+    edge465->set_node(0) = node4;
+    edge465->set_node(1) = node6;
+    edge465->set_node(2) = node5;
+    auto edge607 = mesh.add_elem(Elem::build(EDGE3));
+    edge607->set_node(0) = node6;
+    edge607->set_node(1) = node0;
+    edge607->set_node(2) = node7;
+
+    mesh.prepare_for_use();
+  }
+
 
   void testHalfDomain(MeshBase & mesh,
                       TriangulatorInterface & triangulator,
@@ -810,7 +876,6 @@ public:
     this->testTriangulatorBase(mesh, triangulator);
   }
 
-
   void testTriangleSegments()
   {
     LOG_UNIT_TEST;
@@ -819,6 +884,19 @@ public:
     TriangleInterface triangle(mesh);
     testTriangulatorSegments(mesh, triangle);
   }
+
+  void testTriangleEdge3ToTri6()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    TriangleInterface triangulator(mesh);
+
+    testEdge3Mesh(mesh);
+
+    this->testEdge3ToTri6Base(mesh, triangulator);
+  }
+
 #endif // LIBMESH_HAVE_TRIANGLE
 
 
@@ -890,6 +968,18 @@ public:
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorMeshedHoles(mesh, p2t_tri);
+  }
+
+  void testPoly2TriEdge3ToTri6()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator triangulator(mesh);
+
+    testEdge3Mesh(mesh);
+
+    this->testEdge3ToTri6Base(mesh, triangulator);
   }
 
 
