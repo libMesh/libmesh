@@ -1682,7 +1682,7 @@ Real Elem::quality (const ElemQuality q) const
         for (auto n : this->node_index_range())
           {
             // Get list of edge ids adjacent to this node.
-            auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
+            const auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
 
             // Skip any nodes with fewer than 2 adjacent edges. You
             // need at least two adjacent edges to form an interior
@@ -1757,24 +1757,24 @@ Real Elem::quality (const ElemQuality q) const
         for (auto e : this->edge_index_range())
           {
             // Get list of edge ids adjacent to this node.
-            auto adjacent_side_ids = this->sides_on_edge(e);
+            const auto adjacent_side_ids = this->sides_on_edge(e);
 
             // All 3D elements should have exactly two sides adjacent to each edge.
             libmesh_assert_equal_to(adjacent_side_ids.size(), 2);
 
             // Get lists of node ids on each side
-            auto side_0_node_ids = this->nodes_on_side(adjacent_side_ids[0]);
-            auto side_1_node_ids = this->nodes_on_side(adjacent_side_ids[1]);
+            const auto side_0_node_ids = this->nodes_on_side(adjacent_side_ids[0]);
+            const auto side_1_node_ids = this->nodes_on_side(adjacent_side_ids[1]);
 
             // All 3D elements have at least three nodes on each side
             libmesh_assert_greater_equal(side_0_node_ids.size(), 3);
             libmesh_assert_greater_equal(side_1_node_ids.size(), 3);
 
             // Construct (approximate) inward normal on each adjacent side
-            auto side_0_normal =
+            const auto side_0_normal =
               (this->point(side_0_node_ids[2]) - this->point(side_0_node_ids[0])).cross
               (this->point(side_0_node_ids[1]) - this->point(side_0_node_ids[0])).unit();
-            auto side_1_normal =
+            const auto side_1_normal =
               (this->point(side_1_node_ids[2]) - this->point(side_1_node_ids[0])).cross
               (this->point(side_1_node_ids[1]) - this->point(side_1_node_ids[0])).unit();
 
