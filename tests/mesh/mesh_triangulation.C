@@ -152,11 +152,8 @@ public:
         const int n_sides = i+2;
         const TriangulatorInterface::Hole & hole = polyholes[i];
 
-        // Really?  This isn't until C++20?
-        constexpr double my_pi = 3.141592653589793238462643383279;
-
         const Real computed_area = hole.area();
-        const Real theta = my_pi/n_sides;
+        const Real theta = pi/n_sides;
         const Real half_side_length = radius*std::cos(theta);
         const Real apothem = radius*std::sin(theta);
         const Real area = n_sides * apothem * half_side_length;
