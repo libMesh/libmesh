@@ -291,7 +291,7 @@ public:
     LOG_UNIT_TEST;
     testCoreform("meshes/geom_2.exo",
                  "matrices/geom_2_extraction_op.m",
-                 0.09598270393980124874069039295234223854L);
+                 0.09598270393980124874069039295234223854_R);
   }
 
 
@@ -300,7 +300,7 @@ public:
     LOG_UNIT_TEST;
     testCoreform("meshes/geom_4.exo",
                  "matrices/geom_4_extraction_op.m",
-                 0.1040405127939275102143852084416339522L);
+                 0.1040405127939275102143852084416339522_R);
   }
 
 
@@ -309,7 +309,7 @@ public:
     LOG_UNIT_TEST;
     testCoreform("meshes/geom_8.exo",
                  "matrices/geom_8_extraction_op.m",
-                 0.103252835327032837145271735988790535L);
+                 0.103252835327032837145271735988790535_R);
   }
 
 
