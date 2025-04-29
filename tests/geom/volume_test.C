@@ -860,7 +860,7 @@ public:
       // Same element as in testTet4DihedralAngle(). Here we verify that
       // the element is low quality since the SCALED_JACOBIAN is < O(h)
       // as h -> 0, and h can be arbitrarily small in the squashed element.
-      Real h = 0.01;
+      Real h = Real(1)/100;
       std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(0, 1, 0), Point(1, 1, h)};
       auto [elem, nodes] = this->construct_elem(pts, TET4);
       libmesh_ignore(nodes);
