@@ -873,7 +873,8 @@ public:
       // libMesh::out << "Squashed Tet4 scaled_jac = " << scaled_jac << std::endl;
 
       LIBMESH_ASSERT_FP_EQUAL(/*expected=*/h, /*actual=*/jac, TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/h/std::sqrt(h*h + 2), /*actual=*/scaled_jac, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/h/(h*h+1)/std::sqrt(h*h+2),
+                              /*actual=*/scaled_jac, TOLERANCE * TOLERANCE);
     }
 
     {
