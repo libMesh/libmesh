@@ -86,8 +86,8 @@ public:
     _matrix->set(beginning_index + 1, beginning_index, 1);
 
     // Test that off-diagonal elements are always zero
-    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real((*_matrix)(beginning_index, beginning_index + 1)), _tolerance);
-    LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real((*_matrix)(beginning_index + 1, beginning_index)), _tolerance);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(0, (*_matrix)(beginning_index, beginning_index + 1), _tolerance);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(0, (*_matrix)(beginning_index + 1, beginning_index), _tolerance);
 
     // Test add
     {
@@ -105,9 +105,9 @@ public:
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
       {
         if (i)
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, i)), i, _tolerance);
+          LIBMESH_ASSERT_NUMBERS_EQUAL((*_matrix)(i, i), i, _tolerance);
         else
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, i)), _comm->size(), _tolerance);
+          LIBMESH_ASSERT_NUMBERS_EQUAL((*_matrix)(i, i), _comm->size(), _tolerance);
       }
     }
 
@@ -128,9 +128,9 @@ public:
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
       {
         if (i != _global_size - 1)
-          LIBMESH_ASSERT_FP_EQUAL(i, libmesh_real((*_matrix)(i, i)), _tolerance);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(i, (*_matrix)(i, i), _tolerance);
         else
-          LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real((*_matrix)(i, i)), _tolerance);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(0, (*_matrix)(i, i), _tolerance);
       }
     }
 
@@ -156,7 +156,7 @@ public:
       _matrix->close();
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
-        LIBMESH_ASSERT_FP_EQUAL(i, libmesh_real((*_matrix)(i, i)), _tolerance);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(i, (*_matrix)(i, i), _tolerance);
 
       // Build
       auto diagonal = NumericVector<Number>::build(*_comm);
@@ -177,18 +177,18 @@ public:
       _matrix->close();
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
-        LIBMESH_ASSERT_FP_EQUAL(2 * i, libmesh_real((*_matrix)(i, i)), _tolerance);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(2 * i, (*_matrix)(i, i), _tolerance);
 
       // SparseMatrix add
       _matrix->add(-1, copy);
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
-        LIBMESH_ASSERT_FP_EQUAL(i, libmesh_real((*_matrix)(i, i)), _tolerance);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(i, (*_matrix)(i, i), _tolerance);
 
       _matrix->get_transpose(copy);
 
       for (numeric_index_type i = beginning_index; i < end_index; ++i)
-        LIBMESH_ASSERT_FP_EQUAL(i, libmesh_real(copy(i, i)), _tolerance);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(i, copy(i, i), _tolerance);
     }
 
     // Test norms
@@ -204,9 +204,9 @@ public:
         for (numeric_index_type j = beginning_index; j < end_index; ++j)
         {
           if (i == j)
-            LIBMESH_ASSERT_FP_EQUAL(1, libmesh_real((*_matrix)(i, j)), _tolerance);
+            LIBMESH_ASSERT_NUMBERS_EQUAL(1, (*_matrix)(i, j), _tolerance);
           else
-            LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real((*_matrix)(i, j)), _tolerance);
+            LIBMESH_ASSERT_NUMBERS_EQUAL(0, (*_matrix)(i, j), _tolerance);
         }
     }
   }

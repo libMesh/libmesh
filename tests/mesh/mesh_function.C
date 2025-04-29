@@ -123,22 +123,22 @@ public:
             mesh_function(c, 0, vec_values, nullptr);
             const Number retval3 = vec_values.empty() ? -12345 : vec_values(0);
 
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(retval3), expected_value,
-                                    TOLERANCE * TOLERANCE);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (retval3, expected_value, TOLERANCE * TOLERANCE);
 
             if (sbdids1.count(elem->subdomain_id()))
               {
                 CPPUNIT_ASSERT(!sbdids2.count(elem->subdomain_id()));
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(retval1), expected_value,
-                                        TOLERANCE * TOLERANCE);
+                LIBMESH_ASSERT_NUMBERS_EQUAL
+                  (retval1, expected_value, TOLERANCE * TOLERANCE);
 
                 mesh_function(c, 0, vec_values, &sbdids2);
                 CPPUNIT_ASSERT(vec_values.empty());
               }
             else
               {
-                LIBMESH_ASSERT_FP_EQUAL(libmesh_real(retval2), expected_value,
-                                        TOLERANCE * TOLERANCE);
+                LIBMESH_ASSERT_NUMBERS_EQUAL
+                  (retval2, expected_value, TOLERANCE * TOLERANCE);
 
                 mesh_function(c, 0, vec_values, &sbdids1);
                 CPPUNIT_ASSERT(vec_values.empty());
@@ -215,10 +215,8 @@ public:
                               dummy,
                               dummy);
 
-        LIBMESH_ASSERT_FP_EQUAL
-          (libmesh_real(vec_values(0)),
-           libmesh_real(mesh_function_value),
-           TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_NUMBERS_EQUAL
+          (vec_values(0), mesh_function_value, TOLERANCE*TOLERANCE);
       }
   }
 #endif // LIBMESH_ENABLE_AMR

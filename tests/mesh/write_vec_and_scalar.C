@@ -124,27 +124,27 @@ public:
         const dof_id_type gold_i_v  = gold_i_uy + 1;
         CPPUNIT_ASSERT_LESS(gold_vector.size(), std::size_t(gold_i_v));
 
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,0,0))),
-                                gold_vector[gold_i_ux], tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,v2,0))),
-                                gold_vector[gold_i_uy], tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,2*v2,0))),
-                                gold_vector[gold_i_v], tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(sys2_soln(node->dof_number(0,0,0)),
+                                    gold_vector[gold_i_ux], tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(sys2_soln(node->dof_number(0,v2,0)),
+                                    gold_vector[gold_i_uy], tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(sys2_soln(node->dof_number(0,2*v2,0)),
+                                    gold_vector[gold_i_v], tol);
 
         // Let's check imaginary parts and magnitude for good measure
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,1,0))),
-                                0.0, tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,2,0))),
-                                std::abs(gold_vector[gold_i_ux]), tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,4,0))),
-                                0.0, tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,5,0))),
-                                std::abs(gold_vector[gold_i_uy]), tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,7,0))),
-                                0.0, tol);
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys2_soln(node->dof_number(0,8,0))),
-                                std::abs(gold_vector[gold_i_v]), tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(sys2_soln(node->dof_number(0,1,0)),
+                                    0.0, tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(sys2_soln(node->dof_number(0,2,0)),
+                                    std::abs(gold_vector[gold_i_ux]), tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(sys2_soln(node->dof_number(0,4,0)),
+                                    0.0, tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(sys2_soln(node->dof_number(0,5,0)),
+                                    std::abs(gold_vector[gold_i_uy]), tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(sys2_soln(node->dof_number(0,7,0)),
+                                    0.0, tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(sys2_soln(node->dof_number(0,8,0)),
+                                    std::abs(gold_vector[gold_i_v]), tol);
 #endif
       }
   }

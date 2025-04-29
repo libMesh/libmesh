@@ -565,9 +565,8 @@ public:
         for (Real y = 0; y < 1 + TOLERANCE; y += Real(1.L/3.L))
           {
             Point p(x,y);
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                    libmesh_real(6*x+60*y),
-                                    exotol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (sys.point_value(0,p), 6*x+60*y, exotol);
           }
     }
   }
@@ -655,9 +654,8 @@ public:
         for (Real y = Real(1.L/6.L); y < 1; y += Real(1.L/3.L))
           {
             Point p(x,y);
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                    libmesh_real(6*x+60*y),
-                                    exotol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (sys.point_value(0,p), 6*x+60*y, exotol);
           }
     }
   }
@@ -834,12 +832,10 @@ public:
         for (Real y = Real(1.L/6.L); y < 1; y += Real(1.L/3.L))
           {
             Point p(x,y);
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                    libmesh_real(6*x+60*y),
-                                    exotol);
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(1,p)),
-                                    libmesh_real(sin(x)+cos(y)),
-                                    exotol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (sys.point_value(0,p), 6*x+60*y, exotol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (sys.point_value(1,p), sin(x)+cos(y), exotol);
           }
     }
   }
@@ -1710,7 +1706,7 @@ public:
       {
         if (elem->type() == NODEELEM)
           continue;
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(0.04), elem->volume(), TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(Real(0.04), elem->volume(), TOLERANCE);
 
         for (unsigned int n=0; n != 9; ++n)
           CPPUNIT_ASSERT_EQUAL

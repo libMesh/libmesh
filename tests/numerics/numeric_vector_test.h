@@ -82,70 +82,70 @@ public:
     CPPUNIT_ASSERT(!relative_fuzzy_equals(v, vorig));
 
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              libMesh::Real(2*n+2),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), libMesh::Real(2*n+2),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v *= v;
 
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              libMesh::Real(4*n*n+8*n+4),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), libMesh::Real(4*n*n+8*n+4),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v -= vorig;
 
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              libMesh::Real(4*n*n+7*n+3),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), libMesh::Real(4*n*n+7*n+3),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v /= vorig;
 
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              libMesh::Real(4*n+3),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), libMesh::Real(4*n+3),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v.add(1);
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              libMesh::Real(4*n+4),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), libMesh::Real(4*n+4),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v.add(2, vorig);
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              libMesh::Real(6*n+6),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), libMesh::Real(6*n+6),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v.scale(1/libMesh::Real(3));
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              libMesh::Real(2*n+2),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), libMesh::Real(2*n+2),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v = 4;
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              libMesh::Real(4),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), libMesh::Real(4),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v = vorig;
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              libMesh::Real(n+1),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), libMesh::Real(n+1),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
     v.reciprocal();
     for (libMesh::dof_id_type n=first; n != last; n++)
-      LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v(n)),
-                              1/libMesh::Real(n+1),
-                              libMesh::TOLERANCE*libMesh::TOLERANCE);
+      LIBMESH_ASSERT_NUMBERS_EQUAL
+        (v(n), 1/libMesh::Real(n+1),
+         libMesh::TOLERANCE*libMesh::TOLERANCE);
 
-    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v.dot(vorig)),
-                            libMesh::Real(global_size),
-                            libMesh::TOLERANCE*libMesh::TOLERANCE);
+    LIBMESH_ASSERT_NUMBERS_EQUAL
+      (v.dot(vorig), libMesh::Real(global_size),
+       libMesh::TOLERANCE*libMesh::TOLERANCE);
   }
 
   template <class Base, class Derived>
@@ -171,7 +171,7 @@ public:
       std::sqrt(libMesh::Real(global_size-1) *
                 (2*global_size) *
                 (2*global_size-1) / 3);
-    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(v.sum()), -exact_l1,
+    LIBMESH_ASSERT_NUMBERS_EQUAL(v.sum(), -exact_l1,
                             libMesh::TOLERANCE*libMesh::TOLERANCE);
     LIBMESH_ASSERT_FP_EQUAL(v.l1_norm(), exact_l1,
                             libMesh::TOLERANCE*libMesh::TOLERANCE);
@@ -231,9 +231,8 @@ public:
       if (!to_one || my_comm->rank() == root_pid)
         // Yes I really mean v.size()
         for (libMesh::dof_id_type i=0; i<v.size(); i++)
-          LIBMESH_ASSERT_FP_EQUAL(2.*libMesh::libmesh_real(i),
-                                  libMesh::libmesh_real(l[i]),
-                                  libMesh::TOLERANCE*libMesh::TOLERANCE);
+          LIBMESH_ASSERT_NUMBERS_EQUAL
+            (2.*i, l[i], libMesh::TOLERANCE*libMesh::TOLERANCE);
 
       for (libMesh::dof_id_type n=first; n != last; n++)
       {
@@ -250,9 +249,8 @@ public:
       if (!to_one || my_comm->rank() == root_pid)
         // Yes I really mean v.size()
         for (libMesh::dof_id_type i=0; i<v.size(); i++)
-          LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(i),
-                                  libMesh::libmesh_real(l[i]),
-                                  libMesh::TOLERANCE*libMesh::TOLERANCE);
+          LIBMESH_ASSERT_NUMBERS_EQUAL
+            (libMesh::Real(i), l[i], libMesh::TOLERANCE*libMesh::TOLERANCE);
     }
   }
 
@@ -292,9 +290,9 @@ public:
         {
           end_index += block_size + p;
           for (unsigned int j = 0; j != block_size; ++j)
-            LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(values[p*block_size+j]),
-                                    libMesh::libmesh_real(end_index-j-1),
-                                    libMesh::TOLERANCE*libMesh::TOLERANCE);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (values[p*block_size+j], libMesh::Real(end_index-j-1),
+               libMesh::TOLERANCE*libMesh::TOLERANCE);
         }
     }
   }

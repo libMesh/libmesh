@@ -72,9 +72,9 @@ public:
       for (const auto j : make_range(beginning_index, end_index))
       {
         if (i != j)
-          LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real((*_matrix)(i, j)), _tolerance);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(0, (*_matrix)(i, j), _tolerance);
         else
-          LIBMESH_ASSERT_FP_EQUAL(gold_values[i - beginning_index], libmesh_real((*_matrix)(i, i)), _tolerance);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(gold_values[i - beginning_index], (*_matrix)(i, i), _tolerance);
       }
 
     // Test set
@@ -87,7 +87,7 @@ public:
     _matrix->close();
 
     for (const auto i : make_range(beginning_index, end_index))
-      LIBMESH_ASSERT_FP_EQUAL(gold_values[i - beginning_index], libmesh_real((*_matrix)(i, i)), _tolerance);
+      LIBMESH_ASSERT_NUMBERS_EQUAL(gold_values[i - beginning_index], (*_matrix)(i, i), _tolerance);
 
     // Test clone
     auto copy = _matrix->clone();
@@ -100,7 +100,7 @@ public:
 
     for (const auto i : make_range(beginning_index, end_index))
       for (const auto j : make_range(beginning_index, end_index))
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real((*_matrix)(i, j)), libmesh_real((*copy)(i, j)), _tolerance);
+        LIBMESH_ASSERT_NUMBERS_EQUAL((*_matrix)(i, j), (*copy)(i, j), _tolerance);
 
     // Test zero clone
     auto zero_copy = _matrix->zero_clone();
@@ -113,7 +113,7 @@ public:
 
     for (const auto i : make_range(beginning_index, end_index))
       for (const auto j : make_range(beginning_index, end_index))
-        LIBMESH_ASSERT_FP_EQUAL(0, libmesh_real((*zero_copy)(i, j)), _tolerance);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(0, (*zero_copy)(i, j), _tolerance);
   }
 
 private:

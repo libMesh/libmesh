@@ -111,9 +111,9 @@ public:
                libMesh::index_range(cols_to_get))
             {
               CPPUNIT_ASSERT_EQUAL(cols_to_get[col_j], col_start + col_j);
-              LIBMESH_ASSERT_FP_EQUAL
+              LIBMESH_ASSERT_NUMBERS_EQUAL
                 ((i - matrix->row_start() + 1) * (col_j + 1) * (my_comm->rank() + 1),
-                 libMesh::libmesh_real(values[col_j]), _tolerance);
+                 values[col_j], _tolerance);
             }
         }
     };

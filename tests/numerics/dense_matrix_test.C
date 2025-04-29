@@ -48,7 +48,8 @@ private:
 
     for (unsigned int i = 0; i < a.size(); ++i)
       for (unsigned int j = 0; j < b.size(); ++j)
-        LIBMESH_ASSERT_FP_EQUAL(libmesh_real(a_times_b(i,j)), libmesh_real(a_times_b_correct(i,j)), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_NUMBERS_EQUAL
+          (a_times_b(i,j), a_times_b_correct(i,j), TOLERANCE*TOLERANCE);
   }
 
   void testSVD()
@@ -81,11 +82,11 @@ private:
 
     for (unsigned i=0; i<U.m(); ++i)
       for (unsigned j=0; j<U.n(); ++j)
-        LIBMESH_ASSERT_FP_EQUAL( libmesh_real(U(i,j)), libmesh_real(true_U(i,j)), tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL( U(i,j), true_U(i,j), tol);
 
     for (unsigned i=0; i<VT.m(); ++i)
       for (unsigned j=0; j<VT.n(); ++j)
-        LIBMESH_ASSERT_FP_EQUAL( libmesh_real(VT(i,j)), libmesh_real(true_VT(i,j)), tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL( VT(i,j), true_VT(i,j), tol);
 
     for (unsigned i=0; i<sigma.size(); ++i)
       LIBMESH_ASSERT_FP_EQUAL(sigma(i), true_sigma(i), tol);

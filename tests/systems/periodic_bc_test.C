@@ -243,9 +243,8 @@ private:
           Point p{x,y};
           const Number exact = quadratic_solution(p,params,"","");
           const Number approx = sys.point_value(0,p);
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(exact),
-                                  libmesh_real(approx),
-                                  TOLERANCE*TOLERANCE*20);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(exact, approx,
+                                      TOLERANCE*TOLERANCE*20);
         }
   }
 

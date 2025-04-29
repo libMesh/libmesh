@@ -155,31 +155,22 @@ public:
                z = LIBMESH_DIM > 2 ? p(2) : 0;
 
           if (family == RATIONAL_BERNSTEIN && order > 1)
-            LIBMESH_ASSERT_FP_EQUAL
-              (libmesh_real(rational_test(p, dummy, "", "")),
-               libmesh_real(u),
-               this->_value_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (rational_test(p, dummy, "", ""), u, this->_value_tol);
           else if (order > 3)
-            LIBMESH_ASSERT_FP_EQUAL
-              (libmesh_real(fe_quartic_test(p, dummy, "", "")),
-               libmesh_real(u),
-               this->_value_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (fe_quartic_test(p, dummy, "", ""), u, this->_value_tol);
           else if (order > 2)
-            LIBMESH_ASSERT_FP_EQUAL
-              (libmesh_real(fe_cubic_test(p, dummy, "", "")),
-               libmesh_real(u),
-               this->_value_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (fe_cubic_test(p, dummy, "", ""), u, this->_value_tol);
           else if (order > 1)
-            LIBMESH_ASSERT_FP_EQUAL
-              (libmesh_real(x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y +
-                            0.0625*x*z + 0.03125*y*z),
-               libmesh_real(u),
-               this->_value_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (x*x + 0.5*y*y + 0.25*z*z + 0.125*x*y +
+                            0.0625*x*z + 0.03125*y*z,
+               u, this->_value_tol);
           else
-            LIBMESH_ASSERT_FP_EQUAL
-              (libmesh_real(x + 0.25*y + 0.0625*z),
-               libmesh_real(u),
-               this->_value_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL (x + 0.25*y + 0.0625*z, u,
+                                         this->_value_tol);
         }
     };
 
@@ -248,17 +239,17 @@ public:
 
           const Gradient true_tangential_grad = true_grad - ((true_grad * n) * n);
 
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(tangential_grad_u(0)),
-                                  libmesh_real(true_tangential_grad(0)),
-                                  this->_grad_tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(tangential_grad_u(0),
+                                      true_tangential_grad(0),
+                                      this->_grad_tol);
           if (this->_dim > 1)
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(tangential_grad_u(1)),
-                                    libmesh_real(true_tangential_grad(1)),
-                                    this->_grad_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL(tangential_grad_u(1),
+                                        true_tangential_grad(1),
+                                        this->_grad_tol);
           if (this->_dim > 2)
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(tangential_grad_u(2)),
-                                    libmesh_real(true_tangential_grad(2)),
-                                    this->_grad_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL(tangential_grad_u(2),
+                                        true_tangential_grad(2),
+                                        this->_grad_tol);
         }
     };
 
@@ -332,17 +323,17 @@ public:
 
           const Gradient true_tangential_grad = true_grad - ((true_grad * n) * n);
 
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(tangential_grad_u(0)),
-                                  libmesh_real(true_tangential_grad(0)),
-                                  this->_grad_tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(tangential_grad_u(0),
+                                      true_tangential_grad(0),
+                                      this->_grad_tol);
           if (this->_dim > 1)
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(tangential_grad_u(1)),
-                                    libmesh_real(true_tangential_grad(1)),
+            LIBMESH_ASSERT_NUMBERS_EQUAL(tangential_grad_u(1),
+                                    true_tangential_grad(1),
                                     this->_grad_tol);
           if (this->_dim > 2)
-            LIBMESH_ASSERT_FP_EQUAL(libmesh_real(tangential_grad_u(2)),
-                                    libmesh_real(true_tangential_grad(2)),
-                                    this->_grad_tol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL(tangential_grad_u(2),
+                                        true_tangential_grad(2),
+                                        this->_grad_tol);
         }
     };
 
@@ -403,29 +394,29 @@ public:
           // Subtract off values only relevant in normal directions
           RealTensor tangential_hess = tangential_hessian(true_hess, n);
 
-          LIBMESH_ASSERT_FP_EQUAL(tangential_hess(0,0), libmesh_real(hess_u(0,0)),
-                                  this->_hess_tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(tangential_hess(0,0),
+                                      hess_u(0,0), this->_hess_tol);
           if (this->_dim > 1)
             {
-              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,1)), libmesh_real(hess_u(1,0)),
-                                      this->_hess_tol);
-              LIBMESH_ASSERT_FP_EQUAL(tangential_hess(0,1), libmesh_real(hess_u(0,1)),
-                                      this->_hess_tol);
-              LIBMESH_ASSERT_FP_EQUAL(tangential_hess(1,1), libmesh_real(hess_u(1,1)),
-                                      this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (hess_u(0,1), hess_u(1,0), this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(0,1), hess_u(0,1), this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(1,1), hess_u(1,1), this->_hess_tol);
             }
           if (this->_dim > 2)
             {
-              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(0,2)), libmesh_real(hess_u(2,0)),
-                                      this->_hess_tol);
-              LIBMESH_ASSERT_FP_EQUAL(libmesh_real(hess_u(1,2)), libmesh_real(hess_u(2,1)),
-                                      this->_hess_tol);
-              LIBMESH_ASSERT_FP_EQUAL(tangential_hess(0,2), libmesh_real(hess_u(0,2)),
-                                      this->_hess_tol);
-              LIBMESH_ASSERT_FP_EQUAL(tangential_hess(1,2), libmesh_real(hess_u(1,2)),
-                                      this->_hess_tol);
-              LIBMESH_ASSERT_FP_EQUAL(tangential_hess(2,2), libmesh_real(hess_u(2,2)),
-                                      this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (hess_u(0,2), hess_u(2,0), this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (hess_u(1,2), hess_u(2,1), this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(0,2), hess_u(0,2), this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(1,2), hess_u(1,2), this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(2,2), hess_u(2,2), this->_hess_tol);
             }
         }
     };
@@ -517,23 +508,23 @@ public:
           // Subtract off values only relevant in normal directions
           RealTensor tangential_hess = tangential_hessian(true_hess, n);
 
-          LIBMESH_ASSERT_FP_EQUAL(tangential_hess(0,0), libmesh_real(hess_u(0,0)),
-                                  this->_hess_tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL
+            (tangential_hess(0,0), hess_u(0,0), this->_hess_tol);
           if (this->_dim > 1)
             {
-              LIBMESH_ASSERT_FP_EQUAL(tangential_hess(0,1), libmesh_real(hess_u(0,1)),
-                                      this->_hess_tol);
-              LIBMESH_ASSERT_FP_EQUAL(tangential_hess(1,1), libmesh_real(hess_u(1,1)),
-                                      this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(0,1), hess_u(0,1), this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(1,1), hess_u(1,1), this->_hess_tol);
             }
           if (this->_dim > 2)
             {
-              LIBMESH_ASSERT_FP_EQUAL( tangential_hess(0,2), libmesh_real(hess_u(0,2)),
-                                       this->_hess_tol);
-              LIBMESH_ASSERT_FP_EQUAL( tangential_hess(1,2), libmesh_real(hess_u(1,2)),
-                                       this->_hess_tol);
-              LIBMESH_ASSERT_FP_EQUAL( tangential_hess(2,2), libmesh_real(hess_u(2,2)),
-                                       this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(0,2), hess_u(0,2), this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(1,2), hess_u(1,2), this->_hess_tol);
+              LIBMESH_ASSERT_NUMBERS_EQUAL
+                (tangential_hess(2,2), hess_u(2,2), this->_hess_tol);
             }
         }
     };

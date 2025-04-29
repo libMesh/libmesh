@@ -299,9 +299,10 @@ public:
       for (Real y = 0.1; y < 1; y += 0.2)
         {
           Point p(x,y);
-          LIBMESH_ASSERT_FP_EQUAL(libmesh_real(sys.point_value(0,p)),
-                                  libmesh_real(bilinear_test(p,es.parameters,"","")),
-                                  TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_NUMBERS_EQUAL
+            (sys.point_value(0,p),
+             bilinear_test(p,es.parameters,"",""),
+             TOLERANCE*TOLERANCE);
         }
   }
 
