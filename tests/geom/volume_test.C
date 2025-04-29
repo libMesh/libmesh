@@ -236,7 +236,7 @@ public:
     // floating point accuracy.
     middle_node = Point(0.5, 0.1, 0.);
     right_node = Point(1., 0., 0.);
-    LIBMESH_ASSERT_FP_EQUAL(edge3->Elem::volume(), edge3->volume(), std::sqrt(TOLERANCE));
+    LIBMESH_ASSERT_FP_EQUAL(edge3->Elem::volume(), edge3->volume(), 1e-4);
   }
 
   void testEdge3Invertible()
