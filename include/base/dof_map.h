@@ -947,6 +947,18 @@ public:
                               const MeshBase & mesh,
                               unsigned int var_num) const;
 
+  /**
+   * If T == dof_id_type, counts, if T == std::vector<dof_id_type>, fills an
+   * array of, those dof indices which belong to the given variable number and
+   * live on the current processor.
+   */
+  template <typename T,
+            std::enable_if_t<std::is_same_v<T, dof_id_type> ||
+                                 std::is_same_v<T, std::vector<dof_id_type>>,
+                             int> = 0>
+  void local_variable_indices(T & idx, unsigned int var_num) const
+  { this->local_variable_indices(idx, this->_mesh, var_num); }
+
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
   //--------------------------------------------------------------------
