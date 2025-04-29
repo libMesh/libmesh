@@ -844,7 +844,7 @@ void UNVIO::elements_in (std::istream & in_file)
           auto & node_ptr =
             libmesh_map_find(_unv_node_id_to_libmesh_node_ptr, node_labels[j]);
 
-          elem->set_node(assign_elem_nodes[j]) = node_ptr;
+          elem->set_node(assign_elem_nodes[j], node_ptr);
         }
 
       elems_of_dimension[elem->dim()] = true;

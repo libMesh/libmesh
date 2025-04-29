@@ -414,7 +414,7 @@ void TetGenMeshInterface::assign_nodes_to_elem(unsigned * node_labels, Elem * el
 
       Node * current_node = this->_mesh.node_ptr( mapped_node_id );
 
-      elem->set_node(j) = current_node;
+      elem->set_node(j, current_node);
     }
 }
 

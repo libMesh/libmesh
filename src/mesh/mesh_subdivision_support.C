@@ -105,9 +105,9 @@ void MeshTools::Subdivision::all_subdivision(MeshBase & mesh)
 
       auto tri = Elem::build_with_id(TRI3SUBDIVISION, elem->id());
       tri->subdomain_id() = elem->subdomain_id();
-      tri->set_node(0) = elem->node_ptr(0);
-      tri->set_node(1) = elem->node_ptr(1);
-      tri->set_node(2) = elem->node_ptr(2);
+      tri->set_node(0, elem->node_ptr(0));
+      tri->set_node(1, elem->node_ptr(1));
+      tri->set_node(2, elem->node_ptr(2));
 
       if (mesh_has_boundary_data)
         {
@@ -287,9 +287,9 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   if (l == 0)
                     ghost_elems.push_back(newelem);
 
-                  newelem->set_node(0) = nelem->node_ptr(next[k]);
-                  newelem->set_node(1) = nelem->node_ptr(k);
-                  newelem->set_node(2) = node;
+                  newelem->set_node(0, nelem->node_ptr(next[k]));
+                  newelem->set_node(1, nelem->node_ptr(k));
+                  newelem->set_node(2, node);
                   newelem->set_neighbor(0, nelem);
                   newelem->set_ghost(true);
                   if (l>0)
@@ -309,9 +309,9 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               auto uelem = Elem::build(TRI3SUBDIVISION);
               auto newelem = cast_ptr<Tri3Subdivision *>(uelem.get());
 
-              newelem->set_node(0) = elem->node_ptr(next[i]);
-              newelem->set_node(1) = nelem->node_ptr(2);
-              newelem->set_node(2) = elem->node_ptr(prev[i]);
+              newelem->set_node(0, elem->node_ptr(next[i]));
+              newelem->set_node(1, nelem->node_ptr(2));
+              newelem->set_node(2, elem->node_ptr(prev[i]));
               newelem->set_neighbor(0, nelem);
               nelem->set_neighbor(2, newelem);
               newelem->set_ghost(true);
@@ -357,9 +357,9 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
 
               ghost_elems.push_back(newelem);
 
-              newelem->set_node(0) = elem->node_ptr(next[i]);
-              newelem->set_node(1) = elem->node_ptr(i);
-              newelem->set_node(2) = node;
+              newelem->set_node(0, elem->node_ptr(next[i]));
+              newelem->set_node(1, elem->node_ptr(i));
+              newelem->set_node(2, node);
               newelem->set_neighbor(0, elem);
               newelem->set_ghost(true);
               elem->set_neighbor(i, newelem);
@@ -436,9 +436,9 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
                   auto uelem = Elem::build(TRI3SUBDIVISION);
                   auto newelem = cast_ptr<Tri3Subdivision *>(uelem.get());
 
-                  newelem->set_node(0) = nb2->node_ptr(j);
-                  newelem->set_node(1) = nb2->node_ptr(prev[j]);
-                  newelem->set_node(2) = node;
+                  newelem->set_node(0, nb2->node_ptr(j));
+                  newelem->set_node(1, nb2->node_ptr(prev[j]));
+                  newelem->set_node(2, node);
                   newelem->set_neighbor(0, nb2);
                   newelem->set_neighbor(1, nullptr);
                   newelem->set_ghost(true);
@@ -456,9 +456,9 @@ void MeshTools::Subdivision::add_boundary_ghosts(MeshBase & mesh)
               auto uelem = Elem::build(TRI3SUBDIVISION);
               auto newelem = cast_ptr<Tri3Subdivision *>(uelem.get());
 
-              newelem->set_node(0) = elem->node_ptr(next[i]);
-              newelem->set_node(1) = elem->node_ptr(i);
-              newelem->set_node(2) = nb2->node_ptr(prev[j]);
+              newelem->set_node(0, elem->node_ptr(next[i]));
+              newelem->set_node(1, elem->node_ptr(i));
+              newelem->set_node(2, nb2->node_ptr(prev[j]));
               newelem->set_neighbor(0, elem);
               newelem->set_neighbor(1, nb2);
               newelem->set_neighbor(2, nullptr);

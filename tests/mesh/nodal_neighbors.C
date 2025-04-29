@@ -207,8 +207,8 @@ public:
     for (unsigned int e=0; e<7; ++e)
       {
         Elem * elem = mesh.add_elem(Elem::build_with_id(EDGE2, e));
-        elem->set_node(0) = mesh.node_ptr(conn[2*e] - 1);     // convert to 0-based index
-        elem->set_node(1) = mesh.node_ptr(conn[2*e + 1] - 1); // convert to 0-based index
+        elem->set_node(0, mesh.node_ptr(conn[2*e] - 1));     // convert to 0-based index
+        elem->set_node(1, mesh.node_ptr(conn[2*e + 1] - 1)); // convert to 0-based index
       }
 
     // Find neighbors, etc.

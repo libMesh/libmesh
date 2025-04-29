@@ -404,7 +404,7 @@ void STLIO::read_ascii (std::istream & file)
           libmesh_error_msg_if
             (next_vertex > 2,
              "Found more than 3 vertices in a loop; STLIO only supports Tri3.");
-          triangle->set_node(next_vertex++) = node;
+          triangle->set_node(next_vertex++, node);
         }
 
       else if (std::regex_search(line, end_loop_regex))
@@ -505,7 +505,7 @@ void STLIO::read_binary (std::istream & file,
             mesh_points[p] = node;
           }
 
-        triangle->set_node(i) = node;
+        triangle->set_node(i, node);
       }
 
     // The 2-byte "attribute byte count" is unstandardized; typically

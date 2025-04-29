@@ -1294,8 +1294,8 @@ void CheckpointIO::read_connectivity (Xdr & io)
           for (unsigned int n=0,
                n_conn = cast_int<unsigned int>(conn_data.size());
                n != n_conn; n++)
-            elem->set_node(n) =
-              mesh.node_ptr(cast_int<dof_id_type>(conn_data[n]));
+            elem->set_node(n,
+              mesh.node_ptr(cast_int<dof_id_type>(conn_data[n])));
 
           Elem * added_elem = mesh.add_elem(std::move(elem));
 

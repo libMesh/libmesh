@@ -113,7 +113,7 @@ void Elem::refine (MeshRefinement & mesh_refinement)
                 mesh_refinement.add_node(*this, c, cnode,
                                          current_child->processor_id());
               node->set_n_systems (this->n_systems());
-              current_child->set_node(cnode) = node;
+              current_child->set_node(cnode, node);
             }
 
           Elem * added_child = mesh_refinement.add_elem (std::move(current_child));

@@ -98,8 +98,13 @@ public:
   virtual Point master_point (const unsigned int /*i*/) const override
   { remote_elem_error("master_point"); return Point(); }
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   virtual Node * & set_node (const unsigned int i) override
   { remote_elem_error("set_node"); return Elem::set_node(i); }
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+  virtual void set_node (const unsigned int /*i*/, Node * /*node*/) override
+  { remote_elem_error("set_node"); }
 
   /**
    * Don't hide Elem::key() defined in the base class.

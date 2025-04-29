@@ -52,7 +52,7 @@ public:
 #else
             auto node = _mesh->add_point(Point(x, y, z), i);
 #endif
-            elem->set_node(i) = node;
+            elem->set_node(i, node);
           };
 
         const Real halfpos = (minpos + maxpos) / 2.;
@@ -139,7 +139,7 @@ public:
 
         std::unique_ptr<Elem> polygon = std::make_unique<C0Polygon>(5);
         for (auto i : make_range(5))
-          polygon->set_node(i) = _mesh->node_ptr(i);
+          polygon->set_node(i, _mesh->node_ptr(i));
         polygon->set_id() = 0;
 
         _mesh->add_elem(std::move(polygon));

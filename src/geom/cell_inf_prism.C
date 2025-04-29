@@ -184,7 +184,7 @@ std::unique_ptr<Elem> InfPrism::side_ptr (const unsigned int i)
 
   // Set the nodes
   for (auto n : face->node_index_range())
-    face->set_node(n) = this->node_ptr(InfPrism6::side_nodes_map[i][n]);
+    face->set_node(n, this->node_ptr(InfPrism6::side_nodes_map[i][n]));
 
   return face;
 }
@@ -231,7 +231,7 @@ void InfPrism::side_ptr (std::unique_ptr<Elem> & side,
 
   // Set the nodes
   for (auto n : side->node_index_range())
-    side->set_node(n) = this->node_ptr(InfPrism6::side_nodes_map[i][n]);
+    side->set_node(n, this->node_ptr(InfPrism6::side_nodes_map[i][n]));
 }
 
 

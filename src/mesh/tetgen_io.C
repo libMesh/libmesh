@@ -243,8 +243,8 @@ void TetGenIO::element_in (std::istream & ele_stream)
           ele_stream >> node_label;
 
           // Assign node to element
-          elem->set_node(assign_elm_nodes[j]) =
-            mesh.node_ptr(_assign_nodes[node_label]);
+          elem->set_node(assign_elm_nodes[j],
+            mesh.node_ptr(_assign_nodes[node_label]));
         }
 
       // Read the region attribute (if present) and use it to set the subdomain id.

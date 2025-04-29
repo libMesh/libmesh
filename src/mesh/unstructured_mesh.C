@@ -181,7 +181,7 @@ void transfer_elem(Elem & lo_elem,
            */
           pos->second = hi_node;
 
-          hi_elem->set_node(hon) = hi_node;
+          hi_elem->set_node(hon, hi_node);
         }
       // yes, already added.
       else
@@ -190,7 +190,7 @@ void transfer_elem(Elem & lo_elem,
           libmesh_assert(hi_node);
           libmesh_assert_equal_to(mesh.node_ptr(hi_node->id()), hi_node);
 
-          hi_elem->set_node(hon) = hi_node;
+          hi_elem->set_node(hon, hi_node);
 
           // We need to ensure that the processor who should own a
           // node *knows* they own the node.  And because
@@ -515,7 +515,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
        * element are identically numbered.  Transfer these.
        */
       for (unsigned int v=0, lnn=lo_elem->n_nodes(); v < lnn; v++)
-        ho_elem->set_node(v) = lo_elem->node_ptr(v);
+        ho_elem->set_node(v, lo_elem->node_ptr(v));
 
       transfer_elem(*lo_elem, std::move(ho_elem),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -763,8 +763,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
 
         //Assign all the nodes
         for (auto i : el->node_index_range())
-          el->set_node(i) =
-            this->node_ptr(old->node_id(i) + node_id_offset);
+          el->set_node(i,
+            this->node_ptr(old->node_id(i) + node_id_offset));
 
         // And start it off with the same processor id (mod _n_parts).
         el->processor_id() = cast_int<processor_id_type>
@@ -1371,7 +1371,7 @@ void UnstructuredMesh::create_submesh (UnstructuredMesh & new_mesh,
             }
 
           // Define this element's connectivity on the new mesh
-          new_elem->set_node(n) = new_mesh.node_ptr(this_node_id);
+          new_elem->set_node(n, new_mesh.node_ptr(this_node_id));
         }
 
       // Maybe add boundary conditions for this element
@@ -1522,7 +1522,7 @@ void UnstructuredMesh::all_first_order ()
        */
       for (unsigned int v=0, snv=so_elem->n_vertices(); v < snv; v++)
         {
-          lo_elem->set_node(v) = so_elem->node_ptr(v);
+          lo_elem->set_node(v, so_elem->node_ptr(v));
           node_touched_by_me[lo_elem->node_id(v)] = true;
         }
 
@@ -2428,7 +2428,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
             // We also need to copy over the nodeset info here,
             // because the node will get deleted below
             this->get_boundary_info().boundary_ids(el->node_ptr(local_node_index), bc_ids);
-            el->set_node(local_node_index) = &target_node;
+            el->set_node(local_node_index, &target_node);
             this->get_boundary_info().add_node(&target_node, bc_ids);
           }
       }

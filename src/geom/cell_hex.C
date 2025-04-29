@@ -152,7 +152,7 @@ std::unique_ptr<Elem> Hex::side_ptr (const unsigned int i)
   std::unique_ptr<Elem> face = std::make_unique<Quad4>();
 
   for (auto n : face->node_index_range())
-    face->set_node(n) = this->node_ptr(Hex8::side_nodes_map[i][n]);
+    face->set_node(n, this->node_ptr(Hex8::side_nodes_map[i][n]));
 
   return face;
 }

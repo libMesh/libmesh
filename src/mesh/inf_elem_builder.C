@@ -559,8 +559,8 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           // the method of assigning nodes (which follows below)
           // omits in the case of QUAD9 the bubble node; therefore
           // we assign these first by hand here.
-          el->set_node(16) = side->node_ptr(8);
-          el->set_node(17) = outer_nodes[side->node_id(8)];
+          el->set_node(16, side->node_ptr(8));
+          el->set_node(17, outer_nodes[side->node_id(8)]);
           is_higher_order_elem=true;
           break;
 
@@ -571,7 +571,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
         case EDGE3:
           el = Elem::build(INFQUAD6);
-          el->set_node(4) = side->node_ptr(2);
+          el->set_node(4, side->node_ptr(2));
           break;
 
           // 1D infinite elements not supported
@@ -637,8 +637,8 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       // assign vertices to the new infinite element
       for (unsigned int i=0; i<n_base_vertices; i++)
         {
-          el->set_node(i                ) = side->node_ptr(i);
-          el->set_node(i+n_base_vertices) = outer_nodes[side->node_id(i)];
+          el->set_node(i                , side->node_ptr(i));
+          el->set_node(i+n_base_vertices, outer_nodes[side->node_id(i)]);
         }
 
 
@@ -654,9 +654,9 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
           for (unsigned int i=n_base_vertices; i<n_safe_base_nodes; i++)
             {
-              el->set_node(i+n_base_vertices)   = side->node_ptr(i);
-              el->set_node(i+n_safe_base_nodes) =
-                outer_nodes[side->node_id(i)];
+              el->set_node(i+n_base_vertices,     side->node_ptr(i));
+              el->set_node(i+n_safe_base_nodes,
+                           outer_nodes[side->node_id(i)]);
             }
         }
 

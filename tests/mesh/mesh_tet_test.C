@@ -252,10 +252,10 @@ public:
     auto add_tet = [&mesh](std::array<dof_id_type,4> nodes)
     {
       auto elem = mesh.add_elem(Elem::build(TET4));
-      elem->set_node(0) = mesh.node_ptr(nodes[0]);
-      elem->set_node(1) = mesh.node_ptr(nodes[1]);
-      elem->set_node(2) = mesh.node_ptr(nodes[2]);
-      elem->set_node(3) = mesh.node_ptr(nodes[3]);
+      elem->set_node(0, mesh.node_ptr(nodes[0]));
+      elem->set_node(1, mesh.node_ptr(nodes[1]));
+      elem->set_node(2, mesh.node_ptr(nodes[2]));
+      elem->set_node(3, mesh.node_ptr(nodes[3]));
     };
 
     // Split along a different diagonal to start

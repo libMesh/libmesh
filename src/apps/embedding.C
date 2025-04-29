@@ -110,7 +110,7 @@ int main(int argc, char ** argv)
           if (embed == 1.0)
             {
               nodes[v] = ref.point(n);
-              elem->set_node(v) = &nodes[v];
+              elem->set_node(v, &nodes[v]);
             }
           else if (embed != 0.0)
             libmesh_error_msg("Found fractional embedding on vertex!?");
@@ -127,7 +127,7 @@ int main(int argc, char ** argv)
       for (auto pbn : pbns)
         nodes[n] += (ref.point(pbn.first) + ref.point(pbn.second))/2;
       nodes[n] /= pbns.size();
-      elem->set_node(n) = &nodes[n];
+      elem->set_node(n, &nodes[n]);
     }
 
   const unsigned int denomdigits = std::ceil(std::log10(denominator));

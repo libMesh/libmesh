@@ -562,14 +562,14 @@ void GmshIO::read_mesh(std::istream & in)
                       for (unsigned int i=0; i<nnodes; i++)
                       {
                         in >> node_id;
-                        elem->set_node(eletype.nodes[i]) = mesh.node_ptr(nodetrans[node_id]);
+                        elem->set_node(eletype.nodes[i], mesh.node_ptr(nodetrans[node_id]));
                       }
                     else
                     {
                       for (unsigned int i=0; i<nnodes; i++)
                       {
                         in >> node_id;
-                        elem->set_node(i) = mesh.node_ptr(nodetrans[node_id]);
+                        elem->set_node(i, mesh.node_ptr(nodetrans[node_id]));
                       }
                     }
 
@@ -680,10 +680,10 @@ void GmshIO::read_mesh(std::istream & in)
                       // Add node pointers to the elements.
                       // If there is a node translation table, use it.
                       if (eletype.nodes.size() > 0)
-                          elem->set_node(eletype.nodes[local_node_counter++]) =
-                            node;
+                          elem->set_node(eletype.nodes[local_node_counter++],
+                                         node);
                       else
-                          elem->set_node(local_node_counter++) = node;
+                          elem->set_node(local_node_counter++, node);
                     }
 
                     // Make sure that the libmesh element we added has nnodes nodes.

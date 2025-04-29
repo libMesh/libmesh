@@ -775,9 +775,8 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
 
       for (unsigned int n=0; n != n_nodes; n++)
-        elem->set_node(n) =
-          mesh->node_ptr
-          (cast_int<dof_id_type>(*in++));
+        elem->set_node (n, mesh->node_ptr
+                        (cast_int<dof_id_type>(*in++)));
 
       // Set interior_parent if found
       {

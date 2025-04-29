@@ -339,7 +339,7 @@ void NetGenMeshInterface::triangulate ()
       {
         const dof_id_type node_id =
           libmesh_map_find(ng_to_libmesh_id, ngnodes[n]);
-        elem->set_node(n) = this->_mesh.node_ptr(node_id);
+        elem->set_node(n, this->_mesh.node_ptr(node_id));
       }
 
     // NetGen and we disagree about node numbering orientation

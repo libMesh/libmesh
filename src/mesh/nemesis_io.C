@@ -916,7 +916,7 @@ void Nemesis_IO::read (const std::string & base_filename)
                 global_node_idx = nemhelper->node_num_map[local_node_idx]-1; // new global node index
 
               // Set node number
-              elem->set_node(k) = mesh.node_ptr(global_node_idx);
+              elem->set_node(k, mesh.node_ptr(global_node_idx));
             }
         } // for (unsigned int j=0; j<nemhelper->num_elem_this_blk; j++)
     } // end for (unsigned int i=0; i<nemhelper->num_elem_blk; i++)

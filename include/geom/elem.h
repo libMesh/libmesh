@@ -188,10 +188,23 @@ public:
    */
   Node & node_ref (const unsigned int i);
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
-   * \returns The pointer to local \p Node \p i as a writable reference.
+   * \returns The pointer to the \p Node with local number \p i as a
+   * writable reference.
+   *
+   * \deprecated This setter cannot update the multiple node pointers
+   * used in a general polyhedron; use the \p set_node overload that
+   * takes an argument.
    */
   virtual Node * & set_node (const unsigned int i);
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+  /**
+   * Sets local \p Node \p i to refer to \p node.
+   */
+  virtual void set_node (const unsigned int i,
+                         Node * node);
 
   /**
    * Nested classes for use iterating over all nodes of an element.
@@ -2042,8 +2055,8 @@ protected:
   void swap2nodes(unsigned int n1, unsigned int n2)
   {
     Node * temp = this->node_ptr(n1);
-    this->set_node(n1) = this->node_ptr(n2);
-    this->set_node(n2) = temp;
+    this->set_node(n1, this->node_ptr(n2));
+    this->set_node(n2, temp);
   }
 
   /**
@@ -2491,12 +2504,27 @@ unsigned int Elem::get_node_index (const Node * node_ptr) const
 
 
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
 inline
 Node * & Elem::set_node (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_nodes());
 
+  libmesh_deprecated();
+
   return _nodes[i];
+}
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+
+
+inline
+void Elem::set_node (const unsigned int i,
+                     Node * node)
+{
+  libmesh_assert_less (i, this->n_nodes());
+
+  _nodes[i] = node;
 }
 
 
@@ -2704,7 +2732,7 @@ Elem::simple_build_side_ptr (const unsigned int i,
     {
       face = std::make_unique<Sideclass>(this);
       for (auto n : face->node_index_range())
-        face->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
+        face->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
     }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -2746,7 +2774,7 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
       side->set_p_level(this->p_level());
 #endif
       for (auto n : side->node_index_range())
-        side->set_node(n) = this->node_ptr(Subclass::side_nodes_map[i][n]);
+        side->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
     }
 }
 
@@ -2771,7 +2799,7 @@ Elem::simple_side_ptr (std::unique_ptr<Elem> & side,
       side->subdomain_id() = this->subdomain_id();
 
       for (auto n : side->node_index_range())
-        side->set_node(n) = this->node_ptr(Mapclass::side_nodes_map[i][n]);
+        side->set_node(n, this->node_ptr(Mapclass::side_nodes_map[i][n]));
     }
 }
 
@@ -2813,7 +2841,7 @@ Elem::simple_build_edge_ptr (const unsigned int i)
   std::unique_ptr<Elem> edge = std::make_unique<Edgeclass>(this);
 
   for (auto n : edge->node_index_range())
-    edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);
+    edge->set_node(n, this->node_ptr(Subclass::edge_nodes_map[i][n]));
 
   edge->set_interior_parent(this);
   edge->set_mapping_type(this->mapping_type());
@@ -2850,7 +2878,7 @@ Elem::simple_build_edge_ptr (std::unique_ptr<Elem> & edge,
       edge->set_p_level(this->p_level());
 #endif
       for (auto n : edge->node_index_range())
-        edge->set_node(n) = this->node_ptr(Subclass::edge_nodes_map[i][n]);
+        edge->set_node(n, this->node_ptr(Subclass::edge_nodes_map[i][n]));
     }
 }
 

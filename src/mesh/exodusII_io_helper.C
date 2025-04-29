@@ -1344,7 +1344,7 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 
             // Assign node pointers to low-order edge
             for (unsigned int v=0; v<edge_ptr->n_vertices(); ++v)
-              low_order_edge->set_node(v) = edge_ptr->node_ptr(v);
+              low_order_edge->set_node(v, edge_ptr->node_ptr(v));
 
             // Compute the key for the temporary low-order edge we just built
             dof_id_type low_order_edge_key = low_order_edge->key();
@@ -1416,7 +1416,7 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
                   int exodus_node_id_zero_based = exodus_node_id - 1;
                   int libmesh_node_id = node_num_map[exodus_node_id_zero_based] - 1;
 
-                  edge->set_node(n) = mesh.node_ptr(libmesh_node_id);
+                  edge->set_node(n, mesh.node_ptr(libmesh_node_id));
                 }
 
               // Compute key for the edge Elem we just built.

@@ -135,8 +135,8 @@ public:
 
     Elem * e = mesh.add_elem(Elem::build_with_id(EDGE2, mesh.max_elem_id()));
     e->processor_id() = 0;
-    e->set_node(0) = mesh.node_ptr(2);
-    e->set_node(1) = mesh.node_ptr(8);
+    e->set_node(0, mesh.node_ptr(2));
+    e->set_node(1, mesh.node_ptr(8));
     mesh.prepare_for_use();
 
     es.reinit();
@@ -181,7 +181,7 @@ public:
 
     MeshTools::Generation::build_line (mesh, 10, 0., 1., EDGE2);
     auto node_elem = mesh.add_elem(Elem::build(NODEELEM));
-    node_elem->set_node(0) = mesh.node_ptr(0);
+    node_elem->set_node(0, mesh.node_ptr(0));
     mesh.prepare_for_use();
 
     EquationSystems es(mesh);

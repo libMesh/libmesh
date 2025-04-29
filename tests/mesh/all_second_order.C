@@ -69,8 +69,8 @@ public:
     for (dof_id_type n=0; n<4; ++n)
       {
         Elem * elem = mesh.add_elem(Elem::build(EDGE2));
-        elem->set_node(0) = mesh.node_ptr(n);
-        elem->set_node(1) = mesh.node_ptr(n+4);
+        elem->set_node(0, mesh.node_ptr(n));
+        elem->set_node(1, mesh.node_ptr(n+4));
         elem->subdomain_id() = 1;
       }
 
@@ -143,8 +143,8 @@ public:
     for (dof_id_type n=0; n<elem->n_vertices(); ++n)
       {
         Elem * elem = mesh.add_elem(Elem::build(EDGE2));
-        elem->set_node(0) = mesh.node_ptr(n);
-        elem->set_node(1) = mesh.node_ptr(node_offset + n);
+        elem->set_node(0, mesh.node_ptr(n));
+        elem->set_node(1, mesh.node_ptr(node_offset + n));
       }
 
     // Convert all elements to SECOND-order, automatically skipping those that are
@@ -280,8 +280,8 @@ public:
     for (dof_id_type n=0; n<4; ++n)
       {
         Elem * elem = mesh.add_elem(Elem::build(EDGE2));
-        elem->set_node(0) = mesh.node_ptr(n);
-        elem->set_node(1) = mesh.node_ptr(n+4);
+        elem->set_node(0, mesh.node_ptr(n));
+        elem->set_node(1, mesh.node_ptr(n+4));
         elem->subdomain_id() = 1;
       }
 
@@ -352,8 +352,8 @@ public:
     for (dof_id_type n=0; n<elem->n_vertices(); ++n)
       {
         Elem * elem = mesh.add_elem(Elem::build(EDGE2));
-        elem->set_node(0) = mesh.node_ptr(n);
-        elem->set_node(1) = mesh.node_ptr(node_offset + n);
+        elem->set_node(0, mesh.node_ptr(n));
+        elem->set_node(1, mesh.node_ptr(node_offset + n));
       }
 
     // Convert all elements, automatically skipping those that are

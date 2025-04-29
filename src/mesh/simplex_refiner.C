@@ -211,14 +211,14 @@ std::size_t SimplexRefiner::refine_via_edges(Elem & elem,
 
   // We'll switch(elem->type()) here eventually
   subelem[0] = std::make_unique<Tri3>();
-  subelem[0]->set_node(0) = elem.node_ptr(side_to_refine);
-  subelem[0]->set_node(1) = midedge_node;
-  subelem[0]->set_node(2) = elem.node_ptr((side_to_refine+2)%3);
+  subelem[0]->set_node(0, elem.node_ptr(side_to_refine));
+  subelem[0]->set_node(1, midedge_node);
+  subelem[0]->set_node(2, elem.node_ptr((side_to_refine+2)%3));
 
   subelem[1] = std::make_unique<Tri3>();
-  subelem[1]->set_node(0) = elem.node_ptr((side_to_refine+2)%3);
-  subelem[1]->set_node(1) = midedge_node;
-  subelem[1]->set_node(2) = elem.node_ptr((side_to_refine+1)%3);
+  subelem[1]->set_node(0, elem.node_ptr((side_to_refine+2)%3));
+  subelem[1]->set_node(1, midedge_node);
+  subelem[1]->set_node(2, elem.node_ptr((side_to_refine+1)%3));
 
   // Preserve boundary and sort-of-preserve neighbor information.  We
   // need remote_elem neighbors to avoid breaking distributed meshes

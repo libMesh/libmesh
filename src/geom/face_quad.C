@@ -116,7 +116,7 @@ std::unique_ptr<Elem> Quad::side_ptr (const unsigned int i)
   std::unique_ptr<Elem> edge = std::make_unique<Edge2>();
 
   for (auto n : edge->node_index_range())
-    edge->set_node(n) = this->node_ptr(Quad4::side_nodes_map[i][n]);
+    edge->set_node(n, this->node_ptr(Quad4::side_nodes_map[i][n]));
 
   return edge;
 }
