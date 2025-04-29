@@ -65,8 +65,8 @@ void QConical::conical_product_tri()
   QJacobi jac1D(1, get_order(), 1, 0);
 
   // The Gauss rule needs to be scaled to [0,1]
-  std::pair<Real, Real> old_range(-1.0L, 1.0L);
-  std::pair<Real, Real> new_range( 0.0L, 1.0L);
+  std::pair<Real, Real> old_range(-1, 1);
+  std::pair<Real, Real> new_range( 0, 1);
   gauss1D.scale(old_range,
                 new_range);
 
@@ -117,8 +117,8 @@ void QConical::conical_product_tet()
   QJacobi jacB1D(1, get_order(), /*alpha=*/2, /*beta=*/0);
 
   // The Gauss rule needs to be scaled to [0,1]
-  std::pair<Real, Real> old_range(-1.0L, 1.0L);
-  std::pair<Real, Real> new_range( 0.0L, 1.0L);
+  std::pair<Real, Real> old_range(-1, 1);
+  std::pair<Real, Real> new_range( 0, 1);
   gauss1D.scale(old_range,
                 new_range);
 
