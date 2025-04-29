@@ -382,7 +382,7 @@ public:
     ErrorVector connected_err;
     connected_dm.estimate_error(*_sys, connected_err);
     const Real mean_connected_disc = connected_err.mean();
-    CPPUNIT_ASSERT_LESS(1e-14, mean_connected_disc);
+    CPPUNIT_ASSERT_LESS(Real(1e-14), mean_connected_disc);
 
     // We should be able to see the discontinuity along the slit
     DiscontinuityMeasure slit_dm;
@@ -390,7 +390,7 @@ public:
     ErrorVector slit_disc;
     slit_dm.estimate_error(*_sys, slit_disc);
     const Real mean_slit_disc = slit_disc.mean();
-    CPPUNIT_ASSERT_GREATER(1e-3, mean_slit_disc);
+    CPPUNIT_ASSERT_GREATER(Real(1e-3), mean_slit_disc);
   }
 
   void testRestart()
