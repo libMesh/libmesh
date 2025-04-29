@@ -846,6 +846,11 @@ public:
   static FEFieldType field_type (const FEFamily & fe_family);
 
   /**
+   * \returns Whether the element's shape functions are orientation-dependent.
+   */
+  static bool orientation_dependent (const FEFamily & fe_family);
+
+  /**
    * \returns The number of components of a vector-valued element.
    * Scalar-valued elements return 1.
    */
