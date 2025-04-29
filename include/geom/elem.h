@@ -749,6 +749,12 @@ public:
   virtual unsigned int n_faces () const = 0;
 
   /**
+   * \returns An integer range from 0 up to (but not including)
+   * the number of faces this element has.
+   */
+  IntRange<unsigned short> face_index_range () const;
+
+  /**
    * \returns The number of children the element that has been derived
    * from this class may have.
    */
@@ -2661,6 +2667,15 @@ IntRange<unsigned short>
 Elem::edge_index_range() const
 {
   return {0, cast_int<unsigned short>(this->n_edges())};
+}
+
+
+
+inline
+IntRange<unsigned short>
+Elem::face_index_range() const
+{
+  return {0, cast_int<unsigned short>(this->n_faces())};
 }
 
 
