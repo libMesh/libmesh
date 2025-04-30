@@ -255,6 +255,9 @@ void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
                                     const std::vector<numeric_index_type> & rows,
                                     const std::vector<numeric_index_type> & cols)
 {
+  if (rows.empty() || cols.empty())
+    return;
+
   libmesh_assert(_current_elem_id != DofObject::invalid_id);
   auto & matrix_data = libmesh_map_find(_elem_to_matrix_data, _current_elem_id);
   const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, _current_elem_id);
