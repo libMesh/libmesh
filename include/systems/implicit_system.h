@@ -340,6 +340,11 @@ public:
 
   virtual void create_static_condensation() override;
 
+  /**
+   * \returns The static condensation system matrix
+   */
+  StaticCondensation & get_static_condensation_system_matrix();
+
 protected:
   /**
    * Adds the system matrix
@@ -363,6 +368,13 @@ private:
    */
    StaticCondensation * _sc_system_matrix;
 };
+
+inline
+StaticCondensation & ImplicitSystem::get_static_condensation_system_matrix()
+{
+  libmesh_assert(_sc_system_matrix);
+  return *_sc_system_matrix;
+}
 
 } // namespace libMesh
 
