@@ -30,7 +30,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_sync.h"
 #include "libmesh/utility.h"
-#include "libmesh/static_condensation.h"
+#include "libmesh/static_condensation_dof_map.h"
 
 // TIMPI includes
 #include "timpi/communicator.h"
@@ -50,7 +50,7 @@ Build::Build (const DofMap & dof_map_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in,
               const bool calculate_constrained_in,
-              const StaticCondensation * const sc_in) :
+              const StaticCondensationDofMap * const sc_in) :
   ParallelObject(dof_map_in),
   dof_map(dof_map_in),
   dof_coupling(dof_coupling_in),

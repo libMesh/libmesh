@@ -19,6 +19,7 @@
 #define LIBMESH_DOF_MAP_BASE_H
 
 #include "libmesh/id_types.h"
+#include "libmesh/parallel_object.h"
 #include <vector>
 
 namespace libMesh
@@ -27,10 +28,10 @@ class Variable;
 class Elem;
 class Node;
 
-class DofMapBase
+class DofMapBase : public ParallelObject
 {
 public:
-  DofMapBase() = default;
+  DofMapBase(const Parallel::Communicator & comm) : ParallelObject(comm), _n_dfs(0) {}
 
   /**
    * \returns The number of variables in the global solution vector. Defaults
@@ -47,7 +48,9 @@ public:
   /**
    * \returns The first dof index that is local to partition \p proc.
    */
-  virtual dof_id_type first_dof() const = 0;
+  dof_id_type first_dof(const processor_id_type proc) const;
+
+  dof_id_type first_dof() const { return this->first_dof(this->processor_id()); }
 
   /**
    * \returns The first dof index that is after all indices local to
@@ -55,7 +58,9 @@ public:
    *
    * Analogous to the end() member function of STL containers.
    */
-  virtual dof_id_type end_dof() const = 0;
+  dof_id_type end_dof(const processor_id_type proc) const;
+
+  dof_id_type end_dof() const { return this->end_dof(this->processor_id()); }
 
   /**
    * Fills the vector \p di with the global degree of freedom indices
@@ -77,13 +82,61 @@ public:
   /**
    * \returns The total number of degrees of freedom in the problem.
    */
-  virtual dof_id_type n_dofs() const = 0;
+  dof_id_type n_dofs() const { return _n_dfs; }
+
+  /**
+   * \returns The number of degrees of freedom on partition \p proc.
+   */
+  dof_id_type n_dofs_on_processor(const processor_id_type proc) const;
 
   /**
    * \returns The number of degrees of freedom on this processor.
    */
-  virtual dof_id_type n_local_dofs() const = 0;
+  dof_id_type n_local_dofs() const { return this->n_dofs_on_processor(this->processor_id()); }
+
+  virtual void clear();
+
+protected:
+  /**
+   * compute the key degree of freedom information given the local number of degrees of freedom on
+   * this process
+   * \returns The total number of DOFs for the System, summed across all procs.
+   */
+  std::size_t compute_dof_info(dof_id_type n_local_dofs);
+
+  /**
+   * First DOF index on processor \p p.
+   */
+  std::vector<dof_id_type> _first_df;
+
+  /**
+   * Last DOF index (plus 1) on processor \p p.
+   */
+  std::vector<dof_id_type> _end_df;
+
+  /**
+   * Total number of degrees of freedom.
+   */
+  dof_id_type _n_dfs;
 };
+
+inline dof_id_type DofMapBase::first_dof(const processor_id_type proc) const
+{
+  libmesh_assert_less(proc, _first_df.size());
+  return _first_df[proc];
+}
+
+inline dof_id_type DofMapBase::end_dof(const processor_id_type proc) const
+{
+  libmesh_assert_less(proc, _end_df.size());
+  return _end_df[proc];
+}
+
+inline dof_id_type DofMapBase::n_dofs_on_processor(const processor_id_type proc) const
+{
+  libmesh_assert_less(proc, _first_df.size());
+  return cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
+}
 
 }
 #endif // LIBMESH_DOF_MAP_BASE_H
