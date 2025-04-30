@@ -223,7 +223,10 @@ void TriangulatorInterface::elems_to_segments()
           const dof_id_type id1 = libmesh_map_find(point_id_map, next_pt);
           this->segments.emplace_back(id0, id1);
           for (auto m : make_range(mh.n_midpoints()))
+          {
             this->segment_midpoints.emplace_back(mh.midpoint(m, i));
+            this->segment_midpoints_keys.emplace_back(pt);
+          }
         }
 
       for (Node * node : nodes_to_delete)
@@ -358,7 +361,7 @@ void TriangulatorInterface::increase_triangle_order()
   for (auto m : make_range(n_midpoints))
     for (auto i : make_range(this->segments.size()))
       {
-        const Point & p = _mesh.point(this->segments[i].first);
+        const Point & p = segment_midpoints_keys[i*n_midpoints+m];
         all_midpoints[{p,m}] =
           this->segment_midpoints[i*n_midpoints+m];
       }
