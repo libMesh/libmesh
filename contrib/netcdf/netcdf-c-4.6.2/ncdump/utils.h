@@ -18,7 +18,11 @@
 #define NC_GRP_DELIM '/'
 
 typedef int bool_t;
-enum {false=0, true=1};
+#ifndef false
+#define false 0
+#define true 1
+//enum {false=0, true=1};
+#endif
 
 struct safebuf_t;
 /* Buffer structure for implementing growable strings, used in
