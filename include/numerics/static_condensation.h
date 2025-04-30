@@ -27,7 +27,6 @@
 #include "libmesh/id_types.h"
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_matrix.h"
-#include "libmesh/dof_map_base.h"
 #include "libmesh/variable.h"
 #include "libmesh/sparsity_pattern.h"
 
@@ -53,14 +52,18 @@ class NumericVector;
 template <typename>
 class Preconditioner;
 class StaticCondensationPreconditioner;
+class StaticCondensationDofMap;
 
 typedef Eigen::Matrix<Number, Eigen::Dynamic, Eigen::Dynamic> EigenMatrix;
 typedef Eigen::Matrix<Number, Eigen::Dynamic, 1> EigenVector;
 
-class StaticCondensation : public PetscMatrixShellMatrix<Number>, public DofMapBase
+class StaticCondensation : public PetscMatrixShellMatrix<Number>
 {
 public:
-  StaticCondensation(const MeshBase & mesh, System & system, const DofMap & dof_map);
+  StaticCondensation(const MeshBase & mesh,
+                     System & system,
+                     const DofMap & full_dof_map,
+                     const StaticCondensationDofMap & reduced_dof_map);
   virtual ~StaticCondensation();
 
   //
@@ -143,7 +146,7 @@ public:
   //
 
   /**
-   * Build the element global to local index maps and size the element matrices
+   * Size the element matrices
    */
   void init();
 
@@ -162,18 +165,6 @@ public:
   const SparseMatrix<Number> & get_condensed_mat() const;
 
   /**
-   * Add \p vars to the list of variables not to condense. This can be useful when some variable's
-   * equation is discretized with a DG method or if including the variable in the condensed block
-   * diagonal would result in it being singular
-   */
-  void dont_condense_vars(const std::unordered_set<unsigned int> & vars);
-
-  /**
-   * @returns our list of variables for whom we do not condense out any dofs
-   */
-  const std::unordered_set<unsigned int> & uncondensed_vars() const { return _uncondensed_vars; }
-
-  /**
    * Set the current element. This enables fast lookups of local indices from global indices
    */
   void set_current_elem(const Elem & elem);
@@ -183,33 +174,10 @@ public:
    */
   StaticCondensationPreconditioner & get_preconditioner() { return *_scp; }
 
-  virtual unsigned int n_variables() const override;
-
-  virtual const Variable & variable(const unsigned int c) const override;
-
-  virtual void dof_indices(const Elem * const elem,
-                           std::vector<dof_id_type> & di,
-                           const unsigned int vn,
-                           int p_level = -12345) const override;
-
-  virtual void dof_indices(const Node * const node,
-                           std::vector<dof_id_type> & di,
-                           const unsigned int vn) const override;
-
-  virtual dof_id_type first_dof() const override;
-  virtual dof_id_type end_dof() const override;
-  virtual dof_id_type n_dofs() const override;
-  virtual dof_id_type n_local_dofs() const override;
-
   /**
    * @returns The reduced system linear solver
    */
   LinearSolver<Number> & reduced_system_solver();
-
-  /*
-   * @returns The dummyish reduced system
-   */
-  const System & reduced_system() const;
 
   virtual bool require_sparsity_pattern() const override { return false; }
 
@@ -243,7 +211,7 @@ private:
    * Data stored on a per-element basis used to compute element Schur complements and their
    * applications to vectors
    */
-  struct LocalData
+  struct MatrixData
   {
     /// condensed-condensed matrix entries
     EigenMatrix Acc;
@@ -256,35 +224,15 @@ private:
 
     // Acc LU decompositions
     typename std::remove_const<decltype(Acc.partialPivLu())>::type AccFactor;
-
-    /// The uncondensed degrees of freedom with global numbering corresponding to the the \emph reduced
-    /// system. Note that initially this will actually hold the indices corresponding to the fully
-    /// sized problem, but we will swap it out by the time we are done initializing
-    std::vector<std::vector<dof_id_type>> reduced_space_indices;
-
-    /// A map from the global degree of freedom number for the full system (condensed + uncondensed)
-    /// to an element local number. If this map is queried with a condensed dof, nothing will be
-    /// found. The size of this container will be the number of uncondensed degrees of freedom whose
-    /// basis functions are nonzero on the element
-    std::unordered_map<dof_id_type, dof_id_type> uncondensed_global_to_local_map;
-    /// A map from the global degree of freedom number for the full system (condensed + uncondensed)
-    /// to an element local number. If this map is queried with an uncondensed dof, nothing will be
-    /// found. The size of this container will be the number of condensed degrees of freedom whose
-    /// basis functions are nonzero on the element
-    std::unordered_map<dof_id_type, dof_id_type> condensed_global_to_local_map;
   };
 
   /// A map from element ID to Schur complement data
-  std::unordered_map<dof_id_type, LocalData> _elem_to_local_data;
-
-  /// All the uncondensed degrees of freedom (numbered in the "full" uncondensed + condensed
-  /// space). This data member is used for creating subvectors corresponding to only uncondensed
-  /// dofs
-  std::vector<dof_id_type> _local_uncondensed_dofs;
+  std::unordered_map<dof_id_type, MatrixData> _elem_to_matrix_data;
 
   const MeshBase & _mesh;
   System & _system;
-  const DofMap & _dof_map;
+  const DofMap & _full_dof_map;
+  const StaticCondensationDofMap & _reduced_dof_map;
 
   /// global sparse matrix for the uncondensed degrees of freedom
   std::unique_ptr<SparseMatrix<Number>> _reduced_sys_mat;
@@ -301,9 +249,6 @@ private:
   // solution for the Newton *update*
   std::unique_ptr<NumericVector<Number>> _ghosted_full_sol;
 
-  /// Variables for which we will keep all dofs
-  std::unordered_set<unsigned int> _uncondensed_vars;
-
   /// The current element ID. This is one half of a key, along with the global index, that maps to a
   /// local index
   dof_id_type _current_elem_id;
@@ -319,15 +264,6 @@ private:
 
   /// Whether we have cached values via add_XXX()
   bool _have_cached_values;
-
-  /// The variables in the reduced system
-  std::vector<Variable> _reduced_vars;
-
-  /// A dummyish system to help with DofObjects
-  System * _reduced_system;
-
-  /// Owned storage of the reduced system sparsity pattern. Note that the \p SparseMatrix \p _sp data member is set to point to this
-  std::unique_ptr<SparsityPattern::Build> _reduced_sp;
 };
 
 inline const SparseMatrix<Number> & StaticCondensation::get_condensed_mat() const
@@ -336,21 +272,10 @@ inline const SparseMatrix<Number> & StaticCondensation::get_condensed_mat() cons
   return *_reduced_sys_mat;
 }
 
-inline void StaticCondensation::dont_condense_vars(const std::unordered_set<unsigned int> & vars)
-{
-  _uncondensed_vars.insert(vars.begin(), vars.end());
-}
-
 inline LinearSolver<Number> & StaticCondensation::reduced_system_solver()
 {
   libmesh_assert_msg(_reduced_solver, "Reduced system solver not built yet");
   return *_reduced_solver;
-}
-
-inline const System & StaticCondensation::reduced_system() const
-{
-  libmesh_assert(_reduced_system);
-  return *_reduced_system;
 }
 
 }
@@ -366,11 +291,12 @@ class MeshBase;
 class System;
 class DofMap;
 class StaticCondensationPreconditioner;
+class StaticCondensationDofMap;
 
 class StaticCondensation : public SparseMatrix<Number>
 {
 public:
-  StaticCondensation(const MeshBase &, const System &, const DofMap & dof_map);
+  StaticCondensation(const MeshBase &, const System &, const DofMap & full_dof_map);
 
   const std::unordered_set<unsigned int> & uncondensed_vars() const { libmesh_not_implemented(); }
   StaticCondensationPreconditioner & get_preconditioner() { libmesh_not_implemented(); }

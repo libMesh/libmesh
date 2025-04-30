@@ -69,7 +69,7 @@ class PeriodicBoundaryBase;
 class PeriodicBoundaries;
 class System;
 class NonlinearImplicitSystem;
-class StaticCondensation;
+class StaticCondensationDofMap;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -177,8 +177,7 @@ class NodeConstraints : public std::map<const Node *,
  * \brief Manages the degrees of freedom (DOFs) in a simulation.
  */
 class DofMap : public DofMapBase,
-               public ReferenceCountedObject<DofMap>,
-               public ParallelObject
+               public ReferenceCountedObject<DofMap>
 {
 public:
 
@@ -661,8 +660,7 @@ public:
     return (this->has_blocked_representation() ? this->n_variables() : 1);
   }
 
-  dof_id_type n_dofs() const override { return _n_dfs; }
-
+  using DofMapBase::n_dofs;
   /**
    * \returns The total number of degrees of freedom for a particular
    * variable \p vn.
@@ -679,9 +677,7 @@ public:
    */
   dof_id_type n_SCALAR_dofs() const { return _n_SCALAR_dofs; }
 
-  dof_id_type n_local_dofs () const override
-  { return this->n_dofs_on_processor (this->processor_id()); }
-
+  using DofMapBase::n_local_dofs;
   /**
    * \returns The number of degrees of freedom on this processor for a
    * particular variable \p vn.  This is an O(N) operation on serialized or
@@ -695,15 +691,6 @@ public:
   }
 
   /**
-   * \returns The number of degrees of freedom on partition \p proc.
-   */
-  dof_id_type n_dofs_on_processor(const processor_id_type proc) const
-  {
-    libmesh_assert_less (proc, _first_df.size());
-    return cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
-  }
-
-  /**
    * \returns The number of degrees of freedom on each partition for a
    * particular variable \p vn.
    */
@@ -713,12 +700,6 @@ public:
     this->comm().allgather(this->n_local_dofs(vn), n_local_dofs);
     return n_local_dofs;
   }
-
-  dof_id_type first_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _first_df.size()); return _first_df[proc]; }
-
-  dof_id_type first_dof() const override
-  { return this->first_dof(this->processor_id()); }
 
 #ifdef LIBMESH_ENABLE_AMR
   /**
@@ -731,12 +712,6 @@ public:
   { return this->first_old_dof(this->processor_id()); }
 
 #endif //LIBMESH_ENABLE_AMR
-
-  dof_id_type end_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _end_df.size()); return _end_df[proc]; }
-
-  dof_id_type end_dof() const override
-  { return this->end_dof(this->processor_id()); }
 
   /**
    * \returns The processor id that owns the dof index \p dof
@@ -1642,7 +1617,7 @@ public:
    * Free all new memory associated with the object, but restore its
    * original state, with the mesh pointer and any default ghosting.
    */
-  void clear ();
+  virtual void clear () override;
 
   /**
    * Prints summary info about the sparsity bandwidth and constraints.
@@ -1717,7 +1692,7 @@ public:
   /**
    * Add a static condensation class
    */
-  void add_static_condensation(const StaticCondensation & sc) { _sc = &sc; }
+  void add_static_condensation(const StaticCondensationDofMap & sc) { _sc = &sc; }
 
   /**
    * Checks whether we have static condensation
@@ -1728,7 +1703,7 @@ public:
    * @returns the static condensation class. This should have been already added with a call to \p
    * add_static_condensation()
    */
-  const StaticCondensation & get_static_condensation() const;
+  const StaticCondensationDofMap & get_static_condensation() const;
 
 private:
 
@@ -2029,16 +2004,6 @@ private:
   std::vector<SparseMatrix<Number> * > _matrices;
 
   /**
-   * First DOF index on processor \p p.
-   */
-  std::vector<dof_id_type> _first_df;
-
-  /**
-   * Last DOF index (plus 1) on processor \p p.
-   */
-  std::vector<dof_id_type> _end_df;
-
-  /**
    * First DOF index for SCALAR variable v, or garbage for non-SCALAR
    * variable v
    */
@@ -2141,11 +2106,6 @@ private:
   std::unique_ptr<SparsityPattern::Build> _sp;
 
   /**
-   * Total number of degrees of freedom.
-   */
-  dof_id_type _n_dfs;
-
-  /**
    * The total number of SCALAR dofs associated to
    * all SCALAR variables.
    */
@@ -2244,7 +2204,7 @@ private:
   bool _verify_dirichlet_bc_consistency;
 
   /// Static condensation class
-  const StaticCondensation * _sc;
+  const StaticCondensationDofMap * _sc;
 };
 
 
@@ -2768,7 +2728,7 @@ void DofMap::dof_indices (const Elem * const elem,
 }
 
 inline
-const StaticCondensation & DofMap::get_static_condensation() const
+const StaticCondensationDofMap & DofMap::get_static_condensation() const
 {
   libmesh_assert(_sc);
   return *_sc;
