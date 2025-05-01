@@ -13,7 +13,7 @@
 #if defined(LIBMESH_DEFAULT_QUADRUPLE_PRECISION) || \
     defined(LIBMESH_DEFAULT_TRIPLE_PRECISION)
 # define LIBMESH_ASSERT_FP_EQUAL(expected,actual,tolerance) \
-         CPPUNIT_ASSERT_DOUBLES_EQUAL(double(expected-actual),0,double(tolerance))
+         CPPUNIT_ASSERT_DOUBLES_EQUAL(double((expected)-(actual)),0,double(tolerance))
 #else
 # define LIBMESH_ASSERT_FP_EQUAL(expected,actual,tolerance) \
          CPPUNIT_ASSERT_DOUBLES_EQUAL(expected,actual,tolerance)
