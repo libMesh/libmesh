@@ -181,6 +181,12 @@ public:
 
   virtual bool require_sparsity_pattern() const override { return false; }
 
+  /**
+   * Sets whether this matrix represents uncondensed dofs only. In that case when building the Schur
+   * complement we won't attempt to invert zero element matrices corresponding to the condensed dofs
+   */
+  void uncondensed_dofs_only() { _uncondensed_dofs_only = true; }
+
 private:
   /**
    * Retrieves the degree of freedom values from \p global_vector corresponding to \p
@@ -267,6 +273,11 @@ private:
 
   /// The parallel type to use for the reduced matrix
   ParallelType _parallel_type;
+
+  /// whether this matrix represents uncondensed dofs only. In that case when building the Schur
+  /// complement we won't attempt to invert zero element matrices corresponding to the condensed
+  /// dofs
+  bool _uncondensed_dofs_only;
 };
 
 inline const SparseMatrix<Number> & StaticCondensation::get_condensed_mat() const

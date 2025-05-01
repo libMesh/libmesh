@@ -48,7 +48,8 @@ StaticCondensation::StaticCondensation(const MeshBase & mesh,
     _current_elem_id(DofObject::invalid_id),
     _sc_is_initialized(false),
     _have_cached_values(false),
-    _parallel_type(INVALID_PARALLELIZATION)
+    _parallel_type(INVALID_PARALLELIZATION),
+    _uncondensed_dofs_only(false)
 {
   _size_one_mat.resize(1, 1);
   _scp = std::make_unique<StaticCondensationPreconditioner>(*this);
@@ -199,13 +200,19 @@ void StaticCondensation::close()
     {
       const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, elem_id);
       reduced_space_indices.clear();
-      matrix_data.AccFactor = matrix_data.Acc.partialPivLu();
-      const EigenMatrix S =
-          matrix_data.Auu - matrix_data.Auc * matrix_data.AccFactor.solve(matrix_data.Acu);
-      shim.resize(S.rows(), S.cols());
-      for (const auto i : make_range(S.rows()))
-        for (const auto j : make_range(S.cols()))
-          shim(i, j) = S(i, j);
+
+      // The result matrix is either a Schur complement or it's simply the result of summing element
+      // matrices of the uncondensed degrees of freedom
+      EigenMatrix result = matrix_data.Auu;
+      if (!_uncondensed_dofs_only)
+        {
+          matrix_data.AccFactor = matrix_data.Acc.partialPivLu();
+          result -= matrix_data.Auc * matrix_data.AccFactor.solve(matrix_data.Acu);
+        }
+      shim.resize(result.rows(), result.cols());
+      for (const auto i : make_range(result.rows()))
+        for (const auto j : make_range(result.cols()))
+          shim(i, j) = result(i, j);
       for (const auto & var_reduced_space_indices : dof_data.reduced_space_indices)
         reduced_space_indices.insert(reduced_space_indices.end(),
                                      var_reduced_space_indices.begin(),
