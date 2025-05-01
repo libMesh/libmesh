@@ -28,7 +28,6 @@
 #include "libmesh/id_types.h"
 #include "libmesh/parallel_object.h"
 #include "libmesh/enum_parallel_type.h" // PARALLEL
-#include "libmesh/enum_matrix_build_type.h" // AUTOMATIC
 #include "libmesh/enum_solver_package.h"
 
 // C++ includes
@@ -121,8 +120,7 @@ public:
    */
   static std::unique_ptr<SparseMatrix<T>>
   build(const Parallel::Communicator & comm,
-        const SolverPackage solver_package = libMesh::default_solver_package(),
-        const MatrixBuildType matrix_build_type = MatrixBuildType::AUTOMATIC);
+        const SolverPackage solver_package = libMesh::default_solver_package());
 
   virtual SolverPackage solver_package() = 0;
 

@@ -31,7 +31,6 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/tensor_value.h" // For point_hessian
 #include "libmesh/variable.h"
-#include "libmesh/enum_matrix_build_type.h" // AUTOMATIC
 
 // C++ includes
 #include <cstddef>
@@ -1844,12 +1843,10 @@ public:
    *
    * @param mat_name A name for the matrix
    * @param type The serial/parallel/ghosted type of the matrix
-   * @param mat_build_type The matrix type to build
    *
    */
   SparseMatrix<Number> & add_matrix (std::string_view mat_name,
-                                     ParallelType type = PARALLEL,
-                                     MatrixBuildType mat_build_type = MatrixBuildType::AUTOMATIC);
+                                     ParallelType type = PARALLEL);
 
   /**
   * Adds the additional matrix \p mat_name to this system.  Only
