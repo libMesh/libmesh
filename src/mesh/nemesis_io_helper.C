@@ -2692,7 +2692,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                                    static_cast<int>(stride*(var_ctr+comp)+1),
                                                    static_cast<int>(sbd_id),
                                                    static_cast<int>(local_soln.size()),
-                                                   local_soln_buffer.data());
+                                                   MappedOutputVector(local_soln_buffer, _single_precision).data());
                     EX_CHECK_ERR(ex_err, "Error writing element real values.");
 
                     std::transform(local_soln.begin(), local_soln.end(),
@@ -2702,7 +2702,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                                    static_cast<int>(stride*(var_ctr+comp)+2),
                                                    static_cast<int>(sbd_id),
                                                    static_cast<int>(local_soln.size()),
-                                                   local_soln_buffer.data());
+                                                   MappedOutputVector(local_soln_buffer, _single_precision).data());
                     EX_CHECK_ERR(ex_err, "Error writing element imaginary values.");
 
                     if (write_complex_abs)
@@ -2714,7 +2714,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                                        static_cast<int>(stride*(var_ctr+comp)+2),
                                                        static_cast<int>(sbd_id),
                                                        static_cast<int>(local_soln.size()),
-                                                       local_soln_buffer.data());
+                                                       MappedOutputVector(local_soln_buffer, _single_precision).data());
                         EX_CHECK_ERR(ex_err, "Error writing element magnitudes.");
                       }
 #else // LIBMESH_USE_COMPLEX_NUMBERS
@@ -2723,7 +2723,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                                    static_cast<int>(var_ctr+comp+1),
                                                    static_cast<int>(sbd_id),
                                                    static_cast<int>(local_soln.size()),
-                                                   local_soln.data());
+                                                   MappedOutputVector(local_soln, _single_precision).data());
                     EX_CHECK_ERR(ex_err, "Error writing element values.");
 #endif // LIBMESH_USE_COMPLEX_NUMBERS
                   }
