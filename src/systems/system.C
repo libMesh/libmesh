@@ -39,6 +39,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/static_condensation_dof_map.h"
+#include "libmesh/static_condensation.h"
 
 // includes for calculate_norm, point_*
 #include "libmesh/fe_base.h"
@@ -1006,14 +1007,12 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
 
 
 SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
-                                           const ParallelType type,
-                                           const MatrixBuildType mat_build_type)
+                                           const ParallelType type)
 {
   parallel_object_only();
 
   libmesh_assert(this->comm().verify(std::string(mat_name)));
   libmesh_assert(this->comm().verify(int(type)));
-  libmesh_assert(this->comm().verify(int(mat_build_type)));
 
   // Return the matrix if it is already there.
   if (auto it = this->_matrices.find(mat_name);
@@ -1021,15 +1020,17 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
     return *it->second;
 
   // Otherwise build the matrix to return.
-  auto pr = _matrices.emplace
-    (mat_name,
-     SparseMatrix<Number>::build(this->comm(),
-                                 libMesh::default_solver_package(),
-                                 mat_build_type));
+  std::unique_ptr<SparseMatrix<Number>> matrix;
+  if (this->has_static_condensation())
+    matrix = std::make_unique<StaticCondensation>(
+        this->get_mesh(), *this, this->get_dof_map(), *_sc_dof_map);
+  else
+    matrix = SparseMatrix<Number>::build(this->comm(), libMesh::default_solver_package());
+  auto & mat = *matrix;
+
+  _matrices.emplace(mat_name, std::move(matrix));
 
   _matrix_types.emplace(mat_name, type);
-
-  SparseMatrix<Number> & mat = *(pr.first->second);
 
   // Initialize it first if we've already initialized the others.
   this->late_matrix_init(mat, type);
