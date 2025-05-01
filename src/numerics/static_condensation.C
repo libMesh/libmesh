@@ -15,6 +15,7 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include "libmesh/enum_parallel_type.h"
 #include "libmesh/static_condensation.h"
 
 #if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_HAVE_PETSC)
@@ -46,7 +47,8 @@ StaticCondensation::StaticCondensation(const MeshBase & mesh,
     _reduced_dof_map(reduced_dof_map),
     _current_elem_id(DofObject::invalid_id),
     _sc_is_initialized(false),
-    _have_cached_values(false)
+    _have_cached_values(false),
+    _parallel_type(INVALID_PARALLELIZATION)
 {
   _size_one_mat.resize(1, 1);
   _scp = std::make_unique<StaticCondensationPreconditioner>(*this);
@@ -94,6 +96,7 @@ void StaticCondensation::init(const numeric_index_type m,
   if (!this->initialized())
     {
       PetscMatrixShellMatrix<Number>::init(m, n, m_l, n_l, nnz, noz, blocksize);
+      _parallel_type = ((m == m_l) && (this->n_processors() > 1)) ? SERIAL : PARALLEL;
       this->init();
     }
 }
@@ -103,6 +106,7 @@ void StaticCondensation::init(const ParallelType type)
   if (!this->initialized())
     {
       PetscMatrixShellMatrix<Number>::init(type);
+      _parallel_type = type;
       this->init();
     }
 }
@@ -114,10 +118,17 @@ bool StaticCondensation::initialized() const
 
 void StaticCondensation::init()
 {
-  if (_sc_is_initialized)
+  if (this->initialized())
     return;
 
   libmesh_assert(_reduced_dof_map.initialized());
+
+  // This API is public, so it can be called without going through the other init overloads which
+  // would give us an indication of what kind of parallel type the user wants. If we've gotten no
+  // indication so far, we will default to parallel
+  if (_parallel_type == INVALID_PARALLELIZATION)
+    _parallel_type = PARALLEL;
+  libmesh_assert(_parallel_type != SERIAL);
 
   for (const auto & [elem_id, dof_data] : _reduced_dof_map._elem_to_dof_data)
     {
@@ -136,7 +147,8 @@ void StaticCondensation::init()
   // Build the reduced system data
   //
   const auto n = _reduced_dof_map.n_dofs();
-  const auto n_local = _reduced_dof_map.n_local_dofs();
+  const auto n_local =
+      (_parallel_type == SERIAL) ? _reduced_dof_map.n_dofs() : _reduced_dof_map.n_local_dofs();
   _reduced_solver = LinearSolver<Number>::build(this->comm());
   _reduced_solver->init((_system.name() + "_condensed_").c_str());
   _reduced_rhs = NumericVector<Number>::build(this->comm());

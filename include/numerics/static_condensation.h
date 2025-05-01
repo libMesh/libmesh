@@ -264,6 +264,9 @@ private:
 
   /// Whether we have cached values via add_XXX()
   bool _have_cached_values;
+
+  /// The parallel type to use for the reduced matrix
+  ParallelType _parallel_type;
 };
 
 inline const SparseMatrix<Number> & StaticCondensation::get_condensed_mat() const
