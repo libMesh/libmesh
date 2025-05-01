@@ -1134,10 +1134,12 @@ public:
 
   void testPoly2TriNonUniformRefined()
   {
+#ifdef LIBMESH_HAVE_FPARSER
     ParsedFunction<Real> var_area {"0.002*(1+2*x)*(1+2*y)"};
     Mesh mesh(*TestCommWorld);
     testTriangulatorTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, nullptr, 1.5, 150, 0, &var_area);
+#endif // LIBMESH_HAVE_FPARSER
   }
 
   void testPoly2TriHolesRefined()
@@ -1251,6 +1253,7 @@ public:
 
   void testPoly2TriHolesNonUniformRefined()
   {
+#ifdef LIBMESH_HAVE_FPARSER
     // Add a diamond hole
     TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
@@ -1259,6 +1262,7 @@ public:
     Mesh mesh(*TestCommWorld);
     testTriangulatorTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, &holes, 1.25, 150, 0, &var_area);
+#endif // LIBMESH_HAVE_FPARSER
   }
 
 
