@@ -158,10 +158,7 @@ DofMap::DofMap(const unsigned int number,
   need_full_sparsity_pattern(false),
   _n_SCALAR_dofs(0)
 #ifdef LIBMESH_ENABLE_AMR
-  , _n_old_dfs(0),
-  _first_old_df(),
-  _end_old_df(),
-  _first_old_scalar_df()
+  , _first_old_scalar_df()
 #endif
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   , _dof_constraints()
@@ -1028,12 +1025,6 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   // Get DOF counts on all processors
   const auto n_dofs = this->compute_dof_info(next_free_dof);
 
-  // Resize and fill the _first_df and _end_df arrays
-#ifdef LIBMESH_ENABLE_AMR
-  _first_old_df = _first_df;
-  _end_old_df = _end_df;
-#endif
-
   // Clear all the current DOF indices
   // (distribute_dofs expects them cleared!)
   this->invalidate_dofs(mesh);
@@ -1107,10 +1098,8 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   }
 #endif
 
-  // Set the total number of degrees of freedom, then start finding
-  // SCALAR degrees of freedom
+  // start finding SCALAR degrees of freedom
 #ifdef LIBMESH_ENABLE_AMR
-  _n_old_dfs = _n_dfs;
   _first_old_scalar_df = _first_scalar_df;
 #endif
   _first_scalar_df.clear();

@@ -701,18 +701,6 @@ public:
     return n_local_dofs;
   }
 
-#ifdef LIBMESH_ENABLE_AMR
-  /**
-   * \returns The first old dof index that is local to partition \p proc.
-   */
-  dof_id_type first_old_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _first_old_df.size()); return _first_old_df[proc]; }
-
-  dof_id_type first_old_dof() const
-  { return this->first_old_dof(this->processor_id()); }
-
-#endif //LIBMESH_ENABLE_AMR
-
   /**
    * \returns The processor id that owns the dof index \p dof
    */
@@ -722,21 +710,6 @@ public:
     libmesh_assert (ub != _end_df.end());
     return cast_int<processor_id_type>(ub - _end_df.begin());
   }
-
-#ifdef LIBMESH_ENABLE_AMR
-  /**
-   * \returns The first old dof index that is after all indices local
-   * to processor \p proc.
-   *
-   * Analogous to the end() member function of STL containers.
-   */
-  dof_id_type end_old_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _end_old_df.size()); return _end_old_df[proc]; }
-
-  dof_id_type end_old_dof() const
-  { return this->end_old_dof(this->processor_id()); }
-
-#endif //LIBMESH_ENABLE_AMR
 
   void dof_indices (const Elem * const elem,
                     std::vector<dof_id_type> & di) const;
@@ -1586,11 +1559,6 @@ public:
                         std::vector<dof_id_type> & di,
                         const unsigned int vn = libMesh::invalid_uint) const;
 
-  /**
-   * \returns The total number of degrees of freedom on old_dof_objects
-   */
-  dof_id_type n_old_dofs() const { return _n_old_dfs; }
-
 #endif // LIBMESH_ENABLE_AMR
 
   /**
@@ -2112,21 +2080,6 @@ private:
   dof_id_type _n_SCALAR_dofs;
 
 #ifdef LIBMESH_ENABLE_AMR
-
-  /**
-   * Total number of degrees of freedom on old dof objects
-   */
-  dof_id_type _n_old_dfs;
-
-  /**
-   * First old DOF index on processor \p p.
-   */
-  std::vector<dof_id_type> _first_old_df;
-
-  /**
-   * Last old DOF index (plus 1) on processor \p p.
-   */
-  std::vector<dof_id_type> _end_old_df;
 
   /**
    * First old DOF index for SCALAR variable v, or garbage for
