@@ -66,8 +66,9 @@ private:
       Node * n2 = nullptr;
       for (const Node & n : e1c->node_ref_range())
         {
-          const Point diff = Point(*n1)-Point(n);
 #if LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+          const Point diff = Point(*n1)-Point(n);
+
           // We're testing against ExodusII input, and if we're in
           // triple or quadruple precision that means our lovely
           // higher-precision node coordinates got truncated to double
