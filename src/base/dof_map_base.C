@@ -20,6 +20,16 @@
 
 namespace libMesh
 {
+DofMapBase::DofMapBase(const Parallel::Communicator & comm)
+  : ParallelObject(comm),
+    _n_dfs(0)
+#ifdef LIBMESH_ENABLE_AMR
+    ,
+    _n_old_dfs(0)
+#endif
+{
+}
+
 std::size_t DofMapBase::compute_dof_info(const dof_id_type n_local_dofs)
 {
   // Get DOF counts on all processors
@@ -28,7 +38,12 @@ std::size_t DofMapBase::compute_dof_info(const dof_id_type n_local_dofs)
   std::vector<dof_id_type> dofs_on_proc(n_proc, 0);
   this->comm().allgather(n_local_dofs, dofs_on_proc);
 
+#ifdef LIBMESH_ENABLE_AMR
   // Resize and fill the _first_df and _end_df arrays
+  _first_old_df = _first_df;
+  _end_old_df = _end_df;
+#endif
+
   _first_df.resize(n_proc);
   _end_df.resize(n_proc);
 
@@ -38,6 +53,10 @@ std::size_t DofMapBase::compute_dof_info(const dof_id_type n_local_dofs)
     _first_df[i] = _end_df[i - 1] = _first_df[i - 1] + dofs_on_proc[i - 1];
   _end_df[n_proc - 1] = _first_df[n_proc - 1] + dofs_on_proc[n_proc - 1];
 
+// Set the total number of degrees of freedom
+#ifdef LIBMESH_ENABLE_AMR
+  _n_old_dfs = _n_dfs;
+#endif
   _n_dfs = _end_df[n_proc - 1];
 
   // Return total number of DOFs across all procs. We compute and

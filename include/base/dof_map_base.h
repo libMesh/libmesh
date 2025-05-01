@@ -31,7 +31,7 @@ class Node;
 class DofMapBase : public ParallelObject
 {
 public:
-  DofMapBase(const Parallel::Communicator & comm) : ParallelObject(comm), _n_dfs(0) {}
+  DofMapBase(const Parallel::Communicator & comm);
 
   /**
    * \returns The number of variables in the global solution vector. Defaults
@@ -96,6 +96,30 @@ public:
 
   virtual void clear();
 
+  /**
+   * \returns The total number of degrees of freedom on old_dof_objects
+   */
+  dof_id_type n_old_dofs() const { return _n_old_dfs; }
+
+#ifdef LIBMESH_ENABLE_AMR
+  /**
+   * \returns The first old dof index that is local to partition \p proc.
+   */
+  dof_id_type first_old_dof(const processor_id_type proc) const;
+
+  dof_id_type first_old_dof() const { return this->first_old_dof(this->processor_id()); }
+
+  /**
+   * \returns The first old dof index that is after all indices local
+   * to processor \p proc.
+   *
+   * Analogous to the end() member function of STL containers.
+   */
+  dof_id_type end_old_dof(const processor_id_type proc) const;
+
+  dof_id_type end_old_dof() const { return this->end_old_dof(this->processor_id()); }
+#endif // LIBMESH_ENABLE_AMR
+
 protected:
   /**
    * compute the key degree of freedom information given the local number of degrees of freedom on
@@ -118,6 +142,24 @@ protected:
    * Total number of degrees of freedom.
    */
   dof_id_type _n_dfs;
+
+#ifdef LIBMESH_ENABLE_AMR
+
+  /**
+   * Total number of degrees of freedom on old dof objects
+   */
+  dof_id_type _n_old_dfs;
+
+  /**
+   * First old DOF index on processor \p p.
+   */
+  std::vector<dof_id_type> _first_old_df;
+
+  /**
+   * Last old DOF index (plus 1) on processor \p p.
+   */
+  std::vector<dof_id_type> _end_old_df;
+#endif
 };
 
 inline dof_id_type DofMapBase::first_dof(const processor_id_type proc) const
@@ -136,6 +178,18 @@ inline dof_id_type DofMapBase::n_dofs_on_processor(const processor_id_type proc)
 {
   libmesh_assert_less(proc, _first_df.size());
   return cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
+}
+
+inline dof_id_type DofMapBase::first_old_dof(const processor_id_type proc) const
+{
+  libmesh_assert_less(proc, _first_old_df.size());
+  return _first_old_df[proc];
+}
+
+inline dof_id_type DofMapBase::end_old_dof(const processor_id_type proc) const
+{
+  libmesh_assert_less(proc, _end_old_df.size());
+  return _end_old_df[proc];
 }
 
 }
