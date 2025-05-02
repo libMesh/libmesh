@@ -587,17 +587,17 @@ void System::assemble_qoi_derivative(const QoISet & qoi_indices,
 
 
 void System::qoi_parameter_sensitivity (const QoISet & qoi_indices,
-                                        const ParameterVector & parameters,
+                                        const ParameterVector & parameters_vec,
                                         SensitivityData & sensitivities)
 {
   // Forward sensitivities are more efficient for Nq > Np
-  if (qoi_indices.size(*this) > parameters.size())
-    forward_qoi_parameter_sensitivity(qoi_indices, parameters, sensitivities);
+  if (qoi_indices.size(*this) > parameters_vec.size())
+    forward_qoi_parameter_sensitivity(qoi_indices, parameters_vec, sensitivities);
   // Adjoint sensitivities are more efficient for Np > Nq,
   // and an adjoint may be more reusable than a forward
   // solution sensitivity in the Np == Nq case.
   else
-    adjoint_qoi_parameter_sensitivity(qoi_indices, parameters, sensitivities);
+    adjoint_qoi_parameter_sensitivity(qoi_indices, parameters_vec, sensitivities);
 }
 
 
