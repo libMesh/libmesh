@@ -290,6 +290,7 @@ SolverPackage default_solver_package ();
 constexpr Real operator ""_R(const char * r) { return Real(r); }
 #else
 constexpr Real operator ""_R(long double r) { return r; }
+constexpr Real operator ""_R(unsigned long long r) { return Real(r); }
 #endif
 
 /**
