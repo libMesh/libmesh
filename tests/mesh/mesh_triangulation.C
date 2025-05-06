@@ -152,11 +152,8 @@ public:
         const int n_sides = i+2;
         const TriangulatorInterface::Hole & hole = polyholes[i];
 
-        // Really?  This isn't until C++20?
-        constexpr double my_pi = 3.141592653589793238462643383279;
-
         const Real computed_area = hole.area();
-        const Real theta = my_pi/n_sides;
+        const Real theta = pi/n_sides;
         const Real half_side_length = radius*std::cos(theta);
         const Real apothem = radius*std::sin(theta);
         const Real area = n_sides * apothem * half_side_length;
@@ -455,7 +452,7 @@ public:
     commonSettings(triangulator);
 
     // Add a diamond hole in the center
-    TriangulatorInterface::PolygonHole diamond(Point(0), std::sqrt(2)/2, 4);
+    TriangulatorInterface::PolygonHole diamond(Point(0), std::sqrt(2_R)/2, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
     triangulator.attach_hole_list(&holes);
 
@@ -464,8 +461,8 @@ public:
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), static_cast<dof_id_type>(8));
 
     // Center coordinates for all the elements we expect
-    Real r2p2o6 = (std::sqrt(Real(2))+2)/6;
-    Real r2p4o6 = (std::sqrt(Real(2))+4)/6;
+    Real r2p2o6 = (std::sqrt(2_R)+2)/6;
+    Real r2p4o6 = (std::sqrt(2_R)+4)/6;
 
     std::vector <Point> expected_centers
     { {r2p2o6,r2p2o6}, {r2p2o6,-r2p2o6},
@@ -1137,10 +1134,12 @@ public:
 
   void testPoly2TriNonUniformRefined()
   {
+#ifdef LIBMESH_HAVE_FPARSER
     ParsedFunction<Real> var_area {"0.002*(1+2*x)*(1+2*y)"};
     Mesh mesh(*TestCommWorld);
     testTriangulatorTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, nullptr, 1.5, 150, 0, &var_area);
+#endif // LIBMESH_HAVE_FPARSER
   }
 
   void testPoly2TriHolesRefined()
@@ -1148,7 +1147,7 @@ public:
     LOG_UNIT_TEST;
 
     // Add a diamond hole
-    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
+    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2_R)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
     Mesh mesh(*TestCommWorld);
@@ -1172,7 +1171,7 @@ public:
 
     // Add a bunch of tiny diamond holes
     const int N=3, M=3;
-    TriangulatorInterface::PolygonHole diamond(Point(), std::sqrt(2)/20, 4);
+    TriangulatorInterface::PolygonHole diamond(Point(), std::sqrt(2_R)/20, 4);
 
     std::vector<TriangulatorInterface::AffineHole> hole_data;
     // Reserve so we don't invalidate pointers
@@ -1191,7 +1190,7 @@ public:
 
     p2t_tri.set_refine_boundary_allowed(false);
 
-    testTriangulatorInterp(mesh, p2t_tri, 4, 0, total_area, 0.03);
+    testTriangulatorInterp(mesh, p2t_tri, 4, 0, total_area, 0.03_R);
   }
 
   void testPoly2TriHolesInteriorRefinedBase
@@ -1199,7 +1198,7 @@ public:
      Real desired_area)
   {
     // Add a diamond hole, disallowing refinement of it
-    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
+    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2_R)/4, 4);
 
     CPPUNIT_ASSERT_EQUAL(diamond.refine_boundary_allowed(), true);
 
@@ -1244,7 +1243,7 @@ public:
   void testPoly2TriHolesExtraRefined()
   {
     // Add a diamond hole
-    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
+    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2_R)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
     Mesh mesh(*TestCommWorld);
@@ -1254,14 +1253,16 @@ public:
 
   void testPoly2TriHolesNonUniformRefined()
   {
+#ifdef LIBMESH_HAVE_FPARSER
     // Add a diamond hole
-    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2)/4, 4);
+    TriangulatorInterface::PolygonHole diamond(Point(0.5,0.5), std::sqrt(2_R)/4, 4);
     const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
 
     ParsedFunction<Real> var_area {"0.002*(0.25+2*x)*(0.25+2*y)"};
     Mesh mesh(*TestCommWorld);
     testTriangulatorTrapMesh(mesh);
     testPoly2TriRefinementBase(mesh, &holes, 1.25, 150, 0, &var_area);
+#endif // LIBMESH_HAVE_FPARSER
   }
 
 

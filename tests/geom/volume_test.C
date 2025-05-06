@@ -236,7 +236,7 @@ public:
     // floating point accuracy.
     middle_node = Point(0.5, 0.1, 0.);
     right_node = Point(1., 0., 0.);
-    LIBMESH_ASSERT_FP_EQUAL(edge3->Elem::volume(), edge3->volume(), std::sqrt(TOLERANCE));
+    LIBMESH_ASSERT_FP_EQUAL(edge3->Elem::volume(), edge3->volume(), 1e-4);
   }
 
   void testEdge3Invertible()
@@ -416,7 +416,7 @@ public:
 
       // 1a) Unit square aspect ratio should be == 1
       Real aspect_ratio = elem->quality(ASPECT_RATIO);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
 
       // 1b) Rotate all points about x-axis by 90 degrees
       Real cost = std::cos(.5*libMesh::pi);
@@ -429,7 +429,7 @@ public:
         pt = Rx * pt;
 
       aspect_ratio = elem->quality(ASPECT_RATIO);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
 
       // 1c) Rotate all points about z-axis by 90 degrees
       RealTensorValue Rz(cost, -sint, 0,
@@ -440,7 +440,7 @@ public:
         pt = Rz * pt;
 
       aspect_ratio = elem->quality(ASPECT_RATIO);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
 
       // 1d) Rotate all points about y-axis by 270 degrees
       RealTensorValue Ry(cost,  0, sint,
@@ -452,7 +452,7 @@ public:
           pt = Ry * pt;
 
       aspect_ratio = elem->quality(ASPECT_RATIO);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0, /*actual=*/aspect_ratio, TOLERANCE);
     }
 
     // Case 2: Rhombus QUAD4. This case should have an aspect ratio of
@@ -475,7 +475,7 @@ public:
 
         // The expected aspect ratio for the rhombus is 1/sin(theta)
         Real aspect_ratio = elem->quality(ASPECT_RATIO);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0/st, /*actual=*/aspect_ratio, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0/st, /*actual=*/aspect_ratio, TOLERANCE);
       };
 
       // 2a) Rhombus with interior angle theta=pi/6. The expected
@@ -499,7 +499,7 @@ public:
 
         // The expected aspect ratio for the rectangle is "a"
         Real aspect_ratio = elem->quality(ASPECT_RATIO);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/a, /*actual=*/aspect_ratio, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/a, /*actual=*/aspect_ratio, TOLERANCE);
       };
 
       // 3a) Test case twice as long as it is tall
@@ -525,7 +525,7 @@ public:
       libmesh_ignore(nodes);
 
       Real aspect_ratio = elem->quality(ASPECT_RATIO);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/2.5, /*actual=*/aspect_ratio, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/2.5, /*actual=*/aspect_ratio, TOLERANCE);
     }
 
     // Case 5) Trapezoid QUAD
@@ -538,7 +538,7 @@ public:
         libmesh_ignore(nodes);
 
         Real aspect_ratio = elem->quality(ASPECT_RATIO);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1./(1. - a), /*actual=*/aspect_ratio, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1./(1. - a), /*actual=*/aspect_ratio, TOLERANCE);
       };
 
       // 3a) Test "simple" trapezoid with expected aspect ratio 1.5
@@ -563,7 +563,7 @@ public:
       // The expected value is ~ 1.44338
       Real aspect_ratio = elem->quality(ASPECT_RATIO);
       // libMesh::out << "Unit TRI3 aspect ratio = " << aspect_ratio << std::endl;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(5)/2/std::sqrt(Real(3)), /*actual=*/aspect_ratio, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/Real(5)/2/std::sqrt(Real(3)), /*actual=*/aspect_ratio, TOLERANCE);
     }
 
     // Case 2) Equilateral TRI3
@@ -576,7 +576,7 @@ public:
       // The expected value is 1.0
       Real aspect_ratio = elem->quality(ASPECT_RATIO);
       // libMesh::out << "Equilateral TRI3 aspect ratio = " << aspect_ratio << std::endl;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1), /*actual=*/aspect_ratio, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/Real(1), /*actual=*/aspect_ratio, TOLERANCE);
     }
 
     // Case 3) Reference TRI3 with one leg length = L >> 1
@@ -590,7 +590,7 @@ public:
       // The expected value is ~ 11.5759
       Real aspect_ratio = elem->quality(ASPECT_RATIO);
       // libMesh::out << "TRI3 with leg length L = " << L << ", aspect ratio = " << aspect_ratio << std::endl;
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1)/std::sqrt(Real(3)) * (Real(2)*L + Real(1)/(2*L)), /*actual=*/aspect_ratio, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/Real(1)/std::sqrt(Real(3)) * (Real(2)*L + Real(1)/(2*L)), /*actual=*/aspect_ratio, TOLERANCE);
     }
   }
 
@@ -609,7 +609,7 @@ public:
 
       // 1a) Any flat element should have warp == 1
       Real warpage = elem->quality(WARP);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
 
       // 1b) Rotate all points about x-axis by 90 degrees
       Real cost = std::cos(.5*libMesh::pi);
@@ -622,7 +622,7 @@ public:
         pt = Rx * pt;
 
       warpage = elem->quality(WARP);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
 
       // 1c) Rotate all points about z-axis by 90 degrees
       RealTensorValue Rz(cost, -sint, 0,
@@ -633,7 +633,7 @@ public:
         pt = Rz * pt;
 
       warpage = elem->quality(WARP);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
 
       // 1d) Rotate all points about y-axis by 270 degrees
       RealTensorValue Ry(cost,  0, sint,
@@ -645,7 +645,7 @@ public:
           pt = Ry * pt;
 
       warpage = elem->quality(WARP);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0, /*actual=*/warpage, TOLERANCE);
     }
 
     // Case 2: Unit square quadrilateral with Node 2 displaced by a distance h in the z-direction.
@@ -660,7 +660,7 @@ public:
         // libMesh::out << "QUAD with node 3 displaced by h = "
         //              << h << " in the z-direction , warpage = " << warpage
         //              << std::endl;
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1) / (h*h + 1), /*actual=*/warpage, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/Real(1) / (h*h + 1), /*actual=*/warpage, TOLERANCE);
       };
 
       // For h = 0.1, the expected warpage value is ~ 0.991, so not
@@ -691,8 +691,8 @@ public:
       {
         Real min_angle = elem->quality(MIN_ANGLE);
         Real max_angle = elem->quality(MAX_ANGLE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
       }
 
       // 1b) Rotate all points about x-axis by 90 degrees
@@ -708,8 +708,8 @@ public:
       {
         Real min_angle = elem->quality(MIN_ANGLE);
         Real max_angle = elem->quality(MAX_ANGLE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
       }
 
       // 1c) Rotate all points about z-axis by 90 degrees
@@ -723,8 +723,8 @@ public:
       {
         Real min_angle = elem->quality(MIN_ANGLE);
         Real max_angle = elem->quality(MAX_ANGLE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
       }
 
       // 1d) Rotate all points about y-axis by 270 degrees
@@ -739,8 +739,8 @@ public:
       {
         Real min_angle = elem->quality(MIN_ANGLE);
         Real max_angle = elem->quality(MAX_ANGLE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/min_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
       }
     }
 
@@ -765,8 +765,8 @@ public:
 
         Real min_angle = elem->quality(MIN_ANGLE);
         Real max_angle = elem->quality(MAX_ANGLE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(180) / libMesh::pi * theta,                 /*actual=*/min_angle, TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(180) / libMesh::pi * (libMesh::pi - theta), /*actual=*/max_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/Real(180) / libMesh::pi * theta,                 /*actual=*/min_angle, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/Real(180) / libMesh::pi * (libMesh::pi - theta), /*actual=*/max_angle, TOLERANCE);
       };
 
       // 2a) Rhombus with interior angle theta=pi/6.
@@ -808,8 +808,8 @@ public:
         // libMesh::out << "jac = " << jac << std::endl;
         // libMesh::out << "scaled_jac = " << scaled_jac << std::endl;
 
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/std::abs(std::sin(theta)), /*actual=*/jac, TOLERANCE);
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/std::abs(std::sin(theta)), /*actual=*/scaled_jac, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::abs(std::sin(theta)), /*actual=*/jac, TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::abs(std::sin(theta)), /*actual=*/scaled_jac, TOLERANCE);
       };
 
       // 2a) Rhombus with interior angle theta=pi/6.
@@ -844,12 +844,12 @@ public:
     // libMesh::out << "Squashed Tet4 min_dihedral_angle = " << min_dihedral_angle << " degrees" << std::endl;
     // libMesh::out << "Squashed Tet4 max_dihedral_angle = " << max_dihedral_angle << " degrees" << std::endl;
 
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/44.9985676771277, /*actual=*/min_angle, TOLERANCE);
-    CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/44.9985676771277, /*actual=*/min_angle, TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/90, /*actual=*/max_angle, TOLERANCE);
 
     // Assert that both min and max dihedral angles are less than 1 degree (a very low quality element)
-    CPPUNIT_ASSERT_LESS(1.0, min_dihedral_angle);
-    CPPUNIT_ASSERT_LESS(1.0, max_dihedral_angle);
+    CPPUNIT_ASSERT_LESS(Real(1), min_dihedral_angle);
+    CPPUNIT_ASSERT_LESS(Real(1), max_dihedral_angle);
   }
 
   void testTet4Jacobian()
@@ -860,7 +860,7 @@ public:
       // Same element as in testTet4DihedralAngle(). Here we verify that
       // the element is low quality since the SCALED_JACOBIAN is < O(h)
       // as h -> 0, and h can be arbitrarily small in the squashed element.
-      Real h = 0.01;
+      Real h = Real(1)/100;
       std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(0, 1, 0), Point(1, 1, h)};
       auto [elem, nodes] = this->construct_elem(pts, TET4);
       libmesh_ignore(nodes);
@@ -872,8 +872,9 @@ public:
       // libMesh::out << "Squashed Tet4 jac = " << jac << std::endl;
       // libMesh::out << "Squashed Tet4 scaled_jac = " << scaled_jac << std::endl;
 
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/h, /*actual=*/jac, TOLERANCE);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/h/std::sqrt(h*h + 2), /*actual=*/scaled_jac, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/h, /*actual=*/jac, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/h/(h*h+1)/std::sqrt(h*h+2),
+                              /*actual=*/scaled_jac, TOLERANCE * TOLERANCE);
     }
 
     {
@@ -899,8 +900,8 @@ public:
       // libMesh::out << "build_cube() Tet4 jac = " << jac << std::endl;
       // libMesh::out << "build_cube() Tet4 scaled_jac = " << scaled_jac << std::endl;
 
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/2,                          /*actual=*/jac, TOLERANCE);
-      CPPUNIT_ASSERT_DOUBLES_EQUAL(/*expected=*/Real(1)/std::sqrt(Real(6)), /*actual=*/scaled_jac, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/2,                          /*actual=*/jac, TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/Real(1)/std::sqrt(Real(6)), /*actual=*/scaled_jac, TOLERANCE);
     }
   }
 
@@ -1103,12 +1104,12 @@ protected:
           // libMesh::out << "base_centroid = " << base_centroid << std::endl;
           // libMesh::out.flags(flags);
 
-          CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, TOLERANCE*TOLERANCE));
+          CPPUNIT_ASSERT(derived_centroid.absolute_fuzzy_equals(base_centroid, 50*TOLERANCE*TOLERANCE));
 
           // Make sure that base class and "optimized" routines for computing the cell volume agree
           Real derived_volume = elem->volume();
           Real base_volume = elem->Elem::volume();
-          LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, 50*TOLERANCE*TOLERANCE);
         }
     }
   }

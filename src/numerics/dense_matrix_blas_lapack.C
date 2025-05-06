@@ -605,7 +605,7 @@ void DenseMatrix<T>::_svd_solve_lapack(const DenseVector<T> & rhs,
   // Used to determine the effective rank of A.  Singular values
   // S(i) <= RCOND*S(1) are treated as zero.  If RCOND < 0, machine
   // precision is used instead.
-  PetscScalar RCOND = rcond;
+  PetscScalar RCOND = PS(rcond);
 
   // RANK
   // The effective rank of A, i.e., the number of singular values

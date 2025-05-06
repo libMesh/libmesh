@@ -289,21 +289,27 @@ public:
   void testCoreformGeom2()
   {
     LOG_UNIT_TEST;
-    testCoreform("meshes/geom_2.exo", "matrices/geom_2_extraction_op.m", 0.0959827039398013);
+    testCoreform("meshes/geom_2.exo",
+                 "matrices/geom_2_extraction_op.m",
+                 0.09598270393980124874069039295234223854_R);
   }
 
 
   void testCoreformGeom4()
   {
     LOG_UNIT_TEST;
-    testCoreform("meshes/geom_4.exo", "matrices/geom_4_extraction_op.m", 0.10404051279393);
+    testCoreform("meshes/geom_4.exo",
+                 "matrices/geom_4_extraction_op.m",
+                 0.1040405127939275102143852084416339522_R);
   }
 
 
   void testCoreformGeom8()
   {
     LOG_UNIT_TEST;
-    testCoreform("meshes/geom_8.exo", "matrices/geom_8_extraction_op.m", 0.103252835327016);
+    testCoreform("meshes/geom_8.exo",
+                 "matrices/geom_8_extraction_op.m",
+                 0.103252835327032837145271735988790535_R);
   }
 
 

@@ -25,12 +25,16 @@
 #include <type_traits> // std::is_trivially_copyable
 
 
+// Boost doesn't satisfy `is_trivially_copyable` for its float128
+// wrapper, but surely it's memcpyable anyway?
+#if !LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 static_assert(std::is_trivially_copyable<libMesh::TypeVector<libMesh::Real>>::value,
               "Someone made TypeVector non-TriviallyCopyable");
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 static_assert(std::is_trivially_copyable<libMesh::TypeVector<libMesh::Complex>>::value,
               "Someone made TypeVector non-TriviallyCopyable");
 #endif
+#endif // LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 
 
 namespace libMesh

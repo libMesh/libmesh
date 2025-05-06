@@ -43,10 +43,11 @@ public:
   {
     auto mat_to_read = std::make_unique<PetscMatrix<Number>>(*my_comm);
 
-    // Petsc binary formats depend on sizeof(PetscInt)
-#if LIBMESH_DOF_ID_BYTES == 4
+    // Petsc binary formats depend on sizeof(PetscInt) and
+    // sizeof(PetscScalar)
+#if LIBMESH_DOF_ID_BYTES == 4 && LIBMESH_DEFAULT_DOUBLE_PRECISION
     mat_to_read->read("matrices/geom_1_extraction_op.petsc32");
-#elif LIBMESH_DOF_ID_BYTES == 8
+#elif LIBMESH_DOF_ID_BYTES == 8 && LIBMESH_DEFAULT_DOUBLE_PRECISION
     mat_to_read->read("matrices/geom_1_extraction_op.petsc64");
 #else
     return;

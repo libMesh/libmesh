@@ -287,7 +287,7 @@ Point Quad4::true_centroid () const
   // (as defined on the [-1,1]^2 reference domain). We use a 4-point
   // rule, which is exact for bi-cubics. The weights for this rule are
   // all equal to 1.
-  const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
+  const Real q[2] = {-std::sqrt(Real(3))/3, std::sqrt(Real(3))/3.};
 
   // Nodal areas
   Real A0 = 0., A1 = 0., A2 = 0., A3 = 0.;
@@ -337,7 +337,7 @@ Real Quad4::volume () const
 
   // 4-point rule, exact for bi-cubics.  The weights for this rule are
   // all equal to 1.
-  const Real q[2] = {-std::sqrt(3.)/3, std::sqrt(3.)/3.};
+  const Real q[2] = {-std::sqrt(Real(3))/3, std::sqrt(Real(3))/3.};
 
   Real vol=0.;
   for (unsigned int i=0; i<2; ++i)

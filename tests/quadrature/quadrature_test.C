@@ -371,6 +371,12 @@ public:
           if (elem_type == PYRAMID18)
             exactorder=1;
 
+          // Our PRISM20 rule was only computed in double precision.
+          if ((sizeof(Real) > sizeof(double)) && elem_type == PRISM20)
+            quadrature_tolerance = TOLERANCE;
+          else // restore the default
+            quadrature_tolerance = TOLERANCE * std::sqrt(TOLERANCE);
+
           testPolynomials(QNODAL, order, elem_type, true_values[i], exactorder);
         }
   }
@@ -402,13 +408,16 @@ public:
     QuadratureType qtype[3] = {QCONICAL, QGRUNDMANN_MOLLER, QGAUSS};
 
     int end_order = 7;
-    // Our higher order tet rules were only computed to double precision
-    if (quadrature_tolerance < 1e-16)
-      end_order = 2;
 
     for (int qt=0; qt<3; ++qt)
       for (int order=0; order<end_order; ++order)
-        testPolynomials(qtype[qt], order, TET4, tet_integrals, order);
+        {
+          // Our higher order tet rules were only computed to double
+          // precision
+          if ((sizeof(Real) > sizeof(double)) && order > 2)
+            quadrature_tolerance = TOLERANCE;
+          testPolynomials(qtype[qt], order, TET4, tet_integrals, order);
+        }
   }
 
   void testTriQuadrature ()
@@ -564,7 +573,14 @@ public:
     else if (qtype == QSIMPSON)
       testPolynomials(qtype, order, TRI6, tri_integrals, std::min(1u,exactorder));
     else
-      testPolynomials(qtype, order, TRI6, tri_integrals, exactorder);
+      {
+        // Our 18th order and higher triangle rules were only computed
+        // in double precision, so we use a lower tolerance here.
+        if ((sizeof(Real) > sizeof(double)) && (order > 17))
+          quadrature_tolerance = TOLERANCE;
+
+        testPolynomials(qtype, order, TRI6, tri_integrals, exactorder);
+      }
   }
 
 
@@ -602,8 +618,15 @@ public:
     else
       {
         testPolynomials(qtype, order, TET10, tet_integrals, exactorder);
-        testPolynomials(qtype, order, PRISM15, prism_integrals, exactorder);
         testPolynomials(qtype, order, PYRAMID14, pyramid_integrals, exactorder);
+
+        // Our 18th order and higher triangle rules (used to construct
+        // prism rules) were only computed in double precision, so we
+        // use a lower tolerance here.
+        if ((sizeof(Real) > sizeof(double)) && (order > 17))
+          quadrature_tolerance = TOLERANCE;
+
+        testPolynomials(qtype, order, PRISM15, prism_integrals, exactorder);
       }
   }
 };

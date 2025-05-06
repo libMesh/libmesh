@@ -2221,26 +2221,12 @@ void Nemesis_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool /*us
 
   if (local_num_nodes)
     {
-      if (_single_precision)
-        {
-          std::vector<float>
-            x_single(x.begin(), x.end()),
-            y_single(y.begin(), y.end()),
-            z_single(z.begin(), z.end());
-
-          ex_err = exII::ex_put_coord(ex_id,
-                                      x_single.data(),
-                                      y_single.data(),
-                                      z_single.data());
-        }
-      else
-        {
-          // Call Exodus API to write nodal coordinates...
-          ex_err = exII::ex_put_coord(ex_id,
-                                      x.data(),
-                                      y.data(),
-                                      z.data());
-        }
+      // Call Exodus API to write nodal coordinates...
+      ex_err = exII::ex_put_coord
+        (ex_id,
+         x.empty() ? nullptr : MappedOutputVector(x, _single_precision).data(),
+         y.empty() ? nullptr : MappedOutputVector(y, _single_precision).data(),
+         z.empty() ? nullptr : MappedOutputVector(z, _single_precision).data());
       EX_CHECK_ERR(ex_err, "Error writing node coordinates");
 
       // And write the nodal map we created for them
@@ -2706,7 +2692,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                                    static_cast<int>(stride*(var_ctr+comp)+1),
                                                    static_cast<int>(sbd_id),
                                                    static_cast<int>(local_soln.size()),
-                                                   local_soln_buffer.data());
+                                                   MappedOutputVector(local_soln_buffer, _single_precision).data());
                     EX_CHECK_ERR(ex_err, "Error writing element real values.");
 
                     std::transform(local_soln.begin(), local_soln.end(),
@@ -2716,7 +2702,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                                    static_cast<int>(stride*(var_ctr+comp)+2),
                                                    static_cast<int>(sbd_id),
                                                    static_cast<int>(local_soln.size()),
-                                                   local_soln_buffer.data());
+                                                   MappedOutputVector(local_soln_buffer, _single_precision).data());
                     EX_CHECK_ERR(ex_err, "Error writing element imaginary values.");
 
                     if (write_complex_abs)
@@ -2728,7 +2714,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                                        static_cast<int>(stride*(var_ctr+comp)+2),
                                                        static_cast<int>(sbd_id),
                                                        static_cast<int>(local_soln.size()),
-                                                       local_soln_buffer.data());
+                                                       MappedOutputVector(local_soln_buffer, _single_precision).data());
                         EX_CHECK_ERR(ex_err, "Error writing element magnitudes.");
                       }
 #else // LIBMESH_USE_COMPLEX_NUMBERS
@@ -2737,7 +2723,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
                                                    static_cast<int>(var_ctr+comp+1),
                                                    static_cast<int>(sbd_id),
                                                    static_cast<int>(local_soln.size()),
-                                                   local_soln.data());
+                                                   MappedOutputVector(local_soln, _single_precision).data());
                     EX_CHECK_ERR(ex_err, "Error writing element values.");
 #endif // LIBMESH_USE_COMPLEX_NUMBERS
                   }

@@ -276,10 +276,27 @@ extern const Number imaginary;
 SolverPackage default_solver_package ();
 
 /**
+ * The C++ standard doesn't support literals at higher than long
+ * double precision, so if we're in quadruple precision we need our
+ * own user-defined literal operator.
+ *
+ * If we're not in quadruple precision then we just need a
+ * zero-overhead passthrough.
+ *
+ * We'll use a simple _R since we're already qualified by the libMesh
+ * namespace here.
+ */
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+constexpr Real operator ""_R(const char * r) { return Real(r); }
+#else
+constexpr Real operator ""_R(long double r) { return r; }
+constexpr Real operator ""_R(unsigned long long r) { return Real(r); }
+#endif
+
+/**
  * \f$ \pi=3.14159... \f$.
  */
-const Real pi =
-  static_cast<Real>(3.1415926535897932384626433832795029L);
+const Real pi = 3.1415926535897932384626433832795029_R;
 
 /**
  * \f$ zero=0. \f$.

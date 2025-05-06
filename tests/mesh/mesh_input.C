@@ -245,8 +245,8 @@ public:
       for (Elem * elem : elements)
       {
         const Point center = elem->vertex_average();
-        const int xn = center(0)*3;
-        const int yn = center(1)*3;
+        const int xn = int(center(0)*3);
+        const int yn = int(center(1)*3);
         const dof_id_type new_id = start_id + yn*5 + xn;
         mesh.renumber_elem(elem->id(), new_id);
       }
@@ -273,8 +273,8 @@ public:
       for (const auto & elem : mesh.element_ptr_range())
       {
         const Point center = elem->vertex_average();
-        const int xn = center(0)*3;
-        const int yn = center(1)*3;
+        const int xn = int(center(0)*3);
+        const int yn = int(center(1)*3);
         const dof_id_type expected_id = start_id + yn*5 + xn;
         CPPUNIT_ASSERT_EQUAL(elem->id(), expected_id);
       }
@@ -294,8 +294,8 @@ public:
       for (const auto & elem : mesh.element_ptr_range())
       {
         const Point center = elem->vertex_average();
-        const int xn = center(0)*3;
-        const int yn = center(1)*3;
+        const int xn = int(center(0)*3);
+        const int yn = int(center(1)*3);
         const subdomain_id_type new_id = yn*4 + xn;
         elem->subdomain_id() = new_id;
       }
@@ -322,8 +322,8 @@ public:
       for (const auto & elem : mesh.element_ptr_range())
       {
         const Point center = elem->vertex_average();
-        const int xn = center(0)*3;
-        const int yn = center(1)*3;
+        const int xn = int(center(0)*3);
+        const int yn = int(center(1)*3);
         const subdomain_id_type expected_id = yn*4 + xn;
         CPPUNIT_ASSERT_EQUAL(elem->subdomain_id(), expected_id);
       }
@@ -1652,7 +1652,7 @@ public:
     if (elem)
       {
         const Real vol = elem->volume();
-        CPPUNIT_ASSERT_DOUBLES_EQUAL(vol, 1./6, TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(vol, 1./6, TOLERANCE*TOLERANCE);
       }
 #endif
   }
@@ -1765,7 +1765,7 @@ public:
     sys.project_solution(sin_x_plus_cos_y, nullptr, es.parameters);
 
     // Make this easy to tweak in the future
-    const double my_tolerance = TOLERANCE;
+    const Real my_tolerance = TOLERANCE;
 
     // Calculate some norms, skipping the spline points, and compare
     // to regression standard values

@@ -114,12 +114,19 @@
 
 namespace std
 {
+
+// With Boost 1.70 and earlier, we have to define operator<< ourselves
+// or we can't use it.  With Boost 1.71 and later, we *can't* define
+// operator<< ourselves or it conflicts with theirs.
+
+#if BOOST_VERSION < 107000
 inline
 std::ostream & operator<< (std::ostream & os, const PetscScalar in)
 {
   os << (boost::multiprecision::float128(in));
   return os;
 }
+#endif
 
 /*
 

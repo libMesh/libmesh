@@ -1259,7 +1259,7 @@ void PetscMatrix<T>::scale(const T scale)
 {
   libmesh_assert(this->closed());
 
-  LibmeshPetscCall(MatScale(this->_mat, scale));
+  LibmeshPetscCall(MatScale(this->_mat, PS(scale)));
 }
 
 template <typename T>

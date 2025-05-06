@@ -521,7 +521,7 @@ void VTKIO::nodes_to_vtk()
 
       double pnt[3] = {0, 0, 0};
       for (unsigned int i=0; i<LIBMESH_DIM; ++i)
-        pnt[i] = node(i);
+        pnt[i] = double(node(i));
 
       // Fill mapping between global and local node numbers
       _local_node_map[node.id()] = local_node_counter;
@@ -536,7 +536,7 @@ void VTKIO::nodes_to_vtk()
       if (have_weights)
       {
         Real weight = node.get_extra_datum<Real>(weight_index);
-        rational_weights->InsertTuple1(local_node_counter, weight);
+        rational_weights->InsertTuple1(local_node_counter, double(weight));
       }
 #endif
 
@@ -619,7 +619,7 @@ void VTKIO::cells_to_vtk()
               // InsertNextPoint accepts either a double or float array of length 3.
               double pt[3] = {0., 0., 0.};
               for (unsigned int d=0; d<LIBMESH_DIM; ++d)
-                pt[d] = the_node(d);
+                pt[d] = double(the_node(d));
 
               // Insert the point into the _vtk_grid
               vtkIdType local = _vtk_grid->GetPoints()->InsertNextPoint(pt);
@@ -664,7 +664,7 @@ void VTKIO::node_values_to_vtk(const std::string & name,
 
   // copy values into vtk
   for (auto i : index_range(local_values)) {
-    data->SetValue(i, local_values[i]);
+    data->SetValue(i, double(local_values[i]));
   }
 
   _vtk_grid->GetPointData()->AddArray(data);

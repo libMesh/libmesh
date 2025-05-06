@@ -50,9 +50,9 @@ public:
     CPPUNIT_ASSERT(params.has_value("a"));
     CPPUNIT_ASSERT(params.has_value("b"));
     CPPUNIT_ASSERT(params.has_value("c"));
-    CPPUNIT_ASSERT_EQUAL(params.get_value("a"), 1.);
-    CPPUNIT_ASSERT_EQUAL(params.get_value("b"), 2.);
-    CPPUNIT_ASSERT_EQUAL(params.get_value("c"), 3.);
+    CPPUNIT_ASSERT_EQUAL(params.get_value("a"), Real(1));
+    CPPUNIT_ASSERT_EQUAL(params.get_value("b"), Real(2));
+    CPPUNIT_ASSERT_EQUAL(params.get_value("c"), Real(3));
   }
 
   void testOldConstructor()
@@ -70,9 +70,9 @@ public:
     CPPUNIT_ASSERT(params.has_value("a"));
     CPPUNIT_ASSERT(params.has_value("b"));
     CPPUNIT_ASSERT(params.has_value("c"));
-    CPPUNIT_ASSERT_EQUAL(params.get_value("a"), 1.);
-    CPPUNIT_ASSERT_EQUAL(params.get_value("b"), 2.);
-    CPPUNIT_ASSERT_EQUAL(params.get_value("c"), 3.);
+    CPPUNIT_ASSERT_EQUAL(params.get_value("a"), Real(1));
+    CPPUNIT_ASSERT_EQUAL(params.get_value("b"), Real(2));
+    CPPUNIT_ASSERT_EQUAL(params.get_value("c"), Real(3));
 
     // Test that RBParameters objects constructed with the old
     // constructor have the correct number of samples.
@@ -99,9 +99,9 @@ public:
     CPPUNIT_ASSERT(m.count("a"));
     CPPUNIT_ASSERT(m.count("b"));
     CPPUNIT_ASSERT(m.count("c"));
-    CPPUNIT_ASSERT_EQUAL(m["a"], 1.);
-    CPPUNIT_ASSERT_EQUAL(m["b"], 2.);
-    CPPUNIT_ASSERT_EQUAL(m["c"], 3.);
+    CPPUNIT_ASSERT_EQUAL(m["a"], Real(1));
+    CPPUNIT_ASSERT_EQUAL(m["b"], Real(2));
+    CPPUNIT_ASSERT_EQUAL(m["c"], Real(3));
   }
 
   void testIteratorsWithSamples()
@@ -129,9 +129,9 @@ public:
     CPPUNIT_ASSERT(m.count("a"));
     CPPUNIT_ASSERT(m.count("b"));
     CPPUNIT_ASSERT(m.count("c"));
-    CPPUNIT_ASSERT_EQUAL(m["a"], 1.);
-    CPPUNIT_ASSERT_EQUAL(m["b"], 2.);
-    CPPUNIT_ASSERT_EQUAL(m["c"], 3.);
+    CPPUNIT_ASSERT_EQUAL(m["a"], Real(1));
+    CPPUNIT_ASSERT_EQUAL(m["b"], Real(2));
+    CPPUNIT_ASSERT_EQUAL(m["c"], Real(3));
   }
 
   void testAppend()

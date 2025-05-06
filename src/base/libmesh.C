@@ -231,8 +231,6 @@ PerfLog            perflog ("libMesh",
                             );
 
 
-// const Real         pi = 3.1415926535897932384626433832795029L;
-
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 const Number       imaginary (0., 1.);
 // const Number       zero      (0., 0.);

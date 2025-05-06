@@ -153,7 +153,7 @@ public:
         // simply refine the reference tetrahedron in that case.
         const Real scaled_jac = elem->quality(SCALED_JACOBIAN);
         CPPUNIT_ASSERT_LESSEQUAL   (1 + TOLERANCE, scaled_jac);
-        CPPUNIT_ASSERT_GREATEREQUAL(          0.4, scaled_jac);
+        CPPUNIT_ASSERT_GREATEREQUAL(    Real(0.4), scaled_jac);
 
         // Debugging
         // libMesh::out << "elem->type() = " << Utility::enum_to_string(elem->type())
