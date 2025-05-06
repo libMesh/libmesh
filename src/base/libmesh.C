@@ -442,30 +442,32 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       int mpi_thread_request = using_threads;
       const auto mpi_thread_type = libMesh::command_line_value("--mpi-thread-type", std::string(""));
       if (mpi_thread_type.empty())
-        check_empty_command_line_value(*command_line, "--mpi-thread-type");
+        {
+          check_empty_command_line_value(*command_line, "--mpi-thread-type");
+#if defined(PETSC_HAVE_STRUMPACK) && defined(PETSC_HAVE_SLATE)
+          mpi_thread_request = 3;
+#endif
+        }
       else
         {
-          int cli_mpi_thread_request;
           if (mpi_thread_type == "single")
             {
               if (using_threads)
                 libmesh_error_msg("We are using threads, so we require more mpi thread support "
                                   "than '--mpi-thread-type=single'");
-              cli_mpi_thread_request = 0;
+              mpi_thread_request = 0;
             }
           else if (mpi_thread_type == "funneled")
-            cli_mpi_thread_request = 1;
+            mpi_thread_request = 1;
           else if (mpi_thread_type == "serialized")
-            cli_mpi_thread_request = 2;
+            mpi_thread_request = 2;
           else if (mpi_thread_type == "multiple")
-            cli_mpi_thread_request = 3;
+            mpi_thread_request = 3;
           else
             libmesh_error_msg(
                 "Unsupported mpi thread type '"
                 << mpi_thread_type
                 << "'. Allowed options are 'single', 'funneled', 'serialized', and 'multiple'");
-
-          mpi_thread_request = cli_mpi_thread_request;
         }
 
       this->_timpi_init =
