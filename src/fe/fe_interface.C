@@ -822,7 +822,6 @@ RealGradient FEInterface::vectorshape_hcurl(const unsigned int dim,
       phi(1) = dxidy*vector_shape(0) + detady*vector_shape(1);
 
       phi(2) = dxidz*vector_shape(0) + detadz*vector_shape(1);
-          
 
       return phi;
     }
@@ -861,7 +860,7 @@ RealGradient FEInterface::vectorshape_hcurl(const unsigned int dim,
 
       phi(2) = dxidz*vector_shape(0) + detadz*vector_shape(1)
         + dzetadz*vector_shape(2);
-          
+
       return phi;
     }
 

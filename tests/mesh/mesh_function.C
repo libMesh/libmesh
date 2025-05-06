@@ -240,7 +240,7 @@ public:
                 EquationSystems::READ_ADDITIONAL_DATA);
     es.update();
 
-    // Pulling the correct system and variable infromation from 
+    // Pulling the correct system and variable infromation from
     // the XDA files (the default system name is "nl0")
     System & sys = es.get_system<System>("nl0");
     std::unique_ptr<NumericVector<Number>> mesh_function_vector =
@@ -257,7 +257,7 @@ public:
     DenseVector<Gradient> output;
     const std::set<subdomain_id_type> * subdomain_ids = nullptr;
     const Point & p = Point(0.5, 0.5);
-    
+
     // Suppling the Lagrange Vec value at center of mesh to output
     (mesh_function)(p, 0.0, output, subdomain_ids);
 
@@ -285,7 +285,7 @@ public:
                 EquationSystems::READ_ADDITIONAL_DATA);
     es.update();
 
-    // Pulling the correct system and variable infromation from 
+    // Pulling the correct system and variable infromation from
     // the XDA files (the default system name is "nl0")
     System & sys = es.get_system<System>("nl0");
     std::unique_ptr<NumericVector<Number>> mesh_function_vector =
@@ -302,7 +302,7 @@ public:
     DenseVector<Gradient> output;
     const std::set<subdomain_id_type> * subdomain_ids = nullptr;
     const Point & p = Point(0.5, 0.5);
-    
+
     // Suppling the Nedelec One value at center of mesh to output
     (mesh_function)(p, 0.0, output, subdomain_ids);
 
@@ -330,7 +330,7 @@ public:
                 EquationSystems::READ_ADDITIONAL_DATA);
     es.update();
 
-    // Pulling the correct system and variable infromation from 
+    // Pulling the correct system and variable infromation from
     // the XDA files (the default system name is "nl0")
     System & sys = es.get_system<System>("nl0");
     std::unique_ptr<NumericVector<Number>> mesh_function_vector =
@@ -347,7 +347,7 @@ public:
     DenseVector<Gradient> output;
     const std::set<subdomain_id_type> * subdomain_ids = nullptr;
     const Point & p = Point(0.5, 0.5);
-    
+
     // Suppling the Raviart Thomas value at center of mesh to output
     (mesh_function)(p, 0.0, output, subdomain_ids);
 
