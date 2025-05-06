@@ -216,7 +216,13 @@ data = matrices/geom_1_extraction_op.m \
        meshes/non_manifold_junction2.exo \
        meshes/non_manifold_junction3.exo \
        meshes/Cluster_34.stl \
-       meshes/engraving.stl
+       meshes/engraving.stl \
+       solutions/lagrange_vec_solution_mesh.xda \
+       solutions/lagrange_vec_solution.xda \
+       solutions/nedelec_one_solution_mesh.xda \
+       solutions/nedelec_one_solution.xda \
+       solutions/raviart_thomas_solution_mesh.xda \
+       solutions/raviart_thomas_solution.xda 
 
 
 unit_tests_data = $(data)
@@ -428,6 +434,7 @@ if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 
 .linkstamp:
+  -rm -f solutions && $(LN_S) -f $(srcdir)/solutions .
 	-rm -f meshes && $(LN_S) -f $(srcdir)/meshes .
 	-rm -f matrices && $(LN_S) -f $(srcdir)/matrices .
 	$(AM_V_GEN)touch .linkstamp
