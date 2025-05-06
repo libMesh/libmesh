@@ -1042,6 +1042,29 @@ T triple_product(const TypeVector<T> & a,
 }
 
 
+// compute the solid angle subtended by the tetrahedral vertex 0, as
+// defined by vectors v01, v02, and v03.  The solid angle is defined
+// to be positive if the vectors are obey the right-hand rule, or
+// negative for a left-hand orientation.
+template <typename T>
+inline
+T solid_angle(const TypeVector<T> & v01,
+              const TypeVector<T> & v02,
+              const TypeVector<T> & v03)
+{
+  const Real norm01 = v01.norm(),
+             norm02 = v02.norm(),
+             norm03 = v03.norm();
+  const T tan_half_angle =
+    triple_product(v01, v02, v03) /
+    ((v01*v02)*norm03 + (v01*v03)*norm02 + (v02*v03)*norm01 +
+     norm01*norm02*norm03);
+
+  return Real(2)*std::atan(tan_half_angle);
+}
+
+
+
 
 /**
  * Compute |b x c|^2 without creating the extra temporary produced by
