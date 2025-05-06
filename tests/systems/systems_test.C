@@ -777,9 +777,7 @@ public:
     TransientExplicitSystem &sys =
       es.add_system<TransientExplicitSystem> ("SimpleSystem");
 
-    auto generic_elem = Elem::build(elem_type);
-
-    auto u_var = sys.add_variable("u", generic_elem->default_order(), LAGRANGE_VEC);
+    auto u_var = sys.add_variable("u", Elem::type_to_default_order_map[elem_type], LAGRANGE_VEC);
 
     MeshTools::Generation::build_square (mesh,
                                          1, 1,
@@ -792,7 +790,7 @@ public:
     // function projection code right now
     for (const auto & node : mesh.local_node_ptr_range())
     {
-      for (unsigned int i = 0; i < generic_elem->dim(); ++i)
+      for (unsigned int i : make_range(Elem::type_to_dim_map[elem_type]))
       {
         auto dof_index = node->dof_number(sys.number(), u_var, i);
         sys.solution->set(dof_index, (*node)(i));
@@ -812,7 +810,7 @@ public:
     for (const auto & node : mesh.local_node_ptr_range())
     {
       // 2D element here
-      for (unsigned int i = 0; i < generic_elem->dim(); ++i)
+      for (unsigned int i : make_range(Elem::type_to_dim_map[elem_type]))
       {
         auto dof_index = node->dof_number(sys.number(), u_var, i);
         auto value = (*sys.solution)(dof_index);
@@ -829,9 +827,8 @@ public:
     TransientExplicitSystem &sys =
       es.add_system<TransientExplicitSystem> ("SimpleSystem");
 
-    auto generic_elem = Elem::build(elem_type);
-
-    auto u_var = sys.add_variable("u", generic_elem->default_order(), LAGRANGE_VEC);
+    auto u_var = sys.add_variable
+      ("u", Elem::type_to_default_order_map[elem_type], LAGRANGE_VEC);
 
     MeshTools::Generation::build_cube (mesh,
                                        1, 1, 1,
@@ -844,7 +841,7 @@ public:
     // function projection code right now
     for (const auto & node : mesh.local_node_ptr_range())
     {
-      for (unsigned int i = 0; i < generic_elem->dim(); ++i)
+      for (unsigned int i : make_range(Elem::type_to_dim_map[elem_type]))
       {
         auto dof_index = node->dof_number(sys.number(), u_var, i);
         sys.solution->set(dof_index, (*node)(i));
@@ -863,7 +860,7 @@ public:
 
     for (const auto & node : mesh.local_node_ptr_range())
     {
-      for (unsigned int i = 0; i < generic_elem->dim(); ++i)
+      for (unsigned int i : make_range(Elem::type_to_dim_map[elem_type]))
       {
         auto dof_index = node->dof_number(sys.number(), u_var, i);
         auto value = (*sys.solution)(dof_index);

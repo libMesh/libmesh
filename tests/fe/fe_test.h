@@ -349,8 +349,7 @@ public:
   void setUp()
   {
     _mesh = std::make_unique<Mesh>(*TestCommWorld);
-    const std::unique_ptr<Elem> test_elem = Elem::build(elem_type);
-    _dim = test_elem->dim();
+    _dim = Elem::type_to_dim_map[elem_type];
     const unsigned int build_ny = (_dim > 1) * build_nx;
     const unsigned int build_nz = (_dim > 2) * build_nx;
 

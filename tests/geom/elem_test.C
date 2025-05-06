@@ -198,10 +198,16 @@ public:
       {
         CPPUNIT_ASSERT(elem->n_nodes() <= Elem::max_n_nodes);
 
+        const ElemType etype = elem->type();
+
+        CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(elem->dim()),
+                             Elem::type_to_dim_map[etype]);
+        CPPUNIT_ASSERT_EQUAL(elem->default_order(),
+                             Elem::type_to_default_order_map[etype]);
+
         // If we have an element type with topology defined solely by
         // the type, then that should match the runtime topology.  If
         // not, then we should be aware of it.
-        const ElemType etype = elem->type();
         if (!elem->runtime_topology())
           {
             CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), Elem::type_to_n_nodes_map[etype]);
