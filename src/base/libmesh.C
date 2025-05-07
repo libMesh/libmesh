@@ -445,7 +445,12 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
         {
           check_empty_command_line_value(*command_line, "--mpi-thread-type");
 #if defined(PETSC_HAVE_STRUMPACK) && defined(PETSC_HAVE_SLATE)
-          // Slate always requests MPI_THREAD_MULTIPLE
+          // For GPU computations, the solver strumpack uses slate which always requests
+          // MPI_THREAD_MULTIPLE. The solution here is not perfect because the run may never be
+          // using strumpack, but we believe it's better to force the MPI library to use locks
+          // whenever it accesses the message queue, that is, when processing any sends and receive,
+          // than it is to require users to pre-announce/signal what solvers they are using through
+          // --mpi-thread-type
           mpi_thread_request = 3;
 #endif
         }
