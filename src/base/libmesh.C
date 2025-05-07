@@ -445,6 +445,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
         {
           check_empty_command_line_value(*command_line, "--mpi-thread-type");
 #if defined(PETSC_HAVE_STRUMPACK) && defined(PETSC_HAVE_SLATE)
+          // Slate always requests MPI_THREAD_MULTIPLE
           mpi_thread_request = 3;
 #endif
         }
