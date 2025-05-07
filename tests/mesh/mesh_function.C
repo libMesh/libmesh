@@ -227,6 +227,7 @@ public:
   }
 #endif // LIBMESH_ENABLE_AMR
 
+#ifdef LIBMESH_HAVE_PETSC
   // Tests the projection of Lagrange Vectors using MeshFunction
   void vectorMeshFunctionLagrange()
   {
@@ -361,6 +362,7 @@ public:
     LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(0)(1)), libMesh::libmesh_real(output_expected(1)),
                             TOLERANCE * TOLERANCE);
   }
+#endif // LIBMESH_HAVE_PETSC
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(MeshFunctionTest);
