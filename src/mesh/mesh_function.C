@@ -368,7 +368,7 @@ void MeshFunction::operator() (const Point & p,
 
               // interpolate the solution
               {
-                RealGradient value = 0.;
+                Gradient value = 0.;
 
                 for (auto i : index_range(dof_indices))
                   value += this->_vector(dof_indices[i]) * FEInterface::correct_vectorshape(dim, fe_type, element, i, pt);
