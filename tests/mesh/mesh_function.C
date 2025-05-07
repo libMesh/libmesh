@@ -264,11 +264,11 @@ public:
     (mesh_function)(p, 0.0, output, subdomain_ids);
 
     // Expected value at center mesh
-    Gradient output_expected = Gradient(0.100977281077292,0.201954562154583);
+    Gradient output_expected = VectorValue(0.100977281077292,0.201954562154583);
 
-    LIBMESH_ASSERT_FP_EQUAL(output(0)(0), output_expected(0),
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(0)(0)), libMesh::libmesh_real(output_expected(0)),
                             TOLERANCE * TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(output(0)(1), output_expected(1),
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(0)(1)), libMesh::libmesh_real(output_expected(1)),
                             TOLERANCE * TOLERANCE);
   }
 
@@ -309,11 +309,11 @@ public:
     (mesh_function)(p, 0.0, output, subdomain_ids);
 
     // Expected value at center mesh
-    Gradient output_expected = Gradient(0.0949202883998996,-0.0949202883918033);
+    Gradient output_expected = VectorValue(0.0949202883998996,-0.0949202883918033);
 
-    LIBMESH_ASSERT_FP_EQUAL(output(0)(0), output_expected(0),
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(0)(0)), libMesh::libmesh_real(output_expected(0)),
                             TOLERANCE * TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(output(0)(1), output_expected(1),
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(0)(1)), libMesh::libmesh_real(output_expected(1)),
                             TOLERANCE * TOLERANCE);
   }
 
@@ -354,11 +354,11 @@ public:
     (mesh_function)(p, 0.0, output, subdomain_ids);
 
     // Expected value at center mesh
-    Gradient output_expected = Gradient(0.0772539939808116,-0.0772537479511396);
+    Gradient output_expected = VectorValue(0.0772539939808116,-0.0772537479511396);
 
-    LIBMESH_ASSERT_FP_EQUAL(output(0)(0), output_expected(0),
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(0)(0)), libMesh::libmesh_real(output_expected(0)),
                             TOLERANCE * TOLERANCE);
-    LIBMESH_ASSERT_FP_EQUAL(output(0)(1), output_expected(1),
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(0)(1)), libMesh::libmesh_real(output_expected(1)),
                             TOLERANCE * TOLERANCE);
   }
 };
