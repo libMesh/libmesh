@@ -44,9 +44,11 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( test_subdomain_id_sets );
+#ifdef LIBMESH_HAVE_PETSC
   CPPUNIT_TEST( vectorMeshFuctionLagrange );
   CPPUNIT_TEST( vectorMeshFuctionNedelec );
   CPPUNIT_TEST( vectorMeshFuctionRaviartThomas );
+#endif // LIBMESH_HAVE_PETSC
 #endif
 #if LIBMESH_DIM > 2
 #ifdef LIBMESH_ENABLE_AMR
@@ -225,6 +227,7 @@ public:
   }
 #endif // LIBMESH_ENABLE_AMR
 
+#ifdef LIBMESH_HAVE_PETSC
   // Tests the projection of Lagrange Vectors using MeshFunction
   void vectorMeshFuctionLagrange()
   {
@@ -359,6 +362,7 @@ public:
     LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(0)(1)), libMesh::libmesh_real(output_expected(1)),
                             TOLERANCE * TOLERANCE);
   }
+#endif // LIBMESH_HAVE_PETSC
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(MeshFunctionTest);
