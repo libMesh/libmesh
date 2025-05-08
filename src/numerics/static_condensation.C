@@ -305,7 +305,12 @@ void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
     if (!index_is_condensed)
       {
         index_it = dof_data.uncondensed_global_to_local_map.find(global_index);
-        libmesh_assert(index_it != dof_data.uncondensed_global_to_local_map.end());
+        if (index_it == dof_data.uncondensed_global_to_local_map.end())
+          libmesh_error_msg("Failed to find the global index "
+                            << global_index
+                            << " in our current element's degree of freedom information. One way "
+                               "this can happen is when using a discontinuous Galerkin method, "
+                               "adding element matrices to both + and - sides of a face");
       }
     return std::make_pair(index_is_condensed, index_it->second);
   };
