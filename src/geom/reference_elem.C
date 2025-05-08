@@ -212,8 +212,8 @@ void init_ref_elem_table()
     ref_elem_file[PYRAMID14] = ElemDataStrings::one_pyramid14;
     ref_elem_file[PYRAMID18] = ElemDataStrings::one_pyramid18;
 
-    // No entry here for C0POLYGON - the reference element there
-    // depends on the number of nodes in the polygon and can't be
+    // No entry here for C0POLYGON or C0POLYHEDRON - the reference
+    // element there depends on the number of nodes and can't be
     // precomputed.
   }
 

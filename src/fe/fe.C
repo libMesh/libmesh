@@ -745,70 +745,12 @@ void FE<Dim,T>::init_base_shape_functions(const std::vector<Point> & qp,
 #endif // LIBMESH_ENABLE_INFINITE_ELEMENTS
 
 
-template <typename OutputShape>
-OutputShape fe_fdm_deriv(const Elem * elem,
-                         const Order order,
-                         const unsigned int i,
-                         const unsigned int j,
-                         const Point & p,
-                         const bool add_p_level,
-                         OutputShape(*shape_func)
-                           (const Elem *, const Order,
-                            const unsigned int, const Point &,
-                            const bool))
-{
-  libmesh_assert(elem);
+// Helper for FDM methods
+namespace {
+using namespace libMesh;
 
-  libmesh_assert_less (j, LIBMESH_DIM);
-
-  // cheat by using finite difference approximations:
-  const Real eps = TOLERANCE;
-  Point pp = p, pm = p;
-
-  switch (j)
-    {
-      // d()/dxi
-    case 0:
-      {
-        pp(0) += eps;
-        pm(0) -= eps;
-        break;
-      }
-
-      // d()/deta
-    case 1:
-      {
-        pp(1) += eps;
-        pm(1) -= eps;
-        break;
-      }
-
-      // d()/dzeta
-    case 2:
-      {
-        pp(2) += eps;
-        pm(2) -= eps;
-        break;
-      }
-
-    default:
-      libmesh_error_msg("Invalid derivative index j = " << j);
-    }
-
-  return (shape_func(elem, order, i, pp, add_p_level) -
-          shape_func(elem, order, i, pm, add_p_level))/2./eps;
-}
-
-
-template <typename OutputShape>
-OutputShape fe_fdm_deriv(const ElemType type,
-                         const Order order,
-                         const unsigned int i,
-                         const unsigned int j,
-                         const Point & p,
-                         OutputShape(*shape_func)
-                           (const ElemType, const Order,
-                            const unsigned int, const Point &))
+std::tuple<Point, Point, Real>
+fdm_points(const unsigned int j, const Point & p)
 {
   libmesh_assert_less (j, LIBMESH_DIM);
 
@@ -846,23 +788,11 @@ OutputShape fe_fdm_deriv(const ElemType type,
       libmesh_error_msg("Invalid derivative index j = " << j);
     }
 
-  return (shape_func(type, order, i, pp) -
-          shape_func(type, order, i, pm))/2./eps;
+  return std::make_tuple(pp, pm, eps);
 }
 
-
-template <typename OutputShape>
-OutputShape
-fe_fdm_second_deriv(const Elem * elem,
-                    const Order order,
-                    const unsigned int i,
-                    const unsigned int j,
-                    const Point & p,
-                    const bool add_p_level,
-                    OutputShape(*deriv_func)
-                      (const Elem *, const Order,
-                       const unsigned int, const unsigned int,
-                       const Point &, const bool))
+std::tuple<Point, Point, Real, unsigned int>
+fdm_second_points(const unsigned int j, const Point & p)
 {
   // cheat by using finite difference approximations:
   const Real eps = 1.e-5;
@@ -928,6 +858,84 @@ fe_fdm_second_deriv(const Elem * elem,
     default:
       libmesh_error_msg("Invalid shape function derivative j = " << j);
     }
+
+  return std::make_tuple(pp, pm, eps, deriv_j);
+}
+
+}
+
+
+template <typename OutputShape>
+OutputShape fe_fdm_deriv(const Elem * elem,
+                         const Order order,
+                         const unsigned int i,
+                         const unsigned int j,
+                         const Point & p,
+                         const bool add_p_level,
+                         OutputShape(*shape_func)
+                           (const Elem *, const Order,
+                            const unsigned int, const Point &,
+                            const bool))
+{
+  libmesh_assert(elem);
+
+  auto [pp, pm, eps] = fdm_points(j, p);
+
+  return (shape_func(elem, order, i, pp, add_p_level) -
+          shape_func(elem, order, i, pm, add_p_level))/2./eps;
+}
+
+
+template <typename OutputShape>
+OutputShape fe_fdm_deriv(const ElemType type,
+                         const Order order,
+                         const unsigned int i,
+                         const unsigned int j,
+                         const Point & p,
+                         OutputShape(*shape_func)
+                           (const ElemType, const Order,
+                            const unsigned int, const Point &))
+{
+  auto [pp, pm, eps] = fdm_points(j, p);
+
+  return (shape_func(type, order, i, pp) -
+          shape_func(type, order, i, pm))/2./eps;
+}
+
+
+template <typename OutputShape>
+OutputShape fe_fdm_deriv(const ElemType type,
+                         const Order order,
+                         const Elem * elem,
+                         const unsigned int i,
+                         const unsigned int j,
+                         const Point & p,
+                         OutputShape(*shape_func)
+                           (const ElemType, const Order,
+                            const Elem *,
+                            const unsigned int, const Point &))
+{
+  auto [pp, pm, eps] = fdm_points(j, p);
+
+  return (shape_func(type, order, elem, i, pp) -
+          shape_func(type, order, elem, i, pm))/2./eps;
+}
+
+
+template <typename OutputShape>
+OutputShape
+fe_fdm_second_deriv(const Elem * elem,
+                    const Order order,
+                    const unsigned int i,
+                    const unsigned int j,
+                    const Point & p,
+                    const bool add_p_level,
+                    OutputShape(*deriv_func)
+                      (const Elem *, const Order,
+                       const unsigned int, const unsigned int,
+                       const Point &, const bool))
+{
+  auto [pp, pm, eps, deriv_j] = fdm_second_points(j, p);
 
   return (deriv_func(elem, order, i, deriv_j, pp, add_p_level) -
           deriv_func(elem, order, i, deriv_j, pm, add_p_level))/2./eps;
@@ -946,73 +954,31 @@ fe_fdm_second_deriv(const ElemType type,
                        const unsigned int, const unsigned int,
                        const Point &))
 {
-  // cheat by using finite difference approximations:
-  const Real eps = 1.e-5;
-  Point pp = p, pm = p;
-  unsigned int deriv_j = 0;
-
-  switch (j)
-    {
-      //  d^2() / dxi^2
-    case 0:
-      {
-        pp(0) += eps;
-        pm(0) -= eps;
-        deriv_j = 0;
-        break;
-      }
-
-      // d^2() / dxi deta
-    case 1:
-      {
-        pp(1) += eps;
-        pm(1) -= eps;
-        deriv_j = 0;
-        break;
-      }
-
-      // d^2() / deta^2
-    case 2:
-      {
-        pp(1) += eps;
-        pm(1) -= eps;
-        deriv_j = 1;
-        break;
-      }
-
-      // d^2()/dxidzeta
-    case 3:
-      {
-        pp(2) += eps;
-        pm(2) -= eps;
-        deriv_j = 0;
-        break;
-      }                  // d^2()/deta^2
-
-      // d^2()/detadzeta
-    case 4:
-      {
-        pp(2) += eps;
-        pm(2) -= eps;
-        deriv_j = 1;
-        break;
-      }
-
-      // d^2()/dzeta^2
-    case 5:
-      {
-        pp(2) += eps;
-        pm(2) -= eps;
-        deriv_j = 2;
-        break;
-      }
-
-    default:
-      libmesh_error_msg("Invalid shape function derivative j = " << j);
-    }
+  auto [pp, pm, eps, deriv_j] = fdm_second_points(j, p);
 
   return (deriv_func(type, order, i, deriv_j, pp) -
           deriv_func(type, order, i, deriv_j, pm))/2./eps;
+}
+
+
+template <typename OutputShape>
+OutputShape
+fe_fdm_second_deriv(const ElemType type,
+                    const Order order,
+                    const Elem * elem,
+                    const unsigned int i,
+                    const unsigned int j,
+                    const Point & p,
+                    OutputShape(*deriv_func)
+                      (const ElemType, const Order,
+                       const Elem *,
+                       const unsigned int, const unsigned int,
+                       const Point &))
+{
+  auto [pp, pm, eps, deriv_j] = fdm_second_points(j, p);
+
+  return (deriv_func(type, order, elem, i, deriv_j, pp) -
+          deriv_func(type, order, elem, i, deriv_j, pm))/2./eps;
 }
 
 
@@ -1392,6 +1358,13 @@ Real fe_fdm_deriv<Real>(const ElemType, const Order, const unsigned int,
                            const Point &));
 
 template
+Real fe_fdm_deriv<Real>(const ElemType, const Order, const Elem *,
+                        const unsigned int, const unsigned int, const Point &,
+                        Real(*shape_func)
+                          (const ElemType, const Order, const Elem *,
+                           const unsigned int, const Point &));
+
+template
 RealGradient
 fe_fdm_deriv<RealGradient>(const Elem *, const Order, const unsigned int,
                            const unsigned int, const Point &, const bool,
@@ -1414,6 +1387,14 @@ fe_fdm_second_deriv<Real>(const Elem *, const Order, const unsigned int,
                           Real(*shape_func)
                             (const Elem *, const Order, const unsigned int,
                              const unsigned int, const Point &, const bool));
+
+template
+Real
+fe_fdm_second_deriv<Real>(const ElemType, const Order, const Elem *,
+                          const unsigned int, const unsigned int, const Point &,
+                          Real(*shape_func)
+                            (const ElemType, const Order, const Elem *,
+                             const unsigned int, const unsigned int, const Point &));
 
 template
 RealGradient

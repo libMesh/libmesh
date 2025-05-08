@@ -92,6 +92,7 @@ BUILT_SOURCES = \
         inf_fe_map.h \
         bounding_box.h \
         cell.h \
+        cell_c0polyhedron.h \
         cell_hex.h \
         cell_hex20.h \
         cell_hex27.h \
@@ -104,6 +105,7 @@ BUILT_SOURCES = \
         cell_inf_prism.h \
         cell_inf_prism12.h \
         cell_inf_prism6.h \
+        cell_polyhedron.h \
         cell_prism.h \
         cell_prism15.h \
         cell_prism18.h \
@@ -869,6 +871,9 @@ bounding_box.h: $(top_srcdir)/include/geom/bounding_box.h
 cell.h: $(top_srcdir)/include/geom/cell.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_c0polyhedron.h: $(top_srcdir)/include/geom/cell_c0polyhedron.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_hex.h: $(top_srcdir)/include/geom/cell_hex.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -903,6 +908,9 @@ cell_inf_prism12.h: $(top_srcdir)/include/geom/cell_inf_prism12.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_inf_prism6.h: $(top_srcdir)/include/geom/cell_inf_prism6.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_polyhedron.h: $(top_srcdir)/include/geom/cell_polyhedron.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_prism.h: $(top_srcdir)/include/geom/cell_prism.h

@@ -124,7 +124,7 @@ void QBase::init(const ElemType t,
 {
   // Some element types require data from a specific element, so can
   // only be used with newer APIs.
-  if (t == C0POLYGON)
+  if (t == C0POLYGON || t == C0POLYHEDRON)
     libmesh_error_msg("Code (see stack trace) used an outdated quadrature function overload.\n"
                       "Quadrature rules on a C0Polygon are not defined by its ElemType alone.");
 

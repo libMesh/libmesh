@@ -137,9 +137,9 @@ public:
         // test are found in tetrahedra, which have a minimum value of
         // 2.0. However, we return a default value of 1.0 for 0D and
         // 1D elements here, and we have a custom distorted-pentagon
-        // C0Polygon with a 0.5 at 2 nodes, so we handle those cases
-        // too.
-        if (elem->dim() < 2)
+        // C0Polygon with a 0.5 at 2 nodes and a custom C0Polyhedron
+        // with a 1, so we handle those cases too.
+        if (elem->dim() < 2 || elem->type() == C0POLYHEDRON)
           CPPUNIT_ASSERT_GREATEREQUAL(1 - TOLERANCE, jac);
         else if (elem->type() == C0POLYGON)
           CPPUNIT_ASSERT_GREATEREQUAL(0.5 - TOLERANCE, jac);
@@ -298,6 +298,9 @@ public:
         if (elem->infinite())
           continue;
 
+        if (elem->type() == C0POLYHEDRON)
+          continue;
+
         const Point vertex_avg = elem->vertex_average();
 
         const unsigned int n_sides = elem->n_sides();
@@ -401,11 +404,15 @@ public:
         // Our map should still be affine.
         // ... except for stupid singular pyramid maps
         // ... or the polygons we're deliberately testing non-affine
+        // ... or the polyhedra we deliberately don't define "affine
+        // map" for.
         if ((elem->dim() < 3 ||
              elem->n_vertices() != 5) &&
-            elem_type != C0POLYGON)
+            elem_type != C0POLYGON &&
+            elem_type != C0POLYHEDRON)
           CPPUNIT_ASSERT(elem->has_affine_map());
-        else if (elem_type == C0POLYGON)
+        else if (elem_type == C0POLYGON &&
+                 elem_type != C0POLYHEDRON)
           CPPUNIT_ASSERT(!elem->has_affine_map());
 
         // The neighbors and bcids should have flipped back to where
@@ -595,7 +602,8 @@ public:
         elem_type == PYRAMID13 ||
         elem_type == PYRAMID14 ||
         elem_type == PYRAMID18 ||
-        elem_type == C0POLYGON)
+        elem_type == C0POLYGON ||
+        elem_type == C0POLYHEDRON)
       return;
 
     auto refining_mesh = this->_mesh->clone();
@@ -899,6 +907,9 @@ INSTANTIATE_ELEMTEST(QUADSHELL9);
 
 // This just tests with one pentagon, but better than nothing
 INSTANTIATE_ELEMTEST(C0POLYGON);
+
+// And this is just one truncated cube; also better than nothing
+INSTANTIATE_ELEMTEST(C0POLYHEDRON);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 INSTANTIATE_ELEMTEST(INFQUAD4);

@@ -1,4 +1,5 @@
 // libmesh includes
+#include <libmesh/cell_c0polyhedron.h>
 #include <libmesh/elem.h>
 #include <libmesh/enum_elem_type.h>
 #include <libmesh/face_c0polygon.h>
@@ -48,6 +49,7 @@ public:
   CPPUNIT_TEST( testC0PolygonQuad );
   CPPUNIT_TEST( testC0PolygonPentagon );
   CPPUNIT_TEST( testC0PolygonHexagon );
+  CPPUNIT_TEST( testC0PolyhedronCube );
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1055,6 +1057,133 @@ protected:
     CPPUNIT_ASSERT(elem->is_flipped());
     elem->flip(&mesh.get_boundary_info());
   }
+
+
+  // Helper function to factor out common tests
+  void testC0PolyhedronMethods(MeshBase & mesh)
+  {
+    Elem * elem = mesh.query_elem_ptr(0);
+    bool found_elem = elem;
+    mesh.comm().max(found_elem);
+    CPPUNIT_ASSERT(found_elem);
+
+    if (!elem)
+      return;
+
+    CPPUNIT_ASSERT_EQUAL(elem->type(), C0POLYHEDRON);
+
+    const int V = elem->n_vertices();
+    const int E = elem->n_edges();
+    const int F = elem->n_faces();
+
+    CPPUNIT_ASSERT_EQUAL(int(elem->n_nodes()), V);
+    CPPUNIT_ASSERT_EQUAL(int(elem->n_sides()), F);
+
+    // Euler characteristic for polygons homeomorphic to spheres is 2
+    CPPUNIT_ASSERT_EQUAL(V-E+F, 2);
+
+    int FE = 0;
+    int FV = 0;
+
+    std::vector<int> sides_on_vertex(V, 0);
+    for (auto s : make_range(F))
+      {
+        auto side = elem->build_side_ptr(s);
+        CPPUNIT_ASSERT_EQUAL(side->type(), C0POLYGON);
+        FE += side->n_edges();
+        const int SV = side->n_vertices();
+        FV += SV;
+
+        auto nos = elem->nodes_on_side(s);
+        CPPUNIT_ASSERT_EQUAL(nos.size(), std::size_t(SV));
+
+        for (auto v : make_range(SV))
+          {
+            Node * sidenode = side->node_ptr(v);
+            const unsigned int n = elem->get_node_index(sidenode);
+            CPPUNIT_ASSERT(n != invalid_uint);
+            ++sides_on_vertex[n];
+
+            // We're just looking at first order so far
+            CPPUNIT_ASSERT(side->is_vertex(v));
+            CPPUNIT_ASSERT(!side->is_edge(v));
+            CPPUNIT_ASSERT(elem->is_vertex(n));
+            CPPUNIT_ASSERT(!elem->is_edge(n));
+            CPPUNIT_ASSERT(!elem->is_face(n));
+            CPPUNIT_ASSERT(elem->is_node_on_side(n, s));
+            CPPUNIT_ASSERT(std::find(nos.begin(), nos.end(), n) != nos.end());
+          }
+      }
+
+    // We hit every edge from 2 faces
+    CPPUNIT_ASSERT_EQUAL(E*2, FE);
+
+    // We hit every vertex from at least 3 faces
+    CPPUNIT_ASSERT_LESSEQUAL(FV, V*3);  // V*3 <= FV
+    for (auto sov : sides_on_vertex)
+      CPPUNIT_ASSERT_LESSEQUAL(sov, 3); // 3 <= sov
+
+    CPPUNIT_ASSERT(!elem->is_flipped());
+  }
+
+
+
+  void testC0Polyhedron(const std::vector<std::shared_ptr<Polygon>> & sides,
+                        Real expected_volume)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    std::unique_ptr<Elem> polyhedron = std::make_unique<C0Polyhedron>(sides);
+
+    polyhedron->set_id() = 0;
+    Elem * elem = mesh.add_elem(std::move(polyhedron));
+
+    const Real derived_volume = elem->volume();
+    const Real base_volume = elem->Elem::volume();
+    LIBMESH_ASSERT_FP_EQUAL(base_volume, derived_volume, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(derived_volume, expected_volume, TOLERANCE*TOLERANCE);
+
+    this->testC0PolyhedronMethods(mesh);
+  }
+
+
+
+  void testC0PolyhedronCube()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    mesh.add_point(Point(0, 0, 0), 0);
+    mesh.add_point(Point(1, 0, 0), 1);
+    mesh.add_point(Point(1, 1, 0), 2);
+    mesh.add_point(Point(0, 1, 0), 3);
+    mesh.add_point(Point(0, 0, 1), 4);
+    mesh.add_point(Point(1, 0, 1), 5);
+    mesh.add_point(Point(1, 1, 1), 6);
+    mesh.add_point(Point(0, 1, 1), 7);
+
+    // See notes in elem_test.h
+    const std::vector<std::vector<unsigned int>> nodes_on_side =
+      { {0, 1, 2, 3},   // min z
+        {0, 1, 5, 4},   // min y
+        {2, 6, 5, 1},   // max x
+        {2, 3, 7, 6},   // max y
+        {0, 4, 7, 3},   // min x
+        {5, 6, 7, 4} }; // max z
+
+    // Build all the sides.
+    std::vector<std::shared_ptr<Polygon>> sides(nodes_on_side.size());
+
+    for (auto s : index_range(nodes_on_side))
+      {
+        const auto & nodes_on_s = nodes_on_side[s];
+        sides[s] = std::make_shared<C0Polygon>(nodes_on_s.size());
+        for (auto i : index_range(nodes_on_s))
+          sides[s]->set_node(i, mesh.node_ptr(nodes_on_s[i]));
+      }
+
+    testC0Polyhedron(sides, 1);
+  }
+
 
 
   // Helper function that builds the specified type of Elem from a

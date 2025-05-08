@@ -87,6 +87,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID13:
           case PYRAMID14:
           case PYRAMID18:
+          case C0POLYHEDRON:
             return 4;
 
           case INVALID_ELEM:
@@ -140,6 +141,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID13:
           case PYRAMID14:
           case PYRAMID18:
+          case C0POLYHEDRON:
             return 10;
 
           case INVALID_ELEM:
@@ -193,6 +195,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID13:
           case PYRAMID14:
           case PYRAMID18:
+          case C0POLYHEDRON:
             return 20;
 
           case INVALID_ELEM:
@@ -244,6 +247,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
+          case C0POLYHEDRON:
             return 35;
 
           case INVALID_ELEM:
@@ -294,6 +298,7 @@ unsigned int monomial_n_dofs(const ElemType t, const Order o)
           case PYRAMID5:
           case PYRAMID13:
           case PYRAMID14:
+          case C0POLYHEDRON:
             return (order+1)*(order+2)*(order+3)/6;
 
           case INVALID_ELEM:

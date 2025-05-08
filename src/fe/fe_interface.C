@@ -2193,6 +2193,8 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return 2;
         case PYRAMID18:
           return 3;
+        case C0POLYHEDRON:
+          return 1;
         default:
           return unknown;
         }
@@ -2234,6 +2236,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID13:
         case PYRAMID14:
         case PYRAMID18:
+        case C0POLYHEDRON:
           return unlimited;
         default:
           return unknown;
@@ -2283,6 +2286,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID13:
         case PYRAMID14:
         case PYRAMID18:
+        case C0POLYHEDRON:
           return 0;
         default:
           return unknown;
@@ -2326,6 +2330,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID13:
         case PYRAMID14:
         case PYRAMID18:
+        case C0POLYHEDRON:
           return 0;
         default:
           return unknown;
@@ -2364,6 +2369,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID13:
         case PYRAMID14:
         case PYRAMID18:
+        case C0POLYHEDRON:
           return unlimited;
         default:
           return unknown;
@@ -2404,6 +2410,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID13:
         case PYRAMID14:
         case PYRAMID18:
+        case C0POLYHEDRON:
           return 0;
         default:
           return unknown;
@@ -2448,6 +2455,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID13:
         case PYRAMID14:
         case PYRAMID18:
+        case C0POLYHEDRON:
           return 0;
         default:
           return unknown;
@@ -2497,6 +2505,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID13:
         case PYRAMID14:
         case PYRAMID18:
+        case C0POLYHEDRON:
           return 0;
         default:
           return unknown;
@@ -2545,6 +2554,7 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
         case PYRAMID13:
         case PYRAMID14:
         case PYRAMID18:
+        case C0POLYHEDRON:
           return 0;
         default:
           return unknown;

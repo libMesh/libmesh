@@ -22,6 +22,7 @@
 #include "libmesh/quadrature_trap.h"
 #include "libmesh/quadrature_simpson.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/cell_c0polyhedron.h"
 
 namespace libMesh
 {
@@ -301,6 +302,37 @@ void QNodal::init_3D()
         _weights = {wv, wv, wv, wv, we, we, we, we, we, we, wf, wf, wf, wf};
         return;
       }
+
+      //---------------------------------------------
+      // Arbitrary polygon quadrature rules
+    case C0POLYHEDRON:
+      {
+        // Polyhedra require the newer Quadrature API
+        if (!_elem)
+          libmesh_error();
+
+        libmesh_assert(_elem->type() == C0POLYHEDRON);
+
+        const C0Polyhedron & poly = *cast_ptr<const C0Polyhedron *>(_elem);
+
+        const Real master_poly_volume = _elem->volume();
+
+        // For polyhedra the master element is the physical element.
+        //
+        // Using even weights is not the most effective nodal rule for
+        // that case, but users who want an effective rule probably
+        // want a non-nodal rule anyway.
+        const unsigned int nn = poly.n_nodes();
+        const Real weight = master_poly_volume / nn;
+        _weights.resize(nn, weight);
+
+        _points.resize(poly.n_nodes());
+        for (auto n : make_range(nn))
+          _points[n] = poly.master_point(n);
+
+        return;
+      }
+
 
     default:
       libmesh_error_msg("ERROR: Unsupported type: " << Utility::enum_to_string(_type));
