@@ -22,6 +22,7 @@
 #include "libmesh/fe_lagrange_shape_1D.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/cell_c0polyhedron.h"
+#include "libmesh/tensor_value.h"
 
 // Anonymous namespace for functions shared by LAGRANGE and
 // L2_LAGRANGE implementations. Implementations appear at the bottom
