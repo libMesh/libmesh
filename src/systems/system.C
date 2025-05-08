@@ -38,6 +38,8 @@
 #include "libmesh/parallel_fe_type.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
+#include "libmesh/static_condensation_dof_map.h"
+#include "libmesh/static_condensation.h"
 
 // includes for calculate_norm, point_*
 #include "libmesh/fe_base.h"
@@ -73,6 +75,7 @@ System::System (EquationSystems & es,
   time                              (0.),
   qoi                               (0),
   qoi_error_estimates               (0),
+  _sc_dof_map                       (nullptr),
   _init_system_function             (nullptr),
   _init_system_object               (nullptr),
   _assemble_system_function         (nullptr),
@@ -104,6 +107,8 @@ System::System (EquationSystems & es,
 {
   if (libMesh::on_command_line("--solver-system-names"))
     this->prefix_with_name(true);
+  if (libMesh::on_command_line("--" + name_in + "-static-condensation"))
+    this->create_static_condensation_dof_map();
 }
 
 
@@ -175,6 +180,8 @@ void System::clear ()
   _variables.clear();
   _variable_numbers.clear();
   _dof_map->clear ();
+  if (_sc_dof_map)
+    _sc_dof_map->clear();
   solution->clear ();
   current_local_solution->clear ();
 
@@ -221,6 +228,10 @@ void System::init_data ()
 
   // Distribute the degrees of freedom on the mesh
   auto total_dofs = _dof_map->distribute_dofs (mesh);
+
+  // With the global dofs determined, initialize the condensed system if it exists
+  if (_sc_dof_map)
+    _sc_dof_map->init();
 
   // Throw an error if the total number of DOFs is not capable of
   // being indexed by our solution vector.
@@ -354,7 +365,8 @@ void System::init_matrices ()
           pr.second->use_hash_table() ||
           (this->_prefer_hash_table_matrix_assembly && pr.second->supports_hash_table());
       pr.second->use_hash_table(use_hash);
-      if (!use_hash)
+      // Make this call after we've determined whether the matrix is using a hash table
+      if (pr.second->require_sparsity_pattern())
         this->_require_sparsity_pattern = true;
     }
 
@@ -995,14 +1007,12 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
 
 
 SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
-                                           const ParallelType type,
-                                           const MatrixBuildType mat_build_type)
+                                           const ParallelType type)
 {
   parallel_object_only();
 
   libmesh_assert(this->comm().verify(std::string(mat_name)));
   libmesh_assert(this->comm().verify(int(type)));
-  libmesh_assert(this->comm().verify(int(mat_build_type)));
 
   // Return the matrix if it is already there.
   if (auto it = this->_matrices.find(mat_name);
@@ -1010,15 +1020,17 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
     return *it->second;
 
   // Otherwise build the matrix to return.
-  auto pr = _matrices.emplace
-    (mat_name,
-     SparseMatrix<Number>::build(this->comm(),
-                                 libMesh::default_solver_package(),
-                                 mat_build_type));
+  std::unique_ptr<SparseMatrix<Number>> matrix;
+  if (this->has_static_condensation())
+    matrix = std::make_unique<StaticCondensation>(
+        this->get_mesh(), *this, this->get_dof_map(), *_sc_dof_map);
+  else
+    matrix = SparseMatrix<Number>::build(this->comm(), libMesh::default_solver_package());
+  auto & mat = *matrix;
+
+  _matrices.emplace(mat_name, std::move(matrix));
 
   _matrix_types.emplace(mat_name, type);
-
-  SparseMatrix<Number> & mat = *(pr.first->second);
 
   // Initialize it first if we've already initialized the others.
   this->late_matrix_init(mat, type);
@@ -2840,5 +2852,16 @@ Tensor System::point_hessian(unsigned int, const Point &, const NumericVector<Nu
 }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+void System::create_static_condensation()
+{
+  this->create_static_condensation_dof_map();
+}
+
+void System::create_static_condensation_dof_map()
+{
+  _sc_dof_map = std::make_unique<StaticCondensationDofMap>(this->get_mesh(), *this, this->get_dof_map());
+  this->get_dof_map().add_static_condensation(*_sc_dof_map);
+}
 
 } // namespace libMesh

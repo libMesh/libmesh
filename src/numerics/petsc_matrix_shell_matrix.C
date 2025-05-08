@@ -36,16 +36,15 @@ PetscMatrixShellMatrix<T>::init(const numeric_index_type m,
                                 const numeric_index_type blocksize)
 {
   init_shell_mat(*this, m, n, m_l, n_l, blocksize);
-
   this->set_context();
 }
 
 template <typename T>
 void
-PetscMatrixShellMatrix<T>::init(ParallelType)
+PetscMatrixShellMatrix<T>::init(ParallelType libmesh_dbg_var(type))
 {
+  libmesh_assert(type != SERIAL);
   init_shell_mat(*this);
-
   this->set_context();
 }
 

@@ -31,7 +31,6 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/tensor_value.h" // For point_hessian
 #include "libmesh/variable.h"
-#include "libmesh/enum_matrix_build_type.h" // AUTOMATIC
 
 // C++ includes
 #include <cstddef>
@@ -74,6 +73,7 @@ class SystemSubset;
 class FEType;
 class SystemNorm;
 enum FEMNormType : int;
+class StaticCondensationDofMap;
 
 /**
  * \brief Manages consistently variables, degrees of freedom, and coefficient
@@ -1843,12 +1843,10 @@ public:
    *
    * @param mat_name A name for the matrix
    * @param type The serial/parallel/ghosted type of the matrix
-   * @param mat_build_type The matrix type to build
    *
    */
   SparseMatrix<Number> & add_matrix (std::string_view mat_name,
-                                     ParallelType type = PARALLEL,
-                                     MatrixBuildType mat_build_type = MatrixBuildType::AUTOMATIC);
+                                     ParallelType type = PARALLEL);
 
   /**
   * Adds the additional matrix \p mat_name to this system.  Only
@@ -1894,7 +1892,7 @@ public:
    * \returns \p true if this \p System has a matrix associated with the
    * given name, \p false otherwise.
    */
-  inline bool have_matrix (std::string_view mat_name) const { return _matrices.count(mat_name); };
+  inline bool have_matrix (std::string_view mat_name) const { return _matrices.count(mat_name); }
 
   /**
    * \returns A const pointer to this system's additional matrix
@@ -1943,6 +1941,22 @@ public:
    */
   std::string prefix() const { return this->name() + "_"; }
 
+  /**
+   * Request that static condensation be performed for this system
+   */
+   virtual void create_static_condensation();
+
+  /**
+   * Retrieve the static condensation class. Errors if \p create_static_condensation() has not been
+   * called prior, so calls to this should be guarded by checking \p has_static_condensation()
+   */
+   StaticCondensationDofMap & get_static_condensation_dof_map();
+
+   /**
+    * @returns Whether this system will be statically condensed
+    */
+   bool has_static_condensation() const { return _sc_dof_map.get(); }
+ 
 protected:
 
   /**
@@ -2009,6 +2023,11 @@ protected:
   virtual bool condense_constrained_dofs() const { return false; }
 
 private:
+  /**
+   * Creates the degree of freedom map for the statically condensed system
+   */
+  void create_static_condensation_dof_map();
+  
   /**
    * Helper function to keep DofMap forward declarable in system.h
    */
@@ -2108,6 +2127,9 @@ private:
    */
   dof_id_type write_serialized_vector (Xdr & io,
                                        const NumericVector<Number> & vec) const;
+
+  /// Degree of freedom map for the condensed space
+  std::unique_ptr<StaticCondensationDofMap> _sc_dof_map;
 
   /**
    * Function that initializes the system.
@@ -2445,7 +2467,7 @@ unsigned int System::n_components() const
     return 0;
 
   const Variable & last = _variables.back();
-  return last.first_scalar_number() + last.n_components();
+  return last.first_scalar_number() + last.n_components(this->get_mesh());
 }
 
 
@@ -2727,6 +2749,16 @@ System::prefer_hash_table_matrix_assembly(const bool preference)
       _matrices_initialized,
       "System::prefer_hash_table_matrix_assembly() should be called before matrices are initialized");
   _prefer_hash_table_matrix_assembly = preference;
+}
+
+inline
+StaticCondensationDofMap &
+System::get_static_condensation_dof_map()
+{
+  if (!_sc_dof_map)
+    libmesh_error_msg("Static condensation was not requested by the user");
+
+  return *_sc_dof_map;
 }
 
 } // namespace libMesh

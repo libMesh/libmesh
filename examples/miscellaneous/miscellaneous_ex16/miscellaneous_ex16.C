@@ -171,7 +171,7 @@ main(int argc, char ** argv)
   libmesh_error_msg_if(!libMesh::relative_fuzzy_equals(*sys.solution, *sc_sys.solution, 1e-4),
                        "mismatching solution");
   libMesh::out << "Static condensation reduced problem size to "
-               << sc_sys.get_static_condensation().get_condensed_mat().m() << std::endl;
+               << sc_sys.get_static_condensation_system_matrix().get_condensed_mat().m() << std::endl;
 
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 
@@ -208,7 +208,7 @@ assemble_poisson(EquationSystems & es, const std::string & system_name)
   // Get a pointer to the StaticCondensation class if it exists
   StaticCondensation * sc = nullptr;
   if (system.has_static_condensation())
-    sc = &system.get_static_condensation();
+    sc = &system.get_static_condensation_system_matrix();
 
   // A reference to the  DofMap object for this system.  The  DofMap
   // object handles the index translation from node and element numbers

@@ -621,6 +621,7 @@ include_HEADERS = \
         base/auto_ptr.h \
         base/dirichlet_boundaries.h \
         base/dof_map.h \
+        base/dof_map_base.h \
         base/dof_object.h \
         base/factory.h \
         base/float128_shims.h \
@@ -653,7 +654,6 @@ include_HEADERS = \
         enums/enum_fe_family.h \
         enums/enum_inf_map_type.h \
         enums/enum_io_package.h \
-        enums/enum_matrix_build_type.h \
         enums/enum_norm_type.h \
         enums/enum_order.h \
         enums/enum_parallel_type.h \
@@ -888,6 +888,7 @@ include_HEADERS = \
         numerics/sparse_matrix.h \
         numerics/sparse_shell_matrix.h \
         numerics/static_condensation.h \
+        numerics/static_condensation_dof_map.h \
         numerics/static_condensation_preconditioner.h \
         numerics/sum_shell_matrix.h \
         numerics/tensor_shell_matrix.h \
