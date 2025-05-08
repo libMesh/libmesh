@@ -243,7 +243,24 @@ void StaticCondensation::zero()
     }
 }
 
-void StaticCondensation::setup() { libmesh_assert(this->closed()); }
+void StaticCondensation::setup()
+{
+  libmesh_assert(this->closed());
+  libmesh_assert(this->initialized());
+  MatNullSpace nullsp;
+  LibmeshPetscCall(MatGetNullSpace(this->mat(), &nullsp));
+  if (nullsp)
+    {
+      PetscInt num_nullspace_vecs;
+      PetscBool const_nullspace;
+      LibmeshPetscCall(MatNullSpaceGetVecs(nullsp, &const_nullspace, &num_nullspace_vecs, nullptr));
+      libmesh_assert((const_nullspace == PETSC_TRUE) == !num_nullspace_vecs);
+      if (const_nullspace == PETSC_FALSE)
+        libmesh_error_msg("We only support the constant nullspace in StaticCondensation");
+      LibmeshPetscCall(MatSetNullSpace(
+          cast_ptr<PetscMatrixBase<Number> *>(_reduced_sys_mat.get())->mat(), nullsp));
+    }
+}
 
 numeric_index_type StaticCondensation::m() const { return _full_dof_map.n_dofs(); }
 
