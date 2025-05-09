@@ -22,7 +22,9 @@
   CPPUNIT_TEST( testNorms );                    \
   CPPUNIT_TEST( testNormsBase );                \
   CPPUNIT_TEST( testOperations );               \
-  CPPUNIT_TEST( testOperationsBase );
+  CPPUNIT_TEST( testOperationsBase );           \
+  CPPUNIT_TEST( testWriteAndRead );             \
+  CPPUNIT_TEST( testWriteAndReadBase );
 
 
 template <class DerivedClass>
@@ -146,6 +148,43 @@ public:
     LIBMESH_ASSERT_NUMBERS_EQUAL
       (v.dot(vorig), libMesh::Real(global_size),
        libMesh::TOLERANCE*libMesh::TOLERANCE);
+  }
+
+  template <class Base, class Derived>
+  void WriteAndRead()
+  {
+    auto v_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
+    Base & v = *v_ptr;
+
+    const libMesh::dof_id_type
+      first = v.first_local_index(),
+      last  = v.last_local_index();
+
+    for (libMesh::dof_id_type n=first; n != last; n++)
+      v.set (n, static_cast<libMesh::Number>(n+1));
+    v.close();
+
+    v.print_matlab(libmesh_suite_name+"_vector.m");
+
+    // Let's make sure we don't have any race conditions; we have
+    // multiple SparseMatrix subclasses that might be trying to read
+    // and write the same file.
+
+    TestCommWorld->barrier();
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+    // We're not supporting complex reads quite yet
+    return;
+#endif
+
+    auto v_new_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
+    Base & v_new = *v_new_ptr;
+
+    v_new.read_matlab(libmesh_suite_name+"_vector.m");
+
+    TestCommWorld->barrier();
+
+    CPPUNIT_ASSERT_EQUAL(v.l1_norm_diff(v_new), libMesh::Real(0));
   }
 
   template <class Base, class Derived>
@@ -365,6 +404,20 @@ public:
     LOG_UNIT_TEST;
 
     Operations<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
+  }
+
+  void testWriteAndRead()
+  {
+    LOG_UNIT_TEST;
+
+    WriteAndRead<DerivedClass,DerivedClass >();
+  }
+
+  void testWriteAndReadBase()
+  {
+    LOG_UNIT_TEST;
+
+    WriteAndRead<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
   }
 };
 

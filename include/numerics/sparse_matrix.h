@@ -469,8 +469,8 @@ public:
   virtual void read(const std::string & filename);
 
   /**
-   * Read the contents of the matrix from Matlab's sparse matrix
-   * format.
+   * Read the contents of the matrix from the Matlab-script sparse
+   * matrix format used by PETSc.
    *
    * If the size and sparsity of the matrix in \p filename appears
    * consistent with the existing sparsity of \p this then the

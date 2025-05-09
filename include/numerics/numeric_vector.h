@@ -735,10 +735,20 @@ public:
    * format. Optionally prints the vector to the file named \p name.
    * If \p name is not specified it is dumped to the screen.
    */
-  virtual void print_matlab(const std::string & /*name*/ = "") const
-  {
-    libmesh_not_implemented();
-  }
+  virtual void print_matlab(const std::string & filename = "") const;
+
+  /**
+   * Read the contents of the vector from the Matlab-script format
+   * used by PETSc.
+   *
+   * If the size of the matrix in \p filename appears consistent with
+   * the existing partitioning of \p this then the existing parallel
+   * decomposition will be retained.
+   * If not, then \p this will be initialized with the size from
+   * the file, linearly partitioned onto the number of processors
+   * available.
+   */
+  virtual void read_matlab(const std::string & filename);
 
   /**
    * Fills in \p subvector from this vector using the indices in \p rows.
