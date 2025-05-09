@@ -836,14 +836,12 @@ public:
   static bool extra_hanging_dofs (const FEType & fe_t);
 
   /**
-   * \returns The number of components of a vector-valued element.
-   * Scalar-valued elements return 1.
+   * \returns Whether the element is vector- or scalar-valued.
    */
   static FEFieldType field_type (const FEType & fe_type);
 
   /**
-   * \returns The number of components of a vector-valued element.
-   * Scalar-valued elements return 1.
+   * \returns Whether the element is vector- or scalar-valued.
    */
   static FEFieldType field_type (const FEFamily & fe_family);
 
