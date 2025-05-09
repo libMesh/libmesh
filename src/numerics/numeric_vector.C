@@ -425,7 +425,7 @@ void NumericVector<T>::read_matlab(const std::string & filename)
                    (this->local_size() != end_entry - first_entry);
 
   this->comm().max(need_init);
-  
+
   if (need_init)
     this->init(n, end_entry - first_entry);
 
