@@ -21,6 +21,9 @@ run_example_no_extra_options "$example_name" "$options"
 options="element_type=QUAD9 -pc_type lu"
 run_example_no_extra_options "$example_name" "$options"
 
+options="element_type=QUAD9 grid_size=5 refine=2 -pc_type lu"
+run_example_no_extra_options "$example_name" "$options"
+
 options="order=2 element_type=TRI6 -pc_type lu"
 run_example_no_extra_options "$example_name" "$options"
 
