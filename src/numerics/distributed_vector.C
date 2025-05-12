@@ -395,6 +395,88 @@ DistributedVector<T>::operator = (const std::vector<T> & v)
 
 
 template <typename T>
+inline
+void DistributedVector<T>::close ()
+{
+  libmesh_assert (this->initialized());
+
+  parallel_object_only();
+
+  bool have_remote_values = !_remote_values.empty();
+  this->comm().max(have_remote_values);
+
+  if (have_remote_values)
+    {
+      bool someone_is_setting = (_unclosed_state == SET_VALUES);
+      this->comm().max(someone_is_setting);
+      bool someone_is_adding = (_unclosed_state == ADD_VALUES);
+      this->comm().max(someone_is_adding);
+
+#ifndef NDEBUG
+      // If *I* have remote values, I must know what to do with them.
+      if (!_remote_values.empty())
+        libmesh_assert(_unclosed_state == SET_VALUES ||
+                       _unclosed_state == ADD_VALUES);
+
+      // If *anyone* had remote values, we must be doing something
+      libmesh_assert(someone_is_setting || someone_is_adding);
+
+      // We must be doing only *one* thing with remote values
+      libmesh_assert(!someone_is_setting || !someone_is_adding);
+#endif
+
+      // We want to traverse in order later
+      std::sort(_remote_values.begin(), _remote_values.end());
+
+      std::vector<numeric_index_type> last_local_indices;
+      this->comm().allgather(_last_local_index, last_local_indices);
+
+      std::map<processor_id_type, std::vector<std::pair<numeric_index_type,T>>> 
+        updates_to_send;
+
+      processor_id_type p = 0;
+      for (auto [i, v] : _remote_values)
+        {
+          while (i >= last_local_indices[p])
+            {
+              libmesh_assert_less(p, this->n_processors());
+              ++p;
+            }
+          updates_to_send[p].emplace_back(i, v);
+        }
+      _remote_values.clear();
+
+      auto action_functor =
+        [this, someone_is_setting, someone_is_adding]
+        (processor_id_type,
+         const std::vector<std::pair<numeric_index_type,T>> & incoming_values)
+        {
+          for (auto [i, v] : incoming_values)
+            {
+              libmesh_assert_greater_equal(i, _first_local_index);
+              libmesh_assert_less(i, _last_local_index);
+              if (someone_is_setting)
+                _values[i-_first_local_index] = v;
+              else
+                {
+                  libmesh_assert (someone_is_adding);
+                  _values[i-_first_local_index] += v;
+                }
+            }
+        };
+
+      Parallel::push_parallel_vector_data
+        (this->comm(), updates_to_send, action_functor);
+
+      _unclosed_state = DO_NOTHING;
+    }
+
+  this->_is_closed = true;
+}
+
+
+
+template <typename T>
 void DistributedVector<T>::localize (NumericVector<T> & v_local_in) const
 
 {

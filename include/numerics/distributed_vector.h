@@ -241,6 +241,26 @@ private:
   std::vector<T> _values;
 
   /**
+   * Entries to add or set on remote processors during the next
+   * close()
+   */
+  std::vector<std::pair<numeric_index_type, T>> _remote_values;
+
+  /**
+   * Whether we are adding or setting remote values or neither - this
+   * determines behavior at the next close();
+   */
+  enum UnclosedState { DO_NOTHING = 0,
+                       ADD_VALUES,
+                       SET_VALUES,
+                       INVALID_UNCLOSEDSTATE };
+
+  /**
+   * The current state of this vector, if it is unclosed.
+   */
+  UnclosedState _unclosed_state;
+
+  /**
    * The global vector size.
    */
   numeric_index_type _global_size;
@@ -269,6 +289,7 @@ inline
 DistributedVector<T>::DistributedVector (const Parallel::Communicator & comm_in,
                                          const ParallelType ptype) :
   NumericVector<T>(comm_in, ptype),
+  _unclosed_state   (DO_NOTHING),
   _global_size      (0),
   _local_size       (0),
   _first_local_index(0),
@@ -351,7 +372,9 @@ void DistributedVector<T>::init (const numeric_index_type n,
     this->clear();
 
   // Initialize data structures
+  _unclosed_state = DO_NOTHING;
   _values.resize(n_local);
+  _remote_values.clear();
   _local_size  = n_local;
   _global_size = n;
 
@@ -394,6 +417,7 @@ void DistributedVector<T>::init (const numeric_index_type n,
 
   // Set the initialized flag
   this->_is_initialized = true;
+  this->_is_closed = true;
 
   // Zero the components unless directed otherwise
   if (!fast)
@@ -439,26 +463,17 @@ void DistributedVector<T>::init (const numeric_index_type n,
 
 template <typename T>
 inline
-void DistributedVector<T>::close ()
-{
-  libmesh_assert (this->initialized());
-
-  this->_is_closed = true;
-}
-
-
-
-template <typename T>
-inline
 void DistributedVector<T>::clear ()
 {
   _values.clear();
+  _remote_values.clear();
+
+  _unclosed_state = DO_NOTHING;
 
   _global_size =
     _local_size =
     _first_local_index =
     _last_local_index = 0;
-
 
   this->_is_closed = this->_is_initialized = false;
 }
@@ -472,6 +487,11 @@ void DistributedVector<T>::zero ()
   libmesh_assert (this->initialized());
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
+
+  // We should be closed
+  libmesh_assert (this->closed());
+  libmesh_assert_equal_to (_unclosed_state, DO_NOTHING);
+  libmesh_assert (_remote_values.empty());
 
   std::fill (_values.begin(),
              _values.end(),
@@ -580,11 +600,19 @@ void DistributedVector<T>::set (const numeric_index_type i, const T value)
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
   libmesh_assert_less (i, size());
-  libmesh_assert_less (i-first_local_index(), local_size());
+  libmesh_assert (_unclosed_state == DO_NOTHING ||
+                  _unclosed_state == SET_VALUES);
 
   std::scoped_lock lock(this->_numeric_vector_mutex);
-  _values[i - _first_local_index] = value;
-
+  if (i >= first_local_index() && i < last_local_index())
+    {
+      _values[i - _first_local_index] = value;
+    }
+  else
+    {
+      _remote_values.emplace_back(i, value);
+      _unclosed_state = SET_VALUES;
+    }
 
   this->_is_closed = false;
 }
@@ -600,11 +628,18 @@ void DistributedVector<T>::add (const numeric_index_type i, const T value)
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
   libmesh_assert_less (i, size());
-  libmesh_assert_less (i-first_local_index(), local_size());
 
   std::scoped_lock lock(this->_numeric_vector_mutex);
-  _values[i - _first_local_index] += value;
 
+  if (i >= first_local_index() && i < last_local_index())
+    {
+      _values[i - _first_local_index] += value;
+    }
+  else
+    {
+      _remote_values.emplace_back(i, value);
+      _unclosed_state = ADD_VALUES;
+    }
 
   this->_is_closed = false;
 }
@@ -619,6 +654,7 @@ Real DistributedVector<T>::min () const
   parallel_object_only();
 
   libmesh_assert (this->initialized());
+  libmesh_assert (this->closed());
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
@@ -641,6 +677,7 @@ Real DistributedVector<T>::max() const
   parallel_object_only();
 
   libmesh_assert (this->initialized());
+  libmesh_assert (this->closed());
   libmesh_assert_equal_to (_values.size(), _local_size);
   libmesh_assert_equal_to ((_last_local_index - _first_local_index), _local_size);
 
@@ -666,9 +703,12 @@ void DistributedVector<T>::swap (NumericVector<T> & other)
   std::swap(_last_local_index, v._last_local_index);
 
   std::swap(this->_is_initialized, v._is_initialized);
+  std::swap(this->_is_closed, v._is_closed);
+  std::swap(this->_unclosed_state, v._unclosed_state);
 
   // This should be O(1) with any reasonable STL implementation
   std::swap(_values, v._values);
+  std::swap(_remote_values, v._remote_values);
 }
 
 template <typename T>
