@@ -694,7 +694,7 @@ example_name = adaptivity_ex5
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/adaptivity/ex5
 data = adaptivity_ex5.C exact_solution.C run.sh
-sources = $(data) run.sh
+sources = $(data)
 
 ######################################################################
 #
