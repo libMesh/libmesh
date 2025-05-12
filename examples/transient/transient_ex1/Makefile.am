@@ -9,7 +9,7 @@ example_name  = transient_ex1
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/transient/ex1
 data          = transient_ex1.C exact_solution.C ../../adaptivity/adaptivity_ex2/mesh.xda run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = out_*.gmv transient_ex1.e
 

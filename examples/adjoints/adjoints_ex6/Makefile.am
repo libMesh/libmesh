@@ -7,8 +7,8 @@ femparameters.C: $(top_srcdir)/examples/adjoints/adjoints_ex1/femparameters.C
 example_name  = adjoints_ex6
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/adjoints/ex6
-data          = adjoints_ex6.C element_postprocess.C femparameters.C poisson.C general.in Makefile.in poisson.in femparameters.h poisson.h
-sources       = $(data) run.sh
+data          = adjoints_ex6.C element_postprocess.C femparameters.C poisson.C general.in Makefile.in poisson.in femparameters.h poisson.h run.sh
+sources       = $(data)
 
 CLEANFILES = *.gmv.* primal.e* dual.e*
 

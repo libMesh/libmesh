@@ -1,7 +1,7 @@
 example_name  = miscellaneous_ex8
 install_dir   = $(examples_install_path)/miscellaneous/ex8
 data          = miscellaneous_ex8.C run.sh unstruct.ucd.gz struct.ucd.gz
-sources       = $(data) run.sh
+sources       = $(data)
 
 # conditionally enable this test
 if LIBMESH_ENABLE_NANOFLANN

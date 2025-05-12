@@ -2,7 +2,7 @@ example_name  = vector_fe_ex5
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/vector_fe/ex5
 data          = vector_fe_ex5.C exact_solution.C assembly.C vector_fe_ex5.in run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = out.e out_constant.e
 

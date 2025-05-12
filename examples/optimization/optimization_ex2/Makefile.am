@@ -2,7 +2,7 @@ example_name  = optimization_ex2
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/optimization/ex2
 data          = optimization_ex2.C optimization_ex2.in run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = optimization_soln.exo
 

@@ -8,7 +8,7 @@ example_name  = fem_system_ex5
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/fem_system/ex5
 data          = fem_system_ex5.C fem_system_ex5.in PressurizedCyl_Patch6_256Elem.bxt ../fem_system_ex3/elasticity_system.C elasticity_system.h run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 elasticity_system.C : $(top_srcdir)/examples/fem_system/fem_system_ex3/elasticity_system.C
 	$(AM_V_GEN)$(LN_S) -f $< $@
