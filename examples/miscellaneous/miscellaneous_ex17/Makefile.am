@@ -1,6 +1,6 @@
 example_name  = miscellaneous_ex17
 check_SCRIPTS = run.sh
-install_dir   = $(examples_install_path)/introduction/ex3
+install_dir   = $(examples_install_path)/miscellaneous/ex17
 data          = miscellaneous_ex17.C exact_solution.C run.sh
 sources       = $(data) run.sh
 
