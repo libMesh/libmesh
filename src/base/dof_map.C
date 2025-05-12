@@ -901,7 +901,7 @@ void DofMap::invalidate_dofs(MeshBase & mesh) const
 void DofMap::clear()
 {
   DofMapBase::clear();
-  
+
   // we don't want to clear
   // the coupling matrix!
   // It should not change...

@@ -1956,7 +1956,7 @@ public:
     * @returns Whether this system will be statically condensed
     */
    bool has_static_condensation() const { return _sc_dof_map.get(); }
- 
+
 protected:
 
   /**
@@ -2027,7 +2027,7 @@ private:
    * Creates the degree of freedom map for the statically condensed system
    */
   void create_static_condensation_dof_map();
-  
+
   /**
    * Helper function to keep DofMap forward declarable in system.h
    */

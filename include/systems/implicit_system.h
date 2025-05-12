@@ -357,7 +357,7 @@ protected:
   template <typename T>
   void setup_static_condensation_preconditioner(T & solver);
 
-private:  
+private:
   /**
    * Create the static condensation system matrix
    */
