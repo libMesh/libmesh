@@ -431,7 +431,7 @@ void DistributedVector<T>::close ()
       std::vector<numeric_index_type> last_local_indices;
       this->comm().allgather(_last_local_index, last_local_indices);
 
-      std::map<processor_id_type, std::vector<std::pair<numeric_index_type,T>>> 
+      std::map<processor_id_type, std::vector<std::pair<numeric_index_type,T>>>
         updates_to_send;
 
       processor_id_type p = 0;
