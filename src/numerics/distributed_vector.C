@@ -409,8 +409,6 @@ void DistributedVector<T>::close ()
     {
       bool someone_is_setting = (_unclosed_state == SET_VALUES);
       this->comm().max(someone_is_setting);
-      bool someone_is_adding = (_unclosed_state == ADD_VALUES);
-      this->comm().max(someone_is_adding);
 
 #ifndef NDEBUG
       // If *I* have remote values, I must know what to do with them.
@@ -418,11 +416,12 @@ void DistributedVector<T>::close ()
         libmesh_assert(_unclosed_state == SET_VALUES ||
                        _unclosed_state == ADD_VALUES);
 
-      // If *anyone* had remote values, we must be doing something
-      libmesh_assert(someone_is_setting || someone_is_adding);
+      // If *anyone* had remote values, we must be doing something,
+      // and all ranks must agree on what we're doing.
+      bool someone_is_adding = (_unclosed_state == ADD_VALUES);
+      this->comm().max(someone_is_adding);
 
-      // We must be doing only *one* thing with remote values
-      libmesh_assert(!someone_is_setting || !someone_is_adding);
+      libmesh_assert_not_equal_to(someone_is_setting, someone_is_adding);
 #endif
 
       // We want to traverse in order later
@@ -447,7 +446,7 @@ void DistributedVector<T>::close ()
       _remote_values.clear();
 
       auto action_functor =
-        [this, someone_is_setting, someone_is_adding]
+        [this, someone_is_setting]
         (processor_id_type,
          const std::vector<std::pair<numeric_index_type,T>> & incoming_values)
         {
@@ -458,10 +457,7 @@ void DistributedVector<T>::close ()
               if (someone_is_setting)
                 _values[i-_first_local_index] = v;
               else
-                {
-                  libmesh_assert (someone_is_adding);
-                  _values[i-_first_local_index] += v;
-                }
+                _values[i-_first_local_index] += v;
             }
         };
 
