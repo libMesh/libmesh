@@ -424,8 +424,11 @@ void DistributedVector<T>::close ()
       libmesh_assert_not_equal_to(someone_is_setting, someone_is_adding);
 #endif
 
-      // We want to traverse in order later
-      std::sort(_remote_values.begin(), _remote_values.end());
+      // We want to traverse in id order later, but we can't compare
+      // values with default < in the case where Number==complex.
+      std::sort(_remote_values.begin(), _remote_values.end(),
+                [](auto a, auto b)
+                { return a.first < b.first; });
 
       std::vector<numeric_index_type> last_local_indices;
       this->comm().allgather(_last_local_index, last_local_indices);
