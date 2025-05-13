@@ -11,7 +11,7 @@ example_name  = adjoints_ex5
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/adjoints/ex5
 data          = heatsystem.C element_qoi_derivative.C factoryfunction.C general.in initial.C heatsystem.h adjoints_ex5.C femparameters.C heat.in femparameters.h adjoint_initial.C adjoint_initial.h initial.h run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = *.gmv.* primal.e* dual.e* primal.out.xda.* adjoint.out.xda.*
 

@@ -7,7 +7,7 @@ example_name  = subdomains_ex2
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/subdomains/ex2
 data          = subdomains_ex2.C exact_solution.C run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = out_*.e gnuplot_*
 

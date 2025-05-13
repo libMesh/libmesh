@@ -2,7 +2,7 @@ example_name  = introduction_ex1
 
 install_dir   = $(examples_install_path)/introduction/ex1
 data          = introduction_ex1.C run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 check_SCRIPTS = run.sh
 CLEANFILES    = output.xda output.xdr

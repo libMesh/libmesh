@@ -726,7 +726,7 @@ example_name = fem_system_ex2
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/fem_system/ex2
 data = fem_system_ex2.C solid.in solid_system.C solid_system.h nonlinear_neohooke_cc.C nonlinear_neohooke_cc.h run.sh
-sources = $(data) run.sh
+sources = $(data)
 
 ######################################################################
 #

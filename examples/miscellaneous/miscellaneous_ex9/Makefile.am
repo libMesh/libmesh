@@ -1,7 +1,7 @@
 example_name  = miscellaneous_ex9
 install_dir   = $(examples_install_path)/miscellaneous/ex9
 data          = augment_sparsity_on_interface.h miscellaneous_ex9.exo augment_sparsity_on_interface.C miscellaneous_ex9.C run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 check_SCRIPTS = run.sh
 CLEANFILES = solution.exo

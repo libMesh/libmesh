@@ -22,7 +22,7 @@
 //
 // This example uses Raviart-Thomas elements to solve a model div-grad problem
 // in H(div) in both 2d and 3d. The problem is simply a mixed div-grad
-// formulation, \vec{u} = -\nabla p, and \nabla \cdot \vec{u} = f, of the
+// formulation, \vec{u} = -\nabla p, and -\nabla \cdot \vec{u} = -f, of the
 // Poisson problem in Introduction Example 3, \nabla^2 p = -f. In particular,
 // unlike in Introduction Example 3, where we solve solely for the scalar field
 // p, here we solve for both the vector field \vec{u} and the scalar field p.
@@ -446,7 +446,7 @@ void assemble_divgrad(EquationSystems & es,
           for (unsigned int k = 0; k != scalar_n_dofs; k++)
             for (unsigned int j = 0; j != vector_n_dofs; j++)
               {
-                Ke(k + vector_n_dofs, j) += JxW[qp]*(div_vector_phi[j][qp]*scalar_phi[k][qp]);
+                Ke(k + vector_n_dofs, j) -= JxW[qp]*(div_vector_phi[j][qp]*scalar_phi[k][qp]);
               }
 
           // This is the end of the matrix summation loop
@@ -472,7 +472,7 @@ void assemble_divgrad(EquationSystems & es,
             // forcing function.
             for (unsigned int k = 0; k != scalar_n_dofs; k++)
               {
-                Fe(k + vector_n_dofs) += JxW[qp]*f*scalar_phi[k][qp];
+                Fe(k + vector_n_dofs) -= JxW[qp]*f*scalar_phi[k][qp];
               }
           }
 

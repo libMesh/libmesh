@@ -2,7 +2,7 @@ example_name  = systems_of_equations_ex9
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/systems_of_equations/ex9
 data          = systems_of_equations_ex9.C run.sh systems_of_equations_ex9.exo
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = solution.exo
 

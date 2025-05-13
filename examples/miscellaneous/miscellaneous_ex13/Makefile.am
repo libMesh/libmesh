@@ -1,7 +1,7 @@
 example_name  = miscellaneous_ex13
 install_dir   = $(examples_install_path)/miscellaneous/ex13
 data          = miscellaneous_ex13.C run.sh cylinder.exo
-sources       = $(data) run.sh
+sources       = $(data)
 check_SCRIPTS = run.sh
 
 CLEANFILES = out.e cylinder.xdr

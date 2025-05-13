@@ -2,7 +2,7 @@ example_name  = transient_ex2
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/transient/ex2
 data          = transient_ex2.C pipe-mesh.unv run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = pressure_node.res out.*.gmv out_*.vtu  out_*.pvtu
 

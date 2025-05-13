@@ -8,7 +8,7 @@ example_name  = adaptivity_ex2
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/adaptivity/ex2
 data          = adaptivity_ex2.C exact_solution.C mesh.xda run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = solution_read_in.gmv saved_solution.xda saved_solution.gmv saved_mesh.xda out.gmv.*
 

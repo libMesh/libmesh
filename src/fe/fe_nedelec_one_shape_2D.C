@@ -25,7 +25,7 @@ namespace libMesh
 {
 
 // An excellent discussion of Nedelec shape functions is given in
-// https://web.archive.org/web/20240719125223/https://www.dealii.org/reports/nedelec/nedelec.pdf
+// https://www.dealii.org/reports/nedelec/nedelec.pdf
 // An excellent summary of Nedelec shape functions is also given in
 // https://defelement.com/elements/nedelec1.html
 template <>

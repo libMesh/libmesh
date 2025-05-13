@@ -706,7 +706,7 @@ example_name = reduced_basis_ex6
 check_SCRIPTS = run.sh
 install_dir = $(examples_install_path)/reduced_basis/ex6
 data = reduced_basis_ex6.C assembly.h eim_classes.h rb_classes.h reduced_basis_ex6.in eim.in rb.in run.sh
-sources = $(data) run.sh
+sources = $(data)
 
 ######################################################################
 #

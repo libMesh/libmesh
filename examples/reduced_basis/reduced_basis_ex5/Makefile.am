@@ -2,7 +2,7 @@ example_name  = reduced_basis_ex5
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/reduced_basis/ex5
 data          = reduced_basis_ex5.C assembly.h assembly.C rb_classes.h reduced_basis_ex5.in Twisted_Beam.bez.gz run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = RB_sol.e offline_data/* rb_eval.bin
 

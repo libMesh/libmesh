@@ -2,7 +2,7 @@ example_name  = transient_ex3
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/transient/ex3
 data          = advection_2D.in advection_system.C advection_system.h claw_system.C claw_system.h transient_ex3.C run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = claw_solution.*.e
 

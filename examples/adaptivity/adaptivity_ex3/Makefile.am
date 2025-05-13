@@ -2,7 +2,7 @@ example_name  = adaptivity_ex3
 check_SCRIPTS = run.sh
 install_dir   = $(examples_install_path)/adaptivity/ex3
 data          = adaptivity_ex3.C adaptivity_ex3.in lshaped.xda lshaped3D.xda run.sh
-sources       = $(data) run.sh
+sources       = $(data)
 
 CLEANFILES = lshaped.e *.m error_*.e error_*.n*
 

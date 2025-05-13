@@ -41,9 +41,6 @@
 #include "libmesh/steady_solver.h"
 #include "solution_function.h"
 
-// C++ includes
-#include <memory>
-
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
@@ -60,11 +57,14 @@ int main (int argc, char ** argv)
   // Parse the input file
   GetPot infile("vector_fe_ex4.in");
 
+  // But allow the command line to override it.
+  infile.parse_command_line(argc, argv);
+
   // Read in parameters from the input file
   const unsigned int grid_size = infile("grid_size", 2);
 
   // Skip higher-dimensional examples on a lower-dimensional libMesh build
-  libmesh_example_requires(3 <= LIBMESH_DIM, "2D/3D support");
+  libmesh_example_requires(3 <= LIBMESH_DIM, "3D support");
 
   // Create a mesh, with dimension to be overridden later, on the
   // default MPI communicator.
@@ -81,8 +81,10 @@ int main (int argc, char ** argv)
   // H(curl) norms when using Nedelec elements. For more information
   // on this topic, see the relevant results in other software [1-3]
   // and the descriptions in [4,5]. In this particular example, we
-  // have observed O(h^2) convergence in L2 for HEX20s, but the reason
-  // for the higher-than-expected rate is not currently known.
+  // have observed O(h^2) convergence in L2 for HEX20/HEX27s, since the
+  // particular solution we seek is, just like the basis functions, constant
+  // along each of the cartesian axes. The basis functions are linear in the
+  // other two dimensions, improving the convergence speed.
   //
   // [1]: deal.ii, https://www.dealii.org/reports/nedelec/nedelec.pdf
   // [2]: FEMPAR, https://www.sciencedirect.com/science/article/pii/S096599781831113X
@@ -97,9 +99,9 @@ int main (int argc, char ** argv)
                                      grid_size,
                                      grid_size,
                                      grid_size,
-                                     -1., 1,
                                      -1., 1.,
-                                     -1., 1,
+                                     -1., 1.,
+                                     -1., 1.,
                                      Utility::string_to_enum<ElemType>(elem_str));
 
 
@@ -135,6 +137,7 @@ int main (int argc, char ** argv)
   // Print information about the system to the screen.
   equation_systems.print_info();
 
+  // Solve the system.
   system.solve();
 
   ExactSolution exact_sol(equation_systems);
