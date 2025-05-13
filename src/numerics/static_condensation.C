@@ -472,7 +472,8 @@ namespace libMesh
 {
 StaticCondensation::StaticCondensation(const MeshBase &,
                                        const System &,
-                                       const DofMap & full_dof_map)
+                                       const DofMap & full_dof_map,
+                                       const StaticCondensationDofMap &)
   : SparseMatrix<Number>(full_dof_map.comm())
 {
   libmesh_error_msg(

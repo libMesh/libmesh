@@ -310,7 +310,10 @@ class StaticCondensationDofMap;
 class StaticCondensation : public SparseMatrix<Number>
 {
 public:
-  StaticCondensation(const MeshBase &, const System &, const DofMap & full_dof_map);
+  StaticCondensation(const MeshBase &,
+                     const System &,
+                     const DofMap & full_dof_map,
+                     const StaticCondensationDofMap & reduced_dof_map);
 
   const std::unordered_set<unsigned int> & uncondensed_vars() const { libmesh_not_implemented(); }
   StaticCondensationPreconditioner & get_preconditioner() { libmesh_not_implemented(); }
