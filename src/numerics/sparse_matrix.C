@@ -165,14 +165,10 @@ void SparseMatrix<Complex>::print(std::ostream & os, const bool sparse) const
 template <typename T>
 std::unique_ptr<SparseMatrix<T>>
 SparseMatrix<T>::build(const Parallel::Communicator & comm,
-                       const SolverPackage solver_package,
-                       const MatrixBuildType matrix_build_type /* = AUTOMATIC */)
+                       const SolverPackage solver_package)
 {
   // Avoid unused parameter warnings when no solver packages are enabled.
   libmesh_ignore(comm);
-
-  if (matrix_build_type == MatrixBuildType::DIAGONAL)
-    return std::make_unique<DiagonalMatrix<T>>(comm);
 
   // Build the appropriate vector
   switch (solver_package)

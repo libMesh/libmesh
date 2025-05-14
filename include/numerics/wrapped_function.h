@@ -160,8 +160,8 @@ void WrappedFunction<Output>::operator() (const Point & p,
   const unsigned int n_vars = _sys.n_vars();
   for (unsigned int v = 0; v != n_vars; ++v)
     {
-      const unsigned int n_components =
-        _sys.variable(v).n_components();
+      const auto n_components =
+        _sys.variable(v).n_components(_sys.get_mesh());
       if (n_components == 1)
         output(_sys.variable_scalar_number(v,0)) =
           _fptr(p, *_parameters, _sys.name(), _sys.variable_name(v));
@@ -199,12 +199,7 @@ Output WrappedFunction<Output>::component (unsigned int i,
   for (unsigned int v = 0; v != n_vars; ++v)
     {
       const auto & var_fe_type = _sys.variable_type(v);
-      const unsigned int n_components = [&var_fe_type, v, this](){
-        if (var_fe_type.family == SCALAR)
-          return _sys.variable(v).n_components();
-        else
-          return FEInterface::n_vec_dim(_sys.get_mesh(), var_fe_type);
-      }();
+      const auto n_components = _sys.variable(v).n_components(_sys.get_mesh());
       if (i >= vc + n_components)
       {
         vc += n_components;
