@@ -1801,7 +1801,7 @@ void MeshBase::detect_interior_parents()
   //This map will be used to set interior parents
   std::unordered_map<dof_id_type, std::vector<dof_id_type>> node_to_elem;
 
-  for (const auto & elem : this->active_element_ptr_range())
+  for (const auto & elem : this->element_ptr_range())
     {
       // Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
       for (auto n : make_range(elem->n_vertices()))
