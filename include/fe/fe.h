@@ -790,10 +790,23 @@ protected:
                                       const unsigned vdim = 1);
 
   /**
-   * An array of the node locations on the last
-   * element we computed on
+   * Vectors holding the node locations, edge and
+   * face orientations of the last element we cached.
    */
   std::vector<Point> cached_nodes;
+  std::vector<bool> cached_edges, cached_faces;
+
+  /**
+   * Repopulate the element cache with the node locations,
+   * edge and face orientations of the element \p elem.
+   */
+  void cache(const Elem * elem);
+
+  /**
+   * Check if the node locations, edge and face orientations
+   * held in the element cache match those of element \p elem.
+   */
+  bool matches_cache(const Elem * elem);
 
   /**
    * The last side and last edge we did a reinit on

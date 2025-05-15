@@ -2655,6 +2655,25 @@ FEFieldType FEInterface::field_type (const FEFamily & fe_family)
     }
 }
 
+bool FEInterface::orientation_dependent (const FEFamily & fe_family)
+{
+  switch (fe_family)
+    {
+    case HIERARCHIC:
+    case L2_HIERARCHIC:
+    case HIERARCHIC_VEC:
+    case L2_HIERARCHIC_VEC:
+    case BERNSTEIN:
+    case RATIONAL_BERNSTEIN:
+    case SZABAB:
+    case NEDELEC_ONE:
+    case RAVIART_THOMAS:
+      return true;
+    default:
+      return false;
+    }
+}
+
 unsigned int FEInterface::n_vec_dim (const MeshBase & mesh,
                                      const FEType & fe_type)
 {

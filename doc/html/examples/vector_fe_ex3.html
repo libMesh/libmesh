@@ -297,6 +297,69 @@ HCurl-Error is: 0.813116
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex3:
+*   ./example-opt element_type=QUAD9 grid_size=5 refine=2 -pc_type lu
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={2}
+  elem_default_orders()={SECOND}
+  supported_nodal_order()=2
+  spatial_dimension()=2
+  n_nodes()=1681
+    n_local_nodes()=1681
+  n_elem()=525
+    n_local_elem()=525
+    n_active_elem()=400
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=1
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="FIRST"
+    n_dofs()=840
+    n_local_dofs()=840
+    max(n_local_dofs())=840
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=840
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 6.71429
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 7
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 28.9779
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 1, residual 4.3648e-14
+Trying full Newton step
+  Current Residual: 6.73932e-14
+  Nonlinear solver converged, step 0, residual reduction 2.32568e-15 < 1e-06
+  Nonlinear solver relative step size 1 > 1e-06
+L2-Error is: 0.12862
+HCurl semi-norm error is: 0.802879
+HCurl-Error is: 0.813116
+
+***************************************************************
+* Done Running Example vector_fe_ex3:
+*   ./example-opt element_type=QUAD9 grid_size=5 refine=2 -pc_type lu
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex3:
 *   ./example-opt order=2 element_type=TRI6 -pc_type lu
 ***************************************************************
 
