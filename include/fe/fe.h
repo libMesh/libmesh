@@ -806,7 +806,7 @@ protected:
    * Check if the node locations, edge and face orientations
    * held in the element cache match those of element \p elem.
    */
-  bool match(const Elem * elem);
+  bool matches_cache(const Elem * elem);
 
   /**
    * The last side and last edge we did a reinit on

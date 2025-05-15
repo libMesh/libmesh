@@ -171,7 +171,7 @@ void FE<Dim,T>::cache(const Elem * elem)
 
 
 template <unsigned int Dim, FEFamily T>
-bool FE<Dim,T>::match(const Elem * elem)
+bool FE<Dim,T>::matches_cache(const Elem * elem)
 {
   bool m = cached_nodes.size() == elem->n_nodes();
   for (unsigned n = 1; m && n < elem->n_nodes(); n++)
@@ -271,7 +271,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
               this->_elem = elem;
 
               // Check if cached element's nodes, edge and face orientations still fit
-              cached_elem_still_fits = this->match(elem);
+              cached_elem_still_fits = this->matches_cache(elem);
 
               // Initialize the shape functions if needed
               if (this->shapes_need_reinit() && !cached_elem_still_fits)
