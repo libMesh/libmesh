@@ -147,7 +147,7 @@ void NonlinearImplicitSystem::set_solver_parameters ()
     double(es.parameters.get<Real>("nonlinear solver relative step tolerance"));
 
   // Get the user-specified linear solver tolerances
-  const auto [maxlinearits, linear_tol] = this->get_linear_solve_parameters();
+  const auto [maxlinearits, linear_tol] = this->Parent::get_linear_solve_parameters();
 
   const double linear_min_tol = parameters.have_parameter<Real>("linear solver minimum tolerance") ?
     double(parameters.get<Real>("linear solver minimum tolerance")) :
