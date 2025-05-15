@@ -471,6 +471,7 @@ public:
   CPPUNIT_TEST( test3DProjectVectorFEHex20 );
   CPPUNIT_TEST( test3DProjectVectorFEHex27 );
 #ifdef LIBMESH_HAVE_SOLVER
+  CPPUNIT_TEST( testSetSystemParameterOverEquationSystem);
   CPPUNIT_TEST( testAssemblyWithDgFemContext );
 #endif
 #endif // LIBMESH_DIM > 2
@@ -1258,6 +1259,73 @@ public:
 
     LIBMESH_ASSERT_FP_EQUAL(system.solution->l1_norm(), ref_l1_norm, TOLERANCE*TOLERANCE);
   }
+
+
+  void testSetSystemParameterOverEquationSystem()
+  {
+    LOG_UNIT_TEST;
+
+    ReplicatedMesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_cube (mesh,
+                                      1,
+                                      0,
+                                      0,
+                                      0., 1.,
+                                      0., 0.,
+                                      0., 0.,
+                                      EDGE2);
+
+    Point new_point_a(2.);
+    Point new_point_b(3.);
+    Node* new_node_a = mesh.add_point( new_point_a );
+    Node* new_node_b = mesh.add_point( new_point_b );
+    auto new_edge_elem = mesh.add_elem(Elem::build(EDGE2));
+    new_edge_elem->set_node(0) = new_node_a;
+    new_edge_elem->set_node(1) = new_node_b;
+
+    mesh.elem_ref(0).subdomain_id() = 10;
+    mesh.elem_ref(1).subdomain_id() = 10;
+
+    mesh.prepare_for_use();
+
+    // Create an equation systems object.
+    EquationSystems equation_systems (mesh);
+
+    // Set some parameters to the equation system that would cause a failed test
+    equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = 0;
+
+    // Setup Linear Implicit system
+    LinearImplicitSystem & li_system =
+      equation_systems.add_system<LinearImplicitSystem> ("test");
+
+    // We must use a discontinuous variable type in this test or
+    // else the sparsity pattern will not be correct
+    li_system.add_variable("u", FIRST, L2_LAGRANGE);
+
+    MeshTools::Generation::build_cube (mesh,
+                                       5, 5, 5,
+                                       0., 1., 0., 1., 0., 1.,
+                                       HEX8);
+
+    li_system.attach_assemble_function (assembly_with_dg_fem_context);
+    li_system.get_linear_solver()->set_solver_type(GMRES);
+    // Need 5 iterations, dont overdo the preconditioning
+    li_system.get_linear_solver()->set_preconditioner_type(IDENTITY_PRECOND);
+
+    // Set some parameters to the system that work for the solve
+    li_system.parameters.set<unsigned int>("linear solver maximum iterations") = 5;
+    li_system.parameters.set<Real>("linear solver tolerance") = 1e-100;
+
+    // Need to init before we can access the system matrix
+    equation_systems.init ();
+
+    // See the solve pass, indicating system parameters are used over equation system parameters
+    li_system.solve();
+
+    // Check that the number of iterations from the systems got obeyed
+    CPPUNIT_ASSERT_EQUAL(li_system.n_linear_iterations(), 5u);
+}
 
   void testAssemblyWithDgFemContext()
   {

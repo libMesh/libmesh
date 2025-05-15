@@ -1026,10 +1026,10 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
  */
 void System::project_solution (ValueFunctionPointer fptr,
                                GradientFunctionPointer gptr,
-                               const Parameters & parameters) const
+                               const Parameters & function_parameters) const
 {
-  WrappedFunction<Number> f(*this, fptr, &parameters);
-  WrappedFunction<Gradient> g(*this, gptr, &parameters);
+  WrappedFunction<Number> f(*this, fptr, &function_parameters);
+  WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
   this->project_solution(&f, &g);
 }
 
@@ -1066,12 +1066,12 @@ void System::project_solution (FEMFunctionBase<Number> * f,
  */
 void System::project_vector (ValueFunctionPointer fptr,
                              GradientFunctionPointer gptr,
-                             const Parameters & parameters,
+                             const Parameters & function_parameters,
                              NumericVector<Number> & new_vector,
                              int is_adjoint) const
 {
-  WrappedFunction<Number> f(*this, fptr, &parameters);
-  WrappedFunction<Gradient> g(*this, gptr, &parameters);
+  WrappedFunction<Number> f(*this, fptr, &function_parameters);
+  WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
   this->project_vector(new_vector, &f, &g, is_adjoint);
 }
 
@@ -1237,10 +1237,10 @@ void System::boundary_project_solution (const std::set<boundary_id_type> & b,
                                         const std::vector<unsigned int> & variables,
                                         ValueFunctionPointer fptr,
                                         GradientFunctionPointer gptr,
-                                        const Parameters & parameters)
+                                        const Parameters & function_parameters)
 {
-  WrappedFunction<Number> f(*this, fptr, &parameters);
-  WrappedFunction<Gradient> g(*this, gptr, &parameters);
+  WrappedFunction<Number> f(*this, fptr, &function_parameters);
+  WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
   this->boundary_project_solution(b, variables, &f, &g);
 }
 
@@ -1272,12 +1272,12 @@ void System::boundary_project_vector (const std::set<boundary_id_type> & b,
                                       const std::vector<unsigned int> & variables,
                                       ValueFunctionPointer fptr,
                                       GradientFunctionPointer gptr,
-                                      const Parameters & parameters,
+                                      const Parameters & function_parameters,
                                       NumericVector<Number> & new_vector,
                                       int is_adjoint) const
 {
-  WrappedFunction<Number> f(*this, fptr, &parameters);
-  WrappedFunction<Gradient> g(*this, gptr, &parameters);
+  WrappedFunction<Number> f(*this, fptr, &function_parameters);
+  WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
   this->boundary_project_vector(b, variables, new_vector, &f, &g,
                                 is_adjoint);
 }
