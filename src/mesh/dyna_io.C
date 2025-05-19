@@ -31,9 +31,7 @@
 
 // gzstream for reading compressed files as a stream
 #ifdef LIBMESH_HAVE_GZSTREAM
-# include "libmesh/ignore_warnings.h" // shadowing in gzstream.h
 # include "gzstream.h"
-# include "libmesh/restore_warnings.h"
 #endif
 
 // C++ includes

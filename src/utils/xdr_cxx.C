@@ -28,9 +28,7 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/libmesh_logging.h"
 #ifdef LIBMESH_HAVE_GZSTREAM
-# include "libmesh/ignore_warnings.h" // shadowing in gzstream.h
 # include "gzstream.h" // For reading/writing compressed streams
-# include "libmesh/restore_warnings.h"
 #endif
 #include "libmesh/utility.h" // unzip_file
 
