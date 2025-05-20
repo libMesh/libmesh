@@ -848,8 +848,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
   // That prepare_for_use() call marked us as prepared, but we
   // specifically avoided some important preparation, so we might not
   // actually be prepared now.
-  if (skip_find_neighbors &&
-      (!was_prepared || !other_mesh.is_prepared()))
+  if (skip_find_neighbors ||
+      !was_prepared || !other_mesh.is_prepared())
     this->set_isnt_prepared();
 }
 

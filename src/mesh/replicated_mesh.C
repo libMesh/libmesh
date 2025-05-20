@@ -110,6 +110,8 @@ ReplicatedMesh::ReplicatedMesh (const MeshBase & other_mesh) :
 
   this->copy_constraint_rows(other_mesh);
 
+  this->_is_prepared = other_mesh.is_prepared();
+
   auto & this_boundary_info = this->get_boundary_info();
   const auto & other_boundary_info = other_mesh.get_boundary_info();
 
