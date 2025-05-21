@@ -123,7 +123,7 @@ void ImplicitSystem::disable_cache () {
 
 
 std::pair<unsigned int, Real>
-ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
+ImplicitSystem::sensitivity_solve (const ParameterVector & parameters_vec)
 {
   // Log how long the linear solve takes.
   LOG_SCOPE("sensitivity_solve()", "ImplicitSystem");
@@ -138,7 +138,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
       this->matrix->close();
 
       // Reset and build the RHS from the residual derivatives
-      this->assemble_residual_derivatives(parameters);
+      this->assemble_residual_derivatives(parameters_vec);
     }
 
   // The sensitivity problem is linear
@@ -152,7 +152,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
 
   // Solve the linear system.
   SparseMatrix<Number> * pc = this->request_matrix("Preconditioner");
-  for (auto p : make_range(parameters.size()))
+  for (auto p : make_range(parameters_vec.size()))
     {
       std::pair<unsigned int, Real> rval =
         solver->solve (*matrix, pc,
@@ -167,7 +167,7 @@ ImplicitSystem::sensitivity_solve (const ParameterVector & parameters)
 
   // The linear solver may not have fit our constraints exactly
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-  for (auto p : make_range(parameters.size()))
+  for (auto p : make_range(parameters_vec.size()))
     this->get_dof_map().enforce_constraints_exactly
       (*this, &this->get_sensitivity_solution(p),
        /* homogeneous = */ true);
@@ -240,7 +240,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   // We currently get partial derivatives via central differencing
   const Real delta_p = TOLERANCE;
 
-  ParameterVector & parameters =
+  ParameterVector & parameters_vec =
     const_cast<ParameterVector &>(parameters_in);
 
   // The forward system should now already be solved.
@@ -280,10 +280,10 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   // then finally dividing by 2*dp.
 
   ParameterVector oldparameters, parameterperturbation;
-  parameters.deep_copy(oldparameters);
+  parameters_vec.deep_copy(oldparameters);
   weights.deep_copy(parameterperturbation);
   parameterperturbation *= delta_p;
-  parameters += parameterperturbation;
+  parameters_vec += parameterperturbation;
 
   this->assembly(false, true);
   this->matrix->close();
@@ -304,9 +304,9 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
         *(temprhs[i]) *= -1.0;
       }
 
-  oldparameters.value_copy(parameters);
+  oldparameters.value_copy(parameters_vec);
   parameterperturbation *= -1.0;
-  parameters += parameterperturbation;
+  parameters_vec += parameterperturbation;
 
   this->assembly(false, true);
   this->matrix->close();
@@ -327,7 +327,7 @@ ImplicitSystem::weighted_sensitivity_adjoint_solve (const ParameterVector & para
   // Finally, assemble the jacobian at the non-perturbed parameter
   // values.  Ignore assemble_before_solve; if we had a good
   // non-perturbed matrix before we've already overwritten it.
-  oldparameters.value_copy(parameters);
+  oldparameters.value_copy(parameters_vec);
 
   // if (this->assemble_before_solve)
   {
@@ -385,7 +385,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
   // We currently get partial derivatives via central differencing
   const Real delta_p = TOLERANCE;
 
-  ParameterVector & parameters =
+  ParameterVector & parameters_vec =
     const_cast<ParameterVector &>(parameters_in);
 
   // The forward system should now already be solved.
@@ -405,19 +405,19 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
   // sum_l(w_l*v_l) ~= (v(p + dp*w_l*e_l) - v(p - dp*w_l*e_l))/(2*dp)
 
   ParameterVector oldparameters, parameterperturbation;
-  parameters.deep_copy(oldparameters);
+  parameters_vec.deep_copy(oldparameters);
   weights.deep_copy(parameterperturbation);
   parameterperturbation *= delta_p;
-  parameters += parameterperturbation;
+  parameters_vec += parameterperturbation;
 
   this->assembly(true, false, true);
   this->rhs->close();
 
   std::unique_ptr<NumericVector<Number>> temprhs = this->rhs->clone();
 
-  oldparameters.value_copy(parameters);
+  oldparameters.value_copy(parameters_vec);
   parameterperturbation *= -1.0;
-  parameters += parameterperturbation;
+  parameters_vec += parameterperturbation;
 
   this->assembly(true, false, true);
   this->rhs->close();
@@ -427,7 +427,7 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
 
   // Finally, assemble the jacobian at the non-perturbed parameter
   // values
-  oldparameters.value_copy(parameters);
+  oldparameters.value_copy(parameters_vec);
 
   // Build the Jacobian
   this->assembly(false, true);
@@ -459,11 +459,11 @@ ImplicitSystem::weighted_sensitivity_solve (const ParameterVector & parameters_i
 
 void ImplicitSystem::assemble_residual_derivatives(const ParameterVector & parameters_in)
 {
-  ParameterVector & parameters =
+  ParameterVector & parameters_vec =
     const_cast<ParameterVector &>(parameters_in);
 
   const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
+    (parameters_vec.size());
 
   for (unsigned int p=0; p != Np; ++p)
     {
@@ -472,19 +472,19 @@ void ImplicitSystem::assemble_residual_derivatives(const ParameterVector & param
       // Approximate -(partial R / partial p) by
       // (R(p-dp) - R(p+dp)) / (2*dp)
 
-      Number old_parameter = *parameters[p];
+      Number old_parameter = *parameters_vec[p];
 
       const Real delta_p =
         TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
 
-      *parameters[p] -= delta_p;
+      *parameters_vec[p] -= delta_p;
 
       //      this->assembly(true, false, true);
       this->assembly(true, false, false);
       this->rhs->close();
       sensitivity_rhs = *this->rhs;
 
-      *parameters[p] = old_parameter + delta_p;
+      *parameters_vec[p] = old_parameter + delta_p;
 
       //      this->assembly(true, false, true);
       this->assembly(true, false, false);
@@ -494,7 +494,7 @@ void ImplicitSystem::assemble_residual_derivatives(const ParameterVector & param
       sensitivity_rhs /= (2*delta_p);
       sensitivity_rhs.close();
 
-      *parameters[p] = old_parameter;
+      *parameters_vec[p] = old_parameter;
     }
 }
 
@@ -504,11 +504,11 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
                                                         const ParameterVector & parameters_in,
                                                         SensitivityData & sensitivities)
 {
-  ParameterVector & parameters =
+  ParameterVector & parameters_vec =
     const_cast<ParameterVector &>(parameters_in);
 
   const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
+    (parameters_vec.size());
   const unsigned int Nq = this->n_qois();
 
   // An introduction to the problem:
@@ -532,7 +532,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
   this->assemble_residual_derivatives(parameters_in);
 
   // Get ready to fill in sensitivities:
-  sensitivities.allocate_data(qoi_indices, *this, parameters);
+  sensitivities.allocate_data(qoi_indices, *this, parameters_vec);
 
   // We use the identities:
   // dq/dp = (partial q / partial p) + (partial q / partial u) *
@@ -573,18 +573,18 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
       // (partial R / partial p) ~= (rhs(p+dp) - rhs(p-dp))/(2*dp)
 
-      Number old_parameter = *parameters[j];
+      Number old_parameter = *parameters_vec[j];
 
       const Real delta_p =
         TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
 
-      *parameters[j] = old_parameter - delta_p;
+      *parameters_vec[j] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
       const std::vector<Number> qoi_minus = this->get_qoi_values();
 
       NumericVector<Number> & neg_partialR_partialp = this->get_sensitivity_rhs(j);
 
-      *parameters[j] = old_parameter + delta_p;
+      *parameters_vec[j] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
       const std::vector<Number> qoi_plus = this->get_qoi_values();
 
@@ -594,7 +594,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
           partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
 
       // Don't leave the parameter changed
-      *parameters[j] = old_parameter;
+      *parameters_vec[j] = old_parameter;
 
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
@@ -602,7 +602,7 @@ void ImplicitSystem::adjoint_qoi_parameter_sensitivity (const QoISet & qoi_indic
             neg_partialR_partialp.dot(this->get_adjoint_solution(i));
     }
 
-  // All parameters have been reset.
+  // All parameters_vec have been reset.
   // Reset the original qoi.
 
   this->assemble_qoi(qoi_indices);
@@ -614,11 +614,11 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
                                                         const ParameterVector & parameters_in,
                                                         SensitivityData & sensitivities)
 {
-  ParameterVector & parameters =
+  ParameterVector & parameters_vec =
     const_cast<ParameterVector &>(parameters_in);
 
   const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
+    (parameters_vec.size());
   const unsigned int Nq = this->n_qois();
 
   // An introduction to the problem:
@@ -634,10 +634,10 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
   // We first solve for (partial u / partial p) for each parameter:
   // J * (partial u / partial p) = - (partial R / partial p)
 
-  this->sensitivity_solve(parameters);
+  this->sensitivity_solve(parameters_vec);
 
   // Get ready to fill in sensitivities:
-  sensitivities.allocate_data(qoi_indices, *this, parameters);
+  sensitivities.allocate_data(qoi_indices, *this, parameters_vec);
 
   // We use the identity:
   // dq/dp = (partial q / partial p) + (partial q / partial u) *
@@ -661,16 +661,16 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
 
       // (partial q / partial p) ~= (q(p+dp)-q(p-dp))/(2*dp)
 
-      Number old_parameter = *parameters[j];
+      Number old_parameter = *parameters_vec[j];
 
       const Real delta_p =
         TOLERANCE * std::max(std::abs(old_parameter), 1e-3);
 
-      *parameters[j] = old_parameter - delta_p;
+      *parameters_vec[j] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
       const std::vector<Number> qoi_minus = this->get_qoi_values();
 
-      *parameters[j] = old_parameter + delta_p;
+      *parameters_vec[j] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
       const std::vector<Number> qoi_plus = this->get_qoi_values();
 
@@ -680,7 +680,7 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
           partialq_partialp[i] = (qoi_plus[i] - qoi_minus[i]) / (2.*delta_p);
 
       // Don't leave the parameter changed
-      *parameters[j] = old_parameter;
+      *parameters_vec[j] = old_parameter;
 
       for (unsigned int i=0; i != Nq; ++i)
         if (qoi_indices.has_index(i))
@@ -688,7 +688,7 @@ void ImplicitSystem::forward_qoi_parameter_sensitivity (const QoISet & qoi_indic
             this->get_adjoint_rhs(i).dot(this->get_sensitivity_solution(j));
     }
 
-  // All parameters have been reset.
+  // All parameters_vec have been reset.
   // We didn't cache the original rhs or matrix for memory reasons,
   // but we can restore them to a state consistent solution -
   // principle of least surprise.
@@ -708,14 +708,14 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
   // We currently get partial derivatives via finite differencing
   const Real delta_p = TOLERANCE;
 
-  ParameterVector & parameters =
+  ParameterVector & parameters_vec =
     const_cast<ParameterVector &>(parameters_in);
 
   // We'll use a single temporary vector for matrix-vector-vector products
   std::unique_ptr<NumericVector<Number>> tempvec = this->solution->zero_clone();
 
   const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
+    (parameters_vec.size());
   const unsigned int Nq = this->n_qois();
 
   // For each quantity of interest q, the parameter sensitivity
@@ -743,7 +743,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
     }
 
   // Get ready to fill in sensitivities:
-  sensitivities.allocate_data(qoi_indices, *this, parameters);
+  sensitivities.allocate_data(qoi_indices, *this, parameters_vec);
 
   // We can't solve for all the solution sensitivities u'_l or for all
   // of the parameter sensitivity adjoint solutions z^l without
@@ -751,10 +751,10 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
   // weighted sum - this is just O(Nq) solves.
 
   // First solve for sum_l(w_l u'_l).
-  this->weighted_sensitivity_solve(parameters, vector);
+  this->weighted_sensitivity_solve(parameters_vec, vector);
 
   // Then solve for sum_l(w_l z^l).
-  this->weighted_sensitivity_adjoint_solve(parameters, vector, qoi_indices);
+  this->weighted_sensitivity_adjoint_solve(parameters_vec, vector, qoi_indices);
 
   for (unsigned int k=0; k != Np; ++k)
     {
@@ -771,14 +771,14 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
       // R(p + dp*w_l*e_l - dp*e_k) + R(p - dp*w_l*e_l - dp*e_k))/(4*dp^2)
 
       ParameterVector oldparameters, parameterperturbation;
-      parameters.deep_copy(oldparameters);
+      parameters_vec.deep_copy(oldparameters);
       vector.deep_copy(parameterperturbation);
       parameterperturbation *= delta_p;
-      parameters += parameterperturbation;
+      parameters_vec += parameterperturbation;
 
-      Number old_parameter = *parameters[k];
+      Number old_parameter = *parameters_vec[k];
 
-      *parameters[k] = old_parameter + delta_p;
+      *parameters_vec[k] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
       this->assembly(true, false, true);
       this->rhs->close();
@@ -788,7 +788,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
         if (qoi_indices.has_index(i))
           partial2R_term[i] = this->rhs->dot(this->get_adjoint_solution(i));
 
-      *parameters[k] = old_parameter - delta_p;
+      *parameters_vec[k] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
       this->assembly(true, false, true);
       this->rhs->close();
@@ -799,14 +799,14 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
             partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
           }
 
-      oldparameters.value_copy(parameters);
+      oldparameters.value_copy(parameters_vec);
       parameterperturbation *= -1.0;
-      parameters += parameterperturbation;
+      parameters_vec += parameterperturbation;
 
       // Re-center old_parameter, which may be affected by vector
-      old_parameter = *parameters[k];
+      old_parameter = *parameters_vec[k];
 
-      *parameters[k] = old_parameter + delta_p;
+      *parameters_vec[k] = old_parameter + delta_p;
       this->assemble_qoi(qoi_indices);
       this->assembly(true, false, true);
       this->rhs->close();
@@ -817,7 +817,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
             partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
           }
 
-      *parameters[k] = old_parameter - delta_p;
+      *parameters_vec[k] = old_parameter - delta_p;
       this->assemble_qoi(qoi_indices);
       this->assembly(true, false, true);
       this->rhs->close();
@@ -855,7 +855,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
       // FIXME: this is probably a bad order of operations for
       // controlling floating point error.
 
-      *parameters[k] = old_parameter + delta_p;
+      *parameters_vec[k] = old_parameter + delta_p;
       this->assembly(true, true);
       this->rhs->close();
       this->matrix->close();
@@ -874,7 +874,7 @@ void ImplicitSystem::qoi_parameter_hessian_vector_product (const QoISet & qoi_in
                                     this->get_adjoint_solution(i).dot(*tempvec)) / (2.*delta_p);
           }
 
-      *parameters[k] = old_parameter - delta_p;
+      *parameters_vec[k] = old_parameter - delta_p;
       this->assembly(true, true);
       this->rhs->close();
       this->matrix->close();
@@ -912,7 +912,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
   // We currently get partial derivatives via finite differencing
   const Real delta_p = TOLERANCE;
 
-  ParameterVector & parameters =
+  ParameterVector & parameters_vec =
     const_cast<ParameterVector &>(parameters_in);
 
   // We'll use one temporary vector for matrix-vector-vector products
@@ -923,7 +923,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
   std::unique_ptr<NumericVector<Number>> oldsolution = this->solution->clone();
 
   const unsigned int Np = cast_int<unsigned int>
-    (parameters.size());
+    (parameters_vec.size());
   const unsigned int Nq = this->n_qois();
 
   // For each quantity of interest q, the parameter sensitivity
@@ -951,14 +951,14 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
     }
 
   // And a sensitivity solve to get u_k for each parameter
-  this->sensitivity_solve(parameters);
+  this->sensitivity_solve(parameters_vec);
 
   // Get ready to fill in second derivatives:
-  sensitivities.allocate_hessian_data(qoi_indices, *this, parameters);
+  sensitivities.allocate_hessian_data(qoi_indices, *this, parameters_vec);
 
   for (unsigned int k=0; k != Np; ++k)
     {
-      Number old_parameterk = *parameters[k];
+      Number old_parameterk = *parameters_vec[k];
 
       // The Hessian is symmetric, so we just calculate the lower
       // triangle and the diagonal, and we get the upper triangle from
@@ -966,7 +966,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
 
       for (unsigned int l=0; l != k+1; ++l)
         {
-          // The second partial derivatives with respect to parameters
+          // The second partial derivatives with respect to parameters_vec
           // are all calculated via a central finite difference
           // stencil:
           // F''_{kl} ~= (F(p+dp*e_k+dp*e_l) - F(p+dp*e_k-dp*e_l) -
@@ -977,10 +977,10 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
           // We have to be careful with the perturbations to handle
           // the k=l case
 
-          Number old_parameterl = *parameters[l];
+          Number old_parameterl = *parameters_vec[l];
 
-          *parameters[k] += delta_p;
-          *parameters[l] += delta_p;
+          *parameters_vec[k] += delta_p;
+          *parameters_vec[l] += delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false, true);
           this->rhs->close();
@@ -990,7 +990,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
             if (qoi_indices.has_index(i))
               partial2R_term[i] = this->rhs->dot(this->get_adjoint_solution(i));
 
-          *parameters[l] -= 2.*delta_p;
+          *parameters_vec[l] -= 2.*delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false, true);
           this->rhs->close();
@@ -1001,7 +1001,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
                 partial2R_term[i] -= this->rhs->dot(this->get_adjoint_solution(i));
               }
 
-          *parameters[k] -= 2.*delta_p;
+          *parameters_vec[k] -= 2.*delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false, true);
           this->rhs->close();
@@ -1012,7 +1012,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
                 partial2R_term[i] += this->rhs->dot(this->get_adjoint_solution(i));
               }
 
-          *parameters[l] += 2.*delta_p;
+          *parameters_vec[l] += 2.*delta_p;
           this->assemble_qoi(qoi_indices);
           this->assembly(true, false, true);
           this->rhs->close();
@@ -1034,9 +1034,9 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
                   sensitivities.second_derivative(i,l,k) += current_terms;
               }
 
-          // Don't leave the parameters perturbed
-          *parameters[l] = old_parameterl;
-          *parameters[k] = old_parameterk;
+          // Don't leave the parameters_vec perturbed
+          *parameters_vec[l] = old_parameterl;
+          *parameters_vec[k] = old_parameterk;
         }
 
       // We get (partial q / partial u) and
@@ -1052,7 +1052,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
       // FIXME: this is probably a bad order of operations for
       // controlling floating point error.
 
-      *parameters[k] = old_parameterk + delta_p;
+      *parameters_vec[k] = old_parameterk + delta_p;
       this->assembly(false, true);
       this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices,
@@ -1078,7 +1078,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
               }
         }
 
-      *parameters[k] = old_parameterk - delta_p;
+      *parameters_vec[k] = old_parameterk - delta_p;
       this->assembly(false, true);
       this->matrix->close();
       this->assemble_qoi_derivative(qoi_indices,
@@ -1105,7 +1105,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
         }
 
       // Don't leave the parameter perturbed
-      *parameters[k] = old_parameterk;
+      *parameters_vec[k] = old_parameterk;
 
       // Our last remaining terms are -R_uu(u,z)*u_k*u_l and
       // Q_uu(u)*u_k*u_l
@@ -1184,7 +1184,7 @@ void ImplicitSystem::qoi_parameter_hessian (const QoISet & qoi_indices,
       *this->solution = *oldsolution;
     }
 
-  // All parameters have been reset.
+  // All parameters_vec have been reset.
   // Don't leave the qoi or system changed - principle of least
   // surprise.
   // We've modified solution, so we need to update before calling
@@ -1222,8 +1222,14 @@ LinearSolver<Number> * ImplicitSystem::get_linear_solver() const
 
 std::pair<unsigned int, Real> ImplicitSystem::get_linear_solve_parameters() const
 {
-  return std::make_pair(this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations"),
-                        this->get_equation_systems().parameters.get<Real>("linear solver tolerance"));
+  return std::make_pair(
+      parameters.have_parameter<unsigned int>("linear solver maximum iterations")
+          ? parameters.get<unsigned int>("linear solver maximum iterations")
+          : this->get_equation_systems().parameters.get<unsigned int>(
+                "linear solver maximum iterations"),
+      parameters.have_parameter<Real>("linear solver tolerance")
+          ? parameters.get<Real>("linear solver tolerance")
+          : this->get_equation_systems().parameters.get<Real>("linear solver tolerance"));
 }
 
 

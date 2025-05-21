@@ -112,6 +112,10 @@ void FrequencySystem::init_data ()
   // make sure we have frequencies to solve for
   if (!_finished_set_frequencies)
     {
+      // not supported for now
+      if (parameters.have_parameter<unsigned int> ("n_frequencies"))
+        libmesh_not_implemented_msg("ERROR: Setting the n_frequencies parameter on the system is not supported");
+
       // when this system was read from file, check
       // if this has a "n_frequencies" parameter,
       // and initialize us with these.
@@ -339,10 +343,7 @@ void FrequencySystem::solve (const unsigned int n_start,
   // Get the user-specified linear solver tolerance,
   //     the user-specified maximum # of linear solver iterations,
   //     the user-specified wave speed
-  const Real tol            =
-    es.parameters.get<Real>("linear solver tolerance");
-  const unsigned int maxits =
-    es.parameters.get<unsigned int>("linear solver maximum iterations");
+  const auto [maxits, tol] = this->get_linear_solve_parameters();
 
   // start solver loop
   for (unsigned int n=n_start; n<= n_stop; n++)
