@@ -825,31 +825,38 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
   this->set_next_unique_id(other_mesh.parallel_max_unique_id() + unique_id_offset + 1);
 #endif
 
-  //Finally prepare the new Mesh for use.  Keep the same numbering and
-  //partitioning for now.
-  const bool was_prepared = this->is_prepared();
+  // Finally, partially prepare the new Mesh for use.
+  // This is for backwards compatibility, so we don't want to prepare
+  // everything.
+  //
+  // Keep the same numbering and partitioning and distribution status
+  // for now, but save our original policies to restore later.
+  const bool allowed_renumbering = this->allow_renumbering();
+  const bool allowed_find_neighbors = this->allow_find_neighbors();
+  const bool allowed_elem_removal = this->allow_remote_element_removal();
   this->allow_renumbering(false);
   this->allow_remote_element_removal(false);
   this->allow_find_neighbors(!skip_find_neighbors);
 
   // We should generally be able to skip *all* partitioning here
   // because we're only adding one already-consistent mesh to another.
+  const bool skipped_partitioning = this->skip_partitioning();
   this->skip_partitioning(true);
 
+  const bool was_prepared = this->is_prepared();
   this->prepare_for_use();
 
-  //But in the long term, use the same renumbering and partitioning
-  //policies as our source mesh.
-  this->allow_find_neighbors(other_mesh.allow_find_neighbors());
-  this->allow_renumbering(other_mesh.allow_renumbering());
-  this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
-  this->skip_partitioning(other_mesh.skip_partitioning());
+  //But in the long term, don't change our policies.
+  this->allow_find_neighbors(allowed_find_neighbors);
+  this->allow_renumbering(allowed_renumbering);
+  this->allow_remote_element_removal(allowed_elem_removal);
+  this->skip_partitioning(skipped_partitioning);
 
   // That prepare_for_use() call marked us as prepared, but we
   // specifically avoided some important preparation, so we might not
   // actually be prepared now.
-  if (skip_find_neighbors &&
-      (!was_prepared || !other_mesh.is_prepared()))
+  if (skip_find_neighbors ||
+      !was_prepared || !other_mesh.is_prepared())
     this->set_isnt_prepared();
 }
 

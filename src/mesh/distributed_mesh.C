@@ -193,12 +193,19 @@ DistributedMesh::DistributedMesh (const MeshBase & other_mesh) :
 {
   this->copy_nodes_and_elements(other_mesh, true);
 
+  this->allow_find_neighbors(other_mesh.allow_find_neighbors());
+  this->allow_renumbering(other_mesh.allow_renumbering());
+  this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
+  this->skip_partitioning(other_mesh.skip_partitioning());
+
   // The prepare_for_use() in copy_nodes_and_elements() is going to be
   // tricky to remove without breaking backwards compatibility, but it
   // updates some things we want to just copy.
   this->copy_cached_data(other_mesh);
 
   this->copy_constraint_rows(other_mesh);
+
+  this->_is_prepared = other_mesh.is_prepared();
 
   auto & this_boundary_info = this->get_boundary_info();
   const auto & other_boundary_info = other_mesh.get_boundary_info();
