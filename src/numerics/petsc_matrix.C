@@ -354,10 +354,11 @@ template <typename T>
 void PetscMatrix<T>::init (const ParallelType libmesh_dbg_var(type))
 {
   libmesh_assert(this->_dof_map);
-  libmesh_assert(type != SERIAL);
 
   const numeric_index_type m_in = this->_dof_map->n_dofs();
   const numeric_index_type m_l = this->_dof_map->n_local_dofs();
+  if (m_in != m_l)
+    libmesh_assert(type != SERIAL);
 
   const auto blocksize = this->_dof_map->block_size();
 

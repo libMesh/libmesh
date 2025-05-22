@@ -43,7 +43,13 @@ template <typename T>
 void
 PetscMatrixShellMatrix<T>::init(ParallelType libmesh_dbg_var(type))
 {
-  libmesh_assert(type != SERIAL);
+#ifndef NDEBUG
+  libmesh_assert(this->_dof_map);
+  const auto m = this->_dof_map->n_dofs();
+  const auto m_l = this->_dof_map->n_local_dofs();
+  if (m != m_l)
+    libmesh_assert(type != SERIAL);
+#endif
   init_shell_mat(*this);
   this->set_context();
 }
