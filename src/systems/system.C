@@ -229,7 +229,7 @@ void System::init_data ()
   // Distribute the degrees of freedom on the mesh
   auto total_dofs = _dof_map->distribute_dofs (mesh);
 
-  // With the global dofs determined, initialize the condensed system if it exists
+  // With the global dofs determined, initialize the condensed dof data if it exists
   if (_sc_dof_map)
     _sc_dof_map->init();
 
