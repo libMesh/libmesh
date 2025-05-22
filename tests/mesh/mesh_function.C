@@ -278,7 +278,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    // Reading mesh and solution infromation from XDA files
+    // Reading mesh and solution information from XDA files
     ReplicatedMesh mesh(*TestCommWorld);
     mesh.read("solutions/nedelec_one_solution_mesh.xda");
     EquationSystems es(mesh);
