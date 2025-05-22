@@ -1281,8 +1281,8 @@ public:
     Node* new_node_a = mesh.add_point( new_point_a );
     Node* new_node_b = mesh.add_point( new_point_b );
     auto new_edge_elem = mesh.add_elem(Elem::build(EDGE2));
-    new_edge_elem->set_node(0) = new_node_a;
-    new_edge_elem->set_node(1) = new_node_b;
+    new_edge_elem->set_node(0, new_node_a);
+    new_edge_elem->set_node(1, new_node_b);
 
     mesh.elem_ref(0).subdomain_id() = 10;
     mesh.elem_ref(1).subdomain_id() = 10;
