@@ -1007,12 +1007,14 @@ const std::string & System::vector_name (const NumericVector<Number> & vec_refer
 
 
 SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
-                                           const ParallelType type)
+                                           const ParallelType type,
+                                           const MatrixBuildType mat_build_type)
 {
   parallel_object_only();
 
   libmesh_assert(this->comm().verify(std::string(mat_name)));
   libmesh_assert(this->comm().verify(int(type)));
+  libmesh_assert(this->comm().verify(int(mat_build_type)));
 
   // Return the matrix if it is already there.
   if (auto it = this->_matrices.find(mat_name);
