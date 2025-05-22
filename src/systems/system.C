@@ -1024,8 +1024,13 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
   // Otherwise build the matrix to return.
   std::unique_ptr<SparseMatrix<Number>> matrix;
   if (this->has_static_condensation())
-    matrix = std::make_unique<StaticCondensation>(
-        this->get_mesh(), *this, this->get_dof_map(), *_sc_dof_map);
+    {
+      if (mat_build_type == MatrixBuildType::DIAGONAL)
+        libmesh_error_msg(
+            "We do not currently support static condensation of the diagonal matrix type");
+      matrix = std::make_unique<StaticCondensation>(
+          this->get_mesh(), *this, this->get_dof_map(), *_sc_dof_map);
+    }
   else
     matrix = SparseMatrix<Number>::build(this->comm(), libMesh::default_solver_package());
   auto & mat = *matrix;
