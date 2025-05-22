@@ -154,6 +154,7 @@ main(int argc, char ** argv)
 
   StaticCondensationDofMap * sc_dof_map = nullptr;
   StaticCondensation * sc_system_matrix = nullptr;
+  // Has the user requested static condensation from the command line?
   if (system.has_static_condensation())
     {
       sc_dof_map = &system.get_static_condensation_dof_map();
