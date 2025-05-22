@@ -94,9 +94,11 @@ int main (int argc, char ** argv)
   // Make sure the code is robust against nodal reorderings.
   MeshTools::Modification::permute_elements(mesh);
 
+#ifdef LIBMESH_ENABLE_AMR
   // Make sure the code is robust against mesh refinements.
   MeshRefinement mesh_refinement(mesh);
   mesh_refinement.uniformly_refine(infile("refine", 0));
+#endif
 
   // Make sure the code is robust against solves on 2d meshes rotated out of
   // the xy plane. By default, all Euler angles are zero, the rotation matrix
