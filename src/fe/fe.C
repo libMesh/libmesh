@@ -27,6 +27,7 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/libmesh_singleton.h"
 
 namespace {
   // Put this outside a templated class, so we only get 1 warning
@@ -40,6 +41,19 @@ namespace {
 
 namespace libMesh
 {
+// ------------------------------------------------------------
+// Whether we cache the node locations, edge and face orientations of the last
+// element we computed on as needed to avoid calling init_shape_functions and
+// compute_shape_functions
+static const bool * caching = nullptr;
+
+class CachingSetup: public Singleton::Setup
+{
+  private:
+    void setup() { caching = new bool(!on_command_line("--disable-caching")); }
+  public:
+    ~CachingSetup() { delete caching; caching = nullptr; }
+} caching_setup;
 
 
 // ------------------------------------------------------------
@@ -136,6 +150,50 @@ void FE<Dim,T>::dofs_on_edge(const Elem * const elem,
 
 
 template <unsigned int Dim, FEFamily T>
+void FE<Dim,T>::cache(const Elem * elem)
+{
+  cached_nodes.resize(elem->n_nodes());
+  for (auto n : elem->node_index_range())
+    cached_nodes[n] = elem->point(n);
+
+  if (FEInterface::orientation_dependent(T))
+    {
+      cached_edges.resize(elem->n_edges());
+      for (auto n : elem->edge_index_range())
+        cached_edges[n] = elem->positive_edge_orientation(n);
+
+      cached_faces.resize(elem->n_faces());
+      for (auto n : elem->face_index_range())
+        cached_faces[n] = elem->positive_face_orientation(n);
+    }
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
+bool FE<Dim,T>::matches_cache(const Elem * elem)
+{
+  bool m = cached_nodes.size() == elem->n_nodes();
+  for (unsigned n = 1; m && n < elem->n_nodes(); n++)
+    m = (elem->point(n) - elem->point(0)).relative_fuzzy_equals(cached_nodes[n] - cached_nodes[0]);
+
+  if (FEInterface::orientation_dependent(T))
+    {
+      m &= cached_edges.size() == elem->n_edges();
+      for (unsigned n = 0; m && n < elem->n_edges(); n++)
+        m = elem->positive_edge_orientation(n) == cached_edges[n];
+
+      m &= cached_faces.size() == elem->n_faces();
+      for (unsigned n = 0; m && n < elem->n_faces(); n++)
+        m = elem->positive_face_orientation(n) == cached_faces[n];
+    }
+
+  return m;
+}
+
+
+
+template <unsigned int Dim, FEFamily T>
 void FE<Dim,T>::reinit(const Elem * elem,
                        const std::vector<Point> * const pts,
                        const std::vector<Real> * const weights)
@@ -149,7 +207,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
 
   // Try to avoid calling init_shape_functions
   // even when shapes_need_reinit
-  bool cached_nodes_still_fit = false;
+  bool cached_elem_still_fits = false;
 
   // Most of the hard work happens when we have an actual element
   if (elem)
@@ -202,47 +260,31 @@ void FE<Dim,T>::reinit(const Elem * elem,
               this->_elem_type = elem->type();
               this->_elem_p_level = elem->p_level();
               this->_p_level = this->_add_p_level_in_reinit * elem->p_level();
+
               // Initialize the shape functions
               this->_fe_map->template init_reference_to_physical_map<Dim>
                 (this->qrule->get_points(), elem);
               this->init_shape_functions (this->qrule->get_points(), elem);
-
-              if (this->shapes_need_reinit())
-                {
-                  cached_nodes.resize(elem->n_nodes());
-                  for (auto n : elem->node_index_range())
-                    cached_nodes[n] = elem->point(n);
-                }
             }
           else
             {
-              // libmesh_assert_greater (elem->n_nodes(), 1);
               this->_elem = elem;
 
-              cached_nodes_still_fit = true;
-              if (cached_nodes.size() != elem->n_nodes())
-                cached_nodes_still_fit = false;
-              else
-                for (auto n : make_range(1u, elem->n_nodes()))
-                  {
-                    if (!(elem->point(n) - elem->point(0)).relative_fuzzy_equals
-                        ((cached_nodes[n] - cached_nodes[0]), 1e-13))
-                      {
-                        cached_nodes_still_fit = false;
-                        break;
-                      }
-                  }
+              // Check if cached element's nodes, edge and face orientations still fit
+              cached_elem_still_fits = this->matches_cache(elem);
 
-              if (this->shapes_need_reinit() && !cached_nodes_still_fit)
+              // Initialize the shape functions if needed
+              if (this->shapes_need_reinit() && !cached_elem_still_fits)
                 {
                   this->_fe_map->template init_reference_to_physical_map<Dim>
                     (this->qrule->get_points(), elem);
                   this->init_shape_functions (this->qrule->get_points(), elem);
-                  cached_nodes.resize(elem->n_nodes());
-                  for (auto n : elem->node_index_range())
-                    cached_nodes[n] = elem->point(n);
                 }
             }
+
+          // Replace cached nodes, edge and face orientations if no longer fitting
+          if (this->shapes_need_reinit() && !cached_elem_still_fits && *caching)
+            this->cache(elem);
 
           // The shape functions correspond to the qrule
           this->shapes_on_quadrature = true;
@@ -299,7 +341,7 @@ void FE<Dim,T>::reinit(const Elem * elem,
 
   // Compute the shape functions and the derivatives at all of the
   // quadrature points.
-  if (!cached_nodes_still_fit)
+  if (!cached_elem_still_fits)
     {
       if (pts != nullptr)
         this->compute_shape_functions (elem,*pts);
