@@ -28,6 +28,26 @@ class Variable;
 class Elem;
 class Node;
 
+/**
+ * This base class provides a minimal set of interfaces for satisfying user requests for
+ * - variables that contribute degrees of freedom to this map
+ * - distribution of degrees of freedom among ranks in parallel (e.g. MPI) simulations
+ * - degrees of freedom associated with nodes and elements
+ * This minimal set of interfaces is sufficient for providing information for use cases such
+ * as building field splits for advanced preconditioning techniques
+ *
+ * Sub-classes of this base class may not be fully-featured stand-alone degree of freedom maps.
+ * For instance a sub-class may not be constructible without information from an already constructed
+ * fully-featured degree of freedom map. As an example, a degree of freedom map for a statically
+ * condensed system of equations will require *a priori* and flow naturally from a degree of freedom
+ * map for the full non-condensed system. In this example, the partitioning of the statically
+ * condensed degrees of freedom may logically follow the partitioning in the global system, e.g. a
+ * face degree of freedom in the global system that is assigned to process i by the full degree of
+ * freedom map will retain its rank assignment in the statically condensed degree of freedom map.
+ * Because the statically condensed dof map can lazily use the information from the full dof map,
+ * it does not require its own partitioning capabilities. Consequently, partitioning interfaces
+ * are not present in this base interface
+ */
 class DofMapBase : public ParallelObject
 {
 public:

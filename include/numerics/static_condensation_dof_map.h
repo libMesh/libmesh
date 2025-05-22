@@ -37,6 +37,24 @@ class System;
 class DofMap;
 class Elem;
 
+/**
+ * A class holding degree of freedom information pertinent to static condensation.
+ * Static condensation is a process for reducing the number of unknowns in a
+ * linear(ized) system. It is often used in conjunction with a hybridized discontinuous Galerkin
+ * (HDG) method to reduce the number of unknowns in the linear system to something more on the order
+ * of a continuous Galerkin (CG) method as opposed to a discontinuous Galerkin method. In the HDG
+ * example, degrees of freedom on the element interiors are condensed out and only the degrees of
+ * freedom on element faces are retained in the condensed system. Static condensation is not only
+ * applicable to HDG methods, however. One could also use static condensation with a high order CG
+ * method, again removing internal degrees of freedom and leaving those on element boundaries.
+ *
+ * Users may query this class for condensed space degree of freedom information associated with
+ * elements. Queries with nodes are not supported. This class also holds information for mapping
+ * degree of freedom indices in the global, uncondensed space to local element degree of freedom
+ * numbers. This information is essential in order to build the element Schur complement matrices
+ * that are used to map global system vector and matrix data to the condensed system vector and
+ * matrix data
+ */
 class StaticCondensationDofMap : public DofMapBase
 {
 public:
