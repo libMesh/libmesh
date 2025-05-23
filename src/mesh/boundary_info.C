@@ -848,8 +848,9 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     }
 
   // We haven't been bothering to keep unique ids consistent on ghost
-  // elements
-  if (!boundary_mesh.is_serial())
+  // elements or nodes, unless we're doing everything the same on
+  // every processor.
+  if (!boundary_mesh.is_replicated())
     MeshCommunication().make_node_unique_ids_parallel_consistent(boundary_mesh);
 
   // Make sure we didn't add ids inconsistently
