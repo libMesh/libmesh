@@ -471,9 +471,18 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   /**
    * If the boundary_mesh is still serial, that means we *can't*
    * parallelize it, so to make sure we can construct it in full on
-   * every processor we'll serialize the interior mesh.  Use a
-   * temporary serializer here.
+   * every processor we'll serialize the interior mesh.
+   *
+   * We'll use a temporary MeshSerializer here, but as soon as we
+   * unserialize we'll be turning a bunch of interior_parent() links
+   * into dangling pointers, and it won't be easy to tell which.  So
+   * we'll keep around a distributed copy for that case, and query it
+   * to fix up interior_parent() links as necessary.
    */
+  std::unique_ptr<MeshBase> mesh_copy;
+  if (boundary_mesh.is_serial() && !_mesh->is_serial())
+    mesh_copy = _mesh->clone();
+
   MeshSerializer serializer
     (const_cast<MeshBase &>(*_mesh), boundary_mesh.is_serial());
 
@@ -534,6 +543,22 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
 
           // Assign the new node pointer
           new_elem->set_node(nn, new_node);
+        }
+    }
+
+  // The new elements might have interior parent pointers aimed at
+  // _mesh elements which are about to go remote, and we don't to
+  // leave those pointers dangling.  Fix them up if needed.
+  if (mesh_copy.get())
+    {
+      for (auto & new_elem : boundary_mesh.element_ptr_range())
+        {
+          const dof_id_type interior_parent_id =
+            new_elem->interior_parent()->id();
+
+          if (!mesh_copy->query_elem_ptr(interior_parent_id))
+            new_elem->set_interior_parent
+              (const_cast<RemoteElem *>(remote_elem));
         }
     }
 
