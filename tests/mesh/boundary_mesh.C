@@ -1,3 +1,4 @@
+#include <libmesh/distributed_mesh.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
@@ -28,17 +29,23 @@ public:
 
 protected:
 
-  std::unique_ptr<Mesh> _mesh;
-  std::unique_ptr<Mesh> _all_boundary_mesh;
-  std::unique_ptr<Mesh> _left_boundary_mesh;
-  std::unique_ptr<Mesh> _internal_boundary_mesh;
+  std::unique_ptr<UnstructuredMesh> _mesh;
+  std::unique_ptr<UnstructuredMesh> _all_boundary_mesh;
+  std::unique_ptr<UnstructuredMesh> _left_boundary_mesh;
+  std::unique_ptr<UnstructuredMesh> _internal_boundary_mesh;
 
   void build_mesh()
   {
     _mesh = std::make_unique<Mesh>(*TestCommWorld);
     _all_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
-    _left_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
-    _internal_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
+
+    // We want to test Distributed->Replicated sync; this does that in
+    // some builds
+    _left_boundary_mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
+
+    // We want to test Replicated->Distributed sync; this does that in
+    // other builds
+    _internal_boundary_mesh = std::make_unique<DistributedMesh>(*TestCommWorld);
 
     MeshTools::Generation::build_square(*_mesh, 3, 5,
                                         0.2, 0.8, 0.2, 0.7, QUAD9);
