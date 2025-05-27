@@ -39,7 +39,7 @@ namespace libMesh
 StaticCondensation::StaticCondensation(const MeshBase & mesh,
                                        System & system,
                                        const DofMap & full_dof_map,
-                                       const StaticCondensationDofMap & reduced_dof_map)
+                                       StaticCondensationDofMap & reduced_dof_map)
   : PetscMatrixShellMatrix<Number>(full_dof_map.comm()),
     _mesh(mesh),
     _system(system),
@@ -463,6 +463,11 @@ void StaticCondensation::apply(const NumericVector<Number> & full_rhs,
 
 SolverPackage StaticCondensation::solver_package() { return libMesh::default_solver_package(); }
 
+void StaticCondensation::dont_condense_vars(const std::unordered_set<unsigned int> & vars)
+{
+  _reduced_dof_map.dont_condense_vars(vars);
+}
+
 }
 #else
 
@@ -473,7 +478,7 @@ namespace libMesh
 StaticCondensation::StaticCondensation(const MeshBase &,
                                        const System &,
                                        const DofMap & full_dof_map,
-                                       const StaticCondensationDofMap &)
+                                       StaticCondensationDofMap &)
   : SparseMatrix<Number>(full_dof_map.comm())
 {
   libmesh_error_msg(

@@ -63,7 +63,7 @@ public:
   StaticCondensation(const MeshBase & mesh,
                      System & system,
                      const DofMap & full_dof_map,
-                     const StaticCondensationDofMap & reduced_dof_map);
+                     StaticCondensationDofMap & reduced_dof_map);
   virtual ~StaticCondensation();
 
   //
@@ -187,6 +187,13 @@ public:
    */
   void uncondensed_dofs_only() { _uncondensed_dofs_only = true; }
 
+  /**
+   * Add \p vars to the list of variables not to condense. This can be useful when some variable's
+   * equation is discretized with a DG method or if including the variable in the condensed block
+   * diagonal would result in it being singular
+   */
+  void dont_condense_vars(const std::unordered_set<unsigned int> & vars);
+
 private:
   /**
    * Retrieves the degree of freedom values from \p global_vector corresponding to \p
@@ -238,7 +245,7 @@ private:
   const MeshBase & _mesh;
   System & _system;
   const DofMap & _full_dof_map;
-  const StaticCondensationDofMap & _reduced_dof_map;
+  StaticCondensationDofMap & _reduced_dof_map;
 
   /// global sparse matrix for the uncondensed degrees of freedom
   std::unique_ptr<SparseMatrix<Number>> _reduced_sys_mat;
@@ -313,7 +320,7 @@ public:
   StaticCondensation(const MeshBase &,
                      const System &,
                      const DofMap & full_dof_map,
-                     const StaticCondensationDofMap & reduced_dof_map);
+                     StaticCondensationDofMap & reduced_dof_map);
 
   const std::unordered_set<unsigned int> & uncondensed_vars() const { libmesh_not_implemented(); }
   StaticCondensationPreconditioner & get_preconditioner() { libmesh_not_implemented(); }

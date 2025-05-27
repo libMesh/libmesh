@@ -343,7 +343,7 @@ public:
   /**
    * \returns The static condensation system matrix
    */
-  StaticCondensation & get_static_condensation_system_matrix();
+  StaticCondensation & get_static_condensation();
 
 protected:
   /**
@@ -370,7 +370,7 @@ private:
 };
 
 inline
-StaticCondensation & ImplicitSystem::get_static_condensation_system_matrix()
+StaticCondensation & ImplicitSystem::get_static_condensation()
 {
   libmesh_assert(_sc_system_matrix);
   return *_sc_system_matrix;

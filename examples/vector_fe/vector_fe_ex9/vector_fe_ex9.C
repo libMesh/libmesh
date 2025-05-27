@@ -52,7 +52,6 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/nonlinear_solver.h"
-#include "libmesh/static_condensation_dof_map.h"
 #include "libmesh/static_condensation.h"
 
 // The exact solution and error computation.
@@ -152,14 +151,11 @@ main(int argc, char ** argv)
   const FEType scalar_fe_type(FIRST, L2_LAGRANGE);
   const FEType lm_fe_type(FIRST, SIDE_HIERARCHIC);
 
-  StaticCondensationDofMap * sc_dof_map = nullptr;
-  StaticCondensation * sc_system_matrix = nullptr;
-  // Has the user requested static condensation from the command line?
+  StaticCondensation * sc = nullptr;
   if (system.has_static_condensation())
     {
-      sc_dof_map = &system.get_static_condensation_dof_map();
-      sc_dof_map->dont_condense_vars({p_num});
-      sc_system_matrix = cast_ptr<StaticCondensation *>(system.matrix);
+      sc = &system.get_static_condensation();
+      sc->dont_condense_vars({p_num});
     }
 
   HDGProblem hdg(nu, cavity);
@@ -174,7 +170,7 @@ main(int argc, char ** argv)
   hdg.scalar_fe_face = FEBase::build(dimension, scalar_fe_type);
   hdg.lm_fe_face = FEBase::build(dimension, lm_fe_type);
   hdg.mms = mms;
-  hdg.sc = sc_system_matrix;
+  hdg.sc = sc;
 
   system.nonlinear_solver->residual_object = &hdg;
   system.nonlinear_solver->jacobian_object = &hdg;
