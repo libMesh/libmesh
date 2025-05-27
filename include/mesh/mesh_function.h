@@ -416,6 +416,11 @@ protected:
    * See \p enable_out_of_mesh_mode() for more details.
    */
   DenseVector<Number> _out_of_mesh_value;
+
+  /**
+   * the new size to resize output to  
+   */
+  int _new_resize;
 };
 
 
