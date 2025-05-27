@@ -301,11 +301,19 @@ void AbaqusIO::read (const std::string & fname)
           if (upper.find("*NODE") == static_cast<std::string::size_type>(0))
             {
               // Some sections that begin with *NODE are actually
-              // "*NODE OUTPUT" sections which we want to skip.  I
+              // unrelated sections which we want to skip.  I
               // have only seen this with a single space, but it would
               // probably be more robust to remove whitespace before
               // making this check.
-              if (upper.find("*NODE OUTPUT") == static_cast<std::string::size_type>(0))
+              bool skip_this_section = false;
+              std::vector<std::string> keywords_to_ignore = {"OUTPUT", "PRINT", "FILE", "RESPONSE"};
+              for (auto & affix : keywords_to_ignore) {
+                std::stringstream keyword;
+                keyword << "*NODE " << affix;
+                if (upper.find(keyword.str()) == static_cast<std::string::size_type>(0))
+                  skip_this_section = true;
+              }
+              if (skip_this_section)
                 continue;
 
               // Some *Node sections also specify an Nset name on the same line.
@@ -329,7 +337,15 @@ void AbaqusIO::read (const std::string & fname)
               // have only seen this with a single space, but it would
               // probably be more robust to remove whitespace before
               // making this check.
-              if (upper.find("*ELEMENT OUTPUT") == static_cast<std::string::size_type>(0))
+              bool skip_this_section = false;
+              std::vector<std::string> keywords_to_ignore = {"OUTPUT", "MATRIX", "PROPERTIES", "RESPONSE"};
+              for (auto & affix : keywords_to_ignore) {
+                std::stringstream keyword;
+                keyword << "*ELEMENT " << affix;
+                if (upper.find(keyword.str()) == static_cast<std::string::size_type>(0))
+                  skip_this_section = true;
+              }
+              if (skip_this_section)
                 continue;
 
               // Some *Element sections also specify an Elset name on the same line.
