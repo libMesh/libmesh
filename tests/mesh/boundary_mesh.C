@@ -2,6 +2,7 @@
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
+#include <libmesh/mesh_serializer.h>
 #include <libmesh/remote_elem.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/boundary_info.h>
@@ -23,6 +24,7 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
+  CPPUNIT_TEST( testBoundarySerialization );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -212,6 +214,23 @@ public:
     this->sanityCheck();
   }
 
+  void testBoundarySerialization()
+  {
+    LOG_UNIT_TEST;
+
+    MeshSerializer internal_serializer(*_internal_boundary_mesh);
+
+    // There are only four elements in the internal sideset mesh.
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(4),
+                         _internal_boundary_mesh->n_elem());
+
+    // There are 2*n_elem + 1 nodes in the internal sideset mesh.
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(9),
+                         _internal_boundary_mesh->n_nodes());
+
+    this->sanityCheck();
+  }
+
   void sanityCheck()
   {
     // Sanity check all the elements
@@ -320,6 +339,7 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
+  CPPUNIT_TEST( testBoundarySerialization );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -337,6 +357,7 @@ public:
     MeshRefinement(*_mesh).uniformly_refine(1);
     MeshRefinement(*_left_boundary_mesh).uniformly_refine(1);
     MeshRefinement(*_all_boundary_mesh).uniformly_refine(1);
+    MeshRefinement(*_internal_boundary_mesh).uniformly_refine(1);
 #endif
   }
 
@@ -380,6 +401,43 @@ public:
     // There'd better be only 2*2*5+1 nodes on the left boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(21),
                          _left_boundary_mesh->n_nodes());
+
+
+    // There'd better be only 2*4 active elements on the internal
+    // sideset mesh
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(8),
+                         _internal_boundary_mesh->n_active_elem());
+
+    // Plus the original 4 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12),
+                         _internal_boundary_mesh->n_elem());
+
+    // There'd better be only 2*2*4+1 nodes on the internal boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
+                         _internal_boundary_mesh->n_nodes());
+
+    this->sanityCheck();
+  }
+
+
+  void testBoundarySerialization()
+  {
+    LOG_UNIT_TEST;
+
+    MeshSerializer internal_serializer(*_internal_boundary_mesh);
+
+    // There'd better be only 2*4 active elements on the internal
+    // sideset mesh
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(8),
+                         _internal_boundary_mesh->n_active_elem());
+
+    // Plus the original 4 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12),
+                         _internal_boundary_mesh->n_elem());
+
+    // There'd better be only 2*2*4+1 nodes on the internal boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
+                         _internal_boundary_mesh->n_nodes());
 
     this->sanityCheck();
   }
