@@ -1788,6 +1788,25 @@ public:
   void detect_interior_parents();
 
   /**
+   * \return A mesh that may own interior parents of elements in this
+   * mesh.  In most cases this mesh includes its own interior parents,
+   * but in cases where a separate "interior" mesh was used to create
+   * this mesh as a distinct lower-dimensional boundary (or boundary
+   * subset) mesh, the original mesh will be returned here.
+   */
+  const MeshBase & interior_mesh() const { return *_interior_mesh; }
+
+  /**
+   * \return A writeable reference to the interior mesh.
+   */
+  MeshBase & interior_mesh() { return *_interior_mesh; }
+
+  /**
+   * Sets the interior mesh.  For advanced use only.
+   */
+  void set_interior_mesh(MeshBase & int_mesh) { _interior_mesh = &int_mesh; }
+
+  /**
    * \return The cached mesh subdomains. As long as the mesh is prepared, this
    * should contain all the subdomain ids across processors. Relies on the mesh
    * being prepared
@@ -1905,6 +1924,12 @@ protected:
    */
   unique_id_type _next_unique_id;
 #endif
+
+  /**
+   * Defaulting to \p this, a pointer to the mesh used to generate
+   * boundary elements on \p this.
+   */
+  MeshBase *_interior_mesh;
 
   /**
    * If this is true then no partitioning should be done with the

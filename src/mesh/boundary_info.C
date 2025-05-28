@@ -654,6 +654,15 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   libmesh_assert_equal_to(_mesh->is_serial(),
                           boundary_mesh.is_serial());
 
+  // If the boundary mesh already has interior pointers pointing at
+  // elements in a third mesh then we're in trouble
+  libmesh_assert(&boundary_mesh.interior_mesh() == &boundary_mesh ||
+                 &boundary_mesh.interior_mesh() == _mesh);
+
+  // And now we're going to add interior pointers to elements from
+  // this mesh
+  boundary_mesh.set_interior_mesh(*_mesh);
+
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
   this->_find_id_maps(requested_boundary_ids,
                       0,

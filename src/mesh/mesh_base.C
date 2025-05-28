@@ -70,6 +70,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(DofObject::invalid_unique_id),
 #endif
+  _interior_mesh(this),
   _skip_noncritical_partitioning(false),
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
@@ -101,6 +102,10 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id(other_mesh._next_unique_id),
 #endif
+  // If the other mesh interior_parent pointers just go back to
+  // itself, so should we
+  _interior_mesh((other_mesh._interior_mesh == &other_mesh) ?
+                 this : other_mesh._interior_mesh),
   _skip_noncritical_partitioning(other_mesh._skip_noncritical_partitioning),
   _skip_all_partitioning(other_mesh._skip_all_partitioning),
   _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
@@ -168,9 +173,13 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _is_prepared = other_mesh.is_prepared();
   _point_locator = std::move(other_mesh._point_locator);
   _count_lower_dim_elems_in_point_locator = other_mesh.get_count_lower_dim_elems_in_point_locator();
-  #ifdef LIBMESH_ENABLE_UNIQUE_ID
-    _next_unique_id = other_mesh.next_unique_id();
-  #endif
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id = other_mesh.next_unique_id();
+#endif
+  // If the other mesh interior_parent pointers just go back to
+  // itself, so should we
+  _interior_mesh = (other_mesh._interior_mesh == &other_mesh) ?
+                   this : other_mesh._interior_mesh;
   _skip_noncritical_partitioning = other_mesh.skip_noncritical_partitioning();
   _skip_all_partitioning = other_mesh.skip_partitioning();
   _skip_renumber_nodes_and_elements = !(other_mesh.allow_renumbering());
@@ -247,6 +256,15 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (_count_lower_dim_elems_in_point_locator !=
         other_mesh._count_lower_dim_elems_in_point_locator)
     return false;
+
+  // We should either both have our own interior parents or both not;
+  // but if we both don't then we can't really assert anything else
+  // because pointing at the same interior mesh is fair but so is
+  // pointing at two different copies of "the same" interior mesh.
+  if ((_interior_mesh == this) !=
+      (other_mesh._interior_mesh == &other_mesh))
+    return false;
+
   if (_skip_noncritical_partitioning != other_mesh._skip_noncritical_partitioning)
     return false;
   if (_skip_all_partitioning != other_mesh._skip_all_partitioning)
@@ -1794,11 +1812,17 @@ void MeshBase::detect_interior_parents()
   // This requires an inspection on every processor
   parallel_object_only();
 
-  // Check if the mesh contains mixed dimensions. If so, then set interior parents, otherwise return.
+  // Check if the mesh contains mixed dimensions. If so, then we may
+  // have interior parents to set.  Otherwise return.
   if (this->elem_dimensions().size() == 1)
     return;
 
-  //This map will be used to set interior parents
+  // Do we have interior parent pointers going to a different mesh?
+  // If so then we'll still check to make sure that's the only place
+  // they go, so we can libmesh_not_implemented() if not.
+  const bool separate_interior_mesh = (&(this->interior_mesh()) != this);
+
+  // This map will be used to set interior parents
   std::unordered_map<dof_id_type, std::vector<dof_id_type>> node_to_elem;
 
   for (const auto & elem : this->element_ptr_range())
@@ -1877,6 +1901,14 @@ void MeshBase::detect_interior_parents()
                   break;
                 }
             }
+
+          // Do we have a mixed dimensional mesh that contains some of
+          // its own interior parents, but we already expect to have
+          // interior parents on a different mesh?  That's going to
+          // take some work to support if anyone needs it.
+          if (separate_interior_mesh)
+            libmesh_not_implemented_msg
+              ("interior_parent() values in multiple meshes are unsupported.");
         }
     }
 }
