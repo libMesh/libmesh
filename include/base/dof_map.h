@@ -38,6 +38,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/mesh_subdivision_support.h"
+#include "libmesh/dof_map_base.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -68,7 +69,7 @@ class PeriodicBoundaryBase;
 class PeriodicBoundaries;
 class System;
 class NonlinearImplicitSystem;
-class StaticCondensation;
+class StaticCondensationDofMap;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -175,8 +176,8 @@ class NodeConstraints : public std::map<const Node *,
  * \date 2002-2007
  * \brief Manages the degrees of freedom (DOFs) in a simulation.
  */
-class DofMap : public ReferenceCountedObject<DofMap>,
-               public ParallelObject
+class DofMap : public DofMapBase,
+               public ReferenceCountedObject<DofMap>
 {
 public:
 
@@ -594,10 +595,7 @@ public:
    */
   const VariableGroup & variable_group (const unsigned int c) const;
 
-  /**
-   * \returns The variable description object for variable \p c.
-   */
-  const Variable & variable (const unsigned int c) const;
+  const Variable & variable (const unsigned int c) const override;
 
   /**
    * \returns The approximation order for variable \p c.
@@ -627,12 +625,7 @@ public:
   unsigned int n_variable_groups() const
   { return cast_int<unsigned int>(_variable_groups.size()); }
 
-  /**
-   * \returns The number of variables in the global solution vector. Defaults
-   * to 1, should be 1 for a scalar equation, 3 for 2D incompressible Navier
-   * Stokes (u,v,p), etc...
-   */
-  unsigned int n_variables() const
+  unsigned int n_variables() const override
   { return cast_int<unsigned int>(_variables.size()); }
 
   /**
@@ -667,11 +660,7 @@ public:
     return (this->has_blocked_representation() ? this->n_variables() : 1);
   }
 
-  /**
-   * \returns The total number of degrees of freedom in the problem.
-   */
-  dof_id_type n_dofs() const { return _n_dfs; }
-
+  using DofMapBase::n_dofs;
   /**
    * \returns The total number of degrees of freedom for a particular
    * variable \p vn.
@@ -688,12 +677,7 @@ public:
    */
   dof_id_type n_SCALAR_dofs() const { return _n_SCALAR_dofs; }
 
-  /**
-   * \returns The number of degrees of freedom on this processor.
-   */
-  dof_id_type n_local_dofs () const
-  { return this->n_dofs_on_processor (this->processor_id()); }
-
+  using DofMapBase::n_local_dofs;
   /**
    * \returns The number of degrees of freedom on this processor for a
    * particular variable \p vn.  This is an O(N) operation on serialized or
@@ -704,15 +688,6 @@ public:
     dof_id_type n;
     this->local_variable_indices(n, _mesh, vn);
     return n;
-  }
-
-  /**
-   * \returns The number of degrees of freedom on partition \p proc.
-   */
-  dof_id_type n_dofs_on_processor(const processor_id_type proc) const
-  {
-    libmesh_assert_less (proc, _first_df.size());
-    return cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
   }
 
   /**
@@ -727,39 +702,6 @@ public:
   }
 
   /**
-   * \returns The first dof index that is local to partition \p proc.
-   */
-  dof_id_type first_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _first_df.size()); return _first_df[proc]; }
-
-  dof_id_type first_dof() const
-  { return this->first_dof(this->processor_id()); }
-
-#ifdef LIBMESH_ENABLE_AMR
-  /**
-   * \returns The first old dof index that is local to partition \p proc.
-   */
-  dof_id_type first_old_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _first_old_df.size()); return _first_old_df[proc]; }
-
-  dof_id_type first_old_dof() const
-  { return this->first_old_dof(this->processor_id()); }
-
-#endif //LIBMESH_ENABLE_AMR
-
-  /**
-   * \returns The first dof index that is after all indices local to
-   * processor \p proc.
-   *
-   * Analogous to the end() member function of STL containers.
-   */
-  dof_id_type end_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _end_df.size()); return _end_df[proc]; }
-
-  dof_id_type end_dof() const
-  { return this->end_dof(this->processor_id()); }
-
-  /**
    * \returns The processor id that owns the dof index \p dof
    */
   processor_id_type dof_owner(const dof_id_type dof) const
@@ -769,25 +711,6 @@ public:
     return cast_int<processor_id_type>(ub - _end_df.begin());
   }
 
-#ifdef LIBMESH_ENABLE_AMR
-  /**
-   * \returns The first old dof index that is after all indices local
-   * to processor \p proc.
-   *
-   * Analogous to the end() member function of STL containers.
-   */
-  dof_id_type end_old_dof(const processor_id_type proc) const
-  { libmesh_assert_less (proc, _end_old_df.size()); return _end_old_df[proc]; }
-
-  dof_id_type end_old_dof() const
-  { return this->end_old_dof(this->processor_id()); }
-
-#endif //LIBMESH_ENABLE_AMR
-
-  /**
-   * Fills the vector \p di with the global degree of freedom indices
-   * for the element.
-   */
   void dof_indices (const Elem * const elem,
                     std::vector<dof_id_type> & di) const;
 
@@ -799,7 +722,7 @@ public:
   void dof_indices (const Elem * const elem,
                     std::vector<dof_id_type> & di,
                     const unsigned int vn,
-                    int p_level = -12345) const;
+                    int p_level = -12345) const override;
 
   /**
    * Retrieves degree of freedom indices for a given \p elem and then performs actions for these
@@ -851,7 +774,7 @@ public:
    */
   void dof_indices (const Node * const node,
                     std::vector<dof_id_type> & di,
-                    const unsigned int vn) const;
+                    const unsigned int vn) const override;
 
   /**
    * Appends to the vector \p di the global degree of freedom indices
@@ -971,6 +894,18 @@ public:
   void local_variable_indices(T & idx,
                               const MeshBase & mesh,
                               unsigned int var_num) const;
+
+  /**
+   * If T == dof_id_type, counts, if T == std::vector<dof_id_type>, fills an
+   * array of, those dof indices which belong to the given variable number and
+   * live on the current processor.
+   */
+  template <typename T,
+            std::enable_if_t<std::is_same_v<T, dof_id_type> ||
+                                 std::is_same_v<T, std::vector<dof_id_type>>,
+                             int> = 0>
+  void local_variable_indices(T & idx, unsigned int var_num) const
+  { this->local_variable_indices(idx, this->_mesh, var_num); }
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
 
@@ -1624,11 +1559,6 @@ public:
                         std::vector<dof_id_type> & di,
                         const unsigned int vn = libMesh::invalid_uint) const;
 
-  /**
-   * \returns The total number of degrees of freedom on old_dof_objects
-   */
-  dof_id_type n_old_dofs() const { return _n_old_dfs; }
-
 #endif // LIBMESH_ENABLE_AMR
 
   /**
@@ -1655,7 +1585,7 @@ public:
    * Free all new memory associated with the object, but restore its
    * original state, with the mesh pointer and any default ghosting.
    */
-  void clear ();
+  virtual void clear () override;
 
   /**
    * Prints summary info about the sparsity bandwidth and constraints.
@@ -1702,7 +1632,8 @@ public:
    * constraints or sufficiently many user constraints.
    */
   std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh,
-                                                         bool calculate_constrained = false) const;
+                                                         bool calculate_constrained = false,
+                                                         bool use_condensed_system = false) const;
 
   /**
    * Describe whether the given variable group should be p-refined. If this API is not called with
@@ -1729,18 +1660,18 @@ public:
   /**
    * Add a static condensation class
    */
-  void add_static_condensation(const StaticCondensation & sc) { _sc = &sc; }
+  void create_static_condensation(const MeshBase & mesh, System & system);
 
   /**
    * Checks whether we have static condensation
    */
-  bool has_static_condensation() const { return _sc; }
+  bool has_static_condensation() const { return _sc.get(); }
 
   /**
    * @returns the static condensation class. This should have been already added with a call to \p
    * add_static_condensation()
    */
-  const StaticCondensation & get_static_condensation() const;
+  StaticCondensationDofMap & get_static_condensation();
 
 private:
 
@@ -2041,16 +1972,6 @@ private:
   std::vector<SparseMatrix<Number> * > _matrices;
 
   /**
-   * First DOF index on processor \p p.
-   */
-  std::vector<dof_id_type> _first_df;
-
-  /**
-   * Last DOF index (plus 1) on processor \p p.
-   */
-  std::vector<dof_id_type> _end_df;
-
-  /**
    * First DOF index for SCALAR variable v, or garbage for non-SCALAR
    * variable v
    */
@@ -2153,32 +2074,12 @@ private:
   std::unique_ptr<SparsityPattern::Build> _sp;
 
   /**
-   * Total number of degrees of freedom.
-   */
-  dof_id_type _n_dfs;
-
-  /**
    * The total number of SCALAR dofs associated to
    * all SCALAR variables.
    */
   dof_id_type _n_SCALAR_dofs;
 
 #ifdef LIBMESH_ENABLE_AMR
-
-  /**
-   * Total number of degrees of freedom on old dof objects
-   */
-  dof_id_type _n_old_dfs;
-
-  /**
-   * First old DOF index on processor \p p.
-   */
-  std::vector<dof_id_type> _first_old_df;
-
-  /**
-   * Last old DOF index (plus 1) on processor \p p.
-   */
-  std::vector<dof_id_type> _end_old_df;
 
   /**
    * First old DOF index for SCALAR variable v, or garbage for
@@ -2256,7 +2157,7 @@ private:
   bool _verify_dirichlet_bc_consistency;
 
   /// Static condensation class
-  const StaticCondensation * _sc;
+  std::unique_ptr<StaticCondensationDofMap> _sc;
 };
 
 
@@ -2780,7 +2681,7 @@ void DofMap::dof_indices (const Elem * const elem,
 }
 
 inline
-const StaticCondensation & DofMap::get_static_condensation() const
+StaticCondensationDofMap & DofMap::get_static_condensation()
 {
   libmesh_assert(_sc);
   return *_sc;

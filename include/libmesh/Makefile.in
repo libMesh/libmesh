@@ -521,12 +521,12 @@ vtkversion = @vtkversion@
 # include the magic script!
 EXTRA_DIST = rebuild_makefile.sh
 BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
-	dof_object.h factory.h float128_shims.h getpot.h id_types.h \
-	libmesh.h libmesh_augment_std_namespace.h libmesh_base.h \
-	libmesh_common.h libmesh_documentation.h libmesh_exceptions.h \
-	libmesh_logging.h libmesh_singleton.h libmesh_version.h \
-	multi_predicates.h periodic_boundaries.h periodic_boundary.h \
-	periodic_boundary_base.h print_trace.h \
+	dof_map_base.h dof_object.h factory.h float128_shims.h \
+	getpot.h id_types.h libmesh.h libmesh_augment_std_namespace.h \
+	libmesh_base.h libmesh_common.h libmesh_documentation.h \
+	libmesh_exceptions.h libmesh_logging.h libmesh_singleton.h \
+	libmesh_version.h multi_predicates.h periodic_boundaries.h \
+	periodic_boundary.h periodic_boundary_base.h print_trace.h \
 	reference_counted_object.h reference_counter.h \
 	single_predicates.h sparsity_pattern.h variable.h \
 	variant_filter_iterator.h enum_convergence_flags.h \
@@ -610,25 +610,26 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	petsc_shell_matrix.h petsc_solver_exception.h petsc_vector.h \
 	preconditioner.h raw_accessor.h refinement_selector.h \
 	shell_matrix.h sparse_matrix.h sparse_shell_matrix.h \
-	static_condensation.h static_condensation_preconditioner.h \
-	sum_shell_matrix.h tensor_shell_matrix.h tensor_tools.h \
-	tensor_value.h trilinos_epetra_matrix.h \
-	trilinos_epetra_vector.h trilinos_preconditioner.h tuple_of.h \
-	type_n_tensor.h type_tensor.h type_vector.h vector_value.h \
-	wrapped_function.h wrapped_functor.h wrapped_petsc.h \
-	zero_function.h libmesh_call_mpi.h parallel.h \
-	parallel_algebra.h parallel_bin_sorter.h \
-	parallel_conversion_utils.h parallel_eigen.h parallel_elem.h \
-	parallel_fe_type.h parallel_ghost_sync.h parallel_hilbert.h \
-	parallel_histogram.h parallel_node.h parallel_object.h \
-	parallel_only.h parallel_sort.h threads.h threads_allocators.h \
-	threads_none.h threads_pthread.h threads_tbb.h \
-	centroid_partitioner.h hilbert_sfc_partitioner.h \
-	linear_partitioner.h mapped_subdomain_partitioner.h \
-	metis_csr_graph.h metis_partitioner.h morton_sfc_partitioner.h \
-	parmetis_helper.h parmetis_partitioner.h partitioner.h \
-	sfc_partitioner.h subdomain_partitioner.h diff_physics.h \
-	diff_qoi.h fem_physics.h quadrature.h quadrature_clough.h \
+	static_condensation.h static_condensation_dof_map.h \
+	static_condensation_preconditioner.h sum_shell_matrix.h \
+	tensor_shell_matrix.h tensor_tools.h tensor_value.h \
+	trilinos_epetra_matrix.h trilinos_epetra_vector.h \
+	trilinos_preconditioner.h tuple_of.h type_n_tensor.h \
+	type_tensor.h type_vector.h vector_value.h wrapped_function.h \
+	wrapped_functor.h wrapped_petsc.h zero_function.h \
+	libmesh_call_mpi.h parallel.h parallel_algebra.h \
+	parallel_bin_sorter.h parallel_conversion_utils.h \
+	parallel_eigen.h parallel_elem.h parallel_fe_type.h \
+	parallel_ghost_sync.h parallel_hilbert.h parallel_histogram.h \
+	parallel_node.h parallel_object.h parallel_only.h \
+	parallel_sort.h threads.h threads_allocators.h threads_none.h \
+	threads_pthread.h threads_tbb.h centroid_partitioner.h \
+	hilbert_sfc_partitioner.h linear_partitioner.h \
+	mapped_subdomain_partitioner.h metis_csr_graph.h \
+	metis_partitioner.h morton_sfc_partitioner.h parmetis_helper.h \
+	parmetis_partitioner.h partitioner.h sfc_partitioner.h \
+	subdomain_partitioner.h diff_physics.h diff_qoi.h \
+	fem_physics.h quadrature.h quadrature_clough.h \
 	quadrature_composite.h quadrature_conical.h quadrature_gauss.h \
 	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
 	quadrature_jacobi.h quadrature_monomial.h quadrature_nodal.h \
@@ -950,6 +951,9 @@ dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_map.h: $(top_srcdir)/include/base/dof_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+dof_map_base.h: $(top_srcdir)/include/base/dof_map_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_object.h: $(top_srcdir)/include/base/dof_object.h
@@ -1763,6 +1767,9 @@ sparse_shell_matrix.h: $(top_srcdir)/include/numerics/sparse_shell_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 static_condensation.h: $(top_srcdir)/include/numerics/static_condensation.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+static_condensation_dof_map.h: $(top_srcdir)/include/numerics/static_condensation_dof_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 static_condensation_preconditioner.h: $(top_srcdir)/include/numerics/static_condensation_preconditioner.h
