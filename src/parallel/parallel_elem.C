@@ -579,7 +579,8 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           }
         else
           {
-            Elem * ip = mesh->query_elem_ptr(interior_parent_id);
+            Elem * ip =
+              mesh->interior_mesh().query_elem_ptr(interior_parent_id);
 
             // The sending processor sees an interior parent here, so
             // if we don't have that interior element, then we'd
@@ -794,7 +795,8 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           {
             // If we don't have the interior parent element, then it's
             // a remote_elem until we get it.
-            Elem * ip = mesh->query_elem_ptr(interior_parent_id);
+            Elem * ip =
+              mesh->interior_mesh().query_elem_ptr(interior_parent_id);
             if (!ip )
               elem->set_interior_parent
                 (const_cast<RemoteElem *>(remote_elem));
