@@ -272,7 +272,7 @@ void MeshFunction::operator() (const Point & p,
 
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
-            // Adding entries for each scalar variable and spatial components of 
+            // Adding entries for each scalar variable and spatial components of
             // vector variables
             switch (fe_type.family)
               {
