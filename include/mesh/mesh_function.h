@@ -202,16 +202,6 @@ public:
                    const std::set<subdomain_id_type> * subdomain_ids);
 
   /**
-   * Computes vector values at coordinate \p p and for time \p time,
-   * restricting the point to the passed subdomain_ids, which
-   * parameter overrides the internal subdomain_ids.
-   */
-  void operator() (const Point & p,
-    const Real time,
-    DenseVector<Gradient> & output,
-    const std::set<subdomain_id_type> * subdomain_ids);
-
-  /**
    * Similar to operator() with the same parameter list, but with the difference
    * that multiple values on faces are explicitly permitted. This is useful for
    * discontinuous shape functions that are evaluated on faces.

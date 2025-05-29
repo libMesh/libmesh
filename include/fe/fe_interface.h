@@ -357,57 +357,6 @@ public:
                                    const Real eps=TOLERANCE);
 
   /**
-   * \returns The vector value of the \f$ i^{th} \f$ shape function at
-   * point \p p. This method allows you to specify the dimension,
-   * element type, and order directly. Automatically passes the
-   * request to the appropriate finite element class member.
-   */
-  static RealGradient vectorshape(const unsigned int dim,
-                                  const FEType & fe_t,
-                                  const Elem * elem,
-                                  const unsigned int i,
-                                  const Point & p);
-
-  /**
-   * \returns The vector value of the \f$ i^{th} \f$ shape function at
-   * point \p p for H_CURL continuity.. This method allows you to
-   * specify the dimension, element type, and order directly.
-   * Automatically passes the request to the appropriate finite
-   * element class member.
-   */
-  static RealGradient vectorshape_hcurl(const unsigned int dim,
-                                        const FEType & fe_t,
-                                        const Elem * elem,
-                                        const unsigned int i,
-                                        const Point & p);
-
-  /**
-   * \returns The vector value of the \f$ i^{th} \f$ shape function at
-   * point \p p for H_DIV continuity. This method allows you to
-   * specify the dimension, element type, and order directly.
-   * Automatically passes the request to the appropriate finite
-   * element class member.
-   */
-  static RealGradient vectorshape_hdiv(const unsigned int dim,
-                                       const FEType & fe_t,
-                                       const Elem * elem,
-                                       const unsigned int i,
-                                       const Point & p);
-
-  /**
-   * \returns The corrected vector value of the \f$ i^{th} \f$
-   * shape function at point \p p for C_ZERO, H_CURL, and H_DIV
-   * continuity. This method allows you to specify the dimension,
-   * element type, and order directly. Automatically passes the
-   * request to the appropriate finite element class member.
-   */
-  static RealGradient correct_vectorshape(const unsigned int dim,
-                                          const FEType & fe_t,
-                                          const Elem * elem,
-                                          const unsigned int i,
-                                          const Point & p);
-
-  /**
    * \returns The value of the \f$ i^{th} \f$ shape function at
    * point \p p. This method allows you to specify the dimension,
    * element type, and order directly. Automatically passes the
