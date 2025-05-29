@@ -1660,18 +1660,18 @@ public:
   /**
    * Add a static condensation class
    */
-  void add_static_condensation(const StaticCondensationDofMap & sc) { _sc = &sc; }
+  void create_static_condensation(const MeshBase & mesh, System & system);
 
   /**
    * Checks whether we have static condensation
    */
-  bool has_static_condensation() const { return _sc; }
+  bool has_static_condensation() const { return _sc.get(); }
 
   /**
    * @returns the static condensation class. This should have been already added with a call to \p
    * add_static_condensation()
    */
-  const StaticCondensationDofMap & get_static_condensation() const;
+  StaticCondensationDofMap & get_static_condensation();
 
 private:
 
@@ -2157,7 +2157,7 @@ private:
   bool _verify_dirichlet_bc_consistency;
 
   /// Static condensation class
-  const StaticCondensationDofMap * _sc;
+  std::unique_ptr<StaticCondensationDofMap> _sc;
 };
 
 
@@ -2681,7 +2681,7 @@ void DofMap::dof_indices (const Elem * const elem,
 }
 
 inline
-const StaticCondensationDofMap & DofMap::get_static_condensation() const
+StaticCondensationDofMap & DofMap::get_static_condensation()
 {
   libmesh_assert(_sc);
   return *_sc;

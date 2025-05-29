@@ -41,11 +41,8 @@ StaticCondensationDofMap::StaticCondensationDofMap(const MeshBase & mesh,
 
 StaticCondensationDofMap::~StaticCondensationDofMap() = default;
 
-void StaticCondensationDofMap::init()
+void StaticCondensationDofMap::reinit()
 {
-  if (_sc_is_initialized)
-    return;
-
   std::vector<dof_id_type> elem_dofs; // only used to satisfy API
   std::vector<dof_id_type> elem_uncondensed_dofs;
   std::unordered_set<dof_id_type> local_uncondensed_dofs;
@@ -343,5 +340,6 @@ void StaticCondensationDofMap::clear()
   _reduced_sp = nullptr;
   _reduced_nnz.clear();
   _reduced_noz.clear();
+  _sc_is_initialized = false;
 }
 }

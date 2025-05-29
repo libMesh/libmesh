@@ -74,7 +74,6 @@ class SystemSubset;
 class FEType;
 class SystemNorm;
 enum FEMNormType : int;
-class StaticCondensationDofMap;
 
 /**
  * \brief Manages consistently variables, degrees of freedom, and coefficient
@@ -1949,16 +1948,10 @@ public:
    */
    virtual void create_static_condensation();
 
-  /**
-   * Retrieve the static condensation class. Errors if \p create_static_condensation() has not been
-   * called prior, so calls to this should be guarded by checking \p has_static_condensation()
-   */
-   StaticCondensationDofMap & get_static_condensation_dof_map();
-
    /**
     * @returns Whether this system will be statically condensed
     */
-   bool has_static_condensation() const { return _sc_dof_map.get(); }
+   bool has_static_condensation() const;
 
 protected:
 
@@ -2026,11 +2019,6 @@ protected:
   virtual bool condense_constrained_dofs() const { return false; }
 
 private:
-  /**
-   * Creates the degree of freedom map for the statically condensed system
-   */
-  void create_static_condensation_dof_map();
-
   /**
    * Helper function to keep DofMap forward declarable in system.h
    */
@@ -2130,9 +2118,6 @@ private:
    */
   dof_id_type write_serialized_vector (Xdr & io,
                                        const NumericVector<Number> & vec) const;
-
-  /// Degree of freedom map for the condensed space
-  std::unique_ptr<StaticCondensationDofMap> _sc_dof_map;
 
   /**
    * Function that initializes the system.
@@ -2752,16 +2737,6 @@ System::prefer_hash_table_matrix_assembly(const bool preference)
       _matrices_initialized,
       "System::prefer_hash_table_matrix_assembly() should be called before matrices are initialized");
   _prefer_hash_table_matrix_assembly = preference;
-}
-
-inline
-StaticCondensationDofMap &
-System::get_static_condensation_dof_map()
-{
-  if (!_sc_dof_map)
-    libmesh_error_msg("Static condensation was not requested by the user");
-
-  return *_sc_dof_map;
 }
 
 } // namespace libMesh

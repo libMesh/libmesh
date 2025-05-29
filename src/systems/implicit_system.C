@@ -56,7 +56,7 @@ ImplicitSystem::~ImplicitSystem () = default;
 
 void ImplicitSystem::create_static_condensation_system_matrix()
 {
-  auto sc_system_matrix = std::make_unique<StaticCondensation>(this->get_mesh(), *this, this->get_dof_map(), this->get_static_condensation_dof_map());
+  auto sc_system_matrix = std::make_unique<StaticCondensation>(this->get_mesh(), *this, this->get_dof_map(), this->get_dof_map().get_static_condensation());
   _sc_system_matrix = sc_system_matrix.get();
   matrix = &(this->add_matrix ("System Matrix", std::move(sc_system_matrix)));
 }

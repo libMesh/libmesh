@@ -39,7 +39,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
-#include "libmesh/static_condensation.h"
+#include "libmesh/static_condensation_dof_map.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -83,7 +83,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
   if (use_condensed_system)
     {
       libmesh_assert(this->has_static_condensation());
-      sc = &this->get_static_condensation();
+      sc = _sc.get();
     }
 
   // We can compute the sparsity pattern in parallel on multiple
@@ -969,6 +969,8 @@ void DofMap::clear()
 #endif
 
   _matrices.clear();
+  if (_sc)
+    _sc->clear();
 }
 
 
@@ -1134,6 +1136,10 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   // boundaries that are shared by multiple elements are added for
   // each element.
   this->add_neighbors_to_send_list(mesh);
+
+  // With the global dofs determined, initialize the condensed dof data if it exists
+  if (_sc)
+    _sc->reinit();
 
   // Here we used to clean up that data structure; now System and
   // EquationSystems call that for us, after we've added constraint
@@ -3068,6 +3074,11 @@ std::string DofMap::get_info() const
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 
   return os.str();
+}
+
+void DofMap::create_static_condensation(const MeshBase & mesh, System & sys)
+{
+  _sc = std::make_unique<StaticCondensationDofMap>(mesh, sys, *this);
 }
 
 template LIBMESH_EXPORT bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;

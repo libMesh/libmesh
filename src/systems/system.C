@@ -38,7 +38,6 @@
 #include "libmesh/parallel_fe_type.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
-#include "libmesh/static_condensation_dof_map.h"
 #include "libmesh/static_condensation.h"
 
 // includes for calculate_norm, point_*
@@ -75,7 +74,6 @@ System::System (EquationSystems & es,
   time                              (0.),
   qoi                               (0),
   qoi_error_estimates               (0),
-  _sc_dof_map                       (nullptr),
   _init_system_function             (nullptr),
   _init_system_object               (nullptr),
   _assemble_system_function         (nullptr),
@@ -108,7 +106,7 @@ System::System (EquationSystems & es,
   if (libMesh::on_command_line("--solver-system-names"))
     this->prefix_with_name(true);
   if (libMesh::on_command_line("--" + name_in + "-static-condensation"))
-    this->create_static_condensation_dof_map();
+    this->create_static_condensation();
 }
 
 
@@ -180,8 +178,6 @@ void System::clear ()
   _variables.clear();
   _variable_numbers.clear();
   _dof_map->clear ();
-  if (_sc_dof_map)
-    _sc_dof_map->clear();
   solution->clear ();
   current_local_solution->clear ();
 
@@ -228,10 +224,6 @@ void System::init_data ()
 
   // Distribute the degrees of freedom on the mesh
   auto total_dofs = _dof_map->distribute_dofs (mesh);
-
-  // With the global dofs determined, initialize the condensed dof data if it exists
-  if (_sc_dof_map)
-    _sc_dof_map->init();
 
   // Throw an error if the total number of DOFs is not capable of
   // being indexed by our solution vector.
@@ -1028,8 +1020,10 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
       if (mat_build_type == MatrixBuildType::DIAGONAL)
         libmesh_error_msg(
             "We do not currently support static condensation of the diagonal matrix type");
-      matrix = std::make_unique<StaticCondensation>(
-          this->get_mesh(), *this, this->get_dof_map(), *_sc_dof_map);
+      matrix = std::make_unique<StaticCondensation>(this->get_mesh(),
+                                                    *this,
+                                                    this->get_dof_map(),
+                                                    this->get_dof_map().get_static_condensation());
     }
   else
     matrix = SparseMatrix<Number>::build(this->comm(), libMesh::default_solver_package());
@@ -2862,13 +2856,12 @@ Tensor System::point_hessian(unsigned int, const Point &, const NumericVector<Nu
 
 void System::create_static_condensation()
 {
-  this->create_static_condensation_dof_map();
+  this->get_dof_map().create_static_condensation(this->get_mesh(), *this);
 }
 
-void System::create_static_condensation_dof_map()
+bool System::has_static_condensation() const
 {
-  _sc_dof_map = std::make_unique<StaticCondensationDofMap>(this->get_mesh(), *this, this->get_dof_map());
-  this->get_dof_map().add_static_condensation(*_sc_dof_map);
+  return this->get_dof_map().has_static_condensation();
 }
 
 } // namespace libMesh

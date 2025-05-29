@@ -68,7 +68,7 @@ public:
   /**
    * Build the element global to local index maps
    */
-  void init();
+  void reinit();
 
   /**
    * Add \p vars to the list of variables not to condense. This can be useful when some variable's
