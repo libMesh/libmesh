@@ -36,6 +36,10 @@ protected:
   std::unique_ptr<UnstructuredMesh> _left_boundary_mesh;
   std::unique_ptr<UnstructuredMesh> _internal_boundary_mesh;
 
+  // We create an internal sideset ID that does not conflict with
+  // sidesets 0-3 that get created by build_square().
+  static constexpr boundary_id_type bid = 5;
+
   void build_mesh()
   {
     _mesh = std::make_unique<Mesh>(*TestCommWorld);
@@ -90,8 +94,38 @@ protected:
           elem->subdomain_id() = 2;
       }
 
+    // To test the "relative to" feature, we add the same sides to the
+    // same sideset twice, from elements in subdomain 2 the second
+    // time.  These should not show up in the BoundaryMesh, i.e. there
+    // should not be overlapped elems in the BoundaryMesh.
+    BoundaryInfo & bi = _mesh->get_boundary_info();
+
+    for (auto & elem : _mesh->active_element_ptr_range())
+      {
+        const Point c = elem->vertex_average();
+        if (c(0) < 0.6 && c(1) < 0.4)
+          {
+            if (c(0) > 0.4)
+              bi.add_side(elem, 1, bid);
+            if (c(1) > 0.3)
+              bi.add_side(elem, 2, bid);
+          }
+        else
+          {
+            if (c(0) < 0.75 && c(1) < 0.4)
+              bi.add_side(elem, 3, bid);
+            if (c(0) < 0.6 && c(1) < 0.5)
+              bi.add_side(elem, 0, bid);
+          }
+      }
+  }
+
+  void sync_and_test_meshes()
+  {
     // Get the border of the square
-    _mesh->get_boundary_info().sync(*_all_boundary_mesh);
+    const std::set<boundary_id_type> square_boundaries {0, 1, 2, 3};
+    _mesh->get_boundary_info().sync(square_boundaries,
+                                    *_all_boundary_mesh);
 
     // Check that the interior_parent side indices that we set on the
     // BoundaryMesh as extra integers agree with the side returned
@@ -124,35 +158,6 @@ protected:
     // Add the left side of the square to its own boundary mesh.
     _mesh->get_boundary_info().sync(left_id, *_left_boundary_mesh);
 
-    // We create an internal sideset ID that does not conflict with
-    // sidesets 0-3 that get created by build_square().
-    boundary_id_type bid = 5;
-
-    // To test the "relative to" feature, we add the same sides to the
-    // same sideset twice, from elements in subdomain 2 the second
-    // time.  These should not show up in the BoundaryMesh, i.e. there
-    // should not be overlapped elems in the BoundaryMesh.
-    BoundaryInfo & bi = _mesh->get_boundary_info();
-
-    for (auto & elem : _mesh->active_element_ptr_range())
-      {
-        const Point c = elem->vertex_average();
-        if (c(0) < 0.6 && c(1) < 0.4)
-          {
-            if (c(0) > 0.4)
-              bi.add_side(elem, 1, bid);
-            if (c(1) > 0.3)
-              bi.add_side(elem, 2, bid);
-          }
-        else
-          {
-            if (c(0) < 0.75 && c(1) < 0.4)
-              bi.add_side(elem, 3, bid);
-            if (c(0) < 0.6 && c(1) < 0.5)
-              bi.add_side(elem, 0, bid);
-          }
-      }
-
 
     // Create a BoundaryMesh from the internal sideset relative to subdomain 1.
     {
@@ -171,6 +176,7 @@ public:
   {
 #if LIBMESH_DIM > 1
     this->build_mesh();
+    this->sync_and_test_meshes();
 #endif
   }
 
@@ -351,6 +357,7 @@ public:
   {
 #if LIBMESH_DIM > 1
     this->build_mesh();
+    this->sync_and_test_meshes();
 
     // Need to refine interior mesh before separate boundary meshes,
     // if we want to get interior_parent links right.
