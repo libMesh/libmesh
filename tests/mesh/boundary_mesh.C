@@ -33,6 +33,7 @@ protected:
 
   std::unique_ptr<UnstructuredMesh> _mesh;
   std::unique_ptr<UnstructuredMesh> _all_boundary_mesh;
+  std::unique_ptr<UnstructuredMesh> _exterior_boundary_mesh;
   std::unique_ptr<UnstructuredMesh> _left_boundary_mesh;
   std::unique_ptr<UnstructuredMesh> _internal_boundary_mesh;
 
@@ -44,6 +45,7 @@ protected:
   {
     _mesh = std::make_unique<Mesh>(*TestCommWorld);
     _all_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
+    _exterior_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
 
     // We want to test Distributed->Replicated sync; this does that in
     // some builds
@@ -64,6 +66,7 @@ protected:
         _mesh->skip_noncritical_partitioning(true);
         _left_boundary_mesh->skip_noncritical_partitioning(true);
         _all_boundary_mesh->skip_noncritical_partitioning(true);
+        _exterior_boundary_mesh->skip_noncritical_partitioning(true);
         _internal_boundary_mesh->skip_noncritical_partitioning(true);
       }
 
@@ -123,9 +126,12 @@ protected:
   void sync_and_test_meshes()
   {
     // Get the border of the square
-    const std::set<boundary_id_type> square_boundaries {0, 1, 2, 3};
-    _mesh->get_boundary_info().sync(square_boundaries,
-                                    *_all_boundary_mesh);
+    const std::set<boundary_id_type> exterior_boundaries {0, 1, 2, 3};
+    _mesh->get_boundary_info().sync(exterior_boundaries,
+                                    *_exterior_boundary_mesh);
+
+    // Get everything
+    _mesh->get_boundary_info().sync(*_all_boundary_mesh);
 
     // Check that the interior_parent side indices that we set on the
     // BoundaryMesh as extra integers agree with the side returned
@@ -189,33 +195,42 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(20),
                          _mesh->n_elem());
 
-    // There'd better be only 7*11 nodes in the interior
+    // There'd better be 7*11 nodes in the interior
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(77),
                          _mesh->n_nodes());
 
-    // There'd better be only 2*(3+5) elements on the full boundary
+    // There'd better be 2*(3+5) elements on the exterior boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(16),
-                         _all_boundary_mesh->n_elem());
+                         _exterior_boundary_mesh->n_elem());
 
-    // There'd better be only 2*2*(3+5) nodes on the full boundary
+    // There'd better be 2*2*(3+5) nodes on the exterior boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(32),
-                         _all_boundary_mesh->n_nodes());
+                         _exterior_boundary_mesh->n_nodes());
 
-    // There'd better be only 5 elements on the left boundary
+    // There'd better be 5 elements on the left boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(5),
                          _left_boundary_mesh->n_elem());
 
-    // There'd better be only 2*5+1 nodes on the left boundary
+    // There'd better be 2*5+1 nodes on the left boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(11),
                          _left_boundary_mesh->n_nodes());
 
-    // There are only four elements in the internal sideset mesh.
+    // There are four elements in the one-sided internal sideset mesh.
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(4),
                          _internal_boundary_mesh->n_elem());
 
-    // There are 2*n_elem + 1 nodes in the internal sideset mesh.
+    // There are 2*n_elem + 1 nodes in the one-sided internal sideset mesh.
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(9),
                          _internal_boundary_mesh->n_nodes());
+
+    // There'd better be 2*(3+5)+2*4 elements on the total
+    // boundary (which includes both sides of the internal boundary)
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(24),
+                         _all_boundary_mesh->n_elem());
+
+    // There'd better be 2*2*(3+5) + 2*4-1 nodes on the total boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(39),
+                         _all_boundary_mesh->n_nodes());
 
     this->sanityCheck();
   }
@@ -226,7 +241,7 @@ public:
 
     MeshSerializer internal_serializer(*_internal_boundary_mesh);
 
-    // There are only four elements in the internal sideset mesh.
+    // There are four elements in the internal sideset mesh.
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(4),
                          _internal_boundary_mesh->n_elem());
 
@@ -362,8 +377,10 @@ public:
     // Need to refine interior mesh before separate boundary meshes,
     // if we want to get interior_parent links right.
     MeshRefinement(*_mesh).uniformly_refine(1);
-    MeshRefinement(*_left_boundary_mesh).uniformly_refine(1);
+
     MeshRefinement(*_all_boundary_mesh).uniformly_refine(1);
+    MeshRefinement(*_exterior_boundary_mesh).uniformly_refine(1);
+    MeshRefinement(*_left_boundary_mesh).uniformly_refine(1);
     MeshRefinement(*_internal_boundary_mesh).uniformly_refine(1);
 #endif
   }
@@ -381,23 +398,23 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(90),
                          _mesh->n_elem());
 
-    // There'd better be only 13*21 nodes in the interior
+    // There'd better be 13*21 nodes in the interior
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(273),
                          _mesh->n_nodes());
 
-    // There'd better be only 2*2*(3+5) active elements on the full boundary
+    // There'd better be 2*2*(3+5) active elements on the exterior boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(32),
-                         _all_boundary_mesh->n_active_elem());
+                         _exterior_boundary_mesh->n_active_elem());
 
     // Plus the original 16 now-inactive elements
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(48),
-                         _all_boundary_mesh->n_elem());
+                         _exterior_boundary_mesh->n_elem());
 
-    // There'd better be only 2*2*2*(3+5) nodes on the full boundary
+    // There'd better be 2*2*2*(3+5) nodes on the exterior boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(64),
-                         _all_boundary_mesh->n_nodes());
+                         _exterior_boundary_mesh->n_nodes());
 
-    // There'd better be only 2*5 active elements on the left boundary
+    // There'd better be 2*5 active elements on the left boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(10),
                          _left_boundary_mesh->n_active_elem());
 
@@ -405,12 +422,11 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(15),
                          _left_boundary_mesh->n_elem());
 
-    // There'd better be only 2*2*5+1 nodes on the left boundary
+    // There'd better be 2*2*5+1 nodes on the left boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(21),
                          _left_boundary_mesh->n_nodes());
 
-
-    // There'd better be only 2*4 active elements on the internal
+    // There'd better be 2*4 active elements on the one-sided internal
     // sideset mesh
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(8),
                          _internal_boundary_mesh->n_active_elem());
@@ -419,9 +435,23 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12),
                          _internal_boundary_mesh->n_elem());
 
-    // There'd better be only 2*2*4+1 nodes on the internal boundary
+    // There'd better be 2*2*4+1 nodes on the internal boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
                          _internal_boundary_mesh->n_nodes());
+
+    // There'd better be 2*2*(3+5) + 2*2*4 active elements on the total
+    // boundary (which includes both sides of the internal boundary)
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(48),
+                         _all_boundary_mesh->n_active_elem());
+
+    // Plus the original 24 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(72),
+                         _all_boundary_mesh->n_elem());
+
+    // There'd better be 2*2*2*(3+5) + 2*2*4-1 nodes on the total boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(79),
+                         _all_boundary_mesh->n_nodes());
+
 
     this->sanityCheck();
   }
@@ -433,7 +463,7 @@ public:
 
     MeshSerializer internal_serializer(*_internal_boundary_mesh);
 
-    // There'd better be only 2*4 active elements on the internal
+    // There'd better be 2*4 active elements on the internal
     // sideset mesh
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(8),
                          _internal_boundary_mesh->n_active_elem());
@@ -442,7 +472,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12),
                          _internal_boundary_mesh->n_elem());
 
-    // There'd better be only 2*2*4+1 nodes on the internal boundary
+    // There'd better be 2*2*4+1 nodes on the internal boundary
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
                          _internal_boundary_mesh->n_nodes());
 
@@ -452,5 +482,133 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryRefinedMeshTest );
+
+
+class BoundaryOfRefinedMeshTest : public BoundaryMeshTest {
+  /**
+   * The goal of this test is the same as the previous, but now we do a
+   * uniform refinement *before* synchronizing to the boundary mesh
+   * rather than after.
+   */
+public:
+  LIBMESH_CPPUNIT_TEST_SUITE( BoundaryOfRefinedMeshTest );
+
+#if LIBMESH_DIM > 1
+  CPPUNIT_TEST( testMesh );
+  CPPUNIT_TEST( testBoundarySerialization );
+#endif
+
+  CPPUNIT_TEST_SUITE_END();
+
+  // Yes, this is necessary. Somewhere in those macros is a protected/private
+public:
+
+  void setUp()
+  {
+#if LIBMESH_DIM > 1
+    this->build_mesh();
+
+    // Refine interior mesh before creating boundary meshes
+    MeshRefinement(*_mesh).uniformly_refine(1);
+
+    this->sync_and_test_meshes();
+#endif
+  }
+
+  void testMesh()
+  {
+    LOG_UNIT_TEST;
+
+    // There'd better be 3*5*4 + 5*2 active elements in the interior
+    // plus right boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(70),
+                         _mesh->n_active_elem());
+
+    // Plus the original 20 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(90),
+                         _mesh->n_elem());
+
+    // There'd better be 13*21 nodes in the interior
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(273),
+                         _mesh->n_nodes());
+
+    // There'd better be 2*2*(3+5) active elements on the exterior boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(32),
+                         _exterior_boundary_mesh->n_active_elem());
+
+    // Plus the original 16 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(48),
+                         _exterior_boundary_mesh->n_elem());
+
+    // There'd better be 2*2*2*(3+5) nodes on the exterior boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(64),
+                         _exterior_boundary_mesh->n_nodes());
+
+    // There'd better be 2*5 active elements on the left boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(10),
+                         _left_boundary_mesh->n_active_elem());
+
+    // Plus the original 5 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(15),
+                         _left_boundary_mesh->n_elem());
+
+    // There'd better be 2*2*5+1 nodes on the left boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(21),
+                         _left_boundary_mesh->n_nodes());
+
+    // There'd better be 2*4 active elements on the internal
+    // sideset mesh
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(8),
+                         _internal_boundary_mesh->n_active_elem());
+
+    // Plus the original 4 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12),
+                         _internal_boundary_mesh->n_elem());
+
+    // There'd better be 2*2*4+1 nodes on the one-sided internal boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
+                         _internal_boundary_mesh->n_nodes());
+
+    // There'd better be 2*2*(3+5) + 2*2*4 active elements on the total
+    // boundary (which includes both sides of the internal boundary)
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(48),
+                         _all_boundary_mesh->n_active_elem());
+
+    // Plus the original 24 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(72),
+                         _all_boundary_mesh->n_elem());
+
+    // There'd better be 2*2*2*(3+5) + 2*2*4-1 nodes on the total boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(79),
+                         _all_boundary_mesh->n_nodes());
+
+    this->sanityCheck();
+  }
+
+  void testBoundarySerialization()
+  {
+    LOG_UNIT_TEST;
+
+    MeshSerializer internal_serializer(*_internal_boundary_mesh);
+
+    // There'd better be 2*4 active elements on the internal
+    // sideset mesh
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(8),
+                         _internal_boundary_mesh->n_active_elem());
+
+    // Plus the original 4 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12),
+                         _internal_boundary_mesh->n_elem());
+
+    // There'd better be 2*2*4+1 nodes on the internal boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
+                         _internal_boundary_mesh->n_nodes());
+
+    this->sanityCheck();
+  }
+
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryOfRefinedMeshTest );
 
 #endif
