@@ -9,6 +9,7 @@
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
+#include "libmesh/enum_xdr_mode.h"
 
 
 using namespace libMesh;
@@ -43,6 +44,12 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( test_subdomain_id_sets );
+#ifdef LIBMESH_HAVE_PETSC
+  CPPUNIT_TEST( vectorMeshFunctionLagrange );
+  CPPUNIT_TEST( vectorMeshFunctionNedelec );
+  CPPUNIT_TEST( vectorMeshFunctionRaviartThomas );
+  CPPUNIT_TEST( mixedScalarAndVectorVariables );
+#endif // LIBMESH_HAVE_PETSC
 #endif
 #if LIBMESH_DIM > 2
 #ifdef LIBMESH_ENABLE_AMR
@@ -220,7 +227,211 @@ public:
       }
   }
 #endif // LIBMESH_ENABLE_AMR
+
+#ifdef LIBMESH_HAVE_PETSC
+  // Tests the projection of Lagrange Vectors using MeshFunction
+  void vectorMeshFunctionLagrange()
+  {
+    LOG_UNIT_TEST;
+
+    // Reading mesh and solution infromation from XDA files
+    ReplicatedMesh mesh(*TestCommWorld);
+    mesh.read("solutions/lagrange_vec_solution_mesh.xda");
+    EquationSystems es(mesh);
+    es.read("solutions/lagrange_vec_solution.xda", READ,
+            EquationSystems::READ_HEADER |
+                EquationSystems::READ_DATA |
+                EquationSystems::READ_ADDITIONAL_DATA);
+    es.update();
+
+    // Pulling the correct system and variable infromation from
+    // the XDA files (the default system name is "nl0")
+    System & sys = es.get_system<System>("nl0");
+    std::unique_ptr<NumericVector<Number>> mesh_function_vector =
+        NumericVector<Number>::build(es.comm());
+    mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
+    sys.solution->localize(*mesh_function_vector);
+
+    // Setting up libMesh::MeshFunction
+    MeshFunction mesh_function(es, *mesh_function_vector,
+                                sys.get_dof_map(), 0);
+    mesh_function.init();
+
+    // Defining input parameters for MeshFunction::operator()
+    // DenseVector<Gradient> output;
+    DenseVector<Number> output;
+    const std::set<subdomain_id_type> * subdomain_ids = nullptr;
+    const Point & p = Point(0.5, 0.5);
+
+    // Supplying the Lagrange Vec value at center of mesh to output
+    (mesh_function)(p, 0.0, output, subdomain_ids);
+    Gradient output_vec = VectorValue(output(0),output(1));
+
+    // Expected value at center mesh
+    Gradient output_expected = VectorValue(0.100977281077292,0.201954562154583);
+
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(0)), libMesh::libmesh_real(output_expected(0)),
+                            TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(1)), libMesh::libmesh_real(output_expected(1)),
+                            TOLERANCE * TOLERANCE);
+  }
+
+  // Tests the projection of Nedelec Vectors using MeshFunction
+  void vectorMeshFunctionNedelec()
+  {
+    LOG_UNIT_TEST;
+
+    // Reading mesh and solution information from XDA files
+    ReplicatedMesh mesh(*TestCommWorld);
+    mesh.read("solutions/nedelec_one_solution_mesh.xda");
+    EquationSystems es(mesh);
+    es.read("solutions/nedelec_one_solution.xda", READ,
+            EquationSystems::READ_HEADER |
+                EquationSystems::READ_DATA |
+                EquationSystems::READ_ADDITIONAL_DATA);
+    es.update();
+
+    // Pulling the correct system and variable infromation from
+    // the XDA files (the default system name is "nl0")
+    System & sys = es.get_system<System>("nl0");
+    std::unique_ptr<NumericVector<Number>> mesh_function_vector =
+        NumericVector<Number>::build(es.comm());
+    mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
+    sys.solution->localize(*mesh_function_vector);
+
+    // Setting up libMesh::MeshFunction
+    MeshFunction mesh_function(es, *mesh_function_vector,
+                                sys.get_dof_map(), 0);
+    mesh_function.init();
+
+    // Defining input parameters for MeshFunction::operator()
+    DenseVector<Number> output;
+    const std::set<subdomain_id_type> * subdomain_ids = nullptr;
+    const Point & p = Point(0.5, 0.5);
+
+    // Supplying the Nedelec One value at center of mesh to output
+    (mesh_function)(p, 0.0, output, subdomain_ids);
+    Gradient output_vec = VectorValue(output(0),output(1));
+
+    // Expected value at center mesh
+    Gradient output_expected = VectorValue(0.0949202883998996,-0.0949202883918033);
+
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(0)), libMesh::libmesh_real(output_expected(0)),
+                            TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(1)), libMesh::libmesh_real(output_expected(1)),
+                            TOLERANCE * TOLERANCE);
+  }
+
+  // Tests the projection of Raviart Thomas Vectors using MeshFunction
+  void vectorMeshFunctionRaviartThomas()
+  {
+    LOG_UNIT_TEST;
+
+    // Reading mesh and solution infromation from XDA files
+    ReplicatedMesh mesh(*TestCommWorld);
+    mesh.read("solutions/raviart_thomas_solution_mesh.xda");
+    EquationSystems es(mesh);
+    es.read("solutions/raviart_thomas_solution.xda", READ,
+            EquationSystems::READ_HEADER |
+                EquationSystems::READ_DATA |
+                EquationSystems::READ_ADDITIONAL_DATA);
+    es.update();
+
+    // Pulling the correct system and variable infromation from
+    // the XDA files (the default system name is "nl0")
+    System & sys = es.get_system<System>("nl0");
+    std::unique_ptr<NumericVector<Number>> mesh_function_vector =
+        NumericVector<Number>::build(es.comm());
+    mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
+    sys.solution->localize(*mesh_function_vector);
+
+    // Setting up libMesh::MeshFunction
+    MeshFunction mesh_function(es, *mesh_function_vector,
+                                sys.get_dof_map(), 0);
+    mesh_function.init();
+
+    // Defining input parameters for MeshFunction::operator()
+    DenseVector<Number> output;
+    const std::set<subdomain_id_type> * subdomain_ids = nullptr;
+    const Point & p = Point(0.5, 0.5);
+
+    // Supplying the Raviart Thomas value at center of mesh to output
+    (mesh_function)(p, 0.0, output, subdomain_ids);
+    Gradient output_vec = VectorValue(output(0),output(1));
+
+    // Expected value at center mesh
+    Gradient output_expected = VectorValue(0.0772539939808116,-0.0772537479511396);
+
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(0)), libMesh::libmesh_real(output_expected(0)),
+                            TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(1)), libMesh::libmesh_real(output_expected(1)),
+                            TOLERANCE * TOLERANCE);
+  }
+
+  // Tests MeshFunction for mixed scalar and vector variable outputs
+  // In this case, the variables types are:
+  //  - variable index: 0, variable family: Raviart Thomas, Order: First
+  //  - variable index: 1, variable family: Monomial, Order: Constant
+  //  - variable index: 2, variable family: Scalar, Order: First
+  void mixedScalarAndVectorVariables()
+  {
+    LOG_UNIT_TEST;
+
+    // Reading mesh and solution infromation from XDA files
+    ReplicatedMesh mesh(*TestCommWorld);
+    mesh.read("solutions/raviart_thomas_solution_mesh.xda");
+    EquationSystems es(mesh);
+    es.read("solutions/raviart_thomas_solution.xda", READ,
+            EquationSystems::READ_HEADER |
+                EquationSystems::READ_DATA |
+                EquationSystems::READ_ADDITIONAL_DATA);
+    es.update();
+
+    // Pulling the correct system and variable infromation from
+    // the XDA files (the default system name is "nl0")
+    System & sys = es.get_system<System>("nl0");
+    std::unique_ptr<NumericVector<Number>> mesh_function_vector =
+        NumericVector<Number>::build(es.comm());
+    mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
+    sys.solution->localize(*mesh_function_vector);
+
+    // Pulling the total number of variables stored in XDA file
+    std::vector<unsigned int> variables;
+    sys.get_all_variable_numbers(variables);
+    std::sort(variables.begin(),variables.end());
+
+    // Setting up libMesh::MeshFunction
+    MeshFunction mesh_function(es, *mesh_function_vector,
+                                sys.get_dof_map(), variables);
+    mesh_function.init();
+
+    // Defining input parameters for MeshFunction::operator()
+    DenseVector<Number> output;
+    const std::set<subdomain_id_type> * subdomain_ids = nullptr;
+    const Point & p = Point(0.5, 0.5);
+
+    // Supplying the variables value at center of mesh to output
+    (mesh_function)(p, 0.0, output, subdomain_ids);
+    Gradient output_raviart_thomas = VectorValue(output(0),output(1));
+
+    // Expected value at center mesh
+    Gradient raviart_thomas_expected = VectorValue(0.0772539939808116,-0.0772537479511396);
+    Number monomial_expected = -0.44265566716952;
+    Number scalar_expected = -2.86546e-18;
+
+    // Checking Raviart Thomas variable family values
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_raviart_thomas(0)), libMesh::libmesh_real(raviart_thomas_expected(0)),
+                            TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_raviart_thomas(1)), libMesh::libmesh_real(raviart_thomas_expected(1)),
+                            TOLERANCE * TOLERANCE);
+    // Checking Monomial variable family value
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(2)), libMesh::libmesh_real(monomial_expected),
+                            TOLERANCE * TOLERANCE);
+    // Checking scalar variable family value
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(3)), libMesh::libmesh_real(scalar_expected),
+                            TOLERANCE * TOLERANCE);
+  }
+#endif // LIBMESH_HAVE_PETSC
 };
 
-
-CPPUNIT_TEST_SUITE_REGISTRATION( MeshFunctionTest );
+CPPUNIT_TEST_SUITE_REGISTRATION(MeshFunctionTest);
