@@ -691,25 +691,18 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           !subdomains_relative_to.count(elem->subdomain_id()))
         continue;
 
-      // Get the top-level parent for this element
-      const Elem * top_parent = elem->top_parent();
-
-      // Find all the boundary side ids for this Elem.
-      auto bounds = _boundary_side_id.equal_range(top_parent);
-
       for (auto s : elem->side_index_range())
         {
           bool add_this_side = false;
-          boundary_id_type this_bcid = invalid_id;
 
-          for (const auto & pr : as_range(bounds))
+          // Find all the boundary side ids for this Elem side.
+          std::vector<boundary_id_type> bcids;
+          this->boundary_ids(elem, s, bcids);
+
+          for (const boundary_id_type bcid : bcids)
             {
-              this_bcid = pr.second.second;
-
-              // if this side is flagged with a boundary condition
-              // and the user wants this id
-              if ((pr.second.first == s) &&
-                  (requested_boundary_ids.count(this_bcid)))
+              // if the user wants this id, we want this side
+              if (requested_boundary_ids.count(bcid))
                 {
                   add_this_side = true;
                   break;
@@ -722,8 +715,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           // boundary was copied to the BoundaryMesh, and handles the
           // case where elements on the geometric boundary are not in
           // any sidesets.
-          if (bounds.first == bounds.second            &&
-              requested_boundary_ids.count(invalid_id) &&
+          if (requested_boundary_ids.count(invalid_id) &&
               elem->neighbor_ptr(s) == nullptr)
             add_this_side = true;
 
@@ -3145,26 +3137,18 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
           !subdomains_relative_to.count(elem->subdomain_id()))
         continue;
 
-      // Get the top-level parent for this element. This is used for
-      // searching for boundary sides on this element.
-      const Elem * top_parent = elem->top_parent();
-
-      // Find all the boundary side ids for this Elem.
-      auto bounds = _boundary_side_id.equal_range(top_parent);
-
       for (auto s : elem->side_index_range())
         {
           bool add_this_side = false;
-          boundary_id_type this_bcid = invalid_id;
 
-          for (const auto & pr : as_range(bounds))
+          // Find all the boundary side ids for this Elem side.
+          std::vector<boundary_id_type> bcids;
+          this->boundary_ids(elem, s, bcids);
+
+          for (const boundary_id_type bcid : bcids)
             {
-              this_bcid = pr.second.second;
-
-              // if this side is flagged with a boundary condition
-              // and the user wants this id
-              if ((pr.second.first == s) &&
-                  (requested_boundary_ids.count(this_bcid)))
+              // if the user wants this id, we want this side
+              if (requested_boundary_ids.count(bcid))
                 {
                   add_this_side = true;
                   break;
@@ -3177,8 +3161,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
           // boundary was copied to the BoundaryMesh, and handles the
           // case where elements on the geometric boundary are not in
           // any sidesets.
-          if (bounds.first == bounds.second            &&
-              requested_boundary_ids.count(invalid_id) &&
+          if (requested_boundary_ids.count(invalid_id) &&
               elem->neighbor_ptr(s) == nullptr)
             add_this_side = true;
 
