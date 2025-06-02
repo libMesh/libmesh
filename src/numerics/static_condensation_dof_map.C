@@ -37,6 +37,7 @@ StaticCondensationDofMap::StaticCondensationDofMap(const MeshBase & mesh,
     _dof_map(dof_map),
     _sc_is_initialized(false)
 {
+  libmesh_experimental();
 }
 
 StaticCondensationDofMap::~StaticCondensationDofMap() = default;
