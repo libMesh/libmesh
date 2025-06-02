@@ -276,6 +276,9 @@ public:
 
   /**
    * Reinitializes the constraints for this system.
+   *
+   * Also prepares the send_list, whether or not constraints have
+   * changed.
    */
   virtual void reinit_constraints ();
 
