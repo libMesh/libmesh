@@ -187,8 +187,9 @@ void StaticCondensation::close()
   _communicator.max(_have_cached_values);
   if (!_have_cached_values)
     {
-      const bool closed = _reduced_sys_mat->closed();
-      libmesh_assert(_communicator.verify(closed));
+      bool closed = _reduced_sys_mat->closed();
+      // closed is not collective
+      _communicator.min(closed);
       if (!closed)
         _reduced_sys_mat->close();
       return;
@@ -251,9 +252,13 @@ numeric_index_type StaticCondensation::row_start() const { return _full_dof_map.
 
 numeric_index_type StaticCondensation::row_stop() const { return _full_dof_map.end_dof(); }
 
-void StaticCondensation::set(const numeric_index_type, const numeric_index_type, const Number)
+void StaticCondensation::set(const numeric_index_type full_i,
+                             const numeric_index_type full_j,
+                             const Number val)
 {
-  libmesh_not_implemented();
+  const auto reduced_i = _reduced_dof_map.get_reduced_from_global_constraint_dof(full_i);
+  const auto reduced_j = _reduced_dof_map.get_reduced_from_global_constraint_dof(full_j);
+  _reduced_sys_mat->set(reduced_i, reduced_j, val);
 }
 
 void StaticCondensation::set_current_elem(const Elem & elem)
@@ -295,6 +300,12 @@ void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
                                "this can happen is when using a discontinuous Galerkin method, "
                                "adding element matrices to both + and - sides of a face");
       }
+    else
+      // We found the dof in the condensed container. Let's assert that it's not also in the
+      // uncondensed container
+      libmesh_assert(dof_data.uncondensed_global_to_local_map.find(global_index) ==
+                     dof_data.uncondensed_global_to_local_map.end());
+
     return std::make_pair(index_is_condensed, index_it->second);
   };
 

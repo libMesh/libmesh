@@ -1673,6 +1673,11 @@ public:
    */
   StaticCondensationDofMap & get_static_condensation();
 
+  /**
+   * Calls reinit on the static condensation map if it exists
+   */
+  void reinit_static_condensation();
+
 private:
 
   /**

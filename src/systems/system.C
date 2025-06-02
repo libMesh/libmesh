@@ -235,7 +235,12 @@ void System::init_data ()
   // Recreate any user or internal constraints
   this->reinit_constraints();
 
-  // And clean up the send_list before we first use it
+  // Now finally after dof distribution and construction of any 
+  // possible constraints, we may init any static condensation
+  // data
+  _dof_map->reinit_static_condensation();
+
+  // Clean up the send_list before we first use it
   _dof_map->prepare_send_list();
 
   // Resize the solution conformal to the current mesh
