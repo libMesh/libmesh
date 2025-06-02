@@ -232,8 +232,8 @@ void System::init_data ()
   // Recreate any user or internal constraints
   this->reinit_constraints();
 
-  // And clean up the send_list before we first use it
-  _dof_map->prepare_send_list();
+  // Even if there weren't any constraint changes,
+  // reinit_constraints() did prepare_send_list() for us.
 
   // Resize the solution conformal to the current mesh
   solution->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
