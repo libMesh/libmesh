@@ -61,6 +61,11 @@
 // indexing.
 #include "libmesh/dof_map.h"
 
+// For mesh refinement
+#include "libmesh/mesh_refinement.h"
+#include "libmesh/error_vector.h"
+#include "libmesh/kelly_error_estimator.h"
+
 // I/O utilities.
 #include "libmesh/getpot.h"
 #include "libmesh/vtk_io.h"
@@ -113,7 +118,7 @@ main(int argc, char ** argv)
   // But allow the command line to override it.
   infile.parse_command_line(argc, argv);
 
-  const unsigned int grid_size = infile("grid_size", 15);
+  const unsigned int grid_size = infile("grid_size", 5);
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
@@ -153,25 +158,73 @@ main(int argc, char ** argv)
   sc_sys.attach_assemble_function(assemble_poisson);
   sc_sys.create_static_condensation();
 
+  // Define the mesh refinement object that takes care of adaptively
+  // refining the mesh.
+  MeshRefinement mesh_refinement(mesh);
+
+  // These parameters determine the proportion of elements that will
+  // be refined and coarsened. Any element within 30% of the maximum
+  // error on any element will be refined, and any element within 30%
+  // of the minimum error on any element might be coarsened
+  mesh_refinement.refine_fraction()  = 0.7;
+  mesh_refinement.coarsen_fraction() = 0.3;
+  // We won't refine any element more than 2 times in total
+  mesh_refinement.max_h_level()      = 2;
+
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
-  // Prints information about the system to the screen.
-  equation_systems.print_info();
+  // Refinement parameters
+  const unsigned int max_r_steps = 2; // Refine the mesh 2 times
 
-  // Solve
-  sys.solve();
-  auto * sc_solver = dynamic_cast<PetscLinearSolver<Number> *>(sc_sys.get_linear_solver());
-  libmesh_assert(sc_solver);
-  KSP sc_ksp = sc_solver->ksp();
-  LibmeshPetscCall2(sc_solver->comm(), KSPSetType(sc_ksp, KSPPREONLY));
-  LibmeshPetscCall2(sc_solver->comm(), KSPSetInitialGuessNonzero(sc_ksp, PETSC_FALSE));
-  sc_sys.solve();
+  for (const auto r_step : make_range(max_r_steps + 1))
+    {
+      // Prints information about the system to the screen.
+      equation_systems.print_info();
 
-  libmesh_error_msg_if(!libMesh::relative_fuzzy_equals(*sys.solution, *sc_sys.solution, 1e-4),
-                       "mismatching solution");
-  libMesh::out << "Static condensation reduced problem size to "
-               << sc_sys.get_static_condensation().get_condensed_mat().m() << std::endl;
+      // Solve
+      sys.solve();
+      auto * sc_solver = dynamic_cast<PetscLinearSolver<Number> *>(sc_sys.get_linear_solver());
+      libmesh_assert(sc_solver);
+      KSP sc_ksp = sc_solver->ksp();
+      LibmeshPetscCall2(sc_solver->comm(), KSPSetType(sc_ksp, KSPPREONLY));
+      LibmeshPetscCall2(sc_solver->comm(), KSPSetInitialGuessNonzero(sc_ksp, PETSC_FALSE));
+      sc_sys.solve();
+
+      libmesh_error_msg_if(!libMesh::relative_fuzzy_equals(*sys.solution, *sc_sys.solution, 1e-4),
+                           "mismatching solution");
+      libMesh::out << "Static condensation reduced problem size to "
+                   << sc_sys.get_static_condensation().get_condensed_mat().m() << std::endl << std::endl;
+
+      // We need to ensure that the mesh is not refined on the last iteration
+      // of this loop, since we do not want to refine the mesh unless we are
+      // going to solve the equation system for that refined mesh.
+      if (r_step != max_r_steps)
+        {
+          // Error estimation objects, see Adaptivity Example 2 for details
+          ErrorVector error;
+          KellyErrorEstimator error_estimator;
+          error_estimator.use_unweighted_quadrature_rules = true;
+
+          // Compute the error for each active element
+          error_estimator.estimate_error(sys, error);
+
+          // Output error estimate magnitude
+          libMesh::out << "Error estimate\nl2 norm = " << error.l2_norm()
+                       << "\nmaximum = " << error.maximum() << std::endl << std::endl;
+
+          // Flag elements to be refined and coarsened
+          mesh_refinement.flag_elements_by_error_fraction(error);
+
+          // Perform refinement and coarsening
+          mesh_refinement.refine_and_coarsen_elements();
+
+          // Reinitialize the equation_systems object for the newly refined
+          // mesh. One of the steps in this is project the solution onto the
+          // new mesh
+          equation_systems.reinit();
+        }
+    }
 
 #if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 

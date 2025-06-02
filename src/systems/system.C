@@ -238,6 +238,11 @@ void System::init_data ()
   // Even if there weren't any constraint changes,
   // reinit_constraints() did prepare_send_list() for us.
 
+  // Now finally after dof distribution and construction of any
+  // possible constraints, we may init any static condensation
+  // data
+  _dof_map->reinit_static_condensation();
+
   // Resize the solution conformal to the current mesh
   solution->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 

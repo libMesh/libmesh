@@ -245,6 +245,19 @@ bool EquationSystems::reinit_solutions ()
         }
     }
 
+  // FIXME: For backwards compatibility, assume
+  // refine_and_coarsen_elements or refine_uniformly have already
+  // been called
+  //
+  // Note that static condensation can be reinitialized at the very end
+  // because it is not involved in the restriction or prolongation of
+  // the solution vectors. And it's a good thing that we can wait until
+  // the end because this method may contract the mesh which would invalidate
+  // any static condensation reinitialization performed before that point
+  // because we perform mappings from element IDs to degree of freedom data
+  for (unsigned int i=0; i != n_sys; ++i)
+    this->get_system(i).get_dof_map().reinit_static_condensation();
+
   return mesh_changed;
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
