@@ -187,6 +187,11 @@ bool EquationSystems::reinit_solutions ()
         // Recreate any user or internal constraints
         sys.reinit_constraints();
 
+        // Now finally after dof distribution and construction of any 
+        // possible constraints, we may reinit any static condensation
+        // data
+        sys.get_dof_map().reinit_static_condensation();
+
         sys.get_dof_map().prepare_send_list();
 
         sys.prolong_vectors();
