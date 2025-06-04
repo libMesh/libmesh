@@ -187,7 +187,8 @@ bool EquationSystems::reinit_solutions ()
         // Recreate any user or internal constraints
         sys.reinit_constraints();
 
-        sys.get_dof_map().prepare_send_list();
+        // Even if there weren't any constraint changes,
+        // reinit_constraints() did prepare_send_list() for us.
 
         sys.prolong_vectors();
       }
@@ -211,7 +212,10 @@ bool EquationSystems::reinit_solutions ()
               System & sys = this->get_system(i);
               sys.get_dof_map().distribute_dofs(_mesh);
               sys.reinit_constraints();
-              sys.get_dof_map().prepare_send_list();
+
+              // Even if there weren't any constraint changes,
+              // reinit_constraints() did prepare_send_list() for us.
+
               sys.restrict_vectors();
             }
           mesh_changed = true;
@@ -231,7 +235,10 @@ bool EquationSystems::reinit_solutions ()
               System & sys = this->get_system(i);
               sys.get_dof_map().distribute_dofs(_mesh);
               sys.reinit_constraints();
-              sys.get_dof_map().prepare_send_list();
+
+              // Even if there weren't any constraint changes,
+              // reinit_constraints() did prepare_send_list() for us.
+
               sys.prolong_vectors();
             }
           mesh_changed = true;
@@ -287,7 +294,9 @@ void EquationSystems::allgather ()
       // send_list after an allgather, but let's keep it in consistent
       // shape just in case.
       sys.reinit_constraints();
-      dof_map.prepare_send_list();
+
+      // Even if there weren't any constraint changes,
+      // reinit_constraints() did prepare_send_list() for us.
     }
 }
 
