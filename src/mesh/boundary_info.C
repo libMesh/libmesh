@@ -780,6 +780,9 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
         new_elem->set_extra_integer(parent_side_index_tag, s);
 
 #ifdef LIBMESH_ENABLE_AMR
+      new_elem->set_refinement_flag(elem->refinement_flag());
+      new_elem->set_p_refinement_flag(elem->p_refinement_flag());
+
       // Set parent links
       if (elem->parent())
         {
@@ -792,8 +795,6 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           libmesh_assert(side_parent);
 
           new_elem->set_parent(side_parent);
-
-          side_parent->set_refinement_flag(Elem::INACTIVE);
 
           // Figuring out which child we are of our parent
           // is a trick.  Due to libMesh child numbering
