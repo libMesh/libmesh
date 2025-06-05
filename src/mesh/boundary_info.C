@@ -478,12 +478,18 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
    * into dangling pointers, and it won't be easy to tell which.  So
    * we'll keep around a distributed copy for that case, and query it
    * to fix up interior_parent() links as necessary.
+   *
+   * We'll also need to make sure to unserialize the mesh *before* we
+   * prepare the boundary mesh for use, or the prepare_for_use() call
+   * on a refined boundary mesh will happily notice that it can find
+   * and restore some refined elements' interior_parent pointers, not
+   * knowing that those interior parents are about to go remote.
    */
   std::unique_ptr<MeshBase> mesh_copy;
   if (boundary_mesh.is_serial() && !_mesh->is_serial())
     mesh_copy = _mesh->clone();
 
-  MeshSerializer serializer
+  auto serializer = std::make_unique<MeshSerializer>
     (const_cast<MeshBase &>(*_mesh), boundary_mesh.is_serial());
 
   /**
@@ -565,6 +571,11 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   // Don't repartition this mesh; we want it to stay in sync with the
   // interior partitioning.
   boundary_mesh.partitioner().reset(nullptr);
+
+  // Deserialize the interior mesh before the boundary mesh
+  // prepare_for_use() can come to erroneous conclusions about which
+  // of its elements are semilocal
+  serializer.reset();
 
   // Make boundary_mesh nodes and elements contiguous
   boundary_mesh.prepare_for_use();
