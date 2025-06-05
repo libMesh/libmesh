@@ -152,9 +152,10 @@ protected:
         dof_id_type parent_side_index =
           belem->get_extra_integer(parent_side_index_tag);
 
-        CPPUNIT_ASSERT_EQUAL
-          (static_cast<dof_id_type>(belem->interior_parent()->which_side_am_i(belem)),
-           parent_side_index);
+        if (belem->interior_parent() != remote_elem)
+          CPPUNIT_ASSERT_EQUAL
+            (static_cast<dof_id_type>(belem->interior_parent()->which_side_am_i(belem)),
+             parent_side_index);
       }
 
     std::set<boundary_id_type> left_id, right_id;
