@@ -37,9 +37,10 @@ protected:
   std::unique_ptr<UnstructuredMesh> _left_boundary_mesh;
   std::unique_ptr<UnstructuredMesh> _internal_boundary_mesh;
 
-  // We create an internal sideset ID that does not conflict with
+  // We create internal sideset IDs that do not conflict with
   // sidesets 0-3 that get created by build_square().
-  static constexpr boundary_id_type bid = 5;
+  static constexpr boundary_id_type bid1 = 5;
+  static constexpr boundary_id_type bid2 = 6;
 
   void build_mesh()
   {
@@ -117,16 +118,16 @@ protected:
         if (c(0) < 0.6 && c(1) < 0.4)
           {
             if (c(0) > 0.4)
-              bi.add_side(elem, 1, bid);
+              bi.add_side(elem, 1, bid1);
             if (c(1) > 0.3)
-              bi.add_side(elem, 2, bid);
+              bi.add_side(elem, 2, bid1);
           }
         else
           {
             if (c(0) < 0.75 && c(1) < 0.4)
-              bi.add_side(elem, 3, bid);
+              bi.add_side(elem, 3, bid2);
             if (c(0) < 0.6 && c(1) < 0.5)
-              bi.add_side(elem, 0, bid);
+              bi.add_side(elem, 0, bid2);
           }
       }
   }
@@ -138,8 +139,20 @@ protected:
     _mesh->get_boundary_info().sync(exterior_boundaries,
                                     *_exterior_boundary_mesh);
 
-    // Get everything
-    _mesh->get_boundary_info().sync(*_all_boundary_mesh);
+    // Get everything, for some sense of "everything".  Our interior
+    // boundary has boundary ids applied from both sides, but if we
+    // build sides from both directions then we have a (badly!)
+    // non-manifold mesh, which we don't support, because of the
+    // difficulty constructing neighbor_ptr pointers sensibly.
+    //
+    // Even with this one-sided configuration, we end up with a mesh
+    // that's non-manifold at two points, where the interior boundary
+    // intersects the exterior boundary.  That prevented us from
+    // making this a distributed mesh; hopefully it won't cause more
+    // problems too.
+    const std::set<boundary_id_type> all_boundaries {0, 1, 2, 3, 5};
+    _mesh->get_boundary_info().sync(all_boundaries,
+                                    *_all_boundary_mesh);
 
     // Check that the interior_parent side indices that we set on the
     // BoundaryMesh as extra integers agree with the side returned
@@ -174,10 +187,9 @@ protected:
     _mesh->get_boundary_info().sync(left_id, *_left_boundary_mesh);
 
 
-    // Create a BoundaryMesh from the internal sideset relative to subdomain 1.
+    // Create a BoundaryMesh from the internal sidesets relative to subdomain 1.
     {
-      std::set<boundary_id_type> requested_boundary_ids;
-      requested_boundary_ids.insert(bid);
+      std::set<boundary_id_type> requested_boundary_ids {bid1, bid2};
       std::set<subdomain_id_type> subdomains_relative_to;
       subdomains_relative_to.insert(1);
       _mesh->get_boundary_info().sync(requested_boundary_ids,
@@ -232,9 +244,9 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(9),
                          _internal_boundary_mesh->n_nodes());
 
-    // There'd better be 2*(3+5)+2*4 elements on the total
-    // boundary (which includes both sides of the internal boundary)
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(24),
+    // There'd better be 2*(3+5)+4 elements on the total
+    // boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(20),
                          _all_boundary_mesh->n_elem());
 
     // There'd better be 2*2*(3+5) + 2*4-1 nodes on the total boundary
@@ -448,13 +460,13 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
                          _internal_boundary_mesh->n_nodes());
 
-    // There'd better be 2*2*(3+5) + 2*2*4 active elements on the total
-    // boundary (which includes both sides of the internal boundary)
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(48),
+    // There'd better be 2*2*(3+5) + 2*4 active elements on the total
+    // boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(40),
                          _all_boundary_mesh->n_active_elem());
 
-    // Plus the original 24 now-inactive elements
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(72),
+    // Plus the original 20 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(60),
                          _all_boundary_mesh->n_elem());
 
     // There'd better be 2*2*2*(3+5) + 2*2*4-1 nodes on the total boundary
@@ -578,13 +590,13 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
                          _internal_boundary_mesh->n_nodes());
 
-    // There'd better be 2*2*(3+5) + 2*2*4 active elements on the total
-    // boundary (which includes both sides of the internal boundary)
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(48),
+    // There'd better be 2*2*(3+5) + 2*4 active elements on the total
+    // boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(40),
                          _all_boundary_mesh->n_active_elem());
 
-    // Plus the original 24 now-inactive elements
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(72),
+    // Plus the original 20 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(60),
                          _all_boundary_mesh->n_elem());
 
     // There'd better be 2*2*2*(3+5) + 2*2*4-1 nodes on the total boundary
