@@ -44,7 +44,15 @@ protected:
   void build_mesh()
   {
     _mesh = std::make_unique<Mesh>(*TestCommWorld);
-    _all_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
+
+    // The mesh of all boundaries is, because of the two nodes each
+    // joining three edges where the internal boundary meets the
+    // external boundary, not a manifold mesh.  We still have work to
+    // do to properly support non-manifold meshes.  In particular, we
+    // can't yet refine them correctly if they're distributed, so
+    // we'll force this one to be Replicated.
+    _all_boundary_mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
+
     _exterior_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
 
     // We want to test Distributed->Replicated sync; this does that in
