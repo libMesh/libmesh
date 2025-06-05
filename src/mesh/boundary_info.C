@@ -818,6 +818,22 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
               side_parent->add_child(new_elem, 3);
             }
         }
+
+      // Set remote_elem child links if necessary.  Rather than
+      // worrying about which interior child corresponds to which side
+      // child we'll just set all null links to be remote and we'll
+      // rely on our detection of actual semilocal children to
+      // overwrite the links that shouldn't be remote.
+      if (elem->has_children())
+        for (auto c : make_range(elem->n_children()))
+          if (elem->child_ptr(c) == remote_elem &&
+              elem->is_child_on_side(c, s))
+            {
+              for (auto sc : make_range(new_elem->n_children()))
+                if (!new_elem->raw_child_ptr(sc))
+                  new_elem->add_child
+                    (const_cast<RemoteElem*>(remote_elem), sc);
+            }
 #endif
 
       new_elem->set_interior_parent (elem);
