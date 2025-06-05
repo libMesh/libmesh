@@ -661,7 +661,10 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   LOG_SCOPE("add_elements()", "BoundaryInfo");
 
   // We're not prepared to mix serial and distributed meshes in this
-  // method, so make sure they match from the start.
+  // method, so make sure their statuses match from the start.
+  //
+  // Specifically test *is_serial* here - we can handle a mix of
+  // ReplicatedMesh and serialized DistributedMesh.
   libmesh_assert_equal_to(_mesh->is_serial(),
                           boundary_mesh.is_serial());
 
