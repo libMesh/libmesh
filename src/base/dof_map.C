@@ -39,7 +39,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
-#include "libmesh/static_condensation.h"
+#include "libmesh/static_condensation_dof_map.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -59,7 +59,8 @@ namespace libMesh
 // DofMap member functions
 std::unique_ptr<SparsityPattern::Build>
 DofMap::build_sparsity (const MeshBase & mesh,
-                        const bool calculate_constrained) const
+                        const bool calculate_constrained,
+                        const bool use_condensed_system) const
 {
   libmesh_assert (mesh.is_prepared());
 
@@ -78,6 +79,13 @@ DofMap::build_sparsity (const MeshBase & mesh,
   // between neighbor dofs
   bool implicit_neighbor_dofs = this->use_coupled_neighbor_dofs(mesh);
 
+  const StaticCondensationDofMap * sc = nullptr;
+  if (use_condensed_system)
+    {
+      libmesh_assert(this->has_static_condensation());
+      sc = _sc.get();
+    }
+
   // We can compute the sparsity pattern in parallel on multiple
   // threads.  The goal is for each thread to compute the full sparsity
   // pattern for a subset of elements.  These sparsity patterns can
@@ -92,7 +100,8 @@ DofMap::build_sparsity (const MeshBase & mesh,
      this->_coupling_functors,
      implicit_neighbor_dofs,
      need_full_sparsity_pattern,
-     calculate_constrained);
+     calculate_constrained,
+     sc);
 
   Threads::parallel_reduce (ConstElemRange (mesh.active_local_elements_begin(),
                                             mesh.active_local_elements_end()), *sp);
@@ -126,7 +135,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
 
 DofMap::DofMap(const unsigned int number,
                MeshBase & mesh) :
-  ParallelObject (mesh.comm()),
+  DofMapBase (mesh.comm()),
   _dof_coupling(nullptr),
   _error_on_constraint_loop(false),
   _constrained_sparsity_construction(false),
@@ -136,8 +145,6 @@ DofMap::DofMap(const unsigned int number,
   _sys_number(number),
   _mesh(mesh),
   _matrices(),
-  _first_df(),
-  _end_df(),
   _first_scalar_df(),
   _send_list(),
   _augment_sparsity_pattern(nullptr),
@@ -149,13 +156,9 @@ DofMap::DofMap(const unsigned int number,
   _default_coupling(std::make_unique<DefaultCoupling>()),
   _default_evaluating(std::make_unique<DefaultCoupling>()),
   need_full_sparsity_pattern(false),
-  _n_dfs(0),
   _n_SCALAR_dofs(0)
 #ifdef LIBMESH_ENABLE_AMR
-  , _n_old_dfs(0),
-  _first_old_df(),
-  _end_old_df(),
-  _first_old_scalar_df()
+  , _first_old_scalar_df()
 #endif
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
   , _dof_constraints()
@@ -897,6 +900,8 @@ void DofMap::invalidate_dofs(MeshBase & mesh) const
 
 void DofMap::clear()
 {
+  DofMapBase::clear();
+
   // we don't want to clear
   // the coupling matrix!
   // It should not change...
@@ -945,8 +950,6 @@ void DofMap::clear()
   _variable_groups.clear();
   _var_to_vg.clear();
   _variable_group_numbers.clear();
-  _first_df.clear();
-  _end_df.clear();
   _first_scalar_df.clear();
   this->clear_send_list();
   this->clear_sparsity();
@@ -966,8 +969,8 @@ void DofMap::clear()
 #endif
 
   _matrices.clear();
-
-  _n_dfs = 0;
+  if (_sc)
+    _sc->clear();
 }
 
 
@@ -983,7 +986,9 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   libmesh_assert (mesh.is_prepared());
 
   const processor_id_type proc_id = this->processor_id();
+#ifndef NDEBUG
   const processor_id_type n_proc  = this->n_processors();
+#endif
 
   //  libmesh_assert_greater (this->n_variables(), 0);
   libmesh_assert_less (proc_id, n_proc);
@@ -1020,23 +1025,7 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
       (next_free_dof, mesh, constraining_subdomains);
 
   // Get DOF counts on all processors
-  std::vector<dof_id_type> dofs_on_proc(n_proc, 0);
-  this->comm().allgather(next_free_dof, dofs_on_proc);
-
-  // Resize and fill the _first_df and _end_df arrays
-#ifdef LIBMESH_ENABLE_AMR
-  _first_old_df = _first_df;
-  _end_old_df = _end_df;
-#endif
-
-  _first_df.resize(n_proc);
-  _end_df.resize (n_proc);
-
-  // Get DOF offsets
-  _first_df[0] = 0;
-  for (processor_id_type i=1; i < n_proc; ++i)
-    _first_df[i] = _end_df[i-1] = _first_df[i-1] + dofs_on_proc[i-1];
-  _end_df[n_proc-1] = _first_df[n_proc-1] + dofs_on_proc[n_proc-1];
+  const auto n_dofs = this->compute_dof_info(next_free_dof);
 
   // Clear all the current DOF indices
   // (distribute_dofs expects them cleared!)
@@ -1111,16 +1100,13 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   }
 #endif
 
-  // Set the total number of degrees of freedom, then start finding
-  // SCALAR degrees of freedom
+  // start finding SCALAR degrees of freedom
 #ifdef LIBMESH_ENABLE_AMR
-  _n_old_dfs = _n_dfs;
   _first_old_scalar_df = _first_scalar_df;
 #endif
-  _n_dfs = _end_df[n_proc-1];
   _first_scalar_df.clear();
   _first_scalar_df.resize(this->n_variables(), DofObject::invalid_id);
-  dof_id_type current_SCALAR_dof_index = n_dofs() - n_SCALAR_dofs();
+  dof_id_type current_SCALAR_dof_index = n_dofs - n_SCALAR_dofs();
 
   // Calculate and cache the initial DoF indices for SCALAR variables.
   // This is an O(N_vars) calculation so we want to do it once per
@@ -1151,18 +1137,16 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   // each element.
   this->add_neighbors_to_send_list(mesh);
 
+  // With the global dofs determined, initialize the condensed dof data if it exists
+  if (_sc)
+    _sc->reinit();
+
   // Here we used to clean up that data structure; now System and
   // EquationSystems call that for us, after we've added constraint
   // dependencies to the send_list too.
   // this->sort_send_list ();
 
-  // Return total number of DOFs across all procs. We compute and
-  // return this as a std::size_t so that we can detect situations in
-  // which the total number of DOFs across all procs would exceed the
-  // capability of the underlying NumericVector representation to
-  // index into it correctly (std::size_t is the largest unsigned
-  // type, so no NumericVector representation can exceed it).
-  return std::accumulate(dofs_on_proc.begin(), dofs_on_proc.end(), static_cast<std::size_t>(0));
+  return n_dofs;
 }
 
 
@@ -3090,6 +3074,11 @@ std::string DofMap::get_info() const
 #endif // LIBMESH_ENABLE_CONSTRAINTS
 
   return os.str();
+}
+
+void DofMap::create_static_condensation(const MeshBase & mesh, System & sys)
+{
+  _sc = std::make_unique<StaticCondensationDofMap>(mesh, sys, *this);
 }
 
 template LIBMESH_EXPORT bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;

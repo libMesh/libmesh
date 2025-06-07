@@ -1888,7 +1888,7 @@ public:
    * \returns \p true if this \p System has a matrix associated with the
    * given name, \p false otherwise.
    */
-  inline bool have_matrix (std::string_view mat_name) const { return _matrices.count(mat_name); };
+  inline bool have_matrix (std::string_view mat_name) const { return _matrices.count(mat_name); }
 
   /**
    * \returns A const pointer to this system's additional matrix
@@ -1936,6 +1936,16 @@ public:
    * prefix is only used if \p prefix_with_name()
    */
   std::string prefix() const { return this->name() + "_"; }
+
+  /**
+   * Request that static condensation be performed for this system
+   */
+   virtual void create_static_condensation();
+
+   /**
+    * @returns Whether this system will be statically condensed
+    */
+   bool has_static_condensation() const;
 
 protected:
 
@@ -2439,7 +2449,7 @@ unsigned int System::n_components() const
     return 0;
 
   const Variable & last = _variables.back();
-  return last.first_scalar_number() + last.n_components();
+  return last.first_scalar_number() + last.n_components(this->get_mesh());
 }
 
 

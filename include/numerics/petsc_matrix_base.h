@@ -118,6 +118,7 @@ public:
    * it, or very bad things will likely happen!
    */
   Mat mat () { libmesh_assert (_mat); return _mat; }
+  Mat mat() const { libmesh_assert(_mat); return _mat; }
 
   /**
    * clear() is called from the destructor, so it should not throw.

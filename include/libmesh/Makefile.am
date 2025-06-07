@@ -9,6 +9,7 @@ BUILT_SOURCES = \
         auto_ptr.h \
         dirichlet_boundaries.h \
         dof_map.h \
+        dof_map_base.h \
         dof_object.h \
         factory.h \
         float128_shims.h \
@@ -280,6 +281,7 @@ BUILT_SOURCES = \
         sparse_matrix.h \
         sparse_shell_matrix.h \
         static_condensation.h \
+        static_condensation_dof_map.h \
         static_condensation_preconditioner.h \
         sum_shell_matrix.h \
         tensor_shell_matrix.h \
@@ -620,6 +622,9 @@ dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_map.h: $(top_srcdir)/include/base/dof_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+dof_map_base.h: $(top_srcdir)/include/base/dof_map_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_object.h: $(top_srcdir)/include/base/dof_object.h
@@ -1433,6 +1438,9 @@ sparse_shell_matrix.h: $(top_srcdir)/include/numerics/sparse_shell_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 static_condensation.h: $(top_srcdir)/include/numerics/static_condensation.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+static_condensation_dof_map.h: $(top_srcdir)/include/numerics/static_condensation_dof_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 static_condensation_preconditioner.h: $(top_srcdir)/include/numerics/static_condensation_preconditioner.h
