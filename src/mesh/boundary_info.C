@@ -478,12 +478,18 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
    * into dangling pointers, and it won't be easy to tell which.  So
    * we'll keep around a distributed copy for that case, and query it
    * to fix up interior_parent() links as necessary.
+   *
+   * We'll also need to make sure to unserialize the mesh *before* we
+   * prepare the boundary mesh for use, or the prepare_for_use() call
+   * on a refined boundary mesh will happily notice that it can find
+   * and restore some refined elements' interior_parent pointers, not
+   * knowing that those interior parents are about to go remote.
    */
   std::unique_ptr<MeshBase> mesh_copy;
   if (boundary_mesh.is_serial() && !_mesh->is_serial())
     mesh_copy = _mesh->clone();
 
-  MeshSerializer serializer
+  auto serializer = std::make_unique<MeshSerializer>
     (const_cast<MeshBase &>(*_mesh), boundary_mesh.is_serial());
 
   /**
@@ -565,6 +571,11 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   // Don't repartition this mesh; we want it to stay in sync with the
   // interior partitioning.
   boundary_mesh.partitioner().reset(nullptr);
+
+  // Deserialize the interior mesh before the boundary mesh
+  // prepare_for_use() can come to erroneous conclusions about which
+  // of its elements are semilocal
+  serializer.reset();
 
   // Make boundary_mesh nodes and elements contiguous
   boundary_mesh.prepare_for_use();
@@ -650,9 +661,21 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   LOG_SCOPE("add_elements()", "BoundaryInfo");
 
   // We're not prepared to mix serial and distributed meshes in this
-  // method, so make sure they match from the start.
+  // method, so make sure their statuses match from the start.
+  //
+  // Specifically test *is_serial* here - we can handle a mix of
+  // ReplicatedMesh and serialized DistributedMesh.
   libmesh_assert_equal_to(_mesh->is_serial(),
                           boundary_mesh.is_serial());
+
+  // If the boundary mesh already has interior pointers pointing at
+  // elements in a third mesh then we're in trouble
+  libmesh_assert(&boundary_mesh.interior_mesh() == &boundary_mesh ||
+                 &boundary_mesh.interior_mesh() == _mesh);
+
+  // And now we're going to add interior pointers to elements from
+  // this mesh
+  boundary_mesh.set_interior_mesh(*_mesh);
 
   std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
   this->_find_id_maps(requested_boundary_ids,
@@ -682,25 +705,18 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           !subdomains_relative_to.count(elem->subdomain_id()))
         continue;
 
-      // Get the top-level parent for this element
-      const Elem * top_parent = elem->top_parent();
-
-      // Find all the boundary side ids for this Elem.
-      auto bounds = _boundary_side_id.equal_range(top_parent);
-
       for (auto s : elem->side_index_range())
         {
           bool add_this_side = false;
-          boundary_id_type this_bcid = invalid_id;
 
-          for (const auto & pr : as_range(bounds))
+          // Find all the boundary side ids for this Elem side.
+          std::vector<boundary_id_type> bcids;
+          this->boundary_ids(elem, s, bcids);
+
+          for (const boundary_id_type bcid : bcids)
             {
-              this_bcid = pr.second.second;
-
-              // if this side is flagged with a boundary condition
-              // and the user wants this id
-              if ((pr.second.first == s) &&
-                  (requested_boundary_ids.count(this_bcid)))
+              // if the user wants this id, we want this side
+              if (requested_boundary_ids.count(bcid))
                 {
                   add_this_side = true;
                   break;
@@ -713,8 +729,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           // boundary was copied to the BoundaryMesh, and handles the
           // case where elements on the geometric boundary are not in
           // any sidesets.
-          if (bounds.first == bounds.second            &&
-              requested_boundary_ids.count(invalid_id) &&
+          if (requested_boundary_ids.count(invalid_id) &&
               elem->neighbor_ptr(s) == nullptr)
             add_this_side = true;
 
@@ -765,6 +780,9 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
         new_elem->set_extra_integer(parent_side_index_tag, s);
 
 #ifdef LIBMESH_ENABLE_AMR
+      new_elem->set_refinement_flag(elem->refinement_flag());
+      new_elem->set_p_refinement_flag(elem->p_refinement_flag());
+
       // Set parent links
       if (elem->parent())
         {
@@ -777,8 +795,6 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
           libmesh_assert(side_parent);
 
           new_elem->set_parent(side_parent);
-
-          side_parent->set_refinement_flag(Elem::INACTIVE);
 
           // Figuring out which child we are of our parent
           // is a trick.  Due to libMesh child numbering
@@ -802,6 +818,22 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
               side_parent->add_child(new_elem, 3);
             }
         }
+
+      // Set remote_elem child links if necessary.  Rather than
+      // worrying about which interior child corresponds to which side
+      // child we'll just set all null links to be remote and we'll
+      // rely on our detection of actual semilocal children to
+      // overwrite the links that shouldn't be remote.
+      if (elem->has_children())
+        for (auto c : make_range(elem->n_children()))
+          if (elem->child_ptr(c) == remote_elem &&
+              elem->is_child_on_side(c, s))
+            {
+              for (auto sc : make_range(new_elem->n_children()))
+                if (!new_elem->raw_child_ptr(sc))
+                  new_elem->add_child
+                    (const_cast<RemoteElem*>(remote_elem), sc);
+            }
 #endif
 
       new_elem->set_interior_parent (elem);
@@ -3136,26 +3168,18 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
           !subdomains_relative_to.count(elem->subdomain_id()))
         continue;
 
-      // Get the top-level parent for this element. This is used for
-      // searching for boundary sides on this element.
-      const Elem * top_parent = elem->top_parent();
-
-      // Find all the boundary side ids for this Elem.
-      auto bounds = _boundary_side_id.equal_range(top_parent);
-
       for (auto s : elem->side_index_range())
         {
           bool add_this_side = false;
-          boundary_id_type this_bcid = invalid_id;
 
-          for (const auto & pr : as_range(bounds))
+          // Find all the boundary side ids for this Elem side.
+          std::vector<boundary_id_type> bcids;
+          this->boundary_ids(elem, s, bcids);
+
+          for (const boundary_id_type bcid : bcids)
             {
-              this_bcid = pr.second.second;
-
-              // if this side is flagged with a boundary condition
-              // and the user wants this id
-              if ((pr.second.first == s) &&
-                  (requested_boundary_ids.count(this_bcid)))
+              // if the user wants this id, we want this side
+              if (requested_boundary_ids.count(bcid))
                 {
                   add_this_side = true;
                   break;
@@ -3168,8 +3192,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
           // boundary was copied to the BoundaryMesh, and handles the
           // case where elements on the geometric boundary are not in
           // any sidesets.
-          if (bounds.first == bounds.second            &&
-              requested_boundary_ids.count(invalid_id) &&
+          if (requested_boundary_ids.count(invalid_id) &&
               elem->neighbor_ptr(s) == nullptr)
             add_this_side = true;
 
