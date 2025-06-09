@@ -32,7 +32,7 @@ public:
 protected:
 
   std::unique_ptr<UnstructuredMesh> _mesh;
-  std::unique_ptr<UnstructuredMesh> _all_boundary_mesh;
+  std::unique_ptr<UnstructuredMesh> _multi_boundary_mesh;
   std::unique_ptr<UnstructuredMesh> _exterior_boundary_mesh;
   std::unique_ptr<UnstructuredMesh> _left_boundary_mesh;
   std::unique_ptr<UnstructuredMesh> _internal_boundary_mesh;
@@ -45,15 +45,7 @@ protected:
   void build_mesh()
   {
     _mesh = std::make_unique<Mesh>(*TestCommWorld);
-
-    // The mesh of all boundaries is, because of the two nodes each
-    // joining three edges where the internal boundary meets the
-    // external boundary, not a manifold mesh.  We still have work to
-    // do to properly support non-manifold meshes.  In particular, we
-    // can't yet refine them correctly if they're distributed, so
-    // we'll force this one to be Replicated.
-    _all_boundary_mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
-
+    _multi_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
     _exterior_boundary_mesh = std::make_unique<Mesh>(*TestCommWorld);
 
     // We want to test Distributed->Replicated sync; this does that in
@@ -74,7 +66,7 @@ protected:
       {
         _mesh->skip_noncritical_partitioning(true);
         _left_boundary_mesh->skip_noncritical_partitioning(true);
-        _all_boundary_mesh->skip_noncritical_partitioning(true);
+        _multi_boundary_mesh->skip_noncritical_partitioning(true);
         _exterior_boundary_mesh->skip_noncritical_partitioning(true);
         _internal_boundary_mesh->skip_noncritical_partitioning(true);
       }
@@ -139,28 +131,28 @@ protected:
     _mesh->get_boundary_info().sync(exterior_boundaries,
                                     *_exterior_boundary_mesh);
 
-    // Get everything, for some sense of "everything".  Our interior
-    // boundary has boundary ids applied from both sides, but if we
-    // build sides from both directions then we have a (badly!)
-    // non-manifold mesh, which we don't support, because of the
-    // difficulty constructing neighbor_ptr pointers sensibly.
-    //
-    // Even with this one-sided configuration, we end up with a mesh
-    // that's non-manifold at two points, where the interior boundary
-    // intersects the exterior boundary.  That prevented us from
-    // making this a distributed mesh; hopefully it won't cause more
-    // problems too.
-    const std::set<boundary_id_type> all_boundaries {0, 1, 2, 3, 5};
-    _mesh->get_boundary_info().sync(all_boundaries,
-                                    *_all_boundary_mesh);
+    // The mesh of all boundaries is, because of the two nodes each
+    // joining three edges where the internal boundary meets the
+    // external boundary, not a manifold mesh.  We still have work to
+    // do to properly support non-manifold meshes, and
+    // find_neighbors() when preparing such a mesh is likely to fail,
+    // so we'll just do the best test we can here, requesting a set of
+    // three different boundaries.  We drop the left and bottom
+    // boundaries because they have any T intersections with the
+    // interior boundaries, and we drop one of the interior boundaries
+    // because with both together we'd have 4 edges meeting at every
+    // interior boundary vertex.
+    const std::set<boundary_id_type> multi_boundaries {1, 2, 5};
+    _mesh->get_boundary_info().sync(multi_boundaries,
+                                    *_multi_boundary_mesh);
 
     // Check that the interior_parent side indices that we set on the
     // BoundaryMesh as extra integers agree with the side returned
     // by which_side_am_i().
     unsigned int parent_side_index_tag =
-      _all_boundary_mesh->get_elem_integer_index("parent_side_index");
+      _multi_boundary_mesh->get_elem_integer_index("parent_side_index");
 
-    for (const auto & belem : _all_boundary_mesh->element_ptr_range())
+    for (const auto & belem : _multi_boundary_mesh->element_ptr_range())
       {
         dof_id_type parent_side_index =
           belem->get_extra_integer(parent_side_index_tag);
@@ -244,14 +236,13 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(9),
                          _internal_boundary_mesh->n_nodes());
 
-    // There'd better be 2*(3+5)+4 elements on the total
-    // boundary
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(20),
-                         _all_boundary_mesh->n_elem());
+    // There'd better be 3+5 + 4 elements on the multi-boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(12),
+                         _multi_boundary_mesh->n_elem());
 
-    // There'd better be 2*2*(3+5) + 2*4-1 nodes on the total boundary
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(39),
-                         _all_boundary_mesh->n_nodes());
+    // There'd better be (3+5)*2+1 + 4*2+1 nodes on the multi-boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(26),
+                         _multi_boundary_mesh->n_nodes());
 
     this->sanityCheck();
   }
@@ -399,7 +390,7 @@ public:
     // if we want to get interior_parent links right.
     MeshRefinement(*_mesh).uniformly_refine(1);
 
-    MeshRefinement(*_all_boundary_mesh).uniformly_refine(1);
+    MeshRefinement(*_multi_boundary_mesh).uniformly_refine(1);
     MeshRefinement(*_exterior_boundary_mesh).uniformly_refine(1);
     MeshRefinement(*_left_boundary_mesh).uniformly_refine(1);
     MeshRefinement(*_internal_boundary_mesh).uniformly_refine(1);
@@ -460,18 +451,19 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
                          _internal_boundary_mesh->n_nodes());
 
-    // There'd better be 2*2*(3+5) + 2*4 active elements on the total
-    // boundary
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(40),
-                         _all_boundary_mesh->n_active_elem());
+    // There'd better be 2*(3+5) + 2*4 active elements on the
+    // multi-boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(24),
+                         _multi_boundary_mesh->n_active_elem());
 
-    // Plus the original 20 now-inactive elements
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(60),
-                         _all_boundary_mesh->n_elem());
+    // Plus the original 12 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(36),
+                         _multi_boundary_mesh->n_elem());
 
-    // There'd better be 2*2*2*(3+5) + 2*2*4-1 nodes on the total boundary
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(79),
-                         _all_boundary_mesh->n_nodes());
+    // There'd better be 2*2*(3+5)+1 + 2*2*4+1 nodes on the
+    // multi-boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(50),
+                         _multi_boundary_mesh->n_nodes());
 
 
     this->sanityCheck();
@@ -590,18 +582,18 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(17),
                          _internal_boundary_mesh->n_nodes());
 
-    // There'd better be 2*2*(3+5) + 2*4 active elements on the total
-    // boundary
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(40),
-                         _all_boundary_mesh->n_active_elem());
+    // There'd better be 2*(3+5) + 2*4 active elements on the
+    // multi-boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(24),
+                         _multi_boundary_mesh->n_active_elem());
 
-    // Plus the original 20 now-inactive elements
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(60),
-                         _all_boundary_mesh->n_elem());
+    // Plus the original 12 now-inactive elements
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(36),
+                         _multi_boundary_mesh->n_elem());
 
     // There'd better be 2*2*2*(3+5) + 2*2*4-1 nodes on the total boundary
-    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(79),
-                         _all_boundary_mesh->n_nodes());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(50),
+                         _multi_boundary_mesh->n_nodes());
 
     this->sanityCheck();
   }
