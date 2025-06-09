@@ -97,15 +97,28 @@ protected:
   std::unique_ptr<UnstructuredMesh> _mesh;
   std::unique_ptr<UnstructuredMesh> _replicated_boundary_mesh;
   std::unique_ptr<UnstructuredMesh> _distributed_boundary_mesh;
+  std::unique_ptr<UnstructuredMesh> _interior_node_mesh;
 
   void build_mesh()
   {
     _mesh = std::make_unique<Mesh>(*TestCommWorld);
     _replicated_boundary_mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
     _distributed_boundary_mesh = std::make_unique<DistributedMesh>(*TestCommWorld);
+    _interior_node_mesh = std::make_unique<Mesh>(*TestCommWorld);
 
     MeshTools::Generation::build_line(*_mesh, 3,
                                         0.2, 0.8, EDGE3);
+
+    static constexpr boundary_id_type bid_int = 2;
+
+    // Add an interior boundary too
+    BoundaryInfo & bi = _mesh->get_boundary_info();
+    for (auto & elem : _mesh->active_element_ptr_range())
+      {
+        const Point c = elem->vertex_average();
+        if (c(0) > 0.6)
+          bi.add_side(elem, 0, bid_int);
+      }
 
     // We'll need to skip most repartitioning with DistributedMesh for
     // now; otherwise the boundary meshes' interior parents might get
@@ -130,6 +143,11 @@ protected:
     _mesh->get_boundary_info().sync(exterior_boundaries,
                                     *_distributed_boundary_mesh);
     check_parent_side_index_tag(*_distributed_boundary_mesh);
+
+    const std::set<boundary_id_type> interior_boundaries {2};
+    _mesh->get_boundary_info().sync(interior_boundaries,
+                                    *_interior_node_mesh);
+    check_parent_side_index_tag(*_interior_node_mesh);
 
     // Add the right side of the square to the square; this should
     // make it a mixed dimension mesh. We skip storing the parent
@@ -177,6 +195,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2),
                          _distributed_boundary_mesh->n_nodes());
 
+    // There'd better be 1 nodeelem on the interior boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(1),
+                         _interior_node_mesh->n_elem());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(1),
+                         _interior_node_mesh->n_nodes());
+
     this->sanityCheck();
   }
 
@@ -205,10 +229,9 @@ public:
   {
     sanity_check_mesh(*_mesh, NODEELEM, EDGE3, true);
 
-    for (const UnstructuredMesh * boundary_mesh :
-         { _replicated_boundary_mesh.get(),
-           _distributed_boundary_mesh.get() })
-      sanity_check_mesh(*boundary_mesh, NODEELEM, EDGE3, false);
+    sanity_check_mesh(*_replicated_boundary_mesh, NODEELEM, EDGE3, false);
+    sanity_check_mesh(*_distributed_boundary_mesh, NODEELEM, EDGE3, false);
+    sanity_check_mesh(*_interior_node_mesh, NODEELEM, EDGE3, false);
   }
 };
 
