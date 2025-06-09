@@ -12,7 +12,218 @@
 
 #include <memory>
 
+namespace {
+
+  using namespace libMesh;
+
+  // Check that the interior_parent side indices that we set on a
+  // BoundaryMesh as extra integers agree with the side returned by
+  // which_side_am_i().
+  void check_parent_side_index_tag(libMesh::UnstructuredMesh & boundary_mesh)
+  {
+    const unsigned int parent_side_index_tag =
+      boundary_mesh.get_elem_integer_index("parent_side_index");
+
+    for (const auto & belem : boundary_mesh.element_ptr_range())
+      {
+        const dof_id_type parent_side_index =
+          belem->get_extra_integer(parent_side_index_tag);
+
+        if (belem->interior_parent() != remote_elem)
+          CPPUNIT_ASSERT_EQUAL
+            (static_cast<dof_id_type>(belem->interior_parent()->which_side_am_i(belem)),
+             parent_side_index);
+      }
+  }
+
+}
+
 using namespace libMesh;
+
+class BoundaryMesh0DTest : public CppUnit::TestCase {
+  /**
+   * The goal of this test is to ensure that a 1D mesh generates
+   * boundary meshes correctly.
+   */
+public:
+  LIBMESH_CPPUNIT_TEST_SUITE( BoundaryMesh0DTest );
+
+#if LIBMESH_DIM > 1
+  CPPUNIT_TEST( testMesh );
+#endif
+
+  CPPUNIT_TEST_SUITE_END();
+
+protected:
+
+  std::unique_ptr<UnstructuredMesh> _mesh;
+  std::unique_ptr<UnstructuredMesh> _replicated_boundary_mesh;
+  std::unique_ptr<UnstructuredMesh> _distributed_boundary_mesh;
+
+  void build_mesh()
+  {
+    _mesh = std::make_unique<Mesh>(*TestCommWorld);
+    _replicated_boundary_mesh = std::make_unique<ReplicatedMesh>(*TestCommWorld);
+    _distributed_boundary_mesh = std::make_unique<DistributedMesh>(*TestCommWorld);
+
+    MeshTools::Generation::build_line(*_mesh, 3,
+                                        0.2, 0.8, EDGE3);
+
+    // We'll need to skip most repartitioning with DistributedMesh for
+    // now; otherwise the boundary meshes' interior parents might get
+    // shuffled off to different processors.
+    if (!_mesh->is_serial())
+      {
+        _mesh->skip_noncritical_partitioning(true);
+        _replicated_boundary_mesh->skip_noncritical_partitioning(true);
+        _distributed_boundary_mesh->skip_noncritical_partitioning(true);
+      }
+  }
+
+  void sync_and_test_meshes()
+  {
+    // Get the border of the line
+    const std::set<boundary_id_type> exterior_boundaries {0, 1};
+
+    _mesh->get_boundary_info().sync(exterior_boundaries,
+                                    *_replicated_boundary_mesh);
+    check_parent_side_index_tag(*_replicated_boundary_mesh);
+
+    _mesh->get_boundary_info().sync(exterior_boundaries,
+                                    *_distributed_boundary_mesh);
+    check_parent_side_index_tag(*_distributed_boundary_mesh);
+
+    // Add the right side of the square to the square; this should
+    // make it a mixed dimension mesh. We skip storing the parent
+    // side ids (which is the default) since they are not needed
+    // in this particular test.
+    std::set<boundary_id_type> right_id;
+    right_id.insert(1);
+
+    _mesh->get_boundary_info().add_elements
+      (right_id, *_mesh, /*store_parent_side_ids=*/false);
+    _mesh->prepare_for_use();
+  }
+
+public:
+  void setUp()
+  {
+#if LIBMESH_DIM > 1
+    this->build_mesh();
+    this->sync_and_test_meshes();
+#endif
+  }
+
+  void testMesh()
+  {
+    LOG_UNIT_TEST;
+
+    // There'd better be 3 + 1 elements in the interior plus right
+    // boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(4),
+                         _mesh->n_elem());
+
+    // There'd better be 7 nodes in the interior
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(7),
+                         _mesh->n_nodes());
+
+    // There'd better be 2 elements on the exterior boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2),
+                         _replicated_boundary_mesh->n_elem());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2),
+                         _distributed_boundary_mesh->n_elem());
+
+    // There'd better be 2 nodes on the exterior boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2),
+                         _replicated_boundary_mesh->n_nodes());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2),
+                         _distributed_boundary_mesh->n_nodes());
+
+    this->sanityCheck();
+  }
+
+  void testBoundarySerialization()
+  {
+    LOG_UNIT_TEST;
+
+    MeshSerializer internal_serializer(*_distributed_boundary_mesh);
+
+    // There'd better be 2 elements on the exterior boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2),
+                         _replicated_boundary_mesh->n_elem());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2),
+                         _distributed_boundary_mesh->n_elem());
+
+    // There'd better be 2 nodes on the exterior boundary
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2),
+                         _replicated_boundary_mesh->n_nodes());
+    CPPUNIT_ASSERT_EQUAL(static_cast<dof_id_type>(2),
+                         _distributed_boundary_mesh->n_nodes());
+
+    this->sanityCheck();
+  }
+
+  void sanityCheck()
+  {
+    // Sanity check all the elements
+    for (const auto & elem : _mesh->active_element_ptr_range())
+      {
+        const Elem * pip = elem->dim() < 1 ? elem->interior_parent() : nullptr;
+
+        // On a DistributedMesh we might not be able to see the
+        // interior_parent of a non-local element
+        if (pip == remote_elem)
+          {
+            CPPUNIT_ASSERT(elem->processor_id() != TestCommWorld->rank());
+            continue;
+          }
+
+        // The nodeelems should have interior parents; none of the
+        // edges should.
+        if (pip)
+          {
+            CPPUNIT_ASSERT_EQUAL(elem->type(), NODEELEM);
+            CPPUNIT_ASSERT_EQUAL(pip->type(), EDGE3);
+            CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
+
+            // We only added right nodes
+            LIBMESH_ASSERT_FP_EQUAL(0.8, elem->vertex_average()(0),
+                                    TOLERANCE*TOLERANCE);
+          }
+        else
+          {
+            CPPUNIT_ASSERT_EQUAL(elem->type(), EDGE3);
+          }
+      }
+
+    for (const UnstructuredMesh * boundary_mesh :
+         { _replicated_boundary_mesh.get(),
+           _distributed_boundary_mesh.get() })
+      for (const auto & elem : boundary_mesh->active_element_ptr_range())
+        {
+          CPPUNIT_ASSERT_EQUAL(elem->type(), NODEELEM);
+
+          const Elem * pip = elem->interior_parent();
+
+          // On a DistributedMesh we might not be able to see the
+          // interior_parent of a non-local element
+          if (pip == remote_elem)
+            {
+              CPPUNIT_ASSERT(elem->processor_id() != TestCommWorld->rank());
+              continue;
+            }
+
+          // Both the nodeelems should have interior parents
+          CPPUNIT_ASSERT(pip);
+          CPPUNIT_ASSERT_EQUAL(pip->type(), EDGE3);
+          CPPUNIT_ASSERT_EQUAL(pip->level(), elem->level());
+        }
+
+  }
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryMesh0DTest );
+
 
 class BoundaryMeshTest : public CppUnit::TestCase {
   /**
@@ -130,6 +341,7 @@ protected:
     const std::set<boundary_id_type> exterior_boundaries {0, 1, 2, 3};
     _mesh->get_boundary_info().sync(exterior_boundaries,
                                     *_exterior_boundary_mesh);
+    check_parent_side_index_tag(*_exterior_boundary_mesh);
 
     // The mesh of all boundaries is, because of the two nodes each
     // joining three edges where the internal boundary meets the
@@ -145,23 +357,7 @@ protected:
     const std::set<boundary_id_type> multi_boundaries {1, 2, 5};
     _mesh->get_boundary_info().sync(multi_boundaries,
                                     *_multi_boundary_mesh);
-
-    // Check that the interior_parent side indices that we set on the
-    // BoundaryMesh as extra integers agree with the side returned
-    // by which_side_am_i().
-    unsigned int parent_side_index_tag =
-      _multi_boundary_mesh->get_elem_integer_index("parent_side_index");
-
-    for (const auto & belem : _multi_boundary_mesh->element_ptr_range())
-      {
-        dof_id_type parent_side_index =
-          belem->get_extra_integer(parent_side_index_tag);
-
-        if (belem->interior_parent() != remote_elem)
-          CPPUNIT_ASSERT_EQUAL
-            (static_cast<dof_id_type>(belem->interior_parent()->which_side_am_i(belem)),
-             parent_side_index);
-      }
+    check_parent_side_index_tag(*_multi_boundary_mesh);
 
     std::set<boundary_id_type> left_id, right_id;
     left_id.insert(3);
@@ -177,7 +373,7 @@ protected:
 
     // Add the left side of the square to its own boundary mesh.
     _mesh->get_boundary_info().sync(left_id, *_left_boundary_mesh);
-
+    check_parent_side_index_tag(*_left_boundary_mesh);
 
     // Create a BoundaryMesh from the internal sidesets relative to subdomain 1.
     {
@@ -187,6 +383,7 @@ protected:
       _mesh->get_boundary_info().sync(requested_boundary_ids,
                                       *_internal_boundary_mesh,
                                       subdomains_relative_to);
+      check_parent_side_index_tag(*_internal_boundary_mesh);
     }
   }
 
