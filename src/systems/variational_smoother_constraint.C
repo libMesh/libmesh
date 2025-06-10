@@ -69,8 +69,6 @@ void VariationalSmootherConstraint::constrain()
     //   But for now, just fix all the boundary nodes to not move
     for (const auto d : make_range(mesh.mesh_dimension()))
     {
-      if (bid == 6)// && d > 0)
-        continue;
       const auto constrained_dof_index = node.dof_number(_sys.number(), d, 0);
       DofConstraintRow constraint_row;
       // Leave the constraint row as all zeros so this dof is independent from other dofs
