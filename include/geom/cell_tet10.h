@@ -161,8 +161,7 @@ public:
    * Builds a \p TRI6 built coincident with face i.
    * The \p std::unique_ptr<Elem> handles the memory aspect.
    */
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=false) override;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i) override;
 
   /**
    * Rebuilds a TRI6 built coincident with face i.

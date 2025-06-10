@@ -176,8 +176,7 @@ public:
   /**
    * \returns A pointer to a NodeElem for the specified node.
    */
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=false) override final;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i) override final;
 
   /**
    * Rebuilds a NODEELEM for the specified node.

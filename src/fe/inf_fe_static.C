@@ -86,8 +86,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType & fet,
                                                const Elem * inf_elem)
 {
   // The "base" Elem is a non-infinite Elem corresponding to side 0 of
-  // the InfElem. This builds a "lightweight" proxy and so should be
-  // relatively fast.
+  // the InfElem.
   auto base_elem = inf_elem->build_side_ptr(0);
 
   if (Dim > 1)
@@ -135,8 +134,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_at_node (const FEType & fet,
                                                         const unsigned int n)
 {
   // The "base" Elem is a non-infinite Elem corresponding to side 0 of
-  // the InfElem. This builds a "lightweight" proxy and so should be
-  // relatively fast.
+  // the InfElem.
   auto base_elem = inf_elem->build_side_ptr(0);
 
   unsigned int n_base, n_radial;
@@ -175,8 +173,7 @@ unsigned int InfFE<Dim,T_radial,T_map>::n_dofs_per_elem (const FEType & fet,
                                                          const Elem * inf_elem)
 {
   // The "base" Elem is a non-infinite Elem corresponding to side 0 of
-  // the InfElem. This builds a "lightweight" proxy and so should be
-  // relatively fast.
+  // the InfElem.
   auto base_elem = inf_elem->build_side_ptr(0);
 
   if (Dim > 1)

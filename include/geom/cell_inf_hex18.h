@@ -129,8 +129,7 @@ public:
    *
    * \note The \p std::unique_ptr<Elem> takes care of freeing memory.
    */
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=false) override;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i) override;
 
   /**
    * Rebuilds a \p QUAD9 built coincident with face 0, or an \p

@@ -183,8 +183,7 @@ public:
   /**
    * Copies the Polygon side coincident with side i.
    */
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=false) override;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i) override;
 
   /**
    * Copies the Polygon side coincident with side i.

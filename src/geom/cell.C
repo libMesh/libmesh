@@ -29,7 +29,7 @@ BoundingBox Cell::loose_bounding_box () const
   // through 4-D space, so the full bounding box is just the merger of
   // the sides' bounding boxes.
 
-  std::unique_ptr<const Elem> side_ptr { this->build_side_ptr(0, false) };
+  std::unique_ptr<const Elem> side_ptr { this->build_side_ptr(0) };
   BoundingBox bbox = side_ptr->loose_bounding_box();
   unsigned int my_n_sides = this->n_sides();
   for (unsigned s=1; s < my_n_sides; ++s)

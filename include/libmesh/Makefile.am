@@ -160,7 +160,6 @@ BUILT_SOURCES = \
         point.h \
         reference_elem.h \
         remote_elem.h \
-        side.h \
         sphere.h \
         stored_range.h \
         surface.h \
@@ -1073,9 +1072,6 @@ reference_elem.h: $(top_srcdir)/include/geom/reference_elem.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 remote_elem.h: $(top_srcdir)/include/geom/remote_elem.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-side.h: $(top_srcdir)/include/geom/side.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sphere.h: $(top_srcdir)/include/geom/sphere.h

@@ -26,7 +26,6 @@
 #include "libmesh/edge_inf_edge2.h"
 #include "libmesh/face_quad8.h"
 #include "libmesh/face_inf_quad6.h"
-#include "libmesh/side.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
 
@@ -139,77 +138,39 @@ unsigned int InfHex16::local_edge_node(unsigned int edge,
 
 
 
-std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i,
-                                                bool proxy)
+std::unique_ptr<Elem> InfHex16::build_side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
   std::unique_ptr<Elem> face;
-  if (proxy)
+  // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
+  switch (i)
     {
-#ifdef LIBMESH_ENABLE_DEPRECATED
-      libmesh_deprecated();
-      switch (i)
-        {
-          // base
-        case 0:
-          {
-            face = std::make_unique<Side<Quad8,InfHex16>>(this,i);
-            break;
-          }
+      // the base face
+    case 0:
+      {
+        face = std::make_unique<Quad8>();
+        break;
+      }
 
-          // ifem sides
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-          {
-            face = std::make_unique<Side<InfQuad6,InfHex16>>(this,i);
-            break;
-          }
+      // connecting to another infinite element
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      {
+        face = std::make_unique<InfQuad6>();
+        break;
+      }
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
-#else
-      libmesh_error();
-#endif // LIBMESH_ENABLE_DEPRECATED
-    }
-  else
-    {
-      // Think of a unit cube: (-1,1) x (-1,1) x (1,1)
-      switch (i)
-        {
-          // the base face
-        case 0:
-          {
-            face = std::make_unique<Quad8>();
-            break;
-          }
-
-          // connecting to another infinite element
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-          {
-            face = std::make_unique<InfQuad6>();
-            break;
-          }
-
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
-
-      // Set the nodes
-      for (auto n : face->node_index_range())
-        face->set_node(n, this->node_ptr(InfHex16::side_nodes_map[i][n]));
+    default:
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  if (!proxy) // proxy sides used to leave parent() set
-#endif
-    face->set_parent(nullptr);
+  // Set the nodes
+  for (auto n : face->node_index_range())
+    face->set_node(n, this->node_ptr(InfHex16::side_nodes_map[i][n]));
+
   face->set_interior_parent(this);
 
   face->subdomain_id() = this->subdomain_id();
@@ -236,7 +197,7 @@ void InfHex16::build_side_ptr (std::unique_ptr<Elem> & side,
       {
         if (!side.get() || side->type() != QUAD8)
           {
-            side = this->build_side_ptr(i, false);
+            side = this->build_side_ptr(i);
             return;
           }
         break;
@@ -250,7 +211,7 @@ void InfHex16::build_side_ptr (std::unique_ptr<Elem> & side,
       {
         if (!side.get() || side->type() != INFQUAD6)
           {
-            side = this->build_side_ptr(i, false);
+            side = this->build_side_ptr(i);
             return;
           }
         break;

@@ -17,7 +17,6 @@
 
 
 // Local includes
-#include "libmesh/side.h"
 #include "libmesh/cell_hex27.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_quad9.h"
@@ -242,10 +241,9 @@ unsigned int Hex27::local_edge_node(unsigned int edge,
 
 
 
-std::unique_ptr<Elem> Hex27::build_side_ptr (const unsigned int i,
-                                             bool proxy)
+std::unique_ptr<Elem> Hex27::build_side_ptr (const unsigned int i)
 {
-  return this->simple_build_side_ptr<Quad9, Hex27>(i, proxy);
+  return this->simple_build_side_ptr<Quad9, Hex27>(i);
 }
 
 

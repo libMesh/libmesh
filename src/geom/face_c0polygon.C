@@ -20,7 +20,6 @@
 
 #include "libmesh/edge_edge2.h"
 #include "libmesh/enum_order.h"
-#include "libmesh/side.h"
 #include "libmesh/tensor_value.h"
 
 // C++ headers
@@ -167,25 +166,15 @@ Order C0Polygon::default_order() const
 
 
 
-std::unique_ptr<Elem> C0Polygon::build_side_ptr (const unsigned int i,
-                                                 bool proxy)
+std::unique_ptr<Elem> C0Polygon::build_side_ptr (const unsigned int i)
 {
   const auto ns = this->n_sides();
   libmesh_assert_less (i, ns);
 
-  std::unique_ptr<Elem> sidep;
-  if (proxy)
-    {
-      libmesh_error();
-    }
-  else
-    {
-      sidep = std::make_unique<Edge2>();
-      sidep->set_node(0, this->node_ptr(i));
-      sidep->set_node(1, this->node_ptr((i+1)%ns));
-    }
+  std::unique_ptr<Elem> sidep = std::make_unique<Edge2>();
+  sidep->set_node(0, this->node_ptr(i));
+  sidep->set_node(1, this->node_ptr((i+1)%ns));
 
-  sidep->set_parent(nullptr);
   sidep->set_interior_parent(this);
 
   sidep->set_mapping_type(this->mapping_type());
@@ -207,7 +196,7 @@ void C0Polygon::build_side_ptr (std::unique_ptr<Elem> & side,
 
   if (!side.get() || side->type() != EDGE2)
     {
-      side = this->build_side_ptr(i, false);
+      side = this->build_side_ptr(i);
     }
   else
     {
