@@ -342,8 +342,7 @@ void Polyhedron::side_ptr (std::unique_ptr<Elem> & side,
 
 
 
-std::unique_ptr<Elem> Polyhedron::build_side_ptr (const unsigned int i,
-                                                  bool /*proxy*/)
+std::unique_ptr<Elem> Polyhedron::build_side_ptr (const unsigned int i)
 {
   auto returnval = this->side_ptr(i);
   returnval->set_interior_parent(this);

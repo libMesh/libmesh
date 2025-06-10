@@ -17,7 +17,6 @@
 
 
 // Local includes
-#include "libmesh/side.h"
 #include "libmesh/cell_hex20.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_quad8.h"
@@ -162,10 +161,9 @@ Order Hex20::default_order() const
 
 
 
-std::unique_ptr<Elem> Hex20::build_side_ptr (const unsigned int i,
-                                             bool proxy )
+std::unique_ptr<Elem> Hex20::build_side_ptr (const unsigned int i)
 {
-  return this->simple_build_side_ptr<Quad8, Hex20>(i, proxy);
+  return this->simple_build_side_ptr<Quad8, Hex20>(i);
 }
 
 

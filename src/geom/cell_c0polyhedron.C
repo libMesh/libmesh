@@ -22,7 +22,6 @@
 #include "libmesh/face_polygon.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/replicated_mesh.h"
-#include "libmesh/side.h"
 #include "libmesh/tensor_value.h"
 
 // C++ headers

@@ -204,8 +204,7 @@ public:
                          const unsigned int) override
   { remote_elem_error("side_ptr"); }
 
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int,
-                                                bool) override
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int) override
   { remote_elem_error("build_side_ptr"); return std::unique_ptr<Elem>(); }
 
   virtual void build_side_ptr (std::unique_ptr<Elem> &,

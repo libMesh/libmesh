@@ -109,8 +109,7 @@ public:
    * \returns An \p Edge2 for the base side, or an \p InfEdge2 for
    * the sides 1, 2.
    */
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=false) override;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i) override;
 
   /**
    * Rebuilds an EDGE2 or INFEDGE2 coincident with face i.

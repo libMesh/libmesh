@@ -146,8 +146,7 @@ public:
    */
   using Elem::key;
 
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i,
-                                                bool proxy=false) override;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i) override;
 
   /**
    * Rebuilds an EDGE2 coincident with side i.

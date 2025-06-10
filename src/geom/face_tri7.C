@@ -16,7 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "libmesh/side.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_tri7.h"
 #include "libmesh/enum_io_package.h"
@@ -240,10 +239,9 @@ unsigned int Tri7::local_side_node(unsigned int side,
 
 
 
-std::unique_ptr<Elem> Tri7::build_side_ptr (const unsigned int i,
-                                            bool proxy)
+std::unique_ptr<Elem> Tri7::build_side_ptr (const unsigned int i)
 {
-  return this->simple_build_side_ptr<Edge3, Tri7>(i, proxy);
+  return this->simple_build_side_ptr<Edge3, Tri7>(i);
 }
 
 

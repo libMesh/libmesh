@@ -17,7 +17,6 @@
 
 
 // Local includes
-#include "libmesh/side.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_tri3.h"
@@ -154,10 +153,9 @@ Order Tet4::default_order() const
   return FIRST;
 }
 
-std::unique_ptr<Elem> Tet4::build_side_ptr (const unsigned int i,
-                                            bool proxy)
+std::unique_ptr<Elem> Tet4::build_side_ptr (const unsigned int i)
 {
-  return this->simple_build_side_ptr<Tri3, Tet4>(i, proxy);
+  return this->simple_build_side_ptr<Tri3, Tet4>(i);
 }
 
 
