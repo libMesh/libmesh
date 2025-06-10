@@ -180,7 +180,7 @@ std::unique_ptr<Elem> C0Polygon::build_side_ptr (const unsigned int i,
     }
   else
     {
-      sidep = std::make_unique<Edge2>(this);
+      sidep = std::make_unique<Edge2>();
       sidep->set_node(0, this->node_ptr(i));
       sidep->set_node(1, this->node_ptr((i+1)%ns));
     }
