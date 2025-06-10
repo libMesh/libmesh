@@ -31,9 +31,14 @@ private:
 
   System & _sys;
 
+  /// Whether subdomain boundaries are subject to change via smoothing
+  const bool _preserve_subdomain_boundaries;
+
+  void fix_node(const Node & node);
+
 public:
 
-  VariationalSmootherConstraint(System & sys);
+  VariationalSmootherConstraint(System & sys, const bool & preserve_subdomain_boundaries);
 
   virtual ~VariationalSmootherConstraint() override;
 

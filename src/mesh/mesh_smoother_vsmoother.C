@@ -1057,7 +1057,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<Real> & R,
   sys.extra_quadrature_order = 0;
 
   // Add boundary node and hanging node constraints
-  VariationalSmootherConstraint constraint(sys);
+  VariationalSmootherConstraint constraint(sys, _preserve_subdomain_boundaries);
   sys.attach_constraint_object(constraint);
 
   // Set system parameters

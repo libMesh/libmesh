@@ -22,7 +22,12 @@
 namespace libMesh
 {
 
-VariationalSmootherConstraint::VariationalSmootherConstraint(System & sys) : Constraint(), _sys(sys) {}
+VariationalSmootherConstraint::VariationalSmootherConstraint(System & sys, const bool & preserve_subdomain_boundaries)
+  :
+    Constraint(),
+    _sys(sys),
+    _preserve_subdomain_boundaries(preserve_subdomain_boundaries)
+  {}
 
 VariationalSmootherConstraint::~VariationalSmootherConstraint() = default;
 
@@ -67,17 +72,57 @@ void VariationalSmootherConstraint::constrain()
     //   this edge.
 
     //   But for now, just fix all the boundary nodes to not move
-    for (const auto d : make_range(mesh.mesh_dimension()))
-    {
-      const auto constrained_dof_index = node.dof_number(_sys.number(), d, 0);
-      DofConstraintRow constraint_row;
-      // Leave the constraint row as all zeros so this dof is independent from other dofs
-      const auto constrained_value = node(d);
-      // Simply constrain this dof to retain it's current value
-      _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, constrained_value, true);
-    }
+    this->fix_node(node);
   }
 
+  // Constrain subdomain boundary nodes, if requested
+  if (_preserve_subdomain_boundaries)
+  {
+    auto already_constrained_node_ids = boundary_node_ids;
+    for (const auto * elem : mesh.active_element_ptr_range())
+    {
+      const auto & subdomain_id = elem->subdomain_id();
+      for (const auto side : elem->side_index_range())
+      {
+        const auto * neighbor = elem->neighbor_ptr(side);
+        if (neighbor == nullptr)
+          continue;
+
+        const auto & neighbor_subdomain_id = neighbor->subdomain_id();
+        if (subdomain_id != neighbor_subdomain_id)
+        {
+          for (const auto local_node_id : elem->nodes_on_side(side))
+          {
+            const auto & node = mesh.node_ref(elem->node_id(local_node_id));
+            // Make sure we haven't already constrained this node
+            if (
+                std::find(already_constrained_node_ids.begin(),
+                          already_constrained_node_ids.end(),
+                          node.id()) == already_constrained_node_ids.end()
+            )
+            {
+              this->fix_node(node);
+              already_constrained_node_ids.insert(node.id());
+            }
+          }//for local_node_id
+        }
+      }// for side
+    }// for elem
+  }
+
+}
+
+void VariationalSmootherConstraint::fix_node(const Node & node)
+{
+  for (const auto d : make_range(_sys.get_mesh().mesh_dimension()))
+  {
+    const auto constrained_dof_index = node.dof_number(_sys.number(), d, 0);
+    DofConstraintRow constraint_row;
+    // Leave the constraint row as all zeros so this dof is independent from other dofs
+    const auto constrained_value = node(d);
+    // Simply constrain this dof to retain it's current value
+    _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, constrained_value, true);
+  }
 }
 
 } // namespace libMesh
