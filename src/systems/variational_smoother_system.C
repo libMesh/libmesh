@@ -47,12 +47,10 @@ void VariationalSmootherSystem::assembly (bool get_residual,
   this->solution->close();
   for (auto * node : mesh.local_node_ptr_range())
   {
-    //std::cout << "Updating node " << node->id() << ":" << std::endl;
     for (const auto d : make_range(_dim))
     {
       const auto dof_id = node->dof_number(this->number(), d, 0);
       // Update mesh
-      //std::cout << "  comp " << d << ": " << (*node)(d) << " --> " << (*current_local_solution)(dof_id) << std::endl;
       (*node)(d) = (*current_local_solution)(dof_id);
     }
   }
@@ -193,9 +191,6 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
   const unsigned int n_qpoints = c.get_element_qrule().n_points();
   const auto qpoints = c.get_element_qrule().get_points();
   const auto qweights = c.get_element_qrule().get_weights();
-  //std::cout << "qrule:" << std::endl;
-  //for (const auto qp : make_range(n_qpoints))
-  //  std::cout << "  " << qpoints[qp] << ", " << qweights[qp] << std::endl;
 
   FEMContext & input_c = *libmesh_map_find(input_contexts, &c);
   if (input_system)
@@ -293,23 +288,6 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       //const Real E = (1. - _dilation_weight) * beta + _dilation_weight * mu;
       const RealTensor dE_dS = (1. - _dilation_weight) * dbeta_dS + _dilation_weight * dmu_dS;
 
-      //std::cout << "elem " << elem.id() << " qp " << qp << ":"
-      //          << "\n  S = " << S
-      //          << "\n  det = " << det
-      //          << "\n  tr = " << tr
-      //          << "\n  chi " << chi
-      //          << "\n  beta = " << beta
-      //          << "\n  mu = " << mu
-      //          << "\n  ref_vol = " << _ref_vol
-      //          << "\n  E = " << E
-      //          << "\n  dE_dS = " << dE_dS
-      //          << "\n  dchi_dS = " << dchi_dS
-      //          << "\n  S_inv_T = " << S_inv_T
-      //          << "\n  JxW = " << JxW[qp]
-      //          << "\n  qweight = " << qweights[qp]
-      //          << std::endl;
-
-
       // Factor in nonzero contributions of the gradient of (mapping) jacobian
       std::vector<std::vector<std::vector<Real>>> dphi_maps = {dphidxi_map, dphideta_map, dphidzeta_map};
       for (const auto l : elem.node_index_range())
@@ -361,26 +339,18 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         // d alpha / dS has the form c(S) * S^-T, where c is the scalar coefficient defined below
         const Real dalpha_dS_coef = det * (-4. * _ref_vol * alpha * chi_prime * chi - chi_2prime * det_cube - chi_prime * det_sq + 4 * chi * det - ref_vol_sq) / (2. * _ref_vol * chi_sq);
 
-        //std::cout << "Building Jacobian" << std::endl;
-
         for (const auto l: elem.node_index_range())
         {
-          //std::cout << "  Node l: " << l << std::endl;
-
           for (const auto var_id1 : make_range(dim))
           {
-            //std::cout << "  var_id1 " << var_id1 << std::endl;
             RealTensor dS_dR_l = RealTensor(0);
             for (const auto ii : make_range(dim))
               dS_dR_l(var_id1, ii) = dphi_maps[ii][l][qp];
 
             for (const auto p: elem.node_index_range())
             {
-              //std::cout << "    Node p: " << p << std::endl;
-
               for (const auto var_id2 : make_range(dim))
               {
-                //std::cout << "    var_id2 " << var_id2 << std::endl;
                 RealTensor dS_dR_p = RealTensor(0);
                 for (const auto jj : make_range(dim))
                   dS_dR_p(var_id2, jj) = dphi_maps[jj][p][qp];
@@ -389,17 +359,12 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                 Real d2mu_dR2 = 0.;
                 for (const auto i : make_range(dim))
                 {
-                  //std::cout << "      i = " << i << std::endl;
                   for (const auto j : make_range(dim))
                   {
-                    //std::cout << "        j = " << j << std::endl;
                     for (const auto a : make_range(dim))
                     {
-                      //std::cout << "          a = " << a << std::endl;
                       for (const auto b : make_range(dim))
                       {
-                        //std::cout << "            b = " << b << std::endl;
-
                         const std::vector<Real> d2beta_dS2_tensor_contributions =
                         {
                           I(i,a)     * I(j,b),
@@ -417,19 +382,13 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                         {
                           const Real contribution = d2beta_dS2_coefs[comp_id] * d2beta_dS2_tensor_contributions[comp_id];
                           d2beta_dS2 += contribution;
-                          //std::cout << "                d2beta_dS2 component " << comp_id << " contribution: " << d2beta_dS2_coefs[comp_id] << " x " << d2beta_dS2_tensor_contributions[comp_id] << " = " << contribution << std::endl;
                         }
 
                         const Real d2mu_dS2 = dalpha_dS_coef * S_inv(b,a) * S_inv(j,i) - alpha * S_inv(b,i) * S_inv(j,a);
-                        //std::cout << "              d2mu_dS2_ijab = " << d2mu_dS2 << " = " << dalpha_dS_coef << " x " << S_inv(j,i) << " - " << alpha << " x " << S_inv(b,i) << " x " << S_inv(j,a) << std::endl;
 
                         // Chain rule to change d/dS to d/dR
-                        //std::cout << "              d2beta_dS2_ijab = " << d2beta_dS2 << std::endl;
                         d2beta_dR2 += d2beta_dS2 * dS_dR_l(a, b) * dS_dR_p(i, j);
                         d2mu_dR2 += d2mu_dS2 * dS_dR_l(a, b) * dS_dR_p(i, j);
-                        //std::cout << "              dS_dR_p(" << i << ", " << j << ") = " << dS_dR_p(i,j) << std::endl;
-                        //std::cout << "              dS_dR_l(" << a << ", " << b << ") = " << dS_dR_l(a,b) << std::endl;
-
 
                       }// for b
                     }// for a
@@ -438,7 +397,6 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
                 const Real contribution = qweights[qp] * ((1. - _dilation_weight) * d2beta_dR2 + _dilation_weight * d2mu_dR2);
                 K[var_id1][var_id2](l, p) += contribution;
-                //std::cout << "Adding " << contribution << " to jac for vars " << var_id1 << ", " << var_id2 << " entry " << l << ", " << p << std::endl;
 
               }// for var_id2
             }// for p
@@ -446,14 +404,6 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         }// for l
       }
     } // end of the quadrature point qp-loop
-
-  //std::cout << "F for element " << elem.id() << ":" << std::endl;
-  //for (const auto m : elem.node_index_range())
-  //{
-  //  for (const auto k : make_range(dim))
-  //    std::cout << "component " << k << " local dof (node) " << m
-  //              << " residual: " << F[k](m) << std::endl;
-  //}
 
   return request_jacobian;
 }
