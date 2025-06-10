@@ -204,7 +204,7 @@ std::unique_ptr<Elem> InfHex18::build_side_ptr (const unsigned int i,
           // the base face
         case 0:
           {
-            face = std::make_unique<Quad9>(this);
+            face = std::make_unique<Quad9>();
             break;
           }
 
@@ -214,7 +214,7 @@ std::unique_ptr<Elem> InfHex18::build_side_ptr (const unsigned int i,
         case 3:
         case 4:
           {
-            face = std::make_unique<InfQuad6>(this);
+            face = std::make_unique<InfQuad6>();
             break;
           }
 

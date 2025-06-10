@@ -2695,7 +2695,7 @@ std::unique_ptr<const Elem> Elem::side_ptr (unsigned int i) const
 {
   // Call the non-const version of this function, return the result as
   // a std::unique_ptr<const Elem>.
-  Elem * me = const_cast<Elem *>(this);
+  Elem * me = const_cast<Elem *>();
   const Elem * s = const_cast<const Elem *>(me->side_ptr(i).release());
   return std::unique_ptr<const Elem>(s);
 }
@@ -2708,7 +2708,7 @@ Elem::side_ptr (std::unique_ptr<const Elem> & elem,
                 const unsigned int i) const
 {
   // Hand off to the non-const version of this function
-  Elem * me = const_cast<Elem *>(this);
+  Elem * me = const_cast<Elem *>();
   std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
   me->side_ptr(e, i);
   elem = std::move(e);
@@ -2722,7 +2722,7 @@ Elem::build_side_ptr (const unsigned int i, bool proxy) const
 {
   // Call the non-const version of this function, return the result as
   // a std::unique_ptr<const Elem>.
-  Elem * me = const_cast<Elem *>(this);
+  Elem * me = const_cast<Elem *>();
   const Elem * s = const_cast<const Elem *>(me->build_side_ptr(i, proxy).release());
   return std::unique_ptr<const Elem>(s);
 }
@@ -2735,7 +2735,7 @@ Elem::build_side_ptr (std::unique_ptr<const Elem> & elem,
                       const unsigned int i) const
 {
   // Hand off to the non-const version of this function
-  Elem * me = const_cast<Elem *>(this);
+  Elem * me = const_cast<Elem *>();
   std::unique_ptr<Elem> e {const_cast<Elem *>(elem.release())};
   me->build_side_ptr(e, i);
   elem = std::move(e);
@@ -2763,7 +2763,7 @@ Elem::simple_build_side_ptr (const unsigned int i,
     }
   else
     {
-      face = std::make_unique<Sideclass>(this);
+      face = std::make_unique<Sideclass>();
       for (auto n : face->node_index_range())
         face->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
     }
@@ -2801,6 +2801,7 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
     }
   else
     {
+      side->set_interior_parent(this);
       side->subdomain_id() = this->subdomain_id();
       side->set_mapping_type(this->mapping_type());
 #ifdef LIBMESH_ENABLE_AMR
