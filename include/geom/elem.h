@@ -2375,6 +2375,19 @@ Elem::Elem(const unsigned int nn,
   // If this ever legitimately fails we need to increase max_n_nodes
   libmesh_assert_less_equal(nn, max_n_nodes);
 
+  // We currently only support refinement of elements into child
+  // elements of the same type.  We can't test elem->type() here,
+  // because that's virtual and we're still in the base class
+  // constructor, but we can at least usually verify constency with
+  // the arguments we were handed.
+#ifndef NDEBUG
+  if (p && !p->runtime_topology())
+    {
+      libmesh_assert_equal_to(nn, p->n_nodes());
+      libmesh_assert_equal_to(ns, p->n_sides());
+    }
+#endif
+
   // Initialize the nodes data structure if we're given a pointer to
   // memory for it.
   if (_nodes)
