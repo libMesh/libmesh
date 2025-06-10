@@ -38,6 +38,7 @@
 #include "libmesh/parallel_fe_type.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
+#include "libmesh/static_condensation.h"
 
 // includes for calculate_norm, point_*
 #include "libmesh/fe_base.h"
@@ -104,6 +105,8 @@ System::System (EquationSystems & es,
 {
   if (libMesh::on_command_line("--solver-system-names"))
     this->prefix_with_name(true);
+  if (libMesh::on_command_line("--" + name_in + "-static-condensation"))
+    this->create_static_condensation();
 }
 
 
@@ -354,7 +357,8 @@ void System::init_matrices ()
           pr.second->use_hash_table() ||
           (this->_prefer_hash_table_matrix_assembly && pr.second->supports_hash_table());
       pr.second->use_hash_table(use_hash);
-      if (!use_hash)
+      // Make this call after we've determined whether the matrix is using a hash table
+      if (pr.second->require_sparsity_pattern())
         this->_require_sparsity_pattern = true;
     }
 
@@ -1010,15 +1014,24 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
     return *it->second;
 
   // Otherwise build the matrix to return.
-  auto pr = _matrices.emplace
-    (mat_name,
-     SparseMatrix<Number>::build(this->comm(),
-                                 libMesh::default_solver_package(),
-                                 mat_build_type));
+  std::unique_ptr<SparseMatrix<Number>> matrix;
+  if (this->has_static_condensation())
+    {
+      if (mat_build_type == MatrixBuildType::DIAGONAL)
+        libmesh_error_msg(
+            "We do not currently support static condensation of the diagonal matrix type");
+      matrix = std::make_unique<StaticCondensation>(this->get_mesh(),
+                                                    *this,
+                                                    this->get_dof_map(),
+                                                    this->get_dof_map().get_static_condensation());
+    }
+  else
+    matrix = SparseMatrix<Number>::build(this->comm(), libMesh::default_solver_package());
+  auto & mat = *matrix;
+
+  _matrices.emplace(mat_name, std::move(matrix));
 
   _matrix_types.emplace(mat_name, type);
-
-  SparseMatrix<Number> & mat = *(pr.first->second);
 
   // Initialize it first if we've already initialized the others.
   this->late_matrix_init(mat, type);
@@ -2840,5 +2853,15 @@ Tensor System::point_hessian(unsigned int, const Point &, const NumericVector<Nu
 }
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
+
+void System::create_static_condensation()
+{
+  this->get_dof_map().create_static_condensation(this->get_mesh(), *this);
+}
+
+bool System::has_static_condensation() const
+{
+  return this->get_dof_map().has_static_condensation();
+}
 
 } // namespace libMesh

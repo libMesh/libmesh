@@ -35,6 +35,7 @@ namespace libMesh
 // Forward declarations
 class DofMap;
 class CouplingMatrix;
+class StaticCondensationDofMap;
 
 /**
  * This defines the sparsity pattern, or graph, of a sparse matrix.
@@ -107,7 +108,8 @@ public:
          const std::set<GhostingFunctor *> & coupling_functors_in,
          const bool implicit_neighbor_dofs_in,
          const bool need_full_sparsity_pattern_in,
-         const bool calculate_constrained_in = false);
+         const bool calculate_constrained_in = false,
+         const StaticCondensationDofMap * sc = nullptr);
 
   /**
    * Special functions.
@@ -210,6 +212,7 @@ private:
   const bool implicit_neighbor_dofs;
   const bool need_full_sparsity_pattern;
   const bool calculate_constrained;
+  const StaticCondensationDofMap * const sc;
 
   /**
    * If there are "spider" nodes in the mesh (i.e. a single node which

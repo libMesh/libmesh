@@ -56,6 +56,8 @@ public:
 
   virtual SparseMatrix<T> & operator=(const SparseMatrix<T> &) override;
 
+  virtual bool require_sparsity_pattern() const override { return false; }
+
 private:
   // Make this private because we mark as initialized after we've done our initialization, and we
   // don't want derived classes to mistakenly register their data as initialized (or not)

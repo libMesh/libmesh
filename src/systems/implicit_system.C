@@ -34,6 +34,8 @@
 #include "libmesh/diagonal_matrix.h"
 #include "libmesh/utility.h"
 #include "libmesh/static_condensation.h"
+#include "libmesh/static_condensation_preconditioner.h"
+#include "libmesh/nonlinear_solver.h"
 
 namespace libMesh
 {
@@ -44,25 +46,33 @@ ImplicitSystem::ImplicitSystem (EquationSystems & es,
 
   Parent            (es, name_in, number_in),
   matrix            (nullptr),
-  zero_out_matrix_and_rhs(true),
-  _sc               (nullptr)
+  zero_out_matrix_and_rhs(true)
 {
-  if (libMesh::on_command_line("--" + name_in + "-static-condensation"))
-    this->create_static_condensation();
+  if (this->has_static_condensation())
+    this->create_static_condensation_system_matrix();
 }
 
 ImplicitSystem::~ImplicitSystem () = default;
 
-
+void ImplicitSystem::create_static_condensation_system_matrix()
+{
+  auto sc_system_matrix = std::make_unique<StaticCondensation>(this->get_mesh(), *this, this->get_dof_map(), this->get_dof_map().get_static_condensation());
+  _sc_system_matrix = sc_system_matrix.get();
+  matrix = &(this->add_matrix ("System Matrix", std::move(sc_system_matrix)));
+}
 
 void ImplicitSystem::create_static_condensation ()
 {
-  auto sc = std::make_unique<StaticCondensation>(this->get_mesh(), *this, this->get_dof_map());
-  _sc = sc.get();
-  matrix = &(this->add_matrix ("System Matrix", std::move(sc)));
-  this->get_dof_map().add_static_condensation(*_sc);
+  Parent::create_static_condensation();
+  this->create_static_condensation_system_matrix();
 }
 
+template <typename T>
+void ImplicitSystem::setup_static_condensation_preconditioner(T & solver)
+{
+  libmesh_assert(_sc_system_matrix);
+  solver.attach_preconditioner(&_sc_system_matrix->get_preconditioner());
+}
 
 
 void ImplicitSystem::clear ()
@@ -72,7 +82,7 @@ void ImplicitSystem::clear ()
 
   // Restore us to a "basic" state
   matrix = nullptr;
-  _sc = nullptr;
+  _sc_system_matrix = nullptr;
 }
 
 
@@ -1264,4 +1274,6 @@ SparseMatrix<Number> & ImplicitSystem::get_system_matrix()
   return *matrix;
 }
 
+template void ImplicitSystem::setup_static_condensation_preconditioner(LinearSolver<Number> & solver);
+template void ImplicitSystem::setup_static_condensation_preconditioner(NonlinearSolver<Number> & solver);
 } // namespace libMesh

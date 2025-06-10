@@ -163,6 +163,11 @@ public:
   { return false; }
 
   /**
+   * @returns Whether this matrix needs the sparsity pattern computed by the \p DofMap
+   */
+  virtual bool require_sparsity_pattern() const { return !this->use_hash_table(); }
+
+  /**
    * Updates the matrix sparsity pattern. When your \p SparseMatrix<T>
    * implementation does not need this data, simply do not override
    * this method.

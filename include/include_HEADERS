@@ -20,6 +20,7 @@ include_HEADERS =  \
         base/auto_ptr.h \
         base/dirichlet_boundaries.h \
         base/dof_map.h \
+        base/dof_map_base.h \
         base/dof_object.h \
         base/factory.h \
         base/float128_shims.h \
@@ -287,6 +288,7 @@ include_HEADERS =  \
         numerics/sparse_matrix.h \
         numerics/sparse_shell_matrix.h \
         numerics/static_condensation.h \
+        numerics/static_condensation_dof_map.h \
         numerics/static_condensation_preconditioner.h \
         numerics/sum_shell_matrix.h \
         numerics/tensor_shell_matrix.h \

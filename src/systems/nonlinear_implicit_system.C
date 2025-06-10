@@ -58,8 +58,8 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems & es,
   es.parameters.set<bool>("reuse preconditioner") = false;
   es.parameters.set<unsigned int>("reuse preconditioner maximum linear iterations") = 1;
 
-  if (_sc)
-    nonlinear_solver->attach_preconditioner(&_sc->get_preconditioner());
+  if (this->has_static_condensation())
+    this->setup_static_condensation_preconditioner(*nonlinear_solver);
 }
 
 
@@ -71,7 +71,7 @@ NonlinearImplicitSystem::~NonlinearImplicitSystem () = default;
 void NonlinearImplicitSystem::create_static_condensation()
 {
   Parent::create_static_condensation();
-  nonlinear_solver->attach_preconditioner(&_sc->get_preconditioner());
+  this->setup_static_condensation_preconditioner(*nonlinear_solver);
 }
 
 
