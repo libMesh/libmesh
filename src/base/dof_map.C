@@ -3076,7 +3076,7 @@ std::string DofMap::get_info() const
   return os.str();
 }
 
-void DofMap::create_static_condensation(const MeshBase & mesh, System & sys)
+void DofMap::create_static_condensation(MeshBase & mesh, System & sys)
 {
   _sc = std::make_unique<StaticCondensationDofMap>(mesh, sys, *this);
 }
