@@ -1077,6 +1077,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<Real> & R,
   es.init();
 
   DiffSolver & solver = *(sys.time_solver->diff_solver().get());
+  sys.time_solver->diff_solver()->relative_residual_tolerance = 1e-10;
   solver.quiet = false;
   solver.verbose = true;
   solver.relative_step_tolerance = 1e-10;
