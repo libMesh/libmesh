@@ -104,20 +104,11 @@ void VariationalSmootherSystem::init_context(DiffContext & context)
   for (const auto & dim : elem_dims)
     {
       c.get_element_fe( 0, my_fe, dim );
-
-      my_fe->get_JxW();
-      my_fe->get_phi();
-      my_fe->get_xyz();
-      my_fe->get_dphi();
-
       auto & fe_map = my_fe->get_fe_map();
 
       fe_map.get_dxyzdxi();
       fe_map.get_dxyzdeta();
       fe_map.get_dxyzdzeta();
-
-      c.get_side_fe( 0, my_fe, dim );
-      my_fe->get_nothing();
     }
 
   // Build a corresponding context for the input system if we haven't
@@ -143,9 +134,6 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
   // will be used to assemble the linear system.
 
   const auto * my_fe = c.get_element_fe(0);
-
-  // Element Jacobian * quadrature weights for interior integration
-  //const std::vector<Real> & JxW = my_fe->get_JxW();
 
   const auto & fe_map = my_fe->get_fe_map();
 
