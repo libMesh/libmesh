@@ -173,9 +173,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
     };
 
   // Quadrature info
-  const unsigned int n_qpoints = c.get_element_qrule().n_points();
-  const auto qpoints = c.get_element_qrule().get_points();
-  const auto qweights = c.get_element_qrule().get_weights();
+  const auto quad_weights = c.get_element_qrule().get_weights();
 
   FEMContext & input_c = *libmesh_map_find(input_contexts, &c);
   if (input_system)
@@ -184,7 +182,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       input_c.elem_fe_reinit();
     }
 
-  for (const auto qp : make_range(n_qpoints))
+  for (const auto qp : index_range(quad_weights))
     {
       // Grab the physical-to-reference mapping Jacobian matrix (i.e., "S") at this qp
       RealTensor S;
@@ -250,7 +248,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                          0, 1, 0,
                          0, 0, 1);
 
-      // Distortion metric
+      // The chi function allows us to handle degenerate elements
       const Real chi = 0.5 * (det + std::sqrt(_epsilon_squared + det_sq));
       const Real chi_sq = chi * chi;
       const Real chi_cube = chi_sq * chi;
@@ -262,57 +260,63 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       // d2chi(x) / dx2
       const Real chi_2prime = 0.5 * (1. / sqrt_term - det_sq / std::pow(sqrt_term, 3));
 
+      // Distortion metric (beta)
       //const Real beta = std::pow(tr_div_dim, 0.5 * dim) / chi;
       const RealTensor dbeta_dS = (std::pow(tr_div_dim, 0.5 * dim - 1) / chi) * S - (std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * dchi_dS;
 
-      // Dilation metric
+      // Dilation metric (mu)
       //const Real mu = 0.5 * (_ref_vol + det_sq / _ref_vol) / chi;
       RealTensor dmu_dS = ((det_sq /_ref_vol / chi)) * S_inv_T - (0.5 * (_ref_vol + det_sq / _ref_vol) / chi_sq) * dchi_dS;
 
-      // Combined metric
+      // Combined metric (E)
       //const Real E = (1. - _dilation_weight) * beta + _dilation_weight * mu;
       const RealTensor dE_dS = (1. - _dilation_weight) * dbeta_dS + _dilation_weight * dmu_dS;
 
-      // Factor in nonzero contributions of the gradient of (mapping) jacobian
+      // To compute dS/dR below
       std::vector<std::vector<std::vector<Real>>> dphi_maps = {dphidxi_map, dphideta_map, dphidzeta_map};
+
+      // Compute residual
       for (const auto l : elem.node_index_range())
       {
         for (const auto var_id : make_range(dim))
         {
+          // Build dS/dR, the derivative of the physical-to-reference mapping Jacobin w.r.t. the mesh node locations
           RealTensor dS_dR = RealTensor(0);
           for (const auto jj : make_range(dim))
             dS_dR(var_id, jj) = dphi_maps[jj][l][qp];
 
-          F[var_id](l) += qweights[qp] * dE_dS.contract(dS_dR);
+          F[var_id](l) += quad_weights[qp] * dE_dS.contract(dS_dR);
         }// for var_id
       }// for l
 
 
       if (request_jacobian)
       {
-        // Compute jacobian of the smoothing system (i.e., the Hessian)
+        // Compute jacobian of the smoothing system (i.e., the Hessian of the combined metric)
 
         // Precompute coefficients to be applied to each component of tensor
         // products in the loops below
+
+        // Recall that above, dbeta_dS takes the form: d(beta)/dS = a * S - b * d(chi)/dS
         const std::vector<Real> d2beta_dS2_coefs = {
-          //Part 1
+          //Part 1: scaler coefficients of d(a * S) / dS
           //
           // multiplies I[i,k] x I[j,l]
           std::pow(tr_div_dim, 0.5 * dim - 1.) / chi,
           // multiplies S[k,l] x S[i,j]
           ((dim - 2.) / dim) * std::pow(tr_div_dim, 0.5 * dim - 2.) / chi,
-          // multiplies S_inv[l,k] * S[i,j] (from  dchi_dS x S)
+          // multiplies S_inv[l,k] * S[i,j]
           -(std::pow(tr_div_dim, 0.5 * dim - 1.) / chi_sq) * chi_prime * det,
           //
-          //Part 2
+          //Part 2: scaler coefficients of d(-b * d(chi)/dS) / dS
           //
-          // multiplies S[k,l] x S_inv[j,i] (from S x dchi_dS)
+          // multiplies S[k,l] x S_inv[j,i]
           -(std::pow(tr_div_dim, 0.5 * dim - 1.) / chi_sq) * chi_prime * det,
           // multiplies S_inv[l,k] x S_inv[j,i]
           2. * std::pow(tr_div_dim, 0.5 * dim) * chi_prime * det / chi_cube * chi_prime * det,
-          // multiplies S_inv[l,k] x S_inv[j,i] term from d2chi_dS2
+          // multiplies S_inv[l,k] x S_inv[j,i]
           -(std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * chi_2prime * det_sq,
-          // multiplies S_inv[l,k] x S_inv[j,i] term
+          // multiplies S_inv[l,k] x S_inv[j,i]
           -(std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * chi_prime * det,
           // multiplies S_inv[j,k] x S_inv[l,i]
           (std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * chi_prime * det,
@@ -342,6 +346,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
                 Real d2beta_dR2 = 0.;
                 Real d2mu_dR2 = 0.;
+                // Perform tensor contraction
                 for (const auto i : make_range(dim))
                 {
                   for (const auto j : make_range(dim))
@@ -350,6 +355,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                     {
                       for (const auto b : make_range(dim))
                       {
+                        // Nasty tensor products to be multiplied by d2beta_dS2_coefs to get d2(beta) / dS2
                         const std::vector<Real> d2beta_dS2_tensor_contributions =
                         {
                           I(i,a)     * I(j,b),
@@ -369,6 +375,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                           d2beta_dS2 += contribution;
                         }
 
+                        // Incorporate tensor product portion to get d2(mu) / dS2
                         const Real d2mu_dS2 = dalpha_dS_coef * S_inv(b,a) * S_inv(j,i) - alpha * S_inv(b,i) * S_inv(j,a);
 
                         // Chain rule to change d/dS to d/dR
@@ -378,10 +385,10 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                       }// for b
                     }// for a
                   }// for j
-                }// for i
+                }// for i, end tensor contraction
 
-                const Real contribution = qweights[qp] * ((1. - _dilation_weight) * d2beta_dR2 + _dilation_weight * d2mu_dR2);
-                K[var_id1][var_id2](l, p) += contribution;
+                // Jacobian contribution
+                K[var_id1][var_id2](l, p) += quad_weights[qp] * ((1. - _dilation_weight) * d2beta_dR2 + _dilation_weight * d2mu_dR2);
 
               }// for var_id2
             }// for p
