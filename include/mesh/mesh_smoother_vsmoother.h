@@ -107,12 +107,6 @@ private:
   Real _distance;
 
   /**
-   * Dampening factor
-   */
-  const Real _percent_to_move;
-
-
-  /**
    * Smoother control variables
    */
   unsigned _dim;
@@ -124,14 +118,6 @@ private:
    * original code's behavior.
    */
   dof_id_type _n_nodes;
-
-  /**
-   * The number of active elements in the Mesh at the time of smoothing.
-   * Not set until smooth() is actually called to mimic the
-   * original code's behavior.
-   */
-  dof_id_type _n_cells;
-
 
   /// Whether subdomain boundaries are subject to change via smoothing
   const bool _preserve_subdomain_boundaries;

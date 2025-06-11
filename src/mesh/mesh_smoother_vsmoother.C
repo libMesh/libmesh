@@ -52,7 +52,6 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  Real dilation_weight,
                                                  const bool preserve_subdomain_boundaries) :
   MeshSmoother(mesh),
-  _percent_to_move(1),
   _dim(mesh.mesh_dimension()),
   _dilation_weight(dilation_weight),
   _n_nodes(0),
@@ -119,7 +118,7 @@ Real VariationalMeshSmoother::writegr(const Array2D<Real> & R)
             // Save the squares of the distance
             total_dist += Utility::pow<2>(distance);
 
-            node_ref(j) += distance * _percent_to_move;
+            node_ref(j) += distance;
           }
 
         libmesh_assert_greater_equal (total_dist, 0.);
