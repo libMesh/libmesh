@@ -47,7 +47,7 @@ void VariationalSmootherSystem::assembly (bool get_residual,
   this->solution->close();
   for (auto * node : mesh.local_node_ptr_range())
   {
-    for (const auto d : make_range(_dim))
+    for (const auto d : make_range(mesh.mesh_dimension()))
     {
       const auto dof_id = node->dof_number(this->number(), d, 0);
       // Update mesh
@@ -63,12 +63,10 @@ void VariationalSmootherSystem::assembly (bool get_residual,
 
 void VariationalSmootherSystem::init_data ()
 {
-  // Make sure the user has set the _dim attribute using the get_dim method
-  libmesh_error_msg_if(_dim == 0, "Use the get_dim method to set the mesh dimension.");
-
+  auto & mesh = this->get_mesh();
   // Add a variable for each dimension of the mesh
   // "r0" for x, "r1" for y, "r2" for z
-  for (const auto & d : make_range(_dim))
+  for (const auto & d : make_range(mesh.mesh_dimension()))
     this->add_variable ("r" + std::to_string(d), static_cast<Order>(_fe_order),
                         Utility::string_to_enum<FEFamily>(_fe_family));
 
@@ -76,11 +74,10 @@ void VariationalSmootherSystem::init_data ()
   FEMSystem::init_data();
 
   // Set the current_local_solution to the current mesh
-  auto & mesh = this->get_mesh();
   this->solution->close();
   for (auto * node : mesh.local_node_ptr_range())
   {
-    for (const auto d : make_range(_dim))
+    for (const auto d : make_range(mesh.mesh_dimension()))
     {
       const auto dof_id = node->dof_number(this->number(), d, 0);
       // Update solution

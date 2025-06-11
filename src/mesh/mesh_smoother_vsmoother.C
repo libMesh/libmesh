@@ -166,7 +166,7 @@ void VariationalMeshSmoother::readNodesIntoArray(Array2D<Real> & R, const Variat
   for (auto * node : system.get_mesh().node_ptr_range())
   {
     // For each node grab its X Y [Z] coordinates
-    for (unsigned int j=0; j < system.get_dim(); j++)
+    for (unsigned int j=0; j < _dim; j++)
       R[i][j] = (*node)(j);
 
     ++i;
@@ -199,7 +199,6 @@ void VariationalMeshSmoother::full_smooth(Array2D<Real> & R, Real dilation_weigh
   sys.get_epsilon_squared() = epsilon*epsilon;
   sys.get_ref_vol() = vol;
   sys.get_dilation_weight() = dilation_weight;
-  sys.get_dim() = _dim;
 
   // Set up solver
   sys.time_solver =

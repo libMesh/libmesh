@@ -46,8 +46,7 @@ public:
     _fe_order(1),
     _epsilon_squared(1e-18),
     _ref_vol(1.),
-    _dilation_weight(0.5),
-    _dim(0)
+    _dilation_weight(0.5)
   {}
 
   // Default destructor
@@ -64,8 +63,6 @@ public:
   Real & get_epsilon_squared() { return _epsilon_squared; }
   Real & get_ref_vol() { return _ref_vol; }
   Real & get_dilation_weight() { return _dilation_weight; }
-  unsigned int & get_dim() { return _dim; }
-  const unsigned int & get_dim() const { return _dim; }
 
   std::string & fe_family() { return _fe_family; }
   unsigned int & fe_order() { return _fe_order; }
@@ -104,9 +101,6 @@ protected:
 
   /// The relative weight to give the dilation metric. The distortion metric is given weight 1 - _dilation_weight.
   Real _dilation_weight;
-
-  /// The dimension of the mesh to be used
-  unsigned int _dim;
 };
 
 } // namespace libMesh
