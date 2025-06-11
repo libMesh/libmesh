@@ -84,27 +84,17 @@ public:
    * function in this class which takes an int, using
    * a default value of 1.
    */
-  virtual void smooth() override { _distance = this->smooth(1); }
+  virtual void smooth() override {this->smooth(1); }
 
   /**
    * The actual smoothing function, gets called whenever
    * the user specifies an actual number of smoothing
    * iterations.
    */
-  Real smooth(unsigned int n_iterations);
-
-  /**
-   * \returns Max distance a node moved during the last smooth.
-   */
-  Real distance_moved() const { return _distance; }
+  void smooth(unsigned int n_iterations);
 
 
 private:
-
-  /**
-   * Max distance of the last set of movement.
-   */
-  Real _distance;
 
   /**
    * Smoother control variables
@@ -112,48 +102,8 @@ private:
   unsigned _dim;
   const Real _dilation_weight;
 
-  /**
-   * The number of nodes in the Mesh at the time of smoothing.
-   * Not set until smooth() is actually called to mimic the
-   * original code's behavior.
-   */
-  dof_id_type _n_nodes;
-
   /// Whether subdomain boundaries are subject to change via smoothing
   const bool _preserve_subdomain_boundaries;
-
-  /**
-   * 2D array type for interfacing with C APIs.
-   */
-  template <typename T>
-  struct Array2D
-  {
-    Array2D(unsigned nx, unsigned ny) :
-      _data(nx, std::vector<T>(ny)) {}
-
-    // Accessors
-    std::vector<T> & operator[](unsigned i) {return _data[i];}
-    const std::vector<T> & operator[](unsigned i) const {return _data[i];}
-
-  private:
-    std::vector<std::vector<T>> _data;
-  };
-
-
-  /**
-   * Updates the _mesh attribute with the smoothed mesh.
-   * \param R array of smoothed points to update the mesh.
-   *
-   * \return dist_norm average distance that each node was moved.
-  */
-  Real writegr(const Array2D<Real> & R);
-
-  int readgr(Array2D<Real> & R);
-
-  /// Reads system solution into an array
-  void readNodesIntoArray(Array2D<Real> & R, const VariationalSmootherSystem & system) const;
-
-  void full_smooth(Array2D<Real> & R, Real dilation_weight);
 };
 
 } // namespace libMesh

@@ -54,13 +54,11 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
   MeshSmoother(mesh),
   _dim(mesh.mesh_dimension()),
   _dilation_weight(dilation_weight),
-  _n_nodes(0),
-  _n_cells(0),
   _preserve_subdomain_boundaries(preserve_subdomain_boundaries)
 {}
 
 
-Real VariationalMeshSmoother::smooth(unsigned int)
+void VariationalMeshSmoother::smooth(unsigned int)
 {
   // Update the mesh dimension, since the mesh may have changed since initialization
   _dim = _mesh.mesh_dimension();
@@ -69,118 +67,12 @@ Real VariationalMeshSmoother::smooth(unsigned int)
   if (_mesh.elem_dimensions().size() > 1)
     libmesh_not_implemented_msg("Meshes containing elements of differing dimension are not yet supported.");
 
-  // Records the relative "distance moved"
-  Real dist_norm = 0.;
-
   Real dilation_weight = _dilation_weight;
 
-  // Initialize the _n_nodes and _n_cells member variables
-  this->_n_nodes = _mesh.n_nodes();
-  this->_n_cells = _mesh.n_active_elem();
-
-  Array2D<Real> R(_n_nodes, _dim);
-
-  // initial grid
-  readgr(R);
-
-  // grid optimization
-  full_smooth(R, dilation_weight);
-
-  // save result
-  dist_norm = writegr(R);
-
-  return dist_norm;
-}
-
-
-
-// save grid
-Real VariationalMeshSmoother::writegr(const Array2D<Real> & R)
-{
-  libMesh::out << "Starting writegr" << std::endl;
-
-  Real dist_norm = 0.;
-  // Adjust nodal coordinates to new positions
-  {
-    int i = 0;
-    for (auto & node : _mesh.node_ptr_range())
-      {
-        Real total_dist = 0.;
-
-        // Get a reference to the node
-        Node & node_ref = *node;
-
-        // For each node set its X Y [Z] coordinates
-        for (unsigned int j=0; j<_dim; j++)
-          {
-            Real distance = R[i][j] - node_ref(j);
-
-            // Save the squares of the distance
-            total_dist += Utility::pow<2>(distance);
-
-            node_ref(j) += distance;
-          }
-
-        libmesh_assert_greater_equal (total_dist, 0.);
-
-        // Add the distance this node moved to the global distance
-        dist_norm += total_dist;
-
-        i++;
-      }
-
-    // Relative "error"
-    dist_norm = std::sqrt(dist_norm/_mesh.n_nodes());
-  }
-
-  libMesh::out << "Finished writegr" << std::endl;
-  return dist_norm;
-}
-
-
-
-// reading grid from input file
-int VariationalMeshSmoother::readgr(Array2D<Real> & R)
-{
-  libMesh::out << "Starting readgr" << std::endl;
-
-  int i = 0;
-  for (auto & node : _mesh.node_ptr_range())
-  {
-    // Get a reference to the node
-    Node & node_ref = *node;
-
-    // For each node grab its X [Y] [Z] coordinates
-    for (unsigned int j=0; j<_dim; j++)
-      R[i][j] = node_ref(j);
-  }
-
-  return 0;
-}
-
-
-void VariationalMeshSmoother::readNodesIntoArray(Array2D<Real> & R, const VariationalSmootherSystem & system) const
-{
-  unsigned int i = 0;
-  for (auto * node : system.get_mesh().node_ptr_range())
-  {
-    // For each node grab its X Y [Z] coordinates
-    for (unsigned int j=0; j < _dim; j++)
-      R[i][j] = (*node)(j);
-
-    ++i;
-  }
-}
-
-
-// Preprocess mesh data and control smoothing/untangling iterations
-void VariationalMeshSmoother::full_smooth(Array2D<Real> & R, Real dilation_weight)
-{
   Real vol = 1.;
  
   // Create a new mesh, EquationSystems, and System
-  DistributedMesh mesh(_mesh);
-  EquationSystems es(mesh);
+  EquationSystems es(_mesh);
   VariationalSmootherSystem & sys = es.add_system<VariationalSmootherSystem>("variational_smoother_system");
   //sys.print_element_solutions=true;
   //sys.print_element_residuals=true;
@@ -198,6 +90,7 @@ void VariationalMeshSmoother::full_smooth(Array2D<Real> & R, Real dilation_weigh
   // Set up solver
   sys.time_solver =
     std::make_unique<SteadySolver>(sys);
+
   // Uncomment this line and use -snes_test_jacobian and -snes_test_jacobian_view
   // flags to compare the hand-coded jacobian in VariationalSmootherSystem
   // to finite difference jacobians.
@@ -212,9 +105,6 @@ void VariationalMeshSmoother::full_smooth(Array2D<Real> & R, Real dilation_weigh
   solver.relative_step_tolerance = 1e-10;
 
   sys.solve();
-
-  // Update _mesh with solution
-  readNodesIntoArray(R, sys);
 }
 
 } // namespace libMesh
