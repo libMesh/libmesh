@@ -1660,7 +1660,7 @@ public:
   /**
    * Add a static condensation class
    */
-  void create_static_condensation(const MeshBase & mesh, System & system);
+  void create_static_condensation(MeshBase & mesh, System & system);
 
   /**
    * Checks whether we have static condensation

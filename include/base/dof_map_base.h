@@ -116,12 +116,12 @@ public:
 
   virtual void clear();
 
+#ifdef LIBMESH_ENABLE_AMR
   /**
    * \returns The total number of degrees of freedom on old_dof_objects
    */
   dof_id_type n_old_dofs() const { return _n_old_dfs; }
 
-#ifdef LIBMESH_ENABLE_AMR
   /**
    * \returns The first old dof index that is local to partition \p proc.
    */
@@ -200,6 +200,7 @@ inline dof_id_type DofMapBase::n_dofs_on_processor(const processor_id_type proc)
   return cast_int<dof_id_type>(_end_df[proc] - _first_df[proc]);
 }
 
+#ifdef LIBMESH_ENABLE_AMR
 inline dof_id_type DofMapBase::first_old_dof(const processor_id_type proc) const
 {
   libmesh_assert_less(proc, _first_old_df.size());
@@ -211,6 +212,6 @@ inline dof_id_type DofMapBase::end_old_dof(const processor_id_type proc) const
   libmesh_assert_less(proc, _end_old_df.size());
   return _end_old_df[proc];
 }
-
+#endif // LIBMESH_ENABLE_AMR
 }
 #endif // LIBMESH_DOF_MAP_BASE_H

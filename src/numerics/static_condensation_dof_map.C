@@ -28,7 +28,7 @@
 
 namespace libMesh
 {
-StaticCondensationDofMap::StaticCondensationDofMap(const MeshBase & mesh,
+StaticCondensationDofMap::StaticCondensationDofMap(MeshBase & mesh,
                                                    System & system,
                                                    const DofMap & dof_map)
   : DofMapBase(dof_map.comm()),

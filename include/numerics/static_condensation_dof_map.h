@@ -58,7 +58,7 @@ class Elem;
 class StaticCondensationDofMap : public DofMapBase
 {
 public:
-  StaticCondensationDofMap(const MeshBase & mesh, System & system, const DofMap & dof_map);
+  StaticCondensationDofMap(MeshBase & mesh, System & system, const DofMap & dof_map);
   virtual ~StaticCondensationDofMap();
 
   //
@@ -142,7 +142,7 @@ private:
   /// dofs
   std::vector<dof_id_type> _local_uncondensed_dofs;
 
-  const MeshBase & _mesh;
+  MeshBase & _mesh;
   System & _system;
   const DofMap & _dof_map;
 
