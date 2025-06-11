@@ -35,8 +35,16 @@ namespace libMesh
 // but we must specify element residuals
 class VariationalSmootherSystem : public libMesh::FEMSystem
 {
+/**
+ * This is an FEMSystem to solve the optimization probelem posed by the
+ * VariationalMeshSmoother class.
+ *
+ * The residual is coded as the gradient of the distortion-dilation metric, and
+ * the jacobian as analytically coded as the Hessian of the metric.
+ *
+ * The nodes of the system mesh are updated during the solve.
+ */
 public:
-  // Constructor
   VariationalSmootherSystem(libMesh::EquationSystems & es,
                 const std::string & name,
                 const unsigned int number)
@@ -44,7 +52,7 @@ public:
     input_system(nullptr),
     _fe_family("LAGRANGE"),
     _fe_order(1),
-    _epsilon_squared(1e-18),
+    _epsilon_squared(1e-10),
     _ref_vol(1.),
     _dilation_weight(0.5)
   {}
@@ -60,7 +68,6 @@ public:
                          bool apply_heterogeneous_constraints = false,
                          bool apply_no_constraints = false) override;
 
-  Real & get_epsilon_squared() { return _epsilon_squared; }
   Real & get_ref_vol() { return _ref_vol; }
   Real & get_dilation_weight() { return _dilation_weight; }
 
@@ -89,12 +96,12 @@ protected:
   virtual bool element_time_derivative (bool request_jacobian,
                                         libMesh::DiffContext & context) override;
 
-  // The FE type to use
+  /// The FE type to use
   std::string _fe_family;
   unsigned int _fe_order;
 
-  /// The small nonzero constant to prevent zero denominators
-  Real _epsilon_squared;
+  /// The small nonzero constant to prevent zero denominators (degenerate elements only)
+  const Real _epsilon_squared;
 
   /// The reference volume on an ideal element
   Real _ref_vol;

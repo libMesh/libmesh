@@ -249,10 +249,13 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                          0, 0, 1);
 
       // The chi function allows us to handle degenerate elements
-      const Real chi = 0.5 * (det + std::sqrt(_epsilon_squared + det_sq));
+      // When the element is not degenerate (i.e., det(S) > 0), we can set
+      // _epsilon_squared to zero to get chi(det(S)) = det(S)
+      const Real epsilon_sq = det > 0. ? 0. : _epsilon_squared;
+      const Real chi = 0.5 * (det + std::sqrt(epsilon_sq + det_sq));
       const Real chi_sq = chi * chi;
       const Real chi_cube = chi_sq * chi;
-      const Real sqrt_term = std::sqrt(_epsilon_squared + det_sq);
+      const Real sqrt_term = std::sqrt(epsilon_sq + det_sq);
       // dchi(x) / dx
       const Real chi_prime = 0.5 * (1. + det / sqrt_term);
       // dchi(det(S) / dS
@@ -275,7 +278,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       // To compute dS/dR below
       std::vector<std::vector<std::vector<Real>>> dphi_maps = {dphidxi_map, dphideta_map, dphidzeta_map};
 
-      // Compute residual
+      // Compute residual (i.e., the gradient of the combined metric w.r.t node locations)
       for (const auto l : elem.node_index_range())
       {
         for (const auto var_id : make_range(dim))
@@ -292,7 +295,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
       if (request_jacobian)
       {
-        // Compute jacobian of the smoothing system (i.e., the Hessian of the combined metric)
+        // Compute jacobian of the smoothing system (i.e., the Hessian of the combined metric w.r.t. the mesh node locations)
 
         // Precompute coefficients to be applied to each component of tensor
         // products in the loops below

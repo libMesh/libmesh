@@ -178,9 +178,6 @@ void VariationalMeshSmoother::readNodesIntoArray(Array2D<Real> & R, const Variat
 void VariationalMeshSmoother::full_smooth(Array2D<Real> & R, Real dilation_weight)
 {
   Real vol = 1.;
-
-  // compute max distortion measure over all cells
-  Real epsilon = 0.;//1.e-5;
  
   // Create a new mesh, EquationSystems, and System
   DistributedMesh mesh(_mesh);
@@ -196,7 +193,6 @@ void VariationalMeshSmoother::full_smooth(Array2D<Real> & R, Real dilation_weigh
   sys.attach_constraint_object(constraint);
 
   // Set system parameters
-  sys.get_epsilon_squared() = epsilon*epsilon;
   sys.get_ref_vol() = vol;
   sys.get_dilation_weight() = dilation_weight;
 
