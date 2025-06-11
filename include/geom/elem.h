@@ -2872,7 +2872,7 @@ Elem::simple_build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  std::unique_ptr<Elem> edge = std::make_unique<Edgeclass>(this);
+  std::unique_ptr<Elem> edge = std::make_unique<Edgeclass>();
 
   for (auto n : edge->node_index_range())
     edge->set_node(n, this->node_ptr(Subclass::edge_nodes_map[i][n]));
