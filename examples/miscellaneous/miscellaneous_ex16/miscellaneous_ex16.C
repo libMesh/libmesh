@@ -68,7 +68,7 @@
 
 // I/O utilities.
 #include "libmesh/getpot.h"
-#include "libmesh/vtk_io.h"
+#include "libmesh/exodusII_io.h"
 
 // For the solver for the system with static condensation
 #include "libmesh/petsc_linear_solver.h"
@@ -153,11 +153,12 @@ main(int argc, char ** argv)
   sys.attach_assemble_function(assemble_poisson);
 
   // Now perform same steps for system with static condensation enabled
-  auto & sc_sys = equation_systems.add_system<LinearImplicitSystem>("Poisson2");
-  sc_sys.add_variable("u", SECOND);
+  auto & sc_sys = equation_systems.add_system<LinearImplicitSystem>("SC_Poisson");
+  sc_sys.add_variable("v", SECOND);
   sc_sys.attach_assemble_function(assemble_poisson);
   sc_sys.create_static_condensation();
 
+#ifdef LIBMESH_ENABLE_AMR
   // Define the mesh refinement object that takes care of adaptively
   // refining the mesh.
   MeshRefinement mesh_refinement(mesh);
@@ -170,15 +171,18 @@ main(int argc, char ** argv)
   mesh_refinement.coarsen_fraction() = 0.3;
   // We won't refine any element more than 2 times in total
   mesh_refinement.max_h_level()      = 2;
+#endif
 
   // Initialize the data structures for the equation system.
   equation_systems.init();
 
+#ifdef LIBMESH_ENABLE_AMR
   // Refinement parameters
   const unsigned int max_r_steps = 2; // Refine the mesh 2 times
 
   for (const auto r_step : make_range(max_r_steps + 1))
     {
+#endif
       // Prints information about the system to the screen.
       equation_systems.print_info();
 
@@ -196,6 +200,20 @@ main(int argc, char ** argv)
       libMesh::out << "Static condensation reduced problem size to "
                    << sc_sys.get_static_condensation().get_condensed_mat().m() << std::endl << std::endl;
 
+#if defined(LIBMESH_HAVE_EXODUS_API) && !defined(LIBMESH_ENABLE_PARMESH)
+      // After solving the system write the solution
+      // to an Exodus-formatted file.
+      ExodusII_IO exii_io(mesh);
+      const std::string file_name =
+#ifdef LIBMESH_ENABLE_AMR
+          "out_" + std::to_string(r_step) + ".e";
+#else
+          "out.e";
+#endif
+      exii_io.write_equation_systems(file_name, equation_systems);
+#endif
+
+#ifdef LIBMESH_ENABLE_AMR
       // We need to ensure that the mesh is not refined on the last iteration
       // of this loop, since we do not want to refine the mesh unless we are
       // going to solve the equation system for that refined mesh.
@@ -225,14 +243,7 @@ main(int argc, char ** argv)
           equation_systems.reinit();
         }
     }
-
-#if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
-
-  // After solving the system write the solution
-  // to a VTK-formatted plot file.
-  VTKIO(mesh).write_equation_systems("out.pvtu", equation_systems);
-
-#endif // #ifdef LIBMESH_HAVE_VTK
+#endif // LIBMESH_ENABLE_AMR
 #endif // defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
 
   // All done.
