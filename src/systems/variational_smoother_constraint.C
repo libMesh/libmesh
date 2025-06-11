@@ -42,8 +42,6 @@ void VariationalSmootherConstraint::constrain()
   const auto boundary_node_ids = MeshTools::find_boundary_nodes (mesh);
   for (const auto & bid : boundary_node_ids)
   {
-    //if (bid == 2)
-    //  continue;
     const auto & node = mesh.node_ref(bid);
     // Find all the nodal neighbors... that is the nodes directly connected
     // to this node through one edge
@@ -73,7 +71,8 @@ void VariationalSmootherConstraint::constrain()
 
     //   But for now, just fix all the boundary nodes to not move
     this->fix_node(node);
-  }
+
+  }// end bid
 
   // Constrain subdomain boundary nodes, if requested
   if (_preserve_subdomain_boundaries)

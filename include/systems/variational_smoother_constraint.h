@@ -24,20 +24,35 @@
 
 namespace libMesh
 {
-
+/*
+ * Constraint class for the VariationalMeshSmoother.
+ * 
+ * Currently, all mesh boundary nodes are constrained to not move during smoothing.
+ * If requested (preserve_subdomain_boundaries = true), nodes on subdomain boundaries
+ * are also constrained to not move.
+ */
 class VariationalSmootherConstraint : public System::Constraint
 {
 private:
 
   System & _sys;
 
-  /// Whether subdomain boundaries are subject to change via smoothing
+  /// Whether nodes on subdomain boundaries are subject to change via smoothing
   const bool _preserve_subdomain_boundaries;
 
+  /*
+   * Constrain (fix) a node to not move during mesh smoothing.
+   * @param node Node to fix.
+   */
   void fix_node(const Node & node);
 
 public:
 
+  /*
+   * Constructor
+   * @param sys System to constrain.
+   * @param preserve_subdomain_boundaries Whether to constrain nodes on subdomain boundaries to not move.
+   */
   VariationalSmootherConstraint(System & sys, const bool & preserve_subdomain_boundaries);
 
   virtual ~VariationalSmootherConstraint() override;
