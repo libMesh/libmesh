@@ -51,7 +51,7 @@ public:
   : libMesh::FEMSystem(es, name, number),
     input_system(nullptr),
     _fe_family("LAGRANGE"),
-    _fe_order(1),
+    _fe_order(1), // We will need to change this for higher order meshes like TRI6
     _epsilon_squared(1e-10),
     _ref_vol(1.),
     _dilation_weight(0.5)

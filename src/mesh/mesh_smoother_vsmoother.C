@@ -70,10 +70,15 @@ void VariationalMeshSmoother::smooth(unsigned int)
   // Create a new mesh, EquationSystems, and System
   EquationSystems es(_mesh);
   VariationalSmootherSystem & sys = es.add_system<VariationalSmootherSystem>("variational_smoother_system");
+
+  // Set this to something > 0 to add more quadrature points than the default
+  // rule that integrates order 2 * nq_points + 1 polynomials exactly.
+  sys.extra_quadrature_order = 0;
+
+  // Uncomment these to debug
   //sys.print_element_solutions=true;
   //sys.print_element_residuals=true;
   //sys.print_element_jacobians=true;
-  sys.extra_quadrature_order = 0;
 
   // Add boundary node and hanging node constraints
   VariationalSmootherConstraint constraint(sys, _preserve_subdomain_boundaries);
