@@ -458,6 +458,10 @@ void System::reinit ()
   // project_vector handles vector initialization now
   libmesh_assert_equal_to (solution->size(), current_local_solution->size());
 
+  // Make sure our static condensation dof map is up-to-date before we init any
+  // static condensation matrices
+  this->get_dof_map().reinit_static_condensation();
+
   if (!_matrices.empty() && !_basic_system_only)
     {
       // Clear the matrices
