@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libmesh/libmesh_config.h"
-#if defined(LIBMESH_ENABLE_VSMOOTHER) && LIBMESH_DIM > 1
+#if defined(LIBMESH_ENABLE_VSMOOTHER)
 
 // Local includes
 #include "libmesh/mesh_smoother_vsmoother.h"
@@ -110,4 +110,4 @@ void VariationalMeshSmoother::smooth(unsigned int)
 
 } // namespace libMesh
 
-#endif // defined(LIBMESH_ENABLE_VSMOOTHER) && LIBMESH_DIM > 1
+#endif // defined(LIBMESH_ENABLE_VSMOOTHER)
