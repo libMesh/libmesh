@@ -192,11 +192,21 @@ bool EquationSystems::reinit_solutions ()
 
         sys.prolong_vectors();
       }
+
+    // Once vectors are all projected, we can delete children of coarsened elements
+    this->get_mesh().contract();
+    // Clean up the refinement flags so that, if there are any future vector
+    // projections without an intervening mesh adaptation, the refinement flags
+    // are not in an incorrect state. Note that this must occur after mesh
+    // contraction because we will be checking for JUST_COARSEND in Elem::contract
+    this->get_mesh().clean_refinement_flags();
     mesh_changed = true;
   }
 
   if (this->_refine_in_reinit)
     {
+      bool mesh_changed_in_internal_refine = false;
+
       // Don't override any user refinement settings
       MeshRefinement mesh_refine(_mesh);
       mesh_refine.face_level_mismatch_limit() = 0; // unlimited
@@ -218,12 +228,12 @@ bool EquationSystems::reinit_solutions ()
 
               sys.restrict_vectors();
             }
-          mesh_changed = true;
+          mesh_changed_in_internal_refine = true;
         }
 
       // Once vectors are all restricted, we can delete
       // children of coarsened elements
-      if (mesh_changed)
+      if (mesh_changed_in_internal_refine)
         this->get_mesh().contract();
 
       // Try to refine the mesh, then prolong each system's vectors
@@ -241,22 +251,27 @@ bool EquationSystems::reinit_solutions ()
 
               sys.prolong_vectors();
             }
-          mesh_changed = true;
+          mesh_changed_in_internal_refine = true;
         }
+
+      if (mesh_changed_in_internal_refine)
+        // Clean up the refinement flags so that, if there are any future vector
+        // projections without an intervening mesh adaptation, the refinement flags
+        // are not in an incorrect state
+        this->get_mesh().clean_refinement_flags();
+
+      mesh_changed = mesh_changed || mesh_changed_in_internal_refine;
     }
 
-  // FIXME: For backwards compatibility, assume
-  // refine_and_coarsen_elements or refine_uniformly have already
-  // been called
-  //
   // Note that static condensation can be reinitialized at the very end
   // because it is not involved in the restriction or prolongation of
   // the solution vectors. And it's a good thing that we can wait until
   // the end because this method may contract the mesh which would invalidate
   // any static condensation reinitialization performed before that point
   // because we perform mappings from element IDs to degree of freedom data
-  for (unsigned int i=0; i != n_sys; ++i)
-    this->get_system(i).get_dof_map().reinit_static_condensation();
+  if (mesh_changed)
+    for (unsigned int i=0; i != n_sys; ++i)
+      this->get_system(i).get_dof_map().reinit_static_condensation();
 
   return mesh_changed;
 

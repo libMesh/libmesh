@@ -2412,7 +2412,22 @@ std::string MeshBase::get_local_constraints(bool print_nonlocal) const
   return os.str();
 }
 
-
+void MeshBase::clean_refinement_flags()
+{
+  for (auto * const elem : this->element_ptr_range())
+    {
+      if (elem->active())
+        {
+          elem->set_refinement_flag(Elem::DO_NOTHING);
+          elem->set_p_refinement_flag(Elem::DO_NOTHING);
+        }
+      else
+        {
+          elem->set_refinement_flag(Elem::INACTIVE);
+          elem->set_p_refinement_flag(Elem::INACTIVE);
+        }
+    }
+}
 
 
 // Explicit instantiations for our template function

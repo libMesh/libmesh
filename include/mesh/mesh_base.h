@@ -1814,6 +1814,10 @@ public:
   const std::set<subdomain_id_type> & get_mesh_subdomains() const
   { libmesh_assert(this->is_prepared()); return _mesh_subdomains; }
 
+  /**
+   * Possibly clean refinement flags from previous adaptivity
+   */
+  void clean_refinement_flags();
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,

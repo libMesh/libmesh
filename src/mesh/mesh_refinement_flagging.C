@@ -682,19 +682,7 @@ void MeshRefinement::clean_refinement_flags ()
 {
   // Possibly clean up the refinement flags from
   // a previous step
-  for (auto & elem : _mesh.element_ptr_range())
-    {
-      if (elem->active())
-        {
-          elem->set_refinement_flag(Elem::DO_NOTHING);
-          elem->set_p_refinement_flag(Elem::DO_NOTHING);
-        }
-      else
-        {
-          elem->set_refinement_flag(Elem::INACTIVE);
-          elem->set_p_refinement_flag(Elem::INACTIVE);
-        }
-    }
+  _mesh.clean_refinement_flags();
 }
 
 } // namespace libMesh
