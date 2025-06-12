@@ -99,7 +99,6 @@ private:
   /**
    * Smoother control variables
    */
-  unsigned _dim;
   const Real _dilation_weight;
 
   /// Whether subdomain boundaries are subject to change via smoothing

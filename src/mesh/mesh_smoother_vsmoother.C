@@ -52,7 +52,6 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  Real dilation_weight,
                                                  const bool preserve_subdomain_boundaries) :
   MeshSmoother(mesh),
-  _dim(mesh.mesh_dimension()),
   _dilation_weight(dilation_weight),
   _preserve_subdomain_boundaries(preserve_subdomain_boundaries)
 {}
@@ -60,9 +59,6 @@ VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
 
 void VariationalMeshSmoother::smooth(unsigned int)
 {
-  // Update the mesh dimension, since the mesh may have changed since initialization
-  _dim = _mesh.mesh_dimension();
-
   // Check for multiple dimensions
   if (_mesh.elem_dimensions().size() > 1)
     libmesh_not_implemented_msg("Meshes containing elements of differing dimension are not yet supported.");
