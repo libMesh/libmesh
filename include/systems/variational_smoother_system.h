@@ -53,7 +53,7 @@ public:
     _fe_family("LAGRANGE"),
     _fe_order(1), // We will need to change this for higher order meshes like TRI6
     _epsilon_squared(1e-10),
-    _elem_ref_vols(std::vector<Real>()),
+    _ref_vol(1.),
     _dilation_weight(0.5)
   {}
 
@@ -95,8 +95,10 @@ protected:
   virtual bool element_time_derivative (bool request_jacobian,
                                         libMesh::DiffContext & context) override;
 
-  /// Computes the reference volume of each element for use in the dilation metric
-  void compute_element_reference_volumes();
+  /* Computes the element reference volume used in the dilation metric
+   * The reference value is set to the volume-averaged value of |J| over the mesh.
+   */
+  void compute_element_reference_volume();
 
   /// The FE type to use
   std::string _fe_family;
@@ -106,7 +108,7 @@ protected:
   const Real _epsilon_squared;
 
   /// The reference volume for each element
-  std::vector<Real> _elem_ref_vols;
+  Real _ref_vol;
 
   /// The relative weight to give the dilation metric. The distortion metric is given weight 1 - _dilation_weight.
   Real _dilation_weight;
