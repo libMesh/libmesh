@@ -26,6 +26,7 @@
 #include "libmesh/enum_order.h"
 #include "libmesh/int_range.h"
 
+#ifdef LIBMESH_ENABLE_AMR
 namespace {
   // Avoid downcasting when Real > double
   constexpr libMesh::Real r6 = 6;
@@ -38,6 +39,7 @@ namespace {
   constexpr libMesh::Real r72 = 72;
   constexpr libMesh::Real r144 = 144;
 }
+#endif
 
 namespace libMesh
 {
