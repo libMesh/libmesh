@@ -84,6 +84,30 @@ void VariationalSmootherSystem::init_data ()
       (*solution).set(dof_id, (*node)(d));
     }
   }
+
+  this->compute_element_reference_volumes();
+}
+
+void VariationalSmootherSystem::compute_element_reference_volumes()
+{
+  std::unique_ptr<DiffContext> con = this->build_context();
+  FEMContext & femcontext = cast_ref<FEMContext &>(*con);
+  this->init_context(femcontext);
+
+  const auto & mesh = this->get_mesh();
+  _elem_ref_vols.resize(mesh.n_active_elem());
+
+  for (const auto * elem : mesh.element_ptr_range())
+  {
+    femcontext.pre_fe_reinit(*this, elem);
+    femcontext.elem_fe_reinit();
+
+    const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
+    const auto & JxW = fe_map.get_JxW();
+
+    const Real det_J_integral = std::accumulate(JxW.begin(), JxW.end(), 0.);
+    _elem_ref_vols[elem->id()] = det_J_integral / elem->reference_elem()->volume();
+  }
 }
 
 
@@ -109,6 +133,7 @@ void VariationalSmootherSystem::init_context(DiffContext & context)
       fe_map.get_dxyzdxi();
       fe_map.get_dxyzdeta();
       fe_map.get_dxyzdzeta();
+      fe_map.get_JxW();
     }
 
   // Build a corresponding context for the input system if we haven't
@@ -133,9 +158,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
   // First we get some references to cell-specific data that
   // will be used to assemble the linear system.
 
-  const auto * my_fe = c.get_element_fe(0);
-
-  const auto & fe_map = my_fe->get_fe_map();
+  const auto & fe_map = c.get_element_fe(0)->get_fe_map();
 
   const auto & dxyzdxi = fe_map.get_dxyzdxi();
   const auto & dxyzdeta = fe_map.get_dxyzdeta();
@@ -226,7 +249,8 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       const Real det_sq = det * det;
       const Real det_cube = det_sq * det;
 
-      const Real ref_vol_sq = _ref_vol * _ref_vol;
+      const Real & ref_vol = _elem_ref_vols[elem.id()];
+      const Real ref_vol_sq = ref_vol * ref_vol;
 
       // trace of S^T * S
       // DO NOT USE RealTensor.tr for the trace, it will NOT be correct for
@@ -268,8 +292,8 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       const RealTensor dbeta_dS = (std::pow(tr_div_dim, 0.5 * dim - 1) / chi) * S - (std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * dchi_dS;
 
       // Dilation metric (mu)
-      //const Real mu = 0.5 * (_ref_vol + det_sq / _ref_vol) / chi;
-      RealTensor dmu_dS = ((det_sq /_ref_vol / chi)) * S_inv_T - (0.5 * (_ref_vol + det_sq / _ref_vol) / chi_sq) * dchi_dS;
+      //const Real mu = 0.5 * (ref_vol + det_sq / ref_vol) / chi;
+      RealTensor dmu_dS = ((det_sq /ref_vol / chi)) * S_inv_T - (0.5 * (ref_vol + det_sq / ref_vol) / chi_sq) * dchi_dS;
 
       // Combined metric (E)
       //const Real E = (1. - _dilation_weight) * beta + _dilation_weight * mu;
@@ -327,9 +351,9 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
 
         // We represent d mu / dS as alpha(S) * S^-T, where alpha is a scalar function
-        const Real alpha = (-chi_prime * det_cube + 2. * det_sq * chi - ref_vol_sq * det) / (2. * _ref_vol * chi_sq);
+        const Real alpha = (-chi_prime * det_cube + 2. * det_sq * chi - ref_vol_sq * det) / (2. * ref_vol * chi_sq);
         // d alpha / dS has the form c(S) * S^-T, where c is the scalar coefficient defined below
-        const Real dalpha_dS_coef = det * (-4. * _ref_vol * alpha * chi_prime * chi - chi_2prime * det_cube - chi_prime * det_sq + 4 * chi * det - ref_vol_sq) / (2. * _ref_vol * chi_sq);
+        const Real dalpha_dS_coef = det * (-4. * ref_vol * alpha * chi_prime * chi - chi_2prime * det_cube - chi_prime * det_sq + 4 * chi * det - ref_vol_sq) / (2. * ref_vol * chi_sq);
 
         for (const auto l: elem.node_index_range())
         {

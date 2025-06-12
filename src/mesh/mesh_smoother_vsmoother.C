@@ -65,8 +65,6 @@ void VariationalMeshSmoother::smooth(unsigned int)
 
   Real dilation_weight = _dilation_weight;
 
-  Real vol = 1.;
- 
   // Create a new mesh, EquationSystems, and System
   EquationSystems es(_mesh);
   VariationalSmootherSystem & sys = es.add_system<VariationalSmootherSystem>("variational_smoother_system");
@@ -85,7 +83,6 @@ void VariationalMeshSmoother::smooth(unsigned int)
   sys.attach_constraint_object(constraint);
 
   // Set system parameters
-  sys.get_ref_vol() = vol;
   sys.get_dilation_weight() = dilation_weight;
 
   // Set up solver
