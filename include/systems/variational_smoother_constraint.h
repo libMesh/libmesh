@@ -26,7 +26,7 @@ namespace libMesh
 {
 /*
  * Constraint class for the VariationalMeshSmoother.
- * 
+ *
  * Currently, all mesh boundary nodes are constrained to not move during smoothing.
  * If requested (preserve_subdomain_boundaries = true), nodes on subdomain boundaries
  * are also constrained to not move.
