@@ -171,7 +171,6 @@ include_HEADERS =  \
         geom/point.h \
         geom/reference_elem.h \
         geom/remote_elem.h \
-        geom/side.h \
         geom/sphere.h \
         geom/stored_range.h \
         geom/surface.h \

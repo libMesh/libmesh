@@ -2172,7 +2172,7 @@ void DofMap::dof_indices (const Elem * const elem,
   // libmesh_assert(elem);
 
   // If we are asking for current indices on an element, it ought to
-  // be an active element (or a Side proxy, which also thinks it's
+  // be an active element (or a temporary side, which also thinks it's
   // active)
   libmesh_assert(!elem || elem->active());
 

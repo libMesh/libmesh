@@ -25,7 +25,6 @@
 #include "libmesh/edge_inf_edge2.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/face_inf_quad6.h"
-#include "libmesh/side.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
 
@@ -127,73 +126,36 @@ unsigned int InfPrism12::local_edge_node(unsigned int edge,
 
 
 
-std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i,
-                                                  bool proxy)
+std::unique_ptr<Elem> InfPrism12::build_side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
   std::unique_ptr<Elem> face;
-  if (proxy)
+
+  switch (i)
     {
-#ifdef LIBMESH_ENABLE_DEPRECATED
-      libmesh_deprecated();
-      switch (i)
-        {
-          // base
-        case 0:
-          {
-            face = std::make_unique<Side<Tri6,InfPrism12>>(this,i);
-            break;
-          }
+    case 0: // the triangular face at z=-1, base face
+      {
+        face = std::make_unique<Tri6>();
+        break;
+      }
 
-          // ifem sides
-        case 1:
-        case 2:
-        case 3:
-          {
-            face = std::make_unique<Side<InfQuad6,InfPrism12>>(this,i);
-            break;
-          }
+    case 1: // the quad face at y=0
+    case 2: // the other quad face
+    case 3: // the quad face at x=0
+      {
+        face = std::make_unique<InfQuad6>();
+        break;
+      }
 
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
-#else
-      libmesh_error();
-#endif // LIBMESH_ENABLE_DEPRECATED
+    default:
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-  else
-    {
-      switch (i)
-        {
-        case 0: // the triangular face at z=-1, base face
-          {
-            face = std::make_unique<Tri6>();
-            break;
-          }
+  // Set the nodes
+  for (auto n : face->node_index_range())
+    face->set_node(n, this->node_ptr(InfPrism12::side_nodes_map[i][n]));
 
-        case 1: // the quad face at y=0
-        case 2: // the other quad face
-        case 3: // the quad face at x=0
-          {
-            face = std::make_unique<InfQuad6>();
-            break;
-          }
-
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
-
-      // Set the nodes
-      for (auto n : face->node_index_range())
-        face->set_node(n, this->node_ptr(InfPrism12::side_nodes_map[i][n]));
-    }
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  if (!proxy) // proxy sides used to leave parent() set
-#endif
-    face->set_parent(nullptr);
   face->set_interior_parent(this);
 
   face->subdomain_id() = this->subdomain_id();
@@ -217,7 +179,7 @@ void InfPrism12::build_side_ptr (std::unique_ptr<Elem> & side,
       {
         if (!side.get() || side->type() != TRI6)
           {
-            side = this->build_side_ptr(i, false);
+            side = this->build_side_ptr(i);
             return;
           }
         break;
@@ -229,7 +191,7 @@ void InfPrism12::build_side_ptr (std::unique_ptr<Elem> & side,
       {
         if (!side.get() || side->type() != INFQUAD6)
           {
-            side = this->build_side_ptr(i, false);
+            side = this->build_side_ptr(i);
             return;
           }
         break;
