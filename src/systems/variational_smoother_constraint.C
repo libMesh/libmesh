@@ -51,8 +51,8 @@ void VariationalSmootherConstraint::constrain()
     // Remove any neighbors that are not boundary nodes
     neighbors.erase(
       std::remove_if(neighbors.begin(), neighbors.end(),
-        [&boundary_node_ids](const Node * node) {
-          return boundary_node_ids.find(node->id()) == boundary_node_ids.end();
+        [&boundary_node_ids](const Node * neigh) {
+          return boundary_node_ids.find(neigh->id()) == boundary_node_ids.end();
         }
       ),
       neighbors.end()
