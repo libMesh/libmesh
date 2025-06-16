@@ -120,16 +120,55 @@ private:
    * be uncondensed
    * @param full_dof_number The dof id in the full (uncondensed + condensed) system
    * @param involved_in_constraints Whether the \p full_dof_number is involved in constraints
+   * @param uncondensed_local_to_global_map A map from uncondensed full dof numbering to local
+   * (element) numbering for a given element
+   * @param local_uncondensed_dofs_set Set of local uncondensed degrees of freedom (numbered in the
+   * full system)
+   * @param nonlocal_uncondensed_dofs Map from processor IDs to sets of nonlocal uncondensed degrees
+   * of freedom (numbered in the full system)
+   * @param elem_uncondensed_dofs Used for temporary storage of uncondensed degrees of freedom
+   * active on an element
+   * @param uncondensed_local_dof_number Counter for number of uncondensed dofs on an element
+   * @param constraint_dofs Set of degrees of freedom numbered in the full system involved in
+   * constraints
    */
-  void add_uncondensed_dof_plus_constraint_dofs(dof_id_type full_dof_number,
-                                                bool involved_in_constraints);
+  void add_uncondensed_dof_plus_constraint_dofs(
+      dof_id_type full_dof_number,
+      bool involved_in_constraints,
+      std::unordered_map<dof_id_type, dof_id_type> & uncondensed_global_to_local_map,
+      std::unordered_set<dof_id_type> & local_uncondensed_dofs_set,
+      std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> &
+          nonlocal_uncondensed_dofs,
+      std::vector<dof_id_type> & elem_uncondensed_dofs,
+      dof_id_type & uncondensed_local_dof_number,
+      std::unordered_set<dof_id_type> & constraint_dofs);
 
   /**
    * Add an uncondensed dof
    * @param full_dof_number The dof id in the full (uncondensed + condensed) system
    * @param involved_in_constraints Whether the \p full_dof_number is involved in constraints
+   * @param uncondensed_local_to_global_map A map from uncondensed full dof numbering to local
+   * (element) numbering for a given element
+   * @param local_uncondensed_dofs_set Set of local uncondensed degrees of freedom (numbered in the
+   * full system)
+   * @param nonlocal_uncondensed_dofs Map from processor IDs to sets of nonlocal uncondensed degrees
+   * of freedom (numbered in the full system)
+   * @param elem_uncondensed_dofs Used for temporary storage of uncondensed degrees of freedom
+   * active on an element
+   * @param uncondensed_local_dof_number Counter for number of uncondensed dofs on an element
+   * @param constraint_dofs Set of degrees of freedom numbered in the full system involved in
+   * constraints
    */
-  void add_uncondensed_dof(dof_id_type full_dof_number, bool involved_in_constraints);
+  void add_uncondensed_dof(
+      dof_id_type full_dof_number,
+      bool involved_in_constraints,
+      std::unordered_map<dof_id_type, dof_id_type> & uncondensed_global_to_local_map,
+      std::unordered_set<dof_id_type> & local_uncondensed_dofs_set,
+      std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> &
+          nonlocal_uncondensed_dofs,
+      std::vector<dof_id_type> & elem_uncondensed_dofs,
+      dof_id_type & uncondensed_local_dof_number,
+      std::unordered_set<dof_id_type> & constraint_dofs);
 
   /**
    * Data stored on a per-element basis used to compute element Schur complements and their
@@ -189,27 +228,6 @@ private:
 
   /// Number of off-diagonal nonzeros per row in the reduced system
   std::vector<dof_id_type> _reduced_noz;
-
-  /// Set of local uncondensed degrees of freedom (numbered in the full system). This data member is
-  /// used only during the reinit phase and is cleared at its conclusion
-  std::unordered_set<dof_id_type> _local_uncondensed_dofs_set;
-
-  /// Map from processor IDs to sets of nonlocal uncondensed degrees of freedom (numbered in the
-  /// fully system). This data member is used only during the reinit phase and is cleared at its
-  /// conclusion
-  std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> _nonlocal_uncondensed_dofs;
-
-  /// Used for temporary storage of uncondensed degrees of freedom active on an element
-  std::vector<dof_id_type> _elem_uncondensed_dofs;
-
-  /// Pointer to a map from uncondensed full dof numbering to local (element) numbering for a given element
-  std::unordered_map<dof_id_type, dof_id_type> * _uncondensed_global_to_local_map;
-
-  /// Counter fof number of uncondensed dofs on an element
-  dof_id_type _uncondensed_local_dof_number;
-
-  /// Set of degrees of freedom numbered in the full system involved in constraints. This data member is used only during the reinit phase for construction of \p _full_to_reduced_constraint_dofs
-  std::unordered_set<dof_id_type> _constraint_dofs;
 
   /// A small map from full system degrees of freedom to reduced/condensed system degrees of freedom
   /// involved in constraints. This may be leveraged by \p StaticCondensation::set during \p

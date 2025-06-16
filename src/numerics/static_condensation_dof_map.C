@@ -42,40 +42,69 @@ StaticCondensationDofMap::StaticCondensationDofMap(MeshBase & mesh,
 
 StaticCondensationDofMap::~StaticCondensationDofMap() = default;
 
-void StaticCondensationDofMap::add_uncondensed_dof(const dof_id_type full_dof_number,
-                                                   const bool involved_in_constraints)
+void StaticCondensationDofMap::add_uncondensed_dof(
+    const dof_id_type full_dof_number,
+    const bool involved_in_constraints,
+    std::unordered_map<dof_id_type, dof_id_type> & uncondensed_global_to_local_map,
+    std::unordered_set<dof_id_type> & local_uncondensed_dofs_set,
+    std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> &
+        nonlocal_uncondensed_dofs,
+    std::vector<dof_id_type> & elem_uncondensed_dofs,
+    dof_id_type & uncondensed_local_dof_number,
+    std::unordered_set<dof_id_type> & constraint_dofs)
 {
-  if (_uncondensed_global_to_local_map->count(full_dof_number))
+  if (uncondensed_global_to_local_map.count(full_dof_number))
     // We've already seen this dof on this element
     return;
 
   if (_dof_map.local_index(full_dof_number))
-    _local_uncondensed_dofs_set.insert(full_dof_number);
+    local_uncondensed_dofs_set.insert(full_dof_number);
   else
-    _nonlocal_uncondensed_dofs[_dof_map.dof_owner(full_dof_number)].insert(full_dof_number);
+    nonlocal_uncondensed_dofs[_dof_map.dof_owner(full_dof_number)].insert(full_dof_number);
 
-  _elem_uncondensed_dofs.push_back(full_dof_number);
-  (*_uncondensed_global_to_local_map)[full_dof_number] = _uncondensed_local_dof_number++;
+  elem_uncondensed_dofs.push_back(full_dof_number);
+  (uncondensed_global_to_local_map)[full_dof_number] = uncondensed_local_dof_number++;
   if (involved_in_constraints)
-    _constraint_dofs.insert(full_dof_number);
+    constraint_dofs.insert(full_dof_number);
 }
 
 void StaticCondensationDofMap::add_uncondensed_dof_plus_constraint_dofs(
-    const dof_id_type full_dof_number, bool involved_in_constraints)
+    const dof_id_type full_dof_number,
+    bool involved_in_constraints,
+    std::unordered_map<dof_id_type, dof_id_type> & uncondensed_global_to_local_map,
+    std::unordered_set<dof_id_type> & local_uncondensed_dofs_set,
+    std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> &
+        nonlocal_uncondensed_dofs,
+    std::vector<dof_id_type> & elem_uncondensed_dofs,
+    dof_id_type & uncondensed_local_dof_number,
+    std::unordered_set<dof_id_type> & constraint_dofs)
 {
   const auto & full_dof_constraints = _dof_map.get_dof_constraints();
   auto it = full_dof_constraints.find(full_dof_number);
   const bool is_constrained = it != full_dof_constraints.end();
   involved_in_constraints = involved_in_constraints || is_constrained;
 
-  this->add_uncondensed_dof(full_dof_number, involved_in_constraints);
+  this->add_uncondensed_dof(full_dof_number,
+                            involved_in_constraints,
+                            uncondensed_global_to_local_map,
+                            local_uncondensed_dofs_set,
+                            nonlocal_uncondensed_dofs,
+                            elem_uncondensed_dofs,
+                            uncondensed_local_dof_number,
+                            constraint_dofs);
   if (is_constrained)
     for (const auto [full_constraining_dof, weight] : it->second)
       {
         libmesh_ignore(weight);
         // Our constraining dofs may themselves be constrained
         this->add_uncondensed_dof_plus_constraint_dofs(full_constraining_dof,
-                                                       /*involved_in_constraints=*/true);
+                                                       /*involved_in_constraints=*/true,
+                                                       uncondensed_global_to_local_map,
+                                                       local_uncondensed_dofs_set,
+                                                       nonlocal_uncondensed_dofs,
+                                                       elem_uncondensed_dofs,
+                                                       uncondensed_local_dof_number,
+                                                       constraint_dofs);
       }
 }
 
@@ -84,15 +113,13 @@ void StaticCondensationDofMap::reinit()
   if (this->initialized())
     this->clear();
 
-  std::vector<dof_id_type> elem_dofs; // only used to satisfy API
-  dof_id_type condensed_local_dof_number = 0;
-  std::unordered_map<dof_id_type, dof_id_type> * condensed_global_to_local_map = nullptr;
+  std::vector<dof_id_type> elem_dofs, elem_uncondensed_dofs; // only used to satisfy API
+  dof_id_type condensed_local_dof_number = 0, uncondensed_local_dof_number = 0;
+  std::unordered_map<dof_id_type, dof_id_type> *condensed_global_to_local_map = nullptr,
+                                               *uncondensed_global_to_local_map = nullptr;
   std::set<unsigned int> full_vars_present_in_reduced_sys;
-  _uncondensed_local_dof_number = 0;
-  _uncondensed_global_to_local_map = nullptr;
-  libmesh_assert(_local_uncondensed_dofs_set.empty());
-  libmesh_assert(_nonlocal_uncondensed_dofs.empty());
-  libmesh_assert(_constraint_dofs.empty());
+  std::unordered_set<dof_id_type> local_uncondensed_dofs_set, constraint_dofs;
+  std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> nonlocal_uncondensed_dofs;
 
   // Handle SCALAR dofs
   for (const auto vg : make_range(_dof_map.n_variable_groups()))
@@ -106,28 +133,49 @@ void StaticCondensationDofMap::reinit()
             const auto vn = vg_description.number(vg_vn);
             _dof_map.SCALAR_dof_indices(scalar_dof_indices, vn);
             if (this->comm().rank() == last_pid)
-              _local_uncondensed_dofs_set.insert(scalar_dof_indices.begin(),
-                                                 scalar_dof_indices.end());
+              local_uncondensed_dofs_set.insert(scalar_dof_indices.begin(),
+                                                scalar_dof_indices.end());
             else
-              _nonlocal_uncondensed_dofs[last_pid].insert(scalar_dof_indices.begin(),
-                                                          scalar_dof_indices.end());
+              nonlocal_uncondensed_dofs[last_pid].insert(scalar_dof_indices.begin(),
+                                                         scalar_dof_indices.end());
           }
       }
 
-  auto scalar_dofs_functor = [this](const Elem & /*elem*/,
-                                    std::vector<dof_id_type> & dof_indices,
-                                    const std::vector<dof_id_type> & scalar_dof_indices) {
-    dof_indices.insert(dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
-    for (const auto global_dof : scalar_dof_indices)
-      this->add_uncondensed_dof_plus_constraint_dofs(global_dof, false);
-  };
+  auto scalar_dofs_functor =
+      [this,
+       &uncondensed_global_to_local_map,
+       &local_uncondensed_dofs_set,
+       &nonlocal_uncondensed_dofs,
+       &elem_uncondensed_dofs,
+       &uncondensed_local_dof_number,
+       &constraint_dofs](const Elem & /*elem*/,
+                         std::vector<dof_id_type> & dof_indices,
+                         const std::vector<dof_id_type> & scalar_dof_indices) {
+        dof_indices.insert(dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+        for (const auto global_dof : scalar_dof_indices)
+          this->add_uncondensed_dof_plus_constraint_dofs(global_dof,
+                                                         false,
+                                                         *uncondensed_global_to_local_map,
+                                                         local_uncondensed_dofs_set,
+                                                         nonlocal_uncondensed_dofs,
+                                                         elem_uncondensed_dofs,
+                                                         uncondensed_local_dof_number,
+                                                         constraint_dofs);
+      };
 
-  auto field_dofs_functor = [this, &condensed_local_dof_number, &condensed_global_to_local_map](
-                                const Elem & elem,
-                                const unsigned int node_num,
-                                const unsigned int var_num,
-                                std::vector<dof_id_type> & dof_indices,
-                                const dof_id_type field_dof) {
+  auto field_dofs_functor = [this,
+                             &condensed_local_dof_number,
+                             &condensed_global_to_local_map,
+                             &uncondensed_global_to_local_map,
+                             &local_uncondensed_dofs_set,
+                             &nonlocal_uncondensed_dofs,
+                             &elem_uncondensed_dofs,
+                             &uncondensed_local_dof_number,
+                             &constraint_dofs](const Elem & elem,
+                                               const unsigned int node_num,
+                                               const unsigned int var_num,
+                                               std::vector<dof_id_type> & dof_indices,
+                                               const dof_id_type field_dof) {
     dof_indices.push_back(field_dof);
 
     bool uncondensed_dof = false;
@@ -143,7 +191,14 @@ void StaticCondensationDofMap::reinit()
       uncondensed_dof = true;
 
     if (uncondensed_dof)
-      this->add_uncondensed_dof_plus_constraint_dofs(field_dof, false);
+      this->add_uncondensed_dof_plus_constraint_dofs(field_dof,
+                                                     false,
+                                                     *uncondensed_global_to_local_map,
+                                                     local_uncondensed_dofs_set,
+                                                     nonlocal_uncondensed_dofs,
+                                                     elem_uncondensed_dofs,
+                                                     uncondensed_local_dof_number,
+                                                     constraint_dofs);
     else
       (*condensed_global_to_local_map)[field_dof] = condensed_local_dof_number++;
   };
@@ -152,9 +207,9 @@ void StaticCondensationDofMap::reinit()
     {
       auto & dof_data = _elem_to_dof_data[elem->id()];
       condensed_local_dof_number = 0;
-      _uncondensed_local_dof_number = 0;
+      uncondensed_local_dof_number = 0;
       condensed_global_to_local_map = &dof_data.condensed_global_to_local_map;
-      _uncondensed_global_to_local_map = &dof_data.uncondensed_global_to_local_map;
+      uncondensed_global_to_local_map = &dof_data.uncondensed_global_to_local_map;
 
       const auto sub_id = elem->subdomain_id();
       for (const auto vg : make_range(_dof_map.n_variable_groups()))
@@ -167,28 +222,28 @@ void StaticCondensationDofMap::reinit()
             {
               const auto var_num = var_group.number(v);
               dof_data.reduced_space_indices.resize(var_num + 1);
-              _elem_uncondensed_dofs.clear();
+              elem_uncondensed_dofs.clear();
               _dof_map.dof_indices(elem,
                                    elem_dofs,
                                    var_num,
                                    scalar_dofs_functor,
                                    field_dofs_functor,
                                    elem->p_level());
-              if (!_elem_uncondensed_dofs.empty())
+              if (!elem_uncondensed_dofs.empty())
                 {
                   auto & var_reduced_space_indices = dof_data.reduced_space_indices[var_num];
                   var_reduced_space_indices.insert(var_reduced_space_indices.end(),
-                                                   _elem_uncondensed_dofs.begin(),
-                                                   _elem_uncondensed_dofs.end());
+                                                   elem_uncondensed_dofs.begin(),
+                                                   elem_uncondensed_dofs.end());
                   full_vars_present_in_reduced_sys.insert(var_num);
                 }
             }
         }
     }
 
-  _local_uncondensed_dofs.assign(_local_uncondensed_dofs_set.begin(),
-                                 _local_uncondensed_dofs_set.end());
-  _local_uncondensed_dofs_set.clear();
+  _local_uncondensed_dofs.assign(local_uncondensed_dofs_set.begin(),
+                                 local_uncondensed_dofs_set.end());
+  local_uncondensed_dofs_set.clear();
 
   //
   // Build the reduced system data
@@ -234,13 +289,13 @@ void StaticCondensationDofMap::reinit()
 
   // build our queries
   std::unordered_map<processor_id_type, std::vector<dof_id_type>> nonlocal_uncondensed_dofs_mapvec;
-  for (const auto & [pid, set] : _nonlocal_uncondensed_dofs)
+  for (const auto & [pid, set] : nonlocal_uncondensed_dofs)
     {
       auto & vec = nonlocal_uncondensed_dofs_mapvec[pid];
       vec.assign(set.begin(), set.end());
     }
   // clear no longer needed memory
-  _nonlocal_uncondensed_dofs.clear();
+  nonlocal_uncondensed_dofs.clear();
 
   auto gather_functor = [&full_dof_to_reduced_dof](processor_id_type,
                                                    const std::vector<dof_id_type> & full_dof_ids,
@@ -313,10 +368,10 @@ void StaticCondensationDofMap::reinit()
     }
 
   // Build our dof constraints map
-  for (const auto full_dof : _constraint_dofs)
+  for (const auto full_dof : constraint_dofs)
     _full_to_reduced_constraint_dofs[full_dof] =
         libmesh_map_find(full_dof_to_reduced_dof, full_dof);
-  _constraint_dofs.clear();
+  constraint_dofs.clear();
 
   // Prevent querying Nodes for dof indices
   std::vector<unsigned int> nvpg(_reduced_vars.size());
