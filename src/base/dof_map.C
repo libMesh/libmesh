@@ -1137,10 +1137,6 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   // each element.
   this->add_neighbors_to_send_list(mesh);
 
-  // With the global dofs determined, initialize the condensed dof data if it exists
-  if (_sc)
-    _sc->reinit();
-
   // Here we used to clean up that data structure; now System and
   // EquationSystems call that for us, after we've added constraint
   // dependencies to the send_list too.
@@ -3079,6 +3075,12 @@ std::string DofMap::get_info() const
 void DofMap::create_static_condensation(MeshBase & mesh, System & sys)
 {
   _sc = std::make_unique<StaticCondensationDofMap>(mesh, sys, *this);
+}
+
+void DofMap::reinit_static_condensation()
+{
+  if (_sc)
+    _sc->reinit();
 }
 
 template LIBMESH_EXPORT bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;

@@ -25,6 +25,7 @@
 #include "libmesh/dof_map_base.h"
 #include "libmesh/variable.h"
 #include "libmesh/sparsity_pattern.h"
+#include "libmesh/utility.h"
 
 #include <unordered_map>
 #include <memory>
@@ -107,7 +108,68 @@ public:
 
   virtual void clear() override;
 
+  /**
+   * Retrieve the dof index in the reduced system corresponding to the provided dof index in the
+   * full system. This dof index should be a dof index involved in constraints
+   */
+  dof_id_type get_reduced_from_global_constraint_dof(dof_id_type full_dof) const;
+
 private:
+  /**
+   * Add an uncondensed dof potentially along with constraining dofs which themselves must/will also
+   * be uncondensed
+   * @param full_dof_number The dof id in the full (uncondensed + condensed) system
+   * @param involved_in_constraints Whether the \p full_dof_number is involved in constraints
+   * @param uncondensed_local_to_global_map A map from uncondensed full dof numbering to local
+   * (element) numbering for a given element
+   * @param local_uncondensed_dofs_set Set of local uncondensed degrees of freedom (numbered in the
+   * full system)
+   * @param nonlocal_uncondensed_dofs Map from processor IDs to sets of nonlocal uncondensed degrees
+   * of freedom (numbered in the full system)
+   * @param elem_uncondensed_dofs Used for temporary storage of uncondensed degrees of freedom
+   * active on an element
+   * @param uncondensed_local_dof_number Counter for number of uncondensed dofs on an element
+   * @param constraint_dofs Set of degrees of freedom numbered in the full system involved in
+   * constraints
+   */
+  void add_uncondensed_dof_plus_constraint_dofs(
+      dof_id_type full_dof_number,
+      bool involved_in_constraints,
+      std::unordered_map<dof_id_type, dof_id_type> & uncondensed_global_to_local_map,
+      std::unordered_set<dof_id_type> & local_uncondensed_dofs_set,
+      std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> &
+          nonlocal_uncondensed_dofs,
+      std::vector<dof_id_type> & elem_uncondensed_dofs,
+      dof_id_type & uncondensed_local_dof_number,
+      std::unordered_set<dof_id_type> & constraint_dofs);
+
+  /**
+   * Add an uncondensed dof
+   * @param full_dof_number The dof id in the full (uncondensed + condensed) system
+   * @param involved_in_constraints Whether the \p full_dof_number is involved in constraints
+   * @param uncondensed_local_to_global_map A map from uncondensed full dof numbering to local
+   * (element) numbering for a given element
+   * @param local_uncondensed_dofs_set Set of local uncondensed degrees of freedom (numbered in the
+   * full system)
+   * @param nonlocal_uncondensed_dofs Map from processor IDs to sets of nonlocal uncondensed degrees
+   * of freedom (numbered in the full system)
+   * @param elem_uncondensed_dofs Used for temporary storage of uncondensed degrees of freedom
+   * active on an element
+   * @param uncondensed_local_dof_number Counter for number of uncondensed dofs on an element
+   * @param constraint_dofs Set of degrees of freedom numbered in the full system involved in
+   * constraints
+   */
+  void add_uncondensed_dof(
+      dof_id_type full_dof_number,
+      bool involved_in_constraints,
+      std::unordered_map<dof_id_type, dof_id_type> & uncondensed_global_to_local_map,
+      std::unordered_set<dof_id_type> & local_uncondensed_dofs_set,
+      std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> &
+          nonlocal_uncondensed_dofs,
+      std::vector<dof_id_type> & elem_uncondensed_dofs,
+      dof_id_type & uncondensed_local_dof_number,
+      std::unordered_set<dof_id_type> & constraint_dofs);
+
   /**
    * Data stored on a per-element basis used to compute element Schur complements and their
    * applications to vectors
@@ -166,6 +228,11 @@ private:
 
   /// Number of off-diagonal nonzeros per row in the reduced system
   std::vector<dof_id_type> _reduced_noz;
+
+  /// A small map from full system degrees of freedom to reduced/condensed system degrees of freedom
+  /// involved in constraints. This may be leveraged by \p StaticCondensation::set during \p
+  /// DofMap::enforce_constraints_on_jacobian at the very end of Jacobian evaluation
+  std::unordered_map<dof_id_type, dof_id_type> _full_to_reduced_constraint_dofs;
 };
 
 inline void
@@ -178,6 +245,12 @@ inline const System & StaticCondensationDofMap::reduced_system() const
 {
   libmesh_assert(_reduced_system);
   return *_reduced_system;
+}
+
+inline dof_id_type
+StaticCondensationDofMap::get_reduced_from_global_constraint_dof(const dof_id_type full_dof) const
+{
+  return libmesh_map_find(_full_to_reduced_constraint_dofs, full_dof);
 }
 
 }

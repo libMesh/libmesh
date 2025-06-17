@@ -238,6 +238,11 @@ void System::init_data ()
   // Even if there weren't any constraint changes,
   // reinit_constraints() did prepare_send_list() for us.
 
+  // Now finally after dof distribution and construction of any
+  // possible constraints, we may init any static condensation
+  // data
+  _dof_map->reinit_static_condensation();
+
   // Resize the solution conformal to the current mesh
   solution->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
 
@@ -452,6 +457,10 @@ void System::reinit ()
 
   // project_vector handles vector initialization now
   libmesh_assert_equal_to (solution->size(), current_local_solution->size());
+
+  // Make sure our static condensation dof map is up-to-date before we init any
+  // static condensation matrices
+  this->get_dof_map().reinit_static_condensation();
 
   if (!_matrices.empty() && !_basic_system_only)
     {

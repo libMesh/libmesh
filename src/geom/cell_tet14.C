@@ -23,11 +23,13 @@
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
 
+#ifdef LIBMESH_ENABLE_AMR
 namespace {
   constexpr libMesh::Real r18 = 18;
   constexpr libMesh::Real r64 = 64;
   constexpr libMesh::Real r72 = 72;
 }
+#endif
 
 namespace libMesh
 {
