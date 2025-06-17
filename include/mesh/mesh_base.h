@@ -444,8 +444,8 @@ public:
   { return this->n_nodes_on_proc (DofObject::invalid_processor_id); }
 
   /**
-   * \returns A number greater than or equal to the maximum node id in the
-   * mesh.
+   * \returns A number one greater than the maximum node id in the
+   * mesh. A more apt name for this method would be end_node_id
    */
   virtual dof_id_type max_node_id () const = 0;
 
@@ -496,8 +496,8 @@ public:
   virtual dof_id_type parallel_n_elem () const = 0;
 
   /**
-   * \returns A number greater than or equal to the maximum element id in the
-   * mesh.
+   * \returns A number one greater than the maximum element id in the
+   * mesh. A more apt name for this method would be end_elem_id
    */
   virtual dof_id_type max_elem_id () const = 0;
 
