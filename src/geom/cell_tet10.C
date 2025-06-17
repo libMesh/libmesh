@@ -17,7 +17,6 @@
 
 
 // Local includes
-#include "libmesh/side.h"
 #include "libmesh/cell_tet10.h"
 #include "libmesh/edge_edge3.h"
 #include "libmesh/face_tri6.h"
@@ -202,10 +201,9 @@ unsigned int Tet10::local_edge_node(unsigned int edge,
 
 
 
-std::unique_ptr<Elem> Tet10::build_side_ptr (const unsigned int i,
-                                             bool proxy)
+std::unique_ptr<Elem> Tet10::build_side_ptr (const unsigned int i)
 {
-  return this->simple_build_side_ptr<Tri6, Tet10>(i, proxy);
+  return this->simple_build_side_ptr<Tri6, Tet10>(i);
 }
 
 

@@ -16,7 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "libmesh/side.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/enum_io_package.h"
@@ -210,10 +209,9 @@ Order Quad4::default_order() const
 
 
 
-std::unique_ptr<Elem> Quad4::build_side_ptr (const unsigned int i,
-                                             bool proxy)
+std::unique_ptr<Elem> Quad4::build_side_ptr (const unsigned int i)
 {
-  return this->simple_build_side_ptr<Edge2, Quad4>(i, proxy);
+  return this->simple_build_side_ptr<Edge2, Quad4>(i);
 }
 
 

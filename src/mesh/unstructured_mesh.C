@@ -297,17 +297,13 @@ void transfer_elem(Elem & lo_elem,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   hi_elem->set_unique_id(lo_elem.unique_id());
 #endif
-  hi_elem->processor_id() = lo_pid;
-  hi_elem->subdomain_id() = lo_elem.subdomain_id();
 
   const unsigned int nei = lo_elem.n_extra_integers();
   hi_elem->add_extra_integers(nei);
   for (unsigned int i=0; i != nei; ++i)
     hi_elem->set_extra_integer(i, lo_elem.get_extra_integer(i));
 
-  // This might not help anything but shouldn't hurt.
-  hi_elem->set_mapping_type(lo_elem.mapping_type());
-  hi_elem->set_mapping_data(lo_elem.mapping_data());
+  hi_elem->inherit_data_from(lo_elem);
 
   mesh.insert_elem(std::move(hi_elem));
 }
@@ -1561,17 +1557,13 @@ void UnstructuredMesh::all_first_order ()
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       lo_elem->set_unique_id(so_elem->unique_id());
 #endif
-      lo_elem->processor_id() = so_elem->processor_id();
-      lo_elem->subdomain_id() = so_elem->subdomain_id();
 
       const unsigned int nei = so_elem->n_extra_integers();
       lo_elem->add_extra_integers(nei);
       for (unsigned int i=0; i != nei; ++i)
         lo_elem->set_extra_integer(i, so_elem->get_extra_integer(i));
 
-      // This is probably moot but shouldn't hurt
-      lo_elem->set_mapping_type(so_elem->mapping_type());
-      lo_elem->set_mapping_data(so_elem->mapping_data());
+      lo_elem->inherit_data_from(*so_elem);
 
       this->insert_elem(std::move(lo_elem));
     }

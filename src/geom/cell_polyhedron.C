@@ -342,16 +342,11 @@ void Polyhedron::side_ptr (std::unique_ptr<Elem> & side,
 
 
 
-std::unique_ptr<Elem> Polyhedron::build_side_ptr (const unsigned int i,
-                                                  bool /*proxy*/)
+std::unique_ptr<Elem> Polyhedron::build_side_ptr (const unsigned int i)
 {
   auto returnval = this->side_ptr(i);
   returnval->set_interior_parent(this);
-  returnval->set_mapping_type(this->mapping_type());
-  returnval->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-  returnval->set_p_level(this->p_level());
-#endif
+  returnval->inherit_data_from(*this);
   return returnval;
 }
 
@@ -362,11 +357,7 @@ void Polyhedron::build_side_ptr (std::unique_ptr<Elem> & side,
 {
   this->side_ptr(side, i);
   side->set_interior_parent(this);
-  side->set_mapping_type(this->mapping_type());
-  side->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-  side->set_p_level(this->p_level());
-#endif
+  side->inherit_data_from(*this);
 }
 
 

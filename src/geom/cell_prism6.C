@@ -17,7 +17,6 @@
 
 
 // Local includes
-#include "libmesh/side.h"
 #include "libmesh/cell_prism6.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/face_quad4.h"
@@ -216,77 +215,37 @@ Order Prism6::default_order() const
 
 
 
-std::unique_ptr<Elem> Prism6::build_side_ptr (const unsigned int i,
-                                              bool proxy)
+std::unique_ptr<Elem> Prism6::build_side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
   std::unique_ptr<Elem> face;
-  if (proxy)
+
+  switch (i)
     {
-#ifdef LIBMESH_ENABLE_DEPRECATED
-      libmesh_deprecated();
-      switch(i)
-        {
-        case 0:
-        case 4:
-          {
-            face = std::make_unique<Side<Tri3,Prism6>>(this,i);
-            break;
-          }
-
-        case 1:
-        case 2:
-        case 3:
-          {
-            face = std::make_unique<Side<Quad4,Prism6>>(this,i);
-            break;
-          }
-
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
-#else
-      libmesh_error();
-#endif // LIBMESH_ENABLE_DEPRECATED
-    }
-  else
-    {
-      switch (i)
-        {
-        case 0: // the triangular face at z=-1
-        case 4: // the triangular face at z=1
-          {
-            face = std::make_unique<Tri3>();
-            break;
-          }
-        case 1: // the quad face at y=0
-        case 2: // the other quad face
-        case 3: // the quad face at x=0
-          {
-            face = std::make_unique<Quad4>();
-            break;
-          }
-        default:
-          libmesh_error_msg("Invalid side i = " << i);
-        }
-
-      // Set the nodes
-      for (auto n : face->node_index_range())
-        face->set_node(n, this->node_ptr(Prism6::side_nodes_map[i][n]));
+    case 0: // the triangular face at z=-1
+    case 4: // the triangular face at z=1
+      {
+        face = std::make_unique<Tri3>();
+        break;
+      }
+    case 1: // the quad face at y=0
+    case 2: // the other quad face
+    case 3: // the quad face at x=0
+      {
+        face = std::make_unique<Quad4>();
+        break;
+      }
+    default:
+      libmesh_error_msg("Invalid side i = " << i);
     }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  if (!proxy) // proxy sides used to leave parent() set
-#endif
-    face->set_parent(nullptr);
+  // Set the nodes
+  for (auto n : face->node_index_range())
+    face->set_node(n, this->node_ptr(Prism6::side_nodes_map[i][n]));
+
   face->set_interior_parent(this);
-
-  face->subdomain_id() = this->subdomain_id();
-  face->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  face->set_p_level(this->p_level());
-#endif
+  face->inherit_data_from(*this);
 
   return face;
 }
@@ -298,11 +257,7 @@ void Prism6::build_side_ptr (std::unique_ptr<Elem> & side,
 {
   this->side_ptr(side, i);
   side->set_interior_parent(this);
-  side->subdomain_id() = this->subdomain_id();
-  side->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  side->set_p_level(this->p_level());
-#endif
+  side->inherit_data_from(*this);
 }
 
 

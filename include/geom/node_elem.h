@@ -153,7 +153,7 @@ public:
   /**
    * The \p Elem::build_side_ptr() member makes no sense for nodes.
    */
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int, bool) override
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int) override
   { libmesh_not_implemented(); return std::unique_ptr<Elem>(); }
 
   virtual void build_side_ptr (std::unique_ptr<Elem> &, const unsigned int) override

@@ -862,13 +862,13 @@ public:
   virtual unsigned int n_sub_elem () const = 0;
 
   /**
-   * \returns A temporary/proxy element coincident with side \p i.
+   * \returns A temporary element coincident with side \p i.
    *
    * This method returns the _minimum_ element necessary to uniquely
    * identify the side.  For example, the side of a hexahedron is
    * always returned as a 4-noded quadrilateral, regardless of what
    * type of hex you are dealing with.  Important data like subdomain
-   * id, p level, or mapping type may be omitted from the proxy
+   * id, p level, or mapping type may be omitted from the temporary
    * element.  If you want a first-class full-ordered face (i.e. a
    * 9-noded quad face for a 27-noded hexahedron), use the
    * build_side_ptr method.
@@ -887,9 +887,8 @@ public:
    * an element of the wrong type, it will be freed and a new element
    * allocated; otherwise no memory allocation will occur.
    *
-   * This should not be called with proxy Side elements.  This will
-   * cause \p side to be a minimum-ordered element, even if it is
-   * handed a higher-ordered element that must be replaced.
+   * This will cause \p side to be a minimum-ordered element, even if
+   * it is handed a higher-ordered element that must be replaced.
    *
    * The const version of this function is non-virtual; it simply
    * calls the virtual non-const version and const_casts the return
@@ -914,17 +913,12 @@ public:
    * A \p std::unique_ptr<Elem> is returned to prevent a memory leak.
    * This way the user need not remember to delete the object.
    *
-   * The second argument, which is true by default, specifies that a
-   * "proxy" element (of type Side) will be returned.  This option is
-   * now deprecated; full-featured elements have been made more
-   * efficient.
-   *
    * The const version of this function is non-virtual; it simply
    * calls the virtual non-const version and const_casts the return
    * type.
    */
-  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i, bool proxy=false) = 0;
-  std::unique_ptr<const Elem> build_side_ptr (const unsigned int i, bool proxy=false) const;
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i) = 0;
+  std::unique_ptr<const Elem> build_side_ptr (const unsigned int i) const;
 
   /**
    * Resets the loose element \p side, which may currently point to a
@@ -933,9 +927,8 @@ public:
    * an element of the wrong type, it will be freed and a new element
    * allocated; otherwise no memory allocation will occur.
    *
-   * This should not be called with proxy Side elements.  This will
-   * cause \p side to be a full-ordered element, even if it is handed
-   * a lower-ordered element that must be replaced.
+   * This will cause \p side to be a full-ordered element, even if it
+   * is handed a lower-ordered element that must be replaced.
    *
    * The const version of this function is non-virtual; it simply
    * calls the virtual non-const version and const_casts the return
@@ -967,9 +960,8 @@ public:
    * an element of the wrong type, it will be freed and a new element
    * allocated; otherwise no memory allocation will occur.
    *
-   * This should not be called with proxy SideEdge elements.  This will
-   * cause \p side to be a full-ordered element, even if it is handed
-   * a lower-ordered element that must be replaced.
+   * This will cause \p edge to be a full-ordered element, even if it
+   * is handed a lower-ordered element that must be replaced.
    *
    * The const version of this function is non-virtual; it simply
    * calls the virtual non-const version and const_casts the return
@@ -1166,6 +1158,16 @@ public:
    * vertices are an odd permutation of their lexicographic ordering.
    */
   bool positive_face_orientation(const unsigned int i) const;
+
+
+  /**
+   * A helper function for copying generic element data (mapping,
+   * subdomain, processor) from an element to a derived (child, side,
+   * edge) element.  Useful for forwards compatibility when new data
+   * is added.
+   */
+  void inherit_data_from(const Elem & src);
+
 
 private:
   /**
@@ -2150,8 +2152,7 @@ protected:
    */
   template <typename Sideclass, typename Subclass>
   std::unique_ptr<Elem>
-  simple_build_side_ptr(const unsigned int i,
-                        bool proxy);
+  simple_build_side_ptr(const unsigned int i);
 
   /**
    * An implementation for simple (all sides equal) elements
@@ -2383,6 +2384,19 @@ Elem::Elem(const unsigned int nn,
 
   // If this ever legitimately fails we need to increase max_n_nodes
   libmesh_assert_less_equal(nn, max_n_nodes);
+
+  // We currently only support refinement of elements into child
+  // elements of the same type.  We can't test elem->type() here,
+  // because that's virtual and we're still in the base class
+  // constructor, but we can at least usually verify constency with
+  // the arguments we were handed.
+#ifndef NDEBUG
+  if (p && !p->runtime_topology())
+    {
+      libmesh_assert_equal_to(nn, p->n_nodes());
+      libmesh_assert_equal_to(ns, p->n_sides());
+    }
+#endif
 
   // Initialize the nodes data structure if we're given a pointer to
   // memory for it.
@@ -2718,12 +2732,12 @@ Elem::side_ptr (std::unique_ptr<const Elem> & elem,
 
 inline
 std::unique_ptr<const Elem>
-Elem::build_side_ptr (const unsigned int i, bool proxy) const
+Elem::build_side_ptr (const unsigned int i) const
 {
   // Call the non-const version of this function, return the result as
   // a std::unique_ptr<const Elem>.
   Elem * me = const_cast<Elem *>(this);
-  const Elem * s = const_cast<const Elem *>(me->build_side_ptr(i, proxy).release());
+  const Elem * s = const_cast<const Elem *>(me->build_side_ptr(i).release());
   return std::unique_ptr<const Elem>(s);
 }
 
@@ -2746,39 +2760,16 @@ Elem::build_side_ptr (std::unique_ptr<const Elem> & elem,
 template <typename Sideclass, typename Subclass>
 inline
 std::unique_ptr<Elem>
-Elem::simple_build_side_ptr (const unsigned int i,
-                             bool proxy)
+Elem::simple_build_side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
-  std::unique_ptr<Elem> face;
-  if (proxy)
-    {
-#ifdef LIBMESH_ENABLE_DEPRECATED
-      face = std::make_unique<Side<Sideclass,Subclass>>(this,i);
-      libmesh_deprecated();
-#else
-      libmesh_error();
-#endif
-    }
-  else
-    {
-      face = std::make_unique<Sideclass>(this);
-      for (auto n : face->node_index_range())
-        face->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
-    }
+  std::unique_ptr<Elem> face = std::make_unique<Sideclass>();
+  for (auto n : face->node_index_range())
+    face->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  if (!proxy) // proxy sides used to leave parent() set
-#endif
-    face->set_parent(nullptr);
   face->set_interior_parent(this);
-
-  face->set_mapping_type(this->mapping_type());
-  face->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-  face->set_p_level(this->p_level());
-#endif
+  face->inherit_data_from(*this);
 
   return face;
 }
@@ -2797,15 +2788,12 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
   if (!side.get() || side->type() != sidetype)
     {
       Subclass & real_me = cast_ref<Subclass&>(*this);
-      side = real_me.Subclass::build_side_ptr(i, false);
+      side = real_me.Subclass::build_side_ptr(i);
     }
   else
     {
-      side->subdomain_id() = this->subdomain_id();
-      side->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-      side->set_p_level(this->p_level());
-#endif
+      side->set_interior_parent(this);
+      side->inherit_data_from(*this);
       for (auto n : side->node_index_range())
         side->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
     }
@@ -2871,17 +2859,13 @@ Elem::simple_build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
-  std::unique_ptr<Elem> edge = std::make_unique<Edgeclass>(this);
+  std::unique_ptr<Elem> edge = std::make_unique<Edgeclass>();
 
   for (auto n : edge->node_index_range())
     edge->set_node(n, this->node_ptr(Subclass::edge_nodes_map[i][n]));
 
   edge->set_interior_parent(this);
-  edge->set_mapping_type(this->mapping_type());
-  edge->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-  edge->set_p_level(this->p_level());
-#endif
+  edge->inherit_data_from(*this);
 
   return edge;
 }
@@ -2905,11 +2889,7 @@ Elem::simple_build_edge_ptr (std::unique_ptr<Elem> & edge,
     }
   else
     {
-      edge->set_mapping_type(this->mapping_type());
-      edge->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-      edge->set_p_level(this->p_level());
-#endif
+      edge->inherit_data_from(*this);
       for (auto n : edge->node_index_range())
         edge->set_node(n, this->node_ptr(Subclass::edge_nodes_map[i][n]));
     }
@@ -3343,6 +3323,20 @@ dof_id_type Elem::compute_key (dof_id_type n0,
   std::array<dof_id_type, 4> array = {{n0, n1, n2, n3}};
   std::sort(array.begin(), array.end());
   return Utility::hashword(array);
+}
+
+
+
+inline
+void Elem::inherit_data_from (const Elem & src)
+{
+  this->set_mapping_type(src.mapping_type());
+  this->set_mapping_data(src.mapping_data());
+  this->subdomain_id() = src.subdomain_id();
+  this->processor_id(src.processor_id());
+#ifdef LIBMESH_ENABLE_AMR
+  this->set_p_level(src.p_level());
+#endif
 }
 
 
