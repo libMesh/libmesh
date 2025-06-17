@@ -1159,6 +1159,16 @@ public:
    */
   bool positive_face_orientation(const unsigned int i) const;
 
+
+  /**
+   * A helper function for copying generic element data (mapping,
+   * subdomain, processor) from an element to a derived (child, side,
+   * edge) element.  Useful for forwards compatibility when new data
+   * is added.
+   */
+  void inherit_data_from(const Elem & src);
+
+
 private:
   /**
    * Shared private implementation used by the contains_point()
@@ -3330,6 +3340,20 @@ dof_id_type Elem::compute_key (dof_id_type n0,
   std::array<dof_id_type, 4> array = {{n0, n1, n2, n3}};
   std::sort(array.begin(), array.end());
   return Utility::hashword(array);
+}
+
+
+
+inline
+void Elem::inherit_data_from (const Elem & src)
+{
+  this->set_mapping_type(src.mapping_type());
+  this->set_mapping_data(src.mapping_data());
+  this->subdomain_id() = src.subdomain_id();
+  this->processor_id(src.processor_id());
+#ifdef LIBMESH_ENABLE_AMR
+  this->set_p_level(src.p_level());
+#endif
 }
 
 
