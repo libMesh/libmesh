@@ -96,7 +96,7 @@ protected:
                                         libMesh::DiffContext & context) override;
 
   /* Computes the element reference volume used in the dilation metric
-   * The reference value is set to the volume-averaged value of |J| over the mesh.
+   * The reference value is set to the averaged value of all elements' average |J|.
    */
   void compute_element_reference_volume();
 

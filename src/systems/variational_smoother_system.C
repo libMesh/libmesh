@@ -94,10 +94,11 @@ void VariationalSmootherSystem::compute_element_reference_volume()
   FEMContext & femcontext = cast_ref<FEMContext &>(*con);
   this->init_context(femcontext);
 
+  //TODO: make this calculation correct for multiproc runs.
+
   const auto & mesh = this->get_mesh();
 
-  Real det_J_integral = 0;
-  Real reference_mesh_volume = 0;
+  Real elem_averaged_det_J_sum = 0.;
 
   for (const auto * elem : mesh.element_ptr_range())
   {
@@ -107,11 +108,12 @@ void VariationalSmootherSystem::compute_element_reference_volume()
     const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
     const auto & JxW = fe_map.get_JxW();
 
-    det_J_integral += std::accumulate(JxW.begin(), JxW.end(), 0.);
-    reference_mesh_volume += elem->reference_elem()->volume();
+    const auto elem_integrated_det_J = std::accumulate(JxW.begin(), JxW.end(), 0.);
+    const auto ref_elem_vol = elem->reference_elem()->volume();
+    elem_averaged_det_J_sum += elem_integrated_det_J / ref_elem_vol;
   }
 
-  _ref_vol = det_J_integral / reference_mesh_volume;
+  _ref_vol = elem_averaged_det_J_sum / mesh.n_active_elem();
 }
 
 
