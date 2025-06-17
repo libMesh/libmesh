@@ -257,12 +257,7 @@ std::unique_ptr<Elem> Prism20::build_side_ptr (const unsigned int i)
     face->set_node(n, this->node_ptr(Prism20::side_nodes_map[i][n]));
 
   face->set_interior_parent(this);
-
-  face->subdomain_id() = this->subdomain_id();
-  face->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  face->set_p_level(this->p_level());
-#endif
+  face->inherit_data_from(*this);
 
   return face;
 }
@@ -303,8 +298,7 @@ void Prism20::build_side_ptr (std::unique_ptr<Elem> & side,
       libmesh_error_msg("Invalid side i = " << i);
     }
 
-  side->subdomain_id() = this->subdomain_id();
-  side->set_mapping_type(this->mapping_type());
+  side->inherit_data_from(*this);
 
   // Set the nodes
   for (auto n : side->node_index_range())

@@ -176,12 +176,7 @@ std::unique_ptr<Elem> C0Polygon::build_side_ptr (const unsigned int i)
   sidep->set_node(1, this->node_ptr((i+1)%ns));
 
   sidep->set_interior_parent(this);
-
-  sidep->set_mapping_type(this->mapping_type());
-  sidep->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-  sidep->set_p_level(this->p_level());
-#endif
+  sidep->inherit_data_from(*this);
 
   return sidep;
 }
@@ -200,11 +195,7 @@ void C0Polygon::build_side_ptr (std::unique_ptr<Elem> & side,
     }
   else
     {
-      side->subdomain_id() = this->subdomain_id();
-      side->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-      side->set_p_level(this->p_level());
-#endif
+      side->inherit_data_from(*this);
 
       side->set_node(0, this->node_ptr(i));
       side->set_node(1, this->node_ptr((i+1)%ns));

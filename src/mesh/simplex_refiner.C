@@ -253,8 +253,6 @@ std::size_t SimplexRefiner::refine_via_edges(Elem & elem,
         // but maybe our input had a sliver and we can't fix it.
         libmesh_assert_greater_equal(subelem[i]->volume() + TOLERANCE,
                                      elem.volume() / 2);
-        subelem[i]->processor_id() = elem.processor_id();
-        subelem[i]->subdomain_id() = elem.subdomain_id();
 
         // Copy any extra element data.  Since the subelements
         // haven't been added to the mesh yet any allocation has
@@ -263,9 +261,7 @@ std::size_t SimplexRefiner::refine_via_edges(Elem & elem,
         for (unsigned int ei=0; ei != nei; ++ei)
           subelem[ei]->set_extra_integer(ei, elem.get_extra_integer(ei));
 
-        // Copy any mapping data.
-        subelem[i]->set_mapping_type(elem.mapping_type());
-        subelem[i]->set_mapping_data(elem.mapping_data());
+        subelem[i]->inherit_data_from(elem);
       }
 
   boundary_info.remove(&elem);

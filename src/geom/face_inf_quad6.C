@@ -176,12 +176,7 @@ std::unique_ptr<Elem> InfQuad6::build_side_ptr (const unsigned int i)
     edge->set_node(n, this->node_ptr(InfQuad6::side_nodes_map[i][n]));
 
   edge->set_interior_parent(this);
-
-  edge->subdomain_id() = this->subdomain_id();
-  edge->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  edge->set_p_level(this->p_level());
-#endif
+  edge->inherit_data_from(*this);
 
   return edge;
 }

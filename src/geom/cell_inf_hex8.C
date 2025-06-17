@@ -138,12 +138,7 @@ std::unique_ptr<Elem> InfHex8::build_side_ptr (const unsigned int i)
     face->set_node(n, this->node_ptr(InfHex8::side_nodes_map[i][n]));
 
   face->set_interior_parent(this);
-
-  face->subdomain_id() = this->subdomain_id();
-  face->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  face->set_p_level(this->p_level());
-#endif
+  face->inherit_data_from(*this);
 
   return face;
 }
@@ -154,11 +149,7 @@ void InfHex8::build_side_ptr (std::unique_ptr<Elem> & side,
 {
   this->side_ptr(side, i);
   side->set_interior_parent(this);
-  side->subdomain_id() = this->subdomain_id();
-  side->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  side->set_p_level(this->p_level());
-#endif
+  side->inherit_data_from(*this);
 }
 
 
@@ -213,11 +204,7 @@ void InfHex8::build_edge_ptr (std::unique_ptr<Elem> & edge,
       libmesh_error_msg("Invalid edge i = " << i);
     }
 
-  edge->subdomain_id() = this->subdomain_id();
-  edge->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  edge->set_p_level(this->p_level());
-#endif
+  edge->inherit_data_from(*this);
 
   // Set the nodes
   for (auto n : edge->node_index_range())

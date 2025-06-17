@@ -60,11 +60,7 @@ std::unique_ptr<Elem> Edge::side_ptr (const unsigned int i)
   nodeelem->set_node(0, this->node_ptr(i));
 
   nodeelem->set_interior_parent(this);
-  nodeelem->set_mapping_type(this->mapping_type());
-  nodeelem->subdomain_id() = this->subdomain_id();
-#ifdef LIBMESH_ENABLE_AMR
-  nodeelem->set_p_level(this->p_level());
-#endif
+  nodeelem->inherit_data_from(*this);
 
   return nodeelem;
 }
@@ -79,9 +75,7 @@ void Edge::side_ptr (std::unique_ptr<Elem> & side,
     side = this->build_side_ptr(i);
   else
     {
-      side->subdomain_id() = this->subdomain_id();
-      side->set_mapping_type(this->mapping_type());
-
+      side->inherit_data_from(*this);
       side->set_node(0, this->node_ptr(i));
     }
 }
@@ -96,11 +90,7 @@ std::unique_ptr<Elem> Edge::build_side_ptr (const unsigned int i)
   nodeelem->set_node(0, this->node_ptr(i));
 
   nodeelem->set_interior_parent(this);
-  nodeelem->subdomain_id() = this->subdomain_id();
-  nodeelem->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  nodeelem->set_p_level(this->p_level());
-#endif
+  nodeelem->inherit_data_from(*this);
 
   return nodeelem;
 }
@@ -116,12 +106,7 @@ void Edge::build_side_ptr (std::unique_ptr<Elem> & side,
   else
     {
       side->set_interior_parent(this);
-      side->subdomain_id() = this->subdomain_id();
-      side->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-      side->set_p_level(this->p_level());
-#endif
-
+      side->inherit_data_from(*this);
       side->set_node(0, this->node_ptr(i));
     }
 }

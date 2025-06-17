@@ -192,12 +192,7 @@ std::unique_ptr<Elem> InfQuad4::build_side_ptr (const unsigned int i)
     edge->set_node(n, this->node_ptr(InfQuad4::side_nodes_map[i][n]));
 
   edge->set_interior_parent(this);
-
-  edge->subdomain_id() = this->subdomain_id();
-  edge->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  edge->set_p_level(this->p_level());
-#endif
+  edge->inherit_data_from(*this);
 
   return edge;
 }
@@ -209,11 +204,7 @@ void InfQuad4::build_side_ptr (std::unique_ptr<Elem> & side,
 {
   this->side_ptr(side, i);
   side->set_interior_parent(this);
-  side->subdomain_id() = this->subdomain_id();
-  side->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  side->set_p_level(this->p_level());
-#endif
+  side->inherit_data_from(*this);
 }
 
 

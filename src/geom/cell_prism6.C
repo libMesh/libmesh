@@ -245,12 +245,7 @@ std::unique_ptr<Elem> Prism6::build_side_ptr (const unsigned int i)
     face->set_node(n, this->node_ptr(Prism6::side_nodes_map[i][n]));
 
   face->set_interior_parent(this);
-
-  face->subdomain_id() = this->subdomain_id();
-  face->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  face->set_p_level(this->p_level());
-#endif
+  face->inherit_data_from(*this);
 
   return face;
 }
@@ -262,11 +257,7 @@ void Prism6::build_side_ptr (std::unique_ptr<Elem> & side,
 {
   this->side_ptr(side, i);
   side->set_interior_parent(this);
-  side->subdomain_id() = this->subdomain_id();
-  side->set_mapping_type(this->mapping_type());
-#ifdef LIBMESH_ENABLE_AMR
-  side->set_p_level(this->p_level());
-#endif
+  side->inherit_data_from(*this);
 }
 
 

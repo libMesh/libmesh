@@ -58,16 +58,13 @@ std::unique_ptr<Elem> C0Polyhedron::disconnected_clone() const
   if (this->valid_unique_id())
     returnval->set_unique_id(this->unique_id());
 #endif
-  returnval->subdomain_id() = this->subdomain_id();
-  returnval->processor_id() = this->processor_id();
 
   const auto n_elem_ints = this->n_extra_integers();
   returnval->add_extra_integers(n_elem_ints);
   for (unsigned int i = 0; i != n_elem_ints; ++i)
     returnval->set_extra_integer(i, this->get_extra_integer(i));
 
-  returnval->set_mapping_type(this->mapping_type());
-  returnval->set_mapping_data(this->mapping_data());
+  returnval->inherit_data_from(*this);
 
   return returnval;
 }
