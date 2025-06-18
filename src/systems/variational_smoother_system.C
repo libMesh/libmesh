@@ -45,13 +45,18 @@ void VariationalSmootherSystem::assembly (bool get_residual,
   // Update the mesh based on the current variable values
   auto & mesh = this->get_mesh();
   this->solution->close();
+
+  // Get the entire solution in a serial vector so we don't have issues accessing dofs
+  std::vector<Number> serial_solution;
+  this->solution->localize(serial_solution);
+
   for (auto * node : mesh.local_node_ptr_range())
   {
     for (const auto d : make_range(mesh.mesh_dimension()))
     {
       const auto dof_id = node->dof_number(this->number(), d, 0);
       // Update mesh
-      (*node)(d) = (*current_local_solution)(dof_id);
+      (*node)(d) = serial_solution[dof_id];
     }
   }
 
@@ -73,8 +78,9 @@ void VariationalSmootherSystem::init_data ()
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();
 
-  // Set the current_local_solution to the current mesh
+  // Set the current_local_solution to the current mesh for the initial guess
   this->solution->close();
+
   for (auto * node : mesh.local_node_ptr_range())
   {
     for (const auto d : make_range(mesh.mesh_dimension()))
@@ -94,13 +100,11 @@ void VariationalSmootherSystem::compute_element_reference_volume()
   FEMContext & femcontext = cast_ref<FEMContext &>(*con);
   this->init_context(femcontext);
 
-  //TODO: make this calculation correct for multiproc runs.
-
   const auto & mesh = this->get_mesh();
 
   Real elem_averaged_det_J_sum = 0.;
 
-  for (const auto * elem : mesh.element_ptr_range())
+  for (const auto * elem : mesh.active_local_element_ptr_range())
   {
     femcontext.pre_fe_reinit(*this, elem);
     femcontext.elem_fe_reinit();
@@ -112,6 +116,9 @@ void VariationalSmootherSystem::compute_element_reference_volume()
     const auto ref_elem_vol = elem->reference_elem()->volume();
     elem_averaged_det_J_sum += elem_integrated_det_J / ref_elem_vol;
   }
+
+  // Get contributions from elements on other processors
+  mesh.comm().sum(elem_averaged_det_J_sum);
 
   _ref_vol = elem_averaged_det_J_sum / mesh.n_active_elem();
 }
