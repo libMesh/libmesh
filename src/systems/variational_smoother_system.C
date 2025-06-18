@@ -52,7 +52,7 @@ void VariationalSmootherSystem::assembly (bool get_residual,
     {
       const auto dof_id = node->dof_number(this->number(), d, 0);
       // Update mesh
-      (*node)(d) = (*current_local_solution)(dof_id);
+      (*node)(d) = libmesh_real((*current_local_solution)(dof_id));
     }
   }
 
