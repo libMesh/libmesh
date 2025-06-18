@@ -2710,8 +2710,7 @@ std::unique_ptr<const Elem> Elem::side_ptr (unsigned int i) const
   // Call the non-const version of this function, return the result as
   // a std::unique_ptr<const Elem>.
   Elem * me = const_cast<Elem *>(this);
-  const Elem * s = const_cast<const Elem *>(me->side_ptr(i).release());
-  return std::unique_ptr<const Elem>(s);
+  return me->side_ptr(i);
 }
 
 
@@ -2737,8 +2736,7 @@ Elem::build_side_ptr (const unsigned int i) const
   // Call the non-const version of this function, return the result as
   // a std::unique_ptr<const Elem>.
   Elem * me = const_cast<Elem *>(this);
-  const Elem * s = const_cast<const Elem *>(me->build_side_ptr(i).release());
-  return std::unique_ptr<const Elem>(s);
+  return me->build_side_ptr(i);
 }
 
 
@@ -2833,8 +2831,7 @@ Elem::build_edge_ptr (const unsigned int i) const
   // Call the non-const version of this function, return the result as
   // a std::unique_ptr<const Elem>.
   Elem * me = const_cast<Elem *>(this);
-  const Elem * e = const_cast<const Elem *>(me->build_edge_ptr(i).release());
-  return std::unique_ptr<const Elem>(e);
+  return me->build_edge_ptr(i);
 }
 
 
