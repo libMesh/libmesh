@@ -46,17 +46,13 @@ void VariationalSmootherSystem::assembly (bool get_residual,
   auto & mesh = this->get_mesh();
   this->solution->close();
 
-  // Get the entire solution in a serial vector so we don't have issues accessing dofs
-  std::vector<Number> serial_solution;
-  this->solution->localize(serial_solution);
-
   for (auto * node : mesh.local_node_ptr_range())
   {
     for (const auto d : make_range(mesh.mesh_dimension()))
     {
       const auto dof_id = node->dof_number(this->number(), d, 0);
       // Update mesh
-      (*node)(d) = serial_solution[dof_id];
+      (*node)(d) = (*current_local_solution)(dof_id);
     }
   }
 
