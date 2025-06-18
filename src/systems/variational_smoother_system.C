@@ -218,8 +218,25 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       input_c.elem_fe_reinit();
     }
 
+  // Integrate the distortion-dilation metric over the reference element
   for (const auto qp : index_range(quad_weights))
     {
+      // Compute quantities needed to evaluate the distortion-dilation metric
+      // and its gradient and Hessian.
+      // The metric will be minimized when it's gradient with respect to the node
+      // locations (R) is zero. For Newton's method, minimizing the gradient
+      // requires computation of the gradient's Jacobian with respect to R.
+      // The Jacobian of the distortion-dilation metric's gradientis the Hessian
+      // of the metric.
+      //
+      // Note that the term "Jacobian" has two meanings in this mesh smoothing
+      // application. The first meaning refers to the Jacobian w.r.t R of the
+      // gradient w.r.t. R, (i.e., the Hessian of the metric). This is the K
+      // variable defined above. This is also the Jacobian the 'request_jacobian'
+      // variable refers to. The second mesning refers to the Jacobian of the
+      // physical-to-reference element mapping. This is the Jacobian used to
+      // compute the distorion-dilation metric.
+      //
       // Grab the physical-to-reference mapping Jacobian matrix (i.e., "S") at this qp
       RealTensor S;
       // RealTensors are always 3x3, so we will fill any dimensions above dim
@@ -248,7 +265,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
             dxyzdxi[qp],
             dxyzdeta[qp],
             dxyzdzeta[qp]
-          ).transpose();
+          ).transpose();  // Note the transposition!
           break;
 
         default:
@@ -311,10 +328,11 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       //const Real E = (1. - _dilation_weight) * beta + _dilation_weight * mu;
       const RealTensor dE_dS = (1. - _dilation_weight) * dbeta_dS + _dilation_weight * dmu_dS;
 
-      // To compute dS/dR below
+      // This vector is useful in computing dS/dR below
       std::vector<std::vector<std::vector<Real>>> dphi_maps = {dphidxi_map, dphideta_map, dphidzeta_map};
 
       // Compute residual (i.e., the gradient of the combined metric w.r.t node locations)
+      // Recall that when the gradient (residual) is zero, the combined metric is minimized
       for (const auto l : elem.node_index_range())
       {
         for (const auto var_id : make_range(dim))
@@ -324,6 +342,8 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
           for (const auto jj : make_range(dim))
             dS_dR(var_id, jj) = dphi_maps[jj][l][qp];
 
+          // Residual contribution. The contraction of dE/dS and dS/dR gives us
+          // the gradient we are looking for, dE/dR
           F[var_id](l) += quad_weights[qp] * dE_dS.contract(dS_dR);
         }// for var_id
       }// for l
@@ -331,10 +351,14 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
       if (request_jacobian)
       {
-        // Compute jacobian of the smoothing system (i.e., the Hessian of the combined metric w.r.t. the mesh node locations)
+        // Compute jacobian of the smoothing system (i.e., the Hessian of the
+        // combined metric w.r.t. the mesh node locations)
 
         // Precompute coefficients to be applied to each component of tensor
-        // products in the loops below
+        // products in the loops below. At first glance, these coefficients look
+        // like gibberish, but everything in the Hessian has been verified by
+        // taking finite differences of the gradient. We should probably write
+        // down the derivations of the gradient and Hessian somewhere...
 
         // Recall that above, dbeta_dS takes the form: d(beta)/dS = a * S - b * d(chi)/dS
         const std::vector<Real> d2beta_dS2_coefs = {
@@ -367,18 +391,22 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         // d alpha / dS has the form c(S) * S^-T, where c is the scalar coefficient defined below
         const Real dalpha_dS_coef = det * (-4. * _ref_vol * alpha * chi_prime * chi - chi_2prime * det_cube - chi_prime * det_sq + 4 * chi * det - ref_vol_sq) / (2. * _ref_vol * chi_sq);
 
-        for (const auto l: elem.node_index_range())
+        for (const auto l: elem.node_index_range()) // Contribution to Hessian from node l
         {
-          for (const auto var_id1 : make_range(dim))
+          for (const auto var_id1 : make_range(dim)) // Contribution from each x/y/z component of node l
           {
+            // Build dS/dR_l, the derivative of the physical-to-reference mapping Jacobin w.r.t.
+            // the l-th node
             RealTensor dS_dR_l = RealTensor(0);
             for (const auto ii : make_range(dim))
               dS_dR_l(var_id1, ii) = dphi_maps[ii][l][qp];
 
-            for (const auto p: elem.node_index_range())
+            for (const auto p: elem.node_index_range()) // Contribution to Hessian from node p
             {
-              for (const auto var_id2 : make_range(dim))
+              for (const auto var_id2 : make_range(dim)) // Contribution from each x/y/z component of node p
               {
+                // Build dS/dR_l, the derivative of the physical-to-reference mapping Jacobin w.r.t.
+                // the p-th node
                 RealTensor dS_dR_p = RealTensor(0);
                 for (const auto jj : make_range(dim))
                   dS_dR_p(var_id2, jj) = dphi_maps[jj][p][qp];
@@ -407,6 +435,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                           S_inv(j,a) * S_inv(b,i),
                         };
 
+                        // Combine precomputed coefficients with tensor products to get d2(beta) / dS2
                         Real d2beta_dS2 = 0.;
                         for (const auto comp_id : index_range(d2beta_dS2_coefs))
                         {
