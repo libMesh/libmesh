@@ -127,7 +127,12 @@ public:
   virtual void clear_elems() override;
 
   /**
-   * Remove nullptr elements from arrays
+   * @copydoc MeshBase::renumber_nodes_and_elements()
+   *
+   * Note that regardless of whether \p _skip_renumber_nodes_and_elements is true, this method will
+   * always remove nullptr nodes and elements from arrays and consequently will always renumber. So in
+   * practice \p _skip_renumber_nodes_and_elements means skip reordering of non-null nodes and
+   * elements while allowing renumbering
    */
   virtual void renumber_nodes_and_elements () override;
 
