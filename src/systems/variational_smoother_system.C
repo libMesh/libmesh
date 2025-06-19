@@ -383,9 +383,9 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
 
         // We represent d mu / dS as alpha(S) * S^-T, where alpha is a scalar function
-        const Real alpha = (-chi_prime * det_cube + 2. * det_sq * chi - ref_vol_sq * det) / (2. * _ref_vol * chi_sq);
+        const Real alpha = (-chi_prime * det_cube + 2. * det_sq * chi - ref_vol_sq * det * chi_prime) / (2. * _ref_vol * chi_sq);
         // d alpha / dS has the form c(S) * S^-T, where c is the scalar coefficient defined below
-        const Real dalpha_dS_coef = det * (-4. * _ref_vol * alpha * chi_prime * chi - chi_2prime * det_cube - chi_prime * det_sq + 4 * chi * det - ref_vol_sq) / (2. * _ref_vol * chi_sq);
+        const Real dalpha_dS_coef = det * (-4. * _ref_vol * alpha * chi_prime * chi - chi_2prime * det_cube - chi_prime * det_sq + 4 * chi * det - ref_vol_sq * (chi_prime + det * chi_2prime)) / (2. * _ref_vol * chi_sq);
 
         for (const auto l: elem.node_index_range()) // Contribution to Hessian from node l
         {
