@@ -112,8 +112,7 @@ public:
                                const unsigned int s) const override final;
 
   /**
-   * \returns The side number opposite to \p s (for a tensor product
-   * element), or throws an error otherwise.
+   * \returns The side number opposite to \p s
    */
   virtual unsigned int opposite_side(const unsigned int s) const override final;
 

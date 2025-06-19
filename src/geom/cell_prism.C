@@ -275,6 +275,17 @@ std::vector<unsigned int> Prism::sides_on_edge(const unsigned int e) const
 }
 
 
+
+unsigned int Prism::opposite_side(const unsigned int side_in) const
+{
+  libmesh_assert_less (side_in, 5);
+  static const unsigned int prism_opposites[5] =
+    {4, invalid_uint, invalid_uint, invalid_uint, 0};
+  return prism_opposites[side_in];
+}
+
+
+
 bool
 Prism::is_flipped() const
 {

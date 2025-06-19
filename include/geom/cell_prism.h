@@ -118,6 +118,12 @@ public:
                                const unsigned int s) const override final;
 
   /**
+   * \returns The side number opposite to \p s (for the triangular
+   * sides) or \p invalid_uint (for the quad sides)
+   */
+  virtual unsigned int opposite_side(const unsigned int s) const override final;
+
+  /**
    * Don't hide Elem::key() defined in the base class.
    */
   using Elem::key;
