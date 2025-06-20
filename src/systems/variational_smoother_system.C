@@ -356,28 +356,28 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         // taking finite differences of the gradient. We should probably write
         // down the derivations of the gradient and Hessian somewhere...
 
-        // Recall that above, dbeta_dS takes the form: d(beta)/dS = a * S - b * d(chi)/dS
+        // Recall that above, dbeta_dS takes the form: d(beta)/dS = c1 * S - c2 * d(chi)/dS
         const std::vector<Real> d2beta_dS2_coefs = {
-          //Part 1: scaler coefficients of d(a * S) / dS
+          //Part 1: scaler coefficients of d(c1 * S) / dS
           //
-          // multiplies I[i,k] x I[j,l]
+          // multiplies I[i,a] x I[j,b]
           std::pow(tr_div_dim, 0.5 * dim - 1.) / chi,
-          // multiplies S[k,l] x S[i,j]
+          // multiplies S[a,b] x S[i,j]
           ((dim - 2.) / dim) * std::pow(tr_div_dim, 0.5 * dim - 2.) / chi,
-          // multiplies S_inv[l,k] * S[i,j]
+          // multiplies S_inv[b,a] * S[i,j]
           -(std::pow(tr_div_dim, 0.5 * dim - 1.) / chi_sq) * chi_prime * det,
           //
-          //Part 2: scaler coefficients of d(-b * d(chi)/dS) / dS
+          //Part 2: scaler coefficients of d(-c2 * d(chi)/dS) / dS
           //
-          // multiplies S[k,l] x S_inv[j,i]
+          // multiplies S[a,b] x S_inv[j,i]
           -(std::pow(tr_div_dim, 0.5 * dim - 1.) / chi_sq) * chi_prime * det,
-          // multiplies S_inv[l,k] x S_inv[j,i]
+          // multiplies S_inv[b,a] x S_inv[j,i]
           2. * std::pow(tr_div_dim, 0.5 * dim) * chi_prime * det / chi_cube * chi_prime * det,
-          // multiplies S_inv[l,k] x S_inv[j,i]
+          // multiplies S_inv[b,a] x S_inv[j,i]
           -(std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * chi_2prime * det_sq,
-          // multiplies S_inv[l,k] x S_inv[j,i]
+          // multiplies S_inv[b,a] x S_inv[j,i]
           -(std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * chi_prime * det,
-          // multiplies S_inv[j,k] x S_inv[l,i]
+          // multiplies S_inv[j,a] x S_inv[b,i]
           (std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * chi_prime * det,
         };
 
