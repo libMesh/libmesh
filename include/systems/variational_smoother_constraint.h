@@ -20,7 +20,7 @@
 
 // Local Includes
 #include "libmesh/system.h"
-#include <libmesh/dof_map.h>
+#include "libmesh/dof_map.h"
 
 namespace libMesh
 {

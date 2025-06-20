@@ -21,7 +21,6 @@
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fem_context.h"
-#include "libmesh/getpot.h"
 #include "libmesh/mesh.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
@@ -65,11 +64,14 @@ void VariationalSmootherSystem::assembly (bool get_residual,
 void VariationalSmootherSystem::init_data ()
 {
   auto & mesh = this->get_mesh();
+  const auto & elem_orders = mesh.elem_default_orders();
+  libmesh_error_msg_if(elem_orders.size() != 1,
+      "The variational smoother cannot be used for mixed-order meshes!");
+  const auto fe_order = *elem_orders.begin();
   // Add a variable for each dimension of the mesh
   // "r0" for x, "r1" for y, "r2" for z
   for (const auto & d : make_range(mesh.mesh_dimension()))
-    this->add_variable ("r" + std::to_string(d), static_cast<Order>(_fe_order),
-                        Utility::string_to_enum<FEFamily>(_fe_family));
+    this->add_variable ("r" + std::to_string(d), fe_order);
 
   // Do the parent's initialization after variables are defined
   FEMSystem::init_data();
@@ -145,14 +147,6 @@ void VariationalSmootherSystem::init_context(DiffContext & context)
       fe_map.get_JxW();
     }
 
-  // Build a corresponding context for the input system if we haven't
-  // already
-  auto & input_context = input_contexts[&c];
-  if (input_system && !input_context)
-    {
-      input_context = std::make_unique<FEMContext>(*input_system);
-    }
-
   FEMSystem::init_context(context);
 }
 
@@ -206,13 +200,6 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
   // Quadrature info
   const auto quad_weights = c.get_element_qrule().get_weights();
-
-  FEMContext & input_c = *libmesh_map_find(input_contexts, &c);
-  if (input_system)
-    {
-      input_c.pre_fe_reinit(*input_system, &elem);
-      input_c.elem_fe_reinit();
-    }
 
   // Integrate the distortion-dilation metric over the reference element
   for (const auto qp : index_range(quad_weights))
@@ -308,7 +295,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       // dchi(x) / dx
       const Real chi_prime = 0.5 * (1. + det / sqrt_term);
       // dchi(det(S) / dS
-      RealTensor dchi_dS = chi_prime * det * S_inv_T;
+      const RealTensor dchi_dS = chi_prime * det * S_inv_T;
       // d2chi(x) / dx2
       const Real chi_2prime = 0.5 * (1. / sqrt_term - det_sq / std::pow(sqrt_term, 3));
 
@@ -318,7 +305,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
       // Dilation metric (mu)
       //const Real mu = 0.5 * (_ref_vol + det_sq / _ref_vol) / chi;
-      RealTensor dmu_dS = ((det_sq /_ref_vol / chi)) * S_inv_T - (0.5 * (_ref_vol + det_sq / _ref_vol) / chi_sq) * dchi_dS;
+      const RealTensor dmu_dS = ((det_sq /_ref_vol / chi)) * S_inv_T - (0.5 * (_ref_vol + det_sq / _ref_vol) / chi_sq) * dchi_dS;
 
       // Combined metric (E)
       //const Real E = (1. - _dilation_weight) * beta + _dilation_weight * mu;

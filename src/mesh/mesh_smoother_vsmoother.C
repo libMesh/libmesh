@@ -30,6 +30,7 @@
 #include "libmesh/steady_solver.h"
 #include "libmesh/diff_solver.h"
 #include "libmesh/variational_smoother_constraint.h"
+#include "libmesh/parallel_ghost_sync.h"
 
 // C++ includes
 #include <time.h> // for clock_t, clock()
@@ -63,15 +64,15 @@ void VariationalMeshSmoother::smooth(unsigned int)
   if (_mesh.elem_dimensions().size() > 1)
     libmesh_not_implemented_msg("Meshes containing elements of differing dimension are not yet supported.");
 
-  Real dilation_weight = _dilation_weight;
-
   // Create a new mesh, EquationSystems, and System
-  EquationSystems es(_mesh);
+  DistributedMesh mesh_copy(_mesh);
+  EquationSystems es(mesh_copy);
   VariationalSmootherSystem & sys = es.add_system<VariationalSmootherSystem>("variational_smoother_system");
 
   // Set this to something > 0 to add more quadrature points than the default
   // rule that integrates order 2 * nq_points + 1 polynomials exactly.
-  sys.extra_quadrature_order = 0;
+  // Using higher quadrature orders has not had a significant effect on observed solutions.
+  //sys.extra_quadrature_order = 0;
 
   // Uncomment these to debug
   //sys.print_element_solutions=true;
@@ -83,7 +84,7 @@ void VariationalMeshSmoother::smooth(unsigned int)
   sys.attach_constraint_object(constraint);
 
   // Set system parameters
-  sys.get_dilation_weight() = dilation_weight;
+  sys.get_dilation_weight() = _dilation_weight;
 
   // Set up solver
   sys.time_solver =
@@ -96,13 +97,27 @@ void VariationalMeshSmoother::smooth(unsigned int)
 
   es.init();
 
+  // More debugging options
   DiffSolver & solver = *(sys.time_solver->diff_solver().get());
-  sys.time_solver->diff_solver()->relative_residual_tolerance = 1e-10;
-  solver.quiet = false;
+  //solver.quiet = false;
   solver.verbose = true;
+  sys.time_solver->diff_solver()->relative_residual_tolerance = 1e-10;
   solver.relative_step_tolerance = 1e-10;
 
   sys.solve();
+
+  // Update _mesh from mesh_copy
+  for (auto * node_copy : mesh_copy.local_node_ptr_range())
+  {
+    auto & node = _mesh.node_ref(node_copy->id());
+    std::cout << "mesh_copy node " << node_copy->id() << " lives on proc " << node_copy->processor_id() << std::endl;
+    std::cout << "_mesh node " << node.id() << " lives on proc " << node.processor_id() << std::endl;
+    for (const auto d : make_range(mesh_copy.mesh_dimension()))
+      node(d) = (*node_copy)(d);
+  }
+
+  SyncNodalPositions sync_object(_mesh);
+  Parallel::sync_dofobject_data_by_id (_mesh.comm(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
 }
 
 } // namespace libMesh

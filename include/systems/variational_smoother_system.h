@@ -49,9 +49,6 @@ public:
                 const std::string & name,
                 const unsigned int number)
   : libMesh::FEMSystem(es, name, number),
-    input_system(nullptr),
-    _fe_family("LAGRANGE"),
-    _fe_order(1), // We will need to change this for higher order meshes like TRI6
     _epsilon_squared(1e-10),
     _ref_vol(1.),
     _dilation_weight(0.5)
@@ -70,19 +67,7 @@ public:
 
   Real & get_dilation_weight() { return _dilation_weight; }
 
-  std::string & fe_family() { return _fe_family; }
-  unsigned int & fe_order() { return _fe_order; }
-
-  // We want to be able to project functions based on *other* systems'
-  // values.  For that we need not only a FEMFunction but also a
-  // reference to the system where it applies and a separate context
-  // object (or multiple separate context objects, in the threaded
-  // case) for that system.
-  libMesh::System * input_system;
-
 protected:
-  std::map<libMesh::FEMContext *, std::unique_ptr<libMesh::FEMContext>>
-    input_contexts;
 
   // System initialization
   virtual void init_data () override;
@@ -99,10 +84,6 @@ protected:
    * The reference value is set to the averaged value of all elements' average |J|.
    */
   void compute_element_reference_volume();
-
-  /// The FE type to use
-  std::string _fe_family;
-  unsigned int _fe_order;
 
   /// The small nonzero constant to prevent zero denominators (degenerate elements only)
   const Real _epsilon_squared;
