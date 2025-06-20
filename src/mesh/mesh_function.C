@@ -347,7 +347,7 @@ void MeshFunction::operator() (const Point & p,
 
                   // interpolate the solution
                   {
-                    for (int d = 0; d < dim; d++)
+                    for (unsigned int d = 0; d < dim; d++)
                     {
                       Number value = 0.;
 
