@@ -274,6 +274,14 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         tr += ST_S(i, i);
       const Real tr_div_dim = tr / dim;
 
+      // Precompute pow(tr_div_dim, 0.5 * dim - x) for x = 0, 1, 2
+      const Real half_dim = 0.5 * dim;
+      const std::vector<Real> trace_powers{
+        std::pow(tr_div_dim, half_dim),
+        std::pow(tr_div_dim, half_dim - 1.),
+        std::pow(tr_div_dim, half_dim - 2.),
+      };
+
       // inverse of S
       const RealTensor S_inv = S.inverse();
       // inverse transpose of S
@@ -290,22 +298,22 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       const Real epsilon_sq = det > 0. ? 0. : _epsilon_squared;
       const Real chi = 0.5 * (det + std::sqrt(epsilon_sq + det_sq));
       const Real chi_sq = chi * chi;
-      const Real chi_cube = chi_sq * chi;
       const Real sqrt_term = std::sqrt(epsilon_sq + det_sq);
       // dchi(x) / dx
       const Real chi_prime = 0.5 * (1. + det / sqrt_term);
-      // dchi(det(S) / dS
-      const RealTensor dchi_dS = chi_prime * det * S_inv_T;
+      const Real chi_prime_sq = chi_prime * chi_prime;
       // d2chi(x) / dx2
       const Real chi_2prime = 0.5 * (1. / sqrt_term - det_sq / std::pow(sqrt_term, 3));
 
       // Distortion metric (beta)
-      //const Real beta = std::pow(tr_div_dim, 0.5 * dim) / chi;
-      const RealTensor dbeta_dS = (std::pow(tr_div_dim, 0.5 * dim - 1) / chi) * S - (std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * dchi_dS;
+      //const Real beta = trace_powers[0] / chi;
+      const RealTensor dbeta_dS = (trace_powers[1] / chi) * S - (trace_powers[0] / chi_sq * chi_prime * det) * S_inv_T;
 
       // Dilation metric (mu)
       //const Real mu = 0.5 * (_ref_vol + det_sq / _ref_vol) / chi;
-      const RealTensor dmu_dS = ((det_sq /_ref_vol / chi)) * S_inv_T - (0.5 * (_ref_vol + det_sq / _ref_vol) / chi_sq) * dchi_dS;
+      // We represent d mu / dS as alpha(S) * S^-T, where alpha is a scalar function
+      const Real alpha = (-chi_prime * det_cube + 2. * det_sq * chi - ref_vol_sq * det * chi_prime) / (2. * _ref_vol * chi_sq);
+      const RealTensor dmu_dS = alpha * S_inv_T;
 
       // Combined metric (E)
       //const Real E = (1. - _dilation_weight) * beta + _dilation_weight * mu;
@@ -343,36 +351,35 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         // taking finite differences of the gradient. We should probably write
         // down the derivations of the gradient and Hessian somewhere...
 
-        // Recall that above, dbeta_dS takes the form: d(beta)/dS = c1 * S - c2 * d(chi)/dS
+        // Recall that above, dbeta_dS takes the form:
+        // d(beta)/dS = c1(S) * S - c2(S) * S_inv_T,
+        // where c1 and c2 are scalar-valued functions.
         const std::vector<Real> d2beta_dS2_coefs = {
           //Part 1: scaler coefficients of d(c1 * S) / dS
           //
           // multiplies I[i,a] x I[j,b]
-          std::pow(tr_div_dim, 0.5 * dim - 1.) / chi,
+          trace_powers[1] / chi,
           // multiplies S[a,b] x S[i,j]
-          ((dim - 2.) / dim) * std::pow(tr_div_dim, 0.5 * dim - 2.) / chi,
+          ((dim - 2.) / dim) * trace_powers[2] / chi,
           // multiplies S_inv[b,a] * S[i,j]
-          -(std::pow(tr_div_dim, 0.5 * dim - 1.) / chi_sq) * chi_prime * det,
+          -(trace_powers[1] / chi_sq) * chi_prime * det,
           //
-          //Part 2: scaler coefficients of d(-c2 * d(chi)/dS) / dS
+          //Part 2: scaler coefficients of d(-c2 * S_inv_T) / dS
           //
           // multiplies S[a,b] x S_inv[j,i]
-          -(std::pow(tr_div_dim, 0.5 * dim - 1.) / chi_sq) * chi_prime * det,
+          -(trace_powers[1] / chi_sq) * chi_prime * det,
           // multiplies S_inv[b,a] x S_inv[j,i]
-          2. * std::pow(tr_div_dim, 0.5 * dim) * chi_prime * det / chi_cube * chi_prime * det,
-          // multiplies S_inv[b,a] x S_inv[j,i]
-          -(std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * chi_2prime * det_sq,
-          // multiplies S_inv[b,a] x S_inv[j,i]
-          -(std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * chi_prime * det,
-          // multiplies S_inv[j,a] x S_inv[b,i]
-          (std::pow(tr_div_dim, 0.5 * dim) / chi_sq) * chi_prime * det,
+          trace_powers[0] * (det / chi_sq)
+            * ((2. * chi_prime_sq / chi - chi_2prime) * det - chi_prime),
+          // multiplies S_inv[b,i] x S_inv[j,a]
+          (trace_powers[0] / chi_sq) * chi_prime * det,
         };
 
 
-        // We represent d mu / dS as alpha(S) * S^-T, where alpha is a scalar function
-        const Real alpha = (-chi_prime * det_cube + 2. * det_sq * chi - ref_vol_sq * det * chi_prime) / (2. * _ref_vol * chi_sq);
         // d alpha / dS has the form c(S) * S^-T, where c is the scalar coefficient defined below
-        const Real dalpha_dS_coef = det * (-4. * _ref_vol * alpha * chi_prime * chi - chi_2prime * det_cube - chi_prime * det_sq + 4 * chi * det - ref_vol_sq * (chi_prime + det * chi_2prime)) / (2. * _ref_vol * chi_sq);
+        const Real dalpha_dS_coef = (det / (2. * _ref_vol * chi_sq))
+          * (-4. * _ref_vol * alpha * chi * chi_prime - chi_2prime * det_cube
+             - chi_prime * det_sq + 4 * chi * det - ref_vol_sq * (chi_prime + det * chi_2prime));
 
         for (const auto l: elem.node_index_range()) // Contribution to Hessian from node l
         {
@@ -412,8 +419,6 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                           S(a,b)     * S(i,j),
                           S_inv(b,a) * S(i,j),
                           S(a,b)     * S_inv(j,i),
-                          S_inv(b,a) * S_inv(j,i),
-                          S_inv(b,a) * S_inv(j,i),
                           S_inv(b,a) * S_inv(j,i),
                           S_inv(j,a) * S_inv(b,i),
                         };
