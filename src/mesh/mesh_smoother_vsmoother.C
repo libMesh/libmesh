@@ -110,8 +110,6 @@ void VariationalMeshSmoother::smooth(unsigned int)
   for (auto * node_copy : mesh_copy.local_node_ptr_range())
   {
     auto & node = _mesh.node_ref(node_copy->id());
-    std::cout << "mesh_copy node " << node_copy->id() << " lives on proc " << node_copy->processor_id() << std::endl;
-    std::cout << "_mesh node " << node.id() << " lives on proc " << node.processor_id() << std::endl;
     for (const auto d : make_range(mesh_copy.mesh_dimension()))
       node(d) = (*node_copy)(d);
   }
