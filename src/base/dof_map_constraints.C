@@ -3098,6 +3098,9 @@ void DofMap::enforce_constraints_exactly (const System & system,
   if (!v)
     v = system.solution.get();
 
+  if (!v->closed())
+    v->close();
+
   NumericVector<Number> * v_local  = nullptr; // will be initialized below
   NumericVector<Number> * v_global = nullptr; // will be initialized below
   std::unique_ptr<NumericVector<Number>> v_built;

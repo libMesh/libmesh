@@ -246,7 +246,8 @@ public:
     // Enough iterations to mostly fix us up.  Laplace seems to be at 1e-3
     // tolerance by iteration 6, so hopefully everything is there on any
     // system by 8.
-    for (unsigned int i=0; i != 8; ++i)
+    const unsigned int num_iterations = is_variational_smoother_type ? 1 : 8;
+    for (unsigned int i=0; i != num_iterations; ++i)
       smoother.smooth();
 
     // Transform the parallelogram mesh back to a square mesh. In the case of the

@@ -453,6 +453,8 @@ libmesh_SOURCES =  \
         src/systems/system_subset.C \
         src/systems/system_subset_by_subdomain.C \
         src/systems/transient_system.C \
+        src/systems/variational_smoother_constraint.C \
+        src/systems/variational_smoother_system.C \
         src/utils/error_vector.C \
         src/utils/hashword.C \
         src/utils/location_maps.C \
