@@ -55,6 +55,15 @@ private:
    */
   void constrain_node_to_plane(const Node & node, const Point & ref_normal_vec);
 
+  /*
+   * Constrain a node to remain on the given line during mesh smoothing.
+   * @param node Node to constrain
+   * @param line_vec vector parallel to the constraining line.
+   * This, along with the coordinates of node, are used to define the
+   * constraining line.
+   */
+  void constrain_node_to_line(const Node & node, const Point & line_vec);
+
 public:
 
   /*

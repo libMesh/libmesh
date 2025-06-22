@@ -62,12 +62,10 @@ void VariationalSmootherConstraint::constrain()
     // Determine whether the current node is colinear (coplanar) with its boundary
     // neighbors Start by computing the vectors from the current node to each boundary
     // neighbor node
-    //std::cout << "Node " << node.id() << ":" << std::endl;
     std::vector<Point> dist_vecs;
     for (const auto & neighbor : neighbors)
     {
       dist_vecs.push_back((*neighbor) - node);
-      //std::cout << "  Neighbor " << neighbor->id() << ", dist_vec = " << dist_vecs.back() << std::endl;
     }
 
     // 2D: If the current node and all (two) boundary neighbor nodes lie on the same line,
@@ -129,48 +127,54 @@ void VariationalSmootherConstraint::constrain()
 
       const Point reference_cross_prod = dist_vecs[0].cross(dist_vecs[vec_index]);
       const Point reference_normal = reference_cross_prod / reference_cross_prod.norm();
-      
+
+      // Does the node lie within a 2D surface? (Not on the edge)
       bool node_is_coplanar = true;
+
+      // Does the node lie on the intersection of two 2D surfaces (i.e., a line)?
+      // If so, and the node is not located at the intersection of three 2D surfaces
+      // (i.e., a single point or vertex of the mesh), Then some of the dist_vecs
+      // will be parallel.
+
+      // Each entry will be a vector from dist_vecs that has a corresponding
+      // (anti)parallel vector, also from dist_vecs
+      std::vector<Point> parallel_pairs;
+
       for (const auto ii : index_range(dist_vecs))
       {
         const Point vec_ii_normalized = dist_vecs[ii] / dist_vecs[ii].norm();
         for (const auto jj : make_range(ii + 1, dist_vecs.size()))
         {
-          // No need to compute the cross product for this case, as it is by
-          // definition equal to the reference normal computed above.
-          // Also check for dist_vecs that are (anti)parallel, and skip,
-          // as their cross product will be zero.
           const Point vec_jj_normalized = dist_vecs[jj] / dist_vecs[jj].norm();
           const bool is_parallel =
               vec_ii_normalized.relative_fuzzy_equals(vec_jj_normalized);
           const bool is_antiparallel = vec_ii_normalized.relative_fuzzy_equals(
               -vec_jj_normalized);
 
-          if ((ii == 0 and jj == vec_index) || (is_parallel || is_antiparallel))
+          if (is_parallel || is_antiparallel)
+          {
+            parallel_pairs.push_back(vec_ii_normalized);
+            // Don't bother computing the cross product of parallel vector below,
+            // it will be zero and cannot be used to define a normal vector.
             continue;
+          }
 
           const Point cross_prod = dist_vecs[ii].cross(dist_vecs[jj]);
           const Point normal = cross_prod / cross_prod.norm();
 
-          // node is not coplanar with its boundary neighbors and is thus immovable
+          // node is not coplanar with its boundary neighbors
           if (!(reference_normal.relative_fuzzy_equals(normal) ||
                 reference_normal.relative_fuzzy_equals(-normal)))
-          {
             node_is_coplanar = false;
-            break;
-          }
         }
       }
       
-      // TODO: Need to add check for sliding edge node
-
-      if (!node_is_coplanar)
-      {
+      if (node_is_coplanar)
+        this->constrain_node_to_plane(node, reference_normal);
+      else if (parallel_pairs.size())
+        this->constrain_node_to_line(node, parallel_pairs[0]);
+      else
         this->fix_node(node);
-        continue;
-      }
-
-      this->constrain_node_to_plane(node, reference_normal);
     }
 
     // if not same line/plane, then node is either part of a curved surface or
@@ -240,43 +244,81 @@ void VariationalSmootherConstraint::fix_node(const Node & node)
 
 void VariationalSmootherConstraint::constrain_node_to_plane(const Node & node, const Point & ref_normal_vec)
 {
-      const auto dim = _sys.get_mesh().mesh_dimension();
-      // determine equation of plane: c_x * x + c_y * y + c_z * z + c = 0
-      std::vector<Real> xyz_coefs; // vector to hold c_x, c_y, c_z
-      Real c = 0.;
+  const auto dim = _sys.get_mesh().mesh_dimension();
+  // determine equation of plane: c_x * x + c_y * y + c_z * z + c = 0
+  std::vector<Real> xyz_coefs; // vector to hold c_x, c_y, c_z
+  Real c = 0.;
 
-      // We choose to constrain the dimension with the largest magnitude coefficient
-      // This approach ensures the coefficients added to the constraint_row
-      // (i.e., -c_xyz / c_max) have as small magnitude as possible
-      unsigned int constrained_dim;
-      Real max_abs_coef = 0.;
-      for (const auto d : make_range(dim))
-      {
-        const auto coef = ref_normal_vec(d);
-        xyz_coefs.push_back(coef);
-        c -= coef * node(d);
+  // We choose to constrain the dimension with the largest magnitude coefficient
+  // This approach ensures the coefficients added to the constraint_row
+  // (i.e., -c_xyz / c_max) have as small magnitude as possible
+  unsigned int constrained_dim;
+  Real max_abs_coef = 0.;
+  for (const auto d : make_range(dim))
+  {
+    const auto coef = ref_normal_vec(d);
+    xyz_coefs.push_back(coef);
+    c -= coef * node(d);
 
-        const auto coef_abs = std::abs(coef);
-        if (coef_abs > max_abs_coef)
-        {
-          max_abs_coef = coef_abs;
-          constrained_dim = d;
-        }
-      }
+    const auto coef_abs = std::abs(coef);
+    if (coef_abs > max_abs_coef)
+    {
+      max_abs_coef = coef_abs;
+      constrained_dim = d;
+    }
+  }
 
-      DofConstraintRow constraint_row;
-      for (const auto free_dim : make_range(dim))
-      {
-        if (free_dim == constrained_dim)
-          continue;
+  DofConstraintRow constraint_row;
+  for (const auto free_dim : make_range(dim))
+  {
+    if (free_dim == constrained_dim)
+      continue;
 
-        const auto free_dof_index = node.dof_number(_sys.number(), free_dim, 0);
-        constraint_row[free_dof_index] =  -xyz_coefs[free_dim] / xyz_coefs[constrained_dim];
-      }
+    const auto free_dof_index = node.dof_number(_sys.number(), free_dim, 0);
+    constraint_row[free_dof_index] =  -xyz_coefs[free_dim] / xyz_coefs[constrained_dim];
+  }
 
-      const auto inhomogeneous_part = -c / xyz_coefs[constrained_dim];
-      const auto constrained_dof_index = node.dof_number(_sys.number(), constrained_dim, 0);
-      _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, inhomogeneous_part, true);
+  const auto inhomogeneous_part = -c / xyz_coefs[constrained_dim];
+  const auto constrained_dof_index = node.dof_number(_sys.number(), constrained_dim, 0);
+  _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, inhomogeneous_part, true);
+}
+
+void VariationalSmootherConstraint::constrain_node_to_line(const Node & node, const Point & line_vec)
+{
+  const auto dim = _sys.get_mesh().mesh_dimension();
+
+  // We will free the dimension most paralle to line_vec to keep the
+  // constraint coefficients small
+  const std::vector<Real> line_vec_coefs{line_vec(0), line_vec(1), line_vec(2)};
+  auto it = std::max_element(line_vec_coefs.begin(), line_vec_coefs.end(),
+      [](double a, double b) {
+          return std::abs(a) < std::abs(b);
+      });
+  const unsigned int free_dim = std::distance(line_vec_coefs.begin(), it);
+  const auto free_dof_index = node.dof_number(_sys.number(), free_dim, 0);
+
+  // A line is parameterized as r(t) = node + t * line_vec, so
+  // x(t) = node(x) + t * line_vec(x)
+  // y(t) = node(y) + t * line_vec(y)
+  // z(t) = node(z) + t * line_vec(z)
+  // Let's say we leave x free. Then t = (x(t) - node(x)) / line_vec(x)
+  // Then y and z can be constrained as
+  // y = node(y) + line_vec_y * (x(t) - node(x)) / line_vec(x)
+  //   = x(t) * line_vec(y) / line_vec(x) + (node(y) - node(x) * line_vec(y) / line_vec(x))
+  // z = x(t) * line_vec(z) / line_vec(x) + (node(z) - node(x) * line_vec(z) / line_vec(x))
+
+  libmesh_assert(!relative_fuzzy_equals(line_vec(free_dim), 0.));
+  for (const auto constrained_dim : make_range(dim))
+  {
+    if (constrained_dim == free_dim)
+      continue;
+
+    DofConstraintRow constraint_row;
+    constraint_row[free_dof_index] = line_vec(constrained_dim) / line_vec(free_dim);
+    const auto inhomogeneous_part = node(constrained_dim) - node(free_dim) * line_vec(constrained_dim) / line_vec(free_dim);
+    const auto constrained_dof_index = node.dof_number(_sys.number(), constrained_dim, 0);
+    _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, inhomogeneous_part, true);
+  }
 }
 
 } // namespace libMesh
