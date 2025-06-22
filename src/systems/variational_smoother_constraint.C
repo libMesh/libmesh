@@ -91,34 +91,9 @@ void VariationalSmootherConstraint::constrain()
         continue;
       }
 
-      // else, determine equation of line: c_x * x + c_y * y + c = 0
-      Real c_x, c_y, c;
-      const auto & vec = dist_vecs[0];
-      if (vec(0) == 0) // vertical line
-      {
-        c_y = 0.;
-        c_x = 1.;
-        c = -node(0);
-      }
-      else // not a vertical line
-      {
-        c_y = 1.;
-        c_x = -vec(1) / vec(0); // c_x = -m from y = mx + b
-        c = -c_x * node(0) - node(1);
-      }
-
-      const std::vector<Real> xy_coefs{c_x, c_y};
-
-      // Constrain the dimension with the largest coefficient
-      const unsigned int constrained_dim = (std::abs(c_x) > std::abs(c_y)) ? 0 : 1;
-      const unsigned int free_dim = (std::abs(c_x) > std::abs(c_y)) ? 1 : 0;
-
-      const auto constrained_dof_index = node.dof_number(_sys.number(), constrained_dim, 0);
-      const auto free_dof_index = node.dof_number(_sys.number(), free_dim, 0);
-      DofConstraintRow constraint_row;
-      constraint_row[free_dof_index] =  -xy_coefs[free_dim] / xy_coefs[constrained_dim];
-      const auto constrained_value = -c / xy_coefs[constrained_dim];
-      _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, constrained_value, true);
+      // TODO: what if z is not the inactive dimension in 2D!?!?
+      const auto reference_normal = dist_vecs[0].cross(Point(0., 0., 1.));
+      this->constrain_node_to_plane(node, reference_normal);
     }
 
     // 3D: If the current node and all boundary neighbor nodes lie on the same plane,
@@ -195,44 +170,7 @@ void VariationalSmootherConstraint::constrain()
         continue;
       }
 
-      // else, determine equation of plane: c_x * x + c_y * y + c_z * z + c = 0
-      const Real c_x = reference_normal(0);
-      const Real c_y = reference_normal(1);
-      const Real c_z = reference_normal(2);
-      const Real c = -(c_x * node(0) + c_y * node(1) + c_z * node(2));
-
-      const std::vector<Real> xyz_coefs{c_x, c_y, c_z};
-
-      // Find the dimension with the largest nonzero magnitude coefficient
-      auto it = std::max_element(xyz_coefs.begin(), xyz_coefs.end(),
-          [](double a, double b) {
-              return std::abs(a) < std::abs(b);
-          });
-      const unsigned int constrained_dim = std::distance(xyz_coefs.begin(), it);
-
-      //std::cout << "Node " << node.id() << " (" << node(0) << ", " << node(1) << ", " << node(2)
-      //          << ") lies on the plane " << std::endl
-      //          << c_x << " * x + " << c_y << " * y + " << c_z << " * z + " << c << " = 0" << std::endl;
-
-
-      //const std::vector<std::string> dim_names{"x", "y", "z"};
-      //std::cout << "Constraining " << dim_names[constrained_dim] << " = ";
-
-      DofConstraintRow constraint_row;
-      auto constrained_value = -c / xyz_coefs[constrained_dim];
-      for (const auto free_dim : index_range(xyz_coefs))
-      {
-        if (free_dim == constrained_dim)
-          continue;
-        const auto free_dof_index = node.dof_number(_sys.number(), free_dim, 0);
-        constraint_row[free_dof_index] =  -xyz_coefs[free_dim] / xyz_coefs[constrained_dim];
-        //std::cout << constraint_row[free_dof_index] << " * " << dim_names[free_dim] << " + ";
-      }
-
-      //std::cout << constrained_value << std::endl;
-      const auto constrained_dof_index = node.dof_number(_sys.number(), constrained_dim, 0);
-      _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, constrained_value, true);
-
+      this->constrain_node_to_plane(node, reference_normal);
     }
 
     // if not same line/plane, then node is either part of a curved surface or
@@ -298,6 +236,47 @@ void VariationalSmootherConstraint::fix_node(const Node & node)
     // Simply constrain this dof to retain it's current value
     _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, constrained_value, true);
   }
+}
+
+void VariationalSmootherConstraint::constrain_node_to_plane(const Node & node, const Point & ref_normal_vec)
+{
+      const auto dim = _sys.get_mesh().mesh_dimension();
+      // determine equation of plane: c_x * x + c_y * y + c_z * z + c = 0
+      std::vector<Real> xyz_coefs; // vector to hold c_x, c_y, c_z
+      Real c = 0.;
+
+      // We choose to constrain the dimension with the largest magnitude coefficient
+      // This approach ensures the coefficients added to the constraint_row
+      // (i.e., -c_xyz / c_max) have as small magnitude as possible
+      unsigned int constrained_dim;
+      Real max_abs_coef = 0.;
+      for (const auto d : make_range(dim))
+      {
+        const auto coef = ref_normal_vec(d);
+        xyz_coefs.push_back(coef);
+        c -= coef * node(d);
+
+        const auto coef_abs = std::abs(coef);
+        if (coef_abs > max_abs_coef)
+        {
+          max_abs_coef = coef_abs;
+          constrained_dim = d;
+        }
+      }
+
+      DofConstraintRow constraint_row;
+      for (const auto free_dim : make_range(dim))
+      {
+        if (free_dim == constrained_dim)
+          continue;
+
+        const auto free_dof_index = node.dof_number(_sys.number(), free_dim, 0);
+        constraint_row[free_dof_index] =  -xyz_coefs[free_dim] / xyz_coefs[constrained_dim];
+      }
+
+      const auto inhomogeneous_part = -c / xyz_coefs[constrained_dim];
+      const auto constrained_dof_index = node.dof_number(_sys.number(), constrained_dim, 0);
+      _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, inhomogeneous_part, true);
 }
 
 } // namespace libMesh

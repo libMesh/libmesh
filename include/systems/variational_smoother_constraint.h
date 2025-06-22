@@ -41,10 +41,19 @@ private:
   const bool _preserve_subdomain_boundaries;
 
   /*
-   * Constrain (fix) a node to not move during mesh smoothing.
+   * Constrain (i.e., fix) a node to not move during mesh smoothing.
    * @param node Node to fix.
    */
   void fix_node(const Node & node);
+
+  /*
+   * Constrain a node to remain in the given plane during mesh smoothing.
+   * @param node Node to constrain
+   * @param ref_normal_vec Reference normal vector to the constraining plane.
+   * This, along with the coordinates of node, are used to define the
+   * constraining plane.
+   */
+  void constrain_node_to_plane(const Node & node, const Point & ref_normal_vec);
 
 public:
 
