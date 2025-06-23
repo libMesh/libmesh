@@ -451,6 +451,8 @@ BUILT_SOURCES = \
         system_subset.h \
         system_subset_by_subdomain.h \
         transient_system.h \
+        variational_smoother_constraint.h \
+        variational_smoother_system.h \
         attributes.h \
         communicator.h \
         data_type.h \
@@ -1947,6 +1949,12 @@ system_subset_by_subdomain.h: $(top_srcdir)/include/systems/system_subset_by_sub
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 transient_system.h: $(top_srcdir)/include/systems/transient_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+variational_smoother_constraint.h: $(top_srcdir)/include/systems/variational_smoother_constraint.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+variational_smoother_system.h: $(top_srcdir)/include/systems/variational_smoother_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 attributes.h: $(top_srcdir)/include/timpi_shims/attributes.h
