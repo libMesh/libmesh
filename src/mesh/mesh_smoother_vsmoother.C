@@ -64,13 +64,33 @@ void VariationalMeshSmoother::smooth(unsigned int)
   if (_mesh.elem_dimensions().size() > 1)
     libmesh_not_implemented_msg("Meshes containing elements of differing dimension are not yet supported.");
 
+  /*
+  Ideally we'd want to update _mesh directly even if it already has an
+  EquationSystems attached and doing work on it ... and that's thwarted by the
+  problems:
+
+  1. We can't easily tell if there's already an EquationSystems attached.
+  2. We can't attach a second EquationSystems safely (if it already has a system 0)
+     because the DoF indexing will need to be overwritten by our system.
+  3. The destructor of es won't even clean up after itself (we generally expect
+     a mesh to go unused after its EquationSystems is destroyed), much less know
+     how to restore anything from a previous EquationSystems.
+
+  To avoid these issues, we'll just construct a new DistributedMesh mesh_copy
+  from _mesh, then do the solve on mesh_copy, then copy its node locations back
+  to _mesh after the solve is done. That'll be slightly less memory-efficient
+  and somewhat more CPU-efficient in the case where _mesh is serial, though
+  it'll be significantly less memory-efficient when _mesh is already distributed,
+  but either way the robustness is probably worth it.
+  */
+
   // Create a new mesh, EquationSystems, and System
   DistributedMesh mesh_copy(_mesh);
   EquationSystems es(mesh_copy);
   VariationalSmootherSystem & sys = es.add_system<VariationalSmootherSystem>("variational_smoother_system");
 
   // Set this to something > 0 to add more quadrature points than the default
-  // rule that integrates order 2 * nq_points + 1 polynomials exactly.
+  // rule that integrates order 2 * fe_order + 1 polynomials exactly.
   // Using higher quadrature orders has not had a significant effect on observed solutions.
   //sys.extra_quadrature_order = 0;
 
