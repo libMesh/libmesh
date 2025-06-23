@@ -59,9 +59,9 @@ void VariationalSmootherConstraint::constrain()
       neighbors.end()
     );
 
-    // Determine whether the current node is colinear (coplanar) with its boundary
-    // neighbors Start by computing the vectors from the current node to each boundary
-    // neighbor node
+    // Determine whether the current node is colinear (2D) or coplanar 3D with
+    // its boundary neighbors. Start by computing the vectors from the current
+    // node to each boundary neighbor node
     std::vector<Point> dist_vecs;
     for (const auto & neighbor : neighbors)
     {
@@ -89,7 +89,17 @@ void VariationalSmootherConstraint::constrain()
         continue;
       }
 
-      // TODO: what if z is not the inactive dimension in 2D!?!?
+      // TODO: what if z is not the inactive dimension in 2D?
+      // Would this even happen!?!?
+      //
+      // Yes, yes, we are using a function called "constrain_node_to_plane" to
+      // constrain a node to a line in a 2D mesh. However, the line
+      // c_x * x + c_y * y + c = 0 is equivalent to the plane
+      // c_x * x + c_y * y + 0 * z + c = 0, so the same logic applies here.
+      // Since all dist_vecs reside in the xy plane, and are parallel to the line
+      // we are constraining to, crossing one of the dist_vecs with the unit
+      // vector in the z direction should give us a vector normal to the
+      // constraining line. This reference normal vector also resides in the xy plane.
       const auto reference_normal = dist_vecs[0].cross(Point(0., 0., 1.));
       this->constrain_node_to_plane(node, reference_normal);
     }
