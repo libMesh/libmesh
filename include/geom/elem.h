@@ -920,6 +920,17 @@ public:
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i) = 0;
   std::unique_ptr<const Elem> build_side_ptr (const unsigned int i) const;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  /*
+   * Older versions of libMesh supported a "proxy" option here.
+   */
+  virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i, bool proxy)
+  { if (proxy) libmesh_error(); libmesh_deprecated(); return this->build_side_ptr(i); }
+
+  std::unique_ptr<const Elem> build_side_ptr (const unsigned int i, bool proxy) const
+  { if (proxy) libmesh_error(); libmesh_deprecated(); return this->build_side_ptr(i); }
+#endif
+
   /**
    * Resets the loose element \p side, which may currently point to a
    * different side than \p i or even a different element than \p
