@@ -101,8 +101,7 @@ void VariationalMeshSmoother::smooth(unsigned int)
   DiffSolver & solver = *(sys.time_solver->diff_solver().get());
   //solver.quiet = false;
   solver.verbose = true;
-  sys.time_solver->diff_solver()->relative_residual_tolerance = 1e-10;
-  solver.relative_step_tolerance = 1e-10;
+  sys.time_solver->diff_solver()->relative_residual_tolerance = TOLERANCE*TOLERANCE;
 
   sys.solve();
 
