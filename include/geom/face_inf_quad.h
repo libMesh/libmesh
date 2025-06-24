@@ -211,6 +211,9 @@ public:
   virtual void build_edge_ptr (std::unique_ptr<Elem> & edge, const unsigned int i) override final
   { build_side_ptr(edge, i); }
 
+  // Avoid hiding deprecated version with different signature
+  using Elem::build_side_ptr;
+
   /**
    * is_edge_on_side is trivial in 2D.
    */
