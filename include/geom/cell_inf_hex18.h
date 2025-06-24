@@ -138,6 +138,9 @@ public:
   virtual void build_side_ptr (std::unique_ptr<Elem> & elem,
                                const unsigned int i) override;
 
+  // Avoid hiding deprecated version with different signature
+  using Elem::build_side_ptr;
+
   /**
    * \returns An \p EDGE3 built coincident with edges 0-3, or an \p INFEDGE2
    * built coincident with edges 4 to 11.

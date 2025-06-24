@@ -211,6 +211,9 @@ public:
                                const unsigned int) override
   { remote_elem_error("build_side_ptr"); }
 
+  // Avoid hiding deprecated version with different signature
+  using Elem::build_side_ptr;
+
   virtual std::unique_ptr<Elem> build_edge_ptr (const unsigned int) override
   { remote_elem_error("build_edge_ptr"); return std::unique_ptr<Elem>(); }
 

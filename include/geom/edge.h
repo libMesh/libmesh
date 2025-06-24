@@ -184,6 +184,9 @@ public:
   virtual void build_side_ptr (std::unique_ptr<Elem> & elem,
                                const unsigned int i) override final;
 
+  // Avoid hiding deprecated version with different signature
+  using Elem::build_side_ptr;
+
   /**
    * The \p Elem::build_edge_ptr() member makes no sense for edges.
    */

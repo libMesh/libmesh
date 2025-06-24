@@ -159,6 +159,9 @@ public:
   virtual void build_side_ptr (std::unique_ptr<Elem> &, const unsigned int) override
   { libmesh_not_implemented(); }
 
+  // Avoid hiding deprecated version with different signature
+  using Elem::build_side_ptr;
+
   /**
    * The \p Elem::build_edge_ptr() member makes no sense for nodes.
    */
