@@ -1536,6 +1536,14 @@ void RBConstruction::train_reduced_basis_with_POD()
 
   this->delta_N = get_rb_evaluation().get_n_basis_functions();
   update_system();
+
+  // We now compute all terms required to evaluate the RB error indicator.
+  // Unlike in the case of the RB Greedy algorithm, for the POD approach
+  // we do not need this data in order to compute the basis. However, we
+  // do need this data in order to evaluate error indicator quantities in
+  // the Online stage, so we compute it now so that it can be saved in
+  // the training data.
+  recompute_all_residual_terms();
 }
 
 bool RBConstruction::greedy_termination_test(Real abs_greedy_error,
