@@ -102,13 +102,16 @@ void VariationalSmootherSystem::compute_element_reference_volume()
 
   Real elem_averaged_det_J_sum = 0.;
 
+  // Must pre-request JxW before reinit() for efficiency in
+  // --enable-deprecated builds, and to avoid errors in
+  // --disable-deprecated builds.
+  const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
+  const auto & JxW = fe_map.get_JxW();
+
   for (const auto * elem : mesh.active_local_element_ptr_range())
   {
     femcontext.pre_fe_reinit(*this, elem);
     femcontext.elem_fe_reinit();
-
-    const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
-    const auto & JxW = fe_map.get_JxW();
 
     const auto elem_integrated_det_J = std::accumulate(JxW.begin(), JxW.end(), 0.);
     const auto ref_elem_vol = elem->reference_elem()->volume();
