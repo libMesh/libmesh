@@ -392,7 +392,8 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
             for (const auto ii : make_range(dim))
               dS_dR_l(var_id1, ii) = dphi_maps[ii][l][qp];
 
-            for (const auto p: elem.node_index_range()) // Contribution to Hessian from node p
+            // Jacobian is symmetric, only need to loop over lower triangular portion
+            for (const auto p: make_range(l + 1)) // Contribution to Hessian from node p
             {
               for (const auto var_id2 : make_range(dim)) // Contribution from each x/y/z component of node p
               {
@@ -436,7 +437,13 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                 }// for i, end tensor contraction
 
                 // Jacobian contribution
-                K[var_id1][var_id2](l, p) += quad_weights[qp] * d2E_dR2;
+                const Real jacobian_contribution = quad_weights[qp] * d2E_dR2;
+                K[var_id1][var_id2](l, p) += jacobian_contribution;
+                // Jacobian is symmetric, add contribution to p,l entry
+                // Don't get the diagonal twice!
+                if (p < l)
+                  // Note the transposition of var_id1 and var_id2 as these are also jacobian indices
+                  K[var_id2][var_id1](p, l) += jacobian_contribution;
 
               }// for var_id2
             }// for p
