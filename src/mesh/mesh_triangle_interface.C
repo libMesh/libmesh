@@ -365,8 +365,7 @@ void TriangleInterface::triangulate()
   // To the naked eye, a few smoothing iterations usually looks better,
   // so we do this by default unless the user says not to.
   if (this->_smooth_after_generating)
-    LaplaceMeshSmoother(_mesh).smooth(2);
-
+    LaplaceMeshSmoother(_mesh, 2).smooth();
 
   // Clean up.
   TriangleWrapper::destroy(initial,      TriangleWrapper::INPUT);
