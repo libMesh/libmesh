@@ -356,31 +356,34 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         // Recall that above, dbeta_dS takes the form:
         // d(beta)/dS = c1(S) * S - c2(S) * S_inv_T,
         // where c1 and c2 are scalar-valued functions.
-        const std::vector<Real> d2beta_dS2_coefs = {
+        const std::vector<Real> d2beta_dS2_coefs_times_distortion_weight = {
           //Part 1: scaler coefficients of d(c1 * S) / dS
           //
           // multiplies I[i,a] x I[j,b]
-          trace_powers[1] / chi,
+          (trace_powers[1] / chi) * distortion_weight,
           // multiplies S[a,b] x S[i,j]
-          ((dim - 2.) / dim) * trace_powers[2] / chi,
+          (((dim - 2.) / dim) * trace_powers[2] / chi) * distortion_weight,
           // multiplies S_inv[b,a] * S[i,j]
-          -(trace_powers[1] / chi_sq) * chi_prime * det,
+          (-(trace_powers[1] / chi_sq) * chi_prime * det) * distortion_weight,
           //
           //Part 2: scaler coefficients of d(-c2 * S_inv_T) / dS
           //
           // multiplies S[a,b] x S_inv[j,i]
-          -(trace_powers[1] / chi_sq) * chi_prime * det,
+          (-(trace_powers[1] / chi_sq) * chi_prime * det) * distortion_weight,
           // multiplies S_inv[b,a] x S_inv[j,i]
-          trace_powers[0] * (det / chi_sq)
-            * ((2. * chi_prime_sq / chi - chi_2prime) * det - chi_prime),
+          (trace_powers[0] * (det / chi_sq)
+            * ((2. * chi_prime_sq / chi - chi_2prime) * det - chi_prime)) * distortion_weight,
           // multiplies S_inv[b,i] x S_inv[j,a]
-          (trace_powers[0] / chi_sq) * chi_prime * det,
+          ((trace_powers[0] / chi_sq) * chi_prime * det) * distortion_weight,
         };
 
         // d alpha / dS has the form c(S) * S^-T, where c is the scalar coefficient defined below
-        const Real dalpha_dS_coef = (det / (2. * _ref_vol * chi_sq))
+        const Real dalpha_dS_coef_times_dilation_weight = ((det / (2. * _ref_vol * chi_sq))
           * (-4. * _ref_vol * alpha * chi * chi_prime - chi_2prime * det_cube
-             - chi_prime * det_sq + 4 * chi * det - ref_vol_sq * (chi_prime + det * chi_2prime));
+             - chi_prime * det_sq + 4 * chi * det - ref_vol_sq * (chi_prime + det * chi_2prime))) * _dilation_weight;
+
+        // This is also useful to precompute
+        const Real alpha_times_dilation_weight = alpha * _dilation_weight;
 
         for (const auto l: elem.node_index_range()) // Contribution to Hessian from node l
         {
@@ -412,13 +415,13 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                     // Apply the stuff only depending on i and j before entering a, b loops
                     // beta
                     const std::vector<Real> d2beta_dS2_coefs_ij_applied{
-                      d2beta_dS2_coefs[1] * S(i,j),
-                      d2beta_dS2_coefs[2] * S(i,j),
-                      d2beta_dS2_coefs[3] * S_inv(j,i),
-                      d2beta_dS2_coefs[4] * S_inv(j,i),
+                      d2beta_dS2_coefs_times_distortion_weight[1] * S(i,j),
+                      d2beta_dS2_coefs_times_distortion_weight[2] * S(i,j),
+                      d2beta_dS2_coefs_times_distortion_weight[3] * S_inv(j,i),
+                      d2beta_dS2_coefs_times_distortion_weight[4] * S_inv(j,i),
                     };
                     // mu
-                    const auto dalpha_dS_coef_ij_applied = dalpha_dS_coef * S_inv(j,i);
+                    const auto dalpha_dS_coef_ij_applied = dalpha_dS_coef_times_dilation_weight * S_inv(j,i);
                     for (const auto a : make_range(dim))
                     {
                       for (const auto b : make_range(dim))
@@ -427,38 +430,38 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                         // Combine precomputed coefficients with tensor products to get d2(beta) / dS2
                         // Nice looking version:
                         //
-                        //Real d2beta_dS2 = (
-                        //  d2beta_dS2_coefs[0] * I(i,a)     * I(j,b)     +
-                        //  d2beta_dS2_coefs[1] * S(a,b)     * S(i,j)     +
-                        //  d2beta_dS2_coefs[2] * S_inv(b,a) * S(i,j)     +
-                        //  d2beta_dS2_coefs[3] * S(a,b)     * S_inv(j,i) +
-                        //  d2beta_dS2_coefs[4] * S_inv(b,a) * S_inv(j,i) +
-                        //  d2beta_dS2_coefs[5] * S_inv(j,a) * S_inv(b,i)
+                        //Real d2beta_dS2_coefs_times_distortion_weight = (
+                        //  d2beta_dS2_coefs_times_distortion_weight[0] * I(i,a)     * I(j,b)     +
+                        //  d2beta_dS2_coefs_times_distortion_weight[1] * S(a,b)     * S(i,j)     +
+                        //  d2beta_dS2_coefs_times_distortion_weight[2] * S_inv(b,a) * S(i,j)     +
+                        //  d2beta_dS2_coefs_times_distortion_weight[3] * S(a,b)     * S_inv(j,i) +
+                        //  d2beta_dS2_coefs_times_distortion_weight[4] * S_inv(b,a) * S_inv(j,i) +
+                        //  d2beta_dS2_coefs_times_distortion_weight[5] * S_inv(j,a) * S_inv(b,i)
                         //);
                         //
                         // Efficient version:
 
-                        Real d2beta_dS2 = (
-                          d2beta_dS2_coefs[0]            * I(i,a)     * I(j,b) +
-                          d2beta_dS2_coefs_ij_applied[0] * S(a,b)              +
-                          d2beta_dS2_coefs_ij_applied[1] * S_inv(b,a)          +
-                          d2beta_dS2_coefs_ij_applied[2] * S(a,b)              +
-                          d2beta_dS2_coefs_ij_applied[3] * S_inv(b,a)          +
-                          d2beta_dS2_coefs[5]            * S_inv(j,a) * S_inv(b,i)
+                        Real d2beta_dS2_times_distortion_weight = (
+                          d2beta_dS2_coefs_times_distortion_weight[0] * I(i,a) * I(j,b) +
+                          d2beta_dS2_coefs_ij_applied[0] * S(a,b)     +
+                          d2beta_dS2_coefs_ij_applied[1] * S_inv(b,a) +
+                          d2beta_dS2_coefs_ij_applied[2] * S(a,b)     +
+                          d2beta_dS2_coefs_ij_applied[3] * S_inv(b,a) +
+                          d2beta_dS2_coefs_times_distortion_weight[5] * S_inv(j,a) * S_inv(b,i)
                         );
 
                         // Incorporate tensor product portion to get d2(mu) / dS2
                         // Nice looking version:
                         //
-                        //const Real d2mu_dS2 = dalpha_dS_coef * S_inv(b,a) * S_inv(j,i) - alpha * S_inv(b,i) * S_inv(j,a);
+                        //const Real d2mu_dS2 = dalpha_dS_coef_times_dilation_weight * S_inv(b,a) * S_inv(j,i) - alpha_times_dilation_weight * S_inv(b,i) * S_inv(j,a);
                         //
                         // Efficient version
 
-                        const Real d2mu_dS2 = dalpha_dS_coef_ij_applied * S_inv(b,a) - alpha * S_inv(b,i) * S_inv(j,a);
+                        const Real d2mu_dS2_times_dilation_weight = dalpha_dS_coef_ij_applied * S_inv(b,a) - alpha_times_dilation_weight * S_inv(b,i) * S_inv(j,a);
 
 
                         // Chain rule to change d/dS to d/dR
-                        d2E_dR2 += (distortion_weight * d2beta_dS2 + _dilation_weight * d2mu_dS2) * dS_dR_l(a, b) * dS_dR_p(i, j);
+                        d2E_dR2 += (d2beta_dS2_times_distortion_weight + d2mu_dS2_times_dilation_weight) * dS_dR_l(a, b) * dS_dR_p(i, j);
 
                       }// for b
                     }// for a
