@@ -410,20 +410,35 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                 // Perform tensor contraction
                 for (const auto i : make_range(dim))
                 {
+
                   for (const auto j : make_range(dim))
                   {
+
+                    const auto S_ij = S(i,j);
+                    const auto S_inv_ji = S_inv(j,i);
+
                     // Apply the stuff only depending on i and j before entering a, b loops
                     // beta
                     const std::vector<Real> d2beta_dS2_coefs_ij_applied{
-                      d2beta_dS2_coefs_times_distortion_weight[1] * S(i,j),
-                      d2beta_dS2_coefs_times_distortion_weight[2] * S(i,j),
-                      d2beta_dS2_coefs_times_distortion_weight[3] * S_inv(j,i),
-                      d2beta_dS2_coefs_times_distortion_weight[4] * S_inv(j,i),
+                      d2beta_dS2_coefs_times_distortion_weight[1] * S_ij,
+                      d2beta_dS2_coefs_times_distortion_weight[2] * S_ij,
+                      d2beta_dS2_coefs_times_distortion_weight[3] * S_inv_ji,
+                      d2beta_dS2_coefs_times_distortion_weight[4] * S_inv_ji,
                     };
                     // mu
-                    const auto dalpha_dS_coef_ij_applied = dalpha_dS_coef_times_dilation_weight * S_inv(j,i);
+                    const auto dalpha_dS_coef_ij_applied = dalpha_dS_coef_times_dilation_weight * S_inv_ji;
+
+                    Real d2E_dSdR_l = 0.;
+
                     for (const auto a : make_range(dim))
                     {
+
+                      const auto S_inv_ja = S_inv(j,a);
+
+                      const Real d2beta_dS2_coef_ia_applied = d2beta_dS2_coefs_times_distortion_weight[0] * I(i,a);
+                      const Real d2beta_dS2_coef_ja_applied = d2beta_dS2_coefs_times_distortion_weight[5] * S_inv_ja;
+                      const Real alpha_ja_applied = alpha_times_dilation_weight * S_inv_ja;
+
                       for (const auto b : make_range(dim))
                       {
 
@@ -442,12 +457,12 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                         // Efficient version:
 
                         Real d2beta_dS2_times_distortion_weight = (
-                          d2beta_dS2_coefs_times_distortion_weight[0] * I(i,a) * I(j,b) +
+                          d2beta_dS2_coef_ia_applied     * I(j,b) +
                           d2beta_dS2_coefs_ij_applied[0] * S(a,b)     +
                           d2beta_dS2_coefs_ij_applied[1] * S_inv(b,a) +
                           d2beta_dS2_coefs_ij_applied[2] * S(a,b)     +
                           d2beta_dS2_coefs_ij_applied[3] * S_inv(b,a) +
-                          d2beta_dS2_coefs_times_distortion_weight[5] * S_inv(j,a) * S_inv(b,i)
+                          d2beta_dS2_coef_ja_applied * S_inv(b,i)
                         );
 
                         // Incorporate tensor product portion to get d2(mu) / dS2
@@ -457,14 +472,20 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                         //
                         // Efficient version
 
-                        const Real d2mu_dS2_times_dilation_weight = dalpha_dS_coef_ij_applied * S_inv(b,a) - alpha_times_dilation_weight * S_inv(b,i) * S_inv(j,a);
+                        const Real d2mu_dS2_times_dilation_weight = dalpha_dS_coef_ij_applied * S_inv(b,a) - alpha_ja_applied * S_inv(b,i);
 
 
                         // Chain rule to change d/dS to d/dR
-                        d2E_dR2 += (d2beta_dS2_times_distortion_weight + d2mu_dS2_times_dilation_weight) * dS_dR_l(a, b) * dS_dR_p(i, j);
+                        // Nice looking version:
+                        //
+                        //d2E_dR2 += (d2beta_dS2_times_distortion_weight + d2mu_dS2_times_dilation_weight) * dS_dR_l(a, b) * dS_dR_p(i, j);
+                        // Efficient version:
+                        //
+                        d2E_dSdR_l += (d2beta_dS2_times_distortion_weight + d2mu_dS2_times_dilation_weight) * dS_dR_l(a, b);
 
                       }// for b
                     }// for a
+                    d2E_dR2 += d2E_dSdR_l * dS_dR_p(i, j);
                   }// for j
                 }// for i, end tensor contraction
 
