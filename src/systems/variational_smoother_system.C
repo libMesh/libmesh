@@ -102,7 +102,7 @@ void VariationalSmootherSystem::compute_element_reference_volume()
 
   Real elem_averaged_det_J_sum = 0.;
 
-  // Must pre-request JxW before reinit() for efficiency in
+  // Make pre-requests before reinit() for efficiency in
   // --enable-deprecated builds, and to avoid errors in
   // --disable-deprecated builds.
   const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
@@ -142,12 +142,16 @@ void VariationalSmootherSystem::init_context(DiffContext & context)
   for (const auto & dim : elem_dims)
     {
       c.get_element_fe( 0, my_fe, dim );
-      auto & fe_map = my_fe->get_fe_map();
+      my_fe->get_nothing();
 
+      auto & fe_map = my_fe->get_fe_map();
       fe_map.get_dxyzdxi();
       fe_map.get_dxyzdeta();
       fe_map.get_dxyzdzeta();
       fe_map.get_JxW();
+
+      c.get_side_fe( 0, my_fe, dim );
+      my_fe->get_nothing();
     }
 
   FEMSystem::init_context(context);
