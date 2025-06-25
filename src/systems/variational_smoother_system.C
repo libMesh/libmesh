@@ -409,23 +409,52 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                 {
                   for (const auto j : make_range(dim))
                   {
+                    // Apply the stuff only depending on i and j before entering a, b loops
+                    // beta
+                    const std::vector<Real> d2beta_dS2_coefs_ij_applied{
+                      d2beta_dS2_coefs[1] * S(i,j),
+                      d2beta_dS2_coefs[2] * S(i,j),
+                      d2beta_dS2_coefs[3] * S_inv(j,i),
+                      d2beta_dS2_coefs[4] * S_inv(j,i),
+                    };
+                    // mu
+                    const auto dalpha_dS_coef_ij_applied = dalpha_dS_coef * S_inv(j,i);
                     for (const auto a : make_range(dim))
                     {
                       for (const auto b : make_range(dim))
                       {
 
                         // Combine precomputed coefficients with tensor products to get d2(beta) / dS2
+                        // Nice looking version:
+                        //
+                        //Real d2beta_dS2 = (
+                        //  d2beta_dS2_coefs[0] * I(i,a)     * I(j,b)     +
+                        //  d2beta_dS2_coefs[1] * S(a,b)     * S(i,j)     +
+                        //  d2beta_dS2_coefs[2] * S_inv(b,a) * S(i,j)     +
+                        //  d2beta_dS2_coefs[3] * S(a,b)     * S_inv(j,i) +
+                        //  d2beta_dS2_coefs[4] * S_inv(b,a) * S_inv(j,i) +
+                        //  d2beta_dS2_coefs[5] * S_inv(j,a) * S_inv(b,i)
+                        //);
+                        //
+                        // Efficient version:
+
                         Real d2beta_dS2 = (
-                          d2beta_dS2_coefs[0] * I(i,a)     * I(j,b)     +
-                          d2beta_dS2_coefs[1] * S(a,b)     * S(i,j)     +
-                          d2beta_dS2_coefs[2] * S_inv(b,a) * S(i,j)     +
-                          d2beta_dS2_coefs[3] * S(a,b)     * S_inv(j,i) +
-                          d2beta_dS2_coefs[4] * S_inv(b,a) * S_inv(j,i) +
-                          d2beta_dS2_coefs[5] * S_inv(j,a) * S_inv(b,i)
+                          d2beta_dS2_coefs[0]            * I(i,a)     * I(j,b) +
+                          d2beta_dS2_coefs_ij_applied[0] * S(a,b)              +
+                          d2beta_dS2_coefs_ij_applied[1] * S_inv(b,a)          +
+                          d2beta_dS2_coefs_ij_applied[2] * S(a,b)              +
+                          d2beta_dS2_coefs_ij_applied[3] * S_inv(b,a)          +
+                          d2beta_dS2_coefs[5]            * S_inv(j,a) * S_inv(b,i)
                         );
 
                         // Incorporate tensor product portion to get d2(mu) / dS2
-                        const Real d2mu_dS2 = dalpha_dS_coef * S_inv(b,a) * S_inv(j,i) - alpha * S_inv(b,i) * S_inv(j,a);
+                        // Nice looking version:
+                        //
+                        //const Real d2mu_dS2 = dalpha_dS_coef * S_inv(b,a) * S_inv(j,i) - alpha * S_inv(b,i) * S_inv(j,a);
+                        //
+                        // Efficient version
+
+                        const Real d2mu_dS2 = dalpha_dS_coef_ij_applied * S_inv(b,a) - alpha * S_inv(b,i) * S_inv(j,a);
 
 
                         // Chain rule to change d/dS to d/dR
