@@ -10,6 +10,7 @@
 #include <libmesh/elem.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/boundary_info.h>
+#include <libmesh/system.h> // LIBMESH_HAVE_SOLVER define
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -102,7 +103,7 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testLaplaceQuad );
   CPPUNIT_TEST( testLaplaceTri );
-#  ifdef LIBMESH_ENABLE_VSMOOTHER
+#if defined(LIBMESH_ENABLE_VSMOOTHER) && defined(LIBMESH_HAVE_SOLVER)
   CPPUNIT_TEST( testVariationalQuad );
   CPPUNIT_TEST( testVariationalTri );
   CPPUNIT_TEST( testVariationalQuadMultipleSubdomains );
