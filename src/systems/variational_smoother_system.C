@@ -429,9 +429,9 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                     const auto dalpha_dS_coef_ij_applied = dalpha_dS_coef_times_dilation_weight * S_inv_ji;
 
                     Real d2E_dSdR_l = 0.;
+                    Real d2E_dSdR_p = 0.;
 
-                    for (const auto a : make_range(dim))
-                    {
+                    for (const auto a : make_range(i + 1)) {
 
                       const auto S_inv_ja = S_inv(j,a);
 
@@ -439,23 +439,11 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                       const Real d2beta_dS2_coef_ja_applied = d2beta_dS2_coefs_times_distortion_weight[5] * S_inv_ja;
                       const Real alpha_ja_applied = alpha_times_dilation_weight * S_inv_ja;
 
-                      for (const auto b : make_range(dim))
-                      {
+                      const auto b_limit = (a == i) ? j + 1 : dim;
+                      for (const auto b : make_range(b_limit)) {
 
-                        // Combine precomputed coefficients with tensor products to get d2(beta) / dS2
-                        // Nice looking version:
-                        //
-                        //Real d2beta_dS2_coefs_times_distortion_weight = (
-                        //  d2beta_dS2_coefs_times_distortion_weight[0] * I(i,a)     * I(j,b)     +
-                        //  d2beta_dS2_coefs_times_distortion_weight[1] * S(a,b)     * S(i,j)     +
-                        //  d2beta_dS2_coefs_times_distortion_weight[2] * S_inv(b,a) * S(i,j)     +
-                        //  d2beta_dS2_coefs_times_distortion_weight[3] * S(a,b)     * S_inv(j,i) +
-                        //  d2beta_dS2_coefs_times_distortion_weight[4] * S_inv(b,a) * S_inv(j,i) +
-                        //  d2beta_dS2_coefs_times_distortion_weight[5] * S_inv(j,a) * S_inv(b,i)
-                        //);
-                        //
-                        // Efficient version:
-
+                        // Combine precomputed coefficients with tensor products
+                        // to get d2(beta) / dS2
                         Real d2beta_dS2_times_distortion_weight = (
                           d2beta_dS2_coef_ia_applied     * I(j,b) +
                           d2beta_dS2_coefs_ij_applied[0] * S(a,b)     +
@@ -465,27 +453,25 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                           d2beta_dS2_coef_ja_applied * S_inv(b,i)
                         );
 
-                        // Incorporate tensor product portion to get d2(mu) / dS2
-                        // Nice looking version:
-                        //
-                        //const Real d2mu_dS2 = dalpha_dS_coef_times_dilation_weight * S_inv(b,a) * S_inv(j,i) - alpha_times_dilation_weight * S_inv(b,i) * S_inv(j,a);
-                        //
-                        // Efficient version
-
+                        // Incorporate tensor product portion to get d2(mu) /
+                        // dS2
                         const Real d2mu_dS2_times_dilation_weight = dalpha_dS_coef_ij_applied * S_inv(b,a) - alpha_ja_applied * S_inv(b,i);
 
 
                         // Chain rule to change d/dS to d/dR
-                        // Nice looking version:
-                        //
-                        //d2E_dR2 += (d2beta_dS2_times_distortion_weight + d2mu_dS2_times_dilation_weight) * dS_dR_l(a, b) * dS_dR_p(i, j);
-                        // Efficient version:
-                        //
-                        d2E_dSdR_l += (d2beta_dS2_times_distortion_weight + d2mu_dS2_times_dilation_weight) * dS_dR_l(a, b);
+                        const auto d2E_dS2 =
+                            d2beta_dS2_times_distortion_weight +
+                            d2mu_dS2_times_dilation_weight;
 
-                      }// for b
-                    }// for a
-                    d2E_dR2 += d2E_dSdR_l * dS_dR_p(i, j);
+                        d2E_dSdR_l += d2E_dS2 * dS_dR_l(a, b);
+
+                        if (!(i == a && j == b))
+                          d2E_dSdR_p += d2E_dS2 * dS_dR_p(a, b);
+
+                      } // for b
+                    } // for a
+                    d2E_dR2 +=
+                        d2E_dSdR_l * dS_dR_p(i, j) + d2E_dSdR_p * dS_dR_l(i, j);
                   }// for j
                 }// for i, end tensor contraction
 
