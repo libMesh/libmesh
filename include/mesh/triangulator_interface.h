@@ -36,7 +36,7 @@ namespace libMesh
 {
 
 // Forward Declarations
-class UnstructuredMesh;
+class MeshBase;
 template <unsigned int KDDim>
 class InverseDistanceInterpolation;
 enum ElemType : int;
@@ -97,7 +97,7 @@ public:
    * and the convex hull will be meshed.
    */
   explicit
-  TriangulatorInterface(UnstructuredMesh & mesh);
+  TriangulatorInterface(MeshBase & mesh);
 
   /**
    * Empty destructor.
@@ -391,7 +391,7 @@ protected:
   /**
    * Reference to the mesh which is to be created by triangle.
    */
-  UnstructuredMesh & _mesh;
+  MeshBase & _mesh;
 
   /**
    * A pointer to a vector of Hole*s.  If this is nullptr, there

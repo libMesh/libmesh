@@ -103,7 +103,7 @@ void TriangleWrapper::destroy(TriangleWrapper::triangulateio & t, TriangleWrappe
 
 
 void TriangleWrapper::copy_tri_to_mesh(const triangulateio & triangle_data_input,
-                                       UnstructuredMesh & mesh_output,
+                                       MeshBase & mesh_output,
                                        const ElemType type,
                                        const triangulateio * voronoi)
 {

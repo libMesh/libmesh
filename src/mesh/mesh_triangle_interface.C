@@ -45,7 +45,7 @@ namespace libMesh
 //
 
 // Constructor
-TriangleInterface::TriangleInterface(UnstructuredMesh & mesh)
+TriangleInterface::TriangleInterface(MeshBase & mesh)
   : TriangulatorInterface(mesh),
     _extra_flags(""),
     _serializer(_mesh)

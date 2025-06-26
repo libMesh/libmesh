@@ -49,7 +49,7 @@ public:
    * in the protected data section of the class.
    */
   explicit
-  LaplaceMeshSmoother(UnstructuredMesh & mesh);
+  LaplaceMeshSmoother(MeshBase & mesh);
 
   /**
    * Destructor.

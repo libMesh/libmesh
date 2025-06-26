@@ -104,7 +104,7 @@ Real AutoAreaFunction::operator() (const Point & p,
 //
 
 // Constructor
-TriangulatorInterface::TriangulatorInterface(UnstructuredMesh & mesh)
+TriangulatorInterface::TriangulatorInterface(MeshBase & mesh)
   : _mesh(mesh),
     _holes(nullptr),
     _markers(nullptr),

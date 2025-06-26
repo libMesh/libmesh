@@ -24,7 +24,7 @@ namespace libMesh
 {
 
 // forward declarations
-class UnstructuredMesh;
+class MeshBase;
 
 
 /**
@@ -43,7 +43,7 @@ public:
    * in the protected data section of the class.
    */
   explicit
-  MeshSmoother(UnstructuredMesh & mesh) : _mesh(mesh) {}
+  MeshSmoother(MeshBase & mesh) : _mesh(mesh) {}
 
   /**
    * Destructor.
@@ -58,7 +58,7 @@ public:
 
 protected:
 
-  UnstructuredMesh & _mesh;
+  MeshBase & _mesh;
 };
 
 } // namespace libMesh

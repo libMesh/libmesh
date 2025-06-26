@@ -34,7 +34,7 @@
 namespace libMesh
 {
 // LaplaceMeshSmoother member functions
-LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh & mesh)
+LaplaceMeshSmoother::LaplaceMeshSmoother(MeshBase & mesh)
   : MeshSmoother(mesh),
     _initialized(false)
 {

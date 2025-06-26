@@ -48,7 +48,7 @@ public:
    * and the convex hull will be meshed.
    */
   explicit
-  TriangleInterface(UnstructuredMesh & mesh);
+  TriangleInterface(MeshBase & mesh);
 
   /**
    * Empty destructor.

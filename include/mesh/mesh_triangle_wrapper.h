@@ -32,7 +32,7 @@
 namespace libMesh
 {
 // Forward declarations
-class UnstructuredMesh;
+class MeshBase;
 enum ElemType : int;
 
 // Make sure Triangle uses our "Real" as its "REAL"
@@ -86,7 +86,7 @@ void destroy(triangulateio & t, IO_Type);
  * MeshTools::Generation::build_delaunay_square_with_hole(...) routines.
  */
 void copy_tri_to_mesh(const triangulateio & triangle_data_input,
-                      UnstructuredMesh & mesh_output,
+                      MeshBase & mesh_output,
                       const ElemType type,
                       const triangulateio * voronoi = nullptr);
 } // namespace TriangleWrapper

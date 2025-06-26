@@ -351,7 +351,7 @@ namespace libMesh
 //
 
 // Constructor
-Poly2TriTriangulator::Poly2TriTriangulator(UnstructuredMesh & mesh,
+Poly2TriTriangulator::Poly2TriTriangulator(MeshBase & mesh,
                                            dof_id_type n_boundary_nodes)
   : TriangulatorInterface(mesh),
     _n_boundary_nodes(n_boundary_nodes),
@@ -787,8 +787,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
     libmesh_not_implemented();
 
   // We need neighbor pointers for ray casting and cavity finding
-  UnstructuredMesh & mesh = dynamic_cast<UnstructuredMesh &>(this->_mesh);
-  mesh.find_neighbors();
+  _mesh.find_neighbors();
 
   if (this->desired_area() == 0 &&
       this->get_desired_area_function() == nullptr &&
@@ -834,11 +833,11 @@ bool Poly2TriTriangulator::insert_refinement_points()
     // one processor vs another that's an issue.  So sort our input
     // carefully.
     std::set<Elem *, decltype(comp)> all_elems
-      { mesh.elements_begin(), mesh.elements_end(), comp };
+      { _mesh.elements_begin(), _mesh.elements_end(), comp };
 
     restore_delaunay(all_elems, boundary_info);
 
-    libmesh_assert_delaunay(mesh, new_elems);
+    libmesh_assert_delaunay(_mesh, new_elems);
   }
 
   // Map of which points follow which in the boundary polylines.  If
@@ -857,14 +856,14 @@ bool Poly2TriTriangulator::insert_refinement_points()
   // but let's make sure of that.
 #ifdef DEBUG
   std::unordered_set<Point> mesh_points;
-  for (const Node * node : mesh.node_ptr_range())
+  for (const Node * node : _mesh.node_ptr_range())
     {
       libmesh_assert(!mesh_points.count(*node));
       mesh_points.insert(*node);
     }
 #endif
 
-  auto add_point = [&mesh,
+  auto add_point = [this,
 #ifdef DEBUG
                     &mesh_points,
 #endif
@@ -874,10 +873,10 @@ bool Poly2TriTriangulator::insert_refinement_points()
       libmesh_assert(!mesh_points.count(p));
       mesh_points.insert(p);
 #endif
-      return mesh.add_point(p, nn++);
+      return _mesh.add_point(p, nn++);
     };
 
-  for (auto & elem : mesh.element_ptr_range())
+  for (auto & elem : _mesh.element_ptr_range())
     {
       // element_ptr_range skips deleted elements ... right?
       libmesh_assert(elem);
@@ -1221,7 +1220,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
         {
           if (const auto it = new_elems.find(old_elem);
               it == new_elems.end())
-            mesh.delete_elem(old_elem);
+            _mesh.delete_elem(old_elem);
           else
             new_elems.erase(it);
         }
@@ -1238,7 +1237,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
       // This is too expensive to do on every cavity in devel mode
 #ifdef DEBUG
-      libmesh_assert_delaunay(mesh, new_elems);
+      libmesh_assert_delaunay(_mesh, new_elems);
 #endif
     }
 
@@ -1343,7 +1342,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
                       ++old_it;
                       libmesh_assert(old_it != old_segments.end());
                     }
-                  node = mesh.node_ptr(old_it->second);
+                  node = _mesh.node_ptr(old_it->second);
                 }
               else
                 {
@@ -1467,7 +1466,7 @@ bool Poly2TriTriangulator::insert_refinement_points()
       libmesh_assert_equal_to(raw_elem, unique_elem.get());
       libmesh_assert(!raw_elem->is_flipped());
       libmesh_ignore(raw_elem); // Old gcc warns "unused variable"
-      mesh.add_elem(std::move(unique_elem));
+      _mesh.add_elem(std::move(unique_elem));
     }
 
   // Did we add anything?

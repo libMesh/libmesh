@@ -58,9 +58,9 @@ public:
    * all mesh points are expected to be boundary polyline points.
    */
   explicit
-  Poly2TriTriangulator(UnstructuredMesh & mesh,
+  Poly2TriTriangulator(MeshBase & mesh,
                        dof_id_type n_boundary_nodes =
-                         DofObject::invalid_id);
+                       DofObject::invalid_id);
 
   /**
    * Empty destructor.  Defaulted in the .C so we can forward declare

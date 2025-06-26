@@ -19,7 +19,6 @@
 
 // libmesh includes
 #include "libmesh/mesh_generation.h"
-#include "libmesh/unstructured_mesh.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/edge_edge3.h"
@@ -310,7 +309,7 @@ protected:
 
 // ------------------------------------------------------------
 // MeshTools::Generation function for mesh generation
-void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
+void MeshTools::Generation::build_cube(MeshBase & mesh,
                                        const unsigned int nx,
                                        const unsigned int ny,
                                        const unsigned int nz,
@@ -1652,7 +1651,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
 
 
-void MeshTools::Generation::build_point (UnstructuredMesh & mesh,
+void MeshTools::Generation::build_point (MeshBase & mesh,
                                          const ElemType type,
                                          const bool gauss_lobatto_grid)
 {
@@ -1670,7 +1669,7 @@ void MeshTools::Generation::build_point (UnstructuredMesh & mesh,
 }
 
 
-void MeshTools::Generation::build_line (UnstructuredMesh & mesh,
+void MeshTools::Generation::build_line (MeshBase & mesh,
                                         const unsigned int nx,
                                         const Real xmin, const Real xmax,
                                         const ElemType type,
@@ -1691,7 +1690,7 @@ void MeshTools::Generation::build_line (UnstructuredMesh & mesh,
 
 
 
-void MeshTools::Generation::build_square (UnstructuredMesh & mesh,
+void MeshTools::Generation::build_square (MeshBase & mesh,
                                           const unsigned int nx,
                                           const unsigned int ny,
                                           const Real xmin, const Real xmax,
@@ -1722,7 +1721,7 @@ void MeshTools::Generation::build_square (UnstructuredMesh & mesh,
 
 
 #ifndef LIBMESH_ENABLE_AMR
-void MeshTools::Generation::build_sphere (UnstructuredMesh &,
+void MeshTools::Generation::build_sphere (MeshBase &,
                                           const Real,
                                           const unsigned int,
                                           const ElemType,
@@ -1734,7 +1733,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh &,
 
 #else
 
-void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
+void MeshTools::Generation::build_sphere (MeshBase & mesh,
                                           const Real rad,
                                           const unsigned int nr,
                                           const ElemType type,
@@ -2266,7 +2265,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
 
 // Meshes the tensor product of a 1D and a 1D-or-2D domain.
-void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
+void MeshTools::Generation::build_extrusion (MeshBase & mesh,
                                              const MeshBase & cross_section,
                                              const unsigned int nz,
                                              RealVectorValue extrusion_vector,
@@ -2639,7 +2638,7 @@ void MeshTools::Generation::build_extrusion (UnstructuredMesh & mesh,
 #if defined(LIBMESH_HAVE_TRIANGLE) && LIBMESH_DIM > 1
 
 // Triangulates a 2D rectangular region with or without holes
-void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
+void MeshTools::Generation::build_delaunay_square(MeshBase & mesh,
                                                   const unsigned int nx, // num. of elements in x-dir
                                                   const unsigned int ny, // num. of elements in y-dir
                                                   const Real xmin, const Real xmax,
@@ -2753,7 +2752,7 @@ void MeshTools::Generation::build_delaunay_square(UnstructuredMesh & mesh,
 
 
 void MeshTools::Generation::surface_octahedron
-  (UnstructuredMesh & mesh,
+  (MeshBase & mesh,
    Real xmin, Real xmax,
    Real ymin, Real ymax,
    Real zmin, Real zmax,
