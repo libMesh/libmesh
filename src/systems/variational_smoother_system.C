@@ -208,6 +208,8 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
   // Quadrature info
   const auto quad_weights = c.get_element_qrule().get_weights();
 
+  const auto distortion_weight = 1. - _dilation_weight;
+
   // Integrate the distortion-dilation metric over the reference element
   for (const auto qp : index_range(quad_weights))
     {
@@ -323,8 +325,8 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       const RealTensor dmu_dS = alpha * S_inv_T;
 
       // Combined metric (E)
-      //const Real E = (1. - _dilation_weight) * beta + _dilation_weight * mu;
-      const RealTensor dE_dS = (1. - _dilation_weight) * dbeta_dS + _dilation_weight * dmu_dS;
+      //const Real E = distortion_weight * beta + _dilation_weight * mu;
+      const RealTensor dE_dS = distortion_weight * dbeta_dS + _dilation_weight * dmu_dS;
 
       // This vector is useful in computing dS/dR below
       std::vector<std::vector<std::vector<Real>>> dphi_maps = {dphidxi_map, dphideta_map, dphidzeta_map};
@@ -361,48 +363,64 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         // Recall that above, dbeta_dS takes the form:
         // d(beta)/dS = c1(S) * S - c2(S) * S_inv_T,
         // where c1 and c2 are scalar-valued functions.
-        const std::vector<Real> d2beta_dS2_coefs = {
+        const std::vector<Real> d2beta_dS2_coefs_times_distortion_weight = {
           //Part 1: scaler coefficients of d(c1 * S) / dS
           //
           // multiplies I[i,a] x I[j,b]
-          trace_powers[1] / chi,
+          (trace_powers[1] / chi) * distortion_weight,
           // multiplies S[a,b] x S[i,j]
-          ((dim - 2.) / dim) * trace_powers[2] / chi,
+          (((dim - 2.) / dim) * trace_powers[2] / chi) * distortion_weight,
           // multiplies S_inv[b,a] * S[i,j]
-          -(trace_powers[1] / chi_sq) * chi_prime * det,
+          (-(trace_powers[1] / chi_sq) * chi_prime * det) * distortion_weight,
           //
           //Part 2: scaler coefficients of d(-c2 * S_inv_T) / dS
           //
           // multiplies S[a,b] x S_inv[j,i]
-          -(trace_powers[1] / chi_sq) * chi_prime * det,
+          (-(trace_powers[1] / chi_sq) * chi_prime * det) * distortion_weight,
           // multiplies S_inv[b,a] x S_inv[j,i]
-          trace_powers[0] * (det / chi_sq)
-            * ((2. * chi_prime_sq / chi - chi_2prime) * det - chi_prime),
+          (trace_powers[0] * (det / chi_sq)
+            * ((2. * chi_prime_sq / chi - chi_2prime) * det - chi_prime)) * distortion_weight,
           // multiplies S_inv[b,i] x S_inv[j,a]
-          (trace_powers[0] / chi_sq) * chi_prime * det,
+          ((trace_powers[0] / chi_sq) * chi_prime * det) * distortion_weight,
         };
 
-
         // d alpha / dS has the form c(S) * S^-T, where c is the scalar coefficient defined below
-        const Real dalpha_dS_coef = (det / (2. * _ref_vol * chi_sq))
+        const Real dalpha_dS_coef_times_dilation_weight = ((det / (2. * _ref_vol * chi_sq))
           * (-4. * _ref_vol * alpha * chi * chi_prime - chi_2prime * det_cube
-             - chi_prime * det_sq + 4 * chi * det - ref_vol_sq * (chi_prime + det * chi_2prime));
+             - chi_prime * det_sq + 4 * chi * det - ref_vol_sq * (chi_prime + det * chi_2prime))) * _dilation_weight;
 
-        for (const auto l: elem.node_index_range()) // Contribution to Hessian from node l
+        // This is also useful to precompute
+        const Real alpha_times_dilation_weight = alpha * _dilation_weight;
+
+        /*
+
+        To increase the efficiency of the Jacobian computation, we take
+        advantage of l-p symmetry, ij-ab symmetry, and the sparsity pattern of
+        dS_dR. We also factor all possible multipliers out of inner loops for
+        efficiency. The result is code that is more difficult to read. For
+        clarity, consult the pseudo-code below in this comment.
+
+        for (const auto l: elem.node_index_range()) // Contribution to Hessian
+        from node l
         {
-          for (const auto var_id1 : make_range(dim)) // Contribution from each x/y/z component of node l
+          for (const auto var_id1 : make_range(dim)) // Contribution from each
+        x/y/z component of node l
           {
-            // Build dS/dR_l, the derivative of the physical-to-reference mapping Jacobin w.r.t.
+            // Build dS/dR_l, the derivative of the physical-to-reference
+        mapping Jacobin w.r.t.
             // the l-th node
             RealTensor dS_dR_l = RealTensor(0);
             for (const auto ii : make_range(dim))
               dS_dR_l(var_id1, ii) = dphi_maps[ii][l][qp];
 
-            for (const auto p: elem.node_index_range()) // Contribution to Hessian from node p
+            for (const auto p: elem.node_index_range()) // Contribution to
+        Hessian from node p
             {
-              for (const auto var_id2 : make_range(dim)) // Contribution from each x/y/z component of node p
+              for (const auto var_id2 : make_range(dim)) // Contribution from
+        each x/y/z component of node p
               {
-                // Build dS/dR_l, the derivative of the physical-to-reference mapping Jacobin w.r.t.
+                // Build dS/dR_l, the derivative of the physical-to-reference
+        mapping Jacobin w.r.t.
                 // the p-th node
                 RealTensor dS_dR_p = RealTensor(0);
                 for (const auto jj : make_range(dim))
@@ -419,8 +437,9 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                     {
                       for (const auto b : make_range(dim))
                       {
-                        // Nasty tensor products to be multiplied by d2beta_dS2_coefs to get d2(beta) / dS2
-                        const std::vector<Real> d2beta_dS2_tensor_contributions =
+                        // Nasty tensor products to be multiplied by
+        d2beta_dS2_coefs to get d2(beta) / dS2 const std::vector<Real>
+        d2beta_dS2_tensor_contributions =
                         {
                           I(i,a)     * I(j,b),
                           S(a,b)     * S(i,j),
@@ -430,20 +449,21 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                           S_inv(j,a) * S_inv(b,i),
                         };
 
-                        // Combine precomputed coefficients with tensor products to get d2(beta) / dS2
-                        Real d2beta_dS2 = 0.;
-                        for (const auto comp_id : index_range(d2beta_dS2_coefs))
+                        // Combine precomputed coefficients with tensor products
+        to get d2(beta) / dS2 Real d2beta_dS2 = 0.; for (const auto comp_id :
+        index_range(d2beta_dS2_coefs))
                         {
-                          const Real contribution = d2beta_dS2_coefs[comp_id] * d2beta_dS2_tensor_contributions[comp_id];
-                          d2beta_dS2 += contribution;
+                          const Real contribution = d2beta_dS2_coefs[comp_id] *
+        d2beta_dS2_tensor_contributions[comp_id]; d2beta_dS2 += contribution;
                         }
 
-                        // Incorporate tensor product portion to get d2(mu) / dS2
-                        const Real d2mu_dS2 = dalpha_dS_coef * S_inv(b,a) * S_inv(j,i) - alpha * S_inv(b,i) * S_inv(j,a);
+                        // Incorporate tensor product portion to get d2(mu) /
+        dS2 const Real d2mu_dS2 = dalpha_dS_coef * S_inv(b,a) * S_inv(j,i) -
+        alpha * S_inv(b,i) * S_inv(j,a);
 
                         // Chain rule to change d/dS to d/dR
-                        d2beta_dR2 += d2beta_dS2 * dS_dR_l(a, b) * dS_dR_p(i, j);
-                        d2mu_dR2 += d2mu_dS2 * dS_dR_l(a, b) * dS_dR_p(i, j);
+                        d2beta_dR2 += d2beta_dS2 * dS_dR_l(a, b) * dS_dR_p(i,
+        j); d2mu_dR2 += d2mu_dS2 * dS_dR_l(a, b) * dS_dR_p(i, j);
 
                       }// for b
                     }// for a
@@ -451,7 +471,128 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                 }// for i, end tensor contraction
 
                 // Jacobian contribution
-                K[var_id1][var_id2](l, p) += quad_weights[qp] * ((1. - _dilation_weight) * d2beta_dR2 + _dilation_weight * d2mu_dR2);
+                K[var_id1][var_id2](l, p) += quad_weights[qp] * ((1. -
+        _dilation_weight) * d2beta_dR2 + _dilation_weight * d2mu_dR2);
+
+              }// for var_id2
+            }// for p
+          }// for var_id1
+        }// for l
+
+        End pseudo-code, begin efficient code
+
+        */
+
+        for (const auto l: elem.node_index_range()) // Contribution to Hessian from node l
+        {
+          for (const auto var_id1 : make_range(dim)) // Contribution from each x/y/z component of node l
+          {
+            // Build dS/dR_l, the derivative of the physical-to-reference mapping Jacobin w.r.t.
+            // the l-th node
+            RealTensor dS_dR_l = RealTensor(0);
+            for (const auto ii : make_range(dim))
+              dS_dR_l(var_id1, ii) = dphi_maps[ii][l][qp];
+
+            // Jacobian is symmetric, only need to loop over lower triangular portion
+            for (const auto p: make_range(l + 1)) // Contribution to Hessian from node p
+            {
+              for (const auto var_id2 : make_range(dim)) // Contribution from each x/y/z component of node p
+              {
+                // Build dS/dR_l, the derivative of the physical-to-reference mapping Jacobin w.r.t.
+                // the p-th node
+                RealTensor dS_dR_p = RealTensor(0);
+                for (const auto jj : make_range(dim))
+                  dS_dR_p(var_id2, jj) = dphi_maps[jj][p][qp];
+
+                Real d2E_dR2 = 0.;
+                // Perform tensor contraction
+                for (const auto i : make_range(dim))
+                {
+
+                  for (const auto j : make_range(dim))
+                  {
+
+                    const auto S_ij = S(i,j);
+                    const auto S_inv_ji = S_inv(j,i);
+
+                    // Apply the stuff only depending on i and j before entering a, b loops
+                    // beta
+                    const std::vector<Real> d2beta_dS2_coefs_ij_applied{
+                      d2beta_dS2_coefs_times_distortion_weight[1] * S_ij,
+                      d2beta_dS2_coefs_times_distortion_weight[2] * S_ij,
+                      d2beta_dS2_coefs_times_distortion_weight[3] * S_inv_ji,
+                      d2beta_dS2_coefs_times_distortion_weight[4] * S_inv_ji,
+                    };
+                    // mu
+                    const auto dalpha_dS_coef_ij_applied = dalpha_dS_coef_times_dilation_weight * S_inv_ji;
+
+                    Real d2E_dSdR_l = 0.;
+                    Real d2E_dSdR_p = 0.;
+
+                    for (const auto a : make_range(i + 1)) {
+
+                      // If this condition is met, both the ijab and abij
+                      // contributions to the Jacobian are zero due to the
+                      // spasity patterns of dS_dR_l and dS_dR_p and this
+                      // iteration may be skipped
+                      if (!(a == var_id1 && i == var_id2) &&
+                          !(a == var_id2 && i == var_id1))
+                        continue;
+
+                      const auto S_inv_ja = S_inv(j,a);
+
+                      const Real d2beta_dS2_coef_ia_applied = d2beta_dS2_coefs_times_distortion_weight[0] * I(i,a);
+                      const Real d2beta_dS2_coef_ja_applied = d2beta_dS2_coefs_times_distortion_weight[5] * S_inv_ja;
+                      const Real alpha_ja_applied = alpha_times_dilation_weight * S_inv_ja;
+
+                      const auto b_limit = (a == i) ? j + 1 : dim;
+                      for (const auto b : make_range(b_limit)) {
+
+                        // Combine precomputed coefficients with tensor products
+                        // to get d2(beta) / dS2
+                        Real d2beta_dS2_times_distortion_weight = (
+                          d2beta_dS2_coef_ia_applied     * I(j,b) +
+                          d2beta_dS2_coefs_ij_applied[0] * S(a,b)     +
+                          d2beta_dS2_coefs_ij_applied[1] * S_inv(b,a) +
+                          d2beta_dS2_coefs_ij_applied[2] * S(a,b)     +
+                          d2beta_dS2_coefs_ij_applied[3] * S_inv(b,a) +
+                          d2beta_dS2_coef_ja_applied * S_inv(b,i)
+                        );
+
+                        // Incorporate tensor product portion to get d2(mu) /
+                        // dS2
+                        const Real d2mu_dS2_times_dilation_weight = dalpha_dS_coef_ij_applied * S_inv(b,a) - alpha_ja_applied * S_inv(b,i);
+
+
+                        // Chain rule to change d/dS to d/dR
+                        const auto d2E_dS2 =
+                            d2beta_dS2_times_distortion_weight +
+                            d2mu_dS2_times_dilation_weight;
+
+                        // if !(a == var_id1 (next line) && i == var_id2
+                        // (outside 'a' loop)), dS_dR_l(p) multiplier is zero
+                        d2E_dSdR_l += d2E_dS2 * dS_dR_l(a, b);
+
+                        if (!(i == a && j == b))
+                          // if !(a == var_id2 (next line) && i == var_id1
+                          // (outside 'a' loop)), dS_dR_p(l) multiplier is zero
+                          d2E_dSdR_p += d2E_dS2 * dS_dR_p(a, b);
+
+                      } // for b
+                    } // for a
+                    d2E_dR2 +=
+                        d2E_dSdR_l * dS_dR_p(i, j) + d2E_dSdR_p * dS_dR_l(i, j);
+                  }// for j
+                }// for i, end tensor contraction
+
+                // Jacobian contribution
+                const Real jacobian_contribution = quad_weights[qp] * d2E_dR2;
+                K[var_id1][var_id2](l, p) += jacobian_contribution;
+                // Jacobian is symmetric, add contribution to p,l entry
+                // Don't get the diagonal twice!
+                if (p < l)
+                  // Note the transposition of var_id1 and var_id2 as these are also jacobian indices
+                  K[var_id2][var_id1](p, l) += jacobian_contribution;
 
               }// for var_id2
             }// for p
