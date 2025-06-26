@@ -433,6 +433,14 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
                     for (const auto a : make_range(i + 1)) {
 
+                      // If this condition is met, both the ijab and abij
+                      // contributions to the Jacobian are zero due to the
+                      // spasity patterns of dS_dR_l and dS_dR_p and this
+                      // iteration may be skipped
+                      if (!(a == var_id1 && i == var_id2) &&
+                          !(a == var_id2 && i == var_id1))
+                        continue;
+
                       const auto S_inv_ja = S_inv(j,a);
 
                       const Real d2beta_dS2_coef_ia_applied = d2beta_dS2_coefs_times_distortion_weight[0] * I(i,a);
@@ -463,9 +471,13 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                             d2beta_dS2_times_distortion_weight +
                             d2mu_dS2_times_dilation_weight;
 
+                        // if !(a == var_id1 (next line) && i == var_id2
+                        // (outside 'a' loop)), dS_dR_l(p) multiplier is zero
                         d2E_dSdR_l += d2E_dS2 * dS_dR_l(a, b);
 
                         if (!(i == a && j == b))
+                          // if !(a == var_id2 (next line) && i == var_id1
+                          // (outside 'a' loop)), dS_dR_p(l) multiplier is zero
                           d2E_dSdR_p += d2E_dS2 * dS_dR_p(a, b);
 
                       } // for b
