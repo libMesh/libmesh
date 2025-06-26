@@ -385,6 +385,97 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         // This is also useful to precompute
         const Real alpha_times_dilation_weight = alpha * _dilation_weight;
 
+        /*
+
+        To increase the efficiency of the Jacobian computation, we take
+        advantage of l-p symmetry, ij-ab symmetry, and the sparsity pattern of
+        dS_dR. We also factor all possible multipliers out of inner loops for
+        efficiency. The result is code that is more difficult to read. For
+        clarity, consult the pseudo-code below in this comment.
+
+        for (const auto l: elem.node_index_range()) // Contribution to Hessian
+        from node l
+        {
+          for (const auto var_id1 : make_range(dim)) // Contribution from each
+        x/y/z component of node l
+          {
+            // Build dS/dR_l, the derivative of the physical-to-reference
+        mapping Jacobin w.r.t.
+            // the l-th node
+            RealTensor dS_dR_l = RealTensor(0);
+            for (const auto ii : make_range(dim))
+              dS_dR_l(var_id1, ii) = dphi_maps[ii][l][qp];
+
+            for (const auto p: elem.node_index_range()) // Contribution to
+        Hessian from node p
+            {
+              for (const auto var_id2 : make_range(dim)) // Contribution from
+        each x/y/z component of node p
+              {
+                // Build dS/dR_l, the derivative of the physical-to-reference
+        mapping Jacobin w.r.t.
+                // the p-th node
+                RealTensor dS_dR_p = RealTensor(0);
+                for (const auto jj : make_range(dim))
+                  dS_dR_p(var_id2, jj) = dphi_maps[jj][p][qp];
+
+                Real d2beta_dR2 = 0.;
+                Real d2mu_dR2 = 0.;
+                // Perform tensor contraction
+                for (const auto i : make_range(dim))
+                {
+                  for (const auto j : make_range(dim))
+                  {
+                    for (const auto a : make_range(dim))
+                    {
+                      for (const auto b : make_range(dim))
+                      {
+                        // Nasty tensor products to be multiplied by
+        d2beta_dS2_coefs to get d2(beta) / dS2 const std::vector<Real>
+        d2beta_dS2_tensor_contributions =
+                        {
+                          I(i,a)     * I(j,b),
+                          S(a,b)     * S(i,j),
+                          S_inv(b,a) * S(i,j),
+                          S(a,b)     * S_inv(j,i),
+                          S_inv(b,a) * S_inv(j,i),
+                          S_inv(j,a) * S_inv(b,i),
+                        };
+
+                        // Combine precomputed coefficients with tensor products
+        to get d2(beta) / dS2 Real d2beta_dS2 = 0.; for (const auto comp_id :
+        index_range(d2beta_dS2_coefs))
+                        {
+                          const Real contribution = d2beta_dS2_coefs[comp_id] *
+        d2beta_dS2_tensor_contributions[comp_id]; d2beta_dS2 += contribution;
+                        }
+
+                        // Incorporate tensor product portion to get d2(mu) /
+        dS2 const Real d2mu_dS2 = dalpha_dS_coef * S_inv(b,a) * S_inv(j,i) -
+        alpha * S_inv(b,i) * S_inv(j,a);
+
+                        // Chain rule to change d/dS to d/dR
+                        d2beta_dR2 += d2beta_dS2 * dS_dR_l(a, b) * dS_dR_p(i,
+        j); d2mu_dR2 += d2mu_dS2 * dS_dR_l(a, b) * dS_dR_p(i, j);
+
+                      }// for b
+                    }// for a
+                  }// for j
+                }// for i, end tensor contraction
+
+                // Jacobian contribution
+                K[var_id1][var_id2](l, p) += quad_weights[qp] * ((1. -
+        _dilation_weight) * d2beta_dR2 + _dilation_weight * d2mu_dR2);
+
+              }// for var_id2
+            }// for p
+          }// for var_id1
+        }// for l
+
+        End pseudo-code, begin efficient code
+
+        */
+
         for (const auto l: elem.node_index_range()) // Contribution to Hessian from node l
         {
           for (const auto var_id1 : make_range(dim)) // Contribution from each x/y/z component of node l
