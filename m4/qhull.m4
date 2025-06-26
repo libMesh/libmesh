@@ -4,8 +4,8 @@
 AC_DEFUN([CONFIGURE_QHULL],
 [
   AC_ARG_ENABLE(qhull,
-                AS_HELP_STRING([--enable-qhull],
-                               [build with Qhull API support]),
+                AS_HELP_STRING([--disable-qhull],
+                               [build without Qhull API support]),
                 [AS_CASE("${enableval}",
                          [yes], [enableqhull=yes],
                          [no],  [enableqhull=no],

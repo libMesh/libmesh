@@ -4,8 +4,8 @@
 AC_DEFUN([CONFIGURE_POLY2TRI],
 [
   AC_ARG_ENABLE(poly2tri,
-                AS_HELP_STRING([--enable-poly2tri],
-                               [build with poly2tri API support]),
+                AS_HELP_STRING([--disable-poly2tri],
+                               [build without poly2tri API support]),
                 [AS_CASE("${enableval}",
                          [yes], [enablepoly2tri=yes],
                          [no],  [enablepoly2tri=no],

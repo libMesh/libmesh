@@ -4,8 +4,8 @@ dnl -------------------------------------------------------------
 AC_DEFUN([CONFIGURE_NETGEN],
 [
   AC_ARG_ENABLE(netgen,
-                AS_HELP_STRING([--enable-netgen],
-                               [build with Netgen mesh generation library support]),
+                AS_HELP_STRING([--disable-netgen],
+                               [build without Netgen mesh generation library support]),
                 [AS_CASE("${enableval}",
                          [yes], [enablenetgen=yes],
                          [no],  [enablenetgen=no],
