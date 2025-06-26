@@ -2114,15 +2114,15 @@ Optional Features:
   --disable-metis         build without Metis graph partitioning support
   --disable-parmetis      build without Parmetis parallel graph partitioning
                           support
-  --enable-poly2tri       build with poly2tri API support
-  --enable-netgen         build with Netgen mesh generation library support
+  --disable-poly2tri      build without poly2tri API support
+  --disable-netgen        build without Netgen mesh generation library support
   --enable-netgen-required
                           Error if NetGen is not detected by configure
   --disable-tetgen        build without TetGen tetrahedralization library
                           support
   --disable-triangle      build without Triangle Delaunay triangulation
                           library support
-  --enable-qhull          build with Qhull API support
+  --disable-qhull         build without Qhull API support
   --disable-gmv           build without GMV file I/O support
   --disable-vtk           build without VTK file I/O support
   --enable-vtk-required   Error if VTK is not detected by configure
