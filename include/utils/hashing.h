@@ -54,6 +54,19 @@ public:
 
     return returnval;
   }
+
+  template <typename T, std::size_t N>
+  std::size_t operator()(const std::array<T, N> & x) const
+  {
+    // Hopefully argument-based lookup lets us recurse with this
+    using std::hash;
+
+    std::size_t returnval = 0;
+    for (std::size_t i = 0; i != N; ++i)
+      boostcopy::hash_combine(returnval, x[i]);
+
+    return returnval;
+  }
 };
 
 

@@ -174,6 +174,25 @@ void NetGenMeshInterface::triangulate ()
         ("Ng_GenerateVolumeMesh failed with an unknown error code");
   };
 
+  // Keep track of what boundary ids we want to assign to each new
+  // triangle.  We'll give the outer boundary BC 0, and give holes ids
+  // starting from 1.
+  // We key on sorted tuples of node ids to identify a side.
+  std::unordered_map<std::array<dof_id_type,3>,
+                     boundary_id_type, libMesh::hash> side_boundary_id;
+
+  auto insert_id = []
+    (std::array<dof_id_type,3> & array,
+     dof_id_type n_id)
+  {
+    libmesh_assert_less(n_id, DofObject::invalid_id);
+    unsigned int i=0;
+    while (array[i] < n_id)
+      ++i;
+    while (i < 3)
+      std::swap(array[i++], n_id);
+  };
+
   WrappedNgMesh ngmesh;
 
   // Create surface mesh in the WrappedNgMesh
@@ -184,8 +203,9 @@ void NetGenMeshInterface::triangulate ()
     int ng_id = 1;
 
     auto create_surface_component =
-      [this, &ng_id, &ng_to_libmesh_id, &ngmesh]
-      (UnstructuredMesh & srcmesh, bool hole_mesh)
+      [this, &ng_id, &ng_to_libmesh_id, &ngmesh, &side_boundary_id, &insert_id]
+      (UnstructuredMesh & srcmesh, bool hole_mesh,
+       boundary_id_type bcid)
     {
       // Keep track of what nodes we've already added to the Netgen
       // mesh vs what nodes we need to add.  We'll keep track by id,
@@ -217,6 +237,10 @@ void NetGenMeshInterface::triangulate ()
           // If someone has non-triangles, let's just ignore them.
           if (elem->type() != TRI3)
             continue;
+
+          std::array<dof_id_type,3> sorted_ids =
+            {DofObject::invalid_id, DofObject::invalid_id,
+             DofObject::invalid_id};
 
           for (int ni : make_range(3))
             {
@@ -261,17 +285,24 @@ void NetGenMeshInterface::triangulate ()
                   elem_node = ng_id;
                   ++ng_id;
                 }
+
+              insert_id(sorted_ids, n_id);
             }
+
+          side_boundary_id[sorted_ids] = bcid;
 
           Ng_AddSurfaceElement(ngmesh, NG_TRIG, elem_nodes.data());
         }
     };
 
-    create_surface_component(this->_mesh, false);
+    // Number the outer boundary 0, and the holes starting from 1
+    boundary_id_type bcid = 0;
+
+    create_surface_component(this->_mesh, false, bcid);
 
     if (_holes)
       for (const std::unique_ptr<UnstructuredMesh> & h : *_holes)
-        create_surface_component(*h, true);
+        create_surface_component(*h, true, ++bcid);
   }
 
   auto result = Ng_GenerateVolumeMesh(ngmesh, &params);
@@ -344,6 +375,21 @@ void NetGenMeshInterface::triangulate ()
 
     // NetGen and we disagree about node numbering orientation
     elem->orient(bi);
+
+    for (auto s : make_range(4))
+      {
+        std::array<dof_id_type,3> sorted_ids =
+          {DofObject::invalid_id, DofObject::invalid_id,
+           DofObject::invalid_id};
+
+        std::vector<unsigned int> nos = elem->nodes_on_side(s);
+        for (auto n : nos)
+          insert_id(sorted_ids, elem->node_id(n));
+
+        if (auto it = side_boundary_id.find(sorted_ids);
+            it != side_boundary_id.end())
+          bi->add_side(elem, s, it->second);
+      }
   }
 
   // We don't need our holes anymore.  Delete their serializers
