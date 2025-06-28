@@ -18,6 +18,7 @@
 // Local Includes
 #include "libmesh/variational_smoother_constraint.h"
 #include "libmesh/mesh_tools.h"
+#include "libmesh/boundary_info.h"
 
 namespace libMesh
 {
@@ -40,6 +41,8 @@ void VariationalSmootherConstraint::constrain()
   std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
   MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
+  const auto & boundary_info = mesh.get_boundary_info();
+
   const auto boundary_node_ids = MeshTools::find_boundary_nodes (mesh);
   for (const auto & bid : boundary_node_ids)
   {
@@ -49,13 +52,37 @@ void VariationalSmootherConstraint::constrain()
     std::vector<const Node *> neighbors;
     MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
 
-    // Remove any neighbors that are not boundary nodes
-    neighbors.erase(
-      std::remove_if(neighbors.begin(), neighbors.end(),
-        [&boundary_node_ids](const Node * neigh) {
-          return boundary_node_ids.find(neigh->id()) == boundary_node_ids.end();
+    // Remove any neighbors that are not boundary nodes OR boundary neighbor nodes
+    // that don't share a boundary id with node
+    auto remove_neighbor = [&boundary_node_ids, &node, &nodes_to_elem_map, &boundary_info]
+      (const Node * neigh) -> bool
+    {
+      const bool is_neighbor_boundary_node = boundary_node_ids.find(neigh->id()) != boundary_node_ids.end();
+
+      // Determine whether nodes share a common boundary id
+      // First, find the common element that both node and neigh belong to
+      const auto & elems_containing_node = nodes_to_elem_map[node.id()];
+      const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
+      const Elem * common_elem = nullptr;
+      for (const auto * neigh_elem : elems_containing_neigh)
+        if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
+        {
+          common_elem = neigh_elem;
+          break;
         }
-      ),
+
+      libmesh_assert(common_elem != nullptr);
+
+      // Now, determine whether node and neigh share a common boundary id
+      const bool nodes_have_common_bid = nodes_share_boundary_id(
+          node, *neigh, *common_elem, boundary_info);
+
+      // remove if neighbor is not boundary node or nodes don't share a common bid
+      return (is_neighbor_boundary_node && nodes_have_common_bid) ? false : true;
+    };
+
+    neighbors.erase(
+      std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
       neighbors.end()
     );
 
@@ -141,10 +168,10 @@ void VariationalSmootherConstraint::constrain()
       // Does the node lie within a 2D surface? (Not on the edge)
       bool node_is_coplanar = true;
 
-      // Does the node lie on the intersection of two 2D surfaces (i.e., a line)?
-      // If so, and the node is not located at the intersection of three 2D surfaces
-      // (i.e., a single point or vertex of the mesh), Then some of the dist_vecs
-      // will be parallel.
+      // Does the node lie on the intersection of two 2D surfaces (i.e., a
+      // line)? If so, and the node is not located at the intersection of three
+      // 2D surfaces (i.e., a single point or vertex of the mesh), then some of
+      // the dist_vecs will be parallel.
 
       // Each entry will be a vector from dist_vecs that has a corresponding
       // (anti)parallel vector, also from dist_vecs
@@ -228,6 +255,7 @@ void VariationalSmootherConstraint::constrain()
                           node.id()) == already_constrained_node_ids.end()
             )
             {
+              // TODO Allow nodes to slide along subdomain boundary
               this->fix_node(node);
               already_constrained_node_ids.insert(node.id());
             }
@@ -329,6 +357,64 @@ void VariationalSmootherConstraint::constrain_node_to_line(const Node & node, co
     const auto constrained_dof_index = node.dof_number(_sys.number(), constrained_dim, 0);
     _sys.get_dof_map().add_constraint_row( constrained_dof_index, constraint_row, inhomogeneous_part, true);
   }
+}
+
+// Utility function to determine whether two nodes share a boundary ID.
+// The motivation for this is that a sliding boundary node on a triangular
+// element can have a neighbor boundary node in the same element that is not
+// part of the same boundary
+// Consider the below example with nodes A, C, D, F, G that comprise elements
+// E1, E2, E3, with boundaries B1, B2, B3, B4. To determine the constraint
+// equations for the sliding node C, the neighboring nodes A and D need to
+// be identified to construct the line that C is allowed to slide along.
+// Note that neighbors A and D both share the boundary B1 with C.
+// Without ensuring that neighbors share the same boundary as the current
+// node, a neighboring node that does not lie on the same boundary
+// (i.e. F and G) might be selected to define the constraining line,
+// resulting in an incorrect constraint.
+// Note that if, for example, boundaries B1 and B2 were to be combined
+// into boundary B12, the node F would share a boundary id with node C
+// and result in an incorrect constraint. It would be useful to design
+// additional checks to detect cases like this.
+
+//         B3
+//    G-----------F
+//    | \       / |
+// B4 |  \  E2 /  | B2
+//    |   \   /   |
+//    | E1 \ / E3 |
+//    A-----C-----D
+//         B1
+
+bool VariationalSmootherConstraint::nodes_share_boundary_id(
+  const Node & boundary_node,
+  const Node & neighbor_node,
+  const Elem & containing_elem,
+  const BoundaryInfo & boundary_info)
+{
+  bool nodes_share_bid = false;
+
+  // Node ids local to containing_elem
+  const auto node_id = containing_elem.get_node_index(&boundary_node);
+  const auto neighbor_id = containing_elem.get_node_index(&neighbor_node);
+
+  for (const auto side_id : containing_elem.side_index_range())
+  {
+    // We don't care about this side if it doesn't contain our boundary and neighbor nodes
+    if (!(containing_elem.is_node_on_side(node_id, side_id) && containing_elem.is_node_on_side(neighbor_id, side_id)))
+      continue;
+
+    // If the current side, containing boundary_node and neighbor_node, lies on a boundary,
+    // we can say that boundary_node and neighbor_node have a common boundary id.
+    std::vector<boundary_id_type> boundary_ids;
+    boundary_info.boundary_ids(&containing_elem, side_id, boundary_ids);
+    if (boundary_ids.size())
+    {
+      nodes_share_bid = true;
+      break;
+    }
+  }
+  return nodes_share_bid;
 }
 
 } // namespace libMesh

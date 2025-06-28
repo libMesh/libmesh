@@ -64,6 +64,20 @@ private:
    */
   void constrain_node_to_line(const Node & node, const Point & line_vec);
 
+  /*
+   * Determines whether two neighboring nodes share a common boundary id.
+   * @param boundary_node The first of the two prospective nodes.
+   * @param neighbor_node The second of the two prospective nodes.
+   * @param containing_elem The element containing node1 and node2.
+   * @param boundary_info The mesh's BoundaryInfo.
+   * @return nodes_share_bid Whether node1 and node2 share a common boundary id.
+   */
+  static bool nodes_share_boundary_id(
+      const Node & boundary_node,
+      const Node & neighbor_node,
+      const Elem & containing_elem,
+      const BoundaryInfo & boundary_info);
+
 public:
 
   /*
