@@ -34,8 +34,7 @@ VariationalSmootherConstraint::~VariationalSmootherConstraint() = default;
 
 void VariationalSmootherConstraint::constrain()
 {
-  const auto & mesh = _sys.get_mesh();
-  const auto dim = mesh.mesh_dimension();
+  const auto &mesh = _sys.get_mesh();
 
   // Only compute the node to elem map once
   std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
@@ -86,146 +85,7 @@ void VariationalSmootherConstraint::constrain()
       neighbors.end()
     );
 
-    // Determine whether the current node is colinear (2D) or coplanar 3D with
-    // its boundary neighbors. Start by computing the vectors from the current
-    // node to each boundary neighbor node
-    std::vector<Point> dist_vecs;
-    for (const auto & neighbor : neighbors)
-    {
-      dist_vecs.push_back((*neighbor) - node);
-    }
-
-    // 2D: If the current node and all (two) boundary neighbor nodes lie on the same line,
-    // the magnitude of the dot product of the distance vectors will be equal
-    // to the product of the magnitudes of the vectors. This is because the distance
-    // vectors lie on the same line, so the cos(theta) term in the dot product
-    // evaluates to -1 or 1.
-    if (dim == 2)
-    {
-      // Physically, the boundary of a 2D mesh is a 1D curve. By the
-      // definition of a "neighbor", it is only possible for a node
-      // to have 2 neighbors on the boundary.
-      libmesh_assert_equal_to(dist_vecs.size(), dim);
-      const Real dot_product = dist_vecs[0] * dist_vecs[1];
-      const Real norm_product = dist_vecs[0].norm() * dist_vecs[1].norm();
-
-      // node is not colinear with its boundary neighbors and is thus immovable
-      if (!relative_fuzzy_equals(std::abs(dot_product), norm_product))
-      {
-        this->fix_node(node);
-        continue;
-      }
-
-      // TODO: what if z is not the inactive dimension in 2D?
-      // Would this even happen!?!?
-      //
-      // Yes, yes, we are using a function called "constrain_node_to_plane" to
-      // constrain a node to a line in a 2D mesh. However, the line
-      // c_x * x + c_y * y + c = 0 is equivalent to the plane
-      // c_x * x + c_y * y + 0 * z + c = 0, so the same logic applies here.
-      // Since all dist_vecs reside in the xy plane, and are parallel to the line
-      // we are constraining to, crossing one of the dist_vecs with the unit
-      // vector in the z direction should give us a vector normal to the
-      // constraining line. This reference normal vector also resides in the xy plane.
-      const auto reference_normal = dist_vecs[0].cross(Point(0., 0., 1.));
-      this->constrain_node_to_plane(node, reference_normal);
-    }
-
-    // 3D: If the current node and all boundary neighbor nodes lie on the same plane,
-    // all the distance vectors from the current node to the boundary nodes will be
-    // orthogonal to the plane normal. We can obtain a reference normal by normalizing
-    // the cross product between two of the distance vectors. If the normalized cross
-    // products of all other combinations (excluding self combinations) match this
-    // reference normal, then the current node is coplanar with all of its boundary nodes.
-    else if (dim == 3)
-    {
-      // We should have at least 2 distance vectors to compute a normal with in 3D
-      libmesh_assert_greater_equal(dist_vecs.size(), 2);
-
-      // Compute the reference normal by taking the cross product of two vectors in
-      // dist_vecs. We will use dist_vecs[0] as the first vector and the next available
-      // vector in dist_vecs that is not (anti)parallel to dist_vecs[0]. Without this
-      // check we may end up with a zero vector for the reference vector.
-      unsigned int vec_index;
-      const Point vec_0_normalized = dist_vecs[0] / dist_vecs[0].norm();
-      for (const auto ii : make_range(size_t(1), dist_vecs.size()))
-      {
-        // (anti)parallel check
-        const bool is_parallel =
-            vec_0_normalized.relative_fuzzy_equals(dist_vecs[ii] / dist_vecs[ii].norm());
-        const bool is_antiparallel =
-            vec_0_normalized.relative_fuzzy_equals(-dist_vecs[ii] / dist_vecs[ii].norm());
-        if (!(is_parallel || is_antiparallel))
-        {
-          vec_index = ii;
-          break;
-        }
-      }
-
-      const Point reference_cross_prod = dist_vecs[0].cross(dist_vecs[vec_index]);
-      const Point reference_normal = reference_cross_prod / reference_cross_prod.norm();
-
-      // Does the node lie within a 2D surface? (Not on the edge)
-      bool node_is_coplanar = true;
-
-      // Does the node lie on the intersection of two 2D surfaces (i.e., a
-      // line)? If so, and the node is not located at the intersection of three
-      // 2D surfaces (i.e., a single point or vertex of the mesh), then some of
-      // the dist_vecs will be parallel.
-
-      // Each entry will be a vector from dist_vecs that has a corresponding
-      // (anti)parallel vector, also from dist_vecs
-      std::vector<Point> parallel_pairs;
-
-      for (const auto ii : index_range(dist_vecs))
-      {
-        const Point vec_ii_normalized = dist_vecs[ii] / dist_vecs[ii].norm();
-        for (const auto jj : make_range(ii + 1, dist_vecs.size()))
-        {
-          const Point vec_jj_normalized = dist_vecs[jj] / dist_vecs[jj].norm();
-          const bool is_parallel =
-              vec_ii_normalized.relative_fuzzy_equals(vec_jj_normalized);
-          const bool is_antiparallel = vec_ii_normalized.relative_fuzzy_equals(
-              -vec_jj_normalized);
-
-          if (is_parallel || is_antiparallel)
-          {
-            parallel_pairs.push_back(vec_ii_normalized);
-            // Don't bother computing the cross product of parallel vector below,
-            // it will be zero and cannot be used to define a normal vector.
-            continue;
-          }
-
-          const Point cross_prod = dist_vecs[ii].cross(dist_vecs[jj]);
-          const Point normal = cross_prod / cross_prod.norm();
-
-          // node is not coplanar with its boundary neighbors
-          if (!(reference_normal.relative_fuzzy_equals(normal) ||
-                reference_normal.relative_fuzzy_equals(-normal)))
-            node_is_coplanar = false;
-        }
-      }
-      
-      if (node_is_coplanar)
-        this->constrain_node_to_plane(node, reference_normal);
-      else if (parallel_pairs.size())
-        this->constrain_node_to_line(node, parallel_pairs[0]);
-      else
-        this->fix_node(node);
-    }
-
-    // if not same line/plane, then node is either part of a curved surface or
-    // it is the vertex where two boundary surfaces meet. In the first case,
-    // we should just fix the node. For the latter case:
-    //   - 2D: just fix the node
-    //   - 3D: If the node is at the intersection of 3 surfaces (i.e., the
-    //   vertex of a cube), fix the node. If the node is at the intersection
-    //   of 2 surfaces (i.e., the edge of a cube), constrain it to slide along
-    //   this edge.
-
-    //  1D
-    else
-      this->fix_node(node);
+    this->impose_constraints(node, neighbors);
 
   }// end bid
 
@@ -256,6 +116,8 @@ void VariationalSmootherConstraint::constrain()
             )
             {
               // TODO Allow nodes to slide along subdomain boundary
+              // Should define methods to identify lines/places from a list of
+              // neighbors, use it here
               this->fix_node(node);
               already_constrained_node_ids.insert(node.id());
             }
@@ -264,7 +126,144 @@ void VariationalSmootherConstraint::constrain()
       }// for side
     }// for elem
   }
+}
 
+void VariationalSmootherConstraint::impose_constraints(
+    const Node &node, const std::vector<const Node *> neighbors) {
+  const auto &mesh = _sys.get_mesh();
+  const auto dim = mesh.mesh_dimension();
+
+  // Determine whether the current node is colinear (2D) or coplanar 3D with
+  // its boundary neighbors. Start by computing the vectors from the current
+  // node to each boundary neighbor node
+  std::vector<Point> dist_vecs;
+  for (const auto &neighbor : neighbors)
+    dist_vecs.push_back((*neighbor) - node);
+
+  // 2D: If the current node and all (two) boundary neighbor nodes lie on the
+  // same line, the magnitude of the dot product of the distance vectors will be
+  // equal to the product of the magnitudes of the vectors. This is because the
+  // distance vectors lie on the same line, so the cos(theta) term in the dot
+  // product evaluates to -1 or 1.
+  if (dim == 2) {
+    // Physically, the boundary of a 2D mesh is a 1D curve. By the
+    // definition of a "neighbor", it is only possible for a node
+    // to have 2 neighbors on the boundary.
+    libmesh_assert_equal_to(dist_vecs.size(), dim);
+    const Real dot_product = dist_vecs[0] * dist_vecs[1];
+    const Real norm_product = dist_vecs[0].norm() * dist_vecs[1].norm();
+
+    // node is not colinear with its boundary neighbors and is thus immovable
+    if (!relative_fuzzy_equals(std::abs(dot_product), norm_product))
+      this->fix_node(node);
+
+    else {
+      // Yes, yes, we are using a function called "constrain_node_to_plane" to
+      // constrain a node to a line in a 2D mesh. However, the line
+      // c_x * x + c_y * y + c = 0 is equivalent to the plane
+      // c_x * x + c_y * y + 0 * z + c = 0, so the same logic applies here.
+      // Since all dist_vecs reside in the xy plane, and are parallel to the
+      // line we are constraining to, crossing one of the dist_vecs with the
+      // unit vector in the z direction should give us a vector normal to the
+      // constraining line. This reference normal vector also resides in the xy
+      // plane.
+      //
+      // TODO: what if z is not the inactive dimension in 2D?
+      // Would this even happen!?!?
+      const auto reference_normal = dist_vecs[0].cross(Point(0., 0., 1.));
+      this->constrain_node_to_plane(node, reference_normal);
+    }
+  }
+
+  // 3D: If the current node and all boundary neighbor nodes lie on the same
+  // plane, all the distance vectors from the current node to the boundary nodes
+  // will be orthogonal to the plane normal. We can obtain a reference normal by
+  // normalizing the cross product between two of the distance vectors. If the
+  // normalized cross products of all other combinations (excluding self
+  // combinations) match this reference normal, then the current node is
+  // coplanar with all of its boundary nodes and should be constrained to the
+  // plane. If not same line/plane, then node is either part of a curved surface
+  // or it is the vertex where two boundary surfaces meet. In the first case, we
+  // should just fix the node. For the latter case, if the node is at the
+  // intersection of 3 surfaces (i.e., the vertex of a cube), fix the node. If
+  // the node is at the intersection of 2 surfaces (i.e., the edge of a cube),
+  // constrain it to slide along this edge.
+  else if (dim == 3) {
+    // We should have at least 2 distance vectors to compute a normal with in 3D
+    libmesh_assert_greater_equal(dist_vecs.size(), 2);
+
+    // Compute the reference normal by taking the cross product of two vectors
+    // in dist_vecs. We will use dist_vecs[0] as the first vector and the next
+    // available vector in dist_vecs that is not (anti)parallel to dist_vecs[0].
+    // Without this check we may end up with a zero vector for the reference
+    // vector.
+    unsigned int vec_index;
+    const Point vec_0_normalized = dist_vecs[0] / dist_vecs[0].norm();
+    for (const auto ii : make_range(size_t(1), dist_vecs.size())) {
+      // (anti)parallel check
+      const bool is_parallel = vec_0_normalized.relative_fuzzy_equals(
+          dist_vecs[ii] / dist_vecs[ii].norm());
+      const bool is_antiparallel = vec_0_normalized.relative_fuzzy_equals(
+          -dist_vecs[ii] / dist_vecs[ii].norm());
+      if (!(is_parallel || is_antiparallel)) {
+        vec_index = ii;
+        break;
+      }
+    }
+
+    const Point reference_cross_prod = dist_vecs[0].cross(dist_vecs[vec_index]);
+    const Point reference_normal =
+        reference_cross_prod / reference_cross_prod.norm();
+
+    // Does the node lie within a 2D surface? (Not on the edge)
+    bool node_is_coplanar = true;
+
+    // Does the node lie on the intersection of two 2D surfaces (i.e., a
+    // line)? If so, and the node is not located at the intersection of three
+    // 2D surfaces (i.e., a single point or vertex of the mesh), then some of
+    // the dist_vecs will be parallel.
+
+    // Each entry will be a vector from dist_vecs that has a corresponding
+    // (anti)parallel vector, also from dist_vecs
+    std::vector<Point> parallel_pairs;
+
+    for (const auto ii : index_range(dist_vecs)) {
+      const Point vec_ii_normalized = dist_vecs[ii] / dist_vecs[ii].norm();
+      for (const auto jj : make_range(ii + 1, dist_vecs.size())) {
+        const Point vec_jj_normalized = dist_vecs[jj] / dist_vecs[jj].norm();
+        const bool is_parallel =
+            vec_ii_normalized.relative_fuzzy_equals(vec_jj_normalized);
+        const bool is_antiparallel =
+            vec_ii_normalized.relative_fuzzy_equals(-vec_jj_normalized);
+
+        if (is_parallel || is_antiparallel) {
+          parallel_pairs.push_back(vec_ii_normalized);
+          // Don't bother computing the cross product of parallel vector below,
+          // it will be zero and cannot be used to define a normal vector.
+          continue;
+        }
+
+        const Point cross_prod = dist_vecs[ii].cross(dist_vecs[jj]);
+        const Point normal = cross_prod / cross_prod.norm();
+
+        // node is not coplanar with its boundary neighbors
+        if (!(reference_normal.relative_fuzzy_equals(normal) ||
+              reference_normal.relative_fuzzy_equals(-normal)))
+          node_is_coplanar = false;
+      }
+    }
+
+    if (node_is_coplanar)
+      this->constrain_node_to_plane(node, reference_normal);
+    else if (parallel_pairs.size())
+      this->constrain_node_to_line(node, parallel_pairs[0]);
+    else
+      this->fix_node(node);
+  }
+
+  //  1D
+  else
+    this->fix_node(node);
 }
 
 void VariationalSmootherConstraint::fix_node(const Node & node)

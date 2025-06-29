@@ -41,6 +41,15 @@ private:
   const bool _preserve_subdomain_boundaries;
 
   /*
+   * Identifies and imposes the appropriate constraints on a node.
+   * @param node The node to constrain.
+   * @param neighbors Vector of neighbors to use to identify the constraint to
+   * impose.
+   */
+  void impose_constraints(const Node &node,
+                          const std::vector<const Node *> neighbors);
+
+  /*
    * Constrain (i.e., fix) a node to not move during mesh smoothing.
    * @param node Node to fix.
    */

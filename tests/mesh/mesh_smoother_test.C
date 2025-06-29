@@ -221,7 +221,8 @@ public:
       (const Node & node) {
       auto it = subdomain_boundary_node_id_to_point.find(node.id());
       if (it != subdomain_boundary_node_id_to_point.end())
-        return (Point(node) == subdomain_boundary_node_id_to_point[node.id()]);
+        return (relative_fuzzy_equals(
+            Point(node), subdomain_boundary_node_id_to_point[node.id()]));
       else
         // node is not an internal subdomain boundary node, just return true
         return true;
