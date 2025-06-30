@@ -63,18 +63,15 @@ void VariationalSmootherConstraint::constrain()
       const auto & elems_containing_node = nodes_to_elem_map[node.id()];
       const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
       const Elem * common_elem = nullptr;
+      bool nodes_have_common_bid = false;
       for (const auto * neigh_elem : elems_containing_neigh)
         if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
         {
           common_elem = neigh_elem;
-          break;
+          // Keep this in the loop because there can be multiple common elements
+          // Now, determine whether node and neigh share a common boundary id
+          nodes_have_common_bid = nodes_share_boundary_id(node, *neigh, *common_elem, boundary_info) || nodes_have_common_bid;
         }
-
-      libmesh_assert(common_elem != nullptr);
-
-      // Now, determine whether node and neigh share a common boundary id
-      const bool nodes_have_common_bid = nodes_share_boundary_id(
-          node, *neigh, *common_elem, boundary_info);
 
       // remove if neighbor is not boundary node or nodes don't share a common bid
       return (is_neighbor_boundary_node && nodes_have_common_bid) ? false : true;
@@ -151,7 +148,6 @@ void VariationalSmootherConstraint::constrain()
 
               // Now, determine whether node and neigh are on a side coincident
               // with the interval boundary
-              unsigned int matched_side;
               for (const auto common_side : common_elem->side_index_range())
               {
                 bool node_found_on_side = false;
@@ -166,20 +162,21 @@ void VariationalSmootherConstraint::constrain()
 
                 if (node_found_on_side && neigh_found_on_side)
                 {
-                  matched_side = common_side;
-                  break;
+                  const auto matched_side = common_side;
+                  // There could be multiple matched sides, so keep this next part
+                  // inside the loop
+                  //
+                  // Does matched_side, containing both node and neigh, lie on the
+                  // subdomain boundary between sub_id1 (= common_sub_id or other_sub_id)
+                  // and sub_id2 (= other sub_id or common_sub_id)?
+                  const auto matched_neighbor_sub_id = common_elem->neighbor_ptr(matched_side)->subdomain_id();
+                  const bool is_matched_side_on_subdomain_boundary = matched_neighbor_sub_id == other_sub_id;
+                  if (is_matched_side_on_subdomain_boundary)
+                    return false; // Don't remove the neighbor node
                 }
               }
 
-              // Does matched_side, containing both node and neigh, lie on the
-              // subdomain boundary between sub_id1 (= common_sub_id or other_sub_id)
-              // and sub_id2 (= other sub_id or common_sub_id)?
-              const auto matched_neighbor_sub_id = common_elem->neighbor_ptr(matched_side)->subdomain_id();
-              const bool is_matched_side_on_subdomain_boundary = matched_neighbor_sub_id == other_sub_id;
-
-              // We return wheather neigh should be removed
-              return !is_matched_side_on_subdomain_boundary;
-
+              return true; // Remove the neighbor node
             };
 
             neighbors.erase(
