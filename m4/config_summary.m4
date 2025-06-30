@@ -194,7 +194,7 @@ AS_IF([test "x$enableoptional" = "xyes"],
               ])
       ])
 AS_ECHO([])
-AS_IF([test "x$enableglibcxxdebugging" = "xyes"],
+AS_IF([test "x$acsm_enableglibcxxdebugging" = "xyes"],
       [
         AS_ECHO([ \
 "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" \

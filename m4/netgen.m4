@@ -38,6 +38,13 @@ AC_DEFUN([CONFIGURE_NETGEN],
   NETGEN_BUILD_LDFLAGS=""
   AS_IF([test "x$enablenetgen" = "xyes"],
         [
+          dnl Check whether the user has requested glibcxx debugging.
+          dnl If so, then we should only be building with a single method
+          dnl because we only build a single netgen library
+          AS_IF([test "x$acsm_enableglibcxxdebugging" = "xyes"],
+                [AS_IF([test "x$METHODS" != "xdbg"],
+                       [AC_MSG_ERROR([If enabling glibcxx debugging and using netgen, only a single method 'dbg' method can be used in 'METHODS', but instead $METHODS was used])])
+                 NETGEN_CXXFLAGS="$NETGEN_CXXFLAGS -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC"])
           dnl Autoconf doesn't define $abs_top_srcdir at this point;
           dnl here's a trick from GraphicsMagick:
           my_top_srcdir="$(cd $srcdir && pwd)"
@@ -63,7 +70,7 @@ AC_DEFUN([CONFIGURE_NETGEN],
           dnl than a relative path, because cmake emits errors if
           dnl given the latter.  Guess why?
           AS_IF([(cd contrib/netgen/build && \
-                   cmake -DUSE_NATIVE_ARCH=OFF -DUSE_PYTHON=OFF -DUSE_GUI=OFF -DUSE_OCC=OFF -DCMAKE_INSTALL_PREFIX:PATH=$my_top_builddir/contrib/netgen/install \
+                   cmake -DUSE_NATIVE_ARCH=OFF -DUSE_PYTHON=OFF -DUSE_GUI=OFF -DUSE_OCC=OFF -DCMAKE_CXX_FLAGS="$NETGEN_CXXFLAGS" -DCMAKE_INSTALL_PREFIX:PATH=$my_top_builddir/contrib/netgen/install \
                    $my_top_srcdir/contrib/netgen/netgen)],
                 [
                   NETGEN_INCLUDE="-I\$(top_srcdir)/contrib/netgen/ -I\$(top_builddir)/contrib/netgen/build/"
