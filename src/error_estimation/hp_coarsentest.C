@@ -134,7 +134,7 @@ void HPCoarsenTest::add_projection(const System & system,
     }
 }
 
-void HPCoarsenTest::select_refinement (System & system)
+void HPCoarsenTest::select_refinement (System & system, ErrorVector & smoothness)
 {
   LOG_SCOPE("select_refinement()", "HPCoarsenTest");
 
@@ -534,7 +534,7 @@ void HPCoarsenTest::select_refinement (System & system)
       const Real h_value =
         std::sqrt(h_error_per_cell[e_id]) /
         static_cast<Real>(new_h_dofs);
-      if (p_value > h_value)
+      if (smoothness[elem->id()] > smoothness.mean() && p_value > h_value)
         {
           elem->set_p_refinement_flag(Elem::REFINE);
           elem->set_refinement_flag(Elem::DO_NOTHING);

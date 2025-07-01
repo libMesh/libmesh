@@ -67,6 +67,7 @@ BUILT_SOURCES = \
         hp_singular.h \
         jump_error_estimator.h \
         kelly_error_estimator.h \
+        smoothness_estimator.h \
         patch_recovery_error_estimator.h \
         uniform_refinement_estimator.h \
         weighted_patch_recovery_error_estimator.h \
@@ -797,6 +798,9 @@ jump_error_estimator.h: $(top_srcdir)/include/error_estimation/jump_error_estima
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 kelly_error_estimator.h: $(top_srcdir)/include/error_estimation/kelly_error_estimator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+smoothness_estimator.h: $(top_srcdir)/include/error_estimation/smoothness_estimator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 patch_recovery_error_estimator.h: $(top_srcdir)/include/error_estimation/patch_recovery_error_estimator.h

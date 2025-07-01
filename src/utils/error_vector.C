@@ -208,7 +208,8 @@ bool ErrorVector::is_active_elem (dof_id_type i) const
 
 
 void ErrorVector::plot_error(const std::string & filename,
-                             const MeshBase & oldmesh) const
+                             const MeshBase & oldmesh,
+                             const std::string & data_type) const
 {
   std::unique_ptr<MeshBase> meshptr = oldmesh.clone();
   MeshBase & mesh = *meshptr;
@@ -231,7 +232,12 @@ void ErrorVector::plot_error(const std::string & filename,
   EquationSystems temp_es (mesh);
   ExplicitSystem & error_system
     = temp_es.add_system<ExplicitSystem> ("Error");
-  error_system.add_variable("error", CONSTANT, MONOMIAL);
+  if (data_type == "error")
+    error_system.add_variable(data_type, CONSTANT, MONOMIAL);
+  else
+    error_system.add_variable("smoothness", CONSTANT, MONOMIAL);
+
+
   temp_es.init();
 
   const DofMap & error_dof_map = error_system.get_dof_map();

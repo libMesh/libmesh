@@ -50,6 +50,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/gmv_io.h"
 #include "libmesh/tecplot_io.h"
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
@@ -61,6 +62,7 @@
 #include "libmesh/discontinuity_measure.h"
 #include "libmesh/exact_error_estimator.h"
 #include "libmesh/kelly_error_estimator.h"
+#include "libmesh/smoothness_estimator.h"
 #include "libmesh/patch_recovery_error_estimator.h"
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/hp_coarsentest.h"
@@ -480,13 +482,28 @@ int main(int argc, char ** argv)
 #ifdef LIBMESH_HAVE_EXODUS_API
 #  ifdef LIBMESH_HAVE_NEMESIS_API
               std::string error_output = "error_" + ss.str() + ".n";
+              std::string smoothness_output = "smoothness_" + ss.str() + ".n";
 #  else
               std::string error_output = "error_" + ss.str() + ".e";
+              std::string smoothness_output = "smoothness_" + ss.str() + ".e";
 #  endif
 #else
               std::string error_output = "error_" + ss.str() + ".gmv";
+              std::string smoothness_output = "smoothness_" + ss.str() + ".gmv";
 #endif
               error.plot_error(error_output, mesh);
+
+              // We use the ErrorVector to collect the computed regularity
+              // (a measure of smoothness) information on a finite element mesh.
+              ErrorVector smoothness;
+
+              if (refine_type == "hp")
+                {
+                  SmoothnessEstimator estimate_smoothness;
+                  estimate_smoothness.estimate_error(system, smoothness);
+                  std::string data_type = "smoothness";
+                  smoothness.plot_error(smoothness_output, mesh, data_type);
+                }
 
               // This takes the error in error and decides which elements
               // will be coarsened or refined.  Any element within 20% of the
@@ -510,7 +527,7 @@ int main(int argc, char ** argv)
               else if (refine_type == "hp")
                 {
                   HPCoarsenTest hpselector;
-                  hpselector.select_refinement(system);
+                  hpselector.select_refinement(system, smoothness);
                 }
               // If we are doing "singular hp" refinement, we
               // try switching most elements from h to p
