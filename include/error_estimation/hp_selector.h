@@ -22,6 +22,7 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/error_vector.h"
 
 // C++ includes
 #include <vector>
@@ -70,7 +71,7 @@ public:
    * refinement and potentially change the desired
    * refinement type.
    */
-  virtual void select_refinement (System & system) = 0;
+  virtual void select_refinement (System & system, ErrorVector & smoothness) = 0;
 
   /**
    * This vector can be used to "scale" certain
