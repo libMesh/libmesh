@@ -567,10 +567,8 @@ int main(int argc, char ** argv)
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Write out the solution
   // After solving the system write the solution
-  // to a GMVIO-formatted plot file (p levels can be visualized).
-  GMVIO gmv_io (mesh);
-  gmv_io.p_levels();
-  gmv_io.write_equation_systems ("lshaped.gmv", equation_systems);
+  // to a ExodusII_IO-formatted plot file.
+  ExodusII_IO (mesh).write_equation_systems ("lshaped.e", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // Close up the output file.

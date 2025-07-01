@@ -1,3 +1,21 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2025 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
 // libmesh includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/smoothness_estimator.h"
@@ -59,7 +77,8 @@ std::vector<Real> SmoothnessEstimator::legepoly(const unsigned int dim,
   std::vector<Real> Lx(npols, 0.), Ly(npols, 1.), Lz(npols, 1.);
   const Real x = p(0);
   Lx[0] = 1.;
-  if (npols > 1) Lx[1] = x;
+  if (npols > 1)
+    Lx[1] = x;
   for (int n = 2; n < npols; ++n)
     Lx[n] = ((2. * n - 1) * x * Lx[n - 1] - (n - 1) * Lx[n - 2]) / n;
 
@@ -67,7 +86,8 @@ std::vector<Real> SmoothnessEstimator::legepoly(const unsigned int dim,
   {
     const Real y = p(1);
     Ly[0] = 1.;
-    if (npols > 1) Ly[1] = y;
+    if (npols > 1)
+      Ly[1] = y;
     for (int n = 2; n < npols; ++n)
       Ly[n] = ((2. * n - 1) * y * Ly[n - 1] - (n - 1) * Ly[n - 2]) / n;
   }
@@ -76,7 +96,8 @@ std::vector<Real> SmoothnessEstimator::legepoly(const unsigned int dim,
   {
     const Real z = p(2);
     Lz[0] = 1.;
-    if (npols > 1) Lz[1] = z;
+    if (npols > 1)
+      Lz[1] = z;
     for (int n = 2; n < npols; ++n)
       Lz[n] = ((2. * n - 1) * z * Lz[n - 1] - (n - 1) * Lz[n - 2]) / n;
   }
@@ -153,8 +174,8 @@ void SmoothnessEstimator::estimate_error (const System & system,
                                        smoothness_per_cell)
                          );
 
-  // Each processor has now computed the error contributions
-  // for its local elements, and smoothness_per_cell contains 0 for all the
+  // Each processor has now computed the smoothness for its local
+  // elements, and smoothness_per_cell contains 0 for all the
   // non-local elements.  Summing the vector will provide the true
   // value for each element, local or remote
   this->reduce_error(smoothness_per_cell, system.comm());
@@ -225,7 +246,7 @@ for (const auto & elem : range)
     DenseVector<Number> F;
     DenseVector<Number> Pu_h;
 
-    F.resize(matsize); 
+    F.resize(matsize);
     Pu_h.resize(matsize);
 
 
@@ -295,8 +316,8 @@ for (const auto & elem : range)
     for (unsigned int i = 0; i < Pu_h.size(); ++i)
     {
       unsigned int degree = total_degree_per_index[i];
-      // Excluding the constant mode i.e, zeroth order coefficient as we use ln|order| later 
-      // Constant order term often dominates the scale and doesn't inform about regularity. 
+      // Excluding the constant mode i.e, zeroth order coefficient as we use ln|order| later
+      // Constant order term often dominates the scale and doesn't inform about regularity.
       if (degree > 0)
         coeff_by_degree[degree].push_back(Pu_h(i));
     }
@@ -320,8 +341,8 @@ for (const auto & elem : range)
       norms.push_back(norm);
     }
 
-    
-    // Collect log |U_k| vs log |k|
+
+    // Collect log |U_k| and log |k|
     std::vector<double> log_norms, log_degrees;
 
     for (unsigned int i = 0; i < degrees.size(); ++i)
@@ -334,7 +355,7 @@ for (const auto & elem : range)
     }
 
 
-    // Fit log-log line : least-squares fit
+    // Fit log-log line - we use least-squares fit
     double Sx = 0., Sy = 0., Sxx = 0., Sxy = 0.;
     const size_t N = log_degrees.size();
 
@@ -347,63 +368,12 @@ for (const auto & elem : range)
     }
 
     const double slope = (N * Sxy - Sx * Sy) / (N * Sxx - Sx * Sx);
-    const double intercept = (Sy - slope * Sx) / N;
+    // const double intercept = (Sy - slope * Sx) / N;
 
     const double regularity = -slope;
 
     Threads::spin_mutex::scoped_lock acquire(Threads::spin_mtx);
     smoothness_per_cell[e_id] = regularity;
-    
-    // R2 calculation 
-    double SS_res = 0.0;
-    double SS_tot = 0.0;
-    const double y_mean = Sy / N;
-
-    for (size_t i = 0; i < N; ++i)
-    {
-      const double y_i = log_norms[i];
-      const double x_i = log_degrees[i];
-      const double y_pred = slope * x_i + intercept;
-
-      SS_res += (y_i - y_pred) * (y_i - y_pred);
-      SS_tot += (y_i - y_mean) * (y_i - y_mean);
-    }
-    const double R_squared = (SS_tot > 0.0) ? 1.0 - (SS_res / SS_tot) : 0.0;
-
-
-    // Here we calculate the projection error from Legendre projection
-    Real projection_error = 0;
-    // Loop over quadrature points of the current element
-    for (unsigned int sp=0; sp<n_qp; sp++)
-    {
-      // Compute the solution at the current quadrature point
-      std::vector<Number> temperr(1, 0.0); 
-
-      // Compute the fe solution at the current quadrature point
-      Number u_h = libMesh::zero;
-      for (unsigned int i=0; i<n_dofs; i++)
-        u_h += (*phi)[i][sp]*system.current_solution (dof_indices[i]);
-
-      // Compute the phi values at the current quadrature point
-      std::vector<Real> psi = legepoly(dim, element_order, q_point[sp], matsize);
-      for (unsigned int i=0; i<matsize; i++)
-      {
-        // x component of the recovered solution where Pu_h is projection coefficients
-        temperr[0] += Pu_h(i)*psi[i];
-      }
-      // difference between recovered solution u* and fe solution u
-      temperr[0] -= u_h;
-      // Squaring and integrate the diff. between u and u* over the element to get per element error
-      projection_error += JxW[sp]*TensorTools::norm_sq(temperr[0]);
-    } // End loop over quadrature points
-
-    // libMesh::out << "E id :" << e_id 
-    //             << " Projection error : " <<  projection_error 
-    //             << " Regularity : " << regularity 
-    //             << " Order :" << element_order
-    //             << " R2 :" << R_squared
-    //             << std::endl;
-
   } // end variables loop
 
 } // end element loop
