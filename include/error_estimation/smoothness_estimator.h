@@ -1,3 +1,22 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2025 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+
 #ifndef LIBMESH_SMOOTHNESS_ESTIMATOR_H
 #define LIBMESH_SMOOTHNESS_ESTIMATOR_H
 
@@ -20,8 +39,9 @@ enum Order : int;
 /**
  * This class implements the Smoothness indicator.
  *
- * \author ---
- * \author ---
+ * \author Arjun Kulathuvayal
+ * \author Varis Carey
+ * \author Benjamin S. Kirk
  * \date 2025
  */
 class SmoothnessEstimator : public ErrorEstimator
@@ -46,9 +66,10 @@ public:
   virtual ~SmoothnessEstimator() = default;
 
   /**
-   * This function uses the Patch Recovery error
-   * estimate to estimate the error on each cell.
-   * The estimated error is output in the vector
+   * This function uses the Legendre expansion of
+   * solution to estimate coefficient decay to quantify
+   * the solution smoothness on each cell.
+   * The estimated smoothness is output in the vector (stored as ErrorVector)
    * \p smoothness_per_cell
    */
   virtual void estimate_error (const System & system,

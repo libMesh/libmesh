@@ -30,6 +30,7 @@ libmesh_SOURCES =  \
         src/error_estimation/hp_singular.C \
         src/error_estimation/jump_error_estimator.C \
         src/error_estimation/kelly_error_estimator.C \
+        src/error_estimation/smoothness_estimator.C \
         src/error_estimation/patch_recovery_error_estimator.C \
         src/error_estimation/uniform_refinement_estimator.C \
         src/error_estimation/weighted_patch_recovery_error_estimator.C \
@@ -473,4 +474,4 @@ libmesh_SOURCES =  \
         src/utils/tree.C \
         src/utils/tree_node.C \
         src/utils/utility.C \
-        src/utils/xdr_cxx.C 
+        src/utils/xdr_cxx.C

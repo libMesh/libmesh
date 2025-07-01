@@ -412,11 +412,6 @@ int main(int argc, char ** argv)
               // The ErrorVector is a particular StatisticsVector
               // for computing error information on a finite element mesh.
               ErrorVector error;
-              ErrorVector smoothness;
-
-              // Smoothness Estimator
-              SmoothnessEstimator estimate_smoothness;
-              estimate_smoothness.estimate_error(system, smoothness);
 
               if (indicator_type == "exact")
                 {
@@ -498,7 +493,17 @@ int main(int argc, char ** argv)
               std::string smoothness_output = "smoothness_" + ss.str() + ".gmv";
 #endif
               error.plot_error(error_output, mesh);
-              smoothness.plot_smoothness(smoothness_output, mesh);
+
+              // We use the ErrorVector to collect the computed regularity
+              // (a measure of smoothness) information on a finite element mesh.
+              ErrorVector smoothness;
+
+              if (refine_type == "hp")
+                {
+                  SmoothnessEstimator estimate_smoothness;
+                  estimate_smoothness.estimate_error(system, smoothness);
+                  smoothness.plot_smoothness(smoothness_output, mesh);
+                }
 
               // This takes the error in error and decides which elements
               // will be coarsened or refined.  Any element within 20% of the
@@ -567,10 +572,8 @@ int main(int argc, char ** argv)
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Write out the solution
   // After solving the system write the solution
-  // to a GMVIO-formatted plot file (p levels can be visualized).
-  GMVIO gmv_io (mesh);
-  gmv_io.p_levels();
-  gmv_io.write_equation_systems ("lshaped.gmv", equation_systems);
+  // to a ExodusII_IO-formatted plot file.
+  ExodusII_IO (mesh).write_equation_systems ("lshaped.e", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // Close up the output file.
