@@ -46,6 +46,7 @@ void VariationalSmootherConstraint::constrain()
   for (const auto & bid : boundary_node_ids)
   {
     const auto & node = mesh.node_ref(bid);
+
     // Find all the nodal neighbors... that is the nodes directly connected
     // to this node through one edge
     std::vector<const Node *> neighbors;
@@ -112,82 +113,81 @@ void VariationalSmootherConstraint::constrain()
           if (
               std::find(already_constrained_node_ids.begin(),
                         already_constrained_node_ids.end(),
-                        node.id()) == already_constrained_node_ids.end()
+                        node.id()) != already_constrained_node_ids.end()
           )
+            continue;
+
+          // Find all the nodal neighbors... that is the nodes directly connected
+          // to this node through one edge
+          std::vector<const Node *> neighbors;
+          MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+
+          // Remove any neighbors that are not on the subdomain boundary
+          auto remove_neighbor = [&node, &nodes_to_elem_map, &sub_id1, &sub_id2]
+            (const Node * neigh) -> bool
           {
-
-            // Find all the nodal neighbors... that is the nodes directly connected
-            // to this node through one edge
-            std::vector<const Node *> neighbors;
-            MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
-
-            // Remove any neighbors that are not on the subdomain boundary
-            auto remove_neighbor = [&node, &nodes_to_elem_map, &sub_id1, &sub_id2]
-              (const Node * neigh) -> bool
+            // Determine whether the neighbor is on the subdomain boundary
+            // First, find the common element that both node and neigh belong to
+            const auto & elems_containing_node = nodes_to_elem_map[node.id()];
+            const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
+            const Elem * common_elem = nullptr;
+            for (const auto * neigh_elem : elems_containing_neigh)
             {
-              // Determine whether the neighbor is on the subdomain boundary
-              // First, find the common element that both node and neigh belong to
-              const auto & elems_containing_node = nodes_to_elem_map[node.id()];
-              const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
-              const Elem * common_elem = nullptr;
-              for (const auto * neigh_elem : elems_containing_neigh)
+              if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
               {
-                if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
-                {
-                  common_elem = neigh_elem;
-                  break;
-                }
+                common_elem = neigh_elem;
+                break;
+              }
+            }
+
+            libmesh_assert(common_elem != nullptr);
+            const auto common_sub_id = common_elem->subdomain_id();
+            libmesh_assert(common_sub_id == sub_id1 || common_sub_id == sub_id2);
+
+            // Define this allias for convenience
+            const auto & other_sub_id = (common_sub_id == sub_id1) ? sub_id2: sub_id1;
+
+            // Now, determine whether node and neigh are on a side coincident
+            // with the interval boundary
+            for (const auto common_side : common_elem->side_index_range())
+            {
+              bool node_found_on_side = false;
+              bool neigh_found_on_side = false;
+              for (const auto local_node_id : common_elem->nodes_on_side(common_side))
+              {
+                if (common_elem->node_id(local_node_id) == node.id())
+                  node_found_on_side = true;
+                else if (common_elem->node_id(local_node_id) == neigh->id())
+                  neigh_found_on_side = true;
               }
 
-              libmesh_assert(common_elem != nullptr);
-              const auto common_sub_id = common_elem->subdomain_id();
-              libmesh_assert(common_sub_id == sub_id1 || common_sub_id == sub_id2);
-
-              // Define this allias for convenience
-              const auto & other_sub_id = (common_sub_id == sub_id1) ? sub_id2: sub_id1;
-
-              // Now, determine whether node and neigh are on a side coincident
-              // with the interval boundary
-              for (const auto common_side : common_elem->side_index_range())
+              if (node_found_on_side && neigh_found_on_side)
               {
-                bool node_found_on_side = false;
-                bool neigh_found_on_side = false;
-                for (const auto local_node_id : common_elem->nodes_on_side(common_side))
-                {
-                  if (common_elem->node_id(local_node_id) == node.id())
-                    node_found_on_side = true;
-                  else if (common_elem->node_id(local_node_id) == neigh->id())
-                    neigh_found_on_side = true;
-                }
-
-                if (node_found_on_side && neigh_found_on_side)
-                {
-                  const auto matched_side = common_side;
-                  // There could be multiple matched sides, so keep this next part
-                  // inside the loop
-                  //
-                  // Does matched_side, containing both node and neigh, lie on the
-                  // subdomain boundary between sub_id1 (= common_sub_id or other_sub_id)
-                  // and sub_id2 (= other sub_id or common_sub_id)?
-                  const auto matched_neighbor_sub_id = common_elem->neighbor_ptr(matched_side)->subdomain_id();
-                  const bool is_matched_side_on_subdomain_boundary = matched_neighbor_sub_id == other_sub_id;
-                  if (is_matched_side_on_subdomain_boundary)
-                    return false; // Don't remove the neighbor node
-                }
+                const auto matched_side = common_side;
+                // There could be multiple matched sides, so keep this next part
+                // inside the loop
+                //
+                // Does matched_side, containing both node and neigh, lie on the
+                // subdomain boundary between sub_id1 (= common_sub_id or other_sub_id)
+                // and sub_id2 (= other sub_id or common_sub_id)?
+                const auto matched_neighbor_sub_id = common_elem->neighbor_ptr(matched_side)->subdomain_id();
+                const bool is_matched_side_on_subdomain_boundary = matched_neighbor_sub_id == other_sub_id;
+                if (is_matched_side_on_subdomain_boundary)
+                  return false; // Don't remove the neighbor node
               }
+            }
 
-              return true; // Remove the neighbor node
-            };
+            return true; // Remove the neighbor node
+          };
 
-            neighbors.erase(
-              std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
-              neighbors.end()
-            );
+          neighbors.erase(
+            std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
+            neighbors.end()
+          );
 
+          this->impose_constraints(node, neighbors);
+          already_constrained_node_ids.insert(node.id());
 
-            this->impose_constraints(node, neighbors);
-            already_constrained_node_ids.insert(node.id());
-          }
         }//for local_node_id
 
       }// for side
