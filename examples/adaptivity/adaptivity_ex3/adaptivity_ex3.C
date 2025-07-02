@@ -50,6 +50,8 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/xdr_io.h"
+#include "libmesh/gmv_io.h"
 #include "libmesh/tecplot_io.h"
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
@@ -61,6 +63,7 @@
 #include "libmesh/discontinuity_measure.h"
 #include "libmesh/exact_error_estimator.h"
 #include "libmesh/kelly_error_estimator.h"
+#include "libmesh/smoothness_estimator.h"
 #include "libmesh/patch_recovery_error_estimator.h"
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/hp_coarsentest.h"
@@ -148,7 +151,7 @@ int main(int argc, char ** argv)
   const Real refine_percentage      = input_file("refine_percentage", 0.5);
   const Real coarsen_percentage     = input_file("coarsen_percentage", 0.5);
   const unsigned int uniform_refine = input_file("uniform_refine",0);
-  const std::string refine_type     = input_file("refinement_type", "h");
+  const std::string refine_type     = input_file("refinement_type", "hp");
   const std::string approx_type     = input_file("approx_type", "LAGRANGE");
   const unsigned int approx_order   = input_file("approx_order", 1);
   n_vars                            = input_file("n_vars", n_vars);
@@ -409,6 +412,11 @@ int main(int argc, char ** argv)
               // The ErrorVector is a particular StatisticsVector
               // for computing error information on a finite element mesh.
               ErrorVector error;
+              ErrorVector smoothness;
+
+              // Smoothness Estimator
+              SmoothnessEstimator estimate_smoothness;
+              estimate_smoothness.estimate_error(system, smoothness);
 
               if (indicator_type == "exact")
                 {
@@ -480,13 +488,17 @@ int main(int argc, char ** argv)
 #ifdef LIBMESH_HAVE_EXODUS_API
 #  ifdef LIBMESH_HAVE_NEMESIS_API
               std::string error_output = "error_" + ss.str() + ".n";
+              std::string smoothness_output = "smoothness_" + ss.str() + ".n";
 #  else
               std::string error_output = "error_" + ss.str() + ".e";
+              std::string smoothness_output = "smoothness_" + ss.str() + ".e";
 #  endif
 #else
               std::string error_output = "error_" + ss.str() + ".gmv";
+              std::string smoothness_output = "smoothness_" + ss.str() + ".gmv";
 #endif
               error.plot_error(error_output, mesh);
+              smoothness.plot_smoothness(smoothness_output, mesh);
 
               // This takes the error in error and decides which elements
               // will be coarsened or refined.  Any element within 20% of the
@@ -510,7 +522,7 @@ int main(int argc, char ** argv)
               else if (refine_type == "hp")
                 {
                   HPCoarsenTest hpselector;
-                  hpselector.select_refinement(system);
+                  hpselector.select_refinement(system, smoothness);
                 }
               // If we are doing "singular hp" refinement, we
               // try switching most elements from h to p
@@ -555,9 +567,8 @@ int main(int argc, char ** argv)
 #ifdef LIBMESH_HAVE_EXODUS_API
   // Write out the solution
   // After solving the system write the solution
-  // to a ExodusII-formatted plot file.
-  ExodusII_IO (mesh).write_equation_systems ("lshaped.e",
-                                             equation_systems);
+  // to a ExodusII_IO-formatted plot file.
+  ExodusII_IO (mesh).write_equation_systems ("lshaped.e", equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   // Close up the output file.

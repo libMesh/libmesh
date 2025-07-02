@@ -150,6 +150,14 @@ public:
   void plot_error(const std::string & filename,
                   const MeshBase & mesh) const;
 
+    /**
+   * Plots a data file, of a type determined by looking at
+   * the file extension in \p filename, of the error values on
+   * the active elements of \p mesh.
+   */
+  void plot_smoothness(const std::string & filename,
+                       const MeshBase & mesh) const;
+
 protected:
   /**
    * Utility function to decide whether element i is active
