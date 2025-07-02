@@ -40,57 +40,12 @@ void VariationalSmootherConstraint::constrain()
   std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
   MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
-  const auto & boundary_info = mesh.get_boundary_info();
-
-  const auto boundary_node_ids = MeshTools::find_boundary_nodes (mesh);
-  for (const auto & bid : boundary_node_ids)
-  {
-    const auto & node = mesh.node_ref(bid);
-
-    // Find all the nodal neighbors... that is the nodes directly connected
-    // to this node through one edge
-    std::vector<const Node *> neighbors;
-    MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
-
-    // Remove any neighbors that are not boundary nodes OR boundary neighbor nodes
-    // that don't share a boundary id with node
-    auto remove_neighbor = [&boundary_node_ids, &node, &nodes_to_elem_map, &boundary_info]
-      (const Node * neigh) -> bool
-    {
-      const bool is_neighbor_boundary_node = boundary_node_ids.find(neigh->id()) != boundary_node_ids.end();
-
-      // Determine whether nodes share a common boundary id
-      // First, find the common element that both node and neigh belong to
-      const auto & elems_containing_node = nodes_to_elem_map[node.id()];
-      const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
-      const Elem * common_elem = nullptr;
-      bool nodes_have_common_bid = false;
-      for (const auto * neigh_elem : elems_containing_neigh)
-        if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
-        {
-          common_elem = neigh_elem;
-          // Keep this in the loop because there can be multiple common elements
-          // Now, determine whether node and neigh share a common boundary id
-          nodes_have_common_bid = nodes_share_boundary_id(node, *neigh, *common_elem, boundary_info) || nodes_have_common_bid;
-        }
-
-      // remove if neighbor is not boundary node or nodes don't share a common bid
-      return (is_neighbor_boundary_node && nodes_have_common_bid) ? false : true;
-    };
-
-    neighbors.erase(
-      std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
-      neighbors.end()
-    );
-
-    this->impose_constraints(node, neighbors);
-
-  }// end bid
-
-  // Constrain subdomain boundary nodes, if requested
+  // Constrain subdomain boundary nodes, if requested. We do this before
+  // constraining true boundary nodes because subdomain boundary constraints
+  // are more strict.
+  std::unordered_set<dof_id_type> already_constrained_node_ids;
   if (_preserve_subdomain_boundaries)
   {
-    auto already_constrained_node_ids = boundary_node_ids;
     for (const auto * elem : mesh.active_element_ptr_range())
     {
       const auto & sub_id1 = elem->subdomain_id();
@@ -161,7 +116,7 @@ void VariationalSmootherConstraint::constrain()
                   neigh_found_on_side = true;
               }
 
-              if (node_found_on_side && neigh_found_on_side)
+              if (node_found_on_side && neigh_found_on_side && common_elem->neighbor_ptr(common_side))
               {
                 const auto matched_side = common_side;
                 // There could be multiple matched sides, so keep this next part
@@ -193,6 +148,60 @@ void VariationalSmootherConstraint::constrain()
       }// for side
     }// for elem
   }
+
+  const auto & boundary_info = mesh.get_boundary_info();
+
+  const auto boundary_node_ids = MeshTools::find_boundary_nodes (mesh);
+  for (const auto & bid : boundary_node_ids)
+  {
+    if (
+        std::find(already_constrained_node_ids.begin(),
+                  already_constrained_node_ids.end(),
+                  bid) != already_constrained_node_ids.end()
+    )
+      continue;
+
+    const auto & node = mesh.node_ref(bid);
+
+    // Find all the nodal neighbors... that is the nodes directly connected
+    // to this node through one edge
+    std::vector<const Node *> neighbors;
+    MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+
+    // Remove any neighbors that are not boundary nodes OR boundary neighbor nodes
+    // that don't share a boundary id with node
+    auto remove_neighbor = [&boundary_node_ids, &node, &nodes_to_elem_map, &boundary_info]
+      (const Node * neigh) -> bool
+    {
+      const bool is_neighbor_boundary_node = boundary_node_ids.find(neigh->id()) != boundary_node_ids.end();
+
+      // Determine whether nodes share a common boundary id
+      // First, find the common element that both node and neigh belong to
+      const auto & elems_containing_node = nodes_to_elem_map[node.id()];
+      const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
+      const Elem * common_elem = nullptr;
+      bool nodes_have_common_bid = false;
+      for (const auto * neigh_elem : elems_containing_neigh)
+        if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
+        {
+          common_elem = neigh_elem;
+          // Keep this in the loop because there can be multiple common elements
+          // Now, determine whether node and neigh share a common boundary id
+          nodes_have_common_bid = nodes_share_boundary_id(node, *neigh, *common_elem, boundary_info) || nodes_have_common_bid;
+        }
+
+      // remove if neighbor is not boundary node or nodes don't share a common bid
+      return (is_neighbor_boundary_node && nodes_have_common_bid) ? false : true;
+    };
+
+    neighbors.erase(
+      std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
+      neighbors.end()
+    );
+
+    this->impose_constraints(node, neighbors);
+
+  }// end bid
 }
 
 void VariationalSmootherConstraint::impose_constraints(
