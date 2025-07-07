@@ -244,12 +244,6 @@ void MeshFunction::operator() (const Point & p,
     }
   else
     {
-      // resize the output vector to the number of output values
-      // that the user told us
-      output.resize (cast_int<unsigned int>
-                     (this->_system_vars.size()));
-
-
       {
         const unsigned int dim = element->dim();
 
@@ -259,6 +253,53 @@ void MeshFunction::operator() (const Point & p,
         // since the inverse mapping is the same for all FEFamilies
         const Point mapped_point (FEMap::inverse_map (dim, element,
                                                       p));
+
+        // resize the output vector to the number of output values
+        // that the user told us, this include multiple entries for
+        // the spatial components of vector variable
+        unsigned int output_size = 0;
+        for (auto index : index_range(this->_system_vars))
+          {
+            const unsigned int var = _system_vars[index];
+
+            if (var == libMesh::invalid_uint)
+              {
+                libmesh_assert (_out_of_mesh_mode &&
+                                index < _out_of_mesh_value.size());
+                output(index) = _out_of_mesh_value(index);
+                continue;
+              }
+
+            const FEType & fe_type = this->_dof_map.variable_type(var);
+
+            // Adding entries for each scalar variable and spatial components of
+            // vector variables
+            switch (fe_type.family)
+              {
+              case HIERARCHIC_VEC:
+              case L2_HIERARCHIC_VEC:
+              case LAGRANGE_VEC:
+              case L2_LAGRANGE_VEC:
+              case MONOMIAL_VEC:
+              case NEDELEC_ONE:
+              case RAVIART_THOMAS:
+              case L2_RAVIART_THOMAS:
+                {
+                  output_size = output_size + dim;
+                  break;
+                }
+              default:
+                {
+                  output_size++;
+                  break;
+                }
+              }
+
+          }
+        output.resize(output_size);
+
+        // Adding a counter to keep the output indexing correct for mix scalar-vector output sets
+        unsigned int vec_count = 0;
 
         // loop over all vars
         for (auto index : index_range(this->_system_vars))
@@ -276,35 +317,81 @@ void MeshFunction::operator() (const Point & p,
 
             const FEType & fe_type = this->_dof_map.variable_type(var);
 
-            // Build an FEComputeData that contains both input and output data
-            // for the specific compute_data method.
-            {
-              FEComputeData data (this->_eqn_systems, mapped_point);
-
-              FEInterface::compute_data (dim, fe_type, element, data);
-
-              // where the solution values for the var-th variable are stored
-              std::vector<dof_id_type> dof_indices;
-              this->_dof_map.dof_indices (element, dof_indices, var);
-
-              // interpolate the solution
+            // The method between vector and scalar variable are different:
+            // For scalar variables, we use the previous established method of using FEInterface::compute_data
+            // For vector variables, we call the phi() data directly to build the variable solution
+            switch (fe_type.family)
               {
-                Number value = 0.;
+              case HIERARCHIC_VEC:
+              case L2_HIERARCHIC_VEC:
+              case LAGRANGE_VEC:
+              case L2_LAGRANGE_VEC:
+              case MONOMIAL_VEC:
+              case NEDELEC_ONE:
+              case RAVIART_THOMAS:
+              case L2_RAVIART_THOMAS:
+                {
+                  // Calling the physical mesh point needed for the shape function
+                  FEComputeData data (this->_eqn_systems, mapped_point);
+                  const Point & pt = data.p;
 
-                for (auto i : index_range(dof_indices))
-                  value += this->_vector(dof_indices[i]) * data.shape[i];
+                  // where the solution values for the var-th variable are stored
+                  std::vector<dof_id_type> dof_indices;
+                  this->_dof_map.dof_indices (element, dof_indices, var);
 
-                output(index) = value;
+                  // Calling the properly-transformed shape function using get_phi()
+                  std::unique_ptr<FEVectorBase> vec_fe = FEVectorBase::build(dim, fe_type);
+                  std::vector<Point> vec_pt = {pt};
+                  const std::vector<std::vector<RealGradient>> & vec_phi = vec_fe->get_phi();
+                  vec_fe->reinit(element, &vec_pt);
+
+                  // interpolate the solution
+                  {
+                    for (unsigned int d = 0; d < dim; d++)
+                    {
+                      Number value = 0.;
+
+                      for (auto i : index_range(dof_indices))
+                        value += this->_vector(dof_indices[i]) * (vec_phi[i][0](d));
+
+                      output(index+vec_count*(dim-1)+d) = value;
+                    }
+                  }
+
+                  vec_count++;
+                  break;
+                }
+              default:
+                {
+                  // Build an FEComputeData that contains both input and output data
+                  // for the specific compute_data method.
+
+                  FEComputeData data (this->_eqn_systems, mapped_point);
+
+                  FEInterface::compute_data (dim, fe_type, element, data);
+
+                  // where the solution values for the var-th variable are stored
+                  std::vector<dof_id_type> dof_indices;
+                  this->_dof_map.dof_indices (element, dof_indices, var);
+
+                  // interpolate the solution
+                  {
+                    Number value = 0.;
+
+                    for (auto i : index_range(dof_indices))
+                      value += this->_vector(dof_indices[i]) * data.shape[i];
+
+                    output(index+vec_count*(dim-1)) = value;
+                  }
+                  break;
+                }
               }
-
-            }
 
             // next variable
           }
       }
     }
 }
-
 
 void MeshFunction::discontinuous_value (const Point & p,
                                         const Real time,
