@@ -257,7 +257,7 @@ void MeshFunction::operator() (const Point & p,
         // resize the output vector to the number of output values
         // that the user told us, this include multiple entries for
         // the spatial components of vector variable
-        unsigned int output_size;
+        unsigned int output_size = 0;
         for (auto index : index_range(this->_system_vars))
           {
             const unsigned int var = _system_vars[index];
