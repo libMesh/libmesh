@@ -87,6 +87,22 @@ private:
       const Elem & containing_elem,
       const BoundaryInfo & boundary_info);
 
+  static void filter_neighbors_for_subdomain_constraint(
+      const Node & node,
+      std::vector<const Node *> & neighbors,
+      const subdomain_id_type sub_id1,
+      const subdomain_id_type sub_id2,
+      std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map
+    );
+
+  static void filter_neighbors_for_boundary_constraint(
+      const Node & node,
+      std::vector<const Node *> & neighbors,
+      std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
+      const std::unordered_set<dof_id_type> & boundary_node_ids,
+      const BoundaryInfo & boundary_info
+    );
+
 public:
 
   /*

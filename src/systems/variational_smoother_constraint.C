@@ -40,10 +40,12 @@ void VariationalSmootherConstraint::constrain()
   std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
   MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
-  // Constrain subdomain boundary nodes, if requested. We do this before
-  // constraining true boundary nodes because subdomain boundary constraints
-  // are more strict.
-  std::unordered_set<dof_id_type> already_constrained_node_ids;
+  const auto & boundary_info = mesh.get_boundary_info();
+
+  const auto boundary_node_ids = MeshTools::find_boundary_nodes(mesh);
+
+  // Identify/constrain subdomain boundary nodes, if requested
+  std::unordered_map<dof_id_type, std::vector<const Node *>> subdomain_boundary_map;
   if (_preserve_subdomain_boundaries)
   {
     for (const auto * elem : mesh.active_element_ptr_range())
@@ -64,12 +66,8 @@ void VariationalSmootherConstraint::constrain()
         for (const auto local_node_id : elem->nodes_on_side(side))
         {
           const auto & node = mesh.node_ref(elem->node_id(local_node_id));
-          // Make sure we haven't already constrained this node
-          if (
-              std::find(already_constrained_node_ids.begin(),
-                        already_constrained_node_ids.end(),
-                        node.id()) != already_constrained_node_ids.end()
-          )
+          // Make sure we haven't already processed this node
+          if (subdomain_boundary_map.count(node.id()))
             continue;
 
           // Find all the nodal neighbors... that is the nodes directly connected
@@ -78,70 +76,19 @@ void VariationalSmootherConstraint::constrain()
           MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
 
           // Remove any neighbors that are not on the subdomain boundary
-          auto remove_neighbor = [&node, &nodes_to_elem_map, &sub_id1, &sub_id2]
-            (const Node * neigh) -> bool
-          {
-            // Determine whether the neighbor is on the subdomain boundary
-            // First, find the common element that both node and neigh belong to
-            const auto & elems_containing_node = nodes_to_elem_map[node.id()];
-            const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
-            const Elem * common_elem = nullptr;
-            for (const auto * neigh_elem : elems_containing_neigh)
-            {
-              if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
-              {
-                common_elem = neigh_elem;
-                break;
-              }
-            }
+          VariationalSmootherConstraint::filter_neighbors_for_subdomain_constraint(
+              node, neighbors, sub_id1, sub_id2, nodes_to_elem_map);
 
-            libmesh_assert(common_elem != nullptr);
-            const auto common_sub_id = common_elem->subdomain_id();
-            libmesh_assert(common_sub_id == sub_id1 || common_sub_id == sub_id2);
+          // This subdomain boundary node does not lie on an external boundary,
+          // go ahead and impose constraint
+          if (boundary_node_ids.find(node.id()) == boundary_node_ids.end())
+            this->impose_constraints(node, neighbors);
 
-            // Define this allias for convenience
-            const auto & other_sub_id = (common_sub_id == sub_id1) ? sub_id2: sub_id1;
+          // This subdomain boundary node lies on an external boundary, save it
+          // for later to combine with the external boundary constraint
+          else
+            subdomain_boundary_map[node.id()] = neighbors;
 
-            // Now, determine whether node and neigh are on a side coincident
-            // with the interval boundary
-            for (const auto common_side : common_elem->side_index_range())
-            {
-              bool node_found_on_side = false;
-              bool neigh_found_on_side = false;
-              for (const auto local_node_id : common_elem->nodes_on_side(common_side))
-              {
-                if (common_elem->node_id(local_node_id) == node.id())
-                  node_found_on_side = true;
-                else if (common_elem->node_id(local_node_id) == neigh->id())
-                  neigh_found_on_side = true;
-              }
-
-              if (node_found_on_side && neigh_found_on_side && common_elem->neighbor_ptr(common_side))
-              {
-                const auto matched_side = common_side;
-                // There could be multiple matched sides, so keep this next part
-                // inside the loop
-                //
-                // Does matched_side, containing both node and neigh, lie on the
-                // subdomain boundary between sub_id1 (= common_sub_id or other_sub_id)
-                // and sub_id2 (= other sub_id or common_sub_id)?
-                const auto matched_neighbor_sub_id = common_elem->neighbor_ptr(matched_side)->subdomain_id();
-                const bool is_matched_side_on_subdomain_boundary = matched_neighbor_sub_id == other_sub_id;
-                if (is_matched_side_on_subdomain_boundary)
-                  return false; // Don't remove the neighbor node
-              }
-            }
-
-            return true; // Remove the neighbor node
-          };
-
-          neighbors.erase(
-            std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
-            neighbors.end()
-          );
-
-          this->impose_constraints(node, neighbors);
-          already_constrained_node_ids.insert(node.id());
 
         }//for local_node_id
 
@@ -149,18 +96,10 @@ void VariationalSmootherConstraint::constrain()
     }// for elem
   }
 
-  const auto & boundary_info = mesh.get_boundary_info();
 
-  const auto boundary_node_ids = MeshTools::find_boundary_nodes (mesh);
+  // Loop through boundary nodes and impose constraints
   for (const auto & bid : boundary_node_ids)
   {
-    if (
-        std::find(already_constrained_node_ids.begin(),
-                  already_constrained_node_ids.end(),
-                  bid) != already_constrained_node_ids.end()
-    )
-      continue;
-
     const auto & node = mesh.node_ref(bid);
 
     // Find all the nodal neighbors... that is the nodes directly connected
@@ -170,34 +109,19 @@ void VariationalSmootherConstraint::constrain()
 
     // Remove any neighbors that are not boundary nodes OR boundary neighbor nodes
     // that don't share a boundary id with node
-    auto remove_neighbor = [&boundary_node_ids, &node, &nodes_to_elem_map, &boundary_info]
-      (const Node * neigh) -> bool
+    VariationalSmootherConstraint::filter_neighbors_for_boundary_constraint(
+        node, neighbors, nodes_to_elem_map, boundary_node_ids, boundary_info);
+
+    // Check for the case where this boundary node is also part of a subdomain id boundary
+    const auto it = subdomain_boundary_map.find(bid);
+    if (it != subdomain_boundary_map.end())
     {
-      const bool is_neighbor_boundary_node = boundary_node_ids.find(neigh->id()) != boundary_node_ids.end();
-
-      // Determine whether nodes share a common boundary id
-      // First, find the common element that both node and neigh belong to
-      const auto & elems_containing_node = nodes_to_elem_map[node.id()];
-      const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
-      const Elem * common_elem = nullptr;
-      bool nodes_have_common_bid = false;
-      for (const auto * neigh_elem : elems_containing_neigh)
-        if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
-        {
-          common_elem = neigh_elem;
-          // Keep this in the loop because there can be multiple common elements
-          // Now, determine whether node and neigh share a common boundary id
-          nodes_have_common_bid = nodes_share_boundary_id(node, *neigh, *common_elem, boundary_info) || nodes_have_common_bid;
-        }
-
-      // remove if neighbor is not boundary node or nodes don't share a common bid
-      return (is_neighbor_boundary_node && nodes_have_common_bid) ? false : true;
-    };
-
-    neighbors.erase(
-      std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
-      neighbors.end()
-    );
+      const auto & subdomain_neighbors = it->second;
+      // Combine current neighbors with subdomain boundary neighbors 
+      for (const auto & neighbor : subdomain_neighbors)
+        if (std::find(neighbors.begin(), neighbors.end(), neighbor) == neighbors.end())
+          neighbors.push_back(neighbor);
+    }
 
     this->impose_constraints(node, neighbors);
 
@@ -302,6 +226,7 @@ void VariationalSmootherConstraint::impose_constraints(
     // Each entry will be a vector from dist_vecs that has a corresponding
     // (anti)parallel vector, also from dist_vecs
     std::vector<Point> parallel_pairs;
+    bool all_pairs_parallel = true;
 
     for (const auto ii : index_range(dist_vecs)) {
       const Point vec_ii_normalized = dist_vecs[ii] / dist_vecs[ii].norm();
@@ -314,6 +239,10 @@ void VariationalSmootherConstraint::impose_constraints(
 
         if (is_parallel || is_antiparallel) {
           parallel_pairs.push_back(vec_ii_normalized);
+          all_pairs_parallel &= (
+              vec_ii_normalized.relative_fuzzy_equals(parallel_pairs[0]) ||
+              vec_ii_normalized.relative_fuzzy_equals(-parallel_pairs[0])
+          );
           // Don't bother computing the cross product of parallel vector below,
           // it will be zero and cannot be used to define a normal vector.
           continue;
@@ -329,9 +258,13 @@ void VariationalSmootherConstraint::impose_constraints(
       }
     }
 
+    if (relative_fuzzy_equals(node(0), -29., 0.01) && absolute_fuzzy_equals(node(1), 0., 0.01) && relative_fuzzy_equals(node(2), 1., 0.01))
+      std::cout << "Node " << node.id() << std::endl;
+
     if (node_is_coplanar)
       this->constrain_node_to_plane(node, reference_normal);
-    else if (parallel_pairs.size())
+
+    else if (parallel_pairs.size() && all_pairs_parallel)
       this->constrain_node_to_line(node, parallel_pairs[0]);
     else
       this->fix_node(node);
@@ -400,7 +333,7 @@ void VariationalSmootherConstraint::constrain_node_to_line(const Node & node, co
 {
   const auto dim = _sys.get_mesh().mesh_dimension();
 
-  // We will free the dimension most paralle to line_vec to keep the
+  // We will free the dimension most parallel to line_vec to keep the
   // constraint coefficients small
   const std::vector<Real> line_vec_coefs{line_vec(0), line_vec(1), line_vec(2)};
   auto it = std::max_element(line_vec_coefs.begin(), line_vec_coefs.end(),
@@ -490,6 +423,119 @@ bool VariationalSmootherConstraint::nodes_share_boundary_id(
     }
   }
   return nodes_share_bid;
+}
+
+void VariationalSmootherConstraint::filter_neighbors_for_subdomain_constraint(
+  const Node & node,
+  std::vector<const Node *> & neighbors,
+  const subdomain_id_type sub_id1,
+  const subdomain_id_type sub_id2,
+  std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map)
+{
+
+  // Remove any neighbors that are not on the subdomain boundary
+  auto remove_neighbor = [&node, &nodes_to_elem_map, &sub_id1, &sub_id2]
+    (const Node * neigh) -> bool
+  {
+    // Determine whether the neighbor is on the subdomain boundary
+    // First, find the common elements that both node and neigh belong to
+    const auto & elems_containing_node = nodes_to_elem_map[node.id()];
+    const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
+    const Elem * common_elem = nullptr;
+    for (const auto * neigh_elem : elems_containing_neigh)
+    {
+      if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
+        common_elem = neigh_elem;
+      else
+        continue;
+
+      const auto common_sub_id = common_elem->subdomain_id();
+      libmesh_assert(common_sub_id == sub_id1 || common_sub_id == sub_id2);
+
+      // Define this allias for convenience
+      const auto & other_sub_id = (common_sub_id == sub_id1) ? sub_id2: sub_id1;
+
+      // Now, determine whether node and neigh are on a side coincident
+      // with the interval boundary
+      for (const auto common_side : common_elem->side_index_range())
+      {
+        bool node_found_on_side = false;
+        bool neigh_found_on_side = false;
+        for (const auto local_node_id : common_elem->nodes_on_side(common_side))
+        {
+          if (common_elem->node_id(local_node_id) == node.id())
+            node_found_on_side = true;
+          else if (common_elem->node_id(local_node_id) == neigh->id())
+            neigh_found_on_side = true;
+        }
+
+        if (node_found_on_side && neigh_found_on_side && common_elem->neighbor_ptr(common_side))
+        {
+          const auto matched_side = common_side;
+          // There could be multiple matched sides, so keep this next part
+          // inside the loop
+          //
+          // Does matched_side, containing both node and neigh, lie on the
+          // subdomain boundary between sub_id1 (= common_sub_id or other_sub_id)
+          // and sub_id2 (= other sub_id or common_sub_id)?
+          const auto matched_neighbor_sub_id = common_elem->neighbor_ptr(matched_side)->subdomain_id();
+          const bool is_matched_side_on_subdomain_boundary = matched_neighbor_sub_id == other_sub_id;
+          if (is_matched_side_on_subdomain_boundary)
+            return false; // Don't remove the neighbor node
+        }
+      }// for common_side
+
+    }// for neigh_elem
+
+    return true; // Remove the neighbor node
+  };
+
+  neighbors.erase(
+    std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
+    neighbors.end()
+  );
+
+}
+
+void VariationalSmootherConstraint::filter_neighbors_for_boundary_constraint(
+  const Node & node,
+  std::vector<const Node *> & neighbors,
+  std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
+  const std::unordered_set<dof_id_type> & boundary_node_ids,
+  const BoundaryInfo & boundary_info)
+{
+
+  // Remove any neighbors that are not boundary nodes OR boundary neighbor nodes
+  // that don't share a boundary id with node
+  auto remove_neighbor = [&boundary_node_ids, &node, &nodes_to_elem_map, &boundary_info]
+    (const Node * neigh) -> bool
+  {
+    const bool is_neighbor_boundary_node = boundary_node_ids.find(neigh->id()) != boundary_node_ids.end();
+
+    // Determine whether nodes share a common boundary id
+    // First, find the common element that both node and neigh belong to
+    const auto & elems_containing_node = nodes_to_elem_map[node.id()];
+    const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
+    const Elem * common_elem = nullptr;
+    bool nodes_have_common_bid = false;
+    for (const auto * neigh_elem : elems_containing_neigh)
+      if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
+      {
+        common_elem = neigh_elem;
+        // Keep this in the loop because there can be multiple common elements
+        // Now, determine whether node and neigh share a common boundary id
+        nodes_have_common_bid = VariationalSmootherConstraint::nodes_share_boundary_id(node, *neigh, *common_elem, boundary_info) || nodes_have_common_bid;
+      }
+
+    // remove if neighbor is not boundary node or nodes don't share a common bid
+    return (is_neighbor_boundary_node && nodes_have_common_bid) ? false : true;
+  };
+
+  neighbors.erase(
+    std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
+    neighbors.end()
+  );
+
 }
 
 } // namespace libMesh
