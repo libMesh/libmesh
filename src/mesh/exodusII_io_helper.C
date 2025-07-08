@@ -1012,16 +1012,17 @@ void ExodusII_IO_Helper::read_bex_cv_blocks()
               for (auto i : IntRange<std::size_t>(0, bex_num_dense_cv_blocks))
                 {
                   bex_dense_constraint_vecs[i].resize(bex_dense_cv_info[2*i]);
+                  const int vecsize = bex_dense_cv_info[2*i+1];
                   for (auto & vec : bex_dense_constraint_vecs[i])
                     {
-                      const int vecsize = bex_dense_cv_info[2*i+1];
                       vec.resize(vecsize);
-                      std::copy(&bex_dense_cv_blocks[offset],
-                                &bex_dense_cv_blocks[offset+vecsize],
+                      std::copy(std::next(bex_dense_cv_blocks.begin(), offset),
+                                std::next(bex_dense_cv_blocks.begin(), offset + vecsize),
                                 vec.begin());
                       offset += vecsize;
                     }
                 }
+              libmesh_assert(offset == bex_dense_cv_blocks.size());
             }
         }
     }
