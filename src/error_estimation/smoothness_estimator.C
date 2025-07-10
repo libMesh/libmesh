@@ -220,6 +220,10 @@ for (const auto & elem : range)
     const FEType & fe_type = dof_map.variable_type(var);
     const Order element_order = fe_type.order + elem->p_level();
 
+    if (element_order == 1)
+      libmesh_warning("Warning: Polynomial order in element is 1, smoothness cannot be stimated!\n"
+                      << "Doing h adaptivity instead!");
+
     std::unique_ptr<FEBase> fe(FEBase::build(dim, fe_type));
     std::unique_ptr<QBase> qrule(fe_type.default_quadrature_rule(dim, error_estimator._extra_order));
     fe->attach_quadrature_rule(qrule.get());
