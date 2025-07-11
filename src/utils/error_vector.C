@@ -253,8 +253,8 @@ void ErrorVector::plot_error(const std::string & filename,
       // libmesh_assert_greater ((*this)[elem_id], 0.);
       error_system.solution->set(solution_index, (*this)[elem_id]);
     }
-
   error_system.solution->close();
+  error_system.update();
 
   // We may have to renumber if the original numbering was not
   // contiguous.  Since this is just a temporary mesh, that's probably
@@ -307,6 +307,110 @@ void ErrorVector::plot_error(const std::string & filename,
       temp_es.write("soln-"+filename,ENCODE,
                     EquationSystems::WRITE_DATA |
                     EquationSystems::WRITE_ADDITIONAL_DATA);
+    }
+  else
+    {
+      libmesh_here();
+      libMesh::err << "Warning: ErrorVector::plot_error currently only"
+                   << " supports .gmv, .plt, .xdr/.xda, and .exo/.e (if enabled) output;" << std::endl;
+      libMesh::err << "Could not recognize filename: " << filename
+                   << std::endl;
+    }
+}
+
+
+void ErrorVector::plot_smoothness(const std::string & filename,
+                             const MeshBase & oldmesh) const
+{
+  std::unique_ptr<MeshBase> meshptr = oldmesh.clone();
+  MeshBase & mesh = *meshptr;
+
+  // The all_first_order routine will prepare_for_use(), which would
+  // break our ordering if elements get changed.
+  mesh.allow_renumbering(false);
+  mesh.all_first_order();
+
+#ifdef LIBMESH_ENABLE_AMR
+  // We don't want p elevation when plotting a single constant value
+  // per element
+  for (auto & elem : mesh.element_ptr_range())
+    {
+      elem->set_p_refinement_flag(Elem::DO_NOTHING);
+      elem->set_p_level(0);
+    }
+#endif // LIBMESH_ENABLE_AMR
+
+  EquationSystems temp_es (mesh);
+  ExplicitSystem & smooth_sys = temp_es.add_system<ExplicitSystem>("Smoothness");
+  smooth_sys.add_variable("smoothness", CONSTANT, MONOMIAL);
+
+  temp_es.get_system("Smoothness").init();
+
+  NumericVector<Number> & smoothness_score = *smooth_sys.solution;
+  std::vector<dof_id_type> dof_indices;
+
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+    {
+      smooth_sys.get_dof_map().dof_indices(elem, dof_indices);
+
+      const dof_id_type elem_id = elem->id();
+
+      const dof_id_type solution_index = dof_indices[0];
+
+      libmesh_assert_less (elem_id, (*this).size());
+
+      smoothness_score.set(solution_index, (*this)[elem_id]);
+    }
+
+  smooth_sys.solution->close();
+  smooth_sys.update();
+
+  // We may have to renumber if the original numbering was not
+  // contiguous.  Since this is just a temporary mesh, that's probably
+  // fine.
+  if (mesh.max_elem_id() != mesh.n_elem() || mesh.max_node_id() != mesh.n_nodes())
+    {
+      mesh.allow_renumbering(true);
+      mesh.renumber_nodes_and_elements();
+    }
+
+  if (filename.rfind(".gmv") < filename.size())
+    {
+      GMVIO(mesh).write_discontinuous_gmv(filename,
+                                          temp_es, false);
+    }
+  else if (filename.rfind(".plt") < filename.size())
+    {
+      TecplotIO (mesh).write_equation_systems
+        (filename, temp_es);
+    }
+#if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
+  else if ((filename.rfind(".nem") < filename.size()) ||
+           (filename.rfind(".n") < filename.size()))
+    {
+      Nemesis_IO io(mesh);
+      io.write(filename);
+      io.write_element_data(temp_es);
+    }
+#endif
+#ifdef LIBMESH_HAVE_EXODUS_API
+  else if ((filename.rfind(".exo") < filename.size()) ||
+           (filename.rfind(".e") < filename.size()))
+    {
+      ExodusII_IO io(mesh);
+      io.write(filename);
+      io.write_element_data(temp_es);
+    }
+#endif
+  else if (filename.rfind(".xda") < filename.size())
+    {
+      XdrIO(mesh).write("mesh-"+filename);
+      temp_es.write("soln-"+filename,WRITE, EquationSystems::WRITE_DATA | EquationSystems::WRITE_ADDITIONAL_DATA);
+    }
+  else if (filename.rfind(".xdr") < filename.size())
+    {
+      XdrIO(mesh,true).write("mesh-"+filename);
+      temp_es.write("soln-"+filename,ENCODE, EquationSystems::WRITE_DATA | EquationSystems::WRITE_ADDITIONAL_DATA);
     }
   else
     {
