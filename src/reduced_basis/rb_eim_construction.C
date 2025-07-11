@@ -451,6 +451,14 @@ Real RBEIMConstruction::train_eim_approximation_with_greedy()
 
   libMesh::out << std::endl << "---- Performing Greedy EIM basis enrichment ----" << std::endl;
 
+  if (_max_abs_value_in_training_set <= get_abs_training_tolerance())
+  {
+    std::cout << "Maximum absolute value in the training set is "
+      << _max_abs_value_in_training_set << ", which is less than or equal to the abs. training tolerance of "
+      << get_abs_training_tolerance() << ", hence exiting Greedy basis enrichment with empty basis" << std::endl;
+    return 0.0;
+  }
+
   // Initialize greedy_error so that we do not incorrectly set is_zero_bf=true on
   // the first iteration.
   Real greedy_error = -1.;
