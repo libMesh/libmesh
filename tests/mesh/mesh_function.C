@@ -234,7 +234,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    // Reading mesh and solution infromation from XDA files
+    // Reading mesh and solution information from XDA files
     ReplicatedMesh mesh(*TestCommWorld);
     mesh.read("solutions/lagrange_vec_solution_mesh.xda");
     EquationSystems es(mesh);
@@ -244,7 +244,7 @@ public:
                 EquationSystems::READ_ADDITIONAL_DATA);
     es.update();
 
-    // Pulling the correct system and variable infromation from
+    // Pulling the correct system and variable information from
     // the XDA files (the default system name is "nl0")
     System & sys = es.get_system<System>("nl0");
     std::unique_ptr<NumericVector<Number>> mesh_function_vector =
@@ -291,7 +291,7 @@ public:
                 EquationSystems::READ_ADDITIONAL_DATA);
     es.update();
 
-    // Pulling the correct system and variable infromation from
+    // Pulling the correct system and variable information from
     // the XDA files (the default system name is "nl0")
     System & sys = es.get_system<System>("nl0");
     std::unique_ptr<NumericVector<Number>> mesh_function_vector =
@@ -327,7 +327,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    // Reading mesh and solution infromation from XDA files
+    // Reading mesh and solution information from XDA files
     ReplicatedMesh mesh(*TestCommWorld);
     mesh.read("solutions/raviart_thomas_solution_mesh.xda");
     EquationSystems es(mesh);
@@ -377,7 +377,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    // Reading mesh and solution infromation from XDA files
+    // Reading mesh and solution information from XDA files
     ReplicatedMesh mesh(*TestCommWorld);
     mesh.read("solutions/raviart_thomas_solution_mesh.xda");
     EquationSystems es(mesh);
@@ -387,7 +387,7 @@ public:
                 EquationSystems::READ_ADDITIONAL_DATA);
     es.update();
 
-    // Pulling the correct system and variable infromation from
+    // Pulling the correct system and variable information from
     // the XDA files (the default system name is "nl0")
     System & sys = es.get_system<System>("nl0");
     std::unique_ptr<NumericVector<Number>> mesh_function_vector =
