@@ -24,6 +24,138 @@
 
 namespace libMesh
 {
+
+struct PointConstraint;
+struct LineConstraint;
+struct PlaneConstraint;
+
+/// Type used to store a constraint that may be a PlaneConstraint,
+/// LineConstraint, or PointConstraint
+using ConstraintVariant =
+    std::variant<PointConstraint, LineConstraint, PlaneConstraint>;
+
+/// Represents a fixed point constraint.
+struct PointConstraint {
+  Point location;
+
+  PointConstraint() = default;
+
+  /// Constructor
+  /// @parm p The point defining the constraint.
+  PointConstraint(const Point &p);
+
+  bool operator<(const PointConstraint &other) const;
+
+  bool operator==(const PointConstraint &other) const;
+
+  /// Computes the intersection of this point with another constraint.
+  /// Handles intersection with PointConstraint, LineConstraint, or
+  /// PlaneConstraint.
+  /// @param other The constraint to intersect with.
+  /// @return The most specific ConstraintVariant that satisfies both
+  /// constraints.
+  ConstraintVariant intersect(const ConstraintVariant &other) const;
+};
+
+/// Represents a line constraint defined by a base point and direction vector.
+struct LineConstraint {
+  Point r0;
+  Point dir;
+
+  LineConstraint() = default;
+
+  /// Constructor
+  /// @parm p A point on the constraining line.
+  /// @param d the direction of the constraining line.
+  LineConstraint(const Point &p, const Point &d);
+
+  bool operator<(const LineConstraint &other) const;
+
+  bool operator==(const LineConstraint &other) const;
+
+  /// Query whether a point lies on the line.
+  /// @param p The point in question
+  /// @return bool indicating whether p lies on the line.
+  bool contains_point(const PointConstraint &p) const;
+
+  /// Query whether a line is parallel to this line
+  /// @ param l The line in question
+  /// @ return bool indicating whether l is parallel to this line.
+  bool is_parallel(const LineConstraint &l) const;
+
+  /// Query whether a plane is parallel to this line
+  /// @ param p The plane in question
+  /// @ return bool indicating whether p is parallel to this line.
+  bool is_parallel(const PlaneConstraint &p) const;
+
+  /// Computes the intersection of this line with another constraint.
+  /// Handles intersection with LineConstraint, PlaneConstraint, or
+  /// PointConstraint.
+  /// @param other The constraint to intersect with.
+  /// @return The most specific ConstraintVariant that satisfies both
+  /// constraints.
+  ConstraintVariant intersect(const ConstraintVariant &other) const;
+};
+
+/// Represents a plane constraint defined by a point and normal vector.
+struct PlaneConstraint {
+  Point point;
+  Point normal;
+
+  PlaneConstraint() = default;
+
+  /// Constructor
+  /// @parm p A point on the constraining plane.
+  /// @param n the direction normal to the constraining plane.
+  PlaneConstraint(const Point &p, const Point &n);
+
+  bool operator<(const PlaneConstraint &other) const;
+
+  bool operator==(const PlaneConstraint &other) const;
+
+  /// Query whether a point lies on the plane.
+  /// @param p The point in question
+  /// @return bool indicating whether p lies on the plane.
+  bool contains_point(const PointConstraint &p) const;
+
+  /// Query whether a line lies on the plane.
+  /// @param l The line in question
+  /// @return bool indicating whether l lies on the plane.
+  bool contains_line(const LineConstraint &l) const;
+
+  /// Query whether a plane is parallel to this plane
+  /// @ param p The plane in question
+  /// @ return bool indicating whether p is parallel to this plane.
+  bool is_parallel(const PlaneConstraint &p) const;
+
+  /// Query whether a line is parallel to this plane
+  /// @ param l The line in question
+  /// @ return bool indicating whether l is parallel to this plane.
+  bool is_parallel(const LineConstraint &l) const;
+
+  /// Computes the intersection of this plane with another constraint.
+  /// Handles intersection with PlaneConstraint, LineConstraint, or
+  /// PointConstraint.
+  /// @param other The constraint to intersect with.
+  /// @return The most specific ConstraintVariant that satisfies both
+  /// constraints.
+  ConstraintVariant intersect(const ConstraintVariant &other) const;
+};
+
+/// Dispatch intersection between two constraint variants.
+/// Resolves to the appropriate method based on the type of the first operand.
+/// @param a First constraint.
+/// @param b Constraint to combine with a.
+/// @return Combination (intersection) of constraint a and b.
+inline ConstraintVariant intersect_constraints(const ConstraintVariant &a,
+                                               const ConstraintVariant &b) {
+  return std::visit(
+      [](const auto &lhs, const auto &rhs) -> ConstraintVariant {
+        return lhs.intersect(rhs);
+      },
+      a, b);
+}
+
 /*
  * Constraint class for the VariationalMeshSmoother.
  *
@@ -39,15 +171,6 @@ private:
 
   /// Whether nodes on subdomain boundaries are subject to change via smoothing
   const bool _preserve_subdomain_boundaries;
-
-  /*
-   * Identifies and imposes the appropriate constraints on a node.
-   * @param node The node to constrain.
-   * @param neighbors Vector of neighbors to use to identify the constraint to
-   * impose.
-   */
-  void impose_constraints(const Node &node,
-                          const std::vector<const Node *> neighbors);
 
   /*
    * Constrain (i.e., fix) a node to not move during mesh smoothing.
@@ -87,21 +210,56 @@ private:
       const Elem & containing_elem,
       const BoundaryInfo & boundary_info);
 
-  static void filter_neighbors_for_subdomain_constraint(
-      const Node & node,
-      std::vector<const Node *> & neighbors,
-      const subdomain_id_type sub_id1,
+  /// Get the relevant nodal neighbors for a subdomain constraint.
+  /// @param mesh The mesh being smoothed.
+  /// @param node The node (on the subdomain boundary) being constrained.
+  /// @param sub_id1 The subdomain id of the block on one side of the subdomain
+  /// boundary.
+  /// @param sub_id2 The subdomain id of the block on the other side of the
+  /// subdomain boundary.
+  /// @param nodes_to_elem_map A mapping from node id to containing element ids.
+  /// @return A set of node pointer sets containing nodal neighbors to 'node' on
+  /// the sub_id1-sub_id2 boundary. The subsets are grouped by element faces
+  /// that form the subdomain boundary. Note that 'node' itself does not appear
+  /// in this set.
+  static std::set<std::set<const Node *>>
+  get_neighbors_for_subdomain_constraint(
+      const MeshBase &mesh, const Node &node, const subdomain_id_type sub_id1,
       const subdomain_id_type sub_id2,
-      std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map
-    );
+      const std::unordered_map<dof_id_type, std::vector<const Elem *>>
+          &nodes_to_elem_map);
 
-  static void filter_neighbors_for_boundary_constraint(
-      const Node & node,
-      std::vector<const Node *> & neighbors,
-      std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
-      const std::unordered_set<dof_id_type> & boundary_node_ids,
-      const BoundaryInfo & boundary_info
-    );
+  /// Get the relevant nodal neighbors for an external boundary constraint.
+  /// @param mesh The mesh being smoothed.
+  /// @param node The node (on the external boundary) being constrained.
+  /// @param boundary_node_ids The set of mesh's external boundary node ids.
+  /// @param boundary_info The mesh's BoundaryInfo.
+  /// @param nodes_to_elem_map A mapping from node id to containing element ids.
+  /// @return A set of node pointer sets containing nodal neighbors to 'node' on
+  /// the external boundary. The subsets are grouped by element faces that form
+  /// the external boundary. Note that 'node' itself does not appear in this
+  /// set.
+  static std::set<std::set<const Node *>> get_neighbors_for_boundary_constraint(
+      const MeshBase &mesh, const Node &node,
+      const std::unordered_set<dof_id_type> &boundary_node_ids,
+      const BoundaryInfo &boundary_info,
+      const std::unordered_map<dof_id_type, std::vector<const Elem *>>
+          &nodes_to_elem_map);
+
+  /// Determines the appropriate constraint (PointConstraint, LineConstraint, or
+  /// PlaneConstraint) for a node based on its neighbors.
+  /// @param node The node to constrain.
+  /// @param dim The mesh dimension.
+  /// @return The best-fit constraint for the given geometry.
+  static ConstraintVariant determine_constraint(
+      const Node &node, const unsigned int dim,
+      const std::set<std::set<const Node *>> &side_grouped_boundary_neighbors);
+
+  /// Applies a given constraint to a node (e.g., fixing it, restricting it to a
+  /// line or plane).
+  /// @param node The node to constrain.
+  /// @param constraint The geometric constraint variant to apply.
+  void impose_constraint(const Node &node, const ConstraintVariant &constraint);
 
 public:
 

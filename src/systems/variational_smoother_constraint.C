@@ -23,6 +23,248 @@
 namespace libMesh
 {
 
+PointConstraint::PointConstraint(const Point &p) : location(p) {}
+
+bool PointConstraint::operator<(const PointConstraint &other) const {
+  return location < other.location;
+}
+
+bool PointConstraint::operator==(const PointConstraint &other) const {
+  return location == other.location;
+}
+
+ConstraintVariant
+PointConstraint::intersect(const ConstraintVariant &other) const {
+  return std::visit(
+      [&](auto &&o) -> ConstraintVariant {
+        if constexpr (std::is_same_v<std::decay_t<decltype(o)>,
+                                     PointConstraint>) {
+          libmesh_error_msg_if(!(this->location == o.location),
+                               "Points do not match.");
+          return *this;
+        } else {
+          libmesh_error_msg_if(!o.contains_point(*this),
+                               "Point is not on the constraint.");
+          return *this;
+        }
+      },
+      other);
+}
+
+LineConstraint::LineConstraint(const Point &p, const Point &d) {
+  r0 = p;
+  libmesh_error_msg_if(
+      d.norm() < TOLERANCE,
+      "Can't define a line with zero magnitude direction vector.");
+  // Flip direction vector if necessary so it points in the positive x/y/z
+  // direction This helps to eliminate duplicate lines
+  Point canonical{0, 0, 0};
+  // Choose the canonical dimension to ensure the dot product below is nonzero
+  for (const auto dim_id : make_range(3))
+    if (!absolute_fuzzy_equals(d(dim_id), 0.)) {
+      canonical(dim_id) = 1.;
+      break;
+    }
+
+  const auto dot_prod = d * canonical;
+  libmesh_assert(!absolute_fuzzy_equals(dot_prod, 0.));
+  dir = (dot_prod > 0) ? d.unit() : -d.unit();
+}
+
+bool LineConstraint::operator<(const LineConstraint &other) const {
+  if (!(dir.absolute_fuzzy_equals(other.dir, TOLERANCE)))
+    return dir < other.dir;
+  return (dir * r0) < (other.dir * other.r0) - TOLERANCE;
+}
+
+bool LineConstraint::operator==(const LineConstraint &other) const {
+  if (!(dir.absolute_fuzzy_equals(other.dir, TOLERANCE)))
+    return false;
+  return this->contains_point(other.r0);
+}
+
+bool LineConstraint::contains_point(const PointConstraint &p) const {
+  // If the point lies on the line, then the vector p - r0 is parallel to the
+  // line In that case, the cross product of p - r0 with the line's direction
+  // will be zero.
+  return dir.cross(p.location - r0).norm() < TOLERANCE;
+}
+
+bool LineConstraint::is_parallel(const LineConstraint &l) const {
+  return dir.absolute_fuzzy_equals(l.dir, TOLERANCE);
+}
+
+bool LineConstraint::is_parallel(const PlaneConstraint &p) const {
+  return dir * p.normal < TOLERANCE;
+}
+
+ConstraintVariant
+LineConstraint::intersect(const ConstraintVariant &other) const {
+  return std::visit(
+      [&](auto &&o) -> ConstraintVariant {
+        using T = std::decay_t<decltype(o)>;
+        if constexpr (std::is_same_v<T, LineConstraint>) {
+          if (*this == o)
+            return *this;
+          libmesh_error_msg_if(this->is_parallel(o),
+                               "Lines are parallel and do not intersect.");
+
+          // Solve for t in the equation p1 + t·d1 = p2 + s·d2
+          // The shortest vector between skew lines lies along the normal vector
+          // (d1 × d2). Projecting the vector (p2 - p1) onto this normal gives a
+          // scalar proportional to the distance. This is equivalent to solving:
+          //   ((p2 - p1) × d2) · (d1 × d2) = t · |d1 × d2|²
+          //   ⇒ t = ((delta × d2) · (d1 × d2)) / |d1 × d2|²
+
+          const Point delta = o.r0 - r0;
+          const Point cross_d1_d2 = dir.cross(o.dir);
+          const Real cross_dot = (delta.cross(o.dir)) * cross_d1_d2;
+          const Real denom = cross_d1_d2.norm_sq();
+
+          const Real t = cross_dot / denom;
+          const Point intersection = r0 + t * dir;
+
+          // Verify that intersection lies on both lines
+          libmesh_error_msg_if(o.dir.cross(intersection - o.r0).norm() >
+                                   TOLERANCE,
+                               "Lines do not intersect at a single point.");
+
+          return PointConstraint{intersection};
+        } else if constexpr (std::is_same_v<T, PlaneConstraint>) {
+          return o.intersect(*this);
+        } else if constexpr (std::is_same_v<T, PointConstraint>) {
+          libmesh_error_msg_if(!this->contains_point(o),
+                               "Point is not on the line.");
+          return o;
+        } else
+          libmesh_error_msg("Unsupported constraint type in Line::intersect.");
+      },
+      other);
+}
+
+PlaneConstraint::PlaneConstraint(const Point &p, const Point &n) {
+  point = p;
+  libmesh_error_msg_if(
+      n.norm() < TOLERANCE,
+      "Can't define a plane with zero magnitude direction vector.");
+  // Flip normal vector if necessary so it points in the positive x/y/z
+  // direction This helps to eliminate duplicate points
+  Point canonical{0, 0, 0};
+  // Choose the canonical dimension to ensure the dot product below is nonzero
+  for (const auto dim_id : make_range(3))
+    if (!absolute_fuzzy_equals(n(dim_id), 0.)) {
+      canonical(dim_id) = 1.;
+      break;
+    }
+
+  const auto dot_prod = n * canonical;
+  libmesh_assert(!absolute_fuzzy_equals(dot_prod, 0.));
+  normal = (dot_prod > 0) ? n.unit() : -n.unit();
+}
+
+bool PlaneConstraint::operator<(const PlaneConstraint &other) const {
+  if (!(normal.absolute_fuzzy_equals(other.normal, TOLERANCE)))
+    return normal < other.normal;
+  return (normal * point) < (other.normal * other.point) - TOLERANCE;
+}
+
+bool PlaneConstraint::operator==(const PlaneConstraint &other) const {
+  if (!(normal.absolute_fuzzy_equals(other.normal, TOLERANCE)))
+    return false;
+  return this->contains_point(other.point);
+}
+
+bool PlaneConstraint::is_parallel(const PlaneConstraint &p) const {
+  return normal.absolute_fuzzy_equals(p.normal, TOLERANCE);
+}
+
+bool PlaneConstraint::is_parallel(const LineConstraint &l) const {
+  return l.is_parallel(*this);
+}
+
+bool PlaneConstraint::contains_point(const PointConstraint &p) const {
+  // distance between the point and the plane
+  const Real dist = (p.location - point) * normal;
+  return std::abs(dist) < TOLERANCE;
+}
+
+bool PlaneConstraint::contains_line(const LineConstraint &l) const {
+  const bool base_on_plane = this->contains_point(PointConstraint(l.r0));
+  const bool dir_orthogonal = std::abs(normal * l.dir) < TOLERANCE;
+  return base_on_plane && dir_orthogonal;
+}
+
+ConstraintVariant
+PlaneConstraint::intersect(const ConstraintVariant &other) const {
+  return std::visit(
+      [&](auto &&o) -> ConstraintVariant {
+        using T = std::decay_t<decltype(o)>;
+        if constexpr (std::is_same_v<T, PlaneConstraint>) {
+          // If planes are identical, return one of them
+          if (*this == o)
+            return *this;
+          libmesh_error_msg_if(this->is_parallel(o),
+                               "Planes are parallel and do not intersect.");
+
+          // Solve for a point on the intersection line of two planes.
+          // Given planes:
+          //   Plane 1: n1 · (x - p1) = 0
+          //   Plane 2: n2 · (x - p2) = 0
+          // The line of intersection has direction dir = n1 × n2.
+          // To find a point on this line, we assume:
+          //   x = p1 + s·n1 = p2 + t·n2
+          //   ⇒ p1 - p2 = t·n2 - s·n1
+          // Taking dot products with n1 and n2 leads to:
+          //   [-n1·n1   n1·n2] [s] = [n1 · (p1 - p2)]
+          //   [-n1·n2   n2·n2] [t]   [n2 · (p1 - p2)]
+
+          const Point dir =
+              this->normal.cross(o.normal); // direction of line of intersection
+          libmesh_assert(dir.norm() > TOLERANCE);
+          const Point w = this->point - o.point;
+
+          // Dot product terms used in 2x2 system
+          const Real n1_dot_n1 = normal * normal;
+          const Real n1_dot_n2 = normal * o.normal;
+          const Real n2_dot_n2 = o.normal * o.normal;
+          const Real n1_dot_w = normal * w;
+          const Real n2_dot_w = o.normal * w;
+
+          const Real denom = -(n1_dot_n1 * n2_dot_n2 - n1_dot_n2 * n1_dot_n2);
+          libmesh_assert(std::abs(denom) > TOLERANCE);
+
+          const Real s = -(n1_dot_n2 * n2_dot_w - n2_dot_n2 * n1_dot_w) / denom;
+          const Point p0 = point + s * normal;
+
+          return LineConstraint{p0, dir};
+        } else if constexpr (std::is_same_v<T, LineConstraint>) {
+          if (this->contains_line(o))
+            return o;
+          libmesh_error_msg_if(
+              this->is_parallel(o),
+              "Line is parallel and does not intersect the plane.");
+
+          // Solve for t in the parametric equation:
+          //   p(t) = r0 + t·d
+          // such that this point also satisfies the plane equation:
+          //   n · (p(t) - p0) = 0
+          // which leads to:
+          //   t = (n · (p0 - r0)) / (n · d)
+
+          const Real denom = normal * o.dir;
+          libmesh_assert(std::abs(denom) > TOLERANCE);
+          const Real t = (normal * (point - o.r0)) / denom;
+          return PointConstraint{o.r0 + t * o.dir};
+        } else if constexpr (std::is_same_v<T, PointConstraint>) {
+          libmesh_error_msg_if(!this->contains_point(o),
+                               "Point is not on the plane.");
+          return o;
+        } else
+          libmesh_error_msg("Unsupported constraint type in Plane::intersect.");
+      },
+      other);
+}
+
 VariationalSmootherConstraint::VariationalSmootherConstraint(System & sys, const bool & preserve_subdomain_boundaries)
   :
     Constraint(),
@@ -35,6 +277,7 @@ VariationalSmootherConstraint::~VariationalSmootherConstraint() = default;
 void VariationalSmootherConstraint::constrain()
 {
   const auto &mesh = _sys.get_mesh();
+  const auto dim = mesh.mesh_dimension();
 
   // Only compute the node to elem map once
   std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
@@ -45,7 +288,7 @@ void VariationalSmootherConstraint::constrain()
   const auto boundary_node_ids = MeshTools::find_boundary_nodes(mesh);
 
   // Identify/constrain subdomain boundary nodes, if requested
-  std::unordered_map<dof_id_type, std::vector<const Node *>> subdomain_boundary_map;
+  std::unordered_map<dof_id_type, ConstraintVariant> subdomain_boundary_map;
   if (_preserve_subdomain_boundaries)
   {
     for (const auto * elem : mesh.active_element_ptr_range())
@@ -70,25 +313,24 @@ void VariationalSmootherConstraint::constrain()
           if (subdomain_boundary_map.count(node.id()))
             continue;
 
-          // Find all the nodal neighbors... that is the nodes directly connected
-          // to this node through one edge
-          std::vector<const Node *> neighbors;
-          MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+          // Get the relevant nodal neighbors for the subdomain constraint
+          const auto side_grouped_boundary_neighbors =
+              get_neighbors_for_subdomain_constraint(
+                  mesh, node, sub_id1, sub_id2, nodes_to_elem_map);
 
-          // Remove any neighbors that are not on the subdomain boundary
-          VariationalSmootherConstraint::filter_neighbors_for_subdomain_constraint(
-              node, neighbors, sub_id1, sub_id2, nodes_to_elem_map);
+          // Determine which constraint should be imposed
+          const auto subdomain_constraint =
+              determine_constraint(node, dim, side_grouped_boundary_neighbors);
 
           // This subdomain boundary node does not lie on an external boundary,
           // go ahead and impose constraint
           if (boundary_node_ids.find(node.id()) == boundary_node_ids.end())
-            this->impose_constraints(node, neighbors);
+            this->impose_constraint(node, subdomain_constraint);
 
           // This subdomain boundary node lies on an external boundary, save it
           // for later to combine with the external boundary constraint
           else
-            subdomain_boundary_map[node.id()] = neighbors;
-
+            subdomain_boundary_map[node.id()] = subdomain_constraint;
 
         }//for local_node_id
 
@@ -102,177 +344,29 @@ void VariationalSmootherConstraint::constrain()
   {
     const auto & node = mesh.node_ref(bid);
 
-    // Find all the nodal neighbors... that is the nodes directly connected
-    // to this node through one edge
-    std::vector<const Node *> neighbors;
-    MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+    // Get the relevant nodal neighbors for the boundary constraint
+    const auto side_grouped_boundary_neighbors =
+        get_neighbors_for_boundary_constraint(mesh, node, boundary_node_ids,
+                                              boundary_info, nodes_to_elem_map);
 
-    // Remove any neighbors that are not boundary nodes OR boundary neighbor nodes
-    // that don't share a boundary id with node
-    VariationalSmootherConstraint::filter_neighbors_for_boundary_constraint(
-        node, neighbors, nodes_to_elem_map, boundary_node_ids, boundary_info);
+    // Determine which constraint should be imposed
+    const auto boundary_constraint =
+        determine_constraint(node, dim, side_grouped_boundary_neighbors);
 
     // Check for the case where this boundary node is also part of a subdomain id boundary
     const auto it = subdomain_boundary_map.find(bid);
     if (it != subdomain_boundary_map.end())
     {
-      const auto & subdomain_neighbors = it->second;
-      // Combine current neighbors with subdomain boundary neighbors 
-      for (const auto & neighbor : subdomain_neighbors)
-        if (std::find(neighbors.begin(), neighbors.end(), neighbor) == neighbors.end())
-          neighbors.push_back(neighbor);
-    }
+      const auto &subdomain_constraint = it->second;
+      // Combine current boundary constraint with previously determined
+      // subdomain_constraint
+      const auto combined_constraint =
+          intersect_constraints(subdomain_constraint, boundary_constraint);
+      this->impose_constraint(node, combined_constraint);
+    } else
+      this->impose_constraint(node, boundary_constraint);
 
-    this->impose_constraints(node, neighbors);
-
-  }// end bid
-}
-
-void VariationalSmootherConstraint::impose_constraints(
-    const Node &node, const std::vector<const Node *> neighbors) {
-  const auto &mesh = _sys.get_mesh();
-  const auto dim = mesh.mesh_dimension();
-
-  // Determine whether the current node is colinear (2D) or coplanar 3D with
-  // its boundary neighbors. Start by computing the vectors from the current
-  // node to each boundary neighbor node
-  std::vector<Point> dist_vecs;
-  for (const auto &neighbor : neighbors)
-    dist_vecs.push_back((*neighbor) - node);
-
-  // 2D: If the current node and all (two) boundary neighbor nodes lie on the
-  // same line, the magnitude of the dot product of the distance vectors will be
-  // equal to the product of the magnitudes of the vectors. This is because the
-  // distance vectors lie on the same line, so the cos(theta) term in the dot
-  // product evaluates to -1 or 1.
-  if (dim == 2) {
-    // Physically, the boundary of a 2D mesh is a 1D curve. By the
-    // definition of a "neighbor", it is only possible for a node
-    // to have 2 neighbors on the boundary.
-    libmesh_assert_equal_to(dist_vecs.size(), dim);
-    const Real dot_product = dist_vecs[0] * dist_vecs[1];
-    const Real norm_product = dist_vecs[0].norm() * dist_vecs[1].norm();
-
-    // node is not colinear with its boundary neighbors and is thus immovable
-    if (!relative_fuzzy_equals(std::abs(dot_product), norm_product))
-      this->fix_node(node);
-
-    else {
-      // Yes, yes, we are using a function called "constrain_node_to_plane" to
-      // constrain a node to a line in a 2D mesh. However, the line
-      // c_x * x + c_y * y + c = 0 is equivalent to the plane
-      // c_x * x + c_y * y + 0 * z + c = 0, so the same logic applies here.
-      // Since all dist_vecs reside in the xy plane, and are parallel to the
-      // line we are constraining to, crossing one of the dist_vecs with the
-      // unit vector in the z direction should give us a vector normal to the
-      // constraining line. This reference normal vector also resides in the xy
-      // plane.
-      //
-      // TODO: what if z is not the inactive dimension in 2D?
-      // Would this even happen!?!?
-      const auto reference_normal = dist_vecs[0].cross(Point(0., 0., 1.));
-      this->constrain_node_to_plane(node, reference_normal);
-    }
-  }
-
-  // 3D: If the current node and all boundary neighbor nodes lie on the same
-  // plane, all the distance vectors from the current node to the boundary nodes
-  // will be orthogonal to the plane normal. We can obtain a reference normal by
-  // normalizing the cross product between two of the distance vectors. If the
-  // normalized cross products of all other combinations (excluding self
-  // combinations) match this reference normal, then the current node is
-  // coplanar with all of its boundary nodes and should be constrained to the
-  // plane. If not same line/plane, then node is either part of a curved surface
-  // or it is the vertex where two boundary surfaces meet. In the first case, we
-  // should just fix the node. For the latter case, if the node is at the
-  // intersection of 3 surfaces (i.e., the vertex of a cube), fix the node. If
-  // the node is at the intersection of 2 surfaces (i.e., the edge of a cube),
-  // constrain it to slide along this edge.
-  else if (dim == 3) {
-    // We should have at least 2 distance vectors to compute a normal with in 3D
-    libmesh_assert_greater_equal(dist_vecs.size(), 2);
-
-    // Compute the reference normal by taking the cross product of two vectors
-    // in dist_vecs. We will use dist_vecs[0] as the first vector and the next
-    // available vector in dist_vecs that is not (anti)parallel to dist_vecs[0].
-    // Without this check we may end up with a zero vector for the reference
-    // vector.
-    unsigned int vec_index;
-    const Point vec_0_normalized = dist_vecs[0] / dist_vecs[0].norm();
-    for (const auto ii : make_range(size_t(1), dist_vecs.size())) {
-      // (anti)parallel check
-      const bool is_parallel = vec_0_normalized.relative_fuzzy_equals(
-          dist_vecs[ii] / dist_vecs[ii].norm());
-      const bool is_antiparallel = vec_0_normalized.relative_fuzzy_equals(
-          -dist_vecs[ii] / dist_vecs[ii].norm());
-      if (!(is_parallel || is_antiparallel)) {
-        vec_index = ii;
-        break;
-      }
-    }
-
-    const Point reference_cross_prod = dist_vecs[0].cross(dist_vecs[vec_index]);
-    const Point reference_normal =
-        reference_cross_prod / reference_cross_prod.norm();
-
-    // Does the node lie within a 2D surface? (Not on the edge)
-    bool node_is_coplanar = true;
-
-    // Does the node lie on the intersection of two 2D surfaces (i.e., a
-    // line)? If so, and the node is not located at the intersection of three
-    // 2D surfaces (i.e., a single point or vertex of the mesh), then some of
-    // the dist_vecs will be parallel.
-
-    // Each entry will be a vector from dist_vecs that has a corresponding
-    // (anti)parallel vector, also from dist_vecs
-    std::vector<Point> parallel_pairs;
-    bool all_pairs_parallel = true;
-
-    for (const auto ii : index_range(dist_vecs)) {
-      const Point vec_ii_normalized = dist_vecs[ii] / dist_vecs[ii].norm();
-      for (const auto jj : make_range(ii + 1, dist_vecs.size())) {
-        const Point vec_jj_normalized = dist_vecs[jj] / dist_vecs[jj].norm();
-        const bool is_parallel =
-            vec_ii_normalized.relative_fuzzy_equals(vec_jj_normalized);
-        const bool is_antiparallel =
-            vec_ii_normalized.relative_fuzzy_equals(-vec_jj_normalized);
-
-        if (is_parallel || is_antiparallel) {
-          parallel_pairs.push_back(vec_ii_normalized);
-          all_pairs_parallel &= (
-              vec_ii_normalized.relative_fuzzy_equals(parallel_pairs[0]) ||
-              vec_ii_normalized.relative_fuzzy_equals(-parallel_pairs[0])
-          );
-          // Don't bother computing the cross product of parallel vector below,
-          // it will be zero and cannot be used to define a normal vector.
-          continue;
-        }
-
-        const Point cross_prod = dist_vecs[ii].cross(dist_vecs[jj]);
-        const Point normal = cross_prod / cross_prod.norm();
-
-        // node is not coplanar with its boundary neighbors
-        if (!(reference_normal.relative_fuzzy_equals(normal) ||
-              reference_normal.relative_fuzzy_equals(-normal)))
-          node_is_coplanar = false;
-      }
-    }
-
-    if (relative_fuzzy_equals(node(0), -29., 0.01) && absolute_fuzzy_equals(node(1), 0., 0.01) && relative_fuzzy_equals(node(2), 1., 0.01))
-      std::cout << "Node " << node.id() << std::endl;
-
-    if (node_is_coplanar)
-      this->constrain_node_to_plane(node, reference_normal);
-
-    else if (parallel_pairs.size() && all_pairs_parallel)
-      this->constrain_node_to_line(node, parallel_pairs[0]);
-    else
-      this->fix_node(node);
-  }
-
-  //  1D
-  else
-    this->fix_node(node);
+  } // end bid
 }
 
 void VariationalSmootherConstraint::fix_node(const Node & node)
@@ -425,22 +519,27 @@ bool VariationalSmootherConstraint::nodes_share_boundary_id(
   return nodes_share_bid;
 }
 
-void VariationalSmootherConstraint::filter_neighbors_for_subdomain_constraint(
-  const Node & node,
-  std::vector<const Node *> & neighbors,
-  const subdomain_id_type sub_id1,
-  const subdomain_id_type sub_id2,
-  std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map)
-{
+std::set<std::set<const Node *>>
+VariationalSmootherConstraint::get_neighbors_for_subdomain_constraint(
+    const MeshBase &mesh, const Node &node, const subdomain_id_type sub_id1,
+    const subdomain_id_type sub_id2,
+    const std::unordered_map<dof_id_type, std::vector<const Elem *>>
+        &nodes_to_elem_map) {
 
-  // Remove any neighbors that are not on the subdomain boundary
-  auto remove_neighbor = [&node, &nodes_to_elem_map, &sub_id1, &sub_id2]
-    (const Node * neigh) -> bool
-  {
+  // Find all the nodal neighbors... that is the nodes directly connected
+  // to this node through one edge
+  std::vector<const Node *> neighbors;
+  MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+
+  // Each constituent set corresponds to neighbors sharing a face on the
+  // subdomain boundary
+  std::set<std::set<const Node *>> side_grouped_boundary_neighbors;
+
+  for (const auto *neigh : neighbors) {
     // Determine whether the neighbor is on the subdomain boundary
     // First, find the common elements that both node and neigh belong to
-    const auto & elems_containing_node = nodes_to_elem_map[node.id()];
-    const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
+    const auto &elems_containing_node = nodes_to_elem_map.at(node.id());
+    const auto &elems_containing_neigh = nodes_to_elem_map.at(neigh->id());
     const Elem * common_elem = nullptr;
     for (const auto * neigh_elem : elems_containing_neigh)
     {
@@ -456,7 +555,7 @@ void VariationalSmootherConstraint::filter_neighbors_for_subdomain_constraint(
       const auto & other_sub_id = (common_sub_id == sub_id1) ? sub_id2: sub_id1;
 
       // Now, determine whether node and neigh are on a side coincident
-      // with the interval boundary
+      // with the subdomain boundary
       for (const auto common_side : common_elem->side_index_range())
       {
         bool node_found_on_side = false;
@@ -469,73 +568,194 @@ void VariationalSmootherConstraint::filter_neighbors_for_subdomain_constraint(
             neigh_found_on_side = true;
         }
 
-        if (node_found_on_side && neigh_found_on_side && common_elem->neighbor_ptr(common_side))
-        {
-          const auto matched_side = common_side;
-          // There could be multiple matched sides, so keep this next part
-          // inside the loop
-          //
-          // Does matched_side, containing both node and neigh, lie on the
-          // subdomain boundary between sub_id1 (= common_sub_id or other_sub_id)
-          // and sub_id2 (= other sub_id or common_sub_id)?
-          const auto matched_neighbor_sub_id = common_elem->neighbor_ptr(matched_side)->subdomain_id();
-          const bool is_matched_side_on_subdomain_boundary = matched_neighbor_sub_id == other_sub_id;
-          if (is_matched_side_on_subdomain_boundary)
-            return false; // Don't remove the neighbor node
+        if (!(node_found_on_side && neigh_found_on_side &&
+              common_elem->neighbor_ptr(common_side)))
+          continue;
+
+        const auto matched_side = common_side;
+        // There could be multiple matched sides, so keep this next part
+        // inside the common_side loop
+        //
+        // Does matched_side, containing both node and neigh, lie on the
+        // subdomain boundary between sub_id1 (= common_sub_id or other_sub_id)
+        // and sub_id2 (= other sub_id or common_sub_id)?
+        const auto matched_neighbor_sub_id =
+            common_elem->neighbor_ptr(matched_side)->subdomain_id();
+        const bool is_matched_side_on_subdomain_boundary =
+            matched_neighbor_sub_id == other_sub_id;
+        if (is_matched_side_on_subdomain_boundary) {
+          // Store all nodes that live on this side
+          const auto nodes_on_side = common_elem->nodes_on_side(common_side);
+          std::set<const Node *> node_ptrs_on_side;
+          for (const auto local_node_id : nodes_on_side)
+            node_ptrs_on_side.insert(common_elem->node_ptr(local_node_id));
+          node_ptrs_on_side.erase(node_ptrs_on_side.find(&node));
+          side_grouped_boundary_neighbors.insert(node_ptrs_on_side);
+
+          continue;
         }
+
       }// for common_side
 
     }// for neigh_elem
+  }
 
-    return true; // Remove the neighbor node
-  };
-
-  neighbors.erase(
-    std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
-    neighbors.end()
-  );
-
+  return side_grouped_boundary_neighbors;
 }
 
-void VariationalSmootherConstraint::filter_neighbors_for_boundary_constraint(
-  const Node & node,
-  std::vector<const Node *> & neighbors,
-  std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
-  const std::unordered_set<dof_id_type> & boundary_node_ids,
-  const BoundaryInfo & boundary_info)
-{
+std::set<std::set<const Node *>>
+VariationalSmootherConstraint::get_neighbors_for_boundary_constraint(
+    const MeshBase &mesh, const Node &node,
+    const std::unordered_set<dof_id_type> &boundary_node_ids,
+    const BoundaryInfo &boundary_info,
+    const std::unordered_map<dof_id_type, std::vector<const Elem *>>
+        &nodes_to_elem_map) {
 
-  // Remove any neighbors that are not boundary nodes OR boundary neighbor nodes
-  // that don't share a boundary id with node
-  auto remove_neighbor = [&boundary_node_ids, &node, &nodes_to_elem_map, &boundary_info]
-    (const Node * neigh) -> bool
-  {
+  // Find all the nodal neighbors... that is the nodes directly connected
+  // to this node through one edge
+  std::vector<const Node *> neighbors;
+  MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+
+  // Each constituent set corresponds to neighbors sharing a face on the
+  // boundary
+  std::set<std::set<const Node *>> side_grouped_boundary_neighbors;
+
+  for (const auto *neigh : neighbors) {
     const bool is_neighbor_boundary_node = boundary_node_ids.find(neigh->id()) != boundary_node_ids.end();
+    if (!is_neighbor_boundary_node)
+      continue;
 
     // Determine whether nodes share a common boundary id
     // First, find the common element that both node and neigh belong to
-    const auto & elems_containing_node = nodes_to_elem_map[node.id()];
-    const auto & elems_containing_neigh = nodes_to_elem_map[neigh->id()];
-    const Elem * common_elem = nullptr;
-    bool nodes_have_common_bid = false;
-    for (const auto * neigh_elem : elems_containing_neigh)
-      if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
-      {
-        common_elem = neigh_elem;
-        // Keep this in the loop because there can be multiple common elements
-        // Now, determine whether node and neigh share a common boundary id
-        nodes_have_common_bid = VariationalSmootherConstraint::nodes_share_boundary_id(node, *neigh, *common_elem, boundary_info) || nodes_have_common_bid;
+    const auto &elems_containing_node = nodes_to_elem_map.at(node.id());
+    const auto &elems_containing_neigh = nodes_to_elem_map.at(neigh->id());
+    const Elem *common_elem = nullptr;
+    for (const auto *neigh_elem : elems_containing_neigh) {
+      const bool is_neigh_common =
+          std::find(elems_containing_node.begin(), elems_containing_node.end(),
+                    neigh_elem) != elems_containing_node.end();
+      if (!is_neigh_common)
+        continue;
+      common_elem = neigh_elem;
+      // Keep this in the neigh_elem loop because there can be multiple common
+      // elements Now, determine whether node and neigh share a common boundary
+      // id
+      const bool nodes_have_common_bid =
+          VariationalSmootherConstraint::nodes_share_boundary_id(
+              node, *neigh, *common_elem, boundary_info);
+      if (nodes_have_common_bid) {
+        // Find the side coinciding with the shared boundary
+        for (const auto side : common_elem->side_index_range()) {
+          // We only care about external boundaries here, make sure side doesn't
+          // have a neighbor
+          if (common_elem->neighbor_ptr(side))
+            continue;
+
+          bool node_found_on_side = false;
+          bool neigh_found_on_side = false;
+          const auto nodes_on_side = common_elem->nodes_on_side(side);
+          for (const auto local_node_id : nodes_on_side) {
+            if (common_elem->node_id(local_node_id) == node.id())
+              node_found_on_side = true;
+            else if (common_elem->node_id(local_node_id) == neigh->id())
+              neigh_found_on_side = true;
+          }
+          if (!(node_found_on_side && neigh_found_on_side))
+            continue;
+
+          std::set<const Node *> node_ptrs_on_side;
+          for (const auto local_node_id : nodes_on_side)
+            node_ptrs_on_side.insert(common_elem->node_ptr(local_node_id));
+          node_ptrs_on_side.erase(node_ptrs_on_side.find(&node));
+          side_grouped_boundary_neighbors.insert(node_ptrs_on_side);
+        }
+        continue;
       }
+    }
+  }
+  return side_grouped_boundary_neighbors;
+}
 
-    // remove if neighbor is not boundary node or nodes don't share a common bid
-    return (is_neighbor_boundary_node && nodes_have_common_bid) ? false : true;
-  };
+ConstraintVariant VariationalSmootherConstraint::determine_constraint(
+    const Node &node, const unsigned int dim,
+    const std::set<std::set<const Node *>> &side_grouped_boundary_neighbors) {
+  // Determines the appropriate geometric constraint for a node based on its
+  // neighbors.
 
-  neighbors.erase(
-    std::remove_if(neighbors.begin(), neighbors.end(), remove_neighbor),
-    neighbors.end()
-  );
+  // Extract neighbors in flat vector
+  std::vector<const Node *> neighbors;
+  for (const auto &side : side_grouped_boundary_neighbors)
+    neighbors.insert(neighbors.end(), side.begin(), side.end());
+  libmesh_assert_greater_equal(neighbors.size(), 1);
 
+  // Constrain the node to it's current location
+  if (dim == 1 || neighbors.size() == 1)
+    return PointConstraint{node};
+
+  if (dim == 2 || neighbors.size() == 2) {
+    // Determine whether node + all neighbors are colinear
+    bool all_colinear = true;
+    const Point ref_dir = (*neighbors[0] - node).unit();
+    for (const auto i : make_range(size_t(1), neighbors.size())) {
+      const Point delta = *(neighbors[i]) - node;
+      libmesh_assert(delta.norm() >= TOLERANCE);
+      const Point dir = delta.unit();
+      if (!dir.relative_fuzzy_equals(ref_dir) &&
+          !dir.relative_fuzzy_equals(-ref_dir)) {
+        all_colinear = false;
+        break;
+      }
+    }
+    if (all_colinear)
+      return LineConstraint{node, ref_dir};
+
+    return PointConstraint{node};
+  }
+
+  // dim == 3, neighbors.size() >= 3
+  std::set<PlaneConstraint> valid_planes;
+  for (const auto &side_nodes : side_grouped_boundary_neighbors) {
+    std::vector<const Node *> side_nodes_vec(side_nodes.begin(),
+                                             side_nodes.end());
+    for (const auto i : index_range(side_nodes_vec)) {
+      const Point vec_i = (*side_nodes_vec[i] - node);
+      for (const auto j : make_range(i)) {
+        const Point vec_j = (*side_nodes_vec[j] - node);
+        Point candidate_normal = vec_i.cross(vec_j);
+        if (candidate_normal.norm() <= TOLERANCE)
+          continue;
+
+        const PlaneConstraint candidate_plane{node, candidate_normal};
+        valid_planes.emplace(candidate_plane);
+      }
+    }
+  }
+
+  // Fall back to point constraint
+  if (valid_planes.empty())
+    return PointConstraint(node);
+
+  // Combine all the planes together to get a common constraint
+  auto it = valid_planes.begin();
+  ConstraintVariant current = *it++;
+  for (; it != valid_planes.end(); ++it)
+    current = intersect_constraints(current, *it);
+
+  return current;
+}
+
+// Applies the computed constraint (PointConstraint, LineConstraint, or
+// PlaneConstraint) to a node.
+void VariationalSmootherConstraint::impose_constraint(
+    const Node &node, const ConstraintVariant &constraint) {
+  if (std::holds_alternative<PointConstraint>(constraint))
+    fix_node(node);
+  else if (std::holds_alternative<LineConstraint>(constraint))
+    constrain_node_to_line(node, std::get<LineConstraint>(constraint).dir);
+  else if (std::holds_alternative<PlaneConstraint>(constraint))
+    constrain_node_to_plane(node, std::get<PlaneConstraint>(constraint).normal);
+  else
+    libmesh_assert_msg(false, "Unknown constraint type.");
 }
 
 } // namespace libMesh
