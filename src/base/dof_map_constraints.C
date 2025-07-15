@@ -5530,28 +5530,9 @@ void DofMap::check_dirichlet_bcid_consistency (const MeshBase & mesh,
 
 void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & periodic_boundary)
 {
-  // See if we already have a periodic boundary associated myboundary...
-  PeriodicBoundaryBase * existing_boundary = _periodic_boundaries->boundary(periodic_boundary.myboundary);
-
-  if (!existing_boundary)
-    {
-      // ...if not, clone the input (and its inverse) and add them to the PeriodicBoundaries object
-      // Pass the pairedboundary of the original as the boundary id of the inverse clone.
-      _periodic_boundaries->emplace(periodic_boundary.myboundary, periodic_boundary.clone());
-      _periodic_boundaries->emplace(periodic_boundary.pairedboundary, periodic_boundary.clone(PeriodicBoundaryBase::INVERSE));
-    }
-  else
-    {
-      // ...otherwise, merge this object's variable IDs with the existing boundary object's.
-      existing_boundary->merge(periodic_boundary);
-
-      // Do the same merging process for the inverse boundary.  Note: the inverse better already exist!
-      PeriodicBoundaryBase * inverse_boundary = _periodic_boundaries->boundary(periodic_boundary.pairedboundary);
-      libmesh_assert(inverse_boundary);
-      inverse_boundary->merge(periodic_boundary);
-    }
+  auto inverse_boundary = periodic_boundary.clone(PeriodicBoundaryBase::INVERSE);
+  this->add_periodic_boundary(periodic_boundary, *inverse_boundary);
 }
-
 
 
 
@@ -5597,7 +5578,6 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & boundary,
       libmesh_assert(typeid(inverse_boundary) == typeid(*existing_inverse_boundary));
 #endif
     }
-}
 }
 
 
