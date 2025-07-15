@@ -356,13 +356,13 @@ public:
   /**
    * Beginning of range of coupling functors
    */
-  std::set<GhostingFunctor *>::const_iterator coupling_functors_begin() const
+  std::vector<GhostingFunctor *>::const_iterator coupling_functors_begin() const
   { return _coupling_functors.begin(); }
 
   /**
    * End of range of coupling functors
    */
-  std::set<GhostingFunctor *>::const_iterator coupling_functors_end() const
+  std::vector<GhostingFunctor *>::const_iterator coupling_functors_end() const
   { return _coupling_functors.end(); }
 
   /**
@@ -418,13 +418,13 @@ public:
   /**
    * Beginning of range of algebraic ghosting functors
    */
-  std::set<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_begin() const
+  std::vector<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_begin() const
   { return _algebraic_ghosting_functors.begin(); }
 
   /**
    * End of range of algebraic ghosting functors
    */
-  std::set<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_end() const
+  std::vector<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_end() const
   { return _algebraic_ghosting_functors.end(); }
 
   /**
@@ -1849,8 +1849,8 @@ private:
   static void
   merge_ghost_functor_outputs (GhostingFunctor::map_type & elements_to_ghost,
                                CouplingMatricesSet & temporary_coupling_matrices,
-                               const std::set<GhostingFunctor *>::iterator & gf_begin,
-                               const std::set<GhostingFunctor *>::iterator & gf_end,
+                               const std::vector<GhostingFunctor *>::const_iterator & gf_begin,
+                               const std::vector<GhostingFunctor *>::const_iterator & gf_end,
                                const MeshBase::const_element_iterator & elems_begin,
                                const MeshBase::const_element_iterator & elems_end,
                                processor_id_type p);
@@ -2040,11 +2040,14 @@ private:
    * The list of all GhostingFunctor objects to be used when
    * distributing ghosted vectors.
    *
-   * The library should automatically copy these functors to the
+   * The library should automatically refer these functors to the
    * MeshBase, too, so any algebraically ghosted dofs will live on
    * geometrically ghosted elements.
+   *
+   * Keep these in a vector so any parallel computation is done in the
+   * same order on all processors.
    */
-  std::set<GhostingFunctor *> _algebraic_ghosting_functors;
+  std::vector<GhostingFunctor *> _algebraic_ghosting_functors;
 
   /**
    * The list of all GhostingFunctor objects to be used when
@@ -2053,11 +2056,11 @@ private:
    * These objects will *also* be used as algebraic ghosting functors,
    * but not vice-versa.
    *
-   * The library should automatically copy these functors to the
+   * The library should automatically refer these functors to the
    * MeshBase, too, so any dofs coupled to local dofs will live on
    * geometrically ghosted elements.
    */
-  std::set<GhostingFunctor *> _coupling_functors;
+  std::vector<GhostingFunctor *> _coupling_functors;
 
   /**
    * Hang on to references to any GhostingFunctor objects we were

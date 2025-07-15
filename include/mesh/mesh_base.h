@@ -1264,8 +1264,7 @@ public:
    * this function; the GhostingFunctor lifetime is expected to extend
    * until either the functor is removed or the Mesh is destructed.
    */
-  void add_ghosting_functor(GhostingFunctor & ghosting_functor)
-  { _ghosting_functors.insert(&ghosting_functor); }
+  void add_ghosting_functor(GhostingFunctor & ghosting_functor);
 
   /**
    * Adds a functor which can specify ghosting requirements for use on
@@ -1288,13 +1287,13 @@ public:
   /**
    * Beginning of range of ghosting functors
    */
-  std::set<GhostingFunctor *>::const_iterator ghosting_functors_begin() const
+  std::vector<GhostingFunctor *>::const_iterator ghosting_functors_begin() const
   { return _ghosting_functors.begin(); }
 
   /**
    * End of range of ghosting functors
    */
-  std::set<GhostingFunctor *>::const_iterator ghosting_functors_end() const
+  std::vector<GhostingFunctor *>::const_iterator ghosting_functors_end() const
   { return _ghosting_functors.end(); }
 
   /**
@@ -2083,7 +2082,7 @@ protected:
    * Basically unused by ReplicatedMesh for now, but belongs to
    * MeshBase because the cost is trivial.
    */
-  std::set<GhostingFunctor *> _ghosting_functors;
+  std::vector<GhostingFunctor *> _ghosting_functors;
 
   /**
    * Hang on to references to any GhostingFunctor objects we were
