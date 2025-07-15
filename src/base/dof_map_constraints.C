@@ -5562,10 +5562,42 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & boundary,
   libmesh_assert_equal_to (boundary.pairedboundary, inverse_boundary.myboundary);
   libmesh_assert(boundary.get_variables() == inverse_boundary.get_variables());
 
-  // Store clones of the passed-in objects. These will be cleaned up
-  // automatically in the _periodic_boundaries destructor.
-  _periodic_boundaries->emplace(boundary.myboundary, boundary.clone());
-  _periodic_boundaries->emplace(inverse_boundary.myboundary, inverse_boundary.clone());
+  // See if we already have a periodic boundary associated myboundary...
+  PeriodicBoundaryBase * existing_boundary =
+    _periodic_boundaries->boundary(boundary.myboundary);
+
+  if (!existing_boundary)
+    {
+      // ...if not, clone the inputs and add them to the
+      // PeriodicBoundaries object.
+      // These will be cleaned up automatically in the
+      // _periodic_boundaries destructor.
+      _periodic_boundaries->emplace(boundary.myboundary, boundary.clone());
+      _periodic_boundaries->emplace(inverse_boundary.myboundary, inverse_boundary.clone());
+    }
+  else
+    {
+      // ...otherwise, merge this object's variable IDs with the
+      // existing boundary object's.
+      existing_boundary->merge(boundary);
+
+      // Do the same merging process for the inverse boundary.  The
+      // inverse had better already exist!
+      PeriodicBoundaryBase * existing_inverse_boundary =
+        _periodic_boundaries->boundary(boundary.pairedboundary);
+      libmesh_assert(existing_inverse_boundary);
+      existing_inverse_boundary->merge(inverse_boundary);
+
+      // If we had to merge different *types* of boundaries then
+      // something likely has gone wrong.
+#ifdef LIBMESH_HAVE_RTTI
+      // typeid needs to be given references, not just pointers, to
+      // return a derived class name.
+      libmesh_assert(typeid(boundary) == typeid(*existing_boundary));
+      libmesh_assert(typeid(inverse_boundary) == typeid(*existing_inverse_boundary));
+#endif
+    }
+}
 }
 
 
