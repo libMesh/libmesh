@@ -5560,6 +5560,7 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & boundary,
 {
   libmesh_assert_equal_to (boundary.myboundary, inverse_boundary.pairedboundary);
   libmesh_assert_equal_to (boundary.pairedboundary, inverse_boundary.myboundary);
+  libmesh_assert(boundary.get_variables() == inverse_boundary.get_variables());
 
   // Store clones of the passed-in objects. These will be cleaned up
   // automatically in the _periodic_boundaries destructor.
