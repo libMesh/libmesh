@@ -37,7 +37,7 @@ class Elem;
 enum Order : int;
 
 /**
- * This class implements the Smoothness indicator.
+ * This class implements the Smoothness estimate.
  *
  * \author Arjun Kulathuvayal
  * \author Varis Carey
@@ -49,9 +49,7 @@ class SmoothnessEstimator : public ErrorEstimator
 public:
 
   /**
-   * Constructor.  Defaults to H1 seminorm.  All Hilbert norms and
-   * seminorms should be supported now.  W1,p and W2,p norms would
-   * be natural to support if any contributors make the effort.
+   * Constructor.
    */
   SmoothnessEstimator();
 
@@ -66,13 +64,11 @@ public:
   virtual ~SmoothnessEstimator() = default;
 
   /**
-   * This function uses the Legendre expansion of
-   * solution to estimate coefficient decay to quantify
-   * the solution smoothness on each cell.
+   * This function uses the Legendre expansion of solution to estimate coefficient
+   * decay to quantify the solution smoothness on each cell.
    * The estimated smoothness is output in the vector (stored as ErrorVector)
    * For element order 1, the least square fit of log|order| vs log |coefficients|
-   * fails and Nan values pupulates over smoothness vector. This leads to pure
-   * h refinement.
+   * fails. This leads to pure h refinement.
    * \p smoothness_per_cell
    */
   virtual void estimate_error (const System & system,
@@ -107,6 +103,11 @@ protected:
    */
   int _extra_order;
 
+  /**
+   * Computes slop in a linear regression
+   */
+  static Real compute_slope(int N, Real Sx, Real Sy, Real Sxx, Real Sxy);
+  
 private:
 
   /**

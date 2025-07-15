@@ -128,6 +128,16 @@ std::vector<Real> SmoothnessEstimator::legepoly(const unsigned int dim,
   return psi;
 }
 
+Real SmoothnessEstimator::compute_slope(int N, Real Sx, Real Sy, Real Sxx, Real Sxy)
+{
+    const Real denom = (N * Sxx - Sx * Sx);
+    // Triggers for first order polynomials when there only 1 point
+    // available at log |c_k| and log |k| space to fit.
+    if (std::abs(denom) < std::numeric_limits<Real>::epsilon()) {
+        return std::numeric_limits<Real>::max();
+    }
+    return (N * Sxy - Sx * Sy) / denom;
+}
 
 void SmoothnessEstimator::estimate_error (const System & system,
                                                   ErrorVector & smoothness_per_cell,
@@ -357,10 +367,8 @@ for (const auto & elem : range)
       Sxy += log_degrees[i] * log_norms[i];
     }
 
-    const double slope = (N * Sxy - Sx * Sy) / (N * Sxx - Sx * Sx);
+    const double regularity = -compute_slope(N, Sx, Sy, Sxx, Sxy);
     // const double intercept = (Sy - slope * Sx) / N;
-
-    const double regularity = -slope;
 
     Threads::spin_mutex::scoped_lock acquire(Threads::spin_mtx);
     smoothness_per_cell[e_id] = regularity;
