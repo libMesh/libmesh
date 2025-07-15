@@ -35,6 +35,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/tensor_value.h"
+#include "libmesh/smoothness_estimator.h"
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -134,7 +135,7 @@ void HPCoarsenTest::add_projection(const System & system,
     }
 }
 
-void HPCoarsenTest::select_refinement (System & system, ErrorVector & smoothness)
+void HPCoarsenTest::select_refinement (System & system)
 {
   LOG_SCOPE("select_refinement()", "HPCoarsenTest");
 
@@ -168,6 +169,12 @@ void HPCoarsenTest::select_refinement (System & system, ErrorVector & smoothness
       // No specified scaling.  Scale all variables by one.
       component_scale.resize (n_vars, 1.0);
     }
+
+  // Estimates smoothness of solution on each cell
+  // via Legendre coefficient decay rate.
+  ErrorVector smoothness;
+  SmoothnessEstimator estimate_smoothness;
+  estimate_smoothness.estimate_smoothness(system, smoothness);
 
   // Resize the error_per_cell vectors to handle
   // the number of elements, initialize them to 0.

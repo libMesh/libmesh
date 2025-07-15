@@ -24,7 +24,7 @@
 #include "libmesh/error_vector.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
-#include "libmesh/quadrature_grid.h"
+#include "libmesh/quadrature.h"
 #include "libmesh/system.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
@@ -132,6 +132,14 @@ Real SmoothnessEstimator::compute_slope(int N, Real Sx, Real Sy, Real Sxx, Real 
     return (N * Sxy - Sx * Sy) / denom;
 }
 
+void SmoothnessEstimator::reduce_smoothness (std::vector<ErrorVectorReal> & error_per_cell,
+                                   const Parallel::Communicator & comm)
+{
+  // Aggregates element-wise contributions computed
+  // in parallel across all processors
+  comm.sum(error_per_cell);
+}
+
 void SmoothnessEstimator::estimate_smoothness (const System & system,
                                                   ErrorVector & smoothness_per_cell,
                                                   const NumericVector<Number> * solution_vector)
@@ -172,7 +180,7 @@ void SmoothnessEstimator::estimate_smoothness (const System & system,
   // elements, and smoothness_per_cell contains 0 for all the
   // non-local elements.  Summing the vector will provide the true
   // value for each element, local or remote
-  system.comm().sum(smoothness_per_cell);
+  this->reduce_smoothness (smoothness_per_cell, system.comm());
 
   // If we used a non-standard solution before, now is the time to fix
   // the current_local_solution

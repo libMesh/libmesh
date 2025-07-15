@@ -40,8 +40,7 @@ enum ErrorEstimatorType : int {
                          LAPLACIAN               =  5,
                          PATCH_RECOVERY          =  6,
                          WEIGHTED_PATCH_RECOVERY =  7,
-                         UNIFORM_REFINEMENT      =  8,
-                         SMOOTHNESS              =  9};
+                         UNIFORM_REFINEMENT      =  8};
 
 }
 

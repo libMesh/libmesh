@@ -65,8 +65,8 @@ public:
 
   /**
    * This function uses the Legendre expansion of solution to estimate coefficient
-   * decay to quantify the solution smoothness on each cell.
-   * The estimated smoothness is output in the vector (stored as ErrorVector)
+   * decay to quantify the solution smoothness on each cell. The estimated smoothness
+   * is output in the vector (for time being, we use ErrorVector)
    * For element order 1, the least square fit of log|order| vs log |coefficients|
    * fails. This leads to pure h refinement.
    * \p smoothness_per_cell
@@ -104,6 +104,9 @@ protected:
    * Computes slop in a linear regression
    */
   static Real compute_slope(int N, Real Sx, Real Sy, Real Sxx, Real Sxy);
+
+  void reduce_smoothness (std::vector<ErrorVectorReal> & error_per_cell,
+                          const Parallel::Communicator & comm);
 
 private:
 

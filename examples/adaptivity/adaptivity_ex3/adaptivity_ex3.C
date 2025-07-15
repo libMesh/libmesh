@@ -493,12 +493,9 @@ int main(int argc, char ** argv)
 #endif
               error.plot_error(error_output, mesh);
 
-              // We use the ErrorVector to collect the computed regularity
-              // (a measure of smoothness) information on a finite element mesh.
-              ErrorVector smoothness;
-
               if (refine_type == "hp")
                 {
+                  ErrorVector smoothness;
                   SmoothnessEstimator estimate_smoothness;
                   estimate_smoothness.estimate_smoothness(system, smoothness);
                   std::string data_type = "smoothness";
@@ -527,7 +524,7 @@ int main(int argc, char ** argv)
               else if (refine_type == "hp")
                 {
                   HPCoarsenTest hpselector;
-                  hpselector.select_refinement(system, smoothness);
+                  hpselector.select_refinement(system);
                 }
               // If we are doing "singular hp" refinement, we
               // try switching most elements from h to p

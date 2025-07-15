@@ -232,11 +232,7 @@ void ErrorVector::plot_error(const std::string & filename,
   EquationSystems temp_es (mesh);
   ExplicitSystem & error_system
     = temp_es.add_system<ExplicitSystem> ("Error");
-  if (data_type == "error")
-    error_system.add_variable(data_type, CONSTANT, MONOMIAL);
-  else
-    error_system.add_variable("smoothness", CONSTANT, MONOMIAL);
-
+  error_system.add_variable(data_type, CONSTANT, MONOMIAL);
 
   temp_es.init();
 
