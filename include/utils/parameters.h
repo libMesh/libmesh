@@ -33,6 +33,7 @@
 #include <typeinfo>
 #include <vector>
 #include <memory>
+#include <set>
 
 namespace libMesh
 {
@@ -54,6 +55,9 @@ void print_helper(std::ostream & os, const std::vector<std::vector<std::vector<P
 
 template<typename P1, typename P2, typename C, typename A>
 void print_helper(std::ostream & os, const std::map<P1, P2, C, A> * param);
+
+template <typename P, typename C, typename A>
+void print_helper(std::ostream & os, const std::set<P, C, A> * param);
 
 /**
  * This class provides the ability to map between
@@ -593,6 +597,14 @@ void print_helper(std::ostream & os, const std::map<P1, P2, C, A> * param)
         os << ", ";
     }
   os << '}';
+}
+
+//non-member set print function
+template<typename P, typename C, typename A>
+void print_helper(std::ostream & os, const std::set<P, C, A> * param)
+{
+  for (const auto & p : *param)
+    os << p << " ";
 }
 
 
