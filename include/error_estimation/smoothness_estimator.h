@@ -44,7 +44,7 @@ enum Order : int;
  * \author Benjamin S. Kirk
  * \date 2025
  */
-class SmoothnessEstimator : public ErrorEstimator
+class SmoothnessEstimator
 {
 public:
 
@@ -71,10 +71,9 @@ public:
    * fails. This leads to pure h refinement.
    * \p smoothness_per_cell
    */
-  virtual void estimate_error (const System & system,
+  virtual void estimate_smoothness (const System & system,
                                ErrorVector & smoothness_per_cell,
-                               const NumericVector<Number> * solution_vector = nullptr,
-                               bool estimate_parent_error = false) override;
+                               const NumericVector<Number> * solution_vector = nullptr);
 
   /**
    * Increases or decreases the order of the quadrature rule used for numerical
@@ -85,8 +84,6 @@ public:
    */
   void extra_quadrature_order (const int extraorder)
   { _extra_order = extraorder; }
-
-  virtual ErrorEstimatorType type() const override;
 
 protected:
 
@@ -107,21 +104,21 @@ protected:
    * Computes slop in a linear regression
    */
   static Real compute_slope(int N, Real Sx, Real Sy, Real Sxx, Real Sxy);
-  
+
 private:
 
   /**
    * Class to compute the error contribution for a range
    * of elements. May be executed in parallel on separate threads.
    */
-  class EstimateError
+  class EstimateSmoothness
   {
   public:
-    EstimateError (const System & sys,
+    EstimateSmoothness (const System & sys,
                    const SmoothnessEstimator & ee,
                    ErrorVector & epc) :
       system(sys),
-      error_estimator(ee),
+      smoothness_estimator(ee),
       smoothness_per_cell(epc)
     {}
 
@@ -129,11 +126,11 @@ private:
 
   private:
     const System & system;
-    const SmoothnessEstimator & error_estimator;
+    const SmoothnessEstimator & smoothness_estimator;
     ErrorVector & smoothness_per_cell;
   };
 
-  friend class EstimateError;
+  friend class EstimateSmoothness;
 };
 
 

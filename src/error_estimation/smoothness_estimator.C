@@ -28,7 +28,6 @@
 #include "libmesh/system.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/numeric_vector.h"
-#include "libmesh/enum_error_estimator_type.h"
 #include "libmesh/enum_to_string.h"
 
 // C++ includes
@@ -39,16 +38,10 @@
 namespace libMesh
 {
 
-ErrorEstimatorType SmoothnessEstimator::type() const
-{
-  return SMOOTHNESS;
-}
-
 
 //-----------------------------------------------------------------
 // SmoothnessEstimator implementations
 SmoothnessEstimator::SmoothnessEstimator() :
-    ErrorEstimator(),
     _extra_order(1)
 {
 }
@@ -139,10 +132,9 @@ Real SmoothnessEstimator::compute_slope(int N, Real Sx, Real Sy, Real Sxx, Real 
     return (N * Sxy - Sx * Sy) / denom;
 }
 
-void SmoothnessEstimator::estimate_error (const System & system,
+void SmoothnessEstimator::estimate_smoothness (const System & system,
                                                   ErrorVector & smoothness_per_cell,
-                                                  const NumericVector<Number> * solution_vector,
-                                                  bool)
+                                                  const NumericVector<Number> * solution_vector)
 {
   LOG_SCOPE("estimate_error()", "SmoothnessEstimator");
 
@@ -171,7 +163,7 @@ void SmoothnessEstimator::estimate_error (const System & system,
   Threads::parallel_for (ConstElemRange(mesh.active_local_elements_begin(),
                                         mesh.active_local_elements_end(),
                                         200),
-                         EstimateError(system,
+                         EstimateSmoothness(system,
                                        *this,
                                        smoothness_per_cell)
                          );
@@ -180,7 +172,7 @@ void SmoothnessEstimator::estimate_error (const System & system,
   // elements, and smoothness_per_cell contains 0 for all the
   // non-local elements.  Summing the vector will provide the true
   // value for each element, local or remote
-  this->reduce_error(smoothness_per_cell, system.comm());
+  system.comm().sum(smoothness_per_cell);
 
   // If we used a non-standard solution before, now is the time to fix
   // the current_local_solution
@@ -194,7 +186,7 @@ void SmoothnessEstimator::estimate_error (const System & system,
 }
 
 
-void SmoothnessEstimator::EstimateError::operator()(const ConstElemRange & range) const
+void SmoothnessEstimator::EstimateSmoothness::operator()(const ConstElemRange & range) const
 {
   // The current mesh
   const MeshBase & mesh = system.get_mesh();
@@ -220,7 +212,7 @@ for (const auto & elem : range)
     const Order element_order = fe_type.order + elem->p_level();
 
     std::unique_ptr<FEBase> fe(FEBase::build(dim, fe_type));
-    std::unique_ptr<QBase> qrule(fe_type.default_quadrature_rule(dim, error_estimator._extra_order));
+    std::unique_ptr<QBase> qrule(fe_type.default_quadrature_rule(dim, smoothness_estimator._extra_order));
     fe->attach_quadrature_rule(qrule.get());
 
     const std::vector<Real> & JxW = fe->get_JxW();

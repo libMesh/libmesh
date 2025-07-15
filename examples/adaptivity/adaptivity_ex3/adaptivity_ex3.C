@@ -500,7 +500,7 @@ int main(int argc, char ** argv)
               if (refine_type == "hp")
                 {
                   SmoothnessEstimator estimate_smoothness;
-                  estimate_smoothness.estimate_error(system, smoothness);
+                  estimate_smoothness.estimate_smoothness(system, smoothness);
                   std::string data_type = "smoothness";
                   smoothness.plot_error(smoothness_output, mesh, data_type);
                 }
