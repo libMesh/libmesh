@@ -132,19 +132,19 @@ Real SmoothnessEstimator::compute_slope(int N, Real Sx, Real Sy, Real Sxx, Real 
     return (N * Sxy - Sx * Sy) / denom;
 }
 
-void SmoothnessEstimator::reduce_smoothness (std::vector<ErrorVectorReal> & error_per_cell,
+void SmoothnessEstimator::reduce_smoothness (std::vector<ErrorVectorReal> & _smoothness_per_cell,
                                    const Parallel::Communicator & comm)
 {
   // Aggregates element-wise contributions computed
   // in parallel across all processors
-  comm.sum(error_per_cell);
+  comm.sum(_smoothness_per_cell);
 }
 
 void SmoothnessEstimator::estimate_smoothness (const System & system,
                                                   ErrorVector & smoothness_per_cell,
                                                   const NumericVector<Number> * solution_vector)
 {
-  LOG_SCOPE("estimate_error()", "SmoothnessEstimator");
+  LOG_SCOPE("estimate_smoothness()", "SmoothnessEstimator");
 
   // The current mesh
   const MeshBase & mesh = system.get_mesh();
@@ -180,6 +180,7 @@ void SmoothnessEstimator::estimate_smoothness (const System & system,
   // elements, and smoothness_per_cell contains 0 for all the
   // non-local elements.  Summing the vector will provide the true
   // value for each element, local or remote
+  this->reduce_smoothness (smoothness_per_cell, system.comm());
   this->reduce_smoothness (smoothness_per_cell, system.comm());
 
   // If we used a non-standard solution before, now is the time to fix

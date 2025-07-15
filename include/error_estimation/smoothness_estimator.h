@@ -21,7 +21,6 @@
 #define LIBMESH_SMOOTHNESS_ESTIMATOR_H
 
 // Local Includes
-#include "libmesh/error_estimator.h"
 #include "libmesh/point.h"
 #include "libmesh/elem_range.h"
 
@@ -33,6 +32,8 @@ namespace libMesh
 {
 
 // Forward Declarations
+class ErrorVector;
+class System;
 class Elem;
 enum Order : int;
 

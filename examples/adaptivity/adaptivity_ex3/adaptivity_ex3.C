@@ -50,7 +50,6 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/exodusII_io.h"
-#include "libmesh/gmv_io.h"
 #include "libmesh/tecplot_io.h"
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"

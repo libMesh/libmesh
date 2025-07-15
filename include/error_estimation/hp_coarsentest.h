@@ -28,7 +28,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/fe.h"         // MipsPro requires fe.h and quadrature.h
 #include "libmesh/quadrature.h" // Required for inline deletion std::unique_ptrs<> in destructor
-#include "libmesh/error_vector.h"
 
 // C++ includes
 #include <vector>
