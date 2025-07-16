@@ -145,6 +145,37 @@ public:
   }
 
 
+  void testBcids(UnstructuredMesh & mesh)
+  {
+    BoundaryInfo & bi = mesh.get_boundary_info();
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        for (auto s : elem->side_index_range())
+          {
+            auto neigh = elem->neighbor_ptr(s);
+
+            if (neigh)
+            {
+              CPPUNIT_ASSERT_EQUAL(bi.n_boundary_ids(elem, s), 0u);
+              continue;
+            }
+
+            CPPUNIT_ASSERT_EQUAL(bi.n_boundary_ids(elem, s), 1u);
+
+            auto side = elem->side_ptr(s);
+            auto normal = (side->point(1) - side->point(0)).cross
+                          (side->point(2) - side->point(0));
+            // Outer faces, in these tests
+            if (normal * side->vertex_average() > 0)
+              CPPUNIT_ASSERT(bi.has_boundary_id(elem, s, 0));
+            // Inner faces, with one-hole tests
+            else
+              CPPUNIT_ASSERT(bi.has_boundary_id(elem, s, 1));
+          }
+      }
+  }
+
+
   void testHole(UnstructuredMesh & mesh,
                 MeshTetInterface & triangulator)
   {
@@ -327,6 +358,7 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testTrisToTets(mesh, net_tet);
+    testBcids(mesh);
   }
 
 
@@ -347,6 +379,7 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testTetsToTets(mesh, net_tet);
+    testBcids(mesh);
   }
 
 
@@ -357,6 +390,7 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testTrisToTets(mesh, net_tet, true);
+    testBcids(mesh);
   }
 
 
@@ -367,6 +401,7 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testHole(mesh, net_tet);
+    testBcids(mesh);
   }
 
 
@@ -378,6 +413,7 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testSphereShell(mesh, net_tet);
+    testBcids(mesh);
   }
 #endif
 
