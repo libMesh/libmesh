@@ -327,10 +327,12 @@ void VariationalSmootherConstraint::constrain()
           if (boundary_node_ids.find(node.id()) == boundary_node_ids.end())
             this->impose_constraint(node, subdomain_constraint);
 
-          // This subdomain boundary node lies on an external boundary, save it
-          // for later to combine with the external boundary constraint
-          else
-            subdomain_boundary_map[node.id()] = subdomain_constraint;
+          // This subdomain boundary node could lie on an external boundary, save it
+          // for later to combine with the external boundary constraint.
+          // We also save constraints for non-boundary nodes so we don't try to
+          // re-constrain the node when accessed from the neighboring elem.
+          // See subdomain_boundary_map.count call above.
+          subdomain_boundary_map[node.id()] = subdomain_constraint;
 
         }//for local_node_id
 
