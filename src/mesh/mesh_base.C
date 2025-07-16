@@ -947,6 +947,15 @@ void MeshBase::clear ()
 
 void MeshBase::add_ghosting_functor(GhostingFunctor & ghosting_functor)
 {
+  // We used to implicitly support duplicate inserts to std::set
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  _ghosting_functors.erase
+    (std::remove(_ghosting_functors.begin(),
+                 _ghosting_functors.end(),
+                 &ghosting_functor),
+     _ghosting_functors.end());
+#endif
+
   // We shouldn't have two copies of the same functor
   libmesh_assert(std::find(_ghosting_functors.begin(),
                            _ghosting_functors.end(),

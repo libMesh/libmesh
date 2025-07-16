@@ -2033,6 +2033,15 @@ void
 DofMap::add_coupling_functor(GhostingFunctor & coupling_functor,
                              bool to_mesh)
 {
+  // We used to implicitly support duplicate inserts to std::set
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  _coupling_functors.erase
+    (std::remove(_coupling_functors.begin(),
+                 _coupling_functors.end(),
+                 &coupling_functor),
+     _coupling_functors.end());
+#endif
+
   // We shouldn't have two copies of the same functor
   libmesh_assert(std::find(_coupling_functors.begin(),
                            _coupling_functors.end(),
@@ -2074,6 +2083,15 @@ void
 DofMap::add_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor,
                                        bool to_mesh)
 {
+  // We used to implicitly support duplicate inserts to std::set
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  _algebraic_ghosting_functors.erase
+    (std::remove(_algebraic_ghosting_functors.begin(),
+                 _algebraic_ghosting_functors.end(),
+                 &evaluable_functor),
+     _algebraic_ghosting_functors.end());
+#endif
+
   // We shouldn't have two copies of the same functor
   libmesh_assert(std::find(_algebraic_ghosting_functors.begin(),
                            _algebraic_ghosting_functors.end(),
