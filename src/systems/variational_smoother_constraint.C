@@ -304,7 +304,7 @@ void VariationalSmootherConstraint::constrain()
         if (sub_id1 == sub_id2)
           continue;
 
-        // elem and neighbor are in difference subdomains, and share nodes
+        // elem and neighbor are in different subdomains, and share nodes
         // that need to be constrained
         for (const auto local_node_id : elem->nodes_on_side(side))
         {
@@ -610,10 +610,6 @@ VariationalSmootherConstraint::get_neighbors_for_subdomain_constraint(
     }// for neigh_elem
   }
 
-  libmesh_assert_msg(!side_grouped_boundary_neighbors.empty(),
-      "No boundary neighbors found for node " << node << " on the subdomain "
-      << "boundary for subdomain " << sub_id);
-
   return side_grouped_boundary_neighbors;
 }
 
@@ -688,9 +684,6 @@ VariationalSmootherConstraint::get_neighbors_for_boundary_constraint(
     }
   }
 
-  libmesh_assert_msg(!side_grouped_boundary_neighbors.empty(),
-      "No boundary neighbors found for node " << node << " on the external boundary");
-
   return side_grouped_boundary_neighbors;
 }
 
@@ -704,7 +697,6 @@ ConstraintVariant VariationalSmootherConstraint::determine_constraint(
   std::vector<const Node *> neighbors;
   for (const auto &side : side_grouped_boundary_neighbors)
     neighbors.insert(neighbors.end(), side.begin(), side.end());
-  libmesh_assert_greater_equal(neighbors.size(), 1);
 
   // Constrain the node to it's current location
   if (dim == 1 || neighbors.size() == 1)
