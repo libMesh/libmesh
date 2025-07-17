@@ -362,9 +362,19 @@ void VariationalSmootherConstraint::constrain()
       const auto &subdomain_constraint = it->second;
       // Combine current boundary constraint with previously determined
       // subdomain_constraint
-      const auto combined_constraint =
-          intersect_constraints(subdomain_constraint, boundary_constraint);
-      this->impose_constraint(node, combined_constraint);
+      try
+      {
+        const auto combined_constraint =
+            intersect_constraints(subdomain_constraint, boundary_constraint);
+        this->impose_constraint(node, combined_constraint);
+      }
+      catch (const std::exception & e)
+      {
+        // This will catch cases where constraints have no intersection
+        // Fall back to fixed node constraint
+        this->impose_constraint(node, PointConstraint(node));
+      }
+
     } else
       this->impose_constraint(node, boundary_constraint);
 
@@ -741,7 +751,19 @@ ConstraintVariant VariationalSmootherConstraint::determine_constraint(
   auto it = valid_planes.begin();
   ConstraintVariant current = *it++;
   for (; it != valid_planes.end(); ++it)
-    current = intersect_constraints(current, *it);
+  {
+    try
+    {
+      current = intersect_constraints(current, *it);
+    }
+    catch (const std::exception & e)
+    {
+      // This will catch cases where constraints have no intersection
+      // Fall back to fixed node constraint
+      current = PointConstraint(node);
+      break;
+    }
+  }
 
   return current;
 }
