@@ -181,10 +181,14 @@ public:
     std::unordered_map<dof_id_type, Point> subdomain_boundary_node_id_to_point;
     if (multiple_subdomains)
     {
-      // Increment the subdomain id on the right half by 1
-      for (auto *elem : mesh.active_element_ptr_range())
-        if (elem->vertex_average()(0) > 0.5)
-          ++elem->subdomain_id();
+      // Modify the subdomain ids in an interesting way
+      for (auto *elem : mesh.active_element_ptr_range()) {
+        unsigned int subdomain_id = 0;
+        for (const auto d : make_range(dim))
+          if (elem->vertex_average()(d) > 0.5)
+            ++subdomain_id;
+        elem->subdomain_id() += subdomain_id;
+      }
 
       // This loop should NOT be combined with the one above because we need to
       // finish checking and updating subdomain ids for all elements before
