@@ -316,7 +316,7 @@ void VariationalSmootherConstraint::constrain()
           // Get the relevant nodal neighbors for the subdomain constraint
           const auto side_grouped_boundary_neighbors =
               get_neighbors_for_subdomain_constraint(
-                  mesh, node, sub_id1, sub_id2, nodes_to_elem_map);
+                  mesh, node, sub_id1, nodes_to_elem_map);
 
           // Determine which constraint should be imposed
           const auto subdomain_constraint =
@@ -533,8 +533,7 @@ bool VariationalSmootherConstraint::nodes_share_boundary_id(
 
 std::set<std::set<const Node *>>
 VariationalSmootherConstraint::get_neighbors_for_subdomain_constraint(
-    const MeshBase &mesh, const Node &node, const subdomain_id_type sub_id1,
-    const subdomain_id_type sub_id2,
+    const MeshBase &mesh, const Node &node, const subdomain_id_type sub_id,
     const std::unordered_map<dof_id_type, std::vector<const Elem *>>
         &nodes_to_elem_map) {
 
@@ -555,16 +554,15 @@ VariationalSmootherConstraint::get_neighbors_for_subdomain_constraint(
     const Elem * common_elem = nullptr;
     for (const auto * neigh_elem : elems_containing_neigh)
     {
-      if (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem) != elems_containing_node.end())
+      if (
+          (std::find(elems_containing_node.begin(), elems_containing_node.end(), neigh_elem)
+          != elems_containing_node.end())
+          // We should be able to find a common element on the sub_id boundary
+          && (neigh_elem->subdomain_id() == sub_id)
+      )
         common_elem = neigh_elem;
       else
         continue;
-
-      const auto common_sub_id = common_elem->subdomain_id();
-      libmesh_assert(common_sub_id == sub_id1 || common_sub_id == sub_id2);
-
-      // Define this allias for convenience
-      const auto & other_sub_id = (common_sub_id == sub_id1) ? sub_id2: sub_id1;
 
       // Now, determine whether node and neigh are on a side coincident
       // with the subdomain boundary
@@ -589,12 +587,12 @@ VariationalSmootherConstraint::get_neighbors_for_subdomain_constraint(
         // inside the common_side loop
         //
         // Does matched_side, containing both node and neigh, lie on the
-        // subdomain boundary between sub_id1 (= common_sub_id or other_sub_id)
-        // and sub_id2 (= other sub_id or common_sub_id)?
+        // sub_id subdomain boundary?
         const auto matched_neighbor_sub_id =
             common_elem->neighbor_ptr(matched_side)->subdomain_id();
         const bool is_matched_side_on_subdomain_boundary =
-            matched_neighbor_sub_id == other_sub_id;
+            matched_neighbor_sub_id != sub_id;
+
         if (is_matched_side_on_subdomain_boundary) {
           // Store all nodes that live on this side
           const auto nodes_on_side = common_elem->nodes_on_side(common_side);
@@ -611,6 +609,10 @@ VariationalSmootherConstraint::get_neighbors_for_subdomain_constraint(
 
     }// for neigh_elem
   }
+
+  libmesh_assert_msg(!side_grouped_boundary_neighbors.empty(),
+      "No boundary neighbors found for node " << node << " on the subdomain "
+      << "boundary for subdomain " << sub_id);
 
   return side_grouped_boundary_neighbors;
 }
@@ -685,6 +687,10 @@ VariationalSmootherConstraint::get_neighbors_for_boundary_constraint(
       }
     }
   }
+
+  libmesh_assert_msg(!side_grouped_boundary_neighbors.empty(),
+      "No boundary neighbors found for node " << node << " on the external boundary");
+
   return side_grouped_boundary_neighbors;
 }
 

@@ -213,10 +213,8 @@ private:
   /// Get the relevant nodal neighbors for a subdomain constraint.
   /// @param mesh The mesh being smoothed.
   /// @param node The node (on the subdomain boundary) being constrained.
-  /// @param sub_id1 The subdomain id of the block on one side of the subdomain
+  /// @param sub_id The subdomain id of the block on one side of the subdomain
   /// boundary.
-  /// @param sub_id2 The subdomain id of the block on the other side of the
-  /// subdomain boundary.
   /// @param nodes_to_elem_map A mapping from node id to containing element ids.
   /// @return A set of node pointer sets containing nodal neighbors to 'node' on
   /// the sub_id1-sub_id2 boundary. The subsets are grouped by element faces
@@ -224,8 +222,7 @@ private:
   /// in this set.
   static std::set<std::set<const Node *>>
   get_neighbors_for_subdomain_constraint(
-      const MeshBase &mesh, const Node &node, const subdomain_id_type sub_id1,
-      const subdomain_id_type sub_id2,
+      const MeshBase &mesh, const Node &node, const subdomain_id_type sub_id,
       const std::unordered_map<dof_id_type, std::vector<const Elem *>>
           &nodes_to_elem_map);
 
