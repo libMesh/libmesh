@@ -22,6 +22,9 @@
 #include "libmesh/system.h"
 #include "libmesh/dof_map.h"
 
+// C++ includes
+#include <variant>
+
 namespace libMesh
 {
 
