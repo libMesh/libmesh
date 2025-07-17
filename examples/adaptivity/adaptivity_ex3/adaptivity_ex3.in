@@ -37,7 +37,7 @@ indicator_type = kelly
 # Use an exact indicator with matchedhp/hp.
 # matchedhp refinement stupidly does both h and p or neither
 # on every element; hp refinement tries to do one or the other
-# refinement_type = h
+refinement_type = h
 
 # Mesh dimensionality
 # We generate 1D meshes on [-1, 0].
