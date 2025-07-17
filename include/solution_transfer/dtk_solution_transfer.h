@@ -48,7 +48,7 @@ namespace libMesh
 
 /**
  * Implementation of a SolutionTransfer object that uses the
- * DataTransferKit (https://github.com/CNERG/DataTransferKit) to
+ * DataTransferKit (https://github.com/ORNL-CEES/DataTransferKit) to
  * transfer variables back and forth between systems.
  *
  * \author Derek Gaston
