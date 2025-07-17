@@ -1285,15 +1285,22 @@ public:
   void remove_ghosting_functor(GhostingFunctor & ghosting_functor);
 
   /**
+   * Iterator type for ghosting functor ranges.  This has changed in
+   * the past and may change again; code should use auto or the type
+   * here.
+   */
+  typedef std::vector<GhostingFunctor *>::const_iterator GhostingFunctorIterator;
+
+  /**
    * Beginning of range of ghosting functors
    */
-  std::vector<GhostingFunctor *>::const_iterator ghosting_functors_begin() const
+  GhostingFunctorIterator ghosting_functors_begin() const
   { return _ghosting_functors.begin(); }
 
   /**
    * End of range of ghosting functors
    */
-  std::vector<GhostingFunctor *>::const_iterator ghosting_functors_end() const
+  GhostingFunctorIterator ghosting_functors_end() const
   { return _ghosting_functors.end(); }
 
   /**

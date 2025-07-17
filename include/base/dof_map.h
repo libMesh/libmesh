@@ -308,6 +308,13 @@ public:
   void add_default_ghosting();
 
   /**
+   * Iterator type for coupling and algebraic ghosting functor ranges.
+   * This has changed in the past and may change again; code should
+   * use auto or the type here.
+   */
+  typedef std::vector<GhostingFunctor *>::const_iterator GhostingFunctorIterator;
+
+  /**
    * Adds a functor which can specify coupling requirements for
    * creation of sparse matrices.
    * Degree of freedom pairs which match the elements and variables
@@ -356,13 +363,13 @@ public:
   /**
    * Beginning of range of coupling functors
    */
-  std::vector<GhostingFunctor *>::const_iterator coupling_functors_begin() const
+  GhostingFunctorIterator coupling_functors_begin() const
   { return _coupling_functors.begin(); }
 
   /**
    * End of range of coupling functors
    */
-  std::vector<GhostingFunctor *>::const_iterator coupling_functors_end() const
+  GhostingFunctorIterator coupling_functors_end() const
   { return _coupling_functors.end(); }
 
   /**
@@ -418,13 +425,13 @@ public:
   /**
    * Beginning of range of algebraic ghosting functors
    */
-  std::vector<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_begin() const
+  GhostingFunctorIterator algebraic_ghosting_functors_begin() const
   { return _algebraic_ghosting_functors.begin(); }
 
   /**
    * End of range of algebraic ghosting functors
    */
-  std::vector<GhostingFunctor *>::const_iterator algebraic_ghosting_functors_end() const
+  GhostingFunctorIterator algebraic_ghosting_functors_end() const
   { return _algebraic_ghosting_functors.end(); }
 
   /**
@@ -1849,8 +1856,8 @@ private:
   static void
   merge_ghost_functor_outputs (GhostingFunctor::map_type & elements_to_ghost,
                                CouplingMatricesSet & temporary_coupling_matrices,
-                               const std::vector<GhostingFunctor *>::const_iterator & gf_begin,
-                               const std::vector<GhostingFunctor *>::const_iterator & gf_end,
+                               const GhostingFunctorIterator & gf_begin,
+                               const GhostingFunctorIterator & gf_end,
                                const MeshBase::const_element_iterator & elems_begin,
                                const MeshBase::const_element_iterator & elems_end,
                                processor_id_type p);

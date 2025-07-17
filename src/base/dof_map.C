@@ -1613,8 +1613,8 @@ void
 DofMap::
 merge_ghost_functor_outputs(GhostingFunctor::map_type & elements_to_ghost,
                             CouplingMatricesSet & temporary_coupling_matrices,
-                            const std::vector<GhostingFunctor *>::const_iterator & gf_begin,
-                            const std::vector<GhostingFunctor *>::const_iterator & gf_end,
+                            const GhostingFunctorIterator & gf_begin,
+                            const GhostingFunctorIterator & gf_end,
                             const MeshBase::const_element_iterator & elems_begin,
                             const MeshBase::const_element_iterator & elems_end,
                             processor_id_type p)
