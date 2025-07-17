@@ -19,7 +19,30 @@
 namespace {
 using namespace libMesh;
 
+// Distortion function that doesn't distort boundary nodes
+// 2D only, use for LaplaceMeshSmoother
+class DistortSquare : public FunctionBase<Real> {
+  std::unique_ptr<FunctionBase<Real>> clone() const override {
+    return std::make_unique<DistortSquare>();
+  }
+
+  Real operator()(const Point &, const Real = 0.) override {
+    libmesh_not_implemented();
+  } // scalar-only API
+
+  // Skew inward based on a cubic function
+  void operator()(const Point &p, const Real, DenseVector<Real> &output) {
+    output.resize(3);
+    const Real eta = 2 * p(0) - 1;
+    const Real zeta = 2 * p(1) - 1;
+    output(0) = p(0) + (std::pow(eta, 3) - eta) * p(1) * (1 - p(1));
+    output(1) = p(1) + (std::pow(zeta, 3) - zeta) * p(0) * (1 - p(0));
+    output(2) = 0;
+  }
+};
+
 // Distortion function supporting 1D, 2D, and 3D
+// Use for VariationalMeshSmoother
 class DistortHyperCube : public FunctionBase<Real> {
 public:
   DistortHyperCube(const unsigned int dim) : _dim(dim) {}
@@ -160,8 +183,73 @@ public:
 
   void tearDown() {}
 
-  void testSmoother(ReplicatedMesh & mesh, MeshSmoother & smoother, const ElemType type, const bool multiple_subdomains=false)
-  {
+  void testLaplaceSmoother(ReplicatedMesh &mesh, MeshSmoother &smoother,
+                           ElemType type) {
+    LOG_UNIT_TEST;
+
+    constexpr unsigned int n_elems_per_side = 4;
+
+    MeshTools::Generation::build_square(mesh, n_elems_per_side,
+                                        n_elems_per_side, 0., 1., 0., 1., type);
+
+    // Move it around so we have something that needs smoothing
+    DistortSquare ds;
+    MeshTools::Modification::redistribute(mesh, ds);
+
+    // Assert the distortion is as expected
+    auto center_distortion_is = [](const Node &node, int d, bool distortion,
+                                   Real distortion_tol = TOLERANCE) {
+      const Real r = node(d);
+      const Real R = r * n_elems_per_side;
+      CPPUNIT_ASSERT_GREATER(-TOLERANCE * TOLERANCE, r);
+      CPPUNIT_ASSERT_GREATER(-TOLERANCE * TOLERANCE, 1 - r);
+
+      // If we're at the boundaries we should *never* be distorted
+      if (std::abs(node(0)) < TOLERANCE * TOLERANCE ||
+          std::abs(node(0) - 1) < TOLERANCE * TOLERANCE) {
+        const Real R1 = node(1) * n_elems_per_side;
+        CPPUNIT_ASSERT_LESS(TOLERANCE * TOLERANCE,
+                            std::abs(R1 - std::round(R1)));
+        return true;
+      }
+
+      if (std::abs(node(1)) < TOLERANCE * TOLERANCE ||
+          std::abs(node(1) - 1) < TOLERANCE * TOLERANCE) {
+        const Real R0 = node(0) * n_elems_per_side;
+        CPPUNIT_ASSERT_LESS(TOLERANCE * TOLERANCE,
+                            std::abs(R0 - std::round(R0)));
+
+        return true;
+      }
+
+      // If we're at the center we're fine
+      if (std::abs(r - 0.5) < TOLERANCE * TOLERANCE)
+        return true;
+
+      return ((std::abs(R - std::round(R)) > distortion_tol) == distortion);
+    };
+
+    for (auto node : mesh.node_ptr_range()) {
+      CPPUNIT_ASSERT(center_distortion_is(*node, 0, true));
+      CPPUNIT_ASSERT(center_distortion_is(*node, 1, true));
+    }
+
+    // Enough iterations to mostly fix us up.  Laplace seems to be at 1e-3
+    // tolerance by iteration 6, so hopefully everything is there on any
+    // system by 8.
+    for (unsigned int i = 0; i != 8; ++i)
+      smoother.smooth();
+
+    // Make sure we're not too distorted anymore.
+    for (auto node : mesh.node_ptr_range()) {
+      CPPUNIT_ASSERT(center_distortion_is(*node, 0, false, 1e-3));
+      CPPUNIT_ASSERT(center_distortion_is(*node, 1, false, 1e-3));
+    }
+  }
+
+  void testVariationalSmoother(ReplicatedMesh &mesh, MeshSmoother &smoother,
+                               const ElemType type,
+                               const bool multiple_subdomains = false) {
     LOG_UNIT_TEST;
 
     const auto dim = ReferenceElem::get(type).dim();
@@ -308,28 +396,21 @@ public:
       // Transform the square mesh of triangles to a parallelogram mesh of
       // triangles. This will allow the Variational Smoother to smooth the mesh
       // to the optimal case of equilateral triangles
-      const bool is_variational_smoother_type =
-          (dynamic_cast<VariationalMeshSmoother *>(&smoother) != nullptr);
-      if (type == TRI3 && is_variational_smoother_type) {
+      if (type == TRI3) {
         SquareToParallelogram stp;
         MeshTools::Modification::redistribute(mesh, stp);
       }
 
-    // Enough iterations to mostly fix us up.  Laplace seems to be at 1e-3
-    // tolerance by iteration 6, so hopefully everything is there on any
-    // system by 8.
-    const unsigned int num_iterations = is_variational_smoother_type ? 1 : 8;
-    for (unsigned int i=0; i != num_iterations; ++i)
       smoother.smooth();
 
-    // Transform the parallelogram mesh back to a square mesh. In the case of the
-    // Variational Smoother, equilateral triangular elements will be transformed
-    // into right triangular elements that align with the original undistorted mesh.
-    if (type == TRI3 && is_variational_smoother_type)
-    {
-      ParallelogramToSquare pts;
-      MeshTools::Modification::redistribute(mesh, pts);
-    }
+      // Transform the parallelogram mesh back to a square mesh. In the case of
+      // the Variational Smoother, equilateral triangular elements will be
+      // transformed into right triangular elements that align with the original
+      // undistorted mesh.
+      if (type == TRI3) {
+        ParallelogramToSquare pts;
+        MeshTools::Modification::redistribute(mesh, pts);
+      }
 
     // Make sure we're not too distorted anymore OR that interval subdomain boundary nodes did not change.
     for (auto node : mesh.node_ptr_range())
@@ -341,13 +422,12 @@ public:
       }
   }
 
-
   void testLaplaceQuad()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     LaplaceMeshSmoother laplace(mesh);
 
-    testSmoother(mesh, laplace, QUAD4);
+    testLaplaceSmoother(mesh, laplace, QUAD4);
   }
 
 
@@ -356,7 +436,7 @@ public:
     ReplicatedMesh mesh(*TestCommWorld);
     LaplaceMeshSmoother laplace(mesh);
 
-    testSmoother(mesh, laplace, TRI3);
+    testLaplaceSmoother(mesh, laplace, TRI3);
   }
 
 
@@ -365,14 +445,14 @@ public:
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testSmoother(mesh, variational, EDGE2);
+    testVariationalSmoother(mesh, variational, EDGE2);
   }
 
   void testVariationalEdgeMultipleSubdomains() {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testSmoother(mesh, variational, EDGE2, true);
+    testVariationalSmoother(mesh, variational, EDGE2, true);
   }
 
   void testVariationalQuad()
@@ -380,14 +460,14 @@ public:
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testSmoother(mesh, variational, QUAD4);
+    testVariationalSmoother(mesh, variational, QUAD4);
   }
 
   void testVariationalQuadMultipleSubdomains() {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testSmoother(mesh, variational, QUAD4, true);
+    testVariationalSmoother(mesh, variational, QUAD4, true);
   }
 
   void testVariationalTri()
@@ -395,28 +475,28 @@ public:
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testSmoother(mesh, variational, TRI3);
+    testVariationalSmoother(mesh, variational, TRI3);
   }
 
   void testVariationalTriMultipleSubdomains() {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testSmoother(mesh, variational, TRI3, true);
+    testVariationalSmoother(mesh, variational, TRI3, true);
   }
 
   void testVariationalHex() {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testSmoother(mesh, variational, HEX8);
+    testVariationalSmoother(mesh, variational, HEX8);
   }
 
   void testVariationalHexMultipleSubdomains() {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testSmoother(mesh, variational, HEX8, true);
+    testVariationalSmoother(mesh, variational, HEX8, true);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
