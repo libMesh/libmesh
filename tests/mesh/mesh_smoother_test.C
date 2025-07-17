@@ -142,9 +142,14 @@ public:
   CPPUNIT_TEST( testLaplaceQuad );
   CPPUNIT_TEST( testLaplaceTri );
 #if defined(LIBMESH_ENABLE_VSMOOTHER) && defined(LIBMESH_HAVE_SOLVER)
-  CPPUNIT_TEST( testVariationalQuad );
-  CPPUNIT_TEST( testVariationalTri );
+  CPPUNIT_TEST(testVariationalEdge);
+  CPPUNIT_TEST(testVariationalEdgeMultipleSubdomains);
+  CPPUNIT_TEST(testVariationalQuad);
   CPPUNIT_TEST( testVariationalQuadMultipleSubdomains );
+  CPPUNIT_TEST(testVariationalTri);
+  CPPUNIT_TEST(testVariationalTriMultipleSubdomains);
+  CPPUNIT_TEST(testVariationalHex);
+  CPPUNIT_TEST(testVariationalHexMultipleSubdomains);
 #  endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
 
@@ -170,8 +175,24 @@ public:
     libmesh_error_msg_if(n_elems_per_side % 2 != 1,
                          "n_elems_per_side should be odd.");
 
-    MeshTools::Generation::build_square(mesh, n_elems_per_side, n_elems_per_side,
-                                        0.,1.,0.,1., type);
+    switch (dim) {
+    case 1:
+      MeshTools::Generation::build_line(mesh, n_elems_per_side, 0., 1., type);
+      break;
+    case 2:
+      MeshTools::Generation::build_square(
+          mesh, n_elems_per_side, n_elems_per_side, 0., 1., 0., 1., type);
+      break;
+
+    case 3:
+      MeshTools::Generation::build_cube(mesh, n_elems_per_side,
+                                        n_elems_per_side, n_elems_per_side, 0.,
+                                        1., 0., 1., 0., 1., type);
+      break;
+
+    default:
+      libmesh_error_msg("Unsupported dimension " << dim);
+    }
 
     // Move it around so we have something that needs smoothing
     DistortHyperCube dh(dim);
@@ -340,6 +361,20 @@ public:
 
 
 #ifdef LIBMESH_ENABLE_VSMOOTHER
+  void testVariationalEdge() {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testSmoother(mesh, variational, EDGE2);
+  }
+
+  void testVariationalEdgeMultipleSubdomains() {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testSmoother(mesh, variational, EDGE2, true);
+  }
+
   void testVariationalQuad()
   {
     ReplicatedMesh mesh(*TestCommWorld);
@@ -348,6 +383,12 @@ public:
     testSmoother(mesh, variational, QUAD4);
   }
 
+  void testVariationalQuadMultipleSubdomains() {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testSmoother(mesh, variational, QUAD4, true);
+  }
 
   void testVariationalTri()
   {
@@ -357,12 +398,25 @@ public:
     testSmoother(mesh, variational, TRI3);
   }
 
-  void testVariationalQuadMultipleSubdomains()
-  {
+  void testVariationalTriMultipleSubdomains() {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testSmoother(mesh, variational, QUAD4, true);
+    testSmoother(mesh, variational, TRI3, true);
+  }
+
+  void testVariationalHex() {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testSmoother(mesh, variational, HEX8);
+  }
+
+  void testVariationalHexMultipleSubdomains() {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testSmoother(mesh, variational, HEX8, true);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
