@@ -46,7 +46,7 @@ namespace SparsityPattern
 // a full DofMap definition is available.
 Build::Build (const DofMap & dof_map_in,
               const CouplingMatrix * dof_coupling_in,
-              const std::set<GhostingFunctor *> & coupling_functors_in,
+              const std::vector<GhostingFunctor *> & coupling_functors_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in,
               const bool calculate_constrained_in,
