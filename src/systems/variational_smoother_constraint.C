@@ -404,7 +404,14 @@ void VariationalSmootherConstraint::constrain_node_to_plane(const Node & node, c
   // We choose to constrain the dimension with the largest magnitude coefficient
   // This approach ensures the coefficients added to the constraint_row
   // (i.e., -c_xyz / c_max) have as small magnitude as possible
-  unsigned int constrained_dim;
+
+  // We initialize this to avoid maybe-uninitialized compiler error
+  unsigned int constrained_dim = 0;
+
+  // Let's assert that we have a nonzero normal to ensure that constrained_dim
+  // is always set
+  libmesh_assert(ref_normal_vec.norm() > TOLERANCE);
+
   Real max_abs_coef = 0.;
   for (const auto d : make_range(dim))
   {
