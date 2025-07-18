@@ -50,14 +50,16 @@ public:
   /**
    * Constructor
    * @param point The point defining the constraint.
+   * @param tol The tolerance to use for numerical comparisons.
    */
-  PointConstraint(const Point &point);
+  PointConstraint(const Point &point, const Real &tol = TOLERANCE);
 
   /**
    * Comparison operator for ordering PointConstraint objects.
    * A PointConstraint is considered less than another if its location
    * is lexicographically less than the other's location.
    * @param other The PointConstraint to compare with.
+   * @param tol The tolerance to use for numerical comparisons.
    * @return True if this PointConstraint is less than the other.
    */
   bool operator<(const PointConstraint &other) const;
@@ -86,12 +88,22 @@ public:
    */
   const Point &point() const { return _point; }
 
+  /**
+   * Const getter for the _tol attribute
+   */
+  const Real &tol() const { return _tol; }
+
 private:
   // Life is easier if we don't make this const
   /**
    * Location of constraint
    */
   Point _point;
+
+  /**
+   * Tolerance to use for numerical comparisons
+   */
+  Real _tol;
 };
 
 /**
@@ -105,8 +117,10 @@ public:
    * Constructor
    * @param point A point on the constraining line.
    * @param direction the direction of the constraining line.
+   * @param tol The tolerance to use for numerical comparisons.
    */
-  LineConstraint(const Point &point, const Point &direction);
+  LineConstraint(const Point &point, const Point &direction,
+                 const Real &tol = TOLERANCE);
 
   /**
    * Comparison operator for ordering LineConstraint objects.
@@ -168,12 +182,27 @@ public:
    */
   const Point &direction() const { return _direction; }
 
+  /**
+   * Const getter for the _tol attribute
+   */
+  const Real &tol() const { return _tol; }
+
 private:
   // Life is easier if we don't make these const
-  /// A point on the constraining line
+  /**
+   * A point on the constraining line
+   */
   Point _point;
-  /// Direction of the constraining line
+
+  /**
+   * Direction of the constraining line
+   */
   Point _direction;
+
+  /**
+   * Tolerance to use for numerical comparisons
+   */
+  Real _tol;
 };
 
 /**
@@ -188,8 +217,10 @@ public:
    * Constructor
    * @param point A point on the constraining plane.
    * @param normal the direction normal to the constraining plane.
+   * @param tol The tolerance to use for numerical comparisons.
    */
-  PlaneConstraint(const Point &point, const Point &normal);
+  PlaneConstraint(const Point &point, const Point &normal,
+                  const Real &tol = TOLERANCE);
 
   /**
    * Comparison operator for ordering PlaneConstraint objects.
@@ -258,12 +289,27 @@ public:
    */
   const Point &normal() const { return _normal; }
 
+  /**
+   * Const getter for the _tol attribute
+   */
+  const Real &tol() const { return _tol; }
+
 private:
   // Life is easier if we don't make these const
-  /// A point on the constraining plane
+  /**
+   * A point on the constraining plane
+   */
   Point _point;
-  /// The direction normal to the constraining plane
+
+  /**
+   * The direction normal to the constraining plane
+   */
   Point _normal;
+
+  /**
+   * Tolerance to use for numerical comparisons
+   */
+  Real _tol;
 };
 
 /**
