@@ -9,6 +9,7 @@
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
+#include "libmesh/enum_xdr_mode.h"
 
 
 using namespace libMesh;
@@ -43,6 +44,12 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( test_subdomain_id_sets );
+#ifdef LIBMESH_HAVE_PETSC
+  CPPUNIT_TEST( vectorMeshFunctionLagrange );
+  CPPUNIT_TEST( vectorMeshFunctionNedelec );
+  CPPUNIT_TEST( vectorMeshFunctionRaviartThomas );
+  CPPUNIT_TEST( mixedScalarAndVectorVariables );
+#endif // LIBMESH_HAVE_PETSC
 #endif
 #if LIBMESH_DIM > 2
 #ifdef LIBMESH_ENABLE_AMR
@@ -220,7 +227,138 @@ public:
       }
   }
 #endif // LIBMESH_ENABLE_AMR
+
+#ifdef LIBMESH_HAVE_PETSC
+
+  // A helper function that populates the solution data from output files
+  DenseVector<Number> read_variable_info_from_output_data(const std::string & mesh_name,
+                                                          const std::string & solutions_name)
+  {
+    DenseVector<Number> output;
+
+    // Reading mesh and solution information from XDA files
+    ReplicatedMesh mesh(*TestCommWorld);
+    mesh.read(mesh_name);
+    EquationSystems es(mesh);
+    es.read(solutions_name, READ,
+            EquationSystems::READ_HEADER |
+                EquationSystems::READ_DATA |
+                EquationSystems::READ_ADDITIONAL_DATA);
+    es.update();
+
+    // Pulling the correct system and variable information from
+    // the XDA files (the default system name is "nl0")
+    System & sys = es.get_system<System>("nl0");
+    std::unique_ptr<NumericVector<Number>> mesh_function_vector =
+        NumericVector<Number>::build(es.comm());
+    mesh_function_vector->init(sys.n_dofs(), false, SERIAL);
+    sys.solution->localize(*mesh_function_vector);
+
+    // Pulling the total number of variables stored in XDA file
+    std::vector<unsigned int> variables;
+    sys.get_all_variable_numbers(variables);
+    std::sort(variables.begin(),variables.end());
+
+    // Setting up libMesh::MeshFunction
+    MeshFunction mesh_function(es, *mesh_function_vector,
+                                sys.get_dof_map(), variables);
+    mesh_function.init();
+
+    // Defining input parameters for MeshFunction::operator()
+    const std::set<subdomain_id_type> * subdomain_ids = nullptr;
+    const Point & p = Point(0.5, 0.5);
+
+    // Supplying the variable values at center of mesh to output
+    (mesh_function)(p, 0.0, output, subdomain_ids);
+
+    return output;
+  }
+
+  // Tests the projection of Lagrange Vectors using MeshFunction
+  void vectorMeshFunctionLagrange()
+  {
+    LOG_UNIT_TEST;
+
+    // Populating the solution data using a helper function
+    DenseVector<Number> output = read_variable_info_from_output_data("solutions/lagrange_vec_solution_mesh.xda","solutions/lagrange_vec_solution.xda");
+    Gradient output_vec = VectorValue(output(0),output(1));
+
+    // Expected value at center mesh
+    Gradient output_expected = VectorValue(0.100977281077292,0.201954562154583);
+
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(0)), libMesh::libmesh_real(output_expected(0)),
+                            TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(1)), libMesh::libmesh_real(output_expected(1)),
+                            TOLERANCE * TOLERANCE);
+  }
+
+  // Tests the projection of Nedelec Vectors using MeshFunction
+  void vectorMeshFunctionNedelec()
+  {
+    LOG_UNIT_TEST;
+
+    // Populating the solution data using a helper function
+    DenseVector<Number> output = read_variable_info_from_output_data("solutions/nedelec_one_solution_mesh.xda","solutions/nedelec_one_solution.xda");
+    Gradient output_vec = VectorValue(output(0),output(1));
+
+    // Expected value at center mesh
+    Gradient output_expected = VectorValue(0.0949202883998996,-0.0949202883918033);
+
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(0)), libMesh::libmesh_real(output_expected(0)),
+                            TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(1)), libMesh::libmesh_real(output_expected(1)),
+                            TOLERANCE * TOLERANCE);
+  }
+
+  // Tests the projection of Raviart Thomas Vectors using MeshFunction
+  void vectorMeshFunctionRaviartThomas()
+  {
+    LOG_UNIT_TEST;
+
+    // Populating the solution data using a helper function
+    DenseVector<Number> output = read_variable_info_from_output_data("solutions/raviart_thomas_solution_mesh.xda","solutions/raviart_thomas_solution.xda");
+    Gradient output_vec = VectorValue(output(0),output(1));
+
+    // Expected value at center mesh
+    Gradient output_expected = VectorValue(0.0772539939808116,-0.0772537479511396);
+
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(0)), libMesh::libmesh_real(output_expected(0)),
+                            TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_vec(1)), libMesh::libmesh_real(output_expected(1)),
+                            TOLERANCE * TOLERANCE);
+  }
+
+  // Tests MeshFunction for mixed scalar and vector variable outputs
+  // In this case, the variables types are:
+  //  - variable index: 0, variable family: Raviart Thomas, Order: First
+  //  - variable index: 1, variable family: Monomial, Order: Constant
+  //  - variable index: 2, variable family: Scalar, Order: First
+  void mixedScalarAndVectorVariables()
+  {
+    LOG_UNIT_TEST;
+
+    // Populating the solution data using a helper function
+    DenseVector<Number> output = read_variable_info_from_output_data("solutions/raviart_thomas_solution_mesh.xda","solutions/raviart_thomas_solution.xda");
+    Gradient output_raviart_thomas = VectorValue(output(0),output(1));
+
+    // Expected value at center mesh
+    Gradient raviart_thomas_expected = VectorValue(0.0772539939808116,-0.0772537479511396);
+    Number monomial_expected = -0.44265566716952;
+    Number scalar_expected = -2.86546e-18;
+
+    // Checking Raviart Thomas variable family values
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_raviart_thomas(0)), libMesh::libmesh_real(raviart_thomas_expected(0)),
+                            TOLERANCE * TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output_raviart_thomas(1)), libMesh::libmesh_real(raviart_thomas_expected(1)),
+                            TOLERANCE * TOLERANCE);
+    // Checking Monomial variable family value
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(2)), libMesh::libmesh_real(monomial_expected),
+                            TOLERANCE * TOLERANCE);
+    // Checking scalar variable family value
+    LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(output(3)), libMesh::libmesh_real(scalar_expected),
+                            TOLERANCE * TOLERANCE);
+  }
+#endif // LIBMESH_HAVE_PETSC
 };
 
-
-CPPUNIT_TEST_SUITE_REGISTRATION( MeshFunctionTest );
+CPPUNIT_TEST_SUITE_REGISTRATION(MeshFunctionTest);
