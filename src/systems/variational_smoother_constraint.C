@@ -26,11 +26,14 @@ namespace libMesh
 PointConstraint::PointConstraint(const Point &p) : location(p) {}
 
 bool PointConstraint::operator<(const PointConstraint &other) const {
+  if (*this == other)
+    return false;
+
   return location < other.location;
 }
 
 bool PointConstraint::operator==(const PointConstraint &other) const {
-  return location == other.location;
+  return location.absolute_fuzzy_equals(other.location, TOLERANCE);
 }
 
 ConstraintVariant
@@ -72,9 +75,12 @@ LineConstraint::LineConstraint(const Point &p, const Point &d) {
 }
 
 bool LineConstraint::operator<(const LineConstraint &other) const {
+  if (*this == other)
+    return false;
+
   if (!(dir.absolute_fuzzy_equals(other.dir, TOLERANCE)))
     return dir < other.dir;
-  return (dir * r0) < (other.dir * other.r0) - TOLERANCE;
+  return (dir * r0) < (other.dir * other.r0);
 }
 
 bool LineConstraint::operator==(const LineConstraint &other) const {
@@ -163,9 +169,12 @@ PlaneConstraint::PlaneConstraint(const Point &p, const Point &n) {
 }
 
 bool PlaneConstraint::operator<(const PlaneConstraint &other) const {
+  if (*this == other)
+    return false;
+
   if (!(normal.absolute_fuzzy_equals(other.normal, TOLERANCE)))
     return normal < other.normal;
-  return (normal * point) < (other.normal * other.point) - TOLERANCE;
+  return (normal * point) < (other.normal * other.point);
 }
 
 bool PlaneConstraint::operator==(const PlaneConstraint &other) const {
