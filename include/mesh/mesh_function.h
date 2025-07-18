@@ -27,7 +27,6 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/tree_base.h"
 #include "libmesh/parallel_object.h"
-#include "libmesh/fe.h"
 
 // C++ includes
 #include <cstddef>
