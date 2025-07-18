@@ -371,14 +371,12 @@ void VariationalSmootherConstraint::constrain()
       const auto &subdomain_constraint = it->second;
       // Combine current boundary constraint with previously determined
       // subdomain_constraint
-      try
-      {
+      libmesh_try {
         const auto combined_constraint =
             intersect_constraints(subdomain_constraint, boundary_constraint);
         this->impose_constraint(node, combined_constraint);
       }
-      catch (const std::exception & e)
-      {
+      libmesh_catch(const std::exception &e) {
         // This will catch cases where constraints have no intersection
         // Fall back to fixed node constraint
         this->impose_constraint(node, PointConstraint(node));
@@ -766,12 +764,8 @@ ConstraintVariant VariationalSmootherConstraint::determine_constraint(
   ConstraintVariant current = *it++;
   for (; it != valid_planes.end(); ++it)
   {
-    try
-    {
-      current = intersect_constraints(current, *it);
-    }
-    catch (const std::exception & e)
-    {
+    libmesh_try { current = intersect_constraints(current, *it); }
+    libmesh_catch(const std::exception &e) {
       // This will catch cases where constraints have no intersection
       // Fall back to fixed node constraint
       current = PointConstraint(node);
