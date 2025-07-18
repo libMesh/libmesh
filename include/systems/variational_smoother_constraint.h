@@ -75,6 +75,8 @@ struct PointConstraint {
    * @param other The constraint to intersect with.
    * @return The most specific ConstraintVariant that satisfies both
    * constraints.
+   * @throw libMesh::LogicError If the constraints are incompatible and cannot
+   * intersect.
    */
   ConstraintVariant intersect(const ConstraintVariant &other) const;
 };
@@ -140,6 +142,8 @@ struct LineConstraint {
    * @param other The constraint to intersect with.
    * @return The most specific ConstraintVariant that satisfies both
    * constraints.
+   * @throw libMesh::LogicError If the constraints are incompatible and cannot
+   * intersect.
    */
   ConstraintVariant intersect(const ConstraintVariant &other) const;
 };
@@ -212,6 +216,8 @@ struct PlaneConstraint {
    * @param other The constraint to intersect with.
    * @return The most specific ConstraintVariant that satisfies both
    * constraints.
+   * @throw libMesh::LogicError If the constraints are incompatible and cannot
+   * intersect.
    */
   ConstraintVariant intersect(const ConstraintVariant &other) const;
 };
