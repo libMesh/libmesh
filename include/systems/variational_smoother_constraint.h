@@ -52,8 +52,20 @@ struct PointConstraint {
    */
   PointConstraint(const Point &p);
 
+  /**
+   * Comparison operator for ordering PointConstraint objects.
+   * A PointConstraint is considered less than another if its location
+   * is lexicographically less than the other's location.
+   * @param other The PointConstraint to compare with.
+   * @return True if this PointConstraint is less than the other.
+   */
   bool operator<(const PointConstraint &other) const;
 
+  /**
+   * Equality operator.
+   * @param other The PointConstraint to compare with.
+   * @return True if both PointConstraints have the same location.
+   */
   bool operator==(const PointConstraint &other) const;
 
   /**
@@ -83,8 +95,21 @@ struct LineConstraint {
    */
   LineConstraint(const Point &p, const Point &d);
 
+  /**
+   * Comparison operator for ordering LineConstraint objects.
+   * The comparison is primarily based on the direction vector. If the direction
+   * vectors are equal (within tolerance), the tie is broken using the dot
+   * product of the direction with the base point.
+   * @param other The LineConstraint to compare with.
+   * @return True if this LineConstraint is less than the other.
+   */
   bool operator<(const LineConstraint &other) const;
 
+  /**
+   * Equality operator.
+   * @param other The LineConstraint to compare with.
+   * @return True if both LineConstraints represent the same line.
+   */
   bool operator==(const LineConstraint &other) const;
 
   /**
@@ -135,8 +160,21 @@ struct PlaneConstraint {
    */
   PlaneConstraint(const Point &p, const Point &n);
 
+  /**
+   * Comparison operator for ordering PlaneConstraint objects.
+   * The comparison is primarily based on the normal vector. If the normal
+   * vectors are equal (within tolerance), the tie is broken using the dot
+   * product of the normal with the point on the plane.
+   * @param other The PlaneConstraint to compare with.
+   * @return True if this PlaneConstraint is less than the other.
+   */
   bool operator<(const PlaneConstraint &other) const;
 
+  /**
+   * Equality operator.
+   * @param other The PlaneConstraint to compare with.
+   * @return True if both PlaneConstraints represent the same plane.
+   */
   bool operator==(const PlaneConstraint &other) const;
 
   /**
