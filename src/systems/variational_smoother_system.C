@@ -18,15 +18,16 @@
 #include "libmesh/variational_smoother_system.h"
 
 #include "libmesh/elem.h"
+#include "libmesh/face_tri3.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/mesh.h"
+#include "libmesh/numeric_vector.h"
+#include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/utility.h"
-#include "libmesh/numeric_vector.h"
-#include "libmesh/parallel_ghost_sync.h"
 
 // C++ includes
 #include <functional> // std::reference_wrapper
@@ -89,16 +90,16 @@ void VariationalSmootherSystem::init_data ()
     }
   }
 
-  this->compute_element_reference_volume();
+  this->prepare_for_smoothing();
 }
 
-void VariationalSmootherSystem::compute_element_reference_volume()
-{
+void VariationalSmootherSystem::prepare_for_smoothing() {
   std::unique_ptr<DiffContext> con = this->build_context();
   FEMContext & femcontext = cast_ref<FEMContext &>(*con);
   this->init_context(femcontext);
 
   const auto & mesh = this->get_mesh();
+  const auto dim = mesh.mesh_dimension();
 
   Real elem_averaged_det_J_sum = 0.;
 
@@ -108,23 +109,96 @@ void VariationalSmootherSystem::compute_element_reference_volume()
   const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
   const auto & JxW = fe_map.get_JxW();
 
+  std::map<ElemType, std::vector<Real>> target_elem_inverse_jacobian_dets;
+
   for (const auto * elem : mesh.active_local_element_ptr_range())
   {
     femcontext.pre_fe_reinit(*this, elem);
     femcontext.elem_fe_reinit();
 
-    const auto elem_integrated_det_J = std::accumulate(JxW.begin(), JxW.end(), 0.);
+    // Add target element info, if applicable
+    if (_target_inverse_jacobians.find(elem->type()) ==
+        _target_inverse_jacobians.end()) {
+      // Create FEMap to compute target_element mapping information
+      FEMap fe_map_target;
+
+      // pre-request mapping derivatives
+      const auto &dxyzdxi = fe_map_target.get_dxyzdxi();
+      const auto &dxyzdeta = fe_map_target.get_dxyzdeta();
+      // const auto & dxyzdzeta = fe_map_target.get_dxyzdzeta();
+
+      const auto &qrule_points = femcontext.get_element_qrule().get_points();
+      const auto &qrule_weights = femcontext.get_element_qrule().get_weights();
+      const auto nq_points = femcontext.get_element_qrule().n_points();
+
+      // If the target element is the reference element, Jacobian matrix is
+      // identity, det of inverse is 1. This will only be overwritten if a
+      // different target elemen is explicitly specified.
+      target_elem_inverse_jacobian_dets[elem->type()] =
+          std::vector<Real>(nq_points, 1.0);
+
+      switch (elem->type()) {
+      case TRI3: {
+        // Build target element: an equilateral triangle
+        Tri3 target_elem;
+
+        // equilateral triangle side length that preserves area of reference
+        // element
+        const Real sqrt_3 = std::sqrt(3.);
+        const auto ref_volume = target_elem.reference_elem()->volume();
+        const auto s = std::sqrt(4. / sqrt_3 * ref_volume);
+
+        // Set nodes of target element to form an equilateral triangle
+        Node node_0 = Node(0., 0.);
+        Node node_1 = Node(s, 0.);
+        Node node_2 = Node(0.5 * s, 0.5 * s * sqrt_3);
+        target_elem.set_node(0) = &node_0;
+        target_elem.set_node(1) = &node_1;
+        target_elem.set_node(2) = &node_2;
+
+        // build map
+        fe_map_target.init_reference_to_physical_map(dim, qrule_points,
+                                                     &target_elem);
+        fe_map_target.compute_map(dim, qrule_weights, &target_elem,
+                                  /*d2phi=*/false);
+
+        // Yes, triangle-to-triangle mappings have constant Jacobians, but we
+        // will keep things general for now
+        _target_inverse_jacobians[target_elem.type()] =
+            std::vector<RealTensor>(nq_points);
+        for (const auto qp : make_range(nq_points)) {
+          const RealTensor H_inv =
+              RealTensor(dxyzdxi[qp](0), dxyzdeta[qp](0), 0, dxyzdxi[qp](1),
+                         dxyzdeta[qp](1), 0, 0, 0, 1)
+                  .inverse();
+
+          _target_inverse_jacobians[target_elem.type()][qp] = H_inv;
+          target_elem_inverse_jacobian_dets[target_elem.type()][qp] =
+              H_inv.det();
+        }
+
+        break;
+      }
+
+      default:
+        break;
+      }
+    }
+
+    Real elem_integrated_det_J(0.);
+    for (const auto qp : index_range(JxW))
+      elem_integrated_det_J +=
+          JxW[qp] * target_elem_inverse_jacobian_dets[elem->type()][qp];
     const auto ref_elem_vol = elem->reference_elem()->volume();
     elem_averaged_det_J_sum += elem_integrated_det_J / ref_elem_vol;
-  }
+
+  } // for elem
 
   // Get contributions from elements on other processors
   mesh.comm().sum(elem_averaged_det_J_sum);
 
   _ref_vol = elem_averaged_det_J_sum / mesh.n_active_elem();
 }
-
-
 
 void VariationalSmootherSystem::init_context(DiffContext & context)
 {
@@ -263,6 +337,11 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         default:
           libmesh_error_msg("Unsupported dimension.");
       }
+
+      // Apply any applicable target element transformations
+      if (_target_inverse_jacobians.find(elem.type()) !=
+          _target_inverse_jacobians.end())
+        S = S * _target_inverse_jacobians[elem.type()][qp];
 
       // Compute quantities needed for the smoothing algorithm
 

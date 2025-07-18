@@ -81,9 +81,12 @@ protected:
                                         libMesh::DiffContext & context) override;
 
   /* Computes the element reference volume used in the dilation metric
-   * The reference value is set to the averaged value of all elements' average |J|.
+   * The reference value is set to the averaged value of all elements' average
+   * |J|. Also computes any applicable target element inverse Jacobians. Target
+   * elements are relavant when the reference element does not minimize the
+   * distortion metric.
    */
-  void compute_element_reference_volume();
+  void prepare_for_smoothing();
 
   /// The small nonzero constant to prevent zero denominators (degenerate elements only)
   const Real _epsilon_squared;
@@ -93,6 +96,11 @@ protected:
 
   /// The relative weight to give the dilation metric. The distortion metric is given weight 1 - _dilation_weight.
   Real _dilation_weight;
+
+  /* Map to hold target qp-dependent element inverse reference-to-target mapping
+   * Jacobians, if any
+   */
+  std::map<ElemType, std::vector<RealTensor>> _target_inverse_jacobians;
 };
 
 } // namespace libMesh
