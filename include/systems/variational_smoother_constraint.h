@@ -28,9 +28,9 @@
 namespace libMesh
 {
 
-struct PointConstraint;
-struct LineConstraint;
-struct PlaneConstraint;
+class PointConstraint;
+class LineConstraint;
+class PlaneConstraint;
 
 /**
  * Type used to store a constraint that may be a PlaneConstraint,
@@ -42,15 +42,16 @@ using ConstraintVariant =
 /**
  * Represents a fixed point constraint.
  */
-struct PointConstraint {
-  Point location;
+class PointConstraint {
+
+public:
   PointConstraint() = default;
 
   /**
    * Constructor
-   * @param p The point defining the constraint.
+   * @param point The point defining the constraint.
    */
-  PointConstraint(const Point &p);
+  PointConstraint(const Point &point);
 
   /**
    * Comparison operator for ordering PointConstraint objects.
@@ -79,23 +80,33 @@ struct PointConstraint {
    * intersect.
    */
   ConstraintVariant intersect(const ConstraintVariant &other) const;
+
+  /**
+   * Const getter for the _point attribute
+   */
+  const Point &point() const { return _point; }
+
+private:
+  // Life is easier if we don't make this const
+  /**
+   * Location of constraint
+   */
+  Point _point;
 };
 
 /**
  * Represents a line constraint defined by a base point and direction vector.
  */
-struct LineConstraint {
-  Point r0;
-  Point dir;
-
+class LineConstraint {
+public:
   LineConstraint() = default;
 
   /**
    * Constructor
-   * @param p A point on the constraining line.
-   * @param d the direction of the constraining line.
+   * @param point A point on the constraining line.
+   * @param direction the direction of the constraining line.
    */
-  LineConstraint(const Point &p, const Point &d);
+  LineConstraint(const Point &point, const Point &direction);
 
   /**
    * Comparison operator for ordering LineConstraint objects.
@@ -146,23 +157,39 @@ struct LineConstraint {
    * intersect.
    */
   ConstraintVariant intersect(const ConstraintVariant &other) const;
+
+  /**
+   * Const getter for the _point attribute
+   */
+  const Point &point() const { return _point; }
+
+  /**
+   * Const getter for the _direction attribute
+   */
+  const Point &direction() const { return _direction; }
+
+private:
+  // Life is easier if we don't make these const
+  /// A point on the constraining line
+  Point _point;
+  /// Direction of the constraining line
+  Point _direction;
 };
 
 /**
  * Represents a plane constraint defined by a point and normal vector.
  */
-struct PlaneConstraint {
-  Point point;
-  Point normal;
+class PlaneConstraint {
 
+public:
   PlaneConstraint() = default;
 
   /**
    * Constructor
-   * @param p A point on the constraining plane.
-   * @param n the direction normal to the constraining plane.
+   * @param point A point on the constraining plane.
+   * @param normal the direction normal to the constraining plane.
    */
-  PlaneConstraint(const Point &p, const Point &n);
+  PlaneConstraint(const Point &point, const Point &normal);
 
   /**
    * Comparison operator for ordering PlaneConstraint objects.
@@ -220,6 +247,23 @@ struct PlaneConstraint {
    * intersect.
    */
   ConstraintVariant intersect(const ConstraintVariant &other) const;
+
+  /**
+   * Const getter for the _point attribute
+   */
+  const Point &point() const { return _point; }
+
+  /**
+   * Const getter for the _normal attribute
+   */
+  const Point &normal() const { return _normal; }
+
+private:
+  // Life is easier if we don't make these const
+  /// A point on the constraining plane
+  Point _point;
+  /// The direction normal to the constraining plane
+  Point _normal;
 };
 
 /**

@@ -23,17 +23,39 @@
 namespace libMesh
 {
 
-PointConstraint::PointConstraint(const Point &p) : location(p) {}
+// Helper function to orient a vector in the positive x/y/z direction
+auto get_positive_vector = [](const Point &vec) -> Point {
+  libmesh_error_msg_if(
+      vec.norm() < TOLERANCE,
+      "Can't define a positively-oriented vector with a zero vector.");
+
+  // Choose sign such that direction vector points in the positive x/y/z
+  // direction This helps to eliminate duplicate lines/planes
+  Point canonical{0, 0, 0};
+  // Choose the canonical dimension to ensure the dot product below is nonzero
+  for (const auto dim_id : make_range(3))
+    if (!absolute_fuzzy_equals(vec(dim_id), 0.)) {
+      canonical(dim_id) = 1.;
+      break;
+    }
+
+  const auto dot_prod = vec * canonical;
+  libmesh_assert(!absolute_fuzzy_equals(dot_prod, 0.));
+
+  return (dot_prod > 0) ? vec.unit() : -vec.unit();
+};
+
+PointConstraint::PointConstraint(const Point &point) : _point(point) {}
 
 bool PointConstraint::operator<(const PointConstraint &other) const {
   if (*this == other)
     return false;
 
-  return location < other.location;
+  return _point < other.point();
 }
 
 bool PointConstraint::operator==(const PointConstraint &other) const {
-  return location.absolute_fuzzy_equals(other.location, TOLERANCE);
+  return _point.absolute_fuzzy_equals(other.point(), TOLERANCE);
 }
 
 ConstraintVariant
@@ -42,7 +64,7 @@ PointConstraint::intersect(const ConstraintVariant &other) const {
       [&](auto &&o) -> ConstraintVariant {
         if constexpr (std::is_same_v<std::decay_t<decltype(o)>,
                                      PointConstraint>) {
-          libmesh_error_msg_if(!(this->location == o.location),
+          libmesh_error_msg_if(!(this->_point == o.point()),
                                "Points do not match.");
           return *this;
         } else {
@@ -54,54 +76,41 @@ PointConstraint::intersect(const ConstraintVariant &other) const {
       other);
 }
 
-LineConstraint::LineConstraint(const Point &p, const Point &d) {
-  r0 = p;
+LineConstraint::LineConstraint(const Point &point, const Point &direction)
+    : _point(point), _direction(get_positive_vector(direction)) {
   libmesh_error_msg_if(
-      d.norm() < TOLERANCE,
+      _direction.norm() < TOLERANCE,
       "Can't define a line with zero magnitude direction vector.");
-  // Flip direction vector if necessary so it points in the positive x/y/z
-  // direction This helps to eliminate duplicate lines
-  Point canonical{0, 0, 0};
-  // Choose the canonical dimension to ensure the dot product below is nonzero
-  for (const auto dim_id : make_range(3))
-    if (!absolute_fuzzy_equals(d(dim_id), 0.)) {
-      canonical(dim_id) = 1.;
-      break;
-    }
-
-  const auto dot_prod = d * canonical;
-  libmesh_assert(!absolute_fuzzy_equals(dot_prod, 0.));
-  dir = (dot_prod > 0) ? d.unit() : -d.unit();
 }
 
 bool LineConstraint::operator<(const LineConstraint &other) const {
   if (*this == other)
     return false;
 
-  if (!(dir.absolute_fuzzy_equals(other.dir, TOLERANCE)))
-    return dir < other.dir;
-  return (dir * r0) < (other.dir * other.r0);
+  if (!(_direction.absolute_fuzzy_equals(other.direction(), TOLERANCE)))
+    return _direction < other.direction();
+  return (_direction * _point) < (other.direction() * other.point());
 }
 
 bool LineConstraint::operator==(const LineConstraint &other) const {
-  if (!(dir.absolute_fuzzy_equals(other.dir, TOLERANCE)))
+  if (!(_direction.absolute_fuzzy_equals(other.direction(), TOLERANCE)))
     return false;
-  return this->contains_point(other.r0);
+  return this->contains_point(other.point());
 }
 
 bool LineConstraint::contains_point(const PointConstraint &p) const {
-  // If the point lies on the line, then the vector p - r0 is parallel to the
-  // line In that case, the cross product of p - r0 with the line's direction
+  // If the point lies on the line, then the vector p - point is parallel to the
+  // line In that case, the cross product of p - point with the line's direction
   // will be zero.
-  return dir.cross(p.location - r0).norm() < TOLERANCE;
+  return _direction.cross(p.point() - _point).norm() < TOLERANCE;
 }
 
 bool LineConstraint::is_parallel(const LineConstraint &l) const {
-  return dir.absolute_fuzzy_equals(l.dir, TOLERANCE);
+  return _direction.absolute_fuzzy_equals(l.direction(), TOLERANCE);
 }
 
 bool LineConstraint::is_parallel(const PlaneConstraint &p) const {
-  return dir * p.normal < TOLERANCE;
+  return _direction * p.normal() < TOLERANCE;
 }
 
 ConstraintVariant
@@ -122,18 +131,18 @@ LineConstraint::intersect(const ConstraintVariant &other) const {
           //   ((p2 - p1) × d2) · (d1 × d2) = t · |d1 × d2|²
           //   ⇒ t = ((delta × d2) · (d1 × d2)) / |d1 × d2|²
 
-          const Point delta = o.r0 - r0;
-          const Point cross_d1_d2 = dir.cross(o.dir);
-          const Real cross_dot = (delta.cross(o.dir)) * cross_d1_d2;
+          const Point delta = o.point() - _point;
+          const Point cross_d1_d2 = _direction.cross(o.direction());
+          const Real cross_dot = (delta.cross(o.direction())) * cross_d1_d2;
           const Real denom = cross_d1_d2.norm_sq();
 
           const Real t = cross_dot / denom;
-          const Point intersection = r0 + t * dir;
+          const Point intersection = _point + t * _direction;
 
           // Verify that intersection lies on both lines
-          libmesh_error_msg_if(o.dir.cross(intersection - o.r0).norm() >
-                                   TOLERANCE,
-                               "Lines do not intersect at a single point.");
+          libmesh_error_msg_if(
+              o.direction().cross(intersection - o.point()).norm() > TOLERANCE,
+              "Lines do not intersect at a single point.");
 
           return PointConstraint{intersection};
         } else if constexpr (std::is_same_v<T, PlaneConstraint>) {
@@ -148,43 +157,30 @@ LineConstraint::intersect(const ConstraintVariant &other) const {
       other);
 }
 
-PlaneConstraint::PlaneConstraint(const Point &p, const Point &n) {
-  point = p;
+PlaneConstraint::PlaneConstraint(const Point &point, const Point &normal)
+    : _point(point), _normal(get_positive_vector(normal)) {
   libmesh_error_msg_if(
-      n.norm() < TOLERANCE,
+      _normal.norm() < TOLERANCE,
       "Can't define a plane with zero magnitude direction vector.");
-  // Flip normal vector if necessary so it points in the positive x/y/z
-  // direction This helps to eliminate duplicate points
-  Point canonical{0, 0, 0};
-  // Choose the canonical dimension to ensure the dot product below is nonzero
-  for (const auto dim_id : make_range(3))
-    if (!absolute_fuzzy_equals(n(dim_id), 0.)) {
-      canonical(dim_id) = 1.;
-      break;
-    }
-
-  const auto dot_prod = n * canonical;
-  libmesh_assert(!absolute_fuzzy_equals(dot_prod, 0.));
-  normal = (dot_prod > 0) ? n.unit() : -n.unit();
 }
 
 bool PlaneConstraint::operator<(const PlaneConstraint &other) const {
   if (*this == other)
     return false;
 
-  if (!(normal.absolute_fuzzy_equals(other.normal, TOLERANCE)))
-    return normal < other.normal;
-  return (normal * point) < (other.normal * other.point);
+  if (!(_normal.absolute_fuzzy_equals(other.normal(), TOLERANCE)))
+    return _normal < other.normal();
+  return (_normal * _point) < (other.normal() * other.point());
 }
 
 bool PlaneConstraint::operator==(const PlaneConstraint &other) const {
-  if (!(normal.absolute_fuzzy_equals(other.normal, TOLERANCE)))
+  if (!(_normal.absolute_fuzzy_equals(other.normal(), TOLERANCE)))
     return false;
-  return this->contains_point(other.point);
+  return this->contains_point(other.point());
 }
 
 bool PlaneConstraint::is_parallel(const PlaneConstraint &p) const {
-  return normal.absolute_fuzzy_equals(p.normal, TOLERANCE);
+  return _normal.absolute_fuzzy_equals(p.normal(), TOLERANCE);
 }
 
 bool PlaneConstraint::is_parallel(const LineConstraint &l) const {
@@ -193,13 +189,13 @@ bool PlaneConstraint::is_parallel(const LineConstraint &l) const {
 
 bool PlaneConstraint::contains_point(const PointConstraint &p) const {
   // distance between the point and the plane
-  const Real dist = (p.location - point) * normal;
+  const Real dist = (p.point() - _point) * _normal;
   return std::abs(dist) < TOLERANCE;
 }
 
 bool PlaneConstraint::contains_line(const LineConstraint &l) const {
-  const bool base_on_plane = this->contains_point(PointConstraint(l.r0));
-  const bool dir_orthogonal = std::abs(normal * l.dir) < TOLERANCE;
+  const bool base_on_plane = this->contains_point(PointConstraint(l.point()));
+  const bool dir_orthogonal = std::abs(_normal * l.direction()) < TOLERANCE;
   return base_on_plane && dir_orthogonal;
 }
 
@@ -227,23 +223,23 @@ PlaneConstraint::intersect(const ConstraintVariant &other) const {
           //   [-n1·n1   n1·n2] [s] = [n1 · (p1 - p2)]
           //   [-n1·n2   n2·n2] [t]   [n2 · (p1 - p2)]
 
-          const Point dir =
-              this->normal.cross(o.normal); // direction of line of intersection
+          const Point dir = this->_normal.cross(
+              o.normal()); // direction of line of intersection
           libmesh_assert(dir.norm() > TOLERANCE);
-          const Point w = this->point - o.point;
+          const Point w = _point - o.point();
 
           // Dot product terms used in 2x2 system
-          const Real n1_dot_n1 = normal * normal;
-          const Real n1_dot_n2 = normal * o.normal;
-          const Real n2_dot_n2 = o.normal * o.normal;
-          const Real n1_dot_w = normal * w;
-          const Real n2_dot_w = o.normal * w;
+          const Real n1_dot_n1 = _normal * _normal;
+          const Real n1_dot_n2 = _normal * o.normal();
+          const Real n2_dot_n2 = o.normal() * o.normal();
+          const Real n1_dot_w = _normal * w;
+          const Real n2_dot_w = o.normal() * w;
 
           const Real denom = -(n1_dot_n1 * n2_dot_n2 - n1_dot_n2 * n1_dot_n2);
           libmesh_assert(std::abs(denom) > TOLERANCE);
 
           const Real s = -(n1_dot_n2 * n2_dot_w - n2_dot_n2 * n1_dot_w) / denom;
-          const Point p0 = point + s * normal;
+          const Point p0 = _point + s * _normal;
 
           return LineConstraint{p0, dir};
         } else if constexpr (std::is_same_v<T, LineConstraint>) {
@@ -254,16 +250,16 @@ PlaneConstraint::intersect(const ConstraintVariant &other) const {
               "Line is parallel and does not intersect the plane.");
 
           // Solve for t in the parametric equation:
-          //   p(t) = r0 + t·d
+          //   p(t) = point + t·d
           // such that this point also satisfies the plane equation:
           //   n · (p(t) - p0) = 0
           // which leads to:
-          //   t = (n · (p0 - r0)) / (n · d)
+          //   t = (n · (p0 - point)) / (n · d)
 
-          const Real denom = normal * o.dir;
+          const Real denom = _normal * o.direction();
           libmesh_assert(std::abs(denom) > TOLERANCE);
-          const Real t = (normal * (point - o.r0)) / denom;
-          return PointConstraint{o.r0 + t * o.dir};
+          const Real t = (_normal * (_point - o.point())) / denom;
+          return PointConstraint{o.point() + t * o.direction()};
         } else if constexpr (std::is_same_v<T, PointConstraint>) {
           libmesh_error_msg_if(!this->contains_point(o),
                                "Point is not on the plane.");
@@ -783,9 +779,11 @@ void VariationalSmootherConstraint::impose_constraint(
   if (std::holds_alternative<PointConstraint>(constraint))
     fix_node(node);
   else if (std::holds_alternative<LineConstraint>(constraint))
-    constrain_node_to_line(node, std::get<LineConstraint>(constraint).dir);
+    constrain_node_to_line(node,
+                           std::get<LineConstraint>(constraint).direction());
   else if (std::holds_alternative<PlaneConstraint>(constraint))
-    constrain_node_to_plane(node, std::get<PlaneConstraint>(constraint).normal);
+    constrain_node_to_plane(node,
+                            std::get<PlaneConstraint>(constraint).normal());
   else
     libmesh_assert_msg(false, "Unknown constraint type.");
 }
