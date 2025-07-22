@@ -2061,8 +2061,15 @@ DofMap::remove_coupling_functor(GhostingFunctor & coupling_functor)
 {
   auto raw_it = std::find(_coupling_functors.begin(),
                           _coupling_functors.end(), &coupling_functor);
+
+#ifndef LIBMESH_ENABLE_DEPRECATED
+  // We shouldn't be trying to remove a functor that isn't there
   libmesh_assert(raw_it != _coupling_functors.end());
-  _coupling_functors.erase(raw_it);
+#else
+  // Our old API supported trying to remove a functor that isn't there
+  if (raw_it != _coupling_functors.end())
+#endif
+    _coupling_functors.erase(raw_it);
 
   // We shouldn't have had two copies of the same functor
   libmesh_assert(std::find(_coupling_functors.begin(),
@@ -2112,8 +2119,15 @@ DofMap::remove_algebraic_ghosting_functor(GhostingFunctor & evaluable_functor)
   auto raw_it = std::find(_algebraic_ghosting_functors.begin(),
                           _algebraic_ghosting_functors.end(),
                           &evaluable_functor);
+
+#ifndef LIBMESH_ENABLE_DEPRECATED
+  // We shouldn't be trying to remove a functor that isn't there
   libmesh_assert(raw_it != _algebraic_ghosting_functors.end());
-  _algebraic_ghosting_functors.erase(raw_it);
+#else
+  // Our old API supported trying to remove a functor that isn't there
+  if (raw_it != _algebraic_ghosting_functors.end())
+#endif
+    _algebraic_ghosting_functors.erase(raw_it);
 
   // We shouldn't have had two copies of the same functor
   libmesh_assert(std::find(_algebraic_ghosting_functors.begin(),
