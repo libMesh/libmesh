@@ -81,7 +81,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _point_locator_close_to_point_tol(0.)
 {
   _elem_dims.insert(d);
-  _ghosting_functors.insert(_default_ghosting.get());
+  _ghosting_functors.push_back(_default_ghosting.get());
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
   libmesh_assert_greater_equal (LIBMESH_DIM, d);
   libmesh_assert (libMesh::initialized());
@@ -128,7 +128,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
       // default ghosting
       if (gf == other_default_ghosting)
         {
-          _ghosting_functors.insert(_default_ghosting.get());
+          _ghosting_functors.push_back(_default_ghosting.get());
           continue;
         }
 
@@ -344,7 +344,7 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
       return false;
 
   // FIXME: we have no good way to compare ghosting functors, since
-  // they're in a set sorted by pointer, and we have no way *at all*
+  // they're in a vector of pointers, and we have no way *at all*
   // to compare ghosting functors, since they don't have operator==
   // defined and we encourage users to subclass them.  We can check if
   // we have the same number, is all.
@@ -945,9 +945,46 @@ void MeshBase::clear ()
 
 
 
+void MeshBase::add_ghosting_functor(GhostingFunctor & ghosting_functor)
+{
+  // We used to implicitly support duplicate inserts to std::set
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  _ghosting_functors.erase
+    (std::remove(_ghosting_functors.begin(),
+                 _ghosting_functors.end(),
+                 &ghosting_functor),
+     _ghosting_functors.end());
+#endif
+
+  // We shouldn't have two copies of the same functor
+  libmesh_assert(std::find(_ghosting_functors.begin(),
+                           _ghosting_functors.end(),
+                           &ghosting_functor) ==
+                 _ghosting_functors.end());
+
+  _ghosting_functors.push_back(&ghosting_functor);
+}
+
+
+
 void MeshBase::remove_ghosting_functor(GhostingFunctor & ghosting_functor)
 {
-  _ghosting_functors.erase(&ghosting_functor);
+  auto raw_it = std::find(_ghosting_functors.begin(),
+                          _ghosting_functors.end(), &ghosting_functor);
+
+  // The DofMap has a "to_mesh" parameter that tells it to avoid
+  // registering a new functor with the mesh, but it doesn't keep
+  // track of which functors weren't added, so we'll support "remove a
+  // functor that isn't there" just like we did with set::erase
+  // before.
+  if (raw_it != _ghosting_functors.end())
+    _ghosting_functors.erase(raw_it);
+
+  // We shouldn't have had two copies of the same functor
+  libmesh_assert(std::find(_ghosting_functors.begin(),
+                           _ghosting_functors.end(),
+                           &ghosting_functor) ==
+                 _ghosting_functors.end());
 
   if (const auto it = _shared_functors.find(&ghosting_functor);
       it != _shared_functors.end())
