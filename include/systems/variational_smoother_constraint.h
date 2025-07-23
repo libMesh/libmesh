@@ -31,13 +31,14 @@ namespace libMesh
 class PointConstraint;
 class LineConstraint;
 class PlaneConstraint;
+class InvalidConstraint;
 
 /**
  * Type used to store a constraint that may be a PlaneConstraint,
  * LineConstraint, or PointConstraint
  */
-using ConstraintVariant =
-    std::variant<PointConstraint, LineConstraint, PlaneConstraint>;
+using ConstraintVariant = std::variant<PointConstraint, LineConstraint,
+                                       PlaneConstraint, InvalidConstraint>;
 
 /**
  * Represents a fixed point constraint.
@@ -72,14 +73,20 @@ public:
   bool operator==(const PointConstraint &other) const;
 
   /**
+   * Query whether a point lies on another point.
+   * @param p The point in question
+   * @return bool indicating whether p lies on this point.
+   */
+  bool contains_point(const PointConstraint &p) const { return *this == p; }
+
+  /**
    * Computes the intersection of this point with another constraint.
    * Handles intersection with PointConstraint, LineConstraint, or
    * PlaneConstraint.
    * @param other The constraint to intersect with.
    * @return The most specific ConstraintVariant that satisfies both
-   * constraints.
-   * @throw libMesh::LogicError If the constraints are incompatible and cannot
-   * intersect.
+   * constraints. constraints. If no intersection exists, return an
+   * InvalidConstraint.
    */
   ConstraintVariant intersect(const ConstraintVariant &other) const;
 
@@ -166,9 +173,8 @@ public:
    * PointConstraint.
    * @param other The constraint to intersect with.
    * @return The most specific ConstraintVariant that satisfies both
-   * constraints.
-   * @throw libMesh::LogicError If the constraints are incompatible and cannot
-   * intersect.
+   * constraints. constraints. If no intersection exists, return an
+   * InvalidConstraint.
    */
   ConstraintVariant intersect(const ConstraintVariant &other) const;
 
@@ -273,9 +279,8 @@ public:
    * PointConstraint.
    * @param other The constraint to intersect with.
    * @return The most specific ConstraintVariant that satisfies both
-   * constraints.
-   * @throw libMesh::LogicError If the constraints are incompatible and cannot
-   * intersect.
+   * constraints. constraints. If no intersection exists, return an
+   * InvalidConstraint.
    */
   ConstraintVariant intersect(const ConstraintVariant &other) const;
 
@@ -310,6 +315,39 @@ private:
    * Tolerance to use for numerical comparisons
    */
   Real _tol;
+};
+
+/**
+ * Represents an invalid constraint (i.e., when the two constraints don't
+ * intersect)
+ */
+class InvalidConstraint {
+
+public:
+  InvalidConstraint() = default;
+
+  /**
+   * Dummy intersect method that should never be called.
+   */
+  ConstraintVariant intersect(const ConstraintVariant &) const {
+    libmesh_assert_msg(false, _err_msg);
+    return *this;
+  }
+
+  /**
+   * Dummy contains_point method that should never be called.
+   */
+  bool contains_point(const PointConstraint &) const {
+    libmesh_assert_msg(false, _err_msg);
+    return false;
+  }
+
+private:
+  std::string _err_msg =
+      std::string("We should never get here! The InvalidConstraint object ") +
+      std::string(
+          "should be detected and replaced with a valid ConstraintVariant ") +
+      std::string("prior to calling any class methods.");
 };
 
 /**
@@ -437,6 +475,7 @@ private:
    * line or plane).
    * @param node The node to constrain.
    * @param constraint The geometric constraint variant to apply.
+   * @throw libMesh::logicError If the constraint cannot be imposed.
    */
   void impose_constraint(const Node &node, const ConstraintVariant &constraint);
 

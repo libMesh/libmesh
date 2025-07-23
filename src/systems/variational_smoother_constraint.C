@@ -63,16 +63,11 @@ ConstraintVariant
 PointConstraint::intersect(const ConstraintVariant &other) const {
   return std::visit(
       [&](auto &&o) -> ConstraintVariant {
-        if constexpr (std::is_same_v<std::decay_t<decltype(o)>,
-                                     PointConstraint>) {
-          libmesh_error_msg_if(!(this->_point == o.point()),
-                               "Points do not match.");
-          return *this;
-        } else {
-          libmesh_error_msg_if(!o.contains_point(*this),
-                               "Point is not on the constraint.");
-          return *this;
-        }
+        if (!o.contains_point(*this))
+          // Point is not on the constraint
+          return InvalidConstraint();
+
+        return *this;
       },
       other);
 }
@@ -123,8 +118,10 @@ LineConstraint::intersect(const ConstraintVariant &other) const {
         if constexpr (std::is_same_v<T, LineConstraint>) {
           if (*this == o)
             return *this;
-          libmesh_error_msg_if(this->is_parallel(o),
-                               "Lines are parallel and do not intersect.");
+
+          if (this->is_parallel(o))
+            // Lines are parallel and do not intersect
+            return InvalidConstraint();
 
           // Solve for t in the equation p1 + t·d1 = p2 + s·d2
           // The shortest vector between skew lines lies along the normal vector
@@ -142,17 +139,22 @@ LineConstraint::intersect(const ConstraintVariant &other) const {
           const Point intersection = _point + t * _direction;
 
           // Verify that intersection lies on both lines
-          libmesh_error_msg_if(
-              o.direction().cross(intersection - o.point()).norm() > _tol,
-              "Lines do not intersect at a single point.");
+          if (o.direction().cross(intersection - o.point()).norm() > _tol)
+            // Lines do not intersect at a single point
+            return InvalidConstraint();
 
           return PointConstraint{intersection};
+
         } else if constexpr (std::is_same_v<T, PlaneConstraint>) {
           return o.intersect(*this);
+
         } else if constexpr (std::is_same_v<T, PointConstraint>) {
-          libmesh_error_msg_if(!this->contains_point(o),
-                               "Point is not on the line.");
+          if (!this->contains_point(o))
+            // Point is not on the line
+            return InvalidConstraint();
+
           return o;
+
         } else
           libmesh_error_msg("Unsupported constraint type in Line::intersect.");
       },
@@ -211,8 +213,10 @@ PlaneConstraint::intersect(const ConstraintVariant &other) const {
           // If planes are identical, return one of them
           if (*this == o)
             return *this;
-          libmesh_error_msg_if(this->is_parallel(o),
-                               "Planes are parallel and do not intersect.");
+
+          if (this->is_parallel(o))
+            // Planes are parallel and do not intersect
+            return InvalidConstraint();
 
           // Solve for a point on the intersection line of two planes.
           // Given planes:
@@ -248,9 +252,10 @@ PlaneConstraint::intersect(const ConstraintVariant &other) const {
         } else if constexpr (std::is_same_v<T, LineConstraint>) {
           if (this->contains_line(o))
             return o;
-          libmesh_error_msg_if(
-              this->is_parallel(o),
-              "Line is parallel and does not intersect the plane.");
+
+          if (this->is_parallel(o))
+            // Line is parallel and does not intersect the plane
+            return InvalidConstraint();
 
           // Solve for t in the parametric equation:
           //   p(t) = point + t·d
@@ -264,8 +269,10 @@ PlaneConstraint::intersect(const ConstraintVariant &other) const {
           const Real t = (_normal * (_point - o.point())) / denom;
           return PointConstraint{o.point() + t * o.direction()};
         } else if constexpr (std::is_same_v<T, PointConstraint>) {
-          libmesh_error_msg_if(!this->contains_point(o),
-                               "Point is not on the plane.");
+          if (!this->contains_point(o))
+            // Point is not on the plane
+            return InvalidConstraint();
+
           return o;
         } else
           libmesh_error_msg("Unsupported constraint type in Plane::intersect.");
@@ -370,16 +377,15 @@ void VariationalSmootherConstraint::constrain()
       const auto &subdomain_constraint = it->second;
       // Combine current boundary constraint with previously determined
       // subdomain_constraint
-      libmesh_try {
-        const auto combined_constraint =
-            intersect_constraints(subdomain_constraint, boundary_constraint);
-        this->impose_constraint(node, combined_constraint);
-      }
-      libmesh_catch(const std::exception &e) {
-        // This will catch cases where constraints have no intersection
-        // Fall back to fixed node constraint
-        this->impose_constraint(node, PointConstraint(node));
-      }
+      auto combined_constraint =
+          intersect_constraints(subdomain_constraint, boundary_constraint);
+
+      // This will catch cases where constraints have no intersection
+      // Fall back to fixed node constraint
+      if (std::holds_alternative<InvalidConstraint>(combined_constraint))
+        combined_constraint = PointConstraint(node);
+
+      this->impose_constraint(node, combined_constraint);
 
     } else
       this->impose_constraint(node, boundary_constraint);
@@ -763,10 +769,11 @@ ConstraintVariant VariationalSmootherConstraint::determine_constraint(
   ConstraintVariant current = *it++;
   for (; it != valid_planes.end(); ++it)
   {
-    libmesh_try { current = intersect_constraints(current, *it); }
-    libmesh_catch(const std::exception &e) {
-      // This will catch cases where constraints have no intersection
-      // Fall back to fixed node constraint
+    current = intersect_constraints(current, *it);
+
+    // This will catch cases where constraints have no intersection
+    // Fall back to fixed node constraint
+    if (std::holds_alternative<InvalidConstraint>(current)) {
       current = PointConstraint(node);
       break;
     }
@@ -779,6 +786,10 @@ ConstraintVariant VariationalSmootherConstraint::determine_constraint(
 // PlaneConstraint) to a node.
 void VariationalSmootherConstraint::impose_constraint(
     const Node &node, const ConstraintVariant &constraint) {
+
+  libmesh_assert_msg(!std::holds_alternative<InvalidConstraint>(constraint),
+                     "Cannot impose constraint using InvalidConstraint.");
+
   if (std::holds_alternative<PointConstraint>(constraint))
     fix_node(node);
   else if (std::holds_alternative<LineConstraint>(constraint))
@@ -787,6 +798,7 @@ void VariationalSmootherConstraint::impose_constraint(
   else if (std::holds_alternative<PlaneConstraint>(constraint))
     constrain_node_to_plane(node,
                             std::get<PlaneConstraint>(constraint).normal());
+
   else
     libmesh_assert_msg(false, "Unknown constraint type.");
 }
