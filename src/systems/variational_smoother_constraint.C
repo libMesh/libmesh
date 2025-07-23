@@ -772,6 +772,7 @@ ConstraintVariant VariationalSmootherConstraint::determine_constraint(
     current = intersect_constraints(current, *it);
 
     // This will catch cases where constraints have no intersection
+    // (i.e., the element surface is non-planar)
     // Fall back to fixed node constraint
     if (std::holds_alternative<InvalidConstraint>(current)) {
       current = PointConstraint(node);
