@@ -140,52 +140,52 @@ void VariationalSmootherSystem::prepare_for_smoothing()
 
       switch (elem->type())
       {
-      case TRI3:
-      {
-        // Build target element: an equilateral triangle
-        Tri3 target_elem;
-
-        // equilateral triangle side length that preserves area of reference
-        // element
-        const Real sqrt_3 = std::sqrt(3.);
-        const auto ref_volume = target_elem.reference_elem()->volume();
-        const auto s = std::sqrt(4. / sqrt_3 * ref_volume);
-
-        // Set nodes of target element to form an equilateral triangle
-        Node node_0 = Node(0., 0.);
-        Node node_1 = Node(s, 0.);
-        Node node_2 = Node(0.5 * s, 0.5 * s * sqrt_3);
-        target_elem.set_node(0) = &node_0;
-        target_elem.set_node(1) = &node_1;
-        target_elem.set_node(2) = &node_2;
-
-        // build map
-        fe_map_target.init_reference_to_physical_map(dim, qrule_points,
-                                                     &target_elem);
-        fe_map_target.compute_map(dim, qrule_weights, &target_elem,
-                                  /*d2phi=*/false);
-
-        // Yes, triangle-to-triangle mappings have constant Jacobians, but we
-        // will keep things general for now
-        _target_inverse_jacobians[target_elem.type()] =
-            std::vector<RealTensor>(nq_points);
-        for (const auto qp : make_range(nq_points))
+        case TRI3:
         {
-          const RealTensor H_inv =
-              RealTensor(dxyzdxi[qp](0), dxyzdeta[qp](0), 0, dxyzdxi[qp](1),
-                         dxyzdeta[qp](1), 0, 0, 0, 1)
-                  .inverse();
+          // Build target element: an equilateral triangle
+          Tri3 target_elem;
 
-          _target_inverse_jacobians[target_elem.type()][qp] = H_inv;
-          target_elem_inverse_jacobian_dets[target_elem.type()][qp] =
-              H_inv.det();
+          // equilateral triangle side length that preserves area of reference
+          // element
+          const Real sqrt_3 = std::sqrt(3.);
+          const auto ref_volume = target_elem.reference_elem()->volume();
+          const auto s = std::sqrt(4. / sqrt_3 * ref_volume);
+
+          // Set nodes of target element to form an equilateral triangle
+          Node node_0 = Node(0., 0.);
+          Node node_1 = Node(s, 0.);
+          Node node_2 = Node(0.5 * s, 0.5 * s * sqrt_3);
+          target_elem.set_node(0) = &node_0;
+          target_elem.set_node(1) = &node_1;
+          target_elem.set_node(2) = &node_2;
+
+          // build map
+          fe_map_target.init_reference_to_physical_map(dim, qrule_points,
+                                                       &target_elem);
+          fe_map_target.compute_map(dim, qrule_weights, &target_elem,
+                                    /*d2phi=*/false);
+
+          // Yes, triangle-to-triangle mappings have constant Jacobians, but we
+          // will keep things general for now
+          _target_inverse_jacobians[target_elem.type()] =
+              std::vector<RealTensor>(nq_points);
+          for (const auto qp : make_range(nq_points))
+          {
+            const RealTensor H_inv =
+                RealTensor(dxyzdxi[qp](0), dxyzdeta[qp](0), 0, dxyzdxi[qp](1),
+                           dxyzdeta[qp](1), 0, 0, 0, 1)
+                    .inverse();
+
+            _target_inverse_jacobians[target_elem.type()][qp] = H_inv;
+            target_elem_inverse_jacobian_dets[target_elem.type()][qp] =
+                H_inv.det();
+          }
+
+          break;
         }
 
-        break;
-      }
-
-      default:
-        break;
+        default:
+          break;
       }
     }
 
