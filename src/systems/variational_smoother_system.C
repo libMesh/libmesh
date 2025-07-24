@@ -19,6 +19,7 @@
 
 #include "libmesh/elem.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/face_tri6.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fem_context.h"
@@ -113,90 +114,135 @@ void VariationalSmootherSystem::prepare_for_smoothing()
   std::map<ElemType, std::vector<Real>> target_elem_inverse_jacobian_dets;
 
   for (const auto * elem : mesh.active_local_element_ptr_range())
-  {
-    femcontext.pre_fe_reinit(*this, elem);
-    femcontext.elem_fe_reinit();
-
-    // Add target element info, if applicable
-    if (_target_inverse_jacobians.find(elem->type()) == _target_inverse_jacobians.end())
     {
-      // Create FEMap to compute target_element mapping information
-      FEMap fe_map_target;
+      femcontext.pre_fe_reinit(*this, elem);
+      femcontext.elem_fe_reinit();
 
-      // pre-request mapping derivatives
-      const auto & dxyzdxi = fe_map_target.get_dxyzdxi();
-      const auto & dxyzdeta = fe_map_target.get_dxyzdeta();
-      // const auto & dxyzdzeta = fe_map_target.get_dxyzdzeta();
-
-      const auto & qrule_points = femcontext.get_element_qrule().get_points();
-      const auto & qrule_weights = femcontext.get_element_qrule().get_weights();
-      const auto nq_points = femcontext.get_element_qrule().n_points();
-
-      // If the target element is the reference element, Jacobian matrix is
-      // identity, det of inverse is 1. This will only be overwritten if a
-      // different target elemen is explicitly specified.
-      target_elem_inverse_jacobian_dets[elem->type()] =
-          std::vector<Real>(nq_points, 1.0);
-
-      switch (elem->type())
+      // Add target element info, if applicable
+      if (_target_inverse_jacobians.find(elem->type()) == _target_inverse_jacobians.end())
         {
-          case TRI3:
-            {
-              // Build target element: an equilateral triangle
-              Tri3 target_elem;
+          // Create FEMap to compute target_element mapping information
+          FEMap fe_map_target;
 
-              // equilateral triangle side length that preserves area of reference
-              // element
+          // pre-request mapping derivatives
+          const auto & dxyzdxi = fe_map_target.get_dxyzdxi();
+          const auto & dxyzdeta = fe_map_target.get_dxyzdeta();
+          // const auto & dxyzdzeta = fe_map_target.get_dxyzdzeta();
+
+          const auto & qrule_points = femcontext.get_element_qrule().get_points();
+          const auto & qrule_weights = femcontext.get_element_qrule().get_weights();
+          const auto nq_points = femcontext.get_element_qrule().n_points();
+
+          // If the target element is the reference element, Jacobian matrix is
+          // identity, det of inverse is 1. This will only be overwritten if a
+          // different target elemen is explicitly specified.
+          target_elem_inverse_jacobian_dets[elem->type()] =
+              std::vector<Real>(nq_points, 1.0);
+
+          // Elems deriving from Tri
+          if (dynamic_cast<const Tri*>(elem))
+            {
+
+              // The target element will be an equilateral triangle with area equal to 
+              // the area of the reference element.
+
+              // First, let's define the nodal locations of the vertices
               const Real sqrt_3 = std::sqrt(3.);
-              const auto ref_volume = target_elem.reference_elem()->volume();
-              const auto s = std::sqrt(4. / sqrt_3 * ref_volume);
+
+              std::vector<Point> equilateral_points{
+                Point(0.,  0.),
+                Point(1.,  0.),
+                Point(0.5, 0.5 * sqrt_3)
+              };
+
+              // Area of the reference element
+              Real ref_area;
+
+              // Target element
+              std::unique_ptr<Tri> target_elem;
+
+              switch (elem->type())
+                {
+                case TRI3:
+                  {
+                    target_elem = std::make_unique<Tri3>();
+
+                    // equilateral triangle side length that preserves area of reference
+                    // element
+                    ref_area = target_elem->reference_elem()->volume();
+
+                    break;
+                  }
+
+                case TRI6:
+                  {
+                    target_elem = std::make_unique<Tri6>();
+
+                    // equilateral triangle side length that preserves area of reference
+                    // element
+                    ref_area = target_elem->reference_elem()->volume();
+
+                    // Define the midpoint nodes of the equilateral triangle
+                    equilateral_points.emplace_back(0.50, 0.          );
+                    equilateral_points.emplace_back(0.75, 0.25 * sqrt_3);
+                    equilateral_points.emplace_back(0.25, 0.25 * sqrt_3);
+
+                    break;
+                  }
+
+                default:
+                  libmesh_error_msg("Unsupported triangular element!");
+                  break;
+                }
+
+              // Equilateral triangle side length preserving area of the reference element
+              const auto side_length = std::sqrt(4. / sqrt_3 * ref_area);
+
+              std::vector<std::unique_ptr<Node>> owned_nodes;
 
               // Set nodes of target element to form an equilateral triangle
-              Node node_0 = Node(0., 0.);
-              Node node_1 = Node(s, 0.);
-              Node node_2 = Node(0.5 * s, 0.5 * s * sqrt_3);
-              target_elem.set_node(0) = &node_0;
-              target_elem.set_node(1) = &node_1;
-              target_elem.set_node(2) = &node_2;
+              for (const dof_id_type node_id : index_range(equilateral_points))
+                {
+                  // Scale the nodal positions to conserve area
+                  auto node_ptr = std::make_unique<Node>(
+                      equilateral_points[node_id] * side_length, node_id);
+                  target_elem->set_node(node_id) = node_ptr.get();
+
+                  // Store the pointer so it stays alive
+                  owned_nodes.push_back(std::move(node_ptr));
+                }
 
               // build map
-              fe_map_target.init_reference_to_physical_map(dim, qrule_points,
-                                                           &target_elem);
-              fe_map_target.compute_map(dim, qrule_weights, &target_elem,
-                                        /*d2phi=*/false);
+              fe_map_target.init_reference_to_physical_map(dim, qrule_points, target_elem.get());
+              fe_map_target.compute_map(dim, qrule_weights, target_elem.get(), /*d2phi=*/false);
 
               // Yes, triangle-to-triangle mappings have constant Jacobians, but we
               // will keep things general for now
-              _target_inverse_jacobians[target_elem.type()] =
+              _target_inverse_jacobians[target_elem->type()] =
                   std::vector<RealTensor>(nq_points);
               for (const auto qp : make_range(nq_points))
-              {
-                const RealTensor H_inv =
-                    RealTensor(dxyzdxi[qp](0), dxyzdeta[qp](0), 0, dxyzdxi[qp](1),
-                               dxyzdeta[qp](1), 0, 0, 0, 1)
-                        .inverse();
+                {
+                  const RealTensor H_inv =
+                      RealTensor(dxyzdxi[qp](0), dxyzdeta[qp](0), 0, dxyzdxi[qp](1),
+                                 dxyzdeta[qp](1), 0, 0, 0, 1)
+                          .inverse();
 
-                _target_inverse_jacobians[target_elem.type()][qp] = H_inv;
-                target_elem_inverse_jacobian_dets[target_elem.type()][qp] =
-                    H_inv.det();
-              }
+                  _target_inverse_jacobians[target_elem->type()][qp] = H_inv;
+                  target_elem_inverse_jacobian_dets[target_elem->type()][qp] =
+                      H_inv.det();
+                }
+            }// if Tri
+        }// if find == end()
 
-              break;
-            }
+      // Reference volume computation
+      Real elem_integrated_det_J(0.);
+      for (const auto qp : index_range(JxW))
+        elem_integrated_det_J +=
+            JxW[qp] * target_elem_inverse_jacobian_dets[elem->type()][qp];
+      const auto ref_elem_vol = elem->reference_elem()->volume();
+      elem_averaged_det_J_sum += elem_integrated_det_J / ref_elem_vol;
 
-          default:
-            break;
-        }
-    }
-
-    Real elem_integrated_det_J(0.);
-    for (const auto qp : index_range(JxW))
-      elem_integrated_det_J +=
-          JxW[qp] * target_elem_inverse_jacobian_dets[elem->type()][qp];
-    const auto ref_elem_vol = elem->reference_elem()->volume();
-    elem_averaged_det_J_sum += elem_integrated_det_J / ref_elem_vol;
-
-  } // for elem
+    } // for elem
 
   // Get contributions from elements on other processors
   mesh.comm().sum(elem_averaged_det_J_sum);

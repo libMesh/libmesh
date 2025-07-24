@@ -186,8 +186,10 @@ public:
 
   CPPUNIT_TEST(testVariationalQuad);
   CPPUNIT_TEST(testVariationalQuadMultipleSubdomains);
-  CPPUNIT_TEST(testVariationalTri);
-  CPPUNIT_TEST(testVariationalTriMultipleSubdomains);
+
+  CPPUNIT_TEST(testVariationalTri3);
+  CPPUNIT_TEST(testVariationalTri6);
+  CPPUNIT_TEST(testVariationalTri6MultipleSubdomains);
 
   CPPUNIT_TEST(testVariationalHex8);
   CPPUNIT_TEST(testVariationalHex20);
@@ -528,7 +530,7 @@ public:
     testVariationalSmoother(mesh, variational, QUAD4, true);
   }
 
-  void testVariationalTri()
+  void testVariationalTri3()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
@@ -536,7 +538,15 @@ public:
     testVariationalSmoother(mesh, variational, TRI3);
   }
 
-  void testVariationalTriMultipleSubdomains()
+  void testVariationalTri6()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, TRI6);
+  }
+
+  void testVariationalTri6MultipleSubdomains()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
