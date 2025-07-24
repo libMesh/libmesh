@@ -127,48 +127,49 @@ ConstraintVariant LineConstraint::intersect(const ConstraintVariant & other) con
         // so we can match the actual stored variant type in std::is_same_v.
         using T = std::decay_t<decltype(o)>;
         if constexpr (std::is_same_v<T, LineConstraint>)
-        {
-          if (*this == o)
-            return *this;
+          {
+            if (*this == o)
+              return *this;
 
-          if (this->is_parallel(o))
-            // Lines are parallel and do not intersect
-            return InvalidConstraint();
+            if (this->is_parallel(o))
+              // Lines are parallel and do not intersect
+              return InvalidConstraint();
 
-          // Solve for t in the equation p1 + t·d1 = p2 + s·d2
-          // The shortest vector between skew lines lies along the normal vector
-          // (d1 × d2). Projecting the vector (p2 - p1) onto this normal gives a
-          // scalar proportional to the distance. This is equivalent to solving:
-          //   ((p2 - p1) × d2) · (d1 × d2) = t · |d1 × d2|²
-          //   ⇒ t = ((delta × d2) · (d1 × d2)) / |d1 × d2|²
+            // Solve for t in the equation p1 + t·d1 = p2 + s·d2
+            // The shortest vector between skew lines lies along the normal vector
+            // (d1 × d2). Projecting the vector (p2 - p1) onto this normal gives a
+            // scalar proportional to the distance. This is equivalent to solving:
+            //   ((p2 - p1) × d2) · (d1 × d2) = t · |d1 × d2|²
+            //   ⇒ t = ((delta × d2) · (d1 × d2)) / |d1 × d2|²
 
-          const Point delta = o.point() - _point;
-          const Point cross_d1_d2 = _direction.cross(o.direction());
-          const Real cross_dot = (delta.cross(o.direction())) * cross_d1_d2;
-          const Real denom = cross_d1_d2.norm_sq();
+            const Point delta = o.point() - _point;
+            const Point cross_d1_d2 = _direction.cross(o.direction());
+            const Real cross_dot = (delta.cross(o.direction())) * cross_d1_d2;
+            const Real denom = cross_d1_d2.norm_sq();
 
-          const Real t = cross_dot / denom;
-          const Point intersection = _point + t * _direction;
+            const Real t = cross_dot / denom;
+            const Point intersection = _point + t * _direction;
 
-          // Verify that intersection lies on both lines
-          if (o.direction().cross(intersection - o.point()).norm() > _tol)
-            // Lines do not intersect at a single point
-            return InvalidConstraint();
+            // Verify that intersection lies on both lines
+            if (o.direction().cross(intersection - o.point()).norm() > _tol)
+              // Lines do not intersect at a single point
+              return InvalidConstraint();
 
-          return PointConstraint{intersection};
-        }
+            return PointConstraint{intersection};
+          }
+
         else if constexpr (std::is_same_v<T, PlaneConstraint>)
-        {
           return o.intersect(*this);
-        }
-        else if constexpr (std::is_same_v<T, PointConstraint>)
-        {
-          if (!this->contains_point(o))
-            // Point is not on the line
-            return InvalidConstraint();
 
-          return o;
-        }
+        else if constexpr (std::is_same_v<T, PointConstraint>)
+          {
+            if (!this->contains_point(o))
+              // Point is not on the line
+              return InvalidConstraint();
+
+            return o;
+          }
+
         else
           libmesh_error_msg("Unsupported constraint type in Line::intersect.");
       },
@@ -229,75 +230,78 @@ ConstraintVariant PlaneConstraint::intersect(const ConstraintVariant & other) co
         // so we can match the actual stored variant type in std::is_same_v.
         using T = std::decay_t<decltype(o)>;
         if constexpr (std::is_same_v<T, PlaneConstraint>)
-        {
-          // If planes are identical, return one of them
-          if (*this == o)
-            return *this;
+          {
+            // If planes are identical, return one of them
+            if (*this == o)
+              return *this;
 
-          if (this->is_parallel(o))
-            // Planes are parallel and do not intersect
-            return InvalidConstraint();
+            if (this->is_parallel(o))
+              // Planes are parallel and do not intersect
+              return InvalidConstraint();
 
-          // Solve for a point on the intersection line of two planes.
-          // Given planes:
-          //   Plane 1: n1 · (x - p1) = 0
-          //   Plane 2: n2 · (x - p2) = 0
-          // The line of intersection has direction dir = n1 × n2.
-          // To find a point on this line, we assume:
-          //   x = p1 + s·n1 = p2 + t·n2
-          //   ⇒ p1 - p2 = t·n2 - s·n1
-          // Taking dot products with n1 and n2 leads to:
-          //   [-n1·n1   n1·n2] [s] = [n1 · (p1 - p2)]
-          //   [-n1·n2   n2·n2] [t]   [n2 · (p1 - p2)]
+            // Solve for a point on the intersection line of two planes.
+            // Given planes:
+            //   Plane 1: n1 · (x - p1) = 0
+            //   Plane 2: n2 · (x - p2) = 0
+            // The line of intersection has direction dir = n1 × n2.
+            // To find a point on this line, we assume:
+            //   x = p1 + s·n1 = p2 + t·n2
+            //   ⇒ p1 - p2 = t·n2 - s·n1
+            // Taking dot products with n1 and n2 leads to:
+            //   [-n1·n1   n1·n2] [s] = [n1 · (p1 - p2)]
+            //   [-n1·n2   n2·n2] [t]   [n2 · (p1 - p2)]
 
-          const Point dir = this->_normal.cross(o.normal()); // direction of line of intersection
-          libmesh_assert(dir.norm() > _tol);
-          const Point w = _point - o.point();
+            const Point dir = this->_normal.cross(o.normal()); // direction of line of intersection
+            libmesh_assert(dir.norm() > _tol);
+            const Point w = _point - o.point();
 
-          // Dot product terms used in 2x2 system
-          const Real n1_dot_n1 = _normal * _normal;
-          const Real n1_dot_n2 = _normal * o.normal();
-          const Real n2_dot_n2 = o.normal() * o.normal();
-          const Real n1_dot_w = _normal * w;
-          const Real n2_dot_w = o.normal() * w;
+            // Dot product terms used in 2x2 system
+            const Real n1_dot_n1 = _normal * _normal;
+            const Real n1_dot_n2 = _normal * o.normal();
+            const Real n2_dot_n2 = o.normal() * o.normal();
+            const Real n1_dot_w = _normal * w;
+            const Real n2_dot_w = o.normal() * w;
 
-          const Real denom = -(n1_dot_n1 * n2_dot_n2 - n1_dot_n2 * n1_dot_n2);
-          libmesh_assert(std::abs(denom) > _tol);
+            const Real denom = -(n1_dot_n1 * n2_dot_n2 - n1_dot_n2 * n1_dot_n2);
+            libmesh_assert(std::abs(denom) > _tol);
 
-          const Real s = -(n1_dot_n2 * n2_dot_w - n2_dot_n2 * n1_dot_w) / denom;
-          const Point p0 = _point + s * _normal;
+            const Real s = -(n1_dot_n2 * n2_dot_w - n2_dot_n2 * n1_dot_w) / denom;
+            const Point p0 = _point + s * _normal;
 
-          return LineConstraint{p0, dir};
-        }
+            return LineConstraint{p0, dir};
+          }
+
         else if constexpr (std::is_same_v<T, LineConstraint>)
-        {
-          if (this->contains_line(o))
-            return o;
+          {
+            if (this->contains_line(o))
+              return o;
 
-          if (this->is_parallel(o))
-            // Line is parallel and does not intersect the plane
-            return InvalidConstraint();
+            if (this->is_parallel(o))
+              // Line is parallel and does not intersect the plane
+              return InvalidConstraint();
 
-          // Solve for t in the parametric equation:
-          //   p(t) = point + t·d
-          // such that this point also satisfies the plane equation:
-          //   n · (p(t) - p0) = 0
-          // which leads to:
-          //   t = (n · (p0 - point)) / (n · d)
+            // Solve for t in the parametric equation:
+            //   p(t) = point + t·d
+            // such that this point also satisfies the plane equation:
+            //   n · (p(t) - p0) = 0
+            // which leads to:
+            //   t = (n · (p0 - point)) / (n · d)
 
-          const Real denom = _normal * o.direction();
-          libmesh_assert(std::abs(denom) > _tol);
-          const Real t = (_normal * (_point - o.point())) / denom;
-          return PointConstraint{o.point() + t * o.direction()};
-        }
+            const Real denom = _normal * o.direction();
+            libmesh_assert(std::abs(denom) > _tol);
+            const Real t = (_normal * (_point - o.point())) / denom;
+            return PointConstraint{o.point() + t * o.direction()};
+          }
+
         else if constexpr (std::is_same_v<T, PointConstraint>)
-        {
-          if (!this->contains_point(o))
-            // Point is not on the plane
-            return InvalidConstraint();
+          {
+            if (!this->contains_point(o))
+              // Point is not on the plane
+              return InvalidConstraint();
 
-          return o;
-        }
+            return o;
+          }
+
         else
           libmesh_error_msg("Unsupported constraint type in Plane::intersect.");
       },
@@ -393,19 +397,20 @@ void VariationalSmootherConstraint::constrain()
 
       // Check for the case where this boundary node is also part of a subdomain id boundary
       if (const auto it = subdomain_boundary_map.find(bid); it != subdomain_boundary_map.end())
-      {
-        const auto & subdomain_constraint = it->second;
-        // Combine current boundary constraint with previously determined
-        // subdomain_constraint
-        auto combined_constraint = intersect_constraints(subdomain_constraint, boundary_constraint);
+        {
+          const auto & subdomain_constraint = it->second;
+          // Combine current boundary constraint with previously determined
+          // subdomain_constraint
+          auto combined_constraint = intersect_constraints(subdomain_constraint, boundary_constraint);
 
-        // This will catch cases where constraints have no intersection
-        // Fall back to fixed node constraint
-        if (std::holds_alternative<InvalidConstraint>(combined_constraint))
-          combined_constraint = PointConstraint(node);
+          // This will catch cases where constraints have no intersection
+          // Fall back to fixed node constraint
+          if (std::holds_alternative<InvalidConstraint>(combined_constraint))
+            combined_constraint = PointConstraint(node);
 
-        this->impose_constraint(node, combined_constraint);
-      }
+          this->impose_constraint(node, combined_constraint);
+        }
+
       else
         this->impose_constraint(node, boundary_constraint);
 
@@ -760,16 +765,17 @@ ConstraintVariant VariationalSmootherConstraint::determine_constraint(
       bool all_colinear = true;
       const Point ref_dir = (*neighbors[0] - node).unit();
       for (const auto i : make_range(std::size_t(1), neighbors.size()))
-      {
-        const Point delta = *(neighbors[i]) - node;
-        libmesh_assert(delta.norm() >= TOLERANCE);
-        const Point dir = delta.unit();
-        if (!dir.relative_fuzzy_equals(ref_dir) && !dir.relative_fuzzy_equals(-ref_dir))
         {
-          all_colinear = false;
-          break;
+          const Point delta = *(neighbors[i]) - node;
+          libmesh_assert(delta.norm() >= TOLERANCE);
+          const Point dir = delta.unit();
+          if (!dir.relative_fuzzy_equals(ref_dir) && !dir.relative_fuzzy_equals(-ref_dir))
+          {
+            all_colinear = false;
+            break;
+          }
         }
-      }
+
       if (all_colinear)
         return LineConstraint{node, ref_dir};
 
