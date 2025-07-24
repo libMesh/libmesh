@@ -373,7 +373,7 @@ public:
        * dim - num_dofs coordinantes should be 0 or 1.
        */
 
-      size_t num_zero_or_one = 0;
+      std::size_t num_zero_or_one = 0;
 
       bool distorted = false;
       for (const auto d : make_range(dim))

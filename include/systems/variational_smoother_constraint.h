@@ -28,6 +28,7 @@
 namespace libMesh
 {
 
+// Forward declarations
 class PointConstraint;
 class LineConstraint;
 class PlaneConstraint;
@@ -35,7 +36,9 @@ class InvalidConstraint;
 
 /**
  * Type used to store a constraint that may be a PlaneConstraint,
- * LineConstraint, or PointConstraint
+ * LineConstraint, or PointConstraint. std::variant is an alternative to using
+ * the classic polymorphic approach where these constraints inherit from an
+ * common base class.
  */
 using ConstraintVariant = std::variant<PointConstraint, LineConstraint,
                                        PlaneConstraint, InvalidConstraint>;
@@ -43,7 +46,8 @@ using ConstraintVariant = std::variant<PointConstraint, LineConstraint,
 /**
  * Represents a fixed point constraint.
  */
-class PointConstraint {
+class PointConstraint
+{
 
 public:
   PointConstraint() = default;
@@ -116,7 +120,8 @@ private:
 /**
  * Represents a line constraint defined by a base point and direction vector.
  */
-class LineConstraint {
+class LineConstraint
+{
 public:
   LineConstraint() = default;
 
@@ -214,7 +219,8 @@ private:
 /**
  * Represents a plane constraint defined by a point and normal vector.
  */
-class PlaneConstraint {
+class PlaneConstraint
+{
 
 public:
   PlaneConstraint() = default;
@@ -321,10 +327,16 @@ private:
  * Represents an invalid constraint (i.e., when the two constraints don't
  * intersect)
  */
-class InvalidConstraint {
+class InvalidConstraint
+{
 
 public:
-  InvalidConstraint() = default;
+  InvalidConstraint()
+    : _err_msg("We should never get here! The InvalidConstraint object should be "
+               "detected and replaced with a valid ConstraintVariant prior to calling "
+               "any class methods.")
+  {
+  }
 
   /**
    * Dummy intersect method that should never be called.
@@ -343,11 +355,7 @@ public:
   }
 
 private:
-  std::string _err_msg =
-      std::string("We should never get here! The InvalidConstraint object ") +
-      std::string(
-          "should be detected and replaced with a valid ConstraintVariant ") +
-      std::string("prior to calling any class methods.");
+  std::string _err_msg;
 };
 
 /**
@@ -359,6 +367,11 @@ private:
  */
 inline ConstraintVariant intersect_constraints(const ConstraintVariant &a,
                                                const ConstraintVariant &b) {
+  // std::visit applies the visitor v (a Callable that can be called with any
+  // combination of types from Variants) to the active value inside a
+  // std::Variant. This circumvents the issue that the literal ConstraintVariant
+  // type does not have a method called 'intersect' (but the types defining
+  // ConstraintVariant do)
   return std::visit(
       [](const auto &lhs, const auto &rhs) -> ConstraintVariant {
         return lhs.intersect(rhs);

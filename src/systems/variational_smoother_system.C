@@ -93,7 +93,8 @@ void VariationalSmootherSystem::init_data ()
   this->prepare_for_smoothing();
 }
 
-void VariationalSmootherSystem::prepare_for_smoothing() {
+void VariationalSmootherSystem::prepare_for_smoothing()
+{
   std::unique_ptr<DiffContext> con = this->build_context();
   FEMContext & femcontext = cast_ref<FEMContext &>(*con);
   this->init_context(femcontext);
@@ -117,18 +118,18 @@ void VariationalSmootherSystem::prepare_for_smoothing() {
     femcontext.elem_fe_reinit();
 
     // Add target element info, if applicable
-    if (_target_inverse_jacobians.find(elem->type()) ==
-        _target_inverse_jacobians.end()) {
+    if (_target_inverse_jacobians.find(elem->type()) == _target_inverse_jacobians.end())
+    {
       // Create FEMap to compute target_element mapping information
       FEMap fe_map_target;
 
       // pre-request mapping derivatives
-      const auto &dxyzdxi = fe_map_target.get_dxyzdxi();
-      const auto &dxyzdeta = fe_map_target.get_dxyzdeta();
+      const auto & dxyzdxi = fe_map_target.get_dxyzdxi();
+      const auto & dxyzdeta = fe_map_target.get_dxyzdeta();
       // const auto & dxyzdzeta = fe_map_target.get_dxyzdzeta();
 
-      const auto &qrule_points = femcontext.get_element_qrule().get_points();
-      const auto &qrule_weights = femcontext.get_element_qrule().get_weights();
+      const auto & qrule_points = femcontext.get_element_qrule().get_points();
+      const auto & qrule_weights = femcontext.get_element_qrule().get_weights();
       const auto nq_points = femcontext.get_element_qrule().n_points();
 
       // If the target element is the reference element, Jacobian matrix is
@@ -137,8 +138,10 @@ void VariationalSmootherSystem::prepare_for_smoothing() {
       target_elem_inverse_jacobian_dets[elem->type()] =
           std::vector<Real>(nq_points, 1.0);
 
-      switch (elem->type()) {
-      case TRI3: {
+      switch (elem->type())
+      {
+      case TRI3:
+      {
         // Build target element: an equilateral triangle
         Tri3 target_elem;
 
@@ -166,7 +169,8 @@ void VariationalSmootherSystem::prepare_for_smoothing() {
         // will keep things general for now
         _target_inverse_jacobians[target_elem.type()] =
             std::vector<RealTensor>(nq_points);
-        for (const auto qp : make_range(nq_points)) {
+        for (const auto qp : make_range(nq_points))
+        {
           const RealTensor H_inv =
               RealTensor(dxyzdxi[qp](0), dxyzdeta[qp](0), 0, dxyzdxi[qp](1),
                          dxyzdeta[qp](1), 0, 0, 0, 1)
@@ -608,7 +612,8 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                     Real d2E_dSdR_l = 0.;
                     Real d2E_dSdR_p = 0.;
 
-                    for (const auto a : make_range(i + 1)) {
+                    for (const auto a : make_range(i + 1))
+                    {
 
                       // If this condition is met, both the ijab and abij
                       // contributions to the Jacobian are zero due to the
@@ -625,7 +630,8 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                       const Real alpha_ja_applied = alpha_times_dilation_weight * S_inv_ja;
 
                       const auto b_limit = (a == i) ? j + 1 : dim;
-                      for (const auto b : make_range(b_limit)) {
+                      for (const auto b : make_range(b_limit))
+                      {
 
                         // Combine precomputed coefficients with tensor products
                         // to get d2(beta) / dS2
