@@ -92,7 +92,8 @@ private:
         if (!is_on_boundary[i]) // only distort free dimensions
           {
             Real xi = 2. * p(i) - 1.;
-            Real modulation = 0.3; // This value constrols the strength of the distortion
+            // This value controls the strength of the distortion
+            Real modulation = 0.3;
             for (unsigned int j = 0; j < _dim; ++j)
               {
                 if (j != i)
@@ -101,12 +102,12 @@ private:
                     modulation *= (pj - 0.5) * (pj - 0.5) * 4.; // quadratic bump centered at 0.5
                   }
               }
-            output(i) = p(i) + (std::pow(xi, 3) - xi) * modulation;
+            const auto delta = (std::pow(xi, 3) - xi) * modulation;
+            // Check for delta = 0 to make sure we perturb every point
+            output(i) = (delta > TOLERANCE) ? p(i) + delta : 1.05 * p(i);
           }
         else
-          {
-            output(i) = p(i); // dimension on boundary remains unchanged
-          }
+          output(i) = p(i); // dimension on boundary remains unchanged
       }
   }
 
@@ -273,11 +274,18 @@ public:
 
     unsigned int n_elems_per_side = 5;
 
-    // If n_elems_per_side is even, then some sliding boundary nodes will have a
-    // coordinante with value 0.5, which is already the optimal position,
-    // causing distortion_is(node, true) to return false when evaluating the
-    // distorted mesh. To avoid this, we require n_elems_per_side to be odd.
-    libmesh_error_msg_if(n_elems_per_side % 2 != 1, "n_elems_per_side should be odd.");
+    // The current distortion mechanism in DistortHyperCube, combined with the
+    // way multiple subdomains are assigned below, has the property that:
+    //   - When n_elems_per_side is even, some of the subdomain boundary nodes
+    //     are colinear, leading to sliding node constraints.
+    //   - When n_elems_per_side is odd, none of the subdomain boundary nodes
+    //     are colinear, leading to all subdomain boundary nodes being fixed.
+    // Our check for preserved subdomain boundaries is overly restrictive
+    // because we error if any subdomain boundary nodes move during smoothing.
+    // To avoid this error, instead of implementing a more elaborate check for
+    // sliding subdomain boundary nodes, we require n_elems_per_side to be odd.
+    libmesh_error_msg_if(n_elems_per_side % 2 != 1,
+                         "n_elems_per_side should be odd.");
 
     switch (dim)
       {
@@ -383,15 +391,10 @@ public:
           CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, r);
           CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, 1 - r);
 
-          // Due to the type of distortion used, nodes on the x, y, or z plane
-          // of symmetry do not have their respective x, y, or z node adjusted.
-          // Just continue to the next dimension.
-          if (std::abs(r - 0.5) < distortion_tol * distortion_tol)
-            continue;
-
           const bool d_distorted = std::abs(R - std::round(R)) > distortion_tol;
           distorted |= d_distorted;
-          num_zero_or_one += (absolute_fuzzy_equals(r, 0.) || absolute_fuzzy_equals(r, 1.));
+          num_zero_or_one +=
+              (absolute_fuzzy_equals(r, 0.) || absolute_fuzzy_equals(r, 1.));
         }
 
       CPPUNIT_ASSERT_GREATEREQUAL(dim - num_dofs, num_zero_or_one);
