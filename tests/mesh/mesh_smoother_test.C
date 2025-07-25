@@ -193,7 +193,8 @@ public:
 
   CPPUNIT_TEST(testVariationalHex8);
   CPPUNIT_TEST(testVariationalHex20);
-  CPPUNIT_TEST(testVariationalHex20MultipleSubdomains);
+  CPPUNIT_TEST(testVariationalHex27);
+  CPPUNIT_TEST(testVariationalHex27MultipleSubdomains);
 #endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
 
@@ -570,12 +571,20 @@ public:
     testVariationalSmoother(mesh, variational, HEX20);
   }
 
-  void testVariationalHex20MultipleSubdomains()
+  void testVariationalHex27()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testVariationalSmoother(mesh, variational, HEX20, true);
+    testVariationalSmoother(mesh, variational, HEX27);
+  }
+
+  void testVariationalHex27MultipleSubdomains()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, HEX27, true);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
