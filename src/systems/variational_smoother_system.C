@@ -143,7 +143,7 @@ void VariationalSmootherSystem::prepare_for_smoothing()
           if (dynamic_cast<const Tri*>(elem))
             {
 
-              // The target element will be an equilateral triangle with area equal to 
+              // The target element will be an equilateral triangle with area equal to
               // the area of the reference element.
 
               // First, let's define the nodal locations of the vertices
