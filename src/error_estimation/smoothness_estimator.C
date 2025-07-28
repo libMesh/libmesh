@@ -181,7 +181,6 @@ void SmoothnessEstimator::estimate_smoothness (const System & system,
   // non-local elements.  Summing the vector will provide the true
   // value for each element, local or remote
   this->reduce_smoothness (smoothness_per_cell, system.comm());
-  this->reduce_smoothness (smoothness_per_cell, system.comm());
 
   // If we used a non-standard solution before, now is the time to fix
   // the current_local_solution
