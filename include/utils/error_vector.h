@@ -148,7 +148,8 @@ public:
    * the active elements of \p mesh.
    */
   void plot_error(const std::string & filename,
-                  const MeshBase & mesh) const;
+                  const MeshBase & mesh,
+                  const std::string & data_type = "error") const;
 
 protected:
   /**
