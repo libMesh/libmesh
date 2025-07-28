@@ -118,9 +118,10 @@ void VariationalMeshSmoother::smooth(unsigned int)
   es.init();
 
   // More debugging options
-  DiffSolver & solver = *(sys.time_solver->diff_solver().get());
+  //DiffSolver & solver = *(sys.time_solver->diff_solver().get());
   //solver.quiet = false;
-  solver.verbose = true;
+  //solver.verbose = true;
+
   sys.time_solver->diff_solver()->relative_residual_tolerance = TOLERANCE*TOLERANCE;
 
   sys.solve();
