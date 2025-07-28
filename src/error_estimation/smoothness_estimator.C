@@ -132,12 +132,12 @@ Real SmoothnessEstimator::compute_slope(int N, Real Sx, Real Sy, Real Sxx, Real 
     return (N * Sxy - Sx * Sy) / denom;
 }
 
-void SmoothnessEstimator::reduce_smoothness (std::vector<ErrorVectorReal> & _smoothness_per_cell,
+void SmoothnessEstimator::reduce_smoothness (std::vector<ErrorVectorReal> & smoothness_per_cell,
                                    const Parallel::Communicator & comm)
 {
   // Aggregates element-wise contributions computed
   // in parallel across all processors
-  comm.sum(_smoothness_per_cell);
+  comm.sum(smoothness_per_cell);
 }
 
 void SmoothnessEstimator::estimate_smoothness (const System & system,
