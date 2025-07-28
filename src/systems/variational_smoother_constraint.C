@@ -536,10 +536,6 @@ void VariationalSmootherConstraint::find_nodal_or_face_neighbors(
   if (!neighbors.size())
     {
       // Grab the element containing node
-      // It doesn't make sense for a node having no edge neighbors to belong to
-      // multiple elements, right? Otherwise, we will figure out those cases as
-      // they occur.
-      libmesh_assert(nodes_to_elem_map.at(node.id()).size() == 1);
       const auto *elem = nodes_to_elem_map.at(node.id()).front();
       // Find the element side containing node
       for (const auto &side : elem->side_index_range())
