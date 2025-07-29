@@ -140,7 +140,7 @@ void VariationalSmootherSystem::prepare_for_smoothing()
               std::vector<Real>(nq_points, 1.0);
 
           // Elems deriving from Tri
-          if (dynamic_cast<const Tri*>(elem))
+          if (elem->type() == TRI3 || elem->type() == TRI6)
             {
 
               // The target element will be an equilateral triangle with area equal to
