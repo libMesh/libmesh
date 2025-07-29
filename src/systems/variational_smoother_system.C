@@ -159,29 +159,22 @@ void VariationalSmootherSystem::prepare_for_smoothing()
               Real ref_area;
 
               // Target element
-              std::unique_ptr<Tri> target_elem;
+              const auto target_elem = Elem::build(elem->type());
+
+              // equilateral triangle side length that preserves area of reference
+              // element
+              ref_area = target_elem->reference_elem()->volume();
 
               switch (elem->type())
                 {
                 case TRI3:
                   {
-                    target_elem = std::make_unique<Tri3>();
-
-                    // equilateral triangle side length that preserves area of reference
-                    // element
-                    ref_area = target_elem->reference_elem()->volume();
-
+                    // Nothing to do here, vertices already defined in equilateral_points
                     break;
                   }
 
                 case TRI6:
                   {
-                    target_elem = std::make_unique<Tri6>();
-
-                    // equilateral triangle side length that preserves area of reference
-                    // element
-                    ref_area = target_elem->reference_elem()->volume();
-
                     // Define the midpoint nodes of the equilateral triangle
                     equilateral_points.emplace_back(0.50, 0.          );
                     equilateral_points.emplace_back(0.75, 0.25 * sqrt_3);
