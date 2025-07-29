@@ -155,15 +155,11 @@ void VariationalSmootherSystem::prepare_for_smoothing()
                 Point(0.5, 0.5 * sqrt_3)
               };
 
-              // Area of the reference element
-              Real ref_area;
-
               // Target element
               const auto target_elem = Elem::build(elem->type());
 
-              // equilateral triangle side length that preserves area of reference
-              // element
-              ref_area = target_elem->reference_elem()->volume();
+              // Area of the reference element
+              const auto ref_area = target_elem->reference_elem()->volume();
 
               switch (elem->type())
                 {
