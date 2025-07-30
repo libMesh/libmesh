@@ -195,7 +195,7 @@ void VariationalSmootherSystem::prepare_for_smoothing()
                   // Scale the nodal positions to conserve area
                   auto node_ptr = std::make_unique<Node>(
                       equilateral_points[node_id] * side_length, node_id);
-                  target_elem->set_node(node_id) = node_ptr.get();
+                  target_elem->set_node(node_id, node_ptr.get());
 
                   // Store the pointer so it stays alive
                   owned_nodes.push_back(std::move(node_ptr));
