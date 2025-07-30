@@ -286,20 +286,7 @@ public:
     const auto dim = ref_elem->dim();
     const bool type_is_tri = Utility::enum_to_string(type).compare(0, 3, "TRI") == 0;
 
-    unsigned int n_elems_per_side = 5;
-
-    // The current distortion mechanism in DistortHyperCube, combined with the
-    // way multiple subdomains are assigned below, has the property that:
-    //   - When n_elems_per_side is even, some of the subdomain boundary nodes
-    //     are colinear, leading to sliding node constraints.
-    //   - When n_elems_per_side is odd, none of the subdomain boundary nodes
-    //     are colinear, leading to all subdomain boundary nodes being fixed.
-    // Our check for preserved subdomain boundaries is overly restrictive
-    // because we error if any subdomain boundary nodes move during smoothing.
-    // To avoid this error, instead of implementing a more elaborate check for
-    // sliding subdomain boundary nodes, we require n_elems_per_side to be odd.
-    libmesh_error_msg_if(n_elems_per_side % 2 != 1,
-                         "n_elems_per_side should be odd.");
+    unsigned int n_elems_per_side = 4;
 
     switch (dim)
       {
@@ -334,7 +321,7 @@ public:
     MeshTools::Modification::redistribute(mesh, dh);
 
     // Add multiple subdomains if requested
-    std::unordered_map<dof_id_type, Point> subdomain_boundary_node_id_to_point;
+    std::unordered_map<subdomain_id_type, Real> distorted_subdomain_volumes;
     if (multiple_subdomains)
       {
         // Modify the subdomain ids in an interesting way
@@ -349,21 +336,9 @@ public:
 
         // This loop should NOT be combined with the one above because we need to
         // finish checking and updating subdomain ids for all elements before
-        // recording the final subdomain boundary.
+        // recording the final subdomain volumes.
         for (auto * elem : mesh.active_element_ptr_range())
-          for (const auto & s : elem->side_index_range())
-            {
-              const auto * neighbor = elem->neighbor_ptr(s);
-              if (neighbor == nullptr)
-                continue;
-
-              if (elem->subdomain_id() != neighbor->subdomain_id())
-                // This side is part of a subdomain boundary, record the
-                // corresponding node locations
-                for (const auto & n : elem->nodes_on_side(s))
-                  subdomain_boundary_node_id_to_point[elem->node_id(n)] =
-                      Point(*(elem->get_nodes()[n]));
-            }
+          distorted_subdomain_volumes[elem->subdomain_id()] += elem->volume();
       }
 
 
@@ -428,17 +403,7 @@ public:
           // if (num_dofs < dim)
           return true;
         return distorted == distortion;
-      };
 
-    // Function to check if a given node has changed based on previous mapping
-    auto is_subdomain_boundary_node_the_same = [&subdomain_boundary_node_id_to_point](
-                                                   const Node & node) {
-      auto it = subdomain_boundary_node_id_to_point.find(node.id());
-      if (it != subdomain_boundary_node_id_to_point.end())
-        return (relative_fuzzy_equals(Point(node), subdomain_boundary_node_id_to_point[node.id()]));
-      else
-        // node is not a subdomain boundary node, just return true
-        return true;
     };
 
     // Make sure our DistortSquare transformation has distorted the mesh
@@ -466,15 +431,27 @@ public:
         MeshTools::Modification::redistribute(mesh, pts);
       }
 
-    // Make sure we're not too distorted anymore OR that interval subdomain boundary nodes did not
-    // change.
-    for (auto node : mesh.node_ptr_range())
+    if (multiple_subdomains)
       {
-        if (multiple_subdomains)
-          CPPUNIT_ASSERT(is_subdomain_boundary_node_the_same(*node));
-        else
-          CPPUNIT_ASSERT(distortion_is(*node, false, 1e-3));
+        // Make sure the subdomain volumes didn't change. Although this doesn't
+        // guarantee that the subdomain didn't change, it is a good indicator
+        // and is friedly to sliding subdomain boundary nodes.
+        std::unordered_map<subdomain_id_type, Real> smoothed_subdomain_volumes;
+        for (auto * elem : mesh.active_element_ptr_range())
+          smoothed_subdomain_volumes[elem->subdomain_id()] += elem->volume();
+
+        for (const auto & pair : distorted_subdomain_volumes)
+          {
+            const auto & subdomain_id = pair.first;
+            CPPUNIT_ASSERT(
+                relative_fuzzy_equals(libmesh_map_find(distorted_subdomain_volumes, subdomain_id),
+                                      libmesh_map_find(smoothed_subdomain_volumes, subdomain_id)));
+          }
       }
+    else
+      // Make sure we're not too distorted anymore
+      for (auto node : mesh.node_ptr_range())
+        CPPUNIT_ASSERT(distortion_is(*node, false, 1e-3));
   }
 
   void testLaplaceQuad()
