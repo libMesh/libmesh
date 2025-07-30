@@ -192,13 +192,10 @@ void VariationalSmootherSystem::prepare_for_smoothing()
               // Set nodes of target element to form an equilateral triangle
               for (const dof_id_type node_id : index_range(equilateral_points))
                 {
-                  // Scale the nodal positions to conserve area
-                  auto node_ptr = std::make_unique<Node>(
-                      equilateral_points[node_id] * side_length, node_id);
-                  target_elem->set_node(node_id, node_ptr.get());
-
-                  // Store the pointer so it stays alive
-                  owned_nodes.push_back(std::move(node_ptr));
+                  // Scale the nodal positions to conserve area, store the pointer to keep it alive
+                  owned_nodes.emplace_back(
+                      Node::build(equilateral_points[node_id] * side_length, node_id));
+                  target_elem->set_node(node_id, owned_nodes.back().get());
                 }
 
               // build map
@@ -224,7 +221,7 @@ void VariationalSmootherSystem::prepare_for_smoothing()
         }// if find == end()
 
       // Reference volume computation
-      Real elem_integrated_det_J(0.);
+      Real elem_integrated_det_J = 0.;
       for (const auto qp : index_range(JxW))
         elem_integrated_det_J +=
             JxW[qp] * target_elem_inverse_jacobian_dets[elem->type()][qp];

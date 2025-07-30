@@ -429,10 +429,10 @@ private:
    * HEX27 elements.
    */
   static void find_nodal_or_face_neighbors(
-      const MeshBase &mesh, const Node &node,
-      const std::unordered_map<dof_id_type, std::vector<const Elem *>>
-          &nodes_to_elem_map,
-      std::vector<const Node *> &neighbors);
+      const MeshBase & mesh,
+      const Node & node,
+      const std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
+      std::vector<const Node *> & neighbors);
 
   /**
    * Determines whether two neighboring nodes share a common boundary id.

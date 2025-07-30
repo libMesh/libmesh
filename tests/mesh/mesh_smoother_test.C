@@ -13,6 +13,7 @@
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/system.h> // LIBMESH_HAVE_SOLVER define
 #include "libmesh/face_tri.h"
+#include "libmesh/utility.h"
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -20,6 +21,7 @@
 namespace
 {
 using namespace libMesh;
+using Utility::pow;
 
 // Distortion function that doesn't distort boundary nodes
 // 2D only, use for LaplaceMeshSmoother
@@ -41,8 +43,8 @@ class DistortSquare : public FunctionBase<Real>
     output.resize(3);
     const Real eta = 2 * p(0) - 1;
     const Real zeta = 2 * p(1) - 1;
-    output(0) = p(0) + (std::pow(eta, 3) - eta) * p(1) * (1 - p(1));
-    output(1) = p(1) + (std::pow(zeta, 3) - zeta) * p(0) * (1 - p(0));
+    output(0) = p(0) + (pow<3>(eta) - eta) * p(1) * (1 - p(1));
+    output(1) = p(1) + (pow<3>(zeta) - zeta) * p(0) * (1 - p(0));
     output(2) = 0;
   }
 };
@@ -103,7 +105,7 @@ private:
                     modulation *= (pj - 0.5) * (pj - 0.5) * 4.; // quadratic bump centered at 0.5
                   }
               }
-            const auto delta = (std::pow(xi, 3) - xi) * modulation;
+            const auto delta = (pow<3>(xi) - xi) * modulation;
             // Check for delta = 0 to make sure we perturb every point
             output(i) = (delta > TOLERANCE) ? p(i) + delta : 1.05 * p(i);
           }
