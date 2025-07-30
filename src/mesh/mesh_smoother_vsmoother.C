@@ -123,6 +123,7 @@ void VariationalMeshSmoother::setup()
   // solver.verbose = true;
 
   _system->time_solver->diff_solver()->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+  _system->time_solver->diff_solver()->absolute_residual_tolerance = TOLERANCE * TOLERANCE;
 
   _setup_called = true;
 }
