@@ -155,9 +155,9 @@ void VariationalSmootherSystem::prepare_for_smoothing()
               Node node_0 = Node(0., 0.);
               Node node_1 = Node(s, 0.);
               Node node_2 = Node(0.5 * s, 0.5 * s * sqrt_3);
-              target_elem.set_node(0) = &node_0;
-              target_elem.set_node(1) = &node_1;
-              target_elem.set_node(2) = &node_2;
+              target_elem.set_node(0, &node_0);
+              target_elem.set_node(1, &node_1);
+              target_elem.set_node(2, &node_2);
 
               // build map
               fe_map_target.init_reference_to_physical_map(dim, qrule_points,
