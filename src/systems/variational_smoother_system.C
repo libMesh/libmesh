@@ -427,7 +427,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       const Real chi_prime = 0.5 * (1. + det / sqrt_term);
       const Real chi_prime_sq = chi_prime * chi_prime;
       // d2chi(x) / dx2
-      const Real chi_2prime = 0.5 * (1. / sqrt_term - det_sq / std::pow(sqrt_term, 3));
+      const Real chi_2prime = 0.5 * (1. / sqrt_term - det_sq / Utility::pow<3>(sqrt_term));
 
       // Distortion metric (beta)
       //const Real beta = trace_powers[0] / chi;
