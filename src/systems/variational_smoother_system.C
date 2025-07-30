@@ -168,6 +168,9 @@ void VariationalSmootherSystem::init_context(DiffContext & context)
       fe_map.get_dxyzdzeta();
       fe_map.get_JxW();
 
+      // Mesh may be tangled, allow negative Jacobians
+      fe_map.set_jacobian_tolerance(std::numeric_limits<Real>::lowest());
+
       c.get_side_fe( 0, my_fe, dim );
       my_fe->get_nothing();
     }
