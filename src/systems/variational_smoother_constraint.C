@@ -521,6 +521,45 @@ void VariationalSmootherConstraint::constrain_node_to_line(const Node & node,
     }
 }
 
+void VariationalSmootherConstraint::find_nodal_or_face_neighbors(
+    const MeshBase & mesh,
+    const Node & node,
+    const std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
+    std::vector<const Node *> & neighbors)
+{
+  // Find all the nodal neighbors... that is the nodes directly connected
+  // to this node through one edge.
+  MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+
+  // If no neighbors are found, use all nodes on the containing side as
+  // neighbors.
+  if (!neighbors.size())
+    {
+      // Grab the element containing node
+      const auto * elem = libmesh_map_find(nodes_to_elem_map, node.id()).front();
+      // Find the element side containing node
+      for (const auto &side : elem->side_index_range())
+        {
+          const auto &nodes_on_side = elem->nodes_on_side(side);
+          const auto it =
+              std::find_if(nodes_on_side.begin(), nodes_on_side.end(), [&](auto local_node_id) {
+                return elem->node_id(local_node_id) == node.id();
+              });
+
+          if (it != nodes_on_side.end())
+            {
+              for (const auto &local_node_id : nodes_on_side)
+                // No need to add node itself as a neighbor
+                if (const auto *node_ptr = elem->node_ptr(local_node_id);
+                    *node_ptr != node)
+                  neighbors.push_back(node_ptr);
+              break;
+            }
+        }
+    }
+  libmesh_assert(neighbors.size());
+}
+
 // Utility function to determine whether two nodes share a boundary ID.
 // The motivation for this is that a sliding boundary node on a triangular
 // element can have a neighbor boundary node in the same element that is not
@@ -588,9 +627,11 @@ VariationalSmootherConstraint::get_neighbors_for_subdomain_constraint(
 {
 
   // Find all the nodal neighbors... that is the nodes directly connected
-  // to this node through one edge
+  // to this node through one edge, or if none exists, use other nodes on the
+  // containing face
   std::vector<const Node *> neighbors;
-  MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+  VariationalSmootherConstraint::find_nodal_or_face_neighbors(
+      mesh, node, nodes_to_elem_map, neighbors);
 
   // Each constituent set corresponds to neighbors sharing a face on the
   // subdomain boundary
@@ -600,8 +641,8 @@ VariationalSmootherConstraint::get_neighbors_for_subdomain_constraint(
     {
       // Determine whether the neighbor is on the subdomain boundary
       // First, find the common elements that both node and neigh belong to
-      const auto & elems_containing_node = nodes_to_elem_map.at(node.id());
-      const auto & elems_containing_neigh = nodes_to_elem_map.at(neigh->id());
+      const auto & elems_containing_node = libmesh_map_find(nodes_to_elem_map, node.id());
+      const auto & elems_containing_neigh = libmesh_map_find(nodes_to_elem_map, neigh->id());
       const Elem * common_elem = nullptr;
       for (const auto * neigh_elem : elems_containing_neigh)
         {
@@ -672,9 +713,11 @@ VariationalSmootherConstraint::get_neighbors_for_boundary_constraint(
 {
 
   // Find all the nodal neighbors... that is the nodes directly connected
-  // to this node through one edge
+  // to this node through one edge, or if none exists, use other nodes on the
+  // containing face
   std::vector<const Node *> neighbors;
-  MeshTools::find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+  VariationalSmootherConstraint::find_nodal_or_face_neighbors(
+      mesh, node, nodes_to_elem_map, neighbors);
 
   // Each constituent set corresponds to neighbors sharing a face on the
   // boundary
@@ -689,8 +732,8 @@ VariationalSmootherConstraint::get_neighbors_for_boundary_constraint(
 
       // Determine whether nodes share a common boundary id
       // First, find the common element that both node and neigh belong to
-      const auto & elems_containing_node = nodes_to_elem_map.at(node.id());
-      const auto & elems_containing_neigh = nodes_to_elem_map.at(neigh->id());
+      const auto & elems_containing_node = libmesh_map_find(nodes_to_elem_map, node.id());
+      const auto & elems_containing_neigh = libmesh_map_find(nodes_to_elem_map, neigh->id());
       const Elem * common_elem = nullptr;
       for (const auto * neigh_elem : elems_containing_neigh)
         {

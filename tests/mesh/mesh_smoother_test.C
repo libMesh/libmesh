@@ -12,6 +12,8 @@
 #include <libmesh/reference_elem.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/system.h> // LIBMESH_HAVE_SOLVER define
+#include "libmesh/face_tri.h"
+#include "libmesh/utility.h"
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -19,6 +21,7 @@
 namespace
 {
 using namespace libMesh;
+using Utility::pow;
 
 // Distortion function that doesn't distort boundary nodes
 // 2D only, use for LaplaceMeshSmoother
@@ -40,8 +43,8 @@ class DistortSquare : public FunctionBase<Real>
     output.resize(3);
     const Real eta = 2 * p(0) - 1;
     const Real zeta = 2 * p(1) - 1;
-    output(0) = p(0) + (std::pow(eta, 3) - eta) * p(1) * (1 - p(1));
-    output(1) = p(1) + (std::pow(zeta, 3) - zeta) * p(0) * (1 - p(0));
+    output(0) = p(0) + (pow<3>(eta) - eta) * p(1) * (1 - p(1));
+    output(1) = p(1) + (pow<3>(zeta) - zeta) * p(0) * (1 - p(0));
     output(2) = 0;
   }
 };
@@ -92,7 +95,8 @@ private:
         if (!is_on_boundary[i]) // only distort free dimensions
           {
             Real xi = 2. * p(i) - 1.;
-            Real modulation = 0.3; // This value constrols the strength of the distortion
+            // This value controls the strength of the distortion
+            Real modulation = 0.3;
             for (unsigned int j = 0; j < _dim; ++j)
               {
                 if (j != i)
@@ -101,12 +105,12 @@ private:
                     modulation *= (pj - 0.5) * (pj - 0.5) * 4.; // quadratic bump centered at 0.5
                   }
               }
-            output(i) = p(i) + (std::pow(xi, 3) - xi) * modulation;
+            const auto delta = (pow<3>(xi) - xi) * modulation;
+            // Check for delta = 0 to make sure we perturb every point
+            output(i) = (delta > TOLERANCE) ? p(i) + delta : 1.05 * p(i);
           }
         else
-          {
-            output(i) = p(i); // dimension on boundary remains unchanged
-          }
+          output(i) = p(i); // dimension on boundary remains unchanged
       }
   }
 
@@ -178,14 +182,21 @@ public:
   CPPUNIT_TEST(testLaplaceQuad);
   CPPUNIT_TEST(testLaplaceTri);
 #if defined(LIBMESH_ENABLE_VSMOOTHER) && defined(LIBMESH_HAVE_SOLVER)
-  CPPUNIT_TEST(testVariationalEdge);
-  CPPUNIT_TEST(testVariationalEdgeMultipleSubdomains);
+  CPPUNIT_TEST(testVariationalEdge2);
+  CPPUNIT_TEST(testVariationalEdge3);
+  CPPUNIT_TEST(testVariationalEdge3MultipleSubdomains);
+
   CPPUNIT_TEST(testVariationalQuad);
   CPPUNIT_TEST(testVariationalQuadMultipleSubdomains);
-  CPPUNIT_TEST(testVariationalTri);
-  CPPUNIT_TEST(testVariationalTriMultipleSubdomains);
-  CPPUNIT_TEST(testVariationalHex);
-  CPPUNIT_TEST(testVariationalHexMultipleSubdomains);
+
+  CPPUNIT_TEST(testVariationalTri3);
+  CPPUNIT_TEST(testVariationalTri6);
+  CPPUNIT_TEST(testVariationalTri6MultipleSubdomains);
+
+  CPPUNIT_TEST(testVariationalHex8);
+  CPPUNIT_TEST(testVariationalHex20);
+  CPPUNIT_TEST(testVariationalHex27);
+  CPPUNIT_TEST(testVariationalHex27MultipleSubdomains);
 #endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
 
@@ -269,15 +280,25 @@ public:
   {
     LOG_UNIT_TEST;
 
-    const auto dim = ReferenceElem::get(type).dim();
+    // Get mesh dimension, determine whether type is triangular
+    const auto * ref_elem = &(ReferenceElem::get(type));
+    const auto dim = ref_elem->dim();
+    const bool type_is_tri = dynamic_cast<const Tri*>(ref_elem);
 
     unsigned int n_elems_per_side = 5;
 
-    // If n_elems_per_side is even, then some sliding boundary nodes will have a
-    // coordinante with value 0.5, which is already the optimal position,
-    // causing distortion_is(node, true) to return false when evaluating the
-    // distorted mesh. To avoid this, we require n_elems_per_side to be odd.
-    libmesh_error_msg_if(n_elems_per_side % 2 != 1, "n_elems_per_side should be odd.");
+    // The current distortion mechanism in DistortHyperCube, combined with the
+    // way multiple subdomains are assigned below, has the property that:
+    //   - When n_elems_per_side is even, some of the subdomain boundary nodes
+    //     are colinear, leading to sliding node constraints.
+    //   - When n_elems_per_side is odd, none of the subdomain boundary nodes
+    //     are colinear, leading to all subdomain boundary nodes being fixed.
+    // Our check for preserved subdomain boundaries is overly restrictive
+    // because we error if any subdomain boundary nodes move during smoothing.
+    // To avoid this error, instead of implementing a more elaborate check for
+    // sliding subdomain boundary nodes, we require n_elems_per_side to be odd.
+    libmesh_error_msg_if(n_elems_per_side % 2 != 1,
+                         "n_elems_per_side should be odd.");
 
     switch (dim)
       {
@@ -344,64 +365,69 @@ public:
             }
       }
 
-    // Function to assert the distortion is as expected
-    const auto & boundary_info = mesh.get_boundary_info();
-    auto distortion_is = [&n_elems_per_side, &dim, &boundary_info](
-                             const Node & node, bool distortion, Real distortion_tol = TOLERANCE) {
-      // Get boundary ids associated with the node
-      std::vector<boundary_id_type> boundary_ids;
-      boundary_info.boundary_ids(&node, boundary_ids);
 
-      // This tells us what type of node we are: internal, sliding, or fixed
-      const auto num_dofs = dim - boundary_ids.size();
-      /*
-       * The following cases of num_dofs are possible, ASSUMING all boundaries
-       * are non-overlapping
-       * 3D: 3-0,     3-1,     3-2,     3-3
-       *   = 3        2        1        0
-       *     internal sliding, sliding, fixed
-       * 2D: 2-0,     2-1,     2-2
-       *   = 2        1        0
-       *     internal sliding, fixed
-       * 1D: 1-0,     1-1
-       *   = 1        0
-       *     internal fixed
-       *
-       * We expect that R is an integer in [0, n_elems_per_side] for
-       * num_dofs of the node's cooridinantes, while the remaining coordinates
-       * are fixed to the boundary with value 0 or 1. In other words, at LEAST
-       * dim - num_dofs coordinantes should be 0 or 1.
-       */
+      // Get the mesh order
+      const auto &elem_orders = mesh.elem_default_orders();
+      libmesh_error_msg_if(
+          elem_orders.size() != 1,
+          "The variational smoother cannot be used for mixed-order meshes!");
+      const auto fe_order = *elem_orders.begin();
 
-      std::size_t num_zero_or_one = 0;
+      // Function to assert the distortion is as expected
+      const auto &boundary_info = mesh.get_boundary_info();
+      auto distortion_is = [
+        &n_elems_per_side, &dim, &boundary_info, &fe_order
+      ](const Node &node, bool distortion, Real distortion_tol = TOLERANCE)
+      {
+        // Get boundary ids associated with the node
+        std::vector<boundary_id_type> boundary_ids;
+        boundary_info.boundary_ids(&node, boundary_ids);
 
-      bool distorted = false;
-      for (const auto d : make_range(dim))
-        {
-          const Real r = node(d);
-          const Real R = r * n_elems_per_side;
-          CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, r);
-          CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, 1 - r);
+        // This tells us what type of node we are: internal, sliding, or fixed
+        const auto num_dofs = dim - boundary_ids.size();
+        /*
+         * The following cases of num_dofs are possible, ASSUMING all boundaries
+         * are non-overlapping
+         * 3D: 3-0,     3-1,     3-2,     3-3
+         *   = 3        2        1        0
+         *     internal sliding, sliding, fixed
+         * 2D: 2-0,     2-1,     2-2
+         *   = 2        1        0
+         *     internal sliding, fixed
+         * 1D: 1-0,     1-1
+         *   = 1        0
+         *     internal fixed
+         *
+         * We expect that R is an integer in [0, n_elems_per_side] for
+         * num_dofs of the node's cooridinantes, while the remaining coordinates
+         * are fixed to the boundary with value 0 or 1. In other words, at LEAST
+         * dim - num_dofs coordinantes should be 0 or 1.
+         */
 
-          // Due to the type of distortion used, nodes on the x, y, or z plane
-          // of symmetry do not have their respective x, y, or z node adjusted.
-          // Just continue to the next dimension.
-          if (std::abs(r - 0.5) < distortion_tol * distortion_tol)
-            continue;
+        std::size_t num_zero_or_one = 0;
 
-          const bool d_distorted = std::abs(R - std::round(R)) > distortion_tol;
-          distorted |= d_distorted;
-          num_zero_or_one += (absolute_fuzzy_equals(r, 0.) || absolute_fuzzy_equals(r, 1.));
-        }
+        bool distorted = false;
+        for (const auto d : make_range(dim))
+          {
+            const Real r = node(d);
+            const Real R = r * n_elems_per_side * fe_order;
+            CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, r);
+            CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, 1 - r);
 
-      CPPUNIT_ASSERT_GREATEREQUAL(dim - num_dofs, num_zero_or_one);
+            const bool d_distorted = std::abs(R - std::round(R)) > distortion_tol;
+            distorted |= d_distorted;
+            num_zero_or_one +=
+                (absolute_fuzzy_equals(r, 0.) || absolute_fuzzy_equals(r, 1.));
+          }
 
-      // We can never expect a fixed node to be distorted
-      if (num_dofs == 0)
-        // if (num_dofs < dim)
-        return true;
-      return distorted == distortion;
-    };
+        CPPUNIT_ASSERT_GREATEREQUAL(dim - num_dofs, num_zero_or_one);
+
+        // We can never expect a fixed node to be distorted
+        if (num_dofs == 0)
+          // if (num_dofs < dim)
+          return true;
+        return distorted == distortion;
+      };
 
     // Function to check if a given node has changed based on previous mapping
     auto is_subdomain_boundary_node_the_same = [&subdomain_boundary_node_id_to_point](
@@ -421,7 +447,7 @@ public:
     // Transform the square mesh of triangles to a parallelogram mesh of
     // triangles. This will allow the Variational Smoother to smooth the mesh
     // to the optimal case of equilateral triangles
-    if (type == TRI3)
+    if (type_is_tri)
       {
         SquareToParallelogram stp;
         MeshTools::Modification::redistribute(mesh, stp);
@@ -433,7 +459,7 @@ public:
     // the Variational Smoother, equilateral triangular elements will be
     // transformed into right triangular elements that align with the original
     // undistorted mesh.
-    if (type == TRI3)
+    if (type_is_tri)
       {
         ParallelogramToSquare pts;
         MeshTools::Modification::redistribute(mesh, pts);
@@ -467,7 +493,7 @@ public:
   }
 
 #ifdef LIBMESH_ENABLE_VSMOOTHER
-  void testVariationalEdge()
+  void testVariationalEdge2()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
@@ -475,12 +501,20 @@ public:
     testVariationalSmoother(mesh, variational, EDGE2);
   }
 
-  void testVariationalEdgeMultipleSubdomains()
+  void testVariationalEdge3()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testVariationalSmoother(mesh, variational, EDGE2, true);
+    testVariationalSmoother(mesh, variational, EDGE3);
+  }
+
+  void testVariationalEdge3MultipleSubdomains()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, EDGE3, true);
   }
 
   void testVariationalQuad()
@@ -499,7 +533,7 @@ public:
     testVariationalSmoother(mesh, variational, QUAD4, true);
   }
 
-  void testVariationalTri()
+  void testVariationalTri3()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
@@ -507,7 +541,15 @@ public:
     testVariationalSmoother(mesh, variational, TRI3);
   }
 
-  void testVariationalTriMultipleSubdomains()
+  void testVariationalTri6()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, TRI6);
+  }
+
+  void testVariationalTri6MultipleSubdomains()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
@@ -515,7 +557,7 @@ public:
     testVariationalSmoother(mesh, variational, TRI3, true);
   }
 
-  void testVariationalHex()
+  void testVariationalHex8()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
@@ -523,12 +565,28 @@ public:
     testVariationalSmoother(mesh, variational, HEX8);
   }
 
-  void testVariationalHexMultipleSubdomains()
+  void testVariationalHex20()
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testVariationalSmoother(mesh, variational, HEX8, true);
+    testVariationalSmoother(mesh, variational, HEX20);
+  }
+
+  void testVariationalHex27()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, HEX27);
+  }
+
+  void testVariationalHex27MultipleSubdomains()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, HEX27, true);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
