@@ -638,7 +638,7 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
   const auto ref_vol = target_elem->reference_elem()->volume();
 
   // Update the nodes of the target element, depending on type
-  const Real sqrt_3 = std::sqrt(3.);
+  const Real sqrt_3 = std::sqrt(Real(3));
   std::vector<std::unique_ptr<Node>> owned_nodes;
 
   const auto type_str = Utility::enum_to_string(type);
