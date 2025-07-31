@@ -386,6 +386,20 @@ void deallocate (std::vector<T> & vec)
 std::string_view basename_of(const std::string & fullname);
 
 
+/**
+ * Look for a substring within a string.
+ */
+bool contains(std::string_view superstring,
+              std::string_view substring);
+
+
+/**
+ * Look for a substring at the very end of a string.
+ */
+bool ends_with(std::string_view superstring,
+               std::string_view suffix);
+
+
 // Utility functions useful when dealing with complex numbers.
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
