@@ -14,6 +14,7 @@
 #include <libmesh/system.h> // LIBMESH_HAVE_SOLVER define
 #include "libmesh/face_tri.h"
 #include "libmesh/utility.h"
+#include "libmesh/enum_to_string.h"
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -283,7 +284,7 @@ public:
     // Get mesh dimension, determine whether type is triangular
     const auto * ref_elem = &(ReferenceElem::get(type));
     const auto dim = ref_elem->dim();
-    const bool type_is_tri = dynamic_cast<const Tri*>(ref_elem);
+    const bool type_is_tri = Utility::enum_to_string(type).compare(0, 3, "TRI") == 0;
 
     unsigned int n_elems_per_side = 5;
 
