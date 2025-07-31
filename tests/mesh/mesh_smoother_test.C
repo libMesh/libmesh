@@ -14,6 +14,7 @@
 #include <libmesh/system.h> // LIBMESH_HAVE_SOLVER define
 #include "libmesh/face_tri.h"
 #include "libmesh/utility.h"
+#include "libmesh/enum_to_string.h"
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"

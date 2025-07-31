@@ -29,6 +29,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/utility.h"
+#include "libmesh/enum_to_string.h"
 
 // C++ includes
 #include <functional> // std::reference_wrapper
