@@ -202,5 +202,27 @@ std::string Utility::unzip_file (std::string_view name)
 
 
 
+bool Utility::contains(std::string_view superstring, std::string_view substring)
+{
+  // This can just be C++23 contains() someday
+  return superstring.find(substring) != std::string::npos;
+}
+
+
+
+bool Utility::ends_with(std::string_view superstring,
+                        std::string_view suffix)
+{
+  // This can just be C++20 ends_with() someday
+  const auto sufsize = suffix.size();
+  const auto supsize = superstring.size();
+  if (sufsize > supsize)
+    return false;
+
+  return superstring.compare(supsize - sufsize, std::string::npos,
+                             suffix) == 0;
+}
+
+
 
 } // namespace libMesh
