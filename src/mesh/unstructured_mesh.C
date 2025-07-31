@@ -1237,7 +1237,7 @@ void UnstructuredMesh::read (const std::string & name,
   // during prepare_for_use() for certain types of mesh files.
   // This is required in cases where there is an associated solution
   // file which expects a certain ordering of the nodes.
-  if (name.rfind(".gmv") == name.size() - 4)
+  if (Utility::ends_with(name, ".gmv"))
     this->allow_renumbering(false);
 
   NameBasedIO(*this).read(name);

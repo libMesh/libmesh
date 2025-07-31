@@ -222,8 +222,7 @@ void STLIO::read (const std::string & filename)
 
 std::unique_ptr<std::istream> STLIO::open_file (const std::string & filename)
 {
-  std::string_view basename = Utility::basename_of(filename);
-  const bool gzipped_file = (basename.rfind(".gz") == basename.size() - 3);
+  const bool gzipped_file = Utility::ends_with(filename, ".gz");
 
   std::unique_ptr<std::istream> file;
 

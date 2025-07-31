@@ -28,6 +28,7 @@
 #include "libmesh/mesh_tools.h"
 #include "libmesh/node.h"
 #include "libmesh/partitioner.h"
+#include "libmesh/utility.h"
 #include "libmesh/xdr_cxx.h"
 
 // TIMPI includes

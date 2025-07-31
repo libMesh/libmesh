@@ -35,6 +35,7 @@
 #include "libmesh/point.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/enum_xdr_mode.h"
+#include "libmesh/utility.h"
 
 
 using namespace libMesh;
@@ -151,9 +152,9 @@ int main(int argc, char ** argv)
 
   XdrMODE read_mode;
 
-  if (solnname.rfind(".xdr") < solnname.size())
+  if (Utility::contains(solnname, ".xdr"))
     read_mode = DECODE;
-  else if (solnname.rfind(".xda") < solnname.size())
+  else if (Utility::contains(solnname, ".xda"))
     read_mode = READ;
   else
     libmesh_error_msg("Unrecognized file extension on " << solnname);

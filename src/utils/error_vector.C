@@ -268,19 +268,19 @@ void ErrorVector::plot_error(const std::string & filename,
       mesh.renumber_nodes_and_elements();
     }
 
-  if (filename.rfind(".gmv") < filename.size())
+  if (Utility::contains(filename, ".gmv"))
     {
       GMVIO(mesh).write_discontinuous_gmv(filename,
                                           temp_es, false);
     }
-  else if (filename.rfind(".plt") < filename.size())
+  else if (Utility::contains(filename, ".plt"))
     {
       TecplotIO (mesh).write_equation_systems
         (filename, temp_es);
     }
 #if defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_NEMESIS_API)
-  else if ((filename.rfind(".nem") < filename.size()) ||
-           (filename.rfind(".n") < filename.size()))
+  else if (Utility::contains(filename, ".nem") ||
+           Utility::contains(filename, ".n"))
     {
       Nemesis_IO io(mesh);
       io.write(filename);
@@ -288,22 +288,22 @@ void ErrorVector::plot_error(const std::string & filename,
     }
 #endif
 #ifdef LIBMESH_HAVE_EXODUS_API
-  else if ((filename.rfind(".exo") < filename.size()) ||
-           (filename.rfind(".e") < filename.size()))
+  else if (Utility::contains(filename, ".exo") ||
+           Utility::contains(filename, ".e"))
     {
       ExodusII_IO io(mesh);
       io.write(filename);
       io.write_element_data(temp_es);
     }
 #endif
-  else if (filename.rfind(".xda") < filename.size())
+  else if (Utility::contains(filename, ".xda"))
     {
       XdrIO(mesh).write("mesh-"+filename);
       temp_es.write("soln-"+filename,WRITE,
                     EquationSystems::WRITE_DATA |
                     EquationSystems::WRITE_ADDITIONAL_DATA);
     }
-  else if (filename.rfind(".xdr") < filename.size())
+  else if (Utility::contains(filename, ".xdr"))
     {
       XdrIO(mesh,true).write("mesh-"+filename);
       temp_es.write("soln-"+filename,ENCODE,

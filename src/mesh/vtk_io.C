@@ -26,6 +26,7 @@
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_io_package.h"
+#include "libmesh/utility.h"
 
 #ifdef LIBMESH_HAVE_VTK
 
@@ -356,7 +357,7 @@ void VTKIO::write_nodal_data (const std::string & fname,
   // Warn that the .pvtu file extension should be used.  Paraview
   // recognizes this, and it works in both serial and parallel.  Only
   // warn about this once.
-  if (fname.substr(fname.rfind("."), fname.size()) != ".pvtu")
+  if (!Utility::ends_with(fname, ".pvtu"))
     libmesh_do_once(libMesh::err << "The .pvtu extension should be used when writing VTK files in libMesh.");
 
   // If there are variable names being written, the solution vector
