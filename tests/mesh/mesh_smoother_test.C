@@ -283,7 +283,7 @@ public:
     // Get mesh dimension, determine whether type is triangular
     const auto * ref_elem = &(ReferenceElem::get(type));
     const auto dim = ref_elem->dim();
-    const bool type_is_tri = dynamic_cast<const Tri*>(ref_elem);
+    const bool type_is_tri = Utility::enum_to_string(type).compare(0, 3, "TRI") == 0;
 
     unsigned int n_elems_per_side = 5;
 

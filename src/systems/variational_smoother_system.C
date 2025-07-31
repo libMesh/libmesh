@@ -139,8 +139,10 @@ void VariationalSmootherSystem::prepare_for_smoothing()
           target_elem_inverse_jacobian_dets[elem->type()] =
               std::vector<Real>(nq_points, 1.0);
 
+          const auto type_str = Utility::enum_to_string(elem->type());
+
           // Elems deriving from Tri
-          if (elem->type() == TRI3 || elem->type() == TRI6)
+          if (type_str.compare(0, 3, "TRI") == 0)
             {
 
               // The target element will be an equilateral triangle with area equal to
@@ -180,7 +182,7 @@ void VariationalSmootherSystem::prepare_for_smoothing()
                   }
 
                 default:
-                  libmesh_error_msg("Unsupported triangular element!");
+                  libmesh_error_msg("Unsupported triangular element: " << type_str);
                   break;
                 }
 
