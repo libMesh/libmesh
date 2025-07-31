@@ -67,6 +67,29 @@ public:
 
   Real & get_dilation_weight() { return _dilation_weight; }
 
+  /**
+   * Get the target element for a given element type.
+   * @param type Element type
+   * @return a std::pair containing the target element for type and the
+   * corresponding nodes that must be kept in scope while the target element is
+   * used.
+   */
+  static std::pair<std::unique_ptr<Elem>, std::vector<std::unique_ptr<Node>>>
+  get_target_elem(const ElemType & type);
+
+  /**
+   * Get the jacobians (and determinants) of the target-to-reference element mapping.
+   * @param target_elem Target element.
+   * @param femcontext Context used to build mapping.
+   * @param jacobian Vector in which to store the jacobians for each quadrature point.
+   * @param jacobian_dets Vector in which to store the determinant of the jacobians
+   * for each quadrature point.
+   */
+  static void get_target_to_reference_jacobian(const Elem * const target_elem,
+                                               const FEMContext & femcontext,
+                                               std::vector<RealTensor> & jacobians,
+                                               std::vector<Real> & jacobian_dets);
+
 protected:
 
   // System initialization
@@ -97,10 +120,10 @@ protected:
   /// The relative weight to give the dilation metric. The distortion metric is given weight 1 - _dilation_weight.
   Real _dilation_weight;
 
-  /* Map to hold target qp-dependent element inverse reference-to-target mapping
+  /* Map to hold target qp-dependent element target-to-reference mapping
    * Jacobians, if any
    */
-  std::map<ElemType, std::vector<RealTensor>> _target_inverse_jacobians;
+  std::map<ElemType, std::vector<RealTensor>> _target_jacobians;
 };
 
 } // namespace libMesh
