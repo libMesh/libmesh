@@ -97,7 +97,7 @@ bool & UNVIO::verbose ()
 
 void UNVIO::read (const std::string & file_name)
 {
-  if (file_name.rfind(".gz") < file_name.size())
+  if (Utility::contains(file_name, ".gz"))
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
 
@@ -258,7 +258,7 @@ void UNVIO::read_implementation (std::istream & in_stream)
 
 void UNVIO::write (const std::string & file_name)
 {
-  if (file_name.rfind(".gz") < file_name.size())
+  if (Utility::contains(file_name, ".gz"))
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
 

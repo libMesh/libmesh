@@ -18,9 +18,11 @@
 
 // Local includes
 #include "libmesh/tetgen_io.h"
-#include "libmesh/mesh_base.h"
+
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_tet10.h"
+#include "libmesh/mesh_base.h"
+#include "libmesh/utility.h"
 
 // C++ includes
 #include <array>
@@ -50,14 +52,14 @@ void TetGenIO::read (const std::string & name)
   // Check name for *.node or *.ele extension.
   // Set std::istream for node_stream and ele_stream.
   //
-  if (name.rfind(".node") < name.size())
+  if (Utility::contains(name, ".node"))
     {
       name_node            = name;
       dummy                = name;
       std::size_t position = dummy.rfind(".node");
       name_ele             = dummy.replace(position, 5, ".ele");
     }
-  else if (name.rfind(".ele") < name.size())
+  else if (Utility::contains(name, ".ele"))
     {
       name_ele = name;
       dummy    = name;
@@ -270,7 +272,7 @@ void TetGenIO::write (const std::string & fname)
   // libmesh_assert three dimensions (should be extended later)
   libmesh_assert_equal_to (MeshOutput<MeshBase>::mesh().mesh_dimension(), 3);
 
-  libmesh_error_msg_if(!(fname.rfind(".poly") < fname.size()),
+  libmesh_error_msg_if(!Utility::contains(fname, ".poly"),
                        "ERROR: Unrecognized file name: " << fname);
 
   // Open the output file stream

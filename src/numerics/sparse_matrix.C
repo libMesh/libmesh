@@ -520,15 +520,15 @@ void SparseMatrix<T>::read(const std::string & filename)
 
   std::string_view basename = Utility::basename_of(filename);
 
-  const bool gzipped_file = (basename.rfind(".gz") == basename.size() - 3);
+  const bool gzipped_file = Utility::ends_with(filename, ".gz");
 
   if (gzipped_file)
     basename.remove_suffix(3);
 
-  if (basename.rfind(".matlab") == basename.size() - 7 ||
-      basename.rfind(".m") == basename.size() - 2)
+  if (Utility::ends_with(basename, ".matlab") ||
+      Utility::ends_with(basename, ".m"))
     this->read_matlab(filename);
-  else if (basename.rfind(".petsc64") == basename.size() - 8)
+  else if (Utility::ends_with(basename, ".petsc64"))
     {
 #ifndef LIBMESH_HAVE_PETSC
       libmesh_error_msg("Cannot load PETSc matrix file " <<
@@ -540,7 +540,7 @@ void SparseMatrix<T>::read(const std::string & filename)
 #endif
       this->read_petsc_binary(filename);
     }
-  else if (basename.rfind(".petsc32") == basename.size() - 8)
+  else if (Utility::ends_with(basename, ".petsc32"))
     {
 #ifndef LIBMESH_HAVE_PETSC
       libmesh_error_msg("Cannot load PETSc matrix file " <<
@@ -575,7 +575,7 @@ void SparseMatrix<T>::read_matlab(const std::string & filename)
 #else
   parallel_object_only();
 
-  const bool gzipped_file = (filename.rfind(".gz") == filename.size() - 3);
+  const bool gzipped_file = Utility::ends_with(filename, ".gz");
 
   // The sizes we get from the file
   std::size_t m = 0,
