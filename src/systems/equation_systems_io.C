@@ -24,10 +24,11 @@
 #include "libmesh/libmesh_version.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_refinement.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
+#include "libmesh/utility.h"
 #include "libmesh/xdr_cxx.h"
-#include "libmesh/mesh_refinement.h"
 
 // C++ Includes
 #include <iomanip> // setfill
@@ -47,12 +48,12 @@ std::string local_file_name (const unsigned int processor_id,
   std::ostringstream returnval;
 
   std::string_view suffix;
-  if (basename.size() - basename.rfind(".bz2") == 4)
+  if (Utility::ends_with(basename, ".bz2"))
     {
       basename.remove_suffix(4);
       suffix = ".bz2";
     }
-  else if (basename.size() - basename.rfind(".gz") == 3)
+  else if (Utility::ends_with(basename, ".gz"))
     {
       basename.remove_suffix(3);
       suffix = ".gz";
@@ -217,14 +218,14 @@ void EquationSystems::read (Xdr & io,
         io.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
 
 
-        read_parallel_files = (version.rfind(" parallel") < version.size());
+        read_parallel_files = Utility::contains(version, " parallel");
 
         // If requested that we try to read infinite element information,
         // and the string " with infinite elements" is not in the version,
         // then tack it on.  This is for compatibility reading ifem
         // files written prior to 11/10/2008 - BSK
         if (try_read_ifems)
-          if (!(version.rfind(" with infinite elements") < version.size()))
+          if (!Utility::contains(version, " with infinite elements"))
             version += " with infinite elements";
 
       }

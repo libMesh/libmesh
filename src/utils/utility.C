@@ -167,7 +167,7 @@ std::string Utility::unzip_file (std::string_view name)
   pid_suffix << '_' << getpid();
 
   std::string new_name { name };
-  if (name.rfind(".bz2") == name.size() - 4)
+  if (Utility::ends_with(name, ".bz2"))
     {
 #ifdef LIBMESH_HAVE_BZIP
       new_name.erase(new_name.end() - 4, new_name.end());
@@ -182,7 +182,7 @@ std::string Utility::unzip_file (std::string_view name)
       libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
 #endif
     }
-  else if (name.rfind(".xz") == name.size() - 3)
+  else if (Utility::ends_with(name, ".xz"))
     {
 #ifdef LIBMESH_HAVE_XZ
       new_name.erase(new_name.end() - 3, new_name.end());
@@ -200,6 +200,28 @@ std::string Utility::unzip_file (std::string_view name)
   return new_name;
 }
 
+
+
+bool Utility::contains(std::string_view superstring, std::string_view substring)
+{
+  // This can just be C++23 contains() someday
+  return superstring.find(substring) != std::string::npos;
+}
+
+
+
+bool Utility::ends_with(std::string_view superstring,
+                        std::string_view suffix)
+{
+  // This can just be C++20 ends_with() someday
+  const auto sufsize = suffix.size();
+  const auto supsize = superstring.size();
+  if (sufsize > supsize)
+    return false;
+
+  return superstring.compare(supsize - sufsize, std::string::npos,
+                             suffix) == 0;
+}
 
 
 

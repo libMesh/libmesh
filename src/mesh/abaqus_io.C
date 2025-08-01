@@ -233,7 +233,7 @@ void AbaqusIO::read (const std::string & fname)
   the_mesh.clear();
 
   // Open stream for reading
-  const bool gzipped_file = (fname.rfind(".gz") == fname.size() - 3);
+  const bool gzipped_file = Utility::ends_with(fname, ".gz");
 
   if (gzipped_file)
     {

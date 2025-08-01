@@ -72,14 +72,16 @@ void NameBasedIO::read (const std::string & name)
 
   const std::string_view basename = Utility::basename_of(name);
 
+  using Utility::ends_with;
+  using Utility::contains;
+
   // See if the file exists.  Perform this check on all processors
   // so that the code is terminated properly in the case that the
   // file does not exist.
 
   // For Nemesis files, the name we try to read will have suffixes
   // identifying processor rank
-  if (basename.rfind(".nem") == basename.size() - 4 ||
-      basename.rfind(".n") == basename.size() - 2)
+  if (ends_with(basename, ".nem") || ends_with(basename, ".n"))
     {
       std::ostringstream full_name;
 
@@ -98,7 +100,7 @@ void NameBasedIO::read (const std::string & name)
       std::ifstream in (full_name.str().c_str());
       libmesh_error_msg_if(!in.good(), "ERROR: cannot locate specified file:\n\t" << full_name.str());
     }
-  else if (basename.rfind(".cp")) {} // Do error checking in the reader
+  else if (contains(basename, ".cp")) {} // Do error checking in the reader
   else
     {
       std::ifstream in (name.c_str());
@@ -109,13 +111,13 @@ void NameBasedIO::read (const std::string & name)
   if (is_parallel_file_format(basename))
     {
       // no need to handle bz2 files here -- the Xdr class does that.
-      if ((basename.rfind(".xda") < basename.size()) ||
-          (basename.rfind(".xdr") < basename.size()))
+      if (contains(basename, ".xda") ||
+          contains(basename, ".xdr"))
         {
           XdrIO xdr_io(mymesh);
 
           // .xda* ==> bzip2/gzip/ASCII flavors
-          if (basename.rfind(".xda") < basename.size())
+          if (contains(basename, ".xda"))
             {
               xdr_io.binary() = false;
               xdr_io.read (name);
@@ -152,12 +154,12 @@ void NameBasedIO::read (const std::string & name)
           mymesh.allow_renumbering(false);
 #endif
         }
-      else if (basename.rfind(".nem") < basename.size() ||
-               basename.rfind(".n")   < basename.size())
+      else if (contains(basename, ".nem") ||
+               contains(basename, ".n"))
         Nemesis_IO(mymesh).read (name);
-      else if (basename.rfind(".cp") < basename.size())
+      else if (contains(basename, ".cp"))
         {
-          if (basename.rfind(".cpa") < basename.size())
+          if (contains(basename, ".cpa"))
             CheckpointIO(mymesh, false).read(name);
           else
             CheckpointIO(mymesh, true).read(name);
@@ -178,7 +180,7 @@ void NameBasedIO::read (const std::string & name)
           pid_suffix << '_' << getpid();
           // Nasty hack for reading/writing zipped files
           std::string new_name = name;
-          if (name.rfind(".bz2") == name.size() - 4)
+          if (ends_with(name, ".bz2"))
             {
 #ifdef LIBMESH_HAVE_BZIP
               new_name.erase(new_name.end() - 4, new_name.end());
@@ -192,7 +194,7 @@ void NameBasedIO::read (const std::string & name)
               libmesh_error_msg("ERROR: need bzip2/bunzip2 to open .bz2 file " << name);
 #endif
             }
-          else if (name.rfind(".xz") == name.size() - 3)
+          else if (ends_with(name, ".xz"))
             {
 #ifdef LIBMESH_HAVE_XZ
               new_name.erase(new_name.end() - 3, new_name.end());
@@ -207,49 +209,49 @@ void NameBasedIO::read (const std::string & name)
 #endif
             }
 
-          if (basename.rfind(".mat") < basename.size())
+          if (contains(basename, ".mat"))
             MatlabIO(mymesh).read(new_name);
 
-          else if (basename.rfind(".ucd") < basename.size())
+          else if (contains(basename, ".ucd"))
             UCDIO(mymesh).read (new_name);
 
-          else if ((basename.rfind(".off")  < basename.size()) ||
-                   (basename.rfind(".ogl")  < basename.size()) ||
-                   (basename.rfind(".oogl") < basename.size()))
+          else if (contains(basename, ".off") ||
+                   contains(basename, ".ogl") ||
+                   contains(basename, ".oogl"))
             OFFIO(mymesh).read (new_name);
 
-          else if (basename.rfind(".unv") < basename.size())
+          else if (contains(basename, ".unv"))
             UNVIO(mymesh).read (new_name);
 
-          else if ((basename.rfind(".node")  < basename.size()) ||
-                   (basename.rfind(".ele")   < basename.size()))
+          else if (contains(basename, ".node") ||
+                   contains(basename, ".ele"))
             TetGenIO(mymesh).read (new_name);
 
-          else if (basename.rfind(".exd") < basename.size() ||
-                   basename.rfind(".e") < basename.size())
+          else if (contains(basename, ".exd") ||
+                   contains(basename, ".e"))
             ExodusII_IO(mymesh).read (new_name);
 
-          else if (basename.rfind(".msh") < basename.size())
+          else if (contains(basename, ".msh"))
             GmshIO(mymesh).read (new_name);
 
-          else if (basename.rfind(".gmv") < basename.size())
+          else if (contains(basename, ".gmv"))
             GMVIO(mymesh).read (new_name);
 
-          else if (basename.rfind(".stl") < basename.size())
+          else if (contains(basename, ".stl"))
             STLIO(mymesh).read (new_name);
 
-          else if (basename.rfind(".pvtu") < basename.size() ||
-                   basename.rfind(".vtu") < basename.size())
+          else if (contains(basename, ".pvtu") ||
+                   contains(basename, ".vtu"))
             VTKIO(mymesh).read(new_name);
 
-          else if (basename.rfind(".inp") < basename.size())
+          else if (contains(basename, ".inp"))
             AbaqusIO(mymesh).read(new_name);
 
-          else if ((basename.rfind(".bext")  < basename.size()) ||
-                   (basename.rfind(".bxt")   < basename.size()))
+          else if (contains(basename, ".bext") ||
+                   contains(basename, ".bxt"))
             DynaIO(mymesh).read (new_name);
 
-          else if (basename.rfind(".bez")  < basename.size())
+          else if (contains(basename, ".bez"))
             DynaIO(mymesh, false).read (new_name);
 
           else
@@ -287,9 +289,9 @@ void NameBasedIO::read (const std::string & name)
 
           // If we temporarily decompressed a file, remove the
           // uncompressed version
-          if (name.rfind(".bz2") == name.size() - 4)
+          if (ends_with(basename, ".bz2"))
             std::remove(new_name.c_str());
-          if (name.rfind(".xz") == name.size() - 3)
+          if (ends_with(basename, ".xz"))
             std::remove(new_name.c_str());
         }
 
@@ -306,25 +308,28 @@ void NameBasedIO::write (const std::string & name)
 
   const std::string_view basename = Utility::basename_of(name);
 
+  using Utility::contains;
+  using Utility::ends_with;
+
   // parallel formats are special -- they may choose to write
   // separate files, let's not try to handle the zipping here.
   if (is_parallel_file_format(basename))
     {
       // no need to handle bz2 files here -- the Xdr class does that.
-      if (basename.rfind(".xda") < basename.size())
+      if (contains(basename, ".xda"))
         XdrIO(mymesh).write(name);
 
-      else if (basename.rfind(".xdr") < basename.size())
+      else if (contains(basename, ".xdr"))
         XdrIO(mymesh,true).write(name);
 
-      else if (basename.rfind(".nem") < basename.size() ||
-               basename.rfind(".n")   < basename.size())
+      else if (contains(basename, ".nem") ||
+               contains(basename, ".n"))
         Nemesis_IO(mymesh).write(name);
 
-      else if (basename.rfind(".cpa") < basename.size())
+      else if (contains(basename, ".cpa"))
         CheckpointIO(mymesh,false).write(name);
 
-      else if (basename.rfind(".cpr") < basename.size())
+      else if (contains(basename, ".cpr"))
         CheckpointIO(mymesh,true).write(name);
 
       else
@@ -343,12 +348,12 @@ void NameBasedIO::write (const std::string & name)
       std::ostringstream pid_suffix;
       pid_suffix << '_' << pid_0;
 
-      if (name.rfind(".bz2") == name.size() - 4)
+      if (ends_with(name, ".bz2"))
         {
           new_name.erase(new_name.end() - 4, new_name.end());
           new_name += pid_suffix.str();
         }
-      else if (name.rfind(".xz") == name.size() - 3)
+      else if (ends_with(name, ".xz"))
         {
           new_name.erase(new_name.end() - 3, new_name.end());
           new_name += pid_suffix.str();
@@ -357,16 +362,16 @@ void NameBasedIO::write (const std::string & name)
       // New scope so that io will close before we try to zip the file
       {
         // Write the file based on extension
-        if (basename.rfind(".dat") < basename.size())
+        if (contains(basename, ".dat"))
           TecplotIO(mymesh).write (new_name);
 
-        else if (basename.rfind(".plt") < basename.size())
+        else if (contains(basename, ".plt"))
           TecplotIO(mymesh,true).write (new_name);
 
-        else if (basename.rfind(".ucd") < basename.size())
+        else if (contains(basename, ".ucd"))
           UCDIO (mymesh).write (new_name);
 
-        else if (basename.rfind(".gmv") < basename.size())
+        else if (contains(basename, ".gmv"))
           if (mymesh.n_partitions() > 1)
             GMVIO(mymesh).write (new_name);
           else
@@ -376,29 +381,29 @@ void NameBasedIO::write (const std::string & name)
               io.write (new_name);
             }
 
-        else if (basename.rfind(".exd") < basename.size() ||
-                 basename.rfind(".e") < basename.size())
+        else if (contains(basename, ".exd") ||
+                 contains(basename, ".e"))
           ExodusII_IO(mymesh).write(new_name);
 
-        else if (basename.rfind(".unv") < basename.size())
+        else if (contains(basename, ".unv"))
           UNVIO(mymesh).write (new_name);
 
-        else if (basename.rfind(".mesh") < basename.size())
+        else if (contains(basename, ".mesh"))
           MEDITIO(mymesh).write (new_name);
 
-        else if (basename.rfind(".poly") < basename.size())
+        else if (contains(basename, ".poly"))
           TetGenIO(mymesh).write (new_name);
 
-        else if (basename.rfind(".msh") < basename.size())
+        else if (contains(basename, ".msh"))
           GmshIO(mymesh).write (new_name);
 
-        else if (basename.rfind(".fro") < basename.size())
+        else if (contains(basename, ".fro"))
           FroIO(mymesh).write (new_name);
 
-        else if (basename.rfind(".pvtu") < basename.size())
+        else if (contains(basename, ".pvtu"))
           VTKIO(mymesh).write (name);
 
-        else if (basename.rfind(".stl") < basename.size())
+        else if (contains(basename, ".stl"))
           STLIO(mymesh).write (new_name);
 
         else
@@ -431,7 +436,7 @@ void NameBasedIO::write (const std::string & name)
       }
 
       // Nasty hack for reading/writing zipped files
-      if (name.rfind(".bz2") == name.size() - 4)
+      if (ends_with(basename, ".bz2"))
         {
           LOG_SCOPE("system(bzip2)", "NameBasedIO");
           if (mymesh.processor_id() == 0)
@@ -444,7 +449,7 @@ void NameBasedIO::write (const std::string & name)
             }
           mymesh.comm().barrier();
         }
-      if (name.rfind(".xz") == name.size() - 3)
+      if (ends_with(basename, ".xz"))
         {
           LOG_SCOPE("system(xz)", "NameBasedIO");
           if (mymesh.processor_id() == 0)
@@ -467,15 +472,18 @@ void NameBasedIO::write_nodal_data (const std::string & name,
 {
   const MeshBase & mymesh = MeshOutput<MeshBase>::mesh();
 
+  using Utility::contains;
+  using Utility::ends_with;
+
   // Write the file based on extension
-  if (name.rfind(".dat") < name.size())
+  if (contains(name, ".dat"))
     TecplotIO(mymesh).write_nodal_data (name, v, vn);
 
-  else if (name.rfind(".exd") < name.size() ||
-           name.rfind(".e") < name.size())
+  else if (contains(name, ".exd") ||
+           contains(name, ".e"))
     ExodusII_IO(mymesh).write_nodal_data(name, v, vn);
 
-  else if (name.rfind(".gmv") < name.size())
+  else if (contains(name, ".gmv"))
     {
       if (mymesh.n_subdomains() > 1)
         GMVIO(mymesh).write_nodal_data (name, v, vn);
@@ -487,23 +495,23 @@ void NameBasedIO::write_nodal_data (const std::string & name,
         }
     }
 
-  else if (name.rfind(".mesh") < name.size())
+  else if (contains(name, ".mesh"))
     MEDITIO(mymesh).write_nodal_data (name, v, vn);
 
-  else if (name.rfind(".msh") < name.size())
+  else if (contains(name, ".msh"))
     GmshIO(mymesh).write_nodal_data (name, v, vn);
 
-  else if (name.rfind(".nem") < name.size() ||
-           name.rfind(".n")   < name.size())
+  else if (contains(name, ".nem") ||
+           contains(name, ".n"))
     Nemesis_IO(mymesh).write_nodal_data(name, v, vn);
 
-  else if (name.rfind(".plt") < name.size())
+  else if (contains(name, ".plt"))
     TecplotIO(mymesh,true).write_nodal_data (name, v, vn);
 
-  else if (name.rfind(".pvtu") < name.size())
+  else if (contains(name, ".pvtu"))
     VTKIO(mymesh).write_nodal_data (name, v, vn);
 
-  else if (name.rfind(".ucd") < name.size())
+  else if (contains(name, ".ucd"))
     UCDIO (mymesh).write_nodal_data (name, v, vn);
 
   else
@@ -538,14 +546,14 @@ void NameBasedIO::write_equation_systems (const std::string & filename,
       const std::string_view basename =
         Utility::basename_of(filename);
 
-      if (basename.rfind(".xda") < basename.size())
+      if (Utility::contains(basename, ".xda"))
         {
           es.write(filename,WRITE,
                    EquationSystems::WRITE_DATA |
                    EquationSystems::WRITE_ADDITIONAL_DATA);
           return;
         }
-      else if (basename.rfind(".xdr") < basename.size())
+      else if (Utility::contains(basename, ".xdr"))
         {
           es.write(filename,ENCODE,
                    EquationSystems::WRITE_DATA |
@@ -559,6 +567,15 @@ void NameBasedIO::write_equation_systems (const std::string & filename,
     (filename, es, system_names);
 }
 
+
+bool NameBasedIO::is_parallel_file_format(std::string_view name)
+{
+  using Utility::contains;
+  using Utility::ends_with;
+  return (contains(name, ".xda") || contains(name, ".xdr") ||
+          ends_with(name, ".nem") || ends_with(name, ".n") ||
+          contains(name, ".cp"));
+}
 
 
 } // namespace libMesh

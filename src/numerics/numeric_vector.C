@@ -304,7 +304,7 @@ void NumericVector<T>::read_matlab(const std::string & filename)
 #else
   parallel_object_only();
 
-  const bool gzipped_file = (filename.rfind(".gz") == filename.size() - 3);
+  const bool gzipped_file = Utility::ends_with(filename, ".gz");
 
   // If we don't already have this size, we'll need to reinit, and
   // determine which entries each processor is in charge of.

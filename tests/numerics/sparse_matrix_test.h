@@ -196,9 +196,12 @@ public:
 
     // If we're working with serial matrices then just print one of
     // them so they don't step on the others' toes.
+    //
+    // Use a very short filename, because we had a bug with that and
+    // we want to test it.
     if (matrix->n_processors() > 1 ||
         TestCommWorld->rank() == 0)
-      matrix->print_matlab(libmesh_suite_name+"_matrix.m");
+      matrix->print_matlab("M.m");
 
     matrix->clear();
 
@@ -213,7 +216,7 @@ public:
     return;
 #endif
 
-    matrix->read(libmesh_suite_name+"_matrix.m");
+    matrix->read("M.m");
 
     TestCommWorld->barrier();
 

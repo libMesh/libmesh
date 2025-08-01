@@ -82,7 +82,7 @@ void PltLoader::read_header (std::istream & in)
 
   //----------------------------------------------------
   // Read plt files written by older versions of Tecplot
-  if (this->version().rfind("V7") < this->version().size())
+  if (Utility::contains(this->version(), "V7"))
     {
       if (this->verbose())
         libMesh::out << "Reading legacy .plt format (<= v9) ..."
@@ -281,7 +281,7 @@ void PltLoader::read_header (std::istream & in)
 
   //----------------------------------------------------
   // Read plt files written by newer versions of Tecplot
-  else if (this->version().rfind("V1") < this->version().size())
+  else if (Utility::contains(this->version(), "V1"))
     {
       if (this->verbose())
         libMesh::out << "Reading new .plt format (>= v10)..."
@@ -617,7 +617,7 @@ void PltLoader::read_data (std::istream & in)
 
       //----------------------------------------------------
       // Read plt files written by older versions of Tecplot
-      if (this->version().rfind("V7") < this->version().size())
+      if (Utility::contains(this->version(), "V7"))
         {
           float f = 0.;
 
@@ -717,7 +717,7 @@ void PltLoader::read_data (std::istream & in)
 
       //----------------------------------------------------
       // Read plt files written by newer versions of Tecplot
-      else if (this->version().rfind("V1") < this->version().size())
+      else if (Utility::contains(this->version(), "V1"))
         {
           float f = 0.;
 

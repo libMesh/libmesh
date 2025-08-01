@@ -119,19 +119,6 @@ NameBasedIO::NameBasedIO (MeshBase & mesh) :
 {
 }
 
-inline
-bool
-NameBasedIO::is_parallel_file_format (std::string_view name)
-{
-  return ((name.rfind(".xda") < name.size()) ||
-          (name.rfind(".xdr") < name.size()) ||
-          (name.rfind(".nem") == name.size() - 4) ||
-          (name.rfind(".n") == name.size() - 2) ||
-          (name.rfind(".cp") < name.size())
-          );
-}
-
-
 } // namespace libMesh
 
 

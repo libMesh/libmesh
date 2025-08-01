@@ -81,7 +81,7 @@ std::map<std::string, ElemType> UCDIO::build_reading_element_map()
 
 void UCDIO::read (const std::string & file_name)
 {
-  if (file_name.rfind(".gz") < file_name.size())
+  if (Utility::contains(file_name, ".gz"))
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
       igzstream in_stream (file_name.c_str());
@@ -102,7 +102,7 @@ void UCDIO::read (const std::string & file_name)
 
 void UCDIO::write (const std::string & file_name)
 {
-  if (file_name.rfind(".gz") < file_name.size())
+  if (Utility::contains(file_name, ".gz"))
     {
 #ifdef LIBMESH_HAVE_GZSTREAM
       ogzstream out_stream (file_name.c_str());
