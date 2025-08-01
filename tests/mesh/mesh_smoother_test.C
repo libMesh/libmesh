@@ -160,7 +160,7 @@ class ParallelogramToSquare : public FunctionBase<Real>
   void operator()(const Point & p, const Real, DenseVector<Real> & output)
   {
     output.resize(3);
-    output(0) = p(0) + p(1) / std::sqrt(Real(3).);
+    output(0) = p(0) + p(1) / std::sqrt(Real(3));
     output(1) = (2. / std::sqrt(Real(3))) * p(1);
     output(2) = 0;
   }
