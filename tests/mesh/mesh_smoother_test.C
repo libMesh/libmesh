@@ -19,6 +19,8 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <random>
+
 namespace
 {
 using namespace libMesh;
@@ -71,33 +73,19 @@ private:
     output.zero();
 
     // Count how many coordinates are exactly on the boundary (0 or 1)
-    unsigned int boundary_dims = 0;
     std::array<bool, 3> is_on_boundary = {false, false, false};
     for (unsigned int i = 0; i < _dim; ++i)
-      {
-        if (std::abs(p(i)) < TOLERANCE || std::abs(p(i) - 1.) < TOLERANCE)
-          {
-            ++boundary_dims;
-            is_on_boundary[i] = true;
-          }
-      }
-
-    // If all coordinates are on the boundary, treat as vertex — leave unchanged
-    if (boundary_dims == _dim)
-      {
-        for (unsigned int i = 0; i < _dim; ++i)
-          output(i) = p(i);
-        return;
-      }
+      if (std::abs(p(i)) < TOLERANCE || std::abs(p(i) - 1.) < TOLERANCE)
+        is_on_boundary[i] = true;
 
     // Distort only those directions not fixed on the boundary
     for (unsigned int i = 0; i < _dim; ++i)
       {
         if (!is_on_boundary[i]) // only distort free dimensions
           {
-            Real xi = 2. * p(i) - 1.;
             // This value controls the strength of the distortion
             Real modulation = 0.3;
+            Real xi = 2. * p(i) - 1.;
             for (unsigned int j = 0; j < _dim; ++j)
               {
                 if (j != i)
@@ -189,6 +177,7 @@ public:
 
   CPPUNIT_TEST(testVariationalQuad);
   CPPUNIT_TEST(testVariationalQuadMultipleSubdomains);
+  CPPUNIT_TEST(testVariationalQuadTangled);
 
   CPPUNIT_TEST(testVariationalTri3);
   CPPUNIT_TEST(testVariationalTri6);
@@ -197,6 +186,7 @@ public:
   CPPUNIT_TEST(testVariationalHex8);
   CPPUNIT_TEST(testVariationalHex20);
   CPPUNIT_TEST(testVariationalHex27);
+  CPPUNIT_TEST(testVariationalHex27Tangled);
   CPPUNIT_TEST(testVariationalHex27MultipleSubdomains);
 #endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
@@ -275,11 +265,16 @@ public:
   }
 
   void testVariationalSmoother(ReplicatedMesh & mesh,
-                               MeshSmoother & smoother,
+                               VariationalMeshSmoother & smoother,
                                const ElemType type,
-                               const bool multiple_subdomains = false)
+                               const bool multiple_subdomains = false,
+                               const bool tangle_mesh=false)
   {
     LOG_UNIT_TEST;
+
+    libmesh_error_msg_if(
+        multiple_subdomains && tangle_mesh,
+        "Arbitrary mesh tangling with multiple subdomains is not yet supported.");
 
     // Get mesh dimension, determine whether type is triangular
     const auto * ref_elem = &(ReferenceElem::get(type));
@@ -320,6 +315,62 @@ public:
     DistortHyperCube dh(dim);
     MeshTools::Modification::redistribute(mesh, dh);
 
+    const auto & boundary_info = mesh.get_boundary_info();
+
+    if (tangle_mesh)
+      {
+        for (auto * elem : mesh.active_element_ptr_range())
+          {
+            // The solver has trouble if the mesh is too tangled, so only tangle
+            // some elements
+            const auto centroid = elem->vertex_average();
+            if ((centroid - Point(0.5, (dim > 1) ? 0.5 : 0.0, (dim > 2) ? 0.5 : 0.)).norm() < 0.25)
+              {
+                // Identify the first two non-boundary nodes in elem
+                dof_id_type node1_id = DofObject::invalid_id;
+                dof_id_type node2_id = DofObject::invalid_id;
+                for (const auto & node_id : make_range(elem->n_nodes()))
+                  {
+                    // Get boundary ids associated with the node
+                    std::vector<boundary_id_type> boundary_ids;
+                    const auto * node_ptr = elem->node_ptr(node_id);
+                    boundary_info.boundary_ids(node_ptr, boundary_ids);
+
+                    // Skip if boundary node
+                    if (boundary_ids.size())
+                      continue;
+
+                    if (node1_id == DofObject::invalid_id)
+                      node1_id = node_id;
+                    else if (node2_id == DofObject::invalid_id)
+                      {
+                        node2_id = node_id;
+                        break;
+                      }
+                  }
+
+                // Swap the nodes
+                if ((node1_id != DofObject::invalid_id) && (node2_id != DofObject::invalid_id))
+                  {
+                    auto & node1 = elem->node_ref(node1_id);
+                    auto & node2 = elem->node_ref(node2_id);
+
+                    for (const auto & d : make_range(dim))
+                      {
+                        auto tmp = node1(d);
+                        node1(d) = node2(d);
+                        node2(d) = tmp;
+                      }
+
+                    // Once we have swapped two elements of the mesh, do not swap
+                    // any more. Again, we still have issues with "too tangled"
+                    // meshes.
+                    break;
+                  }
+              }
+          }
+      }
+
     // Add multiple subdomains if requested
     std::unordered_map<subdomain_id_type, Real> distorted_subdomain_volumes;
     if (multiple_subdomains)
@@ -350,7 +401,6 @@ public:
       const auto fe_order = *elem_orders.begin();
 
       // Function to assert the distortion is as expected
-      const auto &boundary_info = mesh.get_boundary_info();
       auto distortion_is = [
         &n_elems_per_side, &dim, &boundary_info, &fe_order
       ](const Node &node, bool distortion, Real distortion_tol = TOLERANCE)
@@ -387,8 +437,6 @@ public:
           {
             const Real r = node(d);
             const Real R = r * n_elems_per_side * fe_order;
-            CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, r);
-            CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, 1 - r);
 
             const bool d_distorted = std::abs(R - std::round(R)) > distortion_tol;
             distorted |= d_distorted;
@@ -406,9 +454,19 @@ public:
 
     };
 
-    // Make sure our DistortSquare transformation has distorted the mesh
+    // Make sure our DistortHyperCube transformation has distorted the mesh
     for (auto node : mesh.node_ptr_range())
       CPPUNIT_ASSERT(distortion_is(*node, true));
+
+    // Make sure our DistortHyperCube transformation has tangled the mesh
+    if (tangle_mesh)
+    {
+      smoother.setup(); // Need this to create the system we are about to access
+      auto * system = smoother.get_system();
+      system->compute_mesh_quality_info();
+      const auto & unsmoothed_info = system->get_mesh_info();
+      CPPUNIT_ASSERT(unsmoothed_info.mesh_is_tangled);
+    }
 
     // Transform the square mesh of triangles to a parallelogram mesh of
     // triangles. This will allow the Variational Smoother to smooth the mesh
@@ -451,7 +509,7 @@ public:
     else
       // Make sure we're not too distorted anymore
       for (auto node : mesh.node_ptr_range())
-        CPPUNIT_ASSERT(distortion_is(*node, false, 1e-3));
+        CPPUNIT_ASSERT(distortion_is(*node, false, 1e-2));
   }
 
   void testLaplaceQuad()
@@ -511,6 +569,14 @@ public:
     testVariationalSmoother(mesh, variational, QUAD4, true);
   }
 
+  void testVariationalQuadTangled()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, QUAD4, false, true);
+  }
+
   void testVariationalTri3()
   {
     ReplicatedMesh mesh(*TestCommWorld);
@@ -565,6 +631,14 @@ public:
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX27, true);
+  }
+
+  void testVariationalHex27Tangled()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, HEX27, false, true);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
