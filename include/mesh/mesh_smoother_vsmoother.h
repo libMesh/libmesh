@@ -27,7 +27,10 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_smoother.h"
 #include "libmesh/variational_smoother_system.h"
+#include "libmesh/variational_smoother_constraint.h"
 #include "petsc_diff_solver.h"
+#include "libmesh/distributed_mesh.h"
+#include "libmesh/equation_systems.h"
 
 // C++ Includes
 #include <cstddef>
@@ -79,6 +82,12 @@ public:
   virtual ~VariationalMeshSmoother() = default;
 
   /**
+   * Setup method that creates equation systems, system, and constraints, to be
+   * called just prior to smoothing.
+   */
+  virtual void setup();
+
+  /**
    * Redefinition of the smooth function from the
    * base class.  All this does is call the smooth
    * function in this class which takes an int, using
@@ -93,6 +102,10 @@ public:
    */
   void smooth(unsigned int n_iterations);
 
+  /**
+   * Getter for the _system attribute
+   */
+  VariationalSmootherSystem * get_system() { return _system; }
 
 private:
 
@@ -101,8 +114,35 @@ private:
    */
   const Real _dilation_weight;
 
-  /// Whether subdomain boundaries are subject to change via smoothing
+  /**
+   * Whether subdomain boundaries are subject to change via smoothing
+   */
   const bool _preserve_subdomain_boundaries;
+
+  /**
+   * EquationsSystems object associated with the smoother
+   */
+  std::unique_ptr<EquationSystems> _equation_systems;
+
+  /**
+   * System used to smooth the mesh.
+   */
+  VariationalSmootherSystem * _system;
+
+  /**
+   * Constraints imposed on the smoothing process.
+   */
+  std::unique_ptr<VariationalSmootherConstraint> _constraint;
+
+  /**
+   * Mesh copy to avoid multiple EquationSystems.
+   */
+  std::unique_ptr<DistributedMesh> _mesh_copy;
+
+  /**
+   * Attribute the keep track of whether the setup method has been called.
+   */
+  bool _setup_called;
 };
 
 } // namespace libMesh
