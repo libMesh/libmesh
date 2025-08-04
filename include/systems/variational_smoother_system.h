@@ -130,6 +130,11 @@ protected:
    * Jacobians, if any
    */
   std::map<ElemType, std::vector<RealTensor>> _target_jacobians;
+
+  /*
+   * Map to hold the determinants of _target_jacobians.
+   */
+  std::map<ElemType, std::vector<Real>> _target_jacobian_dets;
 };
 
 } // namespace libMesh
