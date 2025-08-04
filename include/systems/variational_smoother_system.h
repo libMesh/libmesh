@@ -111,13 +111,19 @@ protected:
    */
   void prepare_for_smoothing();
 
-  /// The small nonzero constant to prevent zero denominators (degenerate elements only)
+  /**
+  * The small nonzero constant to prevent zero denominators (degenerate meshes only)
+  */
   const Real _epsilon_squared;
 
-  /// The reference volume for each element
+  /**
+  * The reference volume for each element
+  */
   Real _ref_vol;
 
-  /// The relative weight to give the dilation metric. The distortion metric is given weight 1 - _dilation_weight.
+  /**
+  * The relative weight to give the dilation metric. The distortion metric is given weight 1 - _dilation_weight.
+  */
   Real _dilation_weight;
 
   /* Map to hold target qp-dependent element target-to-reference mapping
