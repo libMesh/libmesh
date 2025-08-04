@@ -215,13 +215,12 @@ void StaticCondensationDofMap::reinit()
       for (const auto vg : make_range(_dof_map.n_variable_groups()))
         {
           const auto & var_group = _dof_map.variable_group(vg);
-          if (!var_group.active_on_subdomain(sub_id))
-            continue;
-
           for (const auto v : make_range(var_group.n_variables()))
             {
               const auto var_num = var_group.number(v);
               dof_data.reduced_space_indices.resize(var_num + 1);
+              if (!var_group.active_on_subdomain(sub_id))
+                continue;
               elem_uncondensed_dofs.clear();
               _dof_map.dof_indices(elem,
                                    elem_dofs,
