@@ -120,6 +120,12 @@ void VariationalSmootherSystem::assembly (bool get_residual,
   SyncNodalPositions sync_object(mesh);
   Parallel::sync_dofobject_data_by_id (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
 
+  // Compute and update mesh quality information
+  compute_mesh_quality_info();
+
+  // Update _epsilon_squared_assembly based on whether the mesh is tangled
+  _epsilon_squared_assembly = _mesh_info.mesh_is_tangled ? _epsilon_squared : 0.;
+
   FEMSystem::assembly(get_residual, get_jacobian, apply_heterogeneous_constraints, apply_no_constraints);
 }
 
@@ -156,6 +162,10 @@ void VariationalSmootherSystem::init_data ()
 
 void VariationalSmootherSystem::prepare_for_smoothing()
 {
+  // If this method has already been called to set _ref_vol, just return.
+  if (std::abs(_ref_vol) > TOLERANCE * TOLERANCE)
+    return;
+
   std::unique_ptr<DiffContext> con = this->build_context();
   FEMContext & femcontext = cast_ref<FEMContext &>(*con);
   this->init_context(femcontext);
@@ -343,12 +353,9 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                          0, 0, 1);
 
       // The chi function allows us to handle degenerate elements
-      // When the element is not degenerate (i.e., det(S) > 0), we can set
-      // _epsilon_squared to zero to get chi(det(S)) = det(S)
-      const Real epsilon_sq = det > 0. ? 0. : _epsilon_squared;
-      const Real chi = 0.5 * (det + std::sqrt(epsilon_sq + det_sq));
+      const Real chi = 0.5 * (det + std::sqrt(_epsilon_squared_assembly + det_sq));
       const Real chi_sq = chi * chi;
-      const Real sqrt_term = std::sqrt(epsilon_sq + det_sq);
+      const Real sqrt_term = std::sqrt(_epsilon_squared_assembly + det_sq);
       // dchi(x) / dx
       const Real chi_prime = 0.5 * (1. + det / sqrt_term);
       const Real chi_prime_sq = chi_prime * chi_prime;
@@ -645,6 +652,131 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
     } // end of the quadrature point qp-loop
 
   return request_jacobian;
+}
+
+void VariationalSmootherSystem::compute_mesh_quality_info()
+{
+  // If the reference volume has not yet been computed, compute it.
+  if (std::abs(_ref_vol) < TOLERANCE * TOLERANCE)
+    prepare_for_smoothing();
+
+  std::unique_ptr<DiffContext> con = this->build_context();
+  FEMContext & femcontext = cast_ref<FEMContext &>(*con);
+  this->init_context(femcontext);
+
+  const auto & mesh = this->get_mesh();
+  const auto dim = mesh.mesh_dimension();
+  const Real half_dim = 0.5 * dim;
+  const auto distortion_weight = 1. - _dilation_weight;
+
+  // Make pre-requests before reinit() for efficiency in
+  // --enable-deprecated builds, and to avoid errors in
+  // --disable-deprecated builds.
+  const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
+  const auto & JxW = fe_map.get_JxW();
+  fe_map.get_dxyzdxi();
+  fe_map.get_dxyzdeta();
+  fe_map.get_dxyzdzeta();
+
+  MeshQualityInfo info;
+
+  for (const auto * elem : mesh.active_local_element_ptr_range())
+    {
+      femcontext.pre_fe_reinit(*this, elem);
+      femcontext.elem_fe_reinit();
+
+      // Element-integrated quantities
+      Real det_S_int = 0.;
+      Real beta_int = 0.;
+      Real mu_int = 0.;
+      Real combined_int = 0.;
+
+      for (const auto qp : index_range(JxW))
+        {
+          const auto det_SxW = JxW[qp] * _target_jacobian_dets[elem->type()][qp];
+          det_S_int += det_SxW;
+
+          // Grab the physical-to-reference mapping Jacobian matrix (i.e., "S") at this qp
+          RealTensor S = get_jacobian_at_qp(fe_map, dim, qp);
+
+          // Apply target element transformation
+          S *= _target_jacobians[elem->type()][qp];
+
+          // Determinant of S
+          const auto det = S.det();
+          const auto det_sq = det * det;
+
+          if (det > info.max_qp_det_J)
+            info.max_qp_det_J = det;
+          else if (det < info.min_qp_det_J)
+            info.min_qp_det_J = det;
+
+          if (det < TOLERANCE * TOLERANCE)
+            info.mesh_is_tangled = true;
+
+          // trace of S^T * S
+          const auto tr = trace(S.transpose() * S, dim);
+
+          // The chi function allows us to handle degenerate elements
+          const Real chi = 0.5 * (det + std::sqrt(_epsilon_squared_assembly + det_sq));
+
+          // distortion
+          const Real beta = std::pow(tr / dim, half_dim) / chi;
+          beta_int += beta * det_SxW;
+
+          // dilation
+          const Real mu = 0.5 * (_ref_vol + det_sq / _ref_vol) / chi;
+          mu_int += mu * det_SxW;
+
+          // combined
+          const Real E = distortion_weight * beta + _dilation_weight * mu;
+          combined_int += E * det_SxW;
+        }
+
+      info.total_det_J += det_S_int;
+      if (det_S_int > info.max_elem_det_J.second)
+        info.max_elem_det_J = std::make_pair(elem->id(), det_S_int);
+      else if (det_S_int < info.min_elem_det_J.second)
+        info.min_elem_det_J = std::make_pair(elem->id(), det_S_int);
+
+      info.total_distortion += beta_int;
+      if (beta_int > info.max_elem_distortion.second)
+        info.max_elem_distortion = std::make_pair(elem->id(), beta_int);
+      else if (beta_int < info.min_elem_distortion.second)
+        info.min_elem_distortion = std::make_pair(elem->id(), beta_int);
+
+      info.total_dilation += mu_int;
+      if (mu_int > info.max_elem_dilation.second)
+        info.max_elem_dilation = std::make_pair(elem->id(), mu_int);
+      else if (mu_int < info.min_elem_dilation.second)
+        info.min_elem_dilation = std::make_pair(elem->id(), mu_int);
+
+      info.total_combined += combined_int;
+      if (combined_int > info.max_elem_combined.second)
+        info.max_elem_combined = std::make_pair(elem->id(), combined_int);
+      else if (combined_int < info.min_elem_combined.second)
+        info.min_elem_combined = std::make_pair(elem->id(), combined_int);
+
+    } // for elem
+
+  // Get contributions from elements on other processors
+  mesh.comm().max(info.max_elem_det_J);
+  mesh.comm().min(info.min_elem_det_J);
+  mesh.comm().sum(info.total_det_J);
+
+  mesh.comm().max(info.max_elem_distortion);
+  mesh.comm().min(info.min_elem_distortion);
+  mesh.comm().sum(info.total_distortion);
+
+  mesh.comm().max(info.max_elem_dilation);
+  mesh.comm().min(info.min_elem_dilation);
+  mesh.comm().sum(info.total_dilation);
+
+  mesh.comm().max(info.max_elem_combined);
+  mesh.comm().min(info.min_elem_combined);
+  mesh.comm().sum(info.total_combined);
+
+  _mesh_info = info;
 }
 
 std::pair<std::unique_ptr<Elem>, std::vector<std::unique_ptr<Node>>>

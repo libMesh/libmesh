@@ -31,6 +31,42 @@
 namespace libMesh
 {
 
+/**
+ * Struct to hold smoother-relevant information about the mesh quality.
+ */
+struct MeshQualityInfo
+{
+  // dof_id_types will hold the id of the Elem where the metric occurs
+
+  std::pair<dof_id_type, Real> max_elem_distortion{DofObject::invalid_id,
+                                                   std::numeric_limits<Real>::lowest()};
+  std::pair<dof_id_type, Real> min_elem_distortion{DofObject::invalid_id,
+                                                   std::numeric_limits<Real>::max()};
+  Real total_distortion = 0.;
+
+  std::pair<dof_id_type, Real> max_elem_dilation{DofObject::invalid_id,
+                                                 std::numeric_limits<Real>::lowest()};
+  std::pair<dof_id_type, Real> min_elem_dilation{DofObject::invalid_id,
+                                                 std::numeric_limits<Real>::max()};
+  Real total_dilation = 0.;
+
+  std::pair<dof_id_type, Real> max_elem_combined{DofObject::invalid_id,
+                                                 std::numeric_limits<Real>::lowest()};
+  std::pair<dof_id_type, Real> min_elem_combined{DofObject::invalid_id,
+                                                 std::numeric_limits<Real>::max()};
+  Real total_combined = 0.;
+
+  std::pair<dof_id_type, Real> max_elem_det_J{DofObject::invalid_id,
+                                              std::numeric_limits<Real>::lowest()};
+  std::pair<dof_id_type, Real> min_elem_det_J{DofObject::invalid_id,
+                                              std::numeric_limits<Real>::max()};
+  Real total_det_J = 0.;
+  Real max_qp_det_J = std::numeric_limits<Real>::lowest();
+  Real min_qp_det_J = std::numeric_limits<Real>::max();
+
+  bool mesh_is_tangled = false;
+};
+
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
 class VariationalSmootherSystem : public libMesh::FEMSystem
@@ -46,12 +82,12 @@ class VariationalSmootherSystem : public libMesh::FEMSystem
  */
 public:
   VariationalSmootherSystem(libMesh::EquationSystems & es,
-                const std::string & name,
-                const unsigned int number)
-  : libMesh::FEMSystem(es, name, number),
-    _epsilon_squared(1e-10),
-    _ref_vol(1.),
-    _dilation_weight(0.5)
+                            const std::string & name,
+                            const unsigned int number)
+    : libMesh::FEMSystem(es, name, number),
+      _epsilon_squared(TOLERANCE),
+      _ref_vol(0.),
+      _dilation_weight(0.5)
   {}
 
   // Default destructor
@@ -90,6 +126,16 @@ public:
                                                std::vector<RealTensor> & jacobians,
                                                std::vector<Real> & jacobian_dets);
 
+  /**
+   * Const getter for the _mesh_info attribute.
+   */
+  const MeshQualityInfo & get_mesh_info() const { return _mesh_info; }
+
+  /*
+   * Computes information about the mesh quality and sets the _mesh_info attribute.
+   */
+  void compute_mesh_quality_info();
+
 protected:
 
   // System initialization
@@ -117,6 +163,12 @@ protected:
   const Real _epsilon_squared;
 
   /**
+   * Epsilon squared value determined at runtime during each assembly. The value
+   * depends on whether the mesh is tangled.
+   */
+  Real _epsilon_squared_assembly;
+
+  /**
   * The reference volume for each element
   */
   Real _ref_vol;
@@ -135,6 +187,11 @@ protected:
    * Map to hold the determinants of _target_jacobians.
    */
   std::map<ElemType, std::vector<Real>> _target_jacobian_dets;
+
+  /**
+   * Information about the mesh quality.
+   */
+  MeshQualityInfo _mesh_info;
 };
 
 } // namespace libMesh
