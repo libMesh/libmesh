@@ -2368,9 +2368,9 @@ data = matrices/geom_1_extraction_op.m \
        meshes/non_manifold_junction3.exo \
        meshes/Cluster_34.stl \
        meshes/engraving.stl \
-	   solutions/lagrange_vec_solution_mesh.xda \
+       solutions/lagrange_vec_solution_mesh.xda \
        solutions/lagrange_vec_solution.xda \
-	   solutions/nedelec_one_solution_mesh.xda \
+       solutions/nedelec_one_solution_mesh.xda \
        solutions/nedelec_one_solution.xda \
        solutions/raviart_thomas_solution_mesh.xda \
        solutions/raviart_thomas_solution.xda 

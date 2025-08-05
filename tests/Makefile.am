@@ -434,7 +434,7 @@ if LIBMESH_VPATH_BUILD
   BUILT_SOURCES = .linkstamp
 
 .linkstamp:
-  -rm -f solutions && $(LN_S) -f $(srcdir)/solutions .
+	-rm -f solutions && $(LN_S) -f $(srcdir)/solutions .
 	-rm -f meshes && $(LN_S) -f $(srcdir)/meshes .
 	-rm -f matrices && $(LN_S) -f $(srcdir)/matrices .
 	$(AM_V_GEN)touch .linkstamp
