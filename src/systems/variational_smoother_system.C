@@ -39,6 +39,14 @@ namespace libMesh
 {
 
 /**
+ * Function to prevent dividing by zero for degenerate elements
+ */
+Real chi_epsilon(const Real & x, const Real epsilon_squared)
+{
+  return 0.5 * (x + std::sqrt(epsilon_squared + Utility::pow<2>(x)));
+}
+
+/**
  * Given an fe_map, element dimension, and quadrature point index, returns the
  * Jacobian of the physical-to-reference mapping.
  */
@@ -353,7 +361,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                          0, 0, 1);
 
       // The chi function allows us to handle degenerate elements
-      const Real chi = 0.5 * (det + std::sqrt(_epsilon_squared_assembly + det_sq));
+      const auto chi = chi_epsilon(det, _epsilon_squared_assembly);
       const Real chi_sq = chi * chi;
       const Real sqrt_term = std::sqrt(_epsilon_squared_assembly + det_sq);
       // dchi(x) / dx
@@ -718,7 +726,7 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
           const auto tr = trace(S.transpose() * S, dim);
 
           // The chi function allows us to handle degenerate elements
-          const Real chi = 0.5 * (det + std::sqrt(_epsilon_squared_assembly + det_sq));
+          const auto chi = chi_epsilon(det, _epsilon_squared_assembly);
 
           // distortion
           const Real beta = std::pow(tr / dim, half_dim) / chi;
