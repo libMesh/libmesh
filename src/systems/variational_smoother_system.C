@@ -132,7 +132,15 @@ void VariationalSmootherSystem::assembly (bool get_residual,
   compute_mesh_quality_info();
 
   // Update _epsilon_squared_assembly based on whether the mesh is tangled
-  _epsilon_squared_assembly = _mesh_info.mesh_is_tangled ? _epsilon_squared : 0.;
+  if (_mesh_info.mesh_is_tangled)
+    {
+      const Real & min_S = _mesh_info.min_qp_det_S;
+      // This component is based on what Larisa did in the original code.
+      const Real variable_component = 100. * Utility::pow<2>(_ref_vol * min_S);
+      _epsilon_squared_assembly = _epsilon_squared + variable_component;
+    }
+  else
+    _epsilon_squared_assembly = 0.;
 
   FEMSystem::assembly(get_residual, get_jacobian, apply_heterogeneous_constraints, apply_no_constraints);
 }
