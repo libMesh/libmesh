@@ -49,7 +49,8 @@ class UnstructuredMesh;
  * The initial implementation was done by her, the adaptation to
  * libmesh was completed by Derek Gaston.  The code was heavily
  * refactored into something more closely resembling C++ by John
- * Peterson in 2014.
+ * Peterson in 2014. The code eventually fell out of use and stopped
+ * functioning. Patrick Behne reimplemented the smoother in 2025.
  *
  * Here are the relevant publications:
  * 1) L. Branets, G. Carey, "Extension of a mesh quality metric for
@@ -61,6 +62,11 @@ class UnstructuredMesh;
  *
  * 3) L. Branets, "A variational grid optimization algorithm based on a local
  * cell quality metric", Ph.D. thesis, The University of Texas at Austin, 2005.
+ *
+ * Notes:
+ *
+ * 1) The smoother supports tangled meshes. However, it cannot untangle all such
+ * meshes. This will be investigated further in the future.
  *
  * \author Derek R. Gaston
  * \date 2006
