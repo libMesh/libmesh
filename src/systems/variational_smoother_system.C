@@ -758,28 +758,28 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
         }
 
       info.total_det_S += det_S_int;
-      if (det_S_int > info.max_elem_det_S)
-        info.max_elem_det_S = det_S_int;
-      else if (det_S_int < info.min_elem_det_S)
-        info.min_elem_det_S = det_S_int;
+      if (det_S_int > info.max_elem_det_S.second)
+        info.max_elem_det_S = std::make_pair(elem->id(), det_S_int);
+      else if (det_S_int < info.min_elem_det_S.second)
+        info.min_elem_det_S = std::make_pair(elem->id(), det_S_int);
 
       info.total_distortion += beta_int;
-      if (beta_int > info.max_elem_distortion)
-        info.max_elem_distortion = beta_int;
-      else if (beta_int < info.min_elem_distortion)
-        info.min_elem_distortion = beta_int;
+      if (beta_int > info.max_elem_distortion.second)
+        info.max_elem_distortion = std::make_pair(elem->id(), beta_int);
+      else if (beta_int < info.min_elem_distortion.second)
+        info.min_elem_distortion = std::make_pair(elem->id(), beta_int);
 
       info.total_dilation += mu_int;
-      if (mu_int > info.max_elem_dilation)
-        info.max_elem_dilation = mu_int;
-      else if (mu_int < info.min_elem_dilation)
-        info.min_elem_dilation = mu_int;
+      if (mu_int > info.max_elem_dilation.second)
+        info.max_elem_dilation = std::make_pair(elem->id(), mu_int);
+      else if (mu_int < info.min_elem_dilation.second)
+        info.min_elem_dilation = std::make_pair(elem->id(), mu_int);
 
       info.total_combined += combined_int;
-      if (combined_int > info.max_elem_combined)
-        info.max_elem_combined = combined_int;
-      else if (combined_int < info.min_elem_combined)
-        info.min_elem_combined = combined_int;
+      if (combined_int > info.max_elem_combined.second)
+        info.max_elem_combined = std::make_pair(elem->id(), combined_int);
+      else if (combined_int < info.min_elem_combined.second)
+        info.min_elem_combined = std::make_pair(elem->id(), combined_int);
 
     } // for elem
 
