@@ -180,7 +180,7 @@ void VariationalSmootherSystem::prepare_for_smoothing()
 
   const auto & mesh = this->get_mesh();
 
-  Real elem_averaged_det_J_sum = 0.;
+  Real elem_averaged_det_S_sum = 0.;
 
   // Make pre-requests before reinit() for efficiency in
   // --enable-deprecated builds, and to avoid errors in
@@ -204,18 +204,18 @@ void VariationalSmootherSystem::prepare_for_smoothing()
         }// if find == end()
 
       // Reference volume computation
-      Real elem_integrated_det_J = 0.;
+      Real elem_integrated_det_S = 0.;
       for (const auto qp : index_range(JxW))
-        elem_integrated_det_J += JxW[qp] * _target_jacobian_dets[elem->type()][qp];
+        elem_integrated_det_S += JxW[qp] * _target_jacobian_dets[elem->type()][qp];
       const auto ref_elem_vol = elem->reference_elem()->volume();
-      elem_averaged_det_J_sum += elem_integrated_det_J / ref_elem_vol;
+      elem_averaged_det_S_sum += elem_integrated_det_S / ref_elem_vol;
 
     } // for elem
 
   // Get contributions from elements on other processors
-  mesh.comm().sum(elem_averaged_det_J_sum);
+  mesh.comm().sum(elem_averaged_det_S_sum);
 
-  _ref_vol = elem_averaged_det_J_sum / mesh.n_active_elem();
+  _ref_vol = elem_averaged_det_S_sum / mesh.n_active_elem();
 }
 
 void VariationalSmootherSystem::init_context(DiffContext & context)
@@ -714,10 +714,10 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
           const auto det = S.det();
           const auto det_sq = det * det;
 
-          if (det > info.max_qp_det_J)
-            info.max_qp_det_J = det;
-          else if (det < info.min_qp_det_J)
-            info.min_qp_det_J = det;
+          if (det > info.max_qp_det_S)
+            info.max_qp_det_S = det;
+          else if (det < info.min_qp_det_S)
+            info.min_qp_det_S = det;
 
           if (det < TOLERANCE * TOLERANCE)
             info.mesh_is_tangled = true;
@@ -741,11 +741,11 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
           combined_int += E * det_SxW;
         }
 
-      info.total_det_J += det_S_int;
-      if (det_S_int > info.max_elem_det_J.second)
-        info.max_elem_det_J = std::make_pair(elem->id(), det_S_int);
-      else if (det_S_int < info.min_elem_det_J.second)
-        info.min_elem_det_J = std::make_pair(elem->id(), det_S_int);
+      info.total_det_S += det_S_int;
+      if (det_S_int > info.max_elem_det_S.second)
+        info.max_elem_det_S = std::make_pair(elem->id(), det_S_int);
+      else if (det_S_int < info.min_elem_det_S.second)
+        info.min_elem_det_S = std::make_pair(elem->id(), det_S_int);
 
       info.total_distortion += beta_int;
       if (beta_int > info.max_elem_distortion.second)
@@ -768,9 +768,11 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
     } // for elem
 
   // Get contributions from elements on other processors
-  mesh.comm().max(info.max_elem_det_J);
-  mesh.comm().min(info.min_elem_det_J);
-  mesh.comm().sum(info.total_det_J);
+  mesh.comm().max(info.max_elem_det_S);
+  mesh.comm().min(info.min_elem_det_S);
+  mesh.comm().max(info.max_qp_det_S);
+  mesh.comm().min(info.min_qp_det_S);
+  mesh.comm().sum(info.total_det_S);
 
   mesh.comm().max(info.max_elem_distortion);
   mesh.comm().min(info.min_elem_distortion);

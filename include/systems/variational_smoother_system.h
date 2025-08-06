@@ -56,13 +56,13 @@ struct MeshQualityInfo
                                                  std::numeric_limits<Real>::max()};
   Real total_combined = 0.;
 
-  std::pair<dof_id_type, Real> max_elem_det_J{DofObject::invalid_id,
+  std::pair<dof_id_type, Real> max_elem_det_S{DofObject::invalid_id,
                                               std::numeric_limits<Real>::lowest()};
-  std::pair<dof_id_type, Real> min_elem_det_J{DofObject::invalid_id,
+  std::pair<dof_id_type, Real> min_elem_det_S{DofObject::invalid_id,
                                               std::numeric_limits<Real>::max()};
-  Real total_det_J = 0.;
-  Real max_qp_det_J = std::numeric_limits<Real>::lowest();
-  Real min_qp_det_J = std::numeric_limits<Real>::max();
+  Real total_det_S = 0.;
+  Real max_qp_det_S = std::numeric_limits<Real>::lowest();
+  Real min_qp_det_S = std::numeric_limits<Real>::max();
 
   bool mesh_is_tangled = false;
 };
