@@ -802,6 +802,10 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
   mesh.comm().min(info.min_elem_combined);
   mesh.comm().sum(info.total_combined);
 
+  unsigned int mesh_is_tangled_int = info.mesh_is_tangled;
+  mesh.comm().sum(mesh_is_tangled_int);
+  info.mesh_is_tangled = (bool) mesh_is_tangled_int;
+
   _mesh_info = info;
 }
 
