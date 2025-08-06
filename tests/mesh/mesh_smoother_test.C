@@ -272,9 +272,9 @@ public:
   {
     LOG_UNIT_TEST;
 
-    libmesh_error_msg_if(
-        multiple_subdomains && tangle_mesh,
-        "Arbitrary mesh tangling with multiple subdomains is not yet supported.");
+    if (multiple_subdomains && tangle_mesh)
+      libmesh_not_implemented_msg(
+          "Arbitrary mesh tangling with multiple subdomains is not supported.");
 
     // Get mesh dimension, determine whether type is triangular
     const auto * ref_elem = &(ReferenceElem::get(type));
