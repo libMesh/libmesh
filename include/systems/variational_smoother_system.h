@@ -65,6 +65,7 @@ struct MeshQualityInfo
   Real min_qp_det_S = std::numeric_limits<Real>::max();
 
   bool mesh_is_tangled = false;
+  bool initialized = false;
 };
 
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
@@ -127,9 +128,10 @@ public:
                                                std::vector<Real> & jacobian_dets);
 
   /**
-   * Const getter for the _mesh_info attribute.
+   * Getter for the _mesh_info attribute. If this attribute has not yet been
+   * initialized, compute_mesh_quality_info is called to initialize it.
    */
-  const MeshQualityInfo & get_mesh_info() const { return _mesh_info; }
+  const MeshQualityInfo & get_mesh_info();
 
   /*
    * Computes information about the mesh quality and sets the _mesh_info attribute.

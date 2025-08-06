@@ -109,9 +109,9 @@ public:
   void smooth(unsigned int n_iterations);
 
   /**
-   * Getter for the _system attribute
+   * Getter for the _system's _mesh_info attribute
    */
-  VariationalSmootherSystem * get_system() { return _system; }
+  const MeshQualityInfo & get_mesh_info() const { return _system->get_mesh_info(); }
 
 private:
 

@@ -462,9 +462,7 @@ public:
     if (tangle_mesh)
     {
       smoother.setup(); // Need this to create the system we are about to access
-      auto * system = smoother.get_system();
-      system->compute_mesh_quality_info();
-      const auto & unsmoothed_info = system->get_mesh_info();
+      const auto & unsmoothed_info = smoother.get_mesh_info();
       CPPUNIT_ASSERT(unsmoothed_info.mesh_is_tangled);
     }
 

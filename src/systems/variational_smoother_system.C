@@ -670,6 +670,14 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
   return request_jacobian;
 }
 
+const MeshQualityInfo & VariationalSmootherSystem::get_mesh_info()
+{
+  if (!_mesh_info.initialized)
+    compute_mesh_quality_info();
+
+  return _mesh_info;
+}
+
 void VariationalSmootherSystem::compute_mesh_quality_info()
 {
   // If the reference volume has not yet been computed, compute it.
