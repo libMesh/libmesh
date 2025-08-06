@@ -113,7 +113,7 @@ void VariationalMeshSmoother::setup()
   // Uncomment this line and use -snes_test_jacobian and -snes_test_jacobian_view
   // flags to compare the hand-coded jacobian in VariationalSmootherSystem
   // to finite difference jacobians.
-  //_system->time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(sys);
+  //_system->time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(*_system);
 
   _equation_systems->init();
 
