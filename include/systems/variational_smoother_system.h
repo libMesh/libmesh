@@ -41,28 +41,28 @@ struct MeshQualityInfo
   // the min/max accross processors will compare the numeric values instead of
   // the element ids.
 
-  std::pair<Real, dof_id_type> max_elem_distortion{DofObject::invalid_id,
-                                                   std::numeric_limits<Real>::lowest()};
-  std::pair<Real, dof_id_type> min_elem_distortion{DofObject::invalid_id,
-                                                   std::numeric_limits<Real>::max()};
+  std::pair<Real, dof_id_type> max_elem_distortion{std::numeric_limits<Real>::lowest(),
+                                                   DofObject::invalid_id};
+  std::pair<Real, dof_id_type> min_elem_distortion{std::numeric_limits<Real>::max(),
+                                                   DofObject::invalid_id};
   Real total_distortion = 0.;
 
-  std::pair<Real, dof_id_type> max_elem_dilation{DofObject::invalid_id,
-                                                 std::numeric_limits<Real>::lowest()};
-  std::pair<Real, dof_id_type> min_elem_dilation{DofObject::invalid_id,
-                                                 std::numeric_limits<Real>::max()};
+  std::pair<Real, dof_id_type> max_elem_dilation{std::numeric_limits<Real>::lowest(),
+                                                 DofObject::invalid_id};
+  std::pair<Real, dof_id_type> min_elem_dilation{std::numeric_limits<Real>::max(),
+                                                 DofObject::invalid_id};
   Real total_dilation = 0.;
 
-  std::pair<Real, dof_id_type> max_elem_combined{DofObject::invalid_id,
-                                                 std::numeric_limits<Real>::lowest()};
-  std::pair<Real, dof_id_type> min_elem_combined{DofObject::invalid_id,
-                                                 std::numeric_limits<Real>::max()};
+  std::pair<Real, dof_id_type> max_elem_combined{std::numeric_limits<Real>::lowest(),
+                                                 DofObject::invalid_id};
+  std::pair<Real, dof_id_type> min_elem_combined{std::numeric_limits<Real>::max(),
+                                                 DofObject::invalid_id};
   Real total_combined = 0.;
 
-  std::pair<Real, dof_id_type> max_elem_det_S{DofObject::invalid_id,
-                                              std::numeric_limits<Real>::lowest()};
-  std::pair<Real, dof_id_type> min_elem_det_S{DofObject::invalid_id,
-                                              std::numeric_limits<Real>::max()};
+  std::pair<Real, dof_id_type> max_elem_det_S{std::numeric_limits<Real>::lowest(),
+                                              DofObject::invalid_id};
+  std::pair<Real, dof_id_type> min_elem_det_S{std::numeric_limits<Real>::max(),
+                                              DofObject::invalid_id};
   Real total_det_S = 0.;
   Real max_qp_det_S = std::numeric_limits<Real>::lowest();
   Real min_qp_det_S = std::numeric_limits<Real>::max();
