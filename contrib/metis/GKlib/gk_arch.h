@@ -59,6 +59,7 @@ typedef ptrdiff_t ssize_t;
 #endif
 
 #ifdef __MSC__
+#if _MSC_VER < 1900
 /* MSC does not have rint() function */
 #define rint(x) ((int)((x)+0.5))  
 
@@ -66,6 +67,9 @@ typedef ptrdiff_t ssize_t;
 #ifndef INFINITY
 #define INFINITY FLT_MAX
 #endif
+#endif
+
+#define USE_GKREGEX
 #endif
 
 #endif
