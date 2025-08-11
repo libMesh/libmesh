@@ -758,27 +758,27 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
         }
 
       info.total_det_S += det_S_int;
-      if (det_S_int > info.max_elem_det_S.second)
+      if (det_S_int > info.max_elem_det_S.first)
         info.max_elem_det_S = std::make_pair(det_S_int, elem->id());
-      else if (det_S_int < info.min_elem_det_S.second)
+      else if (det_S_int < info.min_elem_det_S.first)
         info.min_elem_det_S = std::make_pair(det_S_int, elem->id());
 
       info.total_distortion += beta_int;
-      if (beta_int > info.max_elem_distortion.second)
+      if (beta_int > info.max_elem_distortion.first)
         info.max_elem_distortion = std::make_pair(beta_int, elem->id());
-      else if (beta_int < info.min_elem_distortion.second)
+      else if (beta_int < info.min_elem_distortion.first)
         info.min_elem_distortion = std::make_pair(beta_int, elem->id());
 
       info.total_dilation += mu_int;
-      if (mu_int > info.max_elem_dilation.second)
+      if (mu_int > info.max_elem_dilation.first)
         info.max_elem_dilation = std::make_pair(mu_int, elem->id());
-      else if (mu_int < info.min_elem_dilation.second)
+      else if (mu_int < info.min_elem_dilation.first)
         info.min_elem_dilation = std::make_pair(mu_int, elem->id());
 
       info.total_combined += combined_int;
-      if (combined_int > info.max_elem_combined.second)
+      if (combined_int > info.max_elem_combined.first)
         info.max_elem_combined = std::make_pair(combined_int, elem->id());
-      else if (combined_int < info.min_elem_combined.second)
+      else if (combined_int < info.min_elem_combined.first)
         info.min_elem_combined = std::make_pair(combined_int, elem->id());
 
     } // for elem
