@@ -125,25 +125,44 @@ private:
    */
   const bool _preserve_subdomain_boundaries;
 
-  /**
-   * EquationsSystems object associated with the smoother
-   */
-  std::unique_ptr<EquationSystems> _equation_systems;
-
-  /**
-   * System used to smooth the mesh.
-   */
-  VariationalSmootherSystem * _system;
-
-  /**
-   * Constraints imposed on the smoothing process.
-   */
-  std::unique_ptr<VariationalSmootherConstraint> _constraint;
+  // These must be declared in reverse dependency order to avoid corrupting the
+  // heap during destruction
 
   /**
    * Mesh copy to avoid multiple EquationSystems.
    */
+  // independent of _equations_systems and _constraint
   std::unique_ptr<DistributedMesh> _mesh_copy;
+
+  /**
+   * EquationsSystems object associated with the smoother
+   */
+  // uses _mesh_copy, owns the system
+  std::unique_ptr<EquationSystems> _equation_systems;
+
+
+  // Now it's safe to store non-owning pointers to the above
+
+  /*
+   * System used to smooth the mesh.
+   */
+  // Owned by _equation_systems
+  VariationalSmootherSystem * _system;
+
+  /**
+   * Getter for _system to protect against dangling pointers
+   */
+  VariationalSmootherSystem * system() const
+  {
+    libmesh_assert(_system);
+    return _system;
+  }
+
+  /**
+   * Constraints imposed on the smoothing process.
+   */
+  // uses system, which is owned by _equations_systems
+  std::unique_ptr<VariationalSmootherConstraint> _constraint;
 
   /**
    * Attribute the keep track of whether the setup method has been called.

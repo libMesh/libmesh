@@ -92,38 +92,38 @@ void VariationalMeshSmoother::setup()
   // Set this to something > 0 to add more quadrature points than the default
   // rule that integrates order 2 * fe_order + 1 polynomials exactly.
   // Using higher quadrature orders has not had a significant effect on observed solutions.
-  //_system->extra_quadrature_order = 0;
+  //system()->extra_quadrature_order = 0;
 
   // Uncomment these to debug
-  //_system->print_element_solutions=true;
-  //_system->print_element_residuals=true;
-  //_system->print_element_jacobians=true;
+  //system()->print_element_solutions=true;
+  //system()->print_element_residuals=true;
+  //system()->print_element_jacobians=true;
 
   // Add boundary node and hanging node constraints
   _constraint =
       std::make_unique<VariationalSmootherConstraint>(*_system, _preserve_subdomain_boundaries);
-  _system->attach_constraint_object(*_constraint);
+  system()->attach_constraint_object(*_constraint);
 
   // Set system parameters
-  _system->get_dilation_weight() = _dilation_weight;
+  system()->get_dilation_weight() = _dilation_weight;
 
   // Set up solver
-  _system->time_solver = std::make_unique<SteadySolver>(*_system);
+  system()->time_solver = std::make_unique<SteadySolver>(*_system);
 
   // Uncomment this line and use -snes_test_jacobian and -snes_test_jacobian_view
   // flags to compare the hand-coded jacobian in VariationalSmootherSystem
   // to finite difference jacobians.
-  //_system->time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(*_system);
+  //system()->time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(*_system);
 
   _equation_systems->init();
 
   // More debugging options
-  // DiffSolver & solver = *(_system->time_solver->diff_solver().get());
+  // DiffSolver & solver = *(system()->time_solver->diff_solver().get());
   // solver.quiet = false;
   // solver.verbose = true;
 
-  _system->time_solver->diff_solver()->relative_residual_tolerance = TOLERANCE * TOLERANCE;
-  _system->time_solver->diff_solver()->absolute_residual_tolerance = TOLERANCE * TOLERANCE;
+  system()->time_solver->diff_solver()->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+  system()->time_solver->diff_solver()->absolute_residual_tolerance = TOLERANCE * TOLERANCE;
 
   _setup_called = true;
 }
@@ -133,7 +133,7 @@ void VariationalMeshSmoother::smooth(unsigned int)
   if (!_setup_called)
     setup();
 
-  _system->solve();
+  system()->solve();
 
   // Update _mesh from _mesh_copy
   for (auto * node_copy : _mesh_copy->local_node_ptr_range())
