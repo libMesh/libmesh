@@ -319,7 +319,8 @@ public:
 
     if (tangle_mesh)
       {
-        for (auto * elem : mesh.active_element_ptr_range())
+        bool swapped_nodes = false;
+        for (auto * elem : mesh.active_local_element_ptr_range())
           {
             // The solver has trouble if the mesh is too tangled, so only tangle
             // some elements
@@ -352,6 +353,11 @@ public:
                 // Swap the nodes
                 if ((node1_id != DofObject::invalid_id) && (node2_id != DofObject::invalid_id))
                   {
+                    // Make sure we haven't swapped any nodes yet on this or other processors
+                    mesh.comm().max(swapped_nodes);
+                    if (swapped_nodes)
+                      break;
+
                     auto & node1 = elem->node_ref(node1_id);
                     auto & node2 = elem->node_ref(node2_id);
 
@@ -365,7 +371,7 @@ public:
                     // Once we have swapped two elements of the mesh, do not swap
                     // any more. Again, we still have issues with "too tangled"
                     // meshes.
-                    break;
+                    swapped_nodes = true;
                   }
               }
           }
