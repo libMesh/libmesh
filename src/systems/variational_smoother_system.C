@@ -130,19 +130,61 @@ void VariationalSmootherSystem::assembly (bool get_residual,
 
   // Compute and update mesh quality information
   compute_mesh_quality_info();
+  const bool is_tangled = _mesh_info.mesh_is_tangled;
 
-  // Update _epsilon_squared_assembly based on whether the mesh is tangled
-  if (_mesh_info.mesh_is_tangled)
+  // Update _epsilon_squared_assembly based on whether we are untangling or
+  // smoothing
+  if (_untangling_solve)
     {
       const Real & min_S = _mesh_info.min_qp_det_S;
       // This component is based on what Larisa did in the original code.
       const Real variable_component = 100. * Utility::pow<2>(_ref_vol * min_S);
       _epsilon_squared_assembly = _epsilon_squared + variable_component;
     }
+
   else
     _epsilon_squared_assembly = 0.;
 
   FEMSystem::assembly(get_residual, get_jacobian, apply_heterogeneous_constraints, apply_no_constraints);
+
+  if (_untangling_solve && !is_tangled)
+    {
+      // Mesh is untangled, artificially reduce residual by factor 0.9 to tell
+      // the solver we are on the right track. The mesh may become re-tangled in
+      // subsequent nonlinear and line search iterations, so we will not use
+      // this reduction factor in the case of re-tangulation. This approach
+      // should drive the solver to eventually favor untangled solutions.
+      rhs->close();
+      (*rhs) *= 0.9;
+    }
+}
+
+void VariationalSmootherSystem::solve()
+{
+  const auto & mesh_info = get_mesh_info();
+  if (mesh_info.mesh_is_tangled)
+    {
+      // Untangling solve
+      _untangling_solve = true;
+
+      // Untangling seems to work better using only the distortion metric.
+      // For a mixed metric, I've seen it *technically* untangle a mesh to a
+      // still-suboptimal mesh (i.e., a local minima), but not been able to
+      // smooth it well because the smoothest solution is on the other side of
+      // a tangulation barrier.
+      const auto dilation_weight = _dilation_weight;
+      _dilation_weight = 0.;
+
+      FEMSystem::solve();
+
+      // Reset the dilation weight
+      _dilation_weight = dilation_weight;
+    }
+
+  // Smoothing solve
+  _untangling_solve = false;
+  FEMSystem::solve();
+  libmesh_error_msg_if(get_mesh_info().mesh_is_tangled, "The smoothing solve tangled the mesh!");
 }
 
 void VariationalSmootherSystem::init_data ()

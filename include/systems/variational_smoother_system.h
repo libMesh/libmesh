@@ -91,7 +91,8 @@ public:
     : libMesh::FEMSystem(es, name, number),
       _epsilon_squared(TOLERANCE),
       _ref_vol(0.),
-      _dilation_weight(0.5)
+      _dilation_weight(0.5),
+      _untangling_solve(false)
   {}
 
   // Default destructor
@@ -106,6 +107,13 @@ public:
                          bool apply_no_constraints = false) override;
 
   Real & get_dilation_weight() { return _dilation_weight; }
+
+  /**
+   * Solves the system to smooth the mesh. If the mesh is initially tangled,
+   * a solve is first performed to untangle the mesh, followed by a solve to
+   * smooth the mesh.
+   */
+  virtual void solve() override;
 
   /**
    * Get the target element for a given element type.
@@ -197,6 +205,11 @@ protected:
    * Information about the mesh quality.
    */
   MeshQualityInfo _mesh_info;
+
+  /**
+   * Flag to indicate if the current solve is to untangle or smooth
+   */
+  bool _untangling_solve;
 };
 
 } // namespace libMesh
