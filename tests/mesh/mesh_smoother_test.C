@@ -269,7 +269,8 @@ public:
                                VariationalMeshSmoother & smoother,
                                const ElemType type,
                                const bool multiple_subdomains = false,
-                               const bool tangle_mesh=false)
+                               const bool tangle_mesh=false,
+                               const Real tangle_damping_factor=1.0)
   {
     LOG_UNIT_TEST;
 
@@ -362,12 +363,9 @@ public:
                     auto & node1 = elem->node_ref(node1_id);
                     auto & node2 = elem->node_ref(node2_id);
 
-                    for (const auto & d : make_range(dim))
-                      {
-                        auto tmp = node1(d);
-                        node1(d) = node2(d);
-                        node2(d) = tmp;
-                      }
+                    const auto diff = node1 - node2;
+                    node1 -= tangle_damping_factor * diff;
+                    node2 += tangle_damping_factor * diff;
 
                     // Once we have swapped two elements of the mesh, do not swap
                     // any more. Again, we still have issues with "too tangled"
@@ -582,7 +580,7 @@ public:
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testVariationalSmoother(mesh, variational, QUAD4, false, true);
+    testVariationalSmoother(mesh, variational, QUAD4, false, true, 0.65);
   }
 
   void testVariationalTri3()
