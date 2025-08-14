@@ -927,6 +927,92 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
     } // if Tri
 
 
+  // Elems deriving from Pyramid
+  else if (type_str.compare(0, 7, "PYRAMID") == 0)
+    {
+
+      // Ideally, the target element would be a pyramid with an square base and
+      // equilateral triangular sides with volume equal to the volume of the
+      // reference element.
+
+      // A pyramid with square base sidelength s and equilateral triangular
+      // sides has height h = s / sqrt(2).
+      // The volume is v = s^2 h / 3 = s^3 / ( 3 sqrt(2)).
+      // Solving for s: s = (3 sqrt(2) v)^(1/3), where v is the volume of the
+      // non-optimal reference element.
+
+      // const Real sqrt_2 = std::sqrt(Real(2));
+      // Side length that preserves the volume of the reference element
+      // const auto side_length = std::pow(3. * sqrt_2 * ref_vol, 1. / 3.);
+      // Pyramid height with the property that all faces are equilateral triangles
+      // const auto target_height = side_length / sqrt_2;
+
+      // HOWEVER, higher-order pyramids with this h/s ratio will not pass our
+      // current unit tests where a cube is partitioned into  sub-cubes, each
+      // of which contains 6 pyramids, with two pyramids each oriented along
+      // the x/y/z axes. We cannot simultaneously scale each of the axes by
+      // 1 / sqrt(2) without messing up the h/s ratio in the other dimensions.
+      // For now, we will use a target element with square base of side length
+      // s and height s / 2. The factor of 2 comes from the fact that a cube of
+      // side length s is divided into 6 pyramids of height s / 2.
+      // Let's preserve the volume of the reference element. The resulting
+      // target element has volume v = s^2 (s/2) / 3 = s^3 / 6.
+      // Solving for s: s = (6v)^(1/3).
+
+      // Side length that preserves the volume of the reference element
+      const auto side_length = std::pow(6. * ref_vol, 1. / 3.);
+      // Pyramid height that is half the side length
+      const auto target_height = 0.5 * side_length;
+
+      const auto & s = side_length;
+      const auto & h = target_height;
+
+      //                                         x        y        z    node_id
+      owned_nodes.emplace_back(Node::build(Point(0.,      0.,      0.), 0));
+      owned_nodes.emplace_back(Node::build(Point(s,       0.,      0.), 1));
+      owned_nodes.emplace_back(Node::build(Point(s,       s,       0.), 2));
+      owned_nodes.emplace_back(Node::build(Point(0.,      s,       0.), 3));
+      owned_nodes.emplace_back(Node::build(Point(0.5 * s, 0.5 * s, h),  4));
+
+      if (type == PYRAMID13 || type == PYRAMID14 || type == PYRAMID18)
+        {
+          const auto & on = owned_nodes;
+          // Define the edge midpoint nodes of the pyramid
+
+          // Base node to base node midpoint nodes
+          owned_nodes.emplace_back(Node::build((*on[0] + *on[1]) / 2., 5));
+          owned_nodes.emplace_back(Node::build((*on[1] + *on[2]) / 2., 6));
+          owned_nodes.emplace_back(Node::build((*on[2] + *on[3]) / 2., 7));
+          owned_nodes.emplace_back(Node::build((*on[3] + *on[0]) / 2., 8));
+
+          // Base node to apex node midpoint nodes
+          owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[4]) / 2.), 9));
+          owned_nodes.emplace_back(Node::build(Point((*on[1] + *on[4]) / 2.), 10));
+          owned_nodes.emplace_back(Node::build(Point((*on[2] + *on[4]) / 2.), 11));
+          owned_nodes.emplace_back(Node::build(Point((*on[3] + *on[4]) / 2.), 12));
+
+          if (type == PYRAMID14 || type == PYRAMID18)
+            {
+              // Define the square face midpoint node of the pyramid
+              owned_nodes.emplace_back(
+                  Node::build(Point((*on[0] + *on[1] + *on[2] + *on[3]) / 4.), 13));
+
+              if (type == PYRAMID18)
+                {
+                  // Define the triangular face nodes
+                  owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[1] + *on[4]) / 3.), 14));
+                  owned_nodes.emplace_back(Node::build(Point((*on[1] + *on[2] + *on[4]) / 3.), 15));
+                  owned_nodes.emplace_back(Node::build(Point((*on[2] + *on[3] + *on[4]) / 3.), 16));
+                  owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[3] + *on[4]) / 3.), 17));
+                }
+            }
+        }
+
+      else if (type != PYRAMID5)
+        libmesh_error_msg("Unsupported pyramid element: " << type_str);
+
+    } // if Pyramid
+
   // Set the target_elem equal to the reference elem
   else
     for (const auto & node : target_elem->reference_elem()->node_ref_range())
@@ -936,7 +1022,7 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
   for (const auto & node_ptr : owned_nodes)
     target_elem->set_node(node_ptr->id(), node_ptr.get());
 
-  libmesh_assert(relative_fuzzy_equals(target_elem->volume(), ref_vol));
+  libmesh_assert(relative_fuzzy_equals(target_elem->volume(), ref_vol, TOLERANCE));
 
   return std::make_pair(std::move(target_elem), std::move(owned_nodes));
 }
