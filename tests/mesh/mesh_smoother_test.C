@@ -97,7 +97,7 @@ private:
               }
             const auto delta = (pow<3>(xi) - xi) * modulation;
             // Check for delta = 0 to make sure we perturb every point
-            output(i) = (delta > TOLERANCE) ? p(i) + delta : 1.05 * p(i);
+            output(i) = (delta > TOLERANCE) ? p(i) + delta : 1.03 * p(i);
           }
         else
           output(i) = p(i); // dimension on boundary remains unchanged
@@ -154,7 +154,6 @@ class ParallelogramToSquare : public FunctionBase<Real>
     output(2) = 0;
   }
 };
-
 }
 
 using namespace libMesh;
@@ -189,6 +188,12 @@ public:
   CPPUNIT_TEST(testVariationalHex27);
   CPPUNIT_TEST(testVariationalHex27Tangled);
   CPPUNIT_TEST(testVariationalHex27MultipleSubdomains);
+
+  CPPUNIT_TEST(testVariationalPyramid5);
+  CPPUNIT_TEST(testVariationalPyramid13);
+  CPPUNIT_TEST(testVariationalPyramid14);
+  CPPUNIT_TEST(testVariationalPyramid18);
+  CPPUNIT_TEST(testVariationalPyramid18MultipleSubdomains);
 #endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
 
@@ -282,6 +287,7 @@ public:
     const auto * ref_elem = &(ReferenceElem::get(type));
     const auto dim = ref_elem->dim();
     const bool type_is_tri = Utility::enum_to_string(type).compare(0, 3, "TRI") == 0;
+    const bool type_is_pyramid = Utility::enum_to_string(type).compare(0, 7, "PYRAMID") == 0;
 
     unsigned int n_elems_per_side = 4;
 
@@ -410,66 +416,65 @@ public:
           distorted_subdomain_volumes[elem->subdomain_id()] += elem->volume();
       }
 
+    // Get the mesh order
+    const auto & elem_orders = mesh.elem_default_orders();
+    libmesh_error_msg_if(elem_orders.size() != 1,
+                         "The variational smoother cannot be used for mixed-order meshes!");
+    // For pyramids, the factor 2 accounts for the account that cubes of side
+    // length s are divided into pyramids of base side length s and height s/2.
+    // The factor 4 lets us catch triangular face midpoint nodes for PYRAMID18 elements.
+    const auto scale_factor = *elem_orders.begin() * (type_is_pyramid ? 2 * 4 : 1);
 
-      // Get the mesh order
-      const auto &elem_orders = mesh.elem_default_orders();
-      libmesh_error_msg_if(
-          elem_orders.size() != 1,
-          "The variational smoother cannot be used for mixed-order meshes!");
-      const auto fe_order = *elem_orders.begin();
+    // Function to assert the distortion is as expected
+    auto distortion_is = [&n_elems_per_side, &dim, &boundary_info, &scale_factor](
+                             const Node & node, bool distortion, Real distortion_tol = TOLERANCE) {
+      // Get boundary ids associated with the node
+      std::vector<boundary_id_type> boundary_ids;
+      boundary_info.boundary_ids(&node, boundary_ids);
 
-      // Function to assert the distortion is as expected
-      auto distortion_is = [
-        &n_elems_per_side, &dim, &boundary_info, &fe_order
-      ](const Node &node, bool distortion, Real distortion_tol = TOLERANCE)
-      {
-        // Get boundary ids associated with the node
-        std::vector<boundary_id_type> boundary_ids;
-        boundary_info.boundary_ids(&node, boundary_ids);
+      // This tells us what type of node we are: internal, sliding, or fixed
+      const auto num_dofs = dim - boundary_ids.size();
+      /*
+       * The following cases of num_dofs are possible, ASSUMING all boundaries
+       * are non-overlapping
+       * 3D: 3-0,     3-1,     3-2,     3-3
+       *   = 3        2        1        0
+       *     internal sliding, sliding, fixed
+       * 2D: 2-0,     2-1,     2-2
+       *   = 2        1        0
+       *     internal sliding, fixed
+       * 1D: 1-0,     1-1
+       *   = 1        0
+       *     internal fixed
+       *
+       * We expect that R is an integer in [0, n_elems_per_side] for
+       * num_dofs of the node's cooridinantes, while the remaining coordinates
+       * are fixed to the boundary with value 0 or 1. In other words, at LEAST
+       * dim - num_dofs coordinantes should be 0 or 1.
+       */
 
-        // This tells us what type of node we are: internal, sliding, or fixed
-        const auto num_dofs = dim - boundary_ids.size();
-        /*
-         * The following cases of num_dofs are possible, ASSUMING all boundaries
-         * are non-overlapping
-         * 3D: 3-0,     3-1,     3-2,     3-3
-         *   = 3        2        1        0
-         *     internal sliding, sliding, fixed
-         * 2D: 2-0,     2-1,     2-2
-         *   = 2        1        0
-         *     internal sliding, fixed
-         * 1D: 1-0,     1-1
-         *   = 1        0
-         *     internal fixed
-         *
-         * We expect that R is an integer in [0, n_elems_per_side] for
-         * num_dofs of the node's cooridinantes, while the remaining coordinates
-         * are fixed to the boundary with value 0 or 1. In other words, at LEAST
-         * dim - num_dofs coordinantes should be 0 or 1.
-         */
+      std::size_t num_zero_or_one = 0;
 
-        std::size_t num_zero_or_one = 0;
+      bool distorted = false;
+      for (const auto d : make_range(dim))
+        {
+          const Real r = node(d);
+          const Real R = r * n_elems_per_side * scale_factor;
+          CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, r);
+          CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, 1 - r);
 
-        bool distorted = false;
-        for (const auto d : make_range(dim))
-          {
-            const Real r = node(d);
-            const Real R = r * n_elems_per_side * fe_order;
+          const bool d_distorted = std::abs(R - std::round(R)) > distortion_tol;
+          distorted |= d_distorted;
+          num_zero_or_one += (absolute_fuzzy_equals(r, 0.) || absolute_fuzzy_equals(r, 1.));
+        }
 
-            const bool d_distorted = std::abs(R - std::round(R)) > distortion_tol;
-            distorted |= d_distorted;
-            num_zero_or_one +=
-                (absolute_fuzzy_equals(r, 0.) || absolute_fuzzy_equals(r, 1.));
-          }
+      CPPUNIT_ASSERT_GREATEREQUAL(dim - num_dofs, num_zero_or_one);
 
-        CPPUNIT_ASSERT_GREATEREQUAL(dim - num_dofs, num_zero_or_one);
-
-        // We can never expect a fixed node to be distorted
-        if (num_dofs == 0)
-          // if (num_dofs < dim)
-          return true;
-        return distorted == distortion;
-
+      // We can never expect a fixed node to be distorted
+      if (num_dofs == 0)
+        // if (num_dofs < dim)
+        return true;
+      return distorted == distortion;
     };
 
     // Make sure our DistortHyperCube transformation has distorted the mesh
@@ -511,7 +516,8 @@ public:
             const auto & subdomain_id = pair.first;
             CPPUNIT_ASSERT(
                 relative_fuzzy_equals(libmesh_map_find(distorted_subdomain_volumes, subdomain_id),
-                                      libmesh_map_find(smoothed_subdomain_volumes, subdomain_id)));
+                                      libmesh_map_find(smoothed_subdomain_volumes, subdomain_id),
+                                      TOLERANCE));
           }
       }
     else
@@ -647,6 +653,46 @@ public:
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX27, false, true, 0.75);
+  }
+
+  void testVariationalPyramid5()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, PYRAMID5);
+  }
+
+  void testVariationalPyramid13()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, PYRAMID13);
+  }
+
+  void testVariationalPyramid14()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, PYRAMID14);
+  }
+
+  void testVariationalPyramid18()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, PYRAMID18);
+  }
+
+  void testVariationalPyramid18MultipleSubdomains()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, PYRAMID18, true);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
