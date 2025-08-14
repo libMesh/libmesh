@@ -15,6 +15,7 @@
 #include "libmesh/face_tri.h"
 #include "libmesh/utility.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/parallel_ghost_sync.h"
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -375,6 +376,9 @@ public:
                   }
               }
           }
+
+        SyncNodalPositions sync_object(mesh);
+        Parallel::sync_dofobject_data_by_id (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
       }
 
     // Add multiple subdomains if requested
