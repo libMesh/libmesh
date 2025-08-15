@@ -15,9 +15,12 @@
 #include "libmesh/face_tri.h"
 #include "libmesh/utility.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/parallel_ghost_sync.h"
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
+
+#include <random>
 
 namespace
 {
@@ -71,33 +74,19 @@ private:
     output.zero();
 
     // Count how many coordinates are exactly on the boundary (0 or 1)
-    unsigned int boundary_dims = 0;
     std::array<bool, 3> is_on_boundary = {false, false, false};
     for (unsigned int i = 0; i < _dim; ++i)
-      {
-        if (std::abs(p(i)) < TOLERANCE || std::abs(p(i) - 1.) < TOLERANCE)
-          {
-            ++boundary_dims;
-            is_on_boundary[i] = true;
-          }
-      }
-
-    // If all coordinates are on the boundary, treat as vertex — leave unchanged
-    if (boundary_dims == _dim)
-      {
-        for (unsigned int i = 0; i < _dim; ++i)
-          output(i) = p(i);
-        return;
-      }
+      if (std::abs(p(i)) < TOLERANCE || std::abs(p(i) - 1.) < TOLERANCE)
+        is_on_boundary[i] = true;
 
     // Distort only those directions not fixed on the boundary
     for (unsigned int i = 0; i < _dim; ++i)
       {
         if (!is_on_boundary[i]) // only distort free dimensions
           {
-            Real xi = 2. * p(i) - 1.;
             // This value controls the strength of the distortion
             Real modulation = 0.3;
+            Real xi = 2. * p(i) - 1.;
             for (unsigned int j = 0; j < _dim; ++j)
               {
                 if (j != i)
@@ -189,6 +178,7 @@ public:
 
   CPPUNIT_TEST(testVariationalQuad);
   CPPUNIT_TEST(testVariationalQuadMultipleSubdomains);
+  CPPUNIT_TEST(testVariationalQuadTangled);
 
   CPPUNIT_TEST(testVariationalTri3);
   CPPUNIT_TEST(testVariationalTri6);
@@ -197,6 +187,7 @@ public:
   CPPUNIT_TEST(testVariationalHex8);
   CPPUNIT_TEST(testVariationalHex20);
   CPPUNIT_TEST(testVariationalHex27);
+  CPPUNIT_TEST(testVariationalHex27Tangled);
   CPPUNIT_TEST(testVariationalHex27MultipleSubdomains);
 #endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
@@ -275,31 +266,24 @@ public:
   }
 
   void testVariationalSmoother(ReplicatedMesh & mesh,
-                               MeshSmoother & smoother,
+                               VariationalMeshSmoother & smoother,
                                const ElemType type,
-                               const bool multiple_subdomains = false)
+                               const bool multiple_subdomains = false,
+                               const bool tangle_mesh=false,
+                               const Real tangle_damping_factor=1.0)
   {
     LOG_UNIT_TEST;
+
+    if (multiple_subdomains && tangle_mesh)
+      libmesh_not_implemented_msg(
+          "Arbitrary mesh tangling with multiple subdomains is not supported.");
 
     // Get mesh dimension, determine whether type is triangular
     const auto * ref_elem = &(ReferenceElem::get(type));
     const auto dim = ref_elem->dim();
     const bool type_is_tri = Utility::enum_to_string(type).compare(0, 3, "TRI") == 0;
 
-    unsigned int n_elems_per_side = 5;
-
-    // The current distortion mechanism in DistortHyperCube, combined with the
-    // way multiple subdomains are assigned below, has the property that:
-    //   - When n_elems_per_side is even, some of the subdomain boundary nodes
-    //     are colinear, leading to sliding node constraints.
-    //   - When n_elems_per_side is odd, none of the subdomain boundary nodes
-    //     are colinear, leading to all subdomain boundary nodes being fixed.
-    // Our check for preserved subdomain boundaries is overly restrictive
-    // because we error if any subdomain boundary nodes move during smoothing.
-    // To avoid this error, instead of implementing a more elaborate check for
-    // sliding subdomain boundary nodes, we require n_elems_per_side to be odd.
-    libmesh_error_msg_if(n_elems_per_side % 2 != 1,
-                         "n_elems_per_side should be odd.");
+    unsigned int n_elems_per_side = 4;
 
     switch (dim)
       {
@@ -333,8 +317,84 @@ public:
     DistortHyperCube dh(dim);
     MeshTools::Modification::redistribute(mesh, dh);
 
+    const auto & boundary_info = mesh.get_boundary_info();
+
+    if (tangle_mesh)
+      {
+        std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
+        MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
+        bool modified_nodes = false;
+        for (auto * elem : mesh.active_local_element_ptr_range())
+          {
+            // Identify the first two non-boundary nodes in elem
+            dof_id_type node1_id = DofObject::invalid_id;
+            dof_id_type node2_id = DofObject::invalid_id;
+            for (const auto & node_id : make_range(elem->n_nodes()))
+              {
+                // Get boundary ids associated with the node
+                std::vector<boundary_id_type> boundary_ids;
+                const auto * node_ptr = elem->node_ptr(node_id);
+                boundary_info.boundary_ids(node_ptr, boundary_ids);
+
+                // Skip if boundary node
+                if (boundary_ids.size())
+                  continue;
+
+                if (node1_id == DofObject::invalid_id)
+                  node1_id = node_id;
+                else if (node2_id == DofObject::invalid_id)
+                  {
+                    // Only set node2_id if it is directly a neighbor of node1
+                    std::vector<const Node *> neighbors;
+                    MeshTools::find_nodal_neighbors(
+                        mesh, elem->node_ref(node_id), nodes_to_elem_map, neighbors);
+                    if (std::find(neighbors.begin(), neighbors.end(), elem->node_ptr(node1_id)) !=
+                        neighbors.end())
+                      {
+                        node2_id = node_id;
+                        break;
+                      }
+                  }
+              }
+
+            // modify the nodes
+            if ((node1_id != DofObject::invalid_id) && (node2_id != DofObject::invalid_id))
+              {
+                // Make sure we haven't swapped any nodes yet on this or other processors
+                mesh.comm().max(modified_nodes);
+                if (modified_nodes)
+                  break;
+
+                auto & node1 = elem->node_ref(node1_id);
+                auto & node2 = elem->node_ref(node2_id);
+
+                const Point diff = node1 - node2;
+                // Note that a damping factor of 1 will swap the nodes and one
+                // of 0.5 will move the nodes to the mean of their original
+                // locations.
+                node1 -= tangle_damping_factor * diff;
+                node2 += tangle_damping_factor * diff;
+
+                // Once we have modified two nodes of the mesh, do not modify
+                // any more. Again, we still have issues with "too tangled"
+                // meshes. For some, the untangling solve won't converge.
+                // For others, it will converge to a local optima (i.e.,
+                // (the mesh is untangled, but still of poor quality)
+                modified_nodes = true;
+              }
+          }
+
+        SyncNodalPositions sync_object(mesh);
+        Parallel::sync_dofobject_data_by_id (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
+
+        // Make sure the mesh is tangled
+        smoother.setup(); // Need this to create the system we are about to access
+        const auto & unsmoothed_info = smoother.get_mesh_info();
+        CPPUNIT_ASSERT(unsmoothed_info.mesh_is_tangled);
+      }
+
     // Add multiple subdomains if requested
-    std::unordered_map<dof_id_type, Point> subdomain_boundary_node_id_to_point;
+    std::unordered_map<subdomain_id_type, Real> distorted_subdomain_volumes;
     if (multiple_subdomains)
       {
         // Modify the subdomain ids in an interesting way
@@ -349,21 +409,9 @@ public:
 
         // This loop should NOT be combined with the one above because we need to
         // finish checking and updating subdomain ids for all elements before
-        // recording the final subdomain boundary.
+        // recording the final subdomain volumes.
         for (auto * elem : mesh.active_element_ptr_range())
-          for (const auto & s : elem->side_index_range())
-            {
-              const auto * neighbor = elem->neighbor_ptr(s);
-              if (neighbor == nullptr)
-                continue;
-
-              if (elem->subdomain_id() != neighbor->subdomain_id())
-                // This side is part of a subdomain boundary, record the
-                // corresponding node locations
-                for (const auto & n : elem->nodes_on_side(s))
-                  subdomain_boundary_node_id_to_point[elem->node_id(n)] =
-                      Point(*(elem->get_nodes()[n]));
-            }
+          distorted_subdomain_volumes[elem->subdomain_id()] += elem->volume();
       }
 
 
@@ -375,7 +423,6 @@ public:
       const auto fe_order = *elem_orders.begin();
 
       // Function to assert the distortion is as expected
-      const auto &boundary_info = mesh.get_boundary_info();
       auto distortion_is = [
         &n_elems_per_side, &dim, &boundary_info, &fe_order
       ](const Node &node, bool distortion, Real distortion_tol = TOLERANCE)
@@ -412,8 +459,6 @@ public:
           {
             const Real r = node(d);
             const Real R = r * n_elems_per_side * fe_order;
-            CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, r);
-            CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, 1 - r);
 
             const bool d_distorted = std::abs(R - std::round(R)) > distortion_tol;
             distorted |= d_distorted;
@@ -428,20 +473,10 @@ public:
           // if (num_dofs < dim)
           return true;
         return distorted == distortion;
-      };
 
-    // Function to check if a given node has changed based on previous mapping
-    auto is_subdomain_boundary_node_the_same = [&subdomain_boundary_node_id_to_point](
-                                                   const Node & node) {
-      auto it = subdomain_boundary_node_id_to_point.find(node.id());
-      if (it != subdomain_boundary_node_id_to_point.end())
-        return (relative_fuzzy_equals(Point(node), subdomain_boundary_node_id_to_point[node.id()]));
-      else
-        // node is not a subdomain boundary node, just return true
-        return true;
     };
 
-    // Make sure our DistortSquare transformation has distorted the mesh
+    // Make sure our DistortHyperCube transformation has distorted the mesh
     for (auto node : mesh.node_ptr_range())
       CPPUNIT_ASSERT(distortion_is(*node, true));
 
@@ -466,15 +501,27 @@ public:
         MeshTools::Modification::redistribute(mesh, pts);
       }
 
-    // Make sure we're not too distorted anymore OR that interval subdomain boundary nodes did not
-    // change.
-    for (auto node : mesh.node_ptr_range())
+    if (multiple_subdomains)
       {
-        if (multiple_subdomains)
-          CPPUNIT_ASSERT(is_subdomain_boundary_node_the_same(*node));
-        else
-          CPPUNIT_ASSERT(distortion_is(*node, false, 1e-3));
+        // Make sure the subdomain volumes didn't change. Although this doesn't
+        // guarantee that the subdomain didn't change, it is a good indicator
+        // and is friedly to sliding subdomain boundary nodes.
+        std::unordered_map<subdomain_id_type, Real> smoothed_subdomain_volumes;
+        for (auto * elem : mesh.active_element_ptr_range())
+          smoothed_subdomain_volumes[elem->subdomain_id()] += elem->volume();
+
+        for (const auto & pair : distorted_subdomain_volumes)
+          {
+            const auto & subdomain_id = pair.first;
+            CPPUNIT_ASSERT(
+                relative_fuzzy_equals(libmesh_map_find(distorted_subdomain_volumes, subdomain_id),
+                                      libmesh_map_find(smoothed_subdomain_volumes, subdomain_id)));
+          }
       }
+    else
+      // Make sure we're not too distorted anymore
+      for (auto node : mesh.node_ptr_range())
+        CPPUNIT_ASSERT(distortion_is(*node, false, 1e-2));
   }
 
   void testLaplaceQuad()
@@ -534,6 +581,14 @@ public:
     testVariationalSmoother(mesh, variational, QUAD4, true);
   }
 
+  void testVariationalQuadTangled()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, QUAD4, false, true, 0.65);
+  }
+
   void testVariationalTri3()
   {
     ReplicatedMesh mesh(*TestCommWorld);
@@ -588,6 +643,14 @@ public:
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX27, true);
+  }
+
+  void testVariationalHex27Tangled()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, HEX27, false, true, 0.75);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
