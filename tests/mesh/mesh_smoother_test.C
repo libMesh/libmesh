@@ -321,62 +321,76 @@ public:
 
     if (tangle_mesh)
       {
-        bool swapped_nodes = false;
+        std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
+        MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
+        bool modified_nodes = false;
         for (auto * elem : mesh.active_local_element_ptr_range())
           {
-            // The solver has trouble if the mesh is too tangled, so only tangle
-            // some elements
-            const auto centroid = elem->vertex_average();
-            if ((centroid - Point(0.5, (dim > 1) ? 0.5 : 0.0, (dim > 2) ? 0.5 : 0.)).norm() < 0.25)
+            // Identify the first two non-boundary nodes in elem
+            dof_id_type node1_id = DofObject::invalid_id;
+            dof_id_type node2_id = DofObject::invalid_id;
+            for (const auto & node_id : make_range(elem->n_nodes()))
               {
-                // Identify the first two non-boundary nodes in elem
-                dof_id_type node1_id = DofObject::invalid_id;
-                dof_id_type node2_id = DofObject::invalid_id;
-                for (const auto & node_id : make_range(elem->n_nodes()))
+                // Get boundary ids associated with the node
+                std::vector<boundary_id_type> boundary_ids;
+                const auto * node_ptr = elem->node_ptr(node_id);
+                boundary_info.boundary_ids(node_ptr, boundary_ids);
+
+                // Skip if boundary node
+                if (boundary_ids.size())
+                  continue;
+
+                if (node1_id == DofObject::invalid_id)
+                  node1_id = node_id;
+                else if (node2_id == DofObject::invalid_id)
                   {
-                    // Get boundary ids associated with the node
-                    std::vector<boundary_id_type> boundary_ids;
-                    const auto * node_ptr = elem->node_ptr(node_id);
-                    boundary_info.boundary_ids(node_ptr, boundary_ids);
-
-                    // Skip if boundary node
-                    if (boundary_ids.size())
-                      continue;
-
-                    if (node1_id == DofObject::invalid_id)
-                      node1_id = node_id;
-                    else if (node2_id == DofObject::invalid_id)
+                    // Only set node2_id if it is directly a neighbor of node1
+                    std::vector<const Node *> neighbors;
+                    MeshTools::find_nodal_neighbors(
+                        mesh, elem->node_ref(node_id), nodes_to_elem_map, neighbors);
+                    if (std::find(neighbors.begin(), neighbors.end(), elem->node_ptr(node1_id)) !=
+                        neighbors.end())
                       {
                         node2_id = node_id;
                         break;
                       }
                   }
+              }
 
-                // Swap the nodes
-                if ((node1_id != DofObject::invalid_id) && (node2_id != DofObject::invalid_id))
-                  {
-                    // Make sure we haven't swapped any nodes yet on this or other processors
-                    mesh.comm().max(swapped_nodes);
-                    if (swapped_nodes)
-                      break;
+            // modify the nodes
+            if ((node1_id != DofObject::invalid_id) && (node2_id != DofObject::invalid_id))
+              {
+                // Make sure we haven't swapped any nodes yet on this or other processors
+                mesh.comm().max(modified_nodes);
+                if (modified_nodes)
+                  break;
 
-                    auto & node1 = elem->node_ref(node1_id);
-                    auto & node2 = elem->node_ref(node2_id);
+                auto & node1 = elem->node_ref(node1_id);
+                auto & node2 = elem->node_ref(node2_id);
 
-                    const auto diff = node1 - node2;
-                    node1 -= tangle_damping_factor * diff;
-                    node2 += tangle_damping_factor * diff;
+                const Point diff = node1 - node2;
+                // Note that a damping factor of 1 will swap the nodes and one
+                // of 0.5 will move the nodes to the mean of their original
+                // locations.
+                node1 -= tangle_damping_factor * diff;
+                node2 += tangle_damping_factor * diff;
 
-                    // Once we have swapped two elements of the mesh, do not swap
-                    // any more. Again, we still have issues with "too tangled"
-                    // meshes.
-                    swapped_nodes = true;
-                  }
+                // Once we have modified two nodes of the mesh, do not modify
+                // any more. Again, we still have issues with "too tangled"
+                // meshes. For some, the untangling solve won't converge.
+                // For others, it will converge to a local optima (i.e.,
+                // (the mesh is untangled, but still of poor quality)
+                modified_nodes = true;
               }
           }
 
         SyncNodalPositions sync_object(mesh);
         Parallel::sync_dofobject_data_by_id (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
+
+        // Make sure the mesh is tangled
+        smoother.setup(); // Need this to create the system we are about to access
+        const auto & unsmoothed_info = smoother.get_mesh_info();
+        CPPUNIT_ASSERT(unsmoothed_info.mesh_is_tangled);
       }
 
     // Add multiple subdomains if requested
@@ -465,14 +479,6 @@ public:
     // Make sure our DistortHyperCube transformation has distorted the mesh
     for (auto node : mesh.node_ptr_range())
       CPPUNIT_ASSERT(distortion_is(*node, true));
-
-    // Make sure our DistortHyperCube transformation has tangled the mesh
-    if (tangle_mesh)
-    {
-      smoother.setup(); // Need this to create the system we are about to access
-      const auto & unsmoothed_info = smoother.get_mesh_info();
-      CPPUNIT_ASSERT(unsmoothed_info.mesh_is_tangled);
-    }
 
     // Transform the square mesh of triangles to a parallelogram mesh of
     // triangles. This will allow the Variational Smoother to smooth the mesh
@@ -644,7 +650,7 @@ public:
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testVariationalSmoother(mesh, variational, HEX27, false, true);
+    testVariationalSmoother(mesh, variational, HEX27, false, true, 0.75);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
