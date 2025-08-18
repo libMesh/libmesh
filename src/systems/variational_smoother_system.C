@@ -38,6 +38,28 @@
 namespace libMesh
 {
 
+/*
+ * Gets the dof_id_type value corresponding to the minimum of the Real value.
+ */
+void communicate_pair_min(std::pair<Real, dof_id_type> & pair, const Parallel::Communicator & comm)
+{
+  // Get rank where minimum occurs
+  unsigned int rank;
+  comm.minloc(pair.first, rank);
+  comm.broadcast(pair.second, rank);
+}
+
+/*
+ * Gets the dof_id_type value corresponding to the maximum of the Real value.
+ */
+void communicate_pair_max(std::pair<Real, dof_id_type> & pair, const Parallel::Communicator & comm)
+{
+  // Get rank where minimum occurs
+  unsigned int rank;
+  comm.maxloc(pair.first, rank);
+  comm.broadcast(pair.second, rank);
+}
+
 /**
  * Function to prevent dividing by zero for degenerate elements
  */
@@ -826,22 +848,22 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
     } // for elem
 
   // Get contributions from elements on other processors
-  mesh.comm().max(info.max_elem_det_S);
-  mesh.comm().min(info.min_elem_det_S);
+  communicate_pair_max(info.max_elem_det_S, mesh.comm());
+  communicate_pair_min(info.min_elem_det_S, mesh.comm());
   mesh.comm().max(info.max_qp_det_S);
   mesh.comm().min(info.min_qp_det_S);
   mesh.comm().sum(info.total_det_S);
 
-  mesh.comm().max(info.max_elem_distortion);
-  mesh.comm().min(info.min_elem_distortion);
+  communicate_pair_max(info.max_elem_distortion, mesh.comm());
+  communicate_pair_min(info.min_elem_distortion, mesh.comm());
   mesh.comm().sum(info.total_distortion);
 
-  mesh.comm().max(info.max_elem_dilation);
-  mesh.comm().min(info.min_elem_dilation);
+  communicate_pair_max(info.max_elem_dilation, mesh.comm());
+  communicate_pair_min(info.min_elem_dilation, mesh.comm());
   mesh.comm().sum(info.total_dilation);
 
-  mesh.comm().max(info.max_elem_combined);
-  mesh.comm().min(info.min_elem_combined);
+  communicate_pair_max(info.max_elem_combined, mesh.comm());
+  communicate_pair_min(info.min_elem_combined, mesh.comm());
   mesh.comm().sum(info.total_combined);
 
   mesh.comm().max(info.mesh_is_tangled);
