@@ -240,6 +240,34 @@ void StaticCondensationDofMap::reinit()
         }
     }
 
+  //
+  // We've built our local uncondensed dofs container ... but only using local element dof_indices
+  // calls. It can be the case that we own a degree of freedom that is not actually needed by our
+  // local element assembly but is needed by other processes element assembly. One example we've run
+  // into of this is a mid-edge coarse element node holding side hierarchic dofs which is also a
+  // fine element's vertex node. This node may be owned by the process holding the fine element
+  // which doesn't need those side hierarchic dofs for its assembly
+  //
+
+  // Build supported query type. Has to be map to contiguous data for calls to MPI
+  std::unordered_map<processor_id_type, std::vector<dof_id_type>> nonlocal_uncondensed_dofs_mapvec;
+  for (const auto & [pid, set] : nonlocal_uncondensed_dofs)
+    {
+      auto & vec = nonlocal_uncondensed_dofs_mapvec[pid];
+      vec.assign(set.begin(), set.end());
+    }
+  // clear no longer needed memory
+  nonlocal_uncondensed_dofs.clear();
+
+  auto receive_needed_local_dofs =
+      [&local_uncondensed_dofs_set](processor_id_type,
+                                    const std::vector<dof_id_type> & local_dofs_to_insert) {
+        local_uncondensed_dofs_set.insert(local_dofs_to_insert.begin(), local_dofs_to_insert.end());
+      };
+
+  TIMPI::push_parallel_vector_data(
+      _mesh.comm(), nonlocal_uncondensed_dofs_mapvec, receive_needed_local_dofs);
+
   _local_uncondensed_dofs.assign(local_uncondensed_dofs_set.begin(),
                                  local_uncondensed_dofs_set.end());
   local_uncondensed_dofs_set.clear();
@@ -285,16 +313,6 @@ void StaticCondensationDofMap::reinit()
   //
   // Now we need to pull our nonlocal data
   //
-
-  // build our queries
-  std::unordered_map<processor_id_type, std::vector<dof_id_type>> nonlocal_uncondensed_dofs_mapvec;
-  for (const auto & [pid, set] : nonlocal_uncondensed_dofs)
-    {
-      auto & vec = nonlocal_uncondensed_dofs_mapvec[pid];
-      vec.assign(set.begin(), set.end());
-    }
-  // clear no longer needed memory
-  nonlocal_uncondensed_dofs.clear();
 
   auto gather_functor = [&full_dof_to_reduced_dof](processor_id_type,
                                                    const std::vector<dof_id_type> & full_dof_ids,
