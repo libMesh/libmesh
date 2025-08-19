@@ -66,8 +66,8 @@ class UnstructuredMesh;
  * Notes:
  *
  * 1) The smoother supports tangled meshes. However, not all untangling solves
- * converge. Some will converge to a local optima, resulting in an untangled,
- * but still suboptimal mesh that cannot be smoothed much further.
+ * converge. In other words, we are able to untangle SOME tangled meshes, but
+ * not ANY tangled mesh.
  *
  * \author Derek R. Gaston
  * \date 2006
