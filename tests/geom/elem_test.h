@@ -286,8 +286,13 @@ public:
       this->_mesh->subdomain_name(sbdid) = sbdname.str();
     }
 
-    // And make sure our mesh's cache knows about them all for later
-    // tests comparisons
+    // Make sure our mesh's cache knows about them all for later
+    // test comparisons
     this->_mesh->cache_elem_data();
+
+    // We may have updated only a portion of subdomain names if we're
+    // on a distributed mesh, but every processor should know about
+    // every name.
+    this->_mesh->sync_subdomain_name_map();
   }
 };
