@@ -362,18 +362,19 @@ void StaticCondensationDofMap::reinit()
     {
       libmesh_ignore(elem);
       auto & reduced_space_indices = dof_data.reduced_space_indices;
-      // Start erasing from the back to reduce the number of copy assignment operations
-      if (reduced_space_indices.size())
-        for (typename std::vector<dof_id_type>::difference_type i =
-                 reduced_space_indices.size() - 1;
-             i >= 0;
-             --i)
-          if (!full_vars_present_in_reduced_sys.count(i))
-            reduced_space_indices.erase(reduced_space_indices.begin() + i);
-      // It is theoretically possible that we have an element that doesn't have dofs for one of the
-      // variables present in our reduced system, which is why the assertion below is not an
-      // equality assertion
-      libmesh_assert(reduced_space_indices.size() <= full_vars_present_in_reduced_sys.size());
+      // Keep around only those variables which are present in our reduced system
+      {
+        std::size_t i = 0;
+        reduced_space_indices.erase(
+            std::remove_if(
+                reduced_space_indices.begin(),
+                reduced_space_indices.end(),
+                [&full_vars_present_in_reduced_sys, &i](const std::vector<dof_id_type> &) {
+                  return !full_vars_present_in_reduced_sys.count(i++);
+                }),
+            reduced_space_indices.end());
+      }
+      libmesh_assert(reduced_space_indices.size() == full_vars_present_in_reduced_sys.size());
 
       for (auto & var_dof_indices : reduced_space_indices)
         {
