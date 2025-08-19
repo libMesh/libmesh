@@ -32,6 +32,10 @@
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h" // libmesh_map_find
 
+namespace nglib {
+#include "netgen/nglib/nglib.h"
+}
+
 namespace {
 
 // RAII for exception safety
