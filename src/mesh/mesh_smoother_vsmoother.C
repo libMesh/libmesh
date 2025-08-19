@@ -145,6 +145,19 @@ void VariationalMeshSmoother::smooth(unsigned int)
 
   SyncNodalPositions sync_object(_mesh);
   Parallel::sync_dofobject_data_by_id (_mesh.comm(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
+
+  // Release memory occupied by _mesh_copy
+  _mesh_copy.reset();
+  // We'll need to call setup again since we'll have to reconstruct _mesh_copy
+  _setup_called = false;
+}
+
+const MeshQualityInfo & VariationalMeshSmoother::get_mesh_info() const
+{
+  libmesh_error_msg_if(!_setup_called, "Need to first call the setup() method of "
+      << "this VariationalMeshSmoother object, then call get_mesh_info() prior "
+      << "to calling smooth().");
+  return _system->get_mesh_info();
 }
 
 } // namespace libMesh

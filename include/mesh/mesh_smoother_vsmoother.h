@@ -112,7 +112,7 @@ public:
   /**
    * Getter for the _system's _mesh_info attribute
    */
-  const MeshQualityInfo & get_mesh_info() const { return _system->get_mesh_info(); }
+  const MeshQualityInfo & get_mesh_info() const;
 
 private:
 
