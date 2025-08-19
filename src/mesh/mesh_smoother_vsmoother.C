@@ -147,6 +147,8 @@ void VariationalMeshSmoother::smooth(unsigned int)
   Parallel::sync_dofobject_data_by_id (_mesh.comm(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
 
   // Release memory occupied by _mesh_copy
+  // Destruct this before _mesh_copy because it references _mesh_copy
+  _equation_systems.reset();
   _mesh_copy.reset();
   // We'll need to call setup again since we'll have to reconstruct _mesh_copy
   _setup_called = false;
