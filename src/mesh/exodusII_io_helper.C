@@ -699,6 +699,11 @@ void ExodusII_IO_Helper::open(const char * filename, bool read_only)
   EX_CHECK_ERR(ex_id, err_msg);
   if (verbose) libMesh::out << "File opened successfully." << std::endl;
 
+  // It looks like ExodusII can support 80 chars reliably, so unless
+  // we have reason to do otherwise we'll just waste 48 bytes here and
+  // there by default.
+  int max_name_length_to_set = libmesh_max_str_length;
+
   if (read_only)
   {
     opened_for_reading = true;
@@ -715,18 +720,13 @@ void ExodusII_IO_Helper::open(const char * filename, bool read_only)
 
     // I don't think the 32 here should be necessary, but let's make
     // sure we don't accidentally make things *worse* for anyone.
-    exII::ex_set_max_name_length(ex_id, std::max(max_name_length, 32));
+    max_name_length_to_set = std::max(max_name_length, 32);
   }
   else
-  {
-    // We don't have access to the names we might be writing until we
-    // write them, so we can't set a guaranteed max name length here.
-    // But it looks like the most ExodusII can support is 80, so we'll
-    // just waste 48 bytes here and there.
-    exII::ex_set_max_name_length(ex_id, libmesh_max_str_length);
-
     opened_for_writing = true;
-  }
+
+  ex_err = exII::ex_set_max_name_length(ex_id, max_name_length_to_set);
+  EX_CHECK_ERR(ex_err, "Error setting max ExodusII name length.");
 
   current_filename = std::string(filename);
 }
@@ -2223,15 +2223,16 @@ void ExodusII_IO_Helper::create(std::string filename)
 
       EX_CHECK_ERR(ex_id, "Error creating ExodusII/Nemesis mesh file.");
 
+      // We don't have access to the names we might be writing until we
+      // write them, so we can't set a guaranteed max name length here.
+      // But it looks like the most ExodusII can support is 80, so we'll
+      // just waste 48 bytes here and there.
+      ex_err = exII::ex_set_max_name_length(ex_id, libmesh_max_str_length);
+      EX_CHECK_ERR(ex_err, "Error setting max ExodusII name length.");
+
       if (verbose)
         libMesh::out << "File created successfully." << std::endl;
     }
-
-    // We don't have access to the names we might be writing until we
-    // write them, so we can't set a guaranteed max name length here.
-    // But it looks like the most ExodusII can support is 80, so we'll
-    // just waste 48 bytes here and there.
-    exII::ex_set_max_name_length(ex_id, libmesh_max_str_length);
 
   opened_for_writing = true;
   _opened_by_create = true;
