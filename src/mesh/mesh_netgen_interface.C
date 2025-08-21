@@ -28,9 +28,14 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/utility.h" // libmesh_map_find
+
+namespace nglib {
+#include "netgen/nglib/nglib.h"
+}
 
 namespace {
 
@@ -77,6 +82,8 @@ NetGenMeshInterface::NetGenMeshInterface (UnstructuredMesh & mesh) :
 void NetGenMeshInterface::triangulate ()
 {
   using namespace nglib;
+
+  LOG_SCOPE("triangulate()", "NetGenMeshInterface");
 
   // We're hoping to do volume_to_surface_mesh in parallel at least,
   // but then we'll need to serialize any hole meshes to rank 0 so it
@@ -207,6 +214,8 @@ void NetGenMeshInterface::triangulate ()
       (UnstructuredMesh & srcmesh, bool hole_mesh,
        boundary_id_type bcid)
     {
+      LOG_SCOPE("create_surface_component()", "NetGenMeshInterface");
+
       // Keep track of what nodes we've already added to the Netgen
       // mesh vs what nodes we need to add.  We'll keep track by id,
       // not by point location.  I don't know if Netgen can handle
@@ -305,8 +314,12 @@ void NetGenMeshInterface::triangulate ()
         create_surface_component(*h, true, ++bcid);
   }
 
-  auto result = Ng_GenerateVolumeMesh(ngmesh, &params);
-  handle_ng_result(result);
+  {
+    LOG_SCOPE("Ng_GenerateVolumeMesh()", "NetGenMeshInterface");
+
+    auto result = Ng_GenerateVolumeMesh(ngmesh, &params);
+    handle_ng_result(result);
+  }
 
   const int n_elem = Ng_GetNE(ngmesh);
 

@@ -26,11 +26,6 @@
 // Local includes
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/mesh_tet_interface.h"
-#include "libmesh/point.h" // used for specifying holes
-
-namespace nglib {
-#include "netgen/nglib/nglib.h"
-}
 
 // C++ includes
 #include <cstddef>
