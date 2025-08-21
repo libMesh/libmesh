@@ -38,6 +38,94 @@
 namespace libMesh
 {
 
+/*
+ * Gets the dof_id_type value corresponding to the minimum of the Real value.
+ */
+void communicate_pair_min(std::pair<Real, dof_id_type> & pair, const Parallel::Communicator & comm)
+{
+  // Get rank where minimum occurs
+  unsigned int rank;
+  comm.minloc(pair.first, rank);
+  comm.broadcast(pair.second, rank);
+}
+
+/*
+ * Gets the dof_id_type value corresponding to the maximum of the Real value.
+ */
+void communicate_pair_max(std::pair<Real, dof_id_type> & pair, const Parallel::Communicator & comm)
+{
+  // Get rank where minimum occurs
+  unsigned int rank;
+  comm.maxloc(pair.first, rank);
+  comm.broadcast(pair.second, rank);
+}
+
+/**
+ * Function to prevent dividing by zero for degenerate elements
+ */
+Real chi_epsilon(const Real & x, const Real epsilon_squared)
+{
+  return 0.5 * (x + std::sqrt(epsilon_squared + Utility::pow<2>(x)));
+}
+
+/**
+ * Given an fe_map, element dimension, and quadrature point index, returns the
+ * Jacobian of the physical-to-reference mapping.
+ */
+RealTensor get_jacobian_at_qp(const FEMap & fe_map,
+                          const unsigned int & dim,
+                          const unsigned int & qp)
+{
+  const auto & dxyzdxi = fe_map.get_dxyzdxi()[qp];
+  const auto & dxyzdeta = fe_map.get_dxyzdeta()[qp];
+  const auto & dxyzdzeta = fe_map.get_dxyzdzeta()[qp];
+
+  // RealTensors are always 3x3, so we will fill any dimensions above dim
+  // with 1s on the diagonal. This indicates a 1 to 1 relationship between
+  // the physical and reference elements in these extra dimensions.
+  switch (dim)
+  {
+    case 1:
+      return RealTensor(
+        dxyzdxi(0), 0, 0,
+                     0, 1, 0,
+                     0, 0, 1
+      );
+      break;
+
+    case 2:
+      return RealTensor(
+        dxyzdxi(0), dxyzdeta(0), 0,
+        dxyzdxi(1), dxyzdeta(1), 0,
+        0,              0,               1
+      );
+      break;
+
+    case 3:
+      return RealTensor(
+        dxyzdxi,
+        dxyzdeta,
+        dxyzdzeta
+      ).transpose();  // Note the transposition!
+      break;
+
+    default:
+      libmesh_error_msg("Unsupported dimension.");
+  }
+}
+
+/**
+ * Compute the trace of a dim-dimensional matrix.
+ */
+Real trace(const RealTensor & A, const unsigned int & dim)
+{
+  Real tr = 0.0;
+  for (const auto i : make_range(dim))
+    tr += A(i, i);
+
+  return tr;
+}
+
 VariationalSmootherSystem::~VariationalSmootherSystem () = default;
 
 void VariationalSmootherSystem::assembly (bool get_residual,
@@ -62,7 +150,63 @@ void VariationalSmootherSystem::assembly (bool get_residual,
   SyncNodalPositions sync_object(mesh);
   Parallel::sync_dofobject_data_by_id (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
 
+  // Compute and update mesh quality information
+  compute_mesh_quality_info();
+  const bool is_tangled = _mesh_info.mesh_is_tangled;
+
+  // Update _epsilon_squared_assembly based on whether we are untangling or
+  // smoothing
+  if (_untangling_solve)
+    {
+      const Real & min_S = _mesh_info.min_qp_det_S;
+      // This component is based on what Larisa did in the original code.
+      const Real variable_component = 100. * Utility::pow<2>(_ref_vol * min_S);
+      _epsilon_squared_assembly = _epsilon_squared + variable_component;
+    }
+
+  else
+    _epsilon_squared_assembly = 0.;
+
   FEMSystem::assembly(get_residual, get_jacobian, apply_heterogeneous_constraints, apply_no_constraints);
+
+  if (_untangling_solve && !is_tangled)
+    {
+      // Mesh is untangled, artificially reduce residual by factor 0.9 to tell
+      // the solver we are on the right track. The mesh may become re-tangled in
+      // subsequent nonlinear and line search iterations, so we will not use
+      // this reduction factor in the case of re-tangulation. This approach
+      // should drive the solver to eventually favor untangled solutions.
+      rhs->close();
+      (*rhs) *= 0.9;
+    }
+}
+
+void VariationalSmootherSystem::solve()
+{
+  const auto & mesh_info = get_mesh_info();
+  if (mesh_info.mesh_is_tangled)
+    {
+      // Untangling solve
+      _untangling_solve = true;
+
+      // Untangling seems to work better using only the distortion metric.
+      // For a mixed metric, I've seen it *technically* untangle a mesh to a
+      // still-suboptimal mesh (i.e., a local minima), but not been able to
+      // smooth it well because the smoothest solution is on the other side of
+      // a tangulation barrier.
+      const auto dilation_weight = _dilation_weight;
+      _dilation_weight = 0.;
+
+      FEMSystem::solve();
+
+      // Reset the dilation weight
+      _dilation_weight = dilation_weight;
+    }
+
+  // Smoothing solve
+  _untangling_solve = false;
+  FEMSystem::solve();
+  libmesh_error_msg_if(get_mesh_info().mesh_is_tangled, "The smoothing solve tangled the mesh!");
 }
 
 void VariationalSmootherSystem::init_data ()
@@ -98,21 +242,23 @@ void VariationalSmootherSystem::init_data ()
 
 void VariationalSmootherSystem::prepare_for_smoothing()
 {
+  // If this method has already been called to set _ref_vol, just return.
+  if (std::abs(_ref_vol) > TOLERANCE * TOLERANCE)
+    return;
+
   std::unique_ptr<DiffContext> con = this->build_context();
   FEMContext & femcontext = cast_ref<FEMContext &>(*con);
   this->init_context(femcontext);
 
   const auto & mesh = this->get_mesh();
 
-  Real elem_averaged_det_J_sum = 0.;
+  Real elem_averaged_det_S_sum = 0.;
 
   // Make pre-requests before reinit() for efficiency in
   // --enable-deprecated builds, and to avoid errors in
   // --disable-deprecated builds.
   const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
   const auto & JxW = fe_map.get_JxW();
-
-  std::map<ElemType, std::vector<Real>> target_jacobians_dets;
 
   for (const auto * elem : mesh.active_local_element_ptr_range())
     {
@@ -126,22 +272,22 @@ void VariationalSmootherSystem::prepare_for_smoothing()
           get_target_to_reference_jacobian(target_elem.get(),
                                            femcontext,
                                            _target_jacobians[elem->type()],
-                                           target_jacobians_dets[elem->type()]);
+                                           _target_jacobian_dets[elem->type()]);
         }// if find == end()
 
       // Reference volume computation
-      Real elem_integrated_det_J = 0.;
+      Real elem_integrated_det_S = 0.;
       for (const auto qp : index_range(JxW))
-        elem_integrated_det_J += JxW[qp] * target_jacobians_dets[elem->type()][qp];
+        elem_integrated_det_S += JxW[qp] * _target_jacobian_dets[elem->type()][qp];
       const auto ref_elem_vol = elem->reference_elem()->volume();
-      elem_averaged_det_J_sum += elem_integrated_det_J / ref_elem_vol;
+      elem_averaged_det_S_sum += elem_integrated_det_S / ref_elem_vol;
 
     } // for elem
 
   // Get contributions from elements on other processors
-  mesh.comm().sum(elem_averaged_det_J_sum);
+  mesh.comm().sum(elem_averaged_det_S_sum);
 
-  _ref_vol = elem_averaged_det_J_sum / mesh.n_active_elem();
+  _ref_vol = elem_averaged_det_S_sum / mesh.n_active_elem();
 }
 
 void VariationalSmootherSystem::init_context(DiffContext & context)
@@ -168,6 +314,9 @@ void VariationalSmootherSystem::init_context(DiffContext & context)
       fe_map.get_dxyzdzeta();
       fe_map.get_JxW();
 
+      // Mesh may be tangled, allow negative Jacobians
+      fe_map.set_jacobian_tolerance(std::numeric_limits<Real>::lowest());
+
       c.get_side_fe( 0, my_fe, dim );
       my_fe->get_nothing();
     }
@@ -182,19 +331,6 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
   FEMContext & c = cast_ref<FEMContext &>(context);
 
   const Elem & elem = c.get_elem();
-
-  // First we get some references to cell-specific data that
-  // will be used to assemble the linear system.
-
-  const auto & fe_map = c.get_element_fe(0)->get_fe_map();
-
-  const auto & dxyzdxi = fe_map.get_dxyzdxi();
-  const auto & dxyzdeta = fe_map.get_dxyzdeta();
-  const auto & dxyzdzeta = fe_map.get_dxyzdzeta();
-
-  const auto & dphidxi_map = fe_map.get_dphidxi_map();
-  const auto & dphideta_map = fe_map.get_dphideta_map();
-  const auto & dphidzeta_map = fe_map.get_dphidzeta_map();
 
   unsigned int dim = c.get_dim();
 
@@ -228,6 +364,15 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
 
   const auto distortion_weight = 1. - _dilation_weight;
 
+  // Get some references to cell-specific data that
+  // will be used to assemble the linear system.
+
+  const auto & fe_map = c.get_element_fe(0)->get_fe_map();
+
+  const auto & dphidxi_map = fe_map.get_dphidxi_map();
+  const auto & dphideta_map = fe_map.get_dphideta_map();
+  const auto & dphidzeta_map = fe_map.get_dphidzeta_map();
+
   // Integrate the distortion-dilation metric over the reference element
   for (const auto qp : index_range(quad_weights))
     {
@@ -248,43 +393,10 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       // compute the distorion-dilation metric.
       //
       // Grab the physical-to-reference mapping Jacobian matrix (i.e., "S") at this qp
-      RealTensor S;
-      // RealTensors are always 3x3, so we will fill any dimensions above dim
-      // with 1s on the diagonal. This indicates a 1 to 1 relationship between
-      // the physical and reference elements in these extra dimensions.
-      switch (dim)
-      {
-        case 1:
-          S = RealTensor(
-            dxyzdxi[qp](0), 0, 0,
-                         0, 1, 0,
-                         0, 0, 1
-          );
-          break;
+      RealTensor S = get_jacobian_at_qp(fe_map, dim, qp);
 
-        case 2:
-          S = RealTensor(
-            dxyzdxi[qp](0), dxyzdeta[qp](0), 0,
-            dxyzdxi[qp](1), dxyzdeta[qp](1), 0,
-            0,              0,               1
-          );
-          break;
-
-        case 3:
-          S = RealTensor(
-            dxyzdxi[qp],
-            dxyzdeta[qp],
-            dxyzdzeta[qp]
-          ).transpose();  // Note the transposition!
-          break;
-
-        default:
-          libmesh_error_msg("Unsupported dimension.");
-      }
-
-      // Apply any applicable target element transformations
-      if (_target_jacobians.find(elem.type()) != _target_jacobians.end())
-        S = S * _target_jacobians[elem.type()][qp];
+      // Apply target element transformation
+      S *= _target_jacobians[elem.type()][qp];
 
       // Compute quantities needed for the smoothing algorithm
 
@@ -298,11 +410,8 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       // trace of S^T * S
       // DO NOT USE RealTensor.tr for the trace, it will NOT be correct for
       // 1D and 2D meshes because of our hack of putting 1s in the diagonal of
-      // S for the extra dimensions
-      const RealTensor ST_S = S.transpose() * S;
-      Real tr = 0.0;
-      for (const auto i : make_range(dim))
-        tr += ST_S(i, i);
+      // S for the extra dimensions (see get_jacobian_at_qp)
+      const auto tr = trace(S.transpose() * S, dim);
       const Real tr_div_dim = tr / dim;
 
       // Precompute pow(tr_div_dim, 0.5 * dim - x) for x = 0, 1, 2
@@ -324,12 +433,9 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                          0, 0, 1);
 
       // The chi function allows us to handle degenerate elements
-      // When the element is not degenerate (i.e., det(S) > 0), we can set
-      // _epsilon_squared to zero to get chi(det(S)) = det(S)
-      const Real epsilon_sq = det > 0. ? 0. : _epsilon_squared;
-      const Real chi = 0.5 * (det + std::sqrt(epsilon_sq + det_sq));
+      const auto chi = chi_epsilon(det, _epsilon_squared_assembly);
       const Real chi_sq = chi * chi;
-      const Real sqrt_term = std::sqrt(epsilon_sq + det_sq);
+      const Real sqrt_term = std::sqrt(_epsilon_squared_assembly + det_sq);
       // dchi(x) / dx
       const Real chi_prime = 0.5 * (1. + det / sqrt_term);
       const Real chi_prime_sq = chi_prime * chi_prime;
@@ -628,6 +734,143 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
   return request_jacobian;
 }
 
+const MeshQualityInfo & VariationalSmootherSystem::get_mesh_info()
+{
+  if (!_mesh_info.initialized)
+    compute_mesh_quality_info();
+
+  return _mesh_info;
+}
+
+void VariationalSmootherSystem::compute_mesh_quality_info()
+{
+  // If the reference volume has not yet been computed, compute it.
+  if (std::abs(_ref_vol) < TOLERANCE * TOLERANCE)
+    prepare_for_smoothing();
+
+  std::unique_ptr<DiffContext> con = this->build_context();
+  FEMContext & femcontext = cast_ref<FEMContext &>(*con);
+  this->init_context(femcontext);
+
+  const auto & mesh = this->get_mesh();
+  const auto dim = mesh.mesh_dimension();
+  const Real half_dim = 0.5 * dim;
+  const auto distortion_weight = 1. - _dilation_weight;
+
+  // Make pre-requests before reinit() for efficiency in
+  // --enable-deprecated builds, and to avoid errors in
+  // --disable-deprecated builds.
+  const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
+  const auto & JxW = fe_map.get_JxW();
+  fe_map.get_dxyzdxi();
+  fe_map.get_dxyzdeta();
+  fe_map.get_dxyzdzeta();
+
+  MeshQualityInfo info;
+
+  for (const auto * elem : mesh.active_local_element_ptr_range())
+    {
+      femcontext.pre_fe_reinit(*this, elem);
+      femcontext.elem_fe_reinit();
+
+      // Element-integrated quantities
+      Real det_S_int = 0.;
+      Real beta_int = 0.;
+      Real mu_int = 0.;
+      Real combined_int = 0.;
+
+      for (const auto qp : index_range(JxW))
+        {
+          const auto det_SxW = JxW[qp] * _target_jacobian_dets[elem->type()][qp];
+          det_S_int += det_SxW;
+
+          // Grab the physical-to-reference mapping Jacobian matrix (i.e., "S") at this qp
+          RealTensor S = get_jacobian_at_qp(fe_map, dim, qp);
+
+          // Apply target element transformation
+          S *= _target_jacobians[elem->type()][qp];
+
+          // Determinant of S
+          const auto det = S.det();
+          const auto det_sq = det * det;
+
+          if (det > info.max_qp_det_S)
+            info.max_qp_det_S = det;
+          else if (det < info.min_qp_det_S)
+            info.min_qp_det_S = det;
+
+          if (det < TOLERANCE * TOLERANCE)
+            info.mesh_is_tangled = true;
+
+          // trace of S^T * S
+          const auto tr = trace(S.transpose() * S, dim);
+
+          // The chi function allows us to handle degenerate elements
+          const auto chi = chi_epsilon(det, _epsilon_squared_assembly);
+
+          // distortion
+          const Real beta = std::pow(tr / dim, half_dim) / chi;
+          beta_int += beta * det_SxW;
+
+          // dilation
+          const Real mu = 0.5 * (_ref_vol + det_sq / _ref_vol) / chi;
+          mu_int += mu * det_SxW;
+
+          // combined
+          const Real E = distortion_weight * beta + _dilation_weight * mu;
+          combined_int += E * det_SxW;
+        }
+
+      info.total_det_S += det_S_int;
+      if (det_S_int > info.max_elem_det_S.first)
+        info.max_elem_det_S = std::make_pair(det_S_int, elem->id());
+      else if (det_S_int < info.min_elem_det_S.first)
+        info.min_elem_det_S = std::make_pair(det_S_int, elem->id());
+
+      info.total_distortion += beta_int;
+      if (beta_int > info.max_elem_distortion.first)
+        info.max_elem_distortion = std::make_pair(beta_int, elem->id());
+      else if (beta_int < info.min_elem_distortion.first)
+        info.min_elem_distortion = std::make_pair(beta_int, elem->id());
+
+      info.total_dilation += mu_int;
+      if (mu_int > info.max_elem_dilation.first)
+        info.max_elem_dilation = std::make_pair(mu_int, elem->id());
+      else if (mu_int < info.min_elem_dilation.first)
+        info.min_elem_dilation = std::make_pair(mu_int, elem->id());
+
+      info.total_combined += combined_int;
+      if (combined_int > info.max_elem_combined.first)
+        info.max_elem_combined = std::make_pair(combined_int, elem->id());
+      else if (combined_int < info.min_elem_combined.first)
+        info.min_elem_combined = std::make_pair(combined_int, elem->id());
+
+    } // for elem
+
+  // Get contributions from elements on other processors
+  communicate_pair_max(info.max_elem_det_S, mesh.comm());
+  communicate_pair_min(info.min_elem_det_S, mesh.comm());
+  mesh.comm().max(info.max_qp_det_S);
+  mesh.comm().min(info.min_qp_det_S);
+  mesh.comm().sum(info.total_det_S);
+
+  communicate_pair_max(info.max_elem_distortion, mesh.comm());
+  communicate_pair_min(info.min_elem_distortion, mesh.comm());
+  mesh.comm().sum(info.total_distortion);
+
+  communicate_pair_max(info.max_elem_dilation, mesh.comm());
+  communicate_pair_min(info.min_elem_dilation, mesh.comm());
+  mesh.comm().sum(info.total_dilation);
+
+  communicate_pair_max(info.max_elem_combined, mesh.comm());
+  communicate_pair_min(info.min_elem_combined, mesh.comm());
+  mesh.comm().sum(info.total_combined);
+
+  mesh.comm().max(info.mesh_is_tangled);
+
+  _mesh_info = info;
+}
+
 std::pair<std::unique_ptr<Elem>, std::vector<std::unique_ptr<Node>>>
 VariationalSmootherSystem::get_target_elem(const ElemType & type)
 {
@@ -733,9 +976,9 @@ void VariationalSmootherSystem::get_target_to_reference_jacobian(
   FEMap fe_map_target;
 
   // pre-request mapping derivatives
-  const auto & dxyzdxi = fe_map_target.get_dxyzdxi();
-  const auto & dxyzdeta = fe_map_target.get_dxyzdeta();
-  const auto & dxyzdzeta = fe_map_target.get_dxyzdzeta();
+  fe_map_target.get_dxyzdxi();
+  fe_map_target.get_dxyzdeta();
+  fe_map_target.get_dxyzdzeta();
 
   // build map
   fe_map_target.init_reference_to_physical_map(dim, qrule_points, target_elem);
@@ -744,34 +987,7 @@ void VariationalSmootherSystem::get_target_to_reference_jacobian(
   for (const auto qp : make_range(nq_points))
     {
       // We use Larisa's H notation to denote the reference-to-target jacobian
-      RealTensor H;
-      switch (dim)
-        {
-            case 1: {
-              H = RealTensor(
-                  dxyzdxi[qp](0), 0., 0.,
-                  0.,             1., 0.,
-                  0.,             0., 1.);
-
-              break;
-            }
-            case 2: {
-              H = RealTensor(
-                  dxyzdxi[qp](0), dxyzdeta[qp](0), 0.,
-                  dxyzdxi[qp](1), dxyzdeta[qp](1), 0.,
-                  0.,             0.,              1.);
-
-              break;
-            }
-            case 3: {
-              H = RealTensor(dxyzdxi[qp], dxyzdeta[qp], dxyzdzeta[qp]).transpose();
-
-              break;
-            }
-
-          default:
-            libmesh_error_msg("Unsupported mesh dimension " << dim);
-        }
+      RealTensor H = get_jacobian_at_qp(fe_map_target, dim, qp);
 
       // The target-to-reference jacobian is the inverse of the
       // reference-to-target jacobian

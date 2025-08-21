@@ -31,6 +31,46 @@
 namespace libMesh
 {
 
+/**
+ * Struct to hold smoother-relevant information about the mesh quality.
+ */
+struct MeshQualityInfo
+{
+  // dof_id_types will hold the id of the Elem where the metric occurs
+  // IMPORTANT: the Real should be the first entry of the pair so that taking
+  // the min/max accross processors will compare the numeric values instead of
+  // the element ids.
+
+  std::pair<Real, dof_id_type> max_elem_distortion{std::numeric_limits<Real>::lowest(),
+                                                   DofObject::invalid_id};
+  std::pair<Real, dof_id_type> min_elem_distortion{std::numeric_limits<Real>::max(),
+                                                   DofObject::invalid_id};
+  Real total_distortion = 0.;
+
+  std::pair<Real, dof_id_type> max_elem_dilation{std::numeric_limits<Real>::lowest(),
+                                                 DofObject::invalid_id};
+  std::pair<Real, dof_id_type> min_elem_dilation{std::numeric_limits<Real>::max(),
+                                                 DofObject::invalid_id};
+  Real total_dilation = 0.;
+
+  std::pair<Real, dof_id_type> max_elem_combined{std::numeric_limits<Real>::lowest(),
+                                                 DofObject::invalid_id};
+  std::pair<Real, dof_id_type> min_elem_combined{std::numeric_limits<Real>::max(),
+                                                 DofObject::invalid_id};
+  Real total_combined = 0.;
+
+  std::pair<Real, dof_id_type> max_elem_det_S{std::numeric_limits<Real>::lowest(),
+                                              DofObject::invalid_id};
+  std::pair<Real, dof_id_type> min_elem_det_S{std::numeric_limits<Real>::max(),
+                                              DofObject::invalid_id};
+  Real total_det_S = 0.;
+  Real max_qp_det_S = std::numeric_limits<Real>::lowest();
+  Real min_qp_det_S = std::numeric_limits<Real>::max();
+
+  bool mesh_is_tangled = false;
+  bool initialized = false;
+};
+
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
 class VariationalSmootherSystem : public libMesh::FEMSystem
@@ -46,12 +86,13 @@ class VariationalSmootherSystem : public libMesh::FEMSystem
  */
 public:
   VariationalSmootherSystem(libMesh::EquationSystems & es,
-                const std::string & name,
-                const unsigned int number)
-  : libMesh::FEMSystem(es, name, number),
-    _epsilon_squared(1e-10),
-    _ref_vol(1.),
-    _dilation_weight(0.5)
+                            const std::string & name,
+                            const unsigned int number)
+    : libMesh::FEMSystem(es, name, number),
+      _epsilon_squared(TOLERANCE),
+      _ref_vol(0.),
+      _dilation_weight(0.5),
+      _untangling_solve(false)
   {}
 
   // Default destructor
@@ -66,6 +107,13 @@ public:
                          bool apply_no_constraints = false) override;
 
   Real & get_dilation_weight() { return _dilation_weight; }
+
+  /**
+   * Solves the system to smooth the mesh. If the mesh is initially tangled,
+   * a solve is first performed to untangle the mesh, followed by a solve to
+   * smooth the mesh.
+   */
+  virtual void solve() override;
 
   /**
    * Get the target element for a given element type.
@@ -90,6 +138,17 @@ public:
                                                std::vector<RealTensor> & jacobians,
                                                std::vector<Real> & jacobian_dets);
 
+  /**
+   * Getter for the _mesh_info attribute. If this attribute has not yet been
+   * initialized, compute_mesh_quality_info is called to initialize it.
+   */
+  const MeshQualityInfo & get_mesh_info();
+
+  /*
+   * Computes information about the mesh quality and sets the _mesh_info attribute.
+   */
+  void compute_mesh_quality_info();
+
 protected:
 
   // System initialization
@@ -111,19 +170,46 @@ protected:
    */
   void prepare_for_smoothing();
 
-  /// The small nonzero constant to prevent zero denominators (degenerate elements only)
+  /**
+  * The small nonzero constant to prevent zero denominators (degenerate meshes only)
+  */
   const Real _epsilon_squared;
 
-  /// The reference volume for each element
+  /**
+   * Epsilon squared value determined at runtime during each assembly. The value
+   * depends on whether the mesh is tangled.
+   */
+  Real _epsilon_squared_assembly;
+
+  /**
+  * The reference volume for each element
+  */
   Real _ref_vol;
 
-  /// The relative weight to give the dilation metric. The distortion metric is given weight 1 - _dilation_weight.
+  /**
+  * The relative weight to give the dilation metric. The distortion metric is given weight 1 - _dilation_weight.
+  */
   Real _dilation_weight;
 
   /* Map to hold target qp-dependent element target-to-reference mapping
    * Jacobians, if any
    */
   std::map<ElemType, std::vector<RealTensor>> _target_jacobians;
+
+  /*
+   * Map to hold the determinants of _target_jacobians.
+   */
+  std::map<ElemType, std::vector<Real>> _target_jacobian_dets;
+
+  /**
+   * Information about the mesh quality.
+   */
+  MeshQualityInfo _mesh_info;
+
+  /**
+   * Flag to indicate if the current solve is to untangle or smooth
+   */
+  bool _untangling_solve;
 };
 
 } // namespace libMesh

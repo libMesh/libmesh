@@ -29,7 +29,6 @@
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/diff_solver.h"
-#include "libmesh/variational_smoother_constraint.h"
 #include "libmesh/parallel_ghost_sync.h"
 
 // C++ includes
@@ -51,14 +50,14 @@ namespace libMesh
 // Member functions for the Variational Smoother
 VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  Real dilation_weight,
-                                                 const bool preserve_subdomain_boundaries) :
-  MeshSmoother(mesh),
-  _dilation_weight(dilation_weight),
-  _preserve_subdomain_boundaries(preserve_subdomain_boundaries)
+                                                 const bool preserve_subdomain_boundaries)
+  : MeshSmoother(mesh),
+    _dilation_weight(dilation_weight),
+    _preserve_subdomain_boundaries(preserve_subdomain_boundaries),
+    _setup_called(false)
 {}
 
-
-void VariationalMeshSmoother::smooth(unsigned int)
+void VariationalMeshSmoother::setup()
 {
   // Check for multiple dimensions
   if (_mesh.elem_dimensions().size() > 1)
@@ -76,8 +75,8 @@ void VariationalMeshSmoother::smooth(unsigned int)
      a mesh to go unused after its EquationSystems is destroyed), much less know
      how to restore anything from a previous EquationSystems.
 
-  To avoid these issues, we'll just construct a new DistributedMesh mesh_copy
-  from _mesh, then do the solve on mesh_copy, then copy its node locations back
+  To avoid these issues, we'll just construct a new DistributedMesh _mesh_copy
+  from _mesh, then do the solve on _mesh_copy, then copy its node locations back
   to _mesh after the solve is done. That'll be slightly less memory-efficient
   and somewhat more CPU-efficient in the case where _mesh is serial, though
   it'll be significantly less memory-efficient when _mesh is already distributed,
@@ -85,57 +84,82 @@ void VariationalMeshSmoother::smooth(unsigned int)
   */
 
   // Create a new mesh, EquationSystems, and System
-  DistributedMesh mesh_copy(_mesh);
-  EquationSystems es(mesh_copy);
-  VariationalSmootherSystem & sys = es.add_system<VariationalSmootherSystem>("variational_smoother_system");
+  _mesh_copy = std::make_unique<DistributedMesh>(_mesh);
+  _equation_systems = std::make_unique<EquationSystems>(*_mesh_copy);
+  _system =
+      &(_equation_systems->add_system<VariationalSmootherSystem>("variational_smoother_system"));
 
   // Set this to something > 0 to add more quadrature points than the default
   // rule that integrates order 2 * fe_order + 1 polynomials exactly.
   // Using higher quadrature orders has not had a significant effect on observed solutions.
-  //sys.extra_quadrature_order = 0;
+  //system()->extra_quadrature_order = 0;
 
   // Uncomment these to debug
-  //sys.print_element_solutions=true;
-  //sys.print_element_residuals=true;
-  //sys.print_element_jacobians=true;
+  //system()->print_element_solutions=true;
+  //system()->print_element_residuals=true;
+  //system()->print_element_jacobians=true;
 
   // Add boundary node and hanging node constraints
-  VariationalSmootherConstraint constraint(sys, _preserve_subdomain_boundaries);
-  sys.attach_constraint_object(constraint);
+  _constraint =
+      std::make_unique<VariationalSmootherConstraint>(*_system, _preserve_subdomain_boundaries);
+  system()->attach_constraint_object(*_constraint);
 
   // Set system parameters
-  sys.get_dilation_weight() = _dilation_weight;
+  system()->get_dilation_weight() = _dilation_weight;
 
   // Set up solver
-  sys.time_solver =
-    std::make_unique<SteadySolver>(sys);
+  system()->time_solver = std::make_unique<SteadySolver>(*_system);
 
   // Uncomment this line and use -snes_test_jacobian and -snes_test_jacobian_view
   // flags to compare the hand-coded jacobian in VariationalSmootherSystem
   // to finite difference jacobians.
-  //sys.time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(sys);
+  //system()->time_solver->diff_solver() = std::make_unique<PetscDiffSolver>(*_system);
 
-  es.init();
+  _equation_systems->init();
 
   // More debugging options
-  //DiffSolver & solver = *(sys.time_solver->diff_solver().get());
-  //solver.quiet = false;
-  //solver.verbose = true;
+  // DiffSolver & solver = *(system()->time_solver->diff_solver().get());
+  // solver.quiet = false;
+  // solver.verbose = true;
 
-  sys.time_solver->diff_solver()->relative_residual_tolerance = TOLERANCE*TOLERANCE;
+  system()->time_solver->diff_solver()->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+  system()->time_solver->diff_solver()->absolute_residual_tolerance = TOLERANCE * TOLERANCE;
 
-  sys.solve();
+  _setup_called = true;
+}
 
-  // Update _mesh from mesh_copy
-  for (auto * node_copy : mesh_copy.local_node_ptr_range())
-  {
-    auto & node = _mesh.node_ref(node_copy->id());
-    for (const auto d : make_range(mesh_copy.mesh_dimension()))
-      node(d) = (*node_copy)(d);
-  }
+void VariationalMeshSmoother::smooth(unsigned int)
+{
+  if (!_setup_called)
+    setup();
+
+  system()->solve();
+
+  // Update _mesh from _mesh_copy
+  for (auto * node_copy : _mesh_copy->local_node_ptr_range())
+    {
+      auto & node = _mesh.node_ref(node_copy->id());
+      for (const auto d : make_range(_mesh_copy->mesh_dimension()))
+        node(d) = (*node_copy)(d);
+    }
 
   SyncNodalPositions sync_object(_mesh);
   Parallel::sync_dofobject_data_by_id (_mesh.comm(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
+
+  // Release memory occupied by _mesh_copy
+  // Destruct this before _mesh_copy because it references _mesh_copy
+  _equation_systems.reset();
+  _mesh_copy.reset();
+  // We'll need to call setup again since we'll have to reconstruct _mesh_copy
+  _setup_called = false;
+}
+
+const MeshQualityInfo & VariationalMeshSmoother::get_mesh_info() const
+{
+  libmesh_error_msg_if(!_setup_called, "Need to first call the setup() method of "
+      << "this VariationalMeshSmoother object, then call get_mesh_info() prior "
+      << "to calling smooth().");
+  return _system->get_mesh_info();
 }
 
 } // namespace libMesh

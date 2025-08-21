@@ -27,7 +27,10 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/mesh_smoother.h"
 #include "libmesh/variational_smoother_system.h"
+#include "libmesh/variational_smoother_constraint.h"
 #include "petsc_diff_solver.h"
+#include "libmesh/distributed_mesh.h"
+#include "libmesh/equation_systems.h"
 
 // C++ Includes
 #include <cstddef>
@@ -46,7 +49,8 @@ class UnstructuredMesh;
  * The initial implementation was done by her, the adaptation to
  * libmesh was completed by Derek Gaston.  The code was heavily
  * refactored into something more closely resembling C++ by John
- * Peterson in 2014.
+ * Peterson in 2014. The code eventually fell out of use and stopped
+ * functioning. Patrick Behne reimplemented the smoother in 2025.
  *
  * Here are the relevant publications:
  * 1) L. Branets, G. Carey, "Extension of a mesh quality metric for
@@ -58,6 +62,12 @@ class UnstructuredMesh;
  *
  * 3) L. Branets, "A variational grid optimization algorithm based on a local
  * cell quality metric", Ph.D. thesis, The University of Texas at Austin, 2005.
+ *
+ * Notes:
+ *
+ * 1) The smoother supports tangled meshes. However, not all untangling solves
+ * converge. In other words, we are able to untangle SOME tangled meshes, but
+ * not ANY tangled mesh.
  *
  * \author Derek R. Gaston
  * \date 2006
@@ -79,6 +89,12 @@ public:
   virtual ~VariationalMeshSmoother() = default;
 
   /**
+   * Setup method that creates equation systems, system, and constraints, to be
+   * called just prior to smoothing.
+   */
+  virtual void setup();
+
+  /**
    * Redefinition of the smooth function from the
    * base class.  All this does is call the smooth
    * function in this class which takes an int, using
@@ -93,6 +109,10 @@ public:
    */
   void smooth(unsigned int n_iterations);
 
+  /**
+   * Getter for the _system's _mesh_info attribute
+   */
+  const MeshQualityInfo & get_mesh_info() const;
 
 private:
 
@@ -101,8 +121,54 @@ private:
    */
   const Real _dilation_weight;
 
-  /// Whether subdomain boundaries are subject to change via smoothing
+  /**
+   * Whether subdomain boundaries are subject to change via smoothing
+   */
   const bool _preserve_subdomain_boundaries;
+
+  // These must be declared in reverse dependency order to avoid corrupting the
+  // heap during destruction
+
+  /**
+   * Mesh copy to avoid multiple EquationSystems.
+   */
+  // independent of _equations_systems and _constraint
+  std::unique_ptr<DistributedMesh> _mesh_copy;
+
+  /**
+   * EquationsSystems object associated with the smoother
+   */
+  // uses _mesh_copy, owns the system
+  std::unique_ptr<EquationSystems> _equation_systems;
+
+
+  // Now it's safe to store non-owning pointers to the above
+
+  /*
+   * System used to smooth the mesh.
+   */
+  // Owned by _equation_systems
+  VariationalSmootherSystem * _system;
+
+  /**
+   * Getter for _system to protect against dangling pointers
+   */
+  VariationalSmootherSystem * system() const
+  {
+    libmesh_assert(_system);
+    return _system;
+  }
+
+  /**
+   * Constraints imposed on the smoothing process.
+   */
+  // uses system, which is owned by _equations_systems
+  std::unique_ptr<VariationalSmootherConstraint> _constraint;
+
+  /**
+   * Attribute the keep track of whether the setup method has been called.
+   */
+  bool _setup_called;
 };
 
 } // namespace libMesh
