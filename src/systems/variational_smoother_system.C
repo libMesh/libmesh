@@ -931,7 +931,7 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
   else if (type_str.compare(0, 7, "PYRAMID") == 0)
     {
 
-      // Ideally, the target element would be a pyramid with an square base and
+      // The target element is a pyramid with an square base and
       // equilateral triangular sides with volume equal to the volume of the
       // reference element.
 
@@ -941,28 +941,11 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
       // Solving for s: s = (3 sqrt(2) v)^(1/3), where v is the volume of the
       // non-optimal reference element.
 
-      // const Real sqrt_2 = std::sqrt(Real(2));
+      const Real sqrt_2 = std::sqrt(Real(2));
       // Side length that preserves the volume of the reference element
-      // const auto side_length = std::pow(3. * sqrt_2 * ref_vol, 1. / 3.);
+      const auto side_length = std::pow(3. * sqrt_2 * ref_vol, 1. / 3.);
       // Pyramid height with the property that all faces are equilateral triangles
-      // const auto target_height = side_length / sqrt_2;
-
-      // HOWEVER, higher-order pyramids with this h/s ratio will not pass our
-      // current unit tests where a cube is partitioned into  sub-cubes, each
-      // of which contains 6 pyramids, with two pyramids each oriented along
-      // the x/y/z axes. We cannot simultaneously scale each of the axes by
-      // 1 / sqrt(2) without messing up the h/s ratio in the other dimensions.
-      // For now, we will use a target element with square base of side length
-      // s and height s / 2. The factor of 2 comes from the fact that a cube of
-      // side length s is divided into 6 pyramids of height s / 2.
-      // Let's preserve the volume of the reference element. The resulting
-      // target element has volume v = s^2 (s/2) / 3 = s^3 / 6.
-      // Solving for s: s = (6v)^(1/3).
-
-      // Side length that preserves the volume of the reference element
-      const auto side_length = std::pow(6. * ref_vol, 1. / 3.);
-      // Pyramid height that is half the side length
-      const auto target_height = 0.5 * side_length;
+      const auto target_height = side_length / sqrt_2;
 
       const auto & s = side_length;
       const auto & h = target_height;
@@ -1003,7 +986,7 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
                   owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[1] + *on[4]) / 3.), 14));
                   owned_nodes.emplace_back(Node::build(Point((*on[1] + *on[2] + *on[4]) / 3.), 15));
                   owned_nodes.emplace_back(Node::build(Point((*on[2] + *on[3] + *on[4]) / 3.), 16));
-                  owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[3] + *on[4]) / 3.), 17));
+                  owned_nodes.emplace_back(Node::build(Point((*on[3] + *on[0] + *on[4]) / 3.), 17));
                 }
             }
         }

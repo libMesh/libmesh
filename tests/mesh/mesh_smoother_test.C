@@ -521,9 +521,69 @@ public:
           }
       }
     else
-      // Make sure we're not too distorted anymore
-      for (auto node : mesh.node_ptr_range())
-        CPPUNIT_ASSERT(node_distortion_is(*node, false, 1e-2));
+      {
+        // Make sure we're not too distorted anymore
+        std::set<dof_id_type> nodes_checked;
+        for (const auto * elem : mesh.active_element_ptr_range())
+          {
+            for (const auto local_node_id : make_range(elem->n_nodes()))
+              {
+                const auto & node = elem->node_ref(local_node_id);
+                if (nodes_checked.find(node.id()) != nodes_checked.end())
+                  continue;
+
+                nodes_checked.insert(node.id());
+
+                // Check for special case where pyramidal base-to-apex midpoint
+                // nodes are not smoothed to the actual midpoints.
+                if (type_is_pyramid)
+                  {
+                    if (local_node_id > 8 && local_node_id < 13)
+                      {
+                        // Base-Apex midpoint nodes
+                        //
+                        // Due to the nature of the pyramidal target element and the
+                        // cubic nature of the test mesh, for a dilation weight o
+                        // 0.5, smoothed base-apex midpoint nodes are smoothed to
+                        // the point base + x * (apex - base) instead of
+                        // base + 0.5 (apex - base), where x is in (0,1) and
+                        // depends on the number of nodes in the element.
+                        // We hard-code this check below.
+
+                        const auto & base = elem->node_ref(local_node_id - 9);
+                        const auto & apex = elem->node_ref(4);
+                        const Real x = (type == PYRAMID18) ? 0.569332 : 0.549876;
+
+                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(base + x * (apex - base), 1e-3));
+                        continue;
+                      }
+                    else if (local_node_id > 13)
+                      {
+                        // Triangular face midpoint nodes
+                        //
+                        // Due to the nature of the pyramidal target element and the
+                        // cubic nature of the test mesh, for a dilation weight o
+                        // 0.5, smoothed triangular face midpoint nodes are
+                        // smoothed a weighted average of the constituent
+                        // vertices instead of an unweighted average.
+                        // We hard-code this check below.
+                        const auto & base1 = elem->node_ref(local_node_id - 14);
+                        const auto & base2 = elem->node_ref((local_node_id - 13) % 4);
+                        const auto & apex = elem->node_ref(4);
+
+                        const auto node_approx = (0.3141064847 * base1 +
+                                                  0.3141064847 * base2 +
+                                                  0.3717870306 * apex);
+                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, 1e-3));
+                        continue;
+                      }
+                  }
+
+                CPPUNIT_ASSERT(node_distortion_is(node, false, 1e-2));
+
+              }
+          }
+      }
   }
 
   void testLaplaceQuad()
