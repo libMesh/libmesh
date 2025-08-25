@@ -425,8 +425,8 @@ public:
     // The factor 4 lets us catch triangular face midpoint nodes for PYRAMID18 elements.
     const auto scale_factor = *elem_orders.begin() * (type_is_pyramid ? 2 * 4 : 1);
 
-    // Function to assert the distortion is as expected
-    auto distortion_is = [&n_elems_per_side, &dim, &boundary_info, &scale_factor](
+    // Function to assert the node distortion is as expected
+    auto node_distortion_is = [&n_elems_per_side, &dim, &boundary_info, &scale_factor](
                              const Node & node, bool distortion, Real distortion_tol = TOLERANCE) {
       // Get boundary ids associated with the node
       std::vector<boundary_id_type> boundary_ids;
@@ -479,7 +479,7 @@ public:
 
     // Make sure our DistortHyperCube transformation has distorted the mesh
     for (auto node : mesh.node_ptr_range())
-      CPPUNIT_ASSERT(distortion_is(*node, true));
+      CPPUNIT_ASSERT(node_distortion_is(*node, true));
 
     // Transform the square mesh of triangles to a parallelogram mesh of
     // triangles. This will allow the Variational Smoother to smooth the mesh
@@ -523,7 +523,7 @@ public:
     else
       // Make sure we're not too distorted anymore
       for (auto node : mesh.node_ptr_range())
-        CPPUNIT_ASSERT(distortion_is(*node, false, 1e-2));
+        CPPUNIT_ASSERT(node_distortion_is(*node, false, 1e-2));
   }
 
   void testLaplaceQuad()
