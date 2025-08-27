@@ -714,7 +714,7 @@ public:
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testVariationalSmoother(mesh, variational, HEX27, false, true, 0.65);
+    testVariationalSmoother(mesh, variational, HEX27, false, true, 0.55);
   }
 
   void testVariationalPyramid5()
