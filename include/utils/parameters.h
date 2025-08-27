@@ -34,6 +34,9 @@
 #include <vector>
 #include <memory>
 #include <set>
+#ifdef LIBMESH_HAVE_RTTI
+#include <typeinfo>
+#endif
 
 namespace libMesh
 {
@@ -183,6 +186,12 @@ public:
 
 #ifdef LIBMESH_HAVE_RTTI
     /**
+     * std::type_info for type of parameter stored.
+     * Must be reimplemented in derived classes.
+     */
+    virtual const std::type_info & type_info () const = 0;
+
+    /**
      * String identifying the type of parameter stored.
      * Must be reimplemented in derived classes.
      */
@@ -222,6 +231,11 @@ public:
     T & set () { return _value; }
 
 #ifdef LIBMESH_HAVE_RTTI
+    /**
+     * std::type_info for type of parameter stored.
+     */
+    virtual const std::type_info & type_info () const override;
+
     /**
      * String identifying the type of parameter stored.
      */
@@ -291,14 +305,21 @@ protected:
 // ------------------------------------------------------------
 // Parameters::Parameter<> class inline methods
 
-// This only works with Run-Time Type Information, even though
+// These only work with Run-Time Type Information, even though
 // typeid(T) *should* be determinable at compile time regardless...
 #ifdef LIBMESH_HAVE_RTTI
 template <typename T>
 inline
+const std::type_info & Parameters::Parameter<T>::type_info () const
+{
+  return typeid(T);
+}
+
+template <typename T>
+inline
 std::string Parameters::Parameter<T>::type () const
 {
-  return demangle(typeid(T).name());
+  return demangle(type_info().name());
 }
 #endif
 
