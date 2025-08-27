@@ -289,7 +289,9 @@ public:
     const bool type_is_tri = Utility::enum_to_string(type).compare(0, 3, "TRI") == 0;
     const bool type_is_pyramid = Utility::enum_to_string(type).compare(0, 7, "PYRAMID") == 0;
 
-    unsigned int n_elems_per_side = 4;
+    // Used fewer elems for higher order types, as extra midpoint nodes will add
+    // enough complexity
+    unsigned int n_elems_per_side = 4 / Elem::type_to_default_order_map[type];
 
     switch (dim)
       {
@@ -334,7 +336,7 @@ public:
 
         // Define p1 and p2 given the integer indices
         // Undistorted elem side length
-        const Real dr = 1. / n_elems_per_side;
+        const Real dr = 1. / (n_elems_per_side * Elem::type_to_default_order_map[type]);
         const Point p1 = Point(dr, dim > 1 ? dr : 0, dim > 2 ? dr : 0);
         const Point p2 = Point(2. * dr, dim > 1 ? dr : 0, dim > 2 ? 2. * dr : 0);
 
@@ -712,7 +714,7 @@ public:
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
-    testVariationalSmoother(mesh, variational, HEX27, false, true, 0.75);
+    testVariationalSmoother(mesh, variational, HEX27, false, true, 0.65);
   }
 
   void testVariationalPyramid5()
