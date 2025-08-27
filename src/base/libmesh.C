@@ -599,7 +599,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // The amount of benefit which occurs is probably implementation
   // defined, and may be nothing.  On the other hand, I have seen
   // some IO tests where IO performance improves by a factor of two.
-  if (!libMesh::on_command_line ("--sync-with-stdio"))
+  if (libMesh::on_command_line ("--dont-sync-with-stdio"))
     std::ios::sync_with_stdio(false);
 
   // Honor the --separate-libmeshout command-line option.
