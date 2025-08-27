@@ -29,6 +29,7 @@
 #include "libmesh/print_trace.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/perf_log.h"
+#include "libmesh/thread_buffered_syncbuf.h"
 
 // TIMPI includes
 #include "timpi/communicator.h"
@@ -219,6 +220,54 @@ int                GLOBAL_COMM_WORLD = 0;
 
 OStreamProxy out(std::cout);
 OStreamProxy err(std::cerr);
+
+// Our thread-safe wrappers and the “pre-wrap” sink pointers
+std::unique_ptr<ThreadBufferedSyncbuf> _out_syncd_thread_buffer;
+std::unique_ptr<ThreadBufferedSyncbuf> _err_syncd_thread_buffer;
+std::streambuf * _out_prewrap_buf = nullptr;
+std::streambuf * _err_prewrap_buf = nullptr;
+
+// Install after redirection/drop decisions
+void install_thread_buffered_sync()
+{
+  // libMesh::out
+  if (auto * ob = libMesh::out.rdbuf(); ob)
+    {
+      _out_prewrap_buf = ob;
+      _out_syncd_thread_buffer =
+          std::make_unique<ThreadBufferedSyncbuf>(*ob, /*flush_on_newline=*/true);
+      libMesh::out.rdbuf(_out_syncd_thread_buffer.get());
+    }
+
+  // libMesh::err
+  if (auto * eb = libMesh::err.rdbuf(); eb)
+    {
+      _err_prewrap_buf = eb;
+      _err_syncd_thread_buffer =
+          std::make_unique<ThreadBufferedSyncbuf>(*eb, /*flush_on_newline=*/true);
+      libMesh::err.rdbuf(_err_syncd_thread_buffer.get());
+    }
+}
+
+// Uninstall before restoring/redirection teardown
+void uninstall_thread_buffered_sync()
+{
+  if (_out_syncd_thread_buffer)
+    {
+      // flush any thread-local leftovers on this thread
+      libMesh::out << std::flush;
+      libMesh::out.rdbuf(_out_prewrap_buf);
+      _out_syncd_thread_buffer.reset();
+      _out_prewrap_buf = nullptr;
+    }
+  if (_err_syncd_thread_buffer)
+    {
+      libMesh::err << std::flush;
+      libMesh::err.rdbuf(_err_prewrap_buf);
+      _err_syncd_thread_buffer.reset();
+      _err_prewrap_buf = nullptr;
+    }
+}
 
 bool warned_about_auto_ptr(false);
 
@@ -677,6 +726,9 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     if (libMesh::global_processor_id() != 0)
       libMesh::err.rdbuf (nullptr);
 
+  // Now that we've finished setting our stream buffers, let's wrap them (if they're non-null) in our thread-safe wrapper
+  install_thread_buffered_sync();
+
   // Check command line to override printing
   // of reference count information.
   if (libMesh::on_command_line("--disable-refcount-printing"))
@@ -786,6 +838,9 @@ LibMeshInit::~LibMeshInit()
 
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
+
+  // Before resetting the stream buffers, let's remove our thread wrappers
+  uninstall_thread_buffered_sync();
 
   if (libMesh::on_command_line ("--redirect-stdout") ||
       libMesh::on_command_line ("--redirect-output"))
