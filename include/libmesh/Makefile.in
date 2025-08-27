@@ -543,7 +543,7 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	error_estimator.h exact_error_estimator.h exact_solution.h \
 	fourth_error_estimators.h hp_coarsentest.h hp_selector.h \
 	hp_singular.h jump_error_estimator.h kelly_error_estimator.h \
-	smoothness_estimator.h patch_recovery_error_estimator.h \
+	patch_recovery_error_estimator.h smoothness_estimator.h \
 	uniform_refinement_estimator.h \
 	weighted_patch_recovery_error_estimator.h fe.h fe_abstract.h \
 	fe_base.h fe_compute_data.h fe_interface.h \
@@ -694,9 +694,9 @@ BUILT_SOURCES = auto_ptr.h dirichlet_boundaries.h dof_map.h \
 	point_locator_base.h point_locator_nanoflann.h \
 	point_locator_tree.h pointer_to_pointer_iter.h \
 	pool_allocator.h restore_warnings.h simple_range.h \
-	statistics.h string_to_enum.h timestamp.h topology_map.h \
-	tree.h tree_base.h tree_node.h utility.h vectormap.h \
-	win_gettimeofday.h xdr_cxx.h \
+	statistics.h string_to_enum.h thread_buffered_syncbuf.h \
+	timestamp.h topology_map.h tree.h tree_base.h tree_node.h \
+	utility.h vectormap.h win_gettimeofday.h xdr_cxx.h \
 	parallel_communicator_specializations $(am__append_1) \
 	$(am__append_3) $(am__append_5) $(am__append_7) \
 	$(am__append_9) $(am__append_11) $(am__append_13) \
@@ -1129,10 +1129,10 @@ jump_error_estimator.h: $(top_srcdir)/include/error_estimation/jump_error_estima
 kelly_error_estimator.h: $(top_srcdir)/include/error_estimation/kelly_error_estimator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-smoothness_estimator.h: $(top_srcdir)/include/error_estimation/smoothness_estimator.h
+patch_recovery_error_estimator.h: $(top_srcdir)/include/error_estimation/patch_recovery_error_estimator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-patch_recovery_error_estimator.h: $(top_srcdir)/include/error_estimation/patch_recovery_error_estimator.h
+smoothness_estimator.h: $(top_srcdir)/include/error_estimation/smoothness_estimator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 uniform_refinement_estimator.h: $(top_srcdir)/include/error_estimation/uniform_refinement_estimator.h
@@ -2432,6 +2432,9 @@ statistics.h: $(top_srcdir)/include/utils/statistics.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 string_to_enum.h: $(top_srcdir)/include/utils/string_to_enum.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+thread_buffered_syncbuf.h: $(top_srcdir)/include/utils/thread_buffered_syncbuf.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 timestamp.h: $(top_srcdir)/include/utils/timestamp.h
