@@ -918,6 +918,23 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                                                                              /*add_basis_function*/ !exit_on_next_iteration,
                                                                              eim_point_data.get());
 
+              // If we encountered linearly dependent data, then we treat this the same as
+              // when we have exit_condition_satisfied==true because the EIM training cannot
+              // proceed any further. As a result, we set exit_on_next_iteration=true here,
+              // as we do above in the case that exit_condition_satisfied==true.
+              if (is_linearly_dependent)
+              {
+                bool has_parameters = (get_parameters().n_parameters() > 0);
+                if (get_rb_eim_evaluation().use_eim_error_indicator() && has_parameters)
+                  {
+                    exit_on_next_iteration = true;
+                    libMesh::out << "Linearly dependent data detected, finalizing iteration for the EIM error indicator before exiting"
+                                  << std::endl;
+                  }
+                else
+                  break;
+              }
+
               if (is_linearly_dependent && !is_zero_bf)
                 {
                   // In this case we detected that v is actually linearly dependent and that is_zero_bf
@@ -984,6 +1001,23 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
                                                                              /*add_basis_function*/ !exit_on_next_iteration,
                                                                              eim_point_data.get());
 
+              // If we encountered linearly dependent data, then we treat this the same as
+              // when we have exit_condition_satisfied==true because the EIM training cannot
+              // proceed any further. As a result, we set exit_on_next_iteration=true here,
+              // as we do above in the case that exit_condition_satisfied==true.
+              if (is_linearly_dependent)
+              {
+                bool has_parameters = (get_parameters().n_parameters() > 0);
+                if (get_rb_eim_evaluation().use_eim_error_indicator() && has_parameters)
+                  {
+                    exit_on_next_iteration = true;
+                    libMesh::out << "Linearly dependent data detected, finalizing iteration for the EIM error indicator before exiting"
+                                  << std::endl;
+                  }
+                else
+                  break;
+              }
+
               if (is_linearly_dependent && !is_zero_bf)
                 {
                   // In this case we detected that v is actually linearly dependent and that is_zero_bf
@@ -1049,6 +1083,23 @@ Real RBEIMConstruction::train_eim_approximation_with_POD()
               bool is_linearly_dependent = enrich_eim_approximation_on_interiors(v,
                                                                                  /*add_basis_function*/ !exit_on_next_iteration,
                                                                                  eim_point_data.get());
+
+              // If we encountered linearly dependent data, then we treat this the same as
+              // when we have exit_condition_satisfied==true because the EIM training cannot
+              // proceed any further. As a result, we set exit_on_next_iteration=true here,
+              // as we do above in the case that exit_condition_satisfied==true.
+              if (is_linearly_dependent)
+              {
+                bool has_parameters = (get_parameters().n_parameters() > 0);
+                if (get_rb_eim_evaluation().use_eim_error_indicator() && has_parameters)
+                  {
+                    exit_on_next_iteration = true;
+                    libMesh::out << "Linearly dependent data detected, finalizing iteration for the EIM error indicator before exiting"
+                                  << std::endl;
+                  }
+                else
+                  break;
+              }
 
               if (is_linearly_dependent && !is_zero_bf)
                 {
