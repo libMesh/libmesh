@@ -67,8 +67,8 @@ BUILT_SOURCES = \
         hp_singular.h \
         jump_error_estimator.h \
         kelly_error_estimator.h \
-        smoothness_estimator.h \
         patch_recovery_error_estimator.h \
+        smoothness_estimator.h \
         uniform_refinement_estimator.h \
         weighted_patch_recovery_error_estimator.h \
         fe.h \
@@ -502,6 +502,7 @@ BUILT_SOURCES = \
         simple_range.h \
         statistics.h \
         string_to_enum.h \
+        thread_buffered_syncbuf.h \
         timestamp.h \
         topology_map.h \
         tree.h \
@@ -800,10 +801,10 @@ jump_error_estimator.h: $(top_srcdir)/include/error_estimation/jump_error_estima
 kelly_error_estimator.h: $(top_srcdir)/include/error_estimation/kelly_error_estimator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-smoothness_estimator.h: $(top_srcdir)/include/error_estimation/smoothness_estimator.h
+patch_recovery_error_estimator.h: $(top_srcdir)/include/error_estimation/patch_recovery_error_estimator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-patch_recovery_error_estimator.h: $(top_srcdir)/include/error_estimation/patch_recovery_error_estimator.h
+smoothness_estimator.h: $(top_srcdir)/include/error_estimation/smoothness_estimator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 uniform_refinement_estimator.h: $(top_srcdir)/include/error_estimation/uniform_refinement_estimator.h
@@ -2103,6 +2104,9 @@ statistics.h: $(top_srcdir)/include/utils/statistics.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 string_to_enum.h: $(top_srcdir)/include/utils/string_to_enum.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+thread_buffered_syncbuf.h: $(top_srcdir)/include/utils/thread_buffered_syncbuf.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 timestamp.h: $(top_srcdir)/include/utils/timestamp.h
