@@ -708,21 +708,21 @@ public:
     auto node7 = mesh.add_point(Point(hsq2,-hsq2), 7);
 
     auto edge021 = mesh.add_elem(Elem::build(EDGE3));
-    edge021->set_node(0) = node0;
-    edge021->set_node(1) = node2;
-    edge021->set_node(2) = node1;
+    edge021->set_node(0, node0);
+    edge021->set_node(1, node2);
+    edge021->set_node(2, node1);
     auto edge243 = mesh.add_elem(Elem::build(EDGE3));
-    edge243->set_node(0) = node2;
-    edge243->set_node(1) = node4;
-    edge243->set_node(2) = node3;
+    edge243->set_node(0, node2);
+    edge243->set_node(1, node4);
+    edge243->set_node(2, node3);
     auto edge465 = mesh.add_elem(Elem::build(EDGE3));
-    edge465->set_node(0) = node4;
-    edge465->set_node(1) = node6;
-    edge465->set_node(2) = node5;
+    edge465->set_node(0, node4);
+    edge465->set_node(1, node6);
+    edge465->set_node(2, node5);
     auto edge607 = mesh.add_elem(Elem::build(EDGE3));
-    edge607->set_node(0) = node6;
-    edge607->set_node(1) = node0;
-    edge607->set_node(2) = node7;
+    edge607->set_node(0, node6);
+    edge607->set_node(1, node0);
+    edge607->set_node(2, node7);
 
     mesh.prepare_for_use();
   }
