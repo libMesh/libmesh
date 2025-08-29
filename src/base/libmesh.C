@@ -594,12 +594,17 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
   // the command line arguments appeared twice in the GetPot object...
   command_line = std::make_unique<GetPot>(argc, argv);
 
-  // The following line is an optimization when simultaneous
+  // Not syncing with stdio is an optimization when simultaneous
   // C and C++ style access to output streams is not required.
   // The amount of benefit which occurs is probably implementation
   // defined, and may be nothing.  On the other hand, I have seen
   // some IO tests where IO performance improves by a factor of two.
-  if (!libMesh::on_command_line ("--sync-with-stdio"))
+  // However, not syncing the streams means thread safety is no longer
+  // guaranteed and we have indeed seen thread sanitizer warnings
+  // during concurrent writes to std::cout when toggling this boolean
+  // to true. We default to preferring safety and correctness instead
+  // of performance
+  if (libMesh::on_command_line ("--dont-sync-with-stdio"))
     std::ios::sync_with_stdio(false);
 
   // Honor the --separate-libmeshout command-line option.
