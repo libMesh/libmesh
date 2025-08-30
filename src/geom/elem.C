@@ -2694,29 +2694,35 @@ Elem::bracketing_nodes(unsigned int child,
           // This only doesn't break horribly because we add children
           // and nodes in straightforward + hierarchical orders...
           for (unsigned int c=0; c <= child; ++c)
-            for (auto n : make_range(this->n_nodes_in_child(c)))
-              {
-                if (c == child && n == child_node)
-                  break;
+            {
+              libmesh_assert(this->child_ptr(c));
+              if (this->child_ptr(c) == remote_elem)
+                continue;
 
-                if (pb.first == full_elem->as_parent_node(c,n))
-                  {
-                    // We should be consistent
-                    if (pt1 != DofObject::invalid_id)
-                      libmesh_assert_equal_to(pt1, this->child_ptr(c)->node_id(n));
+              for (auto n : make_range(this->n_nodes_in_child(c)))
+                {
+                  if (c == child && n == child_node)
+                    break;
 
-                    pt1 = this->child_ptr(c)->node_id(n);
-                  }
+                  if (pb.first == full_elem->as_parent_node(c,n))
+                    {
+                      // We should be consistent
+                      if (pt1 != DofObject::invalid_id)
+                        libmesh_assert_equal_to(pt1, this->child_ptr(c)->node_id(n));
 
-                if (pb.second == full_elem->as_parent_node(c,n))
-                  {
-                    // We should be consistent
-                    if (pt2 != DofObject::invalid_id)
-                      libmesh_assert_equal_to(pt2, this->child_ptr(c)->node_id(n));
+                      pt1 = this->child_ptr(c)->node_id(n);
+                    }
 
-                    pt2 = this->child_ptr(c)->node_id(n);
-                  }
-              }
+                  if (pb.second == full_elem->as_parent_node(c,n))
+                    {
+                      // We should be consistent
+                      if (pt2 != DofObject::invalid_id)
+                        libmesh_assert_equal_to(pt2, this->child_ptr(c)->node_id(n));
+
+                      pt2 = this->child_ptr(c)->node_id(n);
+                    }
+                }
+            }
 
           // We should *usually* find all bracketing nodes by the time
           // we query them (again, because of the child & node add
