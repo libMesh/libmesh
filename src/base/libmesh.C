@@ -230,9 +230,17 @@ std::streambuf * _err_prewrap_buf = nullptr;
 // Install after redirection/drop decisions
 void install_thread_buffered_sync()
 {
+  auto check_stored_buffer = [](const auto * const libmesh_dbg_var(stored_buffer)) {
+    libmesh_assert_msg(!stored_buffer,
+                       "Oops, we've already stored a prewrapped buffer. We must be calling this "
+                       "function a second time in which case we're going to lose the already "
+                       "stored prewrapped buffer forever");
+  };
+
   // libMesh::out
   if (auto * ob = libMesh::out.rdbuf(); ob)
     {
+      check_stored_buffer(_out_prewrap_buf);
       _out_prewrap_buf = ob;
       _out_syncd_thread_buffer =
           std::make_unique<ThreadBufferedSyncbuf>(*ob, /*flush_on_newline=*/true);
@@ -242,6 +250,7 @@ void install_thread_buffered_sync()
   // libMesh::err
   if (auto * eb = libMesh::err.rdbuf(); eb)
     {
+      check_stored_buffer(_err_prewrap_buf);
       _err_prewrap_buf = eb;
       _err_syncd_thread_buffer =
           std::make_unique<ThreadBufferedSyncbuf>(*eb, /*flush_on_newline=*/true);
