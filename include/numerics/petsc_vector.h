@@ -635,9 +635,11 @@ PetscVector<T>::PetscVector (Vec v,
           this->_type = GHOSTED;
           LibmeshPetscCall(ISRestoreIndices(ghostis, &indices));
         }
+      else
+        this->_type = PARALLEL;
     }
   else if (std::strcmp(ptype,VECSHARED) == 0)
-#else
+#else // PETSc < 3.21.0
   if ((std::strcmp(ptype,VECSHARED) == 0) || (std::strcmp(ptype,VECMPI) == 0))
 #endif
     {
