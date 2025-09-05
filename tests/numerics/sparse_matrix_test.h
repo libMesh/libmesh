@@ -24,6 +24,7 @@
   CPPUNIT_TEST(testReadMatlab1);             \
   CPPUNIT_TEST(testReadMatlab2);             \
   CPPUNIT_TEST(testReadMatlab4);             \
+  CPPUNIT_TEST(testReadHDF5);             \
   CPPUNIT_TEST(testWriteAndRead);            \
   CPPUNIT_TEST(testClone);
 
@@ -185,6 +186,23 @@ public:
   {
     LOG_UNIT_TEST;
     testReadMatlab("matrices/geom_4_extraction_op.m");
+  }
+
+
+  void testReadHDF5()
+  {
+#ifdef LIBMESH_HAVE_HDF5
+    LOG_UNIT_TEST;
+
+    matrix->clear();
+    auto matrix2 = std::make_unique<DerivedClass>(*my_comm);
+    matrix->read("matrices/geom_1_extraction_op.m");
+    matrix2->read("matrices/geom_1_extraction_op.h5");
+
+    // We need some more SparseMatrix operators, but not today
+    CPPUNIT_ASSERT(matrix->l1_norm() == matrix2->l1_norm());
+    CPPUNIT_ASSERT(matrix->linfty_norm() == matrix2->linfty_norm());
+#endif // LIBMESH_HAVE_HDF5
   }
 
 
