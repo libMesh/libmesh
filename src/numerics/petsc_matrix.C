@@ -1123,15 +1123,10 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
 {
   libmesh_assert (this->initialized());
 
-  // PETSc 2.2.1 & newer
-  const PetscScalar * petsc_row;
-  const PetscInt    * petsc_cols;
-
   // If the entry is not in the sparse matrix, it is 0.
   T value=0.;
 
   PetscInt
-    ncols=0,
     i_val=static_cast<PetscInt>(i_in),
     j_val=static_cast<PetscInt>(j_in);
 
@@ -1142,30 +1137,7 @@ T PetscMatrix<T>::operator () (const numeric_index_type i_in,
   // to run on one processor.
   libmesh_assert(this->closed());
 
-  LibmeshPetscCall(MatGetRow(this->_mat, i_val, &ncols, &petsc_cols, &petsc_row));
-
-  // Perform a binary search to find the contiguous index in
-  // petsc_cols (resp. petsc_row) corresponding to global index j_val
-  std::pair<const PetscInt *, const PetscInt *> p =
-    std::equal_range (petsc_cols, petsc_cols + ncols, j_val);
-
-  // Found an entry for j_val
-  if (p.first != p.second)
-    {
-      // The entry in the contiguous row corresponding
-      // to the j_val column of interest
-      const std::size_t j =
-        std::distance (const_cast<PetscInt *>(petsc_cols),
-                       const_cast<PetscInt *>(p.first));
-
-      libmesh_assert_less (j, ncols);
-      libmesh_assert_equal_to (petsc_cols[j], j_val);
-
-      value = static_cast<T> (petsc_row[j]);
-    }
-
-  LibmeshPetscCall(MatRestoreRow(this->_mat, i_val,
-                                 &ncols, &petsc_cols, &petsc_row));
+  LibmeshPetscCall(MatGetValue(this->_mat, i_val, j_val, &value));
 
   return value;
 }
