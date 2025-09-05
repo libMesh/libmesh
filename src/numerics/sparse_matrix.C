@@ -762,14 +762,14 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
               cols[i] < new_col_stops[current_proc])
             {
               ++current_on_diagonal_nonzeros;
-              on_diagonal_nonzeros = 
+              on_diagonal_nonzeros =
                 std::max(on_diagonal_nonzeros,
                          current_on_diagonal_nonzeros);
             }
           else
             {
               ++current_off_diagonal_nonzeros;
-              off_diagonal_nonzeros = 
+              off_diagonal_nonzeros =
                 std::max(off_diagonal_nonzeros,
                          current_off_diagonal_nonzeros);
             }
