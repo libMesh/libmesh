@@ -556,10 +556,15 @@ void SparseMatrix<T>::read(const std::string & filename)
 #endif
       this->read_petsc_binary(filename);
     }
+  else if (Utility::ends_with(basename, ".h5"))
+    {
+      this->read_coreform_hdf5(filename);
+    }
   else
     libmesh_error_msg(" ERROR: Unrecognized matrix file extension on: "
                       << basename
                       << "\n   I understand the following:\n\n"
+                      << "     *.h5      -- CoreForm HDF5 sparse matrix format\n"
                       << "     *.matlab  -- Matlab sparse matrix format\n"
                       << "     *.m       -- Matlab sparse matrix format\n"
                       << "     *.petsc32 -- PETSc binary format, 32-bit\n"
