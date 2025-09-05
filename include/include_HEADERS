@@ -77,8 +77,8 @@ include_HEADERS =  \
         error_estimation/hp_singular.h \
         error_estimation/jump_error_estimator.h \
         error_estimation/kelly_error_estimator.h \
-        error_estimation/smoothness_estimator.h \
         error_estimation/patch_recovery_error_estimator.h \
+        error_estimation/smoothness_estimator.h \
         error_estimation/uniform_refinement_estimator.h \
         error_estimation/weighted_patch_recovery_error_estimator.h \
         fe/fe.h \
@@ -506,6 +506,7 @@ include_HEADERS =  \
         utils/simple_range.h \
         utils/statistics.h \
         utils/string_to_enum.h \
+        utils/thread_buffered_syncbuf.h \
         utils/timestamp.h \
         utils/topology_map.h \
         utils/tree.h \
