@@ -466,12 +466,23 @@ public:
    */
   virtual void print_petsc_hdf5(const std::string & filename);
 
-
   /**
    * Read the contents of the matrix from a file, with the file format
    * inferred from the extension of \p filename.
    */
   virtual void read(const std::string & filename);
+
+  /**
+   * Read the contents of the matrix from a file, with the HDF5 sparse
+   * matrix format used by CoreForm, expecing sparse matrix data in
+   * the group given by \p groupname.
+   *
+   * This will be initialized with the sparsity from the file,
+   * linearly partitioned onto the number of processors available
+   * unless \p this matrix is pre-sized and pre-partitionsed.
+   */
+  virtual void read_coreform_hdf5(const std::string & filename,
+                                  const std::string & groupname = "extraction");
 
   /**
    * Read the contents of the matrix from the Matlab-script sparse
