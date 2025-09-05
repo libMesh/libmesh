@@ -579,6 +579,7 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
                                          const std::string & groupname)
 {
 #ifndef LIBMESH_HAVE_HDF5
+  libmesh_ignore(filename, groupname);
   libmesh_error_msg("ERROR: need HDF5 support to handle .h5 files!!!");
 #else
   LOG_SCOPE("read_coreform_hdf5()", "SparseMatrix");
