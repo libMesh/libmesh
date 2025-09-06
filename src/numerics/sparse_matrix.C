@@ -39,6 +39,11 @@
 # include "gzstream.h"
 #endif
 
+#ifdef LIBMESH_HAVE_HDF5
+// Sticking to the C API to be safest on portability
+# include "hdf5.h"
+#endif
+
 // C++ includes
 #include <memory>
 #include <fstream>
@@ -551,16 +556,256 @@ void SparseMatrix<T>::read(const std::string & filename)
 #endif
       this->read_petsc_binary(filename);
     }
+  else if (Utility::ends_with(basename, ".h5"))
+    {
+      this->read_coreform_hdf5(filename);
+    }
   else
     libmesh_error_msg(" ERROR: Unrecognized matrix file extension on: "
                       << basename
                       << "\n   I understand the following:\n\n"
+                      << "     *.h5      -- CoreForm HDF5 sparse matrix format\n"
                       << "     *.matlab  -- Matlab sparse matrix format\n"
                       << "     *.m       -- Matlab sparse matrix format\n"
                       << "     *.petsc32 -- PETSc binary format, 32-bit\n"
                       << "     *.petsc64 -- PETSc binary format, 64-bit\n"
                      );
 }
+
+
+
+template <typename T>
+void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
+                                         const std::string & groupname)
+{
+#ifndef LIBMESH_HAVE_HDF5
+  libmesh_ignore(filename, groupname);
+  libmesh_error_msg("ERROR: need HDF5 support to handle .h5 files!!!");
+#else
+  LOG_SCOPE("read_coreform_hdf5()", "SparseMatrix");
+
+  std::size_t num_rows, num_cols;
+
+  hid_t group;
+
+  auto check_open = [&filename](hid_t id, const std::string & objname)
+  {
+    if (id == H5I_INVALID_HID)
+      libmesh_error_msg("Couldn't open " + objname + " in " + filename);
+  };
+
+  auto check_hdf5 = [&filename](auto hdf5val, const std::string & objname)
+  {
+    if (hdf5val < 0)
+      libmesh_error_msg("HDF5 error from " + objname + " in " + filename);
+  };
+
+
+  if (this->processor_id() == 0)
+    {
+      const hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+      if (file == H5I_INVALID_HID)
+        libmesh_file_error(filename);
+
+      group = H5Gopen(file, groupname.c_str(), H5P_DEFAULT);
+      check_open(group, groupname);
+
+      auto read_size_attribute = [&filename, &group, &check_open, &check_hdf5]
+        (const std::string & attribute_name)
+      {
+        unsigned long long returnval = 0;
+
+        const hid_t attr = H5Aopen(group, attribute_name.c_str(), H5P_DEFAULT);
+        check_open(attr, attribute_name);
+
+        const hid_t attr_type = H5Aget_type(attr);
+        check_hdf5(attr_type, attribute_name + " type");
+
+        // HDF5 will convert between the file's integer type and ours, but
+        // we do expect an integer type.
+        if (H5Tget_class(attr_type) != H5T_INTEGER)
+          libmesh_error_msg("Non-integer type for " + attribute_name + " in " + filename);
+
+        H5Tclose(attr_type);
+
+        // HDF5 is supposed to handle both upscaling and endianness
+        // conversions here
+        herr_t errval = H5Aread(attr, H5T_NATIVE_ULLONG, &returnval);
+        check_hdf5(errval, attribute_name + " read");
+
+        H5Aclose(attr);
+
+        return returnval;
+      };
+
+      num_cols = read_size_attribute("num_cols");
+      num_rows = read_size_attribute("num_rows");
+
+      this->comm().broadcast(num_cols);
+      this->comm().broadcast(num_rows);
+    }
+  else
+    {
+      this->comm().broadcast(num_cols);
+      this->comm().broadcast(num_rows);
+    }
+
+  numeric_index_type new_row_start, new_row_stop,
+                     new_col_start, new_col_stop;
+
+  // If we need to reinit, we need to determine which rows+columns
+  // each processor is in charge of.
+  std::vector<numeric_index_type> new_row_starts, new_row_stops,
+                                  new_col_starts, new_col_stops;
+
+  if (this->initialized() &&
+      num_cols == this->m() &&
+      num_rows == this->n())
+    {
+      new_row_start = this->row_start(),
+      new_row_stop  = this->row_stop();
+
+      new_col_start = this->col_start(),
+      new_col_stop  = this->col_stop();
+    }
+  else
+    {
+      // Determine which rows/columns each processor will be in charge of
+      new_row_start =     this->processor_id() * num_rows / this->n_processors(),
+      new_row_stop  = (this->processor_id()+1) * num_rows / this->n_processors();
+
+      new_col_start =     this->processor_id() * num_cols / this->n_processors(),
+      new_col_stop  = (this->processor_id()+1) * num_cols / this->n_processors();
+    }
+
+  this->comm().gather(0, new_row_start, new_row_starts);
+  this->comm().gather(0, new_row_stop, new_row_stops);
+  this->comm().gather(0, new_col_start, new_col_starts);
+  this->comm().gather(0, new_col_stop, new_col_stops);
+
+  numeric_index_type on_diagonal_nonzeros = 0,
+                     off_diagonal_nonzeros = 0;
+
+  std::vector<std::size_t> cols, row_offsets;
+  std::vector<double> vals;
+
+  if (this->processor_id() == 0)
+    {
+      auto read_vector = [&filename, &group, &check_open, &check_hdf5]
+        (const std::string & dataname, auto hdf5_class,
+         auto hdf5_type, auto & datavec)
+      {
+        const hid_t data = H5Dopen1(group, dataname.c_str());
+        check_open(data, dataname.c_str());
+
+        const hid_t data_type = H5Dget_type(data);
+        check_hdf5(data_type, dataname + " type");
+
+        // HDF5 will convert between the file's integer type and ours, but
+        // we do expect an integer type.
+        if (H5Tget_class(data_type) != hdf5_class)
+          libmesh_error_msg("Unexpected type for " + dataname + " in " + filename);
+
+        H5Tclose(data_type);
+
+        const hid_t dataspace = H5Dget_space(data);
+        check_hdf5(dataspace, dataname + " space");
+
+        int ndims = H5Sget_simple_extent_ndims(dataspace);
+        if (ndims != 1)
+          libmesh_error_msg("Non-vector space for " + dataname + " in " + filename);
+
+        hsize_t len, maxlen;
+        herr_t errval = H5Sget_simple_extent_dims(dataspace, &len, &maxlen);
+        check_hdf5(errval, dataname + " dims");
+
+        datavec.resize(len);
+
+        errval = H5Dread(data, hdf5_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, datavec.data());
+        check_hdf5(errval, dataname + " read");
+      };
+
+      read_vector("cols", H5T_INTEGER, H5T_NATIVE_ULLONG, cols);
+      read_vector("row_offsets", H5T_INTEGER, H5T_NATIVE_ULLONG, row_offsets);
+      read_vector("vals", H5T_FLOAT, H5T_NATIVE_DOUBLE, vals);
+
+      if (cols.size() != vals.size())
+        libmesh_error_msg("Inconsistent cols/vals sizes in " + filename);
+
+      if (row_offsets.size() != num_rows + 1)
+        libmesh_error_msg("Inconsistent row_offsets size in " + filename);
+
+      // Data for the row we're working on
+      numeric_index_type current_row = 0;
+      processor_id_type current_proc = 0;
+      numeric_index_type current_on_diagonal_nonzeros = 0;
+      numeric_index_type current_off_diagonal_nonzeros = 0;
+      if (row_offsets[0] != 0)
+        libmesh_error_msg("Unexpected row_offsets[0] in " + filename);
+
+      for (auto i : index_range(cols))
+        {
+          while (row_offsets[current_row+1] <= i)
+            {
+              ++current_row;
+              if (row_offsets[current_row] < row_offsets[current_row-1])
+                libmesh_error_msg("Non-monotonic row_offsets in " + filename);
+              current_on_diagonal_nonzeros = 0;
+              current_off_diagonal_nonzeros = 0;
+            }
+
+          while (current_row >= (new_row_stops[current_proc]+1))
+            ++current_proc;
+
+          // 0-based indexing in file
+          if (cols[i] >= new_col_starts[current_proc] &&
+              cols[i] < new_col_stops[current_proc])
+            {
+              ++current_on_diagonal_nonzeros;
+              on_diagonal_nonzeros =
+                std::max(on_diagonal_nonzeros,
+                         current_on_diagonal_nonzeros);
+            }
+          else
+            {
+              ++current_off_diagonal_nonzeros;
+              off_diagonal_nonzeros =
+                std::max(off_diagonal_nonzeros,
+                         current_off_diagonal_nonzeros);
+            }
+        }
+    }
+
+  this->comm().broadcast(on_diagonal_nonzeros);
+  this->comm().broadcast(off_diagonal_nonzeros);
+
+  this->init(num_rows, num_cols,
+             new_row_stop-new_row_start,
+             new_col_stop-new_col_start,
+             on_diagonal_nonzeros,
+             off_diagonal_nonzeros);
+
+  // Set the matrix values last.
+  if (this->processor_id() == 0)
+    {
+      numeric_index_type current_row = 0;
+      for (auto i : index_range(cols))
+        {
+          while (row_offsets[current_row+1] <= i)
+            {
+              ++current_row;
+              libmesh_assert_greater_equal (row_offsets[current_row],
+                                            row_offsets[current_row-1]);
+            }
+          this->set(current_row, cols[i], vals[i]);
+        }
+    }
+
+  this->close();
+#endif // LIBMESH_HAVE_HDF5
+}
+
 
 
 template <typename T>
