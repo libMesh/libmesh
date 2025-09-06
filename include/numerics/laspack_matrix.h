@@ -164,7 +164,7 @@ public:
 
   virtual Real l1_norm () const override;
 
-  virtual Real linfty_norm () const override { libmesh_not_implemented(); return 0.; }
+  virtual Real linfty_norm () const override;
 
   virtual bool closed() const override { return _closed; }
 
