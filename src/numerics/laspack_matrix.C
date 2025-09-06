@@ -311,6 +311,39 @@ Real LaspackMatrix<T>::l1_norm () const
 
 
 template <typename T>
+Real LaspackMatrix<T>::linfty_norm () const
+{
+  const numeric_index_type n_rows = this->m();
+
+  Real max_row_sum = 0;
+
+  for (numeric_index_type row : make_range(n_rows))
+    {
+      Real row_sum = 0;
+
+      const numeric_index_type len = (_row_start[row+1] - _row_start[row]);
+
+      // Make sure we agree on the row length
+      libmesh_assert_equal_to (len, Q_GetLen(&_QMat, row+1));
+
+      for (numeric_index_type l=0; l<len; l++)
+        {
+          // Make sure the data structures are working
+          libmesh_assert_equal_to ((*(_row_start[row] + l)+1), Q_GetPos
+                                   (&_QMat, row+1, l));
+
+          row_sum += std::abs(Q_GetVal (&_QMat, row+1, l));
+        }
+
+      max_row_sum = std::max(max_row_sum, row_sum);
+    }
+
+  return max_row_sum;
+}
+
+
+
+template <typename T>
 void LaspackMatrix<T>::get_diagonal (NumericVector<T> & /*dest*/) const
 {
   libmesh_not_implemented();
