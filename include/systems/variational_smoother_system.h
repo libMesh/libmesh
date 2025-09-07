@@ -90,6 +90,7 @@ public:
                             const unsigned int number)
     : libMesh::FEMSystem(es, name, number),
       _epsilon_squared(TOLERANCE),
+      _epsilon_squared_assembly(0.),
       _ref_vol(0.),
       _dilation_weight(0.5),
       _untangling_solve(false)
