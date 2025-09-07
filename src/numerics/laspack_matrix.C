@@ -25,6 +25,7 @@
 #include "libmesh/laspack_matrix.h"
 #include "libmesh/dense_matrix.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/numeric_vector.h"
 #include "libmesh/sparsity_pattern.h"
 
 
@@ -344,17 +345,85 @@ Real LaspackMatrix<T>::linfty_norm () const
 
 
 template <typename T>
-void LaspackMatrix<T>::get_diagonal (NumericVector<T> & /*dest*/) const
+void LaspackMatrix<T>::get_diagonal (NumericVector<T> & dest) const
 {
-  libmesh_not_implemented();
+  const numeric_index_type n_rows = this->m();
+
+  dest.init(n_rows, n_rows);
+
+  for (numeric_index_type i : make_range(n_rows))
+    dest.set(i, Q_GetEl (const_cast<QMatrix*>(&_QMat), i+1, i+1));
 }
 
 
 
 template <typename T>
-void LaspackMatrix<T>::get_transpose (SparseMatrix<T> & /*dest*/) const
+void LaspackMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
 {
-  libmesh_not_implemented();
+  LaspackMatrix<T> & target = cast_ref<LaspackMatrix<T> &>(dest);
+  target.clear();
+
+  const numeric_index_type N = this->n();
+  libmesh_assert_equal_to(N, this->m());
+
+  std::vector<numeric_index_type> col_sizes(N);
+  for (numeric_index_type row : make_range(N))
+    {
+      const numeric_index_type len = (_row_start[row+1] - _row_start[row]);
+      auto r_start = _row_start[row];
+      for (numeric_index_type l=0; l<len; l++)
+        {
+          const numeric_index_type col = *(r_start + l);
+          ++col_sizes[col];
+        }
+    }
+
+  target._csr.resize(_csr.size());
+  target._row_start.resize(N+1);
+  std::vector<std::vector<numeric_index_type>::iterator> writeable_row_start(N+1);
+  writeable_row_start[0] = target._csr.begin();
+  target._row_start[0] = target._csr.begin();
+  for (numeric_index_type col: make_range(N))
+    {
+      writeable_row_start[col+1] = writeable_row_start[col] + col_sizes[col];
+      target._row_start[col+1] = target._row_start[col] + col_sizes[col];
+    }
+
+  std::vector<numeric_index_type> col_offsets;
+  // Reuse memory
+  col_offsets.swap(col_sizes);
+  std::fill(col_offsets.begin(), col_offsets.end(), 0);
+
+  Q_Constr(&target._QMat, const_cast<char *>("Mat"), N, _LPFalse, Rowws, Normal, _LPTrue);
+  target._is_initialized = true;
+
+  for (numeric_index_type row : make_range(N))
+    {
+      const numeric_index_type len = (_row_start[row+1] - _row_start[row]);
+      auto r_start = _row_start[row];
+      for (numeric_index_type l=0; l<len; l++)
+        {
+          const numeric_index_type col = *(r_start + l);
+          *(writeable_row_start[col]+col_offsets[col]) = row;
+          ++col_offsets[col];
+        }
+    }
+
+  for (numeric_index_type col : make_range(N))
+    {
+      auto len = col_offsets[col];
+      libmesh_assert_equal_to(target._row_start[col+1] -
+                              target._row_start[col], len);
+      Q_SetLen(&target._QMat, col+1, len);
+
+      auto rs = target._row_start[col];
+      for (numeric_index_type l : make_range(len))
+        {
+          const numeric_index_type j = *(rs+l);
+          const auto value = Q_GetEl(const_cast<QMatrix*>(&_QMat), j+1, col+1);
+          Q_SetEntry (&target._QMat, col+1, l, j+1, value);
+        }
+    }
 }
 
 
