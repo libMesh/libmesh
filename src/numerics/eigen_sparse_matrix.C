@@ -143,6 +143,8 @@ void EigenSparseMatrix<T>::get_diagonal (NumericVector<T> & dest_in) const
   EigenSparseVector<T> & dest = cast_ref<EigenSparseVector<T> &>(dest_in);
 
   dest._vec = _mat.diagonal();
+
+  dest.close();
 }
 
 
@@ -153,6 +155,9 @@ void EigenSparseMatrix<T>::get_transpose (SparseMatrix<T> & dest_in) const
   EigenSparseMatrix<T> & dest = cast_ref<EigenSparseMatrix<T> &>(dest_in);
 
   dest._mat = _mat.transpose();
+
+  dest._is_initialized = true;
+  dest._closed = true;
 }
 
 
