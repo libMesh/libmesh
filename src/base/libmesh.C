@@ -736,7 +736,8 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
       libMesh::err.rdbuf (nullptr);
 
   // Now that we've finished setting our stream buffers, let's wrap them (if they're non-null) in our thread-safe wrapper
-  install_thread_buffered_sync();
+  if (!libMesh::on_command_line ("--disable-thread-safe-output"))
+    install_thread_buffered_sync();
 
   // Check command line to override printing
   // of reference count information.
@@ -849,7 +850,8 @@ LibMeshInit::~LibMeshInit()
   libMeshPrivateData::_is_initialized = false;
 
   // Before resetting the stream buffers, let's remove our thread wrappers
-  uninstall_thread_buffered_sync();
+  if (!libMesh::on_command_line ("--disable-thread-safe-output"))
+    uninstall_thread_buffered_sync();
 
   if (libMesh::on_command_line ("--redirect-stdout") ||
       libMesh::on_command_line ("--redirect-output"))
