@@ -1056,14 +1056,12 @@ void PetscVector<T>::print_matlab (const std::string & name) const
   this->_restore_array();
   libmesh_assert (this->closed());
 
-
-  WrappedPetsc<PetscViewer> petsc_viewer;
-  LibmeshPetscCall(PetscViewerCreate (this->comm().get(), petsc_viewer.get()));
-
   // Create an ASCII file containing the matrix
   // if a filename was provided.
   if (name != "")
     {
+      WrappedPetsc<PetscViewer> petsc_viewer;
+
       LibmeshPetscCall(PetscViewerASCIIOpen(this->comm().get(),
                                             name.c_str(),
                                             petsc_viewer.get()));
