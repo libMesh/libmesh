@@ -1735,7 +1735,8 @@ UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
                                  bool use_binary_search,
                                  bool enforce_all_nodes_match_on_boundaries,
                                  bool merge_boundary_nodes_all_or_nothing,
-                                 bool remap_subdomain_ids)
+                                 bool remap_subdomain_ids,
+                                 bool prepare_after_stitching)
 {
   LOG_SCOPE("stitch_meshes()", "UnstructuredMesh");
   return stitching_helper(&other_mesh,
@@ -1748,7 +1749,8 @@ UnstructuredMesh::stitch_meshes (const MeshBase & other_mesh,
                           enforce_all_nodes_match_on_boundaries,
                           true,
                           merge_boundary_nodes_all_or_nothing,
-                          remap_subdomain_ids);
+                          remap_subdomain_ids,
+                          prepare_after_stitching);
 }
 
 
@@ -1760,7 +1762,8 @@ UnstructuredMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                                    bool verbose,
                                    bool use_binary_search,
                                    bool enforce_all_nodes_match_on_boundaries,
-                                   bool merge_boundary_nodes_all_or_nothing)
+                                   bool merge_boundary_nodes_all_or_nothing,
+                                   bool prepare_after_stitching)
 
 {
   return stitching_helper(nullptr,
@@ -1771,9 +1774,10 @@ UnstructuredMesh::stitch_surfaces (boundary_id_type boundary_id_1,
                           verbose,
                           use_binary_search,
                           enforce_all_nodes_match_on_boundaries,
-                          true,
+                          /* skip_find_neighbors = */ true,
                           merge_boundary_nodes_all_or_nothing,
-                          false);
+                          /* remap_subdomain_ids = */ false,
+                          prepare_after_stitching);
 }
 
 
@@ -1788,7 +1792,8 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                                     bool enforce_all_nodes_match_on_boundaries,
                                     bool skip_find_neighbors,
                                     bool merge_boundary_nodes_all_or_nothing,
-                                    bool remap_subdomain_ids)
+                                    bool remap_subdomain_ids,
+                                    bool prepare_after_stitching)
 {
 #ifdef DEBUG
   // We rely on neighbor links here
@@ -2550,13 +2555,21 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
         }
     }
 
-  const bool old_allow_find_neighbors = this->allow_find_neighbors();
-  const bool old_allow_remote_element_removal = this->allow_remote_element_removal();
-  this->allow_find_neighbors(!skip_find_neighbors);
-  this->allow_remote_element_removal(false);
-  this->prepare_for_use();
-  this->allow_find_neighbors(old_allow_find_neighbors);
-  this->allow_remote_element_removal(old_allow_remote_element_removal);
+  if (prepare_after_stitching)
+    {
+      // We set our new neighbor pointers already
+      const bool old_allow_find_neighbors = this->allow_find_neighbors();
+      this->allow_find_neighbors(!skip_find_neighbors);
+
+      // We haven't newly remoted any elements
+      const bool old_allow_remote_element_removal = this->allow_remote_element_removal();
+      this->allow_remote_element_removal(false);
+
+      this->prepare_for_use();
+
+      this->allow_find_neighbors(old_allow_find_neighbors);
+      this->allow_remote_element_removal(old_allow_remote_element_removal);
+    }
 
   // After the stitching, we may want to clear boundary IDs from element
   // faces that are now internal to the mesh

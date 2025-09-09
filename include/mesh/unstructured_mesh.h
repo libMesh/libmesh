@@ -214,6 +214,13 @@ public:
    * older libMesh behavior: leave all subdomain ids alone and woe
    * unto you if you weren't keeping track of them.
    *
+   * If \p prepare_after_stitching is true then we prepare the newly
+   * stitched mesh for use immediately after stitching.  If the mesh
+   * does not need to be completely prepared for use yet (e.g. because
+   * it will undergo further stitching etc. before repartitioning for
+   * load balancing is desired), this can be set to false to
+   * potentially improve performance.
+   *
    * \returns the count of how many nodes were merged between the two meshes.
    * This can be zero in the case of no matching nodes or if
    * \p merge_boundary_nodes_all_or_nothing was active and relevant.
@@ -227,7 +234,8 @@ public:
                              bool use_binary_search=true,
                              bool enforce_all_nodes_match_on_boundaries=false,
                              bool merge_boundary_nodes_all_or_nothing=false,
-                             bool remap_subdomain_ids=false);
+                             bool remap_subdomain_ids=false,
+                             bool prepare_after_stitching=true);
 
   /**
    * Similar to stitch_meshes, except that we stitch two adjacent surfaces within this mesh.
@@ -239,7 +247,8 @@ public:
                                bool verbose=true,
                                bool use_binary_search=true,
                                bool enforce_all_nodes_match_on_boundaries=false,
-                               bool merge_boundary_nodes_all_or_nothing=false);
+                               bool merge_boundary_nodes_all_or_nothing=false,
+                               bool prepare_after_stitching=true);
 
   /**
    * Deep copy of nodes and elements from another mesh object (used by
@@ -300,7 +309,8 @@ private:
                                 bool enforce_all_nodes_match_on_boundaries,
                                 bool skip_find_neighbors,
                                 bool merge_boundary_nodes_all_or_nothing,
-                                bool remap_subdomain_ids);
+                                bool remap_subdomain_ids,
+                                bool prepare_after_stitching);
 };
 
 
