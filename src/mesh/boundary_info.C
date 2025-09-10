@@ -1593,7 +1593,7 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
         while (searched_elem->parent() != nullptr)
         {
           const Elem * parent = searched_elem->parent();
-          if (parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+          if (search_on_side[side] && parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
             search_on_side[side] = false;
           searched_elem = parent;
         }
