@@ -1598,10 +1598,11 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
           searched_elem = parent;
         }
     }
-    // Now search on the top parent
-    for (const auto & pr : as_range(_boundary_side_id.equal_range(elem->top_parent())))
-      if (search_on_side[pr.second.first])
-        vec_to_fill[pr.second.first].push_back(pr.second.second);
+    // Now search on the top parent, only if we need to (element is not deep inside the top parent)
+    if (*std::max_element(search_on_side.begin(), search_on_side.end()))
+      for (const auto & pr : as_range(_boundary_side_id.equal_range(elem->top_parent())))
+        if (search_on_side[pr.second.first])
+          vec_to_fill[pr.second.first].push_back(pr.second.second);
     return;
   }
 
