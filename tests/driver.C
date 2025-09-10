@@ -116,11 +116,17 @@ int main(int argc, char ** argv)
   std::string deny_regex_string = "^$";
   deny_regex_string = libMesh::command_line_next("--deny_re", deny_regex_string);
 
+  // We might have to delete the test suite ourselves, after the
+  // runner has deleted whatever subtests it has.
+  std::unique_ptr<CppUnit::Test> owned_suite;
+
   // Recursively add tests matching the regex to the runner object.
   CppUnit::TextUi::TestRunner runner;
 
-  // The Cppunit registry object that knows about all the tests.
+  // The Cppunit registry object that knows about all the tests, and
+  // the test suite it creates.
   CppUnit::TestFactoryRegistry & registry = CppUnit::TestFactoryRegistry::getRegistry();
+  CppUnit::Test * suite = registry.makeTest();
 
   // A test suite container for holding tests not matching the regex. When main's
   // scope ends, this class's destructor will delete the rejected tests
@@ -134,15 +140,17 @@ int main(int argc, char ** argv)
   // Add all tests which match the re to the runner object.
   libMesh::out << "Will run the following tests:" << std::endl;
   const int n_tests_added =
-    add_matching_tests_to_runner(registry.makeTest(),
+    add_matching_tests_to_runner(suite,
                                  allow_regex_string, allow_regex,
                                  deny_regex_string, deny_regex,
                                  runner, rejects);
   if (n_tests_added >= 0)
     libMesh::out << "--- Running " << n_tests_added << " tests in total." << std::endl;
+  if (n_tests_added != -12345)
+    owned_suite.reset(suite);
 #else
   // If no C++11 <regex> just run all the tests.
-  runner.addTest(registry.makeTest());
+  runner.addTest(suite);
 #endif
 
   std::unique_ptr<CppUnit::TestResult> controller;
