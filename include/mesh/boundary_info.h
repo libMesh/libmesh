@@ -500,6 +500,13 @@ public:
                                    const unsigned short int side) const;
 
   /**
+   * \returns The list of boundary ids associated with any of the sides of
+   * element \p elem. Indexed by sides.
+   */
+  void boundary_ids (const Elem * const elem,
+                     std::vector<std::vector<boundary_id_type>> & vec_to_fill) const;
+
+  /**
    * \returns The list of boundary ids associated with the \p side side of
    * element \p elem.
    */
