@@ -653,8 +653,10 @@ public:
   /**
    * Adds sides to a sideset if every node on that side are in the same
    * sideset
+   * @param nodeset_list nodesets to build sidesets from.
+   *                     If empty (default), builds from all existing sidesets
    */
-  void build_side_list_from_node_list();
+  void build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list = {});
 
   /**
    * Creates a list of element numbers, sides, and ids for those sides.
