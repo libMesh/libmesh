@@ -24,7 +24,8 @@
   CPPUNIT_TEST(testReadMatlab1);             \
   CPPUNIT_TEST(testReadMatlab2);             \
   CPPUNIT_TEST(testReadMatlab4);             \
-  CPPUNIT_TEST(testReadHDF5);             \
+  CPPUNIT_TEST(testReadHDF5);                \
+  CPPUNIT_TEST(testTransposeNorms);          \
   CPPUNIT_TEST(testWriteAndRead);            \
   CPPUNIT_TEST(testClone);
 
@@ -144,6 +145,7 @@ public:
     testValues();
   }
 
+
   void testReadMatlab(const std::string & filename)
   {
     // Laspack doesn't handle non-square matrices)
@@ -203,6 +205,19 @@ public:
     CPPUNIT_ASSERT(matrix->l1_norm() == matrix2->l1_norm());
     CPPUNIT_ASSERT(matrix->linfty_norm() == matrix2->linfty_norm());
 #endif // LIBMESH_HAVE_HDF5
+  }
+
+
+  void testTransposeNorms()
+  {
+    LOG_UNIT_TEST;
+
+    setValues();
+
+    auto matrix2 = std::make_unique<DerivedClass>(*my_comm);
+    matrix->get_transpose(*matrix2);
+    LIBMESH_ASSERT_FP_EQUAL(matrix->l1_norm(), matrix2->linfty_norm(), _tolerance);
+    LIBMESH_ASSERT_FP_EQUAL(matrix2->l1_norm(), matrix->linfty_norm(), _tolerance);
   }
 
 
