@@ -1612,9 +1612,9 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
 #endif
 }
 
-void BoundaryInfo::boundary_ids (const Elem * const elem,
-                                 const unsigned short int side,
-                                 std::vector<boundary_id_type> & vec_to_fill) const
+void BoundaryInfo::side_boundary_ids (const Elem * const elem,
+                                      const unsigned short int side,
+                                      std::vector<boundary_id_type> & vec_to_fill) const
 {
   libmesh_assert(elem);
 
