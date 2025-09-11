@@ -2612,7 +2612,7 @@ void BoundaryInfo::parallel_sync_node_ids()
        node_id_action_functor, datum_type_ex);
 }
 
-void BoundaryInfo::build_side_list_from_node_list()
+void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list)
 {
   // Check for early return
   if (_boundary_node_id.empty())
@@ -2638,7 +2638,8 @@ void BoundaryInfo::build_side_list_from_node_list()
         // nodeset ID count
         for (const auto & node : side_elem->node_ref_range())
           for (const auto & pr : as_range(_boundary_node_id.equal_range(&node)))
-            nodesets_node_count[pr.second]++;
+            if (nodeset_list.empty() || nodeset_list.count(pr.second))
+              nodesets_node_count[pr.second]++;
 
         // Now check to see what nodeset_counts have the correct
         // number of nodes in them.  For any that do, add this side to
