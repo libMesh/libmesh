@@ -641,7 +641,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(5), container[1]);
 
       std::vector<std::vector<boundary_id_type>> all_bids_container;
-      bi.boundary_ids(elem, all_bids_container);
+      bi.side_boundary_ids(elem, all_bids_container);
       CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(elem->n_sides()), all_bids_container.size());
       CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), all_bids_container[3].size());
       CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), all_bids_container[3][0]);
@@ -818,7 +818,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), container[1]);
 
         std::vector<std::vector<boundary_id_type>> all_bids_container;
-        bi.boundary_ids(elem, all_bids_container);
+        bi.side_boundary_ids(elem, all_bids_container);
         CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(elem->n_sides()), all_bids_container.size());
         CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), all_bids_container[3].size());
         CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(5), all_bids_container[3][0]);
@@ -827,7 +827,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(2), all_bids_container[2][0]);
         // This is against the spirit of the test, but harmless
         bi.allow_children_on_boundary_side(false);
-        bi.boundary_ids(elem, all_bids_container);
+        bi.side_boundary_ids(elem, all_bids_container);
         CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(elem->n_sides()), all_bids_container.size());
         CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[3].size());
         CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), all_bids_container[3][0]);

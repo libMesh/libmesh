@@ -1523,8 +1523,8 @@ bool BoundaryInfo::has_boundary_id(const Elem * const elem,
 }
 
 
-void BoundaryInfo::boundary_ids (const Elem * const elem,
-                                 std::vector<std::vector<boundary_id_type>> & vec_to_fill) const
+void BoundaryInfo::side_boundary_ids (const Elem * const elem,
+                                      std::vector<std::vector<boundary_id_type>> & vec_to_fill) const
 {
   libmesh_assert(elem);
 
