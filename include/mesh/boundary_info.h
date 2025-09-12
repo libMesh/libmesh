@@ -387,6 +387,14 @@ public:
   void renumber_id (boundary_id_type old_id, boundary_id_type new_id);
 
   /**
+   * Checks for existing nodeset that matches with this sideset
+   */
+
+  bool has_equivalent_nodeset(const Elem * side, boundary_id_type bc_id);
+
+  void add_equivalent_sideset(boundary_id_type bc_id) {_sideset_to_nodeset_conversion.insert(bc_id); }
+
+  /**
    * \returns The number of user-specified boundary ids on the
    * semilocal part of the mesh.
    *
@@ -1045,6 +1053,11 @@ private:
    * This only contains information related to this process's local and ghosted elements
    */
   std::set<boundary_id_type> _node_boundary_ids;
+
+  /**
+   * Set of sideset that are equivalent to their corresponding nodeset
+   */
+  std::set<boundary_id_type> _sideset_to_nodeset_conversion;
 
   /**
    * Set of user-specified boundary IDs for shellfaces *only*.
