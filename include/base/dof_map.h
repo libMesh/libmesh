@@ -572,17 +572,17 @@ public:
     return _sp.get();
   }
 
-  // /**
-  //  * Add an unknown of order \p order and finite element type
-  //  * \p type to the system of equations.
-  //  */
-  // void add_variable (const Variable & var);
+  /**
+   * Add our knowledge of variables and their groups
+   */
+  void
+  add_variables_and_groups(const std::vector<Variable> & variables, const std::vector<VariableGroup> & variable_groups, PassKey<System>);
 
   /**
-   * Add a group of unknowns of order \p order and finite element type
-   * \p type to the system of equations.
+   * Add knowledge of array variables
    */
-  void add_variable_group (VariableGroup var_group);
+  void add_array_variables(const std::vector<ArrayVariableBlock> & array_variables)
+  { this->_array_variables = &array_variables; }
 
   /**
    * Specify whether or not we perform an extra (opt-mode enabled) check
@@ -630,10 +630,10 @@ public:
    * Stokes (u,v,p), etc...
    */
   unsigned int n_variable_groups() const
-  { return cast_int<unsigned int>(_variable_groups.size()); }
+  { libmesh_assert(_variable_groups); return cast_int<unsigned int>(_variable_groups->size()); }
 
   unsigned int n_variables() const override
-  { return cast_int<unsigned int>(_variables.size()); }
+  { libmesh_assert(_variables); return cast_int<unsigned int>(_variables->size()); }
 
   /**
    * \returns The variable group number that the provided variable number belongs to
@@ -730,6 +730,26 @@ public:
                     std::vector<dof_id_type> & di,
                     const unsigned int vn,
                     int p_level = -12345) const override;
+
+  /**
+   * Fills the vector \p di with the global degree of freedom indices
+   * for the element. This will aggregate all the degrees of the freedom
+   * from the variable array that \p vn is a member of, and potentially for a
+   * non-default element p refinement level
+   */
+  void array_dof_indices(const Elem * const elem,
+                         std::vector<dof_id_type> & di,
+                         const unsigned int vn,
+                         int p_level = -12345) const;
+
+  void array_dof_indices(const Node * const node,
+                         std::vector<dof_id_type> & di,
+                         const unsigned int vn) const;
+
+  template <typename DofIndicesFunctor>
+  void array_dof_indices(const DofIndicesFunctor & functor,
+                         std::vector<dof_id_type> & di,
+                         const unsigned int vn) const;
 
   /**
    * Retrieves degree of freedom indices for a given \p elem and then performs actions for these
@@ -1688,6 +1708,13 @@ public:
 private:
 
   /**
+   * Retrieve the array variable bounds for a given variable \p vi. This variable may
+   * lie anywhere within an array variable range
+   */
+  std::pair<unsigned int, unsigned int>
+  get_variable_array(unsigned int vi) const;
+
+  /**
    * Helper function that gets the dof indices on the current element
    * for a non-SCALAR type variable, where the variable is identified
    * by its variable group number \p vg and its offset \p vig from the
@@ -1947,14 +1974,14 @@ private:
   bool _constrained_sparsity_construction;
 
   /**
-   * The finite element type for each variable.
+   * The individual variables
    */
-  std::vector<Variable> _variables;
+  const std::vector<Variable> * _variables = nullptr;
 
   /**
-   * The finite element type for each variable group.
+   * The groups of variables
    */
-  std::vector<VariableGroup> _variable_groups;
+  const std::vector<VariableGroup> * _variable_groups = nullptr;
 
   /**
    * The variable group number for each variable.
@@ -2173,6 +2200,9 @@ private:
 
   /// Static condensation class
   std::unique_ptr<StaticCondensationDofMap> _sc;
+
+  /// Pointer to array variable information held by the \p System
+  const std::vector<ArrayVariableBlock> * _array_variables = nullptr;
 };
 
 
@@ -2189,9 +2219,10 @@ unsigned int DofMap::sys_number() const
 inline
 const VariableGroup & DofMap::variable_group (const unsigned int g) const
 {
-  libmesh_assert_less (g, _variable_groups.size());
+  libmesh_assert(_variable_groups);
+  libmesh_assert_less (g, _variable_groups->size());
 
-  return _variable_groups[g];
+  return (*_variable_groups)[g];
 }
 
 
@@ -2199,9 +2230,10 @@ const VariableGroup & DofMap::variable_group (const unsigned int g) const
 inline
 const Variable & DofMap::variable (const unsigned int c) const
 {
-  libmesh_assert_less (c, _variables.size());
+  libmesh_assert(_variables);
+  libmesh_assert_less (c, _variables->size());
 
-  return _variables[c];
+  return (*_variables)[c];
 }
 
 
@@ -2209,9 +2241,10 @@ const Variable & DofMap::variable (const unsigned int c) const
 inline
 Order DofMap::variable_order (const unsigned int c) const
 {
-  libmesh_assert_less (c, _variables.size());
+  libmesh_assert(_variables);
+  libmesh_assert_less (c, _variables->size());
 
-  return _variables[c].type().order;
+  return (*_variables)[c].type().order;
 }
 
 
@@ -2219,9 +2252,10 @@ Order DofMap::variable_order (const unsigned int c) const
 inline
 Order DofMap::variable_group_order (const unsigned int vg) const
 {
-  libmesh_assert_less (vg, _variable_groups.size());
+  libmesh_assert(_variable_groups);
+  libmesh_assert_less (vg, _variable_groups->size());
 
-  return _variable_groups[vg].type().order;
+  return (*_variable_groups)[vg].type().order;
 }
 
 
@@ -2229,9 +2263,10 @@ Order DofMap::variable_group_order (const unsigned int vg) const
 inline
 const FEType & DofMap::variable_type (const unsigned int c) const
 {
-  libmesh_assert_less (c, _variables.size());
+  libmesh_assert(_variables);
+  libmesh_assert_less (c, _variables->size());
 
-  return _variables[c].type();
+  return (*_variables)[c].type();
 }
 
 
@@ -2239,9 +2274,10 @@ const FEType & DofMap::variable_type (const unsigned int c) const
 inline
 const FEType & DofMap::variable_group_type (const unsigned int vg) const
 {
-  libmesh_assert_less (vg, _variable_groups.size());
+  libmesh_assert(_variable_groups);
+  libmesh_assert_less (vg, _variable_groups->size());
 
-  return _variable_groups[vg].type();
+  return (*_variable_groups)[vg].type();
 }
 
 
@@ -2700,6 +2736,74 @@ StaticCondensationDofMap & DofMap::get_static_condensation()
 {
   libmesh_assert(_sc);
   return *_sc;
+}
+
+inline std::pair<unsigned int, unsigned int>
+DofMap::get_variable_array(const unsigned int vi) const
+{
+  auto it = std::upper_bound(
+      _array_variables->begin(),
+      _array_variables->end(),
+      vi,
+      [](unsigned int value, const ArrayVariableBlock & b) { return value < b.begin; });
+
+  libmesh_assert_msg(it != _array_variables->begin(),
+                     "Passed in " << std::to_string(vi) << " is not in any of our array variables");
+  --it;
+  libmesh_assert_msg(vi < it->end,
+                     "Passed in " << std::to_string(vi) << " is not in any of our array variables");
+  return {it->begin, it->end};
+}
+
+template <typename DofIndicesFunctor>
+void DofMap::array_dof_indices(const DofIndicesFunctor & functor,
+                               std::vector<dof_id_type> & di,
+                               const unsigned int vn) const
+{
+  libmesh_assert(this->_array_variables);
+  const auto [begin, end] = this->get_variable_array(vn);
+  functor(di, begin);
+
+  const unsigned int count = end - begin;
+  // We make count, which could be >> ntest, the inner index in hopes of vectorization
+  if (count > 1)
+    {
+      static thread_local std::vector<dof_id_type> work_dof_indices;
+      work_dof_indices = di;
+      const dof_id_type component_size = di.size();
+      di.resize(count * component_size);
+
+      const auto pack_container =
+          [&di, component_size, count](const unsigned int j,
+                                       const std::vector<dof_id_type> & j_dof_indices,
+                                       const unsigned int stride) {
+            libmesh_assert_msg(
+                &j_dof_indices != &di,
+                "You are asking to write over the dof index container as you're reading from it!");
+            libmesh_assert(j_dof_indices.size() == component_size);
+            for (const auto i : make_range(component_size))
+              di[i * count + j] = j_dof_indices[i] + stride * j;
+          };
+      pack_container(0, work_dof_indices, 0);
+
+      const auto & fe_type = (*_variable_groups)[libmesh_map_find(_var_to_vg, vn)].type();
+      if (const bool lagrange = fe_type.family == LAGRANGE;
+          lagrange || (FEInterface::get_continuity(fe_type) == DISCONTINUOUS))
+        {
+          const auto stride = lagrange ? 1 : component_size;
+          for (const auto j : make_range((unsigned int)1, count))
+            pack_container(j, work_dof_indices, stride);
+        }
+      else
+        {
+          unsigned int j = 1;
+          for (const auto i : make_range(begin + 1, end))
+            {
+              functor(work_dof_indices, i);
+              pack_container(j++, work_dof_indices, 0);
+            }
+        }
+    }
 }
 
 } // namespace libMesh

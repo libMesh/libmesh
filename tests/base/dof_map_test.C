@@ -68,6 +68,8 @@ public:
   CPPUNIT_TEST( testConstraintLoopDetection );
 #endif
 
+  CPPUNIT_TEST( testArrayDofIndices );
+
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -189,6 +191,46 @@ public:
     CPPUNIT_ASSERT_THROW_MESSAGE("Constraint loop not detected", es.init(), libMesh::LogicError);
   }
 #endif
+
+  void testArrayDofIndicesWithType(const FEType & fe_type)
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    auto & sys = es.add_system<System>("SimpleSystem");
+    const auto last_var = sys.add_variable_array({"u0", "u1"}, fe_type);
+    MeshTools::Generation::build_square (mesh,1,1,-1., 1.,-1., 1., QUAD9);
+    es.init();
+    auto & dof_map = sys.get_dof_map();
+    const auto * const elem = mesh.query_elem_ptr(0);
+    if (elem)
+    {
+      std::vector<dof_id_type> array_dofs, work_dofs, dofs;
+      dof_map.array_dof_indices(elem, array_dofs, last_var);
+      // Make sure there are no duplicates
+      std::sort(array_dofs.begin(), array_dofs.end());
+      auto it = std::unique(array_dofs.begin(), array_dofs.end());
+      array_dofs.erase(it, array_dofs.end());
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(dof_map.n_dofs()), array_dofs.size());
+      dof_map.dof_indices(elem, work_dofs, last_var);
+      dofs = work_dofs;
+      dof_map.dof_indices(elem, work_dofs, last_var - 1);
+      dofs.insert(dofs.end(), work_dofs.begin(), work_dofs.end());
+      std::sort(dofs.begin(), dofs.end());
+      CPPUNIT_ASSERT(array_dofs == dofs);
+    }
+  }
+
+  void testArrayDofIndices()
+  {
+    LOG_UNIT_TEST;
+    for (int i = 1; i < 3; ++i)
+    {
+      testArrayDofIndicesWithType({i, LAGRANGE});
+      testArrayDofIndicesWithType({i, HIERARCHIC});
+      testArrayDofIndicesWithType({i, MONOMIAL});
+      testArrayDofIndicesWithType({i, L2_LAGRANGE});
+    }
+  }
 
 };
 
