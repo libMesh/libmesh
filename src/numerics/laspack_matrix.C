@@ -412,8 +412,8 @@ void LaspackMatrix<T>::get_transpose (SparseMatrix<T> & dest) const
   for (numeric_index_type col : make_range(N))
     {
       auto len = col_offsets[col];
-      libmesh_assert_equal_to(target._row_start[col+1] -
-                              target._row_start[col], len);
+      libmesh_assert(target._row_start[col] + len ==
+                     target._row_start[col+1]);
       Q_SetLen(&target._QMat, col+1, len);
 
       auto rs = target._row_start[col];
