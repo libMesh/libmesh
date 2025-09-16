@@ -70,11 +70,11 @@ function check_autotool_prerequisites ()
             libtool_version=$($libtool --version 2>&1 | grep "(GNU libtool)")
 
             case "$libtool_version" in
-                *2.4* | *2.2*)
+                *2.5* | *2.4* | *2.2*)
                     echo "Using libtool ($libtool_version)"
                     ;;
                 *)
-                    echo "Indaequate Libtool ($libtool_version), building a new one..."
+                    echo "Inadequate Libtool ($libtool_version), building a new one..."
                     build_autotools=1
             esac
         else
@@ -92,7 +92,7 @@ function check_autotool_prerequisites ()
             if test $automake_minor_version -lt $automake_minor; then
                 echo "Automake Version $automake_major.$automake_minor_version too old, building a new one..."
                 build_autotools=1
-            else
+            elif test $automake_minor_version -eq $automake_minor; then
                 automake_subminor_version=$($automake --version | grep " $automake_major\." | cut -d"." -f3)
                 version_id=$($automake --version 2>&1 | grep "(GNU automake)")
                 if test $automake_subminor_version -lt $automake_subminor; then
@@ -141,7 +141,7 @@ if test "$build_autotools" = "1"; then
     # set the path to use the new tools as they are installed.
     # for example, the new autoconf is needed to build automake.
         PATH=$autotools_distdir/bin:$PATH
-        for tool in autoconf-2.71 automake-1.16.5 libtool-2.4.7 ; do
+        for tool in autoconf-2.72 automake-1.18.1 libtool-2.5.4 ; do
             cd $autotools_distdir
             echo "  building $tool in $autotools_distdir"
             tar zxf $tool.tar.gz
