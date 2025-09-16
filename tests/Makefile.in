@@ -2298,7 +2298,8 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	utils/point_locator_test.C utils/rb_parameters_test.C \
 	utils/transparent_comparator.C utils/vectormap_test.C \
 	utils/xdr_test.C $(am__append_1)
-data = matrices/geom_1_extraction_op.m \
+data = matrices/geom_1_extraction_op.h5 \
+       matrices/geom_1_extraction_op.m \
        matrices/geom_1_extraction_op.m.gz \
        matrices/geom_2_extraction_op.m \
        matrices/geom_2_extraction_op.m.gz \
