@@ -1,3 +1,17 @@
+1.8.1 -> 1.8.2
+  * Allow std::set Parameter instances.
+  * Avoid out of bounds access w/ operator[] and assert correctness.
+  * Update doxygen for max_node_id/max_elem_id.
+  * Fix institutional links and other for developer info.
+  * Fix CheckpointIO constructor-from-const-mesh.
+  * Fix XDRIO constructor-from-const-mesh.
+  * Make MeshBase::write() const.
+  * Allow Exodus/Nemesis writing with const Mesh.
+  * Don't look for 2D sides of a 2D element.
+  * Fix quadratic element issue in TriangulatorInterface.
+  * Fix double-creation of PetscViewers.
+  * Add unit test to cover previously-broken read().
+  * Add/use Utility::contains(), Utility::ends_with() to fix filename extension parsing bugs.
 1.8.0 -> 1.8.1
   * Don't let GMSH physicals overwrite each other (#4128)
   * Fix netgen build: Remove old netgen buildstamp with old build dir (#4134)
