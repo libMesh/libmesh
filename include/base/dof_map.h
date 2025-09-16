@@ -2768,23 +2768,19 @@ void DofMap::array_dof_indices(const DofIndicesFunctor & functor,
   // We make count, which could be >> ntest, the inner index in hopes of vectorization
   if (count > 1)
     {
-      static thread_local std::vector<dof_id_type> work_dof_indices;
-      work_dof_indices = di;
       const dof_id_type component_size = di.size();
       di.resize(count * component_size);
 
-      const auto pack_container =
-          [&di, component_size, count](const unsigned int j,
-                                       const std::vector<dof_id_type> & j_dof_indices,
-                                       const unsigned int stride) {
-            libmesh_assert_msg(
-                &j_dof_indices != &di,
-                "You are asking to write over the dof index container as you're reading from it!");
-            libmesh_assert(j_dof_indices.size() == component_size);
-            for (const auto i : make_range(component_size))
-              di[i * count + j] = j_dof_indices[i] + stride * j;
-          };
-      pack_container(0, work_dof_indices, 0);
+      const auto pack_container = [&di,
+                                   component_size](const unsigned int j,
+                                                   const std::vector<dof_id_type> & j_dof_indices,
+                                                   const unsigned int stride) {
+        if (&j_dof_indices != &di)
+          libmesh_assert(j_dof_indices.size() == component_size);
+        for (const auto i : make_range(component_size))
+          di[j * component_size + i] = j_dof_indices[i] + stride * j;
+      };
+      pack_container(0, di, 0);
 
       const auto & fe_type = (*_variable_groups)[libmesh_map_find(_var_to_vg, vn)].type();
       if (const bool lagrange = fe_type.family == LAGRANGE;
@@ -2792,10 +2788,11 @@ void DofMap::array_dof_indices(const DofIndicesFunctor & functor,
         {
           const auto stride = lagrange ? 1 : component_size;
           for (const auto j : make_range((unsigned int)1, count))
-            pack_container(j, work_dof_indices, stride);
+            pack_container(j, di, stride);
         }
       else
         {
+          static thread_local std::vector<dof_id_type> work_dof_indices;
           unsigned int j = 1;
           for (const auto i : make_range(begin + 1, end))
             {
