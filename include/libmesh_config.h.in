@@ -343,11 +343,11 @@
 /* Flag indicating whether compiler supports std::*::merge */
 #undef HAVE_CXX17_SPLICING
 
-/* Define to 1 if you have the declaration of `sigaction', and to 0 if you
+/* Define to 1 if you have the declaration of 'sigaction', and to 0 if you
    don't. */
 #undef HAVE_DECL_SIGACTION
 
-/* Define to 1 if you have the declaration of `_mkdir', and to 0 if you don't.
+/* Define to 1 if you have the declaration of '_mkdir', and to 0 if you don't.
    */
 #undef HAVE_DECL__MKDIR
 
@@ -410,7 +410,7 @@
 /* Flag indicating if the library should be built with calls to getpwuid() */
 #undef HAVE_GETPWUID
 
-/* Define to 1 if you have the `gettimeofday' function. */
+/* Define to 1 if you have the 'gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
 
 /* define if the compiler supports glibc backtrace */
@@ -455,7 +455,7 @@
 /* "The make directory command" */
 #undef HAVE_MKDIR
 
-/* Define to 1 if you have the `mkstemp' function. */
+/* Define to 1 if you have the 'mkstemp' function. */
 #undef HAVE_MKSTEMP
 
 /* Flag indicating whether or not MPI is available */
@@ -725,34 +725,34 @@
 /* Flag indicating if the library should keep names in libMesh namespace */
 #undef REQUIRE_SEPARATE_NAMESPACE
 
-/* The size of `double', as computed by sizeof. */
+/* The size of 'double', as computed by sizeof. */
 #undef SIZEOF_DOUBLE
 
-/* The size of `float', as computed by sizeof. */
+/* The size of 'float', as computed by sizeof. */
 #undef SIZEOF_FLOAT
 
-/* The size of `function_pointer', as computed by sizeof. */
+/* The size of 'function_pointer', as computed by sizeof. */
 #undef SIZEOF_FUNCTION_POINTER
 
-/* The size of `int', as computed by sizeof. */
+/* The size of 'int', as computed by sizeof. */
 #undef SIZEOF_INT
 
-/* The size of `long int', as computed by sizeof. */
+/* The size of 'long int', as computed by sizeof. */
 #undef SIZEOF_LONG_INT
 
-/* The size of `short int', as computed by sizeof. */
+/* The size of 'short int', as computed by sizeof. */
 #undef SIZEOF_SHORT_INT
 
-/* The size of `size_t', as computed by sizeof. */
+/* The size of 'size_t', as computed by sizeof. */
 #undef SIZEOF_SIZE_T
 
-/* The size of `unsigned int', as computed by sizeof. */
+/* The size of 'unsigned int', as computed by sizeof. */
 #undef SIZEOF_UNSIGNED_INT
 
-/* The size of `void *', as computed by sizeof. */
+/* The size of 'void *', as computed by sizeof. */
 #undef SIZEOF_VOID_P
 
-/* Define to 1 if all of the C90 standard headers exist (not just the ones
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
