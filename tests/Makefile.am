@@ -354,6 +354,7 @@ CLEANFILES = cube_mesh.xda \
              read_header_test.e \
              output.dat \
              periodic.e \
+             M.m \
              mesh.out.memory.moved.xda \
              mesh.out.file.moved.xda \
              repl_with_nodal_soln.nem.1.0 \
