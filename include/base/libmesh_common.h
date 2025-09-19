@@ -666,6 +666,12 @@ static constexpr std::size_t libmesh_dim = LIBMESH_DIM;
 #define libmesh_fallthrough() ((void) 0)
 #endif
 
+template <typename T>
+class PassKey
+{
+  friend T;
+  constexpr PassKey() = default;
+};
 } // namespace libMesh
 
 

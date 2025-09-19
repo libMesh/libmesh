@@ -1151,16 +1151,31 @@ public:
                              const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
   /**
-   * Adds the variable \p var to the list of variables
+   * Adds the variables \p vars to the list of variables
    * for this system. If \p active_subdomains is either \p nullptr
    * (the default) or points to an empty set, then it will be assumed that
-   * \p var has no subdomain restrictions
+   * the \p vars have no subdomain restrictions
    *
-   * \returns The index number for the new variable.
+   * \returns The index number for the last of the new variables.
    */
   unsigned int add_variables (const std::vector<std::string> & vars,
                               const FEType & type,
                               const std::set<subdomain_id_type> * const active_subdomains = nullptr);
+
+  /**
+   * Adds variables \p vars to the list of variables
+   * for this system. If \p active_subdomains is either \p nullptr
+   * (the default) or points to an empty set, then it will be assumed that
+   * the \p vars have no subdomain restrictions. This API will end up
+   * calling \p this->add_variables(). However, we will additionally store data
+   * that can be leveraged by the \p DofMap to build degrees of freedom
+   * containers corresponding to all the variables in this variable array
+   *
+   * \returns The index number for the last of the new variables.
+   */
+  unsigned int add_variable_array (const std::vector<std::string> & vars,
+                                   const FEType & type,
+                                   const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -2173,6 +2188,16 @@ private:
   QOIDerivative * _qoi_evaluate_derivative_object;
 
   /**
+   * The \p Variable in this \p System.
+   */
+  std::vector<Variable> _variables;
+
+  /**
+   * The \p VariableGroup in this \p System.
+   */
+  std::vector<VariableGroup> _variable_groups;
+
+  /**
    * Data structure describing the relationship between
    * nodes, variables, etc... and degrees of freedom.
    */
@@ -2199,16 +2224,6 @@ private:
    * The number associated with this system
    */
   const unsigned int _sys_number;
-
-  /**
-   * The \p Variable in this \p System.
-   */
-  std::vector<Variable> _variables;
-
-  /**
-   * The \p VariableGroup in this \p System.
-   */
-  std::vector<VariableGroup> _variable_groups;
 
   /**
    * The variable numbers corresponding to user-specified
@@ -2332,6 +2347,11 @@ private:
    * Whether we are name prefixing solver options
    */
   bool _prefix_with_name;
+
+  /**
+   * Array variable information storage
+   */
+  std::vector<ArrayVariableBlock> _array_variables;
 };
 
 
@@ -2732,7 +2752,6 @@ System::prefer_hash_table_matrix_assembly(const bool preference)
       "System::prefer_hash_table_matrix_assembly() should be called before matrices are initialized");
   _prefer_hash_table_matrix_assembly = preference;
 }
-
 } // namespace libMesh
 
 #endif // LIBMESH_SYSTEM_H

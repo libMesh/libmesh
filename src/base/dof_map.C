@@ -40,6 +40,7 @@
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
 #include "libmesh/static_condensation_dof_map.h"
+#include "libmesh/system.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -242,33 +243,6 @@ void DofMap::set_error_on_constraint_loop(bool error_on_constraint_loop)
 {
   _error_on_constraint_loop = error_on_constraint_loop;
 }
-
-
-
-void DofMap::add_variable_group (VariableGroup var_group)
-{
-  // Ensure that we are not duplicating an existing entry in _variable_groups
-  if (std::find(_variable_groups.begin(), _variable_groups.end(), var_group) == _variable_groups.end())
-  {
-   const unsigned int vg = cast_int<unsigned int>(_variable_groups.size());
-
-   _variable_groups.push_back(std::move(var_group));
-
-    VariableGroup & new_var_group = _variable_groups.back();
-
-    for (auto var : make_range(new_var_group.n_variables()))
-    {
-      auto var_instance = new_var_group(var);
-      const auto vn = var_instance.number();
-      _variables.push_back (std::move(var_instance));
-      _variable_group_numbers.push_back (vg);
-      _var_to_vg.emplace(vn, vg);
-    }
-  }
-  // End if check for var_group in _variable_groups
-
-}
-
 
 
 void DofMap::attach_matrix (SparseMatrix<Number> & matrix)
@@ -946,10 +920,11 @@ void DofMap::clear()
 
   this->_shared_functors.clear();
 
-  _variables.clear();
-  _variable_groups.clear();
+  _variables = nullptr;
+  _variable_groups = nullptr;
   _var_to_vg.clear();
   _variable_group_numbers.clear();
+  _array_variables = nullptr;
   _first_scalar_df.clear();
   this->clear_send_list();
   this->clear_sparsity();
@@ -1972,9 +1947,11 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & /*mesh*/) const
   {
     bool all_discontinuous_dofs = true;
 
-    for (auto var : make_range(this->n_variables()))
-      if (FEInterface::get_continuity(this->variable_type(var)) !=  DISCONTINUOUS)
-        all_discontinuous_dofs = false;
+    // We may call this method even without ever having initialized our data
+    if (this->_variables)
+      for (auto var : index_range((*this->_variables)))
+        if (FEInterface::get_continuity(this->variable_type(var)) !=  DISCONTINUOUS)
+          all_discontinuous_dofs = false;
 
     if (all_discontinuous_dofs)
       implicit_neighbor_dofs = true;
@@ -2362,6 +2339,29 @@ void DofMap::dof_indices (const Elem * const elem,
          std::vector<dof_id_type> & dof_indices,
          const dof_id_type dof) { dof_indices.push_back(dof); },
       p_level);
+}
+
+void DofMap::array_dof_indices(const Elem * const elem,
+                               std::vector<dof_id_type> & di,
+                               const unsigned int vn,
+                               int p_level) const
+{
+  auto dof_indices_functor = [elem, p_level, this](std::vector<dof_id_type> & functor_di,
+                                                   const unsigned int functor_vn) {
+    this->dof_indices(elem, functor_di, functor_vn, p_level);
+  };
+  this->array_dof_indices(dof_indices_functor, di, vn);
+}
+
+void DofMap::array_dof_indices(const Node * const node,
+                               std::vector<dof_id_type> & di,
+                               const unsigned int vn) const
+{
+  auto dof_indices_functor = [node, this](std::vector<dof_id_type> & functor_di,
+                                          const unsigned int functor_vn) {
+    this->dof_indices(node, functor_di, functor_vn);
+  };
+  this->array_dof_indices(dof_indices_functor, di, vn);
 }
 
 void DofMap::dof_indices (const Node * const node,
@@ -3146,6 +3146,24 @@ void DofMap::reinit_static_condensation()
 {
   if (_sc)
     _sc->reinit();
+}
+
+void DofMap::add_variables_and_groups(const std::vector<Variable> & variables,
+                                      const std::vector<VariableGroup> & variable_groups,
+                                      PassKey<System>)
+{
+  this->_variables = &variables;
+  this->_variable_groups = &variable_groups;
+
+  for (const auto vg : index_range(variable_groups))
+    {
+      const auto & var_group = variable_groups[vg];
+      for (const auto vi : make_range(var_group.n_variables()))
+        {
+          _variable_group_numbers.push_back(vg);
+          _var_to_vg.emplace(var_group.number(vi), vg);
+        }
+    }
 }
 
 template LIBMESH_EXPORT bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;

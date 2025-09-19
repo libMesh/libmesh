@@ -211,16 +211,11 @@ void System::init_data ()
 
   MeshBase & mesh = this->get_mesh();
 
-  // Add all variable groups to our underlying DofMap
-  unsigned int n_dof_map_vg = _dof_map->n_variable_groups();
-  for (auto vg : make_range(this->n_variable_groups()))
-    {
-      const VariableGroup & group = this->variable_group(vg);
-      if (vg < n_dof_map_vg)
-        libmesh_assert(group == _dof_map->variable_group(vg));
-      else
-        _dof_map->add_variable_group(group);
-    }
+  // Add all variables and variable groups and to our underlying DofMap
+  _dof_map->add_variables_and_groups(_variables, _variable_groups, {});
+
+  // Add our array variables to the underlying DofMap
+  _dof_map->add_array_variables(_array_variables);
 
   // Distribute the degrees of freedom on the mesh
   auto total_dofs = _dof_map->distribute_dofs (mesh);
@@ -1597,7 +1592,16 @@ unsigned int System::add_variables (const std::vector<std::string> & vars,
                              active_subdomains);
 }
 
-
+unsigned int System::add_variable_array (const std::vector<std::string> & vars,
+                                         const FEType & type,
+                                         const std::set<subdomain_id_type> * const active_subdomains)
+{
+  const unsigned int count = cast_int<unsigned int>(vars.size());
+  const unsigned int last_var = this->add_variables(vars, type, active_subdomains);
+  const unsigned int first_var = last_var + 1 - count;
+  _array_variables.push_back({first_var, first_var + count});
+  return last_var;
+}
 
 bool System::has_variable (std::string_view var) const
 {
