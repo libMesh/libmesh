@@ -224,15 +224,6 @@ bool DofMap::is_periodic_boundary (const boundary_id_type boundaryid) const
 
 #endif
 
-
-
-// void DofMap::add_variable (const Variable & var)
-// {
-//   libmesh_not_implemented();
-//   _variables.push_back (var);
-// }
-
-
 void DofMap::set_error_on_cyclic_constraint(bool error_on_cyclic_constraint)
 {
   // This function will eventually be officially libmesh_deprecated();
@@ -3207,7 +3198,7 @@ unsigned int DofMap::add_variable(System & sys,
       // and then consider the conditions which should negate it.
       bool should_be_in_vg = this->identify_variable_groups();
 
-      VariableGroup & vg(_variable_groups.back());
+      VariableGroup & vg = _variable_groups.back();
 
       // get a pointer to their subdomain restriction, if any.
       const std::set<subdomain_id_type> * const their_active_subdomains(
@@ -3235,15 +3226,18 @@ unsigned int DofMap::add_variable(System & sys,
       // were violated
       if (should_be_in_vg)
         {
-          const unsigned int curr_n_vars = this->n_vars();
+          const unsigned int vn = this->n_vars();
 
           std::string varstr(var);
 
-          _variable_numbers[varstr] = curr_n_vars;
+          _variable_numbers[varstr] = vn;
           vg.append(std::move(varstr));
           _variables.push_back(vg(vg.n_variables() - 1));
+          const unsigned int vgn = _variable_groups.size() - 1;
+          _variable_group_numbers.push_back(vgn);
+          _var_to_vg.emplace(vn, vgn);
 
-          return curr_n_vars;
+          return vn;
         }
     }
 
@@ -3295,7 +3289,7 @@ unsigned int DofMap::add_variables(System & sys,
       // and then consider the conditions which should negate it.
       bool should_be_in_vg = this->identify_variable_groups();
 
-      VariableGroup & vg(_variable_groups.back());
+      VariableGroup & vg = _variable_groups.back();
 
       // get a pointer to their subdomain restriction, if any.
       const std::set<subdomain_id_type> * const their_active_subdomains(
@@ -3323,18 +3317,21 @@ unsigned int DofMap::add_variables(System & sys,
       // append the variables to the vg and we're done
       if (should_be_in_vg)
         {
-          unsigned int curr_n_vars = this->n_vars();
+          unsigned int vn = this->n_vars();
+          const unsigned int vgn = _variable_groups.size() - 1;
 
           for (auto ovar : vars)
             {
-              curr_n_vars = this->n_vars();
+              vn = this->n_vars();
 
               vg.append(ovar);
 
               _variables.push_back(vg(vg.n_variables() - 1));
-              _variable_numbers[ovar] = curr_n_vars;
+              _variable_numbers[ovar] = vn;
+              _variable_group_numbers.push_back(vgn);
+              _var_to_vg.emplace(vn, vgn);
             }
-          return curr_n_vars;
+          return vn;
         }
     }
 
