@@ -41,6 +41,7 @@
 #include "libmesh/threads.h"
 #include "libmesh/static_condensation_dof_map.h"
 #include "libmesh/system.h"
+#include "libmesh/parallel_fe_type.h"
 
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
@@ -920,11 +921,11 @@ void DofMap::clear()
 
   this->_shared_functors.clear();
 
-  _variables = nullptr;
-  _variable_groups = nullptr;
+  _variables.clear();
+  _variable_groups.clear();
   _var_to_vg.clear();
   _variable_group_numbers.clear();
-  _array_variables = nullptr;
+  _array_variables.clear();
   _first_scalar_df.clear();
   this->clear_send_list();
   this->clear_sparsity();
@@ -1948,8 +1949,7 @@ bool DofMap::use_coupled_neighbor_dofs(const MeshBase & /*mesh*/) const
     bool all_discontinuous_dofs = true;
 
     // We may call this method even without ever having initialized our data
-    if (this->_variables)
-      for (auto var : index_range((*this->_variables)))
+      for (auto var : index_range(this->_variables))
         if (FEInterface::get_continuity(this->variable_type(var)) !=  DISCONTINUOUS)
           all_discontinuous_dofs = false;
 
@@ -3148,22 +3148,250 @@ void DofMap::reinit_static_condensation()
     _sc->reinit();
 }
 
-void DofMap::add_variables_and_groups(const std::vector<Variable> & variables,
-                                      const std::vector<VariableGroup> & variable_groups,
-                                      PassKey<System>)
+unsigned int DofMap::add_variable(System & sys,
+                                  std::string_view var,
+                                  const FEType & type,
+                                  const std::set<subdomain_id_type> * const active_subdomains)
 {
-  this->_variables = &variables;
-  this->_variable_groups = &variable_groups;
+  parallel_object_only(); // Not strictly needed, but the only safe way to keep in sync
 
-  for (const auto vg : index_range(variable_groups))
+  libmesh_assert(this->comm().verify(std::string(var)));
+  libmesh_assert(this->comm().verify(type));
+  libmesh_assert(this->comm().verify((active_subdomains == nullptr)));
+
+  if (active_subdomains)
+    libmesh_assert(this->comm().verify(active_subdomains->size()));
+
+  // Make sure the variable isn't there already
+  // or if it is, that it's the type we want
+  for (auto v : make_range(this->n_vars()))
+    if (this->variable_name(v) == var)
+      {
+        if (this->variable_type(v) == type)
+          {
+            // Check whether the existing variable's active subdomains also matches
+            // the incoming variable's active subdomains. If they don't match, then
+            // either it is an error by the user or the user is trying to change the
+            // subdomain restriction after the variable has already been added, which
+            // is not supported.
+            const Variable & existing_var = this->variable(v);
+
+            // Check whether active_subdomains is not provided/empty and the existing_var is
+            // implicitly_active()
+            bool check1 = (!active_subdomains || active_subdomains->empty()) &&
+                          existing_var.implicitly_active();
+
+            // Check if the provided active_subdomains is equal to the existing_var's
+            // active_subdomains
+            bool check2 =
+                (active_subdomains && (*active_subdomains == existing_var.active_subdomains()));
+
+            // If either of these checks passed, then we already have this variable
+            if (check1 || check2)
+              return _variables[v].number();
+          }
+
+        libmesh_error_msg("ERROR: incompatible variable "
+                          << var << " has already been added for this system!");
+      }
+
+  libmesh_assert(!sys.is_initialized());
+
+  if (this->n_variable_groups())
     {
-      const auto & var_group = variable_groups[vg];
-      for (const auto vi : make_range(var_group.n_variables()))
+      // Optimize for VariableGroups here - if the user is adding multiple
+      // variables of the same FEType and subdomain restriction, catch
+      // that here and add them as members of the same VariableGroup.
+      //
+      // start by setting this flag to whatever the user has requested
+      // and then consider the conditions which should negate it.
+      bool should_be_in_vg = this->identify_variable_groups();
+
+      VariableGroup & vg(_variable_groups.back());
+
+      // get a pointer to their subdomain restriction, if any.
+      const std::set<subdomain_id_type> * const their_active_subdomains(
+          vg.implicitly_active() ? nullptr : &vg.active_subdomains());
+
+      // Different types?
+      if (vg.type() != type)
+        should_be_in_vg = false;
+
+      // they are restricted, we aren't?
+      if (their_active_subdomains &&
+          (!active_subdomains || (active_subdomains && active_subdomains->empty())))
+        should_be_in_vg = false;
+
+      // they aren't restricted, we are?
+      if (!their_active_subdomains && (active_subdomains && !active_subdomains->empty()))
+        should_be_in_vg = false;
+
+      if (their_active_subdomains && active_subdomains)
+        // restricted to different sets?
+        if (*their_active_subdomains != *active_subdomains)
+          should_be_in_vg = false;
+
+      // OK, after all that, append the variable to the vg if none of the conditions
+      // were violated
+      if (should_be_in_vg)
         {
-          _variable_group_numbers.push_back(vg);
-          _var_to_vg.emplace(var_group.number(vi), vg);
+          const unsigned int curr_n_vars = this->n_vars();
+
+          std::string varstr(var);
+
+          _variable_numbers[varstr] = curr_n_vars;
+          vg.append(std::move(varstr));
+          _variables.push_back(vg(vg.n_variables() - 1));
+
+          return curr_n_vars;
         }
     }
+
+  // otherwise, fall back to adding a single variable group
+  return this->add_variables(
+      sys, std::vector<std::string>(1, std::string(var)), type, active_subdomains);
+}
+
+unsigned int DofMap::add_variables(System & sys,
+                                   const std::vector<std::string> & vars,
+                                   const FEType & type,
+                                   const std::set<subdomain_id_type> * const active_subdomains)
+{
+  parallel_object_only(); // Not strictly needed, but the only safe way to keep in sync
+
+  libmesh_assert(!sys.is_initialized());
+
+  libmesh_assert(this->comm().verify(vars.size()));
+  libmesh_assert(this->comm().verify(type));
+  libmesh_assert(this->comm().verify((active_subdomains == nullptr)));
+
+  if (active_subdomains)
+    libmesh_assert(this->comm().verify(active_subdomains->size()));
+
+  // Make sure the variable isn't there already
+  // or if it is, that it's the type we want
+  for (auto ovar : vars)
+    {
+      libmesh_assert(this->comm().verify(ovar));
+
+      for (auto v : make_range(this->n_vars()))
+        if (this->variable_name(v) == ovar)
+          {
+            if (this->variable_type(v) == type)
+              return _variables[v].number();
+
+            libmesh_error_msg("ERROR: incompatible variable "
+                              << ovar << " has already been added for this system!");
+          }
+    }
+
+  if (this->n_variable_groups())
+    {
+      // Optimize for VariableGroups here - if the user is adding multiple
+      // variables of the same FEType and subdomain restriction, catch
+      // that here and add them as members of the same VariableGroup.
+      //
+      // start by setting this flag to whatever the user has requested
+      // and then consider the conditions which should negate it.
+      bool should_be_in_vg = this->identify_variable_groups();
+
+      VariableGroup & vg(_variable_groups.back());
+
+      // get a pointer to their subdomain restriction, if any.
+      const std::set<subdomain_id_type> * const their_active_subdomains(
+          vg.implicitly_active() ? nullptr : &vg.active_subdomains());
+
+      // Different types?
+      if (vg.type() != type)
+        should_be_in_vg = false;
+
+      // they are restricted, we aren't?
+      if (their_active_subdomains &&
+          (!active_subdomains || (active_subdomains && active_subdomains->empty())))
+        should_be_in_vg = false;
+
+      // they aren't restricted, we are?
+      if (!their_active_subdomains && (active_subdomains && !active_subdomains->empty()))
+        should_be_in_vg = false;
+
+      if (their_active_subdomains && active_subdomains)
+        // restricted to different sets?
+        if (*their_active_subdomains != *active_subdomains)
+          should_be_in_vg = false;
+
+      // If after all that none of the conditions were violated,
+      // append the variables to the vg and we're done
+      if (should_be_in_vg)
+        {
+          unsigned int curr_n_vars = this->n_vars();
+
+          for (auto ovar : vars)
+            {
+              curr_n_vars = this->n_vars();
+
+              vg.append(ovar);
+
+              _variables.push_back(vg(vg.n_variables() - 1));
+              _variable_numbers[ovar] = curr_n_vars;
+            }
+          return curr_n_vars;
+        }
+    }
+
+  const unsigned int curr_n_vars = this->n_vars();
+
+  const unsigned int next_first_component = this->n_components(sys.get_mesh());
+
+  // We weren't able to add to an existing variable group, so
+  // add a new variable group to the list
+  _variable_groups.push_back(
+      (active_subdomains == nullptr)
+          ? VariableGroup(&sys, vars, curr_n_vars, next_first_component, type)
+          : VariableGroup(&sys, vars, curr_n_vars, next_first_component, type, *active_subdomains));
+
+  const VariableGroup & vg(_variable_groups.back());
+  const unsigned int vgn = _variable_groups.size() - 1;
+
+  // Add each component of the group individually
+  for (auto v : make_range(vars.size()))
+    {
+      const unsigned int vn = curr_n_vars + v;
+      _variables.push_back(vg(v));
+      _variable_numbers[vars[v]] = vn;
+      _variable_group_numbers.push_back(vgn);
+      _var_to_vg.emplace(vn, vgn);
+    }
+
+  libmesh_assert_equal_to((curr_n_vars + vars.size()), this->n_vars());
+
+  // BSK - Defer this now to System::init_data() so we can detect
+  // VariableGroups 12/28/2012
+  // // Add the variable group to the _dof_map
+  // _dof_map->add_variable_group (vg);
+
+  // Return the number of the new variable
+  return cast_int<unsigned int>(curr_n_vars + vars.size() - 1);
+}
+
+unsigned int DofMap::add_variable_array (System & sys,
+                                         const std::vector<std::string> & vars,
+                                         const FEType & type,
+                                         const std::set<subdomain_id_type> * const active_subdomains)
+{
+  const unsigned int count = cast_int<unsigned int>(vars.size());
+  const unsigned int last_var = this->add_variables(sys, vars, type, active_subdomains);
+  const unsigned int first_var = last_var + 1 - count;
+  _array_variables.push_back({first_var, first_var + count});
+  return last_var;
+}
+
+void DofMap::get_all_variable_numbers(std::vector<unsigned int> & all_variable_numbers) const
+{
+  all_variable_numbers.resize(n_vars());
+
+  unsigned int count = 0;
+  for (auto vn : _variable_numbers)
+    all_variable_numbers[count++] = vn.second;
 }
 
 template LIBMESH_EXPORT bool DofMap::is_evaluable<Elem>(const Elem &, unsigned int) const;

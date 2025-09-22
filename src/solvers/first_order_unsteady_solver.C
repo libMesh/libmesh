@@ -18,6 +18,7 @@
 #include "libmesh/first_order_unsteady_solver.h"
 #include "libmesh/diff_system.h"
 #include "libmesh/quadrature.h"
+#include "libmesh/variable.h"
 
 namespace libMesh
 {

@@ -23,6 +23,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/mesh_function.h"
 #include "libmesh/node.h"
+#include "libmesh/variable.h"
 
 namespace libMesh
 {

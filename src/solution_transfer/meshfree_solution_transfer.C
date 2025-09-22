@@ -26,6 +26,7 @@
 #include "libmesh/meshfree_interpolation.h"
 #include "libmesh/function_base.h"
 #include "libmesh/node.h"
+#include "libmesh/variable.h"
 
 // C++ includes
 #include <cstddef>

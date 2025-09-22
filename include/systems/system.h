@@ -31,7 +31,6 @@
 #include "libmesh/qoi_set.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/tensor_value.h" // For point_hessian
-#include "libmesh/variable.h"
 #include "libmesh/enum_matrix_build_type.h" // AUTOMATIC
 
 // C++ includes
@@ -74,6 +73,8 @@ class SystemSubset;
 class FEType;
 class SystemNorm;
 enum FEMNormType : int;
+class Variable;
+class VariableGroup;
 
 /**
  * \brief Manages consistently variables, degrees of freedom, and coefficient
@@ -2188,16 +2189,6 @@ private:
   QOIDerivative * _qoi_evaluate_derivative_object;
 
   /**
-   * The \p Variable in this \p System.
-   */
-  std::vector<Variable> _variables;
-
-  /**
-   * The \p VariableGroup in this \p System.
-   */
-  std::vector<VariableGroup> _variable_groups;
-
-  /**
    * Data structure describing the relationship between
    * nodes, variables, etc... and degrees of freedom.
    */
@@ -2224,12 +2215,6 @@ private:
    * The number associated with this system
    */
   const unsigned int _sys_number;
-
-  /**
-   * The variable numbers corresponding to user-specified
-   * names, useful for name-based lookups.
-   */
-  std::map<std::string, unsigned int, std::less<>> _variable_numbers;
 
   /**
    * Flag stating if the system is active or not.
@@ -2291,12 +2276,6 @@ private:
   bool _is_initialized;
 
   /**
-   * \p true when \p VariableGroup structures should be automatically
-   * identified, \p false otherwise.  Defaults to \p true.
-   */
-  bool _identify_variable_groups;
-
-  /**
    * This flag is used only when *reading* in a system from file.
    * Based on the system header, it keeps track of how many
    * additional vectors were actually written for this file.
@@ -2347,11 +2326,6 @@ private:
    * Whether we are name prefixing solver options
    */
   bool _prefix_with_name;
-
-  /**
-   * Array variable information storage
-   */
-  std::vector<ArrayVariableBlock> _array_variables;
 };
 
 
@@ -2447,113 +2421,11 @@ void System::set_basic_system_only ()
 
 
 inline
-unsigned int System::n_vars() const
-{
-  return cast_int<unsigned int>(_variables.size());
-}
-
-
-
-inline
-unsigned int System::n_variable_groups() const
-{
-  return cast_int<unsigned int>(_variable_groups.size());
-}
-
-
-
-inline
-unsigned int System::n_components() const
-{
-  if (_variables.empty())
-    return 0;
-
-  const Variable & last = _variables.back();
-  return last.first_scalar_number() + last.n_components(this->get_mesh());
-}
-
-
-
-inline
-const Variable & System::variable (const unsigned int i) const
-{
-  libmesh_assert_less (i, _variables.size());
-
-  return _variables[i];
-}
-
-
-
-inline
-const VariableGroup & System::variable_group (const unsigned int vg) const
-{
-  libmesh_assert_less (vg, _variable_groups.size());
-
-  return _variable_groups[vg];
-}
-
-
-
-inline
-const std::string & System::variable_name (const unsigned int i) const
-{
-  libmesh_assert_less (i, _variables.size());
-
-  return _variables[i].name();
-}
-
-
-
-inline
 unsigned int
 System::variable_scalar_number (std::string_view var,
                                 unsigned int component) const
 {
   return variable_scalar_number(this->variable_number(var), component);
-}
-
-
-
-inline
-unsigned int
-System::variable_scalar_number (unsigned int var_num,
-                                unsigned int component) const
-{
-  return _variables[var_num].first_scalar_number() + component;
-}
-
-
-
-inline
-const FEType & System::variable_type (const unsigned int i) const
-{
-  libmesh_assert_less (i, _variables.size());
-
-  return _variables[i].type();
-}
-
-
-
-inline
-const FEType & System::variable_type (std::string_view var) const
-{
-  return _variables[this->variable_number(var)].type();
-}
-
-
-
-inline
-bool System::identify_variable_groups () const
-{
-  return _identify_variable_groups;
-}
-
-
-
-inline
-void System::identify_variable_groups (const bool ivg)
-{
-  _identify_variable_groups = ivg;
 }
 
 

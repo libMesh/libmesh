@@ -332,20 +332,6 @@ protected:
   std::vector<std::string> _names;
 };
 
-/**
- * Convenience structure for denoting an array of individual \p Variable
- */
-struct ArrayVariableBlock
-{
-  /// first var in the block
-  unsigned int begin;
-  /// one past the last var (begin + count)
-  unsigned int end;
-
-  /// the size of the array block
-  unsigned int size() const { return end - begin; }
-};
-
 } // namespace libMesh
 
 #endif // LIBMESH_VARIABLE_H
