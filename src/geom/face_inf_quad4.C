@@ -251,6 +251,17 @@ InfQuad4::side_type (const unsigned int s) const
   return INFEDGE2;
 }
 
+Point
+InfQuad4::get_side_normal(const unsigned int s, const Point & /* pt */) const
+{
+  libmesh_assert_less (s, 3);
+  // InfQuad4 elements live in the 2D XY plane, possibly offset by a constant z
+  const Point side_t = this->node_ptr(side_nodes_map[s][1]) -
+                       this->node_ptr(side_nodes_map[s][0]);
+  // From cross product with (0, 0, 1)
+  const Point v(side_t(1), -side_t(0), 0.);
+  return v / v.norm();
+}
 
 void InfQuad4::flip(BoundaryInfo * boundary_info)
 {
