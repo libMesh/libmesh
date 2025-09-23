@@ -178,6 +178,8 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  virtual Point get_side_normal(const unsigned int s, const Point & /* pt */) const override final;
+
 protected:
 
   /**

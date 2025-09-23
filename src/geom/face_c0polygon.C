@@ -335,6 +335,24 @@ ElemType C0Polygon::side_type (const unsigned int libmesh_dbg_var(s)) const
   return EDGE2;
 }
 
+Point
+C0Polygon::get_side_normal(const unsigned int s, const Point & /* pt */) const
+{
+  const auto n_sides = this->n_sides();
+  libmesh_assert_less (s, n_sides);
+  const Point side_t = this->node_ptr((s+1) % n_sides) -
+                       this->node_ptr(s);
+  const unsigned int another_side = (s > n_sides - 2) ? 0 : s + 1;
+  const Point other_side_t = this->node_ptr((another_side + 1) % n_sides) -
+                             this->node_ptr(another_side);
+  // Note: if element is not planar, this will depend on which side was chosen for the
+  //       other side, which will impact the side normal computation as well.
+  const Point pointing_up = ((s > n_sides - 2) ? -1 : 1) * side_t.cross(other_side_t);
+  // Complain at degenerate C0 polygon
+  libmesh_assert_greater(pointing_up.norm_sq(), 0);
+  const Point v = side_t.cross(pointing_up);
+  return v / v.norm();
+}
 
 
 void C0Polygon::retriangulate()

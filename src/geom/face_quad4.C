@@ -383,4 +383,22 @@ ElemType Quad4::side_type (const unsigned int libmesh_dbg_var(s)) const
   return EDGE2;
 }
 
+
+Point
+Quad4::get_side_normal(const unsigned int s, const Point & /* pt */) const
+{
+  libmesh_assert_less (s, 4);
+  const Point side_t = this->node_ptr(side_nodes_map[s][1]) -
+                       this->node_ptr(side_nodes_map[s][0]);
+  const unsigned int another_side = s > 2 ? 0 : s + 1;
+  const Point other_side_t = this->node_ptr(side_nodes_map[another_side][1]) -
+                             this->node_ptr(side_nodes_map[another_side][0]);
+  // Note: if element is not planar, this will depend on which side was chosen for the
+  //       other side, which will impact the side normal computation as well.
+  const Point pointing_up = (s > 2 ? -1 : 1) * side_t.cross(other_side_t);
+  const Point v = side_t.cross(pointing_up);
+  return v / v.norm();
+}
+
+
 } // namespace libMesh
