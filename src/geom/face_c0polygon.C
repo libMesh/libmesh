@@ -341,17 +341,23 @@ C0Polygon::side_vertex_average_normal(const unsigned int s) const
 {
   const auto n_sides = this->n_sides();
   libmesh_assert_less (s, n_sides);
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
   const Point side_t = this->node_ptr((s+1) % n_sides) -
                        this->node_ptr(s);
-  const unsigned int another_side = (s > n_sides - 2) ? 0 : s + 1;
-  const Point other_side_t = this->node_ptr((another_side + 1) % n_sides) -
-                             this->node_ptr(another_side);
-  // Note: if element is not planar, this will depend on which side was chosen for the
-  //       other side, which will impact the side normal computation as well.
-  const Point pointing_up = ((s > n_sides - 2) ? -1 : 1) * side_t.cross(other_side_t);
-  // Complain at degenerate C0 polygon
-  libmesh_assert_greater(pointing_up.norm_sq(), 0);
-  const Point v = side_t.cross(pointing_up);
+  Point plane_normal(0, 0, 1);
+  // Find out what plane we're in, if we're in 3D
+  // Note we don't support non-planar C0-polygon at this time
+#if LIBMESH_DIM > 2
+  const auto vavg = this->vertex_average();
+  for (auto i : make_range(n_sides))
+    {
+      const Point vi     = this->point(i) - vavg;
+      const Point viplus = this->point((i+1)%n_sides) - vavg;
+      plane_normal += vi.cross(viplus);
+    }
+  plane_normal = plane_normal.unit();
+#endif
+  const Point v = side_t.cross(plane_normal);
   return v / v.norm();
 }
 

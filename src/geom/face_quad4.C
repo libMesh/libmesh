@@ -391,13 +391,22 @@ Quad4::side_vertex_average_normal(const unsigned int s) const
   libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
   const Point side_t = this->node_ptr(side_nodes_map[s][1]) -
                        this->node_ptr(side_nodes_map[s][0]);
-  const unsigned int another_side = s > 2 ? 0 : s + 1;
-  const Point other_side_t = this->node_ptr(side_nodes_map[another_side][1]) -
-                             this->node_ptr(side_nodes_map[another_side][0]);
-  // Note: if element is not planar, this will depend on which side was chosen for the
-  //       other side, which will impact the side normal computation as well.
-  const Point pointing_up = (s > 2 ? -1 : 1) * side_t.cross(other_side_t);
-  const Point v = side_t.cross(pointing_up);
+  // At the vertex average, things simplify a bit
+  // We get the element "plane" normal at the two vertex, average them
+  Point normal;
+  for (auto i : make_range(2))
+  {
+    const int incr = (i == 0) ? -1 : 1;
+    const unsigned int other_side = (s + incr) % 4;
+    const Point other_side_t = this->node_ptr(side_nodes_map[other_side][1]) -
+                               this->node_ptr(side_nodes_map[other_side][0]);
+    const auto sign = (incr < 0) ? 1 : -1;
+    const Point normal_at_vertex = sign * side_t.cross(other_side_t);
+    normal += normal_at_vertex;
+  }
+  normal /= 2;
+
+  const Point v = side_t.cross(normal);
   return v / v.norm();
 }
 
