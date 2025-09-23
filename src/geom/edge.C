@@ -168,6 +168,14 @@ ElemType Edge::side_type (const unsigned int libmesh_dbg_var(s)) const
   return NODEELEM;
 }
 
+Point
+Edge::get_side_normal(const unsigned int s, const Point & /* pt */) const
+{
+  libmesh_assert_less (s, 2);
+  const auto v = (this->point(0) - this->point(1)) / (this->point(0) - this->point(1)).norm();
+  return (s == 0) ? v : -v;
+}
+
 
 bool
 Edge::is_flipped() const

@@ -236,6 +236,8 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  virtual Point get_side_normal(const unsigned int s, const Point & /* pt */) const override final;
+
   virtual bool on_reference_element(const Point & p,
                                     const Real eps = TOLERANCE) const override final;
 
