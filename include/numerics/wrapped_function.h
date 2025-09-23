@@ -28,6 +28,7 @@
 #include "libmesh/point.h"
 #include "libmesh/system.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/variable.h"
 
 // C++ includes
 #include <cstddef>
