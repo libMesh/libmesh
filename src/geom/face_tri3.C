@@ -291,7 +291,7 @@ Tri3::side_type (const unsigned int libmesh_dbg_var(s)) const
 
 
 Point
-Tri3::get_side_normal(const unsigned int s, const Point & /* pt */) const
+Tri3::side_vertex_average_normal(const unsigned int s) const
 {
   libmesh_assert_less (s, 3);
   const Point side_t = this->node_ptr(side_nodes_map[s][1]) -

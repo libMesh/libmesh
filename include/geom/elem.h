@@ -699,12 +699,8 @@ public:
   /**
    * \returns the normal (outwards-facing) of the side of the element at the desired point
    * @param s the side of interest
-   * @param pt the point in physical space to compute the side at
-   * Note that the point is not checked to even be on the side surface or not.
-   * In debug mode, some elements may check that it is but don't count on it.
-   * In fact for all linear elements, pt is not used.
    */
-  virtual Point get_side_normal(const unsigned int s, const Point & pt) const;
+  virtual Point side_vertex_average_normal(const unsigned int s) const;
 
   /**
    * \returns An integer range from 0 up to (but not including)

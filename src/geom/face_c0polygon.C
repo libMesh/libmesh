@@ -335,8 +335,9 @@ ElemType C0Polygon::side_type (const unsigned int libmesh_dbg_var(s)) const
   return EDGE2;
 }
 
+
 Point
-C0Polygon::get_side_normal(const unsigned int s, const Point & /* pt */) const
+C0Polygon::side_vertex_average_normal(const unsigned int s) const
 {
   const auto n_sides = this->n_sides();
   libmesh_assert_less (s, n_sides);

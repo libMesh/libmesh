@@ -316,7 +316,7 @@ InfQuad6::side_type (const unsigned int s) const
 }
 
 Point
-InfQuad6::get_side_normal(const unsigned int s, const Point & /* pt */) const
+InfQuad6::side_vertex_average_normal(const unsigned int s) const
 {
   libmesh_assert_less (s, 3);
   // InfQuad6 elements live in the 2D XY plane, possibly offset by a constant z

@@ -3489,7 +3489,7 @@ BoundingBox Elem::loose_bounding_box () const
 }
 
 Point
-Elem::get_side_normal(const unsigned int s, const Point & pt) const
+Elem::side_vertex_average_normal(const unsigned int s) const
 {
   libmesh_not_implemented_msg("Side normals not implemented for element of type: " <<
                               Utility::enum_to_string(this->type()));

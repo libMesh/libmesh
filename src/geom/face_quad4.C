@@ -385,9 +385,10 @@ ElemType Quad4::side_type (const unsigned int libmesh_dbg_var(s)) const
 
 
 Point
-Quad4::get_side_normal(const unsigned int s, const Point & /* pt */) const
+Quad4::side_vertex_average_normal(const unsigned int s) const
 {
   libmesh_assert_less (s, 4);
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
   const Point side_t = this->node_ptr(side_nodes_map[s][1]) -
                        this->node_ptr(side_nodes_map[s][0]);
   const unsigned int another_side = s > 2 ? 0 : s + 1;
