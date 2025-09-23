@@ -704,7 +704,7 @@ public:
    * In debug mode, some elements may check that it is but don't count on it.
    * In fact for all linear elements, pt is not used.
    */
-  virtual Point get_side_normal(const unsigned int s, const Point & pt) const = 0;
+  virtual Point get_side_normal(const unsigned int s, const Point & pt) const;
 
   /**
    * \returns An integer range from 0 up to (but not including)
