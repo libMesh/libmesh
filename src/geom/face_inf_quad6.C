@@ -332,7 +332,7 @@ InfQuad6::side_vertex_average_normal(const unsigned int s) const
                            this->node_ptr(side_nodes_map[s][0]);
       // From cross product with (0, 0, 1)
       const Point v(side_t(1), -side_t(0), 0.);
-      return v / v.norm();
+      return v.unit();
       }
     }
 }

@@ -172,7 +172,7 @@ Point
 Edge::side_vertex_average_normal(const unsigned int s) const
 {
   libmesh_assert_less (s, 2);
-  const auto v = (this->point(0) - this->point(1)) / (this->point(0) - this->point(1)).norm();
+  const auto v = (this->point(0) - this->point(1)).unit();
   return (s == 0) ? v : -v;
 }
 

@@ -389,8 +389,9 @@ Quad4::side_vertex_average_normal(const unsigned int s) const
 {
   libmesh_assert_less (s, 4);
   libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
-  const Point side_t = this->node_ptr(side_nodes_map[s][1]) -
-                       this->node_ptr(side_nodes_map[s][0]);
+  const Point side_t = this->point(side_nodes_map[s][1]) -
+                       this->point(side_nodes_map[s][0]);
+
   // At the vertex average, things simplify a bit
   // We get the element "plane" normal at the two vertex, average them
   Point normal;
@@ -398,16 +399,16 @@ Quad4::side_vertex_average_normal(const unsigned int s) const
   {
     const int incr = (i == 0) ? -1 : 1;
     const unsigned int other_side = (s + incr) % 4;
-    const Point other_side_t = this->node_ptr(side_nodes_map[other_side][1]) -
-                               this->node_ptr(side_nodes_map[other_side][0]);
-    const auto sign = (incr < 0) ? 1 : -1;
+    const Point other_side_t = this->point(side_nodes_map[other_side][1]) -
+                               this->point(side_nodes_map[other_side][0]);
+    const auto sign = (incr < 0) ? -1 : 1;
     const Point normal_at_vertex = sign * side_t.cross(other_side_t);
     normal += normal_at_vertex;
   }
   normal /= 2;
 
   const Point v = side_t.cross(normal);
-  return v / v.norm();
+  return v.unit();
 }
 
 
