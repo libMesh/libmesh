@@ -54,6 +54,7 @@ unit_tests_sources = \
   geom/side_test.C \
   geom/volume_test.C \
   geom/which_node_am_i_test.C \
+  geom/side_vertex_average_normal_test.C \
   mesh/all_second_order.C \
   mesh/all_tri.C \
   mesh/distort.C \
@@ -223,7 +224,7 @@ data = matrices/geom_1_extraction_op.h5 \
        solutions/nedelec_one_solution_mesh.xda \
        solutions/nedelec_one_solution.xda \
        solutions/raviart_thomas_solution_mesh.xda \
-       solutions/raviart_thomas_solution.xda 
+       solutions/raviart_thomas_solution.xda
 
 
 unit_tests_data = $(data)
