@@ -315,28 +315,6 @@ InfQuad6::side_type (const unsigned int s) const
   return INFEDGE2;
 }
 
-Point
-InfQuad6::side_vertex_average_normal(const unsigned int s) const
-{
-  libmesh_assert_less (s, 3);
-  // InfQuad6 elements live in the 2D XY plane, possibly offset by a constant z
-  switch (i)
-    {
-    case 0:
-      {
-      libmesh_not_implemented_msg("Not implemented for side 0 of an infinite Quad6");
-      }
-    default:
-      {
-      const Point side_t = this->node_ptr(side_nodes_map[s][1]) -
-                           this->node_ptr(side_nodes_map[s][0]);
-      // From cross product with (0, 0, 1)
-      const Point v(side_t(1), -side_t(0), 0.);
-      return v.unit();
-      }
-    }
-}
-
 
 void InfQuad6::flip(BoundaryInfo * boundary_info)
 {
