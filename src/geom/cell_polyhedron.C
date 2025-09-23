@@ -318,6 +318,13 @@ dof_id_type Polyhedron::key () const
 
 std::unique_ptr<Elem> Polyhedron::side_ptr (const unsigned int i)
 {
+  return const_cast<const Polyhedron *>(this)->side_ptr(i);
+}
+
+
+
+std::unique_ptr<Elem> Polyhedron::side_ptr (const unsigned int i) const
+{
   libmesh_assert_less (i, this->n_sides());
 
   Polygon & face = *std::get<0>(this->_sidelinks_data[i]);

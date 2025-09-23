@@ -175,6 +175,11 @@ public:
   virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) override final;
 
   /**
+   * \returns A simple Polygon face for side i, but from a clone so it's const
+   */
+  virtual std::unique_ptr<Elem> side_ptr (const unsigned int i) const;
+
+  /**
    * Rebuilds a simple Polygon coincident with face i.
    */
   virtual void side_ptr (std::unique_ptr<Elem> & elem,
