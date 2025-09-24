@@ -75,13 +75,25 @@ class UnstructuredMesh;
 class VariationalMeshSmoother : public MeshSmoother
 {
 public:
-
   /**
-   * Simple constructor to use for smoothing purposes
+   * Constructor.
+   * @param mesh Mesh to smooth by minimizing the distortion-dilation metric.
+   * @param dilation_wiehgt Weight to give the dilation metric. The distortion
+   * metric is given 1 - dilation_weight.
+   * @param preserve_subdomain_boundaries Whether the smoother is to preserve or
+   * modify sobdomain boundaries.
+   * @param relative_residual_tolerance Solver setting for the relative residual tolerance.
+   * @param absolute_residual_tolerance Solver setting for the absolute residual tolerance.
+   * @param solver_quiet Whether to make the solver quiet.
+   * @param solver_verbose Whether to make the solver verbose.
    */
   VariationalMeshSmoother(UnstructuredMesh & mesh,
-                          Real dilation_weight=0.5,
-                          const bool preserve_subdomain_boundaries=true);
+                          Real dilation_weight = 0.5,
+                          const bool preserve_subdomain_boundaries = true,
+                          const double relative_residual_tolerance = TOLERANCE * TOLERANCE,
+                          const double absolute_residual_tolerance = TOLERANCE * TOLERANCE,
+                          const bool solver_quiet = true,
+                          const bool solver_verbose = false);
 
   /**
    * Destructor.
@@ -169,6 +181,26 @@ private:
    * Attribute the keep track of whether the setup method has been called.
    */
   bool _setup_called;
+
+  /**
+   * Solver relative residual tolerance
+   */
+  double _relative_residual_tolerance;
+
+  /**
+   * Solver absolute residual tolerance
+   */
+  double _absolute_residual_tolerance;
+
+  /**
+   * Solver quiet setting
+   */
+  bool _solver_quiet;
+
+  /**
+   * Solver verbose setting
+   */
+  bool _solver_verbose;
 };
 
 } // namespace libMesh

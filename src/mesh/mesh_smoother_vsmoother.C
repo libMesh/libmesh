@@ -50,11 +50,19 @@ namespace libMesh
 // Member functions for the Variational Smoother
 VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
                                                  Real dilation_weight,
-                                                 const bool preserve_subdomain_boundaries)
+                                                 const bool preserve_subdomain_boundaries,
+                                                 const double relative_residual_tolerance,
+                                                 const double absolute_residual_tolerance,
+                                                 const bool solver_quiet,
+                                                 const bool solver_verbose)
   : MeshSmoother(mesh),
     _dilation_weight(dilation_weight),
     _preserve_subdomain_boundaries(preserve_subdomain_boundaries),
-    _setup_called(false)
+    _setup_called(false),
+    _relative_residual_tolerance(relative_residual_tolerance),
+    _absolute_residual_tolerance(absolute_residual_tolerance),
+    _solver_quiet(solver_quiet),
+    _solver_verbose(solver_verbose)
 {}
 
 void VariationalMeshSmoother::setup()
@@ -117,13 +125,14 @@ void VariationalMeshSmoother::setup()
 
   _equation_systems->init();
 
-  // More debugging options
-  // DiffSolver & solver = *(system()->time_solver->diff_solver().get());
-  // solver.quiet = false;
-  // solver.verbose = true;
+  // Solver verbosity
+  DiffSolver & solver = *(system()->time_solver->diff_solver().get());
+  solver.quiet = _solver_quiet;
+  solver.verbose = _solver_verbose;
 
-  system()->time_solver->diff_solver()->relative_residual_tolerance = TOLERANCE * TOLERANCE;
-  system()->time_solver->diff_solver()->absolute_residual_tolerance = TOLERANCE * TOLERANCE;
+  // Solver convergence tolerances
+  system()->time_solver->diff_solver()->relative_residual_tolerance = _relative_residual_tolerance;
+  system()->time_solver->diff_solver()->absolute_residual_tolerance = _absolute_residual_tolerance;
 
   _setup_called = true;
 }

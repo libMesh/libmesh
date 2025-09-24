@@ -195,7 +195,8 @@ bool PlaneConstraint::operator<(const PlaneConstraint & other) const
 
 bool PlaneConstraint::operator==(const PlaneConstraint & other) const
 {
-  if (!(_normal.absolute_fuzzy_equals(other.normal(), _tol)))
+  if (_normal.cross(other.normal()).norm() > _tol)
+    // normals not parallel
     return false;
   return this->contains_point(other.point());
 }
