@@ -479,18 +479,18 @@ public:
   /**
    * An invalid \p id to distinguish an uninitialized \p DofObject
    */
-  static const dof_id_type invalid_id = static_cast<dof_id_type>(-1);
+  static constexpr dof_id_type invalid_id = static_cast<dof_id_type>(-1);
 
   /**
    * An invalid \p unique_id to distinguish an uninitialized \p DofObject
    */
-  static const unique_id_type invalid_unique_id = static_cast<unique_id_type>(-1);
+  static constexpr unique_id_type invalid_unique_id = static_cast<unique_id_type>(-1);
 
   /**
    * An invalid \p processor_id to distinguish DoFs that have
    * not been assigned to a processor.
    */
-  static const processor_id_type invalid_processor_id = static_cast<processor_id_type>(-1);
+  static constexpr processor_id_type invalid_processor_id = static_cast<processor_id_type>(-1);
 
   /**
    * If we pack our indices into an buffer for communications, how
