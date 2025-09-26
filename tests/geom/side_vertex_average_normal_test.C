@@ -464,8 +464,8 @@ public:
     {
       // Deformed cube, but still with planar faces
       // Note that we don't necessarily allow polyhedras with non-planar sides at this time
-      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 3), Point(1, 1, 0), Point(0, 2, 1),
-                                Point(-2.2, 0, 4), Point(-1, 0, 5), Point(-0.5, 1, 4), Point(-2.2, 2, 6)};
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 3), Point(1, 1, 0), Point(0, 2, -1),
+                                Point(0, 0, 4), Point(1, 0, 5), Point(1, 1, 4), Point(0, 2, 6)};
 
       // See notes in elem_test.h
       const std::vector<std::vector<unsigned int>> nodes_on_side =
