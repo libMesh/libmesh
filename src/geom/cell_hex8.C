@@ -530,4 +530,29 @@ Hex8::side_type (const unsigned int libmesh_dbg_var(s)) const
 }
 
 
+Point
+Hex8::side_vertex_average_normal(const unsigned int s) const
+{
+  libmesh_assert_less (s, 6);
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
+
+  // At the side vertex average, things simplify a bit
+  // We get the side "plane" normal at all vertices, then average them
+  Point normal;
+  Point current_edge = this->point(side_nodes_map[s][1]) -
+                       this->point(side_nodes_map[s][0]);
+  for (auto i : make_range(4))
+  {
+    const Point next_edge = this->point(side_nodes_map[s][(i + 2) % 4]) -
+                            this->point(side_nodes_map[s][(i + 1) % 4]);
+    const Point normal_at_vertex = current_edge.cross(next_edge);
+    // Note: we could weigh this! The normals don't even have the same length
+    normal += normal_at_vertex;
+    current_edge = next_edge;
+  }
+  normal /= 4;
+  return normal.unit();
+}
+
+
 } // namespace libMesh

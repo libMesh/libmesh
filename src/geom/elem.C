@@ -3488,7 +3488,13 @@ BoundingBox Elem::loose_bounding_box () const
   return BoundingBox(pmin, pmax);
 }
 
-
+Point
+Elem::side_vertex_average_normal(const unsigned int /*s*/) const
+{
+  libmesh_not_implemented_msg("Side normals not implemented for element of type: " <<
+                              Utility::enum_to_string(this->type()));
+  return Point();
+}
 
 bool Elem::is_vertex_on_parent(unsigned int c,
                                unsigned int n) const

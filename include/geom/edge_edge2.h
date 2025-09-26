@@ -146,6 +146,8 @@ public:
    */
   virtual Real volume () const override;
 
+  virtual Point side_vertex_average_normal(const unsigned int s) const override final;
+
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
   /**

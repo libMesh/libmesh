@@ -189,6 +189,8 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  virtual Point side_vertex_average_normal(const unsigned int s) const override final;
+
   /**
    * Create a triangulation from the current node locations.
    */

@@ -143,6 +143,13 @@ Real Edge2::volume () const
 }
 
 
+Point
+Edge2::side_vertex_average_normal(const unsigned int s) const
+{
+  libmesh_assert_less (s, 2);
+  const auto v = (this->point(0) - this->point(1)).unit();
+  return (s == 0) ? v : -v;
+}
 
 dof_id_type Edge2::key () const
 {

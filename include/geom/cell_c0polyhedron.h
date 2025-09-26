@@ -168,6 +168,8 @@ public:
 
   ElemType side_type (const unsigned int s) const override final;
 
+  Point side_vertex_average_normal(const unsigned int s) const override final;
+
   /**
    * Create a triangulation (tetrahedralization) based on the current
    * sides' triangulations.
