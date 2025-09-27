@@ -23,14 +23,6 @@
 namespace libMesh
 {
 
-// ------------------------------------------------------------
-// DofObject class static member -now initialized in header
-const dof_id_type       DofObject::invalid_id;
-const unique_id_type    DofObject::invalid_unique_id;
-const processor_id_type DofObject::invalid_processor_id;
-
-
-
 // Copy Constructor
 DofObject::DofObject (const DofObject & dof_obj) :
   ReferenceCountedObject<DofObject>(),

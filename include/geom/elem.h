@@ -241,14 +241,9 @@ public:
    * \note We don't use the static_cast(-1) trick here since
    * \p subdomain_id_type is sometimes a *signed* integer for
    * compatibility reasons (see libmesh/id_types.h).
-   *
-   * \note Normally you can declare static const integral types
-   * directly in the header file (C++ standard, 9.4.2/4) but
-   * std::numeric_limits<T>::max() is not considered a "constant
-   * expression".  This one is therefore defined in elem.C.
-   * http://stackoverflow.com/questions/2738435/using-numeric-limitsmax-in-constant-expressions
    */
-  static const subdomain_id_type invalid_subdomain_id;
+  static constexpr subdomain_id_type invalid_subdomain_id
+    = std::numeric_limits<subdomain_id_type>::max();
 
   /**
    * \returns true iff this element type can vary in topology (e.g.
