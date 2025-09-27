@@ -81,7 +81,7 @@ public:
     renameAndShift(mesh0, 0, "zero_");
     renameAndShift(mesh1, 6, "one_");
 
-    mesh0.stitch_meshes(mesh1, 2, 10, TOLERANCE, true, true, false, false);
+    mesh0.stitch_meshes(mesh1, 2, 10, TOLERANCE, true, false, false, false);
 
     CPPUNIT_ASSERT_EQUAL(mesh0.n_elem(),  static_cast<dof_id_type>(16));
     CPPUNIT_ASSERT_EQUAL(mesh0.n_nodes(), static_cast<dof_id_type>(45));
@@ -180,9 +180,9 @@ public:
         (qux2n_idx, {3, 4});
 
     // We stitch the meshes in a hierarchical way.
-    mesh0.stitch_meshes(mesh1, 2, 4, TOLERANCE, true, true, false, false);
-    mesh2.stitch_meshes(mesh3, 2, 4, TOLERANCE, true, true, false, false);
-    mesh0.stitch_meshes(mesh2, 1, 3, TOLERANCE, true, true, false, false);
+    mesh0.stitch_meshes(mesh1, 2, 4, TOLERANCE, true, /*verbose*/false, false, false);
+    mesh2.stitch_meshes(mesh3, 2, 4, TOLERANCE, true, /*verbose*/false, false, false);
+    mesh0.stitch_meshes(mesh2, 1, 3, TOLERANCE, true, /*verbose*/false, false, false);
 
     CPPUNIT_ASSERT_EQUAL(mesh0.n_elem(),  static_cast<dof_id_type>(32));
     CPPUNIT_ASSERT_EQUAL(mesh0.n_nodes(), static_cast<dof_id_type>(405));
@@ -304,7 +304,7 @@ public:
                          /*other boundary=*/4,
                          TOLERANCE,
                          /*clear_stitched_boundary_ids=*/true,
-                         /*verbose=*/true,
+                         /*verbose=*/false,
                          /*use_binary_search=*/false,
                          /*enforce_all_nodes_match_on_boundaries=*/false);
 
