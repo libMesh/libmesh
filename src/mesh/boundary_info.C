@@ -1534,7 +1534,7 @@ void BoundaryInfo::side_boundary_ids (const Elem * const elem,
   vec_to_fill.resize(elem->n_sides());
 
   // In most cases only level-0 elements store BCs.
-  // In certain application (such as time-dependent domains), however, children
+  // In certain applications (such as time-dependent domains), however, children
   // need to store BCs too. This case is covered with the _children_on_boundary
   // flag.
   const Elem * searched_elem = elem;
@@ -1563,11 +1563,12 @@ void BoundaryInfo::side_boundary_ids (const Elem * const elem,
         }
 
         const Elem * parent = searched_elem->parent();
+        const auto child_index = parent ? parent->which_child_am_i(searched_elem) : libMesh::invalid_uint;
         for (const auto side : make_range(elem->n_sides()))
           // If the parent doesn't exist or if the child is not on the correct side of the
           // parent we are done checking the ancestors
           if (search_on_side[side] &&
-                (!parent || parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false))
+                (!parent || parent->is_child_on_side(child_index, side) == false))
             search_on_side[side] = false;
 
         searched_elem = parent;
@@ -1625,7 +1626,7 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
   vec_to_fill.clear();
 
   // In most cases only level-0 elements store BCs.
-  // In certain application (such as time-dependent domains), however, children
+  // In certain applications (such as time-dependent domains), however, children
   // need to store BCs too. This case is covered with the _children_on_boundary
   // flag.
   const Elem * searched_elem = elem;

@@ -646,6 +646,13 @@ public:
       CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), all_bids_container[3].size());
       CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), all_bids_container[3][0]);
       CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(5), all_bids_container[3][1]);
+      // Check other sides
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[0].size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(0), all_bids_container[0][0]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[1].size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(1), all_bids_container[1][0]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[1].size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(2), all_bids_container[2][0]);
     }
   }
 
@@ -825,7 +832,14 @@ public:
         CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), all_bids_container[3][1]);
         CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[2].size());
         CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(2), all_bids_container[2][0]);
-        // This is against the spirit of the test, but harmless
+        // Check other sides
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), all_bids_container[0].size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), all_bids_container[1].size());
+
+        // This is against the spirit of the test, and undefined behavior which
+        // may be changed later. Setting allow_children_on_boundary_side(false) could
+        // be actively doing a transfer_boundary_ids_from_children() and then deleting the
+        // children's data, not leaving the children's data there-but-ignored.
         bi.allow_children_on_boundary_side(false);
         bi.side_boundary_ids(elem, all_bids_container);
         CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(elem->n_sides()), all_bids_container.size());
