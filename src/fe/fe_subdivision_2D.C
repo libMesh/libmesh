@@ -686,6 +686,9 @@ void FESubdivision::reinit(const Elem * elem,
   libmesh_assert_equal_to(sd_elem->get_ordered_valence(2), 6);
 
   // We're calculating now!  Time to determine what.
+  this->calculate_phi = true;
+  this->calculate_dphi = true;
+  this->calculate_d2phi = true;
   this->determine_calculations();
 
   // no custom quadrature support
