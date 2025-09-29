@@ -65,7 +65,6 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/quadrature_nodal.h"
 #include "libmesh/quadrature_gauss.h"
-#include "libmesh/quadrature_trap.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/reference_elem.h"
 #include "libmesh/enum_to_string.h"

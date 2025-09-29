@@ -698,9 +698,6 @@ public:
 
   /**
    * \returns the normal (outwards-facing) of the side of the element at the vertex-average of the side
-   * The default implementation uses the vertex average of the side's reference element.
-   * Derived implementations, notably for linear elements, use the vertex average of the side of the
-   * physicall element. The two are mapped to each other.
    * @param s the side of interest
    */
   virtual Point side_vertex_average_normal(const unsigned int s) const;
