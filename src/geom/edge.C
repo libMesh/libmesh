@@ -168,6 +168,7 @@ ElemType Edge::side_type (const unsigned int libmesh_dbg_var(s)) const
   return NODEELEM;
 }
 
+
 bool
 Edge::is_flipped() const
 {

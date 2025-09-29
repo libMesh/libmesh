@@ -189,22 +189,15 @@ public:
 
     {
       // Non-planar, general
-      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 3), Point(1, 1, 0), Point(0, 2, 1)};
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, -2, 3), Point(1, 1, 0), Point(0, 2, -10.5)};
       auto [quad4, nodes] = this->construct_elem(pts, QUAD4);
-      const std::unique_ptr<const Elem> face = quad4->build_side_ptr(0);
-      std::unique_ptr<libMesh::FEBase> fe(libMesh::FEBase::build(2, libMesh::FEType(1)));
-      libMesh::QGauss qface(1, libMesh::CONSTANT);
-      fe->attach_quadrature_rule(&qface);
-      const std::vector<Point> & normals = fe->get_normals();
       for (const auto s : make_range(quad4->n_sides()))
       {
-        const std::unique_ptr<const Elem> face = quad4->build_side_ptr(s);
-        fe->attach_quadrature_rule(&qface);
-        fe->reinit(quad4.get(), s, TOLERANCE);
         const Point n1 = quad4->side_vertex_average_normal(s);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](0), n1(0), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](1), n1(1), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](2), n1(2), TOLERANCE*TOLERANCE);
+        const Point normal = quad4->Elem::side_vertex_average_normal(s);
+        LIBMESH_ASSERT_FP_EQUAL(normal(0), n1(0), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(normal(1), n1(1), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(normal(2), n1(2), TOLERANCE*TOLERANCE);
       }
     }
   }
@@ -462,10 +455,9 @@ public:
     }
 
     {
-      // Deformed cube, but still with planar faces
-      // Note that we don't necessarily allow polyhedras with non-planar sides at this time
-      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 3), Point(1, 1, 0), Point(0, 2, -1),
-                                Point(0, 0, 4), Point(1, 0, 5), Point(1, 1, 4), Point(0, 2, 6)};
+      // Parallepiped with planar faces
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0),
+                                Point(0, 0, 4), Point(1, 0, 4), Point(1, 1, 5), Point(0, 1, 5)};
 
       // See notes in elem_test.h
       const std::vector<std::vector<unsigned int>> nodes_on_side =
@@ -496,18 +488,13 @@ public:
 
       // Get a hex8 for normal comparisons
       auto [hex8, nodes2] = this->construct_elem(pts, HEX8);
-      std::unique_ptr<libMesh::FEBase> fe(libMesh::FEBase::build(3, libMesh::FEType(1)));
-      libMesh::QGauss qface(2, libMesh::CONSTANT);
-      const std::vector<Point> & normals = fe->get_normals();
       for (const auto s : make_range(hex8->n_sides()))
       {
-        const std::unique_ptr<const Elem> face = hex8->build_side_ptr(s);
-        fe->attach_quadrature_rule(&qface);
-        fe->reinit(hex8.get(), s, TOLERANCE);
         const Point n1 = polyhedron->side_vertex_average_normal(s);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](0), n1(0), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](1), n1(1), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](2), n1(2), TOLERANCE*TOLERANCE);
+        const Point normal = hex8->Elem::side_vertex_average_normal(s);
+        LIBMESH_ASSERT_FP_EQUAL(normal(0), n1(0), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(normal(1), n1(1), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(normal(2), n1(2), TOLERANCE*TOLERANCE);
       }
     }
   }

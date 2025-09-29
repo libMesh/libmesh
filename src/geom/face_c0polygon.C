@@ -355,6 +355,9 @@ C0Polygon::side_vertex_average_normal(const unsigned int s) const
       const Point vi     = this->point(i) - vavg;
       const Point viplus = this->point((i+1)%n_sides) - vavg;
       plane_normal += vi.cross(viplus);
+      // Since we know the polygon is planar
+      if (plane_normal.norm_sq() > TOLERANCE)
+        break;
     }
   plane_normal = plane_normal.unit();
 #endif

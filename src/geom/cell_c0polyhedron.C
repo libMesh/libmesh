@@ -259,13 +259,14 @@ C0Polyhedron::side_vertex_average_normal(const unsigned int s) const
     const Point next_edge = poly_side_ptr->point((i + 2) % n_side_edges) -
                             poly_side_ptr->point((i + 1) % n_side_edges);
     const Point normal_at_vertex = current_edge.cross(next_edge);
-    // Note: we could add weights to this sum
     normal += normal_at_vertex;
+    // Note: the sides are planar, we don't need to test them all
+    if (normal.norm_sq() > TOLERANCE)
+      break;
     current_edge = next_edge;
   }
-  // There might be a better way to flip the sign, but this works thanks to convexity
-  const auto sign = (poly_side_ptr->vertex_average() - this->vertex_average()) * normal > 0 ? 1 : -1;
-  return sign * normal.unit();
+  bool outward_normal = std::get<1>(_sidelinks_data[s]);
+  return (outward_normal ? 1. : -1.) * normal.unit();
 }
 
 

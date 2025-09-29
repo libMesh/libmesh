@@ -547,6 +547,7 @@ Hex8::side_vertex_average_normal(const unsigned int s) const
                             this->point(side_nodes_map[s][(i + 1) % 4]);
     const Point normal_at_vertex = current_edge.cross(next_edge);
     // Note: we could weigh this! The normals don't even have the same length
+    // and yet, it's unweighted and unnormalized that it matches the FE computation of normals
     normal += normal_at_vertex;
     current_edge = next_edge;
   }

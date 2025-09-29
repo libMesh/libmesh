@@ -65,6 +65,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/quadrature_nodal.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_trap.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/reference_elem.h"
 #include "libmesh/enum_to_string.h"
@@ -3489,11 +3490,16 @@ BoundingBox Elem::loose_bounding_box () const
 }
 
 Point
-Elem::side_vertex_average_normal(const unsigned int /*s*/) const
+Elem::side_vertex_average_normal(const unsigned int s) const
 {
-  libmesh_not_implemented_msg("Side normals not implemented for element of type: " <<
-                              Utility::enum_to_string(this->type()));
-  return Point();
+  unsigned int dim = this->dim();
+  const std::unique_ptr<const Elem> face = this->build_side_ptr(s);
+  std::unique_ptr<libMesh::FEBase> fe(
+      libMesh::FEBase::build(dim, libMesh::FEType(this->default_order())));
+  const std::vector<Point> & normals = fe->get_normals();
+  std::vector<Point> ref_side_vertex_average_v = {face->reference_elem()->vertex_average()};
+  fe->reinit(this, s, TOLERANCE, &ref_side_vertex_average_v);
+  return normals[0];
 }
 
 bool Elem::is_vertex_on_parent(unsigned int c,
