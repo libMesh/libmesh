@@ -676,6 +676,13 @@ public:
    * that can be leveraged by the \p DofMap to build degrees of freedom
    * containers corresponding to all the variables in this variable array
    *
+   * An 'array variable' is simply a sequence
+   * of contiguous variable numbers defined by pair where the first member of the pair
+   * is the first number in the variable sequence and the second member of the pair is
+   * the number of the last variable in the sequence plus one. Array variables may be
+   * used in tandem with variable grouping by downstream code to build optimized physics
+   * kernels since each variable in the array will have the same shape functions.
+   *
    * \returns The index number for the last of the new variables.
    */
   unsigned int add_variable_array (System & sys,
@@ -1803,7 +1810,16 @@ private:
 
   /**
    * Retrieve the array variable bounds for a given variable \p vi. This variable may
-   * lie anywhere within an array variable range
+   * lie anywhere within an array variable range. An 'array variable' is simply a sequence
+   * of contiguous variable numbers defined by pair where the first member of the pair
+   * is the first number in the variable sequence and the second member of the pair is
+   * the number of the last variable in the sequence plus one. Array variables may be
+   * used in tandem with variable grouping by downstream code to build optimized physics
+   * kernels since each variable in the array will have the same shape functions.
+   *
+   * We note that we store array variables as a container of the above described pairs. Within
+   * this API we will do a binary search such that the complexity is O(log(N)) where N is the
+   * number of array variables present in \p this
    */
   const std::pair<unsigned int, unsigned int> &
   get_variable_array(unsigned int vi) const;

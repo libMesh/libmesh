@@ -1172,6 +1172,13 @@ public:
    * that can be leveraged by the \p DofMap to build degrees of freedom
    * containers corresponding to all the variables in this variable array
    *
+   * An 'array variable' is simply a sequence
+   * of contiguous variable numbers defined by pair where the first member of the pair
+   * is the first number in the variable sequence and the second member of the pair is
+   * the number of the last variable in the sequence plus one. Array variables may be
+   * used in tandem with variable grouping by downstream code to build optimized physics
+   * kernels since each variable in the array will have the same shape functions.
+   *
    * \returns The index number for the last of the new variables.
    */
   unsigned int add_variable_array (const std::vector<std::string> & vars,
