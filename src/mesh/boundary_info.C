@@ -36,6 +36,7 @@
 
 // C++ includes
 #include <iterator>  // std::distance
+#include <algorithm> // std::max_element
 
 namespace
 {
@@ -1522,6 +1523,95 @@ bool BoundaryInfo::has_boundary_id(const Elem * const elem,
 }
 
 
+void BoundaryInfo::side_boundary_ids (const Elem * const elem,
+                                      std::vector<std::vector<boundary_id_type>> & vec_to_fill) const
+{
+  libmesh_assert(elem);
+
+  // Clear out any previous contents
+  vec_to_fill.clear();
+  // We are going to gather boundary ids for each side
+  vec_to_fill.resize(elem->n_sides());
+
+  // In most cases only level-0 elements store BCs.
+  // In certain applications (such as time-dependent domains), however, children
+  // need to store BCs too. This case is covered with the _children_on_boundary
+  // flag.
+  const Elem * searched_elem = elem;
+
+#ifdef LIBMESH_ENABLE_AMR
+
+  if (elem->level() != 0)
+  {
+    // If we have children on the boundaries, we need to search for boundary IDs on the
+    // child and its ancestors too if they share the side.
+    if (_children_on_boundary)
+    {
+      // Loop over ancestors to check if they have boundary ids on the same side
+      std::vector<bool> search_on_side(elem->n_sides(), true);
+      bool keep_searching = true;
+      while (searched_elem && keep_searching)
+      {
+        for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+        {
+          for (const auto side : make_range(elem->n_sides()))
+            // Here we need to check if the boundary id already exists
+            if (search_on_side[side] && pr.second.first == side &&
+                std::find(vec_to_fill[side].begin(), vec_to_fill[side].end(), pr.second.second) ==
+                          vec_to_fill[side].end())
+              vec_to_fill[side].push_back(pr.second.second);
+        }
+
+        const Elem * parent = searched_elem->parent();
+        const auto child_index = parent ? parent->which_child_am_i(searched_elem) : libMesh::invalid_uint;
+        for (const auto side : make_range(elem->n_sides()))
+          // If the parent doesn't exist or if the child is not on the correct side of the
+          // parent we are done checking the ancestors
+          if (search_on_side[side] &&
+                (!parent || parent->is_child_on_side(child_index, side) == false))
+            search_on_side[side] = false;
+
+        searched_elem = parent;
+        // if found what we needed on all sides, exit
+        keep_searching = *std::max_element(search_on_side.begin(), search_on_side.end());
+      }
+
+      return;
+    }
+
+    // Children not on boundaries case.
+    // It could be that a children is interior to the parent (search_on_side = false will handle that)
+    // However, since no children on boundaries, we know that it's either the top parent or nothing
+    std::vector<bool> search_on_side(elem->n_sides(), true);
+    for (const auto side : make_range(elem->n_sides()))
+    {
+      // If we don't have children on boundaries and we are on an external boundary,
+      // we will just use the top parent. search_on_side[side] = true works
+      if (elem->neighbor_ptr(side) == nullptr)
+        continue;
+      // Otherwise we loop over the ancestors and check if they have a different BC for us
+      else
+        while (searched_elem->parent() != nullptr)
+        {
+          const Elem * parent = searched_elem->parent();
+          if (search_on_side[side] && parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+            search_on_side[side] = false;
+          searched_elem = parent;
+        }
+    }
+    // Now search on the top parent, only if we need to (element is not deep inside the top parent)
+    if (*std::max_element(search_on_side.begin(), search_on_side.end()))
+      for (const auto & pr : as_range(_boundary_side_id.equal_range(elem->top_parent())))
+        if (search_on_side[pr.second.first])
+          vec_to_fill[pr.second.first].push_back(pr.second.second);
+    return;
+  }
+
+  // Check each element in the range to see if its side matches the requested side.
+  for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
+    vec_to_fill[pr.second.first].push_back(pr.second.second);
+#endif
+}
 
 void BoundaryInfo::boundary_ids (const Elem * const elem,
                                  const unsigned short int side,
@@ -1536,7 +1626,7 @@ void BoundaryInfo::boundary_ids (const Elem * const elem,
   vec_to_fill.clear();
 
   // In most cases only level-0 elements store BCs.
-  // In certain application (such as time-dependent domains), however, children
+  // In certain applications (such as time-dependent domains), however, children
   // need to store BCs too. This case is covered with the _children_on_boundary
   // flag.
   const Elem * searched_elem = elem;

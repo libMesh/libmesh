@@ -33,6 +33,7 @@ public:
 #  ifdef LIBMESH_ENABLE_EXCEPTIONS
   CPPUNIT_TEST( testBoundaryOnChildrenErrors );
 #  endif
+  CPPUNIT_TEST( testBoundaryIDs );
   CPPUNIT_TEST( testBoundaryOnChildrenElementsRefineCoarsen );
   CPPUNIT_TEST( testBoundaryOnChildrenBoundaryIDs );
   CPPUNIT_TEST( testBoundaryOnChildrenBoundarySides );
@@ -603,6 +604,58 @@ public:
   }
 #  endif // LIBMESH_ENABLE_EXCEPTIONS
 
+
+  void testBoundaryIDs()
+  {
+    LOG_UNIT_TEST;
+
+    // We create one cell only. The default boundaries of the cell are below.
+    //   ___2___
+    // 3 |     | 1
+    //   |_____|
+    //      0
+
+    auto mesh = std::make_unique<Mesh>(*TestCommWorld);
+    MeshTools::Generation::build_square(*mesh,
+                                        1, 1,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh->get_boundary_info();
+
+    // Now we add the extra boundary ID (5) to the element on side 3
+    auto elem = mesh->elem_ptr(0);
+    if (elem)
+      bi.add_side(elem, 3, 5);
+    mesh->prepare_for_use();
+
+    // Check the element now
+    if (elem && elem->processor_id() == mesh->processor_id())
+    {
+      std::vector<boundary_id_type> container;
+      bi.boundary_ids(elem, 3, container);
+
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), container.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), container[0]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(5), container[1]);
+
+      std::vector<std::vector<boundary_id_type>> all_bids_container;
+      bi.side_boundary_ids(elem, all_bids_container);
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(elem->n_sides()), all_bids_container.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), all_bids_container[3].size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), all_bids_container[3][0]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(5), all_bids_container[3][1]);
+      // Check other sides
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[0].size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(0), all_bids_container[0][0]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[1].size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(1), all_bids_container[1][0]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[1].size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(2), all_bids_container[2][0]);
+    }
+  }
+
   void testBoundaryOnChildrenElementsRefineCoarsen()
   {
     LOG_UNIT_TEST;
@@ -770,6 +823,30 @@ public:
         CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), container.size());
         CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(5), container[0]);
         CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), container[1]);
+
+        std::vector<std::vector<boundary_id_type>> all_bids_container;
+        bi.side_boundary_ids(elem, all_bids_container);
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(elem->n_sides()), all_bids_container.size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(2), all_bids_container[3].size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(5), all_bids_container[3][0]);
+        CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), all_bids_container[3][1]);
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[2].size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(2), all_bids_container[2][0]);
+        // Check other sides
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), all_bids_container[0].size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), all_bids_container[1].size());
+
+        // This is against the spirit of the test, and undefined behavior which
+        // may be changed later. Setting allow_children_on_boundary_side(false) could
+        // be actively doing a transfer_boundary_ids_from_children() and then deleting the
+        // children's data, not leaving the children's data there-but-ignored.
+        bi.allow_children_on_boundary_side(false);
+        bi.side_boundary_ids(elem, all_bids_container);
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(elem->n_sides()), all_bids_container.size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[3].size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(3), all_bids_container[3][0]);
+        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(1), all_bids_container[2].size());
+        CPPUNIT_ASSERT_EQUAL(static_cast<boundary_id_type>(2), all_bids_container[2][0]);
       }
     }
   }
