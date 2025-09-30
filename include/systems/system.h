@@ -31,7 +31,6 @@
 #include "libmesh/qoi_set.h"
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/tensor_value.h" // For point_hessian
-#include "libmesh/variable.h"
 #include "libmesh/enum_matrix_build_type.h" // AUTOMATIC
 
 // C++ includes
@@ -74,6 +73,8 @@ class SystemSubset;
 class FEType;
 class SystemNorm;
 enum FEMNormType : int;
+class Variable;
+class VariableGroup;
 
 /**
  * \brief Manages consistently variables, degrees of freedom, and coefficient
@@ -1151,16 +1152,38 @@ public:
                              const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
   /**
-   * Adds the variable \p var to the list of variables
+   * Adds the variables \p vars to the list of variables
    * for this system. If \p active_subdomains is either \p nullptr
    * (the default) or points to an empty set, then it will be assumed that
-   * \p var has no subdomain restrictions
+   * the \p vars have no subdomain restrictions
    *
-   * \returns The index number for the new variable.
+   * \returns The index number for the last of the new variables.
    */
   unsigned int add_variables (const std::vector<std::string> & vars,
                               const FEType & type,
                               const std::set<subdomain_id_type> * const active_subdomains = nullptr);
+
+  /**
+   * Adds variables \p vars to the list of variables
+   * for this system. If \p active_subdomains is either \p nullptr
+   * (the default) or points to an empty set, then it will be assumed that
+   * the \p vars have no subdomain restrictions. This API will end up
+   * calling \p this->add_variables(). However, we will additionally store data
+   * that can be leveraged by the \p DofMap to build degrees of freedom
+   * containers corresponding to all the variables in this variable array
+   *
+   * An 'array variable' is simply a sequence
+   * of contiguous variable numbers defined by pair where the first member of the pair
+   * is the first number in the variable sequence and the second member of the pair is
+   * the number of the last variable in the sequence plus one. Array variables may be
+   * used in tandem with variable grouping by downstream code to build optimized physics
+   * kernels since each variable in the array will have the same shape functions.
+   *
+   * \returns The index number for the last of the new variables.
+   */
+  unsigned int add_variable_array (const std::vector<std::string> & vars,
+                                   const FEType & type,
+                                   const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
   /**
    * Adds the variable \p var to the list of variables
@@ -2201,22 +2224,6 @@ private:
   const unsigned int _sys_number;
 
   /**
-   * The \p Variable in this \p System.
-   */
-  std::vector<Variable> _variables;
-
-  /**
-   * The \p VariableGroup in this \p System.
-   */
-  std::vector<VariableGroup> _variable_groups;
-
-  /**
-   * The variable numbers corresponding to user-specified
-   * names, useful for name-based lookups.
-   */
-  std::map<std::string, unsigned int, std::less<>> _variable_numbers;
-
-  /**
    * Flag stating if the system is active or not.
    */
   bool _active;
@@ -2274,12 +2281,6 @@ private:
    * immediate initialization, \p false otherwise.
    */
   bool _is_initialized;
-
-  /**
-   * \p true when \p VariableGroup structures should be automatically
-   * identified, \p false otherwise.  Defaults to \p true.
-   */
-  bool _identify_variable_groups;
 
   /**
    * This flag is used only when *reading* in a system from file.
@@ -2427,113 +2428,11 @@ void System::set_basic_system_only ()
 
 
 inline
-unsigned int System::n_vars() const
-{
-  return cast_int<unsigned int>(_variables.size());
-}
-
-
-
-inline
-unsigned int System::n_variable_groups() const
-{
-  return cast_int<unsigned int>(_variable_groups.size());
-}
-
-
-
-inline
-unsigned int System::n_components() const
-{
-  if (_variables.empty())
-    return 0;
-
-  const Variable & last = _variables.back();
-  return last.first_scalar_number() + last.n_components(this->get_mesh());
-}
-
-
-
-inline
-const Variable & System::variable (const unsigned int i) const
-{
-  libmesh_assert_less (i, _variables.size());
-
-  return _variables[i];
-}
-
-
-
-inline
-const VariableGroup & System::variable_group (const unsigned int vg) const
-{
-  libmesh_assert_less (vg, _variable_groups.size());
-
-  return _variable_groups[vg];
-}
-
-
-
-inline
-const std::string & System::variable_name (const unsigned int i) const
-{
-  libmesh_assert_less (i, _variables.size());
-
-  return _variables[i].name();
-}
-
-
-
-inline
 unsigned int
 System::variable_scalar_number (std::string_view var,
                                 unsigned int component) const
 {
   return variable_scalar_number(this->variable_number(var), component);
-}
-
-
-
-inline
-unsigned int
-System::variable_scalar_number (unsigned int var_num,
-                                unsigned int component) const
-{
-  return _variables[var_num].first_scalar_number() + component;
-}
-
-
-
-inline
-const FEType & System::variable_type (const unsigned int i) const
-{
-  libmesh_assert_less (i, _variables.size());
-
-  return _variables[i].type();
-}
-
-
-
-inline
-const FEType & System::variable_type (std::string_view var) const
-{
-  return _variables[this->variable_number(var)].type();
-}
-
-
-
-inline
-bool System::identify_variable_groups () const
-{
-  return _identify_variable_groups;
-}
-
-
-
-inline
-void System::identify_variable_groups (const bool ivg)
-{
-  _identify_variable_groups = ivg;
 }
 
 
@@ -2732,7 +2631,6 @@ System::prefer_hash_table_matrix_assembly(const bool preference)
       "System::prefer_hash_table_matrix_assembly() should be called before matrices are initialized");
   _prefer_hash_table_matrix_assembly = preference;
 }
-
 } // namespace libMesh
 
 #endif // LIBMESH_SYSTEM_H

@@ -572,17 +572,123 @@ public:
     return _sp.get();
   }
 
-  // /**
-  //  * Add an unknown of order \p order and finite element type
-  //  * \p type to the system of equations.
-  //  */
-  // void add_variable (const Variable & var);
+  /**
+   * \returns The number of variables in the system
+   */
+  unsigned int n_vars() const;
 
   /**
-   * Add a group of unknowns of order \p order and finite element type
-   * \p type to the system of equations.
+   * \returns The name of variable \p i.
    */
-  void add_variable_group (VariableGroup var_group);
+  const std::string & variable_name(const unsigned int i) const;
+
+  /**
+   * \returns The total number of scalar components in the system's
+   * variables.  This will equal \p n_vars() in the case of all
+   * scalar-valued variables. If vector variables are involved, we
+   * will need to leverage the \p mesh
+   */
+  unsigned int n_components(const MeshBase & mesh) const;
+
+  /**
+   * \returns \p true when \p VariableGroup structures should be
+   * automatically identified, \p false otherwise.
+   */
+  bool identify_variable_groups () const;
+
+  /**
+   * Toggle automatic \p VariableGroup identification.
+   */
+  void identify_variable_groups (const bool);
+
+  /**
+   * \returns An index, starting from 0 for the first component of the
+   * first variable, and incrementing for each component of each
+   * (potentially vector-valued) variable in the system in order.
+   * For systems with only scalar-valued variables, this will be the
+   * same as \p var_num
+   *
+   * Irony: currently our only non-scalar-valued variable type is
+   * SCALAR.
+   */
+  unsigned int variable_scalar_number (unsigned int var_num,
+                                       unsigned int component) const;
+
+  /**
+   * \returns The finite element type for variable number \p i.
+   */
+  const FEType & variable_type (const unsigned int i) const;
+
+  /**
+   * \returns The finite element type for variable \p var.
+   */
+  const FEType & variable_type (std::string_view var) const;
+
+  /**
+   * \returns The variable number associated with
+   * the user-specified variable named \p var.
+   */
+  unsigned int variable_number (std::string_view var) const;
+
+  /**
+   * \returns \p true if a variable named \p var exists in this System
+   */
+  bool has_variable(std::string_view var) const;
+
+  /**
+   * Fills \p all_variable_numbers with all the variable numbers for the
+   * variables that have been added to this system.
+   */
+  void get_all_variable_numbers(std::vector<unsigned int> & all_variable_numbers) const;
+
+  /**
+   * Adds the variable \p var to the list of variables
+   * for this system. If \p active_subdomains is either \p nullptr
+   * (the default) or points to an empty set, then it will be assumed that
+   * \p var has no subdomain restrictions
+   *
+   * \returns The index number for the new variable.
+   */
+  unsigned int add_variable (System & sys,
+                             std::string_view var,
+                             const FEType & type,
+                             const std::set<subdomain_id_type> * const active_subdomains = nullptr);
+
+  /**
+   * Adds the variables \p vars to the list of variables
+   * for this system. If \p active_subdomains is either \p nullptr
+   * (the default) or points to an empty set, then it will be assumed that
+   * the \p vars have no subdomain restrictions
+   *
+   * \returns The index number for the last of the new variables.
+   */
+  unsigned int add_variables (System & sys,
+                              const std::vector<std::string> & vars,
+                              const FEType & type,
+                              const std::set<subdomain_id_type> * const active_subdomains = nullptr);
+
+  /**
+   * Adds variables \p vars to the list of variables
+   * for this system. If \p active_subdomains is either \p nullptr
+   * (the default) or points to an empty set, then it will be assumed that
+   * the \p vars have no subdomain restrictions. This API will end up
+   * calling \p this->add_variables(). However, we will additionally store data
+   * that can be leveraged by the \p DofMap to build degrees of freedom
+   * containers corresponding to all the variables in this variable array
+   *
+   * An 'array variable' is simply a sequence
+   * of contiguous variable numbers defined by pair where the first member of the pair
+   * is the first number in the variable sequence and the second member of the pair is
+   * the number of the last variable in the sequence plus one. Array variables may be
+   * used in tandem with variable grouping by downstream code to build optimized physics
+   * kernels since each variable in the array will have the same shape functions.
+   *
+   * \returns The index number for the last of the new variables.
+   */
+  unsigned int add_variable_array (System & sys,
+                                   const std::vector<std::string> & vars,
+                                   const FEType & type,
+                                   const std::set<subdomain_id_type> * const active_subdomains = nullptr);
 
   /**
    * Specify whether or not we perform an extra (opt-mode enabled) check
@@ -613,11 +719,6 @@ public:
    * \returns The approximation order for \p VariableGroup \p vg.
    */
   Order variable_group_order (const unsigned int vg) const;
-
-  /**
-   * \returns The finite element type for variable \p c.
-   */
-  const FEType & variable_type (const unsigned int c) const;
 
   /**
    * \returns The finite element type for \p VariableGroup \p vg.
@@ -730,6 +831,26 @@ public:
                     std::vector<dof_id_type> & di,
                     const unsigned int vn,
                     int p_level = -12345) const override;
+
+  /**
+   * Fills the vector \p di with the global degree of freedom indices
+   * for the element. This will aggregate all the degrees of the freedom
+   * from the variable array that \p vn is a member of, and potentially for a
+   * non-default element p refinement level
+   */
+  void array_dof_indices(const Elem * const elem,
+                         std::vector<dof_id_type> & di,
+                         const unsigned int vn,
+                         int p_level = -12345) const;
+
+  void array_dof_indices(const Node * const node,
+                         std::vector<dof_id_type> & di,
+                         const unsigned int vn) const;
+
+  template <typename DofIndicesFunctor>
+  void array_dof_indices(const DofIndicesFunctor & functor,
+                         std::vector<dof_id_type> & di,
+                         const unsigned int vn) const;
 
   /**
    * Retrieves degree of freedom indices for a given \p elem and then performs actions for these
@@ -1688,6 +1809,22 @@ public:
 private:
 
   /**
+   * Retrieve the array variable bounds for a given variable \p vi. This variable may
+   * lie anywhere within an array variable range. An 'array variable' is simply a sequence
+   * of contiguous variable numbers defined by pair where the first member of the pair
+   * is the first number in the variable sequence and the second member of the pair is
+   * the number of the last variable in the sequence plus one. Array variables may be
+   * used in tandem with variable grouping by downstream code to build optimized physics
+   * kernels since each variable in the array will have the same shape functions.
+   *
+   * We note that we store array variables as a container of the above described pairs. Within
+   * this API we will do a binary search such that the complexity is O(log(N)) where N is the
+   * number of array variables present in \p this
+   */
+  const std::pair<unsigned int, unsigned int> &
+  get_variable_array(unsigned int vi) const;
+
+  /**
    * Helper function that gets the dof indices on the current element
    * for a non-SCALAR type variable, where the variable is identified
    * by its variable group number \p vg and its offset \p vig from the
@@ -1947,12 +2084,12 @@ private:
   bool _constrained_sparsity_construction;
 
   /**
-   * The finite element type for each variable.
+   * The variables in this system/degree of freedom map
    */
   std::vector<Variable> _variables;
 
   /**
-   * The finite element type for each variable group.
+   * The variable groups in this system/degree of freedom map
    */
   std::vector<VariableGroup> _variable_groups;
 
@@ -1965,6 +2102,25 @@ private:
    * A map from variable number to variable group number
    */
   std::unordered_map<unsigned int, unsigned int> _var_to_vg;
+
+  /**
+   * The variable numbers corresponding to user-specified
+   * names, useful for name-based lookups.
+   */
+  std::map<std::string, unsigned int, std::less<>> _variable_numbers;
+
+  /**
+   * Array variable information storage. For a given array "variable", the first member of the pair
+   * denotes the first variable number present in the array variable and the second member of the
+   * pair denotes the last variable number present in the array variables plus one
+   */
+  std::vector<std::pair<unsigned int, unsigned int>> _array_variables;
+
+  /**
+   * \p true when \p VariableGroup structures should be automatically
+   * identified, \p false otherwise.  Defaults to \p true.
+   */
+  bool _identify_variable_groups = true;
 
   /**
    * The number of the system we manage DOFs for.
@@ -2700,6 +2856,132 @@ StaticCondensationDofMap & DofMap::get_static_condensation()
 {
   libmesh_assert(_sc);
   return *_sc;
+}
+
+inline const std::pair<unsigned int, unsigned int> &
+DofMap::get_variable_array(const unsigned int vi) const
+{
+  auto it = std::upper_bound(
+      _array_variables.begin(),
+      _array_variables.end(),
+      vi,
+      [](unsigned int value, const std::pair<unsigned int, unsigned int> & b) { return value < b.first; });
+
+  libmesh_assert_msg(it != _array_variables.begin(),
+                     "Passed in " << std::to_string(vi) << " is not in any of our array variables");
+  --it;
+  libmesh_assert_msg(vi < it->second,
+                     "Passed in " << std::to_string(vi) << " is not in any of our array variables");
+  return *it;
+}
+
+template <typename DofIndicesFunctor>
+void DofMap::array_dof_indices(const DofIndicesFunctor & functor,
+                               std::vector<dof_id_type> & di,
+                               const unsigned int vn) const
+{
+  const auto [begin, end] = this->get_variable_array(vn);
+  functor(di, begin);
+
+  const unsigned int count = end - begin;
+  // We make count, which could be >> ntest, the inner index in hopes of vectorization
+  if (count > 1)
+    {
+      const dof_id_type component_size = di.size();
+      di.resize(count * component_size);
+
+      const auto pack_container = [&di,
+                                   component_size](const unsigned int j,
+                                                   const std::vector<dof_id_type> & j_dof_indices,
+                                                   const unsigned int stride) {
+        if (&j_dof_indices != &di)
+          libmesh_assert(j_dof_indices.size() == component_size);
+        for (const auto i : make_range(component_size))
+          di[j * component_size + i] = j_dof_indices[i] + stride * j;
+      };
+      pack_container(0, di, 0);
+
+      const auto & fe_type = _variable_groups[libmesh_map_find(_var_to_vg, vn)].type();
+      if (const bool lagrange = fe_type.family == LAGRANGE;
+          lagrange || (FEInterface::get_continuity(fe_type) == DISCONTINUOUS))
+        {
+          const auto stride = lagrange ? 1 : component_size;
+          for (const auto j : make_range((unsigned int)1, count))
+            pack_container(j, di, stride);
+        }
+      else
+        {
+          static thread_local std::vector<dof_id_type> work_dof_indices;
+          unsigned int j = 1;
+          for (const auto i : make_range(begin + 1, end))
+            {
+              functor(work_dof_indices, i);
+              pack_container(j++, work_dof_indices, 0);
+            }
+        }
+    }
+}
+
+inline
+unsigned int DofMap::n_vars() const
+{
+  return cast_int<unsigned int>(_variables.size());
+}
+
+inline
+const std::string & DofMap::variable_name (const unsigned int i) const
+{
+  libmesh_assert_less (i, _variables.size());
+
+  return _variables[i].name();
+}
+
+inline
+bool DofMap::identify_variable_groups () const
+{
+  return _identify_variable_groups;
+}
+
+inline
+void DofMap::identify_variable_groups (const bool ivg)
+{
+  _identify_variable_groups = ivg;
+}
+
+inline
+unsigned int DofMap::n_components(const MeshBase & mesh) const
+{
+  if (_variables.empty())
+    return 0;
+
+  const Variable & last = _variables.back();
+  return last.first_scalar_number() + last.n_components(mesh);
+}
+
+inline
+unsigned int
+DofMap::variable_scalar_number (unsigned int var_num,
+                                unsigned int component) const
+{
+  return _variables[var_num].first_scalar_number() + component;
+}
+
+inline
+const FEType & DofMap::variable_type (std::string_view var) const
+{
+  return _variables[this->variable_number(var)].type();
+}
+
+inline bool DofMap::has_variable(std::string_view var) const
+{
+  return _variable_numbers.count(var);
+}
+
+inline unsigned int DofMap::variable_number(std::string_view var) const
+{
+  auto var_num = libmesh_map_find(_variable_numbers, var);
+  libmesh_assert_equal_to(_variables[var_num].name(), var);
+  return var_num;
 }
 
 } // namespace libMesh
