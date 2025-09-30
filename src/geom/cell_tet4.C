@@ -626,4 +626,17 @@ ElemType Tet4::side_type (const unsigned int libmesh_dbg_var(s)) const
 }
 
 
+Point
+Tet4::side_vertex_average_normal(const unsigned int s) const
+{
+  libmesh_assert_less (s, 4);
+  const Point n1 = this->node_ptr(side_nodes_map[s][1]) -
+                   this->node_ptr(side_nodes_map[s][0]);
+  const Point n2 = this->node_ptr(side_nodes_map[s][2]) -
+                   this->node_ptr(side_nodes_map[s][1]);
+  const Point pointing_out = n2.cross(n1);
+  return pointing_out.unit();
+}
+
+
 } // namespace libMesh

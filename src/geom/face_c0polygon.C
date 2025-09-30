@@ -336,6 +336,35 @@ ElemType C0Polygon::side_type (const unsigned int libmesh_dbg_var(s)) const
 }
 
 
+Point
+C0Polygon::side_vertex_average_normal(const unsigned int s) const
+{
+  const auto n_sides = this->n_sides();
+  libmesh_assert_less (s, n_sides);
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
+  const Point side_t = this->point((s+1) % n_sides) -
+                       this->point(s);
+  Point plane_normal(0, 0, 1);
+  // Find out what plane we're in, if we're in 3D
+  // Note we don't support non-planar C0-polygon at this time
+#if LIBMESH_DIM > 2
+  plane_normal(2) = 0;
+  const auto vavg = this->vertex_average();
+  for (auto i : make_range(n_sides))
+    {
+      const Point vi     = this->point(i) - vavg;
+      const Point viplus = this->point((i+1)%n_sides) - vavg;
+      plane_normal += vi.cross(viplus);
+      // Since we know the polygon is planar
+      if (plane_normal.norm_sq() > TOLERANCE)
+        break;
+    }
+  plane_normal = plane_normal.unit();
+#endif
+  const Point v = side_t.cross(plane_normal);
+  return v.unit();
+}
+
 
 void C0Polygon::retriangulate()
 {

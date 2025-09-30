@@ -3486,7 +3486,18 @@ BoundingBox Elem::loose_bounding_box () const
   return BoundingBox(pmin, pmax);
 }
 
-
+Point
+Elem::side_vertex_average_normal(const unsigned int s) const
+{
+  unsigned int dim = this->dim();
+  const std::unique_ptr<const Elem> face = this->build_side_ptr(s);
+  std::unique_ptr<libMesh::FEBase> fe(
+      libMesh::FEBase::build(dim, libMesh::FEType(this->default_order())));
+  const std::vector<Point> & normals = fe->get_normals();
+  std::vector<Point> ref_side_vertex_average_v = {face->reference_elem()->vertex_average()};
+  fe->reinit(this, s, TOLERANCE, &ref_side_vertex_average_v);
+  return normals[0];
+}
 
 bool Elem::is_vertex_on_parent(unsigned int c,
                                unsigned int n) const

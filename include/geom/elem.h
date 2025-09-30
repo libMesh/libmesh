@@ -692,6 +692,12 @@ public:
   virtual ElemType side_type (const unsigned int s) const = 0;
 
   /**
+   * \returns the normal (outwards-facing) of the side of the element at the vertex-average of the side
+   * @param s the side of interest
+   */
+  virtual Point side_vertex_average_normal(const unsigned int s) const;
+
+  /**
    * \returns An integer range from 0 up to (but not including)
    * the number of sides this element has.
    */

@@ -242,6 +242,35 @@ ElemType C0Polyhedron::side_type (const unsigned int libmesh_dbg_var(s)) const
 
 
 
+Point
+C0Polyhedron::side_vertex_average_normal(const unsigned int s) const
+{
+  libmesh_assert_less (s, this->n_sides());
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
+  const auto poly_side_ptr = this->side_ptr(s);
+  const auto n_side_edges = poly_side_ptr->n_sides();
+
+  // At the side vertex average, things simplify a bit
+  // We get the side "plane" normal at all vertices, then average them
+  Point normal;
+  Point current_edge = poly_side_ptr->point(1) - poly_side_ptr->point(0);
+  for (auto i : make_range(n_side_edges))
+  {
+    const Point next_edge = poly_side_ptr->point((i + 2) % n_side_edges) -
+                            poly_side_ptr->point((i + 1) % n_side_edges);
+    const Point normal_at_vertex = current_edge.cross(next_edge);
+    normal += normal_at_vertex;
+    // Note: the sides are planar, we don't need to test them all
+    if (normal.norm_sq() > TOLERANCE)
+      break;
+    current_edge = next_edge;
+  }
+  bool outward_normal = std::get<1>(_sidelinks_data[s]);
+  return (outward_normal ? 1. : -1.) * normal.unit();
+}
+
+
+
 void C0Polyhedron::retriangulate()
 {
   this->_triangulation.clear();

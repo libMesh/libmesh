@@ -503,6 +503,49 @@ Prism6::side_type (const unsigned int s) const
   return QUAD4;
 }
 
+Point
+Prism6::side_vertex_average_normal(const unsigned int s) const
+{
+  libmesh_assert_less (s, 5);
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
+
+  switch (s)
+    {
+    case 0: // the triangular face at z=-1
+    case 4: // the triangular face at z=1
+      {
+        const Point n1 = this->point(side_nodes_map[s][1]) -
+                         this->point(side_nodes_map[s][0]);
+        const Point n2 = this->point(side_nodes_map[s][2]) -
+                         this->point(side_nodes_map[s][1]);
+        const Point pointing_out = n1.cross(n2);
+        return pointing_out.unit();
+      }
+    case 1: // the quad face at y=0
+    case 2: // the other quad face
+    case 3: // the quad face at x=0
+      {
+        // At the side vertex average, things simplify a bit
+        // We get the side "plane" normal at all vertices, then average them
+        Point normal;
+        Point current_edge = this->point(side_nodes_map[s][1]) -
+                             this->point(side_nodes_map[s][0]);
+        for (auto i : make_range(4))
+        {
+          const Point next_edge = this->point(side_nodes_map[s][(i + 2) % 4]) -
+                                  this->point(side_nodes_map[s][(i + 1) % 4]);
+          const Point normal_at_vertex = current_edge.cross(next_edge);
+          normal += normal_at_vertex;
+          current_edge = next_edge;
+        }
+        normal /= 4;
+        return normal.unit();
+      }
+    default:
+      libmesh_error_msg("Invalid side s = " << s);
+    }
+}
+
 } // namespace libMesh
 
 namespace // anonymous
