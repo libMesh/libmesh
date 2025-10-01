@@ -871,8 +871,7 @@ public:
   void testVariationalPrism18()
   {
     ReplicatedMesh mesh(*TestCommWorld);
-    VariationalMeshSmoother variational(
-        mesh, 0.5, true, TOLERANCE * TOLERANCE, 100 * TOLERANCE * TOLERANCE);
+    VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PRISM18);
   }
@@ -881,7 +880,7 @@ public:
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(
-        mesh, 0.5, true, TOLERANCE * TOLERANCE, 100 * TOLERANCE * TOLERANCE);
+        mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
 
     testVariationalSmoother(mesh, variational, PRISM20);
   }
@@ -890,7 +889,7 @@ public:
   {
     ReplicatedMesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(
-        mesh, 0.5, true, TOLERANCE * TOLERANCE, 100 * TOLERANCE * TOLERANCE);
+        mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
 
     testVariationalSmoother(mesh, variational, PRISM21);
   }
@@ -899,8 +898,7 @@ public:
   {
     ReplicatedMesh mesh(*TestCommWorld);
     mesh.allow_renumbering(false);
-    VariationalMeshSmoother variational(
-        mesh, 0.5, true, TOLERANCE * TOLERANCE, 100 * TOLERANCE * TOLERANCE);
+    VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PRISM21, true);
   }
