@@ -57,7 +57,7 @@ public:
    * @param point The point defining the constraint.
    * @param tol The tolerance to use for numerical comparisons.
    */
-  PointConstraint(const Point & point, const Real & tol = TOLERANCE);
+  PointConstraint(const Point &point, const Real &tol = TOLERANCE * TOLERANCE);
 
   /**
    * Comparison operator for ordering PointConstraint objects.
@@ -131,7 +131,8 @@ public:
    * @param direction the direction of the constraining line.
    * @param tol The tolerance to use for numerical comparisons.
    */
-  LineConstraint(const Point & point, const Point & direction, const Real & tol = TOLERANCE);
+  LineConstraint(const Point &point, const Point &direction,
+                 const Real &tol = TOLERANCE * TOLERANCE);
 
   /**
    * Comparison operator for ordering LineConstraint objects.
@@ -230,7 +231,8 @@ public:
    * @param normal the direction normal to the constraining plane.
    * @param tol The tolerance to use for numerical comparisons.
    */
-  PlaneConstraint(const Point & point, const Point & normal, const Real & tol = TOLERANCE);
+  PlaneConstraint(const Point &point, const Point &normal,
+                  const Real &tol = TOLERANCE * TOLERANCE);
 
   /**
    * Comparison operator for ordering PlaneConstraint objects.
