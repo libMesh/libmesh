@@ -871,7 +871,8 @@ public:
   void testVariationalPrism18()
   {
     ReplicatedMesh mesh(*TestCommWorld);
-    VariationalMeshSmoother variational(mesh);
+    VariationalMeshSmoother variational(
+        mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
 
     testVariationalSmoother(mesh, variational, PRISM18);
   }
