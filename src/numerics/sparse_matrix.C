@@ -755,7 +755,7 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
               current_off_diagonal_nonzeros = 0;
             }
 
-          while (current_row >= (new_row_stops[current_proc]+1))
+          while (current_row >= new_row_stops[current_proc])
             ++current_proc;
 
           // 0-based indexing in file
