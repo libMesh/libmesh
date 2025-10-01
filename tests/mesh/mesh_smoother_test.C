@@ -13,6 +13,7 @@
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/system.h> // LIBMESH_HAVE_SOLVER define
 #include "libmesh/face_tri.h"
+#include "libmesh/cell_prism.h"
 #include "libmesh/utility.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/parallel_ghost_sync.h"
@@ -127,7 +128,7 @@ class SquareToParallelogram : public FunctionBase<Real>
     output.resize(3);
     output(0) = p(0) - 0.5 * p(1);
     output(1) = 0.5 * std::sqrt(Real(3)) * p(1);
-    output(2) = 0;
+    output(2) = p(2);
   }
 };
 
@@ -151,7 +152,65 @@ class ParallelogramToSquare : public FunctionBase<Real>
     output.resize(3);
     output(0) = p(0) + p(1) / std::sqrt(Real(3));
     output(1) = (2. / std::sqrt(Real(3))) * p(1);
-    output(2) = 0;
+    output(2) = p(2);
+  }
+};
+
+class CubeToParallelepiped : public FunctionBase<Real>
+{
+  std::unique_ptr<FunctionBase<Real>> clone() const override
+  {
+    return std::make_unique<CubeToParallelepiped>();
+  }
+
+  Real operator()(const Point &, const Real = 0.) override
+  {
+    libmesh_not_implemented();
+  } // scalar-only API
+
+  // Has the effect that a cube, meshed into right triangular prisms with diagonals
+  // rising from lower-right to upper-left, is transformed into a right-leaning
+  // parallelepiped of equilateral triangular prisms. Additionally, the z direction
+  // is scaled to ensure element height to base aspect ratios match the target element.
+  // Without the correct aspect ratio, the smoothed mesh nodes are off and the
+  // distortion_is assertions fail.
+  void operator()(const Point & p, const Real, DenseVector<Real> & output)
+  {
+    output.resize(3);
+    output(0) = p(0) + 0.5 * p(1);
+    output(1) = 0.5 * std::sqrt(3) * p(1);
+    // Adjusting z to get the triangular area to element height aspect ratio To
+    // match the target element
+    output(2) = p(2) * 0.25 * std::sqrt(3.);
+  }
+};
+
+class ParallelepipedToCube : public FunctionBase<Real>
+{
+  std::unique_ptr<FunctionBase<Real>> clone() const override
+  {
+    return std::make_unique<ParallelepipedToCube>();
+  }
+
+  Real operator()(const Point &, const Real = 0.) override
+  {
+    libmesh_not_implemented();
+  } // scalar-only API
+
+  // Has the effect that a right-leaning parallelepiped of equilaterial triangular
+  // prisms with is transformed into a cube of right triangular prisms with
+  // diagonals rising from lower-right to upper-left. Additionally, the z direction
+  // is scaled to ensure element heights align with the values expected by the
+  // distortion_is function.
+  // This is the inversion of the CubeToParallelepiped mapping.
+  void operator()(const Point & p, const Real, DenseVector<Real> & output)
+  {
+    output.resize(3);
+    output(0) = p(0) - p(1) / std::sqrt(3.);
+    output(1) = (2. / std::sqrt(3)) * p(1);
+    // Undoing the aspect ratio adjustment to get the z divisions to work with
+    // distortion_is
+    output(2) = p(2) * 4. / std::sqrt(3.);
   }
 };
 }
@@ -194,6 +253,13 @@ public:
   CPPUNIT_TEST(testVariationalPyramid14);
   CPPUNIT_TEST(testVariationalPyramid18);
   CPPUNIT_TEST(testVariationalPyramid18MultipleSubdomains);
+
+  CPPUNIT_TEST(testVariationalPrism6);
+  CPPUNIT_TEST(testVariationalPrism15);
+  CPPUNIT_TEST(testVariationalPrism18);
+  CPPUNIT_TEST(testVariationalPrism20);
+  CPPUNIT_TEST(testVariationalPrism21);
+  CPPUNIT_TEST(testVariationalPrism21MultipleSubdomains);
 #endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
 
@@ -288,6 +354,7 @@ public:
     const auto dim = ref_elem->dim();
     const bool type_is_tri = Utility::enum_to_string(type).compare(0, 3, "TRI") == 0;
     const bool type_is_pyramid = Utility::enum_to_string(type).compare(0, 7, "PYRAMID") == 0;
+    const bool type_is_prism = Utility::enum_to_string(type).compare(0, 5, "PRISM") == 0;
 
     // Used fewer elems for higher order types, as extra midpoint nodes will add
     // enough complexity
@@ -428,7 +495,7 @@ public:
     const auto scale_factor = *elem_orders.begin() * (type_is_pyramid ? 2 * 4 : 1);
 
     // Function to assert the node distortion is as expected
-    auto node_distortion_is = [&n_elems_per_side, &dim, &boundary_info, &scale_factor](
+    auto node_distortion_is = [&n_elems_per_side, &dim, &boundary_info, &scale_factor, &type_is_prism](
                              const Node & node, bool distortion, Real distortion_tol = TOLERANCE) {
       // Get boundary ids associated with the node
       std::vector<boundary_id_type> boundary_ids;
@@ -465,7 +532,17 @@ public:
           CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, r);
           CPPUNIT_ASSERT_GREATER(-distortion_tol * distortion_tol, 1 - r);
 
-          const bool d_distorted = std::abs(R - std::round(R)) > distortion_tol;
+          bool d_distorted = std::abs(R - std::round(R)) > distortion_tol;
+          if (type_is_prism && (scale_factor == 3))
+            {
+              // Adjustment required for triangular face nodes of PRISM20/21 elements.
+              // These elements have fe_order 3. This takes care of nodes occuring at
+              // thirds, but not halves.
+              const Real R_prism = R / scale_factor * 2;
+              const bool d_distorted_prism =
+                  std::abs(R_prism - std::round(R_prism)) > distortion_tol;
+              d_distorted &= d_distorted_prism;
+            }
           distorted |= d_distorted;
           num_zero_or_one += (absolute_fuzzy_equals(r, 0.) || absolute_fuzzy_equals(r, 1.));
         }
@@ -488,20 +565,38 @@ public:
     // to the optimal case of equilateral triangles
     if (type_is_tri)
       {
+        // Transform the square mesh of triangles to a parallelogram mesh of
+        // triangles. This will allow the Variational Smoother to smooth the mesh
+        // to the optimal case of equilateral triangles
         SquareToParallelogram stp;
         MeshTools::Modification::redistribute(mesh, stp);
+      }
+    else if (type_is_prism)
+      {
+        // Transform the cube mesh of prisms to a parallelepiped mesh of
+        // prisms. This will allow the Variational Smoother to smooth the mesh
+        // to the optimal case of equilateral triangular prisms
+        CubeToParallelepiped ctp;
+        MeshTools::Modification::redistribute(mesh, ctp);
       }
 
     smoother.smooth();
 
-    // Transform the parallelogram mesh back to a square mesh. In the case of
-    // the Variational Smoother, equilateral triangular elements will be
-    // transformed into right triangular elements that align with the original
-    // undistorted mesh.
     if (type_is_tri)
       {
+        // Transform the parallelogram mesh back to a square mesh. In the case of
+        // the Variational Smoother, equilateral triangules will be transformed
+        // into right triangules that align with the original undistorted mesh.
         ParallelogramToSquare pts;
         MeshTools::Modification::redistribute(mesh, pts);
+      }
+    else if (type_is_prism)
+      {
+        // Transform the parallelepiped mesh back to a cube mesh. In the case of
+        // the Variational Smoother, equilateral triangular prisms will be transformed
+        // into right triangular prisms that align with the original undistorted mesh.
+        ParallelepipedToCube ptc;
+        MeshTools::Modification::redistribute(mesh, ptc);
       }
 
     if (multiple_subdomains)
@@ -755,6 +850,58 @@ public:
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PYRAMID18, true);
+  }
+
+  void testVariationalPrism6()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, PRISM6);
+  }
+
+  void testVariationalPrism15()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, PRISM15);
+  }
+
+  void testVariationalPrism18()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(
+        mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
+
+    testVariationalSmoother(mesh, variational, PRISM18);
+  }
+
+  void testVariationalPrism20()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(
+        mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
+
+    testVariationalSmoother(mesh, variational, PRISM20);
+  }
+
+  void testVariationalPrism21()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(
+        mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
+
+    testVariationalSmoother(mesh, variational, PRISM21);
+  }
+
+  void testVariationalPrism21MultipleSubdomains()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    mesh.allow_renumbering(false);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, PRISM21, true);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };

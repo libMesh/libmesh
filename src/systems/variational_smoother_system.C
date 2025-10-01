@@ -926,6 +926,78 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
         }
     } // if Tri
 
+  // Elems deriving from Prism
+  else if (type_str.compare(0, 5, "PRISM") == 0)
+    {
+
+      // The target element will be a prism with an equilateral triangular
+      // base with volume equal to the volume of the reference element.
+
+      // For an equilateral triangular base with side length s, the
+      // base area is s^2 * sqrt(3) / 4.
+      // The prism height that will result in equal face areas is
+      // s * sqrt(3) / 4. We choose s such that the target element has
+      // the same volume as the reference element:
+      // v = (s^2 * sqrt(3) / 4) * (s * sqrt(3) / 4) = 3 * s^3 / 4
+      // --> s = (16 * v / 3)^(1/3)
+      // I have no particular motivation for imposing equal face areas,
+      // so this can be updated if a more `optimal` target prism is
+      // identified.
+
+      // Side length that preserves the volume of the reference element
+      const auto side_length = std::pow(16. * ref_vol / 3., 1. / 3.);
+      // Prism height with the property that all faces have equal area
+      const auto target_height = 0.25 * side_length * sqrt_3;
+
+      const auto & s = side_length;
+      const auto & h = target_height;
+      //                                         x        y                 z    node_id
+      owned_nodes.emplace_back(Node::build(Point(0.,      0.,               0.), 0));
+      owned_nodes.emplace_back(Node::build(Point(s,       0.,               0.), 1));
+      owned_nodes.emplace_back(Node::build(Point(0.5 * s, 0.5 * sqrt_3 * s, 0.), 2));
+      owned_nodes.emplace_back(Node::build(Point(0.,      0.,               h),  3));
+      owned_nodes.emplace_back(Node::build(Point(s,       0.,               h),  4));
+      owned_nodes.emplace_back(Node::build(Point(0.5 * s, 0.5 * sqrt_3 * s, h),  5));
+
+      if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+        {
+          // Define the edge midpoint nodes of the prism
+          const auto & on = owned_nodes;
+          owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[1]) / 2.), 6));
+          owned_nodes.emplace_back(Node::build(Point((*on[1] + *on[2]) / 2.), 7));
+          owned_nodes.emplace_back(Node::build(Point((*on[2] + *on[0]) / 2.), 8));
+          owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[3]) / 2.), 9));
+          owned_nodes.emplace_back(Node::build(Point((*on[1] + *on[4]) / 2.), 10));
+          owned_nodes.emplace_back(Node::build(Point((*on[2] + *on[5]) / 2.), 11));
+          owned_nodes.emplace_back(Node::build(Point((*on[3] + *on[4]) / 2.), 12));
+          owned_nodes.emplace_back(Node::build(Point((*on[4] + *on[5]) / 2.), 13));
+          owned_nodes.emplace_back(Node::build(Point((*on[5] + *on[3]) / 2.), 14));
+
+          if (type == PRISM18 || type == PRISM20 || type == PRISM21)
+            {
+              // Define the rectangular face midpoint nodes of the prism
+              owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[1] + *on[3] + *on[4]) / 4.), 15));
+              owned_nodes.emplace_back(Node::build(Point((*on[1] + *on[2] + *on[4] + *on[5]) / 4.), 16));
+              owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[2] + *on[3] + *on[5]) / 4.), 17));
+
+              if (type == PRISM20 || type == PRISM21)
+                {
+                  // Define the triangular face midpoint nodes of the prism
+                  owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[1] + *on[2]) / 3.), 18));
+                  owned_nodes.emplace_back(Node::build(Point((*on[3] + *on[4] + *on[5]) / 3.), 19));
+
+                  if (type == PRISM21)
+                    // Define the interior point of the prism
+                    owned_nodes.emplace_back(Node::build(Point((*on[9] + *on[10] + *on[11]) / 3.), 20));
+
+                }
+            }
+        }
+
+      else if (type != PRISM6)
+        libmesh_error_msg("Unsupported prism element: " << type_str);
+
+    } // if Prism
 
   // Elems deriving from Pyramid
   else if (type_str.compare(0, 7, "PYRAMID") == 0)
