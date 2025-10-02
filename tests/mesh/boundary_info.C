@@ -625,7 +625,7 @@ public:
     BoundaryInfo & bi = mesh->get_boundary_info();
 
     // Now we add the extra boundary ID (5) to the element on side 3
-    auto elem = mesh->elem_ptr(0);
+    auto elem = mesh->query_elem_ptr(0);
     if (elem)
       bi.add_side(elem, 3, 5);
     mesh->prepare_for_use();

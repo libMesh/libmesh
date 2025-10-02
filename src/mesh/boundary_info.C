@@ -1540,7 +1540,6 @@ void BoundaryInfo::side_boundary_ids (const Elem * const elem,
   const Elem * searched_elem = elem;
 
 #ifdef LIBMESH_ENABLE_AMR
-
   if (elem->level() != 0)
   {
     // If we have children on the boundaries, we need to search for boundary IDs on the
@@ -1606,11 +1605,11 @@ void BoundaryInfo::side_boundary_ids (const Elem * const elem,
           vec_to_fill[pr.second.first].push_back(pr.second.second);
     return;
   }
+#endif
 
   // Check each element in the range to see if its side matches the requested side.
   for (const auto & pr : as_range(_boundary_side_id.equal_range(searched_elem)))
     vec_to_fill[pr.second.first].push_back(pr.second.second);
-#endif
 }
 
 void BoundaryInfo::boundary_ids (const Elem * const elem,
