@@ -245,7 +245,8 @@ public:
 // ------------------------------------------------------------
 // System implementation
 void System::project_vector (NumericVector<Number> & vector,
-                             int is_adjoint) const
+                             int is_adjoint,
+                             std::optional<ConstElemRange> active_local_range) const
 {
   // Create a copy of the vector, which currently
   // contains the old data.
@@ -253,7 +254,7 @@ void System::project_vector (NumericVector<Number> & vector,
     old_vector (vector.clone());
 
   // Project the old vector to the new vector
-  this->project_vector (*old_vector, vector, is_adjoint);
+  this->project_vector (*old_vector, vector, is_adjoint, active_local_range);
 }
 
 
@@ -264,7 +265,8 @@ void System::project_vector (NumericVector<Number> & vector,
  */
 void System::project_vector (const NumericVector<Number> & old_v,
                              NumericVector<Number> & new_v,
-                             int is_adjoint) const
+                             int is_adjoint,
+                             std::optional<ConstElemRange> active_local_range) const
 {
   LOG_SCOPE ("project_vector(old,new)", "System");
 
@@ -285,9 +287,12 @@ void System::project_vector (const NumericVector<Number> & old_v,
   std::unique_ptr<NumericVector<Number>> local_old_vector_built;
   const NumericVector<Number> * old_vector_ptr = nullptr;
 
-  ConstElemRange active_local_elem_range
-    (this->get_mesh().active_local_elements_begin(),
-     this->get_mesh().active_local_elements_end());
+  if (!active_local_range)
+    {
+      active_local_range.emplace
+        (this->get_mesh().active_local_elements_begin(),
+         this->get_mesh().active_local_elements_end());
+    }
 
   // If the old vector was uniprocessor, make the new
   // vector uniprocessor
@@ -304,7 +309,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
     {
       // Build a send list for efficient localization
       BuildProjectionList projection_list(*this);
-      Threads::parallel_reduce (active_local_elem_range,
+      Threads::parallel_reduce (active_local_range.value(),
                                 projection_list);
 
       // Create a sorted, unique send_list
@@ -328,7 +333,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
     {
       // Build a send list for efficient localization
       BuildProjectionList projection_list(*this);
-      Threads::parallel_reduce (active_local_elem_range,
+      Threads::parallel_reduce (active_local_range.value(),
                                 projection_list);
 
       // Create a sorted, unique send_list
@@ -389,7 +394,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
             g(*this, old_vector, &regular_vars);
 
           FEMProjector projector(*this, f, &g, setter, regular_vars);
-          projector.project(active_local_elem_range);
+          projector.project(active_local_range.value());
         }
 
       if (!vector_vars.empty())
@@ -403,7 +408,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
           OldSolutionValue<Tensor, &FEMContext::point_gradient> g_vector(*this, old_vector, &vector_vars);
 
           FEMVectorProjector vector_projector(*this, f_vector, &g_vector, setter, vector_vars);
-          vector_projector.project(active_local_elem_range);
+          vector_projector.project(active_local_range.value());
         }
 
       // Copy the SCALAR dofs from old_vector to new_vector
@@ -1068,11 +1073,12 @@ void System::project_vector (ValueFunctionPointer fptr,
                              GradientFunctionPointer gptr,
                              const Parameters & function_parameters,
                              NumericVector<Number> & new_vector,
-                             int is_adjoint) const
+                             int is_adjoint,
+                             std::optional<ConstElemRange> active_local_range) const
 {
   WrappedFunction<Number> f(*this, fptr, &function_parameters);
   WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
-  this->project_vector(new_vector, &f, &g, is_adjoint);
+  this->project_vector(new_vector, &f, &g, is_adjoint, active_local_range);
 }
 
 /**
@@ -1082,7 +1088,8 @@ void System::project_vector (ValueFunctionPointer fptr,
 void System::project_vector (NumericVector<Number> & new_vector,
                              FunctionBase<Number> * f,
                              FunctionBase<Gradient> * g,
-                             int is_adjoint) const
+                             int is_adjoint,
+                             std::optional<ConstElemRange> active_local_range) const
 {
   LOG_SCOPE ("project_vector(FunctionBase)", "System");
 
@@ -1094,10 +1101,10 @@ void System::project_vector (NumericVector<Number> & new_vector,
     {
       WrappedFunctor<Gradient> g_fem(*g);
 
-      this->project_vector(new_vector, &f_fem, &g_fem, is_adjoint);
+      this->project_vector(new_vector, &f_fem, &g_fem, is_adjoint, active_local_range);
     }
   else
-    this->project_vector(new_vector, &f_fem, nullptr, is_adjoint);
+    this->project_vector(new_vector, &f_fem, nullptr, is_adjoint, active_local_range);
 }
 
 
@@ -1108,15 +1115,19 @@ void System::project_vector (NumericVector<Number> & new_vector,
 void System::project_vector (NumericVector<Number> & new_vector,
                              FEMFunctionBase<Number> * f,
                              FEMFunctionBase<Gradient> * g,
-                             int is_adjoint) const
+                             int is_adjoint,
+                             std::optional<ConstElemRange> active_local_range) const
 {
   LOG_SCOPE ("project_fem_vector()", "System");
 
   libmesh_assert (f);
 
-  ConstElemRange active_local_range
-    (this->get_mesh().active_local_elements_begin(),
-     this->get_mesh().active_local_elements_end() );
+  if (!active_local_range)
+    {
+      active_local_range.emplace
+        (this->get_mesh().active_local_elements_begin(),
+         this->get_mesh().active_local_elements_end());
+    }
 
   VectorSetAction<Number> setter(new_vector);
 
@@ -1137,12 +1148,12 @@ void System::project_vector (NumericVector<Number> & new_vector,
       FEMFunctionWrapper<Gradient> gw(*g);
 
       FEMProjector projector(*this, fw, &gw, setter, vars);
-      projector.project(active_local_range);
+      projector.project(active_local_range.value());
     }
   else
     {
       FEMProjector projector(*this, fw, nullptr, setter, vars);
-      projector.project(active_local_range);
+      projector.project(active_local_range.value());
     }
 
   // Also, load values into the SCALAR dofs
@@ -1197,7 +1208,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
     {
       // Look for a spline node: a NodeElem with a rational variable
       // on it.
-      for (auto & elem : active_local_range)
+      for (auto & elem : active_local_range.value())
         if (elem->type() == NODEELEM)
           for (auto rational_var : rational_vars)
             if (rational_var->active_on_subdomain(elem->subdomain_id()))
@@ -1274,12 +1285,13 @@ void System::boundary_project_vector (const std::set<boundary_id_type> & b,
                                       GradientFunctionPointer gptr,
                                       const Parameters & function_parameters,
                                       NumericVector<Number> & new_vector,
-                                      int is_adjoint) const
+                                      int is_adjoint,
+                                      std::optional<ConstElemRange> active_local_range) const
 {
   WrappedFunction<Number> f(*this, fptr, &function_parameters);
   WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
   this->boundary_project_vector(b, variables, new_vector, &f, &g,
-                                is_adjoint);
+                                is_adjoint, active_local_range);
 }
 
 /**
@@ -1291,13 +1303,20 @@ void System::boundary_project_vector (const std::set<boundary_id_type> & b,
                                       NumericVector<Number> & new_vector,
                                       FunctionBase<Number> * f,
                                       FunctionBase<Gradient> * g,
-                                      int is_adjoint) const
+                                      int is_adjoint,
+                                      std::optional<ConstElemRange> active_local_range) const
 {
   LOG_SCOPE ("boundary_project_vector()", "System");
 
+  if (!active_local_range)
+  {
+    active_local_range.emplace
+      (this->get_mesh().active_local_elements_begin(),
+       this->get_mesh().active_local_elements_end());
+  }
+
   Threads::parallel_for
-    (ConstElemRange (this->get_mesh().active_local_elements_begin(),
-                     this->get_mesh().active_local_elements_end() ),
+    (active_local_range.value(),
      BoundaryProjectSolution(b, variables, *this, f, g,
                              this->get_equation_systems().parameters,
                              new_vector)
