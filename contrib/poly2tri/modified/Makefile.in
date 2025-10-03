@@ -411,7 +411,7 @@ am__uninstall_files_from_dir = { \
        $(am__cd) "$$dir" && echo $$files | $(am__xargs_n) 40 $(am__rm_f); }; \
   }
 am__installdirs = "$(DESTDIR)$(includedir)"
-HEADERS = $(nodist_include_HEADERS)
+HEADERS = $(nobase_nodist_include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -706,7 +706,9 @@ host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
 htmldir = @htmldir@
-includedir = @includedir@
+
+# includedir is an automake variable, and we are just using its default value here
+includedir = $(prefix)/include
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
@@ -825,7 +827,20 @@ poly2tri_headers = poly2tri/poly2tri.h \
                    poly2tri/sweep/sweep_context.h \
                    poly2tri/sweep/sweep.h
 
-nodist_include_HEADERS = $(poly2tri_headers)
+
+# nobase_include_HEADERS are headers which should be _installed_ while maintaining relative paths.
+# nodist_include_HEADERS are headers which should _not_ be included as part of the source distribution.
+#
+# In our case, we _do_ want to install the modified poly2tri headers
+# that we create during the build process, but we don't want to
+# distribute them.  If you separately specify the same set of headers
+# as both nobase_ and nodist_, this apparently creates a conflict for
+# automake, and it ends up including the files in the distribution
+# anyway. But, according to Google AI: "If you need both
+# behaviors--keeping the subdirectory structure AND not
+# distributing--the correct variable name is
+# nobase_nodist_include_HEADERS. The nobase_ prefix must come first."
+nobase_nodist_include_HEADERS = $(poly2tri_headers)
 BUILT_SOURCES = $(poly2tri_headers)
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
@@ -1197,26 +1212,29 @@ clean-libtool:
 	-rm -rf $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/.libs $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/common/_libs
 	-rm -rf $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/.libs $(top_builddir)/contrib/poly2tri/poly2tri/poly2tri/sweep/_libs
 	-rm -rf .libs _libs
-install-nodist_includeHEADERS: $(nodist_include_HEADERS)
+install-nobase_nodist_includeHEADERS: $(nobase_nodist_include_HEADERS)
 	@$(NORMAL_INSTALL)
-	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	@list='$(nobase_nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
 	if test -n "$$list"; then \
 	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
 	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
 	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(includedir)'"; \
-	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
+	$(am__nobase_list) | while read dir files; do \
+	  xfiles=; for file in $$files; do \
+	    if test -f "$$file"; then xfiles="$$xfiles $$file"; \
+	    else xfiles="$$xfiles $(srcdir)/$$file"; fi; done; \
+	  test -z "$$xfiles" || { \
+	    test "x$$dir" = x. || { \
+	      echo " $(MKDIR_P) '$(DESTDIR)$(includedir)/$$dir'"; \
+	      $(MKDIR_P) "$(DESTDIR)$(includedir)/$$dir"; }; \
+	    echo " $(INSTALL_HEADER) $$xfiles '$(DESTDIR)$(includedir)/$$dir'"; \
+	    $(INSTALL_HEADER) $$xfiles "$(DESTDIR)$(includedir)/$$dir" || exit $$?; }; \
 	done
 
-uninstall-nodist_includeHEADERS:
+uninstall-nobase_nodist_includeHEADERS:
 	@$(NORMAL_UNINSTALL)
-	@list='$(nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	@list='$(nobase_nodist_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	$(am__nobase_strip_setup); files=`$(am__nobase_strip)`; \
 	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
@@ -1396,7 +1414,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-nodist_includeHEADERS
+install-data-am: install-nobase_nodist_includeHEADERS
 
 install-dvi: install-dvi-am
 
@@ -1466,7 +1484,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-nodist_includeHEADERS
+uninstall-am: uninstall-nobase_nodist_includeHEADERS
 
 .MAKE: all check install install-am install-exec install-strip
 
@@ -1478,13 +1496,13 @@ uninstall-am: uninstall-nodist_includeHEADERS
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
 	install-html-am install-info install-info-am install-man \
-	install-nodist_includeHEADERS install-pdf install-pdf-am \
-	install-ps install-ps-am install-strip installcheck \
-	installcheck-am installdirs maintainer-clean \
+	install-nobase_nodist_includeHEADERS install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags tags-am uninstall uninstall-am \
-	uninstall-nodist_includeHEADERS
+	uninstall-nobase_nodist_includeHEADERS
 
 .PRECIOUS: Makefile
 
