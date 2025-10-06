@@ -1820,6 +1820,7 @@ public:
   const std::set<subdomain_id_type> & get_mesh_subdomains() const
   { libmesh_assert(this->is_prepared()); return _mesh_subdomains; }
 
+protected:
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,
@@ -1830,13 +1831,8 @@ public:
    * be removed in future libMesh versions.  Use the \p get_boundary_info()
    * accessor instead.
    */
-#ifndef LIBMESH_ENABLE_DEPRECATED
-protected:
-#endif
   std::unique_ptr<BoundaryInfo> boundary_info;
 
-
-protected:
   /**
    * Moves any superclass data (e.g. GhostingFunctors that might rely
    * on element and nodal data (which is managed by subclasses!)
