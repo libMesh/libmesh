@@ -47,6 +47,9 @@
 #include <sstream>
 #include <unordered_map>
 
+// TIMPI includes
+#include "timpi/parallel_implementation.h"
+#include "timpi/parallel_sync.h"
 namespace {
 
 using namespace libMesh;
@@ -993,6 +996,112 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
       }
   }
 
+{
+  // Build or obtain a point locator (sub-locator) and initialize it
+  std::unique_ptr<PointLocatorBase> point_locator = this->sub_point_locator();
+
+  // Get a reference to the boundary info object for convenience
+  auto & bi = this->get_boundary_info();
+
+  // Check whether the element side belongs to a paired boundary
+  auto pick_paired_id = [this, &bi](const Elem * e, unsigned int side,
+                                    boundary_id_type &current_id,
+                                    boundary_id_type &paired_id) -> bool
+  {
+    std::vector<boundary_id_type> ids;
+    bi.boundary_ids(e, side, ids);
+    for (auto id : ids)
+    {
+      auto it = _boundary_id_pairs.find(id);
+      if (it != _boundary_id_pairs.end())
+      {
+        current_id = id;
+        paired_id  = it->second;
+        return true;
+      }
+    }
+    return false;
+  };
+
+  // Main loop: iterate over all elements and their sides to find disconnected neighbors
+  for (const auto & element : this->element_ptr_range())
+  {
+    for (auto ms : element->side_index_range())
+    {
+      // Skip if this side already has a valid neighbor (including remote neighbors)
+      if (element->neighbor_ptr(ms) != nullptr &&
+          element->neighbor_ptr(ms) != remote_elem)
+        continue;
+
+      // Determine whether this side belongs to a paired (disconnected) boundary
+      boundary_id_type current_id;
+      boundary_id_type paired_id;
+      if (!pick_paired_id(element, ms, current_id, paired_id))
+        continue; // No valid pair found, skip this side
+
+      // Build the geometry of this side
+      std::unique_ptr<const Elem> this_side;
+      element->build_side_ptr(this_side, ms);
+
+      // Compute centroid and approximate element size
+      const Point c_mid  = this_side->vertex_average();
+
+      // Use the point locator to find candidate elements near the side centroid
+      std::set<const Elem *> const_candidate_elements;
+      point_locator->operator()(c_mid, const_candidate_elements);
+
+      std::set<Elem *> candidate_elements;
+      for (auto ce : const_candidate_elements)
+          candidate_elements.insert(this->elem_ptr(ce->id()));
+
+      bool paired_found = false; // Flag to mark if a valid match was found
+
+      // Loop through candidate elements to look for potential paired neighbors
+      for (auto * cand_elem : candidate_elements)
+        {
+          if (!cand_elem || cand_elem == element)
+            continue;
+
+          // If paired_id == current_id, it means that there is no paired boundary on the other side element.
+          // In this case, we should consider all sides of the candidate element.
+          std::vector<unsigned int> cand_neigh_sides =
+            (paired_id == current_id) ?
+              std::vector<unsigned int>(cand_elem->side_index_range().begin(),
+                                    cand_elem->side_index_range().end()) :
+              bi.sides_with_boundary_id(cand_elem, paired_id);
+
+          if (cand_neigh_sides.empty())
+            continue;
+
+          // Compare each candidate side to the current one
+          for (auto ns : cand_neigh_sides)
+            {
+              // Skip if this side already has a valid (non-remote) neighbor
+              if (cand_elem->neighbor_ptr(ns) != nullptr &&
+                  cand_elem->neighbor_ptr(ns) != remote_elem)
+                continue;
+
+              // Build the geometry of the candidate side
+              std::unique_ptr<const Elem> cand_side;
+              cand_elem->build_side_ptr(cand_side, ns);
+
+              // Check geometric equality
+              if (this_side->geometrically_equal(*cand_side))
+                {
+                  element->set_neighbor(ms, cand_elem);
+                  cand_elem->set_neighbor(ns, element);
+                  paired_found = true;
+                }
+            }
+
+          if (paired_found)
+            break; // Stop searching through other candidates
+        }
+    }
+  }
+}
+
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -1215,7 +1324,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
     }
 
 #endif // AMR
-
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_neighbors(*this,

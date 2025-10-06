@@ -833,6 +833,41 @@ bool Elem::topologically_equal (const Elem & rhs) const
 
 
 
+bool Elem::geometrically_equal(const Elem &rhs, const Real tol_in) const
+{
+  // 1. Basic checks: dimension & node count
+  if (this->dim() != rhs.dim())
+    return false;
+  if (this->n_nodes() != rhs.n_nodes())
+    return false;
+
+  // 2. Compare centroids within tolerance
+  const Real tol = tol_in > 0 ? tol_in : 1e-12;
+  const Point c1 = this->vertex_average();
+  const Point c2 = rhs.vertex_average();
+  if ((c1 - c2).norm() > tol)
+    return false;
+
+  // 3. Unordered comparison within tolerance
+  const unsigned int n = this->n_nodes();
+  std::vector<Point> pts1(n), pts2(n);
+  for (unsigned int i = 0; i < n; ++i)
+    pts1[i] = this->point(i);
+  for (unsigned int i = 0; i < n; ++i)
+    pts2[i] = rhs.point(i);
+
+  for (const auto &p1 : pts1)
+    {
+      auto found = std::any_of(pts2.begin(), pts2.end(),
+                              [&](const Point &p2)
+                              { return (p1 - p2).norm() <= tol; });
+      if (!found)
+        return false;
+    }
+
+  return true;
+}
+
 bool Elem::is_semilocal(const processor_id_type my_pid) const
 {
   std::set<const Elem *> point_neighbors;
