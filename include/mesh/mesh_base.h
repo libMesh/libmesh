@@ -1820,7 +1820,27 @@ public:
   const std::set<subdomain_id_type> & get_mesh_subdomains() const
   { libmesh_assert(this->is_prepared()); return _mesh_subdomains; }
 
+  /**
+   * Register a pair of boundaries as disconnected boundaries.
+   */
+  void add_disconnected_boundaries (const boundary_id_type b1,
+                                    const boundary_id_type b2)
+  {
+    if (b1 == b2)
+      _boundary_id_pairs.emplace(b1, b2);
+    else
+    {
+      _boundary_id_pairs.emplace(b1, b2);
+      _boundary_id_pairs.emplace(b2, b1);
+    }
+  }
+
+
+
 protected:
+
+  /// @brief a map of pairs of boundary ids between which new boundary sides are created
+  std::unordered_map<boundary_id_type, boundary_id_type> _boundary_id_pairs;
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,
