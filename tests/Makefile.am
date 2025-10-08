@@ -219,6 +219,8 @@ data = matrices/geom_1_extraction_op.h5 \
        meshes/non_manifold_junction3.exo \
        meshes/Cluster_34.stl \
        meshes/engraving.stl \
+       meshes/quad4_tri3_smoothed.xda.gz \
+       meshes/hex8_prism6_smoothed.xda.gz \
        solutions/lagrange_vec_solution_mesh.xda \
        solutions/lagrange_vec_solution.xda \
        solutions/nedelec_one_solution_mesh.xda \

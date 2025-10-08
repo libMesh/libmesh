@@ -263,6 +263,12 @@ public:
   CPPUNIT_TEST(testVariationalPrism20);
   CPPUNIT_TEST(testVariationalPrism21);
   CPPUNIT_TEST(testVariationalPrism21MultipleSubdomains);
+
+#if defined(LIBMESH_HAVE_GZSTREAM)
+  CPPUNIT_TEST(testVariationalMixed2D);
+  CPPUNIT_TEST(testVariationalMixed3D);
+#endif
+
 #endif // LIBMESH_ENABLE_VSMOOTHER
 #endif
 
@@ -686,6 +692,56 @@ public:
       }
   }
 
+  // Function that distorts and smooths a mesh and checks that the result is
+  // equal to the original "gold" mesh
+  void testVariationalSmootherRegression(const ReplicatedMesh & gold_mesh)
+  {
+    // Make a copy of the gold mesh to distort and then smooth
+    ReplicatedMesh mesh(gold_mesh);
+
+    // Move it around so we have something that needs smoothing
+    DistortHyperCube dh(mesh.mesh_dimension());
+    MeshTools::Modification::redistribute(mesh, dh);
+
+    // Function to assert the distortion is as expected
+    auto mesh_distortion_is = [](const ReplicatedMesh & gold_mesh,
+                                 const ReplicatedMesh & mesh,
+                                 const bool distortion,
+                                 Real distortion_tol = TOLERANCE) {
+
+      CPPUNIT_ASSERT(gold_mesh.n_nodes() ==  mesh.n_nodes());
+      for (const auto node_id : make_range(gold_mesh.n_nodes()))
+        {
+          const auto & gold_node = gold_mesh.node_ref(node_id);
+          const auto & node = mesh.node_ref(node_id);
+          for (const auto d : make_range(gold_mesh.mesh_dimension()))
+            {
+              const bool d_distorted = std::abs(gold_node(d) - node(d)) > distortion_tol;
+              if (d_distorted)
+                // mesh is distorted from gold_mesh
+                return distortion;
+            }
+        }
+
+      // mesh is not distorted from gold_mesh
+      return !distortion;
+    };
+
+    // Make sure the mesh has been distorted
+    CPPUNIT_ASSERT(mesh_distortion_is(gold_mesh, mesh, true));
+
+    // Turn off subdomain boundary preservation because DistortHyperCube
+    // does not preserve subdomain boundaries
+    // Also set dilation coefficient to 0 because the reference volume of the
+    // distorted mesh won't be equal to the reference volume of the smoothed
+    // mesh and will smooth to a slightly different solution.
+    VariationalMeshSmoother smoother(mesh, 0.0, false);
+    smoother.smooth();
+
+    // Make sure the mesh has been smoothed to the gold mesh
+    CPPUNIT_ASSERT(mesh_distortion_is(gold_mesh, mesh, false));
+  }
+
   void testLaplaceQuad()
   {
     ReplicatedMesh mesh(*TestCommWorld);
@@ -929,6 +985,22 @@ public:
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PRISM21, true);
+  }
+
+  void testVariationalMixed2D()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    mesh.read("meshes/quad4_tri3_smoothed.xda.gz");
+
+    testVariationalSmootherRegression(mesh);
+  }
+
+  void testVariationalMixed3D()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    mesh.read("meshes/hex8_prism6_smoothed.xda.gz");
+
+    testVariationalSmootherRegression(mesh);
   }
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
