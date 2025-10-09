@@ -1925,37 +1925,121 @@ void BoundaryInfo::remove_side (const Elem * elem,
 
 void BoundaryInfo::remove_id (boundary_id_type id, const bool global)
 {
-  // Erase id from ids containers
-  _boundary_ids.erase(id);
-  _side_boundary_ids.erase(id);
-  _edge_boundary_ids.erase(id);
-  _shellface_boundary_ids.erase(id);
-  _node_boundary_ids.erase(id);
-  _ss_id_to_name.erase(id);
-  _ns_id_to_name.erase(id);
-  _es_id_to_name.erase(id);
+  // Pass global==false to the sub-methods here, so we can avoid
+  // unnecessary communications
+  this->remove_side_id(id, false);
+  this->remove_edge_id(id, false);
+  this->remove_shellface_id(id, false);
+  this->remove_node_id(id, false);
+
   if (global)
     _global_boundary_ids.erase(id);
+}
 
-  // Erase (*, id) entries from map.
-  erase_if(_boundary_node_id,
-           [id](decltype(_boundary_node_id)::mapped_type & val)
-           {return val == id;});
 
-  // Erase (*, *, id) entries from map.
-  erase_if(_boundary_edge_id,
-           [id](decltype(_boundary_edge_id)::mapped_type & pr)
-           {return pr.second == id;});
 
-  // Erase (*, *, id) entries from map.
-  erase_if(_boundary_shellface_id,
-           [id](decltype(_boundary_shellface_id)::mapped_type & pr)
-           {return pr.second == id;});
+void BoundaryInfo::remove_side_id (boundary_id_type id, const bool global)
+{
+  // Erase id from ids containers
+  _side_boundary_ids.erase(id);
+
+  if (!_edge_boundary_ids.count(id) &&
+      !_shellface_boundary_ids.count(id) &&
+      !_node_boundary_ids.count(id))
+    _boundary_ids.erase(id);
+
+  _ss_id_to_name.erase(id);
+  if (global)
+    {
+      bool someone_has_it = _boundary_ids.count(id);
+      this->comm().max(someone_has_it);
+      if (!someone_has_it)
+        _global_boundary_ids.erase(id);
+    }
 
   // Erase (*, *, id) entries from map.
   erase_if(_boundary_side_id,
            [id](decltype(_boundary_side_id)::mapped_type & pr)
            {return pr.second == id;});
+}
+
+
+
+void BoundaryInfo::remove_edge_id (boundary_id_type id, const bool global)
+{
+  // Erase id from ids containers
+  _edge_boundary_ids.erase(id);
+
+  if (!_side_boundary_ids.count(id) &&
+      !_shellface_boundary_ids.count(id) &&
+      !_node_boundary_ids.count(id))
+    _boundary_ids.erase(id);
+
+  _es_id_to_name.erase(id);
+  if (global)
+    {
+      bool someone_has_it = _boundary_ids.count(id);
+      this->comm().max(someone_has_it);
+      if (!someone_has_it)
+        _global_boundary_ids.erase(id);
+    }
+
+  // Erase (*, *, id) entries from map.
+  erase_if(_boundary_edge_id,
+           [id](decltype(_boundary_edge_id)::mapped_type & pr)
+           {return pr.second == id;});
+}
+
+
+
+void BoundaryInfo::remove_shellface_id (boundary_id_type id, const bool global)
+{
+  // Erase id from ids containers
+  _shellface_boundary_ids.erase(id);
+
+  if (!_side_boundary_ids.count(id) &&
+      !_edge_boundary_ids.count(id) &&
+      !_node_boundary_ids.count(id))
+    _boundary_ids.erase(id);
+
+  if (global)
+    {
+      bool someone_has_it = _boundary_ids.count(id);
+      this->comm().max(someone_has_it);
+      if (!someone_has_it)
+        _global_boundary_ids.erase(id);
+    }
+
+  // Erase (*, *, id) entries from map.
+  erase_if(_boundary_shellface_id,
+           [id](decltype(_boundary_shellface_id)::mapped_type & pr)
+           {return pr.second == id;});
+}
+
+
+
+void BoundaryInfo::remove_node_id (boundary_id_type id, const bool global)
+{
+  // Erase id from ids containers
+  _node_boundary_ids.erase(id);
+
+  if (!_side_boundary_ids.count(id) &&
+      !_edge_boundary_ids.count(id) &&
+      !_shellface_boundary_ids.count(id))
+    _boundary_ids.erase(id);
+
+  if (global)
+    {
+      bool someone_has_it = _boundary_ids.count(id);
+      this->comm().max(someone_has_it);
+      if (!someone_has_it)
+        _global_boundary_ids.erase(id);
+    }
+
+  // Erase (*, id) entries from map.
+  erase_if(_boundary_node_id,
+           [id](decltype(_boundary_node_id)::mapped_type & val)
+           {return val == id;});
 }
 
 

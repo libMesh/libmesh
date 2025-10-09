@@ -382,6 +382,51 @@ public:
   void remove_id (boundary_id_type id, bool global = false);
 
   /**
+   * Removes all sides with boundary id \p id from the BoundaryInfo
+   * object, removes it from the set of side boundary ids, and removes
+   * it from the set of boundary ids if no other boundary type uses it.
+   *
+   * Set the \p global parameter to true if this is being called for
+   * all processes in the object's communicator, in which case we will
+   * remove the id from the global boundary ID container
+   */
+  void remove_side_id (boundary_id_type id, bool global = false);
+
+  /**
+   * Removes all edges with boundary id \p id from the BoundaryInfo
+   * object, removes it from the set of edge boundary ids, and removes
+   * it from the set of boundary ids if no other boundary type uses it.
+   *
+   * Set the \p global parameter to true if this is being called for
+   * all processes in the object's communicator, in which case we will
+   * remove the id from the global boundary ID container
+   */
+  void remove_edge_id (boundary_id_type id, bool global = false);
+
+  /**
+   * Removes all shellfaces with boundary id \p id from the
+   * BoundaryInfo object, removes it from the set of shellface
+   * boundary ids, and removes it from the set of boundary ids if no
+   * other boundary type uses it.
+   *
+   * Set the \p global parameter to true if this is being called for
+   * all processes in the object's communicator, in which case we will
+   * remove the id from the global boundary ID container
+   */
+  void remove_shellface_id (boundary_id_type id, bool global = false);
+
+  /**
+   * Removes all nodes with boundary id \p id from the BoundaryInfo
+   * object, removes it from the set of node boundary ids, and removes
+   * it from the set of boundary ids if no other boundary type uses it.
+   *
+   * Set the \p global parameter to true if this is being called for
+   * all processes in the object's communicator, in which case we will
+   * remove the id from the global boundary ID container
+   */
+  void remove_node_id (boundary_id_type id, bool global = false);
+
+  /**
    * Changes all entities (nodes, sides, edges, shellfaces) with boundary
    * id \p old_id to instead be labeled by boundary id \p new_id.
    */
