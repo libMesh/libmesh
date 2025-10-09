@@ -350,6 +350,8 @@ void find_nodal_neighbors_helper(const dof_id_type global_id,
                 }
             }
 
+          const auto elem_order = Elem::type_to_default_order_map[elem->type()];
+
           // Index of the current edge
           unsigned current_edge = 0;
 
@@ -373,18 +375,23 @@ void find_nodal_neighbors_helper(const dof_id_type global_id,
 
                   // Find another node in this element on this edge
                   for (unsigned other_node_this_edge = 0; other_node_this_edge != n_nodes; other_node_this_edge++)
-                    if ( (elem->is_node_on_edge(other_node_this_edge, current_edge)) && // On the current edge
-                         (elem->node_id(other_node_this_edge) != global_id))               // But not the original node
-                      {
-                        // We've found a nodal neighbor!  Save a pointer to it..
-                        node_to_save = elem->node_ptr(other_node_this_edge);
-                        break;
-                      }
+                    {
+                      const bool both_vertices = elem->is_vertex(local_node_number) &&
+                                                 elem->is_vertex(other_node_this_edge);
+                      if ( elem->is_node_on_edge(other_node_this_edge, current_edge) && // On the current edge
+                           elem->node_id(other_node_this_edge) != global_id          && // But not the original node
+                            // vertex nodes on the same edge of higher order elements are not nodal neighbors
+                          (elem_order == 1 || !both_vertices))
+                        {
+                          // We've found a nodal neighbor!  Save a pointer to it..
+                          node_to_save = elem->node_ptr(other_node_this_edge);
 
-                  // Make sure we found something
-                  libmesh_assert(node_to_save != nullptr);
+                          // Make sure we found something
+                          libmesh_assert(node_to_save != nullptr);
 
-                  neighbor_set.insert(node_to_save);
+                          neighbor_set.insert(node_to_save);
+                        }
+                    }
                 }
 
               // Keep looking for edges, node may be on more than one edge
