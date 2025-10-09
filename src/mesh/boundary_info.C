@@ -2132,6 +2132,160 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
 
 
 
+void BoundaryInfo::renumber_side_id (boundary_id_type old_id,
+                                     boundary_id_type new_id)
+{
+  // If the IDs are the same, this is a no-op.
+  if (old_id == new_id)
+    return;
+
+  bool found_side = false;
+  for (auto & p : _boundary_side_id)
+    if (p.second.second == old_id)
+      {
+        // If we already have this id on this side, we don't want to
+        // create a duplicate in our multimap
+        this->remove_side(p.first, p.second.first, new_id);
+        p.second.second = new_id;
+        found_side = true;
+      }
+  _side_boundary_ids.erase(old_id);
+
+  if (found_side)
+    {
+      _side_boundary_ids.insert(new_id);
+
+      if (!_shellface_boundary_ids.count(old_id) &&
+          !_edge_boundary_ids.count(old_id) &&
+          !_node_boundary_ids.count(old_id))
+        {
+          _boundary_ids.erase(old_id);
+        }
+      _boundary_ids.insert(new_id);
+    }
+
+  renumber_name(_ss_id_to_name, old_id, new_id);
+
+  this->libmesh_assert_valid_multimaps();
+}
+
+
+
+void BoundaryInfo::renumber_edge_id (boundary_id_type old_id,
+                                     boundary_id_type new_id)
+{
+  // If the IDs are the same, this is a no-op.
+  if (old_id == new_id)
+    return;
+
+  bool found_edge = false;
+  for (auto & p : _boundary_edge_id)
+    if (p.second.second == old_id)
+      {
+        // If we already have this id on this edge, we don't want to
+        // create a duplicate in our multimap
+        this->remove_edge(p.first, p.second.first, new_id);
+        p.second.second = new_id;
+        found_edge = true;
+      }
+  _edge_boundary_ids.erase(old_id);
+
+  if (found_edge)
+    {
+      _edge_boundary_ids.insert(new_id);
+
+      if (!_shellface_boundary_ids.count(old_id) &&
+          !_side_boundary_ids.count(old_id) &&
+          !_node_boundary_ids.count(old_id))
+        {
+          _boundary_ids.erase(old_id);
+        }
+      _boundary_ids.insert(new_id);
+    }
+
+  renumber_name(_es_id_to_name, old_id, new_id);
+
+  this->libmesh_assert_valid_multimaps();
+}
+
+
+
+void BoundaryInfo::renumber_shellface_id (boundary_id_type old_id,
+                                          boundary_id_type new_id)
+{
+  // If the IDs are the same, this is a no-op.
+  if (old_id == new_id)
+    return;
+
+  bool found_shellface = false;
+  for (auto & p : _boundary_shellface_id)
+    if (p.second.second == old_id)
+      {
+        // If we already have this id on this shellface, we don't want
+        // to create a duplicate in our multimap
+        this->remove_shellface(p.first, p.second.first, new_id);
+        p.second.second = new_id;
+        found_shellface = true;
+      }
+  _shellface_boundary_ids.erase(old_id);
+
+  if (found_shellface)
+    {
+      _shellface_boundary_ids.insert(new_id);
+
+      if (!_edge_boundary_ids.count(old_id) &&
+          !_side_boundary_ids.count(old_id) &&
+          !_node_boundary_ids.count(old_id))
+        {
+          _boundary_ids.erase(old_id);
+        }
+      _boundary_ids.insert(new_id);
+    }
+
+  this->libmesh_assert_valid_multimaps();
+}
+
+
+
+void BoundaryInfo::renumber_node_id (boundary_id_type old_id,
+                                     boundary_id_type new_id)
+{
+  // If the IDs are the same, this is a no-op.
+  if (old_id == new_id)
+    return;
+
+  bool found_node = false;
+  for (auto & p : _boundary_node_id)
+    if (p.second == old_id)
+      {
+        // If we already have this id on this node, we don't want to
+        // create a duplicate in our multimap
+        this->remove_node(p.first, new_id);
+        p.second = new_id;
+        found_node = true;
+      }
+  _node_boundary_ids.erase(old_id);
+
+  if (found_node)
+    {
+      _node_boundary_ids.insert(new_id);
+
+      if (!_shellface_boundary_ids.count(old_id) &&
+          !_side_boundary_ids.count(old_id) &&
+          !_edge_boundary_ids.count(old_id))
+        {
+          _boundary_ids.erase(old_id);
+        }
+      _boundary_ids.insert(new_id);
+    }
+
+  renumber_name(_ns_id_to_name, old_id, new_id);
+
+  this->libmesh_assert_valid_multimaps();
+}
+
+
+
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
                                                  const boundary_id_type boundary_id_in) const
 {

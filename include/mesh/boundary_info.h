@@ -433,6 +433,30 @@ public:
   void renumber_id (boundary_id_type old_id, boundary_id_type new_id);
 
   /**
+   * Changes all sides with boundary id \p old_id to instead be
+   * labeled by boundary id \p new_id.
+   */
+  void renumber_side_id (boundary_id_type old_id, boundary_id_type new_id);
+
+  /**
+   * Changes all edges with boundary id \p old_id to instead be
+   * labeled by boundary id \p new_id.
+   */
+  void renumber_edge_id (boundary_id_type old_id, boundary_id_type new_id);
+
+  /**
+   * Changes all shellfaces with boundary id \p old_id to instead be
+   * labeled by boundary id \p new_id.
+   */
+  void renumber_shellface_id (boundary_id_type old_id, boundary_id_type new_id);
+
+  /**
+   * Changes all nodes with boundary id \p old_id to instead be
+   * labeled by boundary id \p new_id.
+   */
+  void renumber_node_id (boundary_id_type old_id, boundary_id_type new_id);
+
+  /**
    * \returns The number of user-specified boundary ids on the
    * semilocal part of the mesh.
    *
