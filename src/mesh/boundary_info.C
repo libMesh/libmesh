@@ -2713,7 +2713,7 @@ BoundaryInfo::build_node_list(NodeBCTupleSortBy sort_by) const
 
 
 void
-BoundaryInfo::build_node_list_from_side_list()
+BoundaryInfo::build_node_list_from_side_list(const std::set<boundary_id_type> & sideset_list)
 {
   // If we're on a distributed mesh, even the owner of a node is not
   // guaranteed to be able to properly assign its new boundary id(s)!
@@ -2740,22 +2740,26 @@ BoundaryInfo::build_node_list_from_side_list()
       if (elem->is_remote())
         continue;
 
+      auto [sidenum, bcid] = id_pair;
+
+      if (!sideset_list.empty() && !sideset_list.count(bcid))
+        continue;
+
       // Need to loop over the sides of any possible children
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
-      elem->active_family_tree_by_side (family, id_pair.first);
+      elem->active_family_tree_by_side (family, sidenum);
 #else
       family.push_back(elem);
 #endif
 
       for (const auto & cur_elem : family)
         {
-          side = &side_builder(*cur_elem, id_pair.first);
+          side = &side_builder(*cur_elem, sidenum);
 
           // Add each node node on the side with the side's boundary id
           for (auto i : side->node_index_range())
             {
-              const boundary_id_type bcid = id_pair.second;
               this->add_node(side->node_ptr(i), bcid);
               if (!mesh_is_serial)
                 {

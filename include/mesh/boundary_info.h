@@ -733,8 +733,12 @@ public:
   /**
    * Adds nodes with boundary ids based on the side's boundary
    * ids they are connected to.
+   *
+   * @param sideset_list sidesets to build nodesets from.
+   *                     If empty (default), builds from all existing
+   *                     sidesets
    */
-  void build_node_list_from_side_list();
+  void build_node_list_from_side_list(const std::set<boundary_id_type> & sideset_list = {});
 
   /**
    * Adds sides to a sideset if every node on that side are in the same
