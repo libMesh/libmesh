@@ -110,6 +110,15 @@ public:
    */
   void regenerate_id_sets ();
 
+  /**
+   * Synchronizes the boundary_ids set on each processor to determine
+   * global_boundary_ids.
+   *
+   * This may be necessary after use of renumber_*() functions, which
+   * perform only local operations, if \p get_global_boundary_ids() is
+   * to be used without a full regenerate_id_sets() call first.
+   */
+  void synchronize_global_id_set ();
 
   /**
    * Generates \p boundary_mesh data structures corresponding to the

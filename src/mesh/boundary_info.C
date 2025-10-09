@@ -413,15 +413,26 @@ void BoundaryInfo::regenerate_id_sets()
     }
 
   // Handle global data
-  _global_boundary_ids = _boundary_ids;
   libmesh_assert(_mesh);
   if (!_mesh->is_serial())
     {
       _communicator.set_union(_ss_id_to_name);
       _communicator.set_union(_ns_id_to_name);
       _communicator.set_union(_es_id_to_name);
-      _communicator.set_union(_global_boundary_ids);
     }
+
+  this->synchronize_global_id_set();
+}
+
+
+
+void BoundaryInfo::synchronize_global_id_set()
+{
+  // Handle global data
+  _global_boundary_ids = _boundary_ids;
+  libmesh_assert(_mesh);
+  if (!_mesh->is_serial())
+    _communicator.set_union(_global_boundary_ids);
 }
 
 
