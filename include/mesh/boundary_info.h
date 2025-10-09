@@ -103,10 +103,10 @@ public:
 
   /**
    * Clears and regenerates the cached sets of ids.
-   * This is necessary after use of remove_*() functions, which remove
-   * individual id associations (an O(1) process) without checking to
-   * see whether that is the last association with the id (an O(N)
-   * process.
+   * This is in general necessary after use of remove_*() functions,
+   * which remove individual id associations (an O(1) process) without
+   * checking to see whether that is the last association with the id
+   * (an O(N) process).
    */
   void regenerate_id_sets ();
 
