@@ -41,6 +41,8 @@ public:
   CPPUNIT_TEST( testBoundaryOnChildrenBoundaryIDs );
   CPPUNIT_TEST( testBoundaryOnChildrenBoundarySides );
 # endif
+  CPPUNIT_TEST( testBuildNodeListFromSideList );
+  CPPUNIT_TEST( testBuildSideListFromNodeList );
 # ifdef LIBMESH_ENABLE_DIRICHLET
   CPPUNIT_TEST( testShellFaceConstraints );
 # endif
@@ -1067,6 +1069,91 @@ public:
     }
   }
 #endif //LIBMESH_ENABLE_AMR
+
+
+  void testBuildNodeListFromSideList()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_square(mesh,
+                                        2, 2,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // build_square gave us ids 0-3 as both side sets and node sets
+    bi.remove_node_id(0);
+    bi.remove_node_id(1);
+    bi.remove_node_id(2);
+    bi.remove_node_id(3);
+
+    CPPUNIT_ASSERT(bi.build_node_list().empty());
+
+    bi.build_node_list_from_side_list({0,2});
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        for (auto n : elem->node_index_range())
+          {
+            const Node * node = elem->node_ptr(n);
+            for (auto s : {0,2})
+              if (elem->is_node_on_side(n, s) && !elem->neighbor_ptr(s))
+                CPPUNIT_ASSERT(bi.has_boundary_id(node, s));
+            for (auto s : {1,3})
+              CPPUNIT_ASSERT(!bi.has_boundary_id(node, s));
+          }
+      }
+  }
+
+
+  void testBuildSideListFromNodeList()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_square(mesh,
+                                        2, 2,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // build_square gave us ids 0-3 as both side sets and node sets
+    bi.remove_side_id(0);
+    bi.remove_side_id(1);
+    bi.remove_side_id(2);
+    bi.remove_side_id(3);
+
+    CPPUNIT_ASSERT(bi.build_side_list().empty());
+
+    bi.build_side_list_from_node_list({0,2});
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        for (auto s : {0,2})
+          {
+            if (!elem->neighbor_ptr(s))
+              {
+                CPPUNIT_ASSERT(bi.has_boundary_id(elem, s, s));
+                CPPUNIT_ASSERT_EQUAL(bi.n_boundary_ids(elem, s), 1u);
+              }
+            else
+              CPPUNIT_ASSERT(!bi.n_boundary_ids(elem, s));
+          }
+        for (auto s : {1,3})
+          {
+            CPPUNIT_ASSERT(!bi.has_boundary_id(elem, s, s));
+            CPPUNIT_ASSERT(!bi.n_boundary_ids(elem, s));
+          }
+      }
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryInfoTest );
