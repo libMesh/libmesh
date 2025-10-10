@@ -284,7 +284,7 @@ protected:
     // Loop over the nodes and call find_nodal_neighbors()
     std::vector<const Node*> neighbor_nodes;
 
-    std::set<const dof_id_type> node_ids_checked;
+    std::set<dof_id_type> node_ids_checked;
     for (const auto * elem : mesh.element_ptr_range())
       {
         for (const auto & node : elem->node_ref_range())
