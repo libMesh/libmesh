@@ -103,13 +103,22 @@ public:
 
   /**
    * Clears and regenerates the cached sets of ids.
-   * This is necessary after use of remove_*() functions, which remove
-   * individual id associations (an O(1) process) without checking to
-   * see whether that is the last association with the id (an O(N)
-   * process.
+   * This is in general necessary after use of remove_*() functions,
+   * which remove individual id associations (an O(1) process) without
+   * checking to see whether that is the last association with the id
+   * (an O(N) process).
    */
   void regenerate_id_sets ();
 
+  /**
+   * Synchronizes the boundary_ids set on each processor to determine
+   * global_boundary_ids.
+   *
+   * This may be necessary after use of renumber_*() functions, which
+   * perform only local operations, if \p get_global_boundary_ids() is
+   * to be used without a full regenerate_id_sets() call first.
+   */
+  void synchronize_global_id_set ();
 
   /**
    * Generates \p boundary_mesh data structures corresponding to the
@@ -373,18 +382,88 @@ public:
    * \p id's existence from the BoundaryInfo object.  That is, after
    * calling remove_id(), \p id will no longer be in the sets returned by
    * get_boundary_ids(), get_side_boundary_ids(), etc., and will not
-   * be in the bc_id_list vector returned by build_side_list(), etc. Set
-   * the \p global parameter to true if this is being called for all processes
-   * in the object's communicator, in which case we will remove the id from
-   * the global boundary ID container
+   * be in the bc_id_list vector returned by build_side_list(), etc.
+   *
+   * Set the \p global parameter to true if this is being called for
+   * all processes in the object's communicator, in which case we will
+   * remove the id from the global boundary ID container
    */
   void remove_id (boundary_id_type id, bool global = false);
+
+  /**
+   * Removes all sides with boundary id \p id from the BoundaryInfo
+   * object, removes it from the set of side boundary ids, and removes
+   * it from the set of boundary ids if no other boundary type uses it.
+   *
+   * Set the \p global parameter to true if this is being called for
+   * all processes in the object's communicator, in which case we will
+   * remove the id from the global boundary ID container
+   */
+  void remove_side_id (boundary_id_type id, bool global = false);
+
+  /**
+   * Removes all edges with boundary id \p id from the BoundaryInfo
+   * object, removes it from the set of edge boundary ids, and removes
+   * it from the set of boundary ids if no other boundary type uses it.
+   *
+   * Set the \p global parameter to true if this is being called for
+   * all processes in the object's communicator, in which case we will
+   * remove the id from the global boundary ID container
+   */
+  void remove_edge_id (boundary_id_type id, bool global = false);
+
+  /**
+   * Removes all shellfaces with boundary id \p id from the
+   * BoundaryInfo object, removes it from the set of shellface
+   * boundary ids, and removes it from the set of boundary ids if no
+   * other boundary type uses it.
+   *
+   * Set the \p global parameter to true if this is being called for
+   * all processes in the object's communicator, in which case we will
+   * remove the id from the global boundary ID container
+   */
+  void remove_shellface_id (boundary_id_type id, bool global = false);
+
+  /**
+   * Removes all nodes with boundary id \p id from the BoundaryInfo
+   * object, removes it from the set of node boundary ids, and removes
+   * it from the set of boundary ids if no other boundary type uses it.
+   *
+   * Set the \p global parameter to true if this is being called for
+   * all processes in the object's communicator, in which case we will
+   * remove the id from the global boundary ID container
+   */
+  void remove_node_id (boundary_id_type id, bool global = false);
 
   /**
    * Changes all entities (nodes, sides, edges, shellfaces) with boundary
    * id \p old_id to instead be labeled by boundary id \p new_id.
    */
   void renumber_id (boundary_id_type old_id, boundary_id_type new_id);
+
+  /**
+   * Changes all sides with boundary id \p old_id to instead be
+   * labeled by boundary id \p new_id.
+   */
+  void renumber_side_id (boundary_id_type old_id, boundary_id_type new_id);
+
+  /**
+   * Changes all edges with boundary id \p old_id to instead be
+   * labeled by boundary id \p new_id.
+   */
+  void renumber_edge_id (boundary_id_type old_id, boundary_id_type new_id);
+
+  /**
+   * Changes all shellfaces with boundary id \p old_id to instead be
+   * labeled by boundary id \p new_id.
+   */
+  void renumber_shellface_id (boundary_id_type old_id, boundary_id_type new_id);
+
+  /**
+   * Changes all nodes with boundary id \p old_id to instead be
+   * labeled by boundary id \p new_id.
+   */
+  void renumber_node_id (boundary_id_type old_id, boundary_id_type new_id);
 
   /**
    * \returns The number of user-specified boundary ids on the
@@ -654,8 +733,12 @@ public:
   /**
    * Adds nodes with boundary ids based on the side's boundary
    * ids they are connected to.
+   *
+   * @param sideset_list sidesets to build nodesets from.
+   *                     If empty (default), builds from all existing
+   *                     sidesets
    */
-  void build_node_list_from_side_list();
+  void build_node_list_from_side_list(const std::set<boundary_id_type> & sideset_list = {});
 
   /**
    * Adds sides to a sideset if every node on that side are in the same

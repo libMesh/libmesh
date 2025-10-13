@@ -413,15 +413,26 @@ void BoundaryInfo::regenerate_id_sets()
     }
 
   // Handle global data
-  _global_boundary_ids = _boundary_ids;
   libmesh_assert(_mesh);
   if (!_mesh->is_serial())
     {
       _communicator.set_union(_ss_id_to_name);
       _communicator.set_union(_ns_id_to_name);
       _communicator.set_union(_es_id_to_name);
-      _communicator.set_union(_global_boundary_ids);
     }
+
+  this->synchronize_global_id_set();
+}
+
+
+
+void BoundaryInfo::synchronize_global_id_set()
+{
+  // Handle global data
+  _global_boundary_ids = _boundary_ids;
+  libmesh_assert(_mesh);
+  if (!_mesh->is_serial())
+    _communicator.set_union(_global_boundary_ids);
 }
 
 
@@ -1925,37 +1936,121 @@ void BoundaryInfo::remove_side (const Elem * elem,
 
 void BoundaryInfo::remove_id (boundary_id_type id, const bool global)
 {
-  // Erase id from ids containers
-  _boundary_ids.erase(id);
-  _side_boundary_ids.erase(id);
-  _edge_boundary_ids.erase(id);
-  _shellface_boundary_ids.erase(id);
-  _node_boundary_ids.erase(id);
-  _ss_id_to_name.erase(id);
-  _ns_id_to_name.erase(id);
-  _es_id_to_name.erase(id);
+  // Pass global==false to the sub-methods here, so we can avoid
+  // unnecessary communications
+  this->remove_side_id(id, false);
+  this->remove_edge_id(id, false);
+  this->remove_shellface_id(id, false);
+  this->remove_node_id(id, false);
+
   if (global)
     _global_boundary_ids.erase(id);
+}
 
-  // Erase (*, id) entries from map.
-  erase_if(_boundary_node_id,
-           [id](decltype(_boundary_node_id)::mapped_type & val)
-           {return val == id;});
 
-  // Erase (*, *, id) entries from map.
-  erase_if(_boundary_edge_id,
-           [id](decltype(_boundary_edge_id)::mapped_type & pr)
-           {return pr.second == id;});
 
-  // Erase (*, *, id) entries from map.
-  erase_if(_boundary_shellface_id,
-           [id](decltype(_boundary_shellface_id)::mapped_type & pr)
-           {return pr.second == id;});
+void BoundaryInfo::remove_side_id (boundary_id_type id, const bool global)
+{
+  // Erase id from ids containers
+  _side_boundary_ids.erase(id);
+
+  if (!_edge_boundary_ids.count(id) &&
+      !_shellface_boundary_ids.count(id) &&
+      !_node_boundary_ids.count(id))
+    _boundary_ids.erase(id);
+
+  _ss_id_to_name.erase(id);
+  if (global)
+    {
+      bool someone_has_it = _boundary_ids.count(id);
+      this->comm().max(someone_has_it);
+      if (!someone_has_it)
+        _global_boundary_ids.erase(id);
+    }
 
   // Erase (*, *, id) entries from map.
   erase_if(_boundary_side_id,
            [id](decltype(_boundary_side_id)::mapped_type & pr)
            {return pr.second == id;});
+}
+
+
+
+void BoundaryInfo::remove_edge_id (boundary_id_type id, const bool global)
+{
+  // Erase id from ids containers
+  _edge_boundary_ids.erase(id);
+
+  if (!_side_boundary_ids.count(id) &&
+      !_shellface_boundary_ids.count(id) &&
+      !_node_boundary_ids.count(id))
+    _boundary_ids.erase(id);
+
+  _es_id_to_name.erase(id);
+  if (global)
+    {
+      bool someone_has_it = _boundary_ids.count(id);
+      this->comm().max(someone_has_it);
+      if (!someone_has_it)
+        _global_boundary_ids.erase(id);
+    }
+
+  // Erase (*, *, id) entries from map.
+  erase_if(_boundary_edge_id,
+           [id](decltype(_boundary_edge_id)::mapped_type & pr)
+           {return pr.second == id;});
+}
+
+
+
+void BoundaryInfo::remove_shellface_id (boundary_id_type id, const bool global)
+{
+  // Erase id from ids containers
+  _shellface_boundary_ids.erase(id);
+
+  if (!_side_boundary_ids.count(id) &&
+      !_edge_boundary_ids.count(id) &&
+      !_node_boundary_ids.count(id))
+    _boundary_ids.erase(id);
+
+  if (global)
+    {
+      bool someone_has_it = _boundary_ids.count(id);
+      this->comm().max(someone_has_it);
+      if (!someone_has_it)
+        _global_boundary_ids.erase(id);
+    }
+
+  // Erase (*, *, id) entries from map.
+  erase_if(_boundary_shellface_id,
+           [id](decltype(_boundary_shellface_id)::mapped_type & pr)
+           {return pr.second == id;});
+}
+
+
+
+void BoundaryInfo::remove_node_id (boundary_id_type id, const bool global)
+{
+  // Erase id from ids containers
+  _node_boundary_ids.erase(id);
+
+  if (!_side_boundary_ids.count(id) &&
+      !_edge_boundary_ids.count(id) &&
+      !_shellface_boundary_ids.count(id))
+    _boundary_ids.erase(id);
+
+  if (global)
+    {
+      bool someone_has_it = _boundary_ids.count(id);
+      this->comm().max(someone_has_it);
+      if (!someone_has_it)
+        _global_boundary_ids.erase(id);
+    }
+
+  // Erase (*, id) entries from map.
+  erase_if(_boundary_node_id,
+           [id](decltype(_boundary_node_id)::mapped_type & val)
+           {return val == id;});
 }
 
 
@@ -2042,6 +2137,160 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
   renumber_name(_ss_id_to_name, old_id, new_id);
   renumber_name(_ns_id_to_name, old_id, new_id);
   renumber_name(_es_id_to_name, old_id, new_id);
+
+  this->libmesh_assert_valid_multimaps();
+}
+
+
+
+void BoundaryInfo::renumber_side_id (boundary_id_type old_id,
+                                     boundary_id_type new_id)
+{
+  // If the IDs are the same, this is a no-op.
+  if (old_id == new_id)
+    return;
+
+  bool found_side = false;
+  for (auto & p : _boundary_side_id)
+    if (p.second.second == old_id)
+      {
+        // If we already have this id on this side, we don't want to
+        // create a duplicate in our multimap
+        this->remove_side(p.first, p.second.first, new_id);
+        p.second.second = new_id;
+        found_side = true;
+      }
+  _side_boundary_ids.erase(old_id);
+
+  if (found_side)
+    {
+      _side_boundary_ids.insert(new_id);
+
+      if (!_shellface_boundary_ids.count(old_id) &&
+          !_edge_boundary_ids.count(old_id) &&
+          !_node_boundary_ids.count(old_id))
+        {
+          _boundary_ids.erase(old_id);
+        }
+      _boundary_ids.insert(new_id);
+    }
+
+  renumber_name(_ss_id_to_name, old_id, new_id);
+
+  this->libmesh_assert_valid_multimaps();
+}
+
+
+
+void BoundaryInfo::renumber_edge_id (boundary_id_type old_id,
+                                     boundary_id_type new_id)
+{
+  // If the IDs are the same, this is a no-op.
+  if (old_id == new_id)
+    return;
+
+  bool found_edge = false;
+  for (auto & p : _boundary_edge_id)
+    if (p.second.second == old_id)
+      {
+        // If we already have this id on this edge, we don't want to
+        // create a duplicate in our multimap
+        this->remove_edge(p.first, p.second.first, new_id);
+        p.second.second = new_id;
+        found_edge = true;
+      }
+  _edge_boundary_ids.erase(old_id);
+
+  if (found_edge)
+    {
+      _edge_boundary_ids.insert(new_id);
+
+      if (!_shellface_boundary_ids.count(old_id) &&
+          !_side_boundary_ids.count(old_id) &&
+          !_node_boundary_ids.count(old_id))
+        {
+          _boundary_ids.erase(old_id);
+        }
+      _boundary_ids.insert(new_id);
+    }
+
+  renumber_name(_es_id_to_name, old_id, new_id);
+
+  this->libmesh_assert_valid_multimaps();
+}
+
+
+
+void BoundaryInfo::renumber_shellface_id (boundary_id_type old_id,
+                                          boundary_id_type new_id)
+{
+  // If the IDs are the same, this is a no-op.
+  if (old_id == new_id)
+    return;
+
+  bool found_shellface = false;
+  for (auto & p : _boundary_shellface_id)
+    if (p.second.second == old_id)
+      {
+        // If we already have this id on this shellface, we don't want
+        // to create a duplicate in our multimap
+        this->remove_shellface(p.first, p.second.first, new_id);
+        p.second.second = new_id;
+        found_shellface = true;
+      }
+  _shellface_boundary_ids.erase(old_id);
+
+  if (found_shellface)
+    {
+      _shellface_boundary_ids.insert(new_id);
+
+      if (!_edge_boundary_ids.count(old_id) &&
+          !_side_boundary_ids.count(old_id) &&
+          !_node_boundary_ids.count(old_id))
+        {
+          _boundary_ids.erase(old_id);
+        }
+      _boundary_ids.insert(new_id);
+    }
+
+  this->libmesh_assert_valid_multimaps();
+}
+
+
+
+void BoundaryInfo::renumber_node_id (boundary_id_type old_id,
+                                     boundary_id_type new_id)
+{
+  // If the IDs are the same, this is a no-op.
+  if (old_id == new_id)
+    return;
+
+  bool found_node = false;
+  for (auto & p : _boundary_node_id)
+    if (p.second == old_id)
+      {
+        // If we already have this id on this node, we don't want to
+        // create a duplicate in our multimap
+        this->remove_node(p.first, new_id);
+        p.second = new_id;
+        found_node = true;
+      }
+  _node_boundary_ids.erase(old_id);
+
+  if (found_node)
+    {
+      _node_boundary_ids.insert(new_id);
+
+      if (!_shellface_boundary_ids.count(old_id) &&
+          !_side_boundary_ids.count(old_id) &&
+          !_edge_boundary_ids.count(old_id))
+        {
+          _boundary_ids.erase(old_id);
+        }
+      _boundary_ids.insert(new_id);
+    }
+
+  renumber_name(_ns_id_to_name, old_id, new_id);
 
   this->libmesh_assert_valid_multimaps();
 }
@@ -2464,7 +2713,7 @@ BoundaryInfo::build_node_list(NodeBCTupleSortBy sort_by) const
 
 
 void
-BoundaryInfo::build_node_list_from_side_list()
+BoundaryInfo::build_node_list_from_side_list(const std::set<boundary_id_type> & sideset_list)
 {
   // If we're on a distributed mesh, even the owner of a node is not
   // guaranteed to be able to properly assign its new boundary id(s)!
@@ -2491,22 +2740,26 @@ BoundaryInfo::build_node_list_from_side_list()
       if (elem->is_remote())
         continue;
 
+      auto [sidenum, bcid] = id_pair;
+
+      if (!sideset_list.empty() && !sideset_list.count(bcid))
+        continue;
+
       // Need to loop over the sides of any possible children
       std::vector<const Elem *> family;
 #ifdef LIBMESH_ENABLE_AMR
-      elem->active_family_tree_by_side (family, id_pair.first);
+      elem->active_family_tree_by_side (family, sidenum);
 #else
       family.push_back(elem);
 #endif
 
       for (const auto & cur_elem : family)
         {
-          side = &side_builder(*cur_elem, id_pair.first);
+          side = &side_builder(*cur_elem, sidenum);
 
           // Add each node node on the side with the side's boundary id
           for (auto i : side->node_index_range())
             {
-              const boundary_id_type bcid = id_pair.second;
               this->add_node(side->node_ptr(i), bcid);
               if (!mesh_is_serial)
                 {

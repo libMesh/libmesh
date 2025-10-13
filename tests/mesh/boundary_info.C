@@ -29,6 +29,9 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testRenumber );
+# if LIBMESH_DIM > 2
+  CPPUNIT_TEST( testSelectiveRenumber );
+# endif
 # ifdef LIBMESH_ENABLE_AMR
 #  ifdef LIBMESH_ENABLE_EXCEPTIONS
   CPPUNIT_TEST( testBoundaryOnChildrenErrors );
@@ -38,6 +41,8 @@ public:
   CPPUNIT_TEST( testBoundaryOnChildrenBoundaryIDs );
   CPPUNIT_TEST( testBoundaryOnChildrenBoundarySides );
 # endif
+  CPPUNIT_TEST( testBuildNodeListFromSideList );
+  CPPUNIT_TEST( testBuildSideListFromNodeList );
 # ifdef LIBMESH_ENABLE_DIRICHLET
   CPPUNIT_TEST( testShellFaceConstraints );
 # endif
@@ -275,6 +280,134 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), bi.n_boundary_ids());
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), bc_triples.size());
+  }
+
+
+  void testSelectiveRenumber()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_cube(mesh,
+                                      2, 2, 2,
+                                      0., 1.,
+                                      0., 1.,
+                                      0., 1.,
+                                      HEX8);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // build_cube adds boundary_ids 0-5 for "back", "bottom", "right",
+    // "top", "left", and "front" (as viewed facing the usual XY plane
+    // with the Z axis pointing toward the viewer) respectively.
+    // Let's scramble those, and scramble them differently on nodes vs
+    // sides.
+    bi.renumber_side_id(0, 6);
+    bi.renumber_side_id(5, 7);
+    bi.renumber_node_id(0, 7);
+    bi.renumber_node_id(5, 6);
+
+    Elem * elem = mesh.query_elem_ptr(0);
+
+    if (elem)
+    {
+      // Let's add a couple edges
+      bi.add_edge(elem, 2, 1);
+      bi.add_edge(elem, 3, 2);
+      bi.edgeset_name(1) = "firstedge";
+      bi.edgeset_name(2) = "secondedge";
+      // And scramble them
+      bi.renumber_edge_id(1, 3);
+      bi.renumber_edge_id(2, 4);
+    }
+
+    // We should get global ids squared away
+    bi.synchronize_global_id_set();
+
+    const std::map<boundary_id_type, std::string> expected_basic_names =
+      {{1,"bottom"}, {2,"right"}, {3,"top"}, {4,"left"}};
+
+    std::map<boundary_id_type, std::string> expected_side_names =
+      expected_basic_names;
+    expected_side_names.insert({{6,"back"}, {7,"front"}});
+
+    std::map<boundary_id_type, std::string> expected_node_names =
+      expected_basic_names;
+    expected_node_names.insert({{6,"front"}, {7,"back"}});
+
+    const std::map<boundary_id_type, std::string> expected_edge_names =
+      {{3,"firstedge"}, {4,"secondedge"}};
+
+    // On a ReplicatedMesh, we should see ids 1-4,6,7 on each processor
+    if (mesh.is_serial())
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), bi.n_boundary_ids());
+
+    // On any mesh, we should see each new id on *some* processor, and
+    // shouldn't see old ids on *any* processor
+    {
+      auto & bc_ids = bi.get_boundary_ids();
+      auto & side_bc_ids = bi.get_side_boundary_ids();
+      auto & edge_bc_ids = bi.get_edge_boundary_ids();
+      auto & node_bc_ids = bi.get_node_boundary_ids();
+
+      for (boundary_id_type noid : {0, 5})
+        {
+          bool has_bcid = bc_ids.count(noid) ||
+                          side_bc_ids.count(noid) ||
+                          edge_bc_ids.count(noid) ||
+                          node_bc_ids.count(noid);
+          mesh.comm().max(has_bcid);
+          CPPUNIT_ASSERT(!has_bcid);
+        }
+
+      for (boundary_id_type id : {1, 2, 3, 4, 6, 7})
+        {
+          bool has_bcid = bc_ids.count(id),
+               has_side_id = side_bc_ids.count(id),
+               has_edge_id = edge_bc_ids.count(id),
+               has_node_id = node_bc_ids.count(id);
+
+          bool bad_name = false;
+          if (has_side_id)
+          {
+            const std::string & side_name = bi.sideset_name(id);
+            bad_name = bad_name || (side_name != libmesh_map_find(expected_side_names, id));
+          }
+
+          if (has_edge_id)
+          {
+            const std::string & edge_name = bi.edgeset_name(id);
+            bad_name = bad_name || (edge_name != libmesh_map_find(expected_edge_names, id));
+          }
+
+          if (has_node_id)
+          {
+            const std::string & node_name = bi.nodeset_name(id);
+            bad_name = bad_name || (node_name != libmesh_map_find(expected_node_names, id));
+          }
+
+          // At least one proc should have each the BCs we expect
+          mesh.comm().max(has_bcid);
+          CPPUNIT_ASSERT(has_bcid);
+
+          mesh.comm().max(has_side_id);
+          CPPUNIT_ASSERT(has_side_id);
+
+          mesh.comm().max(has_edge_id);
+          if (id == 3 || id == 4)
+            CPPUNIT_ASSERT(has_edge_id);
+          else
+            CPPUNIT_ASSERT(!has_edge_id);
+
+          mesh.comm().max(has_node_id);
+          CPPUNIT_ASSERT(has_node_id);
+
+          // No proc should have the wrong name for a BC it has
+          mesh.comm().max(bad_name);
+          CPPUNIT_ASSERT(!bad_name);
+        }
+    }
   }
 
 
@@ -936,6 +1069,91 @@ public:
     }
   }
 #endif //LIBMESH_ENABLE_AMR
+
+
+  void testBuildNodeListFromSideList()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_square(mesh,
+                                        2, 2,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // build_square gave us ids 0-3 as both side sets and node sets
+    bi.remove_node_id(0);
+    bi.remove_node_id(1);
+    bi.remove_node_id(2);
+    bi.remove_node_id(3);
+
+    CPPUNIT_ASSERT(bi.build_node_list().empty());
+
+    bi.build_node_list_from_side_list({0,2});
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        for (auto n : elem->node_index_range())
+          {
+            const Node * node = elem->node_ptr(n);
+            for (auto s : {0,2})
+              if (elem->is_node_on_side(n, s) && !elem->neighbor_ptr(s))
+                CPPUNIT_ASSERT(bi.has_boundary_id(node, s));
+            for (auto s : {1,3})
+              CPPUNIT_ASSERT(!bi.has_boundary_id(node, s));
+          }
+      }
+  }
+
+
+  void testBuildSideListFromNodeList()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_square(mesh,
+                                        2, 2,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // build_square gave us ids 0-3 as both side sets and node sets
+    bi.remove_side_id(0);
+    bi.remove_side_id(1);
+    bi.remove_side_id(2);
+    bi.remove_side_id(3);
+
+    CPPUNIT_ASSERT(bi.build_side_list().empty());
+
+    bi.build_side_list_from_node_list({0,2});
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        for (auto s : {0,2})
+          {
+            if (!elem->neighbor_ptr(s))
+              {
+                CPPUNIT_ASSERT(bi.has_boundary_id(elem, s, s));
+                CPPUNIT_ASSERT_EQUAL(bi.n_boundary_ids(elem, s), 1u);
+              }
+            else
+              CPPUNIT_ASSERT(!bi.n_boundary_ids(elem, s));
+          }
+        for (auto s : {1,3})
+          {
+            CPPUNIT_ASSERT(!bi.has_boundary_id(elem, s, s));
+            CPPUNIT_ASSERT(!bi.n_boundary_ids(elem, s));
+          }
+      }
+  }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryInfoTest );
