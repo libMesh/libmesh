@@ -630,6 +630,8 @@ void DenseMatrix<T>::_lu_back_substitute (const DenseVector<T> & b,
 template<typename T>
 void DenseMatrix<T>::_lu_decompose ()
 {
+  using std::abs;
+
   // If this function was called, there better not be any
   // previous decomposition of the matrix.
   libmesh_assert_equal_to (this->_decomposition_type, NONE);
@@ -648,11 +650,11 @@ void DenseMatrix<T>::_lu_decompose ()
       // Find the pivot row by searching down the i'th column
       _pivots[i] = i;
 
-      // std::abs(complex) must return a Real!
-      auto the_max = std::abs( A(i,i) );
+      // abs(complex) must return a Real!
+      auto the_max = abs( A(i,i) );
       for (unsigned int j=i+1; j<n_rows; ++j)
         {
-          auto candidate_max = std::abs( A(j,i) );
+          auto candidate_max = abs( A(j,i) );
           if (the_max < candidate_max)
             {
               the_max = candidate_max;
@@ -872,6 +874,8 @@ void DenseMatrix<T>::cholesky_solve (const DenseVector<T2> & b,
 template<typename T>
 void DenseMatrix<T>::_cholesky_decompose ()
 {
+  using std::sqrt;
+
   // If we called this function, there better not be any
   // previous decomposition of the matrix.
   libmesh_assert_equal_to (this->_decomposition_type, NONE);
@@ -901,7 +905,7 @@ void DenseMatrix<T>::_cholesky_decompose ()
                                    "Error! Can only use Cholesky decomposition with symmetric positive definite matrices.");
 #endif
 
-              A(i,i) = std::sqrt(A(i,j));
+              A(i,i) = sqrt(A(i,j));
             }
           else
             A(j,i) = A(i,j) / A(i,i);

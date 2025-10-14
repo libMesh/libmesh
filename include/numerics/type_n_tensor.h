@@ -218,7 +218,7 @@ public:
    * \returns The Frobenius norm of the tensor, i.e. the square-root of
    * the sum of the elements squared.
    */
-  auto norm() const -> decltype(std::norm(T()))
+  auto norm() const
   {
     libmesh_not_implemented();
     return 0.;
@@ -228,7 +228,7 @@ public:
    * \returns The Frobenius norm of the tensor squared, i.e. the sum of the
    * entry magnitudes squared.
    */
-  auto norm_sq() const -> decltype(std::norm(T()))
+  auto norm_sq() const
   {
     libmesh_not_implemented();
     return 0.;
