@@ -364,13 +364,13 @@ public:
    * \returns The Frobenius norm of the tensor, i.e. the square-root of
    * the sum of the elements squared.
    */
-  auto norm() const -> decltype(std::norm(T()));
+  auto norm() const;
 
   /**
    * \returns The Frobenius norm of the tensor squared, i.e. sum of the
    * element magnitudes squared.
    */
-  auto norm_sq() const -> decltype(std::norm(T()));
+  auto norm_sq() const;
 
   /**
    * \returns True if all values in the tensor are zero
@@ -1277,9 +1277,10 @@ TypeTensor<T>::contract (const TypeTensor<T2> & t) const
 
 template <typename T>
 inline
-auto TypeTensor<T>::norm() const -> decltype(std::norm(T()))
+auto TypeTensor<T>::norm() const
 {
-  return std::sqrt(this->norm_sq());
+  using std::sqrt;
+  return sqrt(this->norm_sq());
 }
 
 
@@ -1345,7 +1346,7 @@ void TypeTensor<T>::zero()
 
 template <typename T>
 inline
-auto TypeTensor<T>::norm_sq () const -> decltype(std::norm(T()))
+auto TypeTensor<T>::norm_sq () const
 {
   Real sum = 0.;
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)

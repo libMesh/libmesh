@@ -324,7 +324,7 @@ public:
    * This is the natural matrix norm that is compatible to the l1-norm
    * for vectors, i.e. \f$ |Mv|_1 \leq |M|_1 |v|_1 \f$.
    */
-  auto l1_norm () const -> decltype(std::abs(T(0)));
+  auto l1_norm () const;
 
   /**
    * \returns The linfty-norm of the matrix, that is, the max row sum:
@@ -334,7 +334,7 @@ public:
    * This is the natural matrix norm that is compatible to the
    * linfty-norm of vectors, i.e. \f$ |Mv|_\infty \leq |M|_\infty |v|_\infty \f$.
    */
-  auto linfty_norm () const -> decltype(std::abs(T(0)));
+  auto linfty_norm () const;
 
   /**
    * Left multiplies by the transpose of the matrix \p A.
@@ -1122,15 +1122,16 @@ auto DenseMatrix<T>::max () const -> decltype(libmesh_real(T(0)))
 
 template<typename T>
 inline
-auto DenseMatrix<T>::l1_norm () const -> decltype(std::abs(T(0)))
+auto DenseMatrix<T>::l1_norm () const
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
 
-  auto columnsum = std::abs(T(0));
+  using std::abs;
+  auto columnsum = abs(T(0));
   for (unsigned int i=0; i!=this->_m; i++)
     {
-      columnsum += std::abs((*this)(i,0));
+      columnsum += abs((*this)(i,0));
     }
   auto my_max = columnsum;
   for (unsigned int j=1; j!=this->_n; j++)
@@ -1138,7 +1139,7 @@ auto DenseMatrix<T>::l1_norm () const -> decltype(std::abs(T(0)))
       columnsum = 0.;
       for (unsigned int i=0; i!=this->_m; i++)
         {
-          columnsum += std::abs((*this)(i,j));
+          columnsum += abs((*this)(i,j));
         }
       my_max = (my_max > columnsum? my_max : columnsum);
     }
@@ -1149,15 +1150,16 @@ auto DenseMatrix<T>::l1_norm () const -> decltype(std::abs(T(0)))
 
 template<typename T>
 inline
-auto DenseMatrix<T>::linfty_norm () const -> decltype(std::abs(T(0)))
+auto DenseMatrix<T>::linfty_norm () const
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
+  using std::abs;
 
-  auto rowsum = std::abs(T(0));
+  auto rowsum = abs(T(0));
   for (unsigned int j=0; j!=this->_n; j++)
     {
-      rowsum += std::abs((*this)(0,j));
+      rowsum += abs((*this)(0,j));
     }
   auto my_max = rowsum;
   for (unsigned int i=1; i!=this->_m; i++)
@@ -1165,7 +1167,7 @@ auto DenseMatrix<T>::linfty_norm () const -> decltype(std::abs(T(0)))
       rowsum = 0.;
       for (unsigned int j=0; j!=this->_n; j++)
         {
-          rowsum += std::abs((*this)(i,j));
+          rowsum += abs((*this)(i,j));
         }
       my_max = (my_max > rowsum? my_max : rowsum);
     }
