@@ -197,6 +197,21 @@ public:
   const MeshBase & get_mesh() const;
 
   /**
+   * Get the verbosity setting (whether to print extra info to screen,
+   * default false) for this PointLocator
+   */
+  bool get_verbose() const { return _verbose; }
+
+  /**
+   * Set the verbosity setting for this PointLocator
+   */
+  void set_verbose(bool verbosity) { _verbose = verbosity; }
+
+#ifndef LIBMESH_ENABLE_DEPRECATED
+protected:
+#endif
+
+  /**
    * Boolean flag to indicate whether to print out extra info.
    */
   bool _verbose;
