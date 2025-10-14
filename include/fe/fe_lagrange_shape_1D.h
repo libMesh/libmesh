@@ -39,6 +39,7 @@ Real fe_lagrange_1D_linear_shape(const unsigned int i,
     case 0:
       return .5*(1. - xi);
 
+    // case 1
     default:
       return .5*(1. + xi);
     }
@@ -60,6 +61,7 @@ Real fe_lagrange_1D_quadratic_shape(const unsigned int i,
     case 1:
       return .5*xi*(xi + 1);
 
+    // case 2
     default:
       return (1. - xi*xi);
     }
@@ -84,6 +86,7 @@ Real fe_lagrange_1D_cubic_shape(const unsigned int i,
     case 2:
       return 27./16.*(1.-xi*xi)*(1./3.-xi);
 
+    // case 3
     default:
       return 27./16.*(1.-xi*xi)*(1./3.+xi);
     }
@@ -96,6 +99,8 @@ Real fe_lagrange_1D_shape(const Order order,
                           const unsigned int i,
                           const Real xi)
 {
+  libmesh_assert_less_equal(order, THIRD);
+
   switch (order)
     {
       // Lagrange linears
@@ -107,6 +112,7 @@ Real fe_lagrange_1D_shape(const Order order,
       return fe_lagrange_1D_quadratic_shape(i, xi);
 
       // Lagrange cubics
+      // case THIRD
     default:
       return fe_lagrange_1D_cubic_shape(i, xi);
     }
@@ -129,6 +135,7 @@ Real fe_lagrange_1D_linear_shape_deriv(const unsigned int i,
     case 0:
       return -.5;
 
+    // case 1
     default:
       return .5;
     }
@@ -153,6 +160,7 @@ Real fe_lagrange_1D_quadratic_shape_deriv(const unsigned int i,
     case 1:
       return xi+.5;
 
+    // case 2
     default:
       return -2.*xi;
     }
@@ -180,6 +188,7 @@ Real fe_lagrange_1D_cubic_shape_deriv(const unsigned int i,
     case 2:
       return 27./16.*(3.*xi*xi-2./3.*xi-1.);
 
+    // case 3
     default:
       return 27./16.*(-3.*xi*xi-2./3.*xi+1.);
     }
@@ -193,6 +202,8 @@ Real fe_lagrange_1D_shape_deriv(const Order order,
                                 const unsigned int j,
                                 const Real xi)
 {
+  libmesh_assert_less_equal(order, THIRD);
+
   switch (order)
     {
     case FIRST:
@@ -201,6 +212,7 @@ Real fe_lagrange_1D_shape_deriv(const Order order,
     case SECOND:
       return fe_lagrange_1D_quadratic_shape_deriv(i, j, xi);
 
+    // case THIRD
     default:
       return fe_lagrange_1D_cubic_shape_deriv(i, j, xi);
     }
@@ -220,6 +232,7 @@ Real fe_lagrange_1D_quadratic_shape_second_deriv(const unsigned int i,
   // Don't need to switch on j.  1D shape functions
   // depend on xi only!
   libmesh_assert_equal_to (j, 0);
+  libmesh_assert_less(i, 3);
 
   switch (i)
     {
@@ -229,6 +242,7 @@ Real fe_lagrange_1D_quadratic_shape_second_deriv(const unsigned int i,
     case 1:
       return 1.;
 
+    // case 2
     default:
       return -2.;
     }
@@ -243,6 +257,7 @@ Real fe_lagrange_1D_cubic_shape_second_deriv(const unsigned int i,
   // Don't need to switch on j.  1D shape functions
   // depend on xi only!
   libmesh_assert_equal_to (j, 0);
+  libmesh_assert_less(i, 4);
 
   switch (i)
     {
@@ -255,6 +270,7 @@ Real fe_lagrange_1D_cubic_shape_second_deriv(const unsigned int i,
     case 2:
       return 27./16.*(6*xi-2./3.);
 
+    // case 2
     default:
       return 27./16.*(-6*xi-2./3.);
     }
@@ -268,6 +284,8 @@ Real fe_lagrange_1D_shape_second_deriv(const Order order,
                                        const unsigned int j,
                                        const Real xi)
 {
+  libmesh_assert_less_equal(order, THIRD);
+
   switch (order)
     {
     // All second derivatives of linears are zero....
@@ -277,6 +295,7 @@ Real fe_lagrange_1D_shape_second_deriv(const Order order,
     case SECOND:
       return fe_lagrange_1D_quadratic_shape_second_deriv(i, j, xi);
 
+    // case THIRD
     default:
       return fe_lagrange_1D_cubic_shape_second_deriv(i, j, xi);
     } // end switch (order)
