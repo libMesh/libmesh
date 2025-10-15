@@ -1012,19 +1012,6 @@ public:
    */
   virtual Order default_side_order () const { return default_order(); }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * Calls Elem::vertex_average() for backwards compatibility.
-   *
-   * \deprecated This method has now been deprecated, so it will be
-   * removed at some point in the future.  Calls to Elem::centroid()
-   * in user code should be updated to either call
-   * Elem::vertex_average() or Elem::true_centroid() on a case by case
-   * basis.
-   */
-  virtual Point centroid () const;
-#endif // LIBMESH_ENABLE_DEPRECATED
-
   /**
    * \returns The "true" geometric centroid of the element, c=(cx, cy,
    * cz), where:
