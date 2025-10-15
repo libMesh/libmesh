@@ -141,6 +141,23 @@ public:
   void write_complex_magnitude (bool val);
 
   /**
+   * If true this flag enforces the following behaviors:
+   *
+   * .) When reading an Exodus file, instead of setting the
+   *    elem_num_map and node_num_map ids directly on Nodes and Elems
+   *    read in from the Exodus file, set their unique_ids
+   *    instead. Normally libmesh chooses the unique_ids automatically
+   *    but in this case we override that choice.  As a consequence
+   *    the libMesh Elems/Nodes will be numbered based on their
+   *    implied ordering in the exo file (sequentially by block and
+   *    without any gaps in the numbering).
+   * .) When writing an Exodus file, populate the elem_num_map and
+   *    node_num_map with the unique_ids of the Elems/Nodes being
+   *    written.
+   */
+  void set_unique_ids_from_maps (bool val);
+
+  /**
    * By default, we only write out the elements physically stored in
    * the mesh.  If we have any SIDE_DISCONTINUOUS variables, however,
    * we cannot easily output them on elements with sides that share
@@ -669,6 +686,14 @@ private:
    * by not writing out.
    */
   bool _write_complex_abs;
+
+  /**
+   * Set Elem/Node unique_ids based on the elem_num_map and node_num_map
+   * contents during reading, populate those maps with unique_ids during
+   * writing.
+   * See also: docs for set_unique_ids_from_maps(bool) function.
+   */
+  bool _set_unique_ids_from_maps;
 
   /**
    * Set to true (false is the default) to generate independent nodes

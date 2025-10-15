@@ -971,7 +971,10 @@ void ExodusII_IO::write_complex_magnitude (bool val)
   _write_complex_abs = val;
 }
 
-
+void ExodusII_IO::set_unique_ids_from_maps (bool val)
+{
+  _set_unique_ids_from_maps = val;
+}
 
 void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
 {
