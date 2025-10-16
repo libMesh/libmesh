@@ -36,6 +36,10 @@
 #include <string>
 #include <memory>
 
+// periodic boundary condition support
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary.h"
+
 namespace libMesh
 {
 
@@ -1820,27 +1824,49 @@ public:
   const std::set<subdomain_id_type> & get_mesh_subdomains() const
   { libmesh_assert(this->is_prepared()); return _mesh_subdomains; }
 
+#ifdef LIBMESH_ENABLE_PERIODIC
   /**
    * Register a pair of boundaries as disconnected boundaries.
    */
-  void add_disconnected_boundaries (const boundary_id_type b1,
-                                    const boundary_id_type b2)
-  {
-    if (b1 == b2)
-      _boundary_id_pairs.emplace(b1, b2);
-    else
+  void add_disconnected_boundaries(const boundary_id_type b1,
+                                  const boundary_id_type b2)
     {
-      _boundary_id_pairs.emplace(b1, b2);
-      _boundary_id_pairs.emplace(b2, b1);
-    }
-  }
+      // Lazily allocate the container the first time it’s needed
+      if (!_disconnected_boundary_pairs)
+        _disconnected_boundary_pairs = std::make_unique<PeriodicBoundaries>();
 
+      // Create forward and inverse boundary mappings
+      PeriodicBoundary forward(RealVectorValue(0., 0., 0.));
+      PeriodicBoundary inverse(RealVectorValue(0., 0., 0.));
+
+      forward.myboundary       = b1;
+      forward.pairedboundary   = b2;
+      inverse.myboundary       = b2;
+      inverse.pairedboundary   = b1;
+
+      // Add both directions into the container
+      _disconnected_boundary_pairs->emplace(b1, forward.clone());
+      _disconnected_boundary_pairs->emplace(b2, inverse.clone());
+    }
+
+  PeriodicBoundaries * get_disconnected_boundaries()
+    {
+      return _disconnected_boundary_pairs.get();
+    }
+
+  const PeriodicBoundaries * get_disconnected_boundaries() const
+    {
+      return _disconnected_boundary_pairs.get();
+    }
+#endif
 
 
 protected:
 
-  /// @brief a map of pairs of boundary ids between which new boundary sides are created
-  std::unordered_map<boundary_id_type, boundary_id_type> _boundary_id_pairs;
+ #ifdef LIBMESH_ENABLE_PERIODIC
+  /// @brief The disconnected boundary id pairs.
+  std::unique_ptr<PeriodicBoundaries> _disconnected_boundary_pairs;
+#endif
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,
