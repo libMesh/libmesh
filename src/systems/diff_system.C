@@ -282,25 +282,7 @@ void DifferentiableSystem::attach_qoi( DifferentiableQoI * qoi_in )
   this->_diff_qoi.push(qoi_in->clone());
 
   auto & dq = this->_diff_qoi.top();
-  // User needs to resize qoi system qoi accordingly
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  // Call the old API for backwards compatibility
-  dq->init_qoi( this->qoi );
-
-  // Then the new API for forwards compatibility
   dq->init_qoi_count( *this );
-#else
-#ifndef NDEBUG
-  // Make sure the user has updated their QoI subclass - call the old
-  // API and make sure it does nothing
-  std::vector<Number> deprecated_vector;
-  dq->init_qoi( deprecated_vector );
-  libmesh_assert(deprecated_vector.empty());
-#endif
-
-  // Then the new API
-  dq->init_qoi_count( *this );
-#endif
 }
 
 unsigned int DifferentiableSystem::get_second_order_dot_var( unsigned int var ) const
