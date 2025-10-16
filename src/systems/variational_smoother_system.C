@@ -184,6 +184,8 @@ void VariationalSmootherSystem::assembly (bool get_residual,
 void VariationalSmootherSystem::solve()
 {
   const auto & mesh_info = get_mesh_info();
+  if (_verbosity)
+    libMesh::out << "Initial " << mesh_info << std::endl;
   if (mesh_info.mesh_is_tangled)
     {
       // Untangling solve
@@ -197,16 +199,25 @@ void VariationalSmootherSystem::solve()
       const auto dilation_weight = _dilation_weight;
       _dilation_weight = 0.;
 
+      if (_verbosity)
+        libMesh::out << "Untangling the mesh" << std::endl;
       FEMSystem::solve();
 
       // Reset the dilation weight
       _dilation_weight = dilation_weight;
+
+    if (_verbosity)
+      libMesh::out << "Untangled " << mesh_info << std::endl;
     }
 
   // Smoothing solve
   _untangling_solve = false;
+  if (_verbosity)
+    libMesh::out << "Smoothing the mesh" << std::endl;
   FEMSystem::solve();
-  libmesh_error_msg_if(get_mesh_info().mesh_is_tangled, "The smoothing solve tangled the mesh!");
+  libmesh_error_msg_if(mesh_info.mesh_is_tangled, "The smoothing solve tangled the mesh!");
+  if (_verbosity)
+    libMesh::out << "Smoothed " << mesh_info << std::endl;
 }
 
 void VariationalSmootherSystem::init_data ()
@@ -288,6 +299,8 @@ void VariationalSmootherSystem::prepare_for_smoothing()
   mesh.comm().sum(elem_averaged_det_S_sum);
 
   _ref_vol = elem_averaged_det_S_sum / mesh.n_active_elem();
+  if (_verbosity > 1)
+    libMesh::out << "Reference volume: " << _ref_vol << std::endl;
 }
 
 void VariationalSmootherSystem::init_context(DiffContext & context)
@@ -845,6 +858,15 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
       else if (combined_int < info.min_elem_combined.first)
         info.min_elem_combined = std::make_pair(combined_int, elem->id());
 
+      if (_verbosity > 3)
+        {
+          libMesh::out << "Elem " << elem->id() << " quality:" << std::endl
+                       << "  distortion-dilation metric: " << combined_int << std::endl
+                       << "  distortion metric: " << beta_int << std::endl
+                       << "  dilation metric: " << mu_int << std::endl
+                       << "  det(S): " << det_S_int << std::endl;
+        }
+
     } // for elem
 
   // Get contributions from elements on other processors
@@ -869,6 +891,9 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
   mesh.comm().max(info.mesh_is_tangled);
 
   _mesh_info = info;
+
+  if (_verbosity > 2)
+    libMesh::out << info;
 }
 
 std::pair<std::unique_ptr<Elem>, std::vector<std::unique_ptr<Node>>>
@@ -1135,6 +1160,47 @@ void VariationalSmootherSystem::get_target_to_reference_jacobian(
       jacobians[qp] = H.inverse();
       jacobian_dets[qp] = jacobians[qp].det();
     }
+}
+
+std::ostream &operator<<(std::ostream &os, const MeshQualityInfo & info)
+{
+  os << "Mesh quality info:" << std::endl
+     << "  Mesh distortion-dilation metric: "
+     << info.total_combined << std::endl
+     << "  Mesh distortion metric: "
+     << info.total_distortion << std::endl
+     << "  Mesh dilation metric: "
+     << info.total_dilation << std::endl
+     << "  Max distortion-dilation is in elem "
+     << info.max_elem_combined.second << ": "
+     << info.max_elem_combined.first << std::endl
+     << "  Max distortion is in elem "
+     << info.max_elem_distortion.second << ": "
+     << info.max_elem_distortion.first << std::endl
+     << "  Max dilation is in elem "
+     << info.max_elem_dilation.second << ": "
+     << info.max_elem_dilation.first << std::endl
+     << "  Max det(S) is in elem "
+     << info.max_elem_det_S.second << ": "
+     << info.max_elem_det_S.first << std::endl
+     << "  Min distortion-dilation is in elem "
+     << info.min_elem_combined.second << ": "
+     << info.min_elem_combined.first << std::endl
+     << "  Min distortion is in elem "
+     << info.min_elem_distortion.second << ": "
+     << info.min_elem_distortion.first << std::endl
+     << "  Min dilation is in elem "
+     << info.min_elem_dilation.second << ": "
+     << info.min_elem_dilation.first << std::endl
+     << "  Min det(S) is in elem "
+     << info.min_elem_det_S.second << ": "
+     << info.min_elem_det_S.first << std::endl
+     << "  Max qp det(S): " << info.max_qp_det_S << std::endl
+     << "  Min qp det(S): " << info.min_qp_det_S << std::endl
+     << "  Mesh-integrated det(S): " << info.total_det_S << std::endl
+     << "  Tangled: " << info.mesh_is_tangled << std::endl;
+
+  return os;
 }
 
 } // namespace libMesh

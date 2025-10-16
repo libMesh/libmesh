@@ -522,7 +522,7 @@ int main (int argc, char ** argv)
   // Possibly smooth the mesh
   if (vsmooth)
   {
-    VariationalMeshSmoother vsmoother(mesh);
+    VariationalMeshSmoother vsmoother(mesh, 0.5, true, TOLERANCE * TOLERANCE, TOLERANCE * TOLERANCE, 2);
     vsmoother.smooth();
   }
 

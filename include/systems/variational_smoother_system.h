@@ -89,6 +89,7 @@ public:
                             const std::string & name,
                             const unsigned int number)
     : libMesh::FEMSystem(es, name, number),
+      _verbosity(0),
       _epsilon_squared(TOLERANCE),
       _epsilon_squared_assembly(0.),
       _ref_vol(0.),
@@ -150,6 +151,11 @@ public:
    */
   void compute_mesh_quality_info();
 
+  /*
+   * Sets the verbosity of the object.
+   */
+  void set_verbosity(const unsigned int verbosity) { _verbosity = verbosity; }
+
 protected:
 
   // System initialization
@@ -170,6 +176,11 @@ protected:
    * distortion metric.
    */
   void prepare_for_smoothing();
+
+  /**
+   * verbosity setting
+   */
+  unsigned int _verbosity;
 
   /**
   * The small nonzero constant to prevent zero denominators (degenerate meshes only)
