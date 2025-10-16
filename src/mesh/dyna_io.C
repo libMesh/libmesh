@@ -737,17 +737,6 @@ void DynaIO::add_spline_constraints(DofMap &,
 }
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void DynaIO::clear_spline_nodes()
-{
-  libmesh_deprecated();
-
-  MeshTools::clear_spline_nodes(MeshInput<MeshBase>::mesh());
-}
-#endif // LIBMESH_ENABLE_DEPRECATED
-
-
-
 const DynaIO::ElementDefinition &
 DynaIO::find_elem_definition(dyna_int_type dyna_elem,
                              int dim, int p)
