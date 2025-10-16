@@ -346,56 +346,6 @@ bool DifferentiableSystem::have_second_order_scalar_vars() const
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void DifferentiableSystem::swap_physics ( DifferentiablePhysics * & swap_physics )
-{
-  // This isn't safe if users aren't very careful about memory
-  // management and they don't (or aren't able to due to an exception)
-  // swap back.
-  libmesh_deprecated();
-
-  // A mess of code for backwards compatibility
-  if (this->_diff_physics.empty())
-    {
-      // Swap-something-else-for-self
-      std::unique_ptr<DifferentiablePhysics> scary_hack(swap_physics);
-      this->_diff_physics.push(std::move(scary_hack));
-      swap_physics = this;
-    }
-  else if (swap_physics == this)
-    {
-      // The user must be cleaning up after a previous
-      // swap-something-else-for-self
-      libmesh_assert(!this->_diff_physics.empty());
-
-      // So we don't want to delete what got swapped in, but we do
-      // want to put it back into their pointer
-      DifferentiablePhysics * old_p = this->_diff_physics.top().release();
-      this->_diff_physics.pop();
-      swap_physics = old_p;
-
-      // And if the user is doing anything more sophisticated than
-      // that then the user is sophisticated enough to upgrade to
-      // push/pop.
-      libmesh_assert(this->_diff_physics.empty());
-    }
-  else
-    {
-      // Swapping one external physics for another
-      DifferentiablePhysics * old_p = this->_diff_physics.top().release();
-      std::swap(old_p, swap_physics);
-      this->_diff_physics.top().reset(old_p);
-    }
-
-  // If the physics has been swapped, we will reassemble
-  // the matrix from scratch before doing an adjoint solve
-  // rather than just transposing
-  this->disable_cache();
-}
-#endif // LIBMESH_ENABLE_DEPRECATED
-
-
-
 void DifferentiableSystem::push_physics ( DifferentiablePhysics & new_physics )
 {
   this->_diff_physics.push(new_physics.clone_physics());
