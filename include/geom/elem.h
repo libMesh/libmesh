@@ -462,14 +462,6 @@ public:
   virtual unsigned int local_edge_node(unsigned int edge,
                                        unsigned int edge_node) const = 0;
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * This function is deprecated, call local_side_node(side, side_node) instead.
-   */
-  unsigned int which_node_am_i(unsigned int side,
-                               unsigned int side_node) const;
-#endif // LIBMESH_ENABLE_DEPRECATED
-
   /**
    * \returns \p true if a vertex of \p e is contained
    * in this element.  If \p mesh_connection is true, looks
