@@ -2663,33 +2663,6 @@ std::size_t BoundaryInfo::n_nodeset_conds () const
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void BoundaryInfo::build_node_list (std::vector<dof_id_type> & nl,
-                                    std::vector<boundary_id_type> & il) const
-{
-  libmesh_deprecated();
-
-  // Call the non-deprecated version of this function.
-  auto bc_tuples = this->build_node_list();
-
-  // Clear the input vectors, just in case they were used for
-  // something else recently...
-  nl.clear();
-  il.clear();
-
-  // Reserve the size, then use push_back
-  nl.reserve (bc_tuples.size());
-  il.reserve (bc_tuples.size());
-
-  for (const auto & t : bc_tuples)
-    {
-      nl.push_back(std::get<0>(t));
-      il.push_back(std::get<1>(t));
-    }
-}
-#endif
-
-
 std::vector<BoundaryInfo::NodeBCTuple>
 BoundaryInfo::build_node_list(NodeBCTupleSortBy sort_by) const
 {
@@ -3004,37 +2977,6 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void BoundaryInfo::build_side_list (std::vector<dof_id_type> & el,
-                                    std::vector<unsigned short int> & sl,
-                                    std::vector<boundary_id_type> & il) const
-{
-  libmesh_deprecated();
-
-  // Call the non-deprecated version of this function.
-  auto bc_tuples = this->build_side_list();
-
-  // Clear the input vectors, just in case they were used for
-  // something else recently...
-  el.clear();
-  sl.clear();
-  il.clear();
-
-  // Reserve the size, then use push_back
-  el.reserve (bc_tuples.size());
-  sl.reserve (bc_tuples.size());
-  il.reserve (bc_tuples.size());
-
-  for (const auto & t : bc_tuples)
-    {
-      el.push_back(std::get<0>(t));
-      sl.push_back(std::get<1>(t));
-      il.push_back(std::get<2>(t));
-    }
-}
-#endif
-
-
 std::vector<BoundaryInfo::BCTuple>
 BoundaryInfo::build_side_list(BCTupleSortBy sort_by) const
 {
@@ -3062,37 +3004,6 @@ BoundaryInfo::build_side_list(BCTupleSortBy sort_by) const
   return bc_triples;
 }
 
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void BoundaryInfo::build_active_side_list (std::vector<dof_id_type> & el,
-                                           std::vector<unsigned short int> & sl,
-                                           std::vector<boundary_id_type> & il) const
-{
-  libmesh_deprecated();
-
-  // Call the non-deprecated version of this function.
-  auto bc_tuples = this->build_active_side_list();
-
-  // Clear the input vectors, just in case they were used for
-  // something else recently...
-  el.clear();
-  sl.clear();
-  il.clear();
-
-  // Reserve the size, then use push_back
-  el.reserve (bc_tuples.size());
-  sl.reserve (bc_tuples.size());
-  il.reserve (bc_tuples.size());
-
-  for (const auto & t : bc_tuples)
-    {
-      el.push_back(std::get<0>(t));
-      sl.push_back(std::get<1>(t));
-      il.push_back(std::get<2>(t));
-    }
-}
-#endif
 
 
 std::vector<BoundaryInfo::BCTuple>
@@ -3128,37 +3039,6 @@ BoundaryInfo::build_active_side_list () const
 }
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void BoundaryInfo::build_edge_list (std::vector<dof_id_type> & el,
-                                    std::vector<unsigned short int> & sl,
-                                    std::vector<boundary_id_type> & il) const
-{
-  libmesh_deprecated();
-
-  // Call the non-deprecated version of this function.
-  auto bc_tuples = this->build_edge_list();
-
-  // Clear the input vectors, just in case they were used for
-  // something else recently...
-  el.clear();
-  sl.clear();
-  il.clear();
-
-  // Reserve the size, then use push_back
-  el.reserve (bc_tuples.size());
-  sl.reserve (bc_tuples.size());
-  il.reserve (bc_tuples.size());
-
-  for (const auto & t : bc_tuples)
-    {
-      el.push_back(std::get<0>(t));
-      sl.push_back(std::get<1>(t));
-      il.push_back(std::get<2>(t));
-    }
-}
-#endif
-
-
 std::vector<BoundaryInfo::BCTuple>
 BoundaryInfo::build_edge_list() const
 {
@@ -3174,37 +3054,6 @@ BoundaryInfo::build_edge_list() const
 
   return bc_triples;
 }
-
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void BoundaryInfo::build_shellface_list (std::vector<dof_id_type> & el,
-                                         std::vector<unsigned short int> & sl,
-                                         std::vector<boundary_id_type> & il) const
-{
-  libmesh_deprecated();
-
-  // Call the non-deprecated version of this function.
-  auto bc_tuples = this->build_shellface_list();
-
-  // Clear the input vectors, just in case they were used for
-  // something else recently...
-  el.clear();
-  sl.clear();
-  il.clear();
-
-  // Reserve the size, then use push_back
-  el.reserve (bc_tuples.size());
-  sl.reserve (bc_tuples.size());
-  il.reserve (bc_tuples.size());
-
-  for (const auto & t : bc_tuples)
-    {
-      el.push_back(std::get<0>(t));
-      sl.push_back(std::get<1>(t));
-      il.push_back(std::get<2>(t));
-    }
-}
-#endif
 
 
 std::vector<BoundaryInfo::BCTuple>
