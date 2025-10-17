@@ -658,7 +658,8 @@ public:
 
                         const auto & base = elem->node_ref(local_node_id - 9);
                         const auto & apex = elem->node_ref(4);
-                        const Real x = (type == PYRAMID18) ? 0.569332 : 0.549876;
+                        const Real x =
+                            (type == PYRAMID18) ? 0.566460 : 0.549876;
 
                         CPPUNIT_ASSERT(node.relative_fuzzy_equals(base + x * (apex - base), 1e-3));
                         continue;
@@ -930,7 +931,7 @@ public:
   void testVariationalPyramid18MultipleSubdomains()
   {
     ReplicatedMesh mesh(*TestCommWorld);
-    VariationalMeshSmoother variational(mesh);
+    VariationalMeshSmoother variational(mesh, 0.0);
 
     testVariationalSmoother(mesh, variational, PYRAMID18, true);
   }
