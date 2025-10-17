@@ -201,14 +201,6 @@ public:
   { this->_diff_physics.push(physics_in->clone_physics());
     this->_diff_physics.top()->init_physics(*this);}
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * Swap current physics object with external object.  This is
-   * \deprecated for being too unsafe for easy use.
-   */
-  void swap_physics ( DifferentiablePhysics * & swap_physics );
-#endif // LIBMESH_ENABLE_DEPRECATED
-
   /**
    * Push a clone of a new physics object onto our stack, overriding
    * the current physics until the new physics is popped off again (or
