@@ -567,30 +567,40 @@ void ExodusII_IO::read (const std::string & fname)
             {
               for (int k=0; k<exio_helper->num_nodes_per_elem; k++)
                 {
-                  // global index
+                  // Get index into this block's connectivity array
                   int gi = elem_num * exio_helper->num_nodes_per_elem + conv.get_node_map(k);
 
-                  // Look up the value in the connectivity array at this global index
-                  auto conn_gi = exio_helper->connect[gi];
+                  // Helper function that takes an index into the
+                  // nodal connectivity array for the current block
+                  // and determines the corresponding libMesh Node id.
+                  auto get_libmesh_node_id = [this](int gi) -> dof_id_type
+                  {
+                    // Look up the value in the connectivity array at this global index
+                    auto conn_gi = exio_helper->connect[gi];
 
-                  // The entries in 'connect' are actually (1-based)
-                  // indices into the node_num_map, so in order to use
-                  // conn_gi as an index in C++, we need to first make
-                  // it zero-based.
-                  auto conn_gi_zero_based =
-                    cast_int<dof_id_type>(conn_gi - 1);
+                    // The entries in 'connect' are actually (1-based)
+                    // indices into the node_num_map, so in order to use
+                    // conn_gi as an index in C++, we need to first make
+                    // it zero-based.
+                    auto conn_gi_zero_based =
+                      cast_int<dof_id_type>(conn_gi - 1);
 
-                  // If the user set the flag which stores Exodus node
-                  // ids as unique_ids instead of regular ids, then
-                  // the libmesh node id we are looking for is
-                  // actually just "conn_gi_zero_based". Otherwise, we
-                  // need to look up the Node's id in the node_num_map,
-                  // *and* then subtract 1 from that because the entries
-                  // in the node_num_map are also 1-based.
-                  dof_id_type libmesh_node_id =
-                    _set_unique_ids_from_maps ?
-                    cast_int<dof_id_type>(conn_gi_zero_based) :
-                    cast_int<dof_id_type>(exio_helper->node_num_map[conn_gi_zero_based] - 1);
+                    // If the user set the flag which stores Exodus node
+                    // ids as unique_ids instead of regular ids, then
+                    // the libmesh node id we are looking for is
+                    // actually just "conn_gi_zero_based". Otherwise, we
+                    // need to look up the Node's id in the node_num_map,
+                    // *and* then subtract 1 from that because the entries
+                    // in the node_num_map are also 1-based.
+                    dof_id_type libmesh_node_id =
+                      _set_unique_ids_from_maps ?
+                      cast_int<dof_id_type>(conn_gi_zero_based) :
+                      cast_int<dof_id_type>(exio_helper->node_num_map[conn_gi_zero_based] - 1);
+
+                    return libmesh_node_id;
+                  };
+
+                  auto libmesh_node_id = get_libmesh_node_id(gi);
 
                   // Set the node pointer in the Elem
                   elem->set_node(k, mesh.node_ptr(libmesh_node_id));
