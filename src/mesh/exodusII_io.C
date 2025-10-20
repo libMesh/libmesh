@@ -661,10 +661,29 @@ void ExodusII_IO::read (const std::string & fname)
                         libmesh_vector_at(coef_vec, elem_node_index);
 
                       // Get the libMesh node corresponding to that row
-                      const int gi = (elem_num)*exio_helper->bex_num_elem_cvs +
-                        spline_node_index;
+                      const int gi = elem_num * exio_helper->bex_num_elem_cvs + spline_node_index;
+
+                      // Look up the value in the connectivity array at this global index
+                      auto conn_gi = exio_helper->connect[gi];
+
+                      // The entries in 'connect' are actually (1-based)
+                      // indices into the node_num_map, so in order to use
+                      // conn_gi as an index in C++, we need to first make
+                      // it zero-based.
+                      auto conn_gi_zero_based =
+                        cast_int<dof_id_type>(conn_gi - 1);
+
+                      // If the user set the flag which stores Exodus node
+                      // ids as unique_ids instead of regular ids, then
+                      // the libmesh node id we are looking for is
+                      // actually just "conn_gi_zero_based". Otherwise, we
+                      // need to look up the Node's id in the node_num_map,
+                      // *and* then subtract 1 from that because the entries
+                      // in the node_num_map are also 1-based.
                       const dof_id_type libmesh_node_id =
-                        exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
+                        _set_unique_ids_from_maps ?
+                        cast_int<dof_id_type>(conn_gi_zero_based) :
+                        cast_int<dof_id_type>(exio_helper->node_num_map[conn_gi_zero_based] - 1);
 
                       if (coef != 0) // Ignore irrelevant spline nodes
                         key.emplace_back(libmesh_node_id, coef);
