@@ -1409,7 +1409,7 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 
           // Loop over indices in connectivity array, build edge elements,
           // look them up in the edge_map.
-          for (unsigned int i=0, sz=connect.size(); i<sz; i+=num_nodes_per_edge)
+          for (auto [i, sz] = std::make_tuple(0u, connect.size()); i<sz; i+=num_nodes_per_edge)
             {
               auto edge = Elem::build(conv.libmesh_elem_type());
               for (int n=0; n<num_nodes_per_edge; ++n)
