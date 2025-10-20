@@ -306,6 +306,18 @@ public:
                                  std::map<dof_id_type, Real> & elem_var_value_map);
 
   /**
+   * Helper function that takes an index into the nodal connectivity
+   * array stored on this class (i.e. the "connect" member variable)
+   * and determines the corresponding libMesh Node id. Takes into
+   * account whether the user has chosen to set the Node unique ids
+   * based on the node_num_map or to let libMesh set them. The input
+   * is the index into the current "connect" array, the contents of
+   * which will depend on what exII function was most recently called,
+   * see e.g. exII::ex_get_conn().
+   */
+  dof_id_type get_libmesh_node_id(int connect_index);
+
+  /**
    * Opens an \p ExodusII mesh file named \p filename for writing.
    */
   virtual void create(std::string filename);
