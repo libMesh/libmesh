@@ -1416,7 +1416,18 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
                 {
                   int exodus_node_id = connect[i+n];
                   int exodus_node_id_zero_based = exodus_node_id - 1;
-                  int libmesh_node_id = node_num_map[exodus_node_id_zero_based] - 1;
+
+                  // If the user set the _set_unique_ids_from_maps
+                  // flag, then the libmesh node id we are looking for
+                  // is actually just "exodus_node_id_zero_based".
+                  // Otherwise, we need to look up the Node's id in
+                  // the node_num_map, *and* then subtract 1 from that
+                  // because the entries in the node_num_map are also
+                  // 1-based.
+                  dof_id_type libmesh_node_id =
+                    set_unique_ids_from_maps ?
+                    exodus_node_id_zero_based :
+                    cast_int<dof_id_type>(node_num_map[exodus_node_id_zero_based] - 1);
 
                   edge->set_node(n, mesh.node_ptr(libmesh_node_id));
                 }
