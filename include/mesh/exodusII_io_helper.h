@@ -850,6 +850,10 @@ public:
   // On/Off message flag
   bool verbose;
 
+  // Same as the ExodusII_IO flag by the same name. This flag is
+  // also set whenever ExodusII_IO::set_unique_ids_from_maps() is called.
+  bool set_unique_ids_from_maps;
+
   // This flag gets set after the Exodus file has been successfully opened for writing.
   // Both the create() and open() (if called with EX_WRITE) functions may set this flag.
   bool opened_for_writing;

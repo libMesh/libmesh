@@ -134,6 +134,7 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
 #endif
   _allow_empty_variables(false),
   _write_complex_abs(true),
+  _set_unique_ids_from_maps(false),
   _disc_bex(false)
 {
   // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
@@ -157,6 +158,7 @@ ExodusII_IO::ExodusII_IO (const MeshBase & mesh,
 #endif
   _allow_empty_variables(false),
   _write_complex_abs(true),
+  _set_unique_ids_from_maps(false),
   _disc_bex(false)
 {
   // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
@@ -1039,6 +1041,11 @@ void ExodusII_IO::write_complex_magnitude (bool val)
 void ExodusII_IO::set_unique_ids_from_maps (bool val)
 {
   _set_unique_ids_from_maps = val;
+
+  // Set this flag on the helper object as well. The helper needs to know about this
+  // flag, since it sometimes needs to construct libmesh Node ids from nodal connectivity
+  // arrays (see e.g. ExodusII_IO_Helper::read_edge_blocks()).
+  exio_helper->set_unique_ids_from_maps = val;
 }
 
 void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
