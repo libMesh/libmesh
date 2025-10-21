@@ -24,14 +24,4 @@
 // C++ includes
 #include <memory>
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-
-// Set up the libmesh_make_unique macro, for backwards compatibility.
-// We require C++17 now; users should just use std::make_unique
-// directly.
-
-#define libmesh_make_unique std::make_unique
-
-#endif // LIBMESH_ENABLE_DEPRECATED
-
 #endif // LIBMESH_AUTO_PTR_H
