@@ -237,10 +237,6 @@ private:
                              std::vector<dof_id_type> & dofs_vi,
                              unsigned int vi);
 
-#ifndef LIBMESH_ENABLE_DEPRECATED
-private:
-#endif
-
   SparsityPattern::Graph sparsity_pattern;
 
   SparsityPattern::NonlocalGraph nonlocal_pattern;
