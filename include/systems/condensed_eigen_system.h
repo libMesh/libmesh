@@ -168,24 +168,6 @@ public:
    */
   void dont_create_submatrices_in_solve() { _create_submatrices_in_solve = false; }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * The (condensed) system matrix for standard eigenvalue problems.
-   *
-   * Public access to this member variable will be deprecated in
-   * the future! Use get_condensed_matrix_A() instead.
-   */
-  SparseMatrix<Number> * condensed_matrix_A;
-
-  /**
-   * A second (condensed) system matrix for generalized eigenvalue problems.
-   *
-   * Public access to this member variable will be deprecated in
-   * the future! Use get_condensed_matrix_B() instead.
-   */
-  SparseMatrix<Number> * condensed_matrix_B;
-#endif
-
   /**
    * Vector storing the local dof indices that will not be condensed.
    * All dofs that are not in this vector will be eliminated from
@@ -212,10 +194,6 @@ protected:
 
 private:
   virtual bool condense_constrained_dofs() const override final { return true; }
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  void set_raw_pointers();
-#endif
 
   /**
    * A private flag to indicate whether the condensed dofs
