@@ -327,37 +327,24 @@ void ExodusII_IO::read (const std::string & fname)
   std::unordered_map<const Node *, Elem *> spline_nodeelem_ptrs;
 
   // Loop over the nodes, create Nodes with local processor_id 0.
-  for (int i=0; i<exio_helper->num_nodes; i++)
+  for (auto i : make_range(exio_helper->num_nodes))
     {
-      // Use the node_num_map to get the correct ID for Exodus
-      int exodus_id = exio_helper->node_num_map[i];
-
-      // Exodus ids are always 1-based while libmesh ids are always
-      // 0-based, so here we subtract 1 from the value given in the
-      // node_num_map to make it 0-based.
-      auto exodus_id_zero_based =
-        cast_int<dof_id_type>(exodus_id - 1);
-
-      // Determine what id() the Node will have. If the user has set
-      // the _set_unique_ids_from_maps flag to true, then this Node
-      // will simply be assigned an id of "i" as it is added,
-      // otherwise we will immediately assign the Node a (zero-based)
-      // id() based on the value in the node_num_map.
-      dof_id_type libmesh_id =
-        _set_unique_ids_from_maps ?
-        cast_int<dof_id_type>(i) :
-        exodus_id_zero_based;
+      // Determine the libmesh node id implied by "i". The
+      // get_libmesh_node_id() helper function expects a 1-based
+      // Exodus node id, so we construct the "implied" Exodus node id
+      // from "i" by adding 1.
+      auto libmesh_node_id = exio_helper->get_libmesh_node_id(/*exodus_node_id=*/i+1);
 
       // Catch the node that was added to the mesh
-      Node * added_node = mesh.add_point (Point(exio_helper->x[i], exio_helper->y[i], exio_helper->z[i]), libmesh_id);
+      Node * added_node = mesh.add_point (Point(exio_helper->x[i], exio_helper->y[i], exio_helper->z[i]), libmesh_node_id);
 
       // Sanity check: throw an error if the Mesh assigned an ID to
       // the Node which does not match the libmesh_id we just determined.
-      libmesh_error_msg_if(added_node->id() != static_cast<unsigned>(libmesh_id),
+      libmesh_error_msg_if(added_node->id() != static_cast<unsigned>(libmesh_node_id),
                            "Error!  Mesh assigned node ID "
                            << added_node->id()
                            << " which is different from the (zero-based) Exodus ID "
-                           << libmesh_id
+                           << libmesh_node_id
                            << "!");
 
       // If the _set_unique_ids_from_maps flag is true, then set the
@@ -365,10 +352,20 @@ void ExodusII_IO::read (const std::string & fname)
       // node_num_map[i] value.
       if (_set_unique_ids_from_maps)
       {
-        added_node->set_unique_id(cast_int<unique_id_type>(exodus_id_zero_based));
+        // Use the node_num_map to get a 1-based Exodus Node ID
+        int exodus_mapped_id = exio_helper->node_num_map[i];
+
+        // Exodus ids are always 1-based while libmesh ids are always
+        // 0-based, so to make a libmesh unique_id here, we subtract 1
+        // from the exodus_mapped_id to make it 0-based.
+        auto exodus_mapped_id_zero_based =
+          cast_int<dof_id_type>(exodus_mapped_id - 1);
+
+        // Set added_node's unique_id to "exodus_mapped_id_zero_based".
+        added_node->set_unique_id(cast_int<unique_id_type>(exodus_mapped_id_zero_based));
 
         // Normally the Mesh is responsible for setting the unique_ids
-        // of Nodes in a consistent manner, so when we set the value
+        // of Nodes in a consistent manner, so when we set the unique_id
         // of a Node manually based on the node_num_map, we need to
         // make sure that the "next" unique id assigned by the Mesh
         // will still be valid. We do this by making sure that the
@@ -379,7 +376,7 @@ void ExodusII_IO::read (const std::string & fname)
         // here because the Exodus reader might only be called on one processor.
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         unique_id_type next_unique_id = mesh.next_unique_id();
-        mesh.set_next_unique_id(std::max(next_unique_id, exodus_id_zero_based + 1));
+        mesh.set_next_unique_id(std::max(next_unique_id, exodus_mapped_id_zero_based + 1));
 #endif
       }
 
