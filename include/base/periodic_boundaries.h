@@ -69,7 +69,7 @@ public:
                         const Elem * e,
                         unsigned int side,
                         unsigned int * neigh_side = nullptr,
-                        bool skip_finding_check = false) const;
+                        bool skip_found_check = false) const;
 };
 
 } // namespace libMesh

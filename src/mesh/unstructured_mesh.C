@@ -1016,7 +1016,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 for (const auto & [id, boundary_ptr] : *db)
                 {
                   unsigned int neigh_side;
-                  const Elem * neigh = db->neighbor(id, *point_locator, element, ms, &neigh_side, true /*skip_finding_check*/);
+                  const Elem * neigh = db->neighbor(id, *point_locator, element, ms, &neigh_side, true /*skip_found_check*/);
                   if (neigh && neigh != remote_elem && neigh != element)
                     {
                       element->set_neighbor(ms, this->elem_ptr(neigh->id()));

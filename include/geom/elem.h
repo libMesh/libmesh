@@ -306,23 +306,6 @@ public:
    */
   bool topologically_equal (const Elem & rhs) const;
 
-
-  /**
-   * \returns \p true if two elements occupy the same geometric region
-   * within a given tolerance, \p false otherwise.
-   *
-   * Two elements are geometrically equal if they have:
-   *  - The same dimension and number of nodes;
-   *  - Centroids that coincide within the specified tolerance;
-   *  - Node coordinates that match within the tolerance, regardless
-   *    of node IDs or ordering.
-   *
-   * This function compares spatial coordinates rather than connectivity,
-   * making it suitable for detecting coincident or disconnected elements
-   * that share identical geometry but differ in node numbering.
-   */
-  bool geometrically_equal (const Elem & rhs, const Real tol = TOLERANCE) const;
-
   /**
    * \returns A const pointer to the \f$ i^{th} \f$ neighbor of this
    * element, or \p nullptr if \p MeshBase::find_neighbors() has not been
