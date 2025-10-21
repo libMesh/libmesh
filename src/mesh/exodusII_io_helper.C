@@ -2468,12 +2468,22 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
 #endif
   };
 
-  // And in the node_num_map - since the nodes aren't organized in
-  // blocks, libmesh will always write out the identity map
-  // here... unless there has been some refinement and coarsening, or
-  // node deletion without a corresponding call to contract(). You
-  // need to write this any time there could be 'holes' in the node
-  // numbering, so we write it every time.
+  // And in the node_num_map. If the user has set the
+  // _set_unique_ids_from_maps flag, then we will write the Node
+  // unique_ids to the node_num_map, otherwise we will just write a
+  // trivial node_num_map, since in that we don't write the unique_id
+  // information to the Exodus file. In other words, set the
+  // _set_unique_ids_from_maps flag to true on both the reading and
+  // writing ExodusII_IO objects if you want to preserve the
+  // node_num_map information without actually renumbering the Nodes
+  // in libmesh according to the node_num_map.
+  //
+  // One reason why you might not want to actually renumber the Nodes
+  // in libmesh according to the node_num_map is that it can introduce
+  // undesirable large "gaps" in the numbering, e.g. Nodes numbered
+  // [0, 1, 1000, 10001] which is not ideal for the ReplicatedMesh
+  // _nodes data structure, which stores the Nodes in a contiguous
+  // array based on Node id.
 
   // Let's skip the node_num_map in the discontinuous and add_sides
   // cases, since we're effectively duplicating nodes for the sake of
