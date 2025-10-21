@@ -552,23 +552,19 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                     failing = false;
                     if (calculate_xyz)
                       {
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point " \
-                                          << xyz[p] \
-                                          << " in element " \
-                                          << elem->id());
+                        libmesh_degenerate_mapping_msg
+                          ("ERROR: negative Jacobian " << jac[p] <<
+                           " at point " << xyz[p] << " in element " <<
+                           elem->id());
                       }
                     else
                       {
                         // In this case xyz[p] is not defined, so don't
                         // try to print it out.
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point index " \
-                                          << p \
-                                          << " in element " \
-                                          << elem->id());
+                        libmesh_degenerate_mapping_msg
+                          ("ERROR: negative Jacobian " << jac[p] <<
+                           " at point index " << p << " in element "
+                           << elem->id());
                       }
                   }
                 else
@@ -800,23 +796,19 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                     failing = false;
                     if (calculate_xyz)
                       {
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point " \
-                                          << xyz[p] \
-                                          << " in element " \
-                                          << elem->id());
+                        libmesh_degenerate_mapping_msg
+                          ("ERROR: negative Jacobian " << jac[p] <<
+                           " at point " << xyz[p] << " in element " <<
+                           elem->id());
                       }
                     else
                       {
                         // In this case xyz[p] is not defined, so don't
                         // try to print it out.
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point index " \
-                                          << p \
-                                          << " in element " \
-                                          << elem->id());
+                        libmesh_degenerate_mapping_msg
+                          ("ERROR: negative Jacobian " << jac[p] <<
+                           " at point index " << p << " in element "
+                           << elem->id());
                       }
                   }
                 else
@@ -902,23 +894,19 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                     failing = false;
                     if (calculate_xyz)
                       {
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << det \
-                                          << " at point " \
-                                          << xyz[p] \
-                                          << " in element " \
-                                          << elem->id());
+                        libmesh_degenerate_mapping_msg
+                          ("ERROR: negative Jacobian " << det <<
+                           " at point " << xyz[p] << " in element " <<
+                           elem->id());
                       }
                     else
                       {
                         // In this case xyz[p] is not defined, so don't
                         // try to print it out.
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << det \
-                                          << " at point index " \
-                                          << p \
-                                          << " in element " \
-                                          << elem->id());
+                        libmesh_degenerate_mapping_msg
+                          ("ERROR: negative Jacobian " << jac[p] <<
+                           " at point index " << p << " in element "
+                           << elem->id());
                       }
                   }
                 else
@@ -1137,23 +1125,19 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                     failing = false;
                     if (calculate_xyz)
                       {
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point " \
-                                          << xyz[p] \
-                                          << " in element " \
-                                          << elem->id());
+                        libmesh_degenerate_mapping_msg
+                          ("ERROR: negative Jacobian " << jac[p] <<
+                           " at point " << xyz[p] << " in element " <<
+                           elem->id());
                       }
                     else
                       {
                         // In this case xyz[p] is not defined, so don't
                         // try to print it out.
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point index " \
-                                          << p \
-                                          << " in element " \
-                                          << elem->id());
+                        libmesh_degenerate_mapping_msg
+                          ("ERROR: negative Jacobian " << jac[p] <<
+                           " at point index " << p << " in element "
+                           << elem->id());
                       }
                   }
                 else
