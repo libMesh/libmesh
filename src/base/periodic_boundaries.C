@@ -61,7 +61,7 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
                                           const Elem * e,
                                           unsigned int side,
                                           unsigned int * neigh_side,
-                                          bool skip_finding_check) const
+                                          bool skip_found_check) const
 {
   std::unique_ptr<const Elem> neigh_side_proxy;
 
@@ -106,7 +106,7 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
         }
     }
 
-  if (!skip_finding_check)
+  if (!skip_found_check)
     // If we should have found a periodic neighbor but didn't then
     // either we're on a ghosted element with a remote periodic neighbor
     // or we're on a mesh with an inconsistent periodic boundary.
