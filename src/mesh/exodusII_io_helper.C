@@ -1862,7 +1862,7 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
     }
 
   // Clear out any previously read nodal variable values
-  nodal_var_values.clear();
+  this->nodal_var_values.clear();
 
   std::vector<Real> unmapped_nodal_var_values(num_nodes);
 
@@ -1877,18 +1877,21 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
      MappedInputVector(unmapped_nodal_var_values, _single_precision).data());
   EX_CHECK_ERR(ex_err, "Error reading nodal variable values!");
 
-  for (unsigned i=0; i<static_cast<unsigned>(num_nodes); i++)
+  for (auto i : make_range(num_nodes))
     {
-      libmesh_assert_less(i, this->node_num_map.size());
-
-      // Use the node_num_map to obtain the ID of this node in the Exodus file,
-      // and remember to subtract 1 since libmesh is zero-based and Exodus is 1-based.
-      const unsigned mapped_node_id = this->node_num_map[i] - 1;
-
-      libmesh_assert_less(i, unmapped_nodal_var_values.size());
+      // Determine the libmesh node id implied by "i". The
+      // get_libmesh_node_id() helper function expects a 1-based
+      // Exodus node id, so we construct the "implied" Exodus node id
+      // from "i" by adding 1.
+      //
+      // If the user has set the "set_unique_ids_from_maps" flag to
+      // true, then calling get_libmesh_node_id(i+1) will just return
+      // i, otherwise it will determine the value (with error
+      // checking) using this->node_num_map.
+      auto libmesh_node_id = this->get_libmesh_node_id(/*exodus_node_id=*/i+1);
 
       // Store the nodal value in the map.
-      nodal_var_values[mapped_node_id] = unmapped_nodal_var_values[i];
+      this->nodal_var_values[libmesh_node_id] = unmapped_nodal_var_values[i];
     }
 }
 
