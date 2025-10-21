@@ -2507,17 +2507,27 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
 
           // Fill in node_num_map entry with the proper (1-based) node
           // id, unless we're not going to be able to keep the map up
-          // later.
+          // later. If the user has chosen to _set_unique_ids_from_maps,
+          // then we fill up the node_num_map with (1-based) unique
+          // ids rather than node ids.
           if (!_add_sides)
-            node_num_map.push_back(node.id() + 1);
+            {
+              if (this->set_unique_ids_from_maps)
+                node_num_map.push_back(node.unique_id() + 1);
+              else
+                node_num_map.push_back(node.id() + 1);
+            }
 
-          // Also map the zero-based libmesh node id to the 1-based
-          // Exodus ID it will be assigned (this is equivalent to the
-          // current size of the x vector).
+          // Also map the zero-based libmesh node id to the (1-based)
+          // index in the node_num_map it corresponds to
+          // (this is equivalent to the current size of the "x" vector,
+          // so we just use x.size()). This map is used to look up
+          // an Exodus Node id given a libMesh Node id, so it does
+          // involve unique_ids.
           libmesh_node_num_to_exodus[ cast_int<int>(node.id()) ] = cast_int<int>(x.size());
-        }
+        } // end for (node_ptr)
     }
-  else
+  else // use_discontinuous
     {
       for (const auto & elem : mesh.active_element_ptr_range())
         for (const Node & node : elem->node_ref_range())
