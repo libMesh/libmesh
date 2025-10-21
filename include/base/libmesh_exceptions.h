@@ -68,6 +68,21 @@ public:
 
 
 /**
+ * A class representing the detection of a point xi in an element's
+ * "master space" at which the mapping to physical space has a
+ * too-small (negative, or zero, or nearly zero) Jacobian determinant,
+ * where "too-small" is determined by a particular library method's
+ * assigned tolerance.
+ */
+class DegenerateMapping : public std::runtime_error
+{
+public:
+  DegenerateMapping(std::string msg="") :
+    std::runtime_error( "Detected negative or singular Jacobian.\n" + msg ) {}
+};
+
+
+/**
  * A class representing a solver's failure to converge, to be thrown
  * by "libmesh_convergence_failure();"  This should be a last
  * resort; more often, a solve which has failed should be
