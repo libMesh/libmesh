@@ -78,13 +78,6 @@ public:
 
     BoundaryInfo & bi = mesh.get_boundary_info();
 
-    // Side lists should be cleared and refilled by each call
-#ifdef LIBMESH_ENABLE_DEPRECATED
-    std::vector<dof_id_type> element_id_list;
-    std::vector<unsigned short int> side_list;
-    std::vector<boundary_id_type> bc_id_list;
-#endif
-
     // build_square adds boundary_ids 0,1,2,3 for the bottom, right,
     // top, and left sides, respectively.
 
@@ -103,23 +96,11 @@ public:
         }
     }
 
-    // Build the side list
-#ifdef LIBMESH_ENABLE_DEPRECATED
-    bi.build_side_list (element_id_list, side_list, bc_id_list);
-#endif
-
-    // Test that the new vector-of-tuples API works equivalently.
-    auto bc_triples = bi.build_side_list();
-
     // Check that there are exactly 8 sides in the BoundaryInfo for a
     // replicated mesh
+    auto bc_triples = bi.build_side_list();
     if (mesh.is_serial())
-      {
-#ifdef LIBMESH_ENABLE_DEPRECATED
-        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), element_id_list.size());
-#endif
-        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), bc_triples.size());
-      }
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(8), bc_triples.size());
 
     // Let's test that they are preserved (in a relative sense) when
     // we clone a mesh.
@@ -149,28 +130,16 @@ public:
     }
 
     // Build the side list again
-#ifdef LIBMESH_ENABLE_DEPRECATED
-    bi.build_side_list (element_id_list, side_list, bc_id_list);
-#endif
     bc_triples = bi.build_side_list();
 
     // Check that there are now exactly 6 sides left in the
     // BoundaryInfo on a replicated mesh
     if (mesh.is_serial())
-      {
-#ifdef LIBMESH_ENABLE_DEPRECATED
-        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), element_id_list.size());
-#endif
-        CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), bc_triples.size());
-      }
+      CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(6), bc_triples.size());
 
     // Check that the removed ID is really removed
-#ifdef LIBMESH_ENABLE_DEPRECATED
-    CPPUNIT_ASSERT(std::find(bc_id_list.begin(), bc_id_list.end(), 0) == bc_id_list.end());
-#endif
-    typedef std::tuple<dof_id_type, unsigned short int, boundary_id_type> Tuple;
     CPPUNIT_ASSERT(std::find_if(bc_triples.begin(), bc_triples.end(),
-                                [](const Tuple & t)->bool { return std::get<2>(t) == 0; }) == bc_triples.end());
+                                [](const auto & t) { return std::get<2>(t) == 0; }) == bc_triples.end());
 
     // Remove the same id again, make sure nothing changes.
     bi.remove_id(0);
@@ -183,15 +152,9 @@ public:
     bi.remove_id(1);
     bi.remove_id(2);
     bi.remove_id(3);
-#ifdef LIBMESH_ENABLE_DEPRECATED
-    bi.build_side_list (element_id_list, side_list, bc_id_list);
-#endif
     bc_triples = bi.build_side_list();
 
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), bi.n_boundary_ids());
-#ifdef LIBMESH_ENABLE_DEPRECATED
-    CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), element_id_list.size());
-#endif
     CPPUNIT_ASSERT_EQUAL(static_cast<std::size_t>(0), bc_triples.size());
   }
 
@@ -209,13 +172,6 @@ public:
                                         QUAD4);
 
     BoundaryInfo & bi = mesh.get_boundary_info();
-
-    // Side lists should be cleared and refilled by each call
-#ifdef LIBMESH_ENABLE_DEPRECATED
-    std::vector<dof_id_type> element_id_list;
-    std::vector<unsigned short int> side_list;
-    std::vector<boundary_id_type> bc_id_list;
-#endif
 
     // build_square adds boundary_ids 0,1,2,3 for the bottom, right,
     // top, and left sides, respectively.  Let's remap those, not 1-1.
