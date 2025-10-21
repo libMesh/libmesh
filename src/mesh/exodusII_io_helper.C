@@ -2149,6 +2149,13 @@ dof_id_type ExodusII_IO_Helper::get_libmesh_node_id(int exodus_node_id)
   auto exodus_node_id_zero_based =
     cast_int<dof_id_type>(exodus_node_id - 1);
 
+  // Throw an informative error message rather than accessing past the
+  // end of the node_num_map. If we are setting Node unique_ids from
+  // the node_num_map, we don't need to do this check.
+  if (!this->set_unique_ids_from_maps)
+    libmesh_error_msg_if(exodus_node_id_zero_based >= this->node_num_map.size(),
+                         "Cannot get LibMesh node id for Exodus node id: " << exodus_node_id);
+
   // If the user set the flag which stores Exodus node
   // ids as unique_ids instead of regular ids, then
   // the libmesh node id we are looking for is
