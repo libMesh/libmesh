@@ -78,7 +78,7 @@ class DegenerateMapping : public std::runtime_error
 {
 public:
   DegenerateMapping(std::string msg="") :
-    std::runtime_error( "Detected negative or singular Jacobian.\n" + msg ) {}
+    std::runtime_error( "Problem with mapping or its Jacobian.\n" + msg ) {}
 };
 
 
