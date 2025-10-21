@@ -476,23 +476,23 @@ void FEMap::compute_single_point_map(const unsigned int dim,
         if (!failing)
           {
             failing = true;
-            elem->print_info(libMesh::err);
+            std::string elem_info = elem->get_info();
             failing = false;
             if (calculate_xyz)
               {
                 libmesh_degenerate_mapping_msg
-                  ("ERROR: negative Jacobian " << jac[p] <<
-                   " at point " << xyz[p] << " in element " <<
-                   elem->id());
+                  ("Jacobian " << jac[p] << " under tolerance " <<
+                   jacobian_tolerance << " at point " << xyz[p] <<
+                   " in element: " << elem_info);
               }
             else
               {
                 // In this case xyz[p] is not defined, so don't
                 // try to print it out.
                 libmesh_degenerate_mapping_msg
-                  ("ERROR: negative Jacobian " << jac[p] <<
-                   " at point index " << p << " in element "
-                   << elem->id());
+                  ("Jacobian " << jac[p] << " under tolerance " <<
+                   jacobian_tolerance << " at point index " << p <<
+                   " in element: " << elem_info);
               }
           }
         else
