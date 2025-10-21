@@ -7,6 +7,7 @@
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh_smoother_laplace.h>
 #include <libmesh/mesh_smoother_vsmoother.h>
+#include <libmesh/variational_smoother_constraint.h>
 #include <libmesh/mesh_tools.h>
 #include <libmesh/node.h>
 #include <libmesh/reference_elem.h>
@@ -264,6 +265,11 @@ public:
   CPPUNIT_TEST(testVariationalPrism21);
   CPPUNIT_TEST(testVariationalPrism21MultipleSubdomains);
 
+  CPPUNIT_TEST(testVariationalTet4);
+  CPPUNIT_TEST(testVariationalTet10);
+  CPPUNIT_TEST(testVariationalTet14);
+  CPPUNIT_TEST(testVariationalTet14MultipleSubdomains);
+
 #if defined(LIBMESH_HAVE_GZSTREAM)
   CPPUNIT_TEST(testVariationalMixed2D);
   CPPUNIT_TEST(testVariationalMixed3D);
@@ -345,6 +351,54 @@ public:
       }
   }
 
+  // Helper function to determine how many dimensions of a given point lie at
+  // the center and faces of a sub-cube
+  std::pair<unsigned int, unsigned int>
+  numCenteredAndFacedDimensions(const Point & point, const Real & side_length, const Real & tol)
+  {
+    const auto half_length = 0.5 * side_length;
+    unsigned int num_centered = 0;
+    unsigned int num_face = 0;
+    for (const auto d : make_range(3))
+      {
+        const auto num_half_lengths = point(d) / half_length;
+        if (std::abs(num_half_lengths - std::round(num_half_lengths)) > tol)
+          // This coordinante does not occur at a sub-cube face or center
+          continue;
+
+        if ((unsigned int)std::round(num_half_lengths) % 2)
+          // An odd number of half lengths means point(d) is at a sub-cube center
+          ++num_centered;
+        else
+          // An odd number of half lengths means point(d) is on a sub-cube face
+          ++num_face;
+      }
+
+    return std::make_pair(num_centered, num_face);
+  }
+
+  // Helper function to determine whether a given point lies at the center of
+  // a sub-cube
+  bool pointIsCubeCenter(const Point & point, const Real & side_length, const Real & tol = 1e-3)
+  {
+    return numCenteredAndFacedDimensions(point, side_length, tol).first == 3;
+  }
+
+  // Helper function to determine whether a given point lies at the vertex of
+  // a sub-cube
+  bool pointIsCubeVertex(const Point & point, const Real & side_length, const Real & tol = 1e-3)
+  {
+    return numCenteredAndFacedDimensions(point, side_length, tol).second == 3;
+  }
+
+  // Helper function to determine whether a given point lies at the center of
+  // a sub-cube face
+  bool pointIsCubeFaceCenter(const Point & point, const Real & side_length, const Real & tol = 1e-3)
+  {
+    const auto result = numCenteredAndFacedDimensions(point, side_length, tol);
+    return (result.first == 2) && (result.second == 1);
+  }
+
   void testVariationalSmoother(ReplicatedMesh & mesh,
                                VariationalMeshSmoother & smoother,
                                const ElemType type,
@@ -364,10 +418,12 @@ public:
     const bool type_is_tri = Utility::enum_to_string(type).compare(0, 3, "TRI") == 0;
     const bool type_is_pyramid = Utility::enum_to_string(type).compare(0, 7, "PYRAMID") == 0;
     const bool type_is_prism = Utility::enum_to_string(type).compare(0, 5, "PRISM") == 0;
+    const bool type_is_tet = Utility::enum_to_string(type).compare(0, 3, "TET") == 0;
 
     // Used fewer elems for higher order types, as extra midpoint nodes will add
     // enough complexity
     unsigned int n_elems_per_side = 4 / Elem::type_to_default_order_map[type];
+    const auto side_length = 1.0 / n_elems_per_side;
 
     switch (dim)
       {
@@ -501,7 +557,8 @@ public:
     // For pyramids, the factor 2 accounts for the account that cubes of side
     // length s are divided into pyramids of base side length s and height s/2.
     // The factor 4 lets us catch triangular face midpoint nodes for PYRAMID18 elements.
-    const auto scale_factor = *elem_orders.begin() * (type_is_pyramid ? 2 * 4 : 1);
+    // Similar reasoning for tets.
+    const auto scale_factor = *elem_orders.begin() * ((type_is_pyramid || type_is_tet) ? 2 * 4 : 1);
 
     // Function to assert the node distortion is as expected
     auto node_distortion_is = [&n_elems_per_side, &dim, &boundary_info, &scale_factor, &type_is_prism](
@@ -628,6 +685,9 @@ public:
       }
     else
       {
+        std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
+        MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
+
         // Make sure we're not too distorted anymore
         std::set<dof_id_type> nodes_checked;
         for (const auto * elem : mesh.active_element_ptr_range())
@@ -683,6 +743,207 @@ public:
                                                   0.3717870306 * apex);
                         CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, 1e-3));
                         continue;
+                      }
+                  }
+
+                // Check for special case where some tet midpoint nodes are not
+                // smoothed to the actual midpoints.
+                else if (type_is_tet && !elem->is_vertex(local_node_id))
+                  {
+                    // We have a non-vertex node. Determine what "type" of
+                    // midpoint node with respect to the mesh geometry.
+                    // First, get the nodes that neighbor this node
+                    std::vector<const Node *> neighbors;
+                    VariationalSmootherConstraint::find_nodal_or_face_neighbors(
+                        mesh, node, nodes_to_elem_map, neighbors);
+
+                    switch (neighbors.size())
+                      {
+                          case 2: {
+                            // Midpoint node
+                            // Determine what "type" of midpoint node
+
+                            // Is one of the neighbors at the center of a sub-cube?
+                            const auto is_0_cube_center =
+                                pointIsCubeCenter(*neighbors[0], side_length);
+                            const auto is_1_cube_center =
+                                pointIsCubeCenter(*neighbors[1], side_length);
+                            libmesh_assert(!(is_0_cube_center && is_1_cube_center));
+
+                            if (is_0_cube_center || is_1_cube_center)
+                              {
+                                const auto & cube_center =
+                                    is_0_cube_center ? *neighbors[0] : *neighbors[1];
+                                const auto & other =
+                                    is_0_cube_center ? *neighbors[1] : *neighbors[0];
+
+                                // Since one neighbor is a sub-cube center, the
+                                // other will either be a sub-cube face center or
+                                // a sub-cube vertex. Determine which one.
+                                if (pointIsCubeFaceCenter(other, side_length))
+                                  {
+                                    const Real x = (type == TET10) ? 0.42895 : 0.41486;
+                                    CPPUNIT_ASSERT(node.relative_fuzzy_equals(
+                                        other + x * (cube_center - other), 1e-3));
+                                  }
+
+                                else if (pointIsCubeVertex(other, side_length))
+                                  {
+                                    const Real x = (type == TET10) ? 0.55389 : 0.58094;
+                                    CPPUNIT_ASSERT(node.relative_fuzzy_equals(
+                                        other + x * (cube_center - other), 1e-3));
+                                  }
+                              }
+
+                            else
+                              {
+                                // The remaining possibilities are
+                                // cube-vertex-to-cube-vertex midpoints and
+                                // cube-vertex-to-cube-face-center midpoints.
+                                const auto is_0_cube_vertex =
+                                    pointIsCubeVertex(*neighbors[0], side_length);
+                                const auto is_1_cube_vertex =
+                                    pointIsCubeVertex(*neighbors[1], side_length);
+                                const auto is_0_cube_face_center =
+                                    pointIsCubeFaceCenter(*neighbors[0], side_length);
+                                const auto is_1_cube_face_center =
+                                    pointIsCubeFaceCenter(*neighbors[1], side_length);
+
+                                if (is_0_cube_vertex && is_1_cube_vertex)
+                                  // Due to symmetry, this type of midpoint is
+                                  // the geometric midpoint. Let the
+                                  // node_distortion_is function check it
+                                  CPPUNIT_ASSERT(node_distortion_is(node, false, 1e-2));
+
+                                else
+                                  {
+                                    libmesh_error_msg_if(
+                                        (is_0_cube_center || is_0_cube_face_center) &&
+                                            (is_1_cube_center || is_1_cube_face_center),
+                                        "We should never get here!");
+                                    const auto & cube_vertex =
+                                        is_0_cube_vertex ? *neighbors[0] : *neighbors[1];
+                                    const auto & cube_face_center =
+                                        is_0_cube_face_center ? *neighbors[0] : *neighbors[1];
+                                    const Real x = (type == TET10) ? 0.61299 : 0.65126;
+                                    CPPUNIT_ASSERT(node.relative_fuzzy_equals(
+                                        cube_vertex + x * (cube_face_center - cube_vertex), 1e-3));
+                                  }
+                              }
+
+                            continue;
+                            break;
+                          }
+
+                          case 6: {
+                            // Face node
+                            // Only keep the face vertex nodes
+                            neighbors.erase(std::remove_if(neighbors.begin(),
+                                                           neighbors.end(),
+                                                           [&elem](const Node * n) {
+                                                             return !elem->is_vertex(
+                                                                 elem->local_node(n->id()));
+                                                           }),
+                                            neighbors.end());
+
+                            // There are three types of faces:
+                            //
+                            // 1) Isoscelese triangle with vertices at two
+                            //    sub-cube vertices and the sub-cube center,
+                            // 2) Isosceles triangle with vertices at two
+                            //    sub-cube vertices and a sub-cube face center,
+                            // 3) Scalene triangle with vertices at a sub-cube
+                            //    center, a sub-cube vertex, and a sub-cube face
+                            //    center.
+                            //
+                            // Determine which kind of face this node belongs to based on the vertex
+                            // neighbors
+
+                            unsigned int num_vertices_at_cube_center = 0;
+                            unsigned int num_vertices_at_cube_vertices = 0;
+                            unsigned int num_vertices_at_cube_face_centers = 0;
+                            for (const auto * neighbor : neighbors)
+                              {
+                                if (pointIsCubeCenter(*neighbor, side_length))
+                                  num_vertices_at_cube_center += 1;
+                                else if (pointIsCubeVertex(*neighbor, side_length))
+                                  num_vertices_at_cube_vertices += 1;
+                                else if (pointIsCubeFaceCenter(*neighbor, side_length))
+                                  num_vertices_at_cube_face_centers += 1;
+                              }
+
+                            // We will express the face node at a linear
+                            // combination of the face vertices
+                            Node node_approx = Node(0, 0, 0);
+
+                            // Isosceles triangular face
+                            if (num_vertices_at_cube_vertices == 2)
+                              {
+                                // Isosceles triangular face (type 1)
+                                if (num_vertices_at_cube_center)
+                                  for (const auto * neighbor : neighbors)
+                                    {
+                                      Real weight;
+                                      if (pointIsCubeVertex(*neighbor, side_length))
+                                        weight = 0.30601;
+                                      else if (pointIsCubeCenter(*neighbor, side_length))
+                                        weight = 0.38799;
+                                      else
+                                        libmesh_error_msg("We should never get here!");
+
+                                      node_approx += weight * (*neighbor);
+                                    }
+
+                                // Isosceles triangular face (type 2)
+                                else if (num_vertices_at_cube_face_centers)
+                                  for (const auto * neighbor : neighbors)
+                                    {
+                                      Real weight;
+                                      if (pointIsCubeVertex(*neighbor, side_length))
+                                        weight = 0.28078;
+                                      else if (pointIsCubeFaceCenter(*neighbor, side_length))
+                                        weight = 0.43843;
+                                      else
+                                        libmesh_error_msg("We should never get here!");
+
+                                      node_approx += weight * (*neighbor);
+                                    }
+
+                                else
+                                  libmesh_error_msg("We should never get here!");
+                              }
+
+                            // Scalene triangular face (type 3)
+                            else if (num_vertices_at_cube_center && num_vertices_at_cube_vertices &&
+                                     num_vertices_at_cube_face_centers)
+                              for (const auto * neighbor : neighbors)
+                                {
+                                  Real weight;
+                                  if (pointIsCubeCenter(*neighbor, side_length))
+                                    weight = 0.33102;
+                                  else if (pointIsCubeVertex(*neighbor, side_length))
+                                    weight = 0.27147;
+                                  else if (pointIsCubeFaceCenter(*neighbor, side_length))
+                                    weight = 0.39751;
+                                  else
+                                    libmesh_error_msg("We should never get here!");
+
+                                  node_approx += weight * (*neighbor);
+                                }
+
+                            else
+                              libmesh_error_msg("We should never get here!");
+
+                            CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, 1e-3));
+
+                            continue;
+                            break;
+                          }
+                          default: {
+                            libmesh_error_msg(node << " has unexpected number of neighbors ("
+                                                   << neighbors.size() << ")");
+                            break;
+                          }
                       }
                   }
 
@@ -988,6 +1249,38 @@ public:
     testVariationalSmoother(mesh, variational, PRISM21, true);
   }
 
+  void testVariationalTet4()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, TET4);
+  }
+
+  void testVariationalTet10()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, TET10);
+  }
+
+  void testVariationalTet14()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, TET14);
+  }
+
+  void testVariationalTet14MultipleSubdomains()
+  {
+    ReplicatedMesh mesh(*TestCommWorld);
+    VariationalMeshSmoother variational(mesh);
+
+    testVariationalSmoother(mesh, variational, TET14, true);
+  }
+
   void testVariationalMixed2D()
   {
     ReplicatedMesh mesh(*TestCommWorld);
@@ -1003,6 +1296,7 @@ public:
 
     testVariationalSmootherRegression(mesh);
   }
+
 #endif // LIBMESH_ENABLE_VSMOOTHER
 };
 
