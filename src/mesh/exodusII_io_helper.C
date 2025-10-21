@@ -1414,7 +1414,8 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
               auto edge = Elem::build(conv.libmesh_elem_type());
               for (int n=0; n<num_nodes_per_edge; ++n)
                 {
-                  dof_id_type libmesh_node_id = this->get_libmesh_node_id(i+n);
+                  auto exodus_node_id = this->connect[i+n];
+                  dof_id_type libmesh_node_id = this->get_libmesh_node_id(exodus_node_id);
                   edge->set_node(n, mesh.node_ptr(libmesh_node_id));
                 }
 
@@ -2140,15 +2141,11 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
 
 
-dof_id_type ExodusII_IO_Helper::get_libmesh_node_id(int connect_index)
+dof_id_type ExodusII_IO_Helper::get_libmesh_node_id(int exodus_node_id)
 {
-  // Look up the value in the connectivity array at the provided index
-  auto exodus_node_id = this->connect[connect_index];
-
-  // The entries in 'connect' are actually (1-based)
-  // indices into the node_num_map, so in order to use
-  // exodus_node_id as an index in C++, we need to first make
-  // it zero-based.
+  // The input exodus_node_id is a (1-based) index into the
+  // node_num_map, so in order to use exodus_node_id as an index in
+  // C++, we need to first make it zero-based.
   auto exodus_node_id_zero_based =
     cast_int<dof_id_type>(exodus_node_id - 1);
 

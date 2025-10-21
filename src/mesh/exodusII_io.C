@@ -572,8 +572,11 @@ void ExodusII_IO::read (const std::string & fname)
                   // Get index into this block's connectivity array
                   int gi = elem_num * exio_helper->num_nodes_per_elem + conv.get_node_map(k);
 
+                  // Get the 1-based Exodus node id from the "connect" array
+                  auto exodus_node_id = exio_helper->connect[gi];
+
                   // Convert this index to a libMesh Node id
-                  auto libmesh_node_id = exio_helper->get_libmesh_node_id(gi);
+                  auto libmesh_node_id = exio_helper->get_libmesh_node_id(exodus_node_id);
 
                   // Set the node pointer in the Elem
                   elem->set_node(k, mesh.node_ptr(libmesh_node_id));
@@ -646,8 +649,11 @@ void ExodusII_IO::read (const std::string & fname)
                       // Get the libMesh node corresponding to that row
                       const int gi = elem_num * exio_helper->bex_num_elem_cvs + spline_node_index;
 
+                      // Get the 1-based Exodus node id from the "connect" array
+                      auto exodus_node_id = exio_helper->connect[gi];
+
                       // Convert this index to a libMesh Node id
-                      auto libmesh_node_id = exio_helper->get_libmesh_node_id(gi);
+                      auto libmesh_node_id = exio_helper->get_libmesh_node_id(exodus_node_id);
 
                       if (coef != 0) // Ignore irrelevant spline nodes
                         key.emplace_back(libmesh_node_id, coef);
@@ -923,19 +929,20 @@ void ExodusII_IO::read (const std::string & fname)
         for (int i=0; i<exio_helper->num_nodes_per_set[nodeset]; ++i)
           {
             int exodus_id = exio_helper->node_sets_node_list[i + offset];
+            auto exodus_id_zero_based = cast_int<dof_id_type>(exodus_id - 1);
 
             // It's possible for nodesets to have invalid ids in them
             // by accident.  Instead of possibly accessing past the
             // end of node_num_map, let's make sure we have that many
             // entries.
-            libmesh_error_msg_if(static_cast<std::size_t>(exodus_id - 1) >= exio_helper->node_num_map.size(),
+            libmesh_error_msg_if(exodus_id_zero_based >= exio_helper->node_num_map.size(),
                                  "Invalid Exodus node id " << exodus_id
                                  << " found in nodeset " << nodeset_id);
 
             // As before, the entries in 'node_list' are 1-based
             // indices into the node_num_map array, so we have to map
             // them.  See comment above.
-            int libmesh_node_id = exio_helper->node_num_map[exodus_id - 1] - 1;
+            auto libmesh_node_id = cast_int<dof_id_type>(exio_helper->node_num_map[exodus_id_zero_based] - 1);
             mesh.get_boundary_info().add_node(cast_int<dof_id_type>(libmesh_node_id),
                                               nodeset_id);
           }
