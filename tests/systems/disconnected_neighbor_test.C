@@ -286,7 +286,7 @@ private:
     es.init();
     sys.solve();
 
-    ExodusII_IO(mesh).write_equation_systems("temperature_jump.e", es);
+    // ExodusII_IO(mesh).write_equation_systems("temperature_jump.e", es);
 
     Parameters params;
 

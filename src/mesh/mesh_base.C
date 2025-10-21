@@ -49,6 +49,10 @@
 #include <sstream>   // for std::ostringstream
 #include <unordered_map>
 
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary.h"
+
+
 namespace libMesh
 {
 
@@ -1950,6 +1954,44 @@ void MeshBase::detect_interior_parents()
         }
     }
 }
+
+
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  /**
+   * Register a pair of boundaries as disconnected boundaries.
+   */
+  void MeshBase::add_disconnected_boundaries(const boundary_id_type b1,
+                                  const boundary_id_type b2)
+    {
+      // Lazily allocate the container the first time it’s needed
+      if (!_disconnected_boundary_pairs)
+        _disconnected_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+
+      // Create forward and inverse boundary mappings
+      PeriodicBoundary forward(RealVectorValue(0., 0., 0.));
+      PeriodicBoundary inverse(RealVectorValue(0., 0., 0.));
+
+      forward.myboundary       = b1;
+      forward.pairedboundary   = b2;
+      inverse.myboundary       = b2;
+      inverse.pairedboundary   = b1;
+
+      // Add both directions into the container
+      _disconnected_boundary_pairs->emplace(b1, forward.clone());
+      _disconnected_boundary_pairs->emplace(b2, inverse.clone());
+    }
+
+  PeriodicBoundaries * MeshBase::get_disconnected_boundaries()
+    {
+      return _disconnected_boundary_pairs.get();
+    }
+
+  const PeriodicBoundaries * MeshBase::get_disconnected_boundaries() const
+    {
+      return _disconnected_boundary_pairs.get();
+    }
+#endif
 
 
 
