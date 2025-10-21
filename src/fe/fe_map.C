@@ -1614,8 +1614,11 @@ Point FEMap::inverse_map (const unsigned int dim,
             //  G = [J]^T [J]
             const Real G = dxi*dxi;
 
-            if (secure)
-              libmesh_assert_greater (G, 0.);
+            if (secure && G <= 0)
+              libmesh_degenerate_mapping_msg
+                ("inverse_map found a singular Jacobian " <<
+                 " at master point " << p << " in element " <<
+                 elem->id());
 
             const Real Ginv = 1./G;
 
@@ -1667,8 +1670,11 @@ Point FEMap::inverse_map (const unsigned int dim,
 
             const Real det = (G11*G22 - G12*G21);
 
-            if (secure)
-              libmesh_assert_not_equal_to (det, 0.);
+            if (secure && det == 0)
+              libmesh_degenerate_mapping_msg
+                ("inverse_map found a singular Jacobian " <<
+                 " at master point " << p << " in element " <<
+                 elem->id());
 
             const Real inv_det = 1./det;
 
@@ -1751,13 +1757,10 @@ Point FEMap::inverse_map (const unsigned int dim,
                 // case we can just return a far away point.
                 if (secure)
                   {
-                    libMesh::err << "ERROR: Newton scheme encountered a singular Jacobian in element: "
-                                 << elem->id()
-                                 << std::endl;
-
-                    elem->print_info(libMesh::err);
-
-                    libmesh_error_msg("Exiting...");
+                    libmesh_degenerate_mapping_msg(
+                      "inverse_map found a singular Jacobian" <<
+                      " at master point " << p << " in element " <<
+                      elem->id());
                   }
                 else
                   {
@@ -1841,17 +1844,15 @@ Point FEMap::inverse_map (const unsigned int dim,
 
               if (cnt > 2*max_cnt)
                 {
-                  libMesh::err << "ERROR: Newton scheme FAILED to converge in "
-                               << cnt
-                               << " iterations in element "
-                               << elem->id()
-                               << " for physical point = "
-                               << physical_point
-                               << std::endl;
-
-                  elem->print_info(libMesh::err);
-
-                  libmesh_error_msg("Exiting...");
+                  // Whether or not this is a degenerate map in the
+                  // "Jacobian becomes singular or negative" sense,
+                  // it's at least degenerate in the "straightforward
+                  // Newton is failing to invert it" sense.
+                  libmesh_degenerate_mapping_msg(
+                    "inverse_map Newton FAILED to converge in " <<
+                    cnt << " iterations in element " << elem->id() <<
+                    " for physical point = " << physical_point <<
+                    std::endl << elem->get_info());
                 }
             }
           //  Return a far off point when secure is false - this
