@@ -68,8 +68,7 @@ public:
                         const PointLocatorBase & point_locator,
                         const Elem * e,
                         unsigned int side,
-                        unsigned int * neigh_side = nullptr,
-                        bool skip_found_check = false) const;
+                        unsigned int * neigh_side = nullptr) const;
 };
 
 } // namespace libMesh

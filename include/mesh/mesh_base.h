@@ -37,8 +37,12 @@
 #include <memory>
 
 // periodic boundary condition support
-#include "libmesh/periodic_boundaries.h"
-#include "libmesh/periodic_boundary.h"
+// Use forward declarations inside the libMesh namespace
+namespace libMesh
+{
+  class PeriodicBoundary;
+  class PeriodicBoundaries;
+}
 
 namespace libMesh
 {
@@ -1829,35 +1833,11 @@ public:
    * Register a pair of boundaries as disconnected boundaries.
    */
   void add_disconnected_boundaries(const boundary_id_type b1,
-                                  const boundary_id_type b2)
-    {
-      // Lazily allocate the container the first time it’s needed
-      if (!_disconnected_boundary_pairs)
-        _disconnected_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+                                   const boundary_id_type b2);
 
-      // Create forward and inverse boundary mappings
-      PeriodicBoundary forward(RealVectorValue(0., 0., 0.));
-      PeriodicBoundary inverse(RealVectorValue(0., 0., 0.));
+  PeriodicBoundaries * get_disconnected_boundaries();
 
-      forward.myboundary       = b1;
-      forward.pairedboundary   = b2;
-      inverse.myboundary       = b2;
-      inverse.pairedboundary   = b1;
-
-      // Add both directions into the container
-      _disconnected_boundary_pairs->emplace(b1, forward.clone());
-      _disconnected_boundary_pairs->emplace(b2, inverse.clone());
-    }
-
-  PeriodicBoundaries * get_disconnected_boundaries()
-    {
-      return _disconnected_boundary_pairs.get();
-    }
-
-  const PeriodicBoundaries * get_disconnected_boundaries() const
-    {
-      return _disconnected_boundary_pairs.get();
-    }
+  const PeriodicBoundaries * get_disconnected_boundaries() const;
 #endif
 
 
