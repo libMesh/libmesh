@@ -175,6 +175,12 @@ void PointLocatorTree::init (Trees::BuildType build_type)
 
   // ready for take-off
   this->_initialized = true;
+
+  // If we're doing heavy debugging, let's make sure that our tree can
+  // find all our mesh's nodes.
+#ifdef DEBUG
+  this->libmesh_assert_valid_point_locator();
+#endif
 }
 
 const Elem * PointLocatorTree::operator() (const Point & p,
