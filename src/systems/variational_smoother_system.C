@@ -278,7 +278,7 @@ void VariationalSmootherSystem::prepare_for_smoothing()
       // Reference volume computation
       Real elem_integrated_det_S = 0.;
       for (const auto qp : index_range(JxW))
-        elem_integrated_det_S += JxW[qp] * _target_jacobian_dets[elem->type()][qp];
+        elem_integrated_det_S += JxW[qp] / _target_jacobian_dets[elem->type()][qp];
       const auto ref_elem_vol = elem->reference_elem()->volume();
       elem_averaged_det_S_sum += elem_integrated_det_S / ref_elem_vol;
 
@@ -360,7 +360,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
     };
 
   // Quadrature info
-  const auto quad_weights = c.get_element_qrule().get_weights();
+  const auto & quad_weights = c.get_element_qrule().get_weights();
 
   const auto distortion_weight = 1. - _dilation_weight;
 
@@ -373,6 +373,9 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
   const auto & dphideta_map = fe_map.get_dphideta_map();
   const auto & dphidzeta_map = fe_map.get_dphidzeta_map();
 
+  const auto & target_jacobian_dets = _target_jacobian_dets[elem.type()];
+  const auto & target_jacobians = _target_jacobians[elem.type()];
+
   // Integrate the distortion-dilation metric over the reference element
   for (const auto qp : index_range(quad_weights))
     {
@@ -383,19 +386,22 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       // requires computation of the gradient's Jacobian with respect to R.
       // The Jacobian of the distortion-dilation metric's gradientis the Hessian
       // of the metric.
-      //
+
+      // Transform quad weight from reference element to quad weight for target element
+      const auto quad_weight = quad_weights[qp] / target_jacobian_dets[qp];
+
       // Note that the term "Jacobian" has two meanings in this mesh smoothing
       // application. The first meaning refers to the Jacobian w.r.t R of the
       // gradient w.r.t. R, (i.e., the Hessian of the metric). This is the K
       // variable defined above. This is also the Jacobian the 'request_jacobian'
-      // variable refers to. The second mesning refers to the Jacobian of the
-      // physical-to-reference element mapping. This is the Jacobian used to
+      // variable refers to. The second meaning refers to the Jacobian of the
+      // physical-to-target element mapping. This is the Jacobian used to
       // compute the distorion-dilation metric.
       //
       // Grab the physical-to-reference mapping Jacobian matrix (i.e., "S") at this qp
       RealTensor S = get_jacobian_at_qp(fe_map, dim, qp);
 
-      // Apply target element transformation
+      // Apply target element transformation to get the physical-to-target jacobian
       S *= _target_jacobians[elem.type()][qp];
 
       // Compute quantities needed for the smoothing algorithm
@@ -465,14 +471,16 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
       {
         for (const auto var_id : make_range(dim))
         {
-          // Build dS/dR, the derivative of the physical-to-reference mapping Jacobin w.r.t. the mesh node locations
+          // Build dS/dR, the derivative of the physical-to-target mapping Jacobin w.r.t. the mesh
+          // node locations
           RealTensor dS_dR = RealTensor(0);
           for (const auto jj : make_range(dim))
             dS_dR(var_id, jj) = dphi_maps[jj][l][qp];
+          dS_dR *= target_jacobians[qp];
 
           // Residual contribution. The contraction of dE/dS and dS/dR gives us
           // the gradient we are looking for, dE/dR
-          F[var_id](l) += quad_weights[qp] * dE_dS.contract(dS_dR);
+          F[var_id](l) += quad_weight * dE_dS.contract(dS_dR);
         }// for var_id
       }// for l
 
@@ -534,12 +542,13 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
           for (const auto var_id1 : make_range(dim)) // Contribution from each
         x/y/z component of node l
           {
-            // Build dS/dR_l, the derivative of the physical-to-reference
+            // Build dS/dR_l, the derivative of the physical-to-target
         mapping Jacobin w.r.t.
             // the l-th node
             RealTensor dS_dR_l = RealTensor(0);
             for (const auto ii : make_range(dim))
               dS_dR_l(var_id1, ii) = dphi_maps[ii][l][qp];
+            dS_dR_l *= target_jacobians[qp];
 
             for (const auto p: elem.node_index_range()) // Contribution to
         Hessian from node p
@@ -547,12 +556,13 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
               for (const auto var_id2 : make_range(dim)) // Contribution from
         each x/y/z component of node p
               {
-                // Build dS/dR_l, the derivative of the physical-to-reference
+                // Build dS/dR_l, the derivative of the physical-to-target
         mapping Jacobin w.r.t.
                 // the p-th node
                 RealTensor dS_dR_p = RealTensor(0);
                 for (const auto jj : make_range(dim))
                   dS_dR_p(var_id2, jj) = dphi_maps[jj][p][qp];
+                dS_dR_p *= target_jacobians[qp];
 
                 Real d2beta_dR2 = 0.;
                 Real d2mu_dR2 = 0.;
@@ -599,7 +609,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                 }// for i, end tensor contraction
 
                 // Jacobian contribution
-                K[var_id1][var_id2](l, p) += quad_weights[qp] * ((1. -
+                K[var_id1][var_id2](l, p) += quad_weight * ((1. -
         _dilation_weight) * d2beta_dR2 + _dilation_weight * d2mu_dR2);
 
               }// for var_id2
@@ -615,22 +625,24 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
         {
           for (const auto var_id1 : make_range(dim)) // Contribution from each x/y/z component of node l
           {
-            // Build dS/dR_l, the derivative of the physical-to-reference mapping Jacobin w.r.t.
+            // Build dS/dR_l, the derivative of the physical-to-target mapping Jacobin w.r.t.
             // the l-th node
             RealTensor dS_dR_l = RealTensor(0);
             for (const auto ii : make_range(dim))
               dS_dR_l(var_id1, ii) = dphi_maps[ii][l][qp];
+            dS_dR_l *= target_jacobians[qp];
 
             // Jacobian is symmetric, only need to loop over lower triangular portion
             for (const auto p: make_range(l + 1)) // Contribution to Hessian from node p
             {
               for (const auto var_id2 : make_range(dim)) // Contribution from each x/y/z component of node p
               {
-                // Build dS/dR_l, the derivative of the physical-to-reference mapping Jacobin w.r.t.
+                // Build dS/dR_l, the derivative of the physical-to-target mapping Jacobin w.r.t.
                 // the p-th node
                 RealTensor dS_dR_p = RealTensor(0);
                 for (const auto jj : make_range(dim))
                   dS_dR_p(var_id2, jj) = dphi_maps[jj][p][qp];
+                dS_dR_p *= target_jacobians[qp];
 
                 Real d2E_dR2 = 0.;
                 // Perform tensor contraction
@@ -716,7 +728,7 @@ bool VariationalSmootherSystem::element_time_derivative (bool request_jacobian,
                 }// for i, end tensor contraction
 
                 // Jacobian contribution
-                const Real jacobian_contribution = quad_weights[qp] * d2E_dR2;
+                const Real jacobian_contribution = quad_weight * d2E_dR2;
                 K[var_id1][var_id2](l, p) += jacobian_contribution;
                 // Jacobian is symmetric, add contribution to p,l entry
                 // Don't get the diagonal twice!
@@ -761,6 +773,7 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
   // --enable-deprecated builds, and to avoid errors in
   // --disable-deprecated builds.
   const auto & fe_map = femcontext.get_element_fe(0)->get_fe_map();
+  const auto & quad_weights = femcontext.get_element_qrule().get_weights();
   const auto & JxW = fe_map.get_JxW();
   fe_map.get_dxyzdxi();
   fe_map.get_dxyzdeta();
@@ -779,15 +792,17 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
       Real mu_int = 0.;
       Real combined_int = 0.;
 
+      const auto & target_jacobian_dets = _target_jacobian_dets[elem->type()];
+
       for (const auto qp : index_range(JxW))
         {
-          const auto det_SxW = JxW[qp] * _target_jacobian_dets[elem->type()][qp];
-          det_S_int += det_SxW;
+          det_S_int += JxW[qp] / _target_jacobian_dets[elem->type()][qp];
+          const auto quad_weight = quad_weights[qp] / target_jacobian_dets[qp];
 
           // Grab the physical-to-reference mapping Jacobian matrix (i.e., "S") at this qp
           RealTensor S = get_jacobian_at_qp(fe_map, dim, qp);
 
-          // Apply target element transformation
+          // Apply target element transformation to get the physical-to-target jacobian
           S *= _target_jacobians[elem->type()][qp];
 
           // Determinant of S
@@ -810,15 +825,15 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
 
           // distortion
           const Real beta = std::pow(tr / dim, half_dim) / chi;
-          beta_int += beta * det_SxW;
+          beta_int += beta * quad_weight;
 
           // dilation
           const Real mu = 0.5 * (_ref_vol + det_sq / _ref_vol) / chi;
-          mu_int += mu * det_SxW;
+          mu_int += mu * quad_weight;
 
           // combined
           const Real E = distortion_weight * beta + _dilation_weight * mu;
-          combined_int += E * det_SxW;
+          combined_int += E * quad_weight;
         }
 
       info.total_det_S += det_S_int;
