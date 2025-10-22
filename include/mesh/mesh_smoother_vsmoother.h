@@ -84,16 +84,26 @@ public:
    * modify sobdomain boundaries.
    * @param relative_residual_tolerance Solver setting for the relative residual tolerance.
    * @param absolute_residual_tolerance Solver setting for the absolute residual tolerance.
-   * @param solver_quiet Whether to make the solver quiet.
-   * @param solver_verbose Whether to make the solver verbose.
+   * @param verbosity Smoother verbosity option specifying  how much information
+   * is output. The verbosity levels and the corresponding information output
+   * are as follows:
+   *
+   *   verbosity = 0 : No information
+   *
+   *   verbosity > 15: Prints:
+   *     - Solver nonlinear and linear iteration information
+   *
+   * The VariationalSmootherSystem and VariationalSmootherConstraint classes use
+   * the same verbosity value as this VariationalMeshSmoother class. For details
+   * on what those systems print, refer to the documentation for the _verbosity
+   * attribute in each class.
    */
   VariationalMeshSmoother(UnstructuredMesh & mesh,
                           Real dilation_weight = 0.5,
                           const bool preserve_subdomain_boundaries = true,
                           const double relative_residual_tolerance = TOLERANCE * TOLERANCE,
                           const double absolute_residual_tolerance = TOLERANCE * TOLERANCE,
-                          const bool solver_quiet = true,
-                          const bool solver_verbose = false);
+                          const unsigned int verbosity = 0);
 
   /**
    * Destructor.
@@ -127,6 +137,11 @@ public:
   const MeshQualityInfo & get_mesh_info() const;
 
 private:
+
+  /**
+   * verbosity setting
+   */
+  const unsigned int _verbosity;
 
   /**
    * Smoother control variables
@@ -191,16 +206,6 @@ private:
    * Solver absolute residual tolerance
    */
   double _absolute_residual_tolerance;
-
-  /**
-   * Solver quiet setting
-   */
-  bool _solver_quiet;
-
-  /**
-   * Solver verbose setting
-   */
-  bool _solver_verbose;
 };
 
 } // namespace libMesh

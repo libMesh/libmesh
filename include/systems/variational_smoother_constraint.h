@@ -390,6 +390,18 @@ class VariationalSmootherConstraint : public System::Constraint
 {
 private:
 
+  /**
+   * Verbosity setting.
+   * The verbosity levels and the corresponding information output are as
+   * follows:
+   *
+   *   verbosity = 0: No information.
+   *
+   *   20 < verbosity: Prints:
+   *     - Constraint information on all boundary and subdomain nodes
+   */
+  const unsigned int _verbosity;
+
   System & _sys;
 
   /**
@@ -512,7 +524,9 @@ public:
    * @param preserve_subdomain_boundaries Whether to constrain nodes on
    * subdomain boundaries to not move.
    */
-  VariationalSmootherConstraint(System & sys, const bool & preserve_subdomain_boundaries);
+  VariationalSmootherConstraint(System & sys,
+                                const bool & preserve_subdomain_boundaries,
+                                const unsigned int verbosity);
 
   virtual ~VariationalSmootherConstraint() override;
 

@@ -48,22 +48,17 @@ namespace libMesh
 #endif
 
 // Member functions for the Variational Smoother
-VariationalMeshSmoother::VariationalMeshSmoother(UnstructuredMesh & mesh,
-                                                 Real dilation_weight,
-                                                 const bool preserve_subdomain_boundaries,
-                                                 const double relative_residual_tolerance,
-                                                 const double absolute_residual_tolerance,
-                                                 const bool solver_quiet,
-                                                 const bool solver_verbose)
-  : MeshSmoother(mesh),
-    _dilation_weight(dilation_weight),
-    _preserve_subdomain_boundaries(preserve_subdomain_boundaries),
-    _setup_called(false),
-    _relative_residual_tolerance(relative_residual_tolerance),
-    _absolute_residual_tolerance(absolute_residual_tolerance),
-    _solver_quiet(solver_quiet),
-    _solver_verbose(solver_verbose)
-{}
+VariationalMeshSmoother::VariationalMeshSmoother(
+    UnstructuredMesh &mesh, Real dilation_weight,
+    const bool preserve_subdomain_boundaries,
+    const double relative_residual_tolerance,
+    const double absolute_residual_tolerance, const unsigned int verbosity)
+    : MeshSmoother(mesh), _verbosity(verbosity),
+      _dilation_weight(dilation_weight),
+      _preserve_subdomain_boundaries(preserve_subdomain_boundaries),
+      _setup_called(false),
+      _relative_residual_tolerance(relative_residual_tolerance),
+      _absolute_residual_tolerance(absolute_residual_tolerance) {}
 
 void VariationalMeshSmoother::setup()
 {
@@ -108,11 +103,12 @@ void VariationalMeshSmoother::setup()
   //system()->print_element_jacobians=true;
 
   // Add boundary node and hanging node constraints
-  _constraint =
-      std::make_unique<VariationalSmootherConstraint>(*_system, _preserve_subdomain_boundaries);
+  _constraint = std::make_unique<VariationalSmootherConstraint>(
+      *_system, _preserve_subdomain_boundaries, _verbosity);
   system()->attach_constraint_object(*_constraint);
 
   // Set system parameters
+  system()->set_verbosity(_verbosity);
   system()->get_dilation_weight() = _dilation_weight;
 
   // Set up solver
@@ -126,9 +122,11 @@ void VariationalMeshSmoother::setup()
   _equation_systems->init();
 
   // Solver verbosity
-  DiffSolver & solver = *(system()->time_solver->diff_solver().get());
-  solver.quiet = _solver_quiet;
-  solver.verbose = _solver_verbose;
+  if (_verbosity > 15) {
+    DiffSolver &solver = *(system()->time_solver->diff_solver().get());
+    solver.quiet = false;
+    solver.verbose = true;
+  }
 
   // Solver convergence tolerances
   system()->time_solver->diff_solver()->relative_residual_tolerance = _relative_residual_tolerance;

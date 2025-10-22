@@ -308,10 +308,32 @@ ConstraintVariant PlaneConstraint::intersect(const ConstraintVariant & other) co
       other);
 }
 
-VariationalSmootherConstraint::VariationalSmootherConstraint(
-    System & sys, const bool & preserve_subdomain_boundaries)
-  : Constraint(), _sys(sys), _preserve_subdomain_boundaries(preserve_subdomain_boundaries)
+std::ostream &operator<<(std::ostream &os, const ConstraintVariant & c)
 {
+  if (std::holds_alternative<PointConstraint>(c))
+    os << "point constraint: point=" << std::get<PointConstraint>(c).point();
+
+  else if (std::holds_alternative<LineConstraint>(c))
+    {
+      const auto & line = std::get<LineConstraint>(c);
+      os << "line constraint: point=" << line.point() << ", direction=" << line.direction();
+    }
+
+  else if (std::holds_alternative<PlaneConstraint>(c))
+    {
+      const auto & plane = std::get<PlaneConstraint>(c);
+      os << "plane constraint: point=" << plane.point() << ", normal=" << plane.normal();
+    }
+
+  else if (std::holds_alternative<InvalidConstraint>(c))
+    os << "invalid constraint";
+
+  return os;
+}
+
+VariationalSmootherConstraint::VariationalSmootherConstraint(
+    System & sys, const bool & preserve_subdomain_boundaries, const unsigned int verbosity)
+  : Constraint(), _verbosity(verbosity), _sys(sys), _preserve_subdomain_boundaries(preserve_subdomain_boundaries) {
 }
 
 VariationalSmootherConstraint::~VariationalSmootherConstraint() = default;
@@ -367,7 +389,14 @@ void VariationalSmootherConstraint::constrain()
                   // This subdomain boundary node does not lie on an external boundary,
                   // go ahead and impose constraint
                   if (boundary_node_ids.find(node.id()) == boundary_node_ids.end())
-                    this->impose_constraint(node, subdomain_constraint);
+                    {
+                      if (_verbosity > 20)
+                        libMesh::out << "Imposing subdomain constraint on "
+                                     << std::endl << "  " << node << std::endl
+                                     << "    " << subdomain_constraint << std::endl;
+
+                      this->impose_constraint(node, subdomain_constraint);
+                    }
 
                   // This subdomain boundary node could lie on an external boundary, save it
                   // for later to combine with the external boundary constraint.
@@ -408,11 +437,23 @@ void VariationalSmootherConstraint::constrain()
           if (std::holds_alternative<InvalidConstraint>(combined_constraint))
             combined_constraint = PointConstraint(node);
 
+          if (_verbosity > 20)
+            libMesh::out << "Imposing boundary/subdomain constraint on "
+                         << std::endl << "  " << node << std::endl
+                         << "    " << combined_constraint << std::endl;
+
           this->impose_constraint(node, combined_constraint);
         }
 
       else
-        this->impose_constraint(node, boundary_constraint);
+        {
+          if (_verbosity > 20)
+            libMesh::out << "Imposing boundary constraint on "
+                         << std::endl << node << std::endl
+                         << "    " << boundary_constraint << std::endl;
+
+          this->impose_constraint(node, boundary_constraint);
+        }
 
     } // end bid
 }
