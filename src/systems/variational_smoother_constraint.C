@@ -390,7 +390,7 @@ void VariationalSmootherConstraint::constrain()
                   // go ahead and impose constraint
                   if (boundary_node_ids.find(node.id()) == boundary_node_ids.end())
                     {
-                      if (_verbosity > 1)
+                      if (_verbosity > 20)
                         libMesh::out << "Imposing subdomain constraint on "
                                      << std::endl << "  " << node << std::endl
                                      << "    " << subdomain_constraint << std::endl;
@@ -437,7 +437,7 @@ void VariationalSmootherConstraint::constrain()
           if (std::holds_alternative<InvalidConstraint>(combined_constraint))
             combined_constraint = PointConstraint(node);
 
-          if (_verbosity > 1)
+          if (_verbosity > 20)
             libMesh::out << "Imposing boundary/subdomain constraint on "
                          << std::endl << "  " << node << std::endl
                          << "    " << combined_constraint << std::endl;
@@ -447,7 +447,7 @@ void VariationalSmootherConstraint::constrain()
 
       else
         {
-          if (_verbosity > 1)
+          if (_verbosity > 20)
             libMesh::out << "Imposing boundary constraint on "
                          << std::endl << node << std::endl
                          << "    " << boundary_constraint << std::endl;

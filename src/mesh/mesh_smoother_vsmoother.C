@@ -122,7 +122,7 @@ void VariationalMeshSmoother::setup()
   _equation_systems->init();
 
   // Solver verbosity
-  if (_verbosity) {
+  if (_verbosity > 15) {
     DiffSolver &solver = *(system()->time_solver->diff_solver().get());
     solver.quiet = false;
     solver.verbose = true;

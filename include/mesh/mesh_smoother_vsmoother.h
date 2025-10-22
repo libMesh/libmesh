@@ -84,7 +84,19 @@ public:
    * modify sobdomain boundaries.
    * @param relative_residual_tolerance Solver setting for the relative residual tolerance.
    * @param absolute_residual_tolerance Solver setting for the absolute residual tolerance.
-   * @param verbosity Smoother verbosity option specifying how much information is output.
+   * @param verbosity Smoother verbosity option specifying  how much information
+   * is output. The verbosity levels and the corresponding information output
+   * are as follows:
+   *
+   *   verbosity = 0 : No information
+   *
+   *   verbosity > 15: Prints:
+   *     - Solver nonlinear and linear iteration information
+   *
+   * The VariationalSmootherSystem and VariationalSmootherConstraint classes use
+   * the same verbosity value as this VariationalMeshSmoother class. For details
+   * on what those systems print, refer to the documentation for the _verbosity
+   * attribute in each class.
    */
   VariationalMeshSmoother(UnstructuredMesh & mesh,
                           Real dilation_weight = 0.5,

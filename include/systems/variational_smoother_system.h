@@ -178,7 +178,26 @@ protected:
   void prepare_for_smoothing();
 
   /**
-   * verbosity setting
+   * Verbosity setting.
+   * The verbosity levels and the corresponding information output are as
+   * follows:
+   *
+   *   verbosity = 0 : No information.
+   *
+   *   0 < verbosity : Prints:
+   *     - Initial mesh quality information
+   *     - The untangled mesh quality (if applicable)
+   *     - The smoothed mesh quality
+   *
+   *   10 < verbosity: Prints:
+   *     - The reference volume used for the dilation metric
+   *
+   *   50 < verbosity: Prints:
+   *     - Mesh quality information after each assembly
+   *
+   *   90 < verbosity: Prints:
+   *     - Quality information about each element after each assembly
+   *
    */
   unsigned int _verbosity;
 

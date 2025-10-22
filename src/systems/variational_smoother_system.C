@@ -184,7 +184,7 @@ void VariationalSmootherSystem::assembly (bool get_residual,
 void VariationalSmootherSystem::solve()
 {
   const auto & mesh_info = get_mesh_info();
-  if (_verbosity)
+  if (_verbosity > 10)
     libMesh::out << "Initial " << mesh_info << std::endl;
   if (mesh_info.mesh_is_tangled)
     {
@@ -199,24 +199,24 @@ void VariationalSmootherSystem::solve()
       const auto dilation_weight = _dilation_weight;
       _dilation_weight = 0.;
 
-      if (_verbosity)
+      if (_verbosity > 10)
         libMesh::out << "Untangling the mesh" << std::endl;
       FEMSystem::solve();
 
       // Reset the dilation weight
       _dilation_weight = dilation_weight;
 
-    if (_verbosity)
+    if (_verbosity > 10)
       libMesh::out << "Untangled " << mesh_info << std::endl;
     }
 
   // Smoothing solve
   _untangling_solve = false;
-  if (_verbosity)
+  if (_verbosity > 10)
     libMesh::out << "Smoothing the mesh" << std::endl;
   FEMSystem::solve();
   libmesh_error_msg_if(mesh_info.mesh_is_tangled, "The smoothing solve tangled the mesh!");
-  if (_verbosity)
+  if (_verbosity > 10)
     libMesh::out << "Smoothed " << mesh_info << std::endl;
 }
 
@@ -299,7 +299,7 @@ void VariationalSmootherSystem::prepare_for_smoothing()
   mesh.comm().sum(elem_averaged_det_S_sum);
 
   _ref_vol = elem_averaged_det_S_sum / mesh.n_active_elem();
-  if (_verbosity > 1)
+  if (_verbosity > 10)
     libMesh::out << "Reference volume: " << _ref_vol << std::endl;
 }
 
@@ -858,7 +858,7 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
       if (combined_int < info.min_elem_combined.first)
         info.min_elem_combined = std::make_pair(combined_int, elem->id());
 
-      if (_verbosity > 3)
+      if (_verbosity > 90)
         {
           libMesh::out << "Elem " << elem->id() << " quality:" << std::endl
                        << "  distortion-dilation metric: " << combined_int << std::endl
@@ -894,7 +894,7 @@ void VariationalSmootherSystem::compute_mesh_quality_info()
 
   _mesh_info = info;
 
-  if (_verbosity > 2)
+  if (_verbosity > 50)
     libMesh::out << info;
 }
 

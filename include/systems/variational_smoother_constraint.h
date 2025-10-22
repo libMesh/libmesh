@@ -391,7 +391,14 @@ class VariationalSmootherConstraint : public System::Constraint
 private:
 
   /**
-   * verbosity setting
+   * Verbosity setting.
+   * The verbosity levels and the corresponding information output are as
+   * follows:
+   *
+   *   verbosity = 0: No information.
+   *
+   *   20 < verbosity: Prints:
+   *     - Constraint information on all boundary and subdomain nodes
    */
   const unsigned int _verbosity;
 
