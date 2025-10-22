@@ -896,6 +896,7 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
   const auto ref_vol = target_elem->reference_elem()->volume();
 
   // Update the nodes of the target element, depending on type
+  const Real sqrt_2 = std::sqrt(Real(2));
   const Real sqrt_3 = std::sqrt(Real(3));
   std::vector<std::unique_ptr<Node>> owned_nodes;
 
@@ -1028,7 +1029,6 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
       // Solving for s: s = (3 sqrt(2) v)^(1/3), where v is the volume of the
       // non-optimal reference element.
 
-      const Real sqrt_2 = std::sqrt(Real(2));
       // Side length that preserves the volume of the reference element
       const auto side_length = std::pow(3. * sqrt_2 * ref_vol, 1. / 3.);
       // Pyramid height with the property that all faces are equilateral triangles
@@ -1100,8 +1100,6 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
       // reference element is s = (12 * v / sqrt(2))^(1/3), where v is the volume
       // of the non-optimal reference element (i.e., a right tet).
 
-      const Real sqrt_2 = std::sqrt(Real(2));
-      const Real sqrt_3 = std::sqrt(Real(3));
       // Side length that preserves the volume of the reference element
       const auto side_length = std::pow(12. * ref_vol / sqrt_2, 1. / 3.);
       // tet height with the property that all faces are equilateral triangles
