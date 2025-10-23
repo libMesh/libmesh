@@ -998,15 +998,13 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
+  // Get the disconnected boundaries object (from periodic BCs)
   auto * db = this->get_disconnected_boundaries();
 
   if (db)
     {
       // Obtain a point locator
       std::unique_ptr<PointLocatorBase> point_locator = this->sub_point_locator();
-
-      // Get the disconnected boundaries object (from periodic BCs)
-      auto * db = this->get_disconnected_boundaries();
 
       for (const auto & element : this->element_ptr_range())
         {
