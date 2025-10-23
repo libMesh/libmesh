@@ -26,7 +26,7 @@ Real build_octahedron (UnstructuredMesh & mesh, bool flip_tris,
                        Real zmin, Real zmax)
 {
   MeshTools::Generation::surface_octahedron
-    (mesh, xmin, xmax, ymin, ymax, zmin, zmax);
+    (mesh, xmin, xmax, ymin, ymax, zmin, zmax, flip_tris);
 
   // Octahedron volume
   return (xmax-xmin)*(ymax-ymin)*(zmax-zmin)/6;
