@@ -1962,15 +1962,16 @@ void MeshBase::detect_interior_parents()
    * Register a pair of boundaries as disconnected boundaries.
    */
   void MeshBase::add_disconnected_boundaries(const boundary_id_type b1,
-                                  const boundary_id_type b2)
+                                             const boundary_id_type b2,
+                                             const RealVectorValue & translation)
     {
       // Lazily allocate the container the first time it’s needed
       if (!_disconnected_boundary_pairs)
         _disconnected_boundary_pairs = std::make_unique<PeriodicBoundaries>();
 
       // Create forward and inverse boundary mappings
-      PeriodicBoundary forward(RealVectorValue(0., 0., 0.));
-      PeriodicBoundary inverse(RealVectorValue(0., 0., 0.));
+      PeriodicBoundary forward(translation);
+      PeriodicBoundary inverse(translation * -1.0);
 
       forward.myboundary       = b1;
       forward.pairedboundary   = b2;

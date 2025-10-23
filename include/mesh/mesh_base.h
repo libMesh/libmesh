@@ -36,6 +36,8 @@
 #include <string>
 #include <memory>
 
+#include "libmesh/vector_value.h"
+
 // periodic boundary condition support
 // Use forward declarations inside the libMesh namespace
 namespace libMesh
@@ -1833,7 +1835,8 @@ public:
    * Register a pair of boundaries as disconnected boundaries.
    */
   void add_disconnected_boundaries(const boundary_id_type b1,
-                                   const boundary_id_type b2);
+                                   const boundary_id_type b2,
+                                   const RealVectorValue & translation);
 
   PeriodicBoundaries * get_disconnected_boundaries();
 
