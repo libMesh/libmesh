@@ -434,19 +434,6 @@ private:
   void constrain_node_to_line(const Node & node, const Point & line_vec);
 
   /**
-   * Given a mesh and a node in the mesh, the vector will be filled with
-   * every node directly attached to the given one. IF NO neighbors are found,
-   * all nodes on the containing side are treated as neighbors. This is useful
-   * when the node does not lie on an edge, such as the central face node in
-   * HEX27 elements.
-   */
-  static void find_nodal_or_face_neighbors(
-      const MeshBase & mesh,
-      const Node & node,
-      const std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
-      std::vector<const Node *> & neighbors);
-
-  /**
    * Determines whether two neighboring nodes share a common boundary id.
    * @param boundary_node The first of the two prospective nodes.
    * @param neighbor_node The second of the two prospective nodes.

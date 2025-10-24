@@ -348,6 +348,19 @@ void find_nodal_neighbors(const MeshBase & mesh,
                           std::vector<const Node *> & neighbors);
 
 /**
+ * Given a mesh and a node in the mesh, the vector will be filled with
+ * every node directly attached to the given one. IF NO nodal neighbors are found,
+ * all nodes on the containing side are treated as neighbors. This is useful
+ * when the node does not lie on an edge, such as the central face node in
+ * HEX27, TET14, etc. elements.
+ */
+void find_nodal_or_face_neighbors(
+    const MeshBase & mesh,
+    const Node & node,
+    const std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
+    std::vector<const Node *> & neighbors);
+
+/**
  * Given a mesh hanging_nodes will be filled with an associative array keyed off the
  * global id of all the hanging nodes in the mesh.  It will hold an array of the
  * parents of the node (meaning the two nodes to either side of it that make up

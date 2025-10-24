@@ -923,6 +923,7 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
   const auto ref_vol = target_elem->reference_elem()->volume();
 
   // Update the nodes of the target element, depending on type
+  const Real sqrt_2 = std::sqrt(Real(2));
   const Real sqrt_3 = std::sqrt(Real(3));
   std::vector<std::unique_ptr<Node>> owned_nodes;
 
@@ -1055,7 +1056,6 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
       // Solving for s: s = (3 sqrt(2) v)^(1/3), where v is the volume of the
       // non-optimal reference element.
 
-      const Real sqrt_2 = std::sqrt(Real(2));
       // Side length that preserves the volume of the reference element
       const auto side_length = std::pow(3. * sqrt_2 * ref_vol, 1. / 3.);
       // Pyramid height with the property that all faces are equilateral triangles
@@ -1109,6 +1109,67 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
         libmesh_error_msg("Unsupported pyramid element: " << type_str);
 
     } // if Pyramid
+
+  // Elems deriving from Tet
+  else if (type_str.compare(0, 3, "TET") == 0)
+    {
+
+      // The ideal target element is a a regular tet with equilateral
+      // triangles for all faces, with volume equal to the volume of the
+      // reference element.
+
+      // The volume of a tet is given by v = b * h / 3, where b is the area of
+      // the base face and h is the height of the apex node. The area of an
+      // equilateral triangle with side length s is b = sqrt(3) s^2 / 4.
+      // For all faces to have side length s, the height of the apex node is
+      // h = sqrt(2/3) * s. Then the volume is v = sqrt(2) * s^3 / 12.
+      // Solving for s, the side length that will preserve the volume of the
+      // reference element is s = (6 * sqrt(2) * v)^(1/3), where v is the volume
+      // of the non-optimal reference element (i.e., a right tet).
+
+      // Side length that preserves the volume of the reference element
+      const auto side_length = std::cbrt(6. * sqrt_2 * ref_vol);
+      // tet height with the property that all faces are equilateral triangles
+      const auto target_height = sqrt_2 / sqrt_3 * side_length;
+
+      const auto & s = side_length;
+      const auto & h = target_height;
+
+      // For regular tet
+      //                                         x        y                z     node_id
+      owned_nodes.emplace_back(Node::build(Point(0.,      0.,               0.), 0));
+      owned_nodes.emplace_back(Node::build(Point(s,       0.,               0.), 1));
+      owned_nodes.emplace_back(Node::build(Point(0.5 * s, 0.5 * sqrt_3 * s, 0.), 2));
+      owned_nodes.emplace_back(Node::build(Point(0.5 * s, sqrt_3 / 6. * s,  h),  3));
+
+      if (type == TET10 || type == TET14)
+        {
+          const auto & on = owned_nodes;
+          // Define the edge midpoint nodes of the tet
+
+          // Base node to base node midpoint nodes
+          owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[1]) / 2.), 4));
+          owned_nodes.emplace_back(Node::build(Point((*on[1] + *on[2]) / 2.), 5));
+          owned_nodes.emplace_back(Node::build(Point((*on[2] + *on[0]) / 2.), 6));
+          // Base node to apex node midpoint nodes
+          owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[3]) / 2.), 7));
+          owned_nodes.emplace_back(Node::build(Point((*on[1] + *on[3]) / 2.), 8));
+          owned_nodes.emplace_back(Node::build(Point((*on[2] + *on[3]) / 2.), 9));
+
+          if (type == TET14)
+            {
+              // Define the face midpoint nodes of the tet
+              owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[1] + *on[2]) / 3.), 10));
+              owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[1] + *on[3]) / 3.), 11));
+              owned_nodes.emplace_back(Node::build(Point((*on[1] + *on[2] + *on[3]) / 3.), 12));
+              owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[2] + *on[3]) / 3.), 13));
+            }
+        }
+
+      else if (type != TET4)
+        libmesh_error_msg("Unsupported tet element: " << type_str);
+
+    } // if Tet
 
   // Set the target_elem equal to the reference elem
   else
