@@ -378,21 +378,21 @@ public:
 
   // Helper function to determine whether a given point lies at the center of
   // a sub-cube
-  bool pointIsCubeCenter(const Point & point, const Real & side_length, const Real & tol = 1e-3)
+  bool pointIsCubeCenter(const Point & point, const Real & side_length, const Real & tol = TOLERANCE)
   {
     return numCenteredAndFacedDimensions(point, side_length, tol).first == 3;
   }
 
   // Helper function to determine whether a given point lies at the vertex of
   // a sub-cube
-  bool pointIsCubeVertex(const Point & point, const Real & side_length, const Real & tol = 1e-3)
+  bool pointIsCubeVertex(const Point & point, const Real & side_length, const Real & tol = TOLERANCE)
   {
     return numCenteredAndFacedDimensions(point, side_length, tol).second == 3;
   }
 
   // Helper function to determine whether a given point lies at the center of
   // a sub-cube face
-  bool pointIsCubeFaceCenter(const Point & point, const Real & side_length, const Real & tol = 1e-3)
+  bool pointIsCubeFaceCenter(const Point & point, const Real & side_length, const Real & tol = TOLERANCE)
   {
     const auto result = numCenteredAndFacedDimensions(point, side_length, tol);
     return (result.first == 2) && (result.second == 1);
