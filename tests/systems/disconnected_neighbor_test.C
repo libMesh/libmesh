@@ -35,6 +35,23 @@ heat_exact (const Point & p,
   return (p(0) < 0.5) ? p(0) : p(0) + b;
 }
 
+Number left_solution_fn(const Point &,
+                        const Parameters &,
+                        const std::string &,
+                        const std::string &)
+{
+  return 0.0;
+}
+
+Number right_solution_fn(const Point &,
+                         const Parameters & params,
+                         const std::string &,
+                         const std::string &)
+{
+  const Real b = params.get<Real>("b");
+  return 1.0 + b;
+}
+
 // Assemble system with temperature jump interface conditions
 void assemble_temperature_jump(EquationSystems &es,
                                const std::string & /*system_name*/)
@@ -252,11 +269,31 @@ private:
 
     mesh.prepare_for_use();
 
-    auto elem_left = mesh.elem_ptr(0);
-    auto elem_right = mesh.elem_ptr(1);
+    // Check elem 0 (the left element)
+    if (const Elem * elem_left = mesh.query_elem_ptr(0))
+      {
+        // This processor owns elem 0, so we can safely check its neighbor
+        const Elem * elem_right_neighbor = elem_left->neighbor_ptr(1);
 
-    LIBMESH_ASSERT_NUMBERS_EQUAL(elem_left->neighbor_ptr(1)->id(), elem_right->id(), 1e-15);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(elem_right->neighbor_ptr(3)->id(), elem_left->id(), 1e-15);
+        // The neighbor relationship should have been set up by prepare_for_use()
+        libmesh_assert(elem_right_neighbor);
+
+        // Verify the neighbor is indeed elem 1
+        LIBMESH_ASSERT_NUMBERS_EQUAL(elem_right_neighbor->id(), 1, 1e-15);
+      }
+
+    // Check elem 1 (the right element)
+    if (const Elem * elem_right = mesh.query_elem_ptr(1))
+      {
+        // This processor owns elem 1, so we can safely check its neighbor
+        const Elem * elem_left_neighbor = elem_right->neighbor_ptr(3);
+
+        // The neighbor relationship should be valid
+        libmesh_assert(elem_left_neighbor);
+
+        // Verify the neighbor is indeed elem 0
+        LIBMESH_ASSERT_NUMBERS_EQUAL(elem_left_neighbor->id(), 0, 1e-15);
+      }
 
     EquationSystems es(mesh);
     LinearImplicitSystem & sys =
@@ -268,12 +305,10 @@ private:
     std::set<boundary_id_type> right_bdy { right_id };
     std::vector<unsigned int> vars (1, u_var);
 
-    auto left_fn = [](const Point &, const Parameters &, const std::string &, const std::string &) { return 0.0; };
-    auto right_fn = [](const Point &, const Parameters &, const std::string &, const std::string &) { return 1.0 + b; };
-
-    WrappedFunction<Number> left_val(sys, left_fn);
-    WrappedFunction<Number> right_val(sys, right_fn);
-
+    Parameters params;
+    params.set<Real>("b") = b;
+    WrappedFunction<Number> left_val(sys, &left_solution_fn);
+    WrappedFunction<Number> right_val(sys, &right_solution_fn, &params);
     DirichletBoundary bc_left (left_bdy,  vars, left_val);
     DirichletBoundary bc_right(right_bdy, vars, right_val);
 
@@ -290,8 +325,6 @@ private:
     sys.solve();
 
     // ExodusII_IO(mesh).write_equation_systems("temperature_jump.e", es);
-
-    Parameters params;
 
     for (Real x=0.; x<=1.; x+=0.05)
       for (Real y=0.; y<=1.; y+=0.05)
