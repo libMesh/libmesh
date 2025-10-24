@@ -168,11 +168,14 @@ void assemble_temperature_jump(EquationSystems &es,
 class DisconnectedNeighborTest : public CppUnit::TestCase {
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( DisconnectedNeighborTest );
+#ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( testTempJump );
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 private:
 
+#ifdef LIBMESH_HAVE_SOLVER
   void testTempJump()
   {
     Mesh mesh(*TestCommWorld, 2);
@@ -241,7 +244,7 @@ private:
 
     // This is the key testing step: inform libMesh about the disconnected boundaries
     // And, in `prepare_for_use()`, libMesh will set up the disconnected neighbor relationships.
-    mesh.add_disconnected_boundaries(interface_left_id, interface_right_id);
+    mesh.add_disconnected_boundaries(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
 
     // libMesh shouldn't renumber, or our based-on-initial-id
     // assertions later may fail.
@@ -299,6 +302,7 @@ private:
           LIBMESH_ASSERT_NUMBERS_EQUAL(exact, approx, 1e-2);
         }
   }
+#endif
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( DisconnectedNeighborTest );

@@ -1015,13 +1015,15 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                   element->neighbor_ptr(ms) != remote_elem)
                 continue;
 
-                for (const auto & [id, boundary_ptr] : *db)
+              for (const auto & [id, boundary_ptr] : *db)
                 {
                   if (!this->get_boundary_info().has_boundary_id(element, ms, id))
                     continue;
 
                   unsigned int neigh_side;
-                  const Elem * neigh = db->neighbor(id, *point_locator, element, ms, &neigh_side);
+                  const Elem * neigh =
+                    db->neighbor(id, *point_locator, element, ms, &neigh_side);
+
                   if (neigh && neigh != remote_elem && neigh != element)
                     {
                       element->set_neighbor(ms, this->elem_ptr(neigh->id()));
