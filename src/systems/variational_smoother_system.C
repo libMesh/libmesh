@@ -1101,7 +1101,7 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
       // of the non-optimal reference element (i.e., a right tet).
 
       // Side length that preserves the volume of the reference element
-      const auto side_length = std::pow(6. * sqrt_2 * ref_vol, 1 / Real(3));
+      const auto side_length = std::cbrt(6. * sqrt_2 * ref_vol);
       // tet height with the property that all faces are equilateral triangles
       const auto target_height = sqrt_2 / sqrt_3 * side_length;
 
