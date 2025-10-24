@@ -15,6 +15,8 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <libmesh/map_based_disconnected_ghosting.h>
+
 using namespace libMesh;
 
 static const Real b = 1.0;
@@ -262,6 +264,17 @@ private:
     // This is the key testing step: inform libMesh about the disconnected boundaries
     // And, in `prepare_for_use()`, libMesh will set up the disconnected neighbor relationships.
     mesh.add_disconnected_boundaries(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
+
+
+    // new, map-based ghosting functor
+    MapBasedDisconnectedGhosting::DisconnectedMap disconnected_map;
+    // Elem 0 connects to Elem 1
+    disconnected_map[0] = 1;
+    // Elem 1 connects to Elem 0
+    disconnected_map[1] = 0;
+    auto map_ghosting =
+      std::make_shared<MapBasedDisconnectedGhosting>(mesh, disconnected_map);
+    mesh.add_ghosting_functor(map_ghosting);
 
     // libMesh shouldn't renumber, or our based-on-initial-id
     // assertions later may fail.
