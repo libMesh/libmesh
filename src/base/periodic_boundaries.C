@@ -80,7 +80,6 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
   const MeshBase & mesh = point_locator.get_mesh();
   for(const Elem * elem_it : candidate_elements)
     {
-
       std::vector<unsigned int> neigh_sides =
         mesh.get_boundary_info().sides_with_boundary_id(elem_it, b->pairedboundary);
 
@@ -106,13 +105,14 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
   // either we're on a ghosted element with a remote periodic neighbor
   // or we're on a mesh with an inconsistent periodic boundary.
   libmesh_error_msg_if(mesh.is_serial() ||
-                      (e->processor_id() == mesh.processor_id()),
-                      "Periodic boundary neighbor not found");
+                       (e->processor_id() == mesh.processor_id()),
+                       "Periodic boundary neighbor not found");
 
   if (neigh_side)
     *neigh_side = libMesh::invalid_uint;
   return remote_elem;
 }
+
 } // namespace libMesh
 
 
