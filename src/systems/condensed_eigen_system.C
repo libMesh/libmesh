@@ -130,15 +130,6 @@ dof_id_type CondensedEigenSystem::n_global_non_condensed_dofs() const
     }
 }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void
-CondensedEigenSystem::set_raw_pointers()
-{
-  condensed_matrix_A = _condensed_matrix_A.get();
-  condensed_matrix_B = _condensed_matrix_B.get();
-}
-#endif
-
 void
 CondensedEigenSystem::clear()
 {
@@ -146,9 +137,6 @@ CondensedEigenSystem::clear()
   _condensed_matrix_A = nullptr;
   _condensed_matrix_B = nullptr;
   _condensed_precond_matrix = nullptr;
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  set_raw_pointers();
-#endif
 }
 
 void
@@ -171,10 +159,6 @@ CondensedEigenSystem::add_matrices()
     if (!_condensed_precond_matrix)
       _condensed_precond_matrix = SparseMatrix<Number>::build(this->comm());
   }
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  set_raw_pointers();
-#endif
 }
 
 void CondensedEigenSystem::solve()
