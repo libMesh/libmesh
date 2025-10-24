@@ -11,6 +11,9 @@
 #include <libmesh/quadrature_gauss.h>
 #include <libmesh/sparse_matrix.h>
 #include <libmesh/wrapped_function.h>
+#include <libmesh/linear_solver.h>
+#include <libmesh/enum_solver_type.h>
+#include <libmesh/enum_preconditioner_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -187,14 +190,13 @@ void assemble_temperature_jump(EquationSystems &es,
 class DisconnectedNeighborTest : public CppUnit::TestCase {
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( DisconnectedNeighborTest );
-#ifdef LIBMESH_HAVE_SOLVER
+#if defined(LIBMESH_HAVE_SOLVER)
   CPPUNIT_TEST( testTempJump );
 #endif
   CPPUNIT_TEST_SUITE_END();
 
 private:
 
-#ifdef LIBMESH_HAVE_SOLVER
   void testTempJump()
   {
     Mesh mesh(*TestCommWorld, 2);
@@ -334,6 +336,9 @@ private:
     // Without this, PETSc may report "New nonzero at (a,b) caused a malloc."
     sys.get_dof_map().set_implicit_neighbor_dofs(true);
 
+    sys.get_linear_solver()->set_solver_type(GMRES);
+    sys.get_linear_solver()->set_preconditioner_type(IDENTITY_PRECOND);
+
     es.init();
     sys.solve();
 
@@ -348,7 +353,6 @@ private:
           LIBMESH_ASSERT_NUMBERS_EQUAL(exact, approx, 1e-2);
         }
   }
-#endif
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( DisconnectedNeighborTest );
