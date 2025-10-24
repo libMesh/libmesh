@@ -689,6 +689,7 @@ public:
 
         // Make sure we're not too distorted anymore
         std::set<dof_id_type> nodes_checked;
+        const Real tol = TOLERANCE;
         for (const auto * elem : mesh.active_element_ptr_range())
           {
             for (const auto local_node_id : make_range(elem->n_nodes()))
@@ -717,10 +718,9 @@ public:
 
                         const auto & base = elem->node_ref(local_node_id - 9);
                         const auto & apex = elem->node_ref(4);
-                        const Real x =
-                            (type == PYRAMID18) ? 0.566460 : 0.549876;
+                        const Real x = (type == PYRAMID18) ? 0.56646084 : 0.54985875;
 
-                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(base + x * (apex - base), 1e-3));
+                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(base + x * (apex - base), tol));
                         continue;
                       }
                     else if (local_node_id > 13)
@@ -737,10 +737,9 @@ public:
                         const auto & base2 = elem->node_ref((local_node_id - 13) % 4);
                         const auto & apex = elem->node_ref(4);
 
-                        const auto node_approx = (0.3141064847 * base1 +
-                                                  0.3141064847 * base2 +
-                                                  0.3717870306 * apex);
-                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, 1e-3));
+                        const auto node_approx =
+                            (0.31401599 * base1 + 0.31401599 * base2 + 0.37196802 * apex);
+                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, tol));
                         continue;
                       }
                   }
@@ -749,7 +748,6 @@ public:
                 // smoothed to the actual midpoints.
                 else if (type_is_tet && !elem->is_vertex(local_node_id))
                   {
-                    const Real tol = TOLERANCE;
                     // We have a non-vertex node. Determine what "type" of
                     // midpoint node with respect to the mesh geometry.
                     // First, get the nodes that neighbor this node
