@@ -36,6 +36,16 @@
 #include <string>
 #include <memory>
 
+#include "libmesh/vector_value.h"
+
+// periodic boundary condition support
+// Use forward declarations inside the libMesh namespace
+namespace libMesh
+{
+  class PeriodicBoundary;
+  class PeriodicBoundaries;
+}
+
 namespace libMesh
 {
 
@@ -1820,7 +1830,26 @@ public:
   const std::set<subdomain_id_type> & get_mesh_subdomains() const
   { libmesh_assert(this->is_prepared()); return _mesh_subdomains; }
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  /**
+   * Register a pair of boundaries as disconnected boundaries.
+   */
+  void add_disconnected_boundaries(const boundary_id_type b1,
+                                   const boundary_id_type b2,
+                                   const RealVectorValue & translation);
+
+  PeriodicBoundaries * get_disconnected_boundaries();
+
+  const PeriodicBoundaries * get_disconnected_boundaries() const;
+#endif
+
+
 protected:
+
+ #ifdef LIBMESH_ENABLE_PERIODIC
+  /// @brief The disconnected boundary id pairs.
+  std::unique_ptr<PeriodicBoundaries> _disconnected_boundary_pairs;
+#endif
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,

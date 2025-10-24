@@ -47,6 +47,10 @@
 #include <sstream>
 #include <unordered_map>
 
+// for disconnected neighbors
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary.h"
+
 namespace {
 
 using namespace libMesh;
@@ -992,6 +996,44 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
           }
       }
   }
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Get the disconnected boundaries object (from periodic BCs)
+  auto * db = this->get_disconnected_boundaries();
+
+  if (db)
+    {
+      // Obtain a point locator
+      std::unique_ptr<PointLocatorBase> point_locator = this->sub_point_locator();
+
+      for (const auto & element : this->element_ptr_range())
+        {
+          for (auto ms : element->side_index_range())
+            {
+              // Skip if this side already has a valid neighbor (including remote neighbors)
+              if (element->neighbor_ptr(ms) != nullptr &&
+                  element->neighbor_ptr(ms) != remote_elem)
+                continue;
+
+              for (const auto & [id, boundary_ptr] : *db)
+                {
+                  if (!this->get_boundary_info().has_boundary_id(element, ms, id))
+                    continue;
+
+                  unsigned int neigh_side;
+                  const Elem * neigh =
+                    db->neighbor(id, *point_locator, element, ms, &neigh_side);
+
+                  if (neigh && neigh != remote_elem && neigh != element)
+                    {
+                      element->set_neighbor(ms, this->elem_ptr(neigh->id()));
+                      this->elem_ptr(neigh->id())->set_neighbor(neigh_side, element);
+                    }
+                }
+            }
+        }
+    }
+#endif // LIBMESH_ENABLE_PERIODIC
 
 #ifdef LIBMESH_ENABLE_AMR
 
