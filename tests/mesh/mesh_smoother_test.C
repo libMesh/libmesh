@@ -7,7 +7,6 @@
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh_smoother_laplace.h>
 #include <libmesh/mesh_smoother_vsmoother.h>
-#include <libmesh/variational_smoother_constraint.h>
 #include <libmesh/mesh_tools.h>
 #include <libmesh/node.h>
 #include <libmesh/reference_elem.h>
@@ -366,7 +365,7 @@ public:
           // This coordinante does not occur at a sub-cube face or center
           continue;
 
-        if ((unsigned int)std::round(num_half_lengths) % 2)
+        if (std::lround(num_half_lengths) % 2)
           // An odd number of half lengths means point(d) is at a sub-cube center
           ++num_centered;
         else
@@ -750,11 +749,12 @@ public:
                 // smoothed to the actual midpoints.
                 else if (type_is_tet && !elem->is_vertex(local_node_id))
                   {
+                    const Real tol = 1e-5;
                     // We have a non-vertex node. Determine what "type" of
                     // midpoint node with respect to the mesh geometry.
                     // First, get the nodes that neighbor this node
                     std::vector<const Node *> neighbors;
-                    VariationalSmootherConstraint::find_nodal_or_face_neighbors(
+                    MeshTools::find_nodal_or_face_neighbors(
                         mesh, node, nodes_to_elem_map, neighbors);
 
                     switch (neighbors.size())
@@ -784,14 +784,14 @@ public:
                                   {
                                     const Real x = (type == TET10) ? 0.42895 : 0.41486;
                                     CPPUNIT_ASSERT(node.relative_fuzzy_equals(
-                                        other + x * (cube_center - other), 1e-3));
+                                        other + x * (cube_center - other), tol));
                                   }
 
                                 else if (pointIsCubeVertex(other, side_length))
                                   {
                                     const Real x = (type == TET10) ? 0.55389 : 0.58094;
                                     CPPUNIT_ASSERT(node.relative_fuzzy_equals(
-                                        other + x * (cube_center - other), 1e-3));
+                                        other + x * (cube_center - other), tol));
                                   }
                               }
 
@@ -813,7 +813,7 @@ public:
                                   // Due to symmetry, this type of midpoint is
                                   // the geometric midpoint. Let the
                                   // node_distortion_is function check it
-                                  CPPUNIT_ASSERT(node_distortion_is(node, false, 1e-2));
+                                  CPPUNIT_ASSERT(node_distortion_is(node, false));
 
                                 else
                                   {
@@ -827,7 +827,7 @@ public:
                                         is_0_cube_face_center ? *neighbors[0] : *neighbors[1];
                                     const Real x = (type == TET10) ? 0.61299 : 0.65126;
                                     CPPUNIT_ASSERT(node.relative_fuzzy_equals(
-                                        cube_vertex + x * (cube_face_center - cube_vertex), 1e-3));
+                                        cube_vertex + x * (cube_face_center - cube_vertex), tol));
                                   }
                               }
 
@@ -934,7 +934,7 @@ public:
                             else
                               libmesh_error_msg("We should never get here!");
 
-                            CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, 1e-3));
+                            CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, tol));
 
                             continue;
                             break;
@@ -944,10 +944,10 @@ public:
                                                    << neighbors.size() << ")");
                             break;
                           }
-                      }
-                  }
+                      } // switch (neighbors.size())
+                  } // if (type_is_tet)
 
-                CPPUNIT_ASSERT(node_distortion_is(node, false, 1e-2));
+                CPPUNIT_ASSERT(node_distortion_is(node, false));
 
               }
           }

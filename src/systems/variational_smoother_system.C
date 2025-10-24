@@ -1097,11 +1097,11 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
       // For all faces to have side length s, the height of the apex node is
       // h = sqrt(2/3) * s. Then the volume is v = sqrt(2) * s^3 / 12.
       // Solving for s, the side length that will preserve the volume of the
-      // reference element is s = (12 * v / sqrt(2))^(1/3), where v is the volume
+      // reference element is s = (6 * sqrt(2) * v)^(1/3), where v is the volume
       // of the non-optimal reference element (i.e., a right tet).
 
       // Side length that preserves the volume of the reference element
-      const auto side_length = std::pow(12. * ref_vol / sqrt_2, 1. / 3.);
+      const auto side_length = std::pow(6. * sqrt_2 * ref_vol, 1 / Real(3));
       // tet height with the property that all faces are equilateral triangles
       const auto target_height = sqrt_2 / sqrt_3 * side_length;
 
