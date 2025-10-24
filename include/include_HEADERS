@@ -17,7 +17,6 @@ noinst_HEADERS =  \
 # will get installed into '$(prefix)/include/libmesh'
 include_HEADERS =  \
         libmesh_config.h \
-        base/auto_ptr.h \
         base/dirichlet_boundaries.h \
         base/dof_map.h \
         base/dof_map_base.h \

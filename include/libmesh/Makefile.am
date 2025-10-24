@@ -6,7 +6,6 @@
 EXTRA_DIST = rebuild_makefile.sh
 
 BUILT_SOURCES = \
-        auto_ptr.h \
         dirichlet_boundaries.h \
         dof_map.h \
         dof_map_base.h \
@@ -618,9 +617,6 @@ libmesh_config.h: $(top_builddir)/include/libmesh_config.h
 
 #
 # libMesh header rules
-auto_ptr.h: $(top_srcdir)/include/base/auto_ptr.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 

@@ -24,10 +24,6 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/parallel_only.h"
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-#include "libmesh/auto_ptr.h" // for backwards compatibility, not internal use
-#endif // LIBMESH_ENABLE_DEPRECATED
-
 // TIMPI includes
 #include "timpi/attributes.h"
 #include "timpi/communicator.h"
