@@ -20,7 +20,6 @@
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
-#include <iomanip>
 
 #include <random>
 
@@ -647,7 +646,6 @@ public:
       }
 
     smoother.smooth();
-    mesh.write("smoothed.e");
 
     if (type_is_tri)
       {
