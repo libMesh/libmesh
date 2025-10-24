@@ -305,9 +305,7 @@ void load_parameter_ranges(RBParametrized & rb_evaluation,
   // doesn't exist). We don't use the libmesh_try/catch() macros here
   // since they don't really allow you to do any processing of the
   // exception object.
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-  try
-#endif
+  libmesh_try
   {
     const auto & parameter_names = parameter_ranges.getNames();
     for (auto i : make_range(parameter_names.size()))
@@ -329,14 +327,12 @@ void load_parameter_ranges(RBParametrized & rb_evaluation,
         discrete_parameter_values[discrete_names[i]] = values;
       }
   }
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-  catch (std::exception & e)
+  libmesh_catch (std::exception & e)
   {
     libmesh_error_msg("Error loading parameter ranges from capnp reader.\n"
                       "This usually means that the training data either doesn't exist or is out of date.\n"
                       "Detailed information about the error is below:\n\n" << e.what() << "\n");
   }
-#endif
 
   rb_evaluation.initialize_parameters(parameters_min,
                                       parameters_max,
