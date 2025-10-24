@@ -20,6 +20,7 @@
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
+#include <iomanip>
 
 #include <random>
 
@@ -646,6 +647,7 @@ public:
       }
 
     smoother.smooth();
+    mesh.write("smoothed.e");
 
     if (type_is_tri)
       {
@@ -749,7 +751,7 @@ public:
                 // smoothed to the actual midpoints.
                 else if (type_is_tet && !elem->is_vertex(local_node_id))
                   {
-                    const Real tol = 1e-5;
+                    const Real tol = TOLERANCE;
                     // We have a non-vertex node. Determine what "type" of
                     // midpoint node with respect to the mesh geometry.
                     // First, get the nodes that neighbor this node
@@ -782,14 +784,14 @@ public:
                                 // a sub-cube vertex. Determine which one.
                                 if (pointIsCubeFaceCenter(other, side_length))
                                   {
-                                    const Real x = (type == TET10) ? 0.42895 : 0.41486;
+                                    const Real x = (type == TET10) ? 0.42895041 : 0.41486385;
                                     CPPUNIT_ASSERT(node.relative_fuzzy_equals(
                                         other + x * (cube_center - other), tol));
                                   }
 
                                 else if (pointIsCubeVertex(other, side_length))
                                   {
-                                    const Real x = (type == TET10) ? 0.55389 : 0.58094;
+                                    const Real x = (type == TET10) ? 0.55388920 : 0.58093516;
                                     CPPUNIT_ASSERT(node.relative_fuzzy_equals(
                                         other + x * (cube_center - other), tol));
                                   }
@@ -825,7 +827,7 @@ public:
                                         is_0_cube_vertex ? *neighbors[0] : *neighbors[1];
                                     const auto & cube_face_center =
                                         is_0_cube_face_center ? *neighbors[0] : *neighbors[1];
-                                    const Real x = (type == TET10) ? 0.61299 : 0.65126;
+                                    const Real x = (type == TET10) ? 0.61299101 : 0.65125580;
                                     CPPUNIT_ASSERT(node.relative_fuzzy_equals(
                                         cube_vertex + x * (cube_face_center - cube_vertex), tol));
                                   }
@@ -885,9 +887,9 @@ public:
                                     {
                                       Real weight;
                                       if (pointIsCubeVertex(*neighbor, side_length))
-                                        weight = 0.30601;
+                                        weight = 0.30600747;
                                       else if (pointIsCubeCenter(*neighbor, side_length))
-                                        weight = 0.38799;
+                                        weight = 0.38798506;
                                       else
                                         libmesh_error_msg("We should never get here!");
 
@@ -900,9 +902,9 @@ public:
                                     {
                                       Real weight;
                                       if (pointIsCubeVertex(*neighbor, side_length))
-                                        weight = 0.28078;
+                                        weight = 0.28078090;
                                       else if (pointIsCubeFaceCenter(*neighbor, side_length))
-                                        weight = 0.43843;
+                                        weight = 0.43843820;
                                       else
                                         libmesh_error_msg("We should never get here!");
 
@@ -920,11 +922,11 @@ public:
                                 {
                                   Real weight;
                                   if (pointIsCubeCenter(*neighbor, side_length))
-                                    weight = 0.33102;
+                                    weight = 0.33102438;
                                   else if (pointIsCubeVertex(*neighbor, side_length))
-                                    weight = 0.27147;
+                                    weight = 0.27147230;
                                   else if (pointIsCubeFaceCenter(*neighbor, side_length))
-                                    weight = 0.39751;
+                                    weight = 0.39750332;
                                   else
                                     libmesh_error_msg("We should never get here!");
 
