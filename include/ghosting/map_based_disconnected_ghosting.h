@@ -23,9 +23,9 @@ class MapBasedDisconnectedGhosting : public GhostingFunctor
 {
 public:
 
-  // Map from (local element ID, local side number) to neighbor element ID.
+  // Map from (local element ptr) to neighbor element ptr.
   using DisconnectedMap =
-      std::map<dof_id_type, dof_id_type>;
+      std::unordered_map<const Elem *, const Elem *>;
 
   /**
    * @brief Constructor.
