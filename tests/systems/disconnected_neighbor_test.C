@@ -106,7 +106,7 @@ void assemble_temperature_jump(EquationSystems &es,
             Ke(i, j) += conductance * JxW_vol[qp] * (dphi_vol[i][qp] * dphi_vol[j][qp]);
 
       // --- Left-side interface ---
-      unsigned int side = boundary.side_with_boundary_id(elem, interface_left_id);
+      unsigned int side = boundary.side_with_boundary_id(elem, interface_left_id, true /*include_internal_boundary*/);
       if (side != libMesh::invalid_uint)
         {
           fe_face_L->reinit(elem, side);
@@ -142,7 +142,7 @@ void assemble_temperature_jump(EquationSystems &es,
         }
 
       // --- Right-side interface ---
-      side = boundary.side_with_boundary_id(elem, interface_right_id);
+      side = boundary.side_with_boundary_id(elem, interface_right_id, true /*include_internal_boundary*/);
       if (side != libMesh::invalid_uint)
         {
           fe_face_R->reinit(elem, side);
@@ -345,13 +345,16 @@ private:
     // ExodusII_IO(mesh).write_equation_systems("temperature_jump.e", es);
 
     for (Real x=0.; x<=1.; x+=0.05)
-      for (Real y=0.; y<=1.; y+=0.05)
-        {
-          Point p(x,y);
-          const Number exact = heat_exact(p,params,"","");
-          const Number approx = sys.point_value(0,p);
-          LIBMESH_ASSERT_NUMBERS_EQUAL(exact, approx, 1e-2);
-        }
+      {
+        if (std::abs(x - 0.5) < 1e-12) continue; // skip interface
+        for (Real y=0.; y<=1.; y+=0.05)
+          {
+            Point p(x,y);
+            const Number exact = heat_exact(p,params,"","");
+            const Number approx = sys.point_value(0,p);
+            LIBMESH_ASSERT_NUMBERS_EQUAL(exact, approx, 1e-2);
+          }
+      }
   }
 };
 
