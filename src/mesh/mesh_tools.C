@@ -1061,6 +1061,45 @@ void find_nodal_neighbors(const MeshBase &,
   find_nodal_neighbors_helper(node.id(), node_to_elem_vec, neighbors);
 }
 
+void find_nodal_or_face_neighbors(
+    const MeshBase & mesh,
+    const Node & node,
+    const std::unordered_map<dof_id_type, std::vector<const Elem *>> & nodes_to_elem_map,
+    std::vector<const Node *> & neighbors)
+{
+  // Find all the nodal neighbors... that is the nodes directly connected
+  // to this node through one edge.
+  find_nodal_neighbors(mesh, node, nodes_to_elem_map, neighbors);
+
+  // If no neighbors are found, use all nodes on the containing side as
+  // neighbors.
+  if (!neighbors.size())
+    {
+      // Grab the element containing node
+      const auto * elem = libmesh_map_find(nodes_to_elem_map, node.id()).front();
+      // Find the element side containing node
+      for (const auto &side : elem->side_index_range())
+        {
+          const auto &nodes_on_side = elem->nodes_on_side(side);
+          const auto it =
+              std::find_if(nodes_on_side.begin(), nodes_on_side.end(), [&](auto local_node_id) {
+                return elem->node_id(local_node_id) == node.id();
+              });
+
+          if (it != nodes_on_side.end())
+            {
+              for (const auto &local_node_id : nodes_on_side)
+                // No need to add node itself as a neighbor
+                if (const auto *node_ptr = elem->node_ptr(local_node_id);
+                    *node_ptr != node)
+                  neighbors.push_back(node_ptr);
+              break;
+            }
+        }
+    }
+  libmesh_assert(neighbors.size());
+}
+
 
 
 void find_hanging_nodes_and_parents(const MeshBase & mesh,
