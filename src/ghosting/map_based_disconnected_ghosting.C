@@ -40,14 +40,12 @@ MapBasedDisconnectedGhosting::operator() (
         coupled_elements.emplace(elem, nullcm);
 
       // Look up this element's neighbor in the map
-      auto it = _map.find(elem->id());
+      auto it = _map.find(elem);
       if (it == _map.end())
         continue;
 
       // Get the neighbor's ID
-      const dof_id_type neighbor_id = it->second;
-
-      const Elem * neighbor_ptr = _mesh->query_elem_ptr(neighbor_id);
+      const Elem * neighbor_ptr = it->second;
 
       // If the neighbor pointer is valid (meaning it's local or ghosted)
       // AND it's not on processor 'p', add it to the couplings.

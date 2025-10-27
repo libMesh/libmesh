@@ -96,6 +96,8 @@ void assemble_temperature_jump(EquationSystems &es,
       Fe.zero();
 
       // --- Volume contribution ---
+      fe->get_dphi();   // sets calculate_dphi = true
+      fe->get_JxW();    // sets calculate_map  = true
       fe->reinit(elem);
       const auto &JxW_vol = fe->get_JxW();
       const auto &dphi_vol = fe->get_dphi();
@@ -109,6 +111,8 @@ void assemble_temperature_jump(EquationSystems &es,
       unsigned int side = boundary.side_with_boundary_id(elem, interface_left_id, true /*include_internal_boundary*/);
       if (side != libMesh::invalid_uint)
         {
+          fe_face_L->get_phi();    // sets calculate_phi = true
+          fe_face_L->get_JxW();    // sets calculate_map = true
           fe_face_L->reinit(elem, side);
           const auto &phi_L = fe_face_L->get_phi();
           const auto &JxW_face = fe_face_L->get_JxW();
@@ -116,6 +120,8 @@ void assemble_temperature_jump(EquationSystems &es,
           const Elem *neighbor = elem->neighbor_ptr(side);
           libmesh_assert(neighbor);
           unsigned int n_side = neighbor->which_neighbor_am_i(elem);
+          fe_face_R->get_phi();
+          fe_face_R->get_JxW();
           fe_face_R->reinit(neighbor, n_side);
           const auto &phi_R = fe_face_R->get_phi();
 
@@ -145,6 +151,8 @@ void assemble_temperature_jump(EquationSystems &es,
       side = boundary.side_with_boundary_id(elem, interface_right_id, true /*include_internal_boundary*/);
       if (side != libMesh::invalid_uint)
         {
+          fe_face_R->get_phi();    // sets calculate_phi = true
+          fe_face_R->get_JxW();    // sets calculate_map = true
           fe_face_R->reinit(elem, side);
           const auto &phi_R = fe_face_R->get_phi();
           const auto &JxW_face = fe_face_R->get_JxW();
@@ -152,6 +160,8 @@ void assemble_temperature_jump(EquationSystems &es,
           const Elem *neighbor = elem->neighbor_ptr(side);
           libmesh_assert(neighbor);
           unsigned int n_side = neighbor->which_neighbor_am_i(elem);
+          fe_face_L->get_phi();
+          fe_face_L->get_JxW();
           fe_face_L->reinit(neighbor, n_side);
           const auto &phi_L = fe_face_L->get_phi();
 
@@ -266,17 +276,6 @@ private:
     // This is the key testing step: inform libMesh about the disconnected boundaries
     // And, in `prepare_for_use()`, libMesh will set up the disconnected neighbor relationships.
     mesh.add_disconnected_boundaries(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
-
-
-    // new, map-based ghosting functor
-    MapBasedDisconnectedGhosting::DisconnectedMap disconnected_map;
-    // Elem 0 connects to Elem 1
-    disconnected_map[0] = 1;
-    // Elem 1 connects to Elem 0
-    disconnected_map[1] = 0;
-    auto map_ghosting =
-      std::make_shared<MapBasedDisconnectedGhosting>(mesh, disconnected_map);
-    mesh.add_ghosting_functor(map_ghosting);
 
     // libMesh shouldn't renumber, or our based-on-initial-id
     // assertions later may fail.
