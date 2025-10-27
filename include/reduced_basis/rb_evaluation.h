@@ -150,20 +150,6 @@ public:
    */
   virtual Real residual_scaling_denom(Real alpha_LB);
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * Evaluate the dual norm of output \p n for the current parameters.
-   *
-   * This function is \deprecated, since you should either evaluate
-   * the output dual norm using a vector of pre-evaluated thetas, or
-   * by using the RBParameters object returned by calling
-   * get_parameters() on this class. Instead call the version of this
-   * function that takes an option pointer to a vector of evalauted
-   * theta values.
-   */
-  Real eval_output_dual_norm(unsigned int n, const RBParameters & mu);
-#endif // LIBMESH_ENABLE_DEPRECATED
-
   /**
    * Evaluate the dual norm of output \p n for the current parameters,
    * or using the pre-evaluted theta values provided in the "evaluated_thetas"
