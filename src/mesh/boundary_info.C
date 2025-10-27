@@ -2298,7 +2298,8 @@ void BoundaryInfo::renumber_node_id (boundary_id_type old_id,
 
 
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
-                                                 const boundary_id_type boundary_id_in) const
+                                                 const boundary_id_type boundary_id_in,
+                                                 bool include_internal_boundary) const
 {
   const Elem * searched_elem = elem;
 
@@ -2322,7 +2323,7 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
         {
           // If we're on this external boundary then we share this
           // external boundary id
-          if (elem->neighbor_ptr(side) == nullptr)
+          if (elem->neighbor_ptr(side) == nullptr || include_internal_boundary)
             return side;
 
           // If we're on an internal boundary then we need to be sure
