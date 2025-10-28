@@ -51,6 +51,8 @@
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
 
+#include <libmesh/disconnected_neighbor_coupling.h>
+
 namespace {
 
 using namespace libMesh;
@@ -1033,6 +1035,9 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 }
             }
         }
+
+      // Ghost the disconnected elements
+      this->add_ghosting_functor(std::make_unique<DisconnectedNeighborCoupling>(*this));
     }
 #endif // LIBMESH_ENABLE_PERIODIC
 
