@@ -57,7 +57,7 @@ void LaplaceMeshSmoother::smooth() {
   // determined. We store the new positions here
   std::vector<Point> new_positions;
 
-  for (unsigned int n=0; n<_n_iterations; n++)
+  for (const auto n : make_range(_n_iterations))
     {
       new_positions.resize(_mesh.max_node_id());
 
