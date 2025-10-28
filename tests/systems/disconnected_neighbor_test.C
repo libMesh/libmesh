@@ -15,9 +15,6 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
-#include <libmesh/disconnected_neighbor_coupling.h>
-
-
 using namespace libMesh;
 
 static const Real b = 1.0;
@@ -267,9 +264,6 @@ private:
     // assertions later may fail.
     mesh.allow_renumbering(false);
 
-    // Ghost the disconnected elements
-    mesh.add_ghosting_functor(std::make_unique<DisconnectedNeighborCoupling>(mesh));
-
     mesh.prepare_for_use();
 
     // Check elem 0 (the left element)
@@ -358,12 +352,10 @@ private:
     std::set<boundary_id_type> right_bdy { right_id };
     std::vector<unsigned int> vars (1, u_var);
 
-    auto left_fn = [](const Point &, const Parameters &, const std::string &, const std::string &) { return 0.0; };
-    auto right_fn = [](const Point &, const Parameters &, const std::string &, const std::string &) { return 1.0 + b; };
-
-    WrappedFunction<Number> left_val(sys, left_fn);
-    WrappedFunction<Number> right_val(sys, right_fn);
-
+    Parameters params;
+    params.set<Real>("b") = b;
+    WrappedFunction<Number> left_val(sys, &left_solution_fn);
+    WrappedFunction<Number> right_val(sys, &right_solution_fn, &params);
     DirichletBoundary bc_left (left_bdy,  vars, left_val);
     DirichletBoundary bc_right(right_bdy, vars, right_val);
 
@@ -380,8 +372,6 @@ private:
     sys.solve();
 
     // ExodusII_IO(mesh).write_equation_systems("temperature_jump_refine.e", es);
-
-    Parameters params;
 
     for (Real x=0.; x<=1.; x+=0.05)
       {
@@ -503,9 +493,6 @@ private:
     // This is the key testing step: inform libMesh about the disconnected boundaries
     // And, in `prepare_for_use()`, libMesh will set up the disconnected neighbor relationships.
     mesh.add_disconnected_boundaries(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
-
-    // Ghost the disconnected elements
-    mesh.add_ghosting_functor(std::make_unique<DisconnectedNeighborCoupling>(mesh));
 
     mesh.prepare_for_use();
   }
