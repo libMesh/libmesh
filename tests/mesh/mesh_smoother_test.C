@@ -687,9 +687,11 @@ public:
         std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
         MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
-        // Make sure we're not too distorted anymore
+        // Make sure we're not too distorted anymore, using the given
+        // tolerance.
         std::set<dof_id_type> nodes_checked;
         const Real tol = TOLERANCE;
+
         for (const auto * elem : mesh.active_element_ptr_range())
           {
             for (const auto local_node_id : make_range(elem->n_nodes()))
