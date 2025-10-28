@@ -722,7 +722,7 @@ public:
                         const auto & apex = elem->node_ref(4);
                         const Real x = (type == PYRAMID18) ? 0.56646084 : 0.54985875;
 
-                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(base + x * (apex - base), tol));
+                        CPPUNIT_ASSERT(node.absolute_fuzzy_equals(base + x * (apex - base), tol));
                         continue;
                       }
                     else if (local_node_id > 13)
@@ -741,7 +741,7 @@ public:
 
                         const auto node_approx =
                             (0.31401599 * base1 + 0.31401599 * base2 + 0.37196802 * apex);
-                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, tol));
+                        CPPUNIT_ASSERT(node.absolute_fuzzy_equals(node_approx, tol));
                         continue;
                       }
                   }
@@ -783,14 +783,14 @@ public:
                                 if (pointIsCubeFaceCenter(other, side_length))
                                   {
                                     const Real x = (type == TET10) ? 0.42895041 : 0.41486385;
-                                    CPPUNIT_ASSERT(node.relative_fuzzy_equals(
+                                    CPPUNIT_ASSERT(node.absolute_fuzzy_equals(
                                         other + x * (cube_center - other), tol));
                                   }
 
                                 else if (pointIsCubeVertex(other, side_length))
                                   {
                                     const Real x = (type == TET10) ? 0.55388920 : 0.58093516;
-                                    CPPUNIT_ASSERT(node.relative_fuzzy_equals(
+                                    CPPUNIT_ASSERT(node.absolute_fuzzy_equals(
                                         other + x * (cube_center - other), tol));
                                   }
                               }
@@ -826,7 +826,7 @@ public:
                                     const auto & cube_face_center =
                                         is_0_cube_face_center ? *neighbors[0] : *neighbors[1];
                                     const Real x = (type == TET10) ? 0.61299101 : 0.65125580;
-                                    CPPUNIT_ASSERT(node.relative_fuzzy_equals(
+                                    CPPUNIT_ASSERT(node.absolute_fuzzy_equals(
                                         cube_vertex + x * (cube_face_center - cube_vertex), tol));
                                   }
                               }
@@ -934,7 +934,7 @@ public:
                             else
                               libmesh_error_msg("We should never get here!");
 
-                            CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, tol));
+                            CPPUNIT_ASSERT(node.absolute_fuzzy_equals(node_approx, tol));
 
                             continue;
                             break;
