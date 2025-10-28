@@ -101,8 +101,8 @@ public:
   VariationalMeshSmoother(UnstructuredMesh & mesh,
                           Real dilation_weight = 0.5,
                           const bool preserve_subdomain_boundaries = true,
-                          const double relative_residual_tolerance = TOLERANCE * TOLERANCE,
-                          const double absolute_residual_tolerance = TOLERANCE * TOLERANCE,
+                          const Real relative_residual_tolerance = TOLERANCE * TOLERANCE,
+                          const Real absolute_residual_tolerance = TOLERANCE * TOLERANCE,
                           const unsigned int verbosity = 0);
 
   /**
@@ -200,12 +200,12 @@ private:
   /**
    * Solver relative residual tolerance
    */
-  double _relative_residual_tolerance;
+  Real _relative_residual_tolerance;
 
   /**
    * Solver absolute residual tolerance
    */
-  double _absolute_residual_tolerance;
+  Real _absolute_residual_tolerance;
 };
 
 } // namespace libMesh

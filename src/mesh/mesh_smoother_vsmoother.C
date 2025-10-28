@@ -51,8 +51,8 @@ namespace libMesh
 VariationalMeshSmoother::VariationalMeshSmoother(
     UnstructuredMesh &mesh, Real dilation_weight,
     const bool preserve_subdomain_boundaries,
-    const double relative_residual_tolerance,
-    const double absolute_residual_tolerance, const unsigned int verbosity)
+    const Real relative_residual_tolerance,
+    const Real absolute_residual_tolerance, const unsigned int verbosity)
     : MeshSmoother(mesh), _verbosity(verbosity),
       _dilation_weight(dilation_weight),
       _preserve_subdomain_boundaries(preserve_subdomain_boundaries),
