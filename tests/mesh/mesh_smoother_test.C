@@ -687,8 +687,11 @@ public:
         std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
         MeshTools::build_nodes_to_elem_map(mesh, nodes_to_elem_map);
 
-        // Make sure we're not too distorted anymore
+        // Make sure we're not too distorted anymore, using the given
+        // tolerance.
         std::set<dof_id_type> nodes_checked;
+        const Real tol = TOLERANCE;
+
         for (const auto * elem : mesh.active_element_ptr_range())
           {
             for (const auto local_node_id : make_range(elem->n_nodes()))
@@ -717,10 +720,9 @@ public:
 
                         const auto & base = elem->node_ref(local_node_id - 9);
                         const auto & apex = elem->node_ref(4);
-                        const Real x =
-                            (type == PYRAMID18) ? 0.566460 : 0.549876;
+                        const Real x = (type == PYRAMID18) ? 0.56646084 : 0.54985875;
 
-                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(base + x * (apex - base), 1e-3));
+                        CPPUNIT_ASSERT(node.absolute_fuzzy_equals(base + x * (apex - base), tol));
                         continue;
                       }
                     else if (local_node_id > 13)
@@ -737,10 +739,9 @@ public:
                         const auto & base2 = elem->node_ref((local_node_id - 13) % 4);
                         const auto & apex = elem->node_ref(4);
 
-                        const auto node_approx = (0.3141064847 * base1 +
-                                                  0.3141064847 * base2 +
-                                                  0.3717870306 * apex);
-                        CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, 1e-3));
+                        const auto node_approx =
+                            (0.31401599 * base1 + 0.31401599 * base2 + 0.37196802 * apex);
+                        CPPUNIT_ASSERT(node.absolute_fuzzy_equals(node_approx, tol));
                         continue;
                       }
                   }
@@ -749,7 +750,6 @@ public:
                 // smoothed to the actual midpoints.
                 else if (type_is_tet && !elem->is_vertex(local_node_id))
                   {
-                    const Real tol = TOLERANCE;
                     // We have a non-vertex node. Determine what "type" of
                     // midpoint node with respect to the mesh geometry.
                     // First, get the nodes that neighbor this node
@@ -783,14 +783,14 @@ public:
                                 if (pointIsCubeFaceCenter(other, side_length))
                                   {
                                     const Real x = (type == TET10) ? 0.42895041 : 0.41486385;
-                                    CPPUNIT_ASSERT(node.relative_fuzzy_equals(
+                                    CPPUNIT_ASSERT(node.absolute_fuzzy_equals(
                                         other + x * (cube_center - other), tol));
                                   }
 
                                 else if (pointIsCubeVertex(other, side_length))
                                   {
                                     const Real x = (type == TET10) ? 0.55388920 : 0.58093516;
-                                    CPPUNIT_ASSERT(node.relative_fuzzy_equals(
+                                    CPPUNIT_ASSERT(node.absolute_fuzzy_equals(
                                         other + x * (cube_center - other), tol));
                                   }
                               }
@@ -826,7 +826,7 @@ public:
                                     const auto & cube_face_center =
                                         is_0_cube_face_center ? *neighbors[0] : *neighbors[1];
                                     const Real x = (type == TET10) ? 0.61299101 : 0.65125580;
-                                    CPPUNIT_ASSERT(node.relative_fuzzy_equals(
+                                    CPPUNIT_ASSERT(node.absolute_fuzzy_equals(
                                         cube_vertex + x * (cube_face_center - cube_vertex), tol));
                                   }
                               }
@@ -934,7 +934,7 @@ public:
                             else
                               libmesh_error_msg("We should never get here!");
 
-                            CPPUNIT_ASSERT(node.relative_fuzzy_equals(node_approx, tol));
+                            CPPUNIT_ASSERT(node.absolute_fuzzy_equals(node_approx, tol));
 
                             continue;
                             break;

@@ -988,7 +988,7 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
       // identified.
 
       // Side length that preserves the volume of the reference element
-      const auto side_length = std::pow(16. * ref_vol / 3., 1. / 3.);
+      const auto side_length = std::cbrt(16. * ref_vol / 3.);
       // Prism height with the property that all faces have equal area
       const auto target_height = 0.25 * side_length * sqrt_3;
 
@@ -1057,7 +1057,7 @@ VariationalSmootherSystem::get_target_elem(const ElemType & type)
       // non-optimal reference element.
 
       // Side length that preserves the volume of the reference element
-      const auto side_length = std::pow(3. * sqrt_2 * ref_vol, 1. / 3.);
+      const auto side_length = std::cbrt(3. * sqrt_2 * ref_vol);
       // Pyramid height with the property that all faces are equilateral triangles
       const auto target_height = side_length / sqrt_2;
 
