@@ -29,6 +29,7 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testRenumber );
+  CPPUNIT_TEST( testInternalBoundary );
 # if LIBMESH_DIM > 2
   CPPUNIT_TEST( testSelectiveRenumber );
 # endif
@@ -1109,6 +1110,49 @@ public:
           }
       }
   }
+
+
+  void testInternalBoundary()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    // Build a 2x2 QUAD4 structured mesh on [0,1]x[0,1].
+    MeshTools::Generation::build_square(mesh,
+                                        2, 2,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // Select an element on the left side of the interior boundary
+    // (average x-coordinate < 0.5).
+    Elem * left_elem = nullptr;
+    for (auto & elem : mesh.active_element_ptr_range())
+    {
+      if (elem->vertex_average()(0) < 0.5)
+      {
+        left_elem = elem;
+        break;
+      }
+    }
+
+    CPPUNIT_ASSERT(left_elem);
+    unsigned int internal_side = 1;
+    CPPUNIT_ASSERT(left_elem->neighbor_ptr(internal_side) != nullptr);
+
+    // Assign a custom boundary ID on this internal side.
+    boundary_id_type BID = 7;
+    bi.add_side(left_elem, internal_side, BID);
+
+    mesh.prepare_for_use();
+
+    unsigned int found_side = bi.side_with_boundary_id(left_elem, BID);
+    CPPUNIT_ASSERT_EQUAL(internal_side, found_side);
+  }
+
 
 };
 
