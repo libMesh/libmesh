@@ -50,7 +50,7 @@ public:
    * @param n_iterations The number of smoothing iterations to be performed.
    */
   explicit LaplaceMeshSmoother(UnstructuredMesh &mesh,
-                               const unsigned int n_iterations=1);
+                               const unsigned int n_iterations);
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
   /**
@@ -64,8 +64,10 @@ public:
    * will match that of the parent class and the sister VariationalMeshSmoother
    * class.
    */
-  explicit
-  LaplaceMeshSmoother(UnstructuredMesh & mesh);
+  explicit LaplaceMeshSmoother(UnstructuredMesh &mesh)
+      : LaplaceMeshSmoother(mesh, 1) {
+    libmesh_deprecated();
+  }
 #endif
 
   /**

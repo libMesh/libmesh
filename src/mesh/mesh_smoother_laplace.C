@@ -38,14 +38,6 @@ LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh &mesh,
                                          const unsigned int n_iterations)
     : MeshSmoother(mesh), _initialized(false), _n_iterations(n_iterations) {}
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh &mesh)
-    : LaplaceMeshSmoother(mesh, 1)
-{
-  libmesh_deprecated();
-}
-#endif
-
 void LaplaceMeshSmoother::smooth() {
   if (!_initialized)
     this->init();
