@@ -2298,8 +2298,7 @@ void BoundaryInfo::renumber_node_id (boundary_id_type old_id,
 
 
 unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
-                                                 const boundary_id_type boundary_id_in,
-                                                 bool include_internal_boundary) const
+                                                 const boundary_id_type boundary_id_in) const
 {
   const Elem * searched_elem = elem;
 
@@ -2326,11 +2325,12 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
           if (elem->neighbor_ptr(side) == nullptr)
             return side;
 
+          // Internal boundary case
+          const Elem * p = elem;
+
+#ifdef LIBMESH_ENABLE_AMR
           // If we're on an internal boundary then we need to be sure
           // it's the same internal boundary as our top_parent
-          bool aligned_with_parent = false;
-#ifdef LIBMESH_ENABLE_AMR
-          const Elem * p = elem;
           while (p != nullptr)
           {
             const Elem * parent = p->parent();
@@ -2338,12 +2338,12 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
               break;
             p = parent;
           }
-          aligned_with_parent = (p == nullptr);
+#else
+          // do not forget to return the internal boundary when AMR is disabled
+          return side;
 #endif
-          // Two valid cases:
-          // 1. The internal face is geometrically aligned with the parent's boundary side (original behavior)
-          // 2. The caller explicitly allows logical/internal boundaries (e.g. CZM interfaces)
-          if (aligned_with_parent || include_internal_boundary)
+          // We're on that side of our top_parent; return it
+          if (!p)
             return side;
         }
         // Otherwise we need to check if the child's ancestors have something on

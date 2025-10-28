@@ -78,6 +78,12 @@ void assemble_temperature_jump(EquationSystems &es,
     fe_face_L->attach_quadrature_rule(&qface);
     fe_face_R->attach_quadrature_rule(&qface);
 
+    const auto &JxW_vol = fe->get_JxW();
+    const auto &dphi_vol = fe->get_dphi();
+    const auto &phi_L = fe_face_L->get_phi();
+    const auto &phi_R = fe_face_R->get_phi();
+    const auto &JxW_face = fe_face_L->get_JxW();
+
     DenseMatrix<Number> Ke;
     DenseVector<Number> Fe;
     std::vector<dof_id_type> dof_indices;
@@ -96,34 +102,21 @@ void assemble_temperature_jump(EquationSystems &es,
       Fe.zero();
 
       // --- Volume contribution ---
-      fe->get_dphi();   // sets calculate_dphi = true
-      fe->get_JxW();    // sets calculate_map  = true
       fe->reinit(elem);
-      const auto &JxW_vol = fe->get_JxW();
-      const auto &dphi_vol = fe->get_dphi();
-
       for (unsigned int qp = 0; qp < qrule.n_points(); qp++)
         for (unsigned int i = 0; i < n_dofs; i++)
           for (unsigned int j = 0; j < n_dofs; j++)
             Ke(i, j) += conductance * JxW_vol[qp] * (dphi_vol[i][qp] * dphi_vol[j][qp]);
 
       // --- Left-side interface ---
-      unsigned int side = boundary.side_with_boundary_id(elem, interface_left_id, true /*include_internal_boundary*/);
+      unsigned int side = boundary.side_with_boundary_id(elem, interface_left_id);
       if (side != libMesh::invalid_uint)
         {
-          fe_face_L->get_phi();    // sets calculate_phi = true
-          fe_face_L->get_JxW();    // sets calculate_map = true
           fe_face_L->reinit(elem, side);
-          const auto &phi_L = fe_face_L->get_phi();
-          const auto &JxW_face = fe_face_L->get_JxW();
-
           const Elem *neighbor = elem->neighbor_ptr(side);
           libmesh_assert(neighbor);
           unsigned int n_side = neighbor->which_neighbor_am_i(elem);
-          fe_face_R->get_phi();
-          fe_face_R->get_JxW();
           fe_face_R->reinit(neighbor, n_side);
-          const auto &phi_R = fe_face_R->get_phi();
 
           std::vector<dof_id_type> dofs_L, dofs_R;
           dof_map.dof_indices(elem, dofs_L);
@@ -148,22 +141,14 @@ void assemble_temperature_jump(EquationSystems &es,
         }
 
       // --- Right-side interface ---
-      side = boundary.side_with_boundary_id(elem, interface_right_id, true /*include_internal_boundary*/);
+      side = boundary.side_with_boundary_id(elem, interface_right_id);
       if (side != libMesh::invalid_uint)
         {
-          fe_face_R->get_phi();    // sets calculate_phi = true
-          fe_face_R->get_JxW();    // sets calculate_map = true
           fe_face_R->reinit(elem, side);
-          const auto &phi_R = fe_face_R->get_phi();
-          const auto &JxW_face = fe_face_R->get_JxW();
-
           const Elem *neighbor = elem->neighbor_ptr(side);
           libmesh_assert(neighbor);
           unsigned int n_side = neighbor->which_neighbor_am_i(elem);
-          fe_face_L->get_phi();
-          fe_face_L->get_JxW();
           fe_face_L->reinit(neighbor, n_side);
-          const auto &phi_L = fe_face_L->get_phi();
 
           std::vector<dof_id_type> dofs_R, dofs_L;
           dof_map.dof_indices(elem, dofs_R);

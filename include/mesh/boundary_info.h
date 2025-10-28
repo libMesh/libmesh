@@ -616,22 +616,12 @@ public:
   /**
    * \returns A side of element \p elem whose associated boundary id is
    * \p boundary_id if such a side exists, and \p invalid_uint otherwise.
-   * \p include_internal_boundary
-   * If true, sides on internal logical boundaries are also considered.
-   * If false (default), only sides on the geometric boundary
-   * (i.e. sides without a valid neighbor element) are inspected.
-   *
-   * Setting this to true is useful for intentionally disconnected
-   * interfaces (e.g. cohesive zone interfaces) where
-   * a neighboring element exists but the side should still be treated
-   * as a boundary for enforcement of interface conditions.
    *
    * \note If multiple sides of \p elem have the same id, only the lowest numbered
    * such side is returned.
    */
   unsigned int side_with_boundary_id(const Elem * const elem,
-                                     const boundary_id_type boundary_id,
-                                     bool include_internal_boundary = false) const;
+                                     const boundary_id_type boundary_id) const;
 
   /**
    * \returns All sides of element \p elem whose associated boundary id is
