@@ -176,7 +176,7 @@ include_HEADERS =  \
         geom/surface.h \
         ghosting/default_coupling.h \
         ghosting/ghost_point_neighbors.h \
-        ghosting/map_based_disconnected_ghosting.h \
+        ghosting/disconnected_neighbor_coupling.h \
         ghosting/ghosting_functor.h \
         ghosting/non_manifold_coupling.h \
         ghosting/overlap_coupling.h \

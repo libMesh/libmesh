@@ -576,7 +576,7 @@ BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	node_elem.h node_range.h plane.h point.h reference_elem.h \
 	remote_elem.h sphere.h stored_range.h surface.h \
 	default_coupling.h ghost_point_neighbors.h \
-	map_based_disconnected_ghosting.h ghosting_functor.h \
+	disconnected_neighbor_coupling.h ghosting_functor.h \
 	non_manifold_coupling.h overlap_coupling.h \
 	point_neighbor_coupling.h sibling_coupling.h abaqus_io.h \
 	boundary_info.h boundary_mesh.h checkpoint_io.h \
@@ -1432,7 +1432,7 @@ default_coupling.h: $(top_srcdir)/include/ghosting/default_coupling.h
 ghost_point_neighbors.h: $(top_srcdir)/include/ghosting/ghost_point_neighbors.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-map_based_disconnected_ghosting.h: $(top_srcdir)/include/ghosting/map_based_disconnected_ghosting.h
+disconnected_neighbor_coupling.h: $(top_srcdir)/include/ghosting/disconnected_neighbor_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ghosting_functor.h: $(top_srcdir)/include/ghosting/ghosting_functor.h

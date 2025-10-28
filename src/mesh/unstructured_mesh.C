@@ -50,7 +50,6 @@
 // for disconnected neighbors
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
-#include <libmesh/map_based_disconnected_ghosting.h>
 
 namespace {
 
@@ -1004,7 +1003,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
   if (db)
     {
-      MapBasedDisconnectedGhosting::DisconnectedMap disconnected_map;
       // Obtain a point locator
       std::unique_ptr<PointLocatorBase> point_locator = this->sub_point_locator();
 
@@ -1031,16 +1029,10 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                       auto neigh_changeable = this->elem_ptr(neigh->id());
                       element->set_neighbor(ms, neigh_changeable);
                       neigh_changeable->set_neighbor(neigh_side, element);
-                      disconnected_map.emplace(element, neigh_changeable);
-                      disconnected_map.emplace(neigh_changeable, element);
                     }
                 }
             }
         }
-      // Now add the ghosting functor to keep these neighbors in sync
-      auto map_ghosting =
-        std::make_shared<MapBasedDisconnectedGhosting>(*this, disconnected_map);
-      this->add_ghosting_functor(map_ghosting);
     }
 #endif // LIBMESH_ENABLE_PERIODIC
 
