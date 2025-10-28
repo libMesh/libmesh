@@ -11,14 +11,12 @@
 #include <libmesh/quadrature_gauss.h>
 #include <libmesh/sparse_matrix.h>
 #include <libmesh/wrapped_function.h>
-#include <libmesh/linear_solver.h>
-#include <libmesh/enum_solver_type.h>
-#include <libmesh/enum_preconditioner_type.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
-#include <libmesh/map_based_disconnected_ghosting.h>
+#include <libmesh/disconnected_neighbor_coupling.h>
+
 
 using namespace libMesh;
 
@@ -30,6 +28,8 @@ static const boundary_id_type left_id = 3;
 static const boundary_id_type right_id = 1;
 static const boundary_id_type interface_left_id = 5;
 static const boundary_id_type interface_right_id = 6;
+
+static const int nx = 6, ny = 6;
 
 Number
 heat_exact (const Point & p,
@@ -187,6 +187,7 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( DisconnectedNeighborTest );
 #if defined(LIBMESH_HAVE_SOLVER)
   CPPUNIT_TEST( testTempJump );
+  CPPUNIT_TEST( testTempJumpRefine );
 #endif
   CPPUNIT_TEST_SUITE_END();
 
@@ -266,6 +267,9 @@ private:
     // assertions later may fail.
     mesh.allow_renumbering(false);
 
+    // Ghost the disconnected elements
+    mesh.add_ghosting_functor(std::make_unique<DisconnectedNeighborCoupling>(mesh));
+
     mesh.prepare_for_use();
 
     // Check elem 0 (the left element)
@@ -320,9 +324,6 @@ private:
     // Without this, PETSc may report "New nonzero at (a,b) caused a malloc."
     sys.get_dof_map().set_implicit_neighbor_dofs(true);
 
-    sys.get_linear_solver()->set_solver_type(GMRES);
-    sys.get_linear_solver()->set_preconditioner_type(IDENTITY_PRECOND);
-
     es.init();
     sys.solve();
 
@@ -339,6 +340,174 @@ private:
             LIBMESH_ASSERT_NUMBERS_EQUAL(exact, approx, 1e-2);
           }
       }
+  }
+
+
+  void testTempJumpRefine()
+  {
+    Mesh mesh(*TestCommWorld, 2);
+    build_split_mesh_with_interface(mesh);
+
+    EquationSystems es(mesh);
+    LinearImplicitSystem & sys =
+      es.add_system<LinearImplicitSystem>("TempJump");
+
+    const unsigned int u_var = sys.add_variable("u", FEType(FIRST, LAGRANGE));
+
+    std::set<boundary_id_type> left_bdy  { left_id };
+    std::set<boundary_id_type> right_bdy { right_id };
+    std::vector<unsigned int> vars (1, u_var);
+
+    auto left_fn = [](const Point &, const Parameters &, const std::string &, const std::string &) { return 0.0; };
+    auto right_fn = [](const Point &, const Parameters &, const std::string &, const std::string &) { return 1.0 + b; };
+
+    WrappedFunction<Number> left_val(sys, left_fn);
+    WrappedFunction<Number> right_val(sys, right_fn);
+
+    DirichletBoundary bc_left (left_bdy,  vars, left_val);
+    DirichletBoundary bc_right(right_bdy, vars, right_val);
+
+    sys.get_dof_map().add_dirichlet_boundary(bc_left);
+    sys.get_dof_map().add_dirichlet_boundary(bc_right);
+
+    sys.attach_assemble_function(assemble_temperature_jump);
+
+    // Ensure the DofMap creates sparsity entries between neighboring elements.
+    // Without this, PETSc may report "New nonzero at (a,b) caused a malloc."
+    sys.get_dof_map().set_implicit_neighbor_dofs(true);
+
+    es.init();
+    sys.solve();
+
+    // ExodusII_IO(mesh).write_equation_systems("temperature_jump_refine.e", es);
+
+    Parameters params;
+
+    for (Real x=0.; x<=1.; x+=0.05)
+      {
+        if (std::abs(x - 0.5) < 1e-12) continue; // skip interface
+        for (Real y=0.; y<=1.; y+=0.05)
+          {
+            Point p(x,y);
+            const Number exact = heat_exact(p,params,"","");
+            const Number approx = sys.point_value(0,p);
+            LIBMESH_ASSERT_NUMBERS_EQUAL(exact, approx, 1e-2);
+          }
+      }
+  }
+
+
+  // The interface is located at x = 0.5; nx must be even (split evenly into left and right subdomains)
+  void build_split_mesh_with_interface(Mesh &mesh)
+  {
+    // Ensure nx is even so the interface aligns with element boundaries
+    libmesh_error_msg_if(nx % 2 != 0, "nx must be even!");
+
+    mesh.clear();
+    mesh.set_mesh_dimension(2);
+
+    const unsigned nxL = nx / 2;       // Number of elements in x-direction (left half)
+    const unsigned nxR = nx / 2;       // Number of elements in x-direction (right half)
+    const double dx = 1.0 / static_cast<double>(nx);
+    const double dy = 1.0 / static_cast<double>(ny);
+
+    // --- Generate points for the left subdomain [0, 0.5] ---
+    // Each row of the left subdomain has (nxL + 1) nodes.
+    // Total nodes = (nxL + 1) * (ny + 1).
+    auto nidL = [&](unsigned i, unsigned j) {
+      return static_cast<dof_id_type>(j * (nxL + 1) + i);
+    };
+
+    for (unsigned j = 0; j <= ny; ++j)
+    {
+      const double y = j * dy;
+      for (unsigned i = 0; i <= nxL; ++i)
+      {
+        const double x = i * dx; // At i = nxL, x = 0.5 (interface)
+        mesh.add_point(Point(x, y), nidL(i, j));
+      }
+    }
+
+    // --- Generate points for the right subdomain [0.5, 1.0] ---
+    // Interface nodes at x = 0.5 are duplicated with new node IDs.
+    const dof_id_type baseR = static_cast<dof_id_type>((nxL + 1) * (ny + 1));
+
+    auto nidR = [&](unsigned i, unsigned j) {
+      return static_cast<dof_id_type>(baseR + j * (nxR + 1) + i);
+    };
+
+    for (unsigned j = 0; j <= ny; ++j)
+    {
+      const double y = j * dy;
+      for (unsigned i = 0; i <= nxR; ++i)
+      {
+        const double x = 0.5 + i * dx; // At i = 0, x = 0.5 (same coords as left interface, different ID)
+        mesh.add_point(Point(x, y), nidR(i, j));
+      }
+    }
+
+    BoundaryInfo &boundary = mesh.get_boundary_info();
+
+    // --- Create left subdomain elements (QUAD4) ---
+    // Node order: 0 = BL, 1 = BR, 2 = TR, 3 = TL
+    // Side order: 0 = bottom(0-1), 1 = right(1-2), 2 = top(2-3), 3 = left(3-0)
+    dof_id_type eid = 0;
+    for (unsigned j = 0; j < ny; ++j)
+    {
+      for (unsigned i = 0; i < nxL; ++i)
+      {
+        Elem *e = mesh.add_elem(Elem::build_with_id(QUAD4, eid++));
+        e->set_node(0, mesh.node_ptr(nidL(i,   j)));
+        e->set_node(1, mesh.node_ptr(nidL(i+1, j)));
+        e->set_node(2, mesh.node_ptr(nidL(i+1, j+1)));
+        e->set_node(3, mesh.node_ptr(nidL(i,   j+1)));
+
+        // Left outer boundary (i == 0 -> side 3)
+        if (i == 0)
+          boundary.add_side(e, 3, left_id);
+
+        // Interface (left side) boundary (i == nxL - 1 -> side 1)
+        if (i == nxL - 1)
+          boundary.add_side(e, 1, interface_left_id);
+      }
+    }
+
+    // --- Create right subdomain elements (QUAD4) ---
+    for (unsigned j = 0; j < ny; ++j)
+    {
+      for (unsigned i = 0; i < nxR; ++i)
+      {
+        Elem *e = mesh.add_elem(Elem::build_with_id(QUAD4, eid++));
+        e->set_node(0, mesh.node_ptr(nidR(i,   j)));
+        e->set_node(1, mesh.node_ptr(nidR(i+1, j)));
+        e->set_node(2, mesh.node_ptr(nidR(i+1, j+1)));
+        e->set_node(3, mesh.node_ptr(nidR(i,   j+1)));
+
+        // Interface (right side) boundary (i == 0 -> side 3)
+        if (i == 0)
+          boundary.add_side(e, 3, interface_right_id);
+
+        // Right outer boundary (i == nxR - 1 -> side 1)
+        if (i == nxR - 1)
+          boundary.add_side(e, 1, right_id);
+      }
+    }
+
+    // --- Assign human-readable boundary names ---
+    boundary.sideset_name(left_id)            = "left_boundary";
+    boundary.sideset_name(right_id)           = "right_boundary";
+    boundary.sideset_name(interface_left_id)  = "interface_left";
+    boundary.sideset_name(interface_right_id) = "interface_right";
+
+
+    // This is the key testing step: inform libMesh about the disconnected boundaries
+    // And, in `prepare_for_use()`, libMesh will set up the disconnected neighbor relationships.
+    mesh.add_disconnected_boundaries(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
+
+    // Ghost the disconnected elements
+    mesh.add_ghosting_functor(std::make_unique<DisconnectedNeighborCoupling>(mesh));
+
+    mesh.prepare_for_use();
   }
 };
 

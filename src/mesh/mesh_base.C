@@ -52,7 +52,6 @@
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
 
-
 namespace libMesh
 {
 
