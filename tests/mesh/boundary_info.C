@@ -1127,30 +1127,33 @@ public:
 
     BoundaryInfo & bi = mesh.get_boundary_info();
 
-    // Select an element on the left side of the interior boundary
-    // (average x-coordinate < 0.5).
-    Elem * left_elem = nullptr;
-    for (auto & elem : mesh.active_element_ptr_range())
-    {
-      if (elem->vertex_average()(0) < 0.5)
-      {
-        left_elem = elem;
-        break;
-      }
-    }
-
-    CPPUNIT_ASSERT(left_elem);
-    unsigned int internal_side = 1;
-    CPPUNIT_ASSERT(left_elem->neighbor_ptr(internal_side) != nullptr);
-
-    // Assign a custom boundary ID on this internal side.
-    boundary_id_type BID = 7;
-    bi.add_side(left_elem, internal_side, BID);
+    const unsigned int internal_side = 1; // east side for left elems
+    const boundary_id_type BID = 7;
 
     mesh.prepare_for_use();
 
-    unsigned int found_side = bi.side_with_boundary_id(left_elem, BID);
-    CPPUNIT_ASSERT_EQUAL(internal_side, found_side);
+    Elem * left_bottom_elem = nullptr;
+    for (auto & elem : mesh.active_element_ptr_range())
+      {
+        if (elem->processor_id() != mesh.processor_id())
+          continue;
+
+        const Point c = elem->vertex_average();
+        if (c(0) < 0.5 && c(1) < 0.5 && elem->neighbor_ptr(internal_side) != nullptr)
+          {
+            left_bottom_elem = elem;
+            break;
+          }
+      }
+
+
+    if (left_bottom_elem)
+      {
+        bi.add_side(left_bottom_elem, internal_side, BID);
+
+        const unsigned int found_side = bi.side_with_boundary_id(left_bottom_elem, BID);
+        CPPUNIT_ASSERT_EQUAL(internal_side, found_side);
+      }
   }
 
 
