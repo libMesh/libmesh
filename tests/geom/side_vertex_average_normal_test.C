@@ -30,6 +30,7 @@ class SideVertexAverageNormalTest : public CppUnit::TestCase
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( SideVertexAverageNormalTest );
   CPPUNIT_TEST( testEdge2 );
+  CPPUNIT_TEST( testEdge3 );
   CPPUNIT_TEST( testTri3 );
   CPPUNIT_TEST( testQuad4 );
   CPPUNIT_TEST( testPyramid5 );
@@ -75,6 +76,37 @@ public:
       const Point n2 = edge2->side_vertex_average_normal(1);
       LIBMESH_ASSERT_FP_EQUAL(0, n2(0), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(1, n2(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+    }
+  }
+
+  void testEdge3()
+  {
+    LOG_UNIT_TEST;
+
+    {
+      // Reference
+      const Elem & edge3 = ReferenceElem::get(EDGE3);
+      const Point n1 = edge3.side_vertex_average_normal(0);
+      LIBMESH_ASSERT_FP_EQUAL(-1, n1(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      const Point n2 = edge3.side_vertex_average_normal(1);
+      LIBMESH_ASSERT_FP_EQUAL(1, n2(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n2(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+    }
+    {
+      // Oriented
+      std::vector<Point> pts = {Point(1, 0, 0), Point(1, 3, 0), Point(2, 1, 0)};
+      auto [edge3, nodes] = this->construct_elem(pts, EDGE3);
+      const Point n1 = edge3->side_vertex_average_normal(0);
+      LIBMESH_ASSERT_FP_EQUAL(-sqrt(2) / 2, n1(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(-sqrt(2) / 2, n1(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      const Point n2 = edge3->side_vertex_average_normal(1);
+      LIBMESH_ASSERT_FP_EQUAL(-sqrt(5) / 5, n2(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(2 * sqrt(5) / 5, n2(1), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
     }
   }
