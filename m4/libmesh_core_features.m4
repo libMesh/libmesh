@@ -99,7 +99,7 @@ AC_ARG_ENABLE(forward-declare-enums,
 AS_IF([test "$enablefwdenums" != irrelevant],
       [AC_MSG_WARN([--enable/disable-forward-declare-enums is now deprecated])])
 
-$enablefwdenums=yes
+enablefwdenums=yes
 AC_SUBST(enablefwdenums)
 # --------------------------------------------------------------
 
