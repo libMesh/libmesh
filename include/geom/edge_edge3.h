@@ -166,8 +166,6 @@ public:
    */
   virtual Real volume () const override;
 
-  virtual Point side_vertex_average_normal(const unsigned int s) const override final;
-
   /**
    * \returns A bounding box (not necessarily the minimal bounding box)
    * containing the edge.

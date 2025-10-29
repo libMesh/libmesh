@@ -151,6 +151,7 @@ Edge2::side_vertex_average_normal(const unsigned int s) const
   return (s == 0) ? v : -v;
 }
 
+
 dof_id_type Edge2::key () const
 {
   return this->compute_key(this->node_id(0),
