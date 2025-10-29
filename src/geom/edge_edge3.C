@@ -265,6 +265,14 @@ Real Edge3::volume () const
 }
 
 
+Point
+Edge3::side_vertex_average_normal(const unsigned int s) const
+{
+  libmesh_assert_less (s, 2);
+  libmesh_assert_equal_to(this->mapping_type(), LAGRANGE_MAP);
+  return (s == 0) ? (this->point(0) - this->point(2)).unit() : (this->point(1) - this->point(2)).unit();
+}
+
 
 BoundingBox Edge3::loose_bounding_box () const
 {
