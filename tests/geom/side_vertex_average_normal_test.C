@@ -96,18 +96,24 @@ public:
       LIBMESH_ASSERT_FP_EQUAL(0, n2(1), TOLERANCE*TOLERANCE);
       LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
     }
+
     {
-      // Oriented
-      std::vector<Point> pts = {Point(1, 0, 0), Point(1, 3, 0), Point(2, 1, 0)};
+      // Oriented, checked with the FE construction
+      std::vector<Point> pts = {Point(1, 0, 0), Point(1, 3, 0), Point(2.2344, 1.210293, 0)};
       auto [edge3, nodes] = this->construct_elem(pts, EDGE3);
-      const Point n1 = edge3->side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(-sqrt(2) / 2, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-sqrt(2) / 2, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
-      const Point n2 = edge3->side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(-sqrt(5) / 5, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(2 * sqrt(5) / 5, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      std::unique_ptr<libMesh::FEBase> fe(libMesh::FEBase::build(1, libMesh::FEType(1)));
+      libMesh::QGauss qface(0, libMesh::CONSTANT);
+      const std::vector<Point> & normals = fe->get_normals();
+      for (const auto s : make_range(edge3->n_sides()))
+      {
+        const std::unique_ptr<const Elem> face = edge3->build_side_ptr(s);
+        fe->attach_quadrature_rule(&qface);
+        fe->reinit(edge3.get(), s, TOLERANCE);
+        const Point n1 = edge3->side_vertex_average_normal(s);
+        LIBMESH_ASSERT_FP_EQUAL(normals[0](0), n1(0), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(normals[0](1), n1(1), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(normals[0](2), n1(2), TOLERANCE*TOLERANCE);
+      }
     }
   }
 
