@@ -295,6 +295,8 @@ protected:
         MeshRefinement refine(*_mesh);
         refine.uniformly_refine(n_refinements);
       }
+#else
+    CPPUNIT_ASSERT_EQUAL(n_refinements, 0u);
 #endif // LIBMESH_ENABLE_AMR
   }
 
@@ -358,11 +360,13 @@ public:
 
 #ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST( checkCouplingFunctorQuad );
-  CPPUNIT_TEST( checkCouplingFunctorQuadUnifRef );
   CPPUNIT_TEST( checkCouplingFunctorTri );
-  CPPUNIT_TEST( checkCouplingFunctorTriUnifRef );
   CPPUNIT_TEST( checkOverlappingPartitioner );
+# ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( checkCouplingFunctorQuadUnifRef );
+  CPPUNIT_TEST( checkCouplingFunctorTriUnifRef );
   CPPUNIT_TEST( checkOverlappingPartitionerUnifRef );
+# endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -424,6 +428,8 @@ private:
         refine.uniformly_refine(n_refinements);
         _es->reinit();
       }
+#else
+    CPPUNIT_ASSERT_EQUAL(n_refinements, 0u);
 #endif
 
     System & system = _es->get_system("SimpleSystem");
@@ -459,6 +465,8 @@ private:
         refine.uniformly_refine(n_refinements);
         _es->reinit();
       }
+#else
+    CPPUNIT_ASSERT_EQUAL(n_refinements, 0u);
 #endif // LIBMESH_ENABLE_AMR
 
     System & system = _es->get_system("SimpleSystem");
