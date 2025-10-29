@@ -150,6 +150,7 @@ public:
   }
 
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   template <typename MeshType>
   void testWriteExodus(const std::string & filename)
   {
@@ -158,7 +159,6 @@ public:
 
     setupTests(mesh, equation_systems);
 
-#ifdef LIBMESH_HAVE_EXODUS_API
     // Make sure any previous reads are done before the writing starts
     TestCommWorld->barrier();
 
@@ -188,14 +188,14 @@ public:
       exio.copy_nodal_solution(sys2, var_name, var_name, 1);
 
     testSolution(read_mesh, sys2);
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }
-
 
   void testWriteExodusReplicated() { LOG_UNIT_TEST; testWriteExodus<ReplicatedMesh>("rep.e"); }
   void testWriteExodusDistributed() { LOG_UNIT_TEST; testWriteExodus<DistributedMesh>("dist.e"); }
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
 
+#ifdef LIBMESH_HAVE_NEMESIS_API
   template <typename MeshType>
   void testWriteNemesis(const std::string & filename)
   {
@@ -204,7 +204,6 @@ public:
 
     setupTests(mesh, equation_systems);
 
-#ifdef LIBMESH_HAVE_NEMESIS_API
     // Make sure any previous reads are done before the writing starts
     TestCommWorld->barrier();
 
@@ -235,13 +234,11 @@ public:
 
     // FIXME - Nemesis still needs work for vector-valued variables
     // testSolution(read_mesh, sys2);
-#else
-    libmesh_ignore(filename);
-#endif // #ifdef LIBMESH_HAVE_NEMESIS_API
   }
 
   void testWriteNemesisReplicated() { LOG_UNIT_TEST; testWriteNemesis<ReplicatedMesh>("rep.nem"); }
   void testWriteNemesisDistributed() { LOG_UNIT_TEST; testWriteNemesis<DistributedMesh>("dist.nem"); }
+#endif // #ifdef LIBMESH_HAVE_NEMESIS_API
 
 };
 
