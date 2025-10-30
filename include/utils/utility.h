@@ -220,38 +220,6 @@ vector_at(const Vector & vec,
 }
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-/**
- * Utility::iota was created back when std::iota was just an
- * SGI STL extension.
- */
-template <typename ForwardIter, typename T>
-void iota (ForwardIter first, ForwardIter last, T value)
-{
-  // Use std::iota instead!
-  libmesh_deprecated();
-
-  while (first != last)
-    {
-      *first = value++;
-      ++first;
-    }
-}
-
-
-/**
- * Utility::is_sorted was created back when std::is_sorted was just an
- * SGI STL extension.
- */
-template<class InputIterator >
-bool is_sorted(InputIterator first, InputIterator last)
-{
-  libmesh_deprecated();
-  return std::is_sorted(first, last);
-}
-#endif // LIBMESH_ENABLE_DEPRECATED
-
-
 /**
  * The STL provides \p std::binary_search() which returns \p true or
  * \p false depending on whether the searched-for value is found.  In
