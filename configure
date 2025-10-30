@@ -48765,7 +48765,7 @@ then :
 printf "%s\n" "$as_me: WARNING: --enable/disable-forward-declare-enums is now deprecated" >&2;}
 fi
 
-$enablefwdenums=yes
+enablefwdenums=yes
 
 # --------------------------------------------------------------
 
