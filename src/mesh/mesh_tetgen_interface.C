@@ -124,7 +124,7 @@ void TetGenMeshInterface::triangulate_pointset ()
   // To the naked eye, a few smoothing iterations usually looks better.
   // We don't do this by default.
   if (this->_smooth_after_generating)
-    LaplaceMeshSmoother(this->_mesh).smooth(2);
+    LaplaceMeshSmoother(this->_mesh, 2).smooth();
 }
 
 
@@ -179,7 +179,7 @@ void TetGenMeshInterface::pointset_convexhull ()
   // To the naked eye, a few smoothing iterations usually looks better.
   // We don't do this by default.
   if (this->_smooth_after_generating)
-    LaplaceMeshSmoother(this->_mesh).smooth(2);
+    LaplaceMeshSmoother(this->_mesh, 2).smooth();
 }
 
 
@@ -370,7 +370,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
   // To the naked eye, a few smoothing iterations usually looks better.
   // We don't do this by default.
   if (this->_smooth_after_generating)
-    LaplaceMeshSmoother(_mesh).smooth(2);
+    LaplaceMeshSmoother(_mesh, 2).smooth();
 }
 
 

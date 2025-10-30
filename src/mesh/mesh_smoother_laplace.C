@@ -34,17 +34,11 @@
 namespace libMesh
 {
 // LaplaceMeshSmoother member functions
-LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh & mesh)
-  : MeshSmoother(mesh),
-    _initialized(false)
-{
-}
+LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh &mesh,
+                                         const unsigned int n_iterations)
+    : MeshSmoother(mesh), _initialized(false), _n_iterations(n_iterations) {}
 
-
-
-
-void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
-{
+void LaplaceMeshSmoother::smooth() {
   if (!_initialized)
     this->init();
 
@@ -63,7 +57,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
   // determined. We store the new positions here
   std::vector<Point> new_positions;
 
-  for (unsigned int n=0; n<n_iterations; n++)
+  for (unsigned int n=0; n<_n_iterations; n++)
     {
       new_positions.resize(_mesh.max_node_id());
 
@@ -118,7 +112,7 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
       Parallel::sync_dofobject_data_by_id
         (_mesh.comm(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);
 
-    } // end for n_iterations
+    } // end for _n_iterations
 
   // finally adjust the second order nodes (those located between vertices)
   // these nodes will be located between their adjacent nodes
@@ -152,8 +146,14 @@ void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
     }
 }
 
-
-
+#ifdef LIBMESH_ENABLE_DEPRECATED
+void LaplaceMeshSmoother::smooth(unsigned int n_iterations)
+{
+  libmesh_deprecated();
+  _n_iterations = n_iterations;
+  this->smooth();
+}
+#endif
 
 
 void LaplaceMeshSmoother::init()

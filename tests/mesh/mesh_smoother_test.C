@@ -1007,7 +1007,7 @@ public:
   void testLaplaceQuad()
   {
     ReplicatedMesh mesh(*TestCommWorld);
-    LaplaceMeshSmoother laplace(mesh);
+    LaplaceMeshSmoother laplace(mesh, 8);
 
     testLaplaceSmoother(mesh, laplace, QUAD4);
   }
@@ -1015,7 +1015,7 @@ public:
   void testLaplaceTri()
   {
     ReplicatedMesh mesh(*TestCommWorld);
-    LaplaceMeshSmoother laplace(mesh);
+    LaplaceMeshSmoother laplace(mesh, 8);
 
     testLaplaceSmoother(mesh, laplace, TRI3);
   }

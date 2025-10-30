@@ -429,7 +429,7 @@ void Poly2TriTriangulator::triangulate()
   // To the naked eye, a few smoothing iterations usually looks better,
   // so we do this by default unless the user says not to.
   if (this->_smooth_after_generating)
-    LaplaceMeshSmoother(_mesh).smooth(2);
+    LaplaceMeshSmoother(_mesh, 2).smooth();
 
   // The user might have requested TRI6 or higher instead of TRI3.  We
   // can do this before prepare_for_use() because all we need for it

@@ -2248,8 +2248,8 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
   // The meshes could probably use some smoothing.
   if (mesh.mesh_dimension() > 1)
     {
-      LaplaceMeshSmoother smoother(mesh);
-      smoother.smooth(n_smooth);
+      LaplaceMeshSmoother smoother(mesh, n_smooth);
+      smoother.smooth();
     }
 
   // We'll give the whole sphere surface a boundary id of 0

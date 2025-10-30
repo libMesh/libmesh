@@ -47,9 +47,28 @@ public:
   /**
    * Constructor.  Sets the constant mesh reference
    * in the protected data section of the class.
+   * @param n_iterations The number of smoothing iterations to be performed.
    */
-  explicit
-  LaplaceMeshSmoother(UnstructuredMesh & mesh);
+  explicit LaplaceMeshSmoother(UnstructuredMesh &mesh,
+                               const unsigned int n_iterations);
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  /**
+   * Constructor. Sets the constant mesh reference
+   * in the protected data section of the class.
+   *
+   * \deprecated This constructor has been deprecated in favor of the
+   * (UnstructuredMesh, const unsigned int) constructor. By specifying the
+   * number of smoothing iterations in the constructor, there is no need to pass
+   * this parameter to the smooth method. As such, the smooth method's signature
+   * will match that of the parent class and the sister VariationalMeshSmoother
+   * class.
+   */
+  explicit LaplaceMeshSmoother(UnstructuredMesh &mesh)
+      : LaplaceMeshSmoother(mesh, 1) {
+    libmesh_deprecated();
+  }
+#endif
 
   /**
    * Destructor.
@@ -58,18 +77,21 @@ public:
 
   /**
    * Redefinition of the smooth function from the
-   * base class.  All this does is call the smooth
-   * function in this class which takes an int, using
-   * a default value of 1.
+   * base class.
    */
-  virtual void smooth() override { this->smooth(1); }
+  virtual void smooth() override;
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
    * The actual smoothing function, gets called whenever
    * the user specifies an actual number of smoothing
    * iterations.
+   *
+   * \deprecated The number of iterations should be set in the class constructor.
+   * The parameterless smooth() override should be used to smooth.
    */
   void smooth(unsigned int n_iterations);
+#endif
 
   /**
    * Initialization for the Laplace smoothing routine
@@ -102,6 +124,11 @@ private:
    * Data structure for holding the L-graph
    */
   std::vector<std::vector<dof_id_type>> _graph;
+
+  /**
+  * Number of smoothing iterations to perform
+  */
+  unsigned int _n_iterations;
 };
 
 
