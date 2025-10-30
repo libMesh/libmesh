@@ -15,6 +15,8 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include "libmesh/mesh_refinement.h"
+
 using namespace libMesh;
 
 static const Real b = 1.0;
@@ -185,6 +187,10 @@ public:
 #if defined(LIBMESH_HAVE_SOLVER)
   CPPUNIT_TEST( testTempJump );
   CPPUNIT_TEST( testTempJumpRefine );
+  // This test intentionally triggers find_neighbors() consistency check
+  // failure after AMR refinement across disconnected interfaces.
+  // Expected: libmesh_assert_valid_neighbors() fails.
+  CPPUNIT_TEST_EXCEPTION(testTempJumpLocalRefineFail, std::exception);
 #endif
   CPPUNIT_TEST_SUITE_END();
 
@@ -387,8 +393,22 @@ private:
   }
 
 
+  void testTempJumpLocalRefineFail()
+  {
+    try
+    {
+      Mesh mesh(*TestCommWorld, 2);
+      build_split_mesh_with_interface(mesh, true);
+    }
+    catch (const std::exception &e)
+    {
+      CPPUNIT_ASSERT(std::string(e.what()).find("Mesh contains disconnected boundary interfaces") != std::string::npos);
+      throw;
+    }
+  }
+
   // The interface is located at x = 0.5; nx must be even (split evenly into left and right subdomains)
-  void build_split_mesh_with_interface(Mesh &mesh)
+  void build_split_mesh_with_interface(Mesh &mesh, bool test_local_refinement = false)
   {
     // Ensure nx is even so the interface aligns with element boundaries
     libmesh_error_msg_if(nx % 2 != 0, "nx must be even!");
@@ -495,7 +515,25 @@ private:
     mesh.add_disconnected_boundaries(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
 
     mesh.prepare_for_use();
+
+#if LIBMESH_ENABLE_AMR
+    if (test_local_refinement)
+      {
+      // set refinement flags
+      for (auto & elem : mesh.element_ptr_range())
+        {
+            const Real xmid = elem->vertex_average()(0);
+            if ((xmid < 0.5 && xmid > 0.5 - dx) ||
+                (xmid > 0.5 && xmid < 0.5 + dx))
+                elem->set_refinement_flag(Elem::REFINE);
+        }
+
+      // refine
+      MeshRefinement(mesh).refine_elements();
+      }
+#endif
   }
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( DisconnectedNeighborTest );

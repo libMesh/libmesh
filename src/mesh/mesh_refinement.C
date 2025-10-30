@@ -684,6 +684,25 @@ bool MeshRefinement::refine_elements ()
   // This function must be run on all processors at once
   parallel_object_only();
 
+  // Prevent refinement when the mesh has disconnected boundaries.
+  //
+  // Disconnected boundary interfaces violate the topological continuity
+  // assumed by the refinement algorithm. Refinement on such meshes can
+  // produce invalid neighbor relationships (for example reverse indices
+  // equal to invalid_uint), which may trigger assertions like
+  // `rev < neigh->n_neighbors()` or corrupt neighbor data.
+  //
+  // For safety, refinement is disabled while disconnected boundaries are
+  // present.
+  if (_mesh.get_disconnected_boundaries())
+    {
+      libmesh_error_msg(
+        "Mesh contains disconnected boundary interfaces; refinement is disabled.\n"
+        "MeshRefinement::refine_elements() cannot proceed because disconnected\n"
+        "boundaries may produce invalid neighbor relations. Please remove or\n"
+        "repair disconnected boundary interfaces before attempting refinement.");
+    }
+
   if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
 
