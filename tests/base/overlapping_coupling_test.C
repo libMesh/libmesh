@@ -515,7 +515,9 @@ public:
 
   CPPUNIT_TEST( testGhostingCouplingMatrix );
   CPPUNIT_TEST( testGhostingNullCouplingMatrix );
+#ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( testGhostingNullCouplingMatrixUnifRef );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -635,7 +637,9 @@ public:
 
   CPPUNIT_TEST( testSparsityCouplingMatrix );
   CPPUNIT_TEST( testSparsityNullCouplingMatrix );
+#ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( testSparsityNullCouplingMatrixUnifRef );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
