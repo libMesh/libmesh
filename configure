@@ -63450,13 +63450,13 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
           cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-          #include "metaphysicl/numberarray.h"
+          #include "metaphysicl/raw_type.h"
 
 int
 main (void)
 {
 
-              MetaPhysicL::NumberArray<4, double> x;
+              MetaPhysicL::RawType<double> x;
 
   ;
   return 0;
