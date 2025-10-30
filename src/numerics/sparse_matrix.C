@@ -537,8 +537,7 @@ void SparseMatrix<T>::read(const std::string & filename)
 #ifndef LIBMESH_HAVE_PETSC
       libmesh_error_msg("Cannot load PETSc matrix file " <<
                         filename << " without PETSc-enabled libMesh.");
-#endif
-#if LIBMESH_DOF_ID_BYTES != 8
+#elif LIBMESH_DOF_ID_BYTES != 8
       libmesh_error_msg("Cannot load 64-bit PETSc matrix file " <<
                         filename << " with non-64-bit libMesh.");
 #endif
@@ -549,8 +548,7 @@ void SparseMatrix<T>::read(const std::string & filename)
 #ifndef LIBMESH_HAVE_PETSC
       libmesh_error_msg("Cannot load PETSc matrix file " <<
                         filename << " without PETSc-enabled libMesh.");
-#endif
-#if LIBMESH_DOF_ID_BYTES != 4
+#elif LIBMESH_DOF_ID_BYTES != 4
       libmesh_error_msg("Cannot load 32-bit PETSc matrix file " <<
                         filename << " with non-32-bit libMesh.");
 #endif
