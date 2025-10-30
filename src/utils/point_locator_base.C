@@ -22,6 +22,7 @@
 #include "libmesh/point_locator_tree.h"
 #include "libmesh/elem.h"
 #include "libmesh/enum_point_locator_type.h"
+#include "libmesh/mesh_base.h"
 #include "libmesh/point_locator_nanoflann.h"
 
 namespace libMesh
@@ -152,5 +153,30 @@ locate_node(const Point & p,
 
   return nullptr;
 }
+
+
+#ifndef NDEBUG
+void PointLocatorBase::libmesh_assert_valid_point_locator ()
+{
+  // We might only have been built with TREE_LOCAL_ELEMENTS as an
+  // option; let's just check local elements to be safe.
+  for (const Elem * elem : this->_mesh.active_local_element_ptr_range())
+    {
+      // For non-Lagrange mappings, we might have nodes that are
+      // really control points, not contained in the element they
+      // define; we can only safely check containment of vertices.
+      auto range = make_range(0u, (elem->mapping_type() == LAGRANGE_MAP) ?
+                                 elem->n_nodes() : elem->n_vertices());
+
+        for (auto n : range)
+          {
+            const Node & node = elem->node_ref(n);
+            std::set<const Elem *> candidate_elements;
+            this->operator()(node, candidate_elements);
+            libmesh_assert(candidate_elements.count(elem));
+          }
+    }
+}
+#endif
 
 } // namespace libMesh
