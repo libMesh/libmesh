@@ -73,9 +73,9 @@ AC_DEFUN([CONFIGURE_METAPHYSICL],
           CXXFLAGS="$CXXFLAGS $METAPHYSICL_INC"
 
           AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-          @%:@include "metaphysicl/numberarray.h"
+          @%:@include "metaphysicl/raw_type.h"
           ]], [[
-              MetaPhysicL::NumberArray<4, double> x;
+              MetaPhysicL::RawType<double> x;
           ]])],[
               enablemetaphysicl=yes
               AC_MSG_RESULT(yes)
