@@ -6,7 +6,7 @@
   typedef std::map<ElemType, std::string> FileMapType;
   FileMapType ref_elem_file;
 
-static const char* one_node =
+static const char* one_nodeelem =
 "libMesh-0.7.0+\n"
 "1	 # number of elements\n"
 "1	 # number of nodes\n"

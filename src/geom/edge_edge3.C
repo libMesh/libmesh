@@ -265,6 +265,7 @@ Real Edge3::volume () const
 }
 
 
+
 BoundingBox Edge3::loose_bounding_box () const
 {
   // This might be a curved line through 2-space or 3-space, in which
