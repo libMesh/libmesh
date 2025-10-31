@@ -126,20 +126,6 @@ unsigned int RBParametrized::get_n_discrete_params() const
     (get_discrete_parameter_values().size());
 }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-std::set<std::string> RBParametrized::get_parameter_names() const
-{
-  libmesh_deprecated();
-  libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::get_parameter_names");
-
-  std::set<std::string> parameter_names;
-  for (const auto & pr : parameters_min)
-    parameter_names.insert(pr.first);
-
-  return parameter_names;
-}
-#endif // LIBMESH_ENABLE_DEPRECATED
-
 bool RBParametrized::set_parameters(const RBParameters & params)
 {
   libmesh_error_msg_if(!parameters_initialized, "Error: parameters not initialized in RBParametrized::set_parameters");
