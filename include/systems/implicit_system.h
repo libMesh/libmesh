@@ -141,17 +141,6 @@ public:
   virtual std::pair<unsigned int, Real>
   get_linear_solve_parameters() const;
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * Currently a no-op.
-   *
-   * \deprecated This function no longer needs to be called, since
-   * get_linear_solver() no longer returns a heap-allocated dumb
-   * pointer.
-   */
-  virtual void release_linear_solver(LinearSolver<Number> *) const;
-#endif // LIBMESH_ENABLE_DEPRECATED
-
   /**
    * Assembles a residual in \p rhs and/or a jacobian in \p matrix,
    * as requested.
