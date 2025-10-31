@@ -112,6 +112,7 @@ public:
   CPPUNIT_TEST( testExodusCopyNodalSolutionReplicated );
   CPPUNIT_TEST( testExodusCopyElementSolutionReplicated );
   CPPUNIT_TEST( testExodusReadHeader );
+  CPPUNIT_TEST( testExodusSetUniqueIdsFromMaps );
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testExodusIGASidesets );
   CPPUNIT_TEST( testLowOrderEdgeBlocks );
@@ -333,6 +334,15 @@ public:
 
 
 #ifdef LIBMESH_HAVE_EXODUS_API
+  void testExodusSetUniqueIdsFromMaps()
+  {
+    LOG_UNIT_TEST;
+
+    ReplicatedMesh mesh(*TestCommWorld);
+    ExodusII_IO exii(mesh);
+    exii.read("meshes/nontrivial_node_num_map.exo");
+  }
+
   void testExodusReadHeader ()
   {
     LOG_UNIT_TEST;
