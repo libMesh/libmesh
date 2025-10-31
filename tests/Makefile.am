@@ -217,6 +217,7 @@ data = matrices/geom_1_extraction_op.h5 \
        meshes/non_manifold_junction1.exo \
        meshes/non_manifold_junction2.exo \
        meshes/non_manifold_junction3.exo \
+       meshes/nontrivial_node_num_map.exo \
        meshes/Cluster_34.stl \
        meshes/engraving.stl \
        meshes/quad4_tri3_smoothed.xda.gz \
