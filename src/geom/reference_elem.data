@@ -6,6 +6,20 @@
   typedef std::map<ElemType, std::string> FileMapType;
   FileMapType ref_elem_file;
 
+static const char* one_nodeelem =
+"libMesh-0.7.0+\n"
+"1	 # number of elements\n"
+"1	 # number of nodes\n"
+".	 # boundary condition specification file\n"
+"n/a	 # subdomain id specification file\n"
+"n/a	 # processor id specification file\n"
+"n/a	 # p-level specification file\n"
+"1	 # n_elem at level 0, [ type (n0 ... nN-1) ]\n"
+"27 0\n"
+"0.0000000000000000e+00 0.0000000000000000e+00 0.0000000000000000e+00\n"
+"1	 # number of boundary conditions\n"
+"0 0 0\n"
+;
 
 static const char* one_edge =
 "libMesh-0.7.0+\n"
