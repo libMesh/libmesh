@@ -338,9 +338,33 @@ public:
   {
     LOG_UNIT_TEST;
 
+    // This test requires that libmesh is compiled with unique_ids enabled
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
     ReplicatedMesh mesh(*TestCommWorld);
     ExodusII_IO exii(mesh);
+
+    // Set Node/Elem unique ids based on the node/elem_num_map
+    exii.set_unique_ids_from_maps(true);
+
+    // Read the mesh, which contains the following non-trivial node_num_map:
+    // node_num_map =    1,   3, 9,    8,   2,   5,    7,    6,    4
+    // coordx       =  0.5, 0.5, 0,    0, 0.5,   0, -0.5, -0.5, -0.5
+    // coordy       = -0.5,   0, 0, -0.5, 0.5, 0.5,    0, -0.5,  0.5
     exii.read("meshes/nontrivial_node_num_map.exo");
+
+    // Verify the results. The following is a (zero-based) version of
+    // the node_num_map as it exists in the file.
+    std::vector<unique_id_type> expected_unique_ids = {0, 2, 8, 7, 1, 4, 6, 5, 3};
+    for (auto i : index_range(expected_unique_ids))
+      {
+        // Debugging:
+        // libMesh::out << "unique_id for node " << i
+        //              << " = " << mesh.node_ptr(i)->unique_id()
+        //              << std::endl;
+
+        CPPUNIT_ASSERT_EQUAL(mesh.node_ptr(i)->unique_id(), expected_unique_ids[i]);
+      }
+#endif
   }
 
   void testExodusReadHeader ()
