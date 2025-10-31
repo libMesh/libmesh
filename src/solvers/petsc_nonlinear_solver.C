@@ -150,17 +150,6 @@ extern "C"
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  PetscErrorCode
-  __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *)
-  {
-    PetscFunctionBegin;
-    libmesh_deprecated();
-    PetscFunctionReturn(libmesh_petsc_snes_monitor(nullptr, its, fnorm, nullptr));
-  }
-#endif
-
-
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the residual at X
   PetscErrorCode
@@ -237,16 +226,6 @@ extern "C"
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  PetscErrorCode
-  __libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx)
-  {
-    PetscFunctionBegin;
-    libmesh_deprecated();
-    PetscFunctionReturn(libmesh_petsc_snes_residual(snes, x, r, ctx));
-  }
-#endif
-
   //-----------------------------------------------------------------------------------------
   // this function is called by PETSc to approximate the Jacobian at X via finite differences
   PetscErrorCode
@@ -291,16 +270,6 @@ extern "C"
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  PetscErrorCode
-  __libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx)
-  {
-    PetscFunctionBegin;
-    libmesh_deprecated();
-    PetscFunctionReturn(libmesh_petsc_snes_fd_residual(snes, x, r, ctx));
-  }
-#endif
 
   //----------------------------------------------------------------
   // this function is called by PETSc to approximate Jacobian-vector
@@ -425,16 +394,6 @@ extern "C"
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  PetscErrorCode
-  __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r)
-  {
-    PetscFunctionBegin;
-    libmesh_deprecated();
-    PetscFunctionReturn(libmesh_petsc_snes_mffd_interface(ctx, x, r));
-  }
-#endif
 
   //---------------------------------------------------------------
   // this function is called by PETSc to evaluate the Jacobian at X
@@ -578,16 +537,6 @@ extern "C"
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  PetscErrorCode
-  __libmesh_petsc_snes_jacobian(SNES snes, Vec x, Mat jac, Mat pc, void * ctx)
-  {
-    PetscFunctionBegin;
-    libmesh_deprecated();
-    PetscFunctionReturn(libmesh_petsc_snes_jacobian(snes, x, jac, pc, ctx));
-  }
-#endif
-
   // This function gets called by PETSc after the SNES linesearch is
   // complete.  We use it to exactly enforce any constraints on the
   // solution which may have drifted during the linear solve.  In the
@@ -669,15 +618,6 @@ extern "C"
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  PetscErrorCode __libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context)
-  {
-    PetscFunctionBegin;
-    libmesh_deprecated();
-    PetscFunctionReturn(libmesh_petsc_snes_postcheck(nullptr, x, y, w, changed_y, changed_w, context));
-  }
-#endif
 
   PetscErrorCode libmesh_petsc_snes_precheck(SNESLineSearch, Vec X, Vec Y, PetscBool * changed, void * context)
   {
