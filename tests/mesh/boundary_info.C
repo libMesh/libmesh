@@ -29,6 +29,7 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
   CPPUNIT_TEST( testRenumber );
+  CPPUNIT_TEST( testInternalBoundary );
 # if LIBMESH_DIM > 2
   CPPUNIT_TEST( testSelectiveRenumber );
 # endif
@@ -1109,6 +1110,52 @@ public:
           }
       }
   }
+
+
+  void testInternalBoundary()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    // Build a 2x2 QUAD4 structured mesh on [0,1]x[0,1].
+    MeshTools::Generation::build_square(mesh,
+                                        2, 2,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    const unsigned int internal_side = 1; // east side for left elems
+    const boundary_id_type BID = 7;
+
+    mesh.prepare_for_use();
+
+    Elem * left_bottom_elem = nullptr;
+    for (auto & elem : mesh.active_element_ptr_range())
+      {
+        if (elem->processor_id() != mesh.processor_id())
+          continue;
+
+        const Point c = elem->vertex_average();
+        if (c(0) < 0.5 && c(1) < 0.5 && elem->neighbor_ptr(internal_side) != nullptr)
+          {
+            left_bottom_elem = elem;
+            break;
+          }
+      }
+
+
+    if (left_bottom_elem)
+      {
+        bi.add_side(left_bottom_elem, internal_side, BID);
+
+        const unsigned int found_side = bi.side_with_boundary_id(left_bottom_elem, BID);
+        CPPUNIT_ASSERT_EQUAL(internal_side, found_side);
+      }
+  }
+
 
 };
 
