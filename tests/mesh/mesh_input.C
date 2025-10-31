@@ -334,10 +334,11 @@ public:
 
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-  void testExodusSetUniqueIdsFromMaps()
-  {
-    LOG_UNIT_TEST;
 
+  void testExodusSetUniqueIdsFromMaps_implementation(
+    bool set_unique_ids,
+    const std::vector<unique_id_type> & expected_unique_ids)
+  {
     // This test requires that libmesh is compiled with unique_ids enabled
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
     {
@@ -345,17 +346,12 @@ public:
       ExodusII_IO exii(mesh);
 
       // Set Node/Elem unique ids based on the node/elem_num_map
-      exii.set_unique_ids_from_maps(true);
+      exii.set_unique_ids_from_maps(set_unique_ids);
 
-      // Read the mesh, which contains the following non-trivial node_num_map:
-      // node_num_map =    1,   3, 9,    8,   2,   5,    7,    6,    4
-      // coordx       =  0.5, 0.5, 0,    0, 0.5,   0, -0.5, -0.5, -0.5
-      // coordy       = -0.5,   0, 0, -0.5, 0.5, 0.5,    0, -0.5,  0.5
+      // Read the mesh
       exii.read("meshes/nontrivial_node_num_map.exo");
 
-      // Verify the results. The following is a (zero-based) version of
-      // the node_num_map as it exists in the file.
-      std::vector<unique_id_type> expected_unique_ids = {0, 2, 8, 7, 1, 4, 6, 5, 3};
+      // Verify the results.
       for (auto i : index_range(expected_unique_ids))
         {
           // Debugging:
@@ -366,41 +362,34 @@ public:
           CPPUNIT_ASSERT_EQUAL(mesh.node_ptr(i)->unique_id(), expected_unique_ids[i]);
         }
     }
+#else
+    // Prevent compiler warnings about unused variables when
+    // unique_ids are not enabled.
+    libmesh_ignore(set_unique_ids, expected_unique_ids);
+#endif // LIBMESH_ENABLE_UNIQUE_ID
+  } // end testExodusSetUniqueIdsFromMaps_implementation()
 
-    {
-      // Same test but of the standard libmesh behavior (set Node ids
-      // based on node_num_map, rather than unique_ids)
-      ReplicatedMesh mesh(*TestCommWorld);
-      ExodusII_IO exii(mesh);
 
-      // Set Node/Elem unique ids based on the node/elem_num_map
-      exii.set_unique_ids_from_maps(false);
 
-      // Read the mesh, which contains the following non-trivial node_num_map:
-      // node_num_map =    1,   3, 9,    8,   2,   5,    7,    6,    4
-      // coordx       =  0.5, 0.5, 0,    0, 0.5,   0, -0.5, -0.5, -0.5
-      // coordy       = -0.5,   0, 0, -0.5, 0.5, 0.5,    0, -0.5,  0.5
-      exii.read("meshes/nontrivial_node_num_map.exo");
+  void testExodusSetUniqueIdsFromMaps()
+  {
+    LOG_UNIT_TEST;
 
-      // Verify the results. The following is the (zero-based)
-      // _position_ of the (one-based) id "i" in the node_num_map, as
-      // it exists in the file. For example, zero-based Node id 3
-      // corresponds to one-based Node id 4, which appears in
-      // (zero-based) position 8 in the node_num_map, hence: 3 -> 8,
-      // etc.
-      //                                            i = 0,  1, 2, 3, 4, 5, 6, 7, 8
-      std::vector<unique_id_type> expected_unique_ids = {0, 4, 1, 8, 5, 7, 6, 3, 2};
-      for (auto i : index_range(expected_unique_ids))
-        {
-          // Debugging:
-          // libMesh::out << "unique_id for node " << i
-          //              << " = " << mesh.node_ptr(i)->unique_id()
-          //              << std::endl;
+    // node_num_map =    1,   3, 9,    8,   2,   5,    7,    6,    4
+    // The input is a (zero-based) version of the node_num_map as it
+    // exists in the file.
+    this->testExodusSetUniqueIdsFromMaps_implementation(
+      /*set_unique_ids=*/true,
+      /*expected_unique_ids=*/{0, 2, 8, 7, 1, 4, 6, 5, 3});
 
-          CPPUNIT_ASSERT_EQUAL(mesh.node_ptr(i)->unique_id(), expected_unique_ids[i]);
-        }
-    }
-#endif
+    // The input is the (zero-based) _position_ of the (one-based) id
+    // "i" in the node_num_map, as it exists in the file. For example,
+    // zero-based Node id 3 corresponds to one-based Node id 4, which
+    // appears in (zero-based) position 8 in the node_num_map, hence:
+    // 3 -> 8, etc.
+    this->testExodusSetUniqueIdsFromMaps_implementation(
+      /*set_unique_ids=*/false,
+      /*expected_unique_ids=*/{0, 4, 1, 8, 5, 7, 6, 3, 2});
   }
 
   void testExodusReadHeader ()
