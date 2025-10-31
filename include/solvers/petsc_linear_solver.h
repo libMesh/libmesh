@@ -64,20 +64,6 @@ extern "C"
    * ctx will hold the Preconditioner.
    */
   PetscErrorCode libmesh_petsc_preconditioner_apply(PC, Vec x, Vec y);
-
-#if LIBMESH_ENABLE_DEPRECATED
-  /**
-   * This function is called by PETSc to initialize the preconditioner.
-   * ctx will hold the Preconditioner.
-   */
-  PetscErrorCode __libmesh_petsc_preconditioner_setup (PC);
-
-  /**
-   * This function is called by PETSc to actually apply the preconditioner.
-   * ctx will hold the Preconditioner.
-   */
-  PetscErrorCode __libmesh_petsc_preconditioner_apply(PC, Vec x, Vec y);
-#endif
 } // end extern "C"
 
 
