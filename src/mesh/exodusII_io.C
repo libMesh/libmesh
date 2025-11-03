@@ -494,6 +494,12 @@ void ExodusII_IO::read (const std::string & fname)
           // Assign the current subdomain to this Elem
           uelem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id);
 
+          // Determine the libmesh elem id implied by "j". The
+          // get_libmesh_elem_id() helper function expects a 1-based
+          // Exodus elem id, so we construct the "implied" Exodus elem
+          // id from "j" by adding 1.
+          // auto libmesh_elem_id = exio_helper->get_libmesh_elem_id(/*exodus_elem_id=*/j+1);
+
           // Use the elem_num_map to obtain the ID of this element in
           // the Exodus file.  Make sure we aren't reading garbage if
           // the file is corrupt.

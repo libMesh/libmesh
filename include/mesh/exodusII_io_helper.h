@@ -306,12 +306,13 @@ public:
                                  std::map<dof_id_type, Real> & elem_var_value_map);
 
   /**
-   * Helper function that takes a (1-based) Exodus node id and
-   * determines the corresponding libMesh Node id. Takes into account
-   * whether the user has chosen to set the Node unique ids based on
-   * the node_num_map or to let libMesh set them.
+   * Helper function that takes a (1-based) Exodus node/elem id and
+   * determines the corresponding libMesh Node/Elem id. Takes into account
+   * whether the user has chosen to set the Node/Elem unique ids based on
+   * the {node,elem}_num_map or to let libMesh set them.
    */
   dof_id_type get_libmesh_node_id(int exodus_node_id);
+  dof_id_type get_libmesh_elem_id(int exodus_elem_id);
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for writing.
