@@ -347,38 +347,9 @@ void ExodusII_IO::read (const std::string & fname)
                            << libmesh_node_id
                            << "!");
 
-      // If the _set_unique_ids_from_maps flag is true, then set the
-      // unique_id for "added_node" based on the (zero-based version of)
-      // node_num_map[i] value.
-      if (_set_unique_ids_from_maps)
-      {
-        // Use the node_num_map to get a 1-based Exodus Node ID
-        int exodus_mapped_id = exio_helper->node_num_map[i];
-
-        // Exodus ids are always 1-based while libmesh ids are always
-        // 0-based, so to make a libmesh unique_id here, we subtract 1
-        // from the exodus_mapped_id to make it 0-based.
-        auto exodus_mapped_id_zero_based =
-          cast_int<dof_id_type>(exodus_mapped_id - 1);
-
-        // Set added_node's unique_id to "exodus_mapped_id_zero_based".
-        added_node->set_unique_id(cast_int<unique_id_type>(exodus_mapped_id_zero_based));
-
-        // Normally the Mesh is responsible for setting the unique_ids
-        // of Nodes in a consistent manner, so when we set the unique_id
-        // of a Node manually based on the node_num_map, we need to
-        // make sure that the "next" unique id assigned by the Mesh
-        // will still be valid. We do this by making sure that the
-        // next_unique_id is greater than the one we set manually. The
-        // APIs for doing this are only defined when unique ids are
-        // enabled.
-        // Note: it's not generally safe to call mesh.parallel_max_unique_id()
-        // here because the Exodus reader might only be called on one processor.
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-        unique_id_type next_unique_id = mesh.next_unique_id();
-        mesh.set_next_unique_id(std::max(next_unique_id, exodus_mapped_id_zero_based + 1));
-#endif
-      }
+      // If the _set_unique_ids_from_maps flag is true, set the
+      // unique_id for "node", otherwise do nothing.
+      exio_helper->set_node_unique_id(mesh, added_node, i);
 
       // If we have a set of spline weights, these nodes are going to
       // be used as control points for Bezier elements, and we need

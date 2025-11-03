@@ -2213,9 +2213,41 @@ dof_id_type ExodusII_IO_Helper::get_libmesh_elem_id(int exodus_elem_id)
 }
 
 void
-ExodusII_IO_Helper::set_elem_unique_id(MeshBase & mesh,
-                                       Elem * elem,
-                                       int zero_based_elem_num_map_index)
+ExodusII_IO_Helper::set_node_unique_id(
+  MeshBase & mesh, Node * node, int zero_based_node_num_map_index)
+{
+  if (this->set_unique_ids_from_maps)
+  {
+    // Use the node_num_map to get a 1-based Exodus Node ID
+    int exodus_mapped_id = this->node_num_map[zero_based_node_num_map_index];
+
+    // Exodus ids are always 1-based while libmesh ids are always
+    // 0-based, so to make a libmesh unique_id here, we subtract 1
+    // from the exodus_mapped_id to make it 0-based.
+    auto exodus_mapped_id_zero_based =
+      cast_int<dof_id_type>(exodus_mapped_id - 1);
+
+    // Set added_node's unique_id to "exodus_mapped_id_zero_based".
+    node->set_unique_id(cast_int<unique_id_type>(exodus_mapped_id_zero_based));
+
+    // Normally the Mesh is responsible for setting the unique_ids
+    // of Nodes/Elems in a consistent manner, so when we set the unique_id
+    // of a Node/Elem manually based on the {node,elem}_num_map, we need to
+    // make sure that the "next" unique id assigned by the Mesh
+    // will still be valid. We do this by making sure that the
+    // next_unique_id is greater than the one we set manually. The
+    // APIs for doing this are only defined when unique ids are
+    // enabled.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+    unique_id_type next_unique_id = mesh.next_unique_id();
+    mesh.set_next_unique_id(std::max(next_unique_id, exodus_mapped_id_zero_based + 1));
+#endif
+  }
+}
+
+void
+ExodusII_IO_Helper::set_elem_unique_id(
+  MeshBase & mesh, Elem * elem, int zero_based_elem_num_map_index)
 {
   if (this->set_unique_ids_from_maps)
   {

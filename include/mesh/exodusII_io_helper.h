@@ -315,14 +315,15 @@ public:
   dof_id_type get_libmesh_elem_id(int exodus_elem_id);
 
   /**
-   * Helper function that sets the unique_id of the passed-in Elem if
-   * _set_unique_ids_from_maps == true, does nothing if that flag is
-   * false. The input index is assumed to be a zero-based index into
-   * the elem_num_map array.
+   * Helper function that sets the unique_id of the passed-in
+   * Node/Elem if _set_unique_ids_from_maps == true, does nothing if
+   * that flag is false. The input index is assumed to be a zero-based
+   * index into the {node,elem}_num_map array.
    */
-  void set_elem_unique_id(MeshBase & mesh,
-                          Elem * elem,
-                          int zero_based_elem_num_map_index);
+  void set_node_unique_id(
+    MeshBase & mesh, Node * node, int zero_based_node_num_map_index);
+  void set_elem_unique_id(
+    MeshBase & mesh, Elem * elem, int zero_based_elem_num_map_index);
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for writing.
