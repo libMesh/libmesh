@@ -367,6 +367,8 @@ CLEANFILES = cube_mesh.xda \
              output.dat \
              periodic.e \
              M.m \
+             Mzipped.m.gz \
+             M.h5 \
              mesh.out.memory.moved.xda \
              mesh.out.file.moved.xda \
              repl_with_nodal_soln.nem.1.0 \

@@ -21,12 +21,13 @@
 
 #define SPARSEMATRIXTEST                     \
   CPPUNIT_TEST(testGetAndSet);               \
+  CPPUNIT_TEST(testReadHDF5);                \
   CPPUNIT_TEST(testReadMatlab1);             \
   CPPUNIT_TEST(testReadMatlab2);             \
   CPPUNIT_TEST(testReadMatlab4);             \
-  CPPUNIT_TEST(testReadHDF5);                \
   CPPUNIT_TEST(testTransposeNorms);          \
-  CPPUNIT_TEST(testWriteAndRead);            \
+  CPPUNIT_TEST(testWriteAndReadHDF5);        \
+  CPPUNIT_TEST(testWriteAndReadMatlab);      \
   CPPUNIT_TEST(testClone);
 
 
@@ -221,7 +222,7 @@ public:
   }
 
 
-  void testWriteAndRead()
+  void testWriteAndRead(const std::string & filename)
   {
     LOG_UNIT_TEST;
 
@@ -229,12 +230,9 @@ public:
 
     // If we're working with serial matrices then just print one of
     // them so they don't step on the others' toes.
-    //
-    // Use a very short filename, because we had a bug with that and
-    // we want to test it.
     if (matrix->n_processors() > 1 ||
         TestCommWorld->rank() == 0)
-      matrix->print_matlab("M.m");
+      matrix->print(filename);
 
     matrix->clear();
 
@@ -249,11 +247,28 @@ public:
     return;
 #endif
 
-    matrix->read("M.m");
+    matrix->read(filename);
 
     TestCommWorld->barrier();
 
     testValues();
+  }
+
+  void testWriteAndReadHDF5()
+  {
+    testWriteAndRead("M.h5");
+  }
+
+
+  void testWriteAndReadMatlab()
+  {
+    // Use a very short filename, because we had a bug with that and
+    // we want to test it.
+    testWriteAndRead("M.m");
+
+#ifdef LIBMESH_HAVE_GZSTREAM
+    testWriteAndRead("Mzipped.m.gz");
+#endif
   }
 
   void testClone()
