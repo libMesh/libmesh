@@ -2135,12 +2135,14 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
       for (unsigned j=0; j<static_cast<unsigned>(num_elem_this_blk); j++)
         {
-          // Use the elem_num_map to obtain the ID of this element in the Exodus file,
-          // and remember to subtract 1 since libmesh is zero-based and Exodus is 1-based.
-          unsigned mapped_elem_id = this->elem_num_map[ex_el_num] - 1;
+          // Determine the libmesh id of the element with zero-based
+          // index "ex_el_num".  This function expects a one-based
+          // index, so we add 1 to ex_el_num when we pass it in.
+          auto libmesh_elem_id =
+            this->get_libmesh_elem_id(ex_el_num + 1);
 
           // Store the elemental value in the map.
-          elem_var_value_map[mapped_elem_id] = block_elem_var_values[j];
+          elem_var_value_map[libmesh_elem_id] = block_elem_var_values[j];
 
           // Go to the next sequential element ID.
           ex_el_num++;
