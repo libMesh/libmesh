@@ -178,6 +178,9 @@ void init_ref_elem_table()
   {
     ref_elem_file.clear();
 
+    // 0D elements
+    ref_elem_file[NODEELEM] = ElemDataStrings::one_nodeelem;
+
     // 1D elements
     ref_elem_file[EDGE2]    = ElemDataStrings::one_edge;
     ref_elem_file[EDGE3]    = ElemDataStrings::one_edge3;
