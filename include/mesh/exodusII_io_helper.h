@@ -61,6 +61,7 @@ namespace libMesh
 
 // Forward declarations
 class MeshBase;
+class DofObject;
 
 /**
  * This is the \p ExodusII_IO_Helper class.  This class hides the
@@ -324,6 +325,18 @@ public:
     MeshBase & mesh, Node * node, int zero_based_node_num_map_index);
   void set_elem_unique_id(
     MeshBase & mesh, Elem * elem, int zero_based_elem_num_map_index);
+
+private:
+
+  /**
+   * Internal implementation for the two functions above.
+   */
+  void set_dof_object_unique_id(
+    MeshBase & mesh,
+    DofObject * dof_object,
+    int exodus_mapped_id);
+
+public:
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for writing.
