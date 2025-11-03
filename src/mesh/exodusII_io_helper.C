@@ -2754,8 +2754,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       ++counter;
     }
 
-  elem_num_map.resize(num_elem);
-  std::vector<int>::iterator curr_elem_map_end = elem_num_map.begin();
+  // Here we reserve() space so that we can push_back() onto the
+  // elem_num_map in the loops below.
+  this->elem_num_map.reserve(num_elem);
 
   // In the case of discontinuous plotting we initialize a map from
   // (element, node) pairs to the corresponding discontinuous node index.
@@ -2958,7 +2959,16 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // We need these later if we're adding fake sides, but we don't need
   // to recalculate it.
   auto num_elem_this_blk_it = num_elem_this_blk_vec.begin();
+
+  // We write "fake" ids to the elem_num_map when adding fake sides.
+  // I don't think it's too important exactly what fake ids are used,
+  // as long as they don't conflict with any other ids that are
+  // already in the elem_num_map.
   auto next_fake_id = mesh.max_elem_id() + 1; // 1-based numbering in Exodus
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (this->set_unique_ids_from_maps)
+    next_fake_id = mesh.next_unique_id();
+#endif
 
   for (auto & [subdomain_id, element_id_vec] : subdomain_map)
     {
@@ -3030,18 +3040,16 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                                      std::make_pair(elem_id, elem_node_index));
                 }
             } // end for(j)
-        } // end for(i)
 
-        // This transform command stores its result in a range that
-        // begins at the third argument, so this command is adding
-        // values to the elem_num_map vector starting from
-        // curr_elem_map_end.  Here we add 1 to each id to make a
-        // 1-based exodus file.
-        curr_elem_map_end = std::transform
-          (element_id_vec.begin(),
-           element_id_vec.end(),
-           curr_elem_map_end,
-           [](dof_id_type id){return id+1;});
+          // push_back() either elem_id+1 or the current Elem's
+          // unique_id+1 into the elem_num_map, depending on the value
+          // of the set_unique_ids_from_maps flag.
+          if (this->set_unique_ids_from_maps)
+            this->elem_num_map.push_back(elem.unique_id() + 1);
+          else
+            this->elem_num_map.push_back(elem_id + 1);
+
+        } // end for(i)
       }
       else // subdomain_id >= subdomain_id_end
       {
@@ -3082,12 +3090,11 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
               }
           }
 
-        auto old_curr_map_end = curr_elem_map_end;
-        curr_elem_map_end += num_elem_this_blk;
-
-        std::generate
-          (old_curr_map_end, curr_elem_map_end,
-           [&next_fake_id](){return next_fake_id++;});
+        // Store num_elem_this_blk "fake" ids into the
+        // elem_num_map. Use a traditional for-loop to avoid unused
+        // variable warnings about the loop counter.
+        for (unsigned int i=0; i<num_elem_this_blk; ++i)
+          this->elem_num_map.push_back(next_fake_id++);
       }
 
       ++num_elem_this_blk_it;
@@ -3100,7 +3107,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
          nullptr,        // elem_edge_conn (unused)
          nullptr);       // elem_face_conn (unused)
       EX_CHECK_ERR(ex_err, "Error writing element connectivities");
-    }
+    } // end for (auto & [subdomain_id, element_id_vec] : subdomain_map)
 
   // write out the element number map that we created
   ex_err = exII::ex_put_elem_num_map(ex_id, elem_num_map.data());
