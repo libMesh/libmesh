@@ -670,8 +670,8 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
                                   new_col_starts, new_col_stops;
 
   if (this->initialized() &&
-      num_cols == this->m() &&
-      num_rows == this->n())
+      num_cols == this->n() &&
+      num_rows == this->m())
     {
       new_row_start = this->row_start(),
       new_row_stop  = this->row_stop();
