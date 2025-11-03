@@ -2979,9 +2979,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // element ids to add.
       if (subdomain_id < subdomain_id_end)
       {
-      connect.resize(element_id_vec.size()*num_nodes_per_elem);
+        connect.resize(element_id_vec.size()*num_nodes_per_elem);
 
-      for (auto i : index_range(element_id_vec))
+        for (auto i : index_range(element_id_vec))
         {
           unsigned int elem_id = element_id_vec[i];
           libmesh_elem_num_to_exodus[elem_id] = ++libmesh_elem_num_to_exodus_counter; // 1-based indexing for Exodus
@@ -3029,8 +3029,8 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                     libmesh_map_find(discontinuous_node_indices,
                                      std::make_pair(elem_id, elem_node_index));
                 }
-            }
-        }
+            } // end for(j)
+        } // end for(i)
 
         // This transform command stores its result in a range that
         // begins at the third argument, so this command is adding
@@ -3043,10 +3043,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
            curr_elem_map_end,
            [](dof_id_type id){return id+1;});
       }
-      // If this is a "fake" block of added sides, we build those as
-      // we go.
-      else
+      else // subdomain_id >= subdomain_id_end
       {
+        // If this is a "fake" block of added sides, we build those as
+        // we go.
         libmesh_assert(_add_sides);
 
         libmesh_assert(num_elem_this_blk_it != num_elem_this_blk_vec.end());
