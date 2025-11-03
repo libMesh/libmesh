@@ -548,6 +548,7 @@ public:
 
     // Add multiple subdomains if requested
     std::unordered_map<subdomain_id_type, Real> distorted_subdomain_volumes;
+    subdomain_id_type highest_subdomain_id = 0;
     if (multiple_subdomains)
       {
         // Modify the subdomain ids in an interesting way
@@ -563,8 +564,25 @@ public:
         // This loop should NOT be combined with the one above because we need to
         // finish checking and updating subdomain ids for all elements before
         // recording the final subdomain volumes.
-        for (auto * elem : mesh.active_element_ptr_range())
-          distorted_subdomain_volumes[elem->subdomain_id()] += elem->volume();
+          for (auto *elem : mesh.active_element_ptr_range()) {
+            const auto sub_id = elem->subdomain_id();
+            // Don't double count an element's volume on multiple procs
+            if (elem->processor_id() != rank)
+              continue;
+            distorted_subdomain_volumes[sub_id] += elem->volume();
+            highest_subdomain_id = std::max(sub_id, highest_subdomain_id);
+          }
+
+          // Parallel communication
+          mesh.comm().max(highest_subdomain_id);
+          for (const auto sub_id : make_range(highest_subdomain_id + 1)) {
+            // Make sure sub_id exists in the map on this proc
+            if (distorted_subdomain_volumes.find(sub_id) ==
+                distorted_subdomain_volumes.end())
+              distorted_subdomain_volumes[sub_id] = 0.;
+
+            mesh.comm().sum(distorted_subdomain_volumes[sub_id]);
+          }
       }
 
     // Get the mesh order
@@ -688,17 +706,27 @@ public:
         // guarantee that the subdomain didn't change, it is a good indicator
         // and is friedly to sliding subdomain boundary nodes.
         std::unordered_map<subdomain_id_type, Real> smoothed_subdomain_volumes;
-        for (auto * elem : mesh.active_element_ptr_range())
+        for (auto *elem : mesh.active_element_ptr_range()) {
+          // Don't double count an element's volume on multiple procs
+          if (elem->processor_id() != rank)
+            continue;
           smoothed_subdomain_volumes[elem->subdomain_id()] += elem->volume();
+        }
 
-        for (const auto & pair : distorted_subdomain_volumes)
-          {
-            const auto & subdomain_id = pair.first;
-            CPPUNIT_ASSERT(
-                relative_fuzzy_equals(libmesh_map_find(distorted_subdomain_volumes, subdomain_id),
-                                      libmesh_map_find(smoothed_subdomain_volumes, subdomain_id),
-                                      TOLERANCE));
-          }
+        // Parallel communication
+        for (const auto sub_id : make_range(highest_subdomain_id + 1)) {
+          // Make sure sub_id exists in the map on this proc
+          if (smoothed_subdomain_volumes.find(sub_id) ==
+              smoothed_subdomain_volumes.end())
+            smoothed_subdomain_volumes[sub_id] = 0.;
+
+          mesh.comm().sum(smoothed_subdomain_volumes[sub_id]);
+        }
+
+        for (const auto sub_id : make_range(highest_subdomain_id + 1))
+          CPPUNIT_ASSERT(relative_fuzzy_equals(
+              libmesh_map_find(distorted_subdomain_volumes, sub_id),
+              libmesh_map_find(smoothed_subdomain_volumes, sub_id), TOLERANCE));
       }
     else
       {
