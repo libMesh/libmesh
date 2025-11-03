@@ -518,6 +518,143 @@ void SparseMatrix<T>::print_matlab(const std::string & name) const
 
 
 template <typename T>
+void SparseMatrix<T>::print_coreform_hdf5(const std::string & filename,
+                                          const std::string & groupname) const
+{
+#ifndef LIBMESH_HAVE_HDF5
+  libmesh_ignore(filename, groupname);
+  libmesh_error_msg("ERROR: need HDF5 support to handle .h5 files!!!");
+#else
+  LOG_SCOPE("print_coreform_hdf5()", "SparseMatrix");
+
+  const numeric_index_type first_dof = this->row_start(),
+                           end_dof   = this->row_stop();
+
+  std::vector<std::size_t> cols, row_offsets;
+  std::vector<double> vals;
+
+  if (this->processor_id() == 0)
+    row_offsets.push_back(0);
+
+  for (numeric_index_type i : make_range(first_dof, end_dof))
+    {
+      for (auto j : make_range(this->n()))
+        {
+          T c = (*this)(i,j);
+          if (c != static_cast<T>(0.0))
+            {
+              cols.push_back(j);
+              vals.push_back(c);
+            }
+        }
+      // This is a *local* row offset; proc 0 may need to adjust later
+      row_offsets.push_back(cols.size());
+    }
+
+  if (this->processor_id() == 0)
+    {
+      const hid_t file = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC,
+                                   H5P_DEFAULT, H5P_DEFAULT);
+      if (file == H5I_INVALID_HID)
+        libmesh_file_error(filename);
+
+      const hid_t group =
+        H5Gcreate2(file, groupname.c_str(), H5P_DEFAULT, H5P_DEFAULT,
+                   H5P_DEFAULT);
+      check_open(filename, group, groupname);
+
+      auto write_size_attribute = [&filename, &group]
+        (const std::string & attribute_name, unsigned long long writeval)
+      {
+        const hid_t fspace = H5Screate(H5S_SCALAR);
+        check_hdf5(filename, fspace, attribute_name + " fspace");
+
+        const hid_t attr = H5Acreate2(group, attribute_name.c_str(),
+                                      H5T_STD_I64LE, fspace,
+                                      H5P_DEFAULT, H5P_DEFAULT);
+        check_hdf5(filename, attr, attribute_name);
+
+        // HDF5 is supposed to handle both upscaling and endianness
+        // conversions here
+        const herr_t errval = H5Awrite(attr, H5T_NATIVE_ULLONG, &writeval);
+        check_hdf5(filename, errval, attribute_name + " write");
+
+        H5Aclose(attr);
+        H5Sclose(fspace);
+      };
+
+      write_size_attribute("num_cols", this->n());
+      write_size_attribute("num_rows", this->m());
+
+      auto write_vector = [&filename, &group]
+        (const std::string & dataname, auto hdf5_file_type,
+         auto hdf5_native_type, auto & datavec)
+      {
+        const hsize_t len[1] = {cast_int<hsize_t>(datavec.size())};
+
+        const hid_t space = H5Screate_simple(1, len, nullptr);
+        check_hdf5(filename, space, dataname + " space");
+
+        const hid_t data =
+          H5Dcreate2(group, dataname.c_str(), hdf5_file_type, space,
+                     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        check_hdf5(filename, data, dataname + " data");
+
+        const hid_t errval =
+          H5Dwrite(data, hdf5_native_type, H5S_ALL, H5S_ALL,
+                   H5P_DEFAULT, datavec.data());
+        check_hdf5(filename, errval, dataname + " write");
+
+        H5Dclose(data);
+        H5Sclose(space);
+      };
+
+      std::vector<std::size_t> vals_sizes, first_dofs;
+      this->comm().gather(0, vals.size(), vals_sizes);
+      this->comm().gather(0, cast_int<std::size_t>(first_dof), first_dofs);
+      first_dofs.push_back(this->m());
+
+      this->comm().allgather(cols);
+      this->comm().allgather(vals);
+      this->comm().allgather(row_offsets);
+
+      libmesh_assert_equal_to(vals.size(),
+                              cols.size());
+      libmesh_assert_equal_to(vals.size(),
+                              std::accumulate(vals_sizes.begin(),
+                                              vals_sizes.end(),
+                                              std::size_t(0)));
+
+      std::size_t extra_offset = 0;
+      for (auto p : make_range(processor_id_type(1), this->n_processors()))
+        {
+          extra_offset += vals_sizes[p-1];
+          for (auto i : make_range(first_dofs[p]+1, first_dofs[p+1]+1))
+            row_offsets[i] += extra_offset;
+        }
+
+      write_vector("cols", H5T_STD_U64LE, H5T_NATIVE_ULLONG, cols);
+      write_vector("row_offsets", H5T_STD_U64LE, H5T_NATIVE_ULLONG, row_offsets);
+      write_vector("vals", H5T_IEEE_F64LE, H5T_NATIVE_DOUBLE, vals);
+
+      H5Gclose(group);
+      H5Fclose(file);
+    }
+  else
+    {
+      std::vector<std::size_t> dummy;
+      this->comm().gather(0, vals.size(), dummy);
+      this->comm().gather(0, cast_int<std::size_t>(first_dof), dummy);
+      this->comm().allgather(cols);
+      this->comm().allgather(vals);
+      this->comm().allgather(row_offsets);
+    }
+#endif // LIBMESH_HAVE_HDF5
+}
+
+
+
+template <typename T>
 void SparseMatrix<T>::print_petsc_binary(const std::string &)
 {
   libmesh_not_implemented_msg
