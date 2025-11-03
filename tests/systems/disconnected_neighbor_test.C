@@ -187,10 +187,12 @@ public:
 #if defined(LIBMESH_HAVE_SOLVER)
   CPPUNIT_TEST( testTempJump );
   CPPUNIT_TEST( testTempJumpRefine );
+#ifdef LIBMESH_ENABLE_AMR
   // This test intentionally triggers find_neighbors() consistency check
   // failure after AMR refinement across disconnected interfaces.
   // Expected: libmesh_assert_valid_neighbors() fails.
   CPPUNIT_TEST_EXCEPTION(testTempJumpLocalRefineFail, std::exception);
+#endif
 #endif
   CPPUNIT_TEST_SUITE_END();
 
