@@ -734,6 +734,8 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
 
         errval = H5Dread(data, hdf5_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, datavec.data());
         check_hdf5(filename, errval, dataname + " read");
+
+        H5Dclose(data);
       };
 
       read_vector("cols", H5T_INTEGER, H5T_NATIVE_ULLONG, cols);
@@ -810,6 +812,9 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
             }
           this->set(current_row, cols[i], vals[i]);
         }
+
+      H5Gclose(group);
+      H5Fclose(file);
     }
 
   this->close();
