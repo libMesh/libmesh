@@ -1486,6 +1486,12 @@ void ExodusII_IO_Helper::read_elem_num_map ()
 
   if (num_elem)
     {
+      // The elem_num_map may contain ids larger than num_elem.  In
+      // other words, the elem_num_map is not necessarily just a
+      // permutation of the "trivial" 1,2,3,...  mapping, it can
+      // contain effectively "any" numbers. Therefore, to get
+      // "_end_elem_id", we need to check what the max entry in the
+      // elem_num_map is.
       auto it = std::max_element(elem_num_map.begin(), elem_num_map.end());
       _end_elem_id = *it;
     }

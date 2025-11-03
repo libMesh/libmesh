@@ -399,6 +399,13 @@ void ExodusII_IO::read (const std::string & fname)
 
           // Give the NodeElem ids at the end, so we can match any
           // existing ids in the file for other elements
+          //
+          // We don't set the unique_id for this NodeElem here even if
+          // the user has set the _set_unique_ids_from_maps flag
+          // because these NodeElems don't have entries in the
+          // elem_num_map. Therefore, we just let the Mesh assign
+          // whatever unique_id is "next" as the Elem is added to the
+          // Mesh.
           elem->set_id() = exio_helper->end_elem_id() + i;
 
           elem->set_node(0, added_node);
