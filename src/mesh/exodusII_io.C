@@ -869,14 +869,10 @@ void ExodusII_IO::read (const std::string & fname)
         std::map<Elem *, MeshBase::elemset_type> elem_to_elemsets;
         for (auto e : index_range(exio_helper->elemset_list))
           {
-            // Follow standard (see sideset case above) approach for
-            // converting the ids stored in the elemset_list to
-            // libmesh Elem ids.
-            //
-            // TODO: this should be moved to a helper function so we
-            // don't duplicate the code.
-            dof_id_type libmesh_elem_id =
-              cast_int<dof_id_type>(exio_helper->elem_num_map[exio_helper->elemset_list[e] - 1] - 1);
+           // Call helper function to get the libmesh Elem id for the
+           // e'th entry in the current elemset_list.
+           dof_id_type libmesh_elem_id =
+             exio_helper->get_libmesh_elem_id(exio_helper->elemset_list[e]);
 
             // Get a pointer to this Elem
             Elem * elem = mesh.elem_ptr(libmesh_elem_id);
