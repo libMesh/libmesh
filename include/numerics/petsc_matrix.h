@@ -249,9 +249,9 @@ public:
 
   virtual void print_matlab(const std::string & name = "") const override;
 
-  virtual void print_petsc_binary(const std::string & filename) override;
+  virtual void print_petsc_binary(const std::string & filename) const override;
 
-  virtual void print_petsc_hdf5(const std::string & filename) override;
+  virtual void print_petsc_hdf5(const std::string & filename) const override;
 
   virtual void read_petsc_binary(const std::string & filename) override;
 

@@ -655,7 +655,7 @@ void SparseMatrix<T>::print_coreform_hdf5(const std::string & filename,
 
 
 template <typename T>
-void SparseMatrix<T>::print_petsc_binary(const std::string &)
+void SparseMatrix<T>::print_petsc_binary(const std::string &) const
 {
   libmesh_not_implemented_msg
     ("libMesh cannot write PETSc binary-format files from non-PETSc matrices");
@@ -664,7 +664,7 @@ void SparseMatrix<T>::print_petsc_binary(const std::string &)
 
 
 template <typename T>
-void SparseMatrix<T>::print_petsc_hdf5(const std::string &)
+void SparseMatrix<T>::print_petsc_hdf5(const std::string &) const
 {
   libmesh_not_implemented_msg
     ("libMesh cannot write PETSc HDF5-format files from non-PETSc matrices");

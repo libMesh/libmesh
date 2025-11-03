@@ -688,21 +688,25 @@ void PetscMatrix<T>::_petsc_viewer(const std::string & filename,
 
 
 template <typename T>
-void PetscMatrix<T>::print_petsc_binary(const std::string & filename)
+void PetscMatrix<T>::print_petsc_binary(const std::string & filename) const
 {
   libmesh_assert (this->initialized());
 
-  this->_petsc_viewer(filename, PETSCVIEWERBINARY, FILE_MODE_WRITE);
+  // Our helper here isn't const-correct for writes
+  PetscMatrix<T> * nonconst_this = const_cast<PetscMatrix<T>*>(this);
+  nonconst_this->_petsc_viewer(filename, PETSCVIEWERBINARY, FILE_MODE_WRITE);
 }
 
 
 
 template <typename T>
-void PetscMatrix<T>::print_petsc_hdf5(const std::string & filename)
+void PetscMatrix<T>::print_petsc_hdf5(const std::string & filename) const
 {
   libmesh_assert (this->initialized());
 
-  this->_petsc_viewer(filename, PETSCVIEWERHDF5, FILE_MODE_WRITE);
+  // Our helper here isn't const-correct for writes
+  PetscMatrix<T> * nonconst_this = const_cast<PetscMatrix<T>*>(this);
+  nonconst_this->_petsc_viewer(filename, PETSCVIEWERHDF5, FILE_MODE_WRITE);
 }
 
 
