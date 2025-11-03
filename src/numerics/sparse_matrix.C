@@ -52,6 +52,29 @@
 #include <regex>
 #endif
 
+// Anonymous namespace for helper functions
+namespace
+{
+#ifdef LIBMESH_HAVE_HDF5
+  void check_open(const std::string & filename,
+                  hid_t id,
+                  const std::string & objname)
+  {
+    if (id == H5I_INVALID_HID)
+      libmesh_error_msg("Couldn't open " + objname + " in " + filename);
+
+  }
+
+  template <typename T>
+  void check_hdf5(const std::string & filename, T hdf5val, const std::string & objname)
+  {
+    if (hdf5val < 0)
+      libmesh_error_msg("HDF5 error from " + objname + " in " + filename);
+  };
+#endif
+}
+
+
 
 namespace libMesh
 {
@@ -584,41 +607,30 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
 
   std::size_t num_rows, num_cols;
 
-  hid_t group;
-
-  auto check_open = [&filename](hid_t id, const std::string & objname)
-  {
-    if (id == H5I_INVALID_HID)
-      libmesh_error_msg("Couldn't open " + objname + " in " + filename);
-  };
-
-  auto check_hdf5 = [&filename](auto hdf5val, const std::string & objname)
-  {
-    if (hdf5val < 0)
-      libmesh_error_msg("HDF5 error from " + objname + " in " + filename);
-  };
-
+  // These are only used on pid 0, but avoid "uninitialized" warnings
+  hid_t group = H5I_INVALID_HID;
+  hid_t file = H5I_INVALID_HID;
 
   if (this->processor_id() == 0)
     {
-      const hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+      file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
       if (file == H5I_INVALID_HID)
         libmesh_file_error(filename);
 
       group = H5Gopen(file, groupname.c_str(), H5P_DEFAULT);
-      check_open(group, groupname);
+      check_open(filename, group, groupname);
 
-      auto read_size_attribute = [&filename, &group, &check_open, &check_hdf5]
+      auto read_size_attribute = [&filename, &group]
         (const std::string & attribute_name)
       {
         unsigned long long returnval = 0;
 
         const hid_t attr = H5Aopen(group, attribute_name.c_str(), H5P_DEFAULT);
-        check_open(attr, attribute_name);
+        check_open(filename, attr, attribute_name);
 
         const hid_t attr_type = H5Aget_type(attr);
-        check_hdf5(attr_type, attribute_name + " type");
+        check_hdf5(filename, attr_type, attribute_name + " type");
 
         // HDF5 will convert between the file's integer type and ours, but
         // we do expect an integer type.
@@ -629,8 +641,8 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
 
         // HDF5 is supposed to handle both upscaling and endianness
         // conversions here
-        herr_t errval = H5Aread(attr, H5T_NATIVE_ULLONG, &returnval);
-        check_hdf5(errval, attribute_name + " read");
+        const herr_t errval = H5Aread(attr, H5T_NATIVE_ULLONG, &returnval);
+        check_hdf5(filename, errval, attribute_name + " read");
 
         H5Aclose(attr);
 
@@ -690,15 +702,15 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
 
   if (this->processor_id() == 0)
     {
-      auto read_vector = [&filename, &group, &check_open, &check_hdf5]
+      auto read_vector = [&filename, &group]
         (const std::string & dataname, auto hdf5_class,
          auto hdf5_type, auto & datavec)
       {
         const hid_t data = H5Dopen1(group, dataname.c_str());
-        check_open(data, dataname.c_str());
+        check_open(filename, data, dataname.c_str());
 
         const hid_t data_type = H5Dget_type(data);
-        check_hdf5(data_type, dataname + " type");
+        check_hdf5(filename, data_type, dataname + " type");
 
         // HDF5 will convert between the file's integer type and ours, but
         // we do expect an integer type.
@@ -708,7 +720,7 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
         H5Tclose(data_type);
 
         const hid_t dataspace = H5Dget_space(data);
-        check_hdf5(dataspace, dataname + " space");
+        check_hdf5(filename, dataspace, dataname + " space");
 
         int ndims = H5Sget_simple_extent_ndims(dataspace);
         if (ndims != 1)
@@ -716,12 +728,12 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
 
         hsize_t len, maxlen;
         herr_t errval = H5Sget_simple_extent_dims(dataspace, &len, &maxlen);
-        check_hdf5(errval, dataname + " dims");
+        check_hdf5(filename, errval, dataname + " dims");
 
         datavec.resize(len);
 
         errval = H5Dread(data, hdf5_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, datavec.data());
-        check_hdf5(errval, dataname + " read");
+        check_hdf5(filename, errval, dataname + " read");
       };
 
       read_vector("cols", H5T_INTEGER, H5T_NATIVE_ULLONG, cols);
