@@ -457,7 +457,7 @@ public:
     MeshTools::Modification::redistribute(mesh, dh);
 
     const auto & boundary_info = mesh.get_boundary_info();
-    const auto &rank = mesh.comm().rank();
+    const auto & proc_id = mesh.processor_id();
 
     if (tangle_mesh)
       {
@@ -490,7 +490,7 @@ public:
           // return the node id and spatial coordinates for the node with the
           // smallest distance
           auto get_closet_point_accross_all_procs =
-              [&mesh, &rank](const std::map<dof_id_type, Real> &dist_map) {
+              [&mesh, &proc_id](const std::map<dof_id_type, Real> &dist_map) {
                 // Iterator to the map entry with the smallest distance
                 auto min_it =
                     std::min_element(dist_map.begin(), dist_map.end(),
@@ -510,7 +510,7 @@ public:
                 Point node;
                 processor_id_type broadcasting_proc = 0;
                 if (d_min_local == d_min_global) {
-                  broadcasting_proc = rank;
+                  broadcasting_proc = proc_id;
                   node_id = min_it->first;
                   node = mesh.node_ref(node_id);
                 }
@@ -567,7 +567,7 @@ public:
           for (auto *elem : mesh.active_element_ptr_range()) {
             const auto sub_id = elem->subdomain_id();
             // Don't double count an element's volume on multiple procs
-            if (elem->processor_id() != rank)
+            if (elem->processor_id() != proc_id)
               continue;
             distorted_subdomain_volumes[sub_id] += elem->volume();
             highest_subdomain_id = std::max(sub_id, highest_subdomain_id);
@@ -708,7 +708,7 @@ public:
         std::unordered_map<subdomain_id_type, Real> smoothed_subdomain_volumes;
         for (auto *elem : mesh.active_element_ptr_range()) {
           // Don't double count an element's volume on multiple procs
-          if (elem->processor_id() != rank)
+          if (elem->processor_id() != proc_id)
             continue;
           smoothed_subdomain_volumes[elem->subdomain_id()] += elem->volume();
         }
@@ -1069,7 +1069,7 @@ public:
 #ifdef LIBMESH_ENABLE_VSMOOTHER
   void testVariationalEdge2()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, EDGE2);
@@ -1077,7 +1077,7 @@ public:
 
   void testVariationalEdge3()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, EDGE3);
@@ -1085,7 +1085,7 @@ public:
 
   void testVariationalEdge3MultipleSubdomains()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, EDGE3, true);
@@ -1093,7 +1093,7 @@ public:
 
   void testVariationalQuad4()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD4);
@@ -1101,7 +1101,7 @@ public:
 
   void testVariationalQuad4MultipleSubdomains()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD4, true);
@@ -1109,7 +1109,7 @@ public:
 
   void testVariationalQuad8()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD8);
@@ -1117,7 +1117,7 @@ public:
 
   void testVariationalQuad9()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD9);
@@ -1125,7 +1125,7 @@ public:
 
   void testVariationalQuad9MultipleSubdomains()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD9, true);
@@ -1133,7 +1133,7 @@ public:
 
   void testVariationalQuad4Tangled()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD4, false, true, 0.65);
@@ -1141,7 +1141,7 @@ public:
 
   void testVariationalTri3()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TRI3);
@@ -1149,7 +1149,7 @@ public:
 
   void testVariationalTri6()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TRI6);
@@ -1157,7 +1157,7 @@ public:
 
   void testVariationalTri6MultipleSubdomains()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TRI3, true);
@@ -1165,7 +1165,7 @@ public:
 
   void testVariationalHex8()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX8);
@@ -1173,7 +1173,7 @@ public:
 
   void testVariationalHex20()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX20);
@@ -1181,7 +1181,7 @@ public:
 
   void testVariationalHex27()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX27);
@@ -1189,7 +1189,7 @@ public:
 
   void testVariationalHex27MultipleSubdomains()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX27, true);
@@ -1197,7 +1197,7 @@ public:
 
   void testVariationalHex27Tangled()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX27, false, true, 0.55);
@@ -1205,7 +1205,7 @@ public:
 
   void testVariationalPyramid5()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PYRAMID5);
@@ -1213,7 +1213,7 @@ public:
 
   void testVariationalPyramid13()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PYRAMID13);
@@ -1221,7 +1221,7 @@ public:
 
   void testVariationalPyramid14()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PYRAMID14);
@@ -1229,7 +1229,7 @@ public:
 
   void testVariationalPyramid18()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PYRAMID18);
@@ -1237,7 +1237,7 @@ public:
 
   void testVariationalPyramid18MultipleSubdomains()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh, 0.0);
 
     testVariationalSmoother(mesh, variational, PYRAMID18, true);
@@ -1245,7 +1245,7 @@ public:
 
   void testVariationalPrism6()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PRISM6);
@@ -1253,7 +1253,7 @@ public:
 
   void testVariationalPrism15()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PRISM15);
@@ -1261,7 +1261,7 @@ public:
 
   void testVariationalPrism18()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(
         mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
 
@@ -1270,7 +1270,7 @@ public:
 
   void testVariationalPrism20()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(
         mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
 
@@ -1279,7 +1279,7 @@ public:
 
   void testVariationalPrism21()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(
         mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
 
@@ -1288,7 +1288,7 @@ public:
 
   void testVariationalPrism21MultipleSubdomains()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     mesh.allow_renumbering(false);
     VariationalMeshSmoother variational(mesh);
 
@@ -1297,7 +1297,7 @@ public:
 
   void testVariationalTet4()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TET4);
@@ -1305,7 +1305,7 @@ public:
 
   void testVariationalTet10()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TET10);
@@ -1313,7 +1313,7 @@ public:
 
   void testVariationalTet14()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TET14);
@@ -1321,7 +1321,7 @@ public:
 
   void testVariationalTet14MultipleSubdomains()
   {
-    DistributedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TET14, true);

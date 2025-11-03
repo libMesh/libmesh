@@ -342,7 +342,7 @@ void VariationalSmootherConstraint::constrain()
 {
   const auto & mesh = _sys.get_mesh();
   const auto dim = mesh.mesh_dimension();
-  const auto &rank = mesh.comm().rank();
+  const auto & proc_id = mesh.processor_id();
 
   // Only compute the node to elem map once
   std::unordered_map<dof_id_type, std::vector<const Elem *>> nodes_to_elem_map;
@@ -378,7 +378,7 @@ void VariationalSmootherConstraint::constrain()
                   // We leave the responsibility of computing the constraint to
                   // the proc that owns the node.
                   if (subdomain_boundary_map.count(node.id()) ||
-                      node.processor_id() != rank)
+                      node.processor_id() != proc_id)
                     continue;
 
                   // Get the relevant nodal neighbors for the subdomain constraint
@@ -421,7 +421,7 @@ void VariationalSmootherConstraint::constrain()
       const auto & node = mesh.node_ref(bid);
       // We leave the responsibility of computing the constraint to the proc
       // that owns the node.
-      if (node.processor_id() != rank)
+      if (node.processor_id() != proc_id)
         continue;
 
       // Get the relevant nodal neighbors for the boundary constraint
