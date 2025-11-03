@@ -193,7 +193,6 @@ libmesh_SOURCES =  \
         src/geom/surface.C \
         src/ghosting/default_coupling.C \
         src/ghosting/ghost_point_neighbors.C \
-        src/ghosting/disconnected_neighbor_coupling.C \
         src/ghosting/non_manifold_coupling.C \
         src/ghosting/overlap_coupling.C \
         src/ghosting/point_neighbor_coupling.C \
@@ -476,4 +475,4 @@ libmesh_SOURCES =  \
         src/utils/tree.C \
         src/utils/tree_node.C \
         src/utils/utility.C \
-        src/utils/xdr_cxx.C
+        src/utils/xdr_cxx.C 

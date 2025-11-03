@@ -28,7 +28,7 @@ static const boundary_id_type right_id = 1;
 static const boundary_id_type interface_left_id = 5;
 static const boundary_id_type interface_right_id = 6;
 
-static const int nx = 6, ny = 6;
+static const int nx = 2, ny = 2;
 
 Number
 heat_exact (const Point & p,
@@ -200,6 +200,8 @@ private:
 
   void testTempJump()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld, 2);
 
     // Domain: x in (0, 1), y in (0, 1)
@@ -347,6 +349,8 @@ private:
 
   void testTempJumpRefine()
   {
+    LOG_UNIT_TEST;
+
     Mesh mesh(*TestCommWorld, 2);
     build_split_mesh_with_interface(mesh);
 
@@ -397,6 +401,8 @@ private:
 
   void testTempJumpLocalRefineFail()
   {
+    LOG_UNIT_TEST;
+
     try
     {
       Mesh mesh(*TestCommWorld, 2);

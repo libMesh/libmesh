@@ -176,7 +176,6 @@ include_HEADERS =  \
         geom/surface.h \
         ghosting/default_coupling.h \
         ghosting/ghost_point_neighbors.h \
-        ghosting/disconnected_neighbor_coupling.h \
         ghosting/ghosting_functor.h \
         ghosting/non_manifold_coupling.h \
         ghosting/overlap_coupling.h \
@@ -515,4 +514,4 @@ include_HEADERS =  \
         utils/utility.h \
         utils/vectormap.h \
         utils/win_gettimeofday.h \
-        utils/xdr_cxx.h
+        utils/xdr_cxx.h 

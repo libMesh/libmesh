@@ -202,6 +202,10 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _node_integer_default_values = std::move(other_mesh._node_integer_default_values);
   _point_locator_close_to_point_tol = other_mesh.get_point_locator_close_to_point_tol();
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _disconnected_boundary_pairs = std::move(other_mesh._disconnected_boundary_pairs);
+#endif
+
   // This relies on our subclasses *not* invalidating pointers when we
   // do their portion of the move assignment later!
   boundary_info = std::move(other_mesh.boundary_info);
@@ -307,6 +311,12 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (bool(_partitioner) != bool(other_mesh._partitioner))
     return false;
   if (*boundary_info != *other_mesh.boundary_info)
+    return false;
+  // First check whether the "existence" of the two pointers differs (one present, one absent)
+  if ((bool)_disconnected_boundary_pairs != (bool)other_mesh._disconnected_boundary_pairs)
+    return false;
+  // If both exist, compare the contents
+  if (_disconnected_boundary_pairs && (*_disconnected_boundary_pairs != *other_mesh._disconnected_boundary_pairs))
     return false;
 
   const constraint_rows_type & other_rows =

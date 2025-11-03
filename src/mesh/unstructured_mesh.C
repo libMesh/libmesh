@@ -50,9 +50,6 @@
 // for disconnected neighbors
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
-
-#include <libmesh/disconnected_neighbor_coupling.h>
-
 namespace {
 
 using namespace libMesh;
@@ -1035,9 +1032,6 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                 }
             }
         }
-
-      // Ghost the disconnected elements
-      this->add_ghosting_functor(std::make_unique<DisconnectedNeighborCoupling>(*this));
     }
 #endif // LIBMESH_ENABLE_PERIODIC
 
@@ -1847,6 +1841,14 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
   // We rely on neighbor links here
   MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
+
+  auto * this_db = this->get_disconnected_boundaries();
+  auto * other_db = (other_mesh ? other_mesh->get_disconnected_boundaries() : nullptr);
+
+  const bool have_disc_bdys = ((this_db && !this_db->empty()) ||
+                              (other_db && !other_db->empty()));
+  if (have_disc_bdys)
+    libmesh_not_implemented_msg("stitching meshes with disconnected boundaries is not supported yet.");
 
   // We can't even afford any unset neighbor links here.
   if (!this->is_prepared())

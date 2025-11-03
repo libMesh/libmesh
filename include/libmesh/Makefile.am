@@ -166,7 +166,6 @@ BUILT_SOURCES = \
         surface.h \
         default_coupling.h \
         ghost_point_neighbors.h \
-        disconnected_neighbor_coupling.h \
         ghosting_functor.h \
         non_manifold_coupling.h \
         overlap_coupling.h \
@@ -1096,9 +1095,6 @@ default_coupling.h: $(top_srcdir)/include/ghosting/default_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ghost_point_neighbors.h: $(top_srcdir)/include/ghosting/ghost_point_neighbors.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-disconnected_neighbor_coupling.h: $(top_srcdir)/include/ghosting/disconnected_neighbor_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 ghosting_functor.h: $(top_srcdir)/include/ghosting/ghosting_functor.h

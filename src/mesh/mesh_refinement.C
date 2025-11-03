@@ -696,11 +696,8 @@ bool MeshRefinement::refine_elements ()
   // present.
   if (_mesh.get_disconnected_boundaries())
     {
-      libmesh_error_msg(
-        "Mesh contains disconnected boundary interfaces; refinement is disabled.\n"
-        "MeshRefinement::refine_elements() cannot proceed because disconnected\n"
-        "boundaries may produce invalid neighbor relations. Please remove or\n"
-        "repair disconnected boundary interfaces before attempting refinement.");
+      libmesh_not_implemented_msg(
+        "Mesh refinement is not yet implemented for meshes with disconnected boundary interfaces.\n");
     }
 
   if (_face_level_mismatch_limit)

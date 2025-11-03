@@ -1846,7 +1846,7 @@ public:
 
 protected:
 
- #ifdef LIBMESH_ENABLE_PERIODIC
+#ifdef LIBMESH_ENABLE_PERIODIC
   /// @brief The disconnected boundary id pairs.
   std::unique_ptr<PeriodicBoundaries> _disconnected_boundary_pairs;
 #endif
