@@ -492,14 +492,25 @@ public:
           // smallest distance
           auto get_closet_point_accross_all_procs =
               [&mesh, &proc_id](const std::map<dof_id_type, Real> &dist_map) {
-                // Iterator to the map entry with the smallest distance
-                auto min_it =
-                    std::min_element(dist_map.begin(), dist_map.end(),
-                                     [](const auto &a, const auto &b) {
-                                       return a.second < b.second;
-                                     });
 
-                const auto &d_min_local = min_it->second;
+                processor_id_type broadcasting_proc = 0;
+                Real d_min_local = std::numeric_limits<Real>::max();
+                dof_id_type node_id = DofObject::invalid_id;
+
+                // Only execute this if this proc owns any nodes. Otherwise,
+                // use default values defined above
+                if (dist_map.size())
+                {
+                  // Iterator to the map entry with the smallest distance
+                  auto min_it =
+                      std::min_element(dist_map.begin(), dist_map.end(),
+                                       [](const auto &a, const auto &b) {
+                                         return a.second < b.second;
+                                       });
+
+                  node_id = min_it->first;
+                  d_min_local = min_it->second;
+                }
 
                 // Get the smallest distance accross all procs
                 auto d_min_global = d_min_local;
@@ -507,12 +518,9 @@ public:
 
                 // Find the proc id, node_id, and spatial coordinantes for the
                 // node with the smallest distance
-                dof_id_type node_id;
                 Point node;
-                processor_id_type broadcasting_proc = 0;
                 if (d_min_local == d_min_global) {
                   broadcasting_proc = proc_id;
-                  node_id = min_it->first;
                   node = mesh.node_ref(node_id);
                 }
 
