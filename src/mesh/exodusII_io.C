@@ -508,36 +508,9 @@ void ExodusII_IO::read (const std::string & fname)
           // Catch the Elem pointer that the Mesh throws back
           Elem * elem = mesh.add_elem(std::move(uelem));
 
-          // If the _set_unique_ids_from_maps flag is true, then set the
-          // unique_id for "elem" based on the (zero-based version of)
-          // elem_num_map[j] value.
-          if (_set_unique_ids_from_maps)
-          {
-            // Use the elem_num_map to get a 1-based Exodus Node ID
-            int exodus_mapped_id = exio_helper->elem_num_map[j];
-
-            // Exodus ids are always 1-based while libmesh ids are always
-            // 0-based, so to make a libmesh unique_id here, we subtract 1
-            // from the exodus_mapped_id to make it 0-based.
-            auto exodus_mapped_id_zero_based =
-              cast_int<dof_id_type>(exodus_mapped_id - 1);
-
-            // Set elem's unique_id to "exodus_mapped_id_zero_based".
-            elem->set_unique_id(cast_int<unique_id_type>(exodus_mapped_id_zero_based));
-
-            // Normally the Mesh is responsible for setting the unique_ids
-            // of Nodes/Elems in a consistent manner, so when we set the unique_id
-            // of a Node/Elem manually based on the {node,elem}_num_map, we need to
-            // make sure that the "next" unique id assigned by the Mesh
-            // will still be valid. We do this by making sure that the
-            // next_unique_id is greater than the one we set manually. The
-            // APIs for doing this are only defined when unique ids are
-            // enabled.
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-            unique_id_type next_unique_id = mesh.next_unique_id();
-            mesh.set_next_unique_id(std::max(next_unique_id, exodus_mapped_id_zero_based + 1));
-#endif
-          }
+          // If the _set_unique_ids_from_maps flag is true, set the
+          // unique_id for "elem", otherwise do nothing.
+          exio_helper->set_elem_unique_id(mesh, elem, j);
 
           // If the Mesh assigned an ID different from the one we
           // tried to give it, we should probably error.
