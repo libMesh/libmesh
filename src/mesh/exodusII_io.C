@@ -773,15 +773,10 @@ void ExodusII_IO::read (const std::string & fname)
 
     for (auto e : index_range(exio_helper->elem_list))
       {
-        // The numbers in the Exodus file sidesets should be thought
-        // of as (1-based) indices into the elem_num_map array.  So,
-        // to get the right element ID we have to:
-        // 1.) Subtract 1 from elem_list[e] (to get a zero-based index)
-        // 2.) Pass it through elem_num_map (to get the corresponding Exodus ID)
-        // 3.) Subtract 1 from that, since libmesh is "zero"-based,
-        //     even when the Exodus numbering doesn't start with 1.
+        // Call helper function to get the libmesh Elem id for the
+        // e'th entry in the current elem_list.
         dof_id_type libmesh_elem_id =
-          cast_int<dof_id_type>(exio_helper->elem_num_map[exio_helper->elem_list[e] - 1] - 1);
+          exio_helper->get_libmesh_elem_id(exio_helper->elem_list[e]);
 
         // Set any relevant node/edge maps for this element
         Elem & elem = mesh.elem_ref(libmesh_elem_id);
