@@ -11,6 +11,7 @@
 #include <libmesh/node.h>
 #include <libmesh/reference_elem.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/mesh.h>
 #include <libmesh/system.h> // LIBMESH_HAVE_SOLVER define
 #include "libmesh/face_tri.h"
 #include "libmesh/cell_prism.h"
