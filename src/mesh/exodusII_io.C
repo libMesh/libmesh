@@ -495,24 +495,12 @@ void ExodusII_IO::read (const std::string & fname)
           uelem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id);
 
           // Determine the libmesh elem id implied by "j". The
-          // get_libmesh_elem_id() helper function expects a 1-based
-          // Exodus elem id, so we construct the "implied" Exodus elem
-          // id from "j" by adding 1.
-          // auto libmesh_elem_id = exio_helper->get_libmesh_elem_id(/*exodus_elem_id=*/j+1);
+          // ExodusII_IO_Helper::get_libmesh_elem_id() helper function
+          // expects a 1-based Exodus elem id, so we construct the
+          // "implied" Exodus elem id from "j" by adding 1.
+          auto libmesh_elem_id = exio_helper->get_libmesh_elem_id(/*exodus_elem_id=*/j+1);
 
-          // Use the elem_num_map to obtain the ID of this element in
-          // the Exodus file.  Make sure we aren't reading garbage if
-          // the file is corrupt.
-          libmesh_error_msg_if(std::size_t(j) >= exio_helper->elem_num_map.size(),
-                               "Error: Trying to read Exodus file with more elements than elem_num_map entries.\n");
-          int exodus_id = exio_helper->elem_num_map[j];
-
-          // Assign this element the same ID it had in the Exodus
-          // file, but make it zero-based by subtracting 1.  Note:
-          // some day we could use 1-based numbering in libmesh and
-          // thus match the Exodus numbering exactly, but at the
-          // moment libmesh is zero-based.
-          uelem->set_id(exodus_id-1);
+          uelem->set_id(libmesh_elem_id);
 
           // Record that we have seen an element of dimension uelem->dim()
           elems_of_dimension[uelem->dim()] = true;
@@ -520,13 +508,44 @@ void ExodusII_IO::read (const std::string & fname)
           // Catch the Elem pointer that the Mesh throws back
           Elem * elem = mesh.add_elem(std::move(uelem));
 
-          // If the Mesh assigned an ID different from what is in the
-          // Exodus file, we should probably error.
-          libmesh_error_msg_if(elem->id() != static_cast<unsigned>(exodus_id-1),
+          // If the _set_unique_ids_from_maps flag is true, then set the
+          // unique_id for "elem" based on the (zero-based version of)
+          // elem_num_map[j] value.
+          if (_set_unique_ids_from_maps)
+          {
+            // Use the elem_num_map to get a 1-based Exodus Node ID
+            int exodus_mapped_id = exio_helper->elem_num_map[j];
+
+            // Exodus ids are always 1-based while libmesh ids are always
+            // 0-based, so to make a libmesh unique_id here, we subtract 1
+            // from the exodus_mapped_id to make it 0-based.
+            auto exodus_mapped_id_zero_based =
+              cast_int<dof_id_type>(exodus_mapped_id - 1);
+
+            // Set elem's unique_id to "exodus_mapped_id_zero_based".
+            elem->set_unique_id(cast_int<unique_id_type>(exodus_mapped_id_zero_based));
+
+            // Normally the Mesh is responsible for setting the unique_ids
+            // of Nodes/Elems in a consistent manner, so when we set the unique_id
+            // of a Node/Elem manually based on the {node,elem}_num_map, we need to
+            // make sure that the "next" unique id assigned by the Mesh
+            // will still be valid. We do this by making sure that the
+            // next_unique_id is greater than the one we set manually. The
+            // APIs for doing this are only defined when unique ids are
+            // enabled.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+            unique_id_type next_unique_id = mesh.next_unique_id();
+            mesh.set_next_unique_id(std::max(next_unique_id, exodus_mapped_id_zero_based + 1));
+#endif
+          }
+
+          // If the Mesh assigned an ID different from the one we
+          // tried to give it, we should probably error.
+          libmesh_error_msg_if(elem->id() != static_cast<unsigned>(libmesh_elem_id),
                                "Error!  Mesh assigned ID "
                                << elem->id()
                                << " which is different from the (zero-based) Exodus ID "
-                               << exodus_id-1
+                               << libmesh_elem_id
                                << "!");
 
           // Assign extra integer IDs
