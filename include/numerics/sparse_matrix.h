@@ -448,6 +448,12 @@ public:
   virtual void print_personal(std::ostream & os=libMesh::out) const = 0;
 
   /**
+   * Print the contents of the matrix to a file, with a file format
+   * depending on the extension of \p filename
+   */
+  void print(const std::string & filename) const;
+
+  /**
    * Print the contents of the matrix to a file, with the HDF5 sparse
    * matrix format used by CoreForm, putting CSR sparse matrix data in
    * the group given by \p groupname.

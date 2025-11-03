@@ -741,6 +741,74 @@ void SparseMatrix<T>::read(const std::string & filename)
 
 
 template <typename T>
+void SparseMatrix<T>::print(const std::string & filename) const
+{
+  {
+    std::ofstream outstr (filename.c_str());
+    libmesh_error_msg_if
+      (!outstr.good(), "ERROR: cannot write to file:\n\t" <<
+       filename);
+  }
+
+  std::string_view basename = Utility::basename_of(filename);
+
+  const bool gzipped_file = Utility::ends_with(filename, ".gz");
+
+  if (gzipped_file)
+    basename.remove_suffix(3);
+
+  if (Utility::ends_with(basename, ".matlab") ||
+      Utility::ends_with(basename, ".m"))
+    this->print_matlab(filename);
+  else if (Utility::ends_with(basename, ".petsc64"))
+    {
+#ifndef LIBMESH_HAVE_PETSC
+      libmesh_error_msg("Cannot load PETSc matrix file " <<
+                        filename << " without PETSc-enabled libMesh.");
+#elif LIBMESH_DOF_ID_BYTES != 8
+      libmesh_error_msg("Cannot load 64-bit PETSc matrix file " <<
+                        filename << " with non-64-bit libMesh.");
+#endif
+      if (gzipped_file)
+        libmesh_not_implemented_msg("Gzipped PETSc matrices are not currently supported");
+      this->print_petsc_binary(filename);
+    }
+  else if (Utility::ends_with(basename, ".petsc32"))
+    {
+#ifndef LIBMESH_HAVE_PETSC
+      libmesh_error_msg("Cannot load PETSc matrix file " <<
+                        filename << " without PETSc-enabled libMesh.");
+#elif LIBMESH_DOF_ID_BYTES != 4
+      libmesh_error_msg("Cannot load 32-bit PETSc matrix file " <<
+                        filename << " with non-32-bit libMesh.");
+#endif
+      if (gzipped_file)
+        libmesh_not_implemented_msg("Gzipped PETSc matrices are not currently supported");
+      this->print_petsc_binary(filename);
+    }
+  else if (Utility::ends_with(basename, ".h5"))
+    {
+      if (gzipped_file)
+        libmesh_not_implemented_msg("Gzipped HDF5 matrices are not currently supported");
+      this->print_coreform_hdf5(filename);
+    }
+  else
+    libmesh_error_msg(" ERROR: Unrecognized matrix file extension on: "
+                      << basename
+                      << "\n   I understand the following:\n\n"
+                      << "     *.h5        -- CoreForm HDF5 sparse matrix format\n"
+                      << "     *.matlab    -- Matlab sparse matrix format\n"
+                      << "     *.matlab.gz -- Matlab sparse matrix format, gzipped\n"
+                      << "     *.m         -- Matlab sparse matrix format\n"
+                      << "     *.m.gz      -- Matlab sparse matrix format, gzipped\n"
+                      << "     *.petsc32   -- PETSc binary format, 32-bit\n"
+                      << "     *.petsc64   -- PETSc binary format, 64-bit\n"
+                     );
+}
+
+
+
+template <typename T>
 void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
                                          const std::string & groupname)
 {
