@@ -197,6 +197,35 @@ public:
   const MeshBase & get_mesh() const;
 
   /**
+   * Get the verbosity setting (whether to print extra info to screen,
+   * default false) for this PointLocator
+   */
+  bool get_verbose() const { return _verbose; }
+
+  /**
+   * Set the verbosity setting for this PointLocator
+   */
+  void set_verbose(bool verbosity) { _verbose = verbosity; }
+
+#ifndef NDEBUG
+  /**
+   * Verifies that, for every node of every element, the point locator
+   * finds that element when searching at that node.  This is an
+   * O(N log N) operation, and so only available in builds with NDEBUG
+   * undefined, for asserting internal consistency (the PointLocator
+   * works) and external consistency (user code didn't change the mesh
+   * without updating the PointLocator afterward) that we hope should
+   * never be broken in opt.
+   */
+  void libmesh_assert_valid_point_locator ();
+#endif
+
+
+#ifndef LIBMESH_ENABLE_DEPRECATED
+protected:
+#endif
+
+  /**
    * Boolean flag to indicate whether to print out extra info.
    */
   bool _verbose;
