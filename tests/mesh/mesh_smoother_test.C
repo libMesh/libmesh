@@ -457,6 +457,7 @@ public:
     MeshTools::Modification::redistribute(mesh, dh);
 
     const auto & boundary_info = mesh.get_boundary_info();
+    const auto &rank = mesh.comm().rank();
 
     if (tangle_mesh)
       {
@@ -471,61 +472,78 @@ public:
         const Point p1 = Point(dr, dim > 1 ? dr : 0, dim > 2 ? dr : 0);
         const Point p2 = Point(2. * dr, dim > 1 ? dr : 0, dim > 2 ? 2. * dr : 0);
 
-        // ids and distances of mesh nodes nearest p1 and p2
-        dof_id_type node1_id = DofObject::invalid_id;
-        Real dist1_closest = std::numeric_limits<Real>::max();
-        dof_id_type node2_id = DofObject::invalid_id;
-        Real dist2_closest = std::numeric_limits<Real>::max();
+        // We need to find the nodes of the mesh that are closest to p1 and p2.
+        // This will require some parallel communication for distributed meshes.
+
+        // Distances between local mesh nodes and p1
+        std::map<dof_id_type, Real> dist1_map;
+        // Distances between local mesh nodes and p2
+        std::map<dof_id_type, Real> dist2_map;
 
         for (const auto * node : mesh.local_node_ptr_range())
           {
-            const auto dist1 = (*node - p1).norm();
-            if (dist1 < dist1_closest)
-              {
-                dist1_closest = dist1;
-                node1_id = node->id();
-              }
-
-            const auto dist2 = (*node - p2).norm();
-            if (dist2 < dist2_closest)
-              {
-                dist2_closest = dist2;
-                node2_id = node->id();
-              }
+          dist1_map[node->id()] = (*node - p1).norm();
+          dist2_map[node->id()] = (*node - p2).norm();
           }
 
-        // parallel communication
-        unsigned int node1_rank;
-        mesh.comm().minloc(dist1_closest, node1_rank);
-        mesh.comm().broadcast(node1_id, node1_rank);
+          // Helper function to analyze a dist_map accross all processors and
+          // return the node id and spatial coordinates for the node with the
+          // smallest distance
+          auto get_closet_point_accross_all_procs =
+              [&mesh, &rank](const std::map<dof_id_type, Real> &dist_map) {
+                // Iterator to the map entry with the smallest distance
+                auto min_it =
+                    std::min_element(dist_map.begin(), dist_map.end(),
+                                     [](const auto &a, const auto &b) {
+                                       return a.second < b.second;
+                                     });
 
-        unsigned int node2_rank;
-        mesh.comm().minloc(dist2_closest, node2_rank);
-        mesh.comm().broadcast(node2_id, node2_rank);
+                const auto &d_min_local = min_it->second;
 
-        // modify the nodes
-        if ((node1_id != DofObject::invalid_id) && (node2_id != DofObject::invalid_id))
-          {
-            libmesh_assert(node1_id != node2_id);
+                // Get the smallest distance accross all procs
+                auto d_min_global = d_min_local;
+                mesh.comm().min(d_min_global);
 
-            auto & node1 = mesh.node_ref(node1_id);
-            auto & node2 = mesh.node_ref(node2_id);
+                // Find the proc id, node_id, and spatial coordinantes for the
+                // node with the smallest distance
+                dof_id_type node_id;
+                Point node;
+                processor_id_type broadcasting_proc = 0;
+                if (d_min_local == d_min_global) {
+                  broadcasting_proc = rank;
+                  node_id = min_it->first;
+                  node = mesh.node_ref(node_id);
+                }
 
-            const Point diff = node1 - node2;
-            // Note that a damping factor of 1 will swap the nodes and one
-            // of 0.5 will move the nodes to the mean of their original
-            // locations.
-            node1 -= tangle_damping_factor * diff;
-            node2 += tangle_damping_factor * diff;
-          }
+                mesh.comm().max(broadcasting_proc);
+                // Broadcast information about this node to all procs
+                mesh.comm().broadcast(node_id, broadcasting_proc);
+                mesh.comm().broadcast(node, broadcasting_proc);
 
-        SyncNodalPositions sync_object(mesh);
-        Parallel::sync_dofobject_data_by_id (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
+                return std::pair(node_id, node);
+              };
 
-        // Make sure the mesh is tangled
-        smoother.setup(); // Need this to create the system we are about to access
-        const auto & unsmoothed_info = smoother.get_mesh_info();
-        CPPUNIT_ASSERT(unsmoothed_info.mesh_is_tangled);
+          const auto [node_id1, node1] =
+              get_closet_point_accross_all_procs(dist1_map);
+          const auto [node_id2, node2] =
+              get_closet_point_accross_all_procs(dist2_map);
+
+          // modify the nodes if they are on this proc
+          const auto displacement = tangle_damping_factor * (node1 - node2);
+          if (mesh.query_node_ptr(node_id1))
+            mesh.node_ref(node_id1) -= displacement;
+          if (mesh.query_node_ptr(node_id2))
+            mesh.node_ref(node_id2) += displacement;
+
+          SyncNodalPositions sync_object(mesh);
+          Parallel::sync_dofobject_data_by_id(mesh.comm(), mesh.nodes_begin(),
+                                              mesh.nodes_end(), sync_object);
+
+          // Make sure the mesh is tangled
+          // Need this to create the system we are about to access
+          smoother.setup();
+          const auto &unsmoothed_info = smoother.get_mesh_info();
+          CPPUNIT_ASSERT(unsmoothed_info.mesh_is_tangled);
       }
 
     // Add multiple subdomains if requested
