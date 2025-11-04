@@ -2236,7 +2236,10 @@ ExodusII_IO_Helper::set_dof_object_unique_id(
     // enabled.
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
     unique_id_type next_unique_id = mesh.next_unique_id();
-    mesh.set_next_unique_id(std::max(next_unique_id, exodus_mapped_id_zero_based + 1));
+    mesh.set_next_unique_id(std::max(next_unique_id, static_cast<unique_id_type>(exodus_mapped_id_zero_based + 1)));
+#else
+    // Avoid compiler warnings about the unused variable
+    libmesh_ignore(mesh);
 #endif
   }
 }
@@ -3076,7 +3079,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
         // Store num_elem_this_blk "fake" ids into the
         // elem_num_map. Use a traditional for-loop to avoid unused
         // variable warnings about the loop counter.
-        for (unsigned int i=0; i<num_elem_this_blk; ++i)
+        for (int i=0; i<num_elem_this_blk; ++i)
           this->elem_num_map.push_back(next_fake_id++);
       }
 
