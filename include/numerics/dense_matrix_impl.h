@@ -674,7 +674,8 @@ void DenseMatrix<T>::_lu_decompose ()
         }
 
       // If the max abs entry found is zero, the matrix is singular
-      libmesh_error_msg_if(A(i,i) == libMesh::zero, "Matrix A is singular!");
+      if (A(i,i) == libMesh::zero)
+        libmesh_degenerate_mapping_msg ("Matrix A is singular!");
 
       // Scale upper triangle entries of row i by the diagonal entry
       // Note: don't scale the diagonal entry itself!
