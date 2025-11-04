@@ -157,6 +157,18 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   if (other_mesh._partitioner.get())
     _partitioner = other_mesh._partitioner->clone();
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Deep copy of all periodic boundaries
+  if (other_mesh._disconnected_boundary_pairs)
+    {
+      _disconnected_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+
+      for (const auto & [id, pb] : *other_mesh._disconnected_boundary_pairs)
+        if (pb)
+          (*_disconnected_boundary_pairs)[id] = pb->clone();
+    }
+#endif
+
   // _elemset_codes stores pointers to entries in _elemset_codes_inverse_map,
   // so it is not possible to simply copy it directly from other_mesh
   for (const auto & [set, code] : _elemset_codes_inverse_map)
@@ -203,7 +215,17 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _point_locator_close_to_point_tol = other_mesh.get_point_locator_close_to_point_tol();
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  _disconnected_boundary_pairs = std::move(other_mesh._disconnected_boundary_pairs);
+  // Deep copy of all periodic boundaries:
+  // We must clone each PeriodicBoundaryBase in the source map,
+  // since unique_ptr cannot be copied and we need independent instances
+  if (other_mesh._disconnected_boundary_pairs)
+    {
+      _disconnected_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+
+      for (const auto & [id, pb] : *other_mesh._disconnected_boundary_pairs)
+        if (pb)
+          (*_disconnected_boundary_pairs)[id] = pb->clone();
+    }
 #endif
 
   // This relies on our subclasses *not* invalidating pointers when we
@@ -312,11 +334,13 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
     return false;
   if (*boundary_info != *other_mesh.boundary_info)
     return false;
+
   // First check whether the "existence" of the two pointers differs (one present, one absent)
   if ((bool)_disconnected_boundary_pairs != (bool)other_mesh._disconnected_boundary_pairs)
     return false;
-  // If both exist, compare the contents
-  if (_disconnected_boundary_pairs && (*_disconnected_boundary_pairs != *other_mesh._disconnected_boundary_pairs))
+  // If both exist, compare the contents (Weak Test: just compare sizes like `_ghosting_functors`)
+  if (_disconnected_boundary_pairs &&
+      (_disconnected_boundary_pairs->size() != other_mesh._disconnected_boundary_pairs->size()))
     return false;
 
   const constraint_rows_type & other_rows =
