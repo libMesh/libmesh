@@ -19,6 +19,7 @@
 #endif
 
 
+#ifdef LIBMESH_HAVE_HDF5
 #define SPARSEMATRIXTEST                     \
   CPPUNIT_TEST(testGetAndSet);               \
   CPPUNIT_TEST(testReadHDF5);                \
@@ -29,6 +30,16 @@
   CPPUNIT_TEST(testWriteAndReadHDF5);        \
   CPPUNIT_TEST(testWriteAndReadMatlab);      \
   CPPUNIT_TEST(testClone);
+#else // LIBMESH_HAVE_HDF5
+#define SPARSEMATRIXTEST                     \
+  CPPUNIT_TEST(testGetAndSet);               \
+  CPPUNIT_TEST(testReadMatlab1);             \
+  CPPUNIT_TEST(testReadMatlab2);             \
+  CPPUNIT_TEST(testReadMatlab4);             \
+  CPPUNIT_TEST(testTransposeNorms);          \
+  CPPUNIT_TEST(testWriteAndReadMatlab);      \
+  CPPUNIT_TEST(testClone);
+#endif // LIBMESH_HAVE_HDF5
 
 
 
@@ -192,9 +203,9 @@ public:
   }
 
 
+#ifdef LIBMESH_HAVE_HDF5
   void testReadHDF5()
   {
-#ifdef LIBMESH_HAVE_HDF5
     LOG_UNIT_TEST;
 
     matrix->clear();
@@ -205,8 +216,8 @@ public:
     // We need some more SparseMatrix operators, but not today
     CPPUNIT_ASSERT(matrix->l1_norm() == matrix2->l1_norm());
     CPPUNIT_ASSERT(matrix->linfty_norm() == matrix2->linfty_norm());
-#endif // LIBMESH_HAVE_HDF5
   }
+#endif // LIBMESH_HAVE_HDF5
 
 
   void testTransposeNorms()
@@ -254,10 +265,12 @@ public:
     testValues();
   }
 
+#ifdef LIBMESH_HAVE_HDF5
   void testWriteAndReadHDF5()
   {
     testWriteAndRead("M.h5");
   }
+#endif // LIBMESH_HAVE_HDF5
 
 
   void testWriteAndReadMatlab()
