@@ -113,6 +113,7 @@ public:
   CPPUNIT_TEST( testExodusCopyElementSolutionReplicated );
   CPPUNIT_TEST( testExodusReadHeader );
   CPPUNIT_TEST( testExodusSetNodeUniqueIdsFromMaps );
+  CPPUNIT_TEST( testExodusSetElemUniqueIdsFromMaps );
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testExodusIGASidesets );
   CPPUNIT_TEST( testLowOrderEdgeBlocks );
@@ -390,6 +391,72 @@ public:
     this->testExodusSetNodeUniqueIdsFromMaps_implementation(
       /*set_unique_ids=*/false,
       /*expected_unique_ids=*/{0, 4, 1, 8, 5, 7, 6, 3, 2});
+  }
+
+  void testExodusSetElemUniqueIdsFromMaps_implementation(
+    bool set_unique_ids,
+    const std::vector<unique_id_type> & expected_unique_ids)
+  {
+    // This test requires that libmesh is compiled with unique_ids enabled
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+      ExodusII_IO exii(mesh);
+
+      // Set Node/Elem unique ids based on the node/elem_num_map
+      exii.set_unique_ids_from_maps(set_unique_ids);
+
+      // Read the mesh
+      exii.read("meshes/nontrivial_elem_num_map.exo");
+
+      // Verify the results.
+      auto expected_it = expected_unique_ids.begin();
+      for (const auto & elem : mesh.element_ptr_range())
+        {
+          // Debugging:
+          // libMesh::out << "unique_id for Elem " << elem->id()
+          //              << " = " << elem->unique_id()
+          //              << std::endl;
+
+          CPPUNIT_ASSERT_EQUAL(elem->unique_id(), *expected_it++);
+        }
+    }
+#else
+    // Prevent compiler warnings about unused variables when
+    // unique_ids are not enabled.
+    libmesh_ignore(set_unique_ids, expected_unique_ids);
+#endif // LIBMESH_ENABLE_UNIQUE_ID
+  }
+
+  void testExodusSetElemUniqueIdsFromMaps()
+  {
+    LOG_UNIT_TEST;
+
+    // The mesh used in this test has a non-trivial elem_num_map with
+    // a non-contiguous numbering that has a "gap" at the beginning
+    // and is also missing "16":
+    // elem_num_map = 11, 12, 13, 14, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+    //    27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44,
+    //    45, 46 ;
+    {
+      // When we assign (zero-based) elem_num_map entries as unique_ids, the
+      // unique_ids are just a zero-based version of the entries above.
+      std::vector<unique_id_type> expected_unique_ids = {
+        10, 11, 12, 13, 14, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+        30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45};
+      this->testExodusSetElemUniqueIdsFromMaps_implementation(
+        /*set_unique_ids=*/true, expected_unique_ids);
+    }
+
+    {
+      // When libmesh assigns unique_ids, all the Nodes (50) are
+      // numbered first, so the first Elem is assigned a unique_id of
+      // 50 and the rest are sequential from there.
+      std::vector<unique_id_type> expected_unique_ids(/*size=*/35);
+      std::iota(expected_unique_ids.begin(), expected_unique_ids.end(), /*start=*/50);
+      this->testExodusSetElemUniqueIdsFromMaps_implementation(
+        /*set_unique_ids=*/false, expected_unique_ids);
+    }
   }
 
   void testExodusReadHeader ()
