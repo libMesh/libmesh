@@ -329,8 +329,12 @@ public:
 private:
 
   /**
-   * Internal implementation for the two functions above.
+   * Internal implementation for the two sets of functions above.
    */
+  dof_id_type get_libmesh_id(
+    int exodus_id,
+    const std::vector<int> & num_map);
+
   void set_dof_object_unique_id(
     MeshBase & mesh,
     DofObject * dof_object,

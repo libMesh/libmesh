@@ -2214,6 +2214,37 @@ dof_id_type ExodusII_IO_Helper::get_libmesh_elem_id(int exodus_elem_id)
   return libmesh_elem_id;
 }
 
+dof_id_type
+ExodusII_IO_Helper::get_libmesh_id(int exodus_id,
+                                   const std::vector<int> & num_map)
+{
+  // The input exodus_id is assumed to be a (1-based) index into
+  // the {node,elem}_num_map, so in order to use exodus_id as an index
+  // in C++, we need to first make it zero-based.
+  auto exodus_id_zero_based =
+    cast_int<dof_id_type>(exodus_id - 1);
+
+  // Throw an informative error message rather than accessing past the
+  // end of the provided num_map. If we are setting Elem unique_ids
+  // based on the num_map, we don't need to do this check.
+  if (!this->set_unique_ids_from_maps)
+    libmesh_error_msg_if(exodus_id_zero_based >= num_map.size(),
+                         "Cannot get LibMesh id for Exodus id: " << exodus_id);
+
+  // If the user set the flag which stores Exodus node/elem ids as
+  // unique_ids instead of regular ids, then the libmesh id we are
+  // looking for is actually just "exodus_id_zero_based". Otherwise,
+  // we need to look up the Node/Elem's id in the provided num_map,
+  // *and* then subtract 1 from that because the entries in the
+  // num_map are also 1-based.
+  dof_id_type libmesh_id =
+    this->set_unique_ids_from_maps ?
+    cast_int<dof_id_type>(exodus_id_zero_based) :
+    cast_int<dof_id_type>(num_map[exodus_id_zero_based] - 1);
+
+  return libmesh_id;
+}
+
 void
 ExodusII_IO_Helper::set_node_unique_id(
   MeshBase & mesh, Node * node, int zero_based_node_num_map_index)
