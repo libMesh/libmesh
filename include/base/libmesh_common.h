@@ -400,7 +400,7 @@ struct casting_compare {
 // throws a ConvergenceFailure exception
 //
 // The libmesh_degenerate_mapping() macro prints a message into and
-// throws a DegenerateMapping exception
+// throws a DegenerateMap exception
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
     std::stringstream message_stream;                                   \
@@ -458,7 +458,7 @@ struct casting_compare {
   do {                                                               \
     std::stringstream message_stream;                                \
     message_stream << msg << '\n';                                   \
-    LIBMESH_THROW(libMesh::DegenerateMapping(message_stream.str())); \
+    LIBMESH_THROW(libMesh::DegenerateMap(message_stream.str())); \
   } while (0)
 
 #define libmesh_degenerate_mapping(filename) libmesh_degenerate_mapping_msg("")
