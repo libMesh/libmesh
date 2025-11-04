@@ -112,7 +112,7 @@ public:
   CPPUNIT_TEST( testExodusCopyNodalSolutionReplicated );
   CPPUNIT_TEST( testExodusCopyElementSolutionReplicated );
   CPPUNIT_TEST( testExodusReadHeader );
-  CPPUNIT_TEST( testExodusSetUniqueIdsFromMaps );
+  CPPUNIT_TEST( testExodusSetNodeUniqueIdsFromMaps );
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testExodusIGASidesets );
   CPPUNIT_TEST( testLowOrderEdgeBlocks );
@@ -335,7 +335,7 @@ public:
 
 #ifdef LIBMESH_HAVE_EXODUS_API
 
-  void testExodusSetUniqueIdsFromMaps_implementation(
+  void testExodusSetNodeUniqueIdsFromMaps_implementation(
     bool set_unique_ids,
     const std::vector<unique_id_type> & expected_unique_ids)
   {
@@ -367,18 +367,18 @@ public:
     // unique_ids are not enabled.
     libmesh_ignore(set_unique_ids, expected_unique_ids);
 #endif // LIBMESH_ENABLE_UNIQUE_ID
-  } // end testExodusSetUniqueIdsFromMaps_implementation()
+  } // end testExodusSetNodeUniqueIdsFromMaps_implementation()
 
 
 
-  void testExodusSetUniqueIdsFromMaps()
+  void testExodusSetNodeUniqueIdsFromMaps()
   {
     LOG_UNIT_TEST;
 
     // node_num_map =    1,   3, 9,    8,   2,   5,    7,    6,    4
     // The input is a (zero-based) version of the node_num_map as it
     // exists in the file.
-    this->testExodusSetUniqueIdsFromMaps_implementation(
+    this->testExodusSetNodeUniqueIdsFromMaps_implementation(
       /*set_unique_ids=*/true,
       /*expected_unique_ids=*/{0, 2, 8, 7, 1, 4, 6, 5, 3});
 
@@ -387,7 +387,7 @@ public:
     // zero-based Node id 3 corresponds to one-based Node id 4, which
     // appears in (zero-based) position 8 in the node_num_map, hence:
     // 3 -> 8, etc.
-    this->testExodusSetUniqueIdsFromMaps_implementation(
+    this->testExodusSetNodeUniqueIdsFromMaps_implementation(
       /*set_unique_ids=*/false,
       /*expected_unique_ids=*/{0, 4, 1, 8, 5, 7, 6, 3, 2});
   }
