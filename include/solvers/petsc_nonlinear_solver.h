@@ -59,15 +59,6 @@ extern "C"
   PetscErrorCode libmesh_petsc_snes_precheck(SNESLineSearch, Vec X, Vec Y, PetscBool * changed, void * context);
   PetscErrorCode libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context);
   PetscErrorCode libmesh_petsc_linesearch_shellfunc(SNESLineSearch linesearch, void * ctx);
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  PetscErrorCode __libmesh_petsc_snes_monitor (SNES, PetscInt its, PetscReal fnorm, void *);
-  PetscErrorCode __libmesh_petsc_snes_residual (SNES, Vec x, Vec r, void * ctx);
-  PetscErrorCode __libmesh_petsc_snes_fd_residual (SNES, Vec x, Vec r, void * ctx);
-  PetscErrorCode __libmesh_petsc_snes_mffd_interface (void * ctx, Vec x, Vec r);
-  PetscErrorCode __libmesh_petsc_snes_jacobian (SNES, Vec x, Mat jac, Mat pc, void * ctx);
-  PetscErrorCode __libmesh_petsc_snes_postcheck(SNESLineSearch, Vec x, Vec y, Vec w, PetscBool * changed_y, PetscBool * changed_w, void * context);
-#endif
 }
 
 /**

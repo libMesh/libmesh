@@ -81,22 +81,6 @@ extern "C"
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  PetscErrorCode __libmesh_petsc_preconditioner_setup (PC pc)
-  {
-    PetscFunctionBegin;
-    libmesh_deprecated();
-    PetscFunctionReturn(libmesh_petsc_preconditioner_setup(pc));
-  }
-
-  PetscErrorCode __libmesh_petsc_preconditioner_apply(PC pc, Vec x, Vec y)
-  {
-    PetscFunctionBegin;
-    libmesh_deprecated();
-    PetscFunctionReturn(libmesh_petsc_preconditioner_apply(pc, x, y));
-  }
-#endif
 } // end extern "C"
 
 
