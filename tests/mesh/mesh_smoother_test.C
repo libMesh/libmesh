@@ -11,6 +11,7 @@
 #include <libmesh/node.h>
 #include <libmesh/reference_elem.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/mesh.h>
 #include <libmesh/system.h> // LIBMESH_HAVE_SOLVER define
 #include "libmesh/face_tri.h"
 #include "libmesh/cell_prism.h"
@@ -398,12 +399,12 @@ public:
     return (result.first == 2) && (result.second == 1);
   }
 
-  void testVariationalSmoother(ReplicatedMesh & mesh,
-                               VariationalMeshSmoother & smoother,
+  void testVariationalSmoother(Mesh &mesh,
+                               VariationalMeshSmoother &smoother,
                                const ElemType type,
                                const bool multiple_subdomains = false,
-                               const bool tangle_mesh=false,
-                               const Real tangle_damping_factor=1.0)
+                               const bool tangle_mesh = false,
+                               const Real tangle_damping_factor = 1.0)
   {
     LOG_UNIT_TEST;
 
@@ -457,6 +458,7 @@ public:
     MeshTools::Modification::redistribute(mesh, dh);
 
     const auto & boundary_info = mesh.get_boundary_info();
+    const auto & proc_id = mesh.processor_id();
 
     if (tangle_mesh)
       {
@@ -471,65 +473,91 @@ public:
         const Point p1 = Point(dr, dim > 1 ? dr : 0, dim > 2 ? dr : 0);
         const Point p2 = Point(2. * dr, dim > 1 ? dr : 0, dim > 2 ? 2. * dr : 0);
 
-        // ids and distances of mesh nodes nearest p1 and p2
-        dof_id_type node1_id = DofObject::invalid_id;
-        Real dist1_closest = std::numeric_limits<Real>::max();
-        dof_id_type node2_id = DofObject::invalid_id;
-        Real dist2_closest = std::numeric_limits<Real>::max();
+        // We need to find the nodes of the mesh that are closest to p1 and p2.
+        // This will require some parallel communication for distributed meshes.
+
+        // Distances between local mesh nodes and p1
+        std::map<dof_id_type, Real> dist1_map;
+        // Distances between local mesh nodes and p2
+        std::map<dof_id_type, Real> dist2_map;
 
         for (const auto * node : mesh.local_node_ptr_range())
           {
-            const auto dist1 = (*node - p1).norm();
-            if (dist1 < dist1_closest)
-              {
-                dist1_closest = dist1;
-                node1_id = node->id();
-              }
-
-            const auto dist2 = (*node - p2).norm();
-            if (dist2 < dist2_closest)
-              {
-                dist2_closest = dist2;
-                node2_id = node->id();
-              }
+          dist1_map[node->id()] = (*node - p1).norm();
+          dist2_map[node->id()] = (*node - p2).norm();
           }
 
-        // parallel communication
-        unsigned int node1_rank;
-        mesh.comm().minloc(dist1_closest, node1_rank);
-        mesh.comm().broadcast(node1_id, node1_rank);
+          // Helper function to analyze a dist_map accross all processors and
+          // return the node id and spatial coordinates for the node with the
+          // smallest distance
+          auto get_closet_point_accross_all_procs =
+              [&mesh, &proc_id](const std::map<dof_id_type, Real> &dist_map) {
 
-        unsigned int node2_rank;
-        mesh.comm().minloc(dist2_closest, node2_rank);
-        mesh.comm().broadcast(node2_id, node2_rank);
+                processor_id_type broadcasting_proc = 0;
+                Real d_min_local = std::numeric_limits<Real>::max();
+                dof_id_type node_id = DofObject::invalid_id;
 
-        // modify the nodes
-        if ((node1_id != DofObject::invalid_id) && (node2_id != DofObject::invalid_id))
-          {
-            libmesh_assert(node1_id != node2_id);
+                // Only execute this if this proc owns any nodes. Otherwise,
+                // use default values defined above
+                if (dist_map.size())
+                {
+                  // Iterator to the map entry with the smallest distance
+                  auto min_it =
+                      std::min_element(dist_map.begin(), dist_map.end(),
+                                       [](const auto &a, const auto &b) {
+                                         return a.second < b.second;
+                                       });
 
-            auto & node1 = mesh.node_ref(node1_id);
-            auto & node2 = mesh.node_ref(node2_id);
+                  node_id = min_it->first;
+                  d_min_local = min_it->second;
+                }
 
-            const Point diff = node1 - node2;
-            // Note that a damping factor of 1 will swap the nodes and one
-            // of 0.5 will move the nodes to the mean of their original
-            // locations.
-            node1 -= tangle_damping_factor * diff;
-            node2 += tangle_damping_factor * diff;
-          }
+                // Get the smallest distance accross all procs
+                auto d_min_global = d_min_local;
+                mesh.comm().min(d_min_global);
 
-        SyncNodalPositions sync_object(mesh);
-        Parallel::sync_dofobject_data_by_id (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);
+                // Find the proc id, node_id, and spatial coordinantes for the
+                // node with the smallest distance
+                Point node;
+                if (d_min_local == d_min_global) {
+                  broadcasting_proc = proc_id;
+                  node = mesh.node_ref(node_id);
+                }
 
-        // Make sure the mesh is tangled
-        smoother.setup(); // Need this to create the system we are about to access
-        const auto & unsmoothed_info = smoother.get_mesh_info();
-        CPPUNIT_ASSERT(unsmoothed_info.mesh_is_tangled);
+                mesh.comm().max(broadcasting_proc);
+                // Broadcast information about this node to all procs
+                mesh.comm().broadcast(node_id, broadcasting_proc);
+                mesh.comm().broadcast(node, broadcasting_proc);
+
+                return std::pair(node_id, node);
+              };
+
+          const auto [node_id1, node1] =
+              get_closet_point_accross_all_procs(dist1_map);
+          const auto [node_id2, node2] =
+              get_closet_point_accross_all_procs(dist2_map);
+
+          // modify the nodes if they are on this proc
+          const auto displacement = tangle_damping_factor * (node1 - node2);
+          if (mesh.query_node_ptr(node_id1))
+            mesh.node_ref(node_id1) -= displacement;
+          if (mesh.query_node_ptr(node_id2))
+            mesh.node_ref(node_id2) += displacement;
+
+          SyncNodalPositions sync_object(mesh);
+          Parallel::sync_dofobject_data_by_id(mesh.comm(), mesh.nodes_begin(),
+                                              mesh.nodes_end(), sync_object);
+
+          // Make sure the mesh is tangled
+          // Need this to create the system we are about to access
+          smoother.setup();
+          const auto &unsmoothed_info = smoother.get_mesh_info();
+          CPPUNIT_ASSERT(unsmoothed_info.mesh_is_tangled);
       }
 
     // Add multiple subdomains if requested
     std::unordered_map<subdomain_id_type, Real> distorted_subdomain_volumes;
+    subdomain_id_type highest_subdomain_id = 0;
     if (multiple_subdomains)
       {
         // Modify the subdomain ids in an interesting way
@@ -545,8 +573,25 @@ public:
         // This loop should NOT be combined with the one above because we need to
         // finish checking and updating subdomain ids for all elements before
         // recording the final subdomain volumes.
-        for (auto * elem : mesh.active_element_ptr_range())
-          distorted_subdomain_volumes[elem->subdomain_id()] += elem->volume();
+          for (auto *elem : mesh.active_element_ptr_range()) {
+            const auto sub_id = elem->subdomain_id();
+            // Don't double count an element's volume on multiple procs
+            if (elem->processor_id() != proc_id)
+              continue;
+            distorted_subdomain_volumes[sub_id] += elem->volume();
+            highest_subdomain_id = std::max(sub_id, highest_subdomain_id);
+          }
+
+          // Parallel communication
+          mesh.comm().max(highest_subdomain_id);
+          for (const auto sub_id : make_range(highest_subdomain_id + 1)) {
+            // Make sure sub_id exists in the map on this proc
+            if (distorted_subdomain_volumes.find(sub_id) ==
+                distorted_subdomain_volumes.end())
+              distorted_subdomain_volumes[sub_id] = 0.;
+
+            mesh.comm().sum(distorted_subdomain_volumes[sub_id]);
+          }
       }
 
     // Get the mesh order
@@ -670,17 +715,27 @@ public:
         // guarantee that the subdomain didn't change, it is a good indicator
         // and is friedly to sliding subdomain boundary nodes.
         std::unordered_map<subdomain_id_type, Real> smoothed_subdomain_volumes;
-        for (auto * elem : mesh.active_element_ptr_range())
+        for (auto *elem : mesh.active_element_ptr_range()) {
+          // Don't double count an element's volume on multiple procs
+          if (elem->processor_id() != proc_id)
+            continue;
           smoothed_subdomain_volumes[elem->subdomain_id()] += elem->volume();
+        }
 
-        for (const auto & pair : distorted_subdomain_volumes)
-          {
-            const auto & subdomain_id = pair.first;
-            CPPUNIT_ASSERT(
-                relative_fuzzy_equals(libmesh_map_find(distorted_subdomain_volumes, subdomain_id),
-                                      libmesh_map_find(smoothed_subdomain_volumes, subdomain_id),
-                                      TOLERANCE));
-          }
+        // Parallel communication
+        for (const auto sub_id : make_range(highest_subdomain_id + 1)) {
+          // Make sure sub_id exists in the map on this proc
+          if (smoothed_subdomain_volumes.find(sub_id) ==
+              smoothed_subdomain_volumes.end())
+            smoothed_subdomain_volumes[sub_id] = 0.;
+
+          mesh.comm().sum(smoothed_subdomain_volumes[sub_id]);
+        }
+
+        for (const auto sub_id : make_range(highest_subdomain_id + 1))
+          CPPUNIT_ASSERT(relative_fuzzy_equals(
+              libmesh_map_find(distorted_subdomain_volumes, sub_id),
+              libmesh_map_find(smoothed_subdomain_volumes, sub_id), TOLERANCE));
       }
     else
       {
@@ -1023,7 +1078,7 @@ public:
 #ifdef LIBMESH_ENABLE_VSMOOTHER
   void testVariationalEdge2()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, EDGE2);
@@ -1031,7 +1086,7 @@ public:
 
   void testVariationalEdge3()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, EDGE3);
@@ -1039,7 +1094,7 @@ public:
 
   void testVariationalEdge3MultipleSubdomains()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, EDGE3, true);
@@ -1047,7 +1102,7 @@ public:
 
   void testVariationalQuad4()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD4);
@@ -1055,7 +1110,7 @@ public:
 
   void testVariationalQuad4MultipleSubdomains()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD4, true);
@@ -1063,7 +1118,7 @@ public:
 
   void testVariationalQuad8()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD8);
@@ -1071,7 +1126,7 @@ public:
 
   void testVariationalQuad9()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD9);
@@ -1079,7 +1134,7 @@ public:
 
   void testVariationalQuad9MultipleSubdomains()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD9, true);
@@ -1087,7 +1142,7 @@ public:
 
   void testVariationalQuad4Tangled()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, QUAD4, false, true, 0.65);
@@ -1095,7 +1150,7 @@ public:
 
   void testVariationalTri3()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TRI3);
@@ -1103,7 +1158,7 @@ public:
 
   void testVariationalTri6()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TRI6);
@@ -1111,7 +1166,7 @@ public:
 
   void testVariationalTri6MultipleSubdomains()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TRI3, true);
@@ -1119,7 +1174,7 @@ public:
 
   void testVariationalHex8()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX8);
@@ -1127,7 +1182,7 @@ public:
 
   void testVariationalHex20()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX20);
@@ -1135,7 +1190,7 @@ public:
 
   void testVariationalHex27()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX27);
@@ -1143,7 +1198,7 @@ public:
 
   void testVariationalHex27MultipleSubdomains()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX27, true);
@@ -1151,7 +1206,7 @@ public:
 
   void testVariationalHex27Tangled()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, HEX27, false, true, 0.55);
@@ -1159,7 +1214,7 @@ public:
 
   void testVariationalPyramid5()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PYRAMID5);
@@ -1167,7 +1222,7 @@ public:
 
   void testVariationalPyramid13()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PYRAMID13);
@@ -1175,7 +1230,7 @@ public:
 
   void testVariationalPyramid14()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PYRAMID14);
@@ -1183,7 +1238,7 @@ public:
 
   void testVariationalPyramid18()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PYRAMID18);
@@ -1191,7 +1246,7 @@ public:
 
   void testVariationalPyramid18MultipleSubdomains()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh, 0.0);
 
     testVariationalSmoother(mesh, variational, PYRAMID18, true);
@@ -1199,7 +1254,7 @@ public:
 
   void testVariationalPrism6()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PRISM6);
@@ -1207,7 +1262,7 @@ public:
 
   void testVariationalPrism15()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, PRISM15);
@@ -1215,7 +1270,7 @@ public:
 
   void testVariationalPrism18()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(
         mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
 
@@ -1224,7 +1279,7 @@ public:
 
   void testVariationalPrism20()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(
         mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
 
@@ -1233,7 +1288,7 @@ public:
 
   void testVariationalPrism21()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(
         mesh, 0.5, true, TOLERANCE * TOLERANCE, 10 * TOLERANCE * TOLERANCE);
 
@@ -1242,7 +1297,7 @@ public:
 
   void testVariationalPrism21MultipleSubdomains()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     mesh.allow_renumbering(false);
     VariationalMeshSmoother variational(mesh);
 
@@ -1251,7 +1306,7 @@ public:
 
   void testVariationalTet4()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TET4);
@@ -1259,7 +1314,7 @@ public:
 
   void testVariationalTet10()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TET10);
@@ -1267,7 +1322,7 @@ public:
 
   void testVariationalTet14()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TET14);
@@ -1275,7 +1330,7 @@ public:
 
   void testVariationalTet14MultipleSubdomains()
   {
-    ReplicatedMesh mesh(*TestCommWorld);
+    Mesh mesh(*TestCommWorld);
     VariationalMeshSmoother variational(mesh);
 
     testVariationalSmoother(mesh, variational, TET14, true);
