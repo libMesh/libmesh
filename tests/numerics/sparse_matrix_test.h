@@ -29,6 +29,7 @@
   CPPUNIT_TEST(testTransposeNorms);          \
   CPPUNIT_TEST(testWriteAndReadHDF5);        \
   CPPUNIT_TEST(testWriteAndReadMatlab);      \
+  CPPUNIT_TEST(testWriteAndReadZippedMatlab);\
   CPPUNIT_TEST(testClone);
 #else // LIBMESH_HAVE_HDF5
 #define SPARSEMATRIXTEST                     \
@@ -38,6 +39,7 @@
   CPPUNIT_TEST(testReadMatlab4);             \
   CPPUNIT_TEST(testTransposeNorms);          \
   CPPUNIT_TEST(testWriteAndReadMatlab);      \
+  CPPUNIT_TEST(testWriteAndReadZippedMatlab);\
   CPPUNIT_TEST(testClone);
 #endif // LIBMESH_HAVE_HDF5
 
@@ -278,7 +280,10 @@ public:
     // Use a very short filename, because we had a bug with that and
     // we want to test it.
     testWriteAndRead("M.m");
+  }
 
+  void testWriteAndReadZippedMatlab()
+  {
 #ifdef LIBMESH_HAVE_GZSTREAM
     testWriteAndRead("Mzipped.m.gz");
 #endif
