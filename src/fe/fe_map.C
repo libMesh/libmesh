@@ -483,7 +483,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 libmesh_degenerate_mapping_msg
                   ("Jacobian " << det_J << " at or under tolerance " <<
                    jacobian_tolerance << " at point " << xyz[p] <<
-                   " in element: " << elem_info);
+                   " in element:\n" << elem_info);
               }
             else
               {
@@ -492,7 +492,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                 libmesh_degenerate_mapping_msg
                   ("Jacobian " << det_J << " at or under tolerance " <<
                    jacobian_tolerance << " at point index " << p <<
-                   " in element: " << elem_info);
+                   " in element:\n" << elem_info);
               }
           }
         else
