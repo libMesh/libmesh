@@ -122,14 +122,7 @@ public:
    * function in this class which takes an int, using
    * a default value of 1.
    */
-  virtual void smooth() override {this->smooth(1); }
-
-  /**
-   * The actual smoothing function, gets called whenever
-   * the user specifies an actual number of smoothing
-   * iterations.
-   */
-  void smooth(unsigned int n_iterations);
+  virtual void smooth() override;
 
   /**
    * Getter for the _system's _mesh_info attribute

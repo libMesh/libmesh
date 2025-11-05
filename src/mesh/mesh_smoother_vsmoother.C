@@ -135,7 +135,7 @@ void VariationalMeshSmoother::setup()
   _setup_called = true;
 }
 
-void VariationalMeshSmoother::smooth(unsigned int)
+void VariationalMeshSmoother::smooth()
 {
   if (!_setup_called)
     setup();
