@@ -1244,20 +1244,6 @@ std::pair<unsigned int, Real> ImplicitSystem::get_linear_solve_parameters() cons
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void ImplicitSystem::release_linear_solver(LinearSolver<Number> *) const
-{
-  // This function was originally paired with get_linear_solver()
-  // calls when that returned a dumb pointer which needed to be
-  // cleaned up. Since get_linear_solver() now just returns a pointer
-  // to a LinearSolver object managed by this class, this function no
-  // longer needs to do any cleanup.
-  libmesh_deprecated();
-}
-#endif // LIBMESH_ENABLE_DEPRECATED
-
-
-
 const SparseMatrix<Number> & ImplicitSystem::get_system_matrix() const
 {
   libmesh_assert(matrix);
