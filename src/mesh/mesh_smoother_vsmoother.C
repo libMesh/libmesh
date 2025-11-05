@@ -140,7 +140,15 @@ void VariationalMeshSmoother::smooth(unsigned int)
   if (!_setup_called)
     setup();
 
-  system()->solve();
+  try
+    {
+      system()->solve();
+    }
+
+  catch (std::runtime_error& e)
+    {
+      throw std::runtime_error(std::string("VariationalMeshSmoother: issue encountered during solve:\n") + e.what());
+    }
 
   // Update _mesh from _mesh_copy
   for (auto * node_copy : _mesh_copy->local_node_ptr_range())
