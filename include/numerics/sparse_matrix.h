@@ -448,6 +448,20 @@ public:
   virtual void print_personal(std::ostream & os=libMesh::out) const = 0;
 
   /**
+   * Print the contents of the matrix to a file, with a file format
+   * depending on the extension of \p filename
+   */
+  void print(const std::string & filename) const;
+
+  /**
+   * Print the contents of the matrix to a file, with the HDF5 sparse
+   * matrix format used by CoreForm, putting CSR sparse matrix data in
+   * the group given by \p groupname.
+   */
+  virtual void print_coreform_hdf5(const std::string & filename,
+                                   const std::string & groupname = "extraction") const;
+
+  /**
    * Print the contents of the matrix in Matlab's sparse matrix
    * format. Optionally prints the matrix to the file named \p name.
    * If \p name is not specified it is dumped to the screen.
@@ -458,13 +472,13 @@ public:
    * Write the contents of the matrix to a file in PETSc's binary
    * sparse matrix format.
    */
-  virtual void print_petsc_binary(const std::string & filename);
+  virtual void print_petsc_binary(const std::string & filename) const;
 
   /**
    * Write the contents of the matrix to a file in PETSc's HDF5
    * sparse matrix format.
    */
-  virtual void print_petsc_hdf5(const std::string & filename);
+  virtual void print_petsc_hdf5(const std::string & filename) const;
 
   /**
    * Read the contents of the matrix from a file, with the file format

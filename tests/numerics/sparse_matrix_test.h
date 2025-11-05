@@ -19,15 +19,29 @@
 #endif
 
 
+#ifdef LIBMESH_HAVE_HDF5
+#define SPARSEMATRIXTEST                     \
+  CPPUNIT_TEST(testGetAndSet);               \
+  CPPUNIT_TEST(testReadHDF5);                \
+  CPPUNIT_TEST(testReadMatlab1);             \
+  CPPUNIT_TEST(testReadMatlab2);             \
+  CPPUNIT_TEST(testReadMatlab4);             \
+  CPPUNIT_TEST(testTransposeNorms);          \
+  CPPUNIT_TEST(testWriteAndReadHDF5);        \
+  CPPUNIT_TEST(testWriteAndReadMatlab);      \
+  CPPUNIT_TEST(testWriteAndReadZippedMatlab);\
+  CPPUNIT_TEST(testClone);
+#else // LIBMESH_HAVE_HDF5
 #define SPARSEMATRIXTEST                     \
   CPPUNIT_TEST(testGetAndSet);               \
   CPPUNIT_TEST(testReadMatlab1);             \
   CPPUNIT_TEST(testReadMatlab2);             \
   CPPUNIT_TEST(testReadMatlab4);             \
-  CPPUNIT_TEST(testReadHDF5);                \
   CPPUNIT_TEST(testTransposeNorms);          \
-  CPPUNIT_TEST(testWriteAndRead);            \
+  CPPUNIT_TEST(testWriteAndReadMatlab);      \
+  CPPUNIT_TEST(testWriteAndReadZippedMatlab);\
   CPPUNIT_TEST(testClone);
+#endif // LIBMESH_HAVE_HDF5
 
 
 
@@ -191,9 +205,9 @@ public:
   }
 
 
+#ifdef LIBMESH_HAVE_HDF5
   void testReadHDF5()
   {
-#ifdef LIBMESH_HAVE_HDF5
     LOG_UNIT_TEST;
 
     matrix->clear();
@@ -204,8 +218,8 @@ public:
     // We need some more SparseMatrix operators, but not today
     CPPUNIT_ASSERT(matrix->l1_norm() == matrix2->l1_norm());
     CPPUNIT_ASSERT(matrix->linfty_norm() == matrix2->linfty_norm());
-#endif // LIBMESH_HAVE_HDF5
   }
+#endif // LIBMESH_HAVE_HDF5
 
 
   void testTransposeNorms()
@@ -221,7 +235,7 @@ public:
   }
 
 
-  void testWriteAndRead()
+  void testWriteAndRead(const std::string & filename)
   {
     LOG_UNIT_TEST;
 
@@ -229,12 +243,9 @@ public:
 
     // If we're working with serial matrices then just print one of
     // them so they don't step on the others' toes.
-    //
-    // Use a very short filename, because we had a bug with that and
-    // we want to test it.
     if (matrix->n_processors() > 1 ||
         TestCommWorld->rank() == 0)
-      matrix->print_matlab("M.m");
+      matrix->print(filename);
 
     matrix->clear();
 
@@ -249,11 +260,33 @@ public:
     return;
 #endif
 
-    matrix->read("M.m");
+    matrix->read(filename);
 
     TestCommWorld->barrier();
 
     testValues();
+  }
+
+#ifdef LIBMESH_HAVE_HDF5
+  void testWriteAndReadHDF5()
+  {
+    testWriteAndRead("M.h5");
+  }
+#endif // LIBMESH_HAVE_HDF5
+
+
+  void testWriteAndReadMatlab()
+  {
+    // Use a very short filename, because we had a bug with that and
+    // we want to test it.
+    testWriteAndRead("M.m");
+  }
+
+  void testWriteAndReadZippedMatlab()
+  {
+#ifdef LIBMESH_HAVE_GZSTREAM
+    testWriteAndRead("Mzipped.m.gz");
+#endif
   }
 
   void testClone()

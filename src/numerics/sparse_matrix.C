@@ -52,6 +52,29 @@
 #include <regex>
 #endif
 
+// Anonymous namespace for helper functions
+namespace
+{
+#ifdef LIBMESH_HAVE_HDF5
+  void check_open(const std::string & filename,
+                  hid_t id,
+                  const std::string & objname)
+  {
+    if (id == H5I_INVALID_HID)
+      libmesh_error_msg("Couldn't open " + objname + " in " + filename);
+
+  }
+
+  template <typename T>
+  void check_hdf5(const std::string & filename, T hdf5val, const std::string & objname)
+  {
+    if (hdf5val < 0)
+      libmesh_error_msg("HDF5 error from " + objname + " in " + filename);
+  };
+#endif
+}
+
+
 
 namespace libMesh
 {
@@ -495,7 +518,144 @@ void SparseMatrix<T>::print_matlab(const std::string & name) const
 
 
 template <typename T>
-void SparseMatrix<T>::print_petsc_binary(const std::string &)
+void SparseMatrix<T>::print_coreform_hdf5(const std::string & filename,
+                                          const std::string & groupname) const
+{
+#ifndef LIBMESH_HAVE_HDF5
+  libmesh_ignore(filename, groupname);
+  libmesh_error_msg("ERROR: need HDF5 support to handle .h5 files!!!");
+#else
+  LOG_SCOPE("print_coreform_hdf5()", "SparseMatrix");
+
+  const numeric_index_type first_dof = this->row_start(),
+                           end_dof   = this->row_stop();
+
+  std::vector<std::size_t> cols, row_offsets;
+  std::vector<double> vals;
+
+  if (this->processor_id() == 0)
+    row_offsets.push_back(0);
+
+  for (numeric_index_type i : make_range(first_dof, end_dof))
+    {
+      for (auto j : make_range(this->n()))
+        {
+          T c = (*this)(i,j);
+          if (c != static_cast<T>(0.0))
+            {
+              cols.push_back(j);
+              vals.push_back(c);
+            }
+        }
+      // This is a *local* row offset; proc 0 may need to adjust later
+      row_offsets.push_back(cols.size());
+    }
+
+  if (this->processor_id() == 0)
+    {
+      const hid_t file = H5Fcreate(filename.c_str(), H5F_ACC_TRUNC,
+                                   H5P_DEFAULT, H5P_DEFAULT);
+      if (file == H5I_INVALID_HID)
+        libmesh_file_error(filename);
+
+      const hid_t group =
+        H5Gcreate2(file, groupname.c_str(), H5P_DEFAULT, H5P_DEFAULT,
+                   H5P_DEFAULT);
+      check_open(filename, group, groupname);
+
+      auto write_size_attribute = [&filename, &group]
+        (const std::string & attribute_name, unsigned long long writeval)
+      {
+        const hid_t fspace = H5Screate(H5S_SCALAR);
+        check_hdf5(filename, fspace, attribute_name + " fspace");
+
+        const hid_t attr = H5Acreate2(group, attribute_name.c_str(),
+                                      H5T_STD_I64LE, fspace,
+                                      H5P_DEFAULT, H5P_DEFAULT);
+        check_hdf5(filename, attr, attribute_name);
+
+        // HDF5 is supposed to handle both upscaling and endianness
+        // conversions here
+        const herr_t errval = H5Awrite(attr, H5T_NATIVE_ULLONG, &writeval);
+        check_hdf5(filename, errval, attribute_name + " write");
+
+        H5Aclose(attr);
+        H5Sclose(fspace);
+      };
+
+      write_size_attribute("num_cols", this->n());
+      write_size_attribute("num_rows", this->m());
+
+      auto write_vector = [&filename, &group]
+        (const std::string & dataname, auto hdf5_file_type,
+         auto hdf5_native_type, auto & datavec)
+      {
+        const hsize_t len[1] = {cast_int<hsize_t>(datavec.size())};
+
+        const hid_t space = H5Screate_simple(1, len, nullptr);
+        check_hdf5(filename, space, dataname + " space");
+
+        const hid_t data =
+          H5Dcreate2(group, dataname.c_str(), hdf5_file_type, space,
+                     H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        check_hdf5(filename, data, dataname + " data");
+
+        const hid_t errval =
+          H5Dwrite(data, hdf5_native_type, H5S_ALL, H5S_ALL,
+                   H5P_DEFAULT, datavec.data());
+        check_hdf5(filename, errval, dataname + " write");
+
+        H5Dclose(data);
+        H5Sclose(space);
+      };
+
+      std::vector<std::size_t> vals_sizes, first_dofs;
+      this->comm().gather(0, vals.size(), vals_sizes);
+      this->comm().gather(0, cast_int<std::size_t>(first_dof), first_dofs);
+      first_dofs.push_back(this->m());
+
+      this->comm().allgather(cols);
+      this->comm().allgather(vals);
+      this->comm().allgather(row_offsets);
+
+      libmesh_assert_equal_to(vals.size(),
+                              cols.size());
+      libmesh_assert_equal_to(vals.size(),
+                              std::accumulate(vals_sizes.begin(),
+                                              vals_sizes.end(),
+                                              std::size_t(0)));
+
+      std::size_t extra_offset = 0;
+      for (auto p : make_range(processor_id_type(1), this->n_processors()))
+        {
+          extra_offset += vals_sizes[p-1];
+          for (auto i : make_range(first_dofs[p]+1, first_dofs[p+1]+1))
+            row_offsets[i] += extra_offset;
+        }
+
+      write_vector("cols", H5T_STD_U64LE, H5T_NATIVE_ULLONG, cols);
+      write_vector("row_offsets", H5T_STD_U64LE, H5T_NATIVE_ULLONG, row_offsets);
+      write_vector("vals", H5T_IEEE_F64LE, H5T_NATIVE_DOUBLE, vals);
+
+      H5Gclose(group);
+      H5Fclose(file);
+    }
+  else
+    {
+      std::vector<std::size_t> dummy;
+      this->comm().gather(0, vals.size(), dummy);
+      this->comm().gather(0, cast_int<std::size_t>(first_dof), dummy);
+      this->comm().allgather(cols);
+      this->comm().allgather(vals);
+      this->comm().allgather(row_offsets);
+    }
+#endif // LIBMESH_HAVE_HDF5
+}
+
+
+
+template <typename T>
+void SparseMatrix<T>::print_petsc_binary(const std::string &) const
 {
   libmesh_not_implemented_msg
     ("libMesh cannot write PETSc binary-format files from non-PETSc matrices");
@@ -504,7 +664,7 @@ void SparseMatrix<T>::print_petsc_binary(const std::string &)
 
 
 template <typename T>
-void SparseMatrix<T>::print_petsc_hdf5(const std::string &)
+void SparseMatrix<T>::print_petsc_hdf5(const std::string &) const
 {
   libmesh_not_implemented_msg
     ("libMesh cannot write PETSc HDF5-format files from non-PETSc matrices");
@@ -541,6 +701,8 @@ void SparseMatrix<T>::read(const std::string & filename)
       libmesh_error_msg("Cannot load 64-bit PETSc matrix file " <<
                         filename << " with non-64-bit libMesh.");
 #endif
+      if (gzipped_file)
+        libmesh_not_implemented_msg("Gzipped PETSc matrices are not currently supported");
       this->read_petsc_binary(filename);
     }
   else if (Utility::ends_with(basename, ".petsc32"))
@@ -552,21 +714,95 @@ void SparseMatrix<T>::read(const std::string & filename)
       libmesh_error_msg("Cannot load 32-bit PETSc matrix file " <<
                         filename << " with non-32-bit libMesh.");
 #endif
+      if (gzipped_file)
+        libmesh_not_implemented_msg("Gzipped PETSc matrices are not currently supported");
       this->read_petsc_binary(filename);
     }
   else if (Utility::ends_with(basename, ".h5"))
     {
+      if (gzipped_file)
+        libmesh_not_implemented_msg("Gzipped HDF5 matrices are not currently supported");
       this->read_coreform_hdf5(filename);
     }
   else
     libmesh_error_msg(" ERROR: Unrecognized matrix file extension on: "
                       << basename
                       << "\n   I understand the following:\n\n"
-                      << "     *.h5      -- CoreForm HDF5 sparse matrix format\n"
-                      << "     *.matlab  -- Matlab sparse matrix format\n"
-                      << "     *.m       -- Matlab sparse matrix format\n"
-                      << "     *.petsc32 -- PETSc binary format, 32-bit\n"
-                      << "     *.petsc64 -- PETSc binary format, 64-bit\n"
+                      << "     *.h5        -- CoreForm HDF5 sparse matrix format\n"
+                      << "     *.matlab    -- Matlab sparse matrix format\n"
+                      << "     *.matlab.gz -- Matlab sparse matrix format, gzipped\n"
+                      << "     *.m         -- Matlab sparse matrix format\n"
+                      << "     *.m.gz      -- Matlab sparse matrix format, gzipped\n"
+                      << "     *.petsc32   -- PETSc binary format, 32-bit\n"
+                      << "     *.petsc64   -- PETSc binary format, 64-bit\n"
+                     );
+}
+
+
+
+template <typename T>
+void SparseMatrix<T>::print(const std::string & filename) const
+{
+  {
+    std::ofstream outstr (filename.c_str());
+    libmesh_error_msg_if
+      (!outstr.good(), "ERROR: cannot write to file:\n\t" <<
+       filename);
+  }
+
+  std::string_view basename = Utility::basename_of(filename);
+
+  const bool gzipped_file = Utility::ends_with(filename, ".gz");
+
+  if (gzipped_file)
+    basename.remove_suffix(3);
+
+  if (Utility::ends_with(basename, ".matlab") ||
+      Utility::ends_with(basename, ".m"))
+    this->print_matlab(filename);
+  else if (Utility::ends_with(basename, ".petsc64"))
+    {
+#ifndef LIBMESH_HAVE_PETSC
+      libmesh_error_msg("Cannot load PETSc matrix file " <<
+                        filename << " without PETSc-enabled libMesh.");
+#elif LIBMESH_DOF_ID_BYTES != 8
+      libmesh_error_msg("Cannot load 64-bit PETSc matrix file " <<
+                        filename << " with non-64-bit libMesh.");
+#endif
+      if (gzipped_file)
+        libmesh_not_implemented_msg("Gzipped PETSc matrices are not currently supported");
+      this->print_petsc_binary(filename);
+    }
+  else if (Utility::ends_with(basename, ".petsc32"))
+    {
+#ifndef LIBMESH_HAVE_PETSC
+      libmesh_error_msg("Cannot load PETSc matrix file " <<
+                        filename << " without PETSc-enabled libMesh.");
+#elif LIBMESH_DOF_ID_BYTES != 4
+      libmesh_error_msg("Cannot load 32-bit PETSc matrix file " <<
+                        filename << " with non-32-bit libMesh.");
+#endif
+      if (gzipped_file)
+        libmesh_not_implemented_msg("Gzipped PETSc matrices are not currently supported");
+      this->print_petsc_binary(filename);
+    }
+  else if (Utility::ends_with(basename, ".h5"))
+    {
+      if (gzipped_file)
+        libmesh_not_implemented_msg("Gzipped HDF5 matrices are not currently supported");
+      this->print_coreform_hdf5(filename);
+    }
+  else
+    libmesh_error_msg(" ERROR: Unrecognized matrix file extension on: "
+                      << basename
+                      << "\n   I understand the following:\n\n"
+                      << "     *.h5        -- CoreForm HDF5 sparse matrix format\n"
+                      << "     *.matlab    -- Matlab sparse matrix format\n"
+                      << "     *.matlab.gz -- Matlab sparse matrix format, gzipped\n"
+                      << "     *.m         -- Matlab sparse matrix format\n"
+                      << "     *.m.gz      -- Matlab sparse matrix format, gzipped\n"
+                      << "     *.petsc32   -- PETSc binary format, 32-bit\n"
+                      << "     *.petsc64   -- PETSc binary format, 64-bit\n"
                      );
 }
 
@@ -584,41 +820,30 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
 
   std::size_t num_rows, num_cols;
 
-  hid_t group;
-
-  auto check_open = [&filename](hid_t id, const std::string & objname)
-  {
-    if (id == H5I_INVALID_HID)
-      libmesh_error_msg("Couldn't open " + objname + " in " + filename);
-  };
-
-  auto check_hdf5 = [&filename](auto hdf5val, const std::string & objname)
-  {
-    if (hdf5val < 0)
-      libmesh_error_msg("HDF5 error from " + objname + " in " + filename);
-  };
-
+  // These are only used on pid 0, but avoid "uninitialized" warnings
+  hid_t group = H5I_INVALID_HID;
+  hid_t file = H5I_INVALID_HID;
 
   if (this->processor_id() == 0)
     {
-      const hid_t file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+      file = H5Fopen(filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
       if (file == H5I_INVALID_HID)
         libmesh_file_error(filename);
 
       group = H5Gopen(file, groupname.c_str(), H5P_DEFAULT);
-      check_open(group, groupname);
+      check_open(filename, group, groupname);
 
-      auto read_size_attribute = [&filename, &group, &check_open, &check_hdf5]
+      auto read_size_attribute = [&filename, &group]
         (const std::string & attribute_name)
       {
         unsigned long long returnval = 0;
 
         const hid_t attr = H5Aopen(group, attribute_name.c_str(), H5P_DEFAULT);
-        check_open(attr, attribute_name);
+        check_open(filename, attr, attribute_name);
 
         const hid_t attr_type = H5Aget_type(attr);
-        check_hdf5(attr_type, attribute_name + " type");
+        check_hdf5(filename, attr_type, attribute_name + " type");
 
         // HDF5 will convert between the file's integer type and ours, but
         // we do expect an integer type.
@@ -629,8 +854,8 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
 
         // HDF5 is supposed to handle both upscaling and endianness
         // conversions here
-        herr_t errval = H5Aread(attr, H5T_NATIVE_ULLONG, &returnval);
-        check_hdf5(errval, attribute_name + " read");
+        const herr_t errval = H5Aread(attr, H5T_NATIVE_ULLONG, &returnval);
+        check_hdf5(filename, errval, attribute_name + " read");
 
         H5Aclose(attr);
 
@@ -658,8 +883,8 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
                                   new_col_starts, new_col_stops;
 
   if (this->initialized() &&
-      num_cols == this->m() &&
-      num_rows == this->n())
+      num_cols == this->n() &&
+      num_rows == this->m())
     {
       new_row_start = this->row_start(),
       new_row_stop  = this->row_stop();
@@ -690,15 +915,15 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
 
   if (this->processor_id() == 0)
     {
-      auto read_vector = [&filename, &group, &check_open, &check_hdf5]
+      auto read_vector = [&filename, &group]
         (const std::string & dataname, auto hdf5_class,
          auto hdf5_type, auto & datavec)
       {
         const hid_t data = H5Dopen1(group, dataname.c_str());
-        check_open(data, dataname.c_str());
+        check_open(filename, data, dataname.c_str());
 
         const hid_t data_type = H5Dget_type(data);
-        check_hdf5(data_type, dataname + " type");
+        check_hdf5(filename, data_type, dataname + " type");
 
         // HDF5 will convert between the file's integer type and ours, but
         // we do expect an integer type.
@@ -708,7 +933,7 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
         H5Tclose(data_type);
 
         const hid_t dataspace = H5Dget_space(data);
-        check_hdf5(dataspace, dataname + " space");
+        check_hdf5(filename, dataspace, dataname + " space");
 
         int ndims = H5Sget_simple_extent_ndims(dataspace);
         if (ndims != 1)
@@ -716,12 +941,14 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
 
         hsize_t len, maxlen;
         herr_t errval = H5Sget_simple_extent_dims(dataspace, &len, &maxlen);
-        check_hdf5(errval, dataname + " dims");
+        check_hdf5(filename, errval, dataname + " dims");
 
         datavec.resize(len);
 
         errval = H5Dread(data, hdf5_type, H5S_ALL, H5S_ALL, H5P_DEFAULT, datavec.data());
-        check_hdf5(errval, dataname + " read");
+        check_hdf5(filename, errval, dataname + " read");
+
+        H5Dclose(data);
       };
 
       read_vector("cols", H5T_INTEGER, H5T_NATIVE_ULLONG, cols);
@@ -798,6 +1025,9 @@ void SparseMatrix<T>::read_coreform_hdf5(const std::string & filename,
             }
           this->set(current_row, cols[i], vals[i]);
         }
+
+      H5Gclose(group);
+      H5Fclose(file);
     }
 
   this->close();
