@@ -2025,6 +2025,34 @@ void MeshBase::detect_interior_parents()
     {
       return _disconnected_boundary_pairs.get();
     }
+
+  void MeshBase::remove_disconnected_boundaries_pair(const boundary_id_type b1,
+                                                     const boundary_id_type b2)
+    {
+      // Nothing to remove if not allocated or empty
+      if (!_disconnected_boundary_pairs || _disconnected_boundary_pairs->empty())
+        return;
+
+      auto & pairs = *_disconnected_boundary_pairs;
+
+      // Helper to check and erase both directions
+      auto erase_if_match = [&](boundary_id_type key, boundary_id_type pair)
+      {
+        auto it = pairs.find(key);
+        if (it != pairs.end())
+          {
+            const auto & pb = it->second;
+            // check both directions
+            if ((pb->myboundary == key && pb->pairedboundary == pair) ||
+                (pb->pairedboundary == key && pb->myboundary == pair))
+              pairs.erase(it);
+          }
+      };
+
+      erase_if_match(b1, b2);
+      erase_if_match(b2, b1);
+    }
+
 #endif
 
 

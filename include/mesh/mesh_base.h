@@ -1841,6 +1841,10 @@ public:
   PeriodicBoundaries * get_disconnected_boundaries();
 
   const PeriodicBoundaries * get_disconnected_boundaries() const;
+
+  void remove_disconnected_boundaries_pair(const boundary_id_type b1,
+                                           const boundary_id_type b2);
+
 #endif
 
 

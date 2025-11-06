@@ -16,6 +16,7 @@
 #include "libmesh_cppunit.h"
 
 #include "libmesh/mesh_refinement.h"
+#include "libmesh/periodic_boundaries.h"
 
 using namespace libMesh;
 
@@ -196,6 +197,7 @@ public:
   CPPUNIT_TEST_EXCEPTION(testTempJumpLocalRefineFail, std::exception);
 #endif
   CPPUNIT_TEST( testCloneEquality );
+  CPPUNIT_TEST( testStitchingDiscontinuousBoundaries );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -291,6 +293,36 @@ private:
     CPPUNIT_ASSERT(*mesh_clone == mesh);
   }
 
+  void testStitchingDiscontinuousBoundaries()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld, 2);
+    build_two_disconnected_elems(mesh);
+
+    mesh.stitch_surfaces(interface_left_id, interface_right_id, 1e-8 /*tolerance*/,
+                        true/*clear_stitched_boundary_ids*/, false /*verbose*/,false/*use_binary_search*/,
+                        false /*enforce_all_nodes_match_on_boundaries*/, false /*merge_boundary_nodes_all_or_nothing*/,
+                        false /*prepare_after_stitching*/);
+
+    CPPUNIT_ASSERT(mesh.get_disconnected_boundaries()->size() == 0);
+
+
+    // ExodusII_IO(mesh).write("stitched_disconnected_boundaries.e");
+
+    Mesh mesh2(*TestCommWorld, 2);
+    build_two_disconnected_elems(mesh2);
+
+    mesh2.stitch_surfaces(interface_left_id, interface_right_id, 1e-8 /*tolerance*/,
+                        true/*clear_stitched_boundary_ids*/, false /*verbose*/,false/*use_binary_search*/,
+                        false /*enforce_all_nodes_match_on_boundaries*/, false /*merge_boundary_nodes_all_or_nothing*/,
+                        true /*prepare_after_stitching*/);
+
+    CPPUNIT_ASSERT(mesh2.get_disconnected_boundaries()->size() == 0);
+
+    // ExodusII_IO(mesh2).write("stitched_disconnected_boundaries_2.e");
+
+  }
 
   void testTempJumpRefine()
   {
