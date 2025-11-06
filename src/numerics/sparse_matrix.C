@@ -70,7 +70,7 @@ namespace
   {
     if (hdf5val < 0)
       libmesh_error_msg("HDF5 error from " + objname + " in " + filename);
-  };
+  }
 #endif
 }
 
