@@ -299,26 +299,22 @@ void EquationSystems::read (Xdr & io,
         }
 
       for (auto & pr : xda_systems)
-        if (read_legacy_format)
+      {
+        libmesh_error_msg_if(read_legacy_format,
+                             "Reading legacy format XDR files is officially no longer supported.");
+
+        if (read_parallel_files)
           {
-            libmesh_deprecated();
-#ifdef LIBMESH_ENABLE_DEPRECATED
-            pr.second->read_legacy_data (io, read_additional_data);
-#endif
+            if (!local_io)
+            {
+              local_io = local_io_functor();
+              libmesh_assert(local_io->reading());
+            }
+            pr.second->read_parallel_data<InValType> (*local_io, read_additional_data);
           }
         else
-          if (read_parallel_files)
-            {
-              if (!local_io)
-              {
-                local_io = local_io_functor();
-                libmesh_assert(local_io->reading());
-              }
-              pr.second->read_parallel_data<InValType> (*local_io, read_additional_data);
-            }
-          else
-            pr.second->read_serialized_data<InValType> (io, read_additional_data);
-
+          pr.second->read_serialized_data<InValType> (io, read_additional_data);
+      }
 
       // Undo the temporary numbering.
       if (!read_legacy_format && partition_agnostic)
