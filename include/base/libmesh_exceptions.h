@@ -77,7 +77,7 @@ public:
 class ConvergenceFailure : public std::runtime_error
 {
 public:
-  ConvergenceFailure() : std::runtime_error( "Unrecoverable failure to converge" ) {}
+  ConvergenceFailure(const std::string & err_msg="Unrecoverable failure to converge") : std::runtime_error( err_msg ) {}
 };
 
 

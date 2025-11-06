@@ -140,7 +140,17 @@ void VariationalMeshSmoother::smooth()
   if (!_setup_called)
     setup();
 
-  system()->solve();
+  libmesh_try
+    {
+      system()->solve();
+    }
+
+  libmesh_catch (ConvergenceFailure& e)
+    {
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+      throw ConvergenceFailure("The VariationalMeshSmoother solve failed to converge.");
+#endif
+    }
 
   // Update _mesh from _mesh_copy
   for (auto * node_copy : _mesh_copy->local_node_ptr_range())
