@@ -298,13 +298,13 @@ public:
    * \returns The magnitude of the vector, i.e. the square-root of the
    * sum of the elements squared.
    */
-  auto norm() const -> decltype(std::norm(T()));
+  auto norm() const;
 
   /**
    * \returns The magnitude of the vector squared, i.e. the sum of the
    * element magnitudes squared.
    */
-  auto norm_sq() const -> decltype(std::norm(T()));
+  auto norm_sq() const;
 
   /**
    * \returns The L1 norm of the vector
@@ -904,9 +904,10 @@ TypeVector<T>::cross(const TypeVector<T2> & p) const
 
 template <typename T>
 inline
-auto TypeVector<T>::norm() const -> decltype(std::norm(T()))
+auto TypeVector<T>::norm() const
 {
-  return std::sqrt(this->norm_sq());
+  using std::sqrt;
+  return sqrt(this->norm_sq());
 }
 
 
@@ -923,7 +924,7 @@ void TypeVector<T>::zero()
 
 template <typename T>
 inline
-auto TypeVector<T>::norm_sq() const -> decltype(std::norm(T()))
+auto TypeVector<T>::norm_sq() const
 {
 #if LIBMESH_DIM == 1
   return (TensorTools::norm_sq(_coords[0]));

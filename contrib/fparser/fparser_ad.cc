@@ -800,77 +800,77 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
       case cDiv:
         --sp; ccout << "s[" << sp << "] /= s[" << (sp+1) << "];\n"; break;
       case cMod:
-        --sp; ccout << "s[" << sp << "] = std::fmod(s[" << sp << "], s[" << (sp+1) << "]);\n"; break;
+        --sp; ccout << "using std::fmod; s[" << sp << "] = fmod(s[" << sp << "], s[" << (sp+1) << "]);\n"; break;
       case cRDiv:
         --sp; ccout << "s[" << sp << "] = s[" << (sp+1) << "] / s[" << sp << "];\n"; break;
 
       case cSin:
-        ccout << "s[" << sp << "] = std::sin(s[" << sp << "]);\n"; break;
+        ccout << "using std::sin; s[" << sp << "] = sin(s[" << sp << "]);\n"; break;
       case cCos:
-        ccout << "s[" << sp << "] = std::cos(s[" << sp << "]);\n"; break;
+        ccout << "using std::cos; s[" << sp << "] = cos(s[" << sp << "]);\n"; break;
       case cTan:
-        ccout << "s[" << sp << "] = std::tan(s[" << sp << "]);\n"; break;
+        ccout << "using std::tan; s[" << sp << "] = tan(s[" << sp << "]);\n"; break;
       case cSinh:
-        ccout << "s[" << sp << "] = std::sinh(s[" << sp << "]);\n"; break;
+        ccout << "using std::sinh; s[" << sp << "] = sinh(s[" << sp << "]);\n"; break;
       case cCosh:
-        ccout << "s[" << sp << "] = std::cosh(s[" << sp << "]);\n"; break;
+        ccout << "using std::cosh; s[" << sp << "] = cosh(s[" << sp << "]);\n"; break;
       case cTanh:
-        ccout << "s[" << sp << "] = std::tanh(s[" << sp << "]);\n"; break;
+        ccout << "using std::tanh; s[" << sp << "] = tanh(s[" << sp << "]);\n"; break;
       // TODO: div by zero -> this->mData->mEvalErrorType=1; return Value_t(0);
       case cCsc:
-        ccout << "s[" << sp << "] = 1.0/std::sin(s[" << sp << "]);\n"; break;
+        ccout << "using std::sin; s[" << sp << "] = 1.0/sin(s[" << sp << "]);\n"; break;
       case cSec:
-        ccout << "s[" << sp << "] = 1.0/std::cos(s[" << sp << "]);\n"; break;
+        ccout << "using std::cos; s[" << sp << "] = 1.0/cos(s[" << sp << "]);\n"; break;
       case cCot:
-        ccout << "s[" << sp << "] = 1.0/std::tan(s[" << sp << "]);\n"; break;
+        ccout << "using std::tan; s[" << sp << "] = 1.0/tan(s[" << sp << "]);\n"; break;
       case cSinCos:
-        ccout << "s[" << (sp+1) << "] = std::cos(s[" << sp << "]);\n";
-        ccout << "s[" << sp << "] = std::sin(s[" << sp << "]);\n";
+        ccout << "using std::cos; s[" << (sp+1) << "] = cos(s[" << sp << "]);\n";
+        ccout << "using std::sin; s[" << sp << "] = sin(s[" << sp << "]);\n";
         ++sp;
         break;
       case cSinhCosh:
-        ccout << "s[" << (sp+1) << "] = std::cosh(s[" << sp << "]);\n";
-        ccout << "s[" << sp << "] = std::sinh(s[" << sp << "]);\n";
+        ccout << "using std::cosh; s[" << (sp+1) << "] = cosh(s[" << sp << "]);\n";
+        ccout << "using std::sinh; s[" << sp << "] = sinh(s[" << sp << "]);\n";
         ++sp;
         break;
       case cAsin:
-        ccout << "s[" << sp << "] = std::asin(s[" << sp << "]);\n"; break;
+        ccout << " using std::asin; s[" << sp << "] = asin(s[" << sp << "]);\n"; break;
       case cAcos:
-        ccout << "s[" << sp << "] = std::acos(s[" << sp << "]);\n"; break;
+        ccout << " using std::acos; s[" << sp << "] = acos(s[" << sp << "]);\n"; break;
       case cAsinh:
-        ccout << "s[" << sp << "] = std::asinh(s[" << sp << "]);\n"; break;
+        ccout << " using std::asinh; s[" << sp << "] = asinh(s[" << sp << "]);\n"; break;
       case cAcosh:
-        ccout << "s[" << sp << "] = std::acosh(s[" << sp << "]);\n"; break;
+        ccout << " using std::acosh; s[" << sp << "] = acosh(s[" << sp << "]);\n"; break;
       case cAtan:
-        ccout << "s[" << sp << "] = std::atan(s[" << sp << "]);\n"; break;
+        ccout << " using std::atan; s[" << sp << "] = atan(s[" << sp << "]);\n"; break;
       case cAtanh:
-        ccout << "s[" << sp << "] = std::atanh(s[" << sp << "]);\n"; break;
+        ccout << " using std::atanh; s[" << sp << "] = atanh(s[" << sp << "]);\n"; break;
       case cAtan2:
-        --sp; ccout << "s[" << sp << "] = std::atan2(s[" << sp << "], s[" << (sp+1) << "]);\n"; break;
+        --sp; ccout << " using std::atan2; s[" << sp << "] = atan2(s[" << sp << "], s[" << (sp+1) << "]);\n"; break;
       case cHypot:
-        --sp; ccout << "s[" << sp << "] = std::sqrt(s[" << sp << "]*s[" << sp << "] + s[" << (sp+1) << "]*s[" << (sp+1) << "]);\n"; break;
+        --sp; ccout << " using std::sqrt; s[" << sp << "] = sqrt(s[" << sp << "]*s[" << sp << "] + s[" << (sp+1) << "]*s[" << (sp+1) << "]);\n"; break;
 
       case cAbs:
-        ccout << "s[" << sp << "] = std::abs(s[" << sp << "]);\n"; break;
+        ccout << "using std::abs; s[" << sp << "] = abs(s[" << sp << "]);\n"; break;
       case cMax:
         --sp; ccout << "s[" << sp << "] = s[" << sp << "] > s[" << (sp+1) << "] ? s[" << sp << "] : s[" << (sp+1) << "];\n"; break;
       case cMin:
         --sp; ccout << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? s[" << sp << "] : s[" << (sp+1) << "];\n"; break;
       case cTrunc:
-        ccout << "s[" << sp << "] = s[" << sp << "] < 0 ? std::ceil(s[" << sp << "]) : std::floor(s[" << sp << "]);\n"; break;
+        ccout << "using std::ceil, std::floor; s[" << sp << "] = s[" << sp << "] < 0 ? ceil(s[" << sp << "]) : floor(s[" << sp << "]);\n"; break;
       case cCeil:
-        ccout << "s[" << sp << "] = std::ceil(s[" << sp << "]);\n"; break;
+        ccout << "using std::ceil; s[" << sp << "] = ceil(s[" << sp << "]);\n"; break;
       case cFloor:
-        ccout << "s[" << sp << "] = std::floor(s[" << sp << "]);\n"; break;
+        ccout << "using std::floor; s[" << sp << "] = floor(s[" << sp << "]);\n"; break;
       case cInt:
-        ccout << "s[" << sp << "] = s[" << sp << "] < 0 ? std::ceil(s[" << sp << "] - 0.5) : std::floor(s[" << sp << "] + 0.5);\n"; break;
+        ccout << "using std::ceil, std::floor; s[" << sp << "] = s[" << sp << "] < 0 ? ceil(s[" << sp << "] - 0.5) : floor(s[" << sp << "] + 0.5);\n"; break;
 
       case cEqual:
         //--sp; ccout << "s[" << sp << "] = s[" << sp << "] == s[" << (sp+1) << "];\n"; break;
-        --sp; ccout << "s[" << sp << "] = std::abs(s[" << sp << "] - s[" << (sp+1) << "]) <= eps;\n"; break;
+        --sp; ccout << "using std::abs; s[" << sp << "] = abs(s[" << sp << "] - s[" << (sp+1) << "]) <= eps;\n"; break;
       case cNEqual:
         //--sp; ccout << "s[" << sp << "] = s[" << sp << "] != s[" << (sp+1) << "];\n"; break;
-        --sp; ccout << "s[" << sp << "] = std::abs(s[" << sp << "] - s[" << (sp+1) << "]) > eps;\n"; break;
+        --sp; ccout << "using std::abs; s[" << sp << "] = abs(s[" << sp << "] - s[" << (sp+1) << "]) > eps;\n"; break;
       case cLess:
         --sp; ccout << "s[" << sp << "] = s[" << sp << "] < (s[" << (sp+1) << "] - eps);\n"; break;
       case cLessOrEq:
@@ -880,33 +880,33 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
       case cGreaterOrEq:
         --sp; ccout << "s[" << sp << "] = (s[" << sp << "] + eps) >= s[" << (sp+1) << "];\n"; break;
       case cNot:
-        ccout << "s[" << sp << "] = std::abs(s[" << sp << "]) < 0.5;\n"; break;
+        ccout << "using std::abs; s[" << sp << "] = abs(s[" << sp << "]) < 0.5;\n"; break;
       case cNotNot:
-        ccout << "s[" << sp << "] = std::abs(s[" << sp << "]) >= 0.5;\n"; break;
+        ccout << "using std::abs; s[" << sp << "] = abs(s[" << sp << "]) >= 0.5;\n"; break;
       case cAbsNot:
         ccout << "s[" << sp << "] = s[" << sp << "] < 0.5;\n"; break;
       case cAbsNotNot:
         ccout << "s[" << sp << "] = s[" << sp << "] >= 0.5;\n"; break;
       case cOr:
-        --sp; ccout << "s[" << sp << "] = (std::abs(s[" << sp << "]) >= 0.5) || (std::abs(s[" << (sp+1) << "]) >= 0.5);\n"; break;
+        --sp; ccout << "using std::abs; s[" << sp << "] = (abs(s[" << sp << "]) >= 0.5) || (abs(s[" << (sp+1) << "]) >= 0.5);\n"; break;
       case cAbsOr:
         --sp; ccout << "s[" << sp << "] = (s[" << sp << "] >= 0.5) || (s[" << (sp+1) << "] >= 0.5);\n"; break;
       case cAnd:
-        --sp; ccout << "s[" << sp << "] = (std::abs(s[" << sp << "]) >= 0.5) && (std::abs(s[" << (sp+1) << "]) >= 0.5);\n"; break;
+        --sp; ccout << "using std::abs; s[" << sp << "] = (abs(s[" << sp << "]) >= 0.5) && (abs(s[" << (sp+1) << "]) >= 0.5);\n"; break;
       case cAbsAnd:
         --sp; ccout << "s[" << sp << "] = (s[" << sp << "] >= 0.5) && (s[" << (sp+1) << "] >= 0.5);\n"; break;
 
       case cLog:
-        ccout << "s[" << sp << "] = std::log(s[" << sp << "]);\n"; break;
+        ccout << "using std::log; s[" << sp << "] = log(s[" << sp << "]);\n"; break;
       case cLog2:
 #ifdef FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS
-        ccout << "s[" << (sp-1) << "] = std::log2(s[" << (sp-1) << "]);\n";
+        ccout << "using std::log2; s[" << (sp-1) << "] = log2(s[" << (sp-1) << "]);\n";
 #else
-        ccout << "s[" << sp << "] = std::log(s[" << sp << "])/log(2.0);\n";
+        ccout << "using std::log; s[" << sp << "] = log(s[" << sp << "])/log(2.0);\n";
 #endif
         break;
       case cLog10:
-        ccout << "s[" << sp << "] = std::log10(s[" << sp << "]);\n"; break;
+        ccout << "using std::log10; s[" << sp << "] = log10(s[" << sp << "]);\n"; break;
 
       case cNeg:
         ccout << "s[" << sp << "] = -s[" << sp << "];\n"; break;
@@ -929,14 +929,14 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
         {
           // --sp; ccout << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) + (s[" << sp << "] - s[" << (sp+1) << "]) / s[" << (sp+1) << "] : std::log(s[" << sp << "]);\n";
           // --sp; ccout << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "]) - 1.5 + 2.0/s[" << (sp+1) << "] * s[" << sp << "] - 0.5/(s[" << (sp+1) << "]*s[" << (sp+1) << "]) * s[" << sp << "]*s[" << sp << "] : std::log(s[" << sp << "]);\n";
-          --sp; ccout << "s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? std::log(s[" << (sp+1) << "])  +  (s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "]  -  std::pow((s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],2.0)/2.0  +  std::pow((s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],3.0)/3.0 : std::log(s[" << sp << "]);\n";
+          --sp; ccout << "using std::log, std::pow; s[" << sp << "] = s[" << sp << "] < s[" << (sp+1) << "] ? log(s[" << (sp+1) << "])  +  (s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "]  -  pow((s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],2.0)/2.0  +  pow((s[" << sp << "]-s[" << (sp+1) << "])/s[" << (sp+1) << "],3.0)/3.0 : log(s[" << sp << "]);\n";
         }
         else if (function == mFErf)
         {
 #if LIBMESH_HAVE_CXX11_ERF
-          ccout << "s[" << sp << "] = std::erf(s[" << sp << "]);\n";
+          ccout << "using std::erf; s[" << sp << "] = erf(s[" << sp << "]);\n";
 #else
-          std::cerr << "Libmesh is not compiled with c++11 so std::erf is not supported by JIT.\n";
+          std::cerr << "Libmesh is not compiled with c++11 so erf is not supported by JIT.\n";
           return false;
 #endif
         }
@@ -958,7 +958,7 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
         break;
       }
       case cLog2by:
-        --sp; ccout << "s[" << sp << "] = std::log(s[" << sp << "])/log(2.0) * s[" << (sp+1) << "];\n"; break;
+        --sp; ccout << "using std::log; s[" << sp << "] = log(s[" << sp << "])/log(2.0) * s[" << (sp+1) << "];\n"; break;
       case cNop:
         break;
 #endif
@@ -966,20 +966,20 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
       case cSqr:
         ccout << "s[" << sp << "] *= s[" << sp << "];\n"; break;
       case cSqrt:
-        ccout << "s[" << sp << "] = std::sqrt(s[" << sp << "]);\n"; break;
+        ccout << "using std::sqrt; s[" << sp << "] = sqrt(s[" << sp << "]);\n"; break;
       case cRSqrt:
-        ccout << "s[" << sp << "] = std::pow(s[" << sp << "], (-0.5));\n"; break;
+        ccout << "using std::pow; s[" << sp << "] = pow(s[" << sp << "], (-0.5));\n"; break;
       case cPow:
-        --sp; ccout << "s[" << sp << "] = std::pow(s[" << sp << "], s[" << (sp+1) << "]);\n"; break;
+        --sp; ccout << "using std::pow; s[" << sp << "] = pow(s[" << sp << "], s[" << (sp+1) << "]);\n"; break;
       case cExp:
-        ccout << "s[" << sp << "] = std::exp(s[" << sp << "]);\n"; break;
+        ccout << "using std::exp; s[" << sp << "] = exp(s[" << sp << "]);\n"; break;
       case cExp2:
-        ccout << "s[" << sp << "] = std::pow(2.0, s[" << sp << "]);\n"; break;
+        ccout << "using std::pow; s[" << sp << "] = pow(2.0, s[" << sp << "]);\n"; break;
       case cCbrt:
 #ifdef FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS
-        ccout << "s[" << sp << "] = std::cbrt(s[" << sp << "]);\n"; break;
+        ccout << "using std::cbrt; s[" << sp << "] = cbrt(s[" << sp << "]);\n"; break;
 #else
-        ccout << "s[" << sp << "] = s[" << sp << "] == 0 ? 0 : (s[" << sp << "] > 0 ? std::exp(std::log(s[" << sp << "])/3.0) : -std::exp(std::log(-s[" << sp << "])/3.0));\n"; break;
+        ccout << "using std::exp, std::log; s[" << sp << "] = s[" << sp << "] == 0 ? 0 : (s[" << sp << "] > 0 ? exp(log(s[" << sp << "])/3.0) : -exp(log(-s[" << sp << "])/3.0));\n"; break;
 #endif
 
       case cJump:
@@ -991,7 +991,7 @@ bool FunctionParserADBase<Value_t>::JITCodeGen(std::ostream & ccout, const std::
         if (op == cIf)
           ccout << "if (s[" << sp-- << "] < 0.5) ";
         if (op == cAbsIf)
-          ccout << "if (std::abs(s[" << sp-- << "]) < 0.5) ";
+          ccout << "using std::abs; if (abs(s[" << sp-- << "]) < 0.5) ";
 
         if (ip >= ByteCode.size())
           ccout << "*ret = s[" << sp << "]; return;\n";
