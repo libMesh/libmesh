@@ -1103,7 +1103,8 @@ public:
   void testVariationalQuad4()
   {
     Mesh mesh(*TestCommWorld);
-    VariationalMeshSmoother variational(mesh);
+    // High verbosity for a 2D mesh to increase code coverage
+    VariationalMeshSmoother variational(mesh, 0.5, true, TOLERANCE * TOLERANCE, TOLERANCE * TOLERANCE, 100);
 
     testVariationalSmoother(mesh, variational, QUAD4);
   }
@@ -1307,7 +1308,8 @@ public:
   void testVariationalTet4()
   {
     Mesh mesh(*TestCommWorld);
-    VariationalMeshSmoother variational(mesh);
+    // High verbosity for a 3D mesh to increase code coverage
+    VariationalMeshSmoother variational(mesh, 0.5, true, TOLERANCE * TOLERANCE, TOLERANCE * TOLERANCE, 100);
 
     testVariationalSmoother(mesh, variational, TET4);
   }
