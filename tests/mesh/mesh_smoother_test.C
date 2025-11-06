@@ -1103,10 +1103,17 @@ public:
   void testVariationalQuad4()
   {
     Mesh mesh(*TestCommWorld);
-    // High verbosity for a 2D mesh to increase code coverage
     VariationalMeshSmoother variational(mesh, 0.5, true, TOLERANCE * TOLERANCE, TOLERANCE * TOLERANCE, 100);
 
+    // High verbosity for a 3D mesh to increase code coverage, but silence the output
+    // If we want to save the output for processing later, send it somewhere
+    // besides nullptr
+    std::streambuf * out_buf = libMesh::out.rdbuf(nullptr);
+
     testVariationalSmoother(mesh, variational, QUAD4);
+
+    // Reset stdout
+    libMesh::out.rdbuf(out_buf);
   }
 
   void testVariationalQuad4MultipleSubdomains()
@@ -1308,10 +1315,17 @@ public:
   void testVariationalTet4()
   {
     Mesh mesh(*TestCommWorld);
-    // High verbosity for a 3D mesh to increase code coverage
     VariationalMeshSmoother variational(mesh, 0.5, true, TOLERANCE * TOLERANCE, TOLERANCE * TOLERANCE, 100);
 
+    // High verbosity for a 3D mesh to increase code coverage, but silence the output
+    // If we want to save the output for processing later, send it somewhere
+    // besides nullptr
+    std::streambuf * out_buf = libMesh::out.rdbuf(nullptr);
+
     testVariationalSmoother(mesh, variational, TET4);
+
+    // Reset stdout
+    libMesh::out.rdbuf(out_buf);
   }
 
   void testVariationalTet10()
