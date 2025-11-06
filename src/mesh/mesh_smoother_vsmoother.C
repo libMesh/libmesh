@@ -145,9 +145,11 @@ void VariationalMeshSmoother::smooth(unsigned int)
       system()->solve();
     }
 
-  libmesh_catch(std::runtime_error& e)
+  libmesh_catch (std::runtime_error& e)
     {
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
       throw std::runtime_error(std::string("VariationalMeshSmoother: issue encountered during solve:\n") + e.what());
+#endif
     }
 
   // Update _mesh from _mesh_copy
