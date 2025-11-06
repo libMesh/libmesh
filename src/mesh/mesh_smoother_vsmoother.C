@@ -140,12 +140,12 @@ void VariationalMeshSmoother::smooth(unsigned int)
   if (!_setup_called)
     setup();
 
-  try
+  libmesh_try
     {
       system()->solve();
     }
 
-  catch (std::runtime_error& e)
+  libmesh_catch (std::runtime_error& e)
     {
       throw std::runtime_error(std::string("VariationalMeshSmoother: issue encountered during solve:\n") + e.what());
     }
