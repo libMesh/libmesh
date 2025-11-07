@@ -2038,16 +2038,16 @@ void MeshBase::detect_interior_parents()
       // Helper to check and erase both directions
       auto erase_if_match = [](boundary_id_type key,
                               boundary_id_type pair,
-                              PeriodicBoundaries & pairs)
+                              PeriodicBoundaries & pb_map)
         {
-          auto it = pairs.find(key);
-          if (it != pairs.end())
+          auto it = pb_map.find(key);
+          if (it != pb_map.end())
             {
               const auto & pb = *(it->second);
               // Check both directions
               if ((pb.myboundary == key && pb.pairedboundary == pair) ||
                   (pb.pairedboundary == key && pb.myboundary == pair))
-                pairs.erase(it);
+                pb_map.erase(it);
             }
         };
 
