@@ -134,6 +134,7 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
 #endif
   _allow_empty_variables(false),
   _write_complex_abs(true),
+  _set_unique_ids_from_maps(false),
   _disc_bex(false)
 {
   // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
@@ -157,6 +158,7 @@ ExodusII_IO::ExodusII_IO (const MeshBase & mesh,
 #endif
   _allow_empty_variables(false),
   _write_complex_abs(true),
+  _set_unique_ids_from_maps(false),
   _disc_bex(false)
 {
   // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
@@ -325,22 +327,29 @@ void ExodusII_IO::read (const std::string & fname)
   std::unordered_map<const Node *, Elem *> spline_nodeelem_ptrs;
 
   // Loop over the nodes, create Nodes with local processor_id 0.
-  for (int i=0; i<exio_helper->num_nodes; i++)
+  for (auto i : make_range(exio_helper->num_nodes))
     {
-      // Use the node_num_map to get the correct ID for Exodus
-      int exodus_id = exio_helper->node_num_map[i];
+      // Determine the libmesh node id implied by "i". The
+      // get_libmesh_node_id() helper function expects a 1-based
+      // Exodus node id, so we construct the "implied" Exodus node id
+      // from "i" by adding 1.
+      auto libmesh_node_id = exio_helper->get_libmesh_node_id(/*exodus_node_id=*/i+1);
 
       // Catch the node that was added to the mesh
-      Node * added_node = mesh.add_point (Point(exio_helper->x[i], exio_helper->y[i], exio_helper->z[i]), exodus_id-1);
+      Node * added_node = mesh.add_point (Point(exio_helper->x[i], exio_helper->y[i], exio_helper->z[i]), libmesh_node_id);
 
-      // If the Mesh assigned an ID different from what is in the
-      // Exodus file, we should probably error.
-      libmesh_error_msg_if(added_node->id() != static_cast<unsigned>(exodus_id-1),
+      // Sanity check: throw an error if the Mesh assigned an ID to
+      // the Node which does not match the libmesh_id we just determined.
+      libmesh_error_msg_if(added_node->id() != static_cast<unsigned>(libmesh_node_id),
                            "Error!  Mesh assigned node ID "
                            << added_node->id()
                            << " which is different from the (zero-based) Exodus ID "
-                           << exodus_id-1
+                           << libmesh_node_id
                            << "!");
+
+      // If the _set_unique_ids_from_maps flag is true, set the
+      // unique_id for "node", otherwise do nothing.
+      exio_helper->conditionally_set_node_unique_id(mesh, added_node, i);
 
       // If we have a set of spline weights, these nodes are going to
       // be used as control points for Bezier elements, and we need
@@ -361,6 +370,13 @@ void ExodusII_IO::read (const std::string & fname)
 
           // Give the NodeElem ids at the end, so we can match any
           // existing ids in the file for other elements
+          //
+          // We don't set the unique_id for this NodeElem here even if
+          // the user has set the _set_unique_ids_from_maps flag
+          // because these NodeElems don't have entries in the
+          // elem_num_map. Therefore, we just let the Mesh assign
+          // whatever unique_id is "next" as the Elem is added to the
+          // Mesh.
           elem->set_id() = exio_helper->end_elem_id() + i;
 
           elem->set_node(0, added_node);
@@ -449,19 +465,13 @@ void ExodusII_IO::read (const std::string & fname)
           // Assign the current subdomain to this Elem
           uelem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id);
 
-          // Use the elem_num_map to obtain the ID of this element in
-          // the Exodus file.  Make sure we aren't reading garbage if
-          // the file is corrupt.
-          libmesh_error_msg_if(std::size_t(j) >= exio_helper->elem_num_map.size(),
-                               "Error: Trying to read Exodus file with more elements than elem_num_map entries.\n");
-          int exodus_id = exio_helper->elem_num_map[j];
+          // Determine the libmesh elem id implied by "j". The
+          // ExodusII_IO_Helper::get_libmesh_elem_id() helper function
+          // expects a 1-based Exodus elem id, so we construct the
+          // "implied" Exodus elem id from "j" by adding 1.
+          auto libmesh_elem_id = exio_helper->get_libmesh_elem_id(/*exodus_elem_id=*/j+1);
 
-          // Assign this element the same ID it had in the Exodus
-          // file, but make it zero-based by subtracting 1.  Note:
-          // some day we could use 1-based numbering in libmesh and
-          // thus match the Exodus numbering exactly, but at the
-          // moment libmesh is zero-based.
-          uelem->set_id(exodus_id-1);
+          uelem->set_id(libmesh_elem_id);
 
           // Record that we have seen an element of dimension uelem->dim()
           elems_of_dimension[uelem->dim()] = true;
@@ -469,13 +479,17 @@ void ExodusII_IO::read (const std::string & fname)
           // Catch the Elem pointer that the Mesh throws back
           Elem * elem = mesh.add_elem(std::move(uelem));
 
-          // If the Mesh assigned an ID different from what is in the
-          // Exodus file, we should probably error.
-          libmesh_error_msg_if(elem->id() != static_cast<unsigned>(exodus_id-1),
+          // If the _set_unique_ids_from_maps flag is true, set the
+          // unique_id for "elem", otherwise do nothing.
+          exio_helper->conditionally_set_elem_unique_id(mesh, elem, j);
+
+          // If the Mesh assigned an ID different from the one we
+          // tried to give it, we should probably error.
+          libmesh_error_msg_if(elem->id() != static_cast<unsigned>(libmesh_elem_id),
                                "Error!  Mesh assigned ID "
                                << elem->id()
                                << " which is different from the (zero-based) Exodus ID "
-                               << exodus_id-1
+                               << libmesh_elem_id
                                << "!");
 
           // Assign extra integer IDs
@@ -528,17 +542,14 @@ void ExodusII_IO::read (const std::string & fname)
             {
               for (int k=0; k<exio_helper->num_nodes_per_elem; k++)
                 {
-                  // global index
-                  int gi = (elem_num)*exio_helper->num_nodes_per_elem + conv.get_node_map(k);
+                  // Get index into this block's connectivity array
+                  int gi = elem_num * exio_helper->num_nodes_per_elem + conv.get_node_map(k);
 
-                  // The entries in 'connect' are actually (1-based)
-                  // indices into the node_num_map, so to get the right
-                  // node ID we:
-                  // 1.) Subtract 1 from connect[gi]
-                  // 2.) Pass it through node_num_map to get the corresponding Exodus ID
-                  // 3.) Subtract 1 from that, since libmesh node numbering is "zero"-based,
-                  //     even when the Exodus node numbering doesn't start with 1.
-                  int libmesh_node_id = exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
+                  // Get the 1-based Exodus node id from the "connect" array
+                  auto exodus_node_id = exio_helper->connect[gi];
+
+                  // Convert this index to a libMesh Node id
+                  auto libmesh_node_id = exio_helper->get_libmesh_node_id(exodus_node_id);
 
                   // Set the node pointer in the Elem
                   elem->set_node(k, mesh.node_ptr(libmesh_node_id));
@@ -609,10 +620,13 @@ void ExodusII_IO::read (const std::string & fname)
                         libmesh_vector_at(coef_vec, elem_node_index);
 
                       // Get the libMesh node corresponding to that row
-                      const int gi = (elem_num)*exio_helper->bex_num_elem_cvs +
-                        spline_node_index;
-                      const dof_id_type libmesh_node_id =
-                        exio_helper->node_num_map[exio_helper->connect[gi] - 1] - 1;
+                      const int gi = elem_num * exio_helper->bex_num_elem_cvs + spline_node_index;
+
+                      // Get the 1-based Exodus node id from the "connect" array
+                      auto exodus_node_id = exio_helper->connect[gi];
+
+                      // Convert this index to a libMesh Node id
+                      auto libmesh_node_id = exio_helper->get_libmesh_node_id(exodus_node_id);
 
                       if (coef != 0) // Ignore irrelevant spline nodes
                         key.emplace_back(libmesh_node_id, coef);
@@ -703,15 +717,10 @@ void ExodusII_IO::read (const std::string & fname)
 
     for (auto e : index_range(exio_helper->elem_list))
       {
-        // The numbers in the Exodus file sidesets should be thought
-        // of as (1-based) indices into the elem_num_map array.  So,
-        // to get the right element ID we have to:
-        // 1.) Subtract 1 from elem_list[e] (to get a zero-based index)
-        // 2.) Pass it through elem_num_map (to get the corresponding Exodus ID)
-        // 3.) Subtract 1 from that, since libmesh is "zero"-based,
-        //     even when the Exodus numbering doesn't start with 1.
+        // Call helper function to get the libmesh Elem id for the
+        // e'th entry in the current elem_list.
         dof_id_type libmesh_elem_id =
-          cast_int<dof_id_type>(exio_helper->elem_num_map[exio_helper->elem_list[e] - 1] - 1);
+          exio_helper->get_libmesh_elem_id(exio_helper->elem_list[e]);
 
         // Set any relevant node/edge maps for this element
         Elem & elem = mesh.elem_ref(libmesh_elem_id);
@@ -804,14 +813,10 @@ void ExodusII_IO::read (const std::string & fname)
         std::map<Elem *, MeshBase::elemset_type> elem_to_elemsets;
         for (auto e : index_range(exio_helper->elemset_list))
           {
-            // Follow standard (see sideset case above) approach for
-            // converting the ids stored in the elemset_list to
-            // libmesh Elem ids.
-            //
-            // TODO: this should be moved to a helper function so we
-            // don't duplicate the code.
-            dof_id_type libmesh_elem_id =
-              cast_int<dof_id_type>(exio_helper->elem_num_map[exio_helper->elemset_list[e] - 1] - 1);
+           // Call helper function to get the libmesh Elem id for the
+           // e'th entry in the current elemset_list.
+           dof_id_type libmesh_elem_id =
+             exio_helper->get_libmesh_elem_id(exio_helper->elemset_list[e]);
 
             // Get a pointer to this Elem
             Elem * elem = mesh.elem_ptr(libmesh_elem_id);
@@ -887,22 +892,9 @@ void ExodusII_IO::read (const std::string & fname)
 
         for (int i=0; i<exio_helper->num_nodes_per_set[nodeset]; ++i)
           {
-            int exodus_id = exio_helper->node_sets_node_list[i + offset];
-
-            // It's possible for nodesets to have invalid ids in them
-            // by accident.  Instead of possibly accessing past the
-            // end of node_num_map, let's make sure we have that many
-            // entries.
-            libmesh_error_msg_if(static_cast<std::size_t>(exodus_id - 1) >= exio_helper->node_num_map.size(),
-                                 "Invalid Exodus node id " << exodus_id
-                                 << " found in nodeset " << nodeset_id);
-
-            // As before, the entries in 'node_list' are 1-based
-            // indices into the node_num_map array, so we have to map
-            // them.  See comment above.
-            int libmesh_node_id = exio_helper->node_num_map[exodus_id - 1] - 1;
-            mesh.get_boundary_info().add_node(cast_int<dof_id_type>(libmesh_node_id),
-                                              nodeset_id);
+            int exodus_node_id = exio_helper->node_sets_node_list[i + offset];
+            auto libmesh_node_id = exio_helper->get_libmesh_node_id(exodus_node_id);
+            mesh.get_boundary_info().add_node(libmesh_node_id, nodeset_id);
           }
       }
   }
@@ -971,7 +963,15 @@ void ExodusII_IO::write_complex_magnitude (bool val)
   _write_complex_abs = val;
 }
 
+void ExodusII_IO::set_unique_ids_from_maps (bool val)
+{
+  _set_unique_ids_from_maps = val;
 
+  // Set this flag on the helper object as well. The helper needs to know about this
+  // flag, since it sometimes needs to construct libmesh Node ids from nodal connectivity
+  // arrays (see e.g. ExodusII_IO_Helper::read_edge_blocks()).
+  exio_helper->set_unique_ids_from_maps = val;
+}
 
 void ExodusII_IO::use_mesh_dimension_instead_of_spatial_dimension(bool val)
 {

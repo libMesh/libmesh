@@ -458,7 +458,7 @@ public:
   /**
    * \returns The next unique id to be used.
    */
-  unique_id_type next_unique_id() { return _next_unique_id; }
+  unique_id_type next_unique_id() const { return _next_unique_id; }
 
   /**
    * Sets the next available unique id to be used.  On a

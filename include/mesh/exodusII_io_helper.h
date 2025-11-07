@@ -61,6 +61,7 @@ namespace libMesh
 
 // Forward declarations
 class MeshBase;
+class DofObject;
 
 /**
  * This is the \p ExodusII_IO_Helper class.  This class hides the
@@ -304,6 +305,44 @@ public:
   void read_elemental_var_values(std::string elemental_var_name,
                                  int time_step,
                                  std::map<dof_id_type, Real> & elem_var_value_map);
+
+  /**
+   * Helper function that takes a (1-based) Exodus node/elem id and
+   * determines the corresponding libMesh Node/Elem id. Takes into account
+   * whether the user has chosen to set the Node/Elem unique ids based on
+   * the {node,elem}_num_map or to let libMesh set them.
+   */
+  dof_id_type get_libmesh_node_id(int exodus_node_id);
+  dof_id_type get_libmesh_elem_id(int exodus_elem_id);
+
+  /**
+   * Helper function that conditionally sets the unique_id of the
+   * passed-in Node/Elem.  Calling this function does nothing if
+   * _set_unique_ids_from_maps == false, otherwise it sets the
+   * unique_id based on the entries of the {node,elem_num_map}.  The
+   * input index is assumed to be a zero-based index into the
+   * {node,elem}_num_map array.
+   */
+  void conditionally_set_node_unique_id(
+    MeshBase & mesh, Node * node, int zero_based_node_num_map_index);
+  void conditionally_set_elem_unique_id(
+    MeshBase & mesh, Elem * elem, int zero_based_elem_num_map_index);
+
+private:
+
+  /**
+   * Internal implementation for the two sets of functions above.
+   */
+  dof_id_type get_libmesh_id(
+    int exodus_id,
+    const std::vector<int> & num_map);
+
+  void set_dof_object_unique_id(
+    MeshBase & mesh,
+    DofObject * dof_object,
+    int exodus_mapped_id);
+
+public:
 
   /**
    * Opens an \p ExodusII mesh file named \p filename for writing.
@@ -849,6 +888,10 @@ public:
 
   // On/Off message flag
   bool verbose;
+
+  // Same as the ExodusII_IO flag by the same name. This flag is
+  // also set whenever ExodusII_IO::set_unique_ids_from_maps() is called.
+  bool set_unique_ids_from_maps;
 
   // This flag gets set after the Exodus file has been successfully opened for writing.
   // Both the create() and open() (if called with EX_WRITE) functions may set this flag.

@@ -286,6 +286,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_nodal_vars(0),
   num_elem_vars(0),
   verbose(v),
+  set_unique_ids_from_maps(false),
   opened_for_writing(false),
   opened_for_reading(false),
   _run_only_on_proc0(run_only_on_proc0),
@@ -1408,15 +1409,13 @@ void ExodusII_IO_Helper::read_edge_blocks(MeshBase & mesh)
 
           // Loop over indices in connectivity array, build edge elements,
           // look them up in the edge_map.
-          for (unsigned int i=0, sz=connect.size(); i<sz; i+=num_nodes_per_edge)
+          for (auto [i, sz] = std::make_tuple(0u, connect.size()); i<sz; i+=num_nodes_per_edge)
             {
               auto edge = Elem::build(conv.libmesh_elem_type());
               for (int n=0; n<num_nodes_per_edge; ++n)
                 {
-                  int exodus_node_id = connect[i+n];
-                  int exodus_node_id_zero_based = exodus_node_id - 1;
-                  int libmesh_node_id = node_num_map[exodus_node_id_zero_based] - 1;
-
+                  auto exodus_node_id = this->connect[i+n];
+                  dof_id_type libmesh_node_id = this->get_libmesh_node_id(exodus_node_id);
                   edge->set_node(n, mesh.node_ptr(libmesh_node_id));
                 }
 
@@ -1487,6 +1486,12 @@ void ExodusII_IO_Helper::read_elem_num_map ()
 
   if (num_elem)
     {
+      // The elem_num_map may contain ids larger than num_elem.  In
+      // other words, the elem_num_map is not necessarily just a
+      // permutation of the "trivial" 1,2,3,...  mapping, it can
+      // contain effectively "any" numbers. Therefore, to get
+      // "_end_elem_id", we need to check what the max entry in the
+      // elem_num_map is.
       auto it = std::max_element(elem_num_map.begin(), elem_num_map.end());
       _end_elem_id = *it;
     }
@@ -1863,7 +1868,7 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
     }
 
   // Clear out any previously read nodal variable values
-  nodal_var_values.clear();
+  this->nodal_var_values.clear();
 
   std::vector<Real> unmapped_nodal_var_values(num_nodes);
 
@@ -1878,18 +1883,21 @@ void ExodusII_IO_Helper::read_nodal_var_values(std::string nodal_var_name, int t
      MappedInputVector(unmapped_nodal_var_values, _single_precision).data());
   EX_CHECK_ERR(ex_err, "Error reading nodal variable values!");
 
-  for (unsigned i=0; i<static_cast<unsigned>(num_nodes); i++)
+  for (auto i : make_range(num_nodes))
     {
-      libmesh_assert_less(i, this->node_num_map.size());
-
-      // Use the node_num_map to obtain the ID of this node in the Exodus file,
-      // and remember to subtract 1 since libmesh is zero-based and Exodus is 1-based.
-      const unsigned mapped_node_id = this->node_num_map[i] - 1;
-
-      libmesh_assert_less(i, unmapped_nodal_var_values.size());
+      // Determine the libmesh node id implied by "i". The
+      // get_libmesh_node_id() helper function expects a 1-based
+      // Exodus node id, so we construct the "implied" Exodus node id
+      // from "i" by adding 1.
+      //
+      // If the user has set the "set_unique_ids_from_maps" flag to
+      // true, then calling get_libmesh_node_id(i+1) will just return
+      // i, otherwise it will determine the value (with error
+      // checking) using this->node_num_map.
+      auto libmesh_node_id = this->get_libmesh_node_id(/*exodus_node_id=*/i+1);
 
       // Store the nodal value in the map.
-      nodal_var_values[mapped_node_id] = unmapped_nodal_var_values[i];
+      this->nodal_var_values[libmesh_node_id] = unmapped_nodal_var_values[i];
     }
 }
 
@@ -2127,17 +2135,113 @@ void ExodusII_IO_Helper::read_elemental_var_values(std::string elemental_var_nam
 
       for (unsigned j=0; j<static_cast<unsigned>(num_elem_this_blk); j++)
         {
-          // Use the elem_num_map to obtain the ID of this element in the Exodus file,
-          // and remember to subtract 1 since libmesh is zero-based and Exodus is 1-based.
-          unsigned mapped_elem_id = this->elem_num_map[ex_el_num] - 1;
+          // Determine the libmesh id of the element with zero-based
+          // index "ex_el_num".  This function expects a one-based
+          // index, so we add 1 to ex_el_num when we pass it in.
+          auto libmesh_elem_id =
+            this->get_libmesh_elem_id(ex_el_num + 1);
 
           // Store the elemental value in the map.
-          elem_var_value_map[mapped_elem_id] = block_elem_var_values[j];
+          elem_var_value_map[libmesh_elem_id] = block_elem_var_values[j];
 
           // Go to the next sequential element ID.
           ex_el_num++;
         }
     }
+}
+
+
+
+dof_id_type ExodusII_IO_Helper::get_libmesh_node_id(int exodus_node_id)
+{
+  return this->get_libmesh_id(exodus_node_id, this->node_num_map);
+}
+
+dof_id_type ExodusII_IO_Helper::get_libmesh_elem_id(int exodus_elem_id)
+{
+  return this->get_libmesh_id(exodus_elem_id, this->elem_num_map);
+}
+
+dof_id_type
+ExodusII_IO_Helper::get_libmesh_id(int exodus_id,
+                                   const std::vector<int> & num_map)
+{
+  // The input exodus_id is assumed to be a (1-based) index into
+  // the {node,elem}_num_map, so in order to use exodus_id as an index
+  // in C++, we need to first make it zero-based.
+  auto exodus_id_zero_based =
+    cast_int<dof_id_type>(exodus_id - 1);
+
+  // Throw an informative error message rather than accessing past the
+  // end of the provided num_map. If we are setting Elem unique_ids
+  // based on the num_map, we don't need to do this check.
+  if (!this->set_unique_ids_from_maps)
+    libmesh_error_msg_if(exodus_id_zero_based >= num_map.size(),
+                         "Cannot get LibMesh id for Exodus id: " << exodus_id);
+
+  // If the user set the flag which stores Exodus node/elem ids as
+  // unique_ids instead of regular ids, then the libmesh id we are
+  // looking for is actually just "exodus_id_zero_based". Otherwise,
+  // we need to look up the Node/Elem's id in the provided num_map,
+  // *and* then subtract 1 from that because the entries in the
+  // num_map are also 1-based.
+  dof_id_type libmesh_id =
+    this->set_unique_ids_from_maps ?
+    cast_int<dof_id_type>(exodus_id_zero_based) :
+    cast_int<dof_id_type>(num_map[exodus_id_zero_based] - 1);
+
+  return libmesh_id;
+}
+
+
+
+void
+ExodusII_IO_Helper::
+conditionally_set_node_unique_id(MeshBase & mesh, Node * node, int zero_based_node_num_map_index)
+{
+  this->set_dof_object_unique_id(mesh, node, libmesh_vector_at(this->node_num_map, zero_based_node_num_map_index));
+}
+
+void
+ExodusII_IO_Helper::
+conditionally_set_elem_unique_id(MeshBase & mesh, Elem * elem, int zero_based_elem_num_map_index)
+{
+  this->set_dof_object_unique_id(mesh, elem, libmesh_vector_at(this->elem_num_map, zero_based_elem_num_map_index));
+}
+
+void
+ExodusII_IO_Helper::set_dof_object_unique_id(
+  MeshBase & mesh,
+  DofObject * dof_object,
+  int exodus_mapped_id)
+{
+  if (this->set_unique_ids_from_maps)
+  {
+    // Exodus ids are always 1-based while libmesh ids are always
+    // 0-based, so to make a libmesh unique_id here, we subtract 1
+    // from the exodus_mapped_id to make it 0-based.
+    auto exodus_mapped_id_zero_based =
+      cast_int<dof_id_type>(exodus_mapped_id - 1);
+
+    // Set added_node's unique_id to "exodus_mapped_id_zero_based".
+    dof_object->set_unique_id(cast_int<unique_id_type>(exodus_mapped_id_zero_based));
+
+    // Normally the Mesh is responsible for setting the unique_ids
+    // of Nodes/Elems in a consistent manner, so when we set the unique_id
+    // of a Node/Elem manually based on the {node,elem}_num_map, we need to
+    // make sure that the "next" unique id assigned by the Mesh
+    // will still be valid. We do this by making sure that the
+    // next_unique_id is greater than the one we set manually. The
+    // APIs for doing this are only defined when unique ids are
+    // enabled.
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+    unique_id_type next_unique_id = mesh.next_unique_id();
+    mesh.set_next_unique_id(std::max(next_unique_id, static_cast<unique_id_type>(exodus_mapped_id_zero_based + 1)));
+#else
+    // Avoid compiler warnings about the unused variable
+    libmesh_ignore(mesh);
+#endif
+  }
 }
 
 
@@ -2433,12 +2537,22 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
 #endif
   };
 
-  // And in the node_num_map - since the nodes aren't organized in
-  // blocks, libmesh will always write out the identity map
-  // here... unless there has been some refinement and coarsening, or
-  // node deletion without a corresponding call to contract(). You
-  // need to write this any time there could be 'holes' in the node
-  // numbering, so we write it every time.
+  // And in the node_num_map. If the user has set the
+  // _set_unique_ids_from_maps flag, then we will write the Node
+  // unique_ids to the node_num_map, otherwise we will just write a
+  // trivial node_num_map, since in that we don't write the unique_id
+  // information to the Exodus file. In other words, set the
+  // _set_unique_ids_from_maps flag to true on both the reading and
+  // writing ExodusII_IO objects if you want to preserve the
+  // node_num_map information without actually renumbering the Nodes
+  // in libmesh according to the node_num_map.
+  //
+  // One reason why you might not want to actually renumber the Nodes
+  // in libmesh according to the node_num_map is that it can introduce
+  // undesirable large "gaps" in the numbering, e.g. Nodes numbered
+  // [0, 1, 1000, 10001] which is not ideal for the ReplicatedMesh
+  // _nodes data structure, which stores the Nodes in a contiguous
+  // array based on Node id.
 
   // Let's skip the node_num_map in the discontinuous and add_sides
   // cases, since we're effectively duplicating nodes for the sake of
@@ -2462,17 +2576,27 @@ void ExodusII_IO_Helper::write_nodal_coordinates(const MeshBase & mesh, bool use
 
           // Fill in node_num_map entry with the proper (1-based) node
           // id, unless we're not going to be able to keep the map up
-          // later.
+          // later. If the user has chosen to _set_unique_ids_from_maps,
+          // then we fill up the node_num_map with (1-based) unique
+          // ids rather than node ids.
           if (!_add_sides)
-            node_num_map.push_back(node.id() + 1);
+            {
+              if (this->set_unique_ids_from_maps)
+                node_num_map.push_back(node.unique_id() + 1);
+              else
+                node_num_map.push_back(node.id() + 1);
+            }
 
-          // Also map the zero-based libmesh node id to the 1-based
-          // Exodus ID it will be assigned (this is equivalent to the
-          // current size of the x vector).
+          // Also map the zero-based libmesh node id to the (1-based)
+          // index in the node_num_map it corresponds to
+          // (this is equivalent to the current size of the "x" vector,
+          // so we just use x.size()). This map is used to look up
+          // an Exodus Node id given a libMesh Node id, so it does
+          // involve unique_ids.
           libmesh_node_num_to_exodus[ cast_int<int>(node.id()) ] = cast_int<int>(x.size());
-        }
+        } // end for (node_ptr)
     }
-  else
+  else // use_discontinuous
     {
       for (const auto & elem : mesh.active_element_ptr_range())
         for (const Node & node : elem->node_ref_range())
@@ -2616,8 +2740,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       ++counter;
     }
 
-  elem_num_map.resize(num_elem);
-  std::vector<int>::iterator curr_elem_map_end = elem_num_map.begin();
+  // Here we reserve() space so that we can push_back() onto the
+  // elem_num_map in the loops below.
+  this->elem_num_map.reserve(num_elem);
 
   // In the case of discontinuous plotting we initialize a map from
   // (element, node) pairs to the corresponding discontinuous node index.
@@ -2820,7 +2945,16 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // We need these later if we're adding fake sides, but we don't need
   // to recalculate it.
   auto num_elem_this_blk_it = num_elem_this_blk_vec.begin();
+
+  // We write "fake" ids to the elem_num_map when adding fake sides.
+  // I don't think it's too important exactly what fake ids are used,
+  // as long as they don't conflict with any other ids that are
+  // already in the elem_num_map.
   auto next_fake_id = mesh.max_elem_id() + 1; // 1-based numbering in Exodus
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (this->set_unique_ids_from_maps)
+    next_fake_id = mesh.next_unique_id();
+#endif
 
   for (auto & [subdomain_id, element_id_vec] : subdomain_map)
     {
@@ -2841,9 +2975,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // element ids to add.
       if (subdomain_id < subdomain_id_end)
       {
-      connect.resize(element_id_vec.size()*num_nodes_per_elem);
+        connect.resize(element_id_vec.size()*num_nodes_per_elem);
 
-      for (auto i : index_range(element_id_vec))
+        for (auto i : index_range(element_id_vec))
         {
           unsigned int elem_id = element_id_vec[i];
           libmesh_elem_num_to_exodus[elem_id] = ++libmesh_elem_num_to_exodus_counter; // 1-based indexing for Exodus
@@ -2891,24 +3025,22 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                     libmesh_map_find(discontinuous_node_indices,
                                      std::make_pair(elem_id, elem_node_index));
                 }
-            }
-        }
+            } // end for(j)
 
-        // This transform command stores its result in a range that
-        // begins at the third argument, so this command is adding
-        // values to the elem_num_map vector starting from
-        // curr_elem_map_end.  Here we add 1 to each id to make a
-        // 1-based exodus file.
-        curr_elem_map_end = std::transform
-          (element_id_vec.begin(),
-           element_id_vec.end(),
-           curr_elem_map_end,
-           [](dof_id_type id){return id+1;});
+          // push_back() either elem_id+1 or the current Elem's
+          // unique_id+1 into the elem_num_map, depending on the value
+          // of the set_unique_ids_from_maps flag.
+          if (this->set_unique_ids_from_maps)
+            this->elem_num_map.push_back(elem.unique_id() + 1);
+          else
+            this->elem_num_map.push_back(elem_id + 1);
+
+        } // end for(i)
       }
-      // If this is a "fake" block of added sides, we build those as
-      // we go.
-      else
+      else // subdomain_id >= subdomain_id_end
       {
+        // If this is a "fake" block of added sides, we build those as
+        // we go.
         libmesh_assert(_add_sides);
 
         libmesh_assert(num_elem_this_blk_it != num_elem_this_blk_vec.end());
@@ -2944,12 +3076,11 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
               }
           }
 
-        auto old_curr_map_end = curr_elem_map_end;
-        curr_elem_map_end += num_elem_this_blk;
-
-        std::generate
-          (old_curr_map_end, curr_elem_map_end,
-           [&next_fake_id](){return next_fake_id++;});
+        // Store num_elem_this_blk "fake" ids into the
+        // elem_num_map. Use a traditional for-loop to avoid unused
+        // variable warnings about the loop counter.
+        for (int i=0; i<num_elem_this_blk; ++i)
+          this->elem_num_map.push_back(next_fake_id++);
       }
 
       ++num_elem_this_blk_it;
@@ -2962,7 +3093,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
          nullptr,        // elem_edge_conn (unused)
          nullptr);       // elem_face_conn (unused)
       EX_CHECK_ERR(ex_err, "Error writing element connectivities");
-    }
+    } // end for (auto & [subdomain_id, element_id_vec] : subdomain_map)
 
   // write out the element number map that we created
   ex_err = exII::ex_put_elem_num_map(ex_id, elem_num_map.data());
