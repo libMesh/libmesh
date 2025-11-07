@@ -1856,16 +1856,17 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
 
   if (have_disc_bdys)
     {
-      enable_disc_bdys_stitching = true;
+      // Initialize as disabled; will be enabled only if the given boundary IDs form a valid disconnected pair.
+      enable_disc_bdys_stitching = false;
 
       // Not only must we have disconnected boundaries defined, but the specified
       // `this_mesh_boundary_id` and `other_mesh_boundary_id` must also form a valid
       // disconnected boundary pair registered within this mesh.
       auto dbb = this_db ? this_db->boundary(this_mesh_boundary_id) : nullptr;
       if (dbb)
-        if (!((dbb->myboundary == this_mesh_boundary_id && dbb->pairedboundary == other_mesh_boundary_id) ||
-              (dbb->pairedboundary == this_mesh_boundary_id && dbb->myboundary == other_mesh_boundary_id)))
-          enable_disc_bdys_stitching = false;
+        if ((dbb->myboundary == this_mesh_boundary_id && dbb->pairedboundary == other_mesh_boundary_id) ||
+            (dbb->pairedboundary == this_mesh_boundary_id && dbb->myboundary == other_mesh_boundary_id))
+          enable_disc_bdys_stitching = true;
     }
 #endif // LIBMESH_ENABLE_PERIODIC
 
@@ -1958,75 +1959,87 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
               {
                 // Now check whether elem has a face on the specified boundary
                 for (auto side_id : el->side_index_range())
-                  if (el->neighbor_ptr(side_id) == nullptr
-                  || (enable_disc_bdys_stitching && mesh_array[i]->get_boundary_info().has_boundary_id(el, side_id, id_array[i])))
-                    {
-                      // Get *all* boundary IDs on this side, not just the first one!
-                      mesh_array[i]->get_boundary_info().boundary_ids (el, side_id, bc_ids);
+                  {
+                    // Determine if this side should be considered for stitching.
+                    // A side is a candidate if:
+                    // 1. It has no neighbor (a true exterior boundary), or
+                    // 2. For the primary mesh (`this`), self-stitching across a registered
+                    //    disconnected boundary pair is enabled, and this side belongs to
+                    //    one of those disconnected boundaries.
+                    bool should_stitch_this_side =
+                      (el->neighbor_ptr(side_id) == nullptr) ||
+                      ((i == 0) && enable_disc_bdys_stitching &&
+                      mesh_array[i]->get_boundary_info().has_boundary_id(el, side_id, id_array[i]));
 
+                    if (should_stitch_this_side)
+                      {
+                        // Get *all* boundary IDs on this side, not just the first one!
+                        mesh_array[i]->get_boundary_info().boundary_ids (el, side_id, bc_ids);
+
+                        if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
+                          {
+                            el->build_side_ptr(side, side_id);
+                            for (auto & n : side->node_ref_range())
+                              set_array[i]->insert(n.id());
+
+                            h_min = std::min(h_min, side->hmin());
+                            h_min_updated = true;
+
+                            // This side is on the boundary, add its information to side_to_elem
+                            if (skip_find_neighbors && (i==0))
+                              {
+                                key_type key = el->low_order_key(side_id);
+                                val_type val;
+                                val.first = el;
+                                val.second = cast_int<unsigned char>(side_id);
+
+                                key_val_pair kvp;
+                                kvp.first = key;
+                                kvp.second = val;
+                                side_to_elem_map.insert (kvp);
+                              }
+                          }
+
+                        // Also, check the edges on this side. We don't have to worry about
+                        // updating neighbor info in this case since elements don't store
+                        // neighbor info on edges.
+                        for (auto edge_id : el->edge_index_range())
+                          {
+                            if (el->is_edge_on_side(edge_id, side_id))
+                              {
+                                // Get *all* boundary IDs on this edge, not just the first one!
+                                mesh_array[i]->get_boundary_info().edge_boundary_ids (el, edge_id, bc_ids);
+
+                                if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
+                                  {
+                                    std::unique_ptr<const Elem> edge (el->build_edge_ptr(edge_id));
+                                    for (auto & n : edge->node_ref_range())
+                                      set_array[i]->insert( n.id() );
+
+                                    h_min = std::min(h_min, edge->hmin());
+                                    h_min_updated = true;
+                                  }
+                              }
+                          } // end for (edge_id)
+                      } // end if (side == nullptr)
+
+                  // Alternatively, is this a boundary NodeElem? If so,
+                  // add it to a list of NodeElems that will later be
+                  // used to set h_min based on the minimum node
+                  // separation distance between all pairs of boundary
+                  // NodeElems.
+                  if (el->type() == NODEELEM)
+                    {
+                      mesh_array[i]->get_boundary_info().boundary_ids(el->node_ptr(0), bc_ids);
                       if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                         {
-                          el->build_side_ptr(side, side_id);
-                          for (auto & n : side->node_ref_range())
-                            set_array[i]->insert(n.id());
+                          boundary_node_elems.push_back(el);
 
-                          h_min = std::min(h_min, side->hmin());
-                          h_min_updated = true;
-
-                          // This side is on the boundary, add its information to side_to_elem
-                          if (skip_find_neighbors && (i==0))
-                            {
-                              key_type key = el->low_order_key(side_id);
-                              val_type val;
-                              val.first = el;
-                              val.second = cast_int<unsigned char>(side_id);
-
-                              key_val_pair kvp;
-                              kvp.first = key;
-                              kvp.second = val;
-                              side_to_elem_map.insert (kvp);
-                            }
+                          // Debugging:
+                          // libMesh::out << "Elem " << el->id() << " is a NodeElem on boundary " << id_array[i] << std::endl;
                         }
-
-                      // Also, check the edges on this side. We don't have to worry about
-                      // updating neighbor info in this case since elements don't store
-                      // neighbor info on edges.
-                      for (auto edge_id : el->edge_index_range())
-                        {
-                          if (el->is_edge_on_side(edge_id, side_id))
-                            {
-                              // Get *all* boundary IDs on this edge, not just the first one!
-                              mesh_array[i]->get_boundary_info().edge_boundary_ids (el, edge_id, bc_ids);
-
-                              if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
-                                {
-                                  std::unique_ptr<const Elem> edge (el->build_edge_ptr(edge_id));
-                                  for (auto & n : edge->node_ref_range())
-                                    set_array[i]->insert( n.id() );
-
-                                  h_min = std::min(h_min, edge->hmin());
-                                  h_min_updated = true;
-                                }
-                            }
-                        } // end for (edge_id)
-                    } // end if (side == nullptr)
-
-                // Alternatively, is this a boundary NodeElem? If so,
-                // add it to a list of NodeElems that will later be
-                // used to set h_min based on the minimum node
-                // separation distance between all pairs of boundary
-                // NodeElems.
-                if (el->type() == NODEELEM)
-                  {
-                    mesh_array[i]->get_boundary_info().boundary_ids(el->node_ptr(0), bc_ids);
-                    if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
-                      {
-                        boundary_node_elems.push_back(el);
-
-                        // Debugging:
-                        // libMesh::out << "Elem " << el->id() << " is a NodeElem on boundary " << id_array[i] << std::endl;
-                      }
-                  }
+                    }
+                  } // end for (side_id)
               } // end for (el)
 
             // Compute the minimum node separation distance amongst
