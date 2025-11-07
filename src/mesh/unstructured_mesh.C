@@ -1842,12 +1842,18 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
   MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
 
-  // Enable stitching across disconnected boundary pairs
-  // Note:
-  // Disconnected boundary pairs are always defined within "the same" mesh (`this`).
-  // We only handle stitching between disconnected boundaries registered in this->_disconnected_boundary_pairs.
-  // Cross-mesh disconnected stitching is not supported by design;
-  // users can call stitching_helper() separately on each mesh if needed.
+  // Whether to enable stitching across disconnected boundary pairs.
+  //
+  // Notes:
+  // - Each mesh maintains its own registry of disconnected boundary pairs.
+  //   This function only considers the pairs registered in `this` mesh
+  //   (`this->_disconnected_boundary_pairs`). Stitching occurs only when
+  //   the provided boundary IDs form a registered pair in this mesh.
+  // - Disconnected boundary pairs defined in `other_mesh` are ignored,
+  //   even if `other_mesh` is provided. To stitch such pairs, call
+  //   `stitching_helper()` on that mesh separately.
+  // - Cross-mesh disconnected-boundary stitching (i.e., pairing a boundary
+  //   from `this` mesh with one from `other_mesh`) is not supported by design.
   bool enable_disc_bdys_stitching = false;
 #ifdef LIBMESH_ENABLE_PERIODIC
   auto * this_db = this->get_disconnected_boundaries();
