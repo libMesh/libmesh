@@ -277,19 +277,6 @@ void connect_children(const MeshBase & mesh,
                       MeshBase::const_element_iterator elem_end,
                       connected_elem_set_type & connected_elements);
 
-// Take a set of elements and insert all elements' ancestors and
-// subactive descendants as well.  If a mesh is provided and has any
-// constraint rows, insert elements with the constraining nodes for
-// any constrained nodes in our set.
-//
-// \deprecated This method is now deprecated, because it does not
-// handle recursive dependencies.  Use the new
-// connect_element_dependencies method instead.
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void connect_families(connected_elem_set_type & connected_elements,
-                      const MeshBase * mesh = nullptr);
-#endif // LIBMESH_ENABLE_DEPRECATED
-
 // Take a set of elements and create a set of connected nodes.
 void reconnect_nodes (connected_elem_set_type & connected_elements,
                       connected_node_set_type & connected_nodes);

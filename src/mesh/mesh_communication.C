@@ -349,24 +349,6 @@ void connect_children(const MeshBase & mesh,
 }
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void connect_families(connected_elem_set_type & connected_elements,
-                      const MeshBase * mesh)
-{
-  // This old API won't be sufficient in cases (IGA meshes with
-  // non-NodeElem nodes acting as the unconstrained DoFs) that require
-  // recursion.
-  libmesh_deprecated();
-
-  // Just do everything in one fell swoop; this is adequate for most
-  // meshes.
-  connect_element_families(connected_elements, connected_elements,
-                           connected_elements, mesh);
-}
-#endif // LIBMESH_ENABLE_DEPRECATED
-
-
-
 void reconnect_nodes (connected_elem_set_type & connected_elements,
                       connected_node_set_type & connected_nodes)
 {
