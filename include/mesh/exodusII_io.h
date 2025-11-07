@@ -141,19 +141,41 @@ public:
   void write_complex_magnitude (bool val);
 
   /**
-   * If true this flag enforces the following behaviors:
+   * If true, this flag enforces the following behaviors:
    *
    * .) When reading an Exodus file, instead of setting the
    *    elem_num_map and node_num_map ids directly on Nodes and Elems
    *    read in from the Exodus file, set their unique_ids
-   *    instead. Normally libmesh chooses the unique_ids automatically
-   *    but in this case we override that choice.  As a consequence
+   *    instead. Normally libmesh chooses the unique_ids automatically,
+   *    but in this case we override that choice.  As a consequence,
    *    the libMesh Elems/Nodes will be numbered based on their
    *    implied ordering in the exo file (sequentially by block and
    *    without any gaps in the numbering).
    * .) When writing an Exodus file, populate the elem_num_map and
    *    node_num_map with the unique_ids of the Elems/Nodes being
    *    written.
+   *
+   * There are a few reasons why one might want to employ this
+   * behavior. One case is if you are using a ReplicatedMesh and the
+   * {node,elem}_num_map contains "large" (much larger than num_nodes)
+   * ids.  This could happen either because the {node,elem}_num_map
+   * starts with a large id, or because there is a large gap in the
+   * {node,elem}_num_map numbering.  Because the ReplicatedMesh always
+   * constructs std::vectors of size "largest_id" rather than size
+   * "num_nodes" or "num_elems", this mesh will be stored
+   * inefficiently, allocating nullptrs in the std::vector for the
+   * "missing" Nodes/Elems. Setting this flag to true will ensure that
+   * only vectors of size "num_nodes" and "num_elems" are allocated.
+   *
+   * Another case is when you delete Nodes/Elems during a simulation
+   * and/or renumber them, but don't want the original Nodes/Elems to
+   * be renumbered when the Mesh is written back out to an Exodus
+   * file.  Setting this flag to true causes the original Node/Elem
+   * ids to be "saved" in the unique_id fields, so that they can later
+   * be written back to disk with their original numbering.
+   *
+   * This capability is relatively new, and should be considered
+   * experimental.
    */
   void set_unique_ids_from_maps (bool val);
 
