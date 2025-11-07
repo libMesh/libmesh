@@ -349,7 +349,7 @@ void ExodusII_IO::read (const std::string & fname)
 
       // If the _set_unique_ids_from_maps flag is true, set the
       // unique_id for "node", otherwise do nothing.
-      exio_helper->set_node_unique_id(mesh, added_node, i);
+      exio_helper->conditionally_set_node_unique_id(mesh, added_node, i);
 
       // If we have a set of spline weights, these nodes are going to
       // be used as control points for Bezier elements, and we need
@@ -481,7 +481,7 @@ void ExodusII_IO::read (const std::string & fname)
 
           // If the _set_unique_ids_from_maps flag is true, set the
           // unique_id for "elem", otherwise do nothing.
-          exio_helper->set_elem_unique_id(mesh, elem, j);
+          exio_helper->conditionally_set_elem_unique_id(mesh, elem, j);
 
           // If the Mesh assigned an ID different from the one we
           // tried to give it, we should probably error.

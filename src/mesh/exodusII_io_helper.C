@@ -2196,15 +2196,15 @@ ExodusII_IO_Helper::get_libmesh_id(int exodus_id,
 
 
 void
-ExodusII_IO_Helper::set_node_unique_id(
-  MeshBase & mesh, Node * node, int zero_based_node_num_map_index)
+ExodusII_IO_Helper::
+conditionally_set_node_unique_id(MeshBase & mesh, Node * node, int zero_based_node_num_map_index)
 {
   this->set_dof_object_unique_id(mesh, node, libmesh_vector_at(this->node_num_map, zero_based_node_num_map_index));
 }
 
 void
-ExodusII_IO_Helper::set_elem_unique_id(
-  MeshBase & mesh, Elem * elem, int zero_based_elem_num_map_index)
+ExodusII_IO_Helper::
+conditionally_set_elem_unique_id(MeshBase & mesh, Elem * elem, int zero_based_elem_num_map_index)
 {
   this->set_dof_object_unique_id(mesh, elem, libmesh_vector_at(this->elem_num_map, zero_based_elem_num_map_index));
 }
