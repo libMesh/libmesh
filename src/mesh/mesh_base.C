@@ -2036,21 +2036,23 @@ void MeshBase::detect_interior_parents()
       auto & pairs = *_disconnected_boundary_pairs;
 
       // Helper to check and erase both directions
-      auto erase_if_match = [&](boundary_id_type key, boundary_id_type pair)
-      {
-        auto it = pairs.find(key);
-        if (it != pairs.end())
-          {
-            const auto & pb = it->second;
-            // check both directions
-            if ((pb->myboundary == key && pb->pairedboundary == pair) ||
-                (pb->pairedboundary == key && pb->myboundary == pair))
-              pairs.erase(it);
-          }
-      };
+      auto erase_if_match = [](boundary_id_type key,
+                              boundary_id_type pair,
+                              PeriodicBoundaries & pairs)
+        {
+          auto it = pairs.find(key);
+          if (it != pairs.end())
+            {
+              const auto & pb = *(it->second);
+              // Check both directions
+              if ((pb.myboundary == key && pb.pairedboundary == pair) ||
+                  (pb.pairedboundary == key && pb.myboundary == pair))
+                pairs.erase(it);
+            }
+        };
 
-      erase_if_match(b1, b2);
-      erase_if_match(b2, b1);
+      erase_if_match(b1, b2, pairs);
+      erase_if_match(b2, b1, pairs);
     }
 
 #endif

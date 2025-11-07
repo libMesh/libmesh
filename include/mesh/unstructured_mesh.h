@@ -310,8 +310,7 @@ private:
                                 bool skip_find_neighbors,
                                 bool merge_boundary_nodes_all_or_nothing,
                                 bool remap_subdomain_ids,
-                                bool prepare_after_stitching,
-                                bool stitching_intended_disconnected_neighbors = true);
+                                bool prepare_after_stitching);
 };
 
 

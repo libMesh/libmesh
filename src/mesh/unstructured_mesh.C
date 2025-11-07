@@ -1835,46 +1835,37 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                                     bool skip_find_neighbors,
                                     bool merge_boundary_nodes_all_or_nothing,
                                     bool remap_subdomain_ids,
-                                    bool prepare_after_stitching,
-                                    bool stitching_intended_disconnected_neighbors)
+                                    bool prepare_after_stitching)
 {
 #ifdef DEBUG
   // We rely on neighbor links here
   MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
 
-  // Determine whether to activate disconnected boundary stitching:
-  // Enable only if requested by the user and a valid boundary pairing exists
-  // on either side (this mesh or the other mesh).
-  bool account_for_disconnected_boundaries = false;
+  // Enable stitching across disconnected boundary pairs
+  // Note:
+  // Disconnected boundary pairs are always defined within "the same" mesh (`this`).
+  // We only handle stitching between disconnected boundaries registered in this->_disconnected_boundary_pairs.
+  // Cross-mesh disconnected stitching is not supported by design;
+  // users can call stitching_helper() separately on each mesh if needed.
+  bool enable_disc_bdys_stitching = false;
 #ifdef LIBMESH_ENABLE_PERIODIC
   auto * this_db = this->get_disconnected_boundaries();
-  auto * other_db = (other_mesh ? other_mesh->get_disconnected_boundaries() : nullptr);
 
-  const bool have_disc_bdys = ((this_db && !this_db->empty()) ||
-                              (other_db && !other_db->empty()));
+  const bool have_disc_bdys = (this_db && !this_db->empty());
 
-  if (have_disc_bdys && stitching_intended_disconnected_neighbors)
+  if (have_disc_bdys)
     {
-      account_for_disconnected_boundaries = true;
+      enable_disc_bdys_stitching = true;
 
-      // In most cases, other_mesh is nullptr (i.e., stitching the mesh to itself).
-      // In that situation, only this_db is available, so we check it to decide whether
-      // the specified boundary pair is valid. If not, we disable disconnected stitching.
+      // Not only must we have disconnected boundaries defined, but the specified
+      // `this_mesh_boundary_id` and `other_mesh_boundary_id` must also form a valid
+      // disconnected boundary pair registered within this mesh.
       auto dbb = this_db ? this_db->boundary(this_mesh_boundary_id) : nullptr;
       if (dbb)
         if (!((dbb->myboundary == this_mesh_boundary_id && dbb->pairedboundary == other_mesh_boundary_id) ||
               (dbb->pairedboundary == this_mesh_boundary_id && dbb->myboundary == other_mesh_boundary_id)))
-          account_for_disconnected_boundaries = false;
-
-      // If the check above disables stitching, but other_mesh is not nullptr,
-      // we also inspect other_db. If the other mesh defines a valid pairing with this boundary,
-      // we re-enable disconnected boundary stitching.
-      auto odbb = (other_mesh && other_db) ? other_db->boundary(other_mesh_boundary_id) : nullptr;
-      if (odbb && !account_for_disconnected_boundaries)
-        if ((odbb->myboundary == other_mesh_boundary_id && odbb->pairedboundary == this_mesh_boundary_id) ||
-            (odbb->pairedboundary == other_mesh_boundary_id && odbb->myboundary == this_mesh_boundary_id))
-          account_for_disconnected_boundaries = true;
+          enable_disc_bdys_stitching = false;
     }
 #endif // LIBMESH_ENABLE_PERIODIC
 
@@ -1968,7 +1959,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                 // Now check whether elem has a face on the specified boundary
                 for (auto side_id : el->side_index_range())
                   if (el->neighbor_ptr(side_id) == nullptr
-                  || (account_for_disconnected_boundaries && mesh_array[i]->get_boundary_info().has_boundary_id(el, side_id, id_array[i])))
+                  || (enable_disc_bdys_stitching && mesh_array[i]->get_boundary_info().has_boundary_id(el, side_id, id_array[i])))
                     {
                       // Get *all* boundary IDs on this side, not just the first one!
                       mesh_array[i]->get_boundary_info().boundary_ids (el, side_id, bc_ids);
@@ -2558,7 +2549,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                   for (auto s : el->side_index_range())
                     {
                       bool has_real_neighbor = (el->neighbor_ptr(s) != nullptr);
-                      bool has_intended_disconnected_neighbor = account_for_disconnected_boundaries &&
+                      bool has_intended_disconnected_neighbor = enable_disc_bdys_stitching &&
                       (this->get_boundary_info().has_boundary_id(el, s, this_mesh_boundary_id)
                       || this->get_boundary_info().has_boundary_id(el, s, other_mesh_boundary_id));
 
@@ -2640,7 +2631,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
     }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (account_for_disconnected_boundaries)
+  if (enable_disc_bdys_stitching)
     this->remove_disconnected_boundaries_pair(this_mesh_boundary_id, other_mesh_boundary_id);
 #endif
 
