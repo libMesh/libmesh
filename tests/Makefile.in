@@ -256,7 +256,7 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
-	systems/disconnected_neighbor_test.C systems/systems_test.C \
+	systems/disjoint_neighbor_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
 	utils/rb_parameters_test.C utils/transparent_comparator.C \
 	utils/vectormap_test.C utils/xdr_test.C fparser/autodiff.C
@@ -372,7 +372,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	systems/unit_tests_dbg-constraint_operator_test.$(OBJEXT) \
 	systems/unit_tests_dbg-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_dbg-periodic_bc_test.$(OBJEXT) \
-	systems/unit_tests_dbg-disconnected_neighbor_test.$(OBJEXT) \
+	systems/unit_tests_dbg-disjoint_neighbor_test.$(OBJEXT) \
 	systems/unit_tests_dbg-systems_test.$(OBJEXT) \
 	utils/unit_tests_dbg-parameters_test.$(OBJEXT) \
 	utils/unit_tests_dbg-point_locator_test.$(OBJEXT) \
@@ -386,7 +386,7 @@ unit_tests_dbg_OBJECTS = $(am_unit_tests_dbg_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
-am__v_lt_1 = 
+am__v_lt_1 =
 unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
@@ -459,7 +459,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
-	systems/disconnected_neighbor_test.C systems/systems_test.C \
+	systems/disjoint_neighbor_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
 	utils/rb_parameters_test.C utils/transparent_comparator.C \
 	utils/vectormap_test.C utils/xdr_test.C fparser/autodiff.C
@@ -574,7 +574,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	systems/unit_tests_devel-constraint_operator_test.$(OBJEXT) \
 	systems/unit_tests_devel-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_devel-periodic_bc_test.$(OBJEXT) \
-	systems/unit_tests_devel-disconnected_neighbor_test.$(OBJEXT) \
+	systems/unit_tests_devel-disjoint_neighbor_test.$(OBJEXT) \
 	systems/unit_tests_devel-systems_test.$(OBJEXT) \
 	utils/unit_tests_devel-parameters_test.$(OBJEXT) \
 	utils/unit_tests_devel-point_locator_test.$(OBJEXT) \
@@ -657,7 +657,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
-	systems/disconnected_neighbor_test.C systems/systems_test.C \
+	systems/disjoint_neighbor_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
 	utils/rb_parameters_test.C utils/transparent_comparator.C \
 	utils/vectormap_test.C utils/xdr_test.C fparser/autodiff.C
@@ -772,7 +772,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	systems/unit_tests_oprof-constraint_operator_test.$(OBJEXT) \
 	systems/unit_tests_oprof-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_oprof-periodic_bc_test.$(OBJEXT) \
-	systems/unit_tests_oprof-disconnected_neighbor_test.$(OBJEXT) \
+	systems/unit_tests_oprof-disjoint_neighbor_test.$(OBJEXT) \
 	systems/unit_tests_oprof-systems_test.$(OBJEXT) \
 	utils/unit_tests_oprof-parameters_test.$(OBJEXT) \
 	utils/unit_tests_oprof-point_locator_test.$(OBJEXT) \
@@ -855,7 +855,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
-	systems/disconnected_neighbor_test.C systems/systems_test.C \
+	systems/disjoint_neighbor_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
 	utils/rb_parameters_test.C utils/transparent_comparator.C \
 	utils/vectormap_test.C utils/xdr_test.C fparser/autodiff.C
@@ -970,7 +970,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	systems/unit_tests_opt-constraint_operator_test.$(OBJEXT) \
 	systems/unit_tests_opt-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_opt-periodic_bc_test.$(OBJEXT) \
-	systems/unit_tests_opt-disconnected_neighbor_test.$(OBJEXT) \
+	systems/unit_tests_opt-disjoint_neighbor_test.$(OBJEXT) \
 	systems/unit_tests_opt-systems_test.$(OBJEXT) \
 	utils/unit_tests_opt-parameters_test.$(OBJEXT) \
 	utils/unit_tests_opt-point_locator_test.$(OBJEXT) \
@@ -1053,7 +1053,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
-	systems/disconnected_neighbor_test.C systems/systems_test.C \
+	systems/disjoint_neighbor_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
 	utils/rb_parameters_test.C utils/transparent_comparator.C \
 	utils/vectormap_test.C utils/xdr_test.C fparser/autodiff.C
@@ -1168,7 +1168,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	systems/unit_tests_prof-constraint_operator_test.$(OBJEXT) \
 	systems/unit_tests_prof-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_prof-periodic_bc_test.$(OBJEXT) \
-	systems/unit_tests_prof-disconnected_neighbor_test.$(OBJEXT) \
+	systems/unit_tests_prof-disjoint_neighbor_test.$(OBJEXT) \
 	systems/unit_tests_prof-systems_test.$(OBJEXT) \
 	utils/unit_tests_prof-parameters_test.$(OBJEXT) \
 	utils/unit_tests_prof-point_locator_test.$(OBJEXT) \
@@ -1190,11 +1190,11 @@ am__v_P_1 = :
 AM_V_GEN = $(am__v_GEN_@AM_V@)
 am__v_GEN_ = $(am__v_GEN_@AM_DEFAULT_V@)
 am__v_GEN_0 = @echo "  GEN     " $@;
-am__v_GEN_1 = 
+am__v_GEN_1 =
 AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
-am__v_at_1 = 
+am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
 depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
@@ -1739,27 +1739,27 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po \
 	solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-constraint_operator_test.Po \
-	systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Po \
+	systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-constraint_operator_test.Po \
-	systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Po \
+	systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-constraint_operator_test.Po \
-	systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Po \
+	systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-constraint_operator_test.Po \
-	systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Po \
+	systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-constraint_operator_test.Po \
-	systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Po \
+	systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-systems_test.Po \
@@ -1803,7 +1803,7 @@ LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 AM_V_CXX = $(am__v_CXX_@AM_V@)
 am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
 am__v_CXX_0 = @echo "  CXX     " $@;
-am__v_CXX_1 = 
+am__v_CXX_1 =
 CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
@@ -1811,7 +1811,7 @@ CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
-am__v_CXXLD_1 = 
+am__v_CXXLD_1 =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -1821,7 +1821,7 @@ LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CC = $(am__v_CC_@AM_V@)
 am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
 am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
+am__v_CC_1 =
 CCLD = $(CC)
 LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -1829,7 +1829,7 @@ LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
+am__v_CCLD_1 =
 SOURCES = $(unit_tests_dbg_SOURCES) $(unit_tests_devel_SOURCES) \
 	$(unit_tests_oprof_SOURCES) $(unit_tests_opt_SOURCES) \
 	$(unit_tests_prof_SOURCES)
@@ -2323,7 +2323,7 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
 	systems/equation_systems_test.C systems/periodic_bc_test.C \
-	systems/disconnected_neighbor_test.C systems/systems_test.C \
+	systems/disjoint_neighbor_test.C systems/systems_test.C \
 	utils/parameters_test.C utils/point_locator_test.C \
 	utils/rb_parameters_test.C utils/transparent_comparator.C \
 	utils/vectormap_test.C utils/xdr_test.C $(am__append_1)
@@ -2806,7 +2806,7 @@ systems/unit_tests_dbg-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_dbg-periodic_bc_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
-systems/unit_tests_dbg-disconnected_neighbor_test.$(OBJEXT):  \
+systems/unit_tests_dbg-disjoint_neighbor_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_dbg-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
@@ -2837,7 +2837,7 @@ fparser/$(DEPDIR)/$(am__dirstamp):
 fparser/unit_tests_dbg-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
-unit_tests-dbg$(EXEEXT): $(unit_tests_dbg_OBJECTS) $(unit_tests_dbg_DEPENDENCIES) $(EXTRA_unit_tests_dbg_DEPENDENCIES) 
+unit_tests-dbg$(EXEEXT): $(unit_tests_dbg_OBJECTS) $(unit_tests_dbg_DEPENDENCIES) $(EXTRA_unit_tests_dbg_DEPENDENCIES)
 	@rm -f unit_tests-dbg$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_dbg_LINK) $(unit_tests_dbg_OBJECTS) $(unit_tests_dbg_LDADD) $(LIBS)
 base/unit_tests_devel-dof_map_test.$(OBJEXT): base/$(am__dirstamp) \
@@ -3066,7 +3066,7 @@ systems/unit_tests_devel-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_devel-periodic_bc_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
-systems/unit_tests_devel-disconnected_neighbor_test.$(OBJEXT):  \
+systems/unit_tests_devel-disjoint_neighbor_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_devel-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
@@ -3085,7 +3085,7 @@ utils/unit_tests_devel-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
 fparser/unit_tests_devel-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
-unit_tests-devel$(EXEEXT): $(unit_tests_devel_OBJECTS) $(unit_tests_devel_DEPENDENCIES) $(EXTRA_unit_tests_devel_DEPENDENCIES) 
+unit_tests-devel$(EXEEXT): $(unit_tests_devel_OBJECTS) $(unit_tests_devel_DEPENDENCIES) $(EXTRA_unit_tests_devel_DEPENDENCIES)
 	@rm -f unit_tests-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_devel_LINK) $(unit_tests_devel_OBJECTS) $(unit_tests_devel_LDADD) $(LIBS)
 base/unit_tests_oprof-dof_map_test.$(OBJEXT): base/$(am__dirstamp) \
@@ -3314,7 +3314,7 @@ systems/unit_tests_oprof-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_oprof-periodic_bc_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
-systems/unit_tests_oprof-disconnected_neighbor_test.$(OBJEXT):  \
+systems/unit_tests_oprof-disjoint_neighbor_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_oprof-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
@@ -3333,7 +3333,7 @@ utils/unit_tests_oprof-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
 fparser/unit_tests_oprof-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
-unit_tests-oprof$(EXEEXT): $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_DEPENDENCIES) $(EXTRA_unit_tests_oprof_DEPENDENCIES) 
+unit_tests-oprof$(EXEEXT): $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_DEPENDENCIES) $(EXTRA_unit_tests_oprof_DEPENDENCIES)
 	@rm -f unit_tests-oprof$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_oprof_LINK) $(unit_tests_oprof_OBJECTS) $(unit_tests_oprof_LDADD) $(LIBS)
 base/unit_tests_opt-dof_map_test.$(OBJEXT): base/$(am__dirstamp) \
@@ -3562,7 +3562,7 @@ systems/unit_tests_opt-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_opt-periodic_bc_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
-systems/unit_tests_opt-disconnected_neighbor_test.$(OBJEXT):  \
+systems/unit_tests_opt-disjoint_neighbor_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_opt-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
@@ -3581,7 +3581,7 @@ utils/unit_tests_opt-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
 fparser/unit_tests_opt-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
-unit_tests-opt$(EXEEXT): $(unit_tests_opt_OBJECTS) $(unit_tests_opt_DEPENDENCIES) $(EXTRA_unit_tests_opt_DEPENDENCIES) 
+unit_tests-opt$(EXEEXT): $(unit_tests_opt_OBJECTS) $(unit_tests_opt_DEPENDENCIES) $(EXTRA_unit_tests_opt_DEPENDENCIES)
 	@rm -f unit_tests-opt$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_opt_LINK) $(unit_tests_opt_OBJECTS) $(unit_tests_opt_LDADD) $(LIBS)
 base/unit_tests_prof-dof_map_test.$(OBJEXT): base/$(am__dirstamp) \
@@ -3810,7 +3810,7 @@ systems/unit_tests_prof-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_prof-periodic_bc_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
-systems/unit_tests_prof-disconnected_neighbor_test.$(OBJEXT):  \
+systems/unit_tests_prof-disjoint_neighbor_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_prof-systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
@@ -3829,7 +3829,7 @@ utils/unit_tests_prof-xdr_test.$(OBJEXT): utils/$(am__dirstamp) \
 fparser/unit_tests_prof-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 	fparser/$(DEPDIR)/$(am__dirstamp)
 
-unit_tests-prof$(EXEEXT): $(unit_tests_prof_OBJECTS) $(unit_tests_prof_DEPENDENCIES) $(EXTRA_unit_tests_prof_DEPENDENCIES) 
+unit_tests-prof$(EXEEXT): $(unit_tests_prof_OBJECTS) $(unit_tests_prof_DEPENDENCIES) $(EXTRA_unit_tests_prof_DEPENDENCIES)
 	@rm -f unit_tests-prof$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_prof_LINK) $(unit_tests_prof_OBJECTS) $(unit_tests_prof_LDADD) $(LIBS)
 
@@ -4392,27 +4392,27 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-constraint_operator_test.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-constraint_operator_test.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-constraint_operator_test.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-constraint_operator_test.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-constraint_operator_test.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-systems_test.Po@am__quote@ # am--include-marker
@@ -6017,19 +6017,19 @@ systems/unit_tests_dbg-periodic_bc_test.obj: systems/periodic_bc_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
 
-systems/unit_tests_dbg-disconnected_neighbor_test.o: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-disconnected_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_dbg-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_dbg-disconnected_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_dbg-disjoint_neighbor_test.o: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-disjoint_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_dbg-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_dbg-disjoint_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
 
-systems/unit_tests_dbg-disconnected_neighbor_test.obj: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-disconnected_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_dbg-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_dbg-disconnected_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_dbg-disjoint_neighbor_test.obj: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-disjoint_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_dbg-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_dbg-disjoint_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
 
 systems/unit_tests_dbg-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-systems_test.Tpo -c -o systems/unit_tests_dbg-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
@@ -7683,19 +7683,19 @@ systems/unit_tests_devel-periodic_bc_test.obj: systems/periodic_bc_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
 
-systems/unit_tests_devel-disconnected_neighbor_test.o: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-disconnected_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_devel-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_devel-disconnected_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_devel-disjoint_neighbor_test.o: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-disjoint_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_devel-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_devel-disjoint_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
 
-systems/unit_tests_devel-disconnected_neighbor_test.obj: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-disconnected_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_devel-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_devel-disconnected_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_devel-disjoint_neighbor_test.obj: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-disjoint_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_devel-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_devel-disjoint_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
 
 systems/unit_tests_devel-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-systems_test.Tpo -c -o systems/unit_tests_devel-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
@@ -9349,19 +9349,19 @@ systems/unit_tests_oprof-periodic_bc_test.obj: systems/periodic_bc_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
 
-systems/unit_tests_oprof-disconnected_neighbor_test.o: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-disconnected_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_oprof-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_oprof-disconnected_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_oprof-disjoint_neighbor_test.o: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-disjoint_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_oprof-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_oprof-disjoint_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
 
-systems/unit_tests_oprof-disconnected_neighbor_test.obj: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-disconnected_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_oprof-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_oprof-disconnected_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_oprof-disjoint_neighbor_test.obj: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-disjoint_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_oprof-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_oprof-disjoint_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
 
 systems/unit_tests_oprof-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-systems_test.Tpo -c -o systems/unit_tests_oprof-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
@@ -11015,19 +11015,19 @@ systems/unit_tests_opt-periodic_bc_test.obj: systems/periodic_bc_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
 
-systems/unit_tests_opt-disconnected_neighbor_test.o: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-disconnected_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_opt-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_opt-disconnected_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_opt-disjoint_neighbor_test.o: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-disjoint_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_opt-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_opt-disjoint_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
 
-systems/unit_tests_opt-disconnected_neighbor_test.obj: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-disconnected_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_opt-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_opt-disconnected_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_opt-disjoint_neighbor_test.obj: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-disjoint_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_opt-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_opt-disjoint_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
 
 systems/unit_tests_opt-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-systems_test.Tpo -c -o systems/unit_tests_opt-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
@@ -12681,19 +12681,19 @@ systems/unit_tests_prof-periodic_bc_test.obj: systems/periodic_bc_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-periodic_bc_test.obj `if test -f 'systems/periodic_bc_test.C'; then $(CYGPATH_W) 'systems/periodic_bc_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/periodic_bc_test.C'; fi`
 
-systems/unit_tests_prof-disconnected_neighbor_test.o: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-disconnected_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_prof-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_prof-disconnected_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_prof-disjoint_neighbor_test.o: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-disjoint_neighbor_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_prof-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_prof-disjoint_neighbor_test.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-disconnected_neighbor_test.o `test -f 'systems/disconnected_neighbor_test.C' || echo '$(srcdir)/'`systems/disconnected_neighbor_test.C
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-disjoint_neighbor_test.o `test -f 'systems/disjoint_neighbor_test.C' || echo '$(srcdir)/'`systems/disjoint_neighbor_test.C
 
-systems/unit_tests_prof-disconnected_neighbor_test.obj: systems/disconnected_neighbor_test.C
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-disconnected_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Tpo -c -o systems/unit_tests_prof-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disconnected_neighbor_test.C' object='systems/unit_tests_prof-disconnected_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
+systems/unit_tests_prof-disjoint_neighbor_test.obj: systems/disjoint_neighbor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-disjoint_neighbor_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Tpo -c -o systems/unit_tests_prof-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Tpo systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/disjoint_neighbor_test.C' object='systems/unit_tests_prof-disjoint_neighbor_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-disconnected_neighbor_test.obj `if test -f 'systems/disconnected_neighbor_test.C'; then $(CYGPATH_W) 'systems/disconnected_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disconnected_neighbor_test.C'; fi`
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-disjoint_neighbor_test.obj `if test -f 'systems/disjoint_neighbor_test.C'; then $(CYGPATH_W) 'systems/disjoint_neighbor_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/disjoint_neighbor_test.C'; fi`
 
 systems/unit_tests_prof-systems_test.o: systems/systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-systems_test.Tpo -c -o systems/unit_tests_prof-systems_test.o `test -f 'systems/systems_test.C' || echo '$(srcdir)/'`systems/systems_test.C
@@ -13711,27 +13711,27 @@ distclean: distclean-am
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-systems_test.Po
@@ -14353,27 +14353,27 @@ maintainer-clean: maintainer-clean-am
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_dbg-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_devel-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_oprof-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_opt-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-constraint_operator_test.Po
-	-rm -f systems/$(DEPDIR)/unit_tests_prof-disconnected_neighbor_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-systems_test.Po

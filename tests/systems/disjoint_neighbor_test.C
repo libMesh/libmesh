@@ -17,6 +17,7 @@
 
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary_base.h"
 
 using namespace libMesh;
 
@@ -29,7 +30,14 @@ static const boundary_id_type right_id = 1;
 static const boundary_id_type interface_left_id = 5;
 static const boundary_id_type interface_right_id = 6;
 
-static const int nx = 2, ny = 2;
+static const boundary_id_type interface1_left_id  = 5;
+static const boundary_id_type interface1_right_id = 6;
+static const boundary_id_type interface2_left_id  = 7;
+static const boundary_id_type interface2_right_id = 8;
+static const boundary_id_type interface3_left_id  = 9;
+static const boundary_id_type interface3_right_id = 10;
+
+static const int Nx = 2, Ny = 2;
 
 Number
 heat_exact (const Point & p,
@@ -182,22 +190,25 @@ void assemble_temperature_jump(EquationSystems &es,
     system.rhs->close();
   }
 
-class DisconnectedNeighborTest : public CppUnit::TestCase {
+class DisjointNeighborTest : public CppUnit::TestCase {
 public:
-  LIBMESH_CPPUNIT_TEST_SUITE( DisconnectedNeighborTest );
+  LIBMESH_CPPUNIT_TEST_SUITE( DisjointNeighborTest );
 #ifdef LIBMESH_ENABLE_PERIODIC
 #if defined(LIBMESH_HAVE_SOLVER)
   CPPUNIT_TEST( testTempJump );
   CPPUNIT_TEST( testTempJumpRefine );
 #endif
 #ifdef LIBMESH_ENABLE_AMR
-  // This test intentionally triggers find_neighbors() consistency check
-  // failure after AMR refinement across disconnected interfaces.
-  // Expected: libmesh_assert_valid_neighbors() fails.
-  CPPUNIT_TEST_EXCEPTION(testTempJumpLocalRefineFail, std::exception);
+  // // This test intentionally triggers find_neighbors() consistency check
+  // // failure after AMR refinement across disjoint interfaces.
+  // // Expected: libmesh_assert_valid_neighbors() fails.
+  CPPUNIT_TEST(testTempJumpLocalRefineFail);
 #endif
   CPPUNIT_TEST( testCloneEquality );
   CPPUNIT_TEST( testStitchingDiscontinuousBoundaries );
+  CPPUNIT_TEST( testPreserveDisjointNeighborPairsAfterStitch );
+  CPPUNIT_TEST( testStitchCrossMesh );
+  CPPUNIT_TEST( testDisjointNeighborConflictError );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -209,7 +220,7 @@ private:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld, 2);
-    build_two_disconnected_elems(mesh);
+    build_two_disjoint_elems(mesh);
 
     // Check elem 0 (the left element)
     if (const Elem * elem_left = mesh.query_elem_ptr(0))
@@ -287,7 +298,7 @@ private:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld, 2);
-    build_two_disconnected_elems(mesh);
+    build_two_disjoint_elems(mesh);
 
     std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
     CPPUNIT_ASSERT(*mesh_clone == mesh);
@@ -298,30 +309,31 @@ private:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld, 2);
-    build_two_disconnected_elems(mesh);
+    build_two_disjoint_elems(mesh);
+
+    CPPUNIT_ASSERT(mesh.parallel_n_nodes() == 8);
 
     mesh.stitch_surfaces(interface_left_id, interface_right_id, 1e-8 /*tolerance*/,
                         true/*clear_stitched_boundary_ids*/, false /*verbose*/,false/*use_binary_search*/,
                         false /*enforce_all_nodes_match_on_boundaries*/, false /*merge_boundary_nodes_all_or_nothing*/,
                         false /*prepare_after_stitching*/);
 
-    CPPUNIT_ASSERT(mesh.get_disconnected_boundaries()->size() == 0);
-
-
-    // ExodusII_IO(mesh).write("stitched_disconnected_boundaries.e");
+    // ExodusII_IO(mesh).write("stitched_disjoint_neighbor_boundary_pairs.e");
+    CPPUNIT_ASSERT(mesh.parallel_n_nodes() == 6);
 
     Mesh mesh2(*TestCommWorld, 2);
-    build_two_disconnected_elems(mesh2);
+    build_two_disjoint_elems(mesh2);
+
+    CPPUNIT_ASSERT(mesh2.parallel_n_nodes() == 8);
 
     mesh2.stitch_surfaces(interface_left_id, interface_right_id, 1e-8 /*tolerance*/,
                         true/*clear_stitched_boundary_ids*/, false /*verbose*/,false/*use_binary_search*/,
                         false /*enforce_all_nodes_match_on_boundaries*/, false /*merge_boundary_nodes_all_or_nothing*/,
                         true /*prepare_after_stitching*/);
 
-    CPPUNIT_ASSERT(mesh2.get_disconnected_boundaries()->size() == 0);
+    CPPUNIT_ASSERT(mesh2.parallel_n_nodes() == 6);
 
-    // ExodusII_IO(mesh2).write("stitched_disconnected_boundaries_2.e");
-
+    // ExodusII_IO(mesh2).write("stitched_disjoint_neighbor_boundary_pairs_2.e");
   }
 
   void testTempJumpRefine()
@@ -329,7 +341,7 @@ private:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld, 2);
-    build_split_mesh_with_interface(mesh);
+    build_split_mesh_with_interface(mesh, Nx, Ny, 1.0, 1.0);
 
     EquationSystems es(mesh);
     LinearImplicitSystem & sys =
@@ -383,16 +395,242 @@ private:
     try
     {
       Mesh mesh(*TestCommWorld, 2);
-      build_split_mesh_with_interface(mesh, true);
+      build_split_mesh_with_interface(mesh, Nx, Ny, 1.0, 1.0, true);
     }
     catch (const std::exception &e)
     {
-      CPPUNIT_ASSERT(std::string(e.what()).find("Mesh contains disconnected boundary interfaces") != std::string::npos);
-      throw;
+      CPPUNIT_ASSERT(std::string(e.what()).find("Mesh refinement is not yet implemented") != std::string::npos);
     }
   }
 
-  void build_two_disconnected_elems(Mesh &mesh)
+  void testPreserveDisjointNeighborPairsAfterStitch()
+  {
+    LOG_UNIT_TEST;
+    Mesh mesh(*TestCommWorld, 2);
+    build_four_disjoint_elems(mesh);
+    // ExodusII_IO(mesh).write("four_elem_one_row.e");
+    CPPUNIT_ASSERT(mesh.parallel_n_nodes() == 16);
+
+    mesh.stitch_surfaces(interface2_left_id,
+                        interface2_right_id,
+                        1e-8 /* tolerance */,
+                        true  /* clear_stitched_boundary_ids */,
+                        false /* verbose */,
+                        false /* use_binary_search */,
+                        false /* enforce_all_nodes_match_on_boundaries */,
+                        false /* merge_boundary_nodes_all_or_nothing */,
+                        true  /* prepare_after_stitching */);
+
+    // ExodusII_IO(mesh).write("four_elem_one_row_after_stitching.e");
+    CPPUNIT_ASSERT(mesh.parallel_n_nodes() == 14);
+    const auto * disjoint_pairs = mesh.get_disjoint_neighbor_boundary_pairs();
+
+    // make sure that both the interface1 and the interface3 pairing still exist afterward.
+    CPPUNIT_ASSERT(disjoint_pairs->size() == 4);
+    for (const auto & [bid, pb_ptr] : *disjoint_pairs)
+      {
+          const auto & pb = *pb_ptr;
+          const boundary_id_type a = pb.myboundary;
+          const boundary_id_type b = pb.pairedboundary;
+          if ((a == interface1_left_id && b == interface1_right_id) ||
+              (a == interface3_left_id && b == interface3_right_id) ||
+              (a == interface1_right_id && b == interface1_left_id) ||
+              (a == interface3_right_id && b == interface3_left_id))
+            continue;
+          else
+            CPPUNIT_FAIL("Disjoint neighbor boundary pair missing after stitching!");
+      }
+
+  }
+
+  void testStitchCrossMesh()
+  {
+    LOG_UNIT_TEST;
+
+    // Create a mesh with interface boundaries but without pairing
+    Mesh mesh_Y(*TestCommWorld, 2);
+    build_two_disjoint_elems(mesh_Y);
+
+    // Create another mesh that defines the same pair properly
+    auto left_id_x = left_id + 10; // to avoid boundary ID conflict with mesh_Y
+    auto right_id_x = right_id + 10;
+    auto interface_left_id_x = interface_left_id + 10;
+    auto interface_right_id_x = interface_right_id + 10;
+
+    Mesh mesh_X(*TestCommWorld, 2);
+    const auto translate_vec = Point(1.0, 0.0, 0.0);
+    // Left subdomain nodes
+    mesh_X.add_point(Point(0.0, 0.0) + translate_vec, 0);   // bottom-left corner
+    mesh_X.add_point(Point(0.5, 0.0) + translate_vec, 1);   // bottom-right corner of left element (interface node)
+    mesh_X.add_point(Point(0.0, 1.0) + translate_vec, 2);   // top-left corner
+    mesh_X.add_point(Point(0.5, 1.0) + translate_vec, 3);   // top-right corner of left element (interface node)
+
+    // Right subdomain nodes (duplicated interface points)
+    mesh_X.add_point(Point(0.5, 0.0) + translate_vec, 4);   // bottom-left corner of right element (same coords as node 1) (interface node)
+    mesh_X.add_point(Point(1.0, 0.0) + translate_vec, 5);   // bottom-right corner
+    mesh_X.add_point(Point(0.5, 1.0) + translate_vec, 6);   // top-left corner of right element (same coords as node 3) (interface node)
+    mesh_X.add_point(Point(1.0, 1.0) + translate_vec, 7);   // top-right corner
+
+
+    // ---- Define elements ----
+    BoundaryInfo & boundary = mesh_X.get_boundary_info();
+    // Left element (element ID = 0)
+    {
+      Elem * elem = mesh_X.add_elem(Elem::build_with_id(QUAD4, 0));
+      elem->set_node(0, mesh_X.node_ptr(0)); // bottom-left  (0,0)
+      elem->set_node(1, mesh_X.node_ptr(1)); // bottom-right (0.5,0)
+      elem->set_node(2, mesh_X.node_ptr(3)); // top-right    (0.5,1)
+      elem->set_node(3, mesh_X.node_ptr(2)); // top-left     (0,1)
+      boundary.add_side(elem, 3, left_id_x); // left boundary
+      boundary.add_side(elem, 1, interface_left_id_x);
+      boundary.sideset_name(left_id_x) = "left_boundary_x";
+      boundary.sideset_name(interface_left_id_x) = "interface_left_x";
+    }
+
+    // Right element (element ID = 1)
+    {
+      Elem * elem = mesh_X.add_elem(Elem::build_with_id(QUAD4, 1));
+      elem->set_node(0, mesh_X.node_ptr(4)); // bottom-left  (0.5,0)_R
+      elem->set_node(1, mesh_X.node_ptr(5)); // bottom-right (1,0)
+      elem->set_node(2, mesh_X.node_ptr(7)); // top-right    (1,1)
+      elem->set_node(3, mesh_X.node_ptr(6)); // top-left     (0.5,1)_R
+      boundary.add_side(elem, 1, right_id_x); // right boundary
+      boundary.add_side(elem, 3, interface_right_id_x);
+      boundary.sideset_name(right_id_x) = "right_boundary_x";
+      boundary.sideset_name(interface_right_id_x) = "interface_right_x";
+    }
+
+    mesh_X.add_disjoint_neighbor_boundary_pairs(interface_left_id_x, interface_right_id_x, RealVectorValue(0.0, 0.0, 0.0));
+
+    // libMesh shouldn't renumber, or our based-on-initial-id
+    // assertions later may fail.
+    mesh_X.allow_renumbering(false);
+
+    mesh_X.prepare_for_use();
+
+    // Stitching should trigger an error since Y already has the same
+    // boundary IDs but not registered as a pair
+    mesh_Y.stitch_meshes(mesh_X,
+                        right_id, left_id_x,
+                        1e-8,
+                        true,  // clear_stitched_boundary_ids
+                        false, // verbose
+                        false, // use_binary_search
+                        false, // enforce_all_nodes_match_on_boundaries
+                        false, // merge_boundary_nodes_all_or_nothing
+                        false); // prepare_after_stitching
+
+    CPPUNIT_ASSERT(mesh_Y.parallel_n_nodes() == 14);
+    const auto * disjoint_pairs = mesh_Y.get_disjoint_neighbor_boundary_pairs();
+
+    // ExodusII_IO(mesh_Y).write("mesh_Y_after_stitching.e");
+    // make sure that both the interface and the interface_x pairing still exist afterward.
+    CPPUNIT_ASSERT(disjoint_pairs->size() == 4);
+    for (const auto & [bid, pb_ptr] : *disjoint_pairs)
+      {
+          const auto & pb = *pb_ptr;
+          const boundary_id_type a = pb.myboundary;
+          const boundary_id_type b = pb.pairedboundary;
+          if ((a == interface_left_id_x && b == interface_right_id_x) ||
+              (a == interface_right_id_x && b == interface_left_id_x) ||
+              (a == interface_left_id && b == interface_right_id) ||
+              (a == interface_right_id && b == interface_left_id))
+            continue;
+          else
+            CPPUNIT_FAIL("Disjoint neighbor boundary pair missing after stitching!");
+      }
+
+
+  }
+
+
+  void testDisjointNeighborConflictError()
+  {
+    LOG_UNIT_TEST;
+
+    try
+    {
+      Mesh mesh_Y(*TestCommWorld, 2);
+      build_two_disjoint_elems(mesh_Y, false);
+      mesh_Y.add_disjoint_neighbor_boundary_pairs(right_id, left_id, RealVectorValue(-1.0, 0.0, 0.0));
+
+      // Create another mesh that defines the same pair properly
+      auto right_id_x = right_id + 10;
+      auto interface_left_id_x = interface_left_id + 10;
+      auto interface_right_id_x = interface_right_id + 10;
+
+      Mesh mesh_X(*TestCommWorld, 2);
+      const auto translate_vec = Point(1.0, 0.0, 0.0);
+      // Left subdomain nodes
+      mesh_X.add_point(Point(0.0, 0.0) + translate_vec, 0);   // bottom-left corner
+      mesh_X.add_point(Point(0.5, 0.0) + translate_vec, 1);   // bottom-right corner of left element (interface node)
+      mesh_X.add_point(Point(0.0, 1.0) + translate_vec, 2);   // top-left corner
+      mesh_X.add_point(Point(0.5, 1.0) + translate_vec, 3);   // top-right corner of left element (interface node)
+
+      // Right subdomain nodes (duplicated interface points)
+      mesh_X.add_point(Point(0.5, 0.0) + translate_vec, 4);   // bottom-left corner of right element (same coords as node 1) (interface node)
+      mesh_X.add_point(Point(1.0, 0.0) + translate_vec, 5);   // bottom-right corner
+      mesh_X.add_point(Point(0.5, 1.0) + translate_vec, 6);   // top-left corner of right element (same coords as node 3) (interface node)
+      mesh_X.add_point(Point(1.0, 1.0) + translate_vec, 7);   // top-right corner
+
+
+      // ---- Define elements ----
+      BoundaryInfo & boundary = mesh_X.get_boundary_info();
+      // Left element (element ID = 0)
+      {
+        Elem * elem = mesh_X.add_elem(Elem::build_with_id(QUAD4, 0));
+        elem->set_node(0, mesh_X.node_ptr(0)); // bottom-left  (0,0)
+        elem->set_node(1, mesh_X.node_ptr(1)); // bottom-right (0.5,0)
+        elem->set_node(2, mesh_X.node_ptr(3)); // top-right    (0.5,1)
+        elem->set_node(3, mesh_X.node_ptr(2)); // top-left     (0,1)
+        boundary.add_side(elem, 3, right_id); // left boundary -> use the same ID as mesh_Y to trigger conflict
+        boundary.add_side(elem, 1, interface_left_id_x);
+        boundary.sideset_name(right_id) = "left_boundary_x";
+        boundary.sideset_name(interface_left_id_x) = "interface_left_x";
+      }
+
+      // Right element (element ID = 1)
+      {
+        Elem * elem = mesh_X.add_elem(Elem::build_with_id(QUAD4, 1));
+        elem->set_node(0, mesh_X.node_ptr(4)); // bottom-left  (0.5,0)_R
+        elem->set_node(1, mesh_X.node_ptr(5)); // bottom-right (1,0)
+        elem->set_node(2, mesh_X.node_ptr(7)); // top-right    (1,1)
+        elem->set_node(3, mesh_X.node_ptr(6)); // top-left     (0.5,1)_R
+        boundary.add_side(elem, 1, right_id_x); // right boundary
+        boundary.add_side(elem, 3, interface_right_id_x);
+        boundary.sideset_name(right_id_x) = "right_boundary_x";
+        boundary.sideset_name(interface_right_id_x) = "interface_right_x";
+      }
+
+      mesh_X.add_disjoint_neighbor_boundary_pairs(right_id, right_id_x, RealVectorValue(1.0, 0.0, 0.0));
+
+      // libMesh shouldn't renumber, or our based-on-initial-id
+      // assertions later may fail.
+      mesh_X.allow_renumbering(false);
+
+      mesh_X.prepare_for_use();
+
+      // Stitching should trigger an error since Y already has the same
+      // boundary IDs but not registered as a pair
+      mesh_Y.stitch_meshes(mesh_X,
+                          right_id, right_id_x,
+                          1e-8,
+                          true,  // clear_stitched_boundary_ids
+                          false, // verbose
+                          false, // use_binary_search
+                          false, // enforce_all_nodes_match_on_boundaries
+                          false, // merge_boundary_nodes_all_or_nothing
+                          false); // prepare_after_stitching
+    }
+    catch (const std::exception &e)
+    {
+      CPPUNIT_ASSERT(std::string(e.what()).find("Disjoint boundary pairing mismatch") != std::string::npos);
+    }
+  }
+
+
+
+  void build_two_disjoint_elems(Mesh &mesh, bool add_pair = true, const Point &translate_vec = Point(0.0, 0.0, 0.0))
   {
     // Domain: x in (0, 1), y in (0, 1)
     // Split into two subdomains:
@@ -416,16 +654,16 @@ private:
     // ---- Define points ----
 
     // Left subdomain nodes
-    mesh.add_point(Point(0.0, 0.0), 0);   // bottom-left corner
-    mesh.add_point(Point(0.5, 0.0), 1);   // bottom-right corner of left element (interface node)
-    mesh.add_point(Point(0.0, 1.0), 2);   // top-left corner
-    mesh.add_point(Point(0.5, 1.0), 3);   // top-right corner of left element (interface node)
+    mesh.add_point(Point(0.0, 0.0) + translate_vec, 0);   // bottom-left corner
+    mesh.add_point(Point(0.5, 0.0) + translate_vec, 1);   // bottom-right corner of left element (interface node)
+    mesh.add_point(Point(0.0, 1.0) + translate_vec, 2);   // top-left corner
+    mesh.add_point(Point(0.5, 1.0) + translate_vec, 3);   // top-right corner of left element (interface node)
 
     // Right subdomain nodes (duplicated interface points)
-    mesh.add_point(Point(0.5, 0.0), 4);   // bottom-left corner of right element (same coords as node 1) (interface node)
-    mesh.add_point(Point(1.0, 0.0), 5);   // bottom-right corner
-    mesh.add_point(Point(0.5, 1.0), 6);   // top-left corner of right element (same coords as node 3) (interface node)
-    mesh.add_point(Point(1.0, 1.0), 7);   // top-right corner
+    mesh.add_point(Point(0.5, 0.0) + translate_vec, 4);   // bottom-left corner of right element (same coords as node 1) (interface node)
+    mesh.add_point(Point(1.0, 0.0) + translate_vec, 5);   // bottom-right corner
+    mesh.add_point(Point(0.5, 1.0) + translate_vec, 6);   // top-left corner of right element (same coords as node 3) (interface node)
+    mesh.add_point(Point(1.0, 1.0) + translate_vec, 7);   // top-right corner
 
 
     // ---- Define elements ----
@@ -456,9 +694,10 @@ private:
       boundary.sideset_name(interface_right_id) = "interface_right";
     }
 
-    // This is the key testing step: inform libMesh about the disconnected boundaries
-    // And, in `prepare_for_use()`, libMesh will set up the disconnected neighbor relationships.
-    mesh.add_disconnected_boundaries(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
+    // This is the key testing step: inform libMesh about the disjoint neighbor boundary pairs
+    // And, in `prepare_for_use()`, libMesh will set up the disjoint neighbor relationships.
+    if (add_pair)
+      mesh.add_disjoint_neighbor_boundary_pairs(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
 
     // libMesh shouldn't renumber, or our based-on-initial-id
     // assertions later may fail.
@@ -468,7 +707,7 @@ private:
   }
 
   // The interface is located at x = 0.5; nx must be even (split evenly into left and right subdomains)
-  void build_split_mesh_with_interface(Mesh &mesh, bool test_local_refinement = false)
+  void build_split_mesh_with_interface(Mesh &mesh, unsigned nx, unsigned ny, double Lx, double Ly, bool test_local_refinement = false)
   {
     // Ensure nx is even so the interface aligns with element boundaries
     libmesh_error_msg_if(nx % 2 != 0, "nx must be even!");
@@ -570,9 +809,9 @@ private:
     boundary.sideset_name(interface_right_id) = "interface_right";
 
 
-    // This is the key testing step: inform libMesh about the disconnected boundaries
-    // And, in `prepare_for_use()`, libMesh will set up the disconnected neighbor relationships.
-    mesh.add_disconnected_boundaries(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
+    // This is the key testing step: inform libMesh about the disjoint neighbor boundary pairs
+    // And, in `prepare_for_use()`, libMesh will set up the disjoint neighbor relationships.
+    mesh.add_disjoint_neighbor_boundary_pairs(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
 
     mesh.prepare_for_use();
 
@@ -594,6 +833,104 @@ private:
 #endif
   }
 
+void build_four_disjoint_elems(Mesh &mesh)
+{
+  // Clear any existing data and initialize the mesh
+  mesh.clear();
+  mesh.set_mesh_dimension(2);
+
+  BoundaryInfo &boundary = mesh.get_boundary_info();
+
+  // --------------------------------------------------------------------
+  // Domain layout:
+  //   4 elements aligned in a single row, each of width = 0.25
+  //
+  //   y=1:  x0---x1_L---x1_R---x2_L---x2_R---x3_L---x3_R---x4
+  //
+  //   y=0:  x0---x1_L---x1_R---x2_L---x2_R---x3_L---x3_R---x4
+  //
+  //   The interfaces between adjacent elements are duplicated:
+  //   for each internal interface, left and right sides have distinct nodes
+  //   (geometrically coincident but topologically disconnected).
+  // --------------------------------------------------------------------
+  const Real dx = 0.25;
+
+  // ---- Add nodal coordinates ----
+  // Each interface has duplicated nodes (left and right) to represent discontinuity.
+  unsigned id = 0;
+  for (unsigned i = 0; i < 4; ++i)
+    {
+      Real xL = i * dx;
+      Real xR = (i + 1) * dx;
+
+      // Left nodes of the element
+      mesh.add_point(Point(xL, 0.0), id++); // bottom-left
+      mesh.add_point(Point(xL, 1.0), id++); // top-left
+
+      // Right nodes (duplicated interface nodes)
+      mesh.add_point(Point(xR, 0.0), id++); // bottom-right
+      mesh.add_point(Point(xR, 1.0), id++); // top-right
+    }
+
+  // Add one final pair of rightmost boundary nodes
+  mesh.add_point(Point(1.0, 0.0), id++);
+  mesh.add_point(Point(1.0, 1.0), id++);
+
+  // ---- Create four QUAD4 elements ----
+  // Node ordering: 0 = BL, 1 = BR, 2 = TR, 3 = TL
+  unsigned elem_id = 0;
+  for (unsigned i = 0; i < 4; ++i)
+    {
+      Elem *elem = mesh.add_elem(Elem::build_with_id(QUAD4, elem_id++));
+
+      unsigned base = i * 4;
+      elem->set_node(0, mesh.node_ptr(base));     // bottom-left
+      elem->set_node(1, mesh.node_ptr(base + 2)); // bottom-right
+      elem->set_node(2, mesh.node_ptr(base + 3)); // top-right
+      elem->set_node(3, mesh.node_ptr(base + 1)); // top-left
+
+      // Add outer boundaries
+      if (i == 0)
+        boundary.add_side(elem, 3, left_id);  // left outer boundary
+      if (i == 3)
+        boundary.add_side(elem, 1, right_id); // right outer boundary
+    }
+
+  // ---- Define internal interface sides ----
+  // Element side 1 (right) connects to the next element’s side 3 (left)
+  // Each interface is treated as a disjoint (non-conforming) boundary pair
+  boundary.add_side(mesh.elem_ptr(0), 1, interface1_left_id);
+  boundary.add_side(mesh.elem_ptr(1), 3, interface1_right_id);
+
+  boundary.add_side(mesh.elem_ptr(1), 1, interface2_left_id);
+  boundary.add_side(mesh.elem_ptr(2), 3, interface2_right_id);
+
+  boundary.add_side(mesh.elem_ptr(2), 1, interface3_left_id);
+  boundary.add_side(mesh.elem_ptr(3), 3, interface3_right_id);
+
+  // ---- Register disjoint neighbor boundary pairs ----
+  // These pairs inform libMesh that the specified sides are geometrically
+  // adjacent but topologically disconnected.
+  mesh.add_disjoint_neighbor_boundary_pairs(interface1_left_id, interface1_right_id, RealVectorValue(0.0, 0.0, 0.0));
+  mesh.add_disjoint_neighbor_boundary_pairs(interface2_left_id, interface2_right_id, RealVectorValue(0.0, 0.0, 0.0));
+  mesh.add_disjoint_neighbor_boundary_pairs(interface3_left_id, interface3_right_id, RealVectorValue(0.0, 0.0, 0.0));
+
+  // ---- Assign descriptive names to boundary IDs ----
+  boundary.sideset_name(left_id)  = "left_boundary";
+  boundary.sideset_name(right_id) = "right_boundary";
+
+  boundary.sideset_name(interface1_left_id)  = "interface1_left";
+  boundary.sideset_name(interface1_right_id) = "interface1_right";
+  boundary.sideset_name(interface2_left_id)  = "interface2_left";
+  boundary.sideset_name(interface2_right_id) = "interface2_right";
+  boundary.sideset_name(interface3_left_id)  = "interface3_left";
+  boundary.sideset_name(interface3_right_id) = "interface3_right";
+
+  // ---- Finalize mesh setup ----
+  mesh.allow_renumbering(false);
+  mesh.prepare_for_use();
+}
+
 };
 
-CPPUNIT_TEST_SUITE_REGISTRATION( DisconnectedNeighborTest );
+CPPUNIT_TEST_SUITE_REGISTRATION( DisjointNeighborTest );

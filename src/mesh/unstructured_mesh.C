@@ -47,9 +47,10 @@
 #include <sstream>
 #include <unordered_map>
 
-// for disconnected neighbors
+// for disjoint neighbors
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
+
 namespace {
 
 using namespace libMesh;
@@ -997,8 +998,8 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  // Get the disconnected boundaries object (from periodic BCs)
-  auto * db = this->get_disconnected_boundaries();
+  // Get the disjoint neighbor boundary pairs object (from periodic BCs)
+  auto * db = this->get_disjoint_neighbor_boundary_pairs();
 
   if (db)
     {
@@ -1842,37 +1843,56 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
   MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
 
-  // Whether to enable stitching across disconnected boundary pairs.
-  //
-  // Notes:
-  // - Each mesh maintains its own registry of disconnected boundary pairs.
-  //   This function only considers the pairs registered in `this` mesh
-  //   (`this->_disconnected_boundary_pairs`). Stitching occurs only when
-  //   the provided boundary IDs form a registered pair in this mesh.
-  // - Disconnected boundary pairs defined in `other_mesh` are ignored,
-  //   even if `other_mesh` is provided. To stitch such pairs, call
-  //   `stitching_helper()` on that mesh separately.
-  // - Cross-mesh disconnected-boundary stitching (i.e., pairing a boundary
-  //   from `this` mesh with one from `other_mesh`) is not supported by design.
-  bool enable_disc_bdys_stitching = false;
-#ifdef LIBMESH_ENABLE_PERIODIC
-  auto * this_db = this->get_disconnected_boundaries();
+  bool is_valid_disjoint_pair_to_stitch = false;
 
-  const bool have_disc_bdys = (this_db && !this_db->empty());
+#ifdef LIBMESH_ENABLE_PERIODIC
+  auto * this_db  = this->get_disjoint_neighbor_boundary_pairs();
+  auto * other_db = (other_mesh ? other_mesh->get_disjoint_neighbor_boundary_pairs() : nullptr);
+  const bool have_disc_bdys =
+    (this_db && !this_db->empty()) || (other_db && !other_db->empty());
 
   if (have_disc_bdys)
     {
-      // Initialize as disabled; will be enabled only if the given boundary IDs form a valid disconnected pair.
-      enable_disc_bdys_stitching = false;
+      const boundary_id_type a = this_mesh_boundary_id;
+      const boundary_id_type b = other_mesh_boundary_id;
 
-      // Not only must we have disconnected boundaries defined, but the specified
-      // `this_mesh_boundary_id` and `other_mesh_boundary_id` must also form a valid
-      // disconnected boundary pair registered within this mesh.
-      auto dbb = this_db ? this_db->boundary(this_mesh_boundary_id) : nullptr;
-      if (dbb)
-        if ((dbb->myboundary == this_mesh_boundary_id && dbb->pairedboundary == other_mesh_boundary_id) ||
-            (dbb->pairedboundary == this_mesh_boundary_id && dbb->myboundary == other_mesh_boundary_id))
-          enable_disc_bdys_stitching = true;
+      auto get_pb = [](const PeriodicBoundaries * db, boundary_id_type id)
+        {
+          return db ? db->boundary(id) : nullptr;
+        };
+
+      // this mesh
+      const auto * pb_this_a = get_pb(this_db, a);
+      const auto * pb_this_b = get_pb(this_db, b);
+      const bool in_this =
+        (pb_this_a && pb_this_a->pairedboundary == b) ||
+        (pb_this_b && pb_this_b->pairedboundary == a);
+
+      // other mesh
+      const auto * pb_other_b = get_pb(other_db, b);
+      const auto * pb_other_a = get_pb(other_db, a);
+      const bool in_other =
+        (pb_other_b && pb_other_b->pairedboundary == a) ||
+        (pb_other_a && pb_other_a->pairedboundary == b);
+
+      // Conflict conditions:
+      // Case 1: On "this" mesh, a or b exist but are not paired,
+      //         while the other mesh pairs them.
+      if (!in_this && (pb_this_a || pb_this_b) && in_other)
+        libmesh_error_msg("Disjoint boundary pairing mismatch: on 'this' mesh, "
+                          "boundary (" << a << " or " << b
+                          << ") exists but is not paired; on 'other' mesh the pair is present.");
+
+      // Case 2: On "other" mesh, a or b exist but are not paired,
+      //         while this mesh pairs them.
+      if (!in_other && (pb_other_a || pb_other_b) && in_this)
+        libmesh_error_msg("Disjoint boundary pairing mismatch: on 'other' mesh, "
+                          "boundary (" << a << " or " << b
+                          << ") exists but is not paired; on 'this' mesh the pair is present.");
+
+      // Legal conditions: either side has a correct pairing
+      if (in_this || in_other)
+        is_valid_disjoint_pair_to_stitch = true;
     }
 #endif // LIBMESH_ENABLE_PERIODIC
 
@@ -1966,15 +1986,9 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                 // Now check whether elem has a face on the specified boundary
                 for (auto side_id : el->side_index_range())
                   {
-                    // Determine if this side should be considered for stitching.
-                    // A side is a candidate if:
-                    // 1. It has no neighbor (a true exterior boundary), or
-                    // 2. For the primary mesh (`this`), self-stitching across a registered
-                    //    disconnected boundary pair is enabled, and this side belongs to
-                    //    one of those disconnected boundaries.
                     bool should_stitch_this_side =
                       (el->neighbor_ptr(side_id) == nullptr) ||
-                      ((i == 0) && enable_disc_bdys_stitching &&
+                      (is_valid_disjoint_pair_to_stitch &&
                       mesh_array[i]->get_boundary_info().has_boundary_id(el, side_id, id_array[i]));
 
                     if (should_stitch_this_side)
@@ -2287,6 +2301,42 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
     {
       LOG_SCOPE("stitch_meshes copying", "UnstructuredMesh");
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+        // Copy disjoint neighbor boundary pairs (PeriodicBoundary objects)
+        // from `other_mesh` to `this` mesh
+        if (other_db && !other_db->empty())
+          {
+            for (const auto & [bdy_id, pb_ptr] : *other_db)
+              {
+                const auto & pb = *pb_ptr;
+                const boundary_id_type a = pb.myboundary;
+                const boundary_id_type b = pb.pairedboundary;
+
+                if (this_db)
+                  {
+                    // Skip if identical pair already exists
+                    if (const auto * existing_pb = this_db->boundary(a))
+                      if ((existing_pb->myboundary == a && existing_pb->pairedboundary == b) ||
+                          (existing_pb->myboundary == b && existing_pb->pairedboundary == a))
+                        continue;
+
+                    // If both boundary ids exist on this mesh but aren't paired here, refuse to create a new pair
+                    const auto & bdy_ids = this->get_boundary_info().get_boundary_ids();
+                    const bool a_exists = bdy_ids.count(a);
+                    const bool b_exists = bdy_ids.count(b);
+                    // If a and b already exist on `this`, we should be screaming and dying
+                    // unless they already have PeriodicBoundary objects connecting them too
+                    if (a_exists && b_exists && !this_db->boundary(a))
+                      libmesh_error_msg("Conflict: boundaries " << a << " and " << b
+                                        << " already exist on this mesh but are not paired.");
+                  }
+
+                this->add_disjoint_neighbor_boundary_pairs(a, b, pb.get_corresponding_pos(Point(0.0,0.0,0.0)));
+              }
+          }
+#endif // LIBMESH_ENABLE_PERIODIC
+
+
       // Increment the node_to_node_map and node_to_elems_map
       // to account for id offsets
       for (auto & pr : node_to_node_map)
@@ -2488,6 +2538,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
               this->add_elemset_code(elemset_code, other_id_set_to_fill);
             }
         }
+
     } // end if (other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes
@@ -2568,11 +2619,11 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                   for (auto s : el->side_index_range())
                     {
                       bool has_real_neighbor = (el->neighbor_ptr(s) != nullptr);
-                      bool has_intended_disconnected_neighbor = enable_disc_bdys_stitching &&
+                      bool has_disdjoint_neighbor = is_valid_disjoint_pair_to_stitch &&
                       (this->get_boundary_info().has_boundary_id(el, s, this_mesh_boundary_id)
                       || this->get_boundary_info().has_boundary_id(el, s, other_mesh_boundary_id));
 
-                      if (!has_real_neighbor || has_intended_disconnected_neighbor)
+                      if (!has_real_neighbor || has_disdjoint_neighbor)
                         {
                           key_type key = el->low_order_key(s);
                           auto bounds = side_to_elem_map.equal_range(key);
@@ -2650,8 +2701,12 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
     }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (enable_disc_bdys_stitching)
-    this->remove_disconnected_boundaries_pair(this_mesh_boundary_id, other_mesh_boundary_id);
+  // Remove only the disjoint pair that was actually stitched.
+  // Safe because `is_valid_disjoint_pair_to_stitch` is true
+  // only if this exact (a,b) pair exists in the registry.
+  // Other disjoint pairs remain untouched.
+  if (is_valid_disjoint_pair_to_stitch)
+    this->remove_disjoint_boundary_pair(this_mesh_boundary_id, other_mesh_boundary_id);
 #endif
 
   if (prepare_after_stitching)

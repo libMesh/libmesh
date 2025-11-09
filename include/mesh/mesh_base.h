@@ -1832,27 +1832,26 @@ public:
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
-   * Register a pair of boundaries as disconnected boundaries.
+   * Register a pair of boundaries as disjoint neighbor boundary pairs.
    */
-  void add_disconnected_boundaries(const boundary_id_type b1,
+  void add_disjoint_neighbor_boundary_pairs(const boundary_id_type b1,
                                    const boundary_id_type b2,
                                    const RealVectorValue & translation);
 
-  PeriodicBoundaries * get_disconnected_boundaries();
+  PeriodicBoundaries * get_disjoint_neighbor_boundary_pairs();
 
-  const PeriodicBoundaries * get_disconnected_boundaries() const;
+  const PeriodicBoundaries * get_disjoint_neighbor_boundary_pairs() const;
 
-  void remove_disconnected_boundaries_pair(const boundary_id_type b1,
-                                           const boundary_id_type b2);
-
+  void remove_disjoint_boundary_pair(const boundary_id_type b1,
+                                     const boundary_id_type b2);
 #endif
 
 
 protected:
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  /// @brief The disconnected boundary id pairs.
-  std::unique_ptr<PeriodicBoundaries> _disconnected_boundary_pairs;
+  /// @brief The disjoint boundary id pairs.
+  std::unique_ptr<PeriodicBoundaries> _disjoint_boundary_pairs;
 #endif
 
   /**

@@ -46,11 +46,11 @@ void GhostPointNeighbors::operator()
   bool check_periodic_bcs =
     (_periodic_bcs && !_periodic_bcs->empty());
 
-  auto * db = _mesh->get_disconnected_boundaries();
-  bool check_disconnected_bcs = (db && !db->empty());
+  auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
+  bool check_disjoint_bcs = (db && !db->empty());
 
   std::unique_ptr<PointLocatorBase> point_locator;
-  if (check_periodic_bcs || check_disconnected_bcs)
+  if (check_periodic_bcs || check_disjoint_bcs)
       point_locator = _mesh->sub_point_locator();
 
   std::set<const Elem *> periodic_elems_examined;
@@ -180,9 +180,9 @@ void GhostPointNeighbors::operator()
             }
         }
 
-      if (check_disconnected_bcs)
+      if (check_disjoint_bcs)
         {
-          // Also ghost their disconnected neighbors
+          // Also ghost their disjoint neighbors
           for (auto s : elem->side_index_range())
           {
             for (const auto & [id, boundary_ptr] : *db)
