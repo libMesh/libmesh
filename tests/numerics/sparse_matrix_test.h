@@ -270,7 +270,11 @@ public:
 #ifdef LIBMESH_HAVE_HDF5
   void testWriteAndReadHDF5()
   {
+    // This capability is not yet supported when libmesh is compiled
+    // with complex number support
+#ifndef LIBMESH_USE_COMPLEX_NUMBERS
     testWriteAndRead("M.h5");
+#endif
   }
 #endif // LIBMESH_HAVE_HDF5
 
