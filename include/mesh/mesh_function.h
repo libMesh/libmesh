@@ -109,18 +109,6 @@ public:
    */
   virtual void init () override;
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * The actual initialization process.  Takes an optional argument which
-   * specifies the method to use when building a \p PointLocator
-   *
-   * \deprecated The input argument is not used (was it ever?) to
-   * control the PointLocator type which is built, so one should
-   * instead call the version of init() taking no args.
-   */
-  void init (const Trees::BuildType point_locator_build_type);
-#endif // LIBMESH_ENABLE_DEPRECATED
-
   /**
    * Clears the function.
    */

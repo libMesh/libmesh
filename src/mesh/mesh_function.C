@@ -124,20 +124,6 @@ void MeshFunction::init ()
 
 
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-void MeshFunction::init (const Trees::BuildType /*point_locator_build_type*/)
-{
-  libmesh_deprecated();
-
-  // Call the init() taking no args instead. Note: this is backwards
-  // compatible because the argument was not used for anything
-  // previously anyway.
-  this->init();
-}
-#endif // LIBMESH_ENABLE_DEPRECATED
-
-
-
 void
 MeshFunction::clear ()
 {
