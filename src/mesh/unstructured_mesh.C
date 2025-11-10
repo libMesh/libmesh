@@ -1879,14 +1879,14 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
       // Case 1: On "this" mesh, a or b exist but are not paired,
       //         while the other mesh pairs them.
       if (!in_this && (pb_this_a || pb_this_b) && in_other)
-        libmesh_error_msg("Disjoint boundary pairing mismatch: on 'this' mesh, "
+        libmesh_error_msg("Disjoint neighbor boundary pairing mismatch: on 'this' mesh, "
                           "boundary (" << a << " or " << b
                           << ") exists but is not paired; on 'other' mesh the pair is present.");
 
       // Case 2: On "other" mesh, a or b exist but are not paired,
       //         while this mesh pairs them.
       if (!in_other && (pb_other_a || pb_other_b) && in_this)
-        libmesh_error_msg("Disjoint boundary pairing mismatch: on 'other' mesh, "
+        libmesh_error_msg("Disjoint neighbor boundary pairing mismatch: on 'other' mesh, "
                           "boundary (" << a << " or " << b
                           << ") exists but is not paired; on 'this' mesh the pair is present.");
 

@@ -159,13 +159,13 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   // Deep copy of all periodic boundaries
-  if (other_mesh._disjoint_boundary_pairs)
+  if (other_mesh._disjoint_neighbor_boundary_pairs)
     {
-      _disjoint_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+      _disjoint_neighbor_boundary_pairs = std::make_unique<PeriodicBoundaries>();
 
-      for (const auto & [id, pb] : *other_mesh._disjoint_boundary_pairs)
+      for (const auto & [id, pb] : *other_mesh._disjoint_neighbor_boundary_pairs)
         if (pb)
-          (*_disjoint_boundary_pairs)[id] = pb->clone();
+          (*_disjoint_neighbor_boundary_pairs)[id] = pb->clone();
     }
 #endif
 
@@ -218,13 +218,13 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   // Deep copy of all periodic boundaries:
   // We must clone each PeriodicBoundaryBase in the source map,
   // since unique_ptr cannot be copied and we need independent instances
-  if (other_mesh._disjoint_boundary_pairs)
+  if (other_mesh._disjoint_neighbor_boundary_pairs)
     {
-      _disjoint_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+      _disjoint_neighbor_boundary_pairs = std::make_unique<PeriodicBoundaries>();
 
-      for (const auto & [id, pb] : *other_mesh._disjoint_boundary_pairs)
+      for (const auto & [id, pb] : *other_mesh._disjoint_neighbor_boundary_pairs)
         if (pb)
-          (*_disjoint_boundary_pairs)[id] = pb->clone();
+          (*_disjoint_neighbor_boundary_pairs)[id] = pb->clone();
     }
 #endif
 
@@ -336,11 +336,11 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
     return false;
 
   // First check whether the "existence" of the two pointers differs (one present, one absent)
-  if ((bool)_disjoint_boundary_pairs != (bool)other_mesh._disjoint_boundary_pairs)
+  if ((bool)_disjoint_neighbor_boundary_pairs != (bool)other_mesh._disjoint_neighbor_boundary_pairs)
     return false;
   // If both exist, compare the contents (Weak Test: just compare sizes like `_ghosting_functors`)
-  if (_disjoint_boundary_pairs &&
-      (_disjoint_boundary_pairs->size() != other_mesh._disjoint_boundary_pairs->size()))
+  if (_disjoint_neighbor_boundary_pairs &&
+      (_disjoint_neighbor_boundary_pairs->size() != other_mesh._disjoint_neighbor_boundary_pairs->size()))
     return false;
 
   const constraint_rows_type & other_rows =
@@ -1999,10 +1999,10 @@ void MeshBase::detect_interior_parents()
                                              const RealVectorValue & translation)
     {
       // Lazily allocate the container the first time it’s needed
-      if (!_disjoint_boundary_pairs)
-        _disjoint_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+      if (!_disjoint_neighbor_boundary_pairs)
+        _disjoint_neighbor_boundary_pairs = std::make_unique<PeriodicBoundaries>();
 
-      PeriodicBoundaries & db = *_disjoint_boundary_pairs;
+      PeriodicBoundaries & db = *_disjoint_neighbor_boundary_pairs;
 
       // Create forward and inverse boundary mappings
       PeriodicBoundary forward(translation);
@@ -2020,22 +2020,22 @@ void MeshBase::detect_interior_parents()
 
   PeriodicBoundaries * MeshBase::get_disjoint_neighbor_boundary_pairs()
     {
-      return _disjoint_boundary_pairs.get();
+      return _disjoint_neighbor_boundary_pairs.get();
     }
 
   const PeriodicBoundaries * MeshBase::get_disjoint_neighbor_boundary_pairs() const
     {
-      return _disjoint_boundary_pairs.get();
+      return _disjoint_neighbor_boundary_pairs.get();
     }
 
     void MeshBase::remove_disjoint_boundary_pair(const boundary_id_type b1,
                                                    const boundary_id_type b2)
     {
       // Nothing to remove if not allocated or empty
-      if (!_disjoint_boundary_pairs || _disjoint_boundary_pairs->empty())
+      if (!_disjoint_neighbor_boundary_pairs || _disjoint_neighbor_boundary_pairs->empty())
         return;
 
-      auto & pairs = *_disjoint_boundary_pairs;
+      auto & pairs = *_disjoint_neighbor_boundary_pairs;
 
       // Helper to check and erase both directions
       auto erase_if_match = [](boundary_id_type key,

@@ -1850,8 +1850,8 @@ public:
 protected:
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  /// @brief The disjoint boundary id pairs.
-  std::unique_ptr<PeriodicBoundaries> _disjoint_boundary_pairs;
+  /// @brief The disjoint neighbor boundary id pairs.
+  std::unique_ptr<PeriodicBoundaries> _disjoint_neighbor_boundary_pairs;
 #endif
 
   /**

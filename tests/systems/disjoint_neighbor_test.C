@@ -624,7 +624,7 @@ private:
     }
     catch (const std::exception &e)
     {
-      CPPUNIT_ASSERT(std::string(e.what()).find("Disjoint boundary pairing mismatch") != std::string::npos);
+      CPPUNIT_ASSERT(std::string(e.what()).find("Disjoint neighbor boundary pairing mismatch") != std::string::npos);
     }
   }
 
