@@ -204,7 +204,6 @@ include_HEADERS =  \
         mesh/mesh_function.h \
         mesh/mesh_generation.h \
         mesh/mesh_input.h \
-        mesh/mesh_inserter_iterator.h \
         mesh/mesh_modification.h \
         mesh/mesh_netgen_interface.h \
         mesh/mesh_output.h \

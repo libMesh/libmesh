@@ -194,7 +194,6 @@ BUILT_SOURCES = \
         mesh_function.h \
         mesh_generation.h \
         mesh_input.h \
-        mesh_inserter_iterator.h \
         mesh_modification.h \
         mesh_netgen_interface.h \
         mesh_output.h \
@@ -1179,9 +1178,6 @@ mesh_generation.h: $(top_srcdir)/include/mesh/mesh_generation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_input.h: $(top_srcdir)/include/mesh/mesh_input.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-mesh_inserter_iterator.h: $(top_srcdir)/include/mesh/mesh_inserter_iterator.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_modification.h: $(top_srcdir)/include/mesh/mesh_modification.h
