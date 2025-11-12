@@ -521,11 +521,21 @@ template <typename T>
 void SparseMatrix<T>::print_coreform_hdf5(const std::string & filename,
                                           const std::string & groupname) const
 {
-#ifndef LIBMESH_HAVE_HDF5
+#if defined(LIBMESH_USE_COMPLEX_NUMBERS) || !defined(LIBMESH_HAVE_HDF5)
+  // TODO: HDF5 version 2.0.0 and later adds native support for
+  // complex numbers with the H5T_NATIVE_DOUBLE_COMPLEX type [0], so
+  // we could consider supporting T==std::complex<Real> in the future.
+  // [0]: https://forum.hdfgroup.org/t/coming-in-the-next-hdf5-release-native-support-for-complex-number-datatypes/13543
   libmesh_ignore(filename, groupname);
   libmesh_error_msg("ERROR: need HDF5 support to handle .h5 files!!!");
 #else
   LOG_SCOPE("print_coreform_hdf5()", "SparseMatrix");
+
+  // In this implementation, we copy the SparseMatrix entries into a
+  // std::vector<double>, so this won't work for any Number type for
+  // which sizeof(Number) > sizeof(double).
+  if constexpr (sizeof(T) > sizeof(double))
+    libmesh_not_implemented();
 
   const numeric_index_type first_dof = this->row_start(),
                            end_dof   = this->row_stop();
