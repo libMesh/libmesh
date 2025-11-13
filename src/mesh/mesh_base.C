@@ -49,6 +49,9 @@
 #include <sstream>   // for std::ostringstream
 #include <unordered_map>
 
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary.h"
+
 namespace libMesh
 {
 
@@ -154,6 +157,18 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   if (other_mesh._partitioner.get())
     _partitioner = other_mesh._partitioner->clone();
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Deep copy of all periodic boundaries
+  if (other_mesh._disjoint_neighbor_boundary_pairs)
+    {
+      _disjoint_neighbor_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+
+      for (const auto & [id, pb] : *other_mesh._disjoint_neighbor_boundary_pairs)
+        if (pb)
+          (*_disjoint_neighbor_boundary_pairs)[id] = pb->clone();
+    }
+#endif
+
   // _elemset_codes stores pointers to entries in _elemset_codes_inverse_map,
   // so it is not possible to simply copy it directly from other_mesh
   for (const auto & [set, code] : _elemset_codes_inverse_map)
@@ -198,6 +213,20 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _node_integer_names = std::move(other_mesh._node_integer_names);
   _node_integer_default_values = std::move(other_mesh._node_integer_default_values);
   _point_locator_close_to_point_tol = other_mesh.get_point_locator_close_to_point_tol();
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Deep copy of all periodic boundaries:
+  // We must clone each PeriodicBoundaryBase in the source map,
+  // since unique_ptr cannot be copied and we need independent instances
+  if (other_mesh._disjoint_neighbor_boundary_pairs)
+    {
+      _disjoint_neighbor_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+
+      for (const auto & [id, pb] : *other_mesh._disjoint_neighbor_boundary_pairs)
+        if (pb)
+          (*_disjoint_neighbor_boundary_pairs)[id] = pb->clone();
+    }
+#endif
 
   // This relies on our subclasses *not* invalidating pointers when we
   // do their portion of the move assignment later!
@@ -304,6 +333,14 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (bool(_partitioner) != bool(other_mesh._partitioner))
     return false;
   if (*boundary_info != *other_mesh.boundary_info)
+    return false;
+
+  // First check whether the "existence" of the two pointers differs (one present, one absent)
+  if ((bool)_disjoint_neighbor_boundary_pairs != (bool)other_mesh._disjoint_neighbor_boundary_pairs)
+    return false;
+  // If both exist, compare the contents (Weak Test: just compare sizes like `_ghosting_functors`)
+  if (_disjoint_neighbor_boundary_pairs &&
+      (_disjoint_neighbor_boundary_pairs->size() != other_mesh._disjoint_neighbor_boundary_pairs->size()))
     return false;
 
   const constraint_rows_type & other_rows =
@@ -1950,6 +1987,78 @@ void MeshBase::detect_interior_parents()
         }
     }
 }
+
+
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  /**
+   * Register a pair of boundaries as disjoint neighbor boundary pairs.
+   */
+  void MeshBase::add_disjoint_neighbor_boundary_pairs(const boundary_id_type b1,
+                                             const boundary_id_type b2,
+                                             const RealVectorValue & translation)
+    {
+      // Lazily allocate the container the first time it’s needed
+      if (!_disjoint_neighbor_boundary_pairs)
+        _disjoint_neighbor_boundary_pairs = std::make_unique<PeriodicBoundaries>();
+
+      PeriodicBoundaries & db = *_disjoint_neighbor_boundary_pairs;
+
+      // Create forward and inverse boundary mappings
+      PeriodicBoundary forward(translation);
+      PeriodicBoundary inverse(translation * -1.0);
+
+      forward.myboundary       = b1;
+      forward.pairedboundary   = b2;
+      inverse.myboundary       = b2;
+      inverse.pairedboundary   = b1;
+
+      // Add both directions into the container
+      db.emplace(b1, forward.clone());
+      db.emplace(b2, inverse.clone());
+    }
+
+  PeriodicBoundaries * MeshBase::get_disjoint_neighbor_boundary_pairs()
+    {
+      return _disjoint_neighbor_boundary_pairs.get();
+    }
+
+  const PeriodicBoundaries * MeshBase::get_disjoint_neighbor_boundary_pairs() const
+    {
+      return _disjoint_neighbor_boundary_pairs.get();
+    }
+
+    void MeshBase::remove_disjoint_boundary_pair(const boundary_id_type b1,
+                                                   const boundary_id_type b2)
+    {
+      // Nothing to remove if not allocated or empty
+      if (!_disjoint_neighbor_boundary_pairs || _disjoint_neighbor_boundary_pairs->empty())
+        return;
+
+      auto & pairs = *_disjoint_neighbor_boundary_pairs;
+
+      // Helper to check and erase both directions
+      auto erase_if_match = [](boundary_id_type key,
+                              boundary_id_type pair,
+                              PeriodicBoundaries & pb_map)
+        {
+          auto it = pb_map.find(key);
+          if (it != pb_map.end())
+            {
+              const auto & pb = *(it->second);
+              // Check both directions
+              if ((pb.myboundary == key && pb.pairedboundary == pair) ||
+                  (pb.pairedboundary == key && pb.myboundary == pair))
+                pb_map.erase(it);
+            }
+        };
+
+      erase_if_match(b1, b2, pairs);
+      erase_if_match(b2, b1, pairs);
+    }
+
+
+#endif
 
 
 

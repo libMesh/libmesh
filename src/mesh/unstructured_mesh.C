@@ -47,6 +47,10 @@
 #include <sstream>
 #include <unordered_map>
 
+// for disjoint neighbors
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary.h"
+
 namespace {
 
 using namespace libMesh;
@@ -993,6 +997,45 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
       }
   }
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Get the disjoint neighbor boundary pairs object (from periodic BCs)
+  auto * db = this->get_disjoint_neighbor_boundary_pairs();
+
+  if (db)
+    {
+      // Obtain a point locator
+      std::unique_ptr<PointLocatorBase> point_locator = this->sub_point_locator();
+
+      for (const auto & element : this->element_ptr_range())
+        {
+          for (auto ms : element->side_index_range())
+            {
+              // Skip if this side already has a valid neighbor (including remote neighbors)
+              if (element->neighbor_ptr(ms) != nullptr &&
+                  element->neighbor_ptr(ms) != remote_elem)
+                continue;
+
+              for (const auto & [id, boundary_ptr] : *db)
+                {
+                  if (!this->get_boundary_info().has_boundary_id(element, ms, id))
+                    continue;
+
+                  unsigned int neigh_side;
+                  const Elem * neigh =
+                    db->neighbor(id, *point_locator, element, ms, &neigh_side);
+
+                  if (neigh && neigh != remote_elem && neigh != element)
+                    {
+                      auto neigh_changeable = this->elem_ptr(neigh->id());
+                      element->set_neighbor(ms, neigh_changeable);
+                      neigh_changeable->set_neighbor(neigh_side, element);
+                    }
+                }
+            }
+        }
+    }
+#endif // LIBMESH_ENABLE_PERIODIC
+
 #ifdef LIBMESH_ENABLE_AMR
 
   /**
@@ -1800,6 +1843,59 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
   MeshTools::libmesh_assert_valid_neighbors(*this);
 #endif
 
+  bool is_valid_disjoint_pair_to_stitch = false;
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  auto * this_db  = this->get_disjoint_neighbor_boundary_pairs();
+  auto * other_db = (other_mesh ? other_mesh->get_disjoint_neighbor_boundary_pairs() : nullptr);
+  const bool have_disc_bdys =
+    (this_db && !this_db->empty()) || (other_db && !other_db->empty());
+
+  if (have_disc_bdys)
+    {
+      const boundary_id_type a = this_mesh_boundary_id;
+      const boundary_id_type b = other_mesh_boundary_id;
+
+      auto get_pb = [](const PeriodicBoundaries * db, boundary_id_type id)
+        {
+          return db ? db->boundary(id) : nullptr;
+        };
+
+      // this mesh
+      const auto * pb_this_a = get_pb(this_db, a);
+      const auto * pb_this_b = get_pb(this_db, b);
+      const bool in_this =
+        (pb_this_a && pb_this_a->pairedboundary == b) ||
+        (pb_this_b && pb_this_b->pairedboundary == a);
+
+      // other mesh
+      const auto * pb_other_b = get_pb(other_db, b);
+      const auto * pb_other_a = get_pb(other_db, a);
+      const bool in_other =
+        (pb_other_b && pb_other_b->pairedboundary == a) ||
+        (pb_other_a && pb_other_a->pairedboundary == b);
+
+      // Conflict conditions:
+      // Case 1: On "this" mesh, a or b exist but are not paired,
+      //         while the other mesh pairs them.
+      if (!in_this && (pb_this_a || pb_this_b) && in_other)
+        libmesh_error_msg("Disjoint neighbor boundary pairing mismatch: on 'this' mesh, "
+                          "boundary (" << a << " or " << b
+                          << ") exists but is not paired; on 'other' mesh the pair is present.");
+
+      // Case 2: On "other" mesh, a or b exist but are not paired,
+      //         while this mesh pairs them.
+      if (!in_other && (pb_other_a || pb_other_b) && in_this)
+        libmesh_error_msg("Disjoint neighbor boundary pairing mismatch: on 'other' mesh, "
+                          "boundary (" << a << " or " << b
+                          << ") exists but is not paired; on 'this' mesh the pair is present.");
+
+      // Legal conditions: either side has a correct pairing
+      if (in_this || in_other)
+        is_valid_disjoint_pair_to_stitch = true;
+    }
+#endif // LIBMESH_ENABLE_PERIODIC
+
   // We can't even afford any unset neighbor links here.
   if (!this->is_prepared())
     this->find_neighbors();
@@ -1889,74 +1985,81 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
               {
                 // Now check whether elem has a face on the specified boundary
                 for (auto side_id : el->side_index_range())
-                  if (el->neighbor_ptr(side_id) == nullptr)
-                    {
-                      // Get *all* boundary IDs on this side, not just the first one!
-                      mesh_array[i]->get_boundary_info().boundary_ids (el, side_id, bc_ids);
+                  {
+                    bool should_stitch_this_side =
+                      (el->neighbor_ptr(side_id) == nullptr) ||
+                      (is_valid_disjoint_pair_to_stitch &&
+                      mesh_array[i]->get_boundary_info().has_boundary_id(el, side_id, id_array[i]));
 
+                    if (should_stitch_this_side)
+                      {
+                        // Get *all* boundary IDs on this side, not just the first one!
+                        mesh_array[i]->get_boundary_info().boundary_ids (el, side_id, bc_ids);
+
+                        if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
+                          {
+                            el->build_side_ptr(side, side_id);
+                            for (auto & n : side->node_ref_range())
+                              set_array[i]->insert(n.id());
+
+                            h_min = std::min(h_min, side->hmin());
+                            h_min_updated = true;
+
+                            // This side is on the boundary, add its information to side_to_elem
+                            if (skip_find_neighbors && (i==0))
+                              {
+                                key_type key = el->low_order_key(side_id);
+                                val_type val;
+                                val.first = el;
+                                val.second = cast_int<unsigned char>(side_id);
+
+                                key_val_pair kvp;
+                                kvp.first = key;
+                                kvp.second = val;
+                                side_to_elem_map.insert (kvp);
+                              }
+                          }
+
+                        // Also, check the edges on this side. We don't have to worry about
+                        // updating neighbor info in this case since elements don't store
+                        // neighbor info on edges.
+                        for (auto edge_id : el->edge_index_range())
+                          {
+                            if (el->is_edge_on_side(edge_id, side_id))
+                              {
+                                // Get *all* boundary IDs on this edge, not just the first one!
+                                mesh_array[i]->get_boundary_info().edge_boundary_ids (el, edge_id, bc_ids);
+
+                                if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
+                                  {
+                                    std::unique_ptr<const Elem> edge (el->build_edge_ptr(edge_id));
+                                    for (auto & n : edge->node_ref_range())
+                                      set_array[i]->insert( n.id() );
+
+                                    h_min = std::min(h_min, edge->hmin());
+                                    h_min_updated = true;
+                                  }
+                              }
+                          } // end for (edge_id)
+                      } // end if (side == nullptr)
+
+                  // Alternatively, is this a boundary NodeElem? If so,
+                  // add it to a list of NodeElems that will later be
+                  // used to set h_min based on the minimum node
+                  // separation distance between all pairs of boundary
+                  // NodeElems.
+                  if (el->type() == NODEELEM)
+                    {
+                      mesh_array[i]->get_boundary_info().boundary_ids(el->node_ptr(0), bc_ids);
                       if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
                         {
-                          el->build_side_ptr(side, side_id);
-                          for (auto & n : side->node_ref_range())
-                            set_array[i]->insert(n.id());
+                          boundary_node_elems.push_back(el);
 
-                          h_min = std::min(h_min, side->hmin());
-                          h_min_updated = true;
-
-                          // This side is on the boundary, add its information to side_to_elem
-                          if (skip_find_neighbors && (i==0))
-                            {
-                              key_type key = el->low_order_key(side_id);
-                              val_type val;
-                              val.first = el;
-                              val.second = cast_int<unsigned char>(side_id);
-
-                              key_val_pair kvp;
-                              kvp.first = key;
-                              kvp.second = val;
-                              side_to_elem_map.insert (kvp);
-                            }
+                          // Debugging:
+                          // libMesh::out << "Elem " << el->id() << " is a NodeElem on boundary " << id_array[i] << std::endl;
                         }
-
-                      // Also, check the edges on this side. We don't have to worry about
-                      // updating neighbor info in this case since elements don't store
-                      // neighbor info on edges.
-                      for (auto edge_id : el->edge_index_range())
-                        {
-                          if (el->is_edge_on_side(edge_id, side_id))
-                            {
-                              // Get *all* boundary IDs on this edge, not just the first one!
-                              mesh_array[i]->get_boundary_info().edge_boundary_ids (el, edge_id, bc_ids);
-
-                              if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
-                                {
-                                  std::unique_ptr<const Elem> edge (el->build_edge_ptr(edge_id));
-                                  for (auto & n : edge->node_ref_range())
-                                    set_array[i]->insert( n.id() );
-
-                                  h_min = std::min(h_min, edge->hmin());
-                                  h_min_updated = true;
-                                }
-                            }
-                        } // end for (edge_id)
-                    } // end if (side == nullptr)
-
-                // Alternatively, is this a boundary NodeElem? If so,
-                // add it to a list of NodeElems that will later be
-                // used to set h_min based on the minimum node
-                // separation distance between all pairs of boundary
-                // NodeElems.
-                if (el->type() == NODEELEM)
-                  {
-                    mesh_array[i]->get_boundary_info().boundary_ids(el->node_ptr(0), bc_ids);
-                    if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
-                      {
-                        boundary_node_elems.push_back(el);
-
-                        // Debugging:
-                        // libMesh::out << "Elem " << el->id() << " is a NodeElem on boundary " << id_array[i] << std::endl;
-                      }
-                  }
+                    }
+                  } // end for (side_id)
               } // end for (el)
 
             // Compute the minimum node separation distance amongst
@@ -2198,6 +2301,42 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
     {
       LOG_SCOPE("stitch_meshes copying", "UnstructuredMesh");
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+        // Copy disjoint neighbor boundary pairs (PeriodicBoundary objects)
+        // from `other_mesh` to `this` mesh
+        if (other_db && !other_db->empty())
+          {
+            for (const auto & [bdy_id, pb_ptr] : *other_db)
+              {
+                const auto & pb = *pb_ptr;
+                const boundary_id_type a = pb.myboundary;
+                const boundary_id_type b = pb.pairedboundary;
+
+                if (this_db)
+                  {
+                    // Skip if identical pair already exists
+                    if (const auto * existing_pb = this_db->boundary(a))
+                      if ((existing_pb->myboundary == a && existing_pb->pairedboundary == b) ||
+                          (existing_pb->myboundary == b && existing_pb->pairedboundary == a))
+                        continue;
+
+                    // If both boundary ids exist on this mesh but aren't paired here, refuse to create a new pair
+                    const auto & bdy_ids = this->get_boundary_info().get_boundary_ids();
+                    const bool a_exists = bdy_ids.count(a);
+                    const bool b_exists = bdy_ids.count(b);
+                    // If a and b already exist on `this`, we should be screaming and dying
+                    // unless they already have PeriodicBoundary objects connecting them too
+                    if (a_exists && b_exists && !this_db->boundary(a))
+                      libmesh_error_msg("Conflict: boundaries " << a << " and " << b
+                                        << " already exist on this mesh but are not paired.");
+                  }
+
+                this->add_disjoint_neighbor_boundary_pairs(a, b, pb.get_corresponding_pos(Point(0.0,0.0,0.0)));
+              }
+          }
+#endif // LIBMESH_ENABLE_PERIODIC
+
+
       // Increment the node_to_node_map and node_to_elems_map
       // to account for id offsets
       for (auto & pr : node_to_node_map)
@@ -2399,6 +2538,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
               this->add_elemset_code(elemset_code, other_id_set_to_fill);
             }
         }
+
     } // end if (other_mesh)
 
   // Finally, we need to "merge" the overlapping nodes
@@ -2478,7 +2618,12 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                   fixed_elems.insert(elem_id);
                   for (auto s : el->side_index_range())
                     {
-                      if (el->neighbor_ptr(s) == nullptr)
+                      bool has_real_neighbor = (el->neighbor_ptr(s) != nullptr);
+                      bool has_disdjoint_neighbor = is_valid_disjoint_pair_to_stitch &&
+                      (this->get_boundary_info().has_boundary_id(el, s, this_mesh_boundary_id)
+                      || this->get_boundary_info().has_boundary_id(el, s, other_mesh_boundary_id));
+
+                      if (!has_real_neighbor || has_disdjoint_neighbor)
                         {
                           key_type key = el->low_order_key(s);
                           auto bounds = side_to_elem_map.equal_range(key);
@@ -2554,6 +2699,15 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
             }
         }
     }
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Remove only the disjoint pair that was actually stitched.
+  // Safe because `is_valid_disjoint_pair_to_stitch` is true
+  // only if this exact (a,b) pair exists in the registry.
+  // Other disjoint pairs remain untouched.
+  if (is_valid_disjoint_pair_to_stitch)
+    this->remove_disjoint_boundary_pair(this_mesh_boundary_id, other_mesh_boundary_id);
+#endif
 
   if (prepare_after_stitching)
     {

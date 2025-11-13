@@ -46,8 +46,11 @@ void GhostPointNeighbors::operator()
   bool check_periodic_bcs =
     (_periodic_bcs && !_periodic_bcs->empty());
 
+  auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
+  bool check_disjoint_bcs = (db && !db->empty());
+
   std::unique_ptr<PointLocatorBase> point_locator;
-  if (check_periodic_bcs)
+  if (check_periodic_bcs || check_disjoint_bcs)
       point_locator = _mesh->sub_point_locator();
 
   std::set<const Elem *> periodic_elems_examined;
@@ -176,6 +179,30 @@ void GhostPointNeighbors::operator()
                 }
             }
         }
+
+      if (check_disjoint_bcs)
+        {
+          // Also ghost their disjoint neighbors
+          for (auto s : elem->side_index_range())
+          {
+            for (const auto & [id, boundary_ptr] : *db)
+            {
+              if (!_mesh->get_boundary_info().has_boundary_id(elem, s, id))
+                continue;
+
+              unsigned int neigh_side = invalid_uint;
+              const Elem * neigh =
+                  db->neighbor(id, *point_locator, elem, s, &neigh_side);
+
+              if (!neigh || neigh == remote_elem)
+                continue;
+
+              if (neigh->processor_id() != p)
+                coupled_elements.emplace(neigh, nullcm);
+            }
+          }
+        }
+
 #endif // LIBMESH_ENABLE_PERIODIC
     }
 }

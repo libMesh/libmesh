@@ -684,6 +684,22 @@ bool MeshRefinement::refine_elements ()
   // This function must be run on all processors at once
   parallel_object_only();
 
+  // Prevent refinement when the mesh has disjoint neighbor boundary pairs.
+  //
+  // Disjoint neighbor boundary interfaces violate the topological continuity
+  // assumed by the refinement algorithm. Refinement on such meshes can
+  // produce invalid neighbor relationships (for example reverse indices
+  // equal to invalid_uint), which may trigger assertions like
+  // `rev < neigh->n_neighbors()` or corrupt neighbor data.
+  //
+  // For safety, refinement is disabled while disjoint neighbor boundary pairs are
+  // present.
+  if (_mesh.get_disjoint_neighbor_boundary_pairs())
+    {
+      libmesh_not_implemented_msg(
+        "Mesh refinement is not yet implemented for meshes with disjoint neighbor boundary interfaces.\n");
+    }
+
   if (_face_level_mismatch_limit)
     libmesh_assert(test_level_one(true));
 

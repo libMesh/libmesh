@@ -2325,12 +2325,12 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
           if (elem->neighbor_ptr(side) == nullptr)
             return side;
 
-          // If we're on an internal boundary then we need to be sure
-          // it's the same internal boundary as our top_parent
+          // Internal boundary case
           const Elem * p = elem;
 
 #ifdef LIBMESH_ENABLE_AMR
-
+          // If we're on an internal boundary then we need to be sure
+          // it's the same internal boundary as our top_parent
           while (p != nullptr)
           {
             const Elem * parent = p->parent();
@@ -2338,6 +2338,9 @@ unsigned int BoundaryInfo::side_with_boundary_id(const Elem * const elem,
               break;
             p = parent;
           }
+#else
+          // do not forget to return the internal boundary when AMR is disabled
+          return side;
 #endif
           // We're on that side of our top_parent; return it
           if (!p)
