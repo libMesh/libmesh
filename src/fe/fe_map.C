@@ -464,6 +464,47 @@ void FEMap::compute_single_point_map(const unsigned int dim,
   if (calculate_xyz)
     libmesh_assert_equal_to(phi_map.size(), elem_nodes.size());
 
+  auto check_for_degenerate_map =
+    [this, elem, p]
+    (Real det_J) {
+    if (det_J <= jacobian_tolerance)
+      {
+        // Don't call get_info() recursively if we're already
+        // failing.  get_info() calls Elem::volume() which may
+        // call FE::reinit() and trigger the same failure again.
+        static bool failing = false;
+        if (!failing)
+          {
+            failing = true;
+            std::string elem_info = elem->get_info();
+            failing = false;
+            if (calculate_xyz)
+              {
+                libmesh_degenerate_mapping_msg
+                  ("Jacobian " << det_J << " at or under tolerance " <<
+                   jacobian_tolerance << " at point " << xyz[p] <<
+                   " in element:\n" << elem_info);
+              }
+            else
+              {
+                // In this case xyz[p] is not defined, so don't
+                // try to print it out.
+                libmesh_degenerate_mapping_msg
+                  ("Jacobian " << det_J << " at or under tolerance " <<
+                   jacobian_tolerance << " at point index " << p <<
+                   " in element:\n" << elem_info);
+              }
+          }
+        else
+          {
+            // We were already failing when we called this, so just
+            // stop the current computation and return with
+            // incomplete results.
+            return;
+          }
+      }
+  };
+
   switch (dim)
     {
       //--------------------------------------------------------------------
@@ -539,46 +580,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
           {
             jac[p] = dxyzdxi_map[p].norm();
 
-            if (jac[p] <= jacobian_tolerance)
-              {
-                // Don't call print_info() recursively if we're already
-                // failing.  print_info() calls Elem::volume() which may
-                // call FE::reinit() and trigger the same failure again.
-                static bool failing = false;
-                if (!failing)
-                  {
-                    failing = true;
-                    elem->print_info(libMesh::err);
-                    failing = false;
-                    if (calculate_xyz)
-                      {
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point " \
-                                          << xyz[p] \
-                                          << " in element " \
-                                          << elem->id());
-                      }
-                    else
-                      {
-                        // In this case xyz[p] is not defined, so don't
-                        // try to print it out.
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point index " \
-                                          << p \
-                                          << " in element " \
-                                          << elem->id());
-                      }
-                  }
-                else
-                  {
-                    // We were already failing when we called this, so just
-                    // stop the current computation and return with
-                    // incomplete results.
-                    return;
-                  }
-              }
+            check_for_degenerate_map(jac[p]);
 
             // The inverse Jacobian entries also come from the
             // generalized inverse of T (see also the 2D element
@@ -787,46 +789,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
             // jac = dx/dxi*dy/deta - dx/deta*dy/dxi
             jac[p] = (dx_dxi*dy_deta - dx_deta*dy_dxi);
 
-            if (jac[p] <= jacobian_tolerance)
-              {
-                // Don't call print_info() recursively if we're already
-                // failing.  print_info() calls Elem::volume() which may
-                // call FE::reinit() and trigger the same failure again.
-                static bool failing = false;
-                if (!failing)
-                  {
-                    failing = true;
-                    elem->print_info(libMesh::err);
-                    failing = false;
-                    if (calculate_xyz)
-                      {
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point " \
-                                          << xyz[p] \
-                                          << " in element " \
-                                          << elem->id());
-                      }
-                    else
-                      {
-                        // In this case xyz[p] is not defined, so don't
-                        // try to print it out.
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point index " \
-                                          << p \
-                                          << " in element " \
-                                          << elem->id());
-                      }
-                  }
-                else
-                  {
-                    // We were already failing when we called this, so just
-                    // stop the current computation and return with
-                    // incomplete results.
-                    return;
-                  }
-              }
+            check_for_degenerate_map(jac[p]);
 
             JxW[p] = jac[p]*qw[p];
 
@@ -888,47 +851,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
 
             const Real det = (g11*g22 - g12*g21);
 
-            if (det <= jacobian_tolerance)
-              {
-                // Don't call print_info() recursively if we're already
-                // failing.  print_info() calls Elem::volume() which may
-                // call FE::reinit() and trigger the same failure again.
-                thread_local bool failing = false;
-                if (!failing)
-                  {
-                    failing = true;
-                    Threads::spin_mutex::scoped_lock lock(_point_inv_err_mutex);
-                    elem->print_info(libMesh::err);
-                    failing = false;
-                    if (calculate_xyz)
-                      {
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << det \
-                                          << " at point " \
-                                          << xyz[p] \
-                                          << " in element " \
-                                          << elem->id());
-                      }
-                    else
-                      {
-                        // In this case xyz[p] is not defined, so don't
-                        // try to print it out.
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << det \
-                                          << " at point index " \
-                                          << p \
-                                          << " in element " \
-                                          << elem->id());
-                      }
-                  }
-                else
-                  {
-                    // We were already failing when we called this, so just
-                    // stop the current computation and return with
-                    // incomplete results.
-                    return;
-                  }
-              }
+            check_for_degenerate_map(det);
 
             const Real inv_det = 1./det;
             jac[p] = std::sqrt(det);
@@ -1124,46 +1047,7 @@ void FEMap::compute_single_point_map(const unsigned int dim,
                       dy_dxi*(dz_deta*dx_dzeta - dx_deta*dz_dzeta)  +
                       dz_dxi*(dx_deta*dy_dzeta - dy_deta*dx_dzeta));
 
-            if (jac[p] <= jacobian_tolerance)
-              {
-                // Don't call print_info() recursively if we're already
-                // failing.  print_info() calls Elem::volume() which may
-                // call FE::reinit() and trigger the same failure again.
-                static bool failing = false;
-                if (!failing)
-                  {
-                    failing = true;
-                    elem->print_info(libMesh::err);
-                    failing = false;
-                    if (calculate_xyz)
-                      {
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point " \
-                                          << xyz[p] \
-                                          << " in element " \
-                                          << elem->id());
-                      }
-                    else
-                      {
-                        // In this case xyz[p] is not defined, so don't
-                        // try to print it out.
-                        libmesh_error_msg("ERROR: negative Jacobian " \
-                                          << jac[p] \
-                                          << " at point index " \
-                                          << p \
-                                          << " in element " \
-                                          << elem->id());
-                      }
-                  }
-                else
-                  {
-                    // We were already failing when we called this, so just
-                    // stop the current computation and return with
-                    // incomplete results.
-                    return;
-                  }
-              }
+            check_for_degenerate_map(jac[p]);
 
             JxW[p] = jac[p]*qw[p];
 
@@ -1730,8 +1614,11 @@ Point FEMap::inverse_map (const unsigned int dim,
             //  G = [J]^T [J]
             const Real G = dxi*dxi;
 
-            if (secure)
-              libmesh_assert_greater (G, 0.);
+            if (secure && G <= 0)
+              libmesh_degenerate_mapping_msg
+                ("inverse_map found a singular Jacobian " <<
+                 " at master point " << p << " in element " <<
+                 elem->id());
 
             const Real Ginv = 1./G;
 
@@ -1783,8 +1670,11 @@ Point FEMap::inverse_map (const unsigned int dim,
 
             const Real det = (G11*G22 - G12*G21);
 
-            if (secure)
-              libmesh_assert_not_equal_to (det, 0.);
+            if (secure && det == 0)
+              libmesh_degenerate_mapping_msg
+                ("inverse_map found a singular Jacobian " <<
+                 " at master point " << p << " in element " <<
+                 elem->id());
 
             const Real inv_det = 1./det;
 
@@ -1867,13 +1757,10 @@ Point FEMap::inverse_map (const unsigned int dim,
                 // case we can just return a far away point.
                 if (secure)
                   {
-                    libMesh::err << "ERROR: Newton scheme encountered a singular Jacobian in element: "
-                                 << elem->id()
-                                 << std::endl;
-
-                    elem->print_info(libMesh::err);
-
-                    libmesh_error_msg("Exiting...");
+                    libmesh_degenerate_mapping_msg(
+                      "inverse_map found a singular Jacobian" <<
+                      " at master point " << p << " in element " <<
+                      elem->id());
                   }
                 else
                   {
@@ -1957,17 +1844,15 @@ Point FEMap::inverse_map (const unsigned int dim,
 
               if (cnt > 2*max_cnt)
                 {
-                  libMesh::err << "ERROR: Newton scheme FAILED to converge in "
-                               << cnt
-                               << " iterations in element "
-                               << elem->id()
-                               << " for physical point = "
-                               << physical_point
-                               << std::endl;
-
-                  elem->print_info(libMesh::err);
-
-                  libmesh_error_msg("Exiting...");
+                  // Whether or not this is a degenerate map in the
+                  // "Jacobian becomes singular or negative" sense,
+                  // it's at least degenerate in the "straightforward
+                  // Newton is failing to invert it" sense.
+                  libmesh_degenerate_mapping_msg(
+                    "inverse_map Newton FAILED to converge in " <<
+                    cnt << " iterations in element " << elem->id() <<
+                    " for physical point = " << physical_point <<
+                    std::endl << elem->get_info());
                 }
             }
           //  Return a far off point when secure is false - this

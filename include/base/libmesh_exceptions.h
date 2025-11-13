@@ -68,6 +68,30 @@ public:
 
 
 /**
+ * A class representing the detection of an unexpected degeneracy,
+ * e.g. a negative-determinant Jacobian in a map expected to be
+ * positive, or a non-trivial kernel in a map expected to be a
+ * bijection (such as a singular matrix).
+ *
+ * libMesh::FEMap throws this if it encounters a point xi in an
+ * element's "master space" at which the mapping to physical space has
+ * a too-small (negative, or zero, or nearly zero) Jacobian
+ * determinant, where "too-small" is determined by a particular
+ * library method's assigned tolerance.
+ *
+ * libMesh::DenseMatrix throws this if it is asked to solve a system
+ * with a singular matrix and a method (such as lu_solve()) that
+ * cannot handle singularities.
+ */
+class DegenerateMap : public std::runtime_error
+{
+public:
+  DegenerateMap(std::string msg="") :
+    std::runtime_error( "Degenerate map, e.g. negative Jacobian or singular matrix.\n" + msg ) {}
+};
+
+
+/**
  * A class representing a solver's failure to converge, to be thrown
  * by "libmesh_convergence_failure();"  This should be a last
  * resort; more often, a solve which has failed should be
