@@ -330,56 +330,25 @@ void InfFE<Dim, T_radial, T_map>::determine_calculations()
 {
   this->calculations_started = true;
 
-  // If the user forgot to request anything, but we're enabling
-  // deprecated backwards compatibility, then we'll be safe and
-  // calculate everything.  If we haven't enable deprecated backwards
-  // compatibility then we'll scream and die.
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  if (!this->calculate_nothing &&
-      !this->calculate_phi && !this->calculate_dphi &&
-      !this->calculate_dphiref &&
-      !this->calculate_phi_scaled && !this->calculate_dphi_scaled &&
-      !this->calculate_xyz && !this->calculate_jxw &&
-      !this->calculate_map_scaled && !this->calculate_map &&
+  // If the user did not explicitly pre-request something (or nothing)
+  // to be computed, then we throw an error here.
+  bool requested_ok =
+    this->calculate_nothing || this->calculate_phi ||
+    this->calculate_dphi || this->calculate_dphiref ||
+    this->calculate_phi_scaled || this->calculate_dphi_scaled ||
+    this->calculate_xyz || this->calculate_jxw ||
+    this->calculate_map_scaled || this->calculate_map ||
+    this->calculate_curl_phi || this->calculate_div_phi;
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      !this->calculate_d2phi &&
+  requested_ok = requested_ok || this->calculate_d2phi;
 #endif
-      !this->calculate_curl_phi && !this->calculate_div_phi)
-    {
-      libmesh_deprecated();
-      this->calculate_phi = this->calculate_dphi = this->calculate_jxw = true;
-      this->calculate_dphiref = true;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      this->calculate_d2phi = true;
-#endif
-      this->calculate_phi_scaled = this->calculate_dphi_scaled = this->calculate_xyz = true;
-      if (FEInterface::field_type(fe_type.family) == TYPE_VECTOR)
-        {
-          this->calculate_curl_phi = true;
-          this->calculate_div_phi  = true;
-        }
-    }
-#else //LIBMESH_ENABLE_DEPRECATED
-  // ANSI C does not allow to embed the preprocessor-statement into the assert, so we
-  // make two statements, just different by 'calculate_d2phi'.
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  libmesh_assert (this->calculate_nothing || this->calculate_d2phi ||
-                  this->calculate_phi || this->calculate_dphi ||
-                  this->calculate_dphiref ||
-                  this->calculate_phi_scaled || this->calculate_dphi_scaled ||
-                  this->calculate_xyz || this->calculate_jxw ||
-                  this->calculate_map_scaled || this->calculate_map ||
-                  this->calculate_curl_phi || this->calculate_div_phi);
-#else
-  libmesh_assert (this->calculate_nothing ||
-                  this->calculate_phi || this->calculate_dphi ||
-                  this->calculate_dphiref ||
-                  this->calculate_phi_scaled || this->calculate_dphi_scaled ||
-                  this->calculate_xyz || this->calculate_jxw ||
-                  this->calculate_map_scaled || this->calculate_map ||
-                  this->calculate_curl_phi || this->calculate_div_phi);
-#endif
-#endif // LIBMESH_ENABLE_DEPRECATED
+
+  libmesh_error_msg_if(
+    !requested_ok,
+    "You must call one or more of the FE accessors "
+    "(e.g. get_phi(), get_dphi(), get_nothing()) "
+    "_before_ calling reinit()!");
 
   // set further terms necessary to do the requested task
   if (calculate_jxw)
@@ -388,9 +357,9 @@ void InfFE<Dim, T_radial, T_map>::determine_calculations()
     this->calculate_map = true;
   if (this->calculate_dphi_scaled)
     this->calculate_map_scaled = true;
+  // if Cartesian positions were requested but the calculation of map
+  // was not triggered, we'll opt for the 'scaled' variant.
   if (calculate_xyz && !calculate_map)
-    // if Cartesian positions were requested but the calculation of map
-    // was not triggered, we'll opt for the 'scaled' variant.
     this->calculate_map_scaled = true;
   base_fe->calculate_phi = this->calculate_phi || this->calculate_phi_scaled
                        || this->calculate_dphi || this->calculate_dphi_scaled;
