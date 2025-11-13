@@ -191,24 +191,6 @@ public:
                             const processor_id_type proc_id = DofObject::invalid_processor_id) override final;
   virtual Node * add_node (Node * n) override final;
   virtual Node * add_node (std::unique_ptr<Node> n) override final;
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * These methods are deprecated. Please use \p add_node instead
-   * Insert \p Node \p n into the Mesh at a location consistent with
-   * n->id(), allocating extra storage if necessary.  Throws an error if:
-   * .) n==nullptr
-   * .) n->id() == DofObject::invalid_id
-   * .) A node already exists in position n->id().
-   *
-   * This function differs from the ReplicatedMesh::add_node() function,
-   * which is only capable of appending nodes at the end of the nodes
-   * storage.
-   */
-  virtual Node * insert_node(Node * n) override final;
-  virtual Node * insert_node(std::unique_ptr<Node> n) override final;
-#endif
-
   virtual void delete_node (Node * n) override final;
   virtual void renumber_node (dof_id_type old_id, dof_id_type new_id) override final;
   virtual Elem * add_elem (Elem * e) override final;

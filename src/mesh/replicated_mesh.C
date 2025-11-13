@@ -544,66 +544,6 @@ Node * ReplicatedMesh::add_node (std::unique_ptr<Node> n)
   return add_node(n.release());
 }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-
-Node * ReplicatedMesh::insert_node(Node * n)
-{
-  libmesh_deprecated();
-  libmesh_error_msg_if(!n, "Error, attempting to insert nullptr node.");
-  libmesh_error_msg_if(n->id() == DofObject::invalid_id, "Error, cannot insert node with invalid id.");
-
-  if (n->id() < _nodes.size())
-    {
-      // Trying to add an existing node is a no-op.  This lets us use
-      // a straightforward MeshCommunication::allgather() to fix a
-      // not-actually-replicated-yet ReplicatedMesh, as occurs when
-      // reading Nemesis files.
-      if (n->valid_id() && _nodes[n->id()] == n)
-        return n;
-
-      // Don't allow anything else to replace an existing Node.
-      libmesh_error_msg_if(_nodes[ n->id() ] != nullptr,
-                           "Error, cannot insert new node on top of existing node.");
-    }
-  else
-    {
-      // Allocate just enough space to store the new node.  This will
-      // cause highly non-ideal memory allocation behavior if called
-      // repeatedly...
-      _nodes.resize(n->id() + 1);
-    }
-
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-  if (!n->valid_unique_id())
-    n->set_unique_id(_next_unique_id++);
-  else
-   _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
-#endif
-
-  n->add_extra_integers(_node_integer_names.size(),
-                        _node_integer_default_values);
-
-  // We have enough space and this spot isn't already occupied by
-  // another node, so go ahead and add it.
-  ++_n_nodes;
-  _nodes[ n->id() ] = n;
-
-  // If we made it this far, we just inserted the node the user handed
-  // us, so we can give it right back.
-  return n;
-}
-
-Node * ReplicatedMesh::insert_node(std::unique_ptr<Node> n)
-{
-  libmesh_deprecated();
-  // The mesh now takes ownership of the Node. Eventually the guts of
-  // insert_node(Node*) will get moved to a private helper function, and
-  // calling insert_node(Node*) directly will be deprecated.
-  return insert_node(n.release());
-}
-
-#endif
-
 void ReplicatedMesh::delete_node(Node * n)
 {
   libmesh_assert(n);
