@@ -1639,7 +1639,7 @@ private:
    * calculated. Use the get_qoi_values() accessor to get these
    * values.
    */
-  std::vector<Number> qoi;
+  std::vector<Number> _qoi;
 
   /**
    * Vector to hold error estimates for qois, either from a steady
@@ -2509,10 +2509,10 @@ inline
 unsigned int System::n_qois() const
 {
 #ifndef LIBMESH_ENABLE_DEPRECATED
-  libmesh_assert_equal_to(this->qoi.size(), this->qoi_error_estimates.size());
+  libmesh_assert_equal_to(this->_qoi.size(), this->_qoi_error_estimates.size());
 #endif
 
-  return cast_int<unsigned int>(this->qoi.size());
+  return cast_int<unsigned int>(this->_qoi.size());
 }
 
 inline
