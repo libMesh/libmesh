@@ -61,9 +61,7 @@ namespace
 
 // ExodusII defaults to 32 bytes names, but we've had user complaints
 // about truncation with those.
-// It looks like the maximum they'll support is 80 byte names, so
-// rather than figure out exactly what we need in any given case we'll
-// just use 80 bytes.
+// It looks like the maximum they'll support is 80 byte names.
 static constexpr int libmesh_max_str_length = MAX_LINE_LENGTH;
 
 using namespace libMesh;
@@ -302,6 +300,7 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   _nodal_vars_initialized(false),
   _use_mesh_dimension_instead_of_spatial_dimension(false),
   _write_hdf5(true),
+  _max_name_length(32),
   _end_elem_id(0),
   _write_as_dimension(0),
   _single_precision(single_precision)
@@ -699,10 +698,9 @@ void ExodusII_IO_Helper::open(const char * filename, bool read_only)
   EX_CHECK_ERR(ex_id, err_msg);
   if (verbose) libMesh::out << "File opened successfully." << std::endl;
 
-  // It looks like ExodusII can support 80 chars reliably, so unless
-  // we have reason to do otherwise we'll just waste 48 bytes here and
-  // there by default.
-  int max_name_length_to_set = libmesh_max_str_length;
+  // If we're writing then we'll want to use the specified length;
+  // if we're reading then we'll override this by what's in the file.
+  int max_name_length_to_set = _max_name_length;
 
   if (read_only)
   {
@@ -2054,16 +2052,17 @@ ExodusII_IO_Helper::write_var_names_impl(const char * var_type,
 
   if (count > 0)
     {
-      NamesData names_table(count, libmesh_max_str_length);
+      NamesData names_table(count, _max_name_length);
 
       // Store the input names in the format required by Exodus.
       for (int i=0; i != count; ++i)
         {
-          if(names[i].length() > libmesh_max_str_length)
+          if(names[i].length() > _max_name_length)
             libmesh_warning(
-              "*** Warning, Exodus variable name \""
-              << names[i] << "\" too long (max " << libmesh_max_str_length
-              << " characters). Name will be truncated. ");
+              "*** Warning, Exodus variable name \"" <<
+              names[i] << "\" too long (current max " <<
+              _max_name_length << "/" << libmesh_max_str_length <<
+              " characters). Name will be truncated. ");
           names_table.push_back_entry(names[i]);
         }
 
@@ -2227,7 +2226,7 @@ void ExodusII_IO_Helper::create(std::string filename)
       // write them, so we can't set a guaranteed max name length here.
       // But it looks like the most ExodusII can support is 80, so we'll
       // just waste 48 bytes here and there.
-      ex_err = exII::ex_set_max_name_length(ex_id, libmesh_max_str_length);
+      ex_err = exII::ex_set_max_name_length(ex_id, _max_name_length);
       EX_CHECK_ERR(ex_err, "Error setting max ExodusII name length.");
 
       if (verbose)
@@ -2597,13 +2596,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   std::vector<int> num_edges_per_elem_vec;
   std::vector<int> num_faces_per_elem_vec;
   std::vector<int> num_attr_vec;
-  NamesData elem_type_table(num_elem_blk, libmesh_max_str_length);
+  NamesData elem_type_table(num_elem_blk, _max_name_length);
 
   // Note: It appears that there is a bug in exodusII::ex_put_name where
   // the index returned from the ex_id_lkup is erroneously used.  For now
   // the work around is to use the alternative function ex_put_names, but
   // this function requires a char ** data structure.
-  NamesData names_table(num_elem_blk, libmesh_max_str_length);
+  NamesData names_table(num_elem_blk, _max_name_length);
 
   num_elem = 0;
 
@@ -2783,14 +2782,14 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // be passed to exII::ex_put_concat_all_blocks() at the same time as the
   // information about elem blocks.
   std::vector<int> edge_blk_id;
-  NamesData edge_type_table(num_edge_blk, libmesh_max_str_length);
+  NamesData edge_type_table(num_edge_blk, _max_name_length);
   std::vector<int> num_edge_this_blk_vec;
   std::vector<int> num_nodes_per_edge_vec;
   std::vector<int> num_attr_edge_vec;
 
   // We also build a data structure of edge block names which can
   // later be passed to exII::ex_put_names().
-  NamesData edge_block_names_table(num_edge_blk, libmesh_max_str_length);
+  NamesData edge_block_names_table(num_edge_blk, _max_name_length);
 
   // Note: We are going to use the edge **boundary** ids as **block** ids.
   for (const auto & pr : edge_id_to_conn)
@@ -3124,7 +3123,7 @@ void ExodusII_IO_Helper::write_sidesets(const MeshBase & mesh)
   // Write out the sideset names, but only if there is something to write
   if (side_boundary_ids.size() > 0)
     {
-      NamesData names_table(side_boundary_ids.size(), libmesh_max_str_length);
+      NamesData names_table(side_boundary_ids.size(), _max_name_length);
 
       std::vector<exII::ex_set> sets(side_boundary_ids.size());
 
@@ -3205,7 +3204,7 @@ void ExodusII_IO_Helper::write_nodesets(const MeshBase & mesh)
   // Write out the nodeset names, but only if there is something to write
   if (node_boundary_ids.size() > 0)
     {
-      NamesData names_table(node_boundary_ids.size(), libmesh_max_str_length);
+      NamesData names_table(node_boundary_ids.size(), _max_name_length);
 
       // Vectors to be filled and passed to exII::ex_put_concat_sets()
       // Use existing class members and avoid variable shadowing.
@@ -3407,10 +3406,10 @@ void ExodusII_IO_Helper::check_existing_vars(ExodusVarType type,
   bool match =
     std::equal(names.begin(), names.end(),
                names_from_file.begin(),
-               [](const std::string & a,
-                  const std::string & b) -> bool
+               [this](const std::string & a,
+                      const std::string & b) -> bool
                {
-                 return a.compare(/*pos=*/0, /*len=*/libmesh_max_str_length, b) == 0;
+                 return a.compare(/*pos=*/0, /*len=*/_max_name_length, b) == 0;
                });
 
   if (!match)
@@ -3460,7 +3459,7 @@ ExodusII_IO_Helper::write_elemsets(const MeshBase & mesh)
     return;
 
   // TODO: Add support for named elemsets
-  // NamesData names_table(elemsets.size(), libmesh_max_str_length);
+  // NamesData names_table(elemsets.size(), _max_name_length);
 
   // We only need to write elemsets if the Mesh has an extra elem
   // integer called "elemset_code" defined on it.
@@ -4718,6 +4717,18 @@ void ExodusII_IO_Helper::set_hdf5_writing(bool write_hdf5)
 }
 
 
+void ExodusII_IO_Helper::set_max_name_length(unsigned int max_length)
+{
+  // Opt mode error, because this may be exposed to users
+  libmesh_error_msg_if (max_length > libmesh_max_str_length,
+                        "Exodus maximum name length is limited to " <<
+                        libmesh_max_str_length << " characters");
+
+  // Devel+dbg mode assertion, because developers should do better
+  libmesh_assert(!opened_for_writing);
+
+  _max_name_length = max_length;
+}
 
 
 void ExodusII_IO_Helper::write_as_dimension(unsigned dim)
