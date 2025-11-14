@@ -142,6 +142,12 @@ public:
     // was written.
     {
       ExodusII_IO exii(*this->_mesh);
+
+      // We still default to 32-char names for backwards
+      // compatibility, but we're writing a mesh with extra-long names
+      // in it for testing, so we manually enable longer names.
+      exii.set_max_name_length(80);
+
       exii.write("write_exodus_" +
                  Utility::enum_to_string(elem_type) + ".e");
     }
