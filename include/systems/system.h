@@ -1630,27 +1630,6 @@ public:
    */
   unsigned int n_qois() const;
 
-private:
-
-  /**
-   * Values of the quantities of interest.  This vector needs to be
-   * both resized and filled by the user before any quantity of
-   * interest assembly is done and before any sensitivities are
-   * calculated. Use the get_qoi_values() accessor to get these
-   * values.
-   */
-  std::vector<Number> _qoi;
-
-  /**
-   * Vector to hold error estimates for qois, either from a steady
-   * state calculation, or from a single unsteady solver timestep. Used
-   * by the library after resizing to match the size of the qoi vector.
-   * User code can use this for accumulating error estimates for example.
-   * Use the set_qoi_error_estimate()/get_qoi_error_estimate_value()
-   * accessors to set/get these values.
-   */
-  std::vector<Number> _qoi_error_estimates;
-
 public:
 
   /**
@@ -2322,6 +2301,25 @@ private:
    * Whether we are name prefixing solver options
    */
   bool _prefix_with_name;
+
+  /**
+   * Values of the quantities of interest.  This vector needs to be
+   * both resized and filled by the user before any quantity of
+   * interest assembly is done and before any sensitivities are
+   * calculated. Use the get_qoi_values() accessor to get these
+   * values.
+   */
+  std::vector<Number> _qoi;
+
+  /**
+   * Vector to hold error estimates for qois, either from a steady
+   * state calculation, or from a single unsteady solver timestep. Used
+   * by the library after resizing to match the size of the qoi vector.
+   * User code can use this for accumulating error estimates for example.
+   * Use the set_qoi_error_estimate()/get_qoi_error_estimate_value()
+   * accessors to set/get these values.
+   */
+  std::vector<Number> _qoi_error_estimates;
 };
 
 
