@@ -1630,14 +1630,14 @@ public:
    */
   unsigned int n_qois() const;
 
-#ifndef LIBMESH_ENABLE_DEPRECATED // We use accessors for these now
 private:
-#endif
+
   /**
-   * Values of the quantities of interest.  This vector needs
-   * to be both resized and filled by the user before any quantity of
+   * Values of the quantities of interest.  This vector needs to be
+   * both resized and filled by the user before any quantity of
    * interest assembly is done and before any sensitivities are
-   * calculated.
+   * calculated. Use the get_qoi_values() accessor to get these
+   * values.
    */
   std::vector<Number> qoi;
 
@@ -1646,11 +1646,12 @@ private:
    * state calculation, or from a single unsteady solver timestep. Used
    * by the library after resizing to match the size of the qoi vector.
    * User code can use this for accumulating error estimates for example.
+   * Use the set_qoi_error_estimate()/get_qoi_error_estimate_value()
+   * accessors to set/get these values.
    */
   std::vector<Number> qoi_error_estimates;
-#ifndef LIBMESH_ENABLE_DEPRECATED
+
 public:
-#endif
 
   /**
    * Accessors for qoi and qoi_error_estimates vectors
