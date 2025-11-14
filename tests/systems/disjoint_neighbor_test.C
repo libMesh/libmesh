@@ -198,7 +198,7 @@ public:
   CPPUNIT_TEST( testTempJump );
   CPPUNIT_TEST( testTempJumpRefine );
 #endif
-#ifdef LIBMESH_ENABLE_AMR
+#if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_ENABLE_EXCEPTIONS)
   // // This test intentionally triggers find_neighbors() consistency check
   // // failure after AMR refinement across disjoint interfaces.
   // // Expected: libmesh_assert_valid_neighbors() fails.
@@ -208,7 +208,9 @@ public:
   CPPUNIT_TEST( testStitchingDiscontinuousBoundaries );
   CPPUNIT_TEST( testPreserveDisjointNeighborPairsAfterStitch );
   CPPUNIT_TEST( testStitchCrossMesh );
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
   CPPUNIT_TEST( testDisjointNeighborConflictError );
+#endif // LIBMESH_ENABLE_EXCEPTIONS
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -388,6 +390,7 @@ private:
   }
 
 
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
   void testTempJumpLocalRefineFail()
   {
     LOG_UNIT_TEST;
@@ -402,6 +405,7 @@ private:
       CPPUNIT_ASSERT(std::string(e.what()).find("Mesh refinement is not yet implemented") != std::string::npos);
     }
   }
+#endif // LIBMESH_ENABLE_EXCEPTIONS
 
   void testPreserveDisjointNeighborPairsAfterStitch()
   {
@@ -544,6 +548,7 @@ private:
   }
 
 
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
   void testDisjointNeighborConflictError()
   {
     LOG_UNIT_TEST;
@@ -627,6 +632,7 @@ private:
       CPPUNIT_ASSERT(std::string(e.what()).find("Disjoint neighbor boundary pairing mismatch") != std::string::npos);
     }
   }
+#endif // LIBMESH_ENABLE_EXCEPTIONS
 
 
 
