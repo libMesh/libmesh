@@ -312,15 +312,6 @@ public:
   virtual Node * add_node (Node * n) override final;
   virtual Node * add_node (std::unique_ptr<Node> n) override final;
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * These methods are deprecated. Please use \p add_node instead
-   * Calls add_node().
-   */
-  virtual Node * insert_node(Node * n) override final;
-  virtual Node * insert_node(std::unique_ptr<Node> n) override final;
-#endif
-
   /**
    * Takes ownership of node \p n on this partition of a distributed
    * mesh, by setting n.processor_id() to this->processor_id(), as
