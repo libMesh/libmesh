@@ -1798,6 +1798,15 @@ public:
   void cache_elem_data();
 
   /**
+   * libMesh often expects all processors to know about names of all
+   * subdomain ids, but distributed mesh generators may only know
+   * about part of a mesh when creating names.  This method can
+   * synchronize the subdomain id to name map across processors,
+   * assuming no conflicts exist.
+   */
+  void sync_subdomain_name_map();
+
+  /**
    * Search the mesh for elements that have a neighboring element
    * of dim+1 and set that element as the interior parent
    */

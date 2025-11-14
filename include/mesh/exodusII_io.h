@@ -579,6 +579,16 @@ public:
   void append(bool val);
 
   /**
+   * For backwards compatibility, libMesh currently truncates names in
+   * ExodusII output to the old default of 32 characters, but user
+   * code can expand that to up to 80 characters by setting a larger
+   * \p max_length manually.
+   *
+   * This must be set before a file is opened for writing.
+   */
+  void set_max_name_length(unsigned int max_length);
+
+  /**
    * Return list of the elemental variable names
    */
   const std::vector<std::string> & get_elem_var_names();

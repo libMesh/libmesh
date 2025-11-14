@@ -1882,6 +1882,16 @@ void MeshBase::cache_elem_data()
     }
 }
 
+
+void MeshBase::sync_subdomain_name_map()
+{
+  // This requires every processor
+  parallel_object_only();
+
+  this->comm().set_union(_block_id_to_name);
+}
+
+
 void MeshBase::detect_interior_parents()
 {
   // This requires an inspection on every processor

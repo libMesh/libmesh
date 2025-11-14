@@ -2410,6 +2410,12 @@ void ExodusII_IO::set_hdf5_writing(bool write_hdf5)
 }
 
 
+void ExodusII_IO::set_max_name_length(unsigned int max_length)
+{
+  exio_helper->set_max_name_length(max_length);
+}
+
+
 void ExodusII_IO::set_discontinuous_bex(bool disc_bex)
 {
   _disc_bex = disc_bex;

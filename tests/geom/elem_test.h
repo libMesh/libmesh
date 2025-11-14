@@ -12,6 +12,7 @@
 #include "libmesh_cppunit.h"
 
 #include <memory>
+#include <sstream>
 
 using namespace libMesh;
 
@@ -270,13 +271,28 @@ public:
       }
 
     // Use non-default subdomain ids so we can properly test their
-    // preservation
+    // preservation.
+    //
+    // Use long subdomain names so we can test that we're not
+    // truncating as badly as we used to in ExodusII.
     for (const auto & elem :
          this->_mesh->element_ptr_range())
-      elem->subdomain_id() = 10 + (elem->id() % 10);
+    {
+      const subdomain_id_type sbdid = 10 + (elem->id() % 10);
+      elem->subdomain_id() = sbdid;
+      std::ostringstream sbdname;
+      sbdname <<
+        "a_very_long_subdomain_name_for_the_subdomain_with_number_" << sbdid;
+      this->_mesh->subdomain_name(sbdid) = sbdname.str();
+    }
 
-    // And make sure our mesh's cache knows about them all for later
-    // tests comparisons
+    // Make sure our mesh's cache knows about them all for later
+    // test comparisons
     this->_mesh->cache_elem_data();
+
+    // We may have updated only a portion of subdomain names if we're
+    // on a distributed mesh, but every processor should know about
+    // every name.
+    this->_mesh->sync_subdomain_name_map();
   }
 };

@@ -605,6 +605,12 @@ public:
   void set_coordinate_offset(Point p);
 
   /**
+   * Set how many characters to use in names when opening a file for
+   * writing.
+   */
+  void set_max_name_length(unsigned int max_length);
+
+  /**
    * \returns A vector with three copies of each element in the provided name vector,
    * starting with r_, i_ and a_ respectively. If the "write_complex_abs" parameter
    * is true (default), the complex modulus is written, otherwise only the real and
@@ -1002,6 +1008,9 @@ protected:
   // If true, write an HDF5 file when available.  If false, write the
   // old format.
   bool _write_hdf5;
+
+  // The maximum name length to use when writing
+  unsigned int _max_name_length;
 
   // Set once the elem num map has been read
   int _end_elem_id;
