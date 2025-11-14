@@ -1649,7 +1649,7 @@ private:
    * Use the set_qoi_error_estimate()/get_qoi_error_estimate_value()
    * accessors to set/get these values.
    */
-  std::vector<Number> qoi_error_estimates;
+  std::vector<Number> _qoi_error_estimates;
 
 public:
 
