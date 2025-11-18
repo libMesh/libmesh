@@ -115,6 +115,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
+  _allow_node_and_elem_unique_id_overlap(other_mesh._allow_node_and_elem_unique_id_overlap),
   _elem_dims(other_mesh._elem_dims),
   _elem_default_orders(other_mesh._elem_default_orders),
   _supported_nodal_order(other_mesh._supported_nodal_order),
@@ -201,6 +202,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _skip_renumber_nodes_and_elements = !(other_mesh.allow_renumbering());
   _skip_find_neighbors = !(other_mesh.allow_find_neighbors());
   _allow_remote_element_removal = other_mesh.allow_remote_element_removal();
+  _allow_node_and_elem_unique_id_overlap = other_mesh.allow_node_and_elem_unique_id_overlap();
   _block_id_to_name = std::move(other_mesh._block_id_to_name);
   _elem_dims = std::move(other_mesh.elem_dimensions());
   _elem_default_orders = std::move(other_mesh.elem_default_orders());
@@ -304,6 +306,8 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (_skip_find_neighbors != other_mesh._skip_find_neighbors)
     return false;
   if (_allow_remote_element_removal != other_mesh._allow_remote_element_removal)
+    return false;
+  if (_allow_node_and_elem_unique_id_overlap != other_mesh._allow_node_and_elem_unique_id_overlap)
     return false;
   if (_spatial_dimension != other_mesh._spatial_dimension)
     return false;
