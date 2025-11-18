@@ -1955,6 +1955,10 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 
   libmesh_parallel_only(mesh.comm());
 
+  // If the mesh allows Node and Elem unique_ids to overlap
+  if (mesh.allow_node_and_elem_unique_id_overlap())
+    return;
+
   // First collect all the unique_ids we can see and make sure there's
   // no duplicates
   std::unordered_set<unique_id_type> semilocal_unique_ids;

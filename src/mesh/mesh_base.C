@@ -79,6 +79,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_renumber_nodes_and_elements(false),
   _skip_find_neighbors(false),
   _allow_remote_element_removal(true),
+  _allow_node_and_elem_unique_id_overlap(false),
   _spatial_dimension(d),
   _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
   _point_locator_close_to_point_tol(0.)
