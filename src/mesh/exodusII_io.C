@@ -311,6 +311,16 @@ void ExodusII_IO::read (const std::string & fname)
   // else will be directly connected to the spline nodes.
   const bool bex_cv_exist = !exio_helper->bex_dense_constraint_vecs.empty();
 
+  // If the user requests to set Node/Elem unique_ids based on the
+  // node/elem_num_maps, then it is very likely that those unique_ids
+  // will not be "unique" across the entire set of DofObjects (Nodes
+  // and Elems), although they should of course still be unique within
+  // the set of Nodes and the set of Elems on an individual basis.  We
+  // therefore need to relax some of the uniqueness checking that is
+  // done in debug mode by setting the following flag on the Mesh.
+  if (_set_unique_ids_from_maps)
+    mesh.allow_node_and_elem_unique_id_overlap(true);
+
   // Even if weights don't exist, we still use RATIONAL_BERNSTEIN for
   // Bezier-Bernstein BEX elements, we just use 1.0 as the weight on
   // every node.
