@@ -1979,7 +1979,7 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
   dof_id_type pmax_elem_id = mesh.max_elem_id();
   mesh.comm().max(pmax_elem_id);
 
-  for (dof_id_type i=0; i != pmax_elem_id; ++i)
+  for (auto i : make_range(pmax_elem_id))
     {
       const Elem * elem = mesh.query_elem_ptr(i);
       assert_dofobj_unique_id(mesh.comm(), elem, semilocal_unique_ids);
@@ -1991,7 +1991,7 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
   dof_id_type pmax_node_id = mesh.max_node_id();
   mesh.comm().max(pmax_node_id);
 
-  for (dof_id_type i=0; i != pmax_node_id; ++i)
+  for (auto i : make_range(pmax_node_id))
     {
       const Node * node = mesh.query_node_ptr(i);
       assert_dofobj_unique_id(mesh.comm(), node, semilocal_unique_ids);
