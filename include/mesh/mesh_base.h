@@ -1203,6 +1203,15 @@ public:
   bool allow_remote_element_removal() const { return _allow_remote_element_removal; }
 
   /**
+   * If \p true is passed, then this mesh will no longer require
+   * unique_ids to be unique across the set of all DofObjects. That
+   * is, although no two Elems (resp. Nodes) will share the same
+   * unique_id, a given Elem and Node might share the same unique_id.
+   */
+  void allow_node_and_elem_unique_id_overlap(bool allow) { _allow_node_and_elem_unique_id_overlap = allow; }
+  bool allow_node_and_elem_unique_id_overlap() const { return _allow_node_and_elem_unique_id_overlap; }
+
+  /**
    * If true is passed in then the elements on this mesh will no
    * longer be (re)partitioned, and the nodes on this mesh will only
    * be repartitioned if they are found "orphaned" via coarsening or
@@ -1984,6 +1993,19 @@ protected:
    * This is true by default.
    */
   bool _allow_remote_element_removal;
+
+  /**
+   * The Exodus reader (and potentially other readers in the future?)
+   * now supports setting Node and Elem unique_ids based on values
+   * from within the Exodus file itself, rather than generating them
+   * automatically in LibMesh. In this case, the unique_ids will not
+   * necessarily be unique across the set of all _DofObjects_,
+   * although they should still be unique within the individual sets
+   * of Elems and Nodes. The reader can therefore set this Mesh flag
+   * (which defaults to false) to indicate we should be less strict
+   * when checking the "uniqueness" of unique_ids.
+   */
+  bool _allow_node_and_elem_unique_id_overlap;
 
   /**
    * This structure maintains the mapping of named blocks

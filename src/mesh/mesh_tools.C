@@ -1955,45 +1955,80 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 
   libmesh_parallel_only(mesh.comm());
 
-  // First collect all the unique_ids we can see and make sure there's
-  // no duplicates
+  // Storage for semi-local DofObject ids.
   std::unordered_set<unique_id_type> semilocal_unique_ids;
 
-  for (auto const & elem : mesh.active_element_ptr_range())
-    {
-      libmesh_assert (!semilocal_unique_ids.count(elem->unique_id()));
-      semilocal_unique_ids.insert(elem->unique_id());
-    }
+  auto gather_elem_ids = [&]()
+  {
+    for (auto const & elem : mesh.active_element_ptr_range())
+      {
+        auto [it, inserted] = semilocal_unique_ids.insert(elem->unique_id());
+        libmesh_assert(inserted);
+        libmesh_ignore(it);
+      }
+  };
 
-  for (auto const & node : mesh.node_ptr_range())
-    {
-      libmesh_assert (!semilocal_unique_ids.count(node->unique_id()));
-      semilocal_unique_ids.insert(node->unique_id());
-    }
+  auto gather_node_ids = [&]()
+  {
+    for (auto const & node : mesh.node_ptr_range())
+      {
+        auto [it, inserted] = semilocal_unique_ids.insert(node->unique_id());
+        libmesh_assert(inserted);
+        libmesh_ignore(it);
+      }
+  };
 
-  // Then make sure elements are all in sync and remote elements don't
-  // duplicate semilocal
+  auto verify_elems = [&]()
+  {
+    dof_id_type pmax_elem_id = mesh.max_elem_id();
+    mesh.comm().max(pmax_elem_id);
 
-  dof_id_type pmax_elem_id = mesh.max_elem_id();
-  mesh.comm().max(pmax_elem_id);
+    for (auto i : make_range(pmax_elem_id))
+      {
+        const Elem * elem = mesh.query_elem_ptr(i);
+        assert_dofobj_unique_id(mesh.comm(), elem, semilocal_unique_ids);
+      }
+  };
 
-  for (dof_id_type i=0; i != pmax_elem_id; ++i)
-    {
-      const Elem * elem = mesh.query_elem_ptr(i);
-      assert_dofobj_unique_id(mesh.comm(), elem, semilocal_unique_ids);
-    }
+  auto verify_nodes = [&]()
+  {
+    dof_id_type pmax_node_id = mesh.max_node_id();
+    mesh.comm().max(pmax_node_id);
 
-  // Then make sure nodes are all in sync and remote elements don't
-  // duplicate semilocal
+    for (auto i : make_range(pmax_node_id))
+      {
+        const Node * node = mesh.query_node_ptr(i);
+        assert_dofobj_unique_id(mesh.comm(), node, semilocal_unique_ids);
+      }
+  };
 
-  dof_id_type pmax_node_id = mesh.max_node_id();
-  mesh.comm().max(pmax_node_id);
+  if (!mesh.allow_node_and_elem_unique_id_overlap())
+  {
+    // First collect all the unique_ids we can see and make sure there's
+    // no duplicates
+    gather_elem_ids();
+    gather_node_ids();
 
-  for (dof_id_type i=0; i != pmax_node_id; ++i)
-    {
-      const Node * node = mesh.query_node_ptr(i);
-      assert_dofobj_unique_id(mesh.comm(), node, semilocal_unique_ids);
-    }
+    // Then make sure elements/nodes are all in sync and remote
+    // elements don't duplicate semilocal
+    verify_elems();
+    verify_nodes();
+  }
+  else
+  {
+    // If the mesh allows Node and Elem unique_ids to overlap, then we only
+    // check for validity and uniqueness of an Elem (resp. Node) unique id
+    // within the set of Elem (resp. Node) unique_ids.
+    gather_elem_ids();
+    verify_elems();
+
+    // Clear id list before checking Nodes
+    semilocal_unique_ids.clear();
+
+    // Finally, check Nodes
+    gather_node_ids();
+    verify_nodes();
+  }
 }
 #endif
 
