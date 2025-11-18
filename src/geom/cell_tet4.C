@@ -630,11 +630,11 @@ Point
 Tet4::side_vertex_average_normal(const unsigned int s) const
 {
   libmesh_assert_less (s, 4);
-  const Point n1 = this->node_ptr(side_nodes_map[s][1]) -
-                   this->node_ptr(side_nodes_map[s][0]);
-  const Point n2 = this->node_ptr(side_nodes_map[s][2]) -
-                   this->node_ptr(side_nodes_map[s][1]);
-  const Point pointing_out = n2.cross(n1);
+  const Point n1 = this->point(side_nodes_map[s][1]) -
+                   this->point(side_nodes_map[s][0]);
+  const Point n2 = this->point(side_nodes_map[s][2]) -
+                   this->point(side_nodes_map[s][1]);
+  const Point pointing_out = n1.cross(n2);
   return pointing_out.unit();
 }
 
