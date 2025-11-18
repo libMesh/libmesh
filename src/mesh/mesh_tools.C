@@ -1961,14 +1961,16 @@ void libmesh_assert_valid_unique_ids(const MeshBase & mesh)
 
   for (auto const & elem : mesh.active_element_ptr_range())
     {
-      libmesh_assert (!semilocal_unique_ids.count(elem->unique_id()));
-      semilocal_unique_ids.insert(elem->unique_id());
+      auto [it, inserted] = semilocal_unique_ids.insert(elem->unique_id());
+      libmesh_assert(inserted);
+      libmesh_ignore(it);
     }
 
   for (auto const & node : mesh.node_ptr_range())
     {
-      libmesh_assert (!semilocal_unique_ids.count(node->unique_id()));
-      semilocal_unique_ids.insert(node->unique_id());
+      auto [it, inserted] = semilocal_unique_ids.insert(node->unique_id());
+      libmesh_assert(inserted);
+      libmesh_ignore(it);
     }
 
   // Then make sure elements are all in sync and remote elements don't
