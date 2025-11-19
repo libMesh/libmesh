@@ -33,6 +33,7 @@ public:
   CPPUNIT_TEST( testEdge3 );
   CPPUNIT_TEST( testTri3 );
   CPPUNIT_TEST( testQuad4 );
+  CPPUNIT_TEST( testTet4 );
   CPPUNIT_TEST( testPyramid5 );
   CPPUNIT_TEST( testPrism6 );
   CPPUNIT_TEST( testHex8 );
@@ -237,6 +238,33 @@ public:
         LIBMESH_ASSERT_FP_EQUAL(normal(1), n1(1), TOLERANCE*TOLERANCE);
         LIBMESH_ASSERT_FP_EQUAL(normal(2), n1(2), TOLERANCE*TOLERANCE);
       }
+    }
+  }
+
+
+  void testTet4()
+  {
+    LOG_UNIT_TEST;
+
+    {
+      // Reference
+      const Elem & tet4 = ReferenceElem::get(TET4);
+      const Point n1 = tet4.side_vertex_average_normal(0);
+      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(-1, n1(2), TOLERANCE*TOLERANCE);
+      const Point n2 = tet4.side_vertex_average_normal(1);
+      LIBMESH_ASSERT_FP_EQUAL(0, n2(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(-1, n2(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      const Point n3 = tet4.side_vertex_average_normal(2);
+      LIBMESH_ASSERT_FP_EQUAL(1./sqrt(3), n3(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(1./sqrt(3), n3(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(1./sqrt(3), n3(2), TOLERANCE*TOLERANCE);
+      const Point n4 = tet4.side_vertex_average_normal(3);
+      LIBMESH_ASSERT_FP_EQUAL(-1, n4(0), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n4(1), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
     }
   }
 
