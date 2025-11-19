@@ -41,22 +41,6 @@ namespace Parallel {
 namespace Utils {
 
 /**
- * \returns \p true if the vector \p v is sorted, \p false otherwise.
- *
- * This was implemented because std::is_sorted() was an STL extension
- * at the time.
- */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-template <typename KeyType>
-inline
-bool is_sorted (const std::vector<KeyType> & v)
-{
-  libmesh_deprecated();
-  return std::is_sorted(v.begin(), v.end());
-}
-#endif // LIBMESH_ENABLE_DEPRECATED
-
-/**
  * A utility function which converts whatever \p KeyType is to
  * a \p double for the histogram bounds
  */
