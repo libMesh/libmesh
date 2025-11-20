@@ -961,9 +961,10 @@ template <typename T>
 auto
 TypeVector<T>::l1_norm() const
 {
-  decltype(std::abs(T())) ret{};
+  using std::abs;
+  decltype(abs(T())) ret{};
   for (const auto i : make_range(libmesh_dim))
-    ret += std::abs(_coords[i]);
+    ret += abs(_coords[i]);
 
   return ret;
 }
@@ -1053,6 +1054,8 @@ T solid_angle(const TypeVector<T> & v01,
               const TypeVector<T> & v02,
               const TypeVector<T> & v03)
 {
+  using std::atan;
+
   const Real norm01 = v01.norm(),
              norm02 = v02.norm(),
              norm03 = v03.norm();
@@ -1061,7 +1064,7 @@ T solid_angle(const TypeVector<T> & v01,
     ((v01*v02)*norm03 + (v01*v03)*norm02 + (v02*v03)*norm01 +
      norm01*norm02*norm03);
 
-  return Real(2)*std::atan(tan_half_angle);
+  return Real(2)*atan(tan_half_angle);
 }
 
 
@@ -1097,7 +1100,8 @@ inline
 T cross_norm(const TypeVector<T> & b,
              const TypeVector<T> & c)
 {
-  return std::sqrt(cross_norm_sq(b,c));
+  using std::sqrt;
+  return sqrt(cross_norm_sq(b,c));
 }
 
 template <typename T>
