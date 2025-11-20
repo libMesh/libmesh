@@ -32,7 +32,9 @@ public:
   CPPUNIT_TEST( testReplicatedMeshStitchElemsets );
   CPPUNIT_TEST( testRemappingStitch );
   CPPUNIT_TEST( testAmbiguousRemappingStitch );
+#ifdef LIBMESH_HAVE_EXODUS_API
   CPPUNIT_TEST( testNodeElemStitch );
+#endif
 #endif // LIBMESH_DIM > 2
 
   CPPUNIT_TEST_SUITE_END();
@@ -451,6 +453,7 @@ public:
 #endif // LIBMESH_ENABLE_EXCEPTIONS
   }
 
+#ifdef LIBMESH_HAVE_EXODUS_API
   void testNodeElemStitch()
   {
     LOG_UNIT_TEST;
@@ -473,6 +476,8 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(merged_nodes, static_cast<std::size_t>(36));
   }
+#endif
+
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( MeshStitchTest );
