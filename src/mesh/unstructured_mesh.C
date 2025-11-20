@@ -2041,25 +2041,25 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                                   }
                               }
                           } // end for (edge_id)
-                      } // end if (side == nullptr)
-
-                  // Alternatively, is this a boundary NodeElem? If so,
-                  // add it to a list of NodeElems that will later be
-                  // used to set h_min based on the minimum node
-                  // separation distance between all pairs of boundary
-                  // NodeElems.
-                  if (el->type() == NODEELEM)
-                    {
-                      mesh_array[i]->get_boundary_info().boundary_ids(el->node_ptr(0), bc_ids);
-                      if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
-                        {
-                          boundary_node_elems.push_back(el);
-
-                          // Debugging:
-                          // libMesh::out << "Elem " << el->id() << " is a NodeElem on boundary " << id_array[i] << std::endl;
-                        }
-                    }
+                      } // end if (should_stitch_this_side)
                   } // end for (side_id)
+
+                // Alternatively, is this a boundary NodeElem? If so,
+                // add it to a list of NodeElems that will later be
+                // used to set h_min based on the minimum node
+                // separation distance between all pairs of boundary
+                // NodeElems.
+                if (el->type() == NODEELEM)
+                  {
+                    mesh_array[i]->get_boundary_info().boundary_ids(el->node_ptr(0), bc_ids);
+                    if (std::find(bc_ids.begin(), bc_ids.end(), id_array[i]) != bc_ids.end())
+                      {
+                        boundary_node_elems.push_back(el);
+
+                        // Debugging:
+                        // libMesh::out << "Elem " << el->id() << " is a NodeElem on boundary " << id_array[i] << std::endl;
+                      }
+                  } // end if (el->type() == NODEELEM)
               } // end for (el)
 
             // Compute the minimum node separation distance amongst
