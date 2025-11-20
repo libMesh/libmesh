@@ -166,6 +166,8 @@ data = matrices/geom_1_extraction_op.h5 \
        meshes/block.msh \
        meshes/BlockWithHole_Patch9.bxt.gz \
        meshes/circle.msh \
+       meshes/component_1.exo \
+       meshes/component_2.exo \
        meshes/constrain10to4.m \
        meshes/Cube_With_Sidesets.e \
        meshes/exodus_elements/read_exodus_EDGE2.e \
