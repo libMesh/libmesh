@@ -333,15 +333,16 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
     return false;
   if (_node_integer_default_values != other_mesh._node_integer_default_values)
     return false;
-  if (bool(_default_ghosting) != bool(other_mesh._default_ghosting))
+  if (static_cast<bool>(_default_ghosting) != static_cast<bool>(other_mesh._default_ghosting))
     return false;
-  if (bool(_partitioner) != bool(other_mesh._partitioner))
+  if (static_cast<bool>(_partitioner) != static_cast<bool>(other_mesh._partitioner))
     return false;
   if (*boundary_info != *other_mesh.boundary_info)
     return false;
 
   // First check whether the "existence" of the two pointers differs (one present, one absent)
-  if ((bool)_disjoint_neighbor_boundary_pairs != (bool)other_mesh._disjoint_neighbor_boundary_pairs)
+  if (static_cast<bool>(_disjoint_neighbor_boundary_pairs) !=
+      static_cast<bool>(other_mesh._disjoint_neighbor_boundary_pairs))
     return false;
   // If both exist, compare the contents (Weak Test: just compare sizes like `_ghosting_functors`)
   if (_disjoint_neighbor_boundary_pairs &&
