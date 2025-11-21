@@ -32,6 +32,9 @@ public:
   CPPUNIT_TEST( testReplicatedMeshStitchElemsets );
   CPPUNIT_TEST( testRemappingStitch );
   CPPUNIT_TEST( testAmbiguousRemappingStitch );
+#ifdef LIBMESH_HAVE_EXODUS_API
+  CPPUNIT_TEST( testNodeElemStitch );
+#endif
 #endif // LIBMESH_DIM > 2
 
   CPPUNIT_TEST_SUITE_END();
@@ -449,6 +452,31 @@ public:
     CPPUNIT_ASSERT(threw_error);
 #endif // LIBMESH_ENABLE_EXCEPTIONS
   }
+
+#ifdef LIBMESH_HAVE_EXODUS_API
+  void testNodeElemStitch()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh1(*TestCommWorld);
+    mesh1.read("meshes/component_1.exo");
+    Mesh mesh2(*TestCommWorld);
+    mesh2.read("meshes/component_2.exo");
+
+    auto merged_nodes = mesh1.stitch_meshes(
+      mesh2,
+      /*this_mesh_boundary_id=*/5601,
+      /*other_mesh_boundary_id=*/5600,
+      /*tol=*/0.01,
+      /*clear_stitched_boundary_ids=*/ false,
+      /*verbose=*/false,
+      /*use_binary_search=*/false,
+      /*enforce_all_nodes_match_on_boundaries=*/true,
+      /*merge_boundary_nodes_all_or_nothing=*/true);
+
+    CPPUNIT_ASSERT_EQUAL(merged_nodes, static_cast<std::size_t>(36));
+  }
+#endif
 
 };
 
