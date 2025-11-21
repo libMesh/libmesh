@@ -1958,6 +1958,17 @@ public:
     */
    bool has_static_condensation() const;
 
+  /*
+   * If we have e.g. a element space constrained by spline values, we
+   * can directly project functions only on the constrained basis; to
+   * get consistent constraining values we have to solve for them.
+   *
+   * Constrain the new vector using the requested adjoint rather than
+   * primal constraints if is_adjoint is non-negative.
+   */
+  void solve_for_unconstrained_dofs (NumericVector<Number> &,
+                                     int is_adjoint = -1) const;
+
 protected:
 
   /**
@@ -2006,17 +2017,6 @@ protected:
   void project_vector (const NumericVector<Number> &,
                        NumericVector<Number> &,
                        int is_adjoint = -1) const;
-
-  /*
-   * If we have e.g. a element space constrained by spline values, we
-   * can directly project only on the constrained basis; to get
-   * consistent constraining values we have to solve for them.
-   *
-   * Constrain the new vector using the requested adjoint rather than
-   * primal constraints if is_adjoint is non-negative.
-   */
-  void solve_for_unconstrained_dofs (NumericVector<Number> &,
-                                     int is_adjoint = -1) const;
 
   /**
    * Whether this object should condense out constrained degrees of freedom
