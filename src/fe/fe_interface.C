@@ -276,14 +276,12 @@ unsigned int FEInterface::n_shape_functions(const unsigned int dim,
   libmesh_deprecated();
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
-  /*
-   * Since the FEType, stored in DofMap/(some System child), has to
-   * be the _same_ for InfFE and FE, we have to catch calls
-   * to infinite elements through the element type.
-   */
 
+  // We no longer support calling this function with an infinite
+  // ElemType, you must call the FeInterface::n_shape_functions()
+  // taking an Elem* instead.
   if (is_InfFE_elem(t))
-    return ifem_n_shape_functions(dim, fe_t, t);
+    libmesh_not_implemented();
 
 #endif
 
@@ -360,8 +358,11 @@ unsigned int FEInterface::n_dofs(const unsigned int dim,
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 
+  // We no longer support calling this function with an infinite
+  // ElemType, you must call the FeInterface::n_dofs() taking an Elem*
+  // instead.
   if (is_InfFE_elem(t))
-    return ifem_n_dofs(dim, fe_t, t);
+    libmesh_not_implemented();
 
 #endif
 

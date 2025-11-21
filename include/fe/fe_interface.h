@@ -890,28 +890,8 @@ private:
    * the calls to \p FE and \p InfFE.
    */
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * \deprecated Call the version of ifem_n_shape_functions() which
-   * takes a pointer-to-Elem instead.
-   */
-  static unsigned int ifem_n_shape_functions(const unsigned int dim,
-                                             const FEType & fe_t,
-                                             const ElemType t);
-#endif // LIBMESH_ENABLE_DEPRECATED
-
   static unsigned int ifem_n_shape_functions(const FEType & fe_t,
                                              const Elem * elem);
-
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /**
-   * \deprecated Call the version of ifem_n_dofs() which takes a
-   * pointer-to-Elem instead.
-   */
-  static unsigned int ifem_n_dofs(const unsigned int dim,
-                                  const FEType & fe_t,
-                                  const ElemType t);
-#endif // LIBMESH_ENABLE_DEPRECATED
 
   static unsigned int ifem_n_dofs(const FEType & fe_t,
                                   const Elem * elem);
