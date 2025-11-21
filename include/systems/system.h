@@ -1630,27 +1630,7 @@ public:
    */
   unsigned int n_qois() const;
 
-#ifndef LIBMESH_ENABLE_DEPRECATED // We use accessors for these now
-private:
-#endif
-  /**
-   * Values of the quantities of interest.  This vector needs
-   * to be both resized and filled by the user before any quantity of
-   * interest assembly is done and before any sensitivities are
-   * calculated.
-   */
-  std::vector<Number> qoi;
-
-  /**
-   * Vector to hold error estimates for qois, either from a steady
-   * state calculation, or from a single unsteady solver timestep. Used
-   * by the library after resizing to match the size of the qoi vector.
-   * User code can use this for accumulating error estimates for example.
-   */
-  std::vector<Number> qoi_error_estimates;
-#ifndef LIBMESH_ENABLE_DEPRECATED
 public:
-#endif
 
   /**
    * Accessors for qoi and qoi_error_estimates vectors
@@ -2321,6 +2301,25 @@ private:
    * Whether we are name prefixing solver options
    */
   bool _prefix_with_name;
+
+  /**
+   * Values of the quantities of interest.  This vector needs to be
+   * both resized and filled by the user before any quantity of
+   * interest assembly is done and before any sensitivities are
+   * calculated. Use the get_qoi_values() accessor to get these
+   * values.
+   */
+  std::vector<Number> _qoi;
+
+  /**
+   * Vector to hold error estimates for qois, either from a steady
+   * state calculation, or from a single unsteady solver timestep. Used
+   * by the library after resizing to match the size of the qoi vector.
+   * User code can use this for accumulating error estimates for example.
+   * Use the set_qoi_error_estimate()/get_qoi_error_estimate_value()
+   * accessors to set/get these values.
+   */
+  std::vector<Number> _qoi_error_estimates;
 };
 
 
@@ -2507,11 +2506,9 @@ void System::disable_cache () { assemble_before_solve = true; }
 inline
 unsigned int System::n_qois() const
 {
-#ifndef LIBMESH_ENABLE_DEPRECATED
-  libmesh_assert_equal_to(this->qoi.size(), this->qoi_error_estimates.size());
-#endif
+  libmesh_assert_equal_to(this->_qoi.size(), this->_qoi_error_estimates.size());
 
-  return cast_int<unsigned int>(this->qoi.size());
+  return cast_int<unsigned int>(this->_qoi.size());
 }
 
 inline

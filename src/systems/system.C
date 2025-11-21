@@ -71,8 +71,6 @@ System::System (EquationSystems & es,
   solution                          (NumericVector<Number>::build(this->comm())),
   current_local_solution            (NumericVector<Number>::build(this->comm())),
   time                              (0.),
-  qoi                               (0),
-  qoi_error_estimates               (0),
   _init_system_function             (nullptr),
   _init_system_object               (nullptr),
   _assemble_system_function         (nullptr),
@@ -2148,50 +2146,50 @@ void System::user_QOI_derivative(const QoISet & qoi_indices,
 
 void System::init_qois(unsigned int n_qois)
 {
-  qoi.resize(n_qois);
-  qoi_error_estimates.resize(n_qois);
+  _qoi.resize(n_qois);
+  _qoi_error_estimates.resize(n_qois);
 }
 
 
 void System::set_qoi(unsigned int qoi_index, Number qoi_value)
 {
-  libmesh_assert(qoi_index < qoi.size());
+  libmesh_assert(qoi_index < _qoi.size());
 
-  qoi[qoi_index] = qoi_value;
+  _qoi[qoi_index] = qoi_value;
 }
 
 
 Number System::get_qoi_value(unsigned int qoi_index) const
 {
-  libmesh_assert(qoi_index < qoi.size());
-  return qoi[qoi_index];
+  libmesh_assert(qoi_index < _qoi.size());
+  return _qoi[qoi_index];
 }
 
 
 std::vector<Number> System::get_qoi_values() const
 {
-  return this->qoi;
+  return this->_qoi;
 }
 
 
 void System::set_qoi(std::vector<Number> new_qoi)
 {
-  libmesh_assert_equal_to(this->qoi.size(), new_qoi.size());
-  this->qoi = std::move(new_qoi);
+  libmesh_assert_equal_to(this->_qoi.size(), new_qoi.size());
+  this->_qoi = std::move(new_qoi);
 }
 
 
 void System::set_qoi_error_estimate(unsigned int qoi_index, Number qoi_error_estimate)
 {
-  libmesh_assert(qoi_index < qoi_error_estimates.size());
+  libmesh_assert(qoi_index < _qoi_error_estimates.size());
 
-  qoi_error_estimates[qoi_index] = qoi_error_estimate;
+  _qoi_error_estimates[qoi_index] = qoi_error_estimate;
 }
 
 Number System::get_qoi_error_estimate_value(unsigned int qoi_index) const
 {
-  libmesh_assert(qoi_index < qoi_error_estimates.size());
-  return qoi_error_estimates[qoi_index];
+  libmesh_assert(qoi_index < _qoi_error_estimates.size());
+  return _qoi_error_estimates[qoi_index];
 }
 
 
