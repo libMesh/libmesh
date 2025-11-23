@@ -385,6 +385,9 @@ NoxNonlinearSolver<T>::solve (SparseMatrix<T> &  /* jac_in */,  // System Jacobi
   Teuchos::RCP<NOX::Epetra::Group> grpPtr = Teuchos::rcp(new NOX::Epetra::Group(printParams, iReq, x, linSys));
   NOX::Epetra::Group & grp = *(grpPtr.get());
 
+  if (this->relative_step_tolerance != 0) // 0 is default value
+    libmesh_warning("Setting the relative step tolerance is currently not supported with the trilinos nox nonlinear solver.");
+
   Teuchos::RCP<NOX::StatusTest::NormF> absresid =
     Teuchos::rcp(new NOX::StatusTest::NormF(this->absolute_residual_tolerance, NOX::StatusTest::NormF::Unscaled));
   Teuchos::RCP<NOX::StatusTest::NormF> relresid =
