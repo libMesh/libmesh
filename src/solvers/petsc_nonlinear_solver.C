@@ -970,6 +970,10 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
                                      this->max_nonlinear_iterations,
                                      this->max_function_evaluations));
 
+  // Not supported by PETSc
+  if (this->absolute_step_tolerance != 0) // 0 is default value, both in MOOSE and libMesh
+    libmesh_warning("Setting the absolute step tolerance is not supported with the PETSc nonlinear solver.");
+
   // Set the divergence tolerance for the non-linear solver
 #if !PETSC_VERSION_LESS_THAN(3,8,0)
   LibmeshPetscCall(SNESSetDivergenceTolerance(_snes, this->divergence_tolerance));
