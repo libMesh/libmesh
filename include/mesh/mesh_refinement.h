@@ -500,30 +500,12 @@ public:
   bool make_flags_parallel_consistent ();
 
   /**
-   * \returns The value of the \p _enforce_mismatch_limit_prior_to_refinement flag,
-   * false by default.
-   *
-   * \deprecated Use enforce_mismatch_limit_prior_to_refinement() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  bool get_enforce_mismatch_limit_prior_to_refinement();
-#endif
-
-  /**
-   * Set _enforce_mismatch_limit_prior_to_refinement option.
-   * Defaults to false.
-   *
-   * \deprecated Use enforce_mismatch_limit_prior_to_refinement() instead.
-   */
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  void set_enforce_mismatch_limit_prior_to_refinement(bool enforce);
-#endif
-
-  /**
    * Get/set the _enforce_mismatch_limit_prior_to_refinement flag.
    * The default value for this flag is false.
    */
   bool & enforce_mismatch_limit_prior_to_refinement();
+  bool enforce_mismatch_limit_prior_to_refinement() const;
+  void enforce_mismatch_limit_prior_to_refinement(bool enforce);
 
 private:
 
@@ -969,23 +951,21 @@ inline bool & MeshRefinement::allow_unrefined_patches()
   return _allow_unrefined_patches;
 }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-inline bool MeshRefinement::get_enforce_mismatch_limit_prior_to_refinement()
-{
-  libmesh_deprecated();
-  return enforce_mismatch_limit_prior_to_refinement();
-}
-
-inline void MeshRefinement::set_enforce_mismatch_limit_prior_to_refinement(bool enforce)
-{
-  libmesh_deprecated();
-  enforce_mismatch_limit_prior_to_refinement() = enforce;
-}
-#endif
-
 inline bool & MeshRefinement::enforce_mismatch_limit_prior_to_refinement()
 {
   return _enforce_mismatch_limit_prior_to_refinement;
+}
+
+inline bool
+MeshRefinement::enforce_mismatch_limit_prior_to_refinement() const
+{
+  return _enforce_mismatch_limit_prior_to_refinement;
+}
+
+inline void
+MeshRefinement::enforce_mismatch_limit_prior_to_refinement(bool enforce)
+{
+  _enforce_mismatch_limit_prior_to_refinement = enforce;
 }
 
 
