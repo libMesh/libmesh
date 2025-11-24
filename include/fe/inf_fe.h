@@ -382,23 +382,6 @@ public:
                                          const Elem * inf_elem)
   { return n_dofs(fet, inf_elem); }
 
-#ifdef LIBMESH_ENABLE_DEPRECATED
-  /*
-   * \deprecated Call the version of this function that takes a
-   * pointer-to-Elem instead.
-   */
-  static unsigned int n_shape_functions (const FEType & fet,
-                                         const ElemType t)
-  { return n_dofs(fet, t); }
-
-  /**
-   * \deprecated Call the version of this function that takes an Elem*
-   * instead for consistency with other FEInterface::n_dofs() methods.
-   */
-  static unsigned int n_dofs(const FEType & fet,
-                             const ElemType inf_elem_type);
-#endif // LIBMESH_ENABLE_DEPRECATED
-
   /**
    * \returns The number of shape functions associated with this
    * infinite element.  Currently, we have \p o_radial+1 modes in

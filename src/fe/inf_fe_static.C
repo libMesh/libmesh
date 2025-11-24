@@ -62,25 +62,6 @@ bool InfFE<Dim,T_radial,T_map>::_warned_for_dshape     = false;
 
 // ------------------------------------------------------------
 // InfFE static class members
-#ifdef LIBMESH_ENABLE_DEPRECATED
-template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
-unsigned int InfFE<Dim,T_radial,T_map>::n_dofs (const FEType & fet,
-                                                const ElemType inf_elem_type)
-{
-  libmesh_deprecated();
-
-  const ElemType base_et (InfFEBase::get_elem_type(inf_elem_type));
-
-  if (Dim > 1)
-    return FEInterface::n_dofs(Dim-1, fet, base_et) *
-      InfFERadial::n_dofs(fet.radial_order);
-  else
-    return InfFERadial::n_dofs(fet.radial_order);
-}
-#endif // LIBMESH_ENABLE_DEPRECATED
-
-
-
 template <unsigned int Dim, FEFamily T_radial, InfMapType T_map>
 unsigned int InfFE<Dim,T_radial,T_map>::n_dofs(const FEType & fet,
                                                const Elem * inf_elem)
@@ -1370,7 +1351,6 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_indices (const FEType & fet,
 
     else                                                                         // range of i: 134..169
       {
-        libmesh_assert_less (i, n_dofs(fet, inf_elem_type));
         // belongs to the outer shell and is an element associated shape
         const unsigned int i_offset = i - (n_dof_at_all_vertices
                                            + n_dof_at_all_sides
@@ -1713,9 +1693,6 @@ void InfFE<Dim, T_radial, T_map>::inf_compute_constraints (DofConstraints & cons
 //#include "libmesh/inf_fe_instantiate_3D.h"
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
-INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
-INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
-INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(1, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(2, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
 INSTANTIATE_INF_FE_MBRF(3, CARTESIAN, unsigned int, n_dofs_per_elem(const FEType &, const ElemType));
