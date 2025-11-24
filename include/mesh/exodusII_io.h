@@ -212,6 +212,11 @@ public:
   /**
    * If we read in a nodal solution while reading in a mesh, we can attempt
    * to copy that nodal solution into an EquationSystems object.
+   *
+   * \note This function cannot be used with renumbering. For more information,
+   * see MeshBase::allow_renumbering(). If you need both renumbering and nodal
+   * solution vectors, then disable renumbering, load the solution vectors, and
+   * then reenable renumbering.
    */
   void copy_nodal_solution(System & system,
                            std::string system_var_name,
@@ -221,6 +226,11 @@ public:
   /**
    * If we read in a elemental solution while reading in a mesh, we can attempt
    * to copy that elemental solution into an EquationSystems object.
+   *
+   * \note This function cannot be used with renumbering. For more
+   * information, see MeshBase::allow_renumbering(). If you need both
+   * renumbering and nodal solution vectors, then disable renumbering, load the
+   * solution vectors, and then reenable renumbering.
    */
   void copy_elemental_solution(System & system,
                                std::string system_var_name,

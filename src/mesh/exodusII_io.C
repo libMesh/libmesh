@@ -1061,6 +1061,9 @@ void ExodusII_IO::copy_nodal_solution(System & system,
 
   const MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
+  libmesh_error_msg_if(mesh.allow_renumbering(),
+                       "ERROR, nodal data cannot be loaded if the mesh may be renumbered!");
+
   // With Exodus files we only open them on processor 0, so that's the
   // where we have to do the data read too.
   if (system.comm().rank() == 0)
@@ -1172,6 +1175,9 @@ void ExodusII_IO::copy_elemental_solution(System & system,
 
   const MeshBase & mesh = MeshInput<MeshBase>::mesh();
   const DofMap & dof_map = system.get_dof_map();
+
+  libmesh_error_msg_if(mesh.allow_renumbering(),
+                       "ERROR, elemental data cannot be loaded if the mesh may be renumbered!");
 
   // Map from element ID to elemental variable value.  We need to use
   // a map here rather than a vector (e.g. elem_var_values) since the

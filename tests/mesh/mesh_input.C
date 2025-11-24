@@ -653,12 +653,12 @@ public:
 
     {
       MeshType mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
       IOType meshinput(mesh);
 
       // Avoid getting Nemesis solution values mixed up
       if (meshinput.is_parallel_format())
         {
-          mesh.allow_renumbering(false);
           mesh.skip_noncritical_partitioning(true);
         }
 
@@ -742,12 +742,12 @@ public:
 
     {
       MeshType mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
       IOType meshinput(mesh);
 
       // Avoid getting Nemesis solution values mixed up
       if (meshinput.is_parallel_format())
         {
-          mesh.allow_renumbering(false);
           mesh.skip_noncritical_partitioning(true);
         }
 
@@ -831,6 +831,7 @@ public:
     // file(s) were written properly.
     {
       MeshType mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
       EquationSystems es(mesh);
       auto & sys = es.add_system<System>("SimpleSystem");
       sys.add_variable("teste", CONSTANT, MONOMIAL);
@@ -921,12 +922,12 @@ public:
 
     {
       MeshType mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
       IOType meshinput(mesh);
 
       // Avoid getting Nemesis solution values mixed up
       if (meshinput.is_parallel_format())
         {
-          mesh.allow_renumbering(false);
           mesh.skip_noncritical_partitioning(true);
         }
 
@@ -1034,6 +1035,7 @@ public:
 
       // copy_elemental_solution currently requires ReplicatedMesh
       ReplicatedMesh mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
 
       EquationSystems es(mesh);
       System & sys = es.add_system<System> ("SimpleSystem");
@@ -1183,7 +1185,6 @@ public:
     {
       Mesh mesh(*TestCommWorld);
       mesh.allow_renumbering(false);
-
       ExodusII_IO exii(mesh);
 
       if (mesh.processor_id() == 0)
