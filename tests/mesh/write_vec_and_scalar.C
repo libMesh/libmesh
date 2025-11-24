@@ -170,6 +170,7 @@ public:
 
     // Now read it back in
     MeshType read_mesh(*TestCommWorld);
+    read_mesh.allow_renumbering(false);
     ExodusII_IO exio(read_mesh);
     exio.read(filename);
 
@@ -215,6 +216,7 @@ public:
 
     // Now read it back in
     MeshType read_mesh(*TestCommWorld);
+    read_mesh.allow_renumbering(false);
     Nemesis_IO nemio(read_mesh);
     nemio.read(filename);
 
