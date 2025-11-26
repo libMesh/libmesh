@@ -56,6 +56,9 @@ private:
   CppUnit::Test & _shimmed_test;
 };
 
+// "Magic number" for when we're not doing allow or deny regex
+static constexpr int added_whole_suite = -12345;
+
 // Add Tests to runner that match user-provided regex.
 int add_matching_tests_to_runner(CppUnit::Test * test,
                                  const std::string & allow_r_str,
@@ -72,7 +75,7 @@ int add_matching_tests_to_runner(CppUnit::Test * test,
   {
     libMesh::out << test->getName() << std::endl;
     runner.addTest(test);
-    return -12345;
+    return added_whole_suite;
   }
 
   if (test->getChildTestCount() == 0)
@@ -182,7 +185,7 @@ int main(int argc, char ** argv)
 
   // If we didn't add the whole suite to the runner, we need to clean
   // it up ourselves
-  if (n_tests_added != -12345)
+  if (n_tests_added != added_whole_suite)
     owned_suite.reset(suite);
 #else
   // If no C++11 <regex> just run all the tests.
