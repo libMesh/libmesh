@@ -3,6 +3,7 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/ui/text/TestRunner.h>
 #include <cppunit/BriefTestProgressListener.h>
+#include <cppunit/TestPath.h>
 #include <cppunit/TestResult.h>
 #include <libmesh/restore_warnings.h>
 
@@ -17,14 +18,54 @@
 // C++ includes
 #include <regex>
 
+// We want to be able to add a selection of tests from our full suite
+// to our test runner.  But then the test runner will want to destruct
+// those tests afterward, so we can't destruct the suite without it
+// *also* trying to destruct all its tests (undefined behavior), and
+// we can't not destruct the suite without the suite and its
+// unselected tests being leaked (which would be fine since just exit
+// afterward, except valgrind sees the leaks and screams).
+//
+// So, instead of adding selected tests, we add shims of selected
+// tests that can be deleted without deleting the tests they shim.
+class TestShim : public CppUnit::Test
+{
+public:
+  TestShim (CppUnit::Test & shimmed_test) : _shimmed_test(shimmed_test) {}
+
+  virtual void run(CppUnit::TestResult * result) override { _shimmed_test.run(result); }
+
+  virtual int countTestCases () const override { return _shimmed_test.countTestCases(); }
+
+  virtual int getChildTestCount () const override { return _shimmed_test.getChildTestCount(); }
+
+  virtual std::string getName () const override { return _shimmed_test.getName(); }
+
+  virtual bool findTestPath (const std::string & testName, CppUnit::TestPath & testPath) const override { return _shimmed_test.findTestPath(testName, testPath); }
+
+  virtual bool findTestPath (const CppUnit::Test * test, CppUnit::TestPath & testPath) const override { return _shimmed_test.findTestPath(test, testPath); }
+
+  virtual CppUnit::Test * findTest(const std::string & testName) const override { return _shimmed_test.findTest(testName); }
+
+  virtual CppUnit::TestPath resolveTestPath(const std::string & testPath) const override { return _shimmed_test.resolveTestPath(testPath); }
+
+protected:
+  virtual CppUnit::Test * doGetChildTestAt(int index) const override { return _shimmed_test.getChildTestAt(index); }
+
+private:
+  CppUnit::Test & _shimmed_test;
+};
+
+// "Magic number" for when we're not doing allow or deny regex
+static constexpr int added_whole_suite = -12345;
+
 // Add Tests to runner that match user-provided regex.
 int add_matching_tests_to_runner(CppUnit::Test * test,
                                  const std::string & allow_r_str,
                                  const std::regex & allow_r,
                                  const std::string & deny_r_str,
                                  const std::regex & deny_r,
-                                 CppUnit::TextUi::TestRunner & runner,
-                                 CppUnit::TestSuite & rejects)
+                                 CppUnit::TextUi::TestRunner & runner)
 {
   int n_tests_added = 0;
 
@@ -34,7 +75,7 @@ int add_matching_tests_to_runner(CppUnit::Test * test,
   {
     libMesh::out << test->getName() << std::endl;
     runner.addTest(test);
-    return -12345;
+    return added_whole_suite;
   }
 
   if (test->getChildTestCount() == 0)
@@ -46,18 +87,17 @@ int add_matching_tests_to_runner(CppUnit::Test * test,
     {
       libMesh::out << test->getName() << std::endl;
       n_tests_added ++;
-      runner.addTest(test);
+
+      // yes, explicit new; this is how CppUnit works
+      runner.addTest(new TestShim(*test));
     }
-    // Add the test to the rejects it can be cleaned up later
-    else
-      rejects.addTest(test);
   }
 
   // Call this recursively on each of our children, if any.
   for (int i = 0; i < test->getChildTestCount(); i++)
     n_tests_added +=
       add_matching_tests_to_runner(test->getChildTestAt(i), allow_r_str, allow_r,
-                                   deny_r_str, deny_r, runner, rejects);
+                                   deny_r_str, deny_r, runner);
 
   return n_tests_added;
 }
@@ -116,15 +156,17 @@ int main(int argc, char ** argv)
   std::string deny_regex_string = "^$";
   deny_regex_string = libMesh::command_line_next("--deny_re", deny_regex_string);
 
+  // We might have to delete the test suite ourselves, after the
+  // runner has deleted whatever subtests it has.
+  std::unique_ptr<CppUnit::Test> owned_suite;
+
   // Recursively add tests matching the regex to the runner object.
   CppUnit::TextUi::TestRunner runner;
 
-  // The Cppunit registry object that knows about all the tests.
+  // The Cppunit registry object that knows about all the tests, and
+  // the test suite it creates.
   CppUnit::TestFactoryRegistry & registry = CppUnit::TestFactoryRegistry::getRegistry();
-
-  // A test suite container for holding tests not matching the regex. When main's
-  // scope ends, this class's destructor will delete the rejected tests
-  CppUnit::TestSuite rejects("rejects");
+  CppUnit::Test * suite = registry.makeTest();
 
 #ifdef LIBMESH_HAVE_CXX11_REGEX
   // Make regex objects from user's input.
@@ -134,15 +176,20 @@ int main(int argc, char ** argv)
   // Add all tests which match the re to the runner object.
   libMesh::out << "Will run the following tests:" << std::endl;
   const int n_tests_added =
-    add_matching_tests_to_runner(registry.makeTest(),
+    add_matching_tests_to_runner(suite,
                                  allow_regex_string, allow_regex,
                                  deny_regex_string, deny_regex,
-                                 runner, rejects);
+                                 runner);
   if (n_tests_added >= 0)
     libMesh::out << "--- Running " << n_tests_added << " tests in total." << std::endl;
+
+  // If we didn't add the whole suite to the runner, we need to clean
+  // it up ourselves
+  if (n_tests_added != added_whole_suite)
+    owned_suite.reset(suite);
 #else
   // If no C++11 <regex> just run all the tests.
-  runner.addTest(registry.makeTest());
+  runner.addTest(suite);
 #endif
 
   std::unique_ptr<CppUnit::TestResult> controller;
