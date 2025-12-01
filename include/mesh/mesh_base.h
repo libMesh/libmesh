@@ -202,8 +202,9 @@ public:
   virtual void clear_elems () = 0;
 
   /**
-   * \returns \p true if the mesh has undergone all the preparation
-   * done in a call to \p prepare_for_use, \p false otherwise.
+   * \returns \p true if the mesh is marked as having undergone all of
+   * the preparation done in a call to \p prepare_for_use, \p false
+   * otherwise.
    */
   bool is_prepared () const
   { return _preparation; }
@@ -220,8 +221,8 @@ public:
 
   /**
    * Tells this we have done some operation where we should no longer
-   * consider ourself prepared.  This is a very coarse setting; it may
-   * be preferable to mark finer-grained settings instead.
+   * consider ourself prepared.  This is a very coarse setting; it is
+   * generally more efficient to mark finer-grained settings instead.
    */
   void set_isnt_prepared()
   { _preparation = false; }
@@ -229,22 +230,33 @@ public:
   /**
    * Tells this we have done some operation creating unpartitioned
    * elements.
+   *
+   * User code which adds elements to this mesh must either partition
+   * them too or call this method.
    */
   void set_isnt_partitioned()
   { _preparation.is_partitioned = false; }
 
   /**
-   * Tells this we have done some operation (e.g. adding elements to a
+   * Tells this we have done some operation (e.g. adding objects to a
    * distributed mesh on one processor only) which can lose
    * synchronization of id counts.
+   *
+   * User code which does distributed additions of nodes or elements
+   * must call either this method or \p update_parallel_id_counts().
    */
   void set_hasnt_synched_id_counts()
   { _preparation.has_synched_id_counts = false; }
 
   /**
    * Tells this we have done some operation (e.g. adding elements
-   * without setting their neighbor pointers) which requires neighbor
-   * pointers to be found later
+   * without setting their neighbor pointers, or adding disjoint
+   * neighbor boundary pairs) which requires neighbor pointers to be
+   * determined later.
+   *
+   * User code which adds new elements to this mesh must call this
+   * function or manually set neighbor pointer from and to those
+   * elements.
    */
   void set_hasnt_neighbor_ptrs()
   { _preparation.has_neighbor_ptrs = false; }
@@ -252,7 +264,10 @@ public:
   /**
    * Tells this we have done some operation (e.g. adding elements with
    * a new dimension or subdomain value) which may invalidate cached
-   * summaries of element data
+   * summaries of element data.
+   *
+   * User code which adds new elements to this mesh must call this
+   * function.
    */
   void set_hasnt_cached_elem_data()
   { _preparation.has_cached_elem_data = false; }
@@ -260,7 +275,11 @@ public:
   /**
    * Tells this we have done some operation (e.g. refining elements
    * with interior parents) which requires interior parent pointers to
-   * be found later
+   * be found later.
+   *
+   * Most user code will not need to call this method; any user code
+   * that manipulates interior parents or their boundary elements may
+   * be an exception.
    */
   void set_hasnt_interior_parent_ptrs()
   { _preparation.has_interior_parent_ptrs = false; }
@@ -271,7 +290,10 @@ public:
    * mesh should be remote.
    *
    * User code should probably never need to use this; we can set it
-   * in Partitioner.
+   * in Partitioner.  Any user code which manually repartitions
+   * elements on distributed meshes may need to call this manually, in
+   * addition to manually communicating elements with newly-created
+   * ghosting requirements.
    */
   void set_hasnt_removed_remote_elements()
   { _preparation.has_removed_remote_elements = false; }
@@ -281,7 +303,8 @@ public:
    * which may have left orphaned nodes in need of removal.
    *
    * Most user code should probably never need to use this; we can set
-   * it in MeshRefinement.
+   * it in MeshRefinement.  User code which deletes elements without
+   * carefully deleting orphaned nodes should call this manually.
    */
   void set_hasnt_removed_orphaned_nodes()
   { _preparation.has_removed_orphaned_nodes = false; }
@@ -290,14 +313,20 @@ public:
    * Tells this we have done some operation (e.g. adding or removing
    * elements) which may require a reinit() of custom ghosting
    * functors.
+   *
+   * User code which adds or removes elements should call this method.
+   * User code which moves nodes ... should probably call this method,
+   * in case ghosting functors depending on position exist?
    */
   void hasnt_reinit_ghosting_functors()
   { _preparation.has_reinit_ghosting_functors = false; }
 
   /**
-   * Tells this we have done some operation (e.g. removing elements or
-   * adding new boundary entries) which may have invalidated our
-   * cached boundary id sets.
+   * Tells this we have done some operation which may have invalidated
+   * our cached boundary id sets.
+   *
+   * User code which removes elements, or which adds or removes
+   * boundary entries, should call this method.
    */
   void set_hasnt_boundary_id_sets()
   { _preparation.has_boundary_id_sets = false; }
