@@ -1227,7 +1227,7 @@ void clear_spline_nodes(MeshBase & mesh)
 
 bool valid_is_prepared (const MeshBase & mesh)
 {
-  LOG_SCOPE("libmesh_assert_valid_is_prepared()", "MeshTools");
+  LOG_SCOPE("valid_is_prepared()", "MeshTools");
 
   if (!mesh.is_prepared())
     return true;
