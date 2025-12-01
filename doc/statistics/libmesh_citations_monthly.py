@@ -264,6 +264,7 @@ pub_2025 = [
   '2025-09-01', 190,
   '2025-10-01', 208,
   '2025-11-01', 225,
+  '2025-12-01', 240,
 ]
 
 # 2026 monthly publication totals (first of each month)
@@ -272,6 +273,7 @@ pub_2026 = [
   '2025-09-01', 1,
   '2025-10-01', 3,
   '2025-11-01', 6,
+  '2025-12-01', 10,
 ]
 
 """
@@ -312,6 +314,7 @@ plot_one_year(2022, pub_2022, 'k')
 plot_one_year(2023, pub_2023, muted_grey)
 plot_one_year(2024, pub_2024, muted_yellow)
 plot_one_year(2025, pub_2025, muted_brown)
+plot_one_year(2026, pub_2026, muted_purple)
 
 # Label beginning and end of year.
 ax1.set_xticks([0, 12])
