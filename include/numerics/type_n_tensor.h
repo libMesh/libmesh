@@ -65,8 +65,16 @@ public:
 
   TypeNTensor & operator=(const TypeNTensor<N, T> &) { return *this; }
 
-  operator TypeVector<T> () const { libmesh_not_implemented(); return 0; }
-  operator VectorValue<T> () const { libmesh_not_implemented(); return 0; }
+  operator TypeVector<T>() const
+  {
+    libmesh_assert(N == 1);
+    return TypeVector<T>(_coords[0], _coords[1], _coords[2]);
+  }
+  operator VectorValue<T>() const
+  {
+    libmesh_assert(N == 1);
+    return VectorValue<T>(_coords[0], _coords[1], _coords[2]);
+  }
 
   operator TypeTensor<T> () const { libmesh_not_implemented(); return 0; }
   operator TensorValue<T> () const { libmesh_not_implemented(); return 0; }
@@ -79,21 +87,28 @@ public:
   /**
    * \returns A proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
-  const TypeNTensor<N-1,T> slice (const unsigned int /*i*/) const
+  const TypeNTensor<N - 1, T> slice(const unsigned int i) const
   {
-    libmesh_not_implemented();
-    return TypeNTensor<N-1,T>();
+    return const_cast<TypeNTensor<N, T> *>(this)->slice(i);
   }
 
   /**
    * \returns A writable proxy for the \f$ i^{th} \f$ slice of the tensor.
    */
-  TypeNTensor<N-1,T> slice (const unsigned int /*i*/)
+  TypeNTensor<N - 1, T> slice(const unsigned int i)
   {
-    libmesh_not_implemented();
-    return TypeNTensor<N-1,T>();
+    libmesh_assert(i <= N);
+    TypeNTensor<N - 1, T> slice;
+    unsigned int slice_size = int_pow(LIBMESH_DIM, N - 1);
+    slice._coords.resize(slice_size);
+    for (unsigned int j = 0; j < slice_size; j++)
+      slice._coords[j] = _coords[i * slice_size + j];
+    return slice;
   }
 
+  /**
+   * Zero out a tensor by setting it with = 0
+   */
   template <typename Scalar>
   typename boostcopy::enable_if_c<
     ScalarTraits<Scalar>::value,
@@ -322,7 +337,10 @@ public:
   void add_scaled (const TypeNTensor<N, T2> &, const T &);
 
   /**
-   * The coordinates of the \p TypeNTensor
+   * The coordinates of the \p TypeNTensor.
+   * The vector is indexed such that slice i is contiguous.
+   * In dimension 2, this would mean that slice i is the ith row,
+   * and _coords has row-major ordering and column minor-ordering
    */
   std::vector<T> _coords;
 
