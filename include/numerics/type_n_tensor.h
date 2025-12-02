@@ -37,9 +37,9 @@ namespace libMesh
  * This class will eventually define a rank-N tensor in \p LIBMESH_DIM
  * dimensional space of type T.
  *
- * Right now it defines a shim to allow for rank-independent code to
- * compile (but not give correct results) in the case of vector-valued
- * elements and second derivatives.
+ * For routines that are too hard to implement with a general N-dimensional,
+ * it defines a shim to allow for rank-independent code to
+ * compile (but error on unimplemented).
  *
  * \author Roy Stogner
  * \date 2012
@@ -63,7 +63,7 @@ public:
 
   TypeNTensor (const TypeNTensor<N,T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
 
-  TypeNTensor & operator = (const TypeNTensor<N,T> &) { libmesh_not_implemented(); return *this; }
+  TypeNTensor & operator=(const TypeNTensor<N, T> &) { return *this; }
 
   operator TypeVector<T> () const { libmesh_not_implemented(); return 0; }
   operator VectorValue<T> () const { libmesh_not_implemented(); return 0; }
@@ -104,42 +104,54 @@ public:
   /**
    * Add two tensors.
    */
-  template<typename T2>
-  TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
-  operator + (const TypeNTensor<N,T2> &) const
+  template <typename T2>
+  TypeNTensor<N, typename CompareTypes<T, T2>::supertype>
+  operator+(const TypeNTensor<N, T2> & other) const
   {
-    libmesh_not_implemented();
-    return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>();
+    TypeNTensor<N, typename CompareTypes<T, T2>::supertype> sum;
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    sum._coords.resize(size);
+    for (unsigned int i = 0; i < size; i++)
+      sum._coords[i] = _coords[i] + other._coords[i];
+    return sum;
   }
 
   /**
    * Add to this tensor.
    */
-  template<typename T2>
-  const TypeNTensor<N,T> & operator += (const TypeNTensor<N,T2> &/*rhs*/)
+  template <typename T2>
+  const TypeNTensor<N, T> & operator+=(const TypeNTensor<N, T2> & other)
   {
-    libmesh_not_implemented();
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    for (unsigned int i = 0; i < size; i++)
+      _coords[i] += other._coords[i];
     return *this;
   }
 
   /**
    * Subtract two tensors.
    */
-  template<typename T2>
-  TypeNTensor<N,typename CompareTypes<T, T2>::supertype>
-  operator - (const TypeNTensor<N,T2> &) const
+  template <typename T2>
+  TypeNTensor<N, typename CompareTypes<T, T2>::supertype>
+  operator-(const TypeNTensor<N, T2> & other) const
   {
-    libmesh_not_implemented();
-    return TypeNTensor<N,typename CompareTypes<T,T2>::supertype>();
+    TypeNTensor<N, typename CompareTypes<T, T2>::supertype> subtract;
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    subtract._coords.resize(size);
+    for (unsigned int i = 0; i < size; i++)
+      subtract._coords[i] = _coords[i] - other._coords[i];
+    return subtract;
   }
 
   /**
    * Subtract from this tensor.
    */
-  template<typename T2>
-  const TypeNTensor<N,T> & operator -= (const TypeNTensor<N,T2> &)
+  template <typename T2>
+  const TypeNTensor<N, T> & operator-=(const TypeNTensor<N, T2> & other)
   {
-    libmesh_not_implemented();
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    for (unsigned int i = 0; i < size; i++)
+      _coords[i] -= other._coords[i];
     return *this;
   }
 
@@ -148,30 +160,39 @@ public:
    */
   TypeNTensor<N,T> operator - () const
   {
-    libmesh_not_implemented();
-    return *this;
+    TypeNTensor<N, T> minus;
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    minus._coords.resize(size);
+    for (unsigned int i = 0; i < size; i++)
+      minus._coords[i] = -_coords[i];
+    return minus;
   }
 
   /**
    * Multiply every entry of a tensor by a number.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>>::type
-  operator * (const Scalar) const
+  typename boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                                  TypeNTensor<N, typename CompareTypes<T, Scalar>::supertype>>::type
+  operator*(const Scalar factor) const
   {
-    libmesh_not_implemented();
-    return TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>();
+    TypeNTensor<N, T> multiplied;
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    multiplied._coords.resize(size);
+    for (unsigned int i = 0; i < size; i++)
+      multiplied._coords[i] = factor * _coords[i];
+    return multiplied;
   }
 
   /**
    * Multiply every entry of this tensor by a number.
    */
   template <typename Scalar>
-  const TypeNTensor<N,T> & operator *= (const Scalar)
+  const TypeNTensor<N, T> & operator*=(const Scalar factor)
   {
-    libmesh_not_implemented();
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    for (unsigned int i = 0; i < size; i++)
+      _coords[i] *= factor;
     return *this;
   }
 
@@ -179,21 +200,24 @@ public:
    * Divide every entry of a tensor by a number.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
-    ScalarTraits<Scalar>::value,
-    TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>>::type
-  operator / (const Scalar) const
+  typename boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                                  TypeNTensor<N, typename CompareTypes<T, Scalar>::supertype>>::type
+  operator/(const Scalar factor) const
   {
-    libmesh_not_implemented();
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    for (unsigned int i = 0; i < size; i++)
+      _coords[i] /= factor;
     return *this;
   }
 
   /**
    * Divide every entry of this tensor by a number.
    */
-  const TypeNTensor<N,T> & operator /= (const T)
+  const TypeNTensor<N, T> & operator/=(const T factor)
   {
-    libmesh_not_implemented();
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    for (unsigned int i = 0; i < size; i++)
+      _coords[i] /= factor;
     return *this;
   }
 
@@ -218,11 +242,7 @@ public:
    * \returns The Frobenius norm of the tensor, i.e. the square-root of
    * the sum of the elements squared.
    */
-  auto norm() const
-  {
-    libmesh_not_implemented();
-    return 0.;
-  }
+  auto norm() const -> decltype(std::norm(T())) { return std::sqrt(norm_sq()); }
 
   /**
    * \returns The Frobenius norm of the tensor squared, i.e. the sum of the
@@ -230,14 +250,22 @@ public:
    */
   auto norm_sq() const
   {
-    libmesh_not_implemented();
-    return 0.;
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    auto norm = 0.;
+    for (unsigned int i = 0; i < size; i++)
+      norm += _coords[i] * _coords[i];
+    return norm;
   }
 
   /**
    * Set all entries of the tensor to 0.
    */
-  void zero() { libmesh_not_implemented(); }
+  void zero()
+  {
+    unsigned int size = int_pow(LIBMESH_DIM, N);
+    for (unsigned int i = 0; i < size; i++)
+      _coords[i] = T(0);
+  }
 
   /**
    * \returns \p true if two tensors are equal, \p false otherwise.
