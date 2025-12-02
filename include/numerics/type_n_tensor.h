@@ -55,13 +55,31 @@ public:
 
   TypeNTensor () : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
 
-  TypeNTensor (const T &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
+  TypeNTensor(const T &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N)))
+  {
+    libmesh_not_implemented();
+  }
 
-  TypeNTensor (const TypeVector<T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
+  TypeNTensor(const TypeVector<T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N)))
+  {
+    libmesh_not_implemented();
+  }
 
-  TypeNTensor (const TypeTensor<T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
+  TypeNTensor(const TypeTensor<T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N)))
+  {
+    libmesh_not_implemented();
+  }
 
-  TypeNTensor (const TypeNTensor<N,T> &) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N))) {}
+  TypeNTensor(const TypeNTensor<N, T> & TN) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N)))
+  {
+    _coords = TN._coords;
+  }
+
+  TypeNTensor(const std::vector<T> & vec) : _coords(std::vector<T>(int_pow(LIBMESH_DIM, N)))
+  {
+    libmesh_assert(int_pow(LIBMESH_DIM, N) == vec.size());
+    _coords = vec;
+  }
 
   TypeNTensor & operator=(const TypeNTensor<N, T> &) { return *this; }
 
