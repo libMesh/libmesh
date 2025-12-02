@@ -61,7 +61,7 @@ private:
 
   }
 
-  void ttestCastVector()
+  void testCastVector()
   {
 
   }
