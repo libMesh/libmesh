@@ -343,7 +343,7 @@ private:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld, 2);
-    build_split_mesh_with_interface(mesh, Nx, Ny, 1.0, 1.0);
+    build_split_mesh_with_interface(mesh, Nx, Ny);
 
     EquationSystems es(mesh);
     LinearImplicitSystem & sys =
@@ -398,7 +398,7 @@ private:
     try
     {
       Mesh mesh(*TestCommWorld, 2);
-      build_split_mesh_with_interface(mesh, Nx, Ny, 1.0, 1.0, true);
+      build_split_mesh_with_interface(mesh, Nx, Ny, true);
     }
     catch (const std::exception &e)
     {
@@ -713,7 +713,7 @@ private:
   }
 
   // The interface is located at x = 0.5; nx must be even (split evenly into left and right subdomains)
-  void build_split_mesh_with_interface(Mesh &mesh, unsigned nx, unsigned ny, double Lx, double Ly, bool test_local_refinement = false)
+  void build_split_mesh_with_interface(Mesh &mesh, unsigned nx, unsigned ny, bool test_local_refinement = false)
   {
     // Ensure nx is even so the interface aligns with element boundaries
     libmesh_error_msg_if(nx % 2 != 0, "nx must be even!");
