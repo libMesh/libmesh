@@ -22,6 +22,7 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/nonlinear_solver.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/static_condensation.h"
@@ -247,6 +248,11 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
                                        bool /*apply_heterogeneous_constraints*/,
                                        bool /*apply_no_constraints*/)
 {
+  libmesh_assert(this->get_mesh().is_prepared());
+#ifdef DEBUG
+  libmesh_assert(MeshTools::valid_is_prepared(this->get_mesh()));
+#endif
+
   // Get current_local_solution in sync
   this->update();
 

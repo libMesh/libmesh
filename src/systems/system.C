@@ -23,6 +23,7 @@
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parameter_vector.h"
 #include "libmesh/point.h"              // For point_value
@@ -551,6 +552,11 @@ void System::assemble ()
   // Log how long the user's assembly code takes
   LOG_SCOPE("assemble()", "System");
 
+  libmesh_assert(this->get_mesh().is_prepared());
+#ifdef DEBUG
+  libmesh_assert(MeshTools::valid_is_prepared(this->get_mesh()));
+#endif
+
   // Call the user-specified assembly function
   this->user_assembly();
 }
@@ -561,6 +567,11 @@ void System::assemble_qoi (const QoISet & qoi_indices)
 {
   // Log how long the user's assembly code takes
   LOG_SCOPE("assemble_qoi()", "System");
+
+  libmesh_assert(this->get_mesh().is_prepared());
+#ifdef DEBUG
+  libmesh_assert(MeshTools::valid_is_prepared(this->get_mesh()));
+#endif
 
   // Call the user-specified quantity of interest function
   this->user_QOI(qoi_indices);
@@ -574,6 +585,11 @@ void System::assemble_qoi_derivative(const QoISet & qoi_indices,
 {
   // Log how long the user's assembly code takes
   LOG_SCOPE("assemble_qoi_derivative()", "System");
+
+  libmesh_assert(this->get_mesh().is_prepared());
+#ifdef DEBUG
+  libmesh_assert(MeshTools::valid_is_prepared(this->get_mesh()));
+#endif
 
   // Call the user-specified quantity of interest function
   this->user_QOI_derivative(qoi_indices, include_liftfunc,

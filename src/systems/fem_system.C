@@ -25,6 +25,7 @@
 #include "libmesh/fem_system.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel_algebra.h"
 #include "libmesh/parallel_ghost_sync.h"
@@ -898,6 +899,11 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
 
   const MeshBase & mesh = this->get_mesh();
 
+  libmesh_assert(mesh.is_prepared());
+#ifdef DEBUG
+  libmesh_assert(MeshTools::valid_is_prepared(mesh));
+#endif
+
   if (print_solution_norms)
     {
       this->solution->close();
@@ -1150,6 +1156,11 @@ void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
 
   const MeshBase & mesh = this->get_mesh();
 
+  libmesh_assert(mesh.is_prepared());
+#ifdef DEBUG
+  libmesh_assert(MeshTools::valid_is_prepared(mesh));
+#endif
+
   this->update();
 
   const unsigned int Nq = this->n_qois();
@@ -1183,6 +1194,11 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
   LOG_SCOPE("assemble_qoi_derivative()", "FEMSystem");
 
   const MeshBase & mesh = this->get_mesh();
+
+  libmesh_assert(mesh.is_prepared());
+#ifdef DEBUG
+  libmesh_assert(MeshTools::valid_is_prepared(mesh));
+#endif
 
   this->update();
 
