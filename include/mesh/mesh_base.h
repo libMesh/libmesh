@@ -519,16 +519,17 @@ public:
    * higher dimensions is checked.  Also, x-z and y-z planar meshes are
    * considered to have spatial dimension == 3.
    *
-   * The spatial dimension is updated during prepare_for_use() based
+   * The spatial dimension is updated during mesh preparation based
    * on the dimensions of the various elements present in the Mesh,
-   * but is *never automatically decreased* by this function.
+   * but is *never automatically decreased*.
    *
    * For example, if the user calls set_spatial_dimension(2) and then
    * later inserts 3D elements into the mesh,
    * Mesh::spatial_dimension() will return 3 after the next call to
-   * prepare_for_use().  On the other hand, if the user calls
-   * set_spatial_dimension(3) and then inserts only x-aligned 1D
-   * elements into the Mesh, mesh.spatial_dimension() will remain 3.
+   * prepare_for_use() or complete_preparation().  On the other hand,
+   * if the user calls set_spatial_dimension(3) and then inserts only
+   * x-aligned 1D elements into the Mesh, mesh.spatial_dimension()
+   * will remain 3.
    */
   unsigned int spatial_dimension () const;
 
