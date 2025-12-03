@@ -215,6 +215,10 @@ void MeshTools::Modification::distort (MeshBase & mesh,
 #endif
         }
   }
+
+  // We haven't changed any topology, but just changing geometry could
+  // have invalidated a point locator.
+  mesh.clear_point_locator();
 }
 
 
@@ -302,6 +306,10 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
       (*node)(2) = output_vec(2);
 #endif
     }
+
+  // We haven't changed any topology, but just changing geometry could
+  // have invalidated a point locator.
+  mesh.clear_point_locator();
 }
 
 
@@ -315,6 +323,10 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 
   for (auto & node : mesh.node_ptr_range())
     *node += p;
+
+  // We haven't changed any topology, but just changing geometry could
+  // have invalidated a point locator.
+  mesh.clear_point_locator();
 }
 
 
@@ -346,6 +358,10 @@ MeshTools::Modification::rotate (MeshBase & mesh,
                                  const Real theta,
                                  const Real psi)
 {
+  // We won't change any topology, but just changing geometry could
+  // invalidate a point locator.
+  mesh.clear_point_locator();
+
 #if LIBMESH_DIM == 3
   const auto R = RealTensorValue::intrinsic_rotation_matrix(phi, theta, psi);
 
@@ -402,6 +418,10 @@ void MeshTools::Modification::scale (MeshBase & mesh,
 
   for (auto & node : mesh.node_ptr_range())
     (*node)(2) *= z_scale;
+
+  // We haven't changed any topology, but just changing geometry could
+  // have invalidated a point locator.
+  mesh.clear_point_locator();
 }
 
 
@@ -1425,8 +1445,6 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
         MeshCommunication().make_nodes_parallel_consistent (mesh);
     }
 
-
-
   // Prepare the newly created mesh for use.
   mesh.prepare_for_use();
 
@@ -1585,6 +1603,10 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
             }
         } // refinement_level loop
     } // end iteration
+
+  // We haven't changed any topology, but just changing geometry could
+  // have invalidated a point locator.
+  mesh.clear_point_locator();
 }
 
 
@@ -1741,6 +1763,10 @@ void MeshTools::Modification::change_subdomain_id (MeshBase & mesh,
       if (elem->subdomain_id() == old_id)
         elem->subdomain_id() = new_id;
     }
+
+  // We just invalidated mesh.get_subdomain_ids(), but it might not be
+  // efficient to fix that here.
+  mesh.set_hasnt_cached_elem_data();
 }
 
 
