@@ -1256,6 +1256,13 @@ public:
    *  10.) removing any remote elements (if enabled)
    *  11.) regenerating summarized boundary id sets
    *
+   * For backwards compatibility, prepare_for_use() performs *all* those
+   * steps, regardless of the official preparation() state of the
+   * mesh.  In codes which have maintained a valid preparation() state
+   * via methods such as set_hasnt_synched_id_counts(), calling
+   * complete_preparation() will result in a fully-prepared mesh at
+   * less cost.
+   *
    * The argument to skip renumbering is now deprecated - to prevent a
    * mesh from being renumbered, set allow_renumbering(false). The argument to skip
    * finding neighbors is also deprecated. To prevent find_neighbors, set
