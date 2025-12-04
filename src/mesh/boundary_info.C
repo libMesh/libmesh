@@ -138,6 +138,8 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
   for (const auto & [elem, id_pair] : other_boundary_info._boundary_side_id)
     _boundary_side_id.emplace(_mesh->elem_ptr(elem->id()), id_pair);
 
+  _children_on_boundary = other_boundary_info._children_on_boundary;
+
   _boundary_ids = other_boundary_info._boundary_ids;
   _global_boundary_ids = other_boundary_info._global_boundary_ids;
   _side_boundary_ids = other_boundary_info._side_boundary_ids;
