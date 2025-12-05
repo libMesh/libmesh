@@ -88,6 +88,16 @@ void VariationalMeshSmoother::setup()
 
   // Create a new mesh, EquationSystems, and System
   _mesh_copy = std::make_unique<DistributedMesh>(_mesh);
+
+  // If the _mesh wasn't prepared, that's fine (we'll just be moving
+  // its nodes), but we do need the copy to be prepared before our
+  // solve does things like looking at neighbors.  We'll disable
+  // repartitioning and renumbering first to make sure that we can
+  // transfer our geometry changes back to the original mesh.
+  _mesh_copy->allow_renumbering(false);
+  _mesh_copy->skip_partitioning(true);
+  _mesh_copy->complete_preparation();
+
   _equation_systems = std::make_unique<EquationSystems>(*_mesh_copy);
   _system =
       &(_equation_systems->add_system<VariationalSmootherSystem>("variational_smoother_system"));

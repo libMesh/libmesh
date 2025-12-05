@@ -170,6 +170,8 @@ int main (int argc, char ** argv)
       if (elem->neighbor_ptr (side) == nullptr)
         mesh.get_boundary_info().add_side(elem, side, BOUNDARY_ID);
 
+  mesh.get_boundary_info().regenerate_id_sets();
+
   // Print information about the mesh to the screen.
   mesh.print_info();
 

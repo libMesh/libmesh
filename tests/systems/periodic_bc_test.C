@@ -215,7 +215,7 @@ private:
 
     // Okay, *now* the mesh knows to save periodic neighbors
     mesh.allow_remote_element_removal(true);
-    mesh.delete_remote_elements();
+    mesh.prepare_for_use();
 
     const unsigned int u_var = sys.add_variable("u", fe_type);
     sys.attach_assemble_function (periodic_bc_test_poisson);
