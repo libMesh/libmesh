@@ -41,6 +41,7 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/point_locator_nanoflann.h"
 #include "libmesh/elem_side_builder.h"
+#include "libmesh/utility.h"
 
 // C++ includes
 #include <algorithm> // for std::min
@@ -1824,13 +1825,18 @@ void MeshBase::cache_elem_data()
 
   for (const auto & elem : this->active_element_ptr_range())
   {
-    _elem_dims.insert(cast_int<unsigned char>(elem->dim()));
+    const auto elem_dim = cast_int<unsigned char>(elem->dim());
+    _elem_dims.insert(elem_dim);
     _elem_default_orders.insert(elem->default_order());
-    _mesh_subdomains.insert(elem->subdomain_id());
+    const auto sub_id = elem->subdomain_id();
+    _mesh_subdomains.insert(sub_id);
     _supported_nodal_order =
       static_cast<Order>
         (std::min(static_cast<int>(_supported_nodal_order),
                   static_cast<int>(elem->supported_nodal_order())));
+#ifdef DEBUG
+    _subdomain_id_to_elem_dims[sub_id].insert(elem_dim);
+#endif
   }
 
   if (!this->is_serial())
@@ -1841,6 +1847,61 @@ void MeshBase::cache_elem_data()
     this->comm().set_union(_elem_default_orders);
     this->comm().min(_supported_nodal_order);
     this->comm().set_union(_mesh_subdomains);
+
+#ifdef DEBUG
+#ifdef LIBMESH_HAVE_MPI
+
+    using Mask = unsigned char;
+
+    // Prepare sparse subdomain id to dense subdomain "id"
+    const auto n_sub = cast_int<int>(_mesh_subdomains.size());
+    std::unordered_map<subdomain_id_type, subdomain_id_type> sub_to_dense_idx;
+    sub_to_dense_idx.reserve(n_sub);
+    std::vector<subdomain_id_type> dense_idx_to_sub;
+    dense_idx_to_sub.reserve(n_sub);
+    {
+      subdomain_id_type dense_idx = 0;
+      for (const auto sub_id : _mesh_subdomains)
+        {
+          sub_to_dense_idx.emplace(sub_id, dense_idx++);
+          dense_idx_to_sub.push_back(sub_id);
+        }
+    }
+
+    // Pack local dimension sets into Mask
+    std::vector<Mask> masks(n_sub, Mask(0));
+    for (const auto & [sub_id, elem_dims] : _subdomain_id_to_elem_dims)
+      {
+        const auto dense_idx = libmesh_map_find(sub_to_dense_idx, sub_id);
+        Mask m = 0;
+        for (const auto dim : elem_dims)
+          m |= Mask(1u << dim);
+
+        masks[dense_idx] = m;
+      }
+    _subdomain_id_to_elem_dims.clear();
+
+    // Communicate the mask data
+    MPI_Allreduce(
+        MPI_IN_PLACE, masks.data(), n_sub, MPI_UNSIGNED_CHAR, MPI_BOR, _communicator.get());
+
+    constexpr unsigned char max_elem_dim = LIBMESH_DIM;
+
+    for (const auto dense_idx : make_range(n_sub))
+      {
+        const auto mask = masks[dense_idx];
+        if (mask == 0)
+          // No elements for this subdomain
+          continue;
+
+        const auto sub_id = dense_idx_to_sub[dense_idx];
+        auto & dim_set = _subdomain_id_to_elem_dims[sub_id];
+        for (const auto dim : make_range(max_elem_dim))
+          if (mask & Mask(1u << dim))
+            dim_set.insert(dim);
+      }
+#endif // LIBMESH_HAVE_MPI
+#endif // DEBUG
   }
 
   // If the largest element dimension found is larger than the current

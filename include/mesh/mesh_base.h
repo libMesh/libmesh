@@ -1844,6 +1844,14 @@ public:
                                      const boundary_id_type b2);
 #endif
 
+#ifdef DEBUG
+  /**
+   * Get the map from subdomain ID to the set of element dimensions contained within
+   * that subdomain
+   */
+  const std::unordered_map<subdomain_id_type, std::unordered_set<unsigned char>> &
+  get_subdomain_to_elem_dims_map() const { return _subdomain_id_to_elem_dims; }
+#endif
 
 protected:
 
@@ -2153,6 +2161,13 @@ protected:
    * on any PointLocators that we create.
    */
   Real _point_locator_close_to_point_tol;
+
+#ifdef DEBUG
+  /**
+   * Map from subdomain ID to the set of element dimensions present in that subdomain
+   */
+  std::unordered_map<subdomain_id_type, std::unordered_set<unsigned char>> _subdomain_id_to_elem_dims;
+#endif
 
   /**
    * The partitioner class is a friend so that it can set

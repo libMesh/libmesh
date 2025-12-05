@@ -3139,6 +3139,37 @@ void DofMap::reinit_static_condensation()
     _sc->reinit();
 }
 
+#ifdef DEBUG
+namespace
+{
+void discontinuity_sanity_check(const System & sys,
+                                const FEType & fe_type,
+                                const std::set<subdomain_id_type> * const active_subdomains)
+{
+  const auto continuity = FEInterface::get_continuity(fe_type);
+  if (continuity != DISCONTINUOUS && continuity != SIDE_DISCONTINUOUS)
+    return;
+
+  const auto & mesh = sys.get_mesh();
+  const auto & sub_to_elem_dims = mesh.get_subdomain_to_elem_dims_map();
+  const auto & var_subdomains = (active_subdomains && !active_subdomains->empty())
+                                    ? *active_subdomains
+                                    : mesh.get_mesh_subdomains();
+  std::unordered_set<unsigned char> var_elem_dims;
+  for (const auto sub_id : var_subdomains)
+    {
+      const auto & sub_elem_dims = libmesh_map_find(sub_to_elem_dims, sub_id);
+      for (const auto dim : sub_elem_dims)
+        var_elem_dims.insert(dim);
+    }
+  libmesh_assert_msg(var_elem_dims.size() <= 1,
+                     "Discontinuous finite element families cannot live on elements with "
+                     "different dimensions because this violates the idea that the family is "
+                     "discontinuous (undefined) at the interface between elements");
+}
+}
+#endif
+
 unsigned int DofMap::add_variable(System & sys,
                                   std::string_view var,
                                   const FEType & type,
@@ -3152,6 +3183,10 @@ unsigned int DofMap::add_variable(System & sys,
 
   if (active_subdomains)
     libmesh_assert(this->comm().verify(active_subdomains->size()));
+
+#ifdef DEBUG
+  discontinuity_sanity_check(sys, type, active_subdomains);
+#endif
 
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
@@ -3261,6 +3296,10 @@ unsigned int DofMap::add_variables(System & sys,
 
   if (active_subdomains)
     libmesh_assert(this->comm().verify(active_subdomains->size()));
+
+#ifdef DEBUG
+  discontinuity_sanity_check(sys, type, active_subdomains);
+#endif
 
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
