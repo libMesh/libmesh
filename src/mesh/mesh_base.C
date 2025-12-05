@@ -862,10 +862,14 @@ void MeshBase::complete_preparation()
 
   libmesh_assert(this->comm().verify(this->is_serial()));
 
+#ifdef DEBUG
   // If we don't go into this method with valid constraint rows, we're
   // only going to be able to make that worse.
-#ifdef DEBUG
   MeshTools::libmesh_assert_valid_constraint_rows(*this);
+
+  // If this mesh thinks it's already  partially prepared, then in
+  // optimized builds we'll trust it, but in debug builds we'll check.
+  const bool was_partly_prepared = (_preparation == Preparation());
 #endif
 
   // A distributed mesh may have processors with no elements (or
@@ -981,6 +985,10 @@ void MeshBase::complete_preparation()
 #endif
 
 #ifdef DEBUG
+  // The if() here avoids both unnecessary work *and* stack overflow
+  if (was_partly_prepared)
+    libmesh_assert(MeshTools::valid_is_prepared(*this));
+
   MeshTools::libmesh_assert_valid_boundary_ids(*this);
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   MeshTools::libmesh_assert_valid_unique_ids(*this);
