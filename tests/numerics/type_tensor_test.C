@@ -24,6 +24,7 @@ public:
 #endif
   CPPUNIT_TEST(testRowCol);
   CPPUNIT_TEST(testIsZero);
+  CPPUNIT_TEST(testIsHPD);
 #ifdef LIBMESH_HAVE_METAPHYSICL
   CPPUNIT_TEST(testReplaceAlgebraicType);
 #endif
@@ -101,6 +102,87 @@ private:
     {
       TensorValue<double> tensor(0,1,2,3,4,5,6,7,8);
       CPPUNIT_ASSERT(!tensor.is_zero());
+    }
+  }
+
+  void testIsHPD()
+  {
+    LOG_UNIT_TEST;
+
+    {
+#if LIBMESH_DIM == 3
+      {
+        TensorValue<double> tensor(2., 1., 0.,
+                                   1., 2., 1.,
+                                   0., 1., 2.);
+
+        CPPUNIT_ASSERT(tensor.is_hpd(/*rel_tol=*/0.));
+      }
+      {
+        // Symmetric but not positive-definite, because the upper 2x2
+        // principal minor is zero.
+        TensorValue<double> tensor(1,  0., 0.,
+                                   0., 0., 1.,
+                                   0., 1., 0.);
+
+        CPPUNIT_ASSERT(!tensor.is_hpd());
+      }
+      {
+        // Random matrix that is SPD by construction
+
+        auto get_random = [&]()
+        {
+          return static_cast<Real>(std::rand()) / RAND_MAX; // in range [0,1]
+        };
+
+        TensorValue<double> tensor(get_random(), get_random(), get_random(),
+                                   get_random(), get_random(), get_random(),
+                                   get_random(), get_random(), get_random());
+
+        // Make symmetric
+        tensor = 0.5*(tensor + tensor.transpose());
+
+        // Make positive definite
+        for (auto i : make_range(LIBMESH_DIM))
+          tensor(i,i) += 3.;
+
+        CPPUNIT_ASSERT(tensor.is_hpd());
+      }
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+
+      auto i = Complex(0, 1);
+      auto one = Complex(1, 0);
+      {
+        // Symmetric but not Hermitian, because Hermitian matrices must
+        // have real-valued entries on the diagonal.
+        TensorValue<Complex> tensor(i,  0., 0.,
+                                    0., 1., 0.,
+                                    0., 0., 1.);
+
+        CPPUNIT_ASSERT(!tensor.is_hpd());
+      }
+      {
+        // Symmetric but not Hermitian, because the off-diagonal
+        // entries must be complex conjugates of one another.
+        TensorValue<Complex> tensor(2,  i,  0.,
+                                    i,  2., i,
+                                    0., i,  2.);
+
+        CPPUNIT_ASSERT(!tensor.is_hpd());
+      }
+      {
+        // Both Hermitian and positive-definite
+        TensorValue<Complex> tensor(2.,     one+i,  0.,
+                                    one-i,  2.,     one+i,
+                                    0.,     one-i,  2.);
+
+        CPPUNIT_ASSERT(tensor.is_hpd());
+      }
+
+#endif
+
+#endif // LIBMESH_DIM == 3
     }
   }
 

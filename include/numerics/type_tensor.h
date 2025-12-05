@@ -436,6 +436,13 @@ public:
   void write_unformatted (std::ostream & out_stream,
                           const bool newline = true) const;
 
+  /**
+   * Returns true if the TypeTensor is Hermitian (or symmetric, when
+   * T==Real) and positive-definite to within the provided relative
+   * tolerance, false otherwise.
+   */
+  bool is_hpd(Real rel_tol = TOLERANCE*TOLERANCE) const;
+
 protected:
 
   /**
