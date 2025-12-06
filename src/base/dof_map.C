@@ -3151,6 +3151,10 @@ void discontinuity_sanity_check(const System & sys,
     return;
 
   const auto & mesh = sys.get_mesh();
+  // This check won't be meaninful if the mesh isn't prepared
+  if (!mesh.is_prepared())
+    return;
+
   const auto & sub_to_elem_dims = mesh.get_subdomain_to_elem_dims_map();
   const auto & var_subdomains = (active_subdomains && !active_subdomains->empty())
                                     ? *active_subdomains
