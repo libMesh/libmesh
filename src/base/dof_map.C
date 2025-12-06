@@ -3139,6 +3139,47 @@ void DofMap::reinit_static_condensation()
     _sc->reinit();
 }
 
+#ifdef DEBUG
+namespace
+{
+unsigned char determine_elem_dims(const MeshBase & mesh,
+                                  const std::set<subdomain_id_type> & subdomains)
+{
+  unsigned char elem_dims = 0;
+  for (const auto * const elem : mesh.active_subdomain_set_element_ptr_range(subdomains))
+    elem_dims |= static_cast<unsigned char>(1u << cast_int<unsigned char>(elem->dim()));
+  mesh.comm().bitwise_or(elem_dims);
+  return elem_dims;
+}
+
+void discontinuity_sanity_check(const System & sys,
+                                const FEType & fe_type,
+                                const std::set<subdomain_id_type> * const active_subdomains)
+{
+  const auto continuity = FEInterface::get_continuity(fe_type);
+  if (continuity != DISCONTINUOUS && continuity != SIDE_DISCONTINUOUS)
+    return;
+
+  const auto & mesh = sys.get_mesh();
+  // This check won't be meaninful if the mesh isn't prepared
+  if (!mesh.is_prepared())
+    return;
+
+  const auto & var_subdomains = (active_subdomains && !active_subdomains->empty())
+                                    ? *active_subdomains
+                                    : mesh.get_mesh_subdomains();
+  const auto var_elem_dims = determine_elem_dims(mesh, var_subdomains);
+  // Power of two trick. Note that unsigned char automatically promoted to int for arithmetic and bitwise operations
+  const bool more_than_one_bit_set = (var_elem_dims & (var_elem_dims - 1)) != 0;
+  libmesh_assert_msg(
+      !more_than_one_bit_set,
+      "Discontinuous finite element families are typically associated with discontinuous Galerkin "
+      "methods. If degrees of freedom are associated with different values of element dimension, "
+      "then generally this will result in a singular system after application of the DG method.");
+}
+}
+#endif
+
 unsigned int DofMap::add_variable(System & sys,
                                   std::string_view var,
                                   const FEType & type,
@@ -3152,6 +3193,10 @@ unsigned int DofMap::add_variable(System & sys,
 
   if (active_subdomains)
     libmesh_assert(this->comm().verify(active_subdomains->size()));
+
+#ifdef DEBUG
+  discontinuity_sanity_check(sys, type, active_subdomains);
+#endif
 
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
@@ -3261,6 +3306,10 @@ unsigned int DofMap::add_variables(System & sys,
 
   if (active_subdomains)
     libmesh_assert(this->comm().verify(active_subdomains->size()));
+
+#ifdef DEBUG
+  discontinuity_sanity_check(sys, type, active_subdomains);
+#endif
 
   // Make sure the variable isn't there already
   // or if it is, that it's the type we want
