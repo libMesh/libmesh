@@ -182,11 +182,13 @@ public:
     MeshTools::Generation::build_line (mesh, 10, 0., 1., EDGE2);
     auto node_elem = mesh.add_elem(Elem::build(NODEELEM));
     node_elem->set_node(0, mesh.node_ptr(0));
+    node_elem->subdomain_id() = 1;
     mesh.prepare_for_use();
 
     EquationSystems es(mesh);
     System &sys = es.add_system<System> ("SimpleSystem");
-    sys.add_variable("u", CONSTANT, MONOMIAL);
+    const std::set<subdomain_id_type> u_subs = {0};
+    sys.add_variable("u", CONSTANT, MONOMIAL, &u_subs);
     es.init();
     es.reinit();
   }
