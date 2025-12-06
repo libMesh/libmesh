@@ -3166,10 +3166,11 @@ void discontinuity_sanity_check(const System & sys,
       for (const auto dim : sub_elem_dims)
         var_elem_dims.insert(dim);
     }
-  libmesh_assert_msg(var_elem_dims.size() <= 1,
-                     "Discontinuous finite element families cannot live on elements with "
-                     "different dimensions because this violates the idea that the family is "
-                     "discontinuous (undefined) at the interface between elements");
+  libmesh_assert_msg(
+      var_elem_dims.size() <= 1,
+      "Discontinuous finite element families are typically associated with discontinuous Galerkin "
+      "methods. If degrees of freedom are associated with different values of element dimension, "
+      "then generally this will result in a singular system after application of the DG method.");
 }
 }
 #endif
