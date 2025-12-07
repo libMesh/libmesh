@@ -40,6 +40,7 @@
 #include <string_view>
 #include <vector>
 #include <memory>
+#include <optional>
 
 // This define may be useful in --disable-optional builds when it is
 // possible that libmesh will not have any solvers available.
@@ -561,7 +562,8 @@ public:
   void project_vector (NumericVector<Number> & new_vector,
                        FunctionBase<Number> * f,
                        FunctionBase<Gradient> * g = nullptr,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -577,7 +579,8 @@ public:
   void project_vector (NumericVector<Number> & new_vector,
                        FEMFunctionBase<Number> * f,
                        FEMFunctionBase<Gradient> * g = nullptr,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -594,7 +597,8 @@ public:
                        GradientFunctionPointer gptr,
                        const Parameters & parameters,
                        NumericVector<Number> & new_vector,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -651,7 +655,8 @@ public:
                                 NumericVector<Number> & new_vector,
                                 FunctionBase<Number> * f,
                                 FunctionBase<Gradient> * g = nullptr,
-                                int is_adjoint = -1) const;
+                                int is_adjoint = -1,
+                                std::optional<ConstElemRange> active_local_range = std::nullopt) const;
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -674,7 +679,8 @@ public:
                                 GradientFunctionPointer gptr,
                                 const Parameters & parameters,
                                 NumericVector<Number> & new_vector,
-                                int is_adjoint = -1) const;
+                                int is_adjoint = -1,
+                                std::optional<ConstElemRange> active_local_range = std::nullopt) const;
 
   /**
    * \returns The system number.
@@ -1984,7 +1990,8 @@ protected:
    * primal constraints if is_adjoint is non-negative.
    */
   void project_vector (NumericVector<Number> &,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
 
   /**
    * Projects the vector defined on the old mesh onto the
@@ -1996,7 +2003,8 @@ protected:
    */
   void project_vector (const NumericVector<Number> &,
                        NumericVector<Number> &,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
 
   /**
    * Whether this object should condense out constrained degrees of freedom
