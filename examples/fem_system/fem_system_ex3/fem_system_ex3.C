@@ -173,6 +173,8 @@ int main (int argc, char ** argv)
             mesh.get_boundary_info().add_edge(elem, e, edge_boundary_id);
     }
 
+  mesh.get_boundary_info().regenerate_id_sets();
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
