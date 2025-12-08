@@ -97,20 +97,22 @@ bool TypeTensor<T>::is_hpd(Real rel_tol) const
   // and all principal minors are real-valued. Since we already
   // checked that the matrix is Hermitian above, we don't bother to
   // check the complex parts are also zero now.
-  if (std::real(A.det()) < -abs_tol)
-    return false;
 
-  // For 3x3, also check the upper 2x2 determinant
+  // For 3x3 and 2x2, check the 1x1 determinant
+#if LIBMESH_DIM > 1
+  if (std::real(A(0,0)) < -abs_tol)
+    return false;
+#endif
+
+  // For 3x3, check the upper 2x2 determinant
 #if LIBMESH_DIM > 2
   if (std::real(A(0,0)*A(1,1) - A(0,1)*A(1,0)) < -abs_tol)
     return false;
 #endif
 
-  // For 3x3 and 2x2, also check the 1x1 determinant
-#if LIBMESH_DIM > 1
-  if (std::real(A(0,0)) < -abs_tol)
+  // Finally, check the full determinant
+  if (std::real(A.det()) < -abs_tol)
     return false;
-#endif
 
   // If we made it here, then the matrix is Hermitian
   // positive-definite.
