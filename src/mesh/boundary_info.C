@@ -513,9 +513,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   boundary_mesh.set_n_partitions() = _mesh->n_partitions();
 
   std::map<dof_id_type, dof_id_type> node_id_map;
-  std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
 
-  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map, subdomains_relative_to);
+  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, nullptr, subdomains_relative_to);
 
   // Let's add all the boundary nodes we found to the boundary mesh
   for (const auto & node : _mesh->node_ptr_range())
