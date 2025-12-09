@@ -3152,12 +3152,36 @@ unsigned char determine_elem_dims(const MeshBase & mesh,
   return elem_dims;
 }
 
-void discontinuity_sanity_check(const System & sys,
+void discontinuity_sanity_check(const std::vector<std::string> & vars,
+                                const System & sys,
                                 const FEType & fe_type,
                                 const std::set<subdomain_id_type> * const active_subdomains)
 {
+  auto make_error_message = [&vars]() {
+    std::ostringstream oss;
+    for (const auto i : index_range(vars))
+      {
+        oss << "'" << vars[i] << "'";
+        if (i + 1 < vars.size())
+          oss << ", ";
+      }
+    const std::string joined = oss.str();
+
+    const bool plural = vars.size() > 1;
+    const std::string var_word = plural ? "variables" : "variable";
+    const std::string is_are = plural ? "are" : "is";
+
+    // Build the final message
+    return "Discontinuous finite element families are typically associated "
+           "with discontinuous Galerkin methods. If degrees of freedom are "
+           "associated with different values of element dimension, then "
+           "generally this will result in a singular system after application "
+           "of the DG method. The discontinuous " +
+           var_word + " " + joined + " " + is_are + " defined on multiple element dimensions.";
+  };
+
   const auto continuity = FEInterface::get_continuity(fe_type);
-  if (continuity != DISCONTINUOUS && continuity != SIDE_DISCONTINUOUS)
+  if (fe_type.family == SCALAR || (continuity != DISCONTINUOUS && continuity != SIDE_DISCONTINUOUS))
     return;
 
   const auto & mesh = sys.get_mesh();
@@ -3169,13 +3193,12 @@ void discontinuity_sanity_check(const System & sys,
                                     ? *active_subdomains
                                     : mesh.get_mesh_subdomains();
   const auto var_elem_dims = determine_elem_dims(mesh, var_subdomains);
-  // Power of two trick. Note that unsigned char automatically promoted to int for arithmetic and bitwise operations
+  // Power of two trick. Note that unsigned char automatically promoted to int for arithmetic and
+  // bitwise operations
   const bool more_than_one_bit_set = (var_elem_dims & (var_elem_dims - 1)) != 0;
-  libmesh_assert_msg(
-      !more_than_one_bit_set,
-      "Discontinuous finite element families are typically associated with discontinuous Galerkin "
-      "methods. If degrees of freedom are associated with different values of element dimension, "
-      "then generally this will result in a singular system after application of the DG method.");
+
+  if (more_than_one_bit_set)
+    libmesh_error_msg(make_error_message());
 }
 }
 #endif
@@ -3195,7 +3218,8 @@ unsigned int DofMap::add_variable(System & sys,
     libmesh_assert(this->comm().verify(active_subdomains->size()));
 
 #ifdef DEBUG
-  discontinuity_sanity_check(sys, type, active_subdomains);
+  discontinuity_sanity_check(
+      std::vector<std::string>{std::string(var)}, sys, type, active_subdomains);
 #endif
 
   // Make sure the variable isn't there already
@@ -3300,6 +3324,7 @@ unsigned int DofMap::add_variables(System & sys,
 
   libmesh_assert(!sys.is_initialized());
 
+  libmesh_assert(vars.size());
   libmesh_assert(this->comm().verify(vars.size()));
   libmesh_assert(this->comm().verify(type));
   libmesh_assert(this->comm().verify((active_subdomains == nullptr)));
@@ -3308,7 +3333,7 @@ unsigned int DofMap::add_variables(System & sys,
     libmesh_assert(this->comm().verify(active_subdomains->size()));
 
 #ifdef DEBUG
-  discontinuity_sanity_check(sys, type, active_subdomains);
+  discontinuity_sanity_check(vars, sys, type, active_subdomains);
 #endif
 
   // Make sure the variable isn't there already
