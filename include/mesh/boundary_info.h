@@ -971,6 +971,13 @@ private:
                           const std::set<boundary_id_type> & requested_boundary_ids) const;
 
   /**
+   * Helper to determine whether the element is in the requested subdomains
+   */
+  bool
+  _elem_in_requested_subdomains(const Elem * elem,
+                                const std::set<subdomain_id_type> & subdomains_relative_to) const;
+
+  /**
    * A pointer to the Mesh this boundary info pertains to.
    */
   MeshBase * _mesh;

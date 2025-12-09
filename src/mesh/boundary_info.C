@@ -489,6 +489,20 @@ bool BoundaryInfo::_side_is_requested(
   return false;
 }
 
+inline bool BoundaryInfo::_elem_in_requested_subdomains(
+    const Elem * elem, const std::set<subdomain_id_type> & subdomains_relative_to) const
+{
+  // If the subdomains_relative_to container has the
+  // invalid_subdomain_id, we fall back on the "old" behavior of
+  // adding sides regardless of this Elem's subdomain. Otherwise,
+  // if the subdomains_relative_to container doesn't contain the
+  // current Elem's subdomain_id(), we won't add any sides from
+  // it.
+  if (subdomains_relative_to.count(Elem::invalid_subdomain_id))
+    return true;
+  return subdomains_relative_to.count(elem->subdomain_id());
+}
+
 void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_ids,
                          UnstructuredMesh & boundary_mesh,
                          const std::set<subdomain_id_type> & subdomains_relative_to)
@@ -732,14 +746,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
   for (const auto & elem : _mesh->element_ptr_range())
     {
-      // If the subdomains_relative_to container has the
-      // invalid_subdomain_id, we fall back on the "old" behavior of
-      // adding sides regardless of this Elem's subdomain. Otherwise,
-      // if the subdomains_relative_to container doesn't contain the
-      // current Elem's subdomain_id(), we won't add any sides from
-      // it.
-      if (!subdomains_relative_to.count(Elem::invalid_subdomain_id) &&
-          !subdomains_relative_to.count(elem->subdomain_id()))
+      if (!this->_elem_in_requested_subdomains(elem))
         continue;
 
       for (auto s : elem->side_index_range())
@@ -3347,14 +3354,7 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
 
       const Elem * elem = *el;
 
-      // If the subdomains_relative_to container has the
-      // invalid_subdomain_id, we fall back on the "old" behavior of
-      // adding sides regardless of this Elem's subdomain. Otherwise,
-      // if the subdomains_relative_to container doesn't contain the
-      // current Elem's subdomain_id(), we won't add any sides from
-      // it.
-      if (!subdomains_relative_to.count(Elem::invalid_subdomain_id) &&
-          !subdomains_relative_to.count(elem->subdomain_id()))
+      if (!this->_elem_in_requested_subdomains(elem, subdomains_relative_to))
         continue;
 
       for (auto s : elem->side_index_range())
