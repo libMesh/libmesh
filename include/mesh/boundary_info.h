@@ -964,6 +964,13 @@ private:
                       const std::set<subdomain_id_type> & subdomains_relative_to);
 
   /**
+   * Helper for determining whether a side is requested
+   */
+  bool _side_is_requested(const Elem * elem,
+                          unsigned short int side,
+                          const std::set<boundary_id_type> & requested_boundary_ids) const;
+
+  /**
    * A pointer to the Mesh this boundary info pertains to.
    */
   MeshBase * _mesh;

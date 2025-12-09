@@ -462,7 +462,32 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
              subdomains_relative_to);
 }
 
+bool BoundaryInfo::_side_is_requested(
+    const Elem * const elem,
+    const unsigned short int side,
+    const std::set<boundary_id_type> & requested_boundary_ids) const
+{
+  // Find all the boundary side ids for this Elem side.
+  std::vector<boundary_id_type> bcids;
+  this->boundary_ids(elem, side, bcids);
 
+  for (const auto bcid : bcids)
+    // if the user wants this id, we want this side
+    if (requested_boundary_ids.count(bcid))
+      return true;
+
+  // We may still want to add this side if the user called
+  // our APIs with no requested_boundary_ids. This corresponds
+  // to the "old" style of calling our APIs in which the entire
+  // boundary was copied to the BoundaryMesh, and handles the
+  // case where elements on the geometric boundary are not in
+  // any sidesets.
+  if (requested_boundary_ids.count(invalid_id) &&
+      elem->neighbor_ptr(side) == nullptr)
+    return true;
+
+  return false;
+}
 
 void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_ids,
                          UnstructuredMesh & boundary_mesh,
@@ -718,36 +743,8 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
         continue;
 
       for (auto s : elem->side_index_range())
-        {
-          bool add_this_side = false;
-
-          // Find all the boundary side ids for this Elem side.
-          std::vector<boundary_id_type> bcids;
-          this->boundary_ids(elem, s, bcids);
-
-          for (const boundary_id_type bcid : bcids)
-            {
-              // if the user wants this id, we want this side
-              if (requested_boundary_ids.count(bcid))
-                {
-                  add_this_side = true;
-                  break;
-                }
-            }
-
-          // We may still want to add this side if the user called
-          // sync() with no requested_boundary_ids. This corresponds
-          // to the "old" style of calling sync() in which the entire
-          // boundary was copied to the BoundaryMesh, and handles the
-          // case where elements on the geometric boundary are not in
-          // any sidesets.
-          if (requested_boundary_ids.count(invalid_id) &&
-              elem->neighbor_ptr(s) == nullptr)
-            add_this_side = true;
-
-          if (add_this_side)
-            sides_to_add.emplace_back(elem->id(), s);
-        }
+        if (this->_side_is_requested(elem, s, requested_boundary_ids))
+          sides_to_add.emplace_back(elem->id(), s);
     }
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -3361,68 +3358,40 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
         continue;
 
       for (auto s : elem->side_index_range())
-        {
-          bool add_this_side = false;
+        if (this->_side_is_requested(elem, s, requested_boundary_ids))
+          {
+            // We only assign ids for our own and for
+            // unpartitioned elements
+            if (side_id_map &&
+                ((elem->processor_id() == this->processor_id()) ||
+                 (elem->processor_id() ==
+                  DofObject::invalid_processor_id)))
+              {
+                std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
+                libmesh_assert (!side_id_map->count(side_pair));
+                (*side_id_map)[side_pair] = next_elem_id;
+                next_elem_id += this->n_processors() + 1;
+              }
 
-          // Find all the boundary side ids for this Elem side.
-          std::vector<boundary_id_type> bcids;
-          this->boundary_ids(elem, s, bcids);
+            side = &side_builder(*elem, s);
+            for (auto n : side->node_index_range())
+              {
+                const Node & node = side->node_ref(n);
 
-          for (const boundary_id_type bcid : bcids)
-            {
-              // if the user wants this id, we want this side
-              if (requested_boundary_ids.count(bcid))
-                {
-                  add_this_side = true;
-                  break;
-                }
-            }
+                // In parallel we don't know enough to number
+                // others' nodes ourselves.
+                if (!hit_end_el &&
+                    (node.processor_id() != this->processor_id()))
+                  continue;
 
-          // We may still want to add this side if the user called
-          // sync() with no requested_boundary_ids. This corresponds
-          // to the "old" style of calling sync() in which the entire
-          // boundary was copied to the BoundaryMesh, and handles the
-          // case where elements on the geometric boundary are not in
-          // any sidesets.
-          if (requested_boundary_ids.count(invalid_id) &&
-              elem->neighbor_ptr(s) == nullptr)
-            add_this_side = true;
-
-          if (add_this_side)
-            {
-              // We only assign ids for our own and for
-              // unpartitioned elements
-              if (side_id_map &&
-                  ((elem->processor_id() == this->processor_id()) ||
-                   (elem->processor_id() ==
-                    DofObject::invalid_processor_id)))
-                {
-                  std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
-                  libmesh_assert (!side_id_map->count(side_pair));
-                  (*side_id_map)[side_pair] = next_elem_id;
-                  next_elem_id += this->n_processors() + 1;
-                }
-
-              side = &side_builder(*elem, s);
-              for (auto n : side->node_index_range())
-                {
-                  const Node & node = side->node_ref(n);
-
-                  // In parallel we don't know enough to number
-                  // others' nodes ourselves.
-                  if (!hit_end_el &&
-                      (node.processor_id() != this->processor_id()))
-                    continue;
-
-                  dof_id_type node_id = node.id();
-                  if (node_id_map && !node_id_map->count(node_id))
-                    {
-                      (*node_id_map)[node_id] = next_node_id;
-                      next_node_id += this->n_processors() + 1;
-                    }
-                }
-            }
-        }
+                dof_id_type node_id = node.id();
+                if (node_id_map && !node_id_map->count(node_id))
+                  {
+                    (*node_id_map)[node_id] = next_node_id;
+                    next_node_id += this->n_processors() + 1;
+                  }
+              }
+          }
     }
 
   // FIXME: ought to renumber side/node_id_map image to be contiguous
