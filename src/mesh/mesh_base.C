@@ -284,8 +284,7 @@ void MeshBase::assert_equal_to (const MeshBase & other_mesh,
       if (!this->processor_id())
         {
           std::string error_msg {failure_context};
-          error_msg += '\n' +
-            "Meshes failed asserted equality in at least these aspects:\n";
+          error_msg += "\nMeshes failed asserted equality in at least these aspects:\n";
           for (auto & diff : unique_diffs)
             {
               error_msg += diff;
