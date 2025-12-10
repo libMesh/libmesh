@@ -829,14 +829,21 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 LibMeshInit::~LibMeshInit()
 {
   // Every processor had better be ready to exit at the same time.
-  // This would be a libmesh_parallel_only() function, except that
-  // libmesh_parallel_only() uses libmesh_assert() which throws an
-  // exception() which causes compilers to scream about exceptions
-  // inside destructors.
-
   // Even if we're not doing parallel_only debugging, we don't want
   // one processor to try to exit until all others are done working.
-  this->comm().barrier();
+
+  // We could be destructing here because we're unwinding the stack
+  // due to a thrown exception, though.  It's possible that an
+  // application is catching exceptions outside of the LibMeshInit
+  // scope, or that we're using a C++ compiler that does unwinding
+  // for uncaught exceptions (the standard says whether to go straight
+  // to terminate() or unwind first is "implementation-defined").  If
+  // *that* is the case then we can't safely communicate with other
+  // processors that might not all be unwinding too.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  if (std::uncaught_exceptions())
+#endif
+    this->comm().barrier();
 
   // We can't delete, finalize, etc. more than once without
   // reinitializing in between
