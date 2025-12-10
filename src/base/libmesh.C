@@ -278,6 +278,36 @@ void uninstall_thread_buffered_sync()
     }
 }
 
+
+/**
+ * Helper to do cleanup from both destructor and terminate
+ */
+void cleanup_stream_buffers()
+{
+  // Before resetting the stream buffers, let's remove our thread wrappers
+  if (!libMesh::on_command_line ("--disable-thread-safe-output"))
+    uninstall_thread_buffered_sync();
+
+  if (libMesh::on_command_line ("--redirect-stdout") ||
+      libMesh::on_command_line ("--redirect-output"))
+    {
+      // If stdout/stderr were redirected to files, reset them now.
+      libMesh::out.rdbuf (out_buf);
+      libMesh::err.rdbuf (err_buf);
+    }
+
+  // If we built our own output streams, we want to clean them up.
+  if (libMesh::on_command_line ("--separate-libmeshout"))
+    {
+      delete libMesh::out.get();
+      delete libMesh::err.get();
+
+      libMesh::out.reset(std::cout);
+      libMesh::err.reset(std::cerr);
+    }
+}
+
+
 bool warned_about_auto_ptr(false);
 
 PerfLog            perflog ("libMesh",
@@ -854,27 +884,7 @@ LibMeshInit::~LibMeshInit()
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
 
-  // Before resetting the stream buffers, let's remove our thread wrappers
-  if (!libMesh::on_command_line ("--disable-thread-safe-output"))
-    uninstall_thread_buffered_sync();
-
-  if (libMesh::on_command_line ("--redirect-stdout") ||
-      libMesh::on_command_line ("--redirect-output"))
-    {
-      // If stdout/stderr were redirected to files, reset them now.
-      libMesh::out.rdbuf (out_buf);
-      libMesh::err.rdbuf (err_buf);
-    }
-
-  // If we built our own output streams, we want to clean them up.
-  if (libMesh::on_command_line ("--separate-libmeshout"))
-    {
-      delete libMesh::out.get();
-      delete libMesh::err.get();
-
-      libMesh::out.reset(std::cout);
-      libMesh::err.reset(std::cerr);
-    }
+  cleanup_stream_buffers();
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // Reset the old terminate handler; maybe the user code wants to
