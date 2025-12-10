@@ -1334,14 +1334,17 @@ void libmesh_assert_valid_is_prepared (const MeshBase & mesh)
   if (prep.is_partitioned)
     libmesh_assert_msg
       (!mesh.n_unpartitioned_elem() && !mesh.n_unpartitioned_nodes(),
-       "Mesh data does not match mesh preparation().is_partitioned");
+       "Mesh preparation().is_partitioned does not reflect mesh data.");
 
   // If the mesh thinks it's prepared in some way, *re*-preparing in
   // that way shouldn't change a clone of it, as long as we disallow
   // repartitioning or renumbering or remote element removal.
   std::unique_ptr<MeshBase> mesh_clone = reprepared_mesh_clone(mesh);
 
-  mesh.assert_equal_to(*mesh_clone, "Mesh data does not match mesh preparation().");
+  mesh.assert_equal_to
+    (*mesh_clone,
+     "Mesh data does not match mesh preparation().\n"
+     "Efficiently-prepared mesh != exhaustively-prepared clone.");
 }
 
 
