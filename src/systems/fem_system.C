@@ -896,7 +896,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
 
   libmesh_assert(mesh.is_prepared());
 #ifdef DEBUG
-  libmesh_assert(MeshTools::valid_is_prepared(mesh));
+  MeshTools::libmesh_assert_valid_is_prepared(mesh);
 #endif
 
   if (print_solution_norms)
@@ -1151,7 +1151,7 @@ void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
 
   libmesh_assert(mesh.is_prepared());
 #ifdef DEBUG
-  libmesh_assert(MeshTools::valid_is_prepared(mesh));
+  MeshTools::libmesh_assert_valid_is_prepared(mesh);
 #endif
 
   this->update();
@@ -1189,7 +1189,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
 
   libmesh_assert(mesh.is_prepared());
 #ifdef DEBUG
-  libmesh_assert(MeshTools::valid_is_prepared(mesh));
+  MeshTools::libmesh_assert_valid_is_prepared(mesh);
 #endif
 
   this->update();
