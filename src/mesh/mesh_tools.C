@@ -51,7 +51,7 @@
 
 
 // ------------------------------------------------------------
-// anonymous namespace for helper classes
+// anonymous namespace for helper classes and subroutines
 namespace {
 
 using namespace libMesh;
@@ -405,6 +405,68 @@ void find_nodal_neighbors_helper(const dof_id_type global_id,
   // accordingly.
   neighbors.assign(neighbor_set.begin(), neighbor_set.end());
 }
+
+
+
+std::unique_ptr<MeshBase> reprepared_mesh_clone (const MeshBase & mesh)
+{
+  const MeshBase::Preparation prep = mesh.preparation();
+
+  // If the mesh thinks it's prepared in some way, *re*-preparing in
+  // that way shouldn't change a clone of it, as long as we disallow
+  // repartitioning or renumbering or remote element removal.
+  std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
+
+  const bool old_allow_renumbering = mesh_clone->allow_renumbering();
+  const bool old_allow_remote_element_removal =
+    mesh_clone->allow_remote_element_removal();
+  const bool old_skip_partitioning = mesh_clone->skip_partitioning();
+  mesh_clone->allow_renumbering(false);
+  mesh_clone->allow_remote_element_removal(false);
+  mesh_clone->skip_partitioning(true);
+
+  // If the mesh thinks it's already completely prepared, test that
+  if (prep)
+    mesh_clone->prepare_for_use();
+  // If the mesh thinks it's somewhat prepared, test each way it
+  // thinks so.
+  else
+    {
+      if (prep.has_synched_id_counts)
+        mesh_clone->update_parallel_id_counts();
+
+      if (prep.has_neighbor_ptrs)
+        mesh_clone->find_neighbors();
+
+      if (prep.has_cached_elem_data)
+        mesh_clone->cache_elem_data();
+
+      if (prep.has_interior_parent_ptrs)
+        mesh_clone->detect_interior_parents();
+
+      if (old_allow_remote_element_removal &&
+          prep.has_removed_remote_elements)
+        mesh_clone->delete_remote_elements();
+
+      if (prep.has_removed_orphaned_nodes)
+        mesh_clone->remove_orphaned_nodes();
+
+      if (prep.has_boundary_id_sets)
+        mesh_clone->get_boundary_info().regenerate_id_sets();
+
+      // I don't know how we'll tell if this changes anything, but
+      // we'll do it for completeness
+      if (prep.has_reinit_ghosting_functors)
+        mesh_clone->reinit_ghosting_functors();
+    }
+
+  mesh_clone->allow_renumbering(old_allow_renumbering);
+  mesh_clone->allow_remote_element_removal(old_allow_remote_element_removal);
+  mesh_clone->skip_partitioning(old_skip_partitioning);
+
+  return mesh_clone;
+}
+
 
 }
 
@@ -1246,54 +1308,7 @@ bool valid_is_prepared (const MeshBase & mesh)
   // If the mesh thinks it's prepared in some way, *re*-preparing in
   // that way shouldn't change a clone of it, as long as we disallow
   // repartitioning or renumbering or remote element removal.
-  std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
-
-  const bool old_allow_renumbering = mesh_clone->allow_renumbering();
-  const bool old_allow_remote_element_removal =
-    mesh_clone->allow_remote_element_removal();
-  const bool old_skip_partitioning = mesh_clone->skip_partitioning();
-  mesh_clone->allow_renumbering(false);
-  mesh_clone->allow_remote_element_removal(false);
-  mesh_clone->skip_partitioning(true);
-
-  // If the mesh thinks it's already completely prepared, test that
-  if (prep)
-    mesh_clone->prepare_for_use();
-  // If the mesh thinks it's somewhat prepared, test each way it
-  // thinks so.
-  else
-    {
-      if (prep.has_synched_id_counts)
-        mesh_clone->update_parallel_id_counts();
-
-      if (prep.has_neighbor_ptrs)
-        mesh_clone->find_neighbors();
-
-      if (prep.has_cached_elem_data)
-        mesh_clone->cache_elem_data();
-
-      if (prep.has_interior_parent_ptrs)
-        mesh_clone->detect_interior_parents();
-
-      if (old_allow_remote_element_removal &&
-          prep.has_removed_remote_elements)
-        mesh_clone->delete_remote_elements();
-
-      if (prep.has_removed_orphaned_nodes)
-        mesh_clone->remove_orphaned_nodes();
-
-      if (prep.has_boundary_id_sets)
-        mesh_clone->get_boundary_info().regenerate_id_sets();
-
-      // I don't know how we'll tell if this changes anything, but
-      // we'll do it for completeness
-      if (prep.has_reinit_ghosting_functors)
-        mesh_clone->reinit_ghosting_functors();
-    }
-
-  mesh_clone->allow_renumbering(old_allow_renumbering);
-  mesh_clone->allow_remote_element_removal(old_allow_remote_element_removal);
-  mesh_clone->skip_partitioning(old_skip_partitioning);
+  std::unique_ptr<MeshBase> mesh_clone = reprepared_mesh_clone(mesh);
 
   return (mesh == *mesh_clone);
 }
@@ -1301,6 +1316,37 @@ bool valid_is_prepared (const MeshBase & mesh)
 
 
 #ifndef NDEBUG
+
+
+void libmesh_assert_valid_is_prepared (const MeshBase & mesh)
+{
+  LOG_SCOPE("libmesh_assert_valid_is_prepared()", "MeshTools");
+
+  const MeshBase::Preparation prep = mesh.preparation();
+
+  // If the mesh doesn't think *anything* has been prepared, we have
+  // nothing to check.
+  if (prep == MeshBase::Preparation())
+    return;
+
+  // If the mesh thinks it's partitioned, check.  These are counts,
+  // not caches, so it's a real check.
+  if (prep.is_partitioned)
+    libmesh_assert_msg
+      (!mesh.n_unpartitioned_elem() && !mesh.n_unpartitioned_nodes(),
+       "Mesh data does not match mesh preparation().is_partitioned");
+
+  // If the mesh thinks it's prepared in some way, *re*-preparing in
+  // that way shouldn't change a clone of it, as long as we disallow
+  // repartitioning or renumbering or remote element removal.
+  std::unique_ptr<MeshBase> mesh_clone = reprepared_mesh_clone(mesh);
+
+  mesh.assert_equal_to(*mesh_clone, "Mesh data does not match mesh preparation().");
+}
+
+
+
+
 
 void libmesh_assert_equal_n_systems (const MeshBase & mesh)
 {
