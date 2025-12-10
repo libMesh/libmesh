@@ -431,6 +431,11 @@ void libmesh_terminate_handler()
   libMesh::perflog.print_log();
   libMesh::perflog.clear();
 
+  // Now that we're done with output we should clean up our stream
+  // buffers; if we fail to uninstall_thread_buffered_sync() when
+  // needed we can end up seeing a segfault in iostreams destructors
+  cleanup_stream_buffers();
+
   // If we have MPI and it has been initialized, we need to be sure
   // and call MPI_Abort instead of std::abort, so that the parallel
   // job can die nicely.
