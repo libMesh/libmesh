@@ -174,7 +174,7 @@ void libmesh_handleSEGV(int /*signo*/, siginfo_t * info, void * /*context*/)
                     << "  bt");
 }
 #endif
-}
+} // anonymous namespace
 
 
 
