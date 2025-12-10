@@ -124,7 +124,8 @@ AS_IF([test "x${with_hdf5}" != "xno"],
       [
     AS_IF([test -d "${HDF5_PREFIX}/lib"],
           [
-            HDF5_LIBS="-L${HDF5_PREFIX}/lib -lhdf5"
+            HDF5_LDFLAGS="-L${HDF5_PREFIX}/lib"
+            HDF5_LIBS="-lhdf5"
           ])
 
     dnl If there is an "rpath" flag detected, append it to the various
@@ -132,7 +133,7 @@ AS_IF([test "x${with_hdf5}" != "xno"],
     dnl not the right approach for some compilers.
     AS_IF([test "x$RPATHFLAG" != "x" && test -d "${HDF5_PREFIX}/lib"],
           [
-            HDF5_LIBS="${HDF5_LIBS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
+            HDF5_LDFLAGS="${HDF5_LDFLAGS} ${RPATHFLAG}${HDF5_PREFIX}/lib"
           ])
 
     AS_IF([test -d "${HDF5_PREFIX}/include"], [HDF5_CPPFLAGS="-I${HDF5_PREFIX}/include"])
@@ -144,7 +145,8 @@ AS_IF([test "x${with_hdf5}" != "xno"],
 
     CFLAGS="${HDF5_CPPFLAGS} ${CFLAGS}"
     CPPFLAGS="${HDF5_CPPFLAGS} ${CPPFLAGS}"
-    LDFLAGS="${HDF5_LIBS} ${LDFLAGS}"
+    LDFLAGS="${HDF5_LDFLAGS} ${LDFLAGS}"
+    LIBS="${HDF5_LIBS} ${LIBS}"
     AC_LANG_PUSH([C])
     AC_CHECK_HEADER([hdf5.h],[found_header=yes],[found_header=no])
 
@@ -231,6 +233,7 @@ AS_IF([test "x${with_hdf5}" != "xno"],
             AC_DEFINE(HAVE_HDF5,1,[Define if HDF5 is available])
             AC_SUBST(HDF5_CFLAGS)
             AC_SUBST(HDF5_CPPFLAGS)
+            AC_SUBST(HDF5_LDFLAGS)
             AC_SUBST(HDF5_LIBS)
             AC_SUBST(HDF5_PREFIX)
           ])
