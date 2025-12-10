@@ -576,7 +576,7 @@ void System::assemble ()
 
   libmesh_assert(this->get_mesh().is_prepared());
 #ifdef DEBUG
-  libmesh_assert(MeshTools::valid_is_prepared(this->get_mesh()));
+  MeshTools::libmesh_assert_valid_is_prepared(this->get_mesh());
 #endif
 
   // Call the user-specified assembly function
@@ -592,7 +592,7 @@ void System::assemble_qoi (const QoISet & qoi_indices)
 
   libmesh_assert(this->get_mesh().is_prepared());
 #ifdef DEBUG
-  libmesh_assert(MeshTools::valid_is_prepared(this->get_mesh()));
+  MeshTools::libmesh_assert_valid_is_prepared(this->get_mesh());
 #endif
 
   // Call the user-specified quantity of interest function
@@ -610,7 +610,7 @@ void System::assemble_qoi_derivative(const QoISet & qoi_indices,
 
   libmesh_assert(this->get_mesh().is_prepared());
 #ifdef DEBUG
-  libmesh_assert(MeshTools::valid_is_prepared(this->get_mesh()));
+  MeshTools::libmesh_assert_valid_is_prepared(this->get_mesh());
 #endif
 
   // Call the user-specified quantity of interest function
