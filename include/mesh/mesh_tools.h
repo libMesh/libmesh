@@ -394,11 +394,15 @@ void clear_spline_nodes(MeshBase &);
 
 /**
  * A function for testing whether a mesh's cached is_prepared() setting
- * is not a false positive.  If the mesh is marked as not prepared, or
- * if preparing the already-partitioned mesh (without any
- * repartitioning or renumbering) does not change it, then we return
- * true.  If the mesh believes it is prepared but prepare_for_use()
- * would change it, we return false.
+ * is not a false positive, and that its preparation() values are not
+ * false positives.  If the mesh is marked as completely not prepared, or
+ * if preparing a already-prepared mesh (without any repartitioning or
+ * renumbering) or preparing after a complete_preparation() (likewise)
+ * does not change the mesh, then we return true.  If the mesh believes it
+ * is prepared but prepare_for_use() would change it, or if the mesh
+ * believes it is partially prepared in a certain way but
+ * complete_preparation() does not completely prepare it, we return
+ * false.
  */
 bool valid_is_prepared (const MeshBase & mesh);
 
@@ -411,6 +415,13 @@ bool valid_is_prepared (const MeshBase & mesh);
  */
 
 #ifndef NDEBUG
+
+/**
+ * Like libmesh_assert(MeshTools::valid_is_prepared(mesh)), but
+ * provides more information on preparation incompleteness in case of
+ * an error.
+ */
+void libmesh_assert_valid_is_prepared (const MeshBase & mesh);
 
 /**
  * A function for testing that all DofObjects within a mesh
