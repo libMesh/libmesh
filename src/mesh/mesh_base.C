@@ -299,6 +299,8 @@ void MeshBase::assert_equal_to (const MeshBase & other_mesh,
       // know user code is going to catch that error and sync up with
       // us later.
     }
+#else
+  libmesh_ignore(other_mesh, failure_context);
 #endif // NDEBUG
 }
 
