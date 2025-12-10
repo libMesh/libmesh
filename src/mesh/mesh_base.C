@@ -322,7 +322,7 @@ std::string_view MeshBase::first_difference_from(const MeshBase & other_mesh) co
   //
   // We use separate tests here and return strings for each test,
   // to make it easy to see the failing condition a
-  // MeshTools::valid_is_prepared(mesh) is failing.
+  // MeshTools::libmesh_valid_is_prepared(mesh) is failing.
 
 #define CHECK_MEMBER(member_name) \
   if (member_name != other_mesh.member_name) \
@@ -1004,7 +1004,7 @@ void MeshBase::complete_preparation()
 #ifdef DEBUG
   // The if() here avoids both unnecessary work *and* stack overflow
   if (was_partly_prepared)
-    libmesh_assert(MeshTools::valid_is_prepared(*this));
+    MeshTools::libmesh_assert_valid_is_prepared(*this);
 
   MeshTools::libmesh_assert_valid_boundary_ids(*this);
 #ifdef LIBMESH_ENABLE_UNIQUE_ID

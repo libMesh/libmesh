@@ -250,7 +250,7 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
 {
   libmesh_assert(this->get_mesh().is_prepared());
 #ifdef DEBUG
-  libmesh_assert(MeshTools::valid_is_prepared(this->get_mesh()));
+  MeshTools::libmesh_assert_valid_is_prepared(this->get_mesh());
 #endif
 
   // Get current_local_solution in sync
