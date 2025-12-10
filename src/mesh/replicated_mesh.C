@@ -59,23 +59,27 @@ ReplicatedMesh::ReplicatedMesh (const Parallel::Communicator & comm_in,
 }
 
 
-bool ReplicatedMesh::subclass_locally_equals(const MeshBase & other_mesh_base) const
+std::string_view ReplicatedMesh::subclass_first_difference_from (const MeshBase & other_mesh_base) const
 {
   const ReplicatedMesh * rep_mesh_ptr =
     dynamic_cast<const ReplicatedMesh *>(&other_mesh_base);
   if (!rep_mesh_ptr)
-    return false;
+    return "ReplicatedMesh class";
   const ReplicatedMesh & other_mesh = *rep_mesh_ptr;
 
-  if (_n_nodes != other_mesh._n_nodes ||
-      _n_elem != other_mesh._n_elem ||
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-      _next_unique_id != other_mesh._next_unique_id ||
-#endif
-      !this->nodes_and_elements_equal(other_mesh))
-    return false;
+#define CHECK_MEMBER(member_name) \
+  if (member_name != other_mesh.member_name) \
+    return #member_name;
 
-  return true;
+  CHECK_MEMBER(_n_nodes);
+  CHECK_MEMBER(_n_elem);
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  CHECK_MEMBER(_next_unique_id);
+#endif
+  if (!this->nodes_and_elements_equal(other_mesh))
+    return "nodes and/or elements";
+
+  return "";
 }
 
 
