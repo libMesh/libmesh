@@ -409,7 +409,7 @@ bool valid_is_prepared (const MeshBase & mesh);
 ///@{
 
 /**
- * The following functions, only available in builds with NDEBUG
+ * The following functions, no-ops except in builds with NDEBUG
  * undefined, are for asserting internal consistency that we hope
  * should never be broken in opt
  */
@@ -654,6 +654,39 @@ namespace Private {
  */
 void globally_renumber_nodes_and_elements (MeshBase &);
 } // end namespace Private
+
+
+// Declare inline no-ops for assertions with NDEBUG defined
+#ifdef NDEBUG
+
+void libmesh_assert_valid_is_prepared (const MeshBase &) {}
+
+void libmesh_assert_equal_n_systems (const MeshBase &) {}
+
+void libmesh_assert_old_dof_objects (const MeshBase &) {}
+
+void libmesh_assert_valid_node_pointers (const MeshBase &) {}
+
+void libmesh_assert_valid_remote_elems (const MeshBase &) {}
+
+void libmesh_assert_valid_elem_ids (const MeshBase &) {}
+
+void libmesh_assert_valid_amr_elem_ids (const MeshBase &) {}
+
+void libmesh_assert_valid_amr_interior_parents (const MeshBase &) {}
+
+void libmesh_assert_contiguous_dof_ids (const MeshBase &, unsigned int) {}
+
+template <typename DofObjectSubclass>
+void libmesh_assert_topology_consistent_procids (const MeshBase &) {}
+
+void libmesh_assert_canonical_node_procids (const MeshBase &) {}
+
+void libmesh_assert_valid_refinement_tree (const MeshBase &) {}
+
+#endif // NDEBUG
+
+
 
 } // end namespace MeshTools
 
