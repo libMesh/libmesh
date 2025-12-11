@@ -249,7 +249,7 @@ void NonlinearImplicitSystem::assembly(bool get_residual,
                                        bool /*apply_no_constraints*/)
 {
   libmesh_assert(this->get_mesh().is_prepared());
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(LIBMESH_ENABLE_DEPRECATED)
   MeshTools::libmesh_assert_valid_is_prepared(this->get_mesh());
 #endif
 
