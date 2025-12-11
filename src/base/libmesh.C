@@ -841,7 +841,7 @@ LibMeshInit::~LibMeshInit()
   // *that* is the case then we can't safely communicate with other
   // processors that might not all be unwinding too.
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
-  if (std::uncaught_exceptions())
+  if (!std::uncaught_exceptions())
 #endif
     this->comm().barrier();
 
