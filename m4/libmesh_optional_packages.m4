@@ -304,6 +304,13 @@ AS_IF([test "$enabletrilinos" = yes],
 
 
 # -------------------------------------------------------------
+# NVTX -- enabled by default
+# -------------------------------------------------------------
+CONFIGURE_NVTX
+# --------------------------------------------------------------
+
+
+# -------------------------------------------------------------
 # Choose between TBB, OpenMP, and pthreads thread models.
 # The user can control this by configuring with
 #
