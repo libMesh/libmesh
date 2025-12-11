@@ -553,7 +553,7 @@ void System::assemble ()
   LOG_SCOPE("assemble()", "System");
 
   libmesh_assert(this->get_mesh().is_prepared());
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(LIBMESH_ENABLE_DEPRECATED)
   MeshTools::libmesh_assert_valid_is_prepared(this->get_mesh());
 #endif
 
@@ -569,7 +569,7 @@ void System::assemble_qoi (const QoISet & qoi_indices)
   LOG_SCOPE("assemble_qoi()", "System");
 
   libmesh_assert(this->get_mesh().is_prepared());
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(LIBMESH_ENABLE_DEPRECATED)
   MeshTools::libmesh_assert_valid_is_prepared(this->get_mesh());
 #endif
 
@@ -587,7 +587,7 @@ void System::assemble_qoi_derivative(const QoISet & qoi_indices,
   LOG_SCOPE("assemble_qoi_derivative()", "System");
 
   libmesh_assert(this->get_mesh().is_prepared());
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(LIBMESH_ENABLE_DEPRECATED)
   MeshTools::libmesh_assert_valid_is_prepared(this->get_mesh());
 #endif
 
