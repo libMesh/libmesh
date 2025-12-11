@@ -174,7 +174,7 @@ void libmesh_handleSEGV(int /*signo*/, siginfo_t * info, void * /*context*/)
                     << "  bt");
 }
 #endif
-}
+} // anonymous namespace
 
 
 
@@ -277,6 +277,36 @@ void uninstall_thread_buffered_sync()
       _err_prewrap_buf = nullptr;
     }
 }
+
+
+/**
+ * Helper to do cleanup from both destructor and terminate
+ */
+void cleanup_stream_buffers()
+{
+  // Before resetting the stream buffers, let's remove our thread wrappers
+  if (!libMesh::on_command_line ("--disable-thread-safe-output"))
+    uninstall_thread_buffered_sync();
+
+  if (libMesh::on_command_line ("--redirect-stdout") ||
+      libMesh::on_command_line ("--redirect-output"))
+    {
+      // If stdout/stderr were redirected to files, reset them now.
+      libMesh::out.rdbuf (out_buf);
+      libMesh::err.rdbuf (err_buf);
+    }
+
+  // If we built our own output streams, we want to clean them up.
+  if (libMesh::on_command_line ("--separate-libmeshout"))
+    {
+      delete libMesh::out.get();
+      delete libMesh::err.get();
+
+      libMesh::out.reset(std::cout);
+      libMesh::err.reset(std::cerr);
+    }
+}
+
 
 bool warned_about_auto_ptr(false);
 
@@ -400,6 +430,11 @@ void libmesh_terminate_handler()
   // throw that away.
   libMesh::perflog.print_log();
   libMesh::perflog.clear();
+
+  // Now that we're done with output we should clean up our stream
+  // buffers; if we fail to uninstall_thread_buffered_sync() when
+  // needed we can end up seeing a segfault in iostreams destructors
+  cleanup_stream_buffers();
 
   // If we have MPI and it has been initialized, we need to be sure
   // and call MPI_Abort instead of std::abort, so that the parallel
@@ -794,14 +829,21 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 LibMeshInit::~LibMeshInit()
 {
   // Every processor had better be ready to exit at the same time.
-  // This would be a libmesh_parallel_only() function, except that
-  // libmesh_parallel_only() uses libmesh_assert() which throws an
-  // exception() which causes compilers to scream about exceptions
-  // inside destructors.
-
   // Even if we're not doing parallel_only debugging, we don't want
   // one processor to try to exit until all others are done working.
-  this->comm().barrier();
+
+  // We could be destructing here because we're unwinding the stack
+  // due to a thrown exception, though.  It's possible that an
+  // application is catching exceptions outside of the LibMeshInit
+  // scope, or that we're using a C++ compiler that does unwinding
+  // for uncaught exceptions (the standard says whether to go straight
+  // to terminate() or unwind first is "implementation-defined").  If
+  // *that* is the case then we can't safely communicate with other
+  // processors that might not all be unwinding too.
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  if (!std::uncaught_exceptions())
+#endif
+    this->comm().barrier();
 
   // We can't delete, finalize, etc. more than once without
   // reinitializing in between
@@ -854,27 +896,7 @@ LibMeshInit::~LibMeshInit()
   // Set the initialized() flag to false
   libMeshPrivateData::_is_initialized = false;
 
-  // Before resetting the stream buffers, let's remove our thread wrappers
-  if (!libMesh::on_command_line ("--disable-thread-safe-output"))
-    uninstall_thread_buffered_sync();
-
-  if (libMesh::on_command_line ("--redirect-stdout") ||
-      libMesh::on_command_line ("--redirect-output"))
-    {
-      // If stdout/stderr were redirected to files, reset them now.
-      libMesh::out.rdbuf (out_buf);
-      libMesh::err.rdbuf (err_buf);
-    }
-
-  // If we built our own output streams, we want to clean them up.
-  if (libMesh::on_command_line ("--separate-libmeshout"))
-    {
-      delete libMesh::out.get();
-      delete libMesh::err.get();
-
-      libMesh::out.reset(std::cout);
-      libMesh::err.reset(std::cerr);
-    }
+  cleanup_stream_buffers();
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // Reset the old terminate handler; maybe the user code wants to
