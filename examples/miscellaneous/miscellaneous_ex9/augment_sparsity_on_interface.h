@@ -57,7 +57,7 @@ public:
                              boundary_id_type crack_boundary_upper);
 
 
-  virtual std::unique_ptr<GhostingFunctor> clone () const
+  virtual std::unique_ptr<GhostingFunctor> clone () const override
   {
     return std::make_unique<AugmentSparsityOnInterface>
       (_mesh, _crack_boundary_lower, _crack_boundary_upper);

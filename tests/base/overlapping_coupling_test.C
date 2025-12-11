@@ -60,7 +60,7 @@ class OverlappingCouplingFunctor : public GhostingFunctor
 
   virtual ~OverlappingCouplingFunctor(){};
 
-  virtual std::unique_ptr<GhostingFunctor> clone () const
+  virtual std::unique_ptr<GhostingFunctor> clone () const override
   {
     auto clone_functor =
       std::make_unique<OverlappingCouplingFunctor>(_system);
