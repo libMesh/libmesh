@@ -481,6 +481,10 @@
 /* Flag indicating whether the library will be compiled with NLOPT support */
 #undef HAVE_NLOPT
 
+/* Flag indicating whether the library shall be compiled to use NVTX
+   annotations */
+#undef HAVE_NVTX_API
+
 /* Define if OpenMP is enabled */
 #undef HAVE_OPENMP
 

@@ -842,6 +842,7 @@ ax_pthread_config
 OPENMP_CXXFLAGS
 OPENMP_FFLAGS
 OPENMP_CFLAGS
+NVTX_INCLUDE
 TPETRA_INCLUDES
 TPETRA_LIBS
 ML_INCLUDES
@@ -1275,6 +1276,8 @@ with_nox
 with_ml
 with_tpetra
 with_dtk
+enable_nvtx
+with_nvtx
 with_thread_model
 enable_openmp
 enable_pthreads
@@ -2101,6 +2104,7 @@ Optional Features:
                           configure
   --disable-slepc         build without SLEPc eigen solver support
   --disable-trilinos      build without Trilinos support
+  --disable-nvtx          build without annotation support via NVTX
   --disable-openmp        build without OpenMP support
   --disable-pthreads      build without POSIX threading (pthreads) support
   --disable-tbb           build without threading support via Threading
@@ -2222,6 +2226,7 @@ Optional Packages:
   --with-ml=PATH          Specify the path to ML installation
   --with-tpetra=PATH      Specify the path to Tpetra installation
   --with-dtk=PATH         Specify the path to Dtk installation
+  --with-nvtx=PATH        Specify the path where NVTX is installed
   --with-thread-model=tbb,pthread,openmp,auto,none
                           Specify the thread model to use
   --with-tbb=PATH         Specify the path where Threading Building Blocks is
@@ -56276,6 +56281,149 @@ fi
 
 
 # -------------------------------------------------------------
+# NVTX -- enabled by default
+# -------------------------------------------------------------
+
+  # Check whether --enable-nvtx was given.
+if test ${enable_nvtx+y}
+then :
+  enableval=$enable_nvtx; case "${enableval}" in #(
+  yes) :
+    enablenvtx=yes ;; #(
+  no) :
+    enablenvtx=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-nvtx" "$LINENO" 5 ;;
+esac
+else case e in #(
+  e) enablenvtx=$enableoptional ;;
+esac
+fi
+
+
+  if test "x$enablenvtx" = "xyes"
+then :
+
+
+# Check whether --with-nvtx was given.
+if test ${with_nvtx+y}
+then :
+  withval=$with_nvtx; withnvtx=$withval
+else case e in #(
+  e) withnvtx=$NVTX_DIR ;;
+esac
+fi
+
+
+          if test "$withnvtx" != no
+then :
+
+                  if test "x$withnvtx" = "x"
+then :
+  withnvtx=/usr
+fi
+                  as_ac_Header=`printf "%s\n" "ac_cv_header_$withnvtx/include/nvtx3/nvtx3.hpp" | sed "$as_sed_sh"`
+ac_fn_cxx_check_header_compile "$LINENO" "$withnvtx/include/nvtx3/nvtx3.hpp" "$as_ac_Header" "$ac_includes_default"
+if eval test \"x\$"$as_ac_Header"\" = x"yes"
+then :
+  NVTX_INCLUDE_PATH=$withnvtx/include
+fi
+
+
+fi
+
+          if test -r $NVTX_INCLUDE_PATH/nvtx3/nvtx3.hpp
+then :
+
+                  NVTX_INCLUDE=-I$NVTX_INCLUDE_PATH
+
+else case e in #(
+  e) enablenvtx=no ;;
+esac
+fi
+
+                              if test "x$enablenvtx" != "xno"
+then :
+
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for nvtx3::mark support" >&5
+printf %s "checking for nvtx3::mark support... " >&6; }
+                  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+                                    saveCXXFLAGS="$CXXFLAGS"
+                  CXXFLAGS="$saveCXXFLAGS $NVTX_INCLUDE"
+
+                  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+                      #include <nvtx3/nvtx3.hpp>
+
+int
+main (void)
+{
+
+                      nvtx3::mark("Hello world!");
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"
+then :
+
+                      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+                      enablenvtx=yes
+
+else case e in #(
+  e)
+                      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+                      enablenvtx=no
+                     ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+
+                                    CXXFLAGS=$saveCXXFLAGS
+
+                  ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
+
+
+fi
+
+                              if test "x$enablenvtx" != "xno"
+then :
+
+
+
+printf "%s\n" "#define HAVE_NVTX_API 1" >>confdefs.h
+
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with NVTX annotation support >>>" >&5
+printf "%s\n" "<<< Configuring library with NVTX annotation support >>>" >&6; }
+
+fi
+
+fi
+
+if test "$enablenvtx" = yes
+then :
+
+        libmesh_optional_INCLUDES="$NVTX_INCLUDE $libmesh_optional_INCLUDES"
+
+fi
+# --------------------------------------------------------------
+
+
+# -------------------------------------------------------------
 # Choose between TBB, OpenMP, and pthreads thread models.
 # The user can control this by configuring with
 #
@@ -68264,6 +68412,7 @@ then :
 fi
         printf "%s\n" "  netgen........................... : $enablenetgen"
         printf "%s\n" "  nlopt............................ : $enablenlopt"
+        printf "%s\n" "  nvtx............................. : $enablenvtx"
         printf "%s\n" "  parmetis......................... : $enableparmetis"
         printf "%s\n" "  petsc............................ : $enablepetsc"
         if test "x$enablepetsc" = "xyes"
