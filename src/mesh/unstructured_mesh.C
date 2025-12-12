@@ -836,7 +836,8 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
           for (auto & elem_pair : ip_map)
             {
               Elem * ip = const_cast<Elem *>(elem_pair.first->interior_parent());
-              libmesh_assert(ip == other_interior_mesh->elem_ptr(ip->id()));
+              libmesh_assert(ip == remote_elem ||
+                             ip == other_interior_mesh->elem_ptr(ip->id()));
               elem_pair.second->set_interior_parent(ip);
             }
         else
