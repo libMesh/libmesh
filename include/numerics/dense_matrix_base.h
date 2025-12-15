@@ -136,7 +136,7 @@ public:
    * if T2 is scalar.  Return type is void
    */
   template <typename T2, typename T3>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<T2>::value, void >::type
   add (const T2 factor,
        const DenseMatrixBase<T3> & mat);
@@ -190,7 +190,7 @@ protected:
 template<typename T>
 template<typename T2, typename T3>
 inline
-typename boostcopy::enable_if_c<
+typename std::enable_if<
   ScalarTraits<T2>::value, void >::type
 DenseMatrixBase<T>::add (const T2 factor,
                          const DenseMatrixBase<T3> & mat)

@@ -86,7 +86,7 @@ public:
                          const Scalar & zx=0,
                          const Scalar & zy=0,
                          typename
-                         boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                         std::enable_if<ScalarTraits<Scalar>::value,
                          const Scalar>::type & zz=0);
 
   /**
@@ -139,7 +139,7 @@ public:
    * Assignment-from-scalar operator.  Used only to zero out tensors.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TensorValue &>::type
   operator = (const Scalar & libmesh_dbg_var(p) )
@@ -247,7 +247,7 @@ TensorValue<T>::TensorValue (const Scalar & xx,
                              const Scalar & zx,
                              const Scalar & zy,
                              typename
-                             boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                             std::enable_if<ScalarTraits<Scalar>::value,
                              const Scalar>::type & zz) :
   TypeTensor<T> (xx,xy,xz,yx,yy,yz,zx,zy,zz)
 {

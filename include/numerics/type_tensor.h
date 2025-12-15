@@ -92,7 +92,7 @@ protected:
                         const Scalar & zx=0,
                         const Scalar & zy=0,
                         typename
-                        boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                        std::enable_if<ScalarTraits<Scalar>::value,
                         const Scalar>::type & zz=0);
 
   /**
@@ -147,7 +147,7 @@ public:
    * \returns A reference to *this.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeTensor &>::type
   operator = (const Scalar & libmesh_dbg_var(p))
@@ -254,7 +254,7 @@ public:
    */
   template <typename Scalar>
   auto
-  operator * (const Scalar & scalar) const -> typename boostcopy::enable_if_c<
+  operator * (const Scalar & scalar) const -> typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeTensor<decltype(T() * scalar)>>::type;
 
@@ -263,7 +263,7 @@ public:
    *
    * \returns A reference to *this.
    */
-  template <typename Scalar, typename boostcopy::enable_if_c<
+  template <typename Scalar, typename std::enable_if<
                                ScalarTraits<Scalar>::value, int>::type = 0>
   const TypeTensor<T> & operator *= (const Scalar & factor)
     {
@@ -279,7 +279,7 @@ public:
    * \returns A copy of the result, this tensor is unchanged.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
   operator / (const Scalar &) const;
@@ -592,7 +592,7 @@ TypeTensor<T>::TypeTensor (const Scalar & xx,
                            const Scalar & zx,
                            const Scalar & zy,
                            typename
-                           boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                           std::enable_if<ScalarTraits<Scalar>::value,
                            const Scalar>::type & zz)
 {
   _coords[0] = xx;
@@ -969,7 +969,7 @@ template <typename T>
 template <typename Scalar>
 inline
 auto
-TypeTensor<T>::operator * (const Scalar & factor) const -> typename boostcopy::enable_if_c<
+TypeTensor<T>::operator * (const Scalar & factor) const -> typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeTensor<decltype(T() * factor)>>::type
 {
@@ -1004,7 +1004,7 @@ TypeTensor<T>::operator * (const Scalar & factor) const -> typename boostcopy::e
 
 template <typename T, typename Scalar>
 inline
-typename boostcopy::enable_if_c<
+typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
 operator * (const Scalar & factor,
@@ -1016,7 +1016,7 @@ operator * (const Scalar & factor,
 template <typename T>
 template <typename Scalar>
 inline
-typename boostcopy::enable_if_c<
+typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
 TypeTensor<T>::operator / (const Scalar & factor) const

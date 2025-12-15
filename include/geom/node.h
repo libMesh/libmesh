@@ -90,7 +90,7 @@ public:
    */
   template <typename T,
             typename = typename
-              boostcopy::enable_if_c<ScalarTraits<T>::value,void>::type>
+              std::enable_if<ScalarTraits<T>::value,void>::type>
   explicit Node (const T x) :
     Point (x,0,0)
   { this->set_id() = invalid_id; }
