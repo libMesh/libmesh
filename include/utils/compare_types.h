@@ -19,14 +19,15 @@
 #ifndef LIBMESH_COMPARE_TYPES_H
 #define LIBMESH_COMPARE_TYPES_H
 
-// System includes
-#include <complex>
-
 #include "libmesh_config.h"
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 #include "libmesh_common.h" // for Real
 #endif
+
+// System includes
+#include <complex>
+#include <type_traits>
 
 namespace libMesh
 {
