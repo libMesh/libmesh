@@ -976,7 +976,8 @@ void MeshBase::complete_preparation()
   // partition() call will still check for orphaned nodes.
   if (!skip_partitioning() && !_preparation.is_partitioned)
     this->partition();
-  else
+  else if (!this->n_unpartitioned_elem() &&
+           !this->n_unpartitioned_nodes())
     _preparation.is_partitioned = true;
 
   // If we're using DistributedMesh, we'll probably want it
@@ -998,8 +999,15 @@ void MeshBase::complete_preparation()
   if (!_skip_renumber_nodes_and_elements)
     this->renumber_nodes_and_elements();
 
-  // The mesh is now prepared for use, and it should know it.
-  libmesh_assert(_preparation);
+  // The mesh is now prepared for use, with the possible exception of
+  // partitioning that was supposed to be skipped, and it should know
+  // it.
+#ifndef NDEBUG
+  Preparation completed_preparation = _preparation;
+  if (skip_partitioning())
+    completed_preparation.is_partitioned = true;
+  libmesh_assert(completed_preparation);
+#endif
 
 #ifdef DEBUG
   // The if() here avoids both unnecessary work *and* stack overflow
