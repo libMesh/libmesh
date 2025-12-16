@@ -234,9 +234,9 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	numerics/parsed_function_test.C numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
-	numerics/type_tensor_test.C numerics/sparse_matrix_test.h \
-	numerics/dense_matrix_test.C numerics/petsc_matrix_test.C \
-	numerics/diagonal_matrix_test.C \
+	numerics/type_tensor_test.C numerics/type_N_tensor_test.C \
+	numerics/sparse_matrix_test.h numerics/dense_matrix_test.C \
+	numerics/petsc_matrix_test.C numerics/diagonal_matrix_test.C \
 	numerics/lumped_mass_matrix_test.C \
 	numerics/eigen_sparse_matrix_test.C \
 	numerics/tensor_traits_test.C parallel/message_tag.C \
@@ -345,6 +345,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	numerics/unit_tests_dbg-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-vector_value_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-type_tensor_test.$(OBJEXT) \
+	numerics/unit_tests_dbg-type_N_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-dense_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-petsc_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_dbg-diagonal_matrix_test.$(OBJEXT) \
@@ -437,9 +438,9 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	numerics/parsed_function_test.C numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
-	numerics/type_tensor_test.C numerics/sparse_matrix_test.h \
-	numerics/dense_matrix_test.C numerics/petsc_matrix_test.C \
-	numerics/diagonal_matrix_test.C \
+	numerics/type_tensor_test.C numerics/type_N_tensor_test.C \
+	numerics/sparse_matrix_test.h numerics/dense_matrix_test.C \
+	numerics/petsc_matrix_test.C numerics/diagonal_matrix_test.C \
 	numerics/lumped_mass_matrix_test.C \
 	numerics/eigen_sparse_matrix_test.C \
 	numerics/tensor_traits_test.C parallel/message_tag.C \
@@ -547,6 +548,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	numerics/unit_tests_devel-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_devel-vector_value_test.$(OBJEXT) \
 	numerics/unit_tests_devel-type_tensor_test.$(OBJEXT) \
+	numerics/unit_tests_devel-type_N_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_devel-dense_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_devel-petsc_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_devel-diagonal_matrix_test.$(OBJEXT) \
@@ -635,9 +637,9 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	numerics/parsed_function_test.C numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
-	numerics/type_tensor_test.C numerics/sparse_matrix_test.h \
-	numerics/dense_matrix_test.C numerics/petsc_matrix_test.C \
-	numerics/diagonal_matrix_test.C \
+	numerics/type_tensor_test.C numerics/type_N_tensor_test.C \
+	numerics/sparse_matrix_test.h numerics/dense_matrix_test.C \
+	numerics/petsc_matrix_test.C numerics/diagonal_matrix_test.C \
 	numerics/lumped_mass_matrix_test.C \
 	numerics/eigen_sparse_matrix_test.C \
 	numerics/tensor_traits_test.C parallel/message_tag.C \
@@ -745,6 +747,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	numerics/unit_tests_oprof-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-vector_value_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-type_tensor_test.$(OBJEXT) \
+	numerics/unit_tests_oprof-type_N_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-dense_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-petsc_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_oprof-diagonal_matrix_test.$(OBJEXT) \
@@ -833,9 +836,9 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	numerics/parsed_function_test.C numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
-	numerics/type_tensor_test.C numerics/sparse_matrix_test.h \
-	numerics/dense_matrix_test.C numerics/petsc_matrix_test.C \
-	numerics/diagonal_matrix_test.C \
+	numerics/type_tensor_test.C numerics/type_N_tensor_test.C \
+	numerics/sparse_matrix_test.h numerics/dense_matrix_test.C \
+	numerics/petsc_matrix_test.C numerics/diagonal_matrix_test.C \
 	numerics/lumped_mass_matrix_test.C \
 	numerics/eigen_sparse_matrix_test.C \
 	numerics/tensor_traits_test.C parallel/message_tag.C \
@@ -943,6 +946,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	numerics/unit_tests_opt-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_opt-vector_value_test.$(OBJEXT) \
 	numerics/unit_tests_opt-type_tensor_test.$(OBJEXT) \
+	numerics/unit_tests_opt-type_N_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_opt-dense_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_opt-petsc_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_opt-diagonal_matrix_test.$(OBJEXT) \
@@ -1031,9 +1035,9 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	numerics/parsed_function_test.C numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
-	numerics/type_tensor_test.C numerics/sparse_matrix_test.h \
-	numerics/dense_matrix_test.C numerics/petsc_matrix_test.C \
-	numerics/diagonal_matrix_test.C \
+	numerics/type_tensor_test.C numerics/type_N_tensor_test.C \
+	numerics/sparse_matrix_test.h numerics/dense_matrix_test.C \
+	numerics/petsc_matrix_test.C numerics/diagonal_matrix_test.C \
 	numerics/lumped_mass_matrix_test.C \
 	numerics/eigen_sparse_matrix_test.C \
 	numerics/tensor_traits_test.C parallel/message_tag.C \
@@ -1141,6 +1145,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	numerics/unit_tests_prof-trilinos_epetra_vector_test.$(OBJEXT) \
 	numerics/unit_tests_prof-vector_value_test.$(OBJEXT) \
 	numerics/unit_tests_prof-type_tensor_test.$(OBJEXT) \
+	numerics/unit_tests_prof-type_N_tensor_test.$(OBJEXT) \
 	numerics/unit_tests_prof-dense_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_prof-petsc_matrix_test.$(OBJEXT) \
 	numerics/unit_tests_prof-diagonal_matrix_test.$(OBJEXT) \
@@ -1574,6 +1579,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	numerics/$(DEPDIR)/unit_tests_dbg-petsc_vector_test.Po \
 	numerics/$(DEPDIR)/unit_tests_dbg-tensor_traits_test.Po \
 	numerics/$(DEPDIR)/unit_tests_dbg-trilinos_epetra_vector_test.Po \
+	numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_dbg-vector_value_test.Po \
 	numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Po \
@@ -1592,6 +1598,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Po \
 	numerics/$(DEPDIR)/unit_tests_devel-tensor_traits_test.Po \
 	numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Po \
+	numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_devel-vector_value_test.Po \
 	numerics/$(DEPDIR)/unit_tests_oprof-composite_function_test.Po \
@@ -1610,6 +1617,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Po \
 	numerics/$(DEPDIR)/unit_tests_oprof-tensor_traits_test.Po \
 	numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Po \
+	numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_oprof-vector_value_test.Po \
 	numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Po \
@@ -1628,6 +1636,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Po \
 	numerics/$(DEPDIR)/unit_tests_opt-tensor_traits_test.Po \
 	numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Po \
+	numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_opt-vector_value_test.Po \
 	numerics/$(DEPDIR)/unit_tests_prof-composite_function_test.Po \
@@ -1646,6 +1655,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Po \
 	numerics/$(DEPDIR)/unit_tests_prof-tensor_traits_test.Po \
 	numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Po \
+	numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Po \
 	numerics/$(DEPDIR)/unit_tests_prof-vector_value_test.Po \
 	parallel/$(DEPDIR)/unit_tests_dbg-message_tag.Po \
@@ -2302,9 +2312,9 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	numerics/parsed_function_test.C numerics/petsc_vector_test.C \
 	numerics/trilinos_epetra_vector_test.C \
 	numerics/type_vector_test.h numerics/vector_value_test.C \
-	numerics/type_tensor_test.C numerics/sparse_matrix_test.h \
-	numerics/dense_matrix_test.C numerics/petsc_matrix_test.C \
-	numerics/diagonal_matrix_test.C \
+	numerics/type_tensor_test.C numerics/type_N_tensor_test.C \
+	numerics/sparse_matrix_test.h numerics/dense_matrix_test.C \
+	numerics/petsc_matrix_test.C numerics/diagonal_matrix_test.C \
 	numerics/lumped_mass_matrix_test.C \
 	numerics/eigen_sparse_matrix_test.C \
 	numerics/tensor_traits_test.C parallel/message_tag.C \
@@ -2719,6 +2729,8 @@ numerics/unit_tests_dbg-vector_value_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_dbg-type_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_dbg-type_N_tensor_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_dbg-dense_matrix_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_dbg-petsc_matrix_test.$(OBJEXT):  \
@@ -3009,6 +3021,8 @@ numerics/unit_tests_devel-vector_value_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_devel-type_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_devel-type_N_tensor_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_devel-dense_matrix_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_devel-petsc_matrix_test.$(OBJEXT):  \
@@ -3256,6 +3270,8 @@ numerics/unit_tests_oprof-trilinos_epetra_vector_test.$(OBJEXT):  \
 numerics/unit_tests_oprof-vector_value_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_oprof-type_tensor_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_oprof-type_N_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_oprof-dense_matrix_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
@@ -3505,6 +3521,8 @@ numerics/unit_tests_opt-vector_value_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_opt-type_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_opt-type_N_tensor_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_opt-dense_matrix_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_opt-petsc_matrix_test.$(OBJEXT):  \
@@ -3752,6 +3770,8 @@ numerics/unit_tests_prof-trilinos_epetra_vector_test.$(OBJEXT):  \
 numerics/unit_tests_prof-vector_value_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_prof-type_tensor_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/unit_tests_prof-type_N_tensor_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_prof-dense_matrix_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
@@ -4232,6 +4252,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-petsc_vector_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-tensor_traits_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-trilinos_epetra_vector_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_dbg-vector_value_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Po@am__quote@ # am--include-marker
@@ -4250,6 +4271,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-tensor_traits_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_devel-vector_value_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-composite_function_test.Po@am__quote@ # am--include-marker
@@ -4268,6 +4290,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-tensor_traits_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_oprof-vector_value_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Po@am__quote@ # am--include-marker
@@ -4286,6 +4309,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-tensor_traits_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_opt-vector_value_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-composite_function_test.Po@am__quote@ # am--include-marker
@@ -4304,6 +4328,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-tensor_traits_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@numerics/$(DEPDIR)/unit_tests_prof-vector_value_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@parallel/$(DEPDIR)/unit_tests_dbg-message_tag.Po@am__quote@ # am--include-marker
@@ -5643,6 +5668,20 @@ numerics/unit_tests_dbg-type_tensor_test.obj: numerics/type_tensor_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_dbg-type_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_dbg-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
+
+numerics/unit_tests_dbg-type_N_tensor_test.o: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_dbg-type_N_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Tpo -c -o numerics/unit_tests_dbg-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_dbg-type_N_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_dbg-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+
+numerics/unit_tests_dbg-type_N_tensor_test.obj: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_dbg-type_N_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Tpo -c -o numerics/unit_tests_dbg-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_dbg-type_N_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_dbg-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
 
 numerics/unit_tests_dbg-dense_matrix_test.o: numerics/dense_matrix_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_dbg-dense_matrix_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_dbg-dense_matrix_test.Tpo -c -o numerics/unit_tests_dbg-dense_matrix_test.o `test -f 'numerics/dense_matrix_test.C' || echo '$(srcdir)/'`numerics/dense_matrix_test.C
@@ -7310,6 +7349,20 @@ numerics/unit_tests_devel-type_tensor_test.obj: numerics/type_tensor_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
 
+numerics/unit_tests_devel-type_N_tensor_test.o: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-type_N_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Tpo -c -o numerics/unit_tests_devel-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_devel-type_N_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+
+numerics/unit_tests_devel-type_N_tensor_test.obj: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-type_N_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Tpo -c -o numerics/unit_tests_devel-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_devel-type_N_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_devel-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
+
 numerics/unit_tests_devel-dense_matrix_test.o: numerics/dense_matrix_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_devel-dense_matrix_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_devel-dense_matrix_test.Tpo -c -o numerics/unit_tests_devel-dense_matrix_test.o `test -f 'numerics/dense_matrix_test.C' || echo '$(srcdir)/'`numerics/dense_matrix_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_devel-dense_matrix_test.Tpo numerics/$(DEPDIR)/unit_tests_devel-dense_matrix_test.Po
@@ -8975,6 +9028,20 @@ numerics/unit_tests_oprof-type_tensor_test.obj: numerics/type_tensor_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_tensor_test.C' object='numerics/unit_tests_oprof-type_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
+
+numerics/unit_tests_oprof-type_N_tensor_test.o: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-type_N_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Tpo -c -o numerics/unit_tests_oprof-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_oprof-type_N_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+
+numerics/unit_tests_oprof-type_N_tensor_test.obj: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-type_N_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Tpo -c -o numerics/unit_tests_oprof-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_oprof-type_N_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_oprof-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
 
 numerics/unit_tests_oprof-dense_matrix_test.o: numerics/dense_matrix_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_oprof-dense_matrix_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_oprof-dense_matrix_test.Tpo -c -o numerics/unit_tests_oprof-dense_matrix_test.o `test -f 'numerics/dense_matrix_test.C' || echo '$(srcdir)/'`numerics/dense_matrix_test.C
@@ -10642,6 +10709,20 @@ numerics/unit_tests_opt-type_tensor_test.obj: numerics/type_tensor_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
 
+numerics/unit_tests_opt-type_N_tensor_test.o: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-type_N_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Tpo -c -o numerics/unit_tests_opt-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_opt-type_N_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+
+numerics/unit_tests_opt-type_N_tensor_test.obj: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-type_N_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Tpo -c -o numerics/unit_tests_opt-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_opt-type_N_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_opt-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
+
 numerics/unit_tests_opt-dense_matrix_test.o: numerics/dense_matrix_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_opt-dense_matrix_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_opt-dense_matrix_test.Tpo -c -o numerics/unit_tests_opt-dense_matrix_test.o `test -f 'numerics/dense_matrix_test.C' || echo '$(srcdir)/'`numerics/dense_matrix_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_opt-dense_matrix_test.Tpo numerics/$(DEPDIR)/unit_tests_opt-dense_matrix_test.Po
@@ -12308,6 +12389,20 @@ numerics/unit_tests_prof-type_tensor_test.obj: numerics/type_tensor_test.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-type_tensor_test.obj `if test -f 'numerics/type_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_tensor_test.C'; fi`
 
+numerics/unit_tests_prof-type_N_tensor_test.o: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-type_N_tensor_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Tpo -c -o numerics/unit_tests_prof-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_prof-type_N_tensor_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-type_N_tensor_test.o `test -f 'numerics/type_N_tensor_test.C' || echo '$(srcdir)/'`numerics/type_N_tensor_test.C
+
+numerics/unit_tests_prof-type_N_tensor_test.obj: numerics/type_N_tensor_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-type_N_tensor_test.obj -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Tpo -c -o numerics/unit_tests_prof-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='numerics/type_N_tensor_test.C' object='numerics/unit_tests_prof-type_N_tensor_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o numerics/unit_tests_prof-type_N_tensor_test.obj `if test -f 'numerics/type_N_tensor_test.C'; then $(CYGPATH_W) 'numerics/type_N_tensor_test.C'; else $(CYGPATH_W) '$(srcdir)/numerics/type_N_tensor_test.C'; fi`
+
 numerics/unit_tests_prof-dense_matrix_test.o: numerics/dense_matrix_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT numerics/unit_tests_prof-dense_matrix_test.o -MD -MP -MF numerics/$(DEPDIR)/unit_tests_prof-dense_matrix_test.Tpo -c -o numerics/unit_tests_prof-dense_matrix_test.o `test -f 'numerics/dense_matrix_test.C' || echo '$(srcdir)/'`numerics/dense_matrix_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) numerics/$(DEPDIR)/unit_tests_prof-dense_matrix_test.Tpo numerics/$(DEPDIR)/unit_tests_prof-dense_matrix_test.Po
@@ -13551,6 +13646,7 @@ distclean: distclean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-vector_value_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Po
@@ -13569,6 +13665,7 @@ distclean: distclean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-vector_value_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-composite_function_test.Po
@@ -13587,6 +13684,7 @@ distclean: distclean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-vector_value_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Po
@@ -13605,6 +13703,7 @@ distclean: distclean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-vector_value_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-composite_function_test.Po
@@ -13623,6 +13722,7 @@ distclean: distclean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-vector_value_test.Po
 	-rm -f parallel/$(DEPDIR)/unit_tests_dbg-message_tag.Po
@@ -14193,6 +14293,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_dbg-vector_value_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-composite_function_test.Po
@@ -14211,6 +14312,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_devel-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_devel-vector_value_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-composite_function_test.Po
@@ -14229,6 +14331,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_oprof-vector_value_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-composite_function_test.Po
@@ -14247,6 +14350,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_opt-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_opt-vector_value_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-composite_function_test.Po
@@ -14265,6 +14369,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-petsc_vector_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-tensor_traits_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-trilinos_epetra_vector_test.Po
+	-rm -f numerics/$(DEPDIR)/unit_tests_prof-type_N_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-type_tensor_test.Po
 	-rm -f numerics/$(DEPDIR)/unit_tests_prof-vector_value_test.Po
 	-rm -f parallel/$(DEPDIR)/unit_tests_dbg-message_tag.Po
