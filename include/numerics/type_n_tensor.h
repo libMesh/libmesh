@@ -95,7 +95,7 @@ public:
   }
 
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeNTensor &>::type
   operator = (const Scalar & libmesh_dbg_var(p))
@@ -156,7 +156,7 @@ public:
    * Multiply every entry of a tensor by a number.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>>::type
   operator * (const Scalar) const
@@ -179,7 +179,7 @@ public:
    * Divide every entry of a tensor by a number.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeNTensor<N,typename CompareTypes<T, Scalar>::supertype>>::type
   operator / (const Scalar) const
@@ -317,7 +317,7 @@ void TypeNTensor<N, T>::add_scaled (const TypeNTensor<N, T2> & p, const T & fact
 }
 
 template <unsigned int N, typename T, typename Scalar>
-typename boostcopy::enable_if_c<
+typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeNTensor<N,typename CompareTypes<Scalar, T>::supertype>>::type
 operator * (const Scalar &, const TypeNTensor<N, T> &)
@@ -327,7 +327,7 @@ operator * (const Scalar &, const TypeNTensor<N, T> &)
 }
 
 template <unsigned int N, typename T, typename Scalar>
-typename boostcopy::enable_if_c<
+typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeNTensor<N,typename CompareTypes<Scalar, T>::supertype>>::type
 operator / (const Scalar &, const TypeNTensor<N, T> &)

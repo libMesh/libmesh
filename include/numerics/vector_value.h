@@ -75,13 +75,13 @@ public:
    */
   template <typename Scalar1, typename Scalar2, typename Scalar3>
   VectorValue (typename
-               boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
+               std::enable_if<ScalarTraits<Scalar1>::value,
                const Scalar1>::type & x,
                typename
-               boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
+               std::enable_if<ScalarTraits<Scalar2>::value,
                const Scalar2>::type & y = 0,
                typename
-               boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
+               std::enable_if<ScalarTraits<Scalar3>::value,
                const Scalar3>::type & z = 0);
 
 
@@ -94,7 +94,7 @@ public:
   template <typename Scalar>
   VectorValue (const Scalar & x,
                typename
-               boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+               std::enable_if<ScalarTraits<Scalar>::value,
                const Scalar>::type * sfinae = nullptr);
 
 
@@ -124,7 +124,7 @@ public:
    * Assignment-from-scalar operator.  Used only to zero out vectors.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     VectorValue &>::type
   operator = (const Scalar & libmesh_dbg_var(p))
@@ -168,13 +168,13 @@ template <typename T>
 template <typename Scalar1, typename Scalar2, typename Scalar3>
 inline
 VectorValue<T>::VectorValue (typename
-                             boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
+                             std::enable_if<ScalarTraits<Scalar1>::value,
                              const Scalar1>::type & x,
                              typename
-                             boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
+                             std::enable_if<ScalarTraits<Scalar2>::value,
                              const Scalar2>::type & y,
                              typename
-                             boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
+                             std::enable_if<ScalarTraits<Scalar3>::value,
                              const Scalar3>::type & z) :
   TypeVector<T> (x,y,z)
 {
@@ -186,7 +186,7 @@ template <typename Scalar>
 inline
 VectorValue<T>::VectorValue (const Scalar & x,
                              typename
-                             boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                             std::enable_if<ScalarTraits<Scalar>::value,
                              const Scalar>::type * /*sfinae*/) :
   TypeVector<T> (x)
 {

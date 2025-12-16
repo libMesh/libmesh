@@ -88,13 +88,13 @@ protected:
    */
   template <typename Scalar1, typename Scalar2, typename Scalar3>
   TypeVector (typename
-              boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
+              std::enable_if<ScalarTraits<Scalar1>::value,
               const Scalar1>::type & x,
               typename
-              boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
+              std::enable_if<ScalarTraits<Scalar2>::value,
               const Scalar2>::type & y=0,
               typename
-              boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
+              std::enable_if<ScalarTraits<Scalar3>::value,
               const Scalar3>::type & z=0);
 
   /**
@@ -106,7 +106,7 @@ protected:
   template <typename Scalar>
   TypeVector (const Scalar & x,
               typename
-              boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+              std::enable_if<ScalarTraits<Scalar>::value,
               const Scalar>::type * sfinae = nullptr);
 
 public:
@@ -147,7 +147,7 @@ public:
    * Assignment-from-scalar operator.  Used only to zero out vectors.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeVector &>::type
   operator = (const Scalar & libmesh_dbg_var(p))
@@ -235,7 +235,7 @@ public:
    * \returns A copy of the result, this vector is unchanged.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
   operator * (const Scalar &) const;
@@ -253,7 +253,7 @@ public:
    * \returns A copy of the result, this vector is unchanged.
    */
   template <typename Scalar>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
   operator / (const Scalar &) const;
@@ -469,13 +469,13 @@ template <typename T>
 template <typename Scalar1, typename Scalar2, typename Scalar3>
 inline
 TypeVector<T>::TypeVector (typename
-                           boostcopy::enable_if_c<ScalarTraits<Scalar1>::value,
+                           std::enable_if<ScalarTraits<Scalar1>::value,
                            const Scalar1>::type & x,
                            typename
-                           boostcopy::enable_if_c<ScalarTraits<Scalar2>::value,
+                           std::enable_if<ScalarTraits<Scalar2>::value,
                            const Scalar2>::type & y,
                            typename
-                           boostcopy::enable_if_c<ScalarTraits<Scalar3>::value,
+                           std::enable_if<ScalarTraits<Scalar3>::value,
                            const Scalar3>::type & z)
 {
   _coords[0] = x;
@@ -500,7 +500,7 @@ template <typename Scalar>
 inline
 TypeVector<T>::TypeVector (const Scalar & x,
                            typename
-                           boostcopy::enable_if_c<ScalarTraits<Scalar>::value,
+                           std::enable_if<ScalarTraits<Scalar>::value,
                            const Scalar>::type * /*sfinae*/)
 {
   _coords[0] = x;
@@ -735,7 +735,7 @@ TypeVector<T> TypeVector<T>::operator - () const
 template <typename T>
 template <typename Scalar>
 inline
-typename boostcopy::enable_if_c<
+typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
 TypeVector<T>::operator * (const Scalar & factor) const
@@ -762,7 +762,7 @@ TypeVector<T>::operator * (const Scalar & factor) const
 
 template <typename T, typename Scalar>
 inline
-typename boostcopy::enable_if_c<
+typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
 operator * (const Scalar & factor,
@@ -800,7 +800,7 @@ const TypeVector<T> & TypeVector<T>::operator *= (const T & factor)
 template <typename T>
 template <typename Scalar>
 inline
-typename boostcopy::enable_if_c<
+typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
 TypeVector<T>::operator / (const Scalar & factor) const

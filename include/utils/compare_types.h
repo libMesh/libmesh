@@ -19,20 +19,21 @@
 #ifndef LIBMESH_COMPARE_TYPES_H
 #define LIBMESH_COMPARE_TYPES_H
 
-// System includes
-#include <complex>
-
 #include "libmesh_config.h"
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 #include "libmesh_common.h" // for Real
 #endif
 
+// System includes
+#include <complex>
+#include <type_traits>
+
 namespace libMesh
 {
 
-// Copy of boost's enable_if_c
-
+// Copy of boost's enable_if_c - needed before we had std::enable_if
+#ifdef LIBMESH_ENABLE_DEPRECATED
 namespace boostcopy {
 template <bool B, class T = void>
 struct enable_if_c {
@@ -42,6 +43,7 @@ struct enable_if_c {
 template <class T>
 struct enable_if_c<false, T> {};
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
 
 
 // TypesEqual takes two types as parameters.

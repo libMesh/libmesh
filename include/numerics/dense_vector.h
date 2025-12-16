@@ -182,7 +182,7 @@ public:
    * \returns A reference to *this.
    */
   template <typename T2, typename T3>
-  typename boostcopy::enable_if_c<
+  typename std::enable_if<
     ScalarTraits<T2>::value, void >::type
   add (const T2 factor,
        const DenseVector<T3> & vec);
@@ -472,7 +472,7 @@ DenseVector<T> & DenseVector<T>::operator*= (const T factor)
 template<typename T>
 template<typename T2, typename T3>
 inline
-typename boostcopy::enable_if_c<
+typename std::enable_if<
   ScalarTraits<T2>::value, void >::type
 DenseVector<T>::add (const T2 factor,
                      const DenseVector<T3> & vec)

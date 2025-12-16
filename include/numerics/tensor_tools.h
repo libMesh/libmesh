@@ -46,8 +46,8 @@ namespace TensorTools
 
 template <typename T, typename T2>
 inline
-typename boostcopy::enable_if_c<ScalarTraits<T>::value && ScalarTraits<T2>::value,
-                                typename CompareTypes<T, T2>::supertype>::type
+typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value,
+                        typename CompareTypes<T, T2>::supertype>::type
 inner_product(const T & a, const T2& b)
 { return a * b; }
 
