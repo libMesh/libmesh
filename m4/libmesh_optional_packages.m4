@@ -307,6 +307,10 @@ AS_IF([test "$enabletrilinos" = yes],
 # NVTX -- enabled by default
 # -------------------------------------------------------------
 CONFIGURE_NVTX
+AS_IF([test "$enablenvtx" = yes],
+      [
+        libmesh_optional_INCLUDES="$NVTX_INCLUDE $libmesh_optional_INCLUDES"
+      ])
 # --------------------------------------------------------------
 
 
