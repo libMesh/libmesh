@@ -38,6 +38,9 @@
 #ifndef LIBMESH_HAVE_GETTIMEOFDAY
 #include "libmesh/win_gettimeofday.h" // gettimeofday() on Windows
 #endif
+#ifdef LIBMESH_HAVE_NVTX_API
+#include <nvtx3/nvtx3.hpp>
+#endif
 
 namespace libMesh
 {
@@ -505,6 +508,14 @@ void PerfLog::fast_push (const char * label,
       else
         perf_data->start();
       log_stack.push(perf_data);
+
+#ifdef LIBMESH_HAVE_NVTX_API
+      // This takes a single const char *, and we don't want to waste
+      // time allocating a new string on every push, so for now we'll
+      // drop the header.  Maybe we should allocate a new string in
+      // the PerfData?
+      nvtxRangePushA(label);
+#endif
     }
 }
 
@@ -516,6 +527,9 @@ void PerfLog::fast_pop(const char * libmesh_dbg_var(label),
 {
   if (this->log_events)
     {
+#ifdef LIBMESH_HAVE_NVTX_API
+      nvtxRangePop();
+#endif
       // If there's nothing on the stack, then we can't pop anything. Previously we
       // asserted that the log_stack was not empty, but we should not throw from
       // this function, so instead just return in that case.
