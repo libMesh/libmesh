@@ -274,6 +274,8 @@ void MeshBase::assert_equal_to (const MeshBase & other_mesh,
   std::string_view local_diff = first_difference_from(other_mesh);
 
   bool diff_found = !local_diff.empty();
+  this->comm().max(diff_found);
+
   if (diff_found)
     {
       // Construct a user-friendly message to throw on pid 0
