@@ -892,6 +892,8 @@ void MeshBase::complete_preparation()
 
   libmesh_assert(this->comm().verify(this->is_serial()));
 
+  _preparation.libmesh_assert_consistent(this->comm());
+
 #ifdef DEBUG
   // If we don't go into this method with valid constraint rows, we're
   // only going to be able to make that worse.
