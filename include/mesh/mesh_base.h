@@ -2115,6 +2115,9 @@ public:
     bool operator== (const Preparation & other) const;
     bool operator!= (const Preparation & other) const;
 
+    // Assert that a Preparation object is identical across processors
+    void libmesh_assert_consistent (const Parallel::Communicator & libmesh_dbg_var(comm));
+
     bool is_partitioned;
     bool has_synched_id_counts;
     bool has_neighbor_ptrs;

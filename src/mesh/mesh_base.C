@@ -2972,6 +2972,21 @@ MeshBase::Preparation::operator!= (const Preparation & other) const
 }
 
 
+void
+MeshBase::Preparation::libmesh_assert_consistent (const Parallel::Communicator & libmesh_dbg_var(comm))
+{
+  libmesh_assert(comm.verify(is_partitioned));
+  libmesh_assert(comm.verify(has_synched_id_counts));
+  libmesh_assert(comm.verify(has_neighbor_ptrs));
+  libmesh_assert(comm.verify(has_cached_elem_data));
+  libmesh_assert(comm.verify(has_interior_parent_ptrs));
+  libmesh_assert(comm.verify(has_removed_remote_elements));
+  libmesh_assert(comm.verify(has_removed_orphaned_nodes));
+  libmesh_assert(comm.verify(has_reinit_ghosting_functors));
+  libmesh_assert(comm.verify(has_boundary_id_sets));
+}
+
+
 // Explicit instantiations for our template function
 template LIBMESH_EXPORT void
 MeshBase::copy_constraint_rows(const SparseMatrix<Real> & constraint_operator,
