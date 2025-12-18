@@ -280,7 +280,8 @@ void MeshBase::assert_equal_to (const MeshBase & other_mesh,
     {
       // Construct a user-friendly message to throw on pid 0
       std::set<std::string> unique_diffs;
-      unique_diffs.insert(std::string(local_diff));
+      if (!local_diff.empty())
+        unique_diffs.insert(std::string(local_diff));
       this->comm().set_union(unique_diffs);
 
       if (!this->processor_id())
