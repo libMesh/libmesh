@@ -37,6 +37,8 @@ public:
   CPPUNIT_TEST( buildSquareQuad4 );
   CPPUNIT_TEST( buildSquareQuad8 );
   CPPUNIT_TEST( buildSquareQuad9 );
+  CPPUNIT_TEST( buildSquareC0PolygonEven );
+  CPPUNIT_TEST( buildSquareC0PolygonOdd );
 #  ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( buildSphereTri3 );
   CPPUNIT_TEST( buildSphereQuad4 );
@@ -107,7 +109,9 @@ public:
   void testBuildSquare(UnstructuredMesh & mesh, unsigned int n, ElemType type)
   {
     MeshTools::Generation::build_square (mesh, n, n, -2.0, 3.0, -4.0, 5.0, type);
-    if (Elem::type_to_n_sides_map[type] == 4)
+    if (type == C0POLYGON)
+      CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n + 4 + 2 * (n - 1) + ((n - 1) / 2)));
+    else if (Elem::type_to_n_sides_map[type] == 4)
       CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n));
     else
       CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*2));
@@ -132,6 +136,10 @@ public:
         CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
                              cast_int<dof_id_type>((2*n+1)*(2*n+1) + 2*n*n));
         break;
+      case C0POLYGON:
+        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                             cast_int<dof_id_type>(4 + 2*n*n + (n - 1) + 2*n + 2 * (n%2)));
+        break;
       default: // Wait, what did we try to build?
         CPPUNIT_ASSERT(false);
       }
@@ -146,8 +154,9 @@ public:
 
     // Do serial assertions *after* all parallel assertions, so we
     // stay in sync after failure on only some processor(s)
-    for (auto & elem : mesh.element_ptr_range())
-      CPPUNIT_ASSERT(elem->has_affine_map());
+    if (type != C0POLYGON)
+      for (auto & elem : mesh.element_ptr_range())
+        CPPUNIT_ASSERT(elem->has_affine_map());
   }
 
   void testBuildCube(UnstructuredMesh & mesh, unsigned int n, ElemType type)
@@ -293,6 +302,8 @@ public:
   void buildSquareQuad4 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 4, QUAD4); }
   void buildSquareQuad8 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 4, QUAD8); }
   void buildSquareQuad9 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 4, QUAD9); }
+  void buildSquareC0PolygonOdd() { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 5, C0POLYGON); }
+  void buildSquareC0PolygonEven(){ LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildSquare, 6, C0POLYGON); }
 
   void buildSphereTri3 ()     { LOG_UNIT_TEST; testBuildSphere(2, TRI3); }
   void buildSphereQuad4 ()     { LOG_UNIT_TEST; testBuildSphere(2, QUAD4); }
