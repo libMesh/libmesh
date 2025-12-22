@@ -396,11 +396,16 @@ void C0Polygon::retriangulate()
     {
       Real min_cos_angle = 1;
       int best_vertex = -1;
+      std::cout << "Remaining nodes : ";
+      for (auto n : index_range(remaining_nodes))
+        std::cout << remaining_nodes[n] << " ";
+      std::cout << std::endl;
+      const auto max_n = remaining_nodes.size();
       for (auto n : index_range(remaining_nodes))
         {
           const Point & pn = this->point(remaining_nodes[n]);
-          const Point & pnext = this->point(remaining_nodes[(n+1)%ns]);
-          const Point & pprev = this->point(remaining_nodes[(n+ns-1)%ns]);
+          const Point & pnext = this->point(remaining_nodes[(n+1)%max_n]);
+          const Point & pprev = this->point(remaining_nodes[(n+max_n-1)%max_n]);
           const Point vprev = (pn - pprev).unit();
           const Point vnext = (pnext - pn).unit();
 
@@ -418,9 +423,9 @@ void C0Polygon::retriangulate()
 
       libmesh_assert(best_vertex >= 0);
 
-      this->_triangulation.push_back({remaining_nodes[(best_vertex+ns-1)%ns],
+      this->_triangulation.push_back({remaining_nodes[(best_vertex+max_n-1)%max_n],
                                       remaining_nodes[best_vertex],
-                                      remaining_nodes[(best_vertex+1)%ns]});
+                                      remaining_nodes[(best_vertex+1)%max_n]});
       remaining_nodes.erase(remaining_nodes.begin()+best_vertex);
     }
 }
