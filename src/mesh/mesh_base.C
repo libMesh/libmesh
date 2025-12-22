@@ -1992,7 +1992,15 @@ void MeshBase::detect_interior_parents()
 
       for (auto n : make_range(element->n_vertices()))
         {
-          std::vector<dof_id_type> & element_ids = node_to_elem[element->node_id(n)];
+          auto it = node_to_elem.find(element->node_id(n));
+          // Check at first that this node is not isolated.
+          if (it == node_to_elem.end())
+            {
+              found_interior_parents = false;
+              break;
+            }
+
+          std::vector<dof_id_type> & element_ids = it->second;
           for (const auto & eid : element_ids)
             if (this->elem_ref(eid).dim() == element->dim()+1)
               neighbors[n].insert(eid);
