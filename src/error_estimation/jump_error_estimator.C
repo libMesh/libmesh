@@ -110,8 +110,9 @@ void JumpErrorEstimator::estimate_error (const System & system,
   const DofMap & dof_map = system.get_dof_map();
 #endif
 
-  // Resize the error_per_cell vector to be
-  // the number of elements, initialize it to 0.
+  // Resize the error_per_cell vector according to the
+  // maximum element ID because we will be indexing it with IDs.
+  // Initialize to 0.
   error_per_cell.resize (mesh.max_elem_id());
   std::fill (error_per_cell.begin(), error_per_cell.end(), 0.);
 
