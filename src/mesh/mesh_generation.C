@@ -954,7 +954,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                 node_list.push_back(node2);
               }
 
-              new_elem = std::make_unique<Tri3>();
+              new_elem = std::make_unique<C0Polygon>(3);
+              // Switch to Tri3 when exodus default output supports element type mixes
               new_elem->set_node(0, node0);
               new_elem->set_node(1, node1);
               new_elem->set_node(2, node2);
@@ -1032,7 +1033,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   }
                   node_list.push_back(n3);
 
-                  new_elem = std::make_unique<Quad4>();
+                  new_elem = std::make_unique<C0Polygon>(4);
+                  // Switch to Quad4 when exodus default output supports element type mixes
                   new_elem->set_node(0, n0);
                   new_elem->set_node(1, n1);
                   new_elem->set_node(3, n2);
@@ -1082,7 +1084,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                 node2 = mesh.add_point(Point(xmax, ymax, 0.));
               }
 
-              new_elem = std::make_unique<Tri3>();
+              new_elem = std::make_unique<C0Polygon>(3);
+              // Switch to Tri3 when exodus default output supports element type mixes
               new_elem->set_node(0, node0);
               new_elem->set_node(1, node1);
               new_elem->set_node(2, node2);
