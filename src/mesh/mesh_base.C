@@ -1908,6 +1908,49 @@ void MeshBase::detect_interior_parents()
   if (this->elem_dimensions().size() == 1)
     return;
 
+  // An interior parent p of an element el must satisfy p.dim() == el.dim() + 1.
+  // Therefore, we can avoid checking the existence of interior parents
+  // for all those elements el such there there is no p with p.dim() == el.dim() + 1.
+  // We store whether to skip any given dimension in the construction of interior parents
+  // inside the vector in dimensions_to_skip_for_interior_parents.
+  std::vector<bool> skip_dimension_for_interior_parents(LIBMESH_DIM+1);  // all false by default
+  skip_dimension_for_interior_parents.back() = true;
+
+  // Moreover, in the following, we will build a node-to-elem map.
+  // It is among the elems of this map that we will look for interior parents.
+  // Therefore, we can skip all elems p such that there is no el with el.dim() == p.dim() - 1.
+  // We store whether to skip any given dimension in the construction of the node-to-elem map
+  // in the vector skip_dimensions_for_node_to_el_map.
+  std::vector<bool> skip_dimensions_for_node_to_el_map(LIBMESH_DIM+1);  // all false by default
+  skip_dimensions_for_node_to_el_map[*this->elem_dimensions().begin()] = true;
+
+  // We also create a flag to know if all dimensions should be skipped,
+  // and if we should therefore return early.
+  bool skip_all_dimensions = true;
+
+  // Fill dimensions_to_skip_for_interior_parents and dimensions_to_skip_for_node_to_el_map.
+    {
+      const std::set<unsigned char> & elem_dimensions = this->elem_dimensions();
+
+      auto it = elem_dimensions.begin();
+      auto next = std::next(it);
+
+      for (; next != elem_dimensions.end(); ++it, ++next)
+        {
+          if (*it + 1 != *next) // note: elem_dimensions is already sorted
+            {
+              skip_dimension_for_interior_parents[*it] = true;
+              skip_dimensions_for_node_to_el_map[*next] = true;
+            }
+          else if (!skip_dimension_for_interior_parents[*it])
+            skip_all_dimensions = false;
+        }
+    }
+
+  // There is nothing to do if all dimensions should be skipped.
+  if (skip_all_dimensions)
+    return;
+
   // Do we have interior parent pointers going to a different mesh?
   // If so then we'll still check to make sure that's the only place
   // they go, so we can libmesh_not_implemented() if not.
@@ -1918,6 +1961,10 @@ void MeshBase::detect_interior_parents()
 
   for (const auto & elem : this->element_ptr_range())
     {
+      // Ignore element if it cannot be interior parent of any other elem.
+      if (skip_dimensions_for_node_to_el_map[elem->dim()])
+        continue;
+
       // Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
       for (auto n : make_range(elem->n_vertices()))
         {
@@ -1930,8 +1977,9 @@ void MeshBase::detect_interior_parents()
   // Automatically set interior parents
   for (const auto & element : this->element_ptr_range())
     {
-      // Ignore an 3D element or an element that already has an interior parent
-      if (element->dim()>=LIBMESH_DIM || element->interior_parent())
+      // Ignore elements with dimensions to skip
+      // or elements that already have an interior parent.
+      if (skip_dimension_for_interior_parents[element->dim()] || element->interior_parent())
         continue;
 
       // Start by generating a SET of elements that are dim+1 to the current
