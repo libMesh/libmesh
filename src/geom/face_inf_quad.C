@@ -184,7 +184,9 @@ bool InfQuad::is_child_on_side(const unsigned int c,
   libmesh_assert_less (c, this->n_children());
   libmesh_assert_less (s, this->n_sides());
 
-  return (s == 0 || s == c+1);
+  return (s == 0 ||
+          (c == 0 && s == 2) ||
+          (c == 1 && s == 1));
 }
 
 
