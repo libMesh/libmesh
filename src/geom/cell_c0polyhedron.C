@@ -510,17 +510,54 @@ void C0Polyhedron::retriangulate()
       // predecessor and successor nodes in order afterward.
       auto find_valid_nodes_around =
         [n_surrounding, & surrounding_nodes]
-        (unsigned int j)
+        (unsigned int j, unsigned int skip=1e6)
       {
         unsigned int jnext = (j+1)%n_surrounding;
-        while (!surrounding_nodes[jnext])
+        while (!surrounding_nodes[jnext] || jnext == skip)
           jnext = (jnext+1)%n_surrounding;
 
         unsigned int jprev = (j+n_surrounding-1)%n_surrounding;
-        while (!surrounding_nodes[jprev])
+        while (!surrounding_nodes[jprev] || jprev == skip)
           jprev = (jprev+n_surrounding-1)%n_surrounding;
 
         return std::make_pair(jprev, jnext);
+      };
+
+
+      // Vectors from the center node to each of its surrounding
+      // nodes are helpful for calculating prospective tet
+      // quality.
+      std::vector<Point> v0s(n_surrounding);
+      for (auto j : make_range(n_surrounding))
+        v0s[j] = *(Point *)surrounding_nodes[j] - *node;
+
+      // Find the tet quality we'd potentially get from each
+      // possible choice of tet
+      auto local_tet_quality_of =
+        [& surrounding_nodes, & v0s, & find_valid_nodes_around]
+        (unsigned int j, unsigned int skip=1e6)
+      {
+        auto [jminus, jplus] = find_valid_nodes_around(j, skip);
+
+        // Anything proportional to the ratio of volume to
+        // total-edge-length-cubed should peak for perfect tets
+        // but hit 0 for pancakes and slivers.
+
+        const Real total_len =
+          v0s[j].norm() + v0s[jminus].norm() + v0s[jplus].norm() +
+          (*(Point *)surrounding_nodes[jplus] -
+            *(Point *)surrounding_nodes[j]).norm() +
+          (*(Point *)surrounding_nodes[j] -
+            *(Point *)surrounding_nodes[jminus]).norm() +
+          (*(Point *)surrounding_nodes[jminus] -
+            *(Point *)surrounding_nodes[jplus]).norm();
+
+        // Orientation here is tricky.  Think of the triple
+        // product as (v1 cross v2) dot v3, with right hand rule.
+        const Real six_vol =
+          triple_product(v0s[jminus], v0s[jplus], v0s[j]);
+
+        return six_vol / (total_len * total_len * total_len);
       };
 
       // We may have too many surrounding nodes to handle with
@@ -555,7 +592,7 @@ void C0Polyhedron::retriangulate()
       // possible.
 
       auto find_new_tet_nodes =
-        [& local_tet_quality, & find_valid_nodes_around, & surrounding_nodes]
+        [& local_tet_quality, & local_tet_quality_of,  & find_valid_nodes_around, & surrounding_nodes]
         ()
       {
         unsigned int jbest = 0;
@@ -570,6 +607,11 @@ void C0Polyhedron::retriangulate()
         for (const auto surr_node : surrounding_nodes)
           if (surr_node)
             n_valid_surrounding++;
+
+        bool bad_future_neighbors = false;
+        if (local_tet_quality_of(jminus, /*without*/jbest) <= 0 &&
+            local_tet_quality_of(jplus, /*without*/jbest) <= 0)
+          bad_future_neighbors = true;
 
         // Expected qualities post removing jbest from the surrounding nodes
         for (auto j : make_range(std::size_t(1),
@@ -589,17 +631,27 @@ void C0Polyhedron::retriangulate()
                 qneighj > 0)
               continue;
 
+            // Avoid chosing a tet that when constructed would leave both neighbors in bad shape
+            // TODO: simply pre-compute that for every vertex and exclude those nodes
+            if (local_tet_quality_of(jminus, /*without*/j) <= 0 &&
+                local_tet_quality_of(jplus, /*without*/j) <= 0)
+              continue;
+
             const auto num_bad_neigh = (local_tet_quality[jminus] <= 0) +
                                        (local_tet_quality[jplus] <= 0);
             // We want to try for the best possible fix.
             // - The more bad (volume <= 0) neighbors we fix the better
             // - If same number of bad neighbors, pick best quality one
-            if ((num_bad_neigh >= num_bad_neigh_best) &&
+            // - If the current pick for best tet will make the two neighbor tets bad,
+            //   don't keep it
+            if (((num_bad_neigh >= num_bad_neigh_best) &&
                 ((local_tet_quality[j] - qneighj) > (local_tet_quality[jbest] - qneighj)))
+                || bad_future_neighbors)
               {
                 jbest = j;
                 qneighbest = qneighj;
                 num_bad_neigh_best = num_bad_neigh;
+                bad_future_neighbors = false;
               }
           }
 
@@ -611,42 +663,6 @@ void C0Polyhedron::retriangulate()
         std::tie(jminus, jplus) = find_valid_nodes_around(jbest);
 
         return std::make_tuple(jbest, jminus, jplus);
-      };
-
-      // Vectors from the center node to each of its surrounding
-      // nodes are helpful for calculating prospective tet
-      // quality.
-      std::vector<Point> v0s(n_surrounding);
-      for (auto j : make_range(n_surrounding))
-        v0s[j] = *(Point *)surrounding_nodes[j] - *node;
-
-      // Find the tet quality we'd potentially get from each
-      // possible choice of tet
-      auto local_tet_quality_of =
-        [& surrounding_nodes, & v0s, & find_valid_nodes_around]
-        (unsigned int j)
-      {
-        auto [jminus, jplus] = find_valid_nodes_around(j);
-
-        // Anything proportional to the ratio of volume to
-        // total-edge-length-cubed should peak for perfect tets
-        // but hit 0 for pancakes and slivers.
-
-        const Real total_len =
-          v0s[j].norm() + v0s[jminus].norm() + v0s[jplus].norm() +
-          (*(Point *)surrounding_nodes[jplus] -
-            *(Point *)surrounding_nodes[j]).norm() +
-          (*(Point *)surrounding_nodes[j] -
-            *(Point *)surrounding_nodes[jminus]).norm() +
-          (*(Point *)surrounding_nodes[jminus] -
-            *(Point *)surrounding_nodes[jplus]).norm();
-
-        // Orientation here is tricky.  Think of the triple
-        // product as (v1 cross v2) dot v3, with right hand rule.
-        const Real six_vol =
-          triple_product(v0s[jminus], v0s[jplus], v0s[j]);
-
-        return six_vol / (total_len * total_len * total_len);
       };
 
       // Get the quality of the tets for every node around the node:
@@ -670,7 +686,7 @@ void C0Polyhedron::retriangulate()
           for (auto t : make_range(n_surrounding-3))
             {
               libmesh_ignore(t);
-              
+
               auto [jbest, jminus, jplus] = find_new_tet_nodes();
 
               // Turn these four nodes into a tet
