@@ -270,6 +270,39 @@ C0Polyhedron::side_vertex_average_normal(const unsigned int s) const
 }
 
 
+std::array<int, 4>
+C0Polyhedron::subelement_sides_to_poly_sides(unsigned int tri_i) const
+{
+  std::array<int, 4> sides = {invalid_int, invalid_int, invalid_int, invalid_int};
+  const auto & tet_nodes = _triangulation[tri_i];
+  for (const auto poly_side : make_range(n_sides()))
+  {
+    const auto sd_nodes = nodes_on_side(poly_side);
+    bool zero_in = std::find(sd_nodes.begin(), sd_nodes.end(), tet_nodes[0]) != sd_nodes.end();
+    bool one_in = std::find(sd_nodes.begin(), sd_nodes.end(), tet_nodes[1]) != sd_nodes.end();
+    bool two_in = std::find(sd_nodes.begin(), sd_nodes.end(), tet_nodes[2]) != sd_nodes.end();
+    bool three_in = std::find(sd_nodes.begin(), sd_nodes.end(), tet_nodes[3]) != sd_nodes.end();
+
+    // Take advantage of the fact that the poly side can only contain one tet side
+    // Note: we could optimize by replacing the booleans with the searches above
+    if (zero_in)
+    {
+      if (one_in)
+      {
+        if (two_in)
+          sides[0] = poly_side;
+        else if (three_in)
+          sides[1] = poly_side;
+      }
+      else if (two_in && three_in)
+        sides[3] = poly_side;
+    }
+    else if (three_in && two_in && one_in)
+      sides[2] = poly_side;
+  }
+  return sides;
+}
+
 
 void C0Polyhedron::retriangulate()
 {
