@@ -634,6 +634,12 @@ void C0Polyhedron::retriangulate()
                                    local_tet_quality[jplus]);
         // Count number of bad neighbors
         auto num_bad_neigh_best = (local_tet_quality[jminus] <= 0) + (local_tet_quality[jplus] <= 0);
+        // Skip our heuristics if we are considering a bad tet
+        if (local_tet_quality[jbest] == -1e6)
+        {
+          num_bad_neigh_best = 0;
+          qneighbest = 1e6;
+        }
 
         // Count the number of valid surrounding nodes
         unsigned int n_valid_surrounding = 0;
@@ -642,7 +648,7 @@ void C0Polyhedron::retriangulate()
             n_valid_surrounding++;
 
         bool bad_future_neighbors = false;
-        if (local_tet_quality_of(jminus, /*without*/jbest) <= 0 &&
+        if ((n_valid_surrounding > 3) && local_tet_quality_of(jminus, /*without*/jbest) <= 0 &&
             local_tet_quality_of(jplus, /*without*/jbest) <= 0)
           bad_future_neighbors = true;
 
@@ -666,8 +672,9 @@ void C0Polyhedron::retriangulate()
 
             // Avoid chosing a tet that when constructed would leave both neighbors in bad shape
             // TODO: simply pre-compute that for every vertex and exclude those nodes
-            if (local_tet_quality_of(jminus, /*without*/j) <= 0 &&
-                local_tet_quality_of(jplus, /*without*/j) <= 0)
+            // Note: It does not matter if we are down to 3 surrounding nodes, as we are building the final tet
+            if ((n_valid_surrounding > 3) && local_tet_quality_of(jminus, /*without*/j) <= 0 &&
+                                             local_tet_quality_of(jplus, /*without*/j) <= 0)
               continue;
 
             const auto num_bad_neigh = (local_tet_quality[jminus] <= 0) +
@@ -676,9 +683,10 @@ void C0Polyhedron::retriangulate()
             // - The more bad (volume <= 0) neighbors we fix the better
             // - If same number of bad neighbors, pick best quality one
             // - If the current pick for best tet will make the two neighbor tets bad,
-            //   don't keep it
-            if (((num_bad_neigh >= num_bad_neigh_best) &&
-                ((local_tet_quality[j] - qneighj) > (local_tet_quality[jbest] - qneighj)))
+            //   don't keep it and always try another
+            if (((num_bad_neigh > num_bad_neigh_best) || ((num_bad_neigh == num_bad_neigh_best)
+                                                         && ((local_tet_quality[j] - qneighj) >
+                                                          (local_tet_quality[jbest] - qneighj))))
                 || bad_future_neighbors)
               {
                 jbest = j;
