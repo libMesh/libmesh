@@ -872,6 +872,26 @@ void C0Polyhedron::retriangulate()
       surface.delete_elem(oldtri2);
       surface.delete_elem(oldtri3);
 
+      // We've used up our center node, so it's not something we can
+      // eliminate again.
+      nodes_by_geometry.erase(geometry_it);
+
+      // Recompute the valence and angles of the nodes we used
+      // The idea is that if one node is being isolated on one side,
+      // we need to treat it asap
+      if (nodes_by_geometry.size() > 4)
+      {
+        Node * & node_j2 = surrounding_nodes[j2];
+        nodes_by_geometry.erase(node_index[node_j2]);
+        node_index[node_j2] = nodes_by_geometry.emplace(geometry_at(*node_j2), node_j2);
+        Node * & node_j1 = surrounding_nodes[j1];
+        nodes_by_geometry.erase(node_index[node_j1]);
+        node_index[node_j1] = nodes_by_geometry.emplace(geometry_at(*node_j1), node_j1);
+        Node * & node_j3 = surrounding_nodes[j3];
+        nodes_by_geometry.erase(node_index[node_j3]);
+        node_index[node_j3] = nodes_by_geometry.emplace(geometry_at(*node_j3), node_j3);
+      }
+
       // We should have used up all our surrounding nodes now, and we
       // shouldn't have messed up our surface in the process, and our
       // center node should no longer be part of the surface.
@@ -891,10 +911,6 @@ void C0Polyhedron::retriangulate()
           libmesh_assert_not_equal_to
             (elem->node_ptr(p), node);
 #endif
-
-      // We've used up our center node, so it's not something we can
-      // eliminate again.
-      nodes_by_geometry.erase(geometry_it);
     }
 
   // At this point our surface should just have two triangles left.
