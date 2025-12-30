@@ -95,12 +95,35 @@ Real fe_lagrange_1D_cubic_shape(const unsigned int i,
 
 
 inline
+Real fe_lagrange_1D_any_shape(const Order order,
+                              const unsigned int i,
+                              const Real xi)
+{
+  libmesh_assert_greater_equal (order, 0);
+  libmesh_assert_less (i, order + 1);
+
+  // So the interval endpoints are at i = 0 and i = 1
+  const unsigned ii = i == 0 ? 0 : i == 1 ? int(order) : i - 1;
+
+  auto root = [&](const unsigned int k) { return 1. * k / order; };
+  const unsigned int nzeros = order + 1;
+  Real x = (xi + 1.) / 2.;
+  Real val = 1.;
+
+  for (const auto z : make_range(nzeros))
+    if (z != ii)
+      val *= (x - root(z)) / (root(ii) - root(z));
+
+  return val;
+}
+
+
+
+inline
 Real fe_lagrange_1D_shape(const Order order,
                           const unsigned int i,
                           const Real xi)
 {
-  libmesh_assert_less_equal(order, THIRD);
-
   switch (order)
     {
       // Lagrange linears
@@ -112,9 +135,12 @@ Real fe_lagrange_1D_shape(const Order order,
       return fe_lagrange_1D_quadratic_shape(i, xi);
 
       // Lagrange cubics
-      // case THIRD
-    default:
+    case THIRD:
       return fe_lagrange_1D_cubic_shape(i, xi);
+
+      // Lagrange arbitrary shape functions
+    default:
+      return fe_lagrange_1D_any_shape(order, i, xi);
     }
 }
 
@@ -197,13 +223,50 @@ Real fe_lagrange_1D_cubic_shape_deriv(const unsigned int i,
 
 
 inline
+Real fe_lagrange_1D_any_shape_deriv(const Order order,
+                                    const unsigned int i,
+                                    const unsigned int libmesh_dbg_var(j),
+                                    const Real xi)
+{
+  // only d()/dxi in 1D!
+  libmesh_assert_equal_to (j, 0);
+
+  libmesh_assert_greater_equal (order, 0);
+  libmesh_assert_less (i, order + 1);
+
+  // So the interval endpoints are at i = 0 and i = 1
+  const unsigned ii = i == 0 ? 0 : i == 1 ? int(order) : i - 1;
+
+  auto root = [&](const unsigned int k) { return 1. * k / order; };
+  const unsigned int nzeros = order + 1;
+  Real x = (xi + 1.) / 2.;
+  Real val = 0.;
+
+  for (const auto z : make_range(nzeros))
+    if (z != ii)
+    {
+      Real prod = .5;
+      for (const auto zz : make_range(nzeros))
+        if (zz != z && zz != ii)
+          prod *= (x - root(zz));
+      val += prod;
+    }
+
+  for (const auto z : make_range(nzeros))
+    if (z != ii)
+      val /= (root(ii) - root(z));
+
+  return val;
+}
+
+
+
+inline
 Real fe_lagrange_1D_shape_deriv(const Order order,
                                 const unsigned int i,
                                 const unsigned int j,
                                 const Real xi)
 {
-  libmesh_assert_less_equal(order, THIRD);
-
   switch (order)
     {
     case FIRST:
@@ -212,9 +275,11 @@ Real fe_lagrange_1D_shape_deriv(const Order order,
     case SECOND:
       return fe_lagrange_1D_quadratic_shape_deriv(i, j, xi);
 
-    // case THIRD
-    default:
+    case THIRD:
       return fe_lagrange_1D_cubic_shape_deriv(i, j, xi);
+
+    default:
+      return fe_lagrange_1D_any_shape_deriv(order, i, j, xi);
     }
 }
 
@@ -229,9 +294,9 @@ Real fe_lagrange_1D_quadratic_shape_second_deriv(const unsigned int i,
                                                  const unsigned int libmesh_dbg_var(j),
                                                  const Real)
 {
-  // Don't need to switch on j.  1D shape functions
-  // depend on xi only!
+  // Don't need to switch on j. 1D shape functions depend on xi only!
   libmesh_assert_equal_to (j, 0);
+
   libmesh_assert_less(i, 3);
 
   switch (i)
@@ -254,9 +319,9 @@ Real fe_lagrange_1D_cubic_shape_second_deriv(const unsigned int i,
                                              const unsigned int libmesh_dbg_var(j),
                                              const Real xi)
 {
-  // Don't need to switch on j.  1D shape functions
-  // depend on xi only!
+  // Don't need to switch on j. 1D shape functions depend on xi only!
   libmesh_assert_equal_to (j, 0);
+
   libmesh_assert_less(i, 4);
 
   switch (i)
@@ -279,13 +344,52 @@ Real fe_lagrange_1D_cubic_shape_second_deriv(const unsigned int i,
 
 
 inline
+Real fe_lagrange_1D_any_shape_second_deriv(const Order order,
+                                           const unsigned int i,
+                                           const unsigned int libmesh_dbg_var(j),
+                                           const Real xi)
+{
+  // Don't need to switch on j. 1D shape functions depend on xi only!
+  libmesh_assert_equal_to (j, 0);
+
+  libmesh_assert_greater_equal (order, 0);
+  libmesh_assert_less (i, order + 1);
+
+  // So the interval endpoints are at i = 0 and i = 1
+  const unsigned ii = i == 0 ? 0 : i == 1 ? int(order) : i - 1;
+
+  auto root = [&](const unsigned int k) { return 1. * k / order; };
+  const unsigned int nzeros = order + 1;
+  Real x = (xi + 1.) / 2.;
+  Real val = 0.;
+
+  for (const auto z : make_range(nzeros))
+    if (z != ii)
+      for (const auto zz : make_range(nzeros))
+        if (zz != z && zz != ii)
+        {
+          Real prod = .25;
+          for (const auto zzz : make_range(nzeros))
+            if (zzz != zz && zzz != z && zzz != ii)
+              prod *= (x - root(zzz));
+          val += prod;
+        }
+
+  for (const auto z : make_range(nzeros))
+    if (z != ii)
+      val /= (root(ii) - root(z));
+
+  return val;
+}
+
+
+
+inline
 Real fe_lagrange_1D_shape_second_deriv(const Order order,
                                        const unsigned int i,
                                        const unsigned int j,
                                        const Real xi)
 {
-  libmesh_assert_less_equal(order, THIRD);
-
   switch (order)
     {
     // All second derivatives of linears are zero....
@@ -295,9 +399,11 @@ Real fe_lagrange_1D_shape_second_deriv(const Order order,
     case SECOND:
       return fe_lagrange_1D_quadratic_shape_second_deriv(i, j, xi);
 
-    // case THIRD
-    default:
+    case THIRD:
       return fe_lagrange_1D_cubic_shape_second_deriv(i, j, xi);
+
+    default:
+      return fe_lagrange_1D_any_shape_second_deriv(order, i, j, xi);
     } // end switch (order)
 }
 
