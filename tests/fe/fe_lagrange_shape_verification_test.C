@@ -1,5 +1,7 @@
 // libmesh includes
 #include "libmesh/libmesh.h"
+#include "libmesh/elem.h"
+#include "libmesh/fe.h"
 #include "libmesh/fe_lagrange_shape_1D.h"
 
 // unit test includes
@@ -38,6 +40,20 @@ public:
                                   fe_lagrange_1D_any_shape_deriv(Order(o), i, 0, xi), tol);
           LIBMESH_ASSERT_FP_EQUAL(fe_lagrange_1D_shape_second_deriv(Order(o), i, 0, xi),
                                   fe_lagrange_1D_any_shape_second_deriv(Order(o), i, 0, xi), tol);
+        }
+
+    for (auto xi : {0., 1./3., -.5, -1./7.})
+      for(auto o : make_range(4, 7))
+        for(auto i : make_range(o + 1))
+        {
+          using T = FE<1,LAGRANGE>;
+          const unsigned ii = i == 0 ? 1 : i == 1 ? 0 : o + 2 - i;
+          LIBMESH_ASSERT_FP_EQUAL(T::shape(EDGE3, Order(o), i, xi),
+                                  T::shape(EDGE3, Order(o), ii, -xi), tol);
+          LIBMESH_ASSERT_FP_EQUAL( T::shape_deriv(EDGE3, Order(o), i, 0, xi),
+                                  -T::shape_deriv(EDGE3, Order(o), ii, 0, -xi), tol);
+          LIBMESH_ASSERT_FP_EQUAL(T::shape_second_deriv(EDGE3, Order(o), i, 0, xi),
+                                  T::shape_second_deriv(EDGE3, Order(o), ii, 0, -xi), tol);
         }
   }
 };
