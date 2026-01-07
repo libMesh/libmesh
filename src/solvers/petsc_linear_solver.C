@@ -221,7 +221,7 @@ void PetscLinearSolver<T>::init (PetscMatrixBase<T> * matrix,
 
 template <typename T>
 void
-PetscLinearSolver<T>::init_names (const System & sys)
+PetscLinearSolver<T>::init_systems (const System & sys)
 {
   petsc_auto_fieldsplit(this->pc(), sys);
 }

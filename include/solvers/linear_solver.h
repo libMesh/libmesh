@@ -96,14 +96,16 @@ public:
   virtual void init (const char * name = nullptr) = 0;
 
   /**
-   * Apply names to the system to be solved.  For most packages this
-   * is a no-op; for PETSc this sets an option prefix from the system
-   * name and sets field names from the system's variable names.
+   * Apply names to the system to be solved and set auxiliary preconditioner
+   * data. For most packages this is a no-op; for PETSc this a) sets an option
+   * prefix from the system name and sets field names from the system's
+   * variable names and b) sets auxiliary data needed by preconditioners such
+   * as hypre ams/ads.
    *
    * Since field names are applied to DoF numberings, this method must
    * be called again after any System reinit.
    */
-  virtual void init_names (const System &) {}
+  virtual void init_systems (const System &) {}
 
   /**
    * \returns The type of solver to use.

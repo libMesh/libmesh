@@ -64,7 +64,7 @@ void TimeSolver::reinit ()
   else
     this->linear_solver()->init();
 
-  this->_linear_solver->init_names(_system);
+  this->_linear_solver->init_systems(_system);
 }
 
 
@@ -103,7 +103,7 @@ void TimeSolver::init_data ()
   else
     this->linear_solver()->init();
 
-  this->linear_solver()->init_names(_system);
+  this->linear_solver()->init_systems(_system);
 }
 
 
