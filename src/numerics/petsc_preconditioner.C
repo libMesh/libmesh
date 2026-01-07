@@ -157,6 +157,73 @@ void PetscPreconditioner<T>::set_petsc_preconditioner_type (const Preconditioner
 template <typename T>
 void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const unsigned v)
 {
+  // Get the communicator from the PETSc object
+  Parallel::communicator comm;
+  PetscErrorCode ierr = PetscObjectGetComm((PetscObject)pc, &comm);
+  libmesh_error_msg_if(ierr != LIBMESH_PETSC_SUCCESS,
+                       "Error retrieving communicator");
+
+  // Make sure the preconditioner options are set
+  LibmeshPetscCallA(comm, PCSetFromOptions(pc));
+
+  // Get the type of preconditioner we are using
+  PCType pc_type = nullptr;
+  LibmeshPetscCallA(comm, PCGetType(pc, &pc_type));
+
+  // Check if hypre ams/ads, otherwise we quit with nothing to do
+  if (pc_type && std::string(pc_type) == PCHYPRE)
+  {
+    // Get the hypre preconditioner we are using
+    PCType hypre_type = nullptr;
+    LibmeshPetscCallA(comm, PCHYPREGetType(pc, &hypre_type));
+
+    // If not ams/ads, we quit with nothing to do
+    if (std::string(hypre_type) == "ams")
+    {
+      // If multiple variables, we error out as senseless
+      libmesh_error_msg_if(sys.n_vars() > 1,
+                           "Error applying hypre AMS to a system with multiple "
+                           "variables");
+      // If not a 1st order Nédélec or a 2d 1st order Raviart-Thomas system, we
+      // error out as we do not support anything else at the moment
+      libmesh_error_msg_if(sys.variable(v).type() != FEType(1, NEDELEC_ONE) &&
+                          (sys.variable(v).type() != FEType(1, RAVIART_THOMAS) ||
+                           sys.get_mesh().mesh_dimension() != 2),
+                           "Error applying hypre AMS to a system "
+                           "whose variable is not 1st order Nedelec or 1st "
+                           "order Raviart-Thomas on a 2d mesh");
+      set_hypre_ams_data(pc, sys, v);
+    }
+    else if (std::string(hypre_type) == "ads")
+    {
+      // If multiple variables, we error out as senseless
+      libmesh_error_msg_if(sys.n_vars() > 1,
+                           "Error applying hypre ADS to a system with multiple "
+                           "variables");
+      // If not a 3d 1st order Raviart-Thomas system, we error out as we do not
+      // support anything else at the moment
+      libmesh_error_msg_if(sys.variable(v).type() != FEType(1, RAVIART_THOMAS) ||
+                           sys.get_mesh().mesh_dimension() != 3,
+                           "Error applying hypre ADS to a system "
+                           "whose variable is not 1st "
+                           "order Raviart-Thomas on a 3d mesh");
+      set_hypre_ads_data(pc, sys, v);
+    }
+  }
+}
+
+
+
+template <typename T>
+void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const unsigned v)
+{
+}
+
+
+
+template <typename T>
+void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const unsigned v)
+{
 }
 #endif
 

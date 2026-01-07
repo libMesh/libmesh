@@ -87,6 +87,8 @@ public:
    */
 #ifdef LIBMESH_HAVE_PETSC_HYPRE
   static void set_petsc_aux_data (PC & pc, System & sys, const unsigned v = 0);
+  static void set_hypre_ams_data (PC & pc, System & sys, const unsigned v);
+  static void set_hypre_ads_data (PC & pc, System & sys, const unsigned v);
 #else
   static void set_petsc_aux_data (PC &, System &, const unsigned) {}
 #endif
