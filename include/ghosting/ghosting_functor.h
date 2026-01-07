@@ -213,10 +213,12 @@ public:
    * different meshes. The operations in  GhostingFunctor are mesh dependent.
    */
   virtual std::unique_ptr<GhostingFunctor> clone () const
-  // Let us return nullptr for backward compatibility.
-  // We will come back to mark this function as pure virtual
-  // once the API upgrade is done.
-  { return nullptr; }
+#ifndef LIBMESH_ENABLE_DEPRECATED
+  = 0;
+#else
+  // Return nullptr for backward compatibility.
+  { libmesh_deprecated(); return nullptr; }
+#endif
 
   /**
    * It should be called after cloning a ghosting functor.

@@ -60,6 +60,17 @@ class OverlappingCouplingFunctor : public GhostingFunctor
 
   virtual ~OverlappingCouplingFunctor(){};
 
+  virtual std::unique_ptr<GhostingFunctor> clone () const override
+  {
+    auto clone_functor =
+      std::make_unique<OverlappingCouplingFunctor>(_system);
+
+    auto coupling_matrix =
+      std::make_unique<CouplingMatrix>(*_coupling_matrix);
+    clone_functor->set_coupling_matrix(coupling_matrix);
+    return clone_functor;
+  }
+
   void set_coupling_matrix (std::unique_ptr<CouplingMatrix> & coupling_matrix)
   { _coupling_matrix = std::move(coupling_matrix); }
 
