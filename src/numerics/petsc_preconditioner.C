@@ -238,7 +238,7 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
 
   // Global (i.e. total) and local (i.e. to this processor) number of edges and vertices
   const std::vector<dof_id_type> n_all_edges = sys.get_dof_map().n_dofs_per_processor(v);
-  const dof_id_type n_glb_edges = std::reduce(n_all_edges.begin(), n_all_edges.end());
+  const dof_id_type n_glb_edges = std::accumulate(n_all_edges.begin(), n_all_edges.end(), 0);
   const dof_id_type n_loc_edges = n_all_edges[global_processor_id()];
   const dof_id_type n_glb_verts = lagrange_sys.n_dofs();
   const dof_id_type n_loc_verts = lagrange_sys.n_local_dofs();
@@ -253,7 +253,7 @@ void PetscPreconditioner<T>::set_hypre_ams_data(PC & pc, System & sys, const uns
   // The number of vertices and edges in all preceding processors
   dof_id_signed_type vert_offset = -lagrange_sys.get_dof_map().first_dof();
   dof_id_signed_type edge_offset =
-    std::reduce(n_all_edges.begin(), n_all_edges.begin() + global_processor_id());
+    std::accumulate(n_all_edges.begin(), n_all_edges.begin() + global_processor_id(), 0);
 
   // Whether dofs are in variable-major or node-major order
   bool var_major = !libMesh::on_command_line("--node-major-dofs");
@@ -368,7 +368,7 @@ void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const uns
   // Global (i.e. total) and local (i.e. to this processor) number of faces,
   // edges and vertices
   const std::vector<dof_id_type> n_all_faces = sys.get_dof_map().n_dofs_per_processor(v);
-  const dof_id_type n_glb_faces = std::reduce(n_all_faces.begin(), n_all_faces.end());
+  const dof_id_type n_glb_faces = std::accumulate(n_all_faces.begin(), n_all_faces.end(), 0);
   const dof_id_type n_loc_faces = n_all_faces[global_processor_id()];
   const dof_id_type n_glb_edges = nedelec_sys.n_dofs();
   const dof_id_type n_loc_edges = nedelec_sys.n_local_dofs();
@@ -386,7 +386,7 @@ void PetscPreconditioner<T>::set_hypre_ads_data(PC & pc, System & sys, const uns
   // The number of vertices and faces in all preceding processors
   dof_id_signed_type vert_offset = -lagrange_sys.get_dof_map().first_dof();
   dof_id_signed_type face_offset =
-    std::reduce(n_all_faces.begin(), n_all_faces.begin() + global_processor_id());
+    std::accumulate(n_all_faces.begin(), n_all_faces.begin() + global_processor_id(), 0);
 
   // Whether dofs are in variable-major or node-major order
   bool var_major = !libMesh::on_command_line("--node-major-dofs");
