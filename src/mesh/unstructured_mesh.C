@@ -2276,6 +2276,8 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
               node_to_elems_map.clear();
             }
         }
+      if (node_to_node_map.empty())
+        libMesh::out << "Warning: Stitch failed, no matching nodes found. Ensure boundaries are properly aligned before trying again." << std::endl;
     }
   else
     {
