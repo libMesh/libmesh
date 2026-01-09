@@ -43,11 +43,11 @@ void GhostPointNeighbors::operator()
   libmesh_assert(_mesh);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  bool check_periodic_bcs =
+  const bool check_periodic_bcs =
     (_periodic_bcs && !_periodic_bcs->empty());
 
   auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
-  bool check_disjoint_bcs = (db && !db->empty());
+  const bool check_disjoint_bcs = (db && !db->empty());
 
   std::unique_ptr<PointLocatorBase> point_locator;
   if (check_periodic_bcs || check_disjoint_bcs)
@@ -212,7 +212,13 @@ void GhostPointNeighbors::mesh_reinit()
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (!_periodic_bcs || _periodic_bcs->empty())
+  const bool check_periodic_bcs =
+    (_periodic_bcs && !_periodic_bcs->empty());
+
+  auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
+  const bool check_disjoint_bcs = (db && !db->empty());
+
+  if (!check_periodic_bcs && !check_disjoint_bcs)
     return;
 #endif
 
