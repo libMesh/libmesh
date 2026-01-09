@@ -53,7 +53,22 @@ void lagrange_nodal_soln(const Elem * elem,
 
   nodal_soln.resize(n_nodes);
 
+  switch (type)
+    {
+    case EDGE3:
+      {
+        nodal_soln[0] = elem_soln[0];
+        nodal_soln[1] = elem_soln[1];
+        nodal_soln[2] = (totalorder % 2) ? 0 : elem_soln[totalorder / 2 + 1];
+        if (totalorder % 2)
+          for (unsigned i = 0; i < totalorder + 1; i++)
+            nodal_soln[2] += elem_soln[i] * FE<1,LAGRANGE>::shape(type, totalorder, i, 0);
 
+        return;
+      }
+    default:
+      ;
+    }
 
   switch (totalorder)
     {
@@ -62,18 +77,6 @@ void lagrange_nodal_soln(const Elem * elem,
       {
         switch (type)
           {
-          case EDGE3:
-            {
-              libmesh_assert_equal_to (elem_soln.size(), 2);
-              libmesh_assert_equal_to (nodal_soln.size(), 3);
-
-              nodal_soln[0] = elem_soln[0];
-              nodal_soln[1] = elem_soln[1];
-              nodal_soln[2] = .5*(elem_soln[0] + elem_soln[1]);
-
-              return;
-            }
-
           case EDGE4:
             {
               libmesh_assert_equal_to (elem_soln.size(), 2);
@@ -312,21 +315,6 @@ void lagrange_nodal_soln(const Elem * elem,
       {
         switch (type)
           {
-          case EDGE4:
-            {
-              libmesh_assert_equal_to (elem_soln.size(), 3);
-              libmesh_assert_equal_to (nodal_soln.size(), 4);
-
-              // Project quadratic solution onto cubic element nodes
-              nodal_soln[0] = elem_soln[0];
-              nodal_soln[1] = elem_soln[1];
-              nodal_soln[2] = (2.*elem_soln[0] - elem_soln[1] +
-                               8.*elem_soln[2])/9.;
-              nodal_soln[3] = (-elem_soln[0] + 2.*elem_soln[1] +
-                               8.*elem_soln[2])/9.;
-              return;
-            }
-
           case TRI7:
             {
               libmesh_assert_equal_to (elem_soln.size(), 6);
@@ -434,31 +422,25 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
 {
   libmesh_assert(!e || e->type() == t);
 
+  switch (t)
+    {
+    case NODEELEM:
+      return 1;
+    case EDGE3:
+      libmesh_error_msg_if(o == CONSTANT, "ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+      return o + 1;
+    default:
+      ;
+    }
+
   switch (o)
     {
-      // lagrange can only be constant on a single node
-    case CONSTANT:
-      {
-        switch (t)
-          {
-          case NODEELEM:
-            return 1;
-
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
-          }
-      }
-
       // linear Lagrange shape functions
     case FIRST:
       {
         switch (t)
           {
-          case NODEELEM:
-            return 1;
-
           case EDGE2:
-          case EDGE3:
           case EDGE4:
             return 2;
 
@@ -522,12 +504,6 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
       {
         switch (t)
           {
-          case NODEELEM:
-            return 1;
-
-          case EDGE3:
-            return 3;
-
           case TRI6:
           case TRI7:
             return 6;
@@ -577,9 +553,6 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
       {
         switch (t)
           {
-          case NODEELEM:
-            return 1;
-
           case EDGE4:
             return 4;
 
@@ -617,31 +590,25 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
                                      const Order o,
                                      const unsigned int n)
 {
+  switch (t)
+    {
+    case NODEELEM:
+      return 1;
+    case EDGE3:
+      libmesh_error_msg_if(o == CONSTANT, "ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
+      return n < 2 ? 1 : o - 1;
+    default:
+      ;
+    }
+
   switch (o)
     {
-      // lagrange can only be constant on a single node
-    case CONSTANT:
-      {
-        switch (t)
-          {
-          case NODEELEM:
-            return 1;
-
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
-          }
-      }
-
       // linear Lagrange shape functions
     case FIRST:
       {
         switch (t)
           {
-          case NODEELEM:
-            return 1;
-
           case EDGE2:
-          case EDGE3:
           case EDGE4:
             {
               switch (n)
@@ -790,8 +757,6 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
         switch (t)
           {
             // quadratic lagrange has one dof at each node
-          case NODEELEM:
-          case EDGE3:
           case TRI6:
           case QUAD8:
           case QUADSHELL8:
@@ -831,7 +796,6 @@ unsigned int lagrange_n_dofs_at_node(const ElemType t,
       {
         switch (t)
           {
-          case NODEELEM:
           case EDGE4:
           case PRISM20:
           case PRISM21:
