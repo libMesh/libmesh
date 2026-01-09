@@ -73,45 +73,20 @@ Real chi_epsilon(const Real & x, const Real epsilon_squared)
  * Jacobian of the physical-to-reference mapping.
  */
 RealTensor get_jacobian_at_qp(const FEMap & fe_map,
-                          const unsigned int & dim,
-                          const unsigned int & qp)
+                              const unsigned int & dim,
+                              const unsigned int & qp)
 {
-  const auto & dxyzdxi = fe_map.get_dxyzdxi()[qp];
-  const auto & dxyzdeta = fe_map.get_dxyzdeta()[qp];
-  const auto & dxyzdzeta = fe_map.get_dxyzdzeta()[qp];
+  libmesh_error_msg_if(dim > 3, "Unsupported dimension.");
 
   // RealTensors are always 3x3, so we will fill any dimensions above dim
   // with 1s on the diagonal. This indicates a 1 to 1 relationship between
   // the physical and reference elements in these extra dimensions.
-  switch (dim)
-  {
-    case 1:
-      return RealTensor(
-        dxyzdxi(0), 0, 0,
-                     0, 1, 0,
-                     0, 0, 1
-      );
-      break;
 
-    case 2:
-      return RealTensor(
-        dxyzdxi(0), dxyzdeta(0), 0,
-        dxyzdxi(1), dxyzdeta(1), 0,
-        0,              0,               1
-      );
-      break;
+  const auto & dxyzdxi = dim >= 1 ? fe_map.get_dxyzdxi()[qp] : RealGradient(1, 0, 0);
+  const auto & dxyzdeta = dim >= 2 ? fe_map.get_dxyzdeta()[qp] : RealGradient(0, 1, 0);
+  const auto & dxyzdzeta = dim >= 3 ? fe_map.get_dxyzdzeta()[qp] : RealGradient(0, 0, 1);
 
-    case 3:
-      return RealTensor(
-        dxyzdxi,
-        dxyzdeta,
-        dxyzdzeta
-      ).transpose();  // Note the transposition!
-      break;
-
-    default:
-      libmesh_error_msg("Unsupported dimension.");
-  }
+  return RealTensor(dxyzdxi, dxyzdeta, dxyzdzeta).transpose();  // Note the transposition!
 }
 
 /**
