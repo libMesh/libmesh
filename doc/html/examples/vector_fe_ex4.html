@@ -45,7 +45,7 @@
 <pre>
 ***************************************************************
 * Running Example vector_fe_ex4:
-*   ./example-opt element_type=TET10 -pc_type hypre -pc_hypre_type ams
+*   ./example-opt element_type=TET10 -pc_type jacobi
 ***************************************************************
 
  Mesh Information:
@@ -93,18 +93,25 @@
 Assembling the System
 Nonlinear Residual: 5.02926
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 9, residual 2.77095e-12
+Linear solve finished, step 29, residual 1.88386e-13
 Trying full Newton step
-  Current Residual: 2.04533e-11
-  Nonlinear solver converged, step 0, residual reduction 4.06685e-12 < 1e-06
-  Nonlinear solver relative step size 1 > 1e-06
+  Current Residual: 1.14961e-05
+  Nonlinear step: |du|/|u| = 1, |du| = 8.59662
+Assembling the System
+Nonlinear Residual: 1.14961e-05
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 355, residual 1.83282e-25
+Trying full Newton step
+  Current Residual: 1.01399e-14
+  Nonlinear solver converged, step 1, residual reduction 2.01619e-15 < 1e-06
+  Nonlinear solver converged, step 1, relative step size 2.12393e-12 < 1e-06
 L2-Error is: 0.421384
 HCurl semi-norm error is: 1.00529
 HCurl-Error is: 1.09003
 
 ***************************************************************
 * Done Running Example vector_fe_ex4:
-*   ./example-opt element_type=TET10 -pc_type hypre -pc_hypre_type ams
+*   ./example-opt element_type=TET10 -pc_type jacobi
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex4:
@@ -171,7 +178,7 @@ HCurl-Error is: 1.09003
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex4:
-*   ./example-opt element_type=HEX20 -pc_type hypre -pc_hypre_type ams
+*   ./example-opt element_type=HEX20 -pc_type jacobi
 ***************************************************************
 
  Mesh Information:
@@ -219,18 +226,25 @@ HCurl-Error is: 1.09003
 Assembling the System
 Nonlinear Residual: 10.5823
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 6, residual 1.32167e-13
+Linear solve finished, step 8, residual 1.77336e-12
 Trying full Newton step
-  Current Residual: 4.79979e-13
-  Nonlinear solver converged, step 0, residual reduction 4.53565e-14 < 1e-06
-  Nonlinear solver relative step size 1 > 1e-06
+  Current Residual: 0.00343467
+  Nonlinear step: |du|/|u| = 1, |du| = 3.91397
+Assembling the System
+Nonlinear Residual: 0.00343467
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 65, residual 8.76357e-25
+Trying full Newton step
+  Current Residual: 3.98932e-15
+  Nonlinear solver converged, step 1, residual reduction 3.76978e-16 < 1e-06
+  Nonlinear solver converged, step 1, relative step size 6.67301e-12 < 1e-06
 L2-Error is: 0.172154
 HCurl semi-norm error is: 1.47497
 HCurl-Error is: 1.48498
 
 ***************************************************************
 * Done Running Example vector_fe_ex4:
-*   ./example-opt element_type=HEX20 -pc_type hypre -pc_hypre_type ams
+*   ./example-opt element_type=HEX20 -pc_type jacobi
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex4:
