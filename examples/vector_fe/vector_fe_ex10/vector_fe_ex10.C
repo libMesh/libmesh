@@ -27,6 +27,7 @@
 
 // Basic utilities.
 #include "libmesh/string_to_enum.h"
+#include "libmesh/petsc_macro.h"
 
 // The solver packages supported by libMesh.
 #include "libmesh/enum_solver_package.h"
@@ -94,6 +95,12 @@ int main (int argc, char ** argv)
 
   // But allow the command line to override it.
   infile.parse_command_line(argc, argv);
+
+  // hypre AMS/ADS requires PETSc 3.12.2 or above with hypre support enabled
+#if PETSC_VERSION_LESS_THAN(3, 12, 2) || !defined(LIBMESH_HAVE_PETSC_HYPRE)
+  libmesh_example_requires(!infile.search("ams") && !infile.search("ads"),
+                           "PETSc 3.12.2 or above with hypre support enabled");
+#endif
 
   // Read in parameters from the command line and the input file.
   const unsigned int dimension = infile("dim", 2);

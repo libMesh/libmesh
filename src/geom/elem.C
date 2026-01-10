@@ -3589,18 +3589,40 @@ Elem::positive_face_orientation(const unsigned int i) const
   // Get the number of vertices N of face i. Note that for 3d elements, i.e.
   // elements for which this->n_faces() > 0, the number of vertices on any of
   // its sides (or faces) is just the number of that face's sides (or edges).
-  auto side_i = this->side_ptr(i);
-  const unsigned int N = side_i->n_sides();
+  const unsigned int N = Elem::type_to_n_sides_map[this->side_type(i)];
 
   const std::vector<unsigned int> nodes = this->nodes_on_side(i);
 
   auto cmp = [&](const unsigned int & m, const unsigned int & n) -> bool
              { return this->point(m) < this->point(n); };
 
-  const unsigned int V = std::distance(nodes.begin(),
+  const unsigned int v = std::distance(nodes.begin(),
                          std::min_element(nodes.begin(), nodes.begin() + N, cmp));
 
-  return cmp(nodes[(V + N - 1) % N], nodes[(V + 1) % N]);
+  return cmp(nodes[(v - 1 + N) % N], nodes[(v + 1) % N]);
+}
+
+bool
+Elem::relative_edge_face_order(const unsigned int e, const unsigned int s) const
+{
+  libmesh_assert_less (e, this->n_edges());
+  libmesh_assert_less (s, this->n_faces());
+  libmesh_assert (is_edge_on_side(e, s));
+
+  const unsigned int N = Elem::type_to_n_sides_map[this->side_type(s)];
+
+  unsigned int v;
+  for (v = 0; v < N; v++)
+    if (this->local_side_node(s, v) == this->local_edge_node(e, 0))
+      break;
+
+  libmesh_assert (this->local_side_node(s, (v + 1) % N) ==
+                  this->local_edge_node(e, 1) ||
+                  this->local_side_node(s, (v - 1 + N) % N) ==
+                  this->local_edge_node(e, 1));
+
+  return this->local_side_node(s, (v + 1) % N) ==
+         this->local_edge_node(e, 1);
 }
 
 } // namespace libMesh

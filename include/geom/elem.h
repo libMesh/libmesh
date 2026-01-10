@@ -1150,6 +1150,12 @@ public:
    */
   bool positive_face_orientation(const unsigned int i) const;
 
+  /**
+   * \returns \p true iff, for an edge \p e on side \p s, the node map for
+   * side \p s is such that the first vertex (i.e. zeroth node) of \p e is
+   * lower positioned than the second vertex (i.e. first node) of \p e.
+   */
+  bool relative_edge_face_order(const unsigned int e, const unsigned int s) const;
 
   /**
    * A helper function for copying generic element data (mapping,
@@ -1158,7 +1164,6 @@ public:
    * is added.
    */
   void inherit_data_from(const Elem & src);
-
 
 private:
   /**

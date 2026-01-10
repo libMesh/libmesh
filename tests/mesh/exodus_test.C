@@ -66,7 +66,7 @@ private:
       Node * n2 = nullptr;
       for (const Node & n : e1c->node_ref_range())
         {
-#if LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
           const Point diff = Point(*n1)-Point(n);
 
           // We're testing against ExodusII input, and if we're in

@@ -1223,7 +1223,7 @@ LinearSolver<Number> * ImplicitSystem::get_linear_solver() const
   else
     linear_solver->init();
 
-  linear_solver->init_names(*this);
+  linear_solver->init_systems(*this);
 
   return linear_solver.get();
 }

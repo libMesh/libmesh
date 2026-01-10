@@ -84,7 +84,7 @@ int main (int argc, char** argv)
   // FIXME: This example currently segfaults with Trilinos?
   libmesh_example_requires(libMesh::default_solver_package() == PETSC_SOLVERS, "--enable-petsc");
 
-#if LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
   // lets parse the input to check which set of arguments was provided.
   // Skip the runs with wrong arguments:
   GetPot input(argc, argv);

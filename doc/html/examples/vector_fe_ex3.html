@@ -45,7 +45,7 @@
 <pre>
 ***************************************************************
 * Running Example vector_fe_ex3:
-*   ./example-opt element_type=TRI6 -pc_type lu
+*   ./example-opt element_type=TRI6 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 
  Mesh Information:
@@ -93,10 +93,10 @@
 Assembling the System
 Nonlinear Residual: 23.6078
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 1, residual 9.52159e-14
+Linear solve finished, step 12, residual 7.94623e-13
 Trying full Newton step
-  Current Residual: 1.55638e-13
-  Nonlinear solver converged, step 0, residual reduction 6.59264e-15 < 1e-06
+  Current Residual: 1.68209e-11
+  Nonlinear solver converged, step 0, residual reduction 7.12514e-13 < 1e-06
   Nonlinear solver relative step size 1 > 1e-06
 L2-Error is: 0.128366
 HCurl semi-norm error is: 0.655952
@@ -104,11 +104,11 @@ HCurl-Error is: 0.668394
 
 ***************************************************************
 * Done Running Example vector_fe_ex3:
-*   ./example-opt element_type=TRI6 -pc_type lu
+*   ./example-opt element_type=TRI6 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex3:
-*   ./example-opt element_type=TRI7 -pc_type lu
+*   ./example-opt element_type=TRI7 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 
  Mesh Information:
@@ -156,10 +156,10 @@ HCurl-Error is: 0.668394
 Assembling the System
 Nonlinear Residual: 23.6078
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 1, residual 1.07269e-13
+Linear solve finished, step 12, residual 7.64835e-13
 Trying full Newton step
-  Current Residual: 1.63819e-13
-  Nonlinear solver converged, step 0, residual reduction 6.93919e-15 < 1e-06
+  Current Residual: 1.58148e-11
+  Nonlinear solver converged, step 0, residual reduction 6.69898e-13 < 1e-06
   Nonlinear solver relative step size 1 > 1e-06
 L2-Error is: 0.128366
 HCurl semi-norm error is: 0.655952
@@ -167,11 +167,11 @@ HCurl-Error is: 0.668394
 
 ***************************************************************
 * Done Running Example vector_fe_ex3:
-*   ./example-opt element_type=TRI7 -pc_type lu
+*   ./example-opt element_type=TRI7 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex3:
-*   ./example-opt element_type=QUAD8 -pc_type lu
+*   ./example-opt element_type=QUAD8 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 
  Mesh Information:
@@ -219,10 +219,10 @@ HCurl-Error is: 0.668394
 Assembling the System
 Nonlinear Residual: 28.9779
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 1, residual 4.12212e-14
+Linear solve finished, step 12, residual 2.62121e-13
 Trying full Newton step
-  Current Residual: 6.54218e-14
-  Nonlinear solver converged, step 0, residual reduction 2.25765e-15 < 1e-06
+  Current Residual: 3.84069e-12
+  Nonlinear solver converged, step 0, residual reduction 1.32539e-13 < 1e-06
   Nonlinear solver relative step size 1 > 1e-06
 L2-Error is: 0.12862
 HCurl semi-norm error is: 0.802879
@@ -230,11 +230,11 @@ HCurl-Error is: 0.813116
 
 ***************************************************************
 * Done Running Example vector_fe_ex3:
-*   ./example-opt element_type=QUAD8 -pc_type lu
+*   ./example-opt element_type=QUAD8 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex3:
-*   ./example-opt element_type=QUAD9 -pc_type lu
+*   ./example-opt element_type=QUAD9 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 
  Mesh Information:
@@ -282,10 +282,10 @@ HCurl-Error is: 0.813116
 Assembling the System
 Nonlinear Residual: 28.9779
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 1, residual 3.99131e-14
+Linear solve finished, step 12, residual 2.55116e-13
 Trying full Newton step
-  Current Residual: 8.2888e-14
-  Nonlinear solver converged, step 0, residual reduction 2.86039e-15 < 1e-06
+  Current Residual: 3.69086e-12
+  Nonlinear solver converged, step 0, residual reduction 1.27368e-13 < 1e-06
   Nonlinear solver relative step size 1 > 1e-06
 L2-Error is: 0.12862
 HCurl semi-norm error is: 0.802879
@@ -293,7 +293,7 @@ HCurl-Error is: 0.813116
 
 ***************************************************************
 * Done Running Example vector_fe_ex3:
-*   ./example-opt element_type=QUAD9 -pc_type lu
+*   ./example-opt element_type=QUAD9 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex3:
@@ -471,10 +471,10 @@ HCurl-Error is: 0.0403047
 Assembling the System
 Nonlinear Residual: 47.591
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 1, residual 6.89036e-13
+Linear solve finished, step 1, residual 6.95234e-13
 Trying full Newton step
-  Current Residual: 1.75909e-12
-  Nonlinear solver converged, step 0, residual reduction 3.69627e-14 < 1e-06
+  Current Residual: 1.82966e-12
+  Nonlinear solver converged, step 0, residual reduction 3.84455e-14 < 1e-06
   Nonlinear solver relative step size 1 > 1e-06
 L2-Error is: 0.00575821
 HCurl semi-norm error is: 0.0398913

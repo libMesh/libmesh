@@ -32,7 +32,7 @@
 #include "libmesh/preconditioner.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/petscdmlibmesh.h"
-#include "libmesh/petsc_mffd_matrix.h"
+#include "libmesh/petsc_preconditioner.h"
 
 #if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
     !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)
@@ -984,6 +984,10 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LibmeshPetscCall(KSPSetFromOptions(ksp));
 #endif
   LibmeshPetscCall(SNESSetFromOptions(_snes));
+
+  PC pc;
+  LibmeshPetscCall(KSPGetPC(ksp, &pc));
+  PetscPreconditioner<T>::set_petsc_aux_data(pc, this->system());
 
 #if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
     !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)

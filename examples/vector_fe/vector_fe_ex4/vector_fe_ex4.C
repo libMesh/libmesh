@@ -34,6 +34,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_norm_type.h"
+#include "libmesh/petsc_macro.h"
 
 // The systems and solvers we may use
 #include "curl_curl_system.h"
@@ -59,6 +60,12 @@ int main (int argc, char ** argv)
 
   // But allow the command line to override it.
   infile.parse_command_line(argc, argv);
+
+  // hypre AMS requires PETSc 3.12.2 or above with hypre support enabled
+#if PETSC_VERSION_LESS_THAN(3, 12, 2) || !defined(LIBMESH_HAVE_PETSC_HYPRE)
+  libmesh_example_requires(!infile.search("ams"),
+                           "PETSc 3.12.2 or above with hypre support enabled");
+#endif
 
   // Read in parameters from the input file
   const unsigned int grid_size = infile("grid_size", 2);
