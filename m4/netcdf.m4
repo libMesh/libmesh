@@ -131,7 +131,7 @@ AS_HELP_STRING([--enable-netcdf=v492],
                 ])
           AS_IF([test "x$configure_netcdf_v492" = "xyes"],[
                 AC_MSG_NOTICE([Configuring NetCDF v4.9.2])
-                AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
+                AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LDFLAGS=$SUB_LDFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
                 ],
                 [mkdir -p contrib/netcdf/netcdf-c
                  echo "distclean:" > contrib/netcdf/netcdf-c/Makefile
