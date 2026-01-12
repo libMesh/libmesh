@@ -62305,6 +62305,7 @@ ac_abs_srcdir=$ac_abs_top_srcdir$ac_dir_suffix
       as_fn_append ax_args " 'F77=$F77'"
       as_fn_append ax_args " 'FC=$FC'"
       as_fn_append ax_args " 'CPPFLAGS=$SUB_CPPFLAGS'"
+      as_fn_append ax_args " 'LDFLAGS=$SUB_LDFLAGS'"
       as_fn_append ax_args " 'LIBS=$SUB_LIBS'"
       as_fn_append ax_args " '$netcdf_xml2_arg'"
       as_fn_append ax_args " '$netcdf_dap_arg'"
