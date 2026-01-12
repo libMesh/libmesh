@@ -7,6 +7,7 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <regex>
 
 using namespace libMesh;
 
@@ -59,6 +60,29 @@ public:
 
     std::unique_ptr<PointLocatorBase> locator = mesh.sub_point_locator();
 
+    // Make sure we throw in default (not out-of-mesh) mode when
+    // debugging and querying a point out of the mesh
+    const Point p{2,0,0};
+#if defined(LIBMESH_ENABLE_EXCEPTIONS) && !defined(NDEBUG)
+    auto test_exception = [&locator, p]()
+    {
+      bool threw_desired_exception = false;
+      try {
+        locator->operator()(p);
+      }
+      catch (libMesh::LogicError & e) {
+        std::regex msg_regex("out_of_mesh_mode");
+        CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+        threw_desired_exception = true;
+      }
+      catch (...) {
+        CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
+      }
+      CPPUNIT_ASSERT(threw_desired_exception);
+    };
+    test_exception();
+#endif
+
     if (!mesh.is_serial())
       locator->enable_out_of_mesh_mode();
 
@@ -105,6 +129,18 @@ public:
               }
           }
       }
+
+    // Make sure we do not throw in out-of-mesh mode when looking for
+    // a point out of the mesh
+    locator->enable_out_of_mesh_mode();
+    const Elem *elem = locator->operator()(p);
+    CPPUNIT_ASSERT(!elem);
+
+    // Make sure we throw again after disabling out-of-mesh mode again.
+    locator->disable_out_of_mesh_mode();
+#if defined(LIBMESH_ENABLE_EXCEPTIONS) && !defined(NDEBUG)
+    test_exception();
+#endif // LIBMESH_ENABLE_EXCEPTIONS
   }
 
   void testPlanar()
