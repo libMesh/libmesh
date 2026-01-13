@@ -610,82 +610,79 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       // to update a remote_elem link, and we can check for possible
       // inconsistencies along the way.
       //
-      // For subactive elements, we don't bother keeping neighbor
-      // links in good shape, so there's nothing we need to set or can
-      // safely assert here.
-      if (!elem->subactive())
-        for (auto n : elem->side_index_range())
-          {
-            const dof_id_type neighbor_id =
-              cast_int<dof_id_type>(*in++);
+      // Even for subactive elements, we'll try to keep neighbor links
+      // in good shape now, if only so any future find_neighbors() is
+      // idempotent.
+      for (auto n : elem->side_index_range())
+        {
+          const dof_id_type neighbor_id =
+            cast_int<dof_id_type>(*in++);
 
-            const dof_id_type neighbor_side =
-              cast_int<dof_id_type>(*in++);
+          const dof_id_type neighbor_side =
+            cast_int<dof_id_type>(*in++);
 
-            // If the sending processor sees a domain boundary here,
-            // we'd better agree ... unless all we see is a
-            // remote_elem?  In that case maybe we just couldn't keep
-            // up with a user's delete_elem.  Let's trust them.
-            if (neighbor_id == DofObject::invalid_id)
-              {
-                const Elem * my_neigh = elem->neighbor_ptr(n);
-                if (my_neigh == remote_elem)
-                  elem->set_neighbor(n, nullptr);
-                else
-                  libmesh_assert (!my_neigh);
-                continue;
-              }
+          // If the sending processor sees a domain boundary here,
+          // we'd better agree ... unless all we see is a remote_elem?
+          // In that case maybe we just couldn't keep up with a user's
+          // delete_elem.  Let's trust them.
+          if (neighbor_id == DofObject::invalid_id)
+            {
+              const Elem * my_neigh = elem->neighbor_ptr(n);
+              if (my_neigh == remote_elem)
+                elem->set_neighbor(n, nullptr);
+              else
+                libmesh_assert (!my_neigh);
+              continue;
+            }
 
-            // If the sending processor has a remote_elem neighbor here,
-            // then all we know is that we'd better *not* have a domain
-            // boundary ... except that maybe it's the *sending*
-            // processor who missed a delete_elem we saw.
-            if (neighbor_id == remote_elem->id())
-              {
-                // At this level of the code we can't even assert in
-                // cases where the neighbor should know what they're
-                // talking about, so skip it.
+          // If the sending processor has a remote_elem neighbor here,
+          // then all we know is that we'd better *not* have a domain
+          // boundary ... except that maybe it's the *sending*
+          // processor who missed a delete_elem we saw.
+          if (neighbor_id == remote_elem->id())
+            {
+              // At this level of the code we can't even assert in
+              // cases where the neighbor should know what they're
+              // talking about, so skip it.
 
-                // libmesh_assert(elem->neighbor_ptr(n));
-                continue;
-              }
+              // libmesh_assert(elem->neighbor_ptr(n));
+              continue;
+            }
 
-            Elem * neigh = mesh->query_elem_ptr(neighbor_id);
+          Elem * neigh = mesh->query_elem_ptr(neighbor_id);
 
-            // The sending processor sees a neighbor here, so if we
-            // don't have that neighboring element, then we'd better
-            // have a remote_elem signifying that fact.
-            if (!neigh)
-              {
-                libmesh_assert_equal_to (elem->neighbor_ptr(n), remote_elem);
-                continue;
-              }
+          // The sending processor sees a neighbor here, so if we
+          // don't have that neighboring element, then we'd better
+          // have a remote_elem signifying that fact.
+          if (!neigh)
+            {
+              libmesh_assert_equal_to (elem->neighbor_ptr(n), remote_elem);
+              continue;
+            }
 
-            // The sending processor has a neighbor here, and we have
-            // that element, but that does *NOT* mean we're already
-            // linking to it.  Perhaps we initially received both elem
-            // and neigh from processors on which their mutual link was
-            // remote?
-            libmesh_assert(elem->neighbor_ptr(n) == neigh ||
-                           elem->neighbor_ptr(n) == remote_elem);
+          // The sending processor has a neighbor here, and we have
+          // that element, but that does *NOT* mean we're already
+          // linking to it.  Perhaps we initially received both elem
+          // and neigh from processors on which their mutual link was
+          // remote?
+          libmesh_assert(elem->neighbor_ptr(n) == neigh ||
+                         elem->neighbor_ptr(n) == remote_elem);
 
-            // If the link was originally remote, we should update it,
-            // and make sure the appropriate parts of its family link
-            // back to us.
-            if (elem->neighbor_ptr(n) == remote_elem)
-              {
-                elem->set_neighbor(n, neigh);
+          // If the link was originally remote, we should update it,
+          // and make sure the appropriate parts of its family link
+          // back to us.
+          if (elem->neighbor_ptr(n) == remote_elem)
+            {
+              elem->set_neighbor(n, neigh);
 
+              if (neighbor_side != libMesh::invalid_uint)
                 elem->make_links_to_me_local(n, neighbor_side);
-              }
-            else
-              libmesh_assert(neigh->level() < elem->level() ||
-                             neigh->neighbor_ptr(neighbor_side) == elem);
-          }
-      else
-        // We skip these to go to the boundary information if the element is
-        // actually subactive
-        in += 2*elem->n_sides();
+            }
+          else
+            libmesh_assert(elem->subactive() ||
+                           neigh->level() < elem->level() ||
+                           neigh->neighbor_ptr(neighbor_side) == elem);
+        }
 
       // Our p level and refinement flags should be "close to" correct
       // if we're not an active element - we might have a p level
@@ -841,7 +838,8 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           // to us.
           elem->set_neighbor(n, neigh);
 
-          elem->make_links_to_me_local(n, neighbor_side);
+          if (neighbor_side != libMesh::invalid_uint)
+            elem->make_links_to_me_local(n, neighbor_side);
         }
 
       elem->unpack_indexing(in);
