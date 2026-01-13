@@ -1647,13 +1647,14 @@ std::string EquationSystems::get_info () const
 {
   std::ostringstream oss;
 
-  unsigned int n_sys = 0;
+  unsigned int n_hidden_sys = 0;
   for (auto & pr : _systems)
-    if (!pr.second->hide_output())
-      n_sys++;
+    n_hidden_sys += pr.second->hide_output();
 
   oss << " EquationSystems\n"
-      << "  n_systems()=" << n_sys << '\n';
+      << "  n_systems()=" << this->n_systems()
+      << (n_hidden_sys ? " (hidden: " + std::to_string(n_hidden_sys) + ")" : "")
+      << "\n";
 
   // Print the info for the individual systems
   for (const auto & pr : _systems)
