@@ -2134,6 +2134,24 @@ void Elem:: family_tree_by_side (std::vector<Elem *> & family,
 
 
 
+void Elem::total_family_tree_by_side (std::vector<const Elem *> & family,
+                                      unsigned int side,
+                                      bool reset) const
+{
+  ElemInternal::total_family_tree_by_side(this, family, side, reset);
+}
+
+
+
+void Elem::total_family_tree_by_side (std::vector<Elem *> & family,
+                                      unsigned int side,
+                                      bool reset)
+{
+  ElemInternal::total_family_tree_by_side(this, family, side, reset);
+}
+
+
+
 void Elem::active_family_tree_by_side (std::vector<const Elem *> & family,
                                        unsigned int side,
                                        bool reset) const

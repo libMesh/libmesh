@@ -1592,6 +1592,21 @@ public:
                             bool reset = true);
 
   /**
+   * Same as the \p total_family_tree() member, but only adds elements
+   * which are next to \p side.
+   */
+  void total_family_tree_by_side (std::vector<const Elem *> & family,
+                                  unsigned int side,
+                                  bool reset = true) const;
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void total_family_tree_by_side (std::vector<Elem *> & family,
+                                  unsigned int side,
+                                  bool reset = true);
+
+  /**
    * Same as the \p active_family_tree() member, but only adds elements
    * which are next to \p side.
    */
