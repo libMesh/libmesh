@@ -141,6 +141,21 @@ public:
 #if defined(LIBMESH_ENABLE_EXCEPTIONS) && !defined(NDEBUG)
     test_exception();
 #endif // LIBMESH_ENABLE_EXCEPTIONS
+
+    locator->clear();
+    CPPUNIT_ASSERT(!locator->initialized());
+
+    locator->init();
+    CPPUNIT_ASSERT(locator->initialized());
+
+    locator->set_close_to_point_tol(1e-1);
+    Point p2{1.001,0,0};
+    const Elem *elem2 = locator->operator()(p2);
+    bool found_elem = elem2;
+    if (!mesh.is_serial())
+      mesh.comm().max(found_elem);
+
+    CPPUNIT_ASSERT(found_elem);
   }
 
   void testPlanar()
