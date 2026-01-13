@@ -96,6 +96,7 @@ AS_HELP_STRING([--enable-netcdf=v492],
                 [
                  SUB_CPPFLAGS="$HDF5_CPPFLAGS $SUB_CPPFLAGS"
                  SUB_LIBS="$HDF5_LIBS $SUB_LIBS"
+                 SUB_LDFLAGS="$HDF5_LDFLAGS $SUB_LDFLAGS"
                  AS_IF([test "x$enablepetsc" != "xno"],
                        [
                         SUB_CPPFLAGS="$PETSCINCLUDEDIRS $SUB_CPPFLAGS"
@@ -117,10 +118,11 @@ AS_HELP_STRING([--enable-netcdf=v492],
                 [netcdf_dap_arg=--disable-dap
                  netcdf_curl_arg=--disable-curl
                  netcdf_byterange_arg=--disable-byterange])
+
           dnl AX_SUBDIRS_CONFIGURE now dislikes variables in $1
           AS_IF([test "x$configure_netcdf_v462" = "xyes"],[
                 AC_MSG_NOTICE([Configuring NetCDF v4.6.2])
-                AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c-4.6.2],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
+                AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c-4.6.2],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LDFLAGS=$SUB_LDFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
                 ],
                 [mkdir -p contrib/netcdf/netcdf-c-4.6.2
                  echo "distclean:" > contrib/netcdf/netcdf-c-4.6.2/Makefile
@@ -129,7 +131,7 @@ AS_HELP_STRING([--enable-netcdf=v492],
                 ])
           AS_IF([test "x$configure_netcdf_v492" = "xyes"],[
                 AC_MSG_NOTICE([Configuring NetCDF v4.9.2])
-                AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
+                AX_SUBDIRS_CONFIGURE([contrib/netcdf/netcdf-c],[[CXX=$CXX],[CC=$CC],[F77=$F77],[FC=$FC],[CPPFLAGS=$SUB_CPPFLAGS],[LDFLAGS=$SUB_LDFLAGS],[LIBS=$SUB_LIBS],[$netcdf_xml2_arg],[$netcdf_dap_arg],[$netcdf_curl_arg],[$netcdf_byterange_arg],[--disable-testsets],[$netcdf_v4_arg]])
                 ],
                 [mkdir -p contrib/netcdf/netcdf-c
                  echo "distclean:" > contrib/netcdf/netcdf-c/Makefile

@@ -36,7 +36,7 @@ if [ "$#" = "0" ] ; then
 fi
 
 #
-# Need a valid METHOD 
+# Need a valid METHOD
 #
 if (test "x$METHOD" = x); then
     #echo "No METHOD specified - defaulting to opt"
@@ -136,7 +136,7 @@ while [ "x$1" != "x" ]; do
 	    ;;
 
 	"--ldflags")
-	    return_val="@libmesh_LDFLAGS@ $return_val"
+	    return_val="@libmesh_LDFLAGS@ @HDF5_LDFLAGS@ $return_val"
 	    ;;
 
 	"--version")
