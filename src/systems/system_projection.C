@@ -1031,11 +1031,12 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
  */
 void System::project_solution (ValueFunctionPointer fptr,
                                GradientFunctionPointer gptr,
-                               const Parameters & function_parameters) const
+                               const Parameters & function_parameters,
+                               std::optional<ConstElemRange> active_local_range) const
 {
   WrappedFunction<Number> f(*this, fptr, &function_parameters);
   WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
-  this->project_solution(&f, &g);
+  this->project_solution(&f, &g, active_local_range);
 }
 
 
@@ -1044,9 +1045,10 @@ void System::project_solution (ValueFunctionPointer fptr,
  * projections and nodal interpolations on each element.
  */
 void System::project_solution (FunctionBase<Number> * f,
-                               FunctionBase<Gradient> * g) const
+                               FunctionBase<Gradient> * g,
+                               std::optional<ConstElemRange> active_local_range) const
 {
-  this->project_vector(*solution, f, g);
+  this->project_vector(*solution, f, g, /*is_adjoint=*/-1, active_local_range);
 
   solution->localize(*current_local_solution, _dof_map->get_send_list());
 }
@@ -1057,9 +1059,10 @@ void System::project_solution (FunctionBase<Number> * f,
  * projections and nodal interpolations on each element.
  */
 void System::project_solution (FEMFunctionBase<Number> * f,
-                               FEMFunctionBase<Gradient> * g) const
+                               FEMFunctionBase<Gradient> * g,
+                               std::optional<ConstElemRange> active_local_range) const
 {
-  this->project_vector(*solution, f, g);
+  this->project_vector(*solution, f, g, /*is_adjoint=*/-1, active_local_range);
 
   solution->localize(*current_local_solution, _dof_map->get_send_list());
 }
@@ -1248,11 +1251,13 @@ void System::boundary_project_solution (const std::set<boundary_id_type> & b,
                                         const std::vector<unsigned int> & variables,
                                         ValueFunctionPointer fptr,
                                         GradientFunctionPointer gptr,
-                                        const Parameters & function_parameters)
+                                        const Parameters & function_parameters,
+                                        std::optional<ConstElemRange> active_local_range)
+
 {
   WrappedFunction<Number> f(*this, fptr, &function_parameters);
   WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
-  this->boundary_project_solution(b, variables, &f, &g);
+  this->boundary_project_solution(b, variables, &f, &g, active_local_range);
 }
 
 
@@ -1264,9 +1269,10 @@ void System::boundary_project_solution (const std::set<boundary_id_type> & b,
 void System::boundary_project_solution (const std::set<boundary_id_type> & b,
                                         const std::vector<unsigned int> & variables,
                                         FunctionBase<Number> * f,
-                                        FunctionBase<Gradient> * g)
+                                        FunctionBase<Gradient> * g,
+                                        std::optional<ConstElemRange> active_local_range)
 {
-  this->boundary_project_vector(b, variables, *solution, f, g);
+  this->boundary_project_vector(b, variables, *solution, f, g, -1 /*is_adjoint*/, active_local_range);
 
   solution->localize(*current_local_solution);
 }
