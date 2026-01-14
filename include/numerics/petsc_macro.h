@@ -109,7 +109,7 @@
 // If we're using quad precision, we need to disambiguate std
 // operations on PetscScalar
 
-#if LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 # include <boost/multiprecision/float128.hpp>
 
 namespace std

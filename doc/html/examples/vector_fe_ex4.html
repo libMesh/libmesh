@@ -115,6 +115,69 @@ HCurl-Error is: 1.09003
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex4:
+*   ./example-opt element_type=TET14 -pc_type hypre -pc_hypre_type ams
+***************************************************************
+
+ Mesh Information:
+  elem_dimensions()={3}
+  elem_default_orders()={THIRD}
+  supported_nodal_order()=3
+  spatial_dimension()=3
+  n_nodes()=5849
+    n_local_nodes()=5849
+  n_elem()=1536
+    n_local_elem()=1536
+    n_active_elem()=1536
+  n_subdomains()=1
+  n_elemsets()=0
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+  is_prepared()=true
+  is_replicated()=true
+
+ EquationSystems
+  n_systems()=2 (hidden: 1)
+   System #0, "CurlCurl"
+    Type "Implicit"
+    Variables="u"
+    Finite Element Types="NEDELEC_ONE"
+    Approximation Orders="FIRST"
+    n_dofs()=2156
+    n_local_dofs()=2156
+    max(n_local_dofs())=2156
+    n_constrained_dofs()=0
+    n_local_constrained_dofs()=0
+    max(local unconstrained dofs)=2156
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 14.3581
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 25
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 5.02926
+Linear solve starting, tolerance 1e-12
+Linear solve finished, step 9, residual 2.77087e-12
+Trying full Newton step
+  Current Residual: 2.04503e-11
+  Nonlinear solver converged, step 0, residual reduction 4.06627e-12 < 1e-06
+  Nonlinear solver relative step size 1 > 1e-06
+L2-Error is: 0.421384
+HCurl semi-norm error is: 1.00529
+HCurl-Error is: 1.09003
+
+***************************************************************
+* Done Running Example vector_fe_ex4:
+*   ./example-opt element_type=TET14 -pc_type hypre -pc_hypre_type ams
+***************************************************************
+***************************************************************
+* Running Example vector_fe_ex4:
 *   ./example-opt element_type=HEX20 -pc_type jacobi
 ***************************************************************
 
@@ -185,7 +248,7 @@ HCurl-Error is: 1.48498
 ***************************************************************
 ***************************************************************
 * Running Example vector_fe_ex4:
-*   ./example-opt element_type=HEX27 -pc_type jacobi
+*   ./example-opt element_type=HEX27 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 
  Mesh Information:
@@ -208,7 +271,7 @@ HCurl-Error is: 1.48498
   is_replicated()=true
 
  EquationSystems
-  n_systems()=1
+  n_systems()=2 (hidden: 1)
    System #0, "CurlCurl"
     Type "Implicit"
     Variables="u"
@@ -233,25 +296,18 @@ HCurl-Error is: 1.48498
 Assembling the System
 Nonlinear Residual: 10.5823
 Linear solve starting, tolerance 1e-12
-Linear solve finished, step 8, residual 1.77359e-12
+Linear solve finished, step 6, residual 1.32162e-13
 Trying full Newton step
-  Current Residual: 0.00343547
-  Nonlinear step: |du|/|u| = 1, |du| = 3.91397
-Assembling the System
-Nonlinear Residual: 0.00343547
-Linear solve starting, tolerance 1e-12
-Linear solve finished, step 56, residual 1.14044e-24
-Trying full Newton step
-  Current Residual: 5.16952e-15
-  Nonlinear solver converged, step 1, residual reduction 4.88504e-16 < 1e-06
-  Nonlinear solver converged, step 1, relative step size 6.67363e-12 < 1e-06
+  Current Residual: 4.80837e-13
+  Nonlinear solver converged, step 0, residual reduction 4.54376e-14 < 1e-06
+  Nonlinear solver relative step size 1 > 1e-06
 L2-Error is: 0.172154
 HCurl semi-norm error is: 1.47497
 HCurl-Error is: 1.48498
 
 ***************************************************************
 * Done Running Example vector_fe_ex4:
-*   ./example-opt element_type=HEX27 -pc_type jacobi
+*   ./example-opt element_type=HEX27 -pc_type hypre -pc_hypre_type ams
 ***************************************************************
 </pre>
 </div>

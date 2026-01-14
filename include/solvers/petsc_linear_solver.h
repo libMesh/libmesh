@@ -114,14 +114,15 @@ public:
              const char * name = nullptr);
 
   /**
-   * Apply names to the system to be solved.  This sets an option
-   * prefix from the system name and sets field names from the
-   * system's variable names.
+   * Apply names to the system to be solved and set auxiliary preconditioner
+   * data. This a) sets an option prefix from the system name and sets field
+   * names from the system's variable names and b) sets auxiliary data needed
+   * by preconditioners such as hypre ams/ads.
    *
    * Since field names are applied to DoF numberings, this method must
    * be called again after any System reinit.
    */
-  virtual void init_names (const System &) override;
+  virtual void init_systems (const System &) override;
 
   /**
    * After calling this method, all successive solves will be

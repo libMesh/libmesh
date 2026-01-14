@@ -127,7 +127,7 @@ void LinearImplicitSystem::solve ()
   else
     linear_solver->init();
 
-  linear_solver->init_names(*this);
+  linear_solver->init_systems(*this);
 
   // Get the user-specified linear solver tolerance
   const auto [maxits, tol] = this->get_linear_solve_parameters();

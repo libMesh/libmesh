@@ -261,7 +261,7 @@ void NewtonSolver::init()
   else
     _linear_solver->init();
 
-  _linear_solver->init_names(_system);
+  _linear_solver->init_systems(_system);
 }
 
 
@@ -272,7 +272,7 @@ void NewtonSolver::reinit()
 
   _linear_solver->clear();
 
-  _linear_solver->init_names(_system);
+  _linear_solver->init_systems(_system);
 }
 
 

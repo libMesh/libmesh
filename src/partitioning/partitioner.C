@@ -742,7 +742,7 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
   // This function must be run on all processors at once
   libmesh_parallel_only(mesh.comm());
 
-#if LIBMESH_HAVE_PETSC
+#ifdef LIBMESH_HAVE_PETSC
   std::map<std::pair<processor_id_type, processor_id_type>, std::set<dof_id_type>> processor_pair_to_nodes;
 
   processor_pairs_to_interface_nodes(mesh, processor_pair_to_nodes);
