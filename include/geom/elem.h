@@ -290,12 +290,18 @@ public:
   virtual dof_id_type key () const;
 
   /**
-   * \returns \p true if two elements are equivalent, false otherwise.
-   * This is true if the elements are connected to identical global
-   * nodes, regardless of how those nodes might be numbered local
-   * to the elements.
+   * \returns \p true if two elements are equivalent, \p false
+   * otherwise.  This is true if the elements are connected to
+   * identical global nodes, regardless of how those nodes might be
+   * numbered local to the elements.
    */
   bool operator == (const Elem & rhs) const;
+
+  /**
+   * \returns \p false if two elements are equivalent, \p true
+   * otherwise.
+   */
+  bool operator != (const Elem & rhs) const;
 
   /**
    * \returns \p true if two elements have equal topologies, false
@@ -2575,6 +2581,14 @@ inline
 subdomain_id_type & Elem::subdomain_id ()
 {
   return _sbd_id;
+}
+
+
+
+inline
+bool Elem::operator != (const Elem & rhs) const
+{
+  return !(*this == rhs);
 }
 
 
