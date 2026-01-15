@@ -1595,18 +1595,21 @@ void BoundaryInfo::side_boundary_ids (const Elem * const elem,
     std::vector<bool> search_on_side(elem->n_sides(), true);
     for (const auto side : make_range(elem->n_sides()))
     {
+      // Reset the search level for each side
+      const Elem * searched_elem_for_side = elem;
+
       // If we don't have children on boundaries and we are on an external boundary,
       // we will just use the top parent. search_on_side[side] = true works
       if (elem->neighbor_ptr(side) == nullptr)
         continue;
       // Otherwise we loop over the ancestors and check if they have a different BC for us
       else
-        while (searched_elem->parent() != nullptr)
+        while (searched_elem_for_side->parent() != nullptr)
         {
-          const Elem * parent = searched_elem->parent();
-          if (search_on_side[side] && parent->is_child_on_side(parent->which_child_am_i(searched_elem), side) == false)
+          const Elem * parent = searched_elem_for_side->parent();
+          if (search_on_side[side] && parent->is_child_on_side(parent->which_child_am_i(searched_elem_for_side), side) == false)
             search_on_side[side] = false;
-          searched_elem = parent;
+          searched_elem_for_side = parent;
         }
     }
     // Now search on the top parent, only if we need to (element is not deep inside the top parent)
