@@ -50,6 +50,8 @@
 #include "libmesh/error_vector.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/kelly_error_estimator.h"
+// for distributed mesh editing
+#include "libmesh/parallel_ghost_sync.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -65,7 +67,7 @@ void assemble_func(EquationSystems & es, const std::string & system_name)
   std::unique_ptr<FEBase> fe (FEBase::build(dim, fe_type));
   std::unique_ptr<FEBase> inf_fe (FEBase::build_InfFE(dim, fe_type));
 
-  const std::vector<dof_id_type > charged_objects = es.parameters.get<std::vector<dof_id_type> >("charged_elem_id");
+  const std::set<dof_id_type > charged_objects = es.parameters.get<std::set<dof_id_type> >("charged_elem_id");
   const auto qrule=fe_type.default_quadrature_rule(/*dim = */ 3, /*extra order = */ 3);
 
   fe->attach_quadrature_rule (&*qrule);
@@ -115,7 +117,7 @@ void assemble_func(EquationSystems & es, const std::string & system_name)
 
       Real rho;
       // check if charged_objects contains elem->id(), we add the corresponding charge to the rhs vector
-      if (std::find(charged_objects.begin(), charged_objects.end(), elem->id()) != charged_objects.end())
+      if (charged_objects.count(elem->id()))
         rho=1./elem->volume();
       else
         rho = 0;
@@ -178,6 +180,10 @@ int main (int argc, char** argv)
   // creation of an empty mesh-object
   Mesh mesh(init.comm(), dim);
 
+  // We're going to keep track of elements by id, so we don't want
+  // even a DistributedMesh to renumber them.
+  mesh.allow_renumbering(false);
+
   // fill the meshes with a spherical grid of type HEX27 with radius r
   MeshTools::Generation::build_cube (mesh, /*nx= */5, /*ny=*/5, /*nz=*/3,
                                      /*xmin=*/ -5.2, /*xmax=*/5.2,
@@ -205,31 +211,44 @@ int main (int argc, char** argv)
         elem->neighbor_ptr(0)->subdomain_id()=2;
       }
 
+  // If we're on a distributed mesh then we might have missed some
+  // ghosted base elements with remote infinite elements.
+  if (!mesh.is_serial())
+    {
+      SyncSubdomainIds sync_obj(mesh);
+      Parallel::sync_dofobject_data_by_id
+        (mesh.comm(), mesh.elements_begin(), mesh.elements_end(),
+         sync_obj);
+    }
 
   // Now we set the sources of the field: prism-shaped objects that are
   // determined here by containing certain points:
-  PointLocatorTree pt_lctr(mesh);
-  std::vector<dof_id_type> charged_elem_ids(3);
+  auto p_pt_lctr = mesh.sub_point_locator();
+  auto & pt_lctr = *p_pt_lctr;
+  pt_lctr.enable_out_of_mesh_mode();
+
+  std::set<dof_id_type> charged_elem_ids;
   {
     Point pt_0(-3.,-3.0,-1.5);
     Point pt_1(2.,-2.6,-1.5);
     Point pt_2(2., 3.1, 1.7);
     const Elem * elem_0=pt_lctr(pt_0);
     if (elem_0)
-      charged_elem_ids[0]=elem_0->id();
-    else
-      // this indicates some error which I don't know how to handle.
-      libmesh_not_implemented();
+      charged_elem_ids.insert(elem_0->id());
     const Elem * elem_1=pt_lctr(pt_1);
     if (elem_1)
-      charged_elem_ids[1]=elem_1->id();
-    else
-      libmesh_not_implemented();
+      charged_elem_ids.insert(elem_1->id());
     const Elem * elem_2=pt_lctr(pt_2);
     if (elem_2)
-      charged_elem_ids[2]=elem_2->id();
-    else
-      libmesh_not_implemented();
+      charged_elem_ids.insert(elem_2->id());
+
+    // On a distributed mesh we might not have every point in a
+    // semilocal element on every processor
+    if (!mesh.is_serial())
+      mesh.comm().set_union(charged_elem_ids);
+
+    // But we should have every point on *some* processor
+    libmesh_assert_equal_to(charged_elem_ids.size(), 3);
   }
 
   // Create an equation systems object
@@ -238,7 +257,7 @@ int main (int argc, char** argv)
   // This is the only system added here.
   LinearImplicitSystem & eig_sys = eq_sys.add_system<LinearImplicitSystem> ("Poisson");
 
-  eq_sys.parameters.set<std::vector<dof_id_type> >("charged_elem_id")=charged_elem_ids;
+  eq_sys.parameters.set<std::set<dof_id_type> >("charged_elem_id")=charged_elem_ids;
 
   //set the complete type of the variable
   FEType fe_type(SECOND, LAGRANGE, FOURTH, JACOBI_20_00, CARTESIAN);
@@ -272,21 +291,31 @@ int main (int argc, char** argv)
       // in the refined mesh, find the elements that describe the
       // sources of gravitational field: Due to refinement, there are
       // successively more elements to account for the same object.
-      std::vector<dof_id_type> charged_elem_child(0);
-      for(unsigned int j=0; j< charged_elem_ids.size(); ++j)
+      std::set<dof_id_type> charged_elem_children;
+      for(auto id : charged_elem_ids)
         {
-          Elem * charged_elem = mesh.elem_ptr(charged_elem_ids[j]);
+          Elem * charged_elem = mesh.query_elem_ptr(id);
+          if (!charged_elem)
+            {
+              libmesh_assert(!mesh.is_serial());
+              continue;
+            }
+
           if (charged_elem->has_children())
             {
               for(auto & child : charged_elem->child_ref_range())
-                charged_elem_child.push_back(child.id());
+                if (!child.is_remote())
+                  charged_elem_children.insert(child.id());
             }
           else
-            charged_elem_child.push_back(charged_elem->id());
+            charged_elem_children.insert(charged_elem->id());
         }
 
-      charged_elem_ids=charged_elem_child;
-      eq_sys.parameters.set<std::vector<dof_id_type> >("charged_elem_id")=charged_elem_ids;
+      charged_elem_ids=charged_elem_children;
+      if (!mesh.is_serial())
+        mesh.comm().set_union(charged_elem_ids);
+
+      eq_sys.parameters.set<std::set<dof_id_type> >("charged_elem_id")=charged_elem_ids;
 
       // re-assemble and than solve again.
       eig_sys.solve();
