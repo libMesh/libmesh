@@ -917,7 +917,8 @@ UnstructuredMesh::~UnstructuredMesh ()
 
 
 void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
-                                       const bool reset_current_list)
+                                       const bool reset_current_list,
+                                       const bool assert_valid)
 {
   // We might actually want to run this on an empty mesh
   // (e.g. the boundary mesh for a nonexistent bcid!)
@@ -1302,9 +1303,14 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 #endif // AMR
 
 #ifdef DEBUG
-  MeshTools::libmesh_assert_valid_neighbors(*this,
-                                            !reset_remote_elements);
-  MeshTools::libmesh_assert_valid_amr_interior_parents(*this);
+  if (assert_valid)
+    {
+      MeshTools::libmesh_assert_valid_neighbors(*this,
+                                                !reset_remote_elements);
+      MeshTools::libmesh_assert_valid_amr_interior_parents(*this);
+    }
+#else
+  libmesh_ignore(assert_valid);
 #endif
 
   this->_preparation.has_neighbor_ptrs = true;

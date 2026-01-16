@@ -965,14 +965,20 @@ public:
    * After this routine is called all the elements with a \p nullptr neighbor
    * pointer are guaranteed to be on the boundary.  Thus this routine is
    * useful for automatically determining the boundaries of the domain.
-   * If reset_remote_elements is left to false, remote neighbor links are not
-   * reset and searched for in the local mesh.  If reset_current_list is
-   * left as true, then any existing links will be reset before initiating
-   * the algorithm, while honoring the value of the reset_remote_elements
-   * flag.
+   *
+   * If \p reset_remote_elements is left to false, remote neighbor
+   * links are not reset and searched for in the local mesh.
+   *
+   * If \p reset_current_list is left as true, then any existing links
+   * will be reset before initiating the algorithm, while honoring the
+   * value of the \p reset_remote_elements flag.
+   *
+   * If \p assert_valid is left as true, then in dbg mode extensive
+   * consistency checking is performed before returning.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
-                               const bool reset_current_list    = true) = 0;
+                               const bool reset_current_list    = true,
+                               const bool assert_valid          = true) = 0;
 
   /**
    * Removes any orphaned nodes, nodes not connected to any elements.
