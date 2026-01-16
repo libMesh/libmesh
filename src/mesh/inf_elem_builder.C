@@ -35,6 +35,8 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/remote_elem.h"
 
+#include "timpi/parallel_implementation.h"
+
 namespace libMesh
 {
 
@@ -387,10 +389,14 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
         } // neighbor(s) == nullptr
 
-
-
-
-
+  // On a distributed mesh it might be some other processor who sees
+  // the farthest node.
+  if (!this->_mesh.is_serial())
+    {
+      unsigned int rank;
+      this->_mesh.comm().maxloc(max_r, rank);
+      this->_mesh.comm().broadcast(max_r_node, rank);
+    }
 
   //  If a boundary side has one node on the outer boundary,
   //  all points of this side are on the outer boundary.
@@ -405,8 +411,14 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
     // Only the case of no outer boundary is to be excluded.
     onodes.insert(max_r_node);
 
+  // If we're not on a serial mesh, we'll need to synchronize that
+  // onodes list too.
+  bool did_parallel_update;
 
+  do
   {
+    did_parallel_update = false;
+
     auto face_it = faces.begin();
     auto face_end = faces.end();
     unsigned int facesfound=0;
@@ -448,7 +460,16 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           face_it    = faces.begin();
         }
     }
+
+    if (!this->_mesh.is_serial())
+      {
+        auto my_onodes_size = onodes.size();
+        this->_mesh.comm().set_union(onodes);
+        did_parallel_update = (onodes.size() > my_onodes_size);
+        this->_mesh.comm().max(did_parallel_update);
+      }
   }
+  while (did_parallel_update);
 
 
 #ifdef DEBUG
@@ -486,18 +507,24 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
 
   // for each boundary node, add an outer_node with
   // double distance from origin.
-  for (const auto & dof : onodes)
+  for (const auto & n : onodes)
     {
-      Point p = (Point(this->_mesh.point(dof)) * 2) - origin;
+      if (!this->_mesh.query_node_ptr(n))
+        {
+          libmesh_assert(!_mesh.is_serial());
+          continue;
+        }
+
+      Point p = (Point(this->_mesh.point(n)) * 2) - origin;
       if (_mesh.is_serial())
         {
           // Add with a default id in serial
-          outer_nodes[dof]=this->_mesh.add_point(p);
+          outer_nodes[n]=this->_mesh.add_point(p);
         }
       else
         {
           // Pick a unique id in parallel
-          Node & bnode = _mesh.node_ref(dof);
+          Node & bnode = _mesh.node_ref(n);
           dof_id_type new_id = bnode.id() + old_max_node_id;
           std::unique_ptr<Node> new_node = Node::build(p, new_id);
           new_node->processor_id() = bnode.processor_id();
@@ -505,7 +532,7 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
           new_node->set_unique_id(old_max_unique_id + bnode.id());
 #endif
 
-          outer_nodes[dof] =
+          outer_nodes[n] =
             this->_mesh.add_node(std::move(new_node));
         }
     }
@@ -665,6 +692,32 @@ void InfElemBuilder::build_inf_elem(const Point & origin,
       this->_mesh.add_elem(std::move(el));
     } // for
 
+  // If we're not in serial, we might not have all our remote_elem
+  // neighbors set up properly on the new elements: two new infinite
+  // elements which should be neighbors may not be rooted in finite
+  // elmeents which are neighbors, and we were only looking for
+  // remote_elem links on each root finite element.  We'll fix the
+  // problem by first finding all the neighbors we can and then
+  // recognizing that any missing neighbors on infinite elements must
+  // be remote.
+  if (!_mesh.is_serial())
+    {
+      _mesh.find_neighbors(/*reset_remote_elements=*/ false,
+                           /*reset_current_list=*/    true,
+                           /*assert_valid=*/          false);
+
+      for (auto & p : ofaces)
+        {
+          Elem & belem = this->_mesh.elem_ref(p.first);
+          Elem * inf_elem = belem.neighbor_ptr(p.second);
+          libmesh_assert(inf_elem);
+
+          for (auto s : make_range(inf_elem->n_sides()))
+            if (!inf_elem->neighbor_ptr(s))
+              inf_elem->set_neighbor
+                (s, const_cast<RemoteElem *>(remote_elem));
+        }
+    }
 
 #ifdef DEBUG
   _mesh.libmesh_assert_valid_parallel_ids();
