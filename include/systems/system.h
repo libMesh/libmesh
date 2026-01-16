@@ -517,10 +517,13 @@ public:
    * element spaces with continuous derivatives.
    * elem_range \p active_local_range, if provided, indicates the range of elements
    * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    */
   void project_solution (FunctionBase<Number> * f,
                          FunctionBase<Gradient> * g = nullptr,
-                         std::optional<ConstElemRange> active_local_range = std::nullopt) const;
+                         std::optional<ConstElemRange> active_local_range = std::nullopt,
+                         std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto the current solution.
@@ -530,10 +533,13 @@ public:
    * element spaces with continuous derivatives.
    * elem_range \p active_local_range, if provided, indicates the range of elements
    * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    */
   void project_solution (FEMFunctionBase<Number> * f,
                          FEMFunctionBase<Gradient> * g = nullptr,
-                         std::optional<ConstElemRange> active_local_range = std::nullopt) const;
+                         std::optional<ConstElemRange> active_local_range = std::nullopt,
+                         std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto the current solution.
@@ -553,7 +559,8 @@ public:
   void project_solution (ValueFunctionPointer fptr,
                          GradientFunctionPointer gptr,
                          const Parameters & parameters,
-                         std::optional<ConstElemRange> active_local_range = std::nullopt) const;
+                         std::optional<ConstElemRange> active_local_range = std::nullopt,
+                         std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -564,6 +571,8 @@ public:
    * element spaces with continuous derivatives.
    * elem_range \p active_local_range, if provided, indicates the range of elements
    * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -572,7 +581,8 @@ public:
                        FunctionBase<Number> * f,
                        FunctionBase<Gradient> * g = nullptr,
                        int is_adjoint = -1,
-                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -583,6 +593,8 @@ public:
    * element spaces with continuous derivatives.
    * elem_range \p active_local_range, if provided, indicates the range of elements
    * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -591,7 +603,8 @@ public:
                        FEMFunctionBase<Number> * f,
                        FEMFunctionBase<Gradient> * g = nullptr,
                        int is_adjoint = -1,
-                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -602,6 +615,8 @@ public:
    * finite element spaces with continuous derivatives.
    * elem_range \p active_local_range, if provided, indicates the range of elements
    * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -611,7 +626,8 @@ public:
                        const Parameters & parameters,
                        NumericVector<Number> & new_vector,
                        int is_adjoint = -1,
-                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -2014,7 +2030,8 @@ protected:
    */
   void project_vector (NumericVector<Number> &,
                        int is_adjoint = -1,
-                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects the vector defined on the old mesh onto the
@@ -2027,7 +2044,8 @@ protected:
   void project_vector (const NumericVector<Number> &,
                        NumericVector<Number> &,
                        int is_adjoint = -1,
-                       std::optional<ConstElemRange> active_local_range = std::nullopt) const;
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Whether this object should condense out constrained degrees of freedom
