@@ -246,7 +246,8 @@ public:
 // System implementation
 void System::project_vector (NumericVector<Number> & vector,
                              int is_adjoint,
-                             std::optional<ConstElemRange> active_local_range) const
+                             std::optional<ConstElemRange> active_local_range,
+                             std::optional<std::vector<unsigned int>> variable_numbers) const
 {
   // Create a copy of the vector, which currently
   // contains the old data.
@@ -254,7 +255,7 @@ void System::project_vector (NumericVector<Number> & vector,
     old_vector (vector.clone());
 
   // Project the old vector to the new vector
-  this->project_vector (*old_vector, vector, is_adjoint, active_local_range);
+  this->project_vector (*old_vector, vector, is_adjoint, active_local_range, variable_numbers);
 }
 
 
@@ -266,7 +267,8 @@ void System::project_vector (NumericVector<Number> & vector,
 void System::project_vector (const NumericVector<Number> & old_v,
                              NumericVector<Number> & new_v,
                              int is_adjoint,
-                             std::optional<ConstElemRange> active_local_range) const
+                             std::optional<ConstElemRange> active_local_range,
+                             std::optional<std::vector<unsigned int>> variable_numbers) const
 {
   LOG_SCOPE ("project_vector(old,new)", "System");
 
@@ -367,8 +369,22 @@ void System::project_vector (const NumericVector<Number> & old_v,
 
   if (n_variables)
     {
-      std::vector<unsigned int> vars(n_variables);
-      std::iota(vars.begin(), vars.end(), 0);
+      std::vector<unsigned int> vars;
+      if (variable_numbers)
+        {
+          vars = *variable_numbers;
+          for (auto v : vars)
+            if (v >= n_variables)
+              libmesh_error_msg("ERROR: variable number " << v <<
+                               " out of range for system with " <<
+                               n_variables << " variables.");
+        }
+      else
+        {
+          vars.resize(n_variables);
+          std::iota(vars.begin(), vars.end(), 0);
+        }
+
       std::vector<unsigned int> regular_vars, vector_vars;
       for (auto var : vars)
       {
@@ -417,7 +433,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
       if (this->processor_id() == (this->n_processors()-1))
         {
           const DofMap & dof_map = this->get_dof_map();
-          for (auto var : make_range(this->n_vars()))
+          for (auto var : vars)
             if (this->variable(var).type().family == SCALAR)
               {
                 // We can just map SCALAR dofs directly across
@@ -1032,11 +1048,12 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
 void System::project_solution (ValueFunctionPointer fptr,
                                GradientFunctionPointer gptr,
                                const Parameters & function_parameters,
-                               std::optional<ConstElemRange> active_local_range) const
+                               std::optional<ConstElemRange> active_local_range,
+                               std::optional<std::vector<unsigned int>> variable_numbers) const
 {
   WrappedFunction<Number> f(*this, fptr, &function_parameters);
   WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
-  this->project_solution(&f, &g, active_local_range);
+  this->project_solution(&f, &g, active_local_range, variable_numbers);
 }
 
 
@@ -1046,9 +1063,10 @@ void System::project_solution (ValueFunctionPointer fptr,
  */
 void System::project_solution (FunctionBase<Number> * f,
                                FunctionBase<Gradient> * g,
-                               std::optional<ConstElemRange> active_local_range) const
+                               std::optional<ConstElemRange> active_local_range,
+                               std::optional<std::vector<unsigned int>> variable_numbers) const
 {
-  this->project_vector(*solution, f, g, /*is_adjoint=*/-1, active_local_range);
+  this->project_vector(*solution, f, g, /*is_adjoint=*/-1, active_local_range, variable_numbers);
 
   solution->localize(*current_local_solution, _dof_map->get_send_list());
 }
@@ -1060,9 +1078,10 @@ void System::project_solution (FunctionBase<Number> * f,
  */
 void System::project_solution (FEMFunctionBase<Number> * f,
                                FEMFunctionBase<Gradient> * g,
-                               std::optional<ConstElemRange> active_local_range) const
+                               std::optional<ConstElemRange> active_local_range,
+                               std::optional<std::vector<unsigned int>> variable_numbers) const
 {
-  this->project_vector(*solution, f, g, /*is_adjoint=*/-1, active_local_range);
+  this->project_vector(*solution, f, g, /*is_adjoint=*/-1, active_local_range, variable_numbers);
 
   solution->localize(*current_local_solution, _dof_map->get_send_list());
 }
@@ -1077,11 +1096,12 @@ void System::project_vector (ValueFunctionPointer fptr,
                              const Parameters & function_parameters,
                              NumericVector<Number> & new_vector,
                              int is_adjoint,
-                             std::optional<ConstElemRange> active_local_range) const
+                             std::optional<ConstElemRange> active_local_range,
+                             std::optional<std::vector<unsigned int>> variable_numbers) const
 {
   WrappedFunction<Number> f(*this, fptr, &function_parameters);
   WrappedFunction<Gradient> g(*this, gptr, &function_parameters);
-  this->project_vector(new_vector, &f, &g, is_adjoint, active_local_range);
+  this->project_vector(new_vector, &f, &g, is_adjoint, active_local_range, variable_numbers);
 }
 
 /**
@@ -1092,7 +1112,8 @@ void System::project_vector (NumericVector<Number> & new_vector,
                              FunctionBase<Number> * f,
                              FunctionBase<Gradient> * g,
                              int is_adjoint,
-                             std::optional<ConstElemRange> active_local_range) const
+                             std::optional<ConstElemRange> active_local_range,
+                             std::optional<std::vector<unsigned int>> variable_numbers) const
 {
   LOG_SCOPE ("project_vector(FunctionBase)", "System");
 
@@ -1104,10 +1125,10 @@ void System::project_vector (NumericVector<Number> & new_vector,
     {
       WrappedFunctor<Gradient> g_fem(*g);
 
-      this->project_vector(new_vector, &f_fem, &g_fem, is_adjoint, active_local_range);
+      this->project_vector(new_vector, &f_fem, &g_fem, is_adjoint, active_local_range, variable_numbers);
     }
   else
-    this->project_vector(new_vector, &f_fem, nullptr, is_adjoint, active_local_range);
+    this->project_vector(new_vector, &f_fem, nullptr, is_adjoint, active_local_range, variable_numbers);
 }
 
 
@@ -1119,7 +1140,8 @@ void System::project_vector (NumericVector<Number> & new_vector,
                              FEMFunctionBase<Number> * f,
                              FEMFunctionBase<Gradient> * g,
                              int is_adjoint,
-                             std::optional<ConstElemRange> active_local_range) const
+                             std::optional<ConstElemRange> active_local_range,
+                             std::optional<std::vector<unsigned int>> variable_numbers) const
 {
   LOG_SCOPE ("project_fem_vector()", "System");
 
@@ -1136,8 +1158,22 @@ void System::project_vector (NumericVector<Number> & new_vector,
 
   const unsigned int n_variables = this->n_vars();
 
-  std::vector<unsigned int> vars(n_variables);
-  std::iota(vars.begin(), vars.end(), 0);
+  std::vector<unsigned int> vars;
+  if (variable_numbers)
+    {
+      vars = *variable_numbers;
+      for (auto v : vars)
+        if (v >= n_variables)
+          libmesh_error_msg("ERROR: variable number " << v <<
+                           " out of range for system with " <<
+                           n_variables << " variables.");
+    }
+  else
+    {
+      vars.resize(n_variables);
+      std::iota(vars.begin(), vars.end(), 0);
+    }
+
 
   // Use a typedef to make the calling sequence for parallel_for() a bit more readable
   typedef
@@ -1168,7 +1204,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
       FEMContext context( *this );
 
       const DofMap & dof_map = this->get_dof_map();
-      for (auto var : make_range(this->n_vars()))
+      for (auto var : vars)
         if (this->variable(var).type().family == SCALAR)
           {
             // FIXME: We reinit with an arbitrary element in case the user

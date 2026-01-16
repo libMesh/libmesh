@@ -123,14 +123,28 @@ protected:
 template <typename Output>
 void WrappedFunctor<Output>::init_context (const FEMContext & c)
 {
-  for (auto dim : c.elem_dimensions())
+  // If the context was constructed with an active var subset (e.g. projector
+  // projecting only selected variables), then only those FE objects are
+  // guaranteed to exist.
+  const std::vector<unsigned int> * active = c.active_vars();
+
+  auto check_and_init = [&c](unsigned int v, unsigned short dim)
     {
-      for (auto v : make_range(c.n_vars()))
-        {
-          FEAbstract * fe;
-          c.get_element_fe(v, fe, dim);
-          fe->get_nothing();
-        }
+      FEAbstract * fe = nullptr;
+      c.get_element_fe(v, fe, dim);
+      libmesh_assert_msg(fe, "FEAbstract pointer is null for variable "
+                             << v << " in dimension " << dim);
+      fe->get_nothing();
+    };
+
+  for (const auto dim : c.elem_dimensions())
+    {
+      if (active)
+        for (const auto v : *active)
+          check_and_init(v, dim);
+      else
+        for (const auto v : make_range(c.n_vars()))
+          check_and_init(v, dim);
     }
 }
 
