@@ -65,7 +65,7 @@ private:
     EquationSystems es(mesh);
     System &sys = es.add_system<System>("ProjSys");
 
-    // one dof per element
+    // two dofs per element
     const unsigned int u_var = sys.add_variable("u", CONSTANT, MONOMIAL);
     const unsigned int v_var = sys.add_variable("v", CONSTANT, MONOMIAL);
 
