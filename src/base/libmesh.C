@@ -380,11 +380,28 @@ std::terminate_handler old_terminate_handler;
 
 void libmesh_terminate_handler()
 {
+  bool print_debug_info = true;
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // If we have an active exception, it may have an error message that
-  // we should print.
-  libMesh::err << "libMesh terminating";
+  // we should print, or it may have a type that tells us not to print
+  // anything.
   std::exception_ptr ex = std::current_exception();
+  if (ex)
+    {
+      try
+        {
+          std::rethrow_exception(ex);
+        }
+      catch (const TerminationException & term_ex)
+        {
+          print_debug_info = false;
+        }
+      catch (...)
+        {
+        }
+    }
+  if (print_debug_info)
+    libMesh::err << "libMesh terminating:\n";
   if (ex)
     {
       try
@@ -393,10 +410,14 @@ void libmesh_terminate_handler()
         }
       catch (const std::exception & std_ex)
         {
-          libMesh::err << ":\n" << std_ex.what();
+          libMesh::err << std_ex.what();
+        }
+      catch (...)
+        {
         }
     }
-  libMesh::err << std::endl;
+  if (print_debug_info)
+    libMesh::err << std::endl;
 #endif
 
   // If this got called then we're probably crashing; let's print a
@@ -424,11 +445,13 @@ void libmesh_terminate_handler()
   // Mac or Linux.  I think there's good reasons for this behavior too:
   // it's much easier to get a stack trace when the stack doesn't
   // unwind, for example.
-  libMesh::write_traceout();
+  if (print_debug_info)
+    libMesh::write_traceout();
 
   // We may care about performance data pre-crash; it would be sad to
   // throw that away.
-  libMesh::perflog.print_log();
+  if (print_debug_info)
+    libMesh::perflog.print_log();
   libMesh::perflog.clear();
 
   // Now that we're done with output we should clean up our stream
