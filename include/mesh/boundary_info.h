@@ -964,6 +964,28 @@ private:
                       const std::set<subdomain_id_type> & subdomains_relative_to);
 
   /**
+   * Helper for determining whether a side is requested
+   */
+  bool _side_is_requested(const Elem * elem,
+                          unsigned short int side,
+                          const std::set<boundary_id_type> & requested_boundary_ids) const;
+
+  /**
+   * Helper to determine whether the element is in the requested subdomains
+   */
+  bool
+  _elem_in_requested_subdomains(const Elem * elem,
+                                const std::set<subdomain_id_type> & subdomains_relative_to) const;
+
+  /**
+   * Helper to add boundary elements from given \p sides_id_map
+   */
+  void _add_elements_from_sides(
+      UnstructuredMesh & boundary_mesh,
+      const std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> & side_id_map,
+      bool store_parent_side_ids);
+
+  /**
    * A pointer to the Mesh this boundary info pertains to.
    */
   MeshBase * _mesh;
