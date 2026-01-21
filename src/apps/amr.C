@@ -47,7 +47,11 @@ int main (int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
 
-  libmesh_error_msg_if(argc < 4, "Usage: ./prog -d DIM filename");
+  if (argc < 4)
+    {
+      std::cout << "Usage: ./prog -d DIM filename" << std::endl;
+      libmesh_terminate();
+    }
 
   // Variables to get us started
   const unsigned char dim = cast_int<unsigned char>(atoi(argv[2]));
