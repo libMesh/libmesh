@@ -97,7 +97,7 @@ public:
    * refinement and potentially change the desired
    * refinement type.
    */
-  virtual void select_refinement (System & system) override;
+  virtual void select_refinement (System & system, Real smoothness_threshold = 0.9) override;
 
   /**
    * Because the coarsening test seems to always choose p refinement, we're

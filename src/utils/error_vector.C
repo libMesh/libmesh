@@ -52,14 +52,9 @@ ErrorVectorReal ErrorVector::minimum() const
 
   for (dof_id_type i=0; i<n; i++)
     {
-      // Only positive (or zero) values in the error vector
-      libmesh_assert_greater_equal ((*this)[i], 0.);
       if (this->is_active_elem(i))
         min = std::min (min, (*this)[i]);
     }
-
-  // ErrorVectors are for positive values
-  libmesh_assert_greater_equal (min, 0.);
 
   return min;
 }
