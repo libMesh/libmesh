@@ -110,20 +110,20 @@ private:
         dof_map.dof_indices(e, u_indices, u_var);
         dof_map.dof_indices(e, v_indices, v_var);
 
-        const Real u_val = (*sys.solution)(u_indices[0]);
-        const Real v_val = (*sys.solution)(v_indices[0]);
+        const Number u_val = (*sys.solution)(u_indices[0]);
+        const Number v_val = (*sys.solution)(v_indices[0]);
 
-        const Real val_baseline = baseline_linear_function(c, es.parameters, "", "");
-        const Real val_projected = circle_projection_function(c, es.parameters, "", "");
+        const Number val_baseline = baseline_linear_function(c, es.parameters, "", "");
+        const Number val_projected = circle_projection_function(c, es.parameters, "", "");
         if (inside)
           // Inside the circle, values should be equal to the projected value.
-          LIBMESH_ASSERT_FP_EQUAL(u_val, val_projected, tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(u_val, val_projected, tol);
         else
           // Outside the circle, values must remain unchanged.
-          LIBMESH_ASSERT_FP_EQUAL(u_val, val_baseline, tol);
+          LIBMESH_ASSERT_NUMBERS_EQUAL(u_val, val_baseline, tol);
 
         // v variable was never projected, should always equal baseline
-        LIBMESH_ASSERT_FP_EQUAL(v_val, val_baseline, tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL(v_val, val_baseline, tol);
       }
 #endif
   }
