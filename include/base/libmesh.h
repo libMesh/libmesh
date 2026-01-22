@@ -165,6 +165,8 @@ bool initialized ();
  */
 bool closed ();
 
+void libmesh_terminate(const bool verbose);
+
 /**
  * A terminate handler.  libMesh sets this to handle uncaught
  * exceptions; it can also be called manually to print stack traces

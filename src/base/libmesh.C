@@ -374,61 +374,61 @@ bool closed()
 }
 
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-std::terminate_handler old_terminate_handler;
-#endif
-
-void libmesh_terminate_handler()
+void libmesh_terminate(const bool verbose)
 {
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-  // If we have an active exception, it may have an error message that
-  // we should print.
-  libMesh::err << "libMesh terminating";
-  std::exception_ptr ex = std::current_exception();
-  if (ex)
+  if (verbose)
     {
-      try
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+      // If we have an active exception, it may have an error message that
+      // we should print.
+      libMesh::err << "libMesh terminating";
+      std::exception_ptr ex = std::current_exception();
+      if (ex)
         {
-          std::rethrow_exception(ex);
+          try
+            {
+              std::rethrow_exception(ex);
+            }
+          catch (const std::exception & std_ex)
+            {
+              libMesh::err << ":\n" << std_ex.what();
+            }
         }
-      catch (const std::exception & std_ex)
-        {
-          libMesh::err << ":\n" << std_ex.what();
-        }
-    }
-  libMesh::err << std::endl;
+      libMesh::err << std::endl;
 #endif
 
-  // If this got called then we're probably crashing; let's print a
-  // stack trace.  The trace files that are ultimately written depend on:
-  // 1.) Who throws the exception.
-  // 2.) Whether the C++ runtime unwinds the stack before the
-  //     terminate_handler is called (this is implementation defined).
-  //
-  // The various cases are summarized in the table below:
-  //
-  //                        | libmesh exception | other exception
-  //                        -------------------------------------
-  // stack unwinds          |        A          |       B
-  // stack does not unwind  |        C          |       D
-  //
-  // Case A: There will be two stack traces in the file: one "useful"
-  //         one, and one nearly empty one due to stack unwinding.
-  // Case B: You will get one nearly empty stack trace (not great, Bob!)
-  // Case C: You will get two nearly identical stack traces, ignore one of them.
-  // Case D: You will get one useful stack trace.
-  //
-  // Cases A and B (where the stack unwinds when an exception leaves
-  // main) appear to be non-existent in practice.  I don't have a
-  // definitive list, but the stack does not unwind for GCC on either
-  // Mac or Linux.  I think there's good reasons for this behavior too:
-  // it's much easier to get a stack trace when the stack doesn't
-  // unwind, for example.
-  libMesh::write_traceout();
+      // If this got called then we're probably crashing; let's print a
+      // stack trace.  The trace files that are ultimately written depend on:
+      // 1.) Who throws the exception.
+      // 2.) Whether the C++ runtime unwinds the stack before the
+      //     terminate_handler is called (this is implementation defined).
+      //
+      // The various cases are summarized in the table below:
+      //
+      //                        | libmesh exception | other exception
+      //                        -------------------------------------
+      // stack unwinds          |        A          |       B
+      // stack does not unwind  |        C          |       D
+      //
+      // Case A: There will be two stack traces in the file: one "useful"
+      //         one, and one nearly empty one due to stack unwinding.
+      // Case B: You will get one nearly empty stack trace (not great, Bob!)
+      // Case C: You will get two nearly identical stack traces, ignore one of them.
+      // Case D: You will get one useful stack trace.
+      //
+      // Cases A and B (where the stack unwinds when an exception leaves
+      // main) appear to be non-existent in practice.  I don't have a
+      // definitive list, but the stack does not unwind for GCC on either
+      // Mac or Linux.  I think there's good reasons for this behavior too:
+      // it's much easier to get a stack trace when the stack doesn't
+      // unwind, for example.
+      libMesh::write_traceout();
 
-  // We may care about performance data pre-crash; it would be sad to
-  // throw that away.
-  libMesh::perflog.print_log();
+      // We may care about performance data pre-crash; it would be sad to
+      // throw that away.
+      libMesh::perflog.print_log();
+    }
+
   libMesh::perflog.clear();
 
   // Now that we're done with output we should clean up our stream
@@ -447,14 +447,25 @@ void libmesh_terminate_handler()
     MPI_Abort(libMesh::GLOBAL_COMM_WORLD, 1);
 #endif
 
+  // The last attempt to die if nothing else has killed us
+  std::abort();
+}
+
+
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+std::terminate_handler old_terminate_handler;
+#endif
+
+void libmesh_terminate_handler()
+{
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // The system terminate_handler may do useful things, or the user
   // may have set their own terminate handler that we want to call.
   old_terminate_handler();
 #endif
 
-  // The last attempt to die if nothing else has killed us
-  std::abort();
+  libmesh_terminate(true);
 }
 
 
