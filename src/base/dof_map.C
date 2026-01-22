@@ -2495,7 +2495,10 @@ void DofMap::_node_dof_indices (const Elem & elem,
   // function with a million arguments and hoping the compiler inlines
   // it properly into one of our most highly trafficked functions.
 
-  LOG_SCOPE("_node_dof_indices()", "DofMap");
+  // dof_indices() is a relatively light-weight function; the cost of
+  // the logging code itself is roughly on par with the time required
+  // to call dof_indices().
+  // LOG_SCOPE("_node_dof_indices()", "DofMap");
 
   const unsigned int sys_num = this->sys_number();
   const auto [vg, vig] =
@@ -2609,7 +2612,10 @@ void DofMap::SCALAR_dof_indices (std::vector<dof_id_type> & di,
 #endif
                                  ) const
 {
-  LOG_SCOPE("SCALAR_dof_indices()", "DofMap");
+  // dof_indices() is a relatively light-weight function; the cost of
+  // the logging code itself is roughly on par with the time required
+  // to call dof_indices().
+  // LOG_SCOPE("SCALAR_dof_indices()", "DofMap");
 
   libmesh_assert(this->variable(vn).type().family == SCALAR);
 
@@ -2690,7 +2696,10 @@ void DofMap::old_dof_indices (const Elem * const elem,
                               std::vector<dof_id_type> & di,
                               const unsigned int vn) const
 {
-  LOG_SCOPE("old_dof_indices()", "DofMap");
+  // dof_indices() is a relatively light-weight function; the cost of
+  // the logging code itself is roughly on par with the time required
+  // to call dof_indices().
+  // LOG_SCOPE("old_dof_indices()", "DofMap");
 
   libmesh_assert(elem);
 
