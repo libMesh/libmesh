@@ -164,6 +164,22 @@ public:
   std::string what_message;
 };
 
+/**
+ * A class representing an exception used only to send a program to
+ * the terminate handler for abort after cleanup, while bypassing the
+ * usual debugging output (performance logs, stack traces,
+ * "terminating" messages) that the handler does to ease debugging of
+ * uncaught error exceptions.
+ *
+ * We don't even inherit from std::exception here, to avoid being
+ * caught as that type.
+ */
+class TerminationException
+{
+public:
+  TerminationException() {}
+};
+
 }
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS

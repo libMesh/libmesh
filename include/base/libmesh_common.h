@@ -401,6 +401,9 @@ struct casting_compare {
 //
 // The libmesh_degenerate_mapping() macro prints a message into and
 // throws a DegenerateMap exception
+//
+// The libmesh_terminate() macro prints a message and throws a
+// TerminationException exception
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
     std::stringstream message_stream;                                   \
@@ -462,6 +465,11 @@ struct casting_compare {
   } while (0)
 
 #define libmesh_degenerate_mapping(filename) libmesh_degenerate_mapping_msg("")
+
+#define libmesh_terminate()                         \
+  do {                                              \
+    LIBMESH_THROW(libMesh::TerminationException()); \
+  } while (0)
 
 // The libmesh_example_requires() macro prints a message and calls
 // "return 77;" if the condition specified by the macro is not true.  This
