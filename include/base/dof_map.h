@@ -2785,7 +2785,12 @@ void DofMap::dof_indices (const Elem * const elem,
   // We now allow elem==nullptr to request just SCALAR dofs
   // libmesh_assert(elem);
 
-  LOG_SCOPE("dof_indices()", "DofMap");
+  // dof_indices() is a relatively light-weight function that is
+  // called millions of times in normal codes. Therefore, it is not a
+  // good candidate for logging, since the cost of the logging code
+  // itself is roughly on par with the time required to call
+  // dof_indices().
+  // LOG_SCOPE("dof_indices()", "DofMap");
 
   // Clear the DOF indices vector
   di.clear();
