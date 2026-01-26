@@ -773,6 +773,12 @@ void PetscVector<T>::init (const numeric_index_type n,
 {
   parallel_object_only();
 
+  if (this->comm().size() == 1)
+    {
+      libmesh_assert(ghost.empty());
+      this->init(n, n_local, fast, SERIAL);
+    }
+
   PetscInt petsc_n=static_cast<PetscInt>(n);
   PetscInt petsc_n_local=static_cast<PetscInt>(n_local);
   PetscInt petsc_n_ghost=static_cast<PetscInt>(ghost.size());
