@@ -121,7 +121,11 @@ public:
 
   /**
    * Copy assignment operator.
-   * Calls VecCopy after performing various checks.
+   * Supported assignments based on ParallelType combination (note that we lump ghosted into
+   * parallel for this method documentation):
+   *   - Assign from parallel to parallel
+   *   - Assign from serial to serial
+   *   - Assign from parallel to serial
    * \returns A reference to *this as the derived type.
    */
   PetscVector<T> & operator= (const PetscVector<T> & v);

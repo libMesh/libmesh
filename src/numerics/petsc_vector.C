@@ -517,11 +517,33 @@ PetscVector<T>::operator = (const PetscVector<T> & v)
   v._restore_array();
 
   libmesh_assert_equal_to (this->size(), v.size());
-  libmesh_assert_equal_to (this->local_size(), v.local_size());
   libmesh_assert (v.closed());
 
+  // This is PETSc's only requirement for VecCopy
+  if (this->local_size() == v.local_size())
+    LibmeshPetscCall(VecCopy(v._vec, this->_vec));
+  else if (this->local_size() == v.size()) // scatter from parallel to serial
+    {
+      VecScatter scat;
 
-  LibmeshPetscCall(VecCopy (v._vec, this->_vec));
+      libmesh_assert(this->type() == SERIAL);
+      libmesh_assert(v.type() != SERIAL);
+      LibmeshPetscCall(VecDestroy(&this->_vec));
+      LibmeshPetscCall(VecScatterCreateToAll(v._vec, &scat, &this->_vec));
+      LibmeshPetscCall(VecScatterBegin(scat, v._vec, this->_vec, INSERT_VALUES, SCATTER_FORWARD));
+      LibmeshPetscCall(VecScatterEnd(scat, v._vec, this->_vec, INSERT_VALUES, SCATTER_FORWARD));
+      LibmeshPetscCall(VecScatterDestroy(&scat));
+    }
+  else if (v.local_size() == this->size())
+    {
+      libmesh_assert(v.type() == SERIAL);
+      libmesh_assert(this->type() != SERIAL);
+      libmesh_error_msg(
+          "Scattering from a serial vector on every rank to a parallel vector is not behavior we "
+          "define because we do not verify the serial vector is the same on each rank");
+    }
+  else
+    libmesh_error_msg("Unhandled vector combination");
 
   libmesh_assert(this->comm().verify(int(this->type())));
 
