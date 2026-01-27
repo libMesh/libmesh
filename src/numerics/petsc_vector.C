@@ -335,7 +335,8 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
 
   LibmeshPetscCall(VecAXPY(_vec, a, v->vec()));
 
-  libmesh_assert(this->comm().verify(int(this->type())));
+  libmesh_assert(this->comm().verify(
+      static_cast<typename std::underlying_type<ParallelType>::type>(this->type())));
 
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
@@ -375,7 +376,8 @@ void PetscVector<T>::scale (const T factor_in)
 
   LibmeshPetscCall(VecScale(_vec, factor));
 
-  libmesh_assert(this->comm().verify(int(this->type())));
+  libmesh_assert(this->comm().verify(
+      static_cast<typename std::underlying_type<ParallelType>::type>(this->type())));
 
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
@@ -416,7 +418,8 @@ void PetscVector<T>::abs()
 
   LibmeshPetscCall(VecAbs(_vec));
 
-  libmesh_assert(this->comm().verify(int(this->type())));
+  libmesh_assert(this->comm().verify(
+      static_cast<typename std::underlying_type<ParallelType>::type>(this->type())));
 
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
@@ -480,7 +483,8 @@ PetscVector<T>::operator = (const T s_in)
     {
       LibmeshPetscCall(VecSet(_vec, s));
 
-      libmesh_assert(this->comm().verify(int(this->type())));
+      libmesh_assert(this->comm().verify(
+          static_cast<typename std::underlying_type<ParallelType>::type>(this->type())));
 
       if (this->type() == GHOSTED)
         VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
@@ -545,7 +549,8 @@ PetscVector<T>::operator = (const PetscVector<T> & v)
   else
     libmesh_error_msg("Unhandled vector combination");
 
-  libmesh_assert(this->comm().verify(int(this->type())));
+  libmesh_assert(this->comm().verify(
+      static_cast<typename std::underlying_type<ParallelType>::type>(this->type())));
 
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
@@ -601,8 +606,10 @@ void PetscVector<T>::localize (NumericVector<T> & v_local_in) const
 {
   parallel_object_only();
 
-  libmesh_assert(this->comm().verify(int(this->type())));
-  libmesh_assert(this->comm().verify(int(v_local_in.type())));
+  libmesh_assert(this->comm().verify(
+      static_cast<typename std::underlying_type<ParallelType>::type>(this->type())));
+  libmesh_assert(this->comm().verify(
+      static_cast<typename std::underlying_type<ParallelType>::type>(v_local_in.type())));
 
   v_local_in = *this;
 }
@@ -942,7 +949,8 @@ void PetscVector<T>::pointwise_mult (const NumericVector<T> & vec1,
   // Call PETSc function.
   LibmeshPetscCall(VecPointwiseMult(_vec, vec1_petsc->vec(), vec2_petsc->vec()));
 
-  libmesh_assert(this->comm().verify(int(this->type())));
+  libmesh_assert(this->comm().verify(
+      static_cast<typename std::underlying_type<ParallelType>::type>(this->type())));
 
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
@@ -965,7 +973,8 @@ void PetscVector<T>::pointwise_divide (const NumericVector<T> & vec1,
   // Call PETSc function.
   LibmeshPetscCall(VecPointwiseDivide(_vec, vec1_petsc->vec(), vec2_petsc->vec()));
 
-  libmesh_assert(this->comm().verify(int(this->type())));
+  libmesh_assert(this->comm().verify(
+      static_cast<typename std::underlying_type<ParallelType>::type>(this->type())));
 
   if (this->type() == GHOSTED)
     VecGhostUpdateBeginEnd(this->comm(), _vec, INSERT_VALUES, SCATTER_FORWARD);
