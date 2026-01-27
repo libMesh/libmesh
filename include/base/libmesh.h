@@ -166,6 +166,14 @@ bool initialized ();
 bool closed ();
 
 /**
+ * Abort as soon as possible on this rank.
+ *
+ * This cleans up stream buffers, aborts with MPI_Abort (if MPI
+ * is initialized), and falls back to std::abort.
+ */
+void libmesh_abort();
+
+/**
  * A terminate handler.  libMesh sets this to handle uncaught
  * exceptions; it can also be called manually to print stack traces
  * and perf logs and call MPI
