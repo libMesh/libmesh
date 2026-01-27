@@ -176,6 +176,11 @@ void libmesh_terminate_handler()
         {
           quiet = true;
         }
+      // We're just trying to detect exception types here, not
+      // actually rethrow
+      catch (...)
+        {
+        }
     }
 #endif
 
