@@ -171,7 +171,7 @@ bool closed ();
  * This cleans up stream buffers, aborts with MPI_Abort (if MPI
  * is initialized), and falls back to std::abort.
  */
-void libmesh_abort();
+[[noreturn]] void libmesh_abort();
 
 /**
  * A terminate handler.  libMesh sets this to handle uncaught
