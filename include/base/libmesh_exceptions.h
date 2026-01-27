@@ -178,6 +178,8 @@ class TerminationException
 {
 public:
   TerminationException() {}
+
+  const char * what() const noexcept { return "libMesh termination requested"; }
 };
 
 }
