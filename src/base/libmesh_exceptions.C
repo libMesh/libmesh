@@ -25,19 +25,12 @@
 #include "libmesh/print_trace.h"
 
 // C/C++ includes
-#include <cstdlib>
-
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 #include <exception>
 #include <optional>
 #endif
 
-#ifdef LIBMESH_HAVE_OPENMP
-#include <omp.h>
-#endif
-
 #include "signal.h"
-
 
 // floating-point exceptions
 #ifdef LIBMESH_HAVE_FENV_H
@@ -46,48 +39,6 @@
 #ifdef LIBMESH_HAVE_XMMINTRIN_H
 #  include <xmmintrin.h>
 #endif
-
-
-#if defined(LIBMESH_HAVE_MPI)
-# include "libmesh/ignore_warnings.h"
-# include <mpi.h>
-# include "libmesh/restore_warnings.h"
-#endif // #if defined(LIBMESH_HAVE_MPI)
-
-#if defined(LIBMESH_HAVE_PETSC)
-# include "libmesh/petsc_solver_exception.h"
-# include <petsc.h>
-# include <petscerror.h>
-# include "libmesh/petscdmlibmesh.h"
-# if defined(LIBMESH_HAVE_SLEPC)
-// Ignore unused variable warnings from SLEPc
-#  include "libmesh/ignore_warnings.h"
-#  include "libmesh/slepc_macro.h"
-#  include <slepc.h>
-#  include "libmesh/restore_warnings.h"
-# endif // #if defined(LIBMESH_HAVE_SLEPC)
-#endif // #if defined(LIBMESH_HAVE_PETSC)
-
-#ifdef LIBMESH_HAVE_NETGEN
-// We need the nglib namespace, because it's used everywhere in nglib
-// and we don't get binary compatibility without it.
-//
-// We need the nglib namespace *here*, because somehow nobody ever
-// figured out to just put it in nglib.h?
-namespace nglib {
-#include "netgen/nglib/nglib.h"
-}
-#endif
-
-// If we're using MPI and VTK has been detected, we need to do some
-// MPI initialize/finalize stuff for VTK.
-#if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
-#include "libmesh/ignore_warnings.h"
-# include "vtkMPIController.h"
-#include "libmesh/restore_warnings.h"
-#endif
-
-#include <mutex>
 
 // --------------------------------------------------------
 // Local anonymous namespace to hold miscellaneous bits
