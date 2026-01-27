@@ -166,29 +166,6 @@ bool initialized ();
 bool closed ();
 
 /**
- * A terminate handler.  libMesh sets this to handle uncaught
- * exceptions; it can also be called manually to cleanup, print
- * any diagnostics, do cleanup, and abort.
- *
- * If an uncaught exception is a TerminationException, as thrown by
- * libmesh_terminate(), the handler avoids any diagnostic output.
- *
- * If an uncaught exception is a std::exception, its message is
- * printed, followed by stack trace and performance log output.
- */
-void libmesh_terminate_handler();
-
-/**
- * Toggle hardware trap floating point exceptions
- */
-void enableFPE(bool on);
-
-/**
- * Toggle libMesh reporting of segmentation faults
- */
-void enableSEGV(bool on);
-
-/**
  * \returns \p true if the argument \p arg was specified on the command line,
  * \p false otherwise.
  *
