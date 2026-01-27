@@ -15,6 +15,7 @@ BUILT_SOURCES = \
         getpot.h \
         id_types.h \
         libmesh.h \
+        libmesh_abort.h \
         libmesh_augment_std_namespace.h \
         libmesh_base.h \
         libmesh_common.h \
@@ -641,6 +642,9 @@ id_types.h: $(top_srcdir)/include/base/id_types.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh.h: $(top_srcdir)/include/base/libmesh.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+libmesh_abort.h: $(top_srcdir)/include/base/libmesh_abort.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_augment_std_namespace.h: $(top_srcdir)/include/base/libmesh_augment_std_namespace.h

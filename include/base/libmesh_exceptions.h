@@ -22,6 +22,8 @@
 
 #include "libmesh/libmesh_config.h"
 
+#include "libmesh/libmesh_abort.h"
+
 #include <stdexcept>
 #include <string>
 #include <sstream>
@@ -192,7 +194,7 @@ public:
 
 #else
 
-#define LIBMESH_THROW(e) do { libMesh::err << e.what(); std::abort(); } while (0)
+#define LIBMESH_THROW(e) do { libMesh::err << e.what(); libmesh_abort(); } while (0)
 #define libmesh_rethrow
 #define libmesh_try
 #define libmesh_catch(e) if (0)
