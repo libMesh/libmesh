@@ -155,6 +155,7 @@ private:
 
   static PerfLog & perf_log();
 
+  friend void libmesh_abort();
   friend void libmesh_terminate_handler();
 };
 

@@ -339,6 +339,12 @@ void libmesh_abort()
     MPI_Abort(libMesh::GLOBAL_COMM_WORLD, 1);
 #endif
 
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  // The system terminate_handler may do useful things, or the user
+  // may have set their own terminate handler that we want to call.
+  LibMeshInit::_old_terminate_handler();
+#endif
+
   // The last attempt to die if nothing else has killed us
   std::abort();
 }

@@ -220,12 +220,6 @@ void libmesh_terminate_handler()
       LibMeshInit::perf_log().print_log();
     }
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-  // The system terminate_handler may do useful things, or the user
-  // may have set their own terminate handler that we want to call.
-  LibMeshInit::_old_terminate_handler();
-#endif
-
   libmesh_abort();
 }
 
