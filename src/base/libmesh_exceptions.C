@@ -19,10 +19,11 @@
 // Local includes
 #include "libmesh/libmesh_exceptions.h"
 
+// libMesh includes
+#include "libmesh/perf_log.h"
+
 // C/C++ includes
 #include <cstdlib>
-#include <iostream>
-#include <fstream>
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 #include <exception>
@@ -33,7 +34,6 @@
 #include <omp.h>
 #endif
 
-#include "stdlib.h" // C, not C++ - we need setenv() from POSIX
 #include "signal.h"
 
 
@@ -148,10 +148,6 @@ namespace libMesh
 // ------------------------------------------------------------
 // libMesh functions
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-std::terminate_handler old_terminate_handler;
-#endif
-
 void libmesh_terminate_handler()
 {
   bool quiet = false;
@@ -190,7 +186,7 @@ void libmesh_terminate_handler()
       if (exception_message)
         libMesh::err << ":\n" << *exception_message;
 #endif
-      libmesh::err << std::endl;
+      libMesh::err << std::endl;
 
       // If this got called then we're probably crashing; let's print a
       // stack trace.  The trace files that are ultimately written depend on:
@@ -221,13 +217,13 @@ void libmesh_terminate_handler()
 
       // We may care about performance data pre-crash; it would be sad to
       // throw that away.
-      libMesh::perflog.print_log();
+      LibMeshInit::perf_log().print_log();
     }
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // The system terminate_handler may do useful things, or the user
   // may have set their own terminate handler that we want to call.
-  old_terminate_handler();
+  LibMeshInit::_old_terminate_handler();
 #endif
 
   libmesh_abort();

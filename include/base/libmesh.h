@@ -65,6 +65,7 @@ namespace Parallel {
   class Communicator;
 }
 
+class PerfLog;
 enum SolverPackage : int;
 
 /**
@@ -147,6 +148,14 @@ private:
   // protected and forces us to use a named destructor manually
   vtkMPIController * _vtk_mpi_controller;
 #endif
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  static std::terminate_handler _old_terminate_handler;
+#endif
+
+  static PerfLog & perf_log();
+
+  friend void libmesh_terminate_handler();
 };
 
 /**

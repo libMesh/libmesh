@@ -50,16 +50,6 @@
 #endif
 
 #include "stdlib.h" // C, not C++ - we need setenv() from POSIX
-#include "signal.h"
-
-
-// floating-point exceptions
-#ifdef LIBMESH_HAVE_FENV_H
-#  include <fenv.h>
-#endif
-#ifdef LIBMESH_HAVE_XMMINTRIN_H
-#  include <xmmintrin.h>
-#endif
 
 
 #if defined(LIBMESH_HAVE_MPI)
@@ -169,6 +159,8 @@ MPI_Comm           GLOBAL_COMM_WORLD = MPI_COMM_NULL;
 #else
 int                GLOBAL_COMM_WORLD = 0;
 #endif
+
+std::terminate_handler LibMeshInit::_old_terminate_handler;
 
 OStreamProxy out(std::cout);
 OStreamProxy err(std::cerr);
@@ -681,7 +673,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // Set our terminate handler to write stack traces in the event of a
   // crash
-  old_terminate_handler = std::set_terminate(libmesh_terminate_handler);
+  _old_terminate_handler = std::set_terminate(libmesh_terminate_handler);
 #endif
 
 
@@ -795,7 +787,7 @@ LibMeshInit::~LibMeshInit()
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // Reset the old terminate handler; maybe the user code wants to
   // keep doing C++ stuff after closing libMesh stuff.
-  std::set_terminate(old_terminate_handler);
+  std::set_terminate(_old_terminate_handler);
 #endif
 
 #ifdef LIBMESH_HAVE_NETGEN
@@ -864,78 +856,9 @@ LibMeshInit::~LibMeshInit()
 }
 
 
-
-/**
- * Toggle floating point exceptions -- courtesy of Cody Permann & MOOSE team
- */
-void enableFPE(bool on)
+PerfLog & LibMeshInit::perf_log()
 {
-#if !defined(LIBMESH_HAVE_FEENABLEEXCEPT) && defined(LIBMESH_HAVE_XMMINTRIN_H)
-  static int flags = 0;
-#endif
-
-  if (on)
-    {
-#ifdef LIBMESH_HAVE_FEENABLEEXCEPT
-      feenableexcept(FE_DIVBYZERO | FE_INVALID);
-#elif  LIBMESH_HAVE_XMMINTRIN_H
-      flags = _MM_GET_EXCEPTION_MASK();           // store the flags
-      _MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
-#endif
-
-#if LIBMESH_HAVE_DECL_SIGACTION
-      struct sigaction new_action, old_action;
-
-      // Set up the structure to specify the new action.
-      new_action.sa_sigaction = libmesh_handleFPE;
-      sigemptyset (&new_action.sa_mask);
-      new_action.sa_flags = SA_SIGINFO;
-
-      sigaction (SIGFPE, nullptr, &old_action);
-      if (old_action.sa_handler != SIG_IGN)
-        sigaction (SIGFPE, &new_action, nullptr);
-#endif
-    }
-  else
-    {
-#ifdef LIBMESH_HAVE_FEDISABLEEXCEPT
-      fedisableexcept(FE_DIVBYZERO | FE_INVALID);
-#elif  LIBMESH_HAVE_XMMINTRIN_H
-      _MM_SET_EXCEPTION_MASK(flags);
-#endif
-      signal(SIGFPE, SIG_DFL);
-    }
-}
-
-
-// Enable handling of SIGSEGV by libMesh
-// (potentially instead of PETSc)
-void enableSEGV(bool on)
-{
-#if LIBMESH_HAVE_DECL_SIGACTION
-  static struct sigaction old_action;
-  static bool was_on = false;
-
-  if (on)
-    {
-      struct sigaction new_action;
-      was_on = true;
-
-      // Set up the structure to specify the new action.
-      new_action.sa_sigaction = libmesh_handleSEGV;
-      sigemptyset (&new_action.sa_mask);
-      new_action.sa_flags = SA_SIGINFO;
-
-      sigaction (SIGSEGV, &new_action, &old_action);
-    }
-  else if (was_on)
-    {
-      was_on = false;
-      sigaction (SIGSEGV, &old_action, nullptr);
-    }
-#else
-  libmesh_error_msg("System call sigaction not supported.");
-#endif
+  return libMesh::perflog;
 }
 
 
