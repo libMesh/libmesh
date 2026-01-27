@@ -20,7 +20,9 @@
 #include "libmesh/libmesh_exceptions.h"
 
 // libMesh includes
+#include "libmesh/libmesh.h"
 #include "libmesh/perf_log.h"
+#include "libmesh/print_trace.h"
 
 // C/C++ includes
 #include <cstdlib>
