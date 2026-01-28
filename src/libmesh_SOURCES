@@ -7,6 +7,7 @@ libmesh_SOURCES =  \
         src/base/dof_object.C \
         src/base/libmesh.C \
         src/base/libmesh_common.C \
+        src/base/libmesh_exceptions.C \
         src/base/libmesh_singleton.C \
         src/base/libmesh_version.C \
         src/base/periodic_boundaries.C \

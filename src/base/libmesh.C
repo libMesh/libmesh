@@ -42,6 +42,7 @@
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 #include <exception>
+#include <optional>
 #endif
 
 #ifdef LIBMESH_HAVE_OPENMP
@@ -49,16 +50,6 @@
 #endif
 
 #include "stdlib.h" // C, not C++ - we need setenv() from POSIX
-#include "signal.h"
-
-
-// floating-point exceptions
-#ifdef LIBMESH_HAVE_FENV_H
-#  include <fenv.h>
-#endif
-#ifdef LIBMESH_HAVE_XMMINTRIN_H
-#  include <xmmintrin.h>
-#endif
 
 
 #if defined(LIBMESH_HAVE_MPI)
@@ -125,55 +116,6 @@ bool libmesh_initialized_petsc = false;
 bool libmesh_initialized_slepc = false;
 #endif
 
-
-
-/**
- * Floating point exception handler -- courtesy of Cody Permann & MOOSE team
- */
-#if LIBMESH_HAVE_DECL_SIGACTION
-void libmesh_handleFPE(int /*signo*/, siginfo_t * info, void * /*context*/)
-{
-  libMesh::err << std::endl;
-  libMesh::err << "Floating point exception signaled (";
-  switch (info->si_code)
-    {
-    case FPE_INTDIV: libMesh::err << "integer divide by zero"; break;
-    case FPE_INTOVF: libMesh::err << "integer overflow"; break;
-    case FPE_FLTDIV: libMesh::err << "floating point divide by zero"; break;
-    case FPE_FLTOVF: libMesh::err << "floating point overflow"; break;
-    case FPE_FLTUND: libMesh::err << "floating point underflow"; break;
-    case FPE_FLTRES: libMesh::err << "floating point inexact result"; break;
-    case FPE_FLTINV: libMesh::err << "invalid floating point operation"; break;
-    case FPE_FLTSUB: libMesh::err << "subscript out of range"; break;
-    default:         libMesh::err << "unrecognized"; break;
-    }
-  libMesh::err << ")!" << std::endl;
-
-  libmesh_error_msg("\nTo track this down, compile in debug mode, then in gdb do:\n" \
-                    << "  break libmesh_handleFPE\n"                    \
-                    << "  run ...\n"                                    \
-                    << "  bt");
-}
-
-
-void libmesh_handleSEGV(int /*signo*/, siginfo_t * info, void * /*context*/)
-{
-  libMesh::err << std::endl;
-  libMesh::err << "Segmentation fault exception signaled (";
-  switch (info->si_code)
-    {
-    case SEGV_MAPERR: libMesh::err << "Address not mapped"; break;
-    case SEGV_ACCERR: libMesh::err << "Invalid permissions"; break;
-    default:         libMesh::err << "unrecognized"; break;
-    }
-  libMesh::err << ")!" << std::endl;
-
-  libmesh_error_msg("\nTo track this down, compile in debug mode, then in gdb do:\n" \
-                    << "  break libmesh_handleSEGV\n"                    \
-                    << "  run ...\n"                                    \
-                    << "  bt");
-}
-#endif
 } // anonymous namespace
 
 
@@ -217,6 +159,8 @@ MPI_Comm           GLOBAL_COMM_WORLD = MPI_COMM_NULL;
 #else
 int                GLOBAL_COMM_WORLD = 0;
 #endif
+
+std::terminate_handler LibMeshInit::_old_terminate_handler;
 
 OStreamProxy out(std::cout);
 OStreamProxy err(std::cerr);
@@ -374,84 +318,9 @@ bool closed()
 }
 
 
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-std::terminate_handler old_terminate_handler;
-#endif
 
-void libmesh_terminate_handler()
+void libmesh_abort()
 {
-  bool print_debug_info = true;
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-  // If we have an active exception, it may have an error message that
-  // we should print, or it may have a type that tells us not to print
-  // anything.
-  std::exception_ptr ex = std::current_exception();
-  if (ex)
-    {
-      try
-        {
-          std::rethrow_exception(ex);
-        }
-      catch (const TerminationException & term_ex)
-        {
-          print_debug_info = false;
-        }
-      catch (...)
-        {
-        }
-    }
-  if (print_debug_info)
-    libMesh::err << "libMesh terminating:\n";
-  if (ex)
-    {
-      try
-        {
-          std::rethrow_exception(ex);
-        }
-      catch (const std::exception & std_ex)
-        {
-          libMesh::err << std_ex.what();
-        }
-      catch (...)
-        {
-        }
-    }
-  if (print_debug_info)
-    libMesh::err << std::endl;
-#endif
-
-  // If this got called then we're probably crashing; let's print a
-  // stack trace.  The trace files that are ultimately written depend on:
-  // 1.) Who throws the exception.
-  // 2.) Whether the C++ runtime unwinds the stack before the
-  //     terminate_handler is called (this is implementation defined).
-  //
-  // The various cases are summarized in the table below:
-  //
-  //                        | libmesh exception | other exception
-  //                        -------------------------------------
-  // stack unwinds          |        A          |       B
-  // stack does not unwind  |        C          |       D
-  //
-  // Case A: There will be two stack traces in the file: one "useful"
-  //         one, and one nearly empty one due to stack unwinding.
-  // Case B: You will get one nearly empty stack trace (not great, Bob!)
-  // Case C: You will get two nearly identical stack traces, ignore one of them.
-  // Case D: You will get one useful stack trace.
-  //
-  // Cases A and B (where the stack unwinds when an exception leaves
-  // main) appear to be non-existent in practice.  I don't have a
-  // definitive list, but the stack does not unwind for GCC on either
-  // Mac or Linux.  I think there's good reasons for this behavior too:
-  // it's much easier to get a stack trace when the stack doesn't
-  // unwind, for example.
-  if (print_debug_info)
-    libMesh::write_traceout();
-
-  // We may care about performance data pre-crash; it would be sad to
-  // throw that away.
-  if (print_debug_info)
-    libMesh::perflog.print_log();
   libMesh::perflog.clear();
 
   // Now that we're done with output we should clean up our stream
@@ -473,7 +342,7 @@ void libmesh_terminate_handler()
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // The system terminate_handler may do useful things, or the user
   // may have set their own terminate handler that we want to call.
-  old_terminate_handler();
+  LibMeshInit::_old_terminate_handler();
 #endif
 
   // The last attempt to die if nothing else has killed us
@@ -810,7 +679,7 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // Set our terminate handler to write stack traces in the event of a
   // crash
-  old_terminate_handler = std::set_terminate(libmesh_terminate_handler);
+  _old_terminate_handler = std::set_terminate(libmesh_terminate_handler);
 #endif
 
 
@@ -924,7 +793,7 @@ LibMeshInit::~LibMeshInit()
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
   // Reset the old terminate handler; maybe the user code wants to
   // keep doing C++ stuff after closing libMesh stuff.
-  std::set_terminate(old_terminate_handler);
+  std::set_terminate(_old_terminate_handler);
 #endif
 
 #ifdef LIBMESH_HAVE_NETGEN
@@ -993,78 +862,9 @@ LibMeshInit::~LibMeshInit()
 }
 
 
-
-/**
- * Toggle floating point exceptions -- courtesy of Cody Permann & MOOSE team
- */
-void enableFPE(bool on)
+PerfLog & LibMeshInit::perf_log()
 {
-#if !defined(LIBMESH_HAVE_FEENABLEEXCEPT) && defined(LIBMESH_HAVE_XMMINTRIN_H)
-  static int flags = 0;
-#endif
-
-  if (on)
-    {
-#ifdef LIBMESH_HAVE_FEENABLEEXCEPT
-      feenableexcept(FE_DIVBYZERO | FE_INVALID);
-#elif  LIBMESH_HAVE_XMMINTRIN_H
-      flags = _MM_GET_EXCEPTION_MASK();           // store the flags
-      _MM_SET_EXCEPTION_MASK(flags & ~_MM_MASK_INVALID);
-#endif
-
-#if LIBMESH_HAVE_DECL_SIGACTION
-      struct sigaction new_action, old_action;
-
-      // Set up the structure to specify the new action.
-      new_action.sa_sigaction = libmesh_handleFPE;
-      sigemptyset (&new_action.sa_mask);
-      new_action.sa_flags = SA_SIGINFO;
-
-      sigaction (SIGFPE, nullptr, &old_action);
-      if (old_action.sa_handler != SIG_IGN)
-        sigaction (SIGFPE, &new_action, nullptr);
-#endif
-    }
-  else
-    {
-#ifdef LIBMESH_HAVE_FEDISABLEEXCEPT
-      fedisableexcept(FE_DIVBYZERO | FE_INVALID);
-#elif  LIBMESH_HAVE_XMMINTRIN_H
-      _MM_SET_EXCEPTION_MASK(flags);
-#endif
-      signal(SIGFPE, SIG_DFL);
-    }
-}
-
-
-// Enable handling of SIGSEGV by libMesh
-// (potentially instead of PETSc)
-void enableSEGV(bool on)
-{
-#if LIBMESH_HAVE_DECL_SIGACTION
-  static struct sigaction old_action;
-  static bool was_on = false;
-
-  if (on)
-    {
-      struct sigaction new_action;
-      was_on = true;
-
-      // Set up the structure to specify the new action.
-      new_action.sa_sigaction = libmesh_handleSEGV;
-      sigemptyset (&new_action.sa_mask);
-      new_action.sa_flags = SA_SIGINFO;
-
-      sigaction (SIGSEGV, &new_action, &old_action);
-    }
-  else if (was_on)
-    {
-      was_on = false;
-      sigaction (SIGSEGV, &old_action, nullptr);
-    }
-#else
-  libmesh_error_msg("System call sigaction not supported.");
-#endif
+  return libMesh::perflog;
 }
 
 

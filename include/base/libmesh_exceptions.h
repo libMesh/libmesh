@@ -22,11 +22,36 @@
 
 #include "libmesh/libmesh_config.h"
 
+#include "libmesh/libmesh_abort.h"
+
 #include <stdexcept>
 #include <string>
 #include <sstream>
 
 namespace libMesh {
+
+/**
+ * A terminate handler.  libMesh sets this to handle uncaught
+ * exceptions; it can also be called manually to cleanup, print
+ * any diagnostics, do cleanup, and abort.
+ *
+ * If an uncaught exception is a TerminationException, as thrown by
+ * libmesh_terminate(), the handler avoids any diagnostic output.
+ *
+ * If an uncaught exception is a std::exception, its message is
+ * printed, followed by stack trace and performance log output.
+ */
+void libmesh_terminate_handler();
+
+/**
+ * Toggle hardware trap floating point exceptions
+ */
+void enableFPE(bool on);
+
+/**
+ * Toggle libMesh reporting of segmentation faults
+ */
+void enableSEGV(bool on);
 
 /**
  * A class to represent the internal "this should never happen"
@@ -194,7 +219,7 @@ public:
 
 #else
 
-#define LIBMESH_THROW(e) do { libMesh::err << e.what(); std::abort(); } while (0)
+#define LIBMESH_THROW(e) do { libMesh::err << e.what(); libmesh_abort(); } while (0)
 #define libmesh_rethrow
 #define libmesh_try
 #define libmesh_catch(e) if (0)

@@ -632,6 +632,7 @@ include_HEADERS = \
         base/getpot.h \
         base/id_types.h \
         base/libmesh.h \
+        base/libmesh_abort.h \
         base/libmesh_base.h \
         base/libmesh_common.h \
         base/libmesh_documentation.h \

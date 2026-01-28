@@ -65,6 +65,7 @@ namespace Parallel {
   class Communicator;
 }
 
+class PerfLog;
 enum SolverPackage : int;
 
 /**
@@ -147,6 +148,15 @@ private:
   // protected and forces us to use a named destructor manually
   vtkMPIController * _vtk_mpi_controller;
 #endif
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  static std::terminate_handler _old_terminate_handler;
+#endif
+
+  static PerfLog & perf_log();
+
+  friend void libmesh_abort();
+  friend void libmesh_terminate_handler();
 };
 
 /**
@@ -164,23 +174,6 @@ bool initialized ();
  * object destructors.
  */
 bool closed ();
-
-/**
- * A terminate handler.  libMesh sets this to handle uncaught
- * exceptions; it can also be called manually to print stack traces
- * and perf logs and call MPI
- */
-void libmesh_terminate_handler();
-
-/**
- * Toggle hardware trap floating point exceptions
- */
-void enableFPE(bool on);
-
-/**
- * Toggle libMesh reporting of segmentation faults
- */
-void enableSEGV(bool on);
 
 /**
  * \returns \p true if the argument \p arg was specified on the command line,
