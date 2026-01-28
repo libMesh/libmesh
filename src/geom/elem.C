@@ -1489,6 +1489,7 @@ void Elem::make_links_to_me_local(unsigned int n, unsigned int nn)
 #ifdef LIBMESH_ENABLE_AMR
       libmesh_assert((neigh_family_member->neighbor_ptr(nn) &&
                       (neigh_family_member->neighbor_ptr(nn)->active() ||
+                       this->is_ancestor_of(neigh_family_member->neighbor_ptr(nn)) ||
                        neigh_family_member->neighbor_ptr(nn)->is_ancestor_of(this))) ||
                      (neigh_family_member->neighbor_ptr(nn) == remote_elem) ||
                      ((this->refinement_flag() == JUST_REFINED) &&
