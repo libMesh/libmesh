@@ -943,7 +943,8 @@ UnstructuredMesh::~UnstructuredMesh ()
 
 void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                                        const bool reset_current_list,
-                                       const bool assert_valid)
+                                       const bool assert_valid,
+                                       const bool check_non_remote)
 {
   // We might actually want to run this on an empty mesh
   // (e.g. the boundary mesh for a nonexistent bcid!)
@@ -985,7 +986,10 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             // If we haven't yet found a neighbor on this side, try.
             // Even if we think our neighbor is remote, that
             // information may be out of date.
-            if (element->neighbor_ptr(ms) == nullptr ||
+            //
+            // If we're only checking remote neighbors, after a
+            // redistribution, then we'll skip the non-remote ones
+            if ((element->neighbor_ptr(ms) == nullptr && check_non_remote) ||
                 element->neighbor_ptr(ms) == remote_elem)
               {
                 // Get the key for the side of this element.  Use the
