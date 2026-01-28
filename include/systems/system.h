@@ -40,6 +40,7 @@
 #include <string_view>
 #include <vector>
 #include <memory>
+#include <optional>
 
 // This define may be useful in --disable-optional builds when it is
 // possible that libmesh will not have any solvers available.
@@ -514,9 +515,15 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
+   * elem_range \p active_local_range, if provided, indicates the range of elements
+   * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    */
   void project_solution (FunctionBase<Number> * f,
-                         FunctionBase<Gradient> * g = nullptr) const;
+                         FunctionBase<Gradient> * g = nullptr,
+                         std::optional<ConstElemRange> active_local_range = std::nullopt,
+                         std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto the current solution.
@@ -524,9 +531,15 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
+   * elem_range \p active_local_range, if provided, indicates the range of elements
+   * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    */
   void project_solution (FEMFunctionBase<Number> * f,
-                         FEMFunctionBase<Gradient> * g = nullptr) const;
+                         FEMFunctionBase<Gradient> * g = nullptr,
+                         std::optional<ConstElemRange> active_local_range = std::nullopt,
+                         std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto the current solution.
@@ -545,7 +558,9 @@ public:
                                               const std::string & unknown_name);
   void project_solution (ValueFunctionPointer fptr,
                          GradientFunctionPointer gptr,
-                         const Parameters & parameters) const;
+                         const Parameters & parameters,
+                         std::optional<ConstElemRange> active_local_range = std::nullopt,
+                         std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -554,6 +569,10 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
+   * elem_range \p active_local_range, if provided, indicates the range of elements
+   * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -561,7 +580,9 @@ public:
   void project_vector (NumericVector<Number> & new_vector,
                        FunctionBase<Number> * f,
                        FunctionBase<Gradient> * g = nullptr,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -570,6 +591,10 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
+   * elem_range \p active_local_range, if provided, indicates the range of elements
+   * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -577,7 +602,9 @@ public:
   void project_vector (NumericVector<Number> & new_vector,
                        FEMFunctionBase<Number> * f,
                        FEMFunctionBase<Gradient> * g = nullptr,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary functions onto a vector of degree of freedom
@@ -586,6 +613,10 @@ public:
    * represented by function pointers.
    * A gradient \p gptr is only required/used for projecting onto
    * finite element spaces with continuous derivatives.
+   * elem_range \p active_local_range, if provided, indicates the range of elements
+   * over which to perform the projection.
+   * variable_numbers \p variable_numbers, if provided, indicates the variable numbers
+   * onto which to project.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -594,7 +625,9 @@ public:
                        GradientFunctionPointer gptr,
                        const Parameters & parameters,
                        NumericVector<Number> & new_vector,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -607,11 +640,14 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
+   * elem_range \p active_local_range, if provided, indicates the range of elements
+   * over which to perform the projection.
    */
   void boundary_project_solution (const std::set<boundary_id_type> & b,
                                   const std::vector<unsigned int> & variables,
                                   FunctionBase<Number> * f,
-                                  FunctionBase<Gradient> * g = nullptr);
+                                  FunctionBase<Gradient> * g = nullptr,
+                                  std::optional<ConstElemRange> active_local_range = std::nullopt);
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -624,12 +660,15 @@ public:
    * represented by function pointers.
    * A gradient \p gptr is only required/used for projecting onto
    * finite element spaces with continuous derivatives.
+   * elem_range \p active_local_range, if provided, indicates the range of elements
+   * over which to perform the projection.
    */
   void boundary_project_solution (const std::set<boundary_id_type> & b,
                                   const std::vector<unsigned int> & variables,
                                   ValueFunctionPointer fptr,
                                   GradientFunctionPointer gptr,
-                                  const Parameters & parameters);
+                                  const Parameters & parameters,
+                                  std::optional<ConstElemRange> active_local_range = std::nullopt);
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -642,6 +681,8 @@ public:
    * user-provided cloneable functors.
    * A gradient \p g is only required/used for projecting onto finite
    * element spaces with continuous derivatives.
+   * elem_range \p active_local_range, if provided, indicates the range of elements
+   * over which to perform the projection.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -651,7 +692,8 @@ public:
                                 NumericVector<Number> & new_vector,
                                 FunctionBase<Number> * f,
                                 FunctionBase<Gradient> * g = nullptr,
-                                int is_adjoint = -1) const;
+                                int is_adjoint = -1,
+                                std::optional<ConstElemRange> active_local_range = std::nullopt) const;
 
   /**
    * Projects arbitrary boundary functions onto a vector of degree of
@@ -664,6 +706,8 @@ public:
    * represented by function pointers.
    * A gradient \p gptr is only required/used for projecting onto
    * finite element spaces with continuous derivatives.
+   * elem_range \p active_local_range, if provided, indicates the range of elements
+   * over which to perform the projection.
    *
    * Constrain the new vector using the requested adjoint rather than
    * primal constraints if is_adjoint is non-negative.
@@ -674,7 +718,8 @@ public:
                                 GradientFunctionPointer gptr,
                                 const Parameters & parameters,
                                 NumericVector<Number> & new_vector,
-                                int is_adjoint = -1) const;
+                                int is_adjoint = -1,
+                                std::optional<ConstElemRange> active_local_range = std::nullopt) const;
 
   /**
    * \returns The system number.
@@ -1984,7 +2029,9 @@ protected:
    * primal constraints if is_adjoint is non-negative.
    */
   void project_vector (NumericVector<Number> &,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Projects the vector defined on the old mesh onto the
@@ -1996,7 +2043,9 @@ protected:
    */
   void project_vector (const NumericVector<Number> &,
                        NumericVector<Number> &,
-                       int is_adjoint = -1) const;
+                       int is_adjoint = -1,
+                       std::optional<ConstElemRange> active_local_range = std::nullopt,
+                       std::optional<std::vector<unsigned int>> variable_numbers = std::nullopt) const;
 
   /**
    * Whether this object should condense out constrained degrees of freedom
