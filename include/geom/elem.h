@@ -364,6 +364,18 @@ public:
                                const PeriodicBoundaries * pb);
 
   /**
+   * \returns A pointer to the \f$ i^{th} \f$ neighbor of this element
+   * for interior elements.  If an element is on a periodic
+   * boundary, it will return a corresponding element on the opposite
+   * side, along with the side neigh_side.
+   */
+  const std::pair<const Elem *, unsigned int>
+  topological_neighbor_side(const unsigned int i,
+                            const MeshBase & mesh,
+                            const PointLocatorBase & point_locator,
+                            const PeriodicBoundaries * pb) const;
+
+  /**
    * \returns \p true if the element \p elem in question is a neighbor or
    * topological neighbor of this element, \p false otherwise.
    */
