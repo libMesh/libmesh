@@ -121,7 +121,11 @@ public:
 
   /**
    * Copy assignment operator.
-   * Calls VecCopy after performing various checks.
+   * Supported assignments based on ParallelType combination (note that we lump ghosted into
+   * parallel for this method documentation):
+   *   - Assign from parallel to parallel
+   *   - Assign from serial to serial
+   *   - Assign from parallel to serial
    * \returns A reference to *this as the derived type.
    */
   PetscVector<T> & operator= (const PetscVector<T> & v);
@@ -772,6 +776,12 @@ void PetscVector<T>::init (const numeric_index_type n,
                            const ParallelType libmesh_dbg_var(ptype))
 {
   parallel_object_only();
+
+  if (this->comm().size() == 1)
+    {
+      libmesh_assert(ghost.empty());
+      this->init(n, n_local, fast, SERIAL);
+    }
 
   PetscInt petsc_n=static_cast<PetscInt>(n);
   PetscInt petsc_n_local=static_cast<PetscInt>(n_local);
