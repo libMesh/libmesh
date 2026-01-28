@@ -132,7 +132,7 @@ BoundingBox MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 {
   // If we've been handed an unprepared mesh then we need to be made
   // aware of that and fix that; we're relying on neighbor pointers.
-  libmesh_assert(MeshTools::valid_is_prepared(mesh));
+  MeshTools::libmesh_assert_valid_is_prepared(mesh);
 
   if (!mesh.is_prepared())
     mesh.prepare_for_use();

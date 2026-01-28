@@ -185,7 +185,7 @@ int main (int argc, char** argv)
 
   // We also set a standard linear solver flag in the EquationSystems object
   // which controls the maximum number of linear solver iterations allowed.
-  const int max_iter = libMesh::command_line_next("-max_iter", 25);
+  const int max_iter = libMesh::command_line_next("-max_iter", 100);
 
   equation_systems.parameters.set<unsigned int>("linear solver maximum iterations") = max_iter;
 

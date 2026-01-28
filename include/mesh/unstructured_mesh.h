@@ -282,7 +282,9 @@ public:
    * Other functions from MeshBase requiring re-definition.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
-                               const bool reset_current_list    = true) override;
+                               const bool reset_current_list    = true,
+                               const bool assert_valid          = true,
+                               const bool check_non_remote      = true) override;
 
 #ifdef LIBMESH_ENABLE_AMR
   /**

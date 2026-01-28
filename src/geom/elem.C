@@ -1430,8 +1430,11 @@ void Elem::make_links_to_me_local(unsigned int n, unsigned int nn)
   libmesh_assert(neigh);
   libmesh_assert(!neigh->is_remote());
 
+  const unsigned int this_level = this->level();
+  const unsigned int neigh_level = neigh->level();
+
   // We never have neighbors more refined than us
-  libmesh_assert_less_equal (neigh->level(), this->level());
+  libmesh_assert_less_equal (neigh_level, this_level);
 
   // We never have subactive neighbors of non subactive elements
   libmesh_assert(!neigh->subactive() || this->subactive());
@@ -1439,15 +1442,9 @@ void Elem::make_links_to_me_local(unsigned int n, unsigned int nn)
   // If we have a neighbor less refined than us then it must not
   // have any more refined descendants we could have pointed to
   // instead.
-  libmesh_assert((neigh->level() == this->level()) ||
+  libmesh_assert((neigh_level == this_level) ||
                  (neigh->active() && !this->subactive()) ||
                  (!neigh->has_children() && this->subactive()));
-
-  // If neigh is at our level, then its family might have
-  // remote_elem neighbor links which need to point to us
-  // instead, but if not, then we're done.
-  if (neigh->level() != this->level())
-    return;
 
   // What side of neigh are we on?  nn.
   //
@@ -1459,20 +1456,27 @@ void Elem::make_links_to_me_local(unsigned int n, unsigned int nn)
   // not-technically-neighbors until they're
   // not-even-geometrically-neighbors.
 
-  // Find any elements that ought to point to elem
+  // Find any elements that might need to point to elem
   std::vector<Elem *> neigh_family;
-#ifdef LIBMESH_ENABLE_AMR
-  if (this->active())
-    neigh->family_tree_by_side(neigh_family, nn);
-  else
-#endif
-    neigh_family.push_back(neigh);
+  neigh->total_family_tree_by_side(neigh_family, nn);
+
+  // Pull objects out of the loop to reduce heap operations
+  std::unique_ptr<Elem> my_side, neigh_side;
 
   // And point them to elem
   for (auto & neigh_family_member : neigh_family)
     {
       // Only subactive elements point to other subactive elements
-      if (this->subactive() && !neigh_family_member->subactive())
+      const bool member_subactive = neigh_family_member->subactive();
+      if (this->subactive() && !member_subactive)
+        continue;
+
+      // neigh (and possibly some of its family) might be at a lower
+      // level than us, with a neighbor at that lower level.  We
+      // would exit early if neigh was at a lower level, except we do
+      // want to handle neighbor links from subactive descendents.
+      const unsigned int member_level = neigh_family_member->level();
+      if (member_level < this_level)
         continue;
 
       // Ideally, the neighbor link ought to either be correct
@@ -1485,6 +1489,7 @@ void Elem::make_links_to_me_local(unsigned int n, unsigned int nn)
 #ifdef LIBMESH_ENABLE_AMR
       libmesh_assert((neigh_family_member->neighbor_ptr(nn) &&
                       (neigh_family_member->neighbor_ptr(nn)->active() ||
+                       this->is_ancestor_of(neigh_family_member->neighbor_ptr(nn)) ||
                        neigh_family_member->neighbor_ptr(nn)->is_ancestor_of(this))) ||
                      (neigh_family_member->neighbor_ptr(nn) == remote_elem) ||
                      ((this->refinement_flag() == JUST_REFINED) &&
@@ -1494,6 +1499,32 @@ void Elem::make_links_to_me_local(unsigned int n, unsigned int nn)
       libmesh_assert((neigh_family_member->neighbor_ptr(nn) == this) ||
                      (neigh_family_member->neighbor_ptr(nn) == remote_elem));
 #endif
+
+      // Some of neigh's family might be at a higher (finer) level
+      // than us, and might need to point back to one of our children
+      // rather than to us.
+      if (member_level > this_level)
+        {
+          if (this->ancestor())
+            continue;
+
+          if (member_subactive && this->has_children())
+            continue;
+        }
+
+      // If neigh is at a coarser level than us, some of neigh's
+      // subactive family just won't line up with us!
+      if (neigh_level < this_level &&
+          member_level > neigh_level)
+        {
+          libmesh_assert(member_subactive);
+
+          this->side_ptr(my_side, n);
+          neigh_family_member->side_ptr(neigh_side, nn);
+
+          if (*my_side != *neigh_side)
+            continue;
+        }
 
       neigh_family_member->set_neighbor(nn, this);
     }
@@ -2130,6 +2161,24 @@ void Elem:: family_tree_by_side (std::vector<Elem *> & family,
                                  bool reset)
 {
   ElemInternal::family_tree_by_side(this, family, side, reset);
+}
+
+
+
+void Elem::total_family_tree_by_side (std::vector<const Elem *> & family,
+                                      unsigned int side,
+                                      bool reset) const
+{
+  ElemInternal::total_family_tree_by_side(this, family, side, reset);
+}
+
+
+
+void Elem::total_family_tree_by_side (std::vector<Elem *> & family,
+                                      unsigned int side,
+                                      bool reset)
+{
+  ElemInternal::total_family_tree_by_side(this, family, side, reset);
 }
 
 

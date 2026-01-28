@@ -225,6 +225,9 @@ int main (int argc, char ** argv)
         }
     }
 
+  // We're done modifying the BoundaryInfo; get its caches up to date.
+  mesh.get_boundary_info().regenerate_id_sets();
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 

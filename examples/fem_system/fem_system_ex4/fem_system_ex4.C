@@ -157,6 +157,9 @@ int main (int argc, char ** argv)
     if (elem->dim() < dim)
       elem->subdomain_id() = 1;
 
+  // Make sure the mesh knows we added new subdomains.
+  mesh.cache_elem_data();
+
   mesh_refinement.uniformly_refine(coarserefinements);
 
   // Print information about the mesh to the screen.

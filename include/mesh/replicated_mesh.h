@@ -97,7 +97,7 @@ public:
    * Shim to allow operator == (&) to behave like a virtual function
    * without having to be one.
    */
-  virtual bool subclass_locally_equals (const MeshBase & other_mesh) const override;
+  virtual std::string_view subclass_first_difference_from (const MeshBase & other_mesh_base) const override;
 
   /**
    * Virtual copy-constructor, creates a copy of this mesh
