@@ -20110,7 +20110,7 @@ printf "%s\n" "$BINFILE_NAME $FC $CXX" >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if libtool needs -no-undefined flag to build shared libraries" >&5
 printf %s "checking if libtool needs -no-undefined flag to build shared libraries... " >&6; }
 case "`uname`" in
-     CYGWIN*|MINGW*|AIX*)
+     CYGWIN*|MINGW*|MSYS*|AIX*)
      ## Add in the -no-undefined flag to LDFLAGS for libtool.
      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
