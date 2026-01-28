@@ -674,14 +674,14 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           if (elem->neighbor_ptr(n) == remote_elem)
             {
               elem->set_neighbor(n, neigh);
-
-              if (neighbor_side != libMesh::invalid_uint)
-                elem->make_links_to_me_local(n, neighbor_side);
             }
           else
             libmesh_assert(elem->subactive() ||
                            neigh->level() < elem->level() ||
                            neigh->neighbor_ptr(neighbor_side) == elem);
+
+          if (neighbor_side != libMesh::invalid_uint)
+            elem->make_links_to_me_local(n, neighbor_side);
         }
 
       // Our p level and refinement flags should be "close to" correct
