@@ -975,10 +975,17 @@ public:
    *
    * If \p assert_valid is left as true, then in dbg mode extensive
    * consistency checking is performed before returning.
+   *
+   * If \p check_non_remote is set to false, then only sides which
+   * currently have remote neighbors are checked for possible local
+   * neighbors.  This is intended to handle a corner case where
+   * ancestor neighbors are redistributed to a processor only by other
+   * processors who do not see that neighbor link.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
                                const bool reset_current_list    = true,
-                               const bool assert_valid          = true) = 0;
+                               const bool assert_valid          = true,
+                               const bool check_non_remote      = true) = 0;
 
   /**
    * Removes any orphaned nodes, nodes not connected to any elements.
