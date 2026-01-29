@@ -30,6 +30,7 @@
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_quad8.h"
 #include "libmesh/face_quad9.h"
+#include "libmesh/face_c0polygon.h"
 #include "libmesh/cell_hex8.h"
 #include "libmesh/cell_hex20.h"
 #include "libmesh/cell_hex27.h"
@@ -614,6 +615,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               break;
             }
 
+          case C0POLYGON:
+          {
+            mesh.reserve_elem ((nx + 1) * (ny + 1));
+            break;
+          }
+
           default:
             libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
           }
@@ -647,6 +654,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case TRI7:
             {
               mesh.reserve_nodes( (2*nx+1)*(2*ny+1) + 2*nx*ny );
+              break;
+            }
+          case C0POLYGON:
+            {
+              mesh.reserve_nodes (4 + 3*nx*ny + 2*nx + 2*ny);
               break;
             }
 
@@ -735,6 +747,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               break;
             }
 
+            case C0POLYGON:
+            {
+              // we create the nodes at the same time as the elements
+              break;
+            }
 
           default:
             libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
@@ -895,6 +912,195 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   }
               break;
             };
+
+          case C0POLYGON:
+          {
+            // Build a 2D paving using hexagons (center), quads (part of y-boundary)
+            // and triangles (x-boundaries).
+            // Vector to re-use previously created nodes
+            std::vector<Node *> node_list;
+
+            // Start with a layer of triangles on the boundary
+            const auto dx_tri = (xmax - xmin) / (nx);
+            const auto dy_tri = (ymax - ymin) / (ny + 1);
+            std::unique_ptr<Elem> new_elem;
+            for (const auto i : make_range(nx + 1))
+            {
+              // Make new nodes for bottom layer of triangles
+              Node *node0, *node1, *node2;
+              if (i == 0)
+              {
+                node0 = mesh.add_point(Point(0., 0, 0.));
+                node1 = mesh.add_point(Point(0., dy_tri / 2., 0.));
+                node2 = mesh.add_point(Point(dx_tri / 2., 0., 0.));
+                node_list.push_back(node0);
+                node_list.push_back(node1);
+                node_list.push_back(node2);
+              }
+              else if (i < nx)
+              {
+                node0 = node_list.back();
+                node1 = mesh.add_point(Point((i)*dx_tri, dy_tri / 2., 0.));
+                node2 = mesh.add_point(Point((i + 1. / 2.) * dx_tri, 0., 0.));
+                node_list.push_back(node1);
+                node_list.push_back(node2);
+              }
+              else
+              {
+                node0 = node_list.back();
+                node1 = mesh.add_point(Point((i)*dx_tri, dy_tri / 2., 0.));
+                node2 = mesh.add_point(Point((i)*dx_tri, 0., 0.));
+                node_list.push_back(node1);
+                node_list.push_back(node2);
+              }
+
+              new_elem = std::make_unique<C0Polygon>(3);
+              // Switch to Tri3 when exodus default output supports element type mixes
+              new_elem->set_node(0, node0);
+              new_elem->set_node(1, node1);
+              new_elem->set_node(2, node2);
+              auto * elem = mesh.add_elem(std::move(new_elem));
+
+              // Set boundaries
+              if (i == 0)
+                boundary_info.add_side(elem, 0, 3); // left
+              else if (i == nx)
+                boundary_info.add_side(elem, 1, 1); // right
+              boundary_info.add_side(elem, 2, 0); // bottom
+            }
+            // Start with the second node to build hexagons
+            unsigned int running_index = 1;
+
+            // Build layers of hexagons
+            const auto hex_side =
+                (ymax - ymin - (ny == 1 ? dy_tri : (1. + (ny - 1) / 2.) * dy_tri)) / ny;
+            for (const auto j : make_range(ny))
+            {
+              for (const auto i : make_range(nx + (j % 2)))
+              {
+                if ((j % 2 == 0) || ((i > 0) && (i < nx)))
+                {
+                  Node *n0, *n1, *n2, *n3, *n4, *n5;
+                  n0 = node_list[running_index++];
+                  n1 = node_list[running_index++];
+                  n2 = node_list[running_index];
+
+                  if (i == 0)
+                  {
+                    n3 = mesh.add_point(Point(*n0) + RealVectorValue(0, hex_side, 0));
+                    node_list.push_back(n3);
+                  }
+                  else
+                    n3 = node_list.back();
+
+                  n4 = mesh.add_point(Point(*n1) + RealVectorValue(0, hex_side + dy_tri, 0));
+                  n5 = mesh.add_point(Point(*n2) + RealVectorValue(0, hex_side, 0));
+                  node_list.push_back(n4);
+                  node_list.push_back(n5);
+
+                  new_elem = std::make_unique<libMesh::C0Polygon>(6);
+                  new_elem->set_node(0, n0);
+                  new_elem->set_node(1, n1);
+                  new_elem->set_node(2, n2);
+                  new_elem->set_node(3, n5);
+                  new_elem->set_node(4, n4);
+                  new_elem->set_node(5, n3);
+                  auto * elem = mesh.add_elem(std::move(new_elem));
+
+                  // Set boundaries
+                  if (i == 0)
+                    boundary_info.add_side(elem, 5, 3); // left
+                  else if (i == nx)
+                    boundary_info.add_side(elem, 2, 1); // right
+                }
+                // The hexagons are offset, so we build on a quad on each external side to fill
+                else if (i == 0 || i == nx)
+                {
+                  Node *n0, *n1, *n2, *n3;
+                  n0 = node_list[running_index++];
+                  n1 = node_list[running_index];
+
+                  if (i == 0)
+                  {
+                    n2 = mesh.add_point(Point(*n0) + RealVectorValue(0, hex_side + dy_tri, 0));
+                    node_list.push_back(n2);
+                    n3 = mesh.add_point(Point(*n1) + RealVectorValue(0, hex_side, 0));
+                  }
+                  else
+                  {
+                    n2 = node_list.back();
+                    n3 = mesh.add_point(Point(*n1) + RealVectorValue(0, hex_side + dy_tri, 0));
+                  }
+                  node_list.push_back(n3);
+
+                  new_elem = std::make_unique<C0Polygon>(4);
+                  // Switch to Quad4 when exodus default output supports element type mixes
+                  new_elem->set_node(0, n0);
+                  new_elem->set_node(1, n1);
+                  new_elem->set_node(3, n2);
+                  new_elem->set_node(2, n3);
+                  auto * elem = mesh.add_elem(std::move(new_elem));
+
+                  // Set boundaries
+                  if (i == 0)
+                    boundary_info.add_side(elem, 3, 3); // left
+                  else if (i == nx)
+                    boundary_info.add_side(elem, 1, 1); // right
+                }
+                else
+                  libmesh_assert(false);
+              }
+              // Increment once to switch to next 'row' of nodes
+              running_index++;
+
+              // Skip lower right corner node
+              if (j == 0)
+                running_index++;
+            }
+
+            // Build a final layer of triangles
+            const bool ny_odd = (ny % 2 == 1);
+            for (const auto i : make_range(nx + ny_odd))
+            {
+              // Use existing nodes, except at the corners
+              Node *node0, *node1, *node2;
+              if (i == 0 && ny_odd)
+              {
+                node0 = mesh.add_point(Point(0., ymax, 0.));
+                node1 = node_list[running_index++];
+                node2 = node_list[running_index];
+              }
+              else if (i < nx)
+              {
+                node0 = node_list[running_index++];
+                node1 = node_list[running_index++];
+                node2 = node_list[running_index];
+              }
+              // This case only reached if ny is odd and we are using a triangle in top right corner
+              else
+              {
+                node0 = node_list[running_index++];
+                node1 = node_list[running_index];
+                node2 = mesh.add_point(Point(xmax, ymax, 0.));
+              }
+
+              new_elem = std::make_unique<C0Polygon>(3);
+              // Switch to Tri3 when exodus default output supports element type mixes
+              new_elem->set_node(0, node0);
+              new_elem->set_node(1, node1);
+              new_elem->set_node(2, node2);
+              auto * elem = mesh.add_elem(std::move(new_elem));
+
+              // Set boundaries
+              if (i == 0)
+                boundary_info.add_side(elem, 0, 3); // left
+              else if (i == nx)
+                boundary_info.add_side(elem, 1, 1); // right
+              boundary_info.add_side(elem, 2, 2); // top
+
+            }
+            break;
+          }
 
 
           default:
