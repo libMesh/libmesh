@@ -271,7 +271,7 @@ extern bool warned_about_auto_ptr;
   } while (0)
 
 // The libmesh_dbg_var() macro indicates that an argument to a function
-// is used only in debug mode (i.e., when NDEBUG is not defined).
+// is used only in debug and devel modes (i.e., when NDEBUG is not defined).
 #ifndef NDEBUG
 #define libmesh_dbg_var(var) var
 #else

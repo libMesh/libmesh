@@ -679,6 +679,21 @@ public:
                   for (const Node & node : child_side->node_ref_range())
                     CPPUNIT_ASSERT(parent_side->contains_point(node));
 
+                // We can at least check for sharing some node with
+                // a side, on both finite and infinite elements, for
+                // those children that aren't just the middle elements
+                // of triangular sides.
+                bool shares_a_side_node = false;
+                bool shares_a_vertex = false;
+                for (const Node & node : child_side->node_ref_range())
+                  if (parent_side->local_node(node.id()) != invalid_uint)
+                    shares_a_side_node = true;
+                for (const Node & node : elem->node_ref_range())
+                  if (parent->local_node(node.id()) < parent->n_vertices())
+                    shares_a_vertex = true;
+
+                CPPUNIT_ASSERT(shares_a_side_node || !shares_a_vertex);
+
                 if (elem->neighbor_ptr(s) && !elem->neighbor_ptr(s)->is_remote())
                   CPPUNIT_ASSERT_EQUAL(parent->child_neighbor(elem->neighbor_ptr(s)), elem);
               }
@@ -699,6 +714,15 @@ public:
                 if (!parent_edge->infinite())
                   for (const Node & node : child_edge->node_ref_range())
                     CPPUNIT_ASSERT(parent_edge->contains_point(node));
+
+                // We can at least check for sharing some node with
+                // an edge, on both finite and infinite elements
+                bool shares_an_edge_node = false;
+                for (const Node & node : child_edge->node_ref_range())
+                  if (parent_edge->local_node(node.id()) != invalid_uint)
+                    shares_an_edge_node = true;
+
+                CPPUNIT_ASSERT(shares_an_edge_node);
               }
           }
 

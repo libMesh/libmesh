@@ -592,6 +592,10 @@ public:
 
             mesh.comm().sum(distorted_subdomain_volumes[sub_id]);
           }
+
+        // We've just invalidated the get_mesh_subdomains() cache by
+        // adding a new one; fix it.
+        mesh.cache_elem_data();
       }
 
     // Get the mesh order

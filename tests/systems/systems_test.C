@@ -62,6 +62,11 @@ public:
   _mesh(mesh)
   {}
 
+  virtual std::unique_ptr<GhostingFunctor> clone () const override
+  {
+    return std::make_unique<AugmentSparsityOnNodes>(_mesh);
+  }
+
   /**
    * User-defined function to augment the sparsity pattern.
    */

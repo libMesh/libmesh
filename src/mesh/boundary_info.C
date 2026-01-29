@@ -138,6 +138,8 @@ BoundaryInfo & BoundaryInfo::operator=(const BoundaryInfo & other_boundary_info)
   for (const auto & [elem, id_pair] : other_boundary_info._boundary_side_id)
     _boundary_side_id.emplace(_mesh->elem_ptr(elem->id()), id_pair);
 
+  _children_on_boundary = other_boundary_info._children_on_boundary;
+
   _boundary_ids = other_boundary_info._boundary_ids;
   _global_boundary_ids = other_boundary_info._global_boundary_ids;
   _side_boundary_ids = other_boundary_info._side_boundary_ids;
@@ -511,9 +513,8 @@ void BoundaryInfo::sync (const std::set<boundary_id_type> & requested_boundary_i
   boundary_mesh.set_n_partitions() = _mesh->n_partitions();
 
   std::map<dof_id_type, dof_id_type> node_id_map;
-  std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> side_id_map;
 
-  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, &side_id_map, subdomains_relative_to);
+  this->_find_id_maps(requested_boundary_ids, 0, &node_id_map, 0, nullptr, subdomains_relative_to);
 
   // Let's add all the boundary nodes we found to the boundary mesh
   for (const auto & node : _mesh->node_ptr_range())
@@ -3300,11 +3301,28 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                                  std::map<std::pair<dof_id_type, unsigned char>, dof_id_type> * side_id_map,
                                  const std::set<subdomain_id_type> & subdomains_relative_to)
 {
-  // We'll do the same modulus trick that DistributedMesh uses to avoid
-  // id conflicts between different processors
+  // We'll use the standard DistributedMesh trick of dividing up id
+  // ranges by processor_id to avoid picking duplicate node ids.
   dof_id_type
-    next_node_id = first_free_node_id + this->processor_id(),
-    next_elem_id = first_free_elem_id + this->processor_id();
+    next_node_id = first_free_node_id + this->processor_id();
+
+  // We have to be careful how we select different element ids on
+  // different processors, because we may be adding sides of refined
+  // elements and sides of their parents (which are thereby also
+  // parents of their sides), but libMesh convention requires (and
+  // some libMesh communication code assumes) that parent elements
+  // have lower ids than their children.
+  //
+  // We'll start with temporary ids in a temporary map stratefied by
+  // element level, so we can sort by element level after.
+  // Make sure we're sorting by ids here, not anything that might
+  // differ from processor to processor, so we can do an
+  // embarrassingly parallel sort.  This is a serialized data
+  // structure, but it's at worst O(N^2/3) so we'll hold off on doing
+  // this distributed until someone's benchmark screams at us.
+  std::vector
+    <std::set<std::pair<dof_id_type, unsigned char>>>
+    side_id_set_by_level;
 
   // For avoiding extraneous element side construction
   ElemSideBuilder side_builder;
@@ -3337,14 +3355,19 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
 
           // Join up the local results from other processors
           if (side_id_map)
-            this->comm().set_union(*side_id_map);
+          {
+            std::size_t n_levels = side_id_set_by_level.size();
+            this->comm().max(n_levels);
+            side_id_set_by_level.resize(n_levels);
+            for (auto l : make_range(n_levels))
+              this->comm().set_union(side_id_set_by_level[l]);
+          }
           if (node_id_map)
             this->comm().set_union(*node_id_map);
 
           // Finally we'll pass through any unpartitioned elements to add them
           // to the maps and counts.
           next_node_id = first_free_node_id + this->n_processors();
-          next_elem_id = first_free_elem_id + this->n_processors();
 
           el = _mesh->pid_elements_begin(DofObject::invalid_processor_id);
           if (el == end_unpartitioned_el)
@@ -3401,9 +3424,12 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
                     DofObject::invalid_processor_id)))
                 {
                   std::pair<dof_id_type, unsigned char> side_pair(elem->id(), s);
-                  libmesh_assert (!side_id_map->count(side_pair));
-                  (*side_id_map)[side_pair] = next_elem_id;
-                  next_elem_id += this->n_processors() + 1;
+                  auto level = elem->level();
+                  if (side_id_set_by_level.size() <= level)
+                    side_id_set_by_level.resize(level+1);
+                  auto & level_side_id_set = side_id_set_by_level[level];
+                  libmesh_assert (!level_side_id_set.count(side_pair));
+                  level_side_id_set.insert(side_pair);
                 }
 
               side = &side_builder(*elem, s);
@@ -3428,8 +3454,21 @@ void BoundaryInfo::_find_id_maps(const std::set<boundary_id_type> & requested_bo
         }
     }
 
-  // FIXME: ought to renumber side/node_id_map image to be contiguous
-  // to save memory, also ought to reserve memory
+  // FIXME: should we renumber node_id_map's image to be contiguous
+  // here, rather than waiting for renumbering in mesh preparation to
+  // do it later?
+
+  // We do need to build up side_id_map here, to handle proper sorting
+  // by level.
+  if (side_id_map)
+    {
+      dof_id_type next_elem_id = first_free_elem_id;
+      for (auto level : make_range(side_id_set_by_level.size()))
+        {
+          for (auto side_pair : side_id_set_by_level[level])
+            (*side_id_map)[side_pair] = next_elem_id++;
+        }
+    }
 }
 
 void BoundaryInfo::clear_stitched_boundary_side_ids (const boundary_id_type sideset_id,

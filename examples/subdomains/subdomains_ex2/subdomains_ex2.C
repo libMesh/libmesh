@@ -195,6 +195,9 @@ int main (int argc, char ** argv)
         elem->subdomain_id() = 1;
     }
 
+  // Make sure the mesh knows we added new subdomains.
+  mesh.cache_elem_data();
+
   // Print information about the mesh to the screen.
   mesh.print_info();
 

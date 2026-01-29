@@ -735,7 +735,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
 
         // Hold off on trying to set the interior parent because we may actually
         // add lower dimensional elements before their interior parents
-        if (el->dim() < other_mesh.mesh_dimension() && old->interior_parent())
+        if (old->interior_parent())
           ip_map[old] = el.get();
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -797,9 +797,51 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
           }
       }
 
-    for (auto & elem_pair : ip_map)
-      elem_pair.second->set_interior_parent(
-        this->elem_ptr(elem_pair.first->interior_parent()->id() + element_id_offset));
+    // If the other_mesh had some interior parents, we may need to
+    // copy those pointers (if they're to elements in a third mesh),
+    // or create new equivalent pointers (if they're to elements we
+    // just copied), or scream and die (if the other mesh had interior
+    // parents from a third mesh but we already have interior parents
+    // that aren't to that same third mesh.
+    if (!ip_map.empty())
+      {
+        bool existing_interior_parents = false;
+        for (const auto & elem : this->element_ptr_range())
+          if (elem->interior_parent())
+            {
+              existing_interior_parents = true;
+              break;
+            }
+
+        MeshBase * other_interior_mesh =
+          const_cast<MeshBase *>(&other_mesh.interior_mesh());
+
+        // If we don't already have interior parents, then we can just
+        // use whatever interior_mesh we need for the incoming
+        // elements.
+        if (!existing_interior_parents)
+          {
+            if (other_interior_mesh == &other_mesh)
+              this->set_interior_mesh(*this);
+            else
+              this->set_interior_mesh(*other_interior_mesh);
+          }
+
+        if (other_interior_mesh == &other_mesh &&
+            _interior_mesh == this)
+          for (auto & elem_pair : ip_map)
+            elem_pair.second->set_interior_parent(
+              this->elem_ptr(elem_pair.first->interior_parent()->id() + element_id_offset));
+        else if (other_interior_mesh == _interior_mesh)
+          for (auto & elem_pair : ip_map)
+            {
+              Elem * ip = const_cast<Elem *>(elem_pair.first->interior_parent());
+              libmesh_assert(ip == other_interior_mesh->elem_ptr(ip->id()));
+              elem_pair.second->set_interior_parent(ip);
+            }
+        else
+          libmesh_error_msg("Cannot copy boundary elements between meshes with different interior meshes");
+      }
 
     // Loop (again) over the elements to fill in the neighbors
     if (skip_find_neighbors)
