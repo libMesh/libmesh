@@ -140,6 +140,23 @@ void Elem::refine (MeshRefinement & mesh_refinement)
         }
     }
 
+  // Get any new remote neighbor links right; even find_neighbors
+  // relies on those
+  for (unsigned int s : this->side_index_range())
+    {
+      if (this->neighbor_ptr(s) != remote_elem)
+        continue;
+
+      for (unsigned int c = 0; c != nc; c++)
+        {
+          Elem * current_child = this->child_ptr(c);
+          if (current_child != remote_elem &&
+              this->is_child_on_side(c, s))
+            current_child->set_neighbor
+              (s, const_cast<RemoteElem *>(remote_elem));
+        }
+    }
+
   // Un-set my refinement flag now
   this->set_refinement_flag(Elem::INACTIVE);
 

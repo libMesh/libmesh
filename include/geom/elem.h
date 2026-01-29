@@ -290,12 +290,18 @@ public:
   virtual dof_id_type key () const;
 
   /**
-   * \returns \p true if two elements are equivalent, false otherwise.
-   * This is true if the elements are connected to identical global
-   * nodes, regardless of how those nodes might be numbered local
-   * to the elements.
+   * \returns \p true if two elements are equivalent, \p false
+   * otherwise.  This is true if the elements are connected to
+   * identical global nodes, regardless of how those nodes might be
+   * numbered local to the elements.
    */
   bool operator == (const Elem & rhs) const;
+
+  /**
+   * \returns \p false if two elements are equivalent, \p true
+   * otherwise.
+   */
+  bool operator != (const Elem & rhs) const;
 
   /**
    * \returns \p true if two elements have equal topologies, false
@@ -1586,6 +1592,21 @@ public:
                             bool reset = true);
 
   /**
+   * Same as the \p total_family_tree() member, but only adds elements
+   * which are next to \p side.
+   */
+  void total_family_tree_by_side (std::vector<const Elem *> & family,
+                                  unsigned int side,
+                                  bool reset = true) const;
+
+  /**
+   * Non-const version of function above; fills a vector of non-const pointers.
+   */
+  void total_family_tree_by_side (std::vector<Elem *> & family,
+                                  unsigned int side,
+                                  bool reset = true);
+
+  /**
    * Same as the \p active_family_tree() member, but only adds elements
    * which are next to \p side.
    */
@@ -2575,6 +2596,14 @@ inline
 subdomain_id_type & Elem::subdomain_id ()
 {
   return _sbd_id;
+}
+
+
+
+inline
+bool Elem::operator != (const Elem & rhs) const
+{
+  return !(*this == rhs);
 }
 
 

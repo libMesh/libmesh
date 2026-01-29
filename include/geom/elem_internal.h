@@ -146,6 +146,35 @@ family_tree_by_side (T elem,
 
 template <class T>
 void
+total_family_tree_by_side (T elem,
+                           std::vector<T> & family,
+                           unsigned int s,
+                           bool reset)
+{
+  // Clear the vector if the flag reset tells us to.
+  if (reset)
+    family.clear();
+
+  libmesh_assert_less (s, elem->n_sides());
+
+  // Add this element to the family tree.
+  family.push_back(elem);
+
+  // Recurse into the elements children, if it has them.
+  // Do not clear the vector any more.
+  if (elem->has_children())
+    {
+      const unsigned int nc = elem->n_children();
+      for (unsigned int c = 0; c != nc; c++)
+        if (!elem->child_ptr(c)->is_remote() && elem->is_child_on_side(c, s))
+          ElemInternal::total_family_tree_by_side (elem->child_ptr(c), family, s, false);
+    }
+}
+
+
+
+template <class T>
+void
 active_family_tree_by_side (T elem,
                             std::vector<T> & family,
                             unsigned int side,
