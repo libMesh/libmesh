@@ -498,7 +498,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
   // AMR is disabled: simply copy the vector
   new_v = old_v;
 
-  libmesh_ignore(is_adjoint);
+  libmesh_ignore(is_adjoint, active_local_range, variable_numbers);
 
 #endif // #ifdef LIBMESH_ENABLE_AMR
 }
