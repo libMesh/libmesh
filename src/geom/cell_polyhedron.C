@@ -115,6 +115,7 @@ Polyhedron::Polyhedron (const std::vector<std::shared_ptr<Polygon>> & sides,
       {
         const Polygon & side = *sides[s];
         const Point x_i = side.point(0);
+        // opposite of normal
         const Point n_i =
           (side.point(1) - side.point(0)).cross
           (side.point(0) - side.point(side.n_sides()-1)).unit();
@@ -123,7 +124,7 @@ Polyhedron::Polyhedron (const std::vector<std::shared_ptr<Polygon>> & sides,
         inward_normal = (n_i * (center - x_i) > TOLERANCE);
       }
 
-    // We're betting a lot on "our polyhedra are all convex", so let's
+    // We're betting a lot on "our polygon sides are all convex", so let's
     // check that if we have time.
 #ifdef DEBUG
     for (unsigned int s : index_range(sides))
