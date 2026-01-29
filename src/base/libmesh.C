@@ -160,7 +160,9 @@ MPI_Comm           GLOBAL_COMM_WORLD = MPI_COMM_NULL;
 int                GLOBAL_COMM_WORLD = 0;
 #endif
 
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
 std::terminate_handler LibMeshInit::_old_terminate_handler;
+#endif
 
 OStreamProxy out(std::cout);
 OStreamProxy err(std::cerr);
