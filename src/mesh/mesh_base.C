@@ -78,6 +78,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
   _skip_find_neighbors(false),
+  _skip_detect_interior_parents(false),
   _allow_remote_element_removal(true),
   _allow_node_and_elem_unique_id_overlap(false),
   _spatial_dimension(d),
@@ -114,6 +115,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_all_partitioning(other_mesh._skip_all_partitioning),
   _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
+  _skip_detect_interior_parents(other_mesh._skip_detect_interior_parents),
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _allow_node_and_elem_unique_id_overlap(other_mesh._allow_node_and_elem_unique_id_overlap),
   _elem_dims(other_mesh._elem_dims),
@@ -201,6 +203,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _skip_all_partitioning = other_mesh.skip_partitioning();
   _skip_renumber_nodes_and_elements = !(other_mesh.allow_renumbering());
   _skip_find_neighbors = !(other_mesh.allow_find_neighbors());
+  _skip_detect_interior_parents = !(other_mesh.allow_detect_interior_parents());
   _allow_remote_element_removal = other_mesh.allow_remote_element_removal();
   _allow_node_and_elem_unique_id_overlap = other_mesh.allow_node_and_elem_unique_id_overlap();
   _block_id_to_name = std::move(other_mesh._block_id_to_name);
@@ -304,6 +307,8 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (_skip_renumber_nodes_and_elements != other_mesh._skip_renumber_nodes_and_elements)
     return false;
   if (_skip_find_neighbors != other_mesh._skip_find_neighbors)
+    return false;
+  if (_skip_detect_interior_parents != other_mesh._skip_detect_interior_parents)
     return false;
   if (_allow_remote_element_removal != other_mesh._allow_remote_element_removal)
     return false;
@@ -896,7 +901,8 @@ void MeshBase::prepare_for_use ()
 
   // Search the mesh for elements that have a neighboring element
   // of dim+1 and set that element as the interior parent
-  this->detect_interior_parents();
+  if (!_skip_detect_interior_parents)
+    this->detect_interior_parents();
 
   // Fix up node unique ids in case mesh generation code didn't take
   // exceptional care to do so.

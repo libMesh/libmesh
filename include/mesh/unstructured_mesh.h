@@ -109,7 +109,8 @@ public:
   virtual void read (const std::string & name,
                      void * mesh_data=nullptr,
                      bool skip_renumber_nodes_and_elements=false,
-                     bool skip_find_neighbors=false) override;
+                     bool skip_find_neighbors=false,
+                     bool skip_detect_interior_parents=false) override;
   /**
    * Write the file specified by \p name.  Attempts to figure out the
    * proper method by the file extension.

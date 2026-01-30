@@ -104,6 +104,7 @@ ReplicatedMesh::ReplicatedMesh (const MeshBase & other_mesh) :
   this->copy_nodes_and_elements(other_mesh, true);
 
   this->allow_find_neighbors(other_mesh.allow_find_neighbors());
+  this->allow_detect_interior_parents(other_mesh.allow_detect_interior_parents());
   this->allow_renumbering(other_mesh.allow_renumbering());
   this->allow_remote_element_removal(other_mesh.allow_remote_element_removal());
   this->skip_partitioning(other_mesh.skip_partitioning());

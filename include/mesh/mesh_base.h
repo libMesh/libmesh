@@ -1194,6 +1194,13 @@ public:
   bool allow_find_neighbors() const { return !_skip_find_neighbors; }
 
   /**
+   * If \p false is passed then this mesh will no longer work to detect
+   * interior parents when being prepared for use
+   */
+  void allow_detect_interior_parents(bool allow) { _skip_detect_interior_parents = !allow; }
+  bool allow_detect_interior_parents() const { return !_skip_detect_interior_parents; }
+
+  /**
    * If false is passed in then this mesh will no longer have remote
    * elements deleted when being prepared for use; i.e. even a
    * DistributedMesh will remain (if it is already) serialized.
@@ -1390,7 +1397,8 @@ public:
   virtual void read  (const std::string & name,
                       void * mesh_data=nullptr,
                       bool skip_renumber_nodes_and_elements=false,
-                      bool skip_find_neighbors=false) = 0;
+                      bool skip_find_neighbors=false,
+                      bool skip_detect_interior_parents=false) = 0;
   virtual void write (const std::string & name) const = 0;
 
   /**
@@ -1985,6 +1993,11 @@ protected:
    * If this is \p true then we will skip \p find_neighbors in \p prepare_for_use
    */
   bool _skip_find_neighbors;
+
+  /**
+   * If this is \p true then we will skip \p detect_interior_parents in \p prepare_for_use
+   */
+  bool _skip_detect_interior_parents;
 
   /**
    * If this is false then even on DistributedMesh remote elements
