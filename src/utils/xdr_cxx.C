@@ -666,13 +666,6 @@ template <>
 xdrproc_t xdr_translator<Real>() { return (xdrproc_t)(xdr_double); }
 #endif
 
-#if defined(__clang__)
-  #if __has_warning("-Wcast-function-type-mismatch")
-  #   pragma clang diagnostic pop
-  #endif
-#elif defined(__GNUC__)
-  #pragma GCC diagnostic pop
-#endif
 
 } // end anonymous namespace
 
@@ -1311,7 +1304,13 @@ void Xdr::_complex_data_stream (std::complex<T> * val, const unsigned int len, c
     }
 }
 
-
+#if defined(__clang__)
+  #if __has_warning("-Wcast-function-type-mismatch")
+  #   pragma clang diagnostic pop
+  #endif
+#elif defined(__GNUC__)
+  #pragma GCC diagnostic pop
+#endif
 
 void Xdr::comment (std::string & comment_in)
 {
