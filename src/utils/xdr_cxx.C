@@ -556,6 +556,16 @@ bool xdr_translate(XDR * x, std::vector<std::string> & s)
   return b;
 }
 
+#if defined(__clang__)
+  #if __has_warning("-Wcast-function-type-mismatch")
+  #    pragma clang diagnostic push
+  #    pragma clang diagnostic ignored "-Wcast-function-type-mismatch"
+  #  endif
+#elif defined(__GNUC__) && !defined(__clang__)
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
+
 template <>
 xdrproc_t xdr_translator<int>()
 {
@@ -654,6 +664,14 @@ xdrproc_t xdr_translator<long double>() { return (xdrproc_t)(xdr_double); }
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 template <>
 xdrproc_t xdr_translator<Real>() { return (xdrproc_t)(xdr_double); }
+#endif
+
+#if defined(__clang__)
+  #if __has_warning("-Wcast-function-type-mismatch")
+  #   pragma clang diagnostic pop
+  #endif
+#elif defined(__GNUC__)
+  #pragma GCC diagnostic pop
 #endif
 
 } // end anonymous namespace
