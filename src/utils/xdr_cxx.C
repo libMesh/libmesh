@@ -572,25 +572,38 @@ bool xdr_translate(XDR * x, std::vector<std::string> & s)
 // arguments - apparently because the xdr_foo functions now only take
 // two arguments?  We'll add some shims to convert them.
 #ifdef __APPLE__
-  #define libmesh_define_xdr(foo) \
-    bool_t libmesh_xdr_##foo(XDR * x, void * v, unsigned int ui) { return xdr_##foo(x, v); }
+  #define libmesh_define_xdr(ourfunc, theirfunc, type) \
+    bool_t libmesh_xdr_##ourfunc(XDR * x, type * v, unsigned int) { return xdr_##theirfunc(x, v); }
+
+// In my OSX SDK, xdr_long is defined to take int*, not long*, despite
+// their sizes not matching.  We'll use the long long* functions to be
+// safe while we wait for Apple programmers to repent of their sins.
+#ifdef __LP64__
+libmesh_define_xdr(long, longlong_t, long long)
+libmesh_define_xdr(u_long, u_longlong_t, unsigned long long)
 #else
-  #define libmesh_define_xdr(foo) \
-    const xdrproc_t libmesh_xdr_##foo = (xdrproc_t)xdr_##foo;
+libmesh_define_xdr(long, long, long)
+libmesh_define_xdr(u_long, u_long, unsigned long)
 #endif
 
-libmesh_define_xdr(char)
-libmesh_define_xdr(short)
-libmesh_define_xdr(int)
-libmesh_define_xdr(long)
-libmesh_define_xdr(longlong_t)
-libmesh_define_xdr(u_char)
-libmesh_define_xdr(u_short)
-libmesh_define_xdr(u_int)
-libmesh_define_xdr(u_long)
-libmesh_define_xdr(u_longlong_t)
-libmesh_define_xdr(float)
-libmesh_define_xdr(double)
+#else
+  #define libmesh_define_xdr(ourfunc, theirfunc, type) \
+    const xdrproc_t libmesh_xdr_##ourfunc = (xdrproc_t)xdr_##theirfunc;
+
+libmesh_define_xdr(long, long, long)
+libmesh_define_xdr(u_long, u_long, unsigned long)
+#endif
+
+libmesh_define_xdr(char, char, char)
+libmesh_define_xdr(short, short, short)
+libmesh_define_xdr(int, int, int)
+libmesh_define_xdr(longlong_t, longlong_t, long long)
+libmesh_define_xdr(u_char, u_char, unsigned char)
+libmesh_define_xdr(u_short, u_short, unsigned short)
+libmesh_define_xdr(u_int, u_int, unsigned int)
+libmesh_define_xdr(u_longlong_t, u_longlong_t, unsigned long long)
+libmesh_define_xdr(float, float, float)
+libmesh_define_xdr(double, double, double)
 
 
 template <>
