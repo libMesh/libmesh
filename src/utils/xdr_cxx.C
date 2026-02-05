@@ -556,17 +556,54 @@ bool xdr_translate(XDR * x, std::vector<std::string> & s)
   return b;
 }
 
+
+// https://lists.libguestfs.org/archives/list/guestfs@lists.libguestfs.org/message/JNRVVA5VOIDBBQHTF7QYRSWZ2AQG4P7U/
+//
+//  With Mac OS X 10.9, xdrproc_t is no longer defined as:
+//  typedef bool_t (*xdrproc_t)(XDR *, ...);
+//  but instead as:
+//  typdef bool_t (*xdrproc_t)(XDR *, void *, unsigned int);
+//  For reference, Linux systems typically define it as:
+//  typedef bool_t (*xdrproc_t)(XDR *, void *, ...);
+//
+// I'm not sure why it took over a decade later, but we're starting to
+// get "converts to incompatible function type" errors on some OSX
+// builds when trying to pass XDR's own functions to xdrproc_t
+// arguments - apparently because the xdr_foo functions now only take
+// two arguments?  We'll add some shims to convert them.
+#ifdef __APPLE__
+  #define libmesh_define_xdr(foo) \
+    bool_t libmesh_xdr_##foo(XDR * x, void * v, unsigned int ui) { return xdr_##foo(x, v); }
+#else
+  #define libmesh_define_xdr(foo) \
+    const xdrproc_t libmesh_xdr_##foo = (xdrproc_t)xdr_##foo;
+#endif
+
+libmesh_define_xdr(char)
+libmesh_define_xdr(short)
+libmesh_define_xdr(int)
+libmesh_define_xdr(long)
+libmesh_define_xdr(longlong_t)
+libmesh_define_xdr(u_char)
+libmesh_define_xdr(u_short)
+libmesh_define_xdr(u_int)
+libmesh_define_xdr(u_long)
+libmesh_define_xdr(u_longlong_t)
+libmesh_define_xdr(float)
+libmesh_define_xdr(double)
+
+
 template <>
 xdrproc_t xdr_translator<int>()
 {
   // Don't let XDR truncate anything on systems where int is 64-bit;
   // xdr_int is hard-coded to write 32 bits.
   if (sizeof(int) <= 4)
-    return (xdrproc_t)(xdr_int);
+    return (xdrproc_t)(libmesh_xdr_int);
   else if (sizeof(int) == sizeof(long long))
-    return (xdrproc_t)(xdr_longlong_t);
+    return (xdrproc_t)(libmesh_xdr_longlong_t);
   else if (sizeof(int) == sizeof(long))
-    return (xdrproc_t)(xdr_long);
+    return (xdrproc_t)(libmesh_xdr_long);
   else
     libmesh_error();
 }
@@ -577,11 +614,11 @@ xdrproc_t xdr_translator<unsigned int>()
   // Don't let XDR truncate anything on systems where int is 64-bit;
   // xdr_u_int is hard-coded to write 32 bits.
   if (sizeof(unsigned int) <= 4)
-    return (xdrproc_t)(xdr_u_int);
+    return (xdrproc_t)(libmesh_xdr_u_int);
   else if (sizeof(unsigned int) == sizeof(unsigned long))
-    return (xdrproc_t)(xdr_u_long);
+    return (xdrproc_t)(libmesh_xdr_u_long);
   else if (sizeof(unsigned int) == sizeof(unsigned long long))
-    return (xdrproc_t)(xdr_u_longlong_t);
+    return (xdrproc_t)(libmesh_xdr_u_longlong_t);
   else
     libmesh_error();
 }
@@ -592,9 +629,9 @@ xdrproc_t xdr_translator<long int>()
   // Don't let XDR truncate anything on systems where long is 64-bit;
   // xdr_long is hard-coded to write 32 bits.
   if (sizeof(long int) <= 4)
-    return (xdrproc_t)(xdr_long);
+    return (xdrproc_t)(libmesh_xdr_long);
   else if (sizeof(long int) == sizeof(long long))
-    return (xdrproc_t)(xdr_longlong_t);
+    return (xdrproc_t)(libmesh_xdr_longlong_t);
   else
     libmesh_error();
 }
@@ -605,9 +642,9 @@ xdrproc_t xdr_translator<unsigned long int>()
   // Don't let XDR truncate anything on systems where long is 64-bit;
   // xdr_u_long is hard-coded to write 32 bits.  This bit us HARD.
   if (sizeof(unsigned long int) <= 4)
-    return (xdrproc_t)(xdr_u_long);
+    return (xdrproc_t)(libmesh_xdr_u_long);
   else if (sizeof(unsigned long int) == sizeof(unsigned long long))
-    return (xdrproc_t)(xdr_u_longlong_t);
+    return (xdrproc_t)(libmesh_xdr_u_longlong_t);
   else
     libmesh_error();
 }
@@ -621,39 +658,39 @@ xdrproc_t xdr_translator<unsigned long int>()
 // store n>2^64 in one.  Welcome, 22nd century programmers; sorry we
 // couldn't accommodate you.
 template <>
-xdrproc_t xdr_translator<long long>() { return (xdrproc_t)(xdr_longlong_t); }
+xdrproc_t xdr_translator<long long>() { return (xdrproc_t)(libmesh_xdr_longlong_t); }
 
 template <>
-xdrproc_t xdr_translator<unsigned long long>() { return (xdrproc_t)(xdr_u_longlong_t); }
+xdrproc_t xdr_translator<unsigned long long>() { return (xdrproc_t)(libmesh_xdr_u_longlong_t); }
 
 template <>
-xdrproc_t xdr_translator<short int>() { return (xdrproc_t)(xdr_short); }
+xdrproc_t xdr_translator<short int>() { return (xdrproc_t)(libmesh_xdr_short); }
 
 template <>
-xdrproc_t xdr_translator<unsigned short int>() { return (xdrproc_t)(xdr_u_short); }
+xdrproc_t xdr_translator<unsigned short int>() { return (xdrproc_t)(libmesh_xdr_u_short); }
 
 template <>
-xdrproc_t xdr_translator<char>() { return (xdrproc_t)(xdr_char); }
+xdrproc_t xdr_translator<char>() { return (xdrproc_t)(libmesh_xdr_char); }
 
 template <>
-xdrproc_t xdr_translator<signed char>() { return (xdrproc_t)(xdr_char); }
+xdrproc_t xdr_translator<signed char>() { return (xdrproc_t)(libmesh_xdr_char); }
 
 template <>
-xdrproc_t xdr_translator<unsigned char>() { return (xdrproc_t)(xdr_u_char); }
+xdrproc_t xdr_translator<unsigned char>() { return (xdrproc_t)(libmesh_xdr_u_char); }
 
 template <>
-xdrproc_t xdr_translator<float>() { return (xdrproc_t)(xdr_float); }
+xdrproc_t xdr_translator<float>() { return (xdrproc_t)(libmesh_xdr_float); }
 
 template <>
-xdrproc_t xdr_translator<double>() { return (xdrproc_t)(xdr_double); }
+xdrproc_t xdr_translator<double>() { return (xdrproc_t)(libmesh_xdr_double); }
 
 // FIXME - no XDR love for quadruple precision; not even for long double?
 template <>
-xdrproc_t xdr_translator<long double>() { return (xdrproc_t)(xdr_double); }
+xdrproc_t xdr_translator<long double>() { return (xdrproc_t)(libmesh_xdr_double); }
 
 #ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
 template <>
-xdrproc_t xdr_translator<Real>() { return (xdrproc_t)(xdr_double); }
+xdrproc_t xdr_translator<Real>() { return (xdrproc_t)(libmesh_xdr_double); }
 #endif
 
 } // end anonymous namespace
@@ -961,7 +998,7 @@ void Xdr::data_stream (double * val, const unsigned int len, const unsigned int 
   this->_xfp_data_stream
     (val, len,
 #ifdef LIBMESH_HAVE_XDR
-     (xdrproc_t)xdr_double,
+     (xdrproc_t)libmesh_xdr_double,
 #else
      nullptr,
 #endif
@@ -976,7 +1013,7 @@ void Xdr::data_stream (float * val, const unsigned int len, const unsigned int l
   this->_xfp_data_stream
     (val, len,
 #ifdef LIBMESH_HAVE_XDR
-     (xdrproc_t)xdr_float,
+     (xdrproc_t)libmesh_xdr_float,
 #else
      nullptr,
 #endif
@@ -1055,7 +1092,7 @@ void Xdr::_xfp_data_stream (XFP * val, const unsigned int len,
                        reinterpret_cast<char *>(io_buffer.data()),
                        len,
                        sizeof(double),
-                       (xdrproc_t) xdr_double);
+                       (xdrproc_t) libmesh_xdr_double);
 
             // Fill val array if we are reading.
             if (mode == DECODE)
@@ -1196,7 +1233,7 @@ void Xdr::_complex_data_stream (std::complex<T> * val, const unsigned int len, c
                        reinterpret_cast<char *>(io_buffer.data()),
                        2*len,
                        sizeof(double),
-                       (xdrproc_t) xdr_double);
+                       (xdrproc_t) libmesh_xdr_double);
 
             // Fill val array if we are reading.
             if (mode == DECODE)
