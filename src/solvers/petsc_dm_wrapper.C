@@ -186,11 +186,12 @@ namespace libMesh
 #if PETSC_VERSION_LESS_THAN(3,11,0)
           // Lastly, Compute the subsection for the subDM
           ierr = DMCreateSubDM_Section_Private(dm, numFields, fields, is, subdm);
-          CHKERRQ(ierr);
-#else
+#elif PETSC_RELEASE_LESS_THAN(3, 21, 0)
           ierr = DMCreateSectionSubDM(dm, numFields, fields, is, subdm);
-          CHKERRQ(ierr);
+#else
+          ierr = DMCreateSectionSubDM(dm, numFields, fields, NULL, NULL, is, subdm);
 #endif
+          CHKERRQ(ierr);
         }
 
       return 0;
