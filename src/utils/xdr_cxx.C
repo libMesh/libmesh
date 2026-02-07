@@ -23,6 +23,7 @@
 #include <memory>
 #include <sstream>
 #include <fstream>
+#include <tuple> // For XDR API probing trick
 
 // Local includes
 #include "libmesh/xdr_cxx.h"
@@ -571,9 +572,40 @@ bool xdr_translate(XDR * x, std::vector<std::string> & s)
 // builds when trying to pass XDR's own functions to xdrproc_t
 // arguments - apparently because the xdr_foo functions now only take
 // two arguments?  We'll add some shims to convert them.
+
 #ifdef __APPLE__
-  #define libmesh_define_xdr(ourfunc, theirfunc, type) \
-    bool_t libmesh_xdr_##ourfunc(XDR * x, type * v, unsigned int) { return xdr_##theirfunc(x, v); }
+
+// We want these shims to be as robust as possible, and it turns out
+// that *every* XDR implementation sucks in its own way: in TIRPC,
+// xdr_longlong_t does not actually take a long long *, it takes a
+// quad_t *, which my system defines as long *.  My long and long long
+// are the same size, but a pointer to one can't be implicitly
+// converted into a pointer to the other.  So, we'll do crazy template
+// tricks to make sure that, even when we reinterpret_cast that
+// pointer, we're not changing the underlying meaning.
+
+template<typename F>
+struct function_signature;
+
+template<typename returnval, typename... Args>
+struct function_signature<returnval (*)(Args...)>
+{
+  template <std::size_t N>
+  struct arg {
+    static_assert(N < sizeof...(Args), "Function argument index too high");
+    using type = typename std::tuple_element<N, std::tuple<Args...>>::type;
+  };
+};
+
+#define libmesh_define_xdr(ourfunc, theirfunc, cxx_type) \
+  bool_t libmesh_xdr_##ourfunc(XDR * x, cxx_type * v, unsigned int) { \
+    using api_type = \
+      std::remove_pointer<typename function_signature<decltype(&xdr_##theirfunc)>::template arg<1>::type>::type; \
+    static_assert(sizeof(cxx_type) == \
+                  sizeof(api_type), \
+                  "Cannot safely cast data for use with XDR"); \
+    return xdr_##theirfunc(x, reinterpret_cast<api_type *>(v)); \
+  }
 
 // In my OSX SDK, xdr_long is defined to take int*, not long*, despite
 // their sizes not matching.  We'll use the long long* functions to be
