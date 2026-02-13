@@ -78,6 +78,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _skip_all_partitioning(libMesh::on_command_line("--skip-partitioning")),
   _skip_renumber_nodes_and_elements(false),
   _skip_find_neighbors(false),
+  _skip_detect_interior_parents(false),
   _allow_remote_element_removal(true),
   _allow_node_and_elem_unique_id_overlap(false),
   _spatial_dimension(d),
@@ -114,6 +115,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _skip_all_partitioning(other_mesh._skip_all_partitioning),
   _skip_renumber_nodes_and_elements(other_mesh._skip_renumber_nodes_and_elements),
   _skip_find_neighbors(other_mesh._skip_find_neighbors),
+  _skip_detect_interior_parents(other_mesh._skip_detect_interior_parents),
   _allow_remote_element_removal(other_mesh._allow_remote_element_removal),
   _allow_node_and_elem_unique_id_overlap(other_mesh._allow_node_and_elem_unique_id_overlap),
   _elem_dims(other_mesh._elem_dims),
@@ -201,6 +203,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _skip_all_partitioning = other_mesh.skip_partitioning();
   _skip_renumber_nodes_and_elements = !(other_mesh.allow_renumbering());
   _skip_find_neighbors = !(other_mesh.allow_find_neighbors());
+  _skip_detect_interior_parents = !(other_mesh.allow_detect_interior_parents());
   _allow_remote_element_removal = other_mesh.allow_remote_element_removal();
   _allow_node_and_elem_unique_id_overlap = other_mesh.allow_node_and_elem_unique_id_overlap();
   _block_id_to_name = std::move(other_mesh._block_id_to_name);
@@ -304,6 +307,8 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (_skip_renumber_nodes_and_elements != other_mesh._skip_renumber_nodes_and_elements)
     return false;
   if (_skip_find_neighbors != other_mesh._skip_find_neighbors)
+    return false;
+  if (_skip_detect_interior_parents != other_mesh._skip_detect_interior_parents)
     return false;
   if (_allow_remote_element_removal != other_mesh._allow_remote_element_removal)
     return false;
@@ -896,7 +901,8 @@ void MeshBase::prepare_for_use ()
 
   // Search the mesh for elements that have a neighboring element
   // of dim+1 and set that element as the interior parent
-  this->detect_interior_parents();
+  if (!_skip_detect_interior_parents)
+    this->detect_interior_parents();
 
   // Fix up node unique ids in case mesh generation code didn't take
   // exceptional care to do so.
@@ -1908,6 +1914,50 @@ void MeshBase::detect_interior_parents()
   if (this->elem_dimensions().size() == 1)
     return;
 
+  // In this function we find only +1 dimensional interior parents,
+  // (so, for a given element el, the interior parent p must satisfy p.dim() == el.dim() + 1).
+  // Therefore, we can avoid checking the existence of interior parents
+  // for all those elements el such there there is no p with p.dim() == el.dim() + 1.
+  // We store whether to skip any given dimension in the construction of interior parents
+  // inside the vector in dimensions_to_skip_for_interior_parents.
+  std::vector<bool> skip_dimension_for_interior_parents(LIBMESH_DIM+1);  // all false by default
+  skip_dimension_for_interior_parents.back() = true;
+
+  // Moreover, in the following, we will build a node-to-elem map.
+  // It is among the elems of this map that we will look for interior parents.
+  // Therefore, we can skip all elems p such that there is no el with el.dim() == p.dim() - 1.
+  // We store whether to skip any given dimension in the construction of the node-to-elem map
+  // in the vector skip_dimensions_for_node_to_el_map.
+  std::vector<bool> skip_dimensions_for_node_to_el_map(LIBMESH_DIM+1);  // all false by default
+  skip_dimensions_for_node_to_el_map[*this->elem_dimensions().begin()] = true;
+
+  // We also create a flag to know if all dimensions should be skipped,
+  // and if we should therefore return early.
+  bool skip_all_dimensions = true;
+
+  // Fill dimensions_to_skip_for_interior_parents and dimensions_to_skip_for_node_to_el_map.
+    {
+      const std::set<unsigned char> & elem_dimensions = this->elem_dimensions();
+
+      auto it = elem_dimensions.begin();
+      auto next = std::next(it);
+
+      for (; next != elem_dimensions.end(); ++it, ++next)
+        {
+          if (*it + 1 != *next) // note: elem_dimensions is already sorted
+            {
+              skip_dimension_for_interior_parents[*it] = true;
+              skip_dimensions_for_node_to_el_map[*next] = true;
+            }
+          else if (!skip_dimension_for_interior_parents[*it])
+            skip_all_dimensions = false;
+        }
+    }
+
+  // There is nothing to do if all dimensions should be skipped.
+  if (skip_all_dimensions)
+    return;
+
   // Do we have interior parent pointers going to a different mesh?
   // If so then we'll still check to make sure that's the only place
   // they go, so we can libmesh_not_implemented() if not.
@@ -1918,6 +1968,10 @@ void MeshBase::detect_interior_parents()
 
   for (const auto & elem : this->element_ptr_range())
     {
+      // Ignore element if it cannot be interior parent of any other elem.
+      if (skip_dimensions_for_node_to_el_map[elem->dim()])
+        continue;
+
       // Populating the node_to_elem map, same as MeshTools::build_nodes_to_elem_map
       for (auto n : make_range(elem->n_vertices()))
         {
@@ -1930,8 +1984,9 @@ void MeshBase::detect_interior_parents()
   // Automatically set interior parents
   for (const auto & element : this->element_ptr_range())
     {
-      // Ignore an 3D element or an element that already has an interior parent
-      if (element->dim()>=LIBMESH_DIM || element->interior_parent())
+      // Ignore elements with dimensions to skip
+      // or elements that already have an interior parent.
+      if (skip_dimension_for_interior_parents[element->dim()] || element->interior_parent())
         continue;
 
       // Start by generating a SET of elements that are dim+1 to the current
@@ -1944,7 +1999,15 @@ void MeshBase::detect_interior_parents()
 
       for (auto n : make_range(element->n_vertices()))
         {
-          std::vector<dof_id_type> & element_ids = node_to_elem[element->node_id(n)];
+          auto it = node_to_elem.find(element->node_id(n));
+          // Check at first that this node is not isolated.
+          if (it == node_to_elem.end())
+            {
+              found_interior_parents = false;
+              break;
+            }
+
+          std::vector<dof_id_type> & element_ids = it->second;
           for (const auto & eid : element_ids)
             if (this->elem_ref(eid).dim() == element->dim()+1)
               neighbors[n].insert(eid);
