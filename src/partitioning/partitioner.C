@@ -844,7 +844,8 @@ void Partitioner::set_interface_node_processor_ids_petscpartitioner(MeshBase & m
       LibmeshPetscCall2(mesh.comm(), ISRestoreIndices(is, &indices));
     }
 #else
-  libmesh_error_msg("PETSc is required");
+  libmesh_warning("PETSc is required for petscpartitioner node partitioning.\n"
+                  "Retaining default node partitioning.");
 #endif
 }
 
