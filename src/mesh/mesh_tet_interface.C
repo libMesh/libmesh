@@ -454,6 +454,10 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::improve_hull_inte
   // We'll just implement this in serial for now.
   MeshSerializer mesh_serializer(this->_mesh);
 
+  // I don't see why we'd need boundary info here, but maybe we'll
+  // want to preserve edge/node conditions eventually?
+  BoundaryInfo & bi = this->_mesh.get_boundary_info();
+
   const Node * lowest_point = (*this->_mesh.elements_begin())->node_ptr(0);
 
   // Index by ids, not pointers, for consistency in parallel
@@ -488,6 +492,11 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::improve_hull_inte
         {
           best_elem = elem;
           best_abs_normal_0 = abs_normal_0;
+
+          // Make sure that element is actually a good one, by
+          // flipping it if it's not.
+          if (abs_normal_0 == normal(0))
+            elem->flip(&bi);
         }
     }
 
@@ -495,8 +504,6 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::improve_hull_inte
   // for the others.
   std::unordered_set<dof_id_type> frontier_elements{best_elem->id()},
                                   finished_elements{};
-
-  BoundaryInfo & bi = this->_mesh.get_boundary_info();
 
   while (!frontier_elements.empty())
     {
