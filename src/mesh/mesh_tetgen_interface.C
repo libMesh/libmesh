@@ -202,7 +202,7 @@ void TetGenMeshInterface::triangulate_conformingDelaunayMesh_carvehole  (const s
 {
   // Before calling this function, the Mesh must contain a convex hull
   // of TRI3 elements which define the boundary.
-  unsigned hull_integrity_check = check_hull_integrity();
+  auto hull_integrity_check = this->improve_hull_integrity();
 
   // Possibly die if hull integrity check failed
   this->process_hull_integrity_result(hull_integrity_check);

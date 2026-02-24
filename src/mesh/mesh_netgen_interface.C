@@ -109,6 +109,11 @@ void NetGenMeshInterface::triangulate ()
            /* serial_only_needed_on_proc_0 */ true);
       }
 
+  // This should probably only be done on rank 0, but the API is
+  // designed with the hope that we'll parallelize it eventually
+  auto integrity = this->improve_hull_integrity();
+  this->process_hull_integrity_result(integrity);
+
   // If we're not rank 0, we're just going to wait for rank 0 to call
   // Netgen, then receive its data afterward, we're not going to hope
   // that Netgen does the exact same thing on every processor.
@@ -126,9 +131,6 @@ void NetGenMeshInterface::triangulate ()
       this->_mesh.prepare_for_use();
       return;
     }
-
-  auto integrity = this->check_hull_integrity();
-  this->process_hull_integrity_result(integrity);
 
   Ng_Meshing_Parameters params;
 

@@ -335,65 +335,127 @@ BoundingBox MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 }
 
 
-unsigned int MeshTetInterface::check_hull_integrity()
+std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integrity() const
 {
   // Check for easy return: if the Mesh is empty (i.e. if
   // somebody called triangulate_conformingDelaunayMesh on
   // a Mesh with no elements, then hull integrity check must
   // fail...
   if (_mesh.n_elem() == 0)
-    return 3;
+    return {EMPTY_MESH};
+
+  std::set<MeshTetInterface::SurfaceIntegrity> returnval;
 
   for (auto & elem : this->_mesh.element_ptr_range())
     {
       // Check for proper element type
       if (elem->type() != TRI3)
-        {
-          //libmesh_error_msg("ERROR: Some of the elements in the original mesh were not TRI3!");
-          return 1;
-        }
+        returnval.insert(NON_TRI3);
 
-      for (auto neigh : elem->neighbor_ptr_range())
+      for (auto s : elem->side_index_range())
         {
+          const Elem * const neigh = elem->neighbor_ptr(s);
+
           if (neigh == nullptr)
             {
-              // libmesh_error_msg("ERROR: Non-convex hull, cannot be tetrahedralized.");
-              return 2;
+              returnval.insert(MISSING_NEIGHBOR);
+              continue;
+            }
+
+          // Make sure our neighbor points back to us
+          const unsigned int nn = neigh->which_neighbor_am_i(elem);
+
+          if (nn >= 3)
+            {
+              returnval.insert(MISSING_BACKLINK);
+              continue;
+            }
+
+          // Our neighbor should have the same the edge nodes we do on
+          // the neighboring edgei
+          const Node * const n1 = elem->node_ptr(s);
+          const Node * const n2 = elem->node_ptr((s+1)%3);
+
+          const unsigned int i1 = neigh->local_node(n1->id());
+          const unsigned int i2 = neigh->local_node(n2->id());
+          if (i1 >= 3 || i2 >= 3)
+            {
+              returnval.insert(BAD_NEIGHBOR_NODES);
+              continue;
+            }
+
+          // It should have those edge nodes in the opposite order
+          // (because they have the same orientation we do)
+          if ((i2 + 1)%3 != i1)
+            {
+              returnval.insert(NON_ORIENTED);
+              continue;
+            }
+
+          // And it should have those edge nodes in the expected
+          // places relative to its neighbor link
+          if (i2 != nn)
+            {
+              returnval.insert(BAD_NEIGHBOR_LINKS);
+              continue;
             }
         }
     }
 
-  // If we made it here, return success!
-  return 0;
+  // Return anything and everything we found
+  return returnval;
 }
 
 
 
-void MeshTetInterface::process_hull_integrity_result(unsigned result)
+
+
+void MeshTetInterface::process_hull_integrity_result
+  (const std::set<MeshTetInterface::SurfaceIntegrity> & result) const
 {
   std::ostringstream err_msg;
 
-  if (result != 0)
+  if (result.empty()) // success
+    return;
+
+  err_msg << "Error! Conforming Delaunay mesh tetrahedralization requires a convex hull." << std::endl;
+
+  if (result.count(NON_TRI3))
     {
-      err_msg << "Error! Conforming Delaunay mesh tetrahedralization requires a convex hull." << std::endl;
-
-      if (result==1)
-        {
-          err_msg << "Non-TRI3 elements were found in the input Mesh.  ";
-          err_msg << "A constrained Delaunay tetrahedralization requires a convex hull of TRI3 elements." << std::endl;
-        }
-
-      if (result==2)
-        {
-          err_msg << "At least one triangle without three neighbors was found in the input Mesh.  ";
-          err_msg << "A constrained Delaunay tetrahedralization must be a triangular manifold without boundary." << std::endl;
-        }
-
-      if (result==3)
-        err_msg << "The input Mesh was empty!" << std::endl;
-
-      libmesh_error_msg(err_msg.str());
+      err_msg << "At least one non-Tri3 element was found in the input boundary mesh.  ";
+      err_msg << "Our constrained Delaunay tetrahedralization boundary must be a triangulation of Tri3 elements." << std::endl;
     }
+  if (result.count(MISSING_NEIGHBOR))
+    {
+      err_msg << "At least one triangle without three neighbors was found in the input boundary mesh.  ";
+      err_msg << "A constrained Delaunay tetrahedralization boundary must be a triangular manifold without boundary." << std::endl;
+    }
+  if (result.count(EMPTY_MESH))
+    {
+      err_msg << "The input boundary mesh was empty!" << std::endl;
+      err_msg << "Our constrained Delaunay tetrahedralization boundary must be a triangulation of Tri3 elements." << std::endl;
+    }
+  if (result.count(MISSING_BACKLINK))
+    {
+      err_msg << "At least one triangle neighbor without a return neighbor link was found in the input boundary mesh.  ";
+      err_msg << "A constrained Delaunay tetrahedralization boundary must be a conforming and non-adaptively-refined mesh." << std::endl;
+    }
+  if (result.count(BAD_NEIGHBOR_NODES))
+    {
+      err_msg << "At least one triangle neighbor without expected node links was found in the input boundary mesh.  ";
+      err_msg << "A constrained Delaunay tetrahedralization boundary must be a conforming and non-adaptively-refined mesh." << std::endl;
+    }
+  if (result.count(NON_ORIENTED))
+    {
+      err_msg << "At least one triangle neighbor with an inconsistent orientation was found in the input boundary mesh.  ";
+      err_msg << "A constrained Delaunay tetrahedralization boundary must be an oriented Tri3 mesh." << std::endl;
+    }
+  if (result.count(BAD_NEIGHBOR_LINKS))
+    {
+      err_msg << "At least one triangle neighbor with inconsistent node and neighbor links was found in the input boundary mesh." << std::endl;
+    }
+
+  libmesh_error_msg(err_msg.str());
 }
 
 

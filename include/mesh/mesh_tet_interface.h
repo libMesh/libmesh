@@ -104,21 +104,31 @@ protected:
   static BoundingBox volume_to_surface_mesh (UnstructuredMesh & mesh);
 
   /**
+   * Enumeration of possible surface mesh integrity issues.
+   */
+  enum SurfaceIntegrity {
+    NON_TRI3 = 1,           // a non-TRI3 element is found
+    MISSING_NEIGHBOR = 2,   // an element with a nullptr-neighbor is found
+    EMPTY_MESH = 3,         // the mesh is empty
+    MISSING_BACKLINK = 4,   // an element neighbor isn't linked back to it
+    BAD_NEIGHBOR_NODES = 5, // an element neighbor isn't linked to expected nodes
+    NON_ORIENTED = 6,       // an element neighbor has inconsistent orientation
+    BAD_NEIGHBOR_LINKS = 7  // an element neighbor has other inconsistent links
+  };
+
+  /**
    * This function checks the integrity of the current set of
    * elements in the Mesh to see if they comprise a topological
    * manifold that (if it's also geometrically valid) would define
-   * valid hull for a tetrahedralized volume.
-   * That is:
-   * - If they are all TRI3 elements
-   * - They all have non-nullptr neighbors
+   * valid boundary for a tetrahedralized volume.
    *
-   * \returns
-   * - 0 if the mesh forms a topologically valid hull
-   * - 1 if a non-TRI3 element is found
-   * - 2 if an element with a nullptr-neighbor is found
-   * - 3 if the mesh is empty
+   * Named \p check_hull_integrity() for backward compatibility, but
+   * now accepts non-convex manifolds.
+   *
+   * \returns a set of \p  enums describing problems
+   * found, or an empty set if no problems are found.
    */
-  [[nodiscard]] unsigned int check_hull_integrity();
+  [[nodiscard]] std::set<SurfaceIntegrity> check_hull_integrity() const;
 
   /**
    * This function prints an informative message and throws an
@@ -126,7 +136,7 @@ protected:
    * function.  It is a separate function so that you can check hull
    * integrity without exiting or catching an exception if desired.
    */
-  void process_hull_integrity_result(unsigned int result);
+  void process_hull_integrity_result(const std::set<SurfaceIntegrity> & result) const;
 
   /**
    * Delete original convex hull elements from the Mesh
