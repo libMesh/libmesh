@@ -408,6 +408,142 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
 
 
 
+std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::improve_hull_integrity()
+{
+  // We don't really do anything parallel here, but we aspire to.
+  libmesh_parallel_only(this->_mesh.comm());
+
+  std::set<MeshTetInterface::SurfaceIntegrity> integrityproblems =
+    this->check_hull_integrity();
+
+  // If we have no problem, or a problem we can't fix, we're done.
+  if (integrityproblems.empty() ||
+      integrityproblems.count(NON_TRI3) ||
+      integrityproblems.count(EMPTY_MESH))
+    return integrityproblems;
+
+  // Possibly the user gave us an unprepared mesh with missing or bad
+  // neighbor links?
+  if (integrityproblems.count(MISSING_NEIGHBOR) ||
+      integrityproblems.count(MISSING_BACKLINK) ||
+      integrityproblems.count(BAD_NEIGHBOR_LINKS))
+  {
+    this->_mesh.find_neighbors();
+    integrityproblems = this->check_hull_integrity();
+  }
+
+  // If find_neighbors() doesn't fix these, I give up.
+  if (integrityproblems.count(MISSING_NEIGHBOR) ||
+      integrityproblems.count(MISSING_BACKLINK) ||
+      integrityproblems.count(BAD_NEIGHBOR_LINKS))
+    return integrityproblems;
+
+  // find_neighbors() might have fixed everything
+  if (integrityproblems.empty())
+    return integrityproblems;
+
+  // A non-oriented (but orientable!) surface is the only thing we
+  // shouldn't have fixed or given up on by now.
+  libmesh_assert_equal_to(integrityproblems.size(), 1);
+  libmesh_assert_equal_to(integrityproblems.count(NON_ORIENTED), 1);
+
+  // We need one known-good triangle to start from.  We'll pick the
+  // most-negative-x normal among the triangles on the most-negative-x
+  // point.
+
+  // We'll just implement this in serial for now.
+  MeshSerializer mesh_serializer(this->_mesh);
+
+  const Node * lowest_point = (*this->_mesh.elements_begin())->node_ptr(0);
+
+  // Index by ids, not pointers, for consistency in parallel
+  std::unordered_set<dof_id_type> attached_elements;
+
+  for (Elem * elem : this->_mesh.element_ptr_range())
+    {
+      for (const Node & node : elem->node_ref_range())
+        {
+          if (node(0) < (*lowest_point)(0))
+            {
+              lowest_point = &node;
+              attached_elements.clear();
+            }
+          if (&node == lowest_point)
+            attached_elements.insert(elem->id());
+        }
+    }
+
+  Elem * best_elem = nullptr;
+  Real best_abs_normal_0;
+
+  for (dof_id_type id : attached_elements)
+    {
+      Elem * elem = this->_mesh.elem_ptr(id);
+      const Point e01 = elem->point(1) - elem->point(0);
+      const Point e02 = elem->point(2) - elem->point(0);
+      const Point normal = e01.cross(e02).unit();
+      const Real abs_normal_0 = std::abs(normal(0));
+
+      if (!best_elem || abs_normal_0 > best_abs_normal_0)
+        {
+          best_elem = elem;
+          best_abs_normal_0 = abs_normal_0;
+        }
+    }
+
+  // Now flood-fill from that element to get a consistent orientation
+  // for the others.
+  std::unordered_set<dof_id_type> frontier_elements{best_elem->id()},
+                                  finished_elements{};
+
+  BoundaryInfo & bi = this->_mesh.get_boundary_info();
+
+  while (!frontier_elements.empty())
+    {
+      const dof_id_type elem_id = *frontier_elements.begin();
+      Elem & elem = this->_mesh.elem_ref(elem_id);
+      for (auto s : elem.side_index_range())
+        {
+          Elem * neigh = elem.neighbor_ptr(s);
+          libmesh_assert(neigh);
+          libmesh_assert_less(neigh->which_neighbor_am_i(&elem), 3);
+
+          const Node * const n1 = elem.node_ptr(s);
+          const Node * const n2 = elem.node_ptr((s+1)%3);
+          const unsigned int i1 = neigh->local_node(n1->id());
+          const unsigned int i2 = neigh->local_node(n2->id());
+          libmesh_assert_less(i1, 3);
+          libmesh_assert_less(i2, 3);
+
+          const dof_id_type neigh_id = neigh->id();
+
+          const bool frontier_neigh = frontier_elements.count(neigh_id);
+          const bool finished_neigh = finished_elements.count(neigh_id);
+
+          // Are we flipped?
+          if ((i2 + 1)%3 != i1)
+            {
+              // Are we a Moebius strip???  We give up.
+              if (frontier_neigh || finished_neigh)
+                return integrityproblems;
+
+              neigh->flip(&bi);
+            }
+
+          if (!frontier_neigh && !finished_neigh)
+            frontier_elements.insert(neigh_id);
+        }
+
+      finished_elements.insert(elem_id);
+      frontier_elements.erase(elem_id);
+    }
+
+  this->_mesh.find_neighbors();
+
+  libmesh_assert(this->check_hull_integrity().empty());
+
+  return {};
+}
 
 
 void MeshTetInterface::process_hull_integrity_result

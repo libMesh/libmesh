@@ -131,6 +131,16 @@ protected:
   [[nodiscard]] std::set<SurfaceIntegrity> check_hull_integrity() const;
 
   /**
+   * This function checks the integrity of the current set of
+   * elements in the Mesh, and corrects what it can.
+   *
+   * \returns A set of SurfaceIntegrity codes from \p
+   * check_hull_integrity() if there are problems it can't fix, or an
+   * empty set otherwise.
+   */
+  [[nodiscard]] std::set<SurfaceIntegrity> improve_hull_integrity();
+
+  /**
    * This function prints an informative message and throws an
    * exception based on the output of the check_hull_integrity()
    * function.  It is a separate function so that you can check hull
