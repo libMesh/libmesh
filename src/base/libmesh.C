@@ -91,6 +91,10 @@ namespace nglib {
 #include "libmesh/restore_warnings.h"
 #endif
 
+#ifdef PETSC_HAVE_UMPIRE
+#include "umpire/util/io.hpp"
+#endif
+
 #include <mutex>
 
 // --------------------------------------------------------
@@ -219,6 +223,10 @@ void uninstall_thread_buffered_sync()
     {
       libMesh::err << std::flush;
       libMesh::err.rdbuf(_err_prewrap_buf);
+#ifdef PETSC_HAVE_UMPIRE
+      // We must release umpire's reference to our error buffer
+      umpire::util::finalize_io();
+#endif
       _err_syncd_thread_buffer.reset();
       _err_prewrap_buf = nullptr;
     }
