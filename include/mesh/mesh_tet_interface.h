@@ -128,7 +128,9 @@ protected:
     MISSING_BACKLINK = 4,   // an element neighbor isn't linked back to it
     BAD_NEIGHBOR_NODES = 5, // an element neighbor isn't linked to expected nodes
     NON_ORIENTED = 6,       // an element neighbor has inconsistent orientation
-    BAD_NEIGHBOR_LINKS = 7  // an element neighbor has other inconsistent links
+    BAD_NEIGHBOR_LINKS = 7, // an element neighbor has other inconsistent links
+    DEGENERATE_ELEMENT = 8, // an element has zero area
+    DEGENERATE_MESH = 9     // the mesh clearly bounds zero volume
   };
 
   /**

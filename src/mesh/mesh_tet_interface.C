@@ -346,6 +346,19 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
 
   std::set<MeshTetInterface::SurfaceIntegrity> returnval;
 
+  const BoundingBox bb = MeshTools::create_bounding_box(this->_mesh);
+  const Point extents = bb.max() - bb.min();
+  if (extents(0) == 0 ||
+      extents(1) == 0 ||
+      extents(2) == 0)
+    returnval.insert(DEGENERATE_MESH);
+
+  // Figure a area to use for relative tolerances when detecting
+  // degenerate elements
+  const Real ref_area = std::abs(extents(0) * extents(1)) +
+                        std::abs(extents(0) * extents(2)) +
+                        std::abs(extents(1) * extents(2));
+
   for (auto & elem : this->_mesh.element_ptr_range())
     {
       // Check for proper element type
@@ -354,6 +367,14 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
           if (this->_verbosity >= 50)
             std::cerr << "Non-Tri3: " << elem->get_info() << std::endl;
           returnval.insert(NON_TRI3);
+        }
+
+      // Make sure it's a decent element.
+      if (elem->volume() < ref_area * TOLERANCE * TOLERANCE)
+        {
+          if (this->_verbosity >= 50)
+            std::cerr << "Degenerate element: " << elem->get_info() << std::endl;
+          returnval.insert(DEGENERATE_ELEMENT);
         }
 
       for (auto s : elem->side_index_range())
