@@ -92,7 +92,22 @@ public:
    */
   virtual void triangulate () = 0;
 
+  /**
+   * Sets a verbosity level, defaulting to 0 (print nothing), to be
+   * set as high as 100 (print everything).
+   *
+   * For verbosity >= 50, print all detected surface mesh integrity
+   * issues as they're found.  Subclasses may add other output at
+   * other verbosity levels.
+   */
+  void set_verbosity(unsigned int v);
+
 protected:
+
+  /**
+   * verbosity setting
+   */
+  const unsigned int _verbosity;
 
   /**
    * Remove volume elements from the given mesh, after converting

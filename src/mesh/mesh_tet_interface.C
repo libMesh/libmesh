@@ -112,7 +112,7 @@ namespace libMesh
 //----------------------------------------------------------------------
 // MeshTetInterface class members
 MeshTetInterface::MeshTetInterface (UnstructuredMesh & mesh) :
-  _desired_volume(0), _smooth_after_generating(false),
+  _verbosity(0), _desired_volume(0), _smooth_after_generating(false),
   _elem_type(TET4), _mesh(mesh)
 {
 }
@@ -350,7 +350,11 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
     {
       // Check for proper element type
       if (elem->type() != TRI3)
-        returnval.insert(NON_TRI3);
+        {
+          if (this->_verbosity >= 50)
+            std::cerr << "Non-Tri3: " << elem->get_info() << std::endl;
+          returnval.insert(NON_TRI3);
+        }
 
       for (auto s : elem->side_index_range())
         {
@@ -358,6 +362,8 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
 
           if (neigh == nullptr)
             {
+              if (this->_verbosity >= 50)
+                std::cerr << "Element missing neighbor " << s << ": " << elem->get_info() << std::endl;
               returnval.insert(MISSING_NEIGHBOR);
               continue;
             }
@@ -367,6 +373,8 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
 
           if (nn >= 3)
             {
+              if (this->_verbosity >= 50)
+                std::cerr << "Element missing backlink " << s << ": " << elem->get_info() << std::endl;
               returnval.insert(MISSING_BACKLINK);
               continue;
             }
@@ -380,6 +388,8 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
           const unsigned int i2 = neigh->local_node(n2->id());
           if (i1 >= 3 || i2 >= 3)
             {
+              if (this->_verbosity >= 50)
+                std::cerr << "Element with bad neighbor " << s << " nodes: " << elem->get_info() << std::endl;
               returnval.insert(BAD_NEIGHBOR_NODES);
               continue;
             }
@@ -388,6 +398,8 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
           // (because they have the same orientation we do)
           if ((i2 + 1)%3 != i1)
             {
+              if (this->_verbosity >= 50)
+                std::cerr << "Element orientation mismatch with neighbor " << s << ": " << elem->get_info() << std::endl;
               returnval.insert(NON_ORIENTED);
               continue;
             }
@@ -396,6 +408,8 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
           // places relative to its neighbor link
           if (i2 != nn)
             {
+              if (this->_verbosity >= 50)
+                std::cerr << "Element with bad links on neighbor " << s << ": " << elem->get_info() << std::endl;
               returnval.insert(BAD_NEIGHBOR_LINKS);
               continue;
             }
