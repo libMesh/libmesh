@@ -128,6 +128,12 @@ void NetGenMeshInterface::triangulate ()
       // Receive the mesh data rank 0 will send later, then fix it up
       // together
       MeshCommunication().broadcast(this->_mesh);
+
+      // If we got an empty mesh here then our tetrahedralization
+      // failed.
+      libmesh_error_msg_if (!this->_mesh.n_elem(),
+                            "NetGen failed to generate any tetrahedra");
+
       this->_mesh.prepare_for_use();
       return;
     }
@@ -326,8 +332,17 @@ void NetGenMeshInterface::triangulate ()
 
   const int n_elem = Ng_GetNE(ngmesh);
 
-  libmesh_error_msg_if (n_elem <= 0,
-                        "NetGen failed to generate any tetrahedra");
+  // If Netgen fails us, we're likely to get n_elem <= 0.  This is a
+  // common enough failure from bad setups that I want to make sure
+  // it's thrown in parallel so as to not desynchronize any unit tests
+  // that trigger it.  So we'll broadcast the empty mesh to indicate
+  // the problem and enable throwing exceptions in parallel.
+  if (n_elem <= 0)
+    {
+      this->_mesh.clear();
+      MeshCommunication().broadcast(this->_mesh);
+      libmesh_error_msg ("NetGen failed to generate any tetrahedra");
+    }
 
   const dof_id_type n_points = Ng_GetNP(ngmesh);
   const dof_id_type old_nodes = this->_mesh.n_nodes();
