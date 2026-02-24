@@ -91,6 +91,10 @@ namespace nglib {
 #include "libmesh/restore_warnings.h"
 #endif
 
+#ifdef PETSC_HAVE_UMPIRE
+#include "umpire/util/io.hpp"
+#endif
+
 #include <mutex>
 
 // --------------------------------------------------------
@@ -219,6 +223,15 @@ void uninstall_thread_buffered_sync()
     {
       libMesh::err << std::flush;
       libMesh::err.rdbuf(_err_prewrap_buf);
+#ifdef PETSC_HAVE_UMPIRE
+      // Our libMesh::out and libMesh::err stream proxies are very thin wrappers around,
+      // by default, std::cout and std::cerr. So when other libraries or users access the
+      // rdbuf of those streams, then they directly access our thread sync'd custom stream
+      // buffer. Umpire doesn't use the rdbuf of std::cout, but they *do* use the rdbuf of
+      // std::cerr, which means they're using our thread sync'd stream buffer. Consequently,
+      // we must release umpire's reference to our buffer before we destroy it
+      umpire::util::finalize_io();
+#endif
       _err_syncd_thread_buffer.reset();
       _err_prewrap_buf = nullptr;
     }
