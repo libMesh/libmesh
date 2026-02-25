@@ -375,6 +375,10 @@ public:
 
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
+
+    // This should give no output for our correctly-set-up inputs
+    net_tet.set_verbosity(50);
+
     testTrisToTets(mesh, net_tet);
     testBcids(mesh);
   }
