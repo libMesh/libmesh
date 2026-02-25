@@ -107,7 +107,7 @@ protected:
   /**
    * verbosity setting
    */
-  const unsigned int _verbosity;
+  unsigned int _verbosity;
 
   /**
    * Remove volume elements from the given mesh, after converting
@@ -199,6 +199,17 @@ protected:
    */
   std::unique_ptr<std::vector<std::unique_ptr<UnstructuredMesh>>> _holes;
 };
+
+
+// ------------------------------------------------------------
+// MeshTetInterface class member functions
+inline
+void
+MeshTetInterface::set_verbosity(unsigned int v)
+{
+  this->_verbosity = v;
+}
+
 
 } // namespace libMesh
 
