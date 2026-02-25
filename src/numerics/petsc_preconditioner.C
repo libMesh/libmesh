@@ -173,6 +173,12 @@ void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const uns
   PCType pc_type = nullptr;
   LibmeshPetscCallA(comm, PCGetType(pc, &pc_type));
 
+#if !PETSC_VERSION_LESS_THAN(3, 20, 0)
+  // Get the nesting level of this PC's KSP
+  PetscInt level;
+  LibmeshPetscCallA(comm, PCGetKSPNestLevel(pc, &level));
+#endif
+
   // Check if hypre ams/ads, otherwise we quit with nothing to do
   if (pc_type && std::string(pc_type) == PCHYPRE)
   {
@@ -205,7 +211,8 @@ void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const uns
       set_hypre_ads_data(pc, sys, v);
     }
   }
-  else if (pc_type && std::string(pc_type) == PCFIELDSPLIT)
+#if !PETSC_VERSION_LESS_THAN(3, 20, 0)
+  else if (pc_type && std::string(pc_type) == PCFIELDSPLIT && !level)
   {
     // Annoyingly, if using Schur complement preconditioning, we need to call PCSetUp()
     auto pmatrix = cast_ptr<PetscMatrixBase<T> *>(sys.request_matrix("System Matrix"));
@@ -219,17 +226,23 @@ void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const uns
     KSP * subksps;
     LibmeshPetscCallA(comm, PCFieldSplitGetSubKSP(pc, &n_splits, &subksps));
 
+    // We assume a one-to-one map between splits and variables
+    if (sys.n_vars() != n_splits)
+      return;
+
     // Get the sub PC context for each split and recursively call this function
     for (auto s : make_range(n_splits))
     {
       PC subpc;
       LibmeshPetscCallA(comm, KSPGetPC(subksps[s], &subpc));
+      LibmeshPetscCallA(comm, PCSetKSPNestLevel(subpc, level + 1));
       set_petsc_aux_data(subpc, sys, s);
     }
 
     // Free the array of sub KSP contexts
     LibmeshPetscCallA(comm, PetscFree(subksps));
   }
+#endif
 }
 
 
