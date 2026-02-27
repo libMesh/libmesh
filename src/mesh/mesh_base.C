@@ -633,13 +633,6 @@ void MeshBase::change_elemset_id(elemset_id_type old_id, elemset_id_type new_id)
   _all_elemset_ids.insert(new_id);
 }
 
-unsigned int MeshBase::spatial_dimension () const
-{
-  libmesh_assert(_preparation.has_cached_elem_data);
-
-  return cast_int<unsigned int>(_spatial_dimension);
-}
-
 
 
 void MeshBase::set_spatial_dimension(unsigned char d)
