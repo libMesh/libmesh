@@ -435,23 +435,20 @@ public:
    * \returns A const reference to a std::set of element dimensions
    * present in the mesh.
    */
-  const std::set<unsigned char> & elem_dimensions() const
-  { return _elem_dims; }
+  const std::set<unsigned char> & elem_dimensions() const;
 
   /**
    * \returns A const reference to a std::set of element default
    * orders present in the mesh.
    */
-  const std::set<Order> & elem_default_orders() const
-  { return _elem_default_orders; }
+  const std::set<Order> & elem_default_orders() const;
 
   /**
    * \returns The smallest supported_nodal_order() of any element
    * present in the mesh, which is thus the maximum supported nodal
    * order on the mesh as a whole.
    */
-  Order supported_nodal_order() const
-  { return _supported_nodal_order; }
+  Order supported_nodal_order() const;
 
   /**
    * Most of the time you should not need to call this, as the element
@@ -2069,8 +2066,7 @@ public:
    * should contain all the subdomain ids across processors. Relies on the mesh
    * being prepared
    */
-  const std::set<subdomain_id_type> & get_mesh_subdomains() const
-  { libmesh_assert(this->is_prepared()); return _mesh_subdomains; }
+  const std::set<subdomain_id_type> & get_mesh_subdomains() const;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
@@ -2648,6 +2644,48 @@ MeshBase::const_node_iterator : MeshBase::const_node_filter_iter
     const_node_filter_iter(rhs) {}
 };
 
+
+// ------------------------------------------------------------
+// Elem class member functions
+inline
+const std::set<unsigned char> & MeshBase::elem_dimensions() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _elem_dims;
+}
+
+
+inline
+const std::set<Order> & MeshBase::elem_default_orders() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _elem_default_orders;
+}
+
+
+inline
+Order MeshBase::supported_nodal_order() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _supported_nodal_order;
+}
+
+
+inline
+const std::set<subdomain_id_type> & MeshBase::get_mesh_subdomains() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _mesh_subdomains;
+}
+
+
+inline
+unsigned int MeshBase::spatial_dimension () const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+
+  return cast_int<unsigned int>(_spatial_dimension);
+}
 
 template <typename T>
 inline
