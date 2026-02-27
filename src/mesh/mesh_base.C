@@ -282,7 +282,7 @@ void MeshBase::assert_equal_to (const MeshBase & other_mesh,
                                 std::string_view failure_context) const
 {
 #ifndef NDEBUG
-  LOG_SCOPE("operator==()", "MeshBase");
+  LOG_SCOPE("assert_equal_to()", "MeshBase");
 
   std::string_view local_diff = first_difference_from(other_mesh);
 
