@@ -910,7 +910,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
       const bool skipped_partitioning = this->skip_partitioning();
       this->skip_partitioning(true);
 
-      const bool was_prepared = this->is_prepared();
+      const Preparation old_preparation = this->preparation();
       this->prepare_for_use();
 
       //But in the long term, don't change our policies.
@@ -923,9 +923,19 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
       // That prepare_for_use() call marked us as prepared, but we
       // specifically avoided some important preparation, so we might not
       // actually be prepared now.
-      if (skip_find_neighbors ||
-          !was_prepared || !other_mesh.is_prepared())
-        this->unset_is_prepared();
+      if (skip_find_neighbors)
+        this->unset_has_neighbor_ptrs();
+
+      const Preparation other_preparation = other_mesh.preparation();
+      if (!old_preparation.is_partitioned ||
+          !other_preparation.is_partitioned)
+        this->unset_is_partitioned();
+      if (!old_preparation.has_removed_orphaned_nodes ||
+          !other_preparation.has_removed_orphaned_nodes)
+        this->unset_has_removed_orphaned_nodes();
+      if (!old_preparation.has_removed_remote_elements ||
+          !other_preparation.has_removed_remote_elements)
+        this->unset_has_removed_remote_elements();
     }
 
   // In general we've just invalidated just about everything, and we'd
