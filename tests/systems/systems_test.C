@@ -445,6 +445,8 @@ public:
 
   CPPUNIT_TEST( test100KVariables );
 
+  CPPUNIT_TEST( testUninitializedInfo );
+
   CPPUNIT_TEST( testPostInitAddVector );
   CPPUNIT_TEST( testAddVectorProjChange );
   CPPUNIT_TEST( testAddVectorTypeChange );
@@ -659,6 +661,17 @@ public:
     std::vector<dof_id_type> each = sys.get_dof_map().n_dofs_per_processor(888);
     CPPUNIT_ASSERT_EQUAL(std::accumulate(each.begin(), each.end(), dof_id_type(0)), dof_id_type(5));
     CPPUNIT_ASSERT_EQUAL(sys.get_dof_map().n_dofs(888), dof_id_type(5));
+  }
+
+  void testUninitializedInfo()
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    ExplicitSystem & sys = simpleSetup(mesh, es);
+
+    auto info = sys.get_info();
+
+    CPPUNIT_ASSERT (info.find("uninitialized") != std::string::npos);
   }
 
 
