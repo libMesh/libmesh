@@ -466,6 +466,7 @@ public:
 #endif
 #endif // LIBMESH_DIM > 1
 #if LIBMESH_DIM > 2
+  CPPUNIT_TEST( testFirstScalarNumber );
   CPPUNIT_TEST( testProjectHierarchicHex27 );
   CPPUNIT_TEST( testProjectMeshFunctionHex27 );
   CPPUNIT_TEST( testBoundaryProjectCube );
@@ -581,6 +582,45 @@ public:
                                        EDGE3);
 
     return sys;
+  }
+
+
+  void testFirstScalarNumber()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_cube (mesh,
+                                       1, 1, 1,
+                                       0., 1., 0., 1., 0., 1.,
+                                       HEX8);
+
+    EquationSystems es(mesh);
+    System &sys = es.add_system<System> ("SimpleSystem");
+
+    const FEFamily types[3] = {MONOMIAL_VEC, LAGRANGE_VEC, NEDELEC_ONE};
+    const Order orders[3] = {CONSTANT, SECOND, FIRST};
+    const std::string names[3] = {"u", "v", "w"};
+    const unsigned int var_nums[3] =
+      {
+        sys.add_variable("u", CONSTANT, MONOMIAL_VEC),
+        sys.add_variable("v", SECOND, LAGRANGE_VEC),
+        sys.add_variable("w", FIRST, NEDELEC_ONE)
+      };
+
+    for (unsigned int i : {0, 1, 2})
+      {
+        // We did just add these in order
+        CPPUNIT_ASSERT_EQUAL(i, var_nums[i]);
+
+        auto & var = sys.variable(i);
+        CPPUNIT_ASSERT_EQUAL(var.system(), &sys);
+        CPPUNIT_ASSERT_EQUAL(var.name(), names[i]);
+        CPPUNIT_ASSERT_EQUAL(var.number(), i);
+        CPPUNIT_ASSERT_EQUAL(var.first_scalar_number(), i*3);
+        CPPUNIT_ASSERT_EQUAL(var.type().family, types[i]);
+        CPPUNIT_ASSERT_EQUAL(Order(var.type().order), orders[i]);
+        CPPUNIT_ASSERT_EQUAL(var.n_components(mesh), 3u);
+      }
   }
 
 
