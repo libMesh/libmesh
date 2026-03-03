@@ -38,6 +38,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/static_condensation.h"
+#include "libmesh/static_condensation_dof_map.h"
 
 // includes for calculate_norm, point_*
 #include "libmesh/fe_base.h"
@@ -1890,14 +1891,20 @@ std::string System::get_info() const
       dof_id_type local_dofs = this->n_local_dofs();
       oss << "    n_local_dofs()="       << local_dofs                 << '\n';
       this->comm().max(local_dofs);
-      oss << "    max(n_local_dofs())="       << local_dofs                 << '\n';
+      oss << "    max(n_local_dofs())="  << local_dofs                 << '\n';
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-      oss << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
-      oss << "    n_local_constrained_dofs()=" << this->n_local_constrained_dofs() << '\n';
-      dof_id_type local_unconstrained_dofs = this->n_local_dofs() - this->n_local_constrained_dofs();
-      this->comm().max(local_unconstrained_dofs);
-      oss << "    max(local unconstrained dofs)=" << local_unconstrained_dofs << '\n';
+      if (this->n_constrained_dofs())
+        {
+          oss << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
+          oss << "    n_local_constrained_dofs()=" << this->n_local_constrained_dofs() << '\n';
+          dof_id_type local_unconstrained_dofs = this->n_local_dofs() - this->n_local_constrained_dofs();
+          this->comm().max(local_unconstrained_dofs);
+          oss << "    max(local unconstrained dofs)=" << local_unconstrained_dofs << '\n';
+        }
 #endif
+      if (this->has_static_condensation())
+        oss << "    n uncondensed dofs="
+            << this->get_dof_map().get_static_condensation().n_dofs() << '\n';
     }
   else
     oss << "    (still uninitialized)\n";
