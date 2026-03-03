@@ -112,7 +112,7 @@ void EquationSystems::read (Xdr & io,
                             bool partition_agnostic)
 {
   /**
-   * This program implements the output of an
+   * This program implements the input of an
    * EquationSystems object.  This warrants some
    * documentation.  The output file essentially
    * consists of 11 sections:
@@ -235,7 +235,7 @@ void EquationSystems::read (Xdr & io,
     LOG_SCOPE("read()", "EquationSystems");
 
     // 2.)
-    // Read the number of equation systems
+    // Read the number of systems
     unsigned int n_sys=0;
     if (this->processor_id() == 0) io.data (n_sys);
     this->comm().broadcast(n_sys);
