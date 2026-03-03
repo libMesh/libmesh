@@ -77,6 +77,10 @@ void LinearImplicitSystem::clear ()
 
   // clear the parent data
   Parent::clear();
+
+  // And restore any StaticCondensation to defaults
+  if (this->has_static_condensation())
+    this->setup_static_condensation_preconditioner(*linear_solver);
 }
 
 

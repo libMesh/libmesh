@@ -184,6 +184,10 @@ void System::clear ()
   // clear any user-added matrices
   _matrices.clear();
   _matrices_initialized = false;
+
+  // But our "basic"/"null" state may still have a StaticCondensation
+  if (libMesh::on_command_line("--" + _sys_name + "-static-condensation"))
+    this->create_static_condensation();
 }
 
 
