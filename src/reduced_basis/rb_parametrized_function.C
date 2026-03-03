@@ -564,6 +564,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh(const RBP
         }
       elem_counter++;
     }
+  libmesh_error_msg_if(counter == 0, "Parametrized function on mesh has no values");
 
   std::vector<RBParameters> mus {mu};
   vectorized_evaluate(mus, v, preevaluated_values);
@@ -713,6 +714,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_sides(con
       else
         libmesh_error_msg ("Unrecognized side_type: " << side_type);
     }
+  libmesh_error_msg_if(counter == 0, "Parametrized function on mesh sides has no values");
 
   std::vector<RBParameters> mus {mu};
   side_vectorized_evaluate(mus, v, preevaluated_values);
@@ -750,6 +752,7 @@ void RBParametrizedFunction::preevaluate_parametrized_function_on_mesh_nodes(con
 
       counter++;
     }
+  libmesh_error_msg_if(counter == 0, "Parametrized function on mesh nodes has no values");
 
   std::vector<RBParameters> mus {mu};
   node_vectorized_evaluate(mus, v, preevaluated_values);
