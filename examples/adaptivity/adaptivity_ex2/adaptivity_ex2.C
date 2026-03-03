@@ -47,6 +47,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/static_condensation.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dense_matrix.h"
@@ -494,6 +495,11 @@ void assemble_cd (EquationSystems & es,
   TransientLinearImplicitSystem & system =
     es.get_system<TransientLinearImplicitSystem> ("Convection-Diffusion");
 
+  // Get a pointer to the StaticCondensation class if it exists
+  StaticCondensation * sc = nullptr;
+  if (system.has_static_condensation())
+    sc = &system.get_static_condensation();
+
   // Get the Finite Element type for the first (and only)
   // variable in the system.
   FEType fe_type = system.variable_type(0);
@@ -702,6 +708,9 @@ void assemble_cd (EquationSystems & es,
       // DofMap::constrain_element_matrix_and_vector() method does
       // just that.
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+
+      if (sc)
+        sc->set_current_elem(*elem);
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
