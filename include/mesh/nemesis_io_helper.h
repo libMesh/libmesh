@@ -436,11 +436,6 @@ public:
   std::set<int> nodes_attached_to_local_elems;
 
   /**
-   * Map of subdomains to element numbers.
-   */
-  std::map<subdomain_id_type, std::vector<dof_id_type>> subdomain_map;
-
-  /**
    * This is the block connectivity, i.e. for each subdomain (block) there
    * is an element connectivity list. This map associates the block ID to that vector.
    */
