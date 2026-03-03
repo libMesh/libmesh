@@ -1803,6 +1803,12 @@ public:
   StaticCondensationDofMap & get_static_condensation();
 
   /**
+   * @returns the static condensation class. This should have been already added with a call to \p
+   * add_static_condensation()
+   */
+  const StaticCondensationDofMap & get_static_condensation() const;
+
+  /**
    * Calls reinit on the static condensation map if it exists
    */
   void reinit_static_condensation();
@@ -2851,6 +2857,13 @@ void DofMap::dof_indices (const Elem * const elem,
 
 inline
 StaticCondensationDofMap & DofMap::get_static_condensation()
+{
+  libmesh_assert(_sc);
+  return *_sc;
+}
+
+inline
+const StaticCondensationDofMap & DofMap::get_static_condensation() const
 {
   libmesh_assert(_sc);
   return *_sc;
