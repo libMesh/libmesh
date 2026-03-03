@@ -171,6 +171,14 @@ public:
   Point side_vertex_average_normal(const unsigned int s) const override final;
 
   /**
+   * \returns the local side-indices of subelement sides of the
+   * polyhedron
+   *
+   * Each subelement here is a tetrahedron
+   */
+  virtual std::array<int, 4> subelement_sides_to_poly_sides(unsigned int i) const;
+
+  /**
    * Create a triangulation (tetrahedralization) based on the current
    * sides' triangulations.
    */
