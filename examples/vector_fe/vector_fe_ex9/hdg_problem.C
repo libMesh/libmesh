@@ -17,8 +17,6 @@
 
 #include "hdg_problem.h"
 
-#if defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
-
 #include "libmesh/mesh_base.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/static_condensation.h"
@@ -1133,5 +1131,3 @@ HDGProblem::jacobian(const NumericVector<Number> & X,
 }
 
 } // namespace libMesh
-
-#endif

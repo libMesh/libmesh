@@ -20,8 +20,6 @@
 
 #include "libmesh/libmesh_config.h"
 
-#if defined(LIBMESH_HAVE_EIGEN_DENSE) && defined(LIBMESH_HAVE_PETSC)
-
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/fe.h"
 #include "exact_soln.h"
@@ -261,5 +259,4 @@ private:
 
 } // namespace libMesh
 
-#endif
 #endif // HDG_PROBLEM_H
