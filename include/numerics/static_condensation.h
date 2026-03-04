@@ -20,6 +20,11 @@
 
 #include "libmesh/libmesh_config.h"
 
+// Forward declarations
+namespace libMesh {
+  class Elem;
+}
+
 // shell matrices currently only work with petsc,
 // and we currently rely on Eigen for local LU factorizations
 #if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_HAVE_PETSC)
@@ -403,6 +408,9 @@ public:
   void init() { libmesh_not_implemented(); }
   void setup() { libmesh_not_implemented(); }
   void apply(const NumericVector<Number> &, NumericVector<Number> &) { libmesh_not_implemented(); }
+
+  void set_current_elem(const Elem &) {}
+  void dont_condense_vars(const std::unordered_set<unsigned int> &) {}
 };
 }
 
