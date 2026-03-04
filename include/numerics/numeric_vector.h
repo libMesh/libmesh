@@ -752,39 +752,47 @@ public:
 
   /**
    * Fills in \p subvector from this vector using the indices in \p rows.
-   * Similar to the \p create_submatrix() routine for the SparseMatrix class, it
-   * is currently only implemented for PetscVectors. The boolean parameter
-   * communicates whether the supplied vector of rows corresponds to all the
-   * rows that should be used in the subvector's index set, e.g. whether the
-   * rows correspond to the global collective. If the rows supplied are only the
-   * local indices, then the boolean parameter should be set to false
+   *
+   * \p supplying_global_rows communicates whether
+   * the supplied vector of rows corresponds to all the rows that
+   * should be used in the subvector's index set, e.g. whether the
+   * rows correspond to the global collective. If the rows supplied
+   * are only the local indices, then \p supplying_global_rows should
+   * be set to false
+   *
+   * This is currently only implemented for \p PetscVector and \p
+   * EigenSparseVector.
    */
-  virtual void create_subvector(NumericVector<T> & ,
-                                const std::vector<numeric_index_type> &,
-                                bool = true) const
+  virtual void create_subvector(NumericVector<T> & /* subvector */,
+                                const std::vector<numeric_index_type> & /* rows */,
+                                bool /* supplying_global_rows */ = true) const
   {
     libmesh_not_implemented();
   }
 
   /**
    * Creates a view into this vector using the indices in \p
-   * rows.  Similar to the \p create_submatrix() routine for the
-   * SparseMatrix class, it is currently only implemented for
-   * PetscVectors.
+   * rows.
+   *
+   * This is currently only implemented for \p PetscVector and \p
+   * EigenSparseVector.
    */
   virtual std::unique_ptr<NumericVector<T>>
-  get_subvector(const std::vector<numeric_index_type> &)
+  get_subvector(const std::vector<numeric_index_type> & /* rows */)
   {
     libmesh_not_implemented();
   }
 
   /**
    * Restores a view into this vector using the indices in \p
-   * rows.  This  is currently only implemented for
-   * PetscVectors.
+   * rows.  The \p subvector should have been acquired from \p
+   * get_subvector() with the same rows.
+   *
+   * This is currently only implemented for \p PetscVector and \p
+   * EigenSparseVector.
    */
-  virtual void restore_subvector(std::unique_ptr<NumericVector<T>>,
-                                 const std::vector<numeric_index_type> &)
+  virtual void restore_subvector(std::unique_ptr<NumericVector<T>> /* subvector */,
+                                 const std::vector<numeric_index_type> & /* rows */)
   {
     libmesh_not_implemented();
   }
