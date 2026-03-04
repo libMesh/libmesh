@@ -629,9 +629,11 @@ void MeshTetInterface::process_hull_integrity_result
       err_msg << "A constrained Delaunay tetrahedralization boundary must be an oriented Tri3 mesh." << std::endl;
     }
   if (result.count(BAD_NEIGHBOR_LINKS))
-    {
-      err_msg << "At least one triangle neighbor with inconsistent node and neighbor links was found in the input boundary mesh." << std::endl;
-    }
+    err_msg << "At least one triangle neighbor with inconsistent node and neighbor links was found in the input boundary mesh." << std::endl;
+  if (result.count(DEGENERATE_ELEMENT))
+    err_msg << "At least one input triangle is degenerate, with near-zero area relative to the manifold." << std::endl;
+  if (result.count(DEGENERATE_MESH))
+    err_msg << "The input mesh is degenerate, with zero thickness in at least one direction." << std::endl;
 
   libmesh_error_msg(err_msg.str());
 }
