@@ -633,6 +633,7 @@ datarootdir = @datarootdir@
 docdir = @docdir@
 dvidir = @dvidir@
 enabledeprecated = @enabledeprecated@
+enableeigen = @enableeigen@
 enablefwdenums = @enablefwdenums@
 enablelegacyincludepaths = @enablelegacyincludepaths@
 enablepetsc = @enablepetsc@
@@ -768,7 +769,7 @@ data_DATA = $(data) $(top_builddir)/contrib/utils/Makefile
 #
 TESTS_ENVIRONMENT = LIBMESH_DIR=$(abs_top_srcdir); export LIBMESH_DIR; \
 	METHODS="$(METHODS)"; export METHODS; petscmajor=@petscmajor@ \
-	petscminor=@petscminor@
+	petscminor=@petscminor@ enableeigen=@enableeigen@
 TESTS = $(check_SCRIPTS)
 all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
