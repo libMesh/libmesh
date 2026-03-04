@@ -207,10 +207,24 @@ int main (int argc, char ** argv)
       mesh.read ("mesh.xda");
 
       // Again do a search on the command line for an argument
-      const unsigned int n_refinements = 5;
+      const int order =
+        libMesh::command_line_next("-order", 1);
+
+      // If we need a higher-order variable, we'll need second-order
+      // geometric elements to store edge DoFs.  In 2D every
+      // second-order geometric can support every polynomial degree
+      // (even higher-than-second), but we'll leave the 3D-compatible
+      // thing in comments here for didactic purposes.
+      //if (order > 2)
+      //  mesh.all_complete_order();
+      //else
+      if (order > 1)
+        mesh.all_second_order();
+
+      const unsigned int n_refinements =
         libMesh::command_line_next("-n_refinements", 5);
 
-      // Uniformly refine the mesh 5 times
+      // Uniformly refine the mesh n times
       if (!read_solution)
         mesh_refinement.uniformly_refine (n_refinements);
 
@@ -224,8 +238,10 @@ int main (int argc, char ** argv)
         equation_systems.add_system<TransientLinearImplicitSystem>("Convection-Diffusion");
 
       // Adds the variable "u" to "Convection-Diffusion".  "u"
-      // will be approximated using first-order approximation.
-      system.add_variable ("u", FIRST);
+      // will be approximated using first- or second-order
+      // approximation.  For higher than second-order FE we need a
+      // non-Lagrange type.
+      system.add_variable ("u", Order(order), order > 2 ? HIERARCHIC : LAGRANGE);
 
       // Give the system a pointer to the matrix assembly
       // and initialization functions.
@@ -304,6 +320,13 @@ int main (int argc, char ** argv)
 
   const Real dt = 0.025;
   system.time = init_timestep*dt;
+
+  // We're going to refine and coarsen based on some heuristics.
+  const Real refine_fraction =
+    libMesh::command_line_next("-refine_fraction", 0.80);
+
+  const Real coarsen_fraction =
+    libMesh::command_line_next("-coarsen_fraction", 0.07);
 
   // We do 25 timesteps both before and after writing out the
   // intermediate solution
@@ -395,8 +418,8 @@ int main (int argc, char ** argv)
               // be coarsened. Note that the elements flagged for refinement
               // will be refined, but those flagged for coarsening _might_ be
               // coarsened.
-              mesh_refinement.refine_fraction() = 0.80;
-              mesh_refinement.coarsen_fraction() = 0.07;
+              mesh_refinement.refine_fraction() = refine_fraction;
+              mesh_refinement.coarsen_fraction() = coarsen_fraction;
               mesh_refinement.max_h_level() = max_h_level;
               mesh_refinement.flag_elements_by_error_fraction (error);
 
