@@ -231,9 +231,19 @@ public:
   virtual void pointwise_divide (const NumericVector<T> & vec1,
                                  const NumericVector<T> & vec2) override;
 
+  virtual void create_subvector(NumericVector<T> & subvector,
+                                const std::vector<numeric_index_type> & rows,
+                                bool supplying_global_rows = true) const override;
+
   virtual void swap (NumericVector<T> & v) override;
 
   virtual std::size_t max_allowed_id() const override;
+
+  virtual std::unique_ptr<NumericVector<T>>
+  get_subvector(const std::vector<numeric_index_type> & rows) override;
+
+  virtual void restore_subvector(std::unique_ptr<NumericVector<T>> subvector,
+                                 const std::vector<numeric_index_type> & rows) override;
 
   /**
    * References to the underlying Eigen data types.
