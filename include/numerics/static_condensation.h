@@ -20,7 +20,8 @@
 
 #include "libmesh/libmesh_config.h"
 
-// subvectors currently only work with petsc and we rely on Eigen for local LU factorizations
+// shell matrices currently only work with petsc,
+// and we currently rely on Eigen for local LU factorizations
 #if defined(LIBMESH_HAVE_EIGEN) && defined(LIBMESH_HAVE_PETSC)
 
 #include "libmesh/petsc_matrix_shell_matrix.h"
