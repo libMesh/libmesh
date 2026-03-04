@@ -38,3 +38,20 @@ run_example "$example_name" "$options"
 
 benchmark_options="-read_solution -n_timesteps 25 -max_h_level 7 -output_freq 10 -init_timestep 25"
 benchmark_example 1 "$example_name" "$benchmark_options"
+
+# If our build supports static condensation, run from scratch and then
+# from restart with higher p (and less h refinement) to test static
+# condensation
+
+if [ "x$petscmajor" != "x" ] && [ "x$enableeigen" = "xyes" ]; then
+  options="-n_timesteps $n_timesteps -n_refinements 3 -refine_fraction 0.6 -order 3 -output_freq $output_freq -init_timestep 0"
+  run_example "$example_name" "$options"
+
+echo " "
+echo "***** Finished first" $n_timesteps "steps at high order, now read in" \
+    "saved solution and continue *****"
+echo " "
+
+  options="-read_solution -n_timesteps $n_timesteps -refine_fraction 0.6 -coarsen_fraction 0.15 -output_freq $output_freq -init_timestep $n_timesteps"
+  run_example "$example_name" "$options"
+fi
