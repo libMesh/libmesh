@@ -440,9 +440,12 @@ int main (int argc, char ** argv)
       const unsigned int output_freq =
         libMesh::command_line_next("-output_freq", 10);
 
-      // Output every 10 timesteps to file.
+      // Every N timesteps, output solutions to file and summaries to
+      // the console.
       if ((t_step+1)%output_freq == 0)
         {
+          equation_systems.print_info();
+
           std::ostringstream file_name;
 
           file_name << "out.e."
