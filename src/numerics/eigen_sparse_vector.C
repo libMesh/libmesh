@@ -441,12 +441,7 @@ void EigenSparseVector<T>::create_subvector(NumericVector<T> & subvector,
   if (!eigen_subvector->initialized())
     eigen_subvector->init(rows.size());
 
-  // Construct index set
-  //Eigen::Map<Eigen::ArrayXi> ind_vec_map(rows.data(),
-                                         //cast_int<Eigen::Index>(rows.size()));
-
   eigen_subvector->vec() = this->vec()(rows);
-  // eigen_subvector->vec() = ind_vec_map.unaryExpr(this->vec());
 
   eigen_subvector->_is_closed = true;
 }
@@ -474,11 +469,6 @@ EigenSparseVector<T>::restore_subvector(std::unique_ptr<NumericVector<T>> subvec
 {
   auto * const eigen_subvector = cast_ptr<EigenSparseVector<T> *>(subvector.get());
 
-  // Construct index set
-  // Eigen::Map<Eigen::ArrayXi> ind_vec_map(rows.data(),
-  //                                       cast_int<Eigen::Index>(rows.size()));
-
-  DataType subvec = eigen_subvector->vec();
   this->vec()(rows) = eigen_subvector->vec();
   this->_is_closed = true;
 }
