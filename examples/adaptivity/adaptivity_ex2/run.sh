@@ -44,7 +44,7 @@ benchmark_example 1 "$example_name" "$benchmark_options"
 # condensation
 
 if [ "x$petscmajor" != "x" ] && [ "x$enableeigen" = "xyes" ]; then
-  options="-n_timesteps $n_timesteps -n_refinements 3 -refine_fraction 0.6 -order 3 -output_freq $output_freq -init_timestep 0"
+  options="-n_timesteps $n_timesteps -n_refinements 3 -refine_fraction 0.6 -order 3 -output_freq $output_freq -init_timestep 0 --Convection-Diffusion-static-condensation -ksp_type preonly --Convection-Diffusion_condensed_pc_type lu"
   run_example "$example_name" "$options"
 
 echo " "
@@ -52,6 +52,6 @@ echo "***** Finished first" $n_timesteps "steps at high order, now read in" \
     "saved solution and continue *****"
 echo " "
 
-  options="-read_solution -n_timesteps $n_timesteps -refine_fraction 0.6 -coarsen_fraction 0.15 -output_freq $output_freq -init_timestep $n_timesteps"
+  options="-read_solution -n_timesteps $n_timesteps -refine_fraction 0.6 -coarsen_fraction 0.15 -output_freq $output_freq -init_timestep $n_timesteps --Convection-Diffusion-static-condensation -ksp_type preonly --Convection-Diffusion_condensed_pc_type lu"
   run_example "$example_name" "$options"
 fi
