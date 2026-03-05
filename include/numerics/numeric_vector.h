@@ -772,7 +772,8 @@ public:
 
   /**
    * Creates a view into this vector using the indices in \p
-   * rows.
+   * rows. Calls to this API should always be paired with a call to \p restore_subvector,
+   * else any changes made in the subvector will not be reflected in (\p this) original vector.
    *
    * This is currently only implemented for \p PetscVector and \p
    * EigenSparseVector.
