@@ -47,6 +47,7 @@
 #include "libmesh/quadrature.h" // for dirichlet constraints
 #include "libmesh/raw_accessor.h"
 #include "libmesh/sparse_matrix.h" // needed to constrain adjoint rhs
+#include "libmesh/static_condensation_dof_map.h"
 #include "libmesh/system.h" // needed by enforce_constraints_exactly()
 #include "libmesh/tensor_tools.h"
 #include "libmesh/threads.h"
@@ -5323,22 +5324,46 @@ void DofMap::add_constraints_to_send_list()
   if (!has_constraints)
     return;
 
+  auto add_row = [this](const DofConstraintRow & constraint_row) {
+    for (const auto & j : constraint_row)
+      {
+        dof_id_type constraint_dependency = j.first;
+
+        // No point in adding one of our own dofs to the send_list
+        if (this->local_index(constraint_dependency))
+          continue;
+
+        _send_list.push_back(constraint_dependency);
+      }
+  };
+
+  // We usually only need dependencies of our own constrained dofs
   for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
+    if (this->local_index(constrained_dof))
+      add_row(constraint_row);
+
+  // If we only need constraint DoFs constraining DoFs which are
+  // algebraically local, we're done.
+  if (!this->has_static_condensation())
+    return;
+
+  // If we use StaticCondensation, though, we may need constraint DoFs
+  // constraining DoFs which are not local (they're on someone else's
+  // node) but which are supported on local elements.  Let's get those
+  // too if we have to.
+  //
+  // We'll potentially be hitting the same constrained DoFs from
+  // multiple directions.
+  std::unordered_set<dof_id_type> extra_dependencies;
+  for (auto & elem : this->get_static_condensation().mesh().active_local_element_ptr_range())
     {
-      // We only need the dependencies of our own constrained dofs
-      if (!this->local_index(constrained_dof))
-        continue;
-
-      for (const auto & j : constraint_row)
-        {
-          dof_id_type constraint_dependency = j.first;
-
-          // No point in adding one of our own dofs to the send_list
-          if (this->local_index(constraint_dependency))
-            continue;
-
-          _send_list.push_back(constraint_dependency);
-        }
+      std::vector<dof_id_type> di;
+      this->dof_indices (elem, di);
+      for (const auto & dof_id : di)
+        if (!this->local_index(dof_id))
+          if (auto pos = _dof_constraints.find(dof_id);
+              pos != _dof_constraints.end())
+            add_row(pos->second);
     }
 }
 
