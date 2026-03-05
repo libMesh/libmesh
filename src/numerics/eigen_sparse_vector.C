@@ -459,6 +459,8 @@ EigenSparseVector<T>::get_subvector(const std::vector<numeric_index_type> & rows
   // can see if there's a way to improve this later.
   this->create_subvector(*returnval, rows);
 
+  this->_is_closed = false;
+
   return std::move(returnval);
 }
 
