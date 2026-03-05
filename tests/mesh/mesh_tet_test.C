@@ -50,6 +50,7 @@ public:
   CPPUNIT_TEST( testNetGenError );
   CPPUNIT_TEST( testNetGenTets );
   CPPUNIT_TEST( testNetGenFlippedTris );
+  CPPUNIT_TEST( testNetGenNonOriented );
   CPPUNIT_TEST( testNetGenHole );
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -232,12 +233,29 @@ public:
 
   void testTrisToTets(UnstructuredMesh & mesh,
                       MeshTetInterface & triangulator,
-                      bool flip_tris = false)
+                      bool flip_tris = false,
+                      bool flip_some_tris = false)
   {
     // An asymmetric octahedron, so we hopefully have an unambiguous
     // choice of shortest diagonal for a Delaunay algorithm to pick.
     const Real expected_volume =
       build_octahedron(mesh, flip_tris, -1, 1, -1, 1, -0.1, 0.1);
+
+    // Flip a couple tri, breaking the mesh in a way we can fix
+    if (flip_some_tris)
+      for (auto elem : mesh.element_ptr_range())
+        {
+          Point center = elem->vertex_average();
+          if ((center(0) > 0 &&
+               center(1) > 0 &&
+               center(2) > 0) ||
+              (center(0) < 0 &&
+               center(1) < 0 &&
+               center(2) < 0))
+            elem->flip(&mesh.get_boundary_info());
+
+          mesh.unset_is_prepared();
+        }
 
     this->testTetInterfaceBase(mesh, triangulator, /* n_elem = */ 4,
                                /* n_nodes = */ 6, expected_volume);
@@ -357,6 +375,10 @@ public:
 
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
+
+    // This should give no output for our correctly-set-up inputs
+    net_tet.set_verbosity(50);
+
     testTrisToTets(mesh, net_tet);
     testBcids(mesh);
   }
@@ -390,6 +412,17 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testTrisToTets(mesh, net_tet, true);
+    testBcids(mesh);
+  }
+
+
+  void testNetGenNonOriented()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    NetGenMeshInterface net_tet(mesh);
+    testTrisToTets(mesh, net_tet, true, true);
     testBcids(mesh);
   }
 

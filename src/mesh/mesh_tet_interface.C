@@ -112,7 +112,7 @@ namespace libMesh
 //----------------------------------------------------------------------
 // MeshTetInterface class members
 MeshTetInterface::MeshTetInterface (UnstructuredMesh & mesh) :
-  _desired_volume(0), _smooth_after_generating(false),
+  _verbosity(0), _desired_volume(0), _smooth_after_generating(false),
   _elem_type(TET4), _mesh(mesh)
 {
 }
@@ -335,65 +335,307 @@ BoundingBox MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 }
 
 
-unsigned int MeshTetInterface::check_hull_integrity()
+std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integrity() const
 {
   // Check for easy return: if the Mesh is empty (i.e. if
   // somebody called triangulate_conformingDelaunayMesh on
   // a Mesh with no elements, then hull integrity check must
   // fail...
   if (_mesh.n_elem() == 0)
-    return 3;
+    return {EMPTY_MESH};
+
+  std::set<MeshTetInterface::SurfaceIntegrity> returnval;
+
+  const BoundingBox bb = MeshTools::create_bounding_box(this->_mesh);
+  const Point extents = bb.max() - bb.min();
+  if (extents(0) == 0 ||
+      extents(1) == 0 ||
+      extents(2) == 0)
+    returnval.insert(DEGENERATE_MESH);
+
+  // Figure a area to use for relative tolerances when detecting
+  // degenerate elements
+  const Real ref_area = std::abs(extents(0) * extents(1)) +
+                        std::abs(extents(0) * extents(2)) +
+                        std::abs(extents(1) * extents(2));
 
   for (auto & elem : this->_mesh.element_ptr_range())
     {
       // Check for proper element type
       if (elem->type() != TRI3)
         {
-          //libmesh_error_msg("ERROR: Some of the elements in the original mesh were not TRI3!");
-          return 1;
+          if (this->_verbosity >= 50)
+            std::cerr << "Non-Tri3: " << elem->get_info() << std::endl;
+          returnval.insert(NON_TRI3);
         }
 
-      for (auto neigh : elem->neighbor_ptr_range())
+      // Make sure it's a decent element.
+      if (elem->volume() < ref_area * TOLERANCE * TOLERANCE)
         {
+          if (this->_verbosity >= 50)
+            std::cerr << "Degenerate element: " << elem->get_info() << std::endl;
+          returnval.insert(DEGENERATE_ELEMENT);
+        }
+
+      for (auto s : elem->side_index_range())
+        {
+          const Elem * const neigh = elem->neighbor_ptr(s);
+
           if (neigh == nullptr)
             {
-              // libmesh_error_msg("ERROR: Non-convex hull, cannot be tetrahedralized.");
-              return 2;
+              if (this->_verbosity >= 50)
+                std::cerr << "Element missing neighbor " << s << ": " << elem->get_info() << std::endl;
+              returnval.insert(MISSING_NEIGHBOR);
+              continue;
+            }
+
+          // Make sure our neighbor points back to us
+          const unsigned int nn = neigh->which_neighbor_am_i(elem);
+
+          if (nn >= 3)
+            {
+              if (this->_verbosity >= 50)
+                std::cerr << "Element missing backlink " << s << ": " << elem->get_info() << std::endl;
+              returnval.insert(MISSING_BACKLINK);
+              continue;
+            }
+
+          // Our neighbor should have the same the edge nodes we do on
+          // the neighboring edgei
+          const Node * const n1 = elem->node_ptr(s);
+          const Node * const n2 = elem->node_ptr((s+1)%3);
+
+          const unsigned int i1 = neigh->local_node(n1->id());
+          const unsigned int i2 = neigh->local_node(n2->id());
+          if (i1 >= 3 || i2 >= 3)
+            {
+              if (this->_verbosity >= 50)
+                std::cerr << "Element with bad neighbor " << s << " nodes: " << elem->get_info() << std::endl;
+              returnval.insert(BAD_NEIGHBOR_NODES);
+              continue;
+            }
+
+          // It should have those edge nodes in the opposite order
+          // (because they have the same orientation we do)
+          if ((i2 + 1)%3 != i1)
+            {
+              if (this->_verbosity >= 50)
+                std::cerr << "Element orientation mismatch with neighbor " << s << ": " << elem->get_info() << std::endl;
+              returnval.insert(NON_ORIENTED);
+              continue;
+            }
+
+          // And it should have those edge nodes in the expected
+          // places relative to its neighbor link
+          if (i2 != nn)
+            {
+              if (this->_verbosity >= 50)
+                std::cerr << "Element with bad links on neighbor " << s << ": " << elem->get_info() << std::endl;
+              returnval.insert(BAD_NEIGHBOR_LINKS);
+              continue;
             }
         }
     }
 
-  // If we made it here, return success!
-  return 0;
+  // Return anything and everything we found
+  return returnval;
 }
 
 
 
-void MeshTetInterface::process_hull_integrity_result(unsigned result)
+std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::improve_hull_integrity()
+{
+  // We don't really do anything parallel here, but we aspire to.
+  libmesh_parallel_only(this->_mesh.comm());
+
+  std::set<MeshTetInterface::SurfaceIntegrity> integrityproblems =
+    this->check_hull_integrity();
+
+  // If we have no problem, or a problem we can't fix, we're done.
+  if (integrityproblems.empty() ||
+      integrityproblems.count(NON_TRI3) ||
+      integrityproblems.count(EMPTY_MESH))
+    return integrityproblems;
+
+  // Possibly the user gave us an unprepared mesh with missing or bad
+  // neighbor links?
+  if (integrityproblems.count(MISSING_NEIGHBOR) ||
+      integrityproblems.count(MISSING_BACKLINK) ||
+      integrityproblems.count(BAD_NEIGHBOR_LINKS))
+  {
+    this->_mesh.find_neighbors();
+    integrityproblems = this->check_hull_integrity();
+  }
+
+  // If find_neighbors() doesn't fix these, I give up.
+  if (integrityproblems.count(MISSING_NEIGHBOR) ||
+      integrityproblems.count(MISSING_BACKLINK) ||
+      integrityproblems.count(BAD_NEIGHBOR_LINKS))
+    return integrityproblems;
+
+  // find_neighbors() might have fixed everything
+  if (integrityproblems.empty())
+    return integrityproblems;
+
+  // A non-oriented (but orientable!) surface is the only thing we
+  // shouldn't have fixed or given up on by now.
+  libmesh_assert_equal_to(integrityproblems.size(), 1);
+  libmesh_assert_equal_to(integrityproblems.count(NON_ORIENTED), 1);
+
+  // We need one known-good triangle to start from.  We'll pick the
+  // most-negative-x normal among the triangles on the most-negative-x
+  // point.
+
+  // We'll just implement this in serial for now.
+  MeshSerializer mesh_serializer(this->_mesh);
+
+  // I don't see why we'd need boundary info here, but maybe we'll
+  // want to preserve edge/node conditions eventually?
+  BoundaryInfo & bi = this->_mesh.get_boundary_info();
+
+  const Node * lowest_point = (*this->_mesh.elements_begin())->node_ptr(0);
+
+  // Index by ids, not pointers, for consistency in parallel
+  std::unordered_set<dof_id_type> attached_elements;
+
+  for (Elem * elem : this->_mesh.element_ptr_range())
+    {
+      for (const Node & node : elem->node_ref_range())
+        {
+          if (node(0) < (*lowest_point)(0))
+            {
+              lowest_point = &node;
+              attached_elements.clear();
+            }
+          if (&node == lowest_point)
+            attached_elements.insert(elem->id());
+        }
+    }
+
+  Elem * best_elem = nullptr;
+  Real best_abs_normal_0;
+
+  for (dof_id_type id : attached_elements)
+    {
+      Elem * elem = this->_mesh.elem_ptr(id);
+      const Point e01 = elem->point(1) - elem->point(0);
+      const Point e02 = elem->point(2) - elem->point(0);
+      const Point normal = e01.cross(e02).unit();
+      const Real abs_normal_0 = std::abs(normal(0));
+
+      if (!best_elem || abs_normal_0 > best_abs_normal_0)
+        {
+          best_elem = elem;
+          best_abs_normal_0 = abs_normal_0;
+
+          // Make sure that element is actually a good one, by
+          // flipping it if it's not.
+          if (abs_normal_0 == normal(0))
+            elem->flip(&bi);
+        }
+    }
+
+  // Now flood-fill from that element to get a consistent orientation
+  // for the others.
+  std::unordered_set<dof_id_type> frontier_elements{best_elem->id()},
+                                  finished_elements{};
+
+  while (!frontier_elements.empty())
+    {
+      const dof_id_type elem_id = *frontier_elements.begin();
+      Elem & elem = this->_mesh.elem_ref(elem_id);
+      for (auto s : elem.side_index_range())
+        {
+          Elem * neigh = elem.neighbor_ptr(s);
+          libmesh_assert(neigh);
+          libmesh_assert_less(neigh->which_neighbor_am_i(&elem), 3);
+
+          const Node * const n1 = elem.node_ptr(s);
+          const Node * const n2 = elem.node_ptr((s+1)%3);
+          const unsigned int i1 = neigh->local_node(n1->id());
+          const unsigned int i2 = neigh->local_node(n2->id());
+          libmesh_assert_less(i1, 3);
+          libmesh_assert_less(i2, 3);
+
+          const dof_id_type neigh_id = neigh->id();
+
+          const bool frontier_neigh = frontier_elements.count(neigh_id);
+          const bool finished_neigh = finished_elements.count(neigh_id);
+
+          // Are we flipped?
+          if ((i2 + 1)%3 != i1)
+            {
+              // Are we a Moebius strip???  We give up.
+              if (frontier_neigh || finished_neigh)
+                return integrityproblems;
+
+              neigh->flip(&bi);
+            }
+
+          if (!frontier_neigh && !finished_neigh)
+            frontier_elements.insert(neigh_id);
+        }
+
+      finished_elements.insert(elem_id);
+      frontier_elements.erase(elem_id);
+    }
+
+  this->_mesh.find_neighbors();
+
+  libmesh_assert(this->check_hull_integrity().empty());
+
+  return {};
+}
+
+
+void MeshTetInterface::process_hull_integrity_result
+  (const std::set<MeshTetInterface::SurfaceIntegrity> & result) const
 {
   std::ostringstream err_msg;
 
-  if (result != 0)
+  if (result.empty()) // success
+    return;
+
+  err_msg << "Error! Conforming Delaunay mesh tetrahedralization requires a convex hull." << std::endl;
+
+  if (result.count(NON_TRI3))
     {
-      err_msg << "Error! Conforming Delaunay mesh tetrahedralization requires a convex hull." << std::endl;
-
-      if (result==1)
-        {
-          err_msg << "Non-TRI3 elements were found in the input Mesh.  ";
-          err_msg << "A constrained Delaunay tetrahedralization requires a convex hull of TRI3 elements." << std::endl;
-        }
-
-      if (result==2)
-        {
-          err_msg << "At least one triangle without three neighbors was found in the input Mesh.  ";
-          err_msg << "A constrained Delaunay tetrahedralization must be a triangular manifold without boundary." << std::endl;
-        }
-
-      if (result==3)
-        err_msg << "The input Mesh was empty!" << std::endl;
-
-      libmesh_error_msg(err_msg.str());
+      err_msg << "At least one non-Tri3 element was found in the input boundary mesh.  ";
+      err_msg << "Our constrained Delaunay tetrahedralization boundary must be a triangulation of Tri3 elements." << std::endl;
     }
+  if (result.count(MISSING_NEIGHBOR))
+    {
+      err_msg << "At least one triangle without three neighbors was found in the input boundary mesh.  ";
+      err_msg << "A constrained Delaunay tetrahedralization boundary must be a triangular manifold without boundary." << std::endl;
+    }
+  if (result.count(EMPTY_MESH))
+    {
+      err_msg << "The input boundary mesh was empty!" << std::endl;
+      err_msg << "Our constrained Delaunay tetrahedralization boundary must be a triangulation of Tri3 elements." << std::endl;
+    }
+  if (result.count(MISSING_BACKLINK))
+    {
+      err_msg << "At least one triangle neighbor without a return neighbor link was found in the input boundary mesh.  ";
+      err_msg << "A constrained Delaunay tetrahedralization boundary must be a conforming and non-adaptively-refined mesh." << std::endl;
+    }
+  if (result.count(BAD_NEIGHBOR_NODES))
+    {
+      err_msg << "At least one triangle neighbor without expected node links was found in the input boundary mesh.  ";
+      err_msg << "A constrained Delaunay tetrahedralization boundary must be a conforming and non-adaptively-refined mesh." << std::endl;
+    }
+  if (result.count(NON_ORIENTED))
+    {
+      err_msg << "At least one triangle neighbor with an inconsistent orientation was found in the input boundary mesh.  ";
+      err_msg << "A constrained Delaunay tetrahedralization boundary must be an oriented Tri3 mesh." << std::endl;
+    }
+  if (result.count(BAD_NEIGHBOR_LINKS))
+    err_msg << "At least one triangle neighbor with inconsistent node and neighbor links was found in the input boundary mesh." << std::endl;
+  if (result.count(DEGENERATE_ELEMENT))
+    err_msg << "At least one input triangle is degenerate, with near-zero area relative to the manifold." << std::endl;
+  if (result.count(DEGENERATE_MESH))
+    err_msg << "The input mesh is degenerate, with zero thickness in at least one direction." << std::endl;
+
+  libmesh_error_msg(err_msg.str());
 }
 
 

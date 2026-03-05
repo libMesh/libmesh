@@ -92,7 +92,22 @@ public:
    */
   virtual void triangulate () = 0;
 
+  /**
+   * Sets a verbosity level, defaulting to 0 (print nothing), to be
+   * set as high as 100 (print everything).
+   *
+   * For verbosity >= 50, print all detected surface mesh integrity
+   * issues as they're found.  Subclasses may add other output at
+   * other verbosity levels.
+   */
+  void set_verbosity(unsigned int v);
+
 protected:
+
+  /**
+   * verbosity setting
+   */
+  unsigned int _verbosity;
 
   /**
    * Remove volume elements from the given mesh, after converting
@@ -104,21 +119,43 @@ protected:
   static BoundingBox volume_to_surface_mesh (UnstructuredMesh & mesh);
 
   /**
+   * Enumeration of possible surface mesh integrity issues.
+   */
+  enum SurfaceIntegrity {
+    NON_TRI3 = 1,           // a non-TRI3 element is found
+    MISSING_NEIGHBOR = 2,   // an element with a nullptr-neighbor is found
+    EMPTY_MESH = 3,         // the mesh is empty
+    MISSING_BACKLINK = 4,   // an element neighbor isn't linked back to it
+    BAD_NEIGHBOR_NODES = 5, // an element neighbor isn't linked to expected nodes
+    NON_ORIENTED = 6,       // an element neighbor has inconsistent orientation
+    BAD_NEIGHBOR_LINKS = 7, // an element neighbor has other inconsistent links
+    DEGENERATE_ELEMENT = 8, // an element has zero area
+    DEGENERATE_MESH = 9     // the mesh clearly bounds zero volume
+  };
+
+  /**
    * This function checks the integrity of the current set of
    * elements in the Mesh to see if they comprise a topological
    * manifold that (if it's also geometrically valid) would define
-   * valid hull for a tetrahedralized volume.
-   * That is:
-   * - If they are all TRI3 elements
-   * - They all have non-nullptr neighbors
+   * valid boundary for a tetrahedralized volume.
    *
-   * \returns
-   * - 0 if the mesh forms a topologically valid hull
-   * - 1 if a non-TRI3 element is found
-   * - 2 if an element with a nullptr-neighbor is found
-   * - 3 if the mesh is empty
+   * Named \p check_hull_integrity() for backward compatibility, but
+   * now accepts non-convex manifolds.
+   *
+   * \returns a set of \p  enums describing problems
+   * found, or an empty set if no problems are found.
    */
-  [[nodiscard]] unsigned int check_hull_integrity();
+  [[nodiscard]] std::set<SurfaceIntegrity> check_hull_integrity() const;
+
+  /**
+   * This function checks the integrity of the current set of
+   * elements in the Mesh, and corrects what it can.
+   *
+   * \returns A set of SurfaceIntegrity codes from \p
+   * check_hull_integrity() if there are problems it can't fix, or an
+   * empty set otherwise.
+   */
+  [[nodiscard]] std::set<SurfaceIntegrity> improve_hull_integrity();
 
   /**
    * This function prints an informative message and throws an
@@ -126,7 +163,7 @@ protected:
    * function.  It is a separate function so that you can check hull
    * integrity without exiting or catching an exception if desired.
    */
-  void process_hull_integrity_result(unsigned int result);
+  void process_hull_integrity_result(const std::set<SurfaceIntegrity> & result) const;
 
   /**
    * Delete original convex hull elements from the Mesh
@@ -162,6 +199,17 @@ protected:
    */
   std::unique_ptr<std::vector<std::unique_ptr<UnstructuredMesh>>> _holes;
 };
+
+
+// ------------------------------------------------------------
+// MeshTetInterface class member functions
+inline
+void
+MeshTetInterface::set_verbosity(unsigned int v)
+{
+  this->_verbosity = v;
+}
+
 
 } // namespace libMesh
 

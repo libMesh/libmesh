@@ -109,6 +109,11 @@ void NetGenMeshInterface::triangulate ()
            /* serial_only_needed_on_proc_0 */ true);
       }
 
+  // This should probably only be done on rank 0, but the API is
+  // designed with the hope that we'll parallelize it eventually
+  auto integrity = this->improve_hull_integrity();
+  this->process_hull_integrity_result(integrity);
+
   // If we're not rank 0, we're just going to wait for rank 0 to call
   // Netgen, then receive its data afterward, we're not going to hope
   // that Netgen does the exact same thing on every processor.
@@ -123,12 +128,15 @@ void NetGenMeshInterface::triangulate ()
       // Receive the mesh data rank 0 will send later, then fix it up
       // together
       MeshCommunication().broadcast(this->_mesh);
+
+      // If we got an empty mesh here then our tetrahedralization
+      // failed.
+      libmesh_error_msg_if (!this->_mesh.n_elem(),
+                            "NetGen failed to generate any tetrahedra");
+
       this->_mesh.prepare_for_use();
       return;
     }
-
-  auto integrity = this->check_hull_integrity();
-  this->process_hull_integrity_result(integrity);
 
   Ng_Meshing_Parameters params;
 
@@ -324,8 +332,17 @@ void NetGenMeshInterface::triangulate ()
 
   const int n_elem = Ng_GetNE(ngmesh);
 
-  libmesh_error_msg_if (n_elem <= 0,
-                        "NetGen failed to generate any tetrahedra");
+  // If Netgen fails us, we're likely to get n_elem <= 0.  This is a
+  // common enough failure from bad setups that I want to make sure
+  // it's thrown in parallel so as to not desynchronize any unit tests
+  // that trigger it.  So we'll broadcast the empty mesh to indicate
+  // the problem and enable throwing exceptions in parallel.
+  if (n_elem <= 0)
+    {
+      this->_mesh.clear();
+      MeshCommunication().broadcast(this->_mesh);
+      libmesh_error_msg ("NetGen failed to generate any tetrahedra");
+    }
 
   const dof_id_type n_points = Ng_GetNP(ngmesh);
   const dof_id_type old_nodes = this->_mesh.n_nodes();
