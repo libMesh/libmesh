@@ -410,6 +410,9 @@ void StaticCondensationDofMap::reinit()
         }
     }
 
+  // We don't want to write the reduced system
+  _reduced_system->hide_output() = true;
+
   _sc_is_initialized = true;
 }
 

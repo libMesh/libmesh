@@ -111,6 +111,7 @@ TESTS_ENVIRONMENT =  LIBMESH_DIR=$(abs_top_srcdir); export LIBMESH_DIR;
 TESTS_ENVIRONMENT += METHODS="$(METHODS)"; export METHODS;
 TESTS_ENVIRONMENT += petscmajor=@petscmajor@
 TESTS_ENVIRONMENT += petscminor=@petscminor@
+TESTS_ENVIRONMENT += enableeigen=@enableeigen@
 
 TESTS = $(check_SCRIPTS)
 

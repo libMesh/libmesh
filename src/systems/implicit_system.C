@@ -83,6 +83,10 @@ void ImplicitSystem::clear ()
   // Restore us to a "basic" state
   matrix = nullptr;
   _sc_system_matrix = nullptr;
+
+  // But our "basic" state may still have a StaticCondensation
+  if (this->has_static_condensation())
+    this->create_static_condensation_system_matrix();
 }
 
 

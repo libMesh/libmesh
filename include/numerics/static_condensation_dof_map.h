@@ -101,6 +101,11 @@ public:
    */
   const System & reduced_system() const;
 
+  /*
+   * @returns The mesh
+   */
+  const MeshBase & mesh () const { return _mesh; }
+
   /**
    * Whether we are initialized
    */
