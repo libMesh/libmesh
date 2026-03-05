@@ -221,6 +221,10 @@ int main (int argc, char** argv)
          sync_obj);
     }
 
+  // We'll need to update caches of subdomain ids too, to keep the
+  // mesh prepared.
+  mesh.cache_elem_data();
+
   // Now we set the sources of the field: prism-shaped objects that are
   // determined here by containing certain points:
   auto p_pt_lctr = mesh.sub_point_locator();
