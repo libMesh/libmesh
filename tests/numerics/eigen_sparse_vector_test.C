@@ -40,6 +40,8 @@ public:
   CPPUNIT_TEST_SUITE( EigenSparseVectorTest );
 
   NUMERICVECTORTEST
+  CPPUNIT_TEST( testSubvectors );
+  CPPUNIT_TEST( testSubvectorsBase );
 
   CPPUNIT_TEST_SUITE_END();
 };

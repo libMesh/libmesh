@@ -426,6 +426,57 @@ void EigenSparseVector<T>::pointwise_divide (const NumericVector<T> & /*vec1*/,
 }
 
 
+
+template <typename T>
+void EigenSparseVector<T>::create_subvector(NumericVector<T> & subvector,
+                                            const std::vector<numeric_index_type> & rows,
+                                            const bool /* supplying_global_rows */) const
+{
+  // Make sure the passed in subvector is really an EigenSparseVector
+  EigenSparseVector<T> * eigen_subvector = cast_ptr<EigenSparseVector<T> *>(&subvector);
+
+  // If the eigen_subvector is already initialized, we assume that the
+  // user has already allocated the *correct* amount of space for it.
+  // If not, we do so.
+  if (!eigen_subvector->initialized())
+    eigen_subvector->init(rows.size());
+
+  eigen_subvector->vec() = this->vec()(rows);
+
+  eigen_subvector->_is_closed = true;
+}
+
+
+
+template <typename T>
+std::unique_ptr<NumericVector<T>>
+EigenSparseVector<T>::get_subvector(const std::vector<numeric_index_type> & rows)
+{
+  auto returnval = std::make_unique<EigenSparseVector<T>>(this->comm(), rows.size());
+
+  // We're just going to make a copy here, since we'll be calling a
+  // restore later anyway.  Someone with more familiarity with Eigen
+  // can see if there's a way to improve this later.
+  this->create_subvector(*returnval, rows);
+
+  this->_is_closed = false;
+
+  return std::move(returnval);
+}
+
+template <typename T>
+void
+EigenSparseVector<T>::restore_subvector(std::unique_ptr<NumericVector<T>> subvector,
+                                        const std::vector<numeric_index_type> & rows)
+{
+  auto * const eigen_subvector = cast_ptr<EigenSparseVector<T> *>(subvector.get());
+
+  this->vec()(rows) = eigen_subvector->vec();
+  this->_is_closed = true;
+}
+
+
+
 template <typename T>
 Real EigenSparseVector<T>::max() const
 {
