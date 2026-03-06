@@ -1521,6 +1521,8 @@ public:
    * materials in a solid mechanics application, or regions where different
    * physical processes are important.  The subdomain mapping is independent
    * from the parallel decomposition.
+   *
+   * This relies on the mesh cached element data being prepared.
    */
   subdomain_id_type n_subdomains () const;
 
@@ -1530,6 +1532,8 @@ public:
    * materials in a solid mechanics application, or regions where different
    * physical processes are important.  The subdomain mapping is independent
    * from the parallel decomposition.
+   *
+   * This relies on the mesh cached element data being prepared.
    */
   subdomain_id_type n_local_subdomains () const;
 
