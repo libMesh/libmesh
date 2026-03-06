@@ -120,6 +120,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _elem_default_orders(other_mesh._elem_default_orders),
   _supported_nodal_order(other_mesh._supported_nodal_order),
   _mesh_subdomains(other_mesh._mesh_subdomains),
+  _mesh_local_subdomains(other_mesh._mesh_local_subdomains),
   _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
   _all_elemset_ids(other_mesh._all_elemset_ids),
   _spatial_dimension(other_mesh._spatial_dimension),
@@ -209,6 +210,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _elem_default_orders = std::move(other_mesh.elem_default_orders());
   _supported_nodal_order = other_mesh.supported_nodal_order();
   _mesh_subdomains = other_mesh._mesh_subdomains;
+  _mesh_local_subdomains = other_mesh._mesh_local_subdomains;
   _elemset_codes = std::move(other_mesh._elemset_codes);
   _elemset_codes_inverse_map = std::move(other_mesh._elemset_codes_inverse_map);
   _all_elemset_ids = std::move(other_mesh._all_elemset_ids);
@@ -324,6 +326,8 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (_supported_nodal_order != other_mesh._supported_nodal_order)
     return false;
   if (_mesh_subdomains != other_mesh._mesh_subdomains)
+    return false;
+  if (_mesh_local_subdomains != other_mesh._mesh_local_subdomains)
     return false;
   if (_all_elemset_ids != other_mesh._all_elemset_ids)
     return false;
@@ -1112,6 +1116,16 @@ void MeshBase::redistribute()
 
 
 
+void MeshBase::update_post_partitioning()
+{
+  _mesh_local_subdomains.clear();
+
+  for (const Elem * elem : this->active_local_element_ptr_range())
+    _mesh_local_subdomains.insert(elem->subdomain_id());
+}
+
+
+
 subdomain_id_type MeshBase::n_subdomains() const
 {
   // This requires an inspection on every processor
@@ -1860,6 +1874,7 @@ void MeshBase::cache_elem_data()
   _elem_dims.clear();
   _elem_default_orders.clear();
   _mesh_subdomains.clear();
+  _mesh_local_subdomains.clear();
   _supported_nodal_order = MAXIMUM;
 
   for (const auto & elem : this->active_element_ptr_range())
@@ -1867,6 +1882,8 @@ void MeshBase::cache_elem_data()
     _elem_dims.insert(cast_int<unsigned char>(elem->dim()));
     _elem_default_orders.insert(elem->default_order());
     _mesh_subdomains.insert(elem->subdomain_id());
+    if (elem->processor_id() == this->processor_id())
+      _mesh_local_subdomains.insert(elem->subdomain_id());
     _supported_nodal_order =
       static_cast<Order>
         (std::min(static_cast<int>(_supported_nodal_order),
@@ -2220,6 +2237,7 @@ MeshBase::copy_cached_data(const MeshBase & other_mesh)
   this->_elem_default_orders = other_mesh._elem_default_orders;
   this->_supported_nodal_order = other_mesh._supported_nodal_order;
   this->_mesh_subdomains = other_mesh._mesh_subdomains;
+  this->_mesh_local_subdomains = other_mesh._mesh_local_subdomains;
 }
 
 
@@ -2474,6 +2492,7 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
           (std::min(static_cast<int>(this->_supported_nodal_order),
                     static_cast<int>(added_elem->supported_nodal_order())));
       this->_mesh_subdomains.insert(new_sbd_id);
+      this->_mesh_local_subdomains.insert(new_sbd_id);
       node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
       existing_unconstrained_columns.emplace(j,n->id());
 
