@@ -54,6 +54,26 @@
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
 
+namespace {
+
+struct SBDInserter {
+  std::set<subdomain_id_type> my_ids;
+
+  SBDInserter () {}
+  SBDInserter (SBDInserter &, Threads::split) {}
+
+  void operator()(const ConstElemRange & range) {
+    for (const Elem * elem : range)
+      my_ids.insert(elem->subdomain_id());
+  }
+
+  void join(SBDInserter & other) {
+    my_ids.merge(other.my_ids);
+  }
+};
+
+}
+
 namespace libMesh
 {
 
@@ -1129,42 +1149,12 @@ void MeshBase::remove_ghosting_functor(GhostingFunctor & ghosting_functor)
 
 void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids, const bool global /* = true */) const
 {
-  // This requires an inspection on every processor
-  if (global)
-    parallel_object_only();
-
-  struct SBDInserter {
-    std::set<subdomain_id_type> my_ids;
-
-    SBDInserter () {}
-    SBDInserter (SBDInserter &, Threads::split) {}
-
-    void operator()(const ConstElemRange & range) {
-      for (const Elem * elem : range)
-        my_ids.insert(elem->subdomain_id());
-    }
-
-    void join(SBDInserter & other) {
-      my_ids.merge(other.my_ids);
-    }
-  };
-
-  SBDInserter inserter;
-  Threads::parallel_reduce(this->active_local_element_stored_range(), inserter);
-
-  ids.swap(inserter.my_ids);
+  libmesh_assert(this->preparation().has_cached_elem_data);
 
   if (global)
-    {
-      // Only include the unpartitioned elements if the user requests the global IDs.
-      // In the case of the local subdomain IDs, it doesn't make sense to include the
-      // unpartitioned elements because said elements do not have a sense of locality.
-      for (const auto & elem : this->active_unpartitioned_element_ptr_range())
-        ids.insert(elem->subdomain_id());
-
-      // Some subdomains may only live on other processors
-      this->comm().set_union(ids);
-    }
+    ids = this->get_mesh_subdomains();
+  else
+    ids = this->get_mesh_local_subdomains();
 }
 
 
@@ -1187,24 +1177,18 @@ void MeshBase::update_post_partitioning()
   // over local elements is obsolete if our partitioner changed the
   // definition of "local".
   _const_active_local_element_stored_range.reset(nullptr);
-  _mesh_local_subdomains.clear();
 
-  for (const Elem * elem : this->active_local_element_ptr_range())
-    _mesh_local_subdomains.insert(elem->subdomain_id());
+  SBDInserter inserter;
+  Threads::parallel_reduce(this->active_local_element_stored_range(), inserter);
+
+  _mesh_local_subdomains.swap(inserter.my_ids);
 }
 
 
 
 subdomain_id_type MeshBase::n_subdomains() const
 {
-  // This requires an inspection on every processor
-  parallel_object_only();
-
-  std::set<subdomain_id_type> ids;
-
-  this->subdomain_ids (ids);
-
-  return cast_int<subdomain_id_type>(ids.size());
+  return cast_int<subdomain_id_type>(this->get_mesh_subdomains().size());
 }
 
 
