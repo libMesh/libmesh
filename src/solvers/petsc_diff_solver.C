@@ -259,7 +259,14 @@ DiffSolver::SolveResult convert_solve_result(SNESConvergedReason r)
       return DiffSolver::CONVERGED_NO_REASON;
     case SNES_DIVERGED_FUNCTION_DOMAIN:
     case SNES_DIVERGED_FUNCTION_COUNT:
+#if PETSC_VERSION_LESS_THAN(3,25,0)
     case SNES_DIVERGED_FNORM_NAN:
+#else
+    case SNES_DIVERGED_FUNCTION_NANORINF:
+#endif
+#if !PETSC_VERSION_LESS_THAN(3,12,0)
+    case SNES_DIVERGED_TR_DELTA:
+#endif
     case SNES_DIVERGED_INNER:
     case SNES_DIVERGED_LINEAR_SOLVE:
     case SNES_DIVERGED_LOCAL_MIN:
