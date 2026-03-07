@@ -1060,7 +1060,7 @@ void DistributedMesh::redistribute ()
 
 void DistributedMesh::update_post_partitioning ()
 {
-  // this->recalculate_n_partitions();
+  this->UnstructuredMesh::update_post_partitioning();
 
   // Partitioning changes our numbers of unpartitioned objects
   this->update_parallel_id_counts();
