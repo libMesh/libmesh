@@ -38,6 +38,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/static_condensation.h"
+#include "libmesh/static_condensation_dof_map.h"
 
 // includes for calculate_norm, point_*
 #include "libmesh/fe_base.h"
@@ -184,6 +185,10 @@ void System::clear ()
   // clear any user-added matrices
   _matrices.clear();
   _matrices_initialized = false;
+
+  // But our "basic"/"null" state may still have a StaticCondensation
+  if (libMesh::on_command_line("--" + _sys_name + "-static-condensation"))
+    this->create_static_condensation();
 }
 
 
@@ -1039,16 +1044,15 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
 {
   parallel_object_only();
 
-  libmesh_assert(this->comm().verify(std::string(mat_name)));
+  const std::string namestr{mat_name};
+
+  libmesh_assert(this->comm().verify(namestr));
   libmesh_assert(this->comm().verify(int(type)));
 
-  auto [it, inserted] = _matrices.emplace(mat_name, std::move(matrix));
-  libmesh_error_msg_if(!inserted,
-                       "Tried to add '" << mat_name << "' but the matrix already exists");
+  SparseMatrix<Number> & mat = *matrix;
 
-  _matrix_types.emplace(mat_name, type);
-
-  SparseMatrix<Number> & mat = *(it->second);
+  _matrices[namestr] = std::move(matrix);
+  _matrix_types[namestr] = type;
 
   // Initialize it first if we've already initialized the others.
   this->late_matrix_init(mat, type);
@@ -1887,14 +1891,20 @@ std::string System::get_info() const
       dof_id_type local_dofs = this->n_local_dofs();
       oss << "    n_local_dofs()="       << local_dofs                 << '\n';
       this->comm().max(local_dofs);
-      oss << "    max(n_local_dofs())="       << local_dofs                 << '\n';
+      oss << "    max(n_local_dofs())="  << local_dofs                 << '\n';
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
-      oss << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
-      oss << "    n_local_constrained_dofs()=" << this->n_local_constrained_dofs() << '\n';
-      dof_id_type local_unconstrained_dofs = this->n_local_dofs() - this->n_local_constrained_dofs();
-      this->comm().max(local_unconstrained_dofs);
-      oss << "    max(local unconstrained dofs)=" << local_unconstrained_dofs << '\n';
+      if (this->n_constrained_dofs())
+        {
+          oss << "    n_constrained_dofs()=" << this->n_constrained_dofs() << '\n';
+          oss << "    n_local_constrained_dofs()=" << this->n_local_constrained_dofs() << '\n';
+          dof_id_type local_unconstrained_dofs = this->n_local_dofs() - this->n_local_constrained_dofs();
+          this->comm().max(local_unconstrained_dofs);
+          oss << "    max(local unconstrained dofs)=" << local_unconstrained_dofs << '\n';
+        }
 #endif
+      if (this->has_static_condensation())
+        oss << "    n uncondensed dofs="
+            << this->get_dof_map().get_static_condensation().n_dofs() << '\n';
     }
   else
     oss << "    (still uninitialized)\n";

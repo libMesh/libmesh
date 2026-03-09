@@ -153,5 +153,6 @@ AC_DEFUN([CONFIGURE_EIGEN],
         ])
 
   dnl Substitute the substitution variables
+  AC_SUBST(enableeigen)
   AC_SUBST(EIGEN_INCLUDE)
 ])

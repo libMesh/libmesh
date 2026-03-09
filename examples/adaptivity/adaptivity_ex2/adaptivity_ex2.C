@@ -42,11 +42,12 @@
 #include "libmesh/libmesh.h"
 #include "libmesh/replicated_mesh.h"
 #include "libmesh/mesh_refinement.h"
-#include "libmesh/gmv_io.h"
+#include "libmesh/exodusII_io.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/static_condensation.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dense_matrix.h"
@@ -206,10 +207,24 @@ int main (int argc, char ** argv)
       mesh.read ("mesh.xda");
 
       // Again do a search on the command line for an argument
-      const unsigned int n_refinements = 5;
+      const int order =
+        libMesh::command_line_next("-order", 1);
+
+      // If we need a higher-order variable, we'll need second-order
+      // geometric elements to store edge DoFs.  In 2D every
+      // second-order geometric can support every polynomial degree
+      // (even higher-than-second), but we'll leave the 3D-compatible
+      // thing in comments here for didactic purposes.
+      //if (order > 2)
+      //  mesh.all_complete_order();
+      //else
+      if (order > 1)
+        mesh.all_second_order();
+
+      const unsigned int n_refinements =
         libMesh::command_line_next("-n_refinements", 5);
 
-      // Uniformly refine the mesh 5 times
+      // Uniformly refine the mesh n times
       if (!read_solution)
         mesh_refinement.uniformly_refine (n_refinements);
 
@@ -223,8 +238,10 @@ int main (int argc, char ** argv)
         equation_systems.add_system<TransientLinearImplicitSystem>("Convection-Diffusion");
 
       // Adds the variable "u" to "Convection-Diffusion".  "u"
-      // will be approximated using first-order approximation.
-      system.add_variable ("u", FIRST);
+      // will be approximated using first- or second-order
+      // approximation.  For higher than second-order FE we need a
+      // non-Lagrange type.
+      system.add_variable ("u", Order(order), order > 2 ? HIERARCHIC : LAGRANGE);
 
       // Give the system a pointer to the matrix assembly
       // and initialization functions.
@@ -273,10 +290,10 @@ int main (int argc, char ** argv)
 
   if (!read_solution)
     // Write out the initial condition
-    GMVIO(mesh).write_equation_systems ("out.gmv.000", equation_systems);
+    ExodusII_IO(mesh).write_equation_systems ("out.e.000", equation_systems);
   else
     // Write out the solution that was read in
-    GMVIO(mesh).write_equation_systems ("solution_read_in.gmv", equation_systems);
+    ExodusII_IO(mesh).write_equation_systems ("solution_read_in.e", equation_systems);
 
   // The Convection-Diffusion system requires that we specify
   // the flow velocity.  We will specify it as a RealVectorValue
@@ -303,6 +320,13 @@ int main (int argc, char ** argv)
 
   const Real dt = 0.025;
   system.time = init_timestep*dt;
+
+  // We're going to refine and coarsen based on some heuristics.
+  const Real refine_fraction =
+    libMesh::command_line_next("-refine_fraction", 0.80);
+
+  const Real coarsen_fraction =
+    libMesh::command_line_next("-coarsen_fraction", 0.07);
 
   // We do 25 timesteps both before and after writing out the
   // intermediate solution
@@ -394,8 +418,8 @@ int main (int argc, char ** argv)
               // be coarsened. Note that the elements flagged for refinement
               // will be refined, but those flagged for coarsening _might_ be
               // coarsened.
-              mesh_refinement.refine_fraction() = 0.80;
-              mesh_refinement.coarsen_fraction() = 0.07;
+              mesh_refinement.refine_fraction() = refine_fraction;
+              mesh_refinement.coarsen_fraction() = coarsen_fraction;
               mesh_refinement.max_h_level() = max_h_level;
               mesh_refinement.flag_elements_by_error_fraction (error);
 
@@ -416,18 +440,21 @@ int main (int argc, char ** argv)
       const unsigned int output_freq =
         libMesh::command_line_next("-output_freq", 10);
 
-      // Output every 10 timesteps to file.
+      // Every N timesteps, output solutions to file and summaries to
+      // the console.
       if ((t_step+1)%output_freq == 0)
         {
+          equation_systems.print_info();
+
           std::ostringstream file_name;
 
-          file_name << "out.gmv."
+          file_name << "out.e."
                     << std::setw(3)
                     << std::setfill('0')
                     << std::right
                     << t_step+1;
 
-          GMVIO(mesh).write_equation_systems (file_name.str(),
+          ExodusII_IO(mesh).write_equation_systems (file_name.str(),
                                               equation_systems);
         }
     }
@@ -441,8 +468,8 @@ int main (int argc, char ** argv)
 
       mesh.write("saved_mesh.xda");
       equation_systems.write("saved_solution.xda", WRITE);
-      GMVIO(mesh).write_equation_systems ("saved_solution.gmv",
-                                          equation_systems);
+      ExodusII_IO(mesh).write_equation_systems ("saved_solution.e",
+                                                equation_systems);
     }
 #endif // #ifndef LIBMESH_ENABLE_AMR
 
@@ -493,6 +520,11 @@ void assemble_cd (EquationSystems & es,
   // Get a reference to the Convection-Diffusion system object.
   TransientLinearImplicitSystem & system =
     es.get_system<TransientLinearImplicitSystem> ("Convection-Diffusion");
+
+  // Get a pointer to the StaticCondensation class if it exists
+  StaticCondensation * sc = nullptr;
+  if (system.has_static_condensation())
+    sc = &system.get_static_condensation();
 
   // Get the Finite Element type for the first (and only)
   // variable in the system.
@@ -702,6 +734,9 @@ void assemble_cd (EquationSystems & es,
       // DofMap::constrain_element_matrix_and_vector() method does
       // just that.
       dof_map.constrain_element_matrix_and_vector (Ke, Fe, dof_indices);
+
+      if (sc)
+        sc->set_current_elem(*elem);
 
       // The element matrix and right-hand-side are now built
       // for this element.  Add them to the global matrix and
