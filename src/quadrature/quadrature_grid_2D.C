@@ -63,7 +63,7 @@ void QGrid::init_2D()
       {
         const unsigned int np = (_order + 1)*(_order + 2)/2;
         const Real weight = Real(0.5)/np;
-        const Real dx = Real(1)/(_order+1);
+        const Real dx = Real(1)/(static_cast<int>(_order)+1);
         _points.resize(np);
         _weights.resize(np);
 
