@@ -173,7 +173,7 @@ public:
       for (auto get_not_create : {false, true})
         {
           // We don't have such an option?
-          if (get_not_create && !supplying_global_rows)
+          if (get_not_create && supplying_global_rows)
             continue;
 
           for (libMesh::dof_id_type n=first; n != last; n++)
@@ -221,6 +221,7 @@ public:
 
           for (libMesh::dof_id_type n=sub_first; n != sub_last; n++)
             s.set(n, (my_comm->rank()+1) * n);
+          s.close();
 
           // If we "get" a subvector then we're set up to "restore" it
           // afterwards; if not then we're done.
