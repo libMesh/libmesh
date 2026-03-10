@@ -461,7 +461,7 @@ EigenSparseVector<T>::get_subvector(const std::vector<numeric_index_type> & rows
 
   this->_is_closed = false;
 
-  return std::move(returnval);
+  return returnval;
 }
 
 template <typename T>
