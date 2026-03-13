@@ -228,6 +228,7 @@ void NameBasedIO::read (const std::string & name)
             TetGenIO(mymesh).read (new_name);
 
           else if (contains(basename, ".exd") ||
+                   contains(basename, ".exo") ||
                    contains(basename, ".e"))
             ExodusII_IO(mymesh).read (new_name);
 
@@ -382,6 +383,7 @@ void NameBasedIO::write (const std::string & name)
             }
 
         else if (contains(basename, ".exd") ||
+                 contains(basename, ".exo") ||
                  contains(basename, ".e"))
           ExodusII_IO(mymesh).write(new_name);
 
@@ -480,6 +482,7 @@ void NameBasedIO::write_nodal_data (const std::string & name,
     TecplotIO(mymesh).write_nodal_data (name, v, vn);
 
   else if (contains(name, ".exd") ||
+           contains(name, ".exo") ||
            contains(name, ".e"))
     ExodusII_IO(mymesh).write_nodal_data(name, v, vn);
 
