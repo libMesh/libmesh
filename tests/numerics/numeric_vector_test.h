@@ -7,6 +7,7 @@
 // libMesh includes
 #include <libmesh/parallel.h>
 #include <libmesh/fuzzy_equals.h>
+#include <libmesh/int_range.h>
 
 #include "libmesh_cppunit.h"
 
@@ -25,6 +26,10 @@
   CPPUNIT_TEST( testOperationsBase );           \
   CPPUNIT_TEST( testWriteAndRead );             \
   CPPUNIT_TEST( testWriteAndReadBase );
+
+// Tests to add manually, on subclasses supporting them
+//  CPPUNIT_TEST( testSubvectors );
+//  CPPUNIT_TEST( testSubvectorsBase );
 
 
 template <class DerivedClass>
@@ -148,6 +153,98 @@ public:
     LIBMESH_ASSERT_NUMBERS_EQUAL
       (v.dot(vorig), libMesh::Real(global_size),
        libMesh::TOLERANCE*libMesh::TOLERANCE);
+  }
+
+
+  template <class Base, class Derived>
+  void Subvectors()
+  {
+    auto v_ptr = std::make_unique<Derived>(*my_comm, global_size, local_size);
+    Base & v = *v_ptr;
+
+    const libMesh::dof_id_type
+      first = v.first_local_index(),
+      last  = v.last_local_index();
+
+    const unsigned int sub_local_size = block_size/2;
+    const unsigned int sub_global_size = sub_local_size * my_comm->size();
+
+    for (auto supplying_global_rows : {false, true})
+      for (auto get_not_create : {false, true})
+        {
+          // We don't have such an option?
+          if (get_not_create && supplying_global_rows)
+            continue;
+
+          for (libMesh::dof_id_type n=first; n != last; n++)
+            v.set (n, static_cast<libMesh::Number>(n+1));
+          v.close();
+
+          std::unique_ptr<Base> s_ptr =
+            std::make_unique<Derived>(*my_comm, sub_global_size,
+                                      sub_local_size);
+
+          const libMesh::dof_id_type
+            sub_first = s_ptr->first_local_index(),
+            sub_last  = s_ptr->last_local_index();
+
+          CPPUNIT_ASSERT_EQUAL
+            (sub_first, libMesh::dof_id_type(sub_local_size *
+                                             my_comm->rank()));
+
+          CPPUNIT_ASSERT_EQUAL
+            (sub_last, libMesh::dof_id_type(sub_local_size *
+                                            (my_comm->rank()+1)));
+
+          std::vector<libMesh::dof_id_type> rows;
+          for (auto i : libMesh::make_range(sub_local_size))
+            rows.push_back(first+2*i);
+
+          if (supplying_global_rows)
+            my_comm->allgather(rows);
+
+          if (get_not_create)
+            {
+              libMesh::NumericVector<libMesh::Number> * subvec_ptr =
+                v.get_subvector(rows).release();
+              s_ptr.reset(dynamic_cast<Base *>(subvec_ptr));
+            }
+          else
+            v.create_subvector(*s_ptr, rows, supplying_global_rows);
+
+          Base & s = *s_ptr;
+
+          for (auto i : libMesh::make_range(sub_local_size))
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (s(sub_first+i), libMesh::Real(first+2*i+1),
+               libMesh::TOLERANCE*libMesh::TOLERANCE);
+
+          for (libMesh::dof_id_type n=sub_first; n != sub_last; n++)
+            s.set(n, (my_comm->rank()+1) * n);
+          s.close();
+
+          // If we "get" a subvector then we're set up to "restore" it
+          // afterwards; if not then we're done.
+          if (!get_not_create)
+            continue;
+
+          v.restore_subvector(std::move(s_ptr), rows);
+
+          for (libMesh::dof_id_type n=first; n != last; n++)
+            {
+              const libMesh::dof_id_type offset = n - first;
+              if (offset < 2*sub_local_size && !(offset%2))
+                LIBMESH_ASSERT_NUMBERS_EQUAL
+                  (v(n),
+                   libMesh::Real((my_comm->rank()+1) *
+                                 ((offset/2) + sub_first)),
+                   libMesh::TOLERANCE*libMesh::TOLERANCE);
+              else
+                LIBMESH_ASSERT_NUMBERS_EQUAL
+                  (v(n), libMesh::Real(n+1),
+                   libMesh::TOLERANCE*libMesh::TOLERANCE);
+            }
+        }
   }
 
   template <class Base, class Derived>
@@ -404,6 +501,20 @@ public:
     LOG_UNIT_TEST;
 
     Operations<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
+  }
+
+  void testSubvectors()
+  {
+    LOG_UNIT_TEST;
+
+    Subvectors<DerivedClass,DerivedClass >();
+  }
+
+  void testSubvectorsBase()
+  {
+    LOG_UNIT_TEST;
+
+    Subvectors<libMesh::NumericVector<libMesh::Number>,DerivedClass>();
   }
 
   void testWriteAndRead()

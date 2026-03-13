@@ -22,8 +22,9 @@ public:
   NUMERICVECTORTEST
 
   CPPUNIT_TEST( testGetArray );
-
   CPPUNIT_TEST( testPetscOperations );
+  CPPUNIT_TEST( testSubvectors );
+  CPPUNIT_TEST( testSubvectorsBase );
 
   CPPUNIT_TEST_SUITE_END();
 
