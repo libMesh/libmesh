@@ -2050,6 +2050,7 @@ void BoundaryInfo::remove_node_id (boundary_id_type id, const bool global)
       !_shellface_boundary_ids.count(id))
     _boundary_ids.erase(id);
 
+  _ns_id_to_name.erase(id);
   if (global)
     {
       bool someone_has_it = _boundary_ids.count(id);
