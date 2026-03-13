@@ -232,8 +232,8 @@ int main(int argc, char ** argv)
 
 #ifdef LIBMESH_HAVE_EXODUS_API
   // If we have Exodus, use the same base output filename
-  std::string exd_file = output_file;
-  exd_file += ".e";
+  std::string exodus_file = output_file;
+  exodus_file += ".e";
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
   output_file += ".m";
@@ -461,7 +461,7 @@ int main(int argc, char ** argv)
 #ifdef LIBMESH_HAVE_EXODUS_API
   // After solving the system write the solution
   // to a ExodusII-formatted plot file.
-  ExodusII_IO (mesh).write_equation_systems (exd_file,
+  ExodusII_IO (mesh).write_equation_systems (exodus_file,
                                              equation_systems);
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 

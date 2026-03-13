@@ -40,9 +40,7 @@ class System;
 
 /**
  * The \p ExodusII_IO class implements reading meshes in the
- * \p ExodusII file format from Sandia National Labs.  By
- * default, LibMesh expects ExodusII files to have a ".exd"
- * or ".e" file extension.
+ * \p ExodusII file format from Sandia National Labs.
  *
  * \author Benjamin Kirk
  * \author John Peterson
