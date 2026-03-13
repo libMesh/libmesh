@@ -266,7 +266,7 @@ void NameBasedIO::read (const std::string & name)
                                 << "     *.cpa  -- libMesh Checkpoint ASCII format\n" \
                                 << "     *.cpr  -- libMesh Checkpoint binary format\n" \
                                 << "     *.e    -- Sandia's ExodusII format\n" \
-                                << "     *.exd  -- Sandia's ExodusII format\n" \
+                                << "     *.exo  -- Sandia's ExodusII format\n" \
                                 << "     *.gmv  -- LANL's General Mesh Viewer format\n" \
                                 << "     *.inp  -- Abaqus .inp format\n" \
                                 << "     *.mat  -- Matlab triangular ASCII file\n" \
@@ -417,7 +417,7 @@ void NameBasedIO::write (const std::string & name)
               << "     *.cpr   -- libMesh binary checkpoint format,\n"
               << "     *.dat   -- Tecplot ASCII file\n"
               << "     *.e     -- Sandia's ExodusII format\n"
-              << "     *.exd   -- Sandia's ExodusII format\n"
+              << "     *.exo   -- Sandia's ExodusII format\n"
               << "     *.fro   -- ACDL's surface triangulation file\n"
               << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
               << "     *.mesh  -- MEdit mesh format\n"
@@ -524,7 +524,7 @@ void NameBasedIO::write_nodal_data (const std::string & name,
         << "\n   I understand the following:\n\n"
         << "     *.dat  -- Tecplot ASCII file\n"
         << "     *.e    -- Sandia's ExodusII format\n"
-        << "     *.exd  -- Sandia's ExodusII format\n"
+        << "     *.exo  -- Sandia's ExodusII format\n"
         << "     *.gmv  -- LANL's GMV (General Mesh Viewer) format\n"
         << "     *.mesh -- MEdit mesh format\n"
         << "     *.msh  -- GMSH ASCII file\n"

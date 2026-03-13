@@ -55,7 +55,7 @@
  *
  *  - Mesh IO & Format Translation Utilities
  *    - Ideas Universal (UNV) format (.unv) with support for reading nodal data from 2414 datasets.
- *    - Sandia National Labs ExodusII format (.exd)
+ *    - Sandia National Labs ExodusII format (.exo)
  *    - Amtec Engineering's Tecplot binary format (.plt)
  *    - Amtec Engineering's Tecplot ascii format (.dat)
  *    - Los Alamos National Labs GMV format (.gmv)

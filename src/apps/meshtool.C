@@ -668,7 +668,7 @@ void usage(const std::string & prog_name)
            << "     *.cpa   -- libMesh ASCII checkpoint format\n"
            << "     *.cpr   -- libMesh binary checkpoint format,\n"
            << "     *.e     -- Sandia's ExodusII format\n"
-           << "     *.exd   -- Sandia's ExodusII format\n"
+           << "     *.exo   -- Sandia's ExodusII format\n"
            << "     *.gmv   -- LANL's GMV (General Mesh Viewer) format\n"
            << "     *.mesh  -- MEdit mesh format\n"
            << "     *.msh   -- GMSH ASCII file\n"
