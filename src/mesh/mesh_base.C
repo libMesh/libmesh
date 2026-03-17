@@ -2685,7 +2685,6 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
           (std::min(static_cast<int>(this->_supported_nodal_order),
                     static_cast<int>(added_elem->supported_nodal_order())));
       this->_mesh_subdomains.insert(new_sbd_id);
-      this->_mesh_local_subdomains.insert(new_sbd_id);
       node_to_elem_ptrs.emplace(n, std::make_pair(added_elem->id(), 0));
       existing_unconstrained_columns.emplace(j,n->id());
 
@@ -2693,13 +2692,18 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
       // DistributedMesh doesn't get confused and think you're not
       // adding them on all processors at once.
       int n_pids = 0;
+      processor_id_type best_pid = DofObject::invalid_processor_id;
       for (auto [pid, count] : pids)
         if (count >= n_pids)
           {
             n_pids = count;
-            added_elem->processor_id() = pid;
-            n->processor_id() = pid;
+            best_pid = pid;
           }
+      libmesh_assert_not_equal_to(best_pid, DofObject::invalid_processor_id);
+      added_elem->processor_id() = best_pid;
+      n->processor_id() = best_pid;
+      if (this->processor_id() == best_pid)
+        this->_mesh_local_subdomains.insert(new_sbd_id);
     }
 
   // Calculate constraint rows in an indexed form that's easy for us
