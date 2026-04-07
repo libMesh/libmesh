@@ -431,6 +431,9 @@
 /* Define if HDF5 is available */
 #undef HAVE_HDF5
 
+/* Define if Kokkos support is enabled in libMesh */
+#undef HAVE_KOKKOS
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 

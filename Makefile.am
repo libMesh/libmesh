@@ -257,6 +257,13 @@ SUBDIRS += contrib
 
 include src/libmesh_SOURCES
 
+# When Kokkos support is enabled, add the Kokkos FE type-conversion sources.
+# These are kept in src/kokkos/ and not in src/libmesh_SOURCES (which is
+# auto-generated) so that they don't affect non-Kokkos builds.
+if LIBMESH_ENABLE_KOKKOS
+  libmesh_SOURCES += src/kokkos/fe_types.C
+endif
+
 # A convenience library to hold proper libMesh
 # objects.  This will get appended with any contributed
 # sources to create the final library.

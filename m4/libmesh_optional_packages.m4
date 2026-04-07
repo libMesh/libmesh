@@ -861,6 +861,38 @@ AM_CONDITIONAL(LIBMESH_ENABLE_METAPHYSICL, test x$enablemetaphysicl = xyes)
 
 
 
+# -------------------------------------------------------------
+# Kokkos -- optional, enables the native Kokkos FE math path
+# -------------------------------------------------------------
+AC_ARG_WITH([kokkos],
+  AS_HELP_STRING([--with-kokkos=DIR],
+                 [Enable Kokkos support using the installation at DIR]),
+  [KOKKOS_DIR="$withval"],
+  [KOKKOS_DIR="no"])
+
+AS_IF([test "x$KOKKOS_DIR" != "xno"],
+  [
+    AC_CHECK_FILE([$KOKKOS_DIR/include/Kokkos_Core.hpp],
+      [
+        enablekokkos=yes
+        libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I$KOKKOS_DIR/include"
+        libmesh_optional_LIBS="$libmesh_optional_LIBS -L$KOKKOS_DIR/lib -lkokkoscore"
+        AC_DEFINE([LIBMESH_HAVE_KOKKOS], [1],
+                  [Define if Kokkos support is enabled in libMesh])
+        AC_MSG_RESULT(<<< Configuring library with Kokkos support >>>)
+      ],
+      [
+        AC_MSG_WARN([Kokkos not found at $KOKKOS_DIR -- disabling Kokkos FE support])
+        enablekokkos=no
+      ])
+  ],
+  [enablekokkos=no])
+
+AM_CONDITIONAL(LIBMESH_ENABLE_KOKKOS, test x$enablekokkos = xyes)
+# -------------------------------------------------------------
+
+
+
 AS_IF([test "$enableoptional" != no],
       [
         AC_MSG_RESULT(----------------------------------------------)
