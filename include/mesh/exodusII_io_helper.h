@@ -307,6 +307,18 @@ public:
                                  std::map<dof_id_type, Real> & elem_var_value_map);
 
   /**
+   * Reads element "extra integer" values, using the variable names
+   * specified in \p extra_integer_var_names, and converting the
+   * stored values to integer format.  The returned value is a vector
+   * (indexed in the same way as extra_integer_vars) of maps from
+   * element id to extra integer value.
+   *
+   * Currently values from the last time step are used.
+   */
+  std::vector<std::map<dof_id_type, dof_id_type>> read_extra_integers(
+    const std::vector<std::string> & extra_integer_var_names);
+
+  /**
    * Helper function that takes a (1-based) Exodus node/elem id and
    * determines the corresponding libMesh Node/Elem id. Takes into account
    * whether the user has chosen to set the Node/Elem unique ids based on
@@ -942,36 +954,22 @@ public:
    * each processor.  This plus a node id gives a valid nodal solution
    * vector index.
    */
-  dof_id_type node_id_to_vec_id(dof_id_type n) const
-  {
-    if (_added_side_node_offsets.empty())
-      return n;
-
-    // Find the processor id that has node_id in the parallel vec
-    const auto lb = std::upper_bound(_true_node_offsets.begin(),
-                                     _true_node_offsets.end(), n);
-    libmesh_assert(lb != _true_node_offsets.end());
-    const processor_id_type p = lb - _true_node_offsets.begin();
-
-    return n + (p ? _added_side_node_offsets[p-1] : 0);
-  }
+  dof_id_type node_id_to_vec_id(dof_id_type n) const;
 
   /*
    * Returns the sum of both added node "offsets" on processors 0
    * through p-1 and real nodes added on processors 0 to p.
    * This is the starting index for added nodes' data.
    */
-  dof_id_type added_node_offset_on(processor_id_type p) const
-  {
-    libmesh_assert (p < _true_node_offsets.size());
-    const dof_id_type added_node_offsets =
-      (_added_side_node_offsets.empty() || !p) ? 0 :
-      _added_side_node_offsets[p-1];
-    return _true_node_offsets[p] + added_node_offsets;
-  }
-
+  dof_id_type added_node_offset_on(processor_id_type p) const;
 
 protected:
+  /**
+   * Calculate _added_side_node_offsets needed to add "fake" side
+   * elements to the given mesh
+   */
+  void calculate_added_side_node_offsets(const MeshBase & mesh);
+
   /**
    * When appending: during initialization, check that variable names
    * in the file match those you attempt to initialize with.
@@ -1104,13 +1102,28 @@ protected:
                                    int & count,
                                    std::vector<std::string> & result);
 
-private:
-
   /**
    * Set to true iff we want to write separate "side" elements too.
    */
   bool _add_sides = false;
 
+  /**
+   * Map of subdomains to element numbers.
+   */
+  std::map<subdomain_id_type, std::vector<dof_id_type>> _subdomain_map;
+
+  /**
+   * One beyond the last "real" subdomain id, in cases where we have
+   * "fake" subdomain ids for added sides
+   */
+  subdomain_id_type _subdomain_id_end;
+
+  /**
+   * Method for constructing _subdomain_map
+   */
+  void build_subdomain_map(const MeshBase & mesh, bool local);
+
+private:
   /**
    * write_var_names() dispatches to this function.
    */

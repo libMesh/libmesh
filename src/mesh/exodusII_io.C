@@ -406,13 +406,11 @@ void ExodusII_IO::read (const std::string & fname)
   // have already been attached to spline control nodes.
   mesh.reserve_elem(exio_helper->w.size() + exio_helper->num_elem);
 
-  // Read variables for extra integer IDs
-  std::vector<std::map<dof_id_type, Real>> elem_ids(extra_ids.size());
-  // We use the last time step to load the IDs
   exio_helper->read_num_time_steps();
-  unsigned int last_step = exio_helper->num_time_steps;
-  for (auto i : index_range(extra_ids))
-    exio_helper->read_elemental_var_values(_extra_integer_vars[i], last_step, elem_ids[i]);
+
+  // Read variables for extra integer IDs
+  auto extra_integer_values =
+    exio_helper->read_extra_integers(_extra_integer_vars);
 
   // Read in the element connectivity for each block.
   int nelem_last_block = 0;
@@ -504,44 +502,7 @@ void ExodusII_IO::read (const std::string & fname)
 
           // Assign extra integer IDs
           for (auto & id : extra_ids)
-          {
-            const Real v = elem_ids[id][elem->id()];
-
-            if (v == Real(-1))
-              {
-                elem->set_extra_integer(id, DofObject::invalid_id);
-                continue;
-              }
-
-            // Ignore FE_INVALID here even if we've enabled FPEs; a
-            // thrown exception is preferred over an FPE signal.
-            FPEDisabler disable_fpes;
-            const long long iv = std::llround(v);
-
-            // Check if the real number is outside of the range we can
-            // convert exactly
-
-            long long max_representation = 1;
-            max_representation = (max_representation << std::min(std::numeric_limits<Real>::digits,
-                                                                 std::numeric_limits<double>::digits));
-            libmesh_error_msg_if(iv > max_representation,
-                                 "Error! An element integer value higher than "
-                                 << max_representation
-                                 << " was found! Exodus uses real numbers for storing element "
-                                 " integers, which can only represent integers from 0 to "
-                                 << max_representation
-                                 << ".");
-
-            libmesh_error_msg_if(iv < 0,
-                                 "Error! An element integer value less than -1"
-                                 << " was found! Exodus uses real numbers for storing element "
-                                 " integers, which can only represent integers from 0 to "
-                                 << max_representation
-                                 << ".");
-
-
-            elem->set_extra_integer(id, cast_int<dof_id_type>(iv));
-          }
+             elem->set_extra_integer(id, extra_integer_values[id][elem->id()]);
 
           // Set all the nodes for this element
           //

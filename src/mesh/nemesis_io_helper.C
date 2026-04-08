@@ -1666,20 +1666,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
 
   // Make sure there is no leftover information in the subdomain_map, and reserve
   // enough space to store the elements we need.
-  this->subdomain_map.clear();
-  for (const auto & [sbd_id, cnt] : local_subdomain_counts)
-    {
-      if (verbose)
-        {
-          libMesh::out << "[" << this->processor_id() << "] "
-                       << "local_subdomain_counts [" << static_cast<unsigned>(sbd_id) << "]= "
-                       << cnt
-                       << std::endl;
-        }
-
-      this->subdomain_map[sbd_id].reserve(cnt);
-    }
-
+  this->build_subdomain_map(pmesh, true);
 
   // First loop over the elements to figure out which elements are in which subdomain
   for (const auto & elem : pmesh.active_local_element_ptr_range())
@@ -1687,10 +1674,6 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
       // Grab the nodes while we're here.
       for (auto n : elem->node_index_range())
         this->nodes_attached_to_local_elems.insert( elem->node_id(n) );
-
-      subdomain_id_type cur_subdomain = elem->subdomain_id();
-
-      this->subdomain_map[cur_subdomain].push_back(elem->id());
     }
 
   // Set num_nodes which is used by exodusII_io_helper
@@ -1736,7 +1719,7 @@ void Nemesis_IO_Helper::build_element_and_node_maps(const MeshBase & pmesh)
   this->libmesh_elem_num_to_exodus.clear();
 
   // Now loop over each subdomain and get a unique numbering for the elements
-  for (auto & [block_id, elem_ids_this_subdomain] : subdomain_map)
+  for (auto & [block_id, elem_ids_this_subdomain] : this->_subdomain_map)
     {
       block_ids.push_back(block_id);
 
@@ -2308,7 +2291,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
               subdomain_id_type block =
                 cast_int<subdomain_id_type>(it->first);
               const std::vector<int> & this_block_connectivity = it->second;
-              std::vector<dof_id_type> & elements_in_this_block = subdomain_map[block];
+              std::vector<dof_id_type> & elements_in_this_block = this->_subdomain_map[block];
 
               // Use the first element in this block to get representative information.
               // Note that Exodus assumes all elements in a block are of the same type!
@@ -2662,10 +2645,10 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
         {
           const subdomain_id_type sbd_id =
             cast_int<subdomain_id_type>(sbd_id_int);
-          auto it = subdomain_map.find(sbd_id);
+          auto it = this->_subdomain_map.find(sbd_id);
           const std::vector<dof_id_type> empty_vec;
           const std::vector<dof_id_type> & elem_ids =
-            (it == subdomain_map.end()) ? empty_vec : it->second;
+            (it == this->_subdomain_map.end()) ? empty_vec : it->second;
 
           // Possibly skip this (variable, subdomain) combination. Also, check that there is at
           // least one element on the subdomain... Indeed, it is possible to have zero elements,
