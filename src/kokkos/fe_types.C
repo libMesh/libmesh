@@ -5,7 +5,7 @@
 // MOOSE continues to compile framework/src/kokkos/fe/KokkosFETypes.K.
 // Option B will add this file to libMesh's build system.
 
-#include "libmesh/kokkos/fe_types.h"
+#include "kokkos/fe_types.h"
 
 #include "libmesh/libmesh_common.h"
 

@@ -262,6 +262,7 @@ include src/libmesh_SOURCES
 # auto-generated) so that they don't affect non-Kokkos builds.
 if LIBMESH_ENABLE_KOKKOS
   libmesh_SOURCES += src/kokkos/fe_types.C
+  AM_CPPFLAGS    += $(KOKKOS_CPPFLAGS) -I$(top_srcdir)/include
 endif
 
 # A convenience library to hold proper libMesh

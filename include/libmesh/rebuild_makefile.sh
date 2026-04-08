@@ -2,7 +2,7 @@
 
 built_sources=""
 
-headers=`find .. -name "*.h" -a -not -name libmesh_config.h -type f | LC_COLLATE=POSIX sort`
+headers=`find .. -name "*.h" -a -not -name libmesh_config.h -a -not -path "../kokkos/*" -type f | LC_COLLATE=POSIX sort`
 
 for header_with_path in $headers ; do
 

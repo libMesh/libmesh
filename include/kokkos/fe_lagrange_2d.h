@@ -20,7 +20,7 @@ struct FEEvaluator<LagrangeTag, Tri3Tag>
 {
   static constexpr unsigned int n_dofs() { return 3; }
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
   KOKKOS_INLINE_FUNCTION static Real
   shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
@@ -61,7 +61,7 @@ struct FEEvaluator<LagrangeTag, Tri6Tag>
 {
   static constexpr unsigned int n_dofs() { return 6; }
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
   KOKKOS_INLINE_FUNCTION static Real
   shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
@@ -105,7 +105,7 @@ struct FEEvaluator<LagrangeTag, Quad4Tag>
 {
   static constexpr unsigned int n_dofs() { return 4; }
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
   KOKKOS_INLINE_FUNCTION static Real
   shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
@@ -144,7 +144,7 @@ struct FEEvaluator<LagrangeTag, Quad8Tag>
 {
   static constexpr unsigned int n_dofs() { return 8; }
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
   KOKKOS_INLINE_FUNCTION static Real
   shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
@@ -204,7 +204,7 @@ struct FEEvaluator<LagrangeTag, Quad9Tag>
 {
   static constexpr unsigned int n_dofs() { return 9; }
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
   KOKKOS_INLINE_FUNCTION static Real L(unsigned int k, Real t)
   {
     switch (k)

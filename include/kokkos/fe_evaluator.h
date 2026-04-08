@@ -9,12 +9,12 @@
 // All functions are KOKKOS_INLINE_FUNCTION and dispatch via switch statements
 // that compile to fast GPU branch logic.
 //
-// Compiled only when MOOSE_KOKKOS_SCOPE is defined (i.e. from .K translation
+// Compiled only when LIBMESH_HAVE_KOKKOS is defined (i.e. from .K translation
 // units compiled by the Kokkos device compiler).
 
 #pragma once
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
 
 #include "libmesh/kokkos/fe_base.h"
 #include "libmesh/kokkos/fe_types.h"
@@ -347,4 +347,4 @@ nativeGradShape(FEShapeKey key, unsigned int i, Real xi, Real eta, Real zeta)
 
 } // namespace libMesh::Kokkos
 
-#endif // MOOSE_KOKKOS_SCOPE
+#endif // LIBMESH_HAVE_KOKKOS

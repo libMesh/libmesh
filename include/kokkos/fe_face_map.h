@@ -8,7 +8,7 @@
 
 #pragma once
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
 
 #include "libmesh/kokkos/fe_evaluator.h"
 #include "libmesh/elem.h"
@@ -93,4 +93,4 @@ mapFaceQpToParent(const libMesh::Elem & side_in_parent,
 
 } // namespace libMesh::Kokkos
 
-#endif // MOOSE_KOKKOS_SCOPE
+#endif // LIBMESH_HAVE_KOKKOS

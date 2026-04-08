@@ -1,5 +1,21 @@
 SUBDIRS = libmesh
 
+# Kokkos FE math headers — installed preserving the kokkos/ subdirectory so
+# downstream code can use #include "libmesh/kokkos/fe_types.h" etc.
+# nobase_ is used instead of the standard flat install to keep the namespace.
+if LIBMESH_ENABLE_KOKKOS
+nobase_include_HEADERS = \
+  kokkos/scalar_types.h \
+  kokkos/fe_types.h \
+  kokkos/fe_base.h \
+  kokkos/fe_evaluator.h \
+  kokkos/fe_lagrange_1d.h \
+  kokkos/fe_lagrange_2d.h \
+  kokkos/fe_lagrange_3d.h \
+  kokkos/fe_monomial.h \
+  kokkos/fe_face_map.h
+endif
+
 # special handholding for prefix_config.m4 generated files
 # so that 'make clean ; make' works as does 'make distcheck'
 # libmesh_config.h is made by ./configure, so it should get

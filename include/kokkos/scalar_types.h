@@ -5,7 +5,7 @@
 // allocation; all methods are KOKKOS_INLINE_FUNCTION so they compile for
 // both host and device.
 //
-// Guarded by MOOSE_KOKKOS_SCOPE: methods are compiled only when the Kokkos
+// Guarded by LIBMESH_HAVE_KOKKOS: methods are compiled only when the Kokkos
 // device compiler is active.  The struct layouts (and thus sizeof) are always
 // visible so that objects can be declared in any translation unit.
 
@@ -28,7 +28,7 @@ struct Real33
 {
   Real a[3][3];
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
   KOKKOS_INLINE_FUNCTION Real33() { *this = 0; }
   KOKKOS_INLINE_FUNCTION Real33(const Real & scalar) { *this = scalar; }
   KOKKOS_INLINE_FUNCTION Real33(const Real33 & tensor) { *this = tensor; }
@@ -119,7 +119,7 @@ struct Real3
 {
   Real v[3];
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
   KOKKOS_INLINE_FUNCTION Real3()
   {
     v[0] = 0;
@@ -229,7 +229,7 @@ struct Real3
 #endif
 };
 
-#ifdef MOOSE_KOKKOS_SCOPE
+#ifdef LIBMESH_HAVE_KOKKOS
 KOKKOS_INLINE_FUNCTION Real3
 operator*(const Real left, const Real3 right)
 {

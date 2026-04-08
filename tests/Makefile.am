@@ -247,6 +247,13 @@ if LIBMESH_ENABLE_FPARSER
 	fparser/autodiff.C
 endif
 
+if LIBMESH_ENABLE_KOKKOS
+  unit_tests_sources += \
+	fe/kokkos_fe_types_test.C \
+	fe/kokkos_fe_shape_test.C
+  AM_CPPFLAGS += $(KOKKOS_CPPFLAGS) -I$(top_srcdir)/include
+endif
+
 check_PROGRAMS = # empty, append below
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
