@@ -170,6 +170,28 @@ nativeGradMapShape(FEElemTopology topo, unsigned int i, Real xi, Real eta, Real 
   }
 }
 
+// ── Topology-based physics shape overloads ────────────────────────────────────
+// These overloads let callers dispatch by exact FEElemTopology (e.g. QUAD8,
+// HEX20) rather than the (family, class, order) FEShapeKey.  They forward
+// to the corresponding nativeMapShape / nativeGradMapShape which already cover
+// all supported topologies, giving the same LAGRANGE shape functions used for
+// isoparametric geometry mapping.
+
+/// Evaluate the i-th LAGRANGE physics shape function for the given topology.
+KOKKOS_INLINE_FUNCTION Real
+nativeShape(FEElemTopology topo, unsigned int i, Real xi, Real eta, Real zeta)
+{
+  return nativeMapShape(topo, i, xi, eta, zeta);
+}
+
+/// Evaluate the reference-space gradient of the i-th LAGRANGE physics shape
+/// function for the given topology.
+KOKKOS_INLINE_FUNCTION Real3
+nativeGradShape(FEElemTopology topo, unsigned int i, Real xi, Real eta, Real zeta)
+{
+  return nativeGradMapShape(topo, i, xi, eta, zeta);
+}
+
 // ── Physics shape dispatch (FEShapeKey-based) ─────────────────────────────────
 
 /// Evaluate the i-th physics shape function at (xi, eta, zeta).

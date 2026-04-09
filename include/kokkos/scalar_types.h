@@ -12,16 +12,11 @@
 #pragma once
 
 #include "libmesh/libmesh_common.h"
+#include "libmesh/type_vector.h"
 
 #ifdef LIBMESH_HAVE_KOKKOS
 #include <Kokkos_Core.hpp>
 #endif
-
-namespace libMesh
-{
-template <typename T>
-class TypeVector;
-}
 
 namespace libMesh::Kokkos
 {

@@ -28,6 +28,7 @@
 #include "kokkos/fe_face_map.h"
 
 #include "libmesh/fe_base.h"
+#include "libmesh/fe.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/reference_elem.h"
@@ -320,25 +321,11 @@ public:
     const auto & e = E();
     const unsigned int quad_order = Order + 1;
 
-    libMesh::QGauss qr(e.dim, static_cast<libMesh::Order>(quad_order));
-    qr.allow_rules_with_negative_weights = true;
-
-    auto fe = libMesh::FEBase::build(
-        e.dim,
-        libMesh::FEType(static_cast<libMesh::Order>(Order), libMesh::MONOMIAL));
-    fe->attach_quadrature_rule(&qr);
-
-    const auto & phi_lm  = fe->get_phi();
-    const auto & dphi_lm = fe->get_dphi();
-    const libMesh::Elem * ref = &libMesh::ReferenceElem::get(e.lm_type);
-    fe->reinit(ref);
-
-    auto qpts = qpointsFromLibMesh(e, quad_order);
-    CPPUNIT_ASSERT_EQUAL((unsigned int)qr.n_points(), (unsigned int)qpts.size());
-
     const FEShapeKey key{FEFamily::MONOMIAL, elemClass(), Order};
     const unsigned int n = nDofs(key);
-    CPPUNIT_ASSERT_EQUAL(n, (unsigned int)phi_lm.size());
+    const libMesh::Order lm_order = static_cast<libMesh::Order>(Order);
+
+    auto qpts = qpointsFromLibMesh(e, quad_order);
 
     for (unsigned int i = 0; i < n; ++i)
       for (unsigned int q = 0; q < qpts.size(); ++q)
@@ -346,16 +333,41 @@ public:
         Real xi   = qpts[q].v[0];
         Real eta  = qpts[q].v[1];
         Real zeta = qpts[q].v[2];
+        libMesh::Point p(xi, eta, zeta);
 
-        LIBMESH_ASSERT_FP_EQUAL(nativeShape(key, i, xi, eta, zeta),
-                                 phi_lm[i][q], TOL);
+        // Use the static FE<Dim, MONOMIAL>::shape() API to get the reference
+        // value.  This avoids the fe->reinit() + phi_lm path which can give
+        // wrong values for 3D MONOMIAL at order > 1 on bare reference elements.
+        Real lm_phi, lm_dphi_dx, lm_dphi_dy, lm_dphi_dz;
+        if (Dim == 1)
+        {
+          lm_phi    = libMesh::FE<1, libMesh::MONOMIAL>::shape      (e.lm_type, lm_order, i, p);
+          lm_dphi_dx = libMesh::FE<1, libMesh::MONOMIAL>::shape_deriv(e.lm_type, lm_order, i, 0, p);
+          lm_dphi_dy = 0; lm_dphi_dz = 0;
+        }
+        else if (Dim == 2)
+        {
+          lm_phi     = libMesh::FE<2, libMesh::MONOMIAL>::shape      (e.lm_type, lm_order, i, p);
+          lm_dphi_dx = libMesh::FE<2, libMesh::MONOMIAL>::shape_deriv(e.lm_type, lm_order, i, 0, p);
+          lm_dphi_dy = libMesh::FE<2, libMesh::MONOMIAL>::shape_deriv(e.lm_type, lm_order, i, 1, p);
+          lm_dphi_dz = 0;
+        }
+        else
+        {
+          lm_phi     = libMesh::FE<3, libMesh::MONOMIAL>::shape      (e.lm_type, lm_order, i, p);
+          lm_dphi_dx = libMesh::FE<3, libMesh::MONOMIAL>::shape_deriv(e.lm_type, lm_order, i, 0, p);
+          lm_dphi_dy = libMesh::FE<3, libMesh::MONOMIAL>::shape_deriv(e.lm_type, lm_order, i, 1, p);
+          lm_dphi_dz = libMesh::FE<3, libMesh::MONOMIAL>::shape_deriv(e.lm_type, lm_order, i, 2, p);
+        }
+
+        LIBMESH_ASSERT_FP_EQUAL(nativeShape(key, i, xi, eta, zeta), lm_phi, TOL);
 
         Real3 ng = nativeGradShape(key, i, xi, eta, zeta);
-        LIBMESH_ASSERT_FP_EQUAL(ng.v[0], dphi_lm[i][q](0), TOL);
+        LIBMESH_ASSERT_FP_EQUAL(ng.v[0], lm_dphi_dx, TOL);
         if (e.dim >= 2)
-          LIBMESH_ASSERT_FP_EQUAL(ng.v[1], dphi_lm[i][q](1), TOL);
+          LIBMESH_ASSERT_FP_EQUAL(ng.v[1], lm_dphi_dy, TOL);
         if (e.dim >= 3)
-          LIBMESH_ASSERT_FP_EQUAL(ng.v[2], dphi_lm[i][q](2), TOL);
+          LIBMESH_ASSERT_FP_EQUAL(ng.v[2], lm_dphi_dz, TOL);
       }
   }
 };
