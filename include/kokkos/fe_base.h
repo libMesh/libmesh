@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "libmesh/kokkos/scalar_types.h"
+#include "kokkos/scalar_types.h"
 
 namespace libMesh::Kokkos
 {

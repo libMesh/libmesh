@@ -10,7 +10,7 @@
 
 #ifdef LIBMESH_HAVE_KOKKOS
 
-#include "libmesh/kokkos/fe_evaluator.h"
+#include "kokkos/fe_evaluator.h"
 #include "libmesh/elem.h"
 
 namespace libMesh::Kokkos

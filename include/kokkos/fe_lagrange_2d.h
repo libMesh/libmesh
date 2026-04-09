@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "libmesh/kokkos/fe_base.h"
+#include "kokkos/fe_base.h"
 
 namespace libMesh::Kokkos
 {
