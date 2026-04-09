@@ -877,7 +877,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         enablekokkos=yes
         libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I$KOKKOS_DIR/include"
         libmesh_optional_LIBS="$libmesh_optional_LIBS -L$KOKKOS_DIR/lib -lkokkoscore"
-        AC_DEFINE([LIBMESH_HAVE_KOKKOS], [1],
+        AC_DEFINE([HAVE_KOKKOS], [1],
                   [Define if Kokkos support is enabled in libMesh])
         AC_MSG_RESULT(<<< Configuring library with Kokkos support >>>)
       ],
