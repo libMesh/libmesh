@@ -17,15 +17,15 @@
 
 #ifdef LIBMESH_HAVE_KOKKOS
 
-#include "libmesh/kokkos/fe_types.h"
-#include "libmesh/kokkos/fe_base.h"
-#include "libmesh/kokkos/scalar_types.h"
-#include "libmesh/kokkos/fe_lagrange_1d.h"
-#include "libmesh/kokkos/fe_lagrange_2d.h"
-#include "libmesh/kokkos/fe_lagrange_3d.h"
-#include "libmesh/kokkos/fe_monomial.h"
-#include "libmesh/kokkos/fe_evaluator.h"
-#include "libmesh/kokkos/fe_face_map.h"
+#include "kokkos/fe_types.h"
+#include "kokkos/fe_base.h"
+#include "kokkos/scalar_types.h"
+#include "kokkos/fe_lagrange_1d.h"
+#include "kokkos/fe_lagrange_2d.h"
+#include "kokkos/fe_lagrange_3d.h"
+#include "kokkos/fe_monomial.h"
+#include "kokkos/fe_evaluator.h"
+#include "kokkos/fe_face_map.h"
 
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_type.h"

@@ -8,7 +8,7 @@
 
 #ifdef LIBMESH_HAVE_KOKKOS
 
-#include "libmesh/kokkos/fe_types.h"
+#include "kokkos/fe_types.h"
 
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_fe_family.h"
