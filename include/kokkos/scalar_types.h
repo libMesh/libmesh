@@ -13,6 +13,10 @@
 
 #include "libmesh/libmesh_common.h"
 
+#ifdef LIBMESH_HAVE_KOKKOS
+#include <Kokkos_Core.hpp>
+#endif
+
 namespace libMesh
 {
 template <typename T>
