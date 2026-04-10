@@ -111,6 +111,10 @@ struct Real33
         tr_mat(i, j) = a[j][i];
     return tr_mat;
   }
+  KOKKOS_INLINE_FUNCTION Real3 row(unsigned int i) const
+  {
+    return {a[i][0], a[i][1], a[i][2]};
+  }
 #endif
 };
 
@@ -204,6 +208,7 @@ struct Real3
     v[1] *= scalar;
     v[2] *= scalar;
   }
+  KOKKOS_INLINE_FUNCTION Real3 operator-() const { return {-v[0], -v[1], -v[2]}; }
   KOKKOS_INLINE_FUNCTION Real norm() { return std::sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]); }
   KOKKOS_INLINE_FUNCTION Real dot_product(const Real3 vector)
   {
