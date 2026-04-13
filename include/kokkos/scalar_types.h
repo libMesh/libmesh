@@ -14,8 +14,19 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/type_vector.h"
 
-#ifdef LIBMESH_HAVE_KOKKOS
+// Only include Kokkos_Core.hpp when compiling .K translation units (nvcc/hipcc).
+// Regular .C files see LIBMESH_HAVE_KOKKOS but must not include Kokkos_Core.hpp
+// because on CUDA builds that header requires __CUDACC__ to be defined.
+// LIBMESH_KOKKOS_COMPILATION is defined only in KOKKOS_CPPFLAGS (kokkos.mk),
+// mirroring the METAPHYSICL_KOKKOS_COMPILATION pattern.
+#ifdef LIBMESH_KOKKOS_COMPILATION
 #include <Kokkos_Core.hpp>
+#elif defined(LIBMESH_HAVE_KOKKOS)
+// Provide a host-side stub for KOKKOS_INLINE_FUNCTION so that struct methods
+// declared with it remain visible to non-Kokkos translation units.
+#  ifndef KOKKOS_INLINE_FUNCTION
+#    define KOKKOS_INLINE_FUNCTION inline
+#  endif
 #endif
 
 namespace libMesh::Kokkos
@@ -111,10 +122,8 @@ struct Real33
         tr_mat(i, j) = a[j][i];
     return tr_mat;
   }
-  KOKKOS_INLINE_FUNCTION Real3 row(unsigned int i) const
-  {
-    return {a[i][0], a[i][1], a[i][2]};
-  }
+  // Defined after Real3 is declared below
+  KOKKOS_INLINE_FUNCTION struct Real3 row(unsigned int i) const;
 #endif
 };
 
@@ -234,6 +243,12 @@ struct Real3
 };
 
 #ifdef LIBMESH_HAVE_KOKKOS
+KOKKOS_INLINE_FUNCTION Real3
+Real33::row(unsigned int i) const
+{
+  return {a[i][0], a[i][1], a[i][2]};
+}
+
 KOKKOS_INLINE_FUNCTION Real3
 operator*(const Real left, const Real3 right)
 {
