@@ -441,7 +441,8 @@ std::unique_ptr<MeshBase> reprepared_mesh_clone (const MeshBase & mesh)
       if (prep.has_cached_elem_data)
         mesh_clone->cache_elem_data();
 
-      if (prep.has_interior_parent_ptrs)
+      if (mesh.allow_detect_interior_parents() &&
+          prep.has_interior_parent_ptrs)
         mesh_clone->detect_interior_parents();
 
       if (old_allow_remote_element_removal &&
