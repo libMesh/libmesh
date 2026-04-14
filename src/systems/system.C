@@ -211,6 +211,11 @@ void System::init_data ()
 
   MeshBase & mesh = this->get_mesh();
 
+  // Hopefully the user or the EquationSystems prepared the mesh, but
+  // if not then we'd better do it now.
+  if (!mesh.is_prepared())
+    mesh.complete_preparation();
+
   // Distribute the degrees of freedom on the mesh
   auto total_dofs = _dof_map->distribute_dofs (mesh);
 
