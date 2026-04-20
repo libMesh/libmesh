@@ -1311,7 +1311,7 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
     oss << " (may be out of date)";
   oss << '\n';
 
-  oss << "  spatial_dimension()=" << this->_spatial_dimension;
+  oss << "  spatial_dimension()=" << int(this->_spatial_dimension);
   if (!this->preparation().has_cached_elem_data)
     oss << " (may be out of date)";
   oss << '\n';
