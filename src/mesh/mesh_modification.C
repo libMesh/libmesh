@@ -1511,7 +1511,7 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         const Point & p1 = n1;
         Point & p2 = n_center;
         const Point midchord = (p0+p1)/2;
-        const Real edge_chord_len = (p1-p0).norm_sq();
+        const Real edge_chord_len_sq = (p1-p0).norm_sq();
 
         const Real w0 = n0.get_extra_datum<Real>(weight_index);
         const Real w1 = n1.get_extra_datum<Real>(weight_index);
@@ -1521,11 +1521,11 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         // Presumably we want to maintain a somewhat similar uneven
         // parameterization, for whatever boundary layer grading the
         // mesh user wanted?  For now just scream and die.
-        const Point e20 = p0-p2,
+        const Point e02 = p2-p0,
                     e21 = p1-p2;
-        const Real chord_20_len = e20.norm_sq(),
-                   chord_21_len = e21.norm_sq();
-        if (std::abs(chord_20_len-chord_21_len) > edge_chord_len * TOLERANCE)
+        const Real chord_02_len_sq = e02.norm_sq(),
+                   chord_21_len_sq = e21.norm_sq();
+        if (std::abs(chord_02_len_sq-chord_21_len_sq) > edge_chord_len_sq * TOLERANCE*TOLERANCE)
           libmesh_not_implemented_msg
             ("all_rbb() currently doesn't support unevenly parameterized edges");
 
@@ -1533,7 +1533,7 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         // to match the endpoint nodes
         const Point displacement_vec = p2-midchord;
         if (displacement_vec.norm_sq() <
-            edge_chord_len*edge_chord_len*TOLERANCE*TOLERANCE*TOLERANCE)
+            edge_chord_len_sq*TOLERANCE*TOLERANCE*TOLERANCE)
         {
           if (std::abs(w0 - w1) > TOLERANCE*TOLERANCE)
             libmesh_not_implemented();
@@ -1546,10 +1546,12 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         // Circularize the curve on curved edges
         //
         // First find the cosine of phi, the angle between our two
-        // subchords.  This is the same as half of the angle of our
-        // circular arc, which nicely enough is also the angle we take
-        // cos and sec of in NURBS formulae
-        const Real cos_phi = (e20*e21)/chord_20_len/chord_21_len;
+        // subchords (turning from the direction of one to the
+        // direction of the other; this is the supplementary angle to
+        // the angle at the midpoint).  This is the same as half of
+        // the angle of our circular arc, which nicely enough is also
+        // the angle we take cos and sec of in NURBS formulae
+        const Real cos_phi = (e02*e21)/std::sqrt(chord_02_len_sq*chord_21_len_sq);
         n_center.set_extra_datum<Real>(weight_index, cos_phi);
 
         // There's a way to do really large arcs using negative
@@ -1561,7 +1563,7 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
             ("all_rbb() is not recommended for extremely sharp curves on one edge");
 
         // Next find the radius of the circle our arc is from
-        const Real r = edge_chord_len/2/std::sqrt(1-cos_phi*cos_phi);
+        const Real r = std::sqrt(edge_chord_len_sq)/2/std::sqrt(1-cos_phi*cos_phi);
 
         // And perturb our center node so that it becomes a control
         // point for that arc rather than a midpoint of that arc.
