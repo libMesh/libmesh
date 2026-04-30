@@ -114,8 +114,8 @@ void build_square (UnstructuredMesh & mesh,
  * Meshes a spherical or mapped-spherical domain.
  */
 void build_sphere (UnstructuredMesh & mesh,
-                   const Real rad=1,
-                   const unsigned int nr=2,
+                   const Real radius=1,
+                   const unsigned int n_refinements=2,
                    const ElemType type=INVALID_ELEM,
                    const unsigned int n_smooth=2,
                    const bool flat=true);
