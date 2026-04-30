@@ -1,9 +1,10 @@
-#include <libmesh/libmesh.h>
+#include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
+#include <libmesh/fe_map.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
-#include <libmesh/boundary_info.h>
+#include <libmesh/mesh_tools.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -33,6 +34,10 @@ public:
   CPPUNIT_TEST( testAllRBBQuad );
   CPPUNIT_TEST( testAllRBBQuad8 );
   CPPUNIT_TEST( testAllRBBQuad9 );
+
+  CPPUNIT_TEST( testAllRBBCircle4 );
+  CPPUNIT_TEST( testAllRBBCircle8 );
+  CPPUNIT_TEST( testAllRBBCircle16 );
 #endif
 
   // 3D tests
@@ -86,6 +91,70 @@ protected:
     }
   }
 
+  void test_circle(unsigned int n_refinements)
+  {
+    Mesh interior_mesh(*TestCommWorld),
+         boundary_mesh(*TestCommWorld);
+
+    const Real radius = 1;
+    const Real circumference = radius * 2 * pi;
+    const Real tol = TOLERANCE*TOLERANCE;
+
+    // Build a filled circle
+    MeshTools::Generation::build_sphere (interior_mesh, radius,
+                                         n_refinements, QUAD9);
+
+    // Get just the outer EDGE9 circle mesh
+    interior_mesh.get_boundary_info().sync(boundary_mesh);
+
+    const dof_id_type n_edges = 4 << n_refinements;
+
+    CPPUNIT_ASSERT_EQUAL(boundary_mesh.n_elem(), n_edges);
+    CPPUNIT_ASSERT_EQUAL(boundary_mesh.n_elem(), n_edges);
+
+    for (auto & node : boundary_mesh.node_ptr_range())
+      {
+        const Point p = *node;
+        LIBMESH_ASSERT_FP_EQUAL(p.norm(), radius, tol);
+      }
+
+    // We just did Lagrange interpolation, so our mesh measure
+    // shouldn't be *quite* right.  Empirically, we converge from
+    // beneath, and our error looks like Ch^4.
+    const Real max_lagrange_error =
+      radius * 5e-2 / (1 << (4*n_refinements));
+    LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(boundary_mesh),
+                            circumference, max_lagrange_error);
+
+    MeshTools::Modification::all_rbb(boundary_mesh);
+
+    for (auto & elem : boundary_mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(RATIONAL_BERNSTEIN_MAP, elem->mapping_type());
+
+        // We can no longer assert that each Node is at a specified
+        // radius from the circle center, because these are now spline
+        // control nodes, but we can assert that physical points
+        // within the element are at the desired radius.
+        constexpr int n_intervals = 4;
+        Point master_pt;
+        for (master_pt(0) = -1; master_pt(0) <= 1 + TOLERANCE;
+             master_pt(0) += Real(2)/n_intervals)
+          {
+            const Point p = FEMap::map(elem->dim(), elem, master_pt);
+            LIBMESH_ASSERT_FP_EQUAL(radius, p.norm(), tol);
+          }
+      }
+
+    // We're using quadrature for volume approximation, so we still
+    // have error, but our quadrature error looks like Ch^6 with a
+    // much smaller C.
+    const Real max_rbb_error =
+      radius * 1e-3 / (1 << (6*n_refinements));
+    LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(boundary_mesh),
+                            circumference, max_rbb_error);
+  }
+
 public:
   void setUp() {}
 
@@ -109,6 +178,12 @@ public:
 
   // We still don't support general Polys, Tri7s or anything with them
   // as faces, infinite elements, or anything above quadratic.
+
+  // 0 refinements of our default circle gives us 4 RBB edges
+  void testAllRBBCircle4() { LOG_UNIT_TEST; test_circle(0); }
+  void testAllRBBCircle8() { LOG_UNIT_TEST; test_circle(1); }
+  void testAllRBBCircle16() { LOG_UNIT_TEST; test_circle(2); }
+
 };
 
 
