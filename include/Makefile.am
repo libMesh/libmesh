@@ -1,5 +1,23 @@
 SUBDIRS = libmesh
 
+# GPU (Kokkos) FE math headers — installed preserving the gpu/ subdirectory so
+# downstream code can use #include "libmesh/gpu/kokkos_fe_types.h" etc.
+# nobase_ is used instead of the standard flat install to keep the namespace.
+if LIBMESH_ENABLE_KOKKOS
+nobase_include_HEADERS = \
+  gpu/kokkos_scalar_types.h \
+  gpu/kokkos_fe_types.h \
+  gpu/kokkos_fe_base.h \
+  gpu/kokkos_fe_evaluator.h \
+  gpu/kokkos_fe_lagrange_1d.h \
+  gpu/kokkos_fe_lagrange_2d.h \
+  gpu/kokkos_fe_lagrange_3d.h \
+  gpu/kokkos_fe_monomial.h \
+  gpu/kokkos_fe_face_map.h \
+  gpu/kokkos_fe_map.h \
+  gpu/kokkos_quadrature.h
+endif
+
 # special handholding for prefix_config.m4 generated files
 # so that 'make clean ; make' works as does 'make distcheck'
 # libmesh_config.h is made by ./configure, so it should get
