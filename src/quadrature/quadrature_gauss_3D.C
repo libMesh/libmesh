@@ -181,8 +181,6 @@ void QGauss::init_3D()
               // Note: if !allow_rules_with_negative_weights, fall through to next case.
             }
 
-
-
             // Originally a Keast rule,
             //    Patrick Keast,
             //    Moderate Degree Tetrahedral Quadrature Formulas,
