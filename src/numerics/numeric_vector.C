@@ -617,15 +617,15 @@ Real NumericVector<T>::l2_norm_diff (const NumericVector<T> & v) const
 {
   libmesh_assert(this->compatible(v));
 
-  struct Differ {
+  struct L2Differ {
     const NumericVector<T> & v1, & v2;
     Real norm_sq;
 
-    Differ (const NumericVector<T> & v1in,
-            const NumericVector<T> & v2in) :
+    L2Differ (const NumericVector<T> & v1in,
+              const NumericVector<T> & v2in) :
       v1(v1in), v2(v2in), norm_sq(0) {}
 
-    Differ (Differ & other, Threads::split) :
+    L2Differ (L2Differ & other, Threads::split) :
       v1(other.v1), v2(other.v2), norm_sq(0) {}
 
     void operator()(const IntRange<numeric_index_type> & index_range) {
@@ -633,12 +633,12 @@ Real NumericVector<T>::l2_norm_diff (const NumericVector<T> & v) const
         norm_sq += TensorTools::norm_sq(v1(i) - v2(i));
     }
 
-    void join(const Differ & other) {
+    void join(const L2Differ & other) {
       norm_sq += other.norm_sq;
     }
   };
 
-  Differ differ(*this, v);
+  L2Differ differ(*this, v);
 
   Threads::parallel_reduce(make_range(this->first_local_index(), this->last_local_index()), differ);
 
