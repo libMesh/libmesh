@@ -654,13 +654,34 @@ Real NumericVector<T>::l1_norm_diff (const NumericVector<T> & v) const
 {
   libmesh_assert(this->compatible(v));
 
-  Real norm = 0;
-  for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
-    norm += libMesh::l1_norm_diff((*this)(i), v(i));
+  struct L1Differ {
+    const NumericVector<T> & v1, & v2;
+    Real norm;
 
-  this->comm().sum(norm);
+    L1Differ (const NumericVector<T> & v1in,
+              const NumericVector<T> & v2in) :
+      v1(v1in), v2(v2in), norm(0) {}
 
-  return norm;
+    L1Differ (L1Differ & other, Threads::split) :
+      v1(other.v1), v2(other.v2), norm(0) {}
+
+    void operator()(const IntRange<numeric_index_type> & index_range) {
+      for (const auto i : index_range)
+        norm += libMesh::l1_norm_diff(v1(i), v2(i));
+    }
+
+    void join(const L1Differ & other) {
+      norm += other.norm;
+    }
+  };
+
+  L1Differ differ(*this, v);
+
+  Threads::parallel_reduce(make_range(this->first_local_index(), this->last_local_index()), differ);
+
+  this->comm().sum(differ.norm);
+
+  return differ.norm;
 }
 
 
