@@ -59,6 +59,8 @@ enum ElemMappingType : unsigned char;
 template <class MT>
 class MeshInput;
 
+template <typename iterator_type, typename object_type>
+class StoredRange;
 
 /**
  * This is the \p MeshBase class. This class provides all the data necessary
@@ -1856,6 +1858,36 @@ public:
   // solution can be evaluated for all variables of all given DoF maps
   ABSTRACT_NODE_ITERATORS(multi_evaluable_,std::vector<const DofMap *> dof_maps)
 
+  // Technically these define libMesh::MeshBase::*ElemRange, but since
+  // those don't conflict with libMesh::*ElemRange they're as good as
+  // a real forward declaration, which we can't do here.
+  typedef StoredRange<MeshBase::element_iterator,             Elem *>      ElemRange;
+  typedef StoredRange<MeshBase::const_element_iterator, const Elem *> ConstElemRange;
+
+  /**
+   * \returns A reference to a cached vector copy of a range of
+   * pointers to all semilocal elements, suitable for threading.
+   *
+   * Iterating over all semilocal elements is most useful for
+   * modifying the mesh, so we only have a non-const version for now.
+   */
+  const ElemRange & element_stored_range();
+
+  /**
+   * \returns A reference to a cached vector copy of a range of
+   * pointers to all active local elements, suitable for threading.
+   *
+   * Iterating over only local elements is most useful for computing
+   * on the mesh, so we only have a non-const version for now.
+   */
+  const ConstElemRange & active_local_element_stored_range() const;
+
+  /**
+   * Clears stored ranges, to indicate that the mesh has changed and
+   * they should be regenerated when next needed.
+   */
+  void clear_stored_ranges();
+
   /**
    * \returns A writable reference to the whole subdomain name map
    */
@@ -2128,6 +2160,27 @@ protected:
    * Flags indicating in what ways \p this mesh has been prepared.
    */
   Preparation _preparation;
+
+  /**
+   * A cached \p ElemRange for threaded mutation of all semilocal
+   * elements of this mesh.
+   *
+   * This will not actually be built unless needed. Further, since we
+   * want our \p elem_stored_range() method to be \p const (yet do the
+   * dynamic allocating) this needs to be mutable.
+   */
+  mutable std::unique_ptr<ElemRange> _element_stored_range;
+
+  /**
+   * A cached \p ConstElemRange for threaded calculation on all
+   * local elements of this mesh.
+   *
+   * This will not actually be built unless needed. Further, since we
+   * want our \p elem_stored_range() method to be \p const (yet do the
+   * dynamic allocating) this needs to be mutable.
+   */
+  mutable std::unique_ptr<ConstElemRange>
+    _const_active_local_element_stored_range;
 
   /**
    * A \p PointLocator class for this mesh.

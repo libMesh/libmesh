@@ -41,6 +41,8 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/point_locator_nanoflann.h"
 #include "libmesh/elem_side_builder.h"
+#include "libmesh/elem_range.h"
+#include "libmesh/node_range.h"
 
 // C++ includes
 #include <algorithm> // for std::min
@@ -67,6 +69,8 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _default_mapping_type(LAGRANGE_MAP),
   _default_mapping_data(0),
   _preparation (),
+  _element_stored_range (),
+  _const_active_local_element_stored_range (),
   _point_locator (),
   _count_lower_dim_elems_in_point_locator(true),
   _partitioner   (),
@@ -101,6 +105,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _default_mapping_type(other_mesh._default_mapping_type),
   _default_mapping_data(other_mesh._default_mapping_data),
   _preparation (other_mesh._preparation),
+  _element_stored_range (),
+  _const_active_local_element_stored_range (),
   _point_locator (),
   _count_lower_dim_elems_in_point_locator(other_mesh._count_lower_dim_elems_in_point_locator),
   _partitioner   (),
@@ -191,6 +197,8 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _default_mapping_type = other_mesh.default_mapping_type();
   _default_mapping_data = other_mesh.default_mapping_data();
   _preparation = other_mesh._preparation;
+  _element_stored_range = std::move(other_mesh._element_stored_range);
+  _const_active_local_element_stored_range = std::move(other_mesh._const_active_local_element_stored_range);
   _point_locator = std::move(other_mesh._point_locator);
   _count_lower_dim_elems_in_point_locator = other_mesh.get_count_lower_dim_elems_in_point_locator();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -849,6 +857,7 @@ void MeshBase::prepare_for_use ()
   // Mark everything as unprepared, except for those things we've been
   // told we don't need to prepare, for backwards compatibility
   this->clear_point_locator();
+  this->clear_stored_ranges();
   _preparation = false;
   _preparation.has_neighbor_ptrs = _skip_find_neighbors;
   _preparation.has_removed_remote_elements = !_allow_remote_element_removal;
@@ -1036,6 +1045,7 @@ void MeshBase::clear ()
 
   // Clear our point locator.
   this->clear_point_locator();
+  this->clear_stored_ranges();
 }
 
 
@@ -1858,6 +1868,44 @@ subdomain_id_type MeshBase::get_id_by_name(std::string_view name) const
   // with the requested name, so return Elem::invalid_subdomain_id.
   return Elem::invalid_subdomain_id;
 }
+
+
+const ElemRange & MeshBase::element_stored_range()
+{
+  if (!_element_stored_range)
+  {
+    // Range construction may not be safe within threads
+    libmesh_assert(!Threads::in_threads);
+
+    _element_stored_range =
+      std::make_unique<ElemRange>(this->elements_begin(),
+                                  this->elements_end());
+  }
+
+  return *_element_stored_range;
+}
+
+const ConstElemRange & MeshBase::active_local_element_stored_range() const
+{
+  if (!_const_active_local_element_stored_range)
+  {
+    // Range construction may not be safe within threads
+    libmesh_assert(!Threads::in_threads);
+
+    _const_active_local_element_stored_range =
+      std::make_unique<ConstElemRange>(this->active_local_elements_begin(),
+                                  this->active_local_elements_end());
+  }
+
+  return *_const_active_local_element_stored_range;
+}
+
+void MeshBase::clear_stored_ranges()
+{
+  _element_stored_range.reset(nullptr);
+  _const_active_local_element_stored_range.reset(nullptr);
+}
+
 
 #ifdef LIBMESH_ENABLE_DEPRECATED
 void MeshBase::cache_elem_dims()
