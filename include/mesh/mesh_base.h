@@ -38,24 +38,17 @@
 
 #include "libmesh/vector_value.h"
 
-// periodic boundary condition support
-// Use forward declarations inside the libMesh namespace
 namespace libMesh
 {
-  class PeriodicBoundary;
-  class PeriodicBoundaries;
-}
-
-namespace libMesh
-{
-
-// forward declarations
+// Forward declarations
+class BoundaryInfo;
 class Elem;
 class GhostingFunctor;
 class Node;
 class Point;
 class Partitioner;
-class BoundaryInfo;
+class PeriodicBoundary;
+class PeriodicBoundaries;
 
 template <typename T>
 class SparseMatrix;
