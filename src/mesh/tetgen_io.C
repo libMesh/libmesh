@@ -257,7 +257,7 @@ void TetGenIO::element_in (std::istream & ele_stream)
 
           // Make sure that the id we read can be successfully cast to
           // an integral value of type subdomain_id_type.
-          elem->subdomain_id() = cast_int<subdomain_id_type>(region);
+          elem->subdomain_id() = restrict_int<subdomain_id_type>(region);
         }
     }
 }

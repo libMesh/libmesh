@@ -3435,7 +3435,7 @@ void ExodusII_IO_Helper::initialize_element_variables(std::vector<std::string> n
       std::set<subdomain_id_type> current_set;
       if (vars_active_subdomains[var_num].empty())
         for (auto block_id : block_ids)
-          current_set.insert(cast_int<subdomain_id_type>(block_id));
+          current_set.insert(restrict_int<subdomain_id_type>(block_id));
       else
         current_set = vars_active_subdomains[var_num];
 

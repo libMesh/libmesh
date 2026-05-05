@@ -2285,7 +2285,7 @@ void Nemesis_IO_Helper::write_elements(const MeshBase & mesh, bool /*use_discont
           // empty string if there is no name associated with the current
           // block.
           names_table.push_back_entry
-            (mesh.subdomain_name(cast_int<subdomain_id_type>(this->global_elem_blk_ids[i])));
+            (mesh.subdomain_name(restrict_int<subdomain_id_type>(this->global_elem_blk_ids[i])));
 
           // Search for the current global block ID in the map
           if (const auto it = this->block_id_to_elem_connectivity.find( this->global_elem_blk_ids[i] );
@@ -2661,7 +2661,7 @@ Nemesis_IO_Helper::write_element_values(const MeshBase & mesh,
       for (const int sbd_id_int : global_elem_blk_ids)
         {
           const subdomain_id_type sbd_id =
-            cast_int<subdomain_id_type>(sbd_id_int);
+            restrict_int<subdomain_id_type>(sbd_id_int);
           auto it = subdomain_map.find(sbd_id);
           const std::vector<dof_id_type> empty_vec;
           const std::vector<dof_id_type> & elem_ids =

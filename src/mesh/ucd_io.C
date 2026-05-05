@@ -221,7 +221,7 @@ void UCDIO::read_implementation (std::istream & in)
         elems_of_dimension[elem->dim()] = true;
 
         // Set the element's subdomain ID based on the material_id.
-        elem->subdomain_id() = cast_int<subdomain_id_type>(material_id);
+        elem->subdomain_id() = restrict_int<subdomain_id_type>(material_id);
 
         // Add the element to the mesh
         elem->set_id(i);

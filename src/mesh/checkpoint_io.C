@@ -1194,7 +1194,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
         cast_int<processor_id_type>
         (elem_data[2] % mesh.n_processors());
       const subdomain_id_type subdomain_id =
-        cast_int<subdomain_id_type>(elem_data[3]);
+        restrict_int<subdomain_id_type>(elem_data[3]);
 
       // Old broken files used processsor_id_type(-1)...
       // But we *know* our first element will be level 0

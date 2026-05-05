@@ -649,6 +649,32 @@ inline Tnew libmesh_cast_int (Told oldvar)
   return cast_int<Tnew>(oldvar);
 }
 
+
+/**
+ * restrict_int checks that the value of the castee is within the
+ * bounds which are exactly representable by the output type, even in
+ * optimized modes.
+ *
+ * Use this cast when you suspect that the input may not succeed in
+ * correct code (e.g. when an input file is being read from a format
+ * that may allow wider integer types than the current libMesh
+ * configuration).
+ */
+template <typename Tnew, typename Told>
+inline Tnew restrict_int (Told oldvar)
+{
+  if constexpr (!std::is_same_v<Tnew, Told>)
+    {
+      const Tnew returnval = static_cast<Tnew>(oldvar);
+
+      libmesh_error_msg_if (oldvar != static_cast<Told>(returnval),
+                            "restrict_int failed: " << oldvar << " does not fit in type " << typeid(returnval).name());
+    }
+
+  return oldvar;
+}
+
+
 /**
  * This is a helper variable template for cases when we want to use a default compile-time
  * error with constexpr-based if conditions. The templating delays the triggering

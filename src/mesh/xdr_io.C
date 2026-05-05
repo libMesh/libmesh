@@ -1897,7 +1897,7 @@ XdrIO::read_serialized_connectivity (Xdr & io,
             cast_int<processor_id_type>(*it++);
 
           const subdomain_id_type subdomain_id =
-            cast_int<subdomain_id_type>(*it++);
+            restrict_int<subdomain_id_type>(*it++);
 
           tmp = *it++;
 #ifdef LIBMESH_ENABLE_AMR

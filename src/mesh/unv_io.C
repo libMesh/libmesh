@@ -519,7 +519,7 @@ void UNVIO::groups_in (std::istream & in_file)
                     // Set the current group number as the lower-dimensional element's subdomain ID.
                     // We will use this later to set a boundary ID.
                     group_elem->subdomain_id() =
-                      cast_int<subdomain_id_type>(group_number);
+                      restrict_int<subdomain_id_type>(group_number);
 
                     // Store the lower-dimensional element in the provide_bcs container.
                     provide_bcs.emplace(group_elem->key(), group_elem);
@@ -530,7 +530,7 @@ void UNVIO::groups_in (std::istream & in_file)
                   {
                     is_subdomain_group = true;
                     group_elem->subdomain_id() =
-                      cast_int<subdomain_id_type>(group_number);
+                      restrict_int<subdomain_id_type>(group_number);
                   }
 
                 else

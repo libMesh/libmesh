@@ -274,12 +274,12 @@ void GmshIO::read_mesh(std::istream & in)
                   // conditions.
                   if (s.find("lower_dimensional_block") != std::string::npos)
                     {
-                      lower_dimensional_blocks.insert(cast_int<subdomain_id_type>(phys_id));
+                      lower_dimensional_blocks.insert(restrict_int<subdomain_id_type>(phys_id));
 
                       // The user has explicitly told us that this
                       // block is a subdomain, so set that association
                       // in the Mesh.
-                      mesh.subdomain_name(cast_int<subdomain_id_type>(phys_id)) = phys_name;
+                      mesh.subdomain_name(restrict_int<subdomain_id_type>(phys_id)) = phys_name;
                     }
                 }
             }
@@ -795,7 +795,7 @@ void GmshIO::read_mesh(std::istream & in)
               // If the physical's dimension matches the largest
               // dimension we've seen, it's a subdomain name.
               if (phys_dim == max_elem_dimension_seen)
-                mesh.subdomain_name(cast_int<subdomain_id_type>(phys_id)) = phys_name;
+                mesh.subdomain_name(restrict_int<subdomain_id_type>(phys_id)) = phys_name;
 
               // If it's zero-dimensional then it's a nodeset
               else if (phys_dim == 0)

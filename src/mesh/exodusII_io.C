@@ -426,7 +426,7 @@ void ExodusII_IO::read (const std::string & fname)
 
   // We'll set any spline NodeElem subdomain_id() values to exceed the
   // maximum of subdomain_id() values set via Exodus block ids.
-  int max_subdomain_id = std::numeric_limits<int>::min();
+  subdomain_id_type max_subdomain_id = std::numeric_limits<subdomain_id_type>::min();
 
   // We've already added all the nodes explicitly specified in the
   // file, but if we have spline nodes we may need to add assembly
@@ -440,13 +440,14 @@ void ExodusII_IO::read (const std::string & fname)
     {
       // Read the information for block i
       exio_helper->read_elem_in_block (i);
-      const int subdomain_id = exio_helper->get_block_id(i);
+      const subdomain_id_type subdomain_id =
+        restrict_int<subdomain_id_type>(exio_helper->get_block_id(i));
       max_subdomain_id = std::max(max_subdomain_id, subdomain_id);
 
       // populate the map of names
       std::string subdomain_name = exio_helper->get_block_name(i);
       if (!subdomain_name.empty())
-        mesh.subdomain_name(static_cast<subdomain_id_type>(subdomain_id)) = subdomain_name;
+        mesh.subdomain_name(subdomain_id) = subdomain_name;
 
       // Set any relevant node/edge maps for this element
       const std::string type_str (exio_helper->get_elem_type());
@@ -473,7 +474,7 @@ void ExodusII_IO::read (const std::string & fname)
                                  << " has " << uelem->n_nodes() << " nodes.");
 
           // Assign the current subdomain to this Elem
-          uelem->subdomain_id() = static_cast<subdomain_id_type>(subdomain_id);
+          uelem->subdomain_id() = subdomain_id;
 
           // Determine the libmesh elem id implied by "j". The
           // ExodusII_IO_Helper::get_libmesh_elem_id() helper function
