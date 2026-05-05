@@ -877,8 +877,6 @@ dof_id_type n_connected_components(const MeshBase & mesh,
   // many components or completely scrambled ordering, performance
   // can be a disaster.
   auto find_component = [&components](node_entry_type n) {
-    std::unordered_set<node_entry_type> * component = nullptr;
-
     static std::size_t n_temp_components = 0;
 
     if (components.size() > n_temp_components)
@@ -889,12 +887,9 @@ dof_id_type n_connected_components(const MeshBase & mesh,
 
     for (auto & c: components)
       if (c.find(n) != c.end())
-        {
-          libmesh_assert(component == nullptr);
-          component = &c;
-        }
+        return &c;
 
-    return component;
+    return (std::unordered_set<node_entry_type> *)(nullptr);
   };
 
   auto add_to_component =
