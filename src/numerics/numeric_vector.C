@@ -617,13 +617,34 @@ Real NumericVector<T>::l2_norm_diff (const NumericVector<T> & v) const
 {
   libmesh_assert(this->compatible(v));
 
-  Real norm = 0;
-  for (const auto i : make_range(this->first_local_index(), this->last_local_index()))
-    norm += TensorTools::norm_sq((*this)(i) - v(i));
+  struct Differ {
+    const NumericVector<T> & v1, & v2;
+    Real norm_sq;
 
-  this->comm().sum(norm);
+    Differ (const NumericVector<T> & v1in,
+            const NumericVector<T> & v2in) :
+      v1(v1in), v2(v2in), norm_sq(0) {}
 
-  return std::sqrt(norm);
+    Differ (Differ & other, Threads::split) :
+      v1(other.v1), v2(other.v2), norm_sq(0) {}
+
+    void operator()(const IntRange<numeric_index_type> & index_range) {
+      for (const auto i : index_range)
+        norm_sq += TensorTools::norm_sq(v1(i) - v2(i));
+    }
+
+    void join(const Differ & other) {
+      norm_sq += other.norm_sq;
+    }
+  };
+
+  Differ differ(*this, v);
+
+  Threads::parallel_reduce(make_range(this->first_local_index(), this->last_local_index()), differ);
+
+  this->comm().sum(differ.norm_sq);
+
+  return std::sqrt(differ.norm_sq);
 }
 
 

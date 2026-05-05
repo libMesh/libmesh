@@ -61,7 +61,7 @@ public:
     using pointer = T;
     using reference = T&;
 
-    iterator (T i) : _i(i) {}
+    explicit iterator (T i) : _i(i) {}
 
     T operator* () const { return _i; }
 
@@ -75,6 +75,20 @@ public:
     {
       iterator returnval(*this);
       ++_i;
+      return returnval;
+    }
+
+    template <typename T2>
+    void operator+= (T2 n)
+    {
+      _i += cast_int<T>(n);
+    }
+
+    template <typename T2>
+    iterator operator+ (T2 n) const
+    {
+      iterator returnval(_i);
+      returnval += n;
       return returnval;
     }
 
@@ -92,20 +106,39 @@ public:
     T _i;
   };
 
+  typedef typename IntRange<T>::iterator const_iterator;
+
   template <typename U, typename V>
   IntRange(U begin, V end) :
     _begin(cast_int<T>(begin)),
     _end(cast_int<T>(end))
   {}
 
+  // Signature needed for use in threads_pthread.h
+  IntRange(const IntRange &,
+           const const_iterator & begin,
+           const const_iterator & end) :
+    _begin(begin),
+    _end(end)
+  {}
+
   iterator begin() const { return _begin; }
 
   iterator end () const { return _end; }
+
+  std::size_t size () const
+  { return *_end - *_begin; }
 
 private:
   iterator _begin, _end;
 };
 
+
+template <typename T, typename T2>
+typename IntRange<T>::iterator operator+ (T2 n, typename IntRange<T>::iterator i)
+{
+  return i + n;
+}
 
 
 /**
