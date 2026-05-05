@@ -909,7 +909,11 @@ dof_id_type n_connected_components(const MeshBase & mesh,
     // part of the desired component
     else
       {
-        component.merge(*current_component);
+        // Merge the component likely to be smaller into the one
+        // likely to be larger - this is orders of magnitude faster
+        // than the other way around!
+        current_component->merge(component);
+        current_component->swap(component);
         libmesh_assert(current_component->empty());
       }
   };
