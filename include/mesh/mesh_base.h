@@ -234,8 +234,7 @@ public:
    * consider ourself prepared.  This is a very coarse setting; it is
    * generally more efficient to mark finer-grained settings instead.
    */
-  void unset_is_prepared()
-  { _preparation = false; }
+  void unset_is_prepared();
 
   /**
    * Tells this we have done some operation creating unpartitioned

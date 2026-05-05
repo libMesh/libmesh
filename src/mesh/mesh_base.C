@@ -1054,6 +1054,15 @@ bool MeshBase::is_prepared() const
   return static_cast<bool>(_preparation);
 }
 
+
+void MeshBase::unset_is_prepared()
+{
+  _preparation = false;
+  this->clear_point_locator();
+  this->clear_stored_ranges();
+}
+
+
 void MeshBase::add_ghosting_functor(GhostingFunctor & ghosting_functor)
 {
   // We used to implicitly support duplicate inserts to std::set
