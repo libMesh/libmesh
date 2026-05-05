@@ -895,14 +895,17 @@ dof_id_type n_connected_components(const MeshBase & mesh,
   auto add_to_component =
     [&find_component]
     (std::unordered_set<node_entry_type> & component, node_entry_type n) {
-
-    auto current_component = find_component(n);
-    // We may already know we're in the desired component
-    if (&component == current_component)
+    // We may already be in the desired component
+    if (component.find(n) != component.end())
       return;
 
+    auto current_component = find_component(n);
+
+    // Didn't we *just* check this?
+    libmesh_assert (&component != current_component);
+
     // If we're unknown, we should be in the desired component
-    else if (!current_component)
+    if (!current_component)
       component.insert(n);
 
     // If we think we're in another component, it should actually be
