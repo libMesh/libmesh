@@ -722,20 +722,25 @@ bool MeshRefinement::refine_elements ()
 
   // Possibly clean up the refinement flags from
   // a previous step
-  for (auto & elem : _mesh.element_ptr_range())
-    {
-      // Set refinement flag to INACTIVE if the
-      // element isn't active
-      if (!elem->active())
-        {
-          elem->set_refinement_flag(Elem::INACTIVE);
-          elem->set_p_refinement_flag(Elem::INACTIVE);
-        }
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         {
+           // Set refinement flag to INACTIVE if the
+           // element isn't active
+           if (!elem->active())
+             {
+               elem->set_refinement_flag(Elem::INACTIVE);
+               elem->set_p_refinement_flag(Elem::INACTIVE);
+             }
 
-      // This might be left over from the last step
-      if (elem->refinement_flag() == Elem::JUST_REFINED)
-        elem->set_refinement_flag(Elem::DO_NOTHING);
-    }
+           // This might be left over from the last step
+           if (elem->refinement_flag() == Elem::JUST_REFINED)
+             elem->set_refinement_flag(Elem::DO_NOTHING);
+         }
+     });
 
   // Parallel consistency has to come first, or coarsening
   // along processor boundaries might occasionally be falsely
