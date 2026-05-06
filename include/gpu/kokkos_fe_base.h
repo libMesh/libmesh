@@ -27,7 +27,7 @@
 #ifndef LIBMESH_KOKKOS_FE_BASE_H
 #define LIBMESH_KOKKOS_FE_BASE_H
 
-#include "gpu/kokkos_scalar_types.h"
+#include "kokkos_scalar_types.h"
 #include "libmesh/libmesh_device.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_fe_family.h"

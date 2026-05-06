@@ -14,7 +14,7 @@
 #ifndef LIBMESH_KOKKOS_QUADRATURE_H
 #define LIBMESH_KOKKOS_QUADRATURE_H
 
-#include "gpu/kokkos_scalar_types.h"
+#include "kokkos_scalar_types.h"
 #include "libmesh/enum_elem_type.h"
 #include <cmath>
 #include <vector>

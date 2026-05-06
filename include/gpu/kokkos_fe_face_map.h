@@ -3,7 +3,7 @@
 
 #ifdef LIBMESH_HAVE_KOKKOS
 
-#include "gpu/kokkos_fe_evaluator.h"
+#include "kokkos_fe_evaluator.h"
 #include "libmesh/elem.h"
 
 namespace libMesh::Kokkos

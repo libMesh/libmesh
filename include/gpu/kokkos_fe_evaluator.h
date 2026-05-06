@@ -15,12 +15,12 @@
 #ifndef LIBMESH_KOKKOS_FE_EVALUATOR_H
 #define LIBMESH_KOKKOS_FE_EVALUATOR_H
 
-#include "gpu/kokkos_fe_base.h"
-#include "gpu/kokkos_fe_types.h"
-#include "gpu/kokkos_fe_lagrange_1d.h"
-#include "gpu/kokkos_fe_lagrange_2d.h"
-#include "gpu/kokkos_fe_lagrange_3d.h"
-#include "gpu/kokkos_fe_monomial.h"
+#include "kokkos_fe_base.h"
+#include "kokkos_fe_types.h"
+#include "kokkos_fe_lagrange_1d.h"
+#include "kokkos_fe_lagrange_2d.h"
+#include "kokkos_fe_lagrange_3d.h"
+#include "kokkos_fe_monomial.h"
 #include "libmesh/enum_elem_type.h"
 #include "libmesh/enum_fe_family.h"
 

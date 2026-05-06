@@ -106,7 +106,7 @@ while [ "x$1" != "x" ]; do
 	    ;;
 
 	"--cppflags")
-	    return_val="${CPPFLAGS} $return_val"
+	    return_val="${CPPFLAGS} @KOKKOS_CPPFLAGS@ $return_val"
 	    ;;
 	
 	"--cxxflags")

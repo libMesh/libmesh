@@ -14,4 +14,5 @@ Libs.private:
 Cflags: @CPPFLAGS_PROF@ \
         ${cxxflags_extra} \
         -I${includedir} \
+        @KOKKOS_CPPFLAGS@ \
 	@libmesh_optional_INCLUDES@

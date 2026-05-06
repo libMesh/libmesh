@@ -13,7 +13,7 @@
 #ifndef LIBMESH_KOKKOS_FE_MONOMIAL_H
 #define LIBMESH_KOKKOS_FE_MONOMIAL_H
 
-#include "gpu/kokkos_fe_base.h"
+#include "kokkos_fe_base.h"
 #include "libmesh/enum_elem_type.h"
 
 namespace libMesh::Kokkos
