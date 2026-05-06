@@ -523,12 +523,16 @@ void DofMap::reinit
       libmesh_assert (!node->get_old_dof_object());
     }
 
-  for (auto & elem : mesh.element_ptr_range())
-    {
-      elem->clear_old_dof_object();
-      libmesh_assert (!elem->get_old_dof_object());
-    }
-
+  Threads::parallel_for
+    (mesh.element_stored_range(),
+     [](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         {
+           elem->clear_old_dof_object();
+           libmesh_assert (!elem->get_old_dof_object());
+         }
+     });
 
   //------------------------------------------------------------
   // Set the old_dof_objects for the elements that
@@ -564,8 +568,13 @@ void DofMap::reinit
     node->set_n_vars_per_group(sys_num, n_vars_per_group);
 
   // All the elements
-  for (auto & elem : mesh.element_ptr_range())
-    elem->set_n_vars_per_group(sys_num, n_vars_per_group);
+  Threads::parallel_for
+    (mesh.element_stored_range(),
+     [sys_num, n_vars_per_group](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         elem->set_n_vars_per_group(sys_num, n_vars_per_group);
+     });
 
   // Zero _n_SCALAR_dofs, it will be updated below.
   this->_n_SCALAR_dofs = 0;
