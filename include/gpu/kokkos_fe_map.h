@@ -17,8 +17,8 @@
 #ifndef LIBMESH_KOKKOS_FE_MAP_H
 #define LIBMESH_KOKKOS_FE_MAP_H
 
-#include "gpu/kokkos_fe_evaluator.h"
-#include "gpu/kokkos_scalar_types.h"
+#include "kokkos_fe_evaluator.h"
+#include "kokkos_scalar_types.h"
 
 namespace libMesh::Kokkos
 {

@@ -8,7 +8,7 @@
 #ifndef LIBMESH_KOKKOS_FE_LAGRANGE_3D_H
 #define LIBMESH_KOKKOS_FE_LAGRANGE_3D_H
 
-#include "gpu/kokkos_fe_base.h"
+#include "kokkos_fe_base.h"
 
 namespace libMesh::Kokkos
 {

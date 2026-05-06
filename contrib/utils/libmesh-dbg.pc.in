@@ -13,4 +13,5 @@ Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_dbg -ltimpi_dbg \
 Libs.private:
 Cflags: @CPPFLAGS_DBG@ \
         -I${includedir} \
+        @KOKKOS_CPPFLAGS@ \
 	@libmesh_optional_INCLUDES@

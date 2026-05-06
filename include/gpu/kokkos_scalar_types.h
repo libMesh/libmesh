@@ -10,12 +10,80 @@
 #include "libmesh/libmesh_device.h"
 #include "libmesh/type_vector.h"
 #include "libmesh/type_tensor.h"
+
 namespace libMesh::Kokkos
 {
 
 using Real = libMesh::Real;
 using RealVector = libMesh::TypeVector<Real>;
 using RealTensor = libMesh::TypeTensor<Real>;
+
+template <typename VectorType, typename ViewType>
+LIBMESH_DEVICE_INLINE
+VectorType load_vector(const ViewType & view, const unsigned int i)
+{
+  VectorType v;
+  v.zero();
+
+  for (unsigned int d = 0; d < LIBMESH_DIM; ++d)
+    v(d) = view(i, d);
+
+  return v;
+}
+
+template <typename ViewType, typename VectorType>
+LIBMESH_DEVICE_INLINE
+void store_vector(const ViewType & view, const unsigned int i, const VectorType & v)
+{
+  for (unsigned int d = 0; d < LIBMESH_DIM; ++d)
+    view(i, d) = v(d);
+}
+
+template <typename ViewType>
+LIBMESH_DEVICE_INLINE
+Real vector_component(const ViewType & view, const unsigned int i, const unsigned int component)
+{
+  if (component < LIBMESH_DIM)
+    return view(i, component);
+
+  return Real(0);
+}
+
+template <typename TensorType, typename ViewType>
+LIBMESH_DEVICE_INLINE
+TensorType load_tensor(const ViewType & view, const unsigned int i)
+{
+  TensorType T;
+  T.zero();
+
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      T(row, col) = view(i, row, col);
+
+  return T;
+}
+
+template <typename ViewType, typename TensorType>
+LIBMESH_DEVICE_INLINE
+void store_tensor(const ViewType & view, const unsigned int i, const TensorType & T)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      view(i, row, col) = T(row, col);
+}
+
+template <typename ViewType>
+LIBMESH_DEVICE_INLINE
+Real tensor_component(const ViewType & view,
+                      const unsigned int i,
+                      const unsigned int row,
+                      const unsigned int col)
+{
+  if (row < LIBMESH_DIM && col < LIBMESH_DIM)
+    return view(i, row, col);
+
+  return Real(0);
+}
 
 LIBMESH_DEVICE_INLINE
 RealVector zero_vector()
