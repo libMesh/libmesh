@@ -54,6 +54,11 @@ void enableFPE(bool on);
 void enableSEGV(bool on);
 
 /**
+ * Toggle libMesh handling of SIGINT (Ctrl+C) interrupts
+ */
+void enableSIGINT(bool on);
+
+/**
  * A class to represent the internal "this should never happen"
  * errors, to be thrown by "libmesh_error();"
  */

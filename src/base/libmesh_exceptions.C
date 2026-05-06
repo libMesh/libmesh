@@ -90,6 +90,12 @@ void libmesh_handleSEGV(int /*signo*/, siginfo_t * info, void * /*context*/)
                     << "  run ...\n"                                    \
                     << "  bt");
 }
+
+
+void libmesh_handleSIGINT(int /*signo*/, siginfo_t * /*info*/, void * /*context*/)
+{
+  libmesh_error_msg("Interrupt (Ctrl+C?) signaled!");
+}
 #endif
 } // anonymous namespace
 
@@ -249,6 +255,36 @@ void enableSEGV(bool on)
     {
       was_on = false;
       sigaction (SIGSEGV, &old_action, nullptr);
+    }
+#else
+  libmesh_error_msg("System call sigaction not supported.");
+#endif
+}
+
+
+// Enable handling of SIGINT (Ctrl+C) by libMesh
+void enableSIGINT(bool on)
+{
+#if LIBMESH_HAVE_DECL_SIGACTION
+  static struct sigaction old_action;
+  static bool was_on = false;
+
+  if (on)
+    {
+      struct sigaction new_action;
+      was_on = true;
+
+      // Set up the structure to specify the new action.
+      new_action.sa_sigaction = libmesh_handleSIGINT;
+      sigemptyset (&new_action.sa_mask);
+      new_action.sa_flags = SA_SIGINFO;
+
+      sigaction (SIGINT, &new_action, &old_action);
+    }
+  else if (was_on)
+    {
+      was_on = false;
+      sigaction (SIGINT, &old_action, nullptr);
     }
 #else
   libmesh_error_msg("System call sigaction not supported.");
