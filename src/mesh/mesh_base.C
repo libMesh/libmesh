@@ -1122,10 +1122,26 @@ void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids, const bool glob
   if (global)
     parallel_object_only();
 
-  ids.clear();
+  struct SBDInserter {
+    std::set<subdomain_id_type> my_ids;
 
-  for (const auto & elem : this->active_local_element_ptr_range())
-    ids.insert(elem->subdomain_id());
+    SBDInserter () {}
+    SBDInserter (SBDInserter &, Threads::split) {}
+
+    void operator()(const ConstElemRange & range) {
+      for (const Elem * elem : range)
+        my_ids.insert(elem->subdomain_id());
+    }
+
+    void join(SBDInserter & other) {
+      my_ids.merge(other.my_ids);
+    }
+  };
+
+  SBDInserter inserter;
+  Threads::parallel_reduce(this->active_local_element_stored_range(), inserter);
+
+  ids.swap(inserter.my_ids);
 
   if (global)
     {
