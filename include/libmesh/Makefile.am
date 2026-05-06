@@ -41,6 +41,7 @@ BUILT_SOURCES = \
         enum_elem_quality.h \
         enum_elem_type.h \
         enum_error_estimator_type.h \
+        enum_fe_elem_class.h \
         enum_fe_family.h \
         enum_inf_map_type.h \
         enum_io_package.h \
@@ -721,6 +722,9 @@ enum_elem_type.h: $(top_srcdir)/include/enums/enum_elem_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_error_estimator_type.h: $(top_srcdir)/include/enums/enum_error_estimator_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+enum_fe_elem_class.h: $(top_srcdir)/include/enums/enum_fe_elem_class.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_fe_family.h: $(top_srcdir)/include/enums/enum_fe_family.h
