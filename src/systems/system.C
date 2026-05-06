@@ -1471,15 +1471,20 @@ void System::zero_variable (NumericVector<Number> & v,
     }
 
   // Loop over elements.
-  for (const auto & elem : mesh.active_local_element_ptr_range())
-    {
-      unsigned int n_comp = elem->n_comp(sys_num,var_num);
-      for (unsigned int i=0; i<n_comp; i++)
-        {
-          const dof_id_type index = elem->dof_number(sys_num,var_num,i);
-          v.set(index,0.0);
-        }
-    }
+  Threads::parallel_for
+    (mesh.active_local_element_stored_range(),
+     [sys_num, var_num, &v](const ConstElemRange & range)
+     {
+       for (const Elem * elem : range)
+         {
+           unsigned int n_comp = elem->n_comp(sys_num,var_num);
+           for (unsigned int i=0; i<n_comp; i++)
+             {
+               const dof_id_type index = elem->dof_number(sys_num,var_num,i);
+               v.set(index,0.0);
+             }
+         }
+     });
 }
 
 
