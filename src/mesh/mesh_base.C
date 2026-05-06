@@ -2311,8 +2311,14 @@ Real MeshBase::get_point_locator_close_to_point_tol() const
 void MeshBase::size_elem_extra_integers()
 {
   const std::size_t new_size = _elem_integer_names.size();
-  for (auto elem : this->element_ptr_range())
-    elem->add_extra_integers(new_size, _elem_integer_default_values);
+
+  Threads::parallel_for
+    (this->element_stored_range(),
+     [new_size, this](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         elem->add_extra_integers(new_size, this->_elem_integer_default_values);
+     });
 }
 
 
