@@ -766,12 +766,29 @@ dof_id_type n_non_subactive_elem_of_type_at_level(const MeshBase & mesh,
 
 unsigned int n_active_local_levels(const MeshBase & mesh)
 {
-  unsigned int nl = 0;
+  struct LevelCounter {
+    unsigned int nl;
 
-  for (auto & elem : mesh.active_local_element_ptr_range())
-    nl = std::max(elem->level() + 1, nl);
+    LevelCounter () : nl(0) {}
 
-  return nl;
+    LevelCounter (LevelCounter &, Threads::split) :
+      nl(0) {}
+
+    void operator()(const ConstElemRange & range) {
+      for (const Elem * elem : range)
+        nl = std::max(elem->level() + 1, nl);
+    }
+
+    void join(const LevelCounter & other) {
+      nl = std::max(nl, other.nl);
+    }
+  };
+
+  LevelCounter counter;
+
+  Threads::parallel_reduce(mesh.active_local_element_stored_range(), counter);
+
+  return counter.nl;
 }
 
 
