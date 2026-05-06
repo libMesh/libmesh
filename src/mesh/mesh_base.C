@@ -547,14 +547,19 @@ void MeshBase::change_elemset_code(dof_id_type old_code, dof_id_type new_code)
   unsigned int elemset_index = this->get_elem_integer_index("elemset_code");
 
   // Loop over all elems and update code
-  for (auto & elem : this->element_ptr_range())
-    {
-      dof_id_type elemset_code =
-        elem->get_extra_integer(elemset_index);
+  Threads::parallel_for
+    (this->element_stored_range(),
+     [elemset_index, old_code, new_code](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         {
+           dof_id_type elemset_code =
+             elem->get_extra_integer(elemset_index);
 
-      if (elemset_code == old_code)
-        elem->set_extra_integer(elemset_index, new_code);
-    }
+           if (elemset_code == old_code)
+             elem->set_extra_integer(elemset_index, new_code);
+         }
+     });
 }
 
 void MeshBase::change_elemset_id(elemset_id_type old_id, elemset_id_type new_id)
