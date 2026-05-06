@@ -290,8 +290,13 @@ void EquationSystems::allgather ()
   for (auto & node : _mesh.node_ptr_range())
     node->set_n_systems(n_sys);
 
-  for (auto & elem : _mesh.element_ptr_range())
-    elem->set_n_systems(n_sys);
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [n_sys](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         elem->set_n_systems(n_sys);
+     });
 
   // And distribute each system's dofs
   for (auto i : make_range(this->n_systems()))
