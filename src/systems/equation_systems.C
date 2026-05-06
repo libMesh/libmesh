@@ -1764,8 +1764,13 @@ void EquationSystems::_add_system_to_nodes_and_elems()
     node->add_system();
 
   // All the elements
-  for (auto & elem : _mesh.element_ptr_range())
-    elem->add_system();
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         elem->add_system();
+     });
 }
 
 void EquationSystems::_remove_default_ghosting(unsigned int sys_num)
