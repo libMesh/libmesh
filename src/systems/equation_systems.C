@@ -1215,9 +1215,6 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
 
       NumericVector<Number> & sys_soln(*system.current_local_solution);
 
-      // The DOF indices for the finite element
-      std::vector<dof_id_type> dof_indices;
-
       const unsigned int var = var_num.second;
 
       const Variable & variable = system.variable(var);
@@ -1231,18 +1228,29 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
         (system.variable_type(var) == type[1]) ? _mesh.spatial_dimension() : 1;
 
       // Loop over all elements in the mesh and index all components of the variable if it's active
-      for (const auto & elem : _mesh.active_local_element_ptr_range())
-        if (variable.active_on_subdomain(elem->subdomain_id()))
-          {
-            dof_map.dof_indices(elem, dof_indices, var);
+      Threads::parallel_for
+        (_mesh.active_local_element_stored_range(),
+         [&dof_map, &variable, ne, var, var_ctr, n_comps,
+         &parallel_soln, &sys_soln](const ConstElemRange & range)
+         {
+           // The DOF indices for the finite element
+           std::vector<dof_id_type> dof_indices;
 
-            // The number of DOF components needs to be equal to the expected number so that we know
-            // where to store data to correctly correspond to variable names.
-            libmesh_assert_equal_to(dof_indices.size(), n_comps);
+           for (const Elem * elem : range)
+             {
+               if (variable.active_on_subdomain(elem->subdomain_id()))
+                 {
+                   dof_map.dof_indices(elem, dof_indices, var);
 
-            for (unsigned int comp = 0; comp < n_comps; comp++)
-              parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
-          }
+                   // The number of DOF components needs to be equal to the expected number so that we know
+                   // where to store data to correctly correspond to variable names.
+                   libmesh_assert_equal_to(dof_indices.size(), n_comps);
+
+                   for (unsigned int comp = 0; comp < n_comps; comp++)
+                     parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
+                 }
+             }
+         });
 
       var_ctr += n_comps;
     } // end loop over var_nums
