@@ -309,11 +309,18 @@ HDF5_DIR = @HDF5_DIR@
 HDF5_LDFLAGS = @HDF5_LDFLAGS@
 HDF5_LIBS = @HDF5_LIBS@
 HDF5_PREFIX = @HDF5_PREFIX@
+HIPCC = @HIPCC@
+ICPX = @ICPX@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+KOKKOS_CPPFLAGS = @KOKKOS_CPPFLAGS@
+KOKKOS_CXX = @KOKKOS_CXX@
+KOKKOS_CXXFLAGS = @KOKKOS_CXXFLAGS@
+KOKKOS_LDFLAGS = @KOKKOS_LDFLAGS@
+KOKKOS_LIBS = @KOKKOS_LIBS@
 LASPACK_INCLUDE = @LASPACK_INCLUDE@
 LASPACK_LIB = @LASPACK_LIB@
 LD = @LD@
@@ -361,6 +368,7 @@ NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
 NOX_INCLUDES = @NOX_INCLUDES@
 NOX_LIBS = @NOX_LIBS@
 NOX_MAKEFILE_EXPORT = @NOX_MAKEFILE_EXPORT@
+NVCC = @NVCC@
 NVTX_INCLUDE = @NVTX_INCLUDE@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
@@ -530,10 +538,11 @@ EXTRA_DIST = rebuild_makefile.sh
 BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	dof_object.h factory.h float128_shims.h getpot.h id_types.h \
 	libmesh.h libmesh_abort.h libmesh_augment_std_namespace.h \
-	libmesh_base.h libmesh_common.h libmesh_documentation.h \
-	libmesh_exceptions.h libmesh_logging.h libmesh_singleton.h \
-	libmesh_version.h multi_predicates.h periodic_boundaries.h \
-	periodic_boundary.h periodic_boundary_base.h print_trace.h \
+	libmesh_base.h libmesh_common.h libmesh_device.h \
+	libmesh_documentation.h libmesh_exceptions.h libmesh_logging.h \
+	libmesh_singleton.h libmesh_version.h multi_predicates.h \
+	periodic_boundaries.h periodic_boundary.h \
+	periodic_boundary_base.h print_trace.h \
 	reference_counted_object.h reference_counter.h \
 	single_predicates.h sparsity_pattern.h variable.h \
 	variant_filter_iterator.h enum_convergence_flags.h \
@@ -629,13 +638,13 @@ BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	parallel_ghost_sync.h parallel_hilbert.h parallel_histogram.h \
 	parallel_node.h parallel_object.h parallel_only.h \
 	parallel_sort.h threads.h threads_allocators.h threads_none.h \
-	threads_pthread.h threads_spin_mutex_forward.h threads_tbb.h \
-	centroid_partitioner.h hilbert_sfc_partitioner.h \
-	linear_partitioner.h mapped_subdomain_partitioner.h \
-	metis_csr_graph.h metis_partitioner.h morton_sfc_partitioner.h \
-	parmetis_helper.h parmetis_partitioner.h partitioner.h \
-	sfc_partitioner.h subdomain_partitioner.h diff_physics.h \
-	diff_qoi.h fem_physics.h quadrature.h quadrature_clough.h \
+	threads_pthread.h threads_tbb.h centroid_partitioner.h \
+	hilbert_sfc_partitioner.h linear_partitioner.h \
+	mapped_subdomain_partitioner.h metis_csr_graph.h \
+	metis_partitioner.h morton_sfc_partitioner.h parmetis_helper.h \
+	parmetis_partitioner.h partitioner.h sfc_partitioner.h \
+	subdomain_partitioner.h diff_physics.h diff_qoi.h \
+	fem_physics.h quadrature.h quadrature_clough.h \
 	quadrature_composite.h quadrature_conical.h quadrature_gauss.h \
 	quadrature_gauss_lobatto.h quadrature_gm.h quadrature_grid.h \
 	quadrature_jacobi.h quadrature_monomial.h quadrature_nodal.h \
@@ -990,6 +999,9 @@ libmesh_base.h: $(top_srcdir)/include/base/libmesh_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_common.h: $(top_srcdir)/include/base/libmesh_common.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+libmesh_device.h: $(top_srcdir)/include/base/libmesh_device.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_documentation.h: $(top_srcdir)/include/base/libmesh_documentation.h
@@ -1884,9 +1896,6 @@ threads_none.h: $(top_srcdir)/include/parallel/threads_none.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads_pthread.h: $(top_srcdir)/include/parallel/threads_pthread.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-threads_spin_mutex_forward.h: $(top_srcdir)/include/parallel/threads_spin_mutex_forward.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads_tbb.h: $(top_srcdir)/include/parallel/threads_tbb.h
