@@ -110,8 +110,13 @@ void EquationSystems::reinit_mesh ()
   for (auto & node : _mesh.node_ptr_range())
     node->set_n_systems(n_sys);
 
-  for (auto & elem : _mesh.element_ptr_range())
-    elem->set_n_systems(n_sys);
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [n_sys](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         elem->set_n_systems(n_sys);
+     });
 
   //for (auto i : make_range(this->n_systems()))
     //this->get_system(i).init();
