@@ -158,8 +158,13 @@ bool EquationSystems::reinit_solutions ()
       node->set_n_systems(n_sys);
 
     // All the elements
-    for (auto & elem : _mesh.element_ptr_range())
-      elem->set_n_systems(n_sys);
+    Threads::parallel_for
+      (_mesh.element_stored_range(),
+       [n_sys](const ElemRange & range)
+       {
+         for (Elem * elem : range)
+           elem->set_n_systems(n_sys);
+       });
   }
 
   // Localize each system's vectors
