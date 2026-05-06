@@ -28,6 +28,7 @@ include_HEADERS =  \
         base/libmesh_abort.h \
         base/libmesh_base.h \
         base/libmesh_common.h \
+        base/libmesh_device.h \
         base/libmesh_documentation.h \
         base/libmesh_exceptions.h \
         base/libmesh_logging.h \
@@ -322,7 +323,6 @@ include_HEADERS =  \
         parallel/threads_allocators.h \
         parallel/threads_none.h \
         parallel/threads_pthread.h \
-        parallel/threads_spin_mutex_forward.h \
         parallel/threads_tbb.h \
         partitioning/centroid_partitioner.h \
         partitioning/hilbert_sfc_partitioner.h \
