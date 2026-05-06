@@ -491,42 +491,48 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   // Possibly clean up the refinement flags from
   // a previous step.  While we're at it, see if this method should be
   // a no-op.
-  bool elements_flagged = false;
+  std::atomic<bool> elements_flagged{false};
 
-  for (auto & elem : _mesh.element_ptr_range())
-    {
-      // This might be left over from the last step
-      const Elem::RefinementState flag = elem->refinement_flag();
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [&elements_flagged](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         {
+           // This might be left over from the last step
+           const Elem::RefinementState flag = elem->refinement_flag();
 
-      // Set refinement flag to INACTIVE if the
-      // element isn't active
-      if ( !elem->active())
-        {
-          elem->set_refinement_flag(Elem::INACTIVE);
-          elem->set_p_refinement_flag(Elem::INACTIVE);
-        }
-      else if (flag == Elem::JUST_REFINED)
-        elem->set_refinement_flag(Elem::DO_NOTHING);
-      else if (!elements_flagged)
-        {
-          if (flag == Elem::REFINE || flag == Elem::COARSEN)
-            elements_flagged = true;
-          else
-            {
-              const Elem::RefinementState pflag =
-                elem->p_refinement_flag();
-              if (pflag == Elem::REFINE || pflag == Elem::COARSEN)
-                elements_flagged = true;
-            }
-        }
-    }
+           // Set refinement flag to INACTIVE if the
+           // element isn't active
+           if (!elem->active())
+             {
+               elem->set_refinement_flag(Elem::INACTIVE);
+               elem->set_p_refinement_flag(Elem::INACTIVE);
+             }
+           else if (flag == Elem::JUST_REFINED)
+             elem->set_refinement_flag(Elem::DO_NOTHING);
+           else if (!elements_flagged)
+             {
+               if (flag == Elem::REFINE || flag == Elem::COARSEN)
+                 elements_flagged = true;
+               else
+                 {
+                   const Elem::RefinementState pflag =
+                     elem->p_refinement_flag();
+                   if (pflag == Elem::REFINE || pflag == Elem::COARSEN)
+                     elements_flagged = true;
+                 }
+             }
+         }
+     });
 
   // Did *any* processor find elements flagged for AMR/C?
-  _mesh.comm().max(elements_flagged);
+  bool any_elements_flagged = elements_flagged;
+  _mesh.comm().max(any_elements_flagged);
 
   // If we have nothing to do, let's not bother verifying that nothing
   // is compatible with nothing.
-  if (!elements_flagged)
+  if (!any_elements_flagged)
     return false;
 
   // Parallel consistency has to come first, or coarsening
