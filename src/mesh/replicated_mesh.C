@@ -312,6 +312,11 @@ Elem * ReplicatedMesh::add_elem (Elem * e)
   ++_n_elem;
   _elements[id] = e;
 
+  // We actually added a new element.  Some of our caches might still
+  // be valid, but we should clear the ones which definitely are not.
+  this->clear_point_locator();
+  this->clear_stored_ranges();
+
   // Make sure any new element is given space for any extra integers
   // we've requested
   e->add_extra_integers(_elem_integer_names.size(),
@@ -355,6 +360,11 @@ Elem * ReplicatedMesh::insert_elem (Elem * e)
 
   ++_n_elem;
   _elements[eid] = e;
+
+  // We actually added a new element.  Some of our caches might still
+  // be valid, but we should clear the ones which definitely are not.
+  this->clear_point_locator();
+  this->clear_stored_ranges();
 
   // Make sure any new element is given space for any extra integers
   // we've requested
@@ -417,6 +427,11 @@ void ReplicatedMesh::delete_elem(Elem * e)
 
   // explicitly zero the pointer
   *pos = nullptr;
+
+  // Some of our caches might still be valid, but we should clear the
+  // ones which definitely are not.
+  this->clear_point_locator();
+  this->clear_stored_ranges();
 }
 
 
@@ -439,6 +454,12 @@ void ReplicatedMesh::renumber_elem(const dof_id_type old_id,
   libmesh_assert (!_elements[new_id]);
   _elements[new_id] = el;
   _elements[old_id] = nullptr;
+
+  // Should we delete any caches here?  Our point locator indexes by
+  // element pointer and should be fine with an id change.  Our stored
+  // ranges are no longer sorted, which is *probably* fine, but let's
+  // just be safe.
+  this->clear_stored_ranges();
 }
 
 
