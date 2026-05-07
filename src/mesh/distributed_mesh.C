@@ -1063,6 +1063,11 @@ void DistributedMesh::update_post_partitioning ()
 {
   // this->recalculate_n_partitions();
 
+  // Let's do the base class cache clearing first, just in case our
+  // later computations are ever changed to make use of a local
+  // elements range cache
+  this->MeshBase::update_post_partitioning();
+
   // Partitioning changes our numbers of unpartitioned objects
   this->update_parallel_id_counts();
 }

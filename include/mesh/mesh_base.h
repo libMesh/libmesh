@@ -1319,10 +1319,11 @@ public:
   virtual void redistribute ();
 
   /**
-   * Recalculate any cached data after elements and nodes have been
+   * Recalculate any cached data (or invalidate any caches that are
+   * computed on the fly) after elements and nodes have been
    * repartitioned.
    */
-  virtual void update_post_partitioning () {}
+  virtual void update_post_partitioning ();
 
   /**
    * If false is passed in then this mesh will no longer be renumbered

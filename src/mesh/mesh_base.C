@@ -1170,6 +1170,16 @@ void MeshBase::redistribute()
 
 
 
+void MeshBase::update_post_partitioning()
+{
+  // A range over all elements might still be fine here, but any range
+  // over local elements is obsolete if our partitioner changed the
+  // definition of "local".
+  _const_active_local_element_stored_range.reset(nullptr);
+}
+
+
+
 subdomain_id_type MeshBase::n_subdomains() const
 {
   // This requires an inspection on every processor
