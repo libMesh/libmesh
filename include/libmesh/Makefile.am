@@ -19,6 +19,7 @@ BUILT_SOURCES = \
         libmesh_augment_std_namespace.h \
         libmesh_base.h \
         libmesh_common.h \
+        libmesh_device.h \
         libmesh_documentation.h \
         libmesh_exceptions.h \
         libmesh_logging.h \
@@ -172,6 +173,11 @@ BUILT_SOURCES = \
         overlap_coupling.h \
         point_neighbor_coupling.h \
         sibling_coupling.h \
+        kokkos_linalg_base.h \
+        kokkos_storage.h \
+        kokkos_storage_policy.h \
+        kokkos_tensor_ops.h \
+        kokkos_vector_ops.h \
         abaqus_io.h \
         boundary_info.h \
         boundary_mesh.h \
@@ -657,6 +663,9 @@ libmesh_base.h: $(top_srcdir)/include/base/libmesh_base.h
 libmesh_common.h: $(top_srcdir)/include/base/libmesh_common.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+libmesh_device.h: $(top_srcdir)/include/base/libmesh_device.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 libmesh_documentation.h: $(top_srcdir)/include/base/libmesh_documentation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1114,6 +1123,21 @@ point_neighbor_coupling.h: $(top_srcdir)/include/ghosting/point_neighbor_couplin
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sibling_coupling.h: $(top_srcdir)/include/ghosting/sibling_coupling.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_linalg_base.h: $(top_srcdir)/include/gpu/kokkos_linalg_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_storage.h: $(top_srcdir)/include/gpu/kokkos_storage.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_storage_policy.h: $(top_srcdir)/include/gpu/kokkos_storage_policy.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_tensor_ops.h: $(top_srcdir)/include/gpu/kokkos_tensor_ops.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_vector_ops.h: $(top_srcdir)/include/gpu/kokkos_vector_ops.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 abaqus_io.h: $(top_srcdir)/include/mesh/abaqus_io.h
@@ -2138,4 +2162,3 @@ xdr_cxx.h: $(top_srcdir)/include/utils/xdr_cxx.h
 
 parallel_communicator_specializations: $(top_srcdir)/include/timpi_shims/parallel_communicator_specializations
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
