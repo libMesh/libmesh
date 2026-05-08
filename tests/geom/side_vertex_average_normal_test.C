@@ -39,6 +39,9 @@ public:
   CPPUNIT_TEST( testHexes );
   CPPUNIT_TEST( testC0Polygon );
   CPPUNIT_TEST( testC0Polyhedron );
+#ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( testEdge3PRefine );
+#endif // LIBMESH_ENABLE_AMR
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -107,6 +110,25 @@ public:
       }
     }
   }
+
+
+#ifdef LIBMESH_ENABLE_AMR
+  void testEdge3PRefine()
+  {
+    LOG_UNIT_TEST;
+
+    {
+      // Constructed so we can tweak the p level
+      std::vector<Point> pts = {Point(0, 1, 0), Point(0, 2, 0), Point(0, 1.5, 0)};
+      auto [edge3, nodes] = this->construct_elem(pts, EDGE3);
+      edge3->set_p_level(1);
+      const Point n1 = edge3->side_vertex_average_normal(0);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
+      const Point n2 = edge3->side_vertex_average_normal(1);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n2, TOLERANCE*TOLERANCE);
+    }
+  }
+#endif // LIBMESH_ENABLE_AMR
 
 
   void testTris()
