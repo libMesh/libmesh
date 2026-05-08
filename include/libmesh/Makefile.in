@@ -311,11 +311,18 @@ HDF5_DIR = @HDF5_DIR@
 HDF5_LDFLAGS = @HDF5_LDFLAGS@
 HDF5_LIBS = @HDF5_LIBS@
 HDF5_PREFIX = @HDF5_PREFIX@
+HIPCC = @HIPCC@
+ICPX = @ICPX@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+KOKKOS_CPPFLAGS = @KOKKOS_CPPFLAGS@
+KOKKOS_CXX = @KOKKOS_CXX@
+KOKKOS_CXXFLAGS = @KOKKOS_CXXFLAGS@
+KOKKOS_LDFLAGS = @KOKKOS_LDFLAGS@
+KOKKOS_LIBS = @KOKKOS_LIBS@
 LASPACK_INCLUDE = @LASPACK_INCLUDE@
 LASPACK_LIB = @LASPACK_LIB@
 LD = @LD@
@@ -363,6 +370,7 @@ NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
 NOX_INCLUDES = @NOX_INCLUDES@
 NOX_LIBS = @NOX_LIBS@
 NOX_MAKEFILE_EXPORT = @NOX_MAKEFILE_EXPORT@
+NVCC = @NVCC@
 NVTX_INCLUDE = @NVTX_INCLUDE@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
@@ -534,10 +542,11 @@ EXTRA_DIST = rebuild_makefile.sh
 BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	dof_object.h factory.h float128_shims.h getpot.h id_types.h \
 	libmesh.h libmesh_abort.h libmesh_augment_std_namespace.h \
-	libmesh_base.h libmesh_common.h libmesh_documentation.h \
-	libmesh_exceptions.h libmesh_logging.h libmesh_singleton.h \
-	libmesh_version.h multi_predicates.h periodic_boundaries.h \
-	periodic_boundary.h periodic_boundary_base.h print_trace.h \
+	libmesh_base.h libmesh_common.h libmesh_device.h \
+	libmesh_documentation.h libmesh_exceptions.h libmesh_logging.h \
+	libmesh_singleton.h libmesh_version.h multi_predicates.h \
+	periodic_boundaries.h periodic_boundary.h \
+	periodic_boundary_base.h print_trace.h \
 	reference_counted_object.h reference_counter.h \
 	single_predicates.h sparsity_pattern.h variable.h \
 	variant_filter_iterator.h enum_convergence_flags.h \
@@ -584,7 +593,9 @@ BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	remote_elem.h sphere.h stored_range.h surface.h \
 	default_coupling.h ghost_point_neighbors.h ghosting_functor.h \
 	non_manifold_coupling.h overlap_coupling.h \
-	point_neighbor_coupling.h sibling_coupling.h abaqus_io.h \
+	point_neighbor_coupling.h sibling_coupling.h \
+	kokkos_linalg_base.h kokkos_storage.h kokkos_storage_policy.h \
+	kokkos_tensor_ops.h kokkos_vector_ops.h abaqus_io.h \
 	boundary_info.h boundary_mesh.h checkpoint_io.h \
 	distributed_mesh.h dyna_io.h ensight_io.h exodusII_io.h \
 	exodusII_io_helper.h exodus_header_info.h fro_io.h gmsh_io.h \
@@ -994,6 +1005,9 @@ libmesh_base.h: $(top_srcdir)/include/base/libmesh_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_common.h: $(top_srcdir)/include/base/libmesh_common.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+libmesh_device.h: $(top_srcdir)/include/base/libmesh_device.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 libmesh_documentation.h: $(top_srcdir)/include/base/libmesh_documentation.h
@@ -1453,6 +1467,21 @@ point_neighbor_coupling.h: $(top_srcdir)/include/ghosting/point_neighbor_couplin
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 sibling_coupling.h: $(top_srcdir)/include/ghosting/sibling_coupling.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_linalg_base.h: $(top_srcdir)/include/gpu/kokkos_linalg_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_storage.h: $(top_srcdir)/include/gpu/kokkos_storage.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_storage_policy.h: $(top_srcdir)/include/gpu/kokkos_storage_policy.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_tensor_ops.h: $(top_srcdir)/include/gpu/kokkos_tensor_ops.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_vector_ops.h: $(top_srcdir)/include/gpu/kokkos_vector_ops.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 abaqus_io.h: $(top_srcdir)/include/mesh/abaqus_io.h

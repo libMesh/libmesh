@@ -95,25 +95,31 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@	fparser/autodiff.C
 
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
-	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
+	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6) \
+	$(am__EXEEXT_7)
+TESTS = $(am__EXEEXT_1) $(am__append_11)
+@LIBMESH_ENABLE_KOKKOS_TRUE@am__append_2 = -I$(top_srcdir)/include $(KOKKOS_CPPFLAGS)
+@LIBMESH_ENABLE_KOKKOS_TRUE@am__append_3 = kokkos_vector_ops_oracle_unit kokkos_tensor_ops_oracle_unit
+@LIBMESH_ENABLE_KOKKOS_TRUE@am__append_4 = kokkos_vector_ops_oracle_unit kokkos_tensor_ops_oracle_unit
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
 # others segfault and/or hang.  By default we will not run
 # GLIBCXX-debugging builds with cppunit unless specifically
 # configured to.
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_2 = unit_tests-dbg
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_3 = unit_tests-dbg
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_4 = unit_tests-devel
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_5 = unit_tests-prof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_6 = unit_tests-oprof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_7 = unit_tests-opt
-@LIBMESH_VPATH_BUILD_TRUE@am__append_8 = .linkstamp
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_5 = unit_tests-dbg
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_6 = unit_tests-dbg
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_7 = unit_tests-devel
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_8 = unit_tests-prof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_9 = unit_tests-oprof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_10 = unit_tests-opt
+@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_11 = run_unit_tests.sh
+@LIBMESH_VPATH_BUILD_TRUE@am__append_12 = .linkstamp
 
 ######################################################################
 #
 # Don't leave code coverage outputs lying around
-@CODE_COVERAGE_ENABLED_TRUE@am__append_9 = */*.gcda */*.gcno
+@CODE_COVERAGE_ENABLED_TRUE@am__append_13 = */*.gcda */*.gcno
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
@@ -182,12 +188,34 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES = run_unit_tests.sh
 CONFIG_CLEAN_VPATH_FILES =
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_1 = unit_tests-dbg$(EXEEXT)
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_3 = unit_tests-devel$(EXEEXT)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_6 = unit_tests-opt$(EXEEXT)
+@LIBMESH_ENABLE_KOKKOS_TRUE@am__EXEEXT_1 = kokkos_vector_ops_oracle_unit$(EXEEXT) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	kokkos_tensor_ops_oracle_unit$(EXEEXT)
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_3 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_4 = unit_tests-devel$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-prof$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_6 = unit_tests-oprof$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_7 = unit_tests-opt$(EXEEXT)
+am__kokkos_tensor_ops_oracle_unit_SOURCES_DIST =  \
+	numerics/kokkos_tensor_ops_oracle_test.K
+am__dirstamp = $(am__leading_dot)dirstamp
+@LIBMESH_ENABLE_KOKKOS_TRUE@am_kokkos_tensor_ops_oracle_unit_OBJECTS = numerics/kokkos_tensor_ops_oracle_test.$(OBJEXT)
+kokkos_tensor_ops_oracle_unit_OBJECTS =  \
+	$(am_kokkos_tensor_ops_oracle_unit_OBJECTS)
+am__DEPENDENCIES_1 =
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_tensor_ops_oracle_unit_DEPENDENCIES =  \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(top_builddir)/libmesh_opt.la \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(am__DEPENDENCIES_1) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(am__DEPENDENCIES_1)
+am__kokkos_vector_ops_oracle_unit_SOURCES_DIST =  \
+	numerics/kokkos_vector_ops_oracle_test.K
+@LIBMESH_ENABLE_KOKKOS_TRUE@am_kokkos_vector_ops_oracle_unit_OBJECTS = numerics/kokkos_vector_ops_oracle_test.$(OBJEXT)
+kokkos_vector_ops_oracle_unit_OBJECTS =  \
+	$(am_kokkos_vector_ops_oracle_unit_OBJECTS)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_vector_ops_oracle_unit_DEPENDENCIES =  \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(top_builddir)/libmesh_opt.la \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(am__DEPENDENCIES_1) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(am__DEPENDENCIES_1)
 am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	stream_redirector.h test_comm.h base/dof_object_test.h \
 	base/dof_map_test.C base/default_coupling_test.C \
@@ -263,7 +291,6 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	utils/parameters_test.C utils/point_locator_test.C \
 	utils/rb_parameters_test.C utils/transparent_comparator.C \
 	utils/vectormap_test.C utils/xdr_test.C fparser/autodiff.C
-am__dirstamp = $(am__leading_dot)dirstamp
 @LIBMESH_ENABLE_FPARSER_TRUE@am__objects_1 = fparser/unit_tests_dbg-autodiff.$(OBJEXT)
 am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	base/unit_tests_dbg-dof_map_test.$(OBJEXT) \
@@ -1875,10 +1902,14 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(unit_tests_dbg_SOURCES) $(unit_tests_devel_SOURCES) \
+SOURCES = $(kokkos_tensor_ops_oracle_unit_SOURCES) \
+	$(kokkos_vector_ops_oracle_unit_SOURCES) \
+	$(unit_tests_dbg_SOURCES) $(unit_tests_devel_SOURCES) \
 	$(unit_tests_oprof_SOURCES) $(unit_tests_opt_SOURCES) \
 	$(unit_tests_prof_SOURCES)
-DIST_SOURCES = $(am__unit_tests_dbg_SOURCES_DIST) \
+DIST_SOURCES = $(am__kokkos_tensor_ops_oracle_unit_SOURCES_DIST) \
+	$(am__kokkos_vector_ops_oracle_unit_SOURCES_DIST) \
+	$(am__unit_tests_dbg_SOURCES_DIST) \
 	$(am__unit_tests_devel_SOURCES_DIST) \
 	$(am__unit_tests_oprof_SOURCES_DIST) \
 	$(am__unit_tests_opt_SOURCES_DIST) \
@@ -2081,11 +2112,18 @@ HDF5_DIR = @HDF5_DIR@
 HDF5_LDFLAGS = @HDF5_LDFLAGS@
 HDF5_LIBS = @HDF5_LIBS@
 HDF5_PREFIX = @HDF5_PREFIX@
+HIPCC = @HIPCC@
+ICPX = @ICPX@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+KOKKOS_CPPFLAGS = @KOKKOS_CPPFLAGS@
+KOKKOS_CXX = @KOKKOS_CXX@
+KOKKOS_CXXFLAGS = @KOKKOS_CXXFLAGS@
+KOKKOS_LDFLAGS = @KOKKOS_LDFLAGS@
+KOKKOS_LIBS = @KOKKOS_LIBS@
 LASPACK_INCLUDE = @LASPACK_INCLUDE@
 LASPACK_LIB = @LASPACK_LIB@
 LD = @LD@
@@ -2133,6 +2171,7 @@ NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
 NOX_INCLUDES = @NOX_INCLUDES@
 NOX_LIBS = @NOX_LIBS@
 NOX_MAKEFILE_EXPORT = @NOX_MAKEFILE_EXPORT@
+NVCC = @NVCC@
 NVTX_INCLUDE = @NVTX_INCLUDE@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
@@ -2307,6 +2346,7 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 	       -DLIBMESH_IS_UNIT_TESTING
 
 AM_LDFLAGS = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
+KOKKOS_TEST_CPPFLAGS = $(am__append_2)
 unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	test_comm.h base/dof_object_test.h base/dof_map_test.C \
 	base/default_coupling_test.C base/getpot_test.C \
@@ -2470,6 +2510,16 @@ unit_tests_data = $(data)
 
 # Why isn't this working automatically?
 EXTRA_DIST = $(data)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_vector_ops_oracle_unit_SOURCES = numerics/kokkos_vector_ops_oracle_test.K
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_vector_ops_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_vector_ops_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_vector_ops_oracle_unit_LDFLAGS = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_vector_ops_oracle_unit_LDADD = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_tensor_ops_oracle_unit_SOURCES = numerics/kokkos_tensor_ops_oracle_test.K
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_tensor_ops_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_tensor_ops_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_tensor_ops_oracle_unit_LDFLAGS = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_tensor_ops_oracle_unit_LDADD = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
@@ -2500,7 +2550,16 @@ EXTRA_DIST = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_optdir = $(datadir)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DATA = $(data)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
+
+# Custom link rules so the Kokkos compiler drives the final link step.
+kokkos_vector_ops_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_vector_ops_oracle_unit_LDFLAGS) -o $@
+
+kokkos_tensor_ops_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_tensor_ops_oracle_unit_LDFLAGS) -o $@
+
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	mesh_with_soln.e elemental_from_nodal.e write_elemset_data.e \
 	write_sideset_data.e write_nodeset_data.e write_edgeset_data.e \
@@ -2534,8 +2593,8 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	write_exodus_QUADSHELL9.e write_exodus_TET10.e \
 	write_exodus_TET14.e write_exodus_TET4.e write_exodus_TRI3.e \
 	write_exodus_TRI6.e write_exodus_TRI7.e \
-	write_exodus_TRISHELL3.e smoother.out $(am__append_8) \
-	$(am__append_9)
+	write_exodus_TRISHELL3.e smoother.out $(am__append_12) \
+	$(am__append_13)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
@@ -2543,7 +2602,7 @@ all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .C .lo .o .obj
+.SUFFIXES: .C .K .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -2579,6 +2638,24 @@ run_unit_tests.sh: $(top_builddir)/config.status $(srcdir)/run_unit_tests.sh.in
 clean-checkPROGRAMS:
 	$(am__rm_f) $(check_PROGRAMS)
 	test -z "$(EXEEXT)" || $(am__rm_f) $(check_PROGRAMS:$(EXEEXT)=)
+numerics/$(am__dirstamp):
+	@$(MKDIR_P) numerics
+	@: >>numerics/$(am__dirstamp)
+numerics/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) numerics/$(DEPDIR)
+	@: >>numerics/$(DEPDIR)/$(am__dirstamp)
+numerics/kokkos_tensor_ops_oracle_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+
+kokkos_tensor_ops_oracle_unit$(EXEEXT): $(kokkos_tensor_ops_oracle_unit_OBJECTS) $(kokkos_tensor_ops_oracle_unit_DEPENDENCIES) $(EXTRA_kokkos_tensor_ops_oracle_unit_DEPENDENCIES) 
+	@rm -f kokkos_tensor_ops_oracle_unit$(EXEEXT)
+	$(AM_V_GEN)$(kokkos_tensor_ops_oracle_unit_LINK) $(kokkos_tensor_ops_oracle_unit_OBJECTS) $(kokkos_tensor_ops_oracle_unit_LDADD) $(LIBS)
+numerics/kokkos_vector_ops_oracle_test.$(OBJEXT):  \
+	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
+
+kokkos_vector_ops_oracle_unit$(EXEEXT): $(kokkos_vector_ops_oracle_unit_OBJECTS) $(kokkos_vector_ops_oracle_unit_DEPENDENCIES) $(EXTRA_kokkos_vector_ops_oracle_unit_DEPENDENCIES) 
+	@rm -f kokkos_vector_ops_oracle_unit$(EXEEXT)
+	$(AM_V_GEN)$(kokkos_vector_ops_oracle_unit_LINK) $(kokkos_vector_ops_oracle_unit_OBJECTS) $(kokkos_vector_ops_oracle_unit_LDADD) $(LIBS)
 base/$(am__dirstamp):
 	@$(MKDIR_P) base
 	@: >>base/$(am__dirstamp)
@@ -2749,12 +2826,6 @@ mesh/unit_tests_dbg-project_solution_test.$(OBJEXT):  \
 	mesh/$(am__dirstamp) mesh/$(DEPDIR)/$(am__dirstamp)
 mesh/unit_tests_dbg-xdrio_test.$(OBJEXT): mesh/$(am__dirstamp) \
 	mesh/$(DEPDIR)/$(am__dirstamp)
-numerics/$(am__dirstamp):
-	@$(MKDIR_P) numerics
-	@: >>numerics/$(am__dirstamp)
-numerics/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) numerics/$(DEPDIR)
-	@: >>numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_dbg-composite_function_test.$(OBJEXT):  \
 	numerics/$(am__dirstamp) numerics/$(DEPDIR)/$(am__dirstamp)
 numerics/unit_tests_dbg-coupling_matrix_test.$(OBJEXT):  \
@@ -14831,6 +14902,15 @@ $(top_builddir)/libmesh_prof.la: FORCE
 
 $(top_builddir)/libmesh_oprof.la: FORCE
 	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_oprof.la)
+
+# Compile .K translation units with the Kokkos device compiler.
+# $(MPI_INCLUDES) is needed because KOKKOS_CXX may be nvcc/hipcc
+# instead of the MPI compiler wrapper, so mpi.h won't be found implicitly.
+.K.o:
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(MPI_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c $< -o $@
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f solutions && $(LN_S) -f $(srcdir)/solutions .
