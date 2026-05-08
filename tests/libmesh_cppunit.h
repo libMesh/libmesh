@@ -36,7 +36,7 @@
     VectorValue<Real> expected_vec{expected}; \
     VectorValue<Real> actual_vec{actual}; \
   for (int realvec_d=0; realvec_d != LIBMESH_DIM; ++realvec_d) \
-    LIBMESH_ASSERT_FP_EQUAL(expected(realvec_d), actual(realvec_d), tolerance); \
+    LIBMESH_ASSERT_FP_EQUAL(expected_vec(realvec_d), actual_vec(realvec_d), tolerance); \
   } while(0)
 
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
