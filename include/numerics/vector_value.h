@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/type_vector.h"
+#include "libmesh/libmesh_device.h"
 #include "libmesh/compare_types.h"
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -124,6 +125,7 @@ public:
    * Assignment-from-scalar operator.  Used only to zero out vectors.
    */
   template <typename Scalar>
+  LIBMESH_DEVICE_INLINE
   typename std::enable_if<
     ScalarTraits<Scalar>::value,
     VectorValue &>::type
@@ -146,7 +148,7 @@ typedef NumberVectorValue   Gradient;
 // Inline functions
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 VectorValue<T>::VectorValue () :
   TypeVector<T> ()
 {
@@ -154,7 +156,7 @@ VectorValue<T>::VectorValue () :
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 VectorValue<T>::VectorValue (const T & x,
                              const T & y,
                              const T & z) :
@@ -166,7 +168,7 @@ VectorValue<T>::VectorValue (const T & x,
 
 template <typename T>
 template <typename Scalar1, typename Scalar2, typename Scalar3>
-inline
+LIBMESH_DEVICE_INLINE
 VectorValue<T>::VectorValue (typename
                              std::enable_if<ScalarTraits<Scalar1>::value,
                              const Scalar1>::type & x,
@@ -183,7 +185,7 @@ VectorValue<T>::VectorValue (typename
 
 template <typename T>
 template <typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 VectorValue<T>::VectorValue (const Scalar & x,
                              typename
                              std::enable_if<ScalarTraits<Scalar>::value,
@@ -194,7 +196,7 @@ VectorValue<T>::VectorValue (const Scalar & x,
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 VectorValue<T>::VectorValue (const VectorValue<T2> & p) :
   TypeVector<T> (p)
 {
@@ -204,7 +206,7 @@ VectorValue<T>::VectorValue (const VectorValue<T2> & p) :
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 VectorValue<T>::VectorValue (const TypeVector<T2> & p) :
   TypeVector<T> (p)
 {
@@ -212,7 +214,7 @@ VectorValue<T>::VectorValue (const TypeVector<T2> & p) :
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 VectorValue<T>::VectorValue (const TypeVector<Real> & p_re,
                              const TypeVector<Real> & p_im) :
   TypeVector<T> (Complex (p_re(0), p_im(0)),
