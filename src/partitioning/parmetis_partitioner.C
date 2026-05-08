@@ -392,6 +392,9 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
              libmesh_assert_less (local_index, n_active_local_elem);
              libmesh_assert_less (local_index, _pmetis->vwgt.size());
 
+             libmesh_ignore(n_active_elem); // unused outside dbg/devel
+             libmesh_ignore(n_active_local_elem); // unused outside dbg/devel
+
              // Spline nodes are a special case (storing all the
              // unconstrained DoFs in an IGA simulation), but in general
              // we'll try to distribute work by expecting it to be roughly
