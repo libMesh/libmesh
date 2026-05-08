@@ -864,6 +864,134 @@ AM_CONDITIONAL(LIBMESH_ENABLE_METAPHYSICL, test x$enablemetaphysicl = xyes)
 
 
 
+# -------------------------------------------------------------
+# Kokkos -- optional, enables the native Kokkos FE math path
+# -------------------------------------------------------------
+AC_ARG_WITH([kokkos],
+  AS_HELP_STRING([--with-kokkos=DIR],
+                 [Enable Kokkos support using the installation at DIR]),
+  [KOKKOS_DIR="$withval"],
+  [KOKKOS_DIR="no"])
+
+AC_ARG_WITH([kokkos-backend],
+  AS_HELP_STRING([--with-kokkos-backend=BACKEND],
+                 [cuda|hip|sycl|openmp|serial (default: auto-detect from KokkosCore_config.h)]),
+  [KOKKOS_BACKEND="$withval"], [KOKKOS_BACKEND="auto"])
+
+dnl Allow the caller (e.g. MOOSE's configure_libmesh.sh) to pre-set the
+dnl Kokkos compiler and flags via environment variables.  If KOKKOS_CXX is
+dnl already set, we skip auto-detection entirely — the caller knows best.
+dnl We use AC_SUBST (not AC_ARG_VAR) so these flags stay scoped to .K
+dnl compilation rules and don't leak into the main CPPFLAGS/CXXFLAGS.
+
+AS_IF([test "x$KOKKOS_DIR" != "xno"],
+  [
+    AC_CHECK_FILE([$KOKKOS_DIR/include/Kokkos_Core.hpp],
+      [
+        enablekokkos=yes
+        libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I$KOKKOS_DIR/include"
+        libmesh_optional_LIBS="$libmesh_optional_LIBS -L$KOKKOS_DIR/lib -lkokkoscore"
+
+        dnl Only auto-detect if KOKKOS_CXX was not pre-set by the caller
+        AS_IF([test "x$KOKKOS_CXX" = "x"],
+          [
+            KOKKOS_CFG="$KOKKOS_DIR/include/KokkosCore_config.h"
+
+            dnl Auto-detect backend
+            AS_IF([test "x$KOKKOS_BACKEND" = "xauto"],
+              [
+                AS_IF([test -r "$KOKKOS_CFG"],
+                  [
+                    AS_IF([grep -q 'KOKKOS_ENABLE_CUDA' "$KOKKOS_CFG"],
+                      [KOKKOS_BACKEND=cuda],
+                      [AS_IF([grep -q 'KOKKOS_ENABLE_HIP' "$KOKKOS_CFG"],
+                        [KOKKOS_BACKEND=hip],
+                        [AS_IF([grep -q 'KOKKOS_ENABLE_SYCL' "$KOKKOS_CFG"],
+                          [KOKKOS_BACKEND=sycl],
+                          [AS_IF([grep -q 'KOKKOS_ENABLE_OPENMP' "$KOKKOS_CFG"],
+                            [KOKKOS_BACKEND=openmp],
+                            [KOKKOS_BACKEND=serial])])])])
+                  ],
+                  [KOKKOS_BACKEND=serial])
+              ])
+
+            AC_MSG_RESULT([Kokkos backend: $KOKKOS_BACKEND])
+
+            dnl Check if Kokkos was built with OpenMP
+            have_kokkos_openmp=no
+            AS_IF([test -r "$KOKKOS_CFG"],
+              [AS_IF([grep -q 'KOKKOS_ENABLE_OPENMP' "$KOKKOS_CFG"],
+                [have_kokkos_openmp=yes])])
+
+            case "$KOKKOS_BACKEND" in
+              cuda)
+                AC_PATH_PROG([NVCC],[nvcc],[no],[$PATH])
+                AS_IF([test "x$NVCC" = "xno"],
+                  [AC_MSG_ERROR([nvcc not found but Kokkos CUDA backend requested])])
+                KOKKOS_CXX="$NVCC"
+                KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin $CXX"
+                KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler -L$KOKKOS_DIR/lib"
+                AS_IF([test "x$have_kokkos_openmp" = "xyes"],
+                  [
+                    KOKKOS_CXXFLAGS="$KOKKOS_CXXFLAGS -fopenmp"
+                    KOKKOS_LDFLAGS="$KOKKOS_LDFLAGS -fopenmp"
+                  ])
+                ;;
+              hip)
+                AC_PATH_PROG([HIPCC],[hipcc],[no],[$PATH])
+                AS_IF([test "x$HIPCC" = "xno"],
+                  [AC_MSG_ERROR([hipcc not found but Kokkos HIP backend requested])])
+                KOKKOS_CXX="$HIPCC"
+                KOKKOS_LDFLAGS="-L$KOKKOS_DIR/lib"
+                ;;
+              sycl)
+                AC_PATH_PROG([ICPX],[icpx],[no],[$PATH])
+                AS_IF([test "x$ICPX" = "xno"],
+                  [AC_MSG_ERROR([icpx not found but Kokkos SYCL backend requested])])
+                KOKKOS_CXX="$ICPX"
+                KOKKOS_CXXFLAGS="-fsycl"
+                KOKKOS_LDFLAGS="-fsycl -L$KOKKOS_DIR/lib"
+                ;;
+              openmp)
+                KOKKOS_CXX="${CXX}"
+                KOKKOS_CXXFLAGS="-fopenmp -x c++"
+                KOKKOS_LDFLAGS="-fopenmp -L$KOKKOS_DIR/lib"
+                ;;
+              serial|*)
+                KOKKOS_CXX="${CXX}"
+                KOKKOS_CXXFLAGS="-x c++"
+                KOKKOS_LDFLAGS="-L$KOKKOS_DIR/lib"
+                ;;
+            esac
+          ],
+          [AC_MSG_RESULT([Using caller-provided KOKKOS_CXX=$KOKKOS_CXX])])
+
+        dnl Set defaults for any variables not provided by caller or auto-detect
+        KOKKOS_CPPFLAGS="${KOKKOS_CPPFLAGS:--DLIBMESH_KOKKOS_COMPILATION -I$KOKKOS_DIR/include}"
+        KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:--L$KOKKOS_DIR/lib}"
+        KOKKOS_LIBS="${KOKKOS_LIBS:--lkokkoscore}"
+
+        AC_DEFINE([HAVE_KOKKOS], [1],
+                  [Define if Kokkos support is enabled in libMesh])
+        AC_MSG_RESULT(<<< Configuring library with Kokkos support >>>)
+      ],
+      [
+        AC_MSG_WARN([Kokkos not found at $KOKKOS_DIR -- disabling Kokkos FE support])
+        enablekokkos=no
+      ])
+  ],
+  [enablekokkos=no])
+
+AC_SUBST([KOKKOS_CXX])
+AC_SUBST([KOKKOS_CPPFLAGS])
+AC_SUBST([KOKKOS_CXXFLAGS])
+AC_SUBST([KOKKOS_LDFLAGS])
+AC_SUBST([KOKKOS_LIBS])
+AM_CONDITIONAL(LIBMESH_ENABLE_KOKKOS, test x$enablekokkos = xyes)
+# -------------------------------------------------------------
+
+
+
 AS_IF([test "$enableoptional" != no],
       [
         AC_MSG_RESULT(----------------------------------------------)
