@@ -30,6 +30,15 @@
          LIBMESH_ASSERT_FP_EQUAL(expected,actual,tolerance)
 #endif
 
+
+#define LIBMESH_ASSERT_REALVEC_EQUAL(expected,actual,tolerance) \
+  do { \
+    VectorValue<Real> expected_vec{expected}; \
+    VectorValue<Real> actual_vec{actual}; \
+  for (int realvec_d=0; realvec_d != LIBMESH_DIM; ++realvec_d) \
+    LIBMESH_ASSERT_FP_EQUAL(expected(realvec_d), actual(realvec_d), tolerance); \
+  } while(0)
+
 // THE CPPUNIT_TEST_SUITE_END macro expands to code that involves
 // std::auto_ptr, which in turn produces -Wdeprecated-declarations
 // warnings.  These can be ignored in GCC as long as we wrap the
