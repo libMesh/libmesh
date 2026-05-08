@@ -42,6 +42,10 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 public:
+  const RealVectorValue unit_x{1};
+  const RealVectorValue unit_y{0,1};
+  const RealVectorValue unit_z{0,0,1};
+
   void setUp()
   {
   }
@@ -58,26 +62,18 @@ public:
       // Reference
       const Elem & edge2 = ReferenceElem::get(EDGE2);
       const Point n1 = edge2.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n1, TOLERANCE*TOLERANCE);
       const Point n2 = edge2.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(1, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n2, TOLERANCE*TOLERANCE);
     }
     {
       // Oriented
       std::vector<Point> pts = {Point(1, 0, 0), Point(1, 3, 0)};
       auto [edge2, nodes] = this->construct_elem(pts, EDGE2);
       const Point n1 = edge2->side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
       const Point n2 = edge2->side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n2, TOLERANCE*TOLERANCE);
     }
   }
 
@@ -89,13 +85,9 @@ public:
       // Reference
       const Elem & edge3 = ReferenceElem::get(EDGE3);
       const Point n1 = edge3.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n1, TOLERANCE*TOLERANCE);
       const Point n2 = edge3.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(1, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n2, TOLERANCE*TOLERANCE);
     }
 
     {
@@ -111,9 +103,7 @@ public:
         fe->attach_quadrature_rule(&qface);
         fe->reinit(edge3.get(), s, TOLERANCE);
         const Point n1 = edge3->side_vertex_average_normal(s);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](0), n1(0), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](1), n1(1), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](2), n1(2), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_REALVEC_EQUAL(normals[0], n1, TOLERANCE*TOLERANCE);
       }
     }
   }
@@ -126,34 +116,22 @@ public:
       // Reference
       const Elem & tri3 = ReferenceElem::get(TRI3);
       const Point n1 = tri3.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
       const Point n2 = tri3.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y).unit(), n2, TOLERANCE*TOLERANCE);
       const Point n3 = tri3.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n3, TOLERANCE*TOLERANCE);
     }
     {
       // General shape
       std::vector<Point> pts = {Point(1, 0, 0), Point(1, 1, 0), Point(0, 3, 1)};
       auto [tri3, nodes] = this->construct_elem(pts, TRI3);
       const Point n1 = tri3->side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-sqrt(2) / 2, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x-unit_z).unit(), n1, TOLERANCE*TOLERANCE);
       const Point n2 = tri3->side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(1. / sqrt(3), n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1. / sqrt(3), n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1. / sqrt(3), n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y-unit_z).unit(), n2, TOLERANCE*TOLERANCE);
       const Point n3 = tri3->side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(-3. / sqrt(22), n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-2. / sqrt(22), n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(3. / sqrt(22), n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((-3*unit_x-2*unit_y+3*unit_z).unit(), n3, TOLERANCE*TOLERANCE);
     }
   }
 
@@ -165,21 +143,13 @@ public:
       // Reference
       const Elem & quad4 = ReferenceElem::get(QUAD4);
       const Point n1 = quad4.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
       const Point n2 = quad4.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(1, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n2, TOLERANCE*TOLERANCE);
       const Point n3 = quad4.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n3, TOLERANCE*TOLERANCE);
       const Point n4 = quad4.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
     }
 
     {
@@ -187,21 +157,13 @@ public:
       std::vector<Point> pts = {Point(1, 0, 0), Point(1, 3, 0), Point(-1, -1, 0), Point(0, -1, 0)};
       auto [quad4, nodes] = this->construct_elem(pts, QUAD4);
       const Point n1 = quad4->side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(1, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n1, TOLERANCE*TOLERANCE);
       const Point n2 = quad4->side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(-2 / sqrt(5), n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1 / sqrt(5), n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((-2*unit_x+unit_y).unit(), n2, TOLERANCE*TOLERANCE);
       const Point n3 = quad4->side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n3, TOLERANCE*TOLERANCE);
       const Point n4 = quad4->side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(1 / sqrt(2), n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1 / sqrt(2), n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x-unit_y).unit(), n4, TOLERANCE*TOLERANCE);
     }
 
     {
@@ -209,21 +171,13 @@ public:
       std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 1), Point(1, 1, 0), Point(0, 1, 1)};
       auto [quad4, nodes] = this->construct_elem(pts, QUAD4);
       const Point n1 = quad4->side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
       const Point n2 = quad4->side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(1, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n2, TOLERANCE*TOLERANCE);
       const Point n3 = quad4->side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n3, TOLERANCE*TOLERANCE);
       const Point n4 = quad4->side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
     }
 
     {
@@ -234,9 +188,7 @@ public:
       {
         const Point n1 = quad4->side_vertex_average_normal(s);
         const Point normal = quad4->Elem::side_vertex_average_normal(s);
-        LIBMESH_ASSERT_FP_EQUAL(normal(0), n1(0), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normal(1), n1(1), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normal(2), n1(2), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_REALVEC_EQUAL(normal, n1, TOLERANCE*TOLERANCE);
       }
     }
   }
@@ -250,21 +202,13 @@ public:
       // Reference
       const Elem & tet4 = ReferenceElem::get(TET4);
       const Point n1 = tet4.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
       const Point n2 = tet4.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
       const Point n3 = tet4.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(1./sqrt(3), n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1./sqrt(3), n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1./sqrt(3), n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y+unit_z).unit(), n3, TOLERANCE*TOLERANCE);
       const Point n4 = tet4.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
     }
   }
 
@@ -276,25 +220,15 @@ public:
       // Reference
       const Elem & pyr5 = ReferenceElem::get(PYRAMID5);
       const Point n1 = pyr5.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-sqrt(2) / 2, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((-unit_y+unit_z).unit(), n1, TOLERANCE*TOLERANCE);
       const Point n2 = pyr5.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_z).unit(), n2, TOLERANCE*TOLERANCE);
       const Point n3 = pyr5.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((unit_y+unit_z).unit(), n3, TOLERANCE*TOLERANCE);
       const Point n4 = pyr5.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(-sqrt(2) / 2, n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((-unit_x+unit_z).unit(), n4, TOLERANCE*TOLERANCE);
       const Point n5 = pyr5.side_vertex_average_normal(4);
-      LIBMESH_ASSERT_FP_EQUAL(0, n5(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n5(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n5(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n5, TOLERANCE*TOLERANCE);
     }
   }
 
@@ -306,25 +240,15 @@ public:
       // Reference
       const Elem & pri6 = ReferenceElem::get(PRISM6);
       const Point n1 = pri6.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
       const Point n2 = pri6.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
       const Point n3 = pri6.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(sqrt(2) / 2, n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y).unit(), n3, TOLERANCE*TOLERANCE);
       const Point n4 = pri6.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
       const Point n5 = pri6.side_vertex_average_normal(4);
-      LIBMESH_ASSERT_FP_EQUAL(0, n5(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n5(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n5(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_z, n5, TOLERANCE*TOLERANCE);
     }
   }
 
@@ -336,29 +260,17 @@ public:
       // Reference
       const Elem & hex8 = ReferenceElem::get(HEX8);
       const Point n1 = hex8.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
       const Point n2 = hex8.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
       const Point n3 = hex8.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(1, n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n3, TOLERANCE*TOLERANCE);
       const Point n4 = hex8.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n4, TOLERANCE*TOLERANCE);
       const Point n5 = hex8.side_vertex_average_normal(4);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n5(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n5(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n5(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n5, TOLERANCE*TOLERANCE);
       const Point n6 = hex8.side_vertex_average_normal(5);
-      LIBMESH_ASSERT_FP_EQUAL(0, n6(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n6(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n6(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_z, n6, TOLERANCE*TOLERANCE);
     }
 
     {
@@ -375,9 +287,7 @@ public:
         fe->attach_quadrature_rule(&qface);
         fe->reinit(hex8.get(), s, TOLERANCE);
         const Point n1 = hex8->side_vertex_average_normal(s);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](0), n1(0), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](1), n1(1), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](2), n1(2), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_REALVEC_EQUAL(normals[0], n1, TOLERANCE*TOLERANCE);
       }
     }
   }
@@ -390,50 +300,30 @@ public:
       std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
       auto [square, nodes] = this->construct_elem(pts, C0POLYGON);
       const Point n1 = square->side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
       const Point n2 = square->side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(1, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n2, TOLERANCE*TOLERANCE);
       const Point n3 = square->side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n3, TOLERANCE*TOLERANCE);
       const Point n4 = square->side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
     }
     {
       // Hexagon (not the ref one but an easy one to draw)
       std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1.5, 1, 0), Point(1, 2, 0), Point(0, 2, 0) , Point(-0.5, 1, 0)};
       auto [hexagon, nodes] = this->construct_elem(pts, C0POLYGON);
       const Point n1 = hexagon->side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
       const Point n2 = hexagon->side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(2 / sqrt(5), n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1 / sqrt(5), n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((2*unit_x-unit_y).unit(), n2, TOLERANCE*TOLERANCE);
       const Point n3 = hexagon->side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(2 / sqrt(5), n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1 / sqrt(5), n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((2*unit_x+unit_y).unit(), n3, TOLERANCE*TOLERANCE);
       const Point n4 = hexagon->side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n4, TOLERANCE*TOLERANCE);
       const Point n5 = hexagon->side_vertex_average_normal(4);
-      LIBMESH_ASSERT_FP_EQUAL(-2 / sqrt(5), n5(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1 / sqrt(5), n5(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n5(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((-2*unit_x+unit_y).unit(), n5, TOLERANCE*TOLERANCE);
       const Point n6 = hexagon->side_vertex_average_normal(5);
-      LIBMESH_ASSERT_FP_EQUAL(-2 / sqrt(5), n6(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1 / sqrt(5), n6(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n6(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL((-2*unit_x-unit_y).unit(), n6, TOLERANCE*TOLERANCE);
     }
     {
       // Non-planar quad (see quad unit test)
@@ -453,9 +343,7 @@ public:
         fe->attach_quadrature_rule(&qface);
         fe->reinit(quad4.get(), s, TOLERANCE);
         const Point n1 = quad4->side_vertex_average_normal(s);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](0), n1(0), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](1), n1(1), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normals[0](2), n1(2), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_REALVEC_EQUAL(normals[0], n1, TOLERANCE*TOLERANCE);
       }
     }
   }
@@ -498,29 +386,17 @@ public:
       std::unique_ptr<libMesh::Node> mid_elem_node;
       std::unique_ptr<Elem> polyhedron = std::make_unique<C0Polyhedron>(sides, mid_elem_node);
       const Point n1 = polyhedron->side_vertex_average_normal(0);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n1(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n1(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
       const Point n2 = polyhedron->side_vertex_average_normal(1);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n2(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n2(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
       const Point n3 = polyhedron->side_vertex_average_normal(2);
-      LIBMESH_ASSERT_FP_EQUAL(1, n3(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n3(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n3, TOLERANCE*TOLERANCE);
       const Point n4 = polyhedron->side_vertex_average_normal(3);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n4(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n4(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n4, TOLERANCE*TOLERANCE);
       const Point n5 = polyhedron->side_vertex_average_normal(4);
-      LIBMESH_ASSERT_FP_EQUAL(-1, n5(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n5(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n5(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n5, TOLERANCE*TOLERANCE);
       const Point n6 = polyhedron->side_vertex_average_normal(5);
-      LIBMESH_ASSERT_FP_EQUAL(0, n6(0), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(0, n6(1), TOLERANCE*TOLERANCE);
-      LIBMESH_ASSERT_FP_EQUAL(1, n6(2), TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_REALVEC_EQUAL(unit_z, n6, TOLERANCE*TOLERANCE);
     }
 
     {
@@ -562,9 +438,7 @@ public:
       {
         const Point n1 = polyhedron->side_vertex_average_normal(s);
         const Point normal = hex8->Elem::side_vertex_average_normal(s);
-        LIBMESH_ASSERT_FP_EQUAL(normal(0), n1(0), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normal(1), n1(1), TOLERANCE*TOLERANCE);
-        LIBMESH_ASSERT_FP_EQUAL(normal(2), n1(2), TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_REALVEC_EQUAL(normal, n1, TOLERANCE*TOLERANCE);
       }
     }
   }
