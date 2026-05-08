@@ -31,12 +31,12 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( SideVertexAverageNormalTest );
   CPPUNIT_TEST( testEdge2 );
   CPPUNIT_TEST( testEdge3 );
-  CPPUNIT_TEST( testTri3 );
-  CPPUNIT_TEST( testQuad4 );
-  CPPUNIT_TEST( testTet4 );
-  CPPUNIT_TEST( testPyramid5 );
-  CPPUNIT_TEST( testPrism6 );
-  CPPUNIT_TEST( testHex8 );
+  CPPUNIT_TEST( testTris );
+  CPPUNIT_TEST( testQuads );
+  CPPUNIT_TEST( testTets );
+  CPPUNIT_TEST( testPyramids );
+  CPPUNIT_TEST( testPrisms );
+  CPPUNIT_TEST( testHexes );
   CPPUNIT_TEST( testC0Polygon );
   CPPUNIT_TEST( testC0Polyhedron );
   CPPUNIT_TEST_SUITE_END();
@@ -108,20 +108,26 @@ public:
     }
   }
 
-  void testTri3()
+
+  void testTris()
   {
     LOG_UNIT_TEST;
 
-    {
-      // Reference
-      const Elem & tri3 = ReferenceElem::get(TRI3);
-      const Point n1 = tri3.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
-      const Point n2 = tri3.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y).unit(), n2, TOLERANCE*TOLERANCE);
-      const Point n3 = tri3.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n3, TOLERANCE*TOLERANCE);
-    }
+    // Reference elements
+    const Elem * tris[] = {&ReferenceElem::get(TRI3),
+                           &ReferenceElem::get(TRI6),
+                           &ReferenceElem::get(TRI7)};
+
+    for (const Elem * tri : tris)
+      {
+        const Point n1 = tri->side_vertex_average_normal(0);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
+        const Point n2 = tri->side_vertex_average_normal(1);
+        LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y).unit(), n2, TOLERANCE*TOLERANCE);
+        const Point n3 = tri->side_vertex_average_normal(2);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n3, TOLERANCE*TOLERANCE);
+      }
+
     {
       // General shape
       std::vector<Point> pts = {Point(1, 0, 0), Point(1, 1, 0), Point(0, 3, 1)};
@@ -135,22 +141,26 @@ public:
     }
   }
 
-  void testQuad4()
+  void testQuads()
   {
     LOG_UNIT_TEST;
 
-    {
-      // Reference
-      const Elem & quad4 = ReferenceElem::get(QUAD4);
-      const Point n1 = quad4.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
-      const Point n2 = quad4.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n2, TOLERANCE*TOLERANCE);
-      const Point n3 = quad4.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n3, TOLERANCE*TOLERANCE);
-      const Point n4 = quad4.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
-    }
+    // Reference
+    const Elem * quads[] = {&ReferenceElem::get(QUAD4),
+                            &ReferenceElem::get(QUAD8),
+                            &ReferenceElem::get(QUAD9)};
+
+    for (const Elem * quad : quads)
+      {
+        const Point n1 = quad->side_vertex_average_normal(0);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n1, TOLERANCE*TOLERANCE);
+        const Point n2 = quad->side_vertex_average_normal(1);
+        LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n2, TOLERANCE*TOLERANCE);
+        const Point n3 = quad->side_vertex_average_normal(2);
+        LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n3, TOLERANCE*TOLERANCE);
+        const Point n4 = quad->side_vertex_average_normal(3);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
+      }
 
     {
       // Planar, general shape
@@ -194,84 +204,102 @@ public:
   }
 
 
-  void testTet4()
+  void testTets()
   {
     LOG_UNIT_TEST;
 
-    {
-      // Reference
-      const Elem & tet4 = ReferenceElem::get(TET4);
-      const Point n1 = tet4.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
-      const Point n2 = tet4.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
-      const Point n3 = tet4.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y+unit_z).unit(), n3, TOLERANCE*TOLERANCE);
-      const Point n4 = tet4.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
-    }
+    // Reference
+    const Elem * tets[] = {&ReferenceElem::get(TET4),
+                           &ReferenceElem::get(TET10),
+                           &ReferenceElem::get(TET14)};
+
+    for (const Elem * tet : tets)
+      {
+        const Point n1 = tet->side_vertex_average_normal(0);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
+        const Point n2 = tet->side_vertex_average_normal(1);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
+        const Point n3 = tet->side_vertex_average_normal(2);
+        LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y+unit_z).unit(), n3, TOLERANCE*TOLERANCE);
+        const Point n4 = tet->side_vertex_average_normal(3);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
+      }
   }
 
-  void testPyramid5()
+  void testPyramids()
   {
     LOG_UNIT_TEST;
 
-    {
-      // Reference
-      const Elem & pyr5 = ReferenceElem::get(PYRAMID5);
-      const Point n1 = pyr5.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_REALVEC_EQUAL((-unit_y+unit_z).unit(), n1, TOLERANCE*TOLERANCE);
-      const Point n2 = pyr5.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_z).unit(), n2, TOLERANCE*TOLERANCE);
-      const Point n3 = pyr5.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_REALVEC_EQUAL((unit_y+unit_z).unit(), n3, TOLERANCE*TOLERANCE);
-      const Point n4 = pyr5.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_REALVEC_EQUAL((-unit_x+unit_z).unit(), n4, TOLERANCE*TOLERANCE);
-      const Point n5 = pyr5.side_vertex_average_normal(4);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n5, TOLERANCE*TOLERANCE);
-    }
+    // Reference
+    const Elem * pyrs[] = {&ReferenceElem::get(PYRAMID5),
+                           &ReferenceElem::get(PYRAMID13),
+                           &ReferenceElem::get(PYRAMID14),
+                           &ReferenceElem::get(PYRAMID18)};
+
+    for (const Elem * pyr : pyrs)
+      {
+        const Point n1 = pyr->side_vertex_average_normal(0);
+        LIBMESH_ASSERT_REALVEC_EQUAL((-unit_y+unit_z).unit(), n1, TOLERANCE*TOLERANCE);
+        const Point n2 = pyr->side_vertex_average_normal(1);
+        LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_z).unit(), n2, TOLERANCE*TOLERANCE);
+        const Point n3 = pyr->side_vertex_average_normal(2);
+        LIBMESH_ASSERT_REALVEC_EQUAL((unit_y+unit_z).unit(), n3, TOLERANCE*TOLERANCE);
+        const Point n4 = pyr->side_vertex_average_normal(3);
+        LIBMESH_ASSERT_REALVEC_EQUAL((-unit_x+unit_z).unit(), n4, TOLERANCE*TOLERANCE);
+        const Point n5 = pyr->side_vertex_average_normal(4);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n5, TOLERANCE*TOLERANCE);
+      }
   }
 
-  void testPrism6()
+  void testPrisms()
   {
     LOG_UNIT_TEST;
 
-    {
-      // Reference
-      const Elem & pri6 = ReferenceElem::get(PRISM6);
-      const Point n1 = pri6.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
-      const Point n2 = pri6.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
-      const Point n3 = pri6.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y).unit(), n3, TOLERANCE*TOLERANCE);
-      const Point n4 = pri6.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
-      const Point n5 = pri6.side_vertex_average_normal(4);
-      LIBMESH_ASSERT_REALVEC_EQUAL(unit_z, n5, TOLERANCE*TOLERANCE);
-    }
+    // Reference
+    const Elem * pris[] = {&ReferenceElem::get(PRISM6),
+                           &ReferenceElem::get(PRISM15),
+                           &ReferenceElem::get(PRISM18),
+                           &ReferenceElem::get(PRISM20),
+                           &ReferenceElem::get(PRISM21)};
+
+    for (const Elem * pri : pris)
+      {
+        const Point n1 = pri->side_vertex_average_normal(0);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
+        const Point n2 = pri->side_vertex_average_normal(1);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
+        const Point n3 = pri->side_vertex_average_normal(2);
+        LIBMESH_ASSERT_REALVEC_EQUAL((unit_x+unit_y).unit(), n3, TOLERANCE*TOLERANCE);
+        const Point n4 = pri->side_vertex_average_normal(3);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n4, TOLERANCE*TOLERANCE);
+        const Point n5 = pri->side_vertex_average_normal(4);
+        LIBMESH_ASSERT_REALVEC_EQUAL(unit_z, n5, TOLERANCE*TOLERANCE);
+      }
   }
 
-  void testHex8()
+  void testHexes()
   {
     LOG_UNIT_TEST;
 
-    {
-      // Reference
-      const Elem & hex8 = ReferenceElem::get(HEX8);
-      const Point n1 = hex8.side_vertex_average_normal(0);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
-      const Point n2 = hex8.side_vertex_average_normal(1);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
-      const Point n3 = hex8.side_vertex_average_normal(2);
-      LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n3, TOLERANCE*TOLERANCE);
-      const Point n4 = hex8.side_vertex_average_normal(3);
-      LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n4, TOLERANCE*TOLERANCE);
-      const Point n5 = hex8.side_vertex_average_normal(4);
-      LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n5, TOLERANCE*TOLERANCE);
-      const Point n6 = hex8.side_vertex_average_normal(5);
-      LIBMESH_ASSERT_REALVEC_EQUAL(unit_z, n6, TOLERANCE*TOLERANCE);
-    }
+    const Elem * hexes[] = {&ReferenceElem::get(HEX8),
+                            &ReferenceElem::get(HEX20),
+                            &ReferenceElem::get(HEX27)};
+
+    for (const Elem * hex : hexes)
+      {
+        const Point n1 = hex->side_vertex_average_normal(0);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_z, n1, TOLERANCE*TOLERANCE);
+        const Point n2 = hex->side_vertex_average_normal(1);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_y, n2, TOLERANCE*TOLERANCE);
+        const Point n3 = hex->side_vertex_average_normal(2);
+        LIBMESH_ASSERT_REALVEC_EQUAL(unit_x, n3, TOLERANCE*TOLERANCE);
+        const Point n4 = hex->side_vertex_average_normal(3);
+        LIBMESH_ASSERT_REALVEC_EQUAL(unit_y, n4, TOLERANCE*TOLERANCE);
+        const Point n5 = hex->side_vertex_average_normal(4);
+        LIBMESH_ASSERT_REALVEC_EQUAL(-unit_x, n5, TOLERANCE*TOLERANCE);
+        const Point n6 = hex->side_vertex_average_normal(5);
+        LIBMESH_ASSERT_REALVEC_EQUAL(unit_z, n6, TOLERANCE*TOLERANCE);
+      }
 
     {
       // Non-planar quad faces
