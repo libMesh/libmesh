@@ -7,6 +7,7 @@ AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 	       -DLIBMESH_IS_UNIT_TESTING
 AM_LDFLAGS   = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
 LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
+KOKKOS_TEST_CPPFLAGS =
 
 # We might have turned on -Werror and/or paranoid warnings
 CXXFLAGS_DBG += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
@@ -249,6 +250,26 @@ if LIBMESH_ENABLE_FPARSER
 endif
 
 check_PROGRAMS = # empty, append below
+TESTS =
+
+if LIBMESH_ENABLE_KOKKOS
+  KOKKOS_TEST_CPPFLAGS += -I$(top_srcdir)/include $(KOKKOS_CPPFLAGS)
+
+  check_PROGRAMS += kokkos_vector_ops_oracle_unit kokkos_tensor_ops_oracle_unit
+  TESTS += kokkos_vector_ops_oracle_unit kokkos_tensor_ops_oracle_unit
+
+  kokkos_vector_ops_oracle_unit_SOURCES  = numerics/kokkos_vector_ops_oracle_test.K
+  kokkos_vector_ops_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_vector_ops_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_vector_ops_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_vector_ops_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_tensor_ops_oracle_unit_SOURCES  = numerics/kokkos_tensor_ops_oracle_test.K
+  kokkos_tensor_ops_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_tensor_ops_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_tensor_ops_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_tensor_ops_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+endif
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
@@ -359,8 +380,27 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 
 
 if LIBMESH_ENABLE_CPPUNIT
-TESTS = run_unit_tests.sh
+TESTS += run_unit_tests.sh
 endif
+
+# Compile .K translation units with the Kokkos device compiler.
+# If KOKKOS_CXX is not the MPI wrapper, configure populates
+# $(KOKKOS_MPI_CPPFLAGS) from the wrapper's compile flags so mpi.h and
+# any wrapper-provided defines remain visible.
+.K.o:
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c $< -o $@
+
+# Custom link rules so the Kokkos compiler drives the final link step.
+kokkos_vector_ops_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_vector_ops_oracle_unit_LDFLAGS) -o $@
+
+kokkos_tensor_ops_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_tensor_ops_oracle_unit_LDFLAGS) -o $@
 
 CLEANFILES = cube_mesh.xda \
              slit_mesh.xda \
