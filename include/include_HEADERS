@@ -28,6 +28,7 @@ include_HEADERS =  \
         base/libmesh_abort.h \
         base/libmesh_base.h \
         base/libmesh_common.h \
+        base/libmesh_device.h \
         base/libmesh_documentation.h \
         base/libmesh_exceptions.h \
         base/libmesh_logging.h \
@@ -174,6 +175,11 @@ include_HEADERS =  \
         geom/sphere.h \
         geom/stored_range.h \
         geom/surface.h \
+        gpu/kokkos_linalg_base.h \
+        gpu/kokkos_storage.h \
+        gpu/kokkos_storage_policy.h \
+        gpu/kokkos_tensor_ops.h \
+        gpu/kokkos_vector_ops.h \
         ghosting/default_coupling.h \
         ghosting/ghost_point_neighbors.h \
         ghosting/ghosting_functor.h \
