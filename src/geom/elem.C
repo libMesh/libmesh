@@ -3518,6 +3518,7 @@ Elem::side_vertex_average_normal(const unsigned int s) const
   const std::unique_ptr<const Elem> face = this->build_side_ptr(s);
   std::unique_ptr<libMesh::FEBase> fe(
       libMesh::FEBase::build(dim, libMesh::FEType(this->default_order())));
+  fe->add_p_level_in_reinit(false); // Yes, really use the default order
   const std::vector<Point> & normals = fe->get_normals();
   std::vector<Point> ref_side_vertex_average_v = {face->reference_elem()->vertex_average()};
   fe->reinit(this, s, TOLERANCE, &ref_side_vertex_average_v);
