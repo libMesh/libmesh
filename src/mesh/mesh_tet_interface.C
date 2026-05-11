@@ -33,6 +33,8 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
 
+#include "timpi/parallel_implementation.h"
+
 namespace {
   using namespace libMesh;
 
@@ -463,8 +465,21 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
   Threads::parallel_reduce
     (this->_mesh.active_local_element_stored_range(), checker);
 
-  // Return anything and everything we found
+  // Join problems found in threaded loop
   returnval.merge(checker.my_returnval);
+
+  // Join problems found on other ranks
+  std::set<char> int_set;
+  std::transform
+    (returnval.begin(), returnval.end(),
+     std::inserter<std::set<char>>(int_set, int_set.end()),
+     [](SurfaceIntegrity i){return int(i);});
+  _mesh.comm().set_union(int_set);
+  std::transform
+    (int_set.begin(), int_set.end(),
+     std::inserter<std::set<SurfaceIntegrity>>(returnval, returnval.end()),
+     [](int i){return SurfaceIntegrity(i);});
+
   return returnval;
 }
 
