@@ -233,8 +233,6 @@ template <typename StoragePolicy>
 static int
 test_linalg_foundation_storage_roundtrip()
 {
-  int fail = 0;
-
   auto d_vector = libMesh::Kokkos::make_vector_storage<StoragePolicy>("foundation_vector", 1);
   auto d_tensor = libMesh::Kokkos::make_tensor_storage<StoragePolicy>("foundation_tensor", 1);
 
@@ -253,51 +251,64 @@ test_linalg_foundation_storage_roundtrip()
     ::Kokkos::deep_copy(d_tensor, h_tensor);
   }
 
-  const auto vector_in = libMesh::Kokkos::make_vector_ref(d_vector, 0);
-  const auto tensor_in = libMesh::Kokkos::make_tensor_ref(d_tensor, 0);
-
-  const auto as_point = libMesh::Kokkos::materialize_vector<libMesh::Point>(vector_in);
-  const auto as_vector_value =
-    libMesh::Kokkos::materialize_vector<libMesh::VectorValue<Real>>(vector_in);
-  const auto as_type_vector =
-    libMesh::Kokkos::materialize_vector<libMesh::TypeVector<Real>>(vector_in);
-
-  for (unsigned int d = 0; d < LIBMESH_DIM; ++d)
-  {
-    const Real expected = Real(d + 1) * Real(0.5);
-    fail += (std::fabs(as_point(d) - expected) <= tol) ? 0 : 1;
-    fail += (std::fabs(as_vector_value(d) - expected) <= tol) ? 0 : 1;
-    fail += (std::fabs(as_type_vector(d) - expected) <= tol) ? 0 : 1;
-  }
-
-  const auto as_tensor_value =
-    libMesh::Kokkos::materialize_tensor<libMesh::TensorValue<Real>>(tensor_in);
-  const auto as_type_tensor =
-    libMesh::Kokkos::materialize_tensor<libMesh::TypeTensor<Real>>(tensor_in);
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-    {
-      const Real expected = Real(10 * row + col + 1) * Real(0.25);
-      fail += (std::fabs(as_tensor_value(row, col) - expected) <= tol) ? 0 : 1;
-      fail += (std::fabs(as_type_tensor(row, col) - expected) <= tol) ? 0 : 1;
-    }
-
   auto d_vector_out = libMesh::Kokkos::make_vector_storage<StoragePolicy>("foundation_vector_out", 1);
   auto d_tensor_out = libMesh::Kokkos::make_tensor_storage<StoragePolicy>("foundation_tensor_out", 1);
+  ::Kokkos::View<int> d_fail("foundation_fail");
 
-  auto vector_out = libMesh::Kokkos::make_vector_ref(d_vector_out, 0);
-  auto tensor_out = libMesh::Kokkos::make_tensor_ref(d_tensor_out, 0);
+  ::Kokkos::parallel_for(
+    1,
+    KOKKOS_LAMBDA(int) {
+      int local_fail = 0;
 
-  vector_out.zero();
-  vector_out.assign(as_vector_value);
-  vector_out.add_scaled(as_type_vector, Real(0));
-  vector_out.subtract_scaled(as_type_vector, Real(0));
+      const auto vector_in = libMesh::Kokkos::make_vector_ref(d_vector, 0);
+      const auto tensor_in = libMesh::Kokkos::make_tensor_ref(d_tensor, 0);
 
-  tensor_out.zero();
-  tensor_out.assign(as_tensor_value);
-  tensor_out.add_scaled(as_type_tensor, Real(0));
-  tensor_out.subtract_scaled(as_type_tensor, Real(0));
+      const auto as_point = libMesh::Kokkos::materialize_vector<libMesh::Point>(vector_in);
+      const auto as_vector_value =
+        libMesh::Kokkos::materialize_vector<libMesh::VectorValue<Real>>(vector_in);
+      const auto as_type_vector =
+        libMesh::Kokkos::materialize_vector<libMesh::TypeVector<Real>>(vector_in);
+
+      for (unsigned int d = 0; d < LIBMESH_DIM; ++d)
+      {
+        const Real expected = Real(d + 1) * Real(0.5);
+        local_fail += (std::fabs(as_point(d) - expected) <= tol) ? 0 : 1;
+        local_fail += (std::fabs(as_vector_value(d) - expected) <= tol) ? 0 : 1;
+        local_fail += (std::fabs(as_type_vector(d) - expected) <= tol) ? 0 : 1;
+      }
+
+      const auto as_tensor_value =
+        libMesh::Kokkos::materialize_tensor<libMesh::TensorValue<Real>>(tensor_in);
+      const auto as_type_tensor =
+        libMesh::Kokkos::materialize_tensor<libMesh::TypeTensor<Real>>(tensor_in);
+
+      for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+        for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+        {
+          const Real expected = Real(10 * row + col + 1) * Real(0.25);
+          local_fail += (std::fabs(as_tensor_value(row, col) - expected) <= tol) ? 0 : 1;
+          local_fail += (std::fabs(as_type_tensor(row, col) - expected) <= tol) ? 0 : 1;
+        }
+
+      auto vector_out = libMesh::Kokkos::make_vector_ref(d_vector_out, 0);
+      auto tensor_out = libMesh::Kokkos::make_tensor_ref(d_tensor_out, 0);
+
+      vector_out.zero();
+      vector_out.assign(as_vector_value);
+      vector_out.add_scaled(as_type_vector, Real(0));
+      vector_out.subtract_scaled(as_type_vector, Real(0));
+
+      tensor_out.zero();
+      tensor_out.assign(as_tensor_value);
+      tensor_out.add_scaled(as_type_tensor, Real(0));
+      tensor_out.subtract_scaled(as_type_tensor, Real(0));
+
+      d_fail() = local_fail;
+    });
+  ::Kokkos::fence();
+
+  int fail = 0;
+  ::Kokkos::deep_copy(fail, d_fail);
 
   {
     auto h_vector_out = ::Kokkos::create_mirror_view(d_vector_out);
@@ -306,11 +317,17 @@ test_linalg_foundation_storage_roundtrip()
     ::Kokkos::deep_copy(h_tensor_out, d_tensor_out);
 
     for (unsigned int d = 0; d < LIBMESH_DIM; ++d)
-      fail += (std::fabs(h_vector_out(0, d) - as_vector_value(d)) <= tol) ? 0 : 1;
+    {
+      const Real expected = Real(d + 1) * Real(0.5);
+      fail += (std::fabs(h_vector_out(0, d) - expected) <= tol) ? 0 : 1;
+    }
 
     for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
       for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-        fail += (std::fabs(h_tensor_out(0, row, col) - as_tensor_value(row, col)) <= tol) ? 0 : 1;
+      {
+        const Real expected = Real(10 * row + col + 1) * Real(0.25);
+        fail += (std::fabs(h_tensor_out(0, row, col) - expected) <= tol) ? 0 : 1;
+      }
   }
 
   return fail;
