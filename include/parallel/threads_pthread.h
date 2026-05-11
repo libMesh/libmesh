@@ -285,6 +285,8 @@ void parallel_for (const Range & range, const Body & body,
     return;
   }
 
+  Threads::RAIIAcquire<int> a(Threads::active_threads, actual_threads);
+
   DisablePerfLogInScope disable_perf;
 
   std::vector<std::unique_ptr<Range>> ranges(actual_threads);
@@ -379,6 +381,8 @@ void parallel_reduce (const Range & range, Body & body,
     body(range);
     return;
   }
+
+  Threads::RAIIAcquire<int> a(Threads::active_threads, actual_threads);
 
   DisablePerfLogInScope disable_perf;
 

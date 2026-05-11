@@ -40,15 +40,26 @@ namespace Threads
 {
 
 /**
+ * An integer which is set to the number of active threads when we are
+ * in a Threads:: parallel operation.
+ */
+extern int active_threads;
+
+/**
  * A boolean which is true iff we are in a Threads:: function
- * It may be useful to assert(!Threads::in_threads) in any code
- * which is known to not be thread-safe.
+ * It may be useful to assert(!Threads::in_threads), in any code which
+ * is known to not be thread-safe.  Code which is not thread-safe but
+ * which is specifically enabled only when multiple threads are active
+ * might test for (Threads::active_threads != 1) instead.
  */
 extern bool in_threads;
 
 /**
  * We use a class to turn Threads::in_threads on and off, to be
  * exception-safe.
+ *
+ * We'll use the same class to set Threads::active_threads, for the
+ * same reason, but it's a little more complicated for that.
  */
 template <typename T, T new_x_default = T(), bool assert_change = false>
 class RAIIAcquire

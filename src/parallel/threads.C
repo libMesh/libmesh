@@ -29,6 +29,7 @@ namespace Threads
 // object instantiation
 spin_mutex spin_mtx;
 recursive_mutex recursive_mtx;
+int active_threads = 1;
 bool in_threads = false;
 
 void lock_singleton_spin_mutex() { spin_mtx.lock(); }

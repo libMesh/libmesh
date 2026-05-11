@@ -151,6 +151,8 @@ void parallel_for (const Range & range, const Body & body,
 
   if (n_threads > 1)
     {
+      Threads::RAIIAcquire<int> a(Threads::active_threads, n_threads);
+
       DisablePerfLogInScope disable_perf;
       if (n_threads == libMesh::n_threads())
         tbb::parallel_for (range, body, tbb::auto_partitioner());
@@ -182,6 +184,8 @@ void parallel_for (const Range & range, const Body & body, const Partitioner & p
 
   if (n_threads > 1)
     {
+      Threads::RAIIAcquire<int> a(Threads::active_threads, n_threads);
+
       DisablePerfLogInScope disable_perf;
       if (n_threads == libMesh::n_threads())
         tbb::parallel_for (range, body, partitioner);
@@ -213,6 +217,8 @@ void parallel_reduce (const Range & range, Body & body,
 
   if (n_threads > 1)
     {
+      Threads::RAIIAcquire<int> a(Threads::active_threads, n_threads);
+
       DisablePerfLogInScope disable_perf;
       if (n_threads == libMesh::n_threads())
         tbb::parallel_reduce (range, body, tbb::auto_partitioner());
@@ -244,6 +250,8 @@ void parallel_reduce (const Range & range, Body & body, const Partitioner & part
 
   if (n_threads > 1)
     {
+      Threads::RAIIAcquire<int> a(Threads::active_threads, n_threads);
+
       DisablePerfLogInScope disable_perf;
       if (n_threads == libMesh::n_threads())
         tbb::parallel_reduce (range, body, partitioner);
