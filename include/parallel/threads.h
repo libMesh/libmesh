@@ -50,16 +50,27 @@ extern bool in_threads;
  * We use a class to turn Threads::in_threads on and off, to be
  * exception-safe.
  */
-class BoolAcquire
+template <typename T, T new_x_default = T(), bool assert_change = false>
+class RAIIAcquire
 {
 public:
   explicit
-  BoolAcquire(bool & b) : _b(b) { libmesh_assert(!_b); _b = true; }
+  RAIIAcquire(T & x, T new_x = new_x_default) :
+    _x(x), _old_x(x), _new_x(new_x)
+  {
+    libmesh_assert(!assert_change || _x != _new_x);
+    _x = _new_x;
+  }
 
-  ~BoolAcquire() { libmesh_exceptionless_assert(_b); _b = false; }
+  ~RAIIAcquire() { libmesh_exceptionless_assert(_x == _new_x); _x = _old_x; }
 private:
-  bool & _b;
+  T & _x;
+  T _old_x;
+  T _new_x;
 };
+
+// We'll only acquire in_threads to turn it from false to true
+typedef RAIIAcquire<bool, true, true> BoolAcquire;
 
 /**
  * We use a class to turn perf logging off and on within threads, to
