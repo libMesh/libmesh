@@ -505,12 +505,12 @@ void PerfLog::fast_push (const char * label,
   if (this->log_events)
     {
       // The global perflog stack may not be thread-safe, but if we're
-      // in threads we should have disabled it already
-      libmesh_assert(!Threads::in_threads);
+      // creating threads we should have disabled it already
+      libmesh_assert_equal_to(Threads::active_threads, 1);
 #ifdef LIBMESH_HAVE_OPENMP
       // Users might be doing their own non-libMesh threading.  We
       // can't catch every case of that but we can catch OpenMP
-      libmesh_assert(!omp_in_parallel());
+      libmesh_assert_equal_to(omp_get_num_threads(), 1);
 #endif
 
       // Get a reference to the event data to avoid
@@ -542,12 +542,12 @@ void PerfLog::fast_pop(const char * libmesh_dbg_var(label),
   if (this->log_events)
     {
       // The global perflog stack may not be thread-safe, but if we're
-      // in threads we should have disabled it already
-      libmesh_exceptionless_assert(!Threads::in_threads);
+      // creating threads we should have disabled it already
+      libmesh_exceptionless_assert(Threads::active_threads == 1);
 #ifdef LIBMESH_HAVE_OPENMP
       // Users might be doing their own non-libMesh threading.  We
-      // can't catch every case of that but we can catch OpenMP
-      libmesh_exceptionless_assert(!omp_in_parallel());
+      // can't catch every case of that but we can catch OpenMP.
+      libmesh_exceptionless_assert(omp_get_num_threads() == 1);
 #endif
 
 #ifdef LIBMESH_HAVE_NVTX_API

@@ -102,13 +102,13 @@ void PerfLog::clear()
 void PerfLog::push (const std::string & label,
                     const std::string & header)
 {
-  // The global perflog stack may not be thread-safe, but if we're in
-  // threads we should have disabled it already
-  libmesh_assert(!Threads::in_threads);
+  // The global perflog stack may not be thread-safe, but if we're
+  // creating threads we should have disabled it already
+  libmesh_assert_equal_to(Threads::active_threads, 1);
 #ifdef LIBMESH_HAVE_OPENMP
   // Users might be doing their own non-libMesh threading.  We can't
-  // catch every case of that but we can catch OpenMP
-  libmesh_assert(!omp_in_parallel());
+  // catch every case of that but we can catch OpenMP.
+  libmesh_assert_equal_to(omp_get_num_threads(), 1);
 #endif
 
   const char * label_c_str;
@@ -157,13 +157,13 @@ void PerfLog::push (const char * label,
 void PerfLog::pop (const std::string & label,
                    const std::string & header)
 {
-  // The global perflog stack may not be thread-safe, but if we're in
-  // threads we should have disabled it already
-  libmesh_assert(!Threads::in_threads);
+  // The global perflog stack may not be thread-safe, but if we're
+  // creating threads we should have disabled it already
+  libmesh_assert_equal_to(Threads::active_threads, 1);
 #ifdef LIBMESH_HAVE_OPENMP
   // Users might be doing their own non-libMesh threading.  We can't
-  // catch every case of that but we can catch OpenMP
-  libmesh_assert(!omp_in_parallel());
+  // catch every case of that but we can catch OpenMP.
+  libmesh_exceptionless_assert(omp_get_num_threads() == 1);
 #endif
 
   const char * label_c_str = non_temporary_strings[label].get();
