@@ -29,9 +29,13 @@ fi
 
 echo "Testing examples in $examples_install_path"
 
+if test "$PKG_CONFIG" = ""; then
+    PKG_CONFIG=pkg-config
+fi
+
 if test "$PKG_CONFIG" != "no"; then
-    installed_CXXFLAGS=$(pkg-config libmesh --cflags)
-    installed_LIBS=$(pkg-config libmesh --libs)
+    installed_CXXFLAGS=$($PKG_CONFIG libmesh --cflags)
+    installed_LIBS=$($PKG_CONFIG libmesh --libs)
 
 elif test -x $LIBMESH_CONFIG_PATH/libmesh-config; then
     installed_CXXFLAGS=$($LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include)
