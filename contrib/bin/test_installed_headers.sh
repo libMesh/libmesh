@@ -49,12 +49,16 @@ fi
 # Variable is set but not used
 # testing_installed_tree="no"
 
+if test "$PKG_CONFIG" = ""; then
+    PKG_CONFIG=pkg-config
+fi
+
 if test "$test_CXXFLAGS" = ""; then
 
     # testing_installed_tree="yes"
 
     if test "$PKG_CONFIG" != "no"; then
-        test_CXXFLAGS=$(pkg-config libmesh --cflags)
+        test_CXXFLAGS=$($PKG_CONFIG libmesh --cflags)
 
     elif test -x $LIBMESH_CONFIG_PATH/libmesh-config; then
         test_CXXFLAGS=$($LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include)
