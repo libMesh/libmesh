@@ -270,7 +270,57 @@ bool MeshBase::operator== (const MeshBase & other_mesh) const
 }
 
 
+void MeshBase::assert_equal_to (const MeshBase & other_mesh,
+                                std::string_view failure_context) const
+{
+#ifndef NDEBUG
+  LOG_SCOPE("assert_equal_to()", "MeshBase");
+
+  std::string_view local_diff = first_difference_from(other_mesh);
+
+  bool diff_found = !local_diff.empty();
+  this->comm().max(diff_found);
+
+  if (diff_found)
+    {
+      // Construct a user-friendly message to throw on pid 0
+      std::set<std::string> unique_diffs;
+      if (!local_diff.empty())
+        unique_diffs.insert(std::string(local_diff));
+      this->comm().set_union(unique_diffs);
+
+      if (!this->processor_id())
+        {
+          std::string error_msg {failure_context};
+          error_msg += "\nMeshes failed asserted equality in at least these aspects:\n";
+          for (auto & diff : unique_diffs)
+            {
+              error_msg += diff;
+              error_msg += '\n';
+            }
+          libmesh_assert_msg(!diff_found, error_msg);
+        }
+
+      // We're not going to throw on other processors because we don't
+      // want to accidentally preempt pid 0's error message.  We're
+      // not even going to exit on other processors because for all we
+      // know user code is going to catch that error and sync up with
+      // us later.
+    }
+#else
+  libmesh_ignore(other_mesh, failure_context);
+#endif // NDEBUG
+}
+
+
 bool MeshBase::locally_equals (const MeshBase & other_mesh) const
+{
+  const std::string_view diff = first_difference_from(other_mesh);
+  return diff.empty();
+}
+
+
+std::string_view MeshBase::first_difference_from(const MeshBase & other_mesh) const
 {
   // Check whether (almost) everything in the base is equal
   //
@@ -278,21 +328,19 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   // change in a DistributedMesh prepare_for_use(); it's conceptually
   // "mutable".
   //
-  // We use separate if statements instead of logical operators here,
-  // to make it easy to see the failing condition when using a
-  // debugger to figure out why a MeshTools::valid_is_prepared(mesh)
-  // is failing.
-  if (_n_parts != other_mesh._n_parts)
-    return false;
-  if (_default_mapping_type != other_mesh._default_mapping_type)
-    return false;
-  if (_default_mapping_data != other_mesh._default_mapping_data)
-    return false;
-  if (_preparation != other_mesh._preparation)
-    return false;
-  if (_count_lower_dim_elems_in_point_locator !=
-        other_mesh._count_lower_dim_elems_in_point_locator)
-    return false;
+  // We use separate tests here and return strings for each test,
+  // to make it easy to see the failing condition a
+  // MeshTools::libmesh_valid_is_prepared(mesh) is failing.
+
+#define CHECK_MEMBER(member_name) \
+  if (member_name != other_mesh.member_name) \
+    return #member_name;
+
+  CHECK_MEMBER(_n_parts);
+  CHECK_MEMBER(_default_mapping_type);
+  CHECK_MEMBER(_default_mapping_data);
+  CHECK_MEMBER(_preparation);
+  CHECK_MEMBER(_count_lower_dim_elems_in_point_locator);
 
   // We should either both have our own interior parents or both not;
   // but if we both don't then we can't really assert anything else
@@ -300,61 +348,43 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   // pointing at two different copies of "the same" interior mesh.
   if ((_interior_mesh == this) !=
       (other_mesh._interior_mesh == &other_mesh))
-    return false;
+    return "_interior_mesh";
 
-  if (_skip_noncritical_partitioning != other_mesh._skip_noncritical_partitioning)
-    return false;
-  if (_skip_all_partitioning != other_mesh._skip_all_partitioning)
-    return false;
-  if (_skip_renumber_nodes_and_elements != other_mesh._skip_renumber_nodes_and_elements)
-    return false;
-  if (_skip_find_neighbors != other_mesh._skip_find_neighbors)
-    return false;
-  if (_skip_detect_interior_parents != other_mesh._skip_detect_interior_parents)
-    return false;
-  if (_allow_remote_element_removal != other_mesh._allow_remote_element_removal)
-    return false;
-  if (_allow_node_and_elem_unique_id_overlap != other_mesh._allow_node_and_elem_unique_id_overlap)
-    return false;
-  if (_spatial_dimension != other_mesh._spatial_dimension)
-    return false;
-  if (_point_locator_close_to_point_tol != other_mesh._point_locator_close_to_point_tol)
-    return false;
-  if (_block_id_to_name != other_mesh._block_id_to_name)
-    return false;
-  if (_elem_dims != other_mesh._elem_dims)
-    return false;
-  if (_elem_default_orders != other_mesh._elem_default_orders)
-    return false;
-  if (_supported_nodal_order != other_mesh._supported_nodal_order)
-    return false;
-  if (_mesh_subdomains != other_mesh._mesh_subdomains)
-    return false;
-  if (_all_elemset_ids != other_mesh._all_elemset_ids)
-    return false;
-  if (_elem_integer_names != other_mesh._elem_integer_names)
-    return false;
-  if (_elem_integer_default_values != other_mesh._elem_integer_default_values)
-    return false;
-  if (_node_integer_names != other_mesh._node_integer_names)
-    return false;
-  if (_node_integer_default_values != other_mesh._node_integer_default_values)
-    return false;
+  CHECK_MEMBER(_skip_noncritical_partitioning);
+  CHECK_MEMBER(_skip_all_partitioning);
+  CHECK_MEMBER(_skip_renumber_nodes_and_elements);
+  CHECK_MEMBER(_skip_find_neighbors);
+  CHECK_MEMBER(_skip_detect_interior_parents);
+  CHECK_MEMBER(_allow_remote_element_removal);
+  CHECK_MEMBER(_allow_node_and_elem_unique_id_overlap);
+  CHECK_MEMBER(_spatial_dimension);
+  CHECK_MEMBER(_point_locator_close_to_point_tol);
+  CHECK_MEMBER(_block_id_to_name);
+  CHECK_MEMBER(_elem_dims);
+  CHECK_MEMBER(_elem_default_orders);
+  CHECK_MEMBER(_supported_nodal_order);
+  CHECK_MEMBER(_mesh_subdomains);
+  CHECK_MEMBER(_all_elemset_ids);
+  CHECK_MEMBER(_elem_integer_names);
+  CHECK_MEMBER(_elem_integer_default_values);
+  CHECK_MEMBER(_node_integer_names);
+  CHECK_MEMBER(_node_integer_default_values);
+
   if (static_cast<bool>(_default_ghosting) != static_cast<bool>(other_mesh._default_ghosting))
-    return false;
+    return "_default_ghosting";
   if (static_cast<bool>(_partitioner) != static_cast<bool>(other_mesh._partitioner))
-    return false;
+    return "_partitioner";
   if (*boundary_info != *other_mesh.boundary_info)
-    return false;
+    return "boundary_info";
 
   // First check whether the "existence" of the two pointers differs (one present, one absent)
   if (static_cast<bool>(_disjoint_neighbor_boundary_pairs) !=
       static_cast<bool>(other_mesh._disjoint_neighbor_boundary_pairs))
-    return false;
+    return "_disjoint_neighbor_boundary_pairs existence";
   // If both exist, compare the contents (Weak Test: just compare sizes like `_ghosting_functors`)
   if (_disjoint_neighbor_boundary_pairs &&
       (_disjoint_neighbor_boundary_pairs->size() != other_mesh._disjoint_neighbor_boundary_pairs->size()))
-    return false;
+    return "_disjoint_neighbor_boundary_pairs size";
 
   const constraint_rows_type & other_rows =
     other_mesh.get_constraint_rows();
@@ -363,15 +393,15 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
       const dof_id_type node_id = node->id();
       const Node * other_node = other_mesh.query_node_ptr(node_id);
       if (!other_node)
-        return false;
+        return "_constraint_rows node presence";
 
       auto it = other_rows.find(other_node);
       if (it == other_rows.end())
-        return false;
+        return "_constraint_rows row presence";
 
       const auto & other_row = it->second;
       if (row.size() != other_row.size())
-        return false;
+        return "_constraint_rows row size";
 
       for (auto i : index_range(row))
         {
@@ -384,14 +414,14 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
               elem_pair.second !=
               other_elem_pair.second ||
               coef != other_coef)
-            return false;
+            return "_constraint_rows row entry";
         }
     }
 
   for (const auto & [elemset_code, elemset_ptr] : this->_elemset_codes)
     if (const auto it = other_mesh._elemset_codes.find(elemset_code);
         it == other_mesh._elemset_codes.end() || *elemset_ptr != *it->second)
-      return false;
+      return "_elemset_codes";
 
   // FIXME: we have no good way to compare ghosting functors, since
   // they're in a vector of pointers, and we have no way *at all*
@@ -400,13 +430,13 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   // we have the same number, is all.
   if (_ghosting_functors.size() !=
       other_mesh._ghosting_functors.size())
-    return false;
+    return "_ghosting_functors size";
 
   // Same deal for partitioners.  We tested that we both have one or
   // both don't, but are they equivalent?  Let's guess "yes".
 
   // Now let the subclasses decide whether everything else is equal
-  return this->subclass_locally_equals(other_mesh);
+  return this->subclass_first_difference_from(other_mesh);
 }
 
 
@@ -588,11 +618,6 @@ void MeshBase::change_elemset_id(elemset_id_type old_id, elemset_id_type new_id)
   // Update _all_elemset_ids
   _all_elemset_ids.erase(old_id);
   _all_elemset_ids.insert(new_id);
-}
-
-unsigned int MeshBase::spatial_dimension () const
-{
-  return cast_int<unsigned int>(_spatial_dimension);
 }
 
 
@@ -865,10 +890,16 @@ void MeshBase::complete_preparation()
 
   libmesh_assert(this->comm().verify(this->is_serial()));
 
+  _preparation.libmesh_assert_consistent(this->comm());
+
+#ifdef DEBUG
   // If we don't go into this method with valid constraint rows, we're
   // only going to be able to make that worse.
-#ifdef DEBUG
   MeshTools::libmesh_assert_valid_constraint_rows(*this);
+
+  // If this mesh thinks it's already  partially prepared, then in
+  // optimized builds we'll trust it, but in debug builds we'll check.
+  const bool was_partly_prepared = (_preparation == Preparation());
 #endif
 
   // A distributed mesh may have processors with no elements (or
@@ -993,6 +1024,10 @@ void MeshBase::complete_preparation()
 #endif
 
 #ifdef DEBUG
+  // The if() here avoids both unnecessary work *and* stack overflow
+  if (was_partly_prepared)
+    MeshTools::libmesh_assert_valid_is_prepared(*this);
+
   MeshTools::libmesh_assert_valid_boundary_ids(*this);
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   MeshTools::libmesh_assert_valid_unique_ids(*this);
@@ -1043,6 +1078,13 @@ bool MeshBase::is_prepared() const
 {
   return static_cast<bool>(_preparation);
 }
+
+void MeshBase::unset_is_prepared()
+{
+  _preparation = false;
+}
+
+
 
 void MeshBase::add_ghosting_functor(GhostingFunctor & ghosting_functor)
 {
@@ -1228,7 +1270,10 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
                 --_elem_dims.end(), // --end() is valid if the set is non-empty
                 std::ostream_iterator<unsigned int>(oss, ", "));
       oss << cast_int<unsigned int>(*_elem_dims.rbegin());
-      oss << "}\n";
+      oss << "}";
+      if (!this->preparation().has_cached_elem_data)
+        oss << " (may be out of date)";
+      oss << '\n';
     }
 
   if (!_elem_default_orders.empty())
@@ -1240,12 +1285,23 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
                      [](Order o)
                        { return Utility::enum_to_string<Order>(o); });
       oss << Utility::enum_to_string<Order>(*_elem_default_orders.rbegin());
-      oss << "}\n";
+      oss << "}";
+      if (!this->preparation().has_cached_elem_data)
+        oss << " (may be out of date)";
+      oss << '\n';
     }
 
-  oss << "  supported_nodal_order()=" << this->supported_nodal_order()                        << '\n'
-      << "  spatial_dimension()="     << this->spatial_dimension()                            << '\n'
-      << "  n_nodes()="               << this->n_nodes()                                      << '\n'
+  oss << "  supported_nodal_order()=" << this->_supported_nodal_order;
+  if (!this->preparation().has_cached_elem_data)
+    oss << " (may be out of date)";
+  oss << '\n';
+
+  oss << "  spatial_dimension()=" << int(this->_spatial_dimension);
+  if (!this->preparation().has_cached_elem_data)
+    oss << " (may be out of date)";
+  oss << '\n';
+
+  oss << "  n_nodes()="               << this->n_nodes()                                      << '\n'
       << "    n_local_nodes()="       << this->n_local_nodes()                                << '\n'
       << "  n_elem()="                << this->n_elem()                                       << '\n'
       << "    n_local_elem()="        << this->n_local_elem()                                 << '\n';
@@ -1965,19 +2021,31 @@ void MeshBase::detect_interior_parents()
   // This requires an inspection on every processor
   parallel_object_only();
 
-  // This requires up-to-date mesh dimensions in cache
-  libmesh_assert(_preparation.has_cached_elem_data);
+  // This requires up-to-date mesh dimensions, but if we don't have
+  // them cached then we can't update them without changing the mesh
+  // in unexpected ways that interfere with our tests of
+  // partially-prepared meshes in MeshTools::*valid_is_prepared
+  std::set<unsigned char> elem_dims_copy;
+  if (_preparation.has_cached_elem_data)
+    elem_dims_copy = this->elem_dimensions();
+  else
+    {
+      for (const auto & elem : this->active_element_ptr_range())
+        elem_dims_copy.insert(cast_int<unsigned char>(elem->dim()));
+      if (!this->is_serial())
+        this->comm().set_union(elem_dims_copy);
+    }
 
   // Early return if the mesh is empty or has elements of a single spatial dimension.
-  if (this->elem_dimensions().size() <= 1)
+  if (elem_dims_copy.size() <= 1)
     {
       _preparation.has_interior_parent_ptrs = true;
       return;
     }
 
   // Convenient elem_dimensions iterators
-  const auto dim_start = this->elem_dimensions().begin();
-  const auto dim_end = this->elem_dimensions().end();
+  const auto dim_start = elem_dims_copy.begin();
+  const auto dim_end = elem_dims_copy.end();
 
   // In this function we find only +1 dimensional interior parents,
   // (so, for a given element el, the interior parent p must satisfy p.dim() == el.dim() + 1).
@@ -2776,6 +2844,21 @@ bool
 MeshBase::Preparation::operator!= (const Preparation & other) const
 {
   return !(*this == other);
+}
+
+
+void
+MeshBase::Preparation::libmesh_assert_consistent (const Parallel::Communicator & libmesh_dbg_var(comm))
+{
+  libmesh_assert(comm.verify(is_partitioned));
+  libmesh_assert(comm.verify(has_synched_id_counts));
+  libmesh_assert(comm.verify(has_neighbor_ptrs));
+  libmesh_assert(comm.verify(has_cached_elem_data));
+  libmesh_assert(comm.verify(has_interior_parent_ptrs));
+  libmesh_assert(comm.verify(has_removed_remote_elements));
+  libmesh_assert(comm.verify(has_removed_orphaned_nodes));
+  libmesh_assert(comm.verify(has_reinit_ghosting_functors));
+  libmesh_assert(comm.verify(has_boundary_id_sets));
 }
 
 

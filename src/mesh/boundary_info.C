@@ -2144,6 +2144,8 @@ void BoundaryInfo::renumber_id (boundary_id_type old_id,
     {
       _boundary_ids.erase(old_id);
       _boundary_ids.insert(new_id);
+      _global_boundary_ids.erase(old_id);
+      _global_boundary_ids.insert(new_id);
     }
 
   renumber_name(_ss_id_to_name, old_id, new_id);
@@ -2183,8 +2185,10 @@ void BoundaryInfo::renumber_side_id (boundary_id_type old_id,
           !_node_boundary_ids.count(old_id))
         {
           _boundary_ids.erase(old_id);
+          _global_boundary_ids.erase(old_id);
         }
       _boundary_ids.insert(new_id);
+      _global_boundary_ids.insert(new_id);
     }
 
   renumber_name(_ss_id_to_name, old_id, new_id);
@@ -2222,8 +2226,10 @@ void BoundaryInfo::renumber_edge_id (boundary_id_type old_id,
           !_node_boundary_ids.count(old_id))
         {
           _boundary_ids.erase(old_id);
+          _global_boundary_ids.erase(old_id);
         }
       _boundary_ids.insert(new_id);
+      _global_boundary_ids.insert(new_id);
     }
 
   renumber_name(_es_id_to_name, old_id, new_id);
@@ -2261,8 +2267,10 @@ void BoundaryInfo::renumber_shellface_id (boundary_id_type old_id,
           !_node_boundary_ids.count(old_id))
         {
           _boundary_ids.erase(old_id);
+          _global_boundary_ids.erase(old_id);
         }
       _boundary_ids.insert(new_id);
+      _global_boundary_ids.insert(new_id);
     }
 
   this->libmesh_assert_valid_multimaps();
@@ -2298,8 +2306,10 @@ void BoundaryInfo::renumber_node_id (boundary_id_type old_id,
           !_edge_boundary_ids.count(old_id))
         {
           _boundary_ids.erase(old_id);
+          _global_boundary_ids.erase(old_id);
         }
       _boundary_ids.insert(new_id);
+      _global_boundary_ids.insert(new_id);
     }
 
   renumber_name(_ns_id_to_name, old_id, new_id);

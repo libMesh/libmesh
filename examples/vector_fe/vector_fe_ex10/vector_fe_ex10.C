@@ -150,6 +150,9 @@ int main (int argc, char ** argv)
   const Real phi = infile("phi", 0.), theta = infile("theta", 0.), psi = infile("psi", 0.);
   GradDivExactSolution::RM(MeshTools::Modification::rotate(mesh, phi, theta, psi));
 
+  // Mesh rotation invalidates some caches
+  mesh.complete_preparation();
+
   // Print information about the mesh to the screen.
   mesh.print_info();
 

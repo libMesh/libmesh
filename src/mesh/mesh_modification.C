@@ -307,6 +307,10 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
 #endif
     }
 
+  // If we just moved a mesh in or out out of the X axis or XY plane
+  // then we might have changed its spatial_dimension()
+  mesh.unset_has_cached_elem_data();
+
   // We haven't changed any topology, but just changing geometry could
   // have invalidated a point locator.
   mesh.clear_point_locator();
@@ -323,6 +327,10 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 
   for (auto & node : mesh.node_ptr_range())
     *node += p;
+
+  // If we just moved a mesh in or out out of the X axis or XY plane
+  // then we might have changed its spatial_dimension()
+  mesh.unset_has_cached_elem_data();
 
   // We haven't changed any topology, but just changing geometry could
   // have invalidated a point locator.
@@ -365,14 +373,15 @@ MeshTools::Modification::rotate (MeshBase & mesh,
 #if LIBMESH_DIM == 3
   const auto R = RealTensorValue::intrinsic_rotation_matrix(phi, theta, psi);
 
-  if (theta)
-    mesh.set_spatial_dimension(3);
-
   for (auto & node : mesh.node_ptr_range())
     {
       Point & pt = *node;
       pt = R * pt;
     }
+
+  // If we just moved a mesh in or out out of the X axis or XY plane
+  // then we might have changed its spatial_dimension()
+  mesh.unset_has_cached_elem_data();
 
   return R;
 
@@ -418,6 +427,10 @@ void MeshTools::Modification::scale (MeshBase & mesh,
 
   for (auto & node : mesh.node_ptr_range())
     (*node)(2) *= z_scale;
+
+  // If we just collapsed a manifold onto the X axis or XY plane
+  // then we might have changed its spatial_dimension()
+  mesh.unset_has_cached_elem_data();
 
   // We haven't changed any topology, but just changing geometry could
   // have invalidated a point locator.

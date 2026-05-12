@@ -63,6 +63,9 @@ VariationalMeshSmoother::VariationalMeshSmoother(
 void VariationalMeshSmoother::setup()
 {
   // Check for multiple dimensions
+  if (!_mesh.preparation().has_cached_elem_data)
+    _mesh.cache_elem_data();
+
   if (_mesh.elem_dimensions().size() > 1)
     libmesh_not_implemented_msg("Meshes containing elements of differing dimension are not yet supported.");
 
