@@ -354,6 +354,9 @@ void divide_tensor_components(TensorLike & T_in, const Scalar & alpha)
 
 } // namespace detail
 
+namespace detail
+{
+
 // Tensor reductions and predicates
 
 template <typename LeftTensor, typename RightTensor>
@@ -568,31 +571,33 @@ tensor_semantic_type_t<TensorA> tensor_linear_combination(const ScalarA & alpha,
 
 // Tensor/vector conversions
 
+} // namespace detail
+
 // libMesh-like convenience wrappers
 
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto contract(const LeftTensor & left, const RightTensor & right)
   -> std::enable_if_t<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor>,
-                      decltype(tensor_contract(left, right))>
+                      decltype(detail::tensor_contract(left, right))>
 {
-  return tensor_contract(left, right);
+  return detail::tensor_contract(left, right);
 }
 
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto norm_sq(const TensorLike & T_in)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, decltype(tensor_norm_sq(T_in))>
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>, decltype(detail::tensor_norm_sq(T_in))>
 {
-  return tensor_norm_sq(T_in);
+  return detail::tensor_norm_sq(T_in);
 }
 
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto norm(const TensorLike & T_in)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, decltype(tensor_norm(T_in))>
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>, decltype(detail::tensor_norm(T_in))>
 {
-  return tensor_norm(T_in);
+  return detail::tensor_norm(T_in);
 }
 
 template <typename TensorLike>
@@ -600,7 +605,7 @@ LIBMESH_DEVICE_INLINE
 auto is_zero(const TensorLike & T_in)
   -> std::enable_if_t<is_tensor_like_v<TensorLike>, bool>
 {
-  return tensor_is_zero(T_in);
+  return detail::tensor_is_zero(T_in);
 }
 
 template <typename ResultTensor, typename LeftVector, typename RightVector>
@@ -743,6 +748,29 @@ auto multiply(const VectorLike & v, const TensorLike & T_in)
   return multiply<vector_semantic_type_t<VectorLike>>(v, T_in);
 }
 
+template <typename ResultTensor, typename ScalarA, typename TensorA, typename ScalarB, typename TensorB>
+LIBMESH_DEVICE_INLINE
+auto linear_combination(const ScalarA & alpha,
+                        const TensorA & A,
+                        const ScalarB & beta,
+                        const TensorB & B)
+  -> std::enable_if_t<is_tensor_like_v<TensorA> && is_tensor_like_v<TensorB>, ResultTensor>
+{
+  return detail::tensor_linear_combination<ResultTensor>(alpha, A, beta, B);
+}
+
+template <typename ScalarA, typename TensorA, typename ScalarB, typename TensorB>
+LIBMESH_DEVICE_INLINE
+auto linear_combination(const ScalarA & alpha,
+                        const TensorA & A,
+                        const ScalarB & beta,
+                        const TensorB & B)
+  -> std::enable_if_t<is_tensor_like_v<TensorA> && is_tensor_like_v<TensorB>,
+                      tensor_semantic_type_t<TensorA>>
+{
+  return linear_combination<tensor_semantic_type_t<TensorA>>(alpha, A, beta, B);
+}
+
 template <typename ViewType>
 template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
@@ -795,28 +823,28 @@ template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::contract(const RightTensor & right) const
 {
-  return tensor_contract(*this, right);
+  return detail::tensor_contract(*this, right);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::norm() const
 {
-  return tensor_norm(*this);
+  return detail::tensor_norm(*this);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::norm_sq() const
 {
-  return tensor_norm_sq(*this);
+  return detail::tensor_norm_sq(*this);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 bool tensor_ref<ViewType>::is_zero() const
 {
-  return tensor_is_zero(*this);
+  return detail::tensor_is_zero(*this);
 }
 
 template <typename ViewType>
@@ -837,7 +865,7 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::tr() const
 {
-  return tensor_trace(*this);
+  return detail::tensor_trace(*this);
 }
 
 template <typename ViewType>
@@ -887,7 +915,7 @@ auto operator-(const TensorLike & T_in)
   -> std::enable_if_t<is_tensor_like_v<TensorLike> && is_tensor_ref_v<TensorLike>,
                       tensor_semantic_type_t<TensorLike>>
 {
-  return tensor_scale(tensor_value_type_t<TensorLike>(-1), T_in);
+  return detail::tensor_scale(tensor_value_type_t<TensorLike>(-1), T_in);
 }
 
 template <typename LeftTensor, typename RightTensor>
@@ -897,7 +925,7 @@ auto operator+(const LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       tensor_semantic_type_t<LeftTensor>>
 {
-  return tensor_add(left, right);
+  return detail::tensor_add(left, right);
 }
 
 template <typename LeftTensor, typename RightTensor>
@@ -907,7 +935,7 @@ auto operator-(const LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       tensor_semantic_type_t<LeftTensor>>
 {
-  return tensor_subtract(left, right);
+  return detail::tensor_subtract(left, right);
 }
 
 template <typename Scalar,
@@ -918,7 +946,7 @@ template <typename Scalar,
 LIBMESH_DEVICE_INLINE
 auto operator*(const Scalar & alpha, const TensorLike & T_in)
 {
-  return tensor_scale(alpha, T_in);
+  return detail::tensor_scale(alpha, T_in);
 }
 
 template <typename TensorLike,
@@ -929,7 +957,7 @@ template <typename TensorLike,
 LIBMESH_DEVICE_INLINE
 auto operator*(const TensorLike & T_in, const Scalar & alpha)
 {
-  return tensor_scale(alpha, T_in);
+  return detail::tensor_scale(alpha, T_in);
 }
 
 template <typename TensorLike, typename Scalar>
@@ -939,7 +967,7 @@ auto operator/(const TensorLike & T_in, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       tensor_semantic_type_t<TensorLike>>
 {
-  return tensor_divide(T_in, alpha);
+  return detail::tensor_divide(T_in, alpha);
 }
 
 template <typename LeftTensor,
