@@ -299,10 +299,10 @@ void update_tensor_components(LeftTensor & left, const RightTensor & right, cons
 
 template <typename ResultTensor, typename ScalarA, typename TensorA, typename ScalarB, typename TensorB>
 LIBMESH_DEVICE_INLINE
-ResultTensor linear_combination(const ScalarA & alpha,
-                                const TensorA & A,
-                                const ScalarB & beta,
-                                const TensorB & B)
+ResultTensor combine_tensors(const ScalarA & alpha,
+                             const TensorA & A,
+                             const ScalarB & beta,
+                             const TensorB & B)
 {
   ResultTensor out;
   out.zero();
@@ -717,7 +717,7 @@ auto operator+(const LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       tensor_semantic_type_t<LeftTensor>>
 {
-  return detail::linear_combination<tensor_semantic_type_t<LeftTensor>>(
+  return detail::combine_tensors<tensor_semantic_type_t<LeftTensor>>(
     tensor_value_type_t<LeftTensor>(1), left, tensor_value_type_t<LeftTensor>(1), right);
 }
 
@@ -728,7 +728,7 @@ auto operator-(const LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       tensor_semantic_type_t<LeftTensor>>
 {
-  return detail::linear_combination<tensor_semantic_type_t<LeftTensor>>(
+  return detail::combine_tensors<tensor_semantic_type_t<LeftTensor>>(
     tensor_value_type_t<LeftTensor>(1), left, tensor_value_type_t<LeftTensor>(-1), right);
 }
 
