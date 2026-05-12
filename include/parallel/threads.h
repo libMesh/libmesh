@@ -40,26 +40,48 @@ namespace Threads
 {
 
 /**
+ * An integer which is set to the number of active threads when we are
+ * in a Threads:: parallel operation.
+ */
+extern int active_threads;
+
+/**
  * A boolean which is true iff we are in a Threads:: function
- * It may be useful to assert(!Threads::in_threads) in any code
- * which is known to not be thread-safe.
+ * It may be useful to assert(!Threads::in_threads), in any code which
+ * is known to not be thread-safe.  Code which is not thread-safe but
+ * which is specifically enabled only when multiple threads are active
+ * might test for (Threads::active_threads != 1) instead.
  */
 extern bool in_threads;
 
 /**
  * We use a class to turn Threads::in_threads on and off, to be
  * exception-safe.
+ *
+ * We'll use the same class to set Threads::active_threads, for the
+ * same reason, but it's a little more complicated for that.
  */
-class BoolAcquire
+template <typename T, T new_x_default = T(), bool assert_change = false>
+class RAIIAcquire
 {
 public:
   explicit
-  BoolAcquire(bool & b) : _b(b) { libmesh_assert(!_b); _b = true; }
+  RAIIAcquire(T & x, T new_x = new_x_default) :
+    _x(x), _old_x(x), _new_x(new_x)
+  {
+    libmesh_assert(!assert_change || _x != _new_x);
+    _x = _new_x;
+  }
 
-  ~BoolAcquire() { libmesh_exceptionless_assert(_b); _b = false; }
+  ~RAIIAcquire() { libmesh_exceptionless_assert(_x == _new_x); _x = _old_x; }
 private:
-  bool & _b;
+  T & _x;
+  T _old_x;
+  T _new_x;
 };
+
+// We'll only acquire in_threads to turn it from false to true
+typedef RAIIAcquire<bool, true, true> BoolAcquire;
 
 /**
  * We use a class to turn perf logging off and on within threads, to

@@ -274,18 +274,20 @@ void parallel_for (const Range & range, const Body & body,
   libmesh_error_msg_if(n_threads > libMesh::n_threads(),
                        "Requested n_threads (" << n_threads << ") exceeds the "
                        "global thread count (" << libMesh::n_threads() << ").");
-  Threads::BoolAcquire b(Threads::in_threads);
+  Threads::BoolAcquire set_in_threads(Threads::in_threads);
+
+  unsigned int actual_threads = num_pthreads(range, n_threads);
 
   // If we're running in serial - just run!
-  if (n_threads == 1)
+  if (actual_threads == 1)
   {
     body(range);
     return;
   }
 
-  DisablePerfLogInScope disable_perf;
+  Threads::RAIIAcquire<int> set_active_threads(Threads::active_threads, actual_threads);
 
-  unsigned int actual_threads = num_pthreads(range, n_threads);
+  DisablePerfLogInScope disable_perf;
 
   std::vector<std::unique_ptr<Range>> ranges(actual_threads);
   std::vector<RangeBody<const Range, const Body>> range_bodies(actual_threads);
@@ -369,18 +371,20 @@ void parallel_reduce (const Range & range, Body & body,
   libmesh_error_msg_if(n_threads > libMesh::n_threads(),
                        "Requested n_threads (" << n_threads << ") exceeds the "
                        "global thread count (" << libMesh::n_threads() << ").");
-  Threads::BoolAcquire b(Threads::in_threads);
+  Threads::BoolAcquire set_in_threads(Threads::in_threads);
+
+  unsigned int actual_threads = num_pthreads(range, n_threads);
 
   // If we're running in serial - just run!
-  if (n_threads == 1)
+  if (actual_threads == 1)
   {
     body(range);
     return;
   }
 
-  DisablePerfLogInScope disable_perf;
+  Threads::RAIIAcquire<int> set_active_threads(Threads::active_threads, actual_threads);
 
-  unsigned int actual_threads = num_pthreads(range, n_threads);
+  DisablePerfLogInScope disable_perf;
 
   std::vector<std::unique_ptr<Range>> ranges(actual_threads);
   std::vector<std::unique_ptr<Body>> managed_bodies(actual_threads); // bodies we are responsible for
