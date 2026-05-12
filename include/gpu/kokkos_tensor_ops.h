@@ -130,28 +130,6 @@ bool tensor_is_zero(const TensorLike & T_in)
   return true;
 }
 
-template <typename LeftTensor, typename RightTensor>
-LIBMESH_DEVICE_INLINE
-bool tensor_equal(const LeftTensor & left, const RightTensor & right)
-{
-  static_assert(is_tensor_like_v<LeftTensor>, "tensor_equal() requires a tensor-like left input");
-  static_assert(is_tensor_like_v<RightTensor>, "tensor_equal() requires a tensor-like right input");
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      if (tensor_get_component(left, row, col) != tensor_get_component(right, row, col))
-        return false;
-
-  return true;
-}
-
-template <typename LeftTensor, typename RightTensor>
-LIBMESH_DEVICE_INLINE
-bool tensor_not_equal(const LeftTensor & left, const RightTensor & right)
-{
-  return !tensor_equal(left, right);
-}
-
 // Tensor arithmetic
 
 template <typename ResultTensor, typename LeftVector, typename RightVector>
@@ -953,7 +931,12 @@ auto operator==(const LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       bool>
 {
-  return tensor_equal(left, right);
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      if (tensor_get_component(left, row, col) != tensor_get_component(right, row, col))
+        return false;
+
+  return true;
 }
 
 template <typename LeftTensor, typename RightTensor>
@@ -963,7 +946,7 @@ auto operator!=(const LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       bool>
 {
-  return tensor_not_equal(left, right);
+  return !(left == right);
 }
 
 template <typename LeftTensor, typename RightTensor>
