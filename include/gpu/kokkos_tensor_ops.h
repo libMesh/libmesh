@@ -264,9 +264,10 @@ tensor_semantic_type_t<TensorLike> tensor_divide(const TensorLike & T_in, const 
 
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
-auto tensor_determinant(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
+auto tensor_leading_determinant(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
 {
-  static_assert(is_tensor_like_v<TensorLike>, "tensor_determinant() requires a tensor-like input");
+  static_assert(is_tensor_like_v<TensorLike>,
+                "tensor_leading_determinant() requires a tensor-like input");
 
   if (dim == 0)
     return tensor_value_type_t<TensorLike>(1);
@@ -316,7 +317,7 @@ ResultTensor tensor_inverse(const TensorLike & T_in, const unsigned int dim = LI
     return out;
   }
 
-  const auto det = tensor_determinant(T_in, dim);
+  const auto det = tensor_leading_determinant(T_in, dim);
 
   if (dim == 2)
   {
@@ -610,9 +611,9 @@ auto transpose(const TensorLike & T_in)
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto det(const TensorLike & T_in)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, decltype(tensor_determinant(T_in))>
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>, decltype(T_in.det())>
 {
-  return tensor_determinant(T_in);
+  return T_in.det();
 }
 
 template <typename TensorLike>
@@ -779,7 +780,7 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::det(const unsigned int dim) const
 {
-  return tensor_determinant(*this, dim);
+  return tensor_leading_determinant(*this, dim);
 }
 
 template <typename ViewType>

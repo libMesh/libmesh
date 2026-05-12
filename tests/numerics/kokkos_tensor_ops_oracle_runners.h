@@ -51,7 +51,7 @@ test_dim_ops()
     KOKKOS_LAMBDA(int c) {
       const auto J_ref = libMesh::Kokkos::make_tensor_ref(d_J, c);
       const unsigned int dim = d_dims(c);
-      const Real det = libMesh::Kokkos::tensor_determinant(J_ref, dim);
+      const Real det = J_ref.det(dim);
       const auto inv = J_ref.inverse(dim);
       const auto I = libMesh::Kokkos::tensor_identity<oracle_tensor>(dim);
       const auto prod_left = J_ref * inv;
