@@ -58,6 +58,302 @@ tensor_semantic_type_t<TensorLike> copy_tensor(const TensorLike & T_in)
   return copy_tensor<tensor_semantic_type_t<TensorLike>>(T_in);
 }
 
+namespace detail
+{
+
+template <typename TensorLike>
+LIBMESH_DEVICE_INLINE
+auto leading_determinant(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
+{
+  static_assert(is_tensor_like_v<TensorLike>,
+                "detail::leading_determinant() requires a tensor-like input");
+
+  if (dim == 0)
+    return tensor_value_type_t<TensorLike>(1);
+
+  if (dim == 1)
+    return tensor_get_component(T_in, 0, 0);
+
+  if (dim == 2)
+    return tensor_get_component(T_in, 0, 0) * tensor_get_component(T_in, 1, 1) -
+           tensor_get_component(T_in, 0, 1) * tensor_get_component(T_in, 1, 0);
+
+#if LIBMESH_DIM > 2
+  const auto a00 = tensor_get_component(T_in, 0, 0);
+  const auto a01 = tensor_get_component(T_in, 0, 1);
+  const auto a02 = tensor_get_component(T_in, 0, 2);
+  const auto a10 = tensor_get_component(T_in, 1, 0);
+  const auto a11 = tensor_get_component(T_in, 1, 1);
+  const auto a12 = tensor_get_component(T_in, 1, 2);
+  const auto a20 = tensor_get_component(T_in, 2, 0);
+  const auto a21 = tensor_get_component(T_in, 2, 1);
+  const auto a22 = tensor_get_component(T_in, 2, 2);
+
+  return a00 * (a11 * a22 - a12 * a21) -
+         a01 * (a10 * a22 - a12 * a20) +
+         a02 * (a10 * a21 - a11 * a20);
+#else
+  libmesh_ignore(T_in);
+  return tensor_value_type_t<TensorLike>(0);
+#endif
+}
+
+template <typename ResultTensor, typename LeftVector, typename RightVector>
+LIBMESH_DEVICE_INLINE
+ResultTensor outer_product(const LeftVector & left, const RightVector & right)
+{
+  ResultTensor out;
+  out.zero();
+
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(out,
+                           row,
+                           col,
+                           vector_get_component(left, row) * libmesh_conj(vector_get_component(right, col)));
+
+  return out;
+}
+
+template <typename ResultTensor, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+ResultTensor inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
+{
+  static_assert(is_tensor_like_v<TensorLike>, "detail::inverse() requires a tensor-like input");
+
+  ResultTensor out;
+  out.zero();
+
+  if (dim == 0)
+    return out;
+
+  if (dim == 1)
+  {
+    tensor_set_component(out, 0, 0, tensor_value_type_t<ResultTensor>(1) / tensor_get_component(T_in, 0, 0));
+    return out;
+  }
+
+  const auto det = leading_determinant(T_in, dim);
+
+  if (dim == 2)
+  {
+    tensor_set_component(out, 0, 0,  tensor_get_component(T_in, 1, 1) / det);
+    tensor_set_component(out, 0, 1, -tensor_get_component(T_in, 0, 1) / det);
+    tensor_set_component(out, 1, 0, -tensor_get_component(T_in, 1, 0) / det);
+    tensor_set_component(out, 1, 1,  tensor_get_component(T_in, 0, 0) / det);
+    return out;
+  }
+
+#if LIBMESH_DIM > 2
+  const auto a00 = tensor_get_component(T_in, 0, 0);
+  const auto a01 = tensor_get_component(T_in, 0, 1);
+  const auto a02 = tensor_get_component(T_in, 0, 2);
+  const auto a10 = tensor_get_component(T_in, 1, 0);
+  const auto a11 = tensor_get_component(T_in, 1, 1);
+  const auto a12 = tensor_get_component(T_in, 1, 2);
+  const auto a20 = tensor_get_component(T_in, 2, 0);
+  const auto a21 = tensor_get_component(T_in, 2, 1);
+  const auto a22 = tensor_get_component(T_in, 2, 2);
+
+  tensor_set_component(out, 0, 0, (a11 * a22 - a12 * a21) / det);
+  tensor_set_component(out, 0, 1, (a02 * a21 - a01 * a22) / det);
+  tensor_set_component(out, 0, 2, (a01 * a12 - a02 * a11) / det);
+  tensor_set_component(out, 1, 0, (a12 * a20 - a10 * a22) / det);
+  tensor_set_component(out, 1, 1, (a00 * a22 - a02 * a20) / det);
+  tensor_set_component(out, 1, 2, (a02 * a10 - a00 * a12) / det);
+  tensor_set_component(out, 2, 0, (a10 * a21 - a11 * a20) / det);
+  tensor_set_component(out, 2, 1, (a01 * a20 - a00 * a21) / det);
+  tensor_set_component(out, 2, 2, (a00 * a11 - a01 * a10) / det);
+#else
+  libmesh_ignore(T_in);
+#endif
+
+  return out;
+}
+
+template <typename ResultTensor, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+ResultTensor transpose(const TensorLike & T_in)
+{
+  ResultTensor out;
+  out.zero();
+
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(out, row, col, tensor_get_component(T_in, col, row));
+
+  return out;
+}
+
+template <typename ResultTensor, typename LeftTensor, typename RightTensor>
+LIBMESH_DEVICE_INLINE
+ResultTensor multiply(const LeftTensor & left, const RightTensor & right)
+{
+  ResultTensor out;
+  out.zero();
+
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+    {
+      auto value = tensor_get_component(left, row, 0) * tensor_get_component(right, 0, col);
+      for (unsigned int k = 1; k < LIBMESH_DIM; ++k)
+        value += tensor_get_component(left, row, k) * tensor_get_component(right, k, col);
+      tensor_set_component(out, row, col, value);
+    }
+
+  return out;
+}
+
+template <typename ResultVector, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+ResultVector row(const TensorLike & T_in, const unsigned int row_index)
+{
+  ResultVector out;
+  out.zero();
+
+  for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+    vector_set_component(out, col, tensor_get_component(T_in, row_index, col));
+
+  return out;
+}
+
+template <typename ResultVector, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+ResultVector column(const TensorLike & T_in, const unsigned int col_index)
+{
+  ResultVector out;
+  out.zero();
+
+  for (unsigned int row_index = 0; row_index < LIBMESH_DIM; ++row_index)
+    vector_set_component(out, row_index, tensor_get_component(T_in, row_index, col_index));
+
+  return out;
+}
+
+template <typename ResultVector, typename TensorLike, typename VectorLike>
+LIBMESH_DEVICE_INLINE
+ResultVector multiply(const TensorLike & T_in, const VectorLike & v)
+{
+  ResultVector out;
+  out.zero();
+
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+  {
+    auto value = tensor_get_component(T_in, row, 0) * vector_get_component(v, 0);
+    for (unsigned int col = 1; col < LIBMESH_DIM; ++col)
+      value += tensor_get_component(T_in, row, col) * vector_get_component(v, col);
+    vector_set_component(out, row, value);
+  }
+
+  return out;
+}
+
+template <typename ResultVector, typename VectorLike, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+ResultVector multiply(const VectorLike & v, const TensorLike & T_in)
+{
+  ResultVector out;
+  out.zero();
+
+  for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+  {
+    auto value = vector_get_component(v, 0) * tensor_get_component(T_in, 0, col);
+    for (unsigned int row = 1; row < LIBMESH_DIM; ++row)
+      value += vector_get_component(v, row) * tensor_get_component(T_in, row, col);
+    vector_set_component(out, col, value);
+  }
+
+  return out;
+}
+
+template <typename LeftTensor, typename RightTensor>
+LIBMESH_DEVICE_INLINE
+void assign_tensor_components(LeftTensor & left, const RightTensor & right)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(left, row, col, tensor_get_component(right, row, col));
+}
+
+template <typename LeftTensor, typename RightTensor>
+LIBMESH_DEVICE_INLINE
+void add_tensor_components(LeftTensor & left, const RightTensor & right)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(left,
+                           row,
+                           col,
+                           tensor_get_component(left, row, col) + tensor_get_component(right, row, col));
+}
+
+template <typename LeftTensor, typename RightTensor, typename Scalar>
+LIBMESH_DEVICE_INLINE
+void add_scaled_tensor_components(LeftTensor & left, const RightTensor & right, const Scalar & factor)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(left,
+                           row,
+                           col,
+                           tensor_get_component(left, row, col) +
+                             factor * tensor_get_component(right, row, col));
+}
+
+template <typename LeftTensor, typename RightTensor>
+LIBMESH_DEVICE_INLINE
+void subtract_tensor_components(LeftTensor & left, const RightTensor & right)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(left,
+                           row,
+                           col,
+                           tensor_get_component(left, row, col) - tensor_get_component(right, row, col));
+}
+
+template <typename LeftTensor, typename RightTensor, typename Scalar>
+LIBMESH_DEVICE_INLINE
+void subtract_scaled_tensor_components(LeftTensor & left, const RightTensor & right, const Scalar & factor)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(left,
+                           row,
+                           col,
+                           tensor_get_component(left, row, col) -
+                             factor * tensor_get_component(right, row, col));
+}
+
+template <typename TensorLike>
+LIBMESH_DEVICE_INLINE
+void zero_tensor_components(TensorLike & T_in)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(T_in, row, col, tensor_value_type_t<TensorLike>(0));
+}
+
+template <typename TensorLike, typename Scalar>
+LIBMESH_DEVICE_INLINE
+void scale_tensor_components(TensorLike & T_in, const Scalar & alpha)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(T_in, row, col, tensor_get_component(T_in, row, col) * alpha);
+}
+
+template <typename TensorLike, typename Scalar>
+LIBMESH_DEVICE_INLINE
+void divide_tensor_components(TensorLike & T_in, const Scalar & alpha)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      tensor_set_component(T_in, row, col, tensor_get_component(T_in, row, col) / alpha);
+}
+
+} // namespace detail
+
 // Tensor reductions and predicates
 
 template <typename LeftTensor, typename RightTensor>
@@ -131,34 +427,6 @@ bool tensor_is_zero(const TensorLike & T_in)
 }
 
 // Tensor arithmetic
-
-template <typename ResultTensor, typename LeftVector, typename RightVector>
-LIBMESH_DEVICE_INLINE
-ResultTensor tensor_outer_product(const LeftVector & left, const RightVector & right)
-{
-  ResultTensor out;
-  out.zero();
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out,
-                           row,
-                           col,
-                           vector_get_component(left, row) * libmesh_conj(vector_get_component(right, col)));
-
-  return out;
-}
-
-template <typename Dummy = void,
-          typename LeftVector,
-          typename RightVector,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-libMesh::TypeTensor<vector_value_type_t<LeftVector>>
-tensor_outer_product(const LeftVector & left, const RightVector & right)
-{
-  return tensor_outer_product<libMesh::TypeTensor<vector_value_type_t<LeftVector>>>(left, right);
-}
 
 template <typename ResultTensor, typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
@@ -262,131 +530,6 @@ tensor_semantic_type_t<TensorLike> tensor_divide(const TensorLike & T_in, const 
   return tensor_divide<tensor_semantic_type_t<TensorLike>>(T_in, alpha);
 }
 
-template <typename TensorLike>
-LIBMESH_DEVICE_INLINE
-auto tensor_leading_determinant(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
-{
-  static_assert(is_tensor_like_v<TensorLike>,
-                "tensor_leading_determinant() requires a tensor-like input");
-
-  if (dim == 0)
-    return tensor_value_type_t<TensorLike>(1);
-
-  if (dim == 1)
-    return tensor_get_component(T_in, 0, 0);
-
-  if (dim == 2)
-    return tensor_get_component(T_in, 0, 0) * tensor_get_component(T_in, 1, 1) -
-           tensor_get_component(T_in, 0, 1) * tensor_get_component(T_in, 1, 0);
-
-#if LIBMESH_DIM > 2
-  const auto a00 = tensor_get_component(T_in, 0, 0);
-  const auto a01 = tensor_get_component(T_in, 0, 1);
-  const auto a02 = tensor_get_component(T_in, 0, 2);
-  const auto a10 = tensor_get_component(T_in, 1, 0);
-  const auto a11 = tensor_get_component(T_in, 1, 1);
-  const auto a12 = tensor_get_component(T_in, 1, 2);
-  const auto a20 = tensor_get_component(T_in, 2, 0);
-  const auto a21 = tensor_get_component(T_in, 2, 1);
-  const auto a22 = tensor_get_component(T_in, 2, 2);
-
-  return a00 * (a11 * a22 - a12 * a21) -
-         a01 * (a10 * a22 - a12 * a20) +
-         a02 * (a10 * a21 - a11 * a20);
-#else
-  libmesh_ignore(T_in);
-  return tensor_value_type_t<TensorLike>(0);
-#endif
-}
-
-template <typename ResultTensor, typename TensorLike>
-LIBMESH_DEVICE_INLINE
-ResultTensor tensor_inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
-{
-  static_assert(is_tensor_like_v<TensorLike>, "tensor_inverse() requires a tensor-like input");
-
-  ResultTensor out;
-  out.zero();
-
-  if (dim == 0)
-    return out;
-
-  if (dim == 1)
-  {
-    tensor_set_component(out, 0, 0, tensor_value_type_t<ResultTensor>(1) / tensor_get_component(T_in, 0, 0));
-    return out;
-  }
-
-  const auto det = tensor_leading_determinant(T_in, dim);
-
-  if (dim == 2)
-  {
-    tensor_set_component(out, 0, 0,  tensor_get_component(T_in, 1, 1) / det);
-    tensor_set_component(out, 0, 1, -tensor_get_component(T_in, 0, 1) / det);
-    tensor_set_component(out, 1, 0, -tensor_get_component(T_in, 1, 0) / det);
-    tensor_set_component(out, 1, 1,  tensor_get_component(T_in, 0, 0) / det);
-    return out;
-  }
-
-#if LIBMESH_DIM > 2
-  const auto a00 = tensor_get_component(T_in, 0, 0);
-  const auto a01 = tensor_get_component(T_in, 0, 1);
-  const auto a02 = tensor_get_component(T_in, 0, 2);
-  const auto a10 = tensor_get_component(T_in, 1, 0);
-  const auto a11 = tensor_get_component(T_in, 1, 1);
-  const auto a12 = tensor_get_component(T_in, 1, 2);
-  const auto a20 = tensor_get_component(T_in, 2, 0);
-  const auto a21 = tensor_get_component(T_in, 2, 1);
-  const auto a22 = tensor_get_component(T_in, 2, 2);
-
-  tensor_set_component(out, 0, 0, (a11 * a22 - a12 * a21) / det);
-  tensor_set_component(out, 0, 1, (a02 * a21 - a01 * a22) / det);
-  tensor_set_component(out, 0, 2, (a01 * a12 - a02 * a11) / det);
-  tensor_set_component(out, 1, 0, (a12 * a20 - a10 * a22) / det);
-  tensor_set_component(out, 1, 1, (a00 * a22 - a02 * a20) / det);
-  tensor_set_component(out, 1, 2, (a02 * a10 - a00 * a12) / det);
-  tensor_set_component(out, 2, 0, (a10 * a21 - a11 * a20) / det);
-  tensor_set_component(out, 2, 1, (a01 * a20 - a00 * a21) / det);
-  tensor_set_component(out, 2, 2, (a00 * a11 - a01 * a10) / det);
-#else
-  libmesh_ignore(T_in);
-#endif
-
-  return out;
-}
-
-template <typename Dummy = void,
-          typename TensorLike,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-tensor_semantic_type_t<TensorLike> tensor_inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
-{
-  return tensor_inverse<tensor_semantic_type_t<TensorLike>>(T_in, dim);
-}
-
-template <typename ResultTensor, typename TensorLike>
-LIBMESH_DEVICE_INLINE
-ResultTensor tensor_transpose(const TensorLike & T_in)
-{
-  ResultTensor out;
-  out.zero();
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out, row, col, tensor_get_component(T_in, col, row));
-
-  return out;
-}
-
-template <typename Dummy = void,
-          typename TensorLike,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-tensor_semantic_type_t<TensorLike> tensor_transpose(const TensorLike & T_in)
-{
-  return tensor_transpose<tensor_semantic_type_t<TensorLike>>(T_in);
-}
-
 template <typename ResultTensor, typename ScalarA, typename TensorA, typename ScalarB, typename TensorB>
 LIBMESH_DEVICE_INLINE
 ResultTensor tensor_linear_combination(const ScalarA & alpha,
@@ -423,138 +566,7 @@ tensor_semantic_type_t<TensorA> tensor_linear_combination(const ScalarA & alpha,
   return tensor_linear_combination<tensor_semantic_type_t<TensorA>>(alpha, A, beta, B);
 }
 
-template <typename ResultTensor, typename LeftTensor, typename RightTensor>
-LIBMESH_DEVICE_INLINE
-ResultTensor tensor_multiply(const LeftTensor & left, const RightTensor & right)
-{
-  ResultTensor out;
-  out.zero();
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-    {
-      auto value = tensor_get_component(left, row, 0) * tensor_get_component(right, 0, col);
-      for (unsigned int k = 1; k < LIBMESH_DIM; ++k)
-        value += tensor_get_component(left, row, k) * tensor_get_component(right, k, col);
-      tensor_set_component(out, row, col, value);
-    }
-
-  return out;
-}
-
-template <typename Dummy = void,
-          typename LeftTensor,
-          typename RightTensor,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-tensor_semantic_type_t<LeftTensor> tensor_multiply(const LeftTensor & left, const RightTensor & right)
-{
-  return tensor_multiply<tensor_semantic_type_t<LeftTensor>>(left, right);
-}
-
 // Tensor/vector conversions
-
-template <typename ResultVector, typename TensorLike>
-LIBMESH_DEVICE_INLINE
-ResultVector tensor_row(const TensorLike & T_in, const unsigned int row)
-{
-  ResultVector out;
-  out.zero();
-
-  for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-    vector_set_component(out, col, tensor_get_component(T_in, row, col));
-
-  return out;
-}
-
-template <typename Dummy = void,
-          typename TensorLike,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-libMesh::TypeVector<tensor_value_type_t<TensorLike>>
-tensor_row(const TensorLike & T_in, const unsigned int row)
-{
-  return tensor_row<libMesh::TypeVector<tensor_value_type_t<TensorLike>>>(T_in, row);
-}
-
-template <typename ResultVector, typename TensorLike>
-LIBMESH_DEVICE_INLINE
-ResultVector tensor_column(const TensorLike & T_in, const unsigned int col)
-{
-  ResultVector out;
-  out.zero();
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    vector_set_component(out, row, tensor_get_component(T_in, row, col));
-
-  return out;
-}
-
-template <typename Dummy = void,
-          typename TensorLike,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-libMesh::TypeVector<tensor_value_type_t<TensorLike>>
-tensor_column(const TensorLike & T_in, const unsigned int col)
-{
-  return tensor_column<libMesh::TypeVector<tensor_value_type_t<TensorLike>>>(T_in, col);
-}
-
-template <typename ResultVector, typename TensorLike, typename VectorLike>
-LIBMESH_DEVICE_INLINE
-ResultVector tensor_vector_multiply(const TensorLike & T_in, const VectorLike & v)
-{
-  ResultVector out;
-  out.zero();
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-  {
-    auto value = tensor_get_component(T_in, row, 0) * vector_get_component(v, 0);
-    for (unsigned int col = 1; col < LIBMESH_DIM; ++col)
-      value += tensor_get_component(T_in, row, col) * vector_get_component(v, col);
-    vector_set_component(out, row, value);
-  }
-
-  return out;
-}
-
-template <typename Dummy = void,
-          typename TensorLike,
-          typename VectorLike,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-vector_semantic_type_t<VectorLike> tensor_vector_multiply(const TensorLike & T_in, const VectorLike & v)
-{
-  return tensor_vector_multiply<vector_semantic_type_t<VectorLike>>(T_in, v);
-}
-
-template <typename ResultVector, typename VectorLike, typename TensorLike>
-LIBMESH_DEVICE_INLINE
-ResultVector vector_tensor_multiply(const VectorLike & v, const TensorLike & T_in)
-{
-  ResultVector out;
-  out.zero();
-
-  for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-  {
-    auto value = vector_get_component(v, 0) * tensor_get_component(T_in, 0, col);
-    for (unsigned int row = 1; row < LIBMESH_DIM; ++row)
-      value += vector_get_component(v, row) * tensor_get_component(T_in, row, col);
-    vector_set_component(out, col, value);
-  }
-
-  return out;
-}
-
-template <typename Dummy = void,
-          typename VectorLike,
-          typename TensorLike,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-vector_semantic_type_t<VectorLike> vector_tensor_multiply(const VectorLike & v, const TensorLike & T_in)
-{
-  return vector_tensor_multiply<vector_semantic_type_t<VectorLike>>(v, T_in);
-}
 
 // libMesh-like convenience wrappers
 
@@ -591,13 +603,29 @@ auto is_zero(const TensorLike & T_in)
   return tensor_is_zero(T_in);
 }
 
+template <typename ResultTensor, typename LeftVector, typename RightVector>
+LIBMESH_DEVICE_INLINE
+auto outer_product(const LeftVector & left, const RightVector & right)
+  -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector>, ResultTensor>
+{
+  return detail::outer_product<ResultTensor>(left, right);
+}
+
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto outer_product(const LeftVector & left, const RightVector & right)
   -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector>,
                       libMesh::TypeTensor<vector_value_type_t<LeftVector>>>
 {
-  return tensor_outer_product(left, right);
+  return outer_product<libMesh::TypeTensor<vector_value_type_t<LeftVector>>>(left, right);
+}
+
+template <typename ResultTensor, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+auto transpose(const TensorLike & T_in)
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>, ResultTensor>
+{
+  return detail::transpose<ResultTensor>(T_in);
 }
 
 template <typename TensorLike>
@@ -605,7 +633,7 @@ LIBMESH_DEVICE_INLINE
 auto transpose(const TensorLike & T_in)
   -> std::enable_if_t<is_tensor_like_v<TensorLike>, tensor_semantic_type_t<TensorLike>>
 {
-  return tensor_transpose(T_in);
+  return transpose<tensor_semantic_type_t<TensorLike>>(T_in);
 }
 
 template <typename TensorLike>
@@ -616,12 +644,28 @@ auto det(const TensorLike & T_in)
   return T_in.det();
 }
 
+template <typename ResultTensor, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+auto inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>, ResultTensor>
+{
+  return detail::inverse<ResultTensor>(T_in, dim);
+}
+
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
   -> std::enable_if_t<is_tensor_like_v<TensorLike>, tensor_semantic_type_t<TensorLike>>
 {
-  return tensor_inverse(T_in, dim);
+  return inverse<tensor_semantic_type_t<TensorLike>>(T_in, dim);
+}
+
+template <typename ResultVector, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+auto row(const TensorLike & T_in, const unsigned int i)
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>, ResultVector>
+{
+  return detail::row<ResultVector>(T_in, i);
 }
 
 template <typename TensorLike>
@@ -629,7 +673,15 @@ LIBMESH_DEVICE_INLINE
 auto row(const TensorLike & T_in, const unsigned int i)
   -> std::enable_if_t<is_tensor_like_v<TensorLike>, libMesh::TypeVector<tensor_value_type_t<TensorLike>>>
 {
-  return tensor_row(T_in, i);
+  return row<libMesh::TypeVector<tensor_value_type_t<TensorLike>>>(T_in, i);
+}
+
+template <typename ResultVector, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+auto column(const TensorLike & T_in, const unsigned int i)
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>, ResultVector>
+{
+  return detail::column<ResultVector>(T_in, i);
 }
 
 template <typename TensorLike>
@@ -637,7 +689,15 @@ LIBMESH_DEVICE_INLINE
 auto column(const TensorLike & T_in, const unsigned int i)
   -> std::enable_if_t<is_tensor_like_v<TensorLike>, libMesh::TypeVector<tensor_value_type_t<TensorLike>>>
 {
-  return tensor_column(T_in, i);
+  return column<libMesh::TypeVector<tensor_value_type_t<TensorLike>>>(T_in, i);
+}
+
+template <typename ResultTensor, typename LeftTensor, typename RightTensor>
+LIBMESH_DEVICE_INLINE
+auto multiply(const LeftTensor & left, const RightTensor & right)
+  -> std::enable_if_t<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor>, ResultTensor>
+{
+  return detail::multiply<ResultTensor>(left, right);
 }
 
 template <typename LeftTensor, typename RightTensor>
@@ -646,7 +706,15 @@ auto multiply(const LeftTensor & left, const RightTensor & right)
   -> std::enable_if_t<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor>,
                       tensor_semantic_type_t<LeftTensor>>
 {
-  return tensor_multiply(left, right);
+  return multiply<tensor_semantic_type_t<LeftTensor>>(left, right);
+}
+
+template <typename ResultVector, typename TensorLike, typename VectorLike>
+LIBMESH_DEVICE_INLINE
+auto multiply(const TensorLike & T_in, const VectorLike & v)
+  -> std::enable_if_t<is_tensor_like_v<TensorLike> && is_vector_like_v<VectorLike>, ResultVector>
+{
+  return detail::multiply<ResultVector>(T_in, v);
 }
 
 template <typename TensorLike, typename VectorLike>
@@ -655,7 +723,15 @@ auto multiply(const TensorLike & T_in, const VectorLike & v)
   -> std::enable_if_t<is_tensor_like_v<TensorLike> && is_vector_like_v<VectorLike>,
                       vector_semantic_type_t<VectorLike>>
 {
-  return tensor_vector_multiply(T_in, v);
+  return multiply<vector_semantic_type_t<VectorLike>>(T_in, v);
+}
+
+template <typename ResultVector, typename VectorLike, typename TensorLike>
+LIBMESH_DEVICE_INLINE
+auto multiply(const VectorLike & v, const TensorLike & T_in)
+  -> std::enable_if_t<is_vector_like_v<VectorLike> && is_tensor_like_v<TensorLike>, ResultVector>
+{
+  return detail::multiply<ResultVector>(v, T_in);
 }
 
 template <typename VectorLike, typename TensorLike>
@@ -664,7 +740,7 @@ auto multiply(const VectorLike & v, const TensorLike & T_in)
   -> std::enable_if_t<is_vector_like_v<VectorLike> && is_tensor_like_v<TensorLike>,
                       vector_semantic_type_t<VectorLike>>
 {
-  return vector_tensor_multiply(v, T_in);
+  return multiply<vector_semantic_type_t<VectorLike>>(v, T_in);
 }
 
 template <typename ViewType>
@@ -672,9 +748,7 @@ template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
 void tensor_ref<ViewType>::assign(const RightTensor & right)
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(*this, row, col, tensor_get_component(right, row, col));
+  detail::assign_tensor_components(*this, right);
 }
 
 template <typename ViewType>
@@ -682,12 +756,7 @@ template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
 void tensor_ref<ViewType>::add(const RightTensor & right)
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(*this,
-                           row,
-                           col,
-                           tensor_get_component(*this, row, col) + tensor_get_component(right, row, col));
+  detail::add_tensor_components(*this, right);
 }
 
 template <typename ViewType>
@@ -695,13 +764,7 @@ template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
 void tensor_ref<ViewType>::add_scaled(const RightTensor & right, const value_type & factor)
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(*this,
-                           row,
-                           col,
-                           tensor_get_component(*this, row, col) +
-                             factor * tensor_get_component(right, row, col));
+  detail::add_scaled_tensor_components(*this, right, factor);
 }
 
 template <typename ViewType>
@@ -709,12 +772,7 @@ template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
 void tensor_ref<ViewType>::subtract(const RightTensor & right)
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(*this,
-                           row,
-                           col,
-                           tensor_get_component(*this, row, col) - tensor_get_component(right, row, col));
+  detail::subtract_tensor_components(*this, right);
 }
 
 template <typename ViewType>
@@ -722,22 +780,14 @@ template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
 void tensor_ref<ViewType>::subtract_scaled(const RightTensor & right, const value_type & factor)
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(*this,
-                           row,
-                           col,
-                           tensor_get_component(*this, row, col) -
-                             factor * tensor_get_component(right, row, col));
+  detail::subtract_scaled_tensor_components(*this, right, factor);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 void tensor_ref<ViewType>::zero()
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(*this, row, col, value_type(0));
+  detail::zero_tensor_components(*this);
 }
 
 template <typename ViewType>
@@ -773,14 +823,14 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::transpose() const
 {
-  return tensor_transpose(*this);
+  return libMesh::Kokkos::transpose(*this);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::det(const unsigned int dim) const
 {
-  return tensor_leading_determinant(*this, dim);
+  return detail::leading_determinant(*this, dim);
 }
 
 template <typename ViewType>
@@ -794,7 +844,7 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::inverse(const unsigned int dim) const
 {
-  return tensor_inverse(*this, dim);
+  return libMesh::Kokkos::inverse(*this, dim);
 }
 
 template <typename ViewType>
@@ -802,7 +852,7 @@ template <typename VectorLike, typename ResultVector>
 LIBMESH_DEVICE_INLINE
 void tensor_ref<ViewType>::solve(const VectorLike & b, ResultVector & x) const
 {
-  const auto solution = tensor_vector_multiply<vector_semantic_type_t<ResultVector>>(this->inverse(), b);
+  const auto solution = libMesh::Kokkos::multiply<vector_semantic_type_t<ResultVector>>(this->inverse(), b);
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
     vector_set_component(x, component, vector_get_component(solution, component));
 }
@@ -811,14 +861,14 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::row(const unsigned int i) const
 {
-  return tensor_row(*this, i);
+  return libMesh::Kokkos::row(*this, i);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::column(const unsigned int i) const
 {
-  return tensor_column(*this, i);
+  return libMesh::Kokkos::column(*this, i);
 }
 
 template <typename ViewType>
@@ -826,7 +876,7 @@ template <typename VectorLike>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::left_multiply(const VectorLike & v) const
 {
-  return vector_tensor_multiply(v, *this);
+  return libMesh::Kokkos::multiply(v, *this);
 }
 
 // Operator-compatible wrappers for storage-backed refs and mixed ref/owning math.
@@ -900,7 +950,7 @@ template <typename LeftTensor,
 LIBMESH_DEVICE_INLINE
 auto operator*(const LeftTensor & left, const RightTensor & right)
 {
-  return tensor_multiply(left, right);
+  return multiply(left, right);
 }
 
 template <typename TensorLike,
@@ -911,7 +961,7 @@ template <typename TensorLike,
 LIBMESH_DEVICE_INLINE
 auto operator*(const TensorLike & T_in, const VectorLike & v)
 {
-  return tensor_vector_multiply(T_in, v);
+  return multiply(T_in, v);
 }
 
 template <typename VectorLike,
@@ -922,7 +972,7 @@ template <typename VectorLike,
 LIBMESH_DEVICE_INLINE
 auto operator*(const VectorLike & v, const TensorLike & T_in)
 {
-  return vector_tensor_multiply(v, T_in);
+  return multiply(v, T_in);
 }
 
 template <typename LeftTensor, typename RightTensor>
@@ -957,13 +1007,7 @@ auto operator+=(LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       LeftTensor &>
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(left,
-                           row,
-                           col,
-                           tensor_get_component(left, row, col) + tensor_get_component(right, row, col));
-
+  detail::add_tensor_components(left, right);
   return left;
 }
 
@@ -974,13 +1018,7 @@ auto operator-=(LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       LeftTensor &>
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(left,
-                           row,
-                           col,
-                           tensor_get_component(left, row, col) - tensor_get_component(right, row, col));
-
+  detail::subtract_tensor_components(left, right);
   return left;
 }
 
@@ -991,10 +1029,7 @@ auto operator*=(LeftTensor & left, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       LeftTensor &>
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(left, row, col, tensor_get_component(left, row, col) * alpha);
-
+  detail::scale_tensor_components(left, alpha);
   return left;
 }
 
@@ -1005,10 +1040,7 @@ auto operator/=(LeftTensor & left, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       LeftTensor &>
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(left, row, col, tensor_get_component(left, row, col) / alpha);
-
+  detail::divide_tensor_components(left, alpha);
   return left;
 }
 
