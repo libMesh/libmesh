@@ -126,7 +126,7 @@ test_tensor_ops()
       const auto a_ref = libMesh::Kokkos::make_vector_ref(d_a, 0);
       const auto b_ref = libMesh::Kokkos::make_vector_ref(d_b, 0);
       const auto c_ref = libMesh::Kokkos::make_vector_ref(d_c, 0);
-      const auto outer_d = libMesh::Kokkos::tensor_outer_product<oracle_tensor>(a_ref, b_ref);
+      const auto outer_d = libMesh::Kokkos::outer_product<oracle_tensor>(a_ref, b_ref);
       const auto transpose_d = A_ref.transpose();
       const auto mix_d = Real(1.5) * A_ref - Real(0.25) * outer_d;
       const auto right_d = A_ref * c_ref;
@@ -382,7 +382,7 @@ test_mixed_representation_ops()
       const auto inverse = A_ref.inverse();
       const auto add = A_ref + ref_transpose;
       const auto scaled = Real(0.5) * A_ref;
-      const auto outer = libMesh::Kokkos::tensor_outer_product<oracle_tensor>(a_ref, b);
+      const auto outer = libMesh::Kokkos::outer_product<oracle_tensor>(a_ref, b);
 
       d_scalars(0) = a_ref * b;
       d_scalars(1) = A_ref.contract(outer);
