@@ -147,11 +147,11 @@ void parallel_for (const Range & range, const Body & body,
   libmesh_error_msg_if(n_threads > libMesh::n_threads(),
                        "Requested n_threads (" << n_threads << ") exceeds the "
                        "global thread count (" << libMesh::n_threads() << ").");
-  BoolAcquire b(in_threads);
+  BoolAcquire set_in_threads(in_threads);
 
   if (n_threads > 1)
     {
-      Threads::RAIIAcquire<int> a(Threads::active_threads, n_threads);
+      Threads::RAIIAcquire<int> set_active_threads(Threads::active_threads, n_threads);
 
       DisablePerfLogInScope disable_perf;
       if (n_threads == libMesh::n_threads())
@@ -180,11 +180,11 @@ void parallel_for (const Range & range, const Body & body, const Partitioner & p
   libmesh_error_msg_if(n_threads > libMesh::n_threads(),
                        "Requested n_threads (" << n_threads << ") exceeds the "
                        "global thread count (" << libMesh::n_threads() << ").");
-  BoolAcquire b(in_threads);
+  BoolAcquire set_in_threads(in_threads);
 
   if (n_threads > 1)
     {
-      Threads::RAIIAcquire<int> a(Threads::active_threads, n_threads);
+      Threads::RAIIAcquire<int> set_active_threads(Threads::active_threads, n_threads);
 
       DisablePerfLogInScope disable_perf;
       if (n_threads == libMesh::n_threads())
@@ -213,11 +213,11 @@ void parallel_reduce (const Range & range, Body & body,
   libmesh_error_msg_if(n_threads > libMesh::n_threads(),
                        "Requested n_threads (" << n_threads << ") exceeds the "
                        "global thread count (" << libMesh::n_threads() << ").");
-  BoolAcquire b(in_threads);
+  BoolAcquire set_in_threads(in_threads);
 
   if (n_threads > 1)
     {
-      Threads::RAIIAcquire<int> a(Threads::active_threads, n_threads);
+      Threads::RAIIAcquire<int> set_active_threads(Threads::active_threads, n_threads);
 
       DisablePerfLogInScope disable_perf;
       if (n_threads == libMesh::n_threads())
@@ -246,11 +246,11 @@ void parallel_reduce (const Range & range, Body & body, const Partitioner & part
   libmesh_error_msg_if(n_threads > libMesh::n_threads(),
                        "Requested n_threads (" << n_threads << ") exceeds the "
                        "global thread count (" << libMesh::n_threads() << ").");
-  BoolAcquire b(in_threads);
+  BoolAcquire set_in_threads(in_threads);
 
   if (n_threads > 1)
     {
-      Threads::RAIIAcquire<int> a(Threads::active_threads, n_threads);
+      Threads::RAIIAcquire<int> set_active_threads(Threads::active_threads, n_threads);
 
       DisablePerfLogInScope disable_perf;
       if (n_threads == libMesh::n_threads())
