@@ -125,6 +125,12 @@ void TetGenMeshInterface::triangulate_pointset ()
   // We don't do this by default.
   if (this->_smooth_after_generating)
     LaplaceMeshSmoother(this->_mesh, 2).smooth();
+
+  // We've added a bunch of elements.  A full prepare_for_use() would
+  // be expensive here and user code hasn't been expecting it, but we
+  // do have code downstream expecting element caches to be up to
+  // date.
+  this->_mesh.cache_elem_data();
 }
 
 
