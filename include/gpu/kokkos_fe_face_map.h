@@ -5,6 +5,7 @@
 
 #include "kokkos_fe_evaluator.h"
 #include "libmesh/elem.h"
+#include "libmesh/fe_reference_element_traits.h"
 
 namespace libMesh::Kokkos
 {
@@ -22,20 +23,32 @@ RealVector point_to_real_vector(const libMesh::Point & pt)
 }
 
 inline unsigned int
+parent_local_side_node(const libMesh::Elem & parent,
+                       unsigned int side,
+                       unsigned int side_node)
+{
+  unsigned int node = libMesh::invalid_uint;
+  if (libMesh::try_local_side_node(parent.type(), side, side_node, node))
+    return node;
+
+  detail::abort_unsupported("map_face_qp_to_parent(): unsupported parent element type in local side-node lookup");
+  return libMesh::invalid_uint;
+}
+
+inline unsigned int
 recover_parent_side(const libMesh::Elem & parent,
                     const libMesh::Elem & side_in_parent)
 {
   for (unsigned int side = 0; side < parent.n_sides(); ++side)
   {
-    auto candidate = parent.build_side_ptr(side);
-
-    if (candidate->type() != side_in_parent.type() ||
-        candidate->n_nodes() != side_in_parent.n_nodes())
+    if (get_side_topology(parent.type(), side) != side_in_parent.type() ||
+        ((libMesh::side_node_count_or_zero(parent.type(), side) &&
+          libMesh::side_node_count_or_zero(parent.type(), side) != side_in_parent.n_nodes())))
       continue;
 
     bool same_side = true;
-    for (unsigned int k = 0; k < candidate->n_nodes(); ++k)
-      if (candidate->node_ptr(k) != side_in_parent.node_ptr(k))
+    for (unsigned int k = 0; k < side_in_parent.n_nodes(); ++k)
+      if (parent.node_ptr(parent_local_side_node(parent, side, k)) != side_in_parent.node_ptr(k))
       {
         same_side = false;
         break;
@@ -51,50 +64,12 @@ recover_parent_side(const libMesh::Elem & parent,
 inline libMesh::Point
 parent_refspace_node(const libMesh::Elem & parent, unsigned int node)
 {
-  switch (parent.type())
-  {
-    case libMesh::PYRAMID13:
-    case libMesh::PYRAMID14:
-      switch (node)
-      {
-        case 9:
-          return libMesh::Point(-0.5, -0.5, 0.5);
-        case 10:
-          return libMesh::Point(0.5, -0.5, 0.5);
-        case 11:
-          return libMesh::Point(0.5, 0.5, 0.5);
-        case 12:
-          return libMesh::Point(-0.5, 0.5, 0.5);
-        default:
-          return parent.master_point(node);
-      }
+  libMesh::Point pt;
+  if (libMesh::try_reference_node(parent.type(), node, pt))
+    return pt;
 
-    case libMesh::PYRAMID18:
-      switch (node)
-      {
-        case 9:
-          return libMesh::Point(-0.5, -0.5, 0.5);
-        case 10:
-          return libMesh::Point(0.5, -0.5, 0.5);
-        case 11:
-          return libMesh::Point(0.5, 0.5, 0.5);
-        case 12:
-          return libMesh::Point(-0.5, 0.5, 0.5);
-        case 14:
-          return libMesh::Point(-2. / 3., 0.0, 1. / 3.);
-        case 15:
-          return libMesh::Point(0.0, 2. / 3., 1. / 3.);
-        case 16:
-          return libMesh::Point(2. / 3., 0.0, 1. / 3.);
-        case 17:
-          return libMesh::Point(0.0, -2. / 3., 1. / 3.);
-        default:
-          return parent.master_point(node);
-      }
-
-    default:
-      return parent.master_point(node);
-  }
+  detail::abort_unsupported("map_face_qp_to_parent(): unsupported parent element type in reference-node lookup");
+  return libMesh::Point();
 }
 
 /**
@@ -103,10 +78,10 @@ parent_refspace_node(const libMesh::Elem & parent, unsigned int node)
  *
  * side_in_parent must be obtained via build_side_ptr() (not side_ptr()), so that
  * second-order sides carry their midpoint nodes. Parent reference coordinates
- * are reconstructed from the FE reference-space node convention used by
- * FE::side_map(), not from side_in_parent.point(k), which lives in physical
- * space, and not from Elem::master_point() on pyramids, where those node
- * coordinates differ.
+ * are reconstructed from shared libMesh reference-element traits. They are not
+ * reconstructed from side_in_parent.point(k), which lives in physical space.
+ * Element types outside the Kokkos FE support boundary are rejected rather
+ * than silently falling back to generic Elem runtime helpers.
  *
  * @param side_in_parent  The side element as embedded in the parent (from build_side_ptr())
  * @param mapping_type    Geometric mapping type (LAGRANGE_MAP, RATIONAL_BERNSTEIN_MAP)
@@ -136,7 +111,7 @@ map_face_qp_to_parent(const libMesh::Elem & side_in_parent,
   // corresponding parent vertex in the parent reference element.
   if (n == 1)
   {
-    const libMesh::Point pt = parent_refspace_node(*parent, parent->local_side_node(side, 0));
+    const libMesh::Point pt = parent_refspace_node(*parent, parent_local_side_node(*parent, side, 0));
     return point_to_real_vector(pt);
   }
 
@@ -146,7 +121,7 @@ map_face_qp_to_parent(const libMesh::Elem & side_in_parent,
     const Real t = face_qpt(1);
     const Real psi = map_shape(mapping_type, side_topo, k, s, t, 0.0);
 
-    const libMesh::Point pt = parent_refspace_node(*parent, parent->local_side_node(side, k));
+    const libMesh::Point pt = parent_refspace_node(*parent, parent_local_side_node(*parent, side, k));
     parent_pt.add_scaled(point_to_real_vector(pt), psi);
   }
 

@@ -20,6 +20,7 @@
 // Local includes
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/quadrature_conical.h"
+#include "libmesh/quadrature_gauss_rules.h"
 #include "libmesh/quadrature_gm.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/cell_c0polyhedron.h"
@@ -56,6 +57,26 @@ void QGauss::init_3D()
     case TET10:
     case TET14:
       {
+        const auto shared_rule =
+          Quadrature::Gauss::tetrahedron_rule(static_cast<unsigned int>(get_order()),
+                                              allow_rules_with_negative_weights);
+
+        if (shared_rule.count)
+          {
+            _points.resize(shared_rule.count);
+            _weights.resize(shared_rule.count);
+
+            for (unsigned int i = 0; i < shared_rule.count; ++i)
+              {
+                _points[i](0) = shared_rule.points[i].x;
+                _points[i](1) = shared_rule.points[i].y;
+                _points[i](2) = shared_rule.points[i].z;
+                _weights[i] = shared_rule.points[i].w;
+              }
+
+            return;
+          }
+
         switch(get_order())
           {
             // Taken from pg. 222 of "The finite element method," vol. 1

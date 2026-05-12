@@ -89,8 +89,13 @@ include_HEADERS =  \
         fe/fe_interface.h \
         fe/fe_interface_macros.h \
         fe/fe_lagrange_shape_1D.h \
+        fe/fe_reference_element_traits.h \
+        fe/fe_serendipity_lagrange.h \
+        fe/fe_simplex_lagrange.h \
+        fe/fe_tensor_product_lagrange.h \
         fe/fe_macro.h \
         fe/fe_map.h \
+        fe/fe_shape_traits.h \
         fe/fe_transformation_base.h \
         fe/fe_type.h \
         fe/fe_xyz_map.h \
@@ -350,6 +355,7 @@ include_HEADERS =  \
         quadrature/quadrature_composite.h \
         quadrature/quadrature_conical.h \
         quadrature/quadrature_gauss.h \
+        quadrature/quadrature_gauss_rules.h \
         quadrature/quadrature_gauss_lobatto.h \
         quadrature/quadrature_gm.h \
         quadrature/quadrature_grid.h \

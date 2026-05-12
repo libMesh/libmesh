@@ -20,6 +20,9 @@
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_lagrange_shape_1D.h"
+#include "libmesh/fe_serendipity_lagrange.h"
+#include "libmesh/fe_simplex_lagrange.h"
+#include "libmesh/fe_tensor_product_lagrange.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/cell_c0polyhedron.h"
 #include "libmesh/tensor_value.h"
@@ -105,32 +108,12 @@ void FE<3,LAGRANGE>::all_shapes
             {
               libmesh_assert_less_equal (n_sf, 8);
 
-              //                                0  1  2  3  4  5  6  7
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
-
               for (auto qp : index_range(p))
                 {
                   const Point & q_point = p[qp];
-                  // Compute hex shape functions as a tensor-product
-                  const Real xi   = q_point(0);
-                  const Real eta  = q_point(1);
-                  const Real zeta = q_point(2);
-
-                  // one_d_shapes[dim][i] = phi_i(p(dim))
-                  Real one_d_shapes[3][2] = {
-                    {fe_lagrange_1D_linear_shape(0, xi),
-                     fe_lagrange_1D_linear_shape(1, xi)},
-                    {fe_lagrange_1D_linear_shape(0, eta),
-                     fe_lagrange_1D_linear_shape(1, eta)},
-                    {fe_lagrange_1D_linear_shape(0, zeta),
-                     fe_lagrange_1D_linear_shape(1, zeta)}};
 
                   for (unsigned int i : make_range(n_sf))
-                    v[i][qp] = one_d_shapes[0][i0[i]] *
-                               one_d_shapes[1][i1[i]] *
-                               one_d_shapes[2][i2[i]];
+                    v[i][qp] = libMesh::detail::fe_lagrange_hex8_shape(i, q_point(0), q_point(1), q_point(2));
                 }
               return;
             }
@@ -156,38 +139,12 @@ void FE<3,LAGRANGE>::all_shapes
             {
               libmesh_assert_less_equal (n_sf, 27);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
-
               for (auto qp : index_range(p))
                 {
                   const Point & q_point = p[qp];
-                  // Compute hex shape functions as a tensor-product
-                  const Real xi   = q_point(0);
-                  const Real eta  = q_point(1);
-                  const Real zeta = q_point(2);
-
-                  // linear_shapes[dim][i] = phi_i(p(dim))
-                  Real one_d_shapes[3][3] = {
-                    {fe_lagrange_1D_quadratic_shape(0, xi),
-                     fe_lagrange_1D_quadratic_shape(1, xi),
-                     fe_lagrange_1D_quadratic_shape(2, xi)},
-                    {fe_lagrange_1D_quadratic_shape(0, eta),
-                     fe_lagrange_1D_quadratic_shape(1, eta),
-                     fe_lagrange_1D_quadratic_shape(2, eta)},
-                    {fe_lagrange_1D_quadratic_shape(0, zeta),
-                     fe_lagrange_1D_quadratic_shape(1, zeta),
-                     fe_lagrange_1D_quadratic_shape(2, zeta)}};
 
                   for (unsigned int i : make_range(n_sf))
-                    v[i][qp] = one_d_shapes[0][i0[i]] *
-                               one_d_shapes[1][i1[i]] *
-                               one_d_shapes[2][i2[i]];
+                    v[i][qp] = libMesh::detail::fe_lagrange_hex27_shape(i, q_point(0), q_point(1), q_point(2));
                 }
               return;
             }
@@ -273,49 +230,15 @@ void FE<3,LAGRANGE>::all_shape_derivs
             {
               libmesh_assert_equal_to (n_sf, 8);
 
-              //                                0  1  2  3  4  5  6  7
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
-
               for (auto qp : index_range(p))
                 {
                   const Point & q_point = p[qp];
-                  // Compute hex shape functions as a tensor-product
-                  const Real xi   = q_point(0);
-                  const Real eta  = q_point(1);
-                  const Real zeta = q_point(2);
-
-                  // one_d_shapes[dim][i] = phi_i(p(dim))
-                  Real one_d_shapes[3][2] = {
-                    {fe_lagrange_1D_linear_shape(0, xi),
-                     fe_lagrange_1D_linear_shape(1, xi)},
-                    {fe_lagrange_1D_linear_shape(0, eta),
-                     fe_lagrange_1D_linear_shape(1, eta)},
-                    {fe_lagrange_1D_linear_shape(0, zeta),
-                     fe_lagrange_1D_linear_shape(1, zeta)}};
-
-                  // one_d_derivs[dim][i] = dphi_i/dxi(p(dim))
-                  Real one_d_derivs[3][2] = {
-                    {fe_lagrange_1D_linear_shape_deriv(0, 0, xi),
-                     fe_lagrange_1D_linear_shape_deriv(1, 0, xi)},
-                    {fe_lagrange_1D_linear_shape_deriv(0, 0, eta),
-                     fe_lagrange_1D_linear_shape_deriv(1, 0, eta)},
-                    {fe_lagrange_1D_linear_shape_deriv(0, 0, zeta),
-                     fe_lagrange_1D_linear_shape_deriv(1, 0, zeta)}};
-
-                    for (unsigned int i : make_range(n_sf))
-                      {
-                        (*comps[0])[i][qp] = one_d_derivs[0][i0[i]] *
-                                             one_d_shapes[1][i1[i]] *
-                                             one_d_shapes[2][i2[i]];
-                        (*comps[1])[i][qp] = one_d_shapes[0][i0[i]] *
-                                             one_d_derivs[1][i1[i]] *
-                                             one_d_shapes[2][i2[i]];
-                        (*comps[2])[i][qp] = one_d_shapes[0][i0[i]] *
-                                             one_d_shapes[1][i1[i]] *
-                                             one_d_derivs[2][i2[i]];
-                      }
+                  for (unsigned int i : make_range(n_sf))
+                    {
+                      (*comps[0])[i][qp] = libMesh::detail::fe_lagrange_hex8_shape_deriv(i, 0, q_point(0), q_point(1), q_point(2));
+                      (*comps[1])[i][qp] = libMesh::detail::fe_lagrange_hex8_shape_deriv(i, 1, q_point(0), q_point(1), q_point(2));
+                      (*comps[2])[i][qp] = libMesh::detail::fe_lagrange_hex8_shape_deriv(i, 2, q_point(0), q_point(1), q_point(2));
+                    }
                 }
               return;
             }
@@ -341,58 +264,15 @@ void FE<3,LAGRANGE>::all_shape_derivs
             {
               libmesh_assert_less_equal (n_sf, 27);
 
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
-
               for (auto qp : index_range(p))
                 {
                   const Point & q_point = p[qp];
-                  // Compute hex shape functions as a tensor-product
-                  const Real xi   = q_point(0);
-                  const Real eta  = q_point(1);
-                  const Real zeta = q_point(2);
-
-                  // one_d_shapes[dim][i] = phi_i(p(dim))
-                  Real one_d_shapes[3][3] = {
-                    {fe_lagrange_1D_quadratic_shape(0, xi),
-                     fe_lagrange_1D_quadratic_shape(1, xi),
-                     fe_lagrange_1D_quadratic_shape(2, xi)},
-                    {fe_lagrange_1D_quadratic_shape(0, eta),
-                     fe_lagrange_1D_quadratic_shape(1, eta),
-                     fe_lagrange_1D_quadratic_shape(2, eta)},
-                    {fe_lagrange_1D_quadratic_shape(0, zeta),
-                     fe_lagrange_1D_quadratic_shape(1, zeta),
-                     fe_lagrange_1D_quadratic_shape(2, zeta)}};
-
-                  // one_d_derivs[dim][i] = dphi_i/dxi(p(dim))
-                  Real one_d_derivs[3][3] = {
-                    {fe_lagrange_1D_quadratic_shape_deriv(0, 0, xi),
-                     fe_lagrange_1D_quadratic_shape_deriv(1, 0, xi),
-                     fe_lagrange_1D_quadratic_shape_deriv(2, 0, xi)},
-                    {fe_lagrange_1D_quadratic_shape_deriv(0, 0, eta),
-                     fe_lagrange_1D_quadratic_shape_deriv(1, 0, eta),
-                     fe_lagrange_1D_quadratic_shape_deriv(2, 0, eta)},
-                    {fe_lagrange_1D_quadratic_shape_deriv(0, 0, zeta),
-                     fe_lagrange_1D_quadratic_shape_deriv(1, 0, zeta),
-                     fe_lagrange_1D_quadratic_shape_deriv(2, 0, zeta)}};
-
-                    for (unsigned int i : make_range(n_sf))
-                      {
-                        (*comps[0])[i][qp] = one_d_derivs[0][i0[i]] *
-                                             one_d_shapes[1][i1[i]] *
-                                             one_d_shapes[2][i2[i]];
-                        (*comps[1])[i][qp] = one_d_shapes[0][i0[i]] *
-                                             one_d_derivs[1][i1[i]] *
-                                             one_d_shapes[2][i2[i]];
-                        (*comps[2])[i][qp] = one_d_shapes[0][i0[i]] *
-                                             one_d_shapes[1][i1[i]] *
-                                             one_d_derivs[2][i2[i]];
-                      }
+                  for (unsigned int i : make_range(n_sf))
+                    {
+                      (*comps[0])[i][qp] = libMesh::detail::fe_lagrange_hex27_shape_deriv(i, 0, q_point(0), q_point(1), q_point(2));
+                      (*comps[1])[i][qp] = libMesh::detail::fe_lagrange_hex27_shape_deriv(i, 1, q_point(0), q_point(1), q_point(2));
+                      (*comps[2])[i][qp] = libMesh::detail::fe_lagrange_hex27_shape_deriv(i, 2, q_point(0), q_point(1), q_point(2));
+                    }
                 }
               return;
             }
@@ -691,19 +571,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
             {
               libmesh_assert_less (i, 8);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
-              //                                0  1  2  3  4  5  6  7
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
-
-              return (fe_lagrange_1D_linear_shape(i0[i], xi)*
-                      fe_lagrange_1D_linear_shape(i1[i], eta)*
-                      fe_lagrange_1D_linear_shape(i2[i], zeta));
+              return libMesh::detail::fe_lagrange_hex8_shape(i, p(0), p(1), p(2));
             }
 
             // linear tetrahedral shape functions
@@ -712,30 +580,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
           case TET14:
             {
               libmesh_assert_less (i, 4);
-
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-
-              switch(i)
-                {
-                case 0:
-                  return zeta0;
-
-                case 1:
-                  return zeta1;
-
-                case 2:
-                  return zeta2;
-
-                case 3:
-                  return zeta3;
-
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
-                }
+              return libMesh::detail::fe_lagrange_tet4_shape(i, p(0), p(1), p(2));
             }
 
             // linear prism shape functions
@@ -848,82 +693,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
           case HEX20:
             {
               libmesh_assert_less (i, 20);
-
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
-              // these functions are defined for (x,y,z) in [0,1]^3
-              // so transform the locations
-              const Real x = .5*(xi   + 1.);
-              const Real y = .5*(eta  + 1.);
-              const Real z = .5*(zeta + 1.);
-
-              switch (i)
-                {
-                case 0:
-                  return (1. - x)*(1. - y)*(1. - z)*(1. - 2.*x - 2.*y - 2.*z);
-
-                case 1:
-                  return x*(1. - y)*(1. - z)*(2.*x - 2.*y - 2.*z - 1.);
-
-                case 2:
-                  return x*y*(1. - z)*(2.*x + 2.*y - 2.*z - 3.);
-
-                case 3:
-                  return (1. - x)*y*(1. - z)*(2.*y - 2.*x - 2.*z - 1.);
-
-                case 4:
-                  return (1. - x)*(1. - y)*z*(2.*z - 2.*x - 2.*y - 1.);
-
-                case 5:
-                  return x*(1. - y)*z*(2.*x - 2.*y + 2.*z - 3.);
-
-                case 6:
-                  return x*y*z*(2.*x + 2.*y + 2.*z - 5.);
-
-                case 7:
-                  return (1. - x)*y*z*(2.*y - 2.*x + 2.*z - 3.);
-
-                case 8:
-                  return 4.*x*(1. - x)*(1. - y)*(1. - z);
-
-                case 9:
-                  return 4.*x*y*(1. - y)*(1. - z);
-
-                case 10:
-                  return 4.*x*(1. - x)*y*(1. - z);
-
-                case 11:
-                  return 4.*(1. - x)*y*(1. - y)*(1. - z);
-
-                case 12:
-                  return 4.*(1. - x)*(1. - y)*z*(1. - z);
-
-                case 13:
-                  return 4.*x*(1. - y)*z*(1. - z);
-
-                case 14:
-                  return 4.*x*y*z*(1. - z);
-
-                case 15:
-                  return 4.*(1. - x)*y*z*(1. - z);
-
-                case 16:
-                  return 4.*x*(1. - x)*(1. - y)*z;
-
-                case 17:
-                  return 4.*x*y*(1. - y)*z;
-
-                case 18:
-                  return 4.*x*(1. - x)*y*z;
-
-                case 19:
-                  return 4.*(1. - x)*y*(1. - y)*z;
-
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
-                }
+              return libMesh::detail::fe_lagrange_hex20_shape(i, p(0), p(1), p(2));
             }
 
             // triquadratic hexahedral shape functions
@@ -935,22 +705,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
             {
               libmesh_assert_less (i, 27);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
-
-              return (fe_lagrange_1D_quadratic_shape(i0[i], xi)*
-                      fe_lagrange_1D_quadratic_shape(i1[i], eta)*
-                      fe_lagrange_1D_quadratic_shape(i2[i], zeta));
+              return libMesh::detail::fe_lagrange_hex27_shape(i, p(0), p(1), p(2));
             }
 
             // quadratic tetrahedral shape functions
@@ -964,48 +719,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
           case TET14:
             {
               libmesh_assert_less (i, 14);
-
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-
-              switch(i)
-                {
-                case 0:
-                  return zeta0*(2.*zeta0 - 1.);
-
-                case 1:
-                  return zeta1*(2.*zeta1 - 1.);
-
-                case 2:
-                  return zeta2*(2.*zeta2 - 1.);
-
-                case 3:
-                  return zeta3*(2.*zeta3 - 1.);
-
-                case 4:
-                  return 4.*zeta0*zeta1;
-
-                case 5:
-                  return 4.*zeta1*zeta2;
-
-                case 6:
-                  return 4.*zeta2*zeta0;
-
-                case 7:
-                  return 4.*zeta0*zeta3;
-
-                case 8:
-                  return 4.*zeta1*zeta3;
-
-                case 9:
-                  return 4.*zeta2*zeta3;
-
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
-                }
+              return libMesh::detail::fe_lagrange_tet10_shape(i, p(0), p(1), p(2));
             }
 
             // "serendipity" prism
@@ -1402,66 +1116,7 @@ Real fe_lagrange_3D_shape(const ElemType type,
           case TET14:
             {
               libmesh_assert_less (i, 14);
-
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-
-              // Bubble functions (not yet scaled) on side nodes
-              const Real bubble_012 = zeta0*zeta1*zeta2;
-              const Real bubble_013 = zeta0*zeta1*zeta3;
-              const Real bubble_123 = zeta1*zeta2*zeta3;
-              const Real bubble_023 = zeta0*zeta2*zeta3;
-
-              switch(i)
-                {
-                case 0:
-                  return zeta0*(2.*zeta0 - 1.) + 3.*(bubble_012+bubble_013+bubble_023);
-
-                case 1:
-                  return zeta1*(2.*zeta1 - 1.) + 3.*(bubble_012+bubble_013+bubble_123);
-
-                case 2:
-                  return zeta2*(2.*zeta2 - 1.) + 3.*(bubble_012+bubble_023+bubble_123);
-
-                case 3:
-                  return zeta3*(2.*zeta3 - 1.) + 3.*(bubble_013+bubble_023+bubble_123);
-
-                case 4:
-                  return 4.*zeta0*zeta1 - 12.*(bubble_012+bubble_013);
-
-                case 5:
-                  return 4.*zeta1*zeta2 - 12.*(bubble_012+bubble_123);
-
-                case 6:
-                  return 4.*zeta2*zeta0 - 12.*(bubble_012+bubble_023);
-
-                case 7:
-                  return 4.*zeta0*zeta3 - 12.*(bubble_013+bubble_023);
-
-                case 8:
-                  return 4.*zeta1*zeta3 - 12.*(bubble_013+bubble_123);
-
-                case 9:
-                  return 4.*zeta2*zeta3 - 12.*(bubble_023+bubble_123);
-
-                case 10:
-                  return 27.*bubble_012;
-
-                case 11:
-                  return 27.*bubble_013;
-
-                case 12:
-                  return 27.*bubble_123;
-
-                case 13:
-                  return 27.*bubble_023;
-
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
-                }
+              return libMesh::detail::fe_lagrange_tet14_shape(i, p(0), p(1), p(2));
             }
 
           default:
@@ -1508,35 +1163,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
             {
               libmesh_assert_less (i, 8);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
-
-              switch(j)
-                {
-                case 0:
-                  return (fe_lagrange_1D_linear_shape_deriv(i0[i], 0, xi)*
-                          fe_lagrange_1D_linear_shape      (i1[i], eta)*
-                          fe_lagrange_1D_linear_shape      (i2[i], zeta));
-
-                case 1:
-                  return (fe_lagrange_1D_linear_shape      (i0[i], xi)*
-                          fe_lagrange_1D_linear_shape_deriv(i1[i], 0, eta)*
-                          fe_lagrange_1D_linear_shape      (i2[i], zeta));
-
-                case 2:
-                  return (fe_lagrange_1D_linear_shape      (i0[i], xi)*
-                          fe_lagrange_1D_linear_shape      (i1[i], eta)*
-                          fe_lagrange_1D_linear_shape_deriv(i2[i], 0, zeta));
-
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
-                }
+              return libMesh::detail::fe_lagrange_hex8_shape_deriv(i, j, p(0), p(1), p(2));
             }
 
             // linear tetrahedral shape functions
@@ -1545,94 +1172,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
           case TET14:
             {
               libmesh_assert_less (i, 4);
-
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real dzeta0dxi = -1.;
-              const Real dzeta1dxi =  1.;
-              const Real dzeta2dxi =  0.;
-              const Real dzeta3dxi =  0.;
-
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta =  0.;
-              const Real dzeta2deta =  1.;
-              const Real dzeta3deta =  0.;
-
-              const Real dzeta0dzeta = -1.;
-              const Real dzeta1dzeta =  0.;
-              const Real dzeta2dzeta =  0.;
-              const Real dzeta3dzeta =  1.;
-
-              switch (j)
-                {
-                  // d()/dxi
-                case 0:
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return dzeta0dxi;
-
-                      case 1:
-                        return dzeta1dxi;
-
-                      case 2:
-                        return dzeta2dxi;
-
-                      case 3:
-                        return dzeta3dxi;
-
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-
-                  // d()/deta
-                case 1:
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return dzeta0deta;
-
-                      case 1:
-                        return dzeta1deta;
-
-                      case 2:
-                        return dzeta2deta;
-
-                      case 3:
-                        return dzeta3deta;
-
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-
-                  // d()/dzeta
-                case 2:
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return dzeta0dzeta;
-
-                      case 1:
-                        return dzeta1dzeta;
-
-                      case 2:
-                        return dzeta2dzeta;
-
-                      case 3:
-                        return dzeta3dzeta;
-
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-
-                default:
-                  libmesh_error_msg("Invalid shape function derivative j = " << j);
-                }
+              return libMesh::detail::fe_lagrange_tet4_shape_deriv(i, j);
             }
 
             // linear prism shape functions
@@ -1876,255 +1416,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
           case HEX20:
             {
               libmesh_assert_less (i, 20);
-
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
-              // these functions are defined for (x,y,z) in [0,1]^3
-              // so transform the locations
-              const Real x = .5*(xi   + 1.);
-              const Real y = .5*(eta  + 1.);
-              const Real z = .5*(zeta + 1.);
-
-              // and don't forget the chain rule!
-
-              switch (j)
-                {
-
-                  // d/dx*dx/dxi
-                case 0:
-                  switch (i)
-                    {
-                    case 0:
-                      return .5*(1. - y)*(1. - z)*((1. - x)*(-2.) +
-                                                   (-1.)*(1. - 2.*x - 2.*y - 2.*z));
-
-                    case 1:
-                      return .5*(1. - y)*(1. - z)*(x*(2.) +
-                                                   (1.)*(2.*x - 2.*y - 2.*z - 1.));
-
-                    case 2:
-                      return .5*y*(1. - z)*(x*(2.) +
-                                            (1.)*(2.*x + 2.*y - 2.*z - 3.));
-
-                    case 3:
-                      return .5*y*(1. - z)*((1. - x)*(-2.) +
-                                            (-1.)*(2.*y - 2.*x - 2.*z - 1.));
-
-                    case 4:
-                      return .5*(1. - y)*z*((1. - x)*(-2.) +
-                                            (-1.)*(2.*z - 2.*x - 2.*y - 1.));
-
-                    case 5:
-                      return .5*(1. - y)*z*(x*(2.) +
-                                            (1.)*(2.*x - 2.*y + 2.*z - 3.));
-
-                    case 6:
-                      return .5*y*z*(x*(2.) +
-                                     (1.)*(2.*x + 2.*y + 2.*z - 5.));
-
-                    case 7:
-                      return .5*y*z*((1. - x)*(-2.) +
-                                     (-1.)*(2.*y - 2.*x + 2.*z - 3.));
-
-                    case 8:
-                      return 2.*(1. - y)*(1. - z)*(1. - 2.*x);
-
-                    case 9:
-                      return 2.*y*(1. - y)*(1. - z);
-
-                    case 10:
-                      return 2.*y*(1. - z)*(1. - 2.*x);
-
-                    case 11:
-                      return 2.*y*(1. - y)*(1. - z)*(-1.);
-
-                    case 12:
-                      return 2.*(1. - y)*z*(1. - z)*(-1.);
-
-                    case 13:
-                      return 2.*(1. - y)*z*(1. - z);
-
-                    case 14:
-                      return 2.*y*z*(1. - z);
-
-                    case 15:
-                      return 2.*y*z*(1. - z)*(-1.);
-
-                    case 16:
-                      return 2.*(1. - y)*z*(1. - 2.*x);
-
-                    case 17:
-                      return 2.*y*(1. - y)*z;
-
-                    case 18:
-                      return 2.*y*z*(1. - 2.*x);
-
-                    case 19:
-                      return 2.*y*(1. - y)*z*(-1.);
-
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
-                    }
-
-
-                  // d/dy*dy/deta
-                case 1:
-                  switch (i)
-                    {
-                    case 0:
-                      return .5*(1. - x)*(1. - z)*((1. - y)*(-2.) +
-                                                   (-1.)*(1. - 2.*x - 2.*y - 2.*z));
-
-                    case 1:
-                      return .5*x*(1. - z)*((1. - y)*(-2.) +
-                                            (-1.)*(2.*x - 2.*y - 2.*z - 1.));
-
-                    case 2:
-                      return .5*x*(1. - z)*(y*(2.) +
-                                            (1.)*(2.*x + 2.*y - 2.*z - 3.));
-
-                    case 3:
-                      return .5*(1. - x)*(1. - z)*(y*(2.) +
-                                                   (1.)*(2.*y - 2.*x - 2.*z - 1.));
-
-                    case 4:
-                      return .5*(1. - x)*z*((1. - y)*(-2.) +
-                                            (-1.)*(2.*z - 2.*x - 2.*y - 1.));
-
-                    case 5:
-                      return .5*x*z*((1. - y)*(-2.) +
-                                     (-1.)*(2.*x - 2.*y + 2.*z - 3.));
-
-                    case 6:
-                      return .5*x*z*(y*(2.) +
-                                     (1.)*(2.*x + 2.*y + 2.*z - 5.));
-
-                    case 7:
-                      return .5*(1. - x)*z*(y*(2.) +
-                                            (1.)*(2.*y - 2.*x + 2.*z - 3.));
-
-                    case 8:
-                      return 2.*x*(1. - x)*(1. - z)*(-1.);
-
-                    case 9:
-                      return 2.*x*(1. - z)*(1. - 2.*y);
-
-                    case 10:
-                      return 2.*x*(1. - x)*(1. - z);
-
-                    case 11:
-                      return 2.*(1. - x)*(1. - z)*(1. - 2.*y);
-
-                    case 12:
-                      return 2.*(1. - x)*z*(1. - z)*(-1.);
-
-                    case 13:
-                      return 2.*x*z*(1. - z)*(-1.);
-
-                    case 14:
-                      return 2.*x*z*(1. - z);
-
-                    case 15:
-                      return 2.*(1. - x)*z*(1. - z);
-
-                    case 16:
-                      return 2.*x*(1. - x)*z*(-1.);
-
-                    case 17:
-                      return 2.*x*z*(1. - 2.*y);
-
-                    case 18:
-                      return 2.*x*(1. - x)*z;
-
-                    case 19:
-                      return 2.*(1. - x)*z*(1. - 2.*y);
-
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
-                    }
-
-
-                  // d/dz*dz/dzeta
-                case 2:
-                  switch (i)
-                    {
-                    case 0:
-                      return .5*(1. - x)*(1. - y)*((1. - z)*(-2.) +
-                                                   (-1.)*(1. - 2.*x - 2.*y - 2.*z));
-
-                    case 1:
-                      return .5*x*(1. - y)*((1. - z)*(-2.) +
-                                            (-1.)*(2.*x - 2.*y - 2.*z - 1.));
-
-                    case 2:
-                      return .5*x*y*((1. - z)*(-2.) +
-                                     (-1.)*(2.*x + 2.*y - 2.*z - 3.));
-
-                    case 3:
-                      return .5*(1. - x)*y*((1. - z)*(-2.) +
-                                            (-1.)*(2.*y - 2.*x - 2.*z - 1.));
-
-                    case 4:
-                      return .5*(1. - x)*(1. - y)*(z*(2.) +
-                                                   (1.)*(2.*z - 2.*x - 2.*y - 1.));
-
-                    case 5:
-                      return .5*x*(1. - y)*(z*(2.) +
-                                            (1.)*(2.*x - 2.*y + 2.*z - 3.));
-
-                    case 6:
-                      return .5*x*y*(z*(2.) +
-                                     (1.)*(2.*x + 2.*y + 2.*z - 5.));
-
-                    case 7:
-                      return .5*(1. - x)*y*(z*(2.) +
-                                            (1.)*(2.*y - 2.*x + 2.*z - 3.));
-
-                    case 8:
-                      return 2.*x*(1. - x)*(1. - y)*(-1.);
-
-                    case 9:
-                      return 2.*x*y*(1. - y)*(-1.);
-
-                    case 10:
-                      return 2.*x*(1. - x)*y*(-1.);
-
-                    case 11:
-                      return 2.*(1. - x)*y*(1. - y)*(-1.);
-
-                    case 12:
-                      return 2.*(1. - x)*(1. - y)*(1. - 2.*z);
-
-                    case 13:
-                      return 2.*x*(1. - y)*(1. - 2.*z);
-
-                    case 14:
-                      return 2.*x*y*(1. - 2.*z);
-
-                    case 15:
-                      return 2.*(1. - x)*y*(1. - 2.*z);
-
-                    case 16:
-                      return 2.*x*(1. - x)*(1. - y);
-
-                    case 17:
-                      return 2.*x*y*(1. - y);
-
-                    case 18:
-                      return 2.*x*(1. - x)*y;
-
-                    case 19:
-                      return 2.*(1. - x)*y*(1. - y);
-
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
-                    }
-
-                default:
-                  libmesh_error_msg("Invalid shape function derivative j = " << j);
-                }
+              return libMesh::detail::fe_lagrange_hex20_shape_deriv(i, j, p(0), p(1), p(2));
             }
 
             // triquadratic hexahedral shape functions
@@ -2136,39 +1428,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
             {
               libmesh_assert_less (i, 27);
 
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
-
-              switch(j)
-                {
-                case 0:
-                  return (fe_lagrange_1D_quadratic_shape_deriv(i0[i], 0, xi)*
-                          fe_lagrange_1D_quadratic_shape      (i1[i], eta)*
-                          fe_lagrange_1D_quadratic_shape      (i2[i], zeta));
-
-                case 1:
-                  return (fe_lagrange_1D_quadratic_shape      (i0[i], xi)*
-                          fe_lagrange_1D_quadratic_shape_deriv(i1[i], 0, eta)*
-                          fe_lagrange_1D_quadratic_shape      (i2[i], zeta));
-
-                case 2:
-                  return (fe_lagrange_1D_quadratic_shape      (i0[i], xi)*
-                          fe_lagrange_1D_quadratic_shape      (i1[i], eta)*
-                          fe_lagrange_1D_quadratic_shape_deriv(i2[i], 0, zeta));
-
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
-                }
+              return libMesh::detail::fe_lagrange_hex27_shape_deriv(i, j, p(0), p(1), p(2));
             }
 
             // quadratic tetrahedral shape functions
@@ -2180,153 +1440,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
           case TET14:
             {
               libmesh_assert_less (i, 10);
-
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-
-              const Real dzeta0dxi = -1.;
-              const Real dzeta1dxi =  1.;
-              const Real dzeta2dxi =  0.;
-              const Real dzeta3dxi =  0.;
-
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta =  0.;
-              const Real dzeta2deta =  1.;
-              const Real dzeta3deta =  0.;
-
-              const Real dzeta0dzeta = -1.;
-              const Real dzeta1dzeta =  0.;
-              const Real dzeta2dzeta =  0.;
-              const Real dzeta3dzeta =  1.;
-
-              switch (j)
-                {
-                  // d()/dxi
-                case 0:
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return (4.*zeta0 - 1.)*dzeta0dxi;
-
-                      case 1:
-                        return (4.*zeta1 - 1.)*dzeta1dxi;
-
-                      case 2:
-                        return (4.*zeta2 - 1.)*dzeta2dxi;
-
-                      case 3:
-                        return (4.*zeta3 - 1.)*dzeta3dxi;
-
-                      case 4:
-                        return 4.*(zeta0*dzeta1dxi + dzeta0dxi*zeta1);
-
-                      case 5:
-                        return 4.*(zeta1*dzeta2dxi + dzeta1dxi*zeta2);
-
-                      case 6:
-                        return 4.*(zeta0*dzeta2dxi + dzeta0dxi*zeta2);
-
-                      case 7:
-                        return 4.*(zeta0*dzeta3dxi + dzeta0dxi*zeta3);
-
-                      case 8:
-                        return 4.*(zeta1*dzeta3dxi + dzeta1dxi*zeta3);
-
-                      case 9:
-                        return 4.*(zeta2*dzeta3dxi + dzeta2dxi*zeta3);
-
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-
-                  // d()/deta
-                case 1:
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return (4.*zeta0 - 1.)*dzeta0deta;
-
-                      case 1:
-                        return (4.*zeta1 - 1.)*dzeta1deta;
-
-                      case 2:
-                        return (4.*zeta2 - 1.)*dzeta2deta;
-
-                      case 3:
-                        return (4.*zeta3 - 1.)*dzeta3deta;
-
-                      case 4:
-                        return 4.*(zeta0*dzeta1deta + dzeta0deta*zeta1);
-
-                      case 5:
-                        return 4.*(zeta1*dzeta2deta + dzeta1deta*zeta2);
-
-                      case 6:
-                        return 4.*(zeta0*dzeta2deta + dzeta0deta*zeta2);
-
-                      case 7:
-                        return 4.*(zeta0*dzeta3deta + dzeta0deta*zeta3);
-
-                      case 8:
-                        return 4.*(zeta1*dzeta3deta + dzeta1deta*zeta3);
-
-                      case 9:
-                        return 4.*(zeta2*dzeta3deta + dzeta2deta*zeta3);
-
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-
-                  // d()/dzeta
-                case 2:
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return (4.*zeta0 - 1.)*dzeta0dzeta;
-
-                      case 1:
-                        return (4.*zeta1 - 1.)*dzeta1dzeta;
-
-                      case 2:
-                        return (4.*zeta2 - 1.)*dzeta2dzeta;
-
-                      case 3:
-                        return (4.*zeta3 - 1.)*dzeta3dzeta;
-
-                      case 4:
-                        return 4.*(zeta0*dzeta1dzeta + dzeta0dzeta*zeta1);
-
-                      case 5:
-                        return 4.*(zeta1*dzeta2dzeta + dzeta1dzeta*zeta2);
-
-                      case 6:
-                        return 4.*(zeta0*dzeta2dzeta + dzeta0dzeta*zeta2);
-
-                      case 7:
-                        return 4.*(zeta0*dzeta3dzeta + dzeta0dzeta*zeta3);
-
-                      case 8:
-                        return 4.*(zeta1*dzeta3dzeta + dzeta1dzeta*zeta3);
-
-                      case 9:
-                        return 4.*(zeta2*dzeta3dzeta + dzeta2dzeta*zeta3);
-
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
-                }
+              return libMesh::detail::fe_lagrange_tet10_shape_deriv(i, j, p(0), p(1), p(2));
             }
 
 
@@ -2931,201 +2045,7 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
           case TET14:
             {
               libmesh_assert_less (i, 14);
-
-              // Area coordinates, pg. 205, Vol. I, Carey, Oden, Becker FEM
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-
-              const Real dzeta0dxi = -1.;
-              const Real dzeta1dxi =  1.;
-              const Real dzeta2dxi =  0.;
-              const Real dzeta3dxi =  0.;
-              const Real dbubble012dxi = (zeta0-zeta1)*zeta2;
-              const Real dbubble013dxi = (zeta0-zeta1)*zeta3;
-              const Real dbubble123dxi = zeta2*zeta3;
-              const Real dbubble023dxi = -zeta2*zeta3;
-
-              const Real dzeta0deta = -1.;
-              const Real dzeta1deta =  0.;
-              const Real dzeta2deta =  1.;
-              const Real dzeta3deta =  0.;
-              const Real dbubble012deta = (zeta0-zeta2)*zeta1;
-              const Real dbubble013deta = -zeta1*zeta3;
-              const Real dbubble123deta = zeta1*zeta3;
-              const Real dbubble023deta = (zeta0-zeta2)*zeta3;
-
-              const Real dzeta0dzeta = -1.;
-              const Real dzeta1dzeta =  0.;
-              const Real dzeta2dzeta =  0.;
-              const Real dzeta3dzeta =  1.;
-              const Real dbubble012dzeta = -zeta1*zeta2;
-              const Real dbubble013dzeta = (zeta0-zeta3)*zeta1;
-              const Real dbubble123dzeta = zeta1*zeta2;
-              const Real dbubble023dzeta = (zeta0-zeta3)*zeta2;
-
-              switch (j)
-                {
-                  // d()/dxi
-                case 0:
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return (4.*zeta0 - 1.)*dzeta0dxi + 3.*(dbubble012dxi+dbubble013dxi+dbubble023dxi);
-
-                      case 1:
-                        return (4.*zeta1 - 1.)*dzeta1dxi + 3.*(dbubble012dxi+dbubble013dxi+dbubble123dxi);
-
-                      case 2:
-                        return (4.*zeta2 - 1.)*dzeta2dxi + 3.*(dbubble012dxi+dbubble023dxi+dbubble123dxi);
-
-                      case 3:
-                        return (4.*zeta3 - 1.)*dzeta3dxi + 3.*(dbubble013dxi+dbubble023dxi+dbubble123dxi);
-
-                      case 4:
-                        return 4.*(zeta0*dzeta1dxi + dzeta0dxi*zeta1) - 12.*(dbubble012dxi+dbubble013dxi);
-
-                      case 5:
-                        return 4.*(zeta1*dzeta2dxi + dzeta1dxi*zeta2) - 12.*(dbubble012dxi+dbubble123dxi);
-
-                      case 6:
-                        return 4.*(zeta0*dzeta2dxi + dzeta0dxi*zeta2) - 12.*(dbubble012dxi+dbubble023dxi);
-
-                      case 7:
-                        return 4.*(zeta0*dzeta3dxi + dzeta0dxi*zeta3) - 12.*(dbubble013dxi+dbubble023dxi);
-
-                      case 8:
-                        return 4.*(zeta1*dzeta3dxi + dzeta1dxi*zeta3) - 12.*(dbubble013dxi+dbubble123dxi);
-
-                      case 9:
-                        return 4.*(zeta2*dzeta3dxi + dzeta2dxi*zeta3) - 12.*(dbubble023dxi+dbubble123dxi);
-
-                      case 10:
-                        return 27.*dbubble012dxi;
-
-                      case 11:
-                        return 27.*dbubble013dxi;
-
-                      case 12:
-                        return 27.*dbubble123dxi;
-
-                      case 13:
-                        return 27.*dbubble023dxi;
-
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-
-                  // d()/deta
-                case 1:
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return (4.*zeta0 - 1.)*dzeta0deta + 3.*(dbubble012deta+dbubble013deta+dbubble023deta);;
-
-                      case 1:
-                        return (4.*zeta1 - 1.)*dzeta1deta + 3.*(dbubble012deta+dbubble013deta+dbubble123deta);
-
-                      case 2:
-                        return (4.*zeta2 - 1.)*dzeta2deta + 3.*(dbubble012deta+dbubble023deta+dbubble123deta);
-
-                      case 3:
-                        return (4.*zeta3 - 1.)*dzeta3deta + 3.*(dbubble013deta+dbubble023deta+dbubble123deta);
-
-                      case 4:
-                        return 4.*(zeta0*dzeta1deta + dzeta0deta*zeta1) - 12.*(dbubble012deta+dbubble013deta);
-
-                      case 5:
-                        return 4.*(zeta1*dzeta2deta + dzeta1deta*zeta2) - 12.*(dbubble012deta+dbubble123deta);
-
-                      case 6:
-                        return 4.*(zeta0*dzeta2deta + dzeta0deta*zeta2) - 12.*(dbubble012deta+dbubble023deta);
-
-                      case 7:
-                        return 4.*(zeta0*dzeta3deta + dzeta0deta*zeta3) - 12.*(dbubble013deta+dbubble023deta);
-
-                      case 8:
-                        return 4.*(zeta1*dzeta3deta + dzeta1deta*zeta3) - 12.*(dbubble013deta+dbubble123deta);
-
-                      case 9:
-                        return 4.*(zeta2*dzeta3deta + dzeta2deta*zeta3) - 12.*(dbubble023deta+dbubble123deta);
-
-                      case 10:
-                        return 27.*dbubble012deta;
-
-                      case 11:
-                        return 27.*dbubble013deta;
-
-                      case 12:
-                        return 27.*dbubble123deta;
-
-                      case 13:
-                        return 27.*dbubble023deta;
-
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-
-                  // d()/dzeta
-                case 2:
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return (4.*zeta0 - 1.)*dzeta0dzeta + 3.*(dbubble012dzeta+dbubble013dzeta+dbubble023dzeta);
-
-                      case 1:
-                        return (4.*zeta1 - 1.)*dzeta1dzeta + 3.*(dbubble012dzeta+dbubble013dzeta+dbubble123dzeta);
-
-                      case 2:
-                        return (4.*zeta2 - 1.)*dzeta2dzeta + 3.*(dbubble012dzeta+dbubble023dzeta+dbubble123dzeta);
-
-                      case 3:
-                        return (4.*zeta3 - 1.)*dzeta3dzeta + 3.*(dbubble013dzeta+dbubble023dzeta+dbubble123dzeta);
-
-                      case 4:
-                        return 4.*(zeta0*dzeta1dzeta + dzeta0dzeta*zeta1) - 12.*(dbubble012dzeta+dbubble013dzeta);
-
-                      case 5:
-                        return 4.*(zeta1*dzeta2dzeta + dzeta1dzeta*zeta2) - 12.*(dbubble012dzeta+dbubble123dzeta);
-
-                      case 6:
-                        return 4.*(zeta0*dzeta2dzeta + dzeta0dzeta*zeta2) - 12.*(dbubble012dzeta+dbubble023dzeta);
-
-                      case 7:
-                        return 4.*(zeta0*dzeta3dzeta + dzeta0dzeta*zeta3) - 12.*(dbubble013dzeta+dbubble023dzeta);
-
-                      case 8:
-                        return 4.*(zeta1*dzeta3dzeta + dzeta1dzeta*zeta3) - 12.*(dbubble013dzeta+dbubble123dzeta);
-
-                      case 9:
-                        return 4.*(zeta2*dzeta3dzeta + dzeta2dzeta*zeta3) - 12.*(dbubble023dzeta+dbubble123dzeta);
-
-                      case 10:
-                        return 27.*dbubble012dzeta;
-
-                      case 11:
-                        return 27.*dbubble013dzeta;
-
-                      case 12:
-                        return 27.*dbubble123dzeta;
-
-                      case 13:
-                        return 27.*dbubble023dzeta;
-
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
-                }
+              return libMesh::detail::fe_lagrange_tet14_shape_deriv(i, j, p(0), p(1), p(2));
             }
 
           case PRISM20:
@@ -3416,44 +2336,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
           case HEX27:
             {
               libmesh_assert_less (i, 8);
-
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1};
-
-              switch (j)
-                {
-                  // All repeated second derivatives are zero on HEX8
-                case 0: // d^2()/dxi^2
-                case 2: // d^2()/deta^2
-                case 5: // d^2()/dzeta^2
-                  {
-                    return 0.;
-                  }
-
-                case 1: // d^2()/dxideta
-                  return (fe_lagrange_1D_linear_shape_deriv(i0[i], 0, xi)*
-                          fe_lagrange_1D_linear_shape_deriv(i1[i], 0, eta)*
-                          fe_lagrange_1D_linear_shape      (i2[i], zeta));
-
-                case 3: // d^2()/dxidzeta
-                  return (fe_lagrange_1D_linear_shape_deriv(i0[i], 0, xi)*
-                          fe_lagrange_1D_linear_shape      (i1[i], eta)*
-                          fe_lagrange_1D_linear_shape_deriv(i2[i], 0, zeta));
-
-                case 4: // d^2()/detadzeta
-                  return (fe_lagrange_1D_linear_shape      (i0[i], xi)*
-                          fe_lagrange_1D_linear_shape_deriv(i1[i], 0, eta)*
-                          fe_lagrange_1D_linear_shape_deriv(i2[i], 0, zeta));
-
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
-                }
+              return libMesh::detail::fe_lagrange_hex8_shape_second_deriv(i, j, p(0), p(1), p(2));
             }
 
           // All second derivatives for piecewise-linear polyhedra are
@@ -3480,269 +2363,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
           case HEX20:
             {
               libmesh_assert_less (i, 20);
-
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
-              // these functions are defined for (x,y,z) in [0,1]^3
-              // so transform the locations
-              const Real x = .5*(xi   + 1.);
-              const Real y = .5*(eta  + 1.);
-              const Real z = .5*(zeta + 1.);
-
-              switch(j)
-                {
-                case 0: // d^2()/dxi^2
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                      case 1:
-                        return (1. - y) * (1. - z);
-                      case 2:
-                      case 3:
-                        return y * (1. - z);
-                      case 4:
-                      case 5:
-                        return (1. - y) * z;
-                      case 6:
-                      case 7:
-                        return y * z;
-                      case 8:
-                        return -2. * (1. - y) * (1. - z);
-                      case 10:
-                        return -2. * y * (1. - z);
-                      case 16:
-                        return -2. * (1. - y) * z;
-                      case 18:
-                        return -2. * y * z;
-                      case 9:
-                      case 11:
-                      case 12:
-                      case 13:
-                      case 14:
-                      case 15:
-                      case 17:
-                      case 19:
-                        return 0;
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-                case 1: // d^2()/dxideta
-                  {
-                    switch(i)
-                      {
-                      case 0:
-                        return (1.25 - x - y - .5*z) * (1. - z);
-                      case 1:
-                        return (-x + y + .5*z - .25) * (1. - z);
-                      case 2:
-                        return (x + y - .5*z - .75) * (1. - z);
-                      case 3:
-                        return (-y + x + .5*z - .25) * (1. - z);
-                      case 4:
-                        return -.25*z * (4.*x + 4.*y - 2.*z - 3);
-                      case 5:
-                        return -.25*z * (-4.*y + 4.*x + 2.*z - 1.);
-                      case 6:
-                        return .25*z * (-5 + 4.*x + 4.*y + 2.*z);
-                      case 7:
-                        return .25*z * (4.*x - 4.*y - 2.*z + 1.);
-                      case 8:
-                        return (-1. + 2.*x) * (1. - z);
-                      case 9:
-                        return (1. - 2.*y) * (1. - z);
-                      case 10:
-                        return (1. - 2.*x) * (1. - z);
-                      case 11:
-                        return (-1. + 2.*y) * (1. - z);
-                      case 12:
-                        return z * (1. - z);
-                      case 13:
-                        return -z * (1. - z);
-                      case 14:
-                        return z * (1. - z);
-                      case 15:
-                        return -z * (1. - z);
-                      case 16:
-                        return (-1. + 2.*x) * z;
-                      case 17:
-                        return (1. - 2.*y) * z;
-                      case 18:
-                        return (1. - 2.*x) * z;
-                      case 19:
-                        return (-1. + 2.*y) * z;
-                      default:
-                        libmesh_error_msg("Invalid i = " << i);
-                      }
-                  }
-                case 2: // d^2()/deta^2
-                  switch(i)
-                    {
-                    case 0:
-                    case 3:
-                      return (1. - x) * (1. - z);
-                    case 1:
-                    case 2:
-                      return x * (1. - z);
-                    case 4:
-                    case 7:
-                      return (1. - x) * z;
-                    case 5:
-                    case 6:
-                      return x * z;
-                    case 9:
-                      return -2. * x * (1. - z);
-                    case 11:
-                      return -2. * (1. - x) * (1. - z);
-                    case 17:
-                      return -2. * x * z;
-                    case 19:
-                      return -2. * (1. - x) * z;
-                    case 8:
-                    case 10:
-                    case 12:
-                    case 13:
-                    case 14:
-                    case 15:
-                    case 16:
-                    case 18:
-                      return 0.;
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
-                    }
-                case 3: // d^2()/dxidzeta
-                  switch(i)
-                    {
-                    case 0:
-                      return (1.25 - x - .5*y - z) * (1. - y);
-                    case 1:
-                      return (-x + .5*y + z - .25) * (1. - y);
-                    case 2:
-                      return -.25*y * (2.*y + 4.*x - 4.*z - 1.);
-                    case 3:
-                      return -.25*y * (-2.*y + 4.*x + 4.*z - 3);
-                    case 4:
-                      return (-z + x + .5*y - .25) * (1. - y);
-                    case 5:
-                      return (x - .5*y + z - .75) * (1. - y);
-                    case 6:
-                      return .25*y * (2.*y + 4.*x + 4.*z - 5);
-                    case 7:
-                      return .25*y * (-2.*y + 4.*x - 4.*z + 1.);
-                    case 8:
-                      return (-1. + 2.*x) * (1. - y);
-                    case 9:
-                      return -y * (1. - y);
-                    case 10:
-                      return (-1. + 2.*x) * y;
-                    case 11:
-                      return y * (1. - y);
-                    case 12:
-                      return (-1. + 2.*z) * (1. - y);
-                    case 13:
-                      return (1. - 2.*z) * (1. - y);
-                    case 14:
-                      return (1. - 2.*z) * y;
-                    case 15:
-                      return (-1. + 2.*z) * y;
-                    case 16:
-                      return (1. - 2.*x) * (1. - y);
-                    case 17:
-                      return y * (1. - y);
-                    case 18:
-                      return (1. - 2.*x) * y;
-                    case 19:
-                      return -y * (1. - y);
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
-                    }
-                case 4: // d^2()/detadzeta
-                  switch(i)
-                    {
-                    case 0:
-                      return (1.25 - .5*x - y - z) * (1. - x);
-                    case 1:
-                      return .25*x * (2.*x - 4.*y - 4.*z + 3.);
-                    case 2:
-                      return -.25*x * (2.*x + 4.*y - 4.*z - 1.);
-                    case 3:
-                      return (-y + .5*x + z - .25) * (1. - x);
-                    case 4:
-                      return (-z + .5*x + y - .25) * (1. - x);
-                    case 5:
-                      return -.25*x * (2.*x - 4.*y + 4.*z - 1.);
-                    case 6:
-                      return .25*x * (2.*x + 4.*y + 4.*z - 5);
-                    case 7:
-                      return (y - .5*x + z - .75) * (1. - x);
-                    case 8:
-                      return x * (1. - x);
-                    case 9:
-                      return (-1. + 2.*y) * x;
-                    case 10:
-                      return -x * (1. - x);
-                    case 11:
-                      return (-1. + 2.*y) * (1. - x);
-                    case 12:
-                      return (-1. + 2.*z) * (1. - x);
-                    case 13:
-                      return (-1. + 2.*z) * x;
-                    case 14:
-                      return (1. - 2.*z) * x;
-                    case 15:
-                      return (1. - 2.*z) * (1. - x);
-                    case 16:
-                      return -x * (1. - x);
-                    case 17:
-                      return (1. - 2.*y) * x;
-                    case 18:
-                      return x * (1. - x);
-                    case 19:
-                      return (1. - 2.*y) * (1. - x);
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
-                    }
-                case 5: // d^2()/dzeta^2
-                  switch(i)
-                    {
-                    case 0:
-                    case 4:
-                      return (1. - x) * (1. - y);
-                    case 1:
-                    case 5:
-                      return x * (1. - y);
-                    case 2:
-                    case 6:
-                      return x * y;
-                    case 3:
-                    case 7:
-                      return (1. - x) * y;
-                    case 12:
-                      return -2. * (1. - x) * (1. - y);
-                    case 13:
-                      return -2. * x * (1. - y);
-                    case 14:
-                      return -2. * x * y;
-                    case 15:
-                      return -2. * (1. - x) * y;
-                    case 8:
-                    case 9:
-                    case 10:
-                    case 11:
-                    case 16:
-                    case 17:
-                    case 18:
-                    case 19:
-                      return 0.;
-                    default:
-                      libmesh_error_msg("Invalid i = " << i);
-                    }
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
-                }
+              return libMesh::detail::fe_lagrange_hex20_shape_second_deriv(i, j, p(0), p(1), p(2));
             }
 
             // triquadratic hexahedral shape functions
@@ -3753,61 +2374,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
           case HEX27:
             {
               libmesh_assert_less (i, 27);
-
-              // Compute hex shape functions as a tensor-product
-              const Real xi   = p(0);
-              const Real eta  = p(1);
-              const Real zeta = p(2);
-
-              // The only way to make any sense of this
-              // is to look at the mgflo/mg2/mgf documentation
-              // and make the cut-out cube!
-              //                                0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26
-              static const unsigned int i0[] = {0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 0, 2, 2, 1, 2, 0, 2, 2};
-              static const unsigned int i1[] = {0, 0, 1, 1, 0, 0, 1, 1, 0, 2, 1, 2, 0, 0, 1, 1, 0, 2, 1, 2, 2, 0, 2, 1, 2, 2, 2};
-              static const unsigned int i2[] = {0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2, 2, 1, 1, 1, 1, 0, 2, 2, 2, 2, 1, 2};
-
-              switch(j)
-                {
-                  // d^2()/dxi^2
-                case 0:
-                  return (fe_lagrange_1D_quadratic_shape_second_deriv(i0[i], 0, xi)*
-                          fe_lagrange_1D_quadratic_shape             (i1[i], eta)*
-                          fe_lagrange_1D_quadratic_shape             (i2[i], zeta));
-
-                  // d^2()/dxideta
-                case 1:
-                  return (fe_lagrange_1D_quadratic_shape_deriv(i0[i], 0, xi)*
-                          fe_lagrange_1D_quadratic_shape_deriv(i1[i], 0, eta)*
-                          fe_lagrange_1D_quadratic_shape      (i2[i], zeta));
-
-                  // d^2()/deta^2
-                case 2:
-                  return (fe_lagrange_1D_quadratic_shape             (i0[i], xi)*
-                          fe_lagrange_1D_quadratic_shape_second_deriv(i1[i], 0, eta)*
-                          fe_lagrange_1D_quadratic_shape             (i2[i], zeta));
-
-                  // d^2()/dxidzeta
-                case 3:
-                  return (fe_lagrange_1D_quadratic_shape_deriv(i0[i], 0, xi)*
-                          fe_lagrange_1D_quadratic_shape      (i1[i], eta)*
-                          fe_lagrange_1D_quadratic_shape_deriv(i2[i], 0, zeta));
-
-                  // d^2()/detadzeta
-                case 4:
-                  return (fe_lagrange_1D_quadratic_shape      (i0[i], xi)*
-                          fe_lagrange_1D_quadratic_shape_deriv(i1[i], 0, eta)*
-                          fe_lagrange_1D_quadratic_shape_deriv(i2[i], 0, zeta));
-
-                  // d^2()/dzeta^2
-                case 5:
-                  return (fe_lagrange_1D_quadratic_shape             (i0[i], xi)*
-                          fe_lagrange_1D_quadratic_shape             (i1[i], eta)*
-                          fe_lagrange_1D_quadratic_shape_second_deriv(i2[i], 0, zeta));
-
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
-                }
+              return libMesh::detail::fe_lagrange_hex27_shape_second_deriv(i, j, p(0), p(1), p(2));
             }
 
             // quadratic tetrahedral shape functions
@@ -3818,69 +2385,8 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
           case TET10:
           case TET14:
             {
-              // The area coordinates are the same as used for the
-              // shape() and shape_deriv() functions.
-              // const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-              // const Real zeta1 = p(0);
-              // const Real zeta2 = p(1);
-              // const Real zeta3 = p(2);
-              static const Real dzetadxi[4][3] =
-                {
-                  {-1., -1., -1.},
-                  {1.,   0.,  0.},
-                  {0.,   1.,  0.},
-                  {0.,   0.,  1.}
-                };
-
-              // Convert from j -> (j,k) indices for independent variable
-              // (0=xi, 1=eta, 2=zeta)
-              static const unsigned short int independent_var_indices[6][2] =
-                {
-                  {0, 0}, // d^2 phi / dxi^2
-                  {0, 1}, // d^2 phi / dxi deta
-                  {1, 1}, // d^2 phi / deta^2
-                  {0, 2}, // d^2 phi / dxi dzeta
-                  {1, 2}, // d^2 phi / deta dzeta
-                  {2, 2}  // d^2 phi / dzeta^2
-                };
-
-              // Convert from i -> zeta indices.  Each quadratic shape
-              // function for the Tet10 depends on up to two of the zeta
-              // area coordinate functions (see the shape() function above).
-              // This table just tells which two area coords it uses.
-              static const unsigned short int zeta_indices[10][2] =
-                {
-                  {0, 0},
-                  {1, 1},
-                  {2, 2},
-                  {3, 3},
-                  {0, 1},
-                  {1, 2},
-                  {2, 0},
-                  {0, 3},
-                  {1, 3},
-                  {2, 3},
-                };
-
-              // Look up the independent variable indices for this value of j.
-              const unsigned int my_j = independent_var_indices[j][0];
-              const unsigned int my_k = independent_var_indices[j][1];
-
-              if (i<4)
-                {
-                  return 4.*dzetadxi[i][my_j]*dzetadxi[i][my_k];
-                }
-
-              else if (i<10)
-                {
-                  const unsigned short int my_m = zeta_indices[i][0];
-                  const unsigned short int my_n = zeta_indices[i][1];
-
-                  return 4.*(dzetadxi[my_n][my_j]*dzetadxi[my_m][my_k] +
-                             dzetadxi[my_m][my_j]*dzetadxi[my_n][my_k] );
-                }
-              else
-                libmesh_error_msg("Invalid shape function index " << i);
+              libmesh_assert_less (i, 10);
+              return libMesh::detail::fe_lagrange_tet10_shape_second_deriv(i, j);
             }
 
 
@@ -4983,190 +3489,7 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
           case TET14:
             {
               libmesh_assert_less (i, 14);
-
-              // The area coordinates are the same as used for the
-              // shape() and shape_deriv() functions.
-              // const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-              // const Real zeta1 = p(0);
-              // const Real zeta2 = p(1);
-              // const Real zeta3 = p(2);
-              static const Real dzetadxi[4][3] =
-                {
-                  {-1., -1., -1.},
-                  {1.,   0.,  0.},
-                  {0.,   1.,  0.},
-                  {0.,   0.,  1.}
-                };
-
-              // Convert from j -> (j,k) indices for independent variable
-              // (0=xi, 1=eta, 2=zeta)
-              static const unsigned short int independent_var_indices[6][2] =
-                {
-                  {0, 0}, // d^2 phi / dxi^2
-                  {0, 1}, // d^2 phi / dxi deta
-                  {1, 1}, // d^2 phi / deta^2
-                  {0, 2}, // d^2 phi / dxi dzeta
-                  {1, 2}, // d^2 phi / deta dzeta
-                  {2, 2}  // d^2 phi / dzeta^2
-                };
-
-              // Convert from i -> zeta indices.  Each quadratic shape
-              // function for the Tet10 depends on up to two of the zeta
-              // area coordinate functions (see the shape() function above).
-              // This table just tells which two area coords it uses.
-              static const unsigned short int zeta_indices[10][2] =
-                {
-                  {0, 0},
-                  {1, 1},
-                  {2, 2},
-                  {3, 3},
-                  {0, 1},
-                  {1, 2},
-                  {2, 0},
-                  {0, 3},
-                  {1, 3},
-                  {2, 3},
-                };
-
-              // Look up the independent variable indices for this value of j.
-              const unsigned int my_j = independent_var_indices[j][0];
-              const unsigned int my_k = independent_var_indices[j][1];
-
-              Real returnval = 0;
-              if (i<4)
-                returnval = 4.*dzetadxi[i][my_j]*dzetadxi[i][my_k];
-
-              else if (i<10)
-                {
-                  const unsigned short int my_m = zeta_indices[i][0];
-                  const unsigned short int my_n = zeta_indices[i][1];
-
-                  returnval =
-                    4.*(dzetadxi[my_n][my_j]*dzetadxi[my_m][my_k] +
-                        dzetadxi[my_m][my_j]*dzetadxi[my_n][my_k] );
-                }
-
-              const Real zeta1 = p(0);
-              const Real zeta2 = p(1);
-              const Real zeta3 = p(2);
-              const Real zeta0 = 1. - zeta1 - zeta2 - zeta3;
-
-              // Fill these with whichever derivative we're concerned
-              // with
-              Real d2bubble012, d2bubble013, d2bubble023, d2bubble123;
-              switch (j)
-                {
-                  // d^2()/dxi^2
-                case 0:
-                  {
-                    d2bubble012 = -2.*zeta2;
-                    d2bubble013 = -2.*zeta3;
-                    d2bubble023 = 0.;
-                    d2bubble123 = 0.;
-                    break;
-                  }
-
-                  // d^2()/dxideta
-                case 1:
-                  {
-                    d2bubble012 = (zeta0-zeta1)-zeta2;
-                    d2bubble013 = -zeta3;
-                    d2bubble123 = zeta3;
-                    d2bubble023 = -zeta3;
-                    break;
-                  }
-
-                  // d^2()/deta^2
-                case 2:
-                  {
-                    d2bubble012 = -2.*zeta1;
-                    d2bubble013 = 0.;
-                    d2bubble123 = 0.;
-                    d2bubble023 = -2.*zeta3;
-                    break;
-                  }
-
-                  // d^2()/dxi dzeta
-                case 3:
-                  {
-                    d2bubble012 = -zeta2;
-                    d2bubble013 = (zeta0-zeta3)-zeta1;
-                    d2bubble123 = zeta2;
-                    d2bubble023 = -zeta2;
-                    break;
-                  }
-
-                  // d^2()/deta dzeta
-                case 4:
-                  {
-                    d2bubble012 = -zeta1;
-                    d2bubble013 = -zeta1;
-                    d2bubble123 = zeta1;
-                    d2bubble023 = (zeta0-zeta3)-zeta2;
-                    break;
-                  }
-
-                  // d^2()/dzeta^2
-                case 5:
-                  {
-                    d2bubble012 = 0.;
-                    d2bubble013 = -2.*zeta1;
-                    d2bubble123 = 0.;
-                    d2bubble023 = -2.*zeta2;
-                    break;
-                  }
-
-                default:
-                  libmesh_error_msg("Invalid j = " << j);
-                }
-
-              switch (i)
-                {
-                case 0:
-                  return returnval + 3.*(d2bubble012+d2bubble013+d2bubble023);
-
-                case 1:
-                  return returnval + 3.*(d2bubble012+d2bubble013+d2bubble123);
-
-                case 2:
-                  return returnval + 3.*(d2bubble012+d2bubble023+d2bubble123);
-
-                case 3:
-                  return returnval + 3.*(d2bubble013+d2bubble023+d2bubble123);
-
-                case 4:
-                  return returnval - 12.*(d2bubble012+d2bubble013);
-
-                case 5:
-                  return returnval - 12.*(d2bubble012+d2bubble123);
-
-                case 6:
-                  return returnval - 12.*(d2bubble012+d2bubble023);
-
-                case 7:
-                  return returnval - 12.*(d2bubble013+d2bubble023);
-
-                case 8:
-                  return returnval - 12.*(d2bubble013+d2bubble123);
-
-                case 9:
-                  return returnval - 12.*(d2bubble023+d2bubble123);
-
-                case 10:
-                  return 27.*d2bubble012;
-
-                case 11:
-                  return 27.*d2bubble013;
-
-                case 12:
-                  return 27.*d2bubble123;
-
-                case 13:
-                  return 27.*d2bubble023;
-
-                default:
-                  libmesh_error_msg("Invalid i = " << i);
-                }
+              return libMesh::detail::fe_lagrange_tet14_shape_second_deriv(i, j, p(0), p(1), p(2));
             }
 
           case PRISM20:

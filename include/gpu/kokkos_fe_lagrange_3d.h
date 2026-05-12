@@ -9,6 +9,9 @@
 #define LIBMESH_KOKKOS_FE_LAGRANGE_3D_H
 
 #include "kokkos_fe_base.h"
+#include "libmesh/fe_serendipity_lagrange.h"
+#include "libmesh/fe_simplex_lagrange.h"
+#include "libmesh/fe_tensor_product_lagrange.h"
 
 namespace libMesh::Kokkos
 {
@@ -25,27 +28,15 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::TET4>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real zeta)
   {
-    switch (i)
-    {
-      case 0: return 1.0 - xi - eta - zeta;
-      case 1: return xi;
-      case 2: return eta;
-      case 3: return zeta;
-      default: return 0.0;
-    }
+    return libMesh::detail::fe_lagrange_tet4_shape(i, xi, eta, zeta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real /*xi*/, Real /*eta*/, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return make_vector(-1.0, -1.0, -1.0);
-      case 1: return make_vector( 1.0,  0.0,  0.0);
-      case 2: return make_vector( 0.0,  1.0,  0.0);
-      case 3: return make_vector( 0.0,  0.0,  1.0);
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::detail::fe_lagrange_tet4_shape_deriv(i, 0),
+                       libMesh::detail::fe_lagrange_tet4_shape_deriv(i, 1),
+                       libMesh::detail::fe_lagrange_tet4_shape_deriv(i, 2));
   }
 #endif
 };
@@ -72,44 +63,15 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::TET10>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real zeta)
   {
-    const Real z0 = 1.0 - xi - eta - zeta;
-    switch (i)
-    {
-      case 0: return z0  * (2.0*z0   - 1.0);
-      case 1: return xi  * (2.0*xi   - 1.0);
-      case 2: return eta * (2.0*eta  - 1.0);
-      case 3: return zeta* (2.0*zeta - 1.0);
-      case 4: return 4.0 * z0 * xi;
-      case 5: return 4.0 * xi * eta;
-      case 6: return 4.0 * eta * z0;
-      case 7: return 4.0 * z0 * zeta;
-      case 8: return 4.0 * xi * zeta;
-      case 9: return 4.0 * eta * zeta;
-      default: return 0.0;
-    }
+    return libMesh::detail::fe_lagrange_tet10_shape(i, xi, eta, zeta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real xi, Real eta, Real zeta)
   {
-    switch (i)
-    {
-      case 0:
-      {
-        const Real v = 4.0*(xi + eta + zeta) - 3.0;
-        return make_vector(v, v, v);
-      }
-      case 1: return make_vector(4.0*xi - 1.0, 0.0, 0.0);
-      case 2: return make_vector(0.0, 4.0*eta - 1.0, 0.0);
-      case 3: return make_vector(0.0, 0.0, 4.0*zeta - 1.0);
-      case 4: return make_vector( 4.0*(1.0-2.0*xi-eta-zeta), -4.0*xi, -4.0*xi);
-      case 5: return make_vector( 4.0*eta, 4.0*xi, 0.0);
-      case 6: return make_vector(-4.0*eta, 4.0*(1.0-xi-2.0*eta-zeta), -4.0*eta);
-      case 7: return make_vector(-4.0*zeta, -4.0*zeta, 4.0*(1.0-xi-eta-2.0*zeta));
-      case 8: return make_vector(4.0*zeta, 0.0, 4.0*xi);
-      case 9: return make_vector(0.0, 4.0*zeta, 4.0*eta);
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::detail::fe_lagrange_tet10_shape_deriv(i, 0, xi, eta, zeta),
+                       libMesh::detail::fe_lagrange_tet10_shape_deriv(i, 1, xi, eta, zeta),
+                       libMesh::detail::fe_lagrange_tet10_shape_deriv(i, 2, xi, eta, zeta));
   }
 #endif
 };
@@ -129,51 +91,15 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::HEX8>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real zeta)
   {
-    switch (i)
-    {
-      case 0: return 0.125*(1.0-xi)*(1.0-eta)*(1.0-zeta);
-      case 1: return 0.125*(1.0+xi)*(1.0-eta)*(1.0-zeta);
-      case 2: return 0.125*(1.0+xi)*(1.0+eta)*(1.0-zeta);
-      case 3: return 0.125*(1.0-xi)*(1.0+eta)*(1.0-zeta);
-      case 4: return 0.125*(1.0-xi)*(1.0-eta)*(1.0+zeta);
-      case 5: return 0.125*(1.0+xi)*(1.0-eta)*(1.0+zeta);
-      case 6: return 0.125*(1.0+xi)*(1.0+eta)*(1.0+zeta);
-      case 7: return 0.125*(1.0-xi)*(1.0+eta)*(1.0+zeta);
-      default: return 0.0;
-    }
+    return libMesh::detail::fe_lagrange_hex8_shape(i, xi, eta, zeta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real xi, Real eta, Real zeta)
   {
-    switch (i)
-    {
-      case 0: return make_vector(-0.125*(1.0-eta)*(1.0-zeta),
-                                 -0.125*(1.0-xi) *(1.0-zeta),
-                                 -0.125*(1.0-xi) *(1.0-eta));
-      case 1: return make_vector( 0.125*(1.0-eta)*(1.0-zeta),
-                                 -0.125*(1.0+xi) *(1.0-zeta),
-                                 -0.125*(1.0+xi) *(1.0-eta));
-      case 2: return make_vector( 0.125*(1.0+eta)*(1.0-zeta),
-                                  0.125*(1.0+xi) *(1.0-zeta),
-                                 -0.125*(1.0+xi) *(1.0+eta));
-      case 3: return make_vector(-0.125*(1.0+eta)*(1.0-zeta),
-                                  0.125*(1.0-xi) *(1.0-zeta),
-                                 -0.125*(1.0-xi) *(1.0+eta));
-      case 4: return make_vector(-0.125*(1.0-eta)*(1.0+zeta),
-                                 -0.125*(1.0-xi) *(1.0+zeta),
-                                  0.125*(1.0-xi) *(1.0-eta));
-      case 5: return make_vector( 0.125*(1.0-eta)*(1.0+zeta),
-                                 -0.125*(1.0+xi) *(1.0+zeta),
-                                  0.125*(1.0+xi) *(1.0-eta));
-      case 6: return make_vector( 0.125*(1.0+eta)*(1.0+zeta),
-                                  0.125*(1.0+xi) *(1.0+zeta),
-                                  0.125*(1.0+xi) *(1.0+eta));
-      case 7: return make_vector(-0.125*(1.0+eta)*(1.0+zeta),
-                                  0.125*(1.0-xi) *(1.0+zeta),
-                                  0.125*(1.0-xi) *(1.0+eta));
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::detail::fe_lagrange_hex8_shape_deriv(i, 0, xi, eta, zeta),
+                       libMesh::detail::fe_lagrange_hex8_shape_deriv(i, 1, xi, eta, zeta),
+                       libMesh::detail::fe_lagrange_hex8_shape_deriv(i, 2, xi, eta, zeta));
   }
 #endif
 };
@@ -191,107 +117,15 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::HEX20>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real zeta)
   {
-    switch (i)
-    {
-      case 0:  return 0.125*(1.0-xi)*(1.0-eta)*(1.0-zeta)*(-xi-eta-zeta-2.0);
-      case 1:  return 0.125*(1.0+xi)*(1.0-eta)*(1.0-zeta)*( xi-eta-zeta-2.0);
-      case 2:  return 0.125*(1.0+xi)*(1.0+eta)*(1.0-zeta)*( xi+eta-zeta-2.0);
-      case 3:  return 0.125*(1.0-xi)*(1.0+eta)*(1.0-zeta)*(-xi+eta-zeta-2.0);
-      case 4:  return 0.125*(1.0-xi)*(1.0-eta)*(1.0+zeta)*(-xi-eta+zeta-2.0);
-      case 5:  return 0.125*(1.0+xi)*(1.0-eta)*(1.0+zeta)*( xi-eta+zeta-2.0);
-      case 6:  return 0.125*(1.0+xi)*(1.0+eta)*(1.0+zeta)*( xi+eta+zeta-2.0);
-      case 7:  return 0.125*(1.0-xi)*(1.0+eta)*(1.0+zeta)*(-xi+eta+zeta-2.0);
-      case 8:  return 0.25*(1.0-xi*xi)*(1.0-eta)*(1.0-zeta);
-      case 10: return 0.25*(1.0-xi*xi)*(1.0+eta)*(1.0-zeta);
-      case 16: return 0.25*(1.0-xi*xi)*(1.0-eta)*(1.0+zeta);
-      case 18: return 0.25*(1.0-xi*xi)*(1.0+eta)*(1.0+zeta);
-      case 9:  return 0.25*(1.0+xi)*(1.0-eta*eta)*(1.0-zeta);
-      case 11: return 0.25*(1.0-xi)*(1.0-eta*eta)*(1.0-zeta);
-      case 17: return 0.25*(1.0+xi)*(1.0-eta*eta)*(1.0+zeta);
-      case 19: return 0.25*(1.0-xi)*(1.0-eta*eta)*(1.0+zeta);
-      case 12: return 0.25*(1.0-xi)*(1.0-eta)*(1.0-zeta*zeta);
-      case 13: return 0.25*(1.0+xi)*(1.0-eta)*(1.0-zeta*zeta);
-      case 14: return 0.25*(1.0+xi)*(1.0+eta)*(1.0-zeta*zeta);
-      case 15: return 0.25*(1.0-xi)*(1.0+eta)*(1.0-zeta*zeta);
-      default: return 0.0;
-    }
+    return libMesh::detail::fe_lagrange_hex20_shape(i, xi, eta, zeta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real xi, Real eta, Real zeta)
   {
-    switch (i)
-    {
-      case 0: return make_vector(
-        -0.125*(1.0-eta)*(1.0-zeta)*(-2.0*xi-eta-zeta-1.0),
-        -0.125*(1.0-xi) *(1.0-zeta)*(-xi-2.0*eta-zeta-1.0),
-        -0.125*(1.0-xi) *(1.0-eta) *(-xi-eta-2.0*zeta-1.0));
-      case 1: return make_vector(
-         0.125*(1.0-eta)*(1.0-zeta)*(2.0*xi-eta-zeta-1.0),
-        -0.125*(1.0+xi) *(1.0-zeta)*(xi-2.0*eta-zeta-1.0),
-        -0.125*(1.0+xi) *(1.0-eta) *(xi-eta-2.0*zeta-1.0));
-      case 2: return make_vector(
-         0.125*(1.0+eta)*(1.0-zeta)*(2.0*xi+eta-zeta-1.0),
-         0.125*(1.0+xi) *(1.0-zeta)*(xi+2.0*eta-zeta-1.0),
-        -0.125*(1.0+xi) *(1.0+eta) *(xi+eta-2.0*zeta-1.0));
-      case 3: return make_vector(
-        -0.125*(1.0+eta)*(1.0-zeta)*(-2.0*xi+eta-zeta-1.0),
-         0.125*(1.0-xi) *(1.0-zeta)*(-xi+2.0*eta-zeta-1.0),
-        -0.125*(1.0-xi) *(1.0+eta) *(-xi+eta-2.0*zeta-1.0));
-      case 4: return make_vector(
-        -0.125*(1.0-eta)*(1.0+zeta)*(-2.0*xi-eta+zeta-1.0),
-        -0.125*(1.0-xi) *(1.0+zeta)*(-xi-2.0*eta+zeta-1.0),
-         0.125*(1.0-xi) *(1.0-eta) *(-xi-eta+2.0*zeta-1.0));
-      case 5: return make_vector(
-         0.125*(1.0-eta)*(1.0+zeta)*(2.0*xi-eta+zeta-1.0),
-        -0.125*(1.0+xi) *(1.0+zeta)*(xi-2.0*eta+zeta-1.0),
-         0.125*(1.0+xi) *(1.0-eta) *(xi-eta+2.0*zeta-1.0));
-      case 6: return make_vector(
-         0.125*(1.0+eta)*(1.0+zeta)*(2.0*xi+eta+zeta-1.0),
-         0.125*(1.0+xi) *(1.0+zeta)*(xi+2.0*eta+zeta-1.0),
-         0.125*(1.0+xi) *(1.0+eta) *(xi+eta+2.0*zeta-1.0));
-      case 7: return make_vector(
-        -0.125*(1.0+eta)*(1.0+zeta)*(-2.0*xi+eta+zeta-1.0),
-         0.125*(1.0-xi) *(1.0+zeta)*(-xi+2.0*eta+zeta-1.0),
-         0.125*(1.0-xi) *(1.0+eta) *(-xi+eta+2.0*zeta-1.0));
-      case 8:  return make_vector(-0.5*xi*(1.0-eta)*(1.0-zeta),
-                            -0.25*(1.0-xi*xi)*(1.0-zeta),
-                            -0.25*(1.0-xi*xi)*(1.0-eta));
-      case 10: return make_vector(-0.5*xi*(1.0+eta)*(1.0-zeta),
-                             0.25*(1.0-xi*xi)*(1.0-zeta),
-                            -0.25*(1.0-xi*xi)*(1.0+eta));
-      case 16: return make_vector(-0.5*xi*(1.0-eta)*(1.0+zeta),
-                            -0.25*(1.0-xi*xi)*(1.0+zeta),
-                             0.25*(1.0-xi*xi)*(1.0-eta));
-      case 18: return make_vector(-0.5*xi*(1.0+eta)*(1.0+zeta),
-                             0.25*(1.0-xi*xi)*(1.0+zeta),
-                             0.25*(1.0-xi*xi)*(1.0+eta));
-      case 9:  return make_vector( 0.25*(1.0-eta*eta)*(1.0-zeta),
-                            -0.5*eta*(1.0+xi)*(1.0-zeta),
-                            -0.25*(1.0+xi)*(1.0-eta*eta));
-      case 11: return make_vector(-0.25*(1.0-eta*eta)*(1.0-zeta),
-                            -0.5*eta*(1.0-xi)*(1.0-zeta),
-                            -0.25*(1.0-xi)*(1.0-eta*eta));
-      case 17: return make_vector( 0.25*(1.0-eta*eta)*(1.0+zeta),
-                            -0.5*eta*(1.0+xi)*(1.0+zeta),
-                             0.25*(1.0+xi)*(1.0-eta*eta));
-      case 19: return make_vector(-0.25*(1.0-eta*eta)*(1.0+zeta),
-                            -0.5*eta*(1.0-xi)*(1.0+zeta),
-                             0.25*(1.0-xi)*(1.0-eta*eta));
-      case 12: return make_vector(-0.25*(1.0-eta)*(1.0-zeta*zeta),
-                            -0.25*(1.0-xi)*(1.0-zeta*zeta),
-                            -0.5*zeta*(1.0-xi)*(1.0-eta));
-      case 13: return make_vector( 0.25*(1.0-eta)*(1.0-zeta*zeta),
-                            -0.25*(1.0+xi)*(1.0-zeta*zeta),
-                            -0.5*zeta*(1.0+xi)*(1.0-eta));
-      case 14: return make_vector( 0.25*(1.0+eta)*(1.0-zeta*zeta),
-                             0.25*(1.0+xi)*(1.0-zeta*zeta),
-                            -0.5*zeta*(1.0+xi)*(1.0+eta));
-      case 15: return make_vector(-0.25*(1.0+eta)*(1.0-zeta*zeta),
-                             0.25*(1.0-xi)*(1.0-zeta*zeta),
-                            -0.5*zeta*(1.0-xi)*(1.0+eta));
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::detail::fe_lagrange_hex20_shape_deriv(i, 0, xi, eta, zeta),
+                       libMesh::detail::fe_lagrange_hex20_shape_deriv(i, 1, xi, eta, zeta),
+                       libMesh::detail::fe_lagrange_hex20_shape_deriv(i, 2, xi, eta, zeta));
   }
 #endif
 };
@@ -309,55 +143,18 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::HEX27>
   static constexpr unsigned int n_dofs() { return 27; }
 
 #ifdef LIBMESH_HAVE_KOKKOS
-  LIBMESH_DEVICE_INLINE static Real L(unsigned int k, Real t)
-  {
-    switch (k)
-    {
-      case 0: return 0.5 * t * (t - 1.0);
-      case 1: return 0.5 * t * (t + 1.0);
-      case 2: return 1.0 - t * t;
-      default: return 0.0;
-    }
-  }
-
-  LIBMESH_DEVICE_INLINE static Real dL(unsigned int k, Real t)
-  {
-    switch (k)
-    {
-      case 0: return t - 0.5;
-      case 1: return t + 0.5;
-      case 2: return -2.0 * t;
-      default: return 0.0;
-    }
-  }
-
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real zeta)
   {
-    static const unsigned int i0[] =
-      {0,1,1,0, 0,1,1,0, 2,1,2,0, 0,1,1,0, 2,1,2,0, 2,2,1,2,0,2,2};
-    static const unsigned int i1[] =
-      {0,0,1,1, 0,0,1,1, 0,2,1,2, 0,0,1,1, 0,2,1,2, 2,0,2,1,2,2,2};
-    static const unsigned int i2[] =
-      {0,0,0,0, 1,1,1,1, 0,0,0,0, 2,2,2,2, 1,1,1,1, 0,2,2,2,2,1,2};
-    return L(i0[i], xi) * L(i1[i], eta) * L(i2[i], zeta);
+    return libMesh::detail::fe_lagrange_hex27_shape(i, xi, eta, zeta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real xi, Real eta, Real zeta)
   {
-    static const unsigned int i0[] =
-      {0,1,1,0, 0,1,1,0, 2,1,2,0, 0,1,1,0, 2,1,2,0, 2,2,1,2,0,2,2};
-    static const unsigned int i1[] =
-      {0,0,1,1, 0,0,1,1, 0,2,1,2, 0,0,1,1, 0,2,1,2, 2,0,2,1,2,2,2};
-    static const unsigned int i2[] =
-      {0,0,0,0, 1,1,1,1, 0,0,0,0, 2,2,2,2, 1,1,1,1, 0,2,2,2,2,1,2};
-    const Real lxi   = L(i0[i], xi);
-    const Real leta  = L(i1[i], eta);
-    const Real lzeta = L(i2[i], zeta);
-    return make_vector(dL(i0[i], xi)  * leta  * lzeta,
-                       lxi * dL(i1[i], eta)   * lzeta,
-                       lxi * leta  * dL(i2[i], zeta));
+    return make_vector(libMesh::detail::fe_lagrange_hex27_shape_deriv(i, 0, xi, eta, zeta),
+                       libMesh::detail::fe_lagrange_hex27_shape_deriv(i, 1, xi, eta, zeta),
+                       libMesh::detail::fe_lagrange_hex27_shape_deriv(i, 2, xi, eta, zeta));
   }
 #endif
 };

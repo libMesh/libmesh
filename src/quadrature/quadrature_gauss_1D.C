@@ -21,6 +21,7 @@
 
 // Local includes
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_gauss_rules.h"
 
 namespace libMesh
 {
@@ -31,6 +32,22 @@ void QGauss::init_1D()
 {
   //----------------------------------------------------------------------
   // 1D quadrature rules
+  const auto shared_rule = Quadrature::Gauss::gauss_legendre_rule(static_cast<unsigned int>(get_order()));
+
+  if (shared_rule.count)
+    {
+      _points.resize(shared_rule.count);
+      _weights.resize(shared_rule.count);
+
+      for (unsigned int i = 0; i < shared_rule.count; ++i)
+        {
+          _points[i](0) = shared_rule.points[i];
+          _weights[i] = shared_rule.weights[i];
+        }
+
+      return;
+    }
+
   switch(get_order())
     {
     case CONSTANT:

@@ -18,7 +18,6 @@
 #define LIBMESH_KOKKOS_FE_MAP_H
 
 #include "kokkos_fe_evaluator.h"
-#include "kokkos_scalar_types.h"
 
 namespace libMesh::Kokkos
 {
@@ -168,7 +167,7 @@ LIBMESH_DEVICE_INLINE Real
 volume_jxw(const RealTensor & J, unsigned int dim, Real quad_weight)
 {
   if (dim == 3)
-    return leading_determinant(J, 3) * quad_weight;
+    return detail::leading_determinant(J, 3) * quad_weight;
   else if (dim == 2)
     return J.row(0).cross(J.row(1)).norm() * quad_weight;
   else if (dim == 1)

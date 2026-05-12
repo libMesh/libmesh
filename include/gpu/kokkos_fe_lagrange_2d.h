@@ -9,6 +9,9 @@
 #define LIBMESH_KOKKOS_FE_LAGRANGE_2D_H
 
 #include "kokkos_fe_base.h"
+#include "libmesh/fe_serendipity_lagrange.h"
+#include "libmesh/fe_simplex_lagrange.h"
+#include "libmesh/fe_tensor_product_lagrange.h"
 
 namespace libMesh::Kokkos
 {
@@ -25,25 +28,15 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::TRI3>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return 1.0 - xi - eta;
-      case 1: return xi;
-      case 2: return eta;
-      default: return 0.0;
-    }
+    return libMesh::detail::fe_lagrange_tri3_shape(i, xi, eta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real /*xi*/, Real /*eta*/, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return make_vector(-1.0, -1.0, 0.0);
-      case 1: return make_vector( 1.0,  0.0, 0.0);
-      case 2: return make_vector( 0.0,  1.0, 0.0);
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::detail::fe_lagrange_tri3_shape_deriv(i, 0),
+                       libMesh::detail::fe_lagrange_tri3_shape_deriv(i, 1),
+                       0.0);
   }
 #endif
 };
@@ -66,32 +59,15 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::TRI6>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
-    const Real z0 = 1.0 - xi - eta;
-    switch (i)
-    {
-      case 0: return z0 * (2.0 * z0 - 1.0);
-      case 1: return xi * (2.0 * xi - 1.0);
-      case 2: return eta * (2.0 * eta - 1.0);
-      case 3: return 4.0 * z0 * xi;
-      case 4: return 4.0 * xi * eta;
-      case 5: return 4.0 * eta * z0;
-      default: return 0.0;
-    }
+    return libMesh::detail::fe_lagrange_tri6_shape(i, xi, eta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return make_vector(4.0*xi + 4.0*eta - 3.0, 4.0*xi + 4.0*eta - 3.0, 0.0);
-      case 1: return make_vector(4.0*xi - 1.0, 0.0, 0.0);
-      case 2: return make_vector(0.0, 4.0*eta - 1.0, 0.0);
-      case 3: return make_vector(4.0*(1.0 - 2.0*xi - eta), -4.0*xi, 0.0);
-      case 4: return make_vector(4.0*eta, 4.0*xi, 0.0);
-      case 5: return make_vector(-4.0*eta, 4.0*(1.0 - xi - 2.0*eta), 0.0);
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::detail::fe_lagrange_tri6_shape_deriv(i, 0, xi, eta),
+                       libMesh::detail::fe_lagrange_tri6_shape_deriv(i, 1, xi, eta),
+                       0.0);
   }
 #endif
 };
@@ -110,27 +86,15 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::QUAD4>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return 0.25 * (1.0 - xi) * (1.0 - eta);
-      case 1: return 0.25 * (1.0 + xi) * (1.0 - eta);
-      case 2: return 0.25 * (1.0 + xi) * (1.0 + eta);
-      case 3: return 0.25 * (1.0 - xi) * (1.0 + eta);
-      default: return 0.0;
-    }
+    return libMesh::detail::fe_lagrange_quad4_shape(i, xi, eta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return make_vector(-0.25*(1.0-eta), -0.25*(1.0-xi), 0.0);
-      case 1: return make_vector( 0.25*(1.0-eta), -0.25*(1.0+xi), 0.0);
-      case 2: return make_vector( 0.25*(1.0+eta),  0.25*(1.0+xi), 0.0);
-      case 3: return make_vector(-0.25*(1.0+eta),  0.25*(1.0-xi), 0.0);
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::detail::fe_lagrange_quad4_shape_deriv(i, 0, xi, eta),
+                       libMesh::detail::fe_lagrange_quad4_shape_deriv(i, 1, xi, eta),
+                       0.0);
   }
 #endif
 };
@@ -149,43 +113,15 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::QUAD8>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return 0.25 * (1.0-xi) * (1.0-eta) * (-1.0-xi-eta);
-      case 1: return 0.25 * (1.0+xi) * (1.0-eta) * (-1.0+xi-eta);
-      case 2: return 0.25 * (1.0+xi) * (1.0+eta) * (-1.0+xi+eta);
-      case 3: return 0.25 * (1.0-xi) * (1.0+eta) * (-1.0-xi+eta);
-      case 4: return 0.5  * (1.0-xi*xi) * (1.0-eta);
-      case 5: return 0.5  * (1.0+xi)    * (1.0-eta*eta);
-      case 6: return 0.5  * (1.0-xi*xi) * (1.0+eta);
-      case 7: return 0.5  * (1.0-xi)    * (1.0-eta*eta);
-      default: return 0.0;
-    }
+    return libMesh::detail::fe_lagrange_quad8_shape(i, xi, eta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return make_vector(0.25*(1.0-eta)*(2.0*xi+eta),
-                                 0.25*(1.0-xi)*(xi+2.0*eta),
-                                 0.0);
-      case 1: return make_vector(0.25*(1.0-eta)*(2.0*xi-eta),
-                                 0.25*(1.0+xi)*(2.0*eta-xi),
-                                 0.0);
-      case 2: return make_vector(0.25*(1.0+eta)*(2.0*xi+eta),
-                                 0.25*(1.0+xi)*(xi+2.0*eta),
-                                 0.0);
-      case 3: return make_vector(0.25*(1.0+eta)*(2.0*xi-eta),
-                                 0.25*(1.0-xi)*(2.0*eta-xi),
-                                 0.0);
-      case 4: return make_vector(-xi*(1.0-eta), -0.5*(1.0-xi*xi), 0.0);
-      case 5: return make_vector(0.5*(1.0-eta*eta), -eta*(1.0+xi), 0.0);
-      case 6: return make_vector(-xi*(1.0+eta), 0.5*(1.0-xi*xi), 0.0);
-      case 7: return make_vector(-0.5*(1.0-eta*eta), -eta*(1.0-xi), 0.0);
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::detail::fe_lagrange_quad8_shape_deriv(i, 0, xi, eta),
+                       libMesh::detail::fe_lagrange_quad8_shape_deriv(i, 1, xi, eta),
+                       0.0);
   }
 #endif
 };
@@ -206,44 +142,18 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::QUAD9>
   static constexpr unsigned int n_dofs() { return 9; }
 
 #ifdef LIBMESH_HAVE_KOKKOS
-  LIBMESH_DEVICE_INLINE static Real L(unsigned int k, Real t)
-  {
-    switch (k)
-    {
-      case 0: return 0.5 * t * (t - 1.0);
-      case 1: return 0.5 * t * (t + 1.0);
-      case 2: return 1.0 - t * t;
-      default: return 0.0;
-    }
-  }
-
-  LIBMESH_DEVICE_INLINE static Real dL(unsigned int k, Real t)
-  {
-    switch (k)
-    {
-      case 0: return t - 0.5;
-      case 1: return t + 0.5;
-      case 2: return -2.0 * t;
-      default: return 0.0;
-    }
-  }
-
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
-    static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
-    static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
-    return L(i0[i], xi) * L(i1[i], eta);
+    return libMesh::detail::fe_lagrange_quad9_shape(i, xi, eta);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real xi, Real eta, Real /*zeta*/)
   {
-    static const unsigned int i0[] = {0, 1, 1, 0, 2, 1, 2, 0, 2};
-    static const unsigned int i1[] = {0, 0, 1, 1, 0, 2, 1, 2, 2};
-    const Real dxi  = dL(i0[i], xi)  * L(i1[i], eta);
-    const Real deta = L(i0[i], xi)   * dL(i1[i], eta);
-    return make_vector(dxi, deta, 0.0);
+    return make_vector(libMesh::detail::fe_lagrange_quad9_shape_deriv(i, 0, xi, eta),
+                       libMesh::detail::fe_lagrange_quad9_shape_deriv(i, 1, xi, eta),
+                       0.0);
   }
 #endif
 };

@@ -15,10 +15,10 @@
 
 #include "libmesh/libmesh_config.h"
 
+#include "gpu/kokkos_fe_base.h"
 #include "gpu/kokkos_fe_evaluator.h"
 #include "gpu/kokkos_fe_map.h"
 #include "gpu/kokkos_fe_types.h"
-#include "gpu/kokkos_scalar_types.h"
 
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
@@ -233,7 +233,7 @@ test_reconstruction_case_impl(const reconstruction_case & info)
           coeff * grad_shape_for_key<Family, ExactTopo, ExactOrder>(i, d_xi(q), d_eta(q), d_zeta(q));
       }
 
-      const RealTensor invJ = libMesh::Kokkos::leading_inverse(J, dim);
+      const RealTensor invJ = libMesh::Kokkos::inverse<RealTensor>(J, dim);
       const RealVector grad_phys = invJ * grad_ref_sum;
 
       d_u(q) = u;

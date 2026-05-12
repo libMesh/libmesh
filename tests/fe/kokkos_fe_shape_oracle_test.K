@@ -14,9 +14,9 @@
 // are therefore intentionally not invoked here.
 
 #include "libmesh/elem.h"
+#include "gpu/kokkos_fe_base.h"
 #include "gpu/kokkos_fe_evaluator.h"
 #include "gpu/kokkos_fe_types.h"
-#include "gpu/kokkos_scalar_types.h"
 
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"

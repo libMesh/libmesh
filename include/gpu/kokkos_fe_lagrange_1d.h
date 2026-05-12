@@ -13,6 +13,7 @@
 #define LIBMESH_KOKKOS_FE_LAGRANGE_1D_H
 
 #include "kokkos_fe_base.h"
+#include "libmesh/fe_lagrange_shape_1D.h"
 
 namespace libMesh::Kokkos
 {
@@ -28,23 +29,13 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::EDGE2>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real /*eta*/, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return 0.5 * (1.0 - xi);
-      case 1: return 0.5 * (1.0 + xi);
-      default: return 0.0;
-    }
+    return libMesh::fe_lagrange_1D_linear_shape(i, xi);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
-  grad_shape(unsigned int i, Real /*xi*/, Real /*eta*/, Real /*zeta*/)
+  grad_shape(unsigned int i, Real xi, Real /*eta*/, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return make_vector(-0.5, 0.0, 0.0);
-      case 1: return make_vector( 0.5, 0.0, 0.0);
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::fe_lagrange_1D_linear_shape_deriv(i, 0, xi), 0.0, 0.0);
   }
 #endif
 };
@@ -64,25 +55,13 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::EDGE3>
   LIBMESH_DEVICE_INLINE static Real
   shape(unsigned int i, Real xi, Real /*eta*/, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return 0.5 * xi * (xi - 1.0);
-      case 1: return 0.5 * xi * (xi + 1.0);
-      case 2: return 1.0 - xi * xi;
-      default: return 0.0;
-    }
+    return libMesh::fe_lagrange_1D_quadratic_shape(i, xi);
   }
 
   LIBMESH_DEVICE_INLINE static RealVector
   grad_shape(unsigned int i, Real xi, Real /*eta*/, Real /*zeta*/)
   {
-    switch (i)
-    {
-      case 0: return make_vector(xi - 0.5,  0.0, 0.0);
-      case 1: return make_vector(xi + 0.5,  0.0, 0.0);
-      case 2: return make_vector(-2.0 * xi, 0.0, 0.0);
-      default: return zero_vector();
-    }
+    return make_vector(libMesh::fe_lagrange_1D_quadratic_shape_deriv(i, 0, xi), 0.0, 0.0);
   }
 #endif
 };

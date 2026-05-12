@@ -16,11 +16,11 @@
 
 #include "libmesh/libmesh_config.h"
 
+#include "gpu/kokkos_fe_base.h"
 #include "gpu/kokkos_fe_evaluator.h"
 #include "gpu/kokkos_fe_face_map.h"
 #include "gpu/kokkos_fe_map.h"
 #include "gpu/kokkos_fe_types.h"
-#include "gpu/kokkos_scalar_types.h"
 
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
@@ -247,7 +247,7 @@ test_side_trace_case_impl(const side_trace_case & info)
         const RealTensor J =
           libMesh::Kokkos::jacobian<libMesh::LAGRANGE, ExactTopo>(geom_nodes, n_geom_nodes_, xi, eta, zeta);
         const RealVector grad_ref = grad_shape_for_key<Family, ExactTopo, ExactOrder>(i, xi, eta, zeta);
-        const RealVector grad_phys = libMesh::Kokkos::leading_inverse(J, parent_dim) * grad_ref;
+        const RealVector grad_phys = libMesh::Kokkos::inverse<RealTensor>(J, parent_dim) * grad_ref;
         const RealVector normal = libMesh::Kokkos::make_vector(d_normal_x(q), d_normal_y(q), d_normal_z(q));
         const RealVector tangential_grad = tangential_component(grad_phys, normal);
 

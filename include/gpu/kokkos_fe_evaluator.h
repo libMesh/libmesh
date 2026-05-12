@@ -27,33 +27,165 @@
 namespace libMesh::Kokkos
 {
 
+namespace detail
+{
+
+template <typename Op>
+LIBMESH_DEVICE_INLINE auto
+dispatch_lagrange_topology(libMesh::ElemType topo, const Op & op)
+  -> decltype(op.template operator()<libMesh::EDGE2>())
+{
+  switch (topo)
+  {
+    case libMesh::EDGE2: return op.template operator()<libMesh::EDGE2>();
+    case libMesh::EDGE3: return op.template operator()<libMesh::EDGE3>();
+    case libMesh::TRI3: return op.template operator()<libMesh::TRI3>();
+    case libMesh::TRI6: return op.template operator()<libMesh::TRI6>();
+    case libMesh::QUAD4: return op.template operator()<libMesh::QUAD4>();
+    case libMesh::QUAD8: return op.template operator()<libMesh::QUAD8>();
+    case libMesh::QUAD9: return op.template operator()<libMesh::QUAD9>();
+    case libMesh::TET4: return op.template operator()<libMesh::TET4>();
+    case libMesh::TET10: return op.template operator()<libMesh::TET10>();
+    case libMesh::HEX8: return op.template operator()<libMesh::HEX8>();
+    case libMesh::HEX20: return op.template operator()<libMesh::HEX20>();
+    case libMesh::HEX27: return op.template operator()<libMesh::HEX27>();
+    default:
+      detail::abort_unsupported("dispatch_lagrange_topology(): unsupported evaluator topology");
+      return op.template operator()<libMesh::EDGE2>();
+  }
+}
+
+template <unsigned int Dim, typename Op>
+LIBMESH_DEVICE_INLINE auto
+dispatch_monomial_order(libMesh::Order order, const Op & op)
+  -> decltype(op.template operator()<Dim, 0>())
+{
+  switch (order)
+  {
+    case libMesh::CONSTANT: return op.template operator()<Dim, 0>();
+    case libMesh::FIRST: return op.template operator()<Dim, 1>();
+    case libMesh::SECOND: return op.template operator()<Dim, 2>();
+    case libMesh::THIRD: return op.template operator()<Dim, 3>();
+    case libMesh::FOURTH: return op.template operator()<Dim, 4>();
+    case libMesh::FIFTH: return op.template operator()<Dim, 5>();
+    default:
+      detail::abort_unsupported("dispatch_monomial_order(): unsupported MONOMIAL order");
+      return op.template operator()<Dim, 0>();
+  }
+}
+
+template <typename Op>
+LIBMESH_DEVICE_INLINE auto
+dispatch_monomial(libMesh::ElemType elem_type, libMesh::Order order, const Op & op)
+  -> decltype(op.template operator()<1, 0>())
+{
+  switch (monomial_evaluator_dim_or_zero(elem_type))
+  {
+    case 1: return dispatch_monomial_order<1>(order, op);
+    case 2: return dispatch_monomial_order<2>(order, op);
+    case 3: return dispatch_monomial_order<3>(order, op);
+    default:
+      detail::abort_unsupported("dispatch_monomial(): unsupported MONOMIAL element topology");
+      return op.template operator()<1, 0>();
+  }
+}
+
+struct LagrangeShapeOp
+{
+  unsigned int i;
+  Real xi;
+  Real eta;
+  Real zeta;
+
+  template <libMesh::ElemType topo>
+  LIBMESH_DEVICE_INLINE Real operator()() const
+  {
+    return FEEvaluator<libMesh::LAGRANGE, topo>::shape(i, xi, eta, zeta);
+  }
+};
+
+struct LagrangeGradShapeOp
+{
+  unsigned int i;
+  Real xi;
+  Real eta;
+  Real zeta;
+
+  template <libMesh::ElemType topo>
+  LIBMESH_DEVICE_INLINE RealVector operator()() const
+  {
+    return FEEvaluator<libMesh::LAGRANGE, topo>::grad_shape(i, xi, eta, zeta);
+  }
+};
+
+struct MonomialShapeOp
+{
+  unsigned int i;
+  Real xi;
+  Real eta;
+  Real zeta;
+
+  template <unsigned int Dim, unsigned int Order>
+  LIBMESH_DEVICE_INLINE Real operator()() const
+  {
+    if constexpr (Dim == 1)
+      return MonomialImpl1D<Order>::shape(i, xi, eta, zeta);
+    else if constexpr (Dim == 2)
+      return MonomialImpl2D<Order>::shape(i, xi, eta, zeta);
+    else
+      return MonomialImpl3D<Order>::shape(i, xi, eta, zeta);
+  }
+};
+
+struct MonomialGradShapeOp
+{
+  unsigned int i;
+  Real xi;
+  Real eta;
+  Real zeta;
+
+  template <unsigned int Dim, unsigned int Order>
+  LIBMESH_DEVICE_INLINE RealVector operator()() const
+  {
+    if constexpr (Dim == 1)
+      return MonomialImpl1D<Order>::grad_shape(i, xi, eta, zeta);
+    else if constexpr (Dim == 2)
+      return MonomialImpl2D<Order>::grad_shape(i, xi, eta, zeta);
+    else
+      return MonomialImpl3D<Order>::grad_shape(i, xi, eta, zeta);
+  }
+};
+
+} // namespace detail
+
 // ── On-device helpers: element class -> spatial dimension ─────────────────────
 
 LIBMESH_DEVICE_INLINE unsigned int
 dim_from_class(FEElemClass cls)
 {
-  switch (cls)
+  const unsigned int dim = libMesh::elem_class_dim_or_zero(cls);
+
+  if (!dim)
   {
-    case FEElemClass::EDGE:
-      return 1;
-    case FEElemClass::TRI:
-    case FEElemClass::QUAD:
-      return 2;
-    case FEElemClass::TET:
-    case FEElemClass::HEX:
-    case FEElemClass::PRISM:
-    case FEElemClass::PYRAMID:
-      return 3;
-    default:
-      detail::abort_unsupported("dim_from_class(): unsupported element class");
-      return 0;
+    detail::abort_unsupported("dim_from_class(): unsupported element class");
+    return 0;
   }
+
+  return dim;
 }
 
 LIBMESH_DEVICE_INLINE unsigned int
 dim_from_topology(libMesh::ElemType topo)
 {
-  return dim_from_class(class_from_topology(topo));
+  const unsigned int dim = libMesh::topology_dim_or_zero(topo);
+
+  if (!dim)
+  {
+    detail::abort_unsupported("dim_from_topology(): unsupported element type");
+    return 0;
+  }
+
+  return dim;
 }
 
 // ── On-device helper: exact libMesh Lagrange key -> evaluator topology ─────────
@@ -79,36 +211,7 @@ eval_lagrange_shape(libMesh::ElemType topo,
                     Real eta,
                     Real zeta)
 {
-  switch (topo)
-  {
-    case libMesh::EDGE2:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::EDGE2>::shape(i, xi, eta, zeta);
-    case libMesh::EDGE3:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::EDGE3>::shape(i, xi, eta, zeta);
-    case libMesh::TRI3:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::TRI3>::shape(i, xi, eta, zeta);
-    case libMesh::TRI6:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::TRI6>::shape(i, xi, eta, zeta);
-    case libMesh::QUAD4:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::QUAD4>::shape(i, xi, eta, zeta);
-    case libMesh::QUAD8:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::QUAD8>::shape(i, xi, eta, zeta);
-    case libMesh::QUAD9:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::QUAD9>::shape(i, xi, eta, zeta);
-    case libMesh::TET4:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::TET4>::shape(i, xi, eta, zeta);
-    case libMesh::TET10:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::TET10>::shape(i, xi, eta, zeta);
-    case libMesh::HEX8:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::HEX8>::shape(i, xi, eta, zeta);
-    case libMesh::HEX20:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::HEX20>::shape(i, xi, eta, zeta);
-    case libMesh::HEX27:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::HEX27>::shape(i, xi, eta, zeta);
-    default:
-      detail::abort_unsupported("eval_lagrange_shape(): unsupported evaluator topology");
-      return Real(0);
-  }
+  return detail::dispatch_lagrange_topology(topo, detail::LagrangeShapeOp{i, xi, eta, zeta});
 }
 
 LIBMESH_DEVICE_INLINE RealVector
@@ -118,36 +221,7 @@ eval_lagrange_grad_shape(libMesh::ElemType topo,
                          Real eta,
                          Real zeta)
 {
-  switch (topo)
-  {
-    case libMesh::EDGE2:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::EDGE2>::grad_shape(i, xi, eta, zeta);
-    case libMesh::EDGE3:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::EDGE3>::grad_shape(i, xi, eta, zeta);
-    case libMesh::TRI3:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::TRI3>::grad_shape(i, xi, eta, zeta);
-    case libMesh::TRI6:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::TRI6>::grad_shape(i, xi, eta, zeta);
-    case libMesh::QUAD4:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::QUAD4>::grad_shape(i, xi, eta, zeta);
-    case libMesh::QUAD8:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::QUAD8>::grad_shape(i, xi, eta, zeta);
-    case libMesh::QUAD9:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::QUAD9>::grad_shape(i, xi, eta, zeta);
-    case libMesh::TET4:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::TET4>::grad_shape(i, xi, eta, zeta);
-    case libMesh::TET10:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::TET10>::grad_shape(i, xi, eta, zeta);
-    case libMesh::HEX8:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::HEX8>::grad_shape(i, xi, eta, zeta);
-    case libMesh::HEX20:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::HEX20>::grad_shape(i, xi, eta, zeta);
-    case libMesh::HEX27:
-      return FEEvaluator<libMesh::LAGRANGE, libMesh::HEX27>::grad_shape(i, xi, eta, zeta);
-    default:
-      detail::abort_unsupported("eval_lagrange_grad_shape(): unsupported evaluator topology");
-      return zero_vector();
-  }
+  return detail::dispatch_lagrange_topology(topo, detail::LagrangeGradShapeOp{i, xi, eta, zeta});
 }
 
 // ── Geometry-only shape dispatch (mapping-type + topology) ────────────────────
@@ -237,53 +311,9 @@ shape(FEShapeKey key, unsigned int i, Real xi, Real eta, Real zeta)
       return eval_lagrange_shape(lagrange_shape_topology_for_key(key), i, xi, eta, zeta);
 
     case libMesh::MONOMIAL:
-    {
-      switch (monomial_evaluator_dim_or_zero(key.elem_type))
-      {
-        case 1:
-          switch (key.order)
-          {
-            case 0: return MonomialImpl1D<0>::shape(i, xi, eta, zeta);
-            case 1: return MonomialImpl1D<1>::shape(i, xi, eta, zeta);
-            case 2: return MonomialImpl1D<2>::shape(i, xi, eta, zeta);
-            case 3: return MonomialImpl1D<3>::shape(i, xi, eta, zeta);
-            case 4: return MonomialImpl1D<4>::shape(i, xi, eta, zeta);
-            case 5: return MonomialImpl1D<5>::shape(i, xi, eta, zeta);
-            default:
-              detail::abort_unsupported("shape(): unsupported 1D MONOMIAL order");
-              return Real(0);
-          }
-        case 2:
-          switch (key.order)
-          {
-            case 0: return MonomialImpl2D<0>::shape(i, xi, eta, zeta);
-            case 1: return MonomialImpl2D<1>::shape(i, xi, eta, zeta);
-            case 2: return MonomialImpl2D<2>::shape(i, xi, eta, zeta);
-            case 3: return MonomialImpl2D<3>::shape(i, xi, eta, zeta);
-            case 4: return MonomialImpl2D<4>::shape(i, xi, eta, zeta);
-            case 5: return MonomialImpl2D<5>::shape(i, xi, eta, zeta);
-            default:
-              detail::abort_unsupported("shape(): unsupported 2D MONOMIAL order");
-              return Real(0);
-          }
-        case 3:
-          switch (key.order)
-          {
-            case 0: return MonomialImpl3D<0>::shape(i, xi, eta, zeta);
-            case 1: return MonomialImpl3D<1>::shape(i, xi, eta, zeta);
-            case 2: return MonomialImpl3D<2>::shape(i, xi, eta, zeta);
-            case 3: return MonomialImpl3D<3>::shape(i, xi, eta, zeta);
-            case 4: return MonomialImpl3D<4>::shape(i, xi, eta, zeta);
-            case 5: return MonomialImpl3D<5>::shape(i, xi, eta, zeta);
-            default:
-              detail::abort_unsupported("shape(): unsupported 3D MONOMIAL order");
-              return Real(0);
-          }
-        default:
-          detail::abort_unsupported("shape(): unsupported MONOMIAL element topology");
-          return Real(0);
-      }
-    }
+      return detail::dispatch_monomial(key.elem_type,
+                                       key.order,
+                                       detail::MonomialShapeOp{i, xi, eta, zeta});
 
     default:
       detail::abort_unsupported("shape(): unsupported FE family");
@@ -309,53 +339,9 @@ grad_shape(FEShapeKey key, unsigned int i, Real xi, Real eta, Real zeta)
       return eval_lagrange_grad_shape(lagrange_shape_topology_for_key(key), i, xi, eta, zeta);
 
     case libMesh::MONOMIAL:
-    {
-      switch (monomial_evaluator_dim_or_zero(key.elem_type))
-      {
-        case 1:
-          switch (key.order)
-          {
-            case 0: return MonomialImpl1D<0>::grad_shape(i, xi, eta, zeta);
-            case 1: return MonomialImpl1D<1>::grad_shape(i, xi, eta, zeta);
-            case 2: return MonomialImpl1D<2>::grad_shape(i, xi, eta, zeta);
-            case 3: return MonomialImpl1D<3>::grad_shape(i, xi, eta, zeta);
-            case 4: return MonomialImpl1D<4>::grad_shape(i, xi, eta, zeta);
-            case 5: return MonomialImpl1D<5>::grad_shape(i, xi, eta, zeta);
-            default:
-              detail::abort_unsupported("grad_shape(): unsupported 1D MONOMIAL order");
-              return zero_vector();
-          }
-        case 2:
-          switch (key.order)
-          {
-            case 0: return MonomialImpl2D<0>::grad_shape(i, xi, eta, zeta);
-            case 1: return MonomialImpl2D<1>::grad_shape(i, xi, eta, zeta);
-            case 2: return MonomialImpl2D<2>::grad_shape(i, xi, eta, zeta);
-            case 3: return MonomialImpl2D<3>::grad_shape(i, xi, eta, zeta);
-            case 4: return MonomialImpl2D<4>::grad_shape(i, xi, eta, zeta);
-            case 5: return MonomialImpl2D<5>::grad_shape(i, xi, eta, zeta);
-            default:
-              detail::abort_unsupported("grad_shape(): unsupported 2D MONOMIAL order");
-              return zero_vector();
-          }
-        case 3:
-          switch (key.order)
-          {
-            case 0: return MonomialImpl3D<0>::grad_shape(i, xi, eta, zeta);
-            case 1: return MonomialImpl3D<1>::grad_shape(i, xi, eta, zeta);
-            case 2: return MonomialImpl3D<2>::grad_shape(i, xi, eta, zeta);
-            case 3: return MonomialImpl3D<3>::grad_shape(i, xi, eta, zeta);
-            case 4: return MonomialImpl3D<4>::grad_shape(i, xi, eta, zeta);
-            case 5: return MonomialImpl3D<5>::grad_shape(i, xi, eta, zeta);
-            default:
-              detail::abort_unsupported("grad_shape(): unsupported 3D MONOMIAL order");
-              return zero_vector();
-          }
-        default:
-          detail::abort_unsupported("grad_shape(): unsupported MONOMIAL element topology");
-          return zero_vector();
-      }
-    }
+      return detail::dispatch_monomial(key.elem_type,
+                                       key.order,
+                                       detail::MonomialGradShapeOp{i, xi, eta, zeta});
 
     default:
       detail::abort_unsupported("grad_shape(): unsupported FE family");

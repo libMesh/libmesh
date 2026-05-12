@@ -20,6 +20,7 @@
 // Local includes
 #include "libmesh/quadrature_gauss.h"
 #include "libmesh/quadrature_conical.h"
+#include "libmesh/quadrature_gauss_rules.h"
 #include "libmesh/enum_to_string.h"
 
 #include "libmesh/face_c0polygon.h"
@@ -76,6 +77,24 @@ void QGauss::init_2D()
     case TRI6:
     case TRI7:
       {
+        const auto shared_rule =
+          Quadrature::Gauss::triangle_rule(static_cast<unsigned int>(get_order()));
+
+        if (shared_rule.count)
+          {
+            _points.resize(shared_rule.count);
+            _weights.resize(shared_rule.count);
+
+            for (unsigned int i = 0; i < shared_rule.count; ++i)
+              {
+                _points[i](0) = shared_rule.points[i].x;
+                _points[i](1) = shared_rule.points[i].y;
+                _weights[i] = shared_rule.points[i].w;
+              }
+
+            return;
+          }
+
         switch(get_order())
           {
           case CONSTANT:
