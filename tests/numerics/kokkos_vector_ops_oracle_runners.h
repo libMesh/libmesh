@@ -34,14 +34,11 @@ test_vector_ops_case(const vector_case & info)
       const auto c_ref = libMesh::Kokkos::make_vector_ref(d_c, 0);
 
       const Vec copied = libMesh::Kokkos::copy_vector<Vec>(a_ref);
-      const Vec mix = libMesh::Kokkos::vector_linear_combination<Vec>(
-        Real(1), a_ref, Real(1), b_ref, Real(-1), c_ref);
-      const Vec scaled = libMesh::Kokkos::vector_linear_combination<Vec>(
-        Real(1.25), a_ref, Real(-0.5), b_ref, Real(0.25), c_ref);
+      const Vec mix = a_ref + b_ref - c_ref;
+      const Vec scaled = Real(1.25) * a_ref + Real(-0.5) * b_ref + Real(0.25) * c_ref;
       const Vec plus_assign = a_ref + b_ref;
       const Vec minus_assign = a_ref - b_ref;
-      const Vec accum = libMesh::Kokkos::vector_linear_combination<Vec>(
-        Real(1.25), a_ref, Real(-0.5), b_ref, Real(0.25), c_ref);
+      const Vec accum = Real(1.25) * a_ref + Real(-0.5) * b_ref + Real(0.25) * c_ref;
       const Vec divided = a_ref / Real(5.0);
       const Vec outer_right = Real(5.0) * a_ref;
       const Vec outer_left = a_ref * Real(5.0);
