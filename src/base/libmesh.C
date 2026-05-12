@@ -765,16 +765,16 @@ LibMeshInit::~LibMeshInit()
   // Clear the thread task manager we started
   task_scheduler.reset();
 
-  // Force the \p ReferenceCounter to print
-  // its reference count information.  This allows
-  // us to find memory leaks.  By default the
-  // \p ReferenceCounter only prints its information
-  // when the last created object has been destroyed.
-  // That does no good if we are leaking memory!
+  // If we have a memory leak, we want the details printed.
+  if (ReferenceCounter::n_objects() != 0)
+    ReferenceCounter::enable_print_counter_info();
+
+  // Ask the \p ReferenceCounter to print its reference count
+  // information, if printing is enabled.  This allows us to find
+  // memory leaks.
   ReferenceCounter::print_info ();
 
-
-  // Print an informative message if we detect a memory leak
+  // Scream specifically if we detect a memory leak
   if (ReferenceCounter::n_objects() != 0)
     {
       libMesh::err << "Memory leak detected!"
@@ -787,7 +787,6 @@ LibMeshInit::~LibMeshInit()
                    << "for more information"
                    << std::endl;
 #endif
-
     }
 
   //  print the perflog to individual processor's file.
