@@ -674,11 +674,11 @@ libmesh_optional_LIBS
 libmesh_optional_INCLUDES
 LIBMESH_ENABLE_KOKKOS_FALSE
 LIBMESH_ENABLE_KOKKOS_TRUE
+KOKKOS_MPI_CPPFLAGS
 KOKKOS_LIBS
 KOKKOS_LDFLAGS
 KOKKOS_CXXFLAGS
 KOKKOS_CPPFLAGS
-KOKKOS_MPI_CPPFLAGS
 KOKKOS_CXX
 ICPX
 HIPCC
@@ -64238,7 +64238,7 @@ fi
         KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:--L$KOKKOS_DIR/lib}"
         KOKKOS_LIBS="${KOKKOS_LIBS:--lkokkoscore}"
 
-        KOKKOS_MPI_CPPFLAGS=""
+                                        KOKKOS_MPI_CPPFLAGS=""
         if test "x$enablempi" = "xyes" && test "x$KOKKOS_CXX" != "x$CXX"
 then :
 
@@ -64251,7 +64251,7 @@ then :
 fi
             if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
 then :
-  KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^[^ ]* //'`
+  KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^^ * //'`
 fi
             if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
 then :
@@ -64269,7 +64269,7 @@ fi
 
 fi
 
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the Kokkos compiler configuration works" >&5
+                        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the Kokkos compiler configuration works" >&5
 printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
         libmesh_save_CXX="$CXX"
         libmesh_save_CPPFLAGS="$CPPFLAGS"
@@ -64282,6 +64282,11 @@ printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
         CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
         LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
         LIBS="$LIBS $KOKKOS_LIBS"
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
         if test "x$enablempi" = "xyes"
 then :
@@ -64293,20 +64298,17 @@ then :
 
 #include <mpi.h>
 #include <Kokkos_Core.hpp>
-int
-main (int argc, char ** argv)
+int main(int argc, char ** argv)
 {
-
   MPI_Init(&argc, &argv);
   Kokkos::initialize(argc, argv);
   Kokkos::finalize();
   MPI_Finalize();
-
-  ;
   return 0;
 }
+
 _ACEOF
-if ac_fn_cxx_try_link "$LINENO"
+if ac_fn_c_try_link "$LINENO"
 then :
   kokkos_config_works=yes
 else case e in #(
@@ -64322,18 +64324,15 @@ else case e in #(
 /* end confdefs.h.  */
 
 #include <Kokkos_Core.hpp>
-int
-main (int argc, char ** argv)
+int main(int argc, char ** argv)
 {
-
   Kokkos::initialize(argc, argv);
   Kokkos::finalize();
-
-  ;
   return 0;
 }
+
 _ACEOF
-if ac_fn_cxx_try_link "$LINENO"
+if ac_fn_c_try_link "$LINENO"
 then :
   kokkos_config_works=yes
 else case e in #(
@@ -64342,7 +64341,7 @@ esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
- ;;
+           ;;
 esac
 fi
 
@@ -64351,6 +64350,11 @@ fi
         CXXFLAGS="$libmesh_save_CXXFLAGS"
         LDFLAGS="$libmesh_save_LDFLAGS"
         LIBS="$libmesh_save_LIBS"
+        ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
         if test "x$kokkos_config_works" = "xyes"
 then :
@@ -64381,6 +64385,7 @@ else case e in #(
   e) enablekokkos=no ;;
 esac
 fi
+
 
 
 

@@ -1002,6 +1002,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
         LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
         LIBS="$LIBS $KOKKOS_LIBS"
+        AC_LANG_PUSH([C++])
 
         AS_IF([test "x$enablempi" = "xyes"],
           [
@@ -1037,6 +1038,7 @@ int main(int argc, char ** argv)
               [kokkos_config_works=yes],
               [kokkos_config_works=no])
           ])
+        AC_LANG_POP([C++])
 
         CXX="$libmesh_save_CXX"
         CPPFLAGS="$libmesh_save_CPPFLAGS"
