@@ -231,7 +231,11 @@ public:
 
 #else
 
+#if LIBMESH_IN_DEVICE_CODE
+#define LIBMESH_THROW(e) do { LIBMESH_DEVICE_ERROR_MSG((e).what()); } while (0)
+#else
 #define LIBMESH_THROW(e) do { libMesh::err << e.what(); libMesh::libmesh_abort(); } while (0)
+#endif
 #define libmesh_rethrow
 #define libmesh_try
 #define libmesh_catch(e) if (0)

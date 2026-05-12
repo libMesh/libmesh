@@ -67,8 +67,6 @@
 #else
 #  define LIBMESH_DEVICE_INLINE inline
 #  define LIBMESH_IN_DEVICE_CODE 0
-#  define LIBMESH_DEVICE_ERROR_MSG(msg) libmesh_error_msg(msg)
-#  define LIBMESH_DEVICE_ERROR_MSG_IF(cond, msg) libmesh_error_msg_if(cond, msg)
 #endif
 
 #endif // LIBMESH_LIBMESH_DEVICE_H
