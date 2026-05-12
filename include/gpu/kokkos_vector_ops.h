@@ -63,13 +63,6 @@ auto vector_dot(const LeftVector & left, const RightVector & right)
   return sum;
 }
 
-template <typename LeftVector, typename RightVector>
-LIBMESH_DEVICE_INLINE
-auto vector_contract(const LeftVector & left, const RightVector & right)
-{
-  return vector_dot(left, right);
-}
-
 template <typename VectorLike>
 LIBMESH_DEVICE_INLINE
 auto vector_norm_sq(const VectorLike & v)
@@ -120,27 +113,6 @@ bool vector_is_zero(const VectorLike & v)
       return false;
 
   return true;
-}
-
-template <typename LeftVector, typename RightVector>
-LIBMESH_DEVICE_INLINE
-bool vector_equal(const LeftVector & left, const RightVector & right)
-{
-  static_assert(is_vector_like_v<LeftVector>, "vector_equal() requires a vector-like left input");
-  static_assert(is_vector_like_v<RightVector>, "vector_equal() requires a vector-like right input");
-
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    if (vector_get_component(left, component) != vector_get_component(right, component))
-      return false;
-
-  return true;
-}
-
-template <typename LeftVector, typename RightVector>
-LIBMESH_DEVICE_INLINE
-bool vector_not_equal(const LeftVector & left, const RightVector & right)
-{
-  return !vector_equal(left, right);
 }
 
 // Arithmetic
@@ -447,9 +419,9 @@ template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto contract(const LeftVector & left, const RightVector & right)
   -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector>,
-                      decltype(vector_contract(left, right))>
+                      decltype(vector_dot(left, right))>
 {
-  return vector_contract(left, right);
+  return vector_dot(left, right);
 }
 
 template <typename VectorLike>
@@ -544,7 +516,7 @@ template <typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::contract(const RightVector & right) const
 {
-  return vector_contract(*this, right);
+  return vector_dot(*this, right);
 }
 
 template <typename ViewType>
@@ -672,7 +644,11 @@ auto operator==(const LeftVector & left, const RightVector & right)
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       bool>
 {
-  return vector_equal(left, right);
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    if (vector_get_component(left, component) != vector_get_component(right, component))
+      return false;
+
+  return true;
 }
 
 template <typename LeftVector, typename RightVector>
@@ -682,7 +658,7 @@ auto operator!=(const LeftVector & left, const RightVector & right)
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       bool>
 {
-  return vector_not_equal(left, right);
+  return !(left == right);
 }
 
 template <typename LeftVector, typename RightVector>

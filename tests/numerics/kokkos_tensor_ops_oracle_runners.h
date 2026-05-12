@@ -389,8 +389,8 @@ test_mixed_representation_ops()
       d_scalars(2) = A_ref.det();
       d_scalars(3) = (A_ref == A) ? 1.0 : 0.0;
       d_scalars(4) = (A_ref != inverse) ? 1.0 : 0.0;
-      d_scalars(5) = libMesh::Kokkos::vector_equal(row0, ref_row0) ? 1.0 : 0.0;
-      d_scalars(6) = libMesh::Kokkos::vector_equal(col0, ref_col0) ? 1.0 : 0.0;
+      d_scalars(5) = (row0 == ref_row0) ? 1.0 : 0.0;
+      d_scalars(6) = (col0 == ref_col0) ? 1.0 : 0.0;
       d_scalars(7) = A_ref.tr();
 
       libMesh::Kokkos::store_vector(d_vectors, 0, right);
