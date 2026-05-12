@@ -220,12 +220,12 @@ template <libMesh::ElemType Topo>
 static int
 test_kronecker_delta_impl(const map_elem_info & info)
 {
-  auto elem = build_reference_elem(Topo);
-
   std::vector<Real> xi_h(info.n_dofs), eta_h(info.n_dofs), zeta_h(info.n_dofs);
   for (unsigned int j = 0; j < info.n_dofs; ++j)
   {
-    const libMesh::Point p = elem->master_point(j);
+    libMesh::Point p;
+    libmesh_error_msg_if(!libMesh::try_reference_node(Topo, j, p),
+                         "test_kronecker_delta_impl(): unsupported reference-node lookup");
     xi_h[j] = p(0);
     eta_h[j] = p(1);
     zeta_h[j] = p(2);

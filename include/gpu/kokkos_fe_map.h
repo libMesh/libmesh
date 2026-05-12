@@ -18,9 +18,164 @@
 #define LIBMESH_KOKKOS_FE_MAP_H
 
 #include "kokkos_fe_evaluator.h"
+#include "kokkos_storage.h"
+
+#include <type_traits>
 
 namespace libMesh::Kokkos
 {
+
+namespace detail
+{
+
+LIBMESH_DEVICE_INLINE const RealVector &
+node_at(const RealVector * nodes, unsigned int i)
+{
+  return nodes[i];
+}
+
+template <std::size_t N>
+LIBMESH_DEVICE_INLINE const RealVector &
+node_at(const RealVector (&nodes)[N], unsigned int i)
+{
+  return nodes[i];
+}
+
+template <typename NodeStorage,
+          std::enable_if_t<!std::is_pointer_v<std::decay_t<NodeStorage>> &&
+                             !std::is_array_v<std::remove_reference_t<NodeStorage>>,
+                           int> = 0>
+LIBMESH_DEVICE_INLINE RealVector
+node_at(const NodeStorage & nodes, unsigned int i)
+{
+  return load_vector<RealVector>(nodes, i);
+}
+
+template <libMesh::FEFamily family, libMesh::ElemType topo, typename NodeStorage>
+LIBMESH_DEVICE_INLINE RealVector
+physical_point_impl(const NodeStorage & nodes,
+                    unsigned int n_nodes,
+                    Real xi, Real eta, Real zeta)
+{
+  RealVector xyz = zero_vector();
+  for (unsigned int i = 0; i < n_nodes; ++i)
+    xyz += map_shape<family, topo>(i, xi, eta, zeta) * node_at(nodes, i);
+  return xyz;
+}
+
+template <libMesh::FEFamily family, libMesh::ElemType topo, typename NodeStorage>
+LIBMESH_DEVICE_INLINE RealTensor
+jacobian_impl(const NodeStorage & nodes,
+              unsigned int n_nodes,
+              Real xi, Real eta, Real zeta)
+{
+  RealTensor J = zero_tensor();
+  for (unsigned int k = 0; k < n_nodes; ++k)
+    J += libMesh::outer_product(grad_map_shape<family, topo>(k, xi, eta, zeta),
+                                node_at(nodes, k));
+  return J;
+}
+
+template <libMesh::FEFamily family, libMesh::ElemType topo, typename NodeStorage>
+LIBMESH_DEVICE_INLINE void
+physical_point_and_jacobian_impl(const NodeStorage & nodes,
+                                 unsigned int n_nodes,
+                                 Real xi, Real eta, Real zeta,
+                                 RealVector & xyz,
+                                 RealTensor & J)
+{
+  xyz = zero_vector();
+  J = zero_tensor();
+  for (unsigned int k = 0; k < n_nodes; ++k)
+  {
+    const Real phi = map_shape<family, topo>(k, xi, eta, zeta);
+    const RealVector grad = grad_map_shape<family, topo>(k, xi, eta, zeta);
+    const RealVector node = node_at(nodes, k);
+    xyz += phi * node;
+    J += libMesh::outer_product(grad, node);
+  }
+}
+
+template <libMesh::FEFamily family, libMesh::ElemType face_topo, typename NodeStorage>
+LIBMESH_DEVICE_INLINE RealTensor
+face_jacobian_impl(const NodeStorage & face_nodes,
+                   unsigned int n_face_nodes,
+                   Real xi, Real eta, Real zeta)
+{
+  RealTensor J = zero_tensor();
+  for (unsigned int k = 0; k < n_face_nodes; ++k)
+    J += libMesh::outer_product(grad_map_shape<family, face_topo>(k, xi, eta, zeta),
+                                node_at(face_nodes, k));
+  return J;
+}
+
+template <typename NodeStorage>
+LIBMESH_DEVICE_INLINE RealVector
+physical_point_impl(libMesh::ElemMappingType mapping_type,
+                    libMesh::ElemType topo,
+                    const NodeStorage & nodes,
+                    unsigned int n_nodes,
+                    Real xi, Real eta, Real zeta)
+{
+  RealVector xyz = zero_vector();
+  for (unsigned int i = 0; i < n_nodes; ++i)
+    xyz += map_shape(mapping_type, topo, i, xi, eta, zeta) * node_at(nodes, i);
+  return xyz;
+}
+
+template <typename NodeStorage>
+LIBMESH_DEVICE_INLINE RealTensor
+jacobian_impl(libMesh::ElemMappingType mapping_type,
+              libMesh::ElemType topo,
+              const NodeStorage & nodes,
+              unsigned int n_nodes,
+              Real xi, Real eta, Real zeta)
+{
+  RealTensor J = zero_tensor();
+  for (unsigned int k = 0; k < n_nodes; ++k)
+    J += libMesh::outer_product(grad_map_shape(mapping_type, topo, k, xi, eta, zeta),
+                                node_at(nodes, k));
+  return J;
+}
+
+template <typename NodeStorage>
+LIBMESH_DEVICE_INLINE void
+physical_point_and_jacobian_impl(libMesh::ElemMappingType mapping_type,
+                                 libMesh::ElemType topo,
+                                 const NodeStorage & nodes,
+                                 unsigned int n_nodes,
+                                 Real xi, Real eta, Real zeta,
+                                 RealVector & xyz,
+                                 RealTensor & J)
+{
+  xyz = zero_vector();
+  J = zero_tensor();
+  for (unsigned int k = 0; k < n_nodes; ++k)
+  {
+    const Real phi = map_shape(mapping_type, topo, k, xi, eta, zeta);
+    const RealVector grad = grad_map_shape(mapping_type, topo, k, xi, eta, zeta);
+    const RealVector node = node_at(nodes, k);
+    xyz += phi * node;
+    J += libMesh::outer_product(grad, node);
+  }
+}
+
+template <typename NodeStorage>
+LIBMESH_DEVICE_INLINE RealTensor
+face_jacobian_impl(libMesh::ElemMappingType mapping_type,
+                   libMesh::ElemType face_topo,
+                   const NodeStorage & face_nodes,
+                   unsigned int n_face_nodes,
+                   Real xi, Real eta, Real zeta)
+{
+  RealTensor J = zero_tensor();
+  for (unsigned int k = 0; k < n_face_nodes; ++k)
+    J += libMesh::outer_product(grad_map_shape(mapping_type, face_topo, k, xi, eta, zeta),
+                                node_at(face_nodes, k));
+  return J;
+}
+
+} // namespace detail
 
 template <libMesh::FEFamily family, libMesh::ElemType topo>
 LIBMESH_DEVICE_INLINE RealVector
@@ -28,10 +183,20 @@ physical_point(const RealVector * nodes,
               unsigned int n_nodes,
               Real xi, Real eta, Real zeta)
 {
-  RealVector xyz = zero_vector();
-  for (unsigned int i = 0; i < n_nodes; ++i)
-    xyz += map_shape<family, topo>(i, xi, eta, zeta) * nodes[i];
-  return xyz;
+  return detail::physical_point_impl<family, topo>(nodes, n_nodes, xi, eta, zeta);
+}
+
+template <libMesh::FEFamily family, libMesh::ElemType topo,
+          typename NodeStorage,
+          std::enable_if_t<!std::is_pointer_v<std::decay_t<NodeStorage>> &&
+                             !std::is_array_v<std::remove_reference_t<NodeStorage>>,
+                           int> = 0>
+LIBMESH_DEVICE_INLINE RealVector
+physical_point(const NodeStorage & nodes,
+               unsigned int n_nodes,
+               Real xi, Real eta, Real zeta)
+{
+  return detail::physical_point_impl<family, topo>(nodes, n_nodes, xi, eta, zeta);
 }
 
 // =========================================================================
@@ -47,10 +212,20 @@ jacobian(const RealVector * nodes,
          unsigned int n_nodes,
          Real xi, Real eta, Real zeta)
 {
-  RealTensor J = zero_tensor();
-  for (unsigned int k = 0; k < n_nodes; ++k)
-    J += libMesh::outer_product(grad_map_shape<family, topo>(k, xi, eta, zeta), nodes[k]);
-  return J;
+  return detail::jacobian_impl<family, topo>(nodes, n_nodes, xi, eta, zeta);
+}
+
+template <libMesh::FEFamily family, libMesh::ElemType topo,
+          typename NodeStorage,
+          std::enable_if_t<!std::is_pointer_v<std::decay_t<NodeStorage>> &&
+                             !std::is_array_v<std::remove_reference_t<NodeStorage>>,
+                           int> = 0>
+LIBMESH_DEVICE_INLINE RealTensor
+jacobian(const NodeStorage & nodes,
+         unsigned int n_nodes,
+         Real xi, Real eta, Real zeta)
+{
+  return detail::jacobian_impl<family, topo>(nodes, n_nodes, xi, eta, zeta);
 }
 
 template <libMesh::FEFamily family, libMesh::ElemType topo>
@@ -61,15 +236,22 @@ physical_point_and_jacobian(const RealVector * nodes,
                          RealVector & xyz,
                          RealTensor & J)
 {
-  xyz = zero_vector();
-  J = zero_tensor();
-  for (unsigned int k = 0; k < n_nodes; ++k)
-  {
-    const Real phi = map_shape<family, topo>(k, xi, eta, zeta);
-    const RealVector grad = grad_map_shape<family, topo>(k, xi, eta, zeta);
-    xyz += phi * nodes[k];
-    J += libMesh::outer_product(grad, nodes[k]);
-  }
+  detail::physical_point_and_jacobian_impl<family, topo>(nodes, n_nodes, xi, eta, zeta, xyz, J);
+}
+
+template <libMesh::FEFamily family, libMesh::ElemType topo,
+          typename NodeStorage,
+          std::enable_if_t<!std::is_pointer_v<std::decay_t<NodeStorage>> &&
+                             !std::is_array_v<std::remove_reference_t<NodeStorage>>,
+                           int> = 0>
+LIBMESH_DEVICE_INLINE void
+physical_point_and_jacobian(const NodeStorage & nodes,
+                            unsigned int n_nodes,
+                            Real xi, Real eta, Real zeta,
+                            RealVector & xyz,
+                            RealTensor & J)
+{
+  detail::physical_point_and_jacobian_impl<family, topo>(nodes, n_nodes, xi, eta, zeta, xyz, J);
 }
 
 template <libMesh::FEFamily family, libMesh::ElemType face_topo>
@@ -78,11 +260,20 @@ face_jacobian(const RealVector * face_nodes,
              unsigned int n_face_nodes,
              Real xi, Real eta, Real zeta)
 {
-  RealTensor J = zero_tensor();
-  for (unsigned int k = 0; k < n_face_nodes; ++k)
-    J += libMesh::outer_product(grad_map_shape<family, face_topo>(k, xi, eta, zeta),
-                                face_nodes[k]);
-  return J;
+  return detail::face_jacobian_impl<family, face_topo>(face_nodes, n_face_nodes, xi, eta, zeta);
+}
+
+template <libMesh::FEFamily family, libMesh::ElemType face_topo,
+          typename NodeStorage,
+          std::enable_if_t<!std::is_pointer_v<std::decay_t<NodeStorage>> &&
+                             !std::is_array_v<std::remove_reference_t<NodeStorage>>,
+                           int> = 0>
+LIBMESH_DEVICE_INLINE RealTensor
+face_jacobian(const NodeStorage & face_nodes,
+              unsigned int n_face_nodes,
+              Real xi, Real eta, Real zeta)
+{
+  return detail::face_jacobian_impl<family, face_topo>(face_nodes, n_face_nodes, xi, eta, zeta);
 }
 
 // =========================================================================
@@ -97,10 +288,21 @@ physical_point(libMesh::ElemMappingType mapping_type,
               unsigned int n_nodes,
               Real xi, Real eta, Real zeta)
 {
-  RealVector xyz = zero_vector();
-  for (unsigned int i = 0; i < n_nodes; ++i)
-    xyz += map_shape(mapping_type, topo, i, xi, eta, zeta) * nodes[i];
-  return xyz;
+  return detail::physical_point_impl(mapping_type, topo, nodes, n_nodes, xi, eta, zeta);
+}
+
+template <typename NodeStorage,
+          std::enable_if_t<!std::is_pointer_v<std::decay_t<NodeStorage>> &&
+                             !std::is_array_v<std::remove_reference_t<NodeStorage>>,
+                           int> = 0>
+LIBMESH_DEVICE_INLINE RealVector
+physical_point(libMesh::ElemMappingType mapping_type,
+               libMesh::ElemType topo,
+               const NodeStorage & nodes,
+               unsigned int n_nodes,
+               Real xi, Real eta, Real zeta)
+{
+  return detail::physical_point_impl(mapping_type, topo, nodes, n_nodes, xi, eta, zeta);
 }
 
 /// Compute Jacobian matrix (runtime topology), with rows d(x)/d(xi_r).
@@ -111,11 +313,21 @@ jacobian(libMesh::ElemMappingType mapping_type,
          unsigned int n_nodes,
          Real xi, Real eta, Real zeta)
 {
-  RealTensor J = zero_tensor();
-  for (unsigned int k = 0; k < n_nodes; ++k)
-    J += libMesh::outer_product(grad_map_shape(mapping_type, topo, k, xi, eta, zeta),
-                                nodes[k]);
-  return J;
+  return detail::jacobian_impl(mapping_type, topo, nodes, n_nodes, xi, eta, zeta);
+}
+
+template <typename NodeStorage,
+          std::enable_if_t<!std::is_pointer_v<std::decay_t<NodeStorage>> &&
+                             !std::is_array_v<std::remove_reference_t<NodeStorage>>,
+                           int> = 0>
+LIBMESH_DEVICE_INLINE RealTensor
+jacobian(libMesh::ElemMappingType mapping_type,
+         libMesh::ElemType topo,
+         const NodeStorage & nodes,
+         unsigned int n_nodes,
+         Real xi, Real eta, Real zeta)
+{
+  return detail::jacobian_impl(mapping_type, topo, nodes, n_nodes, xi, eta, zeta);
 }
 
 /// Compute physical point and Jacobian together (runtime topology).
@@ -128,15 +340,23 @@ physical_point_and_jacobian(libMesh::ElemMappingType mapping_type,
                          RealVector & xyz,
                          RealTensor & J)
 {
-  xyz = zero_vector();
-  J = zero_tensor();
-  for (unsigned int k = 0; k < n_nodes; ++k)
-  {
-    const Real phi = map_shape(mapping_type, topo, k, xi, eta, zeta);
-    const RealVector grad = grad_map_shape(mapping_type, topo, k, xi, eta, zeta);
-    xyz += phi * nodes[k];
-    J += libMesh::outer_product(grad, nodes[k]);
-  }
+  detail::physical_point_and_jacobian_impl(mapping_type, topo, nodes, n_nodes, xi, eta, zeta, xyz, J);
+}
+
+template <typename NodeStorage,
+          std::enable_if_t<!std::is_pointer_v<std::decay_t<NodeStorage>> &&
+                             !std::is_array_v<std::remove_reference_t<NodeStorage>>,
+                           int> = 0>
+LIBMESH_DEVICE_INLINE void
+physical_point_and_jacobian(libMesh::ElemMappingType mapping_type,
+                            libMesh::ElemType topo,
+                            const NodeStorage & nodes,
+                            unsigned int n_nodes,
+                            Real xi, Real eta, Real zeta,
+                            RealVector & xyz,
+                            RealTensor & J)
+{
+  detail::physical_point_and_jacobian_impl(mapping_type, topo, nodes, n_nodes, xi, eta, zeta, xyz, J);
 }
 
 /// Face Jacobian (runtime topology).
@@ -147,11 +367,21 @@ face_jacobian(libMesh::ElemMappingType mapping_type,
              unsigned int n_face_nodes,
              Real xi, Real eta, Real zeta)
 {
-  RealTensor J = zero_tensor();
-  for (unsigned int k = 0; k < n_face_nodes; ++k)
-    J += libMesh::outer_product(grad_map_shape(mapping_type, face_topo, k, xi, eta, zeta),
-                                face_nodes[k]);
-  return J;
+  return detail::face_jacobian_impl(mapping_type, face_topo, face_nodes, n_face_nodes, xi, eta, zeta);
+}
+
+template <typename NodeStorage,
+          std::enable_if_t<!std::is_pointer_v<std::decay_t<NodeStorage>> &&
+                             !std::is_array_v<std::remove_reference_t<NodeStorage>>,
+                           int> = 0>
+LIBMESH_DEVICE_INLINE RealTensor
+face_jacobian(libMesh::ElemMappingType mapping_type,
+              libMesh::ElemType face_topo,
+              const NodeStorage & face_nodes,
+              unsigned int n_face_nodes,
+              Real xi, Real eta, Real zeta)
+{
+  return detail::face_jacobian_impl(mapping_type, face_topo, face_nodes, n_face_nodes, xi, eta, zeta);
 }
 
 // =========================================================================

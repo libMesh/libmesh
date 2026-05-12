@@ -6,6 +6,7 @@ SUBDIRS = libmesh
 if LIBMESH_ENABLE_KOKKOS
 nobase_include_HEADERS = \
   gpu/kokkos_fe_types.h \
+  gpu/kokkos_fe_shape_dispatch.h \
   gpu/kokkos_fe_base.h \
   gpu/kokkos_fe_evaluator.h \
   gpu/kokkos_fe_lagrange_1d.h \

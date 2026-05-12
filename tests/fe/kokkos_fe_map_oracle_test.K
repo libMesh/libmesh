@@ -347,9 +347,6 @@ check_face_qp_to_parent_case(const char * parent_name,
 
   if (fail)
   {
-    std::vector<libMesh::Point> refspace_nodes;
-    libMesh::FEBase::get_refspace_nodes(parent.type(), refspace_nodes);
-
     std::printf("  face_qp mismatch: parent=%s side_id=%u parent_type=%d side_type=%d\n",
                 parent_name,
                 side_id,
@@ -365,12 +362,12 @@ check_face_qp_to_parent_case(const char * parent_name,
 
     for (unsigned int k = 0; k < side.n_nodes(); ++k)
     {
-      const unsigned int parent_node = parent.local_side_node(side_id, k);
-      const libMesh::Point parent_refspace = refspace_nodes[parent_node];
-      std::printf("      k=%u side_node_id=%llu parent_node=%u parent_refspace=(%.17g, %.17g, %.17g)\n",
+      libMesh::Point parent_refspace;
+      libmesh_error_msg_if(!libMesh::try_reference_side_node(parent.type(), side_id, k, parent_refspace),
+                           "check_face_qp_to_parent_case(): unsupported parent side-node lookup");
+      std::printf("      k=%u side_node_id=%llu parent_refspace=(%.17g, %.17g, %.17g)\n",
                   k,
                   libMesh::cast_int<unsigned long long>(side.node_id(k)),
-                  parent_node,
                   parent_refspace(0),
                   parent_refspace(1),
                   parent_refspace(2));

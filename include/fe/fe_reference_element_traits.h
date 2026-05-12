@@ -892,6 +892,19 @@ try_reference_node(ElemType type,
   }
 }
 
+LIBMESH_DEVICE_INLINE bool
+try_reference_side_node(ElemType parent,
+                        unsigned int side,
+                        unsigned int side_node,
+                        Point & pt)
+{
+  unsigned int node = libMesh::invalid_uint;
+  if (!try_local_side_node(parent, side, side_node, node))
+    return false;
+
+  return try_reference_node(parent, node, pt);
+}
+
 } // namespace libMesh
 
 #endif // LIBMESH_FE_REFERENCE_ELEMENT_TRAITS_H

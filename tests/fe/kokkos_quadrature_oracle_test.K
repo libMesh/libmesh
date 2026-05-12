@@ -251,17 +251,12 @@ test_physical_map_hex8()
   Kokkos::parallel_for(
     1,
     KOKKOS_LAMBDA(int) {
-      RealVector nodes[8];
-      for (unsigned int i = 0; i < 8; ++i)
-        nodes[i] = libMesh::Kokkos::make_vector(
-          d_coords(3 * i + 0), d_coords(3 * i + 1), d_coords(3 * i + 2));
-
       const RealVector xyz_center =
-        libMesh::Kokkos::physical_point<libMesh::LAGRANGE, libMesh::HEX8>(nodes, 8, 0.0, 0.0, 0.0);
+        libMesh::Kokkos::physical_point<libMesh::LAGRANGE, libMesh::HEX8>(d_coords, 8, 0.0, 0.0, 0.0);
       const RealTensor J_center =
-        libMesh::Kokkos::jacobian<libMesh::LAGRANGE, libMesh::HEX8>(nodes, 8, 0.0, 0.0, 0.0);
+        libMesh::Kokkos::jacobian<libMesh::LAGRANGE, libMesh::HEX8>(d_coords, 8, 0.0, 0.0, 0.0);
       const RealVector xyz_corner = libMesh::Kokkos::physical_point<libMesh::LAGRANGE, libMesh::HEX8>(
-        nodes, 8, -1.0, -1.0, -1.0);
+        d_coords, 8, -1.0, -1.0, -1.0);
 
       d_results(0) = vector_component(xyz_center, 0);
       d_results(1) = vector_component(xyz_center, 1);
@@ -307,15 +302,10 @@ test_physical_map_tri3()
   Kokkos::parallel_for(
     1,
     KOKKOS_LAMBDA(int) {
-      RealVector nodes[3];
-      for (unsigned int i = 0; i < 3; ++i)
-        nodes[i] = libMesh::Kokkos::make_vector(
-          d_coords(3 * i + 0), d_coords(3 * i + 1), d_coords(3 * i + 2));
-
       const RealVector xyz = libMesh::Kokkos::physical_point<libMesh::LAGRANGE, libMesh::TRI3>(
-        nodes, 3, 1.0 / 3.0, 1.0 / 3.0, 0.0);
+        d_coords, 3, 1.0 / 3.0, 1.0 / 3.0, 0.0);
       const RealTensor J = libMesh::Kokkos::jacobian<libMesh::LAGRANGE, libMesh::TRI3>(
-        nodes, 3, 1.0 / 3.0, 1.0 / 3.0, 0.0);
+        d_coords, 3, 1.0 / 3.0, 1.0 / 3.0, 0.0);
 
       d_results(0) = vector_component(xyz, 0);
       d_results(1) = vector_component(xyz, 1);
@@ -573,9 +563,6 @@ check_face_qp_to_parent_case(const char * case_name,
 
   if (fail)
   {
-    std::vector<libMesh::Point> refspace_nodes;
-    libMesh::FEBase::get_refspace_nodes(parent.type(), refspace_nodes);
-
     std::printf("  face_qp mismatch: case=%s parent_type=%d side_type=%d side_id=%u\n",
                 case_name,
                 static_cast<int>(parent.type()),
@@ -595,12 +582,12 @@ check_face_qp_to_parent_case(const char * case_name,
 
     for (unsigned int k = 0; k < side.n_nodes(); ++k)
     {
-      const unsigned int parent_node = parent.local_side_node(side_id, k);
-      const libMesh::Point parent_refspace = refspace_nodes[parent_node];
-      std::printf("      k=%u side_node_id=%llu parent_node=%u parent_refspace=(%.17g, %.17g, %.17g)\n",
+      libMesh::Point parent_refspace;
+      libmesh_error_msg_if(!libMesh::try_reference_side_node(parent.type(), side_id, k, parent_refspace),
+                           "check_face_qp_to_parent_case(): unsupported parent side-node lookup");
+      std::printf("      k=%u side_node_id=%llu parent_refspace=(%.17g, %.17g, %.17g)\n",
                   k,
                   libMesh::cast_int<unsigned long long>(side.node_id(k)),
-                  parent_node,
                   parent_refspace(0),
                   parent_refspace(1),
                   parent_refspace(2));

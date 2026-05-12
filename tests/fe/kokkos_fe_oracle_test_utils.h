@@ -4,6 +4,7 @@
 #include "gpu/kokkos_fe_evaluator.h"
 #include "gpu/kokkos_fe_face_map.h"
 #include "gpu/kokkos_fe_map.h"
+#include "gpu/kokkos_fe_shape_dispatch.h"
 #include "gpu/kokkos_fe_types.h"
 
 #include "libmesh/elem.h"
@@ -72,7 +73,7 @@ struct element_fixture
 struct map_helper_context
 {
   std::vector<libMesh::Real> ref_values;
-  Kokkos::View<double *>     d_coords;
+  libMesh::Kokkos::default_storage_policy::vector_view d_coords;
   Kokkos::View<double *>     d_xi;
   Kokkos::View<double *>     d_eta;
   Kokkos::View<double *>     d_zeta;
@@ -85,8 +86,8 @@ struct map_helper_context
 struct face_helper_context
 {
   std::vector<libMesh::Real> ref_values;
-  Kokkos::View<double *>     d_face_coords;
-  Kokkos::View<double *>     d_parent_coords;
+  libMesh::Kokkos::default_storage_policy::vector_view d_face_coords;
+  libMesh::Kokkos::default_storage_policy::vector_view d_parent_coords;
   Kokkos::View<double *>     d_xi;
   Kokkos::View<double *>     d_eta;
   Kokkos::View<double *>     d_zeta;
@@ -100,717 +101,15 @@ struct face_helper_context
   unsigned int               n_face_nodes;
 };
 
-template <libMesh::ElemType ExactTopo, libMesh::Order ExactOrder>
-struct lagrange_evaluator_topology
-{
-  static const libMesh::ElemType value = libMesh::INVALID_ELEM;
-};
-
-#define KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(exact_topo, exact_order, evaluator_topo)      \
-  template <>                                                                                    \
-  struct lagrange_evaluator_topology<libMesh::exact_topo, libMesh::exact_order>                 \
-  {                                                                                              \
-    static const libMesh::ElemType value = libMesh::evaluator_topo;                             \
-  }
-
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(EDGE2, FIRST, EDGE2);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(EDGE3, FIRST, EDGE2);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(EDGE3, SECOND, EDGE3);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(EDGE4, FIRST, EDGE2);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TRI3, FIRST, TRI3);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TRI6, FIRST, TRI3);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TRI6, SECOND, TRI6);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TRI7, FIRST, TRI3);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TRI7, SECOND, TRI6);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(QUAD4, FIRST, QUAD4);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(QUAD8, FIRST, QUAD4);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(QUAD8, SECOND, QUAD8);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(QUAD9, FIRST, QUAD4);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(QUAD9, SECOND, QUAD9);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TET4, FIRST, TET4);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TET10, FIRST, TET4);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TET10, SECOND, TET10);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TET14, FIRST, TET4);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(TET14, SECOND, TET10);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(HEX8, FIRST, HEX8);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(HEX20, FIRST, HEX8);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(HEX20, SECOND, HEX20);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(HEX27, FIRST, HEX8);
-KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE(HEX27, SECOND, HEX27);
-
-#undef KOKKOS_TEST_UTILS_LAGRANGE_TOPOLOGY_CASE
-
-template <libMesh::ElemType ExactTopo>
-struct monomial_evaluator_dim
-{
-  static const unsigned int value = 0;
-};
-
-#define KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(exact_topo, dim_value)                              \
-  template <>                                                                                    \
-  struct monomial_evaluator_dim<libMesh::exact_topo>                                            \
-  {                                                                                              \
-    static const unsigned int value = dim_value;                                                \
-  }
-
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(EDGE2, 1);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(EDGE3, 1);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(EDGE4, 1);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(TRI3, 2);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(TRI6, 2);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(TRI7, 2);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(QUAD4, 2);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(QUAD8, 2);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(QUAD9, 2);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(TET4, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(TET10, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(TET14, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(HEX8, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(HEX20, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(HEX27, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(PRISM6, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(PRISM15, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(PRISM18, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(PRISM20, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(PRISM21, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(PYRAMID5, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(PYRAMID13, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(PYRAMID14, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE(PYRAMID18, 3);
-
-#undef KOKKOS_TEST_UTILS_MONOMIAL_DIM_CASE
-
-template <unsigned int Dim, libMesh::Order ExactOrder>
-struct monomial_order_evaluator;
-
-#define KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(dim_value, exact_order, impl_suffix, impl_order)  \
-  template <>                                                                                    \
-  struct monomial_order_evaluator<dim_value, libMesh::exact_order>                              \
-  {                                                                                              \
-    LIBMESH_DEVICE_INLINE static libMesh::Real shape(unsigned int i,                             \
-                                                      libMesh::Real xi,                          \
-                                                      libMesh::Real eta,                         \
-                                                      libMesh::Real zeta)                        \
-    {                                                                                            \
-      return libMesh::Kokkos::impl_suffix<impl_order>::shape(i, xi, eta, zeta);                 \
-    }                                                                                            \
-                                                                                                 \
-    LIBMESH_DEVICE_INLINE static libMesh::Kokkos::RealVector grad_shape(unsigned int i,         \
-                                                                        libMesh::Real xi,        \
-                                                                        libMesh::Real eta,       \
-                                                                        libMesh::Real zeta)      \
-    {                                                                                            \
-      return libMesh::Kokkos::impl_suffix<impl_order>::grad_shape(i, xi, eta, zeta);            \
-    }                                                                                            \
-  }
-
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(1, CONSTANT, MonomialImpl1D, 0);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(1, FIRST, MonomialImpl1D, 1);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(1, SECOND, MonomialImpl1D, 2);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(1, THIRD, MonomialImpl1D, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(1, FOURTH, MonomialImpl1D, 4);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(1, FIFTH, MonomialImpl1D, 5);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(2, CONSTANT, MonomialImpl2D, 0);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(2, FIRST, MonomialImpl2D, 1);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(2, SECOND, MonomialImpl2D, 2);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(2, THIRD, MonomialImpl2D, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(2, FOURTH, MonomialImpl2D, 4);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(2, FIFTH, MonomialImpl2D, 5);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(3, CONSTANT, MonomialImpl3D, 0);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(3, FIRST, MonomialImpl3D, 1);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(3, SECOND, MonomialImpl3D, 2);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(3, THIRD, MonomialImpl3D, 3);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(3, FOURTH, MonomialImpl3D, 4);
-KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE(3, FIFTH, MonomialImpl3D, 5);
-
-#undef KOKKOS_TEST_UTILS_MONOMIAL_ORDER_CASE
-
-template <libMesh::FEFamily Family, libMesh::ElemType ExactTopo, libMesh::Order ExactOrder>
-struct exact_shape_evaluator;
-
-template <libMesh::ElemType ExactTopo, libMesh::Order ExactOrder>
-struct exact_shape_evaluator<libMesh::LAGRANGE, ExactTopo, ExactOrder>
-{
-  LIBMESH_DEVICE_INLINE static libMesh::Real shape(unsigned int i,
-                                                   libMesh::Real xi,
-                                                   libMesh::Real eta,
-                                                   libMesh::Real zeta)
-  {
-    return libMesh::Kokkos::map_shape<libMesh::LAGRANGE,
-                                      lagrange_evaluator_topology<ExactTopo, ExactOrder>::value>(
-      i, xi, eta, zeta);
-  }
-
-  LIBMESH_DEVICE_INLINE static libMesh::Kokkos::RealVector grad_shape(unsigned int i,
-                                                                      libMesh::Real xi,
-                                                                      libMesh::Real eta,
-                                                                      libMesh::Real zeta)
-  {
-    return libMesh::Kokkos::grad_map_shape<libMesh::LAGRANGE,
-                                           lagrange_evaluator_topology<ExactTopo, ExactOrder>::value>(
-      i, xi, eta, zeta);
-  }
-};
-
-template <libMesh::ElemType ExactTopo, libMesh::Order ExactOrder>
-struct exact_shape_evaluator<libMesh::MONOMIAL, ExactTopo, ExactOrder>
-{
-  LIBMESH_DEVICE_INLINE static libMesh::Real shape(unsigned int i,
-                                                   libMesh::Real xi,
-                                                   libMesh::Real eta,
-                                                   libMesh::Real zeta)
-  {
-    return monomial_order_evaluator<monomial_evaluator_dim<ExactTopo>::value, ExactOrder>::shape(
-      i, xi, eta, zeta);
-  }
-
-  LIBMESH_DEVICE_INLINE static libMesh::Kokkos::RealVector grad_shape(unsigned int i,
-                                                                      libMesh::Real xi,
-                                                                      libMesh::Real eta,
-                                                                      libMesh::Real zeta)
-  {
-    return monomial_order_evaluator<monomial_evaluator_dim<ExactTopo>::value, ExactOrder>::grad_shape(
-      i, xi, eta, zeta);
-  }
-};
-
-template <libMesh::FEFamily Family, libMesh::ElemType ExactTopo, libMesh::Order ExactOrder>
-LIBMESH_DEVICE_INLINE libMesh::Real
-shape_for_key(unsigned int i, libMesh::Real xi, libMesh::Real eta, libMesh::Real zeta)
-{
-  return exact_shape_evaluator<Family, ExactTopo, ExactOrder>::shape(i, xi, eta, zeta);
-}
-
-template <libMesh::FEFamily Family, libMesh::ElemType ExactTopo, libMesh::Order ExactOrder>
-LIBMESH_DEVICE_INLINE libMesh::Kokkos::RealVector
-grad_shape_for_key(unsigned int i, libMesh::Real xi, libMesh::Real eta, libMesh::Real zeta)
-{
-  return exact_shape_evaluator<Family, ExactTopo, ExactOrder>::grad_shape(i, xi, eta, zeta);
-}
-
-template <libMesh::ElemType ExactTopo, typename Dispatcher>
-inline int
-dispatch_supported_monomial_order(libMesh::Order order, const Dispatcher & dispatcher)
-{
-  switch (order)
-  {
-    case libMesh::CONSTANT:
-      return dispatcher.template operator()<libMesh::MONOMIAL, ExactTopo, libMesh::CONSTANT>();
-    case libMesh::FIRST:
-      return dispatcher.template operator()<libMesh::MONOMIAL, ExactTopo, libMesh::FIRST>();
-    case libMesh::SECOND:
-      return dispatcher.template operator()<libMesh::MONOMIAL, ExactTopo, libMesh::SECOND>();
-    case libMesh::THIRD:
-      return dispatcher.template operator()<libMesh::MONOMIAL, ExactTopo, libMesh::THIRD>();
-    case libMesh::FOURTH:
-      return dispatcher.template operator()<libMesh::MONOMIAL, ExactTopo, libMesh::FOURTH>();
-    case libMesh::FIFTH:
-      return dispatcher.template operator()<libMesh::MONOMIAL, ExactTopo, libMesh::FIFTH>();
-    default:
-      return dispatcher.unsupported_key(libMesh::Kokkos::FEShapeKey{ libMesh::MONOMIAL, ExactTopo, order });
-  }
-}
-
-inline bool
-is_supported_lagrange_map_topology(libMesh::ElemType topo);
-
-template <typename Dispatcher>
-inline int
-dispatch_supported_lagrange_shape_key(libMesh::Kokkos::FEShapeKey key, const Dispatcher & dispatcher)
-{
-  if (key.family != libMesh::LAGRANGE || !libMesh::Kokkos::supports_shape(key))
-    return dispatcher.unsupported_key(key);
-
-  switch (key.elem_type)
-  {
-    case libMesh::EDGE2:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::EDGE2, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::EDGE3:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::EDGE3, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::EDGE3, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::EDGE4:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::EDGE4, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TRI3:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TRI3, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TRI6:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TRI6, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TRI6, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TRI7:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TRI7, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TRI7, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::QUAD4:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD4, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::QUAD8:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD8, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD8, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::QUAD9:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD9, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD9, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TET4:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TET4, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TET10:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TET10, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TET10, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TET14:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TET14, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TET14, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::HEX8:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX8, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::HEX20:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX20, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX20, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::HEX27:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX27, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX27, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    default:
-      return dispatcher.unsupported_key(key);
-  }
-}
-
-template <typename Dispatcher>
-inline int
-dispatch_supported_lagrange_shape_key_with_map(libMesh::Kokkos::FEShapeKey key,
-                                               const Dispatcher & dispatcher)
-{
-  if (key.family != libMesh::LAGRANGE ||
-      !libMesh::Kokkos::supports_shape(key) ||
-      !is_supported_lagrange_map_topology(key.elem_type))
-    return dispatcher.unsupported_key(key);
-
-  switch (key.elem_type)
-  {
-    case libMesh::EDGE2:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::EDGE2, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::EDGE3:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::EDGE3, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::EDGE3, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TRI3:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TRI3, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TRI6:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TRI6, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TRI6, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::QUAD4:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD4, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::QUAD8:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD8, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD8, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::QUAD9:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD9, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::QUAD9, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TET4:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TET4, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::TET10:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TET10, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::TET10, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::HEX8:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX8, libMesh::FIRST>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::HEX20:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX20, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX20, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    case libMesh::HEX27:
-      switch (key.order)
-      {
-        case libMesh::FIRST:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX27, libMesh::FIRST>();
-        case libMesh::SECOND:
-          return dispatcher.template operator()<libMesh::LAGRANGE, libMesh::HEX27, libMesh::SECOND>();
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-    default:
-      return dispatcher.unsupported_key(key);
-  }
-}
-
-template <typename Dispatcher>
-inline int
-dispatch_supported_shape_key(libMesh::Kokkos::FEShapeKey key, const Dispatcher & dispatcher)
-{
-  if (!libMesh::Kokkos::supports_shape(key))
-    return dispatcher.unsupported_key(key);
-
-  switch (key.family)
-  {
-    case libMesh::LAGRANGE:
-      return dispatch_supported_lagrange_shape_key(key, dispatcher);
-
-    case libMesh::MONOMIAL:
-      switch (key.elem_type)
-      {
-        case libMesh::EDGE2:
-          return dispatch_supported_monomial_order<libMesh::EDGE2>(key.order, dispatcher);
-        case libMesh::EDGE3:
-          return dispatch_supported_monomial_order<libMesh::EDGE3>(key.order, dispatcher);
-        case libMesh::EDGE4:
-          return dispatch_supported_monomial_order<libMesh::EDGE4>(key.order, dispatcher);
-        case libMesh::TRI3:
-          return dispatch_supported_monomial_order<libMesh::TRI3>(key.order, dispatcher);
-        case libMesh::TRI6:
-          return dispatch_supported_monomial_order<libMesh::TRI6>(key.order, dispatcher);
-        case libMesh::TRI7:
-          return dispatch_supported_monomial_order<libMesh::TRI7>(key.order, dispatcher);
-        case libMesh::QUAD4:
-          return dispatch_supported_monomial_order<libMesh::QUAD4>(key.order, dispatcher);
-        case libMesh::QUAD8:
-          return dispatch_supported_monomial_order<libMesh::QUAD8>(key.order, dispatcher);
-        case libMesh::QUAD9:
-          return dispatch_supported_monomial_order<libMesh::QUAD9>(key.order, dispatcher);
-        case libMesh::TET4:
-          return dispatch_supported_monomial_order<libMesh::TET4>(key.order, dispatcher);
-        case libMesh::TET10:
-          return dispatch_supported_monomial_order<libMesh::TET10>(key.order, dispatcher);
-        case libMesh::TET14:
-          return dispatch_supported_monomial_order<libMesh::TET14>(key.order, dispatcher);
-        case libMesh::HEX8:
-          return dispatch_supported_monomial_order<libMesh::HEX8>(key.order, dispatcher);
-        case libMesh::HEX20:
-          return dispatch_supported_monomial_order<libMesh::HEX20>(key.order, dispatcher);
-        case libMesh::HEX27:
-          return dispatch_supported_monomial_order<libMesh::HEX27>(key.order, dispatcher);
-        case libMesh::PRISM6:
-          return dispatch_supported_monomial_order<libMesh::PRISM6>(key.order, dispatcher);
-        case libMesh::PRISM15:
-          return dispatch_supported_monomial_order<libMesh::PRISM15>(key.order, dispatcher);
-        case libMesh::PRISM18:
-          return dispatch_supported_monomial_order<libMesh::PRISM18>(key.order, dispatcher);
-        case libMesh::PRISM20:
-          return dispatch_supported_monomial_order<libMesh::PRISM20>(key.order, dispatcher);
-        case libMesh::PRISM21:
-          return dispatch_supported_monomial_order<libMesh::PRISM21>(key.order, dispatcher);
-        case libMesh::PYRAMID5:
-          return dispatch_supported_monomial_order<libMesh::PYRAMID5>(key.order, dispatcher);
-        case libMesh::PYRAMID13:
-          return dispatch_supported_monomial_order<libMesh::PYRAMID13>(key.order, dispatcher);
-        case libMesh::PYRAMID14:
-          return dispatch_supported_monomial_order<libMesh::PYRAMID14>(key.order, dispatcher);
-        case libMesh::PYRAMID18:
-          return dispatch_supported_monomial_order<libMesh::PYRAMID18>(key.order, dispatcher);
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-
-    default:
-      return dispatcher.unsupported_key(key);
-  }
-}
-
-inline bool
-is_supported_lagrange_map_topology(libMesh::ElemType topo)
-{
-  switch (topo)
-  {
-    case libMesh::EDGE2:
-    case libMesh::EDGE3:
-    case libMesh::TRI3:
-    case libMesh::TRI6:
-    case libMesh::QUAD4:
-    case libMesh::QUAD8:
-    case libMesh::QUAD9:
-    case libMesh::TET4:
-    case libMesh::TET10:
-    case libMesh::HEX8:
-    case libMesh::HEX20:
-    case libMesh::HEX27:
-      return true;
-
-    default:
-      return false;
-  }
-}
-
-inline bool
-supports_shape_key_with_lagrange_map(libMesh::Kokkos::FEShapeKey key)
-{
-  return libMesh::Kokkos::supports_shape(key) &&
-         is_supported_lagrange_map_topology(key.elem_type);
-}
-
-template <typename Dispatcher>
-inline int
-dispatch_supported_shape_key_with_lagrange_map(libMesh::Kokkos::FEShapeKey key,
-                                               const Dispatcher & dispatcher)
-{
-  if (!supports_shape_key_with_lagrange_map(key))
-    return dispatcher.unsupported_key(key);
-
-  switch (key.family)
-  {
-    case libMesh::LAGRANGE:
-      return dispatch_supported_lagrange_shape_key_with_map(key, dispatcher);
-
-    case libMesh::MONOMIAL:
-      switch (key.elem_type)
-      {
-        case libMesh::EDGE2:
-          return dispatch_supported_monomial_order<libMesh::EDGE2>(key.order, dispatcher);
-        case libMesh::EDGE3:
-          return dispatch_supported_monomial_order<libMesh::EDGE3>(key.order, dispatcher);
-        case libMesh::TRI3:
-          return dispatch_supported_monomial_order<libMesh::TRI3>(key.order, dispatcher);
-        case libMesh::TRI6:
-          return dispatch_supported_monomial_order<libMesh::TRI6>(key.order, dispatcher);
-        case libMesh::QUAD4:
-          return dispatch_supported_monomial_order<libMesh::QUAD4>(key.order, dispatcher);
-        case libMesh::QUAD8:
-          return dispatch_supported_monomial_order<libMesh::QUAD8>(key.order, dispatcher);
-        case libMesh::QUAD9:
-          return dispatch_supported_monomial_order<libMesh::QUAD9>(key.order, dispatcher);
-        case libMesh::TET4:
-          return dispatch_supported_monomial_order<libMesh::TET4>(key.order, dispatcher);
-        case libMesh::TET10:
-          return dispatch_supported_monomial_order<libMesh::TET10>(key.order, dispatcher);
-        case libMesh::HEX8:
-          return dispatch_supported_monomial_order<libMesh::HEX8>(key.order, dispatcher);
-        case libMesh::HEX20:
-          return dispatch_supported_monomial_order<libMesh::HEX20>(key.order, dispatcher);
-        case libMesh::HEX27:
-          return dispatch_supported_monomial_order<libMesh::HEX27>(key.order, dispatcher);
-        default:
-          return dispatcher.unsupported_key(key);
-      }
-
-    default:
-      return dispatcher.unsupported_key(key);
-  }
-}
-
-inline bool
-is_supported_lagrange_face_map_topology(libMesh::ElemType topo)
-{
-  switch (topo)
-  {
-    case libMesh::EDGE2:
-    case libMesh::EDGE3:
-    case libMesh::TRI3:
-    case libMesh::TRI6:
-    case libMesh::QUAD4:
-    case libMesh::QUAD8:
-    case libMesh::QUAD9:
-      return true;
-
-    default:
-      return false;
-  }
-}
-
-template <typename Dispatcher>
-inline int
-dispatch_supported_lagrange_map_topology(libMesh::ElemType topo,
-                                         const Dispatcher & dispatcher)
-{
-  switch (topo)
-  {
-    case libMesh::EDGE2:
-      return dispatcher.template operator()<libMesh::EDGE2>();
-    case libMesh::EDGE3:
-      return dispatcher.template operator()<libMesh::EDGE3>();
-    case libMesh::TRI3:
-      return dispatcher.template operator()<libMesh::TRI3>();
-    case libMesh::TRI6:
-      return dispatcher.template operator()<libMesh::TRI6>();
-    case libMesh::QUAD4:
-      return dispatcher.template operator()<libMesh::QUAD4>();
-    case libMesh::QUAD8:
-      return dispatcher.template operator()<libMesh::QUAD8>();
-    case libMesh::QUAD9:
-      return dispatcher.template operator()<libMesh::QUAD9>();
-    case libMesh::TET4:
-      return dispatcher.template operator()<libMesh::TET4>();
-    case libMesh::TET10:
-      return dispatcher.template operator()<libMesh::TET10>();
-    case libMesh::HEX8:
-      return dispatcher.template operator()<libMesh::HEX8>();
-    case libMesh::HEX20:
-      return dispatcher.template operator()<libMesh::HEX20>();
-    case libMesh::HEX27:
-      return dispatcher.template operator()<libMesh::HEX27>();
-
-    default:
-      return dispatcher.unsupported_topology(topo);
-  }
-}
-
-template <typename Dispatcher>
-inline int
-dispatch_supported_lagrange_face_map_topology(libMesh::ElemType topo,
-                                              const Dispatcher & dispatcher)
-{
-  if (!is_supported_lagrange_face_map_topology(topo))
-    return dispatcher.unsupported_topology(topo);
-
-  return dispatch_supported_lagrange_map_topology(topo, dispatcher);
-}
+using libMesh::Kokkos::dispatch_supported_lagrange_face_map_topology;
+using libMesh::Kokkos::dispatch_supported_lagrange_map_topology;
+using libMesh::Kokkos::dispatch_supported_shape_key;
+using libMesh::Kokkos::dispatch_supported_shape_key_with_lagrange_map;
+using libMesh::Kokkos::grad_shape_for_key;
+using libMesh::Kokkos::is_supported_lagrange_face_map_topology;
+using libMesh::Kokkos::is_supported_lagrange_map_topology;
+using libMesh::Kokkos::shape_for_key;
+using libMesh::Kokkos::supports_shape_key_with_lagrange_map;
 
 inline int
 compare_device_values(const Kokkos::View<double *> & d_values,
@@ -914,16 +213,20 @@ upload_real(const std::vector<libMesh::Real> & values, const char * label)
   return d;
 }
 
-inline Kokkos::View<double *>
+inline libMesh::Kokkos::default_storage_policy::vector_view
 upload_point_coordinates(const libMesh::Elem & elem, const char * label)
 {
-  Kokkos::View<double *> d(std::string(label), 3 * elem.n_nodes());
+  auto d = libMesh::Kokkos::make_vector_storage(label, elem.n_nodes());
   auto h = Kokkos::create_mirror_view(d);
   for (unsigned int i = 0; i < elem.n_nodes(); ++i)
   {
-    h(3 * i + 0) = elem.point(i)(0);
-    h(3 * i + 1) = elem.point(i)(1);
-    h(3 * i + 2) = elem.point(i)(2);
+    h(i, 0) = elem.point(i)(0);
+#if LIBMESH_DIM > 1
+    h(i, 1) = elem.point(i)(1);
+#endif
+#if LIBMESH_DIM > 2
+    h(i, 2) = elem.point(i)(2);
+#endif
   }
   Kokkos::deep_copy(d, h);
   return d;
@@ -946,7 +249,9 @@ build_reference_fixture(libMesh::ElemType elem_type)
 
   for (unsigned int i = 0; i < fixture.elem->n_nodes(); ++i)
   {
-    const libMesh::Point master = fixture.elem->master_point(i);
+    libMesh::Point master;
+    libmesh_error_msg_if(!libMesh::try_reference_node(elem_type, i, master),
+                         "build_reference_fixture(): unsupported reference-node lookup");
     const libMesh::Real xi = master(0);
     const libMesh::Real eta = master(1);
     const libMesh::Real zeta = master(2);
@@ -998,7 +303,9 @@ build_flat_reference_fixture(libMesh::ElemType elem_type)
 
   for (unsigned int i = 0; i < fixture.elem->n_nodes(); ++i)
   {
-    const libMesh::Point master = fixture.elem->master_point(i);
+    libMesh::Point master;
+    libmesh_error_msg_if(!libMesh::try_reference_node(elem_type, i, master),
+                         "build_flat_reference_fixture(): unsupported reference-node lookup");
     const libMesh::Real xi = master(0);
     const libMesh::Real eta = master(1);
     const libMesh::Real zeta = master(2);
@@ -1128,8 +435,6 @@ evaluate_map_helper_context(const map_helper_context & context,
                             const char * result_label,
                             double tol = 1.0e-13)
 {
-  constexpr unsigned int max_nodes = 27;
-
   Kokkos::View<double *> d_results(std::string(result_label), context.ref_values.size());
   const auto d_coords = context.d_coords;
   const auto d_xi = context.d_xi;
@@ -1142,15 +447,10 @@ evaluate_map_helper_context(const map_helper_context & context,
   Kokkos::parallel_for(
     context.nqp,
     KOKKOS_LAMBDA(int q) {
-      libMesh::Kokkos::RealVector nodes[max_nodes];
-      for (unsigned int i = 0; i < n_nodes_; ++i)
-        nodes[i] = libMesh::Kokkos::make_vector(
-          d_coords(3 * i + 0), d_coords(3 * i + 1), d_coords(3 * i + 2));
-
       libMesh::Kokkos::RealVector xyz;
       libMesh::Kokkos::RealTensor J;
       libMesh::Kokkos::physical_point_and_jacobian<libMesh::LAGRANGE, Topo>(
-        nodes, n_nodes_, d_xi(q), d_eta(q), d_zeta(q), xyz, J);
+        d_coords, n_nodes_, d_xi(q), d_eta(q), d_zeta(q), xyz, J);
 
       const libMesh::Real jxw_q = libMesh::Kokkos::volume_jxw(J, dim_, d_w(q));
       const unsigned int base = 13 * static_cast<unsigned int>(q);
@@ -1277,9 +577,6 @@ evaluate_face_helper_context_2d(const face_helper_context & context,
                                 const char * result_label,
                                 double tol = 1.0e-13)
 {
-  constexpr unsigned int max_face_nodes = 9;
-  constexpr unsigned int max_parent_nodes = 27;
-
   Kokkos::View<double *> d_results(std::string(result_label), context.ref_values.size());
   const auto d_face_coords = context.d_face_coords;
   const auto d_parent_coords = context.d_parent_coords;
@@ -1296,19 +593,10 @@ evaluate_face_helper_context_2d(const face_helper_context & context,
   Kokkos::parallel_for(
     context.nqp,
     KOKKOS_LAMBDA(int q) {
-      libMesh::Kokkos::RealVector face_nodes[max_face_nodes];
-      libMesh::Kokkos::RealVector parent_nodes[max_parent_nodes];
-      for (unsigned int i = 0; i < n_face_nodes_; ++i)
-        face_nodes[i] = libMesh::Kokkos::make_vector(
-          d_face_coords(3 * i + 0), d_face_coords(3 * i + 1), d_face_coords(3 * i + 2));
-      for (unsigned int i = 0; i < n_parent_nodes_; ++i)
-        parent_nodes[i] = libMesh::Kokkos::make_vector(
-          d_parent_coords(3 * i + 0), d_parent_coords(3 * i + 1), d_parent_coords(3 * i + 2));
-
       const libMesh::Kokkos::RealTensor J = libMesh::Kokkos::face_jacobian<libMesh::LAGRANGE, SideTopo>(
-        face_nodes, n_face_nodes_, d_xi(q), d_eta(q), d_zeta(q));
+        d_face_coords, n_face_nodes_, d_xi(q), d_eta(q), d_zeta(q));
       const libMesh::Kokkos::RealTensor parent_J = libMesh::Kokkos::jacobian<libMesh::LAGRANGE, ParentTopo>(
-        parent_nodes, n_parent_nodes_, d_parent_xi(q), d_parent_eta(q), d_parent_zeta(q));
+        d_parent_coords, n_parent_nodes_, d_parent_xi(q), d_parent_eta(q), d_parent_zeta(q));
       const libMesh::Real jxw_q = libMesh::Kokkos::face_jxw(J, /*parent_dim=*/2u, d_w(q));
       const libMesh::Kokkos::RealVector normal_q = libMesh::Kokkos::edge_normal_on_parent_surface(J, parent_J);
       const unsigned int base = 13 * static_cast<unsigned int>(q);
@@ -1338,8 +626,6 @@ evaluate_face_helper_context_3d(const face_helper_context & context,
                                 const char * result_label,
                                 double tol = 1.0e-13)
 {
-  constexpr unsigned int max_face_nodes = 9;
-
   Kokkos::View<double *> d_results(std::string(result_label), context.ref_values.size());
   const auto d_face_coords = context.d_face_coords;
   const auto d_xi = context.d_xi;
@@ -1351,13 +637,8 @@ evaluate_face_helper_context_3d(const face_helper_context & context,
   Kokkos::parallel_for(
     context.nqp,
     KOKKOS_LAMBDA(int q) {
-      libMesh::Kokkos::RealVector face_nodes[max_face_nodes];
-      for (unsigned int i = 0; i < n_face_nodes_; ++i)
-        face_nodes[i] = libMesh::Kokkos::make_vector(
-          d_face_coords(3 * i + 0), d_face_coords(3 * i + 1), d_face_coords(3 * i + 2));
-
       const libMesh::Kokkos::RealTensor J = libMesh::Kokkos::face_jacobian<libMesh::LAGRANGE, SideTopo>(
-        face_nodes, n_face_nodes_, d_xi(q), d_eta(q), d_zeta(q));
+        d_face_coords, n_face_nodes_, d_xi(q), d_eta(q), d_zeta(q));
       const libMesh::Real jxw_q = libMesh::Kokkos::face_jxw(J, /*parent_dim=*/3u, d_w(q));
       const libMesh::Kokkos::RealVector normal_q = libMesh::Kokkos::face_normal(J, /*parent_dim=*/3u);
       const unsigned int base = 13 * static_cast<unsigned int>(q);

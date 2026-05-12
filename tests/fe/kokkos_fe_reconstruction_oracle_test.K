@@ -215,13 +215,8 @@ test_reconstruction_case_impl(const reconstruction_case & info)
   Kokkos::parallel_for(
     nqp,
     KOKKOS_LAMBDA(int q) {
-      RealVector geom_nodes[max_geom_nodes];
-      for (unsigned int i = 0; i < n_geom_nodes_; ++i)
-        geom_nodes[i] = libMesh::Kokkos::make_vector(
-          d_coords(3 * i + 0), d_coords(3 * i + 1), d_coords(3 * i + 2));
-
       const RealTensor J = libMesh::Kokkos::jacobian<libMesh::LAGRANGE, ExactTopo>(
-        geom_nodes, n_geom_nodes_, d_xi(q), d_eta(q), d_zeta(q));
+        d_coords, n_geom_nodes_, d_xi(q), d_eta(q), d_zeta(q));
 
       Real u = 0.0;
       RealVector grad_ref_sum = libMesh::Kokkos::zero_vector();

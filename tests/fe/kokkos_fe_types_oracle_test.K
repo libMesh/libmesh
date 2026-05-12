@@ -67,58 +67,13 @@ struct support_case
 static libMesh::ElemType
 host_side_topology_oracle(libMesh::ElemType parent_type)
 {
-  auto elem = build_reference_elem(parent_type);
-
-  if (elem->dim() == 1)
-    return libMesh::EDGE2;
-
-  auto first_side = elem->build_side_ptr(0);
-  const libMesh::ElemType side_topo = first_side->type();
-
-  for (unsigned int s = 1; s < elem->n_sides(); ++s)
-  {
-    auto side = elem->build_side_ptr(s);
-    if (side->type() != side_topo)
-      return libMesh::INVALID_ELEM;
-  }
-
-  return side_topo;
+  return libMesh::side_topology_or_invalid(parent_type);
 }
 
 static libMesh::FEElemClass
 host_class_from_topology_oracle(libMesh::ElemType topo)
 {
-  auto elem = build_reference_elem(topo);
-
-  if (elem->dim() == 1)
-    return libMesh::FEElemClass::EDGE;
-
-  const libMesh::FEType fe_type(libMesh::FIRST, libMesh::LAGRANGE);
-  const unsigned int ndofs = libMesh::FEInterface::n_dofs(fe_type, 0, elem.get());
-
-  switch (elem->dim())
-  {
-    case 2:
-      switch (ndofs)
-      {
-        case 3: return libMesh::FEElemClass::TRI;
-        case 4: return libMesh::FEElemClass::QUAD;
-        default: return libMesh::FEElemClass::N_CLASSES;
-      }
-
-    case 3:
-      switch (ndofs)
-      {
-        case 4: return libMesh::FEElemClass::TET;
-        case 8: return libMesh::FEElemClass::HEX;
-        case 6: return libMesh::FEElemClass::PRISM;
-        case 5: return libMesh::FEElemClass::PYRAMID;
-        default: return libMesh::FEElemClass::N_CLASSES;
-      }
-
-    default:
-      return libMesh::FEElemClass::N_CLASSES;
-  }
+  return libMesh::class_from_topology_or_invalid(topo);
 }
 
 static unsigned int

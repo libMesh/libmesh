@@ -236,16 +236,11 @@ test_side_trace_case_impl(const side_trace_case & info)
         const unsigned int q = static_cast<unsigned int>(idx) / n_dofs;
         const unsigned int i = static_cast<unsigned int>(idx) % n_dofs;
 
-        RealVector geom_nodes[max_geom_nodes];
-        for (unsigned int k = 0; k < n_geom_nodes_; ++k)
-          geom_nodes[k] = libMesh::Kokkos::make_vector(
-            d_coords(3 * k + 0), d_coords(3 * k + 1), d_coords(3 * k + 2));
-
         const Real xi = d_parent_xi(q);
         const Real eta = d_parent_eta(q);
         const Real zeta = d_parent_zeta(q);
         const RealTensor J =
-          libMesh::Kokkos::jacobian<libMesh::LAGRANGE, ExactTopo>(geom_nodes, n_geom_nodes_, xi, eta, zeta);
+          libMesh::Kokkos::jacobian<libMesh::LAGRANGE, ExactTopo>(d_coords, n_geom_nodes_, xi, eta, zeta);
         const RealVector grad_ref = grad_shape_for_key<Family, ExactTopo, ExactOrder>(i, xi, eta, zeta);
         const RealVector grad_phys = libMesh::Kokkos::inverse<RealTensor>(J, parent_dim) * grad_ref;
         const RealVector normal = libMesh::Kokkos::make_vector(d_normal_x(q), d_normal_y(q), d_normal_z(q));
