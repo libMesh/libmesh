@@ -678,6 +678,7 @@ KOKKOS_LIBS
 KOKKOS_LDFLAGS
 KOKKOS_CXXFLAGS
 KOKKOS_CPPFLAGS
+KOKKOS_MPI_CPPFLAGS
 KOKKOS_CXX
 ICPX
 HIPCC
@@ -64237,6 +64238,129 @@ fi
         KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:--L$KOKKOS_DIR/lib}"
         KOKKOS_LIBS="${KOKKOS_LIBS:--lkokkoscore}"
 
+        KOKKOS_MPI_CPPFLAGS=""
+        if test "x$enablempi" = "xyes" && test "x$KOKKOS_CXX" != "x$CXX"
+then :
+
+            { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for MPI compile flags usable with KOKKOS_CXX" >&5
+printf %s "checking for MPI compile flags usable with KOKKOS_CXX... " >&6; }
+            KOKKOS_MPI_CPPFLAGS=`$CXX -showme:compile 2>/dev/null`
+            if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
+then :
+  KOKKOS_MPI_CPPFLAGS=`$CXX -compile_info 2>/dev/null`
+fi
+            if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
+then :
+  KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^[^ ]* //'`
+fi
+            if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
+then :
+  KOKKOS_MPI_CPPFLAGS="$MPI_INCLUDES"
+fi
+            if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
+printf "%s\n" "not found" >&6; }
+else case e in #(
+  e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $KOKKOS_MPI_CPPFLAGS" >&5
+printf "%s\n" "$KOKKOS_MPI_CPPFLAGS" >&6; } ;;
+esac
+fi
+
+fi
+
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the Kokkos compiler configuration works" >&5
+printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
+        libmesh_save_CXX="$CXX"
+        libmesh_save_CPPFLAGS="$CPPFLAGS"
+        libmesh_save_CXXFLAGS="$CXXFLAGS"
+        libmesh_save_LDFLAGS="$LDFLAGS"
+        libmesh_save_LIBS="$LIBS"
+
+        CXX="$KOKKOS_CXX"
+        CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
+        CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
+        LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
+        LIBS="$LIBS $KOKKOS_LIBS"
+
+        if test "x$enablempi" = "xyes"
+then :
+
+            LDFLAGS="$LDFLAGS $MPI_LDFLAGS"
+            LIBS="$LIBS $MPI_LIBS"
+            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <mpi.h>
+#include <Kokkos_Core.hpp>
+int
+main (int argc, char ** argv)
+{
+
+  MPI_Init(&argc, &argv);
+  Kokkos::initialize(argc, argv);
+  Kokkos::finalize();
+  MPI_Finalize();
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+  kokkos_config_works=yes
+else case e in #(
+  e) kokkos_config_works=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+
+else case e in #(
+  e)
+            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <Kokkos_Core.hpp>
+int
+main (int argc, char ** argv)
+{
+
+  Kokkos::initialize(argc, argv);
+  Kokkos::finalize();
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"
+then :
+  kokkos_config_works=yes
+else case e in #(
+  e) kokkos_config_works=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+ ;;
+esac
+fi
+
+        CXX="$libmesh_save_CXX"
+        CPPFLAGS="$libmesh_save_CPPFLAGS"
+        CXXFLAGS="$libmesh_save_CXXFLAGS"
+        LDFLAGS="$libmesh_save_LDFLAGS"
+        LIBS="$libmesh_save_LIBS"
+
+        if test "x$kokkos_config_works" = "xyes"
+then :
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
+else case e in #(
+  e) as_fn_error $? "configured Kokkos compiler/flags failed to compile and link a minimal test program" "$LINENO" 5 ;;
+esac
+fi
+
 
 printf "%s\n" "#define HAVE_KOKKOS 1" >>confdefs.h
 
@@ -68934,4 +69058,3 @@ printf "%s\n" "--------- Done Configuring libMesh ----------" >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ---------------------------------------------" >&5
 printf "%s\n" "---------------------------------------------" >&6; }
 # rm -f -r conftest* config.cache include/libmesh/libmesh_config.h.tmp
-
