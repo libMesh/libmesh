@@ -865,43 +865,50 @@ dof_id_type n_connected_components(const MeshBase & mesh,
   // All nodes in a set here are connected (at least indirectly) to
   // all other nodes in the same set, but have not yet been discovered
   // to be connected to nodes in other sets.
-  std::vector<std::unordered_set<const Node *>> components;
+  //
+  // Using an unordered_set of ids rather than a set of pointers seems
+  // to be roughly 150% faster?
+  // typedef const Node * node_entry_type
+  typedef dof_id_type node_entry_type;
+  std::vector<std::unordered_set<node_entry_type>> components;
 
   // With a typical mesh with few components and somewhat-contiguous
   // ordering, vector performance should be fine.  With a mesh with
   // many components or completely scrambled ordering, performance
   // can be a disaster.
-  auto find_component = [&components](const Node * n) {
-    std::unordered_set<const Node *> * component = nullptr;
-
+  auto find_component = [&components](node_entry_type n) {
     for (auto & c: components)
       if (c.find(n) != c.end())
-        {
-          libmesh_assert(component == nullptr);
-          component = &c;
-        }
+        return &c;
 
-    return component;
+    return (std::unordered_set<node_entry_type> *)(nullptr);
   };
 
   auto add_to_component =
     [&find_component]
-    (std::unordered_set<const Node *> & component, const Node * n) {
-
-    auto current_component = find_component(n);
-    // We may already know we're in the desired component
-    if (&component == current_component)
+    (std::unordered_set<node_entry_type> & component, node_entry_type n) {
+    // We may already be in the desired component
+    if (component.find(n) != component.end())
       return;
 
+    auto current_component = find_component(n);
+
+    // Didn't we *just* check this?
+    libmesh_assert (&component != current_component);
+
     // If we're unknown, we should be in the desired component
-    else if (!current_component)
+    if (!current_component)
       component.insert(n);
 
     // If we think we're in another component, it should actually be
     // part of the desired component
     else
       {
-        component.merge(*current_component);
+        // Merge the component likely to be smaller into the one
+        // likely to be larger - this is orders of magnitude faster
+        // than the other way around!
+        current_component->merge(component);
+        current_component->swap(component);
         libmesh_assert(current_component->empty());
       }
   };
@@ -910,7 +917,8 @@ dof_id_type n_connected_components(const MeshBase & mesh,
 
   for (const auto & elem : mesh.element_ptr_range())
     {
-      const Node * first_node = elem->node_ptr(0);
+      // const node_entry_type first_node = elem->node_ptr(0);
+      const node_entry_type first_node = elem->node_id(0);
 
       auto component = find_component(first_node);
 
@@ -924,11 +932,13 @@ dof_id_type n_connected_components(const MeshBase & mesh,
       if (!component)
         component = &components.emplace_back();
 
-      for (const Node & n : elem->node_ref_range())
+      for (const Node & node : elem->node_ref_range())
         {
-          add_to_component(*component, &n);
+          // const node_entry_type n = &node;
+          const node_entry_type n = node.id();
+          add_to_component(*component, n);
 
-          auto it = constraint_rows.find(&n);
+          auto it = constraint_rows.find(&node);
           if (it == constraint_rows.end())
             continue;
 
@@ -945,7 +955,8 @@ dof_id_type n_connected_components(const MeshBase & mesh,
               const Node * spline_node =
                 spline_elem->node_ptr(pr.second);
 
-              add_to_component(*component, spline_node);
+              // add_to_component(*component, spline_node);
+              add_to_component(*component, spline_node->id());
             }
         }
     }
