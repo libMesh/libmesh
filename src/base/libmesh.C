@@ -772,11 +772,18 @@ LibMeshInit::~LibMeshInit()
   // Ask the \p ReferenceCounter to print its reference count
   // information, if printing is enabled.  This allows us to find
   // memory leaks.
-  ReferenceCounter::print_info ();
+  //
+  // If we don't have any leaks, we'll print to cout, only if we've
+  // been told to.  If we do, we'll print to cerr, to make sure the
+  // user doesn't miss a leak that's only on a processor other than 0.
+  if (ReferenceCounter::n_objects() == 0)
+    ReferenceCounter::print_info ();
 
   // Scream specifically if we detect a memory leak
   if (ReferenceCounter::n_objects() != 0)
     {
+      ReferenceCounter::print_info (libMesh::err);
+
       libMesh::err << "Memory leak detected!"
                    << std::endl;
 
