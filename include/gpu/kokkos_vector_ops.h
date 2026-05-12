@@ -44,6 +44,85 @@ vector_semantic_type_t<VectorLike> copy_vector(const VectorLike & v)
   return copy_vector<vector_semantic_type_t<VectorLike>>(v);
 }
 
+namespace detail
+{
+
+template <typename LeftVector, typename RightVector>
+LIBMESH_DEVICE_INLINE
+void assign_vector_components(LeftVector & left, const RightVector & right)
+{
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    vector_set_component(left, component, vector_get_component(right, component));
+}
+
+template <typename LeftVector, typename RightVector>
+LIBMESH_DEVICE_INLINE
+void add_vector_components(LeftVector & left, const RightVector & right)
+{
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    vector_set_component(left,
+                         component,
+                         vector_get_component(left, component) + vector_get_component(right, component));
+}
+
+template <typename LeftVector, typename RightVector, typename Scalar>
+LIBMESH_DEVICE_INLINE
+void add_scaled_vector_components(LeftVector & left, const RightVector & right, const Scalar & factor)
+{
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    vector_set_component(left,
+                         component,
+                         vector_get_component(left, component) +
+                           factor * vector_get_component(right, component));
+}
+
+template <typename LeftVector, typename RightVector>
+LIBMESH_DEVICE_INLINE
+void subtract_vector_components(LeftVector & left, const RightVector & right)
+{
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    vector_set_component(left,
+                         component,
+                         vector_get_component(left, component) - vector_get_component(right, component));
+}
+
+template <typename LeftVector, typename RightVector, typename Scalar>
+LIBMESH_DEVICE_INLINE
+void subtract_scaled_vector_components(LeftVector & left, const RightVector & right, const Scalar & factor)
+{
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    vector_set_component(left,
+                         component,
+                         vector_get_component(left, component) -
+                           factor * vector_get_component(right, component));
+}
+
+template <typename VectorLike>
+LIBMESH_DEVICE_INLINE
+void zero_vector_components(VectorLike & v)
+{
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    vector_set_component(v, component, vector_value_type_t<VectorLike>(0));
+}
+
+template <typename VectorLike, typename Scalar>
+LIBMESH_DEVICE_INLINE
+void scale_vector_components(VectorLike & v, const Scalar & alpha)
+{
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    vector_set_component(v, component, vector_get_component(v, component) * alpha);
+}
+
+template <typename VectorLike, typename Scalar>
+LIBMESH_DEVICE_INLINE
+void divide_vector_components(VectorLike & v, const Scalar & alpha)
+{
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    vector_set_component(v, component, vector_get_component(v, component) / alpha);
+}
+
+} // namespace detail
+
 // Reductions and predicates
 
 template <typename LeftVector, typename RightVector>
@@ -453,8 +532,7 @@ template <typename RightVector>
 LIBMESH_DEVICE_INLINE
 void vector_ref<ViewType>::assign(const RightVector & right)
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(*this, component, vector_get_component(right, component));
+  detail::assign_vector_components(*this, right);
 }
 
 template <typename ViewType>
@@ -462,10 +540,7 @@ template <typename RightVector>
 LIBMESH_DEVICE_INLINE
 void vector_ref<ViewType>::add(const RightVector & right)
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(*this,
-                         component,
-                         vector_get_component(*this, component) + vector_get_component(right, component));
+  detail::add_vector_components(*this, right);
 }
 
 template <typename ViewType>
@@ -473,11 +548,7 @@ template <typename RightVector>
 LIBMESH_DEVICE_INLINE
 void vector_ref<ViewType>::add_scaled(const RightVector & right, const value_type & factor)
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(*this,
-                         component,
-                         vector_get_component(*this, component) +
-                           factor * vector_get_component(right, component));
+  detail::add_scaled_vector_components(*this, right, factor);
 }
 
 template <typename ViewType>
@@ -485,10 +556,7 @@ template <typename RightVector>
 LIBMESH_DEVICE_INLINE
 void vector_ref<ViewType>::subtract(const RightVector & right)
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(*this,
-                         component,
-                         vector_get_component(*this, component) - vector_get_component(right, component));
+  detail::subtract_vector_components(*this, right);
 }
 
 template <typename ViewType>
@@ -496,19 +564,14 @@ template <typename RightVector>
 LIBMESH_DEVICE_INLINE
 void vector_ref<ViewType>::subtract_scaled(const RightVector & right, const value_type & factor)
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(*this,
-                         component,
-                         vector_get_component(*this, component) -
-                           factor * vector_get_component(right, component));
+  detail::subtract_scaled_vector_components(*this, right, factor);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 void vector_ref<ViewType>::zero()
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(*this, component, value_type(0));
+  detail::zero_vector_components(*this);
 }
 
 template <typename ViewType>
@@ -668,11 +731,7 @@ auto operator+=(LeftVector & left, const RightVector & right)
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       LeftVector &>
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(left,
-                         component,
-                         vector_get_component(left, component) + vector_get_component(right, component));
-
+  detail::add_vector_components(left, right);
   return left;
 }
 
@@ -683,11 +742,7 @@ auto operator-=(LeftVector & left, const RightVector & right)
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       LeftVector &>
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(left,
-                         component,
-                         vector_get_component(left, component) - vector_get_component(right, component));
-
+  detail::subtract_vector_components(left, right);
   return left;
 }
 
@@ -698,9 +753,7 @@ auto operator*=(LeftVector & left, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       LeftVector &>
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(left, component, vector_get_component(left, component) * alpha);
-
+  detail::scale_vector_components(left, alpha);
   return left;
 }
 
@@ -711,9 +764,7 @@ auto operator/=(LeftVector & left, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       LeftVector &>
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(left, component, vector_get_component(left, component) / alpha);
-
+  detail::divide_vector_components(left, alpha);
   return left;
 }
 
