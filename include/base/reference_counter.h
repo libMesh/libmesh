@@ -87,7 +87,7 @@ public:
 
   /**
    * Methods to enable/disable the reference counter output
-   * from print_info()
+   * from print_info().  Enabled by default.
    */
   static void enable_print_counter_info();
   static void disable_print_counter_info();
