@@ -384,11 +384,12 @@ TESTS += run_unit_tests.sh
 endif
 
 # Compile .K translation units with the Kokkos device compiler.
-# $(MPI_INCLUDES) is needed because KOKKOS_CXX may be nvcc/hipcc
-# instead of the MPI compiler wrapper, so mpi.h won't be found implicitly.
+# If KOKKOS_CXX is not the MPI wrapper, configure populates
+# $(KOKKOS_MPI_CPPFLAGS) from the wrapper's compile flags so mpi.h and
+# any wrapper-provided defines remain visible.
 .K.o:
 	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(MPI_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
 	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
 	  -c $< -o $@
 

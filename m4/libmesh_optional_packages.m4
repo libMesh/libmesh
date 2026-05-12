@@ -971,6 +971,86 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:--L$KOKKOS_DIR/lib}"
         KOKKOS_LIBS="${KOKKOS_LIBS:--lkokkoscore}"
 
+        dnl If KOKKOS_CXX differs from the main compiler, it may not be the MPI
+        dnl wrapper and thus may need the wrapper's compile flags explicitly in
+        dnl order to find mpi.h.  Query the primary CXX wrapper for compile-time
+        dnl flags and fall back to MPI_INCLUDES when probing is unavailable.
+        KOKKOS_MPI_CPPFLAGS=""
+        AS_IF([test "x$enablempi" = "xyes" && test "x$KOKKOS_CXX" != "x$CXX"],
+          [
+            AC_MSG_CHECKING([for MPI compile flags usable with KOKKOS_CXX])
+            KOKKOS_MPI_CPPFLAGS=`$CXX -showme:compile 2>/dev/null`
+            AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
+              [KOKKOS_MPI_CPPFLAGS=`$CXX -compile_info 2>/dev/null`])
+            AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
+              [KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^[^ ]* //'`])
+            AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
+              [KOKKOS_MPI_CPPFLAGS="$MPI_INCLUDES"])
+            AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
+              [AC_MSG_RESULT([not found])],
+              [AC_MSG_RESULT([$KOKKOS_MPI_CPPFLAGS])])
+          ])
+
+        dnl Fail configure early if the chosen Kokkos compiler/flags/libs cannot
+        dnl actually compile and link a minimal Kokkos program.
+        AC_MSG_CHECKING([whether the Kokkos compiler configuration works])
+        libmesh_save_CXX="$CXX"
+        libmesh_save_CPPFLAGS="$CPPFLAGS"
+        libmesh_save_CXXFLAGS="$CXXFLAGS"
+        libmesh_save_LDFLAGS="$LDFLAGS"
+        libmesh_save_LIBS="$LIBS"
+
+        CXX="$KOKKOS_CXX"
+        CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
+        CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
+        LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
+        LIBS="$LIBS $KOKKOS_LIBS"
+
+        AS_IF([test "x$enablempi" = "xyes"],
+          [
+            LDFLAGS="$LDFLAGS $MPI_LDFLAGS"
+            LIBS="$LIBS $MPI_LIBS"
+            AC_LINK_IFELSE(
+              [AC_LANG_SOURCE([[
+#include <mpi.h>
+#include <Kokkos_Core.hpp>
+int main(int argc, char ** argv)
+{
+  MPI_Init(&argc, &argv);
+  Kokkos::initialize(argc, argv);
+  Kokkos::finalize();
+  MPI_Finalize();
+  return 0;
+}
+]])],
+              [kokkos_config_works=yes],
+              [kokkos_config_works=no])
+          ],
+          [
+            AC_LINK_IFELSE(
+              [AC_LANG_SOURCE([[
+#include <Kokkos_Core.hpp>
+int main(int argc, char ** argv)
+{
+  Kokkos::initialize(argc, argv);
+  Kokkos::finalize();
+  return 0;
+}
+]])],
+              [kokkos_config_works=yes],
+              [kokkos_config_works=no])
+          ])
+
+        CXX="$libmesh_save_CXX"
+        CPPFLAGS="$libmesh_save_CPPFLAGS"
+        CXXFLAGS="$libmesh_save_CXXFLAGS"
+        LDFLAGS="$libmesh_save_LDFLAGS"
+        LIBS="$libmesh_save_LIBS"
+
+        AS_IF([test "x$kokkos_config_works" = "xyes"],
+          [AC_MSG_RESULT([yes])],
+          [AC_MSG_ERROR([configured Kokkos compiler/flags failed to compile and link a minimal test program])])
+
         AC_DEFINE([HAVE_KOKKOS], [1],
                   [Define if Kokkos support is enabled in libMesh])
         AC_MSG_RESULT(<<< Configuring library with Kokkos support >>>)
@@ -987,6 +1067,7 @@ AC_SUBST([KOKKOS_CPPFLAGS])
 AC_SUBST([KOKKOS_CXXFLAGS])
 AC_SUBST([KOKKOS_LDFLAGS])
 AC_SUBST([KOKKOS_LIBS])
+AC_SUBST([KOKKOS_MPI_CPPFLAGS])
 AM_CONDITIONAL(LIBMESH_ENABLE_KOKKOS, test x$enablekokkos = xyes)
 # -------------------------------------------------------------
 
