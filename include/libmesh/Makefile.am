@@ -82,6 +82,11 @@ BUILT_SOURCES = \
         fe_lagrange_shape_1D.h \
         fe_macro.h \
         fe_map.h \
+        fe_reference_element_traits.h \
+        fe_serendipity_lagrange.h \
+        fe_shape_traits.h \
+        fe_simplex_lagrange.h \
+        fe_tensor_product_lagrange.h \
         fe_transformation_base.h \
         fe_type.h \
         fe_xyz_map.h \
@@ -174,7 +179,18 @@ BUILT_SOURCES = \
         overlap_coupling.h \
         point_neighbor_coupling.h \
         sibling_coupling.h \
+        kokkos_fe_base.h \
+        kokkos_fe_evaluator.h \
+        kokkos_fe_face_map.h \
+        kokkos_fe_lagrange_1d.h \
+        kokkos_fe_lagrange_2d.h \
+        kokkos_fe_lagrange_3d.h \
+        kokkos_fe_map.h \
+        kokkos_fe_monomial.h \
+        kokkos_fe_shape_dispatch.h \
+        kokkos_fe_types.h \
         kokkos_linalg_base.h \
+        kokkos_quadrature.h \
         kokkos_storage.h \
         kokkos_storage_policy.h \
         kokkos_tensor_ops.h \
@@ -347,6 +363,7 @@ BUILT_SOURCES = \
         quadrature_conical.h \
         quadrature_gauss.h \
         quadrature_gauss_lobatto.h \
+        quadrature_gauss_rules.h \
         quadrature_gm.h \
         quadrature_grid.h \
         quadrature_jacobi.h \
@@ -853,6 +870,21 @@ fe_macro.h: $(top_srcdir)/include/fe/fe_macro.h
 fe_map.h: $(top_srcdir)/include/fe/fe_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+fe_reference_element_traits.h: $(top_srcdir)/include/fe/fe_reference_element_traits.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_serendipity_lagrange.h: $(top_srcdir)/include/fe/fe_serendipity_lagrange.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_shape_traits.h: $(top_srcdir)/include/fe/fe_shape_traits.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_simplex_lagrange.h: $(top_srcdir)/include/fe/fe_simplex_lagrange.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_tensor_product_lagrange.h: $(top_srcdir)/include/fe/fe_tensor_product_lagrange.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 fe_transformation_base.h: $(top_srcdir)/include/fe/fe_transformation_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1129,7 +1161,40 @@ point_neighbor_coupling.h: $(top_srcdir)/include/ghosting/point_neighbor_couplin
 sibling_coupling.h: $(top_srcdir)/include/ghosting/sibling_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+kokkos_fe_base.h: $(top_srcdir)/include/gpu/kokkos_fe_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_fe_evaluator.h: $(top_srcdir)/include/gpu/kokkos_fe_evaluator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_fe_face_map.h: $(top_srcdir)/include/gpu/kokkos_fe_face_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_fe_lagrange_1d.h: $(top_srcdir)/include/gpu/kokkos_fe_lagrange_1d.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_fe_lagrange_2d.h: $(top_srcdir)/include/gpu/kokkos_fe_lagrange_2d.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_fe_lagrange_3d.h: $(top_srcdir)/include/gpu/kokkos_fe_lagrange_3d.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_fe_map.h: $(top_srcdir)/include/gpu/kokkos_fe_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_fe_monomial.h: $(top_srcdir)/include/gpu/kokkos_fe_monomial.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_fe_shape_dispatch.h: $(top_srcdir)/include/gpu/kokkos_fe_shape_dispatch.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_fe_types.h: $(top_srcdir)/include/gpu/kokkos_fe_types.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 kokkos_linalg_base.h: $(top_srcdir)/include/gpu/kokkos_linalg_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_quadrature.h: $(top_srcdir)/include/gpu/kokkos_quadrature.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 kokkos_storage.h: $(top_srcdir)/include/gpu/kokkos_storage.h
@@ -1646,6 +1711,9 @@ quadrature_gauss.h: $(top_srcdir)/include/quadrature/quadrature_gauss.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_gauss_lobatto.h: $(top_srcdir)/include/quadrature/quadrature_gauss_lobatto.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+quadrature_gauss_rules.h: $(top_srcdir)/include/quadrature/quadrature_gauss_rules.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 quadrature_gm.h: $(top_srcdir)/include/quadrature/quadrature_gm.h

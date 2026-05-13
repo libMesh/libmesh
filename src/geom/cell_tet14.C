@@ -19,6 +19,7 @@
 // Local includes
 #include "libmesh/cell_tet14.h"
 #include "libmesh/edge_edge3.h"
+#include "libmesh/fe_reference_element_traits.h"
 #include "libmesh/face_tri7.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
@@ -41,24 +42,6 @@ namespace libMesh
 const int Tet14::num_nodes;
 const int Tet14::nodes_per_side;
 const int Tet14::nodes_per_edge;
-
-const unsigned int Tet14::side_nodes_map[Tet14::num_sides][Tet14::nodes_per_side] =
-  {
-    {0, 2, 1, 6, 5, 4, 10}, // Side 0
-    {0, 1, 3, 4, 8, 7, 11}, // Side 1
-    {1, 2, 3, 5, 9, 8, 12}, // Side 2
-    {2, 0, 3, 6, 7, 9, 13}  // Side 3
-  };
-
-const unsigned int Tet14::edge_nodes_map[Tet14::num_edges][Tet14::nodes_per_edge] =
-  {
-    {0, 1, 4}, // Edge 0
-    {1, 2, 5}, // Edge 1
-    {0, 2, 6}, // Edge 2
-    {0, 3, 7}, // Edge 3
-    {1, 3, 8}, // Edge 4
-    {2, 3, 9}  // Edge 5
-  };
 
 // ------------------------------------------------------------
 // Tet14 class member functions
@@ -88,32 +71,44 @@ bool Tet14::is_node_on_side(const unsigned int n,
                             const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  return std::find(std::begin(side_nodes_map[s]),
-                   std::end(side_nodes_map[s]),
-                   n) != std::end(side_nodes_map[s]);
+  const auto count = side_node_count_or_zero(this->type(), s);
+  for (unsigned int i = 0; i != count; ++i)
+    if (this->local_side_node(s, i) == n)
+      return true;
+  return false;
 }
 
 std::vector<unsigned>
 Tet14::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
+  const auto count = side_node_count_or_zero(this->type(), s);
+  std::vector<unsigned> nodes(count);
+  for (unsigned int i = 0; i != count; ++i)
+    nodes[i] = this->local_side_node(s, i);
+  return nodes;
 }
 
 std::vector<unsigned>
 Tet14::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
-  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
+  const auto count = edge_node_count_or_zero(this->type(), e);
+  std::vector<unsigned> nodes(count);
+  for (unsigned int i = 0; i != count; ++i)
+    nodes[i] = this->local_edge_node(e, i);
+  return nodes;
 }
 
 bool Tet14::is_node_on_edge(const unsigned int n,
                             const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  return std::find(std::begin(edge_nodes_map[e]),
-                   std::end(edge_nodes_map[e]),
-                   n) != std::end(edge_nodes_map[e]);
+  const auto count = edge_node_count_or_zero(this->type(), e);
+  for (unsigned int i = 0; i != count; ++i)
+    if (this->local_edge_node(e, i) == n)
+      return true;
+  return false;
 }
 
 
@@ -210,7 +205,10 @@ unsigned int Tet14::local_side_node(unsigned int side,
   libmesh_assert_less (side, this->n_sides());
   libmesh_assert_less (side_node, Tet14::nodes_per_side);
 
-  return Tet14::side_nodes_map[side][side_node];
+  unsigned int node = invalid_uint;
+  libmesh_error_msg_if(!try_local_side_node(this->type(), side, side_node, node),
+                       "Tet14::local_side_node(): unsupported shared side-node lookup");
+  return node;
 }
 
 
@@ -221,7 +219,10 @@ unsigned int Tet14::local_edge_node(unsigned int edge,
   libmesh_assert_less (edge, this->n_edges());
   libmesh_assert_less (edge_node, Tet14::nodes_per_edge);
 
-  return Tet14::edge_nodes_map[edge][edge_node];
+  unsigned int node = invalid_uint;
+  libmesh_error_msg_if(!try_local_edge_node(this->type(), edge, edge_node, node),
+                       "Tet14::local_edge_node(): unsupported shared edge-node lookup");
+  return node;
 }
 
 

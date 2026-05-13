@@ -514,20 +514,18 @@ auto det(const TensorLike & T_in)
   return T_in.det();
 }
 
-template <typename ResultTensor, typename TensorLike>
+template <typename ResultTensor = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, ResultTensor>
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>,
+                      std::conditional_t<std::is_void<ResultTensor>::value,
+                                         tensor_semantic_type_t<TensorLike>,
+                                         ResultTensor>>
 {
-  return detail::inverse<ResultTensor>(T_in, dim);
-}
-
-template <typename TensorLike>
-LIBMESH_DEVICE_INLINE
-auto inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, tensor_semantic_type_t<TensorLike>>
-{
-  return inverse<tensor_semantic_type_t<TensorLike>>(T_in, dim);
+  using output_type = std::conditional_t<std::is_void<ResultTensor>::value,
+                                         tensor_semantic_type_t<TensorLike>,
+                                         ResultTensor>;
+  return detail::inverse<output_type>(T_in, dim);
 }
 
 template <typename ResultVector, typename TensorLike>

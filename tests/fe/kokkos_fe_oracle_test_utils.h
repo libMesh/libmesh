@@ -6,6 +6,7 @@
 #include "gpu/kokkos_fe_map.h"
 #include "gpu/kokkos_fe_shape_dispatch.h"
 #include "gpu/kokkos_fe_types.h"
+#include "gpu/kokkos_storage_policy.h"
 
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
@@ -249,9 +250,7 @@ build_reference_fixture(libMesh::ElemType elem_type)
 
   for (unsigned int i = 0; i < fixture.elem->n_nodes(); ++i)
   {
-    libMesh::Point master;
-    libmesh_error_msg_if(!libMesh::try_reference_node(elem_type, i, master),
-                         "build_reference_fixture(): unsupported reference-node lookup");
+    const libMesh::Point master = fixture.elem->master_point(i);
     const libMesh::Real xi = master(0);
     const libMesh::Real eta = master(1);
     const libMesh::Real zeta = master(2);

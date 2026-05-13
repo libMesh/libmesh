@@ -146,13 +146,13 @@ public:
   virtual Order default_order() const override;
 
   /**
-   * \returns \p Tet10::side_nodes_map[side][side_node] after doing some range checking.
+   * \returns The requested local side node after doing some range checking.
    */
   virtual unsigned int local_side_node(unsigned int side,
                                        unsigned int side_node) const override;
 
   /**
-   * \returns \p Tet10::edge_nodes_map[edge][edge_node] after doing some range checking.
+   * \returns The requested local edge node after doing some range checking.
    */
   virtual unsigned int local_edge_node(unsigned int edge,
                                        unsigned int edge_node) const override;
@@ -216,18 +216,6 @@ public:
   static const int num_nodes = 10;
   static const int nodes_per_side = 6;
   static const int nodes_per_edge = 3;
-
-  /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
-   */
-  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
-
-  /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
-   */
-  static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
 
   /**
    * A specialization for computing the volume of a Tet10.

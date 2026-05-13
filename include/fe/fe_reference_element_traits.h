@@ -5,6 +5,7 @@
 #define LIBMESH_FE_REFERENCE_ELEMENT_TRAITS_H
 
 #include "libmesh/enum_elem_type.h"
+#include "libmesh/libmesh.h"
 #include "libmesh/libmesh_device.h"
 #include "libmesh/point.h"
 
@@ -13,6 +14,7 @@ namespace libMesh
 
 constexpr unsigned int edge2_side_node_counts[2] = {1, 1};
 constexpr unsigned int edge3_side_node_counts[2] = {1, 1};
+constexpr unsigned int edge4_side_node_counts[2] = {1, 1};
 
 constexpr unsigned int tri3_side_node_counts[3] = {2, 2, 2};
 constexpr unsigned int tri6_side_node_counts[3] = {3, 3, 3};
@@ -40,6 +42,18 @@ constexpr unsigned int pyramid5_side_node_counts[5]  = {3, 3, 3, 3, 4};
 constexpr unsigned int pyramid13_side_node_counts[5] = {6, 6, 6, 6, 8};
 constexpr unsigned int pyramid14_side_node_counts[5] = {6, 6, 6, 6, 9};
 constexpr unsigned int pyramid18_side_node_counts[5] = {7, 7, 7, 7, 9};
+
+constexpr unsigned int tet10_edge_node_counts[6]   = {3, 3, 3, 3, 3, 3};
+constexpr unsigned int tet14_edge_node_counts[6]   = {3, 3, 3, 3, 3, 3};
+constexpr unsigned int hex20_edge_node_counts[12]  = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+constexpr unsigned int hex27_edge_node_counts[12]  = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+constexpr unsigned int prism15_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
+constexpr unsigned int prism18_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
+constexpr unsigned int prism20_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
+constexpr unsigned int prism21_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
+constexpr unsigned int pyramid13_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
+constexpr unsigned int pyramid14_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
+constexpr unsigned int pyramid18_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
 
 constexpr unsigned int prism6_side_nodes[5][4] =
   {
@@ -233,6 +247,152 @@ constexpr unsigned int edge3_side_nodes[2][1] =
     {1}
   };
 
+constexpr unsigned int edge4_side_nodes[2][1] =
+  {
+    {0},
+    {1}
+  };
+
+constexpr unsigned int tet10_edge_nodes[6][3] =
+  {
+    {0, 1, 4},
+    {1, 2, 5},
+    {0, 2, 6},
+    {0, 3, 7},
+    {1, 3, 8},
+    {2, 3, 9}
+  };
+
+constexpr unsigned int tet14_edge_nodes[6][3] =
+  {
+    {0, 1, 4},
+    {1, 2, 5},
+    {0, 2, 6},
+    {0, 3, 7},
+    {1, 3, 8},
+    {2, 3, 9}
+  };
+
+constexpr unsigned int hex20_edge_nodes[12][3] =
+  {
+    {0, 1, 8},
+    {1, 2, 9},
+    {2, 3, 10},
+    {0, 3, 11},
+    {0, 4, 12},
+    {1, 5, 13},
+    {2, 6, 14},
+    {3, 7, 15},
+    {4, 5, 16},
+    {5, 6, 17},
+    {6, 7, 18},
+    {4, 7, 19}
+  };
+
+constexpr unsigned int hex27_edge_nodes[12][3] =
+  {
+    {0, 1, 8},
+    {1, 2, 9},
+    {2, 3, 10},
+    {0, 3, 11},
+    {0, 4, 12},
+    {1, 5, 13},
+    {2, 6, 14},
+    {3, 7, 15},
+    {4, 5, 16},
+    {5, 6, 17},
+    {6, 7, 18},
+    {4, 7, 19}
+  };
+
+constexpr unsigned int prism15_edge_nodes[9][3] =
+  {
+    {0, 1, 6},
+    {1, 2, 7},
+    {0, 2, 8},
+    {0, 3, 9},
+    {1, 4, 10},
+    {2, 5, 11},
+    {3, 4, 12},
+    {4, 5, 13},
+    {3, 5, 14}
+  };
+
+constexpr unsigned int prism18_edge_nodes[9][3] =
+  {
+    {0, 1, 6},
+    {1, 2, 7},
+    {0, 2, 8},
+    {0, 3, 9},
+    {1, 4, 10},
+    {2, 5, 11},
+    {3, 4, 12},
+    {4, 5, 13},
+    {3, 5, 14}
+  };
+
+constexpr unsigned int prism20_edge_nodes[9][3] =
+  {
+    {0, 1, 6},
+    {1, 2, 7},
+    {0, 2, 8},
+    {0, 3, 9},
+    {1, 4, 10},
+    {2, 5, 11},
+    {3, 4, 12},
+    {4, 5, 13},
+    {3, 5, 14}
+  };
+
+constexpr unsigned int prism21_edge_nodes[9][3] =
+  {
+    {0, 1, 6},
+    {1, 2, 7},
+    {0, 2, 8},
+    {0, 3, 9},
+    {1, 4, 10},
+    {2, 5, 11},
+    {3, 4, 12},
+    {4, 5, 13},
+    {3, 5, 14}
+  };
+
+constexpr unsigned int pyramid13_edge_nodes[8][3] =
+  {
+    {0, 1, 5},
+    {1, 2, 6},
+    {2, 3, 7},
+    {0, 3, 8},
+    {0, 4, 9},
+    {1, 4, 10},
+    {2, 4, 11},
+    {3, 4, 12}
+  };
+
+constexpr unsigned int pyramid14_edge_nodes[8][3] =
+  {
+    {0, 1, 5},
+    {1, 2, 6},
+    {2, 3, 7},
+    {0, 3, 8},
+    {0, 4, 9},
+    {1, 4, 10},
+    {2, 4, 11},
+    {3, 4, 12}
+  };
+
+constexpr unsigned int pyramid18_edge_nodes[8][3] =
+  {
+    {0, 1, 5},
+    {1, 2, 6},
+    {2, 3, 7},
+    {0, 3, 8},
+    {0, 4, 9},
+    {1, 4, 10},
+    {2, 4, 11},
+    {3, 4, 12}
+  };
+
 LIBMESH_DEVICE_INLINE bool
 requires_side_specific_topology(ElemType parent)
 {
@@ -387,17 +547,23 @@ side_node_count_or_zero(ElemType parent,
       return side < 2 ? edge2_side_node_counts[side] : 0;
     case EDGE3:
       return side < 2 ? edge3_side_node_counts[side] : 0;
+    case EDGE4:
+      return side < 2 ? edge4_side_node_counts[side] : 0;
     case TRI3:
+    case TRISHELL3:
       return side < 3 ? tri3_side_node_counts[side] : 0;
     case TRI6:
       return side < 3 ? tri6_side_node_counts[side] : 0;
     case TRI7:
       return side < 3 ? tri7_side_node_counts[side] : 0;
     case QUAD4:
+    case QUADSHELL4:
       return side < 4 ? quad4_side_node_counts[side] : 0;
     case QUAD8:
+    case QUADSHELL8:
       return side < 4 ? quad8_side_node_counts[side] : 0;
     case QUAD9:
+    case QUADSHELL9:
       return side < 4 ? quad9_side_node_counts[side] : 0;
     case TET4:
       return side < 4 ? tet4_side_node_counts[side] : 0;
@@ -434,6 +600,39 @@ side_node_count_or_zero(ElemType parent,
   }
 }
 
+LIBMESH_DEVICE_INLINE unsigned int
+edge_node_count_or_zero(ElemType parent,
+                        unsigned int edge)
+{
+  switch (parent)
+  {
+    case TET10:
+      return edge < 6 ? tet10_edge_node_counts[edge] : 0;
+    case TET14:
+      return edge < 6 ? tet14_edge_node_counts[edge] : 0;
+    case HEX20:
+      return edge < 12 ? hex20_edge_node_counts[edge] : 0;
+    case HEX27:
+      return edge < 12 ? hex27_edge_node_counts[edge] : 0;
+    case PRISM15:
+      return edge < 9 ? prism15_edge_node_counts[edge] : 0;
+    case PRISM18:
+      return edge < 9 ? prism18_edge_node_counts[edge] : 0;
+    case PRISM20:
+      return edge < 9 ? prism20_edge_node_counts[edge] : 0;
+    case PRISM21:
+      return edge < 9 ? prism21_edge_node_counts[edge] : 0;
+    case PYRAMID13:
+      return edge < 8 ? pyramid13_edge_node_counts[edge] : 0;
+    case PYRAMID14:
+      return edge < 8 ? pyramid14_edge_node_counts[edge] : 0;
+    case PYRAMID18:
+      return edge < 8 ? pyramid18_edge_node_counts[edge] : 0;
+    default:
+      return 0;
+  }
+}
+
 LIBMESH_DEVICE_INLINE bool
 try_local_side_node(ElemType parent,
                     unsigned int side,
@@ -452,7 +651,11 @@ try_local_side_node(ElemType parent,
     case EDGE3:
       node = edge3_side_nodes[side][side_node];
       return true;
+    case EDGE4:
+      node = edge4_side_nodes[side][side_node];
+      return true;
     case TRI3:
+    case TRISHELL3:
       node = tri3_side_nodes[side][side_node];
       return true;
     case TRI6:
@@ -462,12 +665,15 @@ try_local_side_node(ElemType parent,
       node = tri7_side_nodes[side][side_node];
       return true;
     case QUAD4:
+    case QUADSHELL4:
       node = quad4_side_nodes[side][side_node];
       return true;
     case QUAD8:
+    case QUADSHELL8:
       node = quad8_side_nodes[side][side_node];
       return true;
     case QUAD9:
+    case QUADSHELL9:
       node = quad9_side_nodes[side][side_node];
       return true;
     case TET4:
@@ -521,6 +727,56 @@ try_local_side_node(ElemType parent,
 }
 
 LIBMESH_DEVICE_INLINE bool
+try_local_edge_node(ElemType parent,
+                    unsigned int edge,
+                    unsigned int edge_node,
+                    unsigned int & node)
+{
+  const unsigned int count = edge_node_count_or_zero(parent, edge);
+  if (!count || edge_node >= count)
+    return false;
+
+  switch (parent)
+  {
+    case TET10:
+      node = tet10_edge_nodes[edge][edge_node];
+      return true;
+    case TET14:
+      node = tet14_edge_nodes[edge][edge_node];
+      return true;
+    case HEX20:
+      node = hex20_edge_nodes[edge][edge_node];
+      return true;
+    case HEX27:
+      node = hex27_edge_nodes[edge][edge_node];
+      return true;
+    case PRISM15:
+      node = prism15_edge_nodes[edge][edge_node];
+      return true;
+    case PRISM18:
+      node = prism18_edge_nodes[edge][edge_node];
+      return true;
+    case PRISM20:
+      node = prism20_edge_nodes[edge][edge_node];
+      return true;
+    case PRISM21:
+      node = prism21_edge_nodes[edge][edge_node];
+      return true;
+    case PYRAMID13:
+      node = pyramid13_edge_nodes[edge][edge_node];
+      return true;
+    case PYRAMID14:
+      node = pyramid14_edge_nodes[edge][edge_node];
+      return true;
+    case PYRAMID18:
+      node = pyramid18_edge_nodes[edge][edge_node];
+      return true;
+    default:
+      return false;
+  }
+}
+
+LIBMESH_DEVICE_INLINE bool
 try_reference_node(ElemType type,
                    unsigned int node,
                    Point & pt)
@@ -529,6 +785,7 @@ try_reference_node(ElemType type,
   {
     case EDGE2:
     case EDGE3:
+    case EDGE4:
       switch (node)
       {
         case 0:
@@ -541,6 +798,18 @@ try_reference_node(ElemType type,
           if (type == EDGE3)
           {
             pt = Point(0.0);
+            return true;
+          }
+          if (type == EDGE4)
+          {
+            pt = Point(-1. / 3.);
+            return true;
+          }
+          return false;
+        case 3:
+          if (type == EDGE4)
+          {
+            pt = Point(1. / 3.);
             return true;
           }
           return false;
@@ -807,88 +1076,274 @@ try_reference_node(ElemType type,
           return false;
       }
 
+    case PYRAMID5:
     case PYRAMID13:
     case PYRAMID14:
-      switch (node)
-      {
-        case 9:
-          pt = Point(-0.5, -0.5, 0.5);
-          return true;
-        case 10:
-          pt = Point(0.5, -0.5, 0.5);
-          return true;
-        case 11:
-          pt = Point(0.5, 0.5, 0.5);
-          return true;
-        case 12:
-          pt = Point(-0.5, 0.5, 0.5);
-          return true;
-        default:
-          return false;
-      }
-
     case PYRAMID18:
       switch (node)
       {
+        case 0:
+          pt = Point(-1.0, -1.0, 0.0);
+          return true;
+        case 1:
+          pt = Point(1.0, -1.0, 0.0);
+          return true;
+        case 2:
+          pt = Point(1.0, 1.0, 0.0);
+          return true;
+        case 3:
+          pt = Point(-1.0, 1.0, 0.0);
+          return true;
+        case 4:
+          pt = Point(0.0, 0.0, 1.0);
+          return true;
+        case 5:
+          pt = Point(0.0, -1.0, 0.0);
+          return true;
+        case 6:
+          pt = Point(1.0, 0.0, 0.0);
+          return true;
+        case 7:
+          pt = Point(0.0, 1.0, 0.0);
+          return true;
+        case 8:
+          pt = Point(-1.0, 0.0, 0.0);
+          return true;
         case 9:
-          pt = Point(-0.5, -0.5, 0.5);
-          return true;
+          if (type == PYRAMID13 || type == PYRAMID14 || type == PYRAMID18)
+          {
+            pt = Point(-0.5, -0.5, 0.5);
+            return true;
+          }
+          return false;
         case 10:
-          pt = Point(0.5, -0.5, 0.5);
-          return true;
+          if (type == PYRAMID13 || type == PYRAMID14 || type == PYRAMID18)
+          {
+            pt = Point(0.5, -0.5, 0.5);
+            return true;
+          }
+          return false;
         case 11:
-          pt = Point(0.5, 0.5, 0.5);
-          return true;
+          if (type == PYRAMID13 || type == PYRAMID14 || type == PYRAMID18)
+          {
+            pt = Point(0.5, 0.5, 0.5);
+            return true;
+          }
+          return false;
         case 12:
-          pt = Point(-0.5, 0.5, 0.5);
-          return true;
+          if (type == PYRAMID13 || type == PYRAMID14 || type == PYRAMID18)
+          {
+            pt = Point(-0.5, 0.5, 0.5);
+            return true;
+          }
+          return false;
+        case 13:
+          if (type == PYRAMID14 || type == PYRAMID18)
+          {
+            pt = Point(0.0, 0.0, 0.0);
+            return true;
+          }
+          return false;
         case 14:
-          pt = Point(-2. / 3., 0.0, 1. / 3.);
-          return true;
+          if (type == PYRAMID18)
+          {
+            pt = Point(-2. / 3., 0.0, 1. / 3.);
+            return true;
+          }
+          return false;
         case 15:
-          pt = Point(0.0, 2. / 3., 1. / 3.);
-          return true;
+          if (type == PYRAMID18)
+          {
+            pt = Point(0.0, 2. / 3., 1. / 3.);
+            return true;
+          }
+          return false;
         case 16:
-          pt = Point(2. / 3., 0.0, 1. / 3.);
-          return true;
+          if (type == PYRAMID18)
+          {
+            pt = Point(2. / 3., 0.0, 1. / 3.);
+            return true;
+          }
+          return false;
         case 17:
-          pt = Point(0.0, -2. / 3., 1. / 3.);
-          return true;
+          if (type == PYRAMID18)
+          {
+            pt = Point(0.0, -2. / 3., 1. / 3.);
+            return true;
+          }
+          return false;
         default:
           return false;
       }
 
+    case PRISM6:
+    case PRISM15:
+    case PRISM18:
     case PRISM20:
-      switch (node)
-      {
-        case 18:
-          pt = Point(1. / 3., 1. / 3., -1.0);
-          return true;
-        case 19:
-          pt = Point(1. / 3., 1. / 3., 1.0);
-          return true;
-        default:
-          return false;
-      }
-
     case PRISM21:
       switch (node)
       {
+        case 0:
+          pt = Point(0.0, 0.0, -1.0);
+          return true;
+        case 1:
+          pt = Point(1.0, 0.0, -1.0);
+          return true;
+        case 2:
+          pt = Point(0.0, 1.0, -1.0);
+          return true;
+        case 3:
+          pt = Point(0.0, 0.0, 1.0);
+          return true;
+        case 4:
+          pt = Point(1.0, 0.0, 1.0);
+          return true;
+        case 5:
+          pt = Point(0.0, 1.0, 1.0);
+          return true;
+        case 6:
+          if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.5, 0.0, -1.0);
+            return true;
+          }
+          return false;
+        case 7:
+          if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.5, 0.5, -1.0);
+            return true;
+          }
+          return false;
+        case 8:
+          if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.0, 0.5, -1.0);
+            return true;
+          }
+          return false;
+        case 9:
+          if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.0, 0.0, 0.0);
+            return true;
+          }
+          return false;
+        case 10:
+          if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(1.0, 0.0, 0.0);
+            return true;
+          }
+          return false;
+        case 11:
+          if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.0, 1.0, 0.0);
+            return true;
+          }
+          return false;
+        case 12:
+          if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.5, 0.0, 1.0);
+            return true;
+          }
+          return false;
+        case 13:
+          if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.5, 0.5, 1.0);
+            return true;
+          }
+          return false;
+        case 14:
+          if (type == PRISM15 || type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.0, 0.5, 1.0);
+            return true;
+          }
+          return false;
+        case 15:
+          if (type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.5, 0.0, 0.0);
+            return true;
+          }
+          return false;
+        case 16:
+          if (type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.5, 0.5, 0.0);
+            return true;
+          }
+          return false;
+        case 17:
+          if (type == PRISM18 || type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(0.0, 0.5, 0.0);
+            return true;
+          }
+          return false;
         case 18:
-          pt = Point(1. / 3., 1. / 3., -1.0);
-          return true;
+          if (type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(1. / 3., 1. / 3., -1.0);
+            return true;
+          }
+          return false;
         case 19:
-          pt = Point(1. / 3., 1. / 3., 1.0);
-          return true;
+          if (type == PRISM20 || type == PRISM21)
+          {
+            pt = Point(1. / 3., 1. / 3., 1.0);
+            return true;
+          }
+          return false;
         case 20:
-          pt = Point(1. / 3., 1. / 3., 0.0);
-          return true;
+          if (type == PRISM21)
+          {
+            pt = Point(1. / 3., 1. / 3., 0.0);
+            return true;
+          }
+          return false;
         default:
           return false;
       }
 
     default:
       return false;
+  }
+}
+
+LIBMESH_DEVICE_INLINE bool
+try_refspace_node(ElemType type,
+                  unsigned int node,
+                  Point & pt)
+{
+  switch (type)
+  {
+    case NODEELEM:
+      if (!node)
+      {
+        pt = Point(0.0, 0.0, 0.0);
+        return true;
+      }
+      return false;
+
+    case TRISHELL3:
+      return try_reference_node(TRI3, node, pt);
+
+    case QUADSHELL4:
+      return try_reference_node(QUAD4, node, pt);
+
+    case QUADSHELL8:
+      return try_reference_node(QUAD8, node, pt);
+
+    case QUADSHELL9:
+      return try_reference_node(QUAD9, node, pt);
+
+    default:
+      return try_reference_node(type, node, pt);
   }
 }
 

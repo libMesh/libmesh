@@ -358,7 +358,7 @@ test_support_contract()
     { { libMesh::LAGRANGE, libMesh::HEX27,     libMesh::SECOND   }, true  },
     { { libMesh::LAGRANGE, libMesh::NODEELEM,  libMesh::CONSTANT }, false },
     { { libMesh::LAGRANGE, libMesh::NODEELEM,  libMesh::FIRST    }, false },
-    { { libMesh::LAGRANGE, libMesh::EDGE4,     libMesh::THIRD    }, false },
+    { { libMesh::LAGRANGE, libMesh::EDGE4,     libMesh::THIRD    }, true  },
     { { libMesh::LAGRANGE, libMesh::TRI7,      libMesh::THIRD    }, false },
     { { libMesh::LAGRANGE, libMesh::TET14,     libMesh::THIRD    }, false },
     { { libMesh::LAGRANGE, libMesh::PRISM6,    libMesh::FIRST    }, false },

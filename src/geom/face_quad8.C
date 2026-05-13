@@ -17,6 +17,7 @@
 
 // Local includes
 #include "libmesh/edge_edge3.h"
+#include "libmesh/fe_reference_element_traits.h"
 #include "libmesh/face_quad8.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
@@ -31,15 +32,6 @@ namespace libMesh
 // Quad8 class static member initializations
 const int Quad8::num_nodes;
 const int Quad8::nodes_per_side;
-
-const unsigned int Quad8::side_nodes_map[Quad8::num_sides][Quad8::nodes_per_side] =
-  {
-    {0, 1, 4}, // Side 0
-    {1, 2, 5}, // Side 1
-    {2, 3, 6}, // Side 2
-    {3, 0, 7}  // Side 3
-  };
-
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -128,16 +120,22 @@ bool Quad8::is_node_on_side(const unsigned int n,
                             const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  return std::find(std::begin(side_nodes_map[s]),
-                   std::end(side_nodes_map[s]),
-                   n) != std::end(side_nodes_map[s]);
+  const auto count = side_node_count_or_zero(this->type(), s);
+  for (unsigned int i = 0; i != count; ++i)
+    if (this->local_side_node(s, i) == n)
+      return true;
+  return false;
 }
 
 std::vector<unsigned>
 Quad8::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
+  const auto count = side_node_count_or_zero(this->type(), s);
+  std::vector<unsigned> nodes(count);
+  for (unsigned int i = 0; i != count; ++i)
+    nodes[i] = this->local_side_node(s, i);
+  return nodes;
 }
 
 std::vector<unsigned>
@@ -212,7 +210,10 @@ unsigned int Quad8::local_side_node(unsigned int side,
   libmesh_assert_less (side, this->n_sides());
   libmesh_assert_less (side_node, Quad8::nodes_per_side);
 
-  return Quad8::side_nodes_map[side][side_node];
+  unsigned int node = invalid_uint;
+  libmesh_error_msg_if(!try_local_side_node(this->type(), side, side_node, node),
+                       "Quad8::local_side_node(): unsupported shared side-node lookup");
+  return node;
 }
 
 

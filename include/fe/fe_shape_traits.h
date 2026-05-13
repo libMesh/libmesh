@@ -76,7 +76,7 @@ side_topology_or_invalid(ElemType parent)
     case EDGE2:
     case EDGE3:
     case EDGE4:
-      return EDGE2;
+      return NODEELEM;
 
     case TRI3:
     case QUAD4:
@@ -181,7 +181,7 @@ topology_dim_or_zero(ElemType topo)
   return elem_class_dim_or_zero(class_from_topology_or_invalid(topo));
 }
 
-LIBMESH_DEVICE_INLINE ElemType
+LIBMESH_DEVICE_INLINE constexpr ElemType
 lagrange_shape_topology_or_invalid(FEShapeKey key)
 {
   switch (key.order)
@@ -244,6 +244,16 @@ lagrange_shape_topology_or_invalid(FEShapeKey key)
 
         case HEX27:
           return HEX27;
+
+        default:
+          return INVALID_ELEM;
+      }
+
+    case THIRD:
+      switch (key.elem_type)
+      {
+        case EDGE4:
+          return EDGE4;
 
         default:
           return INVALID_ELEM;
@@ -535,7 +545,7 @@ monomial_exact_n_dofs_or_zero(ElemType elem_type,
   }
 }
 
-LIBMESH_DEVICE_INLINE unsigned int
+LIBMESH_DEVICE_INLINE constexpr unsigned int
 monomial_evaluator_dim_or_zero(ElemType elem_type)
 {
   switch (elem_type)
@@ -573,6 +583,87 @@ monomial_evaluator_dim_or_zero(ElemType elem_type)
     default:
       return 0;
   }
+}
+
+LIBMESH_DEVICE_INLINE bool
+supports_shape(FEShapeKey key);
+
+LIBMESH_DEVICE_INLINE bool
+supports_lagrange_map_topology(ElemType topo)
+{
+  switch (topo)
+  {
+    case EDGE2:
+    case EDGE3:
+    case EDGE4:
+    case TRI3:
+    case TRI6:
+    case QUAD4:
+    case QUAD8:
+    case QUAD9:
+    case TET4:
+    case TET10:
+    case HEX8:
+    case HEX20:
+    case HEX27:
+      return true;
+
+    default:
+      return false;
+  }
+}
+
+LIBMESH_DEVICE_INLINE bool
+supports_lagrange_face_map_topology(ElemType topo)
+{
+  return supports_lagrange_map_topology(topo);
+}
+
+template <typename Op, typename Unsupported>
+LIBMESH_DEVICE_INLINE auto
+dispatch_lagrange_map_topology_or(ElemType topo,
+                                  const Op & op,
+                                  const Unsupported & unsupported)
+  -> decltype(op.template operator()<EDGE2>())
+{
+  switch (topo)
+  {
+    case EDGE2:
+      return op.template operator()<EDGE2>();
+    case EDGE3:
+      return op.template operator()<EDGE3>();
+    case EDGE4:
+      return op.template operator()<EDGE4>();
+    case TRI3:
+      return op.template operator()<TRI3>();
+    case TRI6:
+      return op.template operator()<TRI6>();
+    case QUAD4:
+      return op.template operator()<QUAD4>();
+    case QUAD8:
+      return op.template operator()<QUAD8>();
+    case QUAD9:
+      return op.template operator()<QUAD9>();
+    case TET4:
+      return op.template operator()<TET4>();
+    case TET10:
+      return op.template operator()<TET10>();
+    case HEX8:
+      return op.template operator()<HEX8>();
+    case HEX20:
+      return op.template operator()<HEX20>();
+    case HEX27:
+      return op.template operator()<HEX27>();
+    default:
+      return unsupported(topo);
+  }
+}
+
+LIBMESH_DEVICE_INLINE bool
+supports_shape_with_lagrange_map(FEShapeKey key)
+{
+  return supports_shape(key) &&
+         supports_lagrange_map_topology(key.elem_type);
 }
 
 LIBMESH_DEVICE_INLINE bool

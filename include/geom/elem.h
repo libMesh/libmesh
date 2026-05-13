@@ -2787,9 +2787,10 @@ Elem::simple_build_side_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_sides());
 
+  Subclass & real_me = cast_ref<Subclass&>(*this);
   std::unique_ptr<Elem> face = std::make_unique<Sideclass>();
   for (auto n : face->node_index_range())
-    face->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
+    face->set_node(n, this->node_ptr(real_me.local_side_node(i, n)));
 
   face->set_interior_parent(this);
   face->inherit_data_from(*this);
@@ -2817,8 +2818,9 @@ Elem::simple_build_side_ptr (std::unique_ptr<Elem> & side,
     {
       side->set_interior_parent(this);
       side->inherit_data_from(*this);
+      Subclass & real_me = cast_ref<Subclass&>(*this);
       for (auto n : side->node_index_range())
-        side->set_node(n, this->node_ptr(Subclass::side_nodes_map[i][n]));
+        side->set_node(n, this->node_ptr(real_me.local_side_node(i, n)));
     }
 }
 
@@ -2841,9 +2843,9 @@ Elem::simple_side_ptr (std::unique_ptr<Elem> & side,
   else
     {
       side->subdomain_id() = this->subdomain_id();
-
+      Subclass & real_me = cast_ref<Subclass&>(*this);
       for (auto n : side->node_index_range())
-        side->set_node(n, this->node_ptr(Mapclass::side_nodes_map[i][n]));
+        side->set_node(n, this->node_ptr(real_me.local_side_node(i, n)));
     }
 }
 
@@ -2881,10 +2883,11 @@ Elem::simple_build_edge_ptr (const unsigned int i)
 {
   libmesh_assert_less (i, this->n_edges());
 
+  Subclass & real_me = cast_ref<Subclass&>(*this);
   std::unique_ptr<Elem> edge = std::make_unique<Edgeclass>();
 
   for (auto n : edge->node_index_range())
-    edge->set_node(n, this->node_ptr(Subclass::edge_nodes_map[i][n]));
+    edge->set_node(n, this->node_ptr(real_me.local_edge_node(i, n)));
 
   edge->set_interior_parent(this);
   edge->inherit_data_from(*this);
@@ -2912,8 +2915,9 @@ Elem::simple_build_edge_ptr (std::unique_ptr<Elem> & edge,
   else
     {
       edge->inherit_data_from(*this);
+      Subclass & real_me = cast_ref<Subclass&>(*this);
       for (auto n : edge->node_index_range())
-        edge->set_node(n, this->node_ptr(Subclass::edge_nodes_map[i][n]));
+        edge->set_node(n, this->node_ptr(real_me.local_edge_node(i, n)));
     }
 }
 

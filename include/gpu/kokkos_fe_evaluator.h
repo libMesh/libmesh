@@ -27,6 +27,23 @@
 namespace libMesh::Kokkos
 {
 
+LIBMESH_DEVICE_INLINE libMesh::ElemType
+lagrange_shape_topology_for_key(FEShapeKey key);
+
+LIBMESH_DEVICE_INLINE Real
+eval_lagrange_shape(libMesh::ElemType topo,
+                    unsigned int i,
+                    Real xi,
+                    Real eta,
+                    Real zeta);
+
+LIBMESH_DEVICE_INLINE RealVector
+eval_lagrange_grad_shape(libMesh::ElemType topo,
+                         unsigned int i,
+                         Real xi,
+                         Real eta,
+                         Real zeta);
+
 namespace detail
 {
 
@@ -35,24 +52,14 @@ LIBMESH_DEVICE_INLINE auto
 dispatch_lagrange_topology(libMesh::ElemType topo, const Op & op)
   -> decltype(op.template operator()<libMesh::EDGE2>())
 {
-  switch (topo)
-  {
-    case libMesh::EDGE2: return op.template operator()<libMesh::EDGE2>();
-    case libMesh::EDGE3: return op.template operator()<libMesh::EDGE3>();
-    case libMesh::TRI3: return op.template operator()<libMesh::TRI3>();
-    case libMesh::TRI6: return op.template operator()<libMesh::TRI6>();
-    case libMesh::QUAD4: return op.template operator()<libMesh::QUAD4>();
-    case libMesh::QUAD8: return op.template operator()<libMesh::QUAD8>();
-    case libMesh::QUAD9: return op.template operator()<libMesh::QUAD9>();
-    case libMesh::TET4: return op.template operator()<libMesh::TET4>();
-    case libMesh::TET10: return op.template operator()<libMesh::TET10>();
-    case libMesh::HEX8: return op.template operator()<libMesh::HEX8>();
-    case libMesh::HEX20: return op.template operator()<libMesh::HEX20>();
-    case libMesh::HEX27: return op.template operator()<libMesh::HEX27>();
-    default:
+  return libMesh::dispatch_lagrange_map_topology_or(
+    topo,
+    op,
+    [&](libMesh::ElemType) -> decltype(op.template operator()<libMesh::EDGE2>())
+    {
       detail::abort_unsupported("dispatch_lagrange_topology(): unsupported evaluator topology");
       return op.template operator()<libMesh::EDGE2>();
-  }
+    });
 }
 
 template <unsigned int Dim, typename Op>
@@ -153,6 +160,88 @@ struct MonomialGradShapeOp
       return MonomialImpl2D<Order>::grad_shape(i, xi, eta, zeta);
     else
       return MonomialImpl3D<Order>::grad_shape(i, xi, eta, zeta);
+  }
+};
+
+template <typename LagrangeOp, typename MonomialOp>
+LIBMESH_DEVICE_INLINE auto
+dispatch_shape_family(libMesh::FEShapeKey key,
+                      const LagrangeOp & lagrange_op,
+                      const MonomialOp & monomial_op,
+                      const char * unsupported_message)
+  -> decltype(lagrange_op())
+{
+  switch (key.family)
+  {
+    case libMesh::LAGRANGE:
+      return lagrange_op();
+
+    case libMesh::MONOMIAL:
+      return monomial_op();
+
+    default:
+      detail::abort_unsupported(unsupported_message);
+      return lagrange_op();
+  }
+}
+
+struct KeyedLagrangeShapeOp
+{
+  libMesh::Kokkos::FEShapeKey key;
+  unsigned int i;
+  Real xi;
+  Real eta;
+  Real zeta;
+
+  LIBMESH_DEVICE_INLINE Real operator()() const
+  {
+    return eval_lagrange_shape(lagrange_shape_topology_for_key(key), i, xi, eta, zeta);
+  }
+};
+
+struct KeyedLagrangeGradShapeOp
+{
+  libMesh::Kokkos::FEShapeKey key;
+  unsigned int i;
+  Real xi;
+  Real eta;
+  Real zeta;
+
+  LIBMESH_DEVICE_INLINE RealVector operator()() const
+  {
+    return eval_lagrange_grad_shape(lagrange_shape_topology_for_key(key), i, xi, eta, zeta);
+  }
+};
+
+struct KeyedMonomialShapeOp
+{
+  libMesh::Kokkos::FEShapeKey key;
+  unsigned int i;
+  Real xi;
+  Real eta;
+  Real zeta;
+
+  LIBMESH_DEVICE_INLINE Real operator()() const
+  {
+    return detail::dispatch_monomial(key.elem_type,
+                                     key.order,
+                                     detail::MonomialShapeOp{i, xi, eta, zeta});
+  }
+};
+
+struct KeyedMonomialGradShapeOp
+{
+  libMesh::Kokkos::FEShapeKey key;
+  unsigned int i;
+  Real xi;
+  Real eta;
+  Real zeta;
+
+  LIBMESH_DEVICE_INLINE RealVector operator()() const
+  {
+    return detail::dispatch_monomial(key.elem_type,
+                                     key.order,
+                                     detail::MonomialGradShapeOp{i, xi, eta, zeta});
   }
 };
 
@@ -305,20 +394,11 @@ shape(FEShapeKey key, unsigned int i, Real xi, Real eta, Real zeta)
     return Real(0);
   }
 
-  switch (key.family)
-  {
-    case libMesh::LAGRANGE:
-      return eval_lagrange_shape(lagrange_shape_topology_for_key(key), i, xi, eta, zeta);
-
-    case libMesh::MONOMIAL:
-      return detail::dispatch_monomial(key.elem_type,
-                                       key.order,
-                                       detail::MonomialShapeOp{i, xi, eta, zeta});
-
-    default:
-      detail::abort_unsupported("shape(): unsupported FE family");
-      return Real(0);
-  }
+  return detail::dispatch_shape_family(
+    key,
+    detail::KeyedLagrangeShapeOp{key, i, xi, eta, zeta},
+    detail::KeyedMonomialShapeOp{key, i, xi, eta, zeta},
+    "shape(): unsupported FE family");
 }
 
 /// Evaluate the reference-space gradient of the i-th physics shape function.
@@ -333,20 +413,11 @@ grad_shape(FEShapeKey key, unsigned int i, Real xi, Real eta, Real zeta)
     return zero_vector();
   }
 
-  switch (key.family)
-  {
-    case libMesh::LAGRANGE:
-      return eval_lagrange_grad_shape(lagrange_shape_topology_for_key(key), i, xi, eta, zeta);
-
-    case libMesh::MONOMIAL:
-      return detail::dispatch_monomial(key.elem_type,
-                                       key.order,
-                                       detail::MonomialGradShapeOp{i, xi, eta, zeta});
-
-    default:
-      detail::abort_unsupported("grad_shape(): unsupported FE family");
-      return zero_vector();
-  }
+  return detail::dispatch_shape_family(
+    key,
+    detail::KeyedLagrangeGradShapeOp{key, i, xi, eta, zeta},
+    detail::KeyedMonomialGradShapeOp{key, i, xi, eta, zeta},
+    "grad_shape(): unsupported FE family");
 }
 
 } // namespace libMesh::Kokkos

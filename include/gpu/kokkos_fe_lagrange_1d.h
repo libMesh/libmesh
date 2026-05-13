@@ -1,6 +1,6 @@
 // Kokkos FEEvaluator specializations for 1-D Lagrange elements.
 //
-// Covers EDGE2 (linear) and EDGE3 (quadratic).
+// Covers EDGE2 (linear), EDGE3 (quadratic), and EDGE4 (cubic).
 // Reference-element coordinate convention (libMesh-compatible):
 //   EDGE2/EDGE3: xi in [-1, 1]
 //
@@ -62,6 +62,29 @@ struct FEEvaluator<libMesh::LAGRANGE, libMesh::EDGE3>
   grad_shape(unsigned int i, Real xi, Real /*eta*/, Real /*zeta*/)
   {
     return make_vector(libMesh::fe_lagrange_1D_quadratic_shape_deriv(i, 0, xi), 0.0, 0.0);
+  }
+#endif
+};
+
+// ── EDGE4 (cubic edge, 4 nodes) ──────────────────────────────────────────────
+// Node ordering matches libMesh: 0->left(-1), 1->right(+1), 2->(-1/3), 3->(+1/3)
+
+template <>
+struct FEEvaluator<libMesh::LAGRANGE, libMesh::EDGE4>
+{
+  static constexpr unsigned int n_dofs() { return 4; }
+
+#ifdef LIBMESH_HAVE_KOKKOS
+  LIBMESH_DEVICE_INLINE static Real
+  shape(unsigned int i, Real xi, Real /*eta*/, Real /*zeta*/)
+  {
+    return libMesh::fe_lagrange_1D_cubic_shape(i, xi);
+  }
+
+  LIBMESH_DEVICE_INLINE static RealVector
+  grad_shape(unsigned int i, Real xi, Real /*eta*/, Real /*zeta*/)
+  {
+    return make_vector(libMesh::fe_lagrange_1D_cubic_shape_deriv(i, 0, xi), 0.0, 0.0);
   }
 #endif
 };

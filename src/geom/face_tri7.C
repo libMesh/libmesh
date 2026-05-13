@@ -17,6 +17,7 @@
 
 // Local includes
 #include "libmesh/edge_edge3.h"
+#include "libmesh/fe_reference_element_traits.h"
 #include "libmesh/face_tri7.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
@@ -37,14 +38,6 @@ namespace libMesh
 // Tri7 class static member initializations
 const int Tri7::num_nodes;
 const int Tri7::nodes_per_side;
-
-const unsigned int Tri7::side_nodes_map[Tri7::num_sides][Tri7::nodes_per_side] =
-  {
-    {0, 1, 3}, // Side 0
-    {1, 2, 4}, // Side 1
-    {2, 0, 5}  // Side 2
-  };
-
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -143,16 +136,22 @@ bool Tri7::is_node_on_side(const unsigned int n,
                            const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  return std::find(std::begin(side_nodes_map[s]),
-                   std::end(side_nodes_map[s]),
-                   n) != std::end(side_nodes_map[s]);
+  const auto count = side_node_count_or_zero(this->type(), s);
+  for (unsigned int i = 0; i != count; ++i)
+    if (this->local_side_node(s, i) == n)
+      return true;
+  return false;
 }
 
 std::vector<unsigned>
 Tri7::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
+  const auto count = side_node_count_or_zero(this->type(), s);
+  std::vector<unsigned> nodes(count);
+  for (unsigned int i = 0; i != count; ++i)
+    nodes[i] = this->local_side_node(s, i);
+  return nodes;
 }
 
 std::vector<unsigned>
@@ -236,7 +235,10 @@ unsigned int Tri7::local_side_node(unsigned int side,
   libmesh_assert_less (side, this->n_sides());
   libmesh_assert_less (side_node, Tri7::nodes_per_side);
 
-  return Tri7::side_nodes_map[side][side_node];
+  unsigned int node = invalid_uint;
+  libmesh_error_msg_if(!try_local_side_node(this->type(), side, side_node, node),
+                       "Tri7::local_side_node(): unsupported shared side-node lookup");
+  return node;
 }
 
 

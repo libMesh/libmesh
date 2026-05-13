@@ -19,6 +19,7 @@
 // Local includes
 #include "libmesh/cell_hex20.h"
 #include "libmesh/edge_edge3.h"
+#include "libmesh/fe_reference_element_traits.h"
 #include "libmesh/face_quad8.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
@@ -33,32 +34,6 @@ namespace libMesh
 const int Hex20::num_nodes;
 const int Hex20::nodes_per_side;
 const int Hex20::nodes_per_edge;
-
-const unsigned int Hex20::side_nodes_map[Hex20::num_sides][Hex20::nodes_per_side] =
-  {
-    {0, 3, 2, 1, 11, 10,  9,  8}, // Side 0
-    {0, 1, 5, 4,  8, 13, 16, 12}, // Side 1
-    {1, 2, 6, 5,  9, 14, 17, 13}, // Side 2
-    {2, 3, 7, 6, 10, 15, 18, 14}, // Side 3
-    {3, 0, 4, 7, 11, 12, 19, 15}, // Side 4
-    {4, 5, 6, 7, 16, 17, 18, 19}  // Side 5
-  };
-
-const unsigned int Hex20::edge_nodes_map[Hex20::num_edges][Hex20::nodes_per_edge] =
-  {
-    {0, 1, 8},  // Edge 0
-    {1, 2, 9},  // Edge 1
-    {2, 3, 10}, // Edge 2
-    {0, 3, 11}, // Edge 3
-    {0, 4, 12}, // Edge 4
-    {1, 5, 13}, // Edge 5
-    {2, 6, 14}, // Edge 6
-    {3, 7, 15}, // Edge 7
-    {4, 5, 16}, // Edge 8
-    {5, 6, 17}, // Edge 9
-    {6, 7, 18}, // Edge 10
-    {4, 7, 19}  // Edge 11
-  };
 
 // ------------------------------------------------------------
 // Hex20 class member functions
@@ -86,32 +61,44 @@ bool Hex20::is_node_on_side(const unsigned int n,
                             const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  return std::find(std::begin(side_nodes_map[s]),
-                   std::end(side_nodes_map[s]),
-                   n) != std::end(side_nodes_map[s]);
+  const auto count = side_node_count_or_zero(this->type(), s);
+  for (unsigned int i = 0; i != count; ++i)
+    if (this->local_side_node(s, i) == n)
+      return true;
+  return false;
 }
 
 std::vector<unsigned>
 Hex20::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s])};
+  const auto count = side_node_count_or_zero(this->type(), s);
+  std::vector<unsigned> nodes(count);
+  for (unsigned int i = 0; i != count; ++i)
+    nodes[i] = this->local_side_node(s, i);
+  return nodes;
 }
 
 std::vector<unsigned>
 Hex20::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
-  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
+  const auto count = edge_node_count_or_zero(this->type(), e);
+  std::vector<unsigned> nodes(count);
+  for (unsigned int i = 0; i != count; ++i)
+    nodes[i] = this->local_edge_node(e, i);
+  return nodes;
 }
 
 bool Hex20::is_node_on_edge(const unsigned int n,
                             const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  return std::find(std::begin(edge_nodes_map[e]),
-                   std::end(edge_nodes_map[e]),
-                   n) != std::end(edge_nodes_map[e]);
+  const auto count = edge_node_count_or_zero(this->type(), e);
+  for (unsigned int i = 0; i != count; ++i)
+    if (this->local_edge_node(e, i) == n)
+      return true;
+  return false;
 }
 
 
@@ -182,7 +169,10 @@ unsigned int Hex20::local_side_node(unsigned int side,
   libmesh_assert_less (side, this->n_sides());
   libmesh_assert_less (side_node, Hex20::nodes_per_side);
 
-  return Hex20::side_nodes_map[side][side_node];
+  unsigned int node = invalid_uint;
+  libmesh_error_msg_if(!try_local_side_node(this->type(), side, side_node, node),
+                       "Hex20::local_side_node(): unsupported shared side-node lookup");
+  return node;
 }
 
 
@@ -193,7 +183,10 @@ unsigned int Hex20::local_edge_node(unsigned int edge,
   libmesh_assert_less (edge, this->n_edges());
   libmesh_assert_less (edge_node, Hex20::nodes_per_edge);
 
-  return Hex20::edge_nodes_map[edge][edge_node];
+  unsigned int node = invalid_uint;
+  libmesh_error_msg_if(!try_local_edge_node(this->type(), edge, edge_node, node),
+                       "Hex20::local_edge_node(): unsupported shared edge-node lookup");
+  return node;
 }
 
 

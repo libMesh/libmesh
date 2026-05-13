@@ -112,6 +112,7 @@ static const physics_shape_info lagrange_physics_cases[] = {
   { { libMesh::LAGRANGE, libMesh::EDGE3,  libMesh::FIRST  }, 1,  2, "EDGE3/FIRST"   },
   { { libMesh::LAGRANGE, libMesh::EDGE3,  libMesh::SECOND }, 1,  3, "EDGE3/SECOND"  },
   { { libMesh::LAGRANGE, libMesh::EDGE4,  libMesh::FIRST  }, 1,  2, "EDGE4/FIRST"   },
+  { { libMesh::LAGRANGE, libMesh::EDGE4,  libMesh::THIRD  }, 1,  4, "EDGE4/THIRD"   },
 
   { { libMesh::LAGRANGE, libMesh::TRI3,   libMesh::FIRST  }, 2,  3, "TRI3/FIRST"    },
   { { libMesh::LAGRANGE, libMesh::TRI6,   libMesh::FIRST  }, 2,  3, "TRI6/FIRST"    },

@@ -19,6 +19,7 @@
 // Local includes
 #include "libmesh/cell_prism21.h"
 #include "libmesh/edge_edge3.h"
+#include "libmesh/fe_reference_element_traits.h"
 #include "libmesh/face_quad9.h"
 #include "libmesh/face_tri7.h"
 #include "libmesh/enum_io_package.h"
@@ -50,28 +51,6 @@ namespace libMesh
 const int Prism21::num_nodes;
 const int Prism21::nodes_per_side;
 const int Prism21::nodes_per_edge;
-
-const unsigned int Prism21::side_nodes_map[Prism21::num_sides][Prism21::nodes_per_side] =
-  {
-    {0, 2, 1,  8,  7,  6, 18, 99, 99}, // Side 0
-    {0, 1, 4,  3,  6, 10, 12,  9, 15}, // Side 1
-    {1, 2, 5,  4,  7, 11, 13, 10, 16}, // Side 2
-    {2, 0, 3,  5,  8,  9, 14, 11, 17}, // Side 3
-    {3, 4, 5, 12, 13, 14, 19, 99, 99}  // Side 4
-  };
-
-const unsigned int Prism21::edge_nodes_map[Prism21::num_edges][Prism21::nodes_per_edge] =
-  {
-    {0, 1,  6}, // Edge 0
-    {1, 2,  7}, // Edge 1
-    {0, 2,  8}, // Edge 2
-    {0, 3,  9}, // Edge 3
-    {1, 4, 10}, // Edge 4
-    {2, 5, 11}, // Edge 5
-    {3, 4, 12}, // Edge 6
-    {4, 5, 13}, // Edge 7
-    {3, 5, 14}  // Edge 8
-  };
 
 // ------------------------------------------------------------
 // Prism21 class member functions
@@ -105,33 +84,44 @@ bool Prism21::is_node_on_side(const unsigned int n,
                               const unsigned int s) const
 {
   libmesh_assert_less (s, n_sides());
-  return std::find(std::begin(side_nodes_map[s]),
-                   std::end(side_nodes_map[s]),
-                   n) != std::end(side_nodes_map[s]);
+  const auto count = side_node_count_or_zero(this->type(), s);
+  for (unsigned int i = 0; i != count; ++i)
+    if (this->local_side_node(s, i) == n)
+      return true;
+  return false;
 }
 
 std::vector<unsigned>
 Prism21::nodes_on_side(const unsigned int s) const
 {
   libmesh_assert_less(s, n_sides());
-  auto trim = (s > 0 && s < 4) ? 0 : 2;
-  return {std::begin(side_nodes_map[s]), std::end(side_nodes_map[s]) - trim};
+  const auto count = side_node_count_or_zero(this->type(), s);
+  std::vector<unsigned int> nodes(count);
+  for (unsigned int i = 0; i != count; ++i)
+    nodes[i] = this->local_side_node(s, i);
+  return nodes;
 }
 
 std::vector<unsigned>
 Prism21::nodes_on_edge(const unsigned int e) const
 {
   libmesh_assert_less(e, n_edges());
-  return {std::begin(edge_nodes_map[e]), std::end(edge_nodes_map[e])};
+  const auto count = edge_node_count_or_zero(this->type(), e);
+  std::vector<unsigned> nodes(count);
+  for (unsigned int i = 0; i != count; ++i)
+    nodes[i] = this->local_edge_node(e, i);
+  return nodes;
 }
 
 bool Prism21::is_node_on_edge(const unsigned int n,
                               const unsigned int e) const
 {
   libmesh_assert_less (e, n_edges());
-  return std::find(std::begin(edge_nodes_map[e]),
-                   std::end(edge_nodes_map[e]),
-                   n) != std::end(edge_nodes_map[e]);
+  const auto count = edge_node_count_or_zero(this->type(), e);
+  for (unsigned int i = 0; i != count; ++i)
+    if (this->local_edge_node(e, i) == n)
+      return true;
+  return false;
 }
 
 
@@ -231,7 +221,10 @@ unsigned int Prism21::local_side_node(unsigned int side,
   // Some sides have 7 nodes.
   libmesh_assert(!(side==0 || side==4) || side_node < 7);
 
-  return Prism21::side_nodes_map[side][side_node];
+  unsigned int node = invalid_uint;
+  libmesh_error_msg_if(!try_local_side_node(this->type(), side, side_node, node),
+                       "Prism21::local_side_node(): unsupported shared side-node lookup");
+  return node;
 }
 
 
@@ -242,7 +235,10 @@ unsigned int Prism21::local_edge_node(unsigned int edge,
   libmesh_assert_less(edge, this->n_edges());
   libmesh_assert_less(edge_node, Prism21::nodes_per_edge);
 
-  return Prism21::edge_nodes_map[edge][edge_node];
+  unsigned int node = invalid_uint;
+  libmesh_error_msg_if(!try_local_edge_node(this->type(), edge, edge_node, node),
+                       "Prism21::local_edge_node(): unsupported shared edge-node lookup");
+  return node;
 }
 
 
@@ -274,7 +270,7 @@ std::unique_ptr<Elem> Prism21::build_side_ptr (const unsigned int i)
 
   // Set the nodes
   for (auto n : face->node_index_range())
-    face->set_node(n, this->node_ptr(Prism21::side_nodes_map[i][n]));
+    face->set_node(n, this->node_ptr(this->local_side_node(i, n)));
 
   face->set_interior_parent(this);
   face->inherit_data_from(*this);
@@ -322,7 +318,7 @@ void Prism21::build_side_ptr (std::unique_ptr<Elem> & side,
 
   // Set the nodes
   for (auto n : side->node_index_range())
-    side->set_node(n, this->node_ptr(Prism21::side_nodes_map[i][n]));
+    side->set_node(n, this->node_ptr(this->local_side_node(i, n)));
 }
 
 

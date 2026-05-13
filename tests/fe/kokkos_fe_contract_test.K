@@ -32,6 +32,7 @@ namespace
 struct contract_case
 {
   const char * name;
+  bool expect_abort;
 };
 
 struct element_fixture
@@ -294,30 +295,32 @@ main(int argc, char ** argv)
   }
 
   const contract_case cases[] = {
-    { "get_side_topology_prism6" },
-    { "get_side_topology_pyramid5" },
-    { "shape_lagrange_edge4_third" },
-    { "grad_shape_lagrange_prism6_first" },
-    { "shape_monomial_hex27_sixth" },
-    { "grad_shape_monomial_tri7_sixth" },
-    { "ndofs_lagrange_prism6_first" },
-    { "map_shape_rational" },
-    { "grad_map_shape_rational" },
-    { "face_normal_parent_dim2" },
-    { "face_jacobian_prism20_tri7" },
-    { "face_jacobian_prism21_tri7" },
-    { "face_jacobian_pyramid18_tri7" },
-    { "map_face_qp_to_parent_prism20_tri7" },
-    { "map_face_qp_to_parent_prism21_tri7" },
-    { "map_face_qp_to_parent_pyramid18_tri7" }
+    { "get_side_topology_prism6", true },
+    { "get_side_topology_pyramid5", true },
+    { "shape_lagrange_edge4_third", false },
+    { "grad_shape_lagrange_prism6_first", true },
+    { "shape_monomial_hex27_sixth", true },
+    { "grad_shape_monomial_tri7_sixth", true },
+    { "ndofs_lagrange_prism6_first", true },
+    { "map_shape_rational", true },
+    { "grad_map_shape_rational", true },
+    { "face_normal_parent_dim2", true },
+    { "face_jacobian_prism20_tri7", true },
+    { "face_jacobian_prism21_tri7", true },
+    { "face_jacobian_pyramid18_tri7", true },
+    { "map_face_qp_to_parent_prism20_tri7", true },
+    { "map_face_qp_to_parent_prism21_tri7", true },
+    { "map_face_qp_to_parent_pyramid18_tri7", true }
   };
 
   int total_fail = 0;
   for (const auto & info : cases)
   {
-    const bool passed = expect_child_abort(argv[0], info.name);
+    const bool passed = info.expect_abort ? expect_child_abort(argv[0], info.name)
+                                          : expect_child_success(argv[0], info.name);
     const int fail = passed ? 0 : 1;
-    std::printf("[contract_abort]          [%s] %s  (%d failures)\n",
+    std::printf("[%s]          [%s] %s  (%d failures)\n",
+                info.expect_abort ? "contract_abort" : "contract_success",
                 info.name,
                 passed ? "PASS" : "FAIL",
                 fail);

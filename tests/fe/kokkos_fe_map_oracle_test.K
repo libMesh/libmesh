@@ -433,6 +433,7 @@ main(int argc, char ** argv)
     const map_helper_case cases[] = {
       { libMesh::EDGE2,  "EDGE2"  },
       { libMesh::EDGE3,  "EDGE3"  },
+      { libMesh::EDGE4,  "EDGE4"  },
       { libMesh::TRI3,   "TRI3"   },
       { libMesh::TRI6,   "TRI6"   },
       { libMesh::QUAD4,  "QUAD4"  },
