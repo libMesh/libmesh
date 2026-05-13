@@ -26,11 +26,14 @@
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/elem.h"
+#include "libmesh/elem_range.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_serializer.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
+
+#include "timpi/parallel_implementation.h"
 
 namespace {
   using namespace libMesh;
@@ -359,85 +362,124 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
                         std::abs(extents(0) * extents(2)) +
                         std::abs(extents(1) * extents(2));
 
-  for (auto & elem : this->_mesh.element_ptr_range())
-    {
-      // Check for proper element type
-      if (elem->type() != TRI3)
+  struct TriChecker {
+    std::set<MeshTetInterface::SurfaceIntegrity> my_returnval;
+    const Real my_ref_area;
+    const unsigned int my_verbosity;
+
+    TriChecker (Real ref_area, unsigned int verbosity) :
+      my_returnval(), my_ref_area(ref_area),
+      my_verbosity(verbosity) {}
+    TriChecker (TriChecker & other, Threads::split) :
+      my_returnval(), my_ref_area(other.my_ref_area),
+      my_verbosity(other.my_verbosity) {}
+
+    void operator()(const ConstElemRange & range) {
+
+      for (const Elem * elem : range)
         {
-          if (this->_verbosity >= 50)
-            std::cerr << "Non-Tri3: " << elem->get_info() << std::endl;
-          returnval.insert(NON_TRI3);
-        }
-
-      // Make sure it's a decent element.
-      if (elem->volume() < ref_area * TOLERANCE * TOLERANCE)
-        {
-          if (this->_verbosity >= 50)
-            std::cerr << "Degenerate element: " << elem->get_info() << std::endl;
-          returnval.insert(DEGENERATE_ELEMENT);
-        }
-
-      for (auto s : elem->side_index_range())
-        {
-          const Elem * const neigh = elem->neighbor_ptr(s);
-
-          if (neigh == nullptr)
+          // Check for proper element type
+          if (elem->type() != TRI3)
             {
-              if (this->_verbosity >= 50)
-                std::cerr << "Element missing neighbor " << s << ": " << elem->get_info() << std::endl;
-              returnval.insert(MISSING_NEIGHBOR);
-              continue;
+              if (my_verbosity >= 50)
+                std::cerr << "Non-Tri3: " << elem->get_info() << std::endl;
+              my_returnval.insert(NON_TRI3);
             }
 
-          // Make sure our neighbor points back to us
-          const unsigned int nn = neigh->which_neighbor_am_i(elem);
-
-          if (nn >= 3)
+          // Make sure it's a decent element.
+          if (elem->volume() < my_ref_area * TOLERANCE * TOLERANCE)
             {
-              if (this->_verbosity >= 50)
-                std::cerr << "Element missing backlink " << s << ": " << elem->get_info() << std::endl;
-              returnval.insert(MISSING_BACKLINK);
-              continue;
+              if (my_verbosity >= 50)
+                std::cerr << "Degenerate element: " << elem->get_info() << std::endl;
+              my_returnval.insert(DEGENERATE_ELEMENT);
             }
 
-          // Our neighbor should have the same the edge nodes we do on
-          // the neighboring edgei
-          const Node * const n1 = elem->node_ptr(s);
-          const Node * const n2 = elem->node_ptr((s+1)%3);
-
-          const unsigned int i1 = neigh->local_node(n1->id());
-          const unsigned int i2 = neigh->local_node(n2->id());
-          if (i1 >= 3 || i2 >= 3)
+          for (auto s : elem->side_index_range())
             {
-              if (this->_verbosity >= 50)
-                std::cerr << "Element with bad neighbor " << s << " nodes: " << elem->get_info() << std::endl;
-              returnval.insert(BAD_NEIGHBOR_NODES);
-              continue;
-            }
+              const Elem * const neigh = elem->neighbor_ptr(s);
 
-          // It should have those edge nodes in the opposite order
-          // (because they have the same orientation we do)
-          if ((i2 + 1)%3 != i1)
-            {
-              if (this->_verbosity >= 50)
-                std::cerr << "Element orientation mismatch with neighbor " << s << ": " << elem->get_info() << std::endl;
-              returnval.insert(NON_ORIENTED);
-              continue;
-            }
+              if (neigh == nullptr)
+                {
+                  if (my_verbosity >= 50)
+                    std::cerr << "Element missing neighbor " << s << ": " << elem->get_info() << std::endl;
+                  my_returnval.insert(MISSING_NEIGHBOR);
+                  continue;
+                }
 
-          // And it should have those edge nodes in the expected
-          // places relative to its neighbor link
-          if (i2 != nn)
-            {
-              if (this->_verbosity >= 50)
-                std::cerr << "Element with bad links on neighbor " << s << ": " << elem->get_info() << std::endl;
-              returnval.insert(BAD_NEIGHBOR_LINKS);
-              continue;
+              // Make sure our neighbor points back to us
+              const unsigned int nn = neigh->which_neighbor_am_i(elem);
+
+              if (nn >= 3)
+                {
+                  if (my_verbosity >= 50)
+                    std::cerr << "Element missing backlink " << s << ": " << elem->get_info() << std::endl;
+                  my_returnval.insert(MISSING_BACKLINK);
+                  continue;
+                }
+
+              // Our neighbor should have the same the edge nodes we do on
+              // the neighboring edgei
+              const Node * const n1 = elem->node_ptr(s);
+              const Node * const n2 = elem->node_ptr((s+1)%3);
+
+              const unsigned int i1 = neigh->local_node(n1->id());
+              const unsigned int i2 = neigh->local_node(n2->id());
+              if (i1 >= 3 || i2 >= 3)
+                {
+                  if (my_verbosity >= 50)
+                    std::cerr << "Element with bad neighbor " << s << " nodes: " << elem->get_info() << std::endl;
+                  my_returnval.insert(BAD_NEIGHBOR_NODES);
+                  continue;
+                }
+
+              // It should have those edge nodes in the opposite order
+              // (because they have the same orientation we do)
+              if ((i2 + 1)%3 != i1)
+                {
+                  if (my_verbosity >= 50)
+                    std::cerr << "Element orientation mismatch with neighbor " << s << ": " << elem->get_info() << std::endl;
+                  my_returnval.insert(NON_ORIENTED);
+                  continue;
+                }
+
+              // And it should have those edge nodes in the expected
+              // places relative to its neighbor link
+              if (i2 != nn)
+                {
+                  if (my_verbosity >= 50)
+                    std::cerr << "Element with bad links on neighbor " << s << ": " << elem->get_info() << std::endl;
+                  my_returnval.insert(BAD_NEIGHBOR_LINKS);
+                  continue;
+                }
             }
         }
     }
 
-  // Return anything and everything we found
+    void join(TriChecker & other) {
+      my_returnval.merge(other.my_returnval);
+    }
+  };
+
+  TriChecker checker (ref_area, this->_verbosity);
+
+  Threads::parallel_reduce
+    (this->_mesh.active_local_element_stored_range(), checker);
+
+  // Join problems found in threaded loop
+  returnval.merge(checker.my_returnval);
+
+  // Join problems found on other ranks
+  std::set<char> int_set;
+  std::transform
+    (returnval.begin(), returnval.end(),
+     std::inserter<std::set<char>>(int_set, int_set.end()),
+     [](SurfaceIntegrity i){return int(i);});
+  _mesh.comm().set_union(int_set);
+  std::transform
+    (int_set.begin(), int_set.end(),
+     std::inserter<std::set<SurfaceIntegrity>>(returnval, returnval.end()),
+     [](int i){return SurfaceIntegrity(i);});
+
   return returnval;
 }
 

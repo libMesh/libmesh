@@ -110,8 +110,13 @@ void EquationSystems::reinit_mesh ()
   for (auto & node : _mesh.node_ptr_range())
     node->set_n_systems(n_sys);
 
-  for (auto & elem : _mesh.element_ptr_range())
-    elem->set_n_systems(n_sys);
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [n_sys](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         elem->set_n_systems(n_sys);
+     });
 
   //for (auto i : make_range(this->n_systems()))
     //this->get_system(i).init();
@@ -153,8 +158,13 @@ bool EquationSystems::reinit_solutions ()
       node->set_n_systems(n_sys);
 
     // All the elements
-    for (auto & elem : _mesh.element_ptr_range())
-      elem->set_n_systems(n_sys);
+    Threads::parallel_for
+      (_mesh.element_stored_range(),
+       [n_sys](const ElemRange & range)
+       {
+         for (Elem * elem : range)
+           elem->set_n_systems(n_sys);
+       });
   }
 
   // Localize each system's vectors
@@ -280,8 +290,13 @@ void EquationSystems::allgather ()
   for (auto & node : _mesh.node_ptr_range())
     node->set_n_systems(n_sys);
 
-  for (auto & elem : _mesh.element_ptr_range())
-    elem->set_n_systems(n_sys);
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [n_sys](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         elem->set_n_systems(n_sys);
+     });
 
   // And distribute each system's dofs
   for (auto i : make_range(this->n_systems()))
@@ -1200,9 +1215,6 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
 
       NumericVector<Number> & sys_soln(*system.current_local_solution);
 
-      // The DOF indices for the finite element
-      std::vector<dof_id_type> dof_indices;
-
       const unsigned int var = var_num.second;
 
       const Variable & variable = system.variable(var);
@@ -1216,18 +1228,29 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
         (system.variable_type(var) == type[1]) ? _mesh.spatial_dimension() : 1;
 
       // Loop over all elements in the mesh and index all components of the variable if it's active
-      for (const auto & elem : _mesh.active_local_element_ptr_range())
-        if (variable.active_on_subdomain(elem->subdomain_id()))
-          {
-            dof_map.dof_indices(elem, dof_indices, var);
+      Threads::parallel_for
+        (_mesh.active_local_element_stored_range(),
+         [&dof_map, &variable, ne, var, var_ctr, n_comps,
+         &parallel_soln, &sys_soln](const ConstElemRange & range)
+         {
+           // The DOF indices for the finite element
+           std::vector<dof_id_type> dof_indices;
 
-            // The number of DOF components needs to be equal to the expected number so that we know
-            // where to store data to correctly correspond to variable names.
-            libmesh_assert_equal_to(dof_indices.size(), n_comps);
+           for (const Elem * elem : range)
+             {
+               if (variable.active_on_subdomain(elem->subdomain_id()))
+                 {
+                   dof_map.dof_indices(elem, dof_indices, var);
 
-            for (unsigned int comp = 0; comp < n_comps; comp++)
-              parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
-          }
+                   // The number of DOF components needs to be equal to the expected number so that we know
+                   // where to store data to correctly correspond to variable names.
+                   libmesh_assert_equal_to(dof_indices.size(), n_comps);
+
+                   for (unsigned int comp = 0; comp < n_comps; comp++)
+                     parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
+                 }
+             }
+         });
 
       var_ctr += n_comps;
     } // end loop over var_nums
@@ -1741,8 +1764,13 @@ void EquationSystems::_add_system_to_nodes_and_elems()
     node->add_system();
 
   // All the elements
-  for (auto & elem : _mesh.element_ptr_range())
-    elem->add_system();
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         elem->add_system();
+     });
 }
 
 void EquationSystems::_remove_default_ghosting(unsigned int sys_num)

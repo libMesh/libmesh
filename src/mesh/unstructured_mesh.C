@@ -24,6 +24,7 @@
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
+#include "libmesh/elem_range.h"
 #include "libmesh/mesh_tools.h" // For n_levels
 #include "libmesh/parallel.h"
 #include "libmesh/remote_elem.h"
@@ -812,13 +813,19 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
     // that aren't to that same third mesh.
     if (!ip_map.empty())
       {
-        bool existing_interior_parents = false;
-        for (const auto & elem : this->element_ptr_range())
-          if (elem->interior_parent())
-            {
-              existing_interior_parents = true;
-              break;
-            }
+        std::atomic<bool> existing_interior_parents{false};
+
+        Threads::parallel_for
+          (this->element_stored_range(),
+           [&existing_interior_parents](const ElemRange & range)
+           {
+             for (Elem * elem : range)
+               if (elem->interior_parent())
+                 {
+                   existing_interior_parents = true;
+                   break;
+                 }
+           });
 
         MeshBase * other_interior_mesh =
           const_cast<MeshBase *>(&other_mesh.interior_mesh());
@@ -960,10 +967,15 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
   //TODO:[BSK] This should be removed later?!
   if (reset_current_list)
-    for (const auto & e : this->element_ptr_range())
-      for (auto s : e->side_index_range())
-        if (e->neighbor_ptr(s) != remote_elem || reset_remote_elements)
-          e->set_neighbor(s, nullptr);
+    Threads::parallel_for
+      (this->element_stored_range(),
+       [reset_remote_elements](const ElemRange & range)
+       {
+         for (Elem * e : range)
+           for (auto s : e->side_index_range())
+             if (e->neighbor_ptr(s) != remote_elem || reset_remote_elements)
+               e->set_neighbor(s, nullptr);
+       });
 
   // Find neighboring elements by first finding elements
   // with identical side keys and then check to see if they

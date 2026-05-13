@@ -30,6 +30,7 @@
 #include "libmesh/function_base.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_tet10.h"
+#include "libmesh/elem_range.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/libmesh_logging.h"
@@ -1758,11 +1759,14 @@ void MeshTools::Modification::change_subdomain_id (MeshBase & mesh,
       return;
     }
 
-  for (auto & elem : mesh.element_ptr_range())
-    {
-      if (elem->subdomain_id() == old_id)
-        elem->subdomain_id() = new_id;
-    }
+  Threads::parallel_for
+    (mesh.element_stored_range(),
+     [old_id, new_id](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         if (elem->subdomain_id() == old_id)
+           elem->subdomain_id() = new_id;
+     });
 
   // We just invalidated mesh.get_subdomain_ids(), but it might not be
   // efficient to fix that here.

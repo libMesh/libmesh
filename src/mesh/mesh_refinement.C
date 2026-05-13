@@ -16,11 +16,6 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 
-// C++ includes
-#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
-#include <cmath> // for isnan(), when it's defined
-#include <limits>
-
 // Local includes
 #include "libmesh/libmesh_config.h"
 
@@ -28,6 +23,7 @@
 #ifdef LIBMESH_ENABLE_AMR
 
 #include "libmesh/boundary_info.h"
+#include "libmesh/elem_range.h"
 #include "libmesh/error_vector.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
@@ -49,6 +45,11 @@
 #include "libmesh/periodic_boundaries.h"
 #endif
 
+// C++ includes
+#include <atomic>
+#include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
+#include <cmath> // for isnan(), when it's defined
+#include <limits>
 
 
 // Anonymous namespace for helper functions
@@ -283,24 +284,29 @@ void MeshRefinement::create_parent_error_vector(const ErrorVector & error_per_ce
   // calculate local contributions to the parents' errors squared
   // first, then sum across processors and take the square roots
   // second.
-  for (auto & elem : _mesh.active_local_element_ptr_range())
-    {
-      Elem * parent = elem->parent();
+  Threads::parallel_for
+    (_mesh.active_local_element_stored_range(),
+     [&error_per_cell, &error_per_parent](const ConstElemRange & range)
+     {
+       for (const Elem * elem : range)
+         {
+           const Elem * parent = elem->parent();
 
-      // Calculate each contribution to parent cells
-      if (parent)
-        {
-          const dof_id_type parentid  = parent->id();
-          libmesh_assert_less (parentid, error_per_parent.size());
+           // Calculate each contribution to parent cells
+           if (parent)
+             {
+               const dof_id_type parentid  = parent->id();
+               libmesh_assert_less (parentid, error_per_parent.size());
 
-          // If the parent has grandchildren we won't be able to
-          // coarsen it, so forget it.  Otherwise, add this child's
-          // contribution to the sum of the squared child errors
-          if (error_per_parent[parentid] != -1.0)
-            error_per_parent[parentid] += (error_per_cell[elem->id()] *
-                                           error_per_cell[elem->id()]);
-        }
-    }
+               // If the parent has grandchildren we won't be able to
+               // coarsen it, so forget it.  Otherwise, add this child's
+               // contribution to the sum of the squared child errors
+               if (error_per_parent[parentid] != -1.0)
+                 error_per_parent[parentid] += (error_per_cell[elem->id()] *
+                                                error_per_cell[elem->id()]);
+             }
+         }
+     });
 
   // Sum the vector across all processors
   this->comm().sum(static_cast<std::vector<ErrorVectorReal> &>(error_per_parent));
@@ -485,42 +491,48 @@ bool MeshRefinement::refine_and_coarsen_elements ()
   // Possibly clean up the refinement flags from
   // a previous step.  While we're at it, see if this method should be
   // a no-op.
-  bool elements_flagged = false;
+  std::atomic<bool> elements_flagged{false};
 
-  for (auto & elem : _mesh.element_ptr_range())
-    {
-      // This might be left over from the last step
-      const Elem::RefinementState flag = elem->refinement_flag();
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [&elements_flagged](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         {
+           // This might be left over from the last step
+           const Elem::RefinementState flag = elem->refinement_flag();
 
-      // Set refinement flag to INACTIVE if the
-      // element isn't active
-      if ( !elem->active())
-        {
-          elem->set_refinement_flag(Elem::INACTIVE);
-          elem->set_p_refinement_flag(Elem::INACTIVE);
-        }
-      else if (flag == Elem::JUST_REFINED)
-        elem->set_refinement_flag(Elem::DO_NOTHING);
-      else if (!elements_flagged)
-        {
-          if (flag == Elem::REFINE || flag == Elem::COARSEN)
-            elements_flagged = true;
-          else
-            {
-              const Elem::RefinementState pflag =
-                elem->p_refinement_flag();
-              if (pflag == Elem::REFINE || pflag == Elem::COARSEN)
-                elements_flagged = true;
-            }
-        }
-    }
+           // Set refinement flag to INACTIVE if the
+           // element isn't active
+           if (!elem->active())
+             {
+               elem->set_refinement_flag(Elem::INACTIVE);
+               elem->set_p_refinement_flag(Elem::INACTIVE);
+             }
+           else if (flag == Elem::JUST_REFINED)
+             elem->set_refinement_flag(Elem::DO_NOTHING);
+           else if (!elements_flagged)
+             {
+               if (flag == Elem::REFINE || flag == Elem::COARSEN)
+                 elements_flagged = true;
+               else
+                 {
+                   const Elem::RefinementState pflag =
+                     elem->p_refinement_flag();
+                   if (pflag == Elem::REFINE || pflag == Elem::COARSEN)
+                     elements_flagged = true;
+                 }
+             }
+         }
+     });
 
   // Did *any* processor find elements flagged for AMR/C?
-  _mesh.comm().max(elements_flagged);
+  bool any_elements_flagged = elements_flagged;
+  _mesh.comm().max(any_elements_flagged);
 
   // If we have nothing to do, let's not bother verifying that nothing
   // is compatible with nothing.
-  if (!elements_flagged)
+  if (!any_elements_flagged)
     return false;
 
   // Parallel consistency has to come first, or coarsening
@@ -616,20 +628,25 @@ bool MeshRefinement::coarsen_elements ()
 
   // Possibly clean up the refinement flags from
   // a previous step
-  for (auto & elem : _mesh.element_ptr_range())
-    {
-      // Set refinement flag to INACTIVE if the
-      // element isn't active
-      if (!elem->active())
-        {
-          elem->set_refinement_flag(Elem::INACTIVE);
-          elem->set_p_refinement_flag(Elem::INACTIVE);
-        }
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         {
+           // Set refinement flag to INACTIVE if the
+           // element isn't active
+           if (!elem->active())
+             {
+               elem->set_refinement_flag(Elem::INACTIVE);
+               elem->set_p_refinement_flag(Elem::INACTIVE);
+             }
 
-      // This might be left over from the last step
-      if (elem->refinement_flag() == Elem::JUST_REFINED)
-        elem->set_refinement_flag(Elem::DO_NOTHING);
-    }
+           // This might be left over from the last step
+           if (elem->refinement_flag() == Elem::JUST_REFINED)
+             elem->set_refinement_flag(Elem::DO_NOTHING);
+         }
+     });
 
   // Parallel consistency has to come first, or coarsening
   // along processor boundaries might occasionally be falsely
@@ -705,20 +722,25 @@ bool MeshRefinement::refine_elements ()
 
   // Possibly clean up the refinement flags from
   // a previous step
-  for (auto & elem : _mesh.element_ptr_range())
-    {
-      // Set refinement flag to INACTIVE if the
-      // element isn't active
-      if (!elem->active())
-        {
-          elem->set_refinement_flag(Elem::INACTIVE);
-          elem->set_p_refinement_flag(Elem::INACTIVE);
-        }
+  Threads::parallel_for
+    (_mesh.element_stored_range(),
+     [](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         {
+           // Set refinement flag to INACTIVE if the
+           // element isn't active
+           if (!elem->active())
+             {
+               elem->set_refinement_flag(Elem::INACTIVE);
+               elem->set_p_refinement_flag(Elem::INACTIVE);
+             }
 
-      // This might be left over from the last step
-      if (elem->refinement_flag() == Elem::JUST_REFINED)
-        elem->set_refinement_flag(Elem::DO_NOTHING);
-    }
+           // This might be left over from the last step
+           if (elem->refinement_flag() == Elem::JUST_REFINED)
+             elem->set_refinement_flag(Elem::DO_NOTHING);
+         }
+     });
 
   // Parallel consistency has to come first, or coarsening
   // along processor boundaries might occasionally be falsely

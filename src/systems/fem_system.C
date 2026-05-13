@@ -37,11 +37,6 @@
 namespace {
 using namespace libMesh;
 
-// give this guy some scope since there
-// is underlying vector allocation upon
-// creation/deletion
-ConstElemRange elem_range;
-
 typedef Threads::spin_mutex femsystem_mutex;
 femsystem_mutex assembly_mutex;
 
@@ -943,8 +938,7 @@ void FEMSystem::assembly (bool get_residual, bool get_jacobian,
   // Build the residual and jacobian contributions on every active
   // mesh element on this processor
   Threads::parallel_for
-    (elem_range.reset(mesh.active_local_elements_begin(),
-                      mesh.active_local_elements_end()),
+    (mesh.active_local_element_stored_range(),
      AssemblyContributions(*this, get_residual, get_jacobian,
                            apply_heterogeneous_constraints,
                            apply_no_constraints));
@@ -1137,8 +1131,7 @@ void FEMSystem::postprocess ()
   this->get_time_solver().set_is_adjoint(false);
 
   // Loop over every active mesh element on this processor
-  Threads::parallel_for (elem_range.reset(mesh.active_local_elements_begin(),
-                                          mesh.active_local_elements_end()),
+  Threads::parallel_for (mesh.active_local_element_stored_range(),
                          PostprocessContributions(*this));
 }
 
@@ -1165,8 +1158,7 @@ void FEMSystem::assemble_qoi (const QoISet & qoi_indices)
   QoIContributions qoi_contributions(*this, *(this->get_qoi()), qoi_indices);
 
   // Loop over every active mesh element on this processor
-  Threads::parallel_reduce(elem_range.reset(mesh.active_local_elements_begin(),
-                                            mesh.active_local_elements_end()),
+  Threads::parallel_reduce(mesh.active_local_element_stored_range(),
                            qoi_contributions);
 
   std::vector<Number> global_qoi = this->get_qoi_values();
@@ -1193,8 +1185,7 @@ void FEMSystem::assemble_qoi_derivative (const QoISet & qoi_indices,
       this->add_adjoint_rhs(i).zero();
 
   // Loop over every active mesh element on this processor
-  Threads::parallel_for (elem_range.reset(mesh.active_local_elements_begin(),
-                                          mesh.active_local_elements_end()),
+  Threads::parallel_for (mesh.active_local_element_stored_range(),
                          QoIDerivativeContributions(*this, qoi_indices,
                                                     *(this->get_qoi()),
                                                     include_liftfunc,
