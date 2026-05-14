@@ -16,6 +16,13 @@ distclean-local:
 	rm -rf build install
 	rm -f .buildstamp
 
+qhulllibdir = $(libdir)
+qhulllib_DATA = build/libqhullstatic_r.a \
+                build/libqhullcpp.a
+
+build/libqhullstatic_r.a: .buildstamp
+build/libqhullcpp.a: .buildstamp
+
 endif
 
 EXTRA_DIST = qhull
