@@ -434,6 +434,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define if Kokkos support is enabled in libMesh */
+#undef HAVE_KOKKOS
+
 /* Flag indicating whether the library will be compiled with LASPACK support
    */
 #undef HAVE_LASPACK
@@ -484,9 +487,6 @@
 /* Flag indicating whether the library shall be compiled to use NVTX
    annotations */
 #undef HAVE_NVTX_API
-
-/* Defined if the installed TBB is oneTBB (>= 2021) */
-#undef HAVE_ONETBB
 
 /* Define if OpenMP is enabled */
 #undef HAVE_OPENMP

@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_device.h"
 #include "libmesh/type_vector.h"
 
 // C++ includes
@@ -101,13 +102,16 @@ protected:
    * many vectors are needed.
    */
   template<typename T2>
+  LIBMESH_DEVICE_INLINE
   TypeTensor(const TypeVector<T2> & vx);
 
   template<typename T2>
+  LIBMESH_DEVICE_INLINE
   TypeTensor(const TypeVector<T2> & vx,
              const TypeVector<T2> & vy);
 
   template<typename T2>
+  LIBMESH_DEVICE_INLINE
   TypeTensor(const TypeVector<T2> & vx,
              const TypeVector<T2> & vy,
              const TypeVector<T2> & vz);
@@ -133,12 +137,14 @@ public:
   /**
    * Destructor.
    */
+  LIBMESH_DEVICE_INLINE
   ~TypeTensor();
 
   /**
    * Assign to this tensor without creating a temporary.
    */
   template<typename T2>
+  LIBMESH_DEVICE_INLINE
   void assign (const TypeTensor<T2> &);
 
   /**
@@ -147,6 +153,7 @@ public:
    * \returns A reference to *this.
    */
   template <typename Scalar>
+  LIBMESH_DEVICE_INLINE
   typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeTensor &>::type
@@ -166,11 +173,13 @@ public:
   /**
    * \returns A proxy for the \f$ i^{th} \f$ column of the tensor.
    */
+  LIBMESH_DEVICE_INLINE
   ConstTypeTensorColumn<T> slice (const unsigned int i) const;
 
   /**
    * \returns A writable proxy for the \f$ i^{th} \f$ column of the tensor.
    */
+  LIBMESH_DEVICE_INLINE
   TypeTensorColumn<T> slice (const unsigned int i);
 
   /**
@@ -181,6 +190,7 @@ public:
   /**
    * \returns A copy of one column of the tensor as a TypeVector.
    */
+  LIBMESH_DEVICE_INLINE
   TypeVector<T> column(const unsigned int r) const;
 
   /**
@@ -210,6 +220,7 @@ public:
    * Add a scaled tensor to this tensor without creating a temporary.
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   void add_scaled (const TypeTensor<T2> &, const T &);
 
   /**
@@ -240,6 +251,7 @@ public:
    * temporary.
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   void subtract_scaled (const TypeTensor<T2> &, const T &);
 
   /**
@@ -265,6 +277,7 @@ public:
    */
   template <typename Scalar, typename std::enable_if<
                                ScalarTraits<Scalar>::value, int>::type = 0>
+  LIBMESH_DEVICE_INLINE
   const TypeTensor<T> & operator *= (const Scalar & factor)
     {
       for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
@@ -319,6 +332,7 @@ public:
    * \returns The scalar-valued result, this tensor is unchanged.
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   typename CompareTypes<T,T2>::supertype
   contract (const TypeTensor<T2> &) const;
 
@@ -339,6 +353,7 @@ public:
    * \returns A copy of the result vector, this tensor is unchanged.
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   TypeVector<typename CompareTypes<T,T2>::supertype>
   left_multiply (const TypeVector<T2> & p) const;
 
@@ -358,6 +373,7 @@ public:
    *
    * \returns The solution in the \p x vector.
    */
+  LIBMESH_DEVICE_INLINE
   void solve(const TypeVector<T> & b, TypeVector<T> & x) const;
 
   /**
@@ -375,6 +391,7 @@ public:
   /**
    * \returns True if all values in the tensor are zero
    */
+  LIBMESH_DEVICE_INLINE
   bool is_zero() const;
 
   /**
@@ -393,11 +410,13 @@ public:
   /**
    * Set all entries of the tensor to 0.
    */
+  LIBMESH_DEVICE_INLINE
   void zero();
 
   /**
    * \returns \p true if two tensors are equal, \p false otherwise.
    */
+  LIBMESH_DEVICE_INLINE
   bool operator == (const TypeTensor<T> & rhs) const;
 
   /**
@@ -513,7 +532,7 @@ private:
 //------------------------------------------------------
 // Inline functions
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<T>::TypeTensor ()
 {
   _coords[0] = {};
@@ -536,7 +555,7 @@ TypeTensor<T>::TypeTensor ()
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<T>::TypeTensor (const T & xx,
                            const T & xy,
                            const T & xz,
@@ -582,7 +601,7 @@ TypeTensor<T>::TypeTensor (const T & xx,
 
 template <typename T>
 template <typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<T>::TypeTensor (const Scalar & xx,
                            const Scalar & xy,
                            const Scalar & xz,
@@ -631,7 +650,7 @@ TypeTensor<T>::TypeTensor (const Scalar & xx,
 
 template <typename T>
 template<typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<T>::TypeTensor (const TypeTensor <T2> & p)
 {
   // copy the nodes from vector p to me
@@ -642,6 +661,7 @@ TypeTensor<T>::TypeTensor (const TypeTensor <T2> & p)
 
 template <typename T>
 template <typename T2>
+LIBMESH_DEVICE_INLINE
 TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx)
 {
   libmesh_assert_equal_to (LIBMESH_DIM, 1);
@@ -650,6 +670,7 @@ TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx)
 
 template <typename T>
 template <typename T2>
+LIBMESH_DEVICE_INLINE
 TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx,
                           const TypeVector<T2> & vy)
 {
@@ -666,6 +687,7 @@ TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx,
 
 template <typename T>
 template <typename T2>
+LIBMESH_DEVICE_INLINE
 TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx,
                           const TypeVector<T2> & vy,
                           const TypeVector<T2> & vz)
@@ -690,7 +712,7 @@ TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx,
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<T>::~TypeTensor ()
 {
 }
@@ -699,7 +721,7 @@ TypeTensor<T>::~TypeTensor ()
 
 template <typename T>
 template<typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeTensor<T>::assign (const TypeTensor<T2> & p)
 {
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
@@ -709,7 +731,7 @@ void TypeTensor<T>::assign (const TypeTensor<T2> & p)
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 const T & TypeTensor<T>::operator () (const unsigned int i,
                                       const unsigned int j) const
 {
@@ -728,14 +750,14 @@ const T & TypeTensor<T>::operator () (const unsigned int i,
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T & TypeTensor<T>::operator () (const unsigned int i,
                                 const unsigned int j)
 {
 #if LIBMESH_DIM < 3
 
-  libmesh_error_msg_if(i >= LIBMESH_DIM || j >= LIBMESH_DIM,
-                       "ERROR:  You are assigning to a tensor component that is out of range for the compiled LIBMESH_DIM!");
+  LIBMESH_DEVICE_ERROR_MSG_IF(i >= LIBMESH_DIM || j >= LIBMESH_DIM,
+                              "ERROR:  You are assigning to a tensor component that is out of range for the compiled LIBMESH_DIM!");
 
 #endif
 
@@ -747,7 +769,7 @@ T & TypeTensor<T>::operator () (const unsigned int i,
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 ConstTypeTensorColumn<T>
 TypeTensor<T>::slice (const unsigned int i) const
 {
@@ -757,7 +779,7 @@ TypeTensor<T>::slice (const unsigned int i) const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensorColumn<T>
 TypeTensor<T>::slice (const unsigned int i)
 {
@@ -767,7 +789,7 @@ TypeTensor<T>::slice (const unsigned int i)
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<T>
 TypeTensor<T>::row(const unsigned int r) const
 {
@@ -781,7 +803,7 @@ TypeTensor<T>::row(const unsigned int r) const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<T>
 TypeTensor<T>::column(const unsigned int r) const
 {
@@ -796,7 +818,7 @@ TypeTensor<T>::column(const unsigned int r) const
 
 template <typename T>
 template<typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<typename CompareTypes<T, T2>::supertype>
 TypeTensor<T>::operator + (const TypeTensor<T2> & p) const
 {
@@ -831,7 +853,7 @@ TypeTensor<T>::operator + (const TypeTensor<T2> & p) const
 
 template <typename T>
 template<typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 const TypeTensor<T> & TypeTensor<T>::operator += (const TypeTensor<T2> & p)
 {
   this->add (p);
@@ -843,7 +865,7 @@ const TypeTensor<T> & TypeTensor<T>::operator += (const TypeTensor<T2> & p)
 
 template <typename T>
 template<typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeTensor<T>::add (const TypeTensor<T2> & p)
 {
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
@@ -854,7 +876,7 @@ void TypeTensor<T>::add (const TypeTensor<T2> & p)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeTensor<T>::add_scaled (const TypeTensor<T2> & p, const T & factor)
 {
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
@@ -866,7 +888,7 @@ void TypeTensor<T>::add_scaled (const TypeTensor<T2> & p, const T & factor)
 
 template <typename T>
 template<typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<typename CompareTypes<T, T2>::supertype>
 TypeTensor<T>::operator - (const TypeTensor<T2> & p) const
 {
@@ -901,7 +923,7 @@ TypeTensor<T>::operator - (const TypeTensor<T2> & p) const
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 const TypeTensor<T> & TypeTensor<T>::operator -= (const TypeTensor<T2> & p)
 {
   this->subtract (p);
@@ -913,7 +935,7 @@ const TypeTensor<T> & TypeTensor<T>::operator -= (const TypeTensor<T2> & p)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeTensor<T>::subtract (const TypeTensor<T2> & p)
 {
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
@@ -924,7 +946,7 @@ void TypeTensor<T>::subtract (const TypeTensor<T2> & p)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeTensor<T>::subtract_scaled (const TypeTensor<T2> & p, const T & factor)
 {
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
@@ -934,7 +956,7 @@ void TypeTensor<T>::subtract_scaled (const TypeTensor<T2> & p, const T & factor)
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<T> TypeTensor<T>::operator - () const
 {
 
@@ -967,7 +989,7 @@ TypeTensor<T> TypeTensor<T>::operator - () const
 
 template <typename T>
 template <typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 auto
 TypeTensor<T>::operator * (const Scalar & factor) const -> typename std::enable_if<
   ScalarTraits<Scalar>::value,
@@ -1003,7 +1025,7 @@ TypeTensor<T>::operator * (const Scalar & factor) const -> typename std::enable_
 
 
 template <typename T, typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
@@ -1015,7 +1037,7 @@ operator * (const Scalar & factor,
 
 template <typename T>
 template <typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeTensor<typename CompareTypes<T, Scalar>::supertype>>::type
@@ -1053,7 +1075,7 @@ TypeTensor<T>::operator / (const Scalar & factor) const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<T> TypeTensor<T>::transpose() const
 {
 #if LIBMESH_DIM == 1
@@ -1083,7 +1105,7 @@ TypeTensor<T> TypeTensor<T>::transpose() const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<T> TypeTensor<T>::inverse() const
 {
 #if LIBMESH_DIM == 1
@@ -1132,7 +1154,7 @@ TypeTensor<T> TypeTensor<T>::inverse() const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeTensor<T>::solve(const TypeVector<T> & b, TypeVector<T> & x) const
 {
 #if LIBMESH_DIM == 1
@@ -1183,7 +1205,7 @@ void TypeTensor<T>::solve(const TypeVector<T> & b, TypeVector<T> & x) const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 const TypeTensor<T> & TypeTensor<T>::operator /= (const T & factor)
 {
   libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
@@ -1199,7 +1221,7 @@ const TypeTensor<T> & TypeTensor<T>::operator /= (const T & factor)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<typename CompareTypes<T,T2>::supertype>
 TypeTensor<T>::operator * (const TypeVector<T2> & p) const
 {
@@ -1213,7 +1235,7 @@ TypeTensor<T>::operator * (const TypeVector<T2> & p) const
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<typename CompareTypes<T,T2>::supertype>
 TypeTensor<T>::left_multiply (const TypeVector<T2> & p) const
 {
@@ -1226,7 +1248,7 @@ TypeTensor<T>::left_multiply (const TypeVector<T2> & p) const
 }
 
 template <typename T, typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<typename CompareTypes<T,T2>::supertype>
 operator * (const TypeVector<T> & a, const TypeTensor<T2> & b)
 {
@@ -1235,7 +1257,7 @@ operator * (const TypeVector<T> & a, const TypeTensor<T2> & b)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<typename CompareTypes<T, T2>::supertype>
 TypeTensor<T>::operator * (const TypeTensor<T2> & p) const
 {
@@ -1250,7 +1272,7 @@ TypeTensor<T>::operator * (const TypeTensor<T2> & p) const
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 const TypeTensor<T> & TypeTensor<T>::operator *= (const TypeTensor<T2> & p)
 {
   TypeTensor<T> temp;
@@ -1270,7 +1292,7 @@ const TypeTensor<T> & TypeTensor<T>::operator *= (const TypeTensor<T2> & p)
  */
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 typename CompareTypes<T,T2>::supertype
 TypeTensor<T>::contract (const TypeTensor<T2> & t) const
 {
@@ -1283,7 +1305,7 @@ TypeTensor<T>::contract (const TypeTensor<T2> & t) const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto TypeTensor<T>::norm() const
 {
   using std::sqrt;
@@ -1292,7 +1314,7 @@ auto TypeTensor<T>::norm() const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 bool TypeTensor<T>::is_zero() const
 {
   for (const auto & val : _coords)
@@ -1302,7 +1324,7 @@ bool TypeTensor<T>::is_zero() const
 }
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T TypeTensor<T>::det() const
 {
 #if LIBMESH_DIM == 1
@@ -1325,7 +1347,7 @@ T TypeTensor<T>::det() const
 }
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T TypeTensor<T>::tr() const
 {
 #if LIBMESH_DIM == 1
@@ -1342,7 +1364,7 @@ T TypeTensor<T>::tr() const
 }
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeTensor<T>::zero()
 {
   for (unsigned int i=0; i<LIBMESH_DIM*LIBMESH_DIM; i++)
@@ -1352,7 +1374,7 @@ void TypeTensor<T>::zero()
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto TypeTensor<T>::norm_sq () const
 {
   Real sum = 0.;
@@ -1364,7 +1386,7 @@ auto TypeTensor<T>::norm_sq () const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 bool TypeTensor<T>::operator == (const TypeTensor<T> & rhs) const
 {
 #if LIBMESH_DIM == 1
@@ -1436,7 +1458,7 @@ void TypeTensor<T>::print(std::ostream & os) const
 }
 
 template <typename T, typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeTensor<typename CompareTypes<T, T2>::supertype>
 outer_product(const TypeVector<T> & a, const TypeVector<T2> & b)
 {

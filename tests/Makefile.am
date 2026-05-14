@@ -7,6 +7,7 @@ AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 	       -DLIBMESH_IS_UNIT_TESTING
 AM_LDFLAGS   = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
 LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
+KOKKOS_TEST_CPPFLAGS =
 
 # We might have turned on -Werror and/or paranoid warnings
 CXXFLAGS_DBG += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
@@ -134,6 +135,7 @@ unit_tests_sources = \
   partitioning/morton_sfc_partitioner_test.C \
   partitioning/parmetis_partitioner_test.C \
   partitioning/sfc_partitioner_test.C \
+  quadrature/quadrature_exactness.h \
   quadrature/quadrature_test.C \
   solvers/time_solver_test_common.h \
   solvers/first_order_unsteady_solver_test.C \
@@ -240,7 +242,7 @@ data = matrices/geom_1_extraction_op.h5 \
 unit_tests_data = $(data)
 
 # Why isn't this working automatically?
-EXTRA_DIST = $(data)
+EXTRA_DIST = $(data) fe/kokkos_fe_oracle_test_utils.h
 
 if LIBMESH_ENABLE_FPARSER
   unit_tests_sources += \
@@ -248,6 +250,93 @@ if LIBMESH_ENABLE_FPARSER
 endif
 
 check_PROGRAMS = # empty, append below
+TESTS =
+
+if LIBMESH_ENABLE_KOKKOS
+  KOKKOS_TEST_CPPFLAGS += -I$(top_srcdir)/include $(KOKKOS_CPPFLAGS)
+
+  check_PROGRAMS += kokkos_fe_types_oracle_unit kokkos_fe_shape_oracle_unit \
+                    kokkos_fe_map_oracle_unit kokkos_fe_invariant_unit \
+                    kokkos_fe_contract_unit kokkos_fe_permuted_map_oracle_unit \
+                    kokkos_fe_reconstruction_oracle_unit \
+                    kokkos_fe_side_trace_oracle_unit
+  TESTS += kokkos_fe_types_oracle_unit kokkos_fe_shape_oracle_unit \
+           kokkos_fe_map_oracle_unit kokkos_fe_invariant_unit \
+           kokkos_fe_contract_unit kokkos_fe_permuted_map_oracle_unit \
+           kokkos_fe_reconstruction_oracle_unit \
+           kokkos_fe_side_trace_oracle_unit
+
+  kokkos_fe_types_oracle_unit_SOURCES  = fe/kokkos_fe_types_oracle_test.K
+  kokkos_fe_types_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_fe_types_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_fe_types_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_fe_types_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_fe_shape_oracle_unit_SOURCES  = fe/kokkos_fe_shape_oracle_test.K
+  kokkos_fe_shape_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_fe_shape_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_fe_shape_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_fe_shape_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_fe_map_oracle_unit_SOURCES  = fe/kokkos_fe_map_oracle_test.K
+  kokkos_fe_map_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_fe_map_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_fe_map_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_fe_map_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_fe_invariant_unit_SOURCES  = fe/kokkos_fe_invariant_test.K
+  kokkos_fe_invariant_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_fe_invariant_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_fe_invariant_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_fe_invariant_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_fe_contract_unit_SOURCES  = fe/kokkos_fe_contract_test.K
+  kokkos_fe_contract_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_fe_contract_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_fe_contract_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_fe_contract_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_fe_permuted_map_oracle_unit_SOURCES  = fe/kokkos_fe_permuted_map_oracle_test.K
+  kokkos_fe_permuted_map_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_fe_permuted_map_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_fe_permuted_map_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_fe_permuted_map_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_fe_reconstruction_oracle_unit_SOURCES  = fe/kokkos_fe_reconstruction_oracle_test.K
+  kokkos_fe_reconstruction_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_fe_reconstruction_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_fe_reconstruction_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_fe_reconstruction_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_fe_side_trace_oracle_unit_SOURCES  = fe/kokkos_fe_side_trace_oracle_test.K
+  kokkos_fe_side_trace_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_fe_side_trace_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_fe_side_trace_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_fe_side_trace_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  check_PROGRAMS += kokkos_quadrature_oracle_unit kokkos_vector_ops_oracle_unit \
+                    kokkos_tensor_ops_oracle_unit
+  TESTS += kokkos_quadrature_oracle_unit kokkos_vector_ops_oracle_unit \
+           kokkos_tensor_ops_oracle_unit
+
+  kokkos_quadrature_oracle_unit_SOURCES  = fe/kokkos_quadrature_oracle_test.K
+  kokkos_quadrature_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_quadrature_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_quadrature_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_quadrature_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_vector_ops_oracle_unit_SOURCES  = numerics/kokkos_vector_ops_oracle_test.K
+  kokkos_vector_ops_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_vector_ops_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_vector_ops_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_vector_ops_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+
+  kokkos_tensor_ops_oracle_unit_SOURCES  = numerics/kokkos_tensor_ops_oracle_test.K
+  kokkos_tensor_ops_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
+  kokkos_tensor_ops_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
+  kokkos_tensor_ops_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+  kokkos_tensor_ops_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+endif
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
@@ -358,8 +447,62 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 
 
 if LIBMESH_ENABLE_CPPUNIT
-TESTS = run_unit_tests.sh
+TESTS += run_unit_tests.sh
 endif
+
+# Compile .K translation units with the Kokkos device compiler.
+# $(MPI_INCLUDES) is needed because KOKKOS_CXX may be nvcc/hipcc
+# instead of the MPI compiler wrapper, so mpi.h won't be found implicitly.
+.K.o:
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(MPI_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c $< -o $@
+
+# Custom link rules so the Kokkos compiler drives the final link step.
+kokkos_fe_types_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_fe_types_oracle_unit_LDFLAGS) -o $@
+
+kokkos_fe_shape_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_fe_shape_oracle_unit_LDFLAGS) -o $@
+
+kokkos_fe_map_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_fe_map_oracle_unit_LDFLAGS) -o $@
+
+kokkos_fe_invariant_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_fe_invariant_unit_LDFLAGS) -o $@
+
+kokkos_fe_contract_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_fe_contract_unit_LDFLAGS) -o $@
+
+kokkos_fe_permuted_map_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_fe_permuted_map_oracle_unit_LDFLAGS) -o $@
+
+kokkos_fe_reconstruction_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_fe_reconstruction_oracle_unit_LDFLAGS) -o $@
+
+kokkos_fe_side_trace_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_fe_side_trace_oracle_unit_LDFLAGS) -o $@
+
+kokkos_quadrature_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_quadrature_oracle_unit_LDFLAGS) -o $@
+
+kokkos_vector_ops_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_vector_ops_oracle_unit_LDFLAGS) -o $@
+
+kokkos_tensor_ops_oracle_unit_LINK = \
+  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+  $(LDFLAGS) $(kokkos_tensor_ops_oracle_unit_LDFLAGS) -o $@
 
 CLEANFILES = cube_mesh.xda \
              slit_mesh.xda \

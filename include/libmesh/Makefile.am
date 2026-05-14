@@ -19,6 +19,7 @@ BUILT_SOURCES = \
         libmesh_augment_std_namespace.h \
         libmesh_base.h \
         libmesh_common.h \
+        libmesh_device.h \
         libmesh_documentation.h \
         libmesh_exceptions.h \
         libmesh_logging.h \
@@ -40,6 +41,7 @@ BUILT_SOURCES = \
         enum_elem_quality.h \
         enum_elem_type.h \
         enum_error_estimator_type.h \
+        enum_fe_elem_class.h \
         enum_fe_family.h \
         enum_inf_map_type.h \
         enum_io_package.h \
@@ -317,7 +319,6 @@ BUILT_SOURCES = \
         threads_allocators.h \
         threads_none.h \
         threads_pthread.h \
-        threads_spin_mutex_forward.h \
         threads_tbb.h \
         centroid_partitioner.h \
         hilbert_sfc_partitioner.h \
@@ -657,6 +658,9 @@ libmesh_base.h: $(top_srcdir)/include/base/libmesh_base.h
 libmesh_common.h: $(top_srcdir)/include/base/libmesh_common.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+libmesh_device.h: $(top_srcdir)/include/base/libmesh_device.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 libmesh_documentation.h: $(top_srcdir)/include/base/libmesh_documentation.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -718,6 +722,9 @@ enum_elem_type.h: $(top_srcdir)/include/enums/enum_elem_type.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_error_estimator_type.h: $(top_srcdir)/include/enums/enum_error_estimator_type.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+enum_fe_elem_class.h: $(top_srcdir)/include/enums/enum_fe_elem_class.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 enum_fe_family.h: $(top_srcdir)/include/enums/enum_fe_family.h
@@ -1551,9 +1558,6 @@ threads_none.h: $(top_srcdir)/include/parallel/threads_none.h
 threads_pthread.h: $(top_srcdir)/include/parallel/threads_pthread.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-threads_spin_mutex_forward.h: $(top_srcdir)/include/parallel/threads_spin_mutex_forward.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 threads_tbb.h: $(top_srcdir)/include/parallel/threads_tbb.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -2138,4 +2142,3 @@ xdr_cxx.h: $(top_srcdir)/include/utils/xdr_cxx.h
 
 parallel_communicator_specializations: $(top_srcdir)/include/timpi_shims/parallel_communicator_specializations
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-

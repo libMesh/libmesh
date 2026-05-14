@@ -2,10 +2,10 @@
 #include <libmesh/enum_quadrature_type.h>
 #include <libmesh/quadrature.h>
 #include <libmesh/string_to_enum.h>
-#include <libmesh/utility.h>
 
 #include <iomanip>
-#include <numeric> // std::iota
+
+#include "quadrature_exactness.h"
 
 #include "libmesh_cppunit.h"
 
@@ -205,115 +205,47 @@ private:
 
   const std::function<Real(int,int,int)> edge_integrals =
   [](int mode, int, int) {
-    return (mode % 2) ?  0 : (Real(2.0) / (mode+1));
+    return quadrature_exactness::edge_integral(static_cast<unsigned int>(mode));
   };
 
   const std::function<Real(int,int,int)> quad_integrals =
   [](int modex, int modey, int) {
-    const Real exactx = (modex % 2) ?
-      0 : (Real(2.0) / (modex+1));
-
-    const Real exacty = (modey % 2) ?
-      0 : (Real(2.0) / (modey+1));
-
-    return exactx*exacty;
+    return quadrature_exactness::quad_integral(static_cast<unsigned int>(modex),
+                                               static_cast<unsigned int>(modey));
   };
 
   const std::function<Real(int,int,int)> tri_integrals =
   [](int x_power, int y_power, int) {
-    // Compute the true integral, a! b! / (a + b + 2)!
-    Real analytical = 1.0;
-
-    unsigned
-      larger_power = std::max(x_power, y_power),
-      smaller_power = std::min(x_power, y_power);
-
-    // Cancel the larger of the two numerator terms with the
-    // denominator, and fill in the remaining entries.
-    std::vector<unsigned>
-      numerator(smaller_power > 1 ? smaller_power-1 : 0),
-      denominator(2+smaller_power);
-
-    // Fill up the vectors with sequences starting at the right values.
-    std::iota(numerator.begin(), numerator.end(), 2);
-    std::iota(denominator.begin(), denominator.end(), larger_power+1);
-
-    // The denominator is guaranteed to have more terms...
-    for (std::size_t i=0; i<denominator.size(); ++i)
-      {
-        if (i < numerator.size())
-          analytical *= numerator[i];
-        analytical /= denominator[i];
-      }
-    return analytical;
+    return quadrature_exactness::tri_integral(static_cast<unsigned int>(x_power),
+                                              static_cast<unsigned int>(y_power));
   };
 
   const std::function<Real(int,int,int)> hex_integrals =
   [](int modex, int modey, int modez) {
-    const Real exactx = (modex % 2) ?
-      0 : (Real(2.0) / (modex+1));
-
-    const Real exacty = (modey % 2) ?
-      0 : (Real(2.0) / (modey+1));
-
-    const Real exactz = (modez % 2) ?
-      0 : (Real(2.0) / (modez+1));
-
-    return exactx*exacty*exactz;
+    return quadrature_exactness::hex_integral(static_cast<unsigned int>(modex),
+                                              static_cast<unsigned int>(modey),
+                                              static_cast<unsigned int>(modez));
   };
 
   const std::function<Real(int,int,int)> tet_integrals =
   [](int x_power, int y_power, int z_power) {
-    // Compute the true integral, a! b! c! / (a + b + c + 3)!
-    Real analytical = 1.0;
-
-    // Sort the a, b, c values
-    int sorted_powers[3] = {x_power, y_power, z_power};
-    std::sort(sorted_powers, sorted_powers+3);
-
-    // Cancel the largest power with the denominator, fill in the
-    // entries for the remaining numerator terms and the denominator.
-    std::vector<int>
-      numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
-      numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
-      denominator(3 + sorted_powers[0] + sorted_powers[1]);
-
-    // Fill up the vectors with sequences starting at the right values.
-    std::iota(numerator_1.begin(), numerator_1.end(), 2);
-    std::iota(numerator_2.begin(), numerator_2.end(), 2);
-    std::iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
-
-    // The denominator is guaranteed to have the most terms...
-    for (std::size_t i=0; i<denominator.size(); ++i)
-      {
-        if (i < numerator_1.size())
-          analytical *= numerator_1[i];
-
-        if (i < numerator_2.size())
-          analytical *= numerator_2[i];
-
-        analytical /= denominator[i];
-      }
-    return analytical;
+    return quadrature_exactness::tet_integral(static_cast<unsigned int>(x_power),
+                                              static_cast<unsigned int>(y_power),
+                                              static_cast<unsigned int>(z_power));
   };
 
   const std::function<Real(int,int,int)> prism_integrals =
-  [this](int modex, int modey, int modez) {
-    const Real exactz = (modez % 2) ?
-      0 : (Real(2.0) / (modez+1));
-
-    return exactz * tri_integrals(modex, modey, 0);
+  [](int modex, int modey, int modez) {
+    return quadrature_exactness::prism_integral(static_cast<unsigned int>(modex),
+                                                static_cast<unsigned int>(modey),
+                                                static_cast<unsigned int>(modez));
   };
 
   const std::function<Real(int,int,int)> pyramid_integrals =
   [](int modex, int modey, int modez) {
-
-    const int binom = Utility::binomial(modex+modey+modez+3, modez);
-
-    if (modex%2 || modey%2)
-      return Real(0);
-
-    return Real(4)/((modex+1)*(modey+1)*binom*(modex+modey+modez+3));
+    return quadrature_exactness::pyramid_integral(static_cast<unsigned int>(modex),
+                                                  static_cast<unsigned int>(modey),
+                                                  static_cast<unsigned int>(modez));
   };
 
 
