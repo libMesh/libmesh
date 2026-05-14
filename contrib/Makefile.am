@@ -187,12 +187,7 @@ if LIBMESH_ENABLE_TETGEN
 endif
 
 if LIBMESH_ENABLE_QHULL
-  SUBDIRS    += qhull/qhull
-  opt_libs   += qhull/qhull/libopt.la
-  dbg_libs   += qhull/qhull/libdbg.la
-  devel_libs += qhull/qhull/libdevel.la
-  prof_libs  += qhull/qhull/libprof.la
-  oprof_libs += qhull/qhull/liboprof.la
+  SUBDIRS    += qhull
 endif
 
 if LIBMESH_ENABLE_LIBHILBERT
