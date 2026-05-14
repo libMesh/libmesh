@@ -24,4 +24,4 @@
 	url = ../../libMesh/netgen.git
 [submodule "contrib/qhull/git-qhull"]
 	path = contrib/qhull/git-qhull
-	url = git@github.com:qhull/qhull.git
+	url = ../../qhull/qhull.git
