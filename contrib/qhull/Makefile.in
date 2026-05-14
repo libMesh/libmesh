@@ -13,7 +13,6 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
-
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -91,13 +90,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-check_PROGRAMS = pointcloud_kdd_radius$(EXEEXT) \
-	pointcloud_example$(EXEEXT) \
-	pointcloud_adaptor_example$(EXEEXT) \
-	vector_of_vectors_example$(EXEEXT) $(am__EXEEXT_1)
-@LIBMESH_ENABLE_EIGEN_TRUE@am__append_1 = $(EIGEN_INCLUDE)
-@LIBMESH_ENABLE_EIGEN_TRUE@am__append_2 = matrix_example
-subdir = contrib/nanoflann
+subdir = contrib/qhull
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_code_coverage.m4 \
@@ -160,41 +153,11 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/xdr.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-DIST_COMMON = $(srcdir)/Makefile.am $(include_HEADERS) \
-	$(am__DIST_COMMON)
+DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
-@LIBMESH_ENABLE_EIGEN_TRUE@am__EXEEXT_1 = matrix_example$(EXEEXT)
-am__matrix_example_SOURCES_DIST =  \
-	$(srcdir)/nanoflann/examples/matrix_example.cpp
-am__dirstamp = $(am__leading_dot)dirstamp
-@LIBMESH_ENABLE_EIGEN_TRUE@am_matrix_example_OBJECTS = nanoflann/examples/matrix_example.$(OBJEXT)
-matrix_example_OBJECTS = $(am_matrix_example_OBJECTS)
-matrix_example_LDADD = $(LDADD)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
-am_pointcloud_adaptor_example_OBJECTS =  \
-	nanoflann/examples/pointcloud_adaptor_example.$(OBJEXT)
-pointcloud_adaptor_example_OBJECTS =  \
-	$(am_pointcloud_adaptor_example_OBJECTS)
-pointcloud_adaptor_example_LDADD = $(LDADD)
-am_pointcloud_example_OBJECTS =  \
-	nanoflann/examples/pointcloud_example.$(OBJEXT)
-pointcloud_example_OBJECTS = $(am_pointcloud_example_OBJECTS)
-pointcloud_example_LDADD = $(LDADD)
-am_pointcloud_kdd_radius_OBJECTS =  \
-	nanoflann/examples/pointcloud_kdd_radius.$(OBJEXT)
-pointcloud_kdd_radius_OBJECTS = $(am_pointcloud_kdd_radius_OBJECTS)
-pointcloud_kdd_radius_LDADD = $(LDADD)
-am_vector_of_vectors_example_OBJECTS =  \
-	nanoflann/examples/vector_of_vectors_example.$(OBJEXT)
-vector_of_vectors_example_OBJECTS =  \
-	$(am_vector_of_vectors_example_OBJECTS)
-vector_of_vectors_example_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -207,133 +170,15 @@ AM_V_at = $(am__v_at_@AM_V@)
 am__v_at_ = $(am__v_at_@AM_DEFAULT_V@)
 am__v_at_0 = @
 am__v_at_1 = 
-DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)/include
-depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
-am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = nanoflann/examples/$(DEPDIR)/matrix_example.Po \
-	nanoflann/examples/$(DEPDIR)/pointcloud_adaptor_example.Po \
-	nanoflann/examples/$(DEPDIR)/pointcloud_example.Po \
-	nanoflann/examples/$(DEPDIR)/pointcloud_kdd_radius.Po \
-	nanoflann/examples/$(DEPDIR)/vector_of_vectors_example.Po
-am__mv = mv -f
-CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
-LTCXXCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CXXFLAGS) $(CXXFLAGS)
-AM_V_CXX = $(am__v_CXX_@AM_V@)
-am__v_CXX_ = $(am__v_CXX_@AM_DEFAULT_V@)
-am__v_CXX_0 = @echo "  CXX     " $@;
-am__v_CXX_1 = 
-CXXLD = $(CXX)
-CXXLINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(AM_CXXFLAGS) \
-	$(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
-am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
-am__v_CXXLD_0 = @echo "  CXXLD   " $@;
-am__v_CXXLD_1 = 
-COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
-	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
-LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CFLAGS) $(CFLAGS)
-AM_V_CC = $(am__v_CC_@AM_V@)
-am__v_CC_ = $(am__v_CC_@AM_DEFAULT_V@)
-am__v_CC_0 = @echo "  CC      " $@;
-am__v_CC_1 = 
-CCLD = $(CC)
-LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
-	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-AM_V_CCLD = $(am__v_CCLD_@AM_V@)
-am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
-am__v_CCLD_0 = @echo "  CCLD    " $@;
-am__v_CCLD_1 = 
-SOURCES = $(matrix_example_SOURCES) \
-	$(pointcloud_adaptor_example_SOURCES) \
-	$(pointcloud_example_SOURCES) $(pointcloud_kdd_radius_SOURCES) \
-	$(vector_of_vectors_example_SOURCES)
-DIST_SOURCES = $(am__matrix_example_SOURCES_DIST) \
-	$(pointcloud_adaptor_example_SOURCES) \
-	$(pointcloud_example_SOURCES) $(pointcloud_kdd_radius_SOURCES) \
-	$(vector_of_vectors_example_SOURCES)
+SOURCES =
+DIST_SOURCES =
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
-am__vpath_adj = case $$p in \
-    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
-    *) f=$$p;; \
-  esac;
-am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
-am__install_max = 40
-am__nobase_strip_setup = \
-  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
-am__nobase_strip = \
-  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
-am__nobase_list = $(am__nobase_strip_setup); \
-  for p in $$list; do echo "$$p $$p"; done | \
-  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
-  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
-    if (++n[$$2] == $(am__install_max)) \
-      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
-    END { for (dir in files) print dir, files[dir] }'
-am__base_list = \
-  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
-  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
-am__uninstall_files_from_dir = { \
-  { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
-  || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
-       $(am__cd) "$$dir" && echo $$files | $(am__xargs_n) 40 $(am__rm_f); }; \
-  }
-am__installdirs = "$(DESTDIR)$(includedir)"
-HEADERS = $(include_HEADERS)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
-# Read a list of newline-separated strings from the standard input,
-# and print each of them once, without duplicates.  Input order is
-# *not* preserved.
-am__uniquify_input = $(AWK) '\
-  BEGIN { nonempty = 0; } \
-  { items[$$0] = 1; nonempty = 1; } \
-  END { if (nonempty) { for (i in items) print i; }; } \
-'
-# Make sure the list of sources is unique.  This is necessary because,
-# e.g., the same source file might be shared among _SOURCES variables
-# for different programs/libraries.
-am__define_uniq_tagged_files = \
-  list='$(am__tagged_files)'; \
-  unique=`for i in $$list; do \
-    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
-  done | $(am__uniquify_input)`
-am__tty_colors_dummy = \
-  mgn= red= grn= lgn= blu= brg= std=; \
-  am__color_tests=no
-am__tty_colors = { \
-  $(am__tty_colors_dummy); \
-  if test "X$(AM_COLOR_TESTS)" = Xno; then \
-    am__color_tests=no; \
-  elif test "X$(AM_COLOR_TESTS)" = Xalways; then \
-    am__color_tests=yes; \
-  elif test "X$$TERM" != Xdumb && { test -t 1; } 2>/dev/null; then \
-    am__color_tests=yes; \
-  fi; \
-  if test $$am__color_tests = yes; then \
-    red='[0;31m'; \
-    grn='[0;32m'; \
-    lgn='[1;32m'; \
-    blu='[1;34m'; \
-    mgn='[0;35m'; \
-    brg='[1m'; \
-    std='[m'; \
-  fi; \
-}
-am__DIST_COMMON = $(srcdir)/Makefile.in \
-	$(top_srcdir)/build-aux/depcomp
+am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ACSM_ANY_PARANOID_FLAGS = @ACSM_ANY_PARANOID_FLAGS@
@@ -613,11 +458,7 @@ host_cpu = @host_cpu@
 host_os = @host_os@
 host_vendor = @host_vendor@
 htmldir = @htmldir@
-
-# generally we do not install contributed headers, but
-# for nanoflann we will because of its tight inlining
-# in InverseDistanceInterpolation and friends
-includedir = $(prefix)/include/libmesh
+includedir = @includedir@
 infodir = @infodir@
 install_sh = @install_sh@
 libdir = @libdir@
@@ -663,25 +504,10 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
-AUTOMAKE_OPTIONS = subdir-objects
-AM_CPPFLAGS = -I$(top_srcdir)/contrib/nanoflann/nanoflann/include \
-	$(am__append_1)
-AM_CFLAGS = 
-
-# Nanoflann uses C++ threads now, and sometimes we need special C++
-# flags to get those to link properly.  We'll just use opt-mode here.
-AM_CXXFLAGS = $(CXXFLAGS_OPT)
-include_HEADERS = $(srcdir)/nanoflann/include/nanoflann.hpp
-pointcloud_kdd_radius_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_kdd_radius.cpp nanoflann/examples/utils.h
-pointcloud_example_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_example.cpp nanoflann/examples/utils.h
-pointcloud_adaptor_example_SOURCES = $(srcdir)/nanoflann/examples/pointcloud_adaptor_example.cpp
-vector_of_vectors_example_SOURCES = $(srcdir)/nanoflann/examples/vector_of_vectors_example.cpp nanoflann/examples/KDTreeVectorOfVectorsAdaptor.h
-@LIBMESH_ENABLE_EIGEN_TRUE@matrix_example_SOURCES = $(srcdir)/nanoflann/examples/matrix_example.cpp
-TESTS = $(check_PROGRAMS)
+EXTRA_DIST = qhull
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .cpp .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -691,9 +517,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__confi
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/nanoflann/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu contrib/qhull/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu contrib/nanoflann/Makefile
+	  $(AUTOMAKE) --gnu contrib/qhull/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -712,265 +538,17 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 
-clean-checkPROGRAMS:
-	$(am__rm_f) $(check_PROGRAMS)
-	test -z "$(EXEEXT)" || $(am__rm_f) $(check_PROGRAMS:$(EXEEXT)=)
-nanoflann/examples/$(am__dirstamp):
-	@$(MKDIR_P) nanoflann/examples
-	@: >>nanoflann/examples/$(am__dirstamp)
-nanoflann/examples/$(DEPDIR)/$(am__dirstamp):
-	@$(MKDIR_P) nanoflann/examples/$(DEPDIR)
-	@: >>nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
-nanoflann/examples/matrix_example.$(OBJEXT):  \
-	nanoflann/examples/$(am__dirstamp) \
-	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
-
-matrix_example$(EXEEXT): $(matrix_example_OBJECTS) $(matrix_example_DEPENDENCIES) $(EXTRA_matrix_example_DEPENDENCIES) 
-	@rm -f matrix_example$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(matrix_example_OBJECTS) $(matrix_example_LDADD) $(LIBS)
-nanoflann/examples/pointcloud_adaptor_example.$(OBJEXT):  \
-	nanoflann/examples/$(am__dirstamp) \
-	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
-
-pointcloud_adaptor_example$(EXEEXT): $(pointcloud_adaptor_example_OBJECTS) $(pointcloud_adaptor_example_DEPENDENCIES) $(EXTRA_pointcloud_adaptor_example_DEPENDENCIES) 
-	@rm -f pointcloud_adaptor_example$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(pointcloud_adaptor_example_OBJECTS) $(pointcloud_adaptor_example_LDADD) $(LIBS)
-nanoflann/examples/pointcloud_example.$(OBJEXT):  \
-	nanoflann/examples/$(am__dirstamp) \
-	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
-
-pointcloud_example$(EXEEXT): $(pointcloud_example_OBJECTS) $(pointcloud_example_DEPENDENCIES) $(EXTRA_pointcloud_example_DEPENDENCIES) 
-	@rm -f pointcloud_example$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(pointcloud_example_OBJECTS) $(pointcloud_example_LDADD) $(LIBS)
-nanoflann/examples/pointcloud_kdd_radius.$(OBJEXT):  \
-	nanoflann/examples/$(am__dirstamp) \
-	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
-
-pointcloud_kdd_radius$(EXEEXT): $(pointcloud_kdd_radius_OBJECTS) $(pointcloud_kdd_radius_DEPENDENCIES) $(EXTRA_pointcloud_kdd_radius_DEPENDENCIES) 
-	@rm -f pointcloud_kdd_radius$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(pointcloud_kdd_radius_OBJECTS) $(pointcloud_kdd_radius_LDADD) $(LIBS)
-nanoflann/examples/vector_of_vectors_example.$(OBJEXT):  \
-	nanoflann/examples/$(am__dirstamp) \
-	nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
-
-vector_of_vectors_example$(EXEEXT): $(vector_of_vectors_example_OBJECTS) $(vector_of_vectors_example_DEPENDENCIES) $(EXTRA_vector_of_vectors_example_DEPENDENCIES) 
-	@rm -f vector_of_vectors_example$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(vector_of_vectors_example_OBJECTS) $(vector_of_vectors_example_LDADD) $(LIBS)
-
-mostlyclean-compile:
-	-rm -f *.$(OBJEXT)
-	-rm -f nanoflann/examples/*.$(OBJEXT)
-
-distclean-compile:
-	-rm -f *.tab.c
-
-@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/matrix_example.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/pointcloud_adaptor_example.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/pointcloud_example.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/pointcloud_kdd_radius.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@nanoflann/examples/$(DEPDIR)/vector_of_vectors_example.Po@am__quote@ # am--include-marker
-
-$(am__depfiles_remade):
-	@$(MKDIR_P) $(@D)
-	@: >>$@
-
-am--depfiles: $(am__depfiles_remade)
-
-.cpp.o:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ $<
-
-.cpp.obj:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
-@am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
-@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.cpp.lo:
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
-@am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCXX_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-install-includeHEADERS: $(include_HEADERS)
-	@$(NORMAL_INSTALL)
-	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
-	fi; \
-	for p in $$list; do \
-	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
-	  echo "$$d$$p"; \
-	done | $(am__base_list) | \
-	while read files; do \
-	  echo " $(INSTALL_HEADER) $$files '$(DESTDIR)$(includedir)'"; \
-	  $(INSTALL_HEADER) $$files "$(DESTDIR)$(includedir)" || exit $$?; \
-	done
+tags TAGS:
 
-uninstall-includeHEADERS:
-	@$(NORMAL_UNINSTALL)
-	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
-	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
-	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
+ctags CTAGS:
 
-ID: $(am__tagged_files)
-	$(am__define_uniq_tagged_files); mkid -fID $$unique
-tags: tags-am
-TAGS: tags
+cscope cscopelist:
 
-tags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
-	set x; \
-	here=`pwd`; \
-	$(am__define_uniq_tagged_files); \
-	shift; \
-	if test -z "$(ETAGS_ARGS)$$*$$unique"; then :; else \
-	  test -n "$$unique" || unique=$$empty_fix; \
-	  if test $$# -gt 0; then \
-	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	      "$$@" $$unique; \
-	  else \
-	    $(ETAGS) $(ETAGSFLAGS) $(AM_ETAGSFLAGS) $(ETAGS_ARGS) \
-	      $$unique; \
-	  fi; \
-	fi
-ctags: ctags-am
-
-CTAGS: ctags
-ctags-am: $(TAGS_DEPENDENCIES) $(am__tagged_files)
-	$(am__define_uniq_tagged_files); \
-	test -z "$(CTAGS_ARGS)$$unique" \
-	  || $(CTAGS) $(CTAGSFLAGS) $(AM_CTAGSFLAGS) $(CTAGS_ARGS) \
-	     $$unique
-
-GTAGS:
-	here=`$(am__cd) $(top_builddir) && pwd` \
-	  && $(am__cd) $(top_srcdir) \
-	  && gtags -i $(GTAGS_ARGS) "$$here"
-cscopelist: cscopelist-am
-
-cscopelist-am: $(am__tagged_files)
-	list='$(am__tagged_files)'; \
-	case "$(srcdir)" in \
-	  [\\/]* | ?:[\\/]*) sdir="$(srcdir)" ;; \
-	  *) sdir=$(subdir)/$(srcdir) ;; \
-	esac; \
-	for i in $$list; do \
-	  if test -f "$$i"; then \
-	    echo "$(subdir)/$$i"; \
-	  else \
-	    echo "$$sdir/$$i"; \
-	  fi; \
-	done >> $(top_builddir)/cscope.files
-
-distclean-tags:
-	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
-
-check-TESTS: $(TESTS)
-	@failed=0; all=0; xfail=0; xpass=0; skip=0; \
-	srcdir=$(srcdir); export srcdir; \
-	list=' $(TESTS) '; \
-	$(am__tty_colors); \
-	if test -n "$$list"; then \
-	  for tst in $$list; do \
-	    if test -f ./$$tst; then dir=./; \
-	    elif test -f $$tst; then dir=; \
-	    else dir="$(srcdir)/"; fi; \
-	    if $(TESTS_ENVIRONMENT) $${dir}$$tst $(AM_TESTS_FD_REDIRECT); then \
-	      all=`expr $$all + 1`; \
-	      case " $(XFAIL_TESTS) " in \
-	      *[\ \	]$$tst[\ \	]*) \
-		xpass=`expr $$xpass + 1`; \
-		failed=`expr $$failed + 1`; \
-		col=$$red; res=XPASS; \
-	      ;; \
-	      *) \
-		col=$$grn; res=PASS; \
-	      ;; \
-	      esac; \
-	    elif test $$? -ne 77; then \
-	      all=`expr $$all + 1`; \
-	      case " $(XFAIL_TESTS) " in \
-	      *[\ \	]$$tst[\ \	]*) \
-		xfail=`expr $$xfail + 1`; \
-		col=$$lgn; res=XFAIL; \
-	      ;; \
-	      *) \
-		failed=`expr $$failed + 1`; \
-		col=$$red; res=FAIL; \
-	      ;; \
-	      esac; \
-	    else \
-	      skip=`expr $$skip + 1`; \
-	      col=$$blu; res=SKIP; \
-	    fi; \
-	    echo "$${col}$$res$${std}: $$tst"; \
-	  done; \
-	  if test "$$all" -eq 1; then \
-	    tests="test"; \
-	    All=""; \
-	  else \
-	    tests="tests"; \
-	    All="All "; \
-	  fi; \
-	  if test "$$failed" -eq 0; then \
-	    if test "$$xfail" -eq 0; then \
-	      banner="$$All$$all $$tests passed"; \
-	    else \
-	      if test "$$xfail" -eq 1; then failures=failure; else failures=failures; fi; \
-	      banner="$$All$$all $$tests behaved as expected ($$xfail expected $$failures)"; \
-	    fi; \
-	  else \
-	    if test "$$xpass" -eq 0; then \
-	      banner="$$failed of $$all $$tests failed"; \
-	    else \
-	      if test "$$xpass" -eq 1; then passes=pass; else passes=passes; fi; \
-	      banner="$$failed of $$all $$tests did not behave as expected ($$xpass unexpected $$passes)"; \
-	    fi; \
-	  fi; \
-	  dashes="$$banner"; \
-	  skipped=""; \
-	  if test "$$skip" -ne 0; then \
-	    if test "$$skip" -eq 1; then \
-	      skipped="($$skip test was not run)"; \
-	    else \
-	      skipped="($$skip tests were not run)"; \
-	    fi; \
-	    test `echo "$$skipped" | wc -c` -le `echo "$$banner" | wc -c` || \
-	      dashes="$$skipped"; \
-	  fi; \
-	  report=""; \
-	  if test "$$failed" -ne 0 && test -n "$(PACKAGE_BUGREPORT)"; then \
-	    report="Please report to $(PACKAGE_BUGREPORT)"; \
-	    test `echo "$$report" | wc -c` -le `echo "$$banner" | wc -c` || \
-	      dashes="$$report"; \
-	  fi; \
-	  dashes=`echo "$$dashes" | sed s/./=/g`; \
-	  if test "$$failed" -eq 0; then \
-	    col="$$grn"; \
-	  else \
-	    col="$$red"; \
-	  fi; \
-	  echo "$${col}$$dashes$${std}"; \
-	  echo "$${col}$$banner$${std}"; \
-	  test -z "$$skipped" || echo "$${col}$$skipped$${std}"; \
-	  test -z "$$report" || echo "$${col}$$report$${std}"; \
-	  echo "$${col}$$dashes$${std}"; \
-	  test "$$failed" -eq 0; \
-	else :; fi
 
 distdir: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) distdir-am
@@ -1006,14 +584,10 @@ distdir-am: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
-	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
-all-am: Makefile $(HEADERS)
+@LIBMESH_ENABLE_QHULL_FALSE@all-local:
+all-am: Makefile all-local
 installdirs:
-	for dir in "$(DESTDIR)$(includedir)"; do \
-	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
-	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -1040,26 +614,19 @@ clean-generic:
 distclean-generic:
 	-$(am__rm_f) $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || $(am__rm_f) $(CONFIG_CLEAN_VPATH_FILES)
-	-$(am__rm_f) nanoflann/examples/$(DEPDIR)/$(am__dirstamp)
-	-$(am__rm_f) nanoflann/examples/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+@LIBMESH_ENABLE_QHULL_FALSE@clean-local:
+@LIBMESH_ENABLE_QHULL_FALSE@distclean-local:
 clean: clean-am
 
-clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
-	mostlyclean-am
+clean-am: clean-generic clean-libtool clean-local mostlyclean-am
 
 distclean: distclean-am
-	-rm -f nanoflann/examples/$(DEPDIR)/matrix_example.Po
-	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_adaptor_example.Po
-	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_example.Po
-	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_kdd_radius.Po
-	-rm -f nanoflann/examples/$(DEPDIR)/vector_of_vectors_example.Po
 	-rm -f Makefile
-distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-tags
+distclean-am: clean-am distclean-generic distclean-local
 
 dvi: dvi-am
 
@@ -1073,7 +640,7 @@ info: info-am
 
 info-am:
 
-install-data-am: install-includeHEADERS
+install-data-am:
 
 install-dvi: install-dvi-am
 
@@ -1102,18 +669,12 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-	-rm -f nanoflann/examples/$(DEPDIR)/matrix_example.Po
-	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_adaptor_example.Po
-	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_example.Po
-	-rm -f nanoflann/examples/$(DEPDIR)/pointcloud_kdd_radius.Po
-	-rm -f nanoflann/examples/$(DEPDIR)/vector_of_vectors_example.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
 mostlyclean: mostlyclean-am
 
-mostlyclean-am: mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool
+mostlyclean-am: mostlyclean-generic mostlyclean-libtool
 
 pdf: pdf-am
 
@@ -1123,27 +684,41 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS
+uninstall-am:
 
-.MAKE: check-am install-am install-strip
+.MAKE: install-am install-strip
 
-.PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-TESTS \
-	check-am clean clean-checkPROGRAMS clean-generic clean-libtool \
-	cscopelist-am ctags ctags-am distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
+.PHONY: all all-am all-local check check-am clean clean-generic \
+	clean-libtool clean-local cscopelist-am ctags-am distclean \
+	distclean-generic distclean-libtool distclean-local distdir \
+	dvi dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-dvi install-dvi-am \
 	install-exec install-exec-am install-html install-html-am \
-	install-includeHEADERS install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-includeHEADERS
+	install-info install-info-am install-man install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags-am uninstall \
+	uninstall-am
 
 .PRECIOUS: Makefile
 
+
+# Use a stamp file to make sure we don't have multiple sub-$(MAKE)
+# going at once; cmake gets horribly confused if that happens.
+@LIBMESH_ENABLE_QHULL_TRUE@.buildstamp:
+@LIBMESH_ENABLE_QHULL_TRUE@	$(MAKE) -C build $(AM_MAKEFLAGS)
+@LIBMESH_ENABLE_QHULL_TRUE@	touch .buildstamp
+
+@LIBMESH_ENABLE_QHULL_TRUE@all-local: .buildstamp
+
+@LIBMESH_ENABLE_QHULL_TRUE@clean-local:
+@LIBMESH_ENABLE_QHULL_TRUE@	$(MAKE) -C build $(AM_MAKEFLAGS) clean
+@LIBMESH_ENABLE_QHULL_TRUE@	rm -f .buildstamp
+
+@LIBMESH_ENABLE_QHULL_TRUE@distclean-local:
+@LIBMESH_ENABLE_QHULL_TRUE@	rm -rf build install
+@LIBMESH_ENABLE_QHULL_TRUE@	rm -f .buildstamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
