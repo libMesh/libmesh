@@ -781,7 +781,9 @@ GMV_LIBRARY
 GMV_INCLUDE
 LIBMESH_ENABLE_QHULL_FALSE
 LIBMESH_ENABLE_QHULL_TRUE
+QHULL_BUILD_LDFLAGS
 QHULL_LIBS
+QHULL_INCLUDE
 LIBMESH_ENABLE_TRIANGLE_FALSE
 LIBMESH_ENABLE_TRIANGLE_TRUE
 TRIANGLE_LIBRARY
@@ -1305,6 +1307,7 @@ enable_netgen_required
 enable_tetgen
 enable_triangle
 enable_qhull
+enable_qhull_required
 enable_gmv
 enable_vtk
 enable_vtk_required
@@ -2131,6 +2134,7 @@ Optional Features:
   --disable-triangle      build without Triangle Delaunay triangulation
                           library support
   --disable-qhull         build without Qhull API support
+  --enable-qhull-required Error if Qhull is not detected by configure
   --disable-gmv           build without GMV file I/O support
   --disable-vtk           build without VTK file I/O support
   --enable-vtk-required   Error if VTK is not detected by configure
@@ -59288,207 +59292,90 @@ esac
 fi
  # if unspecified, depend on enableoptional
 
-  QHULL_INCLUDE=""
+      # Check whether --enable-qhull-required was given.
+if test ${enable_qhull_required+y}
+then :
+  enableval=$enable_qhull_required; case "${enableval}" in #(
+  yes) :
+    enableqhullrequired=yes
+                                 enableqhull=yes ;; #(
+  no) :
+    enableqhullrequired=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-qhull-required" "$LINENO" 5 ;;
+esac
+else case e in #(
+  e) enableqhullrequired=no ;;
+esac
+fi
+
+
+    QHULL_INCLUDE=""
   QHULL_LIBS=""
-
-    if test "x$enableqhull" = "xyes"
+  QHULL_BUILD_LDFLAGS=""
+  if test "x$enableqhull" = "xyes"
 then :
 
-                    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing sqrt" >&5
-printf %s "checking for library containing sqrt... " >&6; }
-if test ${ac_cv_search_sqrt+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_func_search_save_LIBS=$LIBS
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
+                              my_top_srcdir="$(cd $srcdir && pwd)"
 
-namespace conftest {
-  extern "C" int sqrt ();
-}
-int
-main (void)
-{
-return conftest::sqrt ();
-  ;
-  return 0;
-}
-_ACEOF
-for ac_lib in '' m
-do
-  if test -z "$ac_lib"; then
-    ac_res="none required"
-  else
-    ac_res=-l$ac_lib
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-  fi
-  if ac_fn_cxx_try_link "$LINENO"
-then :
-  ac_cv_search_sqrt=$ac_res
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext
-  if test ${ac_cv_search_sqrt+y}
-then :
-  break
-fi
-done
-if test ${ac_cv_search_sqrt+y}
+                              my_top_builddir="$(pwd)"
+
+                                                  rm -f contrib/qhull/.buildstamp
+          rm -rf contrib/qhull/build
+          mkdir -p contrib/qhull/build
+
+                                        mkdir -p contrib/qhull/install
+
+                                        if (cd contrib/qhull/build && \
+                   cmake -DBUILD_SHARED_LIBS=OFF \
+                         -DQHULL_ENABLE_TESTING=OFF \
+                         -DBUILD_APPLICATIONS=OFF \
+                         -DCMAKE_INSTALL_PREFIX:PATH=$my_top_builddir/contrib/qhull/install \
+                   $my_top_srcdir/contrib/qhull/qhull)
 then :
 
-else case e in #(
-  e) ac_cv_search_sqrt=no ;;
-esac
-fi
-rm conftest.$ac_ext
-LIBS=$ac_func_search_save_LIBS ;;
-esac
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_sqrt" >&5
-printf "%s\n" "$ac_cv_search_sqrt" >&6; }
-ac_res=$ac_cv_search_sqrt
-if test "$ac_res" != no
-then :
-  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-  QHULL_LIBS="-lm"
-fi
-
-          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing trunc" >&5
-printf %s "checking for library containing trunc... " >&6; }
-if test ${ac_cv_search_trunc+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_func_search_save_LIBS=$LIBS
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-namespace conftest {
-  extern "C" int trunc ();
-}
-int
-main (void)
-{
-return conftest::trunc ();
-  ;
-  return 0;
-}
-_ACEOF
-for ac_lib in '' m
-do
-  if test -z "$ac_lib"; then
-    ac_res="none required"
-  else
-    ac_res=-l$ac_lib
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-  fi
-  if ac_fn_cxx_try_link "$LINENO"
-then :
-  ac_cv_search_trunc=$ac_res
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext
-  if test ${ac_cv_search_trunc+y}
-then :
-  break
-fi
-done
-if test ${ac_cv_search_trunc+y}
-then :
-
-else case e in #(
-  e) ac_cv_search_trunc=no ;;
-esac
-fi
-rm conftest.$ac_ext
-LIBS=$ac_func_search_save_LIBS ;;
-esac
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_trunc" >&5
-printf "%s\n" "$ac_cv_search_trunc" >&6; }
-ac_res=$ac_cv_search_trunc
-if test "$ac_res" != no
-then :
-  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-  QHULL_LIBS="-lm"
-fi
-
-          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for library containing cos" >&5
-printf %s "checking for library containing cos... " >&6; }
-if test ${ac_cv_search_cos+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_func_search_save_LIBS=$LIBS
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-namespace conftest {
-  extern "C" int cos ();
-}
-int
-main (void)
-{
-return conftest::cos ();
-  ;
-  return 0;
-}
-_ACEOF
-for ac_lib in '' m
-do
-  if test -z "$ac_lib"; then
-    ac_res="none required"
-  else
-    ac_res=-l$ac_lib
-    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
-  fi
-  if ac_fn_cxx_try_link "$LINENO"
-then :
-  ac_cv_search_cos=$ac_res
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext
-  if test ${ac_cv_search_cos+y}
-then :
-  break
-fi
-done
-if test ${ac_cv_search_cos+y}
-then :
-
-else case e in #(
-  e) ac_cv_search_cos=no ;;
-esac
-fi
-rm conftest.$ac_ext
-LIBS=$ac_func_search_save_LIBS ;;
-esac
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_cos" >&5
-printf "%s\n" "$ac_cv_search_cos" >&6; }
-ac_res=$ac_cv_search_cos
-if test "$ac_res" != no
-then :
-  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
-  QHULL_LIBS="-lm"
-fi
-
-
-                              QHULL_INCLUDE="-I\$(top_srcdir)/contrib/qhull/qhull/src -I\$(top_srcdir)/contrib/qhull/qhull/src/libqhullcpp"
+                                                      QHULL_INCLUDE="-I\$(top_srcdir)/contrib/qhull/qhull/src"
+                  QHULL_LIBS="-lqhullcpp -lqhullstatic_r"
+                  QHULL_BUILD_LDFLAGS="-L\$(abs_top_builddir)/contrib/qhull/build/"
 
 printf "%s\n" "#define HAVE_QHULL_API 1" >>confdefs.h
 
-          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Qhull version 2012.1 support >>>" >&5
-printf "%s\n" "<<< Configuring library with Qhull version 2012.1 support >>>" >&6; }
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Qhull support >>>" >&5
+printf "%s\n" "<<< Configuring library with Qhull support >>>" >&6; }
 
+else case e in #(
+  e)
+                  if test "x$enableqhullrequired" = "xyes"
+then :
+  as_fn_error $? "<<< Failed cmake configuration of user-required Qhull submodule >>>" "$LINENO" 5
+else case e in #(
+  e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Failed cmake configuration of Qhull submodule >>>" >&5
+printf "%s\n" "<<< Failed cmake configuration of Qhull submodule >>>" >&6; } ;;
+esac
 fi
+
+                  enableqhull=no
+                 ;;
+esac
+fi
+
+else case e in #(
+  e)
+          enableqhull=no
+         ;;
+esac
+fi
+
+
 
 
 
 if test $enableqhull = yes
 then :
   libmesh_contrib_INCLUDES="$QHULL_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_contrib_LDFLAGS="$QHULL_BUILD_LDFLAGS $libmesh_contrib_LDFLAGS"
+       libmesh_optional_LIBS="$QHULL_LIBS $libmesh_optional_LIBS"
+
 fi
  if test x$enableqhull = xyes; then
   LIBMESH_ENABLE_QHULL_TRUE=
@@ -59498,7 +59385,7 @@ else
   LIBMESH_ENABLE_QHULL_FALSE=
 fi
 
-ac_config_files="$ac_config_files contrib/qhull/qhull/Makefile"
+ac_config_files="$ac_config_files contrib/qhull/Makefile"
 
 # -------------------------------------------------------------
 
@@ -66368,7 +66255,7 @@ do
     "contrib/netgen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/netgen/Makefile" ;;
     "contrib/tetgen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/tetgen/Makefile" ;;
     "contrib/triangle/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/triangle/Makefile" ;;
-    "contrib/qhull/qhull/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/qhull/qhull/Makefile" ;;
+    "contrib/qhull/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/qhull/Makefile" ;;
     "contrib/gmv/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/gmv/Makefile" ;;
     "contrib/eigen/eigen/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/eigen/eigen/Makefile" ;;
     "contrib/capnproto/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/capnproto/Makefile" ;;

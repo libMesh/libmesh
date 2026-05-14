@@ -22,3 +22,6 @@
 [submodule "contrib/netgen/netgen"]
 	path = contrib/netgen/netgen
 	url = ../../libMesh/netgen.git
+[submodule "contrib/qhull/git-qhull"]
+	path = contrib/qhull/git-qhull
+	url = ../../qhull/qhull.git

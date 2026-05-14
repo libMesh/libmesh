@@ -588,9 +588,12 @@ AC_CONFIG_FILES([contrib/triangle/Makefile])
 # -------------------------------------------------------------
 CONFIGURE_QHULL
 AS_IF([test $enableqhull = yes],
-      [libmesh_contrib_INCLUDES="$QHULL_INCLUDE $libmesh_contrib_INCLUDES"])
+      [libmesh_contrib_INCLUDES="$QHULL_INCLUDE $libmesh_contrib_INCLUDES"
+       libmesh_contrib_LDFLAGS="$QHULL_BUILD_LDFLAGS $libmesh_contrib_LDFLAGS"
+       libmesh_optional_LIBS="$QHULL_LIBS $libmesh_optional_LIBS"
+      ])
 AM_CONDITIONAL(LIBMESH_ENABLE_QHULL, test x$enableqhull = xyes)
-AC_CONFIG_FILES([contrib/qhull/qhull/Makefile])
+AC_CONFIG_FILES([contrib/qhull/Makefile])
 # -------------------------------------------------------------
 
 
