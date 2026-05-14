@@ -59290,7 +59290,7 @@ else case e in #(
   e) enableqhull=$enableoptional ;;
 esac
 fi
-
+ # if unspecified, depend on enableoptional
 
       # Check whether --enable-qhull-required was given.
 if test ${enable_qhull_required+y}

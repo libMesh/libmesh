@@ -13,6 +13,7 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -177,6 +178,34 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+  || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+       $(am__cd) "$$dir" && echo $$files | $(am__xargs_n) 40 $(am__rm_f); }; \
+  }
+am__installdirs = "$(DESTDIR)$(qhulllibdir)"
+DATA = $(qhulllib_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -504,6 +533,10 @@ top_srcdir = @top_srcdir@
 vtkbuild = @vtkbuild@
 vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
+@LIBMESH_ENABLE_QHULL_TRUE@qhulllibdir = $(libdir)
+@LIBMESH_ENABLE_QHULL_TRUE@qhulllib_DATA = build/libqhullstatic_r.a \
+@LIBMESH_ENABLE_QHULL_TRUE@                build/libqhullcpp.a
+
 EXTRA_DIST = qhull
 all: all-am
 
@@ -543,6 +576,27 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-qhulllibDATA: $(qhulllib_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(qhulllib_DATA)'; test -n "$(qhulllibdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(qhulllibdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(qhulllibdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(qhulllibdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(qhulllibdir)" || exit $$?; \
+	done
+
+uninstall-qhulllibDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(qhulllib_DATA)'; test -n "$(qhulllibdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(qhulllibdir)'; $(am__uninstall_files_from_dir)
 tags TAGS:
 
 ctags CTAGS:
@@ -586,8 +640,11 @@ distdir-am: $(DISTFILES)
 check-am: all-am
 check: check-am
 @LIBMESH_ENABLE_QHULL_FALSE@all-local:
-all-am: Makefile all-local
+all-am: Makefile $(DATA) all-local
 installdirs:
+	for dir in "$(DESTDIR)$(qhulllibdir)"; do \
+	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
+	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -640,7 +697,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-qhulllibDATA
 
 install-dvi: install-dvi-am
 
@@ -684,7 +741,7 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am:
+uninstall-am: uninstall-qhulllibDATA
 
 .MAKE: install-am install-strip
 
@@ -695,11 +752,11 @@ uninstall-am:
 	install-data install-data-am install-dvi install-dvi-am \
 	install-exec install-exec-am install-html install-html-am \
 	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags-am uninstall \
-	uninstall-am
+	install-pdf-am install-ps install-ps-am install-qhulllibDATA \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
+	tags-am uninstall uninstall-am uninstall-qhulllibDATA
 
 .PRECIOUS: Makefile
 
@@ -719,6 +776,9 @@ uninstall-am:
 @LIBMESH_ENABLE_QHULL_TRUE@distclean-local:
 @LIBMESH_ENABLE_QHULL_TRUE@	rm -rf build install
 @LIBMESH_ENABLE_QHULL_TRUE@	rm -f .buildstamp
+
+@LIBMESH_ENABLE_QHULL_TRUE@build/libqhullstatic_r.a: .buildstamp
+@LIBMESH_ENABLE_QHULL_TRUE@build/libqhullcpp.a: .buildstamp
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
