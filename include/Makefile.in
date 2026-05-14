@@ -157,7 +157,8 @@ am__aclocal_m4_deps =  \
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(include_HEADERS) \
-	$(noinst_HEADERS) $(am__DIST_COMMON)
+	$(am__nobase_include_HEADERS_DIST) $(noinst_HEADERS) \
+	$(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = libmesh_config.h.tmp
 CONFIG_CLEAN_FILES =
@@ -215,8 +216,16 @@ am__uninstall_files_from_dir = { \
   || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
        $(am__cd) "$$dir" && echo $$files | $(am__xargs_n) 40 $(am__rm_f); }; \
   }
-am__installdirs = "$(DESTDIR)$(includedir)"
-HEADERS = $(include_HEADERS) $(noinst_HEADERS)
+am__installdirs = "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"
+am__nobase_include_HEADERS_DIST = gpu/kokkos_fe_types.h \
+	gpu/kokkos_fe_shape_dispatch.h gpu/kokkos_fe_base.h \
+	gpu/kokkos_fe_evaluator.h gpu/kokkos_fe_lagrange_1d.h \
+	gpu/kokkos_fe_lagrange_2d.h gpu/kokkos_fe_lagrange_3d.h \
+	gpu/kokkos_fe_monomial.h gpu/kokkos_fe_face_map.h \
+	gpu/kokkos_fe_map.h gpu/kokkos_quadrature.h \
+	gpu/kokkos_hilbert_system.h gpu/kokkos_parsed_function.h
+HEADERS = $(include_HEADERS) $(nobase_include_HEADERS) \
+	$(noinst_HEADERS)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -392,6 +401,7 @@ KOKKOS_CXX = @KOKKOS_CXX@
 KOKKOS_CXXFLAGS = @KOKKOS_CXXFLAGS@
 KOKKOS_LDFLAGS = @KOKKOS_LDFLAGS@
 KOKKOS_LIBS = @KOKKOS_LIBS@
+KOKKOS_MPI_CPPFLAGS = @KOKKOS_MPI_CPPFLAGS@
 LASPACK_INCLUDE = @LASPACK_INCLUDE@
 LASPACK_LIB = @LASPACK_LIB@
 LD = @LD@
@@ -606,6 +616,25 @@ vtkmajor = @vtkmajor@
 vtkversion = @vtkversion@
 SUBDIRS = libmesh
 
+# GPU (Kokkos) FE math headers — installed preserving the gpu/ subdirectory so
+# downstream code can use #include "libmesh/gpu/kokkos_fe_types.h" etc.
+# nobase_ is used instead of the standard flat install to keep the namespace.
+@LIBMESH_ENABLE_KOKKOS_TRUE@nobase_include_HEADERS = \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_types.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_shape_dispatch.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_base.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_evaluator.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_lagrange_1d.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_lagrange_2d.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_lagrange_3d.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_monomial.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_face_map.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_map.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_quadrature.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_hilbert_system.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_parsed_function.h
+
+
 # special handholding for prefix_config.m4 generated files
 # so that 'make clean ; make' works as does 'make distcheck'
 # libmesh_config.h is made by ./configure, so it should get
@@ -665,6 +694,7 @@ include_HEADERS = \
         enums/enum_elem_quality.h \
         enums/enum_elem_type.h \
         enums/enum_error_estimator_type.h \
+        enums/enum_fe_elem_class.h \
         enums/enum_fe_family.h \
         enums/enum_inf_map_type.h \
         enums/enum_io_package.h \
@@ -703,8 +733,13 @@ include_HEADERS = \
         fe/fe_interface.h \
         fe/fe_interface_macros.h \
         fe/fe_lagrange_shape_1D.h \
+        fe/fe_reference_element_traits.h \
+        fe/fe_serendipity_lagrange.h \
+        fe/fe_simplex_lagrange.h \
+        fe/fe_tensor_product_lagrange.h \
         fe/fe_macro.h \
         fe/fe_map.h \
+        fe/fe_shape_traits.h \
         fe/fe_transformation_base.h \
         fe/fe_type.h \
         fe/fe_xyz_map.h \
@@ -891,6 +926,7 @@ include_HEADERS = \
         numerics/parsed_fem_function.h \
         numerics/parsed_fem_function_parameter.h \
         numerics/parsed_function.h \
+        numerics/parsed_function_program.h \
         numerics/parsed_function_parameter.h \
         numerics/petsc_macro.h \
         numerics/petsc_matrix.h \
@@ -964,6 +1000,7 @@ include_HEADERS = \
         quadrature/quadrature_composite.h \
         quadrature/quadrature_conical.h \
         quadrature/quadrature_gauss.h \
+        quadrature/quadrature_gauss_rules.h \
         quadrature/quadrature_gauss_lobatto.h \
         quadrature/quadrature_gm.h \
         quadrature/quadrature_grid.h \
@@ -1229,6 +1266,30 @@ uninstall-includeHEADERS:
 	@list='$(include_HEADERS)'; test -n "$(includedir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
+install-nobase_includeHEADERS: $(nobase_include_HEADERS)
+	@$(NORMAL_INSTALL)
+	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(includedir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(includedir)" || exit 1; \
+	fi; \
+	$(am__nobase_list) | while read dir files; do \
+	  xfiles=; for file in $$files; do \
+	    if test -f "$$file"; then xfiles="$$xfiles $$file"; \
+	    else xfiles="$$xfiles $(srcdir)/$$file"; fi; done; \
+	  test -z "$$xfiles" || { \
+	    test "x$$dir" = x. || { \
+	      echo " $(MKDIR_P) '$(DESTDIR)$(includedir)/$$dir'"; \
+	      $(MKDIR_P) "$(DESTDIR)$(includedir)/$$dir"; }; \
+	    echo " $(INSTALL_HEADER) $$xfiles '$(DESTDIR)$(includedir)/$$dir'"; \
+	    $(INSTALL_HEADER) $$xfiles "$(DESTDIR)$(includedir)/$$dir" || exit $$?; }; \
+	done
+
+uninstall-nobase_includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(nobase_include_HEADERS)'; test -n "$(includedir)" || list=; \
+	$(am__nobase_strip_setup); files=`$(am__nobase_strip)`; \
+	dir='$(DESTDIR)$(includedir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -1395,7 +1456,7 @@ check: check-recursive
 all-am: Makefile $(HEADERS) libmesh_config.h.tmp
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(includedir)"; do \
+	for dir in "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -1449,7 +1510,7 @@ info: info-recursive
 
 info-am:
 
-install-data-am: install-includeHEADERS
+install-data-am: install-includeHEADERS install-nobase_includeHEADERS
 
 install-dvi: install-dvi-recursive
 
@@ -1493,7 +1554,7 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-includeHEADERS
+uninstall-am: uninstall-includeHEADERS uninstall-nobase_includeHEADERS
 
 .MAKE: $(am__recursive_targets) all install-am install-strip
 
@@ -1505,12 +1566,13 @@ uninstall-am: uninstall-includeHEADERS
 	install-data-am install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am \
 	install-includeHEADERS install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installcheck-local installdirs installdirs-am maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-includeHEADERS
+	install-man install-nobase_includeHEADERS install-pdf \
+	install-pdf-am install-ps install-ps-am install-strip \
+	installcheck installcheck-am installcheck-local installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
+	ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-includeHEADERS uninstall-nobase_includeHEADERS
 
 .PRECIOUS: Makefile
 

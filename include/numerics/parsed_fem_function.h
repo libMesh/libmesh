@@ -25,12 +25,13 @@
 // Local Includes
 #include "libmesh/fem_function_base.h"
 #include "libmesh/int_range.h"
+#include "libmesh/parsed_function_program.h"
 #include "libmesh/point.h"
 #include "libmesh/system.h"
 
 #ifdef LIBMESH_HAVE_FPARSER
 // FParser includes
-#include "libmesh/fparser.hh"
+#include "libmesh/fparser_ad.hh"
 #endif
 
 // C++ includes
@@ -105,6 +106,10 @@ public:
                            Real time=0.) override;
 
   const std::string & expression() { return _expression; }
+
+#if defined(LIBMESH_HAVE_KOKKOS) && defined(LIBMESH_HAVE_FPARSER) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
+  libMesh::ParsedFEMFunctionProgramBundle<Output> build_program_bundle() const;
+#endif
 
   /**
    * \returns The value of an inline variable.
@@ -439,6 +444,68 @@ ParsedFEMFunction<Output>::clone () const
   return std::make_unique<ParsedFEMFunction>
     (_sys, _expression, &_additional_vars, &_initial_vals);
 }
+
+#if defined(LIBMESH_HAVE_KOKKOS) && defined(LIBMESH_HAVE_FPARSER) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
+template <typename Output>
+inline
+libMesh::ParsedFEMFunctionProgramBundle<Output>
+ParsedFEMFunction<Output>::build_program_bundle() const
+{
+  libmesh_error_msg_if(_subexpressions.size() != 1,
+                       "Kokkos ParsedFEMFunction export currently supports scalar expressions only");
+
+  libMesh::ParsedFEMFunctionProgramBundle<Output> bundle;
+  bundle.uses_field_gradients = _n_requested_grad_components > 0;
+  bundle.uses_field_hessians = _n_requested_hess_components > 0;
+  bundle.uses_normals = _requested_normals;
+  bundle.uses_additional_variables = !_additional_vars.empty();
+
+  auto fp = std::make_unique<FunctionParserADBase<Output>>();
+  fp->AddConstant("NaN", std::numeric_limits<Real>::quiet_NaN());
+  fp->AddConstant("pi", std::acos(Real(-1)));
+  fp->AddConstant("e", std::exp(Real(1)));
+  libmesh_error_msg_if
+    (fp->Parse(_subexpressions.front(), variables) != -1, // -1 for success
+     "ERROR: FunctionParser is unable to parse expression for Kokkos export: "
+     << _subexpressions.front() << '\n' << fp->ErrorMsg());
+
+  fp->SetADFlags(FunctionParserADBase<Output>::ADSilenceErrors |
+                 FunctionParserADBase<Output>::ADAutoOptimize);
+  fp->Optimize();
+  bundle.value = build_parsed_function_program(*fp);
+
+  auto dx_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
+  dx_fp->AutoDiff("x");
+  bundle.dx = build_parsed_function_program(*dx_fp);
+#if LIBMESH_DIM > 1
+  auto dy_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
+  dy_fp->AutoDiff("y");
+  bundle.dy = build_parsed_function_program(*dy_fp);
+#endif
+#if LIBMESH_DIM > 2
+  auto dz_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
+  dz_fp->AutoDiff("z");
+  bundle.dz = build_parsed_function_program(*dz_fp);
+#endif
+  auto dt_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
+  dt_fp->AutoDiff("t");
+  bundle.dt = build_parsed_function_program(*dt_fp);
+
+  for (unsigned int v = 0; v != _n_vars; ++v)
+    {
+      if (!_need_var[v])
+        continue;
+
+      const std::string & varname = _sys.variable_name(v);
+      auto dvar_fp = std::make_unique<FunctionParserADBase<Output>>(*fp);
+      dvar_fp->AutoDiff(varname);
+      bundle.value_variable_numbers.push_back(v);
+      bundle.value_variable_derivatives.push_back(build_parsed_function_program(*dvar_fp));
+    }
+
+  return bundle;
+}
+#endif
 
 template <typename Output>
 inline

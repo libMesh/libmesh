@@ -15,7 +15,9 @@ nobase_include_HEADERS = \
   gpu/kokkos_fe_monomial.h \
   gpu/kokkos_fe_face_map.h \
   gpu/kokkos_fe_map.h \
-  gpu/kokkos_quadrature.h
+  gpu/kokkos_quadrature.h \
+  gpu/kokkos_hilbert_system.h \
+  gpu/kokkos_parsed_function.h
 endif
 
 # special handholding for prefix_config.m4 generated files

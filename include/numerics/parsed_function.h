@@ -26,6 +26,7 @@
 // Local includes
 #include "libmesh/dense_vector.h"
 #include "libmesh/int_range.h"
+#include "libmesh/parsed_function_program.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/point.h"
 
@@ -88,7 +89,7 @@ public:
   /**
    * Query if the automatic derivative generation was successful.
    */
-  virtual bool has_derivatives() { return _valid_derivatives; }
+  virtual bool has_derivatives() const { return _valid_derivatives; }
 
   virtual Output dot(const Point & p,
                      const Real time = 0);
@@ -112,6 +113,12 @@ public:
   virtual Output & getVarAddress(std::string_view variable_name);
 
   virtual std::unique_ptr<FunctionBase<Output>> clone() const override;
+
+  ParsedFunctionProgram<Output>
+  build_program(unsigned int component = 0) const;
+
+  ParsedFunctionProgramBundle<Output>
+  build_program_bundle(unsigned int component = 0) const;
 
   /**
    * \returns The value of an inline variable.
@@ -377,6 +384,37 @@ ParsedFunction<Output,OutputGradient>::clone() const
   return std::make_unique<ParsedFunction>(_expression,
                                           &_additional_vars,
                                           &_initial_vals);
+}
+
+template <typename Output, typename OutputGradient>
+inline
+ParsedFunctionProgram<Output>
+ParsedFunction<Output,OutputGradient>::build_program(const unsigned int component) const
+{
+  libmesh_assert_less(component, parsers.size());
+  return libMesh::build_parsed_function_program(*parsers[component]);
+}
+
+template <typename Output, typename OutputGradient>
+inline
+ParsedFunctionProgramBundle<Output>
+ParsedFunction<Output,OutputGradient>::build_program_bundle(const unsigned int component) const
+{
+  libmesh_assert_less(component, parsers.size());
+  libmesh_error_msg_if(!this->has_derivatives(),
+                       "Cannot build a parsed-function program bundle without valid derivative programs");
+
+  ParsedFunctionProgramBundle<Output> bundle;
+  bundle.value = this->build_program(component);
+  bundle.dx = libMesh::build_parsed_function_program(*dx_parsers[component]);
+#if LIBMESH_DIM > 1
+  bundle.dy = libMesh::build_parsed_function_program(*dy_parsers[component]);
+#endif
+#if LIBMESH_DIM > 2
+  bundle.dz = libMesh::build_parsed_function_program(*dz_parsers[component]);
+#endif
+  bundle.dt = libMesh::build_parsed_function_program(*dt_parsers[component]);
+  return bundle;
 }
 
 template <typename Output, typename OutputGradient>

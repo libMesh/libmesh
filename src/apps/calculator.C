@@ -53,6 +53,11 @@
 #include <memory>
 #include <string>
 
+#ifdef LIBMESH_HAVE_KOKKOS
+#define PETSC_SKIP_CXX_COMPLEX_FIX 1
+#include <Kokkos_Core.hpp>
+#undef __CUDACC_VER__
+#endif
 
 using namespace libMesh;
 
@@ -81,6 +86,7 @@ void usage_error(const char * progname)
                << "                       Hilbert order                 [default: off]\n"
                << " --jump_slits           calculate jumps across slits [default: off]\n"
                << " --integral             only calculate func integral, not projection\n"
+               << " --kokkos               use Kokkos local element assembly when supported\n"
                << std::endl;
 
   exit(1);
@@ -159,10 +165,43 @@ private:
   Number _integral;
 };
 
+#ifdef LIBMESH_HAVE_KOKKOS
+struct KokkosScope
+{
+  KokkosScope(int & argc,
+              char ** & argv,
+              const bool enable)
+    : _enabled(enable)
+  {
+    if (_enabled)
+      ::Kokkos::initialize(argc, argv);
+  }
+
+  ~KokkosScope()
+  {
+    if (_enabled)
+      ::Kokkos::finalize();
+  }
+
+  bool _enabled;
+};
+#endif
+
 
 int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
+
+  const bool use_kokkos = libMesh::on_command_line("--kokkos");
+
+#ifndef LIBMESH_HAVE_KOKKOS
+  libmesh_error_msg_if(use_kokkos,
+                       "--kokkos was requested, but this libMesh build does not have Kokkos enabled");
+#endif
+
+#ifdef LIBMESH_HAVE_KOKKOS
+  KokkosScope kokkos_scope(argc, argv, use_kokkos);
+#endif
 
   // In case the mesh file doesn't let us auto-infer dimension, we let
   // the user specify it on the command line
@@ -228,6 +267,7 @@ int main(int argc, char ** argv)
   const unsigned int order = libMesh::command_line_next("--order", 1u);
 
   std::unique_ptr<FEMFunctionBase<Number>> goal_function;
+  std::unique_ptr<FunctionBase<Number>> analytic_goal_function;
 
   if (solnname != "")
     {
@@ -270,8 +310,10 @@ int main(int argc, char ** argv)
 
       old_es.print_info();
 
+      analytic_goal_function =
+        std::make_unique<ParsedFunction<Number>>(calcfunc);
       goal_function =
-        std::make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
+        std::make_unique<WrappedFunctor<Number>>(*analytic_goal_function);
     }
 
   libMesh::out << "Calculating with system " << current_sys_name << std::endl;
@@ -310,8 +352,12 @@ int main(int argc, char ** argv)
 
       new_sys.fe_family() = family;
       new_sys.fe_order() = order;
+      new_sys.use_kokkos_backend(use_kokkos);
 
-      new_sys.set_goal_func(*goal_function);
+      if (analytic_goal_function)
+        new_sys.set_goal_func(*analytic_goal_function);
+      else
+        new_sys.set_goal_func(*goal_function);
 
       const Real fdm_eps = libMesh::command_line_next("--fdm_eps", Real(TOLERANCE));
 

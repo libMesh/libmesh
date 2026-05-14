@@ -468,6 +468,28 @@ calculator_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 calculator_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
 calculator_dbg_LDADD      = libmesh_dbg.la
 
+# hilbert_kokkos_benchmark
+opt_programs += hilbert_kokkos_benchmark-opt
+hilbert_kokkos_benchmark_opt_SOURCES  = src/apps/hilbert_kokkos_benchmark.C
+hilbert_kokkos_benchmark_opt_SOURCES += src/apps/L2system.C src/apps/L2system.h
+hilbert_kokkos_benchmark_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+hilbert_kokkos_benchmark_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+hilbert_kokkos_benchmark_opt_LDADD    = libmesh_opt.la
+
+devel_programs += hilbert_kokkos_benchmark-devel
+hilbert_kokkos_benchmark_devel_SOURCES  = src/apps/hilbert_kokkos_benchmark.C
+hilbert_kokkos_benchmark_devel_SOURCES += src/apps/L2system.C src/apps/L2system.h
+hilbert_kokkos_benchmark_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+hilbert_kokkos_benchmark_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
+hilbert_kokkos_benchmark_devel_LDADD    = libmesh_devel.la
+
+dbg_programs += hilbert_kokkos_benchmark-dbg
+hilbert_kokkos_benchmark_dbg_SOURCES  = src/apps/hilbert_kokkos_benchmark.C
+hilbert_kokkos_benchmark_dbg_SOURCES += src/apps/L2system.C src/apps/L2system.h
+hilbert_kokkos_benchmark_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+hilbert_kokkos_benchmark_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+hilbert_kokkos_benchmark_dbg_LDADD    = libmesh_dbg.la
+
 # compare
 opt_programs          += compare-opt
 compare_opt_SOURCES    = src/apps/compare.C

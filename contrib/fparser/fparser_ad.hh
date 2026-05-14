@@ -47,7 +47,9 @@ public:
   /**
    * check if the function's byte code is empty.
    */
-  bool isEmpty() { return this->mData->mByteCode.empty(); }
+  bool isEmpty();
+
+  const typename FunctionParserBase<Value_t>::Data * parser_data() const;
 
   /**
    * set the bytecode of this function to return constant zero.

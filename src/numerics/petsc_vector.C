@@ -1178,8 +1178,6 @@ void PetscVector<T>::create_subvector(NumericVector<T> & subvector,
   petsc_subvector->_is_closed = true;
 }
 
-
-
 template <typename T>
 void PetscVector<T>::_get_array(bool read_only) const
 {

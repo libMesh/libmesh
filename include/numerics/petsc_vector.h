@@ -44,6 +44,10 @@
 # undef I // Avoid complex.h contamination
 #endif
 
+#ifdef LIBMESH_HAVE_KOKKOS
+#include <Kokkos_Core.hpp>
+#endif
+
 // C++ includes
 #include <cstddef>
 #include <cstring>
@@ -226,6 +230,57 @@ public:
    * using it unless you know what you are doing!
    */
   const PetscScalar * get_array_read() const;
+
+  /**
+   * Query PETSc for the memory type backing this vector.
+   *
+   * \note If the raw array is currently borrowed via get_array() or
+   * get_array_read(), this method is not valid.
+   */
+  PetscMemType get_mem_type() const;
+
+  bool supports_kokkos_access() const;
+
+#ifdef LIBMESH_HAVE_KOKKOS
+  using kokkos_read_view =
+    ::Kokkos::View<const T *,
+                   typename ::Kokkos::DefaultExecutionSpace::memory_space,
+                   ::Kokkos::MemoryTraits<::Kokkos::Unmanaged>>;
+
+  class KokkosReadViewGuard
+  {
+  public:
+    explicit KokkosReadViewGuard(PetscVector<T> & vector)
+      : _vector(vector),
+        _data(reinterpret_cast<const T *>(vector.get_array_read())),
+        _view(_data, vector.local_size())
+    {
+    }
+
+    KokkosReadViewGuard(const KokkosReadViewGuard &) = delete;
+    KokkosReadViewGuard & operator=(const KokkosReadViewGuard &) = delete;
+
+    ~KokkosReadViewGuard()
+    {
+      _vector.restore_array();
+    }
+
+    const kokkos_read_view & view() const
+    {
+      return _view;
+    }
+
+  private:
+    PetscVector<T> & _vector;
+    const T * _data;
+    kokkos_read_view _view;
+  };
+
+  KokkosReadViewGuard make_kokkos_read_view_guard()
+  {
+    return KokkosReadViewGuard(*this);
+  }
+#endif
 
   /**
    * Restore the data array.
@@ -1194,6 +1249,42 @@ const PetscScalar * PetscVector<T>::get_array_read() const
   _values_manually_retrieved = true;
 
   return _read_only_values;
+}
+
+template <typename T>
+inline
+PetscMemType PetscVector<T>::get_mem_type() const
+{
+  libmesh_error_msg_if(_values_manually_retrieved,
+                       "Cannot query PetscVector memory type while a raw array is borrowed");
+
+#ifdef LIBMESH_HAVE_CXX11_THREAD
+  const bool array_is_present = _array_is_present.load(std::memory_order_acquire);
+#else
+  const bool array_is_present = _array_is_present;
+#endif
+
+  if (array_is_present)
+    _restore_array();
+
+  PetscScalar * dummyarray = nullptr;
+  PetscMemType mem_type = PETSC_MEMTYPE_HOST;
+  LibmeshPetscCall(VecGetArrayAndMemType(_vec, &dummyarray, &mem_type));
+  LibmeshPetscCall(VecRestoreArrayAndMemType(_vec, &dummyarray));
+  return mem_type;
+}
+
+template <typename T>
+inline
+bool PetscVector<T>::supports_kokkos_access() const
+{
+#ifdef LIBMESH_HAVE_KOKKOS
+  return !PetscMemTypeHost(this->get_mem_type()) ||
+         ::Kokkos::SpaceAccessibility<typename ::Kokkos::DefaultExecutionSpace::memory_space,
+                                      ::Kokkos::HostSpace>::accessible;
+#else
+  return false;
+#endif
 }
 
 template <typename T>

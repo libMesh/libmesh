@@ -441,7 +441,7 @@ void ExodusII_IO::read (const std::string & fname)
       // Read the information for block i
       exio_helper->read_elem_in_block (i);
       const subdomain_id_type subdomain_id =
-        restrict_int<subdomain_id_type>(exio_helper->get_block_id(i));
+        cast_int<subdomain_id_type>(exio_helper->get_block_id(i));
       max_subdomain_id = std::max(max_subdomain_id, subdomain_id);
 
       // populate the map of names

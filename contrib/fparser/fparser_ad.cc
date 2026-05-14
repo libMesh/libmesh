@@ -188,6 +188,19 @@ bool FunctionParserADBase<Value_t>::isZero()
 }
 
 template<typename Value_t>
+bool FunctionParserADBase<Value_t>::isEmpty()
+{
+  return this->mData->mByteCode.empty();
+}
+
+template<typename Value_t>
+const typename FunctionParserBase<Value_t>::Data *
+FunctionParserADBase<Value_t>::parser_data() const
+{
+  return const_cast<FunctionParserADBase<Value_t> *>(this)->getParserData();
+}
+
+template<typename Value_t>
 void FunctionParserADBase<Value_t>::setZero()
 {
   this->CopyOnWrite();

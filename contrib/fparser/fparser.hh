@@ -91,7 +91,6 @@ class FunctionParserBase
 
     void Optimize();
 
-
     int ParseAndDeduceVariables(const std::string& function,
                                 int* amountOfVariablesFound = 0,
                                 bool useDegrees = false);

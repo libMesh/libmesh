@@ -857,7 +857,7 @@ void Nemesis_IO::read (const std::string & base_filename)
 
       // Set subdomain ID based on the block ID.
       subdomain_id_type subdomain_id =
-        restrict_int<subdomain_id_type>(nemhelper->block_ids[i]);
+        cast_int<subdomain_id_type>(nemhelper->block_ids[i]);
 
       // Create a type string (this uses the null-terminated string ctor).
       const std::string type_str ( nemhelper->elem_type.data() );

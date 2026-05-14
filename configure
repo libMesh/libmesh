@@ -64288,6 +64288,7 @@ ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
+
         if test "x$enablempi" = "xyes"
 then :
 
@@ -64308,7 +64309,7 @@ int main(int argc, char ** argv)
 }
 
 _ACEOF
-if ac_fn_c_try_link "$LINENO"
+if ac_fn_cxx_try_link "$LINENO"
 then :
   kokkos_config_works=yes
 else case e in #(
@@ -64332,7 +64333,7 @@ int main(int argc, char ** argv)
 }
 
 _ACEOF
-if ac_fn_c_try_link "$LINENO"
+if ac_fn_cxx_try_link "$LINENO"
 then :
   kokkos_config_works=yes
 else case e in #(
@@ -64344,17 +64345,18 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
            ;;
 esac
 fi
+        ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
 
         CXX="$libmesh_save_CXX"
         CPPFLAGS="$libmesh_save_CPPFLAGS"
         CXXFLAGS="$libmesh_save_CXXFLAGS"
         LDFLAGS="$libmesh_save_LDFLAGS"
         LIBS="$libmesh_save_LIBS"
-        ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
         if test "x$kokkos_config_works" = "xyes"
 then :
@@ -69063,3 +69065,4 @@ printf "%s\n" "--------- Done Configuring libMesh ----------" >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ---------------------------------------------" >&5
 printf "%s\n" "---------------------------------------------" >&6; }
 # rm -f -r conftest* config.cache include/libmesh/libmesh_config.h.tmp
+

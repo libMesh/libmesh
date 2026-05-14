@@ -187,6 +187,7 @@ BUILT_SOURCES = \
         kokkos_fe_lagrange_3d.h \
         kokkos_fe_map.h \
         kokkos_fe_monomial.h \
+        kokkos_parsed_function.h \
         kokkos_fe_shape_dispatch.h \
         kokkos_fe_types.h \
         kokkos_linalg_base.h \
@@ -286,6 +287,7 @@ BUILT_SOURCES = \
         parsed_fem_function.h \
         parsed_fem_function_parameter.h \
         parsed_function.h \
+        parsed_function_program.h \
         parsed_function_parameter.h \
         petsc_macro.h \
         petsc_matrix.h \
@@ -1182,6 +1184,9 @@ kokkos_fe_lagrange_3d.h: $(top_srcdir)/include/gpu/kokkos_fe_lagrange_3d.h
 kokkos_fe_map.h: $(top_srcdir)/include/gpu/kokkos_fe_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+kokkos_parsed_function.h: $(top_srcdir)/include/gpu/kokkos_parsed_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 kokkos_fe_monomial.h: $(top_srcdir)/include/gpu/kokkos_fe_monomial.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1480,6 +1485,9 @@ parsed_fem_function_parameter.h: $(top_srcdir)/include/numerics/parsed_fem_funct
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parsed_function.h: $(top_srcdir)/include/numerics/parsed_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parsed_function_program.h: $(top_srcdir)/include/numerics/parsed_function_program.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parsed_function_parameter.h: $(top_srcdir)/include/numerics/parsed_function_parameter.h

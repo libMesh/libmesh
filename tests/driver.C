@@ -13,6 +13,25 @@
 #include "libmesh_cppunit.h"
 #include "test_comm.h"
 
+#ifdef LIBMESH_HAVE_KOKKOS
+#define PETSC_SKIP_CXX_COMPLEX_FIX 1
+#include <Kokkos_Core.hpp>
+#undef __CUDACC_VER__
+
+struct KokkosScope
+{
+  KokkosScope(int & argc, char ** & argv)
+  {
+    Kokkos::initialize(argc, argv);
+  }
+
+  ~KokkosScope()
+  {
+    Kokkos::finalize();
+  }
+};
+#endif
+
 #ifdef LIBMESH_HAVE_CXX11_REGEX
 
 // C++ includes
@@ -107,6 +126,9 @@ int add_matching_tests_to_runner(CppUnit::Test * test,
 
 int main(int argc, char ** argv)
 {
+#ifdef LIBMESH_HAVE_KOKKOS
+  KokkosScope kokkos_scope(argc, argv);
+#endif
   // Initialize the library.  This is necessary because the library
   // may depend on a number of other libraries (i.e. MPI  and Petsc)
   // that require initialization before use.
