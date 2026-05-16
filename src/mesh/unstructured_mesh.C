@@ -2168,7 +2168,7 @@ UnstructuredMesh::stitching_helper (const MeshBase * other_mesh,
                        << "' (" << this_mesh_boundary_id  << ").\n"
                        << "Other mesh has " << other_boundary_node_ids.size()
                        << " nodes on boundary `"
-                       << this->get_boundary_info().get_sideset_name(other_mesh_boundary_id)
+                       << other_mesh->get_boundary_info().get_sideset_name(other_mesh_boundary_id)
                        << "' (" << other_mesh_boundary_id  << ").\n";
 
           if (h_min_updated)
