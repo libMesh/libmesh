@@ -437,6 +437,69 @@ template <unsigned int MaxDofs,
           typename ElemIndexStorage,
           typename ElemDofCountStorage,
           typename OffsetStorage,
+          typename SlotStorage,
+          typename GoalAccess,
+          typename GlobalResidualView,
+          typename GlobalJacobianView>
+void
+run_hilbert_system_bucket_scatter_batch(const libMesh::FEShapeKey key,
+                                        const libMesh::ElemMappingType mapping_type,
+                                        const unsigned int n_nodes,
+                                        const unsigned int quadrature_order,
+                                        const NodeCoordinateStorage & node_coordinates,
+                                        const ElemNodeIdStorage & element_node_ids,
+                                        const ElemIndexStorage & elem_indices,
+                                        const ElemDofCountStorage & elem_n_dofs,
+                                        const OffsetStorage & rhs_offsets,
+                                        const OffsetStorage & mat_offsets,
+                                        const SlotStorage & rhs_slots,
+                                        const SlotStorage & mat_slots,
+                                        const unsigned int hilbert_order,
+                                        GoalAccess goal_access,
+                                        GlobalResidualView rhs_values,
+                                        GlobalJacobianView mat_values,
+                                        const char * const kernel_name)
+{
+  const auto n_records = elem_indices.extent(0);
+
+  ::Kokkos::parallel_for(
+    kernel_name,
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index) {
+      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int elem_index = elem_indices(record_index);
+      const unsigned int n_dofs = elem_n_dofs(record_index);
+
+      const auto elem_nodes =
+        make_element_node_access(node_coordinates, element_node_ids, elem_index);
+      const libMesh::Kokkos::detail::HilbertFEAccess<decltype(elem_nodes)> fe(
+        key, mapping_type, elem_nodes, n_nodes, quadrature_order, elem_index);
+
+      const auto solution =
+        libMesh::Kokkos::detail::make_hilbert_solution_access(fe, ZeroCoeffAccess{}, Number(1.));
+      libMesh::Kokkos::detail::LocalHilbertAccumulator<MaxDofs> accum(n_dofs);
+      libMesh::detail::assemble_hilbert_element(
+        fe, solution, goal_access, true, hilbert_order, accum);
+
+      const auto rhs_offset = rhs_offsets(record_index);
+      const auto mat_offset = mat_offsets(record_index);
+      for (unsigned int i = 0; i != n_dofs; ++i)
+        {
+          ::Kokkos::atomic_add(&rhs_values(rhs_slots(rhs_offset + i)), -accum.residual(i));
+          for (unsigned int j = 0; j != n_dofs; ++j)
+            ::Kokkos::atomic_add(&mat_values(mat_slots(mat_offset + i * n_dofs + j)),
+                                 accum.jacobian(i, j));
+        }
+    });
+  ::Kokkos::fence();
+}
+
+template <unsigned int MaxDofs,
+          typename NodeCoordinateStorage,
+          typename ElemNodeIdStorage,
+          typename ElemIndexStorage,
+          typename ElemDofCountStorage,
+          typename OffsetStorage,
           typename GoalAccess,
           typename ResidualView,
           typename JacobianView>
@@ -593,6 +656,90 @@ run_hilbert_system_fem_value_batch(const libMesh::FEFamily family,
           rhs_values(rhs_offset + i) = -accum.residual(i);
           for (unsigned int j = 0; j != n_dofs; ++j)
             mat_values(mat_offset + i * n_dofs + j) = accum.jacobian(i, j);
+        }
+    });
+  ::Kokkos::fence();
+}
+
+template <unsigned int MaxDofs,
+          unsigned int MaxFieldVariables,
+          typename NodeCoordinateStorage,
+          typename ElemNodeIdStorage,
+          typename ElemIndexStorage,
+          typename ElemDofCountStorage,
+          typename OffsetStorage,
+          typename SlotStorage,
+          typename FieldKeyStorage,
+          typename FieldDofStorage,
+          typename FieldLocalIndexStorage,
+          typename GlobalCoeffStorage,
+          typename GoalFunction,
+          typename GlobalResidualView,
+          typename GlobalJacobianView>
+void
+run_hilbert_system_fem_bucket_scatter_batch(const libMesh::FEShapeKey key,
+                                            const libMesh::ElemMappingType mapping_type,
+                                            const unsigned int n_nodes,
+                                            const unsigned int quadrature_order,
+                                            const NodeCoordinateStorage & node_coordinates,
+                                            const ElemNodeIdStorage & element_node_ids,
+                                            const ElemIndexStorage & elem_indices,
+                                            const ElemDofCountStorage & elem_n_dofs,
+                                            const OffsetStorage & rhs_offsets,
+                                            const OffsetStorage & mat_offsets,
+                                            const SlotStorage & rhs_slots,
+                                            const SlotStorage & mat_slots,
+                                            FieldKeyStorage field_keys,
+                                            FieldDofStorage field_dofs,
+                                            const FieldLocalIndexStorage & field_local_indices,
+                                            const GlobalCoeffStorage & global_coeffs,
+                                            GoalFunction goal_function,
+                                            const unsigned int hilbert_order,
+                                            GlobalResidualView rhs_values,
+                                            GlobalJacobianView mat_values,
+                                            const char * const kernel_name)
+{
+  const auto n_records = elem_indices.extent(0);
+
+  ::Kokkos::parallel_for(
+    kernel_name,
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index) {
+      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int elem_index = elem_indices(record_index);
+      const unsigned int n_dofs = elem_n_dofs(record_index);
+
+      const auto goal_access =
+        GatheredParsedFEMGoalAccess<FieldKeyStorage,
+                                    FieldDofStorage,
+                                    GlobalCoeffStorage,
+                                    typename FieldLocalIndexStorage::value_type,
+                                    GoalFunction,
+                                    MaxFieldVariables>(field_keys,
+                                                       field_dofs,
+                                                       global_coeffs,
+                                                       field_local_indices.values,
+                                                       goal_function);
+
+      const auto elem_nodes =
+        make_element_node_access(node_coordinates, element_node_ids, elem_index);
+      const libMesh::Kokkos::detail::HilbertFEAccess<decltype(elem_nodes)> fe(
+        key, mapping_type, elem_nodes, n_nodes, quadrature_order, elem_index);
+
+      const auto solution =
+        libMesh::Kokkos::detail::make_hilbert_solution_access(fe, ZeroCoeffAccess{}, Number(1.));
+      libMesh::Kokkos::detail::LocalHilbertAccumulator<MaxDofs> accum(n_dofs);
+      libMesh::detail::assemble_hilbert_element(
+        fe, solution, goal_access, true, hilbert_order, accum);
+
+      const auto rhs_offset = rhs_offsets(record_index);
+      const auto mat_offset = mat_offsets(record_index);
+      for (unsigned int i = 0; i != n_dofs; ++i)
+        {
+          ::Kokkos::atomic_add(&rhs_values(rhs_slots(rhs_offset + i)), -accum.residual(i));
+          for (unsigned int j = 0; j != n_dofs; ++j)
+            ::Kokkos::atomic_add(&mat_values(mat_slots(mat_offset + i * n_dofs + j)),
+                                 accum.jacobian(i, j));
         }
     });
   ::Kokkos::fence();

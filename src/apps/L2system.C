@@ -30,6 +30,7 @@
 #include "libmesh/string_to_enum.h"
 #include "libmesh/utility.h"
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <type_traits>
@@ -365,12 +366,16 @@ struct KokkosPetscAssemblyPlan
 {
   std::vector<HilbertElementAssemblyRecord> records;
   std::vector<KokkosHilbertAssemblyBucket> buckets;
+  std::size_t total_rhs_entries = 0;
+  std::size_t total_mat_entries = 0;
   std::vector<PetscInt> rhs_rows;
   std::vector<PetscInt> mat_rows;
   std::vector<PetscInt> mat_cols;
   KokkosHilbertBatchData batch_data;
   ::Kokkos::View<Number *> rhs_values;
   ::Kokkos::View<Number *> mat_values;
+  KokkosSizeView rhs_local_slots;
+  KokkosSizeView mat_value_slots;
   KokkosFEMGoalBatchData fem_goal_batch_data;
   const void * geometry_cache_id = nullptr;
   const void * dof_index_cache_id = nullptr;
@@ -380,9 +385,112 @@ struct KokkosPetscAssemblyPlan
   std::set<subdomain_id_type> subdomains;
   const void * matrix_target = nullptr;
   const void * rhs_target = nullptr;
+  const void * direct_matrix_target = nullptr;
+  const void * direct_rhs_target = nullptr;
   const void * fem_goal_target = nullptr;
   const void * input_vector_target = nullptr;
+  bool direct_storage_active = false;
+  bool coo_storage_ready = false;
 };
+
+void
+ensure_kokkos_petsc_coo_storage(const DofMap::KokkosDofIndexCache & dof_index_cache,
+                                KokkosPetscAssemblyPlan & plan)
+{
+  if (!plan.coo_storage_ready)
+    {
+      plan.rhs_rows.resize(plan.total_rhs_entries);
+      plan.mat_rows.resize(plan.total_mat_entries);
+      plan.mat_cols.resize(plan.total_mat_entries);
+      build_hilbert_coo_indices(
+        dof_index_cache, plan.records, plan.rhs_rows, plan.mat_rows, plan.mat_cols);
+      plan.rhs_values = ::Kokkos::View<Number *>("hilbert_rhs_values", plan.total_rhs_entries);
+      plan.mat_values = ::Kokkos::View<Number *>("hilbert_mat_values", plan.total_mat_entries);
+      plan.coo_storage_ready = true;
+    }
+}
+
+bool
+ensure_kokkos_petsc_direct_storage(HilbertSystem & sys,
+                                   const DofMap::KokkosDofIndexCache & dof_index_cache,
+                                   KokkosPetscAssemblyPlan & plan,
+                                   PetscMatrixBase<Number> & system_matrix,
+                                   PetscVector<Number> & system_rhs)
+{
+  if (plan.direct_matrix_target == &system_matrix && plan.direct_rhs_target == &system_rhs)
+    return plan.direct_storage_active;
+
+  plan.direct_matrix_target = &system_matrix;
+  plan.direct_rhs_target = &system_rhs;
+  plan.direct_storage_active = false;
+
+  if (sys.comm().size() != 1 || PetscMemTypeDevice(system_rhs.get_mem_type()))
+    return false;
+
+  const char * mat_type = nullptr;
+  LibmeshPetscCall2(sys.comm(), MatGetType(system_matrix.mat(), &mat_type));
+  PetscBool is_seq_aij = PETSC_FALSE;
+  PetscBool is_seq_aijkokkos = PETSC_FALSE;
+  LibmeshPetscCall2(sys.comm(), PetscStrcmp(mat_type, MATSEQAIJ, &is_seq_aij));
+  LibmeshPetscCall2(sys.comm(), PetscStrcmp(mat_type, MATSEQAIJKOKKOS, &is_seq_aijkokkos));
+  if (!is_seq_aij && !is_seq_aijkokkos)
+    return false;
+
+  const PetscInt * row_offsets = nullptr;
+  const PetscInt * col_indices = nullptr;
+  PetscScalar * values = nullptr;
+  PetscMemType mem_type = PETSC_MEMTYPE_HOST;
+  LibmeshPetscCall2(sys.comm(),
+                    MatSeqAIJGetCSRAndMemType(
+                      system_matrix.mat(), &row_offsets, &col_indices, &values, &mem_type));
+  if (!PetscMemTypeHost(mem_type))
+    return false;
+
+  std::vector<std::size_t> rhs_local_slots(plan.total_rhs_entries);
+  std::vector<std::size_t> mat_value_slots(plan.total_mat_entries);
+
+  for (const auto & record : plan.records)
+    {
+      const auto elem_dofs =
+        &dof_index_cache.host_element_dof_indices[record.elem_index * dof_index_cache.max_dofs];
+
+      for (unsigned int i = 0; i != record.n_dofs; ++i)
+        rhs_local_slots[record.rhs_offset + i] =
+          system_rhs.map_global_to_local_index(elem_dofs[i]);
+
+      for (unsigned int i = 0; i != record.n_dofs; ++i)
+        {
+          const PetscInt row = cast_int<PetscInt>(elem_dofs[i]);
+          const PetscInt row_begin = row_offsets[row];
+          const PetscInt row_end = row_offsets[row + 1];
+          for (unsigned int j = 0; j != record.n_dofs; ++j)
+            {
+              const PetscInt col = cast_int<PetscInt>(elem_dofs[j]);
+              const auto slot_it =
+                std::find(col_indices + row_begin, col_indices + row_end, col);
+              if (slot_it == col_indices + row_end)
+                return false;
+              mat_value_slots[record.mat_offset + i * record.n_dofs + j] =
+                cast_int<std::size_t>(std::distance(col_indices, slot_it));
+            }
+        }
+    }
+
+  plan.rhs_local_slots = KokkosSizeView("hilbert_rhs_local_slots", rhs_local_slots.size());
+  plan.mat_value_slots = KokkosSizeView("hilbert_mat_value_slots", mat_value_slots.size());
+
+  auto h_rhs_local_slots = ::Kokkos::create_mirror_view(plan.rhs_local_slots);
+  auto h_mat_value_slots = ::Kokkos::create_mirror_view(plan.mat_value_slots);
+  for (auto i : index_range(rhs_local_slots))
+    h_rhs_local_slots(i) = rhs_local_slots[i];
+  for (auto i : index_range(mat_value_slots))
+    h_mat_value_slots(i) = mat_value_slots[i];
+
+  ::Kokkos::deep_copy(plan.rhs_local_slots, h_rhs_local_slots);
+  ::Kokkos::deep_copy(plan.mat_value_slots, h_mat_value_slots);
+  plan.direct_storage_active = true;
+  return true;
+}
 
 namespace
 {
@@ -606,11 +714,6 @@ build_kokkos_petsc_assembly_plan(HilbertSystem & sys,
     return false;
   sort_hilbert_element_records(geometry_cache, sys.variable_type(0), records);
 
-  std::vector<PetscInt> rhs_rows(total_rhs_entries);
-  std::vector<PetscInt> mat_rows(total_mat_entries);
-  std::vector<PetscInt> mat_cols(total_mat_entries);
-  build_hilbert_coo_indices(*dof_index_cache, records, rhs_rows, mat_rows, mat_cols);
-
   KokkosHilbertBatchData batch_data;
   build_hilbert_batch_data(records, batch_data);
   std::vector<KokkosHilbertAssemblyBucket> buckets;
@@ -618,12 +721,16 @@ build_kokkos_petsc_assembly_plan(HilbertSystem & sys,
 
   plan.records = std::move(records);
   plan.buckets = std::move(buckets);
-  plan.rhs_rows = std::move(rhs_rows);
-  plan.mat_rows = std::move(mat_rows);
-  plan.mat_cols = std::move(mat_cols);
+  plan.total_rhs_entries = total_rhs_entries;
+  plan.total_mat_entries = total_mat_entries;
+  plan.rhs_rows.clear();
+  plan.mat_rows.clear();
+  plan.mat_cols.clear();
   plan.batch_data = std::move(batch_data);
-  plan.rhs_values = ::Kokkos::View<Number *>("hilbert_rhs_values", plan.rhs_rows.size());
-  plan.mat_values = ::Kokkos::View<Number *>("hilbert_mat_values", plan.mat_rows.size());
+  plan.rhs_values = ::Kokkos::View<Number *>();
+  plan.mat_values = ::Kokkos::View<Number *>();
+  plan.rhs_local_slots = KokkosSizeView();
+  plan.mat_value_slots = KokkosSizeView();
   plan.geometry_cache_id = &geometry_cache;
   plan.dof_index_cache_id = dof_index_cache;
   plan.fe_type = sys.variable_type(0);
@@ -632,8 +739,12 @@ build_kokkos_petsc_assembly_plan(HilbertSystem & sys,
   plan.subdomains = sys.subdomains_list();
   plan.matrix_target = nullptr;
   plan.rhs_target = nullptr;
+  plan.direct_matrix_target = nullptr;
+  plan.direct_rhs_target = nullptr;
   plan.fem_goal_target = nullptr;
   plan.input_vector_target = nullptr;
+  plan.direct_storage_active = false;
+  plan.coo_storage_ready = false;
   return true;
 }
 
@@ -1022,13 +1133,119 @@ assemble_kokkos_petsc_global_system(HilbertSystem & sys,
                                     const libMesh::Kokkos::KokkosParsedFunction<Number> * analytic_goal,
                                     const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal,
                                     PetscMatrixBase<Number> & system_matrix,
-                                    PetscVector<Number> & system_rhs)
+                                    PetscVector<Number> & system_rhs,
+                                    HilbertSystem::KokkosAssemblyPath & assembly_path)
 {
   if (sys.has_static_condensation() || sys.get_dof_map().n_constrained_dofs())
     return false;
 
   if (!analytic_goal && !fem_goal)
     return false;
+
+  const auto * dof_index_cache = sys.get_dof_map().get_kokkos_dof_index_cache(0);
+  libmesh_assert(dof_index_cache);
+
+  if (ensure_kokkos_petsc_direct_storage(
+        sys, *dof_index_cache, plan, system_matrix, system_rhs))
+    {
+      assembly_path = HilbertSystem::KokkosAssemblyPath::petsc_direct_storage;
+      auto rhs_guard = system_rhs.make_kokkos_write_view_guard();
+      const PetscInt * row_offsets = nullptr;
+      const PetscInt * col_indices = nullptr;
+      PetscScalar * values = nullptr;
+      PetscMemType mem_type = PETSC_MEMTYPE_HOST;
+      LibmeshPetscCall2(sys.comm(),
+                        MatSeqAIJGetCSRAndMemType(
+                          system_matrix.mat(), &row_offsets, &col_indices, &values, &mem_type));
+      libmesh_ignore(col_indices);
+      libmesh_assert(PetscMemTypeHost(mem_type));
+      using KokkosMatrixWriteView =
+        ::Kokkos::View<Number *,
+                       typename ::Kokkos::DefaultExecutionSpace::memory_space,
+                       ::Kokkos::MemoryTraits<::Kokkos::Unmanaged>>;
+      const auto n_local_rows = cast_int<std::size_t>(system_matrix.local_m());
+      KokkosMatrixWriteView matrix_values(reinterpret_cast<Number *>(values),
+                                         cast_int<std::size_t>(row_offsets[n_local_rows]));
+
+      const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
+      if (analytic_goal)
+        {
+          const auto timed_goal = analytic_goal->with_time(sys.time);
+          const auto goal_access =
+            libMesh::Kokkos::detail::make_hilbert_analytic_goal_access(
+              timed_goal, timed_goal.gradient_function());
+
+          for (const auto & bucket : plan.buckets)
+            libMesh::Kokkos::detail::run_hilbert_system_bucket_scatter_batch<
+              kokkos_hilbert_max_dofs>(
+              bucket.key,
+              bucket.mapping_type,
+              bucket.n_nodes,
+              bucket.quadrature_order,
+              geometry_cache.node_coordinates,
+              geometry_cache.element_node_ids,
+              ::Kokkos::subview(plan.batch_data.elem_indices,
+                                ::Kokkos::make_pair(bucket.begin, bucket.end)),
+              ::Kokkos::subview(plan.batch_data.elem_n_dofs,
+                                ::Kokkos::make_pair(bucket.begin, bucket.end)),
+              ::Kokkos::subview(plan.batch_data.rhs_offsets,
+                                ::Kokkos::make_pair(bucket.begin, bucket.end)),
+              ::Kokkos::subview(plan.batch_data.mat_offsets,
+                                ::Kokkos::make_pair(bucket.begin, bucket.end)),
+              plan.rhs_local_slots,
+              plan.mat_value_slots,
+              sys.hilbert_order(),
+              goal_access,
+              rhs_guard.view(),
+              matrix_values,
+              "hilbert_direct_scatter_bucket_batch");
+        }
+      else
+        {
+          const auto timed_goal = fem_goal->with_time(sys.time);
+          if (!ensure_kokkos_fem_goal_batch_data(sys, *fem_goal, plan))
+            return false;
+
+          auto input_guard = plan.fem_goal_batch_data.input_vector->make_kokkos_read_view_guard();
+          for (auto bucket_index : index_range(plan.buckets))
+            {
+              const auto & bucket = plan.buckets[bucket_index];
+              libMesh::Kokkos::detail::run_hilbert_system_fem_bucket_scatter_batch<
+                kokkos_hilbert_max_dofs,
+                kokkos_parsed_fem_max_fields>(
+                bucket.key,
+                bucket.mapping_type,
+                bucket.n_nodes,
+                bucket.quadrature_order,
+                geometry_cache.node_coordinates,
+                geometry_cache.element_node_ids,
+                ::Kokkos::subview(plan.batch_data.elem_indices,
+                                  ::Kokkos::make_pair(bucket.begin, bucket.end)),
+                ::Kokkos::subview(plan.batch_data.elem_n_dofs,
+                                  ::Kokkos::make_pair(bucket.begin, bucket.end)),
+                ::Kokkos::subview(plan.batch_data.rhs_offsets,
+                                  ::Kokkos::make_pair(bucket.begin, bucket.end)),
+                ::Kokkos::subview(plan.batch_data.mat_offsets,
+                                  ::Kokkos::make_pair(bucket.begin, bucket.end)),
+                plan.rhs_local_slots,
+                plan.mat_value_slots,
+                plan.fem_goal_batch_data.bucket_field_keys[bucket_index],
+                plan.fem_goal_batch_data.bucket_field_dofs[bucket_index],
+                plan.fem_goal_batch_data.field_local_indices,
+                input_guard.view(),
+                timed_goal,
+                sys.hilbert_order(),
+                rhs_guard.view(),
+                matrix_values,
+                "hilbert_direct_scatter_fem_bucket_batch");
+            }
+        }
+
+      return true;
+    }
+
+  assembly_path = HilbertSystem::KokkosAssemblyPath::petsc_coo_fallback;
+  ensure_kokkos_petsc_coo_storage(*dof_index_cache, plan);
 
   if (analytic_goal)
     {
@@ -1192,16 +1409,6 @@ HilbertSystem::ensure_kokkos_fem_goal_func()
     });
 }
 
-void
-HilbertSystem::reset_kokkos_goal_cache()
-{
-  _kokkos_goal_func.reset();
-  _kokkos_fem_goal_func.reset();
-#if defined(LIBMESH_HAVE_PETSC)
-  _kokkos_petsc_plan.reset();
-#endif
-}
-
 KokkosPetscAssemblyPlan *
 HilbertSystem::ensure_kokkos_petsc_plan(bool * rebuilt)
 {
@@ -1315,16 +1522,19 @@ HilbertSystem::try_kokkos_petsc_solve()
       0.;
 
   const auto assembly_start = clock::now();
+  auto assembly_path = HilbertSystem::KokkosAssemblyPath::none;
   if (!assemble_kokkos_petsc_global_system(*this,
                                            *plan,
                                            analytic_goal,
                                            fem_goal,
                                            *petsc_matrix,
-                                           *petsc_rhs))
+                                           *petsc_rhs,
+                                           assembly_path))
     return false;
   const auto assembly_stop = clock::now();
   this->_last_kokkos_timing.assembly_seconds =
     std::chrono::duration_cast<std::chrono::duration<Real>>(assembly_stop - assembly_start).count();
+  this->_last_kokkos_timing.assembly_path = assembly_path;
 
   petsc_matrix->close();
   petsc_rhs->close();

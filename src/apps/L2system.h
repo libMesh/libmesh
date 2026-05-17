@@ -45,12 +45,20 @@ struct KokkosPetscAssemblyPlan;
 class HilbertSystem : public libMesh::FEMSystem
 {
 public:
+  enum class KokkosAssemblyPath
+  {
+    none,
+    petsc_direct_storage,
+    petsc_coo_fallback
+  };
+
   struct KokkosTimingInfo
   {
     libMesh::Real plan_seconds = 0.;
     libMesh::Real assembly_seconds = 0.;
     libMesh::Real solve_seconds = 0.;
     libMesh::Real total_seconds = 0.;
+    KokkosAssemblyPath assembly_path = KokkosAssemblyPath::none;
   };
 
   // Constructor
@@ -170,7 +178,11 @@ private:
   KokkosPetscAssemblyPlan * ensure_kokkos_petsc_plan(bool * rebuilt = nullptr);
 #endif
 
-  void reset_kokkos_goal_cache();
+  void reset_kokkos_goal_cache()
+  {
+    _kokkos_goal_func.reset();
+    _kokkos_fem_goal_func.reset();
+  }
 #else
   void reset_kokkos_goal_cache() {}
 #endif

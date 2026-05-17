@@ -246,6 +246,10 @@ public:
     ::Kokkos::View<const T *,
                    typename ::Kokkos::DefaultExecutionSpace::memory_space,
                    ::Kokkos::MemoryTraits<::Kokkos::Unmanaged>>;
+  using kokkos_write_view =
+    ::Kokkos::View<T *,
+                   typename ::Kokkos::DefaultExecutionSpace::memory_space,
+                   ::Kokkos::MemoryTraits<::Kokkos::Unmanaged>>;
 
   class KokkosReadViewGuard
   {
@@ -279,6 +283,40 @@ public:
   KokkosReadViewGuard make_kokkos_read_view_guard()
   {
     return KokkosReadViewGuard(*this);
+  }
+
+  class KokkosWriteViewGuard
+  {
+  public:
+    explicit KokkosWriteViewGuard(PetscVector<T> & vector)
+      : _vector(vector),
+        _data(reinterpret_cast<T *>(vector.get_array())),
+        _view(_data, vector.local_size())
+    {
+    }
+
+    KokkosWriteViewGuard(const KokkosWriteViewGuard &) = delete;
+    KokkosWriteViewGuard & operator=(const KokkosWriteViewGuard &) = delete;
+
+    ~KokkosWriteViewGuard()
+    {
+      _vector.restore_array();
+    }
+
+    const kokkos_write_view & view() const
+    {
+      return _view;
+    }
+
+  private:
+    PetscVector<T> & _vector;
+    T * _data;
+    kokkos_write_view _view;
+  };
+
+  KokkosWriteViewGuard make_kokkos_write_view_guard()
+  {
+    return KokkosWriteViewGuard(*this);
   }
 #endif
 

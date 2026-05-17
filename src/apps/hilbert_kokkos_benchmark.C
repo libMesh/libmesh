@@ -85,6 +85,7 @@ struct BenchmarkResult
   Real average_solver_seconds = 0.;
   Real average_total_seconds = 0.;
   dof_id_type n_dofs = 0;
+  HilbertSystem::KokkosAssemblyPath assembly_path = HilbertSystem::KokkosAssemblyPath::none;
 };
 
 #ifdef LIBMESH_HAVE_KOKKOS
@@ -168,6 +169,22 @@ void configure_linear_solver(HilbertSystem & sys,
   linear_solver->set_preconditioner_type(options.preconditioner_type);
 }
 
+const char *
+kokkos_assembly_path_name(const HilbertSystem::KokkosAssemblyPath path)
+{
+  switch (path)
+    {
+    case HilbertSystem::KokkosAssemblyPath::none:
+      return "none";
+    case HilbertSystem::KokkosAssemblyPath::petsc_direct_storage:
+      return "direct PETSc storage";
+    case HilbertSystem::KokkosAssemblyPath::petsc_coo_fallback:
+      return "PETSc COO fallback";
+    }
+
+  return "unknown";
+}
+
 BenchmarkResult solve_projection_once(const Parallel::Communicator & comm,
                                       const BenchmarkOptions & options,
                                       const bool use_kokkos)
@@ -227,6 +244,7 @@ BenchmarkResult solve_projection_once(const Parallel::Communicator & comm,
       result.average_assembly_seconds = timing.assembly_seconds;
       result.average_solver_seconds = timing.solve_seconds;
       result.average_total_seconds = timing.total_seconds;
+      result.assembly_path = timing.assembly_path;
     }
   result.n_dofs = projection.n_dofs();
   projection.solution->localize(result.solution);
@@ -248,6 +266,7 @@ BenchmarkResult solve_projection(const Parallel::Communicator & comm,
       result.average_solver_seconds += single.average_solver_seconds;
       result.average_total_seconds += single.average_total_seconds;
       result.n_dofs = single.n_dofs;
+      result.assembly_path = single.assembly_path;
       result.solution = std::move(single.solution);
     }
 
@@ -420,6 +439,8 @@ int main(int argc, char ** argv)
   libMesh::out << "Degrees of freedom: " << host_result.n_dofs << std::endl;
   libMesh::out << "Host solve time:    " << host_result.average_solve_seconds << " s" << std::endl;
   libMesh::out << "Kokkos solve time:  " << kokkos_result.average_solve_seconds << " s" << std::endl;
+  libMesh::out << "Kokkos assembly path: "
+               << kokkos_assembly_path_name(kokkos_result.assembly_path) << std::endl;
   libMesh::out << "Kokkos plan time:   " << kokkos_result.average_plan_seconds << " s" << std::endl;
   libMesh::out << "Kokkos assembly:    " << kokkos_result.average_assembly_seconds << " s" << std::endl;
   libMesh::out << "Kokkos solver:      " << kokkos_result.average_solver_seconds << " s" << std::endl;
