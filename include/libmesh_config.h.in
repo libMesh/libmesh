@@ -488,9 +488,6 @@
    annotations */
 #undef HAVE_NVTX_API
 
-/* Defined if the installed TBB is oneTBB (>= 2021) */
-#undef HAVE_ONETBB
-
 /* Define if OpenMP is enabled */
 #undef HAVE_OPENMP
 

@@ -335,7 +335,6 @@ include_HEADERS =  \
         parallel/threads_allocators.h \
         parallel/threads_none.h \
         parallel/threads_pthread.h \
-        parallel/threads_spin_mutex_forward.h \
         parallel/threads_tbb.h \
         partitioning/centroid_partitioner.h \
         partitioning/hilbert_sfc_partitioner.h \

@@ -5,6 +5,7 @@ SUBDIRS = libmesh
 # nobase_ is used instead of the standard flat install to keep the namespace.
 if LIBMESH_ENABLE_KOKKOS
 nobase_include_HEADERS = \
+  gpu/kokkos_scalar_types.h \
   gpu/kokkos_fe_types.h \
   gpu/kokkos_fe_shape_dispatch.h \
   gpu/kokkos_fe_base.h \

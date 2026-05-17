@@ -342,7 +342,6 @@ BUILT_SOURCES = \
         threads_allocators.h \
         threads_none.h \
         threads_pthread.h \
-        threads_spin_mutex_forward.h \
         threads_tbb.h \
         centroid_partitioner.h \
         hilbert_sfc_partitioner.h \
@@ -1650,9 +1649,6 @@ threads_none.h: $(top_srcdir)/include/parallel/threads_none.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads_pthread.h: $(top_srcdir)/include/parallel/threads_pthread.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-threads_spin_mutex_forward.h: $(top_srcdir)/include/parallel/threads_spin_mutex_forward.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads_tbb.h: $(top_srcdir)/include/parallel/threads_tbb.h

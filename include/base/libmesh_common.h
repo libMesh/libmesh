@@ -309,7 +309,7 @@ extern bool warned_about_auto_ptr;
 #define libmesh_assert_less_equal_msg(expr1,expr2, msg)  ((void) 0)
 #define libmesh_assert_greater_equal_msg(expr1,expr2, msg)  ((void) 0)
 
-#elif defined(LIBMESH_KOKKOS_COMPILATION)
+#elif defined(LIBMESH_DEVICE_ASSERT)
 
 // Kokkos compilation: use the device-safe assert from libmesh_device.h.
 #define libmesh_assert_msg(asserted, msg)  LIBMESH_DEVICE_ASSERT(asserted)
@@ -678,7 +678,6 @@ inline Tnew libmesh_cast_int (Told oldvar)
   return cast_int<Tnew>(oldvar);
 }
 
-
 /**
  * restrict_int checks that the value of the castee is within the
  * bounds which are exactly representable by the output type, even in
@@ -702,7 +701,6 @@ inline Tnew restrict_int (Told oldvar)
 
   return oldvar;
 }
-
 /**
  * This is a helper variable template for cases when we want to use a default compile-time
  * error with constexpr-based if conditions. The templating delays the triggering
