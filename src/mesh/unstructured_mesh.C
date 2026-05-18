@@ -42,6 +42,7 @@
 
 // C++ includes
 #include <algorithm> // std::all_of
+#include <atomic>
 #include <fstream>
 #include <iomanip>
 #include <map>
