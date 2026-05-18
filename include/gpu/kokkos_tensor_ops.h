@@ -42,20 +42,17 @@ ResultTensor tensor_identity(const unsigned int dim = LIBMESH_DIM)
   return out;
 }
 
-template <typename ResultTensor, typename TensorLike>
+template <typename ResultTensor = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
-ResultTensor copy_tensor(const TensorLike & T_in)
+auto copy_tensor(const TensorLike & T_in)
+  -> std::conditional_t<std::is_void<ResultTensor>::value,
+                        tensor_semantic_type_t<TensorLike>,
+                        ResultTensor>
 {
-  return materialize_tensor<ResultTensor>(T_in);
-}
-
-template <typename Dummy = void,
-          typename TensorLike,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-tensor_semantic_type_t<TensorLike> copy_tensor(const TensorLike & T_in)
-{
-  return copy_tensor<tensor_semantic_type_t<TensorLike>>(T_in);
+  using output_type = std::conditional_t<std::is_void<ResultTensor>::value,
+                                         tensor_semantic_type_t<TensorLike>,
+                                         ResultTensor>;
+  return materialize_tensor<output_type>(T_in);
 }
 
 namespace detail
@@ -297,71 +294,13 @@ void update_tensor_components(LeftTensor & left, const RightTensor & right, cons
                              factor * tensor_get_component(right, row, col));
 }
 
-template <typename ResultTensor, typename ScalarA, typename TensorA, typename ScalarB, typename TensorB>
+template <typename OutputTensor, typename InputTensor, typename TransformOp>
 LIBMESH_DEVICE_INLINE
-ResultTensor combine_tensors(const ScalarA & alpha,
-                             const TensorA & A,
-                             const ScalarB & beta,
-                             const TensorB & B)
-{
-  ResultTensor out;
-  out.zero();
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out,
-                           row,
-                           col,
-                           alpha * tensor_get_component(A, row, col) +
-                             beta * tensor_get_component(B, row, col));
-
-  return out;
-}
-
-template <typename ResultTensor, typename Scalar, typename TensorLike>
-LIBMESH_DEVICE_INLINE
-ResultTensor scale_tensor(const Scalar & alpha, const TensorLike & T_in)
-{
-  ResultTensor out;
-  out.zero();
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out, row, col, alpha * tensor_get_component(T_in, row, col));
-
-  return out;
-}
-
-template <typename ResultTensor, typename TensorLike, typename Scalar>
-LIBMESH_DEVICE_INLINE
-ResultTensor divide_tensor(const TensorLike & T_in, const Scalar & alpha)
-{
-  ResultTensor out;
-  out.zero();
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out, row, col, tensor_get_component(T_in, row, col) / alpha);
-
-  return out;
-}
-
-template <typename TensorLike, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void scale_tensor_components(TensorLike & T_in, const Scalar & alpha)
+void transform_tensor_components(OutputTensor & out, const InputTensor & in, const TransformOp & op)
 {
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(T_in, row, col, tensor_get_component(T_in, row, col) * alpha);
-}
-
-template <typename TensorLike, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void divide_tensor_components(TensorLike & T_in, const Scalar & alpha)
-{
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(T_in, row, col, tensor_get_component(T_in, row, col) / alpha);
+      tensor_set_component(out, row, col, op(tensor_get_component(in, row, col)));
 }
 
 // Tensor reductions and predicates
@@ -473,37 +412,32 @@ auto is_zero(const TensorLike & T_in)
   return detail::tensor_is_zero(T_in);
 }
 
-template <typename ResultTensor, typename LeftVector, typename RightVector>
-LIBMESH_DEVICE_INLINE
-auto outer_product(const LeftVector & left, const RightVector & right)
-  -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector>, ResultTensor>
-{
-  return detail::outer_product<ResultTensor>(left, right);
-}
-
-template <typename LeftVector, typename RightVector>
+template <typename ResultTensor = void, typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto outer_product(const LeftVector & left, const RightVector & right)
   -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector>,
-                      libMesh::TypeTensor<vector_value_type_t<LeftVector>>>
+                      std::conditional_t<std::is_void<ResultTensor>::value,
+                                         libMesh::TypeTensor<vector_value_type_t<LeftVector>>,
+                                         ResultTensor>>
 {
-  return outer_product<libMesh::TypeTensor<vector_value_type_t<LeftVector>>>(left, right);
+  using output_type = std::conditional_t<std::is_void<ResultTensor>::value,
+                                         libMesh::TypeTensor<vector_value_type_t<LeftVector>>,
+                                         ResultTensor>;
+  return detail::outer_product<output_type>(left, right);
 }
 
-template <typename ResultTensor, typename TensorLike>
+template <typename ResultTensor = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto transpose(const TensorLike & T_in)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, ResultTensor>
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>,
+                      std::conditional_t<std::is_void<ResultTensor>::value,
+                                         tensor_semantic_type_t<TensorLike>,
+                                         ResultTensor>>
 {
-  return detail::transpose<ResultTensor>(T_in);
-}
-
-template <typename TensorLike>
-LIBMESH_DEVICE_INLINE
-auto transpose(const TensorLike & T_in)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, tensor_semantic_type_t<TensorLike>>
-{
-  return transpose<tensor_semantic_type_t<TensorLike>>(T_in);
+  using output_type = std::conditional_t<std::is_void<ResultTensor>::value,
+                                         tensor_semantic_type_t<TensorLike>,
+                                         ResultTensor>;
+  return detail::transpose<output_type>(T_in);
 }
 
 template <typename TensorLike>
@@ -514,53 +448,61 @@ auto det(const TensorLike & T_in)
   return T_in.det();
 }
 
-template <typename ResultTensor, typename TensorLike>
+template <typename ResultTensor = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, ResultTensor>
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>,
+                      std::conditional_t<std::is_void<ResultTensor>::value,
+                                         tensor_semantic_type_t<TensorLike>,
+                                         ResultTensor>>
 {
-  return detail::inverse<ResultTensor>(T_in, dim);
+  using output_type = std::conditional_t<std::is_void<ResultTensor>::value,
+                                         tensor_semantic_type_t<TensorLike>,
+                                         ResultTensor>;
+  return detail::inverse<output_type>(T_in, dim);
 }
 
-template <typename TensorLike>
-LIBMESH_DEVICE_INLINE
-auto inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, tensor_semantic_type_t<TensorLike>>
-{
-  return inverse<tensor_semantic_type_t<TensorLike>>(T_in, dim);
-}
-
-template <typename ResultVector, typename TensorLike>
+template <typename ResultVector = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto row(const TensorLike & T_in, const unsigned int i)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, ResultVector>
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>,
+                      std::conditional_t<std::is_void<ResultVector>::value,
+                                         libMesh::TypeVector<tensor_value_type_t<TensorLike>>,
+                                         ResultVector>>
 {
-  return detail::row<ResultVector>(T_in, i);
+  using output_type = std::conditional_t<std::is_void<ResultVector>::value,
+                                         libMesh::TypeVector<tensor_value_type_t<TensorLike>>,
+                                         ResultVector>;
+  return detail::row<output_type>(T_in, i);
 }
 
-template <typename TensorLike>
-LIBMESH_DEVICE_INLINE
-auto row(const TensorLike & T_in, const unsigned int i)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, libMesh::TypeVector<tensor_value_type_t<TensorLike>>>
-{
-  return row<libMesh::TypeVector<tensor_value_type_t<TensorLike>>>(T_in, i);
-}
-
-template <typename ResultVector, typename TensorLike>
+template <typename ResultVector = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto column(const TensorLike & T_in, const unsigned int i)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, ResultVector>
+  -> std::enable_if_t<is_tensor_like_v<TensorLike>,
+                      std::conditional_t<std::is_void<ResultVector>::value,
+                                         libMesh::TypeVector<tensor_value_type_t<TensorLike>>,
+                                         ResultVector>>
 {
-  return detail::column<ResultVector>(T_in, i);
+  using output_type = std::conditional_t<std::is_void<ResultVector>::value,
+                                         libMesh::TypeVector<tensor_value_type_t<TensorLike>>,
+                                         ResultVector>;
+  return detail::column<output_type>(T_in, i);
 }
 
-template <typename TensorLike>
+template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
-auto column(const TensorLike & T_in, const unsigned int i)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, libMesh::TypeVector<tensor_value_type_t<TensorLike>>>
-{
-  return column<libMesh::TypeVector<tensor_value_type_t<TensorLike>>>(T_in, i);
-}
+auto operator+=(LeftTensor & left, const RightTensor & right)
+  -> std::enable_if_t<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor> &&
+                        (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
+                      LeftTensor &>;
+
+template <typename LeftTensor, typename RightTensor>
+LIBMESH_DEVICE_INLINE
+auto operator-=(LeftTensor & left, const RightTensor & right)
+  -> std::enable_if_t<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor> &&
+                        (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
+                      LeftTensor &>;
 
 template <typename ViewType>
 template <typename RightTensor>
@@ -575,7 +517,7 @@ template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
 void tensor_ref<ViewType>::add(const RightTensor & right)
 {
-  detail::update_tensor_components(*this, right, value_type(1));
+  libMesh::Kokkos::operator+=(*this, right);
 }
 
 template <typename ViewType>
@@ -591,7 +533,7 @@ template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
 void tensor_ref<ViewType>::subtract(const RightTensor & right)
 {
-  detail::update_tensor_components(*this, right, value_type(-1));
+  libMesh::Kokkos::operator-=(*this, right);
 }
 
 template <typename ViewType>
@@ -707,7 +649,12 @@ auto operator-(const TensorLike & T_in)
   -> std::enable_if_t<is_tensor_like_v<TensorLike> && is_tensor_ref_v<TensorLike>,
                       tensor_semantic_type_t<TensorLike>>
 {
-  return detail::scale_tensor<tensor_semantic_type_t<TensorLike>>(tensor_value_type_t<TensorLike>(-1), T_in);
+  auto out = copy_tensor<tensor_semantic_type_t<TensorLike>>(T_in);
+  detail::transform_tensor_components(
+    out,
+    T_in,
+    detail::negate_value<tensor_value_type_t<TensorLike>>{});
+  return out;
 }
 
 template <typename LeftTensor, typename RightTensor>
@@ -717,8 +664,9 @@ auto operator+(const LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       tensor_semantic_type_t<LeftTensor>>
 {
-  return detail::combine_tensors<tensor_semantic_type_t<LeftTensor>>(
-    tensor_value_type_t<LeftTensor>(1), left, tensor_value_type_t<LeftTensor>(1), right);
+  auto out = copy_tensor<tensor_semantic_type_t<LeftTensor>>(left);
+  out += right;
+  return out;
 }
 
 template <typename LeftTensor, typename RightTensor>
@@ -728,8 +676,9 @@ auto operator-(const LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       tensor_semantic_type_t<LeftTensor>>
 {
-  return detail::combine_tensors<tensor_semantic_type_t<LeftTensor>>(
-    tensor_value_type_t<LeftTensor>(1), left, tensor_value_type_t<LeftTensor>(-1), right);
+  auto out = copy_tensor<tensor_semantic_type_t<LeftTensor>>(left);
+  out -= right;
+  return out;
 }
 
 template <typename Scalar,
@@ -740,7 +689,7 @@ template <typename Scalar,
 LIBMESH_DEVICE_INLINE
 auto operator*(const Scalar & alpha, const TensorLike & T_in)
 {
-  return detail::scale_tensor<tensor_semantic_type_t<TensorLike>>(alpha, T_in);
+  return T_in * alpha;
 }
 
 template <typename TensorLike,
@@ -751,7 +700,9 @@ template <typename TensorLike,
 LIBMESH_DEVICE_INLINE
 auto operator*(const TensorLike & T_in, const Scalar & alpha)
 {
-  return detail::scale_tensor<tensor_semantic_type_t<TensorLike>>(alpha, T_in);
+  auto out = copy_tensor<tensor_semantic_type_t<TensorLike>>(T_in);
+  detail::transform_tensor_components(out, T_in, detail::scale_value<Scalar>{alpha});
+  return out;
 }
 
 template <typename TensorLike, typename Scalar>
@@ -761,7 +712,9 @@ auto operator/(const TensorLike & T_in, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       tensor_semantic_type_t<TensorLike>>
 {
-  return detail::divide_tensor<tensor_semantic_type_t<TensorLike>>(T_in, alpha);
+  auto out = copy_tensor<tensor_semantic_type_t<TensorLike>>(T_in);
+  detail::transform_tensor_components(out, T_in, detail::divide_value<Scalar>{alpha});
+  return out;
 }
 
 template <typename LeftTensor,
@@ -851,7 +804,7 @@ auto operator*=(LeftTensor & left, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       LeftTensor &>
 {
-  detail::scale_tensor_components(left, alpha);
+  detail::transform_tensor_components(left, left, detail::scale_value<Scalar>{alpha});
   return left;
 }
 
@@ -862,7 +815,7 @@ auto operator/=(LeftTensor & left, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       LeftTensor &>
 {
-  detail::divide_tensor_components(left, alpha);
+  detail::transform_tensor_components(left, left, detail::divide_value<Scalar>{alpha});
   return left;
 }
 
