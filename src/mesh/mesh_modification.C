@@ -1517,7 +1517,12 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         const Real w1 = n1.get_extra_datum<Real>(weight_index);
 
         // If we see edges that are unevenly parameterized, not just
-        // curved, I'm not sure what we want to do with those.
+        // curved, I'm not sure what we want to do with those.  We
+        // can't isogeometrically represent a circular arc in this
+        // case unless we change the weights on the endpoints, but
+        // then that cascades to requiring changes in every other
+        // element sharing those endpoints.
+        //
         // Presumably we want to maintain a somewhat similar uneven
         // parameterization, for whatever boundary layer grading the
         // mesh user wanted?  For now just scream and die.
@@ -1583,44 +1588,50 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
           libmesh_not_implemented_msg
             ("all_rbb() currently only supports mid-face nodes on Quad9 faces");
 
+        // We only use [4,8) but matching indices is nice and stack is
+        // cheap.
+        // that we're only using what we set, though.
         Real w[9];
-        for (unsigned int i : make_range(9u))
+
+        for (unsigned int i : make_range(4u, 8u))
           w[i] = face.node_ref(i).get_extra_datum<Real>(weight_index);
 
-        // For now we just support 2.5D (extrusions of 2D) meshes.
-        // Let's look for an extrusion direction.
-        int extrude_dir = -1;
-        if (almost_equal(w[0], w[1]) &&
-            almost_equal(w[0], w[4]) &&
-            almost_equal(w[2], w[3]) &&
-            almost_equal(w[2], w[6]) &&
-            almost_equal(w[5], w[7]))
-          extrude_dir = 0;
+        // We can't currently handle arbitrary vertex weights
+#ifndef NDEBUG
+        for (unsigned int i : make_range(4u))
+          libmesh_assert_equal_to
+            (face.node_ref(i).get_extra_datum<Real>(weight_index), 1);
+#endif
 
-        if (almost_equal(w[0], w[3]) &&
-            almost_equal(w[0], w[7]) &&
-            almost_equal(w[1], w[2]) &&
-            almost_equal(w[1], w[5]) &&
-            almost_equal(w[4], w[6]))
-          extrude_dir = 1;
+        // For the mid-face point, if we want to exactly match
+        // any cylinders and cones and spheres, we're actually already
+        // entirely constrained by the other points.
+        //
+        // This formula gives the minimum-energy Steiner surface based
+        // on the outer 8 points.
+        //
+        // That's an isogeometric representation of a cylinder aligned
+        // to either axis, or of a sphere where the quad edges are on
+        // latitude/longitude lines, or of a cone where two edges are
+        // segments of cone generating lines and the other two are
+        // arcs perpendicular to the axis.
+        //
+        // It's not perfectly isogeometric for the spheres we generate
+        // (where the quad edges are all great circles), but it should
+        // still converge asymptotically faster than non-rational
+        // quadratic Lagrange.
+        const Point xi_avg = (face.point(7) + face.point(5))/2;
+        const Point eta_avg = (face.point(4) + face.point(6))/2;
+        const Point vertex_avg = (face.point(0) + face.point(1) +
+                                  face.point(2) + face.point(3))/4;
 
-        // If we're extruding, then we can derive the center point
-        // values from the two perpendicular edges' centers.
-        Node & n_center = face.node_ref(8);
-        Point & p_center = n_center;
-        if (extrude_dir == 0)
-          {
-            n_center.set_extra_datum<Real>(weight_index, w[5]);
-            p_center = (face.point(5) + face.point(7))/2;
-          }
-        else if (extrude_dir == 1)
-          {
-            n_center.set_extra_datum<Real>(weight_index, w[4]);
-            p_center = (face.point(4) + face.point(6))/2;
-          }
-        else
-          libmesh_not_implemented_msg
-            ("all_rbb() currently only supports 2.5D (extrusions) meshes in 3D");
+        const Real w_xi  = (w[7] + w[5])/2;
+        const Real w_eta = (w[4] + w[6])/2;
+        const Real w_mid = w_xi * w_eta;
+
+        Node & midnode = face.node_ref(8);
+        midnode.set_extra_datum<Real>(weight_index, w_mid);
+        midnode = ((1+w_mid)/(w_xi+w_eta) * (w_xi*xi_avg + w_eta*eta_avg) - vertex_avg)/w_mid;
       };
 
       // Check each edge for a curve, and adjust it if needed.
