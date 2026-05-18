@@ -28,20 +28,17 @@ ResultVector zero_vector_value()
   return out;
 }
 
-template <typename ResultVector, typename VectorLike>
+template <typename ResultVector = void, typename VectorLike>
 LIBMESH_DEVICE_INLINE
-ResultVector copy_vector(const VectorLike & v)
+auto copy_vector(const VectorLike & v)
+  -> std::conditional_t<std::is_void<ResultVector>::value,
+                        vector_semantic_type_t<VectorLike>,
+                        ResultVector>
 {
-  return materialize_vector<ResultVector>(v);
-}
-
-template <typename Dummy = void,
-          typename VectorLike,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-vector_semantic_type_t<VectorLike> copy_vector(const VectorLike & v)
-{
-  return copy_vector<vector_semantic_type_t<VectorLike>>(v);
+  using output_type = std::conditional_t<std::is_void<ResultVector>::value,
+                                         vector_semantic_type_t<VectorLike>,
+                                         ResultVector>;
+  return materialize_vector<output_type>(v);
 }
 
 namespace detail
@@ -74,89 +71,61 @@ void update_vector_components(LeftVector & left, const RightVector & right, cons
                            factor * vector_get_component(right, component));
 }
 
-template <typename ResultVector, typename ScalarA, typename VectorA, typename ScalarB, typename VectorB>
+template <typename OutputVector, typename InputVector, typename TransformOp>
 LIBMESH_DEVICE_INLINE
-ResultVector linear_combination(const ScalarA & alpha,
-                                const VectorA & a,
-                                const ScalarB & beta,
-                                const VectorB & b)
-{
-  ResultVector out;
-  out.zero();
-
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(out,
-                         component,
-                         alpha * vector_get_component(a, component) +
-                           beta * vector_get_component(b, component));
-
-  return out;
-}
-
-template <typename ResultVector, typename ScalarA, typename VectorA, typename ScalarB, typename VectorB,
-          typename ScalarC, typename VectorC>
-LIBMESH_DEVICE_INLINE
-ResultVector linear_combination(const ScalarA & alpha,
-                                const VectorA & a,
-                                const ScalarB & beta,
-                                const VectorB & b,
-                                const ScalarC & gamma,
-                                const VectorC & c)
-{
-  ResultVector out;
-  out.zero();
-
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(out,
-                         component,
-                         alpha * vector_get_component(a, component) +
-                           beta * vector_get_component(b, component) +
-                           gamma * vector_get_component(c, component));
-
-  return out;
-}
-
-template <typename ResultVector, typename Scalar, typename VectorLike>
-LIBMESH_DEVICE_INLINE
-ResultVector scale_vector(const Scalar & alpha, const VectorLike & v)
-{
-  ResultVector out;
-  out.zero();
-
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(out, component, alpha * vector_get_component(v, component));
-
-  return out;
-}
-
-template <typename ResultVector, typename VectorLike, typename Scalar>
-LIBMESH_DEVICE_INLINE
-ResultVector divide_vector(const VectorLike & v, const Scalar & alpha)
-{
-  ResultVector out;
-  out.zero();
-
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(out, component, vector_get_component(v, component) / alpha);
-
-  return out;
-}
-
-template <typename VectorLike, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void scale_vector_components(VectorLike & v, const Scalar & alpha)
+void transform_vector_components(OutputVector & out, const InputVector & in, const TransformOp & op)
 {
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(v, component, vector_get_component(v, component) * alpha);
+    vector_set_component(out, component, op(vector_get_component(in, component)));
 }
 
-template <typename VectorLike, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void divide_vector_components(VectorLike & v, const Scalar & alpha)
+template <typename ValueType>
+struct negate_value
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(v, component, vector_get_component(v, component) / alpha);
-}
+  LIBMESH_DEVICE_INLINE
+  auto operator()(const ValueType & value) const
+  {
+    return -value;
+  }
+};
+
+template <typename Scalar>
+struct scale_value
+{
+  const Scalar & alpha;
+
+  LIBMESH_DEVICE_INLINE
+  auto operator()(const Scalar & value) const -> decltype(value * alpha)
+  {
+    return value * alpha;
+  }
+
+  template <typename ValueType>
+  LIBMESH_DEVICE_INLINE
+  auto operator()(const ValueType & value) const -> decltype(value * alpha)
+  {
+    return value * alpha;
+  }
+};
+
+template <typename Scalar>
+struct divide_value
+{
+  const Scalar & alpha;
+
+  LIBMESH_DEVICE_INLINE
+  auto operator()(const Scalar & value) const -> decltype(value / alpha)
+  {
+    return value / alpha;
+  }
+
+  template <typename ValueType>
+  LIBMESH_DEVICE_INLINE
+  auto operator()(const ValueType & value) const -> decltype(value / alpha)
+  {
+    return value / alpha;
+  }
+};
 
 } // namespace detail
 
@@ -231,31 +200,36 @@ bool vector_is_zero(const VectorLike & v)
   return true;
 }
 
-template <typename ResultVector, typename VectorLike>
+template <typename ResultVector = void, typename VectorLike>
 LIBMESH_DEVICE_INLINE
-ResultVector vector_unit(const VectorLike & v)
+auto vector_unit(const VectorLike & v)
+  -> std::conditional_t<std::is_void<ResultVector>::value,
+                        vector_semantic_type_t<VectorLike>,
+                        ResultVector>
 {
   const auto length = vector_norm(v);
   libmesh_assert_not_equal_to(length, static_cast<Real>(0.));
-  return detail::divide_vector<ResultVector>(v, length);
-}
-
-template <typename Dummy = void,
-          typename VectorLike,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-vector_semantic_type_t<VectorLike> vector_unit(const VectorLike & v)
-{
-  return vector_unit<vector_semantic_type_t<VectorLike>>(v);
+  using output_type = std::conditional_t<std::is_void<ResultVector>::value,
+                                         vector_semantic_type_t<VectorLike>,
+                                         ResultVector>;
+  auto out = copy_vector<output_type>(v);
+  detail::transform_vector_components(out, v, detail::divide_value<decltype(length)>{length});
+  return out;
 }
 
 // Geometry
 
-template <typename ResultVector, typename LeftVector, typename RightVector>
+template <typename ResultVector = void, typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
-ResultVector vector_cross(const LeftVector & left, const RightVector & right)
+auto vector_cross(const LeftVector & left, const RightVector & right)
+  -> std::conditional_t<std::is_void<ResultVector>::value,
+                        vector_semantic_type_t<LeftVector>,
+                        ResultVector>
 {
-  ResultVector out;
+  using output_type = std::conditional_t<std::is_void<ResultVector>::value,
+                                         vector_semantic_type_t<LeftVector>,
+                                         ResultVector>;
+  output_type out;
   out.zero();
 
 #if LIBMESH_DIM == 3
@@ -277,16 +251,6 @@ ResultVector vector_cross(const LeftVector & left, const RightVector & right)
 #endif
 
   return out;
-}
-
-template <typename Dummy = void,
-          typename LeftVector,
-          typename RightVector,
-          typename std::enable_if<std::is_void<Dummy>::value, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-vector_semantic_type_t<LeftVector> vector_cross(const LeftVector & left, const RightVector & right)
-{
-  return vector_cross<vector_semantic_type_t<LeftVector>>(left, right);
 }
 
 template <typename LeftVector, typename MiddleVector, typename RightVector>
@@ -385,6 +349,20 @@ auto is_zero(const VectorLike & v)
   return vector_is_zero(v);
 }
 
+template <typename LeftVector, typename RightVector>
+LIBMESH_DEVICE_INLINE
+auto operator+=(LeftVector & left, const RightVector & right)
+  -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector> &&
+                        (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
+                      LeftVector &>;
+
+template <typename LeftVector, typename RightVector>
+LIBMESH_DEVICE_INLINE
+auto operator-=(LeftVector & left, const RightVector & right)
+  -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector> &&
+                        (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
+                      LeftVector &>;
+
 template <typename ViewType>
 template <typename RightVector>
 LIBMESH_DEVICE_INLINE
@@ -398,7 +376,7 @@ template <typename RightVector>
 LIBMESH_DEVICE_INLINE
 void vector_ref<ViewType>::add(const RightVector & right)
 {
-  detail::update_vector_components(*this, right, value_type(1));
+  libMesh::Kokkos::operator+=(*this, right);
 }
 
 template <typename ViewType>
@@ -414,7 +392,7 @@ template <typename RightVector>
 LIBMESH_DEVICE_INLINE
 void vector_ref<ViewType>::subtract(const RightVector & right)
 {
-  detail::update_vector_components(*this, right, value_type(-1));
+  libMesh::Kokkos::operator-=(*this, right);
 }
 
 template <typename ViewType>
@@ -491,7 +469,12 @@ auto operator-(const VectorLike & v)
   -> std::enable_if_t<is_vector_like_v<VectorLike> && is_vector_ref_v<VectorLike>,
                       vector_semantic_type_t<VectorLike>>
 {
-  return detail::scale_vector<vector_semantic_type_t<VectorLike>>(vector_value_type_t<VectorLike>(-1), v);
+  auto out = copy_vector<vector_semantic_type_t<VectorLike>>(v);
+  detail::transform_vector_components(
+    out,
+    v,
+    detail::negate_value<vector_value_type_t<VectorLike>>{});
+  return out;
 }
 
 template <typename LeftVector, typename RightVector>
@@ -501,8 +484,9 @@ auto operator+(const LeftVector & left, const RightVector & right)
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       vector_semantic_type_t<LeftVector>>
 {
-  return detail::linear_combination<vector_semantic_type_t<LeftVector>>(
-    vector_value_type_t<LeftVector>(1), left, vector_value_type_t<LeftVector>(1), right);
+  auto out = copy_vector<vector_semantic_type_t<LeftVector>>(left);
+  out += right;
+  return out;
 }
 
 template <typename LeftVector, typename RightVector>
@@ -512,8 +496,9 @@ auto operator-(const LeftVector & left, const RightVector & right)
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       vector_semantic_type_t<LeftVector>>
 {
-  return detail::linear_combination<vector_semantic_type_t<LeftVector>>(
-    vector_value_type_t<LeftVector>(1), left, vector_value_type_t<LeftVector>(-1), right);
+  auto out = copy_vector<vector_semantic_type_t<LeftVector>>(left);
+  out -= right;
+  return out;
 }
 
 template <typename LeftVector,
@@ -535,7 +520,7 @@ template <typename Scalar,
 LIBMESH_DEVICE_INLINE
 auto operator*(const Scalar & alpha, const VectorLike & v)
 {
-  return detail::scale_vector<vector_semantic_type_t<VectorLike>>(alpha, v);
+  return v * alpha;
 }
 
 template <typename VectorLike,
@@ -546,7 +531,9 @@ template <typename VectorLike,
 LIBMESH_DEVICE_INLINE
 auto operator*(const VectorLike & v, const Scalar & alpha)
 {
-  return detail::scale_vector<vector_semantic_type_t<VectorLike>>(alpha, v);
+  auto out = copy_vector<vector_semantic_type_t<VectorLike>>(v);
+  detail::transform_vector_components(out, v, detail::scale_value<Scalar>{alpha});
+  return out;
 }
 
 template <typename VectorLike,
@@ -557,7 +544,9 @@ template <typename VectorLike,
 LIBMESH_DEVICE_INLINE
 auto operator/(const VectorLike & v, const Scalar & alpha)
 {
-  return detail::divide_vector<vector_semantic_type_t<VectorLike>>(v, alpha);
+  auto out = copy_vector<vector_semantic_type_t<VectorLike>>(v);
+  detail::transform_vector_components(out, v, detail::divide_value<Scalar>{alpha});
+  return out;
 }
 
 template <typename LeftVector, typename RightVector>
@@ -613,7 +602,7 @@ auto operator*=(LeftVector & left, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       LeftVector &>
 {
-  detail::scale_vector_components(left, alpha);
+  detail::transform_vector_components(left, left, detail::scale_value<Scalar>{alpha});
   return left;
 }
 
@@ -624,7 +613,7 @@ auto operator/=(LeftVector & left, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       LeftVector &>
 {
-  detail::divide_vector_components(left, alpha);
+  detail::transform_vector_components(left, left, detail::divide_value<Scalar>{alpha});
   return left;
 }
 
