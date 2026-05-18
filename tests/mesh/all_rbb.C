@@ -42,6 +42,10 @@ public:
   CPPUNIT_TEST( testAllRBBDisk5 );
   CPPUNIT_TEST( testAllRBBDisk20 );
   CPPUNIT_TEST( testAllRBBDisk80 );
+
+  CPPUNIT_TEST( testAllRBBTri6Disk10 );
+  CPPUNIT_TEST( testAllRBBTri6Disk40 );
+  CPPUNIT_TEST( testAllRBBTri6Disk160 );
 #endif
 
   // 3D tests
@@ -159,7 +163,7 @@ protected:
                             circumference, max_rbb_error);
   }
 
-  void test_disk(unsigned int n_refinements)
+  void test_disk(unsigned int n_refinements, const ElemType type = QUAD9)
   {
     Mesh mesh(*TestCommWorld);
 
@@ -169,11 +173,12 @@ protected:
 
     // Build a filled circle
     MeshTools::Generation::build_sphere (mesh, radius,
-                                         n_refinements, QUAD9);
+                                         n_refinements, type);
 
-    const dof_id_type n_quads = 5 << (n_refinements*2);
+    const dof_id_type n_elem =
+      (5 << (n_refinements*2)) * (type == QUAD9 ? 1 : 2);
 
-    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_quads);
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_elem);
 
     // We just did Lagrange interpolation, so our mesh measure
     // shouldn't be *quite* right.  Empirically, we converge from
@@ -252,10 +257,15 @@ public:
   void testAllRBBCircle8() { LOG_UNIT_TEST; test_circle(1); }
   void testAllRBBCircle16() { LOG_UNIT_TEST; test_circle(2); }
 
-  // 0 refinements of our default disk gives us 5 RBB quads
+  // 0 refinements of our default disk gives us 5 RBB quads or 10 RBB
+  // triangles
   void testAllRBBDisk5() { LOG_UNIT_TEST; test_disk(0); }
   void testAllRBBDisk20() { LOG_UNIT_TEST; test_disk(1); }
   void testAllRBBDisk80() { LOG_UNIT_TEST; test_disk(2); }
+
+  void testAllRBBTri6Disk10() { LOG_UNIT_TEST; test_disk(0, TRI6); }
+  void testAllRBBTri6Disk40() { LOG_UNIT_TEST; test_disk(1, TRI6); }
+  void testAllRBBTri6Disk160() { LOG_UNIT_TEST; test_disk(2, TRI6); }
 };
 
 
