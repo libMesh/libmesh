@@ -97,7 +97,7 @@ protected:
          boundary_mesh(*TestCommWorld);
 
     const Real radius = 1;
-    const Real circumference = radius * 2 * pi;
+    const Real circumference = 2 * pi * radius;
     const Real tol = TOLERANCE*TOLERANCE;
 
     // Build a filled circle
