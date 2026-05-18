@@ -38,6 +38,10 @@ public:
   CPPUNIT_TEST( testAllRBBCircle4 );
   CPPUNIT_TEST( testAllRBBCircle8 );
   CPPUNIT_TEST( testAllRBBCircle16 );
+
+  CPPUNIT_TEST( testAllRBBDisk5 );
+  CPPUNIT_TEST( testAllRBBDisk20 );
+  CPPUNIT_TEST( testAllRBBDisk80 );
 #endif
 
   // 3D tests
@@ -147,12 +151,76 @@ protected:
       }
 
     // We're using quadrature for volume approximation, so we still
-    // have error, but our quadrature error looks like Ch^6 with a
-    // much smaller C.
+    // have error, but our quadrature error looks something like Ch^6
+    // with a much smaller C.
     const Real max_rbb_error =
       radius * 1e-3 / (1 << (6*n_refinements));
     LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(boundary_mesh),
                             circumference, max_rbb_error);
+  }
+
+  void test_disk(unsigned int n_refinements)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    const Real radius = 1;
+    const Real area = pi * radius * radius;
+    const Real tol = TOLERANCE*TOLERANCE;
+
+    // Build a filled circle
+    MeshTools::Generation::build_sphere (mesh, radius,
+                                         n_refinements, QUAD9);
+
+    const dof_id_type n_quads = 5 << (n_refinements*2);
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_quads);
+
+    // We just did Lagrange interpolation, so our mesh measure
+    // shouldn't be *quite* right.  Empirically, we converge from
+    // beneath, and our error looks like Ch^4.
+    const Real max_lagrange_error =
+      radius * 5e-2 / (1 << (4*n_refinements));
+
+    LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(mesh),
+                            area, max_lagrange_error);
+
+    MeshTools::Modification::all_rbb(mesh);
+
+    for (const Elem * elem : mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(RATIONAL_BERNSTEIN_MAP, elem->mapping_type());
+
+        // We can no longer assert that each Node is at a specified
+        // radius from the circle center, because these are now spline
+        // control nodes, but we can assert that physical points
+        // within the element are at the desired radius.
+        for (auto s : make_range(elem->n_sides()))
+          {
+            if (elem->neighbor_ptr(s))
+              continue;
+
+            constexpr int n_intervals = 4;
+            Point master_pt = elem->master_point(s);
+            const Point step =
+              (elem->master_point((s+1)%elem->n_sides()) - master_pt)
+              / n_intervals;
+            for (auto i : make_range(n_intervals+1))
+              {
+                libmesh_ignore(i);
+                const Point p = FEMap::map(elem->dim(), elem, master_pt);
+                LIBMESH_ASSERT_FP_EQUAL(radius, p.norm(), tol);
+                master_pt += step;
+              }
+          }
+      }
+
+    // We're using quadrature for volume approximation, so we still
+    // have error, but our quadrature error looks like Ch^6 with a
+    // much smaller C.
+    const Real max_rbb_error =
+      radius * 2e-3 / (1 << (6*n_refinements));
+    LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(mesh),
+                            area, max_rbb_error);
   }
 
 public:
@@ -184,6 +252,10 @@ public:
   void testAllRBBCircle8() { LOG_UNIT_TEST; test_circle(1); }
   void testAllRBBCircle16() { LOG_UNIT_TEST; test_circle(2); }
 
+  // 0 refinements of our default disk gives us 5 RBB quads
+  void testAllRBBDisk5() { LOG_UNIT_TEST; test_disk(0); }
+  void testAllRBBDisk20() { LOG_UNIT_TEST; test_disk(1); }
+  void testAllRBBDisk80() { LOG_UNIT_TEST; test_disk(2); }
 };
 
 
