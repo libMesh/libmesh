@@ -93,7 +93,6 @@ void PetscMatrixBase<T>::set_destroy_mat_on_exit(bool destroy)
   this->_destroy_mat_on_exit = destroy;
 }
 
-
 template <typename T>
 void PetscMatrixBase<T>::swap(PetscMatrixBase<T> & m_in)
 {

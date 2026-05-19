@@ -175,6 +175,59 @@ struct FlatDeviceValueSink
   }
 };
 
+template <typename View>
+struct DirectScatterAccess
+{
+  View values;
+
+  LIBMESH_DEVICE_INLINE
+  void add(const std::size_t slot,
+           const Number value) const
+  {
+    ::Kokkos::atomic_add(&values(slot), value);
+  }
+};
+
+template <typename LocalView, typename RemoteView>
+struct SplitScatterAccess
+{
+  LocalView local_values;
+  RemoteView remote_values;
+  std::size_t local_size = 0;
+
+  LIBMESH_DEVICE_INLINE
+  void add(const std::size_t slot,
+           const Number value) const
+  {
+    if (slot < local_size)
+      ::Kokkos::atomic_add(&local_values(slot), value);
+    else
+      ::Kokkos::atomic_add(&remote_values(slot - local_size), value);
+  }
+};
+
+template <typename DiagView, typename OffdiagView, typename RemoteView>
+struct SplitMatrixScatterAccess
+{
+  DiagView diag_values;
+  OffdiagView offdiag_values;
+  RemoteView remote_values;
+  std::size_t diag_size = 0;
+  std::size_t offdiag_base = 0;
+
+  LIBMESH_DEVICE_INLINE
+  void add(const std::size_t slot,
+           const Number value) const
+  {
+    if (slot < diag_size)
+      ::Kokkos::atomic_add(&diag_values(slot), value);
+    else if (slot < offdiag_base)
+      ::Kokkos::atomic_add(&offdiag_values(slot - diag_size), value);
+    else
+      ::Kokkos::atomic_add(&remote_values(slot - offdiag_base), value);
+  }
+};
+
 struct ZeroCoeffAccess
 {
   LIBMESH_DEVICE_INLINE
@@ -349,7 +402,6 @@ run_hilbert_system_assembly(const libMesh::FEShapeKey key,
                                                 accum);
       sink.write(accum);
     });
-  ::Kokkos::fence();
 
   return true;
 }
@@ -428,7 +480,6 @@ run_hilbert_system_value_batch(const libMesh::FEFamily family,
             mat_values(mat_offset + i * n_dofs + j) = accum.jacobian(i, j);
         }
     });
-  ::Kokkos::fence();
 }
 
 template <unsigned int MaxDofs,
@@ -439,8 +490,8 @@ template <unsigned int MaxDofs,
           typename OffsetStorage,
           typename SlotStorage,
           typename GoalAccess,
-          typename GlobalResidualView,
-          typename GlobalJacobianView>
+          typename ResidualScatterAccess,
+          typename JacobianScatterAccess>
 void
 run_hilbert_system_bucket_scatter_batch(const libMesh::FEShapeKey key,
                                         const libMesh::ElemMappingType mapping_type,
@@ -456,8 +507,8 @@ run_hilbert_system_bucket_scatter_batch(const libMesh::FEShapeKey key,
                                         const SlotStorage & mat_slots,
                                         const unsigned int hilbert_order,
                                         GoalAccess goal_access,
-                                        GlobalResidualView rhs_values,
-                                        GlobalJacobianView mat_values,
+                                        ResidualScatterAccess rhs_scatter,
+                                        JacobianScatterAccess mat_scatter,
                                         const char * const kernel_name)
 {
   const auto n_records = elem_indices.extent(0);
@@ -485,13 +536,11 @@ run_hilbert_system_bucket_scatter_batch(const libMesh::FEShapeKey key,
       const auto mat_offset = mat_offsets(record_index);
       for (unsigned int i = 0; i != n_dofs; ++i)
         {
-          ::Kokkos::atomic_add(&rhs_values(rhs_slots(rhs_offset + i)), -accum.residual(i));
+          rhs_scatter.add(rhs_slots(rhs_offset + i), -accum.residual(i));
           for (unsigned int j = 0; j != n_dofs; ++j)
-            ::Kokkos::atomic_add(&mat_values(mat_slots(mat_offset + i * n_dofs + j)),
-                                 accum.jacobian(i, j));
+            mat_scatter.add(mat_slots(mat_offset + i * n_dofs + j), accum.jacobian(i, j));
         }
     });
-  ::Kokkos::fence();
 }
 
 template <unsigned int MaxDofs,
@@ -550,7 +599,6 @@ run_hilbert_system_bucket_value_batch(const libMesh::FEShapeKey key,
             mat_values(mat_offset + i * n_dofs + j) = accum.jacobian(i, j);
         }
     });
-  ::Kokkos::fence();
 }
 
 template <unsigned int MaxDofs,
@@ -658,7 +706,6 @@ run_hilbert_system_fem_value_batch(const libMesh::FEFamily family,
             mat_values(mat_offset + i * n_dofs + j) = accum.jacobian(i, j);
         }
     });
-  ::Kokkos::fence();
 }
 
 template <unsigned int MaxDofs,
@@ -674,8 +721,8 @@ template <unsigned int MaxDofs,
           typename FieldLocalIndexStorage,
           typename GlobalCoeffStorage,
           typename GoalFunction,
-          typename GlobalResidualView,
-          typename GlobalJacobianView>
+          typename ResidualScatterAccess,
+          typename JacobianScatterAccess>
 void
 run_hilbert_system_fem_bucket_scatter_batch(const libMesh::FEShapeKey key,
                                             const libMesh::ElemMappingType mapping_type,
@@ -695,8 +742,8 @@ run_hilbert_system_fem_bucket_scatter_batch(const libMesh::FEShapeKey key,
                                             const GlobalCoeffStorage & global_coeffs,
                                             GoalFunction goal_function,
                                             const unsigned int hilbert_order,
-                                            GlobalResidualView rhs_values,
-                                            GlobalJacobianView mat_values,
+                                            ResidualScatterAccess rhs_scatter,
+                                            JacobianScatterAccess mat_scatter,
                                             const char * const kernel_name)
 {
   const auto n_records = elem_indices.extent(0);
@@ -736,13 +783,11 @@ run_hilbert_system_fem_bucket_scatter_batch(const libMesh::FEShapeKey key,
       const auto mat_offset = mat_offsets(record_index);
       for (unsigned int i = 0; i != n_dofs; ++i)
         {
-          ::Kokkos::atomic_add(&rhs_values(rhs_slots(rhs_offset + i)), -accum.residual(i));
+          rhs_scatter.add(rhs_slots(rhs_offset + i), -accum.residual(i));
           for (unsigned int j = 0; j != n_dofs; ++j)
-            ::Kokkos::atomic_add(&mat_values(mat_slots(mat_offset + i * n_dofs + j)),
-                                 accum.jacobian(i, j));
+            mat_scatter.add(mat_slots(mat_offset + i * n_dofs + j), accum.jacobian(i, j));
         }
     });
-  ::Kokkos::fence();
 }
 
 template <unsigned int MaxDofs,
@@ -822,7 +867,6 @@ run_hilbert_system_fem_bucket_value_batch(const libMesh::FEShapeKey key,
             mat_values(mat_offset + i * n_dofs + j) = accum.jacobian(i, j);
         }
     });
-  ::Kokkos::fence();
 }
 
 } // namespace libMesh::Kokkos::detail

@@ -19,7 +19,7 @@ AC_DEFUN([CONFIGURE_POLY2TRI],
         [
           dnl The poly2tri API is distributed with libmesh, so we don't have to guess
           dnl where it might be installed...
-          POLY2TRI_INCLUDE="-I\$(top_builddir)/contrib/poly2tri/modified"
+          POLY2TRI_INCLUDE="-I\$(top_builddir)/contrib/poly2tri/modified -I\$(top_srcdir)/contrib/poly2tri/poly2tri"
           AC_DEFINE(HAVE_POLY2TRI, 1, [Flag indicating whether the library will be compiled with poly2tri support])
           AC_MSG_RESULT(<<< Configuring library with poly2tri support >>>)
         ])

@@ -528,6 +528,7 @@ BUILT_SOURCES = \
         statistics.h \
         string_to_enum.h \
         thread_buffered_syncbuf.h \
+        threads_spin_mutex_forward.h \
         timestamp.h \
         topology_map.h \
         tree.h \
@@ -2207,6 +2208,9 @@ string_to_enum.h: $(top_srcdir)/include/utils/string_to_enum.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 thread_buffered_syncbuf.h: $(top_srcdir)/include/utils/thread_buffered_syncbuf.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+threads_spin_mutex_forward.h: $(top_srcdir)/include/parallel/threads_spin_mutex_forward.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 timestamp.h: $(top_srcdir)/include/utils/timestamp.h

@@ -48,8 +48,7 @@ public:
   enum class KokkosAssemblyPath
   {
     none,
-    petsc_direct_storage,
-    petsc_coo_fallback
+    petsc_direct_storage
   };
 
   struct KokkosTimingInfo
@@ -78,6 +77,8 @@ public:
   unsigned int hilbert_order() const { return _hilbert_order; }
   void use_kokkos_backend(bool use) { _use_kokkos_backend = use; }
   bool use_kokkos_backend() const { return _use_kokkos_backend; }
+  void use_exact_parsed_fem_host_path(bool use) { _use_exact_parsed_fem_host_path = use; }
+  bool use_exact_parsed_fem_host_path() const { return _use_exact_parsed_fem_host_path; }
   const KokkosTimingInfo & last_kokkos_timing() const { return _last_kokkos_timing; }
   virtual void solve () override;
   void set_fdm_eps(libMesh::Real eps) {
@@ -144,6 +145,7 @@ protected:
   unsigned int _hilbert_order;
 
   bool _use_kokkos_backend;
+  bool _use_exact_parsed_fem_host_path;
 
   // The function we will call to finite difference our goal
   // function

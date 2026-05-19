@@ -132,6 +132,27 @@ public:
   void set_destroy_mat_on_exit(bool destroy = true);
 
   /**
+   * Replace the underlying PETSc Mat with a prebuilt object.
+   *
+   * This is intended for advanced users that need to construct a Mat
+   * outside of the normal PetscMatrix initialization path while still
+   * using the libMesh wrapper as the owning interface.
+   */
+  void reset_mat(Mat m, bool destroy_on_exit = true)
+  {
+    if (_mat == m && _destroy_mat_on_exit == destroy_on_exit)
+      return;
+
+    this->clear();
+    _mat = m;
+    _destroy_mat_on_exit = destroy_on_exit;
+    this->_is_initialized = (_mat != nullptr);
+
+    if (_mat)
+      this->set_context();
+  }
+
+  /**
    * Swaps the internal data pointers of two PetscMatrices, no actual
    * values are swapped.
    */

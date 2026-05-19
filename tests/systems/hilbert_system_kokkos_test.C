@@ -41,6 +41,7 @@ configure_hilbert_system(HilbertSystem & sys, const bool use_kokkos)
   sys.fe_family() = "LAGRANGE";
   sys.fe_order() = 1;
   sys.use_kokkos_backend(use_kokkos);
+  sys.use_exact_parsed_fem_host_path(true);
   sys.time_solver = std::make_unique<SteadySolver>(sys);
 }
 

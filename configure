@@ -58955,7 +58955,7 @@ fi
     if test "x$enablepoly2tri" = "xyes"
 then :
 
-                              POLY2TRI_INCLUDE="-I\$(top_builddir)/contrib/poly2tri/modified"
+                              POLY2TRI_INCLUDE="-I\$(top_builddir)/contrib/poly2tri/modified -I\$(top_srcdir)/contrib/poly2tri/poly2tri"
 
 printf "%s\n" "#define HAVE_POLY2TRI 1" >>confdefs.h
 
@@ -64366,7 +64366,6 @@ else case e in #(
   e) as_fn_error $? "configured Kokkos compiler/flags failed to compile and link a minimal test program" "$LINENO" 5 ;;
 esac
 fi
-
 
 printf "%s\n" "#define HAVE_KOKKOS 1" >>confdefs.h
 

@@ -255,10 +255,31 @@ public:
   {
   public:
     explicit KokkosReadViewGuard(PetscVector<T> & vector)
-      : _vector(vector),
-        _data(reinterpret_cast<const T *>(vector.get_array_read())),
-        _view(_data, vector.local_size())
+      : _vector(vector)
     {
+      _borrowed_vec = vector._vec;
+      if (vector.is_effectively_ghosted())
+        {
+          LibmeshPetscCallA(_vector.comm().get(), VecGhostGetLocalForm(vector._vec, &_borrowed_vec));
+          PetscInt my_local_size = 0;
+          LibmeshPetscCallA(_vector.comm().get(), VecGetLocalSize(_borrowed_vec, &my_local_size));
+          _local_size = static_cast<numeric_index_type>(my_local_size);
+        }
+      else
+        _local_size = vector.local_size();
+
+      const PetscScalar * data = nullptr;
+      LibmeshPetscCallA(_vector.comm().get(),
+                        VecGetArrayReadAndMemType(_borrowed_vec, &data, &_mem_type));
+      _data = reinterpret_cast<const T *>(data);
+      const bool host_inaccessible =
+        PetscMemTypeHost(_mem_type) &&
+        !::Kokkos::SpaceAccessibility<typename ::Kokkos::DefaultExecutionSpace::memory_space,
+                                      ::Kokkos::HostSpace>::accessible;
+      libmesh_error_msg_if(host_inaccessible,
+                           "PetscVector Kokkos read access requires host-accessible execution "
+                           "space for host PETSc memory.");
+      _view = kokkos_read_view(_data, _local_size);
     }
 
     KokkosReadViewGuard(const KokkosReadViewGuard &) = delete;
@@ -266,7 +287,14 @@ public:
 
     ~KokkosReadViewGuard()
     {
-      _vector.restore_array();
+      const PetscScalar * data = reinterpret_cast<const PetscScalar *>(_data);
+      const auto restore_ierr = VecRestoreArrayReadAndMemType(_borrowed_vec, &data);
+      libmesh_ignore(restore_ierr);
+      if (_vector.is_effectively_ghosted())
+        {
+          const auto ghost_ierr = VecGhostRestoreLocalForm(_vector._vec, &_borrowed_vec);
+          libmesh_ignore(ghost_ierr);
+        }
     }
 
     const kokkos_read_view & view() const
@@ -276,7 +304,10 @@ public:
 
   private:
     PetscVector<T> & _vector;
-    const T * _data;
+    Vec _borrowed_vec = nullptr;
+    const T * _data = nullptr;
+    PetscMemType _mem_type = PETSC_MEMTYPE_HOST;
+    numeric_index_type _local_size = 0;
     kokkos_read_view _view;
   };
 
@@ -289,10 +320,31 @@ public:
   {
   public:
     explicit KokkosWriteViewGuard(PetscVector<T> & vector)
-      : _vector(vector),
-        _data(reinterpret_cast<T *>(vector.get_array())),
-        _view(_data, vector.local_size())
+      : _vector(vector)
     {
+      _borrowed_vec = vector._vec;
+      if (vector.is_effectively_ghosted())
+        {
+          LibmeshPetscCallA(_vector.comm().get(), VecGhostGetLocalForm(vector._vec, &_borrowed_vec));
+          PetscInt my_local_size = 0;
+          LibmeshPetscCallA(_vector.comm().get(), VecGetLocalSize(_borrowed_vec, &my_local_size));
+          _local_size = static_cast<numeric_index_type>(my_local_size);
+        }
+      else
+        _local_size = vector.local_size();
+
+      PetscScalar * data = nullptr;
+      LibmeshPetscCallA(_vector.comm().get(),
+                        VecGetArrayWriteAndMemType(_borrowed_vec, &data, &_mem_type));
+      _data = reinterpret_cast<T *>(data);
+      const bool host_inaccessible =
+        PetscMemTypeHost(_mem_type) &&
+        !::Kokkos::SpaceAccessibility<typename ::Kokkos::DefaultExecutionSpace::memory_space,
+                                      ::Kokkos::HostSpace>::accessible;
+      libmesh_error_msg_if(host_inaccessible,
+                           "PetscVector Kokkos write access requires host-accessible execution "
+                           "space for host PETSc memory.");
+      _view = kokkos_write_view(_data, _local_size);
     }
 
     KokkosWriteViewGuard(const KokkosWriteViewGuard &) = delete;
@@ -300,7 +352,14 @@ public:
 
     ~KokkosWriteViewGuard()
     {
-      _vector.restore_array();
+      PetscScalar * data = reinterpret_cast<PetscScalar *>(_data);
+      const auto restore_ierr = VecRestoreArrayWriteAndMemType(_borrowed_vec, &data);
+      libmesh_ignore(restore_ierr);
+      if (_vector.is_effectively_ghosted())
+        {
+          const auto ghost_ierr = VecGhostRestoreLocalForm(_vector._vec, &_borrowed_vec);
+          libmesh_ignore(ghost_ierr);
+        }
     }
 
     const kokkos_write_view & view() const
@@ -310,7 +369,10 @@ public:
 
   private:
     PetscVector<T> & _vector;
-    T * _data;
+    Vec _borrowed_vec = nullptr;
+    T * _data = nullptr;
+    PetscMemType _mem_type = PETSC_MEMTYPE_HOST;
+    numeric_index_type _local_size = 0;
     kokkos_write_view _view;
   };
 

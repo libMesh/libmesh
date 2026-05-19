@@ -178,8 +178,6 @@ kokkos_assembly_path_name(const HilbertSystem::KokkosAssemblyPath path)
       return "none";
     case HilbertSystem::KokkosAssemblyPath::petsc_direct_storage:
       return "direct PETSc storage";
-    case HilbertSystem::KokkosAssemblyPath::petsc_coo_fallback:
-      return "PETSc COO fallback";
     }
 
   return "unknown";
