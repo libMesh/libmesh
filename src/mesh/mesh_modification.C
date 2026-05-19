@@ -1540,7 +1540,7 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         if (displacement_vec.norm_sq() <
             edge_chord_len_sq*TOLERANCE*TOLERANCE*TOLERANCE)
         {
-          if (std::abs(w0 - w1) > TOLERANCE*TOLERANCE)
+          if (!almost_equal(w0, w1))
             libmesh_not_implemented();
 
           n_center.set_extra_datum<Real>(weight_index, w0);
