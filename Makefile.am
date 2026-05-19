@@ -43,21 +43,13 @@ AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
                    $(libmesh_contrib_INCLUDES) \
                    $(libmesh_optional_INCLUDES) \
                    -I$(top_builddir)/include # required for libmesh_version.h
+AM_CPPFLAGS      += $(LIBMESH_KOKKOS_BUILD_CPPFLAGS)
+AM_CXXFLAGS      += $(LIBMESH_KOKKOS_BUILD_CXXFLAGS)
+AM_LDFLAGS       += $(LIBMESH_KOKKOS_BUILD_LDFLAGS)
 
-.SUFFIXES:
-.SUFFIXES: .C .K .lo .o .obj
+SUFFIXES = .C .K .lo .o .obj
 
 if LIBMESH_ENABLE_KOKKOS
-# In a Kokkos-enabled build, drive the whole C++ tree with the Kokkos
-# compiler wrapper and flags instead of hand-routing individual files.
-# This keeps ordinary .C translation units and explicit .K device tests
-# on the same toolchain model.
-CXX = $(KOKKOS_CXX)
-CXXLD = $(KOKKOS_CXX)
-CPPFLAGS += $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS)
-CXXFLAGS += $(KOKKOS_CXXFLAGS)
-LDFLAGS += $(KOKKOS_LDFLAGS)
-
 .K.o:
 	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	  $(AM_CPPFLAGS) $(CPPFLAGS) \

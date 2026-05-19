@@ -6,19 +6,11 @@ AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
                $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS) \
 	       -DLIBMESH_IS_UNIT_TESTING
 AM_LDFLAGS   = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
+AM_CPPFLAGS  += $(LIBMESH_KOKKOS_BUILD_CPPFLAGS)
+AM_CXXFLAGS  += $(LIBMESH_KOKKOS_BUILD_CXXFLAGS)
+AM_LDFLAGS   += $(LIBMESH_KOKKOS_BUILD_LDFLAGS)
 LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 KOKKOS_TEST_CPPFLAGS =
-
-if LIBMESH_ENABLE_KOKKOS
-# Match the top-level build model: once Kokkos is enabled, build the
-# C++ tree with the Kokkos compiler wrapper instead of routing selected
-# objects by hand.
-CXX = $(KOKKOS_CXX)
-CXXLD = $(KOKKOS_CXX)
-CPPFLAGS += $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS)
-CXXFLAGS += $(KOKKOS_CXXFLAGS)
-LDFLAGS += $(KOKKOS_LDFLAGS)
-endif
 
 # We might have turned on -Werror and/or paranoid warnings
 CXXFLAGS_DBG += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)

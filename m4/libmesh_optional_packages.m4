@@ -882,6 +882,10 @@ AC_ARG_VAR([KOKKOS_CXXFLAGS], [C++ flags for compiling Kokkos translation units]
 AC_ARG_VAR([KOKKOS_LDFLAGS], [Linker flags for linking Kokkos translation units])
 AC_ARG_VAR([KOKKOS_LIBS], [Libraries for linking Kokkos translation units])
 
+LIBMESH_KOKKOS_BUILD_CPPFLAGS=""
+LIBMESH_KOKKOS_BUILD_CXXFLAGS=""
+LIBMESH_KOKKOS_BUILD_LDFLAGS=""
+
 dnl Allow the caller (e.g. MOOSE's configure_libmesh.sh) to pre-set the
 dnl Kokkos compiler and flags via environment variables.  If KOKKOS_CXX is
 dnl already set, we skip auto-detection entirely — the caller knows best.
@@ -1080,6 +1084,16 @@ int main(int argc, char ** argv)
         AS_IF([test "x$kokkos_config_works" = "xyes"],
           [AC_MSG_RESULT([yes])],
           [AC_MSG_ERROR([configured Kokkos compiler/flags failed to compile and link a minimal test program])])
+
+        dnl Use the validated Kokkos compiler as the project-wide C++ compiler
+        dnl for Kokkos-enabled builds.  Automake-generated rules compile .C
+        dnl translation units with $(CXX), so the switch has to happen at
+        dnl configure time rather than in Makefile.am.
+        CXX="$KOKKOS_CXX"
+        LIBMESH_KOKKOS_BUILD_CPPFLAGS="$KOKKOS_MPI_CPPFLAGS $KOKKOS_CPPFLAGS"
+        LIBMESH_KOKKOS_BUILD_CXXFLAGS="$KOKKOS_CXXFLAGS"
+        LIBMESH_KOKKOS_BUILD_LDFLAGS="$KOKKOS_LDFLAGS"
+
         AC_DEFINE([HAVE_KOKKOS], [1],
                   [Define if Kokkos support is enabled in libMesh])
         AC_MSG_RESULT(<<< Configuring library with Kokkos support >>>)
@@ -1097,6 +1111,9 @@ AC_SUBST([KOKKOS_CXXFLAGS])
 AC_SUBST([KOKKOS_LDFLAGS])
 AC_SUBST([KOKKOS_LIBS])
 AC_SUBST([KOKKOS_MPI_CPPFLAGS])
+AC_SUBST([LIBMESH_KOKKOS_BUILD_CPPFLAGS])
+AC_SUBST([LIBMESH_KOKKOS_BUILD_CXXFLAGS])
+AC_SUBST([LIBMESH_KOKKOS_BUILD_LDFLAGS])
 AM_CONDITIONAL(LIBMESH_ENABLE_KOKKOS, test x$enablekokkos = xyes)
 # -------------------------------------------------------------
 
