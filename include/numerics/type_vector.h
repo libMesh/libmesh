@@ -1091,7 +1091,7 @@ TypeVector<T> circumcenter(const TypeVector<T> & p0,
                          e02_cross_e21_z*scaled_vec(0)};
 #endif
   const TypeVector<T> e2C =
-    numerator/2/cross_norm_sq(e02,e21);
+    numerator*T(0.5)/cross_norm_sq(e02,e21);
 
   return p2 + e2C;
 }
