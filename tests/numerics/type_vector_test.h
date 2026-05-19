@@ -396,7 +396,8 @@ public:
   {
     LOG_UNIT_TEST;
 
-    const DerivedClass origin(0), e_x(1), twoone(2,1);
+    const DerivedClass origin(0), e_x(1);
+    DerivedClass twoone(2); twoone(1) = 1;
 
     auto cc1 = circumcenter(origin, e_x, twoone);
     LIBMESH_ASSERT_NUMBERS_EQUAL(cc1(0), 0.5, TOLERANCE*TOLERANCE);
