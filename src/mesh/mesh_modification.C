@@ -1496,7 +1496,7 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
       // Modify the center node of an "edge" - possibly an actual
       // edge, possibly a center node between edge points - to fit a
       // circular curve.
-      auto make_edge_rbb = [default_weight, weight_index]
+      auto make_edge_rbb = [default_weight, weight_index, almost_equal]
         (const Node & n0, const Node & n1, Node & n_center)
       {
         // Skip edges we've already modified; the center node for
@@ -1577,7 +1577,7 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         p2 += displacement_vec.unit() * (R-r);
       };
 
-      auto make_face_rbb = [weight_index, almost_equal] (Elem & face)
+      auto make_face_rbb = [weight_index] (Elem & face)
       {
         // Prisms and pyramids may need to skip some faces while
         // adjusting others
