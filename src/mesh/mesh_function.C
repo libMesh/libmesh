@@ -405,6 +405,15 @@ void MeshFunction::discontinuous_value (const Point & p,
   // empty map
   for (const auto & element : candidate_element)
     {
+      if (!element)
+        {
+          // We'd better be in out_of_mesh_mode if we couldn't find an
+          // element in the mesh
+          libmesh_assert (_out_of_mesh_mode);
+          output[element] = _out_of_mesh_value;
+          continue;
+        }
+
       const unsigned int dim = element->dim();
 
       // define a temporary vector to store all values
