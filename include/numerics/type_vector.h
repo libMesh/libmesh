@@ -805,9 +805,10 @@ typename std::enable_if<
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
 TypeVector<T>::operator / (const Scalar & factor) const
 {
-  libmesh_assert_not_equal_to (factor, static_cast<T>(0.));
-
   typedef typename CompareTypes<T, Scalar>::supertype TS;
+
+  libmesh_assert_not_equal_to (static_cast<TS>(factor),
+                               static_cast<TS>(0.));
 
 #if LIBMESH_DIM == 1
   return TypeVector<TS>(_coords[0]/factor);
