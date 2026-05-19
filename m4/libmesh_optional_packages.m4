@@ -948,7 +948,6 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
             case "$KOKKOS_BACKEND" in
               cuda)
                 AC_PATH_PROG([NVCC_WRAPPER],[nvcc_wrapper],[no],[$PATH])
-                AC_PATH_PROG([NVCC],[nvcc],[no],[$PATH])
                 AS_IF([test "x$NVCC_WRAPPER" != "xno"],
                   [
                     KOKKOS_CXX="$NVCC_WRAPPER"
@@ -956,11 +955,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
                     KOKKOS_LDFLAGS="$libmesh_kokkos_lib_dirs"
                   ],
                   [
-                    AS_IF([test "x$NVCC" = "xno"],
-                      [AC_MSG_ERROR([neither nvcc_wrapper nor nvcc was found but Kokkos CUDA backend was requested])])
-                    KOKKOS_CXX="$NVCC"
-                    KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu -ccbin $CXX"
-                    KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $libmesh_kokkos_lib_dirs"
+                    AC_MSG_ERROR([nvcc_wrapper was not found but Kokkos CUDA backend was requested. libMesh's project-wide Kokkos CUDA build requires nvcc_wrapper (or an explicitly provided CUDA-capable KOKKOS_CXX) rather than raw nvcc.])
                   ])
                 AS_IF([test "x$have_kokkos_openmp" = "xyes"],
                   [
