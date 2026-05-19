@@ -156,7 +156,7 @@ protected:
     const dof_id_type n_edges = 4 << n_refinements;
 
     CPPUNIT_ASSERT_EQUAL(boundary_mesh.n_elem(), n_edges);
-    CPPUNIT_ASSERT_EQUAL(boundary_mesh.n_elem(), n_edges);
+    CPPUNIT_ASSERT_EQUAL(boundary_mesh.n_nodes(), n_edges*2);
 
     for (auto & node : boundary_mesh.node_ptr_range())
       {
