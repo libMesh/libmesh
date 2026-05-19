@@ -1069,6 +1069,33 @@ T solid_angle(const TypeVector<T> & v01,
 
 
 
+// Compute the (possibly 3D) circumcenter of three non-collinear points
+template <typename T>
+inline
+TypeVector<T> circumcenter(const TypeVector<T> & p0,
+                           const TypeVector<T> & p1,
+                           const TypeVector<T> & p2)
+{
+  // smallest subchords in Edge3 order, but this works for any order
+  const TypeVector<T> e02 = p2 - p0;
+  const TypeVector<T> e21 = p1 - p2;
+
+  const TypeVector<T> scaled_vec = e02.norm_sq()*e21 + e21.norm_sq()*e02;
+#if LIBMESH_DIM == 3
+  const TypeVector<T> numerator =
+    (e02.cross(e21)).cross(scaled_vec);
+#else
+  const T e02_cross_e21_z = e02(0)*e21(1)-e02(1)*e21(0);
+  const TypeVector<T> numerator {-e02_cross_e21_z*scaled_vec(1),
+                         e02_cross_e21_z*scaled_vec(0)};
+#endif
+  const TypeVector<T> e2C =
+    numerator/2/cross_norm_sq(e02,e21);
+
+  return p2 + e2C;
+}
+
+
 
 /**
  * Compute |b x c|^2 without creating the extra temporary produced by
