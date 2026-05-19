@@ -5,6 +5,7 @@ SUBDIRS = include #src
 
 AUTOMAKE_OPTIONS = subdir-objects
 ACLOCAL_AMFLAGS  = -I m4 -I m4/autoconf-submodule
+AM_CXXFLAGS      = $(libmesh_CXXFLAGS)
 AM_CFLAGS        = $(libmesh_CFLAGS)
 AM_LDFLAGS       = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
 
