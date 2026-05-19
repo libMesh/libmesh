@@ -44,6 +44,28 @@ AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
                    $(libmesh_optional_INCLUDES) \
                    -I$(top_builddir)/include # required for libmesh_version.h
 
+.SUFFIXES:
+.SUFFIXES: .C .K .lo .o .obj
+
+if LIBMESH_ENABLE_KOKKOS
+# Compile .K translation units with the dedicated Kokkos compiler.
+# If KOKKOS_CXX is not the MPI wrapper, configure populates
+# $(KOKKOS_MPI_CPPFLAGS) from the wrapper's compile flags so mpi.h and
+# any wrapper-provided defines remain visible.
+.K.o:
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c $< -o $@
+
+.K.lo:
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
+	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c $< -o $@
+endif
+
 LIBS             = $(libmesh_optional_LIBS) $(libmesh_precision_LIBS)
 
 # additional files which must be included in 'make dist'
@@ -489,6 +511,218 @@ hilbert_kokkos_benchmark_dbg_SOURCES += src/apps/L2system.C src/apps/L2system.h
 hilbert_kokkos_benchmark_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 hilbert_kokkos_benchmark_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
 hilbert_kokkos_benchmark_dbg_LDADD    = libmesh_dbg.la
+
+if LIBMESH_ENABLE_KOKKOS
+calculator_opt_LDADD += $(KOKKOS_LIBS)
+calculator_devel_LDADD += $(KOKKOS_LIBS)
+calculator_dbg_LDADD += $(KOKKOS_LIBS)
+hilbert_kokkos_benchmark_opt_LDADD += $(KOKKOS_LIBS)
+hilbert_kokkos_benchmark_devel_LDADD += $(KOKKOS_LIBS)
+hilbert_kokkos_benchmark_dbg_LDADD += $(KOKKOS_LIBS)
+
+libmesh_dbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+libmesh_devel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+libmesh_oprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+libmesh_opt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+libmesh_prof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+
+calculator_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(calculator_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+calculator_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(calculator_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+calculator_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(calculator_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+hilbert_kokkos_benchmark_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(hilbert_kokkos_benchmark_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+hilbert_kokkos_benchmark_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(hilbert_kokkos_benchmark_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+hilbert_kokkos_benchmark_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(hilbert_kokkos_benchmark_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+
+src/base/libmesh_dbg_la-dof_map.lo: src/base/dof_map.C
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
+	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/base/libmesh_devel_la-dof_map.lo: src/base/dof_map.C
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
+	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/base/libmesh_oprof_la-dof_map.lo: src/base/dof_map.C
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
+	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/base/libmesh_opt_la-dof_map.lo: src/base/dof_map.C
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
+	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/base/libmesh_prof_la-dof_map.lo: src/base/dof_map.C
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
+	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_opt-calculator.o: src/apps/calculator.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_opt-calculator.obj: src/apps/calculator.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_devel-calculator.o: src/apps/calculator.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_devel-calculator.obj: src/apps/calculator.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_dbg-calculator.o: src/apps/calculator.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_dbg-calculator.obj: src/apps/calculator.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_opt-L2system.o: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_opt-L2system.obj: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_devel-L2system.o: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_devel-L2system.obj: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_dbg-L2system.o: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/calculator_dbg-L2system.obj: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(calculator_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(calculator_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_opt-hilbert_kokkos_benchmark.o: src/apps/hilbert_kokkos_benchmark.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_opt-hilbert_kokkos_benchmark.obj: src/apps/hilbert_kokkos_benchmark.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_opt-L2system.o: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_opt-L2system.obj: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_devel-hilbert_kokkos_benchmark.o: src/apps/hilbert_kokkos_benchmark.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_devel-hilbert_kokkos_benchmark.obj: src/apps/hilbert_kokkos_benchmark.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_devel-L2system.o: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_devel-L2system.obj: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_dbg-hilbert_kokkos_benchmark.o: src/apps/hilbert_kokkos_benchmark.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_dbg-hilbert_kokkos_benchmark.obj: src/apps/hilbert_kokkos_benchmark.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_dbg-L2system.o: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+src/apps/hilbert_kokkos_benchmark_dbg-L2system.obj: src/apps/L2system.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(hilbert_kokkos_benchmark_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(hilbert_kokkos_benchmark_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+endif
 
 # compare
 opt_programs          += compare-opt

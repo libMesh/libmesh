@@ -410,6 +410,85 @@ if LIBMESH_OPT_MODE
 endif
 endif
 
+if LIBMESH_ENABLE_KOKKOS
+unit_tests_dbg_LDADD += $(KOKKOS_LIBS)
+unit_tests_devel_LDADD += $(KOKKOS_LIBS)
+unit_tests_prof_LDADD += $(KOKKOS_LIBS)
+unit_tests_oprof_LDADD += $(KOKKOS_LIBS)
+unit_tests_opt_LDADD += $(KOKKOS_LIBS)
+
+unit_tests_dbg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+unit_tests_prof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+unit_tests_oprof_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+unit_tests_opt_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	$(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) $(KOKKOS_LDFLAGS) -o $@
+
+unit_tests_dbg-driver.o: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+unit_tests_dbg-driver.obj: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+unit_tests_devel-driver.o: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+unit_tests_devel-driver.obj: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+unit_tests_prof-driver.o: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+unit_tests_prof-driver.obj: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+unit_tests_oprof-driver.o: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+unit_tests_oprof-driver.obj: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+unit_tests_opt-driver.o: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+
+unit_tests_opt-driver.obj: driver.C
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ $<
+endif
+
 # Recursive automake builds subdirectories before parent directories.
 # But here we need the subdirectory to be able to link to
 # already-built parent directory libraries.

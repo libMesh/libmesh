@@ -875,6 +875,13 @@ AC_ARG_WITH([kokkos-backend],
                  [cuda|hip|sycl|openmp|serial (default: auto-detect from KokkosCore_config.h)]),
   [KOKKOS_BACKEND="$withval"], [KOKKOS_BACKEND="auto"])
 
+dnl Allow callers to provide the full Kokkos toolchain directly.
+AC_ARG_VAR([KOKKOS_CXX], [Compiler for compiling Kokkos translation units])
+AC_ARG_VAR([KOKKOS_CPPFLAGS], [Preprocessor flags for compiling Kokkos translation units])
+AC_ARG_VAR([KOKKOS_CXXFLAGS], [C++ flags for compiling Kokkos translation units])
+AC_ARG_VAR([KOKKOS_LDFLAGS], [Linker flags for linking Kokkos translation units])
+AC_ARG_VAR([KOKKOS_LIBS], [Libraries for linking Kokkos translation units])
+
 dnl Allow the caller (e.g. MOOSE's configure_libmesh.sh) to pre-set the
 dnl Kokkos compiler and flags via environment variables.  If KOKKOS_CXX is
 dnl already set, we skip auto-detection entirely — the caller knows best.
@@ -883,17 +890,31 @@ dnl compilation rules and don't leak into the main CPPFLAGS/CXXFLAGS.
 
 AS_IF([test "x$KOKKOS_DIR" != "xno"],
   [
-    AC_CHECK_FILE([$KOKKOS_DIR/include/Kokkos_Core.hpp],
+    libmesh_kokkos_include_dirs="-I$KOKKOS_DIR/include"
+    AS_IF([test -n "$PETSC_ARCH" && test -d "$KOKKOS_DIR/$PETSC_ARCH/include"],
+      [libmesh_kokkos_include_dirs="$libmesh_kokkos_include_dirs -I$KOKKOS_DIR/$PETSC_ARCH/include"])
+
+    libmesh_kokkos_lib_dirs=
+    AS_IF([test -d "$KOKKOS_DIR/lib"],
+      [libmesh_kokkos_lib_dirs="-L$KOKKOS_DIR/lib"])
+    AS_IF([test -n "$PETSC_ARCH" && test -d "$KOKKOS_DIR/$PETSC_ARCH/lib"],
+      [libmesh_kokkos_lib_dirs="$libmesh_kokkos_lib_dirs -L$KOKKOS_DIR/$PETSC_ARCH/lib"])
+
+    KOKKOS_CFG="$KOKKOS_DIR/include/KokkosCore_config.h"
+    AS_IF([! test -r "$KOKKOS_CFG" && test -n "$PETSC_ARCH" &&
+           test -r "$KOKKOS_DIR/$PETSC_ARCH/include/KokkosCore_config.h"],
+      [KOKKOS_CFG="$KOKKOS_DIR/$PETSC_ARCH/include/KokkosCore_config.h"])
+
+    AS_IF([test -r "$KOKKOS_DIR/include/Kokkos_Core.hpp" ||
+           (test -n "$PETSC_ARCH" &&
+            test -r "$KOKKOS_DIR/$PETSC_ARCH/include/Kokkos_Core.hpp")],
       [
         enablekokkos=yes
-        libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I$KOKKOS_DIR/include"
-        libmesh_optional_LIBS="$libmesh_optional_LIBS -L$KOKKOS_DIR/lib -lkokkoscore"
+        libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES $libmesh_kokkos_include_dirs"
 
         dnl Only auto-detect if KOKKOS_CXX was not pre-set by the caller
         AS_IF([test "x$KOKKOS_CXX" = "x"],
           [
-            KOKKOS_CFG="$KOKKOS_DIR/include/KokkosCore_config.h"
-
             dnl Auto-detect backend
             AS_IF([test "x$KOKKOS_BACKEND" = "xauto"],
               [
@@ -922,12 +943,21 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
 
             case "$KOKKOS_BACKEND" in
               cuda)
+                AC_PATH_PROG([NVCC_WRAPPER],[nvcc_wrapper],[no],[$PATH])
                 AC_PATH_PROG([NVCC],[nvcc],[no],[$PATH])
-                AS_IF([test "x$NVCC" = "xno"],
-                  [AC_MSG_ERROR([nvcc not found but Kokkos CUDA backend requested])])
-                KOKKOS_CXX="$NVCC"
-                KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin $CXX"
-                KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler -L$KOKKOS_DIR/lib"
+                AS_IF([test "x$NVCC_WRAPPER" != "xno"],
+                  [
+                    KOKKOS_CXX="$NVCC_WRAPPER"
+                    KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu"
+                    KOKKOS_LDFLAGS="$libmesh_kokkos_lib_dirs"
+                  ],
+                  [
+                    AS_IF([test "x$NVCC" = "xno"],
+                      [AC_MSG_ERROR([neither nvcc_wrapper nor nvcc was found but Kokkos CUDA backend was requested])])
+                    KOKKOS_CXX="$NVCC"
+                    KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu -ccbin $CXX"
+                    KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $libmesh_kokkos_lib_dirs"
+                  ])
                 AS_IF([test "x$have_kokkos_openmp" = "xyes"],
                   [
                     KOKKOS_CXXFLAGS="$KOKKOS_CXXFLAGS -fopenmp"
@@ -939,7 +969,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
                 AS_IF([test "x$HIPCC" = "xno"],
                   [AC_MSG_ERROR([hipcc not found but Kokkos HIP backend requested])])
                 KOKKOS_CXX="$HIPCC"
-                KOKKOS_LDFLAGS="-L$KOKKOS_DIR/lib"
+                KOKKOS_LDFLAGS="$libmesh_kokkos_lib_dirs"
                 ;;
               sycl)
                 AC_PATH_PROG([ICPX],[icpx],[no],[$PATH])
@@ -947,26 +977,27 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
                   [AC_MSG_ERROR([icpx not found but Kokkos SYCL backend requested])])
                 KOKKOS_CXX="$ICPX"
                 KOKKOS_CXXFLAGS="-fsycl"
-                KOKKOS_LDFLAGS="-fsycl -L$KOKKOS_DIR/lib"
+                KOKKOS_LDFLAGS="-fsycl $libmesh_kokkos_lib_dirs"
                 ;;
               openmp)
                 KOKKOS_CXX="${CXX}"
                 KOKKOS_CXXFLAGS="-fopenmp -x c++"
-                KOKKOS_LDFLAGS="-fopenmp -L$KOKKOS_DIR/lib"
+                KOKKOS_LDFLAGS="-fopenmp $libmesh_kokkos_lib_dirs"
                 ;;
               serial|*)
                 KOKKOS_CXX="${CXX}"
                 KOKKOS_CXXFLAGS="-x c++"
-                KOKKOS_LDFLAGS="-L$KOKKOS_DIR/lib"
+                KOKKOS_LDFLAGS="$libmesh_kokkos_lib_dirs"
                 ;;
             esac
           ],
           [AC_MSG_RESULT([Using caller-provided KOKKOS_CXX=$KOKKOS_CXX])])
 
         dnl Set defaults for any variables not provided by caller or auto-detect
-        KOKKOS_CPPFLAGS="${KOKKOS_CPPFLAGS:--DLIBMESH_KOKKOS_COMPILATION -I$KOKKOS_DIR/include}"
-        KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:--L$KOKKOS_DIR/lib}"
+        KOKKOS_CPPFLAGS="${KOKKOS_CPPFLAGS:--DLIBMESH_KOKKOS_COMPILATION $libmesh_kokkos_include_dirs}"
+        KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:-$libmesh_kokkos_lib_dirs}"
         KOKKOS_LIBS="${KOKKOS_LIBS:--lkokkoscore}"
+        libmesh_optional_LIBS="$libmesh_optional_LIBS $KOKKOS_LDFLAGS $KOKKOS_LIBS"
 
         dnl If KOKKOS_CXX differs from the main compiler, it may not be the MPI
         dnl wrapper and thus may need the wrapper's compile flags explicitly in
