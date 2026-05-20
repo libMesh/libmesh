@@ -6,14 +6,13 @@ AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
                $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS) \
 	       -DLIBMESH_IS_UNIT_TESTING
 AM_LDFLAGS   = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
-AM_CPPFLAGS  += $(LIBMESH_KOKKOS_BUILD_CPPFLAGS)
-AM_CXXFLAGS  += $(LIBMESH_KOKKOS_BUILD_CXXFLAGS)
-AM_LDFLAGS   += $(LIBMESH_KOKKOS_BUILD_LDFLAGS)
 LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 KOKKOS_TEST_CPPFLAGS =
 KOKKOS_TEST_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD)
 KOKKOS_UNIT_TEST_SOURCES =
+KOKKOS_TEST_K_SOURCES =
+KOKKOS_TEST_OBJECTS =
 
 # We might have turned on -Werror and/or paranoid warnings
 CXXFLAGS_DBG += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
@@ -264,7 +263,35 @@ if LIBMESH_ENABLE_KOKKOS
   KOKKOS_TEST_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX)
   KOKKOS_UNIT_TEST_SOURCES = kokkos_scope.K kokkos_scope.h
+  KOKKOS_TEST_K_SOURCES = \
+    kokkos_scope.K \
+    fe/kokkos_fe_types_oracle_test.K \
+    fe/kokkos_fe_shape_oracle_test.K \
+    fe/kokkos_fe_map_oracle_test.K \
+    fe/kokkos_fe_invariant_test.K \
+    fe/kokkos_fe_contract_test.K \
+    fe/kokkos_fe_permuted_map_oracle_test.K \
+    fe/kokkos_fe_reconstruction_oracle_test.K \
+    fe/kokkos_fe_side_trace_oracle_test.K \
+    fe/kokkos_quadrature_oracle_test.K \
+    numerics/kokkos_vector_ops_oracle_test.K \
+    numerics/kokkos_tensor_ops_oracle_test.K
+  KOKKOS_TEST_OBJECTS = $(KOKKOS_TEST_K_SOURCES:.K=.o)
   unit_tests_sources += ../src/apps/L2system_kokkos.K
+
+$(KOKKOS_TEST_OBJECTS): %.o: %.K
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(MPI_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+src/apps/L2system_kokkos.o: ../src/apps/L2system_kokkos.K
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(MPI_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
   check_PROGRAMS += kokkos_fe_types_oracle_unit kokkos_fe_shape_oracle_unit \
                     kokkos_fe_map_oracle_unit kokkos_fe_invariant_unit \
@@ -472,14 +499,6 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 if LIBMESH_ENABLE_CPPUNIT
 TESTS += run_unit_tests.sh
 endif
-
-# Compile .K translation units with the dedicated Kokkos compiler.
-.K.o:
-	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(MPI_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
-	  $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
-	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
-	  -c $< -o $@
 
 unit_tests_dbg_LINK = $(KOKKOS_TEST_LINK) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 unit_tests_devel_LINK = $(KOKKOS_TEST_LINK) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@

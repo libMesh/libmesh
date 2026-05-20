@@ -44,9 +44,6 @@ AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
                    $(libmesh_contrib_INCLUDES) \
                    $(libmesh_optional_INCLUDES) \
                    -I$(top_builddir)/include # required for libmesh_version.h
-AM_CPPFLAGS      += $(LIBMESH_KOKKOS_BUILD_CPPFLAGS)
-AM_CXXFLAGS      += $(LIBMESH_KOKKOS_BUILD_CXXFLAGS)
-AM_LDFLAGS       += $(LIBMESH_KOKKOS_BUILD_LDFLAGS)
 
 SUFFIXES = .C .K .lo .o .obj
 
@@ -56,27 +53,31 @@ KOKKOS_LIBRARY_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD)
 KOKKOS_L2SYSTEM_APP_SOURCES =
 KOKKOS_LIBMESH_SOURCES =
+KOKKOS_APP_OBJECTS =
+KOKKOS_LIBRARY_OBJECTS =
 
 if LIBMESH_ENABLE_KOKKOS
-.K.o:
-	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
-	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
-	  -c $< -o $@
-
-.K.lo:
-	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
-	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
-	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
-	  -c $< -o $@
-
 KOKKOS_PROGRAM_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX)
 KOKKOS_LIBRARY_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX)
 KOKKOS_L2SYSTEM_APP_SOURCES = src/apps/L2system_kokkos.K
 KOKKOS_LIBMESH_SOURCES = src/base/dof_map_kokkos.K src/mesh/mesh_base_kokkos.K
+KOKKOS_APP_OBJECTS = $(KOKKOS_L2SYSTEM_APP_SOURCES:.K=.o)
+KOKKOS_LIBRARY_OBJECTS = $(KOKKOS_LIBMESH_SOURCES:.K=.lo)
+
+$(KOKKOS_APP_OBJECTS): %.o: %.K
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+
+$(KOKKOS_LIBRARY_OBJECTS): %.lo: %.K
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
+	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 endif
 
 LIBS             = $(libmesh_optional_LIBS) $(libmesh_precision_LIBS)
