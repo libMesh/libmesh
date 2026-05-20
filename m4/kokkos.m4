@@ -26,6 +26,17 @@ AC_DEFUN([CONFIGURE_KOKKOS],
                    [cuda|hip|sycl|openmp|serial (default: auto-detect from KokkosCore_config.h)]),
     [KOKKOS_BACKEND="$withval"], [KOKKOS_BACKEND="auto"])
 
+  dnl Setting --enable-kokkos-required causes an error to be emitted during
+  dnl configure if Kokkos is not successfully detected.
+  AC_ARG_ENABLE(kokkos-required,
+                AS_HELP_STRING([--enable-kokkos-required],
+                               [Error if Kokkos is not detected by configure]),
+                [AS_CASE("${enableval}",
+                         [yes], [kokkosrequired=yes],
+                         [no],  [kokkosrequired=no],
+                         [AC_MSG_ERROR(bad value ${enableval} for --enable-kokkos-required)])],
+                     [kokkosrequired=no])
+
   dnl Allow the caller (e.g. MOOSE's configure_libmesh.sh) to pre-set the
   dnl Kokkos compiler and flags via environment variables.  If KOKKOS_CXX is
   dnl already set, we skip auto-detection entirely — the caller knows best.
@@ -212,6 +223,13 @@ AC_DEFUN([CONFIGURE_KOKKOS],
     ],
     [AC_MSG_NOTICE(<<< Configuring library without Kokkos support >>>)
      enablekokkos=no])
+
+  dnl If Kokkos is not enabled, but it *was* required, error out now
+  dnl instead of compiling libmesh in an invalid configuration.
+  AS_IF([test "$enablekokkos" = "no" && test "$kokkosrequired" = "yes"],
+        dnl We return error code 4 here, since 0 means success and 1 is
+        dnl indistinguishable from other errors.
+        [AC_MSG_ERROR([*** Kokkos was not found, but --enable-kokkos-required was specified.], 4)])
 
   AC_SUBST([KOKKOS_CXX])
   AC_SUBST([KOKKOS_CPPFLAGS])
