@@ -59,9 +59,9 @@
 #undef __CUDACC_VER__
 #endif
 
-using namespace libMesh;
-
 #ifdef LIBMESH_L2SYSTEM_KOKKOS_IMPL
+namespace libMesh
+{
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 constexpr unsigned int kokkos_hilbert_max_dofs = 27;
 constexpr unsigned int kokkos_parsed_fem_max_fields = 16;
@@ -2384,8 +2384,13 @@ HilbertSystem::try_kokkos_petsc_solve()
 }
 #endif
 #endif
+} // namespace libMesh
 
 #endif // LIBMESH_L2SYSTEM_KOKKOS_IMPL
+
+#ifndef LIBMESH_L2SYSTEM_KOKKOS_IMPL
+using namespace libMesh;
+#endif
 
 #if !defined(LIBMESH_L2SYSTEM_KOKKOS_IMPL) && \
     (!defined(LIBMESH_HAVE_KOKKOS) || defined(LIBMESH_USE_COMPLEX_NUMBERS))
