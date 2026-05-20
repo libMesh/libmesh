@@ -39,30 +39,51 @@
 #    define LIBMESH_IN_DEVICE_CODE 0
 #  endif
 
+#  if LIBMESH_IN_DEVICE_CODE
+
 // Device-safe assert: uses printf (supported on CUDA/HIP) and
 // Kokkos::abort() for backend-portable device termination.
 // Defined here (not in libmesh_common.h) because Kokkos headers
 // are only available in .K translation units.
-#  ifndef NDEBUG
-#    define LIBMESH_DEVICE_ASSERT(asserted)                             \
-       do { if (!(asserted)) {                                          \
-         printf("libMesh assert failed: %s, file %s, line %d\n",       \
-                #asserted, __FILE__, __LINE__);                         \
-         ::Kokkos::abort("libmesh_assert failed");                     \
-       } } while (0)
+#    ifndef NDEBUG
+#      define LIBMESH_DEVICE_ASSERT(asserted)                           \
+         do { if (!(asserted)) {                                        \
+           printf("libMesh assert failed: %s, file %s, line %d\n",     \
+                  #asserted, __FILE__, __LINE__);                       \
+           ::Kokkos::abort("libmesh_assert failed");                    \
+         } } while (0)
+#    else
+#      define LIBMESH_DEVICE_ASSERT(asserted) ((void) 0)
+#    endif
+
+#    define LIBMESH_DEVICE_ERROR_MSG(msg)                               \
+       do {                                                             \
+         printf("libMesh error: %s, file %s, line %d\n",               \
+                msg, __FILE__, __LINE__);                               \
+         ::Kokkos::abort(msg);                                          \
+       } while (0)
+
+#    define LIBMESH_DEVICE_ERROR_MSG_IF(cond, msg)                      \
+       do { if (cond) { LIBMESH_DEVICE_ERROR_MSG(msg); } } while (0)
+
 #  else
-#    define LIBMESH_DEVICE_ASSERT(asserted) ((void) 0)
+
+// Host-side passes of .K translation units still need the regular
+// libMesh stream-to-string error path; the device-only printf/Kokkos::abort
+// form cannot accept raw operator<< expressions.
+#    define LIBMESH_DEVICE_ERROR_MSG(msg) libmesh_error_msg(msg)
+#    define LIBMESH_DEVICE_ERROR_MSG_IF(cond, msg) libmesh_error_msg_if(cond, msg)
+
+#    ifndef NDEBUG
+#      define LIBMESH_DEVICE_ASSERT(asserted)                           \
+         do { if (!(asserted)) {                                        \
+           libmesh_error_msg("Assertion `" #asserted "' failed.");      \
+         } } while (0)
+#    else
+#      define LIBMESH_DEVICE_ASSERT(asserted) ((void) 0)
+#    endif
+
 #  endif
-
-#  define LIBMESH_DEVICE_ERROR_MSG(msg)                                 \
-     do {                                                               \
-       printf("libMesh error: %s, file %s, line %d\n",                 \
-              msg, __FILE__, __LINE__);                                 \
-       ::Kokkos::abort(msg);                                            \
-     } while (0)
-
-#  define LIBMESH_DEVICE_ERROR_MSG_IF(cond, msg)                        \
-     do { if (cond) { LIBMESH_DEVICE_ERROR_MSG(msg); } } while (0)
 
 #else
 #  define LIBMESH_DEVICE_INLINE inline
