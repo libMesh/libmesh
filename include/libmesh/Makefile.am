@@ -9,6 +9,7 @@ BUILT_SOURCES = \
         dirichlet_boundaries.h \
         dof_map.h \
         dof_map_base.h \
+        dof_map_kokkos.h \
         dof_object.h \
         factory.h \
         float128_shims.h \
@@ -187,11 +188,14 @@ BUILT_SOURCES = \
         kokkos_fe_lagrange_3d.h \
         kokkos_fe_map.h \
         kokkos_fe_monomial.h \
-        kokkos_parsed_function.h \
         kokkos_fe_shape_dispatch.h \
         kokkos_fe_types.h \
+        kokkos_hilbert_assembly.h \
+        kokkos_hilbert_system.h \
         kokkos_linalg_base.h \
+        kokkos_parsed_function.h \
         kokkos_quadrature.h \
+        kokkos_scalar_types.h \
         kokkos_storage.h \
         kokkos_storage_policy.h \
         kokkos_tensor_ops.h \
@@ -215,6 +219,7 @@ BUILT_SOURCES = \
         medit_io.h \
         mesh.h \
         mesh_base.h \
+        mesh_base_kokkos.h \
         mesh_communication.h \
         mesh_function.h \
         mesh_generation.h \
@@ -287,8 +292,8 @@ BUILT_SOURCES = \
         parsed_fem_function.h \
         parsed_fem_function_parameter.h \
         parsed_function.h \
-        parsed_function_program.h \
         parsed_function_parameter.h \
+        parsed_function_program.h \
         petsc_macro.h \
         petsc_matrix.h \
         petsc_matrix_base.h \
@@ -342,6 +347,7 @@ BUILT_SOURCES = \
         threads_allocators.h \
         threads_none.h \
         threads_pthread.h \
+        threads_spin_mutex_forward.h \
         threads_tbb.h \
         centroid_partitioner.h \
         hilbert_sfc_partitioner.h \
@@ -458,6 +464,8 @@ BUILT_SOURCES = \
         fem_system.h \
         frequency_system.h \
         generic_projector.h \
+        hilbert_assembly.h \
+        hilbert_assembly_kernel.h \
         implicit_system.h \
         inter_mesh_projection.h \
         linear_implicit_system.h \
@@ -528,7 +536,6 @@ BUILT_SOURCES = \
         statistics.h \
         string_to_enum.h \
         thread_buffered_syncbuf.h \
-        threads_spin_mutex_forward.h \
         timestamp.h \
         topology_map.h \
         tree.h \
@@ -651,6 +658,9 @@ dof_map.h: $(top_srcdir)/include/base/dof_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_map_base.h: $(top_srcdir)/include/base/dof_map_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+dof_map_kokkos.h: $(top_srcdir)/include/base/dof_map_kokkos.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_object.h: $(top_srcdir)/include/base/dof_object.h
@@ -1184,9 +1194,6 @@ kokkos_fe_lagrange_3d.h: $(top_srcdir)/include/gpu/kokkos_fe_lagrange_3d.h
 kokkos_fe_map.h: $(top_srcdir)/include/gpu/kokkos_fe_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-kokkos_parsed_function.h: $(top_srcdir)/include/gpu/kokkos_parsed_function.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
 kokkos_fe_monomial.h: $(top_srcdir)/include/gpu/kokkos_fe_monomial.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1196,10 +1203,22 @@ kokkos_fe_shape_dispatch.h: $(top_srcdir)/include/gpu/kokkos_fe_shape_dispatch.h
 kokkos_fe_types.h: $(top_srcdir)/include/gpu/kokkos_fe_types.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+kokkos_hilbert_assembly.h: $(top_srcdir)/include/gpu/kokkos_hilbert_assembly.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_hilbert_system.h: $(top_srcdir)/include/gpu/kokkos_hilbert_system.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 kokkos_linalg_base.h: $(top_srcdir)/include/gpu/kokkos_linalg_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+kokkos_parsed_function.h: $(top_srcdir)/include/gpu/kokkos_parsed_function.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 kokkos_quadrature.h: $(top_srcdir)/include/gpu/kokkos_quadrature.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+kokkos_scalar_types.h: $(top_srcdir)/include/gpu/kokkos_scalar_types.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 kokkos_storage.h: $(top_srcdir)/include/gpu/kokkos_storage.h
@@ -1269,6 +1288,9 @@ mesh.h: $(top_srcdir)/include/mesh/mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_base.h: $(top_srcdir)/include/mesh/mesh_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+mesh_base_kokkos.h: $(top_srcdir)/include/mesh/mesh_base_kokkos.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_communication.h: $(top_srcdir)/include/mesh/mesh_communication.h
@@ -1487,10 +1509,10 @@ parsed_fem_function_parameter.h: $(top_srcdir)/include/numerics/parsed_fem_funct
 parsed_function.h: $(top_srcdir)/include/numerics/parsed_function.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-parsed_function_program.h: $(top_srcdir)/include/numerics/parsed_function_program.h
+parsed_function_parameter.h: $(top_srcdir)/include/numerics/parsed_function_parameter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
-parsed_function_parameter.h: $(top_srcdir)/include/numerics/parsed_function_parameter.h
+parsed_function_program.h: $(top_srcdir)/include/numerics/parsed_function_program.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_macro.h: $(top_srcdir)/include/numerics/petsc_macro.h
@@ -1650,6 +1672,9 @@ threads_none.h: $(top_srcdir)/include/parallel/threads_none.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads_pthread.h: $(top_srcdir)/include/parallel/threads_pthread.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+threads_spin_mutex_forward.h: $(top_srcdir)/include/parallel/threads_spin_mutex_forward.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 threads_tbb.h: $(top_srcdir)/include/parallel/threads_tbb.h
@@ -2000,6 +2025,12 @@ frequency_system.h: $(top_srcdir)/include/systems/frequency_system.h
 generic_projector.h: $(top_srcdir)/include/systems/generic_projector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+hilbert_assembly.h: $(top_srcdir)/include/systems/hilbert_assembly.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+hilbert_assembly_kernel.h: $(top_srcdir)/include/systems/hilbert_assembly_kernel.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 implicit_system.h: $(top_srcdir)/include/systems/implicit_system.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -2208,9 +2239,6 @@ string_to_enum.h: $(top_srcdir)/include/utils/string_to_enum.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 thread_buffered_syncbuf.h: $(top_srcdir)/include/utils/thread_buffered_syncbuf.h
-	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
-
-threads_spin_mutex_forward.h: $(top_srcdir)/include/parallel/threads_spin_mutex_forward.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 timestamp.h: $(top_srcdir)/include/utils/timestamp.h
