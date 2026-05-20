@@ -13,6 +13,7 @@ LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
 KOKKOS_TEST_CPPFLAGS =
 KOKKOS_TEST_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD)
+KOKKOS_UNIT_TEST_SOURCES =
 
 # We might have turned on -Werror and/or paranoid warnings
 CXXFLAGS_DBG += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
@@ -262,6 +263,7 @@ if LIBMESH_ENABLE_KOKKOS
   KOKKOS_TEST_CPPFLAGS += -I$(top_srcdir)/include
   KOKKOS_TEST_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX)
+  KOKKOS_UNIT_TEST_SOURCES = kokkos_scope.K kokkos_scope.h
   unit_tests_sources += ../src/apps/L2system_kokkos.K
 
   check_PROGRAMS += kokkos_fe_types_oracle_unit kokkos_fe_shape_oracle_unit \
@@ -373,7 +375,7 @@ endif
 else
   check_PROGRAMS         += unit_tests-dbg
 endif
-  unit_tests_dbg_SOURCES  = $(unit_tests_sources)
+  unit_tests_dbg_SOURCES  = $(unit_tests_sources) $(KOKKOS_UNIT_TEST_SOURCES)
   unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
   unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
   unit_tests_dbg_LDADD    = $(top_builddir)/libmesh_dbg.la
@@ -385,7 +387,7 @@ endif
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_DEVEL_MODE
   check_PROGRAMS           += unit_tests-devel
-  unit_tests_devel_SOURCES  = $(unit_tests_sources)
+  unit_tests_devel_SOURCES  = $(unit_tests_sources) $(KOKKOS_UNIT_TEST_SOURCES)
   unit_tests_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
   unit_tests_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
   unit_tests_devel_LDADD    = $(top_builddir)/libmesh_devel.la
@@ -397,7 +399,7 @@ endif
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_PROF_MODE
   check_PROGRAMS          += unit_tests-prof
-  unit_tests_prof_SOURCES  = $(unit_tests_sources)
+  unit_tests_prof_SOURCES  = $(unit_tests_sources) $(KOKKOS_UNIT_TEST_SOURCES)
   unit_tests_prof_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
   unit_tests_prof_CXXFLAGS = $(CXXFLAGS_PROF)
   unit_tests_prof_LDADD    = $(top_builddir)/libmesh_prof.la
@@ -409,7 +411,7 @@ endif
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_OPROF_MODE
   check_PROGRAMS           += unit_tests-oprof
-  unit_tests_oprof_SOURCES  = $(unit_tests_sources)
+  unit_tests_oprof_SOURCES  = $(unit_tests_sources) $(KOKKOS_UNIT_TEST_SOURCES)
   unit_tests_oprof_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
   unit_tests_oprof_CXXFLAGS = $(CXXFLAGS_OPROF)
   unit_tests_oprof_LDADD    = $(top_builddir)/libmesh_oprof.la
@@ -421,7 +423,7 @@ endif
 if LIBMESH_ENABLE_CPPUNIT
 if LIBMESH_OPT_MODE
   check_PROGRAMS         += unit_tests-opt
-  unit_tests_opt_SOURCES  = $(unit_tests_sources)
+  unit_tests_opt_SOURCES  = $(unit_tests_sources) $(KOKKOS_UNIT_TEST_SOURCES)
   unit_tests_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
   unit_tests_opt_CXXFLAGS = $(CXXFLAGS_OPT)
   unit_tests_opt_LDADD    = $(top_builddir)/libmesh_opt.la

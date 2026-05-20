@@ -4,6 +4,8 @@
 # details which are not required for the public interface
 noinst_HEADERS =  \
         base/libmesh_augment_std_namespace.h \
+        base/dof_map_kokkos.h \
+        mesh/mesh_base_kokkos.h \
         numerics/laspack_matrix.h \
         numerics/laspack_vector.h \
         solvers/laspack_linear_solver.h \

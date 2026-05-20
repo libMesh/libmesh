@@ -44,7 +44,7 @@
 # undef I // Avoid complex.h contamination
 #endif
 
-#ifdef LIBMESH_HAVE_KOKKOS
+#if defined(LIBMESH_HAVE_KOKKOS) && defined(LIBMESH_KOKKOS_COMPILATION)
 #include <Kokkos_Core.hpp>
 #endif
 
@@ -241,7 +241,7 @@ public:
 
   bool supports_kokkos_access() const;
 
-#ifdef LIBMESH_HAVE_KOKKOS
+#if defined(LIBMESH_HAVE_KOKKOS) && defined(LIBMESH_KOKKOS_COMPILATION)
   using kokkos_read_view =
     ::Kokkos::View<const T *,
                    typename ::Kokkos::DefaultExecutionSpace::memory_space,
@@ -1378,7 +1378,7 @@ template <typename T>
 inline
 bool PetscVector<T>::supports_kokkos_access() const
 {
-#ifdef LIBMESH_HAVE_KOKKOS
+#if defined(LIBMESH_HAVE_KOKKOS) && defined(LIBMESH_KOKKOS_COMPILATION)
   return !PetscMemTypeHost(this->get_mem_type()) ||
          ::Kokkos::SpaceAccessibility<typename ::Kokkos::DefaultExecutionSpace::memory_space,
                                       ::Kokkos::HostSpace>::accessible;

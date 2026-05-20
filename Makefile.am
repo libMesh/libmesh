@@ -52,7 +52,10 @@ SUFFIXES = .C .K .lo .o .obj
 
 KOKKOS_PROGRAM_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD)
+KOKKOS_LIBRARY_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD)
 KOKKOS_L2SYSTEM_APP_SOURCES =
+KOKKOS_LIBMESH_SOURCES =
 
 if LIBMESH_ENABLE_KOKKOS
 .K.o:
@@ -70,7 +73,10 @@ if LIBMESH_ENABLE_KOKKOS
 
 KOKKOS_PROGRAM_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX)
+KOKKOS_LIBRARY_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX)
 KOKKOS_L2SYSTEM_APP_SOURCES = src/apps/L2system_kokkos.K
+KOKKOS_LIBMESH_SOURCES = src/base/dof_map_kokkos.K src/mesh/mesh_base_kokkos.K
 endif
 
 LIBS             = $(libmesh_optional_LIBS) $(libmesh_precision_LIBS)
@@ -293,47 +299,52 @@ lib_LTLIBRARIES =
 
 if LIBMESH_DBG_MODE
   lib_LTLIBRARIES        += libmesh_dbg.la
-  libmesh_dbg_la_SOURCES  = $(libmesh_SOURCES)
+  libmesh_dbg_la_SOURCES  = $(libmesh_SOURCES) $(KOKKOS_LIBMESH_SOURCES)
   libmesh_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
   libmesh_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
   libmesh_dbg_la_CFLAGS   = $(CFLAGS_DBG)
   libmesh_dbg_la_LIBADD   = contrib/libcontrib_dbg.la $(LIBS)
+  libmesh_dbg_la_LINK     = $(KOKKOS_LIBRARY_LINK) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 endif
 
 if LIBMESH_DEVEL_MODE
   lib_LTLIBRARIES          += libmesh_devel.la
-  libmesh_devel_la_SOURCES  = $(libmesh_SOURCES)
+  libmesh_devel_la_SOURCES  = $(libmesh_SOURCES) $(KOKKOS_LIBMESH_SOURCES)
   libmesh_devel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
   libmesh_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
   libmesh_devel_la_CFLAGS   = $(CFLAGS_DEVEL)
   libmesh_devel_la_LIBADD   = contrib/libcontrib_devel.la $(LIBS)
+  libmesh_devel_la_LINK     = $(KOKKOS_LIBRARY_LINK) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 endif
 
 if LIBMESH_OPT_MODE
   lib_LTLIBRARIES        += libmesh_opt.la
-  libmesh_opt_la_SOURCES  = $(libmesh_SOURCES)
+  libmesh_opt_la_SOURCES  = $(libmesh_SOURCES) $(KOKKOS_LIBMESH_SOURCES)
   libmesh_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
   libmesh_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
   libmesh_opt_la_CFLAGS   = $(CFLAGS_OPT)
   libmesh_opt_la_LIBADD   = contrib/libcontrib_opt.la $(LIBS)
+  libmesh_opt_la_LINK     = $(KOKKOS_LIBRARY_LINK) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 endif
 
 if LIBMESH_PROF_MODE
   lib_LTLIBRARIES          += libmesh_prof.la
-  libmesh_prof_la_SOURCES  = $(libmesh_SOURCES)
+  libmesh_prof_la_SOURCES  = $(libmesh_SOURCES) $(KOKKOS_LIBMESH_SOURCES)
   libmesh_prof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
   libmesh_prof_la_CXXFLAGS = $(CXXFLAGS_PROF)
   libmesh_prof_la_CFLAGS   = $(CFLAGS_PROF)
   libmesh_prof_la_LIBADD   = contrib/libcontrib_prof.la $(LIBS)
+  libmesh_prof_la_LINK     = $(KOKKOS_LIBRARY_LINK) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 endif
 
 if LIBMESH_OPROF_MODE
   lib_LTLIBRARIES          += libmesh_oprof.la
-  libmesh_oprof_la_SOURCES  = $(libmesh_SOURCES)
+  libmesh_oprof_la_SOURCES  = $(libmesh_SOURCES) $(KOKKOS_LIBMESH_SOURCES)
   libmesh_oprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
   libmesh_oprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
   libmesh_oprof_la_CFLAGS   = $(CFLAGS_OPROF)
   libmesh_oprof_la_LIBADD   = contrib/libcontrib_oprof.la $(LIBS)
+  libmesh_oprof_la_LINK     = $(KOKKOS_LIBRARY_LINK) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 endif
 
 # Make sure we build the library before we test it

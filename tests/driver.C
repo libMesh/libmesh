@@ -14,20 +14,18 @@
 #include "test_comm.h"
 
 #ifdef LIBMESH_HAVE_KOKKOS
-#define PETSC_SKIP_CXX_COMPLEX_FIX 1
-#include <Kokkos_Core.hpp>
-#undef __CUDACC_VER__
+#include "kokkos_scope.h"
 
 struct KokkosScope
 {
   KokkosScope(int & argc, char ** & argv)
   {
-    Kokkos::initialize(argc, argv);
+    libmesh_unit_tests_kokkos_initialize(argc, argv);
   }
 
   ~KokkosScope()
   {
-    Kokkos::finalize();
+    libmesh_unit_tests_kokkos_finalize();
   }
 };
 #endif

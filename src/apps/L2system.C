@@ -50,7 +50,9 @@
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS) && \
     defined(LIBMESH_L2SYSTEM_KOKKOS_IMPL)
 #include "../../include/gpu/kokkos_hilbert_system.h"
+#include "libmesh/dof_map_kokkos.h"
 #include "libmesh/fe_shape_traits.h"
+#include "libmesh/mesh_base_kokkos.h"
 
 #define PETSC_SKIP_CXX_COMPLEX_FIX 1
 #include <Kokkos_Core.hpp>

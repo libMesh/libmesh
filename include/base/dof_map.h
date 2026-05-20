@@ -40,10 +40,6 @@
 #include "libmesh/mesh_subdivision_support.h"
 #include "libmesh/dof_map_base.h"
 
-#ifdef LIBMESH_HAVE_KOKKOS
-#include "libmesh/kokkos_storage_policy.h"
-#endif
-
 // TIMPI includes
 #include "timpi/parallel_implementation.h"
 #include "timpi/parallel_sync.h"
@@ -1819,31 +1815,12 @@ public:
   void reinit_static_condensation();
 
 #ifdef LIBMESH_HAVE_KOKKOS
-  struct KokkosDofIndexCache
-  {
-    using elem_id_view = ::Kokkos::View<dof_id_type *>;
-    using elem_dof_id_view = ::Kokkos::View<dof_id_type **>;
-    using elem_dof_count_view = ::Kokkos::View<unsigned int *>;
-    using elem_subdomain_view = ::Kokkos::View<subdomain_id_type *>;
-
-    elem_id_view element_ids;
-    elem_dof_id_view element_dof_indices;
-    elem_dof_count_view element_n_dofs;
-    elem_subdomain_view element_subdomains;
-    std::vector<dof_id_type> host_element_ids;
-    std::vector<dof_id_type> host_element_dof_indices;
-    std::vector<unsigned int> host_element_n_dofs;
-    std::vector<subdomain_id_type> host_element_subdomains;
-    unsigned int max_dofs = 0;
-  };
-
-  struct KokkosLocalIndexCache
-  {
-    using elem_local_index_view = ::Kokkos::View<unsigned int **>;
-
-    elem_local_index_view element_local_indices;
-    unsigned int max_dofs = 0;
-  };
+  struct KokkosDofIndexCache;
+  struct KokkosLocalIndexCache;
+  using kokkos_dof_index_cache_ptr =
+    std::unique_ptr<KokkosDofIndexCache, void (*)(KokkosDofIndexCache *)>;
+  using kokkos_local_index_cache_ptr =
+    std::unique_ptr<KokkosLocalIndexCache, void (*)(KokkosLocalIndexCache *)>;
 
   const KokkosDofIndexCache *
   get_kokkos_dof_index_cache(const unsigned int vn = libMesh::invalid_uint) const;
@@ -1860,9 +1837,14 @@ public:
   void prepare_kokkos_local_index_cache(const NumericVector<Number> & local_vector,
                                         const unsigned int vn = libMesh::invalid_uint) const;
   void clear_kokkos_caches() const;
-#endif
 
 private:
+  static void delete_kokkos_dof_index_cache(KokkosDofIndexCache *);
+  static void delete_kokkos_local_index_cache(KokkosLocalIndexCache *);
+#else
+
+private:
+#endif
 
   /**
    * Retrieve the array variable bounds for a given variable \p vi. This variable may
@@ -2190,9 +2172,9 @@ private:
 
 #ifdef LIBMESH_HAVE_KOKKOS
   mutable std::map<unsigned int,
-                   std::unique_ptr<KokkosDofIndexCache>> _kokkos_dof_index_caches;
+                   kokkos_dof_index_cache_ptr> _kokkos_dof_index_caches;
   mutable std::map<std::pair<unsigned int, const NumericVector<Number> *>,
-                   std::unique_ptr<KokkosLocalIndexCache>> _kokkos_local_index_caches;
+                   kokkos_local_index_cache_ptr> _kokkos_local_index_caches;
 #endif
 
   /**
