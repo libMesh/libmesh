@@ -73185,10 +73185,10 @@ fi
 
 
 
+# -------------------------------------------------------------
+# Kokkos -- enables the native Kokkos FE math path
+# -------------------------------------------------------------
 
-# -------------------------------------------------------------
-# Kokkos -- optional, enables the native Kokkos FE math path
-# -------------------------------------------------------------
 
 # Check whether --with-kokkos was given.
 if test ${with_kokkos+y}
@@ -73212,10 +73212,10 @@ fi
 
 
 
-if test "x$KOKKOS_DIR" != "xno"
+  if test "x$KOKKOS_DIR" != "xno"
 then :
 
-    as_ac_File=`printf "%s\n" "ac_cv_file_$KOKKOS_DIR/include/Kokkos_Core.hpp" | sed "$as_sed_sh"`
+      as_ac_File=`printf "%s\n" "ac_cv_file_$KOKKOS_DIR/include/Kokkos_Core.hpp" | sed "$as_sed_sh"`
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $KOKKOS_DIR/include/Kokkos_Core.hpp" >&5
 printf %s "checking for $KOKKOS_DIR/include/Kokkos_Core.hpp... " >&6; }
 if eval test \${$as_ac_File+y}
@@ -73237,22 +73237,22 @@ printf "%s\n" "$ac_res" >&6; }
 if eval test \"x\$"$as_ac_File"\" = x"yes"
 then :
 
-        enablekokkos=yes
-        libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I$KOKKOS_DIR/include"
-        libmesh_optional_LIBS="$libmesh_optional_LIBS -L$KOKKOS_DIR/lib -lkokkoscore"
+          enablekokkos=yes
+          libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES -I$KOKKOS_DIR/include"
+          libmesh_optional_LIBS="$libmesh_optional_LIBS -L$KOKKOS_DIR/lib -lkokkoscore"
 
-                if test "x$KOKKOS_CXX" = "x"
+                    if test "x$KOKKOS_CXX" = "x"
 then :
 
-            KOKKOS_CFG="$KOKKOS_DIR/include/KokkosCore_config.h"
+              KOKKOS_CFG="$KOKKOS_DIR/include/KokkosCore_config.h"
 
-                        if test "x$KOKKOS_BACKEND" = "xauto"
+                            if test "x$KOKKOS_BACKEND" = "xauto"
 then :
 
-                if test -r "$KOKKOS_CFG"
+                  if test -r "$KOKKOS_CFG"
 then :
 
-                    if grep -q 'KOKKOS_ENABLE_CUDA' "$KOKKOS_CFG"
+                      if grep -q 'KOKKOS_ENABLE_CUDA' "$KOKKOS_CFG"
 then :
   KOKKOS_BACKEND=cuda
 else case e in #(
@@ -73285,11 +73285,11 @@ fi
 
 fi
 
-            { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Kokkos backend: $KOKKOS_BACKEND" >&5
+              { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Kokkos backend: $KOKKOS_BACKEND" >&5
 printf "%s\n" "Kokkos backend: $KOKKOS_BACKEND" >&6; }
 
-                        have_kokkos_openmp=no
-            if test -r "$KOKKOS_CFG"
+                            have_kokkos_openmp=no
+              if test -r "$KOKKOS_CFG"
 then :
   if grep -q 'KOKKOS_ENABLE_OPENMP' "$KOKKOS_CFG"
 then :
@@ -73297,9 +73297,9 @@ then :
 fi
 fi
 
-            case "$KOKKOS_BACKEND" in
-              cuda)
-                # Extract the first word of "nvcc", so it can be a program name with args.
+              case "$KOKKOS_BACKEND" in
+                cuda)
+                  # Extract the first word of "nvcc", so it can be a program name with args.
 set dummy nvcc; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
@@ -73346,23 +73346,23 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-                if test "x$NVCC" = "xno"
+                  if test "x$NVCC" = "xno"
 then :
   as_fn_error $? "nvcc not found but Kokkos CUDA backend requested" "$LINENO" 5
 fi
-                KOKKOS_CXX="$NVCC"
-                KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin $CXX"
-                KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler -L$KOKKOS_DIR/lib"
-                if test "x$have_kokkos_openmp" = "xyes"
+                  KOKKOS_CXX="$NVCC"
+                  KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin $CXX"
+                  KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler -L$KOKKOS_DIR/lib"
+                  if test "x$have_kokkos_openmp" = "xyes"
 then :
 
-                    KOKKOS_CXXFLAGS="$KOKKOS_CXXFLAGS -fopenmp"
-                    KOKKOS_LDFLAGS="$KOKKOS_LDFLAGS -fopenmp"
+                      KOKKOS_CXXFLAGS="$KOKKOS_CXXFLAGS -fopenmp"
+                      KOKKOS_LDFLAGS="$KOKKOS_LDFLAGS -fopenmp"
 
 fi
-                ;;
-              hip)
-                # Extract the first word of "hipcc", so it can be a program name with args.
+                  ;;
+                hip)
+                  # Extract the first word of "hipcc", so it can be a program name with args.
 set dummy hipcc; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
@@ -73409,15 +73409,15 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-                if test "x$HIPCC" = "xno"
+                  if test "x$HIPCC" = "xno"
 then :
   as_fn_error $? "hipcc not found but Kokkos HIP backend requested" "$LINENO" 5
 fi
-                KOKKOS_CXX="$HIPCC"
-                KOKKOS_LDFLAGS="-L$KOKKOS_DIR/lib"
-                ;;
-              sycl)
-                # Extract the first word of "icpx", so it can be a program name with args.
+                  KOKKOS_CXX="$HIPCC"
+                  KOKKOS_LDFLAGS="-L$KOKKOS_DIR/lib"
+                  ;;
+                sycl)
+                  # Extract the first word of "icpx", so it can be a program name with args.
 set dummy icpx; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
@@ -73464,25 +73464,25 @@ printf "%s\n" "no" >&6; }
 fi
 
 
-                if test "x$ICPX" = "xno"
+                  if test "x$ICPX" = "xno"
 then :
   as_fn_error $? "icpx not found but Kokkos SYCL backend requested" "$LINENO" 5
 fi
-                KOKKOS_CXX="$ICPX"
-                KOKKOS_CXXFLAGS="-fsycl"
-                KOKKOS_LDFLAGS="-fsycl -L$KOKKOS_DIR/lib"
-                ;;
-              openmp)
-                KOKKOS_CXX="${CXX}"
-                KOKKOS_CXXFLAGS="-fopenmp -x c++"
-                KOKKOS_LDFLAGS="-fopenmp -L$KOKKOS_DIR/lib"
-                ;;
-              serial|*)
-                KOKKOS_CXX="${CXX}"
-                KOKKOS_CXXFLAGS="-x c++"
-                KOKKOS_LDFLAGS="-L$KOKKOS_DIR/lib"
-                ;;
-            esac
+                  KOKKOS_CXX="$ICPX"
+                  KOKKOS_CXXFLAGS="-fsycl"
+                  KOKKOS_LDFLAGS="-fsycl -L$KOKKOS_DIR/lib"
+                  ;;
+                openmp)
+                  KOKKOS_CXX="${CXX}"
+                  KOKKOS_CXXFLAGS="-fopenmp -x c++"
+                  KOKKOS_LDFLAGS="-fopenmp -L$KOKKOS_DIR/lib"
+                  ;;
+                serial|*)
+                  KOKKOS_CXX="${CXX}"
+                  KOKKOS_CXXFLAGS="-x c++"
+                  KOKKOS_LDFLAGS="-L$KOKKOS_DIR/lib"
+                  ;;
+              esac
 
 else case e in #(
   e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Using caller-provided KOKKOS_CXX=$KOKKOS_CXX" >&5
@@ -73490,30 +73490,30 @@ printf "%s\n" "Using caller-provided KOKKOS_CXX=$KOKKOS_CXX" >&6; } ;;
 esac
 fi
 
-                KOKKOS_CPPFLAGS="${KOKKOS_CPPFLAGS:--DLIBMESH_KOKKOS_COMPILATION -I$KOKKOS_DIR/include}"
-        KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:--L$KOKKOS_DIR/lib}"
-        KOKKOS_LIBS="${KOKKOS_LIBS:--lkokkoscore}"
+                    KOKKOS_CPPFLAGS="${KOKKOS_CPPFLAGS:--DLIBMESH_KOKKOS_COMPILATION -I$KOKKOS_DIR/include}"
+          KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:--L$KOKKOS_DIR/lib}"
+          KOKKOS_LIBS="${KOKKOS_LIBS:--lkokkoscore}"
 
-                                        KOKKOS_MPI_CPPFLAGS=""
-        if test "x$enablempi" = "xyes" && test "x$KOKKOS_CXX" != "x$CXX"
+                                                  KOKKOS_MPI_CPPFLAGS=""
+          if test "x$enablempi" = "xyes" && test "x$KOKKOS_CXX" != "x$CXX"
 then :
 
-            { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for MPI compile flags usable with KOKKOS_CXX" >&5
+              { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for MPI compile flags usable with KOKKOS_CXX" >&5
 printf %s "checking for MPI compile flags usable with KOKKOS_CXX... " >&6; }
-            KOKKOS_MPI_CPPFLAGS=`$CXX -showme:compile 2>/dev/null`
-            if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
+              KOKKOS_MPI_CPPFLAGS=`$CXX -showme:compile 2>/dev/null`
+              if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
 then :
   KOKKOS_MPI_CPPFLAGS=`$CXX -compile_info 2>/dev/null`
 fi
-            if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
+              if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
 then :
   KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^^ * //'`
 fi
-            if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
+              if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
 then :
   KOKKOS_MPI_CPPFLAGS="$MPI_INCLUDES"
 fi
-            if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
+              if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
 printf "%s\n" "not found" >&6; }
@@ -73525,44 +73525,44 @@ fi
 
 fi
 
-                        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the Kokkos compiler configuration works" >&5
+                              { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the Kokkos compiler configuration works" >&5
 printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
-        libmesh_save_CXX="$CXX"
-        libmesh_save_CPPFLAGS="$CPPFLAGS"
-        libmesh_save_CXXFLAGS="$CXXFLAGS"
-        libmesh_save_LDFLAGS="$LDFLAGS"
-        libmesh_save_LIBS="$LIBS"
+          libmesh_save_CXX="$CXX"
+          libmesh_save_CPPFLAGS="$CPPFLAGS"
+          libmesh_save_CXXFLAGS="$CXXFLAGS"
+          libmesh_save_LDFLAGS="$LDFLAGS"
+          libmesh_save_LIBS="$LIBS"
 
-        CXX="$KOKKOS_CXX"
-        CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
-        CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
-        LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
-        LIBS="$LIBS $KOKKOS_LIBS"
-        ac_ext=cpp
+          CXX="$KOKKOS_CXX"
+          CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
+          CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
+          LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
+          LIBS="$LIBS $KOKKOS_LIBS"
+          ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
-        if test "x$enablempi" = "xyes"
+          if test "x$enablempi" = "xyes"
 then :
 
-            LDFLAGS="$LDFLAGS $MPI_LDFLAGS"
-            LIBS="$LIBS $MPI_LIBS"
-            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+              LDFLAGS="$LDFLAGS $MPI_LDFLAGS"
+              LIBS="$LIBS $MPI_LIBS"
+              cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-#include <mpi.h>
-#include <Kokkos_Core.hpp>
-int main(int argc, char ** argv)
-{
-  MPI_Init(&argc, &argv);
-  Kokkos::initialize(argc, argv);
-  Kokkos::finalize();
-  MPI_Finalize();
-  return 0;
-}
+  #include <mpi.h>
+  #include <Kokkos_Core.hpp>
+  int main(int argc, char ** argv)
+  {
+    MPI_Init(&argc, &argv);
+    Kokkos::initialize(argc, argv);
+    Kokkos::finalize();
+    MPI_Finalize();
+    return 0;
+  }
 
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"
@@ -73577,16 +73577,16 @@ rm -f core conftest.err conftest.$ac_objext conftest.beam \
 
 else case e in #(
   e)
-            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+              cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
-#include <Kokkos_Core.hpp>
-int main(int argc, char ** argv)
-{
-  Kokkos::initialize(argc, argv);
-  Kokkos::finalize();
-  return 0;
-}
+  #include <Kokkos_Core.hpp>
+  int main(int argc, char ** argv)
+  {
+    Kokkos::initialize(argc, argv);
+    Kokkos::finalize();
+    return 0;
+  }
 
 _ACEOF
 if ac_fn_cxx_try_link "$LINENO"
@@ -73598,23 +73598,23 @@ esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
-           ;;
+             ;;
 esac
 fi
-        ac_ext=c
+          ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-        CXX="$libmesh_save_CXX"
-        CPPFLAGS="$libmesh_save_CPPFLAGS"
-        CXXFLAGS="$libmesh_save_CXXFLAGS"
-        LDFLAGS="$libmesh_save_LDFLAGS"
-        LIBS="$libmesh_save_LIBS"
+          CXX="$libmesh_save_CXX"
+          CPPFLAGS="$libmesh_save_CPPFLAGS"
+          CXXFLAGS="$libmesh_save_CXXFLAGS"
+          LDFLAGS="$libmesh_save_LDFLAGS"
+          LIBS="$libmesh_save_LIBS"
 
-        if test "x$kokkos_config_works" = "xyes"
+          if test "x$kokkos_config_works" = "xyes"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
@@ -73626,15 +73626,15 @@ fi
 
 printf "%s\n" "#define HAVE_KOKKOS 1" >>confdefs.h
 
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Kokkos support >>>" >&5
+          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Configuring library with Kokkos support >>>" >&5
 printf "%s\n" "<<< Configuring library with Kokkos support >>>" >&6; }
 
 else case e in #(
   e)
-        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Kokkos not found at $KOKKOS_DIR -- disabling Kokkos FE support" >&5
+          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Kokkos not found at $KOKKOS_DIR -- disabling Kokkos FE support" >&5
 printf "%s\n" "$as_me: WARNING: Kokkos not found at $KOKKOS_DIR -- disabling Kokkos FE support" >&2;}
-        enablekokkos=no
-       ;;
+          enablekokkos=no
+         ;;
 esac
 fi
 
@@ -73650,13 +73650,14 @@ fi
 
 
 
- if test x$enablekokkos = xyes; then
+   if test x$enablekokkos = xyes; then
   LIBMESH_ENABLE_KOKKOS_TRUE=
   LIBMESH_ENABLE_KOKKOS_FALSE='#'
 else
   LIBMESH_ENABLE_KOKKOS_TRUE='#'
   LIBMESH_ENABLE_KOKKOS_FALSE=
 fi
+
 
 # -------------------------------------------------------------
 
