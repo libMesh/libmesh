@@ -47,7 +47,8 @@
 #include <petscsf.h>
 #endif
 
-#if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
+#if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS) && \
+    defined(LIBMESH_L2SYSTEM_KOKKOS_IMPL)
 #include "../../include/gpu/kokkos_hilbert_system.h"
 #include "libmesh/fe_shape_traits.h"
 
@@ -57,107 +58,6 @@
 #endif
 
 using namespace libMesh;
-
-#if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS) && \
-    !defined(LIBMESH_L2SYSTEM_KOKKOS_IMPL)
-namespace
-{
-constexpr unsigned int kokkos_parsed_fem_max_fields = 16;
-
-class HostExactParsedFEMGoalAccess
-{
-public:
-  HostExactParsedFEMGoalAccess(const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & goal,
-                               FEMContext & input_context)
-    : _goal(goal),
-      _input_context(input_context)
-  {
-  }
-
-  template <typename QpData>
-  Number value(const QpData & qp_data, const Point & xyz) const
-  {
-    Number vars[LIBMESH_DIM + 1 + kokkos_parsed_fem_max_fields] = {};
-    fill_variables(qp_data, xyz, vars);
-    return _goal.value(vars);
-  }
-
-  template <typename QpData>
-  Gradient gradient(const QpData & qp_data, const Point & xyz) const
-  {
-    Number vars[LIBMESH_DIM + 1 + kokkos_parsed_fem_max_fields] = {};
-    Gradient field_gradients[kokkos_parsed_fem_max_fields];
-    fill_variables(qp_data, xyz, vars);
-
-    for (unsigned int field = 0; field != _goal.n_field_variables(); ++field)
-      field_gradients[field] =
-        _input_context.interior_gradient(_goal.field_variable_number(field), qp_data.qp_index());
-
-    return _goal.gradient(vars, field_gradients);
-  }
-
-private:
-  template <typename QpData>
-  void fill_variables(const QpData & qp_data,
-                      const Point & xyz,
-                      Number * vars) const
-  {
-    vars[0] = xyz(0);
-#if LIBMESH_DIM > 1
-    vars[1] = xyz(1);
-#endif
-#if LIBMESH_DIM > 2
-    vars[2] = xyz(2);
-#endif
-    vars[LIBMESH_DIM] = _goal.time();
-
-    for (unsigned int field = 0; field != _goal.n_field_variables(); ++field)
-      vars[LIBMESH_DIM + 1 + field] =
-        _input_context.interior_value(_goal.field_variable_number(field), qp_data.qp_index());
-  }
-
-  const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & _goal;
-  FEMContext & _input_context;
-};
-
-#if defined(LIBMESH_HAVE_PETSC)
-bool
-assemble_host_exact_parsed_fem_goal_element(HilbertSystem & sys,
-                                            FEMContext & c,
-                                            const bool request_jacobian,
-                                            DenseSubVector<Number> & F,
-                                            DenseSubMatrix<Number> & K,
-                                            const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & goal_function)
-{
-  if (!sys.input_system)
-    return false;
-
-  FEMContext * goal_context_ptr = sys.get_input_context(c);
-  if (!goal_context_ptr)
-    return false;
-
-  FEMContext & goal_context = *goal_context_ptr;
-  goal_context.pre_fe_reinit(*sys.input_system, &c.get_elem());
-  goal_context.elem_fe_reinit();
-
-  detail::HostHilbertFEAccess fe(c, 0, sys.hilbert_order());
-  detail::HostHilbertAccumulator accum(F, K);
-  auto solution =
-    detail::make_hilbert_solution_access(fe,
-                                         c.get_elem_solution(0),
-                                         c.get_elem_solution_derivative());
-  HostExactParsedFEMGoalAccess goal_access(goal_function, goal_context);
-  detail::assemble_hilbert_element(fe,
-                                   solution,
-                                   goal_access,
-                                   request_jacobian,
-                                   sys.hilbert_order(),
-                                   accum);
-  return true;
-}
-#endif
-} // anonymous namespace
-#endif
 
 #ifdef LIBMESH_L2SYSTEM_KOKKOS_IMPL
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
@@ -2193,6 +2093,22 @@ HilbertSystem::HilbertSystem(libMesh::EquationSystems & es,
 {
 }
 
+void
+libmesh_kokkos_initialize(int & argc,
+                          char ** & argv,
+                          const bool enable)
+{
+  if (enable)
+    ::Kokkos::initialize(argc, argv);
+}
+
+void
+libmesh_kokkos_finalize(const bool enable)
+{
+  if (enable)
+    ::Kokkos::finalize();
+}
+
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 const libMesh::Kokkos::KokkosParsedFunction<libMesh::Number> *
 HilbertSystem::ensure_kokkos_goal_func()
@@ -2210,6 +2126,43 @@ HilbertSystem::ensure_kokkos_goal_func()
       return nullptr;
 #endif
     });
+}
+
+bool
+HilbertSystem::needs_exact_kokkos_fem_goal_context()
+{
+  return input_system &&
+         dynamic_cast<ParsedFEMFunction<Number> *>(_goal_func.get()) &&
+         this->ensure_kokkos_fem_goal_func();
+}
+
+bool
+HilbertSystem::try_exact_kokkos_analytic_goal_host_assembly(FEMContext & c,
+                                                            const bool request_jacobian,
+                                                            DenseSubVector<Number> & F,
+                                                            DenseSubMatrix<Number> & K)
+{
+  if (const auto * kokkos_goal = this->ensure_kokkos_goal_func())
+    {
+      detail::HostHilbertFEAccess fe(c, 0, _hilbert_order);
+      auto solution =
+        detail::make_hilbert_solution_access(fe,
+                                             c.get_elem_solution(0),
+                                             c.get_elem_solution_derivative());
+      detail::HostHilbertAccumulator accum(F, K);
+      const auto parsed_goal = kokkos_goal->with_time(this->time);
+      auto goal = detail::make_hilbert_analytic_goal_access(parsed_goal,
+                                                            parsed_goal.gradient_function());
+      detail::assemble_hilbert_element(fe,
+                                       solution,
+                                       goal,
+                                       request_jacobian,
+                                       _hilbert_order,
+                                       accum);
+      return true;
+    }
+
+  return false;
 }
 
 const libMesh::Kokkos::KokkosParsedFEMFunction<libMesh::Number> *
@@ -2234,6 +2187,37 @@ HilbertSystem::ensure_kokkos_fem_goal_func()
       return nullptr;
 #endif
     });
+}
+
+bool
+HilbertSystem::try_exact_kokkos_fem_goal_host_assembly(FEMContext & c,
+                                                       const bool request_jacobian,
+                                                       DenseSubVector<Number> & F,
+                                                       DenseSubMatrix<Number> & K)
+{
+#if defined(LIBMESH_HAVE_PETSC)
+  if (!input_system)
+    return false;
+
+  if (const auto * kokkos_fem_goal = this->ensure_kokkos_fem_goal_func())
+    return assemble_host_exact_parsed_fem_goal_element(*this,
+                                                       c,
+                                                       request_jacobian,
+                                                       F,
+                                                       K,
+                                                       kokkos_fem_goal->with_time(this->time));
+#else
+  libmesh_ignore(c, request_jacobian, F, K);
+#endif
+
+  return false;
+}
+
+void
+HilbertSystem::reset_kokkos_goal_cache()
+{
+  _kokkos_goal_func.reset();
+  _kokkos_fem_goal_func.reset();
 }
 
 KokkosPetscAssemblyPlan *
@@ -2419,6 +2403,44 @@ HilbertSystem::HilbertSystem(libMesh::EquationSystems & es,
     _subdomains_list()
 {
 }
+
+void
+libmesh_kokkos_initialize(int & argc,
+                          char ** & argv,
+                          const bool enable)
+{
+  libmesh_ignore(argc, argv, enable);
+}
+
+void
+libmesh_kokkos_finalize(const bool enable)
+{
+  libmesh_ignore(enable);
+}
+
+#if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
+bool HilbertSystem::needs_exact_kokkos_fem_goal_context() { return false; }
+
+bool
+HilbertSystem::try_exact_kokkos_analytic_goal_host_assembly(FEMContext & c,
+                                                            const bool request_jacobian,
+                                                            DenseSubVector<Number> & F,
+                                                            DenseSubMatrix<Number> & K)
+{
+  libmesh_ignore(c, request_jacobian, F, K);
+  return false;
+}
+
+bool
+HilbertSystem::try_exact_kokkos_fem_goal_host_assembly(FEMContext & c,
+                                                       const bool request_jacobian,
+                                                       DenseSubVector<Number> & F,
+                                                       DenseSubMatrix<Number> & K)
+{
+  libmesh_ignore(c, request_jacobian, F, K);
+  return false;
+}
+#endif
 #endif
 
 #ifndef LIBMESH_L2SYSTEM_KOKKOS_IMPL
@@ -2479,8 +2501,7 @@ void HilbertSystem::init_context(DiffContext & context)
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
   if (input_system &&
       this->_hilbert_order > 0 &&
-      dynamic_cast<ParsedFEMFunction<Number> *>(_goal_func.get()) &&
-      this->ensure_kokkos_fem_goal_func())
+      this->needs_exact_kokkos_fem_goal_context())
     {
       for (const auto & dim : elem_dims)
         for (unsigned int var = 0; var != input_system->n_vars(); ++var)
@@ -2542,25 +2563,12 @@ bool HilbertSystem::element_time_derivative (bool request_jacobian,
   };
 
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  if (const auto * kokkos_goal = this->ensure_kokkos_goal_func())
-    {
-      const auto parsed_goal = kokkos_goal->with_time(this->time);
-      auto goal = detail::make_hilbert_analytic_goal_access(parsed_goal,
-                                                            parsed_goal.gradient_function());
-      assemble_with_goal(goal);
-      return request_jacobian;
-    }
+  if (this->try_exact_kokkos_analytic_goal_host_assembly(c, request_jacobian, F, K))
+    return request_jacobian;
 
 #if defined(LIBMESH_HAVE_PETSC)
   if (_use_exact_parsed_fem_host_path && input_system)
-    if (const auto * kokkos_fem_goal = this->ensure_kokkos_fem_goal_func();
-        kokkos_fem_goal &&
-        assemble_host_exact_parsed_fem_goal_element(*this,
-                                                    c,
-                                                    request_jacobian,
-                                                    F,
-                                                    K,
-                                                    kokkos_fem_goal->with_time(this->time)))
+    if (this->try_exact_kokkos_fem_goal_host_assembly(c, request_jacobian, F, K))
       return request_jacobian;
 #endif
 #endif

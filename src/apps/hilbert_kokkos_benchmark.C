@@ -40,12 +40,6 @@
 #include <string>
 #include <vector>
 
-#ifdef LIBMESH_HAVE_KOKKOS
-#define PETSC_SKIP_CXX_COMPLEX_FIX 1
-#include <Kokkos_Core.hpp>
-#undef __CUDACC_VER__
-#endif
-
 using namespace libMesh;
 
 namespace
@@ -88,20 +82,18 @@ struct BenchmarkResult
   HilbertSystem::KokkosAssemblyPath assembly_path = HilbertSystem::KokkosAssemblyPath::none;
 };
 
-#ifdef LIBMESH_HAVE_KOKKOS
 struct KokkosScope
 {
   KokkosScope(int & argc, char ** & argv)
   {
-    ::Kokkos::initialize(argc, argv);
+    libmesh_kokkos_initialize(argc, argv, true);
   }
 
   ~KokkosScope()
   {
-    ::Kokkos::finalize();
+    libmesh_kokkos_finalize(true);
   }
 };
-#endif
 
 void usage_error(const char * progname)
 {
@@ -384,9 +376,7 @@ BenchmarkOptions parse_options()
 
 int main(int argc, char ** argv)
 {
-#ifdef LIBMESH_HAVE_KOKKOS
   KokkosScope kokkos_scope(argc, argv);
-#endif
   LibMeshInit init(argc, argv);
 
 #ifndef LIBMESH_HAVE_KOKKOS

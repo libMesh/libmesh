@@ -20,10 +20,6 @@
 #include "../../include/numerics/parsed_fem_function.h"
 #include "../../include/numerics/parsed_function.h"
 
-#if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
-#include "../../include/gpu/kokkos_parsed_function.h"
-#endif
-
 #include "libmesh/enum_fe_family.h"
 #include "libmesh/fdm_gradient.h"
 #include "libmesh/fem_function_base.h"
@@ -35,6 +31,23 @@
 #include <map>
 #include <memory>
 
+namespace libMesh
+{
+namespace Kokkos
+{
+  template <typename Output>
+  class KokkosParsedFunction;
+
+  template <typename Output>
+  class KokkosParsedFEMFunction;
+}
+}
+
+void libmesh_kokkos_initialize(int & argc,
+                               char ** & argv,
+                               bool enable);
+
+void libmesh_kokkos_finalize(bool enable);
 
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
@@ -171,6 +184,15 @@ private:
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
   const libMesh::Kokkos::KokkosParsedFunction<libMesh::Number> * ensure_kokkos_goal_func();
   const libMesh::Kokkos::KokkosParsedFEMFunction<libMesh::Number> * ensure_kokkos_fem_goal_func();
+  bool needs_exact_kokkos_fem_goal_context();
+  bool try_exact_kokkos_analytic_goal_host_assembly(libMesh::FEMContext & c,
+                                                    bool request_jacobian,
+                                                    libMesh::DenseSubVector<libMesh::Number> & F,
+                                                    libMesh::DenseSubMatrix<libMesh::Number> & K);
+  bool try_exact_kokkos_fem_goal_host_assembly(libMesh::FEMContext & c,
+                                               bool request_jacobian,
+                                               libMesh::DenseSubVector<libMesh::Number> & F,
+                                               libMesh::DenseSubMatrix<libMesh::Number> & K);
   bool try_kokkos_element_assembly(libMesh::FEMContext & c,
                                    bool request_jacobian,
                                    libMesh::DenseSubVector<libMesh::Number> & F,
@@ -180,11 +202,7 @@ private:
   KokkosPetscAssemblyPlan * ensure_kokkos_petsc_plan(bool * rebuilt = nullptr);
 #endif
 
-  void reset_kokkos_goal_cache()
-  {
-    _kokkos_goal_func.reset();
-    _kokkos_fem_goal_func.reset();
-  }
+  void reset_kokkos_goal_cache();
 #else
   void reset_kokkos_goal_cache() {}
 #endif

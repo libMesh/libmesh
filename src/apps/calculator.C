@@ -53,12 +53,6 @@
 #include <memory>
 #include <string>
 
-#ifdef LIBMESH_HAVE_KOKKOS
-#define PETSC_SKIP_CXX_COMPLEX_FIX 1
-#include <Kokkos_Core.hpp>
-#undef __CUDACC_VER__
-#endif
-
 using namespace libMesh;
 
 
@@ -165,7 +159,6 @@ private:
   Number _integral;
 };
 
-#ifdef LIBMESH_HAVE_KOKKOS
 struct KokkosScope
 {
   KokkosScope(int & argc,
@@ -173,20 +166,16 @@ struct KokkosScope
               const bool enable)
     : _enabled(enable)
   {
-    if (_enabled)
-      ::Kokkos::initialize(argc, argv);
+    libmesh_kokkos_initialize(argc, argv, _enabled);
   }
 
   ~KokkosScope()
   {
-    if (_enabled)
-      ::Kokkos::finalize();
+    libmesh_kokkos_finalize(_enabled);
   }
 
   bool _enabled;
 };
-#endif
-
 
 int main(int argc, char ** argv)
 {
@@ -199,9 +188,7 @@ int main(int argc, char ** argv)
                        "--kokkos was requested, but this libMesh build does not have Kokkos enabled");
 #endif
 
-#ifdef LIBMESH_HAVE_KOKKOS
   KokkosScope kokkos_scope(argc, argv, use_kokkos);
-#endif
 
   // In case the mesh file doesn't let us auto-infer dimension, we let
   // the user specify it on the command line
