@@ -144,7 +144,7 @@ AC_DEFUN([CONFIGURE_KOKKOS],
 
               dnl If we found no OpenMPI results, try MPICH arguments
               AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
-                [KOKKOS_MPI_CPPFLAGS=`$CXX -compile_info 2>/dev/null`])
+                [KOKKOS_MPI_CPPFLAGS=`$CXX -cxx='' -compile_info 2>/dev/null`])
 
               dnl If we still have nothing, try Intel MPI arguments
               AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
