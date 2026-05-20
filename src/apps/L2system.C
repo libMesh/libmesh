@@ -2103,10 +2103,10 @@ using libMesh::build_kokkos_petsc_assembly_plan;
 using libMesh::cast_int;
 using libMesh::ensure_kokkos_goal_cache;
 using libMesh::kokkos_petsc_plan_matches;
-using libMesh::libmesh_error_msg;
-using libMesh::libmesh_error_msg_if;
 using libMesh::libmesh_ignore;
 using libMesh::make_hilbert_shape_key;
+using libMesh::kokkos_hilbert_max_dofs;
+using libMesh::kokkos_parsed_fem_max_fields;
 using libMesh::prewarm_kokkos_hilbert_entities;
 namespace detail = libMesh::detail;
 
