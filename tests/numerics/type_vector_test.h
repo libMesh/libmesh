@@ -30,12 +30,14 @@
   CPPUNIT_TEST( testVectorAddAssign );          \
   CPPUNIT_TEST( testVectorSubAssign );          \
                                                 \
+  CPPUNIT_TEST( testIsZero );                   \
+  CPPUNIT_TEST( testSolidAngle );               \
+  CPPUNIT_TEST( testCircumcenter );             \
+                                                \
   CPPUNIT_TEST( testNormBase );                 \
   CPPUNIT_TEST( testNormSqBase );               \
   CPPUNIT_TEST( testValueBase );                \
   CPPUNIT_TEST( testZeroBase );                 \
-  CPPUNIT_TEST( testIsZero );                   \
-  CPPUNIT_TEST( testSolidAngle );               \
                                                 \
   CPPUNIT_TEST( testEqualityBase );             \
   CPPUNIT_TEST( testInEqualityBase );           \
@@ -387,6 +389,31 @@ public:
                        icosa3(0., 1., golden);
     LIBMESH_ASSERT_NUMBERS_EQUAL(solid_angle(icosa1, icosa2, icosa3),
                                 libMesh::pi/5, TOLERANCE*TOLERANCE);
+#endif
+  }
+
+  void testCircumcenter()
+  {
+    LOG_UNIT_TEST;
+
+    const DerivedClass origin(0), e_x(1);
+    DerivedClass twoone(2); twoone(1) = 1;
+
+    auto cc1 = circumcenter(origin, e_x, twoone);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(cc1(0), 0.5, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(cc1(1), 1.5, TOLERANCE*TOLERANCE);
+
+#if LIBMESH_DIM > 2
+    LIBMESH_ASSERT_NUMBERS_EQUAL(cc1(2), 0, TOLERANCE*TOLERANCE);
+    const DerivedClass twozeroone(2,0,1);
+    auto cc2 = circumcenter(origin, e_x, twozeroone);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(cc2(0), 0.5, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(cc2(1), 0, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(cc2(2), 1.5, TOLERANCE*TOLERANCE);
+    auto cc3 = circumcenter(e_x, twoone, twozeroone);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(cc3(0), Real(5)/3, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(cc3(1), Real(1)/3, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_NUMBERS_EQUAL(cc3(2), Real(1)/3, TOLERANCE*TOLERANCE);
 #endif
   }
 
