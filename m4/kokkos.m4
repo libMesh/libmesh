@@ -210,7 +210,7 @@ AC_DEFUN([CONFIGURE_KOKKOS],
 
           AS_IF([test "x$kokkos_config_works" = "xyes"],
             [AC_MSG_RESULT([yes])],
-            [AC_MSG_RESULT([no])],
+            [AC_MSG_RESULT([no])
              AC_MSG_ERROR([Kokkos compiler/flags failed to compile and link a minimal test program])])
 
           AC_DEFINE([HAVE_KOKKOS], [1],
