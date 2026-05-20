@@ -61116,6 +61116,22 @@ fi
 then :
   KOKKOS_MPI_CPPFLAGS="$MPI_INCLUDES"
 fi
+
+
+              STRIPPED_FLAGS=""
+              for flag in $KOKKOS_MPI_CPPFLAGS; do
+                case "$flag" in
+                  -O*) # Skip possibly-undesired optimization level
+                    ;;
+                  -std=*) # Skip possibly-incompatible standard
+                    ;;
+                  *) # Append everything else
+                    STRIPPED_FLAGS="$STRIPPED_FLAGS $flag"
+                    ;;
+                esac
+              done
+              KOKKOS_MPI_CPPFLAGS=$STRIPPED_FLAGS
+
               if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
