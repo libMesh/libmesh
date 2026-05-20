@@ -145,6 +145,27 @@ AC_DEFUN([CONFIGURE_KOKKOS],
                 [KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^[^ ]* //'`])
               AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
                 [KOKKOS_MPI_CPPFLAGS="$MPI_INCLUDES"])
+
+              dnl Our MPI compiler might be reporting a mix of flags
+              dnl we do and do not want.  We could try to retain
+              dnl everything that looks like a linker flag or include
+              dnl path, but linker flags can get weird, so instead we
+              dnl strip out everything that looks like a conflict.
+
+              STRIPPED_FLAGS=""
+              for flag in $KOKKOS_MPI_CPPFLAGS; do
+                case "$flag" in
+                  -O*) # Skip possibly-undesired optimization level
+                    ;;
+                  -std=*) # Skip possibly-incompatible standard
+                    ;;
+                  *) # Append everything else
+                    STRIPPED_FLAGS="$STRIPPED_FLAGS $flag"
+                    ;;
+                esac
+              done
+              KOKKOS_MPI_CPPFLAGS=$STRIPPED_FLAGS
+
               AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
                 [AC_MSG_RESULT([not found])],
                 [AC_MSG_RESULT([$KOKKOS_MPI_CPPFLAGS])])
