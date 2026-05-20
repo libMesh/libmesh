@@ -198,7 +198,8 @@ AC_DEFUN([CONFIGURE_KOKKOS],
           enablekokkos=no
         ])
     ],
-    [enablekokkos=no])
+    [AC_MSG_NOTICE(<<< Configuring library without Kokkos support >>>)
+     enablekokkos=no])
   
   AC_SUBST([KOKKOS_CXX])
   AC_SUBST([KOKKOS_CPPFLAGS])
