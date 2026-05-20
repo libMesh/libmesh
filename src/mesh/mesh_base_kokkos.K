@@ -26,7 +26,7 @@ namespace libMesh
 {
 
 #ifdef LIBMESH_HAVE_KOKKOS
-void MeshBase::delete_kokkos_geometry_cache(KokkosGeometryCache * cache)
+void MeshBase::KokkosGeometryCacheDeleter::operator()(KokkosGeometryCache * cache) const
 {
   delete cache;
 }
@@ -37,8 +37,7 @@ MeshBase::get_kokkos_geometry_cache() const
   if (_kokkos_geometry_cache)
     return *_kokkos_geometry_cache;
 
-  auto cache = kokkos_geometry_cache_ptr(new KokkosGeometryCache(),
-                                         &MeshBase::delete_kokkos_geometry_cache);
+  auto cache = kokkos_geometry_cache_ptr(new KokkosGeometryCache());
   cache->host_element_ids.reserve(this->n_active_local_elem());
 
   for (const auto & elem : this->active_local_element_ptr_range())

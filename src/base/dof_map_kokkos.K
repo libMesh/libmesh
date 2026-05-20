@@ -32,12 +32,12 @@ namespace libMesh
 {
 
 #ifdef LIBMESH_HAVE_KOKKOS
-void DofMap::delete_kokkos_dof_index_cache(KokkosDofIndexCache * cache)
+void DofMap::KokkosDofIndexCacheDeleter::operator()(KokkosDofIndexCache * cache) const
 {
   delete cache;
 }
 
-void DofMap::delete_kokkos_local_index_cache(KokkosLocalIndexCache * cache)
+void DofMap::KokkosLocalIndexCacheDeleter::operator()(KokkosLocalIndexCache * cache) const
 {
   delete cache;
 }
@@ -49,8 +49,7 @@ DofMap::get_kokkos_dof_index_cache(const unsigned int vn) const
     return it->second.get();
 
   const auto & geometry_cache = _mesh.get_kokkos_geometry_cache();
-  auto cache =
-    kokkos_dof_index_cache_ptr(new KokkosDofIndexCache(), &DofMap::delete_kokkos_dof_index_cache);
+  auto cache = kokkos_dof_index_cache_ptr(new KokkosDofIndexCache());
   std::vector<dof_id_type> dof_indices;
   cache->host_element_ids = geometry_cache.host_element_ids;
 
@@ -133,8 +132,7 @@ DofMap::get_kokkos_local_index_cache(const NumericVector<Number> & local_vector,
     return nullptr;
 
   const auto & geometry_cache = _mesh.get_kokkos_geometry_cache();
-  auto cache = kokkos_local_index_cache_ptr(new KokkosLocalIndexCache(),
-                                            &DofMap::delete_kokkos_local_index_cache);
+  auto cache = kokkos_local_index_cache_ptr(new KokkosLocalIndexCache());
   cache->max_dofs = dof_index_cache->max_dofs;
 
   cache->element_local_indices =

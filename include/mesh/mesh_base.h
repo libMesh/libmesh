@@ -192,14 +192,17 @@ public:
 
 #ifdef LIBMESH_HAVE_KOKKOS
   struct KokkosGeometryCache;
+  struct KokkosGeometryCacheDeleter
+  {
+    void operator()(KokkosGeometryCache *) const;
+  };
   using kokkos_geometry_cache_ptr =
-    std::unique_ptr<KokkosGeometryCache, void (*)(KokkosGeometryCache *)>;
+    std::unique_ptr<KokkosGeometryCache, KokkosGeometryCacheDeleter>;
 
   const KokkosGeometryCache & get_kokkos_geometry_cache() const;
   unsigned int get_kokkos_elem_index(const Elem & elem) const;
   void prepare_kokkos_geometry_cache() const;
 private:
-  static void delete_kokkos_geometry_cache(KokkosGeometryCache *);
 #else
   void prepare_kokkos_geometry_cache() const {}
 private:

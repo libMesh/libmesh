@@ -39,7 +39,15 @@ struct static_dim_storage_policy
 
 using layout_left_storage_policy = static_dim_storage_policy<libMesh::Real, ::Kokkos::LayoutLeft>;
 using layout_right_storage_policy = static_dim_storage_policy<libMesh::Real, ::Kokkos::LayoutRight>;
-using default_storage_policy = layout_right_storage_policy;
+using default_vector_layout =
+  typename ::Kokkos::View<libMesh::Real * [LIBMESH_DIM]>::array_layout;
+using default_tensor_layout =
+  typename ::Kokkos::View<libMesh::Real * [LIBMESH_DIM][LIBMESH_DIM]>::array_layout;
+
+static_assert(std::is_same<default_vector_layout, default_tensor_layout>::value,
+              "Kokkos fixed-dimension vector/tensor views must agree on their default layout");
+
+using default_storage_policy = static_dim_storage_policy<libMesh::Real, default_vector_layout>;
 
 template <typename StoragePolicy>
 constexpr const char *

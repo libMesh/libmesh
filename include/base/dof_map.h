@@ -1817,10 +1817,18 @@ public:
 #ifdef LIBMESH_HAVE_KOKKOS
   struct KokkosDofIndexCache;
   struct KokkosLocalIndexCache;
+  struct KokkosDofIndexCacheDeleter
+  {
+    void operator()(KokkosDofIndexCache *) const;
+  };
+  struct KokkosLocalIndexCacheDeleter
+  {
+    void operator()(KokkosLocalIndexCache *) const;
+  };
   using kokkos_dof_index_cache_ptr =
-    std::unique_ptr<KokkosDofIndexCache, void (*)(KokkosDofIndexCache *)>;
+    std::unique_ptr<KokkosDofIndexCache, KokkosDofIndexCacheDeleter>;
   using kokkos_local_index_cache_ptr =
-    std::unique_ptr<KokkosLocalIndexCache, void (*)(KokkosLocalIndexCache *)>;
+    std::unique_ptr<KokkosLocalIndexCache, KokkosLocalIndexCacheDeleter>;
 
   const KokkosDofIndexCache *
   get_kokkos_dof_index_cache(const unsigned int vn = libMesh::invalid_uint) const;
@@ -1839,8 +1847,6 @@ public:
   void clear_kokkos_caches() const;
 
 private:
-  static void delete_kokkos_dof_index_cache(KokkosDofIndexCache *);
-  static void delete_kokkos_local_index_cache(KokkosLocalIndexCache *);
 #else
 
 private:
