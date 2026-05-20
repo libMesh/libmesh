@@ -426,12 +426,6 @@ struct casting_compare {
 //
 // The libmesh_terminate() macro prints a message and throws a
 // TerminationException exception
-#if LIBMESH_IN_DEVICE_CODE
-#define libmesh_error_msg(msg)                                          \
-  do {                                                                  \
-    LIBMESH_DEVICE_ERROR_MSG(msg);                                      \
-  } while (0)
-#else
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
     std::stringstream message_stream;                                   \
@@ -439,7 +433,6 @@ struct casting_compare {
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME, message_stream); \
     LIBMESH_THROW(libMesh::LogicError(message_stream.str()));           \
   } while (0)
-#endif
 
 #define libmesh_error() libmesh_error_msg("")
 
