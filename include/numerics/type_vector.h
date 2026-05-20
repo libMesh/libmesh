@@ -1071,6 +1071,10 @@ T solid_angle(const TypeVector<T> & v01,
 
 
 // Compute the (possibly 3D) circumcenter of three non-collinear points
+//
+// If perfectly collinear points are provided, this algorithm computes
+// NaN.  If near-collinear points are provided, the algorithm may be
+// numerically unstable.
 template <typename T>
 inline
 TypeVector<T> circumcenter(const TypeVector<T> & p0,
