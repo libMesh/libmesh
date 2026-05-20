@@ -138,13 +138,17 @@ AC_DEFUN([CONFIGURE_KOKKOS],
           AS_IF([test "x$enablempi" = "xyes" && test "x$KOKKOS_CXX" != "x$CXX"],
             [
               AC_MSG_CHECKING([for MPI compile flags usable with KOKKOS_CXX])
+
+              dnl Check for flags from OpenMPI mpicxx
               KOKKOS_MPI_CPPFLAGS=`$CXX -showme:compile 2>/dev/null`
+
+              dnl If we found no OpenMPI results, try MPICH arguments
               AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
                 [KOKKOS_MPI_CPPFLAGS=`$CXX -compile_info 2>/dev/null`])
+
+              dnl If we still have nothing, try Intel MPI arguments
               AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
                 [KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^[^ ]* //'`])
-              AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
-                [KOKKOS_MPI_CPPFLAGS="$MPI_INCLUDES"])
 
               dnl Our MPI compiler might be reporting a mix of flags
               dnl we do and do not want.  We could try to retain
@@ -166,6 +170,11 @@ AC_DEFUN([CONFIGURE_KOKKOS],
               done
               KOKKOS_MPI_CPPFLAGS=$STRIPPED_FLAGS
 
+              dnl If we still have nothing, fall back to the env?
+              AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
+                [KOKKOS_MPI_CPPFLAGS="$MPI_INCLUDES"])
+
+              dnl Report what we finally do or do not have
               AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
                 [AC_MSG_RESULT([not found])],
                 [AC_MSG_RESULT([$KOKKOS_MPI_CPPFLAGS])])
