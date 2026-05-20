@@ -999,10 +999,12 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         libmesh_optional_LIBS="$libmesh_optional_LIBS $KOKKOS_LDFLAGS $KOKKOS_LIBS"
 
         dnl If KOKKOS_CXX differs from the main compiler, it may not be the MPI
-        dnl wrapper and thus may need the wrapper's compile flags explicitly in
-        dnl order to find mpi.h.  Query the primary CXX wrapper for compile-time
-        dnl flags and fall back to MPI_INCLUDES when probing is unavailable.
+        dnl wrapper and thus may need the wrapper's compile and link flags
+        dnl explicitly in order to find mpi.h and resolve MPI symbols. Query
+        dnl the primary CXX wrapper first and fall back to the configure-time
+        dnl MPI variables when probing is unavailable.
         KOKKOS_MPI_CPPFLAGS=""
+        KOKKOS_MPI_LIBS=""
         AS_IF([test "x$enablempi" = "xyes" && test "x$KOKKOS_CXX" != "x$CXX"],
           [
             AC_MSG_CHECKING([for MPI compile flags usable with KOKKOS_CXX])
@@ -1016,7 +1018,21 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
             AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
               [AC_MSG_RESULT([not found])],
               [AC_MSG_RESULT([$KOKKOS_MPI_CPPFLAGS])])
+
+            AC_MSG_CHECKING([for MPI link flags usable with KOKKOS_CXX])
+            KOKKOS_MPI_LIBS=`$CXX -showme:link 2>/dev/null`
+            AS_IF([test "x$KOKKOS_MPI_LIBS" = "x"],
+              [KOKKOS_MPI_LIBS=`$CXX -link_info 2>/dev/null`])
+            AS_IF([test "x$KOKKOS_MPI_LIBS" = "x"],
+              [KOKKOS_MPI_LIBS=`$CXX -show 2>/dev/null | sed 's/^[^ ]* //'`])
+            AS_IF([test "x$KOKKOS_MPI_LIBS" = "x"],
+              [KOKKOS_MPI_LIBS="$MPI_LDFLAGS $MPI_LIBS"])
+            AS_IF([test "x$KOKKOS_MPI_LIBS" = "x"],
+              [AC_MSG_RESULT([not found])],
+              [AC_MSG_RESULT([$KOKKOS_MPI_LIBS])])
           ])
+
+        libmesh_optional_LIBS="$libmesh_optional_LIBS $KOKKOS_MPI_LIBS"
 
         dnl Fail configure early if the chosen Kokkos compiler/flags/libs cannot
         dnl actually compile and link a minimal Kokkos program.
@@ -1031,7 +1047,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
         CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
         LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
-        LIBS="$LIBS $KOKKOS_LIBS"
+        LIBS="$LIBS $KOKKOS_LIBS $KOKKOS_MPI_LIBS"
         AC_LANG_PUSH([C++])
 
         AS_IF([test "x$enablempi" = "xyes"],
