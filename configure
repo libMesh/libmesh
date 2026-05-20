@@ -61222,7 +61222,9 @@ then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 else case e in #(
-  e) as_fn_error $? "configured Kokkos compiler/flags failed to compile and link a minimal test program" "$LINENO" 5 ;;
+  e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf "%s\n" "no" >&6; }
+             as_fn_error $? "Kokkos compiler/flags failed to compile and link a minimal test program" "$LINENO" 5 ;;
 esac
 fi
 
