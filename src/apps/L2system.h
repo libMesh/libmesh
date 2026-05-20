@@ -43,6 +43,10 @@ namespace Kokkos
             unsigned int MaxFieldVariables>
   class KokkosParsedFEMFunction;
 }
+
+#if defined(LIBMESH_HAVE_KOKKOS) && defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
+struct KokkosPetscAssemblyPlan;
+#endif
 }
 
 void libmesh_kokkos_initialize(int & argc,
@@ -50,12 +54,6 @@ void libmesh_kokkos_initialize(int & argc,
                                bool enable);
 
 void libmesh_kokkos_finalize(bool enable);
-
-// FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
-// but we must specify element residuals
-#if defined(LIBMESH_HAVE_KOKKOS) && defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
-struct KokkosPetscAssemblyPlan;
-#endif
 
 class HilbertSystem : public libMesh::FEMSystem
 {
@@ -170,7 +168,7 @@ protected:
   std::unique_ptr<libMesh::Kokkos::KokkosParsedFunction<libMesh::Number, 64>> _kokkos_goal_func;
   std::unique_ptr<libMesh::Kokkos::KokkosParsedFEMFunction<libMesh::Number, 64, 16>> _kokkos_fem_goal_func;
 #if defined(LIBMESH_HAVE_PETSC)
-  std::unique_ptr<KokkosPetscAssemblyPlan> _kokkos_petsc_plan;
+  std::unique_ptr<libMesh::KokkosPetscAssemblyPlan> _kokkos_petsc_plan;
 #endif
 #endif
 
@@ -201,7 +199,7 @@ private:
                                    libMesh::DenseSubMatrix<libMesh::Number> & K);
 #if defined(LIBMESH_HAVE_PETSC)
   bool try_kokkos_petsc_solve();
-  KokkosPetscAssemblyPlan * ensure_kokkos_petsc_plan(bool * rebuilt = nullptr);
+  libMesh::KokkosPetscAssemblyPlan * ensure_kokkos_petsc_plan(bool * rebuilt = nullptr);
 #endif
 
   void reset_kokkos_goal_cache();

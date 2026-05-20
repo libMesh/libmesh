@@ -148,7 +148,7 @@ accumulate_hilbert_dense_outputs(const KokkosScalarView<Number> & d_F,
 }
 
 void
-build_hilbert_element_records(HilbertSystem & sys,
+build_hilbert_element_records(::HilbertSystem & sys,
                               std::vector<HilbertElementAssemblyRecord> & records,
                               std::size_t & total_rhs_entries,
                               std::size_t & total_mat_entries)
@@ -182,7 +182,7 @@ build_hilbert_element_records(HilbertSystem & sys,
 }
 
 bool
-build_hilbert_record_quadrature_orders(HilbertSystem & sys,
+build_hilbert_record_quadrature_orders(::HilbertSystem & sys,
                                        std::vector<HilbertElementAssemblyRecord> & records)
 {
   const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
@@ -232,7 +232,7 @@ ensure_kokkos_goal_cache(std::unique_ptr<CachedGoal> & cache,
 }
 
 void
-prewarm_kokkos_hilbert_entities(HilbertSystem & sys,
+prewarm_kokkos_hilbert_entities(::HilbertSystem & sys,
                                 const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal)
 {
   if (sys.current_local_solution)
@@ -524,7 +524,7 @@ sync_kokkos_petsc_remote_slot_views(KokkosPetscAssemblyPlan & plan)
 }
 
 bool
-build_kokkos_petsc_owned_csr_graph(HilbertSystem & sys,
+build_kokkos_petsc_owned_csr_graph(::HilbertSystem & sys,
                                    KokkosPetscAssemblyPlan & plan,
                                    const KokkosDirectMatrixLayout layout,
                                    const PetscInt row_start,
@@ -619,7 +619,7 @@ build_kokkos_petsc_owned_csr_graph(HilbertSystem & sys,
 }
 
 void
-finalize_kokkos_direct_slots(HilbertSystem & sys,
+finalize_kokkos_direct_slots(::HilbertSystem & sys,
                              KokkosPetscAssemblyPlan & plan,
                              const std::vector<std::size_t> & rhs_local_slots,
                              const std::vector<std::size_t> & mat_value_slots)
@@ -713,7 +713,7 @@ lookup_kokkos_owned_matrix_slot(const KokkosPetscAssemblyPlan & plan,
 }
 
 bool
-build_kokkos_petsc_remote_rhs_sf(HilbertSystem & sys,
+build_kokkos_petsc_remote_rhs_sf(::HilbertSystem & sys,
                                  KokkosPetscAssemblyPlan & plan)
 {
   if (plan.direct_matrix_layout != KokkosDirectMatrixLayout::mpi_aij ||
@@ -745,7 +745,7 @@ build_kokkos_petsc_remote_rhs_sf(HilbertSystem & sys,
 }
 
 bool
-build_kokkos_petsc_remote_mat_sf(HilbertSystem & sys,
+build_kokkos_petsc_remote_mat_sf(::HilbertSystem & sys,
                                  KokkosPetscAssemblyPlan & plan)
 {
   if (plan.direct_matrix_layout != KokkosDirectMatrixLayout::mpi_aij ||
@@ -851,7 +851,7 @@ build_kokkos_petsc_remote_mat_sf(HilbertSystem & sys,
 }
 
 bool
-build_kokkos_petsc_remote_sf(HilbertSystem & sys,
+build_kokkos_petsc_remote_sf(::HilbertSystem & sys,
                              KokkosPetscAssemblyPlan & plan)
 {
   clear_kokkos_petsc_remote_sf(plan);
@@ -864,7 +864,7 @@ build_kokkos_petsc_remote_sf(HilbertSystem & sys,
 }
 
 bool
-bind_kokkos_direct_slots_from_plan_graph(HilbertSystem & sys,
+bind_kokkos_direct_slots_from_plan_graph(::HilbertSystem & sys,
                                          const DofMap::KokkosDofIndexCache & dof_index_cache,
                                          KokkosPetscAssemblyPlan & plan,
                                          const numeric_index_type rhs_first_local,
@@ -1005,7 +1005,7 @@ bind_kokkos_direct_slots_from_plan_graph(HilbertSystem & sys,
 }
 
 bool
-ensure_kokkos_petsc_owned_matrix(HilbertSystem & sys,
+ensure_kokkos_petsc_owned_matrix(::HilbertSystem & sys,
                                  KokkosPetscAssemblyPlan & plan,
                                  PetscMatrixBase<Number> & system_matrix)
 {
@@ -1058,7 +1058,7 @@ ensure_kokkos_petsc_owned_matrix(HilbertSystem & sys,
 }
 
 bool
-ensure_kokkos_petsc_direct_storage(HilbertSystem & sys,
+ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
                                    const DofMap::KokkosDofIndexCache & dof_index_cache,
                                    KokkosPetscAssemblyPlan & plan,
                                    PetscMatrixBase<Number> & system_matrix,
@@ -1147,7 +1147,7 @@ namespace
 {
 
 bool
-build_kokkos_element_state(HilbertSystem & sys,
+build_kokkos_element_state(::HilbertSystem & sys,
                            const Elem & elem,
                            KokkosElementAssemblyState & state)
 {
@@ -1335,7 +1335,7 @@ build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & recor
 }
 
 bool
-kokkos_petsc_plan_matches(const HilbertSystem & sys,
+kokkos_petsc_plan_matches(const ::HilbertSystem & sys,
                           const MeshBase::KokkosGeometryCache & geometry_cache,
                           const DofMap::KokkosDofIndexCache & dof_index_cache,
                           const KokkosPetscAssemblyPlan & plan)
@@ -1349,7 +1349,7 @@ kokkos_petsc_plan_matches(const HilbertSystem & sys,
 }
 
 bool
-build_kokkos_petsc_assembly_plan(HilbertSystem & sys,
+build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
                                  KokkosPetscAssemblyPlan & plan)
 {
   const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
@@ -1393,7 +1393,7 @@ build_kokkos_petsc_assembly_plan(HilbertSystem & sys,
 }
 
 bool
-build_kokkos_fem_goal_batch_data(HilbertSystem & sys,
+build_kokkos_fem_goal_batch_data(::HilbertSystem & sys,
                                  const KokkosPetscAssemblyPlan & plan,
                                  const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & goal_function,
                                  KokkosFEMGoalBatchData & batch_data)
@@ -1454,7 +1454,7 @@ build_kokkos_fem_goal_batch_data(HilbertSystem & sys,
 }
 
 bool
-ensure_kokkos_fem_goal_batch_data(HilbertSystem & sys,
+ensure_kokkos_fem_goal_batch_data(::HilbertSystem & sys,
                                   const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & goal_function,
                                   KokkosPetscAssemblyPlan & plan)
 {
@@ -1608,7 +1608,7 @@ assemble_kokkos_hilbert_fem_goal_element(const FEShapeKey output_key,
 
 #if defined(LIBMESH_HAVE_PETSC)
 bool
-assemble_host_exact_parsed_fem_goal_element(HilbertSystem & sys,
+assemble_host_exact_parsed_fem_goal_element(::HilbertSystem & sys,
                                             FEMContext & c,
                                             const bool request_jacobian,
                                             DenseSubVector<Number> & F,
@@ -1737,7 +1737,7 @@ assemble_kokkos_hilbert_fem_goal_device_values(const FEShapeKey output_key,
 
 template <typename ResidualView, typename JacobianView>
 bool
-assemble_kokkos_hilbert_record_values(HilbertSystem & sys,
+assemble_kokkos_hilbert_record_values(::HilbertSystem & sys,
                                       const HilbertElementAssemblyRecord & record,
                                       const unsigned int quadrature_order,
                                       const libMesh::Kokkos::KokkosParsedFunction<Number> * analytic_goal,
@@ -1772,13 +1772,13 @@ assemble_kokkos_hilbert_record_values(HilbertSystem & sys,
 }
 
 bool
-assemble_kokkos_petsc_global_system(HilbertSystem & sys,
+assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                     KokkosPetscAssemblyPlan & plan,
                                     const libMesh::Kokkos::KokkosParsedFunction<Number> * analytic_goal,
                                     const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal,
                                     PetscMatrixBase<Number> & system_matrix,
                                     PetscVector<Number> & system_rhs,
-                                    HilbertSystem::KokkosAssemblyPath & assembly_path)
+                                    ::HilbertSystem::KokkosAssemblyPath & assembly_path)
 {
   libmesh_error_msg_if(sys.has_static_condensation(),
                        "HilbertSystem Kokkos direct PETSc storage does not support static "
@@ -1799,7 +1799,7 @@ assemble_kokkos_petsc_global_system(HilbertSystem & sys,
                       "The COO fallback path has been removed; this case must be supported "
                       "directly or fail.");
 
-  assembly_path = HilbertSystem::KokkosAssemblyPath::petsc_direct_storage;
+  assembly_path = ::HilbertSystem::KokkosAssemblyPath::petsc_direct_storage;
   using KokkosVectorWriteView =
     typename PetscVector<Number>::kokkos_write_view;
   using KokkosMatrixWriteView =
@@ -2077,6 +2077,38 @@ assemble_kokkos_petsc_global_system(HilbertSystem & sys,
 }
 } // anonymous namespace
 #endif
+
+} // namespace libMesh
+
+using libMesh::DenseSubMatrix;
+using libMesh::DenseSubVector;
+using libMesh::Elem;
+using libMesh::FEMContext;
+using libMesh::FEShapeKey;
+using libMesh::KokkosElementAssemblyState;
+using libMesh::KokkosPetscAssemblyPlan;
+using libMesh::LinearSolver;
+using libMesh::Number;
+using libMesh::ParsedFEMFunction;
+using libMesh::ParsedFunction;
+using libMesh::PetscMatrixBase;
+using libMesh::PetscVector;
+using libMesh::Real;
+using libMesh::assemble_host_exact_parsed_fem_goal_element;
+using libMesh::assemble_kokkos_hilbert_element;
+using libMesh::assemble_kokkos_hilbert_fem_goal_element;
+using libMesh::assemble_kokkos_petsc_global_system;
+using libMesh::build_kokkos_element_state;
+using libMesh::build_kokkos_petsc_assembly_plan;
+using libMesh::cast_int;
+using libMesh::ensure_kokkos_goal_cache;
+using libMesh::kokkos_petsc_plan_matches;
+using libMesh::libmesh_error_msg;
+using libMesh::libmesh_error_msg_if;
+using libMesh::libmesh_ignore;
+using libMesh::make_hilbert_shape_key;
+using libMesh::prewarm_kokkos_hilbert_entities;
+namespace detail = libMesh::detail;
 
 HilbertSystem::~HilbertSystem () = default;
 
@@ -2384,7 +2416,6 @@ HilbertSystem::try_kokkos_petsc_solve()
 }
 #endif
 #endif
-} // namespace libMesh
 
 #endif // LIBMESH_L2SYSTEM_KOKKOS_IMPL
 
