@@ -73640,7 +73640,9 @@ fi
 
 
 else case e in #(
-  e) enablekokkos=no ;;
+  e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: <<< Configuring library without Kokkos support >>>" >&5
+printf "%s\n" "$as_me: <<< Configuring library without Kokkos support >>>" >&6;}
+     enablekokkos=no ;;
 esac
 fi
 
@@ -78377,6 +78379,7 @@ fi
         printf "%s\n" "  gmv.............................. : $enablegmv"
         printf "%s\n" "  gzstream......................... : $enablegz"
         printf "%s\n" "  hdf5............................. : $enablehdf5"
+        printf "%s\n" "  kokkos........................... : $enablekokkos"
         printf "%s\n" "  laspack.......................... : $enablelaspack"
         printf "%s\n" "  libhilbert....................... : $enablelibhilbert"
         printf "%s\n" "  metaphysicl...................... : $enablemetaphysicl"
