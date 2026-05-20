@@ -35,12 +35,12 @@ namespace libMesh
 {
 namespace Kokkos
 {
-  template <typename Output = libMesh::Number, unsigned int MaxStack = 64>
+  template <typename Output, unsigned int MaxStack>
   class KokkosParsedFunction;
 
-  template <typename Output = libMesh::Number,
-            unsigned int MaxStack = 64,
-            unsigned int MaxFieldVariables = 16>
+  template <typename Output,
+            unsigned int MaxStack,
+            unsigned int MaxFieldVariables>
   class KokkosParsedFEMFunction;
 }
 }
@@ -167,8 +167,8 @@ protected:
   std::unique_ptr<libMesh::FDMGradient<libMesh::Gradient>> _goal_grad;
   std::unique_ptr<libMesh::FunctionBase<libMesh::Gradient>> _analytic_goal_grad;
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  std::unique_ptr<libMesh::Kokkos::KokkosParsedFunction<libMesh::Number>> _kokkos_goal_func;
-  std::unique_ptr<libMesh::Kokkos::KokkosParsedFEMFunction<libMesh::Number>> _kokkos_fem_goal_func;
+  std::unique_ptr<libMesh::Kokkos::KokkosParsedFunction<libMesh::Number, 64>> _kokkos_goal_func;
+  std::unique_ptr<libMesh::Kokkos::KokkosParsedFEMFunction<libMesh::Number, 64, 16>> _kokkos_fem_goal_func;
 #if defined(LIBMESH_HAVE_PETSC)
   std::unique_ptr<KokkosPetscAssemblyPlan> _kokkos_petsc_plan;
 #endif
@@ -184,8 +184,8 @@ protected:
 
 private:
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  const libMesh::Kokkos::KokkosParsedFunction<libMesh::Number> * ensure_kokkos_goal_func();
-  const libMesh::Kokkos::KokkosParsedFEMFunction<libMesh::Number> * ensure_kokkos_fem_goal_func();
+  const libMesh::Kokkos::KokkosParsedFunction<libMesh::Number, 64> * ensure_kokkos_goal_func();
+  const libMesh::Kokkos::KokkosParsedFEMFunction<libMesh::Number, 64, 16> * ensure_kokkos_fem_goal_func();
   bool needs_exact_kokkos_fem_goal_context();
   bool try_exact_kokkos_analytic_goal_host_assembly(libMesh::FEMContext & c,
                                                     bool request_jacobian,
