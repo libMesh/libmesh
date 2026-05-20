@@ -35,10 +35,12 @@ namespace libMesh
 {
 namespace Kokkos
 {
-  template <typename Output>
+  template <typename Output = libMesh::Number, unsigned int MaxStack = 64>
   class KokkosParsedFunction;
 
-  template <typename Output>
+  template <typename Output = libMesh::Number,
+            unsigned int MaxStack = 64,
+            unsigned int MaxFieldVariables = 16>
   class KokkosParsedFEMFunction;
 }
 }
