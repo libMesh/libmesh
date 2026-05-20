@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+# Wrapper around Kokkos' nvcc_wrapper to smooth over Automake dependency
+# tracking flags that nvcc_wrapper does not fully understand.
+#
+# In particular:
+# - Automake commonly passes -MP, which is meaningful to GCC dependency
+#   generation but ends up leaking to the host compiler without -M/-MM through
+#   nvcc_wrapper's split dependency path.
+# - -MQ is the quoted-target form of -MT; nvcc_wrapper only understands -MT.
+
+set -euo pipefail
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $0 REAL_NVCC_WRAPPER [ARGS...]" >&2
+  exit 2
+fi
+
+real_nvcc_wrapper=$1
+shift
+
+forwarded_args=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -MP)
+      shift
+      ;;
+    -MQ)
+      if [[ $# -lt 2 ]]; then
+        echo "$0: -MQ requires an argument" >&2
+        exit 2
+      fi
+      forwarded_args+=(-MT "$2")
+      shift 2
+      ;;
+    *)
+      forwarded_args+=("$1")
+      shift
+      ;;
+  esac
+done
+
+exec "$real_nvcc_wrapper" "${forwarded_args[@]}"

@@ -967,7 +967,10 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
                       ],
                       [AC_MSG_RESULT([$libmesh_kokkos_host_cxx])])
 
-                    KOKKOS_CXX="$NVCC_WRAPPER"
+                    dnl Route through a tiny libMesh-owned shim so Automake's
+                    dnl dependency-tracking flags do not trip nvcc_wrapper up
+                    dnl on ordinary host-only .C files.
+                    KOKKOS_CXX="$SHELL $srcdir/build-aux/libmesh_nvcc_wrapper $NVCC_WRAPPER"
                     dnl nvcc_wrapper already mediates between nvcc and the host
                     dnl compiler; passing raw nvcc forwarding flags through the
                     dnl wrapper can leak them to g++ and fail.  Keep only the
