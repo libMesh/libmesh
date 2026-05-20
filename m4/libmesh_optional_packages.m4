@@ -1121,13 +1121,12 @@ int main(int argc, char ** argv)
           [AC_MSG_RESULT([yes])],
           [AC_MSG_ERROR([configured Kokkos compiler/flags failed to compile and link a minimal test program])])
 
-        dnl Use the validated Kokkos compiler as the project-wide C++ compiler
-        dnl for Kokkos-enabled builds.  Automake-generated rules compile .C
-        dnl translation units with $(CXX), so the switch has to happen at
-        dnl configure time rather than in Makefile.am.
-        CXX="$KOKKOS_CXX"
-        LIBMESH_KOKKOS_BUILD_CPPFLAGS="$KOKKOS_MPI_CPPFLAGS $KOKKOS_CPPFLAGS"
-        LIBMESH_KOKKOS_BUILD_CXXFLAGS="$KOKKOS_CXXFLAGS"
+        dnl Keep ordinary translation units on the configured host compiler,
+        dnl but make Kokkos headers available project-wide.  Dedicated .K
+        dnl sources are compiled with $(KOKKOS_CXX) in Makefile.am, where
+        dnl LIBMESH_KOKKOS_COMPILATION is re-enabled explicitly.
+        LIBMESH_KOKKOS_BUILD_CPPFLAGS="$KOKKOS_MPI_CPPFLAGS $KOKKOS_CPPFLAGS -ULIBMESH_KOKKOS_COMPILATION"
+        LIBMESH_KOKKOS_BUILD_CXXFLAGS=""
         LIBMESH_KOKKOS_BUILD_LDFLAGS="$KOKKOS_LDFLAGS"
 
         AC_DEFINE([HAVE_KOKKOS], [1],

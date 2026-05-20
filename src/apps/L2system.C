@@ -58,6 +58,108 @@
 
 using namespace libMesh;
 
+#if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS) && \
+    !defined(LIBMESH_L2SYSTEM_KOKKOS_IMPL)
+namespace
+{
+constexpr unsigned int kokkos_parsed_fem_max_fields = 16;
+
+class HostExactParsedFEMGoalAccess
+{
+public:
+  HostExactParsedFEMGoalAccess(const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & goal,
+                               FEMContext & input_context)
+    : _goal(goal),
+      _input_context(input_context)
+  {
+  }
+
+  template <typename QpData>
+  Number value(const QpData & qp_data, const Point & xyz) const
+  {
+    Number vars[LIBMESH_DIM + 1 + kokkos_parsed_fem_max_fields] = {};
+    fill_variables(qp_data, xyz, vars);
+    return _goal.value(vars);
+  }
+
+  template <typename QpData>
+  Gradient gradient(const QpData & qp_data, const Point & xyz) const
+  {
+    Number vars[LIBMESH_DIM + 1 + kokkos_parsed_fem_max_fields] = {};
+    Gradient field_gradients[kokkos_parsed_fem_max_fields];
+    fill_variables(qp_data, xyz, vars);
+
+    for (unsigned int field = 0; field != _goal.n_field_variables(); ++field)
+      field_gradients[field] =
+        _input_context.interior_gradient(_goal.field_variable_number(field), qp_data.qp_index());
+
+    return _goal.gradient(vars, field_gradients);
+  }
+
+private:
+  template <typename QpData>
+  void fill_variables(const QpData & qp_data,
+                      const Point & xyz,
+                      Number * vars) const
+  {
+    vars[0] = xyz(0);
+#if LIBMESH_DIM > 1
+    vars[1] = xyz(1);
+#endif
+#if LIBMESH_DIM > 2
+    vars[2] = xyz(2);
+#endif
+    vars[LIBMESH_DIM] = _goal.time();
+
+    for (unsigned int field = 0; field != _goal.n_field_variables(); ++field)
+      vars[LIBMESH_DIM + 1 + field] =
+        _input_context.interior_value(_goal.field_variable_number(field), qp_data.qp_index());
+  }
+
+  const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & _goal;
+  FEMContext & _input_context;
+};
+
+#if defined(LIBMESH_HAVE_PETSC)
+bool
+assemble_host_exact_parsed_fem_goal_element(HilbertSystem & sys,
+                                            FEMContext & c,
+                                            const bool request_jacobian,
+                                            DenseSubVector<Number> & F,
+                                            DenseSubMatrix<Number> & K,
+                                            const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & goal_function)
+{
+  if (!sys.input_system)
+    return false;
+
+  FEMContext * goal_context_ptr = sys.get_input_context(c);
+  if (!goal_context_ptr)
+    return false;
+
+  FEMContext & goal_context = *goal_context_ptr;
+  goal_context.pre_fe_reinit(*sys.input_system, &c.get_elem());
+  goal_context.elem_fe_reinit();
+
+  detail::HostHilbertFEAccess fe(c, 0, sys.hilbert_order());
+  detail::HostHilbertAccumulator accum(F, K);
+  auto solution =
+    detail::make_hilbert_solution_access(fe,
+                                         c.get_elem_solution(0),
+                                         c.get_elem_solution_derivative());
+  HostExactParsedFEMGoalAccess goal_access(goal_function, goal_context);
+  detail::assemble_hilbert_element(fe,
+                                   solution,
+                                   goal_access,
+                                   request_jacobian,
+                                   sys.hilbert_order(),
+                                   accum);
+  return true;
+}
+#endif
+} // anonymous namespace
+#endif
+
+#ifdef LIBMESH_L2SYSTEM_KOKKOS_IMPL
 #if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 constexpr unsigned int kokkos_hilbert_max_dofs = 27;
 constexpr unsigned int kokkos_parsed_fem_max_fields = 16;
@@ -2297,6 +2399,30 @@ HilbertSystem::try_kokkos_petsc_solve()
 #endif
 #endif
 
+#endif // LIBMESH_L2SYSTEM_KOKKOS_IMPL
+
+#if !defined(LIBMESH_L2SYSTEM_KOKKOS_IMPL) && \
+    (!defined(LIBMESH_HAVE_KOKKOS) || defined(LIBMESH_USE_COMPLEX_NUMBERS))
+HilbertSystem::~HilbertSystem () = default;
+
+HilbertSystem::HilbertSystem(libMesh::EquationSystems & es,
+                             const std::string & name,
+                             const unsigned int number)
+  : libMesh::FEMSystem(es, name, number),
+    input_system(nullptr),
+    _fe_family("LAGRANGE"),
+    _fe_order(1),
+    _hilbert_order(0),
+    _use_kokkos_backend(false),
+    _use_exact_parsed_fem_host_path(false),
+    _fdm_eps(libMesh::TOLERANCE),
+    _subdomains_list()
+{
+}
+#endif
+
+#ifndef LIBMESH_L2SYSTEM_KOKKOS_IMPL
+
 void HilbertSystem::init_data ()
 {
   this->get_dof_map().full_sparsity_pattern_needed();
@@ -2483,3 +2609,5 @@ void HilbertSystem::solve()
 
   FEMSystem::solve();
 }
+
+#endif // LIBMESH_L2SYSTEM_KOKKOS_IMPL
