@@ -59326,8 +59326,9 @@ then :
 
                                         mkdir -p contrib/qhull/install
 
-                                        if (cd contrib/qhull/build && \
+                                                                                if (cd contrib/qhull/build && \
                    cmake -DBUILD_SHARED_LIBS=OFF \
+                         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
                          -DQHULL_ENABLE_TESTING=OFF \
                          -DBUILD_APPLICATIONS=OFF \
                          -DCMAKE_INSTALL_PREFIX:PATH=$my_top_builddir/contrib/qhull/install \

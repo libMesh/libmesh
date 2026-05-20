@@ -53,9 +53,14 @@ AC_DEFUN([CONFIGURE_QHULL],
 
           dnl Build static libraries only to avoid RPATH issues in
           dnl the build tree.  Disable tests and applications to
-          dnl keep the build lean.
+          dnl keep the build lean.  Force -fPIC on the static
+          dnl archives so they can be linked into libmesh's shared
+          dnl library; qhull's CMakeLists only sets
+          dnl POSITION_INDEPENDENT_CODE on libqhullcpp, not on
+          dnl libqhullstatic_r.
           AS_IF([(cd contrib/qhull/build && \
                    cmake -DBUILD_SHARED_LIBS=OFF \
+                         -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
                          -DQHULL_ENABLE_TESTING=OFF \
                          -DBUILD_APPLICATIONS=OFF \
                          -DCMAKE_INSTALL_PREFIX:PATH=$my_top_builddir/contrib/qhull/install \
