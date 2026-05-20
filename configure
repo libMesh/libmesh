@@ -1362,6 +1362,7 @@ with_kokkos
 with_kokkos_include
 with_kokkos_lib
 with_kokkos_backend
+enable_kokkos_required
 '
       ac_precious_vars='build_alias
 host_alias
@@ -2177,6 +2178,8 @@ Optional Features:
   --disable-metaphysicl   build without MetaPhysicL support
   --enable-metaphysicl-required
                           Error if MetaPhysicL is not detected by configure
+  --enable-kokkos-required
+                          Error if Kokkos is not detected by configure
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -60794,6 +60797,23 @@ esac
 fi
 
 
+      # Check whether --enable-kokkos-required was given.
+if test ${enable_kokkos_required+y}
+then :
+  enableval=$enable_kokkos_required; case "${enableval}" in #(
+  yes) :
+    kokkosrequired=yes ;; #(
+  no) :
+    kokkosrequired=no ;; #(
+  *) :
+    as_fn_error $? "bad value ${enableval} for --enable-kokkos-required" "$LINENO" 5 ;;
+esac
+else case e in #(
+  e) kokkosrequired=no ;;
+esac
+fi
+
+
 
   if test "x$KOKKOS_INCLUDE_DIR" != "xno/include" -a "x$KOKKOS_LIB_DIR" != "xno/lib"
 then :
@@ -61227,6 +61247,11 @@ else case e in #(
 printf "%s\n" "$as_me: <<< Configuring library without Kokkos support >>>" >&6;}
      enablekokkos=no ;;
 esac
+fi
+
+      if test "$enablekokkos" = "no" && test "$kokkosrequired" = "yes"
+then :
+                  as_fn_error 4 "*** Kokkos was not found, but --enable-kokkos-required was specified." "$LINENO" 5
 fi
 
 
