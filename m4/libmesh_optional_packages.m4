@@ -950,8 +950,29 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
                 AC_PATH_PROG([NVCC_WRAPPER],[nvcc_wrapper],[no],[$PATH])
                 AS_IF([test "x$NVCC_WRAPPER" != "xno"],
                   [
+                    libmesh_kokkos_host_cxx=""
+                    AS_IF([test "x$enablempi" = "xyes"],
+                      [
+                        libmesh_kokkos_host_cxx=`$CXX --showme:command 2>/dev/null`
+                        AS_IF([test "x$libmesh_kokkos_host_cxx" = "x"],
+                          [libmesh_kokkos_host_cxx=`$CXX -show 2>/dev/null | sed 's/ .*//'`])
+                      ],
+                      [libmesh_kokkos_host_cxx="$CXX"])
+
+                    AC_MSG_CHECKING([for host compiler usable with nvcc_wrapper])
+                    AS_IF([test "x$libmesh_kokkos_host_cxx" = "x"],
+                      [
+                        AC_MSG_RESULT([not found])
+                        AC_MSG_ERROR([Could not determine a host compiler to pass to nvcc_wrapper. Set KOKKOS_CXXFLAGS with a suitable -ccbin value or provide NVCC_WRAPPER_DEFAULT_COMPILER in the environment.])
+                      ],
+                      [AC_MSG_RESULT([$libmesh_kokkos_host_cxx])])
+
                     KOKKOS_CXX="$NVCC_WRAPPER"
-                    KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu"
+                    dnl nvcc_wrapper already mediates between nvcc and the host
+                    dnl compiler; passing raw nvcc forwarding flags through the
+                    dnl wrapper can leak them to g++ and fail.  Keep only the
+                    dnl CUDA flags the wrapper recognizes here.
+                    KOKKOS_CXXFLAGS="--extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu -ccbin $libmesh_kokkos_host_cxx"
                     KOKKOS_LDFLAGS="$libmesh_kokkos_lib_dirs"
                   ],
                   [
