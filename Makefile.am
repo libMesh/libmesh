@@ -376,7 +376,7 @@ if LIBMESH_DBG_MODE
   libmesh_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
   libmesh_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
   libmesh_dbg_la_CFLAGS   = $(CFLAGS_DBG)
-  libmesh_dbg_la_LIBADD   = contrib/libcontrib_dbg.la $(KOKKOS_LIBMESH_DBG_OBJECTS) $(LIBS)
+  libmesh_dbg_la_LIBADD   = contrib/libcontrib_dbg.la $(LIBS)
 endif
 
 if LIBMESH_DEVEL_MODE
@@ -385,7 +385,7 @@ if LIBMESH_DEVEL_MODE
   libmesh_devel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
   libmesh_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
   libmesh_devel_la_CFLAGS   = $(CFLAGS_DEVEL)
-  libmesh_devel_la_LIBADD   = contrib/libcontrib_devel.la $(KOKKOS_LIBMESH_DEVEL_OBJECTS) $(LIBS)
+  libmesh_devel_la_LIBADD   = contrib/libcontrib_devel.la $(LIBS)
 endif
 
 if LIBMESH_OPT_MODE
@@ -394,7 +394,7 @@ if LIBMESH_OPT_MODE
   libmesh_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
   libmesh_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
   libmesh_opt_la_CFLAGS   = $(CFLAGS_OPT)
-  libmesh_opt_la_LIBADD   = contrib/libcontrib_opt.la $(KOKKOS_LIBMESH_OPT_OBJECTS) $(LIBS)
+  libmesh_opt_la_LIBADD   = contrib/libcontrib_opt.la $(LIBS)
 endif
 
 if LIBMESH_PROF_MODE
@@ -403,7 +403,7 @@ if LIBMESH_PROF_MODE
   libmesh_prof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
   libmesh_prof_la_CXXFLAGS = $(CXXFLAGS_PROF)
   libmesh_prof_la_CFLAGS   = $(CFLAGS_PROF)
-  libmesh_prof_la_LIBADD   = contrib/libcontrib_prof.la $(KOKKOS_LIBMESH_PROF_OBJECTS) $(LIBS)
+  libmesh_prof_la_LIBADD   = contrib/libcontrib_prof.la $(LIBS)
 endif
 
 if LIBMESH_OPROF_MODE
@@ -412,7 +412,7 @@ if LIBMESH_OPROF_MODE
   libmesh_oprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
   libmesh_oprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
   libmesh_oprof_la_CFLAGS   = $(CFLAGS_OPROF)
-  libmesh_oprof_la_LIBADD   = contrib/libcontrib_oprof.la $(KOKKOS_LIBMESH_OPROF_OBJECTS) $(LIBS)
+  libmesh_oprof_la_LIBADD   = contrib/libcontrib_oprof.la $(LIBS)
 endif
 
 # Make sure we build the library before we test it
@@ -560,21 +560,68 @@ calculator_opt_SOURCES    = src/apps/calculator.C
 calculator_opt_SOURCES   += src/apps/L2system.C src/apps/L2system.h
 calculator_opt_CPPFLAGS   = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
 calculator_opt_CXXFLAGS   = $(CXXFLAGS_OPT)
-calculator_opt_LDADD      = libmesh_opt.la $(KOKKOS_CALCULATOR_OPT_OBJECTS)
+calculator_opt_LDADD      = libmesh_opt.la
 
 devel_programs        += calculator-devel
 calculator_devel_SOURCES  = src/apps/calculator.C
 calculator_devel_SOURCES += src/apps/L2system.C src/apps/L2system.h
 calculator_devel_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
 calculator_devel_CXXFLAGS = $(CXXFLAGS_DEVEL)
-calculator_devel_LDADD    = libmesh_devel.la $(KOKKOS_CALCULATOR_DEVEL_OBJECTS)
+calculator_devel_LDADD    = libmesh_devel.la
 
 dbg_programs          += calculator-dbg
 calculator_dbg_SOURCES    = src/apps/calculator.C
 calculator_dbg_SOURCES   += src/apps/L2system.C src/apps/L2system.h
 calculator_dbg_CPPFLAGS   = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 calculator_dbg_CXXFLAGS   = $(CXXFLAGS_DBG)
-calculator_dbg_LDADD      = libmesh_dbg.la $(KOKKOS_CALCULATOR_DBG_OBJECTS)
+calculator_dbg_LDADD      = libmesh_dbg.la
+
+if LIBMESH_ENABLE_KOKKOS
+opt_programs                 += calculator-kokkos-opt
+calculator_kokkos_opt_SOURCES = src/apps/calculator.C
+calculator_kokkos_opt_SOURCES += src/apps/L2system.C src/apps/L2system.h
+calculator_kokkos_opt_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
+calculator_kokkos_opt_CXXFLAGS = $(CXXFLAGS_OPT)
+calculator_kokkos_opt_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+calculator_kokkos_opt_LDADD    = libmesh_opt.la \
+                                 $(KOKKOS_LIBMESH_OPT_OBJECTS) \
+                                 $(KOKKOS_CALCULATOR_OPT_OBJECTS) \
+                                 $(KOKKOS_LIBS) \
+                                 $(KOKKOS_MPI_LIBS)
+calculator_kokkos_opt_LINK = \
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX) \
+	$(calculator_kokkos_opt_LDFLAGS) $(LDFLAGS) -o $@
+
+devel_programs                   += calculator-kokkos-devel
+calculator_kokkos_devel_SOURCES   = src/apps/calculator.C
+calculator_kokkos_devel_SOURCES  += src/apps/L2system.C src/apps/L2system.h
+calculator_kokkos_devel_CPPFLAGS  = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
+calculator_kokkos_devel_CXXFLAGS  = $(CXXFLAGS_DEVEL)
+calculator_kokkos_devel_LDFLAGS   = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+calculator_kokkos_devel_LDADD     = libmesh_devel.la \
+                                    $(KOKKOS_LIBMESH_DEVEL_OBJECTS) \
+                                    $(KOKKOS_CALCULATOR_DEVEL_OBJECTS) \
+                                    $(KOKKOS_LIBS) \
+                                    $(KOKKOS_MPI_LIBS)
+calculator_kokkos_devel_LINK = \
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX) \
+	$(calculator_kokkos_devel_LDFLAGS) $(LDFLAGS) -o $@
+
+dbg_programs                 += calculator-kokkos-dbg
+calculator_kokkos_dbg_SOURCES = src/apps/calculator.C
+calculator_kokkos_dbg_SOURCES += src/apps/L2system.C src/apps/L2system.h
+calculator_kokkos_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
+calculator_kokkos_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
+calculator_kokkos_dbg_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
+calculator_kokkos_dbg_LDADD    = libmesh_dbg.la \
+                                 $(KOKKOS_LIBMESH_DBG_OBJECTS) \
+                                 $(KOKKOS_CALCULATOR_DBG_OBJECTS) \
+                                 $(KOKKOS_LIBS) \
+                                 $(KOKKOS_MPI_LIBS)
+calculator_kokkos_dbg_LINK = \
+	$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX) \
+	$(calculator_kokkos_dbg_LDFLAGS) $(LDFLAGS) -o $@
+endif
 
 # compare
 opt_programs          += compare-opt
