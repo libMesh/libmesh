@@ -920,13 +920,13 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
               [
                 AS_IF([test -r "$KOKKOS_CFG"],
                   [
-                    AS_IF([grep -q 'KOKKOS_ENABLE_CUDA' "$KOKKOS_CFG"],
+                    AS_IF([grep -q '^#define KOKKOS_ENABLE_CUDA' "$KOKKOS_CFG"],
                       [KOKKOS_BACKEND=cuda],
-                      [AS_IF([grep -q 'KOKKOS_ENABLE_HIP' "$KOKKOS_CFG"],
+                      [AS_IF([grep -q '^#define KOKKOS_ENABLE_HIP' "$KOKKOS_CFG"],
                         [KOKKOS_BACKEND=hip],
-                        [AS_IF([grep -q 'KOKKOS_ENABLE_SYCL' "$KOKKOS_CFG"],
+                        [AS_IF([grep -q '^#define KOKKOS_ENABLE_SYCL' "$KOKKOS_CFG"],
                           [KOKKOS_BACKEND=sycl],
-                          [AS_IF([grep -q 'KOKKOS_ENABLE_OPENMP' "$KOKKOS_CFG"],
+                          [AS_IF([grep -q '^#define KOKKOS_ENABLE_OPENMP' "$KOKKOS_CFG"],
                             [KOKKOS_BACKEND=openmp],
                             [KOKKOS_BACKEND=serial])])])])
                   ],
@@ -938,7 +938,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
             dnl Check if Kokkos was built with OpenMP
             have_kokkos_openmp=no
             AS_IF([test -r "$KOKKOS_CFG"],
-              [AS_IF([grep -q 'KOKKOS_ENABLE_OPENMP' "$KOKKOS_CFG"],
+              [AS_IF([grep -q '^#define KOKKOS_ENABLE_OPENMP' "$KOKKOS_CFG"],
                 [have_kokkos_openmp=yes])])
 
             case "$KOKKOS_BACKEND" in
@@ -946,11 +946,36 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
                 AC_PATH_PROG([NVCC],[nvcc],[no],[$PATH])
                 AS_IF([test "x$NVCC" = "xno"],
                   [AC_MSG_ERROR([nvcc not found but Kokkos CUDA backend requested])])
+                kokkos_cuda_arch=`sed -n 's/^#define PETSC_PKG_CUDA_MIN_ARCH //p' "${PETSC_DIR}/include/petscconf.h" "${PETSC_DIR}/${PETSC_ARCH}/include/petscconf.h" 2>/dev/null | head -n 1`
+                AS_IF([test "x$kokkos_cuda_arch" = "x" && test -r "$KOKKOS_CFG"],
+                  [kokkos_cuda_arch=`sed -n \
+                    -e 's/^#define KOKKOS_ARCH_BLACKWELL120.*/120/p' \
+                    -e 's/^#define KOKKOS_ARCH_BLACKWELL100.*/100/p' \
+                    -e 's/^#define KOKKOS_ARCH_HOPPER90.*/90/p' \
+                    -e 's/^#define KOKKOS_ARCH_ADA89.*/89/p' \
+                    -e 's/^#define KOKKOS_ARCH_AMPERE86.*/86/p' \
+                    -e 's/^#define KOKKOS_ARCH_AMPERE80.*/80/p' \
+                    -e 's/^#define KOKKOS_ARCH_TURING75.*/75/p' \
+                    -e 's/^#define KOKKOS_ARCH_VOLTA72.*/72/p' \
+                    -e 's/^#define KOKKOS_ARCH_VOLTA70.*/70/p' \
+                    -e 's/^#define KOKKOS_ARCH_PASCAL61.*/61/p' \
+                    -e 's/^#define KOKKOS_ARCH_PASCAL60.*/60/p' \
+                    -e 's/^#define KOKKOS_ARCH_MAXWELL53.*/53/p' \
+                    -e 's/^#define KOKKOS_ARCH_MAXWELL52.*/52/p' \
+                    -e 's/^#define KOKKOS_ARCH_MAXWELL50.*/50/p' \
+                    -e 's/^#define KOKKOS_ARCH_KEPLER37.*/37/p' \
+                    -e 's/^#define KOKKOS_ARCH_KEPLER35.*/35/p' \
+                    -e 's/^#define KOKKOS_ARCH_KEPLER32.*/32/p' \
+                    -e 's/^#define KOKKOS_ARCH_KEPLER30.*/30/p' \
+                    "$KOKKOS_CFG" 2>/dev/null | head -n 1`])
+                kokkos_cuda_arch_flag=""
+                AS_IF([test "x$kokkos_cuda_arch" != "x"],
+                  [kokkos_cuda_arch_flag="-arch=sm_${kokkos_cuda_arch}"])
                 KOKKOS_CXX="$NVCC"
                 dnl Keep raw nvcc scoped to dedicated Kokkos compilation/link
                 dnl rules. Global host links are kept clean elsewhere.
-                KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu -ccbin $CXX"
-                KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $libmesh_kokkos_lib_dirs"
+                KOKKOS_CXXFLAGS="$kokkos_cuda_arch_flag --forward-unknown-to-host-compiler --extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu -ccbin $CXX"
+                KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $kokkos_cuda_arch_flag $libmesh_kokkos_lib_dirs"
                 AS_IF([test "x$have_kokkos_openmp" = "xyes"],
                   [
                     KOKKOS_CXXFLAGS="$KOKKOS_CXXFLAGS -fopenmp"
