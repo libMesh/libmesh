@@ -31,6 +31,8 @@
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_tet10.h"
 #include "libmesh/elem_range.h"
+#include "libmesh/face_c0polygon.h"
+#include "libmesh/face_polygon.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/libmesh_logging.h"
@@ -449,6 +451,15 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
   if (mesh.mesh_dimension() == 3) // in 3D hexes can split into 6 tets
     max_subelems = 6;
 
+  // 2D polygons can be split into an arbitrary number of triangles
+  // depending on their number of sides, so we have to scan the mesh
+  // to find the largest split we will need.
+  if (mesh.mesh_dimension() == 2)
+    for (const Elem * elem : mesh.element_ptr_range())
+      if (const Polygon * poly = dynamic_cast<const Polygon *>(elem))
+        max_subelems = std::max(max_subelems, poly->n_subtriangles());
+  mesh.comm().max(max_subelems);
+
   new_elements.reserve (max_subelems*n_orig_elem);
 
   // If the original mesh has *side* boundary data, we carry that over
@@ -495,8 +506,9 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
           libmesh_not_implemented_msg("Cannot convert a refined element into simplices\n");
 
         // The new elements we will split the quad into.
-        // In 3D we may need as many as 6 tets per hex
-        std::array<std::unique_ptr<Elem>, 6> subelem {};
+        // In 3D we may need as many as 6 tets per hex, and in 2D
+        // we may need as many subtriangles as a polygon has.
+        std::vector<std::unique_ptr<Elem>> subelem(max_subelems);
 
         switch (etype)
           {
@@ -1246,6 +1258,31 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               break;
             }
 
+          case C0POLYGON:
+            {
+              // Split a C0Polygon into the triangles defined by its
+              // current triangulation.  This relies on the user having
+              // a valid triangulation (the constructor sets a default
+              // one, and the user can refresh it via retriangulate()
+              // after moving nodes).
+              const C0Polygon * polygon = cast_ptr<const C0Polygon *>(elem);
+              const unsigned int n_subtri = polygon->n_subtriangles();
+              for (unsigned int t = 0; t != n_subtri; ++t)
+                {
+                  const std::array<int, 3> tri = polygon->subtriangle(t);
+                  if (tri[0] < 0 || tri[1] < 0 || tri[2] < 0)
+                    libmesh_not_implemented_msg
+                      ("Cannot convert a C0Polygon whose triangulation\n"
+                       "introduces special (non-vertex) points");
+                  subelem[t] = Elem::build(TRI3);
+                  subelem[t]->set_node(0, elem->node_ptr(tri[0]));
+                  subelem[t]->set_node(1, elem->node_ptr(tri[1]));
+                  subelem[t]->set_node(2, elem->node_ptr(tri[2]));
+                }
+
+              break;
+            }
+
             // No need to split elements that are already simplicial:
           case EDGE2:
           case EDGE3:
@@ -1382,7 +1419,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               // the same on all processors, therefore keeping the Mesh
               // in sync.  Note: we offset the new IDs by the max of the
               // pre-existing ids to avoid conflicting with originals.
-              subelem[i]->set_id( max_orig_id + 6*elem->id() + i );
+              subelem[i]->set_id( max_orig_id + max_subelems*elem->id() + i );
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
               subelem[i]->set_unique_id(max_unique_id + max_subelems*elem->unique_id() + i);
