@@ -1047,8 +1047,11 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         libmesh_save_CXXFLAGS="$CXXFLAGS"
         libmesh_save_LDFLAGS="$LDFLAGS"
         libmesh_save_LIBS="$LIBS"
+        dnl Preserve non-compiler driver flags that configure attached to CXX,
+        dnl such as the required -std=gnu++17 mode selected earlier.
+        libmesh_kokkos_cxx_driver_flags=`AS_ECHO(["$libmesh_save_CXX"]) | sed 's/^[^ ]*//'`
 
-        CXX="$KOKKOS_CXX"
+        CXX="$KOKKOS_CXX$libmesh_kokkos_cxx_driver_flags"
         CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
         CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
         LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
