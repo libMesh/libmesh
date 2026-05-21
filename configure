@@ -64296,7 +64296,13 @@ fi
                 KOKKOS_CPPFLAGS="${KOKKOS_CPPFLAGS:--DLIBMESH_KOKKOS_COMPILATION $libmesh_kokkos_include_dirs}"
         KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:-$libmesh_kokkos_lib_dirs}"
         KOKKOS_LIBS="${KOKKOS_LIBS:--lkokkoscore}"
-        libmesh_optional_LIBS="$libmesh_optional_LIBS $KOKKOS_LDFLAGS $KOKKOS_LIBS"
+        # Keep compiler-specific Kokkos link flags local to dedicated Kokkos
+        # link steps and the configure probe. Pushing CUDA wrapper flags like
+        # --forward-unknown-to-host-compiler or -arch=sm_80 into the global
+        # libmesh link line causes ordinary host tools linked with g++ to
+        # fail. Only the safe library path and library dependency belong in
+        # the global libmesh link line here.
+        libmesh_optional_LIBS="$libmesh_optional_LIBS $libmesh_kokkos_lib_dirs $KOKKOS_LIBS"
 
                                                 KOKKOS_MPI_CPPFLAGS=""
         KOKKOS_MPI_LIBS=""

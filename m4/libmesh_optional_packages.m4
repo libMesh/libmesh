@@ -943,12 +943,41 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
 
             case "$KOKKOS_BACKEND" in
               cuda)
-                AC_PATH_PROG([NVCC],[nvcc],[no],[$PATH])
-                AS_IF([test "x$NVCC" = "xno"],
-                  [AC_MSG_ERROR([nvcc not found but Kokkos CUDA backend requested])])
-                KOKKOS_CXX="$NVCC"
-                KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin $CXX"
-                KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $libmesh_kokkos_lib_dirs"
+                AC_PATH_PROG([NVCC_WRAPPER],[nvcc_wrapper],[no],[$PATH])
+                AS_IF([test "x$NVCC_WRAPPER" != "xno"],
+                  [
+                    libmesh_kokkos_host_cxx=""
+                    AS_IF([test "x$enablempi" = "xyes"],
+                      [
+                        libmesh_kokkos_host_cxx=`$CXX --showme:command 2>/dev/null`
+                        AS_IF([test "x$libmesh_kokkos_host_cxx" = "x"],
+                          [libmesh_kokkos_host_cxx=`$CXX -show 2>/dev/null | sed 's/ .*//'`])
+                      ],
+                      [libmesh_kokkos_host_cxx="$CXX"])
+
+                    AC_MSG_CHECKING([for host compiler usable with nvcc_wrapper])
+                    AS_IF([test "x$libmesh_kokkos_host_cxx" = "x"],
+                      [
+                        AC_MSG_RESULT([not found])
+                        AC_MSG_ERROR([Could not determine a host compiler to pass to nvcc_wrapper. Set KOKKOS_CXXFLAGS with a suitable -ccbin value or provide NVCC_WRAPPER_DEFAULT_COMPILER in the environment.])
+                      ],
+                      [AC_MSG_RESULT([$libmesh_kokkos_host_cxx])])
+
+                    libmesh_kokkos_wrapper_shim="$PWD/$srcdir/build-aux/libmesh_nvcc_wrapper"
+                    dnl Route through a tiny libMesh-owned shim so Automake's
+                    dnl dependency-tracking flags do not trip nvcc_wrapper up
+                    dnl on ordinary host-only .C files.
+                    KOKKOS_CXX="$SHELL $libmesh_kokkos_wrapper_shim $NVCC_WRAPPER"
+                    dnl nvcc_wrapper already mediates between nvcc and the host
+                    dnl compiler; passing raw nvcc forwarding flags through the
+                    dnl wrapper can leak them to g++ and fail. Keep only the
+                    dnl CUDA flags the wrapper recognizes here.
+                    KOKKOS_CXXFLAGS="--extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu -ccbin $libmesh_kokkos_host_cxx"
+                    KOKKOS_LDFLAGS="$libmesh_kokkos_lib_dirs"
+                  ],
+                  [
+                    AC_MSG_ERROR([nvcc_wrapper was not found but Kokkos CUDA backend was requested. libMesh's project-wide Kokkos CUDA build requires nvcc_wrapper (or an explicitly provided CUDA-capable KOKKOS_CXX) rather than raw nvcc.])
+                  ])
                 AS_IF([test "x$have_kokkos_openmp" = "xyes"],
                   [
                     KOKKOS_CXXFLAGS="$KOKKOS_CXXFLAGS -fopenmp"
@@ -988,7 +1017,13 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         KOKKOS_CPPFLAGS="${KOKKOS_CPPFLAGS:--DLIBMESH_KOKKOS_COMPILATION $libmesh_kokkos_include_dirs}"
         KOKKOS_LDFLAGS="${KOKKOS_LDFLAGS:-$libmesh_kokkos_lib_dirs}"
         KOKKOS_LIBS="${KOKKOS_LIBS:--lkokkoscore}"
-        libmesh_optional_LIBS="$libmesh_optional_LIBS $KOKKOS_LDFLAGS $KOKKOS_LIBS"
+        dnl Keep compiler-specific Kokkos link flags local to dedicated Kokkos
+        dnl link steps and the configure probe. Pushing CUDA wrapper flags like
+        dnl --forward-unknown-to-host-compiler or -arch=sm_80 into the global
+        dnl libmesh link line causes ordinary host tools linked with g++ to
+        dnl fail. Only the safe library path and library dependency belong in
+        dnl the global libmesh link line here.
+        libmesh_optional_LIBS="$libmesh_optional_LIBS $libmesh_kokkos_lib_dirs $KOKKOS_LIBS"
 
         dnl If KOKKOS_CXX differs from the main compiler, it may not be the MPI
         dnl wrapper and thus may need the wrapper's compile and link flags
