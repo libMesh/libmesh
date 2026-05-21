@@ -1024,7 +1024,13 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
               [AC_MSG_RESULT([$KOKKOS_MPI_LIBS])])
           ])
 
-        libmesh_optional_LIBS="$libmesh_optional_LIBS $KOKKOS_MPI_LIBS"
+        dnl Do not append KOKKOS_MPI_LIBS to libmesh_optional_LIBS.  The
+        dnl primary MPI configure path already contributed MPI_LDFLAGS/MPI_LIBS
+        dnl globally, and wrapper-provided link flags can contain split linker
+        dnl directives such as "-Wl,-rpath -Wl,/path" that are only meant for
+        dnl the alternate KOKKOS_CXX probe path.  Keep them local to the
+        dnl configure probe below so they do not pollute the global libmesh link
+        dnl line.
 
         dnl Fail configure early if the chosen Kokkos compiler/flags/libs cannot
         dnl actually compile and link a minimal Kokkos program.

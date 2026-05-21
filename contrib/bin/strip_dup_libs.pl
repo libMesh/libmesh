@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-my @all_libs = @ARGV;
+my @all_libs = normalize_linker_pairs(@ARGV);
 #
 # Move from left to right and remove duplicate -l libraries
 #
@@ -147,4 +147,25 @@ sub remove_rel_paths {
                 }
         }
         return join("/",@new_paths);
+}
+
+sub normalize_linker_pairs {
+        my @entries = @_;
+        my @normalized;
+
+        for (my $i = 0; $i <= $#entries; $i++) {
+                my $entry = $entries[$i];
+
+                if (($entry eq '-Wl,-rpath' || $entry eq '-Wl,-R') &&
+                    $i < $#entries &&
+                    $entries[$i + 1] =~ /^-Wl,(\/.*)$/) {
+                        push @normalized, "$entry,$1";
+                        $i++;
+                        next;
+                }
+
+                push @normalized, $entry;
+        }
+
+        return @normalized;
 }
