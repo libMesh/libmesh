@@ -1,12 +1,16 @@
 #include <libmesh/libmesh.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/elem.h>
+#include <libmesh/face_c0polygon.h>
+#include <libmesh/face_polygon.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
 #include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
+
+#include <cmath>
 
 
 using namespace libMesh;
@@ -28,6 +32,8 @@ public:
   CPPUNIT_TEST( testAllTriQuad );
   CPPUNIT_TEST( testAllTriQuad8 );
   CPPUNIT_TEST( testAllTriQuad9 );
+  CPPUNIT_TEST( testAllTriC0Polygon );
+  CPPUNIT_TEST( testAllTriC0PolygonOctagon );
 #endif
 
   // 3D tests
@@ -112,6 +118,84 @@ public:
   void testAllTriPrism18() { LOG_UNIT_TEST; test_helper_3D(PRISM18, /*nelem=*/6, /*nbcs=*/12); }
   void testAllTriPrism20() { LOG_UNIT_TEST; test_helper_3D(PRISM20, /*nelem=*/6, /*nbcs=*/12); }
   void testAllTriPrism21() { LOG_UNIT_TEST; test_helper_3D(PRISM21, /*nelem=*/6, /*nbcs=*/12); }
+
+  // Build a C0Polygon paving (triangles, quads, hexagons) via
+  // build_square and split it into a pure TRI3 mesh.
+  void testAllTriC0Polygon()
+  {
+    LOG_UNIT_TEST;
+
+    ReplicatedMesh mesh(*TestCommWorld, /*dim=*/2);
+
+    MeshTools::Generation::build_square(mesh,
+                                        /*nx=*/2, /*ny=*/2,
+                                        /*xmin=*/0., /*xmax=*/1.,
+                                        /*ymin=*/0., /*ymax=*/1.,
+                                        C0POLYGON);
+
+    // The post-all_tri element count is the sum of the per-polygon
+    // subtriangle counts, and external sides should be preserved one
+    // for one as TRI3 sides.
+    dof_id_type n_elem_expected = 0;
+    for (const Elem * elem : mesh.element_ptr_range())
+      {
+        const Polygon * poly = dynamic_cast<const Polygon *>(elem);
+        CPPUNIT_ASSERT(poly != nullptr);
+        n_elem_expected += poly->n_subtriangles();
+      }
+
+    const std::size_t n_bcs_before =
+      mesh.get_boundary_info().n_boundary_conds();
+
+    MeshTools::Modification::all_tri(mesh);
+
+    CPPUNIT_ASSERT_EQUAL(n_elem_expected, mesh.n_elem());
+    CPPUNIT_ASSERT_EQUAL(n_bcs_before,
+                         mesh.get_boundary_info().n_boundary_conds());
+
+    for (const Elem * elem : mesh.element_ptr_range())
+      CPPUNIT_ASSERT_EQUAL(ElemType(TRI3), elem->type());
+  }
+
+  // A single regular octagon (8 sides, 6 subtriangles) exercises the
+  // path where a polygon requires more subelements than any non-polygon
+  // 2D element type would.
+  void testAllTriC0PolygonOctagon()
+  {
+    LOG_UNIT_TEST;
+
+    constexpr unsigned int n_sides = 8;
+
+    ReplicatedMesh mesh(*TestCommWorld, /*dim=*/2);
+
+    std::unique_ptr<Elem> octagon = std::make_unique<C0Polygon>(n_sides);
+    for (unsigned int i = 0; i < n_sides; ++i)
+      {
+        const Real angle = 2 * libMesh::pi * i / n_sides;
+        Node * node = mesh.add_point(Point(std::cos(angle), std::sin(angle), 0.),
+                                     /*id=*/i);
+        octagon->set_node(i, node);
+      }
+    octagon->set_id() = 0;
+    Elem * elem = mesh.add_elem(std::move(octagon));
+
+    // Mark every external side with a boundary id so we can verify
+    // boundary information is transferred to the new triangles.
+    for (unsigned int s = 0; s < n_sides; ++s)
+      mesh.get_boundary_info().add_side(elem, s, /*bnd_id=*/0);
+
+    mesh.prepare_for_use();
+
+    MeshTools::Modification::all_tri(mesh);
+
+    // n_sides - 2 = 6 subtriangles
+    CPPUNIT_ASSERT_EQUAL(dof_id_type(n_sides - 2), mesh.n_elem());
+    CPPUNIT_ASSERT_EQUAL(std::size_t(n_sides),
+                         mesh.get_boundary_info().n_boundary_conds());
+
+    for (const Elem * e : mesh.element_ptr_range())
+      CPPUNIT_ASSERT_EQUAL(ElemType(TRI3), e->type());
+  }
 };
 
 
