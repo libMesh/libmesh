@@ -1035,10 +1035,9 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         dnl Do not append KOKKOS_MPI_LIBS to libmesh_optional_LIBS.  The
         dnl primary MPI configure path already contributed MPI_LDFLAGS/MPI_LIBS
         dnl globally, and wrapper-provided link flags can contain split linker
-        dnl directives such as "-Wl,-rpath -Wl,/path" that are only meant for
-        dnl the alternate KOKKOS_CXX probe path.  Keep them local to the
-        dnl configure probe below so they do not pollute the global libmesh link
-        dnl line.
+        dnl directives such as "-Wl,-rpath -Wl,/path".  Those are not suitable
+        dnl for raw-nvcc links and should stay out of the global libmesh link
+        dnl line and out of the raw Kokkos configure probe below.
 
         dnl Fail configure early if the chosen Kokkos compiler/flags/libs cannot
         dnl actually compile and link a minimal Kokkos program.
@@ -1053,7 +1052,11 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
         CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
         LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
-        LIBS="$LIBS $KOKKOS_LIBS $KOKKOS_MPI_LIBS"
+        dnl Follow the older kokkos-build-numerics configure probe pattern:
+        dnl use KOKKOS_MPI_CPPFLAGS to find mpi.h, but rely on the primary MPI
+        dnl link variables for the actual test link instead of wrapper-shaped
+        dnl KOKKOS_MPI_LIBS that can fail with raw nvcc.
+        LIBS="$LIBS $KOKKOS_LIBS"
         AC_LANG_PUSH([C++])
 
         AS_IF([test "x$enablempi" = "xyes"],

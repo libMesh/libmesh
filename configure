@@ -64327,10 +64327,9 @@ fi
         # Do not append KOKKOS_MPI_LIBS to libmesh_optional_LIBS.  The
         # primary MPI configure path already contributed MPI_LDFLAGS/MPI_LIBS
         # globally, and wrapper-provided link flags can contain split linker
-        # directives such as "-Wl,-rpath -Wl,/path" that are only meant for
-        # the alternate KOKKOS_CXX probe path.  Keep them local to the
-        # configure probe below so they do not pollute the global libmesh link
-        # line.
+        # directives such as "-Wl,-rpath -Wl,/path".  Those are not suitable
+        # for raw-nvcc links and should stay out of the global libmesh link
+        # line and out of the raw Kokkos configure probe below.
 
                         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the Kokkos compiler configuration works" >&5
 printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
@@ -64344,7 +64343,11 @@ printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
         CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
         CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
         LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
-        LIBS="$LIBS $KOKKOS_LIBS $KOKKOS_MPI_LIBS"
+        # Follow the older kokkos-build-numerics configure probe pattern:
+        # use KOKKOS_MPI_CPPFLAGS to find mpi.h, but rely on the primary MPI
+        # link variables for the actual test link instead of wrapper-shaped
+        # KOKKOS_MPI_LIBS that can fail with raw nvcc.
+        LIBS="$LIBS $KOKKOS_LIBS"
         ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'

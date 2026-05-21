@@ -586,8 +586,7 @@ calculator_kokkos_opt_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
 calculator_kokkos_opt_LDADD    = libmesh_opt.la \
                                  $(KOKKOS_LIBMESH_OPT_OBJECTS) \
                                  $(KOKKOS_CALCULATOR_OPT_OBJECTS) \
-                                 $(KOKKOS_LIBS) \
-                                 $(KOKKOS_MPI_LIBS)
+                                 $(KOKKOS_LIBS)
 calculator_kokkos_opt_LINK = \
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX) \
 	$(calculator_kokkos_opt_LDFLAGS) $(LDFLAGS) -o $@
@@ -601,8 +600,7 @@ calculator_kokkos_devel_LDFLAGS   = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
 calculator_kokkos_devel_LDADD     = libmesh_devel.la \
                                     $(KOKKOS_LIBMESH_DEVEL_OBJECTS) \
                                     $(KOKKOS_CALCULATOR_DEVEL_OBJECTS) \
-                                    $(KOKKOS_LIBS) \
-                                    $(KOKKOS_MPI_LIBS)
+                                    $(KOKKOS_LIBS)
 calculator_kokkos_devel_LINK = \
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX) \
 	$(calculator_kokkos_devel_LDFLAGS) $(LDFLAGS) -o $@
@@ -616,8 +614,7 @@ calculator_kokkos_dbg_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
 calculator_kokkos_dbg_LDADD    = libmesh_dbg.la \
                                  $(KOKKOS_LIBMESH_DBG_OBJECTS) \
                                  $(KOKKOS_CALCULATOR_DBG_OBJECTS) \
-                                 $(KOKKOS_LIBS) \
-                                 $(KOKKOS_MPI_LIBS)
+                                 $(KOKKOS_LIBS)
 calculator_kokkos_dbg_LINK = \
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(KOKKOS_CXX) \
 	$(calculator_kokkos_dbg_LDFLAGS) $(LDFLAGS) -o $@
