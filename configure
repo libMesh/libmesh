@@ -64065,17 +64065,17 @@ fi
 
             case "$KOKKOS_BACKEND" in
               cuda)
-                # Extract the first word of "nvcc_wrapper", so it can be a program name with args.
-set dummy nvcc_wrapper; ac_word=$2
+                # Extract the first word of "nvcc", so it can be a program name with args.
+set dummy nvcc; ac_word=$2
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_path_NVCC_WRAPPER+y}
+if test ${ac_cv_path_NVCC+y}
 then :
   printf %s "(cached) " >&6
 else case e in #(
-  e) case $NVCC_WRAPPER in
+  e) case $NVCC in
   [\\/]* | ?:[\\/]*)
-  ac_cv_path_NVCC_WRAPPER="$NVCC_WRAPPER" # Let the user override the test with a path.
+  ac_cv_path_NVCC="$NVCC" # Let the user override the test with a path.
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
@@ -64089,7 +64089,7 @@ do
   esac
     for ac_exec_ext in '' $ac_executable_extensions; do
   if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_path_NVCC_WRAPPER="$as_dir$ac_word$ac_exec_ext"
+    ac_cv_path_NVCC="$as_dir$ac_word$ac_exec_ext"
     printf "%s\n" "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
     break 2
   fi
@@ -64097,65 +64097,28 @@ done
   done
 IFS=$as_save_IFS
 
-  test -z "$ac_cv_path_NVCC_WRAPPER" && ac_cv_path_NVCC_WRAPPER="no"
+  test -z "$ac_cv_path_NVCC" && ac_cv_path_NVCC="no"
   ;;
 esac ;;
 esac
 fi
-NVCC_WRAPPER=$ac_cv_path_NVCC_WRAPPER
-if test -n "$NVCC_WRAPPER"; then
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $NVCC_WRAPPER" >&5
-printf "%s\n" "$NVCC_WRAPPER" >&6; }
+NVCC=$ac_cv_path_NVCC
+if test -n "$NVCC"; then
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $NVCC" >&5
+printf "%s\n" "$NVCC" >&6; }
 else
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: no" >&5
 printf "%s\n" "no" >&6; }
 fi
 
 
-                if test "x$NVCC_WRAPPER" != "xno"
+                if test "x$NVCC" = "xno"
 then :
-
-                    libmesh_kokkos_host_cxx=""
-                    if test "x$enablempi" = "xyes"
-then :
-
-                        libmesh_kokkos_host_cxx=`$CXX --showme:command 2>/dev/null`
-                        if test "x$libmesh_kokkos_host_cxx" = "x"
-then :
-  libmesh_kokkos_host_cxx=`$CXX -show 2>/dev/null | sed 's/ .*//'`
+  as_fn_error $? "nvcc not found but Kokkos CUDA backend requested" "$LINENO" 5
 fi
-
-else case e in #(
-  e) libmesh_kokkos_host_cxx="$CXX" ;;
-esac
-fi
-
-                    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for host compiler usable with nvcc_wrapper" >&5
-printf %s "checking for host compiler usable with nvcc_wrapper... " >&6; }
-                    if test "x$libmesh_kokkos_host_cxx" = "x"
-then :
-
-                        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: not found" >&5
-printf "%s\n" "not found" >&6; }
-                        as_fn_error $? "Could not determine a host compiler to pass to nvcc_wrapper. Set KOKKOS_CXXFLAGS with a suitable -ccbin value or provide NVCC_WRAPPER_DEFAULT_COMPILER in the environment." "$LINENO" 5
-
-else case e in #(
-  e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $libmesh_kokkos_host_cxx" >&5
-printf "%s\n" "$libmesh_kokkos_host_cxx" >&6; } ;;
-esac
-fi
-
-                    libmesh_kokkos_wrapper_shim="$PWD/$srcdir/build-aux/libmesh_nvcc_wrapper"
-                                                                                KOKKOS_CXX="$SHELL $libmesh_kokkos_wrapper_shim $NVCC_WRAPPER"
-                                                                                                    KOKKOS_CXXFLAGS="--extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu -ccbin $libmesh_kokkos_host_cxx"
-                    KOKKOS_LDFLAGS="$libmesh_kokkos_lib_dirs"
-
-else case e in #(
-  e)
-                    as_fn_error $? "nvcc_wrapper was not found but Kokkos CUDA backend was requested. libMesh's project-wide Kokkos CUDA build requires nvcc_wrapper (or an explicitly provided CUDA-capable KOKKOS_CXX) rather than raw nvcc." "$LINENO" 5
-                   ;;
-esac
-fi
+                KOKKOS_CXX="$NVCC"
+                KOKKOS_CXXFLAGS="--forward-unknown-to-host-compiler --extended-lambda --expt-relaxed-constexpr --disable-warnings -x cu -ccbin $CXX"
+                KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $libmesh_kokkos_lib_dirs"
                 if test "x$have_kokkos_openmp" = "xyes"
 then :
 
