@@ -30,6 +30,8 @@
 #include "libmesh/function_base.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_tet10.h"
+#include "libmesh/cell_c0polyhedron.h"
+#include "libmesh/cell_polyhedron.h"
 #include "libmesh/elem_range.h"
 #include "libmesh/face_c0polygon.h"
 #include "libmesh/face_polygon.h"
@@ -451,13 +453,16 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
   if (mesh.mesh_dimension() == 3) // in 3D hexes can split into 6 tets
     max_subelems = 6;
 
-  // 2D polygons can be split into an arbitrary number of triangles
-  // depending on their number of sides, so we have to scan the mesh
-  // to find the largest split we will need.
-  if (mesh.mesh_dimension() == 2)
-    for (const Elem * elem : mesh.element_ptr_range())
+  // 2D polygons and 3D polyhedra can be split into an arbitrary
+  // number of triangles/tetrahedra depending on their topology, so we
+  // have to scan the mesh to find the largest split we will need.
+  for (const Elem * elem : mesh.element_ptr_range())
+    {
       if (const Polygon * poly = dynamic_cast<const Polygon *>(elem))
         max_subelems = std::max(max_subelems, poly->n_subtriangles());
+      else if (const Polyhedron * polyhedron = dynamic_cast<const Polyhedron *>(elem))
+        max_subelems = std::max(max_subelems, polyhedron->n_subelements());
+    }
   mesh.comm().max(max_subelems);
 
   new_elements.reserve (max_subelems*n_orig_elem);
@@ -1278,6 +1283,33 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                   subelem[t]->set_node(0, elem->node_ptr(tri[0]));
                   subelem[t]->set_node(1, elem->node_ptr(tri[1]));
                   subelem[t]->set_node(2, elem->node_ptr(tri[2]));
+                }
+
+              break;
+            }
+
+          case C0POLYHEDRON:
+            {
+              // Split a C0Polyhedron into the tetrahedra defined by its
+              // current tetrahedralization.  If the polyhedron required
+              // a mid-element node, the user is expected to have added
+              // that node to the mesh during construction; we just
+              // reference it via the polyhedron's node pointers.
+              const C0Polyhedron * polyhedron =
+                cast_ptr<const C0Polyhedron *>(elem);
+              const unsigned int n_sub = polyhedron->n_subelements();
+              for (unsigned int t = 0; t != n_sub; ++t)
+                {
+                  const std::array<int, 4> tet = polyhedron->subelement(t);
+                  if (tet[0] < 0 || tet[1] < 0 || tet[2] < 0 || tet[3] < 0)
+                    libmesh_not_implemented_msg
+                      ("Cannot convert a C0Polyhedron whose triangulation\n"
+                       "introduces special (non-vertex) points");
+                  subelem[t] = Elem::build(TET4);
+                  subelem[t]->set_node(0, elem->node_ptr(tet[0]));
+                  subelem[t]->set_node(1, elem->node_ptr(tet[1]));
+                  subelem[t]->set_node(2, elem->node_ptr(tet[2]));
+                  subelem[t]->set_node(3, elem->node_ptr(tet[3]));
                 }
 
               break;
