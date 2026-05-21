@@ -16,19 +16,17 @@ struct GaussLegendre1D
 {
   LIBMESH_DEVICE_INLINE static unsigned int n_points(unsigned int alg_order)
   {
-    return Quadrature::Gauss::gauss_legendre_rule(alg_order).count;
+    return Quadrature::Gauss::gauss_legendre_count(alg_order);
   }
 
   LIBMESH_DEVICE_INLINE static Real point(unsigned int alg_order, unsigned int i)
   {
-    const auto rule = Quadrature::Gauss::gauss_legendre_rule(alg_order);
-    return (i < rule.count) ? rule.points[i] : 0.0;
+    return Quadrature::Gauss::gauss_legendre_point(alg_order, i);
   }
 
   LIBMESH_DEVICE_INLINE static Real weight(unsigned int alg_order, unsigned int i)
   {
-    const auto rule = Quadrature::Gauss::gauss_legendre_rule(alg_order);
-    return (i < rule.count) ? rule.weights[i] : 0.0;
+    return Quadrature::Gauss::gauss_legendre_weight(alg_order, i);
   }
 };
 
@@ -61,11 +59,11 @@ struct GaussQuadrature
 
       case libMesh::TRI3:
       case libMesh::TRI6:
-        return Quadrature::Gauss::triangle_rule(order).count;
+        return Quadrature::Gauss::triangle_count(order);
 
       case libMesh::TET4:
       case libMesh::TET10:
-        return Quadrature::Gauss::tetrahedron_rule(order).count;
+        return Quadrature::Gauss::tetrahedron_count(order);
 
       default:
         return 0;
@@ -85,8 +83,7 @@ struct GaussQuadrature
       case libMesh::QUAD8:
       case libMesh::QUAD9:
       {
-        const auto rule = Quadrature::Gauss::gauss_legendre_rule(order);
-        const unsigned int n = rule.count;
+        const unsigned int n = Quadrature::Gauss::gauss_legendre_count(order);
         if (!n)
           return zero_vector();
         const unsigned int i = qp % n;
@@ -100,8 +97,7 @@ struct GaussQuadrature
       case libMesh::HEX20:
       case libMesh::HEX27:
       {
-        const auto rule = Quadrature::Gauss::gauss_legendre_rule(order);
-        const unsigned int n = rule.count;
+        const unsigned int n = Quadrature::Gauss::gauss_legendre_count(order);
         if (!n)
           return zero_vector();
         const unsigned int i = qp % n;
@@ -115,17 +111,21 @@ struct GaussQuadrature
       case libMesh::TRI3:
       case libMesh::TRI6:
       {
-        const auto rule = Quadrature::Gauss::triangle_rule(order);
-        return (qp < rule.count) ? make_vector(rule.points[qp].x, rule.points[qp].y, 0.0) : zero_vector();
+        if (qp >= Quadrature::Gauss::triangle_count(order))
+          return zero_vector();
+
+        const auto point = Quadrature::Gauss::triangle_point(order, qp);
+        return make_vector(point.x, point.y, 0.0);
       }
 
       case libMesh::TET4:
       case libMesh::TET10:
       {
-        const auto rule = Quadrature::Gauss::tetrahedron_rule(order);
-        return (qp < rule.count)
-                 ? make_vector(rule.points[qp].x, rule.points[qp].y, rule.points[qp].z)
-                 : zero_vector();
+        if (qp >= Quadrature::Gauss::tetrahedron_count(order))
+          return zero_vector();
+
+        const auto point = Quadrature::Gauss::tetrahedron_point(order, qp);
+        return make_vector(point.x, point.y, point.z);
       }
 
       default:
@@ -146,8 +146,7 @@ struct GaussQuadrature
       case libMesh::QUAD8:
       case libMesh::QUAD9:
       {
-        const auto rule = Quadrature::Gauss::gauss_legendre_rule(order);
-        const unsigned int n = rule.count;
+        const unsigned int n = Quadrature::Gauss::gauss_legendre_count(order);
         if (!n)
           return 0.0;
         return GaussLegendre1D::weight(order, qp % n) *
@@ -158,8 +157,7 @@ struct GaussQuadrature
       case libMesh::HEX20:
       case libMesh::HEX27:
       {
-        const auto rule = Quadrature::Gauss::gauss_legendre_rule(order);
-        const unsigned int n = rule.count;
+        const unsigned int n = Quadrature::Gauss::gauss_legendre_count(order);
         if (!n)
           return 0.0;
         return GaussLegendre1D::weight(order, qp % n) *
@@ -169,17 +167,11 @@ struct GaussQuadrature
 
       case libMesh::TRI3:
       case libMesh::TRI6:
-      {
-        const auto rule = Quadrature::Gauss::triangle_rule(order);
-        return (qp < rule.count) ? rule.points[qp].w : 0.0;
-      }
+        return (qp < Quadrature::Gauss::triangle_count(order)) ? Quadrature::Gauss::triangle_weight(order, qp) : 0.0;
 
       case libMesh::TET4:
       case libMesh::TET10:
-      {
-        const auto rule = Quadrature::Gauss::tetrahedron_rule(order);
-        return (qp < rule.count) ? rule.points[qp].w : 0.0;
-      }
+        return (qp < Quadrature::Gauss::tetrahedron_count(order)) ? Quadrature::Gauss::tetrahedron_weight(order, qp) : 0.0;
 
       default:
         return 0.0;
