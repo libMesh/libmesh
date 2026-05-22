@@ -64367,7 +64367,13 @@ printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
         libmesh_save_CXXFLAGS="$CXXFLAGS"
         libmesh_save_LDFLAGS="$LDFLAGS"
         libmesh_save_LIBS="$LIBS"
+        libmesh_kokkos_probe_LIBS="$KOKKOS_LIBS"
         libmesh_kokkos_cxx_driver_flags=`printf "%s\n" "$libmesh_save_CXX" | sed 's/^[^ ]*//'`
+
+        if test "x$kokkos_backend" = "xcuda"
+then :
+  libmesh_kokkos_probe_LIBS=`printf "%s\n" " $libmesh_kokkos_probe_LIBS " | sed -e 's/ -Wl,-rpath,[^ ]* / /g' -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' -e 's/  */ /g' -e 's/^ *//' -e 's/ *$//'`
+fi
 
         CXX="$KOKKOS_CXX$libmesh_kokkos_cxx_driver_flags"
         CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
@@ -64377,7 +64383,7 @@ printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
         # use KOKKOS_MPI_CPPFLAGS to find mpi.h, but rely on the primary MPI
         # link variables for the actual test link instead of wrapper-shaped
         # KOKKOS_MPI_LIBS that can fail with raw nvcc.
-        LIBS="$LIBS $KOKKOS_LIBS"
+        LIBS="$LIBS $libmesh_kokkos_probe_LIBS"
         ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
