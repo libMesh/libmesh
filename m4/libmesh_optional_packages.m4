@@ -1073,6 +1073,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         libmesh_save_LDFLAGS="$LDFLAGS"
         libmesh_save_LIBS="$LIBS"
         libmesh_kokkos_probe_LIBS="$KOKKOS_LIBS"
+        libmesh_kokkos_probe_MPI_LDFLAGS="$MPI_LDFLAGS"
         dnl Preserve non-compiler driver flags that configure attached to CXX,
         dnl such as the required -std=gnu++17 mode selected earlier.
         libmesh_kokkos_cxx_driver_flags=`AS_ECHO(["$libmesh_save_CXX"]) | sed 's/^[^ ]*//'`
@@ -1084,9 +1085,17 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
           [libmesh_kokkos_probe_LIBS=`AS_ECHO([" $libmesh_kokkos_probe_LIBS "]) | \
             sed -e 's/ -Wl,-rpath,[^ ]* / /g' \
                 -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' \
+                -e 's/ -Wl,--enable-new-dtags / /g' \
                 -e 's/  */ /g' \
                 -e 's/^ *//' \
-                -e 's/ *$//'`])
+                -e 's/ *$//'`
+           libmesh_kokkos_probe_MPI_LDFLAGS=`AS_ECHO([" $libmesh_kokkos_probe_MPI_LDFLAGS "]) | \
+             sed -e 's/ -Wl,-rpath,[^ ]* / /g' \
+                 -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' \
+                 -e 's/ -Wl,--enable-new-dtags / /g' \
+                 -e 's/  */ /g' \
+                 -e 's/^ *//' \
+                 -e 's/ *$//'`])
 
         CXX="$KOKKOS_CXX$libmesh_kokkos_cxx_driver_flags"
         CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
@@ -1101,7 +1110,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
 
         AS_IF([test "x$enablempi" = "xyes"],
           [
-            LDFLAGS="$LDFLAGS $MPI_LDFLAGS"
+            LDFLAGS="$LDFLAGS $libmesh_kokkos_probe_MPI_LDFLAGS"
             LIBS="$LIBS $MPI_LIBS"
             AC_LINK_IFELSE(
               [AC_LANG_SOURCE([[
