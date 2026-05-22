@@ -134,19 +134,19 @@ src/apps/L2system_kokkos_dbg.o: src/apps/L2system_kokkos.K
 	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	  $(CPPFLAGS_DBG) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  $(CXXFLAGS_DBG) $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
-	  -x c++ -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/apps/L2system_kokkos_devel.o: src/apps/L2system_kokkos.K
 	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	  $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  $(CXXFLAGS_DEVEL) $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
-	  -x c++ -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/apps/L2system_kokkos_opt.o: src/apps/L2system_kokkos.K
 	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 	  $(CPPFLAGS_OPT) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  $(CXXFLAGS_OPT) $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
-	  -x c++ -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
+	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 endif
 
 LIBS             = $(libmesh_optional_LIBS) $(libmesh_precision_LIBS)

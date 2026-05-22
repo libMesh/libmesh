@@ -435,6 +435,8 @@ struct KokkosPetscAssemblyPlan
   }
 };
 
+HilbertSystem::~HilbertSystem () = default;
+
 using RemoteRhsContribution = std::pair<PetscInt, PetscScalar>;
 using RemoteMatContribution = std::tuple<PetscInt, PetscInt, PetscScalar>;
 
@@ -2406,7 +2408,9 @@ HilbertSystem::try_kokkos_petsc_solve()
 using namespace libMesh;
 namespace detail = libMesh::detail;
 
+#if !defined(LIBMESH_HAVE_KOKKOS) || defined(LIBMESH_USE_COMPLEX_NUMBERS)
 HilbertSystem::~HilbertSystem () = default;
+#endif
 
 HilbertSystem::HilbertSystem(libMesh::EquationSystems & es,
                              const std::string & name,
