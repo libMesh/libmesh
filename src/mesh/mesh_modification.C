@@ -1711,42 +1711,42 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
                   almost_equal(w[22], w[24]))
                 extrude_dir = 0;
 
-              if (almost_equal(w[0], w[3]) &&
-                  almost_equal(w[0], w[11]) &&
-                  almost_equal(w[1], w[2]) &&
-                  almost_equal(w[1], w[9]) &&
-                  almost_equal(w[4], w[7]) &&
-                  almost_equal(w[4], w[19]) &&
-                  almost_equal(w[5], w[6]) &&
-                  almost_equal(w[5], w[17]) &&
-                  almost_equal(w[8], w[10]) &&
-                  almost_equal(w[8], w[20]) &&
-                  almost_equal(w[12], w[15]) &&
-                  almost_equal(w[12], w[24]) &&
-                  almost_equal(w[13], w[14]) &&
-                  almost_equal(w[13], w[22]) &&
-                  almost_equal(w[16], w[18]) &&
-                  almost_equal(w[16], w[25]) &&
-                  almost_equal(w[21], w[23]))
+              else if (almost_equal(w[0], w[3]) &&
+                       almost_equal(w[0], w[11]) &&
+                       almost_equal(w[1], w[2]) &&
+                       almost_equal(w[1], w[9]) &&
+                       almost_equal(w[4], w[7]) &&
+                       almost_equal(w[4], w[19]) &&
+                       almost_equal(w[5], w[6]) &&
+                       almost_equal(w[5], w[17]) &&
+                       almost_equal(w[8], w[10]) &&
+                       almost_equal(w[8], w[20]) &&
+                       almost_equal(w[12], w[15]) &&
+                       almost_equal(w[12], w[24]) &&
+                       almost_equal(w[13], w[14]) &&
+                       almost_equal(w[13], w[22]) &&
+                       almost_equal(w[16], w[18]) &&
+                       almost_equal(w[16], w[25]) &&
+                       almost_equal(w[21], w[23]))
                 extrude_dir = 1;
 
-              if (almost_equal(w[0], w[4]) &&
-                  almost_equal(w[0], w[12]) &&
-                  almost_equal(w[1], w[5]) &&
-                  almost_equal(w[1], w[13]) &&
-                  almost_equal(w[2], w[6]) &&
-                  almost_equal(w[2], w[14]) &&
-                  almost_equal(w[3], w[7]) &&
-                  almost_equal(w[3], w[15]) &&
-                  almost_equal(w[8], w[16]) &&
-                  almost_equal(w[8], w[21]) &&
-                  almost_equal(w[9], w[17]) &&
-                  almost_equal(w[9], w[22]) &&
-                  almost_equal(w[10], w[18]) &&
-                  almost_equal(w[10], w[23]) &&
-                  almost_equal(w[11], w[19]) &&
-                  almost_equal(w[11], w[24]) &&
-                  almost_equal(w[20], w[25]))
+              else if (almost_equal(w[0], w[4]) &&
+                       almost_equal(w[0], w[12]) &&
+                       almost_equal(w[1], w[5]) &&
+                       almost_equal(w[1], w[13]) &&
+                       almost_equal(w[2], w[6]) &&
+                       almost_equal(w[2], w[14]) &&
+                       almost_equal(w[3], w[7]) &&
+                       almost_equal(w[3], w[15]) &&
+                       almost_equal(w[8], w[16]) &&
+                       almost_equal(w[8], w[21]) &&
+                       almost_equal(w[9], w[17]) &&
+                       almost_equal(w[9], w[22]) &&
+                       almost_equal(w[10], w[18]) &&
+                       almost_equal(w[10], w[23]) &&
+                       almost_equal(w[11], w[19]) &&
+                       almost_equal(w[11], w[24]) &&
+                       almost_equal(w[20], w[25]))
                 extrude_dir = 2;
 
               // If we're extruding, then we can derive the center point
