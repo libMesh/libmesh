@@ -492,6 +492,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
   // We split on the shortest diagonal to give us better
   // triangle quality in 2D, and we split based on node ids
   // to guarantee consistency in 3D.
+  // C0POLYGONs into their sub-triangles
+  // C0POLYHEDRA into their sub-elements (currently only tets)
 
   // FIXME: This algorithm does not work on refined grids!
   {
@@ -510,9 +512,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
         if (elem->parent())
           libmesh_not_implemented_msg("Cannot convert a refined element into simplices\n");
 
-        // The new elements we will split the quad into.
-        // In 3D we may need as many as 6 tets per hex, and in 2D
-        // we may need as many subtriangles as a polygon has.
+        // The new elements we will split the quad into. Reserving for the maximum
+        // number of sub-elements created for each element
         std::vector<std::unique_ptr<Elem>> subelem(max_subelems);
 
         switch (etype)
@@ -1311,6 +1312,12 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
                   subelem[t]->set_node(2, elem->node_ptr(tet[2]));
                   subelem[t]->set_node(3, elem->node_ptr(tet[3]));
                 }
+              // There is a concern that two neighbor polyhedra might have
+              // a triangulation of a side that does not match. But the
+              // default triangulation is based on the side's triangulation
+              // and the side element is supposed to be shared (that's why
+              // shared pointers to polygons are used to build the polyhedra).
+              // So the default one should work.
 
               break;
             }
