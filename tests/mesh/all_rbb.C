@@ -89,8 +89,33 @@ protected:
 
     for (auto & elem : mesh.element_ptr_range())
     {
-      CPPUNIT_ASSERT_EQUAL(elem->mapping_type(), RATIONAL_BERNSTEIN_MAP);
+      CPPUNIT_ASSERT_EQUAL(elem->mapping_type(),
+                           RATIONAL_BERNSTEIN_MAP);
       CPPUNIT_ASSERT(elem->has_affine_map());
+
+      if (dim > 0)
+        {
+          LIBMESH_ASSERT_FP_EQUAL(elem->volume(), Real(0.5),
+                                  TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_FP_EQUAL(elem->hmin(), Real(0.5),
+                                  TOLERANCE*TOLERANCE);
+        }
+      else
+        {
+          LIBMESH_ASSERT_FP_EQUAL(elem->volume(), Real(1),
+                                  TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_FP_EQUAL(elem->hmin(), Real(0),
+                                  TOLERANCE*TOLERANCE);
+          LIBMESH_ASSERT_FP_EQUAL(elem->hmax(), Real(0),
+                                  TOLERANCE*TOLERANCE);
+        }
+
+      if (dim > 1)
+        LIBMESH_ASSERT_FP_EQUAL(elem->hmax(), Real(1),
+                                TOLERANCE*TOLERANCE);
+      else if (dim == 1)
+        LIBMESH_ASSERT_FP_EQUAL(elem->hmax(), Real(0.5),
+                                TOLERANCE*TOLERANCE);
     }
 
     for (auto & node : mesh.node_ptr_range())
