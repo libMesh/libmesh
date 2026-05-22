@@ -2402,10 +2402,10 @@ HilbertSystem::try_kokkos_petsc_solve()
 
 #endif // LIBMESH_L2SYSTEM_KOKKOS_IMPL
 
+#ifndef LIBMESH_L2SYSTEM_KOKKOS_IMPL
 using namespace libMesh;
 namespace detail = libMesh::detail;
 
-#ifndef LIBMESH_L2SYSTEM_KOKKOS_IMPL
 HilbertSystem::~HilbertSystem () = default;
 
 HilbertSystem::HilbertSystem(libMesh::EquationSystems & es,
