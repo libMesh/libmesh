@@ -64009,6 +64009,7 @@ then :
         enablekokkos=yes
         libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES $libmesh_kokkos_include_dirs"
 
+        libmesh_kokkos_caller_provided=no
                 if test "x$KOKKOS_CXX" = "x"
 then :
 
@@ -64280,7 +64281,8 @@ fi
             esac
 
 else case e in #(
-  e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Using caller-provided KOKKOS_CXX=$KOKKOS_CXX" >&5
+  e) libmesh_kokkos_caller_provided=yes
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Using caller-provided KOKKOS_CXX=$KOKKOS_CXX" >&5
 printf "%s\n" "Using caller-provided KOKKOS_CXX=$KOKKOS_CXX" >&6; } ;;
 esac
 fi
@@ -64404,8 +64406,35 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
         if test "x$enablempi" = "xyes"
 then :
+            if test "x$libmesh_kokkos_caller_provided" = "xyes"
+then :
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
-            LIBS="$LIBS $libmesh_kokkos_probe_MPI_LIBS"
+#include <mpi.h>
+#include <Kokkos_Core.hpp>
+int main(int argc, char ** argv)
+{
+  MPI_Init(&argc, &argv);
+  Kokkos::initialize(argc, argv);
+  Kokkos::finalize();
+  MPI_Finalize();
+  return 0;
+}
+
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"
+then :
+  kokkos_config_works=yes
+else case e in #(
+  e) kokkos_config_works=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+
+else case e in #(
+  e) LIBS="$LIBS $libmesh_kokkos_probe_MPI_LIBS"
             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
@@ -64430,10 +64459,37 @@ esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
+ ;;
+esac
+fi
 
 else case e in #(
-  e)
-            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+  e) if test "x$libmesh_kokkos_caller_provided" = "xyes"
+then :
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <Kokkos_Core.hpp>
+int main(int argc, char ** argv)
+{
+  Kokkos::initialize(argc, argv);
+  Kokkos::finalize();
+  return 0;
+}
+
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"
+then :
+  kokkos_config_works=yes
+else case e in #(
+  e) kokkos_config_works=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+
+else case e in #(
+  e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 #include <Kokkos_Core.hpp>
@@ -64454,6 +64510,9 @@ esac
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.beam \
     conftest$ac_exeext conftest.$ac_ext
+ ;;
+esac
+fi
            ;;
 esac
 fi
@@ -64475,7 +64534,7 @@ then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 printf "%s\n" "yes" >&6; }
 else case e in #(
-  e) as_fn_error $? "configured Kokkos compiler/flags failed to compile and link a minimal test program" "$LINENO" 5 ;;
+  e) as_fn_error $? "configured Kokkos compiler/flags failed to build a minimal test program" "$LINENO" 5 ;;
 esac
 fi
 

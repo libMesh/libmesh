@@ -913,6 +913,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         libmesh_optional_INCLUDES="$libmesh_optional_INCLUDES $libmesh_kokkos_include_dirs"
 
         dnl Only auto-detect if KOKKOS_CXX was not pre-set by the caller
+        libmesh_kokkos_caller_provided=no
         AS_IF([test "x$KOKKOS_CXX" = "x"],
           [
             dnl Auto-detect backend
@@ -1009,7 +1010,10 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
                 ;;
             esac
           ],
-          [AC_MSG_RESULT([Using caller-provided KOKKOS_CXX=$KOKKOS_CXX])])
+          [
+            libmesh_kokkos_caller_provided=yes
+            AC_MSG_RESULT([Using caller-provided KOKKOS_CXX=$KOKKOS_CXX])
+          ])
 
         dnl Set defaults for any variables not provided by caller or auto-detect
         KOKKOS_CPPFLAGS="${KOKKOS_CPPFLAGS:--DLIBMESH_KOKKOS_COMPILATION $libmesh_kokkos_include_dirs}"
@@ -1114,9 +1118,9 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
 
         AS_IF([test "x$enablempi" = "xyes"],
           [
-            LIBS="$LIBS $libmesh_kokkos_probe_MPI_LIBS"
-            AC_LINK_IFELSE(
-              [AC_LANG_SOURCE([[
+            AS_IF([test "x$libmesh_kokkos_caller_provided" = "xyes"],
+              [AC_COMPILE_IFELSE(
+                 [AC_LANG_SOURCE([[
 #include <mpi.h>
 #include <Kokkos_Core.hpp>
 int main(int argc, char ** argv)
@@ -1128,12 +1132,31 @@ int main(int argc, char ** argv)
   return 0;
 }
 ]])],
-              [kokkos_config_works=yes],
-              [kokkos_config_works=no])
+                 [kokkos_config_works=yes],
+                 [kokkos_config_works=no])],
+              [
+                LIBS="$LIBS $libmesh_kokkos_probe_MPI_LIBS"
+                AC_LINK_IFELSE(
+                  [AC_LANG_SOURCE([[
+#include <mpi.h>
+#include <Kokkos_Core.hpp>
+int main(int argc, char ** argv)
+{
+  MPI_Init(&argc, &argv);
+  Kokkos::initialize(argc, argv);
+  Kokkos::finalize();
+  MPI_Finalize();
+  return 0;
+}
+]])],
+                  [kokkos_config_works=yes],
+                  [kokkos_config_works=no])
+              ])
           ],
           [
-            AC_LINK_IFELSE(
-              [AC_LANG_SOURCE([[
+            AS_IF([test "x$libmesh_kokkos_caller_provided" = "xyes"],
+              [AC_COMPILE_IFELSE(
+                 [AC_LANG_SOURCE([[
 #include <Kokkos_Core.hpp>
 int main(int argc, char ** argv)
 {
@@ -1142,8 +1165,20 @@ int main(int argc, char ** argv)
   return 0;
 }
 ]])],
-              [kokkos_config_works=yes],
-              [kokkos_config_works=no])
+                 [kokkos_config_works=yes],
+                 [kokkos_config_works=no])],
+              [AC_LINK_IFELSE(
+                 [AC_LANG_SOURCE([[
+#include <Kokkos_Core.hpp>
+int main(int argc, char ** argv)
+{
+  Kokkos::initialize(argc, argv);
+  Kokkos::finalize();
+  return 0;
+}
+]])],
+                 [kokkos_config_works=yes],
+                 [kokkos_config_works=no])])
           ])
         AC_LANG_POP([C++])
 
@@ -1155,7 +1190,7 @@ int main(int argc, char ** argv)
 
         AS_IF([test "x$kokkos_config_works" = "xyes"],
           [AC_MSG_RESULT([yes])],
-          [AC_MSG_ERROR([configured Kokkos compiler/flags failed to compile and link a minimal test program])])
+          [AC_MSG_ERROR([configured Kokkos compiler/flags failed to build a minimal test program])])
 
         AC_DEFINE([HAVE_KOKKOS], [1],
                   [Define if Kokkos support is enabled in libMesh])
