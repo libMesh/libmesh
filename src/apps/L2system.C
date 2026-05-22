@@ -2110,23 +2110,7 @@ using libMesh::kokkos_parsed_fem_max_fields;
 using libMesh::prewarm_kokkos_hilbert_entities;
 namespace detail = libMesh::detail;
 
-HilbertSystem::~HilbertSystem () = default;
-
-HilbertSystem::HilbertSystem(libMesh::EquationSystems & es,
-                             const std::string & name,
-                             const unsigned int number)
-  : libMesh::FEMSystem(es, name, number),
-    input_system(nullptr),
-    _fe_family("LAGRANGE"),
-    _fe_order(1),
-    _hilbert_order(0),
-    _use_kokkos_backend(false),
-    _use_exact_parsed_fem_host_path(false),
-    _fdm_eps(libMesh::TOLERANCE),
-    _subdomains_list()
-{
-}
-
+#if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 void
 libmesh_kokkos_initialize(int & argc,
                           char ** & argv,
@@ -2143,7 +2127,6 @@ libmesh_kokkos_finalize(const bool enable)
     ::Kokkos::finalize();
 }
 
-#if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
 const libMesh::Kokkos::KokkosParsedFunction<libMesh::Number> *
 HilbertSystem::ensure_kokkos_goal_func()
 {
@@ -2419,12 +2402,10 @@ HilbertSystem::try_kokkos_petsc_solve()
 
 #endif // LIBMESH_L2SYSTEM_KOKKOS_IMPL
 
-#ifndef LIBMESH_L2SYSTEM_KOKKOS_IMPL
 using namespace libMesh;
-#endif
+namespace detail = libMesh::detail;
 
-#if !defined(LIBMESH_L2SYSTEM_KOKKOS_IMPL) && \
-    (!defined(LIBMESH_HAVE_KOKKOS) || defined(LIBMESH_USE_COMPLEX_NUMBERS))
+#ifndef LIBMESH_L2SYSTEM_KOKKOS_IMPL
 HilbertSystem::~HilbertSystem () = default;
 
 HilbertSystem::HilbertSystem(libMesh::EquationSystems & es,
@@ -2441,7 +2422,10 @@ HilbertSystem::HilbertSystem(libMesh::EquationSystems & es,
     _subdomains_list()
 {
 }
+#endif
 
+#if !defined(LIBMESH_L2SYSTEM_KOKKOS_IMPL) && \
+    (!defined(LIBMESH_HAVE_KOKKOS) || defined(LIBMESH_USE_COMPLEX_NUMBERS))
 void
 libmesh_kokkos_initialize(int & argc,
                           char ** & argv,
@@ -2455,34 +2439,9 @@ libmesh_kokkos_finalize(const bool enable)
 {
   libmesh_ignore(enable);
 }
-
-#if defined(LIBMESH_HAVE_KOKKOS) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
-bool HilbertSystem::needs_exact_kokkos_fem_goal_context() { return false; }
-
-bool
-HilbertSystem::try_exact_kokkos_analytic_goal_host_assembly(FEMContext & c,
-                                                            const bool request_jacobian,
-                                                            DenseSubVector<Number> & F,
-                                                            DenseSubMatrix<Number> & K)
-{
-  libmesh_ignore(c, request_jacobian, F, K);
-  return false;
-}
-
-bool
-HilbertSystem::try_exact_kokkos_fem_goal_host_assembly(FEMContext & c,
-                                                       const bool request_jacobian,
-                                                       DenseSubVector<Number> & F,
-                                                       DenseSubMatrix<Number> & K)
-{
-  libmesh_ignore(c, request_jacobian, F, K);
-  return false;
-}
-#endif
 #endif
 
 #ifndef LIBMESH_L2SYSTEM_KOKKOS_IMPL
-
 void HilbertSystem::init_data ()
 {
   this->get_dof_map().full_sparsity_pattern_needed();

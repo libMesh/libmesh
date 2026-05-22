@@ -15,6 +15,5 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-// Compile only the Kokkos-owned L2system definitions from L2system.C.
-#define LIBMESH_L2SYSTEM_KOKKOS_IMPL
-#include "L2system.C"
+// Compile the Kokkos calculator entry path from the shared calculator source.
+#include "calculator.C"
