@@ -64357,8 +64357,8 @@ fi
         # primary MPI configure path already contributed MPI_LDFLAGS/MPI_LIBS
         # globally, and wrapper-provided link flags can contain split linker
         # directives such as "-Wl,-rpath -Wl,/path".  Those are not suitable
-        # for raw-nvcc links and should stay out of the global libmesh link
-        # line and out of the raw Kokkos configure probe below.
+        # for the global libmesh link line and need sanitizing before the raw
+        # Kokkos configure probe below.
 
                         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether the Kokkos compiler configuration works" >&5
 printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
@@ -64368,23 +64368,32 @@ printf %s "checking whether the Kokkos compiler configuration works... " >&6; }
         libmesh_save_LDFLAGS="$LDFLAGS"
         libmesh_save_LIBS="$LIBS"
         libmesh_kokkos_probe_LIBS="$KOKKOS_LIBS"
-        libmesh_kokkos_probe_MPI_LDFLAGS="$MPI_LDFLAGS"
+        libmesh_kokkos_probe_MPI_LIBS="$KOKKOS_MPI_LIBS"
+        if test "x$libmesh_kokkos_probe_MPI_LIBS" = "x"
+then :
+  libmesh_kokkos_probe_MPI_LIBS="$MPI_LDFLAGS $MPI_LIBS"
+fi
         libmesh_kokkos_cxx_driver_flags=`printf "%s\n" "$libmesh_save_CXX" | sed 's/^[^ ]*//'`
 
+        # PETSc-installed Kokkos/CUDA and MPI wrapper link lines can carry
+        # -Wl,-rpath entries. Raw nvcc may reject those during this
+        # configure smoke test even though the real libMesh link later
+        # handles them correctly.
         if test "x$kokkos_backend" = "xcuda"
 then :
   libmesh_kokkos_probe_LIBS=`printf "%s\n" " $libmesh_kokkos_probe_LIBS " | sed -e 's/ -Wl,-rpath,[^ ]* / /g' -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' -e 's/ -Wl,--enable-new-dtags / /g' -e 's/  */ /g' -e 's/^ *//' -e 's/ *$//'`
-           libmesh_kokkos_probe_MPI_LDFLAGS=`printf "%s\n" " $libmesh_kokkos_probe_MPI_LDFLAGS " | sed -e 's/ -Wl,-rpath,[^ ]* / /g' -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' -e 's/ -Wl,--enable-new-dtags / /g' -e 's/  */ /g' -e 's/^ *//' -e 's/ *$//'`
+           libmesh_kokkos_probe_MPI_LIBS=`printf "%s\n" " $libmesh_kokkos_probe_MPI_LIBS " | sed -e 's/ -Wl,-rpath,[^ ]* / /g' -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' -e 's/ -Wl,--enable-new-dtags / /g' -e 's/  */ /g' -e 's/^ *//' -e 's/ *$//'`
 fi
 
         CXX="$KOKKOS_CXX$libmesh_kokkos_cxx_driver_flags"
         CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
         CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
         LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
-        # Follow the older kokkos-build-numerics configure probe pattern:
-        # use KOKKOS_MPI_CPPFLAGS to find mpi.h, but rely on the primary MPI
-        # link variables for the actual test link instead of wrapper-shaped
-        # KOKKOS_MPI_LIBS that can fail with raw nvcc.
+        # Use KOKKOS_MPI_CPPFLAGS to find mpi.h and the MPI link flags that
+        # were actually discovered for the active KOKKOS_CXX.  For raw nvcc
+        # these are wrapper-derived flags that may need sanitizing, which is
+        # why they are kept local to this smoke test rather than added to the
+        # global libmesh link line.
         LIBS="$LIBS $libmesh_kokkos_probe_LIBS"
         ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -64396,8 +64405,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
         if test "x$enablempi" = "xyes"
 then :
 
-            LDFLAGS="$LDFLAGS $libmesh_kokkos_probe_MPI_LDFLAGS"
-            LIBS="$LIBS $MPI_LIBS"
+            LIBS="$LIBS $libmesh_kokkos_probe_MPI_LIBS"
             cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 

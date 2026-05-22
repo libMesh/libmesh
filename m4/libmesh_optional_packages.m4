@@ -1061,8 +1061,8 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         dnl primary MPI configure path already contributed MPI_LDFLAGS/MPI_LIBS
         dnl globally, and wrapper-provided link flags can contain split linker
         dnl directives such as "-Wl,-rpath -Wl,/path".  Those are not suitable
-        dnl for raw-nvcc links and should stay out of the global libmesh link
-        dnl line and out of the raw Kokkos configure probe below.
+        dnl for the global libmesh link line and need sanitizing before the raw
+        dnl Kokkos configure probe below.
 
         dnl Fail configure early if the chosen Kokkos compiler/flags/libs cannot
         dnl actually compile and link a minimal Kokkos program.
@@ -1073,14 +1073,17 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         libmesh_save_LDFLAGS="$LDFLAGS"
         libmesh_save_LIBS="$LIBS"
         libmesh_kokkos_probe_LIBS="$KOKKOS_LIBS"
-        libmesh_kokkos_probe_MPI_LDFLAGS="$MPI_LDFLAGS"
+        libmesh_kokkos_probe_MPI_LIBS="$KOKKOS_MPI_LIBS"
+        AS_IF([test "x$libmesh_kokkos_probe_MPI_LIBS" = "x"],
+          [libmesh_kokkos_probe_MPI_LIBS="$MPI_LDFLAGS $MPI_LIBS"])
         dnl Preserve non-compiler driver flags that configure attached to CXX,
         dnl such as the required -std=gnu++17 mode selected earlier.
         libmesh_kokkos_cxx_driver_flags=`AS_ECHO(["$libmesh_save_CXX"]) | sed 's/^[^ ]*//'`
 
-        dnl PETSc-installed Kokkos/CUDA link lines can carry -Wl,-rpath entries.
-        dnl Raw nvcc may reject those during this configure smoke test even
-        dnl though the real libMesh link later handles them correctly.
+        dnl PETSc-installed Kokkos/CUDA and MPI wrapper link lines can carry
+        dnl -Wl,-rpath entries. Raw nvcc may reject those during this
+        dnl configure smoke test even though the real libMesh link later
+        dnl handles them correctly.
         AS_IF([test "x$kokkos_backend" = "xcuda"],
           [libmesh_kokkos_probe_LIBS=`AS_ECHO([" $libmesh_kokkos_probe_LIBS "]) | \
             sed -e 's/ -Wl,-rpath,[^ ]* / /g' \
@@ -1089,7 +1092,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
                 -e 's/  */ /g' \
                 -e 's/^ *//' \
                 -e 's/ *$//'`
-           libmesh_kokkos_probe_MPI_LDFLAGS=`AS_ECHO([" $libmesh_kokkos_probe_MPI_LDFLAGS "]) | \
+           libmesh_kokkos_probe_MPI_LIBS=`AS_ECHO([" $libmesh_kokkos_probe_MPI_LIBS "]) | \
              sed -e 's/ -Wl,-rpath,[^ ]* / /g' \
                  -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' \
                  -e 's/ -Wl,--enable-new-dtags / /g' \
@@ -1101,17 +1104,17 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
         CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
         LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"
-        dnl Follow the older kokkos-build-numerics configure probe pattern:
-        dnl use KOKKOS_MPI_CPPFLAGS to find mpi.h, but rely on the primary MPI
-        dnl link variables for the actual test link instead of wrapper-shaped
-        dnl KOKKOS_MPI_LIBS that can fail with raw nvcc.
+        dnl Use KOKKOS_MPI_CPPFLAGS to find mpi.h and the MPI link flags that
+        dnl were actually discovered for the active KOKKOS_CXX.  For raw nvcc
+        dnl these are wrapper-derived flags that may need sanitizing, which is
+        dnl why they are kept local to this smoke test rather than added to the
+        dnl global libmesh link line.
         LIBS="$LIBS $libmesh_kokkos_probe_LIBS"
         AC_LANG_PUSH([C++])
 
         AS_IF([test "x$enablempi" = "xyes"],
           [
-            LDFLAGS="$LDFLAGS $libmesh_kokkos_probe_MPI_LDFLAGS"
-            LIBS="$LIBS $MPI_LIBS"
+            LIBS="$LIBS $libmesh_kokkos_probe_MPI_LIBS"
             AC_LINK_IFELSE(
               [AC_LANG_SOURCE([[
 #include <mpi.h>
