@@ -44,15 +44,6 @@ AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
                    $(libmesh_optional_INCLUDES) \
                    -I$(top_builddir)/include # required for libmesh_version.h
 
-KOKKOS_LIBMESH_DBG_OBJECTS =
-KOKKOS_LIBMESH_DEVEL_OBJECTS =
-KOKKOS_LIBMESH_OPT_OBJECTS =
-KOKKOS_LIBMESH_PROF_OBJECTS =
-KOKKOS_LIBMESH_OPROF_OBJECTS =
-KOKKOS_CALCULATOR_DBG_OBJECTS =
-KOKKOS_CALCULATOR_DEVEL_OBJECTS =
-KOKKOS_CALCULATOR_OPT_OBJECTS =
-
 if LIBMESH_ENABLE_KOKKOS
 KOKKOS_LIBMESH_DBG_OBJECTS = src/base/dof_map_kokkos_dbg.lo src/mesh/mesh_base_kokkos_dbg.lo
 KOKKOS_LIBMESH_DEVEL_OBJECTS = src/base/dof_map_kokkos_devel.lo src/mesh/mesh_base_kokkos_devel.lo
@@ -382,7 +373,7 @@ if LIBMESH_DBG_MODE
   libmesh_dbg_la_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
   libmesh_dbg_la_CXXFLAGS = $(CXXFLAGS_DBG)
   libmesh_dbg_la_CFLAGS   = $(CFLAGS_DBG)
-  libmesh_dbg_la_LIBADD   = contrib/libcontrib_dbg.la $(LIBS)
+  libmesh_dbg_la_LIBADD   = contrib/libcontrib_dbg.la $(KOKKOS_LIBMESH_DBG_OBJECTS) $(LIBS)
 endif
 
 if LIBMESH_DEVEL_MODE
@@ -391,7 +382,7 @@ if LIBMESH_DEVEL_MODE
   libmesh_devel_la_CPPFLAGS = $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS)
   libmesh_devel_la_CXXFLAGS = $(CXXFLAGS_DEVEL)
   libmesh_devel_la_CFLAGS   = $(CFLAGS_DEVEL)
-  libmesh_devel_la_LIBADD   = contrib/libcontrib_devel.la $(LIBS)
+  libmesh_devel_la_LIBADD   = contrib/libcontrib_devel.la $(KOKKOS_LIBMESH_DEVEL_OBJECTS) $(LIBS)
 endif
 
 if LIBMESH_OPT_MODE
@@ -400,7 +391,7 @@ if LIBMESH_OPT_MODE
   libmesh_opt_la_CPPFLAGS = $(CPPFLAGS_OPT) $(AM_CPPFLAGS)
   libmesh_opt_la_CXXFLAGS = $(CXXFLAGS_OPT)
   libmesh_opt_la_CFLAGS   = $(CFLAGS_OPT)
-  libmesh_opt_la_LIBADD   = contrib/libcontrib_opt.la $(LIBS)
+  libmesh_opt_la_LIBADD   = contrib/libcontrib_opt.la $(KOKKOS_LIBMESH_OPT_OBJECTS) $(LIBS)
 endif
 
 if LIBMESH_PROF_MODE
@@ -409,7 +400,7 @@ if LIBMESH_PROF_MODE
   libmesh_prof_la_CPPFLAGS = $(CPPFLAGS_PROF) $(AM_CPPFLAGS)
   libmesh_prof_la_CXXFLAGS = $(CXXFLAGS_PROF)
   libmesh_prof_la_CFLAGS   = $(CFLAGS_PROF)
-  libmesh_prof_la_LIBADD   = contrib/libcontrib_prof.la $(LIBS)
+  libmesh_prof_la_LIBADD   = contrib/libcontrib_prof.la $(KOKKOS_LIBMESH_PROF_OBJECTS) $(LIBS)
 endif
 
 if LIBMESH_OPROF_MODE
@@ -418,7 +409,7 @@ if LIBMESH_OPROF_MODE
   libmesh_oprof_la_CPPFLAGS = $(CPPFLAGS_OPROF) $(AM_CPPFLAGS)
   libmesh_oprof_la_CXXFLAGS = $(CXXFLAGS_OPROF)
   libmesh_oprof_la_CFLAGS   = $(CFLAGS_OPROF)
-  libmesh_oprof_la_LIBADD   = contrib/libcontrib_oprof.la $(LIBS)
+  libmesh_oprof_la_LIBADD   = contrib/libcontrib_oprof.la $(KOKKOS_LIBMESH_OPROF_OBJECTS) $(LIBS)
 endif
 
 # Make sure we build the library before we test it
