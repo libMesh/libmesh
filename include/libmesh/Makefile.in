@@ -537,7 +537,8 @@ vtkversion = @vtkversion@
 # include the magic script!
 EXTRA_DIST = rebuild_makefile.sh
 BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
-	dof_object.h factory.h float128_shims.h getpot.h id_types.h \
+	dof_map_kokkos.h dof_object.h factory.h float128_shims.h \
+	getpot.h id_types.h \
 	libmesh.h libmesh_abort.h libmesh_augment_std_namespace.h \
 	libmesh_base.h libmesh_common.h libmesh_device.h \
 	libmesh_documentation.h libmesh_exceptions.h libmesh_logging.h \
@@ -983,6 +984,9 @@ dof_map.h: $(top_srcdir)/include/base/dof_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_map_base.h: $(top_srcdir)/include/base/dof_map_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+dof_map_kokkos.h: $(top_srcdir)/include/base/dof_map_kokkos.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 dof_object.h: $(top_srcdir)/include/base/dof_object.h
@@ -1601,6 +1605,9 @@ mesh.h: $(top_srcdir)/include/mesh/mesh.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_base.h: $(top_srcdir)/include/mesh/mesh_base.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+mesh_base_kokkos.h: $(top_srcdir)/include/mesh/mesh_base_kokkos.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 mesh_communication.h: $(top_srcdir)/include/mesh/mesh_communication.h
