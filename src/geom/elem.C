@@ -682,10 +682,14 @@ Point Elem::vertex_average() const
 
 Real Elem::hmin() const
 {
-  Real h_min=std::numeric_limits<Real>::max();
-
   // Avoid calling a virtual a lot of times
   const auto n_vertices = this->n_vertices();
+
+  // Special case for NodeElem
+  if (!n_vertices)
+    return 0;
+
+  Real h_min=std::numeric_limits<Real>::max();
 
   for (unsigned int n_outer=0; n_outer<n_vertices; n_outer++)
     for (unsigned int n_inner=n_outer+1; n_inner<n_vertices; n_inner++)
