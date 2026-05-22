@@ -7,6 +7,7 @@
 #include <libmesh/face_polygon.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
+#include <libmesh/mesh_tools.h>
 #include <libmesh/boundary_info.h>
 
 #include "test_comm.h"
@@ -181,6 +182,7 @@ public:
         octagon->set_node(i, node);
       }
     octagon->set_id() = 0;
+    Real poly_volume = octagon->volume();
     Elem * elem = mesh.add_elem(std::move(octagon));
 
     // Mark every external side with a boundary id so we can verify
@@ -199,6 +201,8 @@ public:
 
     for (const Elem * e : mesh.element_ptr_range())
       CPPUNIT_ASSERT_EQUAL(ElemType(TRI3), e->type());
+
+    LIBMESH_ASSERT_NUMBERS_EQUAL(poly_volume, MeshTools::volume(mesh), TOLERANCE);
   }
 
 protected:
@@ -252,6 +256,7 @@ protected:
     for (unsigned int b = 0; b < elem->n_sub_elem(); ++b)
       sub_elem_sides_to_parent_side[b] = poly->subelement_sides_to_poly_sides(b);
 
+    Real poly_volume = poly->volume();
     mesh.prepare_for_use();
 
     MeshTools::Modification::all_tri(mesh);
@@ -273,6 +278,7 @@ protected:
         if (side != invalid_int)
           CPPUNIT_ASSERT_EQUAL(mesh.get_boundary_info().has_boundary_id(e, s, side), true);
       }
+    LIBMESH_ASSERT_NUMBERS_EQUAL(poly_volume, MeshTools::volume(mesh), TOLERANCE);
   }
 
 public:
