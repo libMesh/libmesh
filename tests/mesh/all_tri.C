@@ -239,13 +239,18 @@ protected:
     // Mark every external face with a boundary id so we can verify
     // boundary information is transferred to the new tets.
     for (unsigned int s = 0; s < elem->n_sides(); ++s)
-      mesh.get_boundary_info().add_side(elem, s, /*bnd_id=*/0);
+      mesh.get_boundary_info().add_side(elem, s, /*bnd_id=*/s);
 
     // The number of boundary triangles produced is the total number of
     // subtriangles across the polyhedron's polygonal faces.
     std::size_t n_bcs_expected = 0;
     for (unsigned int s = 0; s < elem->n_sides(); ++s)
       n_bcs_expected += sides[s]->n_subtriangles();
+
+    // Keep this map for future checks
+    std::vector<std::array<int, 4>> sub_elem_sides_to_parent_side(elem->n_sub_elem());
+    for (unsigned int b = 0; b < elem->n_sub_elem(); ++b)
+      sub_elem_sides_to_parent_side[b] = poly->subelement_sides_to_poly_sides(b);
 
     mesh.prepare_for_use();
 
@@ -257,6 +262,17 @@ protected:
 
     for (const Elem * e : mesh.element_ptr_range())
       CPPUNIT_ASSERT_EQUAL(ElemType(TET4), e->type());
+
+    // Check that the boundary info and numbering is as expected
+    for (const Elem * e : mesh.element_ptr_range())
+      for (const auto s : make_range(e->n_sides()))
+      {
+        // Get parent side
+        const auto side = sub_elem_sides_to_parent_side[e->id()][s];
+        // Check boundary exists on the tet side if the tet side is on a poly side
+        if (side != invalid_int)
+          CPPUNIT_ASSERT_EQUAL(mesh.get_boundary_info().has_boundary_id(e, s, side), true);
+      }
   }
 
 public:
