@@ -1084,7 +1084,7 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         dnl -Wl,-rpath entries. Raw nvcc may reject those during this
         dnl configure smoke test even though the real libMesh link later
         dnl handles them correctly.
-        AS_IF([test "x$kokkos_backend" = "xcuda"],
+        AS_IF([test "x$KOKKOS_BACKEND" = "xcuda"],
           [libmesh_kokkos_probe_LIBS=`AS_ECHO([" $libmesh_kokkos_probe_LIBS "]) | \
             sed -e 's/ -Wl,-rpath,[^ ]* / /g' \
                 -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' \
