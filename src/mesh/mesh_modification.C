@@ -1590,7 +1590,6 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
 
         // We only use [4,8) but matching indices is nice and stack is
         // cheap.
-        // that we're only using what we set, though.
         Real w[9];
 
         for (unsigned int i : make_range(4u, 8u))

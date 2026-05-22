@@ -15,10 +15,12 @@ using namespace libMesh;
 class AllRBBTest : public CppUnit::TestCase
 {
   /**
-   * The goal of this test is to verify proper operation of the Mesh Extruder
-   * with the optional object callback for setting custom subdomain IDs.
-   * We pass a custom object for generating subdomains based on the old element
-   * ID and the current layer and assert the proper values.
+   * The goal of this test is to verify proper operation of the
+   * all_rbb() mesh modification, by converting meshes of classic
+   * "isogeometric" types from Lagrange interpolants to Rational
+   * Bezier-Bernstein splines, then verifying that the converted
+   * geometry is exact to within floating-point error (for point
+   * radii) or quadrature error (for element volume).
    */
 public:
   LIBMESH_CPPUNIT_TEST_SUITE( AllRBBTest );
@@ -112,7 +114,7 @@ protected:
     MeshTools::Generation::build_sphere (interior_mesh, radius,
                                          n_refinements, QUAD9);
 
-    // Get just the outer EDGE9 circle mesh
+    // Get just the outer EDGE3 circle mesh
     interior_mesh.get_boundary_info().sync(boundary_mesh);
 
     const dof_id_type n_edges = 4 << n_refinements;
