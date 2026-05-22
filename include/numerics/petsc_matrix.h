@@ -293,7 +293,6 @@ public:
 
   virtual void restore_original_nonzero_pattern() override;
 
-protected:
   /**
    * Perform matrix initialization steps sans preallocation
    * @param m The global number of rows
@@ -308,6 +307,15 @@ protected:
                                    numeric_index_type n_l,
                                    numeric_index_type blocksize);
 
+  /**
+   * Finish up the initialization process. This method does a few things which include
+   * - Setting the option to make new nonzeroes an error (otherwise users will just have a silent
+       (often huge) performance penalty
+   * - Marking the matrix as initialized
+   */
+  void finish_initialization();
+
+protected:
   /*
    * Performs matrix preallcation
    * \param m_l The local number of rows.
@@ -318,14 +326,6 @@ protected:
                    const std::vector<numeric_index_type> & n_nz,
                    const std::vector<numeric_index_type> & n_oz,
                    numeric_index_type blocksize);
-
-  /**
-   * Finish up the initialization process. This method does a few things which include
-   * - Setting the option to make new nonzeroes an error (otherwise users will just have a silent
-       (often huge) performance penalty
-   * - Marking the matrix as initialized
-   */
-  void finish_initialization();
 
   /**
    * This function either creates or re-initializes a matrix called \p
