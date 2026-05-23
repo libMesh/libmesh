@@ -215,9 +215,11 @@ void C0Polygon::connectivity(const unsigned int /*sf*/,
 
 Real C0Polygon::volume () const
 {
-  // This specialization is good for Lagrange mappings only
-  if (this->mapping_type() != LAGRANGE_MAP)
-    return this->Elem::volume();
+  // This specialization is good for non-Lagrange mappings, but
+  // remember to be more careful when we extend it to non-planar or
+  // non p=1 polygon types.
+  // if (this->mapping_type() != LAGRANGE_MAP)
+  //   return this->Elem::volume();
 
   // We use a triangulation to calculate here; assert that it's as
   // consistent as possible.
