@@ -199,7 +199,9 @@ void C0Polyhedron::connectivity(const unsigned int /*sf*/,
 
 Real C0Polyhedron::volume () const
 {
-  // This specialization is good for Lagrange mappings only
+  // This specialization is ... probably good for general non-Lagrange
+  // mappings, since we require our polyhedral faces to be planar, but
+  // I'd rather be slow than wrong.
   if (this->mapping_type() != LAGRANGE_MAP)
     return this->Elem::volume();
 

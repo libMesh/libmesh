@@ -298,7 +298,7 @@ dof_id_type Edge4::key () const
 
 Real Edge4::volume () const
 {
-  // This specialization is good for Lagrange mappings only
+  // This specialization is good for Lagrange mappings only in general
   if (this->mapping_type() != LAGRANGE_MAP)
     return this->Elem::volume();
 

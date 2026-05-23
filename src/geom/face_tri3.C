@@ -190,6 +190,9 @@ Point Tri3::true_centroid () const
 
 Real Tri3::volume () const
 {
+  // This specialization is good for non-Lagrange mappings too!  Even
+  // with differing vertex weights we've still got a p=1 planar face.
+
   // 3-node triangles have the following formula for computing the area
   return 0.5 * cross_norm(point(1) - point(0),
                           point(2) - point(0));
