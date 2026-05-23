@@ -80,10 +80,24 @@ protected:
                                         elem_type);
 
     const auto n_orig_elem = mesh.n_elem();
+    CPPUNIT_ASSERT_EQUAL(n_orig_elem, mesh.max_elem_id());
+
+    const Real orig_volume = MeshTools::volume(mesh) / n_orig_elem;
+
+    std::vector<Real> orig_hmin(n_orig_elem), orig_hmax(n_orig_elem);
+
+    // In the tet case our elements all have the same volume but
+    // they're stretched differently and have different hmin/hmax
+    for (auto & elem : mesh.element_ptr_range())
+    {
+      orig_hmin[elem->id()] = elem->hmin();
+      orig_hmax[elem->id()] = elem->hmax();
+    }
 
     MeshTools::Modification::all_rbb(mesh);
 
     CPPUNIT_ASSERT_EQUAL(n_orig_elem, mesh.n_elem());
+    CPPUNIT_ASSERT_EQUAL(n_orig_elem, mesh.max_elem_id());
 
     unsigned char weight_index = mesh.default_mapping_data();
 
@@ -93,29 +107,13 @@ protected:
                            RATIONAL_BERNSTEIN_MAP);
       CPPUNIT_ASSERT(elem->has_affine_map());
 
-      if (dim > 0)
-        {
-          LIBMESH_ASSERT_FP_EQUAL(elem->volume(), Real(0.5),
-                                  TOLERANCE*TOLERANCE);
-          LIBMESH_ASSERT_FP_EQUAL(elem->hmin(), Real(0.5),
-                                  TOLERANCE*TOLERANCE);
-        }
-      else
-        {
-          LIBMESH_ASSERT_FP_EQUAL(elem->volume(), Real(1),
-                                  TOLERANCE*TOLERANCE);
-          LIBMESH_ASSERT_FP_EQUAL(elem->hmin(), Real(0),
-                                  TOLERANCE*TOLERANCE);
-          LIBMESH_ASSERT_FP_EQUAL(elem->hmax(), Real(0),
-                                  TOLERANCE*TOLERANCE);
-        }
-
-      if (dim > 1)
-        LIBMESH_ASSERT_FP_EQUAL(elem->hmax(), Real(1),
-                                TOLERANCE*TOLERANCE);
-      else if (dim == 1)
-        LIBMESH_ASSERT_FP_EQUAL(elem->hmax(), Real(0.5),
-                                TOLERANCE*TOLERANCE);
+      // Tri6 has this much FP error??
+      LIBMESH_ASSERT_FP_EQUAL(elem->volume(), orig_volume,
+                              20*TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(elem->hmax(), orig_hmax[elem->id()],
+                              TOLERANCE*TOLERANCE);
+      LIBMESH_ASSERT_FP_EQUAL(elem->hmin(), orig_hmin[elem->id()],
+                              TOLERANCE*TOLERANCE);
     }
 
     for (auto & node : mesh.node_ptr_range())
