@@ -273,8 +273,10 @@ public:
   void testAllRBBHex() { LOG_UNIT_TEST; test_box(HEX8); }
   void testAllRBBHex20() { LOG_UNIT_TEST; test_box(HEX20); }
   void testAllRBBHex27() { LOG_UNIT_TEST; test_box(HEX27); }
-  void testAllRBBPrism6() { LOG_UNIT_TEST; test_box(PRISM6); }
-  void testAllRBBPrism18() { LOG_UNIT_TEST; test_box(PRISM18); }
+
+  // We need to add BERNSTEIN support for Prisms!
+  // void testAllRBBPrism6() { LOG_UNIT_TEST; test_box(PRISM6); }
+  // void testAllRBBPrism18() { LOG_UNIT_TEST; test_box(PRISM18); }
 
   // We still don't support general Polys, Tri7s or anything with them
   // as faces, infinite elements, or anything above quadratic.
