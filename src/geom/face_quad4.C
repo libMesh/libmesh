@@ -311,6 +311,12 @@ Point Quad4::true_centroid () const
 
 Real Quad4::volume () const
 {
+  // This specialization is good for Lagrange mappings only in general
+  // (consider that we might have a non-planar quad with non-equal
+  // vertex weights)
+  if (this->mapping_type() != LAGRANGE_MAP)
+    return this->Elem::volume();
+
   // Make copies of our points.  It makes the subsequent calculations a bit
   // shorter and avoids dereferencing the same pointer multiple times.
   Point
