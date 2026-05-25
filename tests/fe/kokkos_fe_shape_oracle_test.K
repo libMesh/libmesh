@@ -37,6 +37,11 @@
 #include <string>
 #include <vector>
 
+namespace libMeshTest
+{
+namespace KokkosFEShapeOracle
+{
+
 using libMesh::Kokkos::Real;
 using libMesh::Kokkos::RealVector;
 using kokkos_test_utils::build_qps;
@@ -556,14 +561,9 @@ test_grad_shape_parity(const physics_shape_info & info)
   return dispatch_supported_shape_key(info.key, dispatch);
 }
 
-// ---------------------------------------------------------------------------
-// main
-// ---------------------------------------------------------------------------
-int main(int argc, char ** argv)
+inline int
+run_all_oracles()
 {
-  Kokkos::initialize(argc, argv);
-  libMesh::LibMeshInit init(argc, argv);
-
   int total_fail = 0;
 
   for (unsigned int e = 0; e < n_map_elems; ++e)
@@ -620,11 +620,8 @@ int main(int argc, char ** argv)
     }
   }
 
-  if (total_fail == 0)
-    std::printf("ALL TESTS PASSED\n");
-  else
-    std::printf("%d TEST(S) FAILED\n", total_fail);
-
-  Kokkos::finalize();
   return total_fail ? 1 : 0;
 }
+
+} // namespace KokkosFEShapeOracle
+} // namespace libMeshTest

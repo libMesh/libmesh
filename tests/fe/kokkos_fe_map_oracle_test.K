@@ -40,6 +40,11 @@
 #include <string>
 #include <vector>
 
+namespace libMeshTest
+{
+namespace KokkosFEMapOracle
+{
+
 using libMesh::Kokkos::Real;
 using libMesh::Kokkos::RealVector;
 using kokkos_test_utils::build_face_helper_context;
@@ -421,12 +426,9 @@ test_face_qp_to_parent_for_parent(const face_qp_parent_case & info)
   return fail;
 }
 
-int
-main(int argc, char ** argv)
+inline int
+run_all_oracles()
 {
-  Kokkos::initialize(argc, argv);
-  libMesh::LibMeshInit init(argc, argv);
-
   int total_fail = 0;
 
   {
@@ -516,12 +518,8 @@ main(int argc, char ** argv)
     }
   }
 
-  Kokkos::finalize();
-
-  if (total_fail == 0)
-    std::printf("ALL TESTS PASSED\n");
-  else
-    std::printf("%d TEST(S) FAILED\n", total_fail);
-
   return total_fail ? 1 : 0;
 }
+
+} // namespace KokkosFEMapOracle
+} // namespace libMeshTest

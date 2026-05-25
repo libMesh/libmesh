@@ -23,6 +23,11 @@
 #include <sys/wait.h>
 #include <vector>
 
+namespace libMeshTest
+{
+namespace KokkosFEContractOracle
+{
+
 using libMesh::Kokkos::RealTensor;
 using libMesh::Kokkos::RealVector;
 
@@ -282,13 +287,19 @@ expect_child_abort(const char * argv0, const char * case_name)
   return exit_code != 0 && exit_code != 2 && exit_code != 3;
 }
 
-int
-main(int argc, char ** argv)
+inline int
+dispatch_child_case(int argc, char ** argv)
 {
   if (argc == 3 && std::string(argv[1]) == "--child")
     return run_child_case(argv[2]);
 
-  if (!expect_child_success(argv[0], "noop"))
+  return -1;
+}
+
+inline int
+run_all_oracles(const char * argv0)
+{
+  if (!expect_child_success(argv0, "noop"))
   {
     std::printf("[contract_spawn]          FAIL  (could not successfully respawn test executable)\n");
     return 1;
@@ -316,8 +327,8 @@ main(int argc, char ** argv)
   int total_fail = 0;
   for (const auto & info : cases)
   {
-    const bool passed = info.expect_abort ? expect_child_abort(argv[0], info.name)
-                                          : expect_child_success(argv[0], info.name);
+    const bool passed = info.expect_abort ? expect_child_abort(argv0, info.name)
+                                          : expect_child_success(argv0, info.name);
     const int fail = passed ? 0 : 1;
     std::printf("[%s]          [%s] %s  (%d failures)\n",
                 info.expect_abort ? "contract_abort" : "contract_success",
@@ -327,10 +338,8 @@ main(int argc, char ** argv)
     total_fail += fail;
   }
 
-  if (total_fail == 0)
-    std::printf("ALL TESTS PASSED\n");
-  else
-    std::printf("%d TEST(S) FAILED\n", total_fail);
-
   return total_fail ? 1 : 0;
 }
+
+} // namespace KokkosFEContractOracle
+} // namespace libMeshTest

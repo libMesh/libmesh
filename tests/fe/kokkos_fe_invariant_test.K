@@ -30,6 +30,11 @@
 #include <string>
 #include <vector>
 
+namespace libMeshTest
+{
+namespace KokkosFEInvariantOracle
+{
+
 using libMesh::Kokkos::GaussQuadrature;
 using libMesh::Kokkos::Real;
 using libMesh::Kokkos::RealVector;
@@ -369,12 +374,9 @@ test_quadrature_exactness(const quadrature_exactness_case & info)
   return fail;
 }
 
-int
-main(int argc, char ** argv)
+inline int
+run_all_oracles()
 {
-  Kokkos::initialize(argc, argv);
-  libMesh::LibMeshInit init(argc, argv);
-
   int total_fail = 0;
 
   for (const auto & info : map_elems)
@@ -407,12 +409,8 @@ main(int argc, char ** argv)
     total_fail += f;
   }
 
-  Kokkos::finalize();
-
-  if (total_fail == 0)
-    std::printf("ALL TESTS PASSED\n");
-  else
-    std::printf("%d TEST(S) FAILED\n", total_fail);
-
   return total_fail ? 1 : 0;
 }
+
+} // namespace KokkosFEInvariantOracle
+} // namespace libMeshTest

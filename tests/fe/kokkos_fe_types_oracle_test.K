@@ -35,6 +35,11 @@
 #include <memory>
 #include <string>
 
+namespace libMeshTest
+{
+namespace KokkosFETypesOracle
+{
+
 using kokkos_test_utils::build_reference_elem;
 
 namespace
@@ -416,15 +421,9 @@ test_support_contract()
   return fail;
 }
 
-// ---------------------------------------------------------------------------
-// main
-// ---------------------------------------------------------------------------
-int
-main(int argc, char ** argv)
+inline int
+run_all_oracles()
 {
-  Kokkos::initialize(argc, argv);
-  libMesh::LibMeshInit init(argc, argv);
-
   int total_fail = 0;
 
   {
@@ -453,12 +452,8 @@ main(int argc, char ** argv)
     total_fail += f;
   }
 
-  Kokkos::finalize();
-
-  if (total_fail == 0)
-    std::printf("ALL TESTS PASSED\n");
-  else
-    std::printf("%d TEST(S) FAILED\n", total_fail);
-
   return total_fail ? 1 : 0;
 }
+
+} // namespace KokkosFETypesOracle
+} // namespace libMeshTest

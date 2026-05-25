@@ -39,6 +39,11 @@
 #include <string>
 #include <vector>
 
+namespace libMeshTest
+{
+namespace KokkosFEPermutedMapOracle
+{
+
 using libMesh::Kokkos::Real;
 using libMesh::Kokkos::RealVector;
 using kokkos_test_utils::build_face_helper_context;
@@ -487,12 +492,9 @@ test_face_qp_to_parent_for_all_permutations()
   return fail;
 }
 
-int
-main(int argc, char ** argv)
+inline int
+run_all_oracles()
 {
-  Kokkos::initialize(argc, argv);
-  libMesh::LibMeshInit init(argc, argv);
-
   int fail = 0;
 
   const int map_fail = test_map_helpers_for_all_permutations();
@@ -507,6 +509,8 @@ main(int argc, char ** argv)
   fail += face_qp_fail;
   std::printf("[permuted_face_qp]        %s  (%d failures)\n", face_qp_fail ? "FAIL" : "OK", face_qp_fail);
 
-  Kokkos::finalize();
   return fail ? 1 : 0;
 }
+
+} // namespace KokkosFEPermutedMapOracle
+} // namespace libMeshTest

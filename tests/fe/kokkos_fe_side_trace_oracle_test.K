@@ -38,6 +38,11 @@
 #include <string>
 #include <vector>
 
+namespace libMeshTest
+{
+namespace KokkosFESideTraceOracle
+{
+
 using libMesh::Kokkos::FEShapeKey;
 using libMesh::Kokkos::Real;
 using libMesh::Kokkos::RealTensor;
@@ -302,12 +307,9 @@ test_side_trace_case(const side_trace_case & info)
   return dispatch_supported_shape_key_with_lagrange_map(info.key, dispatch);
 }
 
-int
-main(int argc, char ** argv)
+inline int
+run_all_oracles()
 {
-  Kokkos::initialize(argc, argv);
-  libMesh::LibMeshInit init(argc, argv);
-
   int total_fail = 0;
 
   for (const auto & info : lagrange_cases)
@@ -326,12 +328,8 @@ main(int argc, char ** argv)
     total_fail += f;
   }
 
-  Kokkos::finalize();
-
-  if (total_fail == 0)
-    std::printf("ALL TESTS PASSED\n");
-  else
-    std::printf("%d TEST(S) FAILED\n", total_fail);
-
   return total_fail ? 1 : 0;
 }
+
+} // namespace KokkosFESideTraceOracle
+} // namespace libMeshTest
