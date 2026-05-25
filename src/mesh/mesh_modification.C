@@ -30,7 +30,11 @@
 #include "libmesh/function_base.h"
 #include "libmesh/cell_tet4.h"
 #include "libmesh/cell_tet10.h"
+#include "libmesh/cell_c0polyhedron.h"
+#include "libmesh/cell_polyhedron.h"
 #include "libmesh/elem_range.h"
+#include "libmesh/face_c0polygon.h"
+#include "libmesh/face_polygon.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_tri6.h"
 #include "libmesh/libmesh_logging.h"
@@ -449,6 +453,18 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
   if (mesh.mesh_dimension() == 3) // in 3D hexes can split into 6 tets
     max_subelems = 6;
 
+  // 2D polygons and 3D polyhedra can be split into an arbitrary
+  // number of triangles/tetrahedra depending on their topology, so we
+  // have to scan the mesh to find the largest split we will need.
+  for (const Elem * elem : mesh.element_ptr_range())
+    {
+      if (const Polygon * poly = dynamic_cast<const Polygon *>(elem))
+        max_subelems = std::max(max_subelems, poly->n_subtriangles());
+      else if (const Polyhedron * polyhedron = dynamic_cast<const Polyhedron *>(elem))
+        max_subelems = std::max(max_subelems, polyhedron->n_subelements());
+    }
+  mesh.comm().max(max_subelems);
+
   new_elements.reserve (max_subelems*n_orig_elem);
 
   // If the original mesh has *side* boundary data, we carry that over
@@ -476,6 +492,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
   // We split on the shortest diagonal to give us better
   // triangle quality in 2D, and we split based on node ids
   // to guarantee consistency in 3D.
+  // C0POLYGONs into their sub-triangles
+  // C0POLYHEDRA into their sub-elements (currently only tets)
 
   // FIXME: This algorithm does not work on refined grids!
   {
@@ -494,9 +512,9 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
         if (elem->parent())
           libmesh_not_implemented_msg("Cannot convert a refined element into simplices\n");
 
-        // The new elements we will split the quad into.
-        // In 3D we may need as many as 6 tets per hex
-        std::array<std::unique_ptr<Elem>, 6> subelem {};
+        // The new elements we will split the quad into. Reserving for the maximum
+        // number of sub-elements created for each element
+        std::vector<std::unique_ptr<Elem>> subelem(max_subelems);
 
         switch (etype)
           {
@@ -1246,6 +1264,64 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               break;
             }
 
+          case C0POLYGON:
+            {
+              // Split a C0Polygon into the triangles defined by its
+              // current triangulation.  This relies on the user having
+              // a valid triangulation (the constructor sets a default
+              // one, and the user can refresh it via retriangulate()
+              // after moving nodes).
+              const C0Polygon * polygon = cast_ptr<const C0Polygon *>(elem);
+              const unsigned int n_subtri = polygon->n_subtriangles();
+              for (unsigned int t = 0; t != n_subtri; ++t)
+                {
+                  const std::array<int, 3> tri = polygon->subtriangle(t);
+                  if (tri[0] < 0 || tri[1] < 0 || tri[2] < 0)
+                    libmesh_not_implemented_msg
+                      ("Cannot convert a C0Polygon whose triangulation\n"
+                       "introduces special (non-vertex) points");
+                  subelem[t] = Elem::build(TRI3);
+                  subelem[t]->set_node(0, elem->node_ptr(tri[0]));
+                  subelem[t]->set_node(1, elem->node_ptr(tri[1]));
+                  subelem[t]->set_node(2, elem->node_ptr(tri[2]));
+                }
+
+              break;
+            }
+
+          case C0POLYHEDRON:
+            {
+              // Split a C0Polyhedron into the tetrahedra defined by its
+              // current tetrahedralization.  If the polyhedron required
+              // a mid-element node, the user is expected to have added
+              // that node to the mesh during construction; we just
+              // reference it via the polyhedron's node pointers.
+              const C0Polyhedron * polyhedron =
+                cast_ptr<const C0Polyhedron *>(elem);
+              const unsigned int n_sub = polyhedron->n_subelements();
+              for (unsigned int t = 0; t != n_sub; ++t)
+                {
+                  const std::array<int, 4> tet = polyhedron->subelement(t);
+                  if (tet[0] < 0 || tet[1] < 0 || tet[2] < 0 || tet[3] < 0)
+                    libmesh_not_implemented_msg
+                      ("Cannot convert a C0Polyhedron whose triangulation\n"
+                       "introduces special (non-vertex) points");
+                  subelem[t] = Elem::build(TET4);
+                  subelem[t]->set_node(0, elem->node_ptr(tet[0]));
+                  subelem[t]->set_node(1, elem->node_ptr(tet[1]));
+                  subelem[t]->set_node(2, elem->node_ptr(tet[2]));
+                  subelem[t]->set_node(3, elem->node_ptr(tet[3]));
+                }
+              // There is a concern that two neighbor polyhedra might have
+              // a triangulation of a side that does not match. But the
+              // default triangulation is based on the side's triangulation
+              // and the side element is supposed to be shared (that's why
+              // shared pointers to polygons are used to build the polyhedra).
+              // So the default one should work.
+
+              break;
+            }
+
             // No need to split elements that are already simplicial:
           case EDGE2:
           case EDGE3:
@@ -1382,7 +1458,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               // the same on all processors, therefore keeping the Mesh
               // in sync.  Note: we offset the new IDs by the max of the
               // pre-existing ids to avoid conflicting with originals.
-              subelem[i]->set_id( max_orig_id + 6*elem->id() + i );
+              subelem[i]->set_id( max_orig_id + max_subelems*elem->id() + i );
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
               subelem[i]->set_unique_id(max_unique_id + max_subelems*elem->unique_id() + i);
