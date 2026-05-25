@@ -130,8 +130,8 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/exodus.m4 $(top_srcdir)/m4/feexcept.m4 \
 	$(top_srcdir)/m4/fparser.m4 $(top_srcdir)/m4/glpk.m4 \
 	$(top_srcdir)/m4/gmv.m4 $(top_srcdir)/m4/gz.m4 \
-	$(top_srcdir)/m4/hdf5.m4 $(top_srcdir)/m4/laspack.m4 \
-	$(top_srcdir)/m4/libhilbert.m4 \
+	$(top_srcdir)/m4/hdf5.m4 $(top_srcdir)/m4/kokkos.m4 \
+	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
 	$(top_srcdir)/m4/libmesh_metaphysicl.m4 \
@@ -217,13 +217,13 @@ am__uninstall_files_from_dir = { \
        $(am__cd) "$$dir" && echo $$files | $(am__xargs_n) 40 $(am__rm_f); }; \
   }
 am__installdirs = "$(DESTDIR)$(includedir)" "$(DESTDIR)$(includedir)"
-am__nobase_include_HEADERS_DIST = gpu/kokkos_scalar_types.h \
-	gpu/kokkos_fe_types.h gpu/kokkos_fe_shape_dispatch.h \
-	gpu/kokkos_fe_base.h gpu/kokkos_fe_evaluator.h \
-	gpu/kokkos_fe_lagrange_1d.h gpu/kokkos_fe_lagrange_2d.h \
-	gpu/kokkos_fe_lagrange_3d.h gpu/kokkos_fe_monomial.h \
-	gpu/kokkos_fe_face_map.h gpu/kokkos_fe_map.h \
-	gpu/kokkos_quadrature.h gpu/kokkos_hilbert_system.h \
+am__nobase_include_HEADERS_DIST = gpu/kokkos_fe_types.h \
+	gpu/kokkos_fe_shape_dispatch.h gpu/kokkos_fe_base.h \
+	gpu/kokkos_fe_evaluator.h gpu/kokkos_fe_lagrange_1d.h \
+	gpu/kokkos_fe_lagrange_2d.h gpu/kokkos_fe_lagrange_3d.h \
+	gpu/kokkos_fe_monomial.h gpu/kokkos_fe_face_map.h \
+	gpu/kokkos_fe_map.h gpu/kokkos_quadrature.h \
+	gpu/kokkos_hilbert_assembly.h gpu/kokkos_hilbert_system.h \
 	gpu/kokkos_parsed_function.h
 HEADERS = $(include_HEADERS) $(nobase_include_HEADERS) \
 	$(noinst_HEADERS)
@@ -621,7 +621,6 @@ SUBDIRS = libmesh
 # downstream code can use #include "libmesh/gpu/kokkos_fe_types.h" etc.
 # nobase_ is used instead of the standard flat install to keep the namespace.
 @LIBMESH_ENABLE_KOKKOS_TRUE@nobase_include_HEADERS = \
-@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_scalar_types.h \
 @LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_types.h \
 @LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_shape_dispatch.h \
 @LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_base.h \
@@ -633,6 +632,7 @@ SUBDIRS = libmesh
 @LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_face_map.h \
 @LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_fe_map.h \
 @LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_quadrature.h \
+@LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_hilbert_assembly.h \
 @LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_hilbert_system.h \
 @LIBMESH_ENABLE_KOKKOS_TRUE@  gpu/kokkos_parsed_function.h
 
@@ -649,6 +649,8 @@ DISTCLEANFILES = libmesh_config.h
 # details which are not required for the public interface
 noinst_HEADERS = \
         base/libmesh_augment_std_namespace.h \
+        base/dof_map_kokkos.h \
+        mesh/mesh_base_kokkos.h \
         numerics/laspack_matrix.h \
         numerics/laspack_vector.h \
         solvers/laspack_linear_solver.h \

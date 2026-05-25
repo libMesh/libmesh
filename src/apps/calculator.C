@@ -183,9 +183,9 @@ int main(int argc, char ** argv)
 
   const bool use_kokkos = libMesh::on_command_line("--kokkos");
 
-#ifndef LIBMESH_HAVE_KOKKOS
+#if !defined(LIBMESH_HAVE_KOKKOS) || !defined(LIBMESH_HAVE_PETSC) || defined(LIBMESH_USE_COMPLEX_NUMBERS)
   libmesh_error_msg_if(use_kokkos,
-                       "--kokkos was requested, but this libMesh build does not have Kokkos enabled");
+                       "--kokkos requires a libMesh build with Kokkos, PETSc, and real Number support");
 #endif
 
   KokkosScope kokkos_scope(argc, argv, use_kokkos);

@@ -18,7 +18,7 @@
 #ifndef LIBMESH_KOKKOS_HILBERT_ASSEMBLY_H
 #define LIBMESH_KOKKOS_HILBERT_ASSEMBLY_H
 
-#include "../systems/hilbert_assembly_kernel.h"
+#include "libmesh/hilbert_assembly_kernel.h"
 
 #include "kokkos_fe_evaluator.h"
 #include "kokkos_fe_map.h"
