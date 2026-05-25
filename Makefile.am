@@ -40,6 +40,8 @@ export TAR_OPTIONS
 # codes.  These will be augmented with method-specific
 # cppflags later on
 AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
+                   -iquote $(top_builddir)/include \
+                   -iquote $(top_srcdir)/contrib/netgen \
                    $(libmesh_contrib_INCLUDES) \
                    $(libmesh_optional_INCLUDES) \
                    -I$(top_builddir)/include # required for libmesh_version.h

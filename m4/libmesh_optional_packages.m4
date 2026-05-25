@@ -1080,10 +1080,6 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
         libmesh_kokkos_probe_MPI_LIBS="$KOKKOS_MPI_LIBS"
         AS_IF([test "x$libmesh_kokkos_probe_MPI_LIBS" = "x"],
           [libmesh_kokkos_probe_MPI_LIBS="$MPI_LDFLAGS $MPI_LIBS"])
-        dnl Preserve non-compiler driver flags that configure attached to CXX,
-        dnl such as the required -std=gnu++17 mode selected earlier.
-        libmesh_kokkos_cxx_driver_flags=`AS_ECHO(["$libmesh_save_CXX"]) | sed 's/^[^ ]*//'`
-
         dnl PETSc-installed Kokkos/CUDA and MPI wrapper link lines can carry
         dnl -Wl,-rpath entries. Raw nvcc may reject those during this
         dnl configure smoke test even though the real libMesh link later
@@ -1104,7 +1100,12 @@ AS_IF([test "x$KOKKOS_DIR" != "xno"],
                  -e 's/^ *//' \
                  -e 's/ *$//'`])
 
-        CXX="$KOKKOS_CXX$libmesh_kokkos_cxx_driver_flags"
+        dnl Use the caller-selected Kokkos compiler directly for the probe.
+        dnl Driver/configuration flags belong in CPPFLAGS/CXXFLAGS/LDFLAGS.
+        dnl Re-attaching the saved full CXX command here can duplicate an
+        dnl absolute wrapper path (for example mpicxx.../mpicxx) and break the
+        dnl smoke test before we even compile the minimal program.
+        CXX="$KOKKOS_CXX"
         CPPFLAGS="$CPPFLAGS $KOKKOS_CPPFLAGS $KOKKOS_MPI_CPPFLAGS"
         CXXFLAGS="$CXXFLAGS $KOKKOS_CXXFLAGS"
         LDFLAGS="$LDFLAGS $KOKKOS_LDFLAGS"

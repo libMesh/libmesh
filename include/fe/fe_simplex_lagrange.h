@@ -4,6 +4,7 @@
 #ifndef LIBMESH_FE_SIMPLEX_LAGRANGE_H
 #define LIBMESH_FE_SIMPLEX_LAGRANGE_H
 
+#include "libmesh/libmesh_device.h"
 #include "libmesh/point.h"
 
 namespace libMesh

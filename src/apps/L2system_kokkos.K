@@ -17,6 +17,8 @@
 
 #include "L2system.h"
 
+#include "../../include/systems/hilbert_assembly.h"
+
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
 #include "libmesh/fe_base.h"
@@ -27,6 +29,8 @@
 #include "libmesh/mesh.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel_sync.h"
+#include "libmesh/parsed_fem_function.h"
+#include "libmesh/parsed_function.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/utility.h"
@@ -2145,6 +2149,12 @@ HilbertSystem::kokkos_state()
     this->_kokkos_state.reset(new HilbertSystemKokkosState);
 
   return *this->_kokkos_state;
+}
+
+HilbertSystemKokkosState *
+HilbertSystem::maybe_kokkos_state()
+{
+  return this->_kokkos_state.get();
 }
 
 const HilbertSystemKokkosState *

@@ -36,12 +36,12 @@ namespace libMesh
 {
 namespace Kokkos
 {
-  template <typename Output = libMesh::Number, unsigned int MaxStack = 64>
+  template <typename Output, unsigned int MaxStack>
   class KokkosParsedFunction;
 
-  template <typename Output = libMesh::Number,
-            unsigned int MaxStack = 64,
-            unsigned int MaxFieldVariables = 16>
+  template <typename Output,
+            unsigned int MaxStack,
+            unsigned int MaxFieldVariables>
   class KokkosParsedFEMFunction;
 }
 
@@ -176,6 +176,7 @@ protected:
 private:
 #if defined(LIBMESH_HAVE_KOKKOS) && defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
   HilbertSystemKokkosState & kokkos_state();
+  HilbertSystemKokkosState * maybe_kokkos_state();
   const HilbertSystemKokkosState * maybe_kokkos_state() const;
 
   const libMesh::Kokkos::KokkosParsedFunction<libMesh::Number, 64> * ensure_kokkos_goal_func();

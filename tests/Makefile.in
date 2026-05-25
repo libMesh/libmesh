@@ -160,7 +160,8 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/fparser.m4 $(top_srcdir)/m4/glpk.m4 \
 	$(top_srcdir)/m4/gmv.m4 $(top_srcdir)/m4/gz.m4 \
 	$(top_srcdir)/m4/hdf5.m4 $(top_srcdir)/m4/kokkos.m4 \
-	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
+	$(top_srcdir)/m4/laspack.m4 \
+	$(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
 	$(top_srcdir)/m4/libmesh_metaphysicl.m4 \
@@ -263,7 +264,8 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	partitioning/morton_sfc_partitioner_test.C \
 	partitioning/parmetis_partitioner_test.C \
 	partitioning/sfc_partitioner_test.C \
-	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
+	quadrature/quadrature_exactness.h quadrature/quadrature_test.C \
+	solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
@@ -470,7 +472,8 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	partitioning/morton_sfc_partitioner_test.C \
 	partitioning/parmetis_partitioner_test.C \
 	partitioning/sfc_partitioner_test.C \
-	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
+	quadrature/quadrature_exactness.h quadrature/quadrature_test.C \
+	solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
@@ -680,7 +683,8 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	partitioning/morton_sfc_partitioner_test.C \
 	partitioning/parmetis_partitioner_test.C \
 	partitioning/sfc_partitioner_test.C \
-	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
+	quadrature/quadrature_exactness.h quadrature/quadrature_test.C \
+	solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
@@ -882,7 +886,8 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	partitioning/morton_sfc_partitioner_test.C \
 	partitioning/parmetis_partitioner_test.C \
 	partitioning/sfc_partitioner_test.C \
-	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
+	quadrature/quadrature_exactness.h quadrature/quadrature_test.C \
+	solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
@@ -1084,7 +1089,8 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	partitioning/morton_sfc_partitioner_test.C \
 	partitioning/parmetis_partitioner_test.C \
 	partitioning/sfc_partitioner_test.C \
-	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
+	quadrature/quadrature_exactness.h quadrature/quadrature_test.C \
+	solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
@@ -2389,7 +2395,8 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	partitioning/morton_sfc_partitioner_test.C \
 	partitioning/parmetis_partitioner_test.C \
 	partitioning/sfc_partitioner_test.C \
-	quadrature/quadrature_test.C solvers/time_solver_test_common.h \
+	quadrature/quadrature_exactness.h quadrature/quadrature_test.C \
+	solvers/time_solver_test_common.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
@@ -2487,22 +2494,22 @@ unit_tests_data = $(data)
 # Why isn't this working automatically?
 EXTRA_DIST = $(data) $(kokkos_unit_test_sources)
 kokkos_unit_test_sources = \
-	fe/kokkos_fe_contract_test.K \
-	fe/kokkos_fe_invariant_test.K \
-	fe/kokkos_fe_map_oracle_test.K \
-	fe/kokkos_fe_oracle_runners.h \
-	fe/kokkos_fe_oracle_test_utils.h \
-	fe/kokkos_fe_permuted_map_oracle_test.K \
-	fe/kokkos_fe_reconstruction_oracle_test.K \
-	fe/kokkos_fe_shape_oracle_test.K \
-	fe/kokkos_fe_side_trace_oracle_test.K \
-	fe/kokkos_fe_types_oracle_test.K \
-	numerics/kokkos_numerics_oracle_test_utils.h \
-	numerics/kokkos_tensor_ops_oracle_fixtures.h \
-	numerics/kokkos_tensor_ops_oracle_runners.h \
-	numerics/kokkos_vector_ops_oracle_fixtures.h \
-	numerics/kokkos_vector_ops_oracle_runners.h \
-	fe/kokkos_quadrature_oracle_test.K
+  fe/kokkos_fe_contract_test.K \
+  fe/kokkos_fe_invariant_test.K \
+  fe/kokkos_fe_map_oracle_test.K \
+  fe/kokkos_fe_oracle_runners.h \
+  fe/kokkos_fe_oracle_test_utils.h \
+  fe/kokkos_fe_permuted_map_oracle_test.K \
+  fe/kokkos_fe_reconstruction_oracle_test.K \
+  fe/kokkos_fe_shape_oracle_test.K \
+  fe/kokkos_fe_side_trace_oracle_test.K \
+  fe/kokkos_fe_types_oracle_test.K \
+  numerics/kokkos_numerics_oracle_test_utils.h \
+  numerics/kokkos_tensor_ops_oracle_fixtures.h \
+  numerics/kokkos_tensor_ops_oracle_runners.h \
+  numerics/kokkos_vector_ops_oracle_fixtures.h \
+  numerics/kokkos_vector_ops_oracle_runners.h \
+  fe/kokkos_quadrature_oracle_test.K
 
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests_kokkos_dbg_SOURCES =
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@EXTRA_unit_tests_kokkos_dbg_SOURCES = driver_kokkos.K
@@ -3203,6 +3210,14 @@ fparser/unit_tests_devel-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 unit_tests-devel$(EXEEXT): $(unit_tests_devel_OBJECTS) $(unit_tests_devel_DEPENDENCIES) $(EXTRA_unit_tests_devel_DEPENDENCIES) 
 	@rm -f unit_tests-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_devel_LINK) $(unit_tests_devel_OBJECTS) $(unit_tests_devel_LDADD) $(LIBS)
+
+@LIBMESH_ENABLE_KOKKOS_FALSE@unit_tests-kokkos-dbg$(EXEEXT): $(unit_tests_kokkos_dbg_OBJECTS) $(unit_tests_kokkos_dbg_DEPENDENCIES) $(EXTRA_unit_tests_kokkos_dbg_DEPENDENCIES)
+@LIBMESH_ENABLE_KOKKOS_FALSE@	@rm -f unit_tests-kokkos-dbg$(EXEEXT)
+@LIBMESH_ENABLE_KOKKOS_FALSE@	$(AM_V_CCLD)$(LINK) $(unit_tests_kokkos_dbg_OBJECTS) $(unit_tests_kokkos_dbg_LDADD) $(LIBS)
+
+@LIBMESH_ENABLE_KOKKOS_FALSE@unit_tests-kokkos-opt$(EXEEXT): $(unit_tests_kokkos_opt_OBJECTS) $(unit_tests_kokkos_opt_DEPENDENCIES) $(EXTRA_unit_tests_kokkos_opt_DEPENDENCIES)
+@LIBMESH_ENABLE_KOKKOS_FALSE@	@rm -f unit_tests-kokkos-opt$(EXEEXT)
+@LIBMESH_ENABLE_KOKKOS_FALSE@	$(AM_V_CCLD)$(LINK) $(unit_tests_kokkos_opt_OBJECTS) $(unit_tests_kokkos_opt_LDADD) $(LIBS)
 base/unit_tests_oprof-dof_map_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_oprof-default_coupling_test.$(OBJEXT):  \

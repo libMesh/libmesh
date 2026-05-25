@@ -14,6 +14,7 @@
 #ifndef LIBMESH_FE_TENSOR_PRODUCT_LAGRANGE_H
 #define LIBMESH_FE_TENSOR_PRODUCT_LAGRANGE_H
 
+#include "libmesh/libmesh_device.h"
 #include "libmesh/fe_lagrange_shape_1D.h"
 
 namespace libMesh
