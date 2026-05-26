@@ -112,8 +112,21 @@ AC_DEFUN([CONFIGURE_KOKKOS],
                   kokkos_cuda_arch_flag=""
                   AS_IF([test "x$kokkos_cuda_arch" != "x"],
                     [kokkos_cuda_arch_flag="-arch=sm_${kokkos_cuda_arch}"])
+                  libmesh_kokkos_host_cxx=""
+                  for libmesh_kokkos_cxx_word in $CXX; do
+                    case "$libmesh_kokkos_cxx_word" in
+                      ccache|sccache|distcc)
+                        ;;
+                      *)
+                        libmesh_kokkos_host_cxx=$libmesh_kokkos_cxx_word
+                        break
+                        ;;
+                    esac
+                  done
+                  AS_IF([test "x$libmesh_kokkos_host_cxx" = "x"],
+                    [libmesh_kokkos_host_cxx=$CXX])
                   KOKKOS_CXX="$NVCC"
-                  KOKKOS_CXXFLAGS="$kokkos_cuda_arch_flag --forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin $CXX"
+                  KOKKOS_CXXFLAGS="$kokkos_cuda_arch_flag --forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin=$libmesh_kokkos_host_cxx"
                   KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $kokkos_cuda_arch_flag -L$KOKKOS_LIB_DIR"
                   AS_IF([test "x$have_kokkos_openmp" = "xyes"],
                     [
@@ -175,23 +188,46 @@ AC_DEFUN([CONFIGURE_KOKKOS],
               AS_IF([test "x$KOKKOS_MPI_CPPFLAGS" = "x"],
                 [KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^[^ ]* //'`])
 
-              dnl Our MPI compiler might be reporting a mix of flags
-              dnl we do and do not want.  We could try to retain
-              dnl everything that looks like a linker flag or include
-              dnl path, but linker flags can get weird, so instead we
-              dnl strip out everything that looks like a conflict.
+              dnl Our MPI compiler might be reporting a full compiler command
+              dnl rather than just preprocessor flags.  Bare words such as the
+              dnl host compiler name are harmless to normal wrappers but nvcc
+              dnl treats them as extra input files, which breaks non-linking
+              dnl compile rules that also specify -o.  Keep only flags usable
+              dnl during preprocessing/compilation here; link flags are handled
+              dnl separately by the existing MPI variables.
 
               STRIPPED_FLAGS=""
+              flag_arg_action=""
               for flag in $KOKKOS_MPI_CPPFLAGS; do
-                case "$flag" in
-                  -O*) # Skip possibly-undesired optimization level
-                    ;;
-                  -std=*) # Skip possibly-incompatible standard
-                    ;;
-                  *) # Append everything else
+                AS_IF([test "x$flag_arg_action" = "xkeep"],
+                  [
                     STRIPPED_FLAGS="$STRIPPED_FLAGS $flag"
-                    ;;
-                esac
+                    flag_arg_action=""
+                  ],
+                  [AS_IF([test "x$flag_arg_action" = "xskip"],
+                    [flag_arg_action=""],
+                    [case "$flag" in
+                      -O*|-std=*|-x)
+                        ;;
+                      -I|-D|-U|-isystem|-iquote|-idirafter|-include|-imacros)
+                        STRIPPED_FLAGS="$STRIPPED_FLAGS $flag"
+                        flag_arg_action="keep"
+                        ;;
+                      -I*|-D*|-U*|-pthread|-pthreads|-f*|-m*|-W*)
+                        STRIPPED_FLAGS="$STRIPPED_FLAGS $flag"
+                        ;;
+                      -Xcompiler|-Xcudafe|-Xptxas)
+                        STRIPPED_FLAGS="$STRIPPED_FLAGS $flag"
+                        flag_arg_action="keep"
+                        ;;
+                      -L*|-l*|-Wl,*)
+                        ;;
+                      -*)
+                        STRIPPED_FLAGS="$STRIPPED_FLAGS $flag"
+                        ;;
+                      *)
+                        ;;
+                    esac])])
               done
               KOKKOS_MPI_CPPFLAGS=$STRIPPED_FLAGS
 
