@@ -72,6 +72,13 @@
 # endif // #if defined(LIBMESH_HAVE_SLEPC)
 #endif // #if defined(LIBMESH_HAVE_PETSC)
 
+#ifdef LIBMESH_HAVE_KOKKOS
+namespace libMesh {
+bool libmesh_kokkos_initialize_if_needed(int & argc, char ** & argv);
+void libmesh_kokkos_finalize_if_needed(bool should_finalize);
+}
+#endif
+
 #ifdef LIBMESH_HAVE_NETGEN
 // We need the nglib namespace, because it's used everywhere in nglib
 // and we don't get binary compatibility without it.
@@ -118,6 +125,9 @@ bool libmesh_initialized_petsc = false;
 #endif
 #if defined(LIBMESH_HAVE_SLEPC)
 bool libmesh_initialized_slepc = false;
+#endif
+#if defined(LIBMESH_HAVE_KOKKOS)
+bool libmesh_initialized_kokkos = false;
 #endif
 
 } // anonymous namespace
@@ -424,6 +434,14 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     task_scheduler = std::make_unique<Threads::task_scheduler_init>(libMesh::n_threads());
   }
 
+#if defined(LIBMESH_HAVE_KOKKOS)
+  {
+    auto * mutable_argv = const_cast<char **>(argv);
+    libmesh_initialized_kokkos =
+      libMesh::libmesh_kokkos_initialize_if_needed(argc, mutable_argv);
+  }
+#endif
+
   // Construct singletons who may be at risk of the
   // "static initialization order fiasco"
   Singleton::setup();
@@ -506,6 +524,16 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
           timpi_call_mpi
             (MPI_Comm_set_errhandler(MPI_COMM_WORLD, libmesh_errhandler));
         }
+    }
+  else
+    {
+      this->_timpi_init = nullptr;
+      _comm = new Parallel::Communicator();
+
+      libMesh::GLOBAL_COMM_WORLD = MPI_COMM_SELF;
+
+      libMeshPrivateData::_processor_id = 0;
+      libMeshPrivateData::_n_processors = 1;
     }
 
   // Could we have gotten bad values from the above calls?
@@ -813,6 +841,11 @@ LibMeshInit::~LibMeshInit()
 
 #ifdef LIBMESH_HAVE_NETGEN
   nglib::Ng_Exit();
+#endif
+
+#if defined(LIBMESH_HAVE_KOKKOS)
+  libMesh::libmesh_kokkos_finalize_if_needed(libmesh_initialized_kokkos);
+  libmesh_initialized_kokkos = false;
 #endif
 
   if (libMesh::on_command_line("--enable-fpe"))

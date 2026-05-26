@@ -64308,7 +64308,7 @@ then :
 fi
             if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
 then :
-  KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^[^ ]* //'`
+  KOKKOS_MPI_CPPFLAGS=`$CXX -show 2>/dev/null | sed 's/^^ * //'`
 fi
             if test "x$KOKKOS_MPI_CPPFLAGS" = "x"
 then :
@@ -64333,7 +64333,7 @@ then :
 fi
             if test "x$KOKKOS_MPI_LIBS" = "x"
 then :
-  KOKKOS_MPI_LIBS=`$CXX -show 2>/dev/null | sed 's/^[^ ]* //'`
+  KOKKOS_MPI_LIBS=`$CXX -show 2>/dev/null | sed 's/^^ * //'`
 fi
             if test "x$KOKKOS_MPI_LIBS" = "x"
 then :
@@ -64368,15 +64368,15 @@ fi
                                         if test "x$KOKKOS_BACKEND" = "xcuda"
 then :
   libmesh_kokkos_probe_LIBS=`printf "%s\n" " $libmesh_kokkos_probe_LIBS " | \
-            sed -e 's/ -Wl,-rpath,[^ ]* / /g' \
-                -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' \
+            sed -e 's/ -Wl,-rpath,^ * / /g' \
+                -e 's/ -Wl,-rpath -Wl,^ * / /g' \
                 -e 's/ -Wl,--enable-new-dtags / /g' \
                 -e 's/  */ /g' \
                 -e 's/^ *//' \
                 -e 's/ *$//'`
            libmesh_kokkos_probe_MPI_LIBS=`printf "%s\n" " $libmesh_kokkos_probe_MPI_LIBS " | \
-             sed -e 's/ -Wl,-rpath,[^ ]* / /g' \
-                 -e 's/ -Wl,-rpath -Wl,[^ ]* / /g' \
+             sed -e 's/ -Wl,-rpath,^ * / /g' \
+                 -e 's/ -Wl,-rpath -Wl,^ * / /g' \
                  -e 's/ -Wl,--enable-new-dtags / /g' \
                  -e 's/  */ /g' \
                  -e 's/^ *//' \
