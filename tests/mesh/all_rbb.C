@@ -1,10 +1,12 @@
 #include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
+#include <libmesh/enum_quadrature_type.h>
 #include <libmesh/fe_map.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh_tools.h>
+#include <libmesh/quadrature.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -61,6 +63,9 @@ public:
 // We need to add BERNSTEIN support for Prisms!
 //  CPPUNIT_TEST( testAllRBBPrism6 );
 //  CPPUNIT_TEST( testAllRBBPrism18 );
+
+  CPPUNIT_TEST( testAllRBBCylinder10 );
+  CPPUNIT_TEST( testAllRBBCylinder80 );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -255,6 +260,96 @@ protected:
                             area, max_rbb_error);
   }
 
+  void test_cylinder (unsigned int n_refinements, const ElemType type = HEX27)
+  {
+    Mesh disk_mesh(*TestCommWorld), mesh(*TestCommWorld);
+
+    const Real radius = 1;
+    const Real height = 3;
+    const Real volume = pi * radius * radius * height;
+    const Real tol = TOLERANCE*TOLERANCE;
+
+    // We're extruding a circle from side 0 up
+    const ElemType side_type = Elem::build(type)->side_type(0);
+
+    // Build a filled circle
+    MeshTools::Generation::build_sphere (disk_mesh, radius,
+                                         n_refinements, side_type);
+
+    // Then extrude it into a cylinder
+    const unsigned int nz = 2;
+    const RealVectorValue extrusion_vector{0,0,height};
+    MeshTools::Generation::build_extrusion (mesh, disk_mesh, nz, extrusion_vector);
+
+    const dof_id_type n_elem =
+      (5 << (n_refinements*2)) * (side_type == QUAD9 ? 1 : 2) * nz;
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_elem);
+
+    // We just did Lagrange interpolation, so our mesh measure
+    // shouldn't be *quite* right, but we should converge similarly to
+    // how we did with the filled disk.
+    const Real max_lagrange_error =
+      radius * 5e-2 / (1 << (4*n_refinements)) *
+      radius * radius * height;
+
+    LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(mesh),
+                            volume, max_lagrange_error);
+
+    MeshTools::Modification::all_rbb(mesh);
+
+    std::unique_ptr<const Elem> elem_side;
+    constexpr int n_intervals = 4;
+    auto qrule = QBase::build(QGRID, /*dim=*/2, Order(n_intervals));
+
+    for (const Elem * elem : mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(RATIONAL_BERNSTEIN_MAP, elem->mapping_type());
+
+        // We cannot assert that each Node is at a specified radius
+        // from the cylinder axis, because these are now spline
+        // control nodes, but we can assert that physical points
+        // within the rounded surface are at the desired radius.
+        for (auto s : make_range(elem->n_sides()))
+          {
+            if (elem->neighbor_ptr(s))
+              continue;
+
+            const Point side_normal =
+              elem->side_vertex_average_normal(s);
+
+            // We ought to either be on the rounded surface or the end
+            // caps
+            if (std::abs(side_normal(2)) > TOLERANCE*TOLERANCE)
+              {
+                LIBMESH_ASSERT_FP_EQUAL(side_normal(0), 0, TOLERANCE*TOLERANCE);
+                LIBMESH_ASSERT_FP_EQUAL(side_normal(1), 0, TOLERANCE*TOLERANCE);
+                continue;
+              }
+
+            elem->build_side_ptr(elem_side, s);
+            qrule->init(*elem_side);
+
+            for (auto i : make_range(qrule->n_points()))
+              {
+                Point p = FEMap::map(elem_side->dim(), elem_side.get(), qrule->qp(i));
+                p(2) = 0; // Just look at r in cylindrical coordinates
+                LIBMESH_ASSERT_FP_EQUAL(radius, p.norm(), tol);
+              }
+          }
+      }
+
+    // We're using quadrature for volume approximation, so we still
+    // have error, but our quadrature error looks like Ch^6 with a
+    // much smaller C.
+    const Real max_rbb_error =
+      radius * 2e-3 / (1 << (6*n_refinements)) *
+      radius * radius * height;
+    LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(mesh),
+                            volume, max_rbb_error);
+  }
+
+
 public:
   void setUp() {}
 
@@ -295,6 +390,11 @@ public:
   void testAllRBBTri6Disk10() { LOG_UNIT_TEST; test_disk(0, TRI6); }
   void testAllRBBTri6Disk40() { LOG_UNIT_TEST; test_disk(1, TRI6); }
   void testAllRBBTri6Disk160() { LOG_UNIT_TEST; test_disk(2, TRI6); }
+
+  // Extruding a disk into 2 layers gives us twice as many hexes as we
+  // had quads
+  void testAllRBBCylinder10() { LOG_UNIT_TEST; test_cylinder(0); }
+  void testAllRBBCylinder80() { LOG_UNIT_TEST; test_cylinder(1); }
 };
 
 
