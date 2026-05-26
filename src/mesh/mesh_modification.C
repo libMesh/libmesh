@@ -1469,11 +1469,6 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
   // Out of loop to reduce heap allocations
   std::unique_ptr<Elem> edge_ptr, face_ptr;
 
-  // Utility for checking extrusion directions later
-  auto almost_equal = [](Real a, Real b) {
-    return (std::abs(a-b) < TOLERANCE*TOLERANCE);
-  };
-
   for (auto & elem : mesh.element_ptr_range())
     {
       if (elem->level())
@@ -1505,7 +1500,7 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
       // w1 aren't 1, as well as the cases where the Nodes n0 and n1
       // are already control points which don't match their
       // corresponding physical points.
-      auto make_edge_rbb = [default_weight, weight_index, almost_equal]
+      auto make_edge_rbb = [default_weight, weight_index]
         (const Node & n0, const Node & n1, Node & n_center,
          const Point & p0, const Point & p1)
       {
