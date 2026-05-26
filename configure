@@ -60982,8 +60982,23 @@ fi
 then :
   kokkos_cuda_arch_flag="-arch=sm_${kokkos_cuda_arch}"
 fi
+                  libmesh_kokkos_host_cxx=""
+                  for libmesh_kokkos_cxx_word in $CXX; do
+                    case "$libmesh_kokkos_cxx_word" in
+                      ccache|sccache|distcc)
+                        ;;
+                      *)
+                        libmesh_kokkos_host_cxx=$libmesh_kokkos_cxx_word
+                        break
+                        ;;
+                    esac
+                  done
+                  if test "x$libmesh_kokkos_host_cxx" = "x"
+then :
+  libmesh_kokkos_host_cxx=$CXX
+fi
                   KOKKOS_CXX="$NVCC"
-                  KOKKOS_CXXFLAGS="$kokkos_cuda_arch_flag --forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin $CXX"
+                  KOKKOS_CXXFLAGS="$kokkos_cuda_arch_flag --forward-unknown-to-host-compiler --extended-lambda --disable-warnings --x=cu -ccbin=$libmesh_kokkos_host_cxx"
                   KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $kokkos_cuda_arch_flag -L$KOKKOS_LIB_DIR"
                   if test "x$have_kokkos_openmp" = "xyes"
 then :
@@ -65984,4 +65999,3 @@ printf "%s\n" "--------- Done Configuring libMesh ----------" >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ---------------------------------------------" >&5
 printf "%s\n" "---------------------------------------------" >&6; }
 # rm -f -r conftest* config.cache include/libmesh/libmesh_config.h.tmp
-
