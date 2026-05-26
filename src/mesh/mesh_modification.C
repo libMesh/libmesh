@@ -1613,6 +1613,14 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         midnode = ((1+w_mid)/(w_xi+w_eta) * (w_xi*xi_avg + w_eta*eta_avg) - vertex_avg)/w_mid;
       };
 
+      // If we're on a Hex27, our formula for the mid-volume node
+      // relies on the locations of the mid-face points.  We could
+      // re-calculate those later but let's just save them now.
+      Point midfacepts[6];
+      if (elem->type() == HEX27)
+        for (auto i : make_range(6))
+          midfacepts[i] = elem->point(20+i);
+
       // Check each edge for a curve, and adjust it if needed.
       for (auto e : elem->edge_index_range())
         {
@@ -1667,93 +1675,53 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
             }
           else if (elem->type() == HEX27)
             {
-              // For now we just support 2.5D (extrusions of 2D)
-              // meshes.  Let's look for an extrusion direction.
-              int extrude_dir = -1;
+              // We still have the midnode left to go.  We want
+              // something here that will preserve the tensor product
+              // structure for 2.5D extrusions of IGA faces, but also
+              // be at least near to the minimum-energy control point
+              // and weight for general cases.  We'll treat opposing
+              // mid-face nodes as the endpoints of a (more general
+              // than our edges, since they might have non-1 weights)
+              // Edge3, and see what we'd need on the midnode to
+              // interpolate the center point with them.  If we've got
+              // something isogeometric like an extrusion then our
+              // results should agree; for a quick-but-good output in
+              // general we'll take an average.
+              const int opposite_sides[3][2] = {{0,5}, {1,3}, {2,4}};
 
-              Real w[27];
-              for (unsigned int i : make_range(27u))
-                w[i] = elem->node_ref(i).get_extra_datum<Real>(weight_index);
+              Node & midnode = elem->node_ref(26);
+              const Point original_midpoint = midnode;
 
-              if (almost_equal(w[0], w[1]) &&
-                  almost_equal(w[0], w[8]) &&
-                  almost_equal(w[2], w[3]) &&
-                  almost_equal(w[2], w[10]) &&
-                  almost_equal(w[4], w[5]) &&
-                  almost_equal(w[4], w[16]) &&
-                  almost_equal(w[6], w[7]) &&
-                  almost_equal(w[6], w[18]) &&
-                  almost_equal(w[9], w[11]) &&
-                  almost_equal(w[9], w[20]) &&
-                  almost_equal(w[12], w[13]) &&
-                  almost_equal(w[12], w[21]) &&
-                  almost_equal(w[14], w[15]) &&
-                  almost_equal(w[14], w[23]) &&
-                  almost_equal(w[17], w[19]) &&
-                  almost_equal(w[17], w[25]) &&
-                  almost_equal(w[22], w[24]))
-                extrude_dir = 0;
+              // Averaging in projective space
+              Point sum_weighted_point = 0;
+              Real sum_weight = 0;
 
-              else if (almost_equal(w[0], w[3]) &&
-                       almost_equal(w[0], w[11]) &&
-                       almost_equal(w[1], w[2]) &&
-                       almost_equal(w[1], w[9]) &&
-                       almost_equal(w[4], w[7]) &&
-                       almost_equal(w[4], w[19]) &&
-                       almost_equal(w[5], w[6]) &&
-                       almost_equal(w[5], w[17]) &&
-                       almost_equal(w[8], w[10]) &&
-                       almost_equal(w[8], w[20]) &&
-                       almost_equal(w[12], w[15]) &&
-                       almost_equal(w[12], w[24]) &&
-                       almost_equal(w[13], w[14]) &&
-                       almost_equal(w[13], w[22]) &&
-                       almost_equal(w[16], w[18]) &&
-                       almost_equal(w[16], w[25]) &&
-                       almost_equal(w[21], w[23]))
-                extrude_dir = 1;
-
-              else if (almost_equal(w[0], w[4]) &&
-                       almost_equal(w[0], w[12]) &&
-                       almost_equal(w[1], w[5]) &&
-                       almost_equal(w[1], w[13]) &&
-                       almost_equal(w[2], w[6]) &&
-                       almost_equal(w[2], w[14]) &&
-                       almost_equal(w[3], w[7]) &&
-                       almost_equal(w[3], w[15]) &&
-                       almost_equal(w[8], w[16]) &&
-                       almost_equal(w[8], w[21]) &&
-                       almost_equal(w[9], w[17]) &&
-                       almost_equal(w[9], w[22]) &&
-                       almost_equal(w[10], w[18]) &&
-                       almost_equal(w[10], w[23]) &&
-                       almost_equal(w[11], w[19]) &&
-                       almost_equal(w[11], w[24]) &&
-                       almost_equal(w[20], w[25]))
-                extrude_dir = 2;
-
-              // If we're extruding, then we can derive the center point
-              // values from the two perpendicular faces' centers.
-              Node & n_center = elem->node_ref(26);
-              Point & p_center = n_center;
-              if (extrude_dir == 0)
+              for (int i : make_range(3))
                 {
-                  n_center.set_extra_datum<Real>(weight_index, w[22]);
-                  p_center = (elem->point(22) + elem->point(24))/2;
+                  Node & n0 = elem->node_ref(20+opposite_sides[i][0]);
+                  Node & n1 = elem->node_ref(20+opposite_sides[i][1]);
+
+                  make_edge_rbb(n0, n1, midnode,
+                                midfacepts[opposite_sides[i][0]],
+                                midfacepts[opposite_sides[i][1]]);
+
+                  const Real midweight =
+                    midnode.get_extra_datum<Real>(weight_index);
+                  sum_weight += midweight;
+                  sum_weighted_point += midweight * midnode;
+
+                  // Reset for next run
+                  midnode = original_midpoint;
+                  midnode.set_extra_datum<Real>(weight_index,
+                                                default_weight);
+
                 }
-              else if (extrude_dir == 1)
-                {
-                  n_center.set_extra_datum<Real>(weight_index, w[21]);
-                  p_center = (elem->point(21) + elem->point(23))/2;
-                }
-              else if (extrude_dir == 2)
-                {
-                  n_center.set_extra_datum<Real>(weight_index, w[20]);
-                  p_center = (elem->point(20) + elem->point(25))/2;
-                }
-              else
-                libmesh_not_implemented_msg
-                  ("all_rbb() currently only supports 2.5D (extrusions) meshes in 3D");
+
+              const Real midweight = sum_weight/3;
+              midnode.set_extra_datum<Real>(weight_index,
+                                            midweight);
+
+              midnode = sum_weighted_point / 3 / midweight;
             }
           else
             libmesh_not_implemented_msg
