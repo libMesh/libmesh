@@ -1493,11 +1493,21 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
       if (elem->default_order() == FIRST)
         continue;
 
-      // Modify the center node of an "edge" - possibly an actual
-      // edge, possibly a center node between edge points - to fit a
-      // circular curve.
+      // Modify the center node of an "edge" - possibly an actual edge
+      // element's node, possibly a center node between points on a
+      // face's or cell's edge - for RBB interpolation.  This should fit
+      // a circular curve exactly in cases where the original nodes are
+      // equispaced and the outer nodes' weights are equal, and should
+      // be a good fit otherwise.
+      //
+      // We want to use this to interpolate "internal" conceptual
+      // edges of a Hex27 too, so we'll handle the cases where w0 and
+      // w1 aren't 1, as well as the cases where the Nodes n0 and n1
+      // are already control points which don't match their
+      // corresponding physical points.
       auto make_edge_rbb = [default_weight, weight_index, almost_equal]
-        (const Node & n0, const Node & n1, Node & n_center)
+        (const Node & n0, const Node & n1, Node & n_center,
+         const Point & p0, const Point & p1)
       {
         // Skip edges we've already modified; the center node for
         // these is no longer at the curve point we wish to
@@ -1507,49 +1517,16 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         if (old_weight != default_weight)
           return;
 
-        const Point & p0 = n0;
-        const Point & p1 = n1;
         Point & p2 = n_center;
-        const Point midchord = (p0+p1)/2;
-        const Real edge_chord_len_sq = (p1-p0).norm_sq();
 
         const Real w0 = n0.get_extra_datum<Real>(weight_index);
         const Real w1 = n1.get_extra_datum<Real>(weight_index);
 
-        // If we see edges that are unevenly parameterized, not just
-        // curved, I'm not sure what we want to do with those.  We
-        // can't isogeometrically represent a circular arc in this
-        // case unless we change the weights on the endpoints, but
-        // then that cascades to requiring changes in every other
-        // element sharing those endpoints.
-        //
-        // Presumably we want to maintain a somewhat similar uneven
-        // parameterization, for whatever boundary layer grading the
-        // mesh user wanted?  For now just scream and die.
         const Point e02 = p2-p0,
                     e21 = p1-p2;
         const Real chord_02_len_sq = e02.norm_sq(),
                    chord_21_len_sq = e21.norm_sq();
-        if (std::abs(chord_02_len_sq-chord_21_len_sq) > edge_chord_len_sq * TOLERANCE*TOLERANCE)
-          libmesh_not_implemented_msg
-            ("all_rbb() currently doesn't support unevenly parameterized edges");
 
-        // For straight edges we'll just want the middle node weight
-        // to match the endpoint nodes
-        const Point displacement_vec = p2-midchord;
-        if (displacement_vec.norm_sq() <
-            edge_chord_len_sq*TOLERANCE*TOLERANCE*TOLERANCE)
-        {
-          if (!almost_equal(w0, w1))
-            libmesh_not_implemented();
-
-          n_center.set_extra_datum<Real>(weight_index, w0);
-
-          return;
-        }
-
-        // Circularize the curve on curved edges
-        //
         // First find the cosine of phi, the angle between our two
         // subchords (turning from the direction of one to the
         // direction of the other; this is the supplementary angle to
@@ -1557,7 +1534,6 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         // the angle of our circular arc, which nicely enough is also
         // the angle we take cos and sec of in NURBS formulae
         const Real cos_phi = (e02*e21)/std::sqrt(chord_02_len_sq*chord_21_len_sq);
-        n_center.set_extra_datum<Real>(weight_index, cos_phi);
 
         // There's a way to do really large arcs using negative
         // weights, but we're going to get lousy approximation quality
@@ -1567,14 +1543,18 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
           libmesh_not_implemented_msg
             ("all_rbb() is not recommended for extremely sharp curves on one edge");
 
-        // Next find the radius of the circle our arc is from
-        const Real r = std::sqrt(edge_chord_len_sq)/2/std::sqrt(1-cos_phi*cos_phi);
+        const Real w_center = cos_phi*std::sqrt(w0*w1);
 
-        // And perturb our center node so that it becomes a control
-        // point for that arc rather than a midpoint of that arc.
-        const Real R = r/cos_phi;
+        n_center.set_extra_datum<Real>(weight_index, w_center);
 
-        p2 += displacement_vec.unit() * (R-r);
+        // Now let's get the control point location.  This comes from
+        // a lot of back-and-forth with Gemini, but fortunately I'm
+        // rewriting it after I've already added unit tests that
+        // should scream if it's badly wrong.
+        const Real w_mid = w0/4 + w1/4 + w_center/2;
+        n_center *= 2*w_mid;
+        n_center -= (w0 * p0 + w1 * p1)/2;
+        n_center /= w_center;
       };
 
       auto make_face_rbb = [weight_index] (Elem & face)
@@ -1645,7 +1625,8 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
               ("all_rbb() currently only supports meshes with 2- and/or 3-node edges");
 
           make_edge_rbb(edge_ptr->node_ref(0), edge_ptr->node_ref(1),
-                        edge_ptr->node_ref(2));
+                        edge_ptr->node_ref(2),
+                        edge_ptr->node_ref(0), edge_ptr->node_ref(1));
 
         }
 
@@ -1676,7 +1657,9 @@ void MeshTools::Modification::all_rbb (MeshBase & mesh)
         {
           if (elem->type() == EDGE3)
             {
-              make_edge_rbb(elem->node_ref(0), elem->node_ref(1), elem->node_ref(2));
+              make_edge_rbb(elem->node_ref(0), elem->node_ref(1),
+                            elem->node_ref(2),
+                            elem->node_ref(0), elem->node_ref(1));
             }
           else if (elem->dim() == 2)
             {
