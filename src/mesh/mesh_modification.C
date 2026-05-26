@@ -1529,6 +1529,281 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 }
 
 
+
+void MeshTools::Modification::all_rbb (MeshBase & mesh)
+{
+  // By default, use 1.0 as the weight on every RATIONAL_BERNSTEIN
+  // mapped node
+  const Real default_weight = 1.0;
+
+  const auto weight_index =
+    (mesh.add_node_datum<Real>("rational_weight", true,
+                               &default_weight));
+
+  mesh.set_default_mapping_type(RATIONAL_BERNSTEIN_MAP);
+  mesh.set_default_mapping_data(weight_index);
+
+  // Out of loop to reduce heap allocations
+  std::unique_ptr<Elem> edge_ptr, face_ptr;
+
+  for (auto & elem : mesh.element_ptr_range())
+    {
+      if (elem->level())
+        libmesh_not_implemented_msg
+          ("all_rbb() currently only supports flat meshes with no refinement levels");
+
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      if (elem->infinite())
+        libmesh_not_implemented_msg
+          ("all_rbb() currently only supports finite geometric elements");
+#endif
+
+      elem->set_mapping_type(RATIONAL_BERNSTEIN_MAP);
+      elem->set_mapping_data(weight_index);
+
+      // Nothing to do unless we have curves to correct
+      if (elem->default_order() == FIRST)
+        continue;
+
+      // Modify the center node of an "edge" - possibly an actual edge
+      // element's node, possibly a center node between points on a
+      // face's or cell's edge - for RBB interpolation.  This should fit
+      // a circular curve exactly in cases where the original nodes are
+      // equispaced and the outer nodes' weights are equal, and should
+      // be a good fit otherwise.
+      //
+      // We want to use this to interpolate "internal" conceptual
+      // edges of a Hex27 too, so we'll handle the cases where w0 and
+      // w1 aren't 1, as well as the cases where the Nodes n0 and n1
+      // are already control points which don't match their
+      // corresponding physical points.
+      auto make_edge_rbb = [default_weight, weight_index]
+        (const Node & n0, const Node & n1, Node & n_center,
+         const Point & p0, const Point & p1)
+      {
+        // Skip edges we've already modified; the center node for
+        // these is no longer at the curve point we wish to
+        // interpolate, it should already be at the control point that
+        // accomplishes the interpolation.
+        const Real old_weight = n_center.get_extra_datum<Real>(weight_index);
+        if (old_weight != default_weight)
+          return;
+
+        Point & p2 = n_center;
+
+        const Real w0 = n0.get_extra_datum<Real>(weight_index);
+        const Real w1 = n1.get_extra_datum<Real>(weight_index);
+
+        const Point e02 = p2-p0,
+                    e21 = p1-p2;
+        const Real chord_02_len_sq = e02.norm_sq(),
+                   chord_21_len_sq = e21.norm_sq();
+
+        // First find the cosine of phi, the angle between our two
+        // subchords (turning from the direction of one to the
+        // direction of the other; this is the supplementary angle to
+        // the angle at the midpoint).  This is the same as half of
+        // the angle of our circular arc, which nicely enough is also
+        // the angle we take cos and sec of in NURBS formulae
+        const Real cos_phi = (e02*e21)/std::sqrt(chord_02_len_sq*chord_21_len_sq);
+
+        // There's a way to do really large arcs using negative
+        // weights, but we're going to get lousy approximation quality
+        // from isoparametric elements if we go too low, as well as
+        // bad numerics here, so let's just disallow it.
+        if (cos_phi < 0.5)
+          libmesh_not_implemented_msg
+            ("all_rbb() is not recommended for extremely sharp curves on one edge");
+
+        const Real w_center = cos_phi*std::sqrt(w0*w1);
+
+        n_center.set_extra_datum<Real>(weight_index, w_center);
+
+        // Now let's get the control point location.  This comes from
+        // a lot of back-and-forth with Gemini, but fortunately I'm
+        // rewriting it after I've already added unit tests that
+        // should scream if it's badly wrong.
+        const Real w_mid = w0/4 + w1/4 + w_center/2;
+        n_center *= 2*w_mid;
+        n_center -= (w0 * p0 + w1 * p1)/2;
+        n_center /= w_center;
+      };
+
+      auto make_face_rbb = [weight_index] (Elem & face)
+      {
+        // Prisms and pyramids may need to skip some faces while
+        // adjusting others
+        if (face.type() == TRI6)
+          return;
+
+        if (face.type() != QUAD9)
+          libmesh_not_implemented_msg
+            ("all_rbb() currently only supports mid-face nodes on Quad9 faces");
+
+        // We only use [4,8) but matching indices is nice and stack is
+        // cheap.
+        Real w[9];
+
+        for (unsigned int i : make_range(4u, 8u))
+          w[i] = face.node_ref(i).get_extra_datum<Real>(weight_index);
+
+        // We can't currently handle arbitrary vertex weights
+#ifndef NDEBUG
+        for (unsigned int i : make_range(4u))
+          libmesh_assert_equal_to
+            (face.node_ref(i).get_extra_datum<Real>(weight_index), 1);
+#endif
+
+        // For the mid-face point, if we want to exactly match
+        // any cylinders and cones and spheres, we're actually already
+        // entirely constrained by the other points.
+        //
+        // This formula gives the minimum-energy Steiner surface based
+        // on the outer 8 points.
+        //
+        // That's an isogeometric representation of a cylinder aligned
+        // to either axis, or of a sphere where the quad edges are on
+        // latitude/longitude lines, or of a cone where two edges are
+        // segments of cone generating lines and the other two are
+        // arcs perpendicular to the axis.
+        //
+        // It's not perfectly isogeometric for the spheres we generate
+        // (where the quad edges are all great circles), but it should
+        // still converge asymptotically faster than non-rational
+        // quadratic Lagrange.
+        const Point xi_avg = (face.point(7) + face.point(5))/2;
+        const Point eta_avg = (face.point(4) + face.point(6))/2;
+        const Point vertex_avg = (face.point(0) + face.point(1) +
+                                  face.point(2) + face.point(3))/4;
+
+        const Real w_xi  = (w[7] + w[5])/2;
+        const Real w_eta = (w[4] + w[6])/2;
+        const Real w_mid = w_xi * w_eta;
+
+        Node & midnode = face.node_ref(8);
+        midnode.set_extra_datum<Real>(weight_index, w_mid);
+        midnode = ((1+w_mid)/(w_xi+w_eta) * (w_xi*xi_avg + w_eta*eta_avg) - vertex_avg)/w_mid;
+      };
+
+      // If we're on a Hex27, our formula for the mid-volume node
+      // relies on the locations of the mid-face points.  We could
+      // re-calculate those later but let's just save them now.
+      Point midfacepts[6];
+      if (elem->type() == HEX27)
+        for (auto i : make_range(6))
+          midfacepts[i] = elem->point(20+i);
+
+      // Check each edge for a curve, and adjust it if needed.
+      for (auto e : elem->edge_index_range())
+        {
+          elem->build_edge_ptr(edge_ptr, e);
+
+          // We should add EDGE4 once we have QUAD16/TRI10/HEX64 to
+          // use it
+          if (edge_ptr->type() != EDGE3)
+            libmesh_not_implemented_msg
+              ("all_rbb() currently only supports meshes with 2- and/or 3-node edges");
+
+          make_edge_rbb(edge_ptr->node_ref(0), edge_ptr->node_ref(1),
+                        edge_ptr->node_ref(2),
+                        edge_ptr->node_ref(0), edge_ptr->node_ref(1));
+
+        }
+
+      // If we're in 3D, we may have face nodes that also need to be
+      // adjusted to replace an interpolated curve with a spline
+      // curve.  We know what to do with a quad face, but we'll have
+      // to scream and die if we see a Tri7 face node.
+      bool check_face_points = (elem->dim() > 2) &&
+        (elem->n_nodes() > elem->n_edges() + elem->n_vertices());
+
+      if (check_face_points)
+        for (auto f : elem->side_index_range())
+          {
+            // Prisms and pyramids may need to skip some faces while
+            // adjusting others
+            if (elem->side_type(f) == TRI6)
+              continue;
+
+            elem->build_side_ptr(face_ptr, f);
+
+            make_face_rbb(*face_ptr);
+          }
+
+      bool check_interior_points =
+        elem->n_nodes() > elem->n_edges() + elem->n_vertices() + elem->n_faces();
+
+      if (check_interior_points)
+        {
+          if (elem->type() == EDGE3)
+            {
+              make_edge_rbb(elem->node_ref(0), elem->node_ref(1),
+                            elem->node_ref(2),
+                            elem->node_ref(0), elem->node_ref(1));
+            }
+          else if (elem->dim() == 2)
+            {
+              make_face_rbb(*elem);
+            }
+          else if (elem->type() == HEX27)
+            {
+              // We still have the midnode left to go.  We want
+              // something here that will preserve the tensor product
+              // structure for 2.5D extrusions of IGA faces, but also
+              // be at least near to the minimum-energy control point
+              // and weight for general cases.  We'll treat opposing
+              // mid-face nodes as the endpoints of a (more general
+              // than our edges, since they might have non-1 weights)
+              // Edge3, and see what we'd need on the midnode to
+              // interpolate the center point with them.  If we've got
+              // something isogeometric like an extrusion then our
+              // results should agree; for a quick-but-good output in
+              // general we'll take an average.
+              const int opposite_sides[3][2] = {{0,5}, {1,3}, {2,4}};
+
+              Node & midnode = elem->node_ref(26);
+              const Point original_midpoint = midnode;
+
+              // Averaging in projective space
+              Point sum_weighted_point = 0;
+              Real sum_weight = 0;
+
+              for (int i : make_range(3))
+                {
+                  Node & n0 = elem->node_ref(20+opposite_sides[i][0]);
+                  Node & n1 = elem->node_ref(20+opposite_sides[i][1]);
+
+                  make_edge_rbb(n0, n1, midnode,
+                                midfacepts[opposite_sides[i][0]],
+                                midfacepts[opposite_sides[i][1]]);
+
+                  const Real midweight =
+                    midnode.get_extra_datum<Real>(weight_index);
+                  sum_weight += midweight;
+                  sum_weighted_point += midweight * midnode;
+
+                  // Reset for next run
+                  midnode = original_midpoint;
+                  midnode.set_extra_datum<Real>(weight_index,
+                                                default_weight);
+
+                }
+
+              const Real midweight = sum_weight/3;
+              midnode.set_extra_datum<Real>(weight_index,
+                                            midweight);
+
+              midnode = sum_weighted_point / 3 / midweight;
+            }
+          else
+            libmesh_not_implemented_msg
+              ("all_rbb() doesn't yet support " << elem->type());
+        }
+    }
+}
+
+
+
 void MeshTools::Modification::smooth (MeshBase & mesh,
                                       const unsigned int n_iterations,
                                       const Real power)

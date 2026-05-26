@@ -142,6 +142,14 @@ void scale (MeshBase & mesh,
 void all_tri (MeshBase & mesh);
 
 /**
+ * Converts all element geometric mappings from the default Lagrange
+ * to the more flexible Rational-Bezier-Bernstein.  When elements have
+ * curved edges and/or faces, node weights are chosen so that the new
+ * edges interpolate the old edge node locations with a circular arc.
+ */
+void all_rbb (MeshBase & mesh);
+
+/**
  * Smooth the mesh with a simple Laplace smoothing algorithm.  The mesh is
  * smoothed \p n_iterations times.  If the parameter \p power is 0, each
  * node is moved to the average position of the neighboring connected

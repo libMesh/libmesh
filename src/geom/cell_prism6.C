@@ -436,6 +436,10 @@ Point Prism6::true_centroid () const
 
 Real Prism6::volume () const
 {
+  // This specialization is good for Lagrange mappings only in general
+  if (this->mapping_type() != LAGRANGE_MAP)
+    return this->Elem::volume();
+
   VolumeIntegral vi;
   cell_integral(this, vi);
   return vi.vol;

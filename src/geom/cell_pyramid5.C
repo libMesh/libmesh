@@ -245,6 +245,10 @@ Point Pyramid5::true_centroid () const
 
 Real Pyramid5::volume () const
 {
+  // This specialization is good for Lagrange mappings only in general
+  if (this->mapping_type() != LAGRANGE_MAP)
+    return this->Elem::volume();
+
   // The pyramid with a bilinear base has volume given by the
   // formula in: "Calculation of the Volume of a General Hexahedron
   // for Flow Predictions", AIAA Journal v.23, no.6, 1984, p.954-

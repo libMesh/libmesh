@@ -56,6 +56,7 @@ unit_tests_sources = \
   geom/side_vertex_average_normal_test.C \
   geom/which_node_am_i_test.C \
   mesh/all_second_order.C \
+  mesh/all_rbb.C \
   mesh/all_tri.C \
   mesh/distort.C \
   mesh/boundary_mesh.C \

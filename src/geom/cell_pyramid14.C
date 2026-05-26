@@ -389,7 +389,7 @@ unsigned short int Pyramid14::second_order_adjacent_vertex (const unsigned int n
 
 Real Pyramid14::volume () const
 {
-  // This specialization is good for Lagrange mappings only
+  // This specialization is good for Lagrange mappings only in general
   if (this->mapping_type() != LAGRANGE_MAP)
     return this->Elem::volume();
 

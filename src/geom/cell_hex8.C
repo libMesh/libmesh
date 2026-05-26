@@ -414,6 +414,10 @@ Point Hex8::true_centroid () const
 
 Real Hex8::volume () const
 {
+  // This specialization is good for Lagrange mappings only in general
+  if (this->mapping_type() != LAGRANGE_MAP)
+    return this->Elem::volume();
+
   // Make copies of our points.  It makes the subsequent calculations a bit
   // shorter and avoids dereferencing the same pointer multiple times.
   Point

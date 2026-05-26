@@ -316,6 +316,9 @@ Point Tet4::true_centroid () const
 
 Real Tet4::volume () const
 {
+  // This specialization is good for non-Lagrange mappings too!  Even
+  // with differing vertex weights we've still got p=1 planar faces.
+
   // The volume of a tetrahedron is 1/6 the box product formed
   // by its base and apex vectors
   Point a = point(3) - point(0);

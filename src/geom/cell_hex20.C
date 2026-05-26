@@ -321,7 +321,7 @@ Hex20::second_order_child_vertex (const unsigned int n) const
 
 Real Hex20::volume () const
 {
-  // This specialization is good for Lagrange mappings only
+  // This specialization is good for Lagrange mappings only in general
   if (this->mapping_type() != LAGRANGE_MAP)
     return this->Elem::volume();
 

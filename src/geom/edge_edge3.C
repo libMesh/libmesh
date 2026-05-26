@@ -223,6 +223,10 @@ Edge3::second_order_child_vertex (const unsigned int) const
 
 Real Edge3::volume () const
 {
+  // This specialization is good for Lagrange mappings only in general
+  if (this->mapping_type() != LAGRANGE_MAP)
+    return this->Elem::volume();
+
   // Finding the (exact) length of a general quadratic element
   // is a surprisingly complicated formula.
   Point A = this->point(0) + this->point(1) - 2*this->point(2);

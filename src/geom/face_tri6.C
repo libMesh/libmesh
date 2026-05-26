@@ -323,7 +323,7 @@ BoundingBox Tri6::loose_bounding_box () const
 
 Real Tri6::volume () const
 {
-  // This specialization is good for Lagrange mappings only
+  // This specialization is good for Lagrange mappings only in general
   if (this->mapping_type() != LAGRANGE_MAP)
     return this->Elem::volume();
 
