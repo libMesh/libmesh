@@ -126,7 +126,7 @@ AC_DEFUN([CONFIGURE_KOKKOS],
                   AS_IF([test "x$libmesh_kokkos_host_cxx" = "x"],
                     [libmesh_kokkos_host_cxx=$CXX])
                   KOKKOS_CXX="$NVCC"
-                  KOKKOS_CXXFLAGS="$kokkos_cuda_arch_flag --forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin=$libmesh_kokkos_host_cxx"
+                  KOKKOS_CXXFLAGS="$kokkos_cuda_arch_flag --forward-unknown-to-host-compiler --extended-lambda --disable-warnings --x=cu -ccbin=$libmesh_kokkos_host_cxx"
                   KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $kokkos_cuda_arch_flag -L$KOKKOS_LIB_DIR"
                   AS_IF([test "x$have_kokkos_openmp" = "xyes"],
                     [
