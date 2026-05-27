@@ -39,6 +39,8 @@ public:
   CPPUNIT_TEST( testAllRBBQuad8 );
   CPPUNIT_TEST( testAllRBBQuad9 );
 
+  // We use AMR when generating circles
+#  ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( testAllRBBCircle4 );
   CPPUNIT_TEST( testAllRBBCircle8 );
   CPPUNIT_TEST( testAllRBBCircle16 );
@@ -50,6 +52,7 @@ public:
   CPPUNIT_TEST( testAllRBBTri6Disk10 );
   CPPUNIT_TEST( testAllRBBTri6Disk40 );
   CPPUNIT_TEST( testAllRBBTri6Disk160 );
+#  endif
 #endif
 
   // 3D tests
@@ -64,8 +67,11 @@ public:
 //  CPPUNIT_TEST( testAllRBBPrism6 );
 //  CPPUNIT_TEST( testAllRBBPrism18 );
 
+  // We use AMR when generating circles
+#  ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( testAllRBBCylinder10 );
   CPPUNIT_TEST( testAllRBBCylinder80 );
+#  endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
