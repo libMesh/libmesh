@@ -1759,10 +1759,11 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
 
   if (diagnostics)
     {
-      ::Kokkos::View<Real *> d_debug("debug_hilbert_qp", 8);
+      ::Kokkos::View<Real *> d_debug("debug_hilbert_qp", 14);
       const auto mapping_type = geometry_cache.host_element_mapping_types[elem_index];
       const auto n_nodes = geometry_cache.host_element_n_nodes[elem_index];
       const auto debug_goal = goal_function;
+      const auto debug_goal_access = goal_access;
 
       ::Kokkos::parallel_for(
         "debug_hilbert_first_qp",
@@ -1788,6 +1789,12 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
           const Real JxW = qp_data.JxW();
           const Real phi0 = qp_data.phi(0);
           const Real goal = debug_goal(xyz);
+          const auto solution =
+            libMesh::Kokkos::detail::make_hilbert_solution_access(
+              fe, libMesh::Kokkos::detail::ZeroCoeffAccess{}, Number(1.));
+          const Real solution_value = solution.value(qp_data);
+          const Real access_goal = debug_goal_access.value(qp_data, xyz);
+          const Real err_u = solution_value - access_goal;
 
           d_debug(0) = fe.n_qpoints();
           d_debug(1) = JxW;
@@ -1797,6 +1804,12 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
           d_debug(5) = goal;
           d_debug(6) = phi0;
           d_debug(7) = JxW * goal * phi0;
+          d_debug(8) = solution_value;
+          d_debug(9) = access_goal;
+          d_debug(10) = err_u;
+          d_debug(11) = JxW * err_u * phi0;
+          d_debug(12) = solution_value == Number(0);
+          d_debug(13) = access_goal == goal;
         });
 
       ::Kokkos::fence();
@@ -1813,9 +1826,18 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
                    << " goal=" << h_debug(5)
                    << " phi0=" << h_debug(6)
                    << " product=" << h_debug(7)
+                   << " solution=" << h_debug(8)
+                   << " access_goal=" << h_debug(9)
+                   << " err_u=" << h_debug(10)
+                   << " residual0=" << h_debug(11)
+                   << " solution_is_zero=" << h_debug(12)
+                   << " access_goal_matches_direct=" << h_debug(13)
                    << " goal_finite=" << std::isfinite(h_debug(5))
                    << " JxW_finite=" << std::isfinite(h_debug(1))
                    << " phi0_finite=" << std::isfinite(h_debug(6))
+                   << " solution_finite=" << std::isfinite(h_debug(8))
+                   << " access_goal_finite=" << std::isfinite(h_debug(9))
+                   << " err_u_finite=" << std::isfinite(h_debug(10))
                    << std::endl;
     }
 
