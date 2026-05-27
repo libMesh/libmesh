@@ -1,5 +1,8 @@
 #include "libmesh/libmesh_config.h"
-#include "kokkos_tensor_ops_oracle_runners.h"
+#include "numerics/kokkos_tensor_ops_oracle_runners.h"
+#include "numerics/kokkos_vector_ops_oracle_runners.h"
+
+#include <cstdio>
 
 int
 main(int argc, char ** argv)
@@ -7,7 +10,9 @@ main(int argc, char ** argv)
   Kokkos::initialize(argc, argv);
   libMesh::LibMeshInit init(argc, argv);
 
-  const int total_fail = libMeshTest::KokkosTensorOracle::run_all_oracles();
+  int total_fail = 0;
+  total_fail += libMeshTest::KokkosVectorOracle::run_all_oracles();
+  total_fail += libMeshTest::KokkosTensorOracle::run_all_oracles();
 
   Kokkos::finalize();
 
