@@ -341,6 +341,11 @@ public:
     _K(i, j) += value;
   }
 
+  unsigned int n_dofs() const
+  {
+    return _F.size();
+  }
+
 private:
   DenseSubVector<Number> & _F;
   DenseSubMatrix<Number> & _K;

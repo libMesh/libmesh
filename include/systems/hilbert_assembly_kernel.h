@@ -212,7 +212,7 @@ assemble_hilbert_element(const FEAccess & fe,
                          Accumulator & accum)
 {
   const unsigned int n_qpoints = fe.n_qpoints();
-  const unsigned int n_u_dofs = fe.n_dofs();
+  const unsigned int n_u_dofs = accum.n_dofs();
 
   for (unsigned int qp = 0; qp != n_qpoints; qp++)
     {
