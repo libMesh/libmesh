@@ -843,11 +843,6 @@ LibMeshInit::~LibMeshInit()
   nglib::Ng_Exit();
 #endif
 
-#if defined(LIBMESH_HAVE_KOKKOS)
-  libMesh::libmesh_kokkos_finalize_if_needed(libmesh_initialized_kokkos);
-  libmesh_initialized_kokkos = false;
-#endif
-
   if (libMesh::on_command_line("--enable-fpe"))
     libMesh::enableFPE(false);
 
@@ -889,6 +884,11 @@ LibMeshInit::~LibMeshInit()
 # endif
       CHKERRABORT(libMesh::GLOBAL_COMM_WORLD, ierr);
     }
+#endif
+
+#if defined(LIBMESH_HAVE_KOKKOS)
+  libMesh::libmesh_kokkos_finalize_if_needed(libmesh_initialized_kokkos);
+  libmesh_initialized_kokkos = false;
 #endif
 
 #if defined(LIBMESH_HAVE_MPI) && defined(LIBMESH_HAVE_VTK)
