@@ -189,12 +189,15 @@ bool HilbertSystem::element_time_derivative(const bool request_jacobian,
   };
 
 #if defined(LIBMESH_HAVE_KOKKOS) && defined(LIBMESH_HAVE_PETSC) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  if (this->try_exact_kokkos_analytic_goal_host_assembly(c, request_jacobian, F, K))
-    return request_jacobian;
+  if (_use_kokkos_backend)
+    {
+      if (this->try_exact_kokkos_analytic_goal_host_assembly(c, request_jacobian, F, K))
+        return request_jacobian;
 
-  if (_use_exact_parsed_fem_host_path && input_system)
-    if (this->try_exact_kokkos_fem_goal_host_assembly(c, request_jacobian, F, K))
-      return request_jacobian;
+      if (_use_exact_parsed_fem_host_path && input_system)
+        if (this->try_exact_kokkos_fem_goal_host_assembly(c, request_jacobian, F, K))
+          return request_jacobian;
+    }
 #endif
 
   if (_analytic_goal_func)
