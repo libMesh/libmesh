@@ -2401,7 +2401,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
     }
 
   // A DistributedMesh needs a little prep before flattening
-  if (is_replicated)
+  if (!is_replicated)
     mesh.prepare_for_use();
 
   // The mesh now contains a refinement hierarchy due to the refinements
