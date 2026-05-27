@@ -45,6 +45,7 @@
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
+#include <utility>
 
 #ifdef LIBMESH_HAVE_PETSC
 #include "libmesh/petsc_matrix_base.h"
@@ -2209,6 +2210,7 @@ using libMesh::FEMContext;
 using libMesh::FEShapeKey;
 using libMesh::KokkosElementAssemblyState;
 using libMesh::KokkosPetscAssemblyPlan;
+using libMesh::KokkosScalarView;
 using libMesh::LinearSolver;
 using libMesh::Number;
 using libMesh::ParsedFEMFunction;
@@ -2225,6 +2227,7 @@ using libMesh::build_kokkos_element_state;
 using libMesh::build_kokkos_petsc_assembly_plan;
 using libMesh::cast_int;
 using libMesh::ensure_kokkos_goal_cache;
+using libMesh::kokkos_l2_diagnostics_enabled;
 using libMesh::kokkos_petsc_plan_matches;
 using libMesh::libmesh_ignore;
 using libMesh::make_hilbert_shape_key;
