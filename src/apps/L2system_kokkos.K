@@ -199,12 +199,12 @@ build_hilbert_record_quadrature_orders(::HilbertSystem & sys,
       record.quadrature_order = cast_int<unsigned int>(quadrature_order);
 
       const FEShapeKey shape_key =
-        make_hilbert_shape_key(geometry_cache.element_types(record.elem_index),
-                               geometry_cache.element_p_levels(record.elem_index),
+        make_hilbert_shape_key(geometry_cache.host_element_types[record.elem_index],
+                               geometry_cache.host_element_p_levels[record.elem_index],
                                fe_type);
       if (!libMesh::Kokkos::detail::supports_hilbert_local_assembly(
              shape_key,
-             geometry_cache.element_mapping_types(record.elem_index),
+             geometry_cache.host_element_mapping_types[record.elem_index],
              record.quadrature_order) ||
           record.n_dofs > kokkos_hilbert_max_dofs)
         return false;
@@ -1163,10 +1163,10 @@ build_kokkos_element_state(::HilbertSystem & sys,
   if (state.elem_index == libMesh::invalid_uint)
     return false;
 
-  state.elem_type = state.geometry_cache->element_types(state.elem_index);
-  state.mapping_type = state.geometry_cache->element_mapping_types(state.elem_index);
-  state.elem_n_nodes = state.geometry_cache->element_n_nodes(state.elem_index);
-  state.elem_p_level = state.geometry_cache->element_p_levels(state.elem_index);
+  state.elem_type = state.geometry_cache->host_element_types[state.elem_index];
+  state.mapping_type = state.geometry_cache->host_element_mapping_types[state.elem_index];
+  state.elem_n_nodes = state.geometry_cache->host_element_n_nodes[state.elem_index];
+  state.elem_p_level = state.geometry_cache->host_element_p_levels[state.elem_index];
 
   state.solution_local_indices =
     dof_map.require_kokkos_local_index_cache(*sys.current_local_solution, 0);
@@ -1234,12 +1234,12 @@ make_hilbert_bucket_sort_key(const MeshBase::KokkosGeometryCache & geometry_cach
                              const HilbertElementAssemblyRecord & record)
 {
   const unsigned int elem_index = record.elem_index;
-  return std::make_tuple(cast_int<int>(geometry_cache.element_types(elem_index)),
-                         cast_int<int>(geometry_cache.element_mapping_types(elem_index)),
+  return std::make_tuple(cast_int<int>(geometry_cache.host_element_types[elem_index]),
+                         cast_int<int>(geometry_cache.host_element_mapping_types[elem_index]),
                          cast_int<int>(fe_type.order.get_order() +
-                                       cast_int<int>(geometry_cache.element_p_levels(elem_index))),
+                                       cast_int<int>(geometry_cache.host_element_p_levels[elem_index])),
                          record.quadrature_order,
-                         geometry_cache.element_n_nodes(elem_index));
+                         geometry_cache.host_element_n_nodes[elem_index]);
 }
 
 void
@@ -1274,13 +1274,13 @@ build_hilbert_assembly_buckets(const MeshBase::KokkosGeometryCache & geometry_ca
     bucket.end = end;
     const auto & record = records[begin];
     const unsigned int elem_index = record.elem_index;
-    bucket.key = make_hilbert_shape_key(geometry_cache.element_types(elem_index),
-                                        geometry_cache.element_p_levels(elem_index),
+    bucket.key = make_hilbert_shape_key(geometry_cache.host_element_types[elem_index],
+                                        geometry_cache.host_element_p_levels[elem_index],
                                         fe_type);
-    bucket.elem_type = geometry_cache.element_types(elem_index);
-    bucket.mapping_type = geometry_cache.element_mapping_types(elem_index);
-    bucket.n_nodes = geometry_cache.element_n_nodes(elem_index);
-    bucket.elem_p_level = geometry_cache.element_p_levels(elem_index);
+    bucket.elem_type = geometry_cache.host_element_types[elem_index];
+    bucket.mapping_type = geometry_cache.host_element_mapping_types[elem_index];
+    bucket.n_nodes = geometry_cache.host_element_n_nodes[elem_index];
+    bucket.elem_p_level = geometry_cache.host_element_p_levels[elem_index];
     bucket.quadrature_order = record.quadrature_order;
   };
 
@@ -1665,11 +1665,11 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
 
   return libMesh::Kokkos::detail::run_hilbert_system_assembly<kokkos_hilbert_max_dofs>(
     key,
-    geometry_cache.element_mapping_types(elem_index),
+    geometry_cache.host_element_mapping_types[elem_index],
     geometry_cache.node_coordinates,
     geometry_cache.element_node_ids,
     elem_index,
-    geometry_cache.element_n_nodes(elem_index),
+    geometry_cache.host_element_n_nodes[elem_index],
     quadrature_order,
     hilbert_order,
     libMesh::Kokkos::detail::ZeroCoeffAccess{},
@@ -1693,9 +1693,9 @@ assemble_kokkos_hilbert_fem_goal_device_values(const FEShapeKey output_key,
                                                JacobianView d_mat_values)
 {
   KokkosFEMGoalData goal_data;
-  if (!build_kokkos_fem_goal_data(geometry_cache.element_types(elem_index),
-                                  geometry_cache.element_mapping_types(elem_index),
-                                  geometry_cache.element_p_levels(elem_index),
+  if (!build_kokkos_fem_goal_data(geometry_cache.host_element_types[elem_index],
+                                  geometry_cache.host_element_mapping_types[elem_index],
+                                  geometry_cache.host_element_p_levels[elem_index],
                                   hilbert_order,
                                   input_system,
                                   goal_function,
@@ -1722,11 +1722,11 @@ assemble_kokkos_hilbert_fem_goal_device_values(const FEShapeKey output_key,
 
   return libMesh::Kokkos::detail::run_hilbert_system_assembly<kokkos_hilbert_max_dofs>(
     output_key,
-    geometry_cache.element_mapping_types(elem_index),
+    geometry_cache.host_element_mapping_types[elem_index],
     geometry_cache.node_coordinates,
     geometry_cache.element_node_ids,
     elem_index,
-    geometry_cache.element_n_nodes(elem_index),
+    geometry_cache.host_element_n_nodes[elem_index],
     quadrature_order,
     hilbert_order,
     libMesh::Kokkos::detail::ZeroCoeffAccess{},
@@ -1749,8 +1749,8 @@ assemble_kokkos_hilbert_record_values(::HilbertSystem & sys,
 {
   const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
   const FEShapeKey shape_key =
-    make_hilbert_shape_key(geometry_cache.element_types(record.elem_index),
-                           geometry_cache.element_p_levels(record.elem_index),
+    make_hilbert_shape_key(geometry_cache.host_element_types[record.elem_index],
+                           geometry_cache.host_element_p_levels[record.elem_index],
                            sys.variable_type(0));
 
   return analytic_goal ?

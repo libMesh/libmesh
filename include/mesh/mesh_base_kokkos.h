@@ -50,6 +50,11 @@ struct MeshBase::KokkosGeometryCache
   elem_subdomain_view element_subdomains;
   std::vector<dof_id_type> host_node_ids;
   std::vector<dof_id_type> host_element_ids;
+  std::vector<ElemType> host_element_types;
+  std::vector<ElemMappingType> host_element_mapping_types;
+  std::vector<unsigned int> host_element_n_nodes;
+  std::vector<unsigned int> host_element_p_levels;
+  std::vector<subdomain_id_type> host_element_subdomains;
   std::unordered_map<dof_id_type, unsigned int> node_lookup;
   std::unordered_map<dof_id_type, unsigned int> element_lookup;
   unsigned int max_nodes = 0;

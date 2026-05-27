@@ -91,6 +91,12 @@ MeshBase::get_kokkos_geometry_cache() const
   auto h_element_n_nodes = ::Kokkos::create_mirror_view(cache->element_n_nodes);
   auto h_element_p_levels = ::Kokkos::create_mirror_view(cache->element_p_levels);
   auto h_element_subdomains = ::Kokkos::create_mirror_view(cache->element_subdomains);
+  cache->host_element_types.resize(cache->host_element_ids.size());
+  cache->host_element_mapping_types.resize(cache->host_element_ids.size());
+  cache->host_element_n_nodes.resize(cache->host_element_ids.size());
+  cache->host_element_p_levels.resize(cache->host_element_ids.size());
+  cache->host_element_subdomains.resize(cache->host_element_ids.size(),
+                                        static_cast<subdomain_id_type>(Elem::invalid_subdomain_id));
 
   for (auto node_index : index_range(cache->host_node_ids))
     {
@@ -111,6 +117,11 @@ MeshBase::get_kokkos_geometry_cache() const
       h_element_n_nodes(cast_int<unsigned int>(elem_index)) = elem.n_nodes();
       h_element_p_levels(cast_int<unsigned int>(elem_index)) = elem.p_level();
       h_element_subdomains(cast_int<unsigned int>(elem_index)) = elem.subdomain_id();
+      cache->host_element_types[elem_index] = elem.type();
+      cache->host_element_mapping_types[elem_index] = elem.mapping_type();
+      cache->host_element_n_nodes[elem_index] = elem.n_nodes();
+      cache->host_element_p_levels[elem_index] = elem.p_level();
+      cache->host_element_subdomains[elem_index] = elem.subdomain_id();
       for (unsigned int n = 0; n != elem.n_nodes(); ++n)
         h_element_node_ids(cast_int<unsigned int>(elem_index), n) =
           libmesh_map_find(cache->node_lookup, elem.node_id(n));
