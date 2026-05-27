@@ -175,7 +175,7 @@ AS_IF([test "x$enablemarch" != "xno"],
 # standards level.  Adds the required flag to CXXFLAGS if
 # one is found.  Exits if no acceptable flag is found.
 # --------------------------------------------------------------
-ACSM_CXX_COMPILER_STANDARD([2017], [2023], [defaultnoext])
+ACSM_CXX_COMPILER_STANDARD([2017], [2020], [defaultnoext])
 
 # --------------------------------------------------------------
 # See compiler.m4 for the definition of this function.  It uses the
