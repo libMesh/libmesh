@@ -46,6 +46,15 @@ AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
                    $(libmesh_optional_INCLUDES) \
                    -I$(top_builddir)/include # required for libmesh_version.h
 
+# nvcc does not reliably treat GCC-style two-token -iquote options as
+# preprocessor options, so keep Kokkos .K rules on -I include paths.
+KOKKOS_AM_CPPFLAGS = -DLIBMESH_IS_COMPILING_ITSELF \
+                     -I$(top_builddir)/include \
+                     -I$(top_srcdir)/contrib/netgen \
+                     $(libmesh_contrib_INCLUDES) \
+                     $(libmesh_optional_INCLUDES) \
+                     -I$(top_builddir)/include # required for libmesh_version.h
+
 if LIBMESH_ENABLE_KOKKOS
 KOKKOS_LIBMESH_DBG_OBJECTS = src/base/dof_map_kokkos_dbg.lo src/base/libmesh_kokkos_dbg.lo src/mesh/mesh_base_kokkos_dbg.lo
 KOKKOS_LIBMESH_DEVEL_OBJECTS = src/base/dof_map_kokkos_devel.lo src/base/libmesh_kokkos_devel.lo src/mesh/mesh_base_kokkos_devel.lo
@@ -63,105 +72,105 @@ src/base/dof_map_kokkos_dbg.lo: src/base/dof_map_kokkos.K include/libmesh/dof_ma
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_DBG) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_DBG) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/base/dof_map_kokkos_devel.lo: src/base/dof_map_kokkos.K include/libmesh/dof_map_kokkos.h include/libmesh/mesh_base_kokkos.h
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_DEVEL) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/base/dof_map_kokkos_opt.lo: src/base/dof_map_kokkos.K include/libmesh/dof_map_kokkos.h include/libmesh/mesh_base_kokkos.h
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_OPT) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_OPT) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/base/dof_map_kokkos_prof.lo: src/base/dof_map_kokkos.K include/libmesh/dof_map_kokkos.h include/libmesh/mesh_base_kokkos.h
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_PROF) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_PROF) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/base/dof_map_kokkos_oprof.lo: src/base/dof_map_kokkos.K include/libmesh/dof_map_kokkos.h include/libmesh/mesh_base_kokkos.h
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_OPROF) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_OPROF) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/base/libmesh_kokkos_dbg.lo: src/base/libmesh_kokkos.K
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_DBG) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_DBG) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/base/libmesh_kokkos_devel.lo: src/base/libmesh_kokkos.K
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_DEVEL) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/base/libmesh_kokkos_opt.lo: src/base/libmesh_kokkos.K
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_OPT) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_OPT) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/base/libmesh_kokkos_prof.lo: src/base/libmesh_kokkos.K
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_PROF) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_PROF) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/base/libmesh_kokkos_oprof.lo: src/base/libmesh_kokkos.K
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_OPROF) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_OPROF) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/mesh/mesh_base_kokkos_dbg.lo: src/mesh/mesh_base_kokkos.K include/libmesh/mesh_base_kokkos.h
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_DBG) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_DBG) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/mesh/mesh_base_kokkos_devel.lo: src/mesh/mesh_base_kokkos.K include/libmesh/mesh_base_kokkos.h
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_DEVEL) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/mesh/mesh_base_kokkos_opt.lo: src/mesh/mesh_base_kokkos.K include/libmesh/mesh_base_kokkos.h
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_OPT) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_OPT) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/mesh/mesh_base_kokkos_prof.lo: src/mesh/mesh_base_kokkos.K include/libmesh/mesh_base_kokkos.h
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_PROF) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_PROF) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/mesh/mesh_base_kokkos_oprof.lo: src/mesh/mesh_base_kokkos.K include/libmesh/mesh_base_kokkos.h
 	$(LIBTOOL) $(AM_V_lt) --tag=CXX --mode=compile $(KOKKOS_CXX) \
 	  $(KOKKOS_CXXFLAGS) \
 	  $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_OPROF) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_OPROF) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 if LIBMESH_ENABLE_PETSC
@@ -176,17 +185,17 @@ KOKKOS_CALCULATOR_OPT_OBJECTS = src/apps/L2system_kokkos_opt.o
 
 src/apps/L2system_kokkos_dbg.o: src/apps/L2system_kokkos.K include/libmesh/dof_map_kokkos.h include/libmesh/mesh_base_kokkos.h
 	$(KOKKOS_CXX) $(KOKKOS_CXXFLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_DBG) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_DBG) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/apps/L2system_kokkos_devel.o: src/apps/L2system_kokkos.K include/libmesh/dof_map_kokkos.h include/libmesh/mesh_base_kokkos.h
 	$(KOKKOS_CXX) $(KOKKOS_CXXFLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_DEVEL) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 
 src/apps/L2system_kokkos_opt.o: src/apps/L2system_kokkos.K include/libmesh/dof_map_kokkos.h include/libmesh/mesh_base_kokkos.h
 	$(KOKKOS_CXX) $(KOKKOS_CXXFLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(CPPFLAGS_OPT) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
+	  $(CPPFLAGS_OPT) $(KOKKOS_AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_MPI_CPPFLAGS) $(KOKKOS_CPPFLAGS) \
 	  -c -o $@ `test -f '$<' || echo '$(srcdir)/'`$<
 endif
 else
