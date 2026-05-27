@@ -12,50 +12,50 @@
 namespace libMesh
 {
 
-constexpr unsigned int edge2_side_node_counts[2] = {1, 1};
-constexpr unsigned int edge3_side_node_counts[2] = {1, 1};
-constexpr unsigned int edge4_side_node_counts[2] = {1, 1};
+inline constexpr unsigned int edge2_side_node_counts[2] = {1, 1};
+inline constexpr unsigned int edge3_side_node_counts[2] = {1, 1};
+inline constexpr unsigned int edge4_side_node_counts[2] = {1, 1};
 
-constexpr unsigned int tri3_side_node_counts[3] = {2, 2, 2};
-constexpr unsigned int tri6_side_node_counts[3] = {3, 3, 3};
-constexpr unsigned int tri7_side_node_counts[3] = {3, 3, 3};
+inline constexpr unsigned int tri3_side_node_counts[3] = {2, 2, 2};
+inline constexpr unsigned int tri6_side_node_counts[3] = {3, 3, 3};
+inline constexpr unsigned int tri7_side_node_counts[3] = {3, 3, 3};
 
-constexpr unsigned int quad4_side_node_counts[4] = {2, 2, 2, 2};
-constexpr unsigned int quad8_side_node_counts[4] = {3, 3, 3, 3};
-constexpr unsigned int quad9_side_node_counts[4] = {3, 3, 3, 3};
+inline constexpr unsigned int quad4_side_node_counts[4] = {2, 2, 2, 2};
+inline constexpr unsigned int quad8_side_node_counts[4] = {3, 3, 3, 3};
+inline constexpr unsigned int quad9_side_node_counts[4] = {3, 3, 3, 3};
 
-constexpr unsigned int tet4_side_node_counts[4]  = {3, 3, 3, 3};
-constexpr unsigned int tet10_side_node_counts[4] = {6, 6, 6, 6};
-constexpr unsigned int tet14_side_node_counts[4] = {7, 7, 7, 7};
+inline constexpr unsigned int tet4_side_node_counts[4]  = {3, 3, 3, 3};
+inline constexpr unsigned int tet10_side_node_counts[4] = {6, 6, 6, 6};
+inline constexpr unsigned int tet14_side_node_counts[4] = {7, 7, 7, 7};
 
-constexpr unsigned int hex8_side_node_counts[6]  = {4, 4, 4, 4, 4, 4};
-constexpr unsigned int hex20_side_node_counts[6] = {8, 8, 8, 8, 8, 8};
-constexpr unsigned int hex27_side_node_counts[6] = {9, 9, 9, 9, 9, 9};
+inline constexpr unsigned int hex8_side_node_counts[6]  = {4, 4, 4, 4, 4, 4};
+inline constexpr unsigned int hex20_side_node_counts[6] = {8, 8, 8, 8, 8, 8};
+inline constexpr unsigned int hex27_side_node_counts[6] = {9, 9, 9, 9, 9, 9};
 
-constexpr unsigned int prism6_side_node_counts[5]  = {3, 4, 4, 4, 3};
-constexpr unsigned int prism15_side_node_counts[5] = {6, 8, 8, 8, 6};
-constexpr unsigned int prism18_side_node_counts[5] = {6, 9, 9, 9, 6};
-constexpr unsigned int prism20_side_node_counts[5] = {7, 9, 9, 9, 7};
-constexpr unsigned int prism21_side_node_counts[5] = {7, 9, 9, 9, 7};
+inline constexpr unsigned int prism6_side_node_counts[5]  = {3, 4, 4, 4, 3};
+inline constexpr unsigned int prism15_side_node_counts[5] = {6, 8, 8, 8, 6};
+inline constexpr unsigned int prism18_side_node_counts[5] = {6, 9, 9, 9, 6};
+inline constexpr unsigned int prism20_side_node_counts[5] = {7, 9, 9, 9, 7};
+inline constexpr unsigned int prism21_side_node_counts[5] = {7, 9, 9, 9, 7};
 
-constexpr unsigned int pyramid5_side_node_counts[5]  = {3, 3, 3, 3, 4};
-constexpr unsigned int pyramid13_side_node_counts[5] = {6, 6, 6, 6, 8};
-constexpr unsigned int pyramid14_side_node_counts[5] = {6, 6, 6, 6, 9};
-constexpr unsigned int pyramid18_side_node_counts[5] = {7, 7, 7, 7, 9};
+inline constexpr unsigned int pyramid5_side_node_counts[5]  = {3, 3, 3, 3, 4};
+inline constexpr unsigned int pyramid13_side_node_counts[5] = {6, 6, 6, 6, 8};
+inline constexpr unsigned int pyramid14_side_node_counts[5] = {6, 6, 6, 6, 9};
+inline constexpr unsigned int pyramid18_side_node_counts[5] = {7, 7, 7, 7, 9};
 
-constexpr unsigned int tet10_edge_node_counts[6]   = {3, 3, 3, 3, 3, 3};
-constexpr unsigned int tet14_edge_node_counts[6]   = {3, 3, 3, 3, 3, 3};
-constexpr unsigned int hex20_edge_node_counts[12]  = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-constexpr unsigned int hex27_edge_node_counts[12]  = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-constexpr unsigned int prism15_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
-constexpr unsigned int prism18_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
-constexpr unsigned int prism20_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
-constexpr unsigned int prism21_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
-constexpr unsigned int pyramid13_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
-constexpr unsigned int pyramid14_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
-constexpr unsigned int pyramid18_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int tet10_edge_node_counts[6]   = {3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int tet14_edge_node_counts[6]   = {3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int hex20_edge_node_counts[12]  = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int hex27_edge_node_counts[12]  = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int prism15_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int prism18_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int prism20_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int prism21_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int pyramid13_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int pyramid14_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
+inline constexpr unsigned int pyramid18_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
 
-constexpr unsigned int prism6_side_nodes[5][4] =
+inline constexpr unsigned int prism6_side_nodes[5][4] =
   {
     {0, 2, 1, 99},
     {0, 1, 4, 3},
@@ -64,7 +64,7 @@ constexpr unsigned int prism6_side_nodes[5][4] =
     {3, 4, 5, 99}
   };
 
-constexpr unsigned int prism15_side_nodes[5][8] =
+inline constexpr unsigned int prism15_side_nodes[5][8] =
   {
     {0, 2, 1, 8, 7, 6, 99, 99},
     {0, 1, 4, 3, 6, 10, 12, 9},
@@ -73,7 +73,7 @@ constexpr unsigned int prism15_side_nodes[5][8] =
     {3, 4, 5, 12, 13, 14, 99, 99}
   };
 
-constexpr unsigned int prism18_side_nodes[5][9] =
+inline constexpr unsigned int prism18_side_nodes[5][9] =
   {
     {0, 2, 1, 8, 7, 6, 99, 99, 99},
     {0, 1, 4, 3, 6, 10, 12, 9, 15},
@@ -82,7 +82,7 @@ constexpr unsigned int prism18_side_nodes[5][9] =
     {3, 4, 5, 12, 13, 14, 99, 99, 99}
   };
 
-constexpr unsigned int prism20_side_nodes[5][9] =
+inline constexpr unsigned int prism20_side_nodes[5][9] =
   {
     {0, 2, 1, 8, 7, 6, 18, 99, 99},
     {0, 1, 4, 3, 6, 10, 12, 9, 15},
@@ -91,7 +91,7 @@ constexpr unsigned int prism20_side_nodes[5][9] =
     {3, 4, 5, 12, 13, 14, 19, 99, 99}
   };
 
-constexpr unsigned int prism21_side_nodes[5][9] =
+inline constexpr unsigned int prism21_side_nodes[5][9] =
   {
     {0, 2, 1, 8, 7, 6, 18, 99, 99},
     {0, 1, 4, 3, 6, 10, 12, 9, 15},
@@ -100,7 +100,7 @@ constexpr unsigned int prism21_side_nodes[5][9] =
     {3, 4, 5, 12, 13, 14, 19, 99, 99}
   };
 
-constexpr unsigned int pyramid5_side_nodes[5][4] =
+inline constexpr unsigned int pyramid5_side_nodes[5][4] =
   {
     {0, 1, 4, 99},
     {1, 2, 4, 99},
@@ -109,7 +109,7 @@ constexpr unsigned int pyramid5_side_nodes[5][4] =
     {0, 3, 2, 1}
   };
 
-constexpr unsigned int pyramid13_side_nodes[5][8] =
+inline constexpr unsigned int pyramid13_side_nodes[5][8] =
   {
     {0, 1, 4, 5, 10, 9, 99, 99},
     {1, 2, 4, 6, 11, 10, 99, 99},
@@ -118,7 +118,7 @@ constexpr unsigned int pyramid13_side_nodes[5][8] =
     {0, 3, 2, 1, 8, 7, 6, 5}
   };
 
-constexpr unsigned int pyramid14_side_nodes[5][9] =
+inline constexpr unsigned int pyramid14_side_nodes[5][9] =
   {
     {0, 1, 4, 5, 10, 9, 99, 99, 99},
     {1, 2, 4, 6, 11, 10, 99, 99, 99},
@@ -127,7 +127,7 @@ constexpr unsigned int pyramid14_side_nodes[5][9] =
     {0, 3, 2, 1, 8, 7, 6, 5, 13}
   };
 
-constexpr unsigned int pyramid18_side_nodes[5][9] =
+inline constexpr unsigned int pyramid18_side_nodes[5][9] =
   {
     {0, 1, 4, 5, 10, 9, 14, 99, 99},
     {1, 2, 4, 6, 11, 10, 15, 99, 99},
@@ -136,28 +136,28 @@ constexpr unsigned int pyramid18_side_nodes[5][9] =
     {0, 3, 2, 1, 8, 7, 6, 5, 13}
   };
 
-constexpr unsigned int tri3_side_nodes[3][2] =
+inline constexpr unsigned int tri3_side_nodes[3][2] =
   {
     {0, 1},
     {1, 2},
     {2, 0}
   };
 
-constexpr unsigned int tri6_side_nodes[3][3] =
+inline constexpr unsigned int tri6_side_nodes[3][3] =
   {
     {0, 1, 3},
     {1, 2, 4},
     {2, 0, 5}
   };
 
-constexpr unsigned int tri7_side_nodes[3][3] =
+inline constexpr unsigned int tri7_side_nodes[3][3] =
   {
     {0, 1, 3},
     {1, 2, 4},
     {2, 0, 5}
   };
 
-constexpr unsigned int quad4_side_nodes[4][2] =
+inline constexpr unsigned int quad4_side_nodes[4][2] =
   {
     {0, 1},
     {1, 2},
@@ -165,7 +165,7 @@ constexpr unsigned int quad4_side_nodes[4][2] =
     {3, 0}
   };
 
-constexpr unsigned int quad8_side_nodes[4][3] =
+inline constexpr unsigned int quad8_side_nodes[4][3] =
   {
     {0, 1, 4},
     {1, 2, 5},
@@ -173,7 +173,7 @@ constexpr unsigned int quad8_side_nodes[4][3] =
     {3, 0, 7}
   };
 
-constexpr unsigned int quad9_side_nodes[4][3] =
+inline constexpr unsigned int quad9_side_nodes[4][3] =
   {
     {0, 1, 4},
     {1, 2, 5},
@@ -181,7 +181,7 @@ constexpr unsigned int quad9_side_nodes[4][3] =
     {3, 0, 7}
   };
 
-constexpr unsigned int tet4_side_nodes[4][3] =
+inline constexpr unsigned int tet4_side_nodes[4][3] =
   {
     {0, 2, 1},
     {0, 1, 3},
@@ -189,7 +189,7 @@ constexpr unsigned int tet4_side_nodes[4][3] =
     {2, 0, 3}
   };
 
-constexpr unsigned int tet10_side_nodes[4][6] =
+inline constexpr unsigned int tet10_side_nodes[4][6] =
   {
     {0, 2, 1, 6, 5, 4},
     {0, 1, 3, 4, 8, 7},
@@ -197,7 +197,7 @@ constexpr unsigned int tet10_side_nodes[4][6] =
     {2, 0, 3, 6, 7, 9}
   };
 
-constexpr unsigned int tet14_side_nodes[4][7] =
+inline constexpr unsigned int tet14_side_nodes[4][7] =
   {
     {0, 2, 1, 6, 5, 4, 10},
     {0, 1, 3, 4, 8, 7, 11},
@@ -205,7 +205,7 @@ constexpr unsigned int tet14_side_nodes[4][7] =
     {2, 0, 3, 6, 7, 9, 13}
   };
 
-constexpr unsigned int hex8_side_nodes[6][4] =
+inline constexpr unsigned int hex8_side_nodes[6][4] =
   {
     {0, 3, 2, 1},
     {0, 1, 5, 4},
@@ -215,7 +215,7 @@ constexpr unsigned int hex8_side_nodes[6][4] =
     {4, 5, 6, 7}
   };
 
-constexpr unsigned int hex20_side_nodes[6][8] =
+inline constexpr unsigned int hex20_side_nodes[6][8] =
   {
     {0, 3, 2, 1, 11, 10,  9,  8},
     {0, 1, 5, 4,  8, 13, 16, 12},
@@ -225,7 +225,7 @@ constexpr unsigned int hex20_side_nodes[6][8] =
     {4, 5, 6, 7, 16, 17, 18, 19}
   };
 
-constexpr unsigned int hex27_side_nodes[6][9] =
+inline constexpr unsigned int hex27_side_nodes[6][9] =
   {
     {0, 3, 2, 1, 11, 10,  9,  8, 20},
     {0, 1, 5, 4,  8, 13, 16, 12, 21},
@@ -235,25 +235,25 @@ constexpr unsigned int hex27_side_nodes[6][9] =
     {4, 5, 6, 7, 16, 17, 18, 19, 25}
   };
 
-constexpr unsigned int edge2_side_nodes[2][1] =
+inline constexpr unsigned int edge2_side_nodes[2][1] =
   {
     {0},
     {1}
   };
 
-constexpr unsigned int edge3_side_nodes[2][1] =
+inline constexpr unsigned int edge3_side_nodes[2][1] =
   {
     {0},
     {1}
   };
 
-constexpr unsigned int edge4_side_nodes[2][1] =
+inline constexpr unsigned int edge4_side_nodes[2][1] =
   {
     {0},
     {1}
   };
 
-constexpr unsigned int tet10_edge_nodes[6][3] =
+inline constexpr unsigned int tet10_edge_nodes[6][3] =
   {
     {0, 1, 4},
     {1, 2, 5},
@@ -263,7 +263,7 @@ constexpr unsigned int tet10_edge_nodes[6][3] =
     {2, 3, 9}
   };
 
-constexpr unsigned int tet14_edge_nodes[6][3] =
+inline constexpr unsigned int tet14_edge_nodes[6][3] =
   {
     {0, 1, 4},
     {1, 2, 5},
@@ -273,7 +273,7 @@ constexpr unsigned int tet14_edge_nodes[6][3] =
     {2, 3, 9}
   };
 
-constexpr unsigned int hex20_edge_nodes[12][3] =
+inline constexpr unsigned int hex20_edge_nodes[12][3] =
   {
     {0, 1, 8},
     {1, 2, 9},
@@ -289,7 +289,7 @@ constexpr unsigned int hex20_edge_nodes[12][3] =
     {4, 7, 19}
   };
 
-constexpr unsigned int hex27_edge_nodes[12][3] =
+inline constexpr unsigned int hex27_edge_nodes[12][3] =
   {
     {0, 1, 8},
     {1, 2, 9},
@@ -305,7 +305,7 @@ constexpr unsigned int hex27_edge_nodes[12][3] =
     {4, 7, 19}
   };
 
-constexpr unsigned int prism15_edge_nodes[9][3] =
+inline constexpr unsigned int prism15_edge_nodes[9][3] =
   {
     {0, 1, 6},
     {1, 2, 7},
@@ -318,7 +318,7 @@ constexpr unsigned int prism15_edge_nodes[9][3] =
     {3, 5, 14}
   };
 
-constexpr unsigned int prism18_edge_nodes[9][3] =
+inline constexpr unsigned int prism18_edge_nodes[9][3] =
   {
     {0, 1, 6},
     {1, 2, 7},
@@ -331,7 +331,7 @@ constexpr unsigned int prism18_edge_nodes[9][3] =
     {3, 5, 14}
   };
 
-constexpr unsigned int prism20_edge_nodes[9][3] =
+inline constexpr unsigned int prism20_edge_nodes[9][3] =
   {
     {0, 1, 6},
     {1, 2, 7},
@@ -344,7 +344,7 @@ constexpr unsigned int prism20_edge_nodes[9][3] =
     {3, 5, 14}
   };
 
-constexpr unsigned int prism21_edge_nodes[9][3] =
+inline constexpr unsigned int prism21_edge_nodes[9][3] =
   {
     {0, 1, 6},
     {1, 2, 7},
@@ -357,7 +357,7 @@ constexpr unsigned int prism21_edge_nodes[9][3] =
     {3, 5, 14}
   };
 
-constexpr unsigned int pyramid13_edge_nodes[8][3] =
+inline constexpr unsigned int pyramid13_edge_nodes[8][3] =
   {
     {0, 1, 5},
     {1, 2, 6},
@@ -369,7 +369,7 @@ constexpr unsigned int pyramid13_edge_nodes[8][3] =
     {3, 4, 12}
   };
 
-constexpr unsigned int pyramid14_edge_nodes[8][3] =
+inline constexpr unsigned int pyramid14_edge_nodes[8][3] =
   {
     {0, 1, 5},
     {1, 2, 6},
@@ -381,7 +381,7 @@ constexpr unsigned int pyramid14_edge_nodes[8][3] =
     {3, 4, 12}
   };
 
-constexpr unsigned int pyramid18_edge_nodes[8][3] =
+inline constexpr unsigned int pyramid18_edge_nodes[8][3] =
   {
     {0, 1, 5},
     {1, 2, 6},
