@@ -1644,9 +1644,9 @@ ensure_kokkos_sampled_analytic_goal_data(::HilbertSystem & sys,
         QBase::build(QGAUSS, elem->dim(), static_cast<Order>(record.quadrature_order));
       std::unique_ptr<FEBase> fe = FEBase::build(elem->dim(), sys.variable_type(0));
       fe->attach_quadrature_rule(qrule.get());
+      const auto & xyz = fe->get_xyz();
       fe->reinit(elem);
 
-      const auto & xyz = fe->get_xyz();
       host_offsets[record.elem_index] = host_values.size();
 
       for (const auto qp : index_range(xyz))
