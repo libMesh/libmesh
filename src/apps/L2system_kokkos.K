@@ -46,6 +46,7 @@
 #include <type_traits>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #ifdef LIBMESH_HAVE_PETSC
 #include "libmesh/petsc_matrix_base.h"
@@ -77,6 +78,7 @@ using KokkosScalarView = ::Kokkos::View<T *>;
 
 using KokkosDenseJacobianView = ::Kokkos::View<Number **>;
 using KokkosFlatJacobianView = ::Kokkos::View<Number *>;
+using KokkosGradientView = ::Kokkos::View<Real **>;
 using KokkosUnsignedIntView = ::Kokkos::View<unsigned int *>;
 using KokkosPetscIntView = ::Kokkos::View<PetscInt *>;
 using KokkosSizeView = ::Kokkos::View<std::size_t *>;
@@ -309,6 +311,44 @@ private:
   FEMContext & _input_context;
 };
 
+class SampledAnalyticGoalAccess
+{
+public:
+  SampledAnalyticGoalAccess(KokkosSizeView qp_offsets,
+                            KokkosScalarView<Number> values,
+                            KokkosGradientView gradients)
+    : _qp_offsets(qp_offsets),
+      _values(values),
+      _gradients(gradients)
+  {
+  }
+
+  template <typename QpData>
+  LIBMESH_DEVICE_INLINE
+  Number value(const QpData & qp_data,
+               const Point &) const
+  {
+    return _values(_qp_offsets(qp_data.elem_index()) + qp_data.qp_index());
+  }
+
+  template <typename QpData>
+  LIBMESH_DEVICE_INLINE
+  Gradient gradient(const QpData & qp_data,
+                    const Point &) const
+  {
+    const auto offset = _qp_offsets(qp_data.elem_index()) + qp_data.qp_index();
+    Gradient grad;
+    for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+      grad(d) = _gradients(offset, d);
+    return grad;
+  }
+
+private:
+  KokkosSizeView _qp_offsets;
+  KokkosScalarView<Number> _values;
+  KokkosGradientView _gradients;
+};
+
 struct KokkosElementAssemblyState
 {
   const MeshBase::KokkosGeometryCache * geometry_cache = nullptr;
@@ -410,6 +450,9 @@ struct KokkosPetscAssemblyPlan
   PetscSF rhs_remote_sf = nullptr;
   PetscSF mat_remote_sf = nullptr;
   KokkosFEMGoalBatchData fem_goal_batch_data;
+  KokkosSizeView analytic_goal_qp_offsets;
+  KokkosScalarView<Number> analytic_goal_values;
+  KokkosGradientView analytic_goal_gradients;
   const void * geometry_cache_id = nullptr;
   const void * dof_index_cache_id = nullptr;
   FEType fe_type;
@@ -421,6 +464,9 @@ struct KokkosPetscAssemblyPlan
   const void * direct_rhs_target = nullptr;
   const void * fem_goal_target = nullptr;
   const void * input_vector_target = nullptr;
+  const void * analytic_goal_target = nullptr;
+  const void * analytic_goal_gradient_target = nullptr;
+  Real analytic_goal_time = std::numeric_limits<Real>::quiet_NaN();
   PetscInt row_start = 0;
   PetscInt row_stop = 0;
   PetscInt col_start = 0;
@@ -1479,6 +1525,9 @@ build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
   plan.direct_rhs_target = nullptr;
   plan.fem_goal_target = nullptr;
   plan.input_vector_target = nullptr;
+  plan.analytic_goal_target = nullptr;
+  plan.analytic_goal_gradient_target = nullptr;
+  plan.analytic_goal_time = std::numeric_limits<Real>::quiet_NaN();
   plan.direct_storage_active = false;
   return true;
 }
@@ -1561,6 +1610,85 @@ ensure_kokkos_fem_goal_batch_data(::HilbertSystem & sys,
   plan.fem_goal_batch_data = std::move(batch_data);
   plan.fem_goal_target = &goal_function;
   plan.input_vector_target = input_vector_target;
+  return true;
+}
+
+bool
+ensure_kokkos_sampled_analytic_goal_data(::HilbertSystem & sys,
+                                         FunctionBase<Number> & goal_function,
+                                         FunctionBase<Gradient> * goal_gradient,
+                                         KokkosPetscAssemblyPlan & plan)
+{
+  if (plan.analytic_goal_target == &goal_function &&
+      plan.analytic_goal_gradient_target == goal_gradient &&
+      plan.analytic_goal_time == sys.time)
+    return true;
+
+  if (sys.hilbert_order() > 0 && !goal_gradient)
+    return false;
+
+  const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
+  const auto n_elements = geometry_cache.host_element_ids.size();
+  std::vector<std::size_t> host_offsets(n_elements, std::numeric_limits<std::size_t>::max());
+  std::vector<Number> host_values;
+  std::vector<std::array<Real, LIBMESH_DIM>> host_gradients;
+
+  for (const auto & record : plan.records)
+    {
+      const Elem * elem = sys.get_mesh().query_elem_ptr(record.elem_id);
+      if (!elem)
+        return false;
+
+      std::unique_ptr<QBase> qrule =
+        QBase::build(QGAUSS, elem->dim(), static_cast<Order>(record.quadrature_order));
+      std::unique_ptr<FEBase> fe = FEBase::build(elem->dim(), sys.variable_type(0));
+      fe->attach_quadrature_rule(qrule.get());
+      fe->reinit(elem);
+
+      const auto & xyz = fe->get_xyz();
+      host_offsets[record.elem_index] = host_values.size();
+
+      for (const auto qp : index_range(xyz))
+        {
+          host_values.push_back(goal_function(xyz[qp], sys.time));
+
+          std::array<Real, LIBMESH_DIM> grad_values = {};
+          if (goal_gradient)
+            {
+              const Gradient grad = (*goal_gradient)(xyz[qp], sys.time);
+              for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+                grad_values[d] = grad(d);
+            }
+          host_gradients.push_back(grad_values);
+        }
+    }
+
+  plan.analytic_goal_qp_offsets =
+    KokkosSizeView("hilbert_analytic_goal_qp_offsets", host_offsets.size());
+  plan.analytic_goal_values =
+    KokkosScalarView<Number>("hilbert_analytic_goal_values", host_values.size());
+  plan.analytic_goal_gradients =
+    KokkosGradientView("hilbert_analytic_goal_gradients", host_gradients.size(), LIBMESH_DIM);
+
+  auto h_offsets = ::Kokkos::create_mirror_view(plan.analytic_goal_qp_offsets);
+  for (auto i : index_range(host_offsets))
+    h_offsets(i) = host_offsets[i];
+  ::Kokkos::deep_copy(plan.analytic_goal_qp_offsets, h_offsets);
+
+  auto h_values = ::Kokkos::create_mirror_view(plan.analytic_goal_values);
+  for (auto i : index_range(host_values))
+    h_values(i) = host_values[i];
+  ::Kokkos::deep_copy(plan.analytic_goal_values, h_values);
+
+  auto h_gradients = ::Kokkos::create_mirror_view(plan.analytic_goal_gradients);
+  for (auto i : index_range(host_gradients))
+    for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+      h_gradients(i, d) = host_gradients[i][d];
+  ::Kokkos::deep_copy(plan.analytic_goal_gradients, h_gradients);
+
+  plan.analytic_goal_target = &goal_function;
+  plan.analytic_goal_gradient_target = goal_gradient;
+  plan.analytic_goal_time = sys.time;
   return true;
 }
 
@@ -1743,17 +1871,15 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
                                               const unsigned int hilbert_order,
                                               const unsigned int elem_index,
                                               const MeshBase::KokkosGeometryCache & geometry_cache,
-                                              const libMesh::Kokkos::KokkosParsedFunction<Number> & goal_function,
+                                              const KokkosPetscAssemblyPlan & plan,
                                               ResidualView d_rhs_values,
                                               JacobianView d_mat_values,
                                               const bool diagnostics = false)
 {
   const unsigned int n_dofs = cast_int<unsigned int>(d_rhs_values.extent(0));
-  auto goal_copy = goal_function;
-  auto goal_grad = goal_copy.gradient_function();
-  const auto goal_access =
-    libMesh::Kokkos::detail::make_hilbert_analytic_goal_access(std::move(goal_copy),
-                                                               std::move(goal_grad));
+  const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
+                                              plan.analytic_goal_values,
+                                              plan.analytic_goal_gradients);
   const libMesh::Kokkos::detail::FlatDeviceValueSink<ResidualView, JacobianView> sink{
     d_rhs_values, d_mat_values, n_dofs};
 
@@ -1762,7 +1888,6 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
       ::Kokkos::View<Real *> d_debug("debug_hilbert_qp", 14);
       const auto mapping_type = geometry_cache.host_element_mapping_types[elem_index];
       const auto n_nodes = geometry_cache.host_element_n_nodes[elem_index];
-      const auto debug_goal = goal_function;
       const auto debug_goal_access = goal_access;
 
       ::Kokkos::parallel_for(
@@ -1788,7 +1913,7 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
           const Point & xyz = qp_data.xyz();
           const Real JxW = qp_data.JxW();
           const Real phi0 = qp_data.phi(0);
-          const Real goal = debug_goal(xyz);
+          const Real goal = debug_goal_access.value(qp_data, xyz);
           const auto solution =
             libMesh::Kokkos::detail::make_hilbert_solution_access(
               fe, libMesh::Kokkos::detail::ZeroCoeffAccess{}, Number(1.));
@@ -1918,9 +2043,10 @@ assemble_kokkos_hilbert_fem_goal_device_values(const FEShapeKey output_key,
 template <typename ResidualView, typename JacobianView>
 bool
 assemble_kokkos_hilbert_record_values(::HilbertSystem & sys,
+                                      const KokkosPetscAssemblyPlan & plan,
                                       const HilbertElementAssemblyRecord & record,
                                       const unsigned int quadrature_order,
-                                      const libMesh::Kokkos::KokkosParsedFunction<Number> * analytic_goal,
+                                      const bool analytic_goal,
                                       const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal,
                                       ResidualView rhs_slice,
                                       JacobianView mat_slice,
@@ -1938,7 +2064,7 @@ assemble_kokkos_hilbert_record_values(::HilbertSystem & sys,
                                                          sys.hilbert_order(),
                                                          record.elem_index,
                                                          geometry_cache,
-                                                         analytic_goal->with_time(sys.time),
+                                                         plan,
                                                          rhs_slice,
                                                          mat_slice,
                                                          diagnostics) :
@@ -1956,7 +2082,7 @@ assemble_kokkos_hilbert_record_values(::HilbertSystem & sys,
 bool
 assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                     KokkosPetscAssemblyPlan & plan,
-                                    const libMesh::Kokkos::KokkosParsedFunction<Number> * analytic_goal,
+                                    const bool analytic_goal,
                                     const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal,
                                     PetscMatrixBase<Number> & system_matrix,
                                     PetscVector<Number> & system_rhs,
@@ -1969,8 +2095,8 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                        "HilbertSystem Kokkos direct PETSc storage does not yet support "
                        "constrained dofs.");
   libmesh_error_msg_if(!analytic_goal && !fem_goal,
-                       "HilbertSystem Kokkos direct PETSc storage requires a parsed analytic "
-                       "or parsed FEM goal.");
+                       "HilbertSystem Kokkos direct PETSc storage requires an analytic "
+                       "goal or parsed FEM goal.");
 
   const auto * dof_index_cache = sys.get_dof_map().get_kokkos_dof_index_cache(0);
   libmesh_assert(dof_index_cache);
@@ -2075,11 +2201,9 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
     const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
     if (analytic_goal)
       {
-        auto timed_goal = analytic_goal->with_time(sys.time);
-        auto goal_grad = timed_goal.gradient_function();
-        const auto goal_access =
-          libMesh::Kokkos::detail::make_hilbert_analytic_goal_access(std::move(timed_goal),
-                                                                     std::move(goal_grad));
+        const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
+                                                    plan.analytic_goal_values,
+                                                    plan.analytic_goal_gradients);
 
         for (const auto & bucket : plan.buckets)
           libMesh::Kokkos::detail::run_hilbert_system_bucket_scatter_batch<
@@ -2249,6 +2373,7 @@ using libMesh::build_kokkos_element_state;
 using libMesh::build_kokkos_petsc_assembly_plan;
 using libMesh::cast_int;
 using libMesh::ensure_kokkos_goal_cache;
+using libMesh::ensure_kokkos_sampled_analytic_goal_data;
 using libMesh::kokkos_l2_diagnostics_enabled;
 using libMesh::kokkos_petsc_plan_matches;
 using libMesh::libmesh_ignore;
@@ -2498,15 +2623,15 @@ HilbertSystem::try_kokkos_petsc_solve()
   auto * petsc_rhs = dynamic_cast<PetscVector<Number> *>(this->rhs);
   auto * petsc_solution = dynamic_cast<PetscVector<Number> *>(this->solution.get());
 
-  const auto * analytic_goal = this->ensure_kokkos_goal_func();
+  const bool analytic_goal = static_cast<bool>(_analytic_goal_func);
   const auto * fem_goal = this->ensure_kokkos_fem_goal_func();
 
   libmesh_error_msg_if(!petsc_matrix || !petsc_rhs || !petsc_solution,
                        "HilbertSystem Kokkos direct PETSc storage requires PETSc-backed matrix, "
                        "RHS, and solution objects.");
   libmesh_error_msg_if(!(analytic_goal || fem_goal),
-                       "HilbertSystem Kokkos direct PETSc storage requires a parsed analytic "
-                       "goal or a parsed FEM goal with Kokkos support.");
+                       "HilbertSystem Kokkos direct PETSc storage requires an analytic goal "
+                       "or a parsed FEM goal with Kokkos support.");
 
   prewarm_kokkos_hilbert_entities(*this, fem_goal);
   this->_last_kokkos_timing = {};
@@ -2521,6 +2646,13 @@ HilbertSystem::try_kokkos_petsc_solve()
   libmesh_error_msg_if(!plan,
                        "HilbertSystem Kokkos direct PETSc storage could not build a supported "
                        "assembly plan for the current FE/mapping/quadrature configuration.");
+  if (analytic_goal &&
+      !ensure_kokkos_sampled_analytic_goal_data(*this,
+                                                *_analytic_goal_func,
+                                                _analytic_goal_grad.get(),
+                                                *plan))
+    libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage could not sample the analytic "
+                      "goal on the host for device assembly.");
   const auto plan_stop = clock::now();
   this->_last_kokkos_timing.plan_seconds =
     rebuilt_plan ?
@@ -2554,6 +2686,7 @@ HilbertSystem::try_kokkos_petsc_solve()
 
           const bool ok =
             assemble_kokkos_hilbert_record_values(*this,
+                                                  *plan,
                                                   record,
                                                   record.quadrature_order,
                                                   analytic_goal,
