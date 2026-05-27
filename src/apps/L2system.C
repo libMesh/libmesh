@@ -41,19 +41,6 @@ destroy_hilbert_system_kokkos_state(HilbertSystemKokkosState * state)
   libmesh_ignore(state);
 }
 
-void
-libmesh_kokkos_initialize(int & argc,
-                          char ** & argv,
-                          const bool enable)
-{
-  libmesh_ignore(argc, argv, enable);
-}
-
-void
-libmesh_kokkos_finalize(const bool enable)
-{
-  libmesh_ignore(enable);
-}
 #endif
 
 HilbertSystem::HilbertSystem(libMesh::EquationSystems & es,

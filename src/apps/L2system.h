@@ -52,12 +52,6 @@ struct KokkosPetscAssemblyPlan;
 
 struct HilbertSystemKokkosState;
 
-void libmesh_kokkos_initialize(int & argc,
-                               char ** & argv,
-                               bool enable);
-
-void libmesh_kokkos_finalize(bool enable);
-
 void destroy_hilbert_system_kokkos_state(HilbertSystemKokkosState *);
 
 // FEMSystem, TimeSolver and NewtonSolver will handle most tasks,

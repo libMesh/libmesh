@@ -159,24 +159,6 @@ private:
   Number _integral;
 };
 
-struct KokkosScope
-{
-  KokkosScope(int & argc,
-              char ** & argv,
-              const bool enable)
-    : _enabled(enable)
-  {
-    libmesh_kokkos_initialize(argc, argv, _enabled);
-  }
-
-  ~KokkosScope()
-  {
-    libmesh_kokkos_finalize(_enabled);
-  }
-
-  bool _enabled;
-};
-
 int main(int argc, char ** argv)
 {
   LibMeshInit init(argc, argv);
@@ -187,8 +169,6 @@ int main(int argc, char ** argv)
   libmesh_error_msg_if(use_kokkos,
                        "--kokkos requires a libMesh build with Kokkos, PETSc, and real Number support");
 #endif
-
-  KokkosScope kokkos_scope(argc, argv, use_kokkos);
 
   // In case the mesh file doesn't let us auto-infer dimension, we let
   // the user specify it on the command line

@@ -2126,22 +2126,6 @@ destroy_hilbert_system_kokkos_state(HilbertSystemKokkosState * state)
   delete state;
 }
 
-void
-libmesh_kokkos_initialize(int & argc,
-                          char ** & argv,
-                          const bool enable)
-{
-  if (enable)
-    ::Kokkos::initialize(argc, argv);
-}
-
-void
-libmesh_kokkos_finalize(const bool enable)
-{
-  if (enable)
-    ::Kokkos::finalize();
-}
-
 HilbertSystemKokkosState &
 HilbertSystem::kokkos_state()
 {
