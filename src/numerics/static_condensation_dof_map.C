@@ -93,7 +93,7 @@ void StaticCondensationDofMap::add_uncondensed_dof_plus_constraint_dofs(
                             uncondensed_local_dof_number,
                             constraint_dofs);
   if (is_constrained)
-    for (const auto [full_constraining_dof, weight] : it->second)
+    for (const auto & [full_constraining_dof, weight] : it->second)
       {
         libmesh_ignore(weight);
         // Our constraining dofs may themselves be constrained
