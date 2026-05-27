@@ -40,7 +40,6 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
-#include <cmath>
 #include <limits>
 #include <map>
 #include <tuple>
@@ -72,7 +71,6 @@ namespace libMesh
 {
 constexpr unsigned int kokkos_hilbert_max_dofs = 27;
 constexpr unsigned int kokkos_parsed_fem_max_fields = 16;
-constexpr const char * kokkos_l2_diagnostics_flag = "--kokkos-l2-diagnostics";
 
 template <typename T>
 using KokkosScalarView = ::Kokkos::View<T *>;
@@ -1256,12 +1254,6 @@ namespace
 {
 
 bool
-kokkos_l2_diagnostics_enabled()
-{
-  return libMesh::on_command_line(kokkos_l2_diagnostics_flag);
-}
-
-bool
 build_kokkos_element_state(::HilbertSystem & sys,
                            const Elem & elem,
                            KokkosElementAssemblyState & state)
@@ -1851,8 +1843,7 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
                                               const MeshBase::KokkosGeometryCache & geometry_cache,
                                               const KokkosPetscAssemblyPlan & plan,
                                               ResidualView d_rhs_values,
-                                              JacobianView d_mat_values,
-                                              const bool diagnostics = false)
+                                              JacobianView d_mat_values)
 {
   const unsigned int n_dofs = cast_int<unsigned int>(d_rhs_values.extent(0));
   const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
@@ -1860,89 +1851,6 @@ assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
                                               plan.analytic_goal_gradients);
   const libMesh::Kokkos::detail::FlatDeviceValueSink<ResidualView, JacobianView> sink{
     d_rhs_values, d_mat_values, n_dofs};
-
-  if (diagnostics)
-    {
-      ::Kokkos::View<Real *> d_debug("debug_hilbert_qp", 14);
-      const auto mapping_type = geometry_cache.host_element_mapping_types[elem_index];
-      const auto n_nodes = geometry_cache.host_element_n_nodes[elem_index];
-      const auto debug_goal_access = goal_access;
-
-      ::Kokkos::parallel_for(
-        "debug_hilbert_first_qp",
-        ::Kokkos::RangePolicy<>(0, 1),
-        KOKKOS_LAMBDA(const int)
-        {
-          const auto elem_nodes =
-            libMesh::Kokkos::detail::make_element_node_access(
-              geometry_cache.node_coordinates,
-              geometry_cache.element_node_ids,
-              elem_index);
-
-          const libMesh::Kokkos::detail::HilbertFEAccess<decltype(elem_nodes)> fe(
-            key,
-            mapping_type,
-            elem_nodes,
-            n_nodes,
-            quadrature_order,
-            elem_index);
-
-          const auto qp_data = fe.qp_data(0, hilbert_order > 0);
-          const Point & xyz = qp_data.xyz();
-          const Real JxW = qp_data.JxW();
-          const Real phi0 = qp_data.phi(0);
-          const Real goal = debug_goal_access.value(qp_data, xyz);
-          const auto solution =
-            libMesh::Kokkos::detail::make_hilbert_solution_access(
-              fe, libMesh::Kokkos::detail::ZeroCoeffAccess{}, Number(1.));
-          const Real solution_value = solution.value(qp_data);
-          const Real access_goal = debug_goal_access.value(qp_data, xyz);
-          const Real err_u = solution_value - access_goal;
-
-          d_debug(0) = fe.n_qpoints();
-          d_debug(1) = JxW;
-          d_debug(2) = xyz(0);
-          d_debug(3) = xyz(1);
-          d_debug(4) = xyz(2);
-          d_debug(5) = goal;
-          d_debug(6) = phi0;
-          d_debug(7) = JxW * goal * phi0;
-          d_debug(8) = solution_value;
-          d_debug(9) = access_goal;
-          d_debug(10) = err_u;
-          d_debug(11) = JxW * err_u * phi0;
-          d_debug(12) = solution_value == Number(0);
-          d_debug(13) = access_goal == goal;
-        });
-
-      ::Kokkos::fence();
-
-      auto h_debug =
-        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), d_debug);
-
-      libMesh::out << "First QP diagnostic: "
-                   << "n_qp=" << h_debug(0)
-                   << " JxW=" << h_debug(1)
-                   << " x=" << h_debug(2)
-                   << " y=" << h_debug(3)
-                   << " z=" << h_debug(4)
-                   << " goal=" << h_debug(5)
-                   << " phi0=" << h_debug(6)
-                   << " product=" << h_debug(7)
-                   << " solution=" << h_debug(8)
-                   << " access_goal=" << h_debug(9)
-                   << " err_u=" << h_debug(10)
-                   << " residual0=" << h_debug(11)
-                   << " solution_is_zero=" << h_debug(12)
-                   << " access_goal_matches_direct=" << h_debug(13)
-                   << " goal_finite=" << std::isfinite(h_debug(5))
-                   << " JxW_finite=" << std::isfinite(h_debug(1))
-                   << " phi0_finite=" << std::isfinite(h_debug(6))
-                   << " solution_finite=" << std::isfinite(h_debug(8))
-                   << " access_goal_finite=" << std::isfinite(h_debug(9))
-                   << " err_u_finite=" << std::isfinite(h_debug(10))
-                   << std::endl;
-    }
 
   return libMesh::Kokkos::detail::run_hilbert_system_assembly<kokkos_hilbert_max_dofs>(
     key,
@@ -2027,8 +1935,7 @@ assemble_kokkos_hilbert_record_values(::HilbertSystem & sys,
                                       const bool analytic_goal,
                                       const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal,
                                       ResidualView rhs_slice,
-                                      JacobianView mat_slice,
-                                      const bool diagnostics = false)
+                                      JacobianView mat_slice)
 {
   const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
   const FEShapeKey shape_key =
@@ -2044,8 +1951,7 @@ assemble_kokkos_hilbert_record_values(::HilbertSystem & sys,
                                                          geometry_cache,
                                                          plan,
                                                          rhs_slice,
-                                                         mat_slice,
-                                                         diagnostics) :
+                                                         mat_slice) :
            assemble_kokkos_hilbert_fem_goal_device_values(shape_key,
                                                           quadrature_order,
                                                           sys.hilbert_order(),
@@ -2120,8 +2026,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                     const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal,
                                     PetscMatrixBase<Number> & system_matrix,
                                     PetscVector<Number> & system_rhs,
-                                    ::HilbertSystem::KokkosAssemblyPath & assembly_path,
-                                    const bool diagnostics = false)
+                                    ::HilbertSystem::KokkosAssemblyPath & assembly_path)
 {
   libmesh_error_msg_if(sys.has_static_condensation(),
                        "HilbertSystem Kokkos direct PETSc storage does not support static "
@@ -2211,22 +2116,6 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
     else
       libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage was built without a valid "
                         "PETSc AIJ storage layout.");
-
-    const auto rhs_scatter =
-      libMesh::Kokkos::detail::SplitScatterAccess<KokkosVectorWriteView, KokkosVectorWriteView>{
-        local_rhs_values, remote_rhs_values, plan.rhs_local_size};
-    const auto mat_scatter =
-      libMesh::Kokkos::detail::SplitMatrixScatterAccess<KokkosMatrixWriteView,
-                                                        KokkosMatrixWriteView,
-                                                        KokkosMatrixWriteView>{
-        diag_matrix_values,
-        offdiag_matrix_values,
-        remote_matrix_values,
-        plan.mat_diag_size,
-        plan.mat_diag_size + plan.mat_offdiag_size};
-
-    const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
-    libmesh_ignore(geometry_cache, rhs_scatter, mat_scatter);
 
     KokkosScalarView<Number> record_rhs_values("hilbert_record_rhs_values",
                                                kokkos_hilbert_max_dofs);
@@ -2333,49 +2222,6 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
         ::Kokkos::fence();
       }
 
-    if (diagnostics)
-      {
-        auto h_rhs =
-          ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), local_rhs_values);
-        auto h_mat =
-          ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), plan.mat_coo_values);
-
-        Real rhs_abs_sum = 0.;
-        Real rhs_max = 0.;
-        for (std::size_t i = 0; i != h_rhs.extent(0); ++i)
-          {
-            const Real val = std::abs(h_rhs(i));
-            rhs_abs_sum += val;
-            rhs_max = std::max(rhs_max, val);
-          }
-
-        Real mat_abs_sum = 0.;
-        Real mat_max = 0.;
-        std::size_t mat_nonfinite = 0;
-        for (std::size_t i = 0; i != h_mat.extent(0); ++i)
-          {
-            const Real val = std::abs(h_mat(i));
-            mat_abs_sum += val;
-            mat_max = std::max(mat_max, val);
-            if (!std::isfinite(h_mat(i)))
-              ++mat_nonfinite;
-          }
-
-        libMesh::out << "Kokkos direct RHS diagnostics: "
-                     << "size=" << h_rhs.extent(0)
-                     << " abs_sum=" << rhs_abs_sum
-                     << " max=" << rhs_max
-                     << std::endl;
-        libMesh::out << "Kokkos matrix COO diagnostics: "
-                     << "size=" << h_mat.extent(0)
-                     << " diag_size=" << plan.mat_diag_size
-                     << " offdiag_size=" << plan.mat_offdiag_size
-                     << " abs_sum=" << mat_abs_sum
-                     << " max=" << mat_max
-                     << " nonfinite=" << mat_nonfinite
-                     << std::endl;
-      }
-
     LibmeshPetscCall2(sys.comm(),
                       MatSetValuesCOO(system_matrix.mat(),
                                       plan.mat_coo_values.data(),
@@ -2413,7 +2259,6 @@ using libMesh::build_kokkos_petsc_assembly_plan;
 using libMesh::cast_int;
 using libMesh::ensure_kokkos_goal_cache;
 using libMesh::ensure_kokkos_sampled_analytic_goal_data;
-using libMesh::kokkos_l2_diagnostics_enabled;
 using libMesh::kokkos_petsc_plan_matches;
 using libMesh::libmesh_ignore;
 using libMesh::make_hilbert_shape_key;
@@ -2698,125 +2543,6 @@ HilbertSystem::try_kokkos_petsc_solve()
       std::chrono::duration_cast<std::chrono::duration<Real>>(plan_stop - plan_start).count() :
       0.;
 
-  const bool diagnostics = kokkos_l2_diagnostics_enabled();
-  if (diagnostics)
-    {
-      libMesh::out << "Kokkos plan diagnostics: "
-                   << "records=" << plan->records.size()
-                   << " buckets=" << plan->buckets.size()
-                   << std::endl;
-
-      if (!plan->records.empty())
-        {
-          const auto & record = plan->records.front();
-
-          libMesh::out << "First Kokkos record: "
-                       << "elem=" << record.elem_index
-                       << " ndofs=" << record.n_dofs
-                       << " qorder=" << record.quadrature_order
-                       << " rhs_offset=" << record.rhs_offset
-                       << std::endl;
-
-          KokkosScalarView<Number> d_rhs("debug_one_elem_rhs", record.n_dofs);
-          KokkosScalarView<Number> d_mat("debug_one_elem_mat",
-                                         record.n_dofs * record.n_dofs);
-          ::Kokkos::deep_copy(d_rhs, Number(0));
-          ::Kokkos::deep_copy(d_mat, Number(0));
-
-          const bool ok =
-            assemble_kokkos_hilbert_record_values(*this,
-                                                  *plan,
-                                                  record,
-                                                  record.quadrature_order,
-                                                  analytic_goal,
-                                                  fem_goal,
-                                                  d_rhs,
-                                                  d_mat,
-                                                  diagnostics);
-          ::Kokkos::fence();
-
-          auto h_rhs =
-            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), d_rhs);
-
-          Real rhs_abs_sum = 0.;
-          Real rhs_max = 0.;
-          for (std::size_t i = 0; i != h_rhs.extent(0); ++i)
-            {
-              libMesh::out << "single element rhs[" << i << "]=" << h_rhs(i)
-                           << " finite=" << std::isfinite(h_rhs(i))
-                           << std::endl;
-              const Real val = std::abs(h_rhs(i));
-              rhs_abs_sum += val;
-              rhs_max = std::max(rhs_max, val);
-            }
-
-          libMesh::out << "Single Kokkos element diagnostic: "
-                       << "ok=" << ok
-                       << " rhs_abs_sum=" << rhs_abs_sum
-                       << " rhs_max=" << rhs_max
-                       << std::endl;
-        }
-
-      if (!plan->buckets.empty())
-        {
-          const auto & bucket = plan->buckets.front();
-          auto h_elem_indices =
-            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
-                                                  plan->batch_data.elem_indices);
-          auto h_rhs_offsets =
-            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
-                                                  plan->batch_data.rhs_offsets);
-          auto h_mat_offsets =
-            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
-                                                  plan->batch_data.mat_offsets);
-          auto h_rhs_slots =
-            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
-                                                  plan->rhs_local_slots);
-          auto h_mat_slots =
-            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
-                                                  plan->mat_value_slots);
-
-          auto elem_subview =
-            ::Kokkos::subview(plan->batch_data.elem_indices,
-                              ::Kokkos::make_pair(bucket.begin, bucket.end));
-          auto rhs_offset_subview =
-            ::Kokkos::subview(plan->batch_data.rhs_offsets,
-                              ::Kokkos::make_pair(bucket.begin, bucket.end));
-          auto mat_offset_subview =
-            ::Kokkos::subview(plan->batch_data.mat_offsets,
-                              ::Kokkos::make_pair(bucket.begin, bucket.end));
-          auto h_elem_subview =
-            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), elem_subview);
-          auto h_rhs_offset_subview =
-            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), rhs_offset_subview);
-          auto h_mat_offset_subview =
-            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), mat_offset_subview);
-
-          const std::size_t first_record = bucket.begin;
-          const std::size_t rhs_offset = h_rhs_offsets(first_record);
-          const std::size_t mat_offset = h_mat_offsets(first_record);
-
-          libMesh::out << "Bucket subview diagnostics: "
-                       << "bucket_begin=" << bucket.begin
-                       << " bucket_end=" << bucket.end
-                       << " full_elem_at_begin=" << h_elem_indices(first_record)
-                       << " subview_elem_0=" << h_elem_subview(0)
-                       << " full_rhs_offset_at_begin=" << rhs_offset
-                       << " subview_rhs_offset_0=" << h_rhs_offset_subview(0)
-                       << " full_mat_offset_at_begin=" << mat_offset
-                       << " subview_mat_offset_0=" << h_mat_offset_subview(0)
-                       << std::endl;
-
-          libMesh::out << "Bucket slot diagnostics: "
-                       << "rhs_slot_at_first_offset=" << h_rhs_slots(rhs_offset)
-                       << " rhs_local_size=" << plan->rhs_local_size
-                       << " mat_slot_at_first_offset=" << h_mat_slots(mat_offset)
-                       << " mat_diag_size=" << plan->mat_diag_size
-                       << " mat_offdiag_size=" << plan->mat_offdiag_size
-                       << std::endl;
-        }
-    }
-
   const auto assembly_start = clock::now();
   auto assembly_path = HilbertSystem::KokkosAssemblyPath::none;
   if (!assemble_kokkos_petsc_global_system(*this,
@@ -2825,23 +2551,12 @@ HilbertSystem::try_kokkos_petsc_solve()
                                            fem_goal,
                                            *petsc_matrix,
                                            *petsc_rhs,
-                                           assembly_path,
-                                           diagnostics))
+                                           assembly_path))
     libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage assembly failed.");
   const auto assembly_stop = clock::now();
   this->_last_kokkos_timing.assembly_seconds =
     std::chrono::duration_cast<std::chrono::duration<Real>>(assembly_stop - assembly_start).count();
   this->_last_kokkos_timing.assembly_path = assembly_path;
-
-  if (diagnostics)
-    {
-      libMesh::out << "Kokkos L2 assembly diagnostics: "
-                   << "records=" << plan->records.size()
-                   << " rhs_local_size=" << plan->rhs_local_size
-                   << " mat_coo_size=" << plan->mat_coo_values.extent(0)
-                   << " rhs_norm=" << petsc_rhs->l2_norm()
-                   << std::endl;
-    }
 
   petsc_matrix->close();
   petsc_rhs->close();
