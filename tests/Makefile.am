@@ -243,6 +243,13 @@ unit_tests_data = $(data)
 
 # Why isn't this working automatically?
 EXTRA_DIST = $(data)
+kokkos_unit_test_sources = \
+  numerics/kokkos_numerics_oracle_test_utils.h \
+  numerics/kokkos_tensor_ops_oracle_fixtures.h \
+  numerics/kokkos_tensor_ops_oracle_runners.h \
+  numerics/kokkos_vector_ops_oracle_fixtures.h \
+  numerics/kokkos_vector_ops_oracle_runners.h
+EXTRA_DIST += $(kokkos_unit_test_sources)
 
 if LIBMESH_ENABLE_FPARSER
   unit_tests_sources += \
@@ -255,20 +262,19 @@ TESTS =
 if LIBMESH_ENABLE_KOKKOS
   KOKKOS_TEST_CPPFLAGS += -I$(top_srcdir)/include $(KOKKOS_CPPFLAGS)
 
-  check_PROGRAMS += kokkos_vector_ops_oracle_unit kokkos_tensor_ops_oracle_unit
-  TESTS += kokkos_vector_ops_oracle_unit kokkos_tensor_ops_oracle_unit
+if LIBMESH_DBG_MODE
+  check_PROGRAMS += unit_tests-kokkos-dbg
+  TESTS += unit_tests-kokkos-dbg
+  unit_tests_kokkos_dbg_SOURCES =
+  EXTRA_unit_tests_kokkos_dbg_SOURCES = driver_kokkos.K
+endif
 
-  kokkos_vector_ops_oracle_unit_SOURCES  = numerics/kokkos_vector_ops_oracle_test.K
-  kokkos_vector_ops_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
-  kokkos_vector_ops_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
-  kokkos_vector_ops_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
-  kokkos_vector_ops_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
-
-  kokkos_tensor_ops_oracle_unit_SOURCES  = numerics/kokkos_tensor_ops_oracle_test.K
-  kokkos_tensor_ops_oracle_unit_CPPFLAGS = $(AM_CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS)
-  kokkos_tensor_ops_oracle_unit_CXXFLAGS = $(AM_CXXFLAGS) $(KOKKOS_CXXFLAGS)
-  kokkos_tensor_ops_oracle_unit_LDFLAGS  = $(AM_LDFLAGS) $(KOKKOS_LDFLAGS)
-  kokkos_tensor_ops_oracle_unit_LDADD    = $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS)
+if LIBMESH_OPT_MODE
+  check_PROGRAMS += unit_tests-kokkos-opt
+  TESTS += unit_tests-kokkos-opt
+  unit_tests_kokkos_opt_SOURCES =
+  EXTRA_unit_tests_kokkos_opt_SOURCES = driver_kokkos.K
+endif
 endif
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
@@ -383,24 +389,52 @@ if LIBMESH_ENABLE_CPPUNIT
 TESTS += run_unit_tests.sh
 endif
 
-# Compile .K translation units with the Kokkos device compiler.
-# If KOKKOS_CXX is not the MPI wrapper, configure populates
-# $(KOKKOS_MPI_CPPFLAGS) from the wrapper's compile flags so mpi.h and
-# any wrapper-provided defines remain visible.
-.K.o:
+if LIBMESH_ENABLE_KOKKOS
+driver_kokkos_src = driver_kokkos.K
+unit_tests_kokkos_dbg_object = unit_tests_kokkos_dbg-driver_kokkos.$(OBJEXT)
+unit_tests_kokkos_opt_object = unit_tests_kokkos_opt-driver_kokkos.$(OBJEXT)
+unit_tests_kokkos_dbg_depfile = $(DEPDIR)/unit_tests_kokkos_dbg-driver_kokkos.d
+unit_tests_kokkos_opt_depfile = $(DEPDIR)/unit_tests_kokkos_opt-driver_kokkos.d
+kokkos_unit_test_depfiles = $(unit_tests_kokkos_dbg_depfile) $(unit_tests_kokkos_opt_depfile)
+kokkos_unit_test_cleanfiles = $(unit_tests_kokkos_dbg_object) $(unit_tests_kokkos_opt_object) \
+                              $(kokkos_unit_test_depfiles) \
+                              unit_tests-kokkos-dbg$(EXEEXT) unit_tests-kokkos-opt$(EXEEXT)
+
+# Build the Kokkos tests with the same mode-suffixed naming as the
+# original libMesh unit test executables, while still compiling with
+# the Kokkos device compiler and mode-specific flags.
+$(unit_tests_kokkos_dbg_object): $(driver_kokkos_src)
+	@$(MKDIR_P) $(DEPDIR)
 	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	  $(KOKKOS_MPI_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
-	  $(AM_CXXFLAGS) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(CPPFLAGS_DBG) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS_DBG) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -MMD -MP -MF $(unit_tests_kokkos_dbg_depfile) \
 	  -c $< -o $@
 
-# Custom link rules so the Kokkos compiler drives the final link step.
-kokkos_vector_ops_oracle_unit_LINK = \
-  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
-  $(LDFLAGS) $(kokkos_vector_ops_oracle_unit_LDFLAGS) -o $@
+$(unit_tests_kokkos_opt_object): $(driver_kokkos_src)
+	@$(MKDIR_P) $(DEPDIR)
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(CPPFLAGS_OPT) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS_OPT) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -MMD -MP -MF $(unit_tests_kokkos_opt_depfile) \
+	  -c $< -o $@
 
-kokkos_tensor_ops_oracle_unit_LINK = \
-  $(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
-  $(LDFLAGS) $(kokkos_tensor_ops_oracle_unit_LDFLAGS) -o $@
+unit_tests-kokkos-dbg$(EXEEXT): $(unit_tests_kokkos_dbg_object) $(top_builddir)/libmesh_dbg.la
+	@rm -f $@
+	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
+	  $(unit_tests_kokkos_dbg_object) \
+	  $(top_builddir)/libmesh_dbg.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
+
+unit_tests-kokkos-opt$(EXEEXT): $(unit_tests_kokkos_opt_object) $(top_builddir)/libmesh_opt.la
+	@rm -f $@
+	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
+	  $(unit_tests_kokkos_opt_object) \
+	  $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
+
+-include $(kokkos_unit_test_depfiles)
+endif
 
 CLEANFILES = cube_mesh.xda \
              slit_mesh.xda \
@@ -483,7 +517,8 @@ CLEANFILES = cube_mesh.xda \
              write_exodus_TRI6.e \
              write_exodus_TRI7.e \
              write_exodus_TRISHELL3.e \
-             smoother.out
+             smoother.out \
+             $(kokkos_unit_test_cleanfiles)
 
 # need to link any data files for VPATH builds
 if LIBMESH_VPATH_BUILD
