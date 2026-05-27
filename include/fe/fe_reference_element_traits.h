@@ -12,269 +12,511 @@
 namespace libMesh
 {
 
-inline constexpr unsigned int edge2_side_node_counts[2] = {1, 1};
-inline constexpr unsigned int edge3_side_node_counts[2] = {1, 1};
-inline constexpr unsigned int edge4_side_node_counts[2] = {1, 1};
+template <unsigned int N>
+struct ReferenceElementVector
+{
+  unsigned int values[N];
 
-inline constexpr unsigned int tri3_side_node_counts[3] = {2, 2, 2};
-inline constexpr unsigned int tri6_side_node_counts[3] = {3, 3, 3};
-inline constexpr unsigned int tri7_side_node_counts[3] = {3, 3, 3};
+  LIBMESH_DEVICE_INLINE constexpr unsigned int operator[](unsigned int i) const
+  { return values[i]; }
+};
 
-inline constexpr unsigned int quad4_side_node_counts[4] = {2, 2, 2, 2};
-inline constexpr unsigned int quad8_side_node_counts[4] = {3, 3, 3, 3};
-inline constexpr unsigned int quad9_side_node_counts[4] = {3, 3, 3, 3};
+template <unsigned int Rows, unsigned int Cols>
+struct ReferenceElementTable
+{
+  unsigned int values[Rows][Cols];
 
-inline constexpr unsigned int tet4_side_node_counts[4]  = {3, 3, 3, 3};
-inline constexpr unsigned int tet10_side_node_counts[4] = {6, 6, 6, 6};
-inline constexpr unsigned int tet14_side_node_counts[4] = {7, 7, 7, 7};
+  LIBMESH_DEVICE_INLINE constexpr const unsigned int * operator[](unsigned int i) const
+  { return values[i]; }
 
-inline constexpr unsigned int hex8_side_node_counts[6]  = {4, 4, 4, 4, 4, 4};
-inline constexpr unsigned int hex20_side_node_counts[6] = {8, 8, 8, 8, 8, 8};
-inline constexpr unsigned int hex27_side_node_counts[6] = {9, 9, 9, 9, 9, 9};
+  LIBMESH_DEVICE_INLINE constexpr unsigned int operator()(unsigned int i, unsigned int j) const
+  { return values[i][j]; }
+};
 
-inline constexpr unsigned int prism6_side_node_counts[5]  = {3, 4, 4, 4, 3};
-inline constexpr unsigned int prism15_side_node_counts[5] = {6, 8, 8, 8, 6};
-inline constexpr unsigned int prism18_side_node_counts[5] = {6, 9, 9, 9, 6};
-inline constexpr unsigned int prism20_side_node_counts[5] = {7, 9, 9, 9, 7};
-inline constexpr unsigned int prism21_side_node_counts[5] = {7, 9, 9, 9, 7};
 
-inline constexpr unsigned int pyramid5_side_node_counts[5]  = {3, 3, 3, 3, 4};
-inline constexpr unsigned int pyramid13_side_node_counts[5] = {6, 6, 6, 6, 8};
-inline constexpr unsigned int pyramid14_side_node_counts[5] = {6, 6, 6, 6, 9};
-inline constexpr unsigned int pyramid18_side_node_counts[5] = {7, 7, 7, 7, 9};
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<2>
+edge2_side_node_counts()
+{
+  return {{1, 1}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<2>
+edge3_side_node_counts()
+{
+  return {{1, 1}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<2>
+edge4_side_node_counts()
+{
+  return {{1, 1}};
+}
 
-inline constexpr unsigned int tet10_edge_node_counts[6]   = {3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int tet14_edge_node_counts[6]   = {3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int hex20_edge_node_counts[12]  = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int hex27_edge_node_counts[12]  = {3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int prism15_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int prism18_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int prism20_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int prism21_edge_node_counts[9] = {3, 3, 3, 3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int pyramid13_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int pyramid14_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
-inline constexpr unsigned int pyramid18_edge_node_counts[8] = {3, 3, 3, 3, 3, 3, 3, 3};
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<3>
+tri3_side_node_counts()
+{
+  return {{2, 2, 2}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<3>
+tri6_side_node_counts()
+{
+  return {{3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<3>
+tri7_side_node_counts()
+{
+  return {{3, 3, 3}};
+}
 
-inline constexpr unsigned int prism6_side_nodes[5][4] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<4>
+quad4_side_node_counts()
+{
+  return {{2, 2, 2, 2}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<4>
+quad8_side_node_counts()
+{
+  return {{3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<4>
+quad9_side_node_counts()
+{
+  return {{3, 3, 3, 3}};
+}
+
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<4>
+tet4_side_node_counts()
+{
+  return {{3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<4>
+tet10_side_node_counts()
+{
+  return {{6, 6, 6, 6}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<4>
+tet14_side_node_counts()
+{
+  return {{7, 7, 7, 7}};
+}
+
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<6>
+hex8_side_node_counts()
+{
+  return {{4, 4, 4, 4, 4, 4}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<6>
+hex20_side_node_counts()
+{
+  return {{8, 8, 8, 8, 8, 8}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<6>
+hex27_side_node_counts()
+{
+  return {{9, 9, 9, 9, 9, 9}};
+}
+
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<5>
+prism6_side_node_counts()
+{
+  return {{3, 4, 4, 4, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<5>
+prism15_side_node_counts()
+{
+  return {{6, 8, 8, 8, 6}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<5>
+prism18_side_node_counts()
+{
+  return {{6, 9, 9, 9, 6}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<5>
+prism20_side_node_counts()
+{
+  return {{7, 9, 9, 9, 7}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<5>
+prism21_side_node_counts()
+{
+  return {{7, 9, 9, 9, 7}};
+}
+
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<5>
+pyramid5_side_node_counts()
+{
+  return {{3, 3, 3, 3, 4}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<5>
+pyramid13_side_node_counts()
+{
+  return {{6, 6, 6, 6, 8}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<5>
+pyramid14_side_node_counts()
+{
+  return {{6, 6, 6, 6, 9}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<5>
+pyramid18_side_node_counts()
+{
+  return {{7, 7, 7, 7, 9}};
+}
+
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<6>
+tet10_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<6>
+tet14_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<12>
+hex20_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<12>
+hex27_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<9>
+prism15_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<9>
+prism18_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<9>
+prism20_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<9>
+prism21_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<8>
+pyramid13_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<8>
+pyramid14_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3, 3, 3}};
+}
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementVector<8>
+pyramid18_edge_node_counts()
+{
+  return {{3, 3, 3, 3, 3, 3, 3, 3}};
+}
+
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<5, 4>
+prism6_side_nodes()
+{
+  return {{
     {0, 2, 1, 99},
     {0, 1, 4, 3},
     {1, 2, 5, 4},
     {2, 0, 3, 5},
     {3, 4, 5, 99}
-  };
+  }};
+}
 
-inline constexpr unsigned int prism15_side_nodes[5][8] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<5, 8>
+prism15_side_nodes()
+{
+  return {{
     {0, 2, 1, 8, 7, 6, 99, 99},
     {0, 1, 4, 3, 6, 10, 12, 9},
     {1, 2, 5, 4, 7, 11, 13, 10},
     {2, 0, 3, 5, 8, 9, 14, 11},
     {3, 4, 5, 12, 13, 14, 99, 99}
-  };
+  }};
+}
 
-inline constexpr unsigned int prism18_side_nodes[5][9] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<5, 9>
+prism18_side_nodes()
+{
+  return {{
     {0, 2, 1, 8, 7, 6, 99, 99, 99},
     {0, 1, 4, 3, 6, 10, 12, 9, 15},
     {1, 2, 5, 4, 7, 11, 13, 10, 16},
     {2, 0, 3, 5, 8, 9, 14, 11, 17},
     {3, 4, 5, 12, 13, 14, 99, 99, 99}
-  };
+  }};
+}
 
-inline constexpr unsigned int prism20_side_nodes[5][9] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<5, 9>
+prism20_side_nodes()
+{
+  return {{
     {0, 2, 1, 8, 7, 6, 18, 99, 99},
     {0, 1, 4, 3, 6, 10, 12, 9, 15},
     {1, 2, 5, 4, 7, 11, 13, 10, 16},
     {2, 0, 3, 5, 8, 9, 14, 11, 17},
     {3, 4, 5, 12, 13, 14, 19, 99, 99}
-  };
+  }};
+}
 
-inline constexpr unsigned int prism21_side_nodes[5][9] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<5, 9>
+prism21_side_nodes()
+{
+  return {{
     {0, 2, 1, 8, 7, 6, 18, 99, 99},
     {0, 1, 4, 3, 6, 10, 12, 9, 15},
     {1, 2, 5, 4, 7, 11, 13, 10, 16},
     {2, 0, 3, 5, 8, 9, 14, 11, 17},
     {3, 4, 5, 12, 13, 14, 19, 99, 99}
-  };
+  }};
+}
 
-inline constexpr unsigned int pyramid5_side_nodes[5][4] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<5, 4>
+pyramid5_side_nodes()
+{
+  return {{
     {0, 1, 4, 99},
     {1, 2, 4, 99},
     {2, 3, 4, 99},
     {3, 0, 4, 99},
     {0, 3, 2, 1}
-  };
+  }};
+}
 
-inline constexpr unsigned int pyramid13_side_nodes[5][8] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<5, 8>
+pyramid13_side_nodes()
+{
+  return {{
     {0, 1, 4, 5, 10, 9, 99, 99},
     {1, 2, 4, 6, 11, 10, 99, 99},
     {2, 3, 4, 7, 12, 11, 99, 99},
     {3, 0, 4, 8, 9, 12, 99, 99},
     {0, 3, 2, 1, 8, 7, 6, 5}
-  };
+  }};
+}
 
-inline constexpr unsigned int pyramid14_side_nodes[5][9] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<5, 9>
+pyramid14_side_nodes()
+{
+  return {{
     {0, 1, 4, 5, 10, 9, 99, 99, 99},
     {1, 2, 4, 6, 11, 10, 99, 99, 99},
     {2, 3, 4, 7, 12, 11, 99, 99, 99},
     {3, 0, 4, 8, 9, 12, 99, 99, 99},
     {0, 3, 2, 1, 8, 7, 6, 5, 13}
-  };
+  }};
+}
 
-inline constexpr unsigned int pyramid18_side_nodes[5][9] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<5, 9>
+pyramid18_side_nodes()
+{
+  return {{
     {0, 1, 4, 5, 10, 9, 14, 99, 99},
     {1, 2, 4, 6, 11, 10, 15, 99, 99},
     {2, 3, 4, 7, 12, 11, 16, 99, 99},
     {3, 0, 4, 8, 9, 12, 17, 99, 99},
     {0, 3, 2, 1, 8, 7, 6, 5, 13}
-  };
+  }};
+}
 
-inline constexpr unsigned int tri3_side_nodes[3][2] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<3, 2>
+tri3_side_nodes()
+{
+  return {{
     {0, 1},
     {1, 2},
     {2, 0}
-  };
+  }};
+}
 
-inline constexpr unsigned int tri6_side_nodes[3][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<3, 3>
+tri6_side_nodes()
+{
+  return {{
     {0, 1, 3},
     {1, 2, 4},
     {2, 0, 5}
-  };
+  }};
+}
 
-inline constexpr unsigned int tri7_side_nodes[3][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<3, 3>
+tri7_side_nodes()
+{
+  return {{
     {0, 1, 3},
     {1, 2, 4},
     {2, 0, 5}
-  };
+  }};
+}
 
-inline constexpr unsigned int quad4_side_nodes[4][2] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<4, 2>
+quad4_side_nodes()
+{
+  return {{
     {0, 1},
     {1, 2},
     {2, 3},
     {3, 0}
-  };
+  }};
+}
 
-inline constexpr unsigned int quad8_side_nodes[4][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<4, 3>
+quad8_side_nodes()
+{
+  return {{
     {0, 1, 4},
     {1, 2, 5},
     {2, 3, 6},
     {3, 0, 7}
-  };
+  }};
+}
 
-inline constexpr unsigned int quad9_side_nodes[4][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<4, 3>
+quad9_side_nodes()
+{
+  return {{
     {0, 1, 4},
     {1, 2, 5},
     {2, 3, 6},
     {3, 0, 7}
-  };
+  }};
+}
 
-inline constexpr unsigned int tet4_side_nodes[4][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<4, 3>
+tet4_side_nodes()
+{
+  return {{
     {0, 2, 1},
     {0, 1, 3},
     {1, 2, 3},
     {2, 0, 3}
-  };
+  }};
+}
 
-inline constexpr unsigned int tet10_side_nodes[4][6] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<4, 6>
+tet10_side_nodes()
+{
+  return {{
     {0, 2, 1, 6, 5, 4},
     {0, 1, 3, 4, 8, 7},
     {1, 2, 3, 5, 9, 8},
     {2, 0, 3, 6, 7, 9}
-  };
+  }};
+}
 
-inline constexpr unsigned int tet14_side_nodes[4][7] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<4, 7>
+tet14_side_nodes()
+{
+  return {{
     {0, 2, 1, 6, 5, 4, 10},
     {0, 1, 3, 4, 8, 7, 11},
     {1, 2, 3, 5, 9, 8, 12},
     {2, 0, 3, 6, 7, 9, 13}
-  };
+  }};
+}
 
-inline constexpr unsigned int hex8_side_nodes[6][4] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<6, 4>
+hex8_side_nodes()
+{
+  return {{
     {0, 3, 2, 1},
     {0, 1, 5, 4},
     {1, 2, 6, 5},
     {2, 3, 7, 6},
     {3, 0, 4, 7},
     {4, 5, 6, 7}
-  };
+  }};
+}
 
-inline constexpr unsigned int hex20_side_nodes[6][8] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<6, 8>
+hex20_side_nodes()
+{
+  return {{
     {0, 3, 2, 1, 11, 10,  9,  8},
     {0, 1, 5, 4,  8, 13, 16, 12},
     {1, 2, 6, 5,  9, 14, 17, 13},
     {2, 3, 7, 6, 10, 15, 18, 14},
     {3, 0, 4, 7, 11, 12, 19, 15},
     {4, 5, 6, 7, 16, 17, 18, 19}
-  };
+  }};
+}
 
-inline constexpr unsigned int hex27_side_nodes[6][9] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<6, 9>
+hex27_side_nodes()
+{
+  return {{
     {0, 3, 2, 1, 11, 10,  9,  8, 20},
     {0, 1, 5, 4,  8, 13, 16, 12, 21},
     {1, 2, 6, 5,  9, 14, 17, 13, 22},
     {2, 3, 7, 6, 10, 15, 18, 14, 23},
     {3, 0, 4, 7, 11, 12, 19, 15, 24},
     {4, 5, 6, 7, 16, 17, 18, 19, 25}
-  };
+  }};
+}
 
-inline constexpr unsigned int edge2_side_nodes[2][1] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<2, 1>
+edge2_side_nodes()
+{
+  return {{
     {0},
     {1}
-  };
+  }};
+}
 
-inline constexpr unsigned int edge3_side_nodes[2][1] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<2, 1>
+edge3_side_nodes()
+{
+  return {{
     {0},
     {1}
-  };
+  }};
+}
 
-inline constexpr unsigned int edge4_side_nodes[2][1] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<2, 1>
+edge4_side_nodes()
+{
+  return {{
     {0},
     {1}
-  };
+  }};
+}
 
-inline constexpr unsigned int tet10_edge_nodes[6][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<6, 3>
+tet10_edge_nodes()
+{
+  return {{
     {0, 1, 4},
     {1, 2, 5},
     {0, 2, 6},
     {0, 3, 7},
     {1, 3, 8},
     {2, 3, 9}
-  };
+  }};
+}
 
-inline constexpr unsigned int tet14_edge_nodes[6][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<6, 3>
+tet14_edge_nodes()
+{
+  return {{
     {0, 1, 4},
     {1, 2, 5},
     {0, 2, 6},
     {0, 3, 7},
     {1, 3, 8},
     {2, 3, 9}
-  };
+  }};
+}
 
-inline constexpr unsigned int hex20_edge_nodes[12][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<12, 3>
+hex20_edge_nodes()
+{
+  return {{
     {0, 1, 8},
     {1, 2, 9},
     {2, 3, 10},
@@ -287,10 +529,13 @@ inline constexpr unsigned int hex20_edge_nodes[12][3] =
     {5, 6, 17},
     {6, 7, 18},
     {4, 7, 19}
-  };
+  }};
+}
 
-inline constexpr unsigned int hex27_edge_nodes[12][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<12, 3>
+hex27_edge_nodes()
+{
+  return {{
     {0, 1, 8},
     {1, 2, 9},
     {2, 3, 10},
@@ -303,10 +548,13 @@ inline constexpr unsigned int hex27_edge_nodes[12][3] =
     {5, 6, 17},
     {6, 7, 18},
     {4, 7, 19}
-  };
+  }};
+}
 
-inline constexpr unsigned int prism15_edge_nodes[9][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<9, 3>
+prism15_edge_nodes()
+{
+  return {{
     {0, 1, 6},
     {1, 2, 7},
     {0, 2, 8},
@@ -316,10 +564,13 @@ inline constexpr unsigned int prism15_edge_nodes[9][3] =
     {3, 4, 12},
     {4, 5, 13},
     {3, 5, 14}
-  };
+  }};
+}
 
-inline constexpr unsigned int prism18_edge_nodes[9][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<9, 3>
+prism18_edge_nodes()
+{
+  return {{
     {0, 1, 6},
     {1, 2, 7},
     {0, 2, 8},
@@ -329,10 +580,13 @@ inline constexpr unsigned int prism18_edge_nodes[9][3] =
     {3, 4, 12},
     {4, 5, 13},
     {3, 5, 14}
-  };
+  }};
+}
 
-inline constexpr unsigned int prism20_edge_nodes[9][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<9, 3>
+prism20_edge_nodes()
+{
+  return {{
     {0, 1, 6},
     {1, 2, 7},
     {0, 2, 8},
@@ -342,10 +596,13 @@ inline constexpr unsigned int prism20_edge_nodes[9][3] =
     {3, 4, 12},
     {4, 5, 13},
     {3, 5, 14}
-  };
+  }};
+}
 
-inline constexpr unsigned int prism21_edge_nodes[9][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<9, 3>
+prism21_edge_nodes()
+{
+  return {{
     {0, 1, 6},
     {1, 2, 7},
     {0, 2, 8},
@@ -355,10 +612,13 @@ inline constexpr unsigned int prism21_edge_nodes[9][3] =
     {3, 4, 12},
     {4, 5, 13},
     {3, 5, 14}
-  };
+  }};
+}
 
-inline constexpr unsigned int pyramid13_edge_nodes[8][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<8, 3>
+pyramid13_edge_nodes()
+{
+  return {{
     {0, 1, 5},
     {1, 2, 6},
     {2, 3, 7},
@@ -367,10 +627,13 @@ inline constexpr unsigned int pyramid13_edge_nodes[8][3] =
     {1, 4, 10},
     {2, 4, 11},
     {3, 4, 12}
-  };
+  }};
+}
 
-inline constexpr unsigned int pyramid14_edge_nodes[8][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<8, 3>
+pyramid14_edge_nodes()
+{
+  return {{
     {0, 1, 5},
     {1, 2, 6},
     {2, 3, 7},
@@ -379,10 +642,13 @@ inline constexpr unsigned int pyramid14_edge_nodes[8][3] =
     {1, 4, 10},
     {2, 4, 11},
     {3, 4, 12}
-  };
+  }};
+}
 
-inline constexpr unsigned int pyramid18_edge_nodes[8][3] =
-  {
+LIBMESH_DEVICE_INLINE constexpr ReferenceElementTable<8, 3>
+pyramid18_edge_nodes()
+{
+  return {{
     {0, 1, 5},
     {1, 2, 6},
     {2, 3, 7},
@@ -391,7 +657,8 @@ inline constexpr unsigned int pyramid18_edge_nodes[8][3] =
     {1, 4, 10},
     {2, 4, 11},
     {3, 4, 12}
-  };
+  }};
+}
 
 LIBMESH_DEVICE_INLINE bool
 requires_side_specific_topology(ElemType parent)
@@ -544,57 +811,57 @@ side_node_count_or_zero(ElemType parent,
   switch (parent)
   {
     case EDGE2:
-      return side < 2 ? edge2_side_node_counts[side] : 0;
+      return side < 2 ? edge2_side_node_counts()[side] : 0;
     case EDGE3:
-      return side < 2 ? edge3_side_node_counts[side] : 0;
+      return side < 2 ? edge3_side_node_counts()[side] : 0;
     case EDGE4:
-      return side < 2 ? edge4_side_node_counts[side] : 0;
+      return side < 2 ? edge4_side_node_counts()[side] : 0;
     case TRI3:
     case TRISHELL3:
-      return side < 3 ? tri3_side_node_counts[side] : 0;
+      return side < 3 ? tri3_side_node_counts()[side] : 0;
     case TRI6:
-      return side < 3 ? tri6_side_node_counts[side] : 0;
+      return side < 3 ? tri6_side_node_counts()[side] : 0;
     case TRI7:
-      return side < 3 ? tri7_side_node_counts[side] : 0;
+      return side < 3 ? tri7_side_node_counts()[side] : 0;
     case QUAD4:
     case QUADSHELL4:
-      return side < 4 ? quad4_side_node_counts[side] : 0;
+      return side < 4 ? quad4_side_node_counts()[side] : 0;
     case QUAD8:
     case QUADSHELL8:
-      return side < 4 ? quad8_side_node_counts[side] : 0;
+      return side < 4 ? quad8_side_node_counts()[side] : 0;
     case QUAD9:
     case QUADSHELL9:
-      return side < 4 ? quad9_side_node_counts[side] : 0;
+      return side < 4 ? quad9_side_node_counts()[side] : 0;
     case TET4:
-      return side < 4 ? tet4_side_node_counts[side] : 0;
+      return side < 4 ? tet4_side_node_counts()[side] : 0;
     case TET10:
-      return side < 4 ? tet10_side_node_counts[side] : 0;
+      return side < 4 ? tet10_side_node_counts()[side] : 0;
     case TET14:
-      return side < 4 ? tet14_side_node_counts[side] : 0;
+      return side < 4 ? tet14_side_node_counts()[side] : 0;
     case HEX8:
-      return side < 6 ? hex8_side_node_counts[side] : 0;
+      return side < 6 ? hex8_side_node_counts()[side] : 0;
     case HEX20:
-      return side < 6 ? hex20_side_node_counts[side] : 0;
+      return side < 6 ? hex20_side_node_counts()[side] : 0;
     case HEX27:
-      return side < 6 ? hex27_side_node_counts[side] : 0;
+      return side < 6 ? hex27_side_node_counts()[side] : 0;
     case PRISM6:
-      return side < 5 ? prism6_side_node_counts[side] : 0;
+      return side < 5 ? prism6_side_node_counts()[side] : 0;
     case PRISM15:
-      return side < 5 ? prism15_side_node_counts[side] : 0;
+      return side < 5 ? prism15_side_node_counts()[side] : 0;
     case PRISM18:
-      return side < 5 ? prism18_side_node_counts[side] : 0;
+      return side < 5 ? prism18_side_node_counts()[side] : 0;
     case PRISM20:
-      return side < 5 ? prism20_side_node_counts[side] : 0;
+      return side < 5 ? prism20_side_node_counts()[side] : 0;
     case PRISM21:
-      return side < 5 ? prism21_side_node_counts[side] : 0;
+      return side < 5 ? prism21_side_node_counts()[side] : 0;
     case PYRAMID5:
-      return side < 5 ? pyramid5_side_node_counts[side] : 0;
+      return side < 5 ? pyramid5_side_node_counts()[side] : 0;
     case PYRAMID13:
-      return side < 5 ? pyramid13_side_node_counts[side] : 0;
+      return side < 5 ? pyramid13_side_node_counts()[side] : 0;
     case PYRAMID14:
-      return side < 5 ? pyramid14_side_node_counts[side] : 0;
+      return side < 5 ? pyramid14_side_node_counts()[side] : 0;
     case PYRAMID18:
-      return side < 5 ? pyramid18_side_node_counts[side] : 0;
+      return side < 5 ? pyramid18_side_node_counts()[side] : 0;
     default:
       return 0;
   }
@@ -607,27 +874,27 @@ edge_node_count_or_zero(ElemType parent,
   switch (parent)
   {
     case TET10:
-      return edge < 6 ? tet10_edge_node_counts[edge] : 0;
+      return edge < 6 ? tet10_edge_node_counts()[edge] : 0;
     case TET14:
-      return edge < 6 ? tet14_edge_node_counts[edge] : 0;
+      return edge < 6 ? tet14_edge_node_counts()[edge] : 0;
     case HEX20:
-      return edge < 12 ? hex20_edge_node_counts[edge] : 0;
+      return edge < 12 ? hex20_edge_node_counts()[edge] : 0;
     case HEX27:
-      return edge < 12 ? hex27_edge_node_counts[edge] : 0;
+      return edge < 12 ? hex27_edge_node_counts()[edge] : 0;
     case PRISM15:
-      return edge < 9 ? prism15_edge_node_counts[edge] : 0;
+      return edge < 9 ? prism15_edge_node_counts()[edge] : 0;
     case PRISM18:
-      return edge < 9 ? prism18_edge_node_counts[edge] : 0;
+      return edge < 9 ? prism18_edge_node_counts()[edge] : 0;
     case PRISM20:
-      return edge < 9 ? prism20_edge_node_counts[edge] : 0;
+      return edge < 9 ? prism20_edge_node_counts()[edge] : 0;
     case PRISM21:
-      return edge < 9 ? prism21_edge_node_counts[edge] : 0;
+      return edge < 9 ? prism21_edge_node_counts()[edge] : 0;
     case PYRAMID13:
-      return edge < 8 ? pyramid13_edge_node_counts[edge] : 0;
+      return edge < 8 ? pyramid13_edge_node_counts()[edge] : 0;
     case PYRAMID14:
-      return edge < 8 ? pyramid14_edge_node_counts[edge] : 0;
+      return edge < 8 ? pyramid14_edge_node_counts()[edge] : 0;
     case PYRAMID18:
-      return edge < 8 ? pyramid18_edge_node_counts[edge] : 0;
+      return edge < 8 ? pyramid18_edge_node_counts()[edge] : 0;
     default:
       return 0;
   }
@@ -646,80 +913,80 @@ try_local_side_node(ElemType parent,
   switch (parent)
   {
     case EDGE2:
-      node = edge2_side_nodes[side][side_node];
+      node = edge2_side_nodes()(side, side_node);
       return true;
     case EDGE3:
-      node = edge3_side_nodes[side][side_node];
+      node = edge3_side_nodes()(side, side_node);
       return true;
     case EDGE4:
-      node = edge4_side_nodes[side][side_node];
+      node = edge4_side_nodes()(side, side_node);
       return true;
     case TRI3:
     case TRISHELL3:
-      node = tri3_side_nodes[side][side_node];
+      node = tri3_side_nodes()(side, side_node);
       return true;
     case TRI6:
-      node = tri6_side_nodes[side][side_node];
+      node = tri6_side_nodes()(side, side_node);
       return true;
     case TRI7:
-      node = tri7_side_nodes[side][side_node];
+      node = tri7_side_nodes()(side, side_node);
       return true;
     case QUAD4:
     case QUADSHELL4:
-      node = quad4_side_nodes[side][side_node];
+      node = quad4_side_nodes()(side, side_node);
       return true;
     case QUAD8:
     case QUADSHELL8:
-      node = quad8_side_nodes[side][side_node];
+      node = quad8_side_nodes()(side, side_node);
       return true;
     case QUAD9:
     case QUADSHELL9:
-      node = quad9_side_nodes[side][side_node];
+      node = quad9_side_nodes()(side, side_node);
       return true;
     case TET4:
-      node = tet4_side_nodes[side][side_node];
+      node = tet4_side_nodes()(side, side_node);
       return true;
     case TET10:
-      node = tet10_side_nodes[side][side_node];
+      node = tet10_side_nodes()(side, side_node);
       return true;
     case TET14:
-      node = tet14_side_nodes[side][side_node];
+      node = tet14_side_nodes()(side, side_node);
       return true;
     case HEX8:
-      node = hex8_side_nodes[side][side_node];
+      node = hex8_side_nodes()(side, side_node);
       return true;
     case HEX20:
-      node = hex20_side_nodes[side][side_node];
+      node = hex20_side_nodes()(side, side_node);
       return true;
     case HEX27:
-      node = hex27_side_nodes[side][side_node];
+      node = hex27_side_nodes()(side, side_node);
       return true;
     case PRISM6:
-      node = prism6_side_nodes[side][side_node];
+      node = prism6_side_nodes()(side, side_node);
       return true;
     case PRISM15:
-      node = prism15_side_nodes[side][side_node];
+      node = prism15_side_nodes()(side, side_node);
       return true;
     case PRISM18:
-      node = prism18_side_nodes[side][side_node];
+      node = prism18_side_nodes()(side, side_node);
       return true;
     case PRISM20:
-      node = prism20_side_nodes[side][side_node];
+      node = prism20_side_nodes()(side, side_node);
       return true;
     case PRISM21:
-      node = prism21_side_nodes[side][side_node];
+      node = prism21_side_nodes()(side, side_node);
       return true;
     case PYRAMID5:
-      node = pyramid5_side_nodes[side][side_node];
+      node = pyramid5_side_nodes()(side, side_node);
       return true;
     case PYRAMID13:
-      node = pyramid13_side_nodes[side][side_node];
+      node = pyramid13_side_nodes()(side, side_node);
       return true;
     case PYRAMID14:
-      node = pyramid14_side_nodes[side][side_node];
+      node = pyramid14_side_nodes()(side, side_node);
       return true;
     case PYRAMID18:
-      node = pyramid18_side_nodes[side][side_node];
+      node = pyramid18_side_nodes()(side, side_node);
       return true;
     default:
       return false;
@@ -739,37 +1006,37 @@ try_local_edge_node(ElemType parent,
   switch (parent)
   {
     case TET10:
-      node = tet10_edge_nodes[edge][edge_node];
+      node = tet10_edge_nodes()(edge, edge_node);
       return true;
     case TET14:
-      node = tet14_edge_nodes[edge][edge_node];
+      node = tet14_edge_nodes()(edge, edge_node);
       return true;
     case HEX20:
-      node = hex20_edge_nodes[edge][edge_node];
+      node = hex20_edge_nodes()(edge, edge_node);
       return true;
     case HEX27:
-      node = hex27_edge_nodes[edge][edge_node];
+      node = hex27_edge_nodes()(edge, edge_node);
       return true;
     case PRISM15:
-      node = prism15_edge_nodes[edge][edge_node];
+      node = prism15_edge_nodes()(edge, edge_node);
       return true;
     case PRISM18:
-      node = prism18_edge_nodes[edge][edge_node];
+      node = prism18_edge_nodes()(edge, edge_node);
       return true;
     case PRISM20:
-      node = prism20_edge_nodes[edge][edge_node];
+      node = prism20_edge_nodes()(edge, edge_node);
       return true;
     case PRISM21:
-      node = prism21_edge_nodes[edge][edge_node];
+      node = prism21_edge_nodes()(edge, edge_node);
       return true;
     case PYRAMID13:
-      node = pyramid13_edge_nodes[edge][edge_node];
+      node = pyramid13_edge_nodes()(edge, edge_node);
       return true;
     case PYRAMID14:
-      node = pyramid14_edge_nodes[edge][edge_node];
+      node = pyramid14_edge_nodes()(edge, edge_node);
       return true;
     case PYRAMID18:
-      node = pyramid18_edge_nodes[edge][edge_node];
+      node = pyramid18_edge_nodes()(edge, edge_node);
       return true;
     default:
       return false;
