@@ -919,7 +919,7 @@ namespace libMesh
     // geometric nodes. So can we loop over the nodes we cached in the node_map and
     // the DoFs for each field for that node. We need to give PETSc the local id
     // we built up in the node map.
-    for (const auto [global_node_id, local_node_id] : node_map )
+    for (const auto & [global_node_id, local_node_id] : node_map )
       {
         libmesh_assert( mesh.query_node_ptr(global_node_id) );
 
@@ -931,7 +931,7 @@ namespace libMesh
     // Some finite element types associate dofs with the element. So now we go through
     // any of those with the Elem as the point we add to the PetscSection with accompanying
     // dofs
-    for (const auto [global_elem_id, local_elem_id] : elem_map )
+    for (const auto & [global_elem_id, local_elem_id] : elem_map )
       {
         libmesh_assert( mesh.query_elem_ptr(global_elem_id) );
 
@@ -944,7 +944,7 @@ namespace libMesh
     // SCALAR dofs live on the "last" processor, so only work there if there are any
     if (system.processor_id() == (system.n_processors()-1))
       {
-        for (const auto [local_id, scalar_var] : scalar_map )
+        for (const auto & [local_id, scalar_var] : scalar_map )
           {
             // The number of SCALAR dofs comes from the variable order
             const int n_dofs = system.variable(scalar_var).type().order.get_order();
