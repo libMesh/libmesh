@@ -209,10 +209,10 @@ assemble_hilbert_element(const FEAccess & fe,
                          GoalAccess & goal,
                          const bool request_jacobian,
                          const unsigned int hilbert_order,
+                         const unsigned int n_u_dofs,
                          Accumulator & accum)
 {
   const unsigned int n_qpoints = fe.n_qpoints();
-  const unsigned int n_u_dofs = accum.n_dofs();
 
   for (unsigned int qp = 0; qp != n_qpoints; qp++)
     {
@@ -246,6 +246,27 @@ assemble_hilbert_element(const FEAccess & fe,
                 accum.add_jacobian(i, j, JxWxD * (qp_data.dphi(i) * qp_data.dphi(j)));
         }
     }
+}
+
+template <typename FEAccess,
+          typename SolutionAccess,
+          typename GoalAccess,
+          typename Accumulator>
+LIBMESH_DEVICE_INLINE void
+assemble_hilbert_element(const FEAccess & fe,
+                         const SolutionAccess & solution,
+                         GoalAccess & goal,
+                         const bool request_jacobian,
+                         const unsigned int hilbert_order,
+                         Accumulator & accum)
+{
+  assemble_hilbert_element(fe,
+                           solution,
+                           goal,
+                           request_jacobian,
+                           hilbert_order,
+                           accum.n_dofs(),
+                           accum);
 }
 
 } // namespace detail

@@ -471,7 +471,7 @@ run_hilbert_system_value_batch(const libMesh::FEFamily family,
         libMesh::Kokkos::detail::make_hilbert_solution_access(fe, ZeroCoeffAccess{}, Number(1.));
       libMesh::Kokkos::detail::LocalHilbertAccumulator<MaxDofs> accum(n_dofs);
       libMesh::detail::assemble_hilbert_element(
-        fe, solution, goal_access, true, hilbert_order, accum);
+        fe, solution, goal_access, true, hilbert_order, n_dofs, accum);
 
       const auto rhs_offset = rhs_offsets(record_index);
       const auto mat_offset = mat_offsets(record_index);
@@ -532,7 +532,7 @@ run_hilbert_system_bucket_scatter_batch(const libMesh::FEShapeKey key,
         libMesh::Kokkos::detail::make_hilbert_solution_access(fe, ZeroCoeffAccess{}, Number(1.));
       libMesh::Kokkos::detail::LocalHilbertAccumulator<MaxDofs> accum(n_dofs);
       libMesh::detail::assemble_hilbert_element(
-        fe, solution, goal_access, true, hilbert_order, accum);
+        fe, solution, goal_access, true, hilbert_order, n_dofs, accum);
 
       const auto rhs_offset = rhs_offsets(record_index);
       const auto mat_offset = mat_offsets(record_index);
@@ -590,7 +590,7 @@ run_hilbert_system_bucket_value_batch(const libMesh::FEShapeKey key,
         libMesh::Kokkos::detail::make_hilbert_solution_access(fe, ZeroCoeffAccess{}, Number(1.));
       libMesh::Kokkos::detail::LocalHilbertAccumulator<MaxDofs> accum(n_dofs);
       libMesh::detail::assemble_hilbert_element(
-        fe, solution, goal_access, true, hilbert_order, accum);
+        fe, solution, goal_access, true, hilbert_order, n_dofs, accum);
 
       const auto rhs_offset = rhs_offsets(record_index);
       const auto mat_offset = mat_offsets(record_index);
@@ -697,7 +697,7 @@ run_hilbert_system_fem_value_batch(const libMesh::FEFamily family,
         libMesh::Kokkos::detail::make_hilbert_solution_access(fe, ZeroCoeffAccess{}, Number(1.));
       libMesh::Kokkos::detail::LocalHilbertAccumulator<MaxDofs> accum(n_dofs);
       libMesh::detail::assemble_hilbert_element(
-        fe, solution, goal_access, true, hilbert_order, accum);
+        fe, solution, goal_access, true, hilbert_order, n_dofs, accum);
 
       const auto rhs_offset = rhs_offsets(record_index);
       const auto mat_offset = mat_offsets(record_index);
@@ -779,7 +779,7 @@ run_hilbert_system_fem_bucket_scatter_batch(const libMesh::FEShapeKey key,
         libMesh::Kokkos::detail::make_hilbert_solution_access(fe, ZeroCoeffAccess{}, Number(1.));
       libMesh::Kokkos::detail::LocalHilbertAccumulator<MaxDofs> accum(n_dofs);
       libMesh::detail::assemble_hilbert_element(
-        fe, solution, goal_access, true, hilbert_order, accum);
+        fe, solution, goal_access, true, hilbert_order, n_dofs, accum);
 
       const auto rhs_offset = rhs_offsets(record_index);
       const auto mat_offset = mat_offsets(record_index);
@@ -858,7 +858,7 @@ run_hilbert_system_fem_bucket_value_batch(const libMesh::FEShapeKey key,
         libMesh::Kokkos::detail::make_hilbert_solution_access(fe, ZeroCoeffAccess{}, Number(1.));
       libMesh::Kokkos::detail::LocalHilbertAccumulator<MaxDofs> accum(n_dofs);
       libMesh::detail::assemble_hilbert_element(
-        fe, solution, goal_access, true, hilbert_order, accum);
+        fe, solution, goal_access, true, hilbert_order, n_dofs, accum);
 
       const auto rhs_offset = rhs_offsets(record_index);
       const auto mat_offset = mat_offsets(record_index);
