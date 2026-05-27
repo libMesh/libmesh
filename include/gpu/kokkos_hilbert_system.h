@@ -230,6 +230,8 @@ struct SplitMatrixScatterAccess
 
 struct ZeroCoeffAccess
 {
+  static constexpr bool is_zero_coeff_access = true;
+
   LIBMESH_DEVICE_INLINE
   Number operator()(const unsigned int) const
   {

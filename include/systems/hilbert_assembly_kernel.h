@@ -36,6 +36,15 @@ template <typename T>
 using hilbert_storage_t =
   std::conditional_t<std::is_lvalue_reference_v<T>, T, std::decay_t<T>>;
 
+template <typename T, typename = void>
+struct is_zero_hilbert_coeff_access : std::false_type {};
+
+template <typename T>
+struct is_zero_hilbert_coeff_access<
+  T,
+  std::void_t<decltype(std::decay_t<T>::is_zero_coeff_access)>>
+  : std::bool_constant<std::decay_t<T>::is_zero_coeff_access> {};
+
 template <typename CoeffStorage,
           std::enable_if_t<!std::is_pointer_v<std::decay_t<CoeffStorage>> &&
                              !std::is_array_v<std::remove_reference_t<CoeffStorage>>,
@@ -67,6 +76,9 @@ Number interpolate_hilbert_value(const QpData & qp_data,
                                  const CoeffStorage & coeff,
                                  const unsigned int n_dofs)
 {
+  if constexpr (is_zero_hilbert_coeff_access<CoeffStorage>::value)
+    return Number(0);
+
   Number u = 0.;
 
   for (unsigned int i = 0; i != n_dofs; ++i)
@@ -83,6 +95,9 @@ Gradient interpolate_hilbert_gradient(const QpData & qp_data,
 {
   Gradient grad_u;
   grad_u.zero();
+
+  if constexpr (is_zero_hilbert_coeff_access<CoeffStorage>::value)
+    return grad_u;
 
   for (unsigned int i = 0; i != n_dofs; ++i)
     grad_u.add_scaled(qp_data.dphi(i), coeff_at(coeff, i));
