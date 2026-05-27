@@ -2727,6 +2727,65 @@ HilbertSystem::try_kokkos_petsc_solve()
                        << " rhs_max=" << rhs_max
                        << std::endl;
         }
+
+      if (!plan->buckets.empty())
+        {
+          const auto & bucket = plan->buckets.front();
+          auto h_elem_indices =
+            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
+                                                  plan->batch_data.elem_indices);
+          auto h_rhs_offsets =
+            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
+                                                  plan->batch_data.rhs_offsets);
+          auto h_mat_offsets =
+            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
+                                                  plan->batch_data.mat_offsets);
+          auto h_rhs_slots =
+            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
+                                                  plan->rhs_local_slots);
+          auto h_mat_slots =
+            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(),
+                                                  plan->mat_value_slots);
+
+          auto elem_subview =
+            ::Kokkos::subview(plan->batch_data.elem_indices,
+                              ::Kokkos::make_pair(bucket.begin, bucket.end));
+          auto rhs_offset_subview =
+            ::Kokkos::subview(plan->batch_data.rhs_offsets,
+                              ::Kokkos::make_pair(bucket.begin, bucket.end));
+          auto mat_offset_subview =
+            ::Kokkos::subview(plan->batch_data.mat_offsets,
+                              ::Kokkos::make_pair(bucket.begin, bucket.end));
+          auto h_elem_subview =
+            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), elem_subview);
+          auto h_rhs_offset_subview =
+            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), rhs_offset_subview);
+          auto h_mat_offset_subview =
+            ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), mat_offset_subview);
+
+          const std::size_t first_record = bucket.begin;
+          const std::size_t rhs_offset = h_rhs_offsets(first_record);
+          const std::size_t mat_offset = h_mat_offsets(first_record);
+
+          libMesh::out << "Bucket subview diagnostics: "
+                       << "bucket_begin=" << bucket.begin
+                       << " bucket_end=" << bucket.end
+                       << " full_elem_at_begin=" << h_elem_indices(first_record)
+                       << " subview_elem_0=" << h_elem_subview(0)
+                       << " full_rhs_offset_at_begin=" << rhs_offset
+                       << " subview_rhs_offset_0=" << h_rhs_offset_subview(0)
+                       << " full_mat_offset_at_begin=" << mat_offset
+                       << " subview_mat_offset_0=" << h_mat_offset_subview(0)
+                       << std::endl;
+
+          libMesh::out << "Bucket slot diagnostics: "
+                       << "rhs_slot_at_first_offset=" << h_rhs_slots(rhs_offset)
+                       << " rhs_local_size=" << plan->rhs_local_size
+                       << " mat_slot_at_first_offset=" << h_mat_slots(mat_offset)
+                       << " mat_diag_size=" << plan->mat_diag_size
+                       << " mat_offdiag_size=" << plan->mat_offdiag_size
+                       << std::endl;
+        }
     }
 
   const auto assembly_start = clock::now();
