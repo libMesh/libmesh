@@ -21,6 +21,7 @@
 
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_quadrature_type.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fem_context.h"
