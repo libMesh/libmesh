@@ -375,6 +375,8 @@ struct KokkosPetscAssemblyPlan
   std::vector<PetscInt> offdiag_row_offsets;
   std::vector<PetscInt> offdiag_column_indices;
   std::vector<PetscInt> offdiag_global_columns;
+  std::vector<PetscInt> mat_coo_rows;
+  std::vector<PetscInt> mat_coo_cols;
   KokkosPetscIntView local_row_offsets_view;
   KokkosPetscIntView local_column_indices_view;
   KokkosPetscIntView diag_row_offsets_view;
@@ -388,6 +390,7 @@ struct KokkosPetscAssemblyPlan
   ::Kokkos::View<Number *> mat_remote_values;
   ::Kokkos::View<Number *> rhs_remote_root_values;
   ::Kokkos::View<Number *> mat_remote_root_values;
+  ::Kokkos::View<PetscScalar *> mat_coo_values;
   std::vector<PetscInt> rhs_remote_rows;
   std::vector<PetscInt> mat_remote_rows;
   std::vector<PetscInt> mat_remote_cols;
@@ -546,6 +549,8 @@ build_kokkos_petsc_owned_csr_graph(::HilbertSystem & sys,
   plan.offdiag_row_offsets.clear();
   plan.offdiag_column_indices.clear();
   plan.offdiag_global_columns.clear();
+  plan.mat_coo_rows.clear();
+  plan.mat_coo_cols.clear();
   plan.row_start = row_start;
   plan.row_stop = row_stop;
   plan.col_start = col_start;
@@ -621,6 +626,57 @@ build_kokkos_petsc_owned_csr_graph(::HilbertSystem & sys,
 }
 
 void
+build_kokkos_petsc_owned_coo(KokkosPetscAssemblyPlan & plan)
+{
+  plan.mat_coo_rows.clear();
+  plan.mat_coo_cols.clear();
+  plan.mat_coo_rows.reserve(plan.mat_diag_size + plan.mat_offdiag_size);
+  plan.mat_coo_cols.reserve(plan.mat_diag_size + plan.mat_offdiag_size);
+
+  if (plan.direct_matrix_layout == KokkosDirectMatrixLayout::seq_aij)
+    {
+      const PetscInt n_local_rows = plan.row_stop - plan.row_start;
+      for (PetscInt local_row = 0; local_row != n_local_rows; ++local_row)
+        {
+          const PetscInt global_row = plan.row_start + local_row;
+          for (PetscInt k = plan.local_row_offsets[local_row];
+               k != plan.local_row_offsets[local_row + 1];
+               ++k)
+            {
+              plan.mat_coo_rows.push_back(global_row);
+              plan.mat_coo_cols.push_back(plan.local_column_indices[k]);
+            }
+        }
+      return;
+    }
+
+  const PetscInt n_local_rows = plan.row_stop - plan.row_start;
+  for (PetscInt local_row = 0; local_row != n_local_rows; ++local_row)
+    {
+      const PetscInt global_row = plan.row_start + local_row;
+      for (PetscInt k = plan.diag_row_offsets[local_row];
+           k != plan.diag_row_offsets[local_row + 1];
+           ++k)
+        {
+          plan.mat_coo_rows.push_back(global_row);
+          plan.mat_coo_cols.push_back(plan.col_start + plan.diag_column_indices[k]);
+        }
+    }
+
+  for (PetscInt local_row = 0; local_row != n_local_rows; ++local_row)
+    {
+      const PetscInt global_row = plan.row_start + local_row;
+      for (PetscInt k = plan.offdiag_row_offsets[local_row];
+           k != plan.offdiag_row_offsets[local_row + 1];
+           ++k)
+        {
+          plan.mat_coo_rows.push_back(global_row);
+          plan.mat_coo_cols.push_back(plan.offdiag_global_columns[plan.offdiag_column_indices[k]]);
+        }
+    }
+}
+
+void
 finalize_kokkos_direct_slots(::HilbertSystem & sys,
                              KokkosPetscAssemblyPlan & plan,
                              const std::vector<std::size_t> & rhs_local_slots,
@@ -656,6 +712,10 @@ finalize_kokkos_direct_slots(::HilbertSystem & sys,
   if (!plan.mat_remote_rows.empty())
     plan.mat_remote_values =
       ::Kokkos::View<Number *>("hilbert_mat_remote_values", plan.mat_remote_rows.size());
+
+  if (!plan.mat_coo_rows.empty())
+    plan.mat_coo_values =
+      ::Kokkos::View<PetscScalar *>("hilbert_mat_coo_values", plan.mat_coo_rows.size());
 }
 
 std::size_t
@@ -1033,23 +1093,17 @@ ensure_kokkos_petsc_owned_matrix(::HilbertSystem & sys,
   LibmeshPetscCall2(sys.comm(), MatSetType(new_mat, mat_type));
   LibmeshPetscCall2(sys.comm(), MatSetFromOptions(new_mat));
 
-  if (plan.direct_matrix_layout == KokkosDirectMatrixLayout::seq_aij)
-    LibmeshPetscCall2(sys.comm(),
-                      MatSeqAIJSetPreallocationCSR(new_mat,
-                                                   plan.local_row_offsets.data(),
-                                                   plan.local_column_indices.data(),
-                                                   nullptr));
-  else if (plan.direct_matrix_layout == KokkosDirectMatrixLayout::mpi_aij)
-    LibmeshPetscCall2(sys.comm(),
-                      MatMPIAIJSetPreallocationCSR(new_mat,
-                                                   plan.local_row_offsets.data(),
-                                                   plan.local_column_indices.data(),
-                                                   nullptr));
-  else
+  if (plan.direct_matrix_layout == KokkosDirectMatrixLayout::none)
     {
       LibmeshPetscCall2(sys.comm(), MatDestroy(&new_mat));
       return false;
     }
+
+  LibmeshPetscCall2(sys.comm(),
+                    MatSetPreallocationCOO(new_mat,
+                                           cast_int<PetscCount>(plan.mat_coo_rows.size()),
+                                           plan.mat_coo_rows.data(),
+                                           plan.mat_coo_cols.data()));
 
   LibmeshPetscCall2(sys.comm(), MatSetOption(new_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
   LibmeshPetscCall2(sys.comm(), MatAssemblyBegin(new_mat, MAT_FINAL_ASSEMBLY));
@@ -1085,6 +1139,7 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
   plan.mat_remote_owners.clear();
   plan.rhs_remote_values = {};
   plan.mat_remote_values = {};
+  plan.mat_coo_values = {};
 
   const char * mat_type = nullptr;
   LibmeshPetscCall2(sys.comm(), MatGetType(system_matrix.mat(), &mat_type));
@@ -1130,6 +1185,7 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
     plan.direct_matrix_layout == KokkosDirectMatrixLayout::seq_aij ?
       0 :
       cast_int<std::size_t>(plan.offdiag_row_offsets.empty() ? 0 : plan.offdiag_row_offsets.back());
+  build_kokkos_petsc_owned_coo(plan);
 
   if (!bind_kokkos_direct_slots_from_plan_graph(
         sys, dof_index_cache, plan, rhs_first_local, rhs_last_local, rhs_local_slots, mat_value_slots))
@@ -1832,19 +1888,6 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
     KokkosMatrixWriteView diag_matrix_values;
     KokkosMatrixWriteView offdiag_matrix_values;
     KokkosMatrixWriteView remote_matrix_values;
-    PetscScalar * diag_values_ptr = nullptr;
-    PetscScalar * offdiag_values_ptr = nullptr;
-    PetscInt row_start = 0;
-    PetscInt row_stop = 0;
-    PetscInt col_start = 0;
-    PetscInt col_stop = 0;
-    const PetscInt * diag_row_offsets = nullptr;
-    const PetscInt * diag_col_indices = nullptr;
-    const PetscInt * offdiag_row_offsets = nullptr;
-    const PetscInt * offdiag_col_indices = nullptr;
-    const PetscInt * offdiag_global_columns = nullptr;
-    PetscInt offdiag_n_cols = 0;
-    std::unordered_map<PetscInt, PetscInt> offdiag_column_map;
 
     if (plan.rhs_remote_values.extent(0))
       {
@@ -1860,66 +1903,28 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                                      plan.mat_remote_values.extent(0));
       }
 
+    if (plan.mat_coo_values.extent(0))
+      ::Kokkos::deep_copy(plan.mat_coo_values, PetscScalar(0));
+
     if (plan.direct_matrix_layout == KokkosDirectMatrixLayout::seq_aij)
       {
-        const PetscInt * row_offsets = nullptr;
-        const PetscInt * col_indices = nullptr;
-        PetscScalar * values = nullptr;
-        PetscMemType mem_type = PETSC_MEMTYPE_HOST;
-        LibmeshPetscCall2(sys.comm(),
-                          MatSeqAIJGetCSRAndMemType(
-                            system_matrix.mat(), &row_offsets, &col_indices, &values, &mem_type));
-        libmesh_ignore(col_indices);
-        diag_values_ptr = values;
-        diag_matrix_values = make_matrix_write_view(values, mem_type, plan.mat_diag_size, "PETSc matrix values");
+        diag_matrix_values = make_matrix_write_view(plan.mat_coo_values.data(),
+                                                    kokkos_default_petsc_mem_type(),
+                                                    plan.mat_diag_size,
+                                                    "PETSc matrix values");
       }
     else if (plan.direct_matrix_layout == KokkosDirectMatrixLayout::mpi_aij)
       {
-        Mat diagonal = nullptr;
-        Mat offdiagonal = nullptr;
-        LibmeshPetscCall2(sys.comm(),
-                          MatMPIAIJGetSeqAIJ(system_matrix.mat(),
-                                             &diagonal,
-                                             &offdiagonal,
-                                             &offdiag_global_columns));
-        libmesh_ignore(offdiag_global_columns);
-
-        PetscMemType mem_type = PETSC_MEMTYPE_HOST;
-        LibmeshPetscCall2(sys.comm(),
-                          MatSeqAIJGetCSRAndMemType(
-                            diagonal, &diag_row_offsets, &diag_col_indices, &diag_values_ptr, &mem_type));
-        libmesh_ignore(diag_col_indices);
-        diag_matrix_values = make_matrix_write_view(diag_values_ptr,
-                                                    mem_type,
+        diag_matrix_values = make_matrix_write_view(plan.mat_coo_values.data(),
+                                                    kokkos_default_petsc_mem_type(),
                                                     plan.mat_diag_size,
                                                     "PETSc diagonal matrix values");
 
-        mem_type = PETSC_MEMTYPE_HOST;
-        LibmeshPetscCall2(sys.comm(),
-                          MatSeqAIJGetCSRAndMemType(
-                            offdiagonal,
-                            &offdiag_row_offsets,
-                            &offdiag_col_indices,
-                            &offdiag_values_ptr,
-                            &mem_type));
-        libmesh_ignore(offdiag_col_indices);
-        offdiag_matrix_values = make_matrix_write_view(offdiag_values_ptr,
-                                                       mem_type,
-                                                       plan.mat_offdiag_size,
-                                                       "PETSc off-diagonal matrix values");
-
-        LibmeshPetscCall2(sys.comm(), MatGetOwnershipRange(system_matrix.mat(), &row_start, &row_stop));
-        LibmeshPetscCall2(sys.comm(),
-                          MatGetOwnershipRangeColumn(system_matrix.mat(), &col_start, &col_stop));
-        PetscInt offdiag_n_rows = 0;
-        LibmeshPetscCall2(sys.comm(), MatGetSize(offdiagonal, &offdiag_n_rows, &offdiag_n_cols));
-        libmesh_ignore(offdiag_n_rows);
-        if (offdiag_global_columns && offdiag_n_cols)
-          {
-            offdiag_column_map.reserve(cast_int<std::size_t>(offdiag_n_cols));
-            for (PetscInt i = 0; i != offdiag_n_cols; ++i)
-              offdiag_column_map.emplace(offdiag_global_columns[i], i);
-          }
+        offdiag_matrix_values =
+          make_matrix_write_view(plan.mat_coo_values.data() + plan.mat_diag_size,
+                                 kokkos_default_petsc_mem_type(),
+                                 plan.mat_offdiag_size,
+                                 "PETSc off-diagonal matrix values");
       }
     else
       libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage was built without a valid "
@@ -2073,6 +2078,11 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
 
         ::Kokkos::fence();
       }
+
+    LibmeshPetscCall2(sys.comm(),
+                      MatSetValuesCOO(system_matrix.mat(),
+                                      plan.mat_coo_values.data(),
+                                      INSERT_VALUES));
   }
 
   return true;
