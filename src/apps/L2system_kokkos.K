@@ -420,7 +420,6 @@ struct KokkosPetscAssemblyPlan
   std::vector<PetscInt> offdiag_row_offsets;
   std::vector<PetscInt> offdiag_column_indices;
   std::vector<PetscInt> offdiag_global_columns;
-  std::vector<PetscInt> rhs_coo_rows;
   std::vector<PetscInt> mat_coo_rows;
   std::vector<PetscInt> mat_coo_cols;
   KokkosPetscIntView local_row_offsets_view;
@@ -436,7 +435,6 @@ struct KokkosPetscAssemblyPlan
   ::Kokkos::View<Number *> mat_remote_values;
   ::Kokkos::View<Number *> rhs_remote_root_values;
   ::Kokkos::View<Number *> mat_remote_root_values;
-  ::Kokkos::View<PetscScalar *> rhs_coo_values;
   ::Kokkos::View<PetscScalar *> mat_coo_values;
   std::vector<PetscInt> rhs_remote_rows;
   std::vector<PetscInt> mat_remote_rows;
@@ -602,7 +600,6 @@ build_kokkos_petsc_owned_csr_graph(::HilbertSystem & sys,
   plan.offdiag_row_offsets.clear();
   plan.offdiag_column_indices.clear();
   plan.offdiag_global_columns.clear();
-  plan.rhs_coo_rows.clear();
   plan.mat_coo_rows.clear();
   plan.mat_coo_cols.clear();
   plan.row_start = row_start;
@@ -680,15 +677,6 @@ build_kokkos_petsc_owned_csr_graph(::HilbertSystem & sys,
 }
 
 void
-build_kokkos_petsc_rhs_coo(KokkosPetscAssemblyPlan & plan,
-                           const numeric_index_type rhs_first_local)
-{
-  plan.rhs_coo_rows.resize(plan.rhs_local_size);
-  for (auto i : index_range(plan.rhs_coo_rows))
-    plan.rhs_coo_rows[i] = cast_int<PetscInt>(rhs_first_local + i);
-}
-
-void
 build_kokkos_petsc_owned_coo(KokkosPetscAssemblyPlan & plan)
 {
   plan.mat_coo_rows.clear();
@@ -757,10 +745,6 @@ finalize_kokkos_direct_slots(::HilbertSystem & sys,
 
   ::Kokkos::deep_copy(plan.rhs_local_slots, h_rhs_local_slots);
   ::Kokkos::deep_copy(plan.mat_value_slots, h_mat_value_slots);
-
-  if (!plan.rhs_coo_rows.empty())
-    plan.rhs_coo_values =
-      ::Kokkos::View<PetscScalar *>("hilbert_rhs_coo_values", plan.rhs_coo_rows.size());
 
   plan.rhs_remote_owners.resize(plan.rhs_remote_rows.size());
   for (auto i : index_range(plan.rhs_remote_rows))
@@ -1206,7 +1190,6 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
   plan.mat_remote_owners.clear();
   plan.rhs_remote_values = {};
   plan.mat_remote_values = {};
-  plan.rhs_coo_values = {};
   plan.mat_coo_values = {};
 
   const char * mat_type = nullptr;
@@ -1245,7 +1228,6 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
   std::vector<std::size_t> rhs_local_slots(plan.total_rhs_entries);
   std::vector<std::size_t> mat_value_slots(plan.total_mat_entries);
   plan.rhs_local_size = cast_int<std::size_t>(rhs_last_local - rhs_first_local);
-  build_kokkos_petsc_rhs_coo(plan, rhs_first_local);
   plan.mat_diag_size =
     plan.direct_matrix_layout == KokkosDirectMatrixLayout::seq_aij ?
       cast_int<std::size_t>(plan.local_row_offsets.empty() ? 0 : plan.local_row_offsets.back()) :
@@ -1262,11 +1244,6 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
 
   if (!ensure_kokkos_petsc_owned_matrix(sys, plan, system_matrix))
     return false;
-
-  LibmeshPetscCall2(sys.comm(),
-                    VecSetPreallocationCOO(system_rhs.vec(),
-                                           cast_int<PetscCount>(plan.rhs_coo_rows.size()),
-                                           plan.rhs_coo_rows.data()));
 
   finalize_kokkos_direct_slots(sys, plan, rhs_local_slots, mat_value_slots);
   if (!build_kokkos_petsc_remote_sf(sys, plan))
@@ -2087,7 +2064,8 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                     const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal,
                                     PetscMatrixBase<Number> & system_matrix,
                                     PetscVector<Number> & system_rhs,
-                                    ::HilbertSystem::KokkosAssemblyPath & assembly_path)
+                                    ::HilbertSystem::KokkosAssemblyPath & assembly_path,
+                                    const bool diagnostics = false)
 {
   libmesh_error_msg_if(sys.has_static_condensation(),
                        "HilbertSystem Kokkos direct PETSc storage does not support static "
@@ -2127,16 +2105,9 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                           name + " to be accessible from the active Kokkos execution space.");
       return KokkosMatrixWriteView(reinterpret_cast<Number *>(values), size);
     };
-  PetscInt rhs_first_local_petsc = 0;
-  PetscInt rhs_last_local_petsc = 0;
-  LibmeshPetscCall2(sys.comm(),
-                    VecGetOwnershipRange(system_rhs.vec(), &rhs_first_local_petsc, &rhs_last_local_petsc));
-  libmesh_ignore(rhs_first_local_petsc);
-  libmesh_ignore(rhs_last_local_petsc);
-
   {
-    KokkosVectorWriteView local_rhs_values(reinterpret_cast<Number *>(plan.rhs_coo_values.data()),
-                                           plan.rhs_coo_values.extent(0));
+    auto rhs_guard = system_rhs.make_kokkos_write_view_guard();
+    const KokkosVectorWriteView local_rhs_values = rhs_guard.view();
     KokkosVectorWriteView remote_rhs_values;
     KokkosMatrixWriteView diag_matrix_values;
     KokkosMatrixWriteView offdiag_matrix_values;
@@ -2149,8 +2120,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                                   plan.rhs_remote_values.extent(0));
       }
 
-    if (plan.rhs_coo_values.extent(0))
-      ::Kokkos::deep_copy(plan.rhs_coo_values, PetscScalar(0));
+    ::Kokkos::deep_copy(local_rhs_values, Number(0));
 
     if (plan.mat_remote_values.extent(0))
       {
@@ -2334,13 +2304,52 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
         ::Kokkos::fence();
       }
 
+    if (diagnostics)
+      {
+        auto h_rhs =
+          ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), local_rhs_values);
+        auto h_mat =
+          ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), plan.mat_coo_values);
+
+        Real rhs_abs_sum = 0.;
+        Real rhs_max = 0.;
+        for (std::size_t i = 0; i != h_rhs.extent(0); ++i)
+          {
+            const Real val = std::abs(h_rhs(i));
+            rhs_abs_sum += val;
+            rhs_max = std::max(rhs_max, val);
+          }
+
+        Real mat_abs_sum = 0.;
+        Real mat_max = 0.;
+        std::size_t mat_nonfinite = 0;
+        for (std::size_t i = 0; i != h_mat.extent(0); ++i)
+          {
+            const Real val = std::abs(h_mat(i));
+            mat_abs_sum += val;
+            mat_max = std::max(mat_max, val);
+            if (!std::isfinite(h_mat(i)))
+              ++mat_nonfinite;
+          }
+
+        libMesh::out << "Kokkos direct RHS diagnostics: "
+                     << "size=" << h_rhs.extent(0)
+                     << " abs_sum=" << rhs_abs_sum
+                     << " max=" << rhs_max
+                     << std::endl;
+        libMesh::out << "Kokkos matrix COO diagnostics: "
+                     << "size=" << h_mat.extent(0)
+                     << " diag_size=" << plan.mat_diag_size
+                     << " offdiag_size=" << plan.mat_offdiag_size
+                     << " abs_sum=" << mat_abs_sum
+                     << " max=" << mat_max
+                     << " nonfinite=" << mat_nonfinite
+                     << std::endl;
+      }
+
     LibmeshPetscCall2(sys.comm(),
                       MatSetValuesCOO(system_matrix.mat(),
                                       plan.mat_coo_values.data(),
-                                      INSERT_VALUES));
-    LibmeshPetscCall2(sys.comm(),
-                      VecSetValuesCOO(system_rhs.vec(),
-                                      plan.rhs_coo_values.data(),
                                       INSERT_VALUES));
   }
 
@@ -2728,7 +2737,8 @@ HilbertSystem::try_kokkos_petsc_solve()
                                            fem_goal,
                                            *petsc_matrix,
                                            *petsc_rhs,
-                                           assembly_path))
+                                           assembly_path,
+                                           diagnostics))
     libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage assembly failed.");
   const auto assembly_stop = clock::now();
   this->_last_kokkos_timing.assembly_seconds =
@@ -2737,26 +2747,10 @@ HilbertSystem::try_kokkos_petsc_solve()
 
   if (diagnostics)
     {
-      auto h_rhs =
-        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), plan->rhs_coo_values);
-      Real rhs_abs_sum = 0.;
-      Real rhs_max = 0.;
-      for (std::size_t i = 0; i != h_rhs.extent(0); ++i)
-        {
-          const Real val = std::abs(h_rhs(i));
-          rhs_abs_sum += val;
-          rhs_max = std::max(rhs_max, val);
-        }
-
-      libMesh::out << "Kokkos RHS COO diagnostics: "
-                   << "size=" << h_rhs.extent(0)
-                   << " abs_sum=" << rhs_abs_sum
-                   << " max=" << rhs_max
-                   << std::endl;
       libMesh::out << "Kokkos L2 assembly diagnostics: "
                    << "records=" << plan->records.size()
                    << " rhs_local_size=" << plan->rhs_local_size
-                   << " rhs_coo_size=" << plan->rhs_coo_values.extent(0)
+                   << " mat_coo_size=" << plan->mat_coo_values.extent(0)
                    << " rhs_norm=" << petsc_rhs->l2_norm()
                    << std::endl;
     }
