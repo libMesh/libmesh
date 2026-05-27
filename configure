@@ -60998,7 +60998,7 @@ then :
   libmesh_kokkos_host_cxx=$CXX
 fi
                   KOKKOS_CXX="$NVCC"
-                  KOKKOS_CXXFLAGS="$kokkos_cuda_arch_flag --forward-unknown-to-host-compiler --extended-lambda --disable-warnings --x=cu -ccbin=$libmesh_kokkos_host_cxx"
+                  KOKKOS_CXXFLAGS="$kokkos_cuda_arch_flag --forward-unknown-to-host-compiler --extended-lambda --disable-warnings -x cu -ccbin $libmesh_kokkos_host_cxx"
                   KOKKOS_LDFLAGS="--forward-unknown-to-host-compiler $kokkos_cuda_arch_flag -L$KOKKOS_LIB_DIR"
                   if test "x$have_kokkos_openmp" = "xyes"
 then :
