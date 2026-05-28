@@ -543,6 +543,7 @@ debug_print_kokkos_plan_summary(::HilbertSystem & sys,
     return;
 
   libMesh::out << "L2Kokkos debug: records=" << plan.records.size()
+               << " batch_records=" << plan.batch_data.elem_indices.extent(0)
                << " total_rhs_entries=" << plan.total_rhs_entries
                << " total_mat_entries=" << plan.total_mat_entries
                << " rhs_local_size=" << plan.rhs_local_size
@@ -1598,7 +1599,7 @@ build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
   plan.records = std::move(records);
   plan.total_rhs_entries = total_rhs_entries;
   plan.total_mat_entries = total_mat_entries;
-  plan.batch_data = std::move(batch_data);
+  plan.batch_data = batch_data;
   plan.rhs_entry_values = KokkosScalarView<Number>("hilbert_rhs_entry_values", total_rhs_entries);
   plan.mat_entry_values = KokkosScalarView<Number>("hilbert_mat_entry_values", total_mat_entries);
   plan.rhs_local_slots = KokkosSizeView();
@@ -1702,7 +1703,7 @@ ensure_kokkos_fem_goal_batch_data(::HilbertSystem & sys,
   if (!build_kokkos_fem_goal_batch_data(sys, plan, goal_function, batch_data))
     return false;
 
-  plan.fem_goal_batch_data = std::move(batch_data);
+  plan.fem_goal_batch_data = batch_data;
   plan.fem_goal_target = &goal_function;
   plan.input_vector_target = input_vector_target;
   return true;
