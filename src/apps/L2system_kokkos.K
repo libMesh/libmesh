@@ -756,6 +756,22 @@ debug_print_device_key_stats(::HilbertSystem & sys,
       first_shape_key = h_shape_keys(0);
     }
 
+  PetscInt first_mirror_elem_type = PetscInt(-1);
+  PetscInt first_mirror_p_level = PetscInt(-1);
+  PetscInt first_mirror_n_nodes = PetscInt(-1);
+  if (geometry_cache.element_types.extent(0))
+    {
+      auto h_element_types =
+        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), geometry_cache.element_types);
+      auto h_element_p_levels =
+        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), geometry_cache.element_p_levels);
+      auto h_element_n_nodes =
+        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), geometry_cache.element_n_nodes);
+      first_mirror_elem_type = cast_int<PetscInt>(h_element_types(0));
+      first_mirror_p_level = cast_int<PetscInt>(h_element_p_levels(0));
+      first_mirror_n_nodes = cast_int<PetscInt>(h_element_n_nodes(0));
+    }
+
   std::array<PetscInt, 8> global_counts = {local_total,
                                            local_supported,
                                            local_bad_mapping,
@@ -821,6 +837,11 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                  << " first_device_elem_type=" << first_device_elem_type
                  << " first_device_p_level=" << first_device_p_level
                  << " first_device_n_nodes=" << first_device_n_nodes
+                 << " geometry_device_records=" << geometry_cache.element_types.extent(0)
+                 << " geometry_device_n_node_records=" << geometry_cache.element_n_nodes.extent(0)
+                 << " first_mirror_elem_type=" << first_mirror_elem_type
+                 << " first_mirror_p_level=" << first_mirror_p_level
+                 << " first_mirror_n_nodes=" << first_mirror_n_nodes
                  << std::endl;
 }
 
