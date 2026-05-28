@@ -133,7 +133,6 @@ std::string process_trace(const char * name)
 // source code, a really helpful feature when debugging something...
 bool gdb_backtrace(std::ostream & out_stream)
 {
-#ifdef LIBMESH_GDB_COMMAND
   // Eventual return value, true if gdb succeeds, false otherwise.
   bool success = true;
 
@@ -156,8 +155,15 @@ bool gdb_backtrace(std::ostream & out_stream)
 
       libmesh_try
         {
+#ifdef LIBMESH_GDB_COMMAND
           std::string gdb_command =
             libMesh::command_line_value("gdb",std::string(LIBMESH_GDB_COMMAND));
+#else
+          if (!libMesh::on_command_line("--gdb"))
+            return false;
+          std::string gdb_command =
+            libMesh::command_line_value("gdb",std::string());
+#endif
 
           std::ostringstream command;
           command << gdb_command
@@ -188,9 +194,6 @@ bool gdb_backtrace(std::ostream & out_stream)
   std::remove(temp_file);
 
   return success;
-#else
-  return false;
-#endif
 }
 
 } // end anonymous namespace
@@ -210,8 +213,10 @@ void print_trace(std::ostream & out_stream)
 
   // Let the user disable GDB backtraces by configuring with
   // --without-gdb-command or with a command line option.
-  if ((std::string(LIBMESH_GDB_COMMAND) != std::string("no") &&
-       !libMesh::on_command_line("--no-gdb-backtrace")) ||
+  if (
+#ifdef LIBMESH_GDB_COMMAND
+      !libMesh::on_command_line("--no-gdb-backtrace") ||
+#endif
       libMesh::on_command_line("--gdb"))
     gdb_worked = gdb_backtrace(out_stream);
 
