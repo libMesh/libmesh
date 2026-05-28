@@ -585,10 +585,10 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   const auto elem_n_dofs = plan.batch_data.elem_n_dofs;
   const auto quadrature_orders = plan.batch_data.quadrature_orders;
   const auto shape_keys = plan.batch_data.shape_keys;
-  const auto element_types = geometry_cache.element_types;
-  const auto element_mapping_types = geometry_cache.element_mapping_types;
-  const auto element_n_nodes = geometry_cache.element_n_nodes;
-  const auto element_p_levels = geometry_cache.element_p_levels;
+  const auto element_types = geometry_cache.element_types_dual.view_device();
+  const auto element_mapping_types = geometry_cache.element_mapping_types_dual.view_device();
+  const auto element_n_nodes = geometry_cache.element_n_nodes_dual.view_device();
+  const auto element_p_levels = geometry_cache.element_p_levels_dual.view_device();
   using GeometryExecutionSpace = typename std::decay_t<decltype(element_types)>::execution_space;
 
   KokkosPetscIntView write_smoke("hilbert_debug_device_write_smoke", 1);
@@ -760,14 +760,14 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   PetscInt first_mirror_elem_type = PetscInt(-1);
   PetscInt first_mirror_p_level = PetscInt(-1);
   PetscInt first_mirror_n_nodes = PetscInt(-1);
-  if (geometry_cache.element_types.extent(0))
+  if (element_types.extent(0))
     {
       auto h_element_types =
-        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), geometry_cache.element_types);
+        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), element_types);
       auto h_element_p_levels =
-        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), geometry_cache.element_p_levels);
+        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), element_p_levels);
       auto h_element_n_nodes =
-        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), geometry_cache.element_n_nodes);
+        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), element_n_nodes);
       first_mirror_elem_type = cast_int<PetscInt>(h_element_types(0));
       first_mirror_p_level = cast_int<PetscInt>(h_element_p_levels(0));
       first_mirror_n_nodes = cast_int<PetscInt>(h_element_n_nodes(0));
@@ -838,8 +838,8 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                  << " first_device_elem_type=" << first_device_elem_type
                  << " first_device_p_level=" << first_device_p_level
                  << " first_device_n_nodes=" << first_device_n_nodes
-                 << " geometry_device_records=" << geometry_cache.element_types.extent(0)
-                 << " geometry_device_n_node_records=" << geometry_cache.element_n_nodes.extent(0)
+                 << " geometry_device_records=" << element_types.extent(0)
+                 << " geometry_device_n_node_records=" << element_n_nodes.extent(0)
                  << " first_mirror_elem_type=" << first_mirror_elem_type
                  << " first_mirror_p_level=" << first_mirror_p_level
                  << " first_mirror_n_nodes=" << first_mirror_n_nodes
@@ -1740,8 +1740,8 @@ build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & recor
   ::Kokkos::deep_copy(batch_data.mat_offsets, h_mat_offsets);
 
   const auto elem_indices = batch_data.elem_indices;
-  const auto element_types = geometry_cache.element_types;
-  const auto element_p_levels = geometry_cache.element_p_levels;
+  const auto element_types = geometry_cache.element_types_dual.view_device();
+  const auto element_p_levels = geometry_cache.element_p_levels_dual.view_device();
   const auto shape_keys = batch_data.shape_keys;
   const auto family = fe_type.family;
   const auto base_order = fe_type.order.get_order();
@@ -2333,10 +2333,10 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                                       plan.analytic_goal_values,
                                                       plan.analytic_goal_gradients);
           libMesh::Kokkos::detail::run_hilbert_system_value_batch<kokkos_hilbert_max_dofs>(
-            geometry_cache.node_coordinates,
-            geometry_cache.element_node_ids,
-            geometry_cache.element_mapping_types,
-            geometry_cache.element_n_nodes,
+            geometry_cache.node_coordinates_dual.view_device(),
+            geometry_cache.element_node_ids_dual.view_device(),
+            geometry_cache.element_mapping_types_dual.view_device(),
+            geometry_cache.element_n_nodes_dual.view_device(),
             plan.batch_data.shape_keys,
             plan.batch_data.elem_indices,
             plan.batch_data.elem_n_dofs,
@@ -2358,10 +2358,10 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
           const auto timed_goal = fem_goal->with_time(sys.time);
           libMesh::Kokkos::detail::run_hilbert_system_fem_value_batch<
             kokkos_hilbert_max_dofs,
-            kokkos_parsed_fem_max_fields>(geometry_cache.node_coordinates,
-                                          geometry_cache.element_node_ids,
-                                          geometry_cache.element_mapping_types,
-                                          geometry_cache.element_n_nodes,
+            kokkos_parsed_fem_max_fields>(geometry_cache.node_coordinates_dual.view_device(),
+                                          geometry_cache.element_node_ids_dual.view_device(),
+                                          geometry_cache.element_mapping_types_dual.view_device(),
+                                          geometry_cache.element_n_nodes_dual.view_device(),
                                           plan.batch_data.shape_keys,
                                           plan.batch_data.elem_indices,
                                           plan.batch_data.elem_n_dofs,
