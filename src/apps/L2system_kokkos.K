@@ -589,6 +589,59 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   const auto element_n_nodes = geometry_cache.element_n_nodes;
   const auto element_p_levels = geometry_cache.element_p_levels;
 
+  KokkosPetscIntView write_smoke("hilbert_debug_device_write_smoke", 1);
+  ::Kokkos::deep_copy(write_smoke, PetscInt(0));
+  ::Kokkos::parallel_for(
+    "hilbert_debug_device_write_smoke",
+    ::Kokkos::RangePolicy<>(0, 1),
+    KOKKOS_LAMBDA(const int)
+    {
+      write_smoke(0) = PetscInt(123);
+    });
+  ::Kokkos::fence();
+  auto h_write_smoke = ::Kokkos::create_mirror_view(write_smoke);
+  ::Kokkos::deep_copy(h_write_smoke, write_smoke);
+
+  PetscInt first_device_elem_type = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_first_device_elem_type",
+    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    KOKKOS_LAMBDA(const int, PetscInt & value)
+    {
+      value += cast_int<PetscInt>(element_types(elem_indices(0)));
+    },
+    first_device_elem_type);
+
+  PetscInt first_device_p_level = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_first_device_p_level",
+    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    KOKKOS_LAMBDA(const int, PetscInt & value)
+    {
+      value += cast_int<PetscInt>(element_p_levels(elem_indices(0)));
+    },
+    first_device_p_level);
+
+  PetscInt first_device_n_nodes = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_first_device_n_nodes",
+    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    KOKKOS_LAMBDA(const int, PetscInt & value)
+    {
+      value += cast_int<PetscInt>(element_n_nodes(elem_indices(0)));
+    },
+    first_device_n_nodes);
+
+  PetscInt first_device_record_index = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_first_device_record_index",
+    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    KOKKOS_LAMBDA(const int, PetscInt & value)
+    {
+      value += cast_int<PetscInt>(elem_indices(0));
+    },
+    first_device_record_index);
+
   PetscInt local_total = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_device_key_total",
@@ -736,6 +789,13 @@ debug_print_device_key_stats(::HilbertSystem & sys,
     plan.records.empty()
       ? PetscInt(-1)
       : cast_int<PetscInt>(geometry_cache.host_element_n_nodes[plan.records.front().elem_index]);
+  if (!n_records)
+    {
+      first_device_elem_type = PetscInt(-1);
+      first_device_p_level = PetscInt(-1);
+      first_device_n_nodes = PetscInt(-1);
+      first_device_record_index = PetscInt(-1);
+    }
 
   if (sys.comm().rank() == 0)
     libMesh::out << "L2Kokkos debug: device_key total=" << global_counts[0]
@@ -755,6 +815,11 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                  << " first_n_qpoints=" << first_record_n_qpoints
                  << " first_n_nodes=" << first_record_n_nodes
                  << " first_elem_index=" << first_record_elem_index
+                 << " write_smoke=" << h_write_smoke(0)
+                 << " first_device_elem_index=" << first_device_record_index
+                 << " first_device_elem_type=" << first_device_elem_type
+                 << " first_device_p_level=" << first_device_p_level
+                 << " first_device_n_nodes=" << first_device_n_nodes
                  << std::endl;
 }
 
