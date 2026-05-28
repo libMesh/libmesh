@@ -2649,21 +2649,15 @@ HilbertSystem::try_kokkos_petsc_solve()
   libmesh_error_msg_if(!plan,
                        "HilbertSystem Kokkos direct PETSc storage could not build a supported "
                        "assembly plan for the current FE/mapping/quadrature configuration.");
-  const auto * analytic_kokkos_goal = analytic_goal ? this->ensure_kokkos_goal_func() : nullptr;
   if (analytic_goal)
     {
-      const bool uses_device_analytic_goal =
-        analytic_kokkos_goal && plan->has_single_hilbert_bucket;
-      if (!uses_device_analytic_goal)
-        {
-          LOG_SCOPE("L2Kokkos::prepare analytic goal samples", "HilbertSystem");
-          if (!ensure_kokkos_sampled_analytic_goal_data(*this,
-                                                        *_analytic_goal_func,
-                                                        _analytic_goal_grad.get(),
-                                                        *plan))
-            libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage could not sample the "
-                              "analytic goal on the host for device assembly.");
-        }
+      LOG_SCOPE("L2Kokkos::prepare analytic goal samples", "HilbertSystem");
+      if (!ensure_kokkos_sampled_analytic_goal_data(*this,
+                                                    *_analytic_goal_func,
+                                                    _analytic_goal_grad.get(),
+                                                    *plan))
+        libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage could not sample the "
+                          "analytic goal on the host for device assembly.");
     }
   const auto plan_stop = clock::now();
   this->_last_kokkos_timing.plan_seconds =
@@ -2678,7 +2672,7 @@ HilbertSystem::try_kokkos_petsc_solve()
     if (!assemble_kokkos_petsc_global_system(*this,
                                              *plan,
                                              analytic_goal,
-                                             analytic_kokkos_goal,
+                                             nullptr,
                                              fem_goal,
                                              *petsc_matrix,
                                              *petsc_rhs,
