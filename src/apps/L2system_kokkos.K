@@ -41,6 +41,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <cmath>
 #include <limits>
 #include <map>
 #include <tuple>
@@ -88,6 +89,12 @@ using KokkosFieldKeyStorage =
 using KokkosFieldDofStorage =
   libMesh::Kokkos::detail::StaticArrayAccess<unsigned int, kokkos_parsed_fem_max_fields>;
 using KokkosLocalIndexView = DofMap::KokkosLocalIndexCache::elem_local_index_view;
+
+struct KokkosAssemblyDebugStats
+{
+  Real abs_sum = 0.;
+  Real max_abs = 0.;
+};
 
 struct HilbertElementAssemblyRecord
 {
@@ -140,6 +147,89 @@ accumulate_hilbert_dense_outputs(const KokkosScalarView<Number> & d_F,
   for (unsigned int i = 0; i != F.size(); ++i)
     for (unsigned int j = 0; j != F.size(); ++j)
       K(i, j) += h_K(i, j);
+}
+
+template <typename View>
+KokkosAssemblyDebugStats
+debug_kokkos_vector_stats(const View & view)
+{
+  KokkosAssemblyDebugStats stats;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_abs_sum",
+    ::Kokkos::RangePolicy<>(0, view.extent(0)),
+    KOKKOS_LAMBDA(const std::size_t i, Real & local_sum)
+    {
+      const Real value = static_cast<Real>(view(i));
+      local_sum += value < 0 ? -value : value;
+    },
+    stats.abs_sum);
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_max_abs",
+    ::Kokkos::RangePolicy<>(0, view.extent(0)),
+    KOKKOS_LAMBDA(const std::size_t i, Real & local_max)
+    {
+      const Real raw_value = static_cast<Real>(view(i));
+      const Real abs_value = raw_value < 0 ? -raw_value : raw_value;
+      if (abs_value > local_max)
+        local_max = abs_value;
+    },
+    ::Kokkos::Max<Real>(stats.max_abs));
+  ::Kokkos::fence();
+  return stats;
+}
+
+template <typename View>
+void
+debug_print_kokkos_vector_stats(const Parallel::Communicator & comm,
+                                const std::string & label,
+                                const View & view)
+{
+  const auto local_stats = debug_kokkos_vector_stats(view);
+  Real global_abs_sum = local_stats.abs_sum;
+  Real global_max_abs = local_stats.max_abs;
+  comm.sum(global_abs_sum);
+  comm.max(global_max_abs);
+  if (comm.rank() == 0)
+    libMesh::out << "L2Kokkos debug: " << label
+                 << " size=" << view.extent(0)
+                 << " abs_sum=" << global_abs_sum
+                 << " max_abs=" << global_max_abs
+                 << std::endl;
+}
+
+void
+debug_print_kokkos_plan_summary(::HilbertSystem & sys,
+                                const KokkosPetscAssemblyPlan & plan)
+{
+  if (sys.comm().rank() != 0)
+    return;
+
+  libMesh::out << "L2Kokkos debug: records=" << plan.records.size()
+               << " total_rhs_entries=" << plan.total_rhs_entries
+               << " total_mat_entries=" << plan.total_mat_entries
+               << " rhs_local_size=" << plan.rhs_local_size
+               << " mat_diag_size=" << plan.mat_diag_size
+               << " mat_offdiag_size=" << plan.mat_offdiag_size
+               << " rhs_remote_rows=" << plan.rhs_remote_rows.size()
+               << " mat_remote_rows=" << plan.mat_remote_rows.size()
+               << std::endl;
+
+  if (!plan.records.empty())
+    {
+      const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
+      const auto & record = plan.records.front();
+      libMesh::out << "L2Kokkos debug: first_record elem_id=" << record.elem_id
+                   << " elem_index=" << record.elem_index
+                   << " elem_type=" << geometry_cache.host_element_types[record.elem_index]
+                   << " mapping_type=" << geometry_cache.host_element_mapping_types[record.elem_index]
+                   << " p_level=" << geometry_cache.host_element_p_levels[record.elem_index]
+                   << " n_nodes=" << geometry_cache.host_element_n_nodes[record.elem_index]
+                   << " n_dofs=" << record.n_dofs
+                   << " quadrature_order=" << record.quadrature_order
+                   << " rhs_offset=" << record.rhs_offset
+                   << " mat_offset=" << record.mat_offset
+                   << std::endl;
+    }
 }
 
 void
@@ -1875,6 +1965,10 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
   {
     LOG_SCOPE("L2Kokkos::write PETSc storage", "HilbertSystem");
 
+    const bool debug_assembly = libMesh::on_command_line("--kokkos-debug-assembly");
+    if (debug_assembly)
+      debug_print_kokkos_plan_summary(sys, plan);
+
     auto rhs_guard = system_rhs.make_kokkos_write_view_guard();
     const KokkosVectorWriteView local_rhs_values = rhs_guard.view();
     KokkosVectorWriteView remote_rhs_values;
@@ -1987,6 +2081,16 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                           "hilbert_fem_all_record_values");
         }
 
+      if (debug_assembly)
+        {
+          debug_print_kokkos_vector_stats(sys.comm(),
+                                          "post_value rhs_entry_values",
+                                          plan.rhs_entry_values);
+          debug_print_kokkos_vector_stats(sys.comm(),
+                                          "post_value mat_entry_values",
+                                          plan.mat_entry_values);
+        }
+
       {
         LOG_SCOPE("L2Kokkos::scatter entry values", "HilbertSystem");
         scatter_kokkos_hilbert_entry_values(plan,
@@ -1997,6 +2101,24 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                             offdiag_matrix_values,
                                             remote_matrix_values);
       }
+
+      if (debug_assembly)
+        {
+          debug_print_kokkos_vector_stats(sys.comm(),
+                                          "post_scatter local_rhs_values",
+                                          local_rhs_values);
+          debug_print_kokkos_vector_stats(sys.comm(),
+                                          "post_scatter mat_coo_values",
+                                          plan.mat_coo_values);
+          if (plan.rhs_remote_values.extent(0))
+            debug_print_kokkos_vector_stats(sys.comm(),
+                                            "post_scatter rhs_remote_values",
+                                            plan.rhs_remote_values);
+          if (plan.mat_remote_values.extent(0))
+            debug_print_kokkos_vector_stats(sys.comm(),
+                                            "post_scatter mat_remote_values",
+                                            plan.mat_remote_values);
+        }
     }
 
     ::Kokkos::fence();
@@ -2427,6 +2549,16 @@ HilbertSystem::try_kokkos_petsc_solve()
     petsc_solution->close();
   }
 
+  if (libMesh::on_command_line("--kokkos-debug-assembly"))
+    {
+      PetscReal rhs_norm = 0.;
+      LibmeshPetscCall2(this->comm(), VecNorm(petsc_rhs->vec(), NORM_2, &rhs_norm));
+      if (this->comm().rank() == 0)
+        libMesh::out << "L2Kokkos debug: post_close PETSc rhs_l2_norm="
+                     << static_cast<Real>(rhs_norm)
+                     << std::endl;
+    }
+
   LinearSolver<Number> * solver = this->get_linear_solver();
   {
     LOG_SCOPE("L2Kokkos::init PETSc solver", "HilbertSystem");
@@ -2449,6 +2581,16 @@ HilbertSystem::try_kokkos_petsc_solve()
   const auto solve_stop = clock::now();
   this->_last_kokkos_timing.solve_seconds =
     std::chrono::duration_cast<std::chrono::duration<Real>>(solve_stop - solve_start).count();
+
+  if (libMesh::on_command_line("--kokkos-debug-assembly"))
+    {
+      PetscReal solution_norm = 0.;
+      LibmeshPetscCall2(this->comm(), VecNorm(petsc_solution->vec(), NORM_2, &solution_norm));
+      if (this->comm().rank() == 0)
+        libMesh::out << "L2Kokkos debug: post_solve PETSc solution_l2_norm="
+                     << static_cast<Real>(solution_norm)
+                     << std::endl;
+    }
 
   this->update();
   this->mesh_position_set();
