@@ -577,11 +577,12 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                              const KokkosPetscAssemblyPlan & plan,
                              const MeshBase::KokkosGeometryCache & geometry_cache)
 {
-  KokkosSizeView counts("hilbert_debug_device_key_counts", 7);
+  KokkosSizeView counts("hilbert_debug_device_key_counts", 8);
   KokkosPetscIntView first_key("hilbert_debug_first_device_key", 8);
   ::Kokkos::deep_copy(counts, std::size_t(0));
   ::Kokkos::deep_copy(first_key, PetscInt(-1));
 
+  const auto n_records = plan.batch_data.elem_indices.extent(0);
   const auto family = sys.variable_type(0).family;
   const auto base_order = sys.variable_type(0).order;
   const auto elem_indices = plan.batch_data.elem_indices;
@@ -594,9 +595,10 @@ debug_print_device_key_stats(::HilbertSystem & sys,
 
   ::Kokkos::parallel_for(
     "hilbert_debug_device_keys",
-    ::Kokkos::RangePolicy<>(0, elem_indices.extent(0)),
-    KOKKOS_LAMBDA(const std::size_t record_index)
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index)
     {
+      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const auto elem_type = element_types(elem_index);
       const auto mapping_type = element_mapping_types(elem_index);
@@ -627,6 +629,8 @@ debug_print_device_key_stats(::HilbertSystem & sys,
         ::Kokkos::atomic_add(&counts(5), std::size_t(1));
       if (!elem_n_dofs(record_index))
         ::Kokkos::atomic_add(&counts(6), std::size_t(1));
+      if (record_index == 0)
+        ::Kokkos::atomic_add(&counts(7), std::size_t(1));
 
       if (record_index == 0)
         {
@@ -647,7 +651,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   ::Kokkos::deep_copy(h_counts, counts);
   ::Kokkos::deep_copy(h_first_key, first_key);
 
-  std::array<std::size_t, 7> global_counts = {};
+  std::array<std::size_t, 8> global_counts = {};
   for (auto i : index_range(global_counts))
     global_counts[i] = h_counts(i);
   for (auto & count : global_counts)
@@ -661,6 +665,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                  << " bad_grad=" << global_counts[4]
                  << " zero_qpoints=" << global_counts[5]
                  << " zero_dofs=" << global_counts[6]
+                 << " first_record_hits=" << global_counts[7]
                  << " first_key_family=" << h_first_key(0)
                  << " first_key_elem_type=" << h_first_key(1)
                  << " first_key_order=" << h_first_key(2)
