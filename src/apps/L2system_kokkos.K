@@ -81,6 +81,8 @@ using KokkosGradientView = ::Kokkos::View<Real **>;
 using KokkosUnsignedIntView = ::Kokkos::View<unsigned int *>;
 using KokkosPetscIntView = ::Kokkos::View<PetscInt *>;
 using KokkosSizeView = ::Kokkos::View<std::size_t *>;
+using KokkosFieldKeyRecordView = ::Kokkos::View<FEShapeKey **>;
+using KokkosFieldDofRecordView = ::Kokkos::View<unsigned int **>;
 using KokkosFieldKeyStorage =
   libMesh::Kokkos::detail::StaticArrayAccess<FEShapeKey, kokkos_parsed_fem_max_fields>;
 using KokkosFieldDofStorage =
@@ -95,18 +97,6 @@ struct HilbertElementAssemblyRecord
   unsigned int elem_index = libMesh::invalid_uint;
   unsigned int quadrature_order = 0;
   unsigned int n_dofs = 0;
-};
-
-struct KokkosHilbertAssemblyBucket
-{
-  std::size_t begin = 0;
-  std::size_t end = 0;
-  FEShapeKey key;
-  ElemType elem_type = INVALID_ELEM;
-  ElemMappingType mapping_type = LAGRANGE_MAP;
-  unsigned int n_nodes = 0;
-  unsigned int elem_p_level = 0;
-  unsigned int quadrature_order = 0;
 };
 
 FEShapeKey
@@ -379,8 +369,8 @@ struct KokkosHilbertBatchData
 
 struct KokkosFEMGoalBatchData
 {
-  std::vector<KokkosFieldKeyStorage> bucket_field_keys;
-  std::vector<KokkosFieldDofStorage> bucket_field_dofs;
+  KokkosFieldKeyRecordView field_keys;
+  KokkosFieldDofRecordView field_dofs;
   libMesh::Kokkos::detail::StaticArrayAccess<KokkosLocalIndexView,
                                              kokkos_parsed_fem_max_fields>
     field_local_indices;
@@ -407,7 +397,6 @@ struct PetscIntPairHash
 struct KokkosPetscAssemblyPlan
 {
   std::vector<HilbertElementAssemblyRecord> records;
-  std::vector<KokkosHilbertAssemblyBucket> buckets;
   std::size_t total_rhs_entries = 0;
   std::size_t total_mat_entries = 0;
   KokkosHilbertBatchData batch_data;
@@ -1339,80 +1328,6 @@ build_kokkos_fem_goal_data(const ElemType elem_type,
   return true;
 }
 
-auto
-make_hilbert_bucket_sort_key(const MeshBase::KokkosGeometryCache & geometry_cache,
-                             const FEType & fe_type,
-                             const HilbertElementAssemblyRecord & record)
-{
-  const unsigned int elem_index = record.elem_index;
-  return std::make_tuple(cast_int<int>(geometry_cache.host_element_types[elem_index]),
-                         cast_int<int>(geometry_cache.host_element_mapping_types[elem_index]),
-                         cast_int<int>(fe_type.order.get_order() +
-                                       cast_int<int>(geometry_cache.host_element_p_levels[elem_index])),
-                         record.quadrature_order,
-                         geometry_cache.host_element_n_nodes[elem_index]);
-}
-
-void
-sort_hilbert_element_records(const MeshBase::KokkosGeometryCache & geometry_cache,
-                             const FEType & fe_type,
-                             std::vector<HilbertElementAssemblyRecord> & records)
-{
-  std::sort(records.begin(),
-            records.end(),
-            [&geometry_cache, &fe_type](const auto & lhs, const auto & rhs)
-            {
-              return make_hilbert_bucket_sort_key(geometry_cache, fe_type, lhs) <
-                     make_hilbert_bucket_sort_key(geometry_cache, fe_type, rhs);
-            });
-}
-
-void
-build_hilbert_assembly_buckets(const MeshBase::KokkosGeometryCache & geometry_cache,
-                               const FEType & fe_type,
-                               const std::vector<HilbertElementAssemblyRecord> & records,
-                               std::vector<KokkosHilbertAssemblyBucket> & buckets)
-{
-  buckets.clear();
-  if (records.empty())
-    return;
-
-  auto fill_bucket = [&geometry_cache, &fe_type, &records](KokkosHilbertAssemblyBucket & bucket,
-                                                            const std::size_t begin,
-                                                            const std::size_t end)
-  {
-    bucket.begin = begin;
-    bucket.end = end;
-    const auto & record = records[begin];
-    const unsigned int elem_index = record.elem_index;
-    bucket.key = make_hilbert_shape_key(geometry_cache.host_element_types[elem_index],
-                                        geometry_cache.host_element_p_levels[elem_index],
-                                        fe_type);
-    bucket.elem_type = geometry_cache.host_element_types[elem_index];
-    bucket.mapping_type = geometry_cache.host_element_mapping_types[elem_index];
-    bucket.n_nodes = geometry_cache.host_element_n_nodes[elem_index];
-    bucket.elem_p_level = geometry_cache.host_element_p_levels[elem_index];
-    bucket.quadrature_order = record.quadrature_order;
-  };
-
-  std::size_t bucket_begin = 0;
-  auto current_key = make_hilbert_bucket_sort_key(geometry_cache, fe_type, records.front());
-  for (std::size_t i = 1; i != records.size(); ++i)
-    {
-      const auto next_key = make_hilbert_bucket_sort_key(geometry_cache, fe_type, records[i]);
-      if (next_key == current_key)
-        continue;
-
-      buckets.emplace_back();
-      fill_bucket(buckets.back(), bucket_begin, i);
-      bucket_begin = i;
-      current_key = next_key;
-    }
-
-  buckets.emplace_back();
-  fill_bucket(buckets.back(), bucket_begin, records.size());
-}
-
 void
 build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & records,
                          KokkosHilbertBatchData & batch_data)
@@ -1476,15 +1391,11 @@ build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
   build_hilbert_element_records(sys, records, total_rhs_entries, total_mat_entries);
   if (!build_hilbert_record_quadrature_orders(sys, records))
     return false;
-  sort_hilbert_element_records(geometry_cache, sys.variable_type(0), records);
 
   KokkosHilbertBatchData batch_data;
   build_hilbert_batch_data(records, batch_data);
-  std::vector<KokkosHilbertAssemblyBucket> buckets;
-  build_hilbert_assembly_buckets(geometry_cache, sys.variable_type(0), records, buckets);
 
   plan.records = std::move(records);
-  plan.buckets = std::move(buckets);
   plan.total_rhs_entries = total_rhs_entries;
   plan.total_mat_entries = total_mat_entries;
   plan.batch_data = std::move(batch_data);
@@ -1518,6 +1429,7 @@ build_kokkos_fem_goal_batch_data(::HilbertSystem & sys,
 {
   libmesh_assert(sys.input_system);
   System & input_system = *sys.input_system;
+  const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
   const unsigned int n_fields = goal_function.n_field_variables();
   if (n_fields > kokkos_parsed_fem_max_fields)
     return false;
@@ -1528,8 +1440,12 @@ build_kokkos_fem_goal_batch_data(::HilbertSystem & sys,
 
   batch_data.input_vector = input_vector;
   batch_data.field_local_indices.size = n_fields;
-  batch_data.bucket_field_keys.assign(plan.buckets.size(), KokkosFieldKeyStorage{});
-  batch_data.bucket_field_dofs.assign(plan.buckets.size(), KokkosFieldDofStorage{});
+  batch_data.field_keys =
+    KokkosFieldKeyRecordView("hilbert_fem_goal_field_keys", n_fields, plan.records.size());
+  batch_data.field_dofs =
+    KokkosFieldDofRecordView("hilbert_fem_goal_field_dofs", n_fields, plan.records.size());
+  auto h_field_keys = ::Kokkos::create_mirror_view(batch_data.field_keys);
+  auto h_field_dofs = ::Kokkos::create_mirror_view(batch_data.field_dofs);
 
   for (unsigned int field = 0; field != n_fields; ++field)
     {
@@ -1543,30 +1459,31 @@ build_kokkos_fem_goal_batch_data(::HilbertSystem & sys,
 
       batch_data.field_local_indices.values[field] = local_index_cache->element_local_indices;
 
-      for (auto bucket_index : index_range(plan.buckets))
+      for (auto record_index : index_range(plan.records))
         {
-          const auto & bucket = plan.buckets[bucket_index];
-          const FEShapeKey field_key =
-            make_hilbert_shape_key(bucket.elem_type, bucket.elem_p_level, field_type);
-
-          if (bucket.mapping_type != LAGRANGE_MAP ||
+          const auto & record = plan.records[record_index];
+          const ElemType elem_type = geometry_cache.host_element_types[record.elem_index];
+          const unsigned int elem_p_level = geometry_cache.host_element_p_levels[record.elem_index];
+          const ElemMappingType mapping_type =
+            geometry_cache.host_element_mapping_types[record.elem_index];
+          const FEShapeKey field_key = make_hilbert_shape_key(elem_type, elem_p_level, field_type);
+          if (mapping_type != LAGRANGE_MAP ||
               !supports_shape_with_lagrange_map(field_key) ||
               (sys.hilbert_order() > 0 && !supports_grad_shape(field_key)))
             return false;
 
           const unsigned int field_n_dofs =
-            FEInterface::n_dofs(libMesh::Kokkos::dim_from_topology(bucket.elem_type),
-                                field_type,
-                                bucket.elem_type);
+            FEInterface::n_dofs(libMesh::Kokkos::dim_from_topology(elem_type), field_type, elem_type);
           if (field_n_dofs > kokkos_hilbert_max_dofs)
             return false;
 
-          batch_data.bucket_field_keys[bucket_index].size = n_fields;
-          batch_data.bucket_field_dofs[bucket_index].size = n_fields;
-          batch_data.bucket_field_keys[bucket_index].values[field] = field_key;
-          batch_data.bucket_field_dofs[bucket_index].values[field] = field_n_dofs;
+          h_field_keys(field, record_index) = field_key;
+          h_field_dofs(field, record_index) = field_n_dofs;
         }
     }
+
+  ::Kokkos::deep_copy(batch_data.field_keys, h_field_keys);
+  ::Kokkos::deep_copy(batch_data.field_dofs, h_field_dofs);
 
   return true;
 }
@@ -2000,7 +1917,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                         "PETSc AIJ storage layout.");
 
     {
-      LOG_SCOPE("L2Kokkos::assemble buckets", "HilbertSystem");
+      LOG_SCOPE("L2Kokkos::assemble all records", "HilbertSystem");
 
       const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
       if (analytic_goal)
@@ -2008,30 +1925,25 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
           const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
                                                       plan.analytic_goal_values,
                                                       plan.analytic_goal_gradients);
-          for (const auto & bucket : plan.buckets)
-            {
-              const auto record_range = ::Kokkos::make_pair(bucket.begin, bucket.end);
-              libMesh::Kokkos::detail::run_hilbert_system_bucket_value_batch<
-                kokkos_hilbert_max_dofs>(bucket.key,
-                                         bucket.mapping_type,
-                                         bucket.n_nodes,
-                                         bucket.quadrature_order,
-                                         geometry_cache.node_coordinates,
-                                         geometry_cache.element_node_ids,
-                                         ::Kokkos::subview(plan.batch_data.elem_indices,
-                                                          record_range),
-                                         ::Kokkos::subview(plan.batch_data.elem_n_dofs,
-                                                          record_range),
-                                         ::Kokkos::subview(plan.batch_data.rhs_offsets,
-                                                          record_range),
-                                         ::Kokkos::subview(plan.batch_data.mat_offsets,
-                                                          record_range),
-                                         sys.hilbert_order(),
-                                         goal_access,
-                                         plan.rhs_entry_values,
-                                         plan.mat_entry_values,
-                                         "hilbert_bucket_values");
-            }
+          libMesh::Kokkos::detail::run_hilbert_system_value_batch<kokkos_hilbert_max_dofs>(
+            sys.variable_type(0).family,
+            sys.variable_type(0).order,
+            geometry_cache.node_coordinates,
+            geometry_cache.element_node_ids,
+            geometry_cache.element_types,
+            geometry_cache.element_mapping_types,
+            geometry_cache.element_n_nodes,
+            geometry_cache.element_p_levels,
+            plan.batch_data.elem_indices,
+            plan.batch_data.elem_n_dofs,
+            plan.batch_data.quadrature_orders,
+            plan.batch_data.rhs_offsets,
+            plan.batch_data.mat_offsets,
+            sys.hilbert_order(),
+            goal_access,
+            plan.rhs_entry_values,
+            plan.mat_entry_values,
+            "hilbert_all_record_values");
         }
       else
         {
@@ -2040,38 +1952,30 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
 
           auto input_guard = plan.fem_goal_batch_data.input_vector->make_kokkos_read_view_guard();
           const auto timed_goal = fem_goal->with_time(sys.time);
-          for (const auto bucket_index : index_range(plan.buckets))
-            {
-              const auto & bucket = plan.buckets[bucket_index];
-              const auto record_range = ::Kokkos::make_pair(bucket.begin, bucket.end);
-              libMesh::Kokkos::detail::run_hilbert_system_fem_bucket_value_batch<
-                kokkos_hilbert_max_dofs,
-                kokkos_parsed_fem_max_fields>(bucket.key,
-                                              bucket.mapping_type,
-                                              bucket.n_nodes,
-                                              bucket.quadrature_order,
-                                              geometry_cache.node_coordinates,
-                                              geometry_cache.element_node_ids,
-                                              ::Kokkos::subview(plan.batch_data.elem_indices,
-                                                               record_range),
-                                              ::Kokkos::subview(plan.batch_data.elem_n_dofs,
-                                                               record_range),
-                                              ::Kokkos::subview(plan.batch_data.rhs_offsets,
-                                                               record_range),
-                                              ::Kokkos::subview(plan.batch_data.mat_offsets,
-                                                               record_range),
-                                              plan.fem_goal_batch_data
-                                                .bucket_field_keys[bucket_index],
-                                              plan.fem_goal_batch_data
-                                                .bucket_field_dofs[bucket_index],
-                                              plan.fem_goal_batch_data.field_local_indices,
-                                              input_guard.view(),
-                                              timed_goal,
-                                              sys.hilbert_order(),
-                                              plan.rhs_entry_values,
-                                              plan.mat_entry_values,
-                                              "hilbert_fem_bucket_values");
-            }
+          libMesh::Kokkos::detail::run_hilbert_system_fem_value_batch<
+            kokkos_hilbert_max_dofs,
+            kokkos_parsed_fem_max_fields>(sys.variable_type(0).family,
+                                          sys.variable_type(0).order,
+                                          geometry_cache.node_coordinates,
+                                          geometry_cache.element_node_ids,
+                                          geometry_cache.element_types,
+                                          geometry_cache.element_mapping_types,
+                                          geometry_cache.element_n_nodes,
+                                          geometry_cache.element_p_levels,
+                                          plan.batch_data.elem_indices,
+                                          plan.batch_data.elem_n_dofs,
+                                          plan.batch_data.quadrature_orders,
+                                          plan.batch_data.rhs_offsets,
+                                          plan.batch_data.mat_offsets,
+                                          plan.fem_goal_batch_data.field_keys,
+                                          plan.fem_goal_batch_data.field_dofs,
+                                          plan.fem_goal_batch_data.field_local_indices,
+                                          input_guard.view(),
+                                          timed_goal,
+                                          sys.hilbert_order(),
+                                          plan.rhs_entry_values,
+                                          plan.mat_entry_values,
+                                          "hilbert_fem_all_record_values");
         }
 
       {
