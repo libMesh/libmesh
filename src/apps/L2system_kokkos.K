@@ -47,7 +47,6 @@
 #include <tuple>
 #include <type_traits>
 #include <unordered_map>
-#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -424,7 +423,6 @@ struct KokkosPetscAssemblyPlan
   KokkosSizeView mat_value_slots;
   KokkosScalarView<Number> rhs_entry_values;
   KokkosScalarView<Number> mat_entry_values;
-  std::vector<KokkosUnsignedIntView> hilbert_record_colors;
   ::Kokkos::View<Number *> rhs_remote_values;
   ::Kokkos::View<Number *> mat_remote_values;
   ::Kokkos::View<Number *> rhs_remote_root_values;
@@ -1464,65 +1462,6 @@ build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & recor
   ::Kokkos::fence();
 }
 
-void
-build_hilbert_record_coloring(const std::vector<HilbertElementAssemblyRecord> & records,
-                              const DofMap::KokkosDofIndexCache & dof_index_cache,
-                              std::vector<KokkosUnsignedIntView> & record_colors)
-{
-  std::vector<std::vector<unsigned int>> color_records;
-  std::vector<std::unordered_set<dof_id_type>> color_dofs;
-  std::vector<dof_id_type> elem_dofs;
-
-  for (auto record_index : index_range(records))
-    {
-      const auto & record = records[record_index];
-      elem_dofs.clear();
-      elem_dofs.reserve(record.n_dofs);
-
-      const auto * dofs =
-        &dof_index_cache.host_element_dof_indices[record.elem_index * dof_index_cache.max_dofs];
-      for (unsigned int i = 0; i != record.n_dofs; ++i)
-        elem_dofs.push_back(dofs[i]);
-
-      std::size_t color = 0;
-      for (; color != color_dofs.size(); ++color)
-        {
-          bool overlaps = false;
-          for (const auto elem_dof : elem_dofs)
-            if (color_dofs[color].count(elem_dof))
-              {
-                overlaps = true;
-                break;
-              }
-
-          if (!overlaps)
-            break;
-        }
-
-      if (color == color_dofs.size())
-        {
-          color_records.emplace_back();
-          color_dofs.emplace_back();
-        }
-
-      color_records[color].push_back(cast_int<unsigned int>(record_index));
-      color_dofs[color].insert(elem_dofs.begin(), elem_dofs.end());
-    }
-
-  record_colors.clear();
-  record_colors.reserve(color_records.size());
-  for (auto color : index_range(color_records))
-    {
-      KokkosUnsignedIntView record_indices("hilbert_color_record_indices",
-                                           color_records[color].size());
-      auto h_record_indices = ::Kokkos::create_mirror_view(record_indices);
-      for (auto i : index_range(color_records[color]))
-        h_record_indices(i) = color_records[color][i];
-      ::Kokkos::deep_copy(record_indices, h_record_indices);
-      record_colors.push_back(record_indices);
-    }
-}
-
 bool
 kokkos_petsc_plan_matches(const ::HilbertSystem & sys,
                           const MeshBase::KokkosGeometryCache & geometry_cache,
@@ -1555,8 +1494,6 @@ build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
 
   KokkosHilbertBatchData batch_data;
   build_hilbert_batch_data(records, sys.variable_type(0), geometry_cache, batch_data);
-  std::vector<KokkosUnsignedIntView> record_colors;
-  build_hilbert_record_coloring(records, *dof_index_cache, record_colors);
 
   plan.records = std::move(records);
   plan.total_rhs_entries = total_rhs_entries;
@@ -1564,7 +1501,6 @@ build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
   plan.batch_data = batch_data;
   plan.rhs_entry_values = {};
   plan.mat_entry_values = {};
-  plan.hilbert_record_colors = std::move(record_colors);
   plan.rhs_local_slots = KokkosSizeView();
   plan.mat_value_slots = KokkosSizeView();
   plan.geometry_cache_id = &geometry_cache;
@@ -1979,8 +1915,6 @@ bool
 assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                     KokkosPetscAssemblyPlan & plan,
                                     const bool analytic_goal,
-                                    const libMesh::Kokkos::KokkosParsedFunction<Number> *
-                                      analytic_goal_func,
                                     const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal,
                                     PetscMatrixBase<Number> & system_matrix,
                                     PetscVector<Number> & system_rhs,
@@ -2089,56 +2023,46 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
       bool assembled_direct_scatter = false;
       if (analytic_goal)
         {
+          const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
+                                                      plan.analytic_goal_values,
+                                                      plan.analytic_goal_gradients);
           KokkosHilbertHomogeneousBucket bucket;
-          if (analytic_goal_func &&
-              get_single_supported_hilbert_bucket(plan, geometry_cache, bucket))
+          if (get_single_supported_hilbert_bucket(plan, geometry_cache, bucket))
             {
-              auto timed_goal = analytic_goal_func->with_time(sys.time);
-              auto goal_grad = timed_goal.gradient_function();
-              const auto goal_access =
-                libMesh::Kokkos::detail::make_hilbert_analytic_goal_access(std::move(timed_goal),
-                                                                           std::move(goal_grad));
-
-              const libMesh::Kokkos::detail::SplitNonAtomicScatterAccess<KokkosVectorWriteView,
-                                                                         KokkosVectorWriteView>
+              const libMesh::Kokkos::detail::SplitScatterAccess<KokkosVectorWriteView,
+                                                                KokkosVectorWriteView>
                 rhs_scatter{local_rhs_values, remote_rhs_values, plan.rhs_local_size};
-              const libMesh::Kokkos::detail::SplitMatrixNonAtomicScatterAccess<
-                KokkosMatrixWriteView,
-                KokkosMatrixWriteView,
-                KokkosMatrixWriteView>
+              const libMesh::Kokkos::detail::SplitMatrixScatterAccess<KokkosMatrixWriteView,
+                                                                      KokkosMatrixWriteView,
+                                                                      KokkosMatrixWriteView>
                 mat_scatter{diag_matrix_values,
                             offdiag_matrix_values,
                             remote_matrix_values,
                             plan.mat_diag_size,
                             plan.mat_diag_size + plan.mat_offdiag_size};
 
-              for (const auto & record_indices : plan.hilbert_record_colors)
-                libMesh::Kokkos::detail::run_hilbert_system_colored_bucket_scatter_batch<
-                  kokkos_hilbert_max_dofs>(bucket.key,
-                                            bucket.mapping_type,
-                                            bucket.n_nodes,
-                                            bucket.quadrature_order,
-                                            geometry_cache.node_coordinates_dual.view_device(),
-                                            geometry_cache.element_node_ids_dual.view_device(),
-                                            record_indices,
-                                            plan.batch_data.elem_indices,
-                                            plan.batch_data.elem_n_dofs,
-                                            plan.batch_data.rhs_offsets,
-                                            plan.batch_data.mat_offsets,
-                                            plan.rhs_local_slots,
-                                            plan.mat_value_slots,
-                                            sys.hilbert_order(),
-                                            goal_access,
-                                            rhs_scatter,
-                                            mat_scatter,
-                                            "hilbert_colored_direct_bucket_scatter");
+              libMesh::Kokkos::detail::run_hilbert_system_bucket_scatter_batch<
+                kokkos_hilbert_max_dofs>(bucket.key,
+                                          bucket.mapping_type,
+                                          bucket.n_nodes,
+                                          bucket.quadrature_order,
+                                          geometry_cache.node_coordinates_dual.view_device(),
+                                          geometry_cache.element_node_ids_dual.view_device(),
+                                          plan.batch_data.elem_indices,
+                                          plan.batch_data.elem_n_dofs,
+                                          plan.batch_data.rhs_offsets,
+                                          plan.batch_data.mat_offsets,
+                                          plan.rhs_local_slots,
+                                          plan.mat_value_slots,
+                                          sys.hilbert_order(),
+                                          goal_access,
+                                          rhs_scatter,
+                                          mat_scatter,
+                                          "hilbert_direct_bucket_scatter");
               assembled_direct_scatter = true;
             }
           else
             {
-              const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
-                                                          plan.analytic_goal_values,
-                                                          plan.analytic_goal_gradients);
               ensure_kokkos_entry_value_storage(plan);
               libMesh::Kokkos::detail::run_hilbert_system_value_batch<kokkos_hilbert_max_dofs>(
                 geometry_cache.node_coordinates_dual.view_device(),
@@ -2589,25 +2513,15 @@ HilbertSystem::try_kokkos_petsc_solve()
   libmesh_error_msg_if(!plan,
                        "HilbertSystem Kokkos direct PETSc storage could not build a supported "
                        "assembly plan for the current FE/mapping/quadrature configuration.");
-  const auto * analytic_kokkos_goal = analytic_goal ? this->ensure_kokkos_goal_func() : nullptr;
   if (analytic_goal)
     {
-      KokkosHilbertHomogeneousBucket bucket;
-      const bool uses_device_goal =
-        analytic_kokkos_goal &&
-        get_single_supported_hilbert_bucket(*plan,
-                                            this->get_mesh().get_kokkos_geometry_cache(),
-                                            bucket);
-      if (!uses_device_goal)
-        {
-          LOG_SCOPE("L2Kokkos::prepare analytic goal samples", "HilbertSystem");
-          if (!ensure_kokkos_sampled_analytic_goal_data(*this,
-                                                        *_analytic_goal_func,
-                                                        _analytic_goal_grad.get(),
-                                                        *plan))
-            libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage could not sample the "
-                              "analytic goal on the host for device assembly.");
-        }
+      LOG_SCOPE("L2Kokkos::prepare analytic goal samples", "HilbertSystem");
+      if (!ensure_kokkos_sampled_analytic_goal_data(*this,
+                                                    *_analytic_goal_func,
+                                                    _analytic_goal_grad.get(),
+                                                    *plan))
+        libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage could not sample the analytic "
+                          "goal on the host for device assembly.");
     }
   const auto plan_stop = clock::now();
   this->_last_kokkos_timing.plan_seconds =
@@ -2622,7 +2536,6 @@ HilbertSystem::try_kokkos_petsc_solve()
     if (!assemble_kokkos_petsc_global_system(*this,
                                              *plan,
                                              analytic_goal,
-                                             analytic_kokkos_goal,
                                              fem_goal,
                                              *petsc_matrix,
                                              *petsc_rhs,

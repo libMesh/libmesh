@@ -192,21 +192,6 @@ struct DirectScatterAccess
   }
 };
 
-template <typename View>
-struct DirectNonAtomicScatterAccess
-{
-  using execution_space = typename std::decay_t<View>::execution_space;
-
-  View values;
-
-  LIBMESH_DEVICE_INLINE
-  void add(const std::size_t slot,
-           const Number value) const
-  {
-    values(slot) += value;
-  }
-};
-
 template <typename LocalView, typename RemoteView>
 struct SplitScatterAccess
 {
@@ -224,26 +209,6 @@ struct SplitScatterAccess
       ::Kokkos::atomic_add(&local_values(slot), value);
     else
       ::Kokkos::atomic_add(&remote_values(slot - local_size), value);
-  }
-};
-
-template <typename LocalView, typename RemoteView>
-struct SplitNonAtomicScatterAccess
-{
-  using execution_space = typename std::decay_t<LocalView>::execution_space;
-
-  LocalView local_values;
-  RemoteView remote_values;
-  std::size_t local_size = 0;
-
-  LIBMESH_DEVICE_INLINE
-  void add(const std::size_t slot,
-           const Number value) const
-  {
-    if (slot < local_size)
-      local_values(slot) += value;
-    else
-      remote_values(slot - local_size) += value;
   }
 };
 
@@ -268,30 +233,6 @@ struct SplitMatrixScatterAccess
       ::Kokkos::atomic_add(&offdiag_values(slot - diag_size), value);
     else
       ::Kokkos::atomic_add(&remote_values(slot - offdiag_base), value);
-  }
-};
-
-template <typename DiagView, typename OffdiagView, typename RemoteView>
-struct SplitMatrixNonAtomicScatterAccess
-{
-  using execution_space = typename std::decay_t<DiagView>::execution_space;
-
-  DiagView diag_values;
-  OffdiagView offdiag_values;
-  RemoteView remote_values;
-  std::size_t diag_size = 0;
-  std::size_t offdiag_base = 0;
-
-  LIBMESH_DEVICE_INLINE
-  void add(const std::size_t slot,
-           const Number value) const
-  {
-    if (slot < diag_size)
-      diag_values(slot) += value;
-    else if (slot < offdiag_base)
-      offdiag_values(slot - diag_size) += value;
-    else
-      remote_values(slot - offdiag_base) += value;
   }
 };
 
@@ -616,67 +557,6 @@ run_hilbert_system_bucket_scatter_batch(const libMesh::FEShapeKey key,
     ::Kokkos::RangePolicy<ExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index) {
       const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
-      const unsigned int elem_index = elem_indices(record_index);
-      const unsigned int n_dofs = elem_n_dofs(record_index);
-
-      const auto elem_nodes =
-        make_element_node_access(node_coordinates, element_node_ids, elem_index);
-      const libMesh::Kokkos::detail::HilbertFEAccess<decltype(elem_nodes)> fe(
-        key, mapping_type, elem_nodes, n_nodes, quadrature_order, elem_index);
-
-      const auto solution =
-        libMesh::Kokkos::detail::make_hilbert_solution_access(fe, ZeroCoeffAccess{}, Number(1.));
-      const auto rhs_offset = rhs_offsets(record_index);
-      const auto mat_offset = mat_offsets(record_index);
-      DirectHilbertScatterAccumulator<ResidualScatterAccess,
-                                      JacobianScatterAccess,
-                                      SlotStorage> accum{
-        rhs_scatter, mat_scatter, rhs_slots, mat_slots, rhs_offset, mat_offset, n_dofs};
-      libMesh::detail::assemble_hilbert_element(
-        fe, solution, goal_access, true, hilbert_order, n_dofs, accum);
-    });
-}
-
-template <unsigned int MaxDofs,
-          typename NodeCoordinateStorage,
-          typename ElemNodeIdStorage,
-          typename RecordIndexStorage,
-          typename ElemIndexStorage,
-          typename ElemDofCountStorage,
-          typename OffsetStorage,
-          typename SlotStorage,
-          typename GoalAccess,
-          typename ResidualScatterAccess,
-          typename JacobianScatterAccess>
-void
-run_hilbert_system_colored_bucket_scatter_batch(const libMesh::FEShapeKey key,
-                                                const libMesh::ElemMappingType mapping_type,
-                                                const unsigned int n_nodes,
-                                                const unsigned int quadrature_order,
-                                                const NodeCoordinateStorage & node_coordinates,
-                                                const ElemNodeIdStorage & element_node_ids,
-                                                const RecordIndexStorage & record_indices,
-                                                const ElemIndexStorage & elem_indices,
-                                                const ElemDofCountStorage & elem_n_dofs,
-                                                const OffsetStorage & rhs_offsets,
-                                                const OffsetStorage & mat_offsets,
-                                                const SlotStorage & rhs_slots,
-                                                const SlotStorage & mat_slots,
-                                                const unsigned int hilbert_order,
-                                                GoalAccess goal_access,
-                                                ResidualScatterAccess rhs_scatter,
-                                                JacobianScatterAccess mat_scatter,
-                                                const char * const kernel_name)
-{
-  const auto n_color_records = record_indices.extent(0);
-  using ExecutionSpace = typename std::decay_t<ResidualScatterAccess>::execution_space;
-
-  ::Kokkos::parallel_for(
-    kernel_name,
-    ::Kokkos::RangePolicy<ExecutionSpace>(0, cast_int<int>(n_color_records)),
-    KOKKOS_LAMBDA(const int raw_color_index) {
-      const unsigned int color_index = static_cast<unsigned int>(raw_color_index);
-      const unsigned int record_index = record_indices(color_index);
       const unsigned int elem_index = elem_indices(record_index);
       const unsigned int n_dofs = elem_n_dofs(record_index);
 
