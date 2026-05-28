@@ -580,11 +580,6 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                              const KokkosPetscAssemblyPlan & plan,
                              const MeshBase::KokkosGeometryCache & geometry_cache)
 {
-  KokkosPetscIntView counts("hilbert_debug_device_key_counts", 8);
-  KokkosPetscIntView first_key("hilbert_debug_first_device_key", 8);
-  ::Kokkos::deep_copy(counts, PetscInt(0));
-  ::Kokkos::deep_copy(first_key, PetscInt(-1));
-
   const auto n_records = plan.batch_data.elem_indices.extent(0);
   const auto elem_indices = plan.batch_data.elem_indices;
   const auto elem_n_dofs = plan.batch_data.elem_n_dofs;
@@ -594,67 +589,153 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   const auto element_n_nodes = geometry_cache.element_n_nodes;
   const auto element_p_levels = geometry_cache.element_p_levels;
 
-  ::Kokkos::parallel_for(
-    "hilbert_debug_device_keys",
+  PetscInt local_total = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_device_key_total",
     ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index)
+    KOKKOS_LAMBDA(const int, PetscInt & count)
+    {
+      count += 1;
+    },
+    local_total);
+
+  PetscInt local_supported = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_device_key_supported",
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
     {
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const auto mapping_type = element_mapping_types(elem_index);
-      const unsigned int p_level = element_p_levels(elem_index);
       const unsigned int quadrature_order = quadrature_orders(record_index);
       const libMesh::FEShapeKey key = shape_keys(record_index);
-      const bool lagrange_map = mapping_type == libMesh::LAGRANGE_MAP;
-      const bool shape_ok = libMesh::supports_shape_with_lagrange_map(key);
-      const bool grad_ok = libMesh::supports_grad_shape(key);
-      const unsigned int n_qpoints =
-        libMesh::Kokkos::GaussQuadrature::n_points(key.elem_type, quadrature_order);
-      const bool supported =
-        libMesh::Kokkos::detail::supports_hilbert_local_assembly(key,
-                                                                 mapping_type,
-                                                                 quadrature_order);
+      if (libMesh::Kokkos::detail::supports_hilbert_local_assembly(key,
+                                                                   mapping_type,
+                                                                   quadrature_order))
+        count += 1;
+    },
+    local_supported);
 
-      ::Kokkos::atomic_add(&counts(0), PetscInt(1));
-      if (supported)
-        ::Kokkos::atomic_add(&counts(1), PetscInt(1));
-      if (!lagrange_map)
-        ::Kokkos::atomic_add(&counts(2), PetscInt(1));
-      if (!shape_ok)
-        ::Kokkos::atomic_add(&counts(3), PetscInt(1));
-      if (!grad_ok)
-        ::Kokkos::atomic_add(&counts(4), PetscInt(1));
-      if (!n_qpoints)
-        ::Kokkos::atomic_add(&counts(5), PetscInt(1));
+  PetscInt local_bad_mapping = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_device_key_bad_mapping",
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
+    {
+      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int elem_index = elem_indices(record_index);
+      if (element_mapping_types(elem_index) != libMesh::LAGRANGE_MAP)
+        count += 1;
+    },
+    local_bad_mapping);
+
+  PetscInt local_bad_shape = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_device_key_bad_shape",
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
+    {
+      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const libMesh::FEShapeKey key = shape_keys(record_index);
+      if (!libMesh::supports_shape_with_lagrange_map(key))
+        count += 1;
+    },
+    local_bad_shape);
+
+  PetscInt local_bad_grad = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_device_key_bad_grad",
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
+    {
+      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const libMesh::FEShapeKey key = shape_keys(record_index);
+      if (!libMesh::supports_grad_shape(key))
+        count += 1;
+    },
+    local_bad_grad);
+
+  PetscInt local_zero_qpoints = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_device_key_zero_qpoints",
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
+    {
+      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const libMesh::FEShapeKey key = shape_keys(record_index);
+      if (!libMesh::Kokkos::GaussQuadrature::n_points(key.elem_type,
+                                                      quadrature_orders(record_index)))
+        count += 1;
+    },
+    local_zero_qpoints);
+
+  PetscInt local_zero_dofs = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_device_key_zero_dofs",
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
+    {
+      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
       if (!elem_n_dofs(record_index))
-        ::Kokkos::atomic_add(&counts(6), PetscInt(1));
-      if (record_index == 0)
-        ::Kokkos::atomic_add(&counts(7), PetscInt(1));
+        count += 1;
+    },
+    local_zero_dofs);
 
-      if (record_index == 0)
-        {
-          first_key(0) = cast_int<PetscInt>(key.family);
-          first_key(1) = cast_int<PetscInt>(key.elem_type);
-          first_key(2) = cast_int<PetscInt>(key.order);
-          first_key(3) = cast_int<PetscInt>(mapping_type);
-          first_key(4) = cast_int<PetscInt>(p_level);
-          first_key(5) = cast_int<PetscInt>(quadrature_order);
-          first_key(6) = cast_int<PetscInt>(n_qpoints);
-          first_key(7) = cast_int<PetscInt>(element_n_nodes(elem_index));
-        }
-    });
+  PetscInt local_first_record_hits = 0;
+  ::Kokkos::parallel_reduce(
+    "hilbert_debug_device_key_first_record",
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
+    {
+      if (raw_record_index == 0)
+        count += 1;
+    },
+    local_first_record_hits);
   ::Kokkos::fence();
 
-  auto h_counts = ::Kokkos::create_mirror_view(counts);
-  auto h_first_key = ::Kokkos::create_mirror_view(first_key);
-  ::Kokkos::deep_copy(h_counts, counts);
-  ::Kokkos::deep_copy(h_first_key, first_key);
+  FEShapeKey first_shape_key{INVALID_FE, INVALID_ELEM, INVALID_ORDER};
+  if (n_records)
+    {
+      auto h_shape_keys = ::Kokkos::create_mirror_view(plan.batch_data.shape_keys);
+      ::Kokkos::deep_copy(h_shape_keys, plan.batch_data.shape_keys);
+      first_shape_key = h_shape_keys(0);
+    }
 
-  std::array<PetscInt, 8> global_counts = {};
-  for (auto i : index_range(global_counts))
-    global_counts[i] = h_counts(i);
+  std::array<PetscInt, 8> global_counts = {local_total,
+                                           local_supported,
+                                           local_bad_mapping,
+                                           local_bad_shape,
+                                           local_bad_grad,
+                                           local_zero_qpoints,
+                                           local_zero_dofs,
+                                           local_first_record_hits};
   for (auto & count : global_counts)
     sys.comm().sum(count);
+
+  const PetscInt first_record_elem_index =
+    plan.records.empty() ? PetscInt(-1) : cast_int<PetscInt>(plan.records.front().elem_index);
+  const PetscInt first_record_mapping =
+    plan.records.empty()
+      ? PetscInt(-1)
+      : cast_int<PetscInt>(
+          geometry_cache.host_element_mapping_types[plan.records.front().elem_index]);
+  const PetscInt first_record_p_level =
+    plan.records.empty()
+      ? PetscInt(-1)
+      : cast_int<PetscInt>(geometry_cache.host_element_p_levels[plan.records.front().elem_index]);
+  const PetscInt first_record_quadrature =
+    plan.records.empty() ? PetscInt(-1) : cast_int<PetscInt>(plan.records.front().quadrature_order);
+  const PetscInt first_record_n_qpoints =
+    plan.records.empty()
+      ? PetscInt(-1)
+      : cast_int<PetscInt>(
+          libMesh::Kokkos::GaussQuadrature::n_points(first_shape_key.elem_type,
+                                                     plan.records.front().quadrature_order));
+  const PetscInt first_record_n_nodes =
+    plan.records.empty()
+      ? PetscInt(-1)
+      : cast_int<PetscInt>(geometry_cache.host_element_n_nodes[plan.records.front().elem_index]);
 
   if (sys.comm().rank() == 0)
     libMesh::out << "L2Kokkos debug: device_key total=" << global_counts[0]
@@ -665,14 +746,15 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                  << " zero_qpoints=" << global_counts[5]
                  << " zero_dofs=" << global_counts[6]
                  << " first_record_hits=" << global_counts[7]
-                 << " first_key_family=" << h_first_key(0)
-                 << " first_key_elem_type=" << h_first_key(1)
-                 << " first_key_order=" << h_first_key(2)
-                 << " first_mapping_type=" << h_first_key(3)
-                 << " first_p_level=" << h_first_key(4)
-                 << " first_quadrature_order=" << h_first_key(5)
-                 << " first_n_qpoints=" << h_first_key(6)
-                 << " first_n_nodes=" << h_first_key(7)
+                 << " first_key_family=" << cast_int<PetscInt>(first_shape_key.family)
+                 << " first_key_elem_type=" << cast_int<PetscInt>(first_shape_key.elem_type)
+                 << " first_key_order=" << cast_int<PetscInt>(first_shape_key.order)
+                 << " first_mapping_type=" << first_record_mapping
+                 << " first_p_level=" << first_record_p_level
+                 << " first_quadrature_order=" << first_record_quadrature
+                 << " first_n_qpoints=" << first_record_n_qpoints
+                 << " first_n_nodes=" << first_record_n_nodes
+                 << " first_elem_index=" << first_record_elem_index
                  << std::endl;
 }
 
