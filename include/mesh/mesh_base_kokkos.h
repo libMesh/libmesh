@@ -24,12 +24,23 @@
 
 #include "libmesh/kokkos_storage_policy.h"
 
+#include <Kokkos_DualView.hpp>
+
 namespace libMesh
 {
 
 struct MeshBase::KokkosGeometryCache
 {
   using memory_space = typename ::Kokkos::DefaultExecutionSpace::memory_space;
+  using node_id_dual_view = ::Kokkos::DualView<dof_id_type *, memory_space>;
+  using elem_id_dual_view = ::Kokkos::DualView<dof_id_type *, memory_space>;
+  using node_coord_dual_view = ::Kokkos::DualView<Real **, memory_space>;
+  using elem_node_id_dual_view = ::Kokkos::DualView<unsigned int **, memory_space>;
+  using elem_type_dual_view = ::Kokkos::DualView<ElemType *, memory_space>;
+  using elem_mapping_type_dual_view = ::Kokkos::DualView<ElemMappingType *, memory_space>;
+  using elem_n_nodes_dual_view = ::Kokkos::DualView<unsigned int *, memory_space>;
+  using elem_p_level_dual_view = ::Kokkos::DualView<unsigned int *, memory_space>;
+  using elem_subdomain_dual_view = ::Kokkos::DualView<subdomain_id_type *, memory_space>;
   using node_id_view = ::Kokkos::View<dof_id_type *, memory_space>;
   using elem_id_view = ::Kokkos::View<dof_id_type *, memory_space>;
   using node_coord_view = ::Kokkos::View<Real **, memory_space>;
@@ -40,6 +51,15 @@ struct MeshBase::KokkosGeometryCache
   using elem_p_level_view = ::Kokkos::View<unsigned int *, memory_space>;
   using elem_subdomain_view = ::Kokkos::View<subdomain_id_type *, memory_space>;
 
+  node_id_dual_view node_ids_dual;
+  elem_id_dual_view element_ids_dual;
+  node_coord_dual_view node_coordinates_dual;
+  elem_node_id_dual_view element_node_ids_dual;
+  elem_type_dual_view element_types_dual;
+  elem_mapping_type_dual_view element_mapping_types_dual;
+  elem_n_nodes_dual_view element_n_nodes_dual;
+  elem_p_level_dual_view element_p_levels_dual;
+  elem_subdomain_dual_view element_subdomains_dual;
   node_id_view node_ids;
   elem_id_view element_ids;
   node_coord_view node_coordinates;

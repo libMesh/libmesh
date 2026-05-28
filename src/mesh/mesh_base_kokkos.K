@@ -57,47 +57,43 @@ MeshBase::get_kokkos_geometry_cache() const
         }
     }
 
-  cache->node_ids =
-    KokkosGeometryCache::node_id_view("mesh_kokkos_node_ids", cache->host_node_ids.size());
-  cache->element_ids =
-    KokkosGeometryCache::elem_id_view("mesh_kokkos_element_ids", cache->host_element_ids.size());
-  cache->node_coordinates =
-    KokkosGeometryCache::node_coord_view("mesh_kokkos_node_coordinates",
-                                         cache->host_node_ids.size(),
-                                         LIBMESH_DIM);
-  cache->element_node_ids =
-    KokkosGeometryCache::elem_node_id_view("mesh_kokkos_element_node_ids",
-                                           cache->host_element_ids.size(),
-                                           cache->max_nodes);
-  cache->element_types =
-    KokkosGeometryCache::elem_type_view("mesh_kokkos_element_types", cache->host_element_ids.size());
-  cache->element_mapping_types =
-    KokkosGeometryCache::elem_mapping_type_view("mesh_kokkos_element_mapping_types",
-                                                cache->host_element_ids.size());
-  cache->element_n_nodes =
-    KokkosGeometryCache::elem_n_nodes_view("mesh_kokkos_element_n_nodes", cache->host_element_ids.size());
-  cache->element_p_levels =
-    KokkosGeometryCache::elem_p_level_view("mesh_kokkos_element_p_levels", cache->host_element_ids.size());
-  cache->element_subdomains =
-    KokkosGeometryCache::elem_subdomain_view("mesh_kokkos_element_subdomains",
+  cache->node_ids_dual =
+    KokkosGeometryCache::node_id_dual_view("mesh_kokkos_node_ids", cache->host_node_ids.size());
+  cache->element_ids_dual =
+    KokkosGeometryCache::elem_id_dual_view("mesh_kokkos_element_ids", cache->host_element_ids.size());
+  cache->node_coordinates_dual =
+    KokkosGeometryCache::node_coord_dual_view("mesh_kokkos_node_coordinates",
+                                              cache->host_node_ids.size(),
+                                              LIBMESH_DIM);
+  cache->element_node_ids_dual =
+    KokkosGeometryCache::elem_node_id_dual_view("mesh_kokkos_element_node_ids",
+                                                cache->host_element_ids.size(),
+                                                cache->max_nodes);
+  cache->element_types_dual =
+    KokkosGeometryCache::elem_type_dual_view("mesh_kokkos_element_types",
                                              cache->host_element_ids.size());
+  cache->element_mapping_types_dual =
+    KokkosGeometryCache::elem_mapping_type_dual_view("mesh_kokkos_element_mapping_types",
+                                                     cache->host_element_ids.size());
+  cache->element_n_nodes_dual =
+    KokkosGeometryCache::elem_n_nodes_dual_view("mesh_kokkos_element_n_nodes",
+                                                cache->host_element_ids.size());
+  cache->element_p_levels_dual =
+    KokkosGeometryCache::elem_p_level_dual_view("mesh_kokkos_element_p_levels",
+                                                cache->host_element_ids.size());
+  cache->element_subdomains_dual =
+    KokkosGeometryCache::elem_subdomain_dual_view("mesh_kokkos_element_subdomains",
+                                                  cache->host_element_ids.size());
 
-  auto h_node_ids = ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->node_ids);
-  auto h_element_ids = ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_ids);
-  auto h_node_coordinates =
-    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->node_coordinates);
-  auto h_element_node_ids =
-    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_node_ids);
-  auto h_element_types =
-    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_types);
-  auto h_element_mapping_types =
-    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_mapping_types);
-  auto h_element_n_nodes =
-    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_n_nodes);
-  auto h_element_p_levels =
-    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_p_levels);
-  auto h_element_subdomains =
-    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_subdomains);
+  auto h_node_ids = cache->node_ids_dual.h_view;
+  auto h_element_ids = cache->element_ids_dual.h_view;
+  auto h_node_coordinates = cache->node_coordinates_dual.h_view;
+  auto h_element_node_ids = cache->element_node_ids_dual.h_view;
+  auto h_element_types = cache->element_types_dual.h_view;
+  auto h_element_mapping_types = cache->element_mapping_types_dual.h_view;
+  auto h_element_n_nodes = cache->element_n_nodes_dual.h_view;
+  auto h_element_p_levels = cache->element_p_levels_dual.h_view;
+  auto h_element_subdomains = cache->element_subdomains_dual.h_view;
   cache->host_element_types.resize(cache->host_element_ids.size());
   cache->host_element_mapping_types.resize(cache->host_element_ids.size());
   cache->host_element_n_nodes.resize(cache->host_element_ids.size());
@@ -134,15 +130,35 @@ MeshBase::get_kokkos_geometry_cache() const
           libmesh_map_find(cache->node_lookup, elem.node_id(n));
     }
 
-  ::Kokkos::deep_copy(cache->node_ids, h_node_ids);
-  ::Kokkos::deep_copy(cache->element_ids, h_element_ids);
-  ::Kokkos::deep_copy(cache->node_coordinates, h_node_coordinates);
-  ::Kokkos::deep_copy(cache->element_node_ids, h_element_node_ids);
-  ::Kokkos::deep_copy(cache->element_types, h_element_types);
-  ::Kokkos::deep_copy(cache->element_mapping_types, h_element_mapping_types);
-  ::Kokkos::deep_copy(cache->element_n_nodes, h_element_n_nodes);
-  ::Kokkos::deep_copy(cache->element_p_levels, h_element_p_levels);
-  ::Kokkos::deep_copy(cache->element_subdomains, h_element_subdomains);
+  cache->node_ids_dual.modify_host();
+  cache->element_ids_dual.modify_host();
+  cache->node_coordinates_dual.modify_host();
+  cache->element_node_ids_dual.modify_host();
+  cache->element_types_dual.modify_host();
+  cache->element_mapping_types_dual.modify_host();
+  cache->element_n_nodes_dual.modify_host();
+  cache->element_p_levels_dual.modify_host();
+  cache->element_subdomains_dual.modify_host();
+
+  cache->node_ids_dual.sync_device();
+  cache->element_ids_dual.sync_device();
+  cache->node_coordinates_dual.sync_device();
+  cache->element_node_ids_dual.sync_device();
+  cache->element_types_dual.sync_device();
+  cache->element_mapping_types_dual.sync_device();
+  cache->element_n_nodes_dual.sync_device();
+  cache->element_p_levels_dual.sync_device();
+  cache->element_subdomains_dual.sync_device();
+
+  cache->node_ids = cache->node_ids_dual.d_view;
+  cache->element_ids = cache->element_ids_dual.d_view;
+  cache->node_coordinates = cache->node_coordinates_dual.d_view;
+  cache->element_node_ids = cache->element_node_ids_dual.d_view;
+  cache->element_types = cache->element_types_dual.d_view;
+  cache->element_mapping_types = cache->element_mapping_types_dual.d_view;
+  cache->element_n_nodes = cache->element_n_nodes_dual.d_view;
+  cache->element_p_levels = cache->element_p_levels_dual.d_view;
+  cache->element_subdomains = cache->element_subdomains_dual.d_view;
   _kokkos_geometry_cache = std::move(cache);
   return *_kokkos_geometry_cache;
 }
