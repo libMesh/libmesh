@@ -29,10 +29,11 @@ namespace libMesh
 
 struct DofMap::KokkosDofIndexCache
 {
-  using elem_id_view = ::Kokkos::View<dof_id_type *>;
-  using elem_dof_id_view = ::Kokkos::View<dof_id_type **>;
-  using elem_dof_count_view = ::Kokkos::View<unsigned int *>;
-  using elem_subdomain_view = ::Kokkos::View<subdomain_id_type *>;
+  using memory_space = typename ::Kokkos::DefaultExecutionSpace::memory_space;
+  using elem_id_view = ::Kokkos::View<dof_id_type *, memory_space>;
+  using elem_dof_id_view = ::Kokkos::View<dof_id_type **, memory_space>;
+  using elem_dof_count_view = ::Kokkos::View<unsigned int *, memory_space>;
+  using elem_subdomain_view = ::Kokkos::View<subdomain_id_type *, memory_space>;
 
   elem_id_view element_ids;
   elem_dof_id_view element_dof_indices;
@@ -47,7 +48,8 @@ struct DofMap::KokkosDofIndexCache
 
 struct DofMap::KokkosLocalIndexCache
 {
-  using elem_local_index_view = ::Kokkos::View<unsigned int **>;
+  using memory_space = typename ::Kokkos::DefaultExecutionSpace::memory_space;
+  using elem_local_index_view = ::Kokkos::View<unsigned int **, memory_space>;
 
   elem_local_index_view element_local_indices;
   unsigned int max_dofs = 0;

@@ -29,15 +29,16 @@ namespace libMesh
 
 struct MeshBase::KokkosGeometryCache
 {
-  using node_id_view = ::Kokkos::View<dof_id_type *>;
-  using elem_id_view = ::Kokkos::View<dof_id_type *>;
-  using node_coord_view = ::Kokkos::View<Real **>;
-  using elem_node_id_view = ::Kokkos::View<unsigned int **>;
-  using elem_type_view = ::Kokkos::View<ElemType *>;
-  using elem_mapping_type_view = ::Kokkos::View<ElemMappingType *>;
-  using elem_n_nodes_view = ::Kokkos::View<unsigned int *>;
-  using elem_p_level_view = ::Kokkos::View<unsigned int *>;
-  using elem_subdomain_view = ::Kokkos::View<subdomain_id_type *>;
+  using memory_space = typename ::Kokkos::DefaultExecutionSpace::memory_space;
+  using node_id_view = ::Kokkos::View<dof_id_type *, memory_space>;
+  using elem_id_view = ::Kokkos::View<dof_id_type *, memory_space>;
+  using node_coord_view = ::Kokkos::View<Real **, memory_space>;
+  using elem_node_id_view = ::Kokkos::View<unsigned int **, memory_space>;
+  using elem_type_view = ::Kokkos::View<ElemType *, memory_space>;
+  using elem_mapping_type_view = ::Kokkos::View<ElemMappingType *, memory_space>;
+  using elem_n_nodes_view = ::Kokkos::View<unsigned int *, memory_space>;
+  using elem_p_level_view = ::Kokkos::View<unsigned int *, memory_space>;
+  using elem_subdomain_view = ::Kokkos::View<subdomain_id_type *, memory_space>;
 
   node_id_view node_ids;
   elem_id_view element_ids;
