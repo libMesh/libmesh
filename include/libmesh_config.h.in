@@ -343,6 +343,12 @@
 /* Flag indicating whether compiler supports std::*::merge */
 #undef HAVE_CXX17_SPLICING
 
+/* define if the compiler supports basic C++20 syntax */
+#undef HAVE_CXX20
+
+/* define if the compiler supports basic C++23 syntax */
+#undef HAVE_CXX23
+
 /* Define to 1 if you have the declaration of 'sigaction', and to 0 if you
    don't. */
 #undef HAVE_DECL_SIGACTION
