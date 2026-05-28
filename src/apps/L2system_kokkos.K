@@ -589,6 +589,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   const auto element_mapping_types = geometry_cache.element_mapping_types;
   const auto element_n_nodes = geometry_cache.element_n_nodes;
   const auto element_p_levels = geometry_cache.element_p_levels;
+  using GeometryExecutionSpace = typename std::decay_t<decltype(element_types)>::execution_space;
 
   KokkosPetscIntView write_smoke("hilbert_debug_device_write_smoke", 1);
   ::Kokkos::deep_copy(write_smoke, PetscInt(0));
@@ -606,7 +607,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   PetscInt first_device_elem_type = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_first_device_elem_type",
-    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
     KOKKOS_LAMBDA(const int, PetscInt & value)
     {
       value += cast_int<PetscInt>(element_types(elem_indices(0)));
@@ -616,7 +617,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   PetscInt first_device_p_level = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_first_device_p_level",
-    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
     KOKKOS_LAMBDA(const int, PetscInt & value)
     {
       value += cast_int<PetscInt>(element_p_levels(elem_indices(0)));
@@ -626,7 +627,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   PetscInt first_device_n_nodes = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_first_device_n_nodes",
-    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
     KOKKOS_LAMBDA(const int, PetscInt & value)
     {
       value += cast_int<PetscInt>(element_n_nodes(elem_indices(0)));
@@ -636,7 +637,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   PetscInt first_device_record_index = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_first_device_record_index",
-    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
     KOKKOS_LAMBDA(const int, PetscInt & value)
     {
       value += cast_int<PetscInt>(elem_indices(0));
@@ -656,7 +657,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   PetscInt local_supported = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_device_key_supported",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
     {
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
@@ -674,7 +675,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   PetscInt local_bad_mapping = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_device_key_bad_mapping",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
     {
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
@@ -1745,10 +1746,11 @@ build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & recor
   const auto family = fe_type.family;
   const auto base_order = fe_type.order.get_order();
   const auto n_records = records.size();
+  using GeometryExecutionSpace = typename std::decay_t<decltype(element_types)>::execution_space;
 
   ::Kokkos::parallel_for(
     "hilbert_build_shape_keys",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index)
     {
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);

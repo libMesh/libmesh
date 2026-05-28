@@ -25,6 +25,8 @@
 #include "kokkos_hilbert_assembly.h"
 #include "kokkos_parsed_function.h"
 
+#include <type_traits>
+
 namespace libMesh::Kokkos::detail
 {
 
@@ -474,10 +476,11 @@ run_hilbert_system_value_batch(const NodeCoordinateStorage & node_coordinates,
                                const char * const kernel_name)
 {
   const auto n_records = elem_indices.extent(0);
+  using ExecutionSpace = typename std::decay_t<ResidualView>::execution_space;
 
   ::Kokkos::parallel_for(
     kernel_name,
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    ::Kokkos::RangePolicy<ExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index) {
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
@@ -595,10 +598,11 @@ run_hilbert_system_bucket_value_batch(const libMesh::FEShapeKey key,
                                       const char * const kernel_name)
 {
   const auto n_records = elem_indices.extent(0);
+  using ExecutionSpace = typename std::decay_t<ResidualView>::execution_space;
 
   ::Kokkos::parallel_for(
     kernel_name,
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    ::Kokkos::RangePolicy<ExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index) {
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
@@ -666,10 +670,11 @@ run_hilbert_system_fem_value_batch(const NodeCoordinateStorage & node_coordinate
                                    const char * const kernel_name)
 {
   const auto n_records = elem_indices.extent(0);
+  using ExecutionSpace = typename std::decay_t<ResidualView>::execution_space;
 
   ::Kokkos::parallel_for(
     kernel_name,
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    ::Kokkos::RangePolicy<ExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index) {
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
