@@ -77,13 +77,10 @@ template <typename T>
 using KokkosScalarView = ::Kokkos::View<T *>;
 
 using KokkosDenseJacobianView = ::Kokkos::View<Number **>;
-using KokkosFlatJacobianView = ::Kokkos::View<Number *>;
 using KokkosGradientView = ::Kokkos::View<Real **>;
 using KokkosUnsignedIntView = ::Kokkos::View<unsigned int *>;
 using KokkosPetscIntView = ::Kokkos::View<PetscInt *>;
 using KokkosSizeView = ::Kokkos::View<std::size_t *>;
-using KokkosFieldKeyRecordView = ::Kokkos::View<FEShapeKey **>;
-using KokkosFieldDofRecordView = ::Kokkos::View<unsigned int **>;
 using KokkosFieldKeyStorage =
   libMesh::Kokkos::detail::StaticArrayAccess<FEShapeKey, kokkos_parsed_fem_max_fields>;
 using KokkosFieldDofStorage =
@@ -432,6 +429,8 @@ struct KokkosPetscAssemblyPlan
   KokkosPetscIntView offdiag_global_columns_view;
   KokkosSizeView rhs_local_slots;
   KokkosSizeView mat_value_slots;
+  KokkosScalarView<Number> rhs_entry_values;
+  KokkosScalarView<Number> mat_entry_values;
   ::Kokkos::View<Number *> rhs_remote_values;
   ::Kokkos::View<Number *> mat_remote_values;
   ::Kokkos::View<Number *> rhs_remote_root_values;
@@ -1489,6 +1488,8 @@ build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
   plan.total_rhs_entries = total_rhs_entries;
   plan.total_mat_entries = total_mat_entries;
   plan.batch_data = std::move(batch_data);
+  plan.rhs_entry_values = KokkosScalarView<Number>("hilbert_rhs_entry_values", total_rhs_entries);
+  plan.mat_entry_values = KokkosScalarView<Number>("hilbert_mat_entry_values", total_mat_entries);
   plan.rhs_local_slots = KokkosSizeView();
   plan.mat_value_slots = KokkosSizeView();
   plan.geometry_cache_id = &geometry_cache;
@@ -1843,176 +1844,37 @@ assemble_host_exact_parsed_fem_goal_element(::HilbertSystem & sys,
 }
 #endif
 
-template <typename ResidualView, typename JacobianView>
-bool
-assemble_kokkos_hilbert_element_device_values(const FEShapeKey key,
-                                              const unsigned int quadrature_order,
-                                              const unsigned int hilbert_order,
-                                              const unsigned int elem_index,
-                                              const MeshBase::KokkosGeometryCache & geometry_cache,
-                                              const KokkosPetscAssemblyPlan & plan,
-                                              ResidualView d_rhs_values,
-                                              JacobianView d_mat_values)
-{
-  const unsigned int n_dofs = cast_int<unsigned int>(d_rhs_values.extent(0));
-  const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
-                                              plan.analytic_goal_values,
-                                              plan.analytic_goal_gradients);
-  const libMesh::Kokkos::detail::FlatDeviceValueSink<ResidualView, JacobianView> sink{
-    d_rhs_values, d_mat_values, n_dofs};
-
-  return libMesh::Kokkos::detail::run_hilbert_system_assembly<kokkos_hilbert_max_dofs>(
-    key,
-    geometry_cache.host_element_mapping_types[elem_index],
-    geometry_cache.node_coordinates,
-    geometry_cache.element_node_ids,
-    elem_index,
-    geometry_cache.host_element_n_nodes[elem_index],
-    quadrature_order,
-    hilbert_order,
-    libMesh::Kokkos::detail::ZeroCoeffAccess{},
-    Number(1.),
-    goal_access,
-    true,
-    sink,
-    "hilbert_device_values");
-}
-
-template <typename ResidualView, typename JacobianView>
-bool
-assemble_kokkos_hilbert_fem_goal_device_values(const FEShapeKey output_key,
-                                               const unsigned int quadrature_order,
-                                               const unsigned int hilbert_order,
-                                               const unsigned int elem_index,
-                                               const MeshBase::KokkosGeometryCache & geometry_cache,
-                                               System & input_system,
-                                               const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & goal_function,
-                                               ResidualView d_rhs_values,
-                                               JacobianView d_mat_values)
-{
-  KokkosFEMGoalData goal_data;
-  if (!build_kokkos_fem_goal_data(geometry_cache.host_element_types[elem_index],
-                                  geometry_cache.host_element_mapping_types[elem_index],
-                                  geometry_cache.host_element_p_levels[elem_index],
-                                  hilbert_order,
-                                  input_system,
-                                  goal_function,
-                                  goal_data))
-    return false;
-
-  const unsigned int n_dofs = cast_int<unsigned int>(d_rhs_values.extent(0));
-  const libMesh::Kokkos::detail::FlatDeviceValueSink<ResidualView, JacobianView> sink{
-    d_rhs_values, d_mat_values, n_dofs};
-
-  auto input_guard = goal_data.input_vector->make_kokkos_read_view_guard();
-  const auto goal_access =
-    libMesh::Kokkos::detail::GatheredParsedFEMGoalAccess<KokkosFieldKeyStorage,
-                                                         KokkosFieldDofStorage,
-                                                         decltype(input_guard.view()),
-                                                         KokkosLocalIndexView,
-                                                         libMesh::Kokkos::KokkosParsedFEMFunction<Number>,
-                                                         kokkos_parsed_fem_max_fields>(
-      goal_data.field_keys,
-      goal_data.field_dofs,
-      input_guard.view(),
-      goal_data.field_local_indices.data(),
-      goal_function);
-
-  return libMesh::Kokkos::detail::run_hilbert_system_assembly<kokkos_hilbert_max_dofs>(
-    output_key,
-    geometry_cache.host_element_mapping_types[elem_index],
-    geometry_cache.node_coordinates,
-    geometry_cache.element_node_ids,
-    elem_index,
-    geometry_cache.host_element_n_nodes[elem_index],
-    quadrature_order,
-    hilbert_order,
-    libMesh::Kokkos::detail::ZeroCoeffAccess{},
-    Number(1.),
-    goal_access,
-    true,
-    sink,
-    "hilbert_device_fem_goal_values");
-}
-
-template <typename ResidualView, typename JacobianView>
-bool
-assemble_kokkos_hilbert_record_values(::HilbertSystem & sys,
-                                      const KokkosPetscAssemblyPlan & plan,
-                                      const HilbertElementAssemblyRecord & record,
-                                      const unsigned int quadrature_order,
-                                      const bool analytic_goal,
-                                      const libMesh::Kokkos::KokkosParsedFEMFunction<Number> * fem_goal,
-                                      ResidualView rhs_slice,
-                                      JacobianView mat_slice)
-{
-  LOG_SCOPE("L2Kokkos::assemble record values", "HilbertSystem");
-
-  const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
-  const FEShapeKey shape_key =
-    make_hilbert_shape_key(geometry_cache.host_element_types[record.elem_index],
-                           geometry_cache.host_element_p_levels[record.elem_index],
-                           sys.variable_type(0));
-
-  return analytic_goal ?
-           assemble_kokkos_hilbert_element_device_values(shape_key,
-                                                         quadrature_order,
-                                                         sys.hilbert_order(),
-                                                         record.elem_index,
-                                                         geometry_cache,
-                                                         plan,
-                                                         rhs_slice,
-                                                         mat_slice) :
-           assemble_kokkos_hilbert_fem_goal_device_values(shape_key,
-                                                          quadrature_order,
-                                                          sys.hilbert_order(),
-                                                          record.elem_index,
-                                                          geometry_cache,
-                                                          *sys.input_system,
-                                                          fem_goal->with_time(sys.time),
-                                                          rhs_slice,
-                                                          mat_slice);
-}
-
 template <typename LocalRhsView,
           typename RemoteRhsView,
           typename DiagMatrixView,
           typename OffdiagMatrixView,
-          typename RemoteMatrixView,
-          typename ResidualView,
-          typename JacobianView>
+          typename RemoteMatrixView>
 void
-scatter_kokkos_hilbert_record_values(const HilbertElementAssemblyRecord & record,
-                                     const KokkosSizeView & rhs_slots,
-                                     const KokkosSizeView & mat_slots,
-                                     const std::size_t rhs_local_size,
-                                     const std::size_t mat_diag_size,
-                                     const std::size_t mat_offdiag_base,
-                                     LocalRhsView local_rhs_values,
-                                     RemoteRhsView remote_rhs_values,
-                                     DiagMatrixView diag_matrix_values,
-                                     OffdiagMatrixView offdiag_matrix_values,
-                                     RemoteMatrixView remote_matrix_values,
-                                     ResidualView rhs_values,
-                                     JacobianView mat_values)
+scatter_kokkos_hilbert_entry_values(const KokkosPetscAssemblyPlan & plan,
+                                    const std::size_t mat_offdiag_base,
+                                    LocalRhsView local_rhs_values,
+                                    RemoteRhsView remote_rhs_values,
+                                    DiagMatrixView diag_matrix_values,
+                                    OffdiagMatrixView offdiag_matrix_values,
+                                    RemoteMatrixView remote_matrix_values)
 {
-  LOG_SCOPE("L2Kokkos::scatter record values", "HilbertSystem");
-
-  const unsigned int n_dofs = record.n_dofs;
-  const std::size_t rhs_offset = record.rhs_offset;
-  const std::size_t mat_offset = record.mat_offset;
-  const std::size_t n_rhs_entries = n_dofs;
-  const std::size_t n_mat_entries = n_dofs * n_dofs;
-
+  const std::size_t n_rhs_entries = plan.total_rhs_entries;
+  const std::size_t n_mat_entries = plan.total_mat_entries;
+  const std::size_t rhs_local_size = plan.rhs_local_size;
+  const std::size_t mat_diag_size = plan.mat_diag_size;
+  const auto rhs_slots = plan.rhs_local_slots;
+  const auto mat_slots = plan.mat_value_slots;
+  const auto rhs_entry_values = plan.rhs_entry_values;
+  const auto mat_entry_values = plan.mat_entry_values;
   ::Kokkos::parallel_for(
-    "hilbert_scatter_record_values",
+    "hilbert_scatter_entry_values",
     ::Kokkos::RangePolicy<>(0, n_rhs_entries + n_mat_entries),
     KOKKOS_LAMBDA(const std::size_t entry_index)
     {
       if (entry_index < n_rhs_entries)
         {
-          const std::size_t slot = rhs_slots(rhs_offset + entry_index);
-          const Number value = rhs_values(entry_index);
+          const std::size_t slot = rhs_slots(entry_index);
+          const Number value = rhs_entry_values(entry_index);
           if (slot < rhs_local_size)
             ::Kokkos::atomic_add(&local_rhs_values(slot), value);
           else
@@ -2021,8 +1883,8 @@ scatter_kokkos_hilbert_record_values(const HilbertElementAssemblyRecord & record
         }
 
       const std::size_t mat_entry = entry_index - n_rhs_entries;
-      const std::size_t slot = mat_slots(mat_offset + mat_entry);
-      const Number value = mat_values(mat_entry);
+      const std::size_t slot = mat_slots(mat_entry);
+      const Number value = mat_entry_values(mat_entry);
       if (slot < mat_diag_size)
         ::Kokkos::atomic_add(&diag_matrix_values(slot), value);
       else if (slot < mat_offdiag_base)
@@ -2141,20 +2003,6 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
       LOG_SCOPE("L2Kokkos::assemble buckets", "HilbertSystem");
 
       const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
-      const auto rhs_scatter =
-        libMesh::Kokkos::detail::SplitScatterAccess<KokkosVectorWriteView,
-                                                    KokkosVectorWriteView>{
-          local_rhs_values, remote_rhs_values, plan.rhs_local_size};
-      const auto mat_scatter =
-        libMesh::Kokkos::detail::SplitMatrixScatterAccess<KokkosMatrixWriteView,
-                                                          KokkosMatrixWriteView,
-                                                          KokkosMatrixWriteView>{
-          diag_matrix_values,
-          offdiag_matrix_values,
-          remote_matrix_values,
-          plan.mat_diag_size,
-          plan.mat_diag_size + plan.mat_offdiag_size};
-
       if (analytic_goal)
         {
           const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
@@ -2163,7 +2011,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
           for (const auto & bucket : plan.buckets)
             {
               const auto record_range = ::Kokkos::make_pair(bucket.begin, bucket.end);
-              libMesh::Kokkos::detail::run_hilbert_system_bucket_scatter_batch<
+              libMesh::Kokkos::detail::run_hilbert_system_bucket_value_batch<
                 kokkos_hilbert_max_dofs>(bucket.key,
                                          bucket.mapping_type,
                                          bucket.n_nodes,
@@ -2178,13 +2026,11 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                                           record_range),
                                          ::Kokkos::subview(plan.batch_data.mat_offsets,
                                                           record_range),
-                                         plan.rhs_local_slots,
-                                         plan.mat_value_slots,
                                          sys.hilbert_order(),
                                          goal_access,
-                                         rhs_scatter,
-                                         mat_scatter,
-                                         "hilbert_bucket_direct_scatter");
+                                         plan.rhs_entry_values,
+                                         plan.mat_entry_values,
+                                         "hilbert_bucket_values");
             }
         }
       else
@@ -2198,7 +2044,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
             {
               const auto & bucket = plan.buckets[bucket_index];
               const auto record_range = ::Kokkos::make_pair(bucket.begin, bucket.end);
-              libMesh::Kokkos::detail::run_hilbert_system_fem_bucket_scatter_batch<
+              libMesh::Kokkos::detail::run_hilbert_system_fem_bucket_value_batch<
                 kokkos_hilbert_max_dofs,
                 kokkos_parsed_fem_max_fields>(bucket.key,
                                               bucket.mapping_type,
@@ -2214,8 +2060,6 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                                                record_range),
                                               ::Kokkos::subview(plan.batch_data.mat_offsets,
                                                                record_range),
-                                              plan.rhs_local_slots,
-                                              plan.mat_value_slots,
                                               plan.fem_goal_batch_data
                                                 .bucket_field_keys[bucket_index],
                                               plan.fem_goal_batch_data
@@ -2224,11 +2068,22 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                               input_guard.view(),
                                               timed_goal,
                                               sys.hilbert_order(),
-                                              rhs_scatter,
-                                              mat_scatter,
-                                              "hilbert_fem_bucket_direct_scatter");
+                                              plan.rhs_entry_values,
+                                              plan.mat_entry_values,
+                                              "hilbert_fem_bucket_values");
             }
         }
+
+      {
+        LOG_SCOPE("L2Kokkos::scatter entry values", "HilbertSystem");
+        scatter_kokkos_hilbert_entry_values(plan,
+                                            plan.mat_diag_size + plan.mat_offdiag_size,
+                                            local_rhs_values,
+                                            remote_rhs_values,
+                                            diag_matrix_values,
+                                            offdiag_matrix_values,
+                                            remote_matrix_values);
+      }
     }
 
     ::Kokkos::fence();
@@ -2327,7 +2182,6 @@ using libMesh::Real;
 using libMesh::assemble_host_exact_parsed_fem_goal_element;
 using libMesh::assemble_kokkos_hilbert_element;
 using libMesh::assemble_kokkos_hilbert_fem_goal_element;
-using libMesh::assemble_kokkos_hilbert_record_values;
 using libMesh::assemble_kokkos_petsc_global_system;
 using libMesh::build_kokkos_element_state;
 using libMesh::build_kokkos_petsc_assembly_plan;
