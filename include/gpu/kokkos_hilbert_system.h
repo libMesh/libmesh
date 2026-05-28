@@ -446,10 +446,9 @@ run_hilbert_system_assembly(const libMesh::FEShapeKey key,
 template <unsigned int MaxDofs,
           typename NodeCoordinateStorage,
           typename ElemNodeIdStorage,
-          typename ElemTypeStorage,
           typename ElemMappingTypeStorage,
           typename ElemNodeCountStorage,
-          typename ElemPLevelStorage,
+          typename ShapeKeyStorage,
           typename ElemIndexStorage,
           typename ElemDofCountStorage,
           typename QuadratureOrderStorage,
@@ -458,14 +457,11 @@ template <unsigned int MaxDofs,
           typename ResidualView,
           typename JacobianView>
 void
-run_hilbert_system_value_batch(const libMesh::FEFamily family,
-                               const libMesh::Order base_order,
-                               const NodeCoordinateStorage & node_coordinates,
+run_hilbert_system_value_batch(const NodeCoordinateStorage & node_coordinates,
                                const ElemNodeIdStorage & element_node_ids,
-                               const ElemTypeStorage & element_types,
                                const ElemMappingTypeStorage & element_mapping_types,
                                const ElemNodeCountStorage & element_n_nodes,
-                               const ElemPLevelStorage & element_p_levels,
+                               const ShapeKeyStorage & shape_keys,
                                const ElemIndexStorage & elem_indices,
                                const ElemDofCountStorage & elem_n_dofs,
                                const QuadratureOrderStorage & quadrature_orders,
@@ -486,11 +482,7 @@ run_hilbert_system_value_batch(const libMesh::FEFamily family,
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const unsigned int n_dofs = elem_n_dofs(record_index);
-      const auto key =
-        libMesh::FEShapeKey{family,
-                            element_types(elem_index),
-                            static_cast<libMesh::Order>(base_order +
-                                                        cast_int<int>(element_p_levels(elem_index)))};
+      const auto key = shape_keys(record_index);
 
       const auto elem_nodes =
         make_element_node_access(node_coordinates, element_node_ids, elem_index);
@@ -638,10 +630,9 @@ template <unsigned int MaxDofs,
           unsigned int MaxFieldVariables,
           typename NodeCoordinateStorage,
           typename ElemNodeIdStorage,
-          typename ElemTypeStorage,
           typename ElemMappingTypeStorage,
           typename ElemNodeCountStorage,
-          typename ElemPLevelStorage,
+          typename ShapeKeyStorage,
           typename ElemIndexStorage,
           typename ElemDofCountStorage,
           typename QuadratureOrderStorage,
@@ -654,14 +645,11 @@ template <unsigned int MaxDofs,
           typename ResidualView,
           typename JacobianView>
 void
-run_hilbert_system_fem_value_batch(const libMesh::FEFamily family,
-                                   const libMesh::Order base_order,
-                                   const NodeCoordinateStorage & node_coordinates,
+run_hilbert_system_fem_value_batch(const NodeCoordinateStorage & node_coordinates,
                                    const ElemNodeIdStorage & element_node_ids,
-                                   const ElemTypeStorage & element_types,
                                    const ElemMappingTypeStorage & element_mapping_types,
                                    const ElemNodeCountStorage & element_n_nodes,
-                                   const ElemPLevelStorage & element_p_levels,
+                                   const ShapeKeyStorage & shape_keys,
                                    const ElemIndexStorage & elem_indices,
                                    const ElemDofCountStorage & elem_n_dofs,
                                    const QuadratureOrderStorage & quadrature_orders,
@@ -686,11 +674,7 @@ run_hilbert_system_fem_value_batch(const libMesh::FEFamily family,
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const unsigned int n_dofs = elem_n_dofs(record_index);
-      const auto key =
-        libMesh::FEShapeKey{family,
-                            element_types(elem_index),
-                            static_cast<libMesh::Order>(base_order +
-                                                        cast_int<int>(element_p_levels(elem_index)))};
+      const auto key = shape_keys(record_index);
 
       StaticArrayAccess<libMesh::FEShapeKey, MaxFieldVariables> record_field_keys;
       StaticArrayAccess<unsigned int, MaxFieldVariables> record_field_dofs;

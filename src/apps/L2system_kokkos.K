@@ -82,6 +82,7 @@ using KokkosGradientView = ::Kokkos::View<Real **>;
 using KokkosUnsignedIntView = ::Kokkos::View<unsigned int *>;
 using KokkosPetscIntView = ::Kokkos::View<PetscInt *>;
 using KokkosSizeView = ::Kokkos::View<std::size_t *>;
+using KokkosShapeKeyRecordView = ::Kokkos::View<FEShapeKey *>;
 using KokkosFieldKeyRecordView = ::Kokkos::View<FEShapeKey **>;
 using KokkosFieldDofRecordView = ::Kokkos::View<unsigned int **>;
 using KokkosFieldKeyStorage =
@@ -420,6 +421,7 @@ struct KokkosHilbertBatchData
   KokkosUnsignedIntView quadrature_orders;
   KokkosSizeView rhs_offsets;
   KokkosSizeView mat_offsets;
+  KokkosShapeKeyRecordView shape_keys;
 };
 
 struct KokkosFEMGoalBatchData
@@ -544,6 +546,7 @@ debug_print_kokkos_plan_summary(::HilbertSystem & sys,
 
   libMesh::out << "L2Kokkos debug: records=" << plan.records.size()
                << " batch_records=" << plan.batch_data.elem_indices.extent(0)
+               << " shape_key_records=" << plan.batch_data.shape_keys.extent(0)
                << " total_rhs_entries=" << plan.total_rhs_entries
                << " total_mat_entries=" << plan.total_mat_entries
                << " rhs_local_size=" << plan.rhs_local_size
@@ -577,18 +580,16 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                              const KokkosPetscAssemblyPlan & plan,
                              const MeshBase::KokkosGeometryCache & geometry_cache)
 {
-  KokkosSizeView counts("hilbert_debug_device_key_counts", 8);
+  KokkosPetscIntView counts("hilbert_debug_device_key_counts", 8);
   KokkosPetscIntView first_key("hilbert_debug_first_device_key", 8);
-  ::Kokkos::deep_copy(counts, std::size_t(0));
+  ::Kokkos::deep_copy(counts, PetscInt(0));
   ::Kokkos::deep_copy(first_key, PetscInt(-1));
 
   const auto n_records = plan.batch_data.elem_indices.extent(0);
-  const auto family = sys.variable_type(0).family;
-  const auto base_order = sys.variable_type(0).order;
   const auto elem_indices = plan.batch_data.elem_indices;
   const auto elem_n_dofs = plan.batch_data.elem_n_dofs;
   const auto quadrature_orders = plan.batch_data.quadrature_orders;
-  const auto element_types = geometry_cache.element_types;
+  const auto shape_keys = plan.batch_data.shape_keys;
   const auto element_mapping_types = geometry_cache.element_mapping_types;
   const auto element_n_nodes = geometry_cache.element_n_nodes;
   const auto element_p_levels = geometry_cache.element_p_levels;
@@ -600,12 +601,10 @@ debug_print_device_key_stats(::HilbertSystem & sys,
     {
       const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
-      const auto elem_type = element_types(elem_index);
       const auto mapping_type = element_mapping_types(elem_index);
       const unsigned int p_level = element_p_levels(elem_index);
       const unsigned int quadrature_order = quadrature_orders(record_index);
-      const libMesh::FEShapeKey key{
-        family, elem_type, static_cast<libMesh::Order>(base_order + cast_int<int>(p_level))};
+      const libMesh::FEShapeKey key = shape_keys(record_index);
       const bool lagrange_map = mapping_type == libMesh::LAGRANGE_MAP;
       const bool shape_ok = libMesh::supports_shape_with_lagrange_map(key);
       const bool grad_ok = libMesh::supports_grad_shape(key);
@@ -616,21 +615,21 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                                                                  mapping_type,
                                                                  quadrature_order);
 
-      ::Kokkos::atomic_add(&counts(0), std::size_t(1));
+      ::Kokkos::atomic_add(&counts(0), PetscInt(1));
       if (supported)
-        ::Kokkos::atomic_add(&counts(1), std::size_t(1));
+        ::Kokkos::atomic_add(&counts(1), PetscInt(1));
       if (!lagrange_map)
-        ::Kokkos::atomic_add(&counts(2), std::size_t(1));
+        ::Kokkos::atomic_add(&counts(2), PetscInt(1));
       if (!shape_ok)
-        ::Kokkos::atomic_add(&counts(3), std::size_t(1));
+        ::Kokkos::atomic_add(&counts(3), PetscInt(1));
       if (!grad_ok)
-        ::Kokkos::atomic_add(&counts(4), std::size_t(1));
+        ::Kokkos::atomic_add(&counts(4), PetscInt(1));
       if (!n_qpoints)
-        ::Kokkos::atomic_add(&counts(5), std::size_t(1));
+        ::Kokkos::atomic_add(&counts(5), PetscInt(1));
       if (!elem_n_dofs(record_index))
-        ::Kokkos::atomic_add(&counts(6), std::size_t(1));
+        ::Kokkos::atomic_add(&counts(6), PetscInt(1));
       if (record_index == 0)
-        ::Kokkos::atomic_add(&counts(7), std::size_t(1));
+        ::Kokkos::atomic_add(&counts(7), PetscInt(1));
 
       if (record_index == 0)
         {
@@ -651,7 +650,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   ::Kokkos::deep_copy(h_counts, counts);
   ::Kokkos::deep_copy(h_first_key, first_key);
 
-  std::array<std::size_t, 8> global_counts = {};
+  std::array<PetscInt, 8> global_counts = {};
   for (auto i : index_range(global_counts))
     global_counts[i] = h_counts(i);
   for (auto & count : global_counts)
@@ -1536,6 +1535,8 @@ build_kokkos_fem_goal_data(const ElemType elem_type,
 
 void
 build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & records,
+                         const FEType & fe_type,
+                         const MeshBase::KokkosGeometryCache & geometry_cache,
                          KokkosHilbertBatchData & batch_data)
 {
   batch_data.elem_indices = KokkosUnsignedIntView("hilbert_elem_indices", records.size());
@@ -1544,6 +1545,7 @@ build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & recor
     KokkosUnsignedIntView("hilbert_quadrature_orders", records.size());
   batch_data.rhs_offsets = KokkosSizeView("hilbert_rhs_offsets", records.size());
   batch_data.mat_offsets = KokkosSizeView("hilbert_mat_offsets", records.size());
+  batch_data.shape_keys = KokkosShapeKeyRecordView("hilbert_shape_keys", records.size());
 
   auto h_elem_indices = ::Kokkos::create_mirror_view(batch_data.elem_indices);
   auto h_elem_n_dofs = ::Kokkos::create_mirror_view(batch_data.elem_n_dofs);
@@ -1566,6 +1568,28 @@ build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & recor
   ::Kokkos::deep_copy(batch_data.quadrature_orders, h_quadrature_orders);
   ::Kokkos::deep_copy(batch_data.rhs_offsets, h_rhs_offsets);
   ::Kokkos::deep_copy(batch_data.mat_offsets, h_mat_offsets);
+
+  const auto elem_indices = batch_data.elem_indices;
+  const auto element_types = geometry_cache.element_types;
+  const auto element_p_levels = geometry_cache.element_p_levels;
+  const auto shape_keys = batch_data.shape_keys;
+  const auto family = fe_type.family;
+  const auto base_order = fe_type.order.get_order();
+  const auto n_records = records.size();
+
+  ::Kokkos::parallel_for(
+    "hilbert_build_shape_keys",
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index)
+    {
+      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int elem_index = elem_indices(record_index);
+      shape_keys(record_index) =
+        FEShapeKey{family,
+                   element_types(elem_index),
+                   static_cast<Order>(base_order + cast_int<int>(element_p_levels(elem_index)))};
+    });
+  ::Kokkos::fence();
 }
 
 bool
@@ -1599,7 +1623,7 @@ build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
     return false;
 
   KokkosHilbertBatchData batch_data;
-  build_hilbert_batch_data(records, batch_data);
+  build_hilbert_batch_data(records, sys.variable_type(0), geometry_cache, batch_data);
 
   plan.records = std::move(records);
   plan.total_rhs_entries = total_rhs_entries;
@@ -2138,14 +2162,11 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                                       plan.analytic_goal_values,
                                                       plan.analytic_goal_gradients);
           libMesh::Kokkos::detail::run_hilbert_system_value_batch<kokkos_hilbert_max_dofs>(
-            sys.variable_type(0).family,
-            sys.variable_type(0).order,
             geometry_cache.node_coordinates,
             geometry_cache.element_node_ids,
-            geometry_cache.element_types,
             geometry_cache.element_mapping_types,
             geometry_cache.element_n_nodes,
-            geometry_cache.element_p_levels,
+            plan.batch_data.shape_keys,
             plan.batch_data.elem_indices,
             plan.batch_data.elem_n_dofs,
             plan.batch_data.quadrature_orders,
@@ -2166,14 +2187,11 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
           const auto timed_goal = fem_goal->with_time(sys.time);
           libMesh::Kokkos::detail::run_hilbert_system_fem_value_batch<
             kokkos_hilbert_max_dofs,
-            kokkos_parsed_fem_max_fields>(sys.variable_type(0).family,
-                                          sys.variable_type(0).order,
-                                          geometry_cache.node_coordinates,
+            kokkos_parsed_fem_max_fields>(geometry_cache.node_coordinates,
                                           geometry_cache.element_node_ids,
-                                          geometry_cache.element_types,
                                           geometry_cache.element_mapping_types,
                                           geometry_cache.element_n_nodes,
-                                          geometry_cache.element_p_levels,
+                                          plan.batch_data.shape_keys,
                                           plan.batch_data.elem_indices,
                                           plan.batch_data.elem_n_dofs,
                                           plan.batch_data.quadrature_orders,
