@@ -585,6 +585,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   const auto elem_n_dofs = plan.batch_data.elem_n_dofs;
   const auto quadrature_orders = plan.batch_data.quadrature_orders;
   const auto shape_keys = plan.batch_data.shape_keys;
+  const auto element_types = geometry_cache.element_types;
   const auto element_mapping_types = geometry_cache.element_mapping_types;
   const auto element_n_nodes = geometry_cache.element_n_nodes;
   const auto element_p_levels = geometry_cache.element_p_levels;
