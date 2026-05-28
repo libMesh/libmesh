@@ -180,6 +180,8 @@ struct FlatDeviceValueSink
 template <typename View>
 struct DirectScatterAccess
 {
+  using execution_space = typename std::decay_t<View>::execution_space;
+
   View values;
 
   LIBMESH_DEVICE_INLINE
@@ -193,6 +195,8 @@ struct DirectScatterAccess
 template <typename LocalView, typename RemoteView>
 struct SplitScatterAccess
 {
+  using execution_space = typename std::decay_t<LocalView>::execution_space;
+
   LocalView local_values;
   RemoteView remote_values;
   std::size_t local_size = 0;
@@ -211,6 +215,8 @@ struct SplitScatterAccess
 template <typename DiagView, typename OffdiagView, typename RemoteView>
 struct SplitMatrixScatterAccess
 {
+  using execution_space = typename std::decay_t<DiagView>::execution_space;
+
   DiagView diag_values;
   OffdiagView offdiag_values;
   RemoteView remote_values;
@@ -544,12 +550,13 @@ run_hilbert_system_bucket_scatter_batch(const libMesh::FEShapeKey key,
                                         const char * const kernel_name)
 {
   const auto n_records = elem_indices.extent(0);
+  using ExecutionSpace = typename std::decay_t<ResidualScatterAccess>::execution_space;
 
   ::Kokkos::parallel_for(
     kernel_name,
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    ::Kokkos::RangePolicy<ExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index) {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const unsigned int n_dofs = elem_n_dofs(record_index);
 

@@ -483,6 +483,68 @@ struct KokkosPetscAssemblyPlan
   }
 };
 
+struct KokkosHilbertHomogeneousBucket
+{
+  FEShapeKey key{INVALID_FE, INVALID_ELEM, INVALID_ORDER};
+  ElemMappingType mapping_type = INVALID_MAP;
+  unsigned int n_nodes = 0;
+  unsigned int quadrature_order = 0;
+  unsigned int n_dofs = 0;
+};
+
+bool
+get_single_supported_hilbert_bucket(const KokkosPetscAssemblyPlan & plan,
+                                    const MeshBase::KokkosGeometryCache & geometry_cache,
+                                    KokkosHilbertHomogeneousBucket & bucket)
+{
+  if (plan.records.empty())
+    return false;
+
+  const auto & first_record = plan.records.front();
+  bucket.key = make_hilbert_shape_key(geometry_cache.host_element_types[first_record.elem_index],
+                                      geometry_cache.host_element_p_levels[first_record.elem_index],
+                                      plan.fe_type);
+  bucket.mapping_type = geometry_cache.host_element_mapping_types[first_record.elem_index];
+  bucket.n_nodes = geometry_cache.host_element_n_nodes[first_record.elem_index];
+  bucket.quadrature_order = first_record.quadrature_order;
+  bucket.n_dofs = first_record.n_dofs;
+
+  if (bucket.n_dofs > kokkos_hilbert_max_dofs ||
+      !libMesh::Kokkos::detail::supports_hilbert_local_assembly(bucket.key,
+                                                               bucket.mapping_type,
+                                                               bucket.quadrature_order))
+    return false;
+
+  for (const auto & record : plan.records)
+    {
+      const FEShapeKey key =
+        make_hilbert_shape_key(geometry_cache.host_element_types[record.elem_index],
+                               geometry_cache.host_element_p_levels[record.elem_index],
+                               plan.fe_type);
+      if (key.family != bucket.key.family ||
+          key.elem_type != bucket.key.elem_type ||
+          key.order != bucket.key.order ||
+          geometry_cache.host_element_mapping_types[record.elem_index] != bucket.mapping_type ||
+          geometry_cache.host_element_n_nodes[record.elem_index] != bucket.n_nodes ||
+          record.quadrature_order != bucket.quadrature_order ||
+          record.n_dofs != bucket.n_dofs)
+        return false;
+    }
+
+  return true;
+}
+
+void
+ensure_kokkos_entry_value_storage(KokkosPetscAssemblyPlan & plan)
+{
+  if (plan.rhs_entry_values.extent(0) != plan.total_rhs_entries)
+    plan.rhs_entry_values = KokkosScalarView<Number>("hilbert_rhs_entry_values",
+                                                     plan.total_rhs_entries);
+  if (plan.mat_entry_values.extent(0) != plan.total_mat_entries)
+    plan.mat_entry_values = KokkosScalarView<Number>("hilbert_mat_entry_values",
+                                                     plan.total_mat_entries);
+}
+
 using RemoteRhsContribution = std::pair<PetscInt, PetscScalar>;
 using RemoteMatContribution = std::tuple<PetscInt, PetscInt, PetscScalar>;
 
@@ -1437,8 +1499,8 @@ build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
   plan.total_rhs_entries = total_rhs_entries;
   plan.total_mat_entries = total_mat_entries;
   plan.batch_data = batch_data;
-  plan.rhs_entry_values = KokkosScalarView<Number>("hilbert_rhs_entry_values", total_rhs_entries);
-  plan.mat_entry_values = KokkosScalarView<Number>("hilbert_mat_entry_values", total_mat_entries);
+  plan.rhs_entry_values = {};
+  plan.mat_entry_values = {};
   plan.rhs_local_slots = KokkosSizeView();
   plan.mat_value_slots = KokkosSizeView();
   plan.geometry_cache_id = &geometry_cache;
@@ -1958,27 +2020,67 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
       LOG_SCOPE("L2Kokkos::assemble all records", "HilbertSystem");
 
       const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
+      bool assembled_direct_scatter = false;
       if (analytic_goal)
         {
           const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
                                                       plan.analytic_goal_values,
                                                       plan.analytic_goal_gradients);
-          libMesh::Kokkos::detail::run_hilbert_system_value_batch<kokkos_hilbert_max_dofs>(
-            geometry_cache.node_coordinates_dual.view_device(),
-            geometry_cache.element_node_ids_dual.view_device(),
-            geometry_cache.element_mapping_types_dual.view_device(),
-            geometry_cache.element_n_nodes_dual.view_device(),
-            plan.batch_data.shape_keys,
-            plan.batch_data.elem_indices,
-            plan.batch_data.elem_n_dofs,
-            plan.batch_data.quadrature_orders,
-            plan.batch_data.rhs_offsets,
-            plan.batch_data.mat_offsets,
-            sys.hilbert_order(),
-            goal_access,
-            plan.rhs_entry_values,
-            plan.mat_entry_values,
-            "hilbert_all_record_values");
+          KokkosHilbertHomogeneousBucket bucket;
+          if (get_single_supported_hilbert_bucket(plan, geometry_cache, bucket))
+            {
+              const libMesh::Kokkos::detail::SplitScatterAccess<KokkosVectorWriteView,
+                                                                KokkosVectorWriteView>
+                rhs_scatter{local_rhs_values, remote_rhs_values, plan.rhs_local_size};
+              const libMesh::Kokkos::detail::SplitMatrixScatterAccess<KokkosMatrixWriteView,
+                                                                      KokkosMatrixWriteView,
+                                                                      KokkosMatrixWriteView>
+                mat_scatter{diag_matrix_values,
+                            offdiag_matrix_values,
+                            remote_matrix_values,
+                            plan.mat_diag_size,
+                            plan.mat_diag_size + plan.mat_offdiag_size};
+
+              libMesh::Kokkos::detail::run_hilbert_system_bucket_scatter_batch<
+                kokkos_hilbert_max_dofs>(bucket.key,
+                                          bucket.mapping_type,
+                                          bucket.n_nodes,
+                                          bucket.quadrature_order,
+                                          geometry_cache.node_coordinates_dual.view_device(),
+                                          geometry_cache.element_node_ids_dual.view_device(),
+                                          plan.batch_data.elem_indices,
+                                          plan.batch_data.elem_n_dofs,
+                                          plan.batch_data.rhs_offsets,
+                                          plan.batch_data.mat_offsets,
+                                          plan.rhs_local_slots,
+                                          plan.mat_value_slots,
+                                          sys.hilbert_order(),
+                                          goal_access,
+                                          rhs_scatter,
+                                          mat_scatter,
+                                          "hilbert_direct_bucket_scatter");
+              assembled_direct_scatter = true;
+            }
+          else
+            {
+              ensure_kokkos_entry_value_storage(plan);
+              libMesh::Kokkos::detail::run_hilbert_system_value_batch<kokkos_hilbert_max_dofs>(
+                geometry_cache.node_coordinates_dual.view_device(),
+                geometry_cache.element_node_ids_dual.view_device(),
+                geometry_cache.element_mapping_types_dual.view_device(),
+                geometry_cache.element_n_nodes_dual.view_device(),
+                plan.batch_data.shape_keys,
+                plan.batch_data.elem_indices,
+                plan.batch_data.elem_n_dofs,
+                plan.batch_data.quadrature_orders,
+                plan.batch_data.rhs_offsets,
+                plan.batch_data.mat_offsets,
+                sys.hilbert_order(),
+                goal_access,
+                plan.rhs_entry_values,
+                plan.mat_entry_values,
+                "hilbert_all_record_values");
+            }
         }
       else
         {
@@ -1987,6 +2089,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
 
           auto input_guard = plan.fem_goal_batch_data.input_vector->make_kokkos_read_view_guard();
           const auto timed_goal = fem_goal->with_time(sys.time);
+          ensure_kokkos_entry_value_storage(plan);
           libMesh::Kokkos::detail::run_hilbert_system_fem_value_batch<
             kokkos_hilbert_max_dofs,
             kokkos_parsed_fem_max_fields>(geometry_cache.node_coordinates_dual.view_device(),
@@ -2010,7 +2113,8 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                           "hilbert_fem_all_record_values");
         }
 
-      {
+      if (!assembled_direct_scatter)
+        {
         LOG_SCOPE("L2Kokkos::scatter entry values", "HilbertSystem");
         scatter_kokkos_hilbert_entry_values(plan,
                                             plan.mat_diag_size + plan.mat_offdiag_size,
@@ -2019,7 +2123,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                             diag_matrix_values,
                                             offdiag_matrix_values,
                                             remote_matrix_values);
-      }
+        }
     }
 
     ::Kokkos::fence();
