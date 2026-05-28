@@ -82,15 +82,22 @@ MeshBase::get_kokkos_geometry_cache() const
     KokkosGeometryCache::elem_subdomain_view("mesh_kokkos_element_subdomains",
                                              cache->host_element_ids.size());
 
-  auto h_node_ids = ::Kokkos::create_mirror_view(cache->node_ids);
-  auto h_element_ids = ::Kokkos::create_mirror_view(cache->element_ids);
-  auto h_node_coordinates = ::Kokkos::create_mirror_view(cache->node_coordinates);
-  auto h_element_node_ids = ::Kokkos::create_mirror_view(cache->element_node_ids);
-  auto h_element_types = ::Kokkos::create_mirror_view(cache->element_types);
-  auto h_element_mapping_types = ::Kokkos::create_mirror_view(cache->element_mapping_types);
-  auto h_element_n_nodes = ::Kokkos::create_mirror_view(cache->element_n_nodes);
-  auto h_element_p_levels = ::Kokkos::create_mirror_view(cache->element_p_levels);
-  auto h_element_subdomains = ::Kokkos::create_mirror_view(cache->element_subdomains);
+  auto h_node_ids = ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->node_ids);
+  auto h_element_ids = ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_ids);
+  auto h_node_coordinates =
+    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->node_coordinates);
+  auto h_element_node_ids =
+    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_node_ids);
+  auto h_element_types =
+    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_types);
+  auto h_element_mapping_types =
+    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_mapping_types);
+  auto h_element_n_nodes =
+    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_n_nodes);
+  auto h_element_p_levels =
+    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_p_levels);
+  auto h_element_subdomains =
+    ::Kokkos::create_mirror_view(::Kokkos::HostSpace(), cache->element_subdomains);
   cache->host_element_types.resize(cache->host_element_ids.size());
   cache->host_element_mapping_types.resize(cache->host_element_ids.size());
   cache->host_element_n_nodes.resize(cache->host_element_ids.size());
