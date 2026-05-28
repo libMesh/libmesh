@@ -613,19 +613,19 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                                                                  mapping_type,
                                                                  quadrature_order);
 
-      ::Kokkos::atomic_increment(&counts(0));
+      ::Kokkos::atomic_add(&counts(0), std::size_t(1));
       if (supported)
-        ::Kokkos::atomic_increment(&counts(1));
+        ::Kokkos::atomic_add(&counts(1), std::size_t(1));
       if (!lagrange_map)
-        ::Kokkos::atomic_increment(&counts(2));
+        ::Kokkos::atomic_add(&counts(2), std::size_t(1));
       if (!shape_ok)
-        ::Kokkos::atomic_increment(&counts(3));
+        ::Kokkos::atomic_add(&counts(3), std::size_t(1));
       if (!grad_ok)
-        ::Kokkos::atomic_increment(&counts(4));
+        ::Kokkos::atomic_add(&counts(4), std::size_t(1));
       if (!n_qpoints)
-        ::Kokkos::atomic_increment(&counts(5));
+        ::Kokkos::atomic_add(&counts(5), std::size_t(1));
       if (!elem_n_dofs(record_index))
-        ::Kokkos::atomic_increment(&counts(6));
+        ::Kokkos::atomic_add(&counts(6), std::size_t(1));
 
       if (record_index == 0)
         {
