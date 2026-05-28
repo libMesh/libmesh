@@ -1288,9 +1288,12 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
   LibmeshPetscCall2(sys.comm(), MatGetOwnershipRange(system_matrix.mat(), &row_start, &row_stop));
   LibmeshPetscCall2(sys.comm(),
                     MatGetOwnershipRangeColumn(system_matrix.mat(), &col_start, &col_stop));
-  if (!build_kokkos_petsc_owned_csr_graph(
-        sys, plan, plan.direct_matrix_layout, row_start, row_stop, col_start, col_stop))
-    return false;
+  {
+    LOG_SCOPE("L2Kokkos::direct storage graph setup", "HilbertSystem");
+    if (!build_kokkos_petsc_owned_csr_graph(
+          sys, plan, plan.direct_matrix_layout, row_start, row_stop, col_start, col_stop))
+      return false;
+  }
 
   std::vector<std::size_t> rhs_local_slots(plan.total_rhs_entries);
   std::vector<std::size_t> mat_value_slots(plan.total_mat_entries);
@@ -1305,16 +1308,25 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
       cast_int<std::size_t>(plan.offdiag_row_offsets.empty() ? 0 : plan.offdiag_row_offsets.back());
   build_kokkos_petsc_owned_coo(plan);
 
-  if (!bind_kokkos_direct_slots_from_plan_graph(
-        sys, dof_index_cache, plan, rhs_first_local, rhs_last_local, rhs_local_slots, mat_value_slots))
-    return false;
+  {
+    LOG_SCOPE("L2Kokkos::direct storage slot setup", "HilbertSystem");
+    if (!bind_kokkos_direct_slots_from_plan_graph(
+          sys, dof_index_cache, plan, rhs_first_local, rhs_last_local, rhs_local_slots, mat_value_slots))
+      return false;
+    finalize_kokkos_direct_slots(sys, plan, rhs_local_slots, mat_value_slots);
+  }
 
-  if (!ensure_kokkos_petsc_owned_matrix(sys, plan, system_matrix))
-    return false;
+  {
+    LOG_SCOPE("L2Kokkos::direct storage PETSc matrix setup", "HilbertSystem");
+    if (!ensure_kokkos_petsc_owned_matrix(sys, plan, system_matrix))
+      return false;
+  }
 
-  finalize_kokkos_direct_slots(sys, plan, rhs_local_slots, mat_value_slots);
-  if (!build_kokkos_petsc_remote_sf(sys, plan))
-    return false;
+  {
+    LOG_SCOPE("L2Kokkos::direct storage remote setup", "HilbertSystem");
+    if (!build_kokkos_petsc_remote_sf(sys, plan))
+      return false;
+  }
   plan.direct_storage_active = true;
   return true;
 }
