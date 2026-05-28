@@ -91,12 +91,6 @@ using KokkosFieldDofStorage =
   libMesh::Kokkos::detail::StaticArrayAccess<unsigned int, kokkos_parsed_fem_max_fields>;
 using KokkosLocalIndexView = DofMap::KokkosLocalIndexCache::elem_local_index_view;
 
-struct KokkosAssemblyDebugStats
-{
-  Real abs_sum = 0.;
-  Real max_abs = 0.;
-};
-
 struct HilbertElementAssemblyRecord
 {
   dof_id_type elem_id = DofObject::invalid_id;
@@ -148,54 +142,6 @@ accumulate_hilbert_dense_outputs(const KokkosScalarView<Number> & d_F,
   for (unsigned int i = 0; i != F.size(); ++i)
     for (unsigned int j = 0; j != F.size(); ++j)
       K(i, j) += h_K(i, j);
-}
-
-template <typename View>
-KokkosAssemblyDebugStats
-debug_kokkos_vector_stats(const View & view)
-{
-  KokkosAssemblyDebugStats stats;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_abs_sum",
-    ::Kokkos::RangePolicy<>(0, view.extent(0)),
-    KOKKOS_LAMBDA(const std::size_t i, Real & local_sum)
-    {
-      const Real value = static_cast<Real>(view(i));
-      local_sum += value < 0 ? -value : value;
-    },
-    stats.abs_sum);
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_max_abs",
-    ::Kokkos::RangePolicy<>(0, view.extent(0)),
-    KOKKOS_LAMBDA(const std::size_t i, Real & local_max)
-    {
-      const Real raw_value = static_cast<Real>(view(i));
-      const Real abs_value = raw_value < 0 ? -raw_value : raw_value;
-      if (abs_value > local_max)
-        local_max = abs_value;
-    },
-    ::Kokkos::Max<Real>(stats.max_abs));
-  ::Kokkos::fence();
-  return stats;
-}
-
-template <typename View>
-void
-debug_print_kokkos_vector_stats(const Parallel::Communicator & comm,
-                                const std::string & label,
-                                const View & view)
-{
-  const auto local_stats = debug_kokkos_vector_stats(view);
-  Real global_abs_sum = local_stats.abs_sum;
-  Real global_max_abs = local_stats.max_abs;
-  comm.sum(global_abs_sum);
-  comm.max(global_max_abs);
-  if (comm.rank() == 0)
-    libMesh::out << "L2Kokkos debug: " << label
-                 << " size=" << view.extent(0)
-                 << " abs_sum=" << global_abs_sum
-                 << " max_abs=" << global_max_abs
-                 << std::endl;
 }
 
 void
@@ -536,473 +482,6 @@ struct KokkosPetscAssemblyPlan
       }
   }
 };
-
-void
-debug_print_kokkos_plan_summary(::HilbertSystem & sys,
-                                const KokkosPetscAssemblyPlan & plan)
-{
-  if (sys.comm().rank() != 0)
-    return;
-
-  libMesh::out << "L2Kokkos debug: records=" << plan.records.size()
-               << " batch_records=" << plan.batch_data.elem_indices.extent(0)
-               << " shape_key_records=" << plan.batch_data.shape_keys.extent(0)
-               << " total_rhs_entries=" << plan.total_rhs_entries
-               << " total_mat_entries=" << plan.total_mat_entries
-               << " rhs_local_size=" << plan.rhs_local_size
-               << " mat_diag_size=" << plan.mat_diag_size
-               << " mat_offdiag_size=" << plan.mat_offdiag_size
-               << " rhs_remote_rows=" << plan.rhs_remote_rows.size()
-               << " mat_remote_rows=" << plan.mat_remote_rows.size()
-               << std::endl;
-
-  if (!plan.records.empty())
-    {
-      const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
-      const auto & record = plan.records.front();
-      libMesh::out << "L2Kokkos debug: first_record elem_id=" << record.elem_id
-                   << " elem_index=" << record.elem_index
-                   << " elem_type=" << cast_int<int>(geometry_cache.host_element_types[record.elem_index])
-                   << " mapping_type="
-                   << cast_int<int>(geometry_cache.host_element_mapping_types[record.elem_index])
-                   << " p_level=" << geometry_cache.host_element_p_levels[record.elem_index]
-                   << " n_nodes=" << geometry_cache.host_element_n_nodes[record.elem_index]
-                   << " n_dofs=" << record.n_dofs
-                   << " quadrature_order=" << record.quadrature_order
-                   << " rhs_offset=" << record.rhs_offset
-                   << " mat_offset=" << record.mat_offset
-                   << std::endl;
-    }
-}
-
-void
-debug_print_device_key_stats(::HilbertSystem & sys,
-                             const KokkosPetscAssemblyPlan & plan,
-                             const MeshBase::KokkosGeometryCache & geometry_cache)
-{
-  const auto n_records = plan.batch_data.elem_indices.extent(0);
-  const auto elem_indices = plan.batch_data.elem_indices;
-  const auto elem_n_dofs = plan.batch_data.elem_n_dofs;
-  const auto quadrature_orders = plan.batch_data.quadrature_orders;
-  const auto shape_keys = plan.batch_data.shape_keys;
-  const auto element_types = geometry_cache.element_types_dual.view_device();
-  const auto element_mapping_types = geometry_cache.element_mapping_types_dual.view_device();
-  const auto element_n_nodes = geometry_cache.element_n_nodes_dual.view_device();
-  const auto element_p_levels = geometry_cache.element_p_levels_dual.view_device();
-  using GeometryExecutionSpace = typename std::decay_t<decltype(element_types)>::execution_space;
-
-  KokkosPetscIntView write_smoke("hilbert_debug_device_write_smoke", 1);
-  ::Kokkos::deep_copy(write_smoke, PetscInt(0));
-  ::Kokkos::parallel_for(
-    "hilbert_debug_device_write_smoke",
-    ::Kokkos::RangePolicy<>(0, 1),
-    KOKKOS_LAMBDA(const int)
-    {
-      write_smoke(0) = PetscInt(123);
-    });
-  ::Kokkos::fence();
-  auto h_write_smoke = ::Kokkos::create_mirror_view(write_smoke);
-  ::Kokkos::deep_copy(h_write_smoke, write_smoke);
-
-  KokkosPetscIntView direct_device_reads("hilbert_debug_direct_device_reads", 8);
-  ::Kokkos::deep_copy(direct_device_reads, PetscInt(-1));
-  ::Kokkos::parallel_for(
-    "hilbert_debug_direct_device_write_sentinel",
-    ::Kokkos::RangePolicy<>(0, 1),
-    KOKKOS_LAMBDA(const int)
-    {
-      direct_device_reads(0) = PetscInt(321);
-    });
-  ::Kokkos::parallel_for(
-    "hilbert_debug_direct_device_reads_default",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index)
-    {
-      if (raw_record_index == 0)
-        {
-          const unsigned int elem_index = elem_indices(0);
-          direct_device_reads(1) = static_cast<PetscInt>(elem_index);
-          direct_device_reads(2) = static_cast<PetscInt>(element_types(elem_index));
-          direct_device_reads(3) = static_cast<PetscInt>(element_n_nodes(elem_index));
-        }
-    });
-  ::Kokkos::parallel_for(
-    "hilbert_debug_direct_device_reads_geometry",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index)
-    {
-      if (raw_record_index == 0)
-        {
-          const unsigned int elem_index = elem_indices(0);
-          direct_device_reads(4) = static_cast<PetscInt>(elem_index);
-          direct_device_reads(5) = static_cast<PetscInt>(element_types(elem_index));
-          direct_device_reads(6) = static_cast<PetscInt>(element_n_nodes(elem_index));
-          direct_device_reads(7) = static_cast<PetscInt>(element_mapping_types(elem_index));
-        }
-    });
-  ::Kokkos::fence();
-  auto h_direct_device_reads = ::Kokkos::create_mirror_view(direct_device_reads);
-  ::Kokkos::deep_copy(h_direct_device_reads, direct_device_reads);
-
-  PetscInt first_device_elem_type = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_first_device_elem_type",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records ? 1 : 0)),
-    KOKKOS_LAMBDA(const int, PetscInt & value)
-    {
-      value += static_cast<PetscInt>(element_types(elem_indices(0)));
-    },
-    first_device_elem_type);
-
-  PetscInt first_device_p_level = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_first_device_p_level",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records ? 1 : 0)),
-    KOKKOS_LAMBDA(const int, PetscInt & value)
-    {
-      value += static_cast<PetscInt>(element_p_levels(elem_indices(0)));
-    },
-    first_device_p_level);
-
-  PetscInt first_device_n_nodes = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_first_device_n_nodes",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records ? 1 : 0)),
-    KOKKOS_LAMBDA(const int, PetscInt & value)
-    {
-      value += static_cast<PetscInt>(element_n_nodes(elem_indices(0)));
-    },
-    first_device_n_nodes);
-
-  PetscInt first_device_record_index = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_first_device_record_index",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records ? 1 : 0)),
-    KOKKOS_LAMBDA(const int, PetscInt & value)
-    {
-      value += static_cast<PetscInt>(elem_indices(0));
-    },
-    first_device_record_index);
-
-  PetscInt local_total = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_device_key_total",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int, PetscInt & count)
-    {
-      count += 1;
-    },
-    local_total);
-
-  PetscInt local_supported = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_device_key_supported",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
-    {
-      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
-      const unsigned int elem_index = elem_indices(record_index);
-      const auto mapping_type = element_mapping_types(elem_index);
-      const unsigned int quadrature_order = quadrature_orders(record_index);
-      const libMesh::FEShapeKey key = shape_keys(record_index);
-      if (libMesh::Kokkos::detail::supports_hilbert_local_assembly(key,
-                                                                   mapping_type,
-                                                                   quadrature_order))
-        count += 1;
-    },
-    local_supported);
-
-  PetscInt local_bad_mapping = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_device_key_bad_mapping",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
-    {
-      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
-      const unsigned int elem_index = elem_indices(record_index);
-      if (element_mapping_types(elem_index) != libMesh::LAGRANGE_MAP)
-        count += 1;
-    },
-    local_bad_mapping);
-
-  PetscInt local_bad_shape = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_device_key_bad_shape",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
-    {
-      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
-      const libMesh::FEShapeKey key = shape_keys(record_index);
-      if (!libMesh::supports_shape_with_lagrange_map(key))
-        count += 1;
-    },
-    local_bad_shape);
-
-  PetscInt local_bad_grad = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_device_key_bad_grad",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
-    {
-      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
-      const libMesh::FEShapeKey key = shape_keys(record_index);
-      if (!libMesh::supports_grad_shape(key))
-        count += 1;
-    },
-    local_bad_grad);
-
-  PetscInt local_zero_qpoints = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_device_key_zero_qpoints",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
-    {
-      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
-      const libMesh::FEShapeKey key = shape_keys(record_index);
-      if (!libMesh::Kokkos::GaussQuadrature::n_points(key.elem_type,
-                                                      quadrature_orders(record_index)))
-        count += 1;
-    },
-    local_zero_qpoints);
-
-  PetscInt local_zero_dofs = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_device_key_zero_dofs",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
-    {
-      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
-      if (!elem_n_dofs(record_index))
-        count += 1;
-    },
-    local_zero_dofs);
-
-  PetscInt local_first_record_hits = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_device_key_first_record",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
-    {
-      if (raw_record_index == 0)
-        count += 1;
-    },
-    local_first_record_hits);
-  ::Kokkos::fence();
-
-  FEShapeKey first_shape_key{INVALID_FE, INVALID_ELEM, INVALID_ORDER};
-  if (n_records)
-    {
-      auto h_shape_keys = ::Kokkos::create_mirror_view(plan.batch_data.shape_keys);
-      ::Kokkos::deep_copy(h_shape_keys, plan.batch_data.shape_keys);
-      first_shape_key = h_shape_keys(0);
-    }
-
-  PetscInt first_mirror_elem_type = PetscInt(-1);
-  PetscInt first_mirror_p_level = PetscInt(-1);
-  PetscInt first_mirror_n_nodes = PetscInt(-1);
-  if (element_types.extent(0))
-    {
-      auto h_element_types =
-        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), element_types);
-      auto h_element_p_levels =
-        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), element_p_levels);
-      auto h_element_n_nodes =
-        ::Kokkos::create_mirror_view_and_copy(::Kokkos::HostSpace(), element_n_nodes);
-      first_mirror_elem_type = cast_int<PetscInt>(h_element_types(0));
-      first_mirror_p_level = cast_int<PetscInt>(h_element_p_levels(0));
-      first_mirror_n_nodes = cast_int<PetscInt>(h_element_n_nodes(0));
-    }
-
-  std::array<PetscInt, 8> global_counts = {local_total,
-                                           local_supported,
-                                           local_bad_mapping,
-                                           local_bad_shape,
-                                           local_bad_grad,
-                                           local_zero_qpoints,
-                                           local_zero_dofs,
-                                           local_first_record_hits};
-  for (auto & count : global_counts)
-    sys.comm().sum(count);
-
-  const PetscInt first_record_elem_index =
-    plan.records.empty() ? PetscInt(-1) : cast_int<PetscInt>(plan.records.front().elem_index);
-  const PetscInt first_record_mapping =
-    plan.records.empty()
-      ? PetscInt(-1)
-      : cast_int<PetscInt>(
-          geometry_cache.host_element_mapping_types[plan.records.front().elem_index]);
-  const PetscInt first_record_p_level =
-    plan.records.empty()
-      ? PetscInt(-1)
-      : cast_int<PetscInt>(geometry_cache.host_element_p_levels[plan.records.front().elem_index]);
-  const PetscInt first_record_quadrature =
-    plan.records.empty() ? PetscInt(-1) : cast_int<PetscInt>(plan.records.front().quadrature_order);
-  const PetscInt first_record_n_qpoints =
-    plan.records.empty()
-      ? PetscInt(-1)
-      : cast_int<PetscInt>(
-          libMesh::Kokkos::GaussQuadrature::n_points(first_shape_key.elem_type,
-                                                     plan.records.front().quadrature_order));
-  const PetscInt first_record_n_nodes =
-    plan.records.empty()
-      ? PetscInt(-1)
-      : cast_int<PetscInt>(geometry_cache.host_element_n_nodes[plan.records.front().elem_index]);
-  if (!n_records)
-    {
-      first_device_elem_type = PetscInt(-1);
-      first_device_p_level = PetscInt(-1);
-      first_device_n_nodes = PetscInt(-1);
-      first_device_record_index = PetscInt(-1);
-    }
-
-  if (sys.comm().rank() == 0)
-    libMesh::out << "L2Kokkos debug: device_key total=" << global_counts[0]
-                 << " marker=direct-dualview-read-v2"
-                 << " supported=" << global_counts[1]
-                 << " bad_mapping=" << global_counts[2]
-                 << " bad_shape=" << global_counts[3]
-                 << " bad_grad=" << global_counts[4]
-                 << " zero_qpoints=" << global_counts[5]
-                 << " zero_dofs=" << global_counts[6]
-                 << " first_record_hits=" << global_counts[7]
-                 << " first_key_family=" << cast_int<PetscInt>(first_shape_key.family)
-                 << " first_key_elem_type=" << cast_int<PetscInt>(first_shape_key.elem_type)
-                 << " first_key_order=" << cast_int<PetscInt>(first_shape_key.order)
-                 << " first_mapping_type=" << first_record_mapping
-                 << " first_p_level=" << first_record_p_level
-                 << " first_quadrature_order=" << first_record_quadrature
-                 << " first_n_qpoints=" << first_record_n_qpoints
-                 << " first_n_nodes=" << first_record_n_nodes
-                 << " first_elem_index=" << first_record_elem_index
-                 << " write_smoke=" << h_write_smoke(0)
-                 << " direct_sentinel=" << h_direct_device_reads(0)
-                 << " direct_default_elem_index=" << h_direct_device_reads(1)
-                 << " direct_default_elem_type=" << h_direct_device_reads(2)
-                 << " direct_default_n_nodes=" << h_direct_device_reads(3)
-                 << " direct_geometry_elem_index=" << h_direct_device_reads(4)
-                 << " direct_geometry_elem_type=" << h_direct_device_reads(5)
-                 << " direct_geometry_n_nodes=" << h_direct_device_reads(6)
-                 << " direct_geometry_mapping=" << h_direct_device_reads(7)
-                 << " first_device_elem_index=" << first_device_record_index
-                 << " first_device_elem_type=" << first_device_elem_type
-                 << " first_device_p_level=" << first_device_p_level
-                 << " first_device_n_nodes=" << first_device_n_nodes
-                 << " geometry_device_records=" << element_types.extent(0)
-                 << " geometry_device_n_node_records=" << element_n_nodes.extent(0)
-                 << " first_mirror_elem_type=" << first_mirror_elem_type
-                 << " first_mirror_p_level=" << first_mirror_p_level
-                 << " first_mirror_n_nodes=" << first_mirror_n_nodes
-                 << std::endl;
-}
-
-template <typename GoalAccess>
-void
-debug_print_first_value_kernel_stats(::HilbertSystem & sys,
-                                     const KokkosPetscAssemblyPlan & plan,
-                                     const MeshBase::KokkosGeometryCache & geometry_cache,
-                                     GoalAccess goal_access)
-{
-  const auto n_records = plan.batch_data.elem_indices.extent(0);
-  KokkosPetscIntView int_stats("hilbert_debug_first_value_ints", 8);
-  KokkosScalarView<Number> value_stats("hilbert_debug_first_value_values", 12);
-  ::Kokkos::deep_copy(int_stats, PetscInt(-1));
-  ::Kokkos::deep_copy(value_stats, Number(-999.));
-
-  const auto node_coordinates = geometry_cache.node_coordinates_dual.view_device();
-  const auto element_node_ids = geometry_cache.element_node_ids_dual.view_device();
-  const auto element_mapping_types = geometry_cache.element_mapping_types_dual.view_device();
-  const auto element_n_nodes = geometry_cache.element_n_nodes_dual.view_device();
-  const auto elem_indices = plan.batch_data.elem_indices;
-  const auto elem_n_dofs = plan.batch_data.elem_n_dofs;
-  const auto quadrature_orders = plan.batch_data.quadrature_orders;
-  const auto shape_keys = plan.batch_data.shape_keys;
-  const unsigned int hilbert_order = sys.hilbert_order();
-
-  ::Kokkos::parallel_for(
-    "hilbert_debug_first_value_kernel",
-    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
-    KOKKOS_LAMBDA(const int raw_record_index)
-    {
-      if (raw_record_index != 0)
-        return;
-
-      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
-      const unsigned int elem_index = elem_indices(record_index);
-      const unsigned int n_dofs = elem_n_dofs(record_index);
-      const auto key = shape_keys(record_index);
-      const auto mapping_type = element_mapping_types(elem_index);
-      const unsigned int n_nodes = element_n_nodes(elem_index);
-      const unsigned int quadrature_order = quadrature_orders(record_index);
-      const auto elem_nodes =
-        libMesh::Kokkos::detail::make_element_node_access(node_coordinates,
-                                                          element_node_ids,
-                                                          elem_index);
-      const libMesh::Kokkos::detail::HilbertFEAccess<decltype(elem_nodes)> fe(key,
-                                                                              mapping_type,
-                                                                              elem_nodes,
-                                                                              n_nodes,
-                                                                              quadrature_order,
-                                                                              elem_index);
-      const auto qp_data = fe.qp_data(0, hilbert_order > 0);
-      const Point & xyz = qp_data.xyz();
-      const auto solution =
-        libMesh::Kokkos::detail::make_hilbert_solution_access(
-          fe, libMesh::Kokkos::detail::ZeroCoeffAccess{}, Number(1.));
-      libMesh::Kokkos::detail::LocalHilbertAccumulator<kokkos_hilbert_max_dofs> accum(n_dofs);
-      libMesh::detail::assemble_hilbert_element(
-        fe, solution, goal_access, true, hilbert_order, n_dofs, accum);
-
-      int_stats(0) = static_cast<PetscInt>(elem_index);
-      int_stats(1) = static_cast<PetscInt>(key.elem_type);
-      int_stats(2) = static_cast<PetscInt>(n_dofs);
-      int_stats(3) = static_cast<PetscInt>(n_nodes);
-      int_stats(4) = static_cast<PetscInt>(fe.n_qpoints());
-      int_stats(5) = static_cast<PetscInt>(element_node_ids(elem_index, 0));
-      int_stats(6) = static_cast<PetscInt>(mapping_type);
-      int_stats(7) = static_cast<PetscInt>(quadrature_order);
-
-      value_stats(0) = node_coordinates(element_node_ids(elem_index, 0), 0);
-      value_stats(1) = node_coordinates(element_node_ids(elem_index, 0), 1);
-      value_stats(2) = node_coordinates(element_node_ids(elem_index, 0), 2);
-      value_stats(3) = qp_data.JxW();
-      value_stats(4) = xyz(0);
-      value_stats(5) = xyz(1);
-      value_stats(6) = xyz(2);
-      value_stats(7) = goal_access.value(qp_data, xyz);
-      value_stats(8) = qp_data.phi(0);
-      value_stats(9) = accum.residual(0);
-      value_stats(10) = accum.jacobian(0, 0);
-      value_stats(11) = solution.solution_derivative();
-    });
-  ::Kokkos::fence();
-
-  auto h_int_stats = ::Kokkos::create_mirror_view(int_stats);
-  auto h_value_stats = ::Kokkos::create_mirror_view(value_stats);
-  ::Kokkos::deep_copy(h_int_stats, int_stats);
-  ::Kokkos::deep_copy(h_value_stats, value_stats);
-
-  if (sys.comm().rank() == 0)
-    libMesh::out << "L2Kokkos debug: first_value marker=value-kernel-v1"
-                 << " elem_index=" << h_int_stats(0)
-                 << " elem_type=" << h_int_stats(1)
-                 << " n_dofs=" << h_int_stats(2)
-                 << " n_nodes=" << h_int_stats(3)
-                 << " n_qpoints=" << h_int_stats(4)
-                 << " first_node_index=" << h_int_stats(5)
-                 << " mapping_type=" << h_int_stats(6)
-                 << " quadrature_order=" << h_int_stats(7)
-                 << " node0=(" << h_value_stats(0) << ","
-                 << h_value_stats(1) << "," << h_value_stats(2) << ")"
-                 << " qp0_JxW=" << h_value_stats(3)
-                 << " qp0_xyz=(" << h_value_stats(4) << ","
-                 << h_value_stats(5) << "," << h_value_stats(6) << ")"
-                 << " qp0_goal=" << h_value_stats(7)
-                 << " qp0_phi0=" << h_value_stats(8)
-                 << " residual0=" << h_value_stats(9)
-                 << " jacobian00=" << h_value_stats(10)
-                 << " solution_derivative=" << h_value_stats(11)
-                 << std::endl;
-}
 
 using RemoteRhsContribution = std::pair<PetscInt, PetscScalar>;
 using RemoteMatContribution = std::tuple<PetscInt, PetscInt, PetscScalar>;
@@ -2425,10 +1904,6 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
   {
     LOG_SCOPE("L2Kokkos::write PETSc storage", "HilbertSystem");
 
-    const bool debug_assembly = libMesh::on_command_line("--kokkos-debug-assembly");
-    if (debug_assembly)
-      debug_print_kokkos_plan_summary(sys, plan);
-
     auto rhs_guard = system_rhs.make_kokkos_write_view_guard();
     const KokkosVectorWriteView local_rhs_values = rhs_guard.view();
     KokkosVectorWriteView remote_rhs_values;
@@ -2483,15 +1958,11 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
       LOG_SCOPE("L2Kokkos::assemble all records", "HilbertSystem");
 
       const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
-      if (debug_assembly)
-        debug_print_device_key_stats(sys, plan, geometry_cache);
       if (analytic_goal)
         {
           const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
                                                       plan.analytic_goal_values,
                                                       plan.analytic_goal_gradients);
-          if (debug_assembly)
-            debug_print_first_value_kernel_stats(sys, plan, geometry_cache, goal_access);
           libMesh::Kokkos::detail::run_hilbert_system_value_batch<kokkos_hilbert_max_dofs>(
             geometry_cache.node_coordinates_dual.view_device(),
             geometry_cache.element_node_ids_dual.view_device(),
@@ -2539,16 +2010,6 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                           "hilbert_fem_all_record_values");
         }
 
-      if (debug_assembly)
-        {
-          debug_print_kokkos_vector_stats(sys.comm(),
-                                          "post_value rhs_entry_values",
-                                          plan.rhs_entry_values);
-          debug_print_kokkos_vector_stats(sys.comm(),
-                                          "post_value mat_entry_values",
-                                          plan.mat_entry_values);
-        }
-
       {
         LOG_SCOPE("L2Kokkos::scatter entry values", "HilbertSystem");
         scatter_kokkos_hilbert_entry_values(plan,
@@ -2559,24 +2020,6 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                             offdiag_matrix_values,
                                             remote_matrix_values);
       }
-
-      if (debug_assembly)
-        {
-          debug_print_kokkos_vector_stats(sys.comm(),
-                                          "post_scatter local_rhs_values",
-                                          local_rhs_values);
-          debug_print_kokkos_vector_stats(sys.comm(),
-                                          "post_scatter mat_coo_values",
-                                          plan.mat_coo_values);
-          if (plan.rhs_remote_values.extent(0))
-            debug_print_kokkos_vector_stats(sys.comm(),
-                                            "post_scatter rhs_remote_values",
-                                            plan.rhs_remote_values);
-          if (plan.mat_remote_values.extent(0))
-            debug_print_kokkos_vector_stats(sys.comm(),
-                                            "post_scatter mat_remote_values",
-                                            plan.mat_remote_values);
-        }
     }
 
     ::Kokkos::fence();
@@ -3007,16 +2450,6 @@ HilbertSystem::try_kokkos_petsc_solve()
     petsc_solution->close();
   }
 
-  if (libMesh::on_command_line("--kokkos-debug-assembly"))
-    {
-      PetscReal rhs_norm = 0.;
-      LibmeshPetscCall2(this->comm(), VecNorm(petsc_rhs->vec(), NORM_2, &rhs_norm));
-      if (this->comm().rank() == 0)
-        libMesh::out << "L2Kokkos debug: post_close PETSc rhs_l2_norm="
-                     << static_cast<Real>(rhs_norm)
-                     << std::endl;
-    }
-
   LinearSolver<Number> * solver = this->get_linear_solver();
   {
     LOG_SCOPE("L2Kokkos::init PETSc solver", "HilbertSystem");
@@ -3039,16 +2472,6 @@ HilbertSystem::try_kokkos_petsc_solve()
   const auto solve_stop = clock::now();
   this->_last_kokkos_timing.solve_seconds =
     std::chrono::duration_cast<std::chrono::duration<Real>>(solve_stop - solve_start).count();
-
-  if (libMesh::on_command_line("--kokkos-debug-assembly"))
-    {
-      PetscReal solution_norm = 0.;
-      LibmeshPetscCall2(this->comm(), VecNorm(petsc_solution->vec(), NORM_2, &solution_norm));
-      if (this->comm().rank() == 0)
-        libMesh::out << "L2Kokkos debug: post_solve PETSc solution_l2_norm="
-                     << static_cast<Real>(solution_norm)
-                     << std::endl;
-    }
 
   this->update();
   this->mesh_position_set();
