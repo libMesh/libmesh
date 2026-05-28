@@ -489,6 +489,19 @@ kokkos_default_petsc_mem_type()
   return PETSC_MEMTYPE_KOKKOS;
 }
 
+bool
+is_petsc_kokkos_vec(const Parallel::Communicator & comm, Vec vec)
+{
+  const char * vec_type = nullptr;
+  LibmeshPetscCall2(comm, VecGetType(vec, &vec_type));
+
+  PetscBool is_seq_kokkos = PETSC_FALSE;
+  PetscBool is_mpi_kokkos = PETSC_FALSE;
+  LibmeshPetscCall2(comm, PetscStrcmp(vec_type, "seqkokkos", &is_seq_kokkos));
+  LibmeshPetscCall2(comm, PetscStrcmp(vec_type, "mpikokkos", &is_mpi_kokkos));
+  return is_seq_kokkos || is_mpi_kokkos;
+}
+
 void
 clear_kokkos_petsc_remote_sf(KokkosPetscAssemblyPlan & plan)
 {
@@ -1187,19 +1200,15 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
 
   const char * mat_type = nullptr;
   LibmeshPetscCall2(sys.comm(), MatGetType(system_matrix.mat(), &mat_type));
-  PetscBool is_seq_aij = PETSC_FALSE;
   PetscBool is_seq_aijkokkos = PETSC_FALSE;
-  PetscBool is_mpi_aij = PETSC_FALSE;
   PetscBool is_mpi_aijkokkos = PETSC_FALSE;
-  LibmeshPetscCall2(sys.comm(), PetscStrcmp(mat_type, MATSEQAIJ, &is_seq_aij));
   LibmeshPetscCall2(sys.comm(), PetscStrcmp(mat_type, MATSEQAIJKOKKOS, &is_seq_aijkokkos));
-  LibmeshPetscCall2(sys.comm(), PetscStrcmp(mat_type, MATMPIAIJ, &is_mpi_aij));
   LibmeshPetscCall2(sys.comm(), PetscStrcmp(mat_type, MATMPIAIJKOKKOS, &is_mpi_aijkokkos));
-  if (!is_seq_aij && !is_seq_aijkokkos && !is_mpi_aij && !is_mpi_aijkokkos)
-    return false;
+  if (!is_seq_aijkokkos && !is_mpi_aijkokkos)
+    libmesh_error_msg("HilbertSystem Kokkos direct PETSc storage requires PETSc AIJKokkos "
+                      "matrices. Run with -mat_type aijkokkos.");
   plan.direct_matrix_layout =
-    (is_seq_aij || is_seq_aijkokkos) ? KokkosDirectMatrixLayout::seq_aij :
-                                       KokkosDirectMatrixLayout::mpi_aij;
+    is_seq_aijkokkos ? KokkosDirectMatrixLayout::seq_aij : KokkosDirectMatrixLayout::mpi_aij;
 
   PetscInt rhs_first_local_petsc = 0;
   PetscInt rhs_last_local_petsc = 0;
@@ -2092,6 +2101,7 @@ using libMesh::build_kokkos_petsc_assembly_plan;
 using libMesh::cast_int;
 using libMesh::ensure_kokkos_goal_cache;
 using libMesh::ensure_kokkos_sampled_analytic_goal_data;
+using libMesh::is_petsc_kokkos_vec;
 using libMesh::kokkos_petsc_plan_matches;
 using libMesh::libmesh_ignore;
 using libMesh::make_hilbert_shape_key;
@@ -2351,6 +2361,10 @@ HilbertSystem::try_kokkos_petsc_solve()
   libmesh_error_msg_if(!(analytic_goal || fem_goal),
                        "HilbertSystem Kokkos direct PETSc storage requires an analytic goal "
                        "or a parsed FEM goal with Kokkos support.");
+  libmesh_error_msg_if(!is_petsc_kokkos_vec(this->comm(), petsc_rhs->vec()) ||
+                         !is_petsc_kokkos_vec(this->comm(), petsc_solution->vec()),
+                       "HilbertSystem Kokkos direct PETSc storage requires PETSc Kokkos vectors. "
+                       "Run with -vec_type kokkos.");
 
   prewarm_kokkos_hilbert_entities(*this, fem_goal);
   this->_last_kokkos_timing = {};
