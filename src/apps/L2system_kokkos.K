@@ -198,41 +198,6 @@ debug_print_kokkos_vector_stats(const Parallel::Communicator & comm,
 }
 
 void
-debug_print_kokkos_plan_summary(::HilbertSystem & sys,
-                                const KokkosPetscAssemblyPlan & plan)
-{
-  if (sys.comm().rank() != 0)
-    return;
-
-  libMesh::out << "L2Kokkos debug: records=" << plan.records.size()
-               << " total_rhs_entries=" << plan.total_rhs_entries
-               << " total_mat_entries=" << plan.total_mat_entries
-               << " rhs_local_size=" << plan.rhs_local_size
-               << " mat_diag_size=" << plan.mat_diag_size
-               << " mat_offdiag_size=" << plan.mat_offdiag_size
-               << " rhs_remote_rows=" << plan.rhs_remote_rows.size()
-               << " mat_remote_rows=" << plan.mat_remote_rows.size()
-               << std::endl;
-
-  if (!plan.records.empty())
-    {
-      const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
-      const auto & record = plan.records.front();
-      libMesh::out << "L2Kokkos debug: first_record elem_id=" << record.elem_id
-                   << " elem_index=" << record.elem_index
-                   << " elem_type=" << geometry_cache.host_element_types[record.elem_index]
-                   << " mapping_type=" << geometry_cache.host_element_mapping_types[record.elem_index]
-                   << " p_level=" << geometry_cache.host_element_p_levels[record.elem_index]
-                   << " n_nodes=" << geometry_cache.host_element_n_nodes[record.elem_index]
-                   << " n_dofs=" << record.n_dofs
-                   << " quadrature_order=" << record.quadrature_order
-                   << " rhs_offset=" << record.rhs_offset
-                   << " mat_offset=" << record.mat_offset
-                   << std::endl;
-    }
-}
-
-void
 build_hilbert_element_records(::HilbertSystem & sys,
                               std::vector<HilbertElementAssemblyRecord> & records,
                               std::size_t & total_rhs_entries,
@@ -569,6 +534,41 @@ struct KokkosPetscAssemblyPlan
       }
   }
 };
+
+void
+debug_print_kokkos_plan_summary(::HilbertSystem & sys,
+                                const KokkosPetscAssemblyPlan & plan)
+{
+  if (sys.comm().rank() != 0)
+    return;
+
+  libMesh::out << "L2Kokkos debug: records=" << plan.records.size()
+               << " total_rhs_entries=" << plan.total_rhs_entries
+               << " total_mat_entries=" << plan.total_mat_entries
+               << " rhs_local_size=" << plan.rhs_local_size
+               << " mat_diag_size=" << plan.mat_diag_size
+               << " mat_offdiag_size=" << plan.mat_offdiag_size
+               << " rhs_remote_rows=" << plan.rhs_remote_rows.size()
+               << " mat_remote_rows=" << plan.mat_remote_rows.size()
+               << std::endl;
+
+  if (!plan.records.empty())
+    {
+      const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
+      const auto & record = plan.records.front();
+      libMesh::out << "L2Kokkos debug: first_record elem_id=" << record.elem_id
+                   << " elem_index=" << record.elem_index
+                   << " elem_type=" << geometry_cache.host_element_types[record.elem_index]
+                   << " mapping_type=" << geometry_cache.host_element_mapping_types[record.elem_index]
+                   << " p_level=" << geometry_cache.host_element_p_levels[record.elem_index]
+                   << " n_nodes=" << geometry_cache.host_element_n_nodes[record.elem_index]
+                   << " n_dofs=" << record.n_dofs
+                   << " quadrature_order=" << record.quadrature_order
+                   << " rhs_offset=" << record.rhs_offset
+                   << " mat_offset=" << record.mat_offset
+                   << std::endl;
+    }
+}
 
 using RemoteRhsContribution = std::pair<PetscInt, PetscScalar>;
 using RemoteMatContribution = std::tuple<PetscInt, PetscInt, PetscScalar>;
