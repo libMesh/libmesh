@@ -604,25 +604,41 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   auto h_write_smoke = ::Kokkos::create_mirror_view(write_smoke);
   ::Kokkos::deep_copy(h_write_smoke, write_smoke);
 
-  KokkosPetscIntView direct_device_reads("hilbert_debug_direct_device_reads", 4);
+  KokkosPetscIntView direct_device_reads("hilbert_debug_direct_device_reads", 8);
   ::Kokkos::deep_copy(direct_device_reads, PetscInt(-1));
   ::Kokkos::parallel_for(
-    "hilbert_debug_direct_device_reads_default",
-    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    "hilbert_debug_direct_device_write_sentinel",
+    ::Kokkos::RangePolicy<>(0, 1),
     KOKKOS_LAMBDA(const int)
     {
-      const unsigned int elem_index = elem_indices(0);
-      direct_device_reads(0) = cast_int<PetscInt>(element_types(elem_index));
-      direct_device_reads(1) = cast_int<PetscInt>(element_n_nodes(elem_index));
+      direct_device_reads(0) = PetscInt(321);
+    });
+  ::Kokkos::parallel_for(
+    "hilbert_debug_direct_device_reads_default",
+    ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index)
+    {
+      if (raw_record_index == 0)
+        {
+          const unsigned int elem_index = elem_indices(0);
+          direct_device_reads(1) = static_cast<PetscInt>(elem_index);
+          direct_device_reads(2) = static_cast<PetscInt>(element_types(elem_index));
+          direct_device_reads(3) = static_cast<PetscInt>(element_n_nodes(elem_index));
+        }
     });
   ::Kokkos::parallel_for(
     "hilbert_debug_direct_device_reads_geometry",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
-    KOKKOS_LAMBDA(const int)
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
+    KOKKOS_LAMBDA(const int raw_record_index)
     {
-      const unsigned int elem_index = elem_indices(0);
-      direct_device_reads(2) = cast_int<PetscInt>(element_types(elem_index));
-      direct_device_reads(3) = cast_int<PetscInt>(element_n_nodes(elem_index));
+      if (raw_record_index == 0)
+        {
+          const unsigned int elem_index = elem_indices(0);
+          direct_device_reads(4) = static_cast<PetscInt>(elem_index);
+          direct_device_reads(5) = static_cast<PetscInt>(element_types(elem_index));
+          direct_device_reads(6) = static_cast<PetscInt>(element_n_nodes(elem_index));
+          direct_device_reads(7) = static_cast<PetscInt>(element_mapping_types(elem_index));
+        }
     });
   ::Kokkos::fence();
   auto h_direct_device_reads = ::Kokkos::create_mirror_view(direct_device_reads);
@@ -631,40 +647,40 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   PetscInt first_device_elem_type = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_first_device_elem_type",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records ? 1 : 0)),
     KOKKOS_LAMBDA(const int, PetscInt & value)
     {
-      value += cast_int<PetscInt>(element_types(elem_indices(0)));
+      value += static_cast<PetscInt>(element_types(elem_indices(0)));
     },
     first_device_elem_type);
 
   PetscInt first_device_p_level = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_first_device_p_level",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records ? 1 : 0)),
     KOKKOS_LAMBDA(const int, PetscInt & value)
     {
-      value += cast_int<PetscInt>(element_p_levels(elem_indices(0)));
+      value += static_cast<PetscInt>(element_p_levels(elem_indices(0)));
     },
     first_device_p_level);
 
   PetscInt first_device_n_nodes = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_first_device_n_nodes",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records ? 1 : 0)),
     KOKKOS_LAMBDA(const int, PetscInt & value)
     {
-      value += cast_int<PetscInt>(element_n_nodes(elem_indices(0)));
+      value += static_cast<PetscInt>(element_n_nodes(elem_indices(0)));
     },
     first_device_n_nodes);
 
   PetscInt first_device_record_index = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_first_device_record_index",
-    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records ? 1 : 0)),
     KOKKOS_LAMBDA(const int, PetscInt & value)
     {
-      value += cast_int<PetscInt>(elem_indices(0));
+      value += static_cast<PetscInt>(elem_indices(0));
     },
     first_device_record_index);
 
@@ -684,7 +700,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
     ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
     {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const auto mapping_type = element_mapping_types(elem_index);
       const unsigned int quadrature_order = quadrature_orders(record_index);
@@ -702,7 +718,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
     ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
     {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       if (element_mapping_types(elem_index) != libMesh::LAGRANGE_MAP)
         count += 1;
@@ -715,7 +731,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
     ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
     {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const libMesh::FEShapeKey key = shape_keys(record_index);
       if (!libMesh::supports_shape_with_lagrange_map(key))
         count += 1;
@@ -728,7 +744,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
     ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
     {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const libMesh::FEShapeKey key = shape_keys(record_index);
       if (!libMesh::supports_grad_shape(key))
         count += 1;
@@ -741,7 +757,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
     ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
     {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const libMesh::FEShapeKey key = shape_keys(record_index);
       if (!libMesh::Kokkos::GaussQuadrature::n_points(key.elem_type,
                                                       quadrature_orders(record_index)))
@@ -755,7 +771,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
     ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index, PetscInt & count)
     {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       if (!elem_n_dofs(record_index))
         count += 1;
     },
@@ -841,7 +857,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
 
   if (sys.comm().rank() == 0)
     libMesh::out << "L2Kokkos debug: device_key total=" << global_counts[0]
-                 << " marker=direct-dualview-read-v1"
+                 << " marker=direct-dualview-read-v2"
                  << " supported=" << global_counts[1]
                  << " bad_mapping=" << global_counts[2]
                  << " bad_shape=" << global_counts[3]
@@ -859,10 +875,14 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                  << " first_n_nodes=" << first_record_n_nodes
                  << " first_elem_index=" << first_record_elem_index
                  << " write_smoke=" << h_write_smoke(0)
-                 << " direct_default_elem_type=" << h_direct_device_reads(0)
-                 << " direct_default_n_nodes=" << h_direct_device_reads(1)
-                 << " direct_geometry_elem_type=" << h_direct_device_reads(2)
-                 << " direct_geometry_n_nodes=" << h_direct_device_reads(3)
+                 << " direct_sentinel=" << h_direct_device_reads(0)
+                 << " direct_default_elem_index=" << h_direct_device_reads(1)
+                 << " direct_default_elem_type=" << h_direct_device_reads(2)
+                 << " direct_default_n_nodes=" << h_direct_device_reads(3)
+                 << " direct_geometry_elem_index=" << h_direct_device_reads(4)
+                 << " direct_geometry_elem_type=" << h_direct_device_reads(5)
+                 << " direct_geometry_n_nodes=" << h_direct_device_reads(6)
+                 << " direct_geometry_mapping=" << h_direct_device_reads(7)
                  << " first_device_elem_index=" << first_device_record_index
                  << " first_device_elem_type=" << first_device_elem_type
                  << " first_device_p_level=" << first_device_p_level
@@ -1782,12 +1802,12 @@ build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & recor
     ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index)
     {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       shape_keys(record_index) =
         FEShapeKey{family,
                    element_types(elem_index),
-                   static_cast<Order>(base_order + cast_int<int>(element_p_levels(elem_index)))};
+                   static_cast<Order>(base_order + static_cast<int>(element_p_levels(elem_index)))};
     });
   ::Kokkos::fence();
 }
