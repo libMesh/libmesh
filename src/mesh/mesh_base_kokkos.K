@@ -85,15 +85,15 @@ MeshBase::get_kokkos_geometry_cache() const
     KokkosGeometryCache::elem_subdomain_dual_view("mesh_kokkos_element_subdomains",
                                                   cache->host_element_ids.size());
 
-  auto h_node_ids = cache->node_ids_dual.h_view;
-  auto h_element_ids = cache->element_ids_dual.h_view;
-  auto h_node_coordinates = cache->node_coordinates_dual.h_view;
-  auto h_element_node_ids = cache->element_node_ids_dual.h_view;
-  auto h_element_types = cache->element_types_dual.h_view;
-  auto h_element_mapping_types = cache->element_mapping_types_dual.h_view;
-  auto h_element_n_nodes = cache->element_n_nodes_dual.h_view;
-  auto h_element_p_levels = cache->element_p_levels_dual.h_view;
-  auto h_element_subdomains = cache->element_subdomains_dual.h_view;
+  auto h_node_ids = cache->node_ids_dual.view_host();
+  auto h_element_ids = cache->element_ids_dual.view_host();
+  auto h_node_coordinates = cache->node_coordinates_dual.view_host();
+  auto h_element_node_ids = cache->element_node_ids_dual.view_host();
+  auto h_element_types = cache->element_types_dual.view_host();
+  auto h_element_mapping_types = cache->element_mapping_types_dual.view_host();
+  auto h_element_n_nodes = cache->element_n_nodes_dual.view_host();
+  auto h_element_p_levels = cache->element_p_levels_dual.view_host();
+  auto h_element_subdomains = cache->element_subdomains_dual.view_host();
   cache->host_element_types.resize(cache->host_element_ids.size());
   cache->host_element_mapping_types.resize(cache->host_element_ids.size());
   cache->host_element_n_nodes.resize(cache->host_element_ids.size());
@@ -150,15 +150,15 @@ MeshBase::get_kokkos_geometry_cache() const
   cache->element_p_levels_dual.sync_device();
   cache->element_subdomains_dual.sync_device();
 
-  cache->node_ids = cache->node_ids_dual.d_view;
-  cache->element_ids = cache->element_ids_dual.d_view;
-  cache->node_coordinates = cache->node_coordinates_dual.d_view;
-  cache->element_node_ids = cache->element_node_ids_dual.d_view;
-  cache->element_types = cache->element_types_dual.d_view;
-  cache->element_mapping_types = cache->element_mapping_types_dual.d_view;
-  cache->element_n_nodes = cache->element_n_nodes_dual.d_view;
-  cache->element_p_levels = cache->element_p_levels_dual.d_view;
-  cache->element_subdomains = cache->element_subdomains_dual.d_view;
+  cache->node_ids = cache->node_ids_dual.view_device();
+  cache->element_ids = cache->element_ids_dual.view_device();
+  cache->node_coordinates = cache->node_coordinates_dual.view_device();
+  cache->element_node_ids = cache->element_node_ids_dual.view_device();
+  cache->element_types = cache->element_types_dual.view_device();
+  cache->element_mapping_types = cache->element_mapping_types_dual.view_device();
+  cache->element_n_nodes = cache->element_n_nodes_dual.view_device();
+  cache->element_p_levels = cache->element_p_levels_dual.view_device();
+  cache->element_subdomains = cache->element_subdomains_dual.view_device();
   _kokkos_geometry_cache = std::move(cache);
   return *_kokkos_geometry_cache;
 }
