@@ -558,8 +558,9 @@ debug_print_kokkos_plan_summary(::HilbertSystem & sys,
       const auto & record = plan.records.front();
       libMesh::out << "L2Kokkos debug: first_record elem_id=" << record.elem_id
                    << " elem_index=" << record.elem_index
-                   << " elem_type=" << geometry_cache.host_element_types[record.elem_index]
-                   << " mapping_type=" << geometry_cache.host_element_mapping_types[record.elem_index]
+                   << " elem_type=" << cast_int<int>(geometry_cache.host_element_types[record.elem_index])
+                   << " mapping_type="
+                   << cast_int<int>(geometry_cache.host_element_mapping_types[record.elem_index])
                    << " p_level=" << geometry_cache.host_element_p_levels[record.elem_index]
                    << " n_nodes=" << geometry_cache.host_element_n_nodes[record.elem_index]
                    << " n_dofs=" << record.n_dofs
@@ -568,6 +569,106 @@ debug_print_kokkos_plan_summary(::HilbertSystem & sys,
                    << " mat_offset=" << record.mat_offset
                    << std::endl;
     }
+}
+
+void
+debug_print_device_key_stats(::HilbertSystem & sys,
+                             const KokkosPetscAssemblyPlan & plan,
+                             const MeshBase::KokkosGeometryCache & geometry_cache)
+{
+  KokkosSizeView counts("hilbert_debug_device_key_counts", 7);
+  KokkosPetscIntView first_key("hilbert_debug_first_device_key", 8);
+  ::Kokkos::deep_copy(counts, std::size_t(0));
+  ::Kokkos::deep_copy(first_key, PetscInt(-1));
+
+  const auto family = sys.variable_type(0).family;
+  const auto base_order = sys.variable_type(0).order;
+  const auto elem_indices = plan.batch_data.elem_indices;
+  const auto elem_n_dofs = plan.batch_data.elem_n_dofs;
+  const auto quadrature_orders = plan.batch_data.quadrature_orders;
+  const auto element_types = geometry_cache.element_types;
+  const auto element_mapping_types = geometry_cache.element_mapping_types;
+  const auto element_n_nodes = geometry_cache.element_n_nodes;
+  const auto element_p_levels = geometry_cache.element_p_levels;
+
+  ::Kokkos::parallel_for(
+    "hilbert_debug_device_keys",
+    ::Kokkos::RangePolicy<>(0, elem_indices.extent(0)),
+    KOKKOS_LAMBDA(const std::size_t record_index)
+    {
+      const unsigned int elem_index = elem_indices(record_index);
+      const auto elem_type = element_types(elem_index);
+      const auto mapping_type = element_mapping_types(elem_index);
+      const unsigned int p_level = element_p_levels(elem_index);
+      const unsigned int quadrature_order = quadrature_orders(record_index);
+      const libMesh::FEShapeKey key{
+        family, elem_type, static_cast<libMesh::Order>(base_order + cast_int<int>(p_level))};
+      const bool lagrange_map = mapping_type == libMesh::LAGRANGE_MAP;
+      const bool shape_ok = libMesh::supports_shape_with_lagrange_map(key);
+      const bool grad_ok = libMesh::supports_grad_shape(key);
+      const unsigned int n_qpoints =
+        libMesh::Kokkos::GaussQuadrature::n_points(key.elem_type, quadrature_order);
+      const bool supported =
+        libMesh::Kokkos::detail::supports_hilbert_local_assembly(key,
+                                                                 mapping_type,
+                                                                 quadrature_order);
+
+      ::Kokkos::atomic_increment(&counts(0));
+      if (supported)
+        ::Kokkos::atomic_increment(&counts(1));
+      if (!lagrange_map)
+        ::Kokkos::atomic_increment(&counts(2));
+      if (!shape_ok)
+        ::Kokkos::atomic_increment(&counts(3));
+      if (!grad_ok)
+        ::Kokkos::atomic_increment(&counts(4));
+      if (!n_qpoints)
+        ::Kokkos::atomic_increment(&counts(5));
+      if (!elem_n_dofs(record_index))
+        ::Kokkos::atomic_increment(&counts(6));
+
+      if (record_index == 0)
+        {
+          first_key(0) = cast_int<PetscInt>(key.family);
+          first_key(1) = cast_int<PetscInt>(key.elem_type);
+          first_key(2) = cast_int<PetscInt>(key.order);
+          first_key(3) = cast_int<PetscInt>(mapping_type);
+          first_key(4) = cast_int<PetscInt>(p_level);
+          first_key(5) = cast_int<PetscInt>(quadrature_order);
+          first_key(6) = cast_int<PetscInt>(n_qpoints);
+          first_key(7) = cast_int<PetscInt>(element_n_nodes(elem_index));
+        }
+    });
+  ::Kokkos::fence();
+
+  auto h_counts = ::Kokkos::create_mirror_view(counts);
+  auto h_first_key = ::Kokkos::create_mirror_view(first_key);
+  ::Kokkos::deep_copy(h_counts, counts);
+  ::Kokkos::deep_copy(h_first_key, first_key);
+
+  std::array<std::size_t, 7> global_counts = {};
+  for (auto i : index_range(global_counts))
+    global_counts[i] = h_counts(i);
+  for (auto & count : global_counts)
+    sys.comm().sum(count);
+
+  if (sys.comm().rank() == 0)
+    libMesh::out << "L2Kokkos debug: device_key total=" << global_counts[0]
+                 << " supported=" << global_counts[1]
+                 << " bad_mapping=" << global_counts[2]
+                 << " bad_shape=" << global_counts[3]
+                 << " bad_grad=" << global_counts[4]
+                 << " zero_qpoints=" << global_counts[5]
+                 << " zero_dofs=" << global_counts[6]
+                 << " first_key_family=" << h_first_key(0)
+                 << " first_key_elem_type=" << h_first_key(1)
+                 << " first_key_order=" << h_first_key(2)
+                 << " first_mapping_type=" << h_first_key(3)
+                 << " first_p_level=" << h_first_key(4)
+                 << " first_quadrature_order=" << h_first_key(5)
+                 << " first_n_qpoints=" << h_first_key(6)
+                 << " first_n_nodes=" << h_first_key(7)
+                 << std::endl;
 }
 
 using RemoteRhsContribution = std::pair<PetscInt, PetscScalar>;
@@ -2023,6 +2124,8 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
       LOG_SCOPE("L2Kokkos::assemble all records", "HilbertSystem");
 
       const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
+      if (debug_assembly)
+        debug_print_device_key_stats(sys, plan, geometry_cache);
       if (analytic_goal)
         {
           const SampledAnalyticGoalAccess goal_access(plan.analytic_goal_qp_offsets,
