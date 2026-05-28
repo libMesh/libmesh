@@ -604,6 +604,30 @@ debug_print_device_key_stats(::HilbertSystem & sys,
   auto h_write_smoke = ::Kokkos::create_mirror_view(write_smoke);
   ::Kokkos::deep_copy(h_write_smoke, write_smoke);
 
+  KokkosPetscIntView direct_device_reads("hilbert_debug_direct_device_reads", 4);
+  ::Kokkos::deep_copy(direct_device_reads, PetscInt(-1));
+  ::Kokkos::parallel_for(
+    "hilbert_debug_direct_device_reads_default",
+    ::Kokkos::RangePolicy<>(0, n_records ? 1 : 0),
+    KOKKOS_LAMBDA(const int)
+    {
+      const unsigned int elem_index = elem_indices(0);
+      direct_device_reads(0) = cast_int<PetscInt>(element_types(elem_index));
+      direct_device_reads(1) = cast_int<PetscInt>(element_n_nodes(elem_index));
+    });
+  ::Kokkos::parallel_for(
+    "hilbert_debug_direct_device_reads_geometry",
+    ::Kokkos::RangePolicy<GeometryExecutionSpace>(0, n_records ? 1 : 0),
+    KOKKOS_LAMBDA(const int)
+    {
+      const unsigned int elem_index = elem_indices(0);
+      direct_device_reads(2) = cast_int<PetscInt>(element_types(elem_index));
+      direct_device_reads(3) = cast_int<PetscInt>(element_n_nodes(elem_index));
+    });
+  ::Kokkos::fence();
+  auto h_direct_device_reads = ::Kokkos::create_mirror_view(direct_device_reads);
+  ::Kokkos::deep_copy(h_direct_device_reads, direct_device_reads);
+
   PetscInt first_device_elem_type = 0;
   ::Kokkos::parallel_reduce(
     "hilbert_debug_first_device_elem_type",
@@ -817,6 +841,7 @@ debug_print_device_key_stats(::HilbertSystem & sys,
 
   if (sys.comm().rank() == 0)
     libMesh::out << "L2Kokkos debug: device_key total=" << global_counts[0]
+                 << " marker=direct-dualview-read-v1"
                  << " supported=" << global_counts[1]
                  << " bad_mapping=" << global_counts[2]
                  << " bad_shape=" << global_counts[3]
@@ -834,6 +859,10 @@ debug_print_device_key_stats(::HilbertSystem & sys,
                  << " first_n_nodes=" << first_record_n_nodes
                  << " first_elem_index=" << first_record_elem_index
                  << " write_smoke=" << h_write_smoke(0)
+                 << " direct_default_elem_type=" << h_direct_device_reads(0)
+                 << " direct_default_n_nodes=" << h_direct_device_reads(1)
+                 << " direct_geometry_elem_type=" << h_direct_device_reads(2)
+                 << " direct_geometry_n_nodes=" << h_direct_device_reads(3)
                  << " first_device_elem_index=" << first_device_record_index
                  << " first_device_elem_type=" << first_device_elem_type
                  << " first_device_p_level=" << first_device_p_level
