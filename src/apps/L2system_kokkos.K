@@ -2269,6 +2269,110 @@ run_kokkos_hilbert_bucket_value_batch(const KokkosHilbertHomogeneousBucket & buc
     kernel_name);
 }
 
+bool
+supports_flat_hex8_value_batch(const KokkosHilbertHomogeneousBucket & bucket,
+                               const KokkosPetscAssemblyPlan & plan,
+                               const unsigned int hilbert_order)
+{
+  constexpr unsigned int n_dofs = 8;
+  constexpr unsigned int mat_entries_per_record = n_dofs * n_dofs;
+
+  return hilbert_order == 0 &&
+         bucket.key.family == LAGRANGE &&
+         bucket.key.elem_type == HEX8 &&
+         bucket.key.order == FIRST &&
+         bucket.mapping_type == LAGRANGE_MAP &&
+         bucket.n_nodes == n_dofs &&
+         bucket.n_dofs == n_dofs &&
+         plan.total_rhs_entries == plan.records.size() * n_dofs &&
+         plan.total_mat_entries == plan.records.size() * mat_entries_per_record;
+}
+
+template <typename GoalAccess,
+          typename NodeCoordinateStorage,
+          typename ElemNodeIdStorage>
+void
+run_kokkos_hilbert_flat_hex8_value_batch(const KokkosHilbertHomogeneousBucket & bucket,
+                                         const NodeCoordinateStorage & node_coordinates,
+                                         const ElemNodeIdStorage & element_node_ids,
+                                         KokkosPetscAssemblyPlan & plan,
+                                         GoalAccess goal_access)
+{
+  KokkosProfilingRegion kokkos_region("L2Kokkos::launch flat HEX8 value batch");
+
+  constexpr unsigned int n_dofs = 8;
+  constexpr unsigned int mat_entries_per_record = n_dofs * n_dofs;
+  const std::size_t n_records = plan.batch_data.elem_indices.extent(0);
+  const std::size_t total_rhs_entries = n_records * n_dofs;
+  const std::size_t total_mat_entries = n_records * mat_entries_per_record;
+  const std::size_t total_entries = total_rhs_entries + total_mat_entries;
+
+  const auto elem_indices = plan.batch_data.elem_indices;
+  const auto rhs_offsets = plan.batch_data.rhs_offsets;
+  const auto mat_offsets = plan.batch_data.mat_offsets;
+  const auto rhs_values = plan.rhs_entry_values;
+  const auto mat_values = plan.mat_entry_values;
+  const FEShapeKey key = bucket.key;
+  const ElemMappingType mapping_type = bucket.mapping_type;
+  const unsigned int n_nodes = bucket.n_nodes;
+  const unsigned int quadrature_order = bucket.quadrature_order;
+  using ExecutionSpace = typename std::decay_t<decltype(rhs_values)>::execution_space;
+
+  ::Kokkos::parallel_for(
+    "hilbert_flat_hex8_values",
+    ::Kokkos::RangePolicy<ExecutionSpace>(0, total_entries),
+    KOKKOS_LAMBDA(const std::size_t entry_index)
+    {
+      if (entry_index < total_rhs_entries)
+        {
+          const std::size_t record_index = entry_index / n_dofs;
+          const unsigned int i = static_cast<unsigned int>(entry_index % n_dofs);
+          const unsigned int elem_index = elem_indices(record_index);
+          const auto elem_nodes =
+            libMesh::Kokkos::detail::make_element_node_access(node_coordinates,
+                                                              element_node_ids,
+                                                              elem_index);
+          const libMesh::Kokkos::detail::HilbertFEAccess<decltype(elem_nodes)> fe(
+            key, mapping_type, elem_nodes, n_nodes, quadrature_order, elem_index);
+
+          Number residual = 0.;
+          for (unsigned int qp = 0; qp != fe.n_qpoints(); ++qp)
+            {
+              const auto qp_data = fe.qp_data(qp, false);
+              const Point & xyz = qp_data.xyz();
+              residual += qp_data.JxW() *
+                          ((Number(0.) - goal_access.value(qp_data, xyz)) *
+                           qp_data.phi(i));
+            }
+
+          rhs_values(rhs_offsets(record_index) + i) = -residual;
+          return;
+        }
+
+      const std::size_t mat_entry = entry_index - total_rhs_entries;
+      const std::size_t record_index = mat_entry / mat_entries_per_record;
+      const unsigned int local_entry = static_cast<unsigned int>(mat_entry % mat_entries_per_record);
+      const unsigned int i = local_entry / n_dofs;
+      const unsigned int j = local_entry % n_dofs;
+      const unsigned int elem_index = elem_indices(record_index);
+      const auto elem_nodes =
+        libMesh::Kokkos::detail::make_element_node_access(node_coordinates,
+                                                          element_node_ids,
+                                                          elem_index);
+      const libMesh::Kokkos::detail::HilbertFEAccess<decltype(elem_nodes)> fe(
+        key, mapping_type, elem_nodes, n_nodes, quadrature_order, elem_index);
+
+      Number jacobian = 0.;
+      for (unsigned int qp = 0; qp != fe.n_qpoints(); ++qp)
+        {
+          const auto qp_data = fe.qp_data(qp, false);
+          jacobian += qp_data.JxW() * qp_data.phi(i) * qp_data.phi(j);
+        }
+
+      mat_values(mat_offsets(record_index) + i * n_dofs + j) = jacobian;
+    });
+}
+
 template <typename GoalAccess,
           typename NodeCoordinateStorage,
           typename ElemNodeIdStorage>
@@ -2285,6 +2389,16 @@ try_kokkos_hilbert_bucket_value_batch(const KokkosPetscAssemblyPlan & const_plan
   KokkosHilbertHomogeneousBucket bucket;
   if (!get_cached_single_supported_hilbert_bucket(const_plan, bucket))
     return false;
+
+  if (supports_flat_hex8_value_batch(bucket, const_plan, hilbert_order))
+    {
+      run_kokkos_hilbert_flat_hex8_value_batch(bucket,
+                                               node_coordinates,
+                                               element_node_ids,
+                                               plan,
+                                               goal_access);
+      return true;
+    }
 
   switch (bucket.n_dofs)
     {
