@@ -2277,7 +2277,8 @@ run_kokkos_hilbert_debug_bucket_value_batch(const KokkosHilbertHomogeneousBucket
     kernel_name);
 }
 
-template <typename NodeCoordinateStorage,
+template <typename GoalAccess,
+          typename NodeCoordinateStorage,
           typename ElemNodeIdStorage,
           typename ElemMappingTypeStorage,
           typename ElemNodeCountStorage>
@@ -2288,7 +2289,8 @@ run_kokkos_hilbert_bucket_smoke_check(const KokkosHilbertHomogeneousBucket & buc
                                       const ElemMappingTypeStorage & element_mapping_types,
                                       const ElemNodeCountStorage & element_n_nodes,
                                       const KokkosPetscAssemblyPlan & plan,
-                                      const unsigned int hilbert_order)
+                                      const unsigned int hilbert_order,
+                                      GoalAccess goal_access)
 {
   if (plan.records.empty())
     return;
@@ -2296,7 +2298,7 @@ run_kokkos_hilbert_bucket_smoke_check(const KokkosHilbertHomogeneousBucket & buc
   KokkosProfilingRegion kokkos_region("L2Kokkos::debug bucket FE smoke check");
 
   KokkosUnsignedIntView smoke_uints("hilbert_debug_bucket_smoke_uints", 12);
-  KokkosScalarView<Real> smoke_reals("hilbert_debug_bucket_smoke_reals", 4);
+  KokkosScalarView<Real> smoke_reals("hilbert_debug_bucket_smoke_reals", 12);
   ::Kokkos::deep_copy(smoke_uints, 0u);
   ::Kokkos::deep_copy(smoke_reals, Real(0));
 
@@ -2364,6 +2366,41 @@ run_kokkos_hilbert_bucket_smoke_check(const KokkosHilbertHomogeneousBucket & buc
           smoke_reals(2) = qp_data.JxW();
           smoke_reals(3) = qp_data.phi(0);
         }
+
+      const auto bucket_solution =
+        libMesh::Kokkos::detail::make_hilbert_solution_access(bucket_fe,
+                                                              libMesh::Kokkos::detail::ZeroCoeffAccess{},
+                                                              Number(1.));
+      const auto record_solution =
+        libMesh::Kokkos::detail::make_hilbert_solution_access(record_fe,
+                                                              libMesh::Kokkos::detail::ZeroCoeffAccess{},
+                                                              Number(1.));
+
+      libMesh::Kokkos::detail::LocalHilbertAccumulator<8> bucket_accum(elem_n_dofs(record_index));
+      libMesh::Kokkos::detail::LocalHilbertAccumulator<8> record_accum(elem_n_dofs(record_index));
+      libMesh::detail::assemble_hilbert_element(bucket_fe,
+                                                bucket_solution,
+                                                goal_access,
+                                                true,
+                                                hilbert_order,
+                                                elem_n_dofs(record_index),
+                                                bucket_accum);
+      libMesh::detail::assemble_hilbert_element(record_fe,
+                                                record_solution,
+                                                goal_access,
+                                                true,
+                                                hilbert_order,
+                                                elem_n_dofs(record_index),
+                                                record_accum);
+
+      smoke_reals(4) = bucket_accum.residual(0);
+      smoke_reals(5) = bucket_accum.jacobian(0, 0);
+      smoke_reals(6) = record_accum.residual(0);
+      smoke_reals(7) = record_accum.jacobian(0, 0);
+      smoke_reals(8) = -bucket_accum.residual(0);
+      smoke_reals(9) = bucket_accum.jacobian(0, 0);
+      smoke_reals(10) = -record_accum.residual(0);
+      smoke_reals(11) = record_accum.jacobian(0, 0);
     });
   ::Kokkos::fence();
 
@@ -2389,6 +2426,14 @@ run_kokkos_hilbert_bucket_smoke_check(const KokkosHilbertHomogeneousBucket & buc
                << " bucket_phi00=" << h_smoke_reals(1)
                << " record_JxW0=" << h_smoke_reals(2)
                << " record_phi00=" << h_smoke_reals(3)
+               << " bucket_accum_res0=" << h_smoke_reals(4)
+               << " bucket_accum_jac00=" << h_smoke_reals(5)
+               << " record_accum_res0=" << h_smoke_reals(6)
+               << " record_accum_jac00=" << h_smoke_reals(7)
+               << " bucket_write_rhs0=" << h_smoke_reals(8)
+               << " bucket_write_mat00=" << h_smoke_reals(9)
+               << " record_write_rhs0=" << h_smoke_reals(10)
+               << " record_write_mat00=" << h_smoke_reals(11)
                << '\n';
 }
 
@@ -2547,7 +2592,8 @@ compare_kokkos_hilbert_bucket_value_batch(const KokkosPetscAssemblyPlan & const_
                                         element_mapping_types,
                                         element_n_nodes,
                                         plan,
-                                        hilbert_order);
+                                        hilbert_order,
+                                        goal_access);
 
   KokkosScalarView<Number> bucket_rhs_values("hilbert_debug_bucket_rhs_values",
                                              plan.total_rhs_entries);
