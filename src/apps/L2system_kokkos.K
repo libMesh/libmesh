@@ -625,12 +625,6 @@ get_cached_single_supported_hilbert_bucket(const KokkosPetscAssemblyPlan & plan,
   return true;
 }
 
-bool
-debug_kokkos_bucket_value_batch()
-{
-  return libMesh::on_command_line("--kokkos-debug-bucket");
-}
-
 void
 ensure_kokkos_entry_value_storage(KokkosPetscAssemblyPlan & plan)
 {
@@ -2247,17 +2241,15 @@ template <unsigned int MaxDofs,
           typename NodeCoordinateStorage,
           typename ElemNodeIdStorage>
 void
-run_kokkos_hilbert_debug_bucket_value_batch(const KokkosHilbertHomogeneousBucket & bucket,
-                                            const NodeCoordinateStorage & node_coordinates,
-                                            const ElemNodeIdStorage & element_node_ids,
-                                            KokkosPetscAssemblyPlan & plan,
-                                            const unsigned int hilbert_order,
-                                            GoalAccess goal_access,
-                                            KokkosScalarView<Number> rhs_values,
-                                            KokkosScalarView<Number> mat_values,
-                                            const char * const kernel_name)
+run_kokkos_hilbert_bucket_value_batch(const KokkosHilbertHomogeneousBucket & bucket,
+                                      const NodeCoordinateStorage & node_coordinates,
+                                      const ElemNodeIdStorage & element_node_ids,
+                                      KokkosPetscAssemblyPlan & plan,
+                                      const unsigned int hilbert_order,
+                                      GoalAccess goal_access,
+                                      const char * const kernel_name)
 {
-  KokkosProfilingRegion kokkos_region("L2Kokkos::debug launch bucket value batch");
+  KokkosProfilingRegion kokkos_region("L2Kokkos::launch bucket value batch");
 
   libMesh::Kokkos::detail::run_hilbert_system_bucket_value_batch<MaxDofs>(
     bucket.key,
@@ -2272,239 +2264,6 @@ run_kokkos_hilbert_debug_bucket_value_batch(const KokkosHilbertHomogeneousBucket
     plan.batch_data.mat_offsets,
     hilbert_order,
     goal_access,
-    rhs_values,
-    mat_values,
-    kernel_name);
-}
-
-template <typename GoalAccess,
-          typename NodeCoordinateStorage,
-          typename ElemNodeIdStorage,
-          typename ElemMappingTypeStorage,
-          typename ElemNodeCountStorage>
-void
-run_kokkos_hilbert_bucket_smoke_check(const KokkosHilbertHomogeneousBucket & bucket,
-                                      const NodeCoordinateStorage & node_coordinates,
-                                      const ElemNodeIdStorage & element_node_ids,
-                                      const ElemMappingTypeStorage & element_mapping_types,
-                                      const ElemNodeCountStorage & element_n_nodes,
-                                      const KokkosPetscAssemblyPlan & plan,
-                                      const unsigned int hilbert_order,
-                                      GoalAccess goal_access)
-{
-  if (plan.records.empty())
-    return;
-
-  KokkosProfilingRegion kokkos_region("L2Kokkos::debug bucket FE smoke check");
-
-  KokkosUnsignedIntView smoke_uints("hilbert_debug_bucket_smoke_uints", 12);
-  KokkosScalarView<Real> smoke_reals("hilbert_debug_bucket_smoke_reals", 12);
-  ::Kokkos::deep_copy(smoke_uints, 0u);
-  ::Kokkos::deep_copy(smoke_reals, Real(0));
-
-  const auto elem_indices = plan.batch_data.elem_indices;
-  const auto elem_n_dofs = plan.batch_data.elem_n_dofs;
-  const auto shape_keys = plan.batch_data.shape_keys;
-  const auto quadrature_orders = plan.batch_data.quadrature_orders;
-  const FEShapeKey bucket_key = bucket.key;
-  const ElemMappingType bucket_mapping_type = bucket.mapping_type;
-  const unsigned int bucket_n_nodes = bucket.n_nodes;
-  const unsigned int bucket_quadrature_order = bucket.quadrature_order;
-
-  ::Kokkos::parallel_for(
-    "hilbert_debug_bucket_fe_smoke",
-    ::Kokkos::RangePolicy<>(0, 1),
-    KOKKOS_LAMBDA(const int)
-    {
-      const unsigned int record_index = 0;
-      const unsigned int elem_index = elem_indices(record_index);
-      const auto elem_nodes =
-        libMesh::Kokkos::detail::make_element_node_access(node_coordinates,
-                                                          element_node_ids,
-                                                          elem_index);
-
-      const libMesh::Kokkos::detail::HilbertFEAccess<decltype(elem_nodes)> bucket_fe(
-        bucket_key,
-        bucket_mapping_type,
-        elem_nodes,
-        bucket_n_nodes,
-        bucket_quadrature_order,
-        elem_index);
-
-      const FEShapeKey record_key = shape_keys(record_index);
-      const libMesh::Kokkos::detail::HilbertFEAccess<decltype(elem_nodes)> record_fe(
-        record_key,
-        element_mapping_types(elem_index),
-        elem_nodes,
-        element_n_nodes(elem_index),
-        quadrature_orders(record_index),
-        elem_index);
-
-      smoke_uints(0) = elem_index;
-      smoke_uints(1) = bucket_fe.n_qpoints();
-      smoke_uints(2) = bucket_fe.n_dofs();
-      smoke_uints(3) = record_fe.n_qpoints();
-      smoke_uints(4) = record_fe.n_dofs();
-      smoke_uints(5) = elem_n_dofs(record_index);
-      smoke_uints(6) = bucket_quadrature_order;
-      smoke_uints(7) = quadrature_orders(record_index);
-      smoke_uints(8) = bucket_n_nodes;
-      smoke_uints(9) = element_n_nodes(elem_index);
-      smoke_uints(10) = static_cast<unsigned int>(bucket_key.elem_type);
-      smoke_uints(11) = static_cast<unsigned int>(record_key.elem_type);
-
-      if (bucket_fe.n_qpoints() && bucket_fe.n_dofs())
-        {
-          const auto qp_data = bucket_fe.qp_data(0, hilbert_order > 0);
-          smoke_reals(0) = qp_data.JxW();
-          smoke_reals(1) = qp_data.phi(0);
-        }
-
-      if (record_fe.n_qpoints() && record_fe.n_dofs())
-        {
-          const auto qp_data = record_fe.qp_data(0, hilbert_order > 0);
-          smoke_reals(2) = qp_data.JxW();
-          smoke_reals(3) = qp_data.phi(0);
-        }
-
-      const auto bucket_solution =
-        libMesh::Kokkos::detail::make_hilbert_solution_access(bucket_fe,
-                                                              libMesh::Kokkos::detail::ZeroCoeffAccess{},
-                                                              Number(1.));
-      const auto record_solution =
-        libMesh::Kokkos::detail::make_hilbert_solution_access(record_fe,
-                                                              libMesh::Kokkos::detail::ZeroCoeffAccess{},
-                                                              Number(1.));
-
-      libMesh::Kokkos::detail::LocalHilbertAccumulator<8> bucket_accum(elem_n_dofs(record_index));
-      libMesh::Kokkos::detail::LocalHilbertAccumulator<8> record_accum(elem_n_dofs(record_index));
-      libMesh::detail::assemble_hilbert_element(bucket_fe,
-                                                bucket_solution,
-                                                goal_access,
-                                                true,
-                                                hilbert_order,
-                                                elem_n_dofs(record_index),
-                                                bucket_accum);
-      libMesh::detail::assemble_hilbert_element(record_fe,
-                                                record_solution,
-                                                goal_access,
-                                                true,
-                                                hilbert_order,
-                                                elem_n_dofs(record_index),
-                                                record_accum);
-
-      smoke_reals(4) = bucket_accum.residual(0);
-      smoke_reals(5) = bucket_accum.jacobian(0, 0);
-      smoke_reals(6) = record_accum.residual(0);
-      smoke_reals(7) = record_accum.jacobian(0, 0);
-      smoke_reals(8) = -bucket_accum.residual(0);
-      smoke_reals(9) = bucket_accum.jacobian(0, 0);
-      smoke_reals(10) = -record_accum.residual(0);
-      smoke_reals(11) = record_accum.jacobian(0, 0);
-    });
-  ::Kokkos::fence();
-
-  auto h_smoke_uints = ::Kokkos::create_mirror_view(smoke_uints);
-  auto h_smoke_reals = ::Kokkos::create_mirror_view(smoke_reals);
-  ::Kokkos::deep_copy(h_smoke_uints, smoke_uints);
-  ::Kokkos::deep_copy(h_smoke_reals, smoke_reals);
-
-  libMesh::out << "L2Kokkos bucket smoke: "
-               << "elem_index=" << h_smoke_uints(0)
-               << " bucket_n_qpoints=" << h_smoke_uints(1)
-               << " bucket_fe_n_dofs=" << h_smoke_uints(2)
-               << " record_n_qpoints=" << h_smoke_uints(3)
-               << " record_fe_n_dofs=" << h_smoke_uints(4)
-               << " record_n_dofs=" << h_smoke_uints(5)
-               << " bucket_quadrature_order=" << h_smoke_uints(6)
-               << " record_quadrature_order=" << h_smoke_uints(7)
-               << " bucket_n_nodes=" << h_smoke_uints(8)
-               << " record_n_nodes=" << h_smoke_uints(9)
-               << " bucket_elem_type=" << h_smoke_uints(10)
-               << " record_elem_type=" << h_smoke_uints(11)
-               << " bucket_JxW0=" << h_smoke_reals(0)
-               << " bucket_phi00=" << h_smoke_reals(1)
-               << " record_JxW0=" << h_smoke_reals(2)
-               << " record_phi00=" << h_smoke_reals(3)
-               << " bucket_accum_res0=" << h_smoke_reals(4)
-               << " bucket_accum_jac00=" << h_smoke_reals(5)
-               << " record_accum_res0=" << h_smoke_reals(6)
-               << " record_accum_jac00=" << h_smoke_reals(7)
-               << " bucket_write_rhs0=" << h_smoke_reals(8)
-               << " bucket_write_mat00=" << h_smoke_reals(9)
-               << " record_write_rhs0=" << h_smoke_reals(10)
-               << " record_write_mat00=" << h_smoke_reals(11)
-               << '\n';
-}
-
-template <typename ValueView>
-Real
-kokkos_abs_sum(const ValueView & values)
-{
-  Real sum = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_abs_sum",
-    ::Kokkos::RangePolicy<>(0, values.extent(0)),
-    KOKKOS_LAMBDA(const std::size_t i, Real & local_sum)
-    {
-      const Real value = static_cast<Real>(values(i));
-      local_sum += value < Real(0) ? -value : value;
-    },
-    sum);
-  return sum;
-}
-
-template <typename ValueView>
-Real
-kokkos_max_abs_diff(const ValueView & a,
-                    const ValueView & b)
-{
-  Real max_diff = 0;
-  ::Kokkos::parallel_reduce(
-    "hilbert_debug_max_abs_diff",
-    ::Kokkos::RangePolicy<>(0, a.extent(0)),
-    KOKKOS_LAMBDA(const std::size_t i, Real & local_max)
-    {
-      Real diff = static_cast<Real>(a(i) - b(i));
-      diff = diff < Real(0) ? -diff : diff;
-      if (diff > local_max)
-        local_max = diff;
-    },
-    ::Kokkos::Max<Real>(max_diff));
-  return max_diff;
-}
-
-template <unsigned int MaxDofs,
-          typename GoalAccess,
-          typename NodeCoordinateStorage,
-          typename ElemNodeIdStorage,
-          typename ElemMappingTypeStorage,
-          typename ElemNodeCountStorage>
-void
-run_kokkos_hilbert_record_value_batch(const NodeCoordinateStorage & node_coordinates,
-                                      const ElemNodeIdStorage & element_node_ids,
-                                      const ElemMappingTypeStorage & element_mapping_types,
-                                      const ElemNodeCountStorage & element_n_nodes,
-                                      KokkosPetscAssemblyPlan & plan,
-                                      const unsigned int hilbert_order,
-                                      GoalAccess goal_access,
-                                      const char * const kernel_name)
-{
-  KokkosProfilingRegion kokkos_region("L2Kokkos::launch record value batch");
-
-  libMesh::Kokkos::detail::run_hilbert_system_value_batch<MaxDofs>(
-    node_coordinates,
-    element_node_ids,
-    element_mapping_types,
-    element_n_nodes,
-    plan.batch_data.shape_keys,
-    plan.batch_data.elem_indices,
-    plan.batch_data.elem_n_dofs,
-    plan.batch_data.quadrature_orders,
-    plan.batch_data.rhs_offsets,
-    plan.batch_data.mat_offsets,
-    hilbert_order,
-    goal_access,
     plan.rhs_entry_values,
     plan.mat_entry_values,
     kernel_name);
@@ -2512,21 +2271,16 @@ run_kokkos_hilbert_record_value_batch(const NodeCoordinateStorage & node_coordin
 
 template <typename GoalAccess,
           typename NodeCoordinateStorage,
-          typename ElemNodeIdStorage,
-          typename ElemMappingTypeStorage,
-          typename ElemNodeCountStorage>
+          typename ElemNodeIdStorage>
 bool
-try_kokkos_hilbert_specialized_record_value_batch(
-  const KokkosPetscAssemblyPlan & const_plan,
-  const NodeCoordinateStorage & node_coordinates,
-  const ElemNodeIdStorage & element_node_ids,
-  const ElemMappingTypeStorage & element_mapping_types,
-  const ElemNodeCountStorage & element_n_nodes,
-  KokkosPetscAssemblyPlan & plan,
-  const unsigned int hilbert_order,
-  GoalAccess goal_access)
+try_kokkos_hilbert_bucket_value_batch(const KokkosPetscAssemblyPlan & const_plan,
+                                      const NodeCoordinateStorage & node_coordinates,
+                                      const ElemNodeIdStorage & element_node_ids,
+                                      KokkosPetscAssemblyPlan & plan,
+                                      const unsigned int hilbert_order,
+                                      GoalAccess goal_access)
 {
-  KokkosProfilingRegion kokkos_region("L2Kokkos::try specialized record value batch");
+  KokkosProfilingRegion kokkos_region("L2Kokkos::try bucket value batch");
 
   KokkosHilbertHomogeneousBucket bucket;
   if (!get_cached_single_supported_hilbert_bucket(const_plan, bucket))
@@ -2535,128 +2289,26 @@ try_kokkos_hilbert_specialized_record_value_batch(
   switch (bucket.n_dofs)
     {
     case 8:
-      run_kokkos_hilbert_record_value_batch<8>(node_coordinates,
+      run_kokkos_hilbert_bucket_value_batch<8>(bucket,
+                                               node_coordinates,
                                                element_node_ids,
-                                               element_mapping_types,
-                                               element_n_nodes,
                                                plan,
                                                hilbert_order,
                                                goal_access,
-                                               "hilbert_record8_values");
+                                               "hilbert_bucket8_record_values");
       return true;
     case 27:
-      run_kokkos_hilbert_record_value_batch<27>(node_coordinates,
+      run_kokkos_hilbert_bucket_value_batch<27>(bucket,
+                                                node_coordinates,
                                                 element_node_ids,
-                                                element_mapping_types,
-                                                element_n_nodes,
                                                 plan,
                                                 hilbert_order,
                                                 goal_access,
-                                                "hilbert_record27_values");
+                                                "hilbert_bucket27_record_values");
       return true;
     default:
       return false;
     }
-}
-
-template <typename GoalAccess,
-          typename NodeCoordinateStorage,
-          typename ElemNodeIdStorage,
-          typename ElemMappingTypeStorage,
-          typename ElemNodeCountStorage>
-void
-compare_kokkos_hilbert_bucket_value_batch(const KokkosPetscAssemblyPlan & const_plan,
-                                          const NodeCoordinateStorage & node_coordinates,
-                                          const ElemNodeIdStorage & element_node_ids,
-                                          const ElemMappingTypeStorage & element_mapping_types,
-                                          const ElemNodeCountStorage & element_n_nodes,
-                                          KokkosPetscAssemblyPlan & plan,
-                                          const unsigned int hilbert_order,
-                                          GoalAccess goal_access)
-{
-  if (!debug_kokkos_bucket_value_batch())
-    return;
-
-  KokkosProfilingRegion kokkos_region("L2Kokkos::debug compare bucket value batch");
-
-  KokkosHilbertHomogeneousBucket bucket;
-  if (!get_cached_single_supported_hilbert_bucket(const_plan, bucket))
-    {
-      libMesh::out << "L2Kokkos bucket debug: no homogeneous bucket available\n";
-      return;
-    }
-
-  run_kokkos_hilbert_bucket_smoke_check(bucket,
-                                        node_coordinates,
-                                        element_node_ids,
-                                        element_mapping_types,
-                                        element_n_nodes,
-                                        plan,
-                                        hilbert_order,
-                                        goal_access);
-
-  KokkosScalarView<Number> bucket_rhs_values("hilbert_debug_bucket_rhs_values",
-                                             plan.total_rhs_entries);
-  KokkosScalarView<Number> bucket_mat_values("hilbert_debug_bucket_mat_values",
-                                             plan.total_mat_entries);
-  ::Kokkos::deep_copy(bucket_rhs_values, Number(0));
-  ::Kokkos::deep_copy(bucket_mat_values, Number(0));
-
-  switch (bucket.n_dofs)
-    {
-    case 8:
-      run_kokkos_hilbert_debug_bucket_value_batch<8>(bucket,
-                                                     node_coordinates,
-                                                     element_node_ids,
-                                                     plan,
-                                                     hilbert_order,
-                                                     goal_access,
-                                                     bucket_rhs_values,
-                                                     bucket_mat_values,
-                                                     "hilbert_debug_bucket8_values");
-      break;
-    case 27:
-      run_kokkos_hilbert_debug_bucket_value_batch<27>(bucket,
-                                                      node_coordinates,
-                                                      element_node_ids,
-                                                      plan,
-                                                      hilbert_order,
-                                                      goal_access,
-                                                      bucket_rhs_values,
-                                                      bucket_mat_values,
-                                                      "hilbert_debug_bucket27_values");
-      break;
-    default:
-      libMesh::out << "L2Kokkos bucket debug: unsupported bucket n_dofs="
-                   << bucket.n_dofs << '\n';
-      return;
-    }
-
-  ::Kokkos::fence();
-
-  const Real record_rhs_abs_sum = kokkos_abs_sum(plan.rhs_entry_values);
-  const Real bucket_rhs_abs_sum = kokkos_abs_sum(bucket_rhs_values);
-  const Real rhs_max_abs_diff = kokkos_max_abs_diff(plan.rhs_entry_values, bucket_rhs_values);
-  const Real record_mat_abs_sum = kokkos_abs_sum(plan.mat_entry_values);
-  const Real bucket_mat_abs_sum = kokkos_abs_sum(bucket_mat_values);
-  const Real mat_max_abs_diff = kokkos_max_abs_diff(plan.mat_entry_values, bucket_mat_values);
-
-  libMesh::out << "L2Kokkos bucket debug: "
-               << "records=" << plan.records.size()
-               << " family=" << static_cast<int>(bucket.key.family)
-               << " elem_type=" << static_cast<int>(bucket.key.elem_type)
-               << " order=" << static_cast<int>(bucket.key.order)
-               << " mapping_type=" << static_cast<int>(bucket.mapping_type)
-               << " n_nodes=" << bucket.n_nodes
-               << " quadrature_order=" << bucket.quadrature_order
-               << " n_dofs=" << bucket.n_dofs
-               << " record_rhs_abs_sum=" << record_rhs_abs_sum
-               << " bucket_rhs_abs_sum=" << bucket_rhs_abs_sum
-               << " rhs_max_abs_diff=" << rhs_max_abs_diff
-               << " record_mat_abs_sum=" << record_mat_abs_sum
-               << " bucket_mat_abs_sum=" << bucket_mat_abs_sum
-               << " mat_max_abs_diff=" << mat_max_abs_diff
-               << '\n';
 }
 
 bool
@@ -2769,14 +2421,12 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
             geometry_cache.element_mapping_types_dual.view_device();
           const auto element_n_nodes = geometry_cache.element_n_nodes_dual.view_device();
 
-          if (!try_kokkos_hilbert_specialized_record_value_batch(plan,
-                                                                 node_coordinates,
-                                                                 element_node_ids,
-                                                                 element_mapping_types,
-                                                                 element_n_nodes,
-                                                                 plan,
-                                                                 sys.hilbert_order(),
-                                                                 goal_access))
+          if (!try_kokkos_hilbert_bucket_value_batch(plan,
+                                                     node_coordinates,
+                                                     element_node_ids,
+                                                     plan,
+                                                     sys.hilbert_order(),
+                                                     goal_access))
             libMesh::Kokkos::detail::run_hilbert_system_value_batch<kokkos_hilbert_max_dofs>(
               node_coordinates,
               element_node_ids,
@@ -2793,15 +2443,6 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
               plan.rhs_entry_values,
               plan.mat_entry_values,
               "hilbert_all_record_values");
-
-          compare_kokkos_hilbert_bucket_value_batch(plan,
-                                                    node_coordinates,
-                                                    element_node_ids,
-                                                    element_mapping_types,
-                                                    element_n_nodes,
-                                                    plan,
-                                                    sys.hilbert_order(),
-                                                    goal_access);
         }
       else
         {
