@@ -2239,27 +2239,30 @@ scatter_kokkos_hilbert_entry_values(const KokkosPetscAssemblyPlan & plan,
 template <unsigned int MaxDofs,
           typename GoalAccess,
           typename NodeCoordinateStorage,
-          typename ElemNodeIdStorage>
+          typename ElemNodeIdStorage,
+          typename ElemMappingTypeStorage,
+          typename ElemNodeCountStorage>
 void
-run_kokkos_hilbert_bucket_value_batch(const KokkosHilbertHomogeneousBucket & bucket,
-                                      const NodeCoordinateStorage & node_coordinates,
+run_kokkos_hilbert_record_value_batch(const NodeCoordinateStorage & node_coordinates,
                                       const ElemNodeIdStorage & element_node_ids,
+                                      const ElemMappingTypeStorage & element_mapping_types,
+                                      const ElemNodeCountStorage & element_n_nodes,
                                       KokkosPetscAssemblyPlan & plan,
                                       const unsigned int hilbert_order,
                                       GoalAccess goal_access,
                                       const char * const kernel_name)
 {
-  KokkosProfilingRegion kokkos_region("L2Kokkos::launch bucket value batch");
+  KokkosProfilingRegion kokkos_region("L2Kokkos::launch record value batch");
 
-  libMesh::Kokkos::detail::run_hilbert_system_bucket_value_batch<MaxDofs>(
-    bucket.key,
-    bucket.mapping_type,
-    bucket.n_nodes,
-    bucket.quadrature_order,
+  libMesh::Kokkos::detail::run_hilbert_system_value_batch<MaxDofs>(
     node_coordinates,
     element_node_ids,
+    element_mapping_types,
+    element_n_nodes,
+    plan.batch_data.shape_keys,
     plan.batch_data.elem_indices,
     plan.batch_data.elem_n_dofs,
+    plan.batch_data.quadrature_orders,
     plan.batch_data.rhs_offsets,
     plan.batch_data.mat_offsets,
     hilbert_order,
@@ -2271,16 +2274,21 @@ run_kokkos_hilbert_bucket_value_batch(const KokkosHilbertHomogeneousBucket & buc
 
 template <typename GoalAccess,
           typename NodeCoordinateStorage,
-          typename ElemNodeIdStorage>
+          typename ElemNodeIdStorage,
+          typename ElemMappingTypeStorage,
+          typename ElemNodeCountStorage>
 bool
-try_kokkos_hilbert_bucket_value_batch(const KokkosPetscAssemblyPlan & const_plan,
-                                      const NodeCoordinateStorage & node_coordinates,
-                                      const ElemNodeIdStorage & element_node_ids,
-                                      KokkosPetscAssemblyPlan & plan,
-                                      const unsigned int hilbert_order,
-                                      GoalAccess goal_access)
+try_kokkos_hilbert_specialized_record_value_batch(
+  const KokkosPetscAssemblyPlan & const_plan,
+  const NodeCoordinateStorage & node_coordinates,
+  const ElemNodeIdStorage & element_node_ids,
+  const ElemMappingTypeStorage & element_mapping_types,
+  const ElemNodeCountStorage & element_n_nodes,
+  KokkosPetscAssemblyPlan & plan,
+  const unsigned int hilbert_order,
+  GoalAccess goal_access)
 {
-  KokkosProfilingRegion kokkos_region("L2Kokkos::try bucket value batch");
+  KokkosProfilingRegion kokkos_region("L2Kokkos::try specialized record value batch");
 
   KokkosHilbertHomogeneousBucket bucket;
   if (!get_cached_single_supported_hilbert_bucket(const_plan, bucket))
@@ -2289,22 +2297,24 @@ try_kokkos_hilbert_bucket_value_batch(const KokkosPetscAssemblyPlan & const_plan
   switch (bucket.n_dofs)
     {
     case 8:
-      run_kokkos_hilbert_bucket_value_batch<8>(bucket,
-                                               node_coordinates,
+      run_kokkos_hilbert_record_value_batch<8>(node_coordinates,
                                                element_node_ids,
+                                               element_mapping_types,
+                                               element_n_nodes,
                                                plan,
                                                hilbert_order,
                                                goal_access,
-                                               "hilbert_bucket8_record_values");
+                                               "hilbert_record8_values");
       return true;
     case 27:
-      run_kokkos_hilbert_bucket_value_batch<27>(bucket,
-                                                node_coordinates,
+      run_kokkos_hilbert_record_value_batch<27>(node_coordinates,
                                                 element_node_ids,
+                                                element_mapping_types,
+                                                element_n_nodes,
                                                 plan,
                                                 hilbert_order,
                                                 goal_access,
-                                                "hilbert_bucket27_record_values");
+                                                "hilbert_record27_values");
       return true;
     default:
       return false;
@@ -2415,12 +2425,15 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                                       plan.analytic_goal_values,
                                                       plan.analytic_goal_gradients);
           ensure_kokkos_entry_value_storage(plan);
-          if (!try_kokkos_hilbert_bucket_value_batch(plan,
-                                                     geometry_cache.node_coordinates_dual.view_device(),
-                                                     geometry_cache.element_node_ids_dual.view_device(),
-                                                     plan,
-                                                     sys.hilbert_order(),
-                                                     goal_access))
+          if (!try_kokkos_hilbert_specialized_record_value_batch(
+                plan,
+                geometry_cache.node_coordinates_dual.view_device(),
+                geometry_cache.element_node_ids_dual.view_device(),
+                geometry_cache.element_mapping_types_dual.view_device(),
+                geometry_cache.element_n_nodes_dual.view_device(),
+                plan,
+                sys.hilbert_order(),
+                goal_access))
             libMesh::Kokkos::detail::run_hilbert_system_value_batch<kokkos_hilbert_max_dofs>(
               geometry_cache.node_coordinates_dual.view_device(),
               geometry_cache.element_node_ids_dual.view_device(),
