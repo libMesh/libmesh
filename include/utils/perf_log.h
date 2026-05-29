@@ -26,6 +26,8 @@
 
 // C++ includes
 #include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include <map>
 #include <stack>
 #include <string>
@@ -44,6 +46,40 @@
 
 namespace libMesh
 {
+
+#ifdef LIBMESH_HAVE_NVTX_API
+inline
+std::uint32_t libmesh_perf_log_nvtx_color(const char * header)
+{
+  if (!header)
+    return 0xff8f8f8f;
+  if (!std::strcmp(header, "HilbertSystem"))
+    return 0xff4e79a7;
+  if (!std::strcmp(header, "PetscLinearSolver"))
+    return 0xffe15759;
+  if (!std::strcmp(header, "DofMap"))
+    return 0xff59a14f;
+  if (!std::strcmp(header, "Mesh") ||
+      !std::strcmp(header, "MeshBase") ||
+      !std::strcmp(header, "MeshCommunication") ||
+      !std::strcmp(header, "MeshTools"))
+    return 0xff76b7b2;
+  if (!std::strcmp(header, "FE") || !std::strcmp(header, "FEMap"))
+    return 0xffb07aa1;
+  if (!std::strcmp(header, "EquationSystems") ||
+      !std::strcmp(header, "System") ||
+      !std::strcmp(header, "NewtonSolver"))
+    return 0xffedc948;
+  if (!std::strcmp(header, "ExodusII_IO") ||
+      !std::strcmp(header, "ExodusII_IO_Helper") ||
+      !std::strcmp(header, "NameBasedIO"))
+    return 0xff9c755f;
+  if (!std::strcmp(header, "Partitioner") ||
+      !std::strcmp(header, "DefaultCoupling"))
+    return 0xffbab0ac;
+  return 0xff8f8f8f;
+}
+#endif
 
 /**
  * The \p PerfData class simply contains the performance
@@ -514,7 +550,14 @@ void PerfLog::fast_push (const char * label,
       // time allocating a new string on every push, so for now we'll
       // drop the header.  Maybe we should allocate a new string in
       // the PerfData?
-      nvtxRangePushA(label);
+      nvtxEventAttributes_t event_attributes = {};
+      event_attributes.version = NVTX_VERSION;
+      event_attributes.size = NVTX_EVENT_ATTRIB_STRUCT_SIZE;
+      event_attributes.colorType = NVTX_COLOR_ARGB;
+      event_attributes.color = libmesh_perf_log_nvtx_color(header);
+      event_attributes.messageType = NVTX_MESSAGE_TYPE_ASCII;
+      event_attributes.message.ascii = label;
+      nvtxRangePushEx(&event_attributes);
 #endif
     }
 }
