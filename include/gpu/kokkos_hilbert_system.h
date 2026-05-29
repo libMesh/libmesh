@@ -611,7 +611,7 @@ run_hilbert_system_bucket_value_batch(const libMesh::FEShapeKey key,
     kernel_name,
     ::Kokkos::RangePolicy<ExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index) {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const unsigned int n_dofs = elem_n_dofs(record_index);
 
@@ -683,7 +683,7 @@ run_hilbert_system_fem_value_batch(const NodeCoordinateStorage & node_coordinate
     kernel_name,
     ::Kokkos::RangePolicy<ExecutionSpace>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index) {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const unsigned int n_dofs = elem_n_dofs(record_index);
       const auto key = shape_keys(record_index);
@@ -781,7 +781,7 @@ run_hilbert_system_fem_bucket_scatter_batch(const libMesh::FEShapeKey key,
     kernel_name,
     ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index) {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const unsigned int n_dofs = elem_n_dofs(record_index);
 
@@ -856,7 +856,7 @@ run_hilbert_system_fem_bucket_value_batch(const libMesh::FEShapeKey key,
     kernel_name,
     ::Kokkos::RangePolicy<>(0, cast_int<int>(n_records)),
     KOKKOS_LAMBDA(const int raw_record_index) {
-      const unsigned int record_index = cast_int<unsigned int>(raw_record_index);
+      const unsigned int record_index = static_cast<unsigned int>(raw_record_index);
       const unsigned int elem_index = elem_indices(record_index);
       const unsigned int n_dofs = elem_n_dofs(record_index);
 
