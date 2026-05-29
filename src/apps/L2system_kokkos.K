@@ -65,6 +65,7 @@
 
 #define PETSC_SKIP_CXX_COMPLEX_FIX 1
 #include <Kokkos_Core.hpp>
+#include <Kokkos_Profiling_ScopedRegion.hpp>
 #undef __CUDACC_VER__
 #endif
 
@@ -565,6 +566,22 @@ kokkos_default_petsc_mem_type()
   return PETSC_MEMTYPE_KOKKOS;
 }
 
+struct KokkosProfilingRegion
+{
+  explicit KokkosProfilingRegion(const char * name)
+  {
+    ::Kokkos::Profiling::pushRegion(name);
+  }
+
+  ~KokkosProfilingRegion()
+  {
+    ::Kokkos::Profiling::popRegion();
+  }
+
+  KokkosProfilingRegion(const KokkosProfilingRegion &) = delete;
+  KokkosProfilingRegion & operator=(const KokkosProfilingRegion &) = delete;
+};
+
 bool
 is_petsc_kokkos_vec(const Parallel::Communicator & comm, Vec vec)
 {
@@ -617,6 +634,8 @@ sync_kokkos_petsc_int_view(const std::vector<PetscInt> & host_values,
 void
 sync_kokkos_petsc_owned_graph_views(KokkosPetscAssemblyPlan & plan)
 {
+  KokkosProfilingRegion kokkos_region("L2Kokkos::sync PETSc graph views");
+
   sync_kokkos_petsc_int_view(plan.local_row_offsets,
                              plan.local_row_offsets_view,
                              "hilbert_local_row_offsets");
@@ -643,6 +662,8 @@ sync_kokkos_petsc_owned_graph_views(KokkosPetscAssemblyPlan & plan)
 void
 sync_kokkos_petsc_remote_slot_views(KokkosPetscAssemblyPlan & plan)
 {
+  KokkosProfilingRegion kokkos_region("L2Kokkos::sync remote slot views");
+
   sync_kokkos_petsc_int_view(plan.rhs_remote_rows,
                              plan.rhs_remote_rows_view,
                              "hilbert_rhs_remote_rows");
@@ -666,6 +687,8 @@ build_kokkos_petsc_owned_csr_graph(::HilbertSystem & sys,
                                    const PetscInt col_start,
                                    const PetscInt col_stop)
 {
+  KokkosProfilingRegion kokkos_region("L2Kokkos::build owned CSR graph");
+
   const auto * sp = sys.get_dof_map().get_sparsity_pattern();
   if (!sp)
     return false;
@@ -760,6 +783,8 @@ build_kokkos_petsc_owned_csr_graph(::HilbertSystem & sys,
 void
 build_kokkos_petsc_owned_coo(KokkosPetscAssemblyPlan & plan)
 {
+  KokkosProfilingRegion kokkos_region("L2Kokkos::build PETSc COO graph");
+
   plan.mat_coo_rows.clear();
   plan.mat_coo_cols.clear();
   plan.mat_coo_rows.reserve(plan.mat_diag_size + plan.mat_offdiag_size);
@@ -1188,6 +1213,8 @@ bind_kokkos_direct_slots_from_plan_graph(::HilbertSystem & sys,
                                          const numeric_index_type rhs_first_local,
                                          const numeric_index_type rhs_last_local)
 {
+  KokkosProfilingRegion kokkos_region("L2Kokkos::bind direct slots");
+
   plan.rhs_remote_rows.clear();
   plan.mat_remote_rows.clear();
   plan.mat_remote_cols.clear();
@@ -1312,6 +1339,7 @@ ensure_kokkos_petsc_owned_matrix(::HilbertSystem & sys,
                                  PetscMatrixBase<Number> & system_matrix)
 {
   LOG_SCOPE("L2Kokkos::prepare PETSc COO matrix", "HilbertSystem");
+  KokkosProfilingRegion kokkos_region("L2Kokkos::prepare PETSc COO matrix");
 
   if (plan.graph_matrix_target == &system_matrix)
     return true;
@@ -1341,15 +1369,21 @@ ensure_kokkos_petsc_owned_matrix(::HilbertSystem & sys,
       return false;
     }
 
-  LibmeshPetscCall2(sys.comm(),
-                    MatSetPreallocationCOO(new_mat,
-                                           cast_int<PetscCount>(plan.mat_coo_rows.size()),
-                                           plan.mat_coo_rows.data(),
-                                           plan.mat_coo_cols.data()));
+  {
+    KokkosProfilingRegion preallocation_region("PETSc::MatSetPreallocationCOO");
+    LibmeshPetscCall2(sys.comm(),
+                      MatSetPreallocationCOO(new_mat,
+                                             cast_int<PetscCount>(plan.mat_coo_rows.size()),
+                                             plan.mat_coo_rows.data(),
+                                             plan.mat_coo_cols.data()));
+  }
 
   LibmeshPetscCall2(sys.comm(), MatSetOption(new_mat, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE));
-  LibmeshPetscCall2(sys.comm(), MatAssemblyBegin(new_mat, MAT_FINAL_ASSEMBLY));
-  LibmeshPetscCall2(sys.comm(), MatAssemblyEnd(new_mat, MAT_FINAL_ASSEMBLY));
+  {
+    KokkosProfilingRegion assembly_region("PETSc::MatAssembly initial COO matrix");
+    LibmeshPetscCall2(sys.comm(), MatAssemblyBegin(new_mat, MAT_FINAL_ASSEMBLY));
+    LibmeshPetscCall2(sys.comm(), MatAssemblyEnd(new_mat, MAT_FINAL_ASSEMBLY));
+  }
   system_matrix.reset_mat(new_mat, true);
   plan.graph_matrix_target = &system_matrix;
   return true;
@@ -1363,6 +1397,7 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
                                    PetscVector<Number> & system_rhs)
 {
   LOG_SCOPE("L2Kokkos::prepare direct PETSc storage", "HilbertSystem");
+  KokkosProfilingRegion kokkos_region("L2Kokkos::prepare direct PETSc storage");
 
   if (plan.direct_matrix_target == &system_matrix &&
       plan.direct_rhs_target == &system_rhs &&
@@ -1432,6 +1467,7 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
 
       {
         LOG_SCOPE("L2Kokkos::direct storage graph setup", "HilbertSystem");
+        KokkosProfilingRegion graph_region("L2Kokkos::direct storage graph setup");
         if (!build_kokkos_petsc_owned_csr_graph(
               sys, plan, matrix_layout, row_start, row_stop, col_start, col_stop))
           return false;
@@ -1447,10 +1483,14 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
           0 :
           cast_int<std::size_t>(plan.offdiag_row_offsets.empty() ? 0 :
                                   plan.offdiag_row_offsets.back());
-      build_kokkos_petsc_owned_coo(plan);
+      {
+        KokkosProfilingRegion coo_region("L2Kokkos::direct storage COO setup");
+        build_kokkos_petsc_owned_coo(plan);
+      }
 
       {
         LOG_SCOPE("L2Kokkos::direct storage slot setup", "HilbertSystem");
+        KokkosProfilingRegion slot_region("L2Kokkos::direct storage slot setup");
         if (!bind_kokkos_direct_slots_from_plan_graph(
               sys, dof_index_cache, plan, rhs_first_local, rhs_last_local))
           return false;
@@ -1469,12 +1509,14 @@ ensure_kokkos_petsc_direct_storage(::HilbertSystem & sys,
 
   {
     LOG_SCOPE("L2Kokkos::direct storage PETSc matrix setup", "HilbertSystem");
+    KokkosProfilingRegion matrix_region("L2Kokkos::direct storage PETSc matrix setup");
     if (!ensure_kokkos_petsc_owned_matrix(sys, plan, system_matrix))
       return false;
   }
 
   {
     LOG_SCOPE("L2Kokkos::direct storage remote setup", "HilbertSystem");
+    KokkosProfilingRegion remote_region("L2Kokkos::direct storage remote setup");
     if (!build_kokkos_petsc_remote_sf(sys, plan))
       return false;
   }
@@ -1571,6 +1613,8 @@ build_hilbert_batch_data(const std::vector<HilbertElementAssemblyRecord> & recor
                          const MeshBase::KokkosGeometryCache & geometry_cache,
                          KokkosHilbertBatchData & batch_data)
 {
+  KokkosProfilingRegion kokkos_region("L2Kokkos::build batch data");
+
   batch_data.elem_indices = KokkosUnsignedIntView("hilbert_elem_indices", records.size());
   batch_data.elem_n_dofs = KokkosUnsignedIntView("hilbert_elem_n_dofs", records.size());
   batch_data.quadrature_orders =
@@ -1643,6 +1687,8 @@ bool
 build_kokkos_petsc_assembly_plan(::HilbertSystem & sys,
                                  KokkosPetscAssemblyPlan & plan)
 {
+  KokkosProfilingRegion kokkos_region("L2Kokkos::build assembly plan");
+
   const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
   const auto * dof_index_cache = sys.get_dof_map().get_kokkos_dof_index_cache(0);
   if (!dof_index_cache)
@@ -1701,6 +1747,8 @@ build_kokkos_fem_goal_batch_data(::HilbertSystem & sys,
                                  const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & goal_function,
                                  KokkosFEMGoalBatchData & batch_data)
 {
+  KokkosProfilingRegion kokkos_region("L2Kokkos::build FEM goal batch data");
+
   libmesh_assert(sys.input_system);
   System & input_system = *sys.input_system;
   const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
@@ -1767,6 +1815,8 @@ ensure_kokkos_fem_goal_batch_data(::HilbertSystem & sys,
                                   const libMesh::Kokkos::KokkosParsedFEMFunction<Number> & goal_function,
                                   KokkosPetscAssemblyPlan & plan)
 {
+  KokkosProfilingRegion kokkos_region("L2Kokkos::ensure FEM goal batch data");
+
   libmesh_assert(sys.input_system);
   const void * input_vector_target = sys.input_system->current_local_solution.get();
   if (plan.fem_goal_target == &goal_function && plan.input_vector_target == input_vector_target)
@@ -1789,6 +1839,7 @@ ensure_kokkos_sampled_analytic_goal_data(::HilbertSystem & sys,
                                          KokkosPetscAssemblyPlan & plan)
 {
   LOG_SCOPE("L2Kokkos::sample analytic goal", "HilbertSystem");
+  KokkosProfilingRegion kokkos_region("L2Kokkos::sample analytic goal");
 
   if (plan.analytic_goal_target == &goal_function &&
       plan.analytic_goal_gradient_target == goal_gradient &&
@@ -1804,35 +1855,38 @@ ensure_kokkos_sampled_analytic_goal_data(::HilbertSystem & sys,
   std::vector<Number> host_values;
   std::vector<std::array<Real, LIBMESH_DIM>> host_gradients;
 
-  for (const auto & record : plan.records)
-    {
-      const Elem * elem = sys.get_mesh().query_elem_ptr(record.elem_id);
-      if (!elem)
-        return false;
+  {
+    KokkosProfilingRegion host_sample_region("L2Kokkos::sample analytic goal on host");
+    for (const auto & record : plan.records)
+      {
+        const Elem * elem = sys.get_mesh().query_elem_ptr(record.elem_id);
+        if (!elem)
+          return false;
 
-      std::unique_ptr<QBase> qrule =
-        QBase::build(QGAUSS, elem->dim(), static_cast<Order>(record.quadrature_order));
-      std::unique_ptr<FEBase> fe = FEBase::build(elem->dim(), sys.variable_type(0));
-      fe->attach_quadrature_rule(qrule.get());
-      const auto & xyz = fe->get_xyz();
-      fe->reinit(elem);
+        std::unique_ptr<QBase> qrule =
+          QBase::build(QGAUSS, elem->dim(), static_cast<Order>(record.quadrature_order));
+        std::unique_ptr<FEBase> fe = FEBase::build(elem->dim(), sys.variable_type(0));
+        fe->attach_quadrature_rule(qrule.get());
+        const auto & xyz = fe->get_xyz();
+        fe->reinit(elem);
 
-      host_offsets[record.elem_index] = host_values.size();
+        host_offsets[record.elem_index] = host_values.size();
 
-      for (const auto qp : index_range(xyz))
-        {
-          host_values.push_back(goal_function(xyz[qp], sys.time));
+        for (const auto qp : index_range(xyz))
+          {
+            host_values.push_back(goal_function(xyz[qp], sys.time));
 
-          std::array<Real, LIBMESH_DIM> grad_values = {};
-          if (goal_gradient)
-            {
-              const Gradient grad = (*goal_gradient)(xyz[qp], sys.time);
-              for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
-                grad_values[d] = grad(d);
-            }
-          host_gradients.push_back(grad_values);
-        }
-    }
+            std::array<Real, LIBMESH_DIM> grad_values = {};
+            if (goal_gradient)
+              {
+                const Gradient grad = (*goal_gradient)(xyz[qp], sys.time);
+                for (unsigned int d = 0; d != LIBMESH_DIM; ++d)
+                  grad_values[d] = grad(d);
+              }
+            host_gradients.push_back(grad_values);
+          }
+      }
+  }
 
   plan.analytic_goal_qp_offsets =
     KokkosSizeView("hilbert_analytic_goal_qp_offsets", host_offsets.size());
@@ -1841,6 +1895,7 @@ ensure_kokkos_sampled_analytic_goal_data(::HilbertSystem & sys,
   plan.analytic_goal_gradients =
     KokkosGradientView("hilbert_analytic_goal_gradients", host_gradients.size(), LIBMESH_DIM);
 
+  KokkosProfilingRegion copy_region("L2Kokkos::copy analytic samples to device");
   auto h_offsets = ::Kokkos::create_mirror_view(plan.analytic_goal_qp_offsets);
   for (auto i : index_range(host_offsets))
     h_offsets(i) = host_offsets[i];
@@ -2097,6 +2152,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
                                     ::HilbertSystem::KokkosAssemblyPath & assembly_path)
 {
   LOG_SCOPE("L2Kokkos::assemble PETSc global system", "HilbertSystem");
+  KokkosProfilingRegion kokkos_region("L2Kokkos::assemble PETSc global system");
 
   libmesh_error_msg_if(sys.has_static_condensation(),
                        "HilbertSystem Kokkos direct PETSc storage does not support static "
@@ -2114,6 +2170,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
 
   {
     LOG_SCOPE("L2Kokkos::ensure direct storage", "HilbertSystem");
+    KokkosProfilingRegion direct_region("L2Kokkos::ensure direct storage");
     if (!ensure_kokkos_petsc_direct_storage(
           sys, *dof_index_cache, plan, system_matrix, system_rhs))
       libmesh_error_msg("Failed to build the HilbertSystem Kokkos direct PETSc storage path. "
@@ -2130,6 +2187,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
 
   {
     LOG_SCOPE("L2Kokkos::write PETSc storage", "HilbertSystem");
+    KokkosProfilingRegion write_region("L2Kokkos::write PETSc storage");
 
     auto rhs_guard = system_rhs.make_kokkos_write_view_guard();
     const KokkosVectorWriteView local_rhs_values = rhs_guard.view();
@@ -2138,24 +2196,27 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
     KokkosMatrixWriteView offdiag_matrix_values;
     KokkosMatrixWriteView remote_matrix_values;
 
-    ::Kokkos::deep_copy(local_rhs_values, Number(0));
-    if (plan.rhs_remote_values.extent(0))
-      {
-        ::Kokkos::deep_copy(plan.rhs_remote_values, Number(0));
-        remote_rhs_values =
-          KokkosVectorWriteView(plan.rhs_remote_values.data(),
-                                plan.rhs_remote_values.extent(0));
-      }
+    {
+      KokkosProfilingRegion zero_region("L2Kokkos::zero direct storage values");
+      ::Kokkos::deep_copy(local_rhs_values, Number(0));
+      if (plan.rhs_remote_values.extent(0))
+        {
+          ::Kokkos::deep_copy(plan.rhs_remote_values, Number(0));
+          remote_rhs_values =
+            KokkosVectorWriteView(plan.rhs_remote_values.data(),
+                                  plan.rhs_remote_values.extent(0));
+        }
 
-    if (plan.mat_coo_values.extent(0))
-      ::Kokkos::deep_copy(plan.mat_coo_values, PetscScalar(0));
-    if (plan.mat_remote_values.extent(0))
-      {
-        ::Kokkos::deep_copy(plan.mat_remote_values, Number(0));
-        remote_matrix_values =
-          KokkosMatrixWriteView(plan.mat_remote_values.data(),
-                                plan.mat_remote_values.extent(0));
-      }
+      if (plan.mat_coo_values.extent(0))
+        ::Kokkos::deep_copy(plan.mat_coo_values, PetscScalar(0));
+      if (plan.mat_remote_values.extent(0))
+        {
+          ::Kokkos::deep_copy(plan.mat_remote_values, Number(0));
+          remote_matrix_values =
+            KokkosMatrixWriteView(plan.mat_remote_values.data(),
+                                  plan.mat_remote_values.extent(0));
+        }
+    }
 
     if (plan.direct_matrix_layout == KokkosDirectMatrixLayout::seq_aij)
       diag_matrix_values =
@@ -2174,6 +2235,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
 
     {
       LOG_SCOPE("L2Kokkos::assemble all records", "HilbertSystem");
+      KokkosProfilingRegion records_region("L2Kokkos::assemble all records");
 
       const auto & geometry_cache = sys.get_mesh().get_kokkos_geometry_cache();
       if (analytic_goal)
@@ -2233,6 +2295,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
 
     {
       LOG_SCOPE("L2Kokkos::scatter entry values", "HilbertSystem");
+      KokkosProfilingRegion scatter_region("L2Kokkos::scatter entry values");
       scatter_kokkos_hilbert_entry_values(plan,
                                           plan.mat_diag_size + plan.mat_offdiag_size,
                                           local_rhs_values,
@@ -2247,6 +2310,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
     if (plan.direct_matrix_layout == KokkosDirectMatrixLayout::mpi_aij)
       {
         LOG_SCOPE("L2Kokkos::apply remote reductions", "HilbertSystem");
+        KokkosProfilingRegion remote_reduce_region("L2Kokkos::apply remote reductions");
 
         if (plan.rhs_remote_sf && plan.rhs_remote_values.extent(0))
           {
@@ -2308,6 +2372,7 @@ assemble_kokkos_petsc_global_system(::HilbertSystem & sys,
 
     {
       LOG_SCOPE("L2Kokkos::MatSetValuesCOO", "HilbertSystem");
+      KokkosProfilingRegion mat_values_region("PETSc::MatSetValuesCOO");
       LibmeshPetscCall2(sys.comm(),
                         MatSetValuesCOO(system_matrix.mat(),
                                         plan.mat_coo_values.data(),
@@ -2328,6 +2393,7 @@ using libMesh::FEMContext;
 using libMesh::FEShapeKey;
 using libMesh::KokkosElementAssemblyState;
 using libMesh::KokkosPetscAssemblyPlan;
+using libMesh::KokkosProfilingRegion;
 using libMesh::KokkosScalarView;
 using libMesh::LinearSolver;
 using libMesh::Number;
@@ -2589,6 +2655,7 @@ bool
 HilbertSystem::try_kokkos_petsc_solve()
 {
   LOG_SCOPE("L2Kokkos::solve", "HilbertSystem");
+  KokkosProfilingRegion kokkos_region("L2Kokkos::solve");
 
   using clock = std::chrono::steady_clock;
   auto * petsc_matrix = dynamic_cast<PetscMatrixBase<Number> *>(this->matrix);
@@ -2613,6 +2680,7 @@ HilbertSystem::try_kokkos_petsc_solve()
   const auto total_start = clock::now();
   {
     LOG_SCOPE("L2Kokkos::zero PETSc objects", "HilbertSystem");
+    KokkosProfilingRegion zero_region("L2Kokkos::zero PETSc objects");
     petsc_matrix->zero();
     petsc_rhs->zero();
     petsc_solution->zero();
@@ -2623,6 +2691,7 @@ HilbertSystem::try_kokkos_petsc_solve()
   auto * plan = [&]()
   {
     LOG_SCOPE("L2Kokkos::ensure assembly plan", "HilbertSystem");
+    KokkosProfilingRegion plan_region("L2Kokkos::ensure assembly plan");
     return this->ensure_kokkos_petsc_plan(&rebuilt_plan);
   }();
   libmesh_error_msg_if(!plan,
@@ -2631,6 +2700,7 @@ HilbertSystem::try_kokkos_petsc_solve()
   if (analytic_goal)
     {
       LOG_SCOPE("L2Kokkos::prepare analytic goal samples", "HilbertSystem");
+      KokkosProfilingRegion analytic_region("L2Kokkos::prepare analytic goal samples");
       if (!ensure_kokkos_sampled_analytic_goal_data(*this,
                                                     *_analytic_goal_func,
                                                     _analytic_goal_grad.get(),
@@ -2648,6 +2718,7 @@ HilbertSystem::try_kokkos_petsc_solve()
   auto assembly_path = HilbertSystem::KokkosAssemblyPath::none;
   {
     LOG_SCOPE("L2Kokkos::assemble global system", "HilbertSystem");
+    KokkosProfilingRegion assembly_region("L2Kokkos::assemble global system");
     if (!assemble_kokkos_petsc_global_system(*this,
                                              *plan,
                                              analytic_goal,
@@ -2665,6 +2736,7 @@ HilbertSystem::try_kokkos_petsc_solve()
 
   {
     LOG_SCOPE("L2Kokkos::close PETSc objects", "HilbertSystem");
+    KokkosProfilingRegion close_region("L2Kokkos::close PETSc objects");
     petsc_matrix->close();
     petsc_rhs->close();
     petsc_solution->close();
@@ -2673,6 +2745,7 @@ HilbertSystem::try_kokkos_petsc_solve()
   LinearSolver<Number> * solver = this->get_linear_solver();
   {
     LOG_SCOPE("L2Kokkos::init PETSc solver", "HilbertSystem");
+    KokkosProfilingRegion init_region("L2Kokkos::init PETSc solver");
     if (this->prefix_with_name())
       solver->init(this->prefix().c_str());
     else
@@ -2683,6 +2756,7 @@ HilbertSystem::try_kokkos_petsc_solve()
   const auto solve_start = clock::now();
   {
     LOG_SCOPE("L2Kokkos::PETSc solve", "HilbertSystem");
+    KokkosProfilingRegion solve_region("PETSc::KSPSolve");
     solver->solve(*this->matrix,
                   *this->solution,
                   *this->rhs,
