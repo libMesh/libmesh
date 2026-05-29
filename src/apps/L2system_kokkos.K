@@ -2314,7 +2314,8 @@ kokkos_max_abs_diff(const ValueView & a,
   return max_diff;
 }
 
-template <typename GoalAccess,
+template <unsigned int MaxDofs,
+          typename GoalAccess,
           typename NodeCoordinateStorage,
           typename ElemNodeIdStorage,
           typename ElemMappingTypeStorage,
