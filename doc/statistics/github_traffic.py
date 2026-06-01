@@ -18,7 +18,7 @@ class PlotClones(PlotData):
   def __init__(self):
     super(PlotData, self).__init__()
     self.left_axis_label = 'Clones per Week'
-    self.right_axis_label = 'Avg. Daily Unique Clones'
+    self.right_axis_label = 'Avg. Daily Unique Cloners'
     self.weekly_plot_filename = 'weekly_github_clones.pdf'
     self.monthly_plot_filename = 'monthly_github_clones.pdf'
     self.title_string1 = 'Total Clones:'
