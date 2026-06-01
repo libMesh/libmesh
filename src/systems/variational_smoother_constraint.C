@@ -809,7 +809,10 @@ ConstraintVariant VariationalSmootherConstraint::determine_constraint(
     neighbors.insert(neighbors.end(), side.begin(), side.end());
 
   // Constrain the node to it's current location
-  if (dim == 1 || neighbors.size() == 1)
+  // Note that neighbors.size() <= 1 is used here instead of == 1 so we don't
+  // crash when trying to access *neighbors[0] a few lines below in the
+  // dim == 2 case
+  if (dim == 1 || neighbors.size() <= 1)
     return PointConstraint{node};
 
   if (dim == 2 || neighbors.size() == 2)
