@@ -5761,7 +5761,11 @@ fi
   # Trump --enable-petsc with --disable-mpi
   if test "x$enablempi" = xno
 then :
-  enablepetsc=no;enablepetsc_mpi=no
+
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Disabling PETSc due to --disable-mpi >>>" >&5
+printf "%s\n" "<<< Disabling PETSc due to --disable-mpi >>>" >&6; }
+         enablepetsc=no;enablepetsc_mpi=no
+
 fi
 
 
@@ -5842,7 +5846,11 @@ fi
 
           if test x"$PETSC_DIR" = x
 then :
-  enablepetsc=no;enablepetsc_mpi=no
+
+                 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Disabling PETSc due to unknown PETSC_DIR >>>" >&5
+printf "%s\n" "<<< Disabling PETSc due to unknown PETSC_DIR >>>" >&6; }
+                 enablepetsc=no;enablepetsc_mpi=no
+
 fi
 
 fi
@@ -5850,29 +5858,34 @@ fi
   if test "$enablepetsc" != no
 then :
 
-                    if test -r ${PETSC_DIR}/bmake/${PETSC_ARCH}/petscconf
+                    CONFS="${PETSC_DIR}/bmake/${PETSC_ARCH}/petscconf"                         # 2.3.x
+          CONFS="${CONFS} ${PETSC_DIR}/${PETSC_ARCH}/conf/petscvariables"            # 3.0.x
+          CONFS="${CONFS} ${PETSC_DIR}/conf/petscvariables"                          # 3.0.x
+          CONFS="${CONFS} ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables"  # 3.6.x
+          CONFS="${CONFS} ${PETSC_DIR}/lib/petsc/conf/petscvariables"                # 3.6.x
+          echo $CONFS
+          for CONF in $CONFS; do
+            if test -r $CONF -a "x$PETSC_MPI" = x
 then :
-                  PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/bmake/${PETSC_ARCH}/petscconf | grep -v mpiexec.uni`
-elif test -r ${PETSC_DIR}/${PETSC_ARCH}/conf/petscvariables
-then :
-                  PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/${PETSC_ARCH}/conf/petscvariables | grep -v mpiexec.uni`
-elif test -r ${PETSC_DIR}/conf/petscvariables
-then :
-                  PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/conf/petscvariables | grep -v mpiexec.uni`
-elif test -r ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables
-then :
-                  PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/${PETSC_ARCH}/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
-elif test -r ${PETSC_DIR}/lib/petsc/conf/petscvariables
-then :
-                  PETSC_MPI=`grep MPIEXEC ${PETSC_DIR}/lib/petsc/conf/petscvariables | grep -v mpiexec.uni`
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking PETSc config in ${CONF} for MPIEXEC" >&5
+printf %s "checking PETSc config in ${CONF} for MPIEXEC... " >&6; }
+                   PETSC_MPI=`grep "MPIEXEC *=" ${CONF} | grep -v mpiexec.uni`
+                   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ${PETSC_MPI}" >&5
+printf "%s\n" "${PETSC_MPI}" >&6; }
+
 fi
+          done
 
           if test "x$PETSC_MPI" != x
 then :
 
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< MPIEXEC was found in PETSc config >>>" >&5
+printf "%s\n" "<<< MPIEXEC was found in PETSc config >>>" >&6; }
 
 else case e in #(
   e)
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< No MPIEXEC found in PETSc config >>>" >&5
+printf "%s\n" "<<< No MPIEXEC found in PETSc config >>>" >&6; }
                   enablepetsc_mpi=no
                  ;;
 esac
@@ -5923,6 +5936,8 @@ then :
                                                                                 if test "$PREFIX_INSTALLED_PETSC" = "no"
 then :
 
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Querying PETSc data from ${PETSC_DIR} Makefile >>>" >&5
+printf "%s\n" "<<< Querying PETSc data from ${PETSC_DIR} Makefile >>>" >&6; }
                   PETSCLINKLIBS=`make -s -C ${PETSC_DIR} SHELL=/bin/sh getlinklibs`
                   PETSCINCLUDEDIRS=`make -s -C ${PETSC_DIR} SHELL=/bin/sh getincludedirs`
                   PETSC_CXX=`make -s -C $PETSC_DIR SHELL=/bin/sh getcxxcompiler`
@@ -5941,6 +5956,9 @@ then :
 
 else case e in #(
   e)
+                  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< Scraping PETSc data from ${PETSC_VARS_FILE} >>>" >&5
+printf "%s\n" "<<< Scraping PETSc data from ${PETSC_VARS_FILE} >>>" >&6; }
+
                   printf '%s\n' "include $PETSC_VARS_FILE" > Makefile_config_petsc
                   printf '%s\n' "getincludedirs:" >> Makefile_config_petsc
                   printf '\t%s' "echo " >> Makefile_config_petsc
@@ -5982,6 +6000,14 @@ fi
                  ;;
 esac
 fi
+                    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< PETSc linklibs: $PETSCLINKLIBS >>>" >&5
+printf "%s\n" "<<< PETSc linklibs: $PETSCLINKLIBS >>>" >&6; }
+          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< PETSc includedirs: $PETSCINCLUDEDIRS>>>" >&5
+printf "%s\n" "<<< PETSc includedirs: $PETSCINCLUDEDIRS>>>" >&6; }
+          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< PETSc CC includes: $PETSC_CC_INCLUDES>>>" >&5
+printf "%s\n" "<<< PETSc CC includes: $PETSC_CC_INCLUDES>>>" >&6; }
+          { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< PETSc FC includes: $PETSC_FC_INCLUDES>>>" >&5
+printf "%s\n" "<<< PETSc FC includes: $PETSC_FC_INCLUDES>>>" >&6; }
 
           # We sometimes need the full CC_INCLUDES to access a
           # PETSc-snooped MPI
@@ -8462,7 +8488,9 @@ printf "%s\n" "<<< C++ compiler is Intel(R) icc 14 >>>" >&6; }
 printf "%s\n" "<<< C++ compiler is Intel(R) icc 13 >>>" >&6; }
                             ACSM_GXX_VERSION=intel_icc_v13.x ;; #(
   *) :
-    as_fn_error $? "Unsupported Intel compiler detected" "$LINENO" 5 ;;
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is unknown but accepted Intel version >>>" >&5
+printf "%s\n" "<<< C++ compiler is unknown but accepted Intel version >>>" >&6; }
+                   ACSM_GXX_VERSION=intel-other ;;
 esac
                   compiler_brand_detected=yes
 
@@ -8474,6 +8502,10 @@ then :
 
                   ACSM_GXX_VERSION_STRING="`($CXX -V 2>&1) | grep 'Version '`"
                   case "$ACSM_GXX_VERSION_STRING" in #(
+  *26.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icx 26 >>>" >&5
+printf "%s\n" "<<< C++ compiler is Intel(R) icx 26 >>>" >&6; }
+                            ACSM_GXX_VERSION=intel_icx_v26.x ;; #(
   *25.*) :
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is Intel(R) icx 25 >>>" >&5
 printf "%s\n" "<<< C++ compiler is Intel(R) icx 25 >>>" >&6; }
@@ -8495,7 +8527,9 @@ printf "%s\n" "<<< C++ compiler is Intel(R) icx 22 >>>" >&6; }
 printf "%s\n" "<<< C++ compiler is Intel(R) icx 21 >>>" >&6; }
                             ACSM_GXX_VERSION=intel_icx_v21.x ;; #(
   *) :
-    as_fn_error $? "Unsupported Intel compiler detected" "$LINENO" 5 ;;
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is unknown but accepted Intel version >>>" >&5
+printf "%s\n" "<<< C++ compiler is unknown but accepted Intel version >>>" >&6; }
+                   ACSM_GXX_VERSION=intel-other ;;
 esac
                   compiler_brand_detected=yes
 
@@ -9287,10 +9321,11 @@ acsm_backup_CXXCPP="$CXXCPP"
 
 
   CXX_YEAR=23
-  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX" -a $acsm_found_cxx -eq 0
+  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX"
 then :
-
-    if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
+  if test $acsm_found_cxx -eq 0
+then :
+  if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
 then :
     ax_cxx_compile_alternatives="23"    ax_cxx_compile_cxx23_required=false
   ac_ext=cpp
@@ -12929,8 +12964,8 @@ printf "%s\n" "#define HAVE_CXX23 1" >>confdefs.h
  ;;
 esac
 fi
-    eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
-    if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
+                eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
+                if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
 then :
 
     # If nothing fails later we're good to go
@@ -15442,20 +15477,19 @@ printf "%s\n" "$as_me: WARNING: libMesh prefers C++17 support for set/map merge"
 fi
 
 fi
-    if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
+                if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
 then :
-
-           { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Found C++$CXX_YEAR standard support" >&6;}
-           if test $acsm_found_cxx -eq 0
+                       if test $acsm_found_cxx -eq 0
 then :
   acsm_cxx_version=$CXX_YEAR
 fi
-           acsm_found_cxx=1
+                       acsm_found_cxx=1
 else case e in #(
   e) CXX="$acsm_backup_CXX"
-           CXXCPP="$acsm_backup_CXXCPP"
-           if test "$HAVE_CXX17" = "0"
+                       CXXCPP="$acsm_backup_CXXCPP"
+                       if test "$HAVE_CXX$CXX_YEAR" = "0"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Did not find C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Did not find C++$CXX_YEAR standard support" >&6;}
@@ -15463,13 +15497,22 @@ fi ;;
 esac
 fi
 
+else case e in #(
+  e)                eval "HAVE_CXX$CXX_YEAR=1"
+
+
+              ;;
+esac
+fi
+
 fi
 
   CXX_YEAR=20
-  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX" -a $acsm_found_cxx -eq 0
+  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX"
 then :
-
-    if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
+  if test $acsm_found_cxx -eq 0
+then :
+  if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
 then :
     ax_cxx_compile_alternatives="20"    ax_cxx_compile_cxx20_required=false
   ac_ext=cpp
@@ -19004,8 +19047,8 @@ printf "%s\n" "#define HAVE_CXX20 1" >>confdefs.h
  ;;
 esac
 fi
-    eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
-    if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
+                eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
+                if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
 then :
 
     # If nothing fails later we're good to go
@@ -21517,20 +21560,19 @@ printf "%s\n" "$as_me: WARNING: libMesh prefers C++17 support for set/map merge"
 fi
 
 fi
-    if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
+                if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
 then :
-
-           { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Found C++$CXX_YEAR standard support" >&6;}
-           if test $acsm_found_cxx -eq 0
+                       if test $acsm_found_cxx -eq 0
 then :
   acsm_cxx_version=$CXX_YEAR
 fi
-           acsm_found_cxx=1
+                       acsm_found_cxx=1
 else case e in #(
   e) CXX="$acsm_backup_CXX"
-           CXXCPP="$acsm_backup_CXXCPP"
-           if test "$HAVE_CXX17" = "0"
+                       CXXCPP="$acsm_backup_CXXCPP"
+                       if test "$HAVE_CXX$CXX_YEAR" = "0"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Did not find C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Did not find C++$CXX_YEAR standard support" >&6;}
@@ -21538,13 +21580,22 @@ fi ;;
 esac
 fi
 
+else case e in #(
+  e)                eval "HAVE_CXX$CXX_YEAR=1"
+
+
+              ;;
+esac
+fi
+
 fi
 
   CXX_YEAR=17
-  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX" -a $acsm_found_cxx -eq 0
+  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX"
 then :
-
-    if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
+  if test $acsm_found_cxx -eq 0
+then :
+  if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
 then :
     ax_cxx_compile_alternatives="17 1z"    ax_cxx_compile_cxx17_required=false
   ac_ext=cpp
@@ -24975,8 +25026,8 @@ printf "%s\n" "#define HAVE_CXX17 1" >>confdefs.h
  ;;
 esac
 fi
-    eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
-    if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
+                eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
+                if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
 then :
 
     # If nothing fails later we're good to go
@@ -27488,20 +27539,19 @@ printf "%s\n" "$as_me: WARNING: libMesh prefers C++17 support for set/map merge"
 fi
 
 fi
-    if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
+                if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
 then :
-
-           { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Found C++$CXX_YEAR standard support" >&6;}
-           if test $acsm_found_cxx -eq 0
+                       if test $acsm_found_cxx -eq 0
 then :
   acsm_cxx_version=$CXX_YEAR
 fi
-           acsm_found_cxx=1
+                       acsm_found_cxx=1
 else case e in #(
   e) CXX="$acsm_backup_CXX"
-           CXXCPP="$acsm_backup_CXXCPP"
-           if test "$HAVE_CXX17" = "0"
+                       CXXCPP="$acsm_backup_CXXCPP"
+                       if test "$HAVE_CXX$CXX_YEAR" = "0"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Did not find C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Did not find C++$CXX_YEAR standard support" >&6;}
@@ -27509,13 +27559,22 @@ fi ;;
 esac
 fi
 
+else case e in #(
+  e)                eval "HAVE_CXX$CXX_YEAR=1"
+
+
+              ;;
+esac
+fi
+
 fi
 
   CXX_YEAR=14
-  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX" -a $acsm_found_cxx -eq 0
+  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX"
 then :
-
-    if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
+  if test $acsm_found_cxx -eq 0
+then :
+  if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
 then :
     ax_cxx_compile_alternatives="14 1y"    ax_cxx_compile_cxx14_required=false
   ac_ext=cpp
@@ -29434,8 +29493,8 @@ printf "%s\n" "#define HAVE_CXX14 1" >>confdefs.h
  ;;
 esac
 fi
-    eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
-    if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
+                eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
+                if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
 then :
 
     # If nothing fails later we're good to go
@@ -31947,20 +32006,19 @@ printf "%s\n" "$as_me: WARNING: libMesh prefers C++17 support for set/map merge"
 fi
 
 fi
-    if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
+                if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
 then :
-
-           { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Found C++$CXX_YEAR standard support" >&6;}
-           if test $acsm_found_cxx -eq 0
+                       if test $acsm_found_cxx -eq 0
 then :
   acsm_cxx_version=$CXX_YEAR
 fi
-           acsm_found_cxx=1
+                       acsm_found_cxx=1
 else case e in #(
   e) CXX="$acsm_backup_CXX"
-           CXXCPP="$acsm_backup_CXXCPP"
-           if test "$HAVE_CXX17" = "0"
+                       CXXCPP="$acsm_backup_CXXCPP"
+                       if test "$HAVE_CXX$CXX_YEAR" = "0"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Did not find C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Did not find C++$CXX_YEAR standard support" >&6;}
@@ -31968,13 +32026,22 @@ fi ;;
 esac
 fi
 
+else case e in #(
+  e)                eval "HAVE_CXX$CXX_YEAR=1"
+
+
+              ;;
+esac
+fi
+
 fi
 
   CXX_YEAR=11
-  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX" -a $acsm_found_cxx -eq 0
+  if test "20$CXX_YEAR" -le "$acsm_CXX_STD_MAX"
 then :
-
-    if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
+  if test $acsm_found_cxx -eq 0
+then :
+  if test "20$CXX_YEAR" -gt "$acsm_CXX_STD_MIN"
 then :
     ax_cxx_compile_alternatives="11 0x"    ax_cxx_compile_cxx11_required=false
   ac_ext=cpp
@@ -33413,8 +33480,8 @@ printf "%s\n" "#define HAVE_CXX11 1" >>confdefs.h
  ;;
 esac
 fi
-    eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
-    if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
+                eval "HAVE_TESTED_CXX=\${HAVE_CXX$CXX_YEAR}"
+                if test "$HAVE_TESTED_CXX" = "1" -a $acsm_found_cxx -eq 0
 then :
 
     # If nothing fails later we're good to go
@@ -35926,24 +35993,31 @@ printf "%s\n" "$as_me: WARNING: libMesh prefers C++17 support for set/map merge"
 fi
 
 fi
-    if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
+                if test "$HAVE_TESTED_CXX" = "1" -a "x$have_cxx_all" = xyes
 then :
-
-           { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Found C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Found C++$CXX_YEAR standard support" >&6;}
-           if test $acsm_found_cxx -eq 0
+                       if test $acsm_found_cxx -eq 0
 then :
   acsm_cxx_version=$CXX_YEAR
 fi
-           acsm_found_cxx=1
+                       acsm_found_cxx=1
 else case e in #(
   e) CXX="$acsm_backup_CXX"
-           CXXCPP="$acsm_backup_CXXCPP"
-           if test "$HAVE_CXX17" = "0"
+                       CXXCPP="$acsm_backup_CXXCPP"
+                       if test "$HAVE_CXX$CXX_YEAR" = "0"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Did not find C++$CXX_YEAR standard support" >&5
 printf "%s\n" "$as_me: Did not find C++$CXX_YEAR standard support" >&6;}
 fi ;;
+esac
+fi
+
+else case e in #(
+  e)                eval "HAVE_CXX$CXX_YEAR=1"
+
+
+              ;;
 esac
 fi
 
