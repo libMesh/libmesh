@@ -41,6 +41,13 @@ processor_id_type global_processor_id();
 unsigned int n_threads();
 
 /**
+ * \returns The default grain size (work unit, chunk size), typically
+ * measured in nodes or elements or vector indices, below which work
+ * will not be split between additional threads.
+ */
+unsigned int default_grainsize();
+
+/**
  * Namespaces don't provide private data,
  * so let's take the data we would like
  * private and put it in an obnoxious
@@ -64,6 +71,12 @@ extern processor_id_type _processor_id;
  * Total number of threads possible.
  */
 extern int _n_threads;
+
+/**
+ * Minimum number of elements/nodes/indices per thread above which we
+ * can split work onto more threads.
+ */
+extern unsigned int _default_grainsize;
 }
 }
 
@@ -97,6 +110,15 @@ unsigned int libMesh::n_threads()
 {
   return static_cast<unsigned int>(libMeshPrivateData::_n_threads);
 }
+
+
+
+inline
+unsigned int libMesh::default_grainsize()
+{
+  return libMeshPrivateData::_default_grainsize;
+}
+
 
 
 // We now put everything we can into a separate libMesh namespace;
