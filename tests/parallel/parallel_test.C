@@ -887,7 +887,8 @@ public:
       (libMesh::n_threads() > 2) ? 2u : 1u;
     std::vector<unsigned int> values(3);
     std::iota(values.begin(), values.end(), 0u);
-    const TestRange range(values.cbegin(), values.cend());
+    const TestRange range(values.cbegin(), values.cend(),
+                          /* grainsize */ 1);
     VisitTracker tracker;
 
     Threads::parallel_for(range, ForBody(tracker), requested_threads);
@@ -909,7 +910,8 @@ public:
       (libMesh::n_threads() > 2) ? 2u : 1u;
     std::vector<unsigned int> values(3);
     std::iota(values.begin(), values.end(), 0u);
-    const TestRange range(values.cbegin(), values.cend());
+    const TestRange range(values.cbegin(), values.cend(),
+                          /* grainsize */ 1);
     auto tracker = std::make_shared<VisitTracker>();
     ReduceBody body(tracker);
 
