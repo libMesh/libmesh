@@ -74,13 +74,11 @@ public:
 
   CPPUNIT_TEST( testAllRBBSphere6 );
   CPPUNIT_TEST( testAllRBBSphere24 );
+  CPPUNIT_TEST( testAllRBBSphere96 );
 
   CPPUNIT_TEST( testAllRBBTri6Sphere12 );
   CPPUNIT_TEST( testAllRBBTri6Sphere48 );
-
-  // build_sphere() is kinda slow for a unit test?
-//  CPPUNIT_TEST( testAllRBBSphere96 );
-//  CPPUNIT_TEST( testAllRBBTri6Sphere192 );
+  CPPUNIT_TEST( testAllRBBTri6Sphere192 );
 #  endif
 
 #endif
@@ -564,11 +562,11 @@ public:
   // 12 RBB triangles
   void testAllRBBSphere6() { LOG_UNIT_TEST; test_sphere(0); }
   void testAllRBBSphere24() { LOG_UNIT_TEST; test_sphere(1); }
-  void testAllRBBSphere96() { LOG_UNIT_TEST; test_sphere(2); test_sphere(3); test_sphere(4); test_sphere(5); }
+  void testAllRBBSphere96() { LOG_UNIT_TEST; test_sphere(2); }
 
   void testAllRBBTri6Sphere12() { LOG_UNIT_TEST; test_sphere(0, TRI6); }
   void testAllRBBTri6Sphere48() { LOG_UNIT_TEST; test_sphere(1, TRI6); }
-  void testAllRBBTri6Sphere192() { LOG_UNIT_TEST; test_sphere(2, TRI6); test_sphere(3, TRI6); test_sphere(4, TRI6); test_sphere(5, TRI6); }
+  void testAllRBBTri6Sphere192() { LOG_UNIT_TEST; test_sphere(2, TRI6); }
 };
 
 
