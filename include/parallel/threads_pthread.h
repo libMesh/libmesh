@@ -214,7 +214,7 @@ template <typename Range>
 unsigned int num_pthreads(const Range & range,
                           unsigned int requested = libMesh::n_threads())
 {
-  std::size_t mn = std::min((std::size_t)requested, range.size());
+  std::size_t mn = std::min((std::size_t)requested, range.size()/range.grainsize());
   return mn > 0 ? cast_int<unsigned int>(mn) : 1;
 }
 
