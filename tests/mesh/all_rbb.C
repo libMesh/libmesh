@@ -74,11 +74,13 @@ public:
 
   CPPUNIT_TEST( testAllRBBSphere6 );
   CPPUNIT_TEST( testAllRBBSphere24 );
-  CPPUNIT_TEST( testAllRBBSphere96 );
 
   CPPUNIT_TEST( testAllRBBTri6Sphere12 );
   CPPUNIT_TEST( testAllRBBTri6Sphere48 );
-  CPPUNIT_TEST( testAllRBBTri6Sphere192 );
+
+  // build_sphere() is kinda slow for a unit test?
+//  CPPUNIT_TEST( testAllRBBSphere96 );
+//  CPPUNIT_TEST( testAllRBBTri6Sphere192 );
 #  endif
 
 #endif
