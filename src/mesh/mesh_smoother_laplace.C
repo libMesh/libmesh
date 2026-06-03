@@ -30,6 +30,7 @@
 #include "libmesh/parallel_algebra.h" // StandardType<Point>
 #include "libmesh/int_range.h"
 #include "libmesh/elem_side_builder.h"
+#include "libmesh/libmesh_logging.h"
 
 namespace libMesh
 {
@@ -38,7 +39,10 @@ LaplaceMeshSmoother::LaplaceMeshSmoother(UnstructuredMesh &mesh,
                                          const unsigned int n_iterations)
     : MeshSmoother(mesh), _initialized(false), _n_iterations(n_iterations) {}
 
-void LaplaceMeshSmoother::smooth() {
+void LaplaceMeshSmoother::smooth()
+{
+  LOG_SCOPE("smooth()", "LaplaceMeshSmoother");
+
   if (!_initialized)
     this->init();
 

@@ -30,6 +30,7 @@
 #include "libmesh/steady_solver.h"
 #include "libmesh/diff_solver.h"
 #include "libmesh/parallel_ghost_sync.h"
+#include "libmesh/libmesh_logging.h"
 
 // C++ includes
 #include <time.h> // for clock_t, clock()
@@ -147,6 +148,8 @@ void VariationalMeshSmoother::setup()
 
 void VariationalMeshSmoother::smooth()
 {
+  LOG_SCOPE("smooth()", "VariationalMeshSmoother");
+
   if (!_setup_called)
     setup();
 
