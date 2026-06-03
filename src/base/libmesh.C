@@ -425,6 +425,12 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
     task_scheduler = std::make_unique<Threads::task_scheduler_init>(libMesh::n_threads());
   }
 
+  // The optimal minimum chunk size for threading is probably fairly
+  // system-dependent.
+  libMesh::libMeshPrivateData::_default_grainsize =
+    libMesh::command_line_value("--default-grainsize",
+                                libMesh::libMeshPrivateData::_default_grainsize);
+
   // Construct singletons who may be at risk of the
   // "static initialization order fiasco"
   Singleton::setup();
