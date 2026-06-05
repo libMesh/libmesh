@@ -175,7 +175,7 @@ public:
    * smallest chunk the range may be broken into for parallel
    * execution.
    */
-  explicit BlockedRange (const unsigned int new_grainsize = 1000) :
+  explicit BlockedRange (const unsigned int new_grainsize = libMesh::default_grainsize()) :
     _grainsize(new_grainsize)
   {}
 
@@ -187,7 +187,7 @@ public:
    */
   BlockedRange (const const_iterator first,
                 const const_iterator last,
-                const unsigned int new_grainsize = 1000) :
+                const unsigned int new_grainsize = libMesh::default_grainsize()) :
     _grainsize(new_grainsize)
   {
     this->reset(first, last);

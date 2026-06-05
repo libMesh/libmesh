@@ -66,7 +66,7 @@ public:
    * smallest chunk the range may be broken into for parallel
    * execution.
    */
-  StoredRange (const unsigned int new_grainsize = 1000) :
+  StoredRange (const unsigned int new_grainsize = libMesh::default_grainsize()) :
     _end(),
     _begin(),
     _last(),
@@ -83,7 +83,7 @@ public:
    */
   StoredRange (const iterator_type & first,
                const iterator_type & last,
-               const unsigned int new_grainsize = 1000) :
+               const unsigned int new_grainsize = libMesh::default_grainsize()) :
     _end(),
     _begin(),
     _last(),
@@ -105,7 +105,7 @@ public:
    * deleting this pointer.
    */
   StoredRange (vec_type * objs,
-               const unsigned int new_grainsize = 1000) :
+               const unsigned int new_grainsize = libMesh::default_grainsize()) :
     _end(objs->end()),
     _begin(objs->begin()),
     _last(objs->size()),

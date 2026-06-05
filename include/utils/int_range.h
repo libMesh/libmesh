@@ -129,6 +129,9 @@ public:
   std::size_t size () const
   { return *_end - *_begin; }
 
+  // For thread splitting control
+  std::size_t grainsize () const { return libMesh::default_grainsize(); }
+
 private:
   iterator _begin, _end;
 };

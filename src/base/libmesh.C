@@ -301,6 +301,7 @@ processor_id_type libMesh::libMeshPrivateData::_n_processors = 1;
 processor_id_type libMesh::libMeshPrivateData::_processor_id = 0;
 #endif
 int           libMesh::libMeshPrivateData::_n_threads = 1; /* Threads::task_scheduler_init::automatic; */
+unsigned int  libMesh::libMeshPrivateData::_default_grainsize = 1000;
 bool          libMesh::libMeshPrivateData::_is_initialized = false;
 SolverPackage libMesh::libMeshPrivateData::_solver_package =
 #if   defined(LIBMESH_HAVE_PETSC)    // PETSc is the default
@@ -423,6 +424,12 @@ LibMeshInit::LibMeshInit (int argc, const char * const * argv,
 
     task_scheduler = std::make_unique<Threads::task_scheduler_init>(libMesh::n_threads());
   }
+
+  // The optimal minimum chunk size for threading is probably fairly
+  // system-dependent.
+  libMesh::libMeshPrivateData::_default_grainsize =
+    libMesh::command_line_value("--default-grainsize",
+                                libMesh::libMeshPrivateData::_default_grainsize);
 
   // Construct singletons who may be at risk of the
   // "static initialization order fiasco"
