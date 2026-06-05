@@ -61185,11 +61185,22 @@ esac
 fi
 
 
+if test "$gdb_command" != no
+then :
+
 
 printf "%s\n" "#define GDB_COMMAND \"$gdb_command\"" >>confdefs.h
 
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: configuring gdb command... \"$gdb_command\"" >&5
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: configuring gdb command... \"$gdb_command\"" >&5
 printf "%s\n" "configuring gdb command... \"$gdb_command\"" >&6; }
+
+else case e in #(
+  e)
+        { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: configuring with no gdb\"" >&5
+printf "%s\n" "configuring with no gdb\"" >&6; }
+       ;;
+esac
+fi
 # -------------------------------------------------------------
 
 
