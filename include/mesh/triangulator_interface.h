@@ -387,6 +387,23 @@ protected:
   void increase_triangle_order();
 
   /**
+   * Helper called at the end of \p increase_triangle_order() for \p
+   * TRI7 to reposition the interior node to the curved-mapping image
+   * of the reference centroid after boundary midpoints have been
+   * snapped.  Safe to call unconditionally for TRI7.
+   */
+  void fixup_tri7_center_nodes();
+
+  /**
+   * Helper called at the end of \p increase_triangle_order() to verify
+   * that no boundary-midpoint snap has tangled a quadratic triangle,
+   * by sampling the signed element Jacobian at the reference nodes and
+   * centroid.  Errors out with a diagnostic naming the bad element and
+   * side if the Jacobian is non-positive.
+   */
+  void verify_quadratic_elements();
+
+  /**
    * Helper function to check holes for intersections if requested.
    */
   void verify_holes(const Hole & outer_bdy);
