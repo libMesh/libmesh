@@ -373,7 +373,9 @@ protected:
     const Real surface_area = 4 * pi * radius * radius;
     const Real tol = TOLERANCE*TOLERANCE;
 
-    // Build a filled sphere
+    // Build a filled sphere.  We're going to avoid using the `flat`
+    // direct 2D option here because that only currently supports
+    // TRI3.
     MeshTools::Generation::build_sphere (interior_mesh, radius,
                                          n_refinements, HEX27);
 
