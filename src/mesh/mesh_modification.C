@@ -42,7 +42,9 @@
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/parallel.h"
+#include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/remote_elem.h"
+#include "libmesh/surface.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/elem_side_builder.h"
@@ -1955,6 +1957,105 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
             }
         } // refinement_level loop
     } // end iteration
+
+  // We haven't changed any topology, but just changing geometry could
+  // have invalidated a point locator.
+  mesh.clear_point_locator();
+}
+
+
+
+void MeshTools::Modification::interpolate_boundary (MeshBase & mesh,
+                                                    const Surface & surface,
+                                                    std::set<std::size_t> ids,
+                                                    bool boundary_nodes)
+{
+  const bool is_serial = mesh.is_serial();
+  const processor_id_type mesh_pid = mesh.processor_id();
+
+  // We might have to move ghost nodes on a distributed mesh if their
+  // owners don't see a requisite element or boundary they're on.
+  std::unordered_set<dof_id_type> moved_ghost_nodes;
+
+  auto move_node = [& moved_ghost_nodes, & surface, is_serial, mesh_pid]
+                   (Node & node) {
+    node = surface.closest_point(node);
+
+    if (!is_serial && node.processor_id() != mesh_pid)
+      moved_ghost_nodes.insert(node.id());
+  };
+
+  const bool no_ids = ids.empty();
+  const BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
+  for (const auto & elem : mesh.active_element_ptr_range())
+    {
+      if (elem->mapping_type() != LAGRANGE_MAP)
+        libmesh_not_implemented();
+
+      if (boundary_nodes)
+        {
+          for (auto s : elem->side_index_range())
+            {
+              if (no_ids)
+                {
+                  // If we're not using boundary ids, we're
+                  // interpolating all external and no internal
+                  // boundaries
+                  if (elem->neighbor_ptr(s))
+                    continue;
+                }
+              else
+                {
+                  if (std::none_of(ids.begin(), ids.end(),
+                                   [&boundary_info,elem,s](std::size_t bcid)
+                                   {return boundary_info.has_boundary_id(elem, s, bcid);}))
+                    continue;
+                }
+
+              for (auto n : elem->nodes_on_side(s))
+                move_node(elem->node_ref(n));
+            }
+        }
+      else
+        {
+          if (no_ids || ids.count(elem->subdomain_id()))
+            for (Node & node : elem->node_ref_range())
+              move_node(node);
+        }
+    }
+
+  if (!is_serial)
+    {
+      std::map<processor_id_type, std::vector<dof_id_type>> moved_nodes_map;
+      for (auto id : moved_ghost_nodes)
+        {
+          const Node & node = mesh.node_ref(id);
+          moved_nodes_map[node.processor_id()].push_back(node.id());
+        }
+
+      auto action_functor =
+        [& mesh, & surface]
+        (processor_id_type /* pid */,
+         const std::vector<dof_id_type> & my_moved_nodes)
+        {
+          for (auto id : my_moved_nodes)
+            {
+              Node & node = mesh.node_ref(id);
+              node = surface.closest_point(node);
+            }
+        };
+
+      // First get new node positions to their owners
+      Parallel::push_parallel_vector_data
+        (mesh.comm(), moved_nodes_map, action_functor);
+
+      // Then get node positions to anyone else with them ghosted
+      SyncNodalPositions sync_object(mesh);
+      Parallel::sync_dofobject_data_by_id
+        (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(),
+         sync_object);
+    }
 
   // We haven't changed any topology, but just changing geometry could
   // have invalidated a point locator.
