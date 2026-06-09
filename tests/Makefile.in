@@ -2513,9 +2513,9 @@ kokkos_unit_test_sources = \
   numerics/kokkos_vector_ops_oracle_fixtures.h \
   numerics/kokkos_vector_ops_oracle_runners.h
 
-@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests_kokkos_dbg_SOURCES =
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests_kokkos_dbg_SOURCES = 
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@EXTRA_unit_tests_kokkos_dbg_SOURCES = driver_kokkos.K
-@LIBMESH_ENABLE_KOKKOS_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_kokkos_opt_SOURCES =
+@LIBMESH_ENABLE_KOKKOS_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_kokkos_opt_SOURCES = 
 @LIBMESH_ENABLE_KOKKOS_TRUE@@LIBMESH_OPT_MODE_TRUE@EXTRA_unit_tests_kokkos_opt_SOURCES = driver_kokkos.K
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
@@ -3216,6 +3216,14 @@ fparser/unit_tests_devel-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 unit_tests-devel$(EXEEXT): $(unit_tests_devel_OBJECTS) $(unit_tests_devel_DEPENDENCIES) $(EXTRA_unit_tests_devel_DEPENDENCIES) 
 	@rm -f unit_tests-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_devel_LINK) $(unit_tests_devel_OBJECTS) $(unit_tests_devel_LDADD) $(LIBS)
+
+@LIBMESH_ENABLE_KOKKOS_FALSE@unit_tests-kokkos-dbg$(EXEEXT): $(unit_tests_kokkos_dbg_OBJECTS) $(unit_tests_kokkos_dbg_DEPENDENCIES) $(EXTRA_unit_tests_kokkos_dbg_DEPENDENCIES) 
+@LIBMESH_ENABLE_KOKKOS_FALSE@	@rm -f unit_tests-kokkos-dbg$(EXEEXT)
+@LIBMESH_ENABLE_KOKKOS_FALSE@	$(AM_V_CCLD)$(LINK) $(unit_tests_kokkos_dbg_OBJECTS) $(unit_tests_kokkos_dbg_LDADD) $(LIBS)
+
+@LIBMESH_ENABLE_KOKKOS_FALSE@unit_tests-kokkos-opt$(EXEEXT): $(unit_tests_kokkos_opt_OBJECTS) $(unit_tests_kokkos_opt_DEPENDENCIES) $(EXTRA_unit_tests_kokkos_opt_DEPENDENCIES) 
+@LIBMESH_ENABLE_KOKKOS_FALSE@	@rm -f unit_tests-kokkos-opt$(EXEEXT)
+@LIBMESH_ENABLE_KOKKOS_FALSE@	$(AM_V_CCLD)$(LINK) $(unit_tests_kokkos_opt_OBJECTS) $(unit_tests_kokkos_opt_LDADD) $(LIBS)
 base/unit_tests_oprof-dof_map_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_oprof-default_coupling_test.$(OBJEXT):  \

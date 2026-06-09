@@ -9260,6 +9260,10 @@ fi
 # flag, for the current compiler, for the user's requested C++
 # standards level.  Adds the required flag to CXXFLAGS if
 # one is found.  Exits if no acceptable flag is found.
+#
+# Don't turn on GNU extensions.  We don't use them, and with device
+# computing we might be using a mix of compilers that don't all
+# support them.
 # --------------------------------------------------------------
 
 acsm_CXX_STD_MIN="2017"
