@@ -25,6 +25,9 @@
 #include "libmesh/id_types.h" // for boundary_id_type, subdomain_id_type
 #include "libmesh/tensor_value.h"
 
+// C++ Includes
+#include <set>
+
 namespace libMesh
 {
 
