@@ -12,5 +12,6 @@ Libs: -Wl,-rpath,${libdir} -L${libdir} -lmesh_prof -ltimpi_prof \
       @libmesh_installed_LIBS@ @libmesh_optional_LIBS@
 Libs.private:
 Cflags: @CPPFLAGS_PROF@ \
+        ${cxxflags_extra} \
         -I${includedir} \
 	@libmesh_optional_INCLUDES@
