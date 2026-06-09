@@ -58,6 +58,9 @@ auto copy_tensor(const TensorLike & T_in)
 namespace detail
 {
 
+// These helpers are shared by the public functions and ref operators so
+// Kokkos-backed refs use direct component access without extra materialization.
+
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto leading_determinant(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
@@ -182,6 +185,8 @@ ResultTensor transpose(const TensorLike & T_in)
   return out;
 }
 
+// Tensor/tensor product operators delegate here for the same direct-access path.
+
 template <typename ResultTensor, typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 ResultTensor multiply_tensors(const LeftTensor & left, const RightTensor & right)
@@ -226,6 +231,8 @@ ResultVector column(const TensorLike & T_in, const unsigned int col_index)
 
   return out;
 }
+
+// Tensor/vector and vector/tensor product operators keep the direct-access path too.
 
 template <typename ResultVector, typename TensorLike, typename VectorLike>
 LIBMESH_DEVICE_INLINE
@@ -301,6 +308,28 @@ void transform_tensor_components(OutputTensor & out, const InputTensor & in, con
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
       tensor_set_component(out, row, col, op(tensor_get_component(in, row, col)));
+}
+
+template <typename ResultTensor, typename TensorLike, typename TransformOp>
+LIBMESH_DEVICE_INLINE
+ResultTensor transformed_tensor(const TensorLike & T_in, const TransformOp & op)
+{
+  ResultTensor out;
+  out.zero();
+  transform_tensor_components(out, T_in, op);
+  return out;
+}
+
+template <typename LeftTensor, typename RightTensor>
+LIBMESH_DEVICE_INLINE
+bool tensor_equal_impl(const LeftTensor & left, const RightTensor & right)
+{
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      if (tensor_get_component(left, row, col) != tensor_get_component(right, row, col))
+        return false;
+
+  return true;
 }
 
 // Tensor reductions and predicates
@@ -379,35 +408,36 @@ bool tensor_is_zero(const TensorLike & T_in)
 
 // libMesh-like convenience wrappers
 
-template <typename LeftTensor, typename RightTensor>
+template <typename LeftTensor,
+          typename RightTensor,
+          typename std::enable_if<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor>,
+                                  int>::type = 0>
 LIBMESH_DEVICE_INLINE
 auto contract(const LeftTensor & left, const RightTensor & right)
-  -> std::enable_if_t<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor>,
-                      decltype(detail::tensor_contract(left, right))>
 {
   return detail::tensor_contract(left, right);
 }
 
-template <typename TensorLike>
+template <typename TensorLike,
+          typename std::enable_if<is_tensor_like_v<TensorLike>, int>::type = 0>
 LIBMESH_DEVICE_INLINE
 auto norm_sq(const TensorLike & T_in)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, decltype(detail::tensor_norm_sq(T_in))>
 {
   return detail::tensor_norm_sq(T_in);
 }
 
-template <typename TensorLike>
+template <typename TensorLike,
+          typename std::enable_if<is_tensor_like_v<TensorLike>, int>::type = 0>
 LIBMESH_DEVICE_INLINE
 auto norm(const TensorLike & T_in)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, decltype(detail::tensor_norm(T_in))>
 {
   return detail::tensor_norm(T_in);
 }
 
-template <typename TensorLike>
+template <typename TensorLike,
+          typename std::enable_if<is_tensor_like_v<TensorLike>, int>::type = 0>
 LIBMESH_DEVICE_INLINE
-auto is_zero(const TensorLike & T_in)
-  -> std::enable_if_t<is_tensor_like_v<TensorLike>, bool>
+bool is_zero(const TensorLike & T_in)
 {
   return detail::tensor_is_zero(T_in);
 }
@@ -556,28 +586,28 @@ template <typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::contract(const RightTensor & right) const
 {
-  return detail::tensor_contract(*this, right);
+  return libMesh::Kokkos::contract(*this, right);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::norm() const
 {
-  return detail::tensor_norm(*this);
+  return libMesh::Kokkos::norm(*this);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::norm_sq() const
 {
-  return detail::tensor_norm_sq(*this);
+  return libMesh::Kokkos::norm_sq(*this);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 bool tensor_ref<ViewType>::is_zero() const
 {
-  return detail::tensor_is_zero(*this);
+  return libMesh::Kokkos::is_zero(*this);
 }
 
 template <typename ViewType>
@@ -649,12 +679,9 @@ auto operator-(const TensorLike & T_in)
   -> std::enable_if_t<is_tensor_like_v<TensorLike> && is_tensor_ref_v<TensorLike>,
                       tensor_semantic_type_t<TensorLike>>
 {
-  auto out = copy_tensor<tensor_semantic_type_t<TensorLike>>(T_in);
-  detail::transform_tensor_components(
-    out,
+  return detail::transformed_tensor<tensor_semantic_type_t<TensorLike>>(
     T_in,
     detail::negate_value<tensor_value_type_t<TensorLike>>{});
-  return out;
 }
 
 template <typename LeftTensor, typename RightTensor>
@@ -700,9 +727,9 @@ template <typename TensorLike,
 LIBMESH_DEVICE_INLINE
 auto operator*(const TensorLike & T_in, const Scalar & alpha)
 {
-  auto out = copy_tensor<tensor_semantic_type_t<TensorLike>>(T_in);
-  detail::transform_tensor_components(out, T_in, detail::scale_value<Scalar>{alpha});
-  return out;
+  return detail::transformed_tensor<tensor_semantic_type_t<TensorLike>>(
+    T_in,
+    detail::scale_value<Scalar>{alpha});
 }
 
 template <typename TensorLike, typename Scalar>
@@ -712,9 +739,9 @@ auto operator/(const TensorLike & T_in, const Scalar & alpha)
                         !is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar>,
                       tensor_semantic_type_t<TensorLike>>
 {
-  auto out = copy_tensor<tensor_semantic_type_t<TensorLike>>(T_in);
-  detail::transform_tensor_components(out, T_in, detail::divide_value<Scalar>{alpha});
-  return out;
+  return detail::transformed_tensor<tensor_semantic_type_t<TensorLike>>(
+    T_in,
+    detail::divide_value<Scalar>{alpha});
 }
 
 template <typename LeftTensor,
@@ -757,12 +784,7 @@ auto operator==(const LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       bool>
 {
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      if (tensor_get_component(left, row, col) != tensor_get_component(right, row, col))
-        return false;
-
-  return true;
+  return detail::tensor_equal_impl(left, right);
 }
 
 template <typename LeftTensor, typename RightTensor>

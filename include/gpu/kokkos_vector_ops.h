@@ -44,6 +44,26 @@ auto copy_vector(const VectorLike & v)
 namespace detail
 {
 
+// These helpers are shared by the public functions and ref operators so
+// Kokkos-backed refs use direct component access without extra materialization.
+
+template <typename LeftVector, typename RightVector>
+LIBMESH_DEVICE_INLINE
+auto vector_dot_impl(const LeftVector & left, const RightVector & right)
+{
+  static_assert(is_vector_like_v<LeftVector>, "vector_dot() requires a vector-like left input");
+  static_assert(is_vector_like_v<RightVector>, "vector_dot() requires a vector-like right input");
+
+  using sum_type =
+    detail::remove_cvref_t<decltype(vector_get_component(left, 0) * vector_get_component(right, 0))>;
+
+  sum_type sum = sum_type(0);
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    sum += vector_get_component(left, component) * vector_get_component(right, component);
+
+  return sum;
+}
+
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 void assign_vector_components(LeftVector & left, const RightVector & right)
@@ -77,6 +97,27 @@ void transform_vector_components(OutputVector & out, const InputVector & in, con
 {
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
     vector_set_component(out, component, op(vector_get_component(in, component)));
+}
+
+template <typename ResultVector, typename VectorLike, typename TransformOp>
+LIBMESH_DEVICE_INLINE
+ResultVector transformed_vector(const VectorLike & v, const TransformOp & op)
+{
+  ResultVector out;
+  out.zero();
+  transform_vector_components(out, v, op);
+  return out;
+}
+
+template <typename LeftVector, typename RightVector>
+LIBMESH_DEVICE_INLINE
+bool vector_equal_impl(const LeftVector & left, const RightVector & right)
+{
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    if (vector_get_component(left, component) != vector_get_component(right, component))
+      return false;
+
+  return true;
 }
 
 template <typename ValueType>
@@ -135,17 +176,7 @@ template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto vector_dot(const LeftVector & left, const RightVector & right)
 {
-  static_assert(is_vector_like_v<LeftVector>, "vector_dot() requires a vector-like left input");
-  static_assert(is_vector_like_v<RightVector>, "vector_dot() requires a vector-like right input");
-
-  using sum_type =
-    detail::remove_cvref_t<decltype(vector_get_component(left, 0) * vector_get_component(right, 0))>;
-
-  sum_type sum = sum_type(0);
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    sum += vector_get_component(left, component) * vector_get_component(right, component);
-
-  return sum;
+  return detail::vector_dot_impl(left, right);
 }
 
 template <typename VectorLike>
@@ -212,9 +243,7 @@ auto vector_unit(const VectorLike & v)
   using output_type = std::conditional_t<std::is_void<ResultVector>::value,
                                          vector_semantic_type_t<VectorLike>,
                                          ResultVector>;
-  auto out = copy_vector<output_type>(v);
-  detail::transform_vector_components(out, v, detail::divide_value<decltype(length)>{length});
-  return out;
+  return detail::transformed_vector<output_type>(v, detail::divide_value<decltype(length)>{length});
 }
 
 // Geometry
@@ -316,35 +345,36 @@ auto vector_solid_angle(const VectorA & v01, const VectorB & v02, const VectorC 
 
 // libMesh-like convenience wrappers
 
-template <typename LeftVector, typename RightVector>
+template <typename LeftVector,
+          typename RightVector,
+          typename std::enable_if<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector>,
+                                  int>::type = 0>
 LIBMESH_DEVICE_INLINE
 auto contract(const LeftVector & left, const RightVector & right)
-  -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector>,
-                      decltype(vector_dot(left, right))>
 {
   return vector_dot(left, right);
 }
 
-template <typename VectorLike>
+template <typename VectorLike,
+          typename std::enable_if<is_vector_like_v<VectorLike>, int>::type = 0>
 LIBMESH_DEVICE_INLINE
 auto norm_sq(const VectorLike & v)
-  -> std::enable_if_t<is_vector_like_v<VectorLike>, decltype(vector_norm_sq(v))>
 {
   return vector_norm_sq(v);
 }
 
-template <typename VectorLike>
+template <typename VectorLike,
+          typename std::enable_if<is_vector_like_v<VectorLike>, int>::type = 0>
 LIBMESH_DEVICE_INLINE
 auto norm(const VectorLike & v)
-  -> std::enable_if_t<is_vector_like_v<VectorLike>, decltype(vector_norm(v))>
 {
   return vector_norm(v);
 }
 
-template <typename VectorLike>
+template <typename VectorLike,
+          typename std::enable_if<is_vector_like_v<VectorLike>, int>::type = 0>
 LIBMESH_DEVICE_INLINE
-auto is_zero(const VectorLike & v)
-  -> std::enable_if_t<is_vector_like_v<VectorLike>, bool>
+bool is_zero(const VectorLike & v)
 {
   return vector_is_zero(v);
 }
@@ -415,21 +445,21 @@ template <typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::contract(const RightVector & right) const
 {
-  return vector_dot(*this, right);
+  return libMesh::Kokkos::contract(*this, right);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::norm() const
 {
-  return vector_norm(*this);
+  return libMesh::Kokkos::norm(*this);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::norm_sq() const
 {
-  return vector_norm_sq(*this);
+  return libMesh::Kokkos::norm_sq(*this);
 }
 
 template <typename ViewType>
@@ -443,7 +473,7 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 bool vector_ref<ViewType>::is_zero() const
 {
-  return vector_is_zero(*this);
+  return libMesh::Kokkos::is_zero(*this);
 }
 
 template <typename ViewType>
@@ -469,12 +499,9 @@ auto operator-(const VectorLike & v)
   -> std::enable_if_t<is_vector_like_v<VectorLike> && is_vector_ref_v<VectorLike>,
                       vector_semantic_type_t<VectorLike>>
 {
-  auto out = copy_vector<vector_semantic_type_t<VectorLike>>(v);
-  detail::transform_vector_components(
-    out,
+  return detail::transformed_vector<vector_semantic_type_t<VectorLike>>(
     v,
     detail::negate_value<vector_value_type_t<VectorLike>>{});
-  return out;
 }
 
 template <typename LeftVector, typename RightVector>
@@ -531,9 +558,9 @@ template <typename VectorLike,
 LIBMESH_DEVICE_INLINE
 auto operator*(const VectorLike & v, const Scalar & alpha)
 {
-  auto out = copy_vector<vector_semantic_type_t<VectorLike>>(v);
-  detail::transform_vector_components(out, v, detail::scale_value<Scalar>{alpha});
-  return out;
+  return detail::transformed_vector<vector_semantic_type_t<VectorLike>>(
+    v,
+    detail::scale_value<Scalar>{alpha});
 }
 
 template <typename VectorLike,
@@ -544,9 +571,9 @@ template <typename VectorLike,
 LIBMESH_DEVICE_INLINE
 auto operator/(const VectorLike & v, const Scalar & alpha)
 {
-  auto out = copy_vector<vector_semantic_type_t<VectorLike>>(v);
-  detail::transform_vector_components(out, v, detail::divide_value<Scalar>{alpha});
-  return out;
+  return detail::transformed_vector<vector_semantic_type_t<VectorLike>>(
+    v,
+    detail::divide_value<Scalar>{alpha});
 }
 
 template <typename LeftVector, typename RightVector>
@@ -556,11 +583,7 @@ auto operator==(const LeftVector & left, const RightVector & right)
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       bool>
 {
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    if (vector_get_component(left, component) != vector_get_component(right, component))
-      return false;
-
-  return true;
+  return detail::vector_equal_impl(left, right);
 }
 
 template <typename LeftVector, typename RightVector>
