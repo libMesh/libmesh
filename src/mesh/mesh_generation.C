@@ -2348,7 +2348,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
       const bool move_only_boundary_nodes =
         mesh.mesh_dimension() != 2 || flat;
-      MeshTools::Modification::interpolate_boundary
+      MeshTools::Modification::interpolate_surface
         (mesh, sphere, /*ids=*/{}, move_only_boundary_nodes);
     }
 

@@ -1965,10 +1965,10 @@ void MeshTools::Modification::smooth (MeshBase & mesh,
 
 
 
-void MeshTools::Modification::interpolate_boundary (MeshBase & mesh,
-                                                    const Surface & surface,
-                                                    std::set<std::size_t> ids,
-                                                    bool boundary_nodes)
+void MeshTools::Modification::interpolate_surface (MeshBase & mesh,
+                                                   const Surface & surface,
+                                                   std::set<std::size_t> ids,
+                                                   bool use_boundary_nodes)
 {
   const bool is_serial = mesh.is_serial();
   const processor_id_type mesh_pid = mesh.processor_id();
@@ -1993,7 +1993,7 @@ void MeshTools::Modification::interpolate_boundary (MeshBase & mesh,
       if (elem->mapping_type() != LAGRANGE_MAP)
         libmesh_not_implemented();
 
-      if (boundary_nodes)
+      if (use_boundary_nodes)
         {
           for (auto s : elem->side_index_range())
             {
