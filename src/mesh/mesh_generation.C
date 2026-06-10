@@ -2346,58 +2346,10 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
 
       mesh_refinement.uniformly_refine(1);
 
-      for (const auto & elem : mesh.active_element_ptr_range())
-        for (auto s : elem->side_index_range())
-          if (elem->neighbor_ptr(s) == nullptr || (mesh.mesh_dimension() == 2 && !flat))
-            {
-              elem->build_side_ptr(side, s);
-
-              // Pop each point to the sphere boundary.  Keep track of
-              // any points we don't own, so we can push their "moved"
-              // status to their owners.
-              for (auto n : side->node_index_range())
-                {
-                  Node & side_node = side->node_ref(n);
-                  side_node =
-                    sphere.closest_point(side->point(n));
-
-                  if (!is_replicated &&
-                      side_node.processor_id() != mesh.processor_id())
-                    moved_ghost_nodes.insert(side_node.id());
-                }
-            }
-
-      if (!is_replicated)
-        {
-          std::map<processor_id_type, std::vector<dof_id_type>> moved_nodes_map;
-          for (auto id : moved_ghost_nodes)
-            {
-              const Node & node = mesh.node_ref(id);
-              moved_nodes_map[node.processor_id()].push_back(node.id());
-            }
-
-          auto action_functor =
-            [& mesh, & sphere]
-            (processor_id_type /* pid */,
-             const std::vector<dof_id_type> & my_moved_nodes)
-            {
-              for (auto id : my_moved_nodes)
-                {
-                  Node & node = mesh.node_ref(id);
-                  node = sphere.closest_point(node);
-                }
-            };
-
-          // First get new node positions to their owners
-          Parallel::push_parallel_vector_data
-            (mesh.comm(), moved_nodes_map, action_functor);
-
-          // Then get node positions to anyone else with them ghosted
-          SyncNodalPositions sync_object(mesh);
-          Parallel::sync_dofobject_data_by_id
-            (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(),
-             sync_object);
-        }
+      const bool move_only_boundary_nodes =
+        mesh.mesh_dimension() != 2 || flat;
+      MeshTools::Modification::interpolate_surface
+        (mesh, sphere, /*ids=*/{}, move_only_boundary_nodes);
     }
 
   // A DistributedMesh needs a little prep before flattening

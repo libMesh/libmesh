@@ -25,12 +25,16 @@
 #include "libmesh/id_types.h" // for boundary_id_type, subdomain_id_type
 #include "libmesh/tensor_value.h"
 
+// C++ Includes
+#include <set>
+
 namespace libMesh
 {
 
 // forward declarations
 template <typename Output> class FunctionBase;
 class MeshBase;
+class Surface;
 
 
 // ------------------------------------------------------------
@@ -162,6 +166,31 @@ void all_rbb (MeshBase & mesh);
  * \date 2005
  */
 void smooth(MeshBase &, unsigned int, Real);
+
+/**
+ * Move nodes in \p mesh to their closest points on the specified \p
+ * surface.
+ *
+ * If \p use_boundary_nodes is true (the default), then \p ids is
+ * interpreted as a set of boundary side ids, and nodes are moved iff
+ * they are on element sides which have those boundary ids.  We
+ * do not consider nodal boundary ids, which are for discrete points,
+ * which cannot be continuously moved without moving a neighborhood
+ * around them.
+ *
+ * If \p use_boundary_nodes is false, then \p ids is interpreted as a
+ * set of subdomain ids, and nodes are moved iff they are on elements
+ * which are on those subdomains.
+ *
+ * If \p ids is empty, then rather than "do nothing" we interpret that
+ * as "do everything".  If \p use_boundary_nodes is true then we move
+ * all nodes on domain boundary sides (where elements have null
+ * neighbors), and if false then we move all nodes.
+ */
+void interpolate_surface (MeshBase & mesh,
+                          const Surface & surface,
+                          std::set<std::size_t> ids={},
+                          bool use_boundary_nodes=true);
 
 #ifdef LIBMESH_ENABLE_AMR
 /**
