@@ -338,13 +338,6 @@ auto tensor_contract(const LeftTensor & left, const RightTensor & right)
   return sum;
 }
 
-template <typename TensorLike>
-LIBMESH_DEVICE_INLINE
-auto tensor_norm(const TensorLike & T_in)
-{
-  using std::sqrt;
-  return sqrt(T_in.norm_sq());
-}
 
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
@@ -374,13 +367,6 @@ auto contract(const LeftTensor & left, const RightTensor & right)
   return detail::tensor_contract(left, right);
 }
 
-template <typename TensorLike,
-          typename std::enable_if<is_tensor_like_v<TensorLike>, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-auto norm(const TensorLike & T_in)
-{
-  return detail::tensor_norm(T_in);
-}
 
 template <typename ResultTensor = void, typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
@@ -533,7 +519,8 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::norm() const
 {
-  return libMesh::Kokkos::norm(*this);
+  using std::sqrt;
+  return sqrt(this->norm_sq());
 }
 
 template <typename ViewType>
