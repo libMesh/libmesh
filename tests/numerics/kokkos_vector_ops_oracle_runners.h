@@ -105,7 +105,7 @@ test_vector_ops_case(const vector_case & info)
 #if LIBMESH_DIM > 2
       const Vec cross = a_ref.cross(b_ref);
       Vec unit_cross = cross;
-      if (libMesh::Kokkos::vector_norm(cross) > unit_tol)
+      if (cross.norm() > unit_tol)
         unit_cross = libMesh::Kokkos::vector_unit<Vec>(cross);
 
       libMesh::Kokkos::store_vector(d_vectors, vector_offset++, cross);
@@ -226,7 +226,7 @@ test_mixed_representation_ops()
 #if LIBMESH_DIM > 2
       const auto cross = a_ref.cross(b);
       Vec unit_cross = cross;
-      if (libMesh::Kokkos::vector_norm(cross) > unit_tol)
+      if (cross.norm() > unit_tol)
         unit_cross = libMesh::Kokkos::vector_unit<Vec>(cross);
 
       libMesh::Kokkos::store_vector(d_vectors, 3, cross);
