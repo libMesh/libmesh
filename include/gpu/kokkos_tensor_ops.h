@@ -22,15 +22,6 @@ namespace libMesh::Kokkos
 
 template <typename ResultTensor>
 LIBMESH_DEVICE_INLINE
-ResultTensor zero_tensor_value()
-{
-  ResultTensor out;
-  out.zero();
-  return out;
-}
-
-template <typename ResultTensor>
-LIBMESH_DEVICE_INLINE
 ResultTensor tensor_identity(const unsigned int dim = LIBMESH_DIM)
 {
   ResultTensor out;
@@ -383,20 +374,6 @@ auto tensor_trace(const TensorLike & T_in)
   return sum;
 }
 
-template <typename TensorLike>
-LIBMESH_DEVICE_INLINE
-bool tensor_is_zero(const TensorLike & T_in)
-{
-  static_assert(is_tensor_like_v<TensorLike>, "tensor_is_zero() requires a tensor-like input");
-
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      if (T_in(row, col) != tensor_value_type_t<TensorLike>(0))
-        return false;
-
-  return true;
-}
-
 } // namespace detail
 
 // libMesh-like convenience wrappers
@@ -425,14 +402,6 @@ LIBMESH_DEVICE_INLINE
 auto norm(const TensorLike & T_in)
 {
   return detail::tensor_norm(T_in);
-}
-
-template <typename TensorLike,
-          typename std::enable_if<is_tensor_like_v<TensorLike>, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-bool is_zero(const TensorLike & T_in)
-{
-  return detail::tensor_is_zero(T_in);
 }
 
 template <typename ResultTensor = void, typename LeftVector, typename RightVector>
@@ -600,7 +569,12 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 bool tensor_ref<ViewType>::is_zero() const
 {
-  return libMesh::Kokkos::is_zero(*this);
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      if ((*this)(row, col) != value_type(0))
+        return false;
+
+  return true;
 }
 
 template <typename ViewType>

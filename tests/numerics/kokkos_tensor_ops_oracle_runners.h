@@ -90,7 +90,7 @@ test_tensor_ops()
   const auto left = c * A;
   const Real contract = A.contract(outer);
   const Real norm = A.norm();
-  const auto zero = libMesh::Kokkos::zero_tensor_value<oracle_tensor>();
+  const oracle_tensor zero; // Via default initialization
 
   std::vector<oracle_tensor> ref_outer(1, outer);
   std::vector<oracle_tensor> ref_transpose(1, transpose);
@@ -133,7 +133,8 @@ test_tensor_ops()
       const auto left_d = c_ref * A_ref;
       const Real contract_d = A_ref.contract(outer_d);
       const Real norm_d = A_ref.norm();
-      const bool zero_is_zero_d = libMesh::Kokkos::zero_tensor_value<oracle_tensor>().is_zero();
+      oracle_tensor default_tensor; // We don't default to uninitialized!
+      const bool zero_is_zero_d = default_tensor.is_zero();
       const bool A_is_zero_d = A_ref.is_zero();
 
       for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
