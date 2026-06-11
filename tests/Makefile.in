@@ -95,25 +95,33 @@ target_triplet = @target@
 @LIBMESH_ENABLE_FPARSER_TRUE@	fparser/autodiff.C
 
 check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
-	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6)
+	$(am__EXEEXT_4) $(am__EXEEXT_5) $(am__EXEEXT_6) \
+	$(am__EXEEXT_7) $(am__EXEEXT_8)
+TESTS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__append_13)
+@LIBMESH_ENABLE_KOKKOS_TRUE@am__append_2 = -I$(top_srcdir)/include $(KOKKOS_CPPFLAGS)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@am__append_3 = unit_tests-kokkos-dbg
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@am__append_4 = unit_tests-kokkos-dbg
+@LIBMESH_ENABLE_KOKKOS_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_5 = unit_tests-kokkos-opt
+@LIBMESH_ENABLE_KOKKOS_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_6 = unit_tests-kokkos-opt
 
 # our GLIBC debugging preprocessor flags seem to potentially conflict
 # with libcppunit binaries.  Some cppunit versions work fine for us,
 # others segfault and/or hang.  By default we will not run
 # GLIBCXX-debugging builds with cppunit unless specifically
 # configured to.
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_2 = unit_tests-dbg
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_3 = unit_tests-dbg
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_4 = unit_tests-devel
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_5 = unit_tests-prof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_6 = unit_tests-oprof
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_7 = unit_tests-opt
-@LIBMESH_VPATH_BUILD_TRUE@am__append_8 = .linkstamp
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_7 = unit_tests-dbg
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_8 = unit_tests-dbg
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_9 = unit_tests-devel
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__append_10 = unit_tests-prof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__append_11 = unit_tests-oprof
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__append_12 = unit_tests-opt
+@LIBMESH_ENABLE_CPPUNIT_TRUE@am__append_13 = run_unit_tests.sh
+@LIBMESH_VPATH_BUILD_TRUE@am__append_14 = .linkstamp
 
 ######################################################################
 #
 # Don't leave code coverage outputs lying around
-@CODE_COVERAGE_ENABLED_TRUE@am__append_9 = */*.gcda */*.gcno
+@CODE_COVERAGE_ENABLED_TRUE@am__append_15 = */*.gcda */*.gcno
 subdir = tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps =  \
@@ -123,6 +131,7 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_cxx_compiler_standard.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_paranoid.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_werror.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_kokkos.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_mpi.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_precision.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_scrape_petsc_configure.m4 \
@@ -182,12 +191,14 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/include/libmesh_config.h.tmp
 CONFIG_CLEAN_FILES = run_unit_tests.sh
 CONFIG_CLEAN_VPATH_FILES =
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_1 = unit_tests-dbg$(EXEEXT)
-@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_2 = unit_tests-dbg$(EXEEXT)
-@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_3 = unit_tests-devel$(EXEEXT)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_4 = unit_tests-prof$(EXEEXT)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_5 = unit_tests-oprof$(EXEEXT)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_6 = unit_tests-opt$(EXEEXT)
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@am__EXEEXT_1 = unit_tests-kokkos-dbg$(EXEEXT)
+@LIBMESH_ENABLE_KOKKOS_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_2 = unit_tests-kokkos-opt$(EXEEXT)
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_CPPUNIT_TRUE@@ACSM_ENABLE_GLIBCXX_DEBUGGING_TRUE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_3 = unit_tests-dbg$(EXEEXT)
+@ACSM_ENABLE_GLIBCXX_DEBUGGING_FALSE@@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_4 = unit_tests-dbg$(EXEEXT)
+@LIBMESH_DEVEL_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@am__EXEEXT_5 = unit_tests-devel$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_PROF_MODE_TRUE@am__EXEEXT_6 = unit_tests-prof$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPROF_MODE_TRUE@am__EXEEXT_7 = unit_tests-oprof$(EXEEXT)
+@LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@am__EXEEXT_8 = unit_tests-opt$(EXEEXT)
 am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	stream_redirector.h test_comm.h base/dof_object_test.h \
 	base/dof_map_test.C base/default_coupling_test.C \
@@ -601,6 +612,14 @@ unit_tests_devel_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
+am_unit_tests_kokkos_dbg_OBJECTS =
+am__EXTRA_unit_tests_kokkos_dbg_SOURCES_DIST = driver_kokkos.K
+unit_tests_kokkos_dbg_OBJECTS = $(am_unit_tests_kokkos_dbg_OBJECTS)
+unit_tests_kokkos_dbg_LDADD = $(LDADD)
+am_unit_tests_kokkos_opt_OBJECTS =
+am__EXTRA_unit_tests_kokkos_opt_SOURCES_DIST = driver_kokkos.K
+unit_tests_kokkos_opt_OBJECTS = $(am_unit_tests_kokkos_opt_OBJECTS)
+unit_tests_kokkos_opt_LDADD = $(LDADD)
 am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	stream_redirector.h test_comm.h base/dof_object_test.h \
 	base/dof_map_test.C base/default_coupling_test.C \
@@ -1876,10 +1895,18 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(unit_tests_dbg_SOURCES) $(unit_tests_devel_SOURCES) \
+	$(unit_tests_kokkos_dbg_SOURCES) \
+	$(EXTRA_unit_tests_kokkos_dbg_SOURCES) \
+	$(unit_tests_kokkos_opt_SOURCES) \
+	$(EXTRA_unit_tests_kokkos_opt_SOURCES) \
 	$(unit_tests_oprof_SOURCES) $(unit_tests_opt_SOURCES) \
 	$(unit_tests_prof_SOURCES)
 DIST_SOURCES = $(am__unit_tests_dbg_SOURCES_DIST) \
 	$(am__unit_tests_devel_SOURCES_DIST) \
+	$(unit_tests_kokkos_dbg_SOURCES) \
+	$(am__EXTRA_unit_tests_kokkos_dbg_SOURCES_DIST) \
+	$(unit_tests_kokkos_opt_SOURCES) \
+	$(am__EXTRA_unit_tests_kokkos_opt_SOURCES_DIST) \
 	$(am__unit_tests_oprof_SOURCES_DIST) \
 	$(am__unit_tests_opt_SOURCES_DIST) \
 	$(am__unit_tests_prof_SOURCES_DIST)
@@ -2081,11 +2108,20 @@ HDF5_DIR = @HDF5_DIR@
 HDF5_LDFLAGS = @HDF5_LDFLAGS@
 HDF5_LIBS = @HDF5_LIBS@
 HDF5_PREFIX = @HDF5_PREFIX@
+HIPCC = @HIPCC@
+ICPX = @ICPX@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+KOKKOS_BACKEND = @KOKKOS_BACKEND@
+KOKKOS_CPPFLAGS = @KOKKOS_CPPFLAGS@
+KOKKOS_CXX = @KOKKOS_CXX@
+KOKKOS_CXXFLAGS = @KOKKOS_CXXFLAGS@
+KOKKOS_LDFLAGS = @KOKKOS_LDFLAGS@
+KOKKOS_LIBS = @KOKKOS_LIBS@
+KOKKOS_MPI_CPPFLAGS = @KOKKOS_MPI_CPPFLAGS@
 LASPACK_INCLUDE = @LASPACK_INCLUDE@
 LASPACK_LIB = @LASPACK_LIB@
 LD = @LD@
@@ -2133,6 +2169,7 @@ NODEPRECATEDFLAG = @NODEPRECATEDFLAG@
 NOX_INCLUDES = @NOX_INCLUDES@
 NOX_LIBS = @NOX_LIBS@
 NOX_MAKEFILE_EXPORT = @NOX_MAKEFILE_EXPORT@
+NVCC = @NVCC@
 NVTX_INCLUDE = @NVTX_INCLUDE@
 OBJDUMP = @OBJDUMP@
 OBJEXT = @OBJEXT@
@@ -2307,6 +2344,7 @@ AM_CPPFLAGS = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
 	       -DLIBMESH_IS_UNIT_TESTING
 
 AM_LDFLAGS = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
+KOKKOS_TEST_CPPFLAGS = $(am__append_2)
 unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	test_comm.h base/dof_object_test.h base/dof_map_test.C \
 	base/default_coupling_test.C base/getpot_test.C \
@@ -2469,7 +2507,18 @@ data = matrices/geom_1_extraction_op.h5 \
 unit_tests_data = $(data)
 
 # Why isn't this working automatically?
-EXTRA_DIST = $(data)
+EXTRA_DIST = $(data) $(kokkos_unit_test_sources)
+kokkos_unit_test_sources = \
+  numerics/kokkos_numerics_oracle_test_utils.h \
+  numerics/kokkos_tensor_ops_oracle_fixtures.h \
+  numerics/kokkos_tensor_ops_oracle_runners.h \
+  numerics/kokkos_vector_ops_oracle_fixtures.h \
+  numerics/kokkos_vector_ops_oracle_runners.h
+
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests_kokkos_dbg_SOURCES = 
+@LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_KOKKOS_TRUE@EXTRA_unit_tests_kokkos_dbg_SOURCES = driver_kokkos.K
+@LIBMESH_ENABLE_KOKKOS_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_kokkos_opt_SOURCES = 
+@LIBMESH_ENABLE_KOKKOS_TRUE@@LIBMESH_OPT_MODE_TRUE@EXTRA_unit_tests_kokkos_opt_SOURCES = driver_kokkos.K
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_SOURCES = $(unit_tests_sources)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CPPFLAGS = $(CPPFLAGS_DBG) $(AM_CPPFLAGS)
 @LIBMESH_DBG_MODE_TRUE@@LIBMESH_ENABLE_CPPUNIT_TRUE@unit_tests_dbg_CXXFLAGS = $(CXXFLAGS_DBG)
@@ -2500,7 +2549,16 @@ EXTRA_DIST = $(data)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_LDADD = $(top_builddir)/libmesh_opt.la
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_optdir = $(datadir)
 @LIBMESH_ENABLE_CPPUNIT_TRUE@@LIBMESH_OPT_MODE_TRUE@unit_tests_opt_DATA = $(data)
-@LIBMESH_ENABLE_CPPUNIT_TRUE@TESTS = run_unit_tests.sh
+@LIBMESH_ENABLE_KOKKOS_TRUE@driver_kokkos_src = driver_kokkos.K
+@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests_kokkos_dbg_object = unit_tests_kokkos_dbg-driver_kokkos.$(OBJEXT)
+@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests_kokkos_opt_object = unit_tests_kokkos_opt-driver_kokkos.$(OBJEXT)
+@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests_kokkos_dbg_depfile = $(DEPDIR)/unit_tests_kokkos_dbg-driver_kokkos.d
+@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests_kokkos_opt_depfile = $(DEPDIR)/unit_tests_kokkos_opt-driver_kokkos.d
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_unit_test_depfiles = $(unit_tests_kokkos_dbg_depfile) $(unit_tests_kokkos_opt_depfile)
+@LIBMESH_ENABLE_KOKKOS_TRUE@kokkos_unit_test_cleanfiles = $(unit_tests_kokkos_dbg_object) $(unit_tests_kokkos_opt_object) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@                              $(kokkos_unit_test_depfiles) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@                              unit_tests-kokkos-dbg$(EXEEXT) unit_tests-kokkos-opt$(EXEEXT)
+
 CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	mesh_with_soln.e elemental_from_nodal.e write_elemset_data.e \
 	write_sideset_data.e write_nodeset_data.e write_edgeset_data.e \
@@ -2534,8 +2592,9 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	write_exodus_QUADSHELL9.e write_exodus_TET10.e \
 	write_exodus_TET14.e write_exodus_TET4.e write_exodus_TRI3.e \
 	write_exodus_TRI6.e write_exodus_TRI7.e \
-	write_exodus_TRISHELL3.e smoother.out $(am__append_8) \
-	$(am__append_9)
+	write_exodus_TRISHELL3.e smoother.out \
+	$(kokkos_unit_test_cleanfiles) $(am__append_14) \
+	$(am__append_15)
 
 # need to link any data files for VPATH builds
 @LIBMESH_VPATH_BUILD_TRUE@BUILT_SOURCES = .linkstamp
@@ -3159,6 +3218,14 @@ fparser/unit_tests_devel-autodiff.$(OBJEXT): fparser/$(am__dirstamp) \
 unit_tests-devel$(EXEEXT): $(unit_tests_devel_OBJECTS) $(unit_tests_devel_DEPENDENCIES) $(EXTRA_unit_tests_devel_DEPENDENCIES) 
 	@rm -f unit_tests-devel$(EXEEXT)
 	$(AM_V_CXXLD)$(unit_tests_devel_LINK) $(unit_tests_devel_OBJECTS) $(unit_tests_devel_LDADD) $(LIBS)
+
+@LIBMESH_ENABLE_KOKKOS_FALSE@unit_tests-kokkos-dbg$(EXEEXT): $(unit_tests_kokkos_dbg_OBJECTS) $(unit_tests_kokkos_dbg_DEPENDENCIES) $(EXTRA_unit_tests_kokkos_dbg_DEPENDENCIES) 
+@LIBMESH_ENABLE_KOKKOS_FALSE@	@rm -f unit_tests-kokkos-dbg$(EXEEXT)
+@LIBMESH_ENABLE_KOKKOS_FALSE@	$(AM_V_CCLD)$(LINK) $(unit_tests_kokkos_dbg_OBJECTS) $(unit_tests_kokkos_dbg_LDADD) $(LIBS)
+
+@LIBMESH_ENABLE_KOKKOS_FALSE@unit_tests-kokkos-opt$(EXEEXT): $(unit_tests_kokkos_opt_OBJECTS) $(unit_tests_kokkos_opt_DEPENDENCIES) $(EXTRA_unit_tests_kokkos_opt_DEPENDENCIES) 
+@LIBMESH_ENABLE_KOKKOS_FALSE@	@rm -f unit_tests-kokkos-opt$(EXEEXT)
+@LIBMESH_ENABLE_KOKKOS_FALSE@	$(AM_V_CCLD)$(LINK) $(unit_tests_kokkos_opt_OBJECTS) $(unit_tests_kokkos_opt_LDADD) $(LIBS)
 base/unit_tests_oprof-dof_map_test.$(OBJEXT): base/$(am__dirstamp) \
 	base/$(DEPDIR)/$(am__dirstamp)
 base/unit_tests_oprof-default_coupling_test.$(OBJEXT):  \
@@ -14831,6 +14898,41 @@ $(top_builddir)/libmesh_prof.la: FORCE
 
 $(top_builddir)/libmesh_oprof.la: FORCE
 	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_oprof.la)
+
+# Build the Kokkos tests with the same mode-suffixed naming as the
+# original libMesh unit test executables, while still compiling with
+# the Kokkos device compiler and mode-specific flags.
+@LIBMESH_ENABLE_KOKKOS_TRUE@$(unit_tests_kokkos_dbg_object): $(driver_kokkos_src)
+@LIBMESH_ENABLE_KOKKOS_TRUE@	@$(MKDIR_P) $(DEPDIR)
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(KOKKOS_MPI_CPPFLAGS) $(CPPFLAGS_DBG) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(AM_CXXFLAGS) $(CXXFLAGS_DBG) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  -MMD -MP -MF $(unit_tests_kokkos_dbg_depfile) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  -c $< -o $@
+
+@LIBMESH_ENABLE_KOKKOS_TRUE@$(unit_tests_kokkos_opt_object): $(driver_kokkos_src)
+@LIBMESH_ENABLE_KOKKOS_TRUE@	@$(MKDIR_P) $(DEPDIR)
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(KOKKOS_MPI_CPPFLAGS) $(CPPFLAGS_OPT) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(AM_CXXFLAGS) $(CXXFLAGS_OPT) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  -MMD -MP -MF $(unit_tests_kokkos_opt_depfile) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  -c $< -o $@
+
+@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests-kokkos-dbg$(EXEEXT): $(unit_tests_kokkos_dbg_object) $(top_builddir)/libmesh_dbg.la
+@LIBMESH_ENABLE_KOKKOS_TRUE@	@rm -f $@
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(unit_tests_kokkos_dbg_object) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(top_builddir)/libmesh_dbg.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
+
+@LIBMESH_ENABLE_KOKKOS_TRUE@unit_tests-kokkos-opt$(EXEEXT): $(unit_tests_kokkos_opt_object) $(top_builddir)/libmesh_opt.la
+@LIBMESH_ENABLE_KOKKOS_TRUE@	@rm -f $@
+@LIBMESH_ENABLE_KOKKOS_TRUE@	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(unit_tests_kokkos_opt_object) \
+@LIBMESH_ENABLE_KOKKOS_TRUE@	  $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
+
+@LIBMESH_ENABLE_KOKKOS_TRUE@-include $(kokkos_unit_test_depfiles)
 
 @LIBMESH_VPATH_BUILD_TRUE@.linkstamp:
 @LIBMESH_VPATH_BUILD_TRUE@	-rm -f solutions && $(LN_S) -f $(srcdir)/solutions .
