@@ -55,11 +55,11 @@ auto vector_dot_impl(const LeftVector & left, const RightVector & right)
   static_assert(is_vector_like_v<RightVector>, "vector_dot() requires a vector-like right input");
 
   using sum_type =
-    detail::remove_cvref_t<decltype(vector_get_component(left, 0) * vector_get_component(right, 0))>;
+    detail::remove_cvref_t<decltype(left(0) * right(0))>;
 
   sum_type sum = sum_type(0);
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    sum += vector_get_component(left, component) * vector_get_component(right, component);
+    sum += left(component) * right(component);
 
   return sum;
 }
@@ -69,7 +69,7 @@ LIBMESH_DEVICE_INLINE
 void assign_vector_components(LeftVector & left, const RightVector & right)
 {
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(left, component, vector_get_component(right, component));
+    left(component) = right(component);
 }
 
 template <typename VectorLike, typename Scalar>
@@ -77,7 +77,7 @@ LIBMESH_DEVICE_INLINE
 void fill_vector_components(VectorLike & v, const Scalar & value)
 {
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(v, component, value);
+    v(component) = value;
 }
 
 template <typename LeftVector, typename RightVector, typename Scalar>
@@ -85,10 +85,7 @@ LIBMESH_DEVICE_INLINE
 void update_vector_components(LeftVector & left, const RightVector & right, const Scalar & factor)
 {
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(left,
-                         component,
-                         vector_get_component(left, component) +
-                           factor * vector_get_component(right, component));
+    left(component) = left(component) + factor * right(component);
 }
 
 template <typename OutputVector, typename InputVector, typename TransformOp>
@@ -96,7 +93,7 @@ LIBMESH_DEVICE_INLINE
 void transform_vector_components(OutputVector & out, const InputVector & in, const TransformOp & op)
 {
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(out, component, op(vector_get_component(in, component)));
+    out(component) = op(in(component));
 }
 
 template <typename ResultVector, typename VectorLike, typename TransformOp>
@@ -114,7 +111,7 @@ LIBMESH_DEVICE_INLINE
 bool vector_equal_impl(const LeftVector & left, const RightVector & right)
 {
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    if (vector_get_component(left, component) != vector_get_component(right, component))
+    if (left(component) != right(component))
       return false;
 
   return true;
@@ -185,11 +182,11 @@ auto vector_norm_sq(const VectorLike & v)
 {
   static_assert(is_vector_like_v<VectorLike>, "vector_norm_sq() requires a vector-like input");
 
-  using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq(vector_get_component(v, 0)))>;
+  using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq(v(0)))>;
 
   norm_type sum = norm_type(0);
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    sum += libMesh::TensorTools::norm_sq(vector_get_component(v, component));
+    sum += libMesh::TensorTools::norm_sq(v(component));
 
   return sum;
 }
@@ -209,11 +206,11 @@ auto vector_l1_norm(const VectorLike & v)
   static_assert(is_vector_like_v<VectorLike>, "vector_l1_norm() requires a vector-like input");
 
   using std::abs;
-  using norm_type = detail::remove_cvref_t<decltype(abs(vector_get_component(v, 0)))>;
+  using norm_type = detail::remove_cvref_t<decltype(abs(v(0)))>;
 
   norm_type sum = norm_type(0);
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    sum += abs(vector_get_component(v, component));
+    sum += abs(v(component));
 
   return sum;
 }
@@ -225,7 +222,7 @@ bool vector_is_zero(const VectorLike & v)
   static_assert(is_vector_like_v<VectorLike>, "vector_is_zero() requires a vector-like input");
 
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    if (vector_get_component(v, component) != vector_value_type_t<VectorLike>(0))
+    if (v(component) != vector_value_type_t<VectorLike>(0))
       return false;
 
   return true;
@@ -262,18 +259,9 @@ auto vector_cross(const LeftVector & left, const RightVector & right)
   out.zero();
 
 #if LIBMESH_DIM == 3
-  vector_set_component(out,
-                       0,
-                       vector_get_component(left, 1) * vector_get_component(right, 2) -
-                         vector_get_component(left, 2) * vector_get_component(right, 1));
-  vector_set_component(out,
-                       1,
-                       -vector_get_component(left, 0) * vector_get_component(right, 2) +
-                         vector_get_component(left, 2) * vector_get_component(right, 0));
-  vector_set_component(out,
-                       2,
-                       vector_get_component(left, 0) * vector_get_component(right, 1) -
-                         vector_get_component(left, 1) * vector_get_component(right, 0));
+  out(0) = left(1) * right(2) - left(2) * right(1);
+  out(1) = -left(0) * right(2) + left(2) * right(0);
+  out(2) = left(0) * right(1) - left(1) * right(0);
 #else
   libmesh_ignore(left);
   libmesh_ignore(right);
@@ -289,19 +277,13 @@ auto vector_triple_product(const LeftVector & left,
                            const RightVector & right)
 {
 #if LIBMESH_DIM == 3
-  return vector_get_component(left, 0) *
-           (vector_get_component(middle, 1) * vector_get_component(right, 2) -
-            vector_get_component(middle, 2) * vector_get_component(right, 1)) -
-         vector_get_component(left, 1) *
-           (vector_get_component(middle, 0) * vector_get_component(right, 2) -
-            vector_get_component(middle, 2) * vector_get_component(right, 0)) +
-         vector_get_component(left, 2) *
-           (vector_get_component(middle, 0) * vector_get_component(right, 1) -
-            vector_get_component(middle, 1) * vector_get_component(right, 0));
+  return left(0) * (middle(1) * right(2) - middle(2) * right(1)) -
+         left(1) * (middle(0) * right(2) - middle(2) * right(0)) +
+         left(2) * (middle(0) * right(1) - middle(1) * right(0));
 #else
   libmesh_ignore(left, middle, right);
   using value_type =
-    detail::remove_cvref_t<decltype(vector_get_component(left, 0) * vector_get_component(middle, 0))>;
+    detail::remove_cvref_t<decltype(left(0) * middle(0))>;
   return value_type(0);
 #endif
 }
@@ -310,14 +292,11 @@ template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto vector_cross_norm_sq(const LeftVector & left, const RightVector & right)
 {
-  const auto z = vector_get_component(left, 0) * vector_get_component(right, 1) -
-                 vector_get_component(left, 1) * vector_get_component(right, 0);
+  const auto z = left(0) * right(1) - left(1) * right(0);
 
 #if LIBMESH_DIM == 3
-  const auto x = vector_get_component(left, 1) * vector_get_component(right, 2) -
-                 vector_get_component(left, 2) * vector_get_component(right, 1);
-  const auto y = vector_get_component(left, 0) * vector_get_component(right, 2) -
-                 vector_get_component(left, 2) * vector_get_component(right, 0);
+  const auto x = left(1) * right(2) - left(2) * right(1);
+  const auto y = left(0) * right(2) - left(2) * right(0);
   return x * x + y * y + z * z;
 #else
   return z * z;

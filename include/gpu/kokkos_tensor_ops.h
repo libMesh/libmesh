@@ -110,7 +110,7 @@ ResultTensor outer_product(const LeftVector & left, const RightVector & right)
       tensor_set_component(out,
                            row,
                            col,
-                           vector_get_component(left, row) * libmesh_conj(vector_get_component(right, col)));
+                           left(row) * libmesh_conj(right(col)));
 
   return out;
 }
@@ -214,7 +214,7 @@ ResultVector row(const TensorLike & T_in, const unsigned int row_index)
   out.zero();
 
   for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-    vector_set_component(out, col, tensor_get_component(T_in, row_index, col));
+    out(col) = tensor_get_component(T_in, row_index, col);
 
   return out;
 }
@@ -227,7 +227,7 @@ ResultVector column(const TensorLike & T_in, const unsigned int col_index)
   out.zero();
 
   for (unsigned int row_index = 0; row_index < LIBMESH_DIM; ++row_index)
-    vector_set_component(out, row_index, tensor_get_component(T_in, row_index, col_index));
+    out(row_index) = tensor_get_component(T_in, row_index, col_index);
 
   return out;
 }
@@ -243,10 +243,10 @@ ResultVector multiply_tensor_vector(const TensorLike & T_in, const VectorLike & 
 
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
   {
-    auto value = tensor_get_component(T_in, row, 0) * vector_get_component(v, 0);
+    auto value = tensor_get_component(T_in, row, 0) * v(0);
     for (unsigned int col = 1; col < LIBMESH_DIM; ++col)
-      value += tensor_get_component(T_in, row, col) * vector_get_component(v, col);
-    vector_set_component(out, row, value);
+      value += tensor_get_component(T_in, row, col) * v(col);
+    out(row) = value;
   }
 
   return out;
@@ -261,10 +261,10 @@ ResultVector multiply_vector_tensor(const VectorLike & v, const TensorLike & T_i
 
   for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
   {
-    auto value = vector_get_component(v, 0) * tensor_get_component(T_in, 0, col);
+    auto value = v(0) * tensor_get_component(T_in, 0, col);
     for (unsigned int row = 1; row < LIBMESH_DIM; ++row)
-      value += vector_get_component(v, row) * tensor_get_component(T_in, row, col);
-    vector_set_component(out, col, value);
+      value += v(row) * tensor_get_component(T_in, row, col);
+    out(col) = value;
   }
 
   return out;
@@ -646,7 +646,7 @@ void tensor_ref<ViewType>::solve(const VectorLike & b, ResultVector & x) const
   const auto solution =
     detail::multiply_tensor_vector<vector_semantic_type_t<ResultVector>>(this->inverse(), b);
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(x, component, vector_get_component(solution, component));
+    x(component) = solution(component);
 }
 
 template <typename ViewType>
