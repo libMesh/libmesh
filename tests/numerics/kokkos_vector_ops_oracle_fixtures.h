@@ -28,7 +28,7 @@ static constexpr unsigned int solid_angle_results =
   1 + ((LIBMESH_DIM > 1) ? 2u : 0u) + ((LIBMESH_DIM > 2) ? 4u : 0u);
 static constexpr unsigned int vector_results =
   11 + ((LIBMESH_DIM > 2) ? 2u : 0u);
-static constexpr unsigned int scalar_results = 11 + solid_angle_results;
+static constexpr unsigned int scalar_results = 12 + solid_angle_results;
 
 template <typename Vec>
 LIBMESH_DEVICE_INLINE
@@ -152,6 +152,7 @@ build_host_oracle(const Vec & a, const Vec & b, const Vec & c)
   result.vectors.push_back(mult_assign);
   result.vectors.push_back(div_assign);
 
+  result.scalars.push_back(a * b);
   result.scalars.push_back(a * b);
   result.scalars.push_back(a.contract(b));
   result.scalars.push_back(mix.norm());
