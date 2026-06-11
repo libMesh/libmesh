@@ -10,7 +10,9 @@
 #include "libmesh/libmesh_common.h"
 
 #define PETSC_SKIP_CXX_COMPLEX_FIX 1
+#include "libmesh/ignore_warnings.h"
 #include <Kokkos_Core.hpp>
+#include "libmesh/restore_warnings.h"
 #undef __CUDACC_VER__
 
 #include <string>
