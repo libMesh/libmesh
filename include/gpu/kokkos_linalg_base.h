@@ -175,13 +175,10 @@ public:
     return _view(_index, row, col);
   }
 
-  template <typename Scalar>
   LIBMESH_DEVICE_INLINE
-  void set(const unsigned int row, const unsigned int col, const Scalar & value)
+  decltype(auto) operator()(const unsigned int row, const unsigned int col)
   {
-    static_assert(std::is_assignable<decltype(_view(_index, row, col)), const Scalar &>::value,
-                  "Cannot write through a tensor_ref built from a read-only view");
-    _view(_index, row, col) = value;
+    return _view(_index, row, col);
   }
 
   template <typename RightTensor>
@@ -363,34 +360,6 @@ using vector_semantic_type_t = typename vector_traits<detail::remove_cvref_t<T>>
 template <typename T>
 using tensor_semantic_type_t = typename tensor_traits<detail::remove_cvref_t<T>>::semantic_type;
 
-template <typename T>
-LIBMESH_DEVICE_INLINE
-decltype(auto)
-tensor_get_component(const T & T_in, const unsigned int row, const unsigned int col)
-{
-  return T_in(row, col);
-}
-
-template <typename T, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void tensor_set_component(T & T_out,
-                          const unsigned int row,
-                          const unsigned int col,
-                          const Scalar & value)
-{
-  T_out(row, col) = value;
-}
-
-template <typename ViewType, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void tensor_set_component(tensor_ref<ViewType> T_out,
-                          const unsigned int row,
-                          const unsigned int col,
-                          const Scalar & value)
-{
-  T_out.set(row, col, value);
-}
-
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 vector_ref<typename detail::remove_ref_t<ViewType>>
@@ -435,7 +404,7 @@ OutputTensor materialize_tensor(const TensorLike & T_in)
 
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out, row, col, tensor_get_component(T_in, row, col));
+      out(row, col) = T_in(row, col);
 
   return out;
 }
