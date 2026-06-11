@@ -28,7 +28,7 @@ ResultTensor tensor_identity(const unsigned int dim = LIBMESH_DIM)
   out.zero();
 
   for (unsigned int i = 0; i < dim; ++i)
-    out(i, i) = tensor_value_type_t<ResultTensor>(1);
+    out(i, i) = 1;
 
   return out;
 }
@@ -54,13 +54,14 @@ namespace detail
 
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
-auto leading_determinant(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
+typename TensorLike::value_type
+leading_determinant(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
 {
   static_assert(is_tensor_like_v<TensorLike>,
                 "detail::leading_determinant() requires a tensor-like input");
 
   if (dim == 0)
-    return tensor_value_type_t<TensorLike>(1);
+    return 1;
 
   if (dim == 1)
     return T_in(0, 0);
@@ -85,7 +86,7 @@ auto leading_determinant(const TensorLike & T_in, const unsigned int dim = LIBME
          a02 * (a10 * a21 - a11 * a20);
 #else
   libmesh_ignore(T_in);
-  return tensor_value_type_t<TensorLike>(0);
+  return 0;
 #endif
 }
 
@@ -117,7 +118,8 @@ ResultTensor inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_D
 
   if (dim == 1)
   {
-    out(0, 0) = tensor_value_type_t<ResultTensor>(1) / T_in(0, 0);
+    using value_type = typename ResultTensor::value_type;
+    out(0, 0) = value_type(1) / T_in(0, 0);
     return out;
   }
 
@@ -409,11 +411,11 @@ LIBMESH_DEVICE_INLINE
 auto outer_product(const LeftVector & left, const RightVector & right)
   -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector>,
                       std::conditional_t<std::is_void<ResultTensor>::value,
-                                         libMesh::TypeTensor<vector_value_type_t<LeftVector>>,
+                                         libMesh::TypeTensor<typename LeftVector::value_type>,
                                          ResultTensor>>
 {
   using output_type = std::conditional_t<std::is_void<ResultTensor>::value,
-                                         libMesh::TypeTensor<vector_value_type_t<LeftVector>>,
+                                         libMesh::TypeTensor<typename LeftVector::value_type>,
                                          ResultTensor>;
   return detail::outer_product<output_type>(left, right);
 }
@@ -459,11 +461,11 @@ LIBMESH_DEVICE_INLINE
 auto row(const TensorLike & T_in, const unsigned int i)
   -> std::enable_if_t<is_tensor_like_v<TensorLike>,
                       std::conditional_t<std::is_void<ResultVector>::value,
-                                         libMesh::TypeVector<tensor_value_type_t<TensorLike>>,
+                                         libMesh::TypeVector<typename TensorLike::value_type>,
                                          ResultVector>>
 {
   using output_type = std::conditional_t<std::is_void<ResultVector>::value,
-                                         libMesh::TypeVector<tensor_value_type_t<TensorLike>>,
+                                         libMesh::TypeVector<typename TensorLike::value_type>,
                                          ResultVector>;
   return detail::row<output_type>(T_in, i);
 }
@@ -473,11 +475,11 @@ LIBMESH_DEVICE_INLINE
 auto column(const TensorLike & T_in, const unsigned int i)
   -> std::enable_if_t<is_tensor_like_v<TensorLike>,
                       std::conditional_t<std::is_void<ResultVector>::value,
-                                         libMesh::TypeVector<tensor_value_type_t<TensorLike>>,
+                                         libMesh::TypeVector<typename TensorLike::value_type>,
                                          ResultVector>>
 {
   using output_type = std::conditional_t<std::is_void<ResultVector>::value,
-                                         libMesh::TypeVector<tensor_value_type_t<TensorLike>>,
+                                         libMesh::TypeVector<typename TensorLike::value_type>,
                                          ResultVector>;
   return detail::column<output_type>(T_in, i);
 }
@@ -648,7 +650,7 @@ auto operator-(const TensorLike & T_in)
 {
   return detail::transformed_tensor<tensor_semantic_type_t<TensorLike>>(
     T_in,
-    detail::negate_value<tensor_value_type_t<TensorLike>>{});
+    detail::negate_value<typename TensorLike::value_type>{});
 }
 
 template <typename LeftTensor, typename RightTensor>
@@ -771,7 +773,7 @@ auto operator+=(LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       LeftTensor &>
 {
-  detail::update_tensor_components(left, right, tensor_value_type_t<LeftTensor>(1));
+  detail::update_tensor_components(left, right, 1);
   return left;
 }
 
@@ -782,7 +784,7 @@ auto operator-=(LeftTensor & left, const RightTensor & right)
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       LeftTensor &>
 {
-  detail::update_tensor_components(left, right, tensor_value_type_t<LeftTensor>(-1));
+  detail::update_tensor_components(left, right, -1);
   return left;
 }
 

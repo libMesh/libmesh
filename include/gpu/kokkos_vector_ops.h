@@ -456,7 +456,7 @@ auto operator-(const VectorLike & v)
 {
   return detail::transformed_vector<vector_semantic_type_t<VectorLike>>(
     v,
-    detail::negate_value<vector_value_type_t<VectorLike>>{});
+    detail::negate_value<typename VectorLike::value_type>{});
 }
 
 template <typename LeftVector, typename RightVector>
@@ -558,7 +558,7 @@ auto operator+=(LeftVector & left, const RightVector & right)
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       LeftVector &>
 {
-  detail::update_vector_components(left, right, vector_value_type_t<LeftVector>(1));
+  detail::update_vector_components(left, right, 1);
   return left;
 }
 
@@ -569,7 +569,7 @@ auto operator-=(LeftVector & left, const RightVector & right)
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       LeftVector &>
 {
-  detail::update_vector_components(left, right, vector_value_type_t<LeftVector>(-1));
+  detail::update_vector_components(left, right, -1);
   return left;
 }
 

@@ -257,21 +257,18 @@ private:
 template <typename T>
 struct vector_traits<libMesh::TypeVector<T>>
 {
-  using value_type = T;
   using semantic_type = libMesh::TypeVector<T>;
 };
 
 template <typename T>
 struct vector_traits<libMesh::VectorValue<T>>
 {
-  using value_type = T;
   using semantic_type = libMesh::VectorValue<T>;
 };
 
 template <>
 struct vector_traits<libMesh::Point>
 {
-  using value_type = libMesh::Real;
   using semantic_type = libMesh::Point;
 };
 
@@ -310,14 +307,12 @@ struct is_vector_ref<vector_ref<ViewType>> : std::true_type
 template <typename T>
 struct tensor_traits<libMesh::TypeTensor<T>>
 {
-  using value_type = T;
   using semantic_type = libMesh::TypeTensor<T>;
 };
 
 template <typename T>
 struct tensor_traits<libMesh::TensorValue<T>>
 {
-  using value_type = T;
   using semantic_type = libMesh::TensorValue<T>;
 };
 
@@ -347,12 +342,6 @@ template <typename ViewType>
 struct is_tensor_ref<tensor_ref<ViewType>> : std::true_type
 {
 };
-
-template <typename T>
-using vector_value_type_t = typename vector_traits<detail::remove_cvref_t<T>>::value_type;
-
-template <typename T>
-using tensor_value_type_t = typename tensor_traits<detail::remove_cvref_t<T>>::value_type;
 
 template <typename T>
 using vector_semantic_type_t = typename vector_traits<detail::remove_cvref_t<T>>::semantic_type;
