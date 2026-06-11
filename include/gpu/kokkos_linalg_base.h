@@ -102,15 +102,6 @@ public:
     return _view(_index, component);
   }
 
-  template <typename Scalar>
-  LIBMESH_DEVICE_INLINE
-  void set(const unsigned int component, const Scalar & value)
-  {
-    static_assert(std::is_assignable<decltype(_view(_index, component)), const Scalar &>::value,
-                  "Cannot write through a vector_ref built from a read-only view");
-    _view(_index, component) = value;
-  }
-
   template <typename RightVector>
   LIBMESH_DEVICE_INLINE
   void assign(const RightVector & right);
