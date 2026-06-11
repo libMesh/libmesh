@@ -19,15 +19,6 @@ namespace libMesh::Kokkos
 
 // Construction and materialization
 
-template <typename ResultVector>
-LIBMESH_DEVICE_INLINE
-ResultVector zero_vector_value()
-{
-  ResultVector out;
-  out.zero();
-  return out;
-}
-
 template <typename ResultVector = void, typename VectorLike>
 LIBMESH_DEVICE_INLINE
 auto copy_vector(const VectorLike & v)
@@ -215,18 +206,6 @@ auto vector_l1_norm(const VectorLike & v)
   return sum;
 }
 
-template <typename VectorLike>
-LIBMESH_DEVICE_INLINE
-bool vector_is_zero(const VectorLike & v)
-{
-  static_assert(is_vector_like_v<VectorLike>, "vector_is_zero() requires a vector-like input");
-
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    if (v(component) != vector_value_type_t<VectorLike>(0))
-      return false;
-
-  return true;
-}
 
 template <typename ResultVector = void, typename VectorLike>
 LIBMESH_DEVICE_INLINE
@@ -350,13 +329,6 @@ auto norm(const VectorLike & v)
   return vector_norm(v);
 }
 
-template <typename VectorLike,
-          typename std::enable_if<is_vector_like_v<VectorLike>, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-bool is_zero(const VectorLike & v)
-{
-  return vector_is_zero(v);
-}
 
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
@@ -452,7 +424,11 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 bool vector_ref<ViewType>::is_zero() const
 {
-  return libMesh::Kokkos::is_zero(*this);
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    if ((*this)(component) != value_type(0))
+      return false;
+
+  return true;
 }
 
 template <typename ViewType>
