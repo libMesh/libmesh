@@ -167,27 +167,13 @@ auto vector_dot(const LeftVector & left, const RightVector & right)
   return detail::vector_dot_impl(left, right);
 }
 
-template <typename VectorLike>
-LIBMESH_DEVICE_INLINE
-auto vector_norm_sq(const VectorLike & v)
-{
-  static_assert(is_vector_like_v<VectorLike>, "vector_norm_sq() requires a vector-like input");
-
-  using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq(v(0)))>;
-
-  norm_type sum = norm_type(0);
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    sum += libMesh::TensorTools::norm_sq(v(component));
-
-  return sum;
-}
 
 template <typename VectorLike>
 LIBMESH_DEVICE_INLINE
 auto vector_norm(const VectorLike & v)
 {
   using std::sqrt;
-  return sqrt(vector_norm_sq(v));
+  return sqrt(v.norm_sq());
 }
 
 template <typename VectorLike>
@@ -313,13 +299,6 @@ auto contract(const LeftVector & left, const RightVector & right)
   return vector_dot(left, right);
 }
 
-template <typename VectorLike,
-          typename std::enable_if<is_vector_like_v<VectorLike>, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-auto norm_sq(const VectorLike & v)
-{
-  return vector_norm_sq(v);
-}
 
 template <typename VectorLike,
           typename std::enable_if<is_vector_like_v<VectorLike>, int>::type = 0>
@@ -410,7 +389,13 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::norm_sq() const
 {
-  return libMesh::Kokkos::norm_sq(*this);
+  using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq((*this)(0)))>;
+
+  norm_type sum = norm_type(0);
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    sum += libMesh::TensorTools::norm_sq((*this)(component));
+
+  return sum;
 }
 
 template <typename ViewType>
