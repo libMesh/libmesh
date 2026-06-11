@@ -96,6 +96,12 @@ public:
     return _view(_index, component);
   }
 
+  LIBMESH_DEVICE_INLINE
+  decltype(auto) operator()(const unsigned int component)
+  {
+    return _view(_index, component);
+  }
+
   template <typename Scalar>
   LIBMESH_DEVICE_INLINE
   void set(const unsigned int component, const Scalar & value)
@@ -369,30 +375,6 @@ using tensor_semantic_type_t = typename tensor_traits<detail::remove_cvref_t<T>>
 template <typename T>
 LIBMESH_DEVICE_INLINE
 decltype(auto)
-vector_get_component(const T & v, const unsigned int component)
-{
-  return v(component);
-}
-
-template <typename T, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void vector_set_component(T & v, const unsigned int component, const Scalar & value)
-{
-  v(component) = value;
-}
-
-template <typename ViewType, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void vector_set_component(vector_ref<ViewType> v,
-                          const unsigned int component,
-                          const Scalar & value)
-{
-  v.set(component, value);
-}
-
-template <typename T>
-LIBMESH_DEVICE_INLINE
-decltype(auto)
 tensor_get_component(const T & T_in, const unsigned int row, const unsigned int col)
 {
   return T_in(row, col);
@@ -445,7 +427,7 @@ OutputVector materialize_vector(const VectorLike & v)
   out.zero();
 
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(out, component, vector_get_component(v, component));
+    out(component) = v(component);
 
   return out;
 }
