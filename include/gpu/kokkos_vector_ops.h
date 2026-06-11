@@ -168,31 +168,6 @@ auto vector_dot(const LeftVector & left, const RightVector & right)
 }
 
 
-template <typename VectorLike>
-LIBMESH_DEVICE_INLINE
-auto vector_norm(const VectorLike & v)
-{
-  using std::sqrt;
-  return sqrt(v.norm_sq());
-}
-
-template <typename VectorLike>
-LIBMESH_DEVICE_INLINE
-auto vector_l1_norm(const VectorLike & v)
-{
-  static_assert(is_vector_like_v<VectorLike>, "vector_l1_norm() requires a vector-like input");
-
-  using std::abs;
-  using norm_type = detail::remove_cvref_t<decltype(abs(v(0)))>;
-
-  norm_type sum = norm_type(0);
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    sum += abs(v(component));
-
-  return sum;
-}
-
-
 template <typename ResultVector = void, typename VectorLike>
 LIBMESH_DEVICE_INLINE
 auto vector_unit(const VectorLike & v)
@@ -200,7 +175,7 @@ auto vector_unit(const VectorLike & v)
                         vector_semantic_type_t<VectorLike>,
                         ResultVector>
 {
-  const auto length = vector_norm(v);
+  const auto length = v.norm();
   libmesh_assert_not_equal_to(length, static_cast<Real>(0.));
   using output_type = std::conditional_t<std::is_void<ResultVector>::value,
                                          vector_semantic_type_t<VectorLike>,
@@ -274,9 +249,9 @@ auto vector_solid_angle(const VectorA & v01, const VectorB & v02, const VectorC 
 {
   using std::atan;
 
-  const auto norm01 = vector_norm(v01);
-  const auto norm02 = vector_norm(v02);
-  const auto norm03 = vector_norm(v03);
+  const auto norm01 = v01.norm();
+  const auto norm02 = v02.norm();
+  const auto norm03 = v03.norm();
   const auto tan_half_angle =
     vector_triple_product(v01, v02, v03) /
     (vector_dot(v01, v02) * norm03 +
@@ -297,15 +272,6 @@ LIBMESH_DEVICE_INLINE
 auto contract(const LeftVector & left, const RightVector & right)
 {
   return vector_dot(left, right);
-}
-
-
-template <typename VectorLike,
-          typename std::enable_if<is_vector_like_v<VectorLike>, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-auto norm(const VectorLike & v)
-{
-  return vector_norm(v);
 }
 
 
@@ -382,7 +348,8 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::norm() const
 {
-  return libMesh::Kokkos::norm(*this);
+  using std::sqrt;
+  return sqrt(this->norm_sq());
 }
 
 template <typename ViewType>
@@ -402,7 +369,14 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::l1_norm() const
 {
-  return vector_l1_norm(*this);
+  using std::abs;
+  using norm_type = detail::remove_cvref_t<decltype(abs((*this)(0)))>;
+
+  norm_type sum = norm_type(0);
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    sum += abs((*this)(component));
+
+  return sum;
 }
 
 template <typename ViewType>
