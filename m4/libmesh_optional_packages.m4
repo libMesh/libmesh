@@ -863,6 +863,20 @@ AM_CONDITIONAL(LIBMESH_ENABLE_METAPHYSICL, test x$enablemetaphysicl = xyes)
 
 
 
+# -------------------------------------------------------------
+# Kokkos -- enables the native Kokkos FE math path
+# -------------------------------------------------------------
+ACSM_CONFIGURE_KOKKOS
+
+AS_IF([test "x$enablekokkos" != "xno"],
+      [
+        libmesh_optional_INCLUDES="$KOKKOS_CPPFLAGS $libmesh_optional_INCLUDES"
+        libmesh_optional_LIBS="$KOKKOS_LDFLAGS $KOKKOS_LIBS $libmesh_optional_LIBS"
+      ])
+AM_CONDITIONAL(LIBMESH_ENABLE_KOKKOS, test x$enablekokkos = xyes)
+# -------------------------------------------------------------
+
+
 
 AS_IF([test "$enableoptional" != no],
       [
