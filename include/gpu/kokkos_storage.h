@@ -27,7 +27,7 @@ void store_vector(const ViewType & view, const unsigned int i, const VectorType 
   auto out = make_vector_ref(view, i);
 
   for (unsigned int d = 0; d < LIBMESH_DIM; ++d)
-    vector_set_component(out, d, vector_get_component(v, d));
+    out(d) = v(d);
 }
 
 template <typename TensorType, typename ViewType>
