@@ -67,6 +67,7 @@ test_vector_ops_case(const vector_case & info)
 
       unsigned int scalar_offset = 0;
       d_scalars(scalar_offset++) = a_ref * b_ref;
+      d_scalars(scalar_offset++) = dot;
       d_scalars(scalar_offset++) = contract;
       d_scalars(scalar_offset++) = norm;
       d_scalars(scalar_offset++) = norm_sq;
