@@ -340,26 +340,10 @@ auto tensor_contract(const LeftTensor & left, const RightTensor & right)
 
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
-auto tensor_norm_sq(const TensorLike & T_in)
-{
-  static_assert(is_tensor_like_v<TensorLike>, "tensor_norm_sq() requires a tensor-like input");
-
-  using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq(T_in(0, 0)))>;
-
-  norm_type sum = norm_type(0);
-  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
-    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      sum += libMesh::TensorTools::norm_sq(T_in(row, col));
-
-  return sum;
-}
-
-template <typename TensorLike>
-LIBMESH_DEVICE_INLINE
 auto tensor_norm(const TensorLike & T_in)
 {
   using std::sqrt;
-  return sqrt(tensor_norm_sq(T_in));
+  return sqrt(T_in.norm_sq());
 }
 
 template <typename TensorLike>
@@ -388,14 +372,6 @@ LIBMESH_DEVICE_INLINE
 auto contract(const LeftTensor & left, const RightTensor & right)
 {
   return detail::tensor_contract(left, right);
-}
-
-template <typename TensorLike,
-          typename std::enable_if<is_tensor_like_v<TensorLike>, int>::type = 0>
-LIBMESH_DEVICE_INLINE
-auto norm_sq(const TensorLike & T_in)
-{
-  return detail::tensor_norm_sq(T_in);
 }
 
 template <typename TensorLike,
@@ -564,7 +540,14 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::norm_sq() const
 {
-  return libMesh::Kokkos::norm_sq(*this);
+  using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq((*this)(0, 0)))>;
+
+  norm_type sum = norm_type(0);
+  for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
+    for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
+      sum += libMesh::TensorTools::norm_sq((*this)(row, col));
+
+  return sum;
 }
 
 template <typename ViewType>
