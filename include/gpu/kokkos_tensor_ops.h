@@ -37,7 +37,7 @@ ResultTensor tensor_identity(const unsigned int dim = LIBMESH_DIM)
   out.zero();
 
   for (unsigned int i = 0; i < dim; ++i)
-    tensor_set_component(out, i, i, tensor_value_type_t<ResultTensor>(1));
+    out(i, i) = tensor_value_type_t<ResultTensor>(1);
 
   return out;
 }
@@ -72,22 +72,22 @@ auto leading_determinant(const TensorLike & T_in, const unsigned int dim = LIBME
     return tensor_value_type_t<TensorLike>(1);
 
   if (dim == 1)
-    return tensor_get_component(T_in, 0, 0);
+    return T_in(0, 0);
 
   if (dim == 2)
-    return tensor_get_component(T_in, 0, 0) * tensor_get_component(T_in, 1, 1) -
-           tensor_get_component(T_in, 0, 1) * tensor_get_component(T_in, 1, 0);
+    return T_in(0, 0) * T_in(1, 1) -
+           T_in(0, 1) * T_in(1, 0);
 
 #if LIBMESH_DIM > 2
-  const auto a00 = tensor_get_component(T_in, 0, 0);
-  const auto a01 = tensor_get_component(T_in, 0, 1);
-  const auto a02 = tensor_get_component(T_in, 0, 2);
-  const auto a10 = tensor_get_component(T_in, 1, 0);
-  const auto a11 = tensor_get_component(T_in, 1, 1);
-  const auto a12 = tensor_get_component(T_in, 1, 2);
-  const auto a20 = tensor_get_component(T_in, 2, 0);
-  const auto a21 = tensor_get_component(T_in, 2, 1);
-  const auto a22 = tensor_get_component(T_in, 2, 2);
+  const auto a00 = T_in(0, 0);
+  const auto a01 = T_in(0, 1);
+  const auto a02 = T_in(0, 2);
+  const auto a10 = T_in(1, 0);
+  const auto a11 = T_in(1, 1);
+  const auto a12 = T_in(1, 2);
+  const auto a20 = T_in(2, 0);
+  const auto a21 = T_in(2, 1);
+  const auto a22 = T_in(2, 2);
 
   return a00 * (a11 * a22 - a12 * a21) -
          a01 * (a10 * a22 - a12 * a20) +
@@ -107,10 +107,7 @@ ResultTensor outer_product(const LeftVector & left, const RightVector & right)
 
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out,
-                           row,
-                           col,
-                           left(row) * libmesh_conj(right(col)));
+      out(row, col) = left(row) * libmesh_conj(right(col));
 
   return out;
 }
@@ -129,7 +126,7 @@ ResultTensor inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_D
 
   if (dim == 1)
   {
-    tensor_set_component(out, 0, 0, tensor_value_type_t<ResultTensor>(1) / tensor_get_component(T_in, 0, 0));
+    out(0, 0) = tensor_value_type_t<ResultTensor>(1) / T_in(0, 0);
     return out;
   }
 
@@ -137,33 +134,33 @@ ResultTensor inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_D
 
   if (dim == 2)
   {
-    tensor_set_component(out, 0, 0,  tensor_get_component(T_in, 1, 1) / det);
-    tensor_set_component(out, 0, 1, -tensor_get_component(T_in, 0, 1) / det);
-    tensor_set_component(out, 1, 0, -tensor_get_component(T_in, 1, 0) / det);
-    tensor_set_component(out, 1, 1,  tensor_get_component(T_in, 0, 0) / det);
+    out(0, 0) = T_in(1, 1) / det;
+    out(0, 1) = -T_in(0, 1) / det;
+    out(1, 0) = -T_in(1, 0) / det;
+    out(1, 1) =  T_in(0, 0) / det;
     return out;
   }
 
 #if LIBMESH_DIM > 2
-  const auto a00 = tensor_get_component(T_in, 0, 0);
-  const auto a01 = tensor_get_component(T_in, 0, 1);
-  const auto a02 = tensor_get_component(T_in, 0, 2);
-  const auto a10 = tensor_get_component(T_in, 1, 0);
-  const auto a11 = tensor_get_component(T_in, 1, 1);
-  const auto a12 = tensor_get_component(T_in, 1, 2);
-  const auto a20 = tensor_get_component(T_in, 2, 0);
-  const auto a21 = tensor_get_component(T_in, 2, 1);
-  const auto a22 = tensor_get_component(T_in, 2, 2);
+  const auto a00 = T_in(0, 0);
+  const auto a01 = T_in(0, 1);
+  const auto a02 = T_in(0, 2);
+  const auto a10 = T_in(1, 0);
+  const auto a11 = T_in(1, 1);
+  const auto a12 = T_in(1, 2);
+  const auto a20 = T_in(2, 0);
+  const auto a21 = T_in(2, 1);
+  const auto a22 = T_in(2, 2);
 
-  tensor_set_component(out, 0, 0, (a11 * a22 - a12 * a21) / det);
-  tensor_set_component(out, 0, 1, (a02 * a21 - a01 * a22) / det);
-  tensor_set_component(out, 0, 2, (a01 * a12 - a02 * a11) / det);
-  tensor_set_component(out, 1, 0, (a12 * a20 - a10 * a22) / det);
-  tensor_set_component(out, 1, 1, (a00 * a22 - a02 * a20) / det);
-  tensor_set_component(out, 1, 2, (a02 * a10 - a00 * a12) / det);
-  tensor_set_component(out, 2, 0, (a10 * a21 - a11 * a20) / det);
-  tensor_set_component(out, 2, 1, (a01 * a20 - a00 * a21) / det);
-  tensor_set_component(out, 2, 2, (a00 * a11 - a01 * a10) / det);
+  out(0, 0) = (a11 * a22 - a12 * a21) / det;
+  out(0, 1) = (a02 * a21 - a01 * a22) / det;
+  out(0, 2) = (a01 * a12 - a02 * a11) / det;
+  out(1, 0) = (a12 * a20 - a10 * a22) / det;
+  out(1, 1) = (a00 * a22 - a02 * a20) / det;
+  out(1, 2) = (a02 * a10 - a00 * a12) / det;
+  out(2, 0) = (a10 * a21 - a11 * a20) / det;
+  out(2, 1) = (a01 * a20 - a00 * a21) / det;
+  out(2, 2) = (a00 * a11 - a01 * a10) / det;
 #else
   libmesh_ignore(T_in);
 #endif
@@ -180,7 +177,7 @@ ResultTensor transpose(const TensorLike & T_in)
 
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out, row, col, tensor_get_component(T_in, col, row));
+      out(row, col) = T_in(col, row);
 
   return out;
 }
@@ -197,10 +194,10 @@ ResultTensor multiply_tensors(const LeftTensor & left, const RightTensor & right
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
     {
-      auto value = tensor_get_component(left, row, 0) * tensor_get_component(right, 0, col);
+      auto value = left(row, 0) * right(0, col);
       for (unsigned int k = 1; k < LIBMESH_DIM; ++k)
-        value += tensor_get_component(left, row, k) * tensor_get_component(right, k, col);
-      tensor_set_component(out, row, col, value);
+        value += left(row, k) * right(k, col);
+      out(row, col) = value;
     }
 
   return out;
@@ -214,7 +211,7 @@ ResultVector row(const TensorLike & T_in, const unsigned int row_index)
   out.zero();
 
   for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-    out(col) = tensor_get_component(T_in, row_index, col);
+    out(col) = T_in(row_index, col);
 
   return out;
 }
@@ -227,7 +224,7 @@ ResultVector column(const TensorLike & T_in, const unsigned int col_index)
   out.zero();
 
   for (unsigned int row_index = 0; row_index < LIBMESH_DIM; ++row_index)
-    out(row_index) = tensor_get_component(T_in, row_index, col_index);
+    out(row_index) = T_in(row_index, col_index);
 
   return out;
 }
@@ -243,9 +240,9 @@ ResultVector multiply_tensor_vector(const TensorLike & T_in, const VectorLike & 
 
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
   {
-    auto value = tensor_get_component(T_in, row, 0) * v(0);
+    auto value = T_in(row, 0) * v(0);
     for (unsigned int col = 1; col < LIBMESH_DIM; ++col)
-      value += tensor_get_component(T_in, row, col) * v(col);
+      value += T_in(row, col) * v(col);
     out(row) = value;
   }
 
@@ -261,9 +258,9 @@ ResultVector multiply_vector_tensor(const VectorLike & v, const TensorLike & T_i
 
   for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
   {
-    auto value = v(0) * tensor_get_component(T_in, 0, col);
+    auto value = v(0) * T_in(0, col);
     for (unsigned int row = 1; row < LIBMESH_DIM; ++row)
-      value += v(row) * tensor_get_component(T_in, row, col);
+      value += v(row) * T_in(row, col);
     out(col) = value;
   }
 
@@ -276,7 +273,7 @@ void assign_tensor_components(LeftTensor & left, const RightTensor & right)
 {
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(left, row, col, tensor_get_component(right, row, col));
+      left(row, col) = right(row, col);
 }
 
 template <typename TensorLike, typename Scalar>
@@ -285,7 +282,7 @@ void fill_tensor_components(TensorLike & T_in, const Scalar & value)
 {
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(T_in, row, col, value);
+      T_in(row, col) = value;
 }
 
 template <typename LeftTensor, typename RightTensor, typename Scalar>
@@ -294,11 +291,7 @@ void update_tensor_components(LeftTensor & left, const RightTensor & right, cons
 {
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(left,
-                           row,
-                           col,
-                           tensor_get_component(left, row, col) +
-                             factor * tensor_get_component(right, row, col));
+      left(row, col) = left(row, col) + factor * right(row, col);
 }
 
 template <typename OutputTensor, typename InputTensor, typename TransformOp>
@@ -307,7 +300,7 @@ void transform_tensor_components(OutputTensor & out, const InputTensor & in, con
 {
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out, row, col, op(tensor_get_component(in, row, col)));
+      out(row, col) = op(in(row, col));
 }
 
 template <typename ResultTensor, typename TensorLike, typename TransformOp>
@@ -326,7 +319,7 @@ bool tensor_equal_impl(const LeftTensor & left, const RightTensor & right)
 {
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      if (tensor_get_component(left, row, col) != tensor_get_component(right, row, col))
+      if (left(row, col) != right(row, col))
         return false;
 
   return true;
@@ -342,12 +335,12 @@ auto tensor_contract(const LeftTensor & left, const RightTensor & right)
   static_assert(is_tensor_like_v<RightTensor>, "tensor_contract() requires a tensor-like right input");
 
   using sum_type =
-    detail::remove_cvref_t<decltype(tensor_get_component(left, 0, 0) * tensor_get_component(right, 0, 0))>;
+    detail::remove_cvref_t<decltype(left(0, 0) * right(0, 0))>;
 
   sum_type sum = sum_type(0);
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      sum += tensor_get_component(left, row, col) * tensor_get_component(right, row, col);
+      sum += left(row, col) * right(row, col);
 
   return sum;
 }
@@ -358,12 +351,12 @@ auto tensor_norm_sq(const TensorLike & T_in)
 {
   static_assert(is_tensor_like_v<TensorLike>, "tensor_norm_sq() requires a tensor-like input");
 
-  using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq(tensor_get_component(T_in, 0, 0)))>;
+  using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq(T_in(0, 0)))>;
 
   norm_type sum = norm_type(0);
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      sum += libMesh::TensorTools::norm_sq(tensor_get_component(T_in, row, col));
+      sum += libMesh::TensorTools::norm_sq(T_in(row, col));
 
   return sum;
 }
@@ -382,10 +375,10 @@ auto tensor_trace(const TensorLike & T_in)
 {
   static_assert(is_tensor_like_v<TensorLike>, "tensor_trace() requires a tensor-like input");
 
-  using trace_type = detail::remove_cvref_t<decltype(tensor_get_component(T_in, 0, 0))>;
+  using trace_type = detail::remove_cvref_t<decltype(T_in(0, 0))>;
   trace_type sum = trace_type(0);
   for (unsigned int i = 0; i < LIBMESH_DIM; ++i)
-    sum += tensor_get_component(T_in, i, i);
+    sum += T_in(i, i);
 
   return sum;
 }
@@ -398,7 +391,7 @@ bool tensor_is_zero(const TensorLike & T_in)
 
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      if (tensor_get_component(T_in, row, col) != tensor_value_type_t<TensorLike>(0))
+      if (T_in(row, col) != tensor_value_type_t<TensorLike>(0))
         return false;
 
   return true;

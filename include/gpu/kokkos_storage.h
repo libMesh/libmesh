@@ -45,7 +45,7 @@ void store_tensor(const ViewType & view, const unsigned int i, const TensorType 
 
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out, row, col, tensor_get_component(T, row, col));
+      out(row, col) = T(row, col);
 }
 
 } // namespace libMesh::Kokkos
