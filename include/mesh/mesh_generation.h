@@ -111,7 +111,22 @@ void build_square (UnstructuredMesh & mesh,
                    const bool gauss_lobatto_grid=false);
 
 /**
- * Meshes a spherical or mapped-spherical domain.
+ * Fills \p mesh with a mesh discretizing a ball (||x||<= \p radius)
+ * or sphere (||x|| = \p radius) domain.
+ *
+ * A coarse grid of product elements (edge, quad, or hex) is refined,
+ * \p n_refinements times, snapping boundary nodes to the sphere
+ * surface each time; interior nodes are then smoothed \p n_smooth
+ * times.
+ *
+ * If the selected element \p type is 1D, our 1D ball is a line.
+ *
+ * If \p type is 2D, then if \p flat is true (the default), a 2D ball
+ * (a filled circle) is meshed.
+ *
+ * In 2D, if \p flat is false, a 2D sphere (the surface of a 3D ball)
+ * is meshed, using \p TRI3 elements in an icosahedron for the initial
+ * mesh.
  */
 void build_sphere (UnstructuredMesh & mesh,
                    const Real radius=1,
