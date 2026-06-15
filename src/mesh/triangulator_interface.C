@@ -117,6 +117,7 @@ TriangulatorInterface::TriangulatorInterface(UnstructuredMesh & mesh)
     _insert_extra_points(false),
     _smooth_after_generating(true),
     _quiet(true),
+    _fixup_tri7_center_nodes(false),
     _auto_area_function(nullptr)
 {}
 
@@ -429,8 +430,9 @@ void TriangulatorInterface::increase_triangle_order()
     }
 
   // Moving boundary mid-edge nodes can displace the TRI7 interior node
-  // and tangle the element map, so fix up and verify afterwards.
-  if (_elem_type == TRI7)
+  // and tangle the element map.  Repositioning the interior node is
+  // opt-in (off by default); the validity check always runs.
+  if (_elem_type == TRI7 && _fixup_tri7_center_nodes)
     this->fixup_tri7_center_nodes();
 
   this->verify_quadratic_elements();

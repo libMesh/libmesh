@@ -1001,6 +1001,9 @@ public:
 
     commonSettings(triangulator);
     triangulator.elem_type() = TRI7;
+    // The interior-node relocation is opt-in (off by default), so
+    // enable it here -- this is the behavior under test.
+    triangulator.set_fixup_tri7_center_nodes(true);
     triangulator.triangulate();
 
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), (dof_id_type)2);
