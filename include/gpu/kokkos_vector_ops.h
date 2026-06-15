@@ -40,23 +40,6 @@ namespace detail
 
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
-auto vector_dot_impl(const LeftVector & left, const RightVector & right)
-{
-  static_assert(is_vector_like_v<LeftVector>, "vector_dot() requires a vector-like left input");
-  static_assert(is_vector_like_v<RightVector>, "vector_dot() requires a vector-like right input");
-
-  using sum_type =
-    detail::remove_cvref_t<decltype(left(0) * right(0))>;
-
-  sum_type sum = sum_type(0);
-  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    sum += left(component) * right(component);
-
-  return sum;
-}
-
-template <typename LeftVector, typename RightVector>
-LIBMESH_DEVICE_INLINE
 void assign_vector_components(LeftVector & left, const RightVector & right)
 {
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
@@ -164,7 +147,17 @@ template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto vector_dot(const LeftVector & left, const RightVector & right)
 {
-  return detail::vector_dot_impl(left, right);
+  static_assert(is_vector_like_v<LeftVector>, "vector_dot() requires a vector-like left input");
+  static_assert(is_vector_like_v<RightVector>, "vector_dot() requires a vector-like right input");
+
+  using sum_type =
+    detail::remove_cvref_t<decltype(left(0) * right(0))>;
+
+  sum_type sum = sum_type(0);
+  for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
+    sum += left(component) * right(component);
+
+  return sum;
 }
 
 
