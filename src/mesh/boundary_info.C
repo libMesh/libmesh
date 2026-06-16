@@ -952,6 +952,11 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 
   // global containers are not synced
   boundary_mesh.unset_has_boundary_id_sets();
+
+  // New elements were added; mark the affected preparation flags invalid.
+  boundary_mesh.unset_has_neighbor_ptrs();
+  boundary_mesh.unset_has_cached_elem_data();
+  boundary_mesh.unset_has_reinit_ghosting_functors();
 }
 
 
