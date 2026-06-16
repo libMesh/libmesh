@@ -541,7 +541,7 @@ public:
     const auto & side_boundary_ids = bi.get_side_boundary_ids();
 
     mesh.get_boundary_info().add_elements(side_boundary_ids, mesh);
-    mesh.prepare_for_use();
+    mesh.complete_preparation();
 
     for (const auto & elem : mesh.active_element_ptr_range())
       if (elem->dim() < mesh.mesh_dimension())
@@ -560,7 +560,7 @@ public:
 
     const subdomain_id_type sid = 42;
     mesh.get_boundary_info().add_elements(side_boundary_ids, mesh, false, {sid});
-    mesh.prepare_for_use();
+    mesh.complete_preparation();
 
     unsigned int n_lower = 0;
     for (const auto & elem : mesh.active_element_ptr_range())
@@ -597,7 +597,7 @@ public:
       sids.push_back(id == right_id ? right_sid : top_sid);
 
     mesh.get_boundary_info().add_elements(ids, mesh, false, sids);
-    mesh.prepare_for_use();
+    mesh.complete_preparation();
 
     unsigned int n_right = 0, n_top = 0;
     for (const auto & elem : mesh.active_element_ptr_range())

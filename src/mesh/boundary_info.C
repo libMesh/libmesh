@@ -949,6 +949,9 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     parmesh->libmesh_assert_valid_parallel_ids();
 # endif
 #endif
+
+  // global containers are not synced
+  boundary_mesh.unset_has_boundary_id_sets();
 }
 
 
