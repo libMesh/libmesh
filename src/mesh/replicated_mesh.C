@@ -112,14 +112,14 @@ ReplicatedMesh::ReplicatedMesh (const MeshBase & other_mesh) :
 
   this->copy_constraint_rows(other_mesh);
 
-  this->_preparation = other_mesh.preparation();
-
   auto & this_boundary_info = this->get_boundary_info();
   const auto & other_boundary_info = other_mesh.get_boundary_info();
 
   this_boundary_info = other_boundary_info;
 
   this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
+
+  this->_preparation = other_mesh.preparation();
 
   // If other_mesh is distributed, then we've got parts of it on each
   // processor but we're not replicated yet; fix that.

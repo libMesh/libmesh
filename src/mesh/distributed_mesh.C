@@ -202,14 +202,14 @@ DistributedMesh::DistributedMesh (const MeshBase & other_mesh) :
 
   this->copy_constraint_rows(other_mesh);
 
-  this->_preparation = other_mesh.preparation();
-
   auto & this_boundary_info = this->get_boundary_info();
   const auto & other_boundary_info = other_mesh.get_boundary_info();
 
   this_boundary_info = other_boundary_info;
 
   this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
+
+  this->_preparation = other_mesh.preparation();
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id = other_mesh.parallel_max_unique_id() +
