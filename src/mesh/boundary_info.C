@@ -30,6 +30,7 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/elem_side_builder.h"
+#include "libmesh/utility.h"
 
 // TIMPI includes
 #include "timpi/parallel_sync.h"
@@ -771,6 +772,17 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   unsigned int parent_side_index_tag = store_parent_side_ids ?
     boundary_mesh.add_elem_integer("parent_side_index") : libMesh::invalid_uint;
 
+  // When new elements are assigned subdomain ids in one-to-one
+  // correspondence with the requested boundary ids, we need to map a
+  // boundary id to its index in the (sorted) set. Copying the set into a
+  // contiguous vector lets us do that index lookup in O(1) (after an
+  // O(log N) Utility::binary_find()) rather than the O(N) std::distance()
+  // between std::set iterators.
+  std::vector<boundary_id_type> requested_boundary_ids_vec;
+  if (new_subdomain_ids.size() > 1)
+    requested_boundary_ids_vec.assign(requested_boundary_ids.begin(),
+                                      requested_boundary_ids.end());
+
   for (const auto & [elem_id, s, triggering_bcid] : sides_to_add)
     {
       Elem * elem = _mesh->elem_ptr(elem_id);
@@ -804,10 +816,12 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
         new_elem->subdomain_id() = new_subdomain_ids[0];
       else if (new_subdomain_ids.size() > 1)
         {
-          auto it = requested_boundary_ids.find(triggering_bcid);
-          libmesh_assert(it != requested_boundary_ids.end());
+          auto it = Utility::binary_find(requested_boundary_ids_vec.begin(),
+                                         requested_boundary_ids_vec.end(),
+                                         triggering_bcid);
+          libmesh_assert(it != requested_boundary_ids_vec.end());
           new_elem->subdomain_id() =
-            new_subdomain_ids[std::distance(requested_boundary_ids.begin(), it)];
+            new_subdomain_ids[std::distance(requested_boundary_ids_vec.begin(), it)];
         }
 
 #ifdef LIBMESH_ENABLE_AMR

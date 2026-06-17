@@ -181,7 +181,8 @@ public:
    * The \p boundary_mesh may be the *same* as the interior mesh; this
    * generates a mesh with elements of mixed dimension.
    *
-   * Only boundary elements with the specified ids are created.
+   * Only boundary element sides with boundary ids in the
+   * \p requested_boundary_ids set are considered for addition.
    *
    * If \p new_subdomain_ids is empty, newly created elements retain the
    * default subdomain id.  If it contains a single entry, all new elements
