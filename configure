@@ -71336,6 +71336,7 @@ esac
 then :
 
                                                             SUB_CPPFLAGS="$CPPFLAGS"
+          SUB_LDFLAGS="$LDFLAGS"
           SUB_LIBS="$LIBS"
           if test $enablehdf5 = yes
 then :
