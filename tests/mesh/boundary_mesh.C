@@ -6,6 +6,8 @@
 #include <libmesh/remote_elem.h>
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/boundary_info.h>
+#include <libmesh/mesh_tools.h>
+#include <timpi/parallel_implementation.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -503,6 +505,128 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryMeshTest );
+
+
+class BoundaryMeshSubdomainTest : public CppUnit::TestCase {
+  /**
+   * Tests the new_subdomain_ids parameter of add_elements(), which assigns
+   * subdomain IDs to newly-created lower-D elements.  Three cases:
+   *   1. Empty (default) - elements retain subdomain 0.
+   *   2. Single ID       - all new elements get that ID.
+   *   3. Per-boundary    - one-to-one with requested_boundary_ids (sorted).
+   *
+   * Uses a 3x3 QUAD4 mesh.  build_square() assigns: bottom=0, right=1,
+   * top=2, left=3.
+   */
+public:
+  LIBMESH_CPPUNIT_TEST_SUITE( BoundaryMeshSubdomainTest );
+
+#if LIBMESH_DIM > 1
+  CPPUNIT_TEST( testDefaultSubdomain );
+  CPPUNIT_TEST( testSingleSubdomain );
+  CPPUNIT_TEST( testPerBoundarySubdomain );
+#endif
+
+  CPPUNIT_TEST_SUITE_END();
+
+public:
+  void testDefaultSubdomain()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square(mesh, 3, 3, 0., 1., 0., 1., QUAD4);
+
+    const BoundaryInfo & bi = mesh.get_boundary_info();
+    const auto & side_boundary_ids = bi.get_side_boundary_ids();
+
+    mesh.get_boundary_info().add_elements(side_boundary_ids, mesh);
+    mesh.complete_preparation();
+
+    for (const auto & elem : mesh.active_element_ptr_range())
+      if (elem->dim() < mesh.mesh_dimension())
+        CPPUNIT_ASSERT_EQUAL(static_cast<subdomain_id_type>(0), elem->subdomain_id());
+  }
+
+  void testSingleSubdomain()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square(mesh, 3, 3, 0., 1., 0., 1., QUAD4);
+
+    const BoundaryInfo & bi = mesh.get_boundary_info();
+    const auto & side_boundary_ids = bi.get_side_boundary_ids();
+
+    const subdomain_id_type sid = 42;
+    mesh.get_boundary_info().add_elements(side_boundary_ids, mesh, false, {sid});
+    mesh.complete_preparation();
+
+    unsigned int n_lower = 0;
+    for (const auto & elem : mesh.active_element_ptr_range())
+      if (elem->dim() < mesh.mesh_dimension())
+        {
+          CPPUNIT_ASSERT_EQUAL(sid, elem->subdomain_id());
+          if (elem->processor_id() == mesh.processor_id())
+            ++n_lower;
+        }
+
+    // 3x3 quad mesh has 12 edges across its sides
+    mesh.comm().sum(n_lower);
+    CPPUNIT_ASSERT_EQUAL(12u, n_lower);
+  }
+
+  void testPerBoundarySubdomain()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square(mesh, 3, 3, 0., 1., 0., 1., QUAD4);
+
+    const BoundaryInfo & bi = mesh.get_boundary_info();
+    const boundary_id_type right_id = bi.get_id_by_name("right");
+    const boundary_id_type top_id   = bi.get_id_by_name("top");
+
+    // The set is iterated in sorted boundary_id order, so the subdomain_ids
+    // vector must be ordered accordingly.
+    const subdomain_id_type right_sid = 10;
+    const subdomain_id_type top_sid   = 20;
+    std::set<boundary_id_type> ids = {right_id, top_id};
+    std::vector<subdomain_id_type> sids;
+    for (const auto id : ids)
+      sids.push_back(id == right_id ? right_sid : top_sid);
+
+    mesh.get_boundary_info().add_elements(ids, mesh, false, sids);
+    mesh.complete_preparation();
+
+    unsigned int n_right = 0, n_top = 0;
+    for (const auto & elem : mesh.active_element_ptr_range())
+      if (elem->dim() < mesh.mesh_dimension())
+        {
+          const Real cx = elem->vertex_average()(0);
+          if (cx > 0.9)
+            {
+              CPPUNIT_ASSERT_EQUAL(right_sid, elem->subdomain_id());
+              if (elem->processor_id() == mesh.processor_id())
+                ++n_right;
+            }
+          else
+            {
+              CPPUNIT_ASSERT_EQUAL(top_sid, elem->subdomain_id());
+              if (elem->processor_id() == mesh.processor_id())
+                ++n_top;
+            }
+        }
+
+    mesh.comm().sum(n_right);
+    mesh.comm().sum(n_top);
+    CPPUNIT_ASSERT_EQUAL(3u, n_right);
+    CPPUNIT_ASSERT_EQUAL(3u, n_top);
+  }
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( BoundaryMeshSubdomainTest );
+
 
 #ifdef LIBMESH_ENABLE_AMR
 

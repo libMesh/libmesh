@@ -30,6 +30,7 @@
 #include "libmesh/remote_elem.h"
 #include "libmesh/unstructured_mesh.h"
 #include "libmesh/elem_side_builder.h"
+#include "libmesh/utility.h"
 
 // TIMPI includes
 #include "timpi/parallel_sync.h"
@@ -654,7 +655,8 @@ void BoundaryInfo::get_side_and_node_maps (UnstructuredMesh & boundary_mesh,
 
 void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
                                 UnstructuredMesh & boundary_mesh,
-                                bool store_parent_side_ids)
+                                bool store_parent_side_ids,
+                                const std::vector<subdomain_id_type> & new_subdomain_ids)
 {
   // Call the 3 argument version of this function with a dummy value for the third arg.
   std::set<subdomain_id_type> subdomains_relative_to;
@@ -663,7 +665,8 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   this->add_elements(requested_boundary_ids,
                      boundary_mesh,
                      subdomains_relative_to,
-                     store_parent_side_ids);
+                     store_parent_side_ids,
+                     new_subdomain_ids);
 }
 
 
@@ -671,8 +674,12 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
 void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_boundary_ids,
                                 UnstructuredMesh & boundary_mesh,
                                 const std::set<subdomain_id_type> & subdomains_relative_to,
-                                bool store_parent_side_ids)
+                                bool store_parent_side_ids,
+                                const std::vector<subdomain_id_type> & new_subdomain_ids)
 {
+  libmesh_assert(new_subdomain_ids.empty() ||
+                 new_subdomain_ids.size() == 1 ||
+                 new_subdomain_ids.size() == requested_boundary_ids.size());
   LOG_SCOPE("add_elements()", "BoundaryInfo");
 
   // We're not prepared to mix serial and distributed meshes in this
@@ -704,7 +711,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   // boundary_mesh and _mesh are the same then those additions can
   // invalidate our element iterators.  So we just use the element
   // loop to make a list of sides to add.
-  typedef std::vector<std::pair<dof_id_type, unsigned char>>
+  typedef std::vector<std::tuple<dof_id_type, unsigned char, boundary_id_type>>
     side_container;
   side_container sides_to_add;
 
@@ -723,6 +730,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
       for (auto s : elem->side_index_range())
         {
           bool add_this_side = false;
+          boundary_id_type triggering_bcid = invalid_id;
 
           // Find all the boundary side ids for this Elem side.
           std::vector<boundary_id_type> bcids;
@@ -734,6 +742,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
               if (requested_boundary_ids.count(bcid))
                 {
                   add_this_side = true;
+                  triggering_bcid = bcid;
                   break;
                 }
             }
@@ -749,7 +758,7 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
             add_this_side = true;
 
           if (add_this_side)
-            sides_to_add.emplace_back(elem->id(), s);
+            sides_to_add.emplace_back(elem->id(), s, triggering_bcid);
         }
     }
 
@@ -763,7 +772,18 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
   unsigned int parent_side_index_tag = store_parent_side_ids ?
     boundary_mesh.add_elem_integer("parent_side_index") : libMesh::invalid_uint;
 
-  for (const auto & [elem_id, s] : sides_to_add)
+  // When new elements are assigned subdomain ids in one-to-one
+  // correspondence with the requested boundary ids, we need to map a
+  // boundary id to its index in the (sorted) set. Copying the set into a
+  // contiguous vector lets us do that index lookup in O(1) (after an
+  // O(log N) Utility::binary_find()) rather than the O(N) std::distance()
+  // between std::set iterators.
+  std::vector<boundary_id_type> requested_boundary_ids_vec;
+  if (new_subdomain_ids.size() > 1)
+    requested_boundary_ids_vec.assign(requested_boundary_ids.begin(),
+                                      requested_boundary_ids.end());
+
+  for (const auto & [elem_id, s, triggering_bcid] : sides_to_add)
     {
       Elem * elem = _mesh->elem_ptr(elem_id);
 
@@ -790,6 +810,19 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
       // side id "s" of the interior_parent it corresponds to.
       if (store_parent_side_ids)
         new_elem->set_extra_integer(parent_side_index_tag, s);
+
+      // Assign subdomain id if requested.
+      if (new_subdomain_ids.size() == 1)
+        new_elem->subdomain_id() = new_subdomain_ids[0];
+      else if (new_subdomain_ids.size() > 1)
+        {
+          auto it = Utility::binary_find(requested_boundary_ids_vec.begin(),
+                                         requested_boundary_ids_vec.end(),
+                                         triggering_bcid);
+          libmesh_assert(it != requested_boundary_ids_vec.end());
+          new_elem->subdomain_id() =
+            new_subdomain_ids[std::distance(requested_boundary_ids_vec.begin(), it)];
+        }
 
 #ifdef LIBMESH_ENABLE_AMR
       new_elem->set_refinement_flag(elem->refinement_flag());
@@ -930,6 +963,14 @@ void BoundaryInfo::add_elements(const std::set<boundary_id_type> & requested_bou
     parmesh->libmesh_assert_valid_parallel_ids();
 # endif
 #endif
+
+  // global containers are not synced
+  boundary_mesh.unset_has_boundary_id_sets();
+
+  // New elements were added; mark the affected preparation flags invalid.
+  boundary_mesh.unset_has_neighbor_ptrs();
+  boundary_mesh.unset_has_cached_elem_data();
+  boundary_mesh.unset_has_reinit_ghosting_functors();
 }
 
 
