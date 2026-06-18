@@ -863,6 +863,13 @@ AM_CONDITIONAL(LIBMESH_ENABLE_METAPHYSICL, test x$enablemetaphysicl = xyes)
 
 
 
+# -------------------------------------------------------------
+# Kokkos -- enables the native Kokkos FE math path
+# -------------------------------------------------------------
+CONFIGURE_KOKKOS
+# -------------------------------------------------------------
+
+
 
 AS_IF([test "$enableoptional" != no],
       [

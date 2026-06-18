@@ -174,6 +174,10 @@ AS_IF([test "x$enablemarch" != "xno"],
 # flag, for the current compiler, for the user's requested C++
 # standards level.  Adds the required flag to CXXFLAGS if
 # one is found.  Exits if no acceptable flag is found.
+#
+# Don't turn on GNU extensions.  We don't use them, and with device
+# computing we might be using a mix of compilers that don't all
+# support them.
 # --------------------------------------------------------------
 ACSM_CXX_COMPILER_STANDARD([2017], [2017], [defaultnoext])
 
