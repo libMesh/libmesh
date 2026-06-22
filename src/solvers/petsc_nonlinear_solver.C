@@ -432,7 +432,7 @@ extern "C"
 
     NonlinearImplicitSystem & sys = solver->system();
 
-    PetscMatrixBase<Number> * const PC = pc ? PetscMatrixBase<Number>::get_context(pc, sys.comm()) : nullptr;
+    PetscMatrixBase<Number> * const Pc = pc ? PetscMatrixBase<Number>::get_context(pc, sys.comm()) : nullptr;
     PetscMatrixBase<Number> * Jac = jac ? PetscMatrixBase<Number>::get_context(jac, sys.comm()) : nullptr;
     PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
     PetscVector<Number> X_global(x, sys.comm());
@@ -462,13 +462,13 @@ extern "C"
         Jac->close();
 
       if (pc && (p_is_shell == PETSC_TRUE))
-        PC->close();
+        Pc->close();
 
       PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
     }
 
     // Set the dof maps
-    PC->attach_dof_map(sys.get_dof_map());
+    Pc->attach_dof_map(sys.get_dof_map());
     Jac->attach_dof_map(sys.get_dof_map());
 
     // Use the systems update() to get a good local version of the parallel solution
@@ -484,35 +484,41 @@ extern "C"
       sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
 
     if (solver->_zero_out_jacobian)
-      PC->zero();
+      Pc->zero();
 
 
     if (solver->jacobian != nullptr)
-      solver->jacobian(*sys.current_local_solution.get(), *PC, sys);
+      solver->jacobian(*sys.current_local_solution.get(), *Pc, sys);
 
     else if (solver->jacobian_object != nullptr)
-      solver->jacobian_object->jacobian(*sys.current_local_solution.get(), *PC, sys);
+      solver->jacobian_object->jacobian(*sys.current_local_solution.get(), *Pc, sys);
 
     else if (solver->matvec != nullptr)
-      solver->matvec(*sys.current_local_solution.get(), nullptr, PC, sys);
+      solver->matvec(*sys.current_local_solution.get(), nullptr, Pc, sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
 
-    PC->close();
+    Pc->close();
     if (solver->_exact_constraint_enforcement)
       {
-        sys.get_dof_map().enforce_constraints_on_jacobian(sys, PC);
-        PC->close();
+        sys.get_dof_map().enforce_constraints_on_jacobian(sys, Pc);
+        Pc->close();
       }
 
-    if (Jac != PC)
+    if (Jac != Pc)
       {
         // Assume that shells know what they're doing
         libmesh_assert(!solver->_exact_constraint_enforcement || (j_is_mffd == PETSC_TRUE) ||
                        (j_is_shell == PETSC_TRUE));
         Jac->close();
       }
+
+    KSP kspc;
+    PC pcc;
+    LibmeshPetscCall2(sys.comm(), SNESGetKSP(snes, &kspc));
+    LibmeshPetscCall2(sys.comm(), KSPGetPC(kspc, &pcc));
+    PetscPreconditioner<Number>::set_petsc_aux_data(pcc, sys);
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
@@ -984,10 +990,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   LibmeshPetscCall(KSPSetFromOptions(ksp));
 #endif
   LibmeshPetscCall(SNESSetFromOptions(_snes));
-
-  PC pc;
-  LibmeshPetscCall(KSPGetPC(ksp, &pc));
-  PetscPreconditioner<T>::set_petsc_aux_data(pc, this->system());
 
 #if defined(LIBMESH_HAVE_PETSC_HYPRE) && PETSC_VERSION_LESS_THAN(3, 23, 0) &&                      \
     !PETSC_VERSION_LESS_THAN(3, 12, 0) && defined(PETSC_HAVE_HYPRE_DEVICE)
