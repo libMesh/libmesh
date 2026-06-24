@@ -91,6 +91,7 @@ AS_HELP_STRING([--enable-netcdf=v492],
           dnl passing along PETSc's directories in case we want to link to a
           dnl --download-hdf5 build there.
           SUB_CPPFLAGS="$CPPFLAGS"
+          SUB_LDFLAGS="$LDFLAGS"
           SUB_LIBS="$LIBS"
           AS_IF([test $enablehdf5 = yes],
                 [
