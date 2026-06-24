@@ -790,11 +790,6 @@ bool Poly2TriTriangulator::insert_refinement_points()
   UnstructuredMesh & mesh = dynamic_cast<UnstructuredMesh &>(this->_mesh);
   mesh.find_neighbors();
 
-  if (this->desired_area() == 0 &&
-      this->get_desired_area_function() == nullptr &&
-      !this->has_auto_area_function())
-    return false;
-
   BoundaryInfo & boundary_info = _mesh.get_boundary_info();
 
   // We won't immediately add these, lest we invalidate iterators on a
@@ -840,6 +835,11 @@ bool Poly2TriTriangulator::insert_refinement_points()
 
     libmesh_assert_delaunay(mesh, new_elems);
   }
+
+  if (this->desired_area() == 0 &&
+      this->get_desired_area_function() == nullptr &&
+      !this->has_auto_area_function())
+    return false;
 
   // Map of which points follow which in the boundary polylines.  If
   // we have to add new boundary points, we'll use this to construct
