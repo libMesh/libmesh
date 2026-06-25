@@ -938,6 +938,13 @@ void MeshBase::complete_preparation()
   if (!_preparation.has_cached_elem_data)
     this->cache_elem_data();
 
+  // libMesh expects every processor to know about every subdomain
+  // name, but distributed mesh generators may only have set names for
+  // the part of the mesh they know about, so make sure the map is
+  // consistent everywhere.
+  if (!_preparation.has_synched_subdomain_name_map)
+    this->sync_subdomain_name_map();
+
   // Search the mesh for elements that have a neighboring element
   // of dim+1 and set that element as the interior parent
   if (!_preparation.has_interior_parent_ptrs)
@@ -1879,6 +1886,7 @@ bool MeshBase::get_count_lower_dim_elems_in_point_locator() const
 
 std::string & MeshBase::subdomain_name(subdomain_id_type id)
 {
+  this->unset_has_synched_subdomain_name_map();
   return _block_id_to_name[id];
 }
 
@@ -2043,6 +2051,8 @@ void MeshBase::sync_subdomain_name_map()
   parallel_object_only();
 
   this->comm().set_union(_block_id_to_name);
+
+  _preparation.has_synched_subdomain_name_map = true;
 }
 
 
@@ -2809,7 +2819,8 @@ MeshBase::Preparation::Preparation() :
   has_removed_remote_elements(false),
   has_removed_orphaned_nodes(false),
   has_boundary_id_sets(false),
-  has_reinit_ghosting_functors(false)
+  has_reinit_ghosting_functors(false),
+  has_synched_subdomain_name_map(false)
 {}
 
 MeshBase::Preparation::operator bool() const
@@ -2822,7 +2833,8 @@ MeshBase::Preparation::operator bool() const
          has_removed_remote_elements &&
          has_removed_orphaned_nodes &&
          has_reinit_ghosting_functors &&
-         has_boundary_id_sets;
+         has_boundary_id_sets &&
+         has_synched_subdomain_name_map;
 }
 
 MeshBase::Preparation &
@@ -2837,6 +2849,7 @@ MeshBase::Preparation::operator= (bool set_all)
   has_removed_orphaned_nodes = set_all;
   has_reinit_ghosting_functors = set_all;
   has_boundary_id_sets = set_all;
+  has_synched_subdomain_name_map = set_all;
 
   return *this;
 }
@@ -2861,6 +2874,8 @@ MeshBase::Preparation::operator== (const Preparation & other) const
   if (has_reinit_ghosting_functors != other.has_reinit_ghosting_functors)
     return false;
   if (has_boundary_id_sets != other.has_boundary_id_sets)
+    return false;
+  if (has_synched_subdomain_name_map != other.has_synched_subdomain_name_map)
     return false;
 
   return true;

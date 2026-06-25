@@ -341,6 +341,16 @@ public:
   { _preparation.has_boundary_id_sets = false; }
 
   /**
+   * Tells this we have done some operation which may have left the
+   * subdomain id to name map inconsistent across processors.
+   *
+   * User code which adds or changes subdomain names should call this
+   * method.
+   */
+  void unset_has_synched_subdomain_name_map()
+  { _preparation.has_synched_subdomain_name_map = false; }
+
+  /**
    * \returns \p true if all elements and nodes of the mesh
    * exist on the current processor, \p false otherwise
    */
@@ -1892,7 +1902,7 @@ public:
    * \returns A writable reference to the whole subdomain name map
    */
   std::map<subdomain_id_type, std::string> & set_subdomain_name_map ()
-  { return _block_id_to_name; }
+  { this->unset_has_synched_subdomain_name_map(); return _block_id_to_name; }
   const std::map<subdomain_id_type, std::string> & get_subdomain_name_map () const
   { return _block_id_to_name; }
 
@@ -1988,7 +1998,9 @@ public:
    * subdomain ids, but distributed mesh generators may only know
    * about part of a mesh when creating names.  This method can
    * synchronize the subdomain id to name map across processors,
-   * assuming no conflicts exist.
+   * assuming no conflicts exist.  It is called automatically during
+   * complete_preparation() unless the map is already known to be
+   * synchronized.
    */
   void sync_subdomain_name_map();
 
@@ -2077,6 +2089,7 @@ public:
     bool has_removed_orphaned_nodes;
     bool has_boundary_id_sets;
     bool has_reinit_ghosting_functors;
+    bool has_synched_subdomain_name_map;
   };
 
 protected:
