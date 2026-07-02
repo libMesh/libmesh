@@ -91,12 +91,13 @@ void report_error(const char * file, int line, const char * date, const char * t
     }
   reporting_error = true;
 
+  libMesh::MacroFunctions::here(file, line, date, time, os);
+
   if (libMesh::global_n_processors() == 1 ||
       libMesh::on_command_line("--print-trace"))
     libMesh::print_trace(os);
   else
     libMesh::write_traceout();
-  libMesh::MacroFunctions::here(file, line, date, time, os);
 
   reporting_error = false;
 }
