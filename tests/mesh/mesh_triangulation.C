@@ -1037,6 +1037,8 @@ public:
         if (!x6.relative_fuzzy_equals(straight, TOLERANCE))
           saw_curved_element = true;
       }
+
+    mesh.comm().max(saw_curved_element);
     CPPUNIT_ASSERT(saw_curved_element);
   }
 
