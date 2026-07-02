@@ -57,7 +57,8 @@ public:
     // Pack individual integers into vector
     std::vector<int> buffer =
       {num_dim, num_elem, num_elem_blk, num_node_sets,
-       num_side_sets, num_elem_sets, num_edge_blk, num_edge};
+       num_side_sets, num_elem_sets, num_edge_blk, num_edge,
+       num_face_blk, num_face};
 
     // broadcast integers
     comm.broadcast(buffer);
@@ -72,6 +73,8 @@ public:
     num_elem_sets = buffer[ctr++];
     num_edge_blk  = buffer[ctr++];
     num_edge      = buffer[ctr++];
+    num_face_blk  = buffer[ctr++];
+    num_face      = buffer[ctr++];
   }
 
   std::vector<char> title;
@@ -84,6 +87,8 @@ public:
   int num_elem_sets;
   int num_edge_blk;
   int num_edge;
+  int num_face_blk;
+  int num_face;
 };
 
 } // namespace libMesh

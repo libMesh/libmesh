@@ -703,6 +703,13 @@ public:
   // each block must equal num_edge.
   int & num_edge_blk;
 
+  // Total number of faces
+  int & num_face;
+
+  // Total number of face blocks. The sum of the number of faces in
+  // each block must equal num_face.
+  int & num_face_blk;
+
   // Total number of node sets
   int & num_node_sets;
 

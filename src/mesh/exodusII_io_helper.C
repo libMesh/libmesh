@@ -53,6 +53,7 @@ extern "C" {
 #include <cfenv> // workaround for HDF5 bug
 #include <cstdlib> // std::strtol
 #include <sstream>
+#include <string>
 #include <unordered_map>
 
 // Anonymous namespace for file local data and helper functions
@@ -65,6 +66,8 @@ namespace
 static constexpr int libmesh_max_str_length = MAX_LINE_LENGTH;
 
 using namespace libMesh;
+
+constexpr int c0polyhedron_face_block_id = 1;
 
 // File scope constant node/edge/face mapping arrays.
 // 2D inverse face map definitions.
@@ -274,6 +277,8 @@ ExodusII_IO_Helper::ExodusII_IO_Helper(const ParallelObject & parent,
   num_elem_blk(header_info.num_elem_blk),
   num_edge(header_info.num_edge),
   num_edge_blk(header_info.num_edge_blk),
+  num_face(header_info.num_face),
+  num_face_blk(header_info.num_face_blk),
   num_node_sets(header_info.num_node_sets),
   num_side_sets(header_info.num_side_sets),
   num_elem_sets(header_info.num_elem_sets),
@@ -361,6 +366,14 @@ void ExodusII_IO_Helper::init_conversion_map()
   convert_type(QUAD4, "QUAD4");
   convert_type(QUAD8, "QUAD8");
   convert_type(QUAD9, "QUAD9");
+  convert_type(C0POLYGON, "NSIDED");
+  {
+    auto & conv = conversion_map[3][C0POLYHEDRON];
+    conv.libmesh_type = C0POLYHEDRON;
+    conv.exodus_type = "NFACED";
+    conv.dim = 3;
+    conv.n_nodes = 0;
+  }
   convert_type(QUADSHELL4, "SHELL4", nullptr, nullptr, nullptr,
                /* inverse_side_map = */ &quadshell4_inverse_edge_map,
                nullptr, nullptr, /* shellface_index_offset = */ 2);
@@ -476,6 +489,10 @@ void ExodusII_IO_Helper::init_element_equivalence_map()
 
   // QUADSHELL9 equivalences
   element_equivalence_map["SHELL9"] = QUADSHELL9;
+
+  // Runtime-topology polytope equivalences
+  element_equivalence_map["NSIDED"] = C0POLYGON;
+  element_equivalence_map["NFACED"] = C0POLYHEDRON;
 
   // TRI3 equivalences
   element_equivalence_map["TRI"]       = TRI3;
@@ -756,6 +773,8 @@ ExodusII_IO_Helper::read_header() const
   h.num_elem_sets = params.num_elem_sets;
   h.num_edge_blk = params.num_edge_blk;
   h.num_edge = params.num_edge;
+  h.num_face_blk = params.num_face_blk;
+  h.num_face = params.num_face;
 
   // And return it
   return h;
@@ -2361,6 +2380,25 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
   num_elem = n_active_elem;
   num_nodes = 0;
+  num_face = 0;
+  num_face_blk = 0;
+
+  dof_id_type local_num_c0polyhedron_faces = 0;
+  int has_c0polyhedron = 0;
+  for (const auto & elem : mesh.active_local_element_ptr_range())
+    if (elem->type() == C0POLYHEDRON)
+      {
+        has_c0polyhedron = 1;
+        local_num_c0polyhedron_faces += elem->n_sides();
+      }
+
+  mesh.comm().sum(local_num_c0polyhedron_faces);
+  mesh.comm().max(has_c0polyhedron);
+  if (has_c0polyhedron)
+    {
+      num_face = cast_int<int>(local_num_c0polyhedron_faces);
+      num_face_blk = 1;
+    }
 
   // If we're adding face elements they'll need copies of their nodes.
   // We also have to count of how many nodes (and gaps between nodes!)
@@ -2534,6 +2572,8 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   params.num_elem_sets = num_elem_sets;
   params.num_edge_blk = num_edge_blk;
   params.num_edge = num_edge;
+  params.num_face_blk = num_face_blk;
+  params.num_face = num_face;
 
   ex_err = exII::ex_put_init_ext(ex_id, &params);
   EX_CHECK_ERR(ex_err, "Error initializing new Exodus file.");
@@ -2729,6 +2769,10 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   NamesData names_table(num_elem_blk, _max_name_length);
 
   num_elem = 0;
+  bool has_c0polygon_blocks = false;
+  bool has_c0polyhedron_blocks = false;
+  int c0polyhedron_total_faces = 0;
+  int c0polyhedron_total_face_nodes = 0;
 
   // counter indexes into the block_ids vector
   unsigned int counter = 0;
@@ -2754,8 +2798,13 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           libmesh_assert(!element_id_vec.empty());
           num_elem_this_blk_vec.push_back
             (cast_int<int>(element_id_vec.size()));
-          names_table.push_back_entry
-            (mesh.subdomain_name(subdomain_id));
+
+          std::string block_name = mesh.subdomain_name(subdomain_id);
+          if (block_name.empty() && elem_t == C0POLYGON)
+            block_name = "NSIDED_" + std::to_string(counter + 1);
+          if (block_name.empty() && elem_t == C0POLYHEDRON)
+            block_name = "NFACED_" + std::to_string(counter + 1);
+          names_table.push_back_entry(block_name);
         }
 
       num_elem += num_elem_this_blk_vec.back();
@@ -2764,17 +2813,77 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // Note that Exodus assumes all elements in a block are of the same type!
       // We are using that same assumption here!
       const auto & conv = get_conversion(elem_t);
-      num_nodes_per_elem = Elem::type_to_n_nodes_map[elem_t];
-      if (Elem::type_to_n_nodes_map[elem_t] == invalid_uint)
-        libmesh_not_implemented_msg("Support for Polygons/Polyhedra not yet implemented");
+      int num_edges_per_elem = 0;
+      int num_faces_per_elem = 0;
+      if (elem_t == C0POLYGON)
+        {
+          if (subdomain_id >= subdomain_id_end)
+            libmesh_not_implemented_msg("Support for C0POLYGON side blocks not yet implemented");
+
+          has_c0polygon_blocks = true;
+          num_nodes_per_elem = 0;
+
+          for (auto elem_id : element_id_vec)
+            {
+              const Elem & elem = mesh.elem_ref(elem_id);
+
+              libmesh_error_msg_if(elem.type() != C0POLYGON,
+                                   "Error: Exodus requires all elements with a given subdomain ID "
+                                   "to be the same type.\n"
+                                   << "Can't write both "
+                                   << Utility::enum_to_string(elem.type())
+                                   << " and C0POLYGON in the same block!");
+
+              num_nodes_per_elem += cast_int<int>(elem.n_nodes());
+            }
+        }
+      else if (elem_t == C0POLYHEDRON)
+        {
+          if (subdomain_id >= subdomain_id_end)
+            libmesh_not_implemented_msg("Support for C0POLYHEDRON side blocks not yet implemented");
+
+          has_c0polyhedron_blocks = true;
+          num_nodes_per_elem = 0;
+
+          for (auto elem_id : element_id_vec)
+            {
+              const Elem & elem = mesh.elem_ref(elem_id);
+
+              libmesh_error_msg_if(elem.type() != C0POLYHEDRON,
+                                   "Error: Exodus requires all elements with a given subdomain ID "
+                                   "to be the same type.\n"
+                                   << "Can't write both "
+                                   << Utility::enum_to_string(elem.type())
+                                   << " and C0POLYHEDRON in the same block!");
+
+              const int elem_n_sides = cast_int<int>(elem.n_sides());
+              num_faces_per_elem += elem_n_sides;
+              c0polyhedron_total_faces += elem_n_sides;
+
+              for (auto s : elem.side_index_range())
+                c0polyhedron_total_face_nodes += cast_int<int>(elem.nodes_on_side(s).size());
+            }
+        }
+      else
+        {
+          num_nodes_per_elem = Elem::type_to_n_nodes_map[elem_t];
+          if (Elem::type_to_n_nodes_map[elem_t] == invalid_uint)
+            libmesh_not_implemented_msg("Support for Polygons/Polyhedra not yet implemented");
+        }
 
       elem_blk_id.push_back(subdomain_id);
       elem_type_table.push_back_entry(conv.exodus_elem_type().c_str());
       num_nodes_per_elem_vec.push_back(num_nodes_per_elem);
       num_attr_vec.push_back(0); // we don't currently use elem block attributes.
-      num_edges_per_elem_vec.push_back(0); // We don't currently store any edge blocks
-      num_faces_per_elem_vec.push_back(0); // We don't currently store any face blocks
+      num_edges_per_elem_vec.push_back(num_edges_per_elem); // We don't currently store any edge blocks
+      num_faces_per_elem_vec.push_back(num_faces_per_elem);
       ++counter;
+    }
+
+  if (has_c0polyhedron_blocks)
+    {
+      libmesh_assert_equal_to(num_face_blk, 1);
+      libmesh_assert_equal_to(num_face, c0polyhedron_total_faces);
     }
 
   // Here we reserve() space so that we can push_back() onto the
@@ -2915,6 +3024,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // We also build a data structure of edge block names which can
   // later be passed to exII::ex_put_names().
   NamesData edge_block_names_table(num_edge_blk, _max_name_length);
+  NamesData face_block_names_table(num_face_blk, _max_name_length);
+  if (has_c0polyhedron_blocks)
+    face_block_names_table.push_back_entry("NSIDED_FACES");
 
   // Note: We are going to use the edge **boundary** ids as **block** ids.
   for (const auto & pr : edge_id_to_conn)
@@ -2940,41 +3052,91 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       edge_block_names_table.push_back_entry(bi.get_edgeset_name(id));
     }
 
-  // Zero-initialize and then fill in an exII::ex_block_params struct
-  // with the data we have collected. This new API replaces the old
-  // exII::ex_put_concat_elem_block() API, and will eventually allow
-  // us to also allocate space for edge/face blocks if desired.
-  //
-  // TODO: It seems like we should be able to take advantage of the
-  // optimization where you set define_maps==1, but when I tried this
-  // I got the error: "failed to find node map size". I think the
-  // problem is that we need to first specify a nonzero number of
-  // node/elem maps during the call to ex_put_init_ext() in order for
-  // this to work correctly.
-  exII::ex_block_params params = {};
-
-  // Set pointers for information about elem blocks.
-  params.elem_blk_id = elem_blk_id.data();
-  params.elem_type = elem_type_table.get_char_star_star();
-  params.num_elem_this_blk = num_elem_this_blk_vec.data();
-  params.num_nodes_per_elem = num_nodes_per_elem_vec.data();
-  params.num_edges_per_elem = num_edges_per_elem_vec.data();
-  params.num_faces_per_elem = num_faces_per_elem_vec.data();
-  params.num_attr_elem = num_attr_vec.data();
-  params.define_maps = 0;
-
-  // Set pointers to edge block information only if we actually have some.
-  if (num_edge_blk)
+  if (has_c0polygon_blocks || has_c0polyhedron_blocks)
     {
-      params.edge_blk_id = edge_blk_id.data();
-      params.edge_type = edge_type_table.get_char_star_star();
-      params.num_edge_this_blk = num_edge_this_blk_vec.data();
-      params.num_nodes_per_edge = num_nodes_per_edge_vec.data();
-      params.num_attr_edge = num_attr_edge_vec.data();
-    }
+      // ex_put_concat_all_blocks() does not define the per-polytope
+      // entity count arrays required by NSIDED/NFACED blocks in all supported
+      // Exodus versions. Define blocks individually through ex_put_block().
+      if (has_c0polyhedron_blocks)
+        {
+          ex_err = exII::ex_put_block(ex_id,
+                                      exII::EX_FACE_BLOCK,
+                                      c0polyhedron_face_block_id,
+                                      "NSIDED",
+                                      c0polyhedron_total_faces,
+                                      c0polyhedron_total_face_nodes,
+                                      0,
+                                      0,
+                                      0);
+          EX_CHECK_ERR(ex_err, "Error writing polyhedron face block.");
+        }
 
-  ex_err = exII::ex_put_concat_all_blocks(ex_id, &params);
-  EX_CHECK_ERR(ex_err, "Error writing element blocks.");
+      for (auto i : index_range(elem_blk_id))
+        {
+          ex_err = exII::ex_put_block(ex_id,
+                                      exII::EX_ELEM_BLOCK,
+                                      elem_blk_id[i],
+                                      elem_type_table.get_char_star(cast_int<int>(i)),
+                                      num_elem_this_blk_vec[i],
+                                      num_nodes_per_elem_vec[i],
+                                      num_edges_per_elem_vec[i],
+                                      num_faces_per_elem_vec[i],
+                                      num_attr_vec[i]);
+          EX_CHECK_ERR(ex_err, "Error writing element block.");
+        }
+
+      for (auto i : index_range(edge_blk_id))
+        {
+          ex_err = exII::ex_put_block(ex_id,
+                                      exII::EX_EDGE_BLOCK,
+                                      edge_blk_id[i],
+                                      edge_type_table.get_char_star(cast_int<int>(i)),
+                                      num_edge_this_blk_vec[i],
+                                      num_nodes_per_edge_vec[i],
+                                      0,
+                                      0,
+                                      num_attr_edge_vec[i]);
+          EX_CHECK_ERR(ex_err, "Error writing edge block.");
+        }
+    }
+  else
+    {
+      // Zero-initialize and then fill in an exII::ex_block_params struct
+      // with the data we have collected. This new API replaces the old
+      // exII::ex_put_concat_elem_block() API, and will eventually allow
+      // us to also allocate space for edge/face blocks if desired.
+      //
+      // TODO: It seems like we should be able to take advantage of the
+      // optimization where you set define_maps==1, but when I tried this
+      // I got the error: "failed to find node map size". I think the
+      // problem is that we need to first specify a nonzero number of
+      // node/elem maps during the call to ex_put_init_ext() in order for
+      // this to work correctly.
+      exII::ex_block_params params = {};
+
+      // Set pointers for information about elem blocks.
+      params.elem_blk_id = elem_blk_id.data();
+      params.elem_type = elem_type_table.get_char_star_star();
+      params.num_elem_this_blk = num_elem_this_blk_vec.data();
+      params.num_nodes_per_elem = num_nodes_per_elem_vec.data();
+      params.num_edges_per_elem = num_edges_per_elem_vec.data();
+      params.num_faces_per_elem = num_faces_per_elem_vec.data();
+      params.num_attr_elem = num_attr_vec.data();
+      params.define_maps = 0;
+
+      // Set pointers to edge block information only if we actually have some.
+      if (num_edge_blk)
+        {
+          params.edge_blk_id = edge_blk_id.data();
+          params.edge_type = edge_type_table.get_char_star_star();
+          params.num_edge_this_blk = num_edge_this_blk_vec.data();
+          params.num_nodes_per_edge = num_nodes_per_edge_vec.data();
+          params.num_attr_edge = num_attr_edge_vec.data();
+        }
+
+      ex_err = exII::ex_put_concat_all_blocks(ex_id, &params);
+      EX_CHECK_ERR(ex_err, "Error writing element blocks.");
+    }
 
   // This counter is used to fill up the libmesh_elem_num_to_exodus map in the loop below.
   unsigned libmesh_elem_num_to_exodus_counter = 0;
@@ -2993,6 +3155,12 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
     next_fake_id = mesh.next_unique_id();
 #endif
 
+  std::vector<int> c0polyhedron_face_connect;
+  std::vector<int> c0polyhedron_face_node_counts;
+  c0polyhedron_face_connect.reserve(c0polyhedron_total_face_nodes);
+  c0polyhedron_face_node_counts.reserve(c0polyhedron_total_faces);
+  int next_c0polyhedron_face_id = 1;
+
   for (auto & [subdomain_id, element_id_vec] : subdomain_map)
     {
       // Use the first element in the block to get representative
@@ -3004,15 +3172,39 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
         mesh.elem_ref(element_id_vec[0]).type();
 
       const auto & conv = get_conversion(elem_t);
-      num_nodes_per_elem = Elem::type_to_n_nodes_map[elem_t];
-      if (Elem::type_to_n_nodes_map[elem_t] == invalid_uint)
-        libmesh_not_implemented_msg("Support for Polygons/Polyhedra not yet implemented");
+      const bool is_c0polygon_block = (elem_t == C0POLYGON);
+      const bool is_c0polyhedron_block = (elem_t == C0POLYHEDRON);
+      std::vector<int> c0polygon_node_counts;
+      std::vector<int> c0polyhedron_face_counts;
+
+      if (is_c0polygon_block && subdomain_id >= subdomain_id_end)
+        libmesh_not_implemented_msg("Support for C0POLYGON side blocks not yet implemented");
+      if (is_c0polyhedron_block && subdomain_id >= subdomain_id_end)
+        libmesh_not_implemented_msg("Support for C0POLYHEDRON side blocks not yet implemented");
+
+      if (!is_c0polygon_block && !is_c0polyhedron_block)
+        {
+          num_nodes_per_elem = Elem::type_to_n_nodes_map[elem_t];
+          if (Elem::type_to_n_nodes_map[elem_t] == invalid_uint)
+            libmesh_not_implemented_msg("Support for Polygons/Polyhedra not yet implemented");
+        }
 
       // If this is a *real* block, we just loop over vectors of
       // element ids to add.
       if (subdomain_id < subdomain_id_end)
       {
-        connect.resize(element_id_vec.size()*num_nodes_per_elem);
+        if (is_c0polygon_block)
+          {
+            connect.clear();
+            c0polygon_node_counts.reserve(element_id_vec.size());
+          }
+        else if (is_c0polyhedron_block)
+          {
+            connect.clear();
+            c0polyhedron_face_counts.reserve(element_id_vec.size());
+          }
+        else
+          connect.resize(element_id_vec.size()*num_nodes_per_elem);
 
         for (auto i : index_range(element_id_vec))
         {
@@ -3039,30 +3231,92 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                                << Utility::enum_to_string(conv.libmesh_elem_type())
                                << " in the same block!");
 
-          for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); ++j)
+          if (is_c0polygon_block)
             {
-              unsigned int connect_index   = cast_int<unsigned int>((i*num_nodes_per_elem)+j);
-              unsigned elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
-              if (!use_discontinuous)
-                {
-                  // The global id for the current node in libmesh.
-                  dof_id_type libmesh_node_id = elem.node_id(elem_node_index);
+              c0polygon_node_counts.push_back(cast_int<int>(elem.n_nodes()));
 
-                  // Write the Exodus global node id associated with
-                  // this libmesh node number to the connectivity
-                  // array, or throw an error if it's not found.
-                  connect[connect_index] =
-                    libmesh_map_find(libmesh_node_num_to_exodus,
-                                     cast_int<int>(libmesh_node_id));
-                }
-              else
+              for (auto elem_node_index : elem.node_index_range())
                 {
-                  // Look up the (elem_id, elem_node_index) pair in the map.
-                  connect[connect_index] =
-                    libmesh_map_find(discontinuous_node_indices,
-                                     std::make_pair(elem_id, elem_node_index));
+                  if (!use_discontinuous)
+                    {
+                      // The global id for the current node in libmesh.
+                      dof_id_type libmesh_node_id = elem.node_id(elem_node_index);
+
+                      // Write the Exodus global node id associated with
+                      // this libmesh node number to the connectivity
+                      // array, or throw an error if it's not found.
+                      connect.push_back
+                        (libmesh_map_find(libmesh_node_num_to_exodus,
+                                          cast_int<int>(libmesh_node_id)));
+                    }
+                  else
+                    {
+                      // Look up the (elem_id, elem_node_index) pair in the map.
+                      connect.push_back
+                        (libmesh_map_find(discontinuous_node_indices,
+                                          std::make_pair(elem_id, elem_node_index)));
+                    }
                 }
-            } // end for(j)
+            }
+          else if (is_c0polyhedron_block)
+            {
+              c0polyhedron_face_counts.push_back(cast_int<int>(elem.n_sides()));
+
+              for (auto s : elem.side_index_range())
+                {
+                  connect.push_back(next_c0polyhedron_face_id++);
+
+                  const std::vector<unsigned int> side_nodes =
+                    elem.nodes_on_side(s);
+                  c0polyhedron_face_node_counts.push_back
+                    (cast_int<int>(side_nodes.size()));
+
+                  for (const auto elem_node_index : side_nodes)
+                    {
+                      if (!use_discontinuous)
+                        {
+                          const dof_id_type libmesh_node_id =
+                            elem.node_id(elem_node_index);
+                          c0polyhedron_face_connect.push_back
+                            (libmesh_map_find(libmesh_node_num_to_exodus,
+                                              cast_int<int>(libmesh_node_id)));
+                        }
+                      else
+                        {
+                          c0polyhedron_face_connect.push_back
+                            (libmesh_map_find(discontinuous_node_indices,
+                                              std::make_pair(elem_id, elem_node_index)));
+                        }
+                    }
+                }
+            }
+          else
+            {
+              for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); ++j)
+                {
+                  unsigned int connect_index   = cast_int<unsigned int>((i*num_nodes_per_elem)+j);
+                  unsigned elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
+                  if (!use_discontinuous)
+                    {
+                      // The global id for the current node in libmesh.
+                      dof_id_type libmesh_node_id = elem.node_id(elem_node_index);
+
+                      // Write the Exodus global node id associated with
+                      // this libmesh node number to the connectivity
+                      // array, or throw an error if it's not found.
+                      connect[connect_index] =
+                        libmesh_map_find(libmesh_node_num_to_exodus,
+                                         cast_int<int>(libmesh_node_id));
+                    }
+                  else
+                    {
+                      // Look up the (elem_id, elem_node_index) pair in the map.
+                      connect[connect_index] =
+                        libmesh_map_find(discontinuous_node_indices,
+                                         std::make_pair(elem_id, elem_node_index));
+                    }
+                } // end for(j)
+            }
 
           // push_back() either elem_id+1 or the current Elem's
           // unique_id+1 into the elem_num_map, depending on the value
@@ -3126,11 +3380,53 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
         (ex_id,
          exII::EX_ELEM_BLOCK,
          subdomain_id,
-         connect.data(), // node_conn
-         nullptr,        // elem_edge_conn (unused)
-         nullptr);       // elem_face_conn (unused)
+         is_c0polyhedron_block ? nullptr : connect.data(), // node_conn
+         nullptr,                                          // elem_edge_conn (unused)
+         is_c0polyhedron_block ? connect.data() : nullptr);
       EX_CHECK_ERR(ex_err, "Error writing element connectivities");
+
+      if (is_c0polygon_block)
+        {
+          ex_err = exII::ex_put_entity_count_per_polyhedra
+            (ex_id,
+             exII::EX_ELEM_BLOCK,
+             subdomain_id,
+             c0polygon_node_counts.data());
+          EX_CHECK_ERR(ex_err, "Error writing polygon node counts");
+        }
+      if (is_c0polyhedron_block)
+        {
+          ex_err = exII::ex_put_entity_count_per_polyhedra
+            (ex_id,
+             exII::EX_ELEM_BLOCK,
+             subdomain_id,
+             c0polyhedron_face_counts.data());
+          EX_CHECK_ERR(ex_err, "Error writing polyhedron face counts");
+        }
     } // end for (auto & [subdomain_id, element_id_vec] : subdomain_map)
+
+  if (has_c0polyhedron_blocks)
+    {
+      libmesh_assert_equal_to(c0polyhedron_face_node_counts.size(),
+                              cast_int<std::size_t>(num_face));
+      libmesh_assert_equal_to(next_c0polyhedron_face_id, num_face + 1);
+
+      ex_err = exII::ex_put_conn
+        (ex_id,
+         exII::EX_FACE_BLOCK,
+         c0polyhedron_face_block_id,
+         c0polyhedron_face_connect.data(), // node_conn
+         nullptr,                          // elem_edge_conn (unused)
+         nullptr);                         // elem_face_conn (unused)
+      EX_CHECK_ERR(ex_err, "Error writing polyhedron face connectivities");
+
+      ex_err = exII::ex_put_entity_count_per_polyhedra
+        (ex_id,
+         exII::EX_FACE_BLOCK,
+         c0polyhedron_face_block_id,
+         c0polyhedron_face_node_counts.data());
+      EX_CHECK_ERR(ex_err, "Error writing polyhedron face node counts");
+    }
 
   // write out the element number map that we created
   ex_err = exII::ex_put_elem_num_map(ex_id, elem_num_map.data());
@@ -3141,6 +3437,15 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
     {
       ex_err = exII::ex_put_names(ex_id, exII::EX_ELEM_BLOCK, names_table.get_char_star_star());
       EX_CHECK_ERR(ex_err, "Error writing element block names");
+    }
+
+  if (num_face_blk > 0)
+    {
+      ex_err = exII::ex_put_names
+        (ex_id,
+         exII::EX_FACE_BLOCK,
+         face_block_names_table.get_char_star_star());
+      EX_CHECK_ERR(ex_err, "Error writing face block names");
     }
 
   // Write out edge blocks if we have any
