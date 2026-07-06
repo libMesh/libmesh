@@ -110,6 +110,68 @@ INSTANTIATE_EXODUSTEST(QUAD8);
 INSTANTIATE_EXODUSTEST(QUADSHELL8);
 INSTANTIATE_EXODUSTEST(QUAD9);
 INSTANTIATE_EXODUSTEST(QUADSHELL9);
+
+class ExodusC0PolygonTest : public CppUnit::TestCase
+{
+public:
+  LIBMESH_CPPUNIT_TEST_SUITE(ExodusC0PolygonTest);
+
+  CPPUNIT_TEST(test_write_and_read_pentagon);
+
+  CPPUNIT_TEST_SUITE_END();
+
+  void build_pentagon(Mesh &mesh)
+  {
+    const std::vector<Point> points =
+      { {0, 0}, {1, 0}, {1.5, 0.5}, {1, 1}, {0, 1} };
+
+    for (auto p : index_range(points))
+      mesh.add_point(points[p], /*id=*/p);
+
+    std::unique_ptr<Elem> polygon =
+        std::make_unique<C0Polygon>(cast_int<unsigned int>(points.size()));
+    for (auto i : index_range(points))
+      polygon->set_node(i, mesh.node_ptr(i));
+
+    polygon->set_id() = 0;
+    Elem *elem = mesh.add_elem(std::move(polygon));
+    elem->subdomain_id() = 1;
+    mesh.prepare_for_use();
+  }
+
+  void test_write_and_read_pentagon()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    this->build_pentagon(mesh);
+
+    {
+      ExodusII_IO exii(mesh);
+      exii.write("write_exodus_C0POLYGON.e");
+    }
+
+    Mesh input_mesh(*TestCommWorld);
+    ExodusII_IO exii_input(input_mesh);
+    if (input_mesh.processor_id() == 0)
+      exii_input.read("write_exodus_C0POLYGON.e");
+
+    MeshCommunication().broadcast(input_mesh);
+    input_mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(1), input_mesh.n_elem());
+
+    const Elem *elem = input_mesh.elem_ptr(0);
+    CPPUNIT_ASSERT(elem);
+    CPPUNIT_ASSERT_EQUAL(C0POLYGON, elem->type());
+    CPPUNIT_ASSERT_EQUAL(5u, elem->n_nodes());
+
+    for (auto i : make_range(5))
+      CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(i), elem->node_id(i));
+  }
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION(ExodusC0PolygonTest);
 #endif // LIBMESH_DIM > 1
 
 #if LIBMESH_DIM > 2
@@ -120,6 +182,7 @@ public:
 
   CPPUNIT_TEST(test_write_cube_header);
   CPPUNIT_TEST(test_write_hexagonal_prism_header);
+  CPPUNIT_TEST(test_write_and_read_hexagonal_prism);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -228,6 +291,60 @@ public:
     CPPUNIT_ASSERT_EQUAL(header_info.num_face_blk, 1);
     CPPUNIT_ASSERT_EQUAL(header_info.num_node_sets, 0);
     CPPUNIT_ASSERT_EQUAL(header_info.num_side_sets, 0);
+  }
+
+  void test_write_and_read_hexagonal_prism()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    const std::vector<Point> points =
+      { { 0, -2, 0}, {-1, -1, 0}, {-1, 1, 0},
+        { 0,  2, 0}, { 1,  1, 0}, { 1, -1, 0},
+        { 0, -2, 1}, {-1, -1, 1}, {-1, 1, 1},
+        { 0,  2, 1}, { 1,  1, 1}, { 1, -1, 1} };
+
+    const std::vector<std::vector<unsigned int>> nodes_on_side =
+      { {0, 1, 2, 3, 4, 5},
+        {0, 1,  7,  6},
+        {1, 2,  8,  7},
+        {2, 3,  9,  8},
+        {3, 4, 10,  9},
+        {4, 5, 11, 10},
+        {5, 0,  6, 11},
+        {6, 7,  8,  9, 10, 11} };
+
+    this->build_c0polyhedron(mesh, points, nodes_on_side);
+
+    {
+      ExodusII_IO exii(mesh);
+      exii.write("write_exodus_C0POLYHEDRON_HEXPRISM_READ.e");
+    }
+
+    Mesh input_mesh(*TestCommWorld);
+    ExodusII_IO exii_input(input_mesh);
+    if (input_mesh.processor_id() == 0)
+      exii_input.read("write_exodus_C0POLYHEDRON_HEXPRISM_READ.e");
+
+    MeshCommunication().broadcast(input_mesh);
+    input_mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(1), input_mesh.n_elem());
+
+    const Elem *elem = input_mesh.elem_ptr(0);
+    CPPUNIT_ASSERT(elem);
+    CPPUNIT_ASSERT_EQUAL(C0POLYHEDRON, elem->type());
+    CPPUNIT_ASSERT_EQUAL(12u, elem->n_vertices());
+    CPPUNIT_ASSERT_EQUAL(8u, elem->n_sides());
+
+    for (auto s : index_range(nodes_on_side))
+      {
+        const auto side_nodes = elem->nodes_on_side(s);
+        CPPUNIT_ASSERT_EQUAL(nodes_on_side[s].size(), side_nodes.size());
+        for (auto n : index_range(nodes_on_side[s]))
+          CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(nodes_on_side[s][n]),
+                               elem->node_id(side_nodes[n]));
+      }
   }
 };
 

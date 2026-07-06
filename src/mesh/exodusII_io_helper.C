@@ -723,6 +723,9 @@ void ExodusII_IO_Helper::open(const char * filename, bool read_only)
   if (read_only)
   {
     opened_for_reading = true;
+    elem_node_counts.clear();
+    elem_face_counts.clear();
+    c0polyhedron_face_connect.clear();
 
     // ExodusII reads truncate to 32-char strings by default; we'd
     // like to support whatever's in the file, so as early as possible
@@ -1190,6 +1193,124 @@ std::string ExodusII_IO_Helper::get_node_set_name(int index)
 }
 
 
+void ExodusII_IO_Helper::read_face_blocks()
+{
+  LOG_SCOPE("read_face_blocks()", "ExodusII_IO_Helper");
+
+  if (!c0polyhedron_face_connect.empty())
+    return;
+
+  libmesh_error_msg_if(num_face_blk == 0,
+                       "Error: Exodus NFACED element block found, "
+                       "but the file has no face blocks.");
+
+  std::vector<int> face_block_ids(num_face_blk);
+  ex_err = exII::ex_get_ids(ex_id,
+                            exII::EX_FACE_BLOCK,
+                            face_block_ids.data());
+  EX_CHECK_ERR(ex_err, "Error getting face block IDs.");
+
+  c0polyhedron_face_connect.clear();
+  c0polyhedron_face_connect.reserve(num_face);
+
+  for (auto block : index_range(face_block_ids))
+    {
+      std::vector<char> face_type(libmesh_max_str_length+1);
+      int num_face_this_blk = 0;
+      int num_node_data_this_blk = 0;
+      int num_edges_per_face = 0;
+      int num_faces_per_face = 0;
+      int num_attr_face = 0;
+
+      ex_err = exII::ex_get_block(ex_id,
+                                  exII::EX_FACE_BLOCK,
+                                  face_block_ids[block],
+                                  face_type.data(),
+                                  &num_face_this_blk,
+                                  &num_node_data_this_blk,
+                                  &num_edges_per_face,
+                                  &num_faces_per_face,
+                                  &num_attr_face);
+      EX_CHECK_ERR(ex_err, "Error getting face block info.");
+
+      const auto & conv = get_conversion(std::string(face_type.data()));
+      libmesh_error_msg_if(conv.libmesh_elem_type() != C0POLYGON,
+                           "Error: NFACED polyhedron input currently expects "
+                           "NSIDED face blocks, but face block "
+                           << face_block_ids[block] << " has Exodus type "
+                           << face_type.data() << ".");
+
+      libmesh_error_msg_if
+        (!(num_edges_per_face == 0) && !(num_edges_per_face == -1),
+         "Error: Exodus NSIDED face block "
+         << face_block_ids[block]
+         << " has edge connectivity, which NFACED polyhedron input "
+         << "does not currently support.");
+      libmesh_error_msg_if
+        (!(num_faces_per_face == 0) && !(num_faces_per_face == -1),
+         "Error: Exodus NSIDED face block "
+         << face_block_ids[block]
+         << " has face-in-face connectivity, which NFACED polyhedron "
+         << "input does not currently support.");
+
+      std::vector<int> face_node_counts(num_face_this_blk);
+      if (!face_node_counts.empty())
+        {
+          ex_err = exII::ex_get_entity_count_per_polyhedra
+            (ex_id,
+             exII::EX_FACE_BLOCK,
+             face_block_ids[block],
+             face_node_counts.data());
+          EX_CHECK_ERR(ex_err, "Error reading polyhedron face node counts");
+        }
+
+      int counted_nodes = 0;
+      for (const auto count : face_node_counts)
+        counted_nodes += count;
+
+      libmesh_error_msg_if(counted_nodes != num_node_data_this_blk,
+                           "Error: Exodus NSIDED face block "
+                           << face_block_ids[block]
+                           << " says it has " << num_node_data_this_blk
+                           << " total node entries, but its per-face "
+                           << "node counts sum to " << counted_nodes << ".");
+
+      std::vector<int> face_connect(num_node_data_this_blk);
+      if (!face_connect.empty())
+        {
+          ex_err = exII::ex_get_conn(ex_id,
+                                     exII::EX_FACE_BLOCK,
+                                     face_block_ids[block],
+                                     face_connect.data(),
+                                     nullptr,
+                                     nullptr);
+          EX_CHECK_ERR(ex_err, "Error reading polyhedron face connectivity.");
+        }
+
+      std::size_t offset = 0;
+      for (const auto count : face_node_counts)
+        {
+          libmesh_error_msg_if(count < 3,
+                               "Error: Exodus NSIDED face block "
+                               << face_block_ids[block]
+                               << " has a face with only "
+                               << count << " nodes.");
+
+          c0polyhedron_face_connect.emplace_back
+            (face_connect.begin() + offset,
+             face_connect.begin() + offset + count);
+          offset += count;
+        }
+    }
+
+  libmesh_error_msg_if(c0polyhedron_face_connect.size() !=
+                       cast_int<std::size_t>(num_face),
+                       "Error: Exodus file says it has "
+                       << num_face << " faces, but its face blocks contain "
+                       << c0polyhedron_face_connect.size() << " faces.");
+}
+
+
 
 
 void ExodusII_IO_Helper::read_elem_in_block(int block)
@@ -1197,6 +1318,8 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   LOG_SCOPE("read_elem_in_block()", "ExodusII_IO_Helper");
 
   libmesh_assert_less (block, block_ids.size());
+  elem_node_counts.clear();
+  elem_face_counts.clear();
 
   // Unlike the other "extended" APIs, this one does not use a parameter struct.
   int num_edges_per_elem = 0;
@@ -1215,12 +1338,19 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   EX_CHECK_ERR(ex_err, "Error getting block info.");
   message("Info retrieved successfully for block: ", block);
 
-  // Warn that we don't currently support reading blocks with extended info.
+  const auto & conv = get_conversion(std::string(elem_type.data()));
+  const bool is_c0polygon = (conv.libmesh_elem_type() == C0POLYGON);
+  const bool is_c0polyhedron = (conv.libmesh_elem_type() == C0POLYHEDRON);
+
+  // Warn or error when we don't currently support reading blocks with extended info.
   // Note: the docs say -1 will be returned for this but I found that it was
   // actually 0, so not sure which it will be in general.
-  if (!(num_edges_per_elem == 0) && !(num_edges_per_elem == -1))
+  if (is_c0polyhedron && !(num_edges_per_elem == 0) && !(num_edges_per_elem == -1))
+    libmesh_error_msg("Error: Exodus NFACED element blocks with edge "
+                      "connectivity are not currently supported.");
+  else if (!(num_edges_per_elem == 0) && !(num_edges_per_elem == -1))
     libmesh_warning("Exodus files with extended edge connectivity not currently supported.");
-  if (!(num_faces_per_elem == 0) && !(num_faces_per_elem == -1))
+  if (!is_c0polyhedron && !(num_faces_per_elem == 0) && !(num_faces_per_elem == -1))
     libmesh_warning("Exodus files with extended face connectivity not currently supported.");
 
   // If we have a Bezier element here, then we've packed constraint
@@ -1228,32 +1358,100 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   // num_nodes_per_elem reflected both.
   const bool is_bezier = is_bezier_elem(elem_type.data());
   if (is_bezier)
+    num_nodes_per_elem = conv.n_nodes;
+  else if (is_c0polygon)
     {
-      const auto & conv = get_conversion(std::string(elem_type.data()));
-      num_nodes_per_elem = conv.n_nodes;
+      elem_node_counts.resize(num_elem_this_blk);
+
+      if (!elem_node_counts.empty())
+        {
+          ex_err = exII::ex_get_entity_count_per_polyhedra
+            (ex_id,
+             exII::EX_ELEM_BLOCK,
+             block_ids[block],
+             elem_node_counts.data());
+          EX_CHECK_ERR(ex_err, "Error reading polygon node counts");
+        }
+
+      int counted_nodes = 0;
+      for (const auto count : elem_node_counts)
+        counted_nodes += count;
+
+      libmesh_error_msg_if(counted_nodes != num_node_data_per_elem,
+                           "Error: Exodus NSIDED block "
+                           << block_ids[block]
+                           << " says it has " << num_node_data_per_elem
+                           << " total node entries, but its per-element "
+                           << "node counts sum to " << counted_nodes << ".");
+
+      num_nodes_per_elem = 0;
+    }
+  else if (is_c0polyhedron)
+    {
+      if (c0polyhedron_face_connect.empty())
+        this->read_face_blocks();
+
+      elem_face_counts.resize(num_elem_this_blk);
+
+      if (!elem_face_counts.empty())
+        {
+          ex_err = exII::ex_get_entity_count_per_polyhedra
+            (ex_id,
+             exII::EX_ELEM_BLOCK,
+             block_ids[block],
+             elem_face_counts.data());
+          EX_CHECK_ERR(ex_err, "Error reading polyhedron face counts");
+        }
+
+      int counted_faces = 0;
+      for (const auto count : elem_face_counts)
+        counted_faces += count;
+
+      libmesh_error_msg_if(counted_faces != num_faces_per_elem,
+                           "Error: Exodus NFACED block "
+                           << block_ids[block]
+                           << " says it has " << num_faces_per_elem
+                           << " total face entries, but its per-element "
+                           << "face counts sum to " << counted_faces << ".");
+
+      num_nodes_per_elem = 0;
     }
   else
     num_nodes_per_elem = num_node_data_per_elem;
 
   if (verbose)
-    libMesh::out << "Read a block of " << num_elem_this_blk
-                 << " " << elem_type.data() << "(s)"
-                 << " having " << num_nodes_per_elem
-                 << " nodes per element." << std::endl;
+    {
+      libMesh::out << "Read a block of " << num_elem_this_blk
+                   << " " << elem_type.data() << "(s)";
+      if (is_c0polygon)
+        libMesh::out << " having " << num_node_data_per_elem
+                     << " total node entries.";
+      else if (is_c0polyhedron)
+        libMesh::out << " having " << num_faces_per_elem
+                     << " total face entries.";
+      else
+        libMesh::out << " having " << num_nodes_per_elem
+                     << " nodes per element.";
+      libMesh::out << std::endl;
+    }
 
   // Read in the connectivity of the elements of this block,
   // watching out for the case where we actually have no
   // elements in this block (possible with parallel files)
-  connect.resize(num_node_data_per_elem*num_elem_this_blk);
+  connect.resize(is_c0polygon ?
+                 num_node_data_per_elem :
+                 is_c0polyhedron ?
+                 num_faces_per_elem :
+                 num_node_data_per_elem*num_elem_this_blk);
 
   if (!connect.empty())
     {
       ex_err = exII::ex_get_conn(ex_id,
                                  exII::EX_ELEM_BLOCK,
                                  block_ids[block],
-                                 connect.data(), // node_conn
-                                 nullptr,        // elem_edge_conn (unused)
-                                 nullptr);       // elem_face_conn (unused)
+                                 is_c0polyhedron ? nullptr : connect.data(),
+                                 nullptr, // elem_edge_conn (unused)
+                                 is_c0polyhedron ? connect.data() : nullptr);
 
       EX_CHECK_ERR(ex_err, "Error reading block connectivity.");
       message("Connectivity retrieved successfully for block: ", block);

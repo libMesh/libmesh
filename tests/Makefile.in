@@ -2521,9 +2521,11 @@ CLEANFILES = cube_mesh.xda slit_mesh.xda slit_solution.xda out.e \
 	side_discontinuous_EDGE3_disc.e side_discontinuous_HEX27.e \
 	side_discontinuous_HEX27_disc.e side_discontinuous_QUAD9.e \
 	side_discontinuous_QUAD9_disc.e side_discontinuous_TRI6.e \
-	side_discontinuous_TRI6_disc.e write_exodus_EDGE2.e \
-	write_exodus_EDGE3.e write_exodus_EDGE4.e write_exodus_HEX20.e \
-	write_exodus_HEX27.e write_exodus_HEX8.e \
+	side_discontinuous_TRI6_disc.e write_exodus_C0POLYGON.e \
+	write_exodus_C0POLYHEDRON.e write_exodus_C0POLYHEDRON_HEXPRISM.e \
+	write_exodus_C0POLYHEDRON_HEXPRISM_READ.e \
+	write_exodus_EDGE2.e write_exodus_EDGE3.e write_exodus_EDGE4.e \
+	write_exodus_HEX20.e write_exodus_HEX27.e write_exodus_HEX8.e \
 	write_exodus_PRISM15.e write_exodus_PRISM18.e \
 	write_exodus_PRISM20.e write_exodus_PRISM21.e \
 	write_exodus_PRISM6.e write_exodus_PYRAMID13.e \

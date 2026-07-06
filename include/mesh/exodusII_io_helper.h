@@ -226,6 +226,11 @@ public:
   void read_elem_in_block(int block);
 
   /**
+   * Reads NSIDED face blocks used by NFACED element blocks.
+   */
+  void read_face_blocks();
+
+  /**
    * Read in edge blocks, storing information in the BoundaryInfo object.
    */
   void read_edge_blocks(MeshBase & mesh);
@@ -754,6 +759,15 @@ public:
 
   // Vector of nodes in an element
   std::vector<int> connect;
+
+  // For NSIDED element blocks, the number of nodes in each element
+  std::vector<int> elem_node_counts;
+
+  // For NFACED element blocks, the number of faces in each element
+  std::vector<int> elem_face_counts;
+
+  // For NFACED element blocks, the nodes in each Exodus face
+  std::vector<std::vector<int>> c0polyhedron_face_connect;
 
   // Vector of the sideset IDs
   std::vector<int> ss_ids;
