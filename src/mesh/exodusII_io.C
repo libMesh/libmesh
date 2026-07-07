@@ -72,40 +72,62 @@ namespace
   }
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  enum class SolutionOrdering
+  {
+    variable_major,
+    geometry_major
+  };
+
+  std::size_t ordered_solution_index (const std::size_t var,
+                                      const std::size_t geometry_index,
+                                      const std::size_t num_vars,
+                                      const std::size_t num_geometric_entries,
+                                      const SolutionOrdering ordering)
+  {
+    if (ordering == SolutionOrdering::variable_major)
+      return var * num_geometric_entries + geometry_index;
+    else
+      return geometry_index * num_vars + var;
+  }
+
   std::vector<Real>
   complex_soln_components (const std::vector<Number> & soln,
-                           const unsigned int num_vars,
-                           const bool write_complex_abs)
+                           const std::size_t num_vars,
+                           const bool write_complex_abs,
+                           const SolutionOrdering source_ordering,
+                           const SolutionOrdering destination_ordering)
   {
-    unsigned int num_values = soln.size();
-    unsigned int num_elems = num_values / num_vars;
+    const std::size_t num_values = soln.size();
+    libmesh_assert_greater(num_vars, 0);
+    libmesh_assert_equal_to(num_values % num_vars, 0);
+    const std::size_t num_geometric_entries = num_values / num_vars;
 
     // This will contain the real and imaginary parts and the magnitude
     // of the values in soln
-    int nco = write_complex_abs ? 3 : 2;
+    const std::size_t nco = write_complex_abs ? 3 : 2;
+    const std::size_t num_complex_vars = nco * num_vars;
     std::vector<Real> complex_soln(nco * num_values);
 
-    for (unsigned i=0; i<num_vars; ++i)
-      {
-        for (unsigned int j=0; j<num_elems; ++j)
-          {
-            Number value = soln[i*num_vars + j];
-            complex_soln[nco*i*num_elems + j] = value.real();
-          }
-        for (unsigned int j=0; j<num_elems; ++j)
-          {
-            Number value = soln[i*num_vars + j];
-            complex_soln[nco*i*num_elems + num_elems + j] = value.imag();
-          }
-        if (write_complex_abs)
-          {
-            for (unsigned int j=0; j<num_elems; ++j)
-              {
-                Number value = soln[i*num_vars + j];
-                complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
-              }
-          }
-      }
+    for (const auto var : make_range(num_vars))
+      for (const auto geometry_index : make_range(num_geometric_entries))
+        {
+          const Number value =
+            soln[ordered_solution_index
+                 (var, geometry_index, num_vars, num_geometric_entries, source_ordering)];
+
+          const std::size_t complex_var = nco * var;
+          complex_soln[ordered_solution_index
+                       (complex_var, geometry_index, num_complex_vars,
+                        num_geometric_entries, destination_ordering)] = value.real();
+          complex_soln[ordered_solution_index
+                       (complex_var + 1, geometry_index, num_complex_vars,
+                        num_geometric_entries, destination_ordering)] = value.imag();
+
+          if (write_complex_abs)
+            complex_soln[ordered_solution_index
+                         (complex_var + 2, geometry_index, num_complex_vars,
+                          num_geometric_entries, destination_ordering)] = std::abs(value);
+        }
 
     return complex_soln;
   }
@@ -1432,7 +1454,9 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   exio_helper->initialize_element_variables(complex_names, complex_vars_active_subdomains);
 
   const std::vector<Real> complex_soln =
-    complex_soln_components(soln, names.size(), _write_complex_abs);
+    complex_soln_components(soln, names.size(), _write_complex_abs,
+                            SolutionOrdering::variable_major,
+                            SolutionOrdering::variable_major);
 
   exio_helper->write_element_values(mesh, complex_soln, _timestep, complex_vars_active_subdomains);
 
@@ -1985,7 +2009,9 @@ void ExodusII_IO::write_global_data (const std::vector<Number> & soln,
   exio_helper->initialize_global_variables(complex_names);
 
   const std::vector<Real> complex_soln =
-    complex_soln_components(soln, names.size(), _write_complex_abs);
+    complex_soln_components(soln, names.size(), _write_complex_abs,
+                            SolutionOrdering::variable_major,
+                            SolutionOrdering::variable_major);
 
   exio_helper->write_global_values(complex_soln, _timestep);
 

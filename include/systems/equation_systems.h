@@ -313,7 +313,7 @@ public:
 
   /**
    * Fill the input vector \p soln with solution values.  The
-   * entries will be in variable-major format (corresponding to
+   * entries will be in node-major format (corresponding to
    * the names from \p build_variable_names()).
    *
    * If systems_names!=nullptr, only include data from the
@@ -415,8 +415,8 @@ public:
 
   /**
    * Fill the input vector \p soln with solution values.  The
-   * entries will be in variable-major format (corresponding to
-   * the names from \p build_variable_names()).
+   * entries will be in geometry-major format: element, then local
+   * node/vertex, then variable.
 
    * If systems_names!=nullptr, only include data from the
    * specified systems.
