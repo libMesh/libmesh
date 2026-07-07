@@ -722,6 +722,7 @@ public:
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("e", CONSTANT, MONOMIAL);
+      sys.add_variable("e_no_p", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
 
       MeshTools::Generation::build_square (mesh,
                                            3, 3,
@@ -754,6 +755,7 @@ public:
       EquationSystems es(mesh);
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("teste", CONSTANT, MONOMIAL);
+      sys.add_variable("teste_no_p", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
 
       if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
         meshinput.read(filename);
@@ -769,8 +771,10 @@ public:
       // part.
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
       meshinput.copy_elemental_solution(sys, "teste", "r_e");
+      meshinput.copy_elemental_solution(sys, "teste_no_p", "r_e_no_p");
 #else
       meshinput.copy_elemental_solution(sys, "teste", "e");
+      meshinput.copy_elemental_solution(sys, "teste_no_p", "e_no_p");
 #endif
 
       // Exodus only handles double precision
@@ -782,6 +786,8 @@ public:
             Point p(x,y);
             LIBMESH_ASSERT_NUMBERS_EQUAL
               (sys.point_value(0,p), 6*x+60*y, exotol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (sys.point_value(1,p), 6*x+60*y, exotol);
           }
     }
   }
@@ -878,6 +884,8 @@ public:
       EquationSystems es(mesh);
       System & sys = es.add_system<System> ("SimpleSystem");
       auto e_var = sys.add_variable("e", CONSTANT, MONOMIAL_VEC);
+      auto e_no_p_var = sys.add_variable("e_no_p",
+                                         FEType(CONSTANT, MONOMIAL_VEC).set_p_refinement(false));
 
       MeshTools::Generation::build_square (mesh,
                                            3, 3,
@@ -905,6 +913,10 @@ public:
           elem->dof_number(sys.number(), e_var, 0), six_x_plus_sixty_y(p, params, "", ""));
         sys.current_local_solution->set(
           elem->dof_number(sys.number(), e_var, 1), sin_x_plus_cos_y(p, params, "", ""));
+        sys.current_local_solution->set(
+          elem->dof_number(sys.number(), e_no_p_var, 0), six_x_plus_sixty_y(p, params, "", ""));
+        sys.current_local_solution->set(
+          elem->dof_number(sys.number(), e_no_p_var, 1), sin_x_plus_cos_y(p, params, "", ""));
       }
 
       // After setting values, we need to assemble
@@ -937,8 +949,10 @@ public:
       // We have to read the CONSTANT MONOMIAL_VEC var "e" into separate CONSTANT MONOMIAL vars
       // "e_x" and "e_y" because 'copy_elemental_solution()' currently doesn't support vectors.
       // Again, this isn't a test for reading/copying an elemental vector solution, only writing.
-      sys.add_variable("teste_x", CONSTANT, MONOMIAL);
-      sys.add_variable("teste_y", CONSTANT, MONOMIAL);
+      sys.add_variable("teste_x", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
+      sys.add_variable("teste_y", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
+      sys.add_variable("teste_no_p_x", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
+      sys.add_variable("teste_no_p_y", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
 
       if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
         meshinput.read(filename);
@@ -951,6 +965,8 @@ public:
       // Read the solution e_x and e_y into variable teste_x and teste_y, respectively.
       meshinput.copy_elemental_solution(sys, "teste_x", "e_x");
       meshinput.copy_elemental_solution(sys, "teste_y", "e_y");
+      meshinput.copy_elemental_solution(sys, "teste_no_p_x", "e_no_p_x");
+      meshinput.copy_elemental_solution(sys, "teste_no_p_y", "e_no_p_y");
 
       // Exodus only handles double precision
       Real exotol = std::max(TOLERANCE*TOLERANCE, Real(1e-12));
@@ -963,6 +979,10 @@ public:
               (sys.point_value(0,p), 6*x+60*y, exotol);
             LIBMESH_ASSERT_NUMBERS_EQUAL
               (sys.point_value(1,p), sin(x)+cos(y), exotol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (sys.point_value(2,p), 6*x+60*y, exotol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (sys.point_value(3,p), sin(x)+cos(y), exotol);
           }
     }
   }
@@ -986,6 +1006,9 @@ public:
   {
     LOG_UNIT_TEST;
 
+    const Real scalar_value = 42.;
+    const std::vector<Real> vector_values = {10., 20., 30.};
+
     // first scope: write file
     {
       Mesh mesh(*TestCommWorld);
@@ -993,6 +1016,10 @@ public:
       EquationSystems es(mesh);
       System & sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("u", FIRST, L2_LAGRANGE);
+      const auto c_var =
+        sys.add_variable("c", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
+      const auto vec_var =
+        sys.add_variable("vec", FEType(CONSTANT, MONOMIAL_VEC).set_p_refinement(false));
 
       MeshTools::Generation::build_cube
         (mesh, 2, 2, 2, 0., 1., 0., 1., 0., 1., HEX8);
@@ -1007,6 +1034,13 @@ public:
           dof_map.dof_indices(elem, dof_indices, /*var_id=*/0);
           for (unsigned int i=0; i<dof_indices.size(); ++i)
             sys.solution->set(dof_indices[i], i);
+
+          sys.solution->set(elem->dof_number(sys.number(), c_var, 0), scalar_value);
+          for (auto comp : index_range(vector_values))
+            sys.solution->set(elem->dof_number(sys.number(),
+                                               vec_var,
+                                               cast_int<unsigned int>(comp)),
+                              vector_values[comp]);
         }
       sys.solution->close();
 
@@ -1030,8 +1064,14 @@ public:
         {"u_elem_corner_0",
          "u_elem_corner_1",
          "u_elem_corner_2",
-         "u_elem_corner_3"};
-      std::vector<Real> expected_values = {0., 1., 2., 3.};
+         "u_elem_corner_3",
+         "c",
+         "vec_x",
+         "vec_y",
+         "vec_z"};
+      std::vector<Real> expected_values =
+        {0., 1., 2., 3.,
+         scalar_value, vector_values[0], vector_values[1], vector_values[2]};
 
       // copy_elemental_solution currently requires ReplicatedMesh
       ReplicatedMesh mesh(*TestCommWorld);
@@ -1040,7 +1080,7 @@ public:
       EquationSystems es(mesh);
       System & sys = es.add_system<System> ("SimpleSystem");
       for (auto i : index_range(file_var_names))
-        sys.add_variable(file_var_names[i], CONSTANT, MONOMIAL);
+        sys.add_variable(file_var_names[i], FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
 
       ExodusII_IO exii(mesh);
 

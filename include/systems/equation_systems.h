@@ -36,6 +36,7 @@
 
 // C++ includes
 #include <cstddef>
+#include <functional>
 #include <map>
 #include <set>
 #include <string>
@@ -281,6 +282,24 @@ public:
                              const std::set<std::string> * system_names=nullptr) const;
 
   /**
+   * \returns Whether \p type can be represented as elemental data.
+   *
+   * Elemental data variables are CONSTANT MONOMIALs and CONSTANT
+   * MONOMIAL_VECs, regardless of their p_refinement flag.
+   */
+  static bool is_elemental_data_fe_type (const FEType & type);
+
+  /**
+   * Filter \p var_names to names of variables that can be represented as
+   * elemental data. If \p var_names is empty, all eligible variable names are
+   * returned. Vector-valued variables are decomposed into component names.
+   * If \p system_names!=nullptr, only include names from the specified systems.
+   */
+  void build_elemental_data_variable_names
+    (std::vector<std::string> & var_names,
+     const std::set<std::string> * system_names=nullptr) const;
+
+  /**
    * Fill the input vector \p soln with the solution values for the
    * system named \p name.
    *
@@ -364,6 +383,14 @@ public:
   find_variable_numbers (std::vector<std::string> & names,
                          const FEType * type=nullptr,
                          const std::vector<FEType> * types=nullptr) const;
+
+  /**
+   * Finds system and variable numbers for variables that can be represented
+   * as elemental data. See find_variable_numbers() for name filtering,
+   * component decomposition, and sorting details.
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  find_elemental_data_variable_numbers (std::vector<std::string> & names) const;
 
   /**
    * Builds a parallel vector of CONSTANT MONOMIAL and/or components of
@@ -609,6 +636,14 @@ protected:
   bool _enable_default_ghosting;
 
 private:
+  /**
+   * Implementation detail for find_variable_numbers() variants.
+   */
+  std::vector<std::pair<unsigned int, unsigned int>>
+  find_variable_numbers_by_predicate
+    (std::vector<std::string> & names,
+     const std::function<bool(const FEType &)> & type_filter) const;
+
   /**
    * This function is used in the implementation of add_system,
    * it loops over the nodes and elements of the Mesh, adding the

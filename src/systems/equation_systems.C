@@ -579,6 +579,64 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
   var_names.resize(var_num);
 }
 
+bool EquationSystems::is_elemental_data_fe_type (const FEType & type)
+{
+  return type.order == CONSTANT &&
+         (type.family == MONOMIAL || type.family == MONOMIAL_VEC);
+}
+
+
+
+void EquationSystems::build_elemental_data_variable_names
+  (std::vector<std::string> & var_names,
+   const std::set<std::string> * system_names) const
+{
+  const std::vector<std::string> name_filter = var_names;
+  const bool is_names_empty = name_filter.empty();
+  var_names.clear();
+
+  const std::vector<std::string> component_suffix = {"_x", "_y", "_z"};
+  const unsigned int dim = _mesh.spatial_dimension();
+  libmesh_error_msg_if(dim > 3, "Invalid dim in build_elemental_data_variable_names");
+
+  for (const auto & [sys_name, sys_ptr] : _systems)
+    {
+      const bool use_current_system = (system_names == nullptr) || system_names->count(sys_name);
+      if (!use_current_system || sys_ptr->hide_output())
+        continue;
+
+      for (auto var : make_range(sys_ptr->n_vars()))
+        {
+          const FEType & var_type = sys_ptr->variable_type(var);
+          if (!EquationSystems::is_elemental_data_fe_type(var_type))
+            continue;
+
+          if (FEInterface::field_type(var_type) == TYPE_VECTOR)
+            {
+              for (auto comp : make_range(dim))
+                {
+                  const std::string name =
+                    sys_ptr->variable_name(var) + component_suffix[comp];
+
+                  if (is_names_empty ||
+                      std::find(name_filter.begin(), name_filter.end(), name) != name_filter.end())
+                    var_names.push_back(name);
+                }
+            }
+          else
+            {
+              const std::string & name = sys_ptr->variable_name(var);
+
+              if (is_names_empty ||
+                  std::find(name_filter.begin(), name_filter.end(), name) != name_filter.end())
+                var_names.push_back(name);
+            }
+        }
+    }
+
+  std::sort(var_names.begin(), var_names.end());
+}
+
 
 
 void EquationSystems::build_solution_vector (std::vector<Number> &,
@@ -1048,11 +1106,6 @@ std::vector<std::pair<unsigned int, unsigned int>>
 EquationSystems::find_variable_numbers
   (std::vector<std::string> & names, const FEType * type, const std::vector<FEType> * types) const
 {
-  // This function must be run on all processors at once
-  parallel_object_only();
-
-  libmesh_assert (this->n_systems());
-
   // Resolve class of type input and assert that at least one of them is null
   libmesh_assert_msg(!type || !types,
                      "Input 'type', 'types', or neither in find_variable_numbers, but not both.");
@@ -1062,6 +1115,36 @@ EquationSystems::find_variable_numbers
     type_filter.push_back(*type);
   else if (types)
     type_filter = *types;
+
+  return this->find_variable_numbers_by_predicate
+    (names,
+     [&type_filter](const FEType & var_type)
+     {
+       return type_filter.empty() ||
+              std::find(type_filter.begin(), type_filter.end(), var_type) != type_filter.end();
+     });
+}
+
+
+
+std::vector<std::pair<unsigned int, unsigned int>>
+EquationSystems::find_elemental_data_variable_numbers (std::vector<std::string> & names) const
+{
+  return this->find_variable_numbers_by_predicate
+    (names, EquationSystems::is_elemental_data_fe_type);
+}
+
+
+
+std::vector<std::pair<unsigned int, unsigned int>>
+EquationSystems::find_variable_numbers_by_predicate
+  (std::vector<std::string> & names,
+   const std::function<bool(const FEType &)> & type_filter) const
+{
+  // This function must be run on all processors at once
+  parallel_object_only();
+
+  libmesh_assert (this->n_systems());
 
   // Store a copy of the valid variable names, if any. The names vector will be repopulated with any
   // valid names (or all if 'is_names_empty') in the system that passes through the type filter. If
@@ -1091,8 +1174,7 @@ EquationSystems::find_variable_numbers
         {
           // apply the type filter
           var_type = system.variable_type(var);
-          if (type_filter.size() &&
-              std::find(type_filter.begin(), type_filter.end(), var_type) == type_filter.end())
+          if (!type_filter(var_type))
             continue;
 
           // apply the name filter (note that all variables pass if it is empty)
@@ -1156,9 +1238,8 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
   // Filter any names that aren't elemental variables and get the system indices for those that are.
   // Note that it's probably fine if the names vector is empty since we'll still at least filter
   // out all non-monomials. If there are no monomials, then nothing is output here.
-  std::vector<FEType> type = {FEType(CONSTANT, MONOMIAL), FEType(CONSTANT, MONOMIAL_VEC)};
   std::vector<std::pair<unsigned int, unsigned int>> var_nums =
-    this->find_variable_numbers(names, /*type=*/nullptr, &type);
+    this->find_elemental_data_variable_numbers(names);
 
   const std::size_t nv = names.size(); /*total number of vars including vector components*/
   const dof_id_type ne = _mesh.n_elem();
@@ -1221,11 +1302,13 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
       const DofMap & dof_map = system.get_dof_map();
 
       // We need to check if the constant monomial is a scalar or a vector and set the number of
-      // components as the mesh spatial dimension for the latter as per es.find_variable_numbers().
+      // components for the latter as per es.find_variable_numbers().
       // Even for the case where a variable is not active on any subdomain belonging to the
       // processor, we still need to know this number to update 'var_ctr'.
+      const auto & var_type = system.variable_type(var);
       const unsigned int n_comps =
-        (system.variable_type(var) == type[1]) ? _mesh.spatial_dimension() : 1;
+        (FEInterface::field_type(var_type) == TYPE_VECTOR) ?
+        FEInterface::n_vec_dim(_mesh, var_type) : 1;
 
       // Loop over all elements in the mesh and index all components of the variable if it's active
       Threads::parallel_for
@@ -1280,6 +1363,47 @@ EquationSystems::build_discontinuous_solution_vector
 
   libmesh_assert (this->n_systems());
 
+  const std::vector<std::string> component_suffix = {"_x", "_y", "_z"};
+  const auto requested_components =
+    [this, var_names, &component_suffix](const System & system,
+                                         const unsigned int var)
+    {
+      std::vector<unsigned int> components;
+
+      const std::string & var_name = system.variable_name(var);
+      const FEType & fe_type = system.variable_type(var);
+      const unsigned int n_vec_dim = FEInterface::n_vec_dim(_mesh, fe_type);
+
+      if (FEInterface::field_type(fe_type) == TYPE_VECTOR)
+        {
+          libmesh_error_msg_if(n_vec_dim > component_suffix.size(),
+                               "Invalid dim in build_discontinuous_solution_vector");
+
+          const bool use_all_components =
+            (var_names == nullptr) ||
+            std::count(var_names->begin(), var_names->end(), var_name);
+
+          if (n_vec_dim <= 1)
+            {
+              if (use_all_components)
+                components.push_back(0);
+            }
+          else
+            for (auto comp : make_range(n_vec_dim))
+              {
+                const std::string component_name = var_name + component_suffix[comp];
+                if (use_all_components ||
+                    std::count(var_names->begin(), var_names->end(), component_name))
+                  components.push_back(comp);
+              }
+        }
+      else if (var_names == nullptr ||
+               std::count(var_names->begin(), var_names->end(), var_name))
+        components.push_back(0);
+
+      return components;
+    };
+
   // Get the number of variables (nv) by counting the number of variables
   // in each system listed in system_names
   unsigned int nv = 0;
@@ -1296,18 +1420,7 @@ EquationSystems::build_discontinuous_solution_vector
       // Loop over all variables in this System and check whether we
       // are supposed to use each one.
       for (auto var_id : make_range(sys_ptr->n_vars()))
-        {
-          bool use_current_var = (var_names == nullptr);
-          if (!use_current_var)
-            use_current_var = std::count(var_names->begin(),
-                                         var_names->end(),
-                                         sys_ptr->variable_name(var_id));
-
-          // Only increment the total number of vars if we are
-          // supposed to use this one.
-          if (use_current_var)
-            nv++;
-        }
+        nv += cast_int<unsigned int>(requested_components(*sys_ptr, var_id).size());
     }
 
   // get the total "weight" - the number of nodal values to write for
@@ -1381,22 +1494,20 @@ EquationSystems::build_discontinuous_solution_vector
           // the nodal_soln and store it to the "soln" vector. We
           // store zeros for subdomain-restricted variables on
           // elements where they are not active.
-          for (unsigned int var=0; var<nv_sys; var++)
+          for (auto var : make_range(nv_sys))
             {
-              bool use_current_var = (var_names == nullptr);
-              if (!use_current_var)
-                use_current_var = std::count(var_names->begin(),
-                                             var_names->end(),
-                                             system->variable_name(var));
+              const std::vector<unsigned int> components_to_write =
+                requested_components(*system, var);
 
               // If we aren't supposed to write this var, go to the
               // next loop iteration.
-              if (!use_current_var)
+              if (components_to_write.empty())
                 continue;
 
               const FEType & fe_type = system->variable_type(var);
               const Variable & var_description = system->variable(var);
               const bool add_p_level = fe_type.p_refinement;
+              const unsigned int n_vec_dim = FEInterface::n_vec_dim(_mesh, fe_type);
 
               unsigned int nn=0;
 
@@ -1420,23 +1531,25 @@ EquationSystems::build_discontinuous_solution_vector
                                                soln_coeffs,
                                                nodal_soln,
                                                add_p_level,
-                                               FEInterface::n_vec_dim(_mesh, fe_type));
+                                               n_vec_dim);
 
                       // infinite elements should be skipped...
                       if (!elem->infinite())
                         {
-                          libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes());
+                          libmesh_assert_equal_to (nodal_soln.size(), elem->n_nodes()*n_vec_dim);
 
                           const unsigned int n_vals =
                             vertices_only ? elem->n_vertices() : elem->n_nodes();
 
-                          for (unsigned int n=0; n<n_vals; n++)
+                          for (auto n : make_range(n_vals))
                             {
                               // Compute index into global solution vector.
                               std::size_t index =
                                 nv * (nn++) + (n_vars_written_current_system + var_offset);
 
-                              soln[index] += nodal_soln[n];
+                              for (auto component_index : index_range(components_to_write))
+                                soln[index + component_index] +=
+                                  nodal_soln[n_vec_dim*n + components_to_write[component_index]];
                             }
                         }
                     }
@@ -1485,11 +1598,11 @@ EquationSystems::build_discontinuous_solution_vector
                                 FEInterface::side_nodal_soln
                                   (fe_type, elem, s, soln_coeffs,
                                    nodal_soln, add_p_level,
-                                   FEInterface::n_vec_dim(_mesh, fe_type));
+                                   n_vec_dim);
 
                                 libmesh_assert_equal_to
                                     (nodal_soln.size(),
-                                     side_nodes.size());
+                                     side_nodes.size()*n_vec_dim);
 
                                 // If we don't have a continuous FE
                                 // then we want to average between
@@ -1519,7 +1632,7 @@ EquationSystems::build_discontinuous_solution_vector
                                     FEInterface::side_nodal_soln
                                       (fe_type, neigh, s_neigh,
                                        neigh_coeffs, neigh_soln, add_p_level,
-                                       FEInterface::n_vec_dim(_mesh, fe_type));
+                                       n_vec_dim);
 
                                     const std::vector<unsigned int> neigh_nodes =
                                       neigh->nodes_on_side(s_neigh);
@@ -1527,10 +1640,13 @@ EquationSystems::build_discontinuous_solution_vector
                                       for (auto neigh_n : index_range(neigh_nodes))
                                         if (neigh->node_ptr(neigh_nodes[neigh_n])
                                             == elem->node_ptr(side_nodes[n]))
-                                          {
-                                            nodal_soln[n] += neigh_soln[neigh_n];
-                                            nodal_soln[n] /= 2;
-                                          }
+                                          for (auto comp : make_range(n_vec_dim))
+                                            {
+                                              const auto nodal_index = n_vec_dim*n + comp;
+                                              nodal_soln[nodal_index] +=
+                                                neigh_soln[n_vec_dim*neigh_n + comp];
+                                              nodal_soln[nodal_index] /= 2;
+                                            }
                                   }
 
                                 for (auto n : index_range(side_nodes))
@@ -1543,7 +1659,9 @@ EquationSystems::build_discontinuous_solution_vector
                                     std::size_t index =
                                       nv * (nn++) + (n_vars_written_current_system + var_offset);
 
-                                    soln[index] += nodal_soln[n];
+                                    for (auto component_index : index_range(components_to_write))
+                                      soln[index + component_index] +=
+                                        nodal_soln[n_vec_dim*n + components_to_write[component_index]];
                                   }
                               }
                           }
@@ -1572,7 +1690,7 @@ EquationSystems::build_discontinuous_solution_vector
                 }
               // If we made it here, we actually wrote a variable, so increment
               // the number of variables actually written for the current system.
-              n_vars_written_current_system++;
+              n_vars_written_current_system += cast_int<unsigned int>(components_to_write.size());
 
             } // end loop over vars
         } // end if proc 0
