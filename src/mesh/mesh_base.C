@@ -1894,7 +1894,14 @@ const std::string & MeshBase::subdomain_name(subdomain_id_type id) const
     return iter->second;
 }
 
-
+void MeshBase::set_subdomain_name(const subdomain_id_type id,
+                                  const std::string & name,
+                                  const bool synchronous)
+{
+  if (synchronous)
+    parallel_object_only();
+  _block_id_to_name[id] =  name;
+}
 
 
 subdomain_id_type MeshBase::get_id_by_name(std::string_view name) const
