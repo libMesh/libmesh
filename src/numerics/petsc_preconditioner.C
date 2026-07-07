@@ -189,9 +189,15 @@ void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const uns
                            "variables");
       // If not a 1st order Nédélec or a 2d 1st order Raviart-Thomas system, we
       // error out as we do not support anything else at the moment
-      libmesh_error_msg_if(sys.variable(v).type() != FEType(1, NEDELEC_ONE) &&
-                          (sys.variable(v).type() != FEType(1, RAVIART_THOMAS) ||
-                           sys.get_mesh().mesh_dimension() != 2),
+      const FEType & var_type = sys.variable(v).type();
+      const bool first_order_nedelec =
+        var_type.order == FIRST && var_type.family == NEDELEC_ONE;
+      const bool first_order_raviart_thomas =
+        var_type.order == FIRST && var_type.family == RAVIART_THOMAS;
+
+      libmesh_error_msg_if(!first_order_nedelec &&
+                           (!first_order_raviart_thomas ||
+                            sys.get_mesh().mesh_dimension() != 2),
                            "Error applying hypre AMS to a system "
                            "whose variable is not 1st order Nedelec or 1st "
                            "order Raviart-Thomas on a 2d mesh");
@@ -205,7 +211,11 @@ void PetscPreconditioner<T>::set_petsc_aux_data(PC & pc, System & sys, const uns
                            "variables");
       // If not a 3d 1st order Raviart-Thomas system, we error out as we do not
       // support anything else at the moment
-      libmesh_error_msg_if(sys.variable(v).type() != FEType(1, RAVIART_THOMAS) ||
+      const FEType & var_type = sys.variable(v).type();
+      const bool first_order_raviart_thomas =
+        var_type.order == FIRST && var_type.family == RAVIART_THOMAS;
+
+      libmesh_error_msg_if(!first_order_raviart_thomas ||
                            sys.get_mesh().mesh_dimension() != 3,
                            "Error applying hypre ADS to a system "
                            "whose variable is not 1st "
