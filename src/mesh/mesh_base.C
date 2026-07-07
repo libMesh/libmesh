@@ -1900,8 +1900,6 @@ void MeshBase::set_subdomain_name(const subdomain_id_type id,
 {
   if (synchronous)
     parallel_object_only();
-  else
-    this->unset_has_synched_subdomain_name_map();
   _block_id_to_name[id] =  name;
 }
 
