@@ -1695,6 +1695,17 @@ public:
   const std::string & subdomain_name(subdomain_id_type id) const;
 
   /**
+   * Sets the \p name for the provided \p id
+   * @param id The subdomain id to set the name for
+   * @param name The subdomain name
+   * @param synchronous Whether this method is being called across all mesh ranks. If this is true,
+   * then we don't have to register this collective container as being out of sync
+   */
+  void set_subdomain_name(subdomain_id_type id,
+                          const std::string & name,
+                          bool synchronous = false);
+
+  /**
    * \returns The id of the named subdomain if it exists,
    * \p Elem::invalid_subdomain_id otherwise.
    */
