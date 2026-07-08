@@ -536,6 +536,72 @@ public:
 };
 
 
+class SideHierarchicNodalSolnTest : public CppUnit::TestCase
+{
+public:
+  LIBMESH_CPPUNIT_TEST_SUITE( SideHierarchicNodalSolnTest );
+  CPPUNIT_TEST( testConstantQuad9 );
+  CPPUNIT_TEST_SUITE_END();
+
+  void testConstantQuad9()
+  {
+    LOG_UNIT_TEST;
+
+#if LIBMESH_DIM > 1
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square(mesh, 1, 1, 0., 1., 0., 1., QUAD9);
+
+    auto range = mesh.active_local_element_ptr_range();
+    if (range.begin() == range.end())
+      return;
+
+    const Elem * elem = *range.begin();
+    CPPUNIT_ASSERT_EQUAL(static_cast<int>(QUAD9),
+                         static_cast<int>(elem->type()));
+
+    const FEType fe_type(CONSTANT, SIDE_HIERARCHIC);
+    const std::vector<Number> elem_soln = {1, 3, 5, 7};
+
+    std::vector<Number> nodal_soln;
+    FEInterface::nodal_soln(/*dim=*/2,
+                            fe_type,
+                            elem,
+                            elem_soln,
+                            nodal_soln,
+                            /*add_p_level=*/false);
+
+    CPPUNIT_ASSERT_EQUAL(std::size_t(9), nodal_soln.size());
+
+    std::vector<Number> expected(nodal_soln.size(), 0);
+    std::vector<unsigned int> expected_count(nodal_soln.size(), 0);
+    for (const auto side : elem->side_index_range())
+      for (const auto n : elem->nodes_on_side(side))
+        {
+          expected[n] += elem_soln[side];
+          ++expected_count[n];
+        }
+
+    unsigned int n_nodes_without_side_value = 0;
+    for (const auto n : index_range(expected))
+      {
+        if (expected_count[n])
+          expected[n] /= expected_count[n];
+        else
+          ++n_nodes_without_side_value;
+
+        LIBMESH_ASSERT_NUMBERS_EQUAL(expected[n],
+                                     nodal_soln[n],
+                                     TOLERANCE * TOLERANCE);
+      }
+
+    CPPUNIT_ASSERT_EQUAL(1u, n_nodes_without_side_value);
+#endif
+  }
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION( SideHierarchicNodalSolnTest );
+
+
 #define INSTANTIATE_FESIDETEST(order, family, elemtype)                 \
   class FESideTest_##order##_##family##_##elemtype : public FESideTest<order, family, elemtype> { \
   public:                                                               \
