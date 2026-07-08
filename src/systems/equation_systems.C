@@ -582,7 +582,9 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
 bool EquationSystems::is_elemental_data_fe_type (const FEType & type)
 {
   return type.order == CONSTANT &&
-         (type.family == MONOMIAL || type.family == MONOMIAL_VEC);
+         (type.family == MONOMIAL ||
+          type.family == MONOMIAL_VEC ||
+          type.family == XYZ);
 }
 
 
@@ -1094,8 +1096,7 @@ EquationSystems::build_elemental_solution_vector (std::vector<Number> & soln,
 
   // Localize into 'soln', provided that parallel_soln is not empty.
   // Note: parallel_soln will be empty in the event that none of the
-  // input names were CONSTANT, MONOMIAL nor components of CONSTANT,
-  // MONOMIAL_VEC variables, or there were simply none of these in
+  // input names were elemental data variables, or there were simply none of these in
   // the EquationSystems object.
   soln.clear();
   if (parallel_soln)
@@ -1236,8 +1237,8 @@ std::unique_ptr<NumericVector<Number>>
 EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::string> & names) const
 {
   // Filter any names that aren't elemental variables and get the system indices for those that are.
-  // Note that it's probably fine if the names vector is empty since we'll still at least filter
-  // out all non-monomials. If there are no monomials, then nothing is output here.
+  // Note that it's probably fine if the names vector is empty since we'll still filter out all
+  // non-elemental-data variables. If there are none, then nothing is output here.
   std::vector<std::pair<unsigned int, unsigned int>> var_nums =
     this->find_elemental_data_variable_numbers(names);
 
@@ -1301,7 +1302,7 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
       const Variable & variable = system.variable(var);
       const DofMap & dof_map = system.get_dof_map();
 
-      // We need to check if the constant monomial is a scalar or a vector and set the number of
+      // We need to check if the elemental data variable is a scalar or a vector and set the number of
       // components for the latter as per es.find_variable_numbers().
       // Even for the case where a variable is not active on any subdomain belonging to the
       // processor, we still need to know this number to update 'var_ctr'.
@@ -1339,7 +1340,7 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
     } // end loop over var_nums
 
   // NOTE: number of output names might not be equal to the number passed to this function. Any that
-  // aren't CONSTANT MONOMIALS or components of CONSTANT MONOMIAL_VECS have been filtered out (see
+  // aren't elemental data variables have been filtered out (see
   // EquationSystems::find_variable_numbers).
   //
   // But, if everything is accounted for properly, then names.size() == var_ctr

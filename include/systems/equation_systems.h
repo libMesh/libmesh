@@ -284,8 +284,8 @@ public:
   /**
    * \returns Whether \p type can be represented as elemental data.
    *
-   * Elemental data variables are CONSTANT MONOMIALs and CONSTANT
-   * MONOMIAL_VECs, regardless of their p_refinement flag.
+   * Elemental data variables are CONSTANT element-interior fields,
+   * regardless of their p_refinement flag.
    */
   static bool is_elemental_data_fe_type (const FEType & type);
 
@@ -346,10 +346,9 @@ public:
                                   std::vector<std::set<subdomain_id_type>> & vars_active_subdomains) const;
 
   /**
-   * Retrieve the solution data for CONSTANT MONOMIALs and/or components of
-   * CONSTANT MONOMIAL_VECs. If 'names' is populated, only the variables
-   * corresponding to those names will be retrieved. This can be used to
-   * filter which variables are retrieved.
+   * Retrieve the solution data for elemental data variables. If 'names' is
+   * populated, only the variables corresponding to those names will be
+   * retrieved. This can be used to filter which variables are retrieved.
    *
    * This is the more appropriately-named replacement for the get_solution()
    * function defined above.
@@ -393,8 +392,7 @@ public:
   find_elemental_data_variable_numbers (std::vector<std::string> & names) const;
 
   /**
-   * Builds a parallel vector of CONSTANT MONOMIAL and/or components of
-   * CONSTANT MONOMIAL_VEC solution values corresponding to the entries
+   * Builds a parallel vector of elemental data solution values corresponding to the entries
    * in the input 'names' vector. This vector is approximately uniformly
    * distributed across all of the available processors.
    *
@@ -402,12 +400,12 @@ public:
    * implemented by calling this function and then calling
    * localize_to_one() on the resulting vector.
    *
-   * Returns a nullptr if no CONSTANT, MONOMIAL/MONOMIAL_VEC variables
-   * exist in the 'names' vector (if it is empty, then it will return all
-   * variables in the system of this type if any) or a std::unique_ptr to
+   * Returns a nullptr if no elemental data variables exist in the 'names'
+   * vector (if it is empty, then it will return all variables in the system
+   * of this type if any) or a std::unique_ptr to
    * a var-major numeric vector of total length n_elem * n_vars, where
    * n_vars includes all components of vectors, ordered according to:
-   * [u0, u1, ... uN, v0, v1, ... vN, w0, w1, ... wN] for constant monomial
+   * [u0, u1, ... uN, v0, v1, ... vN, w0, w1, ... wN] for elemental data
    * variables (u, v, w) on a mesh with N elements.
    */
   std::unique_ptr<NumericVector<Number>>

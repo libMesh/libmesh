@@ -723,6 +723,7 @@ public:
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("e", CONSTANT, MONOMIAL);
       sys.add_variable("e_no_p", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
+      sys.add_variable("e_xyz", FEType(CONSTANT, XYZ));
 
       MeshTools::Generation::build_square (mesh,
                                            3, 3,
@@ -756,6 +757,7 @@ public:
       System &sys = es.add_system<System> ("SimpleSystem");
       sys.add_variable("teste", CONSTANT, MONOMIAL);
       sys.add_variable("teste_no_p", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
+      sys.add_variable("teste_xyz", FEType(CONSTANT, XYZ));
 
       if (mesh.processor_id() == 0 || meshinput.is_parallel_format())
         meshinput.read(filename);
@@ -772,9 +774,11 @@ public:
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
       meshinput.copy_elemental_solution(sys, "teste", "r_e");
       meshinput.copy_elemental_solution(sys, "teste_no_p", "r_e_no_p");
+      meshinput.copy_elemental_solution(sys, "teste_xyz", "r_e_xyz");
 #else
       meshinput.copy_elemental_solution(sys, "teste", "e");
       meshinput.copy_elemental_solution(sys, "teste_no_p", "e_no_p");
+      meshinput.copy_elemental_solution(sys, "teste_xyz", "e_xyz");
 #endif
 
       // Exodus only handles double precision
@@ -788,6 +792,8 @@ public:
               (sys.point_value(0,p), 6*x+60*y, exotol);
             LIBMESH_ASSERT_NUMBERS_EQUAL
               (sys.point_value(1,p), 6*x+60*y, exotol);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (sys.point_value(2,p), 6*x+60*y, exotol);
           }
     }
   }
@@ -1007,6 +1013,7 @@ public:
     LOG_UNIT_TEST;
 
     const Real scalar_value = 42.;
+    const Real xyz_value = 84.;
     const std::vector<Real> vector_values = {10., 20., 30.};
 
     // first scope: write file
@@ -1018,6 +1025,8 @@ public:
       sys.add_variable("u", FIRST, L2_LAGRANGE);
       const auto c_var =
         sys.add_variable("c", FEType(CONSTANT, MONOMIAL).set_p_refinement(false));
+      const auto xyz_var =
+        sys.add_variable("xyz", FEType(CONSTANT, XYZ));
       const auto vec_var =
         sys.add_variable("vec", FEType(CONSTANT, MONOMIAL_VEC).set_p_refinement(false));
 
@@ -1036,6 +1045,7 @@ public:
             sys.solution->set(dof_indices[i], i);
 
           sys.solution->set(elem->dof_number(sys.number(), c_var, 0), scalar_value);
+          sys.solution->set(elem->dof_number(sys.number(), xyz_var, 0), xyz_value);
           for (auto comp : index_range(vector_values))
             sys.solution->set(elem->dof_number(sys.number(),
                                                vec_var,
@@ -1066,12 +1076,13 @@ public:
          "u_elem_corner_2",
          "u_elem_corner_3",
          "c",
+         "xyz",
          "vec_x",
          "vec_y",
          "vec_z"};
       std::vector<Real> expected_values =
         {0., 1., 2., 3.,
-         scalar_value, vector_values[0], vector_values[1], vector_values[2]};
+         scalar_value, xyz_value, vector_values[0], vector_values[1], vector_values[2]};
 
       // copy_elemental_solution currently requires ReplicatedMesh
       ReplicatedMesh mesh(*TestCommWorld);

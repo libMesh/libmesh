@@ -1188,14 +1188,13 @@ void ExodusII_IO::copy_elemental_solution(System & system,
   LOG_SCOPE("copy_elemental_solution()", "ExodusII_IO");
 
   const unsigned int var_num = system.variable_number(system_var_name);
-  // Assert that variable is an elemental one.
+  // Assert that variable is an elemental data variable.
   //
-  // NOTE: Currently, this reader is capable of reading only individual components of MONOMIAL_VEC
-  //       types, and each must be written out to its own CONSTANT MONOMIAL variable
+  // NOTE: Currently, this reader is capable of reading only individual components of vector types,
+  //       and each must be written out to its own scalar elemental data variable.
   const auto & var_type = system.variable_type(var_num);
-  libmesh_error_msg_if(var_type.order != CONSTANT ||
-                       (var_type.family != MONOMIAL && var_type.family != MONOMIAL_VEC),
-                       "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL nor CONSTANT MONOMIAL_VEC type.");
+  libmesh_error_msg_if(!EquationSystems::is_elemental_data_fe_type(var_type),
+                       "Error! Trying to copy elemental solution into a variable that is not elemental data.");
 
   const MeshBase & mesh = MeshInput<MeshBase>::mesh();
   const DofMap & dof_map = system.get_dof_map();
@@ -1419,7 +1418,7 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   std::vector<std::string> names;
 
   // If _output_variables is populated, build_elemental_solution_vector() will filter this list to
-  // the monomial variables that can be written as elemental data.
+  // the variables that can be written as elemental data.
   if (_output_variables.size() > 0)
     names.assign(_output_variables.begin(), _output_variables.end());
 
@@ -1500,10 +1499,10 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   // Get a subset of all variable names that can be written directly
   // as elemental data. We treat those slightly differently since they
   // truly only have a single value per Elem.
-  std::vector<std::string> monomial_var_names;
+  std::vector<std::string> elemental_var_names;
   if (!_output_variables.empty())
-    monomial_var_names.assign(_output_variables.begin(), _output_variables.end());
-  es.build_elemental_data_variable_names(monomial_var_names, system_names);
+    elemental_var_names.assign(_output_variables.begin(), _output_variables.end());
+  es.build_elemental_data_variable_names(elemental_var_names, system_names);
 
   // Remove all names from var_names that are not in _output_variables.
   // Note: This approach avoids errors when the user provides invalid
@@ -1680,12 +1679,11 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
     } // end loop over derived_var_names
 
   // At this point we've built the "true" list of derived names, but
-  // if there are any CONSTANT MONOMIALS in this list, we now want to
-  // remove all but one copy of them from the derived_var_names list,
-  // and rename them in (but not remove them from) the
-  // subdomain_to_var_names list, and then update the
-  // derived_vars_active_subdomains containers before finally calling
-  // the Exodus helper functions.
+  // if there are any elemental data variables in this list, we now want
+  // to remove all but one copy of them from the derived_var_names list,
+  // and rename them in (but not remove them from) the subdomain_to_var_names
+  // list, and then update the derived_vars_active_subdomains containers
+  // before finally calling the Exodus helper functions.
   for (auto & derived_var_name : derived_var_names)
     {
       // Get the original name associated with this derived name.
@@ -1696,9 +1694,9 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
       // Convenience variables for the map entry's contents.
       const std::string & orig_name = name_and_id.first;
 
-      // Was the original name a constant monomial?
-      if (std::count(monomial_var_names.begin(),
-                     monomial_var_names.end(),
+      // Was the original name an elemental data variable?
+      if (std::count(elemental_var_names.begin(),
+                     elemental_var_names.end(),
                      orig_name))
         {
           // Rename this variable in the subdomain_to_var_names vectors.
@@ -1722,7 +1720,7 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
 
           // Finally, rename the variable in the derived_var_names vector itself.
           derived_var_name = orig_name;
-        } // if (monomial)
+        } // if (elemental data)
     } // end loop over derived names
 
   // Now remove duplicate entries from derived_var_names after the first.
@@ -1730,7 +1728,7 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   {
     std::vector<std::string> derived_var_names_edited;
     std::vector<std::set<subdomain_id_type>> derived_vars_active_subdomains_edited;
-    std::vector<unsigned int> found_first(monomial_var_names.size());
+    std::vector<unsigned int> found_first(elemental_var_names.size());
 
     for (auto i : index_range(derived_var_names))
       {
@@ -1740,8 +1738,8 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
         // Determine whether we will keep this derived variable name in
         // the final container.
         bool keep = true;
-        for (auto j : index_range(monomial_var_names))
-          if (derived_var_name == monomial_var_names[j])
+        for (auto j : index_range(elemental_var_names))
+          if (derived_var_name == elemental_var_names[j])
             {
               if (!found_first[j])
                 found_first[j] = 1;

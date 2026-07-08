@@ -29,6 +29,7 @@
 #include "libmesh/utility.h" // deallocate
 #include "libmesh/boundary_info.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/fe_interface.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/numeric_vector.h"
@@ -1472,8 +1473,7 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   std::vector<std::string> names;
 
   // If _output_variables is populated, find_elemental_data_variable_numbers()
-  // will filter this list to the monomial variables that can be written as
-  // elemental data.
+  // will filter this list to the variables that can be written as elemental data.
   if (_output_variables.size())
     names.assign(_output_variables.begin(), _output_variables.end());
 
@@ -1482,12 +1482,12 @@ void Nemesis_IO::write_element_data (const EquationSystems & es)
   std::vector<std::pair<unsigned int, unsigned int>> var_nums =
     es.find_elemental_data_variable_numbers(names);
 
-  // find_variable_numbers() can return a nullptr, in which case there are no constant monomial
+  // find_variable_numbers() can return an empty vector, in which case there are no elemental data
   // variables to write, and we can just return.
   if (var_nums.empty())
     {
       if (_verbose)
-        libMesh::out << "No CONSTANT, MONOMIAL or CONSTANT, MONOMIAL_VEC data to be written." << std::endl;
+        libMesh::out << "No elemental data variables to be written." << std::endl;
       return;
     }
 
@@ -1743,8 +1743,9 @@ void Nemesis_IO::copy_elemental_solution(System & system,
 
   const unsigned int var_num = system.variable_number(system_var_name);
   const auto & var_type = system.variable_type(var_num);
-  libmesh_error_msg_if(var_type.order != CONSTANT || var_type.family != MONOMIAL,
-                       "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL type.");
+  libmesh_error_msg_if(!EquationSystems::is_elemental_data_fe_type(var_type) ||
+                       FEInterface::field_type(var_type) == TYPE_VECTOR,
+                       "Error! Trying to copy elemental solution into a variable that is not scalar elemental data.");
 
   const MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
