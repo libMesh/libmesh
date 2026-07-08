@@ -72,40 +72,62 @@ namespace
   }
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
+  enum class SolutionOrdering
+  {
+    variable_major,
+    geometry_major
+  };
+
+  std::size_t ordered_solution_index (const std::size_t var,
+                                      const std::size_t geometry_index,
+                                      const std::size_t num_vars,
+                                      const std::size_t num_geometric_entries,
+                                      const SolutionOrdering ordering)
+  {
+    if (ordering == SolutionOrdering::variable_major)
+      return var * num_geometric_entries + geometry_index;
+    else
+      return geometry_index * num_vars + var;
+  }
+
   std::vector<Real>
   complex_soln_components (const std::vector<Number> & soln,
-                           const unsigned int num_vars,
-                           const bool write_complex_abs)
+                           const std::size_t num_vars,
+                           const bool write_complex_abs,
+                           const SolutionOrdering source_ordering,
+                           const SolutionOrdering destination_ordering)
   {
-    unsigned int num_values = soln.size();
-    unsigned int num_elems = num_values / num_vars;
+    const std::size_t num_values = soln.size();
+    libmesh_assert_greater(num_vars, 0);
+    libmesh_assert_equal_to(num_values % num_vars, 0);
+    const std::size_t num_geometric_entries = num_values / num_vars;
 
     // This will contain the real and imaginary parts and the magnitude
     // of the values in soln
-    int nco = write_complex_abs ? 3 : 2;
+    const std::size_t nco = write_complex_abs ? 3 : 2;
+    const std::size_t num_complex_vars = nco * num_vars;
     std::vector<Real> complex_soln(nco * num_values);
 
-    for (unsigned i=0; i<num_vars; ++i)
-      {
-        for (unsigned int j=0; j<num_elems; ++j)
-          {
-            Number value = soln[i*num_vars + j];
-            complex_soln[nco*i*num_elems + j] = value.real();
-          }
-        for (unsigned int j=0; j<num_elems; ++j)
-          {
-            Number value = soln[i*num_vars + j];
-            complex_soln[nco*i*num_elems + num_elems + j] = value.imag();
-          }
-        if (write_complex_abs)
-          {
-            for (unsigned int j=0; j<num_elems; ++j)
-              {
-                Number value = soln[i*num_vars + j];
-                complex_soln[3*i*num_elems + 2*num_elems + j] = std::abs(value);
-              }
-          }
-      }
+    for (const auto var : make_range(num_vars))
+      for (const auto geometry_index : make_range(num_geometric_entries))
+        {
+          const Number value =
+            soln[ordered_solution_index
+                 (var, geometry_index, num_vars, num_geometric_entries, source_ordering)];
+
+          const std::size_t complex_var = nco * var;
+          complex_soln[ordered_solution_index
+                       (complex_var, geometry_index, num_complex_vars,
+                        num_geometric_entries, destination_ordering)] = value.real();
+          complex_soln[ordered_solution_index
+                       (complex_var + 1, geometry_index, num_complex_vars,
+                        num_geometric_entries, destination_ordering)] = value.imag();
+
+          if (write_complex_abs)
+            complex_soln[ordered_solution_index
+                         (complex_var + 2, geometry_index, num_complex_vars,
+                          num_geometric_entries, destination_ordering)] = std::abs(value);
+        }
 
     return complex_soln;
   }
@@ -1170,8 +1192,9 @@ void ExodusII_IO::copy_elemental_solution(System & system,
   //
   // NOTE: Currently, this reader is capable of reading only individual components of MONOMIAL_VEC
   //       types, and each must be written out to its own CONSTANT MONOMIAL variable
-  libmesh_error_msg_if((system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL))
-                       && (system.variable_type(var_num) != FEType(CONSTANT, MONOMIAL_VEC)),
+  const auto & var_type = system.variable_type(var_num);
+  libmesh_error_msg_if(var_type.order != CONSTANT ||
+                       (var_type.family != MONOMIAL && var_type.family != MONOMIAL_VEC),
                        "Error! Trying to copy elemental solution into a variable that is not of CONSTANT MONOMIAL nor CONSTANT MONOMIAL_VEC type.");
 
   const MeshBase & mesh = MeshInput<MeshBase>::mesh();
@@ -1395,25 +1418,10 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   // To be (possibly) filled with a filtered list of variable names to output.
   std::vector<std::string> names;
 
-  // If _output_variables is populated, only output the monomials which are
-  // also in the _output_variables vector.
+  // If _output_variables is populated, build_elemental_solution_vector() will filter this list to
+  // the monomial variables that can be written as elemental data.
   if (_output_variables.size() > 0)
-    {
-      // Create a list of CONSTANT MONOMIAL variable names
-      std::vector<std::string> monomials;
-      FEType type(CONSTANT, MONOMIAL);
-      es.build_variable_names(monomials, &type);
-
-      // Now concatenate a list of CONSTANT MONOMIAL_VEC variable names
-      type = FEType(CONSTANT, MONOMIAL_VEC);
-      es.build_variable_names(monomials, &type);
-
-      // Filter that list against the _output_variables list.  Note: if names is still empty after
-      // all this filtering, all the monomial variables will be gathered
-      for (const auto & var : monomials)
-        if (std::find(_output_variables.begin(), _output_variables.end(), var) != _output_variables.end())
-          names.push_back(var);
-    }
+    names.assign(_output_variables.begin(), _output_variables.end());
 
   // If we pass in a list of names to "build_elemental_solution_vector()"
   // it'll filter the variables coming back.
@@ -1446,7 +1454,9 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   exio_helper->initialize_element_variables(complex_names, complex_vars_active_subdomains);
 
   const std::vector<Real> complex_soln =
-    complex_soln_components(soln, names.size(), _write_complex_abs);
+    complex_soln_components(soln, names.size(), _write_complex_abs,
+                            SolutionOrdering::variable_major,
+                            SolutionOrdering::variable_major);
 
   exio_helper->write_element_values(mesh, complex_soln, _timestep, complex_vars_active_subdomains);
 
@@ -1487,22 +1497,13 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
   std::vector<std::string> var_names;
   es.build_variable_names (var_names, /*fetype=*/nullptr, system_names);
 
-  // Get a subset of all variable names that are CONSTANT,
-  // MONOMIALs. We treat those slightly differently since they can
+  // Get a subset of all variable names that can be written directly
+  // as elemental data. We treat those slightly differently since they
   // truly only have a single value per Elem.
-  //
-  // Should the same apply here for CONSTANT MONOMIAL_VECs? [CW]
-  // That is, get rid of 'const' on 'fe_type' and rerun:
-  //    fe_type = FEType(CONSTANT, MONOMIAL_VEC);
-  //    es.build_variable_names(monomial_var_names, &fe_type);
-  // Then, es.find_variable_numbers() can be used without a type
-  // (since we know for sure they're monomials) like:
-  //    var_nums = es.find_variable_numbers(monomial_var_names)
-  // for which the DOF indices for 'var_nums' have to be resolved
-  // manually like in build_elemental_solution_vector()
   std::vector<std::string> monomial_var_names;
-  const FEType fe_type(CONSTANT, MONOMIAL);
-  es.build_variable_names(monomial_var_names, &fe_type);
+  if (!_output_variables.empty())
+    monomial_var_names.assign(_output_variables.begin(), _output_variables.end());
+  es.build_elemental_data_variable_names(monomial_var_names, system_names);
 
   // Remove all names from var_names that are not in _output_variables.
   // Note: This approach avoids errors when the user provides invalid
@@ -1519,17 +1520,6 @@ ExodusII_IO::write_element_data_from_discontinuous_nodal_data
                               _output_variables.end(),
                               name);}),
          var_names.end());
-
-      // Also filter the monomial variable names.
-      monomial_var_names.erase
-        (std::remove_if
-         (monomial_var_names.begin(),
-          monomial_var_names.end(),
-          [this](const std::string & name)
-          {return !std::count(_output_variables.begin(),
-                              _output_variables.end(),
-                              name);}),
-         monomial_var_names.end());
     }
 
   // Build a solution vector, limiting the results to the variables in
@@ -2019,7 +2009,9 @@ void ExodusII_IO::write_global_data (const std::vector<Number> & soln,
   exio_helper->initialize_global_variables(complex_names);
 
   const std::vector<Real> complex_soln =
-    complex_soln_components(soln, names.size(), _write_complex_abs);
+    complex_soln_components(soln, names.size(), _write_complex_abs,
+                            SolutionOrdering::variable_major,
+                            SolutionOrdering::variable_major);
 
   exio_helper->write_global_values(complex_soln, _timestep);
 
