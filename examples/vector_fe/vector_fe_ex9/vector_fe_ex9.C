@@ -94,6 +94,12 @@ main(int argc, char ** argv)
   // Skip higher-dimensional examples on a lower-dimensional libMesh build.
   libmesh_example_requires(dimension <= LIBMESH_DIM, dimension << "D support");
 
+      // We only support static condensation calculations with Eigen
+#if !defined(LIBMESH_HAVE_EIGEN_DENSE)
+  if (libMesh::on_command_line("--HDG-static-condensation"))
+    libmesh_example_requires(false, "--enable-eigen");
+#endif
+
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
   Mesh mesh(init.comm());
