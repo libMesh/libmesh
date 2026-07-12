@@ -30,22 +30,22 @@ fi
 echo "Testing examples in $examples_install_path"
 
 if test "$PKG_CONFIG" != "no"; then
-    installed_CXXFLAGS=$(pkg-config libmesh --cflags)
+    installed_CXXFLAGS="$(pkg-config libmesh --cflags) $(pkg-config libmesh --variable=cxxflags_extra)"
     installed_LIBS=$(pkg-config libmesh --libs)
 
+    echo "Using pkg-config CXXFLAGS $installed_CXXFLAGS"
+    echo "Using pkg-config LIBS $installed_LIBS"
 elif test -x $LIBMESH_CONFIG_PATH/libmesh-config; then
     installed_CXXFLAGS=$($LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include)
     installed_LIBS=$($LIBMESH_CONFIG_PATH/libmesh-config --libs)
 
+    echo "Using libmesh-config CXXFLAGS $installed_CXXFLAGS"
+    echo "Using libmesh-config LIBS $installed_LIBS"
 else
     echo "Cannot query package installation!!"
     exit 1
 fi
 
-
-
-#echo "installed_CXXFLAGS=$installed_CXXFLAGS"
-#echo "installed_LIBS=$installed_LIBS"
 
 # this function handles the I/O and compiling of a particular example.
 # by encapsulating this in a function we can fork it and run multiple builds
