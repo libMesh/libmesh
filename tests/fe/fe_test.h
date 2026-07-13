@@ -503,6 +503,9 @@ public:
       {
         for (auto elem : _mesh->active_element_ptr_range())
           {
+            // Workaround for nvc++ bug
+            Elem & e = *elem;
+
             const unsigned int nv = elem->n_vertices();
             const unsigned int nn = elem->n_nodes();
             // We want interiors in lower dimensional elements treated
@@ -515,15 +518,15 @@ public:
             const unsigned int nvef = std::min(nve + n_faces, nn);
 
             for (unsigned int i = 0; i != nv; ++i)
-              elem->node_ref(i).set_extra_datum<Real>(weight_index, 1.);
+              e.node_ref(i).set_extra_datum<Real>(weight_index, 1.);
             for (unsigned int i = nv; i != nve; ++i)
-              elem->node_ref(i).set_extra_datum<Real>(weight_index, rational_w);
+              e.node_ref(i).set_extra_datum<Real>(weight_index, rational_w);
             const Real w2 = rational_w * rational_w;
             for (unsigned int i = nve; i != nvef; ++i)
-              elem->node_ref(i).set_extra_datum<Real>(weight_index, w2);
+              e.node_ref(i).set_extra_datum<Real>(weight_index, w2);
             const Real w3 = rational_w * w2;
             for (unsigned int i = nvef; i != nn; ++i)
-              elem->node_ref(i).set_extra_datum<Real>(weight_index, w3);
+              e.node_ref(i).set_extra_datum<Real>(weight_index, w3);
           }
       }
 

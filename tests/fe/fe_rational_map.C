@@ -73,9 +73,12 @@ public:
 
     for (auto node : _mesh->node_ptr_range())
       {
+        // Workaround for nvc++ bug
+        Node & n = *node;
+
         Real & x = (*node)(0);
         Real & y = (*node)(1);
-        node->set_extra_datum<Real>(weight_index, 1);
+        n.set_extra_datum<Real>(weight_index, 1);
         if (y > .6)
           {
             y = .5 + x;
@@ -85,7 +88,7 @@ public:
           {
             y = .5 + x;
             x = y - .5;
-            node->set_extra_datum<Real>(weight_index, sqrt(Real(2))/2);
+            n.set_extra_datum<Real>(weight_index, sqrt(Real(2))/2);
           }
       }
 
