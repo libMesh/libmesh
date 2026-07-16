@@ -85,7 +85,8 @@ public:
         // that has a 135 degree angle
         CPPUNIT_ASSERT_LESSEQUAL(135 + TOLERANCE, max_angle);
 
-        if (elem->type() == C0POLYGON)
+        if (elem->type() == C0POLYGON ||
+            elem->type() == C0POLYHEDRON)
           {
             const std::vector<ElemQuality> expected = {
               EDGE_LENGTH_RATIO,
@@ -95,7 +96,7 @@ public:
               MIN_ANGLE
             };
 
-            CPPUNIT_ASSERT(expected == Quality::valid(C0POLYGON));
+            CPPUNIT_ASSERT(expected == Quality::valid(elem->type()));
 
             for (const auto quality : expected)
               {
