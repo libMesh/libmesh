@@ -2592,11 +2592,11 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   num_face_blk = 0;
 
   dof_id_type local_num_c0polyhedron_faces = 0;
-  int has_c0polyhedron = 0;
+  bool has_c0polyhedron = false;
   for (const auto & elem : mesh.active_local_element_ptr_range())
     if (elem->type() == C0POLYHEDRON)
       {
-        has_c0polyhedron = 1;
+        has_c0polyhedron = true;
         local_num_c0polyhedron_faces += elem->n_sides();
       }
 
