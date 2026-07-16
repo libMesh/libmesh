@@ -67,8 +67,6 @@ static constexpr int libmesh_max_str_length = MAX_LINE_LENGTH;
 
 using namespace libMesh;
 
-constexpr int c0polyhedron_face_block_id = 1;
-
 // File scope constant node/edge/face mapping arrays.
 // 2D inverse face map definitions.
 // These take a libMesh ID and turn it into an Exodus ID
@@ -203,7 +201,10 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
 
 
   std::map<subdomain_id_type, std::vector<unsigned int>>
-  build_subdomain_map(const MeshBase & mesh, bool add_sides, subdomain_id_type & subdomain_id_end)
+  build_subdomain_map(const MeshBase & mesh,
+                      bool add_sides,
+                      subdomain_id_type & subdomain_id_end,
+                      int & next_block_id)
   {
     std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
 
@@ -249,6 +250,11 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
 
     if (!add_sides && !subdomain_map.empty())
       subdomain_id_end = subdomain_map.rbegin()->first + 1;
+
+    // Allocate optional block IDs after both mesh subdomains and any blocks
+    // synthesized for visualization sides.
+    if (!subdomain_map.empty())
+      next_block_id = cast_int<int>(subdomain_map.rbegin()->first) + 1;
 
     return subdomain_map;
   }
@@ -2574,7 +2580,11 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
   // We need to know about all processors' subdomains
   subdomain_id_type subdomain_id_end = 0;
-  auto subdomain_map = build_subdomain_map(mesh, _add_sides, subdomain_id_end);
+  int c0polyhedron_face_block_id = -1;
+  auto subdomain_map = build_subdomain_map(mesh,
+                                           _add_sides,
+                                           subdomain_id_end,
+                                           c0polyhedron_face_block_id);
 
   num_elem = n_active_elem;
   num_nodes = 0;
@@ -2943,7 +2953,11 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   // Map from block ID to a vector of element IDs in that block.  Element
   // IDs are now of type dof_id_type, subdomain IDs are of type subdomain_id_type.
   subdomain_id_type subdomain_id_end = 0;
-  auto subdomain_map = build_subdomain_map(mesh, _add_sides, subdomain_id_end);
+  int c0polyhedron_face_block_id = -1;
+  auto subdomain_map = build_subdomain_map(mesh,
+                                           _add_sides,
+                                           subdomain_id_end,
+                                           c0polyhedron_face_block_id);
 
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
