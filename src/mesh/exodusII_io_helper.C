@@ -3373,6 +3373,19 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   c0polyhedron_face_node_counts.reserve(c0polyhedron_total_faces);
   int next_c0polyhedron_face_id = 1;
 
+  const auto get_exodus_node_id = [&](const Elem &elem,
+                                  dof_id_type elem_id,
+                                  unsigned int elem_node_index)
+                                   -> int
+  {
+    if (!use_discontinuous)
+    return libmesh_map_find(libmesh_node_num_to_exodus,
+                            cast_int<int>(elem.node_id(elem_node_index)));
+
+    return cast_int<int>(libmesh_map_find(discontinuous_node_indices,
+                                          std::make_pair(elem_id, elem_node_index)));
+  };
+
   for (auto & [subdomain_id, element_id_vec] : subdomain_map)
     {
       // Use the first element in the block to get representative
@@ -3386,15 +3399,17 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       const auto & conv = get_conversion(elem_t);
       const bool is_c0polygon_block = (elem_t == C0POLYGON);
       const bool is_c0polyhedron_block = (elem_t == C0POLYHEDRON);
+      const bool is_variable_connectivity_block =
+        is_c0polygon_block || is_c0polyhedron_block;
       std::vector<int> c0polygon_node_counts;
       std::vector<int> c0polyhedron_face_counts;
 
-      if (is_c0polygon_block && subdomain_id >= subdomain_id_end)
-        libmesh_not_implemented_msg("Support for C0POLYGON side blocks not yet implemented");
-      if (is_c0polyhedron_block && subdomain_id >= subdomain_id_end)
-        libmesh_not_implemented_msg("Support for C0POLYHEDRON side blocks not yet implemented");
+      if (is_variable_connectivity_block && subdomain_id >= subdomain_id_end)
+        libmesh_not_implemented_msg("Support for " <<
+                                    Utility::enum_to_string(elem_t) <<
+                                    " side blocks not yet implemented");
 
-      if (!is_c0polygon_block && !is_c0polyhedron_block)
+      if (!is_variable_connectivity_block)
         {
           num_nodes_per_elem = Elem::type_to_n_nodes_map[elem_t];
           if (Elem::type_to_n_nodes_map[elem_t] == invalid_uint)
@@ -3405,18 +3420,56 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
       // element ids to add.
       if (subdomain_id < subdomain_id_end)
       {
+        if (is_variable_connectivity_block)
+            connect.clear();
         if (is_c0polygon_block)
-          {
-            connect.clear();
             c0polygon_node_counts.reserve(element_id_vec.size());
-          }
         else if (is_c0polyhedron_block)
-          {
-            connect.clear();
             c0polyhedron_face_counts.reserve(element_id_vec.size());
-          }
         else
           connect.resize(element_id_vec.size()*num_nodes_per_elem);
+
+        const auto add_c0polygon_connectivity =
+            [&](const Elem &elem, dof_id_type elem_id)
+        {
+          c0polygon_node_counts.push_back(cast_int<int>(elem.n_nodes()));
+          for (auto elem_node_index : elem.node_index_range())
+            connect.push_back(get_exodus_node_id(elem, elem_id, elem_node_index));
+
+        };
+
+        const auto add_c0polyhedron_connectivity =
+            [&](const Elem &elem, dof_id_type elem_id)
+        {
+          c0polyhedron_face_counts.push_back(cast_int<int>(elem.n_sides()));
+
+          for (auto s: elem.side_index_range())
+          {
+            connect.push_back(next_c0polyhedron_face_id++);
+
+            const std::vector<unsigned int> side_nodes = elem.nodes_on_side(s);
+            c0polyhedron_face_node_counts.push_back(cast_int<int>(side_nodes.size()));
+
+            for (const auto elem_node_index : side_nodes)
+            c0polyhedron_face_connect.push_back(
+              get_exodus_node_id(elem, elem_id, elem_node_index));
+          }
+        };
+
+        const auto add_fixed_connectivity =
+          [&](const Elem &elem, dof_id_type elem_id, std::size_t elem_index)
+        {
+          for (unsigned int j = 0;
+              j < static_cast<unsigned int>(num_nodes_per_elem);
+              ++j)
+          {
+            const auto connect_index =
+              cast_int<unsigned int>((elem_index * num_nodes_per_elem) + j);
+            const auto elem_node_index = conv.get_inverse_node_map(j);
+            connect[connect_index] =
+              get_exodus_node_id(elem, elem_id, elem_node_index);
+          }
+        };
 
         for (auto i : index_range(element_id_vec))
         {
@@ -3444,91 +3497,11 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                                << " in the same block!");
 
           if (is_c0polygon_block)
-            {
-              c0polygon_node_counts.push_back(cast_int<int>(elem.n_nodes()));
-
-              for (auto elem_node_index : elem.node_index_range())
-                {
-                  if (!use_discontinuous)
-                    {
-                      // The global id for the current node in libmesh.
-                      dof_id_type libmesh_node_id = elem.node_id(elem_node_index);
-
-                      // Write the Exodus global node id associated with
-                      // this libmesh node number to the connectivity
-                      // array, or throw an error if it's not found.
-                      connect.push_back
-                        (libmesh_map_find(libmesh_node_num_to_exodus,
-                                          cast_int<int>(libmesh_node_id)));
-                    }
-                  else
-                    {
-                      // Look up the (elem_id, elem_node_index) pair in the map.
-                      connect.push_back
-                        (libmesh_map_find(discontinuous_node_indices,
-                                          std::make_pair(elem_id, elem_node_index)));
-                    }
-                }
-            }
+            add_c0polygon_connectivity(elem, elem_id);
           else if (is_c0polyhedron_block)
-            {
-              c0polyhedron_face_counts.push_back(cast_int<int>(elem.n_sides()));
-
-              for (auto s : elem.side_index_range())
-                {
-                  connect.push_back(next_c0polyhedron_face_id++);
-
-                  const std::vector<unsigned int> side_nodes =
-                    elem.nodes_on_side(s);
-                  c0polyhedron_face_node_counts.push_back
-                    (cast_int<int>(side_nodes.size()));
-
-                  for (const auto elem_node_index : side_nodes)
-                    {
-                      if (!use_discontinuous)
-                        {
-                          const dof_id_type libmesh_node_id =
-                            elem.node_id(elem_node_index);
-                          c0polyhedron_face_connect.push_back
-                            (libmesh_map_find(libmesh_node_num_to_exodus,
-                                              cast_int<int>(libmesh_node_id)));
-                        }
-                      else
-                        {
-                          c0polyhedron_face_connect.push_back
-                            (libmesh_map_find(discontinuous_node_indices,
-                                              std::make_pair(elem_id, elem_node_index)));
-                        }
-                    }
-                }
-            }
+            add_c0polyhedron_connectivity(elem, elem_id);
           else
-            {
-              for (unsigned int j=0; j<static_cast<unsigned int>(num_nodes_per_elem); ++j)
-                {
-                  unsigned int connect_index   = cast_int<unsigned int>((i*num_nodes_per_elem)+j);
-                  unsigned elem_node_index = conv.get_inverse_node_map(j); // inverse node map is for writing.
-                  if (!use_discontinuous)
-                    {
-                      // The global id for the current node in libmesh.
-                      dof_id_type libmesh_node_id = elem.node_id(elem_node_index);
-
-                      // Write the Exodus global node id associated with
-                      // this libmesh node number to the connectivity
-                      // array, or throw an error if it's not found.
-                      connect[connect_index] =
-                        libmesh_map_find(libmesh_node_num_to_exodus,
-                                         cast_int<int>(libmesh_node_id));
-                    }
-                  else
-                    {
-                      // Look up the (elem_id, elem_node_index) pair in the map.
-                      connect[connect_index] =
-                        libmesh_map_find(discontinuous_node_indices,
-                                         std::make_pair(elem_id, elem_node_index));
-                    }
-                } // end for(j)
-            }
+            add_fixed_connectivity(elem, elem_id, i);
 
           // push_back() either elem_id+1 or the current Elem's
           // unique_id+1 into the elem_num_map, depending on the value
