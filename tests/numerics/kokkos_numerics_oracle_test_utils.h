@@ -5,7 +5,9 @@
 
 // Avoid conflicting complex operators between CUDA and PETSc
 #define PETSC_SKIP_CXX_COMPLEX_FIX 1
+#include "libmesh/ignore_warnings.h"
 #include <Kokkos_Core.hpp>
+#include "libmesh/restore_warnings.h"
 #undef __CUDACC_VER__
 
 #include <cmath>

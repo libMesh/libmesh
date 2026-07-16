@@ -106,6 +106,7 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_cxx_compiler_standard.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_paranoid.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_werror.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_kokkos.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_mpi.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_precision.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_scrape_petsc_configure.m4 \
@@ -134,8 +135,8 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/exodus.m4 $(top_srcdir)/m4/feexcept.m4 \
 	$(top_srcdir)/m4/fparser.m4 $(top_srcdir)/m4/glpk.m4 \
 	$(top_srcdir)/m4/gmv.m4 $(top_srcdir)/m4/gz.m4 \
-	$(top_srcdir)/m4/hdf5.m4 $(top_srcdir)/m4/kokkos.m4 \
-	$(top_srcdir)/m4/laspack.m4 $(top_srcdir)/m4/libhilbert.m4 \
+	$(top_srcdir)/m4/hdf5.m4 $(top_srcdir)/m4/laspack.m4 \
+	$(top_srcdir)/m4/libhilbert.m4 \
 	$(top_srcdir)/m4/libmesh_compiler_features.m4 \
 	$(top_srcdir)/m4/libmesh_core_features.m4 \
 	$(top_srcdir)/m4/libmesh_metaphysicl.m4 \
@@ -1030,6 +1031,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+KOKKOS_BACKEND = @KOKKOS_BACKEND@
 KOKKOS_CPPFLAGS = @KOKKOS_CPPFLAGS@
 KOKKOS_CXX = @KOKKOS_CXX@
 KOKKOS_CXXFLAGS = @KOKKOS_CXXFLAGS@

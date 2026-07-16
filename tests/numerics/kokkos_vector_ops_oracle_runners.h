@@ -44,13 +44,13 @@ test_vector_ops_case(const vector_case & info)
       const Vec outer_left = a_ref * Real(5.0);
       const Vec mult_assign = a_ref * Real(5.0);
       const Vec div_assign = a_ref / Real(5.0);
-      const Vec assign_zero = libMesh::Kokkos::zero_vector_value<Vec>();
 
       const Real dot = libMesh::Kokkos::vector_dot(a_ref, b_ref);
       const Real contract = a_ref.contract(b_ref);
       const Real norm = mix.norm();
       const Real norm_sq = mix.norm_sq();
-      const Vec zero = libMesh::Kokkos::zero_vector_value<Vec>();
+      const Vec zero; // By default initialization
+      const Vec assign_zero = zero;
 
       unsigned int vector_offset = 0;
       libMesh::Kokkos::store_vector(d_vectors, vector_offset++, copied);
@@ -67,6 +67,7 @@ test_vector_ops_case(const vector_case & info)
 
       unsigned int scalar_offset = 0;
       d_scalars(scalar_offset++) = a_ref * b_ref;
+      d_scalars(scalar_offset++) = dot;
       d_scalars(scalar_offset++) = contract;
       d_scalars(scalar_offset++) = norm;
       d_scalars(scalar_offset++) = norm_sq;
@@ -104,7 +105,7 @@ test_vector_ops_case(const vector_case & info)
 #if LIBMESH_DIM > 2
       const Vec cross = a_ref.cross(b_ref);
       Vec unit_cross = cross;
-      if (libMesh::Kokkos::vector_norm(cross) > unit_tol)
+      if (cross.norm() > unit_tol)
         unit_cross = libMesh::Kokkos::vector_unit<Vec>(cross);
 
       libMesh::Kokkos::store_vector(d_vectors, vector_offset++, cross);
@@ -225,7 +226,7 @@ test_mixed_representation_ops()
 #if LIBMESH_DIM > 2
       const auto cross = a_ref.cross(b);
       Vec unit_cross = cross;
-      if (libMesh::Kokkos::vector_norm(cross) > unit_tol)
+      if (cross.norm() > unit_tol)
         unit_cross = libMesh::Kokkos::vector_unit<Vec>(cross);
 
       libMesh::Kokkos::store_vector(d_vectors, 3, cross);

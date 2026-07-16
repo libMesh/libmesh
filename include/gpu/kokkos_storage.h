@@ -27,7 +27,7 @@ void store_vector(const ViewType & view, const unsigned int i, const VectorType 
   auto out = make_vector_ref(view, i);
 
   for (unsigned int d = 0; d < LIBMESH_DIM; ++d)
-    vector_set_component(out, d, vector_get_component(v, d));
+    out(d) = v(d);
 }
 
 template <typename TensorType, typename ViewType>
@@ -45,7 +45,7 @@ void store_tensor(const ViewType & view, const unsigned int i, const TensorType 
 
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out, row, col, tensor_get_component(T, row, col));
+      out(row, col) = T(row, col);
 }
 
 } // namespace libMesh::Kokkos

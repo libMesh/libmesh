@@ -26,8 +26,10 @@
 // methods are callable from both host and device code.  In all other
 // translation units it expands to plain `inline`.
 #ifdef LIBMESH_KOKKOS_COMPILATION
+#  include "libmesh/ignore_warnings.h"
 #  include <Kokkos_Macros.hpp>
 #  include <Kokkos_Abort.hpp>
+#  include "libmesh/restore_warnings.h"
 #  define LIBMESH_DEVICE_INLINE KOKKOS_INLINE_FUNCTION
 
 // Backend-neutral device-code detection for Kokkos .K translation units.

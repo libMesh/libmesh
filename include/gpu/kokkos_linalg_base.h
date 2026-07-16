@@ -96,13 +96,10 @@ public:
     return _view(_index, component);
   }
 
-  template <typename Scalar>
   LIBMESH_DEVICE_INLINE
-  void set(const unsigned int component, const Scalar & value)
+  decltype(auto) operator()(const unsigned int component)
   {
-    static_assert(std::is_assignable<decltype(_view(_index, component)), const Scalar &>::value,
-                  "Cannot write through a vector_ref built from a read-only view");
-    _view(_index, component) = value;
+    return _view(_index, component);
   }
 
   template <typename RightVector>
@@ -178,13 +175,10 @@ public:
     return _view(_index, row, col);
   }
 
-  template <typename Scalar>
   LIBMESH_DEVICE_INLINE
-  void set(const unsigned int row, const unsigned int col, const Scalar & value)
+  decltype(auto) operator()(const unsigned int row, const unsigned int col)
   {
-    static_assert(std::is_assignable<decltype(_view(_index, row, col)), const Scalar &>::value,
-                  "Cannot write through a tensor_ref built from a read-only view");
-    _view(_index, row, col) = value;
+    return _view(_index, row, col);
   }
 
   template <typename RightTensor>
@@ -263,21 +257,18 @@ private:
 template <typename T>
 struct vector_traits<libMesh::TypeVector<T>>
 {
-  using value_type = T;
   using semantic_type = libMesh::TypeVector<T>;
 };
 
 template <typename T>
 struct vector_traits<libMesh::VectorValue<T>>
 {
-  using value_type = T;
   using semantic_type = libMesh::VectorValue<T>;
 };
 
 template <>
 struct vector_traits<libMesh::Point>
 {
-  using value_type = libMesh::Real;
   using semantic_type = libMesh::Point;
 };
 
@@ -316,14 +307,12 @@ struct is_vector_ref<vector_ref<ViewType>> : std::true_type
 template <typename T>
 struct tensor_traits<libMesh::TypeTensor<T>>
 {
-  using value_type = T;
   using semantic_type = libMesh::TypeTensor<T>;
 };
 
 template <typename T>
 struct tensor_traits<libMesh::TensorValue<T>>
 {
-  using value_type = T;
   using semantic_type = libMesh::TensorValue<T>;
 };
 
@@ -355,68 +344,10 @@ struct is_tensor_ref<tensor_ref<ViewType>> : std::true_type
 };
 
 template <typename T>
-using vector_value_type_t = typename vector_traits<detail::remove_cvref_t<T>>::value_type;
-
-template <typename T>
-using tensor_value_type_t = typename tensor_traits<detail::remove_cvref_t<T>>::value_type;
-
-template <typename T>
 using vector_semantic_type_t = typename vector_traits<detail::remove_cvref_t<T>>::semantic_type;
 
 template <typename T>
 using tensor_semantic_type_t = typename tensor_traits<detail::remove_cvref_t<T>>::semantic_type;
-
-template <typename T>
-LIBMESH_DEVICE_INLINE
-decltype(auto)
-vector_get_component(const T & v, const unsigned int component)
-{
-  return v(component);
-}
-
-template <typename T, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void vector_set_component(T & v, const unsigned int component, const Scalar & value)
-{
-  v(component) = value;
-}
-
-template <typename ViewType, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void vector_set_component(vector_ref<ViewType> v,
-                          const unsigned int component,
-                          const Scalar & value)
-{
-  v.set(component, value);
-}
-
-template <typename T>
-LIBMESH_DEVICE_INLINE
-decltype(auto)
-tensor_get_component(const T & T_in, const unsigned int row, const unsigned int col)
-{
-  return T_in(row, col);
-}
-
-template <typename T, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void tensor_set_component(T & T_out,
-                          const unsigned int row,
-                          const unsigned int col,
-                          const Scalar & value)
-{
-  T_out(row, col) = value;
-}
-
-template <typename ViewType, typename Scalar>
-LIBMESH_DEVICE_INLINE
-void tensor_set_component(tensor_ref<ViewType> T_out,
-                          const unsigned int row,
-                          const unsigned int col,
-                          const Scalar & value)
-{
-  T_out.set(row, col, value);
-}
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
@@ -445,7 +376,7 @@ OutputVector materialize_vector(const VectorLike & v)
   out.zero();
 
   for (unsigned int component = 0; component < LIBMESH_DIM; ++component)
-    vector_set_component(out, component, vector_get_component(v, component));
+    out(component) = v(component);
 
   return out;
 }
@@ -462,7 +393,7 @@ OutputTensor materialize_tensor(const TensorLike & T_in)
 
   for (unsigned int row = 0; row < LIBMESH_DIM; ++row)
     for (unsigned int col = 0; col < LIBMESH_DIM; ++col)
-      tensor_set_component(out, row, col, tensor_get_component(T_in, row, col));
+      out(row, col) = T_in(row, col);
 
   return out;
 }
