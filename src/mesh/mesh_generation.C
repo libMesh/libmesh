@@ -1217,10 +1217,15 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             {
               const dof_id_type grid_nodes =
                 cast_int<dof_id_type>((nx+1)*(ny+1)*(nz+1));
-              mesh.reserve_nodes(grid_nodes +
-                                 (type == C0POLYHEDRON ?
-                                  cast_int<dof_id_type>(nx*ny*nz) :
-                                  0));
+
+              // Reserve one interior node per polyhedron for the robust
+              // fallback tetrahedralization used when the preferred
+              // tetrahedralization cannot be constructed.
+              const dof_id_type mid_polyhedron_nodes =
+                (type == C0POLYHEDRON) ?
+                cast_int<dof_id_type>(nx*ny*nz) : 0;
+
+              mesh.reserve_nodes(grid_nodes + mid_polyhedron_nodes);
               break;
             }
 
