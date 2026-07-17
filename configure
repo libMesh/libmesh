@@ -905,6 +905,7 @@ PROFILING_FLAGS
 RPATHFLAG
 CXXSHAREDFLAG
 NODEPRECATEDFLAG
+ACSM_IEEE754_FLAGS
 CFLAGS_DVL
 CXXFLAGS_DVL
 GXX_VERSION
@@ -36316,6 +36317,9 @@ then :
                     ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DEVEL -O2 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused"
           ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DEVEL -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
           ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
+
+          ACSM_IEEE754_FLAGS="-fno-unsafe-math-optimizations -fexcess-precision=standard -ffp-contract=off"
+
           ACSM_NODEPRECATEDFLAG="-Wno-deprecated"
 
                     ACSM_FPE_SAFETY_FLAGS="-ftrapping-math"
@@ -36378,12 +36382,15 @@ else case e in #(
                           ACSM_CXXFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10 -qrtti=all -qstaticinline"
                           ACSM_CXXFLAGS_DBG="-qmaxmem=-1 -qansialias -qrtti=all -g -qstaticinline"
                           ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DBG"
+                          ACSM_IEEE754_FLAGS="" # FIXME - not sure here
                           ACSM_NODEPRECATEDFLAG=""
                           ACSM_CFLAGS_OPT="-O3 -qmaxmem=-1 -w -qansialias -Q=10"
                           ACSM_CFLAGS_DBG="-qansialias -g"
                           ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_DBG"
                          ;; #(
               intel_*) :
+
+                          ACSM_IEEE754_FLAGS="" # FIXME - not sure here
 
                                                     ACSM_NODEPRECATEDFLAG="-Wno-deprecated"
 
@@ -36411,6 +36418,7 @@ else case e in #(
                                     ACSM_CFLAGS_DBG="$ACSM_CFLAGS_DBG -w1 -g -wd266 -wd1572 -wd488 -wd161"
                                     ACSM_CFLAGS_OPT="$ACSM_CFLAGS_OPT -O3 -unroll -w0 -ftz"
                                     ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_DBG"
+                                    ACSM_IEEE754_FLAGS="-fp-model precise -no-fma"
                                    ;; #(
   intel_icx_*) :
 
@@ -36421,6 +36429,7 @@ else case e in #(
                                     ACSM_CFLAGS_DBG="$ACSM_CFLAGS_DBG -O0 -g"
                                     ACSM_CFLAGS_OPT="$ACSM_CFLAGS_OPT -O3"
                                     ACSM_CFLAGS_DEVEL="$ACSM_CFLAGS_DEVEL -O2 -g"
+                                    ACSM_IEEE754_FLAGS="-fp-model=precise -ffp-contract=off"
                                    ;; #(
   *) :
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: Unknown Intel compiler \"$ACSM_GXX_VERSION\"" >&5
@@ -36442,6 +36451,8 @@ esac
                                                                                     ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -O0 --display_error_number -g -pedantic -Wno-long-long -Wunused -Wuninitialized --diag_suppress=11,111,177,445,1676"
                                 ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DEVEL -O2 --display_error_number -g -pedantic -Wno-long-long -Wunused -Wuninitialized --diag_suppress=11,111,177,445,1676"
                                 ACSM_CXXFLAGS_OPT="$ACSM_CXXFLAGS_OPT -O2 --display_error_number --diag_suppress=11,111,177,445,1676"
+
+                                ACSM_IEEE754_FLAGS="-fp-model=precise -ffp-contract=off -Kieee"
 
                                 ACSM_NODEPRECATEDFLAG="-Wno-deprecated-declarations"
 
@@ -36465,6 +36476,8 @@ fi
                                 ACSM_CXXFLAGS_OPT="$ACSM_CXXFLAGS_OPT -O2 --no_using_std -fast -Minform=severe"
                                 ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DBG"
 
+                                ACSM_IEEE754_FLAGS="" # FIXME - maybe "-Mnofpapprox -Mnofma -Kieee"?
+
                                                                 ACSM_NODEPRECATEDFLAG=""
 
                                 ACSM_CFLAGS_DBG="$ACSM_CFLAGS_DBG -g"
@@ -36484,6 +36497,7 @@ fi
                          ACSM_CXXFLAGS_DBG="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
                          ACSM_CXXFLAGS_OPT="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
                          ACSM_CXXFLAGS_DEVEL="-h conform,one_instantiation_per_object,instantiate=used,noimplicitinclude -G n"
+                         ACSM_IEEE754_FLAGS="" # FIXME - not sure here
                          ACSM_NODEPRECATEDFLAG=""
                          ACSM_CFLAGS_DBG="-G n"
                          ACSM_CFLAGS_OPT="-G n"
@@ -36496,6 +36510,9 @@ fi
                        ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DEVEL -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
                                               ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long"
                        ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -Wunused-parameter -Wunused -Wpointer-arith -Wformat -Wparentheses -Qunused-arguments -Woverloaded-virtual -fno-limit-debug-info"
+
+                       ACSM_IEEE754_FLAGS="-fno-unsafe-math-optimizations -fexcess-precision=standard -ffp-contract=off"
+
                        ACSM_NODEPRECATEDFLAG="-Wno-deprecated"
 
                                                                                                                                                                  if test "x$ACSM_CLANG_VERSION" = "xother" || test $ACSM_CLANG_VERSION -ge 10
@@ -36599,6 +36616,7 @@ printf "%s\n" "No specific options for this C++ compiler known" >&6; }
               ACSM_CXXFLAGS_DBG="$CXXFLAGS"
               ACSM_CXXFLAGS_OPT="$CXXFLAGS"
               ACSM_CXXFLAGS_DEVEL="$CXXFLAGS"
+              ACSM_IEEE754_FLAGS=""
               ACSM_NODEPRECATEDFLAG=""
 
               ACSM_CFLAGS_DBG="$CFLAGS"
@@ -61009,6 +61027,7 @@ printf "%s\n" "---------------------------------------------" >&6; }
 # instances of @VAR@ with the value of the shell variable VAR in the
 # output files (e.g. one or more Makefiles).
 # --------------------------------------------------------------
+
 
 
 
