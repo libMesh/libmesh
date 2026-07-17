@@ -315,19 +315,6 @@ AS_IF([test "$enablenvtx" = yes],
 
 
 # -------------------------------------------------------------
-# Choose between TBB, OpenMP, and pthreads thread models.
-# The user can control this by configuring with
-#
-# --with-thread-model={tbb,pthread,auto,none}
-#
-# where "auto" will try to automatically detect the best possible
-# version (see threads.m4).
-# -------------------------------------------------------------
-ACX_BEST_THREAD
-
-
-
-# -------------------------------------------------------------
 # LASPACK iterative solvers -- enabled unless
 # --enable-strict-lgpl is specified
 # -------------------------------------------------------------
