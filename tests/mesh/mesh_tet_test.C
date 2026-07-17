@@ -13,6 +13,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <map>
 #include <regex>
 
 
@@ -52,6 +53,8 @@ public:
   CPPUNIT_TEST( testNetGenFlippedTris );
   CPPUNIT_TEST( testNetGenNonOriented );
   CPPUNIT_TEST( testNetGenHole );
+  CPPUNIT_TEST( testNetGenQuadratic );
+  CPPUNIT_TEST( testNetGenQuadraticCurved );
 
 #ifdef LIBMESH_ENABLE_AMR
   CPPUNIT_TEST( testNetGenSphereShell );
@@ -434,6 +437,109 @@ public:
     Mesh mesh(*TestCommWorld);
     NetGenMeshInterface net_tet(mesh);
     testHole(mesh, net_tet);
+    testBcids(mesh);
+  }
+
+
+  void testNetGenQuadratic()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    NetGenMeshInterface net_tet(mesh);
+    net_tet.elem_type() = TET10;
+
+    const Real expected_volume =
+      build_octahedron(mesh, false, -1, 1, -1, 1, -0.1, 0.1);
+
+    net_tet.triangulate();
+
+    LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(mesh),
+                             expected_volume,
+                             TOLERANCE*TOLERANCE);
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(elem->type(), TET10);
+        CPPUNIT_ASSERT_EQUAL(elem->n_nodes(), 10u);
+        CPPUNIT_ASSERT(!elem->is_flipped());
+      }
+
+    // Boundary ids should survive the increase to second order
+    testBcids(mesh);
+  }
+
+
+  void testNetGenQuadraticCurved()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    NetGenMeshInterface net_tet(mesh);
+    net_tet.elem_type() = TET10;
+
+    // Build TRI3 octahedron then upconvert to TRI6 with geometric midpoints.
+    build_octahedron(mesh, false, -1, 1, -1, 1, -0.1, 0.1);
+    mesh.all_second_order();
+    mesh.prepare_for_use();
+
+    // Perturb every TRI6 midpoint outward to simulate a curved boundary.
+    // Key by sorted pair of corner positions (same scheme as record_and_strip).
+    const Real eps = 0.05;
+    std::map<std::pair<Point,Point>, Point> expected;
+
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        libmesh_assert_equal_to(elem->type(), TRI6);
+        for (auto e : make_range(3u))
+          {
+            const Point & pa = elem->point(e);
+            const Point & pb = elem->point((e+1)%3);
+            auto key = pa < pb ? std::make_pair(pa, pb)
+                               : std::make_pair(pb, pa);
+            if (expected.count(key))
+              continue;
+
+            // Perturb midpoint radially outward via mutable Point & ref.
+            Point & mid = elem->point(e+3);
+            mid += eps * mid.unit();
+            expected[key] = mid;
+          }
+      }
+
+    net_tet.triangulate();
+
+    // For every boundary face of the resulting TET10 mesh, verify that edge
+    // midpoints match the perturbed positions — not geometric averages.
+    unsigned int n_checked = 0;
+    for (const auto & elem : mesh.element_ptr_range())
+      for (auto s : elem->side_index_range())
+        {
+          if (elem->neighbor_ptr(s)) continue;
+
+          auto side = elem->build_side_ptr(s);  // TRI6, nodes into mesh
+          for (auto e : make_range(3u))
+            {
+              const Point & pa = side->point(e);
+              const Point & pb = side->point((e+1)%3);
+              auto key = pa < pb ? std::make_pair(pa, pb)
+                                 : std::make_pair(pb, pa);
+              auto it = expected.find(key);
+              if (it == expected.end())
+                continue;
+              const Point & exp = it->second;
+              const Point & got = side->point(e+3);
+              LIBMESH_ASSERT_FP_EQUAL(exp(0), got(0), TOLERANCE);
+              LIBMESH_ASSERT_FP_EQUAL(exp(1), got(1), TOLERANCE);
+              LIBMESH_ASSERT_FP_EQUAL(exp(2), got(2), TOLERANCE);
+              ++n_checked;
+            }
+        }
+
+    CPPUNIT_ASSERT_GREATER(0u, n_checked);
+
+    // Boundary ids should survive the increase to second order, even with
+    // perturbed (curved) boundary midpoints
     testBcids(mesh);
   }
 

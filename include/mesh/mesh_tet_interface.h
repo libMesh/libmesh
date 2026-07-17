@@ -172,6 +172,12 @@ protected:
   void delete_2D_hull_elements();
 
   /**
+   * Converts all linear tet elements to the type requested by
+   * _elem_type, if that type differs from TET4.
+   */
+  void increase_tet_order();
+
+  /**
    * The desired volume for the elements in the resulting mesh.
    * Unlimited (indicated by 0) by default
    */

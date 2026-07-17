@@ -20,6 +20,7 @@
 
 
 // C++ includes
+#include <map>
 #include <sstream>
 
 // Local includes
@@ -27,7 +28,10 @@
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/cell_tet4.h"
+#include "libmesh/cell_tet10.h"
+#include "libmesh/elem.h"
 #include "libmesh/face_tri3.h"
+#include "libmesh/face_tri6.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/threads.h"
@@ -86,12 +90,48 @@ void NetGenMeshInterface::triangulate ()
 
   LOG_SCOPE("triangulate()", "NetGenMeshInterface");
 
+  if (_elem_type != TET4 &&
+      _elem_type != TET10 &&
+      _elem_type != TET14)
+    libmesh_not_implemented();
+
   // We're hoping to do volume_to_surface_mesh in parallel at least,
   // but then we'll need to serialize any hole meshes to rank 0 so it
   // can use them in serial.
 
+  // If the user wants higher-order output, record midpoints from any
+  // quadratic boundary elements before stripping them to TRI3 for
+  // NetGen.  We key by sorted position pairs (not node IDs) so that
+  // outer mesh and hole mesh node namespaces cannot conflict.
+  std::map<std::pair<Point,Point>, Point> edge_midpoints;
+
+  auto record_and_strip =
+    [&edge_midpoints](UnstructuredMesh & m)
+    {
+      bool has_quadratic = false;
+      for (const auto & elem : m.element_ptr_range())
+        {
+          if (elem->type() != TRI6 && elem->type() != TRI7) continue;
+          has_quadratic = true;
+          // TRI6/TRI7: edge e runs node[e]→node[(e+1)%3], midpoint=node[e+3]
+          for (auto e : make_range(3u))
+            {
+              const Point & pa = elem->point(e);
+              const Point & pb = elem->point((e+1)%3);
+              auto key = pa < pb
+                ? std::make_pair(pa,pb) : std::make_pair(pb,pa);
+              edge_midpoints[key] = elem->point(e+3);
+            }
+        }
+      if (has_quadratic)
+        m.all_first_order();
+    };
+
   const BoundingBox mesh_bb =
     MeshTetInterface::volume_to_surface_mesh(this->_mesh);
+
+  if (_elem_type != TET4)
+    record_and_strip(this->_mesh);
 
   std::vector<MeshSerializer> hole_serializers;
   if (_holes)
@@ -99,6 +139,9 @@ void NetGenMeshInterface::triangulate ()
       {
         const BoundingBox hole_bb =
           MeshTetInterface::volume_to_surface_mesh(*hole);
+
+        if (_elem_type != TET4)
+          record_and_strip(*hole);
 
         libmesh_error_msg_if
           (!mesh_bb.contains(hole_bb),
@@ -109,6 +152,51 @@ void NetGenMeshInterface::triangulate ()
           (*hole, /* need_serial */ true,
            /* serial_only_needed_on_proc_0 */ true);
       }
+
+  // Increasing the element order (all_second_order()/all_complete_order()
+  // via increase_tet_order()) performs collective MPI communication, so it
+  // must run on every rank in lockstep -- it cannot run on rank 0 alone
+  // while the other ranks wait in broadcast().  We therefore broadcast
+  // NetGen's TET4 result first, then increase the order and restore the
+  // curved-boundary midpoints identically on all ranks.  This mirrors what
+  // the 2D interfaces do (see TriangulatorInterface::increase_triangle_order,
+  // which is likewise called on all ranks).  edge_midpoints was built while
+  // the mesh was serialized on every rank, so it is identical everywhere and
+  // this post-broadcast fixup is deterministic.
+  auto increase_order_and_restore_midpoints = [this, &edge_midpoints]()
+    {
+      if (_elem_type == TET4)
+        return;
+
+      // find_neighbors() is needed before all_second_order() can place
+      // shared edge midpoints correctly.
+      this->_mesh.find_neighbors();
+      this->increase_tet_order();
+
+      // Move auto-placed geometric midpoints to the recorded positions,
+      // preserving any curvature from the original quadratic boundary.
+      if (!edge_midpoints.empty())
+        for (Elem * elem : _mesh.element_ptr_range())
+          for (auto s : elem->side_index_range())
+            {
+              if (elem->neighbor_ptr(s)) continue;
+
+              // build_side_ptr() returns a TRI6 whose node pointers
+              // reference the actual mesh nodes; point() assignments
+              // update mesh node coordinates in place.
+              auto side = elem->build_side_ptr(s);
+              for (auto e : make_range(3u))
+                {
+                  const Point & pa = side->point(e);
+                  const Point & pb = side->point((e+1)%3);
+                  auto key = pa < pb
+                    ? std::make_pair(pa,pb) : std::make_pair(pb,pa);
+                  if (auto it = edge_midpoints.find(key);
+                      it != edge_midpoints.end())
+                    side->point(e+3) = it->second;
+                }
+            }
+    };
 
   // This should probably only be done on rank 0, but the API is
   // designed with the hope that we'll parallelize it eventually
@@ -126,14 +214,16 @@ void NetGenMeshInterface::triangulate ()
       if (_holes)
         _holes->clear();
 
-      // Receive the mesh data rank 0 will send later, then fix it up
-      // together
+      // Receive the TET4 mesh data rank 0 will send later.
       MeshCommunication().broadcast(this->_mesh);
 
       // If we got an empty mesh here then our tetrahedralization
       // failed.
       libmesh_error_msg_if (!this->_mesh.n_elem(),
                             "NetGen failed to generate any tetrahedra");
+
+      // Increase the element order collectively, in lockstep with rank 0.
+      increase_order_and_restore_midpoints();
 
       this->_mesh.prepare_for_use();
       return;
@@ -432,8 +522,12 @@ void NetGenMeshInterface::triangulate ()
   if (_holes)
     _holes->clear();
 
-  // Send our data to other ranks, then fix it up together
+  // Send NetGen's TET4 result to the other ranks, then increase the element
+  // order collectively on all ranks together.  increase_tet_order() performs
+  // collective communication, so it must not run on rank 0 alone -- doing so
+  // would deadlock against the other ranks waiting in broadcast() above.
   MeshCommunication().broadcast(this->_mesh);
+  increase_order_and_restore_midpoints();
   this->_mesh.prepare_for_use();
 }
 

@@ -700,4 +700,23 @@ void MeshTetInterface::delete_2D_hull_elements()
 
 
 
+void MeshTetInterface::increase_tet_order()
+{
+  switch (_elem_type)
+    {
+    case TET4:
+      return;
+    case TET10:
+      _mesh.all_second_order();
+      break;
+    case TET14:
+      _mesh.all_complete_order();
+      break;
+    default:
+      libmesh_not_implemented();
+    }
+}
+
+
+
 } // namespace libMesh
