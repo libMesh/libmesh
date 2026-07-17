@@ -54,7 +54,7 @@ if test "$test_CXXFLAGS" = ""; then
     # testing_installed_tree="yes"
 
     if test "$PKG_CONFIG" != "no"; then
-        test_CXXFLAGS=$(pkg-config libmesh --cflags)
+        test_CXXFLAGS="$(pkg-config libmesh --cflags) $(pkg-config libmesh --variable=cxxflags_extra)"
         echo "Using pkg-config CXXFLAGS $test_CXXFLAGS"
 
     elif test -x $LIBMESH_CONFIG_PATH/libmesh-config; then
