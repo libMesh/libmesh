@@ -8303,6 +8303,26 @@ then :
                     ACSM_GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "gcc version"`
 
           case "$ACSM_GXX_VERSION_STRING" in #(
+  *gcc\ version\ 16.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-16.x >>>" >&5
+printf "%s\n" "<<< C++ compiler is gcc-16.x >>>" >&6; }
+                                         ACSM_GXX_VERSION=gcc16 ;; #(
+  *gcc\ version\ 15.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-15.x >>>" >&5
+printf "%s\n" "<<< C++ compiler is gcc-15.x >>>" >&6; }
+                                         ACSM_GXX_VERSION=gcc15 ;; #(
+  *gcc\ version\ 14.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-14.x >>>" >&5
+printf "%s\n" "<<< C++ compiler is gcc-14.x >>>" >&6; }
+                                         ACSM_GXX_VERSION=gcc14 ;; #(
+  *gcc\ version\ 13.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-13.x >>>" >&5
+printf "%s\n" "<<< C++ compiler is gcc-13.x >>>" >&6; }
+                                         ACSM_GXX_VERSION=gcc13 ;; #(
+  *gcc\ version\ 12.*) :
+    { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-12.x >>>" >&5
+printf "%s\n" "<<< C++ compiler is gcc-12.x >>>" >&6; }
+                                         ACSM_GXX_VERSION=gcc12 ;; #(
   *gcc\ version\ 11.*) :
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< C++ compiler is gcc-11.x >>>" >&5
 printf "%s\n" "<<< C++ compiler is gcc-11.x >>>" >&6; }
