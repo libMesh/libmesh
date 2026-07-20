@@ -74021,8 +74021,7 @@ fi
 if test "x$enablekokkos" != "xno"
 then :
 
-        libmesh_optional_INCLUDES="$KOKKOS_CPPFLAGS $libmesh_optional_INCLUDES"
-        libmesh_optional_LIBS="$KOKKOS_LDFLAGS $KOKKOS_LIBS $libmesh_optional_LIBS"
+        libmesh_optional_LIBS="$KOKKOS_LIBS $libmesh_optional_LIBS"
 
 fi
  if test x$enablekokkos = xyes; then

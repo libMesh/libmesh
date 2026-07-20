@@ -870,8 +870,7 @@ ACSM_CONFIGURE_KOKKOS
 
 AS_IF([test "x$enablekokkos" != "xno"],
       [
-        libmesh_optional_INCLUDES="$KOKKOS_CPPFLAGS $libmesh_optional_INCLUDES"
-        libmesh_optional_LIBS="$KOKKOS_LDFLAGS $KOKKOS_LIBS $libmesh_optional_LIBS"
+        libmesh_optional_LIBS="$KOKKOS_LIBS $libmesh_optional_LIBS"
       ])
 AM_CONDITIONAL(LIBMESH_ENABLE_KOKKOS, test x$enablekokkos = xyes)
 # -------------------------------------------------------------
