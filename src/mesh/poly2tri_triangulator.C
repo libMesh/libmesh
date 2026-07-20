@@ -29,7 +29,7 @@
 #pragma float_control(precise, on)
 #pragma clang fp contract(off) reassociate(off)
 #endif
-#ifdef __GNUC___
+#ifdef __GNUC__
 #pragma GCC optimize("-fno-unsafe-math-optimizations")
 #pragma GCC optimize("-ffp-contract=off")
 #endif
