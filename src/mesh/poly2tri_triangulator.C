@@ -25,19 +25,20 @@
 //
 // We can't disable excess x87 precision from pragmas, but hopefully
 // anyone optimizing will be using SSE instead anyway.
-#ifdef __clang__
-#pragma float_control(precise, on)
-#pragma clang fp contract(off) reassociate(off)
-#endif
 #ifdef __GNUC__
 #pragma GCC optimize("-fno-unsafe-math-optimizations")
 #pragma GCC optimize("-ffp-contract=off")
+#else
+#ifdef __clang__
+#pragma float_control(precise, on)
+#pragma clang fp contract(off) reassociate(off)
 #endif
 #ifdef __NVCOMPILER
 // We can't get -Kieee from pragmas, but so far FMA contractions are
 // the only thing we've caught breaking us, and nvc++ inherits a
 // pragma for those from LLVM.
 #pragma clang fp contract(off) reassociate(off)
+#endif
 #endif
 
 // libmesh includes
