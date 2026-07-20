@@ -102,52 +102,6 @@ public:
     return _view(_index, component);
   }
 
-  template <typename RightVector>
-  LIBMESH_DEVICE_INLINE
-  void assign(const RightVector & right);
-
-  template <typename RightVector>
-  LIBMESH_DEVICE_INLINE
-  void add(const RightVector & right);
-
-  template <typename RightVector>
-  LIBMESH_DEVICE_INLINE
-  void add_scaled(const RightVector & right, const value_type & factor);
-
-  template <typename RightVector>
-  LIBMESH_DEVICE_INLINE
-  void subtract(const RightVector & right);
-
-  template <typename RightVector>
-  LIBMESH_DEVICE_INLINE
-  void subtract_scaled(const RightVector & right, const value_type & factor);
-
-  LIBMESH_DEVICE_INLINE
-  void zero();
-
-  template <typename RightVector>
-  LIBMESH_DEVICE_INLINE
-  auto contract(const RightVector & right) const;
-
-  LIBMESH_DEVICE_INLINE
-  auto norm() const;
-
-  LIBMESH_DEVICE_INLINE
-  auto norm_sq() const;
-
-  LIBMESH_DEVICE_INLINE
-  auto l1_norm() const;
-
-  LIBMESH_DEVICE_INLINE
-  bool is_zero() const;
-
-  LIBMESH_DEVICE_INLINE
-  auto unit() const;
-
-  template <typename RightVector>
-  LIBMESH_DEVICE_INLINE
-  auto cross(const RightVector & right) const;
-
   LIBMESH_DEVICE_INLINE
   unsigned int index() const
   {
