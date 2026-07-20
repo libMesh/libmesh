@@ -36318,7 +36318,26 @@ then :
           ACSM_CXXFLAGS_DEVEL="$ACSM_CXXFLAGS_DEVEL -Wpointer-arith -Wformat -Wparentheses -Wuninitialized -fstrict-aliasing -Woverloaded-virtual -Wdisabled-optimization"
           ACSM_CXXFLAGS_DBG="$ACSM_CXXFLAGS_DBG -O0 -felide-constructors -g -pedantic -W -Wall -Wextra -Wno-long-long -Wunused -Wpointer-arith -Wformat -Wparentheses -Woverloaded-virtual"
 
-          ACSM_IEEE754_FLAGS="-fno-unsafe-math-optimizations -fexcess-precision=standard -ffp-contract=off"
+          # The former is the default but the latter can be necessary
+          ACSM_IEEE754_FLAGS="-fno-unsafe-math-optimizations -ffp-contract=off"
+
+          # Older gcc only supported disabling x87 rounding in C, not C++
+          if test "x$ACSM_GXX_VERSION" != "xgcc11" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc10" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc9" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc8" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc7" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc5" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc5" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc4.9" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc4.8" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc4.7" &&
+                 test "x$ACSM_GXX_VERSION" != "xgcc4.6"
+then :
+
+                  ACSM_IEEE754_FLAGS="$ACSM_IEEE754_FLAGS -fexcess-precision=standard"
+
+fi
 
           ACSM_NODEPRECATEDFLAG="-Wno-deprecated"
 
