@@ -29,9 +29,6 @@ template <typename T>
 using remove_cvref_t =
   typename std::remove_cv<typename std::remove_reference<T>::type>::type;
 
-template <typename T>
-using remove_ref_t = typename std::remove_reference<T>::type;
-
 template <typename ViewType>
 using vector_view_value_t =
   remove_cvref_t<decltype(std::declval<ViewType &>()(0, 0))>;
@@ -243,25 +240,29 @@ using tensor_semantic_type_t = typename tensor_traits<detail::remove_cvref_t<T>>
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
-vector_ref<typename detail::remove_ref_t<ViewType>>
+vector_ref<typename std::remove_reference<ViewType>::type>
 make_vector_ref(ViewType && view, const unsigned int index)
 {
-  return vector_ref<typename detail::remove_ref_t<ViewType>>(std::forward<ViewType>(view), index);
+  return vector_ref<typename std::remove_reference<ViewType>::type>(std::forward<ViewType>(view),
+                                                                    index);
 }
 
 template <typename ViewType>
 LIBMESH_DEVICE_INLINE
-tensor_ref<typename detail::remove_ref_t<ViewType>>
+tensor_ref<typename std::remove_reference<ViewType>::type>
 make_tensor_ref(ViewType && view, const unsigned int index)
 {
-  return tensor_ref<typename detail::remove_ref_t<ViewType>>(std::forward<ViewType>(view), index);
+  return tensor_ref<typename std::remove_reference<ViewType>::type>(std::forward<ViewType>(view),
+                                                                    index);
 }
 
 template <typename OutputVector, typename VectorLike>
 LIBMESH_DEVICE_INLINE
 OutputVector materialize_vector(const VectorLike & v)
 {
-  static_assert(is_vector_like<detail::remove_cvref_t<VectorLike>>::value,
+  static_assert(is_vector_like_v<OutputVector>,
+                "materialize_vector() requires a vector-like output type");
+  static_assert(is_vector_like_v<VectorLike>,
                 "materialize_vector() requires a vector-like input type");
 
   OutputVector out;
@@ -277,7 +278,9 @@ template <typename OutputTensor, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 OutputTensor materialize_tensor(const TensorLike & T_in)
 {
-  static_assert(is_tensor_like<detail::remove_cvref_t<TensorLike>>::value,
+  static_assert(is_tensor_like_v<OutputTensor>,
+                "materialize_tensor() requires a tensor-like output type");
+  static_assert(is_tensor_like_v<TensorLike>,
                 "materialize_tensor() requires a tensor-like input type");
 
   OutputTensor out;
