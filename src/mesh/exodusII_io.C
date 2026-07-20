@@ -468,13 +468,13 @@ void ExodusII_IO::read (const std::string & fname)
 
           if (is_c0polygon)
             {
-              const int n_nodes = exio_helper->elem_node_counts[elem_num];
-              libmesh_error_msg_if(n_nodes < 3,
+              const int n_elem_nodes = exio_helper->elem_node_counts[elem_num];
+              libmesh_error_msg_if(n_elem_nodes < 3,
                                    "Error: Exodus NSIDED block element "
                                    << elem_num
-                                   << " has only " << n_nodes << " nodes.");
+                                   << " has only " << n_elem_nodes << " nodes.");
 
-              uelem = std::make_unique<C0Polygon>(cast_int<unsigned int>(n_nodes));
+              uelem = std::make_unique<C0Polygon>(cast_int<unsigned int>(n_elem_nodes));
             }
           else if (is_c0polyhedron)
             {
