@@ -135,68 +135,6 @@ public:
     return _view(_index, row, col);
   }
 
-  template <typename RightTensor>
-  LIBMESH_DEVICE_INLINE
-  void assign(const RightTensor & right);
-
-  template <typename RightTensor>
-  LIBMESH_DEVICE_INLINE
-  void add(const RightTensor & right);
-
-  template <typename RightTensor>
-  LIBMESH_DEVICE_INLINE
-  void add_scaled(const RightTensor & right, const value_type & factor);
-
-  template <typename RightTensor>
-  LIBMESH_DEVICE_INLINE
-  void subtract(const RightTensor & right);
-
-  template <typename RightTensor>
-  LIBMESH_DEVICE_INLINE
-  void subtract_scaled(const RightTensor & right, const value_type & factor);
-
-  LIBMESH_DEVICE_INLINE
-  void zero();
-
-  template <typename RightTensor>
-  LIBMESH_DEVICE_INLINE
-  auto contract(const RightTensor & right) const;
-
-  LIBMESH_DEVICE_INLINE
-  auto norm() const;
-
-  LIBMESH_DEVICE_INLINE
-  auto norm_sq() const;
-
-  LIBMESH_DEVICE_INLINE
-  bool is_zero() const;
-
-  LIBMESH_DEVICE_INLINE
-  auto transpose() const;
-
-  LIBMESH_DEVICE_INLINE
-  auto det(const unsigned int dim = LIBMESH_DIM) const;
-
-  LIBMESH_DEVICE_INLINE
-  auto tr() const;
-
-  LIBMESH_DEVICE_INLINE
-  auto inverse(const unsigned int dim = LIBMESH_DIM) const;
-
-  template <typename VectorLike, typename ResultVector>
-  LIBMESH_DEVICE_INLINE
-  void solve(const VectorLike & b, ResultVector & x) const;
-
-  LIBMESH_DEVICE_INLINE
-  auto row(const unsigned int i) const;
-
-  LIBMESH_DEVICE_INLINE
-  auto column(const unsigned int i) const;
-
-  template <typename VectorLike>
-  LIBMESH_DEVICE_INLINE
-  auto left_multiply(const VectorLike & v) const;
-
   LIBMESH_DEVICE_INLINE
   unsigned int index() const
   {
