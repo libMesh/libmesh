@@ -3367,9 +3367,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
     next_fake_id = mesh.next_unique_id();
 #endif
 
-  std::vector<int> c0polyhedron_face_connect;
+  std::vector<int> face_connect;
   std::vector<int> c0polyhedron_face_node_counts;
-  c0polyhedron_face_connect.reserve(c0polyhedron_total_face_nodes);
+  face_connect.reserve(c0polyhedron_total_face_nodes);
   c0polyhedron_face_node_counts.reserve(c0polyhedron_total_faces);
   int next_c0polyhedron_face_id = 1;
 
@@ -3451,7 +3451,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
             c0polyhedron_face_node_counts.push_back(cast_int<int>(side_nodes.size()));
 
             for (const auto elem_node_index : side_nodes)
-            c0polyhedron_face_connect.push_back(
+            face_connect.push_back(
               get_exodus_node_id(elem, elem_id, elem_node_index));
           }
         };
@@ -3600,9 +3600,9 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
         (ex_id,
          exII::EX_FACE_BLOCK,
          c0polyhedron_face_block_id,
-         c0polyhedron_face_connect.data(), // node_conn
-         nullptr,                          // elem_edge_conn (unused)
-         nullptr);                         // elem_face_conn (unused)
+         face_connect.data(), // node_conn
+         nullptr,             // elem_edge_conn (unused)
+         nullptr);            // elem_face_conn (unused)
       EX_CHECK_ERR(ex_err, "Error writing polyhedron face connectivities");
 
       ex_err = exII::ex_put_entity_count_per_polyhedra
