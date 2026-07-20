@@ -33,7 +33,7 @@ test_vector_ops_case(const vector_case & info)
       const auto b_ref = libMesh::Kokkos::make_vector_ref(d_b, 0);
       const auto c_ref = libMesh::Kokkos::make_vector_ref(d_c, 0);
 
-      const Vec copied = libMesh::Kokkos::copy_vector<Vec>(a_ref);
+      const Vec copied = libMesh::Kokkos::materialize_vector<Vec>(a_ref);
       const Vec mix = a_ref + b_ref - c_ref;
       const Vec scaled = Real(1.25) * a_ref + Real(-0.5) * b_ref + Real(0.25) * c_ref;
       const Vec plus_assign = a_ref + b_ref;
@@ -46,7 +46,7 @@ test_vector_ops_case(const vector_case & info)
       const Vec div_assign = a_ref / Real(5.0);
 
       const Real dot = libMesh::Kokkos::vector_dot(a_ref, b_ref);
-      const Real contract = a_ref.contract(b_ref);
+      const Real contract = libMesh::Kokkos::contract(a_ref, b_ref);
       const Real norm = mix.norm();
       const Real norm_sq = mix.norm_sq();
       const Vec zero; // By default initialization
@@ -103,7 +103,7 @@ test_vector_ops_case(const vector_case & info)
 #endif
 
 #if LIBMESH_DIM > 2
-      const Vec cross = a_ref.cross(b_ref);
+      const Vec cross = libMesh::Kokkos::vector_cross<Vec>(a_ref, b_ref);
       Vec unit_cross = cross;
       if (cross.norm() > unit_tol)
         unit_cross = libMesh::Kokkos::vector_unit<Vec>(cross);
@@ -218,13 +218,13 @@ test_mixed_representation_ops()
       libMesh::Kokkos::store_vector(d_vectors, 2, scaled);
 
       d_scalars(0) = a_ref * b;
-      d_scalars(1) = b_ref.contract(a);
+      d_scalars(1) = libMesh::Kokkos::contract(b_ref, a);
       d_scalars(2) = (a_ref == a) ? 1.0 : 0.0;
       d_scalars(3) = (a_ref != b) ? 1.0 : 0.0;
       d_scalars(4) = libMesh::Kokkos::vector_solid_angle(a_ref, b, c);
 
 #if LIBMESH_DIM > 2
-      const auto cross = a_ref.cross(b);
+      const auto cross = libMesh::Kokkos::vector_cross<Vec>(a_ref, b);
       Vec unit_cross = cross;
       if (cross.norm() > unit_tol)
         unit_cross = libMesh::Kokkos::vector_unit<Vec>(cross);
