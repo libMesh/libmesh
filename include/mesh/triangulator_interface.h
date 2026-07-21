@@ -264,6 +264,17 @@ public:
   bool get_verify_hole_boundaries() const {return _verify_hole_boundaries;}
 
   /**
+   * For \p TRI7 elements, after boundary mid-edge nodes have been
+   * snapped to a curved boundary in \p increase_triangle_order(), the
+   * interior node can be repositioned to the curved-mapping image of
+   * the reference centroid.  This is off by default; enable it only if
+   * the consuming code wants the relocated interior node.
+   */
+  void set_fixup_tri7_center_nodes(bool v) {_fixup_tri7_center_nodes = v;}
+
+  bool get_fixup_tri7_center_nodes() const {return _fixup_tri7_center_nodes;}
+
+  /**
    * When constructing a PSLG, if the node numbers do not define the
    * desired boundary segments implicitly through the ordering of the
    * points, you can use the segments vector to specify the segments
@@ -387,6 +398,23 @@ protected:
   void increase_triangle_order();
 
   /**
+   * Helper called at the end of \p increase_triangle_order() for \p
+   * TRI7 to reposition the interior node to the curved-mapping image
+   * of the reference centroid after boundary midpoints have been
+   * snapped.  Safe to call unconditionally for TRI7.
+   */
+  void fixup_tri7_center_nodes();
+
+  /**
+   * Helper called at the end of \p increase_triangle_order() to verify
+   * that no boundary-midpoint snap has tangled a quadratic triangle,
+   * by sampling the signed element Jacobian at the reference nodes and
+   * centroid.  Errors out with a diagnostic naming the bad element and
+   * side if the Jacobian is non-positive.
+   */
+  void verify_quadratic_elements();
+
+  /**
    * Helper function to check holes for intersections if requested.
    */
   void verify_holes(const Hole & outer_bdy);
@@ -477,6 +505,12 @@ protected:
    * Flag which tells if we want to check hole geometry
    */
   bool _verify_hole_boundaries;
+
+  /**
+   * Flag which tells if we want to relocate TRI7 interior nodes to the
+   * curved-mapping centroid after snapping boundary midpoints
+   */
+  bool _fixup_tri7_center_nodes;
 
   /**
   * The auto area function based on the spacing of boundary points

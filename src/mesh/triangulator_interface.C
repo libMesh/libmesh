@@ -36,6 +36,7 @@
 #include "libmesh/meshfree_interpolation.h"
 
 // C/C++ includes
+#include <limits>
 #include <sstream>
 
 
@@ -116,6 +117,7 @@ TriangulatorInterface::TriangulatorInterface(UnstructuredMesh & mesh)
     _insert_extra_points(false),
     _smooth_after_generating(true),
     _quiet(true),
+    _fixup_tri7_center_nodes(false),
     _auto_area_function(nullptr)
 {}
 
@@ -425,6 +427,128 @@ void TriangulatorInterface::increase_triangle_order()
               it != all_midpoints.end())
             elem->point(n+3) = it->second;
         }
+    }
+
+  // Moving boundary mid-edge nodes can displace the TRI7 interior node
+  // and tangle the element map.  Repositioning the interior node is
+  // opt-in (off by default); the validity check always runs.
+  if (_elem_type == TRI7 && _fixup_tri7_center_nodes)
+    this->fixup_tri7_center_nodes();
+
+  this->verify_quadratic_elements();
+}
+
+
+void TriangulatorInterface::fixup_tri7_center_nodes()
+{
+  libmesh_assert_equal_to(_elem_type, TRI7);
+
+  // Place the interior node at the image of the reference centroid
+  // (xi, eta) = (1/3, 1/3) under the curved Tri6 map, using the Tri6
+  // shape function values there as weights: -1/9 on the vertices and
+  // 4/9 on the mid-edges.  This reduces to the straight-edge centroid
+  // when no boundary midpoint has moved.
+  static const Real wv = -Real(1)/9;
+  static const Real wm =  Real(4)/9;
+
+  for (Elem * elem : _mesh.element_ptr_range())
+    {
+      libmesh_assert_equal_to(elem->n_vertices(), 3);
+      libmesh_assert_equal_to(elem->n_nodes(), 7u);
+
+      elem->point(6) = wv * (elem->point(0) +
+                             elem->point(1) +
+                             elem->point(2)) +
+                       wm * (elem->point(3) +
+                             elem->point(4) +
+                             elem->point(5));
+    }
+}
+
+
+void TriangulatorInterface::verify_quadratic_elements()
+{
+  if (_elem_type != TRI6 && _elem_type != TRI7)
+    return;
+
+  // Once fixup_tri7_center_nodes() has placed node 6, the TRI6 and TRI7
+  // mappings coincide and this Tri6 formula serves both.
+  static const Real xi_samples[7]  = {Real(0),   Real(1),   Real(0),
+                                      Real(1)/2, Real(1)/2, Real(0),
+                                      Real(1)/3};
+  static const Real eta_samples[7] = {Real(0),   Real(0),   Real(1),
+                                      Real(0),   Real(1)/2, Real(1)/2,
+                                      Real(1)/3};
+
+  for (Elem * elem : _mesh.element_ptr_range())
+    {
+      libmesh_assert_equal_to(elem->n_vertices(), 3);
+      libmesh_assert_greater_equal(elem->n_nodes(), 6u);
+
+      const Point & x0 = elem->point(0);
+      const Point & x1 = elem->point(1);
+      const Point & x2 = elem->point(2);
+      const Point & x3 = elem->point(3);
+      const Point & x4 = elem->point(4);
+      const Point & x5 = elem->point(5);
+
+      // Tri6 mapping derivative coefficients (see Tri6::volume()):
+      // dx/dxi = xi*a1 + eta*b1 + c1, dx/deta = xi*b1 + eta*b2 + c2.
+      const Point a1 =  4*x0 + 4*x1 - 8*x3;
+      const Point b1 =  4*x0 - 4*x3 + 4*x4 - 4*x5;
+      const Point c1 = -3*x0 - 1*x1 + 4*x3;
+      const Point b2 =  4*x0 + 4*x2 - 8*x5;
+      const Point c2 = -3*x0 - 1*x2 + 4*x5;
+
+      // Scale the tolerance by the straight-edge triangle area, which
+      // is strictly positive for the valid TRI3 poly2tri input.
+      const Real ref_area = 0.5 * cross_norm(x1 - x0, x2 - x0);
+      const Real jac_tol = TOLERANCE * ref_area;
+
+      Real min_jac = std::numeric_limits<Real>::max();
+      unsigned int worst_sample = 0;
+      for (unsigned int s = 0; s != 7; ++s)
+        {
+          const Real xi  = xi_samples[s];
+          const Real eta = eta_samples[s];
+          const Point dxi  = xi*a1 + eta*b1 + c1;
+          const Point deta = xi*b1 + eta*b2 + c2;
+          // z-component of the cross product; the elements are planar.
+          const Real jac = dxi(0)*deta(1) - dxi(1)*deta(0);
+          if (jac < min_jac)
+            {
+              min_jac = jac;
+              worst_sample = s;
+            }
+        }
+
+      if (min_jac > jac_tol)
+        continue;
+
+      // Build a diagnostic naming every snapped boundary side on this
+      // element so the user can immediately see which curved-boundary
+      // input caused the tangle.
+      std::ostringstream sides;
+      for (unsigned int n = 0; n != 3; ++n)
+        if (!elem->neighbor_ptr(n))
+          {
+            const Point straight =
+              0.5 * (elem->point(n) + elem->point((n+1) % 3));
+            sides << " (boundary side " << n
+                  << ": straight midpoint " << straight
+                  << ", snapped midpoint " << elem->point(n+3) << ")";
+          }
+
+      libmesh_error_msg(
+        "TriangulatorInterface: snapping a boundary midpoint produced a "
+        "tangled quadratic triangle (element " << elem->id()
+        << ", non-positive Jacobian " << min_jac
+        << " at reference sample (" << xi_samples[worst_sample] << ", "
+        << eta_samples[worst_sample] << "); reference triangle area "
+        << ref_area << ")." << sides.str()
+        << " Refine the boundary discretization so that recorded "
+        "midpoints lie closer to their straight-line midpoints, "
+        "then retry.");
     }
 }
 

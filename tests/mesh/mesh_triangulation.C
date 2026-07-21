@@ -41,6 +41,8 @@ public:
   CPPUNIT_TEST( testPoly2TriHoles );
   CPPUNIT_TEST( testPoly2TriMeshedHoles );
   CPPUNIT_TEST( testPoly2TriEdge3ToTri6 );
+  CPPUNIT_TEST( testPoly2TriEdge3ToTri7CenterFixup );
+  CPPUNIT_TEST( testPoly2TriEdge3ToTri6FlipThrows );
 #  ifdef LIBMESH_ENABLE_AMR
     CPPUNIT_TEST( testPoly2TriRoundHole );
 #  endif
@@ -977,6 +979,129 @@ public:
     testEdge3Mesh(mesh);
 
     this->testEdge3ToTri6Base(mesh, triangulator);
+  }
+
+
+  void testPoly2TriEdge3ToTri7CenterFixup()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator triangulator(mesh);
+
+    // Re-use the curved (unit-circle) Edge3 boundary from testEdge3Mesh:
+    // four arcs whose midpoints lie on the unit circle.  After
+    // triangulation with TRI7 + boundary-midpoint snap, every TRI7
+    // element's interior node should land at the curved Tri6 image of
+    // the reference centroid (1/3, 1/3) -- the formula applied by
+    // TriangulatorInterface::fixup_tri7_center_nodes() -- *not* at the
+    // straight-edge vertex centroid (P0+P1+P2)/3 that
+    // MeshBase::all_complete_order() initially placed there.
+    testEdge3Mesh(mesh);
+
+    commonSettings(triangulator);
+    triangulator.elem_type() = TRI7;
+    // The interior-node relocation is opt-in (off by default), so
+    // enable it here -- this is the behavior under test.
+    triangulator.set_fixup_tri7_center_nodes(true);
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), (dof_id_type)2);
+
+    bool saw_curved_element = false;
+    for (const auto & elem : mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT_EQUAL(elem->type(), TRI7);
+
+        const Point & x0 = elem->point(0);
+        const Point & x1 = elem->point(1);
+        const Point & x2 = elem->point(2);
+        const Point & x3 = elem->point(3);
+        const Point & x4 = elem->point(4);
+        const Point & x5 = elem->point(5);
+        const Point & x6 = elem->point(6);
+
+        const Point expected =
+          (Real(-1)/9) * (x0 + x1 + x2) +
+          (Real( 4)/9) * (x3 + x4 + x5);
+        const Point straight = (x0 + x1 + x2) / Real(3);
+
+        // Centroid must match the curved-mapping formula exactly.
+        CPPUNIT_ASSERT(x6.relative_fuzzy_equals(expected, TOLERANCE));
+
+        // On the inscribed-square triangulation of the unit circle
+        // each triangle has at least one curved external side, so the
+        // curved-mapping centroid is strictly different from the
+        // straight-edge vertex average -- otherwise the fixup would
+        // be a no-op and we wouldn't actually be testing it.
+        if (!x6.relative_fuzzy_equals(straight, TOLERANCE))
+          saw_curved_element = true;
+      }
+
+    mesh.comm().max(saw_curved_element);
+    CPPUNIT_ASSERT(saw_curved_element);
+  }
+
+
+  void testPoly2TriEdge3ToTri6FlipThrows()
+  {
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    // Build a triangular domain (0,0)-(4,0)-(2,2) using three Edge3
+    // segments.  The bottom segment's mid-edge node is placed at
+    // (2, 1.95) -- almost on top of the apex (2, 2) -- so that
+    // snapping the resulting TRI6 mid-edge node to that location
+    // tangles the element (the curved bottom edge folds across the
+    // apex).  TriangulatorInterface::verify_quadratic_elements()
+    // should detect the non-positive Jacobian and throw.
+    auto vA = mesh.add_point(Point(0, 0),    0);
+    auto vB = mesh.add_point(Point(4, 0),    1);
+    auto vC = mesh.add_point(Point(2, 2),    2);
+    auto mAB = mesh.add_point(Point(2, 1.95), 3);  // pathological
+    auto mBC = mesh.add_point(Point(3, 1),   4);
+    auto mCA = mesh.add_point(Point(1, 1),   5);
+
+    auto edgeAB = mesh.add_elem(Elem::build(EDGE3));
+    edgeAB->set_node(0, vA);
+    edgeAB->set_node(1, vB);
+    edgeAB->set_node(2, mAB);
+
+    auto edgeBC = mesh.add_elem(Elem::build(EDGE3));
+    edgeBC->set_node(0, vB);
+    edgeBC->set_node(1, vC);
+    edgeBC->set_node(2, mBC);
+
+    auto edgeCA = mesh.add_elem(Elem::build(EDGE3));
+    edgeCA->set_node(0, vC);
+    edgeCA->set_node(1, vA);
+    edgeCA->set_node(2, mCA);
+
+    mesh.prepare_for_use();
+
+    Poly2TriTriangulator triangulator(mesh);
+    commonSettings(triangulator);
+    triangulator.elem_type() = TRI6;
+
+    bool threw_desired_exception = false;
+    try {
+      triangulator.triangulate();
+    }
+    catch (libMesh::LogicError & e) {
+      const std::regex msg_regex("tangled quadratic triangle");
+      CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+      threw_desired_exception = true;
+    }
+    catch (CppUnit::Exception & e) {
+      throw e;
+    }
+    catch (...) {
+      CPPUNIT_ASSERT_MESSAGE("Unexpected exception type thrown", false);
+    }
+    CPPUNIT_ASSERT(threw_desired_exception);
+#endif
   }
 
 
