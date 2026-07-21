@@ -3612,7 +3612,7 @@ void BoundaryInfo::clear_stitched_boundary_side_ids (const boundary_id_type side
 const std::set<boundary_id_type> &
 BoundaryInfo::get_global_boundary_ids() const
 {
-  libmesh_assert(_mesh && _mesh->is_prepared());
+  libmesh_assert(_mesh && _mesh->_preparation.has_boundary_id_sets);
   return _global_boundary_ids;
 }
 
