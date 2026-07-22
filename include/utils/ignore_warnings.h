@@ -46,6 +46,7 @@
 #pragma clang diagnostic ignored "-Wmacro-redefined"
 #pragma clang diagnostic ignored "-Winconsistent-missing-override"
 #pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#pragma clang diagnostic ignored "-Wunused-variable"
 #pragma clang diagnostic ignored "-Winvalid-utf8"
 // Ignore warnings from code that does "if (foo) bar();"
 #pragma clang diagnostic ignored "-Wmisleading-indentation"
@@ -82,6 +83,7 @@
 #pragma GCC diagnostic ignored "-Wconversion"
 #pragma GCC diagnostic ignored "-Wstack-protector"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#pragma GCC diagnostic ignored "-Wunused-variable"
 // And this for VTK
 #pragma GCC diagnostic ignored "-Wlogical-op"
 // Ignore warnings from code that uses deprecated members of std, like std::auto_ptr.
