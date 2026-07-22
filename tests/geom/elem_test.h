@@ -231,16 +231,17 @@ public:
         // The initial "natural" way to orient our sides is commented
         // out here; permutations that fix diagonals for us are used
         // instead.
+        // Listing both z sides first also tests nonconsecutive local
+        // side edges in the polyhedron edge lookup.
         const std::vector<std::vector<unsigned int>> nodes_on_side =
           { {0, 1, 2, 3},   // min z
+            {5, 6, 7, 4},   // max z
             {0, 1, 5, 4},   // min y
         //     {1, 2, 6, 5},   // max x - bad
             {2, 6, 5, 1},   // max x
             {2, 3, 7, 6},   // max y
         //     {3, 0, 4, 7},   // min x - bad
-            {0, 4, 7, 3},   // min x
-        //     {4, 5, 6, 7} }; // max z - bad
-            {5, 6, 7, 4} }; // max z
+            {0, 4, 7, 3} }; // min x
 #endif
 
         // Build all the sides.
