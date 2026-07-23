@@ -316,6 +316,16 @@ public:
 
     this->build_c0polyhedron(mesh, points, nodes_on_side);
 
+    std::vector<std::vector<dof_id_type>> expected_nodes_on_side;
+    const Elem & output_elem = mesh.elem_ref(0);
+    expected_nodes_on_side.reserve(output_elem.n_sides());
+    for (auto s : output_elem.side_index_range())
+      {
+        expected_nodes_on_side.emplace_back();
+        for (const auto n : output_elem.nodes_on_side(s))
+          expected_nodes_on_side.back().push_back(output_elem.node_id(n));
+      }
+
     {
       ExodusII_IO exii(mesh);
       exii.write("write_exodus_C0POLYHEDRON_HEXPRISM_READ.e");
@@ -337,12 +347,12 @@ public:
     CPPUNIT_ASSERT_EQUAL(12u, elem->n_vertices());
     CPPUNIT_ASSERT_EQUAL(8u, elem->n_sides());
 
-    for (auto s : index_range(nodes_on_side))
+    for (auto s : index_range(expected_nodes_on_side))
       {
         const auto side_nodes = elem->nodes_on_side(s);
-        CPPUNIT_ASSERT_EQUAL(nodes_on_side[s].size(), side_nodes.size());
-        for (auto n : index_range(nodes_on_side[s]))
-          CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(nodes_on_side[s][n]),
+        CPPUNIT_ASSERT_EQUAL(expected_nodes_on_side[s].size(), side_nodes.size());
+        for (auto n : index_range(expected_nodes_on_side[s]))
+          CPPUNIT_ASSERT_EQUAL(expected_nodes_on_side[s][n],
                                elem->node_id(side_nodes[n]));
       }
   }
