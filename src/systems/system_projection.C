@@ -385,10 +385,12 @@ void System::project_vector (const NumericVector<Number> & old_v,
           std::iota(vars.begin(), vars.end(), 0);
         }
 
-      std::vector<unsigned int> regular_vars, vector_vars;
+      std::vector<unsigned int> regular_vars, vector_vars, scalar_vars;
       for (auto var : vars)
       {
-        if (FEInterface::field_type(this->variable_type(var)) == TYPE_SCALAR)
+        if (this->variable(var).type().family == SCALAR)
+          scalar_vars.push_back(var);
+        else if (FEInterface::field_type(this->variable_type(var)) == TYPE_SCALAR)
           regular_vars.push_back(var);
         else
           vector_vars.push_back(var);
@@ -433,16 +435,15 @@ void System::project_vector (const NumericVector<Number> & old_v,
       if (this->processor_id() == (this->n_processors()-1))
         {
           const DofMap & dof_map = this->get_dof_map();
-          for (auto var : vars)
-            if (this->variable(var).type().family == SCALAR)
-              {
-                // We can just map SCALAR dofs directly across
-                std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
-                dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
-                dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
-                for (auto i : index_range(new_SCALAR_indices))
-                  new_vector.set(new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]));
-              }
+          for (auto var : scalar_vars)
+            {
+              // We can just map SCALAR dofs directly across
+              std::vector<dof_id_type> new_SCALAR_indices, old_SCALAR_indices;
+              dof_map.SCALAR_dof_indices (new_SCALAR_indices, var, false);
+              dof_map.SCALAR_dof_indices (old_SCALAR_indices, var, true);
+              for (auto i : index_range(new_SCALAR_indices))
+                new_vector.set(new_SCALAR_indices[i], old_vector(old_SCALAR_indices[i]));
+            }
         }
     }
 
