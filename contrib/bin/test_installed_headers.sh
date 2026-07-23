@@ -54,10 +54,12 @@ if test "$test_CXXFLAGS" = ""; then
     # testing_installed_tree="yes"
 
     if test "$PKG_CONFIG" != "no"; then
-        test_CXXFLAGS=$(pkg-config libmesh --cflags)
+        test_CXXFLAGS="$(pkg-config libmesh --cflags) $(pkg-config libmesh --variable=cxxflags_extra)"
+        echo "Using pkg-config CXXFLAGS $test_CXXFLAGS"
 
     elif test -x $LIBMESH_CONFIG_PATH/libmesh-config; then
         test_CXXFLAGS=$($LIBMESH_CONFIG_PATH/libmesh-config --cppflags --cxxflags --include)
+        echo "Using libmesh-config CXXFLAGS $test_CXXFLAGS"
 
     else
         echo "Cannot query package installation!!"
