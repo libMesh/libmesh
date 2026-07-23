@@ -1344,9 +1344,18 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   EX_CHECK_ERR(ex_err, "Error getting block info.");
   message("Info retrieved successfully for block: ", block);
 
-  const auto & conv = get_conversion(std::string(elem_type.data()));
-  const bool is_c0polygon = (conv.libmesh_elem_type() == C0POLYGON);
-  const bool is_c0polyhedron = (conv.libmesh_elem_type() == C0POLYHEDRON);
+  // Nemesis uses "Empty" as the element type for blocks with no
+  // elements on the current processor.  There is no element conversion
+  // for that sentinel type, nor is one needed for an empty block.
+  const bool is_bezier = is_bezier_elem(elem_type.data());
+  const Conversion * conversion = nullptr;
+  if (num_elem_this_blk || is_bezier)
+    conversion = &get_conversion(std::string(elem_type.data()));
+
+  const bool is_c0polygon =
+    conversion && conversion->libmesh_elem_type() == C0POLYGON;
+  const bool is_c0polyhedron =
+    conversion && conversion->libmesh_elem_type() == C0POLYHEDRON;
 
   // Warn or error when we don't currently support reading blocks with extended info.
   // Note: the docs say -1 will be returned for this but I found that it was
@@ -1362,9 +1371,11 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
   // If we have a Bezier element here, then we've packed constraint
   // vector connectivity at the end of the nodal connectivity, and
   // num_nodes_per_elem reflected both.
-  const bool is_bezier = is_bezier_elem(elem_type.data());
   if (is_bezier)
-    num_nodes_per_elem = conv.n_nodes;
+    {
+      libmesh_assert(conversion);
+      num_nodes_per_elem = conversion->n_nodes;
+    }
   else if (is_c0polygon)
     {
       elem_node_counts.resize(num_elem_this_blk);
@@ -1504,9 +1515,8 @@ void ExodusII_IO_Helper::read_elem_in_block(int block)
               // for p>2 and aren't useful for p<2, and we don't
               // support anisotropic p...
 #ifndef NDEBUG
-              const auto & conv = get_conversion(std::string(elem_type.data()));
-
-              for (auto d : IntRange<int>(0, conv.dim))
+              libmesh_assert(conversion);
+              for (auto d : IntRange<int>(0, conversion->dim))
                 libmesh_assert_equal_to(bex_elem_degrees[d], 2);
 #endif
             }
