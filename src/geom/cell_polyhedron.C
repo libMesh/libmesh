@@ -444,65 +444,29 @@ Polyhedron::edges_adjacent_to_node(const unsigned int n) const
   // overridden this.
   libmesh_assert_less(n, this->n_vertices());
 
-  const unsigned int ne = this->n_edges();
-  libmesh_assert_equal_to(ne, _edge_lookup.size());
+  libmesh_assert_equal_to(this->n_edges(), _edge_lookup.size());
 
   std::vector<unsigned int> adjacent_edges;
 
-  unsigned int next_edge = 0;
-
-  // Look for any adjacent edges on each side.  Make use of the fact
-  // that we number our edges in order as we encounter them from each
-  // side.
-  for (auto t : index_range(_sidelinks_data))
+  for (const auto edge : index_range(_edge_lookup))
     {
-      const Polygon & face = *std::get<0>(_sidelinks_data[t]);
+      const auto [side, side_edge] = _edge_lookup[edge];
+      const Polygon & face = *std::get<0>(_sidelinks_data[side]);
       const std::vector<unsigned int> & node_map =
-        std::get<2>(_sidelinks_data[t]);
-
-      while (_edge_lookup[next_edge].first < t)
-        {
-          ++next_edge;
-          if (next_edge == ne)
-            return adjacent_edges;
-        }
-
-      // If we haven't seen the next edge on this or an earlier side
-      // then we might as well go on to the next.
-      if (_edge_lookup[next_edge].first > t)
-        continue;
+        std::get<2>(_sidelinks_data[side]);
 
       const unsigned int fnv = face.n_vertices();
       libmesh_assert_equal_to(fnv, face.n_edges());
       libmesh_assert_equal_to(fnv, face.n_sides());
       libmesh_assert_less_equal(fnv, node_map.size());
+      libmesh_assert_less(side_edge, fnv);
 
-      // Polygon faces have one edge per vertex
-      for (auto v : make_range(fnv))
-        {
-          libmesh_assert_equal_to (_edge_lookup[next_edge].first, t);
-
-          if (_edge_lookup[next_edge].second > v)
-            continue;
-
-          while (_edge_lookup[next_edge].first == t &&
-                 _edge_lookup[next_edge].second < v)
-            {
-              ++next_edge;
-              if (next_edge == ne)
-                return adjacent_edges;
-            }
-
-          if (_edge_lookup[next_edge].first > t)
-            break;
-
-          const unsigned int vn = node_map[v];
-          const unsigned int vnp = node_map[(v+1)%fnv];
-          libmesh_assert_less(vn, this->n_vertices());
-          libmesh_assert_less(vnp, this->n_vertices());
-          if (vn == n || vnp == n)
-            adjacent_edges.push_back(next_edge);
-        }
+      const unsigned int vn = node_map[side_edge];
+      const unsigned int vnp = node_map[(side_edge + 1) % fnv];
+      libmesh_assert_less(vn, this->n_vertices());
+      libmesh_assert_less(vnp, this->n_vertices());
+      if (vn == n || vnp == n)
+        adjacent_edges.push_back(edge);
     }
 
   return adjacent_edges;
