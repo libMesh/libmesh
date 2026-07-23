@@ -31,6 +31,7 @@
 #include "libmesh/face_quad8.h"
 #include "libmesh/face_quad9.h"
 #include "libmesh/face_c0polygon.h"
+#include "libmesh/cell_c0polyhedron.h"
 #include "libmesh/cell_hex8.h"
 #include "libmesh/cell_hex20.h"
 #include "libmesh/cell_hex27.h"
@@ -57,6 +58,7 @@
 #include "libmesh/enum_to_string.h"
 
 // C++ includes
+#include <array>
 #include <cstdlib> // *must* precede <cmath> for proper std:abs() on PGI, Sun Studio CC
 #include <cmath> // for std::sqrt
 #include <unordered_set>
@@ -125,6 +127,7 @@ unsigned int idx(const ElemType type,
     case INVALID_ELEM:
     case HEX8:
     case PRISM6:
+    case C0POLYHEDRON:
       {
         return i + (nx+1)*(j + k*(ny+1));
       }
@@ -921,8 +924,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
             std::vector<Node *> node_list;
 
             // Start with a layer of triangles on the boundary
-            const auto dx_tri = (xmax - xmin) / (nx);
-            const auto dy_tri = (ymax - ymin) / (ny + 1);
+            const auto dx_tri = Real(1) / nx;
+            const auto dy_tri = Real(1) / (ny + 1);
             std::unique_ptr<Elem> new_elem;
             for (const auto i : make_range(nx + 1))
             {
@@ -973,7 +976,9 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
             // Build layers of hexagons
             const auto hex_side =
-                (ymax - ymin - (ny == 1 ? dy_tri : (1. + (ny - 1) / 2.) * dy_tri)) / ny;
+                (Real(1) - (ny == 1 ?
+                             dy_tri :
+                             (Real(1) + (ny - 1) / 2.) * dy_tri)) / ny;
             for (const auto j : make_range(ny))
             {
               for (const auto i : make_range(nx + (j % 2)))
@@ -1066,7 +1071,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               Node *node0, *node1, *node2;
               if (i == 0 && ny_odd)
               {
-                node0 = mesh.add_point(Point(0., ymax, 0.));
+                node0 = mesh.add_point(Point(0., 1., 0.));
                 node1 = node_list[running_index++];
                 node2 = node_list[running_index];
               }
@@ -1081,7 +1086,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               {
                 node0 = node_list[running_index++];
                 node1 = node_list[running_index];
-                node2 = mesh.add_point(Point(xmax, ymax, 0.));
+                node2 = mesh.add_point(Point(1., 1., 0.));
               }
 
               new_elem = std::make_unique<C0Polygon>(3);
@@ -1171,6 +1176,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case HEX8:
           case HEX20:
           case HEX27:
+          case C0POLYHEDRON:
           case TET4:  // TET4's are created from an initial HEX27 discretization
           case TET10: // TET10's are created from an initial HEX27 discretization
           case TET14: // TET14's are created from an initial HEX27 discretization
@@ -1207,8 +1213,19 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case INVALID_ELEM:
           case HEX8:
           case PRISM6:
+          case C0POLYHEDRON:
             {
-              mesh.reserve_nodes( (nx+1)*(ny+1)*(nz+1) );
+              const dof_id_type grid_nodes =
+                cast_int<dof_id_type>((nx+1)*(ny+1)*(nz+1));
+
+              // Reserve one interior node per polyhedron for the robust
+              // fallback tetrahedralization used when the preferred
+              // tetrahedralization cannot be constructed.
+              const dof_id_type mid_polyhedron_nodes =
+                (type == C0POLYHEDRON) ?
+                cast_int<dof_id_type>(nx*ny*nz) : 0;
+
+              mesh.reserve_nodes(grid_nodes + mid_polyhedron_nodes);
               break;
             }
 
@@ -1267,6 +1284,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case INVALID_ELEM:
           case HEX8:
           case PRISM6:
+          case C0POLYHEDRON:
             {
               for (unsigned int k=0; k<=nz; k++)
                 for (unsigned int j=0; j<=ny; j++)
@@ -1392,6 +1410,69 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                       elem->set_node(5, mesh.node_ptr(idx(type,nx,ny,i+1,j,k+1)  ));
                       elem->set_node(6, mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1)));
                       elem->set_node(7, mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  ));
+
+                      if (k == 0)
+                        boundary_info.add_side(elem, 0, 0);
+
+                      if (k == (nz-1))
+                        boundary_info.add_side(elem, 5, 5);
+
+                      if (j == 0)
+                        boundary_info.add_side(elem, 1, 1);
+
+                      if (j == (ny-1))
+                        boundary_info.add_side(elem, 3, 3);
+
+                      if (i == 0)
+                        boundary_info.add_side(elem, 4, 4);
+
+                      if (i == (nx-1))
+                        boundary_info.add_side(elem, 2, 2);
+                    }
+              break;
+            }
+
+
+          case C0POLYHEDRON:
+            {
+              const std::array<std::array<unsigned int, 4>, 6> side_nodes =
+                {{{0, 1, 2, 3},   // min z
+                  {0, 1, 5, 4},   // min y
+                  {2, 6, 5, 1},   // max x
+                  {2, 3, 7, 6},   // max y
+                  {0, 4, 7, 3},   // min x
+                  {5, 6, 7, 4}}}; // max z
+
+              for (unsigned int k=0; k<nz; k++)
+                for (unsigned int j=0; j<ny; j++)
+                  for (unsigned int i=0; i<nx; i++)
+                    {
+                      std::array<Node *, 8> elem_nodes =
+                        {{mesh.node_ptr(idx(type,nx,ny,i,j,k)      ),
+                          mesh.node_ptr(idx(type,nx,ny,i+1,j,k)    ),
+                          mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k)  ),
+                          mesh.node_ptr(idx(type,nx,ny,i,j+1,k)    ),
+                          mesh.node_ptr(idx(type,nx,ny,i,j,k+1)    ),
+                          mesh.node_ptr(idx(type,nx,ny,i+1,j,k+1)  ),
+                          mesh.node_ptr(idx(type,nx,ny,i+1,j+1,k+1)),
+                          mesh.node_ptr(idx(type,nx,ny,i,j+1,k+1)  )}};
+
+                      std::vector<std::shared_ptr<Polygon>> sides(side_nodes.size());
+                      for (auto s : index_range(side_nodes))
+                        {
+                          sides[s] = std::make_shared<C0Polygon>(side_nodes[s].size());
+                          for (auto n : index_range(side_nodes[s]))
+                            sides[s]->set_node(n, elem_nodes[side_nodes[s][n]]);
+                        }
+
+                      std::unique_ptr<Node> mid_elem_node;
+                      std::unique_ptr<Elem> new_elem =
+                        std::make_unique<C0Polyhedron>(sides, mid_elem_node);
+                      if (mid_elem_node)
+                        mesh.add_node(std::move(mid_elem_node));
+
+                      new_elem->set_id() = elem_id++;
+                      Elem * elem = mesh.add_elem(std::move(new_elem));
 
                       if (k == 0)
                         boundary_info.add_side(elem, 0, 0);

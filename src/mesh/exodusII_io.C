@@ -20,6 +20,7 @@
 #include "libmesh/exodusII_io.h"
 
 #include "libmesh/boundary_info.h"
+#include "libmesh/cell_c0polyhedron.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/dyna_io.h"  // ElementDefinition for BEX
 #include "libmesh/enum_elem_type.h"
@@ -27,6 +28,7 @@
 #include "libmesh/enum_to_string.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/exodusII_io_helper.h"
+#include "libmesh/face_c0polygon.h"
 #include "libmesh/fpe_disabler.h"
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
@@ -474,20 +476,89 @@ void ExodusII_IO::read (const std::string & fname)
       // Set any relevant node/edge maps for this element
       const std::string type_str (exio_helper->get_elem_type());
       const auto & conv = exio_helper->get_conversion(type_str);
+      const bool is_c0polygon = (conv.libmesh_elem_type() == C0POLYGON);
+      const bool is_c0polyhedron = (conv.libmesh_elem_type() == C0POLYHEDRON);
+      std::size_t c0polygon_connect_offset = 0;
+      std::size_t c0polyhedron_connect_offset = 0;
 
       // Loop over all the faces in this block
       int jmax = nelem_last_block+exio_helper->num_elem_this_blk;
       for (int j=nelem_last_block; j<jmax; j++)
         {
-          auto uelem = Elem::build(conv.libmesh_elem_type());
-
           const int elem_num = j - nelem_last_block;
+          std::unique_ptr<Elem> uelem;
+
+          if (is_c0polygon)
+            {
+              const int n_elem_nodes = exio_helper->elem_node_counts[elem_num];
+              libmesh_error_msg_if(n_elem_nodes < 3,
+                                   "Error: Exodus NSIDED block element "
+                                   << elem_num
+                                   << " has only " << n_elem_nodes << " nodes.");
+
+              uelem = std::make_unique<C0Polygon>(cast_int<unsigned int>(n_elem_nodes));
+            }
+          else if (is_c0polyhedron)
+            {
+              const int n_faces = exio_helper->elem_face_counts[elem_num];
+              libmesh_error_msg_if(n_faces < 4,
+                                   "Error: Exodus NFACED block element "
+                                   << elem_num
+                                   << " has only " << n_faces << " faces.");
+
+              std::vector<std::shared_ptr<Polygon>>
+                sides(cast_int<std::size_t>(n_faces));
+
+              for (auto s : index_range(sides))
+                {
+                  libmesh_assert_less(c0polyhedron_connect_offset,
+                                      exio_helper->connect.size());
+                  const int exodus_face_id =
+                    exio_helper->connect[c0polyhedron_connect_offset++];
+
+                  libmesh_error_msg_if
+                    (exodus_face_id <= 0 ||
+                     exodus_face_id >
+                     cast_int<int>(exio_helper->c0polyhedron_face_connect.size()),
+                     "Error: Exodus NFACED block element "
+                     << elem_num
+                     << " references face ID " << exodus_face_id
+                     << ", but the file contains "
+                     << exio_helper->c0polyhedron_face_connect.size()
+                     << " faces.");
+
+                  const auto & face_nodes =
+                    exio_helper->c0polyhedron_face_connect[exodus_face_id - 1];
+                  auto side = std::make_shared<C0Polygon>
+                    (cast_int<unsigned int>(face_nodes.size()));
+
+                  for (auto n : index_range(face_nodes))
+                    {
+                      const auto libmesh_node_id =
+                        exio_helper->get_libmesh_node_id(face_nodes[n]);
+                      side->set_node(n, mesh.node_ptr(libmesh_node_id));
+                    }
+
+                  sides[s] = std::move(side);
+                }
+
+              std::unique_ptr<Node> mid_elem_node;
+              uelem = std::make_unique<C0Polyhedron>(sides, mid_elem_node);
+              if (mid_elem_node)
+                {
+                  Node * added_node = mesh.add_node(std::move(mid_elem_node));
+                  if (added_node->id() >= n_nodes)
+                    n_nodes = added_node->id() + 1;
+                }
+            }
+          else
+            uelem = Elem::build(conv.libmesh_elem_type());
 
           // Make sure that Exodus's number of nodes per Elem matches
           // the number of Nodes for this type of Elem. We only check
           // this for the first Elem in each block, since these values
           // are the same for every Elem in the block.
-          if (!elem_num)
+          if (!is_c0polygon && !is_c0polyhedron && !elem_num)
             libmesh_error_msg_if(exio_helper->num_nodes_per_elem != static_cast<int>(uelem->n_nodes()),
                                  "Error: Exodus file says "
                                  << exio_helper->num_nodes_per_elem
@@ -571,12 +642,26 @@ void ExodusII_IO::read (const std::string & fname)
           // If we don't have any Bezier extraction operators, this
           // is easy: we've already built all our nodes and just need
           // to link to them.
-          if (exio_helper->bex_cv_conn.empty())
+          if (is_c0polyhedron)
             {
-              for (int k=0; k<exio_helper->num_nodes_per_elem; k++)
+              // Node pointers were already assigned while constructing
+              // the polygonal sides above.
+            }
+          else if (exio_helper->bex_cv_conn.empty())
+            {
+              const int n_nodes_this_elem =
+                is_c0polygon ?
+                exio_helper->elem_node_counts[elem_num] :
+                exio_helper->num_nodes_per_elem;
+
+              for (int k=0; k<n_nodes_this_elem; k++)
                 {
                   // Get index into this block's connectivity array
-                  int gi = elem_num * exio_helper->num_nodes_per_elem + conv.get_node_map(k);
+                  std::size_t gi =
+                    is_c0polygon ?
+                    c0polygon_connect_offset++ :
+                    elem_num * exio_helper->num_nodes_per_elem + conv.get_node_map(k);
+                  libmesh_assert_less(gi, exio_helper->connect.size());
 
                   // Get the 1-based Exodus node id from the "connect" array
                   auto exodus_node_id = exio_helper->connect[gi];
@@ -710,6 +795,11 @@ void ExodusII_IO::read (const std::string & fname)
                 }
             }
         }
+
+      libmesh_assert(!is_c0polygon ||
+                     c0polygon_connect_offset == exio_helper->connect.size());
+      libmesh_assert(!is_c0polyhedron ||
+                     c0polyhedron_connect_offset == exio_helper->connect.size());
 
       // running sum of # of elements per block,
       // (should equal total number of elements in the end)

@@ -7,6 +7,7 @@
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/parallel_implementation.h>
 #include <libmesh/enum_to_string.h>
+#include <libmesh/elem_quality.h>
 
 using namespace libMesh;
 
@@ -83,6 +84,28 @@ public:
         // We're doing some polygon testing with a squashed pentagon
         // that has a 135 degree angle
         CPPUNIT_ASSERT_LESSEQUAL(135 + TOLERANCE, max_angle);
+
+        if (elem->type() == C0POLYGON ||
+            elem->type() == C0POLYHEDRON)
+          {
+            const std::vector<ElemQuality> expected = {
+              EDGE_LENGTH_RATIO,
+              JACOBIAN,
+              SCALED_JACOBIAN,
+              MAX_ANGLE,
+              MIN_ANGLE
+            };
+
+            CPPUNIT_ASSERT(expected == Quality::valid(elem->type()));
+
+            for (const auto quality : expected)
+              {
+                const auto bounds = elem->qual_bounds(quality);
+                CPPUNIT_ASSERT(bounds.first >= 0.);
+                CPPUNIT_ASSERT(bounds.second >= bounds.first);
+                CPPUNIT_ASSERT(std::isfinite(elem->quality(quality)));
+              }
+          }
 
         // Notes on minimum angle we expect to see:
         // 1.) 1D Elements don't have interior angles, so the base

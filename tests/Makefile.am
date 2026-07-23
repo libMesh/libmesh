@@ -415,6 +415,10 @@ CLEANFILES = cube_mesh.xda \
              side_discontinuous_QUAD9_disc.e \
              side_discontinuous_TRI6.e \
              side_discontinuous_TRI6_disc.e \
+             write_exodus_C0POLYGON.e \
+             write_exodus_C0POLYHEDRON.e \
+             write_exodus_C0POLYHEDRON_HEXPRISM.e \
+             write_exodus_C0POLYHEDRON_HEXPRISM_READ.e \
              write_exodus_EDGE2.e \
              write_exodus_EDGE3.e \
              write_exodus_EDGE4.e \
