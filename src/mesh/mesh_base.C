@@ -2072,19 +2072,31 @@ void MeshBase::detect_interior_parents()
   // This requires an inspection on every processor
   parallel_object_only();
 
-  // This requires up-to-date mesh dimensions in cache
-  libmesh_assert(_preparation.has_cached_elem_data);
+  // This requires up-to-date mesh dimensions, but if we don't have
+  // them cached then we can't update them without changing the mesh
+  // in unexpected ways that interfere with our tests of
+  // partially-prepared meshes in MeshTools::*valid_is_prepared
+  std::set<unsigned char> elem_dims_copy;
+  if (_preparation.has_cached_elem_data)
+    elem_dims_copy = this->elem_dimensions();
+  else
+    {
+      for (const auto & elem : this->active_element_ptr_range())
+        elem_dims_copy.insert(cast_int<unsigned char>(elem->dim()));
+      if (!this->is_serial())
+        this->comm().set_union(elem_dims_copy);
+    }
 
   // Early return if the mesh is empty or has elements of a single spatial dimension.
-  if (this->elem_dimensions().size() <= 1)
+  if (elem_dims_copy.size() <= 1)
     {
       _preparation.has_interior_parent_ptrs = true;
       return;
     }
 
   // Convenient elem_dimensions iterators
-  const auto dim_start = this->elem_dimensions().begin();
-  const auto dim_end = this->elem_dimensions().end();
+  const auto dim_start = elem_dims_copy.begin();
+  const auto dim_end = elem_dims_copy.end();
 
   // In this function we find only +1 dimensional interior parents,
   // (so, for a given element el, the interior parent p must satisfy p.dim() == el.dim() + 1).

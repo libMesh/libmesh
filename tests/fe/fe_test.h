@@ -530,6 +530,7 @@ public:
           }
       }
 
+    _mesh->complete_preparation();
     _es = std::make_unique<EquationSystems>(*_mesh);
     _sys = &(_es->add_system<System> ("SimpleSystem"));
     _sys->add_variable("u", order, family);
