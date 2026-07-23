@@ -488,6 +488,8 @@ public:
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( testProjectScalarCoarsening );
+
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #ifdef LIBMESH_HAVE_PETSC
   CPPUNIT_TEST( testProjectMatrixEdge2 );
@@ -826,6 +828,64 @@ public:
                       u_subdomains, v_subdomains, w_subdomains,
                       es.parameters);
 #endif
+  }
+
+  void testProjectScalarCoarsening()
+  {
+    Mesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_square(mesh,
+                                        2, 2,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    // Initialize the EquationSystems on a refined mesh so that the
+    // subsequent reinit performs a fine-to-coarse projection.
+    MeshRefinement mesh_refinement(mesh);
+    for (auto & elem : mesh.active_element_ptr_range())
+      elem->set_refinement_flag(Elem::REFINE);
+    mesh_refinement.refine_elements();
+    mesh.prepare_for_use();
+
+    EquationSystems es(mesh);
+    ExplicitSystem & sys =
+      es.add_system<ExplicitSystem>("SimpleSystem");
+
+    sys.add_variable("u", CONSTANT, MONOMIAL);
+    const unsigned int scalar_var =
+      sys.add_variable("scalar", FIRST, SCALAR);
+
+    es.init();
+
+    std::vector<dof_id_type> scalar_dofs;
+    sys.get_dof_map().SCALAR_dof_indices(scalar_dofs, scalar_var);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), scalar_dofs.size());
+
+    NumericVector<Number> & solution = *sys.solution;
+    const dof_id_type scalar_dof = scalar_dofs[0];
+    if (scalar_dof >= solution.first_local_index() &&
+        scalar_dof < solution.last_local_index())
+      solution.set(scalar_dof, 7.25);
+    solution.close();
+
+    for (auto & elem : mesh.active_element_ptr_range())
+      elem->set_refinement_flag(Elem::COARSEN);
+
+    es.reinit();
+
+    scalar_dofs.clear();
+    sys.get_dof_map().SCALAR_dof_indices(scalar_dofs, scalar_var);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), scalar_dofs.size());
+
+    std::unique_ptr<NumericVector<Number>> localized_solution =
+      NumericVector<Number>::build(es.comm());
+    localized_solution->init(sys.n_dofs(), false, SERIAL);
+    sys.solution->localize(*localized_solution);
+
+    LIBMESH_ASSERT_NUMBERS_EQUAL((*localized_solution)(scalar_dofs[0]),
+                                 Number(7.25),
+                                 TOLERANCE);
   }
 
   void test2DProjectVectorFE(const ElemType elem_type)
