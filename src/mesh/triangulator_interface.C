@@ -18,6 +18,26 @@
 
 #include "libmesh/libmesh_config.h"
 
+// Avoid anything here that might break precise IEEE754 compatibility,
+// to give us more reproduceable results.
+//
+// We can't disable excess x87 precision from pragmas, but hopefully
+// anyone optimizing will be using SSE instead anyway.
+#if defined(__clang__)
+#  pragma float_control(precise, on)
+#  pragma clang fp contract(off) reassociate(off)
+#elif defined(__NVCOMPILER)
+// We can't get -Kieee from pragmas, but so far FMA contractions are
+// the only thing we've caught breaking us, and nvc++ inherits a
+// pragma for those from LLVM.
+#  pragma clang fp contract(off) reassociate(off)
+#elif defined(__GNUC__)
+// GCC goes last, because other compilers define __GNUC__, because
+// they're liars.
+#  pragma GCC optimize("-fno-unsafe-math-optimizations")
+#  pragma GCC optimize("-ffp-contract=off")
+#endif
+
 // libmesh includes
 #include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/unstructured_mesh.h"
