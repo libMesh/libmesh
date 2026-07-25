@@ -23,6 +23,7 @@
 #include "libmesh/fe.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_macro.h"
+#include "libmesh/int_range.h"
 
 namespace libMesh
 {
@@ -34,20 +35,47 @@ namespace libMesh
 namespace {
 
 void side_hierarchic_nodal_soln(const Elem * elem,
-                                const Order /* order */,
-                                const std::vector<Number> & /* elem_soln */,
+                                const Order order,
+                                const std::vector<Number> & elem_soln,
                                 std::vector<Number> & nodal_soln,
-                                const bool /*add_p_level*/)
+                                const bool add_p_level)
 {
   const unsigned int n_nodes = elem->n_nodes();
 
-  std::fill(nodal_soln.begin(), nodal_soln.end(), 0);
-  nodal_soln.resize(n_nodes, 0);
+  nodal_soln.assign(n_nodes, 0);
 
   // We request nodal solutions when plotting, for consistency with
-  // other elements; plotting 0 on non-sides makes sense in that
-  // context.
+  // other elements. Side solutions do not have unique values at element
+  // nodes shared by multiple sides, so average the side values there.
   // libmesh_warning("Nodal solution requested for a side element; this makes no sense.");
+  std::vector<unsigned int> nodal_soln_count(n_nodes, 0);
+  const FEType fe_type{order, SIDE_HIERARCHIC};
+  std::vector<Number> nodal_soln_on_side;
+
+  for (const auto side : elem->side_index_range())
+    {
+      const std::vector<unsigned int> side_nodes =
+        elem->nodes_on_side(side);
+
+      FEInterface::side_nodal_soln(fe_type,
+                                   elem,
+                                   side,
+                                   elem_soln,
+                                   nodal_soln_on_side,
+                                   add_p_level);
+      libmesh_assert_equal_to(nodal_soln_on_side.size(), side_nodes.size());
+
+      for (const auto i : index_range(side_nodes))
+        {
+          const auto n = side_nodes[i];
+          nodal_soln[n] += nodal_soln_on_side[i];
+          ++nodal_soln_count[n];
+        }
+    }
+
+  for (const auto n : index_range(nodal_soln))
+    if (nodal_soln_count[n])
+      nodal_soln[n] /= nodal_soln_count[n];
 } // side_hierarchic_nodal_soln()
 
 
