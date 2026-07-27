@@ -308,7 +308,7 @@ extern bool warned_about_auto_ptr;
 #define libmesh_assert_msg(asserted, msg)                               \
   do {                                                                  \
     if (!(asserted)) {                                                  \
-      libmesh_error_msg(msg);                                           \
+      libmesh_error_msg("Assertion `" #asserted "' failed.\n" << msg);                                           \
     } } while (0)
 
 #define libmesh_exceptionless_assert_msg(asserted, msg)                 \
