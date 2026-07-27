@@ -489,21 +489,18 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
 
         break;
       }
+
     case C0POLYGON:
     case C0POLYHEDRON:
       {
         v = {
-          EDGE_LENGTH_RATIO,
           JACOBIAN,
-          SCALED_JACOBIAN,
           MAX_ANGLE,
           MIN_ANGLE
         };
 
         break;
       }
-
-
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

@@ -89,9 +89,7 @@ public:
             elem->type() == C0POLYHEDRON)
           {
             const std::vector<ElemQuality> expected = {
-              EDGE_LENGTH_RATIO,
               JACOBIAN,
-              SCALED_JACOBIAN,
               MAX_ANGLE,
               MIN_ANGLE
             };
