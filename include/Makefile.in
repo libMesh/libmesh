@@ -1090,6 +1090,7 @@ include_HEADERS = \
         timpi_shims/status.h \
         utils/chunked_mapvector.h \
         utils/compare_types.h \
+        utils/enforce_ieee754.h \
         utils/enum_to_string.h \
         utils/error_vector.h \
         utils/fpe_disabler.h \
@@ -1114,6 +1115,7 @@ include_HEADERS = \
         utils/point_locator_tree.h \
         utils/pointer_to_pointer_iter.h \
         utils/pool_allocator.h \
+        utils/restore_ieee754.h \
         utils/restore_warnings.h \
         utils/simple_range.h \
         utils/statistics.h \

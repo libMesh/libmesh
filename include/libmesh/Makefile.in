@@ -696,18 +696,19 @@ BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	post_wait_dereference_shared_ptr.h post_wait_dereference_tag.h \
 	post_wait_free_buffer.h post_wait_unpack_buffer.h \
 	post_wait_work.h request.h standard_type.h status.h \
-	chunked_mapvector.h compare_types.h enum_to_string.h \
-	error_vector.h fpe_disabler.h fuzzy_equals.h hashing.h \
-	hashword.h ignore_warnings.h int_range.h jacobi_polynomials.h \
-	libmesh_nullptr.h location_maps.h mapvector.h \
-	null_output_iterator.h number_lookups.h ostream_proxy.h \
-	parameters.h perf_log.h perfmon.h plt_loader.h \
+	chunked_mapvector.h compare_types.h enforce_ieee754.h \
+	enum_to_string.h error_vector.h fpe_disabler.h fuzzy_equals.h \
+	hashing.h hashword.h ignore_warnings.h int_range.h \
+	jacobi_polynomials.h libmesh_nullptr.h location_maps.h \
+	mapvector.h null_output_iterator.h number_lookups.h \
+	ostream_proxy.h parameters.h perf_log.h perfmon.h plt_loader.h \
 	point_locator_base.h point_locator_nanoflann.h \
 	point_locator_tree.h pointer_to_pointer_iter.h \
-	pool_allocator.h restore_warnings.h simple_range.h \
-	statistics.h string_to_enum.h thread_buffered_syncbuf.h \
-	timestamp.h topology_map.h tree.h tree_base.h tree_node.h \
-	utility.h vectormap.h win_gettimeofday.h xdr_cxx.h \
+	pool_allocator.h restore_ieee754.h restore_warnings.h \
+	simple_range.h statistics.h string_to_enum.h \
+	thread_buffered_syncbuf.h timestamp.h topology_map.h tree.h \
+	tree_base.h tree_node.h utility.h vectormap.h \
+	win_gettimeofday.h xdr_cxx.h \
 	parallel_communicator_specializations $(am__append_1) \
 	$(am__append_3) $(am__append_5) $(am__append_7) \
 	$(am__append_9) $(am__append_11) $(am__append_13) \
@@ -2362,6 +2363,9 @@ chunked_mapvector.h: $(top_srcdir)/include/utils/chunked_mapvector.h
 compare_types.h: $(top_srcdir)/include/utils/compare_types.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+enforce_ieee754.h: $(top_srcdir)/include/utils/enforce_ieee754.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 enum_to_string.h: $(top_srcdir)/include/utils/enum_to_string.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -2432,6 +2436,9 @@ pointer_to_pointer_iter.h: $(top_srcdir)/include/utils/pointer_to_pointer_iter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+restore_ieee754.h: $(top_srcdir)/include/utils/restore_ieee754.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h
