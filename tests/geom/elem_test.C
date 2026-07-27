@@ -125,7 +125,9 @@ public:
             const std::vector<ElemQuality> expected = {
               EDGE_LENGTH_RATIO,
               MAX_ANGLE,
-              MIN_ANGLE
+              MIN_ANGLE,
+              MAX_DIHEDRAL_ANGLE,
+              MIN_DIHEDRAL_ANGLE
             };
 
             CPPUNIT_ASSERT(expected == Quality::valid(elem->type()));
@@ -137,6 +139,9 @@ public:
             assert_quality(
               MAX_ANGLE, Real(180) - min_polyhedron_angle, 60., 180.);
             assert_quality(MIN_ANGLE, min_polyhedron_angle, 30., 180.);
+            assert_quality(MAX_DIHEDRAL_ANGLE, 90., 60., 90.);
+            assert_quality(
+              MIN_DIHEDRAL_ANGLE, min_polyhedron_angle, 30., 90.);
           }
 
         // Notes on minimum angle we expect to see:
@@ -150,10 +155,9 @@ public:
         if (elem->dim() > 1)
           CPPUNIT_ASSERT_GREATEREQUAL((std::acos(Real(2)/std::sqrt(Real(6))) * 180 / libMesh::pi) - TOLERANCE, min_angle);
 
-        // MIN,MAX_DIHEDRAL_ANGLE are implemented for the fixed-topology
-        // 3D elements tested here.  The generic implementation is not
-        // suitable for arbitrary C0Polyhedron faces and angles.
-        if (elem->dim() > 2 && elem->type() != C0POLYHEDRON)
+        // MIN,MAX_DIHEDRAL_ANGLE are implemented for all 3D elements
+        // tested here.
+        if (elem->dim() > 2)
           {
             const Real min_dihedral_angle = elem->quality(MIN_DIHEDRAL_ANGLE);
             const Real max_dihedral_angle = elem->quality(MAX_DIHEDRAL_ANGLE);

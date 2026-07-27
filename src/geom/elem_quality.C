@@ -215,18 +215,22 @@ std::string Quality::describe (const ElemQuality q)
 
     case MAX_DIHEDRAL_ANGLE:
       desc << "Largest angle between all adjacent pairs of sides (in 2D, equivalent to MAX_ANGLE).\n"
+           << "In 3D, this is the largest unoriented angle between adjacent side planes, in the range [0, 90].\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (90 -> 135)\n"
-           << "Triangles: (60 -> 90)";
+           << "Triangles: (60 -> 90)\n"
+           << "C0Polyhedra: (60 -> 90)";
       break;
 
     case MIN_DIHEDRAL_ANGLE:
       desc << "Smallest angle between all adjacent pairs of sides (in 2D, equivalent to MIN_ANGLE).\n"
+           << "In 3D, this is the smallest unoriented angle between adjacent side planes, in the range [0, 90].\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (45 -> 90)\n"
-           << "Triangles: (30 -> 60)";
+           << "Triangles: (30 -> 60)\n"
+           << "C0Polyhedra: (30 -> 90)";
       break;
 
     case CONDITION:
@@ -515,7 +519,9 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
         v = {
           EDGE_LENGTH_RATIO,
           MAX_ANGLE,
-          MIN_ANGLE
+          MIN_ANGLE,
+          MAX_DIHEDRAL_ANGLE,
+          MIN_DIHEDRAL_ANGLE
         };
 
         break;
