@@ -19,6 +19,12 @@
 // Note: no include guards!  We want to be able to #include this
 // header multiple times.
 
+
+// Avoid anything later that might break precise IEEE754 compatibility
+//
+// We can't disable excess x87 precision from pragmas, but hopefully
+// anyone optimizing will be using SSE instead anyway.
+
 // TODO: icpc options
 #if defined(__clang__) || defined(__NVCOMPILER)
 #  pragma float_control(push)
