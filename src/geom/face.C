@@ -20,7 +20,11 @@
 #include "libmesh/int_range.h"
 #include "libmesh/point.h"
 
-// C++ includes
+
+// We'd like reproduceability in our quasi-circumcenter calculations,
+// because different FP rounding can lead to different triangle
+// splitting decisions
+#include "libmesh/enforce_ieee754.h"
 
 
 namespace libMesh
@@ -59,3 +63,8 @@ Point Face::quasicircumcenter () const
 }
 
 } // namespace libMesh
+  //
+
+// Unnecessary at end of file, *except* maybe we'll do a unity build
+// someday, and in the meantime test coverage is nice.
+#include "libmesh/restore_ieee754.h"
