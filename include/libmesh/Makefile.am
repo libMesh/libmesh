@@ -474,6 +474,7 @@ BUILT_SOURCES = \
         status.h \
         chunked_mapvector.h \
         compare_types.h \
+        enforce_ieee754.h \
         enum_to_string.h \
         error_vector.h \
         fpe_disabler.h \
@@ -498,6 +499,7 @@ BUILT_SOURCES = \
         point_locator_tree.h \
         pointer_to_pointer_iter.h \
         pool_allocator.h \
+        restore_ieee754.h \
         restore_warnings.h \
         simple_range.h \
         statistics.h \
@@ -2022,6 +2024,9 @@ chunked_mapvector.h: $(top_srcdir)/include/utils/chunked_mapvector.h
 compare_types.h: $(top_srcdir)/include/utils/compare_types.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+enforce_ieee754.h: $(top_srcdir)/include/utils/enforce_ieee754.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 enum_to_string.h: $(top_srcdir)/include/utils/enum_to_string.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -2092,6 +2097,9 @@ pointer_to_pointer_iter.h: $(top_srcdir)/include/utils/pointer_to_pointer_iter.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 pool_allocator.h: $(top_srcdir)/include/utils/pool_allocator.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+restore_ieee754.h: $(top_srcdir)/include/utils/restore_ieee754.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 restore_warnings.h: $(top_srcdir)/include/utils/restore_warnings.h
