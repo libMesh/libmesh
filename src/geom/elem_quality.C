@@ -46,6 +46,10 @@ std::string Quality::name (const ElemQuality q)
   switch (q)
     {
 
+    case EDGE_LENGTH_RATIO:
+      its_name = "Edge Length Ratio";
+      break;
+
     case ASPECT_RATIO:
       its_name = "Aspect Ratio";
       break;
@@ -491,10 +495,25 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
       }
 
     case C0POLYGON:
-    case C0POLYHEDRON:
       {
         v = {
+          EDGE_LENGTH_RATIO,
           JACOBIAN,
+          SCALED_JACOBIAN,
+          MAX_ANGLE,
+          MIN_ANGLE
+        };
+
+        break;
+      }
+
+    case C0POLYHEDRON:
+      {
+        // The generic Jacobian metrics only inspect vertices with
+        // exactly three adjacent edges, but arbitrary polyhedra may
+        // have vertices of higher valence.
+        v = {
+          EDGE_LENGTH_RATIO,
           MAX_ANGLE,
           MIN_ANGLE
         };
