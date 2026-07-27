@@ -66,8 +66,9 @@ public:
         // We're building isotropic meshes, where even elements
         // dissected from cubes ought to have tolerable quality.
         //
-        // Worst I see is 2 on tets, but let's add a little tolerance
-        // in case we decide to play with rotated meshes here later
+        // Worst I see is 2 on tets and the skewed C0Polyhedron, but
+        // let's add a little tolerance in case we decide to play with
+        // rotated meshes here later.
         CPPUNIT_ASSERT_LESSEQUAL(Real(2+TOLERANCE), edge_length_ratio); // edge_length_ratio <= 2
 
         // The MIN_ANGLE and MAX_ANGLE quality metrics are also defined on all elements
@@ -85,24 +86,57 @@ public:
         // that has a 135 degree angle
         CPPUNIT_ASSERT_LESSEQUAL(135 + TOLERANCE, max_angle);
 
-        if (elem->type() == C0POLYGON ||
-            elem->type() == C0POLYHEDRON)
+        const auto assert_quality =
+          [elem](const ElemQuality quality,
+                 const Real expected_value,
+                 const Real expected_lower_bound,
+                 const Real expected_upper_bound)
+          {
+            const auto bounds = elem->qual_bounds(quality);
+            LIBMESH_ASSERT_FP_EQUAL(expected_lower_bound, bounds.first, TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(expected_upper_bound, bounds.second, TOLERANCE);
+            LIBMESH_ASSERT_FP_EQUAL(expected_value, elem->quality(quality), TOLERANCE);
+          };
+
+        if (elem->type() == C0POLYGON)
           {
             const std::vector<ElemQuality> expected = {
+              EDGE_LENGTH_RATIO,
               JACOBIAN,
+              SCALED_JACOBIAN,
+              MAX_ANGLE,
+              MIN_ANGLE
+            };
+
+            CPPUNIT_ASSERT(expected == Quality::valid(elem->type()));
+            CPPUNIT_ASSERT_EQUAL(
+              std::string("Edge Length Ratio"),
+              Quality::name(EDGE_LENGTH_RATIO));
+
+            assert_quality(EDGE_LENGTH_RATIO, std::sqrt(Real(2)), 1., 4.);
+            assert_quality(JACOBIAN, 0.5, 0.5, 1.);
+            assert_quality(
+              SCALED_JACOBIAN, Real(1) / std::sqrt(Real(2)), 0.5, 1.);
+            assert_quality(MAX_ANGLE, 135., 108., 144.);
+            assert_quality(MIN_ANGLE, 90., 54., 108.);
+          }
+        else if (elem->type() == C0POLYHEDRON)
+          {
+            const std::vector<ElemQuality> expected = {
+              EDGE_LENGTH_RATIO,
               MAX_ANGLE,
               MIN_ANGLE
             };
 
             CPPUNIT_ASSERT(expected == Quality::valid(elem->type()));
 
-            for (const auto quality : expected)
-              {
-                const auto bounds = elem->qual_bounds(quality);
-                CPPUNIT_ASSERT(bounds.first >= 0.);
-                CPPUNIT_ASSERT(bounds.second >= bounds.first);
-                CPPUNIT_ASSERT(std::isfinite(elem->quality(quality)));
-              }
+            const Real min_polyhedron_angle =
+              std::acos(Real(1) / std::sqrt(Real(17))) *
+              Real(180) / libMesh::pi;
+            assert_quality(EDGE_LENGTH_RATIO, 2., 1., 4.);
+            assert_quality(
+              MAX_ANGLE, Real(180) - min_polyhedron_angle, 60., 180.);
+            assert_quality(MIN_ANGLE, min_polyhedron_angle, 30., 180.);
           }
 
         // Notes on minimum angle we expect to see:
@@ -116,8 +150,10 @@ public:
         if (elem->dim() > 1)
           CPPUNIT_ASSERT_GREATEREQUAL((std::acos(Real(2)/std::sqrt(Real(6))) * 180 / libMesh::pi) - TOLERANCE, min_angle);
 
-        // MIN,MAX_DIHEDRAL_ANGLE are implemented for all 3D elements
-        if (elem->dim() > 2)
+        // MIN,MAX_DIHEDRAL_ANGLE are implemented for the fixed-topology
+        // 3D elements tested here.  The generic implementation is not
+        // suitable for arbitrary C0Polyhedron faces and angles.
+        if (elem->dim() > 2 && elem->type() != C0POLYHEDRON)
           {
             const Real min_dihedral_angle = elem->quality(MIN_DIHEDRAL_ANGLE);
             const Real max_dihedral_angle = elem->quality(MAX_DIHEDRAL_ANGLE);
@@ -141,46 +177,50 @@ public:
             CPPUNIT_ASSERT_GREATEREQUAL(45 - TOLERANCE, min_dihedral_angle);
           }
 
-        // The JACOBIAN and SCALED_JACOBIAN quality metrics are also defined on all elements
+        // The generic JACOBIAN metrics require exactly dim() adjacent
+        // edges at a vertex, which is not guaranteed for arbitrary
+        // C0Polyhedron topology.
+        if (elem->type() != C0POLYHEDRON)
+          {
+            // The largest non-infinite elements in this test (Hexes and
+            // Prisms) have a nodal Jacobian (volume) of 8, e.g. the 2x2x2
+            // reference Hex. The infinite elements that we construct for
+            // this testing have a max nodal area of 64 since they are
+            // created (see setUp()) with max side lengths of 4 (4*4*4=64).
+            const Real jac = elem->quality(JACOBIAN);
+            if (elem->infinite())
+              CPPUNIT_ASSERT_LESSEQUAL   (64 + TOLERANCE, jac);
+            else
+              CPPUNIT_ASSERT_LESSEQUAL   (8 + TOLERANCE, jac);
 
-        // The largest non-infinite elements in this test (Hexes and
-        // Prisms) have a nodal Jacobian (volume) of 8, e.g. the 2x2x2
-        // reference Hex. The infinite elements that we construct for
-        // this testing have a max nodal area of 64 since they are
-        // created (see setUp()) with max side lengths of 4 (4*4*4=64).
-        const Real jac = elem->quality(JACOBIAN);
-        if (elem->infinite())
-          CPPUNIT_ASSERT_LESSEQUAL   (64 + TOLERANCE, jac);
-        else
-          CPPUNIT_ASSERT_LESSEQUAL   (8 + TOLERANCE, jac);
+            // The smallest 2D/3D nodal areas for regular elements in this
+            // test are found in tetrahedra, which have a minimum value of
+            // 2.0. However, we return a default value of 1.0 for 0D and
+            // 1D elements here, and we have a custom distorted-pentagon
+            // C0Polygon with a 0.5 at 3 nodes, so we handle those cases
+            // too.
+            if (elem->dim() < 2)
+              CPPUNIT_ASSERT_GREATEREQUAL(1 - TOLERANCE, jac);
+            else if (elem->type() == C0POLYGON)
+              CPPUNIT_ASSERT_GREATEREQUAL(0.5 - TOLERANCE, jac);
+            else
+              CPPUNIT_ASSERT_GREATEREQUAL(2 - TOLERANCE, jac);
 
-        // The smallest 2D/3D nodal areas for regular elements in this
-        // test are found in tetrahedra, which have a minimum value of
-        // 2.0. However, we return a default value of 1.0 for 0D and
-        // 1D elements here, and we have a custom distorted-pentagon
-        // C0Polygon with a 0.5 at 2 nodes and a custom C0Polyhedron
-        // with a 1, so we handle those cases too.
-        if (elem->dim() < 2 || elem->type() == C0POLYHEDRON)
-          CPPUNIT_ASSERT_GREATEREQUAL(1 - TOLERANCE, jac);
-        else if (elem->type() == C0POLYGON)
-          CPPUNIT_ASSERT_GREATEREQUAL(0.5 - TOLERANCE, jac);
-        else
-          CPPUNIT_ASSERT_GREATEREQUAL(2 - TOLERANCE, jac);
+            // The scaled Jacobian should always be <= 1. The minimum
+            // scaled Jacobian value I observed was ~0.408248 for the
+            // tetrahedral meshes. This is consistent with the way that
+            // we generate Tet meshes with build_cube(), as we don't
+            // simply refine the reference tetrahedron in that case.
+            const Real scaled_jac = elem->quality(SCALED_JACOBIAN);
+            CPPUNIT_ASSERT_LESSEQUAL   (1 + TOLERANCE, scaled_jac);
+            CPPUNIT_ASSERT_GREATEREQUAL(    Real(0.4), scaled_jac);
 
-        // The scaled Jacobian should always be <= 1. The minimum
-        // scaled Jacobian value I observed was ~0.408248 for the
-        // tetrahedral meshes. This is consistent with the way that
-        // we generate Tet meshes with build_cube(), as we don't
-        // simply refine the reference tetrahedron in that case.
-        const Real scaled_jac = elem->quality(SCALED_JACOBIAN);
-        CPPUNIT_ASSERT_LESSEQUAL   (1 + TOLERANCE, scaled_jac);
-        CPPUNIT_ASSERT_GREATEREQUAL(    Real(0.4), scaled_jac);
-
-        // Debugging
-        // libMesh::out << "elem->type() = " << Utility::enum_to_string(elem->type())
-        //              << ", jac = " << jac
-        //              << ", scaled_jac = " << scaled_jac
-        //              << std::endl;
+            // Debugging
+            // libMesh::out << "elem->type() = " << Utility::enum_to_string(elem->type())
+            //              << ", jac = " << jac
+            //              << ", scaled_jac = " << scaled_jac
+            //              << std::endl;
+          }
       }
   }
 
@@ -956,7 +996,7 @@ INSTANTIATE_ELEMTEST(QUADSHELL9);
 // This just tests with one pentagon, but better than nothing
 INSTANTIATE_ELEMTEST(C0POLYGON);
 
-// And this is just one truncated cube; also better than nothing
+// And this is just one skewed box; also better than nothing
 INSTANTIATE_ELEMTEST(C0POLYHEDRON);
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
