@@ -214,18 +214,20 @@ public:
 #endif
 
 #if 1
-        // Or try a plain cube, for simpler debugging
+        // Or try an affine-skewed box.  Unlike a unit cube, its
+        // non-unit quality values cannot be confused with the generic
+        // fallback value of 1.
         _mesh->add_point(Point(0, 0, 0), 0);
-        _mesh->add_point(Point(1, 0, 0), 1);
-        _mesh->add_point(Point(1, 1, 0), 2);
-        _mesh->add_point(Point(0, 1, 0), 3);
+        _mesh->add_point(Point(2, 0, 0), 1);
+        _mesh->add_point(Point(2.25, 1, 0), 2);
+        _mesh->add_point(Point(0.25, 1, 0), 3);
         _mesh->add_point(Point(0, 0, 1), 4);
-        _mesh->add_point(Point(1, 0, 1), 5);
-        _mesh->add_point(Point(1, 1, 1), 6);
-        _mesh->add_point(Point(0, 1, 1), 7);
+        _mesh->add_point(Point(2, 0, 1), 5);
+        _mesh->add_point(Point(2.25, 1, 1), 6);
+        _mesh->add_point(Point(0.25, 1, 1), 7);
 
         // With some combinations of face triangulations, even a
-        // simple cube has no tetrahedralization that doesn't have
+        // simple box has no tetrahedralization that doesn't have
         // either interior discontinuities or a 0-volume pancake tet!
         //
         // The initial "natural" way to orient our sides is commented

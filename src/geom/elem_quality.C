@@ -46,6 +46,10 @@ std::string Quality::name (const ElemQuality q)
   switch (q)
     {
 
+    case EDGE_LENGTH_RATIO:
+      its_name = "Edge Length Ratio";
+      break;
+
     case ASPECT_RATIO:
       its_name = "Aspect Ratio";
       break;
@@ -211,18 +215,22 @@ std::string Quality::describe (const ElemQuality q)
 
     case MAX_DIHEDRAL_ANGLE:
       desc << "Largest angle between all adjacent pairs of sides (in 2D, equivalent to MAX_ANGLE).\n"
+           << "In 3D, this is the largest unoriented angle between adjacent side planes, in the range [0, 90].\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (90 -> 135)\n"
-           << "Triangles: (60 -> 90)";
+           << "Triangles: (60 -> 90)\n"
+           << "C0Polyhedra: (60 -> 90)";
       break;
 
     case MIN_DIHEDRAL_ANGLE:
       desc << "Smallest angle between all adjacent pairs of sides (in 2D, equivalent to MIN_ANGLE).\n"
+           << "In 3D, this is the smallest unoriented angle between adjacent side planes, in the range [0, 90].\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (45 -> 90)\n"
-           << "Triangles: (30 -> 60)";
+           << "Triangles: (30 -> 60)\n"
+           << "C0Polyhedra: (30 -> 90)";
       break;
 
     case CONDITION:
@@ -490,7 +498,34 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
         break;
       }
 
+    case C0POLYGON:
+      {
+        v = {
+          EDGE_LENGTH_RATIO,
+          JACOBIAN,
+          SCALED_JACOBIAN,
+          MAX_ANGLE,
+          MIN_ANGLE
+        };
 
+        break;
+      }
+
+    case C0POLYHEDRON:
+      {
+        // The generic Jacobian metrics only inspect vertices with
+        // exactly three adjacent edges, but arbitrary polyhedra may
+        // have vertices of higher valence.
+        v = {
+          EDGE_LENGTH_RATIO,
+          MAX_ANGLE,
+          MIN_ANGLE,
+          MAX_DIHEDRAL_ANGLE,
+          MIN_DIHEDRAL_ANGLE
+        };
+
+        break;
+      }
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 

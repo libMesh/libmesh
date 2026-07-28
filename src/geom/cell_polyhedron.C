@@ -494,6 +494,19 @@ std::pair<Real, Real> Polyhedron::qual_bounds (const ElemQuality q) const
       bounds.second = 180.;
       break;
 
+    // The generic dihedral metrics measure the unoriented angle
+    // between adjacent face planes, so their values are in [0, 90].
+    // Use the same recommended lower bounds as MIN,MAX_ANGLE.
+    case MIN_DIHEDRAL_ANGLE:
+      bounds.first  = 30.;
+      bounds.second = 90.;
+      break;
+
+    case MAX_DIHEDRAL_ANGLE:
+      bounds.first  = 60.;
+      bounds.second = 90.;
+      break;
+
     case JACOBIAN:
     case SCALED_JACOBIAN:
       bounds.first  = 0.5;

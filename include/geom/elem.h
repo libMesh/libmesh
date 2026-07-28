@@ -1087,11 +1087,14 @@ public:
    * .) EDGE_LENGTH_RATIO - ratio of maximum to minimum edge (in 2D,
    *    side) length, where the min/max is taken over all Elem edges.
    * .) MIN,MAX_ANGLE - The minimum (respectively maximum) angle
-   *    between all pairs of adjacent Elem edges, in degrees. Note
-   *    that, in 3D, these are *not* the dihedral angles (angle
-   *    between adjacent planar faces of the element), which we plan to
-   *    add support for in the future. In 2D, we compute the angle
-   *    between adjacent sides for this metric.
+   *    between all pairs of adjacent Elem edges, in degrees. In 3D,
+   *    these are *not* the dihedral angles between adjacent planar
+   *    faces of the element. In 2D, we compute the angle between
+   *    adjacent sides for this metric.
+   * .) MIN,MAX_DIHEDRAL_ANGLE - In 3D, the minimum (respectively
+   *    maximum) unoriented angle between adjacent side planes, folded
+   *    into the range [0, 90] degrees. In 2D, these are equivalent to
+   *    MIN,MAX_ANGLE.
    */
   virtual Real quality (const ElemQuality q) const;
 
