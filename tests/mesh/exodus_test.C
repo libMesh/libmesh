@@ -157,6 +157,7 @@ public:
       exii_input.read("write_exodus_C0POLYGON.e");
 
     MeshCommunication().broadcast(input_mesh);
+    MeshSerializer input_serializer(input_mesh);
     input_mesh.prepare_for_use();
 
     CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(1), input_mesh.n_elem());
@@ -317,14 +318,17 @@ public:
     this->build_c0polyhedron(mesh, points, nodes_on_side);
 
     std::vector<std::vector<dof_id_type>> expected_nodes_on_side;
-    const Elem & output_elem = mesh.elem_ref(0);
-    expected_nodes_on_side.reserve(output_elem.n_sides());
-    for (auto s : output_elem.side_index_range())
-      {
-        expected_nodes_on_side.emplace_back();
-        for (const auto n : output_elem.nodes_on_side(s))
-          expected_nodes_on_side.back().push_back(output_elem.node_id(n));
-      }
+    {
+      MeshSerializer output_serializer(mesh);
+      const Elem & output_elem = mesh.elem_ref(0);
+      expected_nodes_on_side.reserve(output_elem.n_sides());
+      for (auto s : output_elem.side_index_range())
+        {
+          expected_nodes_on_side.emplace_back();
+          for (const auto n : output_elem.nodes_on_side(s))
+            expected_nodes_on_side.back().push_back(output_elem.node_id(n));
+        }
+    }
 
     {
       ExodusII_IO exii(mesh);
@@ -337,6 +341,7 @@ public:
       exii_input.read("write_exodus_C0POLYHEDRON_HEXPRISM_READ.e");
 
     MeshCommunication().broadcast(input_mesh);
+    MeshSerializer input_serializer(input_mesh);
     input_mesh.prepare_for_use();
 
     CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(1), input_mesh.n_elem());
