@@ -20,7 +20,6 @@
 
 
 // C++ includes
-#include <map>
 #include <sstream>
 
 // Local includes
@@ -105,8 +104,14 @@ void NetGenMeshInterface::triangulate ()
   // outer mesh and hole mesh node namespaces cannot conflict.
   std::map<std::pair<Point,Point>, Point> edge_midpoints;
 
+  // TRI7 boundary faces additionally carry a face-centroid node (local index
+  // 6) that TET14 output reproduces (its faces are TRI7).  Record those too,
+  // keyed by the sorted triple of the face's three corner positions so the
+  // key is independent of node id and rotation.
+  std::map<std::array<Point,3>, Point> face_centroids;
+
   auto record_and_strip =
-    [&edge_midpoints](UnstructuredMesh & m)
+    [&edge_midpoints, &face_centroids](UnstructuredMesh & m)
     {
       bool has_quadratic = false;
       for (const auto & elem : m.element_ptr_range())
@@ -121,6 +126,14 @@ void NetGenMeshInterface::triangulate ()
               auto key = pa < pb
                 ? std::make_pair(pa,pb) : std::make_pair(pb,pa);
               edge_midpoints[key] = elem->point(e+3);
+            }
+          // TRI7: node 6 is the face-centroid node.
+          if (elem->type() == TRI7)
+            {
+              std::array<Point,3> corners =
+                {elem->point(0), elem->point(1), elem->point(2)};
+              std::sort(corners.begin(), corners.end());
+              face_centroids[corners] = elem->point(6);
             }
         }
       if (has_quadratic)
@@ -163,7 +176,8 @@ void NetGenMeshInterface::triangulate ()
   // which is likewise called on all ranks).  edge_midpoints was built while
   // the mesh was serialized on every rank, so it is identical everywhere and
   // this post-broadcast fixup is deterministic.
-  auto increase_order_and_restore_midpoints = [this, &edge_midpoints]()
+  auto increase_order_and_restore_midpoints =
+    [this, &edge_midpoints, &face_centroids]()
     {
       if (_elem_type == TET4)
         return;
@@ -197,15 +211,15 @@ void NetGenMeshInterface::triangulate ()
 
       // Move auto-placed geometric midpoints to the recorded positions,
       // preserving any curvature from the original quadratic boundary.
-      if (!edge_midpoints.empty())
+      if (!edge_midpoints.empty() || !face_centroids.empty())
         for (Elem * elem : _mesh.element_ptr_range())
           for (auto s : elem->side_index_range())
             {
               if (elem->neighbor_ptr(s)) continue;
 
-              // build_side_ptr() returns a TRI6 whose node pointers
-              // reference the actual mesh nodes; point() assignments
-              // update mesh node coordinates in place.
+              // build_side_ptr() returns a TRI6 (TET10) or TRI7 (TET14)
+              // whose node pointers reference the actual mesh nodes; point()
+              // assignments update mesh node coordinates in place.
               auto side = elem->build_side_ptr(s);
               for (auto e : make_range(3u))
                 {
@@ -216,6 +230,18 @@ void NetGenMeshInterface::triangulate ()
                   if (auto it = edge_midpoints.find(key);
                       it != edge_midpoints.end())
                     side->point(e+3) = it->second;
+                }
+
+              // TRI7 faces (TET14 output) also carry a face-centroid node
+              // at local index 6; restore its recorded curved position.
+              if (side->type() == TRI7)
+                {
+                  std::array<Point,3> corners =
+                    {side->point(0), side->point(1), side->point(2)};
+                  std::sort(corners.begin(), corners.end());
+                  if (auto it = face_centroids.find(corners);
+                      it != face_centroids.end())
+                    side->point(6) = it->second;
                 }
             }
     };
