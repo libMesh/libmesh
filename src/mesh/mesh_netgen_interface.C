@@ -168,9 +168,31 @@ void NetGenMeshInterface::triangulate ()
       if (_elem_type == TET4)
         return;
 
+      // NetGen (and volume_to_surface_mesh) can leave gaps in rank 0's
+      // element and node id spaces, while broadcast() compacts them on the
+      // other ranks.  Renumber here -- on every rank, in lockstep -- so all
+      // ranks agree on n_elem()/max_elem_id() before the collective order
+      // increase runs its cross-rank consistency checks.  Note that
+      // renumber_nodes_and_elements() itself performs a collective reduction
+      // for the unique-id counter, so it must be called on all ranks together,
+      // never on rank 0 alone (that would deadlock the others in broadcast()).
+      this->_mesh.renumber_nodes_and_elements();
+
       // find_neighbors() is needed before all_second_order() can place
       // shared edge midpoints correctly.
       this->_mesh.find_neighbors();
+
+      // Refresh the cached element dimensions.  We just replaced the 2D
+      // TRI3 surface elements with 3D TET4 volume elements, but the mesh's
+      // cached dimension is still that of the original surface (2).
+      // all_second_order()/all_complete_order() derive the per-element
+      // unique_id reservation width from mesh_dimension(): a stale value of
+      // 2 reserves only 9-4=5 slots per element, too few for the 6 new edge
+      // nodes of a TET10, so adjacent elements' unique_id ranges overlap and
+      // collide.  cache_elem_data() recomputes the dimension to 3 (reserving
+      // 27-8=19 slots) before the order increase runs.
+      this->_mesh.cache_elem_data();
+
       this->increase_tet_order();
 
       // Move auto-placed geometric midpoints to the recorded positions,
