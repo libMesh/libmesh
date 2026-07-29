@@ -59,6 +59,7 @@ extern "C" {
 
 // C++ includes
 #include <unordered_map>
+#include <unordered_set>
 
 
 namespace libMesh
@@ -440,30 +441,44 @@ void ParmetisPartitioner::build_graph (const MeshBase & mesh)
 
   Partitioner::build_graph(mesh);
 
-  dof_id_type graph_size=0;
+  dof_id_type graph_size_upper_bound = 0;
 
   for (auto & row: _dual_graph)
-   graph_size += cast_int<dof_id_type>(row.size());
+    graph_size_upper_bound += cast_int<dof_id_type>(row.size());
 
   // Reserve space in the adjacency array
   _pmetis->xadj.clear();
   _pmetis->xadj.reserve (n_active_local_elem + 1);
   _pmetis->adjncy.clear();
-  _pmetis->adjncy.reserve (graph_size);
+  _pmetis->adjncy.reserve (graph_size_upper_bound);
 
-  for (auto & graph_row : _dual_graph)
+  const dof_id_type first_local_elem =
+    _pmetis->vtxdist[mesh.processor_id()];
+  std::unordered_set<dof_id_type> unique_neighbors;
+
+  // ParMETIS requires a simple graph.  Preserve first-occurrence order
+  // while filtering so valid graph rows remain otherwise unchanged.
+  for (auto i : index_range(_dual_graph))
     {
       _pmetis->xadj.push_back(cast_int<int>(_pmetis->adjncy.size()));
-      _pmetis->adjncy.insert(_pmetis->adjncy.end(),
-                             graph_row.begin(),
-                             graph_row.end());
+
+      const dof_id_type global_index =
+        first_local_elem + cast_int<dof_id_type>(i);
+      const auto & graph_row = _dual_graph[i];
+      unique_neighbors.clear();
+
+      for (const auto neighbor : graph_row)
+        if (neighbor != global_index &&
+            unique_neighbors.insert(neighbor).second)
+          _pmetis->adjncy.push_back(neighbor);
     }
 
   // The end of the adjacency array for the last elem
   _pmetis->xadj.push_back(cast_int<int>(_pmetis->adjncy.size()));
 
   libmesh_assert_equal_to (_pmetis->xadj.size(), n_active_local_elem+1);
-  libmesh_assert_equal_to (_pmetis->adjncy.size(), graph_size);
+  libmesh_assert_less_equal (_pmetis->adjncy.size(),
+                             graph_size_upper_bound);
 }
 
 #endif // #ifdef LIBMESH_HAVE_PARMETIS
