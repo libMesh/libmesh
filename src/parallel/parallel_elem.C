@@ -24,7 +24,6 @@
 #include "libmesh/cell_c0polyhedron.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
-#include "libmesh/enum_to_string.h"
 #include "libmesh/face_c0polygon.h"
 #include "libmesh/int_range.h"
 #include "libmesh/mesh_base.h"
@@ -81,20 +80,19 @@ Packing<const Elem *>::packed_size (std::vector<largest_id_type>::const_iterator
   unsigned int n_sides = Elem::type_to_n_sides_map[type];
   unsigned int n_edges = Elem::type_to_n_edges_map[type];
   unsigned int variable_topology_size = 0;
+  // No Elem exists yet, so use the static-count sentinel corresponding
+  // to Elem::runtime_topology() in type_to_n_nodes_map.
+  const bool has_runtime_topology = (n_nodes == invalid_uint);
 
-  if (n_nodes == invalid_uint)
+  if (has_runtime_topology)
     {
-      libmesh_error_msg_if(type != C0POLYGON && type != C0POLYHEDRON,
-                           "Unsupported variable-topology element "
-                           << Utility::enum_to_string(type));
-
       auto topology_in = in + header_size;
       n_nodes = cast_int<unsigned int>(*topology_in++);
       n_sides = cast_int<unsigned int>(*topology_in++);
       n_edges = cast_int<unsigned int>(*topology_in++);
       variable_topology_size = 3;
 
-      if (type == C0POLYHEDRON)
+      if (Elem::type_to_dim_map[type] == 3)
         {
           topology_in += n_nodes;
           for (unsigned int s = 0; s != n_sides; ++s)
@@ -182,14 +180,14 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
                                       const MeshBase * mesh)
 {
   unsigned int variable_topology_size = 0;
-  if (elem->type() == C0POLYGON || elem->type() == C0POLYHEDRON)
+  if (elem->runtime_topology())
     {
       // Store the dynamic node, side, and edge counts.
       variable_topology_size = 3;
 
       // A polygon's node ordering fully specifies its topology.  A
       // polyhedron additionally needs each side's local node indices.
-      if (elem->type() == C0POLYHEDRON)
+      if (elem->dim() == 3)
         for (auto s : elem->side_index_range())
           variable_topology_size +=
             1 + cast_int<unsigned int>(elem->nodes_on_side(s).size());
@@ -336,8 +334,7 @@ Packing<const Elem *>::pack (const Elem * const & elem,
   else
     *data_out++ =(DofObject::invalid_id);
 
-  const bool has_variable_topology =
-    elem->type() == C0POLYGON || elem->type() == C0POLYHEDRON;
+  const bool has_variable_topology = elem->runtime_topology();
   if (has_variable_topology)
     {
       *data_out++ = elem->n_nodes();
@@ -348,7 +345,7 @@ Packing<const Elem *>::pack (const Elem * const & elem,
   for (const Node & node : elem->node_ref_range())
     *data_out++ = node.id();
 
-  if (elem->type() == C0POLYHEDRON)
+  if (has_variable_topology && elem->dim() == 3) // AKA, is c0polyhedron
     for (auto s : elem->side_index_range())
       {
         const std::vector<unsigned int> side_nodes =
@@ -519,6 +516,9 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
   unsigned int n_nodes = Elem::type_to_n_nodes_map[type];
   unsigned int n_sides = Elem::type_to_n_sides_map[type];
   unsigned int n_edges = Elem::type_to_n_edges_map[type];
+  // No Elem exists yet, so use the static-count sentinel corresponding
+  // to Elem::runtime_topology().
+  const bool has_runtime_topology = (n_nodes == invalid_uint);
 
   // int 5: processor id
   const processor_id_type processor_id =
@@ -572,71 +572,64 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
   // plus the real data header
   libmesh_assert_equal_to (in - original_in, header_size + 1);
 
-  if (n_nodes == invalid_uint)
+  if (has_runtime_topology)
     {
-      libmesh_error_msg_if(type != C0POLYGON && type != C0POLYHEDRON,
-                           "Unsupported variable-topology element "
-                           << Utility::enum_to_string(type));
-
       n_nodes = cast_int<unsigned int>(*in++);
       n_sides = cast_int<unsigned int>(*in++);
       n_edges = cast_int<unsigned int>(*in++);
 
-      if (type == C0POLYGON)
-        libmesh_error_msg_if
-          (n_nodes < 3 || n_sides != n_nodes || n_edges != n_nodes,
-           "Invalid packed C0POLYGON topology with "
-           << n_nodes << " nodes, " << n_sides << " sides, and "
-           << n_edges << " edges");
-      else
-        libmesh_error_msg_if
-          (n_nodes < 4 || n_sides < 4,
-           "Invalid packed C0POLYHEDRON topology with "
-           << n_nodes << " nodes and " << n_sides << " sides");
+      if (Elem::type_to_dim_map[type] == 2)
+        {
+          libmesh_assert_less (2, n_sides);
+          libmesh_assert_equal_to (n_nodes % n_sides, 0);
+          libmesh_assert_equal_to (n_edges, n_sides);
+        }
+      else if (Elem::type_to_dim_map[type] == 3)
+        {
+          libmesh_assert_less (3, n_nodes);
+          libmesh_assert_less (3, n_sides);
+        }
     }
+  libmesh_ignore(n_edges); // unused outside dbg/devel
 
   const auto node_ids_in = in;
   in += n_nodes;
 
   std::vector<std::vector<unsigned int>> polyhedron_side_nodes;
-  if (type == C0POLYHEDRON)
+  if (has_runtime_topology && Elem::type_to_dim_map[type] == 3)
     {
       polyhedron_side_nodes.resize(n_sides);
+#ifndef NDEBUG
       std::vector<bool> node_seen(n_nodes, false);
       unsigned int next_new_node = 0;
+#endif
       for (auto & side_nodes : polyhedron_side_nodes)
         {
           const unsigned int n_side_nodes =
             cast_int<unsigned int>(*in++);
-          libmesh_error_msg_if(n_side_nodes < 3,
-                               "Cannot unpack a C0POLYHEDRON side with only "
-                               << n_side_nodes << " nodes");
+          libmesh_assert_less (2, n_side_nodes);
           side_nodes.resize(n_side_nodes);
           for (auto & node : side_nodes)
             {
               node = cast_int<unsigned int>(*in++);
-              libmesh_error_msg_if(node >= n_nodes,
-                                   "Invalid local node " << node
-                                   << " in packed C0POLYHEDRON side");
+              libmesh_assert_less (node, n_nodes);
 
-              if (!node_seen[node])
+#ifndef NDEBUG
+              if (type == C0POLYHEDRON && !node_seen[node])
                 {
-                  libmesh_error_msg_if
-                    (node != next_new_node,
-                     "Packed C0POLYHEDRON side connectivity first encounters "
-                     "local node " << node << " where local node "
-                     << next_new_node << " was expected");
+                  libmesh_assert_equal_to (node, next_new_node);
                   node_seen[node] = true;
                   ++next_new_node;
                 }
+#endif
             }
         }
 
-      libmesh_error_msg_if
-        (next_new_node != n_nodes && next_new_node + 1 != n_nodes,
-         "Packed C0POLYHEDRON sides reference " << next_new_node
-         << " vertices, but the element has " << n_nodes
-         << " nodes; at most one unreferenced midpoint node is permitted");
+#ifndef NDEBUG
+      if (type == C0POLYHEDRON)
+        libmesh_assert (next_new_node == n_nodes ||
+                        next_new_node + 1 == n_nodes);
+#endif
     }
 
   Elem * elem = mesh->query_elem_ptr(id);
@@ -654,42 +647,23 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       libmesh_assert_equal_to (elem->processor_id(), processor_id);
       libmesh_assert_equal_to (elem->subdomain_id(), subdomain_id);
       libmesh_assert_equal_to (elem->type(), type);
-
-      if (type == C0POLYGON || type == C0POLYHEDRON)
-        {
-          libmesh_error_msg_if
-            (elem->type() != type ||
-             elem->n_nodes() != n_nodes ||
-             elem->n_sides() != n_sides ||
-             elem->n_edges() != n_edges,
-             "Existing " << Utility::enum_to_string(type)
-             << " topology does not match its packed topology");
-
-          for (unsigned int n = 0; n != n_nodes; ++n)
-            libmesh_error_msg_if
-              (elem->node_id(n) !=
-               cast_int<dof_id_type>(*(node_ids_in + n)),
-               "Existing " << Utility::enum_to_string(type)
-               << " local node " << n
-               << " does not match its packed node");
-
-          if (type == C0POLYHEDRON)
-            for (auto s : elem->side_index_range())
-              libmesh_error_msg_if
-                (elem->nodes_on_side(s) != polyhedron_side_nodes[s],
-                 "Existing C0POLYHEDRON side " << s
-                 << " does not match its packed topology");
-        }
-
       libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
       libmesh_assert_equal_to (elem->n_sides(), n_sides);
       libmesh_assert_equal_to (elem->n_edges(), n_edges);
 
 #ifndef NDEBUG
+      if (elem->runtime_topology() && elem->dim() == 3)
+        for (auto s : elem->side_index_range())
+          libmesh_assert(elem->nodes_on_side(s) ==
+                         polyhedron_side_nodes[s]);
+#endif
+
+#ifndef NDEBUG
       // All our nodes should be correct
       for (unsigned int i=0; i != n_nodes; ++i)
-        libmesh_assert(elem->node_id(i) ==
-                       cast_int<dof_id_type>(*(node_ids_in + i)));
+        libmesh_assert_equal_to
+          (elem->node_id(i),
+           cast_int<dof_id_type>(*(node_ids_in + i)));
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -904,11 +878,7 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
           auto polyhedron = std::make_unique<C0Polyhedron>
             (sides, generated_mid_node, parent);
 
-          libmesh_error_msg_if
-            (polyhedron->n_nodes() != n_nodes,
-             "Packed C0POLYHEDRON has " << n_nodes
-             << " nodes, but reconstructing its topology produced "
-             << polyhedron->n_nodes() << " nodes");
+          libmesh_assert_equal_to (polyhedron->n_nodes(), n_nodes);
 
           if (generated_mid_node)
             {
@@ -962,29 +932,21 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
       // Assign the connectivity
       libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
+      libmesh_assert_equal_to (elem->n_sides(), n_sides);
+      libmesh_assert_equal_to (elem->n_edges(), n_edges);
 
-      if (type == C0POLYHEDRON)
-        {
-          libmesh_error_msg_if(elem->n_sides() != n_sides,
-                               "Packed C0POLYHEDRON has " << n_sides
-                               << " sides, but reconstructing its topology produced "
-                               << elem->n_sides() << " sides");
-          libmesh_error_msg_if(elem->n_edges() != n_edges,
-                               "Packed C0POLYHEDRON has " << n_edges
-                               << " edges, but reconstructing its topology produced "
-                               << elem->n_edges() << " edges");
-
-          for (unsigned int n = 0; n != n_nodes; ++n)
-            libmesh_error_msg_if
-              (elem->node_id(n) !=
-               cast_int<dof_id_type>(*(node_ids_in + n)),
-               "Packed C0POLYHEDRON local node ordering was not preserved");
-        }
-      else
+      if (!elem->runtime_topology() || elem->dim() != 3)
         for (unsigned int n=0; n != n_nodes; n++)
           elem->set_node
             (n, mesh->node_ptr
              (cast_int<dof_id_type>(*(node_ids_in + n))));
+
+#ifndef NDEBUG
+      for (unsigned int n = 0; n != n_nodes; ++n)
+        libmesh_assert_equal_to
+          (elem->node_id(n),
+           cast_int<dof_id_type>(*(node_ids_in + n)));
+#endif
 
       // Set interior_parent if found
       {

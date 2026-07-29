@@ -9,7 +9,6 @@
 #include "libmesh/int_range.h"
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_generation.h"
-#include "libmesh/mesh_serializer.h"
 #include "libmesh/node.h"
 
 #include <memory>
@@ -157,13 +156,18 @@ public:
       exii_input.read("write_exodus_C0POLYGON.e");
 
     MeshCommunication().broadcast(input_mesh);
-    MeshSerializer input_serializer(input_mesh);
     input_mesh.prepare_for_use();
 
     CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(1), input_mesh.n_elem());
 
-    const Elem *elem = input_mesh.elem_ptr(0);
-    CPPUNIT_ASSERT(elem);
+    const Elem *elem = input_mesh.query_elem_ptr(0);
+    bool found_elem = elem;
+    input_mesh.comm().max(found_elem);
+    CPPUNIT_ASSERT(found_elem);
+
+    if (!elem)
+      return;
+
     CPPUNIT_ASSERT_EQUAL(C0POLYGON, elem->type());
     CPPUNIT_ASSERT_EQUAL(5u, elem->n_nodes());
 
@@ -318,17 +322,22 @@ public:
     this->build_c0polyhedron(mesh, points, nodes_on_side);
 
     std::vector<std::vector<dof_id_type>> expected_nodes_on_side;
-    {
-      MeshSerializer output_serializer(mesh);
-      const Elem & output_elem = mesh.elem_ref(0);
-      expected_nodes_on_side.reserve(output_elem.n_sides());
-      for (auto s : output_elem.side_index_range())
-        {
-          expected_nodes_on_side.emplace_back();
-          for (const auto n : output_elem.nodes_on_side(s))
-            expected_nodes_on_side.back().push_back(output_elem.node_id(n));
-        }
-    }
+    const Elem *output_elem = mesh.query_elem_ptr(0);
+    const bool have_output_elem = output_elem;
+    bool found_output_elem = have_output_elem;
+    mesh.comm().max(found_output_elem);
+    CPPUNIT_ASSERT(found_output_elem);
+
+    if (output_elem)
+      {
+        expected_nodes_on_side.reserve(output_elem->n_sides());
+        for (auto s : output_elem->side_index_range())
+          {
+            expected_nodes_on_side.emplace_back();
+            for (const auto n : output_elem->nodes_on_side(s))
+              expected_nodes_on_side.back().push_back(output_elem->node_id(n));
+          }
+      }
 
     {
       ExodusII_IO exii(mesh);
@@ -341,13 +350,23 @@ public:
       exii_input.read("write_exodus_C0POLYHEDRON_HEXPRISM_READ.e");
 
     MeshCommunication().broadcast(input_mesh);
-    MeshSerializer input_serializer(input_mesh);
     input_mesh.prepare_for_use();
 
     CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(1), input_mesh.n_elem());
 
-    const Elem *elem = input_mesh.elem_ptr(0);
-    CPPUNIT_ASSERT(elem);
+    const Elem *elem = input_mesh.query_elem_ptr(0);
+    bool found_elem = elem;
+    input_mesh.comm().max(found_elem);
+    CPPUNIT_ASSERT(found_elem);
+
+    const bool can_compare = have_output_elem && elem;
+    bool found_comparable_elem = can_compare;
+    input_mesh.comm().max(found_comparable_elem);
+    CPPUNIT_ASSERT(found_comparable_elem);
+
+    if (!can_compare)
+      return;
+
     CPPUNIT_ASSERT_EQUAL(C0POLYHEDRON, elem->type());
     CPPUNIT_ASSERT_EQUAL(12u, elem->n_vertices());
     CPPUNIT_ASSERT_EQUAL(8u, elem->n_sides());
