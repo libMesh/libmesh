@@ -1380,6 +1380,25 @@ void Partitioner::build_graph (const MeshBase & mesh)
                                       connections_to_push,
                                       symmetrize_entries);
 
+  // Constraint-based connections can duplicate existing neighbor
+  // connections, or connect an element to itself.  Partitioners expect
+  // a simple graph, so remove self-edges and repeated entries.
+  for (auto i : index_range(_dual_graph))
+    {
+      auto & graph_row = _dual_graph[i];
+      const dof_id_type global_index =
+        first_local_elem + cast_int<dof_id_type>(i);
+
+      graph_row.erase(std::remove(graph_row.begin(),
+                                  graph_row.end(),
+                                  global_index),
+                      graph_row.end());
+
+      std::sort(graph_row.begin(), graph_row.end());
+      graph_row.erase(std::unique(graph_row.begin(), graph_row.end()),
+                      graph_row.end());
+    }
+
   // *Now* we should have a symmetric adjacency matrix.  Let's check
   // that, so any failures get caught before they e.g. confuse
   // Parmetis in hard-to-debug ways.  That's a global communication so
