@@ -130,7 +130,7 @@ public:
    * ids).
    *
    * Though this method is non-virtual, its implementation calls the
-   * virtual function \p subclass_locally_equals() to test for
+   * virtual function \p subclass_first_difference_from() to test for
    * equality of subclass-specific data as well.
    */
   bool operator== (const MeshBase & other_mesh) const;
@@ -139,6 +139,14 @@ public:
   {
     return !(*this == other_mesh);
   }
+
+  /**
+   * This behaves like libmesh_assert(*this == other_mesh), but gives
+   * a more useful accounting of the first difference found, if the
+   * assertion fails.
+   */
+  void assert_equal_to (const MeshBase & other_mesh,
+                        std::string_view failure_context) const;
 
   /**
    * This behaves the same as operator==, but only for the local and
@@ -427,23 +435,20 @@ public:
    * \returns A const reference to a std::set of element dimensions
    * present in the mesh.
    */
-  const std::set<unsigned char> & elem_dimensions() const
-  { return _elem_dims; }
+  const std::set<unsigned char> & elem_dimensions() const;
 
   /**
    * \returns A const reference to a std::set of element default
    * orders present in the mesh.
    */
-  const std::set<Order> & elem_default_orders() const
-  { return _elem_default_orders; }
+  const std::set<Order> & elem_default_orders() const;
 
   /**
    * \returns The smallest supported_nodal_order() of any element
    * present in the mesh, which is thus the maximum supported nodal
    * order on the mesh as a whole.
    */
-  Order supported_nodal_order() const
-  { return _supported_nodal_order; }
+  Order supported_nodal_order() const;
 
   /**
    * Most of the time you should not need to call this, as the element
@@ -986,10 +991,17 @@ public:
    *
    * If \p assert_valid is left as true, then in dbg mode extensive
    * consistency checking is performed before returning.
+   *
+   * If \p check_non_remote is set to false, then only sides which
+   * currently have remote neighbors are checked for possible local
+   * neighbors.  This is intended to handle a corner case where
+   * ancestor neighbors are redistributed to a processor only by other
+   * processors who do not see that neighbor link.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
                                const bool reset_current_list    = true,
-                               const bool assert_valid          = true) = 0;
+                               const bool assert_valid          = true,
+                               const bool check_non_remote      = true) = 0;
 
   /**
    * Removes any orphaned nodes, nodes not connected to any elements.
@@ -2045,8 +2057,7 @@ public:
    * should contain all the subdomain ids across processors. Relies on the mesh
    * being prepared
    */
-  const std::set<subdomain_id_type> & get_mesh_subdomains() const
-  { libmesh_assert(this->is_prepared()); return _mesh_subdomains; }
+  const std::set<subdomain_id_type> & get_mesh_subdomains() const;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
@@ -2090,6 +2101,9 @@ public:
      */
     bool operator== (const Preparation & other) const;
     bool operator!= (const Preparation & other) const;
+
+    // Assert that a Preparation object is identical across processors
+    void libmesh_assert_consistent (const Parallel::Communicator & libmesh_dbg_var(comm));
 
     bool is_partitioned;
     bool has_synched_id_counts;
@@ -2141,13 +2155,19 @@ protected:
    * Shim to allow operator == (&) to behave like a virtual function
    * without having to be one.
    */
-  virtual bool subclass_locally_equals (const MeshBase & other_mesh) const = 0;
+  virtual std::string_view subclass_first_difference_from (const MeshBase & other_mesh) const = 0;
 
   /**
    * Tests for equality of all elements and nodes in the mesh.  Helper
    * function for subclass_equals() in unstructured mesh subclasses.
    */
   bool nodes_and_elements_equal(const MeshBase & other_mesh) const;
+
+  /**
+   *
+   */
+  std::string_view first_difference_from(const MeshBase & other_mesh) const;
+
 
   /**
    * \returns A writable reference to the number of partitions.
@@ -2615,6 +2635,48 @@ MeshBase::const_node_iterator : MeshBase::const_node_filter_iter
     const_node_filter_iter(rhs) {}
 };
 
+
+// ------------------------------------------------------------
+// Elem class member functions
+inline
+const std::set<unsigned char> & MeshBase::elem_dimensions() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _elem_dims;
+}
+
+
+inline
+const std::set<Order> & MeshBase::elem_default_orders() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _elem_default_orders;
+}
+
+
+inline
+Order MeshBase::supported_nodal_order() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _supported_nodal_order;
+}
+
+
+inline
+const std::set<subdomain_id_type> & MeshBase::get_mesh_subdomains() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _mesh_subdomains;
+}
+
+
+inline
+unsigned int MeshBase::spatial_dimension () const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+
+  return cast_int<unsigned int>(_spatial_dimension);
+}
 
 template <typename T>
 inline
