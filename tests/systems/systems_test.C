@@ -830,6 +830,7 @@ public:
 #endif
   }
 
+#ifdef LIBMESH_ENABLE_AMR
   void testProjectScalarCoarsening()
   {
     Mesh mesh(*TestCommWorld);
@@ -887,6 +888,7 @@ public:
                                  Number(7.25),
                                  TOLERANCE);
   }
+#endif
 
   void test2DProjectVectorFE(const ElemType elem_type)
   {
