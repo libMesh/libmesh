@@ -21,8 +21,11 @@
 
 // Local includes
 #include "libmesh/boundary_info.h"
+#include "libmesh/cell_c0polyhedron.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
+#include "libmesh/face_c0polygon.h"
+#include "libmesh/int_range.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/parallel_elem.h"
 #include "libmesh/parallel_mesh.h"
@@ -73,20 +76,37 @@ Packing<const Elem *>::packed_size (std::vector<largest_id_type>::const_iterator
   const ElemType type =
     cast_int<ElemType>(typeint);
 
-  const unsigned int n_nodes =
-    Elem::type_to_n_nodes_map[type];
+  unsigned int n_nodes = Elem::type_to_n_nodes_map[type];
+  unsigned int n_sides = Elem::type_to_n_sides_map[type];
+  unsigned int n_edges = Elem::type_to_n_edges_map[type];
+  unsigned int variable_topology_size = 0;
+  // No Elem exists yet, so use the static-count sentinel corresponding
+  // to Elem::runtime_topology() in type_to_n_nodes_map.
+  const bool has_runtime_topology = (n_nodes == invalid_uint);
 
-  if (n_nodes == invalid_uint)
-    libmesh_not_implemented_msg("Support for Polygons/Polyhedra not yet implemented");
+  if (has_runtime_topology)
+    {
+      auto topology_in = in + header_size;
+      n_nodes = cast_int<unsigned int>(*topology_in++);
+      n_sides = cast_int<unsigned int>(*topology_in++);
+      n_edges = cast_int<unsigned int>(*topology_in++);
+      variable_topology_size = 3;
 
-  const unsigned int n_sides =
-    Elem::type_to_n_sides_map[type];
-
-  const unsigned int n_edges =
-    Elem::type_to_n_edges_map[type];
+      if (Elem::type_to_dim_map[type] == 3)
+        {
+          topology_in += n_nodes;
+          for (unsigned int s = 0; s != n_sides; ++s)
+            {
+              const unsigned int n_side_nodes =
+                cast_int<unsigned int>(*topology_in++);
+              topology_in += n_side_nodes;
+              variable_topology_size += n_side_nodes + 1;
+            }
+        }
+    }
 
   const unsigned int pre_indexing_size =
-    header_size + n_nodes + n_sides*2;
+    header_size + variable_topology_size + n_nodes + n_sides*2;
 
   const unsigned int indexing_size =
     DofObject::unpackable_indexing_size(in+pre_indexing_size);
@@ -159,9 +179,23 @@ unsigned int
 Packing<const Elem *>::packable_size (const Elem * const & elem,
                                       const MeshBase * mesh)
 {
+  unsigned int variable_topology_size = 0;
+  if (elem->runtime_topology())
+    {
+      // Store the dynamic node, side, and edge counts.
+      variable_topology_size = 3;
+
+      // A polygon's node ordering fully specifies its topology.  A
+      // polyhedron additionally needs each side's local node indices.
+      if (elem->dim() == 3)
+        for (auto s : elem->side_index_range())
+          variable_topology_size +=
+            1 + cast_int<unsigned int>(elem->nodes_on_side(s).size());
+    }
+
   // We always communicate if we are on a boundary or not
   unsigned int total_packed_bcs = 1;
-  const unsigned short n_sides = elem->n_sides();
+  const unsigned int n_sides = elem->n_sides();
 
   largest_id_type on_boundary = 0;
   for (auto s : elem->side_index_range())
@@ -180,7 +214,7 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
     if (elem->level() == 0 || mesh->get_boundary_info().is_children_on_boundary_side())
     {
       total_packed_bcs += n_sides;
-      for (unsigned short s = 0; s != n_sides; ++s)
+      for (unsigned int s = 0; s != n_sides; ++s)
         total_packed_bcs +=
           mesh->get_boundary_info().n_raw_boundary_ids(elem,s);
     }
@@ -188,9 +222,9 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
 
   if (elem->level() == 0)
     {
-      const unsigned short n_edges = elem->n_edges();
+      const unsigned int n_edges = elem->n_edges();
       total_packed_bcs += n_edges;
-      for (unsigned short e = 0; e != n_edges; ++e)
+      for (unsigned int e = 0; e != n_edges; ++e)
         total_packed_bcs +=
           mesh->get_boundary_info().n_edge_boundary_ids(elem,e);
 
@@ -204,7 +238,7 @@ Packing<const Elem *>::packable_size (const Elem * const & elem,
 #ifndef NDEBUG
     1 + // add an int for the magic header when testing
 #endif
-    header_size + elem->n_nodes() + n_sides*2 +
+    header_size + variable_topology_size + elem->n_nodes() + n_sides*2 +
     elem->packed_indexing_size() + total_packed_bcs;
 }
 
@@ -300,8 +334,26 @@ Packing<const Elem *>::pack (const Elem * const & elem,
   else
     *data_out++ =(DofObject::invalid_id);
 
+  const bool has_variable_topology = elem->runtime_topology();
+  if (has_variable_topology)
+    {
+      *data_out++ = elem->n_nodes();
+      *data_out++ = elem->n_sides();
+      *data_out++ = elem->n_edges();
+    }
+
   for (const Node & node : elem->node_ref_range())
     *data_out++ = node.id();
+
+  if (has_variable_topology && elem->dim() == 3) // AKA, is c0polyhedron
+    for (auto s : elem->side_index_range())
+      {
+        const std::vector<unsigned int> side_nodes =
+          elem->nodes_on_side(s);
+        *data_out++ = side_nodes.size();
+        for (const auto node : side_nodes)
+          *data_out++ = node;
+      }
 
   // Add the id of and the side for any return link from each neighbor
   for (auto neigh : elem->neighbor_ptr_range())
@@ -461,8 +513,12 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
   const ElemType type =
     cast_int<ElemType>(typeint);
 
-  const unsigned int n_nodes =
-    Elem::type_to_n_nodes_map[type];
+  unsigned int n_nodes = Elem::type_to_n_nodes_map[type];
+  unsigned int n_sides = Elem::type_to_n_sides_map[type];
+  unsigned int n_edges = Elem::type_to_n_edges_map[type];
+  // No Elem exists yet, so use the static-count sentinel corresponding
+  // to Elem::runtime_topology().
+  const bool has_runtime_topology = (n_nodes == invalid_uint);
 
   // int 5: processor id
   const processor_id_type processor_id =
@@ -516,6 +572,66 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
   // plus the real data header
   libmesh_assert_equal_to (in - original_in, header_size + 1);
 
+  if (has_runtime_topology)
+    {
+      n_nodes = cast_int<unsigned int>(*in++);
+      n_sides = cast_int<unsigned int>(*in++);
+      n_edges = cast_int<unsigned int>(*in++);
+
+      if (Elem::type_to_dim_map[type] == 2)
+        {
+          libmesh_assert_less (2, n_sides);
+          libmesh_assert_equal_to (n_nodes % n_sides, 0);
+          libmesh_assert_equal_to (n_edges, n_sides);
+        }
+      else if (Elem::type_to_dim_map[type] == 3)
+        {
+          libmesh_assert_less (3, n_nodes);
+          libmesh_assert_less (3, n_sides);
+        }
+    }
+  libmesh_ignore(n_edges); // unused outside dbg/devel
+
+  const auto node_ids_in = in;
+  in += n_nodes;
+
+  std::vector<std::vector<unsigned int>> polyhedron_side_nodes;
+  if (has_runtime_topology && Elem::type_to_dim_map[type] == 3)
+    {
+      polyhedron_side_nodes.resize(n_sides);
+#ifndef NDEBUG
+      std::vector<bool> node_seen(n_nodes, false);
+      unsigned int next_new_node = 0;
+#endif
+      for (auto & side_nodes : polyhedron_side_nodes)
+        {
+          const unsigned int n_side_nodes =
+            cast_int<unsigned int>(*in++);
+          libmesh_assert_less (2, n_side_nodes);
+          side_nodes.resize(n_side_nodes);
+          for (auto & node : side_nodes)
+            {
+              node = cast_int<unsigned int>(*in++);
+              libmesh_assert_less (node, n_nodes);
+
+#ifndef NDEBUG
+              if (type == C0POLYHEDRON && !node_seen[node])
+                {
+                  libmesh_assert_equal_to (node, next_new_node);
+                  node_seen[node] = true;
+                  ++next_new_node;
+                }
+#endif
+            }
+        }
+
+#ifndef NDEBUG
+      if (type == C0POLYHEDRON)
+        libmesh_assert (next_new_node == n_nodes ||
+                        next_new_node + 1 == n_nodes);
+#endif
+    }
+
   Elem * elem = mesh->query_elem_ptr(id);
 
   // if we already have this element, make sure its
@@ -532,14 +648,22 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       libmesh_assert_equal_to (elem->subdomain_id(), subdomain_id);
       libmesh_assert_equal_to (elem->type(), type);
       libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
+      libmesh_assert_equal_to (elem->n_sides(), n_sides);
+      libmesh_assert_equal_to (elem->n_edges(), n_edges);
+
+#ifndef NDEBUG
+      if (elem->runtime_topology() && elem->dim() == 3)
+        for (auto s : elem->side_index_range())
+          libmesh_assert(elem->nodes_on_side(s) ==
+                         polyhedron_side_nodes[s]);
+#endif
 
 #ifndef NDEBUG
       // All our nodes should be correct
       for (unsigned int i=0; i != n_nodes; ++i)
-        libmesh_assert(elem->node_id(i) ==
-                       cast_int<dof_id_type>(*in++));
-#else
-      in += n_nodes;
+        libmesh_assert_equal_to
+          (elem->node_id(i),
+           cast_int<dof_id_type>(*(node_ids_in + i)));
 #endif
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -730,7 +854,44 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
       libmesh_assert_equal_to (level, 0);
 #endif
 
-      elem = Elem::build(type,parent).release();
+      if (type == C0POLYGON)
+        elem = std::make_unique<C0Polygon>(n_nodes, parent).release();
+      else if (type == C0POLYHEDRON)
+        {
+          std::vector<std::shared_ptr<Polygon>> sides(n_sides);
+          for (auto s : index_range(sides))
+            {
+              const auto & side_nodes = polyhedron_side_nodes[s];
+              auto side = std::make_shared<C0Polygon>
+                (cast_int<unsigned int>(side_nodes.size()));
+              for (auto n : index_range(side_nodes))
+                {
+                  const dof_id_type node_id =
+                    cast_int<dof_id_type>
+                    (*(node_ids_in + side_nodes[n]));
+                  side->set_node(n, mesh->node_ptr(node_id));
+                }
+              sides[s] = std::move(side);
+            }
+
+          std::unique_ptr<Node> generated_mid_node;
+          auto polyhedron = std::make_unique<C0Polyhedron>
+            (sides, generated_mid_node, parent);
+
+          libmesh_assert_equal_to (polyhedron->n_nodes(), n_nodes);
+
+          if (generated_mid_node)
+            {
+              const dof_id_type mid_node_id =
+                cast_int<dof_id_type>(*(node_ids_in + n_nodes - 1));
+              polyhedron->set_node(n_nodes - 1,
+                                   mesh->node_ptr(mid_node_id));
+            }
+
+          elem = polyhedron.release();
+        }
+      else
+        elem = Elem::build(type,parent).release();
       libmesh_assert (elem);
 
 #ifdef LIBMESH_ENABLE_AMR
@@ -771,10 +932,21 @@ Packing<Elem *>::unpack (std::vector<largest_id_type>::const_iterator in,
 
       // Assign the connectivity
       libmesh_assert_equal_to (elem->n_nodes(), n_nodes);
+      libmesh_assert_equal_to (elem->n_sides(), n_sides);
+      libmesh_assert_equal_to (elem->n_edges(), n_edges);
 
-      for (unsigned int n=0; n != n_nodes; n++)
-        elem->set_node (n, mesh->node_ptr
-                        (cast_int<dof_id_type>(*in++)));
+      if (!elem->runtime_topology() || elem->dim() != 3)
+        for (unsigned int n=0; n != n_nodes; n++)
+          elem->set_node
+            (n, mesh->node_ptr
+             (cast_int<dof_id_type>(*(node_ids_in + n))));
+
+#ifndef NDEBUG
+      for (unsigned int n = 0; n != n_nodes; ++n)
+        libmesh_assert_equal_to
+          (elem->node_id(n),
+           cast_int<dof_id_type>(*(node_ids_in + n)));
+#endif
 
       // Set interior_parent if found
       {

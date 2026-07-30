@@ -51,6 +51,7 @@ public:
   CPPUNIT_TEST( buildCubeHex8 );
   CPPUNIT_TEST( buildCubeHex20 );
   CPPUNIT_TEST( buildCubeHex27 );
+  CPPUNIT_TEST( buildCubeC0Polyhedron );
   CPPUNIT_TEST( buildCubePrism6 );
   CPPUNIT_TEST( buildCubePrism15 );
   CPPUNIT_TEST( buildCubePrism18 );
@@ -152,6 +153,23 @@ public:
     CPPUNIT_ASSERT(bbox.min()(1) <= Real(-4.0));
     CPPUNIT_ASSERT(bbox.max()(1) >= Real(5.0));
 
+    if (type == C0POLYGON)
+      {
+        BoundingBox nodal_bbox = MeshTools::create_nodal_bounding_box(mesh);
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.min()(0),
+                                Real(-2.0),
+                                TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.max()(0),
+                                Real(3.0),
+                                TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.min()(1),
+                                Real(-4.0),
+                                TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.max()(1),
+                                Real(5.0),
+                                TOLERANCE*TOLERANCE);
+      }
+
     // Do serial assertions *after* all parallel assertions, so we
     // stay in sync after failure on only some processor(s)
     if (type != C0POLYGON)
@@ -162,81 +180,92 @@ public:
   void testBuildCube(UnstructuredMesh & mesh, unsigned int n, ElemType type)
   {
     MeshTools::Generation::build_cube (mesh, n, n, n, -2.0, 3.0, -4.0, 5.0, -6.0, 7.0, type);
-    switch (Elem::type_to_n_sides_map[type])
+    if (type == C0POLYHEDRON)
       {
-      case 4: // tets
-        CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n*24));
-        break;
-      case 5: // prisms, pyramids
-        if (type == PRISM6 || type == PRISM15 || type == PRISM18 ||
-            type == PRISM20 || type == PRISM21)
-          CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n*2));
-        else
-          CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n*6));
-        break;
-      case 6: // hexes
+        const dof_id_type grid_nodes = cast_int<dof_id_type>((n+1)*(n+1)*(n+1));
+
         CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n));
-        break;
-      default:
-        libmesh_error();
+        CPPUNIT_ASSERT(mesh.n_nodes() >= grid_nodes);
+        CPPUNIT_ASSERT(mesh.n_nodes() <= grid_nodes + cast_int<dof_id_type>(n*n*n));
       }
-
-
-    switch (Elem::type_to_n_nodes_map[type])
+    else
       {
-      case 4: // First-order tets
-        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((n+1)*(n+1)*(n+1) + n*n*n + 3*(n+1)*n*n));
-        break;
-      case 6: // First-order prisms and hexes use the same nodes
-      case 8:
-        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((n+1)*(n+1)*(n+1)));
-        break;
-      case 10: // Second-order tets
-        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 14*n*n*n + 4*3*(n+1)*n*n));
-        break;
-      case 18:
-      case 27: // Second-order prisms and hexes use the same nodes
-        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1)));
-        break;
-      case 20:
-        if (type == HEX20)
-          CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                               cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) - n*n*n - 3*(n+1)*n*n));
-        if (type == PRISM20)
-          CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                               cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 2*(n+1)*n*n));
-        break;
-      case 21: // Prisms based on full Tri7 cross sections
-        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 2*(2*n+1)*n*n));
-        break;
-      case 15: // weird partial order prism
-        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) - n*n*n - 2*(n+1)*n*n));
-        break;
-      case 5: // pyramids
-        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((n+1)*(n+1)*(n+1) + n*n*n));
-        break;
-      case 13:
-        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n - 3*(n+1)*n*n));
-        break;
-      case 14: // pyramids, tets
-        if (type == PYRAMID14)
-          CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                               cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n));
-        else // TET14
-        CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
-                             cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 14*n*n*n + 4*3*(n+1)*n*n +
-                                                   36*n*n*n + 4*3*(n+1)*n*n));
-        break;
-      default:
-        libmesh_error();
+        switch (Elem::type_to_n_sides_map[type])
+          {
+          case 4: // tets
+            CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n*24));
+            break;
+          case 5: // prisms, pyramids
+            if (type == PRISM6 || type == PRISM15 || type == PRISM18 ||
+                type == PRISM20 || type == PRISM21)
+              CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n*2));
+            else
+              CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n*6));
+            break;
+          case 6: // hexes
+            CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), cast_int<dof_id_type>(n*n*n));
+            break;
+          default:
+            libmesh_error();
+          }
+
+
+        switch (Elem::type_to_n_nodes_map[type])
+          {
+          case 4: // First-order tets
+            CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                 cast_int<dof_id_type>((n+1)*(n+1)*(n+1) + n*n*n + 3*(n+1)*n*n));
+            break;
+          case 6: // First-order prisms and hexes use the same nodes
+          case 8:
+            CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                 cast_int<dof_id_type>((n+1)*(n+1)*(n+1)));
+            break;
+          case 10: // Second-order tets
+            CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                 cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 14*n*n*n + 4*3*(n+1)*n*n));
+            break;
+          case 18:
+          case 27: // Second-order prisms and hexes use the same nodes
+            CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                 cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1)));
+            break;
+          case 20:
+            if (type == HEX20)
+              CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                   cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) - n*n*n - 3*(n+1)*n*n));
+            if (type == PRISM20)
+              CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                   cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 2*(n+1)*n*n));
+            break;
+          case 21: // Prisms based on full Tri7 cross sections
+            CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                 cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 2*(2*n+1)*n*n));
+            break;
+          case 15: // weird partial order prism
+            CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                 cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) - n*n*n - 2*(n+1)*n*n));
+            break;
+          case 5: // pyramids
+            CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                 cast_int<dof_id_type>((n+1)*(n+1)*(n+1) + n*n*n));
+            break;
+          case 13:
+            CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                 cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n - 3*(n+1)*n*n));
+            break;
+          case 14: // pyramids, tets
+            if (type == PYRAMID14)
+              CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                   cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 8*n*n*n));
+            else // TET14
+            CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(),
+                                 cast_int<dof_id_type>((2*n+1)*(2*n+1)*(2*n+1) + 14*n*n*n + 4*3*(n+1)*n*n +
+                                                       36*n*n*n + 4*3*(n+1)*n*n));
+            break;
+          default:
+            libmesh_error();
+          }
       }
 
     // Our bounding boxes can be loose on higher order elements, but
@@ -248,6 +277,44 @@ public:
     CPPUNIT_ASSERT(bbox.max()(1) >= Real(5.0));
     CPPUNIT_ASSERT(bbox.min()(2) <= Real(-6.0));
     CPPUNIT_ASSERT(bbox.max()(2) >= Real(7.0));
+
+    if (type == C0POLYHEDRON)
+      {
+        BoundingBox nodal_bbox = MeshTools::create_nodal_bounding_box(mesh);
+        const Real expected_volume = Real(5) * Real(9) * Real(13);
+
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.min()(0),
+                                Real(-2.0),
+                                TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.max()(0),
+                                Real(3.0),
+                                TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.min()(1),
+                                Real(-4.0),
+                                TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.max()(1),
+                                Real(5.0),
+                                TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.min()(2),
+                                Real(-6.0),
+                                TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(nodal_bbox.max()(2),
+                                Real(7.0),
+                                TOLERANCE*TOLERANCE);
+        LIBMESH_ASSERT_FP_EQUAL(MeshTools::volume(mesh),
+                                expected_volume,
+                                TOLERANCE*TOLERANCE);
+
+        for (auto & elem : mesh.element_ptr_range())
+          {
+            CPPUNIT_ASSERT_EQUAL(elem->type(), C0POLYHEDRON);
+            CPPUNIT_ASSERT_EQUAL(elem->n_sides(), 6u);
+            CPPUNIT_ASSERT(elem->n_sub_elem() > 0);
+            CPPUNIT_ASSERT(elem->volume() > 0);
+          }
+
+        return;
+      }
 
     // We don't yet try to do affine map optimizations on pyramids
     if (type == PYRAMID5 ||
@@ -314,6 +381,8 @@ public:
   void buildCubeHex8 ()      { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, HEX8); }
   void buildCubeHex20 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, HEX20); }
   void buildCubeHex27 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, HEX27); }
+  void buildCubeC0Polyhedron ()
+  { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, C0POLYHEDRON); }
   void buildCubePrism6 ()    { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM6); }
   void buildCubePrism15 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM15); }
   void buildCubePrism18 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM18); }

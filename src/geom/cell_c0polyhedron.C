@@ -18,6 +18,7 @@
 // Local includes
 #include "libmesh/cell_c0polyhedron.h"
 
+#include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/face_polygon.h"
 #include "libmesh/mesh_tools.h"
@@ -188,11 +189,44 @@ C0Polyhedron::edges_adjacent_to_node(const unsigned int n) const
 
 
 
-void C0Polyhedron::connectivity(const unsigned int /*sf*/,
-                                const IOPackage /*iop*/,
-                                std::vector<dof_id_type> & /*conn*/) const
+void C0Polyhedron::connectivity(const unsigned int sf,
+                                const IOPackage iop,
+                                std::vector<dof_id_type> & conn) const
 {
-  libmesh_not_implemented();
+  libmesh_assert_less (sf, this->n_sub_elem());
+  libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
+
+  const auto & subtet = this->_triangulation[sf];
+
+  switch (iop)
+    {
+    case TECPLOT:
+      {
+        conn.resize(8);
+        conn[0] = this->node_id(subtet[0])+1;
+        conn[1] = this->node_id(subtet[1])+1;
+        conn[2] = this->node_id(subtet[2])+1;
+        conn[3] = this->node_id(subtet[2])+1;
+        conn[4] = this->node_id(subtet[3])+1;
+        conn[5] = this->node_id(subtet[3])+1;
+        conn[6] = this->node_id(subtet[3])+1;
+        conn[7] = this->node_id(subtet[3])+1;
+        return;
+      }
+
+    case VTK:
+      {
+        conn.resize(4);
+        conn[0] = this->node_id(subtet[0]);
+        conn[1] = this->node_id(subtet[1]);
+        conn[2] = this->node_id(subtet[2]);
+        conn[3] = this->node_id(subtet[3]);
+        return;
+      }
+
+    default:
+      libmesh_error_msg("Unsupported IO package " << iop);
+    }
 }
 
 
