@@ -20,6 +20,10 @@
 
 #ifdef LIBMESH_HAVE_POLY2TRI
 
+// We'd like reproduceability here even when different FP rounding can
+// lead to different triangle splitting decisions
+#include "libmesh/enforce_ieee754.h"
+
 // libmesh includes
 #include "libmesh/poly2tri_triangulator.h"
 
@@ -1522,9 +1526,9 @@ bool Poly2TriTriangulator::should_refine_elem(Elem & elem)
 } // namespace libMesh
 
 
-
-
-
+// Unnecessary at end of file, *except* maybe we'll do a unity build
+// someday, and in the meantime test coverage is nice.
+#include "libmesh/restore_ieee754.h"
 
 
 #endif // LIBMESH_HAVE_POLY2TRI

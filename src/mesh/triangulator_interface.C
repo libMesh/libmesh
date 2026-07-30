@@ -18,6 +18,10 @@
 
 #include "libmesh/libmesh_config.h"
 
+// We'd like reproduceability here even when different FP rounding can
+// lead to different triangle splitting decisions
+#include "libmesh/enforce_ieee754.h"
+
 // libmesh includes
 #include "libmesh/mesh_triangle_interface.h"
 #include "libmesh/unstructured_mesh.h"
@@ -659,3 +663,7 @@ void TriangulatorInterface::calculate_auto_desired_area_samples(std::vector<Poin
 }
 } // namespace libMesh
 
+
+// Unnecessary at end of file, *except* maybe we'll do a unity build
+// someday, and in the meantime test coverage is nice.
+#include "libmesh/restore_ieee754.h"

@@ -11,6 +11,7 @@ pkg_sources = $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/common/shapes.cc 
               $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep.h \
               $(top_srcdir)/contrib/poly2tri/poly2tri/poly2tri/sweep/sweep_context.h
 pkg_libs    =
+pkg_cxxflags = $(ACSM_IEEE754_FLAGS)
 
 EXTRA_DIST = $(top_srcdir)/contrib/poly2tri/poly2tri/AUTHORS \
              $(top_srcdir)/contrib/poly2tri/poly2tri/LICENSE \
