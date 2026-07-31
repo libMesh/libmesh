@@ -70,59 +70,95 @@ namespace
     return signof(det);
   }
 
+  // Return true iff the ray from source toward ray_target crosses the
+  // edge from edge_pt0 (non-inclusive) to edge_pt1 (inclusive) in the
+  // forward ray direction.  edge_pt2 is the vertex following edge_pt1
+  // along the polygon; it is used to classify a crossing that lands
+  // exactly on the shared vertex edge_pt1.
+  //
+  // The decision is made purely from orientation predicates on the
+  // vertices, never from a parametric edge coordinate compared against
+  // a tolerance.  This is what guarantees consistency: a shared vertex
+  // yields the exact same orientation when viewed from either of its
+  // two edges, so a ray passing through a vertex is counted exactly
+  // once for a "through" crossing and not at all for a "tangent"
+  // (glancing) touch, regardless of floating-point round-off.
   bool is_intersection(const Point & source,
                        const Point & ray_target,
                        const Point & edge_pt0,
-                       const Point & edge_pt1)
+                       const Point & edge_pt1,
+                       const Point & edge_pt2)
   {
-    int orient_st0 = orientation(source, ray_target, edge_pt0);
-    int orient_st1 = orientation(source, ray_target, edge_pt1);
-    int orient_edge_s = orientation(edge_pt0, edge_pt1, source);
-    int orient_edge_t = ray_orientation(edge_pt0, edge_pt1, source, ray_target);
+    const int orient_st0 = orientation(source, ray_target, edge_pt0);
+    const int orient_st1 = orientation(source, ray_target, edge_pt1);
 
-    // Intersection on interior
-    if ((orient_st0 == -orient_st1) &&
-        (orient_edge_s != orient_edge_t))
-      return true;
+    // Which side of the edge line the source lies on, and which way the
+    // ray turns off the edge, together tell us whether the crossing is
+    // ahead of the source rather than behind it.
+    const int orient_edge_s = orientation(edge_pt0, edge_pt1, source);
+    const int orient_edge_t = ray_orientation(edge_pt0, edge_pt1, source, ray_target);
+    const bool forward = (orient_edge_s != orient_edge_t);
 
-    // Ray intersects edge_pt1
+    // The ray line passes exactly through edge_pt1, the inclusive
+    // endpoint of this edge.  Count it only as a genuine "through"
+    // crossing: the previous vertex (edge_pt0) and the next vertex
+    // (edge_pt2) must lie on opposite sides of the ray line.  A tangent
+    // touch (both neighbors on the same side) or a collinear edge
+    // (edge_pt0 also on the line) does not count.
     if (orient_st1 == 0)
-      return true;
+      {
+        const int orient_st2 = orientation(source, ray_target, edge_pt2);
+        return forward && (orient_st0 != 0) && (orient_st0 == -orient_st2);
+      }
 
-    // Source is on line; we don't count that
-    // if (orient_edge_s == 0)
-    // Ray is parallel to edge; no intersection;
-    // if (orient_edge_t == 0)
-    // Ray intersects edge_pt0; we don't count that
-    // if (orient_st0 == 0)
+    // The ray line passes through edge_pt0, the non-inclusive endpoint;
+    // that vertex is counted (if at all) by the previous edge.
+    //
+    // A run of two or more vertices all lying exactly on the ray line
+    // is therefore never counted, even when the boundary arrives at the
+    // run from one side and leaves from the other, which ought to count
+    // once.  Deciding that needs a look further along the polygon than
+    // edge_pt2.  This is long-standing behavior, not something the
+    // orientation predicates changed, and it takes exact collinearity
+    // to reach.
+    if (orient_st0 == 0)
+      return false;
 
-    return false;
+    // Ordinary case: count it iff the edge endpoints straddle the ray
+    // line.
+    return forward && (orient_st0 == -orient_st1);
   }
 
-  // Returns a positive distance iff the ray from source in the
+  // Returns a non-negative distance iff the ray from source in the
   // direction of ray_target intersects the edge from pt0
   // (non-inclusive) to pt1 (inclusive), -1 otherwise.
   //
   // If the intersection is a "glancing" one at a corner, return -1.
+  //
+  // edge_pt2 is the vertex following edge_pt1, needed to tell a
+  // "glancing" corner from one the ray passes through.
   Real find_intersection(const Point & source,
                          const Point & ray_target,
                          const Point & edge_pt0,
                          const Point & edge_pt1,
                          const Point & edge_pt2)
   {
-    // Quick and more numerically stable check
-    if (!is_intersection(source, ray_target, edge_pt0, edge_pt1))
+    // Decide whether the ray crosses this edge using only orientation
+    // predicates on the edge vertices, so that shared vertices are
+    // classified consistently between neighboring edges.
+    if (!is_intersection(source, ray_target, edge_pt0, edge_pt1, edge_pt2))
       return -1;
 
-    // Calculate intersection parameters (fractions of the distance
-    // along each segment)
+    // Now that the crossing decision is settled, use parametric math
+    // only to recover the distance to the intersection.
     const Real raydx = ray_target(0)-source(0),
                raydy = ray_target(1)-source(1),
                edgedx = edge_pt1(0)-edge_pt0(0),
                edgedy = edge_pt1(1)-edge_pt0(1);
     const Real denom = edgedx * raydy - edgedy * raydx;
 
-    // divide-by-zero means the segments are parallel
+    // divide-by-zero means the segments are parallel; is_intersection
+    // rejects that case, but guard against it anyway.
     if (denom == 0)
       return -1;
 
@@ -131,46 +167,16 @@ namespace
     const Real targetsdx = edge_pt1(0)-ray_target(0),
                targetsdy = edge_pt1(1)-ray_target(1);
 
-    const Real t_num = targetsdx * raydy -
-                       targetsdy * raydx;
-    const Real t = t_num * one_over_denom;
+    const Real u_num = targetsdx * edgedy - targetsdy * edgedx;
+    const Real u = u_num * one_over_denom;
+    const Real ray_fraction = (1-u);
 
-    // There's an intersection between the ray line and the edge?
-    if (t >= 0 && t < 1)
-      {
-        // There's an intersection right on a vertex?  We'll count it
-        // if and only if it isn't a "double-intersection", if the
-        // *next* edge in line is on the other side of our ray.
-        if (!t)
-          {
-            const Real prevdx = edge_pt0(0)-ray_target(0),
-                       prevdy = edge_pt0(1)-ray_target(1);
-            const Real p_num = prevdx * raydy -
-                               prevdy * raydx;
-
-            const Real nextdx = edge_pt2(0)-ray_target(0),
-                       nextdy = edge_pt2(1)-ray_target(1);
-            const Real n_num = nextdx * raydy -
-                               nextdy * raydx;
-
-            if (signof(p_num) != -signof(n_num))
-              return -1;
-          }
-
-        const Real u_num = targetsdx * edgedy - targetsdy * edgedx;
-        const Real u = u_num * one_over_denom;
-        const Real ray_fraction = (1-u);
-
-        // Intersection is in the other direction!?
-        if (ray_fraction < 0)
-          return -1;
-
-        const Real distance =
-          ray_fraction * std::sqrt(raydx*raydx + raydy*raydy);
-        return distance;
-      }
-
-    return -1;
+    // is_intersection guarantees a forward crossing, so clamp away any
+    // floating-point noise that would otherwise make a vertex hit read
+    // as a tiny negative distance.
+    const Real distance =
+      ray_fraction * std::sqrt(raydx*raydx + raydy*raydy);
+    return std::max(Real(0), distance);
   }
 }
 
