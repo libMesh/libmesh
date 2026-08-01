@@ -642,10 +642,7 @@ std::size_t System::read_serialized_blocked_dof_objects (const dof_id_type n_obj
   std::vector<unsigned int> vars_to_read (_written_var_indices);
 
   if (var_to_read != libMesh::invalid_uint)
-    {
-      vars_to_read.clear();
-      vars_to_read.push_back(var_to_read);
-    }
+    vars_to_read.assign({var_to_read});
 
   const unsigned int
     sys_num    = this->number(),
