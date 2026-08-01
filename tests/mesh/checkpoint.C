@@ -3,6 +3,7 @@
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/face_c0polygon.h"
 #include "libmesh/int_range.h"
+#include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
@@ -152,7 +153,7 @@ public:
       {{0., 0.}, {1., 0.}, {1.5, 0.5}, {1., 1.}, {0., 1.}};
 
     {
-      ReplicatedMesh mesh(comm_self, 2);
+      Mesh mesh(comm_self, 2);
       mesh.allow_renumbering(false);
 
       auto polygon =
@@ -169,7 +170,7 @@ public:
     }
 
     {
-      ReplicatedMesh mesh(comm_self);
+      Mesh mesh(comm_self);
       CheckpointIO checkpoint(mesh, binary);
       checkpoint.read(filename);
 
@@ -177,23 +178,30 @@ public:
       CPPUNIT_ASSERT_EQUAL(dof_id_type(5), mesh.n_nodes());
       CPPUNIT_ASSERT_EQUAL(2u, static_cast<unsigned int>(mesh.mesh_dimension()));
 
-      const Elem & elem = mesh.elem_ref(0);
-      CPPUNIT_ASSERT_EQUAL(C0POLYGON, elem.type());
-      CPPUNIT_ASSERT_EQUAL(5u, elem.n_nodes());
-      CPPUNIT_ASSERT_EQUAL(5u, elem.n_vertices());
-      CPPUNIT_ASSERT_EQUAL(5u, elem.n_sides());
-      CPPUNIT_ASSERT_EQUAL(5u, elem.n_edges());
+      const Elem * elem = mesh.query_elem_ptr(0);
+      bool found_elem = elem;
+      mesh.comm().max(found_elem);
+      CPPUNIT_ASSERT(found_elem);
 
-      for (auto n : index_range(points))
+      if (elem)
         {
-          CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(n), elem.node_id(n));
-          CPPUNIT_ASSERT_EQUAL(points[n], elem.point(n));
+          CPPUNIT_ASSERT_EQUAL(C0POLYGON, elem->type());
+          CPPUNIT_ASSERT_EQUAL(5u, elem->n_nodes());
+          CPPUNIT_ASSERT_EQUAL(5u, elem->n_vertices());
+          CPPUNIT_ASSERT_EQUAL(5u, elem->n_sides());
+          CPPUNIT_ASSERT_EQUAL(5u, elem->n_edges());
 
-          const auto side_nodes = elem.nodes_on_side(n);
-          CPPUNIT_ASSERT_EQUAL(std::size_t(2), side_nodes.size());
-          CPPUNIT_ASSERT_EQUAL(cast_int<unsigned int>(n), side_nodes[0]);
-          CPPUNIT_ASSERT_EQUAL
-            (cast_int<unsigned int>((n + 1) % points.size()), side_nodes[1]);
+          for (auto n : index_range(points))
+            {
+              CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(n), elem->node_id(n));
+              CPPUNIT_ASSERT_EQUAL(points[n], elem->point(n));
+
+              const auto side_nodes = elem->nodes_on_side(n);
+              CPPUNIT_ASSERT_EQUAL(std::size_t(2), side_nodes.size());
+              CPPUNIT_ASSERT_EQUAL(cast_int<unsigned int>(n), side_nodes[0]);
+              CPPUNIT_ASSERT_EQUAL
+                (cast_int<unsigned int>((n + 1) % points.size()), side_nodes[1]);
+            }
         }
     }
 
@@ -229,7 +237,7 @@ public:
        {6, 7, 8, 9, 10, 11}};
 
     {
-      ReplicatedMesh mesh(comm_self, 3);
+      Mesh mesh(comm_self, 3);
       mesh.allow_renumbering(false);
       for (auto n : index_range(points))
         mesh.add_point(points[n], n);
@@ -250,6 +258,10 @@ public:
       auto polyhedron =
         std::make_unique<C0Polyhedron>(sides, mid_elem_node);
       CPPUNIT_ASSERT(mid_elem_node);
+
+      // Explicit id so DistributedMesh matches ReplicatedMesh
+      mid_elem_node->set_id(points.size());
+
       mesh.add_node(std::move(mid_elem_node));
       polyhedron->set_id() = 0;
       mesh.add_elem(std::move(polyhedron));
@@ -260,7 +272,7 @@ public:
     }
 
     {
-      ReplicatedMesh mesh(comm_self);
+      Mesh mesh(comm_self);
       CheckpointIO checkpoint(mesh, binary);
       checkpoint.read(filename);
 
@@ -268,23 +280,30 @@ public:
       CPPUNIT_ASSERT_EQUAL(dof_id_type(13), mesh.n_nodes());
       CPPUNIT_ASSERT_EQUAL(3u, static_cast<unsigned int>(mesh.mesh_dimension()));
 
-      const Elem & elem = mesh.elem_ref(0);
-      CPPUNIT_ASSERT_EQUAL(C0POLYHEDRON, elem.type());
-      CPPUNIT_ASSERT_EQUAL(12u, elem.n_vertices());
-      CPPUNIT_ASSERT_EQUAL(13u, elem.n_nodes());
-      CPPUNIT_ASSERT_EQUAL(8u, elem.n_sides());
-      CPPUNIT_ASSERT_EQUAL(18u, elem.n_edges());
-      CPPUNIT_ASSERT_EQUAL(dof_id_type(12),
-                           elem.node_id(elem.n_vertices()));
+      const Elem * elem = mesh.query_elem_ptr(0);
+      bool found_elem = elem;
+      mesh.comm().max(found_elem);
+      CPPUNIT_ASSERT(found_elem);
 
-      for (auto s : index_range(nodes_on_sides))
+      if (elem)
         {
-          const auto side_nodes = elem.nodes_on_side(s);
-          CPPUNIT_ASSERT_EQUAL(nodes_on_sides[s].size(), side_nodes.size());
-          for (auto n : index_range(side_nodes))
-            CPPUNIT_ASSERT_EQUAL
-              (cast_int<dof_id_type>(nodes_on_sides[s][n]),
-               elem.node_id(side_nodes[n]));
+          CPPUNIT_ASSERT_EQUAL(C0POLYHEDRON, elem->type());
+          CPPUNIT_ASSERT_EQUAL(12u, elem->n_vertices());
+          CPPUNIT_ASSERT_EQUAL(13u, elem->n_nodes());
+          CPPUNIT_ASSERT_EQUAL(8u, elem->n_sides());
+          CPPUNIT_ASSERT_EQUAL(18u, elem->n_edges());
+          CPPUNIT_ASSERT_EQUAL(dof_id_type(12),
+                               elem->node_id(elem->n_vertices()));
+
+          for (auto s : index_range(nodes_on_sides))
+            {
+              const auto side_nodes = elem->nodes_on_side(s);
+              CPPUNIT_ASSERT_EQUAL(nodes_on_sides[s].size(), side_nodes.size());
+              for (auto n : index_range(side_nodes))
+                CPPUNIT_ASSERT_EQUAL
+                  (cast_int<dof_id_type>(nodes_on_sides[s][n]),
+                   elem->node_id(side_nodes[n]));
+            }
         }
     }
 
