@@ -18,9 +18,12 @@
 // Local includes
 #include "libmesh/checkpoint_io.h"
 #include "libmesh/boundary_info.h"
+#include "libmesh/cell_c0polyhedron.h"
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/enum_xdr_mode.h"
+#include "libmesh/face_c0polygon.h"
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_communication.h"
@@ -167,7 +170,7 @@ CheckpointIO::CheckpointIO (MeshBase & mesh, const bool binary_in) :
   ParallelObject      (mesh),
   _binary             (binary_in),
   _parallel           (false),
-  _version            ("checkpoint-1.5"),
+  _version            ("checkpoint-1.6"),
   _my_processor_ids   (1, processor_id()),
   _my_n_processors    (mesh.is_replicated() ? 1 : n_processors())
 {
@@ -179,7 +182,7 @@ CheckpointIO::CheckpointIO (const MeshBase & mesh, const bool binary_in) :
   ParallelObject      (mesh),
   _binary             (binary_in),
   _parallel           (false),
-  _version            ("checkpoint-1.5"),
+  _version            ("checkpoint-1.6"),
   _my_processor_ids   (1, processor_id()),
   _my_n_processors    (mesh.is_replicated() ? 1 : n_processors())
 {
@@ -278,7 +281,15 @@ void CheckpointIO::cleanup(const std::string & input_name, processor_id_type n_p
 
 bool CheckpointIO::version_at_least_1_5() const
 {
-  return (this->version().find("1.5") != std::string::npos);
+  return
+    (this->version().find("1.5") != std::string::npos) ||
+    (this->version().find("1.6") != std::string::npos);
+}
+
+
+bool CheckpointIO::version_at_least_1_6() const
+{
+  return (this->version().find("1.6") != std::string::npos);
 }
 
 
@@ -594,6 +605,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
   libmesh_assert (io.writing());
 
   const bool write_extra_integers = this->version_at_least_1_5();
+  const bool write_runtime_topology = this->version_at_least_1_6();
   const unsigned int n_extra_integers =
     write_extra_integers ? MeshOutput<MeshBase>::mesh().n_elem_integers() : 0;
 
@@ -601,6 +613,7 @@ void CheckpointIO::write_connectivity (Xdr & io,
   // id type pid subdomain_id parent_id extra_integer_0 ...
   std::vector<largest_id_type> elem_data(6 + n_extra_integers);
   std::vector<largest_id_type> conn_data;
+  std::vector<largest_id_type> runtime_topology;
 
   largest_id_type n_elems_here = elements.size();
 
@@ -656,6 +669,28 @@ void CheckpointIO::write_connectivity (Xdr & io,
       uint16_t pflag = elem->p_refinement_flag();
       io.data(pflag, "# pflag");
 #endif
+
+      if (elem->runtime_topology())
+        {
+          libmesh_error_msg_if
+            (!write_runtime_topology,
+             "Checkpoint format 1.6 or newer is required to write " <<
+             Utility::enum_to_string(elem->type()) << " elements.");
+
+          runtime_topology.clear();
+          runtime_topology.push_back(n_nodes);
+          runtime_topology.push_back(elem->n_sides());
+          for (auto s : elem->side_index_range())
+            {
+              const auto side_nodes = elem->nodes_on_side(s);
+              runtime_topology.push_back(side_nodes.size());
+              for (const auto n : side_nodes)
+                runtime_topology.push_back(n);
+            }
+
+          io.data(runtime_topology, "# runtime topology");
+        }
+
       io.data_stream(conn_data.data(),
                      cast_int<unsigned int>(conn_data.size()),
                      cast_int<unsigned int>(conn_data.size()));
@@ -910,6 +945,7 @@ file_id_type CheckpointIO::read_header (const std::string & name)
   uint16_t input_parallel;
   file_id_type input_n_procs;
 
+  std::string input_version;
   std::vector<std::string> node_integer_names, elem_integer_names;
 
   // We'll write a header file from processor 0 and broadcast.
@@ -917,8 +953,7 @@ file_id_type CheckpointIO::read_header (const std::string & name)
     {
       Xdr io (name, this->binary() ? DECODE : READ);
 
-      // read the version, but don't care about it
-      std::string input_version;
+      // read the version
       io.data(input_version);
 
       // read the data type, don't care about it this time
@@ -955,6 +990,9 @@ file_id_type CheckpointIO::read_header (const std::string & name)
     }
 
   // broadcast data from processor 0, set values everywhere
+  this->comm().broadcast(input_version);
+  this->version() = input_version;
+
   this->comm().broadcast(mesh_dimension);
   mesh.set_mesh_dimension(cast_int<unsigned char>(mesh_dimension));
 
@@ -1139,6 +1177,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
   MeshBase & mesh = MeshInput<MeshBase>::mesh();
 
   const bool read_extra_integers = this->version_at_least_1_5();
+  const bool read_runtime_topology = this->version_at_least_1_6();
 
   const unsigned int n_extra_integers =
     read_extra_integers ? mesh.n_elem_integers() : 0;
@@ -1147,7 +1186,7 @@ void CheckpointIO::read_connectivity (Xdr & io)
   io.data(n_elems_here);
 
   // Keep track of the highest dimensional element we've added to the mesh
-  unsigned int highest_elem_dim = 1;
+  unsigned int highest_elem_dim = mesh.mesh_dimension();
 
   // RHS: Originally we used invalid_processor_id as a "no parent" tag
   // number, because I'm an idiot.  Let's try to support broken files
@@ -1176,9 +1215,85 @@ void CheckpointIO::read_connectivity (Xdr & io)
       io.data(pflag, "# pflag");
 #endif
 
+      const ElemType elem_type =
+        static_cast<ElemType>(elem_data[1]);
+      const bool is_c0polygon = (elem_type == C0POLYGON);
+      const bool is_c0polyhedron = (elem_type == C0POLYHEDRON);
+
       unsigned int n_nodes = Elem::type_to_n_nodes_map[elem_data[1]];
-      if (n_nodes == invalid_uint)
-        libmesh_not_implemented_msg("Support for Polygons/Polyhedra not yet implemented");
+      // Runtime-topology types have no fixed node count in this map.
+      const bool has_runtime_topology = (n_nodes == invalid_uint);
+      std::vector<std::vector<unsigned int>> nodes_on_sides;
+
+      if (has_runtime_topology)
+        {
+          libmesh_error_msg_if
+            (!read_runtime_topology,
+             "Checkpoint format 1.6 or newer is required to read " <<
+             Utility::enum_to_string(elem_type) << " elements.");
+
+          std::vector<file_id_type> runtime_topology;
+          io.data(runtime_topology, "# runtime topology");
+          libmesh_error_msg_if(runtime_topology.size() < 2,
+                               "Invalid runtime element topology.");
+
+          std::size_t topology_index = 0;
+          n_nodes =
+            cast_int<unsigned int>(runtime_topology[topology_index++]);
+          const unsigned int n_sides =
+            cast_int<unsigned int>(runtime_topology[topology_index++]);
+          nodes_on_sides.resize(n_sides);
+
+          for (auto s : index_range(nodes_on_sides))
+            {
+              libmesh_error_msg_if
+                (topology_index == runtime_topology.size(),
+                 "Incomplete runtime element checkpoint topology.");
+
+              const unsigned int n_side_nodes =
+                cast_int<unsigned int>(runtime_topology[topology_index++]);
+              libmesh_error_msg_if
+                (n_side_nodes > runtime_topology.size() - topology_index,
+                 "Invalid runtime element side checkpoint topology.");
+
+              auto & side_nodes = nodes_on_sides[s];
+              side_nodes.resize(n_side_nodes);
+              for (auto n : index_range(side_nodes))
+                {
+                  const unsigned int local_node =
+                    cast_int<unsigned int>(runtime_topology[topology_index++]);
+                  libmesh_error_msg_if
+                    (local_node >= n_nodes,
+                     "Runtime element side checkpoint topology references "
+                     "an invalid local node.");
+                  side_nodes[n] = local_node;
+                }
+            }
+
+          libmesh_error_msg_if
+            (topology_index != runtime_topology.size(),
+             "Extra data in runtime element checkpoint topology.");
+
+          if (is_c0polygon)
+            {
+              libmesh_error_msg_if
+                (n_nodes < 3 || n_sides != n_nodes,
+                 "Invalid C0POLYGON checkpoint topology.");
+              for (const auto & side_nodes : nodes_on_sides)
+                libmesh_error_msg_if
+                  (side_nodes.size() != 2,
+                   "Invalid C0POLYGON side checkpoint topology.");
+            }
+          else if (is_c0polyhedron)
+            {
+              libmesh_error_msg_if(n_sides < 4,
+                                   "Invalid C0POLYHEDRON checkpoint topology.");
+              for (const auto & side_nodes : nodes_on_sides)
+                libmesh_error_msg_if
+                  (side_nodes.size() < 3,
+                   "Invalid C0POLYHEDRON side checkpoint topology.");
+            }
+        }
 
       // Snag the node ids this element was connected to
       std::vector<file_id_type> conn_data(n_nodes);
@@ -1188,8 +1303,6 @@ void CheckpointIO::read_connectivity (Xdr & io)
 
       const dof_id_type id                 =
         cast_int<dof_id_type>      (elem_data[0]);
-      const ElemType elem_type             =
-        static_cast<ElemType>      (elem_data[1]);
       const processor_id_type proc_id      =
         cast_int<processor_id_type>
         (elem_data[2] % mesh.n_processors());
@@ -1254,11 +1367,76 @@ void CheckpointIO::read_connectivity (Xdr & io)
             libmesh_assert_equal_to
               (old_elem->node_id(n),
                cast_int<dof_id_type>(conn_data[n]));
+
+          if (has_runtime_topology)
+            {
+              libmesh_assert_equal_to(old_elem->n_sides(),
+                                      nodes_on_sides.size());
+#ifndef NDEBUG
+              for (auto s : index_range(nodes_on_sides))
+                libmesh_assert(old_elem->nodes_on_side(s) ==
+                               nodes_on_sides[s]);
+#endif
+            }
         }
       else
         {
           // Create the element
-          auto elem = Elem::build(elem_type, parent);
+          std::unique_ptr<Elem> elem;
+          std::unique_ptr<Node> generated_mid_elem_node;
+
+          if (is_c0polygon)
+            elem = std::make_unique<C0Polygon>(n_nodes, parent);
+          else if (is_c0polyhedron)
+            {
+              std::vector<std::shared_ptr<Polygon>> sides(nodes_on_sides.size());
+              for (auto s : index_range(nodes_on_sides))
+                {
+                  const auto & side_node_indices = nodes_on_sides[s];
+                  auto side =
+                    std::make_shared<C0Polygon>
+                      (cast_int<unsigned int>(side_node_indices.size()));
+                  for (auto n : index_range(side_node_indices))
+                    side->set_node
+                      (n, mesh.node_ptr(cast_int<dof_id_type>
+                       (conn_data[side_node_indices[n]])));
+                  sides[s] = std::move(side);
+                }
+
+              elem = std::make_unique<C0Polyhedron>
+                (sides, generated_mid_elem_node, parent);
+
+              libmesh_error_msg_if
+                (elem->n_nodes() != conn_data.size(),
+                 "C0POLYHEDRON checkpoint topology is incompatible with "
+                 "this libMesh configuration.");
+
+              for (auto n : make_range(elem->n_vertices()))
+                libmesh_error_msg_if
+                  (elem->node_id(n) !=
+                   cast_int<dof_id_type>(conn_data[n]),
+                   "C0POLYHEDRON checkpoint topology has inconsistent "
+                   "local node ordering.");
+            }
+          else
+            elem = Elem::build(elem_type, parent);
+
+          if (has_runtime_topology)
+            {
+              libmesh_error_msg_if
+                (!elem->runtime_topology() ||
+                 elem->n_nodes() != conn_data.size() ||
+                 elem->n_sides() != nodes_on_sides.size(),
+                 Utility::enum_to_string(elem_type) <<
+                 " checkpoint topology is incompatible with this "
+                 "libMesh configuration.");
+
+              for (auto s : index_range(nodes_on_sides))
+                libmesh_error_msg_if
+                  (elem->nodes_on_side(s) != nodes_on_sides[s],
+                   Utility::enum_to_string(elem_type) <<
+                   " checkpoint topology has inconsistent side ordering.");
+            }
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
           elem->set_unique_id(unique_id);

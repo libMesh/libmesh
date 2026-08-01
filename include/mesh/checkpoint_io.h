@@ -168,6 +168,14 @@ public:
   bool version_at_least_1_5() const;
 
   /**
+   * \returns \p true if the current file has an XDR/XDA version that
+   * matches or exceeds 1.6
+   *
+   * As of this version we encode runtime element topology.
+   */
+  bool version_at_least_1_6() const;
+
+  /**
    * Get/Set the processor id or processor ids to use.
    *
    * The default processor_id to use is the processor_id() of the
