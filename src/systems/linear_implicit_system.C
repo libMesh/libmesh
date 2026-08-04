@@ -23,6 +23,7 @@
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/linear_solver.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/libmesh_call_mpi.h"
 #include "libmesh/numeric_vector.h" // for parameter sensitivity calcs
 //#include "libmesh/parameter_vector.h"
 #include "libmesh/sparse_matrix.h" // for get_transpose
@@ -33,6 +34,81 @@
 namespace libMesh
 {
 
+namespace
+{
+
+/**
+ * Temporarily attaches a per-call solver configuration and restores the
+ * previously attached configuration on every exit path.  This prevents a
+ * borrowed solver from retaining configuration intended for another system,
+ * including when solver initialization or solve() throws.
+ */
+class ScopedSolverConfiguration
+{
+public:
+  ScopedSolverConfiguration(LinearSolver<Number> & solver,
+                            SolverConfiguration * temporary_configuration)
+    : _solver(solver),
+      _previous_configuration(solver.solver_configuration()),
+      _restore(temporary_configuration != nullptr)
+  {
+    if (_restore)
+      _solver.set_solver_configuration(temporary_configuration);
+  }
+
+  ~ScopedSolverConfiguration()
+  {
+    if (_restore)
+      _solver.set_solver_configuration(_previous_configuration);
+  }
+
+private:
+  LinearSolver<Number> & _solver;
+  SolverConfiguration * const _previous_configuration;
+  const bool _restore;
+};
+
+/**
+ * Applies a system's subset restriction to the active solver and removes it
+ * on every exit path.  Without this guard, an exception from solve() could
+ * leave a borrowed solver restricted and affect a later solve on another
+ * system.
+ */
+class SubsetRestrictionGuard
+{
+public:
+  explicit SubsetRestrictionGuard(LinearSolver<Number> & solver)
+    : _solver(solver), _restricted(false)
+  {
+  }
+
+  ~SubsetRestrictionGuard()
+  {
+    if (_restricted)
+      _solver.restrict_solve_to(nullptr);
+  }
+
+  void restrict(const std::vector<unsigned int> * dofs, const SubsetSolveMode subset_solve_mode)
+  {
+    _restricted = true;
+    _solver.restrict_solve_to(dofs, subset_solve_mode);
+  }
+
+  void clear()
+  {
+    if (_restricted)
+      {
+        _solver.restrict_solve_to(nullptr);
+        _restricted = false;
+      }
+  }
+
+private:
+  LinearSolver<Number> & _solver;
+  bool _restricted;
+};
+
+} // anonymous namespace
 
 LinearImplicitSystem::LinearImplicitSystem (EquationSystems & es,
                                             const std::string & name_in,
@@ -117,39 +193,75 @@ void LinearImplicitSystem::restrict_solve_to (const SystemSubset * subset,
     libmesh_assert_equal_to (&subset->get_system(), this);
 }
 
-
-
 void LinearImplicitSystem::solve ()
 {
-  if (this->assemble_before_solve)
+  this->solve(LinearImplicitSystemSolveOptions{});
+}
+
+void LinearImplicitSystem::solve(const LinearImplicitSystemSolveOptions & options)
+{
+  LinearSolver<Number> * const solver = options.solver ? options.solver : linear_solver.get();
+  libmesh_assert(solver);
+
+#ifndef NDEBUG
+#ifdef LIBMESH_HAVE_MPI
+  int communicator_comparison;
+  libmesh_call_mpi(
+      MPI_Comm_compare(solver->comm().get(), this->comm().get(), &communicator_comparison));
+  libmesh_assert(communicator_comparison == MPI_IDENT || communicator_comparison == MPI_CONGRUENT);
+#else
+  libmesh_assert_equal_to(solver->comm().get(), this->comm().get());
+#endif
+#endif
+
+  const bool assemble = options.assemble_before_solve.value_or(this->assemble_before_solve);
+
+  if (assemble)
     // Assemble the linear system
-    this->assemble ();
+    this->assemble();
+
+  ScopedSolverConfiguration scoped_configuration(*solver, options.solver_configuration);
 
   // If the linear solver hasn't been initialized, we do so here.
   if (this->prefix_with_name())
-    linear_solver->init(this->prefix().c_str());
+    solver->init(this->prefix().c_str());
   else
-    linear_solver->init();
+    solver->init();
 
-  linear_solver->init_systems(*this);
+  solver->init_systems(*this);
 
-  // Get the user-specified linear solver tolerance
-  const auto [maxits, tol] = this->get_linear_solve_parameters();
+  SubsetRestrictionGuard subset_guard(*solver);
 
   if (_subset != nullptr)
-    linear_solver->restrict_solve_to(&_subset->dof_ids(),_subset_solve_mode);
+    subset_guard.restrict(&_subset->dof_ids(), _subset_solve_mode);
 
   // Solve the linear system.  Several cases:
   std::pair<unsigned int, Real> rval = std::make_pair(0,0.0);
-  if (_shell_matrix)
-    // 1.) Shell matrix with or without user-supplied preconditioner.
-    rval = linear_solver->solve(*_shell_matrix, this->request_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
-  else
-    // 2.) No shell matrix, with or without user-supplied preconditioner
-    rval = linear_solver->solve (*matrix, this->request_matrix("Preconditioner"), *solution, *rhs, tol, maxits);
+  SparseMatrix<Number> * const preconditioner = this->request_matrix("Preconditioner");
 
-  if (_subset != nullptr)
-    linear_solver->restrict_solve_to(nullptr);
+  if (options.solver_configuration)
+    {
+      if (_shell_matrix)
+        // 1.) Shell matrix with or without user-supplied preconditioner.
+        rval = solver->solve(*_shell_matrix, preconditioner, *solution, *rhs);
+      else
+        // 2.) No shell matrix, with or without user-supplied preconditioner.
+        rval = solver->solve(*matrix, preconditioner, *solution, *rhs);
+    }
+  else
+    {
+      // Get the user-specified linear solver tolerance and iteration limit.
+      const auto [maxits, tol] = this->get_linear_solve_parameters();
+
+      if (_shell_matrix)
+        // 1.) Shell matrix with or without user-supplied preconditioner.
+        rval = solver->solve(*_shell_matrix, preconditioner, *solution, *rhs, tol, maxits);
+      else
+        // 2.) No shell matrix, with or without user-supplied preconditioner.
+        rval = solver->solve(*matrix, preconditioner, *solution, *rhs, tol, maxits);
+    }
+
+  subset_guard.clear();
 
   // Store the number of linear iterations required to
   // solve and the final residual.
@@ -159,8 +271,6 @@ void LinearImplicitSystem::solve ()
   // Update the system after the solve
   this->update();
 }
-
-
 
 void LinearImplicitSystem::attach_shell_matrix (ShellMatrix<Number> * shell_matrix)
 {
