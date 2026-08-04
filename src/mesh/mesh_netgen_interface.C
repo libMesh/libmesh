@@ -182,16 +182,6 @@ void NetGenMeshInterface::triangulate ()
       if (_elem_type == TET4)
         return;
 
-      // NetGen (and volume_to_surface_mesh) can leave gaps in rank 0's
-      // element and node id spaces, while broadcast() compacts them on the
-      // other ranks.  Renumber here -- on every rank, in lockstep -- so all
-      // ranks agree on n_elem()/max_elem_id() before the collective order
-      // increase runs its cross-rank consistency checks.  Note that
-      // renumber_nodes_and_elements() itself performs a collective reduction
-      // for the unique-id counter, so it must be called on all ranks together,
-      // never on rank 0 alone (that would deadlock the others in broadcast()).
-      this->_mesh.renumber_nodes_and_elements();
-
       // find_neighbors() is needed before all_second_order() can place
       // shared edge midpoints correctly.
       this->_mesh.find_neighbors();
