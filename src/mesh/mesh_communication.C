@@ -1284,7 +1284,9 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   mesh.clear_point_locator();
 
   libmesh_assert (mesh.comm().verify(mesh.n_elem()));
+  libmesh_assert (mesh.comm().verify(mesh.max_elem_id()));
   libmesh_assert (mesh.comm().verify(mesh.n_nodes()));
+  libmesh_assert (mesh.comm().verify(mesh.max_node_id()));
 
 #ifdef DEBUG
   MeshTools::libmesh_assert_valid_procids<Elem>(mesh);
