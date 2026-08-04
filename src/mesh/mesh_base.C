@@ -1883,7 +1883,7 @@ bool MeshBase::get_count_lower_dim_elems_in_point_locator() const
 }
 
 
-
+#ifdef LIBMESH_ENABLE_DEPRECATED
 std::string & MeshBase::subdomain_name(subdomain_id_type id)
 {
   // Use set_subdomain_name() instead
@@ -1896,6 +1896,8 @@ std::string & MeshBase::subdomain_name(subdomain_id_type id)
 
   return _block_id_to_name[id];
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
+
 
 const std::string & MeshBase::subdomain_name(subdomain_id_type id) const
 {

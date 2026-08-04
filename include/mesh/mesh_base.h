@@ -1697,11 +1697,20 @@ public:
    */
   virtual void libmesh_assert_valid_parallel_ids() const {}
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
-   * \returns A writable reference for getting/setting an optional
-   * name for a subdomain.
+   * \deprecated
+   * \returns A writable reference for setting an optional name for a
+   * subdomain.  This method is deprecated; use set_subdomain_name()
+   * instead.
    */
   std::string & subdomain_name(subdomain_id_type id);
+#endif // LIBMESH_ENABLE_DEPRECATED
+
+  /**
+   * \returns A reference for getting an optional name for a
+   * subdomain.
+   */
   const std::string & subdomain_name(subdomain_id_type id) const;
 
   /**
