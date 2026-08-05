@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/hashing.h"
+#include "libmesh/libmesh_device.h"
 #include "libmesh/type_vector.h"
 
 namespace libMesh
@@ -44,6 +45,7 @@ public:
    * Constructor.  By default sets all entries to 0.  Gives the point
    * 0 in \p LIBMESH_DIM dimensions.
    */
+  LIBMESH_DEVICE_INLINE
   Point (const Real x=0.,
          const Real y=0.,
          const Real z=0.) :
@@ -53,11 +55,13 @@ public:
   /**
    * Trivial copy-constructor.
    */
+  LIBMESH_DEVICE_INLINE
   Point (const Point & p) = default;
 
   /**
    * Copy-constructor from non-point Typevector.
    */
+  LIBMESH_DEVICE_INLINE
   Point (const TypeVector<Real> & p) :
     TypeVector<Real> (p)
   {}
@@ -65,6 +69,7 @@ public:
   /**
    * Copy-assignment operator.
    */
+  LIBMESH_DEVICE_INLINE
   Point& operator=(const Point & p) = default;
 
   /**
@@ -73,6 +78,7 @@ public:
   template <typename T,
             typename = typename
               std::enable_if<ScalarTraits<T>::value,void>::type>
+  LIBMESH_DEVICE_INLINE
   Point (const T x) :
     TypeVector<Real> (x,0,0)
   {}

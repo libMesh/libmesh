@@ -30,6 +30,10 @@
 // The library configuration options
 #include "libmesh/libmesh_config.h"
 
+// Device compilation support — must be included before assert macros
+// so that LIBMESH_DEVICE_ASSERT is available for the Kokkos path.
+#include "libmesh/libmesh_device.h"
+
 // Use actual timestamps or constant dummies (to aid ccache)
 #ifdef LIBMESH_ENABLE_TIMESTAMPS
 #  define  LIBMESH_TIME __TIME__
@@ -183,33 +187,33 @@ typedef std::complex<Real> COMPLEX;
 
 // Helper functions for complex/real numbers
 // to clean up #ifdef LIBMESH_USE_COMPLEX_NUMBERS elsewhere
-template<typename T> inline T libmesh_real(T a) { return a; }
-template<typename T> inline T libmesh_imag(T /*a*/) { return 0; }
-template<typename T> inline T libmesh_conj(T a) { return a; }
+template<typename T> LIBMESH_DEVICE_INLINE T libmesh_real(T a) { return a; }
+template<typename T> LIBMESH_DEVICE_INLINE T libmesh_imag(T /*a*/) { return 0; }
+template<typename T> LIBMESH_DEVICE_INLINE T libmesh_conj(T a) { return a; }
 
 template<typename T>
-inline T libmesh_real(std::complex<T> a) { return std::real(a); }
+LIBMESH_DEVICE_INLINE T libmesh_real(std::complex<T> a) { return std::real(a); }
 
 template<typename T>
-inline T libmesh_imag(std::complex<T> a) { return std::imag(a); }
+LIBMESH_DEVICE_INLINE T libmesh_imag(std::complex<T> a) { return std::imag(a); }
 
 template<typename T>
-inline std::complex<T> libmesh_conj(std::complex<T> a) { return std::conj(a); }
+LIBMESH_DEVICE_INLINE std::complex<T> libmesh_conj(std::complex<T> a) { return std::conj(a); }
 
 // std::isnan() is in <cmath> as of C++11.
 template <typename T>
-inline bool libmesh_isnan(T x) { return std::isnan(x); }
+LIBMESH_DEVICE_INLINE bool libmesh_isnan(T x) { return std::isnan(x); }
 
 template <typename T>
-inline bool libmesh_isnan(std::complex<T> a)
+LIBMESH_DEVICE_INLINE bool libmesh_isnan(std::complex<T> a)
 { return (std::isnan(std::real(a)) || std::isnan(std::imag(a))); }
 
 // std::isinf() is in <cmath> as of C++11.
 template <typename T>
-inline bool libmesh_isinf(T x) { return std::isinf(x); }
+LIBMESH_DEVICE_INLINE bool libmesh_isinf(T x) { return std::isinf(x); }
 
 template <typename T>
-inline bool libmesh_isinf(std::complex<T> a)
+LIBMESH_DEVICE_INLINE bool libmesh_isinf(std::complex<T> a)
 { return (std::isinf(std::real(a)) || std::isinf(std::imag(a))); }
 
 // Define the value type for unknowns in simulations.
@@ -287,7 +291,13 @@ extern bool warned_about_auto_ptr;
 #endif
 
 // The libmesh_assert() macro acts like C's assert(), but throws a
-// libmesh_error() (including stack trace, etc) instead of just exiting
+// libmesh_error() (including stack trace, etc) instead of just exiting.
+//
+// In .K translation units (LIBMESH_KOKKOS_COMPILATION defined),
+// LIBMESH_DEVICE_ASSERT is provided by libmesh_device.h using
+// printf + Kokkos::abort() — device-safe across CUDA/HIP/SYCL.
+// The assert macros delegate to it so that both host and device
+// code in the same file get assertion checking.
 #ifdef NDEBUG
 
 #define libmesh_assert_msg(asserted, msg)  ((void) 0)
@@ -298,6 +308,18 @@ extern bool warned_about_auto_ptr;
 #define libmesh_assert_greater_msg(expr1,expr2, msg)  ((void) 0)
 #define libmesh_assert_less_equal_msg(expr1,expr2, msg)  ((void) 0)
 #define libmesh_assert_greater_equal_msg(expr1,expr2, msg)  ((void) 0)
+
+#elif defined(LIBMESH_KOKKOS_COMPILATION)
+
+// Kokkos compilation: use the device-safe assert from libmesh_device.h.
+#define libmesh_assert_msg(asserted, msg)  LIBMESH_DEVICE_ASSERT(asserted)
+#define libmesh_exceptionless_assert_msg(asserted, msg) LIBMESH_DEVICE_ASSERT(asserted)
+#define libmesh_assert_equal_to_msg(expr1,expr2, msg)  LIBMESH_DEVICE_ASSERT((expr1) == (expr2))
+#define libmesh_assert_not_equal_to_msg(expr1,expr2, msg)  LIBMESH_DEVICE_ASSERT((expr1) != (expr2))
+#define libmesh_assert_less_msg(expr1,expr2, msg)  LIBMESH_DEVICE_ASSERT((expr1) < (expr2))
+#define libmesh_assert_greater_msg(expr1,expr2, msg)  LIBMESH_DEVICE_ASSERT((expr1) > (expr2))
+#define libmesh_assert_less_equal_msg(expr1,expr2, msg)  LIBMESH_DEVICE_ASSERT((expr1) <= (expr2))
+#define libmesh_assert_greater_equal_msg(expr1,expr2, msg)  LIBMESH_DEVICE_ASSERT((expr1) >= (expr2))
 
 #else
 
@@ -404,6 +426,12 @@ struct casting_compare {
 //
 // The libmesh_terminate() macro prints a message and throws a
 // TerminationException exception
+#if LIBMESH_IN_DEVICE_CODE
+#define libmesh_error_msg(msg)                                          \
+  do {                                                                  \
+    LIBMESH_DEVICE_ERROR_MSG(msg);                                      \
+  } while (0)
+#else
 #define libmesh_error_msg(msg)                                          \
   do {                                                                  \
     std::stringstream message_stream;                                   \
@@ -411,6 +439,7 @@ struct casting_compare {
     libMesh::MacroFunctions::report_error(__FILE__, __LINE__, LIBMESH_DATE, LIBMESH_TIME, message_stream); \
     LIBMESH_THROW(libMesh::LogicError(message_stream.str()));           \
   } while (0)
+#endif
 
 #define libmesh_error() libmesh_error_msg("")
 
@@ -673,7 +702,6 @@ inline Tnew restrict_int (Told oldvar)
 
   return oldvar;
 }
-
 
 /**
  * This is a helper variable template for cases when we want to use a default compile-time

@@ -45,92 +45,92 @@ namespace TensorTools
 // Vector specializations will follow.
 
 template <typename T, typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 typename std::enable_if<ScalarTraits<T>::value && ScalarTraits<T2>::value,
                         typename CompareTypes<T, T2>::supertype>::type
 inner_product(const T & a, const T2& b)
 { return a * b; }
 
 template <typename T, typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 typename CompareTypes<T, T2>::supertype
 inner_product(const TypeVector<T> & a, const TypeVector<T2> & b)
 { return a * b; }
 
 template <typename T, typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 typename CompareTypes<T, T2>::supertype
 inner_product(const TypeTensor<T> & a, const TypeTensor<T2> & b)
 { return a.contract(b); }
 
 template <unsigned int N, typename T, typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 typename CompareTypes<T, T2>::supertype
 inner_product(const TypeNTensor<N,T> & a, const TypeNTensor<N,T2> & b)
 { return a.contract(b); }
 
 template<typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm(const T & a)
 { using std::abs; return abs(a); }
 
 template<typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T norm(std::complex<T> a) { using std::abs; return abs(a); }
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm(const TypeVector<T> & a) -> decltype(TensorTools::norm(T()))
 {using std::sqrt; return sqrt(a.norm_sq());}
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm(const VectorValue<T> & a) -> decltype(TensorTools::norm(T()))
 {using std::sqrt; return sqrt(a.norm_sq());}
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm(const TypeTensor<T> & a) -> decltype(TensorTools::norm(T()))
 {using std::sqrt; return sqrt(a.norm_sq());}
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm(const TensorValue<T> & a) -> decltype(TensorTools::norm(T()))
 {using std::sqrt; return sqrt(a.norm_sq());}
 
 
 template<typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm_sq(const T & a)
-{ using std::norm; return norm(a); }
+{ return a * libmesh_conj(a); }
 
 template<typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T norm_sq(std::complex<T> a) { using std::norm; return norm(a); }
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm_sq(const TypeVector<T> & a)
 {return a.norm_sq();}
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm_sq(const VectorValue<T> & a)
 {return a.norm_sq();}
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm_sq(const TypeTensor<T> & a)
 {return a.norm_sq();}
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto norm_sq(const TensorValue<T> & a)
 {return a.norm_sq();}
 
 
 template<typename T>
-inline
+LIBMESH_DEVICE_INLINE
 bool is_zero(const T & a){ return a.is_zero();}
 
 // Any tensor-rank-independent code will need to include

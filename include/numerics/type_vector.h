@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/libmesh_device.h"
 #include "libmesh/compare_types.h"
 #include "libmesh/tensor_tools.h"
 #include "libmesh/int_range.h"
@@ -141,12 +142,14 @@ public:
    * Assign to this vector without creating a temporary.
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   void assign (const TypeVector<T2> &);
 
   /**
    * Assignment-from-scalar operator.  Used only to zero out vectors.
    */
   template <typename Scalar>
+  LIBMESH_DEVICE_INLINE
   typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TypeVector &>::type
@@ -157,12 +160,14 @@ public:
    * \returns A const reference to the \f$ i^{th} \f$ entry of the vector.
    */
   const T & operator () (const unsigned int i) const;
+  LIBMESH_DEVICE_INLINE
   const T & slice (const unsigned int i) const { return (*this)(i); }
 
   /**
    * \returns A writable reference to the \f$ i^{th} \f$ entry of the vector.
    */
   T & operator () (const unsigned int i);
+  LIBMESH_DEVICE_INLINE
   T & slice (const unsigned int i) { return (*this)(i); }
 
   /**
@@ -192,6 +197,7 @@ public:
    * Add a scaled value to this vector without creating a temporary.
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   void add_scaled (const TypeVector<T2> &, const T &);
 
   /**
@@ -222,6 +228,7 @@ public:
    * temporary.
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   void subtract_scaled (const TypeVector<T2> &, const T &);
 
   /**
@@ -279,6 +286,7 @@ public:
    * \returns The result of TypeVector::operator*().
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   typename CompareTypes<T, T2>::supertype
   contract (const TypeVector<T2> &) const;
 
@@ -292,6 +300,7 @@ public:
   /**
    * \returns A unit vector in the direction of *this.
    */
+  LIBMESH_DEVICE_INLINE
   TypeVector<T> unit() const;
 
   /**
@@ -309,16 +318,19 @@ public:
   /**
    * \returns The L1 norm of the vector
    */
+  LIBMESH_DEVICE_INLINE
   auto l1_norm() const;
 
   /**
    * \returns True if all values in the vector are zero
    */
+  LIBMESH_DEVICE_INLINE
   bool is_zero() const;
 
   /**
    * Set all entries of the vector to 0.
    */
+  LIBMESH_DEVICE_INLINE
   void zero();
 
   /**
@@ -342,11 +354,13 @@ public:
    * \note For floating point types T, the function \p absolute_fuzzy_equals()
    * may be a more appropriate choice.
    */
+  LIBMESH_DEVICE_INLINE
   bool operator == (const TypeVector<T> & rhs) const;
 
   /**
    * \returns !(*this == rhs)
    */
+  LIBMESH_DEVICE_INLINE
   bool operator != (const TypeVector<T> & rhs) const;
 
   /**
@@ -425,7 +439,7 @@ protected:
 // Inline functions
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<T>::TypeVector ()
 {
   _coords[0] = {};
@@ -442,7 +456,7 @@ TypeVector<T>::TypeVector ()
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<T>::TypeVector (const T & x,
                            const T & y,
                            const T & z)
@@ -467,7 +481,7 @@ TypeVector<T>::TypeVector (const T & x,
 
 template <typename T>
 template <typename Scalar1, typename Scalar2, typename Scalar3>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<T>::TypeVector (typename
                            std::enable_if<ScalarTraits<Scalar1>::value,
                            const Scalar1>::type & x,
@@ -497,7 +511,7 @@ TypeVector<T>::TypeVector (typename
 
 template <typename T>
 template <typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<T>::TypeVector (const Scalar & x,
                            typename
                            std::enable_if<ScalarTraits<Scalar>::value,
@@ -518,7 +532,7 @@ TypeVector<T>::TypeVector (const Scalar & x,
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<T>::TypeVector (const TypeVector<T2> & p)
 {
   // copy the nodes from vector p to me
@@ -530,7 +544,7 @@ TypeVector<T>::TypeVector (const TypeVector<T2> & p)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeVector<T>::assign (const TypeVector<T2> & p)
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
@@ -540,7 +554,7 @@ void TypeVector<T>::assign (const TypeVector<T2> & p)
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 const T & TypeVector<T>::operator () (const unsigned int i) const
 {
   libmesh_assert_less (i, LIBMESH_DIM);
@@ -551,7 +565,7 @@ const T & TypeVector<T>::operator () (const unsigned int i) const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T & TypeVector<T>::operator () (const unsigned int i)
 {
   libmesh_assert_less (i, LIBMESH_DIM);
@@ -563,7 +577,7 @@ T & TypeVector<T>::operator () (const unsigned int i)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<typename CompareTypes<T, T2>::supertype>
 TypeVector<T>::operator + (const TypeVector<T2> & p) const
 {
@@ -589,7 +603,7 @@ TypeVector<T>::operator + (const TypeVector<T2> & p) const
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 const TypeVector<T> & TypeVector<T>::operator += (const TypeVector<T2> & p)
 {
   this->add (p);
@@ -601,7 +615,7 @@ const TypeVector<T> & TypeVector<T>::operator += (const TypeVector<T2> & p)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeVector<T>::add (const TypeVector<T2> & p)
 {
 #if LIBMESH_DIM == 1
@@ -625,7 +639,7 @@ void TypeVector<T>::add (const TypeVector<T2> & p)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeVector<T>::add_scaled (const TypeVector<T2> & p, const T & factor)
 {
 #if LIBMESH_DIM == 1
@@ -649,7 +663,7 @@ void TypeVector<T>::add_scaled (const TypeVector<T2> & p, const T & factor)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<typename CompareTypes<T, T2>::supertype>
 TypeVector<T>::operator - (const TypeVector<T2> & p) const
 {
@@ -676,7 +690,7 @@ TypeVector<T>::operator - (const TypeVector<T2> & p) const
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 const TypeVector<T> & TypeVector<T>::operator -= (const TypeVector<T2> & p)
 {
   this->subtract (p);
@@ -688,7 +702,7 @@ const TypeVector<T> & TypeVector<T>::operator -= (const TypeVector<T2> & p)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeVector<T>::subtract (const TypeVector<T2> & p)
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
@@ -699,7 +713,7 @@ void TypeVector<T>::subtract (const TypeVector<T2> & p)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeVector<T>::subtract_scaled (const TypeVector<T2> & p, const T & factor)
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
@@ -709,7 +723,7 @@ void TypeVector<T>::subtract_scaled (const TypeVector<T2> & p, const T & factor)
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<T> TypeVector<T>::operator - () const
 {
 
@@ -734,7 +748,7 @@ TypeVector<T> TypeVector<T>::operator - () const
 
 template <typename T>
 template <typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
@@ -761,7 +775,7 @@ TypeVector<T>::operator * (const Scalar & factor) const
 
 
 template <typename T, typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
@@ -774,7 +788,7 @@ operator * (const Scalar & factor,
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 const TypeVector<T> & TypeVector<T>::operator *= (const T & factor)
 {
 #if LIBMESH_DIM == 1
@@ -799,7 +813,7 @@ const TypeVector<T> & TypeVector<T>::operator *= (const T & factor)
 
 template <typename T>
 template <typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 typename std::enable_if<
   ScalarTraits<Scalar>::value,
   TypeVector<typename CompareTypes<T, Scalar>::supertype>>::type
@@ -831,7 +845,7 @@ TypeVector<T>::operator / (const Scalar & factor) const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 const TypeVector<T> &
 TypeVector<T>::operator /= (const T & factor)
 {
@@ -848,7 +862,7 @@ TypeVector<T>::operator /= (const T & factor)
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 typename CompareTypes<T, T2>::supertype
 TypeVector<T>::operator * (const TypeVector<T2> & p) const
 {
@@ -870,7 +884,7 @@ TypeVector<T>::operator * (const TypeVector<T2> & p) const
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 typename CompareTypes<T, T2>::supertype
 TypeVector<T>::contract(const TypeVector<T2> & p) const
 {
@@ -881,6 +895,7 @@ TypeVector<T>::contract(const TypeVector<T2> & p) const
 
 template <typename T>
 template <typename T2>
+LIBMESH_DEVICE_INLINE
 TypeVector<typename CompareTypes<T, T2>::supertype>
 TypeVector<T>::cross(const TypeVector<T2> & p) const
 {
@@ -904,7 +919,7 @@ TypeVector<T>::cross(const TypeVector<T2> & p) const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto TypeVector<T>::norm() const
 {
   using std::sqrt;
@@ -914,7 +929,7 @@ auto TypeVector<T>::norm() const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 void TypeVector<T>::zero()
 {
   for (unsigned int i=0; i<LIBMESH_DIM; i++)
@@ -924,7 +939,7 @@ void TypeVector<T>::zero()
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 auto TypeVector<T>::norm_sq() const
 {
 #if LIBMESH_DIM == 1
@@ -945,7 +960,7 @@ auto TypeVector<T>::norm_sq() const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 bool TypeVector<T>::is_zero() const
 {
   for (const auto & val : _coords)
@@ -959,6 +974,7 @@ auto
 TypeVector<bool>::l1_norm() const;
 
 template <typename T>
+LIBMESH_DEVICE_INLINE
 auto
 TypeVector<T>::l1_norm() const
 {
@@ -989,7 +1005,7 @@ bool TypeVector<T>::relative_fuzzy_equals(const TypeVector<T> & rhs, Real tol) c
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 bool TypeVector<T>::operator == (const TypeVector<T> & rhs) const
 {
 #if LIBMESH_DIM == 1
@@ -1011,7 +1027,7 @@ bool TypeVector<T>::operator == (const TypeVector<T> & rhs) const
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 bool TypeVector<T>::operator != (const TypeVector<T> & rhs) const
 {
   return (!(*this == rhs));
@@ -1028,7 +1044,7 @@ bool TypeVector<T>::operator != (const TypeVector<T> & rhs) const
 // [b0, b1, b2]
 // [c0, c1, c2]
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T triple_product(const TypeVector<T> & a,
                  const TypeVector<T> & b,
                  const TypeVector<T> & c)
@@ -1050,7 +1066,7 @@ T triple_product(const TypeVector<T> & a,
 // to be positive if the vectors are obey the right-hand rule, or
 // negative for a left-hand orientation.
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T solid_angle(const TypeVector<T> & v01,
               const TypeVector<T> & v02,
               const TypeVector<T> & v03)
@@ -1107,7 +1123,7 @@ TypeVector<T> circumcenter(const TypeVector<T> & p0,
  * calling b.cross(c).norm_sq().
  */
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T cross_norm_sq(const TypeVector<T> & b,
                 const TypeVector<T> & c)
 {
@@ -1128,7 +1144,7 @@ T cross_norm_sq(const TypeVector<T> & b,
  * Calls cross_norm_sq() and takes the square root of the result.
  */
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 T cross_norm(const TypeVector<T> & b,
              const TypeVector<T> & c)
 {
@@ -1137,7 +1153,7 @@ T cross_norm(const TypeVector<T> & b,
 }
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TypeVector<T> TypeVector<T>::unit() const
 {
 
@@ -1199,6 +1215,7 @@ struct CompareTypes<TypeVector<T>, TypeVector<T2>>
 };
 
 template <typename T, typename T2, typename std::enable_if<ScalarTraits<T>::value, int>::type = 0>
+LIBMESH_DEVICE_INLINE
 TypeVector<typename CompareTypes<T, T2>::supertype>
 outer_product(const T & a, const TypeVector<T2> & b)
 {
@@ -1210,6 +1227,7 @@ outer_product(const T & a, const TypeVector<T2> & b)
 }
 
 template <typename T, typename T2, typename std::enable_if<ScalarTraits<T2>::value, int>::type = 0>
+LIBMESH_DEVICE_INLINE
 TypeVector<typename CompareTypes<T, T2>::supertype>
 outer_product(const TypeVector<T> & a, const T2 & b)
 {
@@ -1240,6 +1258,7 @@ l1_norm_diff(const TypeVector<T> & vec1, const TypeVector<T2> & vec2)
 namespace std
 {
 template <typename T>
+LIBMESH_DEVICE_INLINE
 auto norm(const libMesh::TypeVector<T> & vector) -> decltype(std::norm(T()))
 {
   // Yea I agree it's dumb that the standard returns the square of the Euclidean norm
