@@ -261,23 +261,19 @@ void DistributedMesh::update_parallel_id_counts()
   _max_node_id = this->parallel_max_node_id();
   _max_elem_id = this->parallel_max_elem_id();
 
-  if (_next_free_unpartitioned_elem_id < _max_elem_id)
-    _next_free_unpartitioned_elem_id =
-      ((_max_elem_id-1) / (this->n_processors() + 1) + 1) *
-      (this->n_processors() + 1) + this->n_processors();
-  if (_next_free_local_elem_id < _max_elem_id)
-    _next_free_local_elem_id =
-      ((_max_elem_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
-      (this->n_processors() + 1) + this->processor_id();
+  _next_free_unpartitioned_elem_id =
+    ((_max_elem_id-1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->n_processors();
+  _next_free_local_elem_id =
+    ((_max_elem_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->processor_id();
 
-  if (_next_free_unpartitioned_node_id < _max_node_id)
-    _next_free_unpartitioned_node_id =
-      ((_max_node_id-1) / (this->n_processors() + 1) + 1) *
-      (this->n_processors() + 1) + this->n_processors();
-  if (_next_free_local_node_id < _max_node_id)
-    _next_free_local_node_id =
-      ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
-      (this->n_processors() + 1) + this->processor_id();
+  _next_free_unpartitioned_node_id =
+    ((_max_node_id-1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->n_processors();
+  _next_free_local_node_id =
+    ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->processor_id();
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   _next_unique_id = this->parallel_max_unique_id();
