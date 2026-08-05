@@ -118,6 +118,10 @@ void transfer_elem(Elem & lo_elem,
   const unsigned int hon_begin = lo_elem.n_nodes();
   const unsigned int hon_end   = hi_elem->n_nodes();
 
+  libmesh_assert_less (hon_begin, hon_end);
+  libmesh_assert_less_equal
+    (hon_end-hon_begin, max_new_nodes_per_elem);
+
   for (unsigned int hon=hon_begin; hon<hon_end; hon++)
     {
       auto pos = map_hi_order_node(hon, *hi_elem, adj_vertices_to_ho_nodes);
@@ -549,11 +553,14 @@ all_increased_order_range (UnstructuredMesh & mesh,
       if (max_unpartitioned_elem)
         {
           // We'd better be effectively serialized here.  In theory we
-          // could support more complicated cases but in practice we
+          // could support more complicated cases but for now we
           // only support "completely partitioned" and/or "serialized"
-          if (!mesh.comm().verify(n_unpartitioned_elem) ||
-              !mesh.comm().verify(n_partitioned_elem) ||
-              !mesh.is_serial())
+          if (mesh.is_serial())
+            {
+              libmesh_assert(mesh.comm().verify(n_unpartitioned_elem));
+              libmesh_assert(mesh.comm().verify(n_partitioned_elem));
+            }
+          else
             libmesh_not_implemented();
         }
       else
