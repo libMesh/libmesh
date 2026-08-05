@@ -1836,9 +1836,9 @@ void UnstructuredMesh::all_complete_order_range(const SimpleRange<element_iterat
 
     case 2:
       /*
-       * in 2D, we typically refine from Tri6 to Tri7 (1.1667 times
-       * the nodes) but might refine from Quad4 to Quad9
-       * (2.25 times the nodes)
+       * in 2D, we typically refine from Tri3 or Tri6 to Tri7 (2.3333
+       * or 1.1667 times the nodes) but might refine from Quad4 to
+       * Quad9 (2.25 times the nodes)
        */
       max_new_nodes_per_elem = 9 - 4;
       this->reserve_nodes(static_cast<unsigned int>
@@ -1849,10 +1849,10 @@ void UnstructuredMesh::all_complete_order_range(const SimpleRange<element_iterat
     case 3:
       /*
        * in 3D, we typically refine from Tet10 to Tet14 (factor = 1.4)
-       * but may go Hex8 to Hex27 (something  > 3).  Since in 3D there
-       * _are_ already quite some nodes, and since we do not want to
-       * overburden the memory by a too conservative guess, use a
-       * moderate bound
+       * but may go Hex8 to Hex27 or Tet4 to Tet14 (something  > 3).
+       * Since in 3D there _are_ already quite some nodes, and since
+       * we do not want to overburden the memory by a too-conservative
+       * guess, use a moderate bound
        */
       max_new_nodes_per_elem = 27 - 8;
       this->reserve_nodes(static_cast<unsigned int>
