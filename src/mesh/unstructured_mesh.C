@@ -414,8 +414,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * completely-partitioned meshes (where we'll sync nodes later);
    * let's keep track to make sure we're not in any in-between state.
    */
-  dof_id_type n_unpartitioned_elem = 0,
-              n_partitioned_elem = 0;
+  dof_id_type n_unpartitioned_elem = 0;
 
   /**
    * Loop over the elements in the given range.  If any are
@@ -504,8 +503,6 @@ all_increased_order_range (UnstructuredMesh & mesh,
 
       if (lo_elem->processor_id() == DofObject::invalid_processor_id)
         ++n_unpartitioned_elem;
-      else
-        ++n_partitioned_elem;
 
       /*
        * Build the higher-order equivalent; add to
@@ -555,10 +552,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
           // could support more complicated cases but for now we
           // only support "completely partitioned" and/or "serialized"
           if (mesh.is_serial())
-            {
-              libmesh_assert(mesh.comm().verify(n_unpartitioned_elem));
-              libmesh_assert(mesh.comm().verify(n_partitioned_elem));
-            }
+            libmesh_assert(mesh.comm().verify(n_unpartitioned_elem));
           else
             libmesh_not_implemented();
         }
