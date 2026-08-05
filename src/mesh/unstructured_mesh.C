@@ -341,8 +341,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * The mesh should at least be consistent enough for us to add new
    * nodes consistently.
    */
-  libmesh_assert(mesh.comm().verify(mesh.n_elem()));
-  libmesh_assert(mesh.comm().verify(mesh.max_elem_id()));
+  mesh.update_parallel_id_counts();
 
   /*
    * If the mesh is empty then we have nothing to do
