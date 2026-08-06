@@ -396,8 +396,8 @@ public:
       elem->subdomain_id() = 456;
 
     // Resolve them to the same name
-    mesh0.subdomain_name(123) = "OneTwoThree";
-    mesh1.subdomain_name(456) = "OneTwoThree"; // silly autogen
+    mesh0.set_subdomain_name(123, "OneTwoThree");
+    mesh1.set_subdomain_name(456, "OneTwoThree"); // silly autogen
 
     mesh0.stitch_meshes(mesh1, 2, 10, TOLERANCE, true, false, false,
                         false, false, /* remap_subdomain_ids = */ true);
@@ -433,7 +433,7 @@ public:
       elem->subdomain_id() = 123;
 
     // Create a conflict when only one is named
-    mesh1.subdomain_name(123) = "OneTwoThree";
+    mesh1.set_subdomain_name(123, "OneTwoThree");
 
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
     bool threw_error = false;

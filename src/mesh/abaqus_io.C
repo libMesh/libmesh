@@ -1038,7 +1038,7 @@ void AbaqusIO::assign_subdomain_ids()
             // name to the elset name provided by the user in the
             // Abaqus file.
             std::string computed_name = it->first + "_" + Utility::enum_to_string(elem.type());
-            the_mesh.subdomain_name(computed_id) = computed_name;
+            the_mesh.set_subdomain_name(computed_id, computed_name);
           }
       }
   }

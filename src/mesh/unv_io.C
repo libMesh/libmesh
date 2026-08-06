@@ -548,8 +548,8 @@ void UNVIO::groups_in (std::istream & in_file)
           (cast_int<boundary_id_type>(group_number)) = group_name;
 
       if (is_subdomain_group)
-        mesh.subdomain_name
-          (cast_int<subdomain_id_type>(group_number)) = group_name;
+        mesh.set_subdomain_name
+          (cast_int<subdomain_id_type>(group_number), group_name);
 
     } // end while (true)
 
