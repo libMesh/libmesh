@@ -118,6 +118,10 @@ void transfer_elem(Elem & lo_elem,
   const unsigned int hon_begin = lo_elem.n_nodes();
   const unsigned int hon_end   = hi_elem->n_nodes();
 
+  libmesh_assert_less (hon_begin, hon_end);
+  libmesh_assert_less_equal
+    (hon_end-hon_begin, max_new_nodes_per_elem);
+
   for (unsigned int hon=hon_begin; hon<hon_end; hon++)
     {
       auto pos = map_hi_order_node(hon, *hi_elem, adj_vertices_to_ho_nodes);
@@ -337,8 +341,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * The mesh should at least be consistent enough for us to add new
    * nodes consistently.
    */
-  libmesh_assert(mesh.comm().verify(mesh.n_elem()));
-  libmesh_assert(mesh.comm().verify(mesh.max_elem_id()));
+  mesh.update_parallel_id_counts();
 
   /*
    * If the mesh is empty then we have nothing to do
@@ -411,8 +414,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * completely-partitioned meshes (where we'll sync nodes later);
    * let's keep track to make sure we're not in any in-between state.
    */
-  dof_id_type n_unpartitioned_elem = 0,
-              n_partitioned_elem = 0;
+  dof_id_type n_unpartitioned_elem = 0;
 
   /**
    * Loop over the elements in the given range.  If any are
@@ -501,8 +503,6 @@ all_increased_order_range (UnstructuredMesh & mesh,
 
       if (lo_elem->processor_id() == DofObject::invalid_processor_id)
         ++n_unpartitioned_elem;
-      else
-        ++n_partitioned_elem;
 
       /*
        * Build the higher-order equivalent; add to
@@ -549,11 +549,11 @@ all_increased_order_range (UnstructuredMesh & mesh,
       if (max_unpartitioned_elem)
         {
           // We'd better be effectively serialized here.  In theory we
-          // could support more complicated cases but in practice we
+          // could support more complicated cases but for now we
           // only support "completely partitioned" and/or "serialized"
-          if (!mesh.comm().verify(n_unpartitioned_elem) ||
-              !mesh.comm().verify(n_partitioned_elem) ||
-              !mesh.is_serial())
+          if (mesh.is_serial())
+            libmesh_assert(mesh.comm().verify(n_unpartitioned_elem));
+          else
             libmesh_not_implemented();
         }
       else
@@ -1829,9 +1829,9 @@ void UnstructuredMesh::all_complete_order_range(const SimpleRange<element_iterat
 
     case 2:
       /*
-       * in 2D, we typically refine from Tri6 to Tri7 (1.1667 times
-       * the nodes) but might refine from Quad4 to Quad9
-       * (2.25 times the nodes)
+       * in 2D, we typically refine from Tri3 or Tri6 to Tri7 (2.3333
+       * or 1.1667 times the nodes) but might refine from Quad4 to
+       * Quad9 (2.25 times the nodes)
        */
       max_new_nodes_per_elem = 9 - 4;
       this->reserve_nodes(static_cast<unsigned int>
@@ -1842,10 +1842,10 @@ void UnstructuredMesh::all_complete_order_range(const SimpleRange<element_iterat
     case 3:
       /*
        * in 3D, we typically refine from Tet10 to Tet14 (factor = 1.4)
-       * but may go Hex8 to Hex27 (something  > 3).  Since in 3D there
-       * _are_ already quite some nodes, and since we do not want to
-       * overburden the memory by a too conservative guess, use a
-       * moderate bound
+       * but may go Hex8 to Hex27 or Tet4 to Tet14 (something  > 3).
+       * Since in 3D there _are_ already quite some nodes, and since
+       * we do not want to overburden the memory by a too-conservative
+       * guess, use a moderate bound
        */
       max_new_nodes_per_elem = 27 - 8;
       this->reserve_nodes(static_cast<unsigned int>
