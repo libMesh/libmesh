@@ -224,7 +224,6 @@ dnl if so then don't add these libraries
 AS_IF([test "x$enablepetsc" != "xno"],
       [
         libmesh_optional_INCLUDES="$PETSCINCLUDEDIRS $libmesh_optional_INCLUDES"
-        libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"
       ])
 AM_CONDITIONAL(LIBMESH_ENABLE_PETSC, test x$enablepetsc = xyes)
 # -------------------------------------------------------------
@@ -284,6 +283,9 @@ AS_IF([test $enableslepc = yes],
       [
         libmesh_optional_INCLUDES="$SLEPC_INCLUDE $libmesh_optional_INCLUDES"
         libmesh_optional_LIBS="$SLEPC_LIBS $libmesh_optional_LIBS"
+      ],
+      [AS_IF([test "x$enablepetsc" != "xno"],
+             [libmesh_optional_LIBS="$PETSCLINKLIBS $libmesh_optional_LIBS"])
       ])
 AM_CONDITIONAL(LIBMESH_ENABLE_SLEPC, test x$enableslepc = xyes)
 # -------------------------------------------------------------
@@ -871,6 +873,62 @@ AS_IF([test "$enableoptional" != no],
         AC_MSG_RESULT(----------------------------------------------)
       ])
 
+# Libtool keeps -Wl,* tokens in command-line order, but classifies plain -l*
+# tokens as dependency libraries and emits them later.  For linker groups, keep
+# the group contents in the same stream as the group markers.
+libmesh_append_optional_lib()
+{
+  if eval "test \"x\$$1\" = x"; then
+    eval "$1=\$2"
+  else
+    eval "$1=\"\$$1 \$2\""
+  fi
+}
+
+libmesh_grouped_optional_LIBS=
+libmesh_in_linker_group=no
+for libmesh_optional_lib in $libmesh_optional_LIBS
+do
+  case $libmesh_optional_lib in
+    -Wl,--start-group)
+      libmesh_in_linker_group=yes
+      libmesh_append_optional_lib libmesh_grouped_optional_LIBS $libmesh_optional_lib
+      ;;
+    -Wl,--end-group)
+      libmesh_append_optional_lib libmesh_grouped_optional_LIBS $libmesh_optional_lib
+      libmesh_in_linker_group=no
+      ;;
+    -l*)
+      if test "$libmesh_in_linker_group" = yes; then
+        libmesh_append_optional_lib libmesh_grouped_optional_LIBS -Wl,$libmesh_optional_lib
+      else
+        libmesh_append_optional_lib libmesh_grouped_optional_LIBS $libmesh_optional_lib
+      fi
+      ;;
+    */*.a|*/*.so|*/*.so.*|*/*.dylib)
+      if test "$libmesh_in_linker_group" = yes; then
+        libmesh_optional_lib_dir=${libmesh_optional_lib%/*}
+        libmesh_optional_lib_file=${libmesh_optional_lib##*/}
+        libmesh_append_optional_lib libmesh_grouped_optional_LIBS -Wl,-L$libmesh_optional_lib_dir
+        libmesh_append_optional_lib libmesh_grouped_optional_LIBS -Wl,-l:$libmesh_optional_lib_file
+      else
+        libmesh_append_optional_lib libmesh_grouped_optional_LIBS $libmesh_optional_lib
+      fi
+      ;;
+    *.a|*.so|*.so.*|*.dylib)
+      if test "$libmesh_in_linker_group" = yes; then
+        libmesh_append_optional_lib libmesh_grouped_optional_LIBS -Wl,$libmesh_optional_lib
+      else
+        libmesh_append_optional_lib libmesh_grouped_optional_LIBS $libmesh_optional_lib
+      fi
+      ;;
+    *)
+      libmesh_append_optional_lib libmesh_grouped_optional_LIBS $libmesh_optional_lib
+      ;;
+  esac
+done
+libmesh_optional_LIBS=$libmesh_grouped_optional_LIBS
+
 # clean up values, if we have perl.  This step is purely cosmetic, but
 # helps create readable (and easier to debug) compile and link lines
 # by stripping out repeated entries.  This can happen for example when
@@ -891,9 +949,28 @@ AS_IF([test -x $PERL],
               ])
       ])
 
+# PETSc Kokkos device-link libraries are needed when linking programs but
+# should not be linked into libMesh shared libraries.
+libmesh_shared_optional_LIBS=
+for libmesh_optional_lib in $libmesh_optional_LIBS
+do
+  case $libmesh_optional_lib in
+    -lpetsckokkosdlink|-lpetsckokkos|-Wl,-lpetsckokkosdlink|-Wl,-lpetsckokkos|*/libpetsckokkosdlink.*|*/libpetsckokkos.*|-Wl,*/libpetsckokkosdlink.*|-Wl,*/libpetsckokkos.*|-Wl,-l:libpetsckokkosdlink.*|-Wl,-l:libpetsckokkos.*)
+      ;;
+    *)
+      if test "x$libmesh_shared_optional_LIBS" = "x"; then
+        libmesh_shared_optional_LIBS=$libmesh_optional_lib
+      else
+        libmesh_shared_optional_LIBS="$libmesh_shared_optional_LIBS $libmesh_optional_lib"
+      fi
+      ;;
+  esac
+done
+
 # substitute values
 AC_SUBST(libmesh_optional_INCLUDES)
 AC_SUBST(libmesh_optional_LIBS)
+AC_SUBST(libmesh_shared_optional_LIBS)
 AC_SUBST(libmesh_contrib_INCLUDES)
 AC_SUBST(libmesh_contrib_LDFLAGS)
 AC_SUBST(libmesh_pkgconfig_requires)
