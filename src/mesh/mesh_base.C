@@ -1883,12 +1883,21 @@ bool MeshBase::get_count_lower_dim_elems_in_point_locator() const
 }
 
 
-
+#ifdef LIBMESH_ENABLE_DEPRECATED
 std::string & MeshBase::subdomain_name(subdomain_id_type id)
 {
-  this->unset_has_synched_subdomain_name_map();
+  // Use set_subdomain_name() instead
+  libmesh_deprecated();
+
+  // We'd like to do this so our preparation isn't invalidated by a
+  // write, but for all we know the user is just reading from a
+  // non-const mesh!
+  // this->unset_has_synched_subdomain_name_map();
+
   return _block_id_to_name[id];
 }
+#endif // LIBMESH_ENABLE_DEPRECATED
+
 
 const std::string & MeshBase::subdomain_name(subdomain_id_type id) const
 {

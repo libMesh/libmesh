@@ -471,7 +471,7 @@ void ExodusII_IO::read (const std::string & fname)
       // populate the map of names
       std::string subdomain_name = exio_helper->get_block_name(i);
       if (!subdomain_name.empty())
-        mesh.subdomain_name(subdomain_id) = subdomain_name;
+        mesh.set_subdomain_name(subdomain_id, subdomain_name);
 
       // Set any relevant node/edge maps for this element
       const std::string type_str (exio_helper->get_elem_type());

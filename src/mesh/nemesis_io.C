@@ -924,7 +924,7 @@ void Nemesis_IO::read (const std::string & base_filename)
 
   for (const auto & [id, name] : nemhelper->id_to_block_names)
     if (name != "")
-      mesh.subdomain_name(id) = name;
+      mesh.set_subdomain_name(id, name);
 
   if (_verbose)
     {
