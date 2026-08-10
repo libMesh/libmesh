@@ -662,6 +662,15 @@ void ReplicatedMesh::update_parallel_id_counts()
   _next_unique_id = this->parallel_max_unique_id();
 #endif
 
+  // Implicitly get max_elem_id/max_node_id by trimming the vectors
+  auto trim_vec = [](auto & dof_vec) {
+    auto last_non_null = std::find_if(dof_vec.rbegin(), dof_vec.rend(), [](DofObject * d) { return (d != nullptr); });
+    dof_vec.resize(last_non_null.base()-dof_vec.begin());
+  };
+
+  trim_vec(this->_nodes);
+  trim_vec(this->_elements);
+
   this->_preparation.has_synched_id_counts = true;
 }
 
