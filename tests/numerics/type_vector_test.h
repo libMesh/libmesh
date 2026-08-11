@@ -30,6 +30,7 @@
   CPPUNIT_TEST( testVectorAddAssign );          \
   CPPUNIT_TEST( testVectorSubAssign );          \
                                                 \
+  CPPUNIT_TEST( testIsFinite );                 \
   CPPUNIT_TEST( testIsZero );                   \
   CPPUNIT_TEST( testSolidAngle );               \
   CPPUNIT_TEST( testCircumcenter );             \
@@ -321,6 +322,27 @@ public:
     for (int i = 0; i != LIBMESH_DIM; ++i)
       CPPUNIT_ASSERT_EQUAL( T(0), avector(i));
   }
+
+  void testIsFinite()
+  {
+    LOG_UNIT_TEST;
+
+    {
+#if LIBMESH_DIM > 2
+      DerivedClass avector(0,0,0);
+#elif LIBMESH_DIM > 1
+      DerivedClass avector(0,0);
+#else
+      DerivedClass avector(0);
+#endif
+      CPPUNIT_ASSERT(isfinite(avector));
+
+      avector(0) =
+        std::numeric_limits<typename DerivedClass::value_type>::infinity();
+      CPPUNIT_ASSERT(!isfinite(avector));
+    }
+  }
+
 
   void testIsZero()
   {
