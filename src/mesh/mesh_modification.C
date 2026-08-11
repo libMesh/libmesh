@@ -953,31 +953,12 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               //
               // Split on 0-2 diagonal
               if (split_first_diagonal(elem, 0,2, 1,3))
-                {
-                  subelem[0]->set_node(0, elem->node_ptr(0));
-                  subelem[0]->set_node(1, elem->node_ptr(1));
-                  subelem[0]->set_node(2, elem->node_ptr(2));
-                  subelem[0]->set_node(3, elem->node_ptr(4));
-
-                  subelem[1]->set_node(0, elem->node_ptr(0));
-                  subelem[1]->set_node(1, elem->node_ptr(2));
-                  subelem[1]->set_node(2, elem->node_ptr(3));
-                  subelem[1]->set_node(3, elem->node_ptr(4));
-                }
+                set_nodes({{0,1,2,4},{0,2,3,4}});
               // Split on 1-3 diagonal
               else
                 {
                   libmesh_assert (split_first_diagonal(elem, 1,3, 0,2));
-
-                  subelem[0]->set_node(0, elem->node_ptr(0));
-                  subelem[0]->set_node(1, elem->node_ptr(1));
-                  subelem[0]->set_node(2, elem->node_ptr(3));
-                  subelem[0]->set_node(3, elem->node_ptr(4));
-
-                  subelem[1]->set_node(0, elem->node_ptr(1));
-                  subelem[1]->set_node(1, elem->node_ptr(2));
-                  subelem[1]->set_node(2, elem->node_ptr(3));
-                  subelem[1]->set_node(3, elem->node_ptr(4));
+                  set_nodes({{0,1,3,4},{1,2,3,4}});
                 }
 
               break;
