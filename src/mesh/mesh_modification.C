@@ -448,6 +448,8 @@ void MeshTools::Modification::scale (MeshBase & mesh,
 
 void MeshTools::Modification::all_tri (MeshBase & mesh)
 {
+  LOG_SCOPE("all_tri()", "MeshTools::Modification");
+
   if (!mesh.is_replicated() && !mesh.is_prepared())
     mesh.prepare_for_use();
 
@@ -1547,6 +1549,8 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
 void MeshTools::Modification::all_rbb (MeshBase & mesh)
 {
+  LOG_SCOPE("all_rbb()", "MeshTools::Modification");
+
   // By default, use 1.0 as the weight on every RATIONAL_BERNSTEIN
   // mapped node
   const Real default_weight = 1.0;
