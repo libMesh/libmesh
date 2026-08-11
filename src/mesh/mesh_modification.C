@@ -533,11 +533,13 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
         auto set_nodes = [&elem, &subelem]
           (const std::initializer_list<std::initializer_list<int>> & node_ids) {
-          for (int i=0; auto row : node_ids)
+          int i=0;
+          for (auto row : node_ids)
             {
+              int j=0;
               Elem * sub = subelem[i++].get();
               libmesh_assert(sub);
-              for (int j=0; auto node_id : row)
+              for (auto node_id : row)
                 sub->set_node(j++, elem->node_ptr(node_id));
             }
         };
