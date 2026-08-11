@@ -292,7 +292,7 @@ public:
       std::ostringstream sbdname;
       sbdname <<
         "a_very_long_subdomain_name_for_the_subdomain_with_number_" << sbdid;
-      this->_mesh->subdomain_name(sbdid) = sbdname.str();
+      this->_mesh->set_subdomain_name(sbdid, sbdname.str());
     }
 
     // Make sure our mesh's cache knows about them all for later
