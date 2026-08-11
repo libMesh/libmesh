@@ -45,6 +45,8 @@ public:
   CPPUNIT_TEST( testAllTriPrism18 );
   CPPUNIT_TEST( testAllTriPrism20 );
   CPPUNIT_TEST( testAllTriPrism21 );
+  CPPUNIT_TEST( testAllTriPyramid5 );
+  CPPUNIT_TEST( testAllTriPyramid14 );
   CPPUNIT_TEST( testAllTriC0PolyhedronCube );
   CPPUNIT_TEST( testAllTriC0PolyhedronHexagonalPrism );
 #endif
@@ -53,40 +55,18 @@ public:
 
 protected:
   // Helper function called by the test implementations, saves a few lines of code.
-  void test_helper_2D(ElemType elem_type,
-                      dof_id_type n_elem_expected,
-                      std::size_t n_boundary_conds_expected)
+  void test_helper(ElemType elem_type,
+                   dof_id_type n_elem_expected,
+                   std::size_t n_boundary_conds_expected)
   {
-    ReplicatedMesh mesh(*TestCommWorld, /*dim=*/2);
+    ReplicatedMesh mesh(*TestCommWorld);
 
-    // Build a 2x1 TRI3 mesh and ask to split it into triangles.
-    // Should be a no-op
-    MeshTools::Generation::build_square(mesh,
-                                        /*nx=*/2, /*ny=*/1,
-                                        /*xmin=*/0., /*xmax=*/1.,
-                                        /*ymin=*/0., /*ymax=*/1.,
-                                        elem_type);
-
-    MeshTools::Modification::all_tri(mesh);
-
-    // Make sure that the expected number of elements is found.
-    CPPUNIT_ASSERT_EQUAL(n_elem_expected, mesh.n_elem());
-
-    // Make sure the expected number of BCs is found.
-    CPPUNIT_ASSERT_EQUAL(n_boundary_conds_expected, mesh.get_boundary_info().n_boundary_conds());
-  }
-
-  // Helper function called by the test implementations in 3D, saves a few lines of code.
-  void test_helper_3D(ElemType elem_type,
-                      dof_id_type n_elem_expected,
-                      std::size_t n_boundary_conds_expected)
-  {
-    ReplicatedMesh mesh(*TestCommWorld, /*dim=*/3);
-
-    // Build a 2x1 TRI3 mesh and ask to split it into triangles.
-    // Should be a no-op
+    // Build a 2x1 2D or 1x1x1 3D mesh, ask to split it into simplices
+    const unsigned int dim = Elem::type_to_dim_map[elem_type];
     MeshTools::Generation::build_cube(mesh,
-                                      /*nx=*/1, /*ny=*/1, /*nz=*/1,
+                                      /*nx=*/dim < 3 ? 2 : 1,
+                                      /*ny=*/1,
+                                      /*nz=*/dim < 3 ? 0 : 1,
                                       /*xmin=*/0., /*xmax=*/1.,
                                       /*ymin=*/0., /*ymax=*/1.,
                                       /*zmin=*/0., /*zmax=*/1.,
@@ -97,8 +77,26 @@ protected:
     // Make sure that the expected number of elements is found.
     CPPUNIT_ASSERT_EQUAL(n_elem_expected, mesh.n_elem());
 
+    const BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
     // Make sure the expected number of BCs is found.
-    CPPUNIT_ASSERT_EQUAL(n_boundary_conds_expected, mesh.get_boundary_info().n_boundary_conds());
+    CPPUNIT_ASSERT_EQUAL(n_boundary_conds_expected, boundary_info.n_boundary_conds());
+
+    // In these tests we expect all our elements to have the proper
+    // orientation, and we set up the inputs such that our outputs
+    // should be non-curved and should have no boundary sides that
+    // aren't on the previous external boundaries
+    for (const Elem * elem : mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT(!elem->is_flipped());
+        CPPUNIT_ASSERT(elem->has_affine_map());
+        for (auto s : elem->side_index_range())
+          if (!elem->neighbor_ptr(s))
+            CPPUNIT_ASSERT_EQUAL(boundary_info.n_boundary_ids(elem, s), 1u);
+      }
+
+    // We set up inputs with measure 1
+    LIBMESH_ASSERT_NUMBERS_EQUAL(1, MeshTools::volume(mesh), TOLERANCE);
   }
 
 public:
@@ -107,22 +105,26 @@ public:
   void tearDown() {}
 
   // 4 TRIs no-op
-  void testAllTriTri() { LOG_UNIT_TEST; test_helper_2D(TRI3, /*nelem=*/4, /*nbcs=*/6); }
+  void testAllTriTri() { LOG_UNIT_TEST; test_helper(TRI3, /*nelem=*/4, /*nbcs=*/6); }
 
   // 2 quads split into 4 TRIs.
-  void testAllTriQuad() { LOG_UNIT_TEST; test_helper_2D(QUAD4, /*nelem=*/4, /*nbcs=*/6); }
+  void testAllTriQuad() { LOG_UNIT_TEST; test_helper(QUAD4, /*nelem=*/4, /*nbcs=*/6); }
 
   // 2 QUAD8s split into 4 TRIs.
-  void testAllTriQuad8() { LOG_UNIT_TEST; test_helper_2D(QUAD8, /*nelem=*/4, /*nbcs=*/6); }
+  void testAllTriQuad8() { LOG_UNIT_TEST; test_helper(QUAD8, /*nelem=*/4, /*nbcs=*/6); }
 
   // 2 QUAD9s split into 4 TRIs.
-  void testAllTriQuad9() { LOG_UNIT_TEST; test_helper_2D(QUAD9, /*nelem=*/4, /*nbcs=*/6); }
+  void testAllTriQuad9() { LOG_UNIT_TEST; test_helper(QUAD9, /*nelem=*/4, /*nbcs=*/6); }
 
   // 2 PRISMs split into 6 TETs with 2 boundary faces per side.
-  void testAllTriPrism6() { LOG_UNIT_TEST; test_helper_3D(PRISM6, /*nelem=*/6, /*nbcs=*/12); }
-  void testAllTriPrism18() { LOG_UNIT_TEST; test_helper_3D(PRISM18, /*nelem=*/6, /*nbcs=*/12); }
-  void testAllTriPrism20() { LOG_UNIT_TEST; test_helper_3D(PRISM20, /*nelem=*/6, /*nbcs=*/12); }
-  void testAllTriPrism21() { LOG_UNIT_TEST; test_helper_3D(PRISM21, /*nelem=*/6, /*nbcs=*/12); }
+  void testAllTriPrism6() { LOG_UNIT_TEST; test_helper(PRISM6, /*nelem=*/6, /*nbcs=*/12); }
+  void testAllTriPrism18() { LOG_UNIT_TEST; test_helper(PRISM18, /*nelem=*/6, /*nbcs=*/12); }
+  void testAllTriPrism20() { LOG_UNIT_TEST; test_helper(PRISM20, /*nelem=*/6, /*nbcs=*/12); }
+  void testAllTriPrism21() { LOG_UNIT_TEST; test_helper(PRISM21, /*nelem=*/6, /*nbcs=*/12); }
+
+  // 6 PYRAMIDs split into 12 TETs with 2 boundary faces per side
+  void testAllTriPyramid5() { LOG_UNIT_TEST; test_helper(PYRAMID5, /*nelem=*/12, /*nbcs=*/12); }
+  void testAllTriPyramid14() { LOG_UNIT_TEST; test_helper(PYRAMID14, /*nelem=*/12, /*nbcs=*/12); }
 
   // Build a C0Polygon paving (triangles, quads, hexagons) via
   // build_square and split it into a pure TRI3 mesh.
