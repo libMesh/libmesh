@@ -46,6 +46,7 @@ public:
   CPPUNIT_TEST( testAllTriPrism20 );
   CPPUNIT_TEST( testAllTriPrism21 );
   CPPUNIT_TEST( testAllTriPyramid5 );
+  CPPUNIT_TEST( testAllTriPyramid14 );
   CPPUNIT_TEST( testAllTriC0PolyhedronCube );
   CPPUNIT_TEST( testAllTriC0PolyhedronHexagonalPrism );
 #endif
@@ -127,6 +128,7 @@ public:
 
   // 6 PYRAMIDs split into 12 TETs with 2 boundary faces per side
   void testAllTriPyramid5() { LOG_UNIT_TEST; test_helper_3D(PYRAMID5, /*nelem=*/12, /*nbcs=*/12); }
+  void testAllTriPyramid14() { LOG_UNIT_TEST; test_helper_3D(PYRAMID14, /*nelem=*/12, /*nbcs=*/12); }
 
   // Build a C0Polygon paving (triangles, quads, hexagons) via
   // build_square and split it into a pure TRI3 mesh.
