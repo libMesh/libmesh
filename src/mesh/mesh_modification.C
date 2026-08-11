@@ -1401,13 +1401,10 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
             // probably out of luck.  TODO: implement hex20, hex27,
             // pyramid15,...
           default:
-            {
-              libMesh::err << "Error, encountered unimplemented element "
-                           << Utility::enum_to_string<ElemType>(etype)
-                           << " in MeshTools::Modification::all_tri()..."
-                           << std::endl;
-              libmesh_not_implemented();
-            }
+            libmesh_not_implemented_msg
+              ("Error, encountered unimplemented element "
+               << Utility::enum_to_string<ElemType>(etype)
+               << " in MeshTools::Modification::all_tri()...");
           } // end switch (etype)
 
         // Be sure the correct data is set for all subelems.
