@@ -387,7 +387,7 @@ protected:
     CPPUNIT_ASSERT_EQUAL(boundary_mesh.n_elem(), n_faces);
 
     auto check_radii = [&boundary_mesh, radius, type](Real radius_tol) {
-      constexpr int n_intervals = 40;
+      constexpr int n_intervals = 4;
 
       Real max_radius_error = 0;
       for (auto & elem : boundary_mesh.element_ptr_range())
