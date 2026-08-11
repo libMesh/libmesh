@@ -1397,8 +1397,9 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
           case INFPRISM6:
           case INFPRISM12:
             continue;
-            // If we're left with an unimplemented hex we're probably
-            // out of luck.  TODO: implement hexes
+            // If we're left with an unimplemented element we're
+            // probably out of luck.  TODO: implement hex20, hex27,
+            // pyramid15,...
           default:
             {
               libMesh::err << "Error, encountered unimplemented element "
