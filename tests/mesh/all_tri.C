@@ -55,6 +55,27 @@ public:
 
 protected:
   // Helper function called by the test implementations, saves a few lines of code.
+  void test_elements(const MeshBase & mesh)
+  {
+    const BoundaryInfo & boundary_info = mesh.get_boundary_info();
+
+    // In these tests we expect all our elements to have the proper
+    // orientation, and we set up the inputs such that our outputs
+    // should be non-curved and should have no boundary sides that
+    // aren't on the previous external boundaries
+    for (const Elem * elem : mesh.element_ptr_range())
+      {
+        CPPUNIT_ASSERT(!elem->is_flipped());
+        CPPUNIT_ASSERT(elem->has_affine_map());
+        for (auto s : elem->side_index_range())
+          if (!elem->neighbor_ptr(s))
+            CPPUNIT_ASSERT_EQUAL(boundary_info.n_boundary_ids(elem, s), 1u);
+      }
+
+    // We set up inputs with measure 1
+    LIBMESH_ASSERT_NUMBERS_EQUAL(1, MeshTools::volume(mesh), TOLERANCE);
+  }
+
   void test_helper_2D(ElemType elem_type,
                       dof_id_type n_elem_expected,
                       std::size_t n_boundary_conds_expected)
@@ -76,6 +97,8 @@ protected:
 
     // Make sure the expected number of BCs is found.
     CPPUNIT_ASSERT_EQUAL(n_boundary_conds_expected, mesh.get_boundary_info().n_boundary_conds());
+
+    test_elements(mesh);
   }
 
   // Helper function called by the test implementations in 3D, saves a few lines of code.
@@ -101,6 +124,8 @@ protected:
 
     // Make sure the expected number of BCs is found.
     CPPUNIT_ASSERT_EQUAL(n_boundary_conds_expected, mesh.get_boundary_info().n_boundary_conds());
+
+    test_elements(mesh);
   }
 
 public:
