@@ -1435,6 +1435,19 @@ void TypeTensor<T>::print(std::ostream & os) const
 #endif
 }
 
+
+template <typename T>
+bool isfinite (const TypeTensor<T> & var)
+{
+  using std::isfinite;
+  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+    for (unsigned int j=0; j<LIBMESH_DIM; j++)
+      if (!isfinite(var(i,j)))
+        return false;
+  return true;
+}
+
+
 template <typename T, typename T2>
 inline
 TypeTensor<typename CompareTypes<T, T2>::supertype>
