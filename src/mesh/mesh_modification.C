@@ -964,6 +964,31 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
               break;
             }
 
+          case PYRAMID14:
+            {
+              // Pyramids all split into two tetrahedra
+              subelem[0] = Elem::build(TET10);
+              subelem[1] = Elem::build(TET10);
+
+              // Choose how to split the quad face in a way that will
+              // be consistent from possibly-different-type elements
+              // splitting from the other side
+              //
+              // Split on 0-2 diagonal
+              if (split_first_diagonal(elem, 0,2, 1,3))
+                set_nodes({{0,1,2,4,5,6,13,9,10,11},
+                           {0,2,3,4,13,7,8,9,11,12}});
+              // Split on 1-3 diagonal
+              else
+                {
+                  libmesh_assert (split_first_diagonal(elem, 1,3, 0,2));
+                  set_nodes({{0,1,3,4,5,13,8,9,10,12},
+                             {1,2,3,4,6,7,13,10,11,12}});
+                }
+
+              break;
+            }
+
           case C0POLYGON:
             {
               // Split a C0Polygon into the triangles defined by its
@@ -1042,7 +1067,7 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
             continue;
             // If we're left with an unimplemented element we're
             // probably out of luck.  TODO: implement hex20, hex27,
-            // pyramid15,...
+            // pyramid13,...
           default:
             libmesh_not_implemented_msg
               ("Error, encountered unimplemented element "
