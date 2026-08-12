@@ -337,8 +337,10 @@ public:
 #endif
       CPPUNIT_ASSERT(isfinite(avector));
 
+      // numeric_limits isn't specialized for complex, but float
+      // infinity promotes seamlessly to complex<double> etc.
       avector(0) =
-        std::numeric_limits<typename DerivedClass::value_type>::infinity();
+        std::numeric_limits<float>::infinity();
       CPPUNIT_ASSERT(!isfinite(avector));
     }
   }
