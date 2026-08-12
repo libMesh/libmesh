@@ -49,7 +49,7 @@ public:
     this->libmesh_suite_name = "ComplexVectorValueTest";
   }
 
-  LIBMESH_CPPUNIT_TEST_SUITE( NumberVectorValueTest );
+  CPPUNIT_TEST_SUITE( ComplexVectorValueTest );
 
   VECTORVALUETEST
 
