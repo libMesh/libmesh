@@ -19,12 +19,15 @@
          CPPUNIT_ASSERT_DOUBLES_EQUAL(expected,actual,tolerance)
 #endif
 
-#ifdef LIBMESH_USE_COMPLEX_NUMBERS
-# define LIBMESH_ASSERT_NUMBERS_EQUAL(expected,actual,tolerance) \
+# define LIBMESH_ASSERT_COMPLEX_EQUAL(expected,actual,tolerance) \
   do { \
     LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_real(expected),libMesh::libmesh_real(actual),tolerance); \
     LIBMESH_ASSERT_FP_EQUAL(libMesh::libmesh_imag(expected),libMesh::libmesh_imag(actual),tolerance); \
   } while (0)
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+# define LIBMESH_ASSERT_NUMBERS_EQUAL(expected,actual,tolerance) \
+         LIBMESH_ASSERT_COMPLEX_EQUAL(expected,actual,tolerance)
 #else
 # define LIBMESH_ASSERT_NUMBERS_EQUAL(expected,actual,tolerance) \
          LIBMESH_ASSERT_FP_EQUAL(expected,actual,tolerance)
