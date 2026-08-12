@@ -1222,6 +1222,7 @@ template <typename T>
 bool isfinite (const DenseMatrix<T> & var)
 {
   using std::isfinite;
+  using libMesh::isfinite; // for T==complex
   const auto m = var.m(), n = var.n();
   for (auto i : make_range(m))
     for (auto j : make_range(n))

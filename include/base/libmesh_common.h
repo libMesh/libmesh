@@ -212,6 +212,15 @@ template <typename T>
 inline bool libmesh_isinf(std::complex<T> a)
 { return (std::isinf(std::real(a)) || std::isinf(std::imag(a))); }
 
+// std::isfinite() doesn't support complex, but we really want an
+// isfinite to support Number, at least in our own namespace
+template <typename T>
+inline bool isfinite(std::complex<T> a)
+{
+  using std::isfinite;
+  return (isfinite(std::real(a)) && isfinite(std::imag(a)));
+}
+
 // Define the value type for unknowns in simulations.
 // This is either Real or Complex, depending on how
 // the library was configures
