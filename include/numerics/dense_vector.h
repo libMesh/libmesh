@@ -38,8 +38,10 @@
 #endif
 
 // C++ includes
-#include <vector>
+#include <algorithm>
 #include <initializer_list>
+#include <numeric>
+#include <vector>
 
 namespace libMesh
 {
@@ -647,15 +649,11 @@ inline
 Real DenseVector<T>::min () const
 {
   libmesh_assert (this->size());
-  Real my_min = libmesh_real((*this)(0));
-
-  const int N = cast_int<int>(_val.size());
-  for (int i=1; i!=N; i++)
-    {
-      Real current = libmesh_real((*this)(i));
-      my_min = (my_min < current? my_min : current);
-    }
-  return my_min;
+  typedef decltype(libmesh_real(_val[0])) realT;
+  return std::transform_reduce
+    (_val.begin(), _val.end(), std::numeric_limits<realT>::max(),
+     [](auto a, auto b){using std::min; return min(a,b);},
+     [](const T & v){return libmesh_real(v);});
 }
 
 
@@ -665,15 +663,11 @@ inline
 Real DenseVector<T>::max () const
 {
   libmesh_assert (this->size());
-  Real my_max = libmesh_real((*this)(0));
-
-  const int N = cast_int<int>(_val.size());
-  for (int i=1; i!=N; i++)
-    {
-      Real current = libmesh_real((*this)(i));
-      my_max = (my_max > current? my_max : current);
-    }
-  return my_max;
+  typedef decltype(libmesh_real(_val[0])) realT;
+  return std::transform_reduce
+    (_val.begin(), _val.end(), std::numeric_limits<realT>::lowest(),
+     [](auto a, auto b){using std::max; return max(a,b);},
+     [](const T & v){return libmesh_real(v);});
 }
 
 
@@ -688,12 +682,9 @@ Real DenseVector<T>::l1_norm () const
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).template lpNorm<1>();
 #else
-  Real my_norm = 0.;
-  const int N = cast_int<int>(_val.size());
-  for (int i=0; i!=N; i++)
-    my_norm += std::abs((*this)(i));
-
-  return my_norm;
+  return std::transform_reduce
+    (_val.begin(), _val.end(), Real(0), std::plus<>(),
+     [](const T & v){using std::abs; return abs(v);});
 #endif
 }
 
@@ -709,17 +700,10 @@ Real DenseVector<T>::l2_norm () const
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).norm();
 #else
-  Real my_norm = 0.;
-  const int N = cast_int<int>(_val.size());
-  // The following pragma tells clang's vectorizer that it is safe to
-  // reorder floating point operations for this loop.
-#ifdef __clang__
-#pragma clang loop vectorize(enable)
-#endif
-  for (int i=0; i!=N; i++)
-    my_norm += TensorTools::norm_sq((*this)(i));
-
-  return sqrt(my_norm);
+  using std::sqrt;
+  return sqrt(std::transform_reduce
+    (_val.begin(), _val.end(), Real(0), std::plus<>(),
+     [](const T & v){return TensorTools::norm_sq(v);}));
 #endif
 }
 
@@ -735,15 +719,10 @@ Real DenseVector<T>::linfty_norm () const
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).template lpNorm<Eigen::Infinity>();
 #else
-  Real my_norm = TensorTools::norm_sq((*this)(0));
-
-  const int N = cast_int<int>(_val.size());
-  for (int i=1; i!=N; i++)
-    {
-      Real current = TensorTools::norm_sq((*this)(i));
-      my_norm = (my_norm > current? my_norm : current);
-    }
-  return sqrt(my_norm);
+  return std::transform_reduce
+    (_val.begin(), _val.end(), Real(0),
+     [](auto a, auto b){using std::max; return max(a,b);},
+     [](const T & v){using std::abs; return abs(v);});
 #endif
 }
 

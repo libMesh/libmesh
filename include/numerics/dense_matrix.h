@@ -42,9 +42,10 @@
 #endif
 
 // C++ includes
-#include <vector>
 #include <algorithm>
 #include <initializer_list>
+#include <numeric>
+#include <vector>
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #include "metaphysicl/dualnumber_decl.h"
@@ -1141,17 +1142,10 @@ auto DenseMatrix<T>::min () const -> decltype(libmesh_real(T(0)))
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
-  auto my_min = libmesh_real((*this)(0,0));
-
-  for (unsigned int i=0; i!=this->_m; i++)
-    {
-      for (unsigned int j=0; j!=this->_n; j++)
-        {
-          auto current = libmesh_real((*this)(i,j));
-          my_min = (my_min < current? my_min : current);
-        }
-    }
-  return my_min;
+  return std::transform_reduce
+    (_val.begin(), _val.end(), std::numeric_limits<T>::max(),
+     [](auto a, auto b){using std::min; return min(a,b);},
+     [](const T & v){return libmesh_real(v);});
 }
 
 
@@ -1162,17 +1156,10 @@ auto DenseMatrix<T>::max () const -> decltype(libmesh_real(T(0)))
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
-  auto my_max = libmesh_real((*this)(0,0));
-
-  for (unsigned int i=0; i!=this->_m; i++)
-    {
-      for (unsigned int j=0; j!=this->_n; j++)
-        {
-          auto current = libmesh_real((*this)(i,j));
-          my_max = (my_max > current? my_max : current);
-        }
-    }
-  return my_max;
+  return std::transform_reduce
+    (_val.begin(), _val.end(), std::numeric_limits<T>::lowest(),
+     [](auto a, auto b){using std::max; return max(a,b);},
+     [](const T & v){return libmesh_real(v);});
 }
 
 
