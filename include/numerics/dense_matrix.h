@@ -1232,6 +1232,41 @@ bool isfinite (const DenseMatrix<T> & var)
 }
 
 
+template <typename T>
+bool isinf (const DenseMatrix<T> & var)
+{
+  using std::isinf;
+  using libMesh::isinf; // for T==complex
+  using std::isnan;
+  using libMesh::isnan;
+  const auto m = var.m(), n = var.n();
+  bool has_inf = false;
+  for (auto i : make_range(m))
+    for (auto j : make_range(n))
+      {
+        // NaN anywhere makes us NaN, not inf
+        if (isnan(var(i,j)))
+          return false;
+        has_inf = has_inf || isinf(var(i,j));
+      }
+  return has_inf;
+}
+
+
+template <typename T>
+bool isnan (const DenseMatrix<T> & var)
+{
+  using std::isnan;
+  using libMesh::isnan; // for T==complex
+  const auto m = var.m(), n = var.n();
+  for (auto i : make_range(m))
+    for (auto j : make_range(n))
+      if (isnan(var(i,j)))
+        return true;
+  return false;
+}
+
+
 } // namespace libMesh
 
 #ifdef LIBMESH_HAVE_METAPHYSICL

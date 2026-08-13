@@ -1449,6 +1449,41 @@ bool isfinite (const TypeTensor<T> & var)
 }
 
 
+template <typename T>
+bool isinf (const TypeTensor<T> & var)
+{
+  using std::isinf;
+  using libMesh::isinf; // for T==complex
+  using std::isnan;
+  using libMesh::isnan;
+  bool has_inf = false;
+  for (auto i : make_range(LIBMESH_DIM))
+    for (auto j : make_range(LIBMESH_DIM))
+      {
+        // NaN anywhere makes us NaN, not inf
+        if (isnan(var(i,j)))
+          return false;
+        has_inf = has_inf || isinf(var(i,j));
+      }
+  return has_inf;
+}
+
+
+
+template <typename T>
+bool isnan (const TypeTensor<T> & var)
+{
+  using std::isnan;
+  using libMesh::isnan; // for T==complex
+  for (auto i : make_range(LIBMESH_DIM))
+    for (auto j : make_range(LIBMESH_DIM))
+      if (isnan(var(i,j)))
+        return true;
+  return false;
+}
+
+
+
 template <typename T, typename T2>
 inline
 TypeTensor<typename CompareTypes<T, T2>::supertype>

@@ -734,6 +734,35 @@ bool isfinite (const DenseVector<T> & var)
 }
 
 
+template <typename T>
+bool isinf (const DenseVector<T> & var)
+{
+  using std::isinf;
+  using libMesh::isinf; // for T==complex
+  using std::isnan;
+  using libMesh::isnan;
+  bool has_inf = false;
+  for (auto i : index_range(var))
+    {
+      // NaN anywhere makes us NaN, not inf
+      if (isnan(var(i)))
+        return false;
+      has_inf = has_inf || isinf(var(i));
+    }
+  return has_inf;
+}
+
+
+template <typename T>
+bool isnan (const DenseVector<T> & var)
+{
+  using std::isnan;
+  using libMesh::isnan; // for T==complex
+  for (auto i : index_range(var))
+    if (isnan(var(i)))
+      return true;
+  return false;
+}
 
 
 } // namespace libMesh
