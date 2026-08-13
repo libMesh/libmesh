@@ -212,13 +212,27 @@ template <typename T>
 inline bool libmesh_isinf(std::complex<T> a)
 { return (std::isinf(std::real(a)) || std::isinf(std::imag(a))); }
 
-// std::isfinite() doesn't support complex, but we really want an
-// isfinite to support Number, at least in our own namespace
+// cmath classification functions don't support complex, but we really want an
+// isfinite/isinf/isnan to support Number, at least in our own namespace
 template <typename T>
 inline bool isfinite(std::complex<T> a)
 {
   using std::isfinite;
   return (isfinite(std::real(a)) && isfinite(std::imag(a)));
+}
+
+template <typename T>
+inline bool isinf(std::complex<T> a)
+{
+  using std::isinf;
+  return (isinf(std::real(a)) || isinf(std::imag(a)));
+}
+
+template <typename T>
+inline bool isnan(std::complex<T> a)
+{
+  using std::isnan;
+  return (isnan(std::real(a)) || isnan(std::imag(a)));
 }
 
 // Define the value type for unknowns in simulations.
