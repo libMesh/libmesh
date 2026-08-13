@@ -727,7 +727,7 @@ bool isfinite (const DenseVector<T> & var)
 {
   using std::isfinite;
   using libMesh::isfinite; // for T==complex
-  for (auto i : make_range(var.size()))
+  for (auto i : index_range(var))
     if (!isfinite(var(i)))
       return false;
   return true;

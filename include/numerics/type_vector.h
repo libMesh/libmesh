@@ -1192,7 +1192,7 @@ bool isfinite (const TypeVector<T> & var)
 {
   using std::isfinite;
   using libMesh::isfinite; // for T==complex
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
+  for (auto i : make_range(LIBMESH_DIM))
     if (!isfinite(var(i)))
       return false;
   return true;

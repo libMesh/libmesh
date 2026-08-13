@@ -1441,8 +1441,8 @@ bool isfinite (const TypeTensor<T> & var)
 {
   using std::isfinite;
   using libMesh::isfinite; // for T==complex
-  for (unsigned int i=0; i<LIBMESH_DIM; i++)
-    for (unsigned int j=0; j<LIBMESH_DIM; j++)
+  for (auto i : make_range(LIBMESH_DIM))
+    for (auto j : make_range(LIBMESH_DIM))
       if (!isfinite(var(i,j)))
         return false;
   return true;
