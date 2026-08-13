@@ -388,13 +388,7 @@ DenseVector<T>::DenseVector (const DenseVector<T2> & other_vector) :
 {
   const std::vector<T2> & other_vals = other_vector.get_values();
 
-  _val.clear();
-
-  const int N = cast_int<int>(other_vals.size());
-  _val.reserve(N);
-
-  for (int i=0; i<N; i++)
-    _val.push_back(other_vals[i]);
+  _val.assign(other_vals.begin(), other_vals.end());
 }
 
 
@@ -424,15 +418,7 @@ inline
 DenseVector<T> & DenseVector<T>::operator = (const DenseVector<T2> & other_vector)
 {
   const std::vector<T2> & other_vals = other_vector.get_values();
-
-  _val.clear();
-
-  const int N = cast_int<int>(other_vals.size());
-  _val.reserve(N);
-
-  for (int i=0; i<N; i++)
-    _val.push_back(other_vals[i]);
-
+  _val.assign(other_vals.begin(), other_vals.end());
   return *this;
 }
 
