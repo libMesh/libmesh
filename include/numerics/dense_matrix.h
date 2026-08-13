@@ -920,8 +920,9 @@ template<typename T>
 inline
 void DenseMatrix<T>::swap(DenseMatrix<T> & other_matrix)
 {
-  std::swap(this->_m, other_matrix._m);
-  std::swap(this->_n, other_matrix._n);
+  using std::swap;
+  swap(this->_m, other_matrix._m);
+  swap(this->_n, other_matrix._n);
   _val.swap(other_matrix._val);
   DecompositionType _temp = _decomposition_type;
   _decomposition_type = other_matrix._decomposition_type;
