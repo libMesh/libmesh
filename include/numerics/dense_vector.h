@@ -494,9 +494,8 @@ template<typename T>
 inline
 void DenseVector<T>::scale (const T factor)
 {
-  const int N = cast_int<int>(_val.size());
-  for (int i=0; i<N; i++)
-    _val[i] *= factor;
+  for (auto & v : _val)
+    v *= factor;
 }
 
 
