@@ -253,7 +253,7 @@ check_PROGRAMS = # empty, append below
 TESTS =
 
 if LIBMESH_ENABLE_KOKKOS
-  KOKKOS_TEST_CPPFLAGS += -I$(top_srcdir)/include $(KOKKOS_CPPFLAGS)
+  KOKKOS_TEST_CPPFLAGS += -I$(top_srcdir)/include $(KOKKOS_CPPFLAGS) $(KOKKOS_INCLUDES)
 
   check_PROGRAMS += kokkos_vector_ops_oracle_unit kokkos_tensor_ops_oracle_unit
   TESTS += kokkos_vector_ops_oracle_unit kokkos_tensor_ops_oracle_unit
