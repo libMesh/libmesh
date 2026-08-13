@@ -565,6 +565,62 @@ public:
   T det();
 
   /**
+   * Returns true iff every entry is finite.
+   */
+  friend bool isfinite (const DenseMatrix<T> & var)
+  {
+    using std::isfinite;
+    using libMesh::isfinite; // for T==complex
+    for (const T & v : var._val)
+      if (!isfinite(v))
+        return false;
+    return true;
+  }
+
+  /**
+   * Returns true iff no entry is NaN and any entry is infinite.
+   *
+   * This is arguably inconsistent with our std::complex overload (and
+   * the C99 Annex G recommendations for _Complex, and C++
+   * std::complex arithmetic), which treats mixed (inf,NaN) pairs as
+   * infinite, but this is probably safer for users.
+   */
+  friend bool isinf (const DenseMatrix<T> & var)
+  {
+    using std::isinf;
+    using libMesh::isinf; // for T==complex
+    using std::isnan;
+    using libMesh::isnan;
+    bool has_inf = false;
+    for (const T & v : var._val)
+      {
+        // NaN anywhere makes us NaN, not inf
+        if (isnan(v))
+          return false;
+        has_inf = has_inf || isinf(v);
+      }
+    return has_inf;
+  }
+
+  /**
+   * Returns true iff any entry is NaN.
+   *
+   * This is arguably inconsistent with our std::complex overload (and
+   * the C99 Annex G recommendations for _Complex, and C++
+   * std::complex arithmetic), which treats mixed (inf,NaN) pairs as
+   * infinite, but this is probably safer for users.
+   */
+  friend bool isnan (const DenseMatrix<T> & var)
+  {
+    using std::isnan;
+    using libMesh::isnan; // for T==complex
+    for (const T & v : var._val)
+      if (isnan(v))
+        return true;
+    return false;
+  }
+
+  /**
    * Computes the inverse of the dense matrix (assuming it is invertible)
    * by first computing the LU decomposition and then performing multiple
    * back substitution steps.  Follows the algorithm from Numerical Recipes
@@ -1216,70 +1272,6 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 //   rhs(iv) = val;
 
 // }
-
-
-// A matrix is finite iff every component is
-template <typename T>
-bool isfinite (const DenseMatrix<T> & var)
-{
-  using std::isfinite;
-  using libMesh::isfinite; // for T==complex
-  const auto m = var.m(), n = var.n();
-  for (auto i : make_range(m))
-    for (auto j : make_range(n))
-      if (!isfinite(var(i,j)))
-        return false;
-  return true;
-}
-
-
-// A matrix is infinite iff some component is infinite but no
-// component is NaN.
-//
-// This is arguably inconsistent with our std::complex overload (and
-// the C99 Annex G recommendations for _Complex, and C++ std::complex
-// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
-// this is probably safer for users.
-template <typename T>
-bool isinf (const DenseMatrix<T> & var)
-{
-  using std::isinf;
-  using libMesh::isinf; // for T==complex
-  using std::isnan;
-  using libMesh::isnan;
-  const auto m = var.m(), n = var.n();
-  bool has_inf = false;
-  for (auto i : make_range(m))
-    for (auto j : make_range(n))
-      {
-        // NaN anywhere makes us NaN, not inf
-        if (isnan(var(i,j)))
-          return false;
-        has_inf = has_inf || isinf(var(i,j));
-      }
-  return has_inf;
-}
-
-
-
-// A matrix is NaN iff some component is NaN
-//
-// This is arguably inconsistent with our std::complex overload (and
-// the C99 Annex G recommendations for _Complex, and C++ std::complex
-// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
-// this is probably safer for users.
-template <typename T>
-bool isnan (const DenseMatrix<T> & var)
-{
-  using std::isnan;
-  using libMesh::isnan; // for T==complex
-  const auto m = var.m(), n = var.n();
-  for (auto i : make_range(m))
-    for (auto j : make_range(n))
-      if (isnan(var(i,j)))
-        return true;
-  return false;
-}
 
 
 } // namespace libMesh
