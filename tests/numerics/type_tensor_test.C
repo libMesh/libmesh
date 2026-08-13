@@ -22,8 +22,8 @@ public:
   CPPUNIT_TEST(testLeftMultiply);
   CPPUNIT_TEST(testRotation);
 #endif
+  CPPUNIT_TEST(testClassifiers);
   CPPUNIT_TEST(testRowCol);
-  CPPUNIT_TEST(testIsFinite);
   CPPUNIT_TEST(testIsZero);
   CPPUNIT_TEST(testIsHPD);
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -92,18 +92,22 @@ private:
     LIBMESH_ASSERT_FP_EQUAL(28, product(2, 2), tol);
   }
 
-  void testIsFinite()
+  void testClassifiers()
   {
     LOG_UNIT_TEST;
 
     {
       TensorValue<double> tensor;
       CPPUNIT_ASSERT(isfinite(tensor));
+      CPPUNIT_ASSERT(!isinf(tensor));
+      CPPUNIT_ASSERT(!isnan(tensor));
     }
     {
       TensorValue<double> tensor(0,1,0,2,3);
       tensor(0,0) = std::numeric_limits<double>::infinity();
       CPPUNIT_ASSERT(!isfinite(tensor));
+      CPPUNIT_ASSERT(isinf(tensor));
+      CPPUNIT_ASSERT(!isnan(tensor));
     }
   }
 

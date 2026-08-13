@@ -30,7 +30,7 @@
   CPPUNIT_TEST( testVectorAddAssign );          \
   CPPUNIT_TEST( testVectorSubAssign );          \
                                                 \
-  CPPUNIT_TEST( testIsFinite );                 \
+  CPPUNIT_TEST( testClassifiers );              \
   CPPUNIT_TEST( testIsZero );                   \
   CPPUNIT_TEST( testSolidAngle );               \
   CPPUNIT_TEST( testCircumcenter );             \
@@ -323,7 +323,7 @@ public:
       CPPUNIT_ASSERT_EQUAL( T(0), avector(i));
   }
 
-  void testIsFinite()
+  void testClassifiers()
   {
     LOG_UNIT_TEST;
 
@@ -336,12 +336,22 @@ public:
       DerivedClass avector(0);
 #endif
       CPPUNIT_ASSERT(isfinite(avector));
+      CPPUNIT_ASSERT(!isinf(avector));
+      CPPUNIT_ASSERT(!isnan(avector));
 
       // numeric_limits isn't specialized for complex, but float
-      // infinity promotes seamlessly to complex<double> etc.
+      // values promote seamlessly to complex<double> etc.
       avector(0) =
         std::numeric_limits<float>::infinity();
       CPPUNIT_ASSERT(!isfinite(avector));
+      CPPUNIT_ASSERT(isinf(avector));
+      CPPUNIT_ASSERT(!isnan(avector));
+
+      avector(0) =
+        std::numeric_limits<float>::quiet_NaN();
+      CPPUNIT_ASSERT(!isfinite(avector));
+      CPPUNIT_ASSERT(!isinf(avector));
+      CPPUNIT_ASSERT(isnan(avector));
     }
   }
 
