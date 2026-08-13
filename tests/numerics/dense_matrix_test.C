@@ -1,5 +1,6 @@
 // libmesh includes
 #include <libmesh/dense_matrix.h>
+#include <libmesh/dense_submatrix.h>
 #include <libmesh/dense_vector.h>
 
 #ifdef LIBMESH_HAVE_PETSC
@@ -8,6 +9,7 @@
 
 #include "libmesh_cppunit.h"
 
+#include <limits>
 
 using namespace libMesh;
 
@@ -20,6 +22,7 @@ public:
 
   LIBMESH_CPPUNIT_TEST_SUITE(DenseMatrixTest);
 
+  CPPUNIT_TEST(testIsFinite);
   CPPUNIT_TEST(testOuterProduct);
   CPPUNIT_TEST(testSVD);
   CPPUNIT_TEST(testEVDreal);
@@ -31,6 +34,33 @@ public:
 
 
 private:
+
+  void testIsFinite()
+  {
+    LOG_UNIT_TEST;
+
+    DenseMatrix<Real> a(2, 2, {1, 2,
+                               3, 4});
+    CPPUNIT_ASSERT(isfinite(a));
+
+    DenseVector<Real> diag = a.diagonal();
+    CPPUNIT_ASSERT(isfinite(diag));
+
+    DenseSubMatrix suba1(a,0,0,1,1);
+    CPPUNIT_ASSERT(isfinite(suba1));
+
+    DenseSubMatrix suba2(a,1,1,1,1);
+    CPPUNIT_ASSERT(isfinite(suba2));
+
+    a(0, 0) = std::numeric_limits<Real>::infinity();
+    CPPUNIT_ASSERT(!isfinite(a));
+    CPPUNIT_ASSERT(!isfinite(suba1));
+    CPPUNIT_ASSERT(isfinite(suba2));
+
+    CPPUNIT_ASSERT(isfinite(diag));
+    diag = a.diagonal();
+    CPPUNIT_ASSERT(!isfinite(diag));
+  }
 
   void testOuterProduct()
   {

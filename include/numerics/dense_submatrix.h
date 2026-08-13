@@ -229,6 +229,20 @@ T & DenseSubMatrix<T>::operator () (const unsigned int i,
 }
 
 
+template <typename T>
+bool isfinite (const DenseSubMatrix<T> & var)
+{
+  using std::isfinite;
+  using libMesh::isfinite; // for T==complex
+  const auto m = var.m(), n = var.n();
+  for (auto i : make_range(m))
+    for (auto j : make_range(n))
+      if (!isfinite(var(i,j)))
+        return false;
+  return true;
+}
+
+
 } // namespace libMesh
 
 

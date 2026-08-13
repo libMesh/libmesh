@@ -721,6 +721,21 @@ void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
     dest(i) = _val[i];
 }
 
+
+template <typename T>
+bool isfinite (const DenseVector<T> & var)
+{
+  using std::isfinite;
+  using libMesh::isfinite; // for T==complex
+  for (auto i : make_range(var.size()))
+    if (!isfinite(var(i)))
+      return false;
+  return true;
+}
+
+
+
+
 } // namespace libMesh
 
 #ifdef LIBMESH_HAVE_METAPHYSICL

@@ -30,6 +30,7 @@
   CPPUNIT_TEST( testVectorAddAssign );          \
   CPPUNIT_TEST( testVectorSubAssign );          \
                                                 \
+  CPPUNIT_TEST( testIsFinite );                 \
   CPPUNIT_TEST( testIsZero );                   \
   CPPUNIT_TEST( testSolidAngle );               \
   CPPUNIT_TEST( testCircumcenter );             \
@@ -179,12 +180,12 @@ public:
 
     DerivedClass avector = 0;
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , avector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , avector(i) , TOLERANCE*TOLERANCE );
 
     DerivedClass bvector = 2.0;
-    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , bvector(0) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , bvector(0) , TOLERANCE*TOLERANCE );
     for (int i = 1; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , bvector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , bvector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMult()
@@ -193,9 +194,9 @@ public:
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
     {
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , ((*m_1_1_1)*5.0)(i) , TOLERANCE*TOLERANCE );
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , outer_product(*m_1_1_1,5.0)(i) , TOLERANCE*TOLERANCE );
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , outer_product(5.0,*m_1_1_1)(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 5.0 , ((*m_1_1_1)*5.0)(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 5.0 , outer_product(*m_1_1_1,5.0)(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 5.0 , outer_product(5.0,*m_1_1_1)(i) , TOLERANCE*TOLERANCE );
     }
   }
 
@@ -204,7 +205,7 @@ public:
     LOG_UNIT_TEST;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 1/Real(5) , ((*m_1_1_1)/5.0)(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 1/Real(5) , ((*m_1_1_1)/5.0)(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMultAssign()
@@ -215,7 +216,7 @@ public:
     avector*=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , avector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 5.0 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivAssign()
@@ -226,18 +227,18 @@ public:
     avector/=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 1/Real(5) , avector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 1/Real(5) , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAdd()
   {
     LOG_UNIT_TEST;
 
-    LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*m_1_1_1)+(*m_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , ((*m_1_1_1)+(*m_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*m_1_1_1)+(*m_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , ((*m_1_1_1)+(*m_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*m_1_1_1)+(*m_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , ((*m_1_1_1)+(*m_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddScaled()
@@ -248,18 +249,18 @@ public:
     avector.add_scaled((*m_1_1_1),0.5);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 1.5 , avector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 1.5 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSub()
   {
     LOG_UNIT_TEST;
 
-    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*m_1_1_1)-(*m_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , ((*m_1_1_1)-(*m_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*m_1_1_1)-(*m_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , ((*m_1_1_1)-(*m_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*m_1_1_1)-(*m_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , ((*m_1_1_1)-(*m_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorMult()
@@ -267,9 +268,9 @@ public:
     LOG_UNIT_TEST;
 
     if (LIBMESH_DIM == 2)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , (*m_1_1_1)*(*m_n1_1_n1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , (*m_1_1_1)*(*m_n1_1_n1) , TOLERANCE*TOLERANCE );
     else
-      LIBMESH_ASSERT_NUMBERS_EQUAL( -1.0 , (*m_1_1_1)*(*m_n1_1_n1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( -1.0 , (*m_1_1_1)*(*m_n1_1_n1) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddAssign()
@@ -280,7 +281,7 @@ public:
     avector+=(*m_1_1_1);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSubAssign()
@@ -290,11 +291,11 @@ public:
     DerivedClass avector {*basem_1_1_1};
     avector-=(*m_n1_1_n1);
 
-    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , avector(1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , avector(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );
   }
 
   void testValueBase()
@@ -321,6 +322,29 @@ public:
     for (int i = 0; i != LIBMESH_DIM; ++i)
       CPPUNIT_ASSERT_EQUAL( T(0), avector(i));
   }
+
+  void testIsFinite()
+  {
+    LOG_UNIT_TEST;
+
+    {
+#if LIBMESH_DIM > 2
+      DerivedClass avector(0,0,0);
+#elif LIBMESH_DIM > 1
+      DerivedClass avector(0,0);
+#else
+      DerivedClass avector(0);
+#endif
+      CPPUNIT_ASSERT(isfinite(avector));
+
+      // numeric_limits isn't specialized for complex, but float
+      // infinity promotes seamlessly to complex<double> etc.
+      avector(0) =
+        std::numeric_limits<float>::infinity();
+      CPPUNIT_ASSERT(!isfinite(avector));
+    }
+  }
+
 
   void testIsZero()
   {
@@ -353,7 +377,7 @@ public:
     LOG_UNIT_TEST;
 
     const DerivedClass xvec(1.3);
-    LIBMESH_ASSERT_NUMBERS_EQUAL( solid_angle(xvec, xvec, xvec), 0, TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( solid_angle(xvec, xvec, xvec), 0, TOLERANCE*TOLERANCE );
 
 #if LIBMESH_DIM > 1
     // This is ambiguous with --enable-complex builds?  We really need
@@ -368,18 +392,18 @@ public:
     xypdiag(0) = 0.8; xypdiag(1) = -.8;
 
     // Yeah, nothing subtends a non-zero solid angle in 2D either.
-    LIBMESH_ASSERT_NUMBERS_EQUAL( solid_angle(xvec, xvec, yvec), 0, TOLERANCE*TOLERANCE );
-    LIBMESH_ASSERT_NUMBERS_EQUAL( solid_angle(xvec, yvec, xydiag), 0, TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( solid_angle(xvec, xvec, yvec), 0, TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( solid_angle(xvec, yvec, xydiag), 0, TOLERANCE*TOLERANCE );
 #endif
 
 #if LIBMESH_DIM > 2
     const DerivedClass zvec(0.,0.,1.1),
                        xzdiag(0.,.7,.7);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(solid_angle(xydiag, yvec, zvec),
+    LIBMESH_ASSERT_COMPLEX_EQUAL(solid_angle(xydiag, yvec, zvec),
                                 libMesh::pi/4, TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(solid_angle(xvec, yvec, xzdiag),
+    LIBMESH_ASSERT_COMPLEX_EQUAL(solid_angle(xvec, yvec, xzdiag),
                                 libMesh::pi/4, TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(solid_angle(xypdiag, xydiag, zvec),
+    LIBMESH_ASSERT_COMPLEX_EQUAL(solid_angle(xypdiag, xydiag, zvec),
                                 libMesh::pi/2, TOLERANCE*TOLERANCE);
 
     // Icosahedron coordinates are a nice analytic test
@@ -387,7 +411,7 @@ public:
     const DerivedClass icosa1(1., golden, 0.),
                        icosa2(-1., golden, 0.),
                        icosa3(0., 1., golden);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(solid_angle(icosa1, icosa2, icosa3),
+    LIBMESH_ASSERT_COMPLEX_EQUAL(solid_angle(icosa1, icosa2, icosa3),
                                 libMesh::pi/5, TOLERANCE*TOLERANCE);
 #endif
   }
@@ -400,20 +424,20 @@ public:
     DerivedClass twoone(2); twoone(1) = 1;
 
     auto cc1 = circumcenter(origin, e_x, twoone);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(cc1(0), 0.5, TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(cc1(1), 1.5, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_COMPLEX_EQUAL(cc1(0), 0.5, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_COMPLEX_EQUAL(cc1(1), 1.5, TOLERANCE*TOLERANCE);
 
 #if LIBMESH_DIM > 2
-    LIBMESH_ASSERT_NUMBERS_EQUAL(cc1(2), 0, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_COMPLEX_EQUAL(cc1(2), 0, TOLERANCE*TOLERANCE);
     const DerivedClass twozeroone(2,0,1);
     auto cc2 = circumcenter(origin, e_x, twozeroone);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(cc2(0), 0.5, TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(cc2(1), 0, TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(cc2(2), 1.5, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_COMPLEX_EQUAL(cc2(0), 0.5, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_COMPLEX_EQUAL(cc2(1), 0, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_COMPLEX_EQUAL(cc2(2), 1.5, TOLERANCE*TOLERANCE);
     auto cc3 = circumcenter(e_x, twoone, twozeroone);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(cc3(0), Real(5)/3, TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(cc3(1), Real(1)/3, TOLERANCE*TOLERANCE);
-    LIBMESH_ASSERT_NUMBERS_EQUAL(cc3(2), Real(1)/3, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_COMPLEX_EQUAL(cc3(0), Real(5)/3, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_COMPLEX_EQUAL(cc3(1), Real(1)/3, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_COMPLEX_EQUAL(cc3(2), Real(1)/3, TOLERANCE*TOLERANCE);
 #endif
   }
 
@@ -464,7 +488,7 @@ public:
     LOG_UNIT_TEST;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , ((*basem_1_1_1)*5.0)(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 5.0 , ((*basem_1_1_1)*5.0)(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivBase()
@@ -472,7 +496,7 @@ public:
     LOG_UNIT_TEST;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 1/Real(5) , ((*basem_1_1_1)/5.0)(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 1/Real(5) , ((*basem_1_1_1)/5.0)(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarMultAssignBase()
@@ -483,7 +507,7 @@ public:
     avector*=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 5.0 , avector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 5.0 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testScalarDivAssignBase()
@@ -494,18 +518,18 @@ public:
     avector/=5.0;
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 1/Real(5) , avector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 1/Real(5) , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddBase()
   {
     LOG_UNIT_TEST;
 
-    LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*basem_1_1_1)+(*basem_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , ((*basem_1_1_1)+(*basem_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*basem_1_1_1)+(*basem_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , ((*basem_1_1_1)+(*basem_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*basem_1_1_1)+(*basem_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , ((*basem_1_1_1)+(*basem_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddScaledBase()
@@ -516,18 +540,18 @@ public:
     avector.add_scaled((*basem_1_1_1),0.5);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 1.5 , avector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 1.5 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSubBase()
   {
     LOG_UNIT_TEST;
 
-    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*basem_1_1_1)-(*basem_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , ((*basem_1_1_1)-(*basem_n1_1_n1))(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , ((*basem_1_1_1)-(*basem_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , ((*basem_1_1_1)-(*basem_n1_1_n1))(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , ((*basem_1_1_1)-(*basem_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , ((*basem_1_1_1)-(*basem_n1_1_n1))(2) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorMultBase()
@@ -535,9 +559,9 @@ public:
     LOG_UNIT_TEST;
 
     if (LIBMESH_DIM == 2)
-      LIBMESH_ASSERT_NUMBERS_EQUAL(  0.0 , (*basem_1_1_1)*(*basem_n1_1_n1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL(  0.0 , (*basem_1_1_1)*(*basem_n1_1_n1) , TOLERANCE*TOLERANCE );
     else
-      LIBMESH_ASSERT_NUMBERS_EQUAL( -1.0 , (*basem_1_1_1)*(*basem_n1_1_n1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( -1.0 , (*basem_1_1_1)*(*basem_n1_1_n1) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorAddAssignBase()
@@ -548,7 +572,7 @@ public:
     avector+=(*basem_1_1_1);
 
     for (int i = 0; i != LIBMESH_DIM; ++i)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(i) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , avector(i) , TOLERANCE*TOLERANCE );
   }
 
   void testVectorSubAssignBase()
@@ -558,11 +582,11 @@ public:
     TypeVector<T> avector(*m_1_1_1);
     avector-=(*basem_n1_1_n1);
 
-    LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , avector(0) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 1)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 0.0 , avector(1) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 0.0 , avector(1) , TOLERANCE*TOLERANCE );
     if (LIBMESH_DIM > 2)
-      LIBMESH_ASSERT_NUMBERS_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );
+      LIBMESH_ASSERT_COMPLEX_EQUAL( 2.0 , avector(2) , TOLERANCE*TOLERANCE );
   }
 
   void testReplaceAlgebraicType()
