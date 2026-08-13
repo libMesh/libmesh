@@ -21,11 +21,11 @@
 // Defines LIBMESH_DEVICE_INLINE, mirroring MetaPhysicL's METAPHYSICL_INLINE
 // pattern (metaphysicl_device.h / METAPHYSICL_KOKKOS_COMPILATION).
 //
-// When compiling a .K translation unit (LIBMESH_KOKKOS_COMPILATION is defined
+// When compiling a .K translation unit (ACSM_KOKKOS_COMPILATION is defined
 // by kokkos.mk), this expands to KOKKOS_INLINE_FUNCTION so that annotated
 // methods are callable from both host and device code.  In all other
 // translation units it expands to plain `inline`.
-#ifdef LIBMESH_KOKKOS_COMPILATION
+#ifdef ACSM_KOKKOS_COMPILATION
 #  include "libmesh/ignore_warnings.h"
 #  include <Kokkos_Macros.hpp>
 #  include <Kokkos_Abort.hpp>

@@ -327,7 +327,7 @@ extern bool warned_about_auto_ptr;
 // The libmesh_assert() macro acts like C's assert(), but throws a
 // libmesh_error() (including stack trace, etc) instead of just exiting.
 //
-// In .K translation units (LIBMESH_KOKKOS_COMPILATION defined),
+// In .K translation units (ACSM_KOKKOS_COMPILATION defined),
 // LIBMESH_DEVICE_ASSERT is provided by libmesh_device.h using
 // printf + Kokkos::abort() — device-safe across CUDA/HIP/SYCL.
 // The assert macros delegate to it so that both host and device
@@ -343,7 +343,7 @@ extern bool warned_about_auto_ptr;
 #define libmesh_assert_less_equal_msg(expr1,expr2, msg)  ((void) 0)
 #define libmesh_assert_greater_equal_msg(expr1,expr2, msg)  ((void) 0)
 
-#elif defined(LIBMESH_KOKKOS_COMPILATION)
+#elif defined(ACSM_KOKKOS_COMPILATION)
 
 // Kokkos compilation: use the device-safe assert from libmesh_device.h.
 #define libmesh_assert_msg(asserted, msg)  LIBMESH_DEVICE_ASSERT(asserted)
