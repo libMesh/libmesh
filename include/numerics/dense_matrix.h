@@ -1218,6 +1218,7 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 // }
 
 
+// A matrix is finite iff every component is
 template <typename T>
 bool isfinite (const DenseMatrix<T> & var)
 {
@@ -1232,6 +1233,13 @@ bool isfinite (const DenseMatrix<T> & var)
 }
 
 
+// A matrix is infinite iff some component is infinite but no
+// component is NaN.
+//
+// This is arguably inconsistent with our std::complex overload (and
+// the C99 Annex G recommendations for _Complex, and C++ std::complex
+// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
+// this is probably safer for users.
 template <typename T>
 bool isinf (const DenseMatrix<T> & var)
 {
@@ -1253,6 +1261,13 @@ bool isinf (const DenseMatrix<T> & var)
 }
 
 
+
+// A matrix is NaN iff some component is NaN
+//
+// This is arguably inconsistent with our std::complex overload (and
+// the C99 Annex G recommendations for _Complex, and C++ std::complex
+// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
+// this is probably safer for users.
 template <typename T>
 bool isnan (const DenseMatrix<T> & var)
 {

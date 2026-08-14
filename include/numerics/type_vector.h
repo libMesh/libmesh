@@ -1187,6 +1187,7 @@ void TypeVector<T>::print(std::ostream & os) const
 }
 
 
+// A vector is finite iff every component is
 template <typename T>
 bool isfinite (const TypeVector<T> & var)
 {
@@ -1199,6 +1200,13 @@ bool isfinite (const TypeVector<T> & var)
 }
 
 
+// A vector is infinite iff some component is infinite but no
+// component is NaN.
+//
+// This is arguably inconsistent with our std::complex overload (and
+// the C99 Annex G recommendations for _Complex, and C++ std::complex
+// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
+// this is probably safer for users.
 template <typename T>
 bool isinf (const TypeVector<T> & var)
 {
@@ -1218,6 +1226,12 @@ bool isinf (const TypeVector<T> & var)
 }
 
 
+// A vector is NaN iff some component is NaN
+//
+// This is arguably inconsistent with our std::complex overload (and
+// the C99 Annex G recommendations for _Complex, and C++ std::complex
+// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
+// this is probably safer for users.
 template <typename T>
 bool isnan (const TypeVector<T> & var)
 {
