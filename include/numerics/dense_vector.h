@@ -722,18 +722,61 @@ void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
 }
 
 
+// A vector is finite iff every component is
 template <typename T>
 bool isfinite (const DenseVector<T> & var)
 {
   using std::isfinite;
   using libMesh::isfinite; // for T==complex
-  for (auto i : make_range(var.size()))
+  for (auto i : index_range(var))
     if (!isfinite(var(i)))
       return false;
   return true;
 }
 
 
+// A vector is infinite iff some component is infinite but no
+// component is NaN.
+//
+// This is arguably inconsistent with our std::complex overload (and
+// the C99 Annex G recommendations for _Complex, and C++ std::complex
+// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
+// this is probably safer for users.
+template <typename T>
+bool isinf (const DenseVector<T> & var)
+{
+  using std::isinf;
+  using libMesh::isinf; // for T==complex
+  using std::isnan;
+  using libMesh::isnan;
+  bool has_inf = false;
+  for (auto i : index_range(var))
+    {
+      // NaN anywhere makes us NaN, not inf
+      if (isnan(var(i)))
+        return false;
+      has_inf = has_inf || isinf(var(i));
+    }
+  return has_inf;
+}
+
+
+// A vector is NaN iff some component is NaN
+//
+// This is arguably inconsistent with our std::complex overload (and
+// the C99 Annex G recommendations for _Complex, and C++ std::complex
+// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
+// this is probably safer for users.
+template <typename T>
+bool isnan (const DenseVector<T> & var)
+{
+  using std::isnan;
+  using libMesh::isnan; // for T==complex
+  for (auto i : index_range(var))
+    if (isnan(var(i)))
+      return true;
+  return false;
+}
 
 
 } // namespace libMesh

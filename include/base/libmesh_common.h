@@ -181,8 +181,11 @@ typedef std::complex<Real> Complex;
 typedef std::complex<Real> COMPLEX;
 
 
-// Helper functions for complex/real numbers
-// to clean up #ifdef LIBMESH_USE_COMPLEX_NUMBERS elsewhere
+// Helper functions for complex/real number components, to clean up
+// #ifdef LIBMESH_USE_COMPLEX_NUMBERS elsewhere
+//
+// Some of these are just backwards compatibility shims for old code
+// that predated C++11
 template<typename T> inline T libmesh_real(T a) { return a; }
 template<typename T> inline T libmesh_imag(T /*a*/) { return 0; }
 template<typename T> inline T libmesh_conj(T a) { return a; }
@@ -196,29 +199,51 @@ inline T libmesh_imag(std::complex<T> a) { return std::imag(a); }
 template<typename T>
 inline std::complex<T> libmesh_conj(std::complex<T> a) { return std::conj(a); }
 
-// std::isnan() is in <cmath> as of C++11.
-template <typename T>
-inline bool libmesh_isnan(T x) { return std::isnan(x); }
+// Helper functions for complex/real number classification, because
+// for some reason std:: never added isfinite/isinf/isnan overloads
+// for std::complex.
 
 template <typename T>
-inline bool libmesh_isnan(std::complex<T> a)
-{ return (std::isnan(std::real(a)) || std::isnan(std::imag(a))); }
+inline bool libmesh_isinf(T x) { using std::isinf; return isinf(x); }
 
-// std::isinf() is in <cmath> as of C++11.
 template <typename T>
-inline bool libmesh_isinf(T x) { return std::isinf(x); }
+inline bool libmesh_isnan(T x) { using std::isnan; return isnan(x); }
 
+// You'd think we'd treat inf,NaN pairs as NaN rather than infinite,
+// but that's not what the C/C++ standards recommend (ever since C99
+// Annex G), so we'll follow their lead.
+//
+// Anyone who doesn't care about these subtle NaN/inf distinctions
+// should just test isfinite() in their code, and can also probably
+// speed up their arithmetic greatly by using -fcx-limited-range
+// and/or -fcx-fortran-rules
 template <typename T>
 inline bool libmesh_isinf(std::complex<T> a)
 { return (std::isinf(std::real(a)) || std::isinf(std::imag(a))); }
 
-// std::isfinite() doesn't support complex, but we really want an
-// isfinite to support Number, at least in our own namespace
+// Treats inf,NaN pairs as infinite rather than NaN
+template <typename T>
+inline bool libmesh_isnan(std::complex<T> a)
+{ return ((std::isnan(std::real(a)) || std::isnan(std::imag(a))) &&
+          !std::isinf(std::real(a)) && !std::isinf(std::imag(a))); }
+
 template <typename T>
 inline bool isfinite(std::complex<T> a)
 {
-  using std::isfinite;
-  return (isfinite(std::real(a)) && isfinite(std::imag(a)));
+  return (std::isfinite(std::real(a)) && std::isfinite(std::imag(a)));
+}
+
+template <typename T>
+inline bool isinf(std::complex<T> a)
+{
+  return (std::isinf(std::real(a)) || std::isinf(std::imag(a)));
+}
+
+template <typename T>
+inline bool isnan(std::complex<T> a)
+{
+{ return ((std::isnan(std::real(a)) || std::isnan(std::imag(a))) &&
+          !std::isinf(std::real(a)) && !std::isinf(std::imag(a))); }
 }
 
 // Define the value type for unknowns in simulations.

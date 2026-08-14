@@ -22,7 +22,7 @@ public:
 
   LIBMESH_CPPUNIT_TEST_SUITE(DenseMatrixTest);
 
-  CPPUNIT_TEST(testIsFinite);
+  CPPUNIT_TEST(testClassifiers);
   CPPUNIT_TEST(testOuterProduct);
   CPPUNIT_TEST(testSVD);
   CPPUNIT_TEST(testEVDreal);
@@ -35,31 +35,66 @@ public:
 
 private:
 
-  void testIsFinite()
+  void testClassifiers()
   {
     LOG_UNIT_TEST;
 
     DenseMatrix<Real> a(2, 2, {1, 2,
                                3, 4});
     CPPUNIT_ASSERT(isfinite(a));
+    CPPUNIT_ASSERT(!isinf(a));
+    CPPUNIT_ASSERT(!isnan(a));
 
     DenseVector<Real> diag = a.diagonal();
     CPPUNIT_ASSERT(isfinite(diag));
+    CPPUNIT_ASSERT(!isinf(diag));
+    CPPUNIT_ASSERT(!isnan(diag));
 
     DenseSubMatrix suba1(a,0,0,1,1);
     CPPUNIT_ASSERT(isfinite(suba1));
+    CPPUNIT_ASSERT(!isinf(suba1));
+    CPPUNIT_ASSERT(!isnan(suba1));
 
     DenseSubMatrix suba2(a,1,1,1,1);
     CPPUNIT_ASSERT(isfinite(suba2));
+    CPPUNIT_ASSERT(!isinf(suba2));
+    CPPUNIT_ASSERT(!isnan(suba2));
 
     a(0, 0) = std::numeric_limits<Real>::infinity();
     CPPUNIT_ASSERT(!isfinite(a));
     CPPUNIT_ASSERT(!isfinite(suba1));
     CPPUNIT_ASSERT(isfinite(suba2));
+    CPPUNIT_ASSERT(isinf(a));
+    CPPUNIT_ASSERT(isinf(suba1));
+    CPPUNIT_ASSERT(!isinf(suba2));
+    CPPUNIT_ASSERT(!isnan(a));
+    CPPUNIT_ASSERT(!isnan(suba1));
+    CPPUNIT_ASSERT(!isnan(suba2));
 
     CPPUNIT_ASSERT(isfinite(diag));
+    CPPUNIT_ASSERT(!isinf(diag));
+    CPPUNIT_ASSERT(!isnan(diag));
     diag = a.diagonal();
     CPPUNIT_ASSERT(!isfinite(diag));
+    CPPUNIT_ASSERT(isinf(diag));
+    CPPUNIT_ASSERT(!isnan(diag));
+
+    a(0, 0) = 3;
+    a(1, 1) = std::numeric_limits<Real>::quiet_NaN();
+    CPPUNIT_ASSERT(!isfinite(a));
+    CPPUNIT_ASSERT(isfinite(suba1));
+    CPPUNIT_ASSERT(!isfinite(suba2));
+    CPPUNIT_ASSERT(!isinf(a));
+    CPPUNIT_ASSERT(!isinf(suba1));
+    CPPUNIT_ASSERT(!isinf(suba2));
+    CPPUNIT_ASSERT(isnan(a));
+    CPPUNIT_ASSERT(!isnan(suba1));
+    CPPUNIT_ASSERT(isnan(suba2));
+
+    diag = a.diagonal();
+    CPPUNIT_ASSERT(!isfinite(diag));
+    CPPUNIT_ASSERT(!isinf(diag));
+    CPPUNIT_ASSERT(isnan(diag));
   }
 
   void testOuterProduct()
