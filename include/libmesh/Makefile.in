@@ -629,13 +629,13 @@ BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	type_tensor.h type_vector.h vector_value.h wrapped_function.h \
 	wrapped_functor.h wrapped_petsc.h zero_function.h \
 	libmesh_call_mpi.h parallel.h parallel_algebra.h \
-	parallel_bin_sorter.h parallel_conversion_utils.h \
-	parallel_eigen.h parallel_elem.h parallel_fe_type.h \
-	parallel_ghost_sync.h parallel_hilbert.h parallel_histogram.h \
-	parallel_node.h parallel_object.h parallel_only.h \
-	parallel_sort.h threads.h threads_allocators.h threads_none.h \
-	threads_pthread.h threads_spin_mutex_forward.h threads_tbb.h \
-	centroid_partitioner.h hilbert_sfc_partitioner.h \
+	parallel_algorithms.h parallel_bin_sorter.h \
+	parallel_conversion_utils.h parallel_eigen.h parallel_elem.h \
+	parallel_fe_type.h parallel_ghost_sync.h parallel_hilbert.h \
+	parallel_histogram.h parallel_node.h parallel_object.h \
+	parallel_only.h parallel_sort.h threads.h threads_allocators.h \
+	threads_none.h threads_pthread.h threads_spin_mutex_forward.h \
+	threads_tbb.h centroid_partitioner.h hilbert_sfc_partitioner.h \
 	linear_partitioner.h mapped_subdomain_partitioner.h \
 	metis_csr_graph.h metis_partitioner.h morton_sfc_partitioner.h \
 	parmetis_helper.h parmetis_partitioner.h partitioner.h \
@@ -1842,6 +1842,9 @@ parallel.h: $(top_srcdir)/include/parallel/parallel.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_algebra.h: $(top_srcdir)/include/parallel/parallel_algebra.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_algorithms.h: $(top_srcdir)/include/parallel/parallel_algorithms.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_bin_sorter.h: $(top_srcdir)/include/parallel/parallel_bin_sorter.h
