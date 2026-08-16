@@ -649,9 +649,9 @@ inline
 Real DenseVector<T>::min () const
 {
   libmesh_assert (this->size());
-  typedef decltype(libmesh_real(_val[0])) realT;
+  typedef decltype(libmesh_real(T(0))) realfromT;
   return std::transform_reduce
-    (_val.begin(), _val.end(), std::numeric_limits<realT>::max(),
+    (_val.begin(), _val.end(), std::numeric_limits<realfromT>::max(),
      [](const auto & a, const auto & b){using std::min; return min(a,b);},
      [](const T & v){return libmesh_real(v);});
 }
@@ -663,9 +663,9 @@ inline
 Real DenseVector<T>::max () const
 {
   libmesh_assert (this->size());
-  typedef decltype(libmesh_real(_val[0])) realT;
+  typedef decltype(libmesh_real(T(0))) realfromT;
   return std::transform_reduce
-    (_val.begin(), _val.end(), std::numeric_limits<realT>::lowest(),
+    (_val.begin(), _val.end(), std::numeric_limits<realfromT>::lowest(),
      [](const auto & a, const auto & b){using std::max; return max(a,b);},
      [](const T & v){return libmesh_real(v);});
 }
