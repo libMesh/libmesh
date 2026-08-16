@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_matrix_base.h"
 #include "libmesh/int_range.h"
+#include "libmesh/parallel_algorithms.h"
 
 // For the definition of PetscBLASInt.
 #if (LIBMESH_HAVE_PETSC)
@@ -44,7 +45,6 @@
 // C++ includes
 #include <algorithm>
 #include <initializer_list>
-#include <numeric>
 #include <vector>
 
 #ifdef LIBMESH_HAVE_METAPHYSICL

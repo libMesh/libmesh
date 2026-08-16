@@ -22,9 +22,10 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/dense_vector_base.h"
 #include "libmesh/compare_types.h"
+#include "libmesh/dense_vector_base.h"
 #include "libmesh/int_range.h"
+#include "libmesh/parallel_algorithms.h"
 #include "libmesh/tensor_tools.h"
 
 #ifdef LIBMESH_HAVE_EIGEN
@@ -40,7 +41,6 @@
 // C++ includes
 #include <algorithm>
 #include <initializer_list>
-#include <numeric>
 #include <vector>
 
 namespace libMesh
