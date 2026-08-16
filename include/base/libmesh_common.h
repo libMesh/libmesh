@@ -569,8 +569,7 @@ struct casting_compare {
 template<class ...Args> inline void libmesh_ignore( const Args&... ) { }
 
 
-// A workaround for the lack of C++17 merge() support in some
-// compilers
+// Workarounds for incomplete C++17 support in some compilers/libs
 
 #ifdef LIBMESH_HAVE_CXX17_SPLICING
 template <typename T>
@@ -584,6 +583,26 @@ void libmesh_merge_move(T & target, T & source)
 {
   target.insert(source.begin(), source.end());
   source.clear(); // Avoid forwards-incompatibility
+}
+#endif // LIBMESH_HAVE_CXX17_SPLICING
+
+#ifdef LIBMESH_HAVE_CXX17_TRANSFORM_REDUCE
+template <typename InputIt, class T, class BinaryOp, class UnaryOp>
+T libmesh_transform_reduce(InputIt begin, InputIt end, T init, BinaryOp reduce, UnaryOp transform)
+{
+  return std::transform_reduce(begin, end, init, reduce, transform);
+}
+#else
+template <typename InputIt, class T, class BinaryOp, class UnaryOp>
+T libmesh_transform_reduce(InputIt begin, InputIt end, T init, BinaryOp reduce, UnaryOp transform)
+{
+  // Reuse init as returnval.
+  //
+  // Don't try to do any fancy reduce() reordering/vectorization;
+  // people who want that can get a real compiler.
+  for (auto it = begin; it != end; ++it)
+    init = reduce(init, transform(*it));
+  return init;
 }
 #endif // LIBMESH_HAVE_CXX17_SPLICING
 
