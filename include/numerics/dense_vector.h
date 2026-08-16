@@ -652,7 +652,7 @@ Real DenseVector<T>::min () const
   typedef decltype(libmesh_real(_val[0])) realT;
   return std::transform_reduce
     (_val.begin(), _val.end(), std::numeric_limits<realT>::max(),
-     [](auto a, auto b){using std::min; return min(a,b);},
+     [](const auto & a, const auto & b){using std::min; return min(a,b);},
      [](const T & v){return libmesh_real(v);});
 }
 
@@ -666,7 +666,7 @@ Real DenseVector<T>::max () const
   typedef decltype(libmesh_real(_val[0])) realT;
   return std::transform_reduce
     (_val.begin(), _val.end(), std::numeric_limits<realT>::lowest(),
-     [](auto a, auto b){using std::max; return max(a,b);},
+     [](const auto & a, const auto & b){using std::max; return max(a,b);},
      [](const T & v){return libmesh_real(v);});
 }
 

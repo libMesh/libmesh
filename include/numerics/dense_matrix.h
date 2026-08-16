@@ -1144,7 +1144,7 @@ auto DenseMatrix<T>::min () const -> decltype(libmesh_real(T(0)))
   libmesh_assert (this->_n);
   return std::transform_reduce
     (_val.begin(), _val.end(), std::numeric_limits<T>::max(),
-     [](auto a, auto b){using std::min; return min(a,b);},
+     [](const auto & a, const auto & b){using std::min; return min(a,b);},
      [](const T & v){return libmesh_real(v);});
 }
 
@@ -1158,7 +1158,7 @@ auto DenseMatrix<T>::max () const -> decltype(libmesh_real(T(0)))
   libmesh_assert (this->_n);
   return std::transform_reduce
     (_val.begin(), _val.end(), std::numeric_limits<T>::lowest(),
-     [](auto a, auto b){using std::max; return max(a,b);},
+     [](const auto & a, const auto & b){using std::max; return max(a,b);},
      [](const T & v){return libmesh_real(v);});
 }
 
