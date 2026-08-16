@@ -650,7 +650,7 @@ Real DenseVector<T>::min () const
 {
   libmesh_assert (this->size());
   typedef decltype(libmesh_real(T(0))) realfromT;
-  return std::transform_reduce
+  return libmesh_transform_reduce
     (_val.begin(), _val.end(), std::numeric_limits<realfromT>::max(),
      [](const auto & a, const auto & b){using std::min; return min(a,b);},
      [](const T & v){return libmesh_real(v);});
@@ -664,7 +664,7 @@ Real DenseVector<T>::max () const
 {
   libmesh_assert (this->size());
   typedef decltype(libmesh_real(T(0))) realfromT;
-  return std::transform_reduce
+  return libmesh_transform_reduce
     (_val.begin(), _val.end(), std::numeric_limits<realfromT>::lowest(),
      [](const auto & a, const auto & b){using std::max; return max(a,b);},
      [](const T & v){return libmesh_real(v);});
@@ -682,7 +682,7 @@ Real DenseVector<T>::l1_norm () const
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).template lpNorm<1>();
 #else
-  return std::transform_reduce
+  return libmesh_transform_reduce
     (_val.begin(), _val.end(), Real(0), std::plus<>(),
      [](const T & v){using std::abs; return abs(v);});
 #endif
@@ -701,7 +701,7 @@ Real DenseVector<T>::l2_norm () const
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).norm();
 #else
   using std::sqrt;
-  return sqrt(std::transform_reduce
+  return sqrt(libmesh_transform_reduce
     (_val.begin(), _val.end(), Real(0), std::plus<>(),
      [](const T & v){return TensorTools::norm_sq(v);}));
 #endif
@@ -719,7 +719,7 @@ Real DenseVector<T>::linfty_norm () const
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).template lpNorm<Eigen::Infinity>();
 #else
-  return std::transform_reduce
+  return libmesh_transform_reduce
     (_val.begin(), _val.end(), Real(0),
      [](auto a, auto b){using std::max; return max(a,b);},
      [](const T & v){using std::abs; return abs(v);});
