@@ -31,6 +31,7 @@ public:
 
   CPPUNIT_TEST( testTriangleHoleArea );
   CPPUNIT_TEST( testTriangleHoleContains );
+  CPPUNIT_TEST( testHoleContainsRayDegeneracies );
 
 #ifdef LIBMESH_HAVE_POLY2TRI
   CPPUNIT_TEST( testPoly2Tri );
@@ -62,6 +63,10 @@ public:
   CPPUNIT_TEST( testPoly2TriHolesInteriorExtraRefined );
   // This covers an old poly2tri collinearity-tolerance bug
   CPPUNIT_TEST( testPoly2TriHolesExtraRefined );
+
+  // These cover more recent tolerance issues when verifying holes
+  CPPUNIT_TEST( testPoly2TriHolePerturbed );
+  CPPUNIT_TEST( testPoly2TriHoleTangentPerturbed );
 
   CPPUNIT_TEST( testPoly2TriNonUniformRefined );
   CPPUNIT_TEST( testPoly2TriHolesNonUniformRefined );
@@ -278,6 +283,34 @@ public:
     CPPUNIT_ASSERT(!square_jaggy.contains({1.1,1}));
     CPPUNIT_ASSERT(!square_jaggy.contains({1.6,1}));
     CPPUNIT_ASSERT(!square_jaggy.contains({2.1,1}));
+  }
+
+
+  // The case from libMesh issue #3496, with no triangulator in the way.
+  // contains() casts its ray in the +x direction, so a hole vertex that
+  // very nearly shares the query point's y is the degenerate case.
+  //
+  // Rays that hit a vertex exactly - passing through one, grazing one,
+  // or running along a whole edge - are already covered by the holes in
+  // testTriangleHoleContains.  What is special here is the scale: the
+  // ray misses the boundary's vertices by a few ulps, which is where
+  // comparing a parametric edge coordinate against a tolerance used to
+  // classify the same vertex differently from each of its two edges.
+  void testHoleContainsRayDegeneracies()
+  {
+    LOG_UNIT_TEST;
+
+    // Every vertex of a hole has to test as inside a boundary that
+    // encloses it, however nearly collinear the ray from it is with the
+    // boundary's own vertices.
+    const TriangulatorInterface::PolygonHole
+      perturbed(Point(0,4.e-16), std::sqrt(2_R)/2, 4);
+    const TriangulatorInterface::ArbitraryHole outer_bdy
+      {{0,0}, {{100,0},{100,100},{0,100},{-100,100},
+               {-100,0},{-100,-100},{0,-100},{100,-100}}};
+
+    for (auto i : make_range(perturbed.n_points()))
+      CPPUNIT_ASSERT(outer_bdy.contains(perturbed.point(i)));
   }
 
 
@@ -505,6 +538,122 @@ public:
       {-r2p2o6,r2p2o6}, {-r2p2o6,-r2p2o6},
       {0,r2p4o6}, {r2p4o6, 0},
       {0,-r2p4o6}, {-r2p4o6, 0}
+    };
+
+    testFoundCenters(mesh, expected_centers);
+  }
+
+
+  void testTriangulatorHolePerturbed(MeshBase & mesh,
+                                     TriangulatorInterface & triangulator)
+  {
+    // Points based on a simplification of a hole verification failure
+    // case
+    mesh.add_point(Point(100,0), 0);
+    mesh.add_point(Point(100,100), 1);
+    mesh.add_point(Point(0,100), 2);
+    mesh.add_point(Point(-100,100), 3);
+    mesh.add_point(Point(-100,0), 4);
+    mesh.add_point(Point(-100,-100), 5);
+    mesh.add_point(Point(0,-100), 6);
+    mesh.add_point(Point(100,-100), 7);
+
+    commonSettings(triangulator);
+
+    // Don't insert points here; we want the triangulation determined
+    // purely by the boundary and hole points
+    triangulator.desired_area() = 1e16;
+
+    // Add a diamond hole in *almost* the center; the tiny perturbation
+    // puts a hole vertex ray-collinear with a boundary vertex, which
+    // used to trip up the hole verification
+    TriangulatorInterface::PolygonHole
+      diamond(Point(0,4.e-16),
+              std::sqrt(2_R)/2, 4);
+    const std::vector<TriangulatorInterface::Hole*> holes { &diamond };
+    triangulator.attach_hole_list(&holes);
+
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(12));
+
+    // Center coordinates for all the elements we expect
+    const Real r2p200o6 = (std::sqrt(2_R)+200)/6,
+               r2p400o6 = (std::sqrt(2_R)+400)/6;
+
+    std::vector <Point> expected_centers
+    { {r2p400o6,100./3}, {-r2p400o6,100./3},
+      {r2p400o6,-100./3}, {-r2p400o6,-100./3},
+      {100./3,r2p400o6}, {-100./3,r2p400o6},
+      {100./3,-r2p400o6}, {-100./3,-r2p400o6},
+      {r2p200o6,r2p200o6}, {-r2p200o6,r2p200o6},
+      {r2p200o6,-r2p200o6}, {-r2p200o6,-r2p200o6},
+    };
+
+    testFoundCenters(mesh, expected_centers);
+  }
+
+
+  void testTriangulatorHoleTangentPerturbed(MeshBase & mesh,
+                                            TriangulatorInterface & triangulator)
+  {
+    // Points based on a simplification of a hole verification failure
+    // case
+    mesh.add_point(Point(200,0), 0);
+    mesh.add_point(Point(200,100), 1);
+    mesh.add_point(Point(100,100), 2);
+    mesh.add_point(Point(0,100), 3);
+    mesh.add_point(Point(-100,100), 4);
+    mesh.add_point(Point(-200,100), 5);
+    mesh.add_point(Point(-200,0), 6);
+    mesh.add_point(Point(-200,-100), 7);
+    mesh.add_point(Point(-100,-100), 8);
+    mesh.add_point(Point(0,-100), 9);
+    mesh.add_point(Point(100,-100), 10);
+    mesh.add_point(Point(200,-100), 11);
+
+    commonSettings(triangulator);
+
+    // Don't insert points here; we want the triangulation determined
+    // purely by the boundary and hole points
+    triangulator.desired_area() = 1e16;
+
+    // Two diamond holes, in *almost* the center of each half of that
+    // rectangle.  The tiny perturbations make a ray from one hole
+    // vertex "tangent" to a vertex of the other hole, which used to
+    // trip up the hole verification double-intersection check.
+    TriangulatorInterface::PolygonHole
+      left_diamond(Point(-100,4.e-16),
+                   std::sqrt(2_R)/2, 4),
+      right_diamond(Point(100,-4.e-16),
+                    std::sqrt(2_R)/2, 4);
+    const std::vector<TriangulatorInterface::Hole*> holes
+      { &left_diamond, &right_diamond };
+    triangulator.attach_hole_list(&holes);
+
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(22));
+
+    // Center coordinates for all the elements we expect
+    const Real r2p200o6 = (std::sqrt(2_R)+200)/6,
+               r2p400o6 = (std::sqrt(2_R)+400)/6;
+
+    std::vector <Point> expected_centers
+    { // Right half, around the diamond hole near x = 100
+      {100+r2p400o6,100./3}, {100+r2p400o6,-100./3},
+      {100+100./3,r2p400o6}, {100-100./3,r2p400o6},
+      {100+100./3,-r2p400o6}, {100-100./3,-r2p400o6},
+      {100+r2p200o6,r2p200o6}, {100-r2p200o6,r2p200o6},
+      {100+r2p200o6,-r2p200o6}, {100-r2p200o6,-r2p200o6},
+      // Left half, mirror of the right around the hole near x = -100
+      {-100-r2p400o6,100./3}, {-100-r2p400o6,-100./3},
+      {-100-100./3,r2p400o6}, {-100+100./3,r2p400o6},
+      {-100-100./3,-r2p400o6}, {-100+100./3,-r2p400o6},
+      {-100-r2p200o6,r2p200o6}, {-100+r2p200o6,r2p200o6},
+      {-100-r2p200o6,-r2p200o6}, {-100+r2p200o6,-r2p200o6},
+      // The two elements meeting the shared wall at x = 0
+      {0,100./3}, {0,-100./3}
     };
 
     testFoundCenters(mesh, expected_centers);
@@ -957,6 +1106,26 @@ public:
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorHoles(mesh, p2t_tri);
+  }
+
+
+  void testPoly2TriHolePerturbed()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testTriangulatorHolePerturbed(mesh, p2t_tri);
+  }
+
+
+  void testPoly2TriHoleTangentPerturbed()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    Poly2TriTriangulator p2t_tri(mesh);
+    testTriangulatorHoleTangentPerturbed(mesh, p2t_tri);
   }
 
 
