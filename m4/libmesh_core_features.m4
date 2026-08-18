@@ -19,8 +19,14 @@ AC_ARG_WITH([gdb-command],
     [gdb_command="$withval"],
     [gdb_command="no"])
 
-AC_DEFINE_UNQUOTED(GDB_COMMAND, "$gdb_command", [command to invoke gdb])
-AC_MSG_RESULT([configuring gdb command... "$gdb_command"])
+AS_IF([test "$gdb_command" != no],
+      [
+        AC_DEFINE_UNQUOTED(GDB_COMMAND, "$gdb_command", [command to invoke gdb])
+        AC_MSG_RESULT([configuring gdb command... "$gdb_command"])
+      ],
+      [
+        AC_MSG_RESULT([configuring with no gdb"])
+      ])
 # -------------------------------------------------------------
 
 
