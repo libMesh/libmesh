@@ -569,8 +569,7 @@ struct casting_compare {
 template<class ...Args> inline void libmesh_ignore( const Args&... ) { }
 
 
-// A workaround for the lack of C++17 merge() support in some
-// compilers
+// Workaround for incomplete C++17 support in some compilers/libs
 
 #ifdef LIBMESH_HAVE_CXX17_SPLICING
 template <typename T>

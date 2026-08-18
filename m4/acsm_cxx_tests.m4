@@ -168,11 +168,46 @@ AC_DEFUN([ACSM_TEST_CXX_ALL],
           [AC_MSG_WARN([libMesh requires C++11 support for std::isinf])
            have_cxx_all=no])
 
-dnl Optional test here - requiring it would force us to bump up clang
-dnl requirements too high for now.
+dnl Optional tests here - requiring it would force us to bump up clang
+dnl and/or gcc requirements too high for now.
     LIBMESH_TEST_CXX17_SPLICING
     AS_IF([test "x$have_cxx17_splicing" != "xyes"],
           [AC_MSG_WARN([libMesh prefers C++17 support for set/map merge])])
+
+    LIBMESH_TEST_CXX17_TRANSFORM_REDUCE
+    AS_IF([test "x$have_cxx17_transform_reduce" != "xyes"],
+          [AC_MSG_WARN([libMesh prefers C++17 support for std::transform_reduce])])
+  ])
+
+
+dnl Test C++17 std::transform_reduce()"
+AC_DEFUN([LIBMESH_TEST_CXX17_TRANSFORM_REDUCE],
+  [
+    have_cxx17_transform_reduce=no
+
+    AC_LANG_PUSH([C++])
+
+    old_CXXFLAGS="$CXXFLAGS"
+    CXXFLAGS="$CXXFLAGS $libmesh_CXXFLAGS"
+
+    AC_MSG_CHECKING(for C++17 std::transform_reduce)
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+    @%:@include <numeric>
+    @%:@include <vector>
+    ]], [[
+    std::vector<int> v{7,8,9};
+    auto sumsq = std::transform_reduce(v.cbegin(), v.cend(), 0, std::plus{}, [](auto x){return x*x;});
+    ]])],[
+        AC_MSG_RESULT(yes)
+        have_cxx17_transform_reduce=yes
+        AC_DEFINE(HAVE_CXX17_TRANSFORM_REDUCE, 1, [Flag indicating whether compiler supports std::transform_reduce])
+    ],[
+        AC_MSG_RESULT(no)
+    ])
+
+    dnl Reset the flags
+    CXXFLAGS="$old_CXXFLAGS"
+    AC_LANG_POP([C++])
   ])
 
 

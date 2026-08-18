@@ -23,6 +23,7 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE(DenseMatrixTest);
 
   CPPUNIT_TEST(testClassifiers);
+  CPPUNIT_TEST(testNorms);
   CPPUNIT_TEST(testOuterProduct);
   CPPUNIT_TEST(testSVD);
   CPPUNIT_TEST(testEVDreal);
@@ -95,6 +96,26 @@ private:
     CPPUNIT_ASSERT(!isfinite(diag));
     CPPUNIT_ASSERT(!isinf(diag));
     CPPUNIT_ASSERT(isnan(diag));
+  }
+
+  void testNorms()
+  {
+    LOG_UNIT_TEST;
+
+    DenseVector<Real> a = {3.0, -4.0};
+    LIBMESH_ASSERT_FP_EQUAL(a.l1_norm(), 7, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(a.l2_norm(), 5, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(a.linfty_norm(), 4, TOLERANCE*TOLERANCE);
+
+    DenseVector<Real> b = {1.0, -2.0};
+    LIBMESH_ASSERT_FP_EQUAL(b.l1_norm(), 3, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(b.l2_norm(), std::sqrt(Real(5)), TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(b.linfty_norm(), 2, TOLERANCE*TOLERANCE);
+
+    DenseMatrix<Real> a_times_b; // [3 -6; -4 8]
+    a_times_b.outer_product(a, b);
+    LIBMESH_ASSERT_FP_EQUAL(a_times_b.l1_norm(), 14, TOLERANCE*TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(a_times_b.linfty_norm(), 12, TOLERANCE*TOLERANCE);
   }
 
   void testOuterProduct()
