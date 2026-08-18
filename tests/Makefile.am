@@ -257,14 +257,14 @@ if LIBMESH_ENABLE_FPARSER
 endif
 
 check_PROGRAMS = # empty, append below
-TESTS =
+TESTS = run_unit_tests.sh # Runs both unit test and kokkos drivers
+
 
 if LIBMESH_ENABLE_KOKKOS
   KOKKOS_TEST_CPPFLAGS += -I$(top_srcdir)/include $(KOKKOS_CPPFLAGS) $(KOKKOS_INCLUDES)
 
 if LIBMESH_DBG_MODE
   check_PROGRAMS += unit_tests-kokkos-dbg
-  TESTS += unit_tests-kokkos-dbg
   unit_tests_kokkos_dbg_SOURCES =
   EXTRA_unit_tests_kokkos_dbg_SOURCES = driver_kokkos.K
 endif
@@ -289,7 +289,6 @@ endif
 
 if LIBMESH_OPT_MODE
   check_PROGRAMS += unit_tests-kokkos-opt
-  TESTS += unit_tests-kokkos-opt
   unit_tests_kokkos_opt_SOURCES =
   EXTRA_unit_tests_kokkos_opt_SOURCES = driver_kokkos.K
 endif
@@ -401,11 +400,6 @@ $(top_builddir)/libmesh_prof.la: FORCE
 $(top_builddir)/libmesh_oprof.la: FORCE
 	(cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) libmesh_oprof.la)
 
-
-
-if LIBMESH_ENABLE_CPPUNIT
-TESTS += run_unit_tests.sh
-endif
 
 if LIBMESH_ENABLE_KOKKOS
 driver_kokkos_src = driver_kokkos.K
