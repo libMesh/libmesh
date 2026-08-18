@@ -269,6 +269,24 @@ if LIBMESH_DBG_MODE
   EXTRA_unit_tests_kokkos_dbg_SOURCES = driver_kokkos.K
 endif
 
+if LIBMESH_DEVEL_MODE
+  check_PROGRAMS += unit_tests-kokkos-devel
+  unit_tests_kokkos_devel_SOURCES =
+  EXTRA_unit_tests_kokkos_devel_SOURCES = driver_kokkos.K
+endif
+
+if LIBMESH_PROF_MODE
+  check_PROGRAMS += unit_tests-kokkos-prof
+  unit_tests_kokkos_prof_SOURCES =
+  EXTRA_unit_tests_kokkos_prof_SOURCES = driver_kokkos.K
+endif
+
+if LIBMESH_OPROF_MODE
+  check_PROGRAMS += unit_tests-kokkos-oprof
+  unit_tests_kokkos_oprof_SOURCES =
+  EXTRA_unit_tests_kokkos_oprof_SOURCES = driver_kokkos.K
+endif
+
 if LIBMESH_OPT_MODE
   check_PROGRAMS += unit_tests-kokkos-opt
   unit_tests_kokkos_opt_SOURCES =
@@ -385,18 +403,21 @@ $(top_builddir)/libmesh_oprof.la: FORCE
 
 if LIBMESH_ENABLE_KOKKOS
 driver_kokkos_src = driver_kokkos.K
-unit_tests_kokkos_dbg_object = unit_tests_kokkos_dbg-driver_kokkos.$(OBJEXT)
-unit_tests_kokkos_opt_object = unit_tests_kokkos_opt-driver_kokkos.$(OBJEXT)
-unit_tests_kokkos_dbg_depfile = $(DEPDIR)/unit_tests_kokkos_dbg-driver_kokkos.d
-unit_tests_kokkos_opt_depfile = $(DEPDIR)/unit_tests_kokkos_opt-driver_kokkos.d
-kokkos_unit_test_depfiles = $(unit_tests_kokkos_dbg_depfile) $(unit_tests_kokkos_opt_depfile)
-kokkos_unit_test_cleanfiles = $(unit_tests_kokkos_dbg_object) $(unit_tests_kokkos_opt_object) \
-                              $(kokkos_unit_test_depfiles) \
-                              unit_tests-kokkos-dbg$(EXEEXT) unit_tests-kokkos-opt$(EXEEXT)
+kokkos_unit_test_depfiles = # empty, append below
 
 # Build the Kokkos tests with the same mode-suffixed naming as the
 # original libMesh unit test executables, while still compiling with
 # the Kokkos device compiler and mode-specific flags.
+unit_tests_kokkos_dbg_object = unit_tests_kokkos_dbg-driver_kokkos.$(OBJEXT)
+unit_tests_kokkos_devel_object = unit_tests_kokkos_devel-driver_kokkos.$(OBJEXT)
+unit_tests_kokkos_prof_object = unit_tests_kokkos_prof-driver_kokkos.$(OBJEXT)
+unit_tests_kokkos_oprof_object = unit_tests_kokkos_oprof-driver_kokkos.$(OBJEXT)
+unit_tests_kokkos_opt_object = unit_tests_kokkos_opt-driver_kokkos.$(OBJEXT)
+
+if LIBMESH_DBG_MODE
+unit_tests_kokkos_dbg_depfile = $(DEPDIR)/unit_tests_kokkos_dbg-driver_kokkos.d
+kokkos_unit_test_depfiles += $(unit_tests_kokkos_dbg_depfile)
+
 $(unit_tests_kokkos_dbg_object): $(driver_kokkos_src)
 	@$(MKDIR_P) $(DEPDIR)
 	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
@@ -404,6 +425,78 @@ $(unit_tests_kokkos_dbg_object): $(driver_kokkos_src)
 	  $(AM_CXXFLAGS) $(CXXFLAGS_DBG) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
 	  -MMD -MP -MF $(unit_tests_kokkos_dbg_depfile) \
 	  -c $< -o $@
+
+unit_tests-kokkos-dbg$(EXEEXT): $(unit_tests_kokkos_dbg_object) $(top_builddir)/libmesh_dbg.la
+	@rm -f $@
+	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
+	  $(unit_tests_kokkos_dbg_object) \
+	  $(top_builddir)/libmesh_dbg.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
+endif
+
+if LIBMESH_DEVEL_MODE
+unit_tests_kokkos_devel_depfile = $(DEPDIR)/unit_tests_kokkos_devel-driver_kokkos.d
+kokkos_unit_test_depfiles += $(unit_tests_kokkos_devel_depfile)
+
+$(unit_tests_kokkos_devel_object): $(driver_kokkos_src)
+	@$(MKDIR_P) $(DEPDIR)
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(CPPFLAGS_DEVEL) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS_DEVEL) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -MMD -MP -MF $(unit_tests_kokkos_devel_depfile) \
+	  -c $< -o $@
+
+unit_tests-kokkos-devel$(EXEEXT): $(unit_tests_kokkos_devel_object) $(top_builddir)/libmesh_devel.la
+	@rm -f $@
+	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
+	  $(unit_tests_kokkos_devel_object) \
+	  $(top_builddir)/libmesh_devel.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
+endif
+
+if LIBMESH_PROF_MODE
+unit_tests_kokkos_prof_depfile = $(DEPDIR)/unit_tests_kokkos_prof-driver_kokkos.d
+kokkos_unit_test_depfiles += $(unit_tests_kokkos_prof_depfile)
+
+$(unit_tests_kokkos_prof_object): $(driver_kokkos_src)
+	@$(MKDIR_P) $(DEPDIR)
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(CPPFLAGS_PROF) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS_PROF) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -MMD -MP -MF $(unit_tests_kokkos_prof_depfile) \
+	  -c $< -o $@
+
+unit_tests-kokkos-prof$(EXEEXT): $(unit_tests_kokkos_prof_object) $(top_builddir)/libmesh_prof.la
+	@rm -f $@
+	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
+	  $(unit_tests_kokkos_prof_object) \
+	  $(top_builddir)/libmesh_prof.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
+endif
+
+if LIBMESH_OPROF_MODE
+unit_tests_kokkos_oprof_depfile = $(DEPDIR)/unit_tests_kokkos_oprof-driver_kokkos.d
+kokkos_unit_test_depfiles += $(unit_tests_kokkos_oprof_depfile)
+
+$(unit_tests_kokkos_oprof_object): $(driver_kokkos_src)
+	@$(MKDIR_P) $(DEPDIR)
+	$(KOKKOS_CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(KOKKOS_MPI_CPPFLAGS) $(CPPFLAGS_OPROF) $(AM_CPPFLAGS) $(CPPFLAGS) $(KOKKOS_TEST_CPPFLAGS) \
+	  $(AM_CXXFLAGS) $(CXXFLAGS_OPROF) $(CXXFLAGS) $(KOKKOS_CXXFLAGS) \
+	  -MMD -MP -MF $(unit_tests_kokkos_oprof_depfile) \
+	  -c $< -o $@
+
+unit_tests-kokkos-oprof$(EXEEXT): $(unit_tests_kokkos_oprof_object) $(top_builddir)/libmesh_oprof.la
+	@rm -f $@
+	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
+	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
+	  $(unit_tests_kokkos_oprof_object) \
+	  $(top_builddir)/libmesh_oprof.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
+endif
+
+if LIBMESH_OPT_MODE
+unit_tests_kokkos_opt_depfile = $(DEPDIR)/unit_tests_kokkos_opt-driver_kokkos.d
+kokkos_unit_test_depfiles += $(unit_tests_kokkos_opt_depfile)
 
 $(unit_tests_kokkos_opt_object): $(driver_kokkos_src)
 	@$(MKDIR_P) $(DEPDIR)
@@ -413,19 +506,25 @@ $(unit_tests_kokkos_opt_object): $(driver_kokkos_src)
 	  -MMD -MP -MF $(unit_tests_kokkos_opt_depfile) \
 	  -c $< -o $@
 
-unit_tests-kokkos-dbg$(EXEEXT): $(unit_tests_kokkos_dbg_object) $(top_builddir)/libmesh_dbg.la
-	@rm -f $@
-	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
-	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
-	  $(unit_tests_kokkos_dbg_object) \
-	  $(top_builddir)/libmesh_dbg.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
-
 unit_tests-kokkos-opt$(EXEEXT): $(unit_tests_kokkos_opt_object) $(top_builddir)/libmesh_opt.la
 	@rm -f $@
 	$(AM_V_GEN)$(LIBTOOL) --tag=CXX --mode=link $(KOKKOS_CXX) \
 	  $(LDFLAGS) $(AM_LDFLAGS) $(KOKKOS_LDFLAGS) -o $@ \
 	  $(unit_tests_kokkos_opt_object) \
 	  $(top_builddir)/libmesh_opt.la $(KOKKOS_LIBS) $(libmesh_optional_LIBS) $(LIBS)
+endif
+
+kokkos_unit_test_cleanfiles = $(unit_tests_kokkos_dbg_object) \
+			      $(unit_tests_kokkos_devel_object) \
+			      $(unit_tests_kokkos_prof_object) \
+			      $(unit_tests_kokkos_oprof_object) \
+			      $(unit_tests_kokkos_opt_object) \
+                              $(kokkos_unit_test_depfiles) \
+                              unit_tests-kokkos-dbg$(EXEEXT) \
+                              unit_tests-kokkos-devel$(EXEEXT) \
+                              unit_tests-kokkos-prof$(EXEEXT) \
+                              unit_tests-kokkos-oprof$(EXEEXT) \
+			      unit_tests-kokkos-opt$(EXEEXT)
 
 -include $(kokkos_unit_test_depfiles)
 endif
