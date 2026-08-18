@@ -888,14 +888,18 @@ public:
       MeshType mesh(*TestCommWorld);
 
       EquationSystems es(mesh);
+
+      // We need a mesh.spatial_dimension() *before* adding a
+      // vector-valued variable, so add_variable() can figure out how
+      // many components it needs.
+      MeshTools::Generation::build_square (mesh,
+                                           3, 3,
+                                           0., 1., 0., 1.);
+
       System & sys = es.add_system<System> ("SimpleSystem");
       auto e_var = sys.add_variable("e", CONSTANT, MONOMIAL_VEC);
       auto e_no_p_var = sys.add_variable("e_no_p",
                                          FEType(CONSTANT, MONOMIAL_VEC).set_p_refinement(false));
-
-      MeshTools::Generation::build_square (mesh,
-                                           3, 3,
-                                           0., 1., 0., 1.);
 
       es.init();
 
