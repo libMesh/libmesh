@@ -1285,7 +1285,10 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
                 --_elem_dims.end(), // --end() is valid if the set is non-empty
                 std::ostream_iterator<unsigned int>(oss, ", "));
       oss << cast_int<unsigned int>(*_elem_dims.rbegin());
-      oss << "}\n";
+      oss << "}";
+      if (!this->preparation().has_cached_elem_data)
+        oss << " (may be out of date)";
+      oss << '\n';
     }
 
   if (!_elem_default_orders.empty())
@@ -1297,12 +1300,23 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
                      [](Order o)
                        { return Utility::enum_to_string<Order>(o); });
       oss << Utility::enum_to_string<Order>(*_elem_default_orders.rbegin());
-      oss << "}\n";
+      oss << "}";
+      if (!this->preparation().has_cached_elem_data)
+        oss << " (may be out of date)";
+      oss << '\n';
     }
 
-  oss << "  supported_nodal_order()=" << this->supported_nodal_order()                        << '\n'
-      << "  spatial_dimension()="     << this->spatial_dimension()                            << '\n'
-      << "  n_nodes()="               << this->n_nodes()                                      << '\n'
+  oss << "  supported_nodal_order()=" << this->_supported_nodal_order;
+  if (!this->preparation().has_cached_elem_data)
+    oss << " (may be out of date)";
+  oss << '\n';
+
+  oss << "  spatial_dimension()=" << int(this->_spatial_dimension);
+  if (!this->preparation().has_cached_elem_data)
+    oss << " (may be out of date)";
+  oss << '\n';
+
+  oss << "  n_nodes()="               << this->n_nodes()                                      << '\n'
       << "    n_local_nodes()="       << this->n_local_nodes()                                << '\n'
       << "  n_elem()="                << this->n_elem()                                       << '\n'
       << "    n_local_elem()="        << this->n_local_elem()                                 << '\n';
