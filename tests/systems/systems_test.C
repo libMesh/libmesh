@@ -20,7 +20,10 @@
 #include <libmesh/dg_fem_context.h>
 #include <libmesh/enum_solver_type.h>
 #include <libmesh/enum_preconditioner_type.h>
+#include <libmesh/enum_convergence_flags.h>
 #include <libmesh/linear_solver.h>
+#include <libmesh/solver_configuration.h>
+#include <libmesh/system_subset.h>
 #include <libmesh/parallel.h>
 #include <libmesh/face_quad4.h>
 #include <libmesh/face_quad9.h>
@@ -41,6 +44,185 @@
 #include <string>
 
 using namespace libMesh;
+
+#ifdef LIBMESH_HAVE_SOLVER
+namespace
+{
+
+class TestSolverConfiguration : public SolverConfiguration
+{
+public:
+  virtual void configure_solver() override { ++configure_calls; }
+
+  unsigned int configure_calls = 0;
+};
+
+class TestSystemSubset : public SystemSubset
+{
+public:
+  explicit TestSystemSubset(const System & system) : SystemSubset(system) {}
+
+  virtual const std::vector<unsigned int> & dof_ids() const override { return _dof_ids; }
+
+private:
+  std::vector<unsigned int> _dof_ids;
+};
+
+class RecordingLinearSolver : public LinearSolver<Number>
+{
+public:
+  explicit RecordingLinearSolver(const Parallel::Communicator & comm) : LinearSolver<Number>(comm)
+  {
+  }
+
+  virtual void clear() override { this->_is_initialized = false; }
+
+  virtual void init(const char * name = nullptr) override
+  {
+    ++init_calls;
+    configuration_during_init = this->solver_configuration();
+    prefix = name ? name : "";
+    this->_is_initialized = true;
+  }
+
+  virtual void init_systems(const System & system) override
+  {
+    ++init_systems_calls;
+    last_system = &system;
+  }
+
+  virtual void restrict_solve_to(const std::vector<unsigned int> * const dofs,
+                                 const SubsetSolveMode) override
+  {
+    restricted_dofs = dofs;
+    ++restriction_calls;
+  }
+
+  virtual std::pair<unsigned int, Real>
+  solve(SparseMatrix<Number> & matrix,
+        NumericVector<Number> & solution,
+        NumericVector<Number> & rhs,
+        const std::optional<double> tol = std::nullopt,
+        const std::optional<unsigned int> max_its = std::nullopt) override
+  {
+    last_matrix = &matrix;
+    return this->solve_common(solution, rhs, tol, max_its);
+  }
+
+  virtual std::pair<unsigned int, Real>
+  solve(SparseMatrix<Number> & matrix,
+        SparseMatrix<Number> &,
+        NumericVector<Number> & solution,
+        NumericVector<Number> & rhs,
+        const std::optional<double> tol = std::nullopt,
+        const std::optional<unsigned int> max_its = std::nullopt) override
+  {
+    last_matrix = &matrix;
+    return this->solve_common(solution, rhs, tol, max_its);
+  }
+
+  virtual std::pair<unsigned int, Real>
+  solve(const ShellMatrix<Number> &,
+        NumericVector<Number> & solution,
+        NumericVector<Number> & rhs,
+        const std::optional<double> tol = std::nullopt,
+        const std::optional<unsigned int> max_its = std::nullopt) override
+  {
+    return this->solve_common(solution, rhs, tol, max_its);
+  }
+
+  virtual std::pair<unsigned int, Real>
+  solve(const ShellMatrix<Number> &,
+        const SparseMatrix<Number> &,
+        NumericVector<Number> & solution,
+        NumericVector<Number> & rhs,
+        const std::optional<double> tol = std::nullopt,
+        const std::optional<unsigned int> max_its = std::nullopt) override
+  {
+    return this->solve_common(solution, rhs, tol, max_its);
+  }
+
+  virtual LinearConvergenceReason get_converged_reason() const override { return CONVERGED_RTOL; }
+
+  double real_setting(const std::string & name,
+                      const std::optional<double> value,
+                      const std::optional<double> default_value = std::nullopt)
+  {
+    return this->get_real_solver_setting(name, value, default_value);
+  }
+
+  int int_setting(const std::string & name,
+                  const std::optional<int> value,
+                  const std::optional<int> default_value = std::nullopt)
+  {
+    return this->get_int_solver_setting(name, value, default_value);
+  }
+
+  bool throw_during_solve = false;
+  unsigned int init_calls = 0;
+  unsigned int init_systems_calls = 0;
+  SolverConfiguration * configuration_during_init = nullptr;
+  const System * last_system = nullptr;
+  const SparseMatrix<Number> * last_matrix = nullptr;
+  const std::vector<unsigned int> * restricted_dofs = nullptr;
+  unsigned int restriction_calls = 0;
+  std::string prefix;
+  double relative_tolerance = 0.;
+  double absolute_tolerance = 0.;
+  int maximum_iterations = 0;
+  unsigned int returned_iterations = 7;
+  Real returned_residual = 0.125;
+
+private:
+  std::pair<unsigned int, Real> solve_common(NumericVector<Number> & solution,
+                                             NumericVector<Number> & rhs,
+                                             const std::optional<double> tol,
+                                             const std::optional<unsigned int> max_its)
+  {
+    if (throw_during_solve)
+      libmesh_error_msg("Requested test solver solve failure");
+
+    if (this->_solver_configuration)
+      this->_solver_configuration->configure_solver();
+
+    relative_tolerance = this->get_real_solver_setting("rel_tol", tol);
+    absolute_tolerance = this->get_real_solver_setting("abs_tol", std::nullopt, 0.25);
+    maximum_iterations = this->get_int_solver_setting("max_its", max_its);
+    solution = rhs;
+
+    return std::make_pair(returned_iterations, returned_residual);
+  }
+};
+
+unsigned int solve_options_assembly_calls = 0;
+Number solve_options_assembly_rhs = 1.;
+
+void set_identity_matrix_and_rhs(LinearImplicitSystem & system, const Number rhs_value)
+{
+  SparseMatrix<Number> & matrix = *system.matrix;
+  matrix.zero();
+  system.rhs->zero();
+
+  for (auto i = matrix.row_start(); i != matrix.row_stop(); ++i)
+    {
+      matrix.set(i, i, 1.);
+      system.rhs->set(i, rhs_value);
+    }
+
+  matrix.close();
+  system.rhs->close();
+}
+
+void assemble_solve_options_system(EquationSystems & equation_systems,
+                                   const std::string & system_name)
+{
+  ++solve_options_assembly_calls;
+  set_identity_matrix_and_rhs(equation_systems.get_system<LinearImplicitSystem>(system_name),
+                              solve_options_assembly_rhs);
+}
+
+} // anonymous namespace
+#endif // LIBMESH_HAVE_SOLVER
 
 // Sparsity pattern augmentation class used in testDofCouplingWithVarGroups
 class AugmentSparsityOnNodes : public GhostingFunctor
@@ -484,6 +666,9 @@ public:
 #endif
 #endif // LIBMESH_DIM > 2
 #ifdef LIBMESH_HAVE_SOLVER
+  CPPUNIT_TEST(testLinearSolveOptionsAssembly);
+  CPPUNIT_TEST(testLinearSolveOptionsBorrowedSolver);
+  CPPUNIT_TEST(testLinearSolverSettingPrecedence);
   CPPUNIT_TEST( testDofCouplingWithVarGroups );
 #endif
 
@@ -508,6 +693,160 @@ public:
   CPPUNIT_TEST_SUITE_END();
 
 private:
+#ifdef LIBMESH_HAVE_SOLVER
+  void testLinearSolveOptionsAssembly()
+  {
+    LOG_UNIT_TEST;
+
+    ReplicatedMesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_line(mesh, 1, 0., 1., EDGE2);
+
+    EquationSystems equation_systems(mesh);
+    LinearImplicitSystem & system =
+        equation_systems.add_system<LinearImplicitSystem>("solve_options");
+    system.add_variable("u", FIRST);
+    system.prefix_with_name(false);
+
+    auto recording_solver = std::make_unique<RecordingLinearSolver>(system.comm());
+    RecordingLinearSolver * const recording_solver_ptr = recording_solver.get();
+    system.linear_solver = std::move(recording_solver);
+    LinearSolver<Number> * const owned_solver = system.linear_solver.get();
+
+    solve_options_assembly_calls = 0;
+    solve_options_assembly_rhs = 2.;
+    system.attach_assemble_function(assemble_solve_options_system);
+    system.parameters.set<Real>("linear solver tolerance") = 1.e-4;
+    system.parameters.set<unsigned int>("linear solver maximum iterations") = 11;
+
+    equation_systems.init();
+    system.solve();
+
+    CPPUNIT_ASSERT_EQUAL(1u, solve_options_assembly_calls);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.e-4, recording_solver_ptr->relative_tolerance, TOLERANCE);
+    CPPUNIT_ASSERT_EQUAL(11, recording_solver_ptr->maximum_iterations);
+    CPPUNIT_ASSERT_EQUAL(static_cast<const System *>(&system), recording_solver_ptr->last_system);
+
+    set_identity_matrix_and_rhs(system, 4.);
+    LinearImplicitSystemSolveOptions options;
+    options.assemble_before_solve = false;
+    system.solve(options);
+
+    CPPUNIT_ASSERT_EQUAL(1u, solve_options_assembly_calls);
+    CPPUNIT_ASSERT(system.assemble_before_solve);
+    CPPUNIT_ASSERT_EQUAL(owned_solver, system.linear_solver.get());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(4. * system.n_dofs(), system.solution->l1_norm(), TOLERANCE);
+    CPPUNIT_ASSERT_EQUAL(7u, system.n_linear_iterations());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.125, system.final_linear_residual(), TOLERANCE);
+  }
+
+  void testLinearSolveOptionsBorrowedSolver()
+  {
+    LOG_UNIT_TEST;
+
+    ReplicatedMesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_line(mesh, 1, 0., 1., EDGE2);
+
+    EquationSystems equation_systems(mesh);
+    LinearImplicitSystem & first = equation_systems.add_system<LinearImplicitSystem>("first");
+    LinearImplicitSystem & second = equation_systems.add_system<LinearImplicitSystem>("second");
+    first.add_variable("u", FIRST);
+    second.add_variable("u", FIRST);
+    first.prefix_with_name(false);
+    second.prefix_with_name(false);
+
+    auto recording_solver = std::make_unique<RecordingLinearSolver>(first.comm());
+    RecordingLinearSolver * const recording_solver_ptr = recording_solver.get();
+    first.linear_solver = std::move(recording_solver);
+
+    equation_systems.init();
+
+    LinearSolver<Number> * const first_owned_solver = first.linear_solver.get();
+    LinearSolver<Number> * const second_owned_solver = second.linear_solver.get();
+    const bool second_solver_was_initialized = second_owned_solver->initialized();
+    set_identity_matrix_and_rhs(first, 2.);
+    set_identity_matrix_and_rhs(second, 3.);
+
+    TestSolverConfiguration original_configuration;
+    TestSolverConfiguration call_configuration;
+    call_configuration.real_valued_data["rel_tol"] = 1.e-7;
+    call_configuration.real_valued_data["abs_tol"] = 1.e-10;
+    call_configuration.int_valued_data["max_its"] = 23;
+    recording_solver_ptr->set_solver_configuration(original_configuration);
+    recording_solver_ptr->reuse_preconditioner(true);
+
+    LinearImplicitSystemSolveOptions options;
+    options.solver = first_owned_solver;
+    options.solver_configuration = &call_configuration;
+    options.assemble_before_solve = false;
+    first.solve(options);
+    second.solve(options);
+
+    CPPUNIT_ASSERT_EQUAL(first_owned_solver, first.linear_solver.get());
+    CPPUNIT_ASSERT_EQUAL(second_owned_solver, second.linear_solver.get());
+    CPPUNIT_ASSERT_EQUAL(second_solver_was_initialized, second_owned_solver->initialized());
+    CPPUNIT_ASSERT_EQUAL(static_cast<SolverConfiguration *>(&original_configuration),
+                         recording_solver_ptr->solver_configuration());
+    CPPUNIT_ASSERT_EQUAL(static_cast<SolverConfiguration *>(&call_configuration),
+                         recording_solver_ptr->configuration_during_init);
+    CPPUNIT_ASSERT_EQUAL(static_cast<const System *>(&second), recording_solver_ptr->last_system);
+    CPPUNIT_ASSERT_EQUAL(static_cast<const SparseMatrix<Number> *>(second.matrix),
+                         recording_solver_ptr->last_matrix);
+    CPPUNIT_ASSERT_EQUAL(2u, recording_solver_ptr->init_calls);
+    CPPUNIT_ASSERT_EQUAL(2u, recording_solver_ptr->init_systems_calls);
+    CPPUNIT_ASSERT(recording_solver_ptr->prefix.empty());
+    CPPUNIT_ASSERT(recording_solver_ptr->get_same_preconditioner());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.e-7, recording_solver_ptr->relative_tolerance, TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1.e-10, recording_solver_ptr->absolute_tolerance, TOLERANCE);
+    CPPUNIT_ASSERT_EQUAL(23, recording_solver_ptr->maximum_iterations);
+    CPPUNIT_ASSERT_EQUAL(2u, call_configuration.configure_calls);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(2. * first.n_dofs(), first.solution->l1_norm(), TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3. * second.n_dofs(), second.solution->l1_norm(), TOLERANCE);
+    CPPUNIT_ASSERT_EQUAL(7u, second.n_linear_iterations());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.125, second.final_linear_residual(), TOLERANCE);
+
+    TestSystemSubset subset(second);
+    second.restrict_solve_to(&subset);
+    recording_solver_ptr->throw_during_solve = true;
+    CPPUNIT_ASSERT_THROW(second.solve(options), libMesh::LogicError);
+    recording_solver_ptr->throw_during_solve = false;
+    second.restrict_solve_to(nullptr);
+
+    CPPUNIT_ASSERT_EQUAL(static_cast<SolverConfiguration *>(&original_configuration),
+                         recording_solver_ptr->solver_configuration());
+    CPPUNIT_ASSERT_EQUAL(static_cast<const std::vector<unsigned int> *>(nullptr),
+                         recording_solver_ptr->restricted_dofs);
+    CPPUNIT_ASSERT_EQUAL(2u, recording_solver_ptr->restriction_calls);
+    CPPUNIT_ASSERT_EQUAL(first_owned_solver, first.linear_solver.get());
+    CPPUNIT_ASSERT_EQUAL(second_owned_solver, second.linear_solver.get());
+    CPPUNIT_ASSERT_EQUAL(7u, second.n_linear_iterations());
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(0.125, second.final_linear_residual(), TOLERANCE);
+  }
+
+  void testLinearSolverSettingPrecedence()
+  {
+    LOG_UNIT_TEST;
+
+    RecordingLinearSolver solver(*TestCommWorld);
+    TestSolverConfiguration configuration;
+    configuration.real_valued_data["real"] = 2.;
+    configuration.int_valued_data["int"] = 20;
+    solver.set_solver_configuration(configuration);
+
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(1., solver.real_setting("real", 1., 3.), TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(2., solver.real_setting("real", std::nullopt, 3.), TOLERANCE);
+    CPPUNIT_ASSERT_DOUBLES_EQUAL(3., solver.real_setting("missing", std::nullopt, 3.), TOLERANCE);
+    CPPUNIT_ASSERT_EQUAL(10, solver.int_setting("int", 10, 30));
+    CPPUNIT_ASSERT_EQUAL(20, solver.int_setting("int", std::nullopt, 30));
+    CPPUNIT_ASSERT_EQUAL(30, solver.int_setting("missing", std::nullopt, 30));
+    CPPUNIT_ASSERT_THROW(solver.real_setting("missing", std::nullopt), libMesh::LogicError);
+    CPPUNIT_ASSERT_THROW(solver.int_setting("missing", std::nullopt), libMesh::LogicError);
+
+    solver.set_solver_configuration(nullptr);
+    CPPUNIT_ASSERT_EQUAL(static_cast<SolverConfiguration *>(nullptr),
+                         solver.solver_configuration());
+  }
+#endif // LIBMESH_HAVE_SOLVER
+
   void tripleValueTest (const Point & p,
                         const TransientExplicitSystem & sys,
                         const PointLocatorBase & locator,

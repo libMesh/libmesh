@@ -25,6 +25,7 @@
 
 // C++ includes
 #include <cstddef>
+#include <optional>
 
 namespace libMesh
 {
@@ -33,7 +34,32 @@ namespace libMesh
 // Forward Declarations
 template <typename T> class LinearSolver;
 template <typename T> class ShellMatrix;
+class SolverConfiguration;
 
+/**
+ * Per-call options for LinearImplicitSystem::solve().
+ */
+struct LinearImplicitSystemSolveOptions
+{
+  /**
+   * Solver to use for this call.  A null pointer selects the solver
+   * owned by the system.  The caller retains ownership of a borrowed
+   * solver and must keep it alive for the duration of the call.
+   */
+  LinearSolver<Number> * solver = nullptr;
+
+  /**
+   * Configuration to attach for this call.  When non-null, the
+   * configuration supplies rel_tol, abs_tol, and max_its.
+   */
+  SolverConfiguration * solver_configuration = nullptr;
+
+  /**
+   * Per-call assembly policy.  An unset value uses the system's
+   * persistent assemble_before_solve setting.
+   */
+  std::optional<bool> assemble_before_solve;
+};
 
 /**
  * \brief Manages consistently variables, degrees of freedom, coefficient
@@ -126,6 +152,12 @@ public:
    * Assembles & solves the linear system A*x=b.
    */
   virtual void solve () override;
+
+  /**
+   * Optionally assembles and solves the linear system A*x=b using
+   * per-call solver options.
+   */
+  void solve(const LinearImplicitSystemSolveOptions & options);
 
   /**
    * \returns A pointer to a linear solver appropriate for use in
