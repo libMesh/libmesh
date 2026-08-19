@@ -2149,9 +2149,10 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
       switch (el_t)
         {
         case EDGE2:
-        case EDGE3:
         case EDGE4:
           return 3;
+        case EDGE3:
+          return unlimited;
         case TRI3:
         case TRISHELL3:
         case C0POLYGON:
