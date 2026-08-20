@@ -30,6 +30,7 @@ unit_tests_sources = \
   base/multi_evaluable_pred_test.C \
   fe/fe_bernstein_test.C \
   fe/fe_clough_test.C \
+  fe/fe_hdiv_grad_test.C \
   fe/fe_hermite_test.C \
   fe/fe_hierarchic_test.C \
   fe/inf_fe_radial_test.C \
