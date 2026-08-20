@@ -119,8 +119,10 @@ void transfer_elem(Elem & lo_elem,
   const unsigned int hon_end   = hi_elem->n_nodes();
 
   libmesh_assert_less (hon_begin, hon_end);
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
   libmesh_assert_less_equal
     (hon_end-hon_begin, max_new_nodes_per_elem);
+#endif
 
   for (unsigned int hon=hon_begin; hon<hon_end; hon++)
     {
