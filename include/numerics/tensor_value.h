@@ -22,6 +22,7 @@
 
 // Local includes
 #include "libmesh/type_tensor.h"
+#include "libmesh/libmesh_device.h"
 #include "libmesh/libmesh.h" // for pi
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
@@ -93,12 +94,14 @@ public:
    * Constructor.  Takes 1 row vector for LIBMESH_DIM=1
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   TensorValue (const TypeVector<T2> & vx);
 
   /**
    * Constructor.  Takes 2 row vectors for LIBMESH_DIM=2
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   TensorValue (const TypeVector<T2> & vx,
                const TypeVector<T2> & vy);
 
@@ -106,6 +109,7 @@ public:
    * Constructor.  Takes 3 row vectors for LIBMESH_DIM=3
    */
   template <typename T2>
+  LIBMESH_DEVICE_INLINE
   TensorValue (const TypeVector<T2> & vx,
                const TypeVector<T2> & vy,
                const TypeVector<T2> & vz);
@@ -134,11 +138,11 @@ public:
                const TypeTensor<Real> & p_im);
 #endif
 
-
   /**
    * Assignment-from-scalar operator.  Used only to zero out tensors.
    */
   template <typename Scalar>
+  LIBMESH_DEVICE_INLINE
   typename std::enable_if<
     ScalarTraits<Scalar>::value,
     TensorValue &>::type
@@ -211,7 +215,7 @@ typedef NumberTensorValue   Tensor;
 //------------------------------------------------------
 // Inline functions
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TensorValue<T>::TensorValue () :
   TypeTensor<T> ()
 {
@@ -220,7 +224,7 @@ TensorValue<T>::TensorValue () :
 
 
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TensorValue<T>::TensorValue (const T & xx,
                              const T & xy,
                              const T & xz,
@@ -237,7 +241,7 @@ TensorValue<T>::TensorValue (const T & xx,
 
 template <typename T>
 template <typename Scalar>
-inline
+LIBMESH_DEVICE_INLINE
 TensorValue<T>::TensorValue (const Scalar & xx,
                              const Scalar & xy,
                              const Scalar & xz,
@@ -257,7 +261,7 @@ TensorValue<T>::TensorValue (const Scalar & xx,
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TensorValue<T>::TensorValue (const TensorValue<T2> & p) :
   TypeTensor<T> (p)
 {
@@ -267,7 +271,7 @@ TensorValue<T>::TensorValue (const TensorValue<T2> & p) :
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TensorValue<T>::TensorValue (const TypeVector<T2> & vx) :
   TypeTensor<T> (vx)
 {
@@ -277,7 +281,7 @@ TensorValue<T>::TensorValue (const TypeVector<T2> & vx) :
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TensorValue<T>::TensorValue (const TypeVector<T2> & vx,
                              const TypeVector<T2> & vy) :
   TypeTensor<T> (vx, vy)
@@ -288,7 +292,7 @@ TensorValue<T>::TensorValue (const TypeVector<T2> & vx,
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TensorValue<T>::TensorValue (const TypeVector<T2> & vx,
                              const TypeVector<T2> & vy,
                              const TypeVector<T2> & vz) :
@@ -300,7 +304,7 @@ TensorValue<T>::TensorValue (const TypeVector<T2> & vx,
 
 template <typename T>
 template <typename T2>
-inline
+LIBMESH_DEVICE_INLINE
 TensorValue<T>::TensorValue (const TypeTensor<T2> & p) :
   TypeTensor<T> (p)
 {
@@ -309,7 +313,7 @@ TensorValue<T>::TensorValue (const TypeTensor<T2> & p) :
 
 #ifdef LIBMESH_USE_COMPLEX_NUMBERS
 template <typename T>
-inline
+LIBMESH_DEVICE_INLINE
 TensorValue<T>::TensorValue (const TypeTensor<Real> & p_re,
                              const TypeTensor<Real> & p_im) :
   TypeTensor<T> (Complex (p_re(0,0), p_im(0,0)),

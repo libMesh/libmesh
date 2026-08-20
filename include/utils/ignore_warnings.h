@@ -102,6 +102,8 @@
 #pragma GCC diagnostic ignored "-Wcast-function-type"
 #pragma GCC diagnostic ignored "-Wdeprecated-copy"
 #pragma GCC diagnostic ignored "-Wclass-memaccess"
+// Ignore warnings from Kokkos passing printf formats through char *
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
 #endif // __GNUC__ && !__INTEL_COMPILER
 
