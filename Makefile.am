@@ -8,13 +8,6 @@ ACLOCAL_AMFLAGS  = -I m4 -I m4/autoconf-submodule
 AM_CFLAGS        = $(libmesh_CFLAGS)
 AM_LDFLAGS       = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
 
-# We might have turned on -Werror and/or paranoid warnings
-CXXFLAGS_DBG += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
-CXXFLAGS_DEVEL += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
-CXXFLAGS_OPROF += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
-CXXFLAGS_OPT += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
-CXXFLAGS_PROF += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
-
 # We need to set the no-undefined flag for linking
 # with libtool, because Windows requires all shared
 # libraries to include all used symbols. This flag
@@ -43,6 +36,17 @@ AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
                    $(libmesh_contrib_INCLUDES) \
                    $(libmesh_optional_INCLUDES) \
                    -I$(top_builddir)/include # required for libmesh_version.h
+
+# We might have turned on -Werror and/or paranoid warnings.  We need
+# this to be done in CPPFLAGS, not CXXFLAGS, because the latter gets
+# sent to the linker too, and if we're doing Link-Time Optimization
+# (which my g++ 15 seems to do by default!) with third-party
+# dependency libraries (e.g. PETSc-provided BLAS for me) we can't
+# trust that their code will be warning-free.
+#
+# Ideally we'd somehow leave -Werror on for our own objects but not
+# others.  I don't know how to do that.
+AM_CPPFLAGS     += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
 
 LIBS             = $(libmesh_optional_LIBS) $(libmesh_precision_LIBS)
 
