@@ -1,6 +1,13 @@
 #ifndef KOKKOS_NUMERICS_ORACLE_TEST_UTILS_H
 #define KOKKOS_NUMERICS_ORACLE_TEST_UTILS_H
 
+// Shared plumbing for the Kokkos numerics oracle tests: uploading test
+// data to the device and comparing device-computed results against
+// host-computed references.  The comparison helpers mirror device data
+// back to the host and return a count of components outside tolerance
+// (rather than asserting), so the runners can aggregate failures across
+// suites and report them all in one run.
+
 #include "libmesh/libmesh.h"
 
 // Avoid conflicting complex operators between CUDA and PETSc
@@ -21,6 +28,9 @@ namespace KokkosOracle
 
 using libMesh::Real;
 
+// Copies a host vector of plain objects into a new device view, for
+// test inputs that don't go through the gpu/ storage-policy views
+// (e.g. the per-case leading dims in the tensor suite).
 template <typename T>
 inline ::Kokkos::View<T *>
 upload_objects(const std::vector<T> & values, const char * label)
@@ -32,6 +42,12 @@ upload_objects(const std::vector<T> & values, const char * label)
   ::Kokkos::deep_copy(d, h);
   return d;
 }
+
+// The compare_device_* helpers below deep-copy the device results to a
+// host mirror and count individual components that differ from the
+// reference by more than tol; boolean results are encoded as 1.0/0.0
+// scalars by the kernels so a single tolerance comparison covers
+// everything.
 
 inline int
 compare_device_scalars(const ::Kokkos::View<double *> & d_values,

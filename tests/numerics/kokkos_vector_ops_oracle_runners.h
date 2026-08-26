@@ -1,6 +1,19 @@
 #ifndef KOKKOS_VECTOR_OPS_ORACLE_RUNNERS_H
 #define KOKKOS_VECTOR_OPS_ORACLE_RUNNERS_H
 
+// Device-side runners for the Kokkos vector-ops oracle tests, plus a
+// host-only trait check.  Each device test uploads its fixture data,
+// launches a kernel that evaluates the vector algebra in device code -
+// mostly through storage-backed refs - then mirrors the results back
+// and compares them against the host oracle (see
+// kokkos_vector_ops_oracle_fixtures.h for the strategy and the result
+// ordering contract).
+//
+// The kernels use parallel_for over a single index: the goal is to
+// validate the algebra's semantics in device code, not its
+// performance, and one thread computing every result keeps the
+// store-order contract with the host oracle trivial.
+
 #include "kokkos_vector_ops_oracle_fixtures.h"
 
 #include <cstdio>
@@ -10,6 +23,13 @@ namespace libMeshTest
 namespace KokkosVectorOracle
 {
 
+// Runs the vector-algebra sweep for one (a, b, c) input triple: each
+// quantity the host oracle records, recomputed in device code (often
+// through a differently-spelled expression - the host's compound
+// assignments and add_scaled() calls become plain ref arithmetic
+// here) and stored in the oracle's order.  The kernel's offset
+// assertions (active in asserting builds) check the device-side
+// counts; build_host_oracle() has matching asserts for the host side.
 template <typename StoragePolicy, typename Vec>
 static int
 test_vector_ops_case(const vector_case & info)
@@ -142,6 +162,11 @@ run_vector_cases(const char * suite_name)
   return fail;
 }
 
+// Compile-time trait checks with no device analogue: MetaPhysicL's
+// ReplaceAlgebraicType combined with TensorTools::IncrementRank must
+// map TypeVector and VectorValue containers to the matching tensor
+// containers.  Evaluated as constexpr bools so a regression shows up
+// as a test failure rather than a build error.
 inline int
 test_vector_host_only_traits()
 {
@@ -170,6 +195,13 @@ test_vector_host_only_traits()
   return fail;
 }
 
+// The point of this test is mixing representations inside one
+// expression: a device ref on one side of an operator and an
+// independent host-built owning value (captured into the lambda) on
+// the other - with the ref on the left in some expressions (a_ref + b)
+// and on the right in others (a - b_ref).  test_vector_ops_case()
+// pairs its refs with each other or with values derived from them, so
+// it hits these combinations only incidentally.
 template <typename StoragePolicy, typename Vec>
 static int
 test_mixed_representation_ops()
@@ -264,6 +296,10 @@ test_mixed_representation_ops()
   return fail;
 }
 
+// Runs the device suites under both storage layouts and with both
+// TypeVector and VectorValue, so a layout- or type-specific
+// regression can't hide behind the default configuration; the
+// host-only trait checks run once at the end.
 inline int
 run_all_oracles()
 {

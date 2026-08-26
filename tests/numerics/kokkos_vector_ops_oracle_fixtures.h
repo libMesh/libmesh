@@ -1,6 +1,22 @@
 #ifndef KOKKOS_VECTOR_OPS_ORACLE_FIXTURES_H
 #define KOKKOS_VECTOR_OPS_ORACLE_FIXTURES_H
 
+// Fixtures for the Kokkos vector-ops oracle tests.
+//
+// The oracle strategy: build_host_oracle() computes every result with
+// the established host implementations (the owning types' operators
+// plus free functions like solid_angle()), and the runner's device
+// kernel recomputes the same quantities with the gpu/ operations -
+// mostly through Kokkos storage-backed refs, with some (like the solid
+// angles) using owning values built on the device.  Agreement within
+// tolerance validates the gpu/ algebra against the host algebra.
+//
+// The host and device sides communicate only through result *position*:
+// build_host_oracle() pushes results in a fixed order and the kernel in
+// kokkos_vector_ops_oracle_runners.h stores its results in the same
+// order, with the expected counts asserted on both sides.  When adding
+// a result, update both sides and the count constants together.
+
 #include "libmesh/libmesh.h"
 #include "libmesh/tensor_value.h"
 #include "libmesh/type_vector.h"
@@ -22,14 +38,20 @@ namespace KokkosVectorOracle
 using libMesh::Real;
 
 static constexpr double tol = 2.0e-13;
+// Threshold below which a cross product is too short to normalize.
 static constexpr double unit_tol = 1.0e-14;
+// For the icosahedron-vertex solid angle case below.
 static constexpr Real golden_ratio = 1.6180339887498948482;
+// Result counts grow with LIBMESH_DIM: higher dimensions unlock more
+// solid angle configurations, and cross products only exist in 3D.
 static constexpr unsigned int solid_angle_results =
   1 + ((LIBMESH_DIM > 1) ? 2u : 0u) + ((LIBMESH_DIM > 2) ? 4u : 0u);
 static constexpr unsigned int vector_results =
   11 + ((LIBMESH_DIM > 2) ? 2u : 0u);
 static constexpr unsigned int scalar_results = 12 + solid_angle_results;
 
+// Builds a Vec from up-to-3 components, quietly dropping the ones
+// beyond LIBMESH_DIM so the same fixture data works in 1D/2D/3D builds.
 template <typename Vec>
 LIBMESH_DEVICE_INLINE
 Vec
@@ -47,6 +69,9 @@ make_vector(const Real x, const Real y = 0, const Real z = 0)
   return v;
 }
 
+// The host reference helpers solid_angle() and cross_norm_sq() take
+// TypeVector arguments, so these adapt whichever Vec the oracle is
+// instantiated with.
 inline libMesh::TypeVector<Real>
 as_type_vector(const libMesh::TypeVector<Real> & v)
 {
@@ -68,6 +93,8 @@ as_type_vector(const libMesh::VectorValue<Real> & v)
   );
 }
 
+// Host-computed reference results, in the fixed order the device
+// kernel must reproduce.
 template <typename Vec>
 struct host_oracle
 {
@@ -75,6 +102,9 @@ struct host_oracle
   std::vector<Real> scalars;
 };
 
+// One input triple (a, b, c) per case.  Components beyond LIBMESH_DIM
+// are zero, and each case is gated so e.g. a 1D build only exercises
+// collinear data.
 struct vector_case
 {
   const char * name;
@@ -98,6 +128,10 @@ static const vector_case cases[] = {
 #endif
 };
 
+// Computes the reference results with the owning types' own operators.
+// The device kernel in kokkos_vector_ops_oracle_runners.h evaluates the
+// equivalent (sometimes differently-spelled) ref expressions in the
+// same order.
 template <typename Vec>
 inline host_oracle<Vec>
 build_host_oracle(const Vec & a, const Vec & b, const Vec & c)
@@ -128,6 +162,10 @@ build_host_oracle(const Vec & a, const Vec & b, const Vec & c)
   accum.subtract_scaled(c, -0.25);
 
   const auto divided = a / 5.0;
+
+  // The device side computes these as scalar products (5.0 * a_ref and
+  // a_ref * 5.0); for real scalars the vector/scalar outer_product() is
+  // the same thing, so it doubles as the host reference.
   const auto outer_right = libMesh::outer_product(a, 5.0);
   const auto outer_left = libMesh::outer_product(5.0, a);
 
@@ -152,6 +190,8 @@ build_host_oracle(const Vec & a, const Vec & b, const Vec & c)
   result.vectors.push_back(mult_assign);
   result.vectors.push_back(div_assign);
 
+  // a * b appears twice because the kernel records the dot product both
+  // via operator* and via vector_dot().
   result.scalars.push_back(a * b);
   result.scalars.push_back(a * b);
   result.scalars.push_back(a.contract(b));
@@ -165,6 +205,9 @@ build_host_oracle(const Vec & a, const Vec & b, const Vec & c)
   result.scalars.push_back((a != b) ? 1.0 : 0.0);
   result.scalars.push_back(assign_zero.is_zero() ? 1.0 : 0.0);
 
+  // Solid angle cases, from degenerate (all edges collinear) through
+  // planar to genuinely 3D configurations; the icosahedron-vertex case
+  // exercises a nontrivial angle with an analytically clean geometry.
   const auto xvec = make_vector<Vec>(1.3);
   result.scalars.push_back(libMesh::solid_angle(as_type_vector(xvec),
                                                 as_type_vector(xvec),
@@ -203,6 +246,9 @@ build_host_oracle(const Vec & a, const Vec & b, const Vec & c)
 #endif
 
 #if LIBMESH_DIM > 2
+  // unit() asserts on an exactly zero norm and normalizing a tiny one
+  // is numerically unstable, so skip normalizing when a and b are
+  // (nearly) parallel; the device side applies the same guard.
   const auto cross = a.cross(b);
   auto unit_cross = cross;
   if (cross.norm() > unit_tol)

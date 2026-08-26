@@ -1,6 +1,12 @@
 #ifndef KOKKOS_TENSOR_OPS_ORACLE_RUNNERS_H
 #define KOKKOS_TENSOR_OPS_ORACLE_RUNNERS_H
 
+// Device-side runners for the Kokkos tensor-ops oracle tests, plus the
+// linalg-foundation round-trip and host-only checks.  Same structure as
+// kokkos_vector_ops_oracle_runners.h: upload fixtures, evaluate the
+// algebra in a kernel - mostly through storage-backed refs - mirror
+// the results back, and count mismatches against the host references.
+
 #include "kokkos_tensor_ops_oracle_fixtures.h"
 
 #include <cmath>
@@ -11,6 +17,12 @@ namespace libMeshTest
 namespace KokkosTensorOracle
 {
 
+// Checks the leading-dim tensor operations: for each dim_case, the
+// kernel computes det(dim), inverse(dim), the dim-sized identity, and
+// the J * J^-1 / J^-1 * J products through refs, and the results must
+// match the independent host references.  This is the one runner whose
+// kernel is parallel over cases (one thread per case) since each case
+// is self-contained.
 template <typename StoragePolicy>
 static int
 test_dim_ops()
@@ -72,6 +84,11 @@ test_dim_ops()
          libMeshTest::KokkosOracle::compare_device_tensors(d_prod_right, ref_prod_right, tol);
 }
 
+// Full-dimension tensor algebra sweep: outer products, transpose,
+// scaled sums, tensor-vector products from both sides, rows/columns,
+// contraction, norm, and is_zero, each computed on the host with the
+// owning types and recomputed in device code (through refs, owning
+// values derived from them, and one default-constructed tensor).
 template <typename StoragePolicy>
 static int
 test_tensor_ops()
@@ -165,6 +182,11 @@ test_tensor_ops()
          libMeshTest::KokkosOracle::compare_device_scalars(d_scalars, ref_scalars, tol);
 }
 
+// Host-only tensor checks with no device analogue (yet): in 3D builds,
+// TypeTensor::is_hpd() on positive-definite and indefinite matrices
+// and TensorValue's extrinsic rotation matrices round-tripped through
+// their inverses; in every build, the MetaPhysicL rank-increment trait
+// mapping tensor containers to TypeNTensor containers.
 inline int
 test_tensor_host_only_ops()
 {
@@ -230,6 +252,13 @@ test_tensor_host_only_ops()
   return fail;
 }
 
+// Round-trips the storage/ref/materialize foundation in both
+// directions: known component values are written into raw views on the
+// host, materialized on the device into each owning type (Point,
+// VectorValue, TypeVector, TensorValue, TypeTensor) and checked
+// componentwise, then written back out through refs - assign() plus
+// zero-factor add_scaled()/subtract_scaled() calls, which must leave
+// the values untouched - and verified again on the host.
 template <typename StoragePolicy>
 static int
 test_linalg_foundation_storage_roundtrip()
@@ -334,6 +363,11 @@ test_linalg_foundation_storage_roundtrip()
   return fail;
 }
 
+// Re-runs several ref-based operations and, more importantly, pairs
+// refs with independent host-built owning values captured into the
+// lambda (a_ref + b, A_ref == A, A_ref + ref_transpose, ...) -
+// mixed-representation combinations the tests above hit only
+// incidentally through their owning intermediates.
 template <typename StoragePolicy>
 static int
 test_mixed_representation_ops()
@@ -422,6 +456,9 @@ test_mixed_representation_ops()
   return fail;
 }
 
+// Runs the device suites under both storage layouts, so a
+// layout-specific regression can't hide behind the default layout;
+// the host-only checks run once.
 inline int
 run_all_oracles()
 {

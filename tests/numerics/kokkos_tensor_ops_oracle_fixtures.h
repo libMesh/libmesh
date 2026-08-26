@@ -1,6 +1,12 @@
 #ifndef KOKKOS_TENSOR_OPS_ORACLE_FIXTURES_H
 #define KOKKOS_TENSOR_OPS_ORACLE_FIXTURES_H
 
+// Fixtures for the Kokkos tensor-ops oracle tests: input data plus
+// host-side reference implementations.  As with the vector oracle, the
+// runners recompute each quantity on the device through Kokkos
+// storage-backed refs and compare against these host references (see
+// kokkos_vector_ops_oracle_fixtures.h for the overall strategy).
+
 #include "libmesh/libmesh.h"
 #include "libmesh/point.h"
 #include "libmesh/tensor_value.h"
@@ -26,6 +32,10 @@ static constexpr double tol = 2.0e-13;
 
 using oracle_vector = libMesh::TypeVector<Real>;
 using oracle_tensor = libMesh::TypeTensor<Real>;
+
+// The make_host_* builders below take up-to-3D data and quietly drop
+// components beyond LIBMESH_DIM, so the same fixtures serve 1D/2D/3D
+// builds.
 
 inline oracle_vector
 make_host_vector(const Real x, const Real y = 0, const Real z = 0)
@@ -71,6 +81,11 @@ make_host_tensor(const Real xx,
   return T;
 }
 
+// Each case pairs a full tensor with the leading block size its
+// det()/inverse() calls should act on, checking that only the leading
+// dim x dim block participates in those operations.  In the cases
+// where dim < LIBMESH_DIM, the trailing rows/columns are nonzero on
+// purpose: they must not leak into a leading-block result.
 struct tensor_dim_case
 {
   oracle_tensor J;
@@ -109,6 +124,11 @@ build_identity_tensor(const unsigned int dim)
     I(i, i) = Real(1);
   return I;
 }
+
+// Host references for the leading-block determinant and inverse:
+// closed forms for dim 1 and 2, and delegation to the trusted
+// TypeTensor::det()/inverse() for the dim == 3 case - where the gpu/
+// implementations under test use their own closed forms instead.
 
 inline Real
 host_leading_determinant(const oracle_tensor & J, const unsigned int dim)
