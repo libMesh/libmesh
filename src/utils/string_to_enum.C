@@ -81,7 +81,6 @@ build_reverse_map (const MapType & forward)
 std::map<std::string, ElemType> elem_type_to_enum {
    {"EDGE"           , EDGE2},
    {"EDGE2"          , EDGE2},
-   {"EDGE2"          , EDGE2},
    {"EDGE3"          , EDGE3},
    {"EDGE4"          , EDGE4},
 
