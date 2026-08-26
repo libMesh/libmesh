@@ -190,7 +190,7 @@ void assert_semiverify_dofobj(const Parallel::Communicator & communicator,
       libmesh_assert(communicator.semiverify(&n_comp));
       libmesh_assert(communicator.semiverify(&first_dof));
     }
-  else
+  else // ranks w/o a DofObject d must still perform matching calls to the semiverify() collective
     {
       const unsigned int * p_ui = nullptr;
       const std::vector<unsigned int> * p_vui = nullptr;
