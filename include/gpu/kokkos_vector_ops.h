@@ -1,12 +1,47 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2026 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#ifndef LIBMESH_KOKKOS_VECTOR_OPS_H
+#define LIBMESH_KOKKOS_VECTOR_OPS_H
+
 // libMesh Kokkos generic vector operations.
 //
 // These free functions build vector algebra on top of the primitive
 // access/materialization layer in kokkos_linalg_base.h. They are written
 // against vector-like inputs so both libMesh owning types and storage-backed
 // refs can participate in the same math.
-
-#ifndef LIBMESH_KOKKOS_VECTOR_OPS_H
-#define LIBMESH_KOKKOS_VECTOR_OPS_H
+//
+// The header is organized as:
+//
+// - construction/materialization helpers (copy_vector),
+// - detail:: componentwise kernels shared by everything below,
+// - reductions, geometry helpers, and libMesh-like wrappers, and
+// - the out-of-line vector_ref definitions and the operator overloads.
+//
+// The operator overloads are constrained (via is_vector_ref_v) to
+// require at least one storage-backed ref operand: expressions between
+// two owning vectors keep using the operators those types already
+// define, while vector-only expressions involving a ref resolve here
+// (mixed vector/tensor products live in kokkos_tensor_ops.h).
+//
+// Functions taking an optional ResultVector template parameter return
+// the input's semantic type (e.g. TypeVector) by default, but a caller
+// can request a different owning type explicitly, e.g.
+// vector_cross<Point>(a, b).
 
 #include "libmesh/kokkos_linalg_base.h"
 
@@ -19,6 +54,12 @@ namespace libMesh::Kokkos
 
 // Construction and materialization
 
+/**
+ * \returns An owning copy of the vector-like \p v: by default a value
+ * of \p v 's semantic type, or of \p ResultVector if that parameter is
+ * given explicitly.  This is how a kernel snapshots a storage-backed
+ * ref's current value for register-resident work.
+ */
 template <typename ResultVector = void, typename VectorLike>
 LIBMESH_DEVICE_INLINE
 auto copy_vector(const VectorLike & v)
@@ -38,6 +79,9 @@ namespace detail
 // These helpers are shared by the public functions and ref operators so
 // Kokkos-backed refs use direct component access without extra materialization.
 
+/**
+ * Componentwise copy: left = right.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 void assign_vector_components(LeftVector & left, const RightVector & right)
@@ -46,6 +90,9 @@ void assign_vector_components(LeftVector & left, const RightVector & right)
     left(component) = right(component);
 }
 
+/**
+ * Sets every component of \p v to \p value.
+ */
 template <typename VectorLike, typename Scalar>
 LIBMESH_DEVICE_INLINE
 void fill_vector_components(VectorLike & v, const Scalar & value)
@@ -54,6 +101,9 @@ void fill_vector_components(VectorLike & v, const Scalar & value)
     v(component) = value;
 }
 
+/**
+ * Componentwise axpy-style update: left += factor * right.
+ */
 template <typename LeftVector, typename RightVector, typename Scalar>
 LIBMESH_DEVICE_INLINE
 void update_vector_components(LeftVector & left, const RightVector & right, const Scalar & factor)
@@ -62,6 +112,10 @@ void update_vector_components(LeftVector & left, const RightVector & right, cons
     left(component) = left(component) + factor * right(component);
 }
 
+/**
+ * Componentwise transform: out(i) = op(in(i)).  \p out and \p in may
+ * alias, as they do in the compound assignment operators below.
+ */
 template <typename OutputVector, typename InputVector, typename TransformOp>
 LIBMESH_DEVICE_INLINE
 void transform_vector_components(OutputVector & out, const InputVector & in, const TransformOp & op)
@@ -70,6 +124,9 @@ void transform_vector_components(OutputVector & out, const InputVector & in, con
     out(component) = op(in(component));
 }
 
+/**
+ * \returns A new owning \p ResultVector with components op(v(i)).
+ */
 template <typename ResultVector, typename VectorLike, typename TransformOp>
 LIBMESH_DEVICE_INLINE
 ResultVector transformed_vector(const VectorLike & v, const TransformOp & op)
@@ -80,6 +137,10 @@ ResultVector transformed_vector(const VectorLike & v, const TransformOp & op)
   return out;
 }
 
+/**
+ * \returns \p true if \p left and \p right agree exactly in every
+ * component, \p false otherwise.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 bool vector_equal_impl(const LeftVector & left, const RightVector & right)
@@ -91,6 +152,13 @@ bool vector_equal_impl(const LeftVector & left, const RightVector & right)
   return true;
 }
 
+/**
+ * Componentwise transform functors, shared by the vector helpers here
+ * and the tensor helpers in kokkos_tensor_ops.h.  scale_value and
+ * divide_value hold their scalar by reference, so they must not
+ * outlive it; both headers only ever build and consume them within a
+ * single expression.
+ */
 template <typename ValueType>
 struct negate_value
 {
@@ -141,8 +209,12 @@ struct divide_value
 
 } // namespace detail
 
-// Reductions and predicates
+// Reductions and normalization
 
+/**
+ * \returns The dot product of \p left and \p right, in whatever type
+ * their componentwise products sum to.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto vector_dot(const LeftVector & left, const RightVector & right)
@@ -161,6 +233,10 @@ auto vector_dot(const LeftVector & left, const RightVector & right)
 }
 
 
+/**
+ * \returns An owning unit vector in the direction of \p v.  Asserts
+ * (in debug modes) that \p v is not the zero vector.
+ */
 template <typename ResultVector = void, typename VectorLike>
 LIBMESH_DEVICE_INLINE
 auto vector_unit(const VectorLike & v)
@@ -178,6 +254,14 @@ auto vector_unit(const VectorLike & v)
 
 // Geometry
 
+/**
+ * \returns The cross product of \p left and \p right, as an owning
+ * vector.
+ *
+ * \note The result is only nonzero when LIBMESH_DIM == 3; in lower
+ * dimensions the zero vector is returned, without the debug-mode
+ * assertion TypeVector::cross() performs.
+ */
 template <typename ResultVector = void, typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto vector_cross(const LeftVector & left, const RightVector & right)
@@ -203,6 +287,11 @@ auto vector_cross(const LeftVector & left, const RightVector & right)
   return out;
 }
 
+/**
+ * \returns The scalar triple product left . (middle x right), i.e. the
+ * signed volume of the parallelepiped the three vectors span (zero
+ * unless LIBMESH_DIM == 3).
+ */
 template <typename LeftVector, typename MiddleVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto vector_triple_product(const LeftVector & left,
@@ -221,6 +310,11 @@ auto vector_triple_product(const LeftVector & left,
 #endif
 }
 
+/**
+ * \returns |left x right|^2, computed without the extra temporary a
+ * cross().norm_sq() chain would create, mirroring cross_norm_sq() in
+ * type_vector.h.  In 2D only the out-of-plane component contributes.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto vector_cross_norm_sq(const LeftVector & left, const RightVector & right)
@@ -236,6 +330,13 @@ auto vector_cross_norm_sq(const LeftVector & left, const RightVector & right)
 #endif
 }
 
+/**
+ * \returns The solid angle subtended by a tetrahedral vertex, as
+ * defined by the edge vectors \p v01, \p v02, \p v03 - positive if
+ * the vectors obey the right-hand rule, negative for a left-hand
+ * orientation.  Computed by Van Oosterom and Strackee's formula,
+ * mirroring the solid_angle() free function in type_vector.h.
+ */
 template <typename VectorA, typename VectorB, typename VectorC>
 LIBMESH_DEVICE_INLINE
 auto vector_solid_angle(const VectorA & v01, const VectorB & v02, const VectorC & v03)
@@ -257,6 +358,10 @@ auto vector_solid_angle(const VectorA & v01, const VectorB & v02, const VectorC 
 
 // libMesh-like convenience wrappers
 
+/**
+ * \returns The dot product of \p left and \p right; a synonym for
+ * vector_dot() matching the TypeVector::contract() name.
+ */
 template <typename LeftVector,
           typename RightVector,
           typename std::enable_if<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector>,
@@ -267,6 +372,9 @@ auto contract(const LeftVector & left, const RightVector & right)
   return vector_dot(left, right);
 }
 
+
+// Forward declarations of the compound assignment operators, which the
+// vector_ref member definitions below delegate to.
 
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
@@ -281,6 +389,11 @@ auto operator-=(LeftVector & left, const RightVector & right)
   -> std::enable_if_t<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector> &&
                         (is_vector_ref_v<LeftVector> || is_vector_ref_v<RightVector>),
                       LeftVector &>;
+
+// Out-of-line vector_ref member definitions.  Several delegate to the
+// generic operations above or the operators below, so the whole group
+// lives here rather than in kokkos_linalg_base.h; see the class
+// definition for their documentation.
 
 template <typename ViewType>
 template <typename RightVector>
@@ -349,6 +462,7 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::norm_sq() const
 {
+  // TensorTools::norm_sq handles complex-valued components correctly.
   using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq((*this)(0)))>;
 
   norm_type sum = norm_type(0);
@@ -399,7 +513,17 @@ auto vector_ref<ViewType>::cross(const RightVector & right) const
 }
 
 // Operator-compatible wrappers for storage-backed refs and mixed ref/owning math.
+//
+// Every overload requires at least one vector_ref operand (via
+// is_vector_ref_v), so these never compete with the operators the
+// owning types define for themselves.  Vector-valued results are
+// returned as owning values (sums and differences use the left
+// operand's semantic type); compound assignments update the left
+// operand in place, writing through to storage when it is a ref.
 
+/**
+ * \returns The negative of the vector-like \p v, as an owning vector.
+ */
 template <typename VectorLike>
 LIBMESH_DEVICE_INLINE
 auto operator-(const VectorLike & v)
@@ -411,6 +535,9 @@ auto operator-(const VectorLike & v)
     detail::negate_value<typename VectorLike::value_type>{});
 }
 
+/**
+ * \returns The sum of \p left and \p right, as an owning vector.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto operator+(const LeftVector & left, const RightVector & right)
@@ -423,6 +550,9 @@ auto operator+(const LeftVector & left, const RightVector & right)
   return out;
 }
 
+/**
+ * \returns The difference of \p left and \p right, as an owning vector.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto operator-(const LeftVector & left, const RightVector & right)
@@ -435,6 +565,10 @@ auto operator-(const LeftVector & left, const RightVector & right)
   return out;
 }
 
+/**
+ * \returns The dot product of \p left and \p right, matching the
+ * TypeVector convention that vector * vector is a dot product.
+ */
 template <typename LeftVector,
           typename RightVector,
           typename std::enable_if<is_vector_like_v<LeftVector> && is_vector_like_v<RightVector> &&
@@ -446,6 +580,10 @@ auto operator*(const LeftVector & left, const RightVector & right)
   return vector_dot(left, right);
 }
 
+/**
+ * \returns The vector-like \p v scaled by \p alpha, as an owning
+ * vector.  The scalar may appear on either side of the product.
+ */
 template <typename Scalar,
           typename VectorLike,
           typename std::enable_if<!is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar> &&
@@ -470,6 +608,10 @@ auto operator*(const VectorLike & v, const Scalar & alpha)
     detail::scale_value<Scalar>{alpha});
 }
 
+/**
+ * \returns The vector-like \p v divided (componentwise) by the scalar
+ * \p alpha, as an owning vector.
+ */
 template <typename VectorLike,
           typename Scalar,
           typename std::enable_if<is_vector_like_v<VectorLike> && is_vector_ref_v<VectorLike> &&
@@ -483,6 +625,12 @@ auto operator/(const VectorLike & v, const Scalar & alpha)
     detail::divide_value<Scalar>{alpha});
 }
 
+/**
+ * \returns \p true if \p left and \p right agree in every component,
+ * \p false otherwise.  Each component is compared with exact
+ * operator==, matching TypeVector::operator==; this is not a
+ * tolerance-based floating-point comparison.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto operator==(const LeftVector & left, const RightVector & right)
@@ -493,6 +641,10 @@ auto operator==(const LeftVector & left, const RightVector & right)
   return detail::vector_equal_impl(left, right);
 }
 
+/**
+ * \returns \p true if \p left and \p right differ in any component,
+ * \p false otherwise.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto operator!=(const LeftVector & left, const RightVector & right)
@@ -503,6 +655,10 @@ auto operator!=(const LeftVector & left, const RightVector & right)
   return !(left == right);
 }
 
+/**
+ * Adds \p right to \p left in place; when \p left is a ref, the update
+ * writes through to the underlying storage.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto operator+=(LeftVector & left, const RightVector & right)
@@ -514,6 +670,9 @@ auto operator+=(LeftVector & left, const RightVector & right)
   return left;
 }
 
+/**
+ * Subtracts \p right from \p left in place.
+ */
 template <typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto operator-=(LeftVector & left, const RightVector & right)
@@ -525,6 +684,9 @@ auto operator-=(LeftVector & left, const RightVector & right)
   return left;
 }
 
+/**
+ * Scales \p left by \p alpha in place.
+ */
 template <typename LeftVector, typename Scalar>
 LIBMESH_DEVICE_INLINE
 auto operator*=(LeftVector & left, const Scalar & alpha)
@@ -536,6 +698,9 @@ auto operator*=(LeftVector & left, const Scalar & alpha)
   return left;
 }
 
+/**
+ * Divides \p left by \p alpha in place.
+ */
 template <typename LeftVector, typename Scalar>
 LIBMESH_DEVICE_INLINE
 auto operator/=(LeftVector & left, const Scalar & alpha)

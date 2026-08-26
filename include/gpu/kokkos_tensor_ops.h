@@ -1,12 +1,48 @@
+// The libMesh Finite Element Library.
+// Copyright (C) 2002-2026 Benjamin S. Kirk, John W. Peterson, Roy H. Stogner
+
+// This library is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public
+// License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+
+// This library is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// Lesser General Public License for more details.
+
+// You should have received a copy of the GNU Lesser General Public
+// License along with this library; if not, write to the Free Software
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+#ifndef LIBMESH_KOKKOS_TENSOR_OPS_H
+#define LIBMESH_KOKKOS_TENSOR_OPS_H
+
 // libMesh Kokkos generic tensor operations.
 //
 // These free functions build tensor algebra on top of the primitive
 // access/materialization layer in kokkos_linalg_base.h. They are written
 // against tensor-like and vector-like inputs so both libMesh owning types and
 // storage-backed refs can participate in the same math.
-
-#ifndef LIBMESH_KOKKOS_TENSOR_OPS_H
-#define LIBMESH_KOKKOS_TENSOR_OPS_H
+//
+// The header is organized like kokkos_vector_ops.h:
+//
+// - construction/materialization helpers (tensor_identity, copy_tensor),
+// - detail:: componentwise kernels shared by everything below,
+// - libMesh-like wrappers (contract, transpose, det, inverse, ...), and
+// - the out-of-line tensor_ref definitions and the operator overloads.
+//
+// As in the vector case, the operator overloads are constrained (via
+// is_tensor_ref_v / is_vector_ref_v) to require at least one
+// storage-backed ref operand, so expressions between owning types keep
+// using the operators those types already define.
+//
+// Functions taking an optional ResultTensor/ResultVector template
+// parameter pick a default owning result type - the input's semantic
+// type for copy_tensor/transpose/inverse, a plain TypeTensor or
+// TypeVector of the input's component type for outer_product/row/
+// column - but a caller can request a different owning type
+// explicitly, e.g. inverse<TensorValue<Real>>(T).
 
 #include "libmesh/kokkos_linalg_base.h"
 #include "libmesh/kokkos_vector_ops.h"
@@ -20,6 +56,10 @@ namespace libMesh::Kokkos
 
 // Construction and materialization
 
+/**
+ * \returns An owning \p ResultTensor whose leading \p dim x \p dim
+ * block is the identity and whose remaining components are zero.
+ */
 template <typename ResultTensor>
 LIBMESH_DEVICE_INLINE
 ResultTensor tensor_identity(const unsigned int dim = LIBMESH_DIM)
@@ -33,6 +73,12 @@ ResultTensor tensor_identity(const unsigned int dim = LIBMESH_DIM)
   return out;
 }
 
+/**
+ * \returns An owning copy of the tensor-like \p T_in: by default a
+ * value of \p T_in 's semantic type, or of \p ResultTensor if that
+ * parameter is given explicitly.  This is how a kernel snapshots a
+ * storage-backed ref's current value for register-resident work.
+ */
 template <typename ResultTensor = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto copy_tensor(const TensorLike & T_in)
@@ -52,6 +98,11 @@ namespace detail
 // These helpers are shared by the public functions and ref operators so
 // Kokkos-backed refs use direct component access without extra materialization.
 
+/**
+ * \returns The determinant of the leading \p dim x \p dim block of
+ * \p T_in, expanded in closed form for dim <= 3.  A 0x0 determinant is
+ * 1 by convention.
+ */
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
 typename TensorLike::value_type
@@ -90,6 +141,11 @@ leading_determinant(const TensorLike & T_in, const unsigned int dim = LIBMESH_DI
 #endif
 }
 
+/**
+ * \returns The outer product left * conj(right)^T as an owning
+ * \p ResultTensor, conjugating the right operand as the host-side
+ * outer_product() free function in type_tensor.h does.
+ */
 template <typename ResultTensor, typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 ResultTensor outer_product(const LeftVector & left, const RightVector & right)
@@ -104,6 +160,11 @@ ResultTensor outer_product(const LeftVector & left, const RightVector & right)
   return out;
 }
 
+/**
+ * \returns The inverse of the leading \p dim x \p dim block of \p T_in
+ * as an owning \p ResultTensor, computed from the closed-form adjugate
+ * for dim <= 3.  Components outside the leading block are zero.
+ */
 template <typename ResultTensor, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 ResultTensor inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
@@ -161,6 +222,9 @@ ResultTensor inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_D
   return out;
 }
 
+/**
+ * \returns The transpose of \p T_in as an owning \p ResultTensor.
+ */
 template <typename ResultTensor, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 ResultTensor transpose(const TensorLike & T_in)
@@ -177,6 +241,10 @@ ResultTensor transpose(const TensorLike & T_in)
 
 // Tensor/tensor product operators delegate here for the same direct-access path.
 
+/**
+ * \returns The matrix product left * right as an owning
+ * \p ResultTensor.
+ */
 template <typename ResultTensor, typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 ResultTensor multiply_tensors(const LeftTensor & left, const RightTensor & right)
@@ -196,6 +264,9 @@ ResultTensor multiply_tensors(const LeftTensor & left, const RightTensor & right
   return out;
 }
 
+/**
+ * \returns Row \p row_index of \p T_in as an owning \p ResultVector.
+ */
 template <typename ResultVector, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 ResultVector row(const TensorLike & T_in, const unsigned int row_index)
@@ -209,6 +280,10 @@ ResultVector row(const TensorLike & T_in, const unsigned int row_index)
   return out;
 }
 
+/**
+ * \returns Column \p col_index of \p T_in as an owning
+ * \p ResultVector.
+ */
 template <typename ResultVector, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 ResultVector column(const TensorLike & T_in, const unsigned int col_index)
@@ -224,6 +299,10 @@ ResultVector column(const TensorLike & T_in, const unsigned int col_index)
 
 // Tensor/vector and vector/tensor product operators keep the direct-access path too.
 
+/**
+ * \returns The matrix-vector product T_in * v as an owning
+ * \p ResultVector.
+ */
 template <typename ResultVector, typename TensorLike, typename VectorLike>
 LIBMESH_DEVICE_INLINE
 ResultVector multiply_tensor_vector(const TensorLike & T_in, const VectorLike & v)
@@ -242,6 +321,10 @@ ResultVector multiply_tensor_vector(const TensorLike & T_in, const VectorLike & 
   return out;
 }
 
+/**
+ * \returns The vector-matrix product v * T_in (i.e. T_in^T * v) as an
+ * owning \p ResultVector.
+ */
 template <typename ResultVector, typename VectorLike, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 ResultVector multiply_vector_tensor(const VectorLike & v, const TensorLike & T_in)
@@ -260,6 +343,9 @@ ResultVector multiply_vector_tensor(const VectorLike & v, const TensorLike & T_i
   return out;
 }
 
+/**
+ * Componentwise copy: left = right.
+ */
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 void assign_tensor_components(LeftTensor & left, const RightTensor & right)
@@ -269,6 +355,9 @@ void assign_tensor_components(LeftTensor & left, const RightTensor & right)
       left(row, col) = right(row, col);
 }
 
+/**
+ * Sets every component of \p T_in to \p value.
+ */
 template <typename TensorLike, typename Scalar>
 LIBMESH_DEVICE_INLINE
 void fill_tensor_components(TensorLike & T_in, const Scalar & value)
@@ -278,6 +367,9 @@ void fill_tensor_components(TensorLike & T_in, const Scalar & value)
       T_in(row, col) = value;
 }
 
+/**
+ * Componentwise axpy-style update: left += factor * right.
+ */
 template <typename LeftTensor, typename RightTensor, typename Scalar>
 LIBMESH_DEVICE_INLINE
 void update_tensor_components(LeftTensor & left, const RightTensor & right, const Scalar & factor)
@@ -287,6 +379,10 @@ void update_tensor_components(LeftTensor & left, const RightTensor & right, cons
       left(row, col) = left(row, col) + factor * right(row, col);
 }
 
+/**
+ * Componentwise transform: out(i,j) = op(in(i,j)).  \p out and \p in
+ * may alias, as they do in the compound assignment operators below.
+ */
 template <typename OutputTensor, typename InputTensor, typename TransformOp>
 LIBMESH_DEVICE_INLINE
 void transform_tensor_components(OutputTensor & out, const InputTensor & in, const TransformOp & op)
@@ -296,6 +392,9 @@ void transform_tensor_components(OutputTensor & out, const InputTensor & in, con
       out(row, col) = op(in(row, col));
 }
 
+/**
+ * \returns A new owning \p ResultTensor with components op(T_in(i,j)).
+ */
 template <typename ResultTensor, typename TensorLike, typename TransformOp>
 LIBMESH_DEVICE_INLINE
 ResultTensor transformed_tensor(const TensorLike & T_in, const TransformOp & op)
@@ -306,6 +405,10 @@ ResultTensor transformed_tensor(const TensorLike & T_in, const TransformOp & op)
   return out;
 }
 
+/**
+ * \returns \p true if \p left and \p right agree exactly in every
+ * component, \p false otherwise.
+ */
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 bool tensor_equal_impl(const LeftTensor & left, const RightTensor & right)
@@ -318,8 +421,12 @@ bool tensor_equal_impl(const LeftTensor & left, const RightTensor & right)
   return true;
 }
 
-// Tensor reductions and predicates
+// Tensor reductions
 
+/**
+ * \returns The full contraction (sum of componentwise products) of
+ * \p left with \p right.
+ */
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto tensor_contract(const LeftTensor & left, const RightTensor & right)
@@ -339,6 +446,9 @@ auto tensor_contract(const LeftTensor & left, const RightTensor & right)
 }
 
 
+/**
+ * \returns The trace of \p T_in.
+ */
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto tensor_trace(const TensorLike & T_in)
@@ -357,6 +467,10 @@ auto tensor_trace(const TensorLike & T_in)
 
 // libMesh-like convenience wrappers
 
+/**
+ * \returns The full contraction of \p left with \p right; the tensor
+ * overload of the contract() name shared with kokkos_vector_ops.h.
+ */
 template <typename LeftTensor,
           typename RightTensor,
           typename std::enable_if<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor>,
@@ -368,6 +482,11 @@ auto contract(const LeftTensor & left, const RightTensor & right)
 }
 
 
+/**
+ * \returns The outer product left * conj(right)^T of two vector-like
+ * inputs, as an owning tensor: by default a TypeTensor of the left
+ * operand's component type, or \p ResultTensor if given explicitly.
+ */
 template <typename ResultTensor = void, typename LeftVector, typename RightVector>
 LIBMESH_DEVICE_INLINE
 auto outer_product(const LeftVector & left, const RightVector & right)
@@ -382,6 +501,10 @@ auto outer_product(const LeftVector & left, const RightVector & right)
   return detail::outer_product<output_type>(left, right);
 }
 
+/**
+ * \returns The transpose of the tensor-like \p T_in, as an owning
+ * tensor.
+ */
 template <typename ResultTensor = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto transpose(const TensorLike & T_in)
@@ -396,6 +519,11 @@ auto transpose(const TensorLike & T_in)
   return detail::transpose<output_type>(T_in);
 }
 
+/**
+ * \returns The determinant of the tensor-like \p T_in, delegating to
+ * its det() member so owning types use TypeTensor::det() while refs
+ * use tensor_ref::det().
+ */
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto det(const TensorLike & T_in)
@@ -404,6 +532,10 @@ auto det(const TensorLike & T_in)
   return T_in.det();
 }
 
+/**
+ * \returns The inverse of the leading \p dim x \p dim block of the
+ * tensor-like \p T_in, as an owning tensor.
+ */
 template <typename ResultTensor = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
@@ -418,6 +550,11 @@ auto inverse(const TensorLike & T_in, const unsigned int dim = LIBMESH_DIM)
   return detail::inverse<output_type>(T_in, dim);
 }
 
+/**
+ * \returns Row \p i of the tensor-like \p T_in, as an owning vector:
+ * by default a TypeVector of \p T_in 's component type, or
+ * \p ResultVector if given explicitly.
+ */
 template <typename ResultVector = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto row(const TensorLike & T_in, const unsigned int i)
@@ -432,6 +569,10 @@ auto row(const TensorLike & T_in, const unsigned int i)
   return detail::row<output_type>(T_in, i);
 }
 
+/**
+ * \returns Column \p i of the tensor-like \p T_in, as an owning
+ * vector.
+ */
 template <typename ResultVector = void, typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto column(const TensorLike & T_in, const unsigned int i)
@@ -446,6 +587,9 @@ auto column(const TensorLike & T_in, const unsigned int i)
   return detail::column<output_type>(T_in, i);
 }
 
+// Forward declarations of the compound assignment operators, which the
+// tensor_ref member definitions below delegate to.
+
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto operator+=(LeftTensor & left, const RightTensor & right)
@@ -459,6 +603,11 @@ auto operator-=(LeftTensor & left, const RightTensor & right)
   -> std::enable_if_t<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor> &&
                         (is_tensor_ref_v<LeftTensor> || is_tensor_ref_v<RightTensor>),
                       LeftTensor &>;
+
+// Out-of-line tensor_ref member definitions.  Several delegate to the
+// generic operations above or the operators below, so the whole group
+// lives here rather than in kokkos_linalg_base.h; see the class
+// definition for their documentation.
 
 template <typename ViewType>
 template <typename RightTensor>
@@ -527,6 +676,7 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::norm_sq() const
 {
+  // TensorTools::norm_sq handles complex-valued components correctly.
   using norm_type = detail::remove_cvref_t<decltype(libMesh::TensorTools::norm_sq((*this)(0, 0)))>;
 
   norm_type sum = norm_type(0);
@@ -611,7 +761,17 @@ auto tensor_ref<ViewType>::left_multiply(const VectorLike & v) const
 }
 
 // Operator-compatible wrappers for storage-backed refs and mixed ref/owning math.
+//
+// Every overload requires at least one tensor_ref or vector_ref
+// operand, so these never compete with the operators the owning types
+// define for themselves.  Tensor- and vector-valued results are
+// returned as owning values; compound assignments update the left
+// operand in place, writing through to storage when it is a ref.
 
+/**
+ * \returns The negative of the tensor-like \p T_in, as an owning
+ * tensor.
+ */
 template <typename TensorLike>
 LIBMESH_DEVICE_INLINE
 auto operator-(const TensorLike & T_in)
@@ -623,6 +783,9 @@ auto operator-(const TensorLike & T_in)
     detail::negate_value<typename TensorLike::value_type>{});
 }
 
+/**
+ * \returns The sum of \p left and \p right, as an owning tensor.
+ */
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto operator+(const LeftTensor & left, const RightTensor & right)
@@ -635,6 +798,10 @@ auto operator+(const LeftTensor & left, const RightTensor & right)
   return out;
 }
 
+/**
+ * \returns The difference of \p left and \p right, as an owning
+ * tensor.
+ */
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto operator-(const LeftTensor & left, const RightTensor & right)
@@ -647,6 +814,10 @@ auto operator-(const LeftTensor & left, const RightTensor & right)
   return out;
 }
 
+/**
+ * \returns The tensor-like \p T_in scaled by \p alpha, as an owning
+ * tensor.  The scalar may appear on either side of the product.
+ */
 template <typename Scalar,
           typename TensorLike,
           typename std::enable_if<!is_vector_like_v<Scalar> && !is_tensor_like_v<Scalar> &&
@@ -671,6 +842,10 @@ auto operator*(const TensorLike & T_in, const Scalar & alpha)
     detail::scale_value<Scalar>{alpha});
 }
 
+/**
+ * \returns The tensor-like \p T_in divided (componentwise) by the
+ * scalar \p alpha, as an owning tensor.
+ */
 template <typename TensorLike, typename Scalar>
 LIBMESH_DEVICE_INLINE
 auto operator/(const TensorLike & T_in, const Scalar & alpha)
@@ -683,6 +858,10 @@ auto operator/(const TensorLike & T_in, const Scalar & alpha)
     detail::divide_value<Scalar>{alpha});
 }
 
+/**
+ * \returns The matrix product of \p left and \p right, as an owning
+ * tensor.
+ */
 template <typename LeftTensor,
           typename RightTensor,
           typename std::enable_if<is_tensor_like_v<LeftTensor> && is_tensor_like_v<RightTensor> &&
@@ -694,6 +873,9 @@ auto operator*(const LeftTensor & left, const RightTensor & right)
   return detail::multiply_tensors<tensor_semantic_type_t<LeftTensor>>(left, right);
 }
 
+/**
+ * \returns The matrix-vector product T_in * v, as an owning vector.
+ */
 template <typename TensorLike,
           typename VectorLike,
           typename std::enable_if<is_tensor_like_v<TensorLike> && is_vector_like_v<VectorLike> &&
@@ -705,6 +887,10 @@ auto operator*(const TensorLike & T_in, const VectorLike & v)
   return detail::multiply_tensor_vector<vector_semantic_type_t<VectorLike>>(T_in, v);
 }
 
+/**
+ * \returns The vector-matrix product v * T_in (i.e. T_in^T * v), as an
+ * owning vector.
+ */
 template <typename VectorLike,
           typename TensorLike,
           typename std::enable_if<is_vector_like_v<VectorLike> && is_tensor_like_v<TensorLike> &&
@@ -716,6 +902,14 @@ auto operator*(const VectorLike & v, const TensorLike & T_in)
   return detail::multiply_vector_tensor<vector_semantic_type_t<VectorLike>>(v, T_in);
 }
 
+/**
+ * \returns \p true if \p left and \p right agree in every component,
+ * \p false otherwise.  Each component is compared with exact
+ * operator==.  \note This is stricter than TypeTensor::operator==,
+ * which compares the summed componentwise differences against a
+ * component-count multiple of TOLERANCE; two tensors that the host
+ * operator calls equal may compare unequal here.
+ */
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto operator==(const LeftTensor & left, const RightTensor & right)
@@ -726,6 +920,10 @@ auto operator==(const LeftTensor & left, const RightTensor & right)
   return detail::tensor_equal_impl(left, right);
 }
 
+/**
+ * \returns \p true if \p left and \p right differ in any component,
+ * \p false otherwise.
+ */
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto operator!=(const LeftTensor & left, const RightTensor & right)
@@ -736,6 +934,10 @@ auto operator!=(const LeftTensor & left, const RightTensor & right)
   return !(left == right);
 }
 
+/**
+ * Adds \p right to \p left in place; when \p left is a ref, the update
+ * writes through to the underlying storage.
+ */
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto operator+=(LeftTensor & left, const RightTensor & right)
@@ -747,6 +949,9 @@ auto operator+=(LeftTensor & left, const RightTensor & right)
   return left;
 }
 
+/**
+ * Subtracts \p right from \p left in place.
+ */
 template <typename LeftTensor, typename RightTensor>
 LIBMESH_DEVICE_INLINE
 auto operator-=(LeftTensor & left, const RightTensor & right)
@@ -758,6 +963,9 @@ auto operator-=(LeftTensor & left, const RightTensor & right)
   return left;
 }
 
+/**
+ * Scales \p left by \p alpha in place.
+ */
 template <typename LeftTensor, typename Scalar>
 LIBMESH_DEVICE_INLINE
 auto operator*=(LeftTensor & left, const Scalar & alpha)
@@ -769,6 +977,9 @@ auto operator*=(LeftTensor & left, const Scalar & alpha)
   return left;
 }
 
+/**
+ * Divides \p left by \p alpha in place.
+ */
 template <typename LeftTensor, typename Scalar>
 LIBMESH_DEVICE_INLINE
 auto operator/=(LeftTensor & left, const Scalar & alpha)
