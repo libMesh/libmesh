@@ -7657,19 +7657,12 @@ CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
 CXXFLAGS = @CXXFLAGS@
-
-# We might have turned on -Werror and/or paranoid warnings
-CXXFLAGS_DBG = @CXXFLAGS_DBG@ $(ACSM_ANY_WERROR_FLAG) \
-	$(ACSM_ANY_PARANOID_FLAGS)
-CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@ $(ACSM_ANY_WERROR_FLAG) \
-	$(ACSM_ANY_PARANOID_FLAGS)
+CXXFLAGS_DBG = @CXXFLAGS_DBG@
+CXXFLAGS_DEVEL = @CXXFLAGS_DEVEL@
 CXXFLAGS_DVL = @CXXFLAGS_DVL@
-CXXFLAGS_OPROF = @CXXFLAGS_OPROF@ $(ACSM_ANY_WERROR_FLAG) \
-	$(ACSM_ANY_PARANOID_FLAGS)
-CXXFLAGS_OPT = @CXXFLAGS_OPT@ $(ACSM_ANY_WERROR_FLAG) \
-	$(ACSM_ANY_PARANOID_FLAGS)
-CXXFLAGS_PROF = @CXXFLAGS_PROF@ $(ACSM_ANY_WERROR_FLAG) \
-	$(ACSM_ANY_PARANOID_FLAGS)
+CXXFLAGS_OPROF = @CXXFLAGS_OPROF@
+CXXFLAGS_OPT = @CXXFLAGS_OPT@
+CXXFLAGS_PROF = @CXXFLAGS_PROF@
 CXXSHAREDFLAG = @CXXSHAREDFLAG@
 CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
@@ -7991,11 +7984,20 @@ TAR_OPTIONS = --hard-dereference
 # we use when compiling libmesh proper, or its utility
 # codes.  These will be augmented with method-specific
 # cppflags later on
-AM_CPPFLAGS = -DLIBMESH_IS_COMPILING_ITSELF \
-                   $(libmesh_contrib_INCLUDES) \
-                   $(libmesh_optional_INCLUDES) \
-                   -I$(top_builddir)/include # required for libmesh_version.h
 
+# We might have turned on -Werror and/or paranoid warnings.  We need
+# this to be done in CPPFLAGS, not CXXFLAGS, because the latter gets
+# sent to the linker too, and if we're doing Link-Time Optimization
+# (which my g++ 15 seems to do by default!) with third-party
+# dependency libraries (e.g. PETSc-provided BLAS for me) we can't
+# trust that their code will be warning-free.
+#
+# Ideally we'd somehow leave -Werror on for our own objects but not
+# others.  I don't know how to do that.
+AM_CPPFLAGS = -DLIBMESH_IS_COMPILING_ITSELF \
+	$(libmesh_contrib_INCLUDES) $(libmesh_optional_INCLUDES) \
+	-I$(top_builddir)/include $(ACSM_ANY_WERROR_FLAG) \
+	$(ACSM_ANY_PARANOID_FLAGS)
 
 # additional files which must be included in 'make dist'
 EXTRA_DIST = reference_elements \
