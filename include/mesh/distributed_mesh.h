@@ -470,6 +470,26 @@ protected:
 private:
 
   /**
+   * Derives _next_free_local_node_id, _next_free_local_elem_id,
+   * _next_free_unpartitioned_node_id, and _next_free_unpartitioned_elem_id
+   * from the current _max_node_id and _max_elem_id, interleaving ids among
+   * processors so that each processor (and the unpartitioned pool) has its
+   * own reserved slot in every repeating group of n_processors()+1 ids.
+   */
+  void set_next_ids();
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  /**
+   * Derives _next_unique_id and _next_unpartitioned_unique_id from
+   * \p parallel_max_unique_id, the largest unique id currently in use (or
+   * any other value guaranteed to be at least that large, such as a
+   * trusted next_unique_id()), using the same processor-interleaved id
+   * ranges as set_next_ids().
+   */
+  void set_next_unique_ids(unique_id_type parallel_max_unique_id);
+#endif
+
+  /**
    * Typedefs for the container implementation.
    */
   typedef dofobject_container<Elem>::veclike_iterator             elem_iterator_imp;
