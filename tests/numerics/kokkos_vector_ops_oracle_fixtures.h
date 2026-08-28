@@ -38,7 +38,7 @@ namespace KokkosVectorOracle
 using libMesh::Real;
 
 static constexpr double tol = 2.0e-13;
-// Threshold below which a cross product is too short to normalize.
+
 static constexpr double unit_tol = 1.0e-14;
 // For the icosahedron-vertex solid angle case below.
 static constexpr Real golden_ratio = 1.6180339887498948482;
@@ -130,7 +130,7 @@ static const vector_case cases[] = {
 
 // Computes the reference results with the owning types' own operators.
 // The device kernel in kokkos_vector_ops_oracle_runners.h evaluates the
-// equivalent (sometimes differently-spelled) ref expressions in the
+// equivalent ref expressions in the
 // same order.
 template <typename Vec>
 inline host_oracle<Vec>

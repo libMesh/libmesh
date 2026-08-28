@@ -46,7 +46,7 @@ upload_objects(const std::vector<T> & values, const char * label)
 // The compare_device_* helpers below deep-copy the device results to a
 // host mirror and count individual components that differ from the
 // reference by more than tol; boolean results are encoded as 1.0/0.0
-// scalars by the kernels so a single tolerance comparison covers
+// by the kernels so a single tolerance comparison covers
 // everything.
 
 inline int
