@@ -80,6 +80,20 @@ AC_DEFUN([LIBMESH_SET_METHODS],
  CXXFLAGS_OPROF="$CXXFLAGS_OPROF $SANITIZE_OPROF_FLAGS"
  CFLAGS_OPROF="$CFLAGS_OPROF $SANITIZE_OPROF_FLAGS"
 
+ # -------------------------------------------------------------
+ # Choose between TBB, OpenMP, and pthreads thread models.
+ # The user can control this by configuring with
+ #
+ # --with-thread-model={tbb,pthread,auto,none}
+ #
+ # where "auto" will try to automatically detect the best possible
+ # version (see threads.m4).
+ #
+ # We do this here so that any openmp flags will get added to CFLAGS
+ # and CXXFLAGS before we AC_SUBST them.
+ # -------------------------------------------------------------
+ ACX_BEST_THREAD
+
  dnl conditionally compile selected methods
  for method in ${METHODS}; do
      AS_CASE("${method}",

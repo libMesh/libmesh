@@ -23,6 +23,7 @@
 #include "libmesh/libmesh_config.h"
 
 #include "libmesh/libmesh_abort.h"
+#include "libmesh/libmesh_device.h"
 
 #include <stdexcept>
 #include <string>
@@ -217,14 +218,24 @@ public:
 #ifdef LIBMESH_ENABLE_EXCEPTIONS
 #define libmesh_noexcept noexcept
 
+#if LIBMESH_IN_DEVICE_CODE
+// Kokkos device code does not support C++ exceptions.
+#define LIBMESH_THROW(e) do { LIBMESH_DEVICE_ERROR_MSG((e).what()); } while (0)
+#else
 #define LIBMESH_THROW(e) do { throw e; } while (0)
+#endif
+
 #define libmesh_rethrow throw
 #define libmesh_try try
 #define libmesh_catch(e) catch(e)
 
 #else
 
+#if LIBMESH_IN_DEVICE_CODE
+#define LIBMESH_THROW(e) do { LIBMESH_DEVICE_ERROR_MSG((e).what()); } while (0)
+#else
 #define LIBMESH_THROW(e) do { libMesh::err << e.what(); libMesh::libmesh_abort(); } while (0)
+#endif
 #define libmesh_rethrow
 #define libmesh_try
 #define libmesh_catch(e) if (0)
