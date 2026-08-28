@@ -908,6 +908,17 @@ inline
 auto TypeVector<T>::norm() const
 {
   using std::sqrt;
+
+  // The norm is not differentiable at the origin: the directional
+  // derivative there depends on the direction of approach, so there is no
+  // well-defined gradient, and computing sqrt(norm_sq()) directly would
+  // divide by zero in the derivative terms of AD types. We return a zero
+  // derivative in this case, consistent with the MetaPhysicL convention for
+  // other functions with the same kind of non-differentiable point (e.g.
+  // abs()).
+  if (this->is_zero())
+    return decltype(sqrt(this->norm_sq())){};
+
   return sqrt(this->norm_sq());
 }
 
@@ -942,6 +953,47 @@ auto TypeVector<T>::norm_sq() const
           TensorTools::norm_sq(_coords[2]));
 #endif
 }
+
+// float, double, and long double have no derivatives to regularize, and
+// sqrt(0) is already exactly 0 for them, so skip the zero check in the
+// generic norm() above for these scalar types to avoid the extra branch in
+// the common case.
+template <>
+inline
+auto TypeVector<float>::norm() const
+{
+  using std::sqrt;
+  return sqrt(this->norm_sq());
+}
+
+template <>
+inline
+auto TypeVector<double>::norm() const
+{
+  using std::sqrt;
+  return sqrt(this->norm_sq());
+}
+
+template <>
+inline
+auto TypeVector<long double>::norm() const
+{
+  using std::sqrt;
+  return sqrt(this->norm_sq());
+}
+
+#ifdef LIBMESH_DEFAULT_QUADRUPLE_PRECISION
+// In quadruple precision builds Real is a distinct type from float, double,
+// and long double, so it needs its own specialization to get the same
+// unbranched treatment as the other scalar types above.
+template <>
+inline
+auto TypeVector<Real>::norm() const
+{
+  using std::sqrt;
+  return sqrt(this->norm_sq());
+}
+#endif
 
 
 template <typename T>

@@ -4,6 +4,10 @@
 
 #include <type_traits>
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+#include <metaphysicl/dualnumber.h>
+#endif
+
 
 using namespace libMesh;
 
@@ -142,7 +146,63 @@ public:
 };
 
 
+#ifdef LIBMESH_HAVE_METAPHYSICL
+class ADVectorValueTest : public CppUnit::TestCase {
+public:
+  LIBMESH_CPPUNIT_TEST_SUITE( ADVectorValueTest );
+
+  CPPUNIT_TEST( testNormAtZeroDerivative );
+  CPPUNIT_TEST( testNormDerivative );
+
+  CPPUNIT_TEST_SUITE_END();
+
+private:
+  typedef MetaPhysicL::DualNumber<Real> ADReal;
+
+public:
+  void testNormAtZeroDerivative()
+  {
+    LOG_UNIT_TEST;
+
+    VectorValue<ADReal> avector(ADReal(0, 1));
+#if LIBMESH_DIM > 1
+    avector(1) = ADReal(0, 1);
+#endif
+#if LIBMESH_DIM > 2
+    avector(2) = ADReal(0, 1);
+#endif
+
+    const ADReal result = avector.norm();
+
+    LIBMESH_ASSERT_FP_EQUAL( Real(0), result.value(), TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_FP_EQUAL( Real(0), result.derivatives(), TOLERANCE*TOLERANCE );
+  }
+
+  void testNormDerivative()
+  {
+    LOG_UNIT_TEST;
+
+    VectorValue<ADReal> avector(ADReal(1, 1));
+#if LIBMESH_DIM > 1
+    avector(1) = ADReal(1, 1);
+#endif
+#if LIBMESH_DIM > 2
+    avector(2) = ADReal(1, 1);
+#endif
+
+    const ADReal result = avector.norm();
+
+    LIBMESH_ASSERT_FP_EQUAL( std::sqrt(Real(LIBMESH_DIM)), result.value(), TOLERANCE*TOLERANCE );
+    LIBMESH_ASSERT_FP_EQUAL( std::sqrt(Real(LIBMESH_DIM)), result.derivatives(), TOLERANCE*TOLERANCE );
+  }
+};
+#endif // LIBMESH_HAVE_METAPHYSICL
+
+
 CPPUNIT_TEST_SUITE_REGISTRATION( RealVectorValueTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( NumberVectorValueTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( ComplexVectorValueTest );
 CPPUNIT_TEST_SUITE_REGISTRATION( VectorCompareTypesTest );
+#ifdef LIBMESH_HAVE_METAPHYSICL
+CPPUNIT_TEST_SUITE_REGISTRATION( ADVectorValueTest );
+#endif
