@@ -721,7 +721,7 @@ Real DenseVector<T>::linfty_norm () const
 #else
   return libmesh_transform_reduce
     (_val.begin(), _val.end(), Real(0),
-     [](auto a, auto b){using std::max; return max(a,b);},
+     [](const auto & a, const auto & b){using std::max; return max(a,b);},
      [](const T & v){using std::abs; return abs(v);});
 #endif
 }
