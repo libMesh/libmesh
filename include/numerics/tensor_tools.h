@@ -81,22 +81,22 @@ T norm(std::complex<T> a) { using std::abs; return abs(a); }
 template <typename T>
 LIBMESH_DEVICE_INLINE
 auto norm(const TypeVector<T> & a) -> decltype(TensorTools::norm(T()))
-{using std::sqrt; return sqrt(a.norm_sq());}
+{return a.norm();}
 
 template <typename T>
 LIBMESH_DEVICE_INLINE
 auto norm(const VectorValue<T> & a) -> decltype(TensorTools::norm(T()))
-{using std::sqrt; return sqrt(a.norm_sq());}
+{return a.norm();}
 
 template <typename T>
 LIBMESH_DEVICE_INLINE
 auto norm(const TypeTensor<T> & a) -> decltype(TensorTools::norm(T()))
-{using std::sqrt; return sqrt(a.norm_sq());}
+{return a.norm();}
 
 template <typename T>
 LIBMESH_DEVICE_INLINE
 auto norm(const TensorValue<T> & a) -> decltype(TensorTools::norm(T()))
-{using std::sqrt; return sqrt(a.norm_sq());}
+{return a.norm();}
 
 
 template<typename T>
