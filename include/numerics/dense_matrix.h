@@ -24,6 +24,7 @@
 #include "libmesh/libmesh_common.h"
 #include "libmesh/dense_matrix_base.h"
 #include "libmesh/int_range.h"
+#include "libmesh/parallel_algorithms.h"
 
 // For the definition of PetscBLASInt.
 #if (LIBMESH_HAVE_PETSC)
@@ -42,9 +43,9 @@
 #endif
 
 // C++ includes
-#include <vector>
 #include <algorithm>
 #include <initializer_list>
+#include <vector>
 
 #ifdef LIBMESH_HAVE_METAPHYSICL
 #include "metaphysicl/dualnumber_decl.h"
@@ -565,6 +566,62 @@ public:
   T det();
 
   /**
+   * Returns true iff every entry is finite.
+   */
+  friend bool isfinite (const DenseMatrix<T> & var)
+  {
+    using std::isfinite;
+    using libMesh::isfinite; // for T==complex
+    for (const T & v : var._val)
+      if (!isfinite(v))
+        return false;
+    return true;
+  }
+
+  /**
+   * Returns true iff no entry is NaN and any entry is infinite.
+   *
+   * This is arguably inconsistent with our std::complex overload (and
+   * the C99 Annex G recommendations for _Complex, and C++
+   * std::complex arithmetic), which treats mixed (inf,NaN) pairs as
+   * infinite, but this is probably safer for users.
+   */
+  friend bool isinf (const DenseMatrix<T> & var)
+  {
+    using std::isinf;
+    using libMesh::isinf; // for T==complex
+    using std::isnan;
+    using libMesh::isnan;
+    bool has_inf = false;
+    for (const T & v : var._val)
+      {
+        // NaN anywhere makes us NaN, not inf
+        if (isnan(v))
+          return false;
+        has_inf = has_inf || isinf(v);
+      }
+    return has_inf;
+  }
+
+  /**
+   * Returns true iff any entry is NaN.
+   *
+   * This is arguably inconsistent with our std::complex overload (and
+   * the C99 Annex G recommendations for _Complex, and C++
+   * std::complex arithmetic), which treats mixed (inf,NaN) pairs as
+   * infinite, but this is probably safer for users.
+   */
+  friend bool isnan (const DenseMatrix<T> & var)
+  {
+    using std::isnan;
+    using libMesh::isnan; // for T==complex
+    for (const T & v : var._val)
+      if (isnan(v))
+        return true;
+    return false;
+  }
+
+  /**
    * Computes the inverse of the dense matrix (assuming it is invertible)
    * by first computing the LU decomposition and then performing multiple
    * back substitution steps.  Follows the algorithm from Numerical Recipes
@@ -864,8 +921,9 @@ template<typename T>
 inline
 void DenseMatrix<T>::swap(DenseMatrix<T> & other_matrix)
 {
-  std::swap(this->_m, other_matrix._m);
-  std::swap(this->_n, other_matrix._n);
+  using std::swap;
+  swap(this->_m, other_matrix._m);
+  swap(this->_n, other_matrix._n);
   _val.swap(other_matrix._val);
   DecompositionType _temp = _decomposition_type;
   _decomposition_type = other_matrix._decomposition_type;
@@ -1084,17 +1142,11 @@ auto DenseMatrix<T>::min () const -> decltype(libmesh_real(T(0)))
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
-  auto my_min = libmesh_real((*this)(0,0));
-
-  for (unsigned int i=0; i!=this->_m; i++)
-    {
-      for (unsigned int j=0; j!=this->_n; j++)
-        {
-          auto current = libmesh_real((*this)(i,j));
-          my_min = (my_min < current? my_min : current);
-        }
-    }
-  return my_min;
+  typedef decltype(libmesh_real(T(0))) realfromT;
+  return libmesh_transform_reduce
+    (_val.begin(), _val.end(), std::numeric_limits<realfromT>::max(),
+     [](const auto & a, const auto & b){using std::min; return min(a,b);},
+     [](const T & v){return libmesh_real(v);});
 }
 
 
@@ -1105,17 +1157,11 @@ auto DenseMatrix<T>::max () const -> decltype(libmesh_real(T(0)))
 {
   libmesh_assert (this->_m);
   libmesh_assert (this->_n);
-  auto my_max = libmesh_real((*this)(0,0));
-
-  for (unsigned int i=0; i!=this->_m; i++)
-    {
-      for (unsigned int j=0; j!=this->_n; j++)
-        {
-          auto current = libmesh_real((*this)(i,j));
-          my_max = (my_max > current? my_max : current);
-        }
-    }
-  return my_max;
+  typedef decltype(libmesh_real(T(0))) realfromT;
+  return libmesh_transform_reduce
+    (_val.begin(), _val.end(), std::numeric_limits<realfromT>::lowest(),
+     [](const auto & a, const auto & b){using std::max; return max(a,b);},
+     [](const T & v){return libmesh_real(v);});
 }
 
 
@@ -1216,70 +1262,6 @@ T DenseMatrix<T>::transpose (const unsigned int i,
 //   rhs(iv) = val;
 
 // }
-
-
-// A matrix is finite iff every component is
-template <typename T>
-bool isfinite (const DenseMatrix<T> & var)
-{
-  using std::isfinite;
-  using libMesh::isfinite; // for T==complex
-  const auto m = var.m(), n = var.n();
-  for (auto i : make_range(m))
-    for (auto j : make_range(n))
-      if (!isfinite(var(i,j)))
-        return false;
-  return true;
-}
-
-
-// A matrix is infinite iff some component is infinite but no
-// component is NaN.
-//
-// This is arguably inconsistent with our std::complex overload (and
-// the C99 Annex G recommendations for _Complex, and C++ std::complex
-// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
-// this is probably safer for users.
-template <typename T>
-bool isinf (const DenseMatrix<T> & var)
-{
-  using std::isinf;
-  using libMesh::isinf; // for T==complex
-  using std::isnan;
-  using libMesh::isnan;
-  const auto m = var.m(), n = var.n();
-  bool has_inf = false;
-  for (auto i : make_range(m))
-    for (auto j : make_range(n))
-      {
-        // NaN anywhere makes us NaN, not inf
-        if (isnan(var(i,j)))
-          return false;
-        has_inf = has_inf || isinf(var(i,j));
-      }
-  return has_inf;
-}
-
-
-
-// A matrix is NaN iff some component is NaN
-//
-// This is arguably inconsistent with our std::complex overload (and
-// the C99 Annex G recommendations for _Complex, and C++ std::complex
-// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
-// this is probably safer for users.
-template <typename T>
-bool isnan (const DenseMatrix<T> & var)
-{
-  using std::isnan;
-  using libMesh::isnan; // for T==complex
-  const auto m = var.m(), n = var.n();
-  for (auto i : make_range(m))
-    for (auto j : make_range(n))
-      if (isnan(var(i,j)))
-        return true;
-  return false;
-}
 
 
 } // namespace libMesh

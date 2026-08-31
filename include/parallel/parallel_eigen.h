@@ -28,8 +28,10 @@
 
 #ifdef LIBMESH_HAVE_EIGEN
 
-// libEigen includes
+// libEigen includes, avoiding warnings triggered by some versions
+#include "libmesh/ignore_warnings.h"
 #include <Eigen/Core>
+#include "libmesh/restore_warnings.h"
 
 namespace libMesh
 {

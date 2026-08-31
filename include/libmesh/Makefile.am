@@ -307,6 +307,7 @@ BUILT_SOURCES = \
         libmesh_call_mpi.h \
         parallel.h \
         parallel_algebra.h \
+        parallel_algorithms.h \
         parallel_bin_sorter.h \
         parallel_conversion_utils.h \
         parallel_eigen.h \
@@ -1527,6 +1528,9 @@ parallel.h: $(top_srcdir)/include/parallel/parallel.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_algebra.h: $(top_srcdir)/include/parallel/parallel_algebra.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+parallel_algorithms.h: $(top_srcdir)/include/parallel/parallel_algorithms.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 parallel_bin_sorter.h: $(top_srcdir)/include/parallel/parallel_bin_sorter.h

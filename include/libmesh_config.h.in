@@ -343,6 +343,9 @@
 /* Flag indicating whether compiler supports std::*::merge */
 #undef HAVE_CXX17_SPLICING
 
+/* Flag indicating whether compiler supports std::transform_reduce */
+#undef HAVE_CXX17_TRANSFORM_REDUCE
+
 /* define if the compiler supports basic C++20 syntax */
 #undef HAVE_CXX20
 

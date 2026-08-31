@@ -314,6 +314,7 @@ include_HEADERS =  \
         parallel/libmesh_call_mpi.h \
         parallel/parallel.h \
         parallel/parallel_algebra.h \
+        parallel/parallel_algorithms.h \
         parallel/parallel_bin_sorter.h \
         parallel/parallel_eigen.h \
         parallel/parallel_elem.h \

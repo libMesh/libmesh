@@ -22,9 +22,10 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
-#include "libmesh/dense_vector_base.h"
 #include "libmesh/compare_types.h"
+#include "libmesh/dense_vector_base.h"
 #include "libmesh/int_range.h"
+#include "libmesh/parallel_algorithms.h"
 #include "libmesh/tensor_tools.h"
 
 #ifdef LIBMESH_HAVE_EIGEN
@@ -38,8 +39,9 @@
 #endif
 
 // C++ includes
-#include <vector>
+#include <algorithm>
 #include <initializer_list>
+#include <vector>
 
 namespace libMesh
 {
@@ -294,6 +296,62 @@ public:
   typename std::vector<T>::const_iterator end() const { return _val.end(); }
   typename std::vector<T>::iterator end() { return _val.end(); }
 
+  /**
+   * Returns true iff every entry is finite.
+   */
+  friend bool isfinite (const DenseVector<T> & var)
+  {
+    using std::isfinite;
+    using libMesh::isfinite; // for T==complex
+    for (const T & v : var._val)
+      if (!isfinite(v))
+        return false;
+    return true;
+  }
+
+  /**
+   * Returns true iff no entry is NaN and any entry is infinite.
+   *
+   * This is arguably inconsistent with our std::complex overload (and
+   * the C99 Annex G recommendations for _Complex, and C++
+   * std::complex arithmetic), which treats mixed (inf,NaN) pairs as
+   * infinite, but this is probably safer for users.
+   */
+  friend bool isinf (const DenseVector<T> & var)
+  {
+    using std::isinf;
+    using libMesh::isinf; // for T==complex
+    using std::isnan;
+    using libMesh::isnan;
+    bool has_inf = false;
+    for (const T & v : var._val)
+      {
+        // NaN anywhere makes us NaN, not inf
+        if (isnan(v))
+          return false;
+        has_inf = has_inf || isinf(v);
+      }
+    return has_inf;
+  }
+
+  /**
+   * Returns true iff any entry is NaN.
+   *
+   * This is arguably inconsistent with our std::complex overload (and
+   * the C99 Annex G recommendations for _Complex, and C++
+   * std::complex arithmetic), which treats mixed (inf,NaN) pairs as
+   * infinite, but this is probably safer for users.
+   */
+  friend bool isnan (const DenseVector<T> & var)
+  {
+    using std::isnan;
+    using libMesh::isnan; // for T==complex
+    for (const T & v : var._val)
+      if (isnan(v))
+        return true;
+    return false;
+  }
+
 private:
 
   /**
@@ -332,13 +390,7 @@ DenseVector<T>::DenseVector (const DenseVector<T2> & other_vector) :
 {
   const std::vector<T2> & other_vals = other_vector.get_values();
 
-  _val.clear();
-
-  const int N = cast_int<int>(other_vals.size());
-  _val.reserve(N);
-
-  for (int i=0; i<N; i++)
-    _val.push_back(other_vals[i]);
+  _val.assign(other_vals.begin(), other_vals.end());
 }
 
 
@@ -368,15 +420,7 @@ inline
 DenseVector<T> & DenseVector<T>::operator = (const DenseVector<T2> & other_vector)
 {
   const std::vector<T2> & other_vals = other_vector.get_values();
-
-  _val.clear();
-
-  const int N = cast_int<int>(other_vals.size());
-  _val.reserve(N);
-
-  for (int i=0; i<N; i++)
-    _val.push_back(other_vals[i]);
-
+  _val.assign(other_vals.begin(), other_vals.end());
   return *this;
 }
 
@@ -452,9 +496,8 @@ template<typename T>
 inline
 void DenseVector<T>::scale (const T factor)
 {
-  const int N = cast_int<int>(_val.size());
-  for (int i=0; i<N; i++)
-    _val[i] *= factor;
+  for (auto & v : _val)
+    v *= factor;
 }
 
 
@@ -606,15 +649,11 @@ inline
 Real DenseVector<T>::min () const
 {
   libmesh_assert (this->size());
-  Real my_min = libmesh_real((*this)(0));
-
-  const int N = cast_int<int>(_val.size());
-  for (int i=1; i!=N; i++)
-    {
-      Real current = libmesh_real((*this)(i));
-      my_min = (my_min < current? my_min : current);
-    }
-  return my_min;
+  typedef decltype(libmesh_real(T(0))) realfromT;
+  return libmesh_transform_reduce
+    (_val.begin(), _val.end(), std::numeric_limits<realfromT>::max(),
+     [](const auto & a, const auto & b){using std::min; return min(a,b);},
+     [](const T & v){return libmesh_real(v);});
 }
 
 
@@ -624,15 +663,11 @@ inline
 Real DenseVector<T>::max () const
 {
   libmesh_assert (this->size());
-  Real my_max = libmesh_real((*this)(0));
-
-  const int N = cast_int<int>(_val.size());
-  for (int i=1; i!=N; i++)
-    {
-      Real current = libmesh_real((*this)(i));
-      my_max = (my_max > current? my_max : current);
-    }
-  return my_max;
+  typedef decltype(libmesh_real(T(0))) realfromT;
+  return libmesh_transform_reduce
+    (_val.begin(), _val.end(), std::numeric_limits<realfromT>::lowest(),
+     [](const auto & a, const auto & b){using std::max; return max(a,b);},
+     [](const T & v){return libmesh_real(v);});
 }
 
 
@@ -647,12 +682,9 @@ Real DenseVector<T>::l1_norm () const
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).template lpNorm<1>();
 #else
-  Real my_norm = 0.;
-  const int N = cast_int<int>(_val.size());
-  for (int i=0; i!=N; i++)
-    my_norm += std::abs((*this)(i));
-
-  return my_norm;
+  return libmesh_transform_reduce
+    (_val.begin(), _val.end(), Real(0), std::plus<>(),
+     [](const T & v){using std::abs; return abs(v);});
 #endif
 }
 
@@ -668,17 +700,10 @@ Real DenseVector<T>::l2_norm () const
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).norm();
 #else
-  Real my_norm = 0.;
-  const int N = cast_int<int>(_val.size());
-  // The following pragma tells clang's vectorizer that it is safe to
-  // reorder floating point operations for this loop.
-#ifdef __clang__
-#pragma clang loop vectorize(enable)
-#endif
-  for (int i=0; i!=N; i++)
-    my_norm += TensorTools::norm_sq((*this)(i));
-
-  return sqrt(my_norm);
+  using std::sqrt;
+  return sqrt(libmesh_transform_reduce
+    (_val.begin(), _val.end(), Real(0), std::plus<>(),
+     [](const T & v){return TensorTools::norm_sq(v);}));
 #endif
 }
 
@@ -694,15 +719,10 @@ Real DenseVector<T>::linfty_norm () const
 #ifdef LIBMESH_HAVE_EIGEN
   return Eigen::Map<const typename Eigen::Matrix<T, Eigen::Dynamic, 1>>(_val.data(), _val.size()).template lpNorm<Eigen::Infinity>();
 #else
-  Real my_norm = TensorTools::norm_sq((*this)(0));
-
-  const int N = cast_int<int>(_val.size());
-  for (int i=1; i!=N; i++)
-    {
-      Real current = TensorTools::norm_sq((*this)(i));
-      my_norm = (my_norm > current? my_norm : current);
-    }
-  return sqrt(my_norm);
+  return libmesh_transform_reduce
+    (_val.begin(), _val.end(), Real(0),
+     [](const auto & a, const auto & b){using std::max; return max(a,b);},
+     [](const T & v){using std::abs; return abs(v);});
 #endif
 }
 
@@ -719,63 +739,6 @@ void DenseVector<T>::get_principal_subvector (unsigned int sub_n,
   const int N = cast_int<int>(sub_n);
   for (int i=0; i<N; i++)
     dest(i) = _val[i];
-}
-
-
-// A vector is finite iff every component is
-template <typename T>
-bool isfinite (const DenseVector<T> & var)
-{
-  using std::isfinite;
-  using libMesh::isfinite; // for T==complex
-  for (auto i : index_range(var))
-    if (!isfinite(var(i)))
-      return false;
-  return true;
-}
-
-
-// A vector is infinite iff some component is infinite but no
-// component is NaN.
-//
-// This is arguably inconsistent with our std::complex overload (and
-// the C99 Annex G recommendations for _Complex, and C++ std::complex
-// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
-// this is probably safer for users.
-template <typename T>
-bool isinf (const DenseVector<T> & var)
-{
-  using std::isinf;
-  using libMesh::isinf; // for T==complex
-  using std::isnan;
-  using libMesh::isnan;
-  bool has_inf = false;
-  for (auto i : index_range(var))
-    {
-      // NaN anywhere makes us NaN, not inf
-      if (isnan(var(i)))
-        return false;
-      has_inf = has_inf || isinf(var(i));
-    }
-  return has_inf;
-}
-
-
-// A vector is NaN iff some component is NaN
-//
-// This is arguably inconsistent with our std::complex overload (and
-// the C99 Annex G recommendations for _Complex, and C++ std::complex
-// arithmetic), which treats mixed (inf,NaN) pairs as infinite, but
-// this is probably safer for users.
-template <typename T>
-bool isnan (const DenseVector<T> & var)
-{
-  using std::isnan;
-  using libMesh::isnan; // for T==complex
-  for (auto i : index_range(var))
-    if (isnan(var(i)))
-      return true;
-  return false;
 }
 
 
