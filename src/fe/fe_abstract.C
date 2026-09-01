@@ -584,10 +584,10 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
     case PYRAMID18:
       {
         // triangle centers
-        nodes[14] = Point (-2/Real(3),0.,1/Real(3));
-        nodes[15] = Point (0.,2/Real(3),1/Real(3));
-        nodes[16] = Point (2/Real(3),0.,1/Real(3));
-        nodes[17] = Point (0.,-2/Real(3),1/Real(3));
+        nodes[14] = Point (0., -2/Real(3),1/Real(3));
+        nodes[15] = Point (2/Real(3),0.,1/Real(3));
+        nodes[16] = Point (0.,2/Real(3),1/Real(3));
+        nodes[17] = Point (-2/Real(3),0.,1/Real(3));
 
         libmesh_fallthrough();
       }
