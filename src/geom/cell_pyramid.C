@@ -33,7 +33,7 @@ const int Pyramid::num_sides;
 const int Pyramid::num_edges;
 const int Pyramid::num_children;
 
-const Real Pyramid::_master_points[14][3] =
+const Real Pyramid::_master_points[18][3] =
   {
     {-1, -1, 0},
     {1, -1, 0},
@@ -48,7 +48,11 @@ const Real Pyramid::_master_points[14][3] =
     {0.5, -0.5, 0.5},
     {0.5, 0.5, 0.5},
     {-0.5, 0.5, 0.5},
-    {0, 0, 0}
+    {0, 0, 0},
+    {0, -Real(2)/3, Real(1)/3},
+    { Real(2)/3, 0, Real(1)/3},
+    {0,  Real(2)/3, Real(1)/3},
+    {-Real(2)/3, 0, Real(1)/3}
   };
 
 const unsigned int Pyramid::edge_sides_map[8][2] =

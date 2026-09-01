@@ -211,7 +211,7 @@ protected:
   /**
    * Master element node locations
    */
-  static const Real _master_points[14][3];
+  static const Real _master_points[18][3];
 
 #ifdef LIBMESH_ENABLE_AMR
 
