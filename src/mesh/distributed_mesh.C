@@ -149,9 +149,24 @@ DistributedMesh::~DistributedMesh ()
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
 DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
-  DistributedMesh(static_cast<const MeshBase &>(other_mesh))
+  DistributedMesh(static_cast<const MeshBase &>(other_mesh),
+                  /*bool other_is_distributed_type=*/true)
 {
   _deleted_coarse_elements = other_mesh._deleted_coarse_elements;
+  _next_free_local_node_id =
+    other_mesh._next_free_local_node_id;
+  _next_free_local_elem_id =
+    other_mesh._next_free_local_elem_id;
+  _next_free_unpartitioned_node_id =
+    other_mesh._next_free_unpartitioned_node_id;
+  _next_free_unpartitioned_elem_id =
+    other_mesh._next_free_unpartitioned_elem_id;
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  _next_unique_id =
+    other_mesh._next_unique_id;
+  _next_unpartitioned_unique_id =
+    other_mesh._next_unpartitioned_unique_id;
+#endif
 
   // Need to copy extra_ghost_elems
   for (auto & elem : other_mesh._extra_ghost_elems)
@@ -160,7 +175,7 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
 
 
 
-DistributedMesh::DistributedMesh (const MeshBase & other_mesh) :
+DistributedMesh::DistributedMesh (const MeshBase & other_mesh, bool other_is_distributed_type) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
   _is_serial_on_proc_0(other_mesh.is_serial_on_zero()),
   _deleted_coarse_elements(true), // better safe than sorry...
@@ -199,27 +214,17 @@ DistributedMesh::DistributedMesh (const MeshBase & other_mesh) :
   _max_elem_id = other_mesh.max_elem_id();
 
   // If other_mesh is actually a DistributedMesh, we can just copy its raw
-  // counters directly, mirroring other_mesh's own bookkeeping exactly
-  if (const DistributedMesh * other_dist_mesh = dynamic_cast<const DistributedMesh *>(&other_mesh))
+  // counters directly, mirroring other_mesh's own bookkeeping exactly. This
+  // is done in the DistributedMesh copy constructor.
+  // For any other MeshBase subclass (e.g. ReplicatedMesh) we have no
+  // raw counterpart fields to copy, so derive the free-id-range
+  // counters from _max_elem_id/_max_node_id the same way
+  // update_parallel_id_counts() does via the set_next_ids() method. For
+  // the unique id counters we copy other_mesh's own local next_unique_id()
+  // and derive the next available unique ids
+  // (partitioned and unpartitioned) via set_next_unique_ids().
+  if (!other_is_distributed_type)
     {
-      _next_free_local_node_id = other_dist_mesh->_next_free_local_node_id;
-      _next_free_local_elem_id = other_dist_mesh->_next_free_local_elem_id;
-      _next_free_unpartitioned_node_id = other_dist_mesh->_next_free_unpartitioned_node_id;
-      _next_free_unpartitioned_elem_id = other_dist_mesh->_next_free_unpartitioned_elem_id;
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
-      _next_unique_id = other_dist_mesh->_next_unique_id;
-      _next_unpartitioned_unique_id = other_dist_mesh->_next_unpartitioned_unique_id;
-#endif
-    }
-  else
-    {
-      // For any other MeshBase subclass (e.g. ReplicatedMesh) we have no
-      // raw counterpart fields to copy, so derive the free-id-range
-      // counters from _max_elem_id/_max_node_id the same way
-      // update_parallel_id_counts() does via the set_next_ids() method. For
-      // the unique id counters we copy other_mesh's own local next_unique_id()
-      // and derive the next available unique ids
-      // (partitioned and unpartitioned) via set_next_unique_ids().
       this->set_next_ids();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
       libmesh_assert(other_mesh.comm().verify(other_mesh.next_unique_id()));
