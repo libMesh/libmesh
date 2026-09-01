@@ -54,6 +54,116 @@ PetscMatrixShellMatrix<T>::init(ParallelType libmesh_dbg_var(type))
   this->set_context();
 }
 
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::zero()
+{
+  libmesh_error();
+}
+
+template <typename T>
+std::unique_ptr<SparseMatrix<T>>
+PetscMatrixShellMatrix<T>::zero_clone() const
+{
+  libmesh_error();
+}
+
+template <typename T>
+std::unique_ptr<SparseMatrix<T>>
+PetscMatrixShellMatrix<T>::clone() const
+{
+  libmesh_not_implemented();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::set(const numeric_index_type, const numeric_index_type, const T)
+{
+  libmesh_error();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::add(const numeric_index_type, const numeric_index_type, const T)
+{
+  libmesh_error();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::add_matrix(const DenseMatrix<T> &,
+                                      const std::vector<numeric_index_type> &,
+                                      const std::vector<numeric_index_type> &)
+{
+  libmesh_error();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::add_matrix(const DenseMatrix<T> &,
+                                      const std::vector<numeric_index_type> &)
+{
+  libmesh_error();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::add(const T, const SparseMatrix<T> &)
+{
+  libmesh_error();
+}
+
+template <typename T>
+T
+PetscMatrixShellMatrix<T>::operator()(const numeric_index_type, const numeric_index_type) const
+{
+  libmesh_error();
+}
+
+template <typename T>
+Real
+PetscMatrixShellMatrix<T>::l1_norm() const
+{
+  libmesh_error();
+}
+
+template <typename T>
+Real
+PetscMatrixShellMatrix<T>::linfty_norm() const
+{
+  libmesh_error();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::print_personal(std::ostream &) const
+{
+  libmesh_error();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::get_diagonal(NumericVector<T> &) const
+{
+  libmesh_error();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::get_transpose(SparseMatrix<T> &) const
+{
+  libmesh_error();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::get_row(numeric_index_type,
+                                   std::vector<numeric_index_type> &,
+                                   std::vector<T> &) const
+{
+  libmesh_error();
+}
+
 template class LIBMESH_EXPORT PetscMatrixShellMatrix<Number>;
 
 } // namespace libMesh
