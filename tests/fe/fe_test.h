@@ -25,6 +25,7 @@
 
 #define FETEST                                  \
   CPPUNIT_TEST( testFEInterface );              \
+  CPPUNIT_TEST( testRefspaceNodes );            \
   CPPUNIT_TEST( testU );                        \
   CPPUNIT_TEST( testPartitionOfUnity );         \
   CPPUNIT_TEST( testGradU );                    \
@@ -667,6 +668,21 @@ public:
           }
 #endif // LIBMESH_ENABLE_EXCEPTIONS
   }
+
+  void testRefspaceNodes()
+    {
+      LOG_UNIT_TEST;
+
+      if (!this->_elem)
+        return;
+
+      std::vector<Point> nodes;
+      this->_fe->get_refspace_nodes(this->_elem->type(), nodes);
+      for (auto n : index_range(nodes))
+        LIBMESH_ASSERT_REALVEC_EQUAL(nodes[n],
+                                     this->_elem->master_point(n),
+                                     TOLERANCE*TOLERANCE);
+    }
 
   void testPartitionOfUnity()
     {

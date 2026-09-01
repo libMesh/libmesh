@@ -50,6 +50,23 @@ public:
       }
   }
 
+  void test_ref_elem()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        const Elem & ref_elem = *elem->reference_elem();
+
+        for (auto i : elem->node_index_range())
+          {
+            LIBMESH_ASSERT_REALVEC_EQUAL(elem->master_point(i),
+                                         ref_elem.point(i),
+                                         TOLERANCE*TOLERANCE);
+          }
+      }
+  }
+
   void test_quality()
   {
     LOG_UNIT_TEST;
@@ -944,6 +961,7 @@ public:
 
 #define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box );            \
+  CPPUNIT_TEST( test_ref_elem );                \
   CPPUNIT_TEST( test_quality );                 \
   CPPUNIT_TEST( test_node_edge_map_consistency ); \
   CPPUNIT_TEST( test_maps );                    \
