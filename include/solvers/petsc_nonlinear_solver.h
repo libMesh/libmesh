@@ -291,9 +291,6 @@ protected:
   PetscDMWrapper _dm_wrapper;
 #endif
 
-  /// Wrapper for matrix-free finite-difference Jacobians
-  PetscMFFDMatrix<Number> _mffd_jac;
-
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);

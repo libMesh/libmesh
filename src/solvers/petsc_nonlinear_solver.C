@@ -450,7 +450,9 @@ extern "C"
       {
         libmesh_assert(!Jac);
         Jac = &mffd_jac;
-        mffd_jac = jac;
+        // mffd_jac is function-local, so don't attach a context to jac here -- it would
+        // dangle once mffd_jac is destroyed at the end of this call.
+        mffd_jac.assign(jac, /*set_context=*/false);
       }
 
     // We already computed the Jacobian during the residual evaluation
@@ -696,8 +698,7 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _default_monitor(true),
   _snesmf_reuse_base(true),
   _computing_base_vector(true),
-  _setup_reuse(false),
-  _mffd_jac(this->_communicator)
+  _setup_reuse(false)
 {
 }
 
