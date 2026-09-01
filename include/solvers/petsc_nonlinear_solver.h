@@ -107,11 +107,23 @@ public:
   SNES snes(const char * name = nullptr);
 
   /**
-   * Call the Petsc solver.  It calls the method below, using the
-   * same matrix for the system and preconditioner matrices.
+   * Call the Petsc solver, using the same matrix for the system and preconditioner matrices. Calls
+   * the two-matrix overload below with \p pre_in for both.
    */
   virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T> &,                     // System Jacobian Matrix
+  solve (SparseMatrix<T> & pre_in,               // System Preconditioning Matrix
+         NumericVector<T> &,                    // Solution vector
+         NumericVector<T> &,                    // Residual vector
+         const double,                         // Stopping tolerance
+         const unsigned int) override; // N. Iterations
+
+  /**
+   * Call the Petsc solver, using \p jac_in as the actual SNES Jacobian operator (Amat) and
+   * \p pre_in as the preconditioning matrix (Pmat).
+   */
+  virtual std::pair<unsigned int, Real>
+  solve (SparseMatrix<T> & jac_in,               // Jacobian operator matrix (Amat)
+         SparseMatrix<T> & pre_in,               // Preconditioning matrix (Pmat)
          NumericVector<T> &,                    // Solution vector
          NumericVector<T> &,                    // Residual vector
          const double,                         // Stopping tolerance
