@@ -670,6 +670,8 @@ public:
 
   void testPartitionOfUnity()
     {
+      LOG_UNIT_TEST;
+
       if (!this->_elem)
         return;
 
