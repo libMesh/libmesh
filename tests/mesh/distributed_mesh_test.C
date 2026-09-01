@@ -19,6 +19,7 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( DistributedMeshTest );
 
   CPPUNIT_TEST( testRemoteElemError );
+  CPPUNIT_TEST( testCopyConstructorUnsynchedIdCounts );
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -67,6 +68,22 @@ public:
         CPPUNIT_ASSERT(threw_expected_error);
       }
 #endif // LIBMESH_ENABLE_EXCEPTIONS
+  }
+
+  void testCopyConstructorUnsynchedIdCounts()
+  {
+    LOG_UNIT_TEST;
+
+    DistributedMesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_line(mesh, 10, EDGE2);
+
+    CPPUNIT_ASSERT(mesh.preparation().has_synched_id_counts);
+
+    mesh.unset_has_synched_id_counts();
+    CPPUNIT_ASSERT(!mesh.preparation().has_synched_id_counts);
+
+    DistributedMesh mesh_copy(mesh);
+    CPPUNIT_ASSERT(!mesh_copy.preparation().has_synched_id_counts);
   }
 };
 

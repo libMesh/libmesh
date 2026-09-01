@@ -149,16 +149,10 @@ DistributedMesh::~DistributedMesh ()
 // make sure the compiler doesn't give us a default (non-deep) copy
 // constructor instead.
 DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
-  DistributedMesh(static_cast<const MeshBase &>(other_mesh))
+  DistributedMesh(static_cast<const MeshBase &>(other_mesh),
+                  /*bool other_is_distributed_type=*/true)
 {
-  _is_serial = other_mesh._is_serial;
-  _is_serial_on_proc_0 = other_mesh._is_serial_on_proc_0;
   _deleted_coarse_elements = other_mesh._deleted_coarse_elements;
-
-  _n_nodes = other_mesh.n_nodes();
-  _n_elem  = other_mesh.n_elem();
-  _max_node_id = other_mesh.max_node_id();
-  _max_elem_id = other_mesh.max_elem_id();
   _next_free_local_node_id =
     other_mesh._next_free_local_node_id;
   _next_free_local_elem_id =
@@ -181,11 +175,11 @@ DistributedMesh::DistributedMesh (const DistributedMesh & other_mesh) :
 
 
 
-DistributedMesh::DistributedMesh (const MeshBase & other_mesh) :
+DistributedMesh::DistributedMesh (const MeshBase & other_mesh, bool other_is_distributed_type) :
   UnstructuredMesh (other_mesh), _is_serial(other_mesh.is_serial()),
-  _is_serial_on_proc_0(other_mesh.is_serial()),
+  _is_serial_on_proc_0(other_mesh.is_serial_on_zero()),
   _deleted_coarse_elements(true), // better safe than sorry...
-  _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0),
+  _n_nodes(0), _n_elem(0), _max_node_id(0), _max_elem_id(0), // recomputed below
   _next_free_local_node_id(this->processor_id()),
   _next_free_local_elem_id(this->processor_id()),
   _next_free_unpartitioned_node_id(this->n_processors()),
@@ -209,15 +203,40 @@ DistributedMesh::DistributedMesh (const MeshBase & other_mesh) :
 
   this->set_subdomain_name_map() = other_mesh.get_subdomain_name_map();
 
-  this->_preparation = other_mesh.preparation();
+  // add_node()/add_elem() only increment _n_nodes/_n_elem for
+  // nodes/elements they consider locally owned (or unpartitioned), so after
+  // copying only the objects visible to this processor, those counts
+  // reflect an incomplete local view rather than other_mesh's totals,
+  // and need to be copied afresh.
+  _n_nodes = other_mesh.n_nodes();
+  _n_elem = other_mesh.n_elem();
+  _max_node_id = other_mesh.max_node_id();
+  _max_elem_id = other_mesh.max_elem_id();
 
+  // If other_mesh is actually a DistributedMesh, we can just copy its raw
+  // counters directly, mirroring other_mesh's own bookkeeping exactly. This
+  // is done in the DistributedMesh copy constructor.
+  // For any other MeshBase subclass (e.g. ReplicatedMesh) we have no
+  // raw counterpart fields to copy, so derive the free-id-range
+  // counters from _max_elem_id/_max_node_id the same way
+  // update_parallel_id_counts() does via the set_next_ids() method. For
+  // the unique id counters we copy other_mesh's own local next_unique_id()
+  // and derive the next available unique ids
+  // (partitioned and unpartitioned) via set_next_unique_ids().
+  if (!other_is_distributed_type)
+    {
+      this->set_next_ids();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  _next_unique_id = other_mesh.parallel_max_unique_id() +
-                    this->processor_id();
-  _next_unpartitioned_unique_id = _next_unique_id +
-    (this->n_processors() - this->processor_id());
+      libmesh_assert(other_mesh.comm().verify(other_mesh.next_unique_id()));
+      this->set_next_unique_ids(other_mesh.next_unique_id());
 #endif
-  this->update_parallel_id_counts();
+    }
+
+  // Copy other_mesh's actual preparation state, including whatever it
+  // reports for has_synched_id_counts: the counts above are a faithful copy
+  // of other_mesh's own (possibly not-yet-synced) counts, not a freshly
+  // verified computation, so our synced-ness should match other_mesh's.
+  this->_preparation = other_mesh.preparation();
 }
 
 void DistributedMesh::move_nodes_and_elements(MeshBase && other_meshbase)
@@ -247,6 +266,65 @@ void DistributedMesh::move_nodes_and_elements(MeshBase && other_meshbase)
   #endif
 }
 
+void DistributedMesh::set_next_ids()
+{
+  _next_free_unpartitioned_elem_id =
+    ((_max_elem_id-1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->n_processors();
+  _next_free_local_elem_id =
+    ((_max_elem_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->processor_id();
+
+  _next_free_unpartitioned_node_id =
+    ((_max_node_id-1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->n_processors();
+  _next_free_local_node_id =
+    ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+    (this->n_processors() + 1) + this->processor_id();
+}
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+void DistributedMesh::set_next_unique_ids(unique_id_type parallel_max_unique_id)
+{
+  // Unique ids are laid out in repeating groups of (n_processors()+1)
+  // consecutive integers ("alignment" here means a value's position, i.e.
+  // its residue mod (n_processors()+1), within one of these groups). In
+  // every group, the first n_processors() slots (residues 0..n_processors()-1)
+  // are each permanently earmarked for one processor's locally-owned
+  // objects, and the last slot (residue n_processors()) is permanently
+  // earmarked for unpartitioned objects.
+  //
+  // parallel_max_unique_id carries no guarantee of landing on any
+  // particular residue, so rather than simply offsetting it by
+  // processor_id()/n_processors(), we have to explicitly round up to the
+  // start of the next full, entirely-unused group before adding this
+  // processor's (or the unpartitioned pool's) fixed offset into that group.
+  //
+  // (parallel_max_unique_id - 1) / (n_processors()+1) + 1 is the standard
+  // integer idiom for ceil(parallel_max_unique_id / (n_processors()+1)):
+  // the number of complete groups needed to reach at least past the
+  // current max id. Multiplying back by (n_processors()+1) gives the first
+  // id of the next group that is guaranteed to be entirely unused; adding
+  // n_processors(), the unpartitioned pool's fixed offset within a group,
+  // lands on that pool's reserved slot in that group.
+  _next_unpartitioned_unique_id =
+      ((parallel_max_unique_id - 1) / (this->n_processors() + 1) + 1) *
+          (this->n_processors() + 1) +
+      this->n_processors();
+
+  // Same idiom, but shifted by (n_processors()-1) before dividing so that
+  // the rounding accounts for processor_id() possibly being less than the
+  // residue the raw max id already occupies within its group; this can
+  // land this processor's slot in the same group as the unpartitioned
+  // pool's above, or push it into the following group, depending on where
+  // the max id and this processor's offset happen to fall.
+  _next_unique_id =
+      ((parallel_max_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
+          (this->n_processors() + 1) +
+      this->processor_id();
+}
+#endif
+
 // We use cached values for these so they can be called
 // from one processor without bothering the rest, but
 // we may need to update those caches before doing a full
@@ -261,28 +339,14 @@ void DistributedMesh::update_parallel_id_counts()
   _max_node_id = this->parallel_max_node_id();
   _max_elem_id = this->parallel_max_elem_id();
 
-  _next_free_unpartitioned_elem_id =
-    ((_max_elem_id-1) / (this->n_processors() + 1) + 1) *
-    (this->n_processors() + 1) + this->n_processors();
-  _next_free_local_elem_id =
-    ((_max_elem_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
-    (this->n_processors() + 1) + this->processor_id();
+  this->set_next_ids();
 
-  _next_free_unpartitioned_node_id =
-    ((_max_node_id-1) / (this->n_processors() + 1) + 1) *
-    (this->n_processors() + 1) + this->n_processors();
-  _next_free_local_node_id =
-    ((_max_node_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
-    (this->n_processors() + 1) + this->processor_id();
-
+  // set_next_unique_ids() needs the true parallel max unique id (not just
+  // this processor's possibly-stale cached _next_unique_id) since the whole
+  // point of this function is to recompute counters that may have drifted
+  // out of sync.
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  _next_unique_id = this->parallel_max_unique_id();
-  _next_unpartitioned_unique_id =
-    ((_next_unique_id-1) / (this->n_processors() + 1) + 1) *
-    (this->n_processors() + 1) + this->n_processors();
-  _next_unique_id =
-    ((_next_unique_id + this->n_processors() - 1) / (this->n_processors() + 1) + 1) *
-    (this->n_processors() + 1) + this->processor_id();
+  this->set_next_unique_ids(this->parallel_max_unique_id());
 #endif
 
   this->_preparation.has_synched_id_counts = true;
