@@ -676,6 +676,14 @@ public:
       if (!this->_elem)
         return;
 
+      // We don't currently support reference infinite elements
+      if (this->_elem->infinite())
+        return;
+
+      // We'll probably never support reference polytopes
+      if (this->_elem->runtime_topology())
+        return;
+
       std::vector<Point> nodes;
       this->_fe->get_refspace_nodes(this->_elem->type(), nodes);
       for (auto n : index_range(nodes))

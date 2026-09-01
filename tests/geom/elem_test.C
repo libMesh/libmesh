@@ -56,6 +56,14 @@ public:
 
     for (const auto & elem : this->_mesh->active_local_element_ptr_range())
       {
+        // We don't currently support reference infinite elements
+        if (elem->infinite())
+          continue;
+
+        // We'll probably never support reference polytopes
+        if (elem->runtime_topology())
+          continue;
+
         const Elem & ref_elem = *elem->reference_elem();
 
         for (auto i : elem->node_index_range())
