@@ -15,6 +15,13 @@
 // License along with this library; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#include <libmesh/libmesh_config.h>
+
+// NonlinearSolver<T>::build() only has a working implementation when built
+// against one of these packages; without either, constructing a
+// NonlinearImplicitSystem throws unconditionally.
+#if defined(LIBMESH_HAVE_PETSC) || defined(LIBMESH_TRILINOS_HAVE_NOX)
+
 #include <libmesh/nonlinear_implicit_system.h>
 #include <libmesh/nonlinear_solver.h>
 #include <libmesh/sparse_matrix.h>
@@ -189,3 +196,5 @@ public:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(NonlinearImplicitSystemOperatorMatrixTest);
+
+#endif // LIBMESH_HAVE_PETSC || LIBMESH_TRILINOS_HAVE_NOX
