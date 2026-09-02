@@ -205,7 +205,7 @@ protected:
   /**
    * Master element node locations
    */
-  static const Real _master_points[6][3];
+  static const Real _master_points[7][3];
 
   /**
    * This maps the \f$ j^{th} \f$ node to the (in this case) 2 side
