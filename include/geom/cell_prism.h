@@ -211,7 +211,7 @@ protected:
   /**
    * Master element node locations
    */
-  static const Real _master_points[18][3];
+  static const Real _master_points[21][3];
 
   /**
    * This maps the \f$ j^{th} \f$ Prism vertex to the (in this case) 3
