@@ -35,9 +35,9 @@ PetscErrorCode
 petsc_matrix_shell_matrix_test_mult(Mat, Vec x, Vec y)
 {
   PetscFunctionBeginUser;
-  PetscCall(VecCopy(x, y));
-  PetscCall(VecScale(y, 2.));
-  PetscFunctionReturn(PETSC_SUCCESS);
+  LibmeshPetscCallQ(VecCopy(x, y));
+  LibmeshPetscCallQ(VecScale(y, 2.));
+  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 }
 
