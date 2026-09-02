@@ -116,6 +116,8 @@ unit_tests_sources = \
   numerics/sparse_matrix_test.h \
   numerics/dense_matrix_test.C \
   numerics/petsc_matrix_test.C \
+  numerics/petsc_matrix_shell_matrix_test.C \
+  numerics/petsc_mffd_matrix_test.C \
   numerics/diagonal_matrix_test.C \
   numerics/lumped_mass_matrix_test.C \
   numerics/eigen_sparse_matrix_test.C \
@@ -145,6 +147,7 @@ unit_tests_sources = \
   systems/periodic_bc_test.C \
   systems/disjoint_neighbor_test.C \
   systems/systems_test.C \
+  systems/nonlinear_implicit_system_test.C \
   utils/parameters_test.C \
   utils/point_locator_test.C \
   utils/rb_parameters_test.C \
