@@ -215,6 +215,11 @@ void Partitioner::partition (MeshBase & mesh,
   if (n_parts == 1)
     {
       this->single_partition (mesh);
+
+      // Give derived Mesh classes a chance to update any cached data
+      // to reflect the new partitioning
+      mesh.update_post_partitioning();
+
       return;
     }
 

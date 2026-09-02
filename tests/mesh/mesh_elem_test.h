@@ -108,6 +108,11 @@ protected:
 #endif
     }
 
+    // Setting all those processor ids to 0 changes our sets of local
+    // subdomains too.
+    other_mesh.cache_elem_data();
+    this->_mesh->cache_elem_data();
+
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
     other_mesh.set_next_unique_id(this->_mesh->parallel_max_unique_id());
     this->_mesh->set_next_unique_id(this->_mesh->parallel_max_unique_id());

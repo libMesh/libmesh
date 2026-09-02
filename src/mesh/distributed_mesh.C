@@ -1142,7 +1142,7 @@ void DistributedMesh::redistribute ()
 
 void DistributedMesh::update_post_partitioning ()
 {
-  // this->recalculate_n_partitions();
+  this->UnstructuredMesh::update_post_partitioning();
 
   // Let's do the base class cache clearing first, just in case our
   // later computations are ever changed to make use of a local
