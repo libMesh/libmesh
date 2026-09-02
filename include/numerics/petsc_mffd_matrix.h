@@ -48,7 +48,15 @@ public:
 
   explicit PetscMFFDMatrix(const Parallel::Communicator & comm_in);
 
-  PetscMFFDMatrix & operator=(Mat m);
+  /**
+   * Adopt an existing, externally-owned Mat, without destroying it when this
+   * object goes out of scope. \p set_context controls whether we attach a
+   * context pointer to \p m allowing \p get_context() to recover this object
+   * from the Mat later; skip this when this wrapper is short-lived (e.g. a
+   * function-local variable) so we don't leave a dangling context on \p m
+   * after we're destroyed.
+   */
+  void assign(Mat m, bool set_context);
 
   virtual void init(const numeric_index_type,
                     const numeric_index_type,
@@ -101,11 +109,14 @@ PetscMFFDMatrix<T>::PetscMFFDMatrix(const Parallel::Communicator & comm_in)
 }
 
 template <typename T>
-PetscMFFDMatrix<T> &
-PetscMFFDMatrix<T>::operator=(Mat m)
+void
+PetscMFFDMatrix<T>::assign(Mat m, bool set_context)
 {
   this->_mat = m;
-  return *this;
+  this->_is_initialized = true;
+  this->_destroy_mat_on_exit = false;
+  if (set_context)
+    this->set_context();
 }
 
 template <typename T>
