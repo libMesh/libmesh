@@ -93,22 +93,30 @@ private:
         libmesh_error_msg("Unsupported element type " << elem_type);
       }
 
-    if (distort)
-      {
-        // Move a single vertex node without touching the associated
-        // edge/face nodes, turning the element's boundary curved and
-        // giving the map nonzero second derivatives -- this exercises
-        // the terms in map_dphi (A and B in the derivation) that vanish
-        // identically on an affine element.
-        Node & node = mesh.node_ref(0);
-        for (auto d : make_range(dim))
-          node(d) += Real(0.1) * (d + 1);
-      }
-
     auto elem_range = mesh.active_local_element_ptr_range();
     if (elem_range.begin() == elem_range.end())
       return;
     const Elem * elem = *(elem_range.begin());
+
+    if (distort)
+      {
+        // Move one of this element's own vertices partway toward the
+        // element's own vertex average, without touching the associated
+        // edge/face nodes -- this turns the element's boundary curved and
+        // gives the map nonzero second derivatives, exercising the terms
+        // in map_dphi (A and B in the derivation) that vanish identically
+        // on an affine element. For a straight-sided simplex, the signed
+        // volume is an affine function of any single vertex's position,
+        // and moving that vertex to the vertex average reduces the signed
+        // volume to a positive fraction (1/n_vertices) of the original;
+        // moving only partway there is therefore guaranteed to keep the
+        // element non-degenerate, regardless of the element's own size or
+        // shape, unlike a fixed or size-scaled absolute displacement.
+        Node & node = mesh.node_ref(elem->node_id(0));
+        const Point target = elem->vertex_average();
+        for (auto d : make_range(dim))
+          node(d) += Real(0.3) * (target(d) - node(d));
+      }
 
     const FEType fe_type(FIRST, RAVIART_THOMAS);
     std::unique_ptr<FEVectorBase> fe(FEVectorBase::build(dim, fe_type));
