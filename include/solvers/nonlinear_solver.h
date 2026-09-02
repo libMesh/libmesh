@@ -105,18 +105,16 @@ public:
   /**
    * Solves the nonlinear system using \p jac_in as the actual Jacobian operator and \p pre_in as
    * the preconditioning matrix -- which may be the same object (the common case) or genuinely
-   * distinct (e.g. a matrix-free operator paired with an assembled preconditioning matrix). The
-   * default implementation ignores \p jac_in and simply forwards to the single-matrix solve(),
-   * for solver backends that do not distinguish between the two.
+   * distinct (e.g. a matrix-free operator paired with an assembled preconditioning matrix).
    */
   virtual std::pair<unsigned int, Real> solve (SparseMatrix<T> & /* jac_in */,
-                                               SparseMatrix<T> & pre_in,
-                                               NumericVector<T> & x_in,
-                                               NumericVector<T> & r_in,
-                                               const double tol,
-                                               const unsigned int m_its)
+                                               SparseMatrix<T> & /* pre_in */,
+                                               NumericVector<T> & /* x_in */,
+                                               NumericVector<T> & /* r_in */,
+                                               const double /* tol */,
+                                               const unsigned int /* m_its */)
   {
-    return this->solve(pre_in, x_in, r_in, tol, m_its);
+    libmesh_not_implemented();
   }
 
   /**
