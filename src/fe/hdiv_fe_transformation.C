@@ -32,13 +32,7 @@ OutputShape hdiv_piola_map(const RealGradient & dx_dxi,
                            Real J,
                            const OutputShape & phi_ref)
 {
-  OutputShape phi_val;
-  phi_val(0) = (dx_dxi(0)*phi_ref(0) + dx_deta(0)*phi_ref(1))/J;
-  phi_val(1) = (dx_dxi(1)*phi_ref(0) + dx_deta(1)*phi_ref(1))/J;
-#if LIBMESH_DIM > 2
-  phi_val(2) = (dx_dxi(2)*phi_ref(0) + dx_deta(2)*phi_ref(1))/J;
-#endif
-  return phi_val;
+  return (dx_dxi*phi_ref(0) + dx_deta*phi_ref(1))/J;
 }
 
 template<typename OutputShape>
@@ -48,11 +42,7 @@ OutputShape hdiv_piola_map(const RealGradient & dx_dxi,
                            Real J,
                            const OutputShape & phi_ref)
 {
-  OutputShape phi_val;
-  phi_val(0) = (dx_dxi(0)*phi_ref(0) + dx_deta(0)*phi_ref(1) + dx_dzeta(0)*phi_ref(2))/J;
-  phi_val(1) = (dx_dxi(1)*phi_ref(0) + dx_deta(1)*phi_ref(1) + dx_dzeta(1)*phi_ref(2))/J;
-  phi_val(2) = (dx_dxi(2)*phi_ref(0) + dx_deta(2)*phi_ref(1) + dx_dzeta(2)*phi_ref(2))/J;
-  return phi_val;
+  return (dx_dxi*phi_ref(0) + dx_deta*phi_ref(1) + dx_dzeta*phi_ref(2))/J;
 }
 
 } // anonymous namespace
