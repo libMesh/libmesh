@@ -27,22 +27,22 @@ using namespace libMesh;
 // map_phi and map_dphi (which also needs the physical shape function value
 // for the term coming from the derivative of J^{-1}).
 template<typename OutputShape>
-OutputShape hdiv_piola_map(const RealGradient & dx_dxi,
-                           const RealGradient & dx_deta,
+OutputShape hdiv_piola_map(const RealGradient & dxyz_dxi,
+                           const RealGradient & dxyz_deta,
                            Real J,
                            const OutputShape & phi_ref)
 {
-  return (dx_dxi*phi_ref(0) + dx_deta*phi_ref(1))/J;
+  return (dxyz_dxi*phi_ref(0) + dxyz_deta*phi_ref(1))/J;
 }
 
 template<typename OutputShape>
-OutputShape hdiv_piola_map(const RealGradient & dx_dxi,
-                           const RealGradient & dx_deta,
-                           const RealGradient & dx_dzeta,
+OutputShape hdiv_piola_map(const RealGradient & dxyz_dxi,
+                           const RealGradient & dxyz_deta,
+                           const RealGradient & dxyz_dzeta,
                            Real J,
                            const OutputShape & phi_ref)
 {
-  return (dx_dxi*phi_ref(0) + dx_deta*phi_ref(1) + dx_dzeta*phi_ref(2))/J;
+  return (dxyz_dxi*phi_ref(0) + dxyz_deta*phi_ref(1) + dxyz_dzeta*phi_ref(2))/J;
 }
 
 } // anonymous namespace
