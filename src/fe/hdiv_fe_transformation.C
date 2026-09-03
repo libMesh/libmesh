@@ -164,8 +164,8 @@ void HDivFETransformation<OutputShape>::map_dphi(const unsigned int dim,
 
     case 2:
       {
-        const std::vector<RealGradient> & dxyz_dxi   = fe.get_fe_map().get_dxyzdxi();
-        const std::vector<RealGradient> & dxyz_deta  = fe.get_fe_map().get_dxyzdeta();
+        const std::vector<RealGradient> & dxyz_dxi  = fe.get_fe_map().get_dxyzdxi();
+        const std::vector<RealGradient> & dxyz_deta = fe.get_fe_map().get_dxyzdeta();
 
         const std::vector<RealGradient> & d2xyz_dxi2    = fe.get_fe_map().get_d2xyzdxi2();
         const std::vector<RealGradient> & d2xyz_deta2   = fe.get_fe_map().get_d2xyzdeta2();
@@ -217,19 +217,19 @@ void HDivFETransformation<OutputShape>::map_dphi(const unsigned int dim,
                   //   C =  (1/J) * SUM_n (dxi_n/dx_l) * SUM_m F_{km} * dphihat_m/dxi_n
 
                   // Term A: -phi_k(x) * SUM_n (dxi_n/dx_l)*(1/J)*(dJ/dxi_n)
-                  const Real phik = (k == 0) ? phi_val(0) : (k == 1) ? phi_val(1) : phi_val(2);
+                  const Real phik = phi_val(k);
 
                   // Term B: (1/J) * SUM_n (dxi_n/dx_l) * SUM_m (d^2 x_k/dxi_m dxi_n) * phihat_m
-                  const Real d2x_k_dxi2    = (k == 0) ? d2xyz_dxi2[p](0)    : (k == 1) ? d2xyz_dxi2[p](1)    : d2xyz_dxi2[p](2);
-                  const Real d2x_k_deta2   = (k == 0) ? d2xyz_deta2[p](0)   : (k == 1) ? d2xyz_deta2[p](1)   : d2xyz_deta2[p](2);
-                  const Real d2x_k_dxideta = (k == 0) ? d2xyz_dxideta[p](0) : (k == 1) ? d2xyz_dxideta[p](1) : d2xyz_dxideta[p](2);
+                  const Real d2xk_dxi2    = d2xyz_dxi2[p](k);
+                  const Real d2xk_deta2   = d2xyz_deta2[p](k);
+                  const Real d2xk_dxideta = d2xyz_dxideta[p](k);
 
-                  const Real dphik_dxi_B  = (d2x_k_dxi2*phi_ref(0)    + d2x_k_dxideta*phi_ref(1))/J[p];
-                  const Real dphik_deta_B = (d2x_k_dxideta*phi_ref(0) + d2x_k_deta2*phi_ref(1))/J[p];
+                  const Real dphik_dxi_B  = (d2xk_dxi2*phi_ref(0)    + d2xk_dxideta*phi_ref(1))/J[p];
+                  const Real dphik_deta_B = (d2xk_dxideta*phi_ref(0) + d2xk_deta2*phi_ref(1))/J[p];
 
                   // Term C: (1/J) * SUM_n (dxi_n/dx_l) * SUM_m F_{km} * dphihat_m/dxi_n
-                  const Real Fk_xi  = (k == 0) ? dxyz_dxi[p](0)  : (k == 1) ? dxyz_dxi[p](1)  : dxyz_dxi[p](2);
-                  const Real Fk_eta = (k == 0) ? dxyz_deta[p](0) : (k == 1) ? dxyz_deta[p](1) : dxyz_deta[p](2);
+                  const Real Fk_xi  = dxyz_dxi[p](k);
+                  const Real Fk_eta = dxyz_deta[p](k);
 
                   const Real dphik_dxi_C  = (Fk_xi*dphi_dxi[i][p](0)  + Fk_eta*dphi_dxi[i][p](1))/J[p];
                   const Real dphik_deta_C = (Fk_xi*dphi_deta[i][p](0) + Fk_eta*dphi_deta[i][p](1))/J[p];
@@ -316,24 +316,24 @@ void HDivFETransformation<OutputShape>::map_dphi(const unsigned int dim,
                   //   C =  (1/J) * SUM_n (dxi_n/dx_l) * SUM_m F_{km} * dphihat_m/dxi_n
 
                   // Term A: -phi_k(x) * SUM_n (dxi_n/dx_l)*(1/J)*(dJ/dxi_n)
-                  const Real phik = (k == 0) ? phi_val(0) : (k == 1) ? phi_val(1) : phi_val(2);
+                  const Real phik = phi_val(k);
 
                   // Term B: (1/J) * SUM_n (dxi_n/dx_l) * SUM_m (d^2 x_k/dxi_m dxi_n) * phihat_m
-                  const Real d2x_k_dxi2      = (k == 0) ? d2xyz_dxi2[p](0)      : (k == 1) ? d2xyz_dxi2[p](1)      : d2xyz_dxi2[p](2);
-                  const Real d2x_k_deta2     = (k == 0) ? d2xyz_deta2[p](0)     : (k == 1) ? d2xyz_deta2[p](1)     : d2xyz_deta2[p](2);
-                  const Real d2x_k_dzeta2    = (k == 0) ? d2xyz_dzeta2[p](0)    : (k == 1) ? d2xyz_dzeta2[p](1)    : d2xyz_dzeta2[p](2);
-                  const Real d2x_k_dxideta   = (k == 0) ? d2xyz_dxideta[p](0)   : (k == 1) ? d2xyz_dxideta[p](1)   : d2xyz_dxideta[p](2);
-                  const Real d2x_k_dxidzeta  = (k == 0) ? d2xyz_dxidzeta[p](0)  : (k == 1) ? d2xyz_dxidzeta[p](1)  : d2xyz_dxidzeta[p](2);
-                  const Real d2x_k_detadzeta = (k == 0) ? d2xyz_detadzeta[p](0) : (k == 1) ? d2xyz_detadzeta[p](1) : d2xyz_detadzeta[p](2);
+                  const Real d2xk_dxi2      = d2xyz_dxi2[p](k);
+                  const Real d2xk_deta2     = d2xyz_deta2[p](k);
+                  const Real d2xk_dzeta2    = d2xyz_dzeta2[p](k);
+                  const Real d2xk_dxideta   = d2xyz_dxideta[p](k);
+                  const Real d2xk_dxidzeta  = d2xyz_dxidzeta[p](k);
+                  const Real d2xk_detadzeta = d2xyz_detadzeta[p](k);
 
-                  const Real dphik_dxi_B   = (d2x_k_dxi2*phi_ref(0)     + d2x_k_dxideta*phi_ref(1)   + d2x_k_dxidzeta*phi_ref(2))/J[p];
-                  const Real dphik_deta_B  = (d2x_k_dxideta*phi_ref(0) + d2x_k_deta2*phi_ref(1)      + d2x_k_detadzeta*phi_ref(2))/J[p];
-                  const Real dphik_dzeta_B = (d2x_k_dxidzeta*phi_ref(0) + d2x_k_detadzeta*phi_ref(1) + d2x_k_dzeta2*phi_ref(2))/J[p];
+                  const Real dphik_dxi_B   = (d2xk_dxi2*phi_ref(0)     + d2xk_dxideta*phi_ref(1)   + d2xk_dxidzeta*phi_ref(2))/J[p];
+                  const Real dphik_deta_B  = (d2xk_dxideta*phi_ref(0) + d2xk_deta2*phi_ref(1)      + d2xk_detadzeta*phi_ref(2))/J[p];
+                  const Real dphik_dzeta_B = (d2xk_dxidzeta*phi_ref(0) + d2xk_detadzeta*phi_ref(1) + d2xk_dzeta2*phi_ref(2))/J[p];
 
                   // Term C: (1/J) * SUM_n (dxi_n/dx_l) * SUM_m F_{km} * dphihat_m/dxi_n
-                  const Real Fk_xi   = (k == 0) ? dxyz_dxi[p](0)   : (k == 1) ? dxyz_dxi[p](1)   : dxyz_dxi[p](2);
-                  const Real Fk_eta  = (k == 0) ? dxyz_deta[p](0)  : (k == 1) ? dxyz_deta[p](1)  : dxyz_deta[p](2);
-                  const Real Fk_zeta = (k == 0) ? dxyz_dzeta[p](0) : (k == 1) ? dxyz_dzeta[p](1) : dxyz_dzeta[p](2);
+                  const Real Fk_xi   = dxyz_dxi[p](k);
+                  const Real Fk_eta  = dxyz_deta[p](k);
+                  const Real Fk_zeta = dxyz_dzeta[p](k);
 
                   const Real dphik_dxi_C   = (Fk_xi*dphi_dxi[i][p](0)   + Fk_eta*dphi_dxi[i][p](1)   + Fk_zeta*dphi_dxi[i][p](2))/J[p];
                   const Real dphik_deta_C  = (Fk_xi*dphi_deta[i][p](0)  + Fk_eta*dphi_deta[i][p](1)  + Fk_zeta*dphi_deta[i][p](2))/J[p];
