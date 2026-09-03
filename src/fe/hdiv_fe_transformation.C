@@ -53,7 +53,12 @@ namespace libMesh
 template<typename OutputShape>
 void HDivFETransformation<OutputShape>::init_map_phi(const FEGenericBase<OutputShape> & fe) const
 {
-  fe.get_fe_map().get_dxidx();
+  // We only need to pre-request one first-order derivative map piece because there is only a
+  // single calculate_dxyz boolean flag that toggles first derivative computations in the FEMap
+  // and in addition to covering all components it also covers both forward and inverse mapping.
+  // We choose to document pre-requesting the forward (reference -> physical) map here because
+  // that is what is used in map_phi (there is no inverse map usage).
+  fe.get_fe_map().get_dxyzdxi();
 }
 
 
@@ -61,8 +66,15 @@ void HDivFETransformation<OutputShape>::init_map_phi(const FEGenericBase<OutputS
 template<typename OutputShape>
 void HDivFETransformation<OutputShape>::init_map_dphi(const FEGenericBase<OutputShape> & fe) const
 {
-  fe.get_fe_map().get_dxidx();
+  // See above comment in init_map_phi. In map_dphi we actually use both the forward and inverse
+  // first derivative maps so the choice here is a little more arbitrary. We choose to be
+  // consistent with init_map_phi.
+  fe.get_fe_map().get_dxyzdxi();
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+  // As for first order derivatives, there is only a single boolean flag (calculate_d2xyz)
+  // controlling second order derivative computations in FEMap so we only bother prerequesting
+  // one piece. We document pre-requesting the forward map because those are the second
+  // derivatives used in map_dphi.
   fe.get_fe_map().get_d2xyzdxi2();
 #endif
 }
@@ -70,12 +82,10 @@ void HDivFETransformation<OutputShape>::init_map_dphi(const FEGenericBase<Output
 
 
 template<typename OutputShape>
-void HDivFETransformation<OutputShape>::init_map_d2phi(const FEGenericBase<OutputShape> & fe) const
+void HDivFETransformation<OutputShape>::init_map_d2phi(const FEGenericBase<OutputShape> & /*fe*/) const
 {
-  fe.get_fe_map().get_dxidx();
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-  fe.get_fe_map().get_d2xidxyz2();
-#endif
+  // We choose not to pre-request any computations here since we have not yet implemented
+  // map_d2phi. We don't need to give the map unnecessary work.
 }
 
 
