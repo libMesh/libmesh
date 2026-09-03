@@ -208,6 +208,27 @@ public:
   { libmesh_assert(!calculations_started || calculate_phi);
     calculate_phi = true; return phi; }
 
+  /**
+   * \returns The dual (biorthogonal) shape function values at the quadrature
+   * points on the element.
+   *
+   * The dual basis is constructed to satisfy
+   * \f$ \int \Phi_j N_k \, d\gamma = \delta_{jk} \int N_k \, d\gamma \f$
+   * against the primal basis \f$ N \f$. That biorthogonality is what makes a
+   * mortar coupling matrix diagonal, so a Lagrange multiplier can be condensed
+   * with a diagonal inverse.
+   *
+   * \note On QUAD8 and TRI6 these functions are biorthogonal to a locally
+   * transformed primal basis rather than to \f$ N \f$ itself: \f$ \int N_k \f$
+   * is not positive on those faces (exactly 0 at a TRI6 vertex, -1/3 at a QUAD8
+   * corner), so the usual construction degenerates. For those two element types
+   * \f$ \int \Phi_j N_k \f$ is therefore not diagonal; it factors as
+   * \f$ D = \tilde{D} T^{-1} \f$ with \f$ \tilde{D} \f$ diagonal, leaving
+   * \f$ D^{-1} = T \tilde{D}^{-1} \f$ sparse and cheap to apply. The functions
+   * returned here are still expressed in the primal basis, so the type and
+   * meaning of this return value are unchanged. See Popp, Wohlmuth, Gee and
+   * Wall, SIAM J. Sci. Comput. 34(4):B421-B446, 2012, Sec. 4.4.1 and Eq. (4.12).
+   */
   const std::vector<std::vector<OutputShape>> & get_dual_phi() const
   {
     libmesh_assert(!calculations_started || calculate_dual);
@@ -231,6 +252,11 @@ public:
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dphiref = true; return dphi; }
 
+  /**
+   * \returns The dual shape function derivatives at the quadrature points.
+   *
+   * \note See get_dual_phi() for the QUAD8/TRI6 caveat.
+   */
   const std::vector<std::vector<OutputGradient>> & get_dual_dphi() const
   { libmesh_assert(!calculations_started || calculate_dphi);
     calculate_dphi = calculate_dual = calculate_dphiref = true; return dual_dphi; }
@@ -241,6 +267,11 @@ public:
   virtual void request_dual_dphi() const override
   { get_dual_dphi(); }
 
+  /**
+   * \returns The coefficients expressing the dual basis in the primal basis.
+   *
+   * \note See get_dual_phi() for the QUAD8/TRI6 caveat.
+   */
   const DenseMatrix<Real> & get_dual_coeff() const
   { return dual_coeff; }
 
@@ -320,6 +351,12 @@ public:
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dphiref = true; return d2phi; }
 
+  /**
+   * \returns The dual shape function second derivatives at the quadrature
+   * points.
+   *
+   * \note See get_dual_phi() for the QUAD8/TRI6 caveat.
+   */
   const std::vector<std::vector<OutputTensor>> & get_dual_d2phi() const
   { libmesh_assert(!calculations_started || calculate_d2phi);
     calculate_d2phi = calculate_dual = calculate_dphiref = true; return dual_d2phi; }
