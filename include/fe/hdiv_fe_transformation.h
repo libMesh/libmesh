@@ -74,19 +74,21 @@ public:
 
   /**
    * Evaluates shape function gradients in physical coordinates for
-   * \f$ H(div) \f$ conforming elements.
+   * \f$ H(div) \f$ conforming elements, via the contravariant Piola
+   * map's derivative (the gradient of \f$ \phi = J^{-1} (dx/d\xi)
+   * \hat{\phi} \f$ with respect to physical coordinates). Requires
+   * \p LIBMESH_ENABLE_SECOND_DERIVATIVES, since the map's own second
+   * derivatives are needed to differentiate \f$ J^{-1} \f$ and
+   * \f$ (dx/d\xi) \f$.
    */
-  virtual void map_dphi(const unsigned int /*dim*/,
-                        const Elem * const /*elem*/,
-                        const std::vector<Point> & /*qp*/,
-                        const FEGenericBase<OutputShape> & /*fe*/,
-                        std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> & /*dphi*/,
-                        std::vector<std::vector<OutputShape>> & /*dphidx*/,
-                        std::vector<std::vector<OutputShape>> & /*dphidy*/,
-                        std::vector<std::vector<OutputShape>> & /*dphidz*/) const override
-  {
-    libmesh_warning("WARNING: Shape function gradients for HDiv elements are not currently being computed!");
-  }
+  virtual void map_dphi(const unsigned int dim,
+                        const Elem * const elem,
+                        const std::vector<Point> & qp,
+                        const FEGenericBase<OutputShape> & fe,
+                        std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> & dphi,
+                        std::vector<std::vector<OutputShape>> & dphidx,
+                        std::vector<std::vector<OutputShape>> & dphidy,
+                        std::vector<std::vector<OutputShape>> & dphidz) const override;
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   /**
