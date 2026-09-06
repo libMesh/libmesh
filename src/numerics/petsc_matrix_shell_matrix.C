@@ -58,7 +58,8 @@ template <typename T>
 void
 PetscMatrixShellMatrix<T>::zero()
 {
-  libmesh_error();
+  // A shell matrix computes its action and stores no entries, so there is nothing to clear. This is
+  // reachable through System::init_matrices(), which zeroes every matrix it initializes.
 }
 
 template <typename T>
