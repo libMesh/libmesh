@@ -48,6 +48,8 @@ public:
 
   explicit PetscMFFDMatrix(const Parallel::Communicator & comm_in);
 
+  PetscMFFDMatrix & operator=(Mat m) { this->assign(m, false); return *this; }
+
   /**
    * Adopt an existing, externally-owned Mat, without destroying it when this
    * object goes out of scope. \p set_context controls whether we attach a
