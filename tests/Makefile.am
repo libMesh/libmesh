@@ -31,6 +31,7 @@ unit_tests_sources = \
   fe/fe_hdiv_grad_test.C \
   fe/fe_hermite_test.C \
   fe/fe_hierarchic_test.C \
+  fe/fe_orientation_test.C \
   fe/inf_fe_radial_test.C \
   fe/fe_l2_hierarchic_test.C \
   fe/fe_l2_lagrange_test.C \
