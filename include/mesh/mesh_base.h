@@ -130,7 +130,7 @@ public:
    * ids).
    *
    * Though this method is non-virtual, its implementation calls the
-   * virtual function \p subclass_locally_equals() to test for
+   * virtual function \p subclass_first_difference_from() to test for
    * equality of subclass-specific data as well.
    */
   bool operator== (const MeshBase & other_mesh) const;
@@ -139,6 +139,14 @@ public:
   {
     return !(*this == other_mesh);
   }
+
+  /**
+   * This behaves like libmesh_assert(*this == other_mesh), but gives
+   * a more useful accounting of the first difference found, if the
+   * assertion fails.
+   */
+  void assert_equal_to (const MeshBase & other_mesh,
+                        std::string_view failure_context) const;
 
   /**
    * This behaves the same as operator==, but only for the local and
@@ -983,10 +991,17 @@ public:
    *
    * If \p assert_valid is left as true, then in dbg mode extensive
    * consistency checking is performed before returning.
+   *
+   * If \p check_non_remote is set to false, then only sides which
+   * currently have remote neighbors are checked for possible local
+   * neighbors.  This is intended to handle a corner case where
+   * ancestor neighbors are redistributed to a processor only by other
+   * processors who do not see that neighbor link.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
                                const bool reset_current_list    = true,
-                               const bool assert_valid          = true) = 0;
+                               const bool assert_valid          = true,
+                               const bool check_non_remote      = true) = 0;
 
   /**
    * Removes any orphaned nodes, nodes not connected to any elements.
@@ -2096,6 +2111,9 @@ public:
     bool operator== (const Preparation & other) const;
     bool operator!= (const Preparation & other) const;
 
+    // Assert that a Preparation object is identical across processors
+    void libmesh_assert_consistent (const Parallel::Communicator & libmesh_dbg_var(comm));
+
     bool is_partitioned;
     bool has_synched_id_counts;
     bool has_neighbor_ptrs;
@@ -2146,13 +2164,19 @@ protected:
    * Shim to allow operator == (&) to behave like a virtual function
    * without having to be one.
    */
-  virtual bool subclass_locally_equals (const MeshBase & other_mesh) const = 0;
+  virtual std::string_view subclass_first_difference_from (const MeshBase & other_mesh) const = 0;
 
   /**
    * Tests for equality of all elements and nodes in the mesh.  Helper
    * function for subclass_equals() in unstructured mesh subclasses.
    */
   bool nodes_and_elements_equal(const MeshBase & other_mesh) const;
+
+  /**
+   *
+   */
+  std::string_view first_difference_from(const MeshBase & other_mesh) const;
+
 
   /**
    * \returns A writable reference to the number of partitions.
