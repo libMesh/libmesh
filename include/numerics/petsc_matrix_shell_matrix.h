@@ -104,13 +104,6 @@ PetscMatrixShellMatrix<T>::PetscMatrixShellMatrix(const Parallel::Communicator &
 {
 }
 
-template <typename T>
-SparseMatrix<T> &
-PetscMatrixShellMatrix<T>::operator=(const SparseMatrix<T> &)
-{
-  libmesh_error();
-}
-
 } // namespace libMesh
 
 #endif // LIBMESH_HAVE_PETSC
