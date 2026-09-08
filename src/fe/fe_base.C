@@ -821,6 +821,29 @@ void FEGenericBase<Real>::compute_dual_shape_coeffs (const std::vector<Real> & J
         A(i,j) += JxW[qp]*phi_vals[i][qp]*phi_vals[j][qp];
     }
 
+  // The integral positivity condition on the dual basis (Popp, Wohlmuth, Gee and Wall, SIAM J. Sci.
+  // Comput. 34(4):B421-B446, 2012, Eq. (4.2)) fails on QUAD8 and TRI6: D(k,k) = \int N_k is -1/3 at a
+  // QUAD8 corner and exactly 0 at a TRI6 vertex (their Eqs. (4.3) and (4.4)), the latter leaving those
+  // dual shape functions identically zero. Biorthogonalize instead against the locally quadratic
+  // transformed basis Ntilde = T N of their Sec. 4.4.1, in which each vertex absorbs a fraction alpha
+  // of its adjacent mid-edge shapes. That replaces D by T^-1 diag(T d), which for this T is the sparse
+  // update below. alpha = 1/5 is recommended there, and makes the weights strictly positive (QUAD8
+  // 1/5 and 4/5, TRI6 1/15 and 1/10) while preserving the partition of unity. T = I elsewhere.
+  if (_elem && (_elem->type() == TRI6 || _elem->type() == QUAD8) &&
+      get_family() == LAGRANGE && sz == _elem->n_nodes())
+    {
+      const Real alpha = Real(1)/5;
+      // Mid-edge nodes are the trailing indices, and only vertex entries are written, so D(m,m) here
+      // is never a value an earlier iteration modified.
+      for (const auto m : make_range(_elem->n_vertices(), sz))
+        for (const auto v : make_range(_elem->n_second_order_adjacent_vertices(m)))
+          {
+            const auto vertex = _elem->second_order_adjacent_vertex(m, v);
+            D(vertex, vertex) += alpha*D(m,m);
+            D(vertex, m)      -= alpha*D(m,m);
+          }
+    }
+
   // dual_coeff = A^-1*D
   for (const auto j : index_range(phi_vals))
   {
