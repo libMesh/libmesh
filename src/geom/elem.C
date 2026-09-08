@@ -3642,6 +3642,20 @@ Elem::positive_edge_orientation(const unsigned int i) const
 bool
 Elem::positive_face_orientation(const unsigned int i) const
 {
+  return this->face_orientation(i) % 2;
+}
+
+
+unsigned int
+Elem::edge_orientation(const unsigned int i) const
+{
+  return this->positive_edge_orientation(i);
+}
+
+
+unsigned int
+Elem::face_orientation(const unsigned int i) const
+{
   libmesh_assert_less (i, this->n_faces());
 
   // Get the number of vertices N of face i. Note that for 3d elements, i.e.
@@ -3657,7 +3671,11 @@ Elem::positive_face_orientation(const unsigned int i) const
   const unsigned int v = std::distance(nodes.begin(),
                          std::min_element(nodes.begin(), nodes.begin() + N, cmp));
 
-  return cmp(nodes[(v - 1 + N) % N], nodes[(v + 1) % N]);
+  // v is the position of the least vertex. Compare its neighbors just
+  // before and after it, cyclically: the face is positively oriented iff
+  // the lesser neighbor precedes v, i.e. the vertices run backward from
+  // the least vertex through the face's node map.
+  return 2 * v + cmp(nodes[(v - 1 + N) % N], nodes[(v + 1) % N]);
 }
 
 bool

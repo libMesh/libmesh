@@ -1160,6 +1160,25 @@ public:
   bool positive_face_orientation(const unsigned int i) const;
 
   /**
+   * \returns 1 if edge \p i is positively oriented, 0 otherwise; the
+   * edge counterpart of \p face_orientation().
+   */
+  unsigned int edge_orientation(const unsigned int i) const;
+
+  /**
+   * \returns An index over the symmetries of face \p i (six for a
+   * triangle, eight for a quadrilateral): twice the position of the
+   * lexicographically least vertex in the face's node map, plus 1 if
+   * the face is positively oriented.
+   *
+   * Unlike \p positive_face_orientation(), this fixes the full ordering
+   * of the face's vertices, which a basis with face degrees of freedom
+   * (e.g. HIERARCHIC of order three or above) needs in order to be
+   * conforming across the face.
+   */
+  unsigned int face_orientation(const unsigned int i) const;
+
+  /**
    * \returns \p true iff, for an edge \p e on side \p s, the node map for
    * side \p s is such that the first vertex (i.e. zeroth node) of \p e is
    * lower positioned than the second vertex (i.e. first node) of \p e.

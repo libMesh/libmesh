@@ -6,6 +6,7 @@
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/parallel_implementation.h>
+#include <libmesh/remote_elem.h>
 #include <libmesh/enum_to_string.h>
 #include <libmesh/elem_quality.h>
 
@@ -588,6 +589,103 @@ public:
       }
   }
 
+  /**
+   * The vertices of \p face in the order its orientation index encodes: from the
+   * lexicographically least vertex, in the recorded direction.
+   */
+  std::vector<const Node *> oriented_face_nodes(const Elem & elem, const unsigned int face)
+  {
+    const unsigned int n_vertices = Elem::type_to_n_sides_map[elem.side_type(face)];
+    const std::vector<unsigned int> nodes = elem.nodes_on_side(face);
+
+    const unsigned int orientation = elem.face_orientation(face);
+    const unsigned int least = orientation / 2;
+    const bool positive = orientation % 2;
+
+    std::vector<const Node *> sequence;
+    for (const auto k : make_range(n_vertices))
+      sequence.push_back(elem.node_ptr(nodes[(least + (positive ? n_vertices - k : k)) %
+                                             n_vertices]));
+
+    return sequence;
+  }
+
+  void test_orientation()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        if (elem->infinite() || elem->type() == C0POLYHEDRON)
+          continue;
+
+        // Permuting renumbers the vertices without moving them
+        for (const auto p : make_range(elem->n_permutations()))
+          {
+            elem->permute(p);
+
+            for (const auto e : make_range(elem->n_edges()))
+              {
+                const bool positive = elem->point(elem->local_edge_node(e, 0)) >
+                                      elem->point(elem->local_edge_node(e, 1));
+
+                CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(positive),
+                                     elem->edge_orientation(e));
+                CPPUNIT_ASSERT_EQUAL(positive, elem->positive_edge_orientation(e));
+              }
+
+            for (const auto f : make_range(elem->n_faces()))
+              {
+                const unsigned int n_vertices =
+                  Elem::type_to_n_sides_map[elem->side_type(f)];
+                const std::vector<unsigned int> nodes = elem->nodes_on_side(f);
+
+                // The least vertex of the face and the direction from it
+                unsigned int least = 0;
+                for (const auto v : make_range(1u, n_vertices))
+                  if (elem->point(nodes[v]) < elem->point(nodes[least]))
+                    least = v;
+
+                const bool positive =
+                  elem->point(nodes[(least + n_vertices - 1) % n_vertices]) <
+                  elem->point(nodes[(least + 1) % n_vertices]);
+
+                const unsigned int orientation = elem->face_orientation(f);
+
+                CPPUNIT_ASSERT_LESS(2 * n_vertices, orientation);
+                CPPUNIT_ASSERT_EQUAL(2 * least + static_cast<unsigned int>(positive),
+                                     orientation);
+                CPPUNIT_ASSERT_EQUAL(positive, elem->positive_face_orientation(f));
+              }
+          }
+      }
+  }
+
+  void test_orientation_conformity()
+  {
+    LOG_UNIT_TEST;
+
+    // Elements sharing a face may have different orientation indices for it, but the indices
+    // must encode the same vertex sequence.
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        if (elem->infinite() || elem->type() == C0POLYHEDRON)
+          continue;
+
+        for (const auto f : make_range(elem->n_faces()))
+          {
+            const Elem * neighbor = elem->neighbor_ptr(f);
+            if (!neighbor || neighbor == remote_elem || neighbor->infinite())
+              continue;
+
+            const unsigned int f_neighbor = neighbor->which_neighbor_am_i(elem);
+
+            CPPUNIT_ASSERT(oriented_face_nodes(*elem, f) ==
+                           oriented_face_nodes(*neighbor, f_neighbor));
+          }
+      }
+  }
+
   void test_center_node_on_side()
   {
     LOG_UNIT_TEST;
@@ -978,6 +1076,8 @@ public:
   CPPUNIT_TEST( test_flip );                    \
   CPPUNIT_TEST( test_orient );                  \
   CPPUNIT_TEST( test_orient_elements );         \
+  CPPUNIT_TEST( test_orientation );             \
+  CPPUNIT_TEST( test_orientation_conformity );  \
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \
