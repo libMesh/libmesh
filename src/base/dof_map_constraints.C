@@ -4495,7 +4495,7 @@ void DofMap::process_constraints (MeshBase & mesh)
 
   // Now that we have our root constraint dependencies sorted out, add
   // them to the send_list
-  this->add_constraints_to_send_list();
+  this->add_constraints_to_send_list(mesh);
 }
 
 
@@ -5308,7 +5308,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
     }
 }
 
-void DofMap::add_constraints_to_send_list()
+void DofMap::add_constraints_to_send_list (const MeshBase & mesh)
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -5344,7 +5344,7 @@ void DofMap::add_constraints_to_send_list()
 
   // If we only need constraint DoFs constraining DoFs which are
   // algebraically local, we're done.
-  if (!this->has_static_condensation())
+  if (!this->has_static_condensation() && !_need_ghost_constraints)
     return;
 
   // If we use StaticCondensation, though, we may need constraint DoFs
@@ -5352,10 +5352,16 @@ void DofMap::add_constraints_to_send_list()
   // node) but which are supported on local elements.  Let's get those
   // too if we have to.
   //
+  // Kokkos-MOOSE also requires that, because it cannot use VecSetValues
+  // and MatSetValues which can dynamically cache remote entries. Instead,
+  // it allocates ghost entries in advance based on libMesh send_list and
+  // accumulates to those, and does the assembly at once. When ghost DOFs
+  // are constrained, it has to add residual/Jacobian contributions to the
+  // dependencies of ghost DOFs locally as well.
+  //
   // We'll potentially be hitting the same constrained DoFs from
   // multiple directions.
-  std::unordered_set<dof_id_type> extra_dependencies;
-  for (auto & elem : this->get_static_condensation().mesh().active_local_element_ptr_range())
+  for (auto & elem : mesh.active_local_element_ptr_range())
     {
       std::vector<dof_id_type> di;
       this->dof_indices (elem, di);
