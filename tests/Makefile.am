@@ -229,6 +229,7 @@ data = matrices/geom_1_extraction_op.h5 \
        meshes/Cluster_34.stl \
        meshes/engraving.stl \
        meshes/quad4_tri3_smoothed.xda.gz \
+       meshes/quad4_tri3_hourglass.xda.gz \
        meshes/hex8_prism6_smoothed.xda.gz \
        solutions/lagrange_vec_solution_mesh.xda \
        solutions/lagrange_vec_solution.xda \

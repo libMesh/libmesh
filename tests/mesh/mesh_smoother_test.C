@@ -1,6 +1,7 @@
 #include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
 #include <libmesh/enum_elem_type.h>
+#include <libmesh/enum_quadrature_type.h>
 #include <libmesh/function_base.h>
 #include <libmesh/libmesh.h>
 #include <libmesh/mesh_generation.h>
@@ -273,6 +274,7 @@ public:
 #if defined(LIBMESH_HAVE_GZSTREAM)
   CPPUNIT_TEST(testVariationalMixed2D);
   CPPUNIT_TEST(testVariationalMixed3D);
+  CPPUNIT_TEST(testVariationalQuadratureHourglass);
 #endif
 
 #endif // LIBMESH_ENABLE_VSMOOTHER
@@ -1365,6 +1367,62 @@ public:
     mesh.read("meshes/quad4_tri3_smoothed.xda.gz");
 
     testVariationalSmootherRegression(mesh);
+  }
+
+  // Verify that a vertex-sampling quadrature rule prevents the "hourglass"
+  // failure mode of the variational smoother.
+  //
+  // The fixture is a mixed QUAD4/TRI3 patch built around a hub node that is
+  // pinned as a subdomain-boundary node. With the default (interior-only) Gauss
+  // rule, minimizing the distortion-dilation metric folds one of the quads
+  // toward a node---it collapses into a near-triangle (an hourglass)---while the
+  // interior quadrature points still report positive Jacobians, so the mesh is
+  // never flagged as tangled. Switching to a quadrature rule whose points
+  // include the element vertices (here QNODAL) evaluates the metric at the
+  // corners, so the fold is penalized and does not form.
+  //
+  // We detect the fold with Elem::has_invertible_map(), whose default
+  // implementation evaluates the physical-to-reference map Jacobian at the
+  // element nodes (nodal quadrature) and returns false if any nodal Jacobian is
+  // non-positive. A quad folded toward one of its nodes has a non-positive
+  // Jacobian at that corner, so its map is not invertible.
+  void testVariationalQuadratureHourglass()
+  {
+    LOG_UNIT_TEST;
+
+    auto count_non_invertible = [](const MeshBase & m) {
+      unsigned int n_bad = 0;
+      for (const auto * elem : m.active_element_ptr_range())
+        if (!elem->has_invertible_map())
+          ++n_bad;
+      return n_bad;
+    };
+
+    // (1) Default Gauss rule: characterizes the bug. At least one element folds
+    // into an hourglass and loses its invertible map. (If a future change to the
+    // default smoother fixes this on its own, this assertion should be revisited.)
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+      mesh.read("meshes/quad4_tri3_hourglass.xda.gz");
+
+      VariationalMeshSmoother smoother(mesh, 0.5, true);
+      smoother.smooth();
+
+      CPPUNIT_ASSERT(count_non_invertible(mesh) > 0);
+    }
+
+    // (2) Vertex-sampling rule (QNODAL): the metric now "sees" the corners, so
+    // every element keeps an invertible map.
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+      mesh.read("meshes/quad4_tri3_hourglass.xda.gz");
+
+      VariationalMeshSmoother smoother(mesh, 0.5, true);
+      smoother.set_quadrature_type(QNODAL);
+      smoother.smooth();
+
+      CPPUNIT_ASSERT_EQUAL(0u, count_non_invertible(mesh));
+    }
   }
 
   void testVariationalMixed3D()
