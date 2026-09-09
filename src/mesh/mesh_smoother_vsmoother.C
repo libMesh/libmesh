@@ -111,6 +111,13 @@ void VariationalMeshSmoother::setup()
   // Using higher quadrature orders has not had a significant effect on observed solutions.
   //system()->extra_quadrature_order = 0;
 
+  // The default Gauss rule samples the element interior only, so it can miss
+  // degeneracies localized at element corners (e.g. an element collapsing
+  // toward one of its nodes). Selecting a vertex-sampling rule (QTRAP,
+  // QSIMPSON, QNODAL, QGAUSS_LOBATTO) evaluates the metric at the element
+  // nodes instead. Defaults to QGAUSS.
+  system()->set_quadrature_type(_quadrature_type);
+
   // Uncomment these to debug
   //system()->print_element_solutions=true;
   //system()->print_element_residuals=true;

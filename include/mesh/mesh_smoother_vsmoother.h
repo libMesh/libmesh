@@ -129,6 +129,19 @@ public:
    */
   const MeshQualityInfo & get_mesh_info() const;
 
+  /**
+   * Set the quadrature rule type used by the underlying
+   * VariationalSmootherSystem to integrate the distortion-dilation metric.
+   * The default (\p QGAUSS) samples the element interior only, which can miss
+   * degeneracies localized at element corners (e.g. an element collapsing
+   * toward one of its nodes). A vertex-sampling rule such as \p QTRAP,
+   * \p QSIMPSON, \p QNODAL, or \p QGAUSS_LOBATTO evaluates the metric at the
+   * element nodes so a folding corner is penalized (and flagged as tangled) as
+   * it should be. Must be called before smooth()/setup(). See
+   * VariationalSmootherSystem::set_quadrature_type() for details and caveats.
+   */
+  void set_quadrature_type(QuadratureType qt) { _quadrature_type = qt; }
+
 private:
 
   /**
@@ -199,6 +212,12 @@ private:
    * Solver absolute residual tolerance
    */
   Real _absolute_residual_tolerance;
+
+  /**
+   * Quadrature rule type used to integrate the distortion-dilation metric.
+   * See set_quadrature_type().
+   */
+  QuadratureType _quadrature_type = QGAUSS;
 };
 
 } // namespace libMesh

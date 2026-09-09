@@ -20,6 +20,7 @@
 
 // libMesh includes
 #include "libmesh/enum_fe_family.h"
+#include "libmesh/enum_quadrature_type.h"
 #include "libmesh/fem_function_base.h"
 #include "libmesh/fem_system.h"
 #include "libmesh/libmesh_common.h"
@@ -94,7 +95,8 @@ public:
       _epsilon_squared_assembly(0.),
       _ref_vol(0.),
       _dilation_weight(0.5),
-      _untangling_solve(false)
+      _untangling_solve(false),
+      _quadrature_type(QGAUSS)
   {}
 
   // Default destructor
@@ -109,6 +111,27 @@ public:
                          bool apply_no_constraints = false) override;
 
   Real & get_dilation_weight() { return _dilation_weight; }
+
+  /**
+   * Set the quadrature rule type used to integrate the distortion-dilation
+   * metric over each element. The default (\p QGAUSS) samples the element
+   * interior only, which can miss degeneracies localized at element corners
+   * (e.g. an element collapsing toward one of its nodes). A vertex-sampling
+   * rule such as \p QTRAP, \p QSIMPSON, \p QNODAL, or \p QGAUSS_LOBATTO
+   * evaluates the metric at the element nodes, so a folding corner drives the
+   * metric up (and is flagged as tangled) as it should be. The number of
+   * points is set from the default order for the mesh's FE type plus the
+   * System's \p extra_quadrature_order. Not every quadrature type is defined
+   * for every element type (e.g. \p QGAUSS_LOBATTO is only available for
+   * tensor-product elements), so choose a type compatible with the mesh.
+   */
+  void set_quadrature_type(QuadratureType qt) { _quadrature_type = qt; }
+
+  /**
+   * Get the quadrature rule type used to integrate the distortion-dilation
+   * metric. See set_quadrature_type().
+   */
+  QuadratureType get_quadrature_type() const { return _quadrature_type; }
 
   /**
    * Solves the system to smooth the mesh. If the mesh is initially tangled,
@@ -241,6 +264,12 @@ protected:
    * Flag to indicate if the current solve is to untangle or smooth
    */
   bool _untangling_solve;
+
+  /**
+   * The quadrature rule type used to integrate the distortion-dilation metric.
+   * See set_quadrature_type().
+   */
+  QuadratureType _quadrature_type;
 };
 
 } // namespace libMesh

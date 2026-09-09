@@ -310,6 +310,15 @@ void VariationalSmootherSystem::init_context(DiffContext & context)
     }
 
   FEMSystem::init_context(context);
+
+  // Override the default (interior-only) Gauss rule if a different quadrature
+  // type has been requested. A vertex-sampling rule (e.g. QTRAP, QSIMPSON,
+  // QNODAL, QGAUSS_LOBATTO) lets the metric "see" degeneracies localized at
+  // element corners that interior Gauss points miss. Do this after
+  // FEMSystem::init_context() so it is not overwritten. The System's
+  // extra_quadrature_order is respected for the point count.
+  if (_quadrature_type != QGAUSS)
+    c.use_quadrature_rules(_quadrature_type, this->extra_quadrature_order);
 }
 
 
