@@ -930,11 +930,10 @@ Real fe_triangle_helper (const Elem & elem,
   // FDM derivatives correctly!
   if (crossval == 0.)
     {
-      unsigned int basisfactorial = 1.;
-      for (unsigned int n=2; n <= basisorder; ++n)
-        basisfactorial *= n;
-
-      return std::pow(edgenumerator, basisorder) / basisfactorial;
+      // The limit of the general expression below, in which only the bubble's leading term survives
+      // and so carries the same normalization the one-dimensional bubble does
+      return std::pow(edgenumerator, basisorder) *
+        fe_hierarchic_bubble_scaling(basisorder);
     }
   // Experimentally, as c -> 0, n propto c, I'm still seeing good
   // behavior from the default implementation below:
