@@ -1710,11 +1710,10 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
 
             if (crossval == 0.) // Yes, exact comparison; we seem numerically stable otherwise
               {
-                unsigned int basisfactorial = 1.;
-                for (unsigned int n=2; n <= basisorder; ++n)
-                  basisfactorial *= n;
-
-                return flip * std::pow(edgenumerator, basisorder) / basisfactorial;
+                // The limit of the general expression below, in which only the bubble's leading term
+                // survives and so carries the same normalization the one-dimensional bubble does
+                return flip * std::pow(edgenumerator, basisorder) *
+                  fe_hierarchic_bubble_scaling(basisorder);
               }
 
             const Real edgeval = edgenumerator / crossval;
