@@ -6,6 +6,7 @@
 #include "libmesh/mesh_generation.h"
 #include "libmesh/node.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/tensor_value.h"
 
 // unit test includes
 #include "test_comm.h"
