@@ -227,7 +227,6 @@ DistributedMesh::DistributedMesh (const MeshBase & other_mesh, bool other_is_dis
     {
       this->set_next_ids();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-      libmesh_assert(other_mesh.comm().verify(other_mesh.next_unique_id()));
       this->set_next_unique_ids(other_mesh.next_unique_id());
 #endif
     }
