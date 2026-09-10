@@ -26,6 +26,7 @@
 #include "libmesh/libmesh.h"
 
 // C++ includes
+#include <cmath>
 #include <cstddef>
 
 namespace libMesh
@@ -1557,6 +1558,29 @@ OutputShape fe_fdm_deriv(const ElemType type,
                            (const ElemType type, const Order,
                             const Elem *, const unsigned int,
                             const Point &));
+
+/**
+ * \returns The factor scaling the \p i'th (\p i > 1) one-dimensional HIERARCHIC bubble,
+ * \f$\xi^i - 1\f$ for even \p i or \f$\xi^i - \xi\f$ for odd \p i, to unit \f$H^1\f$ seminorm on
+ * \f$[-1,1]\f$: the reciprocal of \f$i\sqrt{2/(2i-1)}\f$ (even) or \f$(i-1)\sqrt{2/(2i-1)}\f$ (odd).
+ *
+ * A \f$1/i!\f$ scaling would shrink the bubbles factorially with order and spread the diagonal of
+ * an assembled operator accordingly; at order eight in two dimensions its smallest entry falls
+ * below the roundoff of its largest, leaving the system numerically singular in double precision.
+ *
+ * The vertex functions stay unscaled: they are interpolatory, so their coefficients are the
+ * solution's vertex values, on which nodal boundary conditions and nodal output rely.
+ */
+inline Real fe_hierarchic_bubble_scaling(const unsigned int i)
+{
+  libmesh_assert_greater(i, 1);
+
+  // An even bubble's derivative i xi^(i-1) squares and integrates to 2 i^2/(2i-1); an odd
+  // bubble's linear term turns i^2 into (i-1)^2.
+  const Real denominator = (i % 2) ? Real(i) - 1. : Real(i);
+
+  return std::sqrt((2. * Real(i) - 1.) / 2.) / denominator;
+}
 
 
 template <typename OutputShape>
