@@ -5,6 +5,10 @@
 #include <libmesh/dof_map.h>
 #include <libmesh/partitioner.h>
 #include <libmesh/replicated_mesh.h>
+#include <libmesh/analytic_function.h>
+#include <libmesh/dense_vector.h>
+#include <libmesh/dirichlet_boundaries.h>
+#include <libmesh/numeric_vector.h>
 
 #include <timpi/parallel_implementation.h>
 
@@ -15,6 +19,25 @@
 #include <string>
 
 using namespace libMesh;
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
+// Quadratic along every edge of the unit square, so a second-order
+// hierarchic basis represents its boundary trace exactly, with nonzero
+// edge bubble coefficients on the y=0 and y=1 sides.
+Number quadratic_boundary_value (const Point & p, const Real time)
+{
+  return p(0)*p(0) + p(1) + time;
+}
+
+// The Dirichlet projection evaluates boundary functions through their
+// vector-valued interface
+void quadratic_boundary_values (DenseVector<Number> & output,
+                                const Point & p,
+                                const Real time)
+{
+  output(0) = quadratic_boundary_value(p, time);
+}
+#endif
 
 #ifdef LIBMESH_ENABLE_CONSTRAINTS
 // This class is used by testConstraintLoopDetection
@@ -129,6 +152,10 @@ public:
 #endif
 
   CPPUNIT_TEST( testArrayDofIndices );
+
+#if defined(LIBMESH_ENABLE_DIRICHLET) && LIBMESH_DIM > 1
+  CPPUNIT_TEST( testComputeDirichletValues );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -377,6 +404,84 @@ public:
       testArrayDofIndicesWithType({i, L2_LAGRANGE});
     }
   }
+
+#if defined(LIBMESH_ENABLE_DIRICHLET) && LIBMESH_DIM > 1
+  void testComputeDirichletValues()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square (mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System> ("SimpleSystem");
+    const unsigned int u = sys.add_variable("u", SECOND, HIERARCHIC);
+    es.init();
+
+    DofMap & dof_map = sys.get_dof_map();
+    const dof_id_type n_constrained = dof_map.n_constrained_dofs();
+
+    AnalyticFunction<Number> f(quadratic_boundary_values);
+    DirichletBoundaries dirichlets;
+    dirichlets.push_back(std::make_unique<DirichletBoundary>
+                         (std::set<boundary_id_type>{0, 1, 2, 3},
+                          std::vector<unsigned int>{u}, f));
+
+    const Real time = 0.5;
+    DofConstraintValueMap values;
+    dof_map.compute_dirichlet_values(dirichlets, mesh, time, values);
+
+    // Test that computing the values constrains nothing
+    CPPUNIT_ASSERT_EQUAL(n_constrained, dof_map.n_constrained_dofs());
+    CPPUNIT_ASSERT(!values.empty());
+
+    // Test that the values are coefficients in the hierarchic basis:
+    // loading them into the solution reproduces the boundary function
+    // along each boundary side, which interpreting them as point values
+    // would not
+    for (const auto & [dof, value] : values)
+      if (dof_map.local_index(dof))
+        sys.solution->set(dof, value);
+    sys.solution->close();
+    sys.update();
+
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      for (auto s : elem->side_index_range())
+        if (!elem->neighbor_ptr(s))
+          {
+            const std::unique_ptr<const Elem> side = elem->build_side_ptr(s);
+            for (const Real xi : {-1., -0.5, 0., 0.5, 1.})
+              {
+                // Map xi in [-1, 1] to a point on the straight side
+                // between its two vertices
+                const Point p = side->point(0) +
+                  0.5 * (1. + xi) * (side->point(1) - side->point(0));
+                LIBMESH_ASSERT_NUMBERS_EQUAL
+                  (quadratic_boundary_value(p, time), sys.point_value(u, p, *elem),
+                   TOLERANCE*TOLERANCE);
+              }
+          }
+
+    // Test that the values match the constraint rows that the same
+    // boundary adds
+    dof_map.add_dirichlet_boundary(*dirichlets[0]);
+    dof_map.create_dof_constraints(mesh, time);
+
+    const DofConstraintValueMap & rhs = dof_map.get_primal_constraint_values();
+    CPPUNIT_ASSERT_EQUAL(values.size(), rhs.size());
+    for (const auto & [dof, value] : rhs)
+      {
+        const auto it = values.find(dof);
+        CPPUNIT_ASSERT(it != values.end());
+        LIBMESH_ASSERT_NUMBERS_EQUAL(value, it->second, TOLERANCE*TOLERANCE);
+      }
+
+    // Test that degrees of freedom the DofMap already constrains are
+    // omitted
+    dof_map.compute_dirichlet_values(dirichlets, mesh, time, values);
+    CPPUNIT_ASSERT(values.empty());
+  }
+#endif
 
 };
 
