@@ -16,8 +16,10 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libmesh/hdiv_fe_transformation.h"
+#include "libmesh/elem.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/int_range.h"
+#include "libmesh/tensor_value.h"
 
 namespace {
 
@@ -165,7 +167,6 @@ void HDivFETransformation<OutputShape>::map_dphi(const unsigned int dim,
                                                   std::vector<std::vector<OutputShape>> & dphidy,
                                                   std::vector<std::vector<OutputShape>> & dphidz) const
 {
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
   switch (dim)
     {
     case 0:
@@ -177,9 +178,21 @@ void HDivFETransformation<OutputShape>::map_dphi(const unsigned int dim,
         const std::vector<RealGradient> & dxyz_dxi  = fe.get_fe_map().get_dxyzdxi();
         const std::vector<RealGradient> & dxyz_deta = fe.get_fe_map().get_dxyzdeta();
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         const std::vector<RealGradient> & d2xyz_dxi2    = fe.get_fe_map().get_d2xyzdxi2();
         const std::vector<RealGradient> & d2xyz_deta2   = fe.get_fe_map().get_d2xyzdeta2();
         const std::vector<RealGradient> & d2xyz_dxideta = fe.get_fe_map().get_d2xyzdxideta();
+#else
+        // Anything but a triangle mesh or simple grid may need --enable-second
+        libmesh_error_msg_if
+          (!elem->has_affine_map(),
+           "HDiv FE gradients on non-affine-mapped elements require second-derivative support");
+        auto n_qp = dxyz_dxi.size();
+
+        const std::vector<RealGradient> d2xyz_dxi2(n_qp, RealGradient());
+        const std::vector<RealGradient> d2xyz_deta2(n_qp, RealGradient());
+        const std::vector<RealGradient> d2xyz_dxideta(n_qp, RealGradient());
+#endif
 
         const std::vector<Real> & J = fe.get_fe_map().get_jacobian();
 
@@ -269,12 +282,27 @@ void HDivFETransformation<OutputShape>::map_dphi(const unsigned int dim,
         const std::vector<RealGradient> & dxyz_deta  = fe.get_fe_map().get_dxyzdeta();
         const std::vector<RealGradient> & dxyz_dzeta = fe.get_fe_map().get_dxyzdzeta();
 
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
         const std::vector<RealGradient> & d2xyz_dxi2     = fe.get_fe_map().get_d2xyzdxi2();
         const std::vector<RealGradient> & d2xyz_deta2    = fe.get_fe_map().get_d2xyzdeta2();
         const std::vector<RealGradient> & d2xyz_dzeta2   = fe.get_fe_map().get_d2xyzdzeta2();
         const std::vector<RealGradient> & d2xyz_dxideta  = fe.get_fe_map().get_d2xyzdxideta();
         const std::vector<RealGradient> & d2xyz_dxidzeta = fe.get_fe_map().get_d2xyzdxidzeta();
         const std::vector<RealGradient> & d2xyz_detadzeta = fe.get_fe_map().get_d2xyzdetadzeta();
+#else
+        // Anything but a tet mesh or simple grid may need --enable-second
+        libmesh_error_msg_if
+          (!elem->has_affine_map(),
+           "HDiv FE gradients on non-affine-mapped elements require second-derivative support");
+        auto n_qp = dxyz_dxi.size();
+
+        const std::vector<RealGradient> d2xyz_dxi2(n_qp, RealGradient());
+        const std::vector<RealGradient> d2xyz_deta2(n_qp, RealGradient());
+        const std::vector<RealGradient> d2xyz_dzeta2(n_qp, RealGradient());
+        const std::vector<RealGradient> d2xyz_dxideta(n_qp, RealGradient());
+        const std::vector<RealGradient> d2xyz_dxidzeta(n_qp, RealGradient());
+        const std::vector<RealGradient> d2xyz_detadzeta(n_qp, RealGradient());
+#endif
 
         const std::vector<Real> & J = fe.get_fe_map().get_jacobian();
 
@@ -369,11 +397,6 @@ void HDivFETransformation<OutputShape>::map_dphi(const unsigned int dim,
     default:
       libmesh_error_msg("Invalid dim = " << dim);
     } // switch(dim)
-#else
-  libmesh_ignore(dim, elem, qp, fe, dphi, dphidx, dphidy, dphidz);
-  libmesh_error_msg("HDiv shape function gradients require the library to be configured "
-                     "with --enable-second-derivatives (LIBMESH_ENABLE_SECOND_DERIVATIVES).");
-#endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 }
 
 template<typename OutputShape>
