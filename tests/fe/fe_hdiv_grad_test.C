@@ -29,15 +29,19 @@ public:
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST(testQuad8Affine);
-  CPPUNIT_TEST(testQuad8NonAffine);
   CPPUNIT_TEST(testTri6Affine);
+#if LIBMESH_ENABLE_SECOND_DERIVATIVES
+  CPPUNIT_TEST(testQuad8NonAffine);
   CPPUNIT_TEST(testTri6NonAffine);
+#endif
 #endif
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testHex27Affine);
-  CPPUNIT_TEST(testHex27NonAffine);
   CPPUNIT_TEST(testTet14Affine);
+#if LIBMESH_ENABLE_SECOND_DERIVATIVES
+  CPPUNIT_TEST(testHex27NonAffine);
   CPPUNIT_TEST(testTet14NonAffine);
+#endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
