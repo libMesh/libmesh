@@ -973,9 +973,9 @@ bool sides_are_the_same_face(const Elem & a, const Elem & b)
   if (a == b)
     return true;
 
-  const bool a_poly = dynamic_cast<const Polygon *>(&a);
-  const bool b_poly = dynamic_cast<const Polygon *>(&b);
-  if (a_poly == b_poly)
+  // The check above would have triggered already if they were both
+  // not polygons. If either is a polygon, we need to check the nodes
+  if (!a.runtime_topology() && !b.runtime_topology())
     return false;
 
   const unsigned int nv = a.n_vertices();
