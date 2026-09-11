@@ -43,6 +43,9 @@ std::array<unsigned int, 4> oriented_prism_nodes(const Elem & elem,
 std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
                                                unsigned int face_num);
 
+void orient_triangle(const Elem & elem,
+                     unsigned int * face_vertex);
+
 template <FEFamily T>
 Real fe_hierarchic_3D_shape(const Elem * elem,
                             const Order order,
@@ -133,7 +136,12 @@ void cube_remap(unsigned int & side_i,
   else
     {
       unsigned int min_side_node = remap_node<4>(0, side, 0);
-      const bool flip = (side.point(min_side_node) < side.point((min_side_node+1)%4));
+
+      // Rotating the least node of the side to the origin leaves the
+      // reflection about the diagonal through it, which is settled by
+      // which of that node's two neighbors is the lesser.
+      const bool flip = (side.point((min_side_node+3)%4) <
+                         side.point((min_side_node+1)%4));
 
       switch (min_side_node) {
       case 0:
@@ -470,8 +478,8 @@ void cube_indices(const Elem * elem,
           if (!elem->positive_face_orientation(1))
             {
               // Case 7
-              xi   = -xi_saved;
-              zeta = zeta_saved;
+              xi   = -zeta_saved;
+              zeta = xi_saved;
             }
           else
             {
@@ -745,7 +753,7 @@ void cube_indices(const Elem * elem,
             {
               // Case 8
               xi  = xi_saved;
-              eta = eta_saved;
+              eta = -eta_saved;
             }
         }
     }
@@ -758,6 +766,27 @@ void cube_indices(const Elem * elem,
       i1 = cube_number_row[basisnum] + 2;
       i2 = cube_number_page[basisnum] + 2;
     }
+}
+
+
+// Reorder the barycentric coordinates of a triangular face of a prism, whose vertices begin at
+// \p first_vertex, so that they follow the order of the face's vertices. The interior basis of a
+// triangle is not symmetric in its barycentric coordinates, so a face shared between two elements
+// needs them ordered the same way from both sides.
+void orient_triangle_coords(const Elem & elem,
+                            const unsigned int first_vertex,
+                            const Point & xi_eta_saved,
+                            Point & xi_eta)
+{
+  unsigned int face_vertex[3] = {first_vertex, first_vertex+1, first_vertex+2};
+  orient_triangle(elem, face_vertex);
+
+  const Real barycentric[3] = {1 - xi_eta_saved(0) - xi_eta_saved(1),
+                               xi_eta_saved(0),
+                               xi_eta_saved(1)};
+
+  xi_eta(0) = barycentric[face_vertex[1] - first_vertex];
+  xi_eta(1) = barycentric[face_vertex[2] - first_vertex];
 }
 
 
@@ -861,8 +890,6 @@ void prism_indices(const Elem * elem,
               // Case 2: flip about 0-4 diagonal
               i01 = s1+1;
               i2 = s0;
-              zeta = 2*xe_fraction-1;
-              xi_eta(0) = (zeta_saved+1)*xe_scale/2;
             }
         }
       else if (elem->point(3) == min_point)
@@ -872,8 +899,7 @@ void prism_indices(const Elem * elem,
               // Case 3: 0->3->4->1->0 rotation
               i01 = s1+1;
               i2 = s0;
-              zeta = 1-2*xe_fraction;
-              xi_eta(0) = (zeta_saved+1)*xe_scale/2;
+              zeta = -zeta_saved;
             }
           else
             {
@@ -890,8 +916,7 @@ void prism_indices(const Elem * elem,
               // Case 5: 0->1->4->3->0 rotation
               i01 = s1+1;
               i2 = s0;
-              zeta = 2*xe_fraction-1;
-              xi_eta(0) = (1-zeta_saved)*xe_scale/2;
+              xi_eta(0) = (1-xe_fraction)*xe_scale;
             }
           else
             {
@@ -916,8 +941,8 @@ void prism_indices(const Elem * elem,
               // Case 8: flip about 1-3 diagonal
               i01 = s1+1;
               i2 = s0;
-              zeta = 1-2*xe_fraction;
-              xi_eta(0) = (1-zeta_saved)*xe_scale/2;
+              xi_eta(0) = (1-xe_fraction)*xe_scale;
+              zeta = -zeta_saved;
             }
         }
     }
@@ -944,7 +969,7 @@ void prism_indices(const Elem * elem,
           if (!elem->positive_face_orientation(2))
             {
               // Case 1: no flips needed
-              i01 = s0+1+3; // edge to triangle side 1 numbering
+              i01 = s0+1+e; // edge to triangle side 1 numbering
               i2 = s1;
             }
           else
@@ -952,10 +977,6 @@ void prism_indices(const Elem * elem,
               // Case 2: flip about 1-5 diagonal
               i01 = s1+1+e;
               i2 = s0;
-              zeta = 2*xe_fraction-1;
-              const Real xe = (zeta_saved+1)/2;
-              xi_eta(1) = xe*xe_scale;
-              xi_eta(0) = xe_scale - xi_eta(1);
             }
         }
       else if (elem->point(4) == min_point)
@@ -965,10 +986,7 @@ void prism_indices(const Elem * elem,
               // Case 3: 1->4->5->2->1 rotation
               i01 = s1+1+e;
               i2 = s0;
-              zeta = 1-2*xe_fraction;
-              const Real xe = (zeta_saved+1)/2;
-              xi_eta(1) = xe*xe_scale;
-              xi_eta(0) = xe_scale - xi_eta(1);
+              zeta = -zeta_saved;
             }
           else
             {
@@ -985,8 +1003,7 @@ void prism_indices(const Elem * elem,
               // Case 5: 1->2->5->4->1 rotation
               i01 = s1+1+e;
               i2 = s0;
-              zeta = 2*xe_fraction-1;
-              const Real xe = (1-zeta_saved)/2;
+              const Real xe = xe_fraction;
               xi_eta(1) = xe*xe_scale;
               xi_eta(0) = xe_scale - xi_eta(1);
             }
@@ -995,7 +1012,7 @@ void prism_indices(const Elem * elem,
               // Case 6: flip about 7-13 midline
               i01 = s0+1+e;
               i2 = s1;
-              const Real xe = (1-xe_fraction);
+              const Real xe = xe_fraction;
               xi_eta(1) = xe*xe_scale;
               xi_eta(0) = xe_scale - xi_eta(1);
             }
@@ -1008,17 +1025,17 @@ void prism_indices(const Elem * elem,
               i01 = s0+1+e;
               i2 = s1;
               zeta = -zeta_saved;
-              const Real xe = (1-xe_fraction);
+              const Real xe = xe_fraction;
               xi_eta(1) = xe*xe_scale;
               xi_eta(0) = xe_scale - xi_eta(1);
             }
           else
             {
-              // Case 8: flip about 1-3 diagonal
+              // Case 8: flip about 2-4 diagonal
               i01 = s1+1+e;
               i2 = s0;
-              zeta = 1-2*xe_fraction;
-              const Real xe = (1-zeta_saved)/2;
+              zeta = -zeta_saved;
+              const Real xe = xe_fraction;
               xi_eta(1) = xe*xe_scale;
               xi_eta(0) = xe_scale - xi_eta(1);
             }
@@ -1055,9 +1072,6 @@ void prism_indices(const Elem * elem,
               // Case 2: flip about 2-3 diagonal
               i01 = s1+1+2*e;
               i2 = s0;
-              zeta = 2*xe_fraction-1;
-              const Real xe = (zeta_saved+1)/2;
-              xi_eta(1) = xe_scale - xe*xe_scale;
             }
         }
       else if (elem->point(5) == min_point)
@@ -1067,9 +1081,7 @@ void prism_indices(const Elem * elem,
               // Case 3: 2->5->3->0->2 rotation
               i01 = s1+1+2*e;
               i2 = s0;
-              zeta = 1-2*xe_fraction;
-              const Real xe = (zeta_saved+1)/2;
-              xi_eta(1) = xe_scale - xe*xe_scale;
+              zeta = -zeta_saved;
             }
           else
             {
@@ -1086,8 +1098,7 @@ void prism_indices(const Elem * elem,
               // Case 5: 2->0->3->5->2 rotation
               i01 = s1+1+2*e;
               i2 = s0;
-              zeta = 2*xe_fraction-1;
-              const Real xe = (1-zeta_saved)/2;
+              const Real xe = (1-xe_fraction);
               xi_eta(1) = xe_scale - xe*xe_scale;
             }
           else
@@ -1115,8 +1126,8 @@ void prism_indices(const Elem * elem,
               // Case 8: flip about 0-5 diagonal
               i01 = s1+1+2*e;
               i2 = s0;
-              zeta = 1-2*xe_fraction;
-              const Real xe = (1-zeta_saved)/2;
+              zeta = -zeta_saved;
+              const Real xe = (1-xe_fraction);
               xi_eta(1) = xe_scale - xe*xe_scale;
             }
         }
@@ -1124,16 +1135,16 @@ void prism_indices(const Elem * elem,
   // Face 0, node 18 - node order due to hierarchic numbering
   else if (i < 6 + 9*e + 3*e*e + e*(e-1)/2)
     {
-      // The TRI code will handle any flips here
       i01 = i - 3 - 6*e - 3*e*e;
       i2 = 0;
+      orient_triangle_coords(*elem, 0, xi_eta_saved, xi_eta);
     }
   // Face 4
   else if (i < 6 + 9*e + 3*e*e + e*(e-1))
     {
-      // The TRI code will handle any flips here
       i01 = i - 3 - 6*e - 3*e*e - e*(e-1)/2;
       i2 = 1;
+      orient_triangle_coords(*elem, 3, xi_eta_saved, xi_eta);
     }
   // Internal DoFs
   else
@@ -2338,7 +2349,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             if (i01 > 2 && i01 < 3u*totalorder)
               {
                 // %(p-1) to find the edge number, %2 for even vs odd
-                const bool odd_basis = ((i01-1)%(totalorder-1))%2;
+                const bool odd_basis = ((i01-3)%(totalorder-1))%2;
                 if (odd_basis)
                   {
                     const int tri_edge = (i01-3)/(totalorder-1);
@@ -2393,11 +2404,10 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
 
             if (crossval == 0.) // Yes, exact comparison; we seem numerically stable otherwise
               {
-                unsigned int basisfactorial = 1.;
-                for (unsigned int n=2; n <= basisorder; ++n)
-                  basisfactorial *= n;
-
-                return std::pow(edgenumerator, basisorder) / basisfactorial;
+                // The limit of the general expression below, in which only the bubble's leading term
+                // survives and so carries the same normalization the one-dimensional bubble does
+                return std::pow(edgenumerator, basisorder) *
+                  fe_hierarchic_bubble_scaling(basisorder);
               }
 
             const Real edgeval = edgenumerator / crossval;

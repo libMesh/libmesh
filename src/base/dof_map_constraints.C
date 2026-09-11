@@ -198,15 +198,14 @@ private:
 #ifdef LIBMESH_ENABLE_DIRICHLET
 
 /**
- * This functor class hierarchy adds a constraint row to a DofMap
+ * This functor class hierarchy disposes of a computed constraint.  Writing it
+ * into a DofMap is one disposition; collecting the prescribed values without
+ * constraining anything is another, so the base holds no DofMap of its own.
  */
 class AddConstraint
 {
-protected:
-  DofMap                  & dof_map;
-
 public:
-  AddConstraint(DofMap & dof_map_in) : dof_map(dof_map_in) {}
+  virtual ~AddConstraint() = default;
 
   virtual void operator()(dof_id_type dof_number,
                           const DofConstraintRow & constraint_row,
@@ -215,8 +214,11 @@ public:
 
 class AddPrimalConstraint : public AddConstraint
 {
+private:
+  DofMap                  & dof_map;
+
 public:
-  AddPrimalConstraint(DofMap & dof_map_in) : AddConstraint(dof_map_in) {}
+  AddPrimalConstraint(DofMap & dof_map_in) : dof_map(dof_map_in) {}
 
   virtual void operator()(dof_id_type dof_number,
                           const DofConstraintRow & constraint_row,
@@ -231,11 +233,12 @@ public:
 class AddAdjointConstraint : public AddConstraint
 {
 private:
+  DofMap                  & dof_map;
   const unsigned int qoi_index;
 
 public:
   AddAdjointConstraint(DofMap & dof_map_in, unsigned int qoi_index_in)
-    : AddConstraint(dof_map_in), qoi_index(qoi_index_in) {}
+    : dof_map(dof_map_in), qoi_index(qoi_index_in) {}
 
   virtual void operator()(dof_id_type dof_number,
                           const DofConstraintRow & constraint_row,
@@ -244,6 +247,32 @@ public:
     dof_map.add_adjoint_constraint_row
       (qoi_index, dof_number, constraint_row, constraint_rhs,
        true);
+  }
+};
+
+/**
+ * Records the prescribed value of each degree of freedom a Dirichlet projection
+ * determines, leaving the DofMap untouched.  A degree of freedom the DofMap
+ * already constrains is skipped, as AddPrimalConstraint skips it, so that the
+ * values collected are those the constraint path would have added.
+ */
+class CollectDirichletValues : public AddConstraint
+{
+private:
+  const DofMap            & dof_map;
+  DofConstraintValueMap   & values;
+
+public:
+  CollectDirichletValues(const DofMap & dof_map_in,
+                         DofConstraintValueMap & values_in)
+    : dof_map(dof_map_in), values(values_in) {}
+
+  virtual void operator()(dof_id_type dof_number,
+                          const DofConstraintRow & /*constraint_row*/,
+                          const Number constraint_rhs) const
+  {
+    if (!dof_map.is_constrained_dof(dof_number))
+      values[dof_number] = constraint_rhs;
   }
 };
 
@@ -257,7 +286,7 @@ public:
 class ConstrainDirichlet
 {
 private:
-  DofMap                  & dof_map;
+  const DofMap            & dof_map;
   const MeshBase          & mesh;
   const Real               time;
   const DirichletBoundaries & dirichlets;
@@ -1544,7 +1573,7 @@ private:
   } // apply_dirichlet_impl
 
 public:
-  ConstrainDirichlet (DofMap & dof_map_in,
+  ConstrainDirichlet (const DofMap & dof_map_in,
                       const MeshBase & mesh_in,
                       const Real time_in,
                       const DirichletBoundaries & dirichlets_in,
@@ -1892,6 +1921,35 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   if (!constraint_rows_empty)
     this->process_mesh_constraint_rows(mesh);
 }
+
+
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
+void DofMap::compute_dirichlet_values(const DirichletBoundaries & dirichlets,
+                                      const MeshBase & mesh,
+                                      const Real time,
+                                      DofConstraintValueMap & values) const
+{
+  parallel_object_only();
+
+  values.clear();
+
+  if (dirichlets.empty())
+    return;
+
+  if (_verify_dirichlet_bc_consistency)
+    for (const auto & dirichlet : dirichlets)
+      this->check_dirichlet_bcid_consistency(mesh, *dirichlet);
+
+  // Processors only project their local elements, as the constraint path does
+  ConstElemRange range (mesh.local_elements_begin(),
+                        mesh.local_elements_end());
+
+  Threads::parallel_for
+    (range, ConstrainDirichlet(*this, mesh, time, dirichlets,
+                               CollectDirichletValues(*this, values)));
+}
+#endif // LIBMESH_ENABLE_DIRICHLET
 
 
 
