@@ -955,7 +955,7 @@ UnstructuredMesh::~UnstructuredMesh ()
 
 namespace {
 /**
- * \returns \p true if element sides \p a and \p b are the same face,
+ * \returns \p true if element sides \p a and \p b are the same elem,
  * for the purpose of linking them as neighbors in find_neighbors().
  *
  * This is normally just Elem::operator==, which compares (sorted) node
@@ -968,13 +968,13 @@ namespace {
  * keys on.  Purely standard/standard and polygon/polygon pairs are left
  * entirely to operator==.
  */
-bool sides_are_the_same_face(const Elem & a, const Elem & b)
+bool sides_are_the_same_elem(const Elem & a, const Elem & b)
 {
   if (a == b)
     return true;
 
-  // The check above would have triggered already if they were both
-  // not polygons. If either is a polygon, we need to check the nodes
+  // The check above would have been sufficient if they were both
+  // polygons or both not. If just one is a polygon, we need to check the nodes
   if (!a.runtime_topology() && !b.runtime_topology())
     return false;
 
@@ -1082,7 +1082,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                         // for matching level() to avoid setting our
                         // neighbor pointer to any of our neighbor's
                         // descendants.
-                        if (sides_are_the_same_face(*my_side, *their_side) &&
+                        if (sides_are_the_same_elem(*my_side, *their_side) &&
                             (element->level() == neighbor->level()))
                           {
                             // So share a side.  Is this a mixed pair

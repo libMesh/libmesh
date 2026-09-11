@@ -4,6 +4,7 @@
 #include <libmesh/cell_c0polyhedron.h>
 #include <libmesh/face_c0polygon.h>
 #include <libmesh/face_polygon.h>
+#include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_tools.h>
 #include <libmesh/replicated_mesh.h>
@@ -434,7 +435,7 @@ public:
   {
     LOG_UNIT_TEST;
 
-    ReplicatedMesh mesh(*TestCommWorld, /*dim=*/3);
+    Mesh mesh(*TestCommWorld, /*dim=*/3);
 
     // Five nodes: {0,1,2,3} form a tet-shaped polyhedron, and the TET4
     // is {1,2,3,4} on the far side of the shared face {1,2,3}.
