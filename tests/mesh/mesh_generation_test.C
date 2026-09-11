@@ -435,57 +435,93 @@ public:
   {
     LOG_UNIT_TEST;
 
-    Mesh mesh(*TestCommWorld, /*dim=*/3);
+    // Exercise both a replicated and a (genuinely) distributed mesh; on
+    // a DistributedMesh with more ranks than elements this used to be
+    // built in a way that dereferenced elements deleted by
+    // delete_remote_elements(), so we must not hold element pointers
+    // across prepare_for_use() and must reduce counts across ranks.
+    for (int is_replicated = 0; is_replicated != 2; ++is_replicated)
+      {
+        std::unique_ptr<UnstructuredMesh> mesh_ptr = new_mesh(is_replicated);
+        UnstructuredMesh & mesh = *mesh_ptr;
 
-    // Five nodes: {0,1,2,3} form a tet-shaped polyhedron, and the TET4
-    // is {1,2,3,4} on the far side of the shared face {1,2,3}.
-    mesh.add_point(Point(0,0,0), 0);
-    mesh.add_point(Point(1,0,0), 1);
-    mesh.add_point(Point(0,1,0), 2);
-    mesh.add_point(Point(0,0,1), 3);
-    mesh.add_point(Point(1,1,1), 4);
+        // Five nodes: {0,1,2,3} form a tet-shaped polyhedron, and the
+        // TET4 is {1,2,3,4} on the far side of the shared face {1,2,3}.
+        mesh.add_point(Point(0,0,0), 0);
+        mesh.add_point(Point(1,0,0), 1);
+        mesh.add_point(Point(0,1,0), 2);
+        mesh.add_point(Point(0,0,1), 3);
+        mesh.add_point(Point(1,1,1), 4);
 
-    auto tri = [&mesh](dof_id_type a, dof_id_type b, dof_id_type c)
-    {
-      auto p = std::make_shared<C0Polygon>(3);
-      p->set_node(0, mesh.node_ptr(a));
-      p->set_node(1, mesh.node_ptr(b));
-      p->set_node(2, mesh.node_ptr(c));
-      return std::shared_ptr<Polygon>(std::move(p));
-    };
+        auto tri = [&mesh](dof_id_type a, dof_id_type b, dof_id_type c)
+        {
+          auto p = std::make_shared<C0Polygon>(3);
+          p->set_node(0, mesh.node_ptr(a));
+          p->set_node(1, mesh.node_ptr(b));
+          p->set_node(2, mesh.node_ptr(c));
+          return std::shared_ptr<Polygon>(std::move(p));
+        };
 
-    std::vector<std::shared_ptr<Polygon>> faces =
-      { tri(0,1,2), tri(0,1,3), tri(1,2,3), tri(0,2,3) };
+        std::vector<std::shared_ptr<Polygon>> faces =
+          { tri(0,1,2), tri(0,1,3), tri(1,2,3), tri(0,2,3) };
 
-    std::unique_ptr<Node> mid_elem_node;
-    std::unique_ptr<Elem> poly =
-      std::make_unique<C0Polyhedron>(faces, mid_elem_node);
-    if (mid_elem_node)
-      mesh.add_node(std::move(mid_elem_node));
-    poly->set_id() = 0;
-    Elem * polye = mesh.add_elem(std::move(poly));
+        std::unique_ptr<Node> mid_elem_node;
+        std::unique_ptr<Elem> poly =
+          std::make_unique<C0Polyhedron>(faces, mid_elem_node);
+        if (mid_elem_node)
+          mesh.add_node(std::move(mid_elem_node));
+        poly->set_id() = 0;
+        mesh.add_elem(std::move(poly));
 
-    std::unique_ptr<Elem> tet = Elem::build(TET4);
-    tet->set_id() = 1;
-    tet->set_node(0, mesh.node_ptr(1));
-    tet->set_node(1, mesh.node_ptr(2));
-    tet->set_node(2, mesh.node_ptr(3));
-    tet->set_node(3, mesh.node_ptr(4));
-    Elem * tete = mesh.add_elem(std::move(tet));
+        std::unique_ptr<Elem> tet = Elem::build(TET4);
+        tet->set_id() = 1;
+        tet->set_node(0, mesh.node_ptr(1));
+        tet->set_node(1, mesh.node_ptr(2));
+        tet->set_node(2, mesh.node_ptr(3));
+        tet->set_node(3, mesh.node_ptr(4));
+        mesh.add_elem(std::move(tet));
 
-    mesh.prepare_for_use();
+        mesh.prepare_for_use();
 
-    // Exactly one side of each element should be linked, to the other.
-    unsigned int poly_links = 0, tet_links = 0;
-    for (auto s : polye->side_index_range())
-      if (const Elem * n = polye->neighbor_ptr(s))
-        { ++poly_links; CPPUNIT_ASSERT(n == tete); }
-    for (auto s : tete->side_index_range())
-      if (const Elem * n = tete->neighbor_ptr(s))
-        { ++tet_links; CPPUNIT_ASSERT(n == polye); }
+        // find_neighbors() must link the polyhedron's C0POLYGON face to
+        // the tet's TRI3 face.  Count the interface from each owned
+        // element's side and reduce, so the check is valid however the
+        // two elements are partitioned.
+        int poly_to_tet = 0, tet_to_poly = 0;
+        for (const Elem * elem : mesh.active_local_element_ptr_range())
+          for (auto s : elem->side_index_range())
+            {
+              const Elem * neigh = elem->neighbor_ptr(s);
+              if (!neigh)
+                continue;
 
-    CPPUNIT_ASSERT_EQUAL(1u, poly_links);
-    CPPUNIT_ASSERT_EQUAL(1u, tet_links);
+              if (elem->type() == C0POLYHEDRON)
+                {
+                  ++poly_to_tet;
+                  if (!neigh->is_remote())
+                    {
+                      CPPUNIT_ASSERT_EQUAL(neigh->type(), TET4);
+                      CPPUNIT_ASSERT(neigh->neighbor_ptr
+                                     (neigh->which_neighbor_am_i(elem)) == elem);
+                    }
+                }
+              else if (elem->type() == TET4)
+                {
+                  ++tet_to_poly;
+                  if (!neigh->is_remote())
+                    {
+                      CPPUNIT_ASSERT_EQUAL(neigh->type(), C0POLYHEDRON);
+                      CPPUNIT_ASSERT(neigh->neighbor_ptr
+                                     (neigh->which_neighbor_am_i(elem)) == elem);
+                    }
+                }
+            }
+        mesh.comm().sum(poly_to_tet);
+        mesh.comm().sum(tet_to_poly);
+
+        CPPUNIT_ASSERT_EQUAL(1, poly_to_tet);
+        CPPUNIT_ASSERT_EQUAL(1, tet_to_poly);
+      }
   }
 
   void buildCubePrism6 ()    { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM6); }
