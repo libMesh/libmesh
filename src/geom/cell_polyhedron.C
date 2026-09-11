@@ -23,6 +23,7 @@
 #include "libmesh/hashword.h"
 
 // C++ includes
+#include <algorithm>
 #include <array>
 #include <unordered_map>
 #include <unordered_set>
@@ -271,6 +272,16 @@ dof_id_type Polyhedron::low_order_key (const unsigned int s) const
   std::vector<dof_id_type> vertex_ids(nv);
   for (unsigned int v : make_range(nv))
     vertex_ids[v] = face.node_id(v);
+
+  // Sort the vertex ids before hashing so the key is independent of the
+  // order in which the face's vertices are stored, just like
+  // Elem::compute_key() does for every other element type.  This is
+  // essential for find_neighbors(): two polyhedra sharing a face
+  // generally wind that face in opposite orders (each orienting it
+  // outward from its own cell), so without sorting the two sides would
+  // hash to different keys, never get compared, and never be linked as
+  // neighbors.
+  std::sort(vertex_ids.begin(), vertex_ids.end());
 
   return Utility::hashword(vertex_ids);
 }
