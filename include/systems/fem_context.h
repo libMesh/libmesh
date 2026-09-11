@@ -23,6 +23,7 @@
 // Local Includes
 #include "libmesh/diff_context.h"
 #include "libmesh/id_types.h"
+#include "libmesh/enum_quadrature_type.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/vector_value.h"
@@ -106,6 +107,23 @@ public:
    * undistorted basis functions, plus \p extra_quadrature_order.
    */
   void use_unweighted_quadrature_rules(int extra_quadrature_order=0);
+
+  /**
+   * Use a specified quadrature rule type \p qt for every element,
+   * side, and edge dimension, at the default quadrature order for the
+   * hardest FE type plus \p extra_quadrature_order.
+   *
+   * This is useful when the default Gauss rules (whose points lie in
+   * the element interior) are inadequate.  For example, rules whose
+   * points include the element vertices (\p QTRAP, \p QSIMPSON, \p
+   * QNODAL, \p QGAUSS_LOBATTO) can detect integrand behavior that is
+   * localized at element corners --- a feature interior Gauss points
+   * can miss entirely.  Note that not every quadrature type is defined
+   * for every element type (e.g. \p QGAUSS_LOBATTO is only available for
+   * tensor-product elements); it is the caller's responsibility to pick
+   * a type compatible with the mesh.
+   */
+  void use_quadrature_rules(QuadratureType qt, int extra_quadrature_order=0);
 
   /**
    * Reports if the boundary id is found on the current side

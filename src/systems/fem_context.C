@@ -195,6 +195,32 @@ void FEMContext::use_unweighted_quadrature_rules(int extra_quadrature_order)
 }
 
 
+void FEMContext::use_quadrature_rules(QuadratureType qt, int extra_quadrature_order)
+{
+  _extra_quadrature_order = extra_quadrature_order;
+
+  const FEType hardest_fe_type = this->find_hardest_fe_type();
+
+  // Match the accuracy of the default rule (which over-integrates a mass
+  // matrix), then add any requested extra order on top.
+  const Order order = static_cast<Order>(hardest_fe_type.default_quadrature_order()
+                                         + extra_quadrature_order);
+
+  for (const auto & dim : _elem_dims)
+    {
+      // Create the requested quadrature rule for the element and its
+      // lower-dimensional sides/edges
+      _element_qrule[dim] = QBase::build(qt, dim, order);
+      if (dim)
+        _side_qrule[dim] = QBase::build(qt, cast_int<unsigned int>(dim - 1), order);
+      if (dim == 3)
+        _edge_qrule = QBase::build(qt, 1, order);
+    }
+
+  this->attach_quadrature_rules();
+}
+
+
 void FEMContext::init_internal_data(const System & sys)
 {
   // Reserve space for the FEAbstract and QBase objects for each
