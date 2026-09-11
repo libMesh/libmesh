@@ -323,8 +323,8 @@ void parallel_for (const Range & range, const Body & body,
   // compiler.
 #ifdef LIBMESH_HAVE_OPENMP
 // Cap the OpenMP team to the actual number of threads this dispatch uses. Without this clause the
-// team defaults to the process-wide libMesh::n_threads(), so omp_get_thread_num() (consumed by
-// MOOSE's ParallelUniqueId) could exceed a reduced per-application thread count and index past
+// team defaults to the process-wide libMesh::n_threads(), so omp_get_thread_num()
+// could exceed a reduced per-application thread count and index past
 // per-thread storage sized to that count.
 #pragma omp parallel for schedule (static) num_threads(actual_threads)
 #endif
