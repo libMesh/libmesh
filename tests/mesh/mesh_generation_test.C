@@ -313,6 +313,37 @@ public:
             CPPUNIT_ASSERT(elem->volume() > 0);
           }
 
+        // Verify that find_neighbors() actually linked the polyhedra to
+        // one another.  This is a regression test for a bug where
+        // Polyhedron::low_order_key() hashed a face's nodes in their
+        // stored (winding) order rather than sorted; since two adjacent
+        // cells wind their shared face in opposite orders, the keys
+        // never matched and every interior face was left looking like a
+        // boundary face with no neighbor.  For an n x n x n cube there
+        // are 3*(n-1)*n*n interior faces, each shared by two elements,
+        // so 2*3*(n-1)*n*n sides should carry a neighbor link.
+        dof_id_type n_neighbor_links = 0;
+        for (auto & elem : mesh.active_local_element_ptr_range())
+          for (auto s : elem->side_index_range())
+            {
+              const Elem * neigh = elem->neighbor_ptr(s);
+              if (!neigh)
+                continue;
+              ++n_neighbor_links;
+
+              // Links to a non-remote neighbor must be reciprocal.
+              if (!neigh->is_remote())
+                {
+                  const unsigned int ns = neigh->which_neighbor_am_i(elem);
+                  CPPUNIT_ASSERT(ns < neigh->n_sides());
+                  CPPUNIT_ASSERT(neigh->neighbor_ptr(ns) == elem);
+                }
+            }
+        mesh.comm().sum(n_neighbor_links);
+
+        CPPUNIT_ASSERT_EQUAL(n_neighbor_links,
+                             cast_int<dof_id_type>(2 * 3 * (n-1) * n * n));
+
         return;
       }
 
