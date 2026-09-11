@@ -101,7 +101,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
      this->_dof_coupling,
      this->_coupling_functors,
      implicit_neighbor_dofs,
-     need_full_sparsity_pattern,
+     _need_full_sparsity_pattern,
      calculate_constrained,
      sc);
 
@@ -157,7 +157,8 @@ DofMap::DofMap(const unsigned int number,
   _extra_send_list_context(nullptr),
   _default_coupling(std::make_unique<DefaultCoupling>()),
   _default_evaluating(std::make_unique<DefaultCoupling>()),
-  need_full_sparsity_pattern(false),
+  _need_full_sparsity_pattern(false),
+  _need_ghost_constraints(false),
   _n_SCALAR_dofs(0)
 #ifdef LIBMESH_ENABLE_AMR
   , _first_old_scalar_df()
@@ -250,7 +251,7 @@ void DofMap::attach_matrix (SparseMatrix<Number> & matrix)
   this->update_sparsity_pattern(matrix);
 
   if (matrix.need_full_sparsity_pattern())
-    need_full_sparsity_pattern = true;
+    _need_full_sparsity_pattern = true;
 }
 
 
@@ -281,7 +282,7 @@ void DofMap::update_sparsity_pattern(SparseMatrix<Number> & matrix) const
         {
           // We'd better have already computed the full sparsity
           // pattern if we need it here
-          libmesh_assert(need_full_sparsity_pattern);
+          libmesh_assert(_need_full_sparsity_pattern);
 
           matrix.update_sparsity_pattern (_sp->get_sparsity_pattern());
         }
@@ -924,7 +925,8 @@ void DofMap::clear()
   _first_scalar_df.clear();
   this->clear_send_list();
   this->clear_sparsity();
-  need_full_sparsity_pattern = false;
+  _need_full_sparsity_pattern = false;
+  _need_ghost_constraints = false;
 
 #ifdef LIBMESH_ENABLE_AMR
 
@@ -1967,12 +1969,12 @@ void DofMap::compute_sparsity(const MeshBase & mesh)
   for (const auto & mat : _matrices)
     {
       mat->attach_sparsity_pattern (*_sp);
-      if (need_full_sparsity_pattern)
+      if (_need_full_sparsity_pattern)
         mat->update_sparsity_pattern (_sp->get_sparsity_pattern());
     }
   // If we don't need the full sparsity pattern anymore, free the
   // parts of it we don't need.
-  if (!need_full_sparsity_pattern)
+  if (!_need_full_sparsity_pattern)
     _sp->clear_full_sparsity();
 }
 
