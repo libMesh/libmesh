@@ -25,6 +25,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/elem.h"
 #include "libmesh/elem_range.h"
+#include "libmesh/face_polygon.h"
 #include "libmesh/mesh_tools.h" // For n_levels
 #include "libmesh/parallel.h"
 #include "libmesh/remote_elem.h"
@@ -952,6 +953,47 @@ UnstructuredMesh::~UnstructuredMesh ()
 
 
 
+namespace {
+/**
+ * \returns \p true if element sides \p a and \p b are the same face,
+ * for the purpose of linking them as neighbors in find_neighbors().
+ *
+ * This is normally just Elem::operator==, which compares (sorted) node
+ * ids.  But operator== first requires the two sides to have the same
+ * element type, so it never matches a Polyhedron's polygonal side
+ * against the TRI3/QUAD4 side of an adjacent standard element (tet,
+ * hex, ...) even when they are geometrically the same face.  At such a
+ * mixed interface -- exactly one side is a polygon -- we fall back to
+ * comparing the vertex node ids, which is what low_order_key() already
+ * keys on.  Purely standard/standard and polygon/polygon pairs are left
+ * entirely to operator==.
+ */
+bool sides_are_the_same_face(const Elem & a, const Elem & b)
+{
+  if (a == b)
+    return true;
+
+  const bool a_poly = dynamic_cast<const Polygon *>(&a);
+  const bool b_poly = dynamic_cast<const Polygon *>(&b);
+  if (a_poly == b_poly)
+    return false;
+
+  const unsigned int nv = a.n_vertices();
+  if (nv != b.n_vertices())
+    return false;
+
+  std::vector<dof_id_type> a_ids(nv), b_ids(nv);
+  for (unsigned int v = 0; v != nv; ++v)
+    {
+      a_ids[v] = a.node_id(v);
+      b_ids[v] = b.node_id(v);
+    }
+  std::sort(a_ids.begin(), a_ids.end());
+  std::sort(b_ids.begin(), b_ids.end());
+  return a_ids == b_ids;
+}
+}
+
 
 
 void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
@@ -1040,7 +1082,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                         // for matching level() to avoid setting our
                         // neighbor pointer to any of our neighbor's
                         // descendants.
-                        if ((*my_side == *their_side) &&
+                        if (sides_are_the_same_face(*my_side, *their_side) &&
                             (element->level() == neighbor->level()))
                           {
                             // So share a side.  Is this a mixed pair
