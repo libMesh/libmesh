@@ -988,10 +988,10 @@ public:
    * consistency checking is performed before returning.
    *
    * If \p check_non_remote is set to false, then only sides which
-   * currently have remote neighbors are checked for possible local
-   * neighbors.  This is intended to handle a corner case where
-   * ancestor neighbors are redistributed to a processor only by other
-   * processors who do not see that neighbor link.
+   * currently have remote neighbor_ptr links are checked for possible
+   * semilocal side-neighbors.  This is intended to handle a corner case
+   * where ancestor neighbors are redistributed to a processor only by
+   * other processors who do not see that neighbor link.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
                                const bool reset_current_list    = true,
