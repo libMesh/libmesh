@@ -257,9 +257,19 @@ public:
   virtual void reinit () override;
 
   /**
-   * Assembles & solves the nonlinear system R(x) = 0.
+   * Assembles & solves the nonlinear system R(x) = 0. If a matrix has been registered via
+   * set_operator_matrix(), it is used as the actual Jacobian operator (Amat) while \p matrix
+   * remains the preconditioning matrix (Pmat); otherwise \p matrix is used for both, as usual.
    */
   virtual void solve () override;
+
+  /**
+   * Set a matrix to use as the actual Jacobian operator (Amat) on the next solve(), distinct from
+   * \p matrix, which continues to be used as the preconditioning matrix (Pmat). Pass nullptr (the
+   * default) to restore the ordinary behavior of using \p matrix for both. Only solve() itself
+   * reads this value back, so there is no public getter.
+   */
+  void set_operator_matrix(SparseMatrix<Number> * mat) { _operator_matrix = mat; }
 
   /**
    * \returns An integer corresponding to the upper iteration count
@@ -335,6 +345,12 @@ protected:
    * The final residual for the nonlinear system R(x)
    */
   Real _final_nonlinear_residual;
+
+  /**
+   * An optional matrix to use as the actual Jacobian operator (Amat), distinct from \p matrix
+   * (used as the preconditioning matrix, Pmat). See set_operator_matrix().
+   */
+  SparseMatrix<Number> * _operator_matrix;
 };
 
 } // namespace libMesh
