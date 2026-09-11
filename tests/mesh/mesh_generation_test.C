@@ -1,12 +1,20 @@
 #include <libmesh/libmesh.h>
 #include <libmesh/distributed_mesh.h>
 #include <libmesh/elem.h>
+#include <libmesh/cell_c0polyhedron.h>
+#include <libmesh/face_c0polygon.h>
+#include <libmesh/face_polygon.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_tools.h>
 #include <libmesh/replicated_mesh.h>
 
+#include <timpi/parallel_implementation.h> // Communicator::sum definition
+
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
+
+#include <memory>
+#include <vector>
 
 
 using namespace libMesh;
@@ -52,6 +60,7 @@ public:
   CPPUNIT_TEST( buildCubeHex20 );
   CPPUNIT_TEST( buildCubeHex27 );
   CPPUNIT_TEST( buildCubeC0Polyhedron );
+  CPPUNIT_TEST( polyhedronTetNeighbor );
   CPPUNIT_TEST( buildCubePrism6 );
   CPPUNIT_TEST( buildCubePrism15 );
   CPPUNIT_TEST( buildCubePrism18 );
@@ -322,7 +331,7 @@ public:
         // boundary face with no neighbor.  For an n x n x n cube there
         // are 3*(n-1)*n*n interior faces, each shared by two elements,
         // so 2*3*(n-1)*n*n sides should carry a neighbor link.
-        dof_id_type n_neighbor_links = 0;
+        int n_neighbor_links = 0;
         for (auto & elem : mesh.active_local_element_ptr_range())
           for (auto s : elem->side_index_range())
             {
@@ -342,7 +351,7 @@ public:
         mesh.comm().sum(n_neighbor_links);
 
         CPPUNIT_ASSERT_EQUAL(n_neighbor_links,
-                             cast_int<dof_id_type>(2 * 3 * (n-1) * n * n));
+                             static_cast<int>(2 * 3 * (n-1) * n * n));
 
         return;
       }
@@ -414,6 +423,70 @@ public:
   void buildCubeHex27 ()     { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, HEX27); }
   void buildCubeC0Polyhedron ()
   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, C0POLYHEDRON); }
+
+  // Verify that find_neighbors() links a C0Polyhedron to an adjacent
+  // standard element (here a TET4) across their shared triangular face.
+  // The polyhedron's side is a C0POLYGON while the tet's side is a TRI3,
+  // so Elem::operator== alone (which requires matching element types)
+  // would not match them; find_neighbors() falls back to a vertex-id
+  // comparison at such a mixed interface.
+  void polyhedronTetNeighbor ()
+  {
+    LOG_UNIT_TEST;
+
+    ReplicatedMesh mesh(*TestCommWorld, /*dim=*/3);
+
+    // Five nodes: {0,1,2,3} form a tet-shaped polyhedron, and the TET4
+    // is {1,2,3,4} on the far side of the shared face {1,2,3}.
+    mesh.add_point(Point(0,0,0), 0);
+    mesh.add_point(Point(1,0,0), 1);
+    mesh.add_point(Point(0,1,0), 2);
+    mesh.add_point(Point(0,0,1), 3);
+    mesh.add_point(Point(1,1,1), 4);
+
+    auto tri = [&mesh](dof_id_type a, dof_id_type b, dof_id_type c)
+    {
+      auto p = std::make_shared<C0Polygon>(3);
+      p->set_node(0, mesh.node_ptr(a));
+      p->set_node(1, mesh.node_ptr(b));
+      p->set_node(2, mesh.node_ptr(c));
+      return std::shared_ptr<Polygon>(std::move(p));
+    };
+
+    std::vector<std::shared_ptr<Polygon>> faces =
+      { tri(0,1,2), tri(0,1,3), tri(1,2,3), tri(0,2,3) };
+
+    std::unique_ptr<Node> mid_elem_node;
+    std::unique_ptr<Elem> poly =
+      std::make_unique<C0Polyhedron>(faces, mid_elem_node);
+    if (mid_elem_node)
+      mesh.add_node(std::move(mid_elem_node));
+    poly->set_id() = 0;
+    Elem * polye = mesh.add_elem(std::move(poly));
+
+    std::unique_ptr<Elem> tet = Elem::build(TET4);
+    tet->set_id() = 1;
+    tet->set_node(0, mesh.node_ptr(1));
+    tet->set_node(1, mesh.node_ptr(2));
+    tet->set_node(2, mesh.node_ptr(3));
+    tet->set_node(3, mesh.node_ptr(4));
+    Elem * tete = mesh.add_elem(std::move(tet));
+
+    mesh.prepare_for_use();
+
+    // Exactly one side of each element should be linked, to the other.
+    unsigned int poly_links = 0, tet_links = 0;
+    for (auto s : polye->side_index_range())
+      if (const Elem * n = polye->neighbor_ptr(s))
+        { ++poly_links; CPPUNIT_ASSERT(n == tete); }
+    for (auto s : tete->side_index_range())
+      if (const Elem * n = tete->neighbor_ptr(s))
+        { ++tet_links; CPPUNIT_ASSERT(n == polye); }
+
+    CPPUNIT_ASSERT_EQUAL(1u, poly_links);
+    CPPUNIT_ASSERT_EQUAL(1u, tet_links);
+  }
+
   void buildCubePrism6 ()    { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM6); }
   void buildCubePrism15 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM15); }
   void buildCubePrism18 ()   { LOG_UNIT_TEST; tester(&MeshGenerationTest::testBuildCube, 2, PRISM18); }
