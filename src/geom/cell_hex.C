@@ -553,12 +553,12 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
       bounds.second = 4.;
       break;
 
-    case SKEW:
     case SKEW_ANGLE:
       bounds.first  = 0.;
       bounds.second = 0.5;
       break;
 
+    case SKEW:
     case SHEAR:
     case SHAPE:
       bounds.first  = 0.3;
