@@ -47,6 +47,8 @@ public:
   CPPUNIT_TEST( testQuad4Size );
   CPPUNIT_TEST( testHex8Size );
   CPPUNIT_TEST( testQuad4Taper );
+  CPPUNIT_TEST( testQuad4Condition );
+  CPPUNIT_TEST( testHex8Condition );
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST( testTet4Jacobian );
@@ -1031,6 +1033,68 @@ public:
     // two slanted edges equal -> worst pair ratio = 2/4 = 0.5
     LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.5,
       /*actual=*/taper_of({Point(0,0,0), Point(4,0,0), Point(3,1,0), Point(1,1,0)}), TOLERANCE);
+  }
+
+  void testQuad4Condition()
+  {
+    LOG_UNIT_TEST;
+
+    // CONDITION = max over corners of the Jacobian condition number
+    // kappa = |A|_F |A^-1|_F / 2 = (|e0|^2 + |e1|^2) / (2 |e0 x e1|),
+    // which is 1 for a square corner and grows with stretch or skew.
+    auto cond_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+      return elem->quality(CONDITION);
+    };
+
+    // Unit square -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/cond_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // 2x1 rectangle -> (4 + 1) / (2 * 2) = 1.25 at every corner
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.25,
+      /*actual=*/cond_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // Unit-edge rhombus with interior angle theta -> kappa = 1/sin(theta)
+    {
+      auto rhombus_condition = [&cond_of](Real theta)
+      {
+        const Real c = std::cos(theta), s = std::sin(theta);
+        return cond_of({Point(0,0,0), Point(1,0,0), Point(1.+c,s,0), Point(c,s,0)});
+      };
+
+      // theta = pi/6 -> 1/sin(pi/6) = 2
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1./std::sin(libMesh::pi/6),
+        /*actual=*/rhombus_condition(libMesh::pi/6), TOLERANCE);
+      // theta = pi/3 -> 1/sin(pi/3) = 2/sqrt(3)
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1./std::sin(libMesh::pi/3),
+        /*actual=*/rhombus_condition(libMesh::pi/3), TOLERANCE);
+    }
+  }
+
+  void testHex8Condition()
+  {
+    LOG_UNIT_TEST;
+
+    auto cond_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, HEX8);
+      libmesh_ignore(nodes);
+      return elem->quality(CONDITION);
+    };
+
+    // Unit cube -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/cond_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0),
+                          Point(0,0,1), Point(1,0,1), Point(1,1,1), Point(0,1,1)}), TOLERANCE);
+
+    // 2x1x1 box: at each corner |A|_F^2 = 6, |det| = 2,
+    // |A^-1|_F^2 = 9/4, so kappa = sqrt(6 * 9/4)/3 = sqrt(6)/2
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::sqrt(Real(6))/2.,
+      /*actual=*/cond_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0),
+                          Point(0,0,1), Point(2,0,1), Point(2,1,1), Point(0,1,1)}), TOLERANCE);
   }
 
   void testTet4DihedralAngle()
