@@ -2066,7 +2066,7 @@ Real Elem::quality (const ElemQuality q) const
         if (J == 0.)
           return 0.;
 
-        return std::min(J, 1. / J);
+        return std::min(J, Real(1) / J);
       }
 
       // Return 1 if we made it here
