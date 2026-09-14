@@ -184,6 +184,22 @@ public:
   bool snes_mf_reuse_base() const { return _snesmf_reuse_base; }
 
   /**
+   * Set whether evaluating the residual twice at the same solution gives exactly the same result.
+   * This is used to decide whether to run the debug-mode check of matrix-free base vector reuse,
+   * which requires an exact match. The check is already skipped for MPI-parallel and threaded runs;
+   * applications whose assembly is non-deterministic for other reasons (e.g. due to device
+   * parallelism) should set this to false. This only disables the check; the base vector is still
+   * reused.
+   */
+  void set_reproducible_residual(bool state) { _reproducible_residual = state; }
+
+  /**
+   * @return Whether evaluating the residual twice at the same solution gives exactly the same
+   * result
+   */
+  bool reproducible_residual() const { return _reproducible_residual; }
+
+  /**
    * Set whether we are computing the base vector for matrix-free finite-differencing
    */
   void set_computing_base_vector(bool computing_base_vector) { _computing_base_vector = computing_base_vector; }
@@ -279,6 +295,11 @@ protected:
    * https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/MatSNESMFSetReuseBase.html
    */
   bool _snesmf_reuse_base;
+
+  /**
+   * Whether residual evaluation is reproducible. See set_reproducible_residual()
+   */
+  bool _reproducible_residual;
 
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace * computeSubspaceObject,
                             void (*)(std::vector<NumericVector<Number> *> &, sys_type &),

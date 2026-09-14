@@ -336,8 +336,11 @@ extern "C"
 #ifndef NDEBUG
 
     // When the user requested to reuse the nonlinear residual as the base for doing matrix-free
-    // approximation of the Jacobian, we'll do a sanity check to make sure that that was safe to do
-    if (solver->snes_mf_reuse_base() && (solver->comm().size() == 1) && (libMesh::n_threads() == 1))
+    // approximation of the Jacobian, we'll do a sanity check to make sure that that was safe to do.
+    // The check requires an exact match, so skip it for MPI-parallel or threaded runs, or when the
+    // application reports that its residual is not reproducible
+    if (solver->snes_mf_reuse_base() && solver->reproducible_residual() &&
+        (solver->comm().size() == 1) && (libMesh::n_threads() == 1))
     {
       SNES snes = solver->snes();
 
@@ -697,6 +700,7 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _zero_out_jacobian(true),
   _default_monitor(true),
   _snesmf_reuse_base(true),
+  _reproducible_residual(true),
   _computing_base_vector(true),
   _setup_reuse(false)
 {
