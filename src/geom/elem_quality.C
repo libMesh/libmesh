@@ -327,9 +327,10 @@ std::string Quality::describe (const ElemQuality q)
       break;
 
     case SIZE:
-      desc << "min (|J|, |1/J|)\n"
-           << '\n'
-           << "|J| = norm of Jacobian matrix.\n"
+      desc << "Relative size: min(J, 1/J),\n"
+           << "where J is the determinant\n"
+           << "of the nodal Jacobian relative\n"
+           << "to the unit reference element.\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (0.3 -> 1)\n"

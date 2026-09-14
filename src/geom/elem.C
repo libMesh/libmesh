@@ -1996,6 +1996,79 @@ Real Elem::quality (const ElemQuality q) const
         return min_node_area;
       }
 
+      // Relative size metric: min(J, 1/J), where J is the determinant
+      // of the "weighted" nodal Jacobian, A * W^{-1}. Following the
+      // other algebraic metrics (SHAPE, SKEW, JACOBIAN), the reference
+      // (weight) matrix W is the identity, i.e. the canonical unit
+      // reference element (unit-length edges meeting at right angles),
+      // for which det(W) = 1. J is therefore the element's nodal
+      // Jacobian determinant (area in 2D, volume in 3D spanned by the
+      // edges meeting at a node), averaged over the corner nodes.
+      //
+      // Both undersized (J < 1) and oversized (J > 1) elements are
+      // penalized, and an element the size of the unit reference
+      // element scores the ideal value of 1. This differs from the
+      // Verdict/CUBIT relative size, which normalizes J by the
+      // mesh-average element size; that requires mesh-wide context not
+      // available to this per-element method, so we use the reference
+      // element instead. Unlike the standard Verdict metric, J is not
+      // squared here.
+    case SIZE:
+      {
+        // 1D elements don't have interior corners, so this metric does
+        // not really apply to them.
+        const auto N = this->dim();
+        if (N < 2)
+          return 1.;
+
+        // Average the nodal Jacobian determinant over the corner
+        // nodes. This uses the same nodal Jacobian construction as the
+        // JACOBIAN metric above.
+        Real sum_node_area = 0.;
+        unsigned int n_corners = 0;
+
+        for (auto n : this->node_index_range())
+          {
+            // Get list of edge ids adjacent to this node.
+            auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
+
+            // Skip any nodes that don't have dim() adjacent edges (see
+            // the JACOBIAN metric above for the Pyramid apex caveat).
+            if (adjacent_edge_ids.size() != N)
+              continue;
+
+            // Construct oriented edges pointing away from node n.
+            std::vector<Point> oriented_edges(N);
+            for (auto i : make_range(N))
+              {
+                auto node_0 = this->local_edge_node(adjacent_edge_ids[i], 0);
+                auto node_1 = this->local_edge_node(adjacent_edge_ids[i], 1);
+                if (node_0 != n)
+                  std::swap(node_0, node_1);
+                oriented_edges[i] = this->point(node_1) - this->point(node_0);
+              }
+
+            // Unscaled nodal area (2D) or volume (3D).
+            Real node_area = (N == 2) ?
+              cross_norm(oriented_edges[0], oriented_edges[1]) :
+              std::abs(triple_product(oriented_edges[0], oriented_edges[1], oriented_edges[2]));
+
+            sum_node_area += node_area;
+            ++n_corners;
+          }
+
+        // No usable corners, or a degenerate (zero-size) element: return
+        // 0 (the lowest quality).
+        if (n_corners == 0)
+          return 0.;
+
+        const Real J = sum_node_area / n_corners;
+        if (J == 0.)
+          return 0.;
+
+        return std::min(J, 1. / J);
+      }
+
       // Return 1 if we made it here
     default:
       {
