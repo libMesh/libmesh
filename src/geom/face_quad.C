@@ -400,6 +400,34 @@ Real Quad::quality (const ElemQuality q) const
           }
       }
 
+      // Verdict/CUBIT "skew" metric: the maximum |cos A|, where A is
+      // the angle between the principal axes of the element. The
+      // principal axes are the vectors connecting the midpoints of
+      // opposite edges. A value of 0 indicates a perfectly orthogonal
+      // (unskewed) element; larger values (up to 1) indicate
+      // increasing skew. This differs from the SKEW metric above,
+      // which is Knupp's algebraic skew (1 is ideal).
+      // See: C. J. Stimpson et al., "The Verdict Geometric Quality
+      // Library," Sandia report SAND2007-1751, 2007.
+    case SKEW_ANGLE:
+      {
+        const Point x0 = this->point(0), x1 = this->point(1),
+                    x2 = this->point(2), x3 = this->point(3);
+
+        // Principal axes: midpoint-to-midpoint of opposite edges.
+        const Point X1 = (x1 - x0) + (x2 - x3);
+        const Point X2 = (x3 - x0) + (x2 - x1);
+
+        const Real n1 = X1.norm(), n2 = X2.norm();
+
+        // Degenerate element: return 0 (the Verdict convention) if
+        // either principal axis has zero length.
+        if (n1 == 0. || n2 == 0.)
+          return 0.;
+
+        return std::abs((X1 * X2) / (n1 * n2));
+      }
+
       // This test returns 0 if a Quad:
       // 1) Is "twisted" (i.e. has an invalid numbering)
       // 2) Has nearly parallel adjacent edges
@@ -539,6 +567,11 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
     case SIZE:
       bounds.first  = 0.3;
       bounds.second = 1.;
+      break;
+
+    case SKEW_ANGLE:
+      bounds.first  = 0.;
+      bounds.second = 0.5;
       break;
 
     case DISTORTION:
