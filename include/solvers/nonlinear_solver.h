@@ -103,6 +103,21 @@ public:
                                                const unsigned int) = 0; // N. Iterations
 
   /**
+   * Solves the nonlinear system using \p jac_in as the actual Jacobian operator and \p pre_in as
+   * the preconditioning matrix -- which may be the same object (the common case) or genuinely
+   * distinct (e.g. a matrix-free operator paired with an assembled preconditioning matrix).
+   */
+  virtual std::pair<unsigned int, Real> solve (SparseMatrix<T> & /* jac_in */,
+                                               SparseMatrix<T> & /* pre_in */,
+                                               NumericVector<T> & /* x_in */,
+                                               NumericVector<T> & /* r_in */,
+                                               const double /* tol */,
+                                               const unsigned int /* m_its */)
+  {
+    libmesh_not_implemented();
+  }
+
+  /**
    * Prints a useful message about why the latest nonlinear solve
    * con(di)verged.
    */
