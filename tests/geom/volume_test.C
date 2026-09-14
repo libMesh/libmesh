@@ -44,6 +44,8 @@ public:
   CPPUNIT_TEST( testQuad4Jacobian );
   CPPUNIT_TEST( testQuad4SkewAngle );
   CPPUNIT_TEST( testHex8SkewAngle );
+  CPPUNIT_TEST( testQuad4Size );
+  CPPUNIT_TEST( testHex8Size );
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST( testTet4Jacobian );
@@ -931,6 +933,69 @@ public:
       // k = 0.5 -> 0.5/sqrt(1.25) ~ 0.4472
       test_sheared_hex(0.5);
     }
+  }
+
+  void testQuad4Size()
+  {
+    LOG_UNIT_TEST;
+
+    // Relative SIZE = min(J, 1/J), where J is the element's nodal
+    // Jacobian determinant measured against the unit reference
+    // element. A unit square is ideal (1); larger and smaller elements
+    // score below 1 symmetrically.
+    auto size_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+      return elem->quality(SIZE);
+    };
+
+    // Unit square -> J = 1 -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/size_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // 2x2 square -> nodal area J = 4 -> min(4, 1/4) = 0.25
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.25,
+      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,2,0), Point(0,2,0)}), TOLERANCE);
+
+    // 2x1 rectangle -> J = 2 -> 0.5
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.5,
+      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // Unit-edge rhombus with interior angle pi/6 -> J = sin(pi/6) = 0.5
+    // -> min(0.5, 2) = 0.5
+    {
+      const Real c = std::cos(libMesh::pi/6), s = std::sin(libMesh::pi/6);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::sin(libMesh::pi/6),
+        /*actual=*/size_of({Point(0,0,0), Point(1,0,0), Point(1.+c,s,0), Point(c,s,0)}), TOLERANCE);
+    }
+  }
+
+  void testHex8Size()
+  {
+    LOG_UNIT_TEST;
+
+    auto size_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, HEX8);
+      libmesh_ignore(nodes);
+      return elem->quality(SIZE);
+    };
+
+    // Unit cube -> J = 1 -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/size_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0),
+                          Point(0,0,1), Point(1,0,1), Point(1,1,1), Point(0,1,1)}), TOLERANCE);
+
+    // 2x2x2 cube -> nodal volume J = 8 -> min(8, 1/8) = 0.125
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.125,
+      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,2,0), Point(0,2,0),
+                          Point(0,0,2), Point(2,0,2), Point(2,2,2), Point(0,2,2)}), TOLERANCE);
+
+    // 2x1x1 box -> J = 2 -> 0.5
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.5,
+      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0),
+                          Point(0,0,1), Point(2,0,1), Point(2,1,1), Point(0,1,1)}), TOLERANCE);
   }
 
   void testTet4DihedralAngle()
