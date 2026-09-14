@@ -336,8 +336,13 @@ extern "C"
 #ifndef NDEBUG
 
     // When the user requested to reuse the nonlinear residual as the base for doing matrix-free
-    // approximation of the Jacobian, we'll do a sanity check to make sure that that was safe to do
-    if (solver->snes_mf_reuse_base() && (solver->comm().size() == 1) && (libMesh::n_threads() == 1))
+    // approximation of the Jacobian, we'll do a sanity check to make sure that that was safe to do.
+    // The comparison below is bitwise, so it only says something when each degree of freedom's
+    // contributions are summed in a fixed order: MPI-parallel and threaded assembly are excluded
+    // here for that reason, and an application assembling in parallel by some means libMesh cannot
+    // see reports that through set_reproducible_residual()
+    if (solver->snes_mf_reuse_base() && solver->reproducible_residual() &&
+        (solver->comm().size() == 1) && (libMesh::n_threads() == 1))
     {
       SNES snes = solver->snes();
 
@@ -450,7 +455,9 @@ extern "C"
       {
         libmesh_assert(!Jac);
         Jac = &mffd_jac;
-        mffd_jac = jac;
+        // mffd_jac is function-local, so don't attach a context to jac here -- it would
+        // dangle once mffd_jac is destroyed at the end of this call.
+        mffd_jac.assign(jac, /*set_context=*/false);
       }
 
     // We already computed the Jacobian during the residual evaluation
@@ -695,9 +702,9 @@ PetscNonlinearSolver<T>::PetscNonlinearSolver (sys_type & system_in) :
   _zero_out_jacobian(true),
   _default_monitor(true),
   _snesmf_reuse_base(true),
+  _reproducible_residual(true),
   _computing_base_vector(true),
-  _setup_reuse(false),
-  _mffd_jac(this->_communicator)
+  _setup_reuse(false)
 {
 }
 
@@ -901,6 +908,18 @@ std::pair<unsigned int, Real>
 PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditioning Matrix
                                 NumericVector<T> & x_in,    // Solution vector
                                 NumericVector<T> & r_in,    // Residual vector
+                                const double        tol,     // Stopping tolerance
+                                const unsigned int  m_its)
+{
+  return this->solve(pre_in, pre_in, x_in, r_in, tol, m_its);
+}
+
+template <typename T>
+std::pair<unsigned int, Real>
+PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator matrix (Amat)
+                                SparseMatrix<T> &  pre_in,  // Preconditioning matrix (Pmat)
+                                NumericVector<T> & x_in,    // Solution vector
+                                NumericVector<T> & r_in,    // Residual vector
                                 const double,              // Stopping tolerance
                                 const unsigned int)
 {
@@ -910,6 +929,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   this->init ();
 
   // Make sure the data passed in are really of Petsc types
+  PetscMatrixBase<T> * jac = cast_ptr<PetscMatrixBase<T> *>(&jac_in);
   PetscMatrixBase<T> * pre = cast_ptr<PetscMatrixBase<T> *>(&pre_in);
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
   PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
@@ -951,7 +971,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  pre_in,  // System Preconditi
   // Only set the jacobian function if we've been provided with something to call.
   // This allows a user to set their own jacobian function if they want to
   if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
-    LibmeshPetscCall(SNESSetJacobian (_snes, pre->mat(), pre->mat(), libmesh_petsc_snes_jacobian, this));
+    LibmeshPetscCall(SNESSetJacobian (_snes, jac->mat(), pre->mat(), libmesh_petsc_snes_jacobian, this));
 
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;

@@ -58,6 +58,27 @@ public:
 
   virtual bool require_sparsity_pattern() const override { return false; }
 
+  virtual void zero() override;
+  virtual std::unique_ptr<SparseMatrix<T>> zero_clone() const override;
+  virtual std::unique_ptr<SparseMatrix<T>> clone() const override;
+  virtual void set(const numeric_index_type i, const numeric_index_type j, const T value) override;
+  virtual void add(const numeric_index_type i, const numeric_index_type j, const T value) override;
+  virtual void add_matrix(const DenseMatrix<T> & dm,
+                          const std::vector<numeric_index_type> & rows,
+                          const std::vector<numeric_index_type> & cols) override;
+  virtual void add_matrix(const DenseMatrix<T> & dm,
+                          const std::vector<numeric_index_type> & dof_indices) override;
+  virtual void add(const T a, const SparseMatrix<T> & X) override;
+  virtual T operator()(const numeric_index_type i, const numeric_index_type j) const override;
+  virtual Real l1_norm() const override;
+  virtual Real linfty_norm() const override;
+  virtual void print_personal(std::ostream & os = libMesh::out) const override;
+  virtual void get_diagonal(NumericVector<T> & dest) const override;
+  virtual void get_transpose(SparseMatrix<T> & dest) const override;
+  virtual void get_row(numeric_index_type i,
+                       std::vector<numeric_index_type> & indices,
+                       std::vector<T> & values) const override;
+
 private:
   // Make this private because we mark as initialized after we've done our initialization, and we
   // don't want derived classes to mistakenly register their data as initialized (or not)
