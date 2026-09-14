@@ -324,6 +324,33 @@ Real Quad::quality (const ElemQuality q) const
           return std::sqrt(2) * min_edge / d_max;
       }
 
+      // Maximum ratio of lengths derived from opposite edges. This uses
+      // the same convention as the Hex TAPER metric (of which the Quad
+      // is the single-face case): for each of the two pairs of opposite
+      // edges we form the ratio of the shorter to the longer length,
+      // and return the smallest (worst) such ratio. The value lies in
+      // (0, 1], with 1 indicating no taper, i.e. both pairs of opposite
+      // edges are equal in length (as for any parallelogram).
+    case TAPER:
+      {
+        const Real d01 = this->length(0,1);
+        const Real d12 = this->length(1,2);
+        const Real d23 = this->length(2,3);
+        const Real d03 = this->length(0,3);
+
+        // Longer length of each opposite-edge pair.
+        const Real max0 = std::max(d01, d23);
+        const Real max1 = std::max(d12, d03);
+
+        // Degenerate element with a zero-length pair of opposite edges:
+        // return 0 (the lowest quality).
+        if (max0 == 0. || max1 == 0.)
+          return 0.;
+
+        return std::min(std::min(d01, d23) / max0,
+                        std::min(d12, d03) / max1);
+      }
+
     case SHAPE:
     case SKEW:
       {

@@ -46,6 +46,7 @@ public:
   CPPUNIT_TEST( testHex8SkewAngle );
   CPPUNIT_TEST( testQuad4Size );
   CPPUNIT_TEST( testHex8Size );
+  CPPUNIT_TEST( testQuad4Taper );
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST( testTet4Jacobian );
@@ -996,6 +997,40 @@ public:
     LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.5,
       /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0),
                           Point(0,0,1), Point(2,0,1), Point(2,1,1), Point(0,1,1)}), TOLERANCE);
+  }
+
+  void testQuad4Taper()
+  {
+    LOG_UNIT_TEST;
+
+    // TAPER = min over the two opposite-edge pairs of (shorter/longer
+    // length), in (0, 1], with 1 meaning no taper.
+    auto taper_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+      return elem->quality(TAPER);
+    };
+
+    // Unit square -> both pairs equal -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/taper_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // 2x1 rectangle -> opposite edges equal (parallelogram) -> no taper -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/taper_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // Rhombus (unit edges) -> all edges equal -> no taper -> 1
+    {
+      const Real c = std::cos(libMesh::pi/3), s = std::sin(libMesh::pi/3);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+        /*actual=*/taper_of({Point(0,0,0), Point(1,0,0), Point(1.+c,s,0), Point(c,s,0)}), TOLERANCE);
+    }
+
+    // Symmetric trapezoid: bottom edge length 4, top edge length 2, the
+    // two slanted edges equal -> worst pair ratio = 2/4 = 0.5
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.5,
+      /*actual=*/taper_of({Point(0,0,0), Point(4,0,0), Point(3,1,0), Point(1,1,0)}), TOLERANCE);
   }
 
   void testTet4DihedralAngle()
