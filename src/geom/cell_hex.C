@@ -491,6 +491,43 @@ Real Hex::quality (const ElemQuality q) const
             return (den == 0.) ? 0 : (8. / den);
           }
       }
+
+      // Verdict/CUBIT "skew" metric: the maximum |cos A| over the
+      // three pairs of principal axes, where A is the angle between a
+      // pair of axes. Each principal axis is the sum of the vectors
+      // connecting the midpoints of opposite faces along one logical
+      // direction. A value of 0 indicates a perfectly orthogonal
+      // (unskewed) element; larger values (up to 1) indicate
+      // increasing skew. This differs from the SKEW metric above,
+      // which is Knupp's algebraic skew (1 is ideal).
+      // See: C. J. Stimpson et al., "The Verdict Geometric Quality
+      // Library," Sandia report SAND2007-1751, 2007.
+    case SKEW_ANGLE:
+      {
+        const Point
+          x0 = point(0), x1 = point(1), x2 = point(2), x3 = point(3),
+          x4 = point(4), x5 = point(5), x6 = point(6), x7 = point(7);
+
+        // Principal axes, one per logical (xi, eta, zeta) direction.
+        const Point
+          X1 = (x1 - x0) + (x2 - x3) + (x5 - x4) + (x6 - x7),
+          X2 = (x3 - x0) + (x2 - x1) + (x7 - x4) + (x6 - x5),
+          X3 = (x4 - x0) + (x5 - x1) + (x6 - x2) + (x7 - x3);
+
+        const Real n1 = X1.norm(), n2 = X2.norm(), n3 = X3.norm();
+
+        // Degenerate element: return 0 (the Verdict convention) if any
+        // principal axis has zero length.
+        if (n1 == 0. || n2 == 0. || n3 == 0.)
+          return 0.;
+
+        // Normalize, then take the largest |cos| among the three
+        // pairs of principal axes.
+        const Point X1h = X1 / n1, X2h = X2 / n2, X3h = X3 / n3;
+        return std::max({std::abs(X1h * X2h),
+                         std::abs(X1h * X3h),
+                         std::abs(X2h * X3h)});
+      }
 #endif // LIBMESH_DIM >= 3
 
       /**
@@ -516,11 +553,12 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
       bounds.second = 4.;
       break;
 
-    case SKEW:
+    case SKEW_ANGLE:
       bounds.first  = 0.;
       bounds.second = 0.5;
       break;
 
+    case SKEW:
     case SHEAR:
     case SHAPE:
       bounds.first  = 0.3;

@@ -1996,6 +1996,164 @@ Real Elem::quality (const ElemQuality q) const
         return min_node_area;
       }
 
+      // Relative size metric: min(J, 1/J), where J is the determinant
+      // of the "weighted" nodal Jacobian, A * W^{-1}. Following the
+      // other algebraic metrics (SHAPE, SKEW, JACOBIAN), the reference
+      // (weight) matrix W is the identity, i.e. the canonical unit
+      // reference element (unit-length edges meeting at right angles),
+      // for which det(W) = 1. J is therefore the element's nodal
+      // Jacobian determinant (area in 2D, volume in 3D spanned by the
+      // edges meeting at a node), averaged over the corner nodes.
+      //
+      // Both undersized (J < 1) and oversized (J > 1) elements are
+      // penalized, and an element the size of the unit reference
+      // element scores the ideal value of 1. This differs from the
+      // Verdict/CUBIT relative size, which normalizes J by the
+      // mesh-average element size; that requires mesh-wide context not
+      // available to this per-element method, so we use the reference
+      // element instead. Unlike the standard Verdict metric, J is not
+      // squared here.
+    case SIZE:
+      {
+        // 1D elements don't have interior corners, so this metric does
+        // not really apply to them.
+        const auto N = this->dim();
+        if (N < 2)
+          return 1.;
+
+        // Average the nodal Jacobian determinant over the corner
+        // nodes. This uses the same nodal Jacobian construction as the
+        // JACOBIAN metric above.
+        Real sum_node_area = 0.;
+        unsigned int n_corners = 0;
+
+        for (auto n : this->node_index_range())
+          {
+            // Get list of edge ids adjacent to this node.
+            auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
+
+            // Skip any nodes that don't have dim() adjacent edges (see
+            // the JACOBIAN metric above for the Pyramid apex caveat).
+            if (adjacent_edge_ids.size() != N)
+              continue;
+
+            // Construct oriented edges pointing away from node n.
+            std::vector<Point> oriented_edges(N);
+            for (auto i : make_range(N))
+              {
+                auto node_0 = this->local_edge_node(adjacent_edge_ids[i], 0);
+                auto node_1 = this->local_edge_node(adjacent_edge_ids[i], 1);
+                if (node_0 != n)
+                  std::swap(node_0, node_1);
+                oriented_edges[i] = this->point(node_1) - this->point(node_0);
+              }
+
+            // Unscaled nodal area (2D) or volume (3D).
+            Real node_area = (N == 2) ?
+              cross_norm(oriented_edges[0], oriented_edges[1]) :
+              std::abs(triple_product(oriented_edges[0], oriented_edges[1], oriented_edges[2]));
+
+            sum_node_area += node_area;
+            ++n_corners;
+          }
+
+        // No usable corners, or a degenerate (zero-size) element: return
+        // 0 (the lowest quality).
+        if (n_corners == 0)
+          return 0.;
+
+        const Real J = sum_node_area / n_corners;
+        if (J == 0.)
+          return 0.;
+
+        return std::min(J, Real(1) / J);
+      }
+
+      // Maximum condition number of the nodal Jacobian matrix over the
+      // corner nodes. At each corner the Jacobian A has the adjacent
+      // edge vectors as its columns; its (Frobenius-norm) condition
+      // number is kappa = |A|_F * |A^{-1}|_F / N. Following the other
+      // algebraic metrics (SHAPE, SKEW), the reference (weight) matrix
+      // is the identity, so kappa = 1 for an orthogonal, equal-length
+      // (ideal) corner and grows without bound as the corner is
+      // stretched or skewed. A degenerate corner (zero Jacobian
+      // determinant) has an infinite condition number, reported as 0
+      // following the convention used elsewhere (e.g. EDGE_LENGTH_RATIO)
+      // that 0 stands in for infinity.
+    case CONDITION:
+      {
+        // 1D elements don't have interior corners, so this metric does
+        // not really apply to them.
+        const auto N = this->dim();
+        if (N < 2)
+          return 1.;
+
+        // kappa >= 1 for every matrix, so 1 is both the ideal value and
+        // a safe floor for the running maximum.
+        Real max_cond = 1.;
+
+        for (auto n : this->node_index_range())
+          {
+            // Get list of edge ids adjacent to this node.
+            auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
+
+            // Skip any nodes that don't have dim() adjacent edges (see
+            // the JACOBIAN metric above for the Pyramid apex caveat).
+            if (adjacent_edge_ids.size() != N)
+              continue;
+
+            // Construct oriented edges pointing away from node n; these
+            // are the columns of the nodal Jacobian A.
+            std::vector<Point> e(N);
+            for (auto i : make_range(N))
+              {
+                auto node_0 = this->local_edge_node(adjacent_edge_ids[i], 0);
+                auto node_1 = this->local_edge_node(adjacent_edge_ids[i], 1);
+                if (node_0 != n)
+                  std::swap(node_0, node_1);
+                e[i] = this->point(node_1) - this->point(node_0);
+              }
+
+            // Squared Frobenius norm of A.
+            Real frob_A_sq = 0.;
+            for (auto i : make_range(N))
+              frob_A_sq += e[i].norm_sq();
+
+            // |det(A)| and the squared Frobenius norm of A^{-1}.
+            Real abs_det, frob_Ainv_sq;
+            if (N == 2)
+              {
+                abs_det = cross_norm(e[0], e[1]);
+
+                // Degenerate corner: infinite condition number.
+                if (abs_det == 0.)
+                  return 0.;
+
+                // For a 2x2 matrix, |A^{-1}|_F = |A|_F / |det|.
+                frob_Ainv_sq = frob_A_sq / (abs_det * abs_det);
+              }
+            else
+              {
+                abs_det = std::abs(triple_product(e[0], e[1], e[2]));
+
+                // Degenerate corner: infinite condition number.
+                if (abs_det == 0.)
+                  return 0.;
+
+                // The rows of A^{-1} are (e1 x e2), (e2 x e0), (e0 x e1),
+                // each divided by det(A).
+                frob_Ainv_sq = (e[1].cross(e[2]).norm_sq() +
+                                e[2].cross(e[0]).norm_sq() +
+                                e[0].cross(e[1]).norm_sq()) / (abs_det * abs_det);
+              }
+
+            const Real kappa = std::sqrt(frob_A_sq * frob_Ainv_sq) / N;
+            max_cond = std::max(max_cond, kappa);
+          }
+
+        return max_cond;
+      }
+
       // Return 1 if we made it here
     default:
       {

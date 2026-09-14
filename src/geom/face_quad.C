@@ -324,6 +324,33 @@ Real Quad::quality (const ElemQuality q) const
           return std::sqrt(2) * min_edge / d_max;
       }
 
+      // Maximum ratio of lengths derived from opposite edges. This uses
+      // the same convention as the Hex TAPER metric (of which the Quad
+      // is the single-face case): for each of the two pairs of opposite
+      // edges we form the ratio of the shorter to the longer length,
+      // and return the smallest (worst) such ratio. The value lies in
+      // (0, 1], with 1 indicating no taper, i.e. both pairs of opposite
+      // edges are equal in length (as for any parallelogram).
+    case TAPER:
+      {
+        const Real d01 = this->length(0,1);
+        const Real d12 = this->length(1,2);
+        const Real d23 = this->length(2,3);
+        const Real d03 = this->length(0,3);
+
+        // Longer length of each opposite-edge pair.
+        const Real max0 = std::max(d01, d23);
+        const Real max1 = std::max(d12, d03);
+
+        // Degenerate element with a zero-length pair of opposite edges:
+        // return 0 (the lowest quality).
+        if (max0 == 0. || max1 == 0.)
+          return 0.;
+
+        return std::min(std::min(d01, d23) / max0,
+                        std::min(d12, d03) / max1);
+      }
+
     case SHAPE:
     case SKEW:
       {
@@ -398,6 +425,34 @@ Real Quad::quality (const ElemQuality q) const
               den += std::sqrt(T[k][0] * T[k][3]) / alpha[k];
             return (den == 0.) ? 0 : (4. / den);
           }
+      }
+
+      // Verdict/CUBIT "skew" metric: the maximum |cos A|, where A is
+      // the angle between the principal axes of the element. The
+      // principal axes are the vectors connecting the midpoints of
+      // opposite edges. A value of 0 indicates a perfectly orthogonal
+      // (unskewed) element; larger values (up to 1) indicate
+      // increasing skew. This differs from the SKEW metric above,
+      // which is Knupp's algebraic skew (1 is ideal).
+      // See: C. J. Stimpson et al., "The Verdict Geometric Quality
+      // Library," Sandia report SAND2007-1751, 2007.
+    case SKEW_ANGLE:
+      {
+        const Point x0 = this->point(0), x1 = this->point(1),
+                    x2 = this->point(2), x3 = this->point(3);
+
+        // Principal axes: midpoint-to-midpoint of opposite edges.
+        const Point X1 = (x1 - x0) + (x2 - x3);
+        const Point X2 = (x3 - x0) + (x2 - x1);
+
+        const Real n1 = X1.norm(), n2 = X2.norm();
+
+        // Degenerate element: return 0 (the Verdict convention) if
+        // either principal axis has zero length.
+        if (n1 == 0. || n2 == 0.)
+          return 0.;
+
+        return std::abs((X1 * X2) / (n1 * n2));
       }
 
       // This test returns 0 if a Quad:
@@ -539,6 +594,11 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
     case SIZE:
       bounds.first  = 0.3;
       bounds.second = 1.;
+      break;
+
+    case SKEW_ANGLE:
+      bounds.first  = 0.;
+      bounds.second = 0.5;
       break;
 
     case DISTORTION:

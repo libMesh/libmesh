@@ -58,6 +58,10 @@ std::string Quality::name (const ElemQuality q)
       its_name = "Skew";
       break;
 
+    case SKEW_ANGLE:
+      its_name = "Skew Angle";
+      break;
+
     case SHEAR:
       its_name = "Shear";
       break;
@@ -162,6 +166,17 @@ std::string Quality::describe (const ElemQuality q)
       break;
 
     case SKEW:
+      desc << "Knupp's algebraic skew metric,\n"
+           << "based on the nodal Jacobian\n"
+           << "skew matrices. 1 is ideal,\n"
+           << "smaller values are worse.\n"
+           << '\n'
+           << "Suggested ranges:\n"
+           << "Hexes: (0.3 -> 1)\n"
+           << "Quads: (0.3 -> 1)";
+      break;
+
+    case SKEW_ANGLE:
       desc << "Maximum |cos A|, where A\n"
            << "is the angle between edges\n"
            << "at element center.\n"
@@ -234,8 +249,10 @@ std::string Quality::describe (const ElemQuality q)
       break;
 
     case CONDITION:
-      desc << "Condition number of the\n"
-           << "Jacobian matrix.\n"
+      desc << "Maximum condition number of\n"
+           << "the Jacobian matrix at each\n"
+           << "corner. 1 is ideal, larger\n"
+           << "values are worse.\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (1 -> 4)\n"
@@ -320,9 +337,10 @@ std::string Quality::describe (const ElemQuality q)
       break;
 
     case SIZE:
-      desc << "min (|J|, |1/J|)\n"
-           << '\n'
-           << "|J| = norm of Jacobian matrix.\n"
+      desc << "Relative size: min(J, 1/J),\n"
+           << "where J is the determinant\n"
+           << "of the nodal Jacobian relative\n"
+           << "to the unit reference element.\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (0.3 -> 1)\n"
@@ -410,6 +428,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           SHEAR,
           SIZE,
           SKEW,
+          SKEW_ANGLE,
           STRETCH,
           TAPER,
           WARP
@@ -459,6 +478,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           SHEAR,
           SIZE,
           SKEW,
+          SKEW_ANGLE,
           STRETCH,
           TAPER
         };
