@@ -475,6 +475,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
           SHEAR,
           SIZE,
           SKEW,
+          SKEW_ANGLE,
           STRETCH,
           TAPER
         };
