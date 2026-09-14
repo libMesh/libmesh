@@ -42,6 +42,8 @@ public:
   CPPUNIT_TEST( testQuad4Warpage );
   CPPUNIT_TEST( testQuad4MinMaxAngle );
   CPPUNIT_TEST( testQuad4Jacobian );
+  CPPUNIT_TEST( testQuad4SkewAngle );
+  CPPUNIT_TEST( testHex8SkewAngle );
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST( testTet4Jacobian );
@@ -820,6 +822,114 @@ public:
 
       // 2b) Rhombus with interior angle theta=pi/3.
       test_rhombus_quad(libMesh::pi / 3);
+    }
+  }
+
+  void testQuad4SkewAngle()
+  {
+    LOG_UNIT_TEST;
+
+    // The SKEW_ANGLE metric is the Verdict "skew": the maximum |cos A|
+    // between the element's principal axes. 0 means perfectly
+    // orthogonal (unskewed), larger (up to 1) means more skewed.
+
+    // Case 1: A unit square has orthogonal principal axes, so its skew
+    // angle is exactly 0.
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.0, /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+    }
+
+    // Case 2: For a rhombus with interior angle theta, the two
+    // principal axes are separated by theta, so the skew metric is
+    // |cos(theta)|. This is also invariant to rigid body rotation, so
+    // we rotate the rhombus about the z-axis before checking.
+    {
+      auto test_rhombus_quad = [this](Real theta)
+      {
+        const Real ct = std::cos(theta);
+        const Real st = std::sin(theta);
+        std::vector<Point> pts = {
+          Point(0, 0, 0),
+          Point(1, 0, 0),
+          Point(1. + ct, st, 0),
+          Point(     ct, st, 0)};
+
+        // Rotate all points about the z-axis by 30 degrees to confirm
+        // the metric is rotation invariant.
+        const Real cr = std::cos(libMesh::pi / 6);
+        const Real sr = std::sin(libMesh::pi / 6);
+        RealTensorValue Rz(cr, -sr, 0,
+                           sr,  cr, 0,
+                           0,    0, 1);
+        for (auto & pt : pts)
+          pt = Rz * pt;
+
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::abs(ct), /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+      };
+
+      // theta = pi/2 -> |cos| = 0 (orthogonal)
+      test_rhombus_quad(libMesh::pi / 2);
+      // theta = pi/3 -> |cos| = 0.5
+      test_rhombus_quad(libMesh::pi / 3);
+      // theta = pi/6 -> |cos| = sqrt(3)/2
+      test_rhombus_quad(libMesh::pi / 6);
+    }
+
+    // Case 3: A degenerate quad with a zero-length principal axis
+    // returns 0 by the Verdict convention.
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(0, 0, 0), Point(1, 1, 0), Point(1, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.0, /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+    }
+  }
+
+  void testHex8SkewAngle()
+  {
+    LOG_UNIT_TEST;
+
+    // Case 1: A unit cube has mutually orthogonal principal axes, so
+    // its skew angle is exactly 0.
+    {
+      std::vector<Point> pts = {
+        Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0),
+        Point(0, 0, 1), Point(1, 0, 1), Point(1, 1, 1), Point(0, 1, 1)};
+      auto [elem, nodes] = this->construct_elem(pts, HEX8);
+      libmesh_ignore(nodes);
+
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.0, /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+    }
+
+    // Case 2: Shear the top face of a unit cube by k in the
+    // x-direction. Only the zeta principal axis tilts, becoming
+    // (k, 0, 1); the xi and eta axes stay orthogonal. The largest
+    // |cos| between any pair of axes is then k / sqrt(k^2 + 1).
+    {
+      auto test_sheared_hex = [this](Real k)
+      {
+        std::vector<Point> pts = {
+          Point(0,   0, 0), Point(1,   0, 0), Point(1,   1, 0), Point(0,   1, 0),
+          Point(k,   0, 1), Point(1+k, 0, 1), Point(1+k, 1, 1), Point(k,   1, 1)};
+        auto [elem, nodes] = this->construct_elem(pts, HEX8);
+        libmesh_ignore(nodes);
+
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::abs(k) / std::sqrt(k*k + 1),
+                                /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+      };
+
+      // k = 1 -> 1/sqrt(2) ~ 0.7071
+      test_sheared_hex(1.0);
+      // k = 0.5 -> 0.5/sqrt(1.25) ~ 0.4472
+      test_sheared_hex(0.5);
     }
   }
 
