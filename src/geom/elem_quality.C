@@ -241,8 +241,10 @@ std::string Quality::describe (const ElemQuality q)
       break;
 
     case CONDITION:
-      desc << "Condition number of the\n"
-           << "Jacobian matrix.\n"
+      desc << "Maximum condition number of\n"
+           << "the Jacobian matrix at each\n"
+           << "corner. 1 is ideal, larger\n"
+           << "values are worse.\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (1 -> 4)\n"
