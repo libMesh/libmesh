@@ -184,6 +184,27 @@ public:
   bool snes_mf_reuse_base() const { return _snesmf_reuse_base; }
 
   /**
+   * Set whether evaluating the residual twice at the same solution yields bitwise identical
+   * results. The debug-mode check that reusing the nonlinear residual as the matrix-free base
+   * vector was safe compares the recomputed base residual against the stored one bitwise, so it
+   * says something only when assembly sums each degree of freedom's contributions in a fixed
+   * order. MPI-parallel and threaded assembly do not, and are already excluded from that check;
+   * an application that performs its own parallel assembly, for instance accumulating with
+   * device atomics whose completion order is not reproducible, has to report that itself.
+   *
+   * Setting this to false disables only that check. It does not change what is computed, and in
+   * particular does not stop the base vector from being reused; where the difference between two
+   * evaluations is at the level of round-off, reusing it remains sound.
+   */
+  void set_reproducible_residual(bool state) { _reproducible_residual = state; }
+
+  /**
+   * @return Whether evaluating the residual twice at the same solution yields bitwise identical
+   * results
+   */
+  bool reproducible_residual() const { return _reproducible_residual; }
+
+  /**
    * Set whether we are computing the base vector for matrix-free finite-differencing
    */
   void set_computing_base_vector(bool computing_base_vector) { _computing_base_vector = computing_base_vector; }
@@ -279,6 +300,12 @@ protected:
    * https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/MatSNESMFSetReuseBase.html
    */
   bool _snesmf_reuse_base;
+
+  /**
+   * True if two residual evaluations at the same solution agree bitwise, which is what makes the
+   * debug-mode base vector reuse check meaningful. See set_reproducible_residual()
+   */
+  bool _reproducible_residual;
 
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace * computeSubspaceObject,
                             void (*)(std::vector<NumericVector<Number> *> &, sys_type &),
