@@ -411,6 +411,7 @@ std::map<SolverType, std::string> enum_to_solvertype =
 std::map<std::string, ElemQuality> elemquality_to_enum {
    {"ASPECT_RATIO"       , ASPECT_RATIO},
    {"SKEW"               , SKEW},
+   {"SKEW_ANGLE"         , SKEW_ANGLE},
    {"SHEAR"              , SHEAR},
    {"SHAPE"              , SHAPE},
    {"MAX_ANGLE"          , MAX_ANGLE},
