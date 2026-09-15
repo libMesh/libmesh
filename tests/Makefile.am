@@ -36,8 +36,10 @@ unit_tests_sources = \
   fe/fe_l2_hierarchic_test.C \
   fe/fe_l2_lagrange_test.C \
   fe/fe_l2_lagrange_gll_test.C \
+  fe/fe_lagrange_gll_test.C \
   fe/fe_gll_collocation_test.C \
   fe/fe_gll_lagrange_agreement_test.C \
+  fe/fe_amr_constraint_test.C \
   fe/fe_lagrange_test.C \
   fe/fe_monomial_test.C \
   fe/fe_rational_map.C \
