@@ -757,6 +757,7 @@ public:
 
         case LAGRANGE:
         case L2_LAGRANGE:
+        case LAGRANGE_GLL:
         case L2_LAGRANGE_GLL:
         case BERNSTEIN:
         case RATIONAL_BERNSTEIN:
