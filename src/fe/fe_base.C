@@ -210,6 +210,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
           case L2_LAGRANGE:
             return std::make_unique<FE<0,L2_LAGRANGE>>(fet);
 
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<0,L2_LAGRANGE_GLL>>(fet);
+
           case HIERARCHIC:
             return std::make_unique<FE<0,HIERARCHIC>>(fet);
 
@@ -259,6 +262,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<1,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<1,L2_LAGRANGE_GLL>>(fet);
 
           case HIERARCHIC:
             return std::make_unique<FE<1,HIERARCHIC>>(fet);
@@ -311,6 +317,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<2,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<2,L2_LAGRANGE_GLL>>(fet);
 
           case HIERARCHIC:
             return std::make_unique<FE<2,HIERARCHIC>>(fet);
@@ -366,6 +375,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<3,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<3,L2_LAGRANGE_GLL>>(fet);
 
           case HIERARCHIC:
             return std::make_unique<FE<3,HIERARCHIC>>(fet);
