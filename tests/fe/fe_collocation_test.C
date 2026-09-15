@@ -4,10 +4,11 @@
 // matrix. The mass matrix assembled with the rule is then diagonal. This holds for any mapping
 // and element shape, because the Jacobian only scales the diagonal entries.
 //
-// L2_LAGRANGE_GLL is collocated with its default Gauss-Lobatto rule, which orders its points
-// the same way the basis numbers its shape functions, so the permutation is the identity. The
-// basis reads its points from QGaussLobatto, so the property holds exactly, and those cases
-// compare against 1 and 0 without a tolerance. LAGRANGE and L2_LAGRANGE are collocated with
+// The Gauss-Lobatto families are collocated with their default Gauss-Lobatto rule.
+// L2_LAGRANGE_GLL numbers its shape functions in the order of the rule's points, so its
+// permutation is the identity. LAGRANGE_GLL numbers them by the entity that owns them, so its
+// permutation is general. Both read their points from QGaussLobatto, so the property holds
+// exactly, and those cases compare against 1 and 0 without a tolerance. LAGRANGE and L2_LAGRANGE are collocated with
 // QNODAL, whose points are the element nodes in an order that can differ from the node
 // numbering. Their shape functions are evaluated at the nodes in floating point, so those
 // cases use a tolerance.
@@ -74,14 +75,17 @@ public:
   /// The quadrature rule collocated with the basis
   std::unique_ptr<QBase> collocated_rule(const FEType & fe_type, const unsigned int dim)
   {
-    if (family == L2_LAGRANGE_GLL)
+    if (gll)
       return fe_type.default_quadrature_rule(dim);
 
     return std::make_unique<QNodal>(dim);
   }
 
+  /// Whether the family is one of the Gauss-Lobatto nodal families
+  static constexpr bool gll = (family == L2_LAGRANGE_GLL || family == LAGRANGE_GLL);
+
   /// The tolerance on shape function values at the collocation points
-  static constexpr Real tol = (family == L2_LAGRANGE_GLL) ? Real(0) : TOLERANCE*TOLERANCE;
+  static constexpr Real tol = gll ? Real(0) : TOLERANCE*TOLERANCE;
 
   /**
    * \returns Entry i is the index of the quadrature point at which shape function i is one,
@@ -217,6 +221,9 @@ public:
 INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, EDGE2, FIRST);
 INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, EDGE3, THIRD);
 INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, EDGE3, EIGHTH);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, EDGE2, FIRST);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, EDGE3, THIRD);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, EDGE3, EIGHTH);
 INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE, EDGE2, FIRST);
 INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE, EDGE3, SECOND);
 INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE, EDGE4, THIRD);
@@ -227,6 +234,10 @@ INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, QUAD4, FIRST);
 INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, QUAD9, SECOND);
 INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, QUAD9, FOURTH);
 INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, QUAD9, EIGHTH);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, QUAD4, FIRST);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, QUAD9, SECOND);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, QUAD9, FOURTH);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, QUAD9, EIGHTH);
 INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE, TRI3, FIRST);
 INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE, TRI6, SECOND);
 INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE, TRI7, THIRD);
@@ -241,6 +252,9 @@ INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE, QUAD9, SECOND);
 INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, HEX8, FIRST);
 INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, HEX27, SECOND);
 INSTANTIATE_FECOLLOCATIONTEST(L2_LAGRANGE_GLL, HEX27, FOURTH);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, HEX8, FIRST);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, HEX27, SECOND);
+INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE_GLL, HEX27, FOURTH);
 INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE, TET4, FIRST);
 INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE, TET10, SECOND);
 INSTANTIATE_FECOLLOCATIONTEST(LAGRANGE, TET14, THIRD);
