@@ -712,6 +712,7 @@ include_HEADERS = \
         fe/fe_compute_data.h \
         fe/fe_interface.h \
         fe/fe_interface_macros.h \
+        fe/fe_lagrange_gll_shape.h \
         fe/fe_lagrange_gll_shape_1D.h \
         fe/fe_lagrange_shape_1D.h \
         fe/fe_macro.h \
