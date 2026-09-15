@@ -87,6 +87,8 @@ include_HEADERS =  \
         fe/fe_compute_data.h \
         fe/fe_interface.h \
         fe/fe_interface_macros.h \
+        fe/fe_lagrange_gll_shape.h \
+        fe/fe_lagrange_gll_shape_1D.h \
         fe/fe_lagrange_shape_1D.h \
         fe/fe_macro.h \
         fe/fe_map.h \
@@ -175,11 +177,6 @@ include_HEADERS =  \
         geom/sphere.h \
         geom/stored_range.h \
         geom/surface.h \
-        gpu/kokkos_linalg_base.h \
-        gpu/kokkos_storage.h \
-        gpu/kokkos_storage_policy.h \
-        gpu/kokkos_tensor_ops.h \
-        gpu/kokkos_vector_ops.h \
         ghosting/default_coupling.h \
         ghosting/ghost_point_neighbors.h \
         ghosting/ghosting_functor.h \
@@ -187,6 +184,11 @@ include_HEADERS =  \
         ghosting/overlap_coupling.h \
         ghosting/point_neighbor_coupling.h \
         ghosting/sibling_coupling.h \
+        gpu/kokkos_linalg_base.h \
+        gpu/kokkos_storage.h \
+        gpu/kokkos_storage_policy.h \
+        gpu/kokkos_tensor_ops.h \
+        gpu/kokkos_vector_ops.h \
         mesh/abaqus_io.h \
         mesh/boundary_info.h \
         mesh/boundary_mesh.h \
