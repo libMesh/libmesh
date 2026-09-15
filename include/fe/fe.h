@@ -1587,8 +1587,8 @@ fe_hierarchic_quad_tensor_indices (const Elem * elem,
  *
  * The bubbles are \f$\xi^i - 1\f$ for even \p i and \f$\xi^i - \xi\f$ for odd \p i, up to this
  * scaling. Integrating the square of their derivatives over \f$[-1,1]\f$ gives a seminorm of
- * \f$\sqrt{2/(2i-1)}/(i-1)!\f$ in the even case and \f$(i-1)\sqrt{2/(2i-1)}/i!\f$ in the odd one, so
- * the reciprocal of the seminorm cancels a factorial and what remains grows only as \f$\sqrt{i}\f$.
+ * \f$i\sqrt{2/(2i-1)}\f$ in the even case and \f$(i-1)\sqrt{2/(2i-1)}\f$ in the odd one, and this
+ * scaling is the reciprocal of that, which grows as \f$\sqrt{i}\f$.
  *
  * The normalization matters because a shape function carrying \f$1/i!\f$ instead shrinks factorially
  * with its order, and an operator assembled from such a basis inherits that spread on its diagonal.
@@ -1604,8 +1604,8 @@ inline Real fe_hierarchic_bubble_scaling(const unsigned int i)
 {
   libmesh_assert_greater(i, 1);
 
-  // An even bubble differentiates to xi^(i-1)/(i-1)!, whose square integrates to 2/(2i-1) over the
-  // interval. The linear term an odd bubble carries turns the i^2 of that calculation into (i-1)^2.
+  // An even bubble differentiates to i xi^(i-1), whose square integrates to 2 i^2/(2i-1) over the
+  // interval. The linear term an odd bubble carries turns that i^2 into (i-1)^2.
   const Real denominator = (i % 2) ? Real(i) - 1. : Real(i);
 
   return std::sqrt((2. * Real(i) - 1.) / 2.) / denominator;
