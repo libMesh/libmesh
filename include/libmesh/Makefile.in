@@ -573,7 +573,8 @@ BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	uniform_refinement_estimator.h \
 	weighted_patch_recovery_error_estimator.h fe.h fe_abstract.h \
 	fe_base.h fe_compute_data.h fe_interface.h \
-	fe_interface_macros.h fe_lagrange_shape_1D.h fe_macro.h \
+	fe_interface_macros.h fe_lagrange_gll_shape.h \
+	fe_lagrange_gll_shape_1D.h fe_lagrange_shape_1D.h fe_macro.h \
 	fe_map.h fe_transformation_base.h fe_type.h fe_xyz_map.h \
 	h1_fe_transformation.h hcurl_fe_transformation.h \
 	hdiv_fe_transformation.h inf_fe.h inf_fe_instantiate_1D.h \
@@ -1189,6 +1190,12 @@ fe_interface.h: $(top_srcdir)/include/fe/fe_interface.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_interface_macros.h: $(top_srcdir)/include/fe/fe_interface_macros.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_gll_shape.h: $(top_srcdir)/include/fe/fe_lagrange_gll_shape.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_gll_shape_1D.h: $(top_srcdir)/include/fe/fe_lagrange_gll_shape_1D.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_lagrange_shape_1D.h: $(top_srcdir)/include/fe/fe_lagrange_shape_1D.h
