@@ -56,7 +56,7 @@ FEType::default_quadrature_rule (const unsigned int dim,
   // A p refined element keeps the pairing: QBase raises the order of a rule by twice the
   // p_level it is initialized with, and 2p-1 rises by two for each degree, so the rule on an
   // element of level l carries the p+l+1 points that the basis of degree p+l interpolates at.
-  if (family == L2_LAGRANGE_GLL)
+  if (family == L2_LAGRANGE_GLL || family == LAGRANGE_GLL)
     {
       const int p = static_cast<int>(order.get_order());
       return std::make_unique<QGaussLobatto>(dim, static_cast<Order>(2*p - 1 + extraorder));
