@@ -72,6 +72,7 @@ enum FEFamily : int {
                // Nodal basis functions on the Gauss-Lobatto points, which are
                // collocated with the Gauss-Lobatto quadrature rule of the same order
                L2_LAGRANGE_GLL = 81,
+               LAGRANGE_GLL    = 82,
                // Invalid
                INVALID_FE   = 99};
 
