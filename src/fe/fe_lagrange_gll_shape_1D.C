@@ -20,14 +20,14 @@
 // Local includes
 #include "libmesh/fe.h"
 #include "libmesh/elem.h"
-#include "libmesh/fe_lagrange_gll_shape_1D.h"
+#include "libmesh/fe_lagrange_gll_shape.h"
 
 
 namespace libMesh
 {
 
-
 LIBMESH_DEFAULT_VECTORIZED_FE(1,L2_LAGRANGE_GLL)
+LIBMESH_DEFAULT_VECTORIZED_FE(1,LAGRANGE_GLL)
 
 
 template <>
@@ -105,6 +105,91 @@ Real FE<1,L2_LAGRANGE_GLL>::shape_deriv(const FEType fet,
 }
 
 
+template <>
+Real FE<1,LAGRANGE_GLL>::shape(const ElemType,
+                               const Order,
+                               const unsigned int,
+                               const Point &)
+{
+  libmesh_error_msg("The LAGRANGE_GLL shape functions follow the orientation of the "
+                    "entity owning each degree of freedom, so they need an Elem.");
+  return 0.;
+}
+
+
+template <>
+Real FE<1,LAGRANGE_GLL>::shape(const Elem * elem,
+                               const Order order,
+                               const unsigned int i,
+                               const Point & p,
+                               const bool add_p_level)
+{
+  libmesh_assert(elem);
+
+  return fe_lagrange_gll_tensor_product<LAGRANGE_GLL, 1>
+    (elem, order + add_p_level*elem->p_level(), i, p, nullptr, 0);
+}
+
+
+template <>
+Real FE<1,LAGRANGE_GLL>::shape(const FEType fet,
+                               const Elem * elem,
+                               const unsigned int i,
+                               const Point & p,
+                               const bool add_p_level)
+{
+  libmesh_assert(elem);
+
+  return fe_lagrange_gll_tensor_product<LAGRANGE_GLL, 1>
+    (elem, fet.order + add_p_level*elem->p_level(), i, p, nullptr, 0);
+}
+
+
+template <>
+Real FE<1,LAGRANGE_GLL>::shape_deriv(const ElemType,
+                                     const Order,
+                                     const unsigned int,
+                                     const unsigned int,
+                                     const Point &)
+{
+  libmesh_error_msg("The LAGRANGE_GLL shape functions follow the orientation of the "
+                    "entity owning each degree of freedom, so they need an Elem.");
+  return 0.;
+}
+
+
+template <>
+Real FE<1,LAGRANGE_GLL>::shape_deriv(const Elem * elem,
+                                     const Order order,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p,
+                                     const bool add_p_level)
+{
+  libmesh_assert(elem);
+  libmesh_assert_less (j, 1);
+
+  return fe_lagrange_gll_tensor_product<LAGRANGE_GLL, 1>
+    (elem, order + add_p_level*elem->p_level(), i, p, &j, 1);
+}
+
+
+template <>
+Real FE<1,LAGRANGE_GLL>::shape_deriv(const FEType fet,
+                                     const Elem * elem,
+                                     const unsigned int i,
+                                     const unsigned int j,
+                                     const Point & p,
+                                     const bool add_p_level)
+{
+  libmesh_assert(elem);
+  libmesh_assert_less (j, 1);
+
+  return fe_lagrange_gll_tensor_product<LAGRANGE_GLL, 1>
+    (elem, fet.order + add_p_level*elem->p_level(), i, p, &j, 1);
+}
+
+
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 template <>
@@ -143,6 +228,51 @@ Real FE<1,L2_LAGRANGE_GLL>::shape_second_deriv(const FEType fet,
   libmesh_assert(elem);
 
   return fe_lagrange_gll_1D_shape_second_deriv(fet.order + add_p_level*elem->p_level(), i, j, p(0));
+}
+
+
+template <>
+Real FE<1,LAGRANGE_GLL>::shape_second_deriv(const ElemType,
+                                            const Order,
+                                            const unsigned int,
+                                            const unsigned int,
+                                            const Point &)
+{
+  libmesh_error_msg("The LAGRANGE_GLL shape functions follow the orientation of the "
+                    "entity owning each degree of freedom, so they need an Elem.");
+  return 0.;
+}
+
+
+template <>
+Real FE<1,LAGRANGE_GLL>::shape_second_deriv(const Elem * elem,
+                                            const Order order,
+                                            const unsigned int i,
+                                            const unsigned int j,
+                                            const Point & p,
+                                            const bool add_p_level)
+{
+  libmesh_assert(elem);
+  libmesh_assert_less (j, fe_lagrange_gll_n_second_derivs<1>());
+
+  return fe_lagrange_gll_tensor_product<LAGRANGE_GLL, 1>
+    (elem, order + add_p_level*elem->p_level(), i, p, fe_lagrange_gll_second_deriv_pairs[j], 2);
+}
+
+
+template <>
+Real FE<1,LAGRANGE_GLL>::shape_second_deriv(const FEType fet,
+                                            const Elem * elem,
+                                            const unsigned int i,
+                                            const unsigned int j,
+                                            const Point & p,
+                                            const bool add_p_level)
+{
+  libmesh_assert(elem);
+  libmesh_assert_less (j, fe_lagrange_gll_n_second_derivs<1>());
+
+  return fe_lagrange_gll_tensor_product<LAGRANGE_GLL, 1>
+    (elem, fet.order + add_p_level*elem->p_level(), i, p, fe_lagrange_gll_second_deriv_pairs[j], 2);
 }
 
 
