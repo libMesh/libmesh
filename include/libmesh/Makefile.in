@@ -573,14 +573,15 @@ BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	uniform_refinement_estimator.h \
 	weighted_patch_recovery_error_estimator.h fe.h fe_abstract.h \
 	fe_base.h fe_compute_data.h fe_interface.h \
-	fe_interface_macros.h fe_lagrange_shape_1D.h fe_macro.h \
-	fe_map.h fe_reference_element_traits.h \
-	fe_transformation_base.h fe_type.h fe_xyz_map.h \
-	h1_fe_transformation.h hcurl_fe_transformation.h \
-	hdiv_fe_transformation.h inf_fe.h inf_fe_instantiate_1D.h \
-	inf_fe_instantiate_2D.h inf_fe_instantiate_3D.h inf_fe_macro.h \
-	inf_fe_map.h bounding_box.h cell.h cell_c0polyhedron.h \
-	cell_hex.h cell_hex20.h cell_hex27.h cell_hex8.h cell_inf.h \
+	fe_interface_macros.h fe_lagrange_gll_shape_1D.h \
+	fe_lagrange_shape_1D.h fe_macro.h fe_map.h \
+	fe_reference_element_traits.h fe_transformation_base.h \
+	fe_type.h fe_xyz_map.h h1_fe_transformation.h \
+	hcurl_fe_transformation.h hdiv_fe_transformation.h inf_fe.h \
+	inf_fe_instantiate_1D.h inf_fe_instantiate_2D.h \
+	inf_fe_instantiate_3D.h inf_fe_macro.h inf_fe_map.h \
+	bounding_box.h cell.h cell_c0polyhedron.h cell_hex.h \
+	cell_hex20.h cell_hex27.h cell_hex8.h cell_inf.h \
 	cell_inf_hex.h cell_inf_hex16.h cell_inf_hex18.h \
 	cell_inf_hex8.h cell_inf_prism.h cell_inf_prism12.h \
 	cell_inf_prism6.h cell_polyhedron.h cell_prism.h \
@@ -1190,6 +1191,9 @@ fe_interface.h: $(top_srcdir)/include/fe/fe_interface.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_interface_macros.h: $(top_srcdir)/include/fe/fe_interface_macros.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_lagrange_gll_shape_1D.h: $(top_srcdir)/include/fe/fe_lagrange_gll_shape_1D.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_lagrange_shape_1D.h: $(top_srcdir)/include/fe/fe_lagrange_shape_1D.h
