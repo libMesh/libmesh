@@ -1,6 +1,7 @@
 #include <libmesh/elem.h>
 #include <libmesh/enum_quadrature_type.h>
 #include <libmesh/quadrature.h>
+#include <libmesh/quadrature_gauss_lobatto.h>
 #include <libmesh/string_to_enum.h>
 #include <libmesh/utility.h>
 
@@ -140,6 +141,13 @@ public:
 
   // Test Jacobi quadrature rules with special weighting function
   CPPUNIT_TEST( testJacobi );
+
+  // Test the one-dimensional Gauss-Lobatto rules keyed by their number of points
+  CPPUNIT_TEST( testGaussLobattoPoints1D );
+  CPPUNIT_TEST( testGaussLobattoCollocation );
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  CPPUNIT_TEST( testGaussLobattoPointsOutOfRange );
+#endif
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -505,6 +513,126 @@ public:
           } // end for(order)
       } // end for(qt)
   } // testJacobi
+
+
+
+  void testGaussLobattoPoints1D ()
+  {
+    LOG_UNIT_TEST;
+
+    for (unsigned int n = 2; n <= QGaussLobatto::max_points_1D; ++n)
+      {
+        std::vector<Real> pts, wts;
+        QGaussLobatto::points_and_weights_1D(n, pts, wts);
+
+        CPPUNIT_ASSERT_EQUAL(std::size_t(n), pts.size());
+        CPPUNIT_ASSERT_EQUAL(std::size_t(n), wts.size());
+
+        // A Gauss-Lobatto rule includes both endpoints, and its points and weights are
+        // symmetric about the midpoint of the interval
+        CPPUNIT_ASSERT_EQUAL(Real(-1), pts.front());
+        CPPUNIT_ASSERT_EQUAL(Real(1), pts.back());
+        for (const auto i : make_range(n))
+          {
+            if (i > 0)
+              CPPUNIT_ASSERT_LESS(pts[i], pts[i-1]);
+            CPPUNIT_ASSERT_EQUAL(-pts[i], pts[n-1-i]);
+            CPPUNIT_ASSERT_EQUAL(wts[i], wts[n-1-i]);
+            CPPUNIT_ASSERT_GREATER(Real(0), wts[i]);
+          }
+
+        // The weight at each endpoint is 2/(n(n-1))
+        LIBMESH_ASSERT_REALS_EQUAL(Real(2) / (n * (n - 1)), wts.front(), quadrature_tolerance);
+
+        // A rule of n points integrates every polynomial through degree 2n-3 exactly
+        for (unsigned int p = 0; p <= 2 * n - 3; ++p)
+          {
+            Real sum = 0;
+            for (const auto i : make_range(n))
+              sum += wts[i] * std::pow(pts[i], p);
+            LIBMESH_ASSERT_REALS_EQUAL(edge_integrals(p, 0, 0), sum, quadrature_tolerance);
+          }
+      }
+  }
+
+
+
+  void testGaussLobattoCollocation ()
+  {
+    LOG_UNIT_TEST;
+
+    // A basis collocated with a Gauss-Lobatto rule relies on the rule's points and weights
+    // being exactly the ones points_and_weights_1D gives, so each comparison is exact. Both
+    // orders that share an n point rule are checked, on the tensor product elements of every
+    // dimension.
+    const std::vector<ElemType> elem_types = {EDGE2
+#if LIBMESH_DIM > 1
+                                              , QUAD4
+#endif
+#if LIBMESH_DIM > 2
+                                              , HEX8
+#endif
+                                             };
+
+    for (unsigned int n = 2; n <= QGaussLobatto::max_points_1D; ++n)
+      {
+        std::vector<Real> pts, wts;
+        QGaussLobatto::points_and_weights_1D(n, pts, wts);
+
+        for (int o = std::max(int(2 * n) - 4, 0); o <= int(2 * n) - 3; ++o)
+          {
+            const Order order = static_cast<Order>(o);
+            CPPUNIT_ASSERT_EQUAL(n, QGaussLobatto::n_points_1D(order));
+
+            for (const ElemType elem_type : elem_types)
+              {
+                auto elem = Elem::build(elem_type);
+                const unsigned int dim = elem->dim();
+
+                QGaussLobatto qrule(dim, order);
+                qrule.init(*elem);
+
+                unsigned int n_points = 1;
+                for (unsigned int d = 0; d < dim; ++d)
+                  n_points *= n;
+                CPPUNIT_ASSERT_EQUAL(n_points, qrule.n_points());
+
+                // The tensor product rule lays its points out with the first coordinate
+                // varying fastest
+                for (const auto q : make_range(qrule.n_points()))
+                  {
+                    Real weight = 1;
+                    unsigned int index = q;
+                    for (const auto d : make_range(dim))
+                      {
+                        CPPUNIT_ASSERT_EQUAL(pts[index % n], qrule.qp(q)(d));
+                        weight *= wts[index % n];
+                        index /= n;
+                      }
+                    CPPUNIT_ASSERT_EQUAL(weight, qrule.w(q));
+                  }
+              }
+          }
+      }
+  }
+
+
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+  void testGaussLobattoPointsOutOfRange ()
+  {
+    LOG_UNIT_TEST;
+
+    std::vector<Real> pts, wts;
+
+    // There is no Gauss-Lobatto rule of fewer than two points, since it must include both
+    // endpoints, and the table ends at max_points_1D
+    for (const unsigned int n : {0u, 1u, QGaussLobatto::max_points_1D + 1})
+      CPPUNIT_ASSERT_THROW_MESSAGE("Untabulated Gauss-Lobatto rule not detected",
+                                   QGaussLobatto::points_and_weights_1D(n, pts, wts),
+                                   libMesh::LogicError);
+  }
+#endif
 
 
 

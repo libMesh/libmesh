@@ -59,6 +59,32 @@ public:
   virtual ~QGaussLobatto() = default;
 
   /**
+   * The largest number of points for which the one-dimensional rule is tabulated.
+   */
+  static constexpr unsigned int max_points_1D = 23;
+
+  /**
+   * \returns The number of one-dimensional points that the rule of order \p order uses.
+   *
+   * A rule of n points is exact through degree 2n-3, so the orders 2n-4 and 2n-3 share a
+   * rule and this inverts that pairing.
+   */
+  static unsigned int n_points_1D (const Order order);
+
+  /**
+   * Fills \p pts and \p wts with the \p n one-dimensional Gauss-Lobatto points and weights
+   * on the reference interval [-1,1], the points in ascending order.
+   *
+   * A nodal basis whose interpolation points are the points of this rule is collocated
+   * with it, which makes its mass matrix diagonal. That property is exact only if the
+   * basis and the rule carry the same values, so a basis reads its points from here, as
+   * the rule itself does.
+   */
+  static void points_and_weights_1D (const unsigned int n,
+                                     std::vector<Real> & pts,
+                                     std::vector<Real> & wts);
+
+  /**
    * \returns \p QGAUSS_LOBATTO.
    */
   virtual QuadratureType type() const override;
