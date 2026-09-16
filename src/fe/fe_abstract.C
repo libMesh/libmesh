@@ -67,7 +67,7 @@ FEAbstract::FEAbstract(const unsigned int d,
   qrule(nullptr),
   shapes_on_quadrature(false),
   _n_total_qp(0),
-  _add_p_level_in_reinit(true)
+  _add_p_level_in_reinit(fet.p_refinement)
 {
 }
 
