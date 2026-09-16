@@ -469,6 +469,27 @@ public:
                                        unsigned int edge_node) const = 0;
 
   /**
+   * \returns The local node id for node \p side_node on side \p side of
+   * an element of type \p t, without needing an instantiated Elem.
+   * The Polygon and Polyhedron subclasses have no such map, and the
+   * infinite elements' maps are not read here, so those must be queried
+   * through an actual Elem.
+   */
+  static unsigned int local_side_node(ElemType t,
+                                      unsigned int side,
+                                      unsigned int side_node);
+
+  /**
+   * \returns The local node id for node \p edge_node on edge \p edge of
+   * an element of type \p t, without needing an instantiated Elem.  For
+   * 2D types this is local_side_node(); 1D types have no edges.  The
+   * same types are unsupported here as in local_side_node().
+   */
+  static unsigned int local_edge_node(ElemType t,
+                                      unsigned int edge,
+                                      unsigned int edge_node);
+
+  /**
    * \returns \p true if a vertex of \p e is contained
    * in this element.  If \p mesh_connection is true, looks
    * specifically for containment possibilities of an element \p e
@@ -748,6 +769,15 @@ public:
    * \returns The type of element for side \p s.
    */
   virtual ElemType side_type (const unsigned int s) const = 0;
+
+  /**
+   * \returns The type of side \p s of an element of type \p t, without
+   * needing an instantiated Elem.  The Polygon and Polyhedron subclasses
+   * have one side type but no fixed number of sides, so \p s goes
+   * unchecked for them; query an actual Elem when you have one.
+   */
+  static ElemType side_type (const ElemType t,
+                             const unsigned int s);
 
   /**
    * \returns the normal (outwards-facing) of the side of the element at the vertex-average of the side
