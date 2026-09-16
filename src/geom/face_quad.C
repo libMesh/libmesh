@@ -553,8 +553,11 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
       break;
 
     case TAPER:
-      bounds.first  = 0.;
-      bounds.second = 0.7;
+      // TAPER is 1 for an untapered element and decreases toward 0 with
+      // increasing taper (see Quad::quality), so the good range runs up
+      // to 1, not down from 0.
+      bounds.first  = 0.7;
+      bounds.second = 1.;
       break;
 
     case WARP:

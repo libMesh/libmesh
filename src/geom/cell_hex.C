@@ -582,8 +582,11 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
       break;
 
     case TAPER:
-      bounds.first  = 0.;
-      bounds.second = 0.4;
+      // TAPER is 1 for an untapered element and decreases toward 0 with
+      // increasing taper (see Hex::quality), so the good range runs up
+      // to 1, not down from 0.
+      bounds.first  = 0.4;
+      bounds.second = 1.;
       break;
 
     case STRETCH:
