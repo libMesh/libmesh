@@ -23,6 +23,8 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/face_tri.h"
+#include "libmesh/face_tri3.h"
+#include "libmesh/fe_reference_element_traits.h"
 
 namespace libMesh
 {
@@ -202,14 +204,12 @@ public:
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * element node numbers.  It is derived from the first-order
+   * Tri3 tables; see fe_reference_element_traits.h.
    */
-  static constexpr unsigned int side_nodes_map[num_sides][nodes_per_side] =
-    {
-      {0, 1, 3}, // Side 0
-      {1, 2, 4}, // Side 1
-      {2, 0, 5}  // Side 2
-    };
+  static constexpr ReferenceElementTable<num_sides, nodes_per_side>
+  _side_nodes = derived_side_nodes<Tri3, num_sides>();
+  static constexpr const unsigned int (&side_nodes_map)[num_sides][nodes_per_side] = _side_nodes.values;
 
   /**
    * An optimized method for approximating the area of a

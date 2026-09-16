@@ -22,6 +22,8 @@
 
 // Local includes
 #include "libmesh/cell_pyramid.h"
+#include "libmesh/cell_pyramid5.h"
+#include "libmesh/fe_reference_element_traits.h"
 
 namespace libMesh
 {
@@ -235,33 +237,18 @@ public:
   static const int nodes_per_edge = 3;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * These map the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge or
+   * side to element node numbers.  They are derived from the
+   * first-order Pyramid5 tables; see fe_reference_element_traits.h.
    */
-  static constexpr unsigned int side_nodes_map[num_sides][nodes_per_side] =
-    {
-      {0, 1, 4, 5, 10,  9, 14, 99, 99}, // Side 0 (front)
-      {1, 2, 4, 6, 11, 10, 15, 99, 99}, // Side 1 (right)
-      {2, 3, 4, 7, 12, 11, 16, 99, 99}, // Side 2 (back)
-      {3, 0, 4, 8,  9, 12, 17, 99, 99}, // Side 3 (left)
-      {0, 3, 2, 1,  8,  7,  6,  5, 13}  // Side 4 (base)
-    };
+  static constexpr ReferenceElementTable<num_edges, nodes_per_edge>
+  _edge_nodes = derived_edge_nodes<Pyramid5, num_edges>();
+  static constexpr const unsigned int (&edge_nodes_map)[num_edges][nodes_per_edge] = _edge_nodes.values;
 
-  /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
-   */
-  static constexpr unsigned int edge_nodes_map[num_edges][nodes_per_edge] =
-    {
-      {0, 1,  5}, // Edge 0
-      {1, 2,  6}, // Edge 1
-      {2, 3,  7}, // Edge 2
-      {0, 3,  8}, // Edge 3
-      {0, 4,  9}, // Edge 4
-      {1, 4, 10}, // Edge 5
-      {2, 4, 11}, // Edge 6
-      {3, 4, 12}  // Edge 7
-    };
+  static constexpr ReferenceElementTable<num_sides, nodes_per_side>
+  _side_nodes = derived_side_nodes<Pyramid5, num_sides, nodes_per_side>
+    (_edge_nodes.values, [](unsigned int s) { return s == 4 ? 13 : 14 + s; });
+  static constexpr const unsigned int (&side_nodes_map)[num_sides][nodes_per_side] = _side_nodes.values;
 
   virtual void permute(unsigned int perm_num) override final;
 

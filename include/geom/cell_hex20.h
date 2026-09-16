@@ -22,6 +22,8 @@
 
 // Local includes
 #include "libmesh/cell_hex.h"
+#include "libmesh/cell_hex8.h"
+#include "libmesh/fe_reference_element_traits.h"
 
 namespace libMesh
 {
@@ -217,38 +219,18 @@ public:
   static const int nodes_per_edge = 3;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * These map the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge or
+   * side to element node numbers.  They are derived from the
+   * first-order Hex8 tables; see fe_reference_element_traits.h.
    */
-  static constexpr unsigned int side_nodes_map[num_sides][nodes_per_side] =
-    {
-      {0, 3, 2, 1, 11, 10,  9,  8}, // Side 0
-      {0, 1, 5, 4,  8, 13, 16, 12}, // Side 1
-      {1, 2, 6, 5,  9, 14, 17, 13}, // Side 2
-      {2, 3, 7, 6, 10, 15, 18, 14}, // Side 3
-      {3, 0, 4, 7, 11, 12, 19, 15}, // Side 4
-      {4, 5, 6, 7, 16, 17, 18, 19}  // Side 5
-    };
+  static constexpr ReferenceElementTable<num_edges, nodes_per_edge>
+  _edge_nodes = derived_edge_nodes<Hex8, num_edges>();
+  static constexpr const unsigned int (&edge_nodes_map)[num_edges][nodes_per_edge] = _edge_nodes.values;
 
-  /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
-   */
-  static constexpr unsigned int edge_nodes_map[num_edges][nodes_per_edge] =
-    {
-      {0, 1, 8},  // Edge 0
-      {1, 2, 9},  // Edge 1
-      {2, 3, 10}, // Edge 2
-      {0, 3, 11}, // Edge 3
-      {0, 4, 12}, // Edge 4
-      {1, 5, 13}, // Edge 5
-      {2, 6, 14}, // Edge 6
-      {3, 7, 15}, // Edge 7
-      {4, 5, 16}, // Edge 8
-      {5, 6, 17}, // Edge 9
-      {6, 7, 18}, // Edge 10
-      {4, 7, 19}  // Edge 11
-    };
+  static constexpr ReferenceElementTable<num_sides, nodes_per_side>
+  _side_nodes = derived_side_nodes<Hex8, num_sides, nodes_per_side>
+    (_edge_nodes.values, no_face_node);
+  static constexpr const unsigned int (&side_nodes_map)[num_sides][nodes_per_side] = _side_nodes.values;
 
   /**
    * A specialization for computing the volume of a Hex20.

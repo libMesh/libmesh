@@ -22,6 +22,8 @@
 
 // Local includes
 #include "libmesh/cell_prism.h"
+#include "libmesh/cell_prism6.h"
+#include "libmesh/fe_reference_element_traits.h"
 
 namespace libMesh
 {
@@ -222,34 +224,18 @@ public:
   static const int nodes_per_edge = 3;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * These map the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge or
+   * side to element node numbers.  They are derived from the
+   * first-order Prism6 tables; see fe_reference_element_traits.h.
    */
-  static constexpr unsigned int side_nodes_map[num_sides][nodes_per_side] =
-    {
-      {0, 2, 1,  8,  7,  6, 99, 99}, // Side 0
-      {0, 1, 4,  3,  6, 10, 12,  9}, // Side 1
-      {1, 2, 5,  4,  7, 11, 13, 10}, // Side 2
-      {2, 0, 3,  5,  8,  9, 14, 11}, // Side 3
-      {3, 4, 5, 12, 13, 14, 99, 99}  // Side 4
-    };
+  static constexpr ReferenceElementTable<num_edges, nodes_per_edge>
+  _edge_nodes = derived_edge_nodes<Prism6, num_edges>();
+  static constexpr const unsigned int (&edge_nodes_map)[num_edges][nodes_per_edge] = _edge_nodes.values;
 
-  /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
-   */
-  static constexpr unsigned int edge_nodes_map[num_edges][nodes_per_edge] =
-    {
-      {0, 1,  6}, // Edge 0
-      {1, 2,  7}, // Edge 1
-      {0, 2,  8}, // Edge 2
-      {0, 3,  9}, // Edge 3
-      {1, 4, 10}, // Edge 4
-      {2, 5, 11}, // Edge 5
-      {3, 4, 12}, // Edge 6
-      {4, 5, 13}, // Edge 7
-      {3, 5, 14}  // Edge 8
-    };
+  static constexpr ReferenceElementTable<num_sides, nodes_per_side>
+  _side_nodes = derived_side_nodes<Prism6, num_sides, nodes_per_side>
+    (_edge_nodes.values, no_face_node);
+  static constexpr const unsigned int (&side_nodes_map)[num_sides][nodes_per_side] = _side_nodes.values;
 
   /**
    * A specialization for computing the volume of a Prism15.
