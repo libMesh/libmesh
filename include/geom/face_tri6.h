@@ -204,7 +204,12 @@ public:
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */
-  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
+  static constexpr unsigned int side_nodes_map[num_sides][nodes_per_side] =
+    {
+      {0, 1, 3}, // Side 0
+      {1, 2, 4}, // Side 1
+      {2, 0, 5}  // Side 2
+    };
 
   /**
    * An optimized method for approximating the area of a

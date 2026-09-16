@@ -35,28 +35,6 @@ const int Prism15::num_nodes;
 const int Prism15::nodes_per_side;
 const int Prism15::nodes_per_edge;
 
-const unsigned int Prism15::side_nodes_map[Prism15::num_sides][Prism15::nodes_per_side] =
-  {
-    {0, 2, 1,  8,  7,  6, 99, 99}, // Side 0
-    {0, 1, 4,  3,  6, 10, 12,  9}, // Side 1
-    {1, 2, 5,  4,  7, 11, 13, 10}, // Side 2
-    {2, 0, 3,  5,  8,  9, 14, 11}, // Side 3
-    {3, 4, 5, 12, 13, 14, 99, 99}  // Side 4
-  };
-
-const unsigned int Prism15::edge_nodes_map[Prism15::num_edges][Prism15::nodes_per_edge] =
-  {
-    {0, 1,  6}, // Edge 0
-    {1, 2,  7}, // Edge 1
-    {0, 2,  8}, // Edge 2
-    {0, 3,  9}, // Edge 3
-    {1, 4, 10}, // Edge 4
-    {2, 5, 11}, // Edge 5
-    {3, 4, 12}, // Edge 6
-    {4, 5, 13}, // Edge 7
-    {3, 5, 14}  // Edge 8
-  };
-
 // ------------------------------------------------------------
 // Prism15 class member functions
 

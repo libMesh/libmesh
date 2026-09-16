@@ -38,13 +38,6 @@ namespace libMesh
 const int Tri7::num_nodes;
 const int Tri7::nodes_per_side;
 
-const unsigned int Tri7::side_nodes_map[Tri7::num_sides][Tri7::nodes_per_side] =
-  {
-    {0, 1, 3}, // Side 0
-    {1, 2, 4}, // Side 1
-    {2, 0, 5}  // Side 2
-  };
-
 
 #ifdef LIBMESH_ENABLE_AMR
 

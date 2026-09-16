@@ -42,24 +42,6 @@ const int Tet14::num_nodes;
 const int Tet14::nodes_per_side;
 const int Tet14::nodes_per_edge;
 
-const unsigned int Tet14::side_nodes_map[Tet14::num_sides][Tet14::nodes_per_side] =
-  {
-    {0, 2, 1, 6, 5, 4, 10}, // Side 0
-    {0, 1, 3, 4, 8, 7, 11}, // Side 1
-    {1, 2, 3, 5, 9, 8, 12}, // Side 2
-    {2, 0, 3, 6, 7, 9, 13}  // Side 3
-  };
-
-const unsigned int Tet14::edge_nodes_map[Tet14::num_edges][Tet14::nodes_per_edge] =
-  {
-    {0, 1, 4}, // Edge 0
-    {1, 2, 5}, // Edge 1
-    {0, 2, 6}, // Edge 2
-    {0, 3, 7}, // Edge 3
-    {1, 3, 8}, // Edge 4
-    {2, 3, 9}  // Edge 5
-  };
-
 // ------------------------------------------------------------
 // Tet14 class member functions
 

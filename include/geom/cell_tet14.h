@@ -226,13 +226,27 @@ public:
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */
-  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
+  static constexpr unsigned int side_nodes_map[num_sides][nodes_per_side] =
+    {
+      {0, 2, 1, 6, 5, 4, 10}, // Side 0
+      {0, 1, 3, 4, 8, 7, 11}, // Side 1
+      {1, 2, 3, 5, 9, 8, 12}, // Side 2
+      {2, 0, 3, 6, 7, 9, 13}  // Side 3
+    };
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
    * element node numbers.
    */
-  static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
+  static constexpr unsigned int edge_nodes_map[num_edges][nodes_per_edge] =
+    {
+      {0, 1, 4}, // Edge 0
+      {1, 2, 5}, // Edge 1
+      {0, 2, 6}, // Edge 2
+      {0, 3, 7}, // Edge 3
+      {1, 3, 8}, // Edge 4
+      {2, 3, 9}  // Edge 5
+    };
 
   virtual void permute(unsigned int perm_num) override final;
 
