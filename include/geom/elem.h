@@ -640,7 +640,67 @@ public:
    * is fixed; for more general types like Polygon subclasses an actual
    * instantiated Elem must be queried.
    */
-  static const unsigned int type_to_n_nodes_map[INVALID_ELEM];
+  static constexpr unsigned int type_to_n_nodes_map[INVALID_ELEM] =
+    {
+      2,  // EDGE2
+      3,  // EDGE3
+      4,  // EDGE4
+
+      3,  // TRI3
+      6,  // TRI6
+
+      4,  // QUAD4
+      8,  // QUAD8
+      9,  // QUAD9
+
+      4,  // TET4
+      10, // TET10
+
+      8,  // HEX8
+      20, // HEX20
+      27, // HEX27
+
+      6,  // PRISM6
+      15, // PRISM15
+      18, // PRISM18
+
+      5,  // PYRAMID5
+      13, // PYRAMID13
+      14, // PYRAMID14
+
+      2,  // INFEDGE2
+
+      4,  // INFQUAD4
+      6,  // INFQUAD6
+
+      8,  // INFHEX8
+      16, // INFHEX16
+      18, // INFHEX18
+
+      6,  // INFPRISM6
+      12, // INFPRISM12
+
+      1,  // NODEELEM
+
+      0,  // REMOTEELEM
+
+      3,  // TRI3SUBDIVISION
+      3,  // TRISHELL3
+      4,  // QUADSHELL4
+      8,  // QUADSHELL8
+
+      7,  // TRI7
+      14, // TET14
+      20, // PRISM20
+      21, // PRISM21
+      18, // PYRAMID18
+
+      9,  // QUADSHELL9
+
+      invalid_uint,  // C0POLYGON
+      invalid_uint,  // C0POLYHEDRON
+
+    };
 
   /**
    * \returns The number of nodes this element contains.
