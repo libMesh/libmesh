@@ -251,8 +251,9 @@ std::string Quality::describe (const ElemQuality q)
     case CONDITION:
       desc << "Maximum condition number of\n"
            << "the Jacobian matrix at each\n"
-           << "corner. 1 is ideal, larger\n"
-           << "values are worse.\n"
+           << "corner, relative to an ideal\n"
+           << "(regular) element. 1 is ideal,\n"
+           << "larger values are worse.\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (1 -> 4)\n"
@@ -338,9 +339,11 @@ std::string Quality::describe (const ElemQuality q)
 
     case SIZE:
       desc << "Relative size: min(J, 1/J),\n"
-           << "where J is the determinant\n"
-           << "of the nodal Jacobian relative\n"
-           << "to the unit reference element.\n"
+           << "where J is the determinant of\n"
+           << "the nodal Jacobian relative to\n"
+           << "an ideal element of the same\n"
+           << "volume. 1 for a uniform\n"
+           << "(affine) element.\n"
            << '\n'
            << "Suggested ranges:\n"
            << "Quads: (0.3 -> 1)\n"

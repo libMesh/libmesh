@@ -942,10 +942,12 @@ public:
   {
     LOG_UNIT_TEST;
 
-    // Relative SIZE = min(J, 1/J), where J is the element's nodal
-    // Jacobian determinant measured against the unit reference
-    // element. A unit square is ideal (1); larger and smaller elements
-    // score below 1 symmetrically.
+    // Relative SIZE = min over corners of min(tau, 1/tau), where tau is
+    // the corner nodal Jacobian determinant divided by that of an ideal
+    // element of the same volume (the mean nodal determinant). It is 1
+    // for any element with a uniform Jacobian (any affine element, at
+    // any scale) and drops below 1 as the Jacobian varies across the
+    // element.
     auto size_of = [this](const std::vector<Point> & pts)
     {
       auto [elem, nodes] = this->construct_elem(pts, QUAD4);
@@ -953,25 +955,25 @@ public:
       return elem->quality(SIZE);
     };
 
-    // Unit square -> J = 1 -> 1
+    // Affine elements (uniform Jacobian) all score 1, regardless of
+    // scale or shape: unit square, a larger square, a stretched
+    // rectangle, and a sheared rhombus.
     LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
       /*actual=*/size_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0)}), TOLERANCE);
-
-    // 2x2 square -> nodal area J = 4 -> min(4, 1/4) = 0.25
-    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.25,
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
       /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,2,0), Point(0,2,0)}), TOLERANCE);
-
-    // 2x1 rectangle -> J = 2 -> 0.5
-    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.5,
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
       /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0)}), TOLERANCE);
-
-    // Unit-edge rhombus with interior angle pi/6 -> J = sin(pi/6) = 0.5
-    // -> min(0.5, 2) = 0.5
     {
       const Real c = std::cos(libMesh::pi/6), s = std::sin(libMesh::pi/6);
-      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::sin(libMesh::pi/6),
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
         /*actual=*/size_of({Point(0,0,0), Point(1,0,0), Point(1.+c,s,0), Point(c,s,0)}), TOLERANCE);
     }
+
+    // Trapezoid with corner nodal areas {6, 6, 4, 4} (mean 5): the
+    // worst corner ratio is 4/5 = 0.8.
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.8,
+      /*actual=*/size_of({Point(0,0,0), Point(3,0,0), Point(2,2,0), Point(0,2,0)}), TOLERANCE);
   }
 
   void testHex8Size()
@@ -985,20 +987,20 @@ public:
       return elem->quality(SIZE);
     };
 
-    // Unit cube -> J = 1 -> 1
+    // Affine boxes (uniform Jacobian) score 1 at any scale.
     LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
       /*actual=*/size_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0),
                           Point(0,0,1), Point(1,0,1), Point(1,1,1), Point(0,1,1)}), TOLERANCE);
-
-    // 2x2x2 cube -> nodal volume J = 8 -> min(8, 1/8) = 0.125
-    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.125,
-      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,2,0), Point(0,2,0),
-                          Point(0,0,2), Point(2,0,2), Point(2,2,2), Point(0,2,2)}), TOLERANCE);
-
-    // 2x1x1 box -> J = 2 -> 0.5
-    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.5,
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
       /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0),
                           Point(0,0,1), Point(2,0,1), Point(2,1,1), Point(0,1,1)}), TOLERANCE);
+
+    // A frustum: 2x2 base, unit top shrunk toward the axis. The four
+    // bottom corners have nodal volume 4 and the four top corners 1
+    // (mean 2.5), so the worst corner ratio is 1/2.5 = 0.4.
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.4,
+      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,2,0), Point(0,2,0),
+                          Point(0.5,0.5,1), Point(1.5,0.5,1), Point(1.5,1.5,1), Point(0.5,1.5,1)}), TOLERANCE);
   }
 
   void testQuad4Taper()

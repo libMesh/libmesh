@@ -22,6 +22,7 @@
 #include "libmesh/boundary_info.h"
 #include "libmesh/fe_type.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/tensor_value.h"
 #include "libmesh/node_elem.h"
 #include "libmesh/edge_edge2.h"
 #include "libmesh/edge_edge3.h"
@@ -1996,23 +1997,17 @@ Real Elem::quality (const ElemQuality q) const
         return min_node_area;
       }
 
-      // Relative size metric: min(J, 1/J), where J is the determinant
-      // of the "weighted" nodal Jacobian, A * W^{-1}. Following the
-      // other algebraic metrics (SHAPE, SKEW, JACOBIAN), the reference
-      // (weight) matrix W is the identity, i.e. the canonical unit
-      // reference element (unit-length edges meeting at right angles),
-      // for which det(W) = 1. J is therefore the element's nodal
-      // Jacobian determinant (area in 2D, volume in 3D spanned by the
-      // edges meeting at a node), averaged over the corner nodes.
-      //
-      // Both undersized (J < 1) and oversized (J > 1) elements are
-      // penalized, and an element the size of the unit reference
-      // element scores the ideal value of 1. This differs from the
-      // Verdict/CUBIT relative size, which normalizes J by the
-      // mesh-average element size; that requires mesh-wide context not
-      // available to this per-element method, so we use the reference
-      // element instead. Unlike the standard Verdict metric, J is not
-      // squared here.
+      // Relative size metric: min over the corner nodes of min(tau,
+      // 1/tau), where tau is the ratio of the corner's nodal Jacobian
+      // determinant to the determinant of the nodal Jacobian of an
+      // ideal (regular) element of the *same volume*. We take that
+      // same-volume reference to be the mean of the element's own
+      // corner nodal Jacobian determinants, so tau = 1 at every corner
+      // of an element whose Jacobian is uniform -- i.e. any affine
+      // element (parallelogram, box, or regular simplex), at any scale
+      // -- and the metric is 1. Non-uniform (non-affine) elements, e.g.
+      // tapered or sheared shapes, score below 1, and a degenerate
+      // corner (zero determinant) drives it to 0.
     case SIZE:
       {
         // 1D elements don't have interior corners, so this metric does
@@ -2021,11 +2016,10 @@ Real Elem::quality (const ElemQuality q) const
         if (N < 2)
           return 1.;
 
-        // Average the nodal Jacobian determinant over the corner
-        // nodes. This uses the same nodal Jacobian construction as the
-        // JACOBIAN metric above.
+        // Collect the nodal Jacobian determinant at each corner, using
+        // the same construction as the JACOBIAN metric above.
+        std::vector<Real> node_areas;
         Real sum_node_area = 0.;
-        unsigned int n_corners = 0;
 
         for (auto n : this->node_index_range())
           {
@@ -2049,37 +2043,55 @@ Real Elem::quality (const ElemQuality q) const
               }
 
             // Unscaled nodal area (2D) or volume (3D).
-            Real node_area = (N == 2) ?
+            const Real node_area = (N == 2) ?
               cross_norm(oriented_edges[0], oriented_edges[1]) :
               std::abs(triple_product(oriented_edges[0], oriented_edges[1], oriented_edges[2]));
 
+            node_areas.push_back(node_area);
             sum_node_area += node_area;
-            ++n_corners;
           }
 
-        // No usable corners, or a degenerate (zero-size) element: return
-        // 0 (the lowest quality).
-        if (n_corners == 0)
+        // No usable corners: return 0 (the lowest quality).
+        if (node_areas.empty())
           return 0.;
 
-        const Real J = sum_node_area / n_corners;
-        if (J == 0.)
+        // Nodal Jacobian determinant of the ideal element of the same
+        // volume (its Jacobian is uniform, so this is the mean).
+        const Real mean_node_area = sum_node_area / node_areas.size();
+        if (mean_node_area == 0.)
           return 0.;
 
-        return std::min(J, Real(1) / J);
+        Real size = 1.;
+        for (const Real a : node_areas)
+          {
+            // A zero-area corner is degenerate: worst quality.
+            if (a == 0.)
+              return 0.;
+
+            const Real tau = a / mean_node_area;
+            size = std::min(size, std::min(tau, Real(1) / tau));
+          }
+
+        return size;
       }
 
-      // Maximum condition number of the nodal Jacobian matrix over the
-      // corner nodes. At each corner the Jacobian A has the adjacent
-      // edge vectors as its columns; its (Frobenius-norm) condition
-      // number is kappa = |A|_F * |A^{-1}|_F / N. Following the other
-      // algebraic metrics (SHAPE, SKEW), the reference (weight) matrix
-      // is the identity, so kappa = 1 for an orthogonal, equal-length
-      // (ideal) corner and grows without bound as the corner is
-      // stretched or skewed. A degenerate corner (zero Jacobian
-      // determinant) has an infinite condition number, reported as 0
-      // following the convention used elsewhere (e.g. EDGE_LENGTH_RATIO)
-      // that 0 stands in for infinity.
+      // Maximum condition number of the nodal Jacobian over the corner
+      // nodes, measured relative to an ideal (regular) element rather
+      // than to the reference element. At each corner the physical
+      // nodal Jacobian A has the adjacent edge vectors as its columns,
+      // and W is the nodal Jacobian of the ideal corner: unit-length
+      // edges meeting at 60 degrees for a simplex, 90 degrees
+      // otherwise. Working with the corner metric tensors T_A = A^T A
+      // and T_W = W^T W (which handles a lower-dimensional element
+      // living in a higher-dimensional space), the Frobenius condition
+      // number of the weighted Jacobian A W^{-1} is
+      //   kappa = sqrt(tr(T_A T_W^{-1}) * tr(T_W T_A^{-1})) / N.
+      // This is 1 for a corner similar to the ideal one -- so an
+      // equilateral triangle or regular tetrahedron scores 1, not just
+      // a right-angled corner -- and grows with distortion. A
+      // degenerate corner has an infinite condition number, reported as
+      // 0 following the convention that 0 stands in for infinity (cf.
+      // EDGE_LENGTH_RATIO).
     case CONDITION:
       {
         // 1D elements don't have interior corners, so this metric does
@@ -2087,6 +2099,18 @@ Real Elem::quality (const ElemQuality q) const
         const auto N = this->dim();
         if (N < 2)
           return 1.;
+
+        // Ideal corner metric tensor T_W: unit-length edges meeting at
+        // the regular angle (cos = 0.5 for simplices, 0 otherwise).
+        // Unused rows/columns are left as the identity so that
+        // RealTensor's 3x3 inverse yields the correct NxN inverse.
+        const Real cos_ideal = (this->n_vertices() == N + 1) ? 0.5 : 0.;
+        RealTensor Tw(1, 0, 0,  0, 1, 0,  0, 0, 1);
+        for (auto i : make_range(N))
+          for (auto j : make_range(N))
+            if (i != j)
+              Tw(i, j) = cos_ideal;
+        const RealTensor Tw_inv = Tw.inverse();
 
         // kappa >= 1 for every matrix, so 1 is both the ideal value and
         // a safe floor for the running maximum.
@@ -2114,40 +2138,31 @@ Real Elem::quality (const ElemQuality q) const
                 e[i] = this->point(node_1) - this->point(node_0);
               }
 
-            // Squared Frobenius norm of A.
-            Real frob_A_sq = 0.;
+            // Physical corner metric tensor T_A = A^T A, padded with the
+            // identity in unused dimensions (as for T_W above).
+            RealTensor Ta(1, 0, 0,  0, 1, 0,  0, 0, 1);
             for (auto i : make_range(N))
-              frob_A_sq += e[i].norm_sq();
+              for (auto j : make_range(N))
+                Ta(i, j) = e[i] * e[j];
 
-            // |det(A)| and the squared Frobenius norm of A^{-1}.
-            Real abs_det, frob_Ainv_sq;
-            if (N == 2)
-              {
-                abs_det = cross_norm(e[0], e[1]);
+            // Degenerate corner: infinite condition number.
+            if (Ta.det() == 0.)
+              return 0.;
 
-                // Degenerate corner: infinite condition number.
-                if (abs_det == 0.)
-                  return 0.;
+            const RealTensor Ta_inv = Ta.inverse();
 
-                // For a 2x2 matrix, |A^{-1}|_F = |A|_F / |det|.
-                frob_Ainv_sq = frob_A_sq / (abs_det * abs_det);
-              }
-            else
-              {
-                abs_det = std::abs(triple_product(e[0], e[1], e[2]));
+            // num1 = tr(T_A T_W^{-1}), num2 = tr(T_W T_A^{-1}) over the
+            // NxN blocks (both symmetric, so summed as elementwise dot
+            // products).
+            Real num1 = 0., num2 = 0.;
+            for (auto i : make_range(N))
+              for (auto j : make_range(N))
+                {
+                  num1 += Ta(i, j) * Tw_inv(i, j);
+                  num2 += Tw(i, j) * Ta_inv(i, j);
+                }
 
-                // Degenerate corner: infinite condition number.
-                if (abs_det == 0.)
-                  return 0.;
-
-                // The rows of A^{-1} are (e1 x e2), (e2 x e0), (e0 x e1),
-                // each divided by det(A).
-                frob_Ainv_sq = (e[1].cross(e[2]).norm_sq() +
-                                e[2].cross(e[0]).norm_sq() +
-                                e[0].cross(e[1]).norm_sq()) / (abs_det * abs_det);
-              }
-
-            const Real kappa = std::sqrt(frob_A_sq * frob_Ainv_sq) / N;
+            const Real kappa = std::sqrt(num1 * num2) / N;
             max_cond = std::max(max_cond, kappa);
           }
 
