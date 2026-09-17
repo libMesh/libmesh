@@ -427,7 +427,9 @@ std::map<std::string, ElemQuality> elemquality_to_enum {
    {"ASPECT_RATIO_GAMMA" , ASPECT_RATIO_GAMMA},
    {"SIZE"               , SIZE},
    {"JACOBIAN"           , JACOBIAN},
+   {"SCALED_JACOBIAN"    , SCALED_JACOBIAN},
    {"TWIST"              , TWIST},
+   {"EDGE_LENGTH_RATIO"  , EDGE_LENGTH_RATIO},
   };
 
 std::map<ElemQuality, std::string> enum_to_elemquality =
