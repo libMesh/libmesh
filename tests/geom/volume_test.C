@@ -995,10 +995,12 @@ public:
       /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0),
                           Point(0,0,1), Point(2,0,1), Point(2,1,1), Point(0,1,1)}), TOLERANCE);
 
-    // A frustum: 2x2 base, unit top shrunk toward the axis. The four
-    // bottom corners have nodal volume 4 and the four top corners 1
-    // (mean 2.5), so the worst corner ratio is 1/2.5 = 0.4.
-    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.4,
+    // A frustum: 2x2 base, unit top shrunk toward the axis. Bottom
+    // corners have nodal volume 4, top corners 1; the element volume is
+    // 7/3 and the ideal cube's nodal-det/volume ratio is 1, so the ideal
+    // nodal volume at this element's volume is 7/3. The worst corner
+    // ratio is (1)/(7/3) = 3/7.
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/Real(3)/7,
       /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,2,0), Point(0,2,0),
                           Point(0.5,0.5,1), Point(1.5,0.5,1), Point(1.5,1.5,1), Point(0.5,1.5,1)}), TOLERANCE);
   }

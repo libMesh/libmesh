@@ -1999,15 +1999,13 @@ Real Elem::quality (const ElemQuality q) const
 
       // Relative size metric: min over the corner nodes of min(tau,
       // 1/tau), where tau is the ratio of the corner's nodal Jacobian
-      // determinant to the determinant of the nodal Jacobian of an
-      // ideal (regular) element of the *same volume*. We take that
-      // same-volume reference to be the mean of the element's own
-      // corner nodal Jacobian determinants, so tau = 1 at every corner
-      // of an element whose Jacobian is uniform -- i.e. any affine
-      // element (parallelogram, box, or regular simplex), at any scale
-      // -- and the metric is 1. Non-uniform (non-affine) elements, e.g.
-      // tapered or sheared shapes, score below 1, and a degenerate
-      // corner (zero determinant) drives it to 0.
+      // determinant to that of the ideal (regular) element of the same
+      // volume -- ReferenceElem::ideal_target(), rescaled to this
+      // element's volume via the volume ratio. tau = 1 at every corner
+      // of an element whose Jacobian is uniform (any affine element:
+      // parallelogram, box, or regular simplex, at any scale), so the
+      // metric is 1; non-uniform (tapered/sheared) elements score below
+      // 1, and a degenerate corner drives it to 0.
     case SIZE:
       {
         // 1D elements don't have interior corners, so this metric does
@@ -2016,82 +2014,75 @@ Real Elem::quality (const ElemQuality q) const
         if (N < 2)
           return 1.;
 
-        // Collect the nodal Jacobian determinant at each corner, using
-        // the same construction as the JACOBIAN metric above.
-        std::vector<Real> node_areas;
-        Real sum_node_area = 0.;
-
-        for (auto n : this->node_index_range())
-          {
-            // Get list of edge ids adjacent to this node.
-            auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
-
-            // Skip any nodes that don't have dim() adjacent edges (see
-            // the JACOBIAN metric above for the Pyramid apex caveat).
-            if (adjacent_edge_ids.size() != N)
-              continue;
-
-            // Construct oriented edges pointing away from node n.
-            std::vector<Point> oriented_edges(N);
-            for (auto i : make_range(N))
-              {
-                auto node_0 = this->local_edge_node(adjacent_edge_ids[i], 0);
-                auto node_1 = this->local_edge_node(adjacent_edge_ids[i], 1);
-                if (node_0 != n)
-                  std::swap(node_0, node_1);
-                oriented_edges[i] = this->point(node_1) - this->point(node_0);
-              }
-
-            // Unscaled nodal area (2D) or volume (3D).
-            const Real node_area = (N == 2) ?
-              cross_norm(oriented_edges[0], oriented_edges[1]) :
-              std::abs(triple_product(oriented_edges[0], oriented_edges[1], oriented_edges[2]));
-
-            node_areas.push_back(node_area);
-            sum_node_area += node_area;
-          }
-
-        // No usable corners: return 0 (the lowest quality).
-        if (node_areas.empty())
+        const Real vol = this->volume();
+        if (vol == 0.)
           return 0.;
 
-        // Nodal Jacobian determinant of the ideal element of the same
-        // volume (its Jacobian is uniform, so this is the mean).
-        const Real mean_node_area = sum_node_area / node_areas.size();
-        if (mean_node_area == 0.)
-          return 0.;
+        // Ideal (regular) element of the same type; its Jacobian is
+        // uniform. We compare nodal determinants after rescaling it to
+        // this element's volume, i.e. multiply by ideal_vol / this_vol.
+        const auto ideal_pair = ReferenceElem::ideal_target(this->type());
+        const Elem & ideal = *ideal_pair.first;
+        const Real vol_ratio = ideal.volume() / vol;
+
+        // Nodal Jacobian determinant at node n of element el (the same
+        // construction as the JACOBIAN metric above).
+        auto nodal_det = [](const Elem & el, const unsigned int n,
+                            const std::vector<unsigned int> & edge_ids,
+                            const unsigned int dim)
+        {
+          std::vector<Point> e(dim);
+          for (unsigned int i = 0; i != dim; ++i)
+            {
+              auto n0 = el.local_edge_node(edge_ids[i], 0);
+              auto n1 = el.local_edge_node(edge_ids[i], 1);
+              if (n0 != n)
+                std::swap(n0, n1);
+              e[i] = el.point(n1) - el.point(n0);
+            }
+          return (dim == 2) ? cross_norm(e[0], e[1])
+                            : std::abs(triple_product(e[0], e[1], e[2]));
+        };
 
         Real size = 1.;
-        for (const Real a : node_areas)
+        bool have_corner = false;
+        for (auto n : this->node_index_range())
           {
-            // A zero-area corner is degenerate: worst quality.
-            if (a == 0.)
+            // Skip any nodes that don't have dim() adjacent edges (see
+            // the JACOBIAN metric above for the Pyramid apex caveat).
+            const auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
+            if (adjacent_edge_ids.size() != N)
+              continue;
+            have_corner = true;
+
+            const Real a  = nodal_det(*this, n, adjacent_edge_ids, N);
+            const Real aw = nodal_det(ideal, n, adjacent_edge_ids, N);
+
+            // Degenerate corner: worst quality.
+            if (a == 0. || aw == 0.)
               return 0.;
 
-            const Real tau = a / mean_node_area;
+            const Real tau = (a / aw) * vol_ratio;
             size = std::min(size, std::min(tau, Real(1) / tau));
           }
 
-        return size;
+        return have_corner ? size : 0.;
       }
 
       // Maximum condition number of the nodal Jacobian over the corner
-      // nodes, measured relative to an ideal (regular) element rather
-      // than to the reference element. At each corner the physical
-      // nodal Jacobian A has the adjacent edge vectors as its columns,
-      // and W is the nodal Jacobian of the ideal corner: unit-length
-      // edges meeting at 60 degrees for a simplex, 90 degrees
-      // otherwise. Working with the corner metric tensors T_A = A^T A
-      // and T_W = W^T W (which handles a lower-dimensional element
-      // living in a higher-dimensional space), the Frobenius condition
-      // number of the weighted Jacobian A W^{-1} is
+      // nodes, measured against the ideal (regular) element rather than
+      // the reference element. At each corner the physical nodal
+      // Jacobian A and the ideal nodal Jacobian W (taken from the same
+      // corner of ReferenceElem::ideal_target) give the weighted
+      // Jacobian A W^{-1}, whose Frobenius condition number, via the
+      // corner metric tensors T_A = A^T A and T_W = W^T W (which also
+      // handles a lower-dimensional element embedded in 3D), is
       //   kappa = sqrt(tr(T_A T_W^{-1}) * tr(T_W T_A^{-1})) / N.
       // This is 1 for a corner similar to the ideal one -- so an
       // equilateral triangle or regular tetrahedron scores 1, not just
       // a right-angled corner -- and grows with distortion. A
       // degenerate corner has an infinite condition number, reported as
-      // 0 following the convention that 0 stands in for infinity (cf.
-      // EDGE_LENGTH_RATIO).
+      // 0 (0 stands in for infinity, cf. EDGE_LENGTH_RATIO).
     case CONDITION:
       {
         // 1D elements don't have interior corners, so this metric does
@@ -2100,17 +2091,34 @@ Real Elem::quality (const ElemQuality q) const
         if (N < 2)
           return 1.;
 
-        // Ideal corner metric tensor T_W: unit-length edges meeting at
-        // the regular angle (cos = 0.5 for simplices, 0 otherwise).
-        // Unused rows/columns are left as the identity so that
-        // RealTensor's 3x3 inverse yields the correct NxN inverse.
-        const Real cos_ideal = (this->n_vertices() == N + 1) ? 0.5 : 0.;
-        RealTensor Tw(1, 0, 0,  0, 1, 0,  0, 0, 1);
-        for (auto i : make_range(N))
-          for (auto j : make_range(N))
-            if (i != j)
-              Tw(i, j) = cos_ideal;
-        const RealTensor Tw_inv = Tw.inverse();
+        // Ideal (regular) element of the same type; W is its nodal
+        // Jacobian. Its scale is irrelevant here (the condition number
+        // is scale invariant), so the reference-volume sizing is fine.
+        const auto ideal_pair = ReferenceElem::ideal_target(this->type());
+        const Elem & ideal = *ideal_pair.first;
+
+        // Corner metric tensor T = A^T A at node n of element el, padded
+        // with the identity in unused dimensions so that RealTensor's
+        // 3x3 inverse yields the correct NxN inverse.
+        auto metric_tensor = [](const Elem & el, const unsigned int n,
+                                const std::vector<unsigned int> & edge_ids,
+                                const unsigned int dim)
+        {
+          std::vector<Point> e(dim);
+          for (unsigned int i = 0; i != dim; ++i)
+            {
+              auto n0 = el.local_edge_node(edge_ids[i], 0);
+              auto n1 = el.local_edge_node(edge_ids[i], 1);
+              if (n0 != n)
+                std::swap(n0, n1);
+              e[i] = el.point(n1) - el.point(n0);
+            }
+          RealTensor T(1, 0, 0,  0, 1, 0,  0, 0, 1);
+          for (unsigned int i = 0; i != dim; ++i)
+            for (unsigned int j = 0; j != dim; ++j)
+              T(i, j) = e[i] * e[j];
+          return T;
+        };
 
         // kappa >= 1 for every matrix, so 1 is both the ideal value and
         // a safe floor for the running maximum.
@@ -2118,38 +2126,21 @@ Real Elem::quality (const ElemQuality q) const
 
         for (auto n : this->node_index_range())
           {
-            // Get list of edge ids adjacent to this node.
-            auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
-
             // Skip any nodes that don't have dim() adjacent edges (see
             // the JACOBIAN metric above for the Pyramid apex caveat).
+            const auto adjacent_edge_ids = this->edges_adjacent_to_node(n);
             if (adjacent_edge_ids.size() != N)
               continue;
 
-            // Construct oriented edges pointing away from node n; these
-            // are the columns of the nodal Jacobian A.
-            std::vector<Point> e(N);
-            for (auto i : make_range(N))
-              {
-                auto node_0 = this->local_edge_node(adjacent_edge_ids[i], 0);
-                auto node_1 = this->local_edge_node(adjacent_edge_ids[i], 1);
-                if (node_0 != n)
-                  std::swap(node_0, node_1);
-                e[i] = this->point(node_1) - this->point(node_0);
-              }
-
-            // Physical corner metric tensor T_A = A^T A, padded with the
-            // identity in unused dimensions (as for T_W above).
-            RealTensor Ta(1, 0, 0,  0, 1, 0,  0, 0, 1);
-            for (auto i : make_range(N))
-              for (auto j : make_range(N))
-                Ta(i, j) = e[i] * e[j];
+            const RealTensor Ta = metric_tensor(*this, n, adjacent_edge_ids, N);
 
             // Degenerate corner: infinite condition number.
             if (Ta.det() == 0.)
               return 0.;
 
+            const RealTensor Tw = metric_tensor(ideal, n, adjacent_edge_ids, N);
             const RealTensor Ta_inv = Ta.inverse();
+            const RealTensor Tw_inv = Tw.inverse();
 
             // num1 = tr(T_A T_W^{-1}), num2 = tr(T_W T_A^{-1}) over the
             // NxN blocks (both symmetric, so summed as elementwise dot
@@ -2162,8 +2153,7 @@ Real Elem::quality (const ElemQuality q) const
                   num2 += Tw(i, j) * Ta_inv(i, j);
                 }
 
-            const Real kappa = std::sqrt(num1 * num2) / N;
-            max_cond = std::max(max_cond, kappa);
+            max_cond = std::max(max_cond, std::sqrt(num1 * num2) / N);
           }
 
         return max_cond;
