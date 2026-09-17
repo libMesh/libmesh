@@ -48,7 +48,14 @@ public:
 
   explicit PetscMFFDMatrix(const Parallel::Communicator & comm_in);
 
-  PetscMFFDMatrix & operator=(Mat m) { this->assign(m, false); return *this; }
+  /**
+   * Calls \p assign with \p set_context equal to \p false as generally speaking
+   * an MFFD matrix will have been created within the PETSc library, and if we
+   * are assigning ourselves to it then we are unlikely to outlive it, and we
+   * don't want to leave dangling context. If you want to set the Mat's context
+   * to \p this, then directly call \p assign with \p set_context equal to true.
+   */
+  PetscMFFDMatrix & operator=(Mat m);
 
   /**
    * Adopt an existing, externally-owned Mat, without destroying it when this
@@ -122,6 +129,14 @@ PetscMFFDMatrix<T>::assign(Mat m, bool set_context)
   this->_destroy_mat_on_exit = false;
   if (set_context)
     this->set_context();
+}
+
+template <typename T>
+PetscMFFDMatrix<T> &
+PetscMFFDMatrix<T>::operator=(Mat m)
+{
+  this->assign(m, false);
+  return *this;
 }
 
 template <typename T>
