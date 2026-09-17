@@ -272,8 +272,15 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
               if (EquationSystems::redundant_added_side(*elem,s))
                 continue;
 
-              auto & marker =
-                subdomain_map[subdomain_id_end + elem->side_type(s)];
+              const subdomain_id_type side_block_id =
+                cast_int<subdomain_id_type>(subdomain_id_end + elem->side_type(s));
+
+              // Guard the invariant above (also catches subdomain_id_type
+              // overflow wrapping a side block id back down onto an
+              // element block id).
+              libmesh_assert_greater_equal(side_block_id, subdomain_id_end);
+
+              auto & marker = subdomain_map[side_block_id];
               if (marker.empty())
                 marker.push_back(1);
               else
@@ -3051,7 +3058,43 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           num_elem_this_blk_vec.push_back
             (cast_int<int>(element_id_vec.size()));
 
-          std::string block_name = mesh.subdomain_name(subdomain_id);
+          // A block id normally *is* a subdomain id, but a subdomain that
+          // contains more than one element type is split across several
+          // blocks by build_subdomain_map(): only its first element type
+          // keeps the subdomain id, while every other type gets a
+          // synthesized block id allocated above all subdomain ids.  We
+          // detect such synthesized blocks from the mismatch between the
+          // block id and the actual subdomain of the elements it holds.
+          const subdomain_id_type elem_subdomain_id =
+            mesh.elem_ref(element_id_vec[0]).subdomain_id();
+          const bool is_synthesized_block = (subdomain_id != elem_subdomain_id);
+
+          std::string block_name = mesh.subdomain_name(elem_subdomain_id);
+
+          if (is_synthesized_block)
+            {
+              // Prefix the (original) subdomain's name with the element
+              // type, so the synthesized block is identifiable and its
+              // name stays distinct from the block that kept the
+              // subdomain id.  This block becomes its own subdomain when
+              // the file is read back in.
+              const std::string type_suffix = Utility::enum_to_string<ElemType>(elem_t);
+              block_name = block_name.empty()
+                ? (std::to_string(elem_subdomain_id) + "_" + type_suffix)
+                : (block_name + "_" + type_suffix);
+
+              // Informational: keep it to one rank so parallel (Nemesis)
+              // writes don't repeat it once per processor.
+              // NOTE might miss logs if only occurs on other ranks
+              if (this->processor_id() == 0)
+                libMesh::out << "ExodusII_IO: subdomain " << elem_subdomain_id
+                             << " contains more than one element type; writing its "
+                             << type_suffix << " elements to a new block \"" << block_name
+                             << "\" (block id " << subdomain_id
+                             << "), which will be read back as a separate subdomain."
+                             << std::endl;
+            }
+
           if (block_name.empty() && elem_t == C0POLYGON)
             block_name = "NSIDED_" + std::to_string(counter + 1);
           if (block_name.empty() && elem_t == C0POLYHEDRON)
