@@ -180,7 +180,8 @@ std::string Quality::describe (const ElemQuality q)
       desc << "Maximum |cos A|, where A\n"
            << "is the angle between edges\n"
            << "at element center.\n"
-           << '\n'
+           << "NOTE: some degenerate elements\n"
+           << "score 0 if zero-length along principal axis.\n"
            << "Suggested ranges:\n"
            << "Hexes: (0 -> 0.5)\n"
            << "Quads: (0 -> 0.5)";
