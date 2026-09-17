@@ -347,8 +347,24 @@ protected:
   Real _final_nonlinear_residual;
 
   /**
-   * An optional matrix to use as the actual Jacobian operator (Amat), distinct from \p matrix
-   * (used as the preconditioning matrix, Pmat). See set_operator_matrix().
+   * An optional matrix to use as the actual Jacobian operator (what is Amat in
+   * PETSc lingo for the linearized system), distinct from the "system" \p
+   * matrix (used as the preconditioning matrix, Pmat in PETSc lingo). We
+   * logically connect the system matrix with the preconditioning matrix because
+   * a preconditioner often requires some explicit matrix representation (even
+   * if it is only the diagonal). Conversely, an explicit representation of the
+   * operator/Amat is almost never required; all that is needed is matrix-vector
+   * products. These can be formed through finite differencing of residuals (the
+   * PETSc MATMFFD type) or through user provided shell operators (PETSc
+   * MATSHELL type) that define \p MatMult(). The former (MATMFFD) is almost
+   * never created by user code and is automatically installed by PETSc when the
+   * \p -snes_mf_operator command-line option is passed. Consequently, we choose
+   * to tie our system matrix data structure to a \p Mat object that a \p
+   * SparseMatrix owns instead of to an Amat that a \p SparseMatrix may not
+   * own. Note that if we are installing this optional \p _operator_matrix, it
+   * also owns its \p Mat and so will generally be an AIJ-type matrix or a
+   * user-defined shell and *not* the MATMFFD type that generally only PETSc
+   * ever creates
    */
   SparseMatrix<Number> * _operator_matrix;
 };
