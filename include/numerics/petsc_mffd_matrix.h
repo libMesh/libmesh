@@ -52,11 +52,11 @@ public:
 
   /**
    * Adopt an existing, externally-owned Mat, without destroying it when this
-   * object goes out of scope. \p set_context controls whether we attach a
-   * context pointer to \p m allowing \p get_context() to recover this object
-   * from the Mat later; skip this when this wrapper is short-lived (e.g. a
-   * function-local variable) so we don't leave a dangling context on \p m
-   * after we're destroyed.
+   * object goes out of scope. Any Mat this object currently owns is destroyed
+   * first. \p set_context controls whether we attach a context pointer to \p m
+   * allowing \p get_context() to recover this object from the Mat later; skip
+   * this when this wrapper is short-lived (e.g. a function-local variable) so
+   * we don't leave a dangling context on \p m after we're destroyed.
    */
   void assign(Mat m, bool set_context);
 
@@ -114,6 +114,9 @@ template <typename T>
 void
 PetscMFFDMatrix<T>::assign(Mat m, bool set_context)
 {
+  if (this->_mat != m)
+    this->clear();
+
   this->_mat = m;
   this->_is_initialized = true;
   this->_destroy_mat_on_exit = false;
