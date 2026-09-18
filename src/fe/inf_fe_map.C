@@ -104,7 +104,7 @@ Point InfFEMap::inverse_map (const unsigned int dim,
   libmesh_assert(dim > 0);
 
   // Start logging the map inversion.
-  LOG_SCOPE("inverse_map()", "InfFEMap");
+  LOG_SCOPE_NO_NVTX("inverse_map()", "InfFEMap");
 
   // The strategy is:
   // compute the intersection of the line
