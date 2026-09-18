@@ -768,7 +768,7 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
   // have already been computed via init_shape_functions
 
   // Start logging the shape function computation
-  LOG_SCOPE("compute_shape_functions()", "FE");
+  LOG_SCOPE_NO_NVTX("compute_shape_functions()", "FE");
 
   this->determine_calculations();
 
