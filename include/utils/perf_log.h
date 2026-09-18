@@ -216,9 +216,17 @@ public:
    * here.  Supply pointers to string literals or other character
    * arrays whose lifetime will exceed the lifetime of the PerfLog
    * object, not to temporarily allocated arrays.
+   *
+   * When the library is built with NVTX support, \p nvtx_range also opens an
+   * NVTX range for the event.  Supply \p false for events that fire once per
+   * mesh entity or more often: such events produce millions of
+   * sub-microsecond NVTX ranges in a profiler capture, which costs time to
+   * record and buries the coarse ranges a capture is usually taken to
+   * measure.  Those events are still timed in the performance log.
    */
   void fast_push (const char * label,
-                  const char * header="");
+                  const char * header="",
+                  bool nvtx_range=true);
 
   /**
    * Push the event \p label onto the stack, pausing any active event.
@@ -249,9 +257,13 @@ public:
    * to fast_push, not merely pointers to identical strings.
    * This method is called from the PerfItem destructor, so it should
    * not throw. We have therefore marked it noexcept as a reminder.
+   *
+   * \p nvtx_range must match the value supplied to the corresponding
+   * fast_push(), so that the NVTX range stack stays balanced.
    */
   void fast_pop (const char * label,
-                 const char * header="") noexcept;
+                 const char * header="",
+                 bool nvtx_range=true) noexcept;
 
   /**
    * Pop the event \p label off the stack, resuming any lower event.
@@ -500,8 +512,13 @@ double PerfData::stopit ()
 // PerfLog class inline member functions
 inline
 void PerfLog::fast_push (const char * label,
-                         const char * header)
+                         const char * header,
+                         bool nvtx_range)
 {
+#ifndef LIBMESH_HAVE_NVTX_API
+  libmesh_ignore(nvtx_range);
+#endif
+
   if (this->log_events)
     {
       // The global perflog stack may not be thread-safe, but if we're
@@ -528,7 +545,8 @@ void PerfLog::fast_push (const char * label,
       // time allocating a new string on every push, so for now we'll
       // drop the header.  Maybe we should allocate a new string in
       // the PerfData?
-      nvtxRangePushA(label);
+      if (nvtx_range)
+        nvtxRangePushA(label);
 #endif
     }
 }
@@ -537,8 +555,13 @@ void PerfLog::fast_push (const char * label,
 
 inline
 void PerfLog::fast_pop(const char * libmesh_dbg_var(label),
-                       const char * libmesh_dbg_var(header)) noexcept
+                       const char * libmesh_dbg_var(header),
+                       bool nvtx_range) noexcept
 {
+#ifndef LIBMESH_HAVE_NVTX_API
+  libmesh_ignore(nvtx_range);
+#endif
+
   if (this->log_events)
     {
       // The global perflog stack may not be thread-safe, but if we're
@@ -551,7 +574,8 @@ void PerfLog::fast_pop(const char * libmesh_dbg_var(label),
 #endif
 
 #ifdef LIBMESH_HAVE_NVTX_API
-      nvtxRangePop();
+      if (nvtx_range)
+        nvtxRangePop();
 #endif
       // If there's nothing on the stack, then we can't pop anything. Previously we
       // asserted that the log_stack was not empty, but we should not throw from

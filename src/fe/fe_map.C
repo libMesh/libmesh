@@ -1169,7 +1169,7 @@ void FEMap::compute_affine_map(const unsigned int dim,
                                const Elem * elem)
 {
   // Start logging the map computation.
-  LOG_SCOPE("compute_affine_map()", "FEMap");
+  LOG_SCOPE_NO_NVTX("compute_affine_map()", "FEMap");
 
   libmesh_assert(elem);
 
@@ -1533,7 +1533,7 @@ Point FEMap::inverse_map (const unsigned int dim,
 #endif
 
   // Start logging the map inversion.
-  LOG_SCOPE("inverse_map()", "FEMap");
+  LOG_SCOPE_NO_NVTX("inverse_map()", "FEMap");
 
   // How much did the point on the reference
   // element change by in this Newton step?
