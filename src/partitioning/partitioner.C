@@ -394,16 +394,22 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
 
   // Calling this on all processors a unique range in [0,n_unpartitioned_elements) is constructed.
   // Only the indices for the elements we pass in are returned in the array.
-  MeshCommunication().find_global_indices (mesh.comm(),
-                                           MeshTools::create_bounding_box(mesh), it, end,
-                                           global_indices);
+  // A replicated mesh traverses its elements in the same order on every processor, so an
+  // element's position in this range is already a globally consistent index into
+  // [0, n_unpartitioned_elements). A spatial global indexing would give an equally arbitrary
+  // linear split of the same range at the cost of a parallel sort, which dominates the
+  // partitioning of a freshly generated mesh, where no element is partitioned yet.
+  if (!mesh.is_replicated())
+    MeshCommunication().find_global_indices (mesh.comm(),
+                                             MeshTools::create_bounding_box(mesh), it, end,
+                                             global_indices);
 
   dof_id_type cnt=0;
   for (auto & elem : as_range(it, end))
     {
-      libmesh_assert_less (cnt, global_indices.size());
+      libmesh_assert (mesh.is_replicated() || cnt < global_indices.size());
       const dof_id_type global_index =
-        global_indices[cnt++];
+        mesh.is_replicated() ? cnt++ : global_indices[cnt++];
 
       libmesh_assert_less (global_index, subdomain_bounds.back());
       libmesh_assert_less (global_index, n_unpartitioned_elements);
