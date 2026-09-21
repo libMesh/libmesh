@@ -63,11 +63,17 @@ Real fe_hierarchic_2D_shape_second_deriv(const Elem * elem,
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+} // anonymous namespace
+
+
+
+namespace libMesh
+{
 
 std::tuple<unsigned int, unsigned int, Real>
-quad_indices(const Elem * elem,
-             const unsigned int totalorder,
-             const unsigned int i)
+fe_hierarchic_quad_tensor_indices(const Elem * elem,
+                                  const unsigned int totalorder,
+                                  const unsigned int i)
 {
   libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
@@ -119,13 +125,6 @@ quad_indices(const Elem * elem,
 
   return {i0, i1, f};
 }
-
-} // anonymous namespace
-
-
-
-namespace libMesh
-{
 
 
 LIBMESH_DEFAULT_VECTORIZED_FE(2,HIERARCHIC)
@@ -1040,7 +1039,7 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
     case QUADSHELL9:
       {
         // Compute quad shape functions as a tensor-product
-        auto [i0, i1, f] = quad_indices(elem, totalorder, i);
+        auto [i0, i1, f] = fe_hierarchic_quad_tensor_indices(elem, totalorder, i);
 
         return f*(FE<1,T>::shape(EDGE3, totalorder, i0, p(0))*
                   FE<1,T>::shape(EDGE3, totalorder, i1, p(1)));
@@ -1091,7 +1090,7 @@ Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
     case QUADSHELL9:
       {
         // Compute quad shape functions as a tensor-product
-        auto [i0, i1, f] = quad_indices(elem, totalorder, i);
+        auto [i0, i1, f] = fe_hierarchic_quad_tensor_indices(elem, totalorder, i);
 
         switch (j)
           {
