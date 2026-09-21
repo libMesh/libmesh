@@ -28,6 +28,7 @@
 // C++ includes
 #include <cmath>
 #include <cstddef>
+#include <tuple>
 
 namespace libMesh
 {
@@ -1558,6 +1559,21 @@ OutputShape fe_fdm_deriv(const ElemType type,
                            (const ElemType type, const Order,
                             const Elem *, const unsigned int,
                             const Point &));
+
+/**
+ * \returns The one-dimensional mode indices \f$(i_0, i_1)\f$ and sign \f$f_i\f$ that factor the
+ * \p i'th HIERARCHIC or L2_HIERARCHIC quadrilateral shape function of total order \p totalorder as
+ * \f$\phi_i(\xi,\eta) = f_i L_{i_0}(\xi) L_{i_1}(\eta)\f$, where \f$L\f$ are the \p EDGE3 shape
+ * functions of the same family and order. Sum factorization uses this to work with the
+ * one-dimensional tables.
+ *
+ * The sign \f$f_i = \pm 1\f$ depends on the element's edge orientations; it keeps odd edge modes
+ * continuous across an edge that neighboring elements traverse in opposite directions.
+ */
+std::tuple<unsigned int, unsigned int, Real>
+fe_hierarchic_quad_tensor_indices (const Elem * elem,
+                                   const unsigned int totalorder,
+                                   const unsigned int i);
 
 /**
  * \returns The factor scaling the \p i'th (\p i > 1) one-dimensional HIERARCHIC bubble,
