@@ -69,6 +69,10 @@ enum FEFamily : int {
                RATIONAL_BERNSTEIN = 61,
                // Side-supported basis functions
                SIDE_HIERARCHIC = 71,
+               // Nodal basis functions on the Gauss-Lobatto points, which are
+               // collocated with the Gauss-Lobatto quadrature rule of the same order
+               L2_LAGRANGE_GLL = 81,
+               LAGRANGE_GLL    = 82,
                // Invalid
                INVALID_FE   = 99};
 

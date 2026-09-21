@@ -19,6 +19,7 @@
 
 // Local includes
 #include "libmesh/fe_interface.h"
+#include "libmesh/quadrature_gauss_lobatto.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "libmesh/fe_interface_macros.h"
@@ -94,6 +95,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
   fe_family_case_func(SIDE_HIERARCHIC, dim, func_and_args, prefix, suffix) \
   fe_family_case_func(LAGRANGE, dim, func_and_args, prefix, suffix)        \
   fe_family_case_func(L2_LAGRANGE, dim, func_and_args, prefix, suffix)     \
+  fe_family_case_func(L2_LAGRANGE_GLL, dim, func_and_args, prefix, suffix) \
+  fe_family_case_func(LAGRANGE_GLL, dim, func_and_args, prefix, suffix)    \
   fe_family_case_func(MONOMIAL, dim, func_and_args, prefix, suffix)        \
   fe_family_case_func(SCALAR, dim, func_and_args, prefix, suffix)          \
   fe_family_case_func(XYZ, dim, func_and_args, prefix, suffix)             \
@@ -108,6 +111,8 @@ FEInterface::is_InfFE_elem(const ElemType et)
   fe_family_case(SIDE_HIERARCHIC) \
   fe_family_case(LAGRANGE)        \
   fe_family_case(L2_LAGRANGE)     \
+  fe_family_case(L2_LAGRANGE_GLL) \
+  fe_family_case(LAGRANGE_GLL)    \
   fe_family_case(MONOMIAL)        \
   fe_family_case(SCALAR)          \
   fe_family_case(XYZ)             \
@@ -2200,6 +2205,29 @@ unsigned int FEInterface::max_order(const FEType & fe_t,
           return unknown;
         }
       break;
+    case L2_LAGRANGE_GLL:
+    case LAGRANGE_GLL:
+      switch (el_t)
+        {
+        case EDGE2:
+        case EDGE3:
+        case EDGE4:
+        case QUAD4:
+        case QUADSHELL4:
+        case QUAD8:
+        case QUADSHELL8:
+        case QUAD9:
+        case QUADSHELL9:
+        case HEX8:
+        case HEX20:
+        case HEX27:
+          // A basis of degree p interpolates at p+1 Gauss-Lobatto points, and the points
+          // are tabulated up to QGaussLobatto::max_points_1D of them
+          return QGaussLobatto::max_points_1D - 1;
+        default:
+          return unknown;
+        }
+      break;
     case MONOMIAL:
     case L2_LAGRANGE:
     case L2_LAGRANGE_VEC:
@@ -2617,6 +2645,7 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
     {
     case LAGRANGE:
     case L2_LAGRANGE:
+    case L2_LAGRANGE_GLL:
     case MONOMIAL:
     case MONOMIAL_VEC:
     case L2_HIERARCHIC:
@@ -2634,6 +2663,11 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
     case HIERARCHIC:
     case HIERARCHIC_VEC:
     case L2_HIERARCHIC_VEC:
+      // A mid-edge or mid-face node of this family owns the interpolation points inside its
+      // entity, and past order two none of those is the node itself, so the node cannot serve
+      // as a vertex for the elements meeting it at a refinement interface and needs a degree
+      // of freedom of its own there
+    case LAGRANGE_GLL:
     fe_family_horder_case()
     default:
       return true;
@@ -2663,6 +2697,7 @@ bool FEInterface::orientation_dependent (const FEFamily & fe_family)
     case HIERARCHIC:
     case L2_HIERARCHIC:
     case HIERARCHIC_VEC:
+    case LAGRANGE_GLL:
     case L2_HIERARCHIC_VEC:
     case BERNSTEIN:
     case RATIONAL_BERNSTEIN:
@@ -2706,7 +2741,9 @@ FEInterface::is_hierarchic (const FEType & fe_type)
     case CLOUGH:  // maybe some day?
     case LAGRANGE:
     case LAGRANGE_VEC:
+    case LAGRANGE_GLL:
     case L2_LAGRANGE:
+    case L2_LAGRANGE_GLL:
     case L2_LAGRANGE_VEC:
     case NEDELEC_ONE:
     case RATIONAL_BERNSTEIN:
@@ -2732,6 +2769,7 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
     case MONOMIAL_VEC:
     case L2_HIERARCHIC:
     case L2_LAGRANGE:
+    case L2_LAGRANGE_GLL:
     case XYZ:
     case SCALAR:
     case L2_RAVIART_THOMAS:
@@ -2741,6 +2779,7 @@ FEContinuity FEInterface::get_continuity(const FEType & fe_type)
 
       // C0 elements
     case LAGRANGE:
+    case LAGRANGE_GLL:
     case HIERARCHIC:
     case BERNSTEIN:
     case SZABAB:

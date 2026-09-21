@@ -51,6 +51,8 @@ std::unique_ptr<FETransformationBase<OutputShape>> FETransformationBase<OutputSh
     case L2_HIERARCHIC_VEC:
     case SIDE_HIERARCHIC:
     case L2_LAGRANGE: // PB: Shouldn't this be L2 conforming?
+    case L2_LAGRANGE_GLL:
+    case LAGRANGE_GLL:
     case L2_LAGRANGE_VEC: // PB: Shouldn't this be L2 conforming?
     case JACOBI_20_00: // PB: For infinite elements...
     case JACOBI_30_00: // PB: For infinite elements...

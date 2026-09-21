@@ -1160,6 +1160,34 @@ public:
   bool positive_face_orientation(const unsigned int i) const;
 
   /**
+   * \returns The orientation of edge \p i, which is 1 when the edge is positively
+   * oriented and 0 when it is not.
+   *
+   * A basis whose shape functions depend on the order of an edge's vertices, such as a
+   * hierarchic basis of order two or above, consumes this index to select the shape
+   * functions of the degrees of freedom that the edge owns.
+   */
+  unsigned int edge_orientation(const unsigned int i) const;
+
+  /**
+   * \returns The orientation of face \p i, an index over the symmetries of the face.
+   *
+   * The orientation of a face is the ordering that the positions of the face's vertices
+   * induce on them: which vertex is the lexicographically least, together with the
+   * direction in which the remaining vertices run from it. This index carries both, as
+   * twice the position that the least vertex takes in the face's node map plus one when
+   * the face is positively oriented, so it runs over the six symmetries of a triangular
+   * face or the eight of a quadrilateral face.
+   *
+   * A basis whose shape functions depend on the order of a face's vertices, such as a
+   * hierarchic basis of order three or above, consumes this index to select the shape
+   * functions of the degrees of freedom that the face owns. The single bit that
+   * \p positive_face_orientation carries fixes the direction alone, which leaves the
+   * least vertex of a face with more than three vertices open.
+   */
+  unsigned int face_orientation(const unsigned int i) const;
+
+  /**
    * \returns \p true iff, for an edge \p e on side \p s, the node map for
    * side \p s is such that the first vertex (i.e. zeroth node) of \p e is
    * lower positioned than the second vertex (i.e. first node) of \p e.
