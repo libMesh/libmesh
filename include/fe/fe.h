@@ -26,7 +26,9 @@
 #include "libmesh/libmesh.h"
 
 // C++ includes
+#include <cmath>
 #include <cstddef>
+#include <tuple>
 
 namespace libMesh
 {
@@ -1557,6 +1559,57 @@ OutputShape fe_fdm_deriv(const ElemType type,
                            (const ElemType type, const Order,
                             const Elem *, const unsigned int,
                             const Point &));
+
+/**
+ * The one-dimensional mode indices and sign whose product forms the \p i'th HIERARCHIC or
+ * L2_HIERARCHIC shape function of total order \p totalorder on a quadrilateral.
+ *
+ * A quadrilateral of these families carries a tensor-product basis, so
+ * \f$\phi_i(\xi,\eta) = f_i L_{i_0}(\xi) L_{i_1}(\eta)\f$ with \f$L\f$ the one-dimensional
+ * shape functions of the same family and total order on \p EDGE3, and
+ * \f$\nabla\phi_i = f_i (L'_{i_0} L_{i_1}, L_{i_0} L'_{i_1})\f$. The sign \f$f_i = \pm 1\f$
+ * keeps an odd edge mode continuous across an edge that this element and its neighbor traverse in
+ * opposite directions, and so depends on the element's edge orientations.
+ *
+ * Exposing the factorization lets a consumer contract against the one-dimensional tables rather
+ * than the two-dimensional ones, which is what sum factorization needs.
+ *
+ * \returns The pair \f$(i_0, i_1)\f$ and the sign \f$f_i\f$.
+ */
+std::tuple<unsigned int, unsigned int, Real>
+fe_hierarchic_quad_tensor_indices (const Elem * elem,
+                                   const unsigned int totalorder,
+                                   const unsigned int i);
+
+/**
+ * The scaling that gives the \p i'th one-dimensional HIERARCHIC bubble function unit \f$H^1\f$
+ * seminorm on the reference interval, for \p i greater than one.
+ *
+ * The bubbles are \f$\xi^i - 1\f$ for even \p i and \f$\xi^i - \xi\f$ for odd \p i, up to this
+ * scaling. Integrating the square of their derivatives over \f$[-1,1]\f$ gives a seminorm of
+ * \f$i\sqrt{2/(2i-1)}\f$ in the even case and \f$(i-1)\sqrt{2/(2i-1)}\f$ in the odd one, and this
+ * scaling is the reciprocal of that, which grows as \f$\sqrt{i}\f$.
+ *
+ * The normalization matters because a shape function carrying \f$1/i!\f$ instead shrinks factorially
+ * with its order, and an operator assembled from such a basis inherits that spread on its diagonal.
+ * At order eight in two dimensions the smallest diagonal entry falls below the roundoff of the
+ * largest, which leaves the discretization numerically singular in double precision however it is
+ * solved.
+ *
+ * Only the bubbles are scaled. The two vertex functions are interpolatory, so their coefficients are
+ * values of the finite element solution at the vertices, and scaling them would change what a nodal
+ * boundary condition or a nodal output of a HIERARCHIC variable means.
+ */
+inline Real fe_hierarchic_bubble_scaling(const unsigned int i)
+{
+  libmesh_assert_greater(i, 1);
+
+  // An even bubble differentiates to i xi^(i-1), whose square integrates to 2 i^2/(2i-1) over the
+  // interval. The linear term an odd bubble carries turns that i^2 into (i-1)^2.
+  const Real denominator = (i % 2) ? Real(i) - 1. : Real(i);
+
+  return std::sqrt((2. * Real(i) - 1.) / 2.) / denominator;
+}
 
 
 template <typename OutputShape>

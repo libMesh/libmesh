@@ -210,6 +210,12 @@ FEGenericBase<Real>::build (const unsigned int dim,
           case L2_LAGRANGE:
             return std::make_unique<FE<0,L2_LAGRANGE>>(fet);
 
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<0,L2_LAGRANGE_GLL>>(fet);
+
+          case LAGRANGE_GLL:
+            return std::make_unique<FE<0,LAGRANGE_GLL>>(fet);
+
           case HIERARCHIC:
             return std::make_unique<FE<0,HIERARCHIC>>(fet);
 
@@ -259,6 +265,12 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<1,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<1,L2_LAGRANGE_GLL>>(fet);
+
+          case LAGRANGE_GLL:
+            return std::make_unique<FE<1,LAGRANGE_GLL>>(fet);
 
           case HIERARCHIC:
             return std::make_unique<FE<1,HIERARCHIC>>(fet);
@@ -311,6 +323,12 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<2,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<2,L2_LAGRANGE_GLL>>(fet);
+
+          case LAGRANGE_GLL:
+            return std::make_unique<FE<2,LAGRANGE_GLL>>(fet);
 
           case HIERARCHIC:
             return std::make_unique<FE<2,HIERARCHIC>>(fet);
@@ -366,6 +384,12 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<3,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<3,L2_LAGRANGE_GLL>>(fet);
+
+          case LAGRANGE_GLL:
+            return std::make_unique<FE<3,LAGRANGE_GLL>>(fet);
 
           case HIERARCHIC:
             return std::make_unique<FE<3,HIERARCHIC>>(fet);
@@ -768,7 +792,7 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
   // have already been computed via init_shape_functions
 
   // Start logging the shape function computation
-  LOG_SCOPE("compute_shape_functions()", "FE");
+  LOG_SCOPE_NO_NVTX("compute_shape_functions()", "FE");
 
   this->determine_calculations();
 

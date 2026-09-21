@@ -762,7 +762,7 @@ void InfFE<Dim,T_radial,T_map>::compute_shape_functions(const Elem * inf_elem,
                            InfFEBase::get_elem_type(inf_elem->type()));
 
   // Start logging the overall computation of shape functions
-  LOG_SCOPE("compute_shape_functions()", "InfFE");
+  LOG_SCOPE_NO_NVTX("compute_shape_functions()", "InfFE");
 
   //const unsigned int n_radial_qp = cast_int<unsigned int>(som.size());
   //const unsigned int n_base_qp = cast_int<unsigned int>(S_map[0].size());
