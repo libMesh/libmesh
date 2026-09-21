@@ -28,6 +28,7 @@
 // C++ includes
 #include <cmath>
 #include <cstddef>
+#include <tuple>
 
 namespace libMesh
 {
@@ -1558,6 +1559,27 @@ OutputShape fe_fdm_deriv(const ElemType type,
                            (const ElemType type, const Order,
                             const Elem *, const unsigned int,
                             const Point &));
+
+/**
+ * The one-dimensional mode indices and sign whose product forms the \p i'th HIERARCHIC or
+ * L2_HIERARCHIC shape function of total order \p totalorder on a quadrilateral.
+ *
+ * A quadrilateral of these families carries a tensor-product basis, so
+ * \f$\phi_i(\xi,\eta) = f_i L_{i_0}(\xi) L_{i_1}(\eta)\f$ with \f$L\f$ the one-dimensional
+ * shape functions of the same family and total order on \p EDGE3, and
+ * \f$\nabla\phi_i = f_i (L'_{i_0} L_{i_1}, L_{i_0} L'_{i_1})\f$. The sign \f$f_i = \pm 1\f$
+ * keeps an odd edge mode continuous across an edge that this element and its neighbor traverse in
+ * opposite directions, and so depends on the element's edge orientations.
+ *
+ * Exposing the factorization lets a consumer contract against the one-dimensional tables rather
+ * than the two-dimensional ones, which is what sum factorization needs.
+ *
+ * \returns The pair \f$(i_0, i_1)\f$ and the sign \f$f_i\f$.
+ */
+std::tuple<unsigned int, unsigned int, Real>
+fe_hierarchic_quad_tensor_indices (const Elem * elem,
+                                   const unsigned int totalorder,
+                                   const unsigned int i);
 
 /**
  * The scaling that gives the \p i'th one-dimensional HIERARCHIC bubble function unit \f$H^1\f$
