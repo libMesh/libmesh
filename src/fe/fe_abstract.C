@@ -891,7 +891,7 @@ void FEAbstract::compute_node_constraints (NodeConstraints & constraints,
   const unsigned int Dim = elem->dim();
 
   // Only constrain elements in 2,3D.
-  if (Dim == 1)
+  if (Dim < 2)
     return;
 
   // Only constrain active and ancestor elements
