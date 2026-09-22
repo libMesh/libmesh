@@ -1392,8 +1392,8 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
                            for (unsigned int qp = 0; qp != n_qp; ++qp)
                              {
                                Number u_h = 0;
-                               for (unsigned int i = 0; i != n_sf; ++i)
-                                 u_h += phi[i][qp] * sys_soln(dof_indices[i]);
+                               for (unsigned int bf = 0; bf != n_sf; ++bf)
+                                 u_h += phi[bf][qp] * sys_soln(dof_indices[bf]);
                                avg += JxW[qp] * u_h;
                                vol += JxW[qp];
                              }
@@ -1424,8 +1424,8 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
                            for (unsigned int qp = 0; qp != n_qp; ++qp)
                              {
                                OutputNumberGradient u_h;
-                               for (unsigned int i = 0; i != n_sf; ++i)
-                                 u_h.add_scaled(phi[i][qp], sys_soln(dof_indices[i]));
+                               for (unsigned int bf = 0; bf != n_sf; ++bf)
+                                 u_h.add_scaled(phi[bf][qp], sys_soln(dof_indices[bf]));
                                avg.add_scaled(u_h, JxW[qp]);
                                vol += JxW[qp];
                              }
