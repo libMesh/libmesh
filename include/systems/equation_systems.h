@@ -285,19 +285,25 @@ public:
    * \returns Whether \p type can be represented as elemental data.
    *
    * Elemental data variables are CONSTANT element-interior fields,
-   * regardless of their p_refinement flag.
+   * regardless of their p_refinement flag, unless
+   * \p allow_high_order_discontinuous is true, in which case
+   * higher-order discontinuous (MONOMIAL, MONOMIAL_VEC, XYZ) fields
+   * are also accepted.
    */
-  static bool is_elemental_data_fe_type (const FEType & type);
+  static bool is_elemental_data_fe_type (const FEType & type,
+                                         bool allow_high_order_discontinuous = false);
 
   /**
    * Filter \p var_names to names of variables that can be represented as
    * elemental data. If \p var_names is empty, all eligible variable names are
    * returned. Vector-valued variables are decomposed into component names.
    * If \p system_names!=nullptr, only include names from the specified systems.
+   * See is_elemental_data_fe_type() for \p allow_high_order_discontinuous.
    */
   void build_elemental_data_variable_names
     (std::vector<std::string> & var_names,
-     const std::set<std::string> * system_names=nullptr) const;
+     const std::set<std::string> * system_names=nullptr,
+     bool allow_high_order_discontinuous = false) const;
 
   /**
    * Fill the input vector \p soln with the solution values for the
@@ -351,10 +357,14 @@ public:
    * retrieved. This can be used to filter which variables are retrieved.
    *
    * This is the more appropriately-named replacement for the get_solution()
-   * function defined above.
+   * function defined above. See is_elemental_data_fe_type() for
+   * \p allow_high_order_discontinuous; when true, higher-order
+   * discontinuous variables are included and their values are a
+   * quadrature average over each element rather than a single DOF.
    */
   void build_elemental_solution_vector (std::vector<Number> & soln,
-                                        std::vector<std::string> & names) const;
+                                        std::vector<std::string> & names,
+                                        bool allow_high_order_discontinuous = false) const;
 
   /**
    * Finds system and variable numbers for any variables of 'type' or of
@@ -386,10 +396,12 @@ public:
   /**
    * Finds system and variable numbers for variables that can be represented
    * as elemental data. See find_variable_numbers() for name filtering,
-   * component decomposition, and sorting details.
+   * component decomposition, and sorting details, and
+   * is_elemental_data_fe_type() for \p allow_high_order_discontinuous.
    */
   std::vector<std::pair<unsigned int, unsigned int>>
-  find_elemental_data_variable_numbers (std::vector<std::string> & names) const;
+  find_elemental_data_variable_numbers (std::vector<std::string> & names,
+                                        bool allow_high_order_discontinuous = false) const;
 
   /**
    * Builds a parallel vector of elemental data solution values corresponding to the entries
@@ -407,9 +419,15 @@ public:
    * n_vars includes all components of vectors, ordered according to:
    * [u0, u1, ... uN, v0, v1, ... vN, w0, w1, ... wN] for elemental data
    * variables (u, v, w) on a mesh with N elements.
+   *
+   * See is_elemental_data_fe_type() for \p allow_high_order_discontinuous;
+   * when true, the value stored for a higher-order discontinuous variable
+   * is a quadrature average of its solution over each element, rather
+   * than a single DOF.
    */
   std::unique_ptr<NumericVector<Number>>
-  build_parallel_elemental_solution_vector (std::vector<std::string> & names) const;
+  build_parallel_elemental_solution_vector (std::vector<std::string> & names,
+                                            bool allow_high_order_discontinuous = false) const;
 
   /**
    * Fill the input vector \p soln with solution values.  The
