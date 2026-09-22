@@ -1934,10 +1934,12 @@ public:
   typedef std::map<const Node *, constraint_rows_mapped_type> constraint_rows_type;
 
   /**
-   * Constraint rows accessors
+   * Constraint rows accessors.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   constraint_rows_type & get_constraint_rows()
-  { return _constraint_rows; }
+  { libmesh_deprecated(); return _constraint_rows; }
+#endif
 
   const constraint_rows_type & get_constraint_rows() const
   { return _constraint_rows; }
