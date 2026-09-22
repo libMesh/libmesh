@@ -336,6 +336,11 @@ void DynaIO::read_mesh(std::istream & in)
               Elem * elem = mesh.add_elem(Elem::build(NODEELEM));
               elem->set_node(0, n);
               elem->subdomain_id() = 1; // Separate id to ease Exodus output
+
+              // We should never be trying to assemble on the new
+              // spline nodes!
+              elem->set_mapping_type(INVALID_MAP);
+
               spline_nodeelem_ptrs[n] = elem;
             }
             ++n_nodes_read;
