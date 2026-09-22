@@ -418,6 +418,10 @@ void ExodusII_IO::read (const std::string & fname)
           elem->set_node(0, added_node);
           Elem * added_elem = mesh.add_elem(std::move(elem));
           spline_nodeelem_ptrs[added_node] = added_elem;
+
+          // We should never be trying to assemble on the new
+          // spline nodes!
+          added_elem->set_mapping_type(INVALID_MAP);
         }
     }
 

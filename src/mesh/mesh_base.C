@@ -2700,6 +2700,13 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
       elem->subdomain_id() = new_sbd_id;
 
       Elem * added_elem = this->add_elem(std::move(elem));
+
+      // We may be using these constraints to constrain
+      // Lagrange- or non-Lagrange-mapped assembly elements, but
+      // either way we should never be trying to assemble on the new
+      // spline nodes!
+      added_elem->set_mapping_type(INVALID_MAP);
+
       this->_elem_dims.insert(0);
       this->_elem_default_orders.insert(added_elem->default_order());
       this->_supported_nodal_order =
