@@ -87,6 +87,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _allow_node_and_elem_unique_id_overlap(false),
   _spatial_dimension(d),
   _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
+  _n_constraint_rows(0),
   _point_locator_close_to_point_tol(0.)
 {
   _elem_dims.insert(d);
@@ -132,6 +133,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _all_elemset_ids(other_mesh._all_elemset_ids),
   _spatial_dimension(other_mesh._spatial_dimension),
   _default_ghosting(std::make_unique<GhostPointNeighbors>(*this)),
+  _n_constraint_rows(0),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
 {
   const GhostingFunctor * const other_default_ghosting = other_mesh._default_ghosting.get();
@@ -228,6 +230,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _elem_integer_default_values = std::move(other_mesh._elem_integer_default_values);
   _node_integer_names = std::move(other_mesh._node_integer_names);
   _node_integer_default_values = std::move(other_mesh._node_integer_default_values);
+  _n_constraint_rows = other_mesh._n_constraint_rows;
   _point_locator_close_to_point_tol = other_mesh.get_point_locator_close_to_point_tol();
 
 #ifdef LIBMESH_ENABLE_PERIODIC
@@ -325,6 +328,8 @@ bool MeshBase::locally_equals (const MeshBase & other_mesh) const
   if (_allow_node_and_elem_unique_id_overlap != other_mesh._allow_node_and_elem_unique_id_overlap)
     return false;
   if (_spatial_dimension != other_mesh._spatial_dimension)
+    return false;
+  if (_n_constraint_rows != other_mesh._n_constraint_rows)
     return false;
   if (_point_locator_close_to_point_tol != other_mesh._point_locator_close_to_point_tol)
     return false;
@@ -1049,6 +1054,7 @@ void MeshBase::clear ()
   _elemset_codes_inverse_map.clear();
 
   _constraint_rows.clear();
+  _n_constraint_rows = 0;
 
   // Clear our point locator.
   this->clear_point_locator();
@@ -2430,6 +2436,7 @@ MeshBase::post_dofobject_moves(MeshBase && other_mesh)
 
   // _constraint_rows
   _constraint_rows = std::move(other_mesh._constraint_rows);
+  _n_constraint_rows = other_mesh._n_constraint_rows;
 
   if (other_mesh.partitioner())
     _partitioner = std::move(other_mesh.partitioner());
@@ -2477,7 +2484,7 @@ bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh) const
 }
 
 
-dof_id_type MeshBase::n_constraint_rows() const
+void MeshBase::count_constraint_rows()
 {
   dof_id_type n_local_rows=0, n_unpartitioned_rows=0;
   for (const auto & [node, node_constraints] : _constraint_rows)
@@ -2491,7 +2498,7 @@ dof_id_type MeshBase::n_constraint_rows() const
 
   this->comm().sum(n_local_rows);
 
-  return n_unpartitioned_rows + n_local_rows;
+  _n_constraint_rows = n_unpartitioned_rows + n_local_rows;
 }
 
 
@@ -2499,6 +2506,8 @@ void
 MeshBase::copy_constraint_rows(const MeshBase & other_mesh)
 {
   LOG_SCOPE("copy_constraint_rows(mesh)", "MeshBase");
+
+  _n_constraint_rows = other_mesh._n_constraint_rows;
 
   _constraint_rows.clear();
 
@@ -2786,6 +2795,8 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
       this->_constraint_rows.emplace(constrained_node,
                                      std::move(constraint_row));
     }
+
+  this->count_constraint_rows();
 }
 
 
