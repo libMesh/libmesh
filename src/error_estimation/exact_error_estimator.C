@@ -306,6 +306,10 @@ void ExactErrorEstimator::estimate_error (const System & system,
       // that live on this processor.
       for (const auto & elem : mesh.active_local_element_ptr_range())
         {
+          // Skip any spline nodes
+          if (elem->type() == NODEELEM && mesh.n_constraint_rows())
+            continue;
+
           const dof_id_type e_id = elem->id();
 
 #ifdef LIBMESH_ENABLE_AMR
