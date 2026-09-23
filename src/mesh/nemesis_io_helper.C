@@ -2543,8 +2543,6 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
               // Fine, we'll do it the hard way
               if (!found_all_indices)
                 {
-                  local_soln.resize(num_nodes);
-
                   // Elements sharing a node can disagree on the
                   // element-local nodal_soln value there (e.g. for
                   // Nedelec/Raviart-Thomas elements, which are not
@@ -2552,7 +2550,30 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
                   // from every element touching each node and average
                   // them, matching
                   // EquationSystems::build_parallel_solution_vector().
-                  std::vector<unsigned int> repeat_count(num_nodes, 0);
+                  //
+                  // A node can be touched by elements owned by
+                  // different processors (e.g. a node on a partition
+                  // boundary), so a plain local accumulation would only
+                  // see this processor's own contributions.  Instead we
+                  // accumulate into distributed vectors indexed by
+                  // global node id and let NumericVector::close() sum
+                  // the cross-processor contributions, then localize()
+                  // just the values we need.
+                  const dof_id_type max_node_id = mesh.max_node_id();
+                  const dof_id_type n_local_nodes =
+                    cast_int<dof_id_type>(std::distance(mesh.local_nodes_begin(),
+                                                        mesh.local_nodes_end()));
+
+                  std::unique_ptr<NumericVector<Number>> global_soln_ptr =
+                    NumericVector<Number>::build(mesh.comm());
+                  NumericVector<Number> & global_soln = *global_soln_ptr;
+                  global_soln.init(max_node_id, n_local_nodes, false, PARALLEL);
+
+                  std::unique_ptr<NumericVector<Number>> global_repeat_ptr =
+                    NumericVector<Number>::build(mesh.comm());
+                  NumericVector<Number> & global_repeat = *global_repeat_ptr;
+                  global_repeat.init(max_node_id, n_local_nodes, false, PARALLEL);
+                  global_repeat.close();
 
                   const Variable & var_description = sys.variable(var);
                   const DofMap & dof_map           = sys.get_dof_map();
@@ -2583,32 +2604,45 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
                         if (!elem->infinite())
                           for (auto n : elem->node_index_range())
                             {
-                              const std::size_t exodus_num =
-                                libmesh_node_num_to_exodus[elem->node_id(n)];
-                              libmesh_assert_greater(exodus_num, 0);
-                              libmesh_assert_less(exodus_num-1, local_soln.size());
-
                               // For a vector variable, nodal_soln is
                               // laid out as elem->dim() components per
                               // node; skip components that don't exist
                               // on lower-dimensional elements.
-                              if (!is_vector)
-                                {
-                                  local_soln[exodus_num-1] += nodal_soln[n];
-                                  repeat_count[exodus_num-1]++;
-                                }
-                              else if (comp < elem->dim())
-                                {
-                                  local_soln[exodus_num-1] +=
-                                    nodal_soln[n*elem->dim() + comp];
-                                  repeat_count[exodus_num-1]++;
-                                }
+                              if (is_vector && comp >= elem->dim())
+                                continue;
+
+                              const dof_id_type node_id = elem->node_id(n);
+                              const Number value =
+                                is_vector ?
+                                nodal_soln[n*elem->dim() + comp] :
+                                nodal_soln[n];
+
+                              global_soln.add(node_id, value);
+                              global_repeat.add(node_id, Number(1));
                             }
                       }
 
+                  global_soln.close();
+                  global_repeat.close();
+
+                  // Nodes with no contributions at all (e.g. gaps left
+                  // by a non-renumbered, coarsened mesh, or nodes where
+                  // this variable isn't active on any subdomain) would
+                  // otherwise cause a divide-by-zero; their (unused)
+                  // global_soln entry is already zero.
+                  for (numeric_index_type i = global_repeat.first_local_index();
+                       i < global_repeat.last_local_index(); ++i)
+                    if (global_repeat(i) == Number(0))
+                      global_repeat.set(i, Number(1));
+                  global_repeat.close();
+
+                  global_soln /= global_repeat;
+
+                  std::vector<numeric_index_type> required_node_ids(num_nodes);
                   for (int i=0; i<num_nodes; ++i)
-                    if (repeat_count[i] > 1)
-                      local_soln[i] /= repeat_count[i];
+                    required_node_ids[i] = this->exodus_node_num_to_libmesh[i]-1;
+
+                  global_soln.localize(local_soln, required_node_ids);
                 }
             }
 
