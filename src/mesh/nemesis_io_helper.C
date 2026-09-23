@@ -2457,122 +2457,184 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
   // FIXME - half this code might be replaceable with a call to
   // EquationSystems::build_parallel_solution_vector()...
 
+  // Vector-valued nodal variables (e.g. LAGRANGE_VEC, 1st-order
+  // MONOMIAL_VEC) are decomposed into per-component names
+  // (name+"_x", name+"_y", ...) by
+  // EquationSystems::find_variable_numbers_by_predicate(), so we must
+  // look up and write each component separately below.
+  const std::vector<std::string> component_suffix = {"_x", "_y", "_z"};
+
   for (auto [sys_num, var] : var_nums)
     {
       const System & sys = es.get_system(sys_num);
+
+      // Parallel formats like Nemesis skip
+      // EquationSystems::build_solution_vector() (see
+      // MeshOutput::write_equation_systems()), which is what normally
+      // keeps System::current_local_solution in sync with
+      // System::solution by calling System::update().  Since we read
+      // directly from current_local_solution below, make sure it's up
+      // to date first.
+      {
+        System & non_const_sys = const_cast<System &>(sys);
+        if (!non_const_sys.solution->closed())
+          non_const_sys.solution->close();
+        non_const_sys.update();
+      }
+
       const std::string & name = sys.variable_name(var);
-
-      auto pos = std::find(output_names.begin(), output_names.end(), name);
-
-      // Skip this name if it's not supposed to be output.
-      if (pos == output_names.end())
-        continue;
-
-      // Compute the (zero-based) index which determines which
-      // variable this will be as far as Nemesis is concerned.  This
-      // will be used below in the write_nodal_values() call.
-      int variable_name_position =
-        cast_int<int>(std::distance(output_names.begin(), pos));
-
-      // Fill up a std::vector with the dofs for the current variable
-      std::vector<numeric_index_type> required_indices(this->num_nodes);
-
-      // Get the dof values required to write just our local part of
-      // the solution vector.
-      std::vector<Number> local_soln;
-
       const FEType type = sys.variable_type(var);
-      if (type.family == SCALAR)
+
+      const bool is_vector = (FEInterface::field_type(type) == TYPE_VECTOR);
+      const unsigned int n_comps =
+        is_vector ? FEInterface::n_vec_dim(mesh, type) : 1;
+
+      for (unsigned int comp = 0; comp < n_comps; ++comp)
         {
-          std::vector<numeric_index_type> scalar_indices;
-          sys.get_dof_map().SCALAR_dof_indices(scalar_indices, var);
-          for (int i=0; i<this->num_nodes; i++)
-            required_indices[i] = scalar_indices[0];
-          sys.current_local_solution->get(required_indices, local_soln);
-        }
-      else
-        {
-          // If we have DoFs at all nodes, e.g. for isoparametric
-          // elements, this is easy:
-          bool found_all_indices = true;
-          for (int i=0; i<this->num_nodes; i++)
+          const std::string full_name =
+            is_vector ? name + component_suffix[comp] : name;
+
+          auto pos = std::find(output_names.begin(), output_names.end(), full_name);
+
+          // Skip this name if it's not supposed to be output.
+          if (pos == output_names.end())
+            continue;
+
+          // Compute the (zero-based) index which determines which
+          // variable this will be as far as Nemesis is concerned.  This
+          // will be used below in the write_nodal_values() call.
+          int variable_name_position =
+            cast_int<int>(std::distance(output_names.begin(), pos));
+
+          // Fill up a std::vector with the dofs for the current variable
+          std::vector<numeric_index_type> required_indices(this->num_nodes);
+
+          // Get the dof values required to write just our local part of
+          // the solution vector.
+          std::vector<Number> local_soln;
+
+          if (type.family == SCALAR)
             {
-              const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]-1);
-              if (node.n_comp(sys_num, var))
-                required_indices[i] = node.dof_number(sys_num, var, 0);
-              else
+              std::vector<numeric_index_type> scalar_indices;
+              sys.get_dof_map().SCALAR_dof_indices(scalar_indices, var);
+              for (int i=0; i<this->num_nodes; i++)
+                required_indices[i] = scalar_indices[0];
+              sys.current_local_solution->get(required_indices, local_soln);
+            }
+          else
+            {
+              // If we have DoFs at all nodes, e.g. for isoparametric
+              // elements, this is easy:
+              bool found_all_indices = true;
+              for (int i=0; i<this->num_nodes; i++)
                 {
-                  found_all_indices = false;
-                  break;
+                  const Node & node = mesh.node_ref(this->exodus_node_num_to_libmesh[i]-1);
+                  if (node.n_comp(sys_num, var))
+                    required_indices[i] = node.dof_number(sys_num, var, comp);
+                  else
+                    {
+                      found_all_indices = false;
+                      break;
+                    }
+                }
+
+              if (found_all_indices)
+                sys.current_local_solution->get(required_indices, local_soln);
+              // Fine, we'll do it the hard way
+              if (!found_all_indices)
+                {
+                  local_soln.resize(num_nodes);
+
+                  // Elements sharing a node can disagree on the
+                  // element-local nodal_soln value there (e.g. for
+                  // Nedelec/Raviart-Thomas elements, which are not
+                  // vertex-continuous), so we accumulate contributions
+                  // from every element touching each node and average
+                  // them, matching
+                  // EquationSystems::build_parallel_solution_vector().
+                  std::vector<unsigned int> repeat_count(num_nodes, 0);
+
+                  const Variable & var_description = sys.variable(var);
+                  const DofMap & dof_map           = sys.get_dof_map();
+
+                  NumericVector<Number> & sys_soln(*sys.current_local_solution);
+                  std::vector<Number>      elem_soln;   // The finite element solution
+                  std::vector<Number>      nodal_soln;  // The FE solution interpolated to the nodes
+                  std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
+
+                  for (const auto & elem : mesh.active_local_element_ptr_range())
+                    if (var_description.active_on_subdomain(elem->subdomain_id()))
+                      {
+                        dof_map.dof_indices (elem, dof_indices, var);
+                        elem_soln.resize(dof_indices.size());
+
+                        for (auto i : index_range(dof_indices))
+                          elem_soln[i] = sys_soln(dof_indices[i]);
+
+                        FEInterface::nodal_soln (elem->dim(),
+                                                 type,
+                                                 elem,
+                                                 elem_soln,
+                                                 nodal_soln,
+                                                 /*add_p_level=*/true,
+                                                 is_vector ? elem->dim() : 1);
+
+                        // infinite elements should be skipped...
+                        if (!elem->infinite())
+                          for (auto n : elem->node_index_range())
+                            {
+                              const std::size_t exodus_num =
+                                libmesh_node_num_to_exodus[elem->node_id(n)];
+                              libmesh_assert_greater(exodus_num, 0);
+                              libmesh_assert_less(exodus_num-1, local_soln.size());
+
+                              // For a vector variable, nodal_soln is
+                              // laid out as elem->dim() components per
+                              // node; skip components that don't exist
+                              // on lower-dimensional elements.
+                              if (!is_vector)
+                                {
+                                  local_soln[exodus_num-1] += nodal_soln[n];
+                                  repeat_count[exodus_num-1]++;
+                                }
+                              else if (comp < elem->dim())
+                                {
+                                  local_soln[exodus_num-1] +=
+                                    nodal_soln[n*elem->dim() + comp];
+                                  repeat_count[exodus_num-1]++;
+                                }
+                            }
+                      }
+
+                  for (int i=0; i<num_nodes; ++i)
+                    if (repeat_count[i] > 1)
+                      local_soln[i] /= repeat_count[i];
                 }
             }
 
-          if (found_all_indices)
-            sys.current_local_solution->get(required_indices, local_soln);
-          // Fine, we'll do it the hard way
-          if (!found_all_indices)
-            {
-              local_soln.resize(num_nodes);
-
-              const Variable & var_description = sys.variable(var);
-              const DofMap & dof_map           = sys.get_dof_map();
-
-              NumericVector<Number> & sys_soln(*sys.current_local_solution);
-              std::vector<Number>      elem_soln;   // The finite element solution
-              std::vector<Number>      nodal_soln;  // The FE solution interpolated to the nodes
-              std::vector<dof_id_type> dof_indices; // The DOF indices for the finite element
-
-              for (const auto & elem : mesh.active_local_element_ptr_range())
-                if (var_description.active_on_subdomain(elem->subdomain_id()))
-                  {
-                    dof_map.dof_indices (elem, dof_indices, var);
-                    elem_soln.resize(dof_indices.size());
-
-                    for (auto i : index_range(dof_indices))
-                      elem_soln[i] = sys_soln(dof_indices[i]);
-
-                    FEInterface::nodal_soln (elem->dim(),
-                                             type,
-                                             elem,
-                                             elem_soln,
-                                             nodal_soln);
-
-                    // infinite elements should be skipped...
-                    if (!elem->infinite())
-                      for (auto n : elem->node_index_range())
-                        {
-                          const std::size_t exodus_num =
-                            libmesh_node_num_to_exodus[elem->node_id(n)];
-                          libmesh_assert_greater(exodus_num, 0);
-                          libmesh_assert_less(exodus_num-1, local_soln.size());
-                          local_soln[exodus_num-1] = nodal_soln[n];
-                        }
-                  }
-            }
-        }
-
 #ifndef LIBMESH_USE_COMPLEX_NUMBERS
-      // Call the ExodusII_IO_Helper function to write the data.
-      write_nodal_values(variable_name_position + 1, local_soln, timestep);
+          // Call the ExodusII_IO_Helper function to write the data.
+          write_nodal_values(variable_name_position + 1, local_soln, timestep);
 #else
-      // We have the local (complex) values. Now extract the real,
-      // imaginary, and magnitude values from them.
-      std::vector<Real> real_parts(num_nodes);
-      std::vector<Real> imag_parts(num_nodes);
-      std::vector<Real> magnitudes(num_nodes);
+          // We have the local (complex) values. Now extract the real,
+          // imaginary, and magnitude values from them.
+          std::vector<Real> real_parts(num_nodes);
+          std::vector<Real> imag_parts(num_nodes);
+          std::vector<Real> magnitudes(num_nodes);
 
-      for (int i=0; i<num_nodes; ++i)
-        {
-          real_parts[i] = local_soln[i].real();
-          imag_parts[i] = local_soln[i].imag();
-          magnitudes[i] = std::abs(local_soln[i]);
-        }
+          for (int i=0; i<num_nodes; ++i)
+            {
+              real_parts[i] = local_soln[i].real();
+              imag_parts[i] = local_soln[i].imag();
+              magnitudes[i] = std::abs(local_soln[i]);
+            }
 
-      // Write the real, imaginary, and magnitude values to file.
-      write_nodal_values(3 * variable_name_position + 1, real_parts, timestep);
-      write_nodal_values(3 * variable_name_position + 2, imag_parts, timestep);
-      write_nodal_values(3 * variable_name_position + 3, magnitudes, timestep);
+          // Write the real, imaginary, and magnitude values to file.
+          write_nodal_values(3 * variable_name_position + 1, real_parts, timestep);
+          write_nodal_values(3 * variable_name_position + 2, imag_parts, timestep);
+          write_nodal_values(3 * variable_name_position + 3, magnitudes, timestep);
 #endif
+        } // end loop over vector components
     }
 }
 

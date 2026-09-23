@@ -234,8 +234,7 @@ public:
     for (const auto & var_name : nodal_vars)
       nemio.copy_nodal_solution(sys2, var_name, var_name, 1);
 
-    // FIXME - Nemesis still needs work for vector-valued variables
-    // testSolution(read_mesh, sys2);
+    testSolution(read_mesh, sys2);
   }
 
   void testWriteNemesisReplicated() { LOG_UNIT_TEST; testWriteNemesis<ReplicatedMesh>("rep.nem"); }
