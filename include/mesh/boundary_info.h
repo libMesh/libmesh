@@ -737,12 +737,28 @@ public:
   void build_node_list_from_side_list(const std::set<boundary_id_type> & sideset_list = {});
 
   /**
-   * Adds sides to a sideset if every node on that side are in the same
-   * sideset
+   * Adds sides to a sideset if every node on that side is in the same
+   * nodeset.
+   *
+   * By default, sides that are interior to a single subdomain (i.e.
+   * whose neighbor, if any, has the same subdomain id) are never added,
+   * even if all of their nodes happen to be in the nodeset. This avoids
+   * spurious "interior" sides being added on meshes that are only one
+   * element deep in some direction, where a nodeset spanning both
+   * exterior faces normal to that direction would otherwise cause the
+   * sides between layers to be pulled in as well. Pass
+   * \p skip_interior_sides = false to restore the old, unconditional
+   * behavior.
+   *
    * @param nodeset_list nodesets to build sidesets from.
    *                     If empty (default), builds from all existing sidesets
+   * @param skip_interior_sides If true (default), skip any side whose
+   *                     neighbor exists and is in the same subdomain,
+   *                     even if all of the side's nodes are in the
+   *                     nodeset.
    */
-  void build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list = {});
+  void build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list = {},
+                                       bool skip_interior_sides = true);
 
   /**
    * Create a list of (element_id, side_id, boundary_id) tuples for

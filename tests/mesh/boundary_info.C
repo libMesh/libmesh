@@ -44,6 +44,7 @@ public:
 # endif
   CPPUNIT_TEST( testBuildNodeListFromSideList );
   CPPUNIT_TEST( testBuildSideListFromNodeList );
+  CPPUNIT_TEST( testBuildSideListFromNodeListThinMesh );
 # ifdef LIBMESH_ENABLE_DIRICHLET
   CPPUNIT_TEST( testShellFaceConstraints );
 # endif
@@ -1109,6 +1110,64 @@ public:
             CPPUNIT_ASSERT(!bi.n_boundary_ids(elem, s));
           }
       }
+  }
+
+
+  void testBuildSideListFromNodeListThinMesh()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    // A mesh that is only one element deep in y: every node in the
+    // mesh lies on either the bottom (y=0) or top (y=1) exterior
+    // face, so a nodeset containing "the top and bottom nodes" ends
+    // up containing *every* node, including those on the interior
+    // side between the two elements.
+    MeshTools::Generation::build_square(mesh,
+                                        2, 1,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    const boundary_id_type nodeset_id = 100;
+    for (const auto & node : mesh.node_ptr_range())
+      bi.add_node(node, nodeset_id);
+
+    // Sanity check: every node in this thin mesh is in the nodeset.
+    for (const auto & node : mesh.node_ptr_range())
+      CPPUNIT_ASSERT(bi.has_boundary_id(node, nodeset_id));
+
+    // Default behavior should skip the interior side, even though
+    // all of its nodes are (trivially) in the nodeset.
+    bi.build_side_list_from_node_list({nodeset_id});
+
+    for (const auto & elem : mesh.element_ptr_range())
+      for (auto s : elem->side_index_range())
+        {
+          const Elem * neigh = elem->neighbor_ptr(s);
+          if (neigh && neigh->subdomain_id() == elem->subdomain_id())
+            CPPUNIT_ASSERT(!bi.has_boundary_id(elem, s, nodeset_id));
+          else
+            CPPUNIT_ASSERT(bi.has_boundary_id(elem, s, nodeset_id));
+        }
+
+    // Passing skip_interior_sides = false should restore the old,
+    // unconditional behavior, adding the interior side as well.
+    bi.build_side_list_from_node_list({nodeset_id}, /*skip_interior_sides=*/false);
+
+    bool found_interior_side = false;
+    for (const auto & elem : mesh.element_ptr_range())
+      for (auto s : elem->side_index_range())
+        {
+          const Elem * neigh = elem->neighbor_ptr(s);
+          if (neigh && neigh->subdomain_id() == elem->subdomain_id() &&
+              bi.has_boundary_id(elem, s, nodeset_id))
+            found_interior_side = true;
+        }
+    CPPUNIT_ASSERT(found_interior_side);
   }
 
 

@@ -2994,7 +2994,8 @@ void BoundaryInfo::parallel_sync_node_ids()
        node_id_action_functor, datum_type_ex);
 }
 
-void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list)
+void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list,
+                                                  bool skip_interior_sides)
 {
   // Check for early return
   if (_boundary_node_id.empty())
@@ -3011,6 +3012,19 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
   for (const auto & elem : _mesh->active_element_ptr_range())
     for (auto side : elem->side_index_range())
       {
+        // A side whose neighbor is in the same subdomain is interior to
+        // a block, not a true boundary or subdomain interface, even if
+        // all of its nodes happen to lie in the nodeset (e.g. on a mesh
+        // that is only one element deep in some direction).  Skip it
+        // unless the caller has explicitly asked for the old,
+        // unconditional behavior.
+        if (skip_interior_sides)
+          {
+            const Elem * neigh = elem->neighbor_ptr(side);
+            if (neigh && neigh->subdomain_id() == elem->subdomain_id())
+              continue;
+          }
+
         side_elem = &side_builder(*elem, side);
 
         // map from nodeset_id to count for that ID
