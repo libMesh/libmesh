@@ -39,12 +39,14 @@
 #include "libmesh/int_range.h"
 
 // C++ includes
+#include <algorithm>
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
 #include <vector>
 #include <string>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <sstream> // for ostringstream
 #include <unordered_map>
@@ -113,6 +115,31 @@ split_file(const std::string & input_name,
 {
   return (split_dir(input_name, n_procs) + "/split-" + std::to_string(n_procs) + "-" +
          std::to_string(proc_id)).append(extension(input_name));
+}
+
+// Report, as a comma-separated list, the processor counts for which a split
+// already exists as a numbered subdirectory of input_name, to help a user
+// pick out why the split they asked for could not be found.
+std::string existing_splits(const std::string & input_name)
+{
+  std::error_code ec;
+  if (!std::filesystem::is_directory(input_name, ec))
+    return "";
+
+  std::vector<std::string> splits;
+  for (const auto & entry : std::filesystem::directory_iterator(input_name, ec))
+  {
+    const auto name = entry.path().filename().string();
+    if (!name.empty() && name.find_first_not_of("0123456789") == std::string::npos &&
+        entry.is_directory(ec))
+      splits.push_back(name);
+  }
+  std::sort(splits.begin(), splits.end());
+
+  std::string list;
+  for (const auto & split : splits)
+    list += (list.empty() ? "" : ", ") + split;
+  return list;
 }
 
 void make_dir(const std::string & input_name, libMesh::processor_id_type n_procs)
@@ -208,13 +235,18 @@ processor_id_type CheckpointIO::select_split_config(const std::string & input_na
             auto orig_header_name = header_name;
             header_name = header_file(input_name, 1);
             std::ifstream in2 (header_name.c_str());
+            const auto splits = existing_splits(input_name);
             libmesh_error_msg_if(!in2.good(),
                                  "ERROR: Neither one of the following files can be located:\n\t'"
                                  << orig_header_name << "' nor\n\t'" << input_name << "'\n"
                                  << "If you are running a parallel job, double check that you've "
                                  << "created a split for " << _my_n_processors << " ranks.\n"
                                  << "Note: One of paths above may refer to a valid directory on your "
-                                 << "system, however we are attempting to read a valid header file.");
+                                 << "system, however we are attempting to read a valid header file.\n"
+                                 << (splits.empty()
+                                         ? "No processor-count splits were found in '" + input_name + "'."
+                                         : "Splits that do exist in '" + input_name +
+                                               "': " + splits + "."));
           }
       }
 

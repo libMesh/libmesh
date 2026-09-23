@@ -13,6 +13,8 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <regex>
+
 
 using namespace libMesh;
 
@@ -38,6 +40,7 @@ public:
   CPPUNIT_TEST( testAsciiC0Polyhedron );
   CPPUNIT_TEST( testBinaryC0Polyhedron );
 #endif
+  CPPUNIT_TEST( testMissingSplitError );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -311,6 +314,63 @@ public:
 #endif // LIBMESH_HAVE_XDR
   }
 #endif
+
+  // Test that a read() for a split count with no matching split (and no
+  // serial fallback) reports the split counts that do exist, per #4560.
+  void testMissingSplitError()
+  {
+    LOG_UNIT_TEST;
+
+#ifdef LIBMESH_HAVE_XDR
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    // The error message we're checking only depends on the checkpoint
+    // directory's contents, so there's no need to exercise this on more
+    // than one rank.
+    if (TestCommWorld->rank() != 0)
+      return;
+
+    Parallel::Communicator comm_self;
+    const std::string filename = "checkpoint_missing_split.cpa";
+    const processor_id_type n_procs = 2;
+
+    {
+      ReplicatedMesh mesh(comm_self);
+      MeshTools::Generation::build_square(mesh, 2, 2, 0., 1., 0., 1., QUAD4);
+      mesh.partition(n_procs);
+
+      CheckpointIO cpr(mesh);
+      cpr.current_processor_ids().clear();
+      for (processor_id_type pid = 0; pid < n_procs; pid++)
+        cpr.current_processor_ids().push_back(pid);
+      cpr.current_n_processors() = n_procs;
+      cpr.parallel() = true;
+      cpr.write(filename);
+    }
+
+    {
+      // Ask for a split count for which neither that split nor the
+      // serial fallback exists; only the split for n_procs does.
+      ReplicatedMesh mesh(comm_self);
+      CheckpointIO cpr(mesh);
+      cpr.current_n_processors() = n_procs + 1;
+
+      bool threw_desired_exception = false;
+      try {
+        cpr.read(filename);
+      }
+      catch (libMesh::LogicError & e) {
+        std::regex msg_regex("Splits that do exist in '" + filename + "': " +
+                             std::to_string(n_procs) + "\\.");
+        CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+        threw_desired_exception = true;
+      }
+      CPPUNIT_ASSERT(threw_desired_exception);
+    }
+
+    CheckpointIO::cleanup(filename, n_procs);
+#endif
+#endif
+  }
 
   void testAsciiDistRepSplitter()
   {
