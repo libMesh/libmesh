@@ -46,7 +46,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <unistd.h>
 
 #include "exodusII.h"
 #include "exodusII_int.h"
@@ -1255,8 +1254,8 @@ static void ex_swap64 (int64_t v[], int64_t i, int64_t j)
 
 static int ex_int_median3(int v[], int iv[], int left, int right)
 {
-  ssize_t center;
-  center = ((ssize_t)left + (ssize_t)right) / 2;
+  long long center;
+  center = ((long long)left + (long long)right) / 2;
 
   if (v[iv[left]] > v[iv[center]])
     ex_swap(iv, left, center);
