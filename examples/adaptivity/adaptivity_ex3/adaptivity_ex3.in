@@ -39,6 +39,12 @@ indicator_type = kelly
 # on every element; hp refinement tries to do one or the other
 refinement_type = h
 
+# Fraction of smoothness values above which p-refinement is
+# favored in hp-adaptivity. For instance, default value is 0.9;
+# means p refining favored (for hp adaptivity) on an element
+# only if local smoothness is above 90%.
+smoothness_threshold = 0.9
+
 # Mesh dimensionality
 # We generate 1D meshes on [-1, 0].
 # We load lshaped.xda for 2 dimensional problems, lshaped3D.xda for 3

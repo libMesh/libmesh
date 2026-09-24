@@ -150,6 +150,7 @@ int main(int argc, char ** argv)
   const Real coarsen_percentage     = input_file("coarsen_percentage", 0.5);
   const unsigned int uniform_refine = input_file("uniform_refine",0);
   const std::string refine_type     = input_file("refinement_type", "h");
+  const Real smoothness_threshold   = input_file("smoothness_threshold", 0.9);
   const std::string approx_type     = input_file("approx_type", "LAGRANGE");
   const unsigned int approx_order   = input_file("approx_order", 1);
   n_vars                            = input_file("n_vars", n_vars);
@@ -523,7 +524,7 @@ int main(int argc, char ** argv)
               else if (refine_type == "hp")
                 {
                   HPCoarsenTest hpselector;
-                  hpselector.select_refinement(system);
+                  hpselector.select_refinement(system, smoothness_threshold);
                 }
               // If we are doing "singular hp" refinement, we
               // try switching most elements from h to p
