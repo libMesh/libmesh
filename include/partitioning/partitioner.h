@@ -276,6 +276,13 @@ protected:
   void assign_partitioning (MeshBase & mesh, const std::vector<dof_id_type> & parts);
 
   /**
+   * This function "catches" nodes which were not locally assigned a
+   * processor ID, due to be only being (locally) seen as a node
+   * connected to an ancestor element with some remote descendants.
+   */
+  static void set_nearly_remote_node_processor_ids(MeshBase & mesh);
+
+  /**
    * The weights that might be used for partitioning.
    */
   ErrorVector * _weights;
