@@ -307,7 +307,7 @@ void ExactErrorEstimator::estimate_error (const System & system,
       for (const auto & elem : mesh.active_local_element_ptr_range())
         {
           // Skip any spline nodes
-          if (elem->type() == NODEELEM && mesh.n_constraint_rows())
+          if (elem->mapping_type() == INVALID_MAP)
             continue;
 
           const dof_id_type e_id = elem->id();
