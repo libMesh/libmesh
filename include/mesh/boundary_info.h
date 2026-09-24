@@ -751,8 +751,10 @@ public:
    * preserves the old, unconditional behavior.
    *
    * On a distributed mesh, a side whose neighbor is an unresolved
-   * RemoteElem is never skipped, even if \p skip_interior_sides is
-   * true, since its subdomain id can't be determined locally.
+   * RemoteElem has its neighbor's subdomain id resolved via parallel
+   * communication with the processor that owns that neighbor, so
+   * such sides are subject to \p skip_interior_sides just like any
+   * other side.
    *
    * @param nodeset_list nodesets to build sidesets from.
    *                     If empty (default), builds from all existing sidesets
