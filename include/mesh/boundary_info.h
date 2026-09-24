@@ -740,25 +740,29 @@ public:
    * Adds sides to a sideset if every node on that side is in the same
    * nodeset.
    *
-   * By default, sides that are interior to a single subdomain (i.e.
-   * whose neighbor, if any, has the same subdomain id) are never added,
-   * even if all of their nodes happen to be in the nodeset. This avoids
-   * spurious "interior" sides being added on meshes that are only one
-   * element deep in some direction, where a nodeset spanning both
-   * exterior faces normal to that direction would otherwise cause the
-   * sides between layers to be pulled in as well. Pass
-   * \p skip_interior_sides = false to restore the old, unconditional
-   * behavior.
+   * If \p skip_interior_sides is true, sides that are interior to a
+   * single subdomain (i.e. whose neighbor, if any, has the same
+   * subdomain id) are never added, even if all of their nodes happen
+   * to be in the nodeset. This avoids spurious "interior" sides being
+   * added on meshes that are only one element deep in some direction,
+   * where a nodeset spanning both exterior faces normal to that
+   * direction would otherwise cause the sides between layers to be
+   * pulled in as well. The default, \p skip_interior_sides = false,
+   * preserves the old, unconditional behavior.
+   *
+   * On a distributed mesh, a side whose neighbor is an unresolved
+   * RemoteElem is never skipped, even if \p skip_interior_sides is
+   * true, since its subdomain id can't be determined locally.
    *
    * @param nodeset_list nodesets to build sidesets from.
    *                     If empty (default), builds from all existing sidesets
-   * @param skip_interior_sides If true (default), skip any side whose
-   *                     neighbor exists and is in the same subdomain,
-   *                     even if all of the side's nodes are in the
-   *                     nodeset.
+   * @param skip_interior_sides If true, skip any side whose neighbor
+   *                     exists and is in the same subdomain, even if
+   *                     all of the side's nodes are in the nodeset.
+   *                     Defaults to false, for backwards compatibility.
    */
   void build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list = {},
-                                       bool skip_interior_sides = true);
+                                       bool skip_interior_sides = false);
 
   /**
    * Create a list of (element_id, side_id, boundary_id) tuples for

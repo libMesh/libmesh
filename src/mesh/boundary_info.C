@@ -2995,7 +2995,7 @@ void BoundaryInfo::parallel_sync_node_ids()
 }
 
 void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list,
-                                                  bool skip_interior_sides)
+                                                   bool skip_interior_sides)
 {
   // Check for early return
   if (_boundary_node_id.empty())
@@ -3016,12 +3016,22 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
         // a block, not a true boundary or subdomain interface, even if
         // all of its nodes happen to lie in the nodeset (e.g. on a mesh
         // that is only one element deep in some direction).  Skip it
-        // unless the caller has explicitly asked for the old,
-        // unconditional behavior.
+        // if the caller has opted in to that behavior.
+        //
+        // On a distributed mesh, elem's neighbor across this side may
+        // be a RemoteElem: a real face neighbor exists, but we don't
+        // store its data locally, so we have no way to know its
+        // subdomain id.  Since RemoteElem doesn't override
+        // subdomain_id(), comparing against it would silently compare
+        // against a meaningless default value, and the answer would
+        // depend on the mesh partitioning rather than just its
+        // topology.  Leave such sides alone (i.e. behave as if
+        // skip_interior_sides were false for them) rather than guess.
         if (skip_interior_sides)
           {
             const Elem * neigh = elem->neighbor_ptr(side);
-            if (neigh && neigh->subdomain_id() == elem->subdomain_id())
+            if (neigh && neigh != remote_elem &&
+                neigh->subdomain_id() == elem->subdomain_id())
               continue;
           }
 

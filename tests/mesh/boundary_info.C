@@ -1140,9 +1140,15 @@ public:
     for (const auto & node : mesh.node_ptr_range())
       CPPUNIT_ASSERT(bi.has_boundary_id(node, nodeset_id));
 
-    // Default behavior should skip the interior side, even though
-    // all of its nodes are (trivially) in the nodeset.
-    bi.build_side_list_from_node_list({nodeset_id});
+    // build_side_list_from_node_list() is purely additive (it never
+    // removes a side once added), so we must run the strict
+    // skip_interior_sides = true check first, before any call adds
+    // the interior side to the sideset.
+    //
+    // Passing skip_interior_sides = true should skip the interior
+    // side, even though all of its nodes are (trivially) in the
+    // nodeset.
+    bi.build_side_list_from_node_list({nodeset_id}, /*skip_interior_sides=*/true);
 
     for (const auto & elem : mesh.element_ptr_range())
       for (auto s : elem->side_index_range())
@@ -1154,9 +1160,12 @@ public:
             CPPUNIT_ASSERT(bi.has_boundary_id(elem, s, nodeset_id));
         }
 
-    // Passing skip_interior_sides = false should restore the old,
-    // unconditional behavior, adding the interior side as well.
-    bi.build_side_list_from_node_list({nodeset_id}, /*skip_interior_sides=*/false);
+    // Default behavior (skip_interior_sides = false) should preserve
+    // the old, unconditional behavior, adding the interior side even
+    // though it isn't a true boundary. Since add_side() is additive,
+    // this call only needs to add the interior side; the exterior
+    // sides are already present from the call above.
+    bi.build_side_list_from_node_list({nodeset_id});
 
     bool found_interior_side = false;
     for (const auto & elem : mesh.element_ptr_range())
