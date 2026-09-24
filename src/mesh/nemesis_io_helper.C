@@ -2538,6 +2538,15 @@ void Nemesis_IO_Helper::write_nodal_solution(const EquationSystems & es,
                     }
                 }
 
+              // The "hard way" below makes collective NumericVector
+              // calls, so every processor must agree on which way to
+              // go; a processor with no local nodes for this variable
+              // (e.g. it owns no local elements at all) would
+              // otherwise default to found_all_indices=true and skip
+              // those collective calls, hanging the processors that
+              // still need to make them.
+              mesh.comm().min(found_all_indices);
+
               if (found_all_indices)
                 sys.current_local_solution->get(required_indices, local_soln);
               // Fine, we'll do it the hard way
