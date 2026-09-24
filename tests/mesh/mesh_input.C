@@ -1641,6 +1641,13 @@ public:
 
     for (auto & elem : mesh.element_ptr_range())
       {
+        // Just test the assembly elements, not spline NodeElems
+        if (elem->mapping_type() == INVALID_MAP)
+          {
+            CPPUNIT_ASSERT_EQUAL(elem->type(), NODEELEM);
+            continue;
+          }
+
         Point master_pt = {}; // center, for tensor product elements
 
         // But perturb it to try and trigger any mapping weirdness
