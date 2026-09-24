@@ -223,8 +223,11 @@ template <typename T>
 void
 PetscLinearSolver<T>::init_systems (const System & sys)
 {
-  petsc_auto_fieldsplit(this->pc(), sys);
-  PetscPreconditioner<T>::set_petsc_aux_data(_pc, const_cast<System &>(sys));
+  if(!libMesh::on_command_line("--use_petsc_dm"))
+  {
+    petsc_auto_fieldsplit(this->pc(), sys);
+    PetscPreconditioner<T>::set_petsc_aux_data(_pc, const_cast<System &>(sys));
+  }
 }
 
 
