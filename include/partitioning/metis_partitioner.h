@@ -62,6 +62,12 @@ public:
     return std::make_unique<MetisPartitioner>(*this);
   }
 
+  /**
+   * METIS is handed the mesh dual graph indexed along a space-filling curve of its own,
+   * so its result does not depend on the partitioning the mesh arrives with.
+   */
+  virtual bool partitions_from_scratch () const override { return true; }
+
   virtual void attach_weights(ErrorVector * weights) override { _weights = weights; }
 
   /**

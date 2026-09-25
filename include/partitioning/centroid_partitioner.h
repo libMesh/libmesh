@@ -93,6 +93,12 @@ public:
   }
 
   /**
+   * Elements are assigned from a sort of their vertex averages, with no reference to the
+   * partitioning the mesh arrives with.
+   */
+  virtual bool partitions_from_scratch () const override { return true; }
+
+  /**
    * Getter for the current sorting method.
    */
   CentroidSortMethod sort_method () const { return _sort_method; }

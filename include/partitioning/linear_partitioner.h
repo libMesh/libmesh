@@ -65,6 +65,12 @@ public:
   }
 
   /**
+   * Elements are assigned from their position in the range, with no reference to the
+   * partitioning the mesh arrives with.
+   */
+  virtual bool partitions_from_scratch () const override { return true; }
+
+  /**
    * Called by the SubdomainPartitioner to partition elements in the range (it, end).
    */
   virtual void partition_range(MeshBase & mesh,
