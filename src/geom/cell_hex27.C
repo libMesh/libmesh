@@ -34,32 +34,6 @@ const int Hex27::num_nodes;
 const int Hex27::nodes_per_side;
 const int Hex27::nodes_per_edge;
 
-const unsigned int Hex27::side_nodes_map[Hex27::num_sides][Hex27::nodes_per_side] =
-  {
-    {0, 3, 2, 1, 11, 10,  9,  8, 20}, // Side 0
-    {0, 1, 5, 4,  8, 13, 16, 12, 21}, // Side 1
-    {1, 2, 6, 5,  9, 14, 17, 13, 22}, // Side 2
-    {2, 3, 7, 6, 10, 15, 18, 14, 23}, // Side 3
-    {3, 0, 4, 7, 11, 12, 19, 15, 24}, // Side 4
-    {4, 5, 6, 7, 16, 17, 18, 19, 25}  // Side 5
-  };
-
-const unsigned int Hex27::edge_nodes_map[Hex27::num_edges][Hex27::nodes_per_edge] =
-  {
-    {0, 1, 8},  // Edge 0
-    {1, 2, 9},  // Edge 1
-    {2, 3, 10}, // Edge 2
-    {0, 3, 11}, // Edge 3
-    {0, 4, 12}, // Edge 4
-    {1, 5, 13}, // Edge 5
-    {2, 6, 14}, // Edge 6
-    {3, 7, 15}, // Edge 7
-    {4, 5, 16}, // Edge 8
-    {5, 6, 17}, // Edge 9
-    {6, 7, 18}, // Edge 10
-    {4, 7, 19}  // Edge 11
-  };
-
 // ------------------------------------------------------------
 // Hex27 class member functions
 

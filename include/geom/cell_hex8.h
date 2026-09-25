@@ -170,13 +170,35 @@ public:
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */
-  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
+  static constexpr unsigned int side_nodes_map[num_sides][nodes_per_side] =
+    {
+      {0, 3, 2, 1}, // Side 0
+      {0, 1, 5, 4}, // Side 1
+      {1, 2, 6, 5}, // Side 2
+      {2, 3, 7, 6}, // Side 3
+      {3, 0, 4, 7}, // Side 4
+      {4, 5, 6, 7}  // Side 5
+    };
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
    * element node numbers.
    */
-  static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
+  static constexpr unsigned int edge_nodes_map[num_edges][nodes_per_edge] =
+    {
+      {0, 1}, // Edge 0
+      {1, 2}, // Edge 1
+      {2, 3}, // Edge 2
+      {0, 3}, // Edge 3
+      {0, 4}, // Edge 4
+      {1, 5}, // Edge 5
+      {2, 6}, // Edge 6
+      {3, 7}, // Edge 7
+      {4, 5}, // Edge 8
+      {5, 6}, // Edge 9
+      {6, 7}, // Edge 10
+      {4, 7}  // Edge 11
+    };
 
   /**
    * Class static helper function that computes the centroid of a

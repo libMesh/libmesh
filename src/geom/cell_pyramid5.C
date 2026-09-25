@@ -37,27 +37,6 @@ const int Pyramid5::num_nodes;
 const int Pyramid5::nodes_per_side;
 const int Pyramid5::nodes_per_edge;
 
-const unsigned int Pyramid5::side_nodes_map[Pyramid5::num_sides][Pyramid5::nodes_per_side] =
-  {
-    {0, 1, 4, 99}, // Side 0
-    {1, 2, 4, 99}, // Side 1
-    {2, 3, 4, 99}, // Side 2
-    {3, 0, 4, 99}, // Side 3
-    {0, 3, 2,  1}  // Side 4
-  };
-
-const unsigned int Pyramid5::edge_nodes_map[Pyramid5::num_edges][Pyramid5::nodes_per_edge] =
-  {
-    {0, 1}, // Edge 0
-    {1, 2}, // Edge 1
-    {2, 3}, // Edge 2
-    {0, 3}, // Edge 3
-    {0, 4}, // Edge 4
-    {1, 4}, // Edge 5
-    {2, 4}, // Edge 6
-    {3, 4}  // Edge 7
-  };
-
 // ------------------------------------------------------------
 // Pyramid5 class member functions
 

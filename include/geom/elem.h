@@ -469,6 +469,27 @@ public:
                                        unsigned int edge_node) const = 0;
 
   /**
+   * \returns The local node id for node \p side_node on side \p side of
+   * an element of type \p t, without needing an instantiated Elem.
+   * The Polygon and Polyhedron subclasses have no such map, and the
+   * infinite elements' maps are not read here, so those must be queried
+   * through an actual Elem.
+   */
+  static unsigned int local_side_node(ElemType t,
+                                      unsigned int side,
+                                      unsigned int side_node);
+
+  /**
+   * \returns The local node id for node \p edge_node on edge \p edge of
+   * an element of type \p t, without needing an instantiated Elem.  For
+   * 2D types this is local_side_node(); 1D types have no edges.  The
+   * same types are unsupported here as in local_side_node().
+   */
+  static unsigned int local_edge_node(ElemType t,
+                                      unsigned int edge,
+                                      unsigned int edge_node);
+
+  /**
    * \returns \p true if a vertex of \p e is contained
    * in this element.  If \p mesh_connection is true, looks
    * specifically for containment possibilities of an element \p e
@@ -640,7 +661,67 @@ public:
    * is fixed; for more general types like Polygon subclasses an actual
    * instantiated Elem must be queried.
    */
-  static const unsigned int type_to_n_nodes_map[INVALID_ELEM];
+  static constexpr unsigned int type_to_n_nodes_map[INVALID_ELEM] =
+    {
+      2,  // EDGE2
+      3,  // EDGE3
+      4,  // EDGE4
+
+      3,  // TRI3
+      6,  // TRI6
+
+      4,  // QUAD4
+      8,  // QUAD8
+      9,  // QUAD9
+
+      4,  // TET4
+      10, // TET10
+
+      8,  // HEX8
+      20, // HEX20
+      27, // HEX27
+
+      6,  // PRISM6
+      15, // PRISM15
+      18, // PRISM18
+
+      5,  // PYRAMID5
+      13, // PYRAMID13
+      14, // PYRAMID14
+
+      2,  // INFEDGE2
+
+      4,  // INFQUAD4
+      6,  // INFQUAD6
+
+      8,  // INFHEX8
+      16, // INFHEX16
+      18, // INFHEX18
+
+      6,  // INFPRISM6
+      12, // INFPRISM12
+
+      1,  // NODEELEM
+
+      0,  // REMOTEELEM
+
+      3,  // TRI3SUBDIVISION
+      3,  // TRISHELL3
+      4,  // QUADSHELL4
+      8,  // QUADSHELL8
+
+      7,  // TRI7
+      14, // TET14
+      20, // PRISM20
+      21, // PRISM21
+      18, // PYRAMID18
+
+      9,  // QUADSHELL9
+
+      invalid_uint,  // C0POLYGON
+      invalid_uint,  // C0POLYHEDRON
+
+    };
 
   /**
    * \returns The number of nodes this element contains.
@@ -688,6 +769,24 @@ public:
    * \returns The type of element for side \p s.
    */
   virtual ElemType side_type (const unsigned int s) const = 0;
+
+  /**
+   * \returns The type of side \p s of an element of type \p t, without
+   * needing an instantiated Elem.  The Polygon and Polyhedron subclasses
+   * have one side type but no fixed number of sides, so \p s goes
+   * unchecked for them; query an actual Elem when you have one.
+   */
+  static ElemType side_type (const ElemType t,
+                             const unsigned int s);
+
+  /**
+   * \returns The type of every edge of an element of type \p t, or
+   * \p INVALID_ELEM for the 1D types, which have no edges.  Unlike its
+   * sides, a finite element's edges all have the same type, so no edge
+   * index is needed; the infinite elements, whose finite and infinite
+   * edges differ, are not answered here.
+   */
+  static ElemType edge_type (const ElemType t);
 
   /**
    * \returns the normal (outwards-facing) of the side of the element at the vertex-average of the side

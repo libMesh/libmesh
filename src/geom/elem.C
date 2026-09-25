@@ -161,67 +161,6 @@ const unsigned int Elem::type_to_dim_map [] =
 
 const unsigned int Elem::max_n_nodes;
 
-const unsigned int Elem::type_to_n_nodes_map [] =
-  {
-    2,  // EDGE2
-    3,  // EDGE3
-    4,  // EDGE4
-
-    3,  // TRI3
-    6,  // TRI6
-
-    4,  // QUAD4
-    8,  // QUAD8
-    9,  // QUAD9
-
-    4,  // TET4
-    10, // TET10
-
-    8,  // HEX8
-    20, // HEX20
-    27, // HEX27
-
-    6,  // PRISM6
-    15, // PRISM15
-    18, // PRISM18
-
-    5,  // PYRAMID5
-    13, // PYRAMID13
-    14, // PYRAMID14
-
-    2,  // INFEDGE2
-
-    4,  // INFQUAD4
-    6,  // INFQUAD6
-
-    8,  // INFHEX8
-    16, // INFHEX16
-    18, // INFHEX18
-
-    6,  // INFPRISM6
-    12, // INFPRISM12
-
-    1,  // NODEELEM
-
-    0,  // REMOTEELEM
-
-    3,  // TRI3SUBDIVISION
-    3,  // TRISHELL3
-    4,  // QUADSHELL4
-    8,  // QUADSHELL8
-
-    7,  // TRI7
-    14, // TET14
-    20, // PRISM20
-    21, // PRISM21
-    18, // PYRAMID18
-
-    9,  // QUADSHELL9
-
-    invalid_uint,  // C0POLYGON
-    invalid_uint,  // C0POLYHEDRON
-  };
-
 const unsigned int Elem::type_to_n_sides_map [] =
   {
     2,  // EDGE2
@@ -3161,6 +3100,307 @@ ElemType Elem::first_order_equivalent_type (const ElemType et)
       // unknown element
       return INVALID_ELEM;
     }
+}
+
+
+// Most of our elements have the same topology on every side, but the
+// prisms and pyramids have both triangular and quadrilateral faces, and
+// a 2D or 3D infinite element's side 0 is its finite base while the rest
+// are infinite.  The polygons and polyhedra have one side type but no
+// fixed side count, so they can answer here too while their side index
+// goes unchecked; ask an actual Elem when you have one.
+ElemType Elem::side_type (const ElemType t,
+                          const unsigned int s)
+{
+  libmesh_assert_less (s, type_to_n_sides_map[t]);
+
+  switch (t)
+    {
+    case EDGE2:
+    case EDGE3:
+    case EDGE4:
+      return NODEELEM;
+    case TRI3:
+    case TRISHELL3:
+    case QUAD4:
+    case QUADSHELL4:
+      // A polygon's sides are all edges and a polyhedron's are all
+      // polygons, however many a given element turns out to have
+    case C0POLYGON:
+      return EDGE2;
+    case TRI6:
+    case TRI7:
+    case QUAD8:
+    case QUADSHELL8:
+    case QUAD9:
+    case QUADSHELL9:
+      return EDGE3;
+    case TET4:
+      return TRI3;
+    case TET10:
+      return TRI6;
+    case TET14:
+      return TRI7;
+    case HEX8:
+      return QUAD4;
+    case HEX20:
+      return QUAD8;
+    case HEX27:
+      return QUAD9;
+      // Sides 0 and 4 of a prism are its triangles
+    case PRISM6:
+      return (s == 0 || s == 4) ? TRI3 : QUAD4;
+    case PRISM15:
+      return (s == 0 || s == 4) ? TRI6 : QUAD8;
+    case PRISM18:
+      return (s == 0 || s == 4) ? TRI6 : QUAD9;
+    case PRISM20:
+    case PRISM21:
+      return (s == 0 || s == 4) ? TRI7 : QUAD9;
+      // Side 4 of a pyramid is its quadrilateral base
+    case PYRAMID5:
+      return (s < 4) ? TRI3 : QUAD4;
+    case PYRAMID13:
+      return (s < 4) ? TRI6 : QUAD8;
+    case PYRAMID14:
+      return (s < 4) ? TRI6 : QUAD9;
+    case PYRAMID18:
+      return (s < 4) ? TRI7 : QUAD9;
+    case C0POLYHEDRON:
+      return C0POLYGON;
+#ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
+      // An InfEdge2's sides are its end nodes, like any other 1D element's
+    case INFEDGE2:
+      return NODEELEM;
+      // A 2D or 3D infinite element's side 0 is the finite base it was
+      // built from; its remaining sides run out to infinity with it
+    case INFQUAD4:
+      return (s == 0) ? EDGE2 : INFEDGE2;
+    case INFQUAD6:
+      return (s == 0) ? EDGE3 : INFEDGE2;
+    case INFHEX8:
+      return (s == 0) ? QUAD4 : INFQUAD4;
+    case INFHEX16:
+      return (s == 0) ? QUAD8 : INFQUAD6;
+    case INFHEX18:
+      return (s == 0) ? QUAD9 : INFQUAD6;
+    case INFPRISM6:
+      return (s == 0) ? TRI3 : INFQUAD4;
+    case INFPRISM12:
+      return (s == 0) ? TRI6 : INFQUAD6;
+#endif
+    default:
+      libmesh_error_msg("No side type for element type " << Utility::enum_to_string(t));
+    }
+
+  return INVALID_ELEM;
+}
+
+
+
+// This reads the same constexpr side_nodes_map tables the element
+// classes use for their virtual local_side_node(), so that code which
+// knows an element type but has no Elem to call a virtual function on --
+// building a side of an element that doesn't exist yet, or a device
+// kernel that has only the type -- can still get at the reference
+// element topology.
+//
+// The polygons and polyhedra have no such table to read, and the
+// infinite elements' maps have no caller here yet, so both error out:
+// asking for a topology we can't answer is a programming error rather
+// than something to signal with a return value.
+// A finite element's edges all have the same type, unlike its sides,
+// which differ on the prisms and pyramids, so this takes no edge index.
+// The infinite elements are the exception -- the edges of their finite
+// base are not the ones running out to infinity -- and like the rest of
+// the static topology lookups they are left to their virtual overrides.
+ElemType Elem::edge_type (const ElemType t)
+{
+  switch (t)
+    {
+      // 1D elements have no edges
+    case EDGE2:
+    case EDGE3:
+    case EDGE4:
+      return INVALID_ELEM;
+      // A 2D element's edges are its sides
+    case TRI3:
+    case TRISHELL3:
+    case TRI6:
+    case TRI7:
+    case QUAD4:
+    case QUADSHELL4:
+    case QUAD8:
+    case QUADSHELL8:
+    case QUAD9:
+    case QUADSHELL9:
+    case C0POLYGON:
+      return side_type(t, 0);
+      // A first-order 3D element's edges hold their two vertices
+    case TET4:
+    case HEX8:
+    case PRISM6:
+    case PYRAMID5:
+    case C0POLYHEDRON:
+      return EDGE2;
+      // and a second-order element's add the midpoint
+    case TET10:
+    case TET14:
+    case HEX20:
+    case HEX27:
+    case PRISM15:
+    case PRISM18:
+    case PRISM20:
+    case PRISM21:
+    case PYRAMID13:
+    case PYRAMID14:
+    case PYRAMID18:
+      return EDGE3;
+    default:
+      libmesh_error_msg("No edge type for element type " << Utility::enum_to_string(t));
+    }
+
+  return INVALID_ELEM;
+}
+
+
+
+unsigned int Elem::local_side_node (const ElemType t,
+                                    const unsigned int side,
+                                    const unsigned int side_node)
+{
+  // The nodes on a side are the nodes of the side's own element type, so
+  // we compose the two lookups here rather than tabulating side node
+  // counts a second time.  That also keeps us inside the meaningful part
+  // of a row: the prisms' and pyramids' triangular sides carry fewer
+  // nodes than their quadrilateral ones, and their rows are padded out
+  // to the longer length
+  libmesh_assert_less (side, type_to_n_sides_map[t]);
+  libmesh_assert_less (side_node, type_to_n_nodes_map[side_type(t, side)]);
+
+  switch (t)
+    {
+      // A 1D element's sides are its end nodes
+    case EDGE2:
+    case EDGE3:
+    case EDGE4:
+      return side;
+      // The shell elements are numbered like the elements they shadow
+    case TRI3:
+    case TRISHELL3:
+      return Tri3::side_nodes_map[side][side_node];
+    case TRI6:
+      return Tri6::side_nodes_map[side][side_node];
+    case TRI7:
+      return Tri7::side_nodes_map[side][side_node];
+    case QUAD4:
+    case QUADSHELL4:
+      return Quad4::side_nodes_map[side][side_node];
+    case QUAD8:
+    case QUADSHELL8:
+      return Quad8::side_nodes_map[side][side_node];
+    case QUAD9:
+    case QUADSHELL9:
+      return Quad9::side_nodes_map[side][side_node];
+    case TET4:
+      return Tet4::side_nodes_map[side][side_node];
+    case TET10:
+      return Tet10::side_nodes_map[side][side_node];
+    case TET14:
+      return Tet14::side_nodes_map[side][side_node];
+    case HEX8:
+      return Hex8::side_nodes_map[side][side_node];
+    case HEX20:
+      return Hex20::side_nodes_map[side][side_node];
+    case HEX27:
+      return Hex27::side_nodes_map[side][side_node];
+    case PRISM6:
+      return Prism6::side_nodes_map[side][side_node];
+    case PRISM15:
+      return Prism15::side_nodes_map[side][side_node];
+    case PRISM18:
+      return Prism18::side_nodes_map[side][side_node];
+    case PRISM20:
+      return Prism20::side_nodes_map[side][side_node];
+    case PRISM21:
+      return Prism21::side_nodes_map[side][side_node];
+    case PYRAMID5:
+      return Pyramid5::side_nodes_map[side][side_node];
+    case PYRAMID13:
+      return Pyramid13::side_nodes_map[side][side_node];
+    case PYRAMID14:
+      return Pyramid14::side_nodes_map[side][side_node];
+    case PYRAMID18:
+      return Pyramid18::side_nodes_map[side][side_node];
+    default:
+      libmesh_error_msg("No static side node map for element type " << Utility::enum_to_string(t));
+    }
+
+  return invalid_uint;
+}
+
+
+
+// A 2D element's edges are its sides -- Face::local_edge_node() defines
+// the two to be the same thing -- so we answer those from the side map
+// and keep one copy of the 2D numbering.  1D elements have no edges to
+// ask about, and like local_side_node() above we error rather than
+// return a flag for a type we have no table for.
+unsigned int Elem::local_edge_node (const ElemType t,
+                                    const unsigned int edge,
+                                    const unsigned int edge_node)
+{
+  libmesh_assert_less (edge, type_to_n_edges_map[t]);
+  libmesh_assert_less (edge_node, type_to_n_nodes_map[edge_type(t)]);
+
+  switch (t)
+    {
+    case TRI3:
+    case TRISHELL3:
+    case TRI6:
+    case TRI7:
+    case QUAD4:
+    case QUADSHELL4:
+    case QUAD8:
+    case QUADSHELL8:
+    case QUAD9:
+    case QUADSHELL9:
+      return local_side_node(t, edge, edge_node);
+    case TET4:
+      return Tet4::edge_nodes_map[edge][edge_node];
+    case TET10:
+      return Tet10::edge_nodes_map[edge][edge_node];
+    case TET14:
+      return Tet14::edge_nodes_map[edge][edge_node];
+    case HEX8:
+      return Hex8::edge_nodes_map[edge][edge_node];
+    case HEX20:
+      return Hex20::edge_nodes_map[edge][edge_node];
+    case HEX27:
+      return Hex27::edge_nodes_map[edge][edge_node];
+    case PRISM6:
+      return Prism6::edge_nodes_map[edge][edge_node];
+    case PRISM15:
+      return Prism15::edge_nodes_map[edge][edge_node];
+    case PRISM18:
+      return Prism18::edge_nodes_map[edge][edge_node];
+    case PRISM20:
+      return Prism20::edge_nodes_map[edge][edge_node];
+    case PRISM21:
+      return Prism21::edge_nodes_map[edge][edge_node];
+    case PYRAMID5:
+      return Pyramid5::edge_nodes_map[edge][edge_node];
+    case PYRAMID13:
+      return Pyramid13::edge_nodes_map[edge][edge_node];
+    case PYRAMID14:
+      return Pyramid14::edge_nodes_map[edge][edge_node];
+    case PYRAMID18:
+      return Pyramid18::edge_nodes_map[edge][edge_node];
+    default:
+      libmesh_error_msg("No static edge node map for element type " << Utility::enum_to_string(t));
+    }
+
+  return invalid_uint;
 }
 
 

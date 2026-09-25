@@ -22,6 +22,8 @@
 
 // Local includes
 #include "libmesh/cell_prism.h"
+#include "libmesh/cell_prism6.h"
+#include "libmesh/fe_reference_element_traits.h"
 
 namespace libMesh
 {
@@ -242,16 +244,18 @@ public:
   static const int nodes_per_edge = 3;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * These map the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge or
+   * side to element node numbers.  They are derived from the
+   * first-order Prism6 tables; see fe_reference_element_traits.h.
    */
-  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
+  static constexpr NodeMapTable<num_edges, nodes_per_edge>
+  _edge_nodes = derived_edge_nodes<Prism6, num_edges>();
+  static constexpr const unsigned int (&edge_nodes_map)[num_edges][nodes_per_edge] = _edge_nodes.values;
 
-  /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
-   */
-  static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
+  static constexpr NodeMapTable<num_sides, nodes_per_side>
+  _side_nodes = derived_side_nodes<Prism6, num_sides, nodes_per_side>
+    (_edge_nodes.values, [](unsigned int s) { return s == 0 ? 18u : s == 4 ? 19u : 14 + s; });
+  static constexpr const unsigned int (&side_nodes_map)[num_sides][nodes_per_side] = _side_nodes.values;
 
   virtual void permute(unsigned int perm_num) override final;
 

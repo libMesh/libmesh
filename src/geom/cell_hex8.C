@@ -39,32 +39,6 @@ const int Hex8::num_nodes;
 const int Hex8::nodes_per_side;
 const int Hex8::nodes_per_edge;
 
-const unsigned int Hex8::side_nodes_map[Hex8::num_sides][Hex8::nodes_per_side] =
-  {
-    {0, 3, 2, 1}, // Side 0
-    {0, 1, 5, 4}, // Side 1
-    {1, 2, 6, 5}, // Side 2
-    {2, 3, 7, 6}, // Side 3
-    {3, 0, 4, 7}, // Side 4
-    {4, 5, 6, 7}  // Side 5
-  };
-
-const unsigned int Hex8::edge_nodes_map[Hex8::num_edges][Hex8::nodes_per_edge] =
-  {
-    {0, 1}, // Edge 0
-    {1, 2}, // Edge 1
-    {2, 3}, // Edge 2
-    {0, 3}, // Edge 3
-    {0, 4}, // Edge 4
-    {1, 5}, // Edge 5
-    {2, 6}, // Edge 6
-    {3, 7}, // Edge 7
-    {4, 5}, // Edge 8
-    {5, 6}, // Edge 9
-    {6, 7}, // Edge 10
-    {4, 7}  // Edge 11
-  };
-
 // ------------------------------------------------------------
 // Hex8 class member functions
 

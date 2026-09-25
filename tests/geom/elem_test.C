@@ -75,6 +75,138 @@ public:
       }
   }
 
+  // The Elem::side_type/local_side_node/local_edge_node overloads that
+  // take an ElemType have to agree with the virtual versions they shadow;
+  // an element of each type is the only honest way to check that.
+  void test_static_topology()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        const ElemType type = elem->type();
+
+        for (const auto s : elem->side_index_range())
+          {
+            const ElemType side_type = Elem::side_type(type, s);
+            CPPUNIT_ASSERT_EQUAL(elem->side_type(s), side_type);
+
+            // A polytope's side type follows from its element type even
+            // though its side count does not, but it has no static node
+            // map to check; neither are the infinite elements' maps read
+            // by these lookups, so both stop at the side type.
+            if (elem->runtime_topology() || elem->infinite())
+              continue;
+
+            const auto nodes = elem->nodes_on_side(s);
+            CPPUNIT_ASSERT_EQUAL(std::size_t(Elem::type_to_n_nodes_map[side_type]),
+                                 nodes.size());
+            for (auto n : index_range(nodes))
+              {
+                CPPUNIT_ASSERT_EQUAL(elem->local_side_node(s, n),
+                                     Elem::local_side_node(type, s, n));
+                CPPUNIT_ASSERT_EQUAL(nodes[n],
+                                     Elem::local_side_node(type, s, n));
+              }
+          }
+
+        // 1D elements have no edges.  A 2D element's edges are its sides,
+        // but nodes_on_edge() and local_edge_node() are not the APIs the
+        // loop above exercised, so those are checked here too.
+        if (elem->infinite() || elem->dim() < 2)
+          continue;
+
+        for (const auto e : elem->edge_index_range())
+          {
+            // There is no virtual edge_type() to check against, but the
+            // element classes state the same fact when they build an
+            // edge, so compare with that instead
+            CPPUNIT_ASSERT_EQUAL(elem->build_edge_ptr(e)->type(),
+                                 Elem::edge_type(type));
+
+            if (elem->runtime_topology())
+              continue;
+
+            const auto nodes = elem->nodes_on_edge(e);
+            CPPUNIT_ASSERT_EQUAL(std::size_t(Elem::type_to_n_nodes_map[Elem::edge_type(type)]),
+                                 nodes.size());
+            for (auto n : index_range(nodes))
+              {
+                CPPUNIT_ASSERT_EQUAL(elem->local_edge_node(e, n),
+                                     Elem::local_edge_node(type, e, n));
+                CPPUNIT_ASSERT_EQUAL(nodes[n],
+                                     Elem::local_edge_node(type, e, n));
+              }
+          }
+      }
+  }
+
+  void test_higher_order_node_placement()
+  {
+    LOG_UNIT_TEST;
+
+    // The side/edge map consistency is a static_assert in each element
+    // header now; what's left to check at runtime is where the
+    // higher-order nodes sit.  Every non-vertex reference node is at
+    // the centroid of the vertices of its edge, its face, or the whole
+    // element, except for EDGE4's nodes, which trisect it.
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        if (elem->infinite() || elem->runtime_topology())
+          continue;
+
+        const ElemType type = elem->type();
+
+        for (const auto i : elem->node_index_range())
+          {
+            if (elem->is_vertex(i))
+              continue;
+
+            // EDGE4's interior nodes trisect it instead
+            if (type == EDGE4)
+              {
+                LIBMESH_ASSERT_REALVEC_EQUAL(Point(i == 2 ? Real(-1)/3 : Real(1)/3),
+                                             elem->master_point(i),
+                                             TOLERANCE*TOLERANCE);
+                continue;
+              }
+
+            // Find the smallest subentity the node belongs to: an edge
+            // if it sits on one, else a face, else the element itself.
+            // Its vertices are what the node should be the centroid of.
+            std::vector<unsigned int> subentity_vertices;
+            if (elem->dim() > 1)
+              for (const auto e : elem->edge_index_range())
+                {
+                  const auto nodes = elem->nodes_on_edge(e);
+                  if (std::find(nodes.begin(), nodes.end(), i) != nodes.end())
+                    subentity_vertices = {nodes[0], nodes[1]};
+                }
+            if (subentity_vertices.empty())
+              for (const auto s : elem->side_index_range())
+                {
+                  const auto nodes = elem->nodes_on_side(s);
+                  if (std::find(nodes.begin(), nodes.end(), i) != nodes.end())
+                    for (auto n : nodes)
+                      if (elem->is_vertex(n))
+                        subentity_vertices.push_back(n);
+                }
+            if (subentity_vertices.empty())
+              for (const auto n : elem->node_index_range())
+                if (elem->is_vertex(n))
+                  subentity_vertices.push_back(n);
+
+            Point centroid;
+            for (auto v : subentity_vertices)
+              centroid += elem->master_point(v);
+            centroid /= Real(subentity_vertices.size());
+
+            LIBMESH_ASSERT_REALVEC_EQUAL(centroid, elem->master_point(i),
+                                         TOLERANCE*TOLERANCE);
+          }
+      }
+  }
+
   void test_quality()
   {
     LOG_UNIT_TEST;
@@ -970,6 +1102,8 @@ public:
 #define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box );            \
   CPPUNIT_TEST( test_ref_elem );                \
+  CPPUNIT_TEST( test_static_topology );         \
+  CPPUNIT_TEST( test_higher_order_node_placement ); \
   CPPUNIT_TEST( test_quality );                 \
   CPPUNIT_TEST( test_node_edge_map_consistency ); \
   CPPUNIT_TEST( test_maps );                    \
