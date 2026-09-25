@@ -756,6 +756,12 @@ public:
    * such sides are subject to \p skip_interior_sides just like any
    * other side.
    *
+   * \note That communication makes this a collective operation when \p
+   * skip_interior_sides is true on a distributed mesh: in that case it
+   * must be called on every processor, with the same arguments.  With
+   * \p skip_interior_sides = false, or on a replicated mesh, nothing
+   * is communicated and this remains a purely local operation.
+   *
    * @param nodeset_list nodesets to build sidesets from.
    *                     If empty (default), builds from all existing sidesets
    * @param skip_interior_sides If true, skip any side whose neighbor
@@ -764,7 +770,7 @@ public:
    *                     Defaults to false, for backwards compatibility.
    */
   void build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list = {},
-                                       bool skip_interior_sides = false);
+                                      bool skip_interior_sides = false);
 
   /**
    * Create a list of (element_id, side_id, boundary_id) tuples for

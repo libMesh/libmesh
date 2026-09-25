@@ -3,6 +3,7 @@
 #include <libmesh/mesh_generation.h>
 #include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
+#include <libmesh/remote_elem.h>
 #include <libmesh/face_quad4_shell.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/zero_function.h>
@@ -1125,9 +1126,9 @@ public:
     // mesh lies on either the bottom (y=0) or top (y=1) exterior
     // face, so a nodeset containing "the top and bottom nodes" ends
     // up containing *every* node, including those on the interior
-    // side between the two elements.
+    // sides between elements.
     MeshTools::Generation::build_square(mesh,
-                                        2, 1,
+                                        8, 1,
                                         0., 1.,
                                         0., 1.,
                                         QUAD4);
@@ -1152,10 +1153,15 @@ public:
     // nodeset.
     bi.build_side_list_from_node_list({nodeset_id}, /*skip_interior_sides=*/true);
 
-    for (const auto & elem : mesh.element_ptr_range())
+    // We only examine local elements here: a ghost element's neighbor
+    // may be a RemoteElem, whose subdomain_id() tells us nothing about
+    // the subdomain of the element it stands in for, so we couldn't
+    // predict the correct answer for its sides.
+    for (const auto & elem : mesh.active_local_element_ptr_range())
       for (auto s : elem->side_index_range())
         {
           const Elem * neigh = elem->neighbor_ptr(s);
+          libmesh_assert(neigh != remote_elem);
           if (neigh && neigh->subdomain_id() == elem->subdomain_id())
             CPPUNIT_ASSERT(!bi.has_boundary_id(elem, s, nodeset_id));
           else
@@ -1170,14 +1176,18 @@ public:
     bi.build_side_list_from_node_list({nodeset_id});
 
     bool found_interior_side = false;
-    for (const auto & elem : mesh.element_ptr_range())
+    for (const auto & elem : mesh.active_local_element_ptr_range())
       for (auto s : elem->side_index_range())
         {
           const Elem * neigh = elem->neighbor_ptr(s);
+          libmesh_assert(neigh != remote_elem);
           if (neigh && neigh->subdomain_id() == elem->subdomain_id() &&
               bi.has_boundary_id(elem, s, nodeset_id))
             found_interior_side = true;
         }
+
+    // A processor with no local elements of its own can't find one.
+    mesh.comm().max(found_interior_side);
     CPPUNIT_ASSERT(found_interior_side);
   }
 

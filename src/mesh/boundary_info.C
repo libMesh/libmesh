@@ -2995,19 +2995,30 @@ void BoundaryInfo::parallel_sync_node_ids()
 }
 
 void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list,
-                                                   bool skip_interior_sides)
+                                                  bool skip_interior_sides)
 {
-  // Check for early return.  This has to be a collective decision:
-  // on a DistributedMesh it's entirely possible for _boundary_node_id
-  // to be empty on some processors (e.g. ones that don't own or ghost
-  // any node in the nodeset) while it's non-empty on others.  Since
-  // we participate in a collective communication below, returning
-  // early here based only on our own local state could leave us out
-  // of step with processors that don't return early, causing a
-  // deadlock.  So we only take the early return if *every* processor
+  // Skipping interior sides on a distributed mesh means resolving the
+  // subdomain id of any neighbor we only see as a RemoteElem, which
+  // takes a collective communication below.  When we're not doing
+  // that, this function stays purely local, the way it has always
+  // been: existing callers are not required to call us in parallel
+  // (AbaqusIO, our only in-library caller, only reads on processor 0),
+  // so we must not add a collective to that path.  When we are doing
+  // it, every processor has to call us, with the same arguments.
+  const bool need_parallel_sync = skip_interior_sides && !_mesh->is_serial();
+
+  // Check for early return.  When we're going to communicate below
+  // this has to be a collective decision: on a DistributedMesh it's
+  // entirely possible for _boundary_node_id to be empty on some
+  // processors (e.g. ones that don't own or ghost any node in the
+  // nodeset) while it's non-empty on others.  Returning early based
+  // only on our own local state would leave us out of step with the
+  // processors that don't return early, causing a deadlock.  So in
+  // that case we only take the early return if *every* processor
   // agrees there's nothing to do.
   bool no_boundary_nodes = _boundary_node_id.empty();
-  this->comm().min(no_boundary_nodes);
+  if (need_parallel_sync)
+    this->comm().min(no_boundary_nodes);
   if (no_boundary_nodes)
     {
       libMesh::out << "No boundary node IDs have been added: cannot build side list!" << std::endl;
@@ -3018,6 +3029,7 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
   ElemSideBuilder side_builder;
   // Pull objects out of the loop to reduce heap operations
   const Elem * side_elem;
+  std::vector<boundary_id_type> matched_ids;
 
   // A side whose nodes are all in the nodeset, but whose neighbor is
   // an unresolved RemoteElem: we can't tell locally whether it's
@@ -3063,7 +3075,9 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
 
         // Now check to see what nodeset_counts have the correct
         // number of nodes in them.
-        std::vector<boundary_id_type> matched_ids;
+        // Note that matched_ids may have been moved from on a prior
+        // iteration, so clear() rather than assuming it's empty.
+        matched_ids.clear();
         for (const auto & pr : nodesets_node_count)
           if (pr.second == side_elem->n_nodes())
             matched_ids.push_back(pr.first);
@@ -3094,10 +3108,19 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
           }
       } // end for side
 
+  // If we're not resolving RemoteElem neighbors then nothing was
+  // deferred, and we must not communicate: see need_parallel_sync
+  // above.
+  if (!need_parallel_sync)
+    {
+      libmesh_assert(pending_sides.empty());
+      return;
+    }
+
   // Even if this processor has no pending_sides of its own, it may
-  // still own elements that other processors need to query, so we
-  // must always participate in the collective communication below
-  // rather than skipping it when our own request list is empty.
+  // still own elements that other processors need to query, so every
+  // processor has to participate in the collective communication
+  // below rather than skipping it when its own request list is empty.
 
   // Ask whichever processor owns each pending element to resolve its
   // side's true neighbor subdomain id.
@@ -3160,7 +3183,9 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
     {
       const auto it =
         neighbor_subdomain.find(std::make_pair(pending.elem->id(), pending.side));
-      libmesh_assert(it != neighbor_subdomain.end());
+      libmesh_error_msg_if(it == neighbor_subdomain.end(),
+                           "Failed to resolve neighbor subdomain id for element "
+                           << pending.elem->id() << ", side " << pending.side);
 
       // The side turned out to be truly interior after all; skip it.
       if (it->second == pending.elem->subdomain_id())
