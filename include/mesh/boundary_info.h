@@ -737,12 +737,40 @@ public:
   void build_node_list_from_side_list(const std::set<boundary_id_type> & sideset_list = {});
 
   /**
-   * Adds sides to a sideset if every node on that side are in the same
-   * sideset
+   * Adds sides to a sideset if every node on that side is in the same
+   * nodeset.
+   *
+   * If \p skip_interior_sides is true, sides that are interior to a
+   * single subdomain (i.e. whose neighbor, if any, has the same
+   * subdomain id) are never added, even if all of their nodes happen
+   * to be in the nodeset. This avoids spurious "interior" sides being
+   * added on meshes that are only one element deep in some direction,
+   * where a nodeset spanning both exterior faces normal to that
+   * direction would otherwise cause the sides between layers to be
+   * pulled in as well. The default, \p skip_interior_sides = false,
+   * preserves the old, unconditional behavior.
+   *
+   * On a distributed mesh, a side whose neighbor is an unresolved
+   * RemoteElem has its neighbor's subdomain id resolved via parallel
+   * communication with the processor that owns that neighbor, so
+   * such sides are subject to \p skip_interior_sides just like any
+   * other side.
+   *
+   * \note That communication makes this a collective operation when \p
+   * skip_interior_sides is true on a distributed mesh: in that case it
+   * must be called on every processor, with the same arguments.  With
+   * \p skip_interior_sides = false, or on a replicated mesh, nothing
+   * is communicated and this remains a purely local operation.
+   *
    * @param nodeset_list nodesets to build sidesets from.
    *                     If empty (default), builds from all existing sidesets
+   * @param skip_interior_sides If true, skip any side whose neighbor
+   *                     exists and is in the same subdomain, even if
+   *                     all of the side's nodes are in the nodeset.
+   *                     Defaults to false, for backwards compatibility.
    */
-  void build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list = {});
+  void build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list = {},
+                                      bool skip_interior_sides = false);
 
   /**
    * Create a list of (element_id, side_id, boundary_id) tuples for
