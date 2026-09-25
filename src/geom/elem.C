@@ -3209,6 +3209,62 @@ ElemType Elem::side_type (const ElemType t,
 // infinite elements' maps have no caller here yet, so both error out:
 // asking for a topology we can't answer is a programming error rather
 // than something to signal with a return value.
+// A finite element's edges all have the same type, unlike its sides,
+// which differ on the prisms and pyramids, so this takes no edge index.
+// The infinite elements are the exception -- the edges of their finite
+// base are not the ones running out to infinity -- and like the rest of
+// the static topology lookups they are left to their virtual overrides.
+ElemType Elem::edge_type (const ElemType t)
+{
+  switch (t)
+    {
+      // 1D elements have no edges
+    case EDGE2:
+    case EDGE3:
+    case EDGE4:
+      return INVALID_ELEM;
+      // A 2D element's edges are its sides
+    case TRI3:
+    case TRISHELL3:
+    case TRI6:
+    case TRI7:
+    case QUAD4:
+    case QUADSHELL4:
+    case QUAD8:
+    case QUADSHELL8:
+    case QUAD9:
+    case QUADSHELL9:
+    case C0POLYGON:
+      return side_type(t, 0);
+      // A first-order 3D element's edges hold their two vertices
+    case TET4:
+    case HEX8:
+    case PRISM6:
+    case PYRAMID5:
+    case C0POLYHEDRON:
+      return EDGE2;
+      // and a second-order element's add the midpoint
+    case TET10:
+    case TET14:
+    case HEX20:
+    case HEX27:
+    case PRISM15:
+    case PRISM18:
+    case PRISM20:
+    case PRISM21:
+    case PYRAMID13:
+    case PYRAMID14:
+    case PYRAMID18:
+      return EDGE3;
+    default:
+      libmesh_error_msg("No edge type for element type " << Utility::enum_to_string(t));
+    }
+
+  return INVALID_ELEM;
+}
+
+
+
 unsigned int Elem::local_side_node (const ElemType t,
                                     const unsigned int side,
                                     const unsigned int side_node)
@@ -3295,6 +3351,7 @@ unsigned int Elem::local_edge_node (const ElemType t,
                                     const unsigned int edge_node)
 {
   libmesh_assert_less (edge, type_to_n_edges_map[t]);
+  libmesh_assert_less (edge_node, type_to_n_nodes_map[edge_type(t)]);
 
   switch (t)
     {
@@ -3309,53 +3366,35 @@ unsigned int Elem::local_edge_node (const ElemType t,
     case QUAD9:
     case QUADSHELL9:
       return local_side_node(t, edge, edge_node);
-      // A 3D element's edge holds its two vertices, plus a midpoint for
-      // the second-order types, so each case checks the node index
-      // against its own class's nodes_per_edge
     case TET4:
-      libmesh_assert_less (edge_node, Tet4::nodes_per_edge);
       return Tet4::edge_nodes_map[edge][edge_node];
     case TET10:
-      libmesh_assert_less (edge_node, Tet10::nodes_per_edge);
       return Tet10::edge_nodes_map[edge][edge_node];
     case TET14:
-      libmesh_assert_less (edge_node, Tet14::nodes_per_edge);
       return Tet14::edge_nodes_map[edge][edge_node];
     case HEX8:
-      libmesh_assert_less (edge_node, Hex8::nodes_per_edge);
       return Hex8::edge_nodes_map[edge][edge_node];
     case HEX20:
-      libmesh_assert_less (edge_node, Hex20::nodes_per_edge);
       return Hex20::edge_nodes_map[edge][edge_node];
     case HEX27:
-      libmesh_assert_less (edge_node, Hex27::nodes_per_edge);
       return Hex27::edge_nodes_map[edge][edge_node];
     case PRISM6:
-      libmesh_assert_less (edge_node, Prism6::nodes_per_edge);
       return Prism6::edge_nodes_map[edge][edge_node];
     case PRISM15:
-      libmesh_assert_less (edge_node, Prism15::nodes_per_edge);
       return Prism15::edge_nodes_map[edge][edge_node];
     case PRISM18:
-      libmesh_assert_less (edge_node, Prism18::nodes_per_edge);
       return Prism18::edge_nodes_map[edge][edge_node];
     case PRISM20:
-      libmesh_assert_less (edge_node, Prism20::nodes_per_edge);
       return Prism20::edge_nodes_map[edge][edge_node];
     case PRISM21:
-      libmesh_assert_less (edge_node, Prism21::nodes_per_edge);
       return Prism21::edge_nodes_map[edge][edge_node];
     case PYRAMID5:
-      libmesh_assert_less (edge_node, Pyramid5::nodes_per_edge);
       return Pyramid5::edge_nodes_map[edge][edge_node];
     case PYRAMID13:
-      libmesh_assert_less (edge_node, Pyramid13::nodes_per_edge);
       return Pyramid13::edge_nodes_map[edge][edge_node];
     case PYRAMID14:
-      libmesh_assert_less (edge_node, Pyramid14::nodes_per_edge);
       return Pyramid14::edge_nodes_map[edge][edge_node];
     case PYRAMID18:
-      libmesh_assert_less (edge_node, Pyramid18::nodes_per_edge);
       return Pyramid18::edge_nodes_map[edge][edge_node];
     default:
       libmesh_error_msg("No static edge node map for element type " << Utility::enum_to_string(t));

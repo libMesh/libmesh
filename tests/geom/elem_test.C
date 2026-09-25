@@ -120,7 +120,15 @@ public:
 
         for (const auto e : elem->edge_index_range())
           {
+            // There is no virtual edge_type() to check against, but the
+            // element classes state the same fact when they build an
+            // edge, so compare with that instead
+            CPPUNIT_ASSERT_EQUAL(elem->build_edge_ptr(e)->type(),
+                                 Elem::edge_type(type));
+
             const auto nodes = elem->nodes_on_edge(e);
+            CPPUNIT_ASSERT_EQUAL(std::size_t(Elem::type_to_n_nodes_map[Elem::edge_type(type)]),
+                                 nodes.size());
             for (auto n : index_range(nodes))
               {
                 CPPUNIT_ASSERT_EQUAL(elem->local_edge_node(e, n),

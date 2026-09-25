@@ -780,6 +780,15 @@ public:
                              const unsigned int s);
 
   /**
+   * \returns The type of every edge of an element of type \p t, or
+   * \p INVALID_ELEM for the 1D types, which have no edges.  Unlike its
+   * sides, a finite element's edges all have the same type, so no edge
+   * index is needed; the infinite elements, whose finite and infinite
+   * edges differ, are not answered here.
+   */
+  static ElemType edge_type (const ElemType t);
+
+  /**
    * \returns the normal (outwards-facing) of the side of the element at the vertex-average of the side
    * @param s the side of interest
    */
