@@ -146,6 +146,7 @@ unit_tests_sources = \
   systems/disjoint_neighbor_test.C \
   systems/systems_test.C \
   systems/nonlinear_implicit_system_test.C \
+  systems/nonlinear_implicit_system_reuse_test.C \
   utils/parameters_test.C \
   utils/point_locator_test.C \
   utils/rb_parameters_test.C \
