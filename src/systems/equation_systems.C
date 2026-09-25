@@ -1397,17 +1397,18 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
                            for (unsigned int comp = 0; comp < n_comps; comp++)
                              parallel_soln.set(ne * (var_ctr + comp) + elem->id(), avg(comp));
                          }
-                       continue;
                      }
+                   else
+                     {
+                       dof_map.dof_indices(elem, dof_indices, var);
 
-                   dof_map.dof_indices(elem, dof_indices, var);
+                       // The number of DOF components needs to be equal to the expected number so that we know
+                       // where to store data to correctly correspond to variable names.
+                       libmesh_assert_equal_to(dof_indices.size(), n_comps);
 
-                   // The number of DOF components needs to be equal to the expected number so that we know
-                   // where to store data to correctly correspond to variable names.
-                   libmesh_assert_equal_to(dof_indices.size(), n_comps);
-
-                   for (unsigned int comp = 0; comp < n_comps; comp++)
-                     parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
+                       for (unsigned int comp = 0; comp < n_comps; comp++)
+                         parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
+                     }
                  }
              }
          });
