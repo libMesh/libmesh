@@ -42,6 +42,13 @@ public:
   CPPUNIT_TEST( testQuad4Warpage );
   CPPUNIT_TEST( testQuad4MinMaxAngle );
   CPPUNIT_TEST( testQuad4Jacobian );
+  CPPUNIT_TEST( testQuad4SkewAngle );
+  CPPUNIT_TEST( testHex8SkewAngle );
+  CPPUNIT_TEST( testQuad4Size );
+  CPPUNIT_TEST( testHex8Size );
+  CPPUNIT_TEST( testQuad4Taper );
+  CPPUNIT_TEST( testQuad4Condition );
+  CPPUNIT_TEST( testHex8Condition );
   CPPUNIT_TEST( testTri3AspectRatio );
   CPPUNIT_TEST( testTet4DihedralAngle );
   CPPUNIT_TEST( testTet4Jacobian );
@@ -821,6 +828,277 @@ public:
       // 2b) Rhombus with interior angle theta=pi/3.
       test_rhombus_quad(libMesh::pi / 3);
     }
+  }
+
+  void testQuad4SkewAngle()
+  {
+    LOG_UNIT_TEST;
+
+    // The SKEW_ANGLE metric is the Verdict "skew": the maximum |cos A|
+    // between the element's principal axes. 0 means perfectly
+    // orthogonal (unskewed), larger (up to 1) means more skewed.
+
+    // Case 1: A unit square has orthogonal principal axes, so its skew
+    // angle is exactly 0.
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.0, /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+    }
+
+    // Case 2: For a rhombus with interior angle theta, the two
+    // principal axes are separated by theta, so the skew metric is
+    // |cos(theta)|. This is also invariant to rigid body rotation, so
+    // we rotate the rhombus about the z-axis before checking.
+    {
+      auto test_rhombus_quad = [this](Real theta)
+      {
+        const Real ct = std::cos(theta);
+        const Real st = std::sin(theta);
+        std::vector<Point> pts = {
+          Point(0, 0, 0),
+          Point(1, 0, 0),
+          Point(1. + ct, st, 0),
+          Point(     ct, st, 0)};
+
+        // Rotate all points about the z-axis by 30 degrees to confirm
+        // the metric is rotation invariant.
+        const Real cr = std::cos(libMesh::pi / 6);
+        const Real sr = std::sin(libMesh::pi / 6);
+        RealTensorValue Rz(cr, -sr, 0,
+                           sr,  cr, 0,
+                           0,    0, 1);
+        for (auto & pt : pts)
+          pt = Rz * pt;
+
+        auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+        libmesh_ignore(nodes);
+
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::abs(ct), /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+      };
+
+      // theta = pi/2 -> |cos| = 0 (orthogonal)
+      test_rhombus_quad(libMesh::pi / 2);
+      // theta = pi/3 -> |cos| = 0.5
+      test_rhombus_quad(libMesh::pi / 3);
+      // theta = pi/6 -> |cos| = sqrt(3)/2
+      test_rhombus_quad(libMesh::pi / 6);
+    }
+
+    // Case 3: A degenerate quad with a zero-length principal axis
+    // returns 0 by the Verdict convention.
+    {
+      std::vector<Point> pts = {Point(0, 0, 0), Point(0, 0, 0), Point(1, 1, 0), Point(1, 1, 0)};
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.0, /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+    }
+  }
+
+  void testHex8SkewAngle()
+  {
+    LOG_UNIT_TEST;
+
+    // Case 1: A unit cube has mutually orthogonal principal axes, so
+    // its skew angle is exactly 0.
+    {
+      std::vector<Point> pts = {
+        Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0),
+        Point(0, 0, 1), Point(1, 0, 1), Point(1, 1, 1), Point(0, 1, 1)};
+      auto [elem, nodes] = this->construct_elem(pts, HEX8);
+      libmesh_ignore(nodes);
+
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.0, /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+    }
+
+    // Case 2: Shear the top face of a unit cube by k in the
+    // x-direction. Only the zeta principal axis tilts, becoming
+    // (k, 0, 1); the xi and eta axes stay orthogonal. The largest
+    // |cos| between any pair of axes is then k / sqrt(k^2 + 1).
+    {
+      auto test_sheared_hex = [this](Real k)
+      {
+        std::vector<Point> pts = {
+          Point(0,   0, 0), Point(1,   0, 0), Point(1,   1, 0), Point(0,   1, 0),
+          Point(k,   0, 1), Point(1+k, 0, 1), Point(1+k, 1, 1), Point(k,   1, 1)};
+        auto [elem, nodes] = this->construct_elem(pts, HEX8);
+        libmesh_ignore(nodes);
+
+        LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::abs(k) / std::sqrt(k*k + 1),
+                                /*actual=*/elem->quality(SKEW_ANGLE), TOLERANCE);
+      };
+
+      // k = 1 -> 1/sqrt(2) ~ 0.7071
+      test_sheared_hex(1.0);
+      // k = 0.5 -> 0.5/sqrt(1.25) ~ 0.4472
+      test_sheared_hex(0.5);
+    }
+  }
+
+  void testQuad4Size()
+  {
+    LOG_UNIT_TEST;
+
+    // Relative SIZE = min over corners of min(tau, 1/tau), where tau is
+    // the corner nodal Jacobian determinant divided by that of an ideal
+    // element of the same volume (the mean nodal determinant). It is 1
+    // for any element with a uniform Jacobian (any affine element, at
+    // any scale) and drops below 1 as the Jacobian varies across the
+    // element.
+    auto size_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+      return elem->quality(SIZE);
+    };
+
+    // Affine elements (uniform Jacobian) all score 1, regardless of
+    // scale or shape: unit square, a larger square, a stretched
+    // rectangle, and a sheared rhombus.
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/size_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0)}), TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,2,0), Point(0,2,0)}), TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0)}), TOLERANCE);
+    {
+      const Real c = std::cos(libMesh::pi/6), s = std::sin(libMesh::pi/6);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+        /*actual=*/size_of({Point(0,0,0), Point(1,0,0), Point(1.+c,s,0), Point(c,s,0)}), TOLERANCE);
+    }
+
+    // Trapezoid with corner nodal areas {6, 6, 4, 4} (mean 5): the
+    // worst corner ratio is 4/5 = 0.8.
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.8,
+      /*actual=*/size_of({Point(0,0,0), Point(3,0,0), Point(2,2,0), Point(0,2,0)}), TOLERANCE);
+  }
+
+  void testHex8Size()
+  {
+    LOG_UNIT_TEST;
+
+    auto size_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, HEX8);
+      libmesh_ignore(nodes);
+      return elem->quality(SIZE);
+    };
+
+    // Affine boxes (uniform Jacobian) score 1 at any scale.
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/size_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0),
+                          Point(0,0,1), Point(1,0,1), Point(1,1,1), Point(0,1,1)}), TOLERANCE);
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0),
+                          Point(0,0,1), Point(2,0,1), Point(2,1,1), Point(0,1,1)}), TOLERANCE);
+
+    // A frustum: 2x2 base, unit top shrunk toward the axis. Bottom
+    // corners have nodal volume 4, top corners 1; the element volume is
+    // 7/3 and the ideal cube's nodal-det/volume ratio is 1, so the ideal
+    // nodal volume at this element's volume is 7/3. The worst corner
+    // ratio is (1)/(7/3) = 3/7.
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/Real(3)/7,
+      /*actual=*/size_of({Point(0,0,0), Point(2,0,0), Point(2,2,0), Point(0,2,0),
+                          Point(0.5,0.5,1), Point(1.5,0.5,1), Point(1.5,1.5,1), Point(0.5,1.5,1)}), TOLERANCE);
+  }
+
+  void testQuad4Taper()
+  {
+    LOG_UNIT_TEST;
+
+    // TAPER = min over the two opposite-edge pairs of (shorter/longer
+    // length), in (0, 1], with 1 meaning no taper.
+    auto taper_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+      return elem->quality(TAPER);
+    };
+
+    // Unit square -> both pairs equal -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/taper_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // 2x1 rectangle -> opposite edges equal (parallelogram) -> no taper -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/taper_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // Rhombus (unit edges) -> all edges equal -> no taper -> 1
+    {
+      const Real c = std::cos(libMesh::pi/3), s = std::sin(libMesh::pi/3);
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+        /*actual=*/taper_of({Point(0,0,0), Point(1,0,0), Point(1.+c,s,0), Point(c,s,0)}), TOLERANCE);
+    }
+
+    // Symmetric trapezoid: bottom edge length 4, top edge length 2, the
+    // two slanted edges equal -> worst pair ratio = 2/4 = 0.5
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/0.5,
+      /*actual=*/taper_of({Point(0,0,0), Point(4,0,0), Point(3,1,0), Point(1,1,0)}), TOLERANCE);
+  }
+
+  void testQuad4Condition()
+  {
+    LOG_UNIT_TEST;
+
+    // CONDITION = max over corners of the Jacobian condition number
+    // kappa = |A|_F |A^-1|_F / 2 = (|e0|^2 + |e1|^2) / (2 |e0 x e1|),
+    // which is 1 for a square corner and grows with stretch or skew.
+    auto cond_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, QUAD4);
+      libmesh_ignore(nodes);
+      return elem->quality(CONDITION);
+    };
+
+    // Unit square -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/cond_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // 2x1 rectangle -> (4 + 1) / (2 * 2) = 1.25 at every corner
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.25,
+      /*actual=*/cond_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0)}), TOLERANCE);
+
+    // Unit-edge rhombus with interior angle theta -> kappa = 1/sin(theta)
+    {
+      auto rhombus_condition = [&cond_of](Real theta)
+      {
+        const Real c = std::cos(theta), s = std::sin(theta);
+        return cond_of({Point(0,0,0), Point(1,0,0), Point(1.+c,s,0), Point(c,s,0)});
+      };
+
+      // theta = pi/6 -> 1/sin(pi/6) = 2
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1./std::sin(libMesh::pi/6),
+        /*actual=*/rhombus_condition(libMesh::pi/6), TOLERANCE);
+      // theta = pi/3 -> 1/sin(pi/3) = 2/sqrt(3)
+      LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1./std::sin(libMesh::pi/3),
+        /*actual=*/rhombus_condition(libMesh::pi/3), TOLERANCE);
+    }
+  }
+
+  void testHex8Condition()
+  {
+    LOG_UNIT_TEST;
+
+    auto cond_of = [this](const std::vector<Point> & pts)
+    {
+      auto [elem, nodes] = this->construct_elem(pts, HEX8);
+      libmesh_ignore(nodes);
+      return elem->quality(CONDITION);
+    };
+
+    // Unit cube -> 1
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/1.0,
+      /*actual=*/cond_of({Point(0,0,0), Point(1,0,0), Point(1,1,0), Point(0,1,0),
+                          Point(0,0,1), Point(1,0,1), Point(1,1,1), Point(0,1,1)}), TOLERANCE);
+
+    // 2x1x1 box: at each corner |A|_F^2 = 6, |det| = 2,
+    // |A^-1|_F^2 = 9/4, so kappa = sqrt(6 * 9/4)/3 = sqrt(6)/2
+    LIBMESH_ASSERT_FP_EQUAL(/*expected=*/std::sqrt(Real(6))/2.,
+      /*actual=*/cond_of({Point(0,0,0), Point(2,0,0), Point(2,1,0), Point(0,1,0),
+                          Point(0,0,1), Point(2,0,1), Point(2,1,1), Point(0,1,1)}), TOLERANCE);
   }
 
   void testTet4DihedralAngle()

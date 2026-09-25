@@ -8,6 +8,7 @@
 #include <libmesh/parallel_implementation.h>
 #include <libmesh/enum_to_string.h>
 #include <libmesh/elem_quality.h>
+#include <libmesh/node.h>
 
 using namespace libMesh;
 
@@ -250,6 +251,86 @@ public:
             //              << ", scaled_jac = " << scaled_jac
             //              << std::endl;
           }
+      }
+  }
+
+  void test_quality_bounds()
+  {
+    LOG_UNIT_TEST;
+
+    // For a well-shaped, unit-scale "ideal" element of this type, every
+    // quality metric that libMesh considers valid for the type should
+    // evaluate to a value inside its suggested qual_bounds(). We build
+    // ideal (regular) shapes only for the linear element types where
+    // that is straightforward; other types are skipped.
+    std::vector<Point> pts;
+    switch (elem_type)
+      {
+      case TRI3:
+        // Equilateral triangle, unit edge length.
+        pts = {Point(0, 0, 0),
+               Point(1, 0, 0),
+               Point(0.5, std::sqrt(Real(3))/2., 0)};
+        break;
+
+      case QUAD4:
+        // Unit square.
+        pts = {Point(0, 0, 0), Point(1, 0, 0),
+               Point(1, 1, 0), Point(0, 1, 0)};
+        break;
+
+      case TET4:
+        // Regular tetrahedron, unit edge length.
+        pts = {Point(0, 0, 0),
+               Point(1, 0, 0),
+               Point(0.5, std::sqrt(Real(3))/2., 0),
+               Point(0.5, std::sqrt(Real(3))/6., std::sqrt(Real(2)/3.))};
+        break;
+
+      case HEX8:
+        // Unit cube.
+        pts = {Point(0, 0, 0), Point(1, 0, 0), Point(1, 1, 0), Point(0, 1, 0),
+               Point(0, 0, 1), Point(1, 0, 1), Point(1, 1, 1), Point(0, 1, 1)};
+        break;
+
+      default:
+        // No ideal element constructed for this type; nothing to check.
+        return;
+      }
+
+    // Build the element from freshly created nodes; evaluating quality
+    // metrics does not require the element to belong to a mesh.
+    std::vector<std::unique_ptr<Node>> nodes(pts.size());
+    for (unsigned int i = 0; i < pts.size(); ++i)
+      nodes[i] = Node::build(pts[i], i);
+
+    std::unique_ptr<Elem> elem = Elem::build(elem_type);
+    CPPUNIT_ASSERT(elem->n_nodes() == pts.size());
+    for (unsigned int i = 0; i < pts.size(); ++i)
+      elem->set_node(i, nodes[i].get());
+
+    for (const ElemQuality q : Quality::valid(elem_type))
+      {
+        const std::pair<Real, Real> bounds = elem->qual_bounds(q);
+
+        // A metric may be listed as valid for a type without having
+        // suggested bounds defined; qual_bounds() returns (-1, -1) as a
+        // sentinel in that case, which we skip.
+        if (bounds.first == -1. && bounds.second == -1.)
+          continue;
+
+        const Real value = elem->quality(q);
+
+        std::ostringstream msg;
+        msg << "Quality metric " << Utility::enum_to_string(q)
+            << " on an ideal " << Utility::enum_to_string(elem_type)
+            << " evaluated to " << value
+            << ", outside its suggested bounds ["
+            << bounds.first << ", " << bounds.second << "]";
+
+        CPPUNIT_ASSERT_MESSAGE(msg.str(),
+                               value >= bounds.first - TOLERANCE &&
+                               value <= bounds.second + TOLERANCE);
       }
   }
 
@@ -971,6 +1052,7 @@ public:
   CPPUNIT_TEST( test_bounding_box );            \
   CPPUNIT_TEST( test_ref_elem );                \
   CPPUNIT_TEST( test_quality );                 \
+  CPPUNIT_TEST( test_quality_bounds );          \
   CPPUNIT_TEST( test_node_edge_map_consistency ); \
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_static_data );             \

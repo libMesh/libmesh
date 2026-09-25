@@ -141,16 +141,6 @@ public:
   virtual void solve() override;
 
   /**
-   * Get the target element for a given element type.
-   * @param type Element type
-   * @return a std::pair containing the target element for type and the
-   * corresponding nodes that must be kept in scope while the target element is
-   * used.
-   */
-  static std::pair<std::unique_ptr<Elem>, std::vector<std::unique_ptr<Node>>>
-  get_target_elem(const ElemType & type);
-
-  /**
    * Get the jacobians (and determinants) of the target-to-reference element mapping.
    * @param target_elem Target element.
    * @param femcontext Context used to build mapping.
