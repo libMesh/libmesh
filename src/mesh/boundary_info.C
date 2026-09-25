@@ -3031,21 +3031,39 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
   const Elem * side_elem;
   std::vector<boundary_id_type> matched_ids;
 
-  // A side whose nodes are all in the nodeset, but whose neighbor is
-  // an unresolved RemoteElem: we can't tell locally whether it's
+  // Add elem's side to each of the given sidesets, making sure each
+  // sideset inherits its nodeset's name, if there is one.
+  auto add_matched_side =
+    [this]
+    (const Elem * elem,
+     unsigned short int side,
+     const std::vector<boundary_id_type> & bids)
+    {
+      for (const auto & bid : bids)
+        {
+          add_side(elem, side, bid);
+
+          // Let the sideset inherit any non-empty name from the nodeset
+          std::string & nset_name = nodeset_name(bid);
+
+          if (nset_name != "")
+            sideset_name(bid) = nset_name;
+        }
+    };
+
+  // Sides whose nodes are all in the nodeset, but whose neighbor is
+  // an unresolved RemoteElem: we can't tell locally whether they're
   // truly interior to a subdomain, since RemoteElem doesn't carry a
-  // meaningful subdomain_id().  We hold these off to the side and
-  // resolve them below via communication with whichever processor
-  // owns \p elem: since that processor owns the element, its
-  // neighbor connectivity for it is guaranteed to be fully resolved,
-  // unlike ours.
-  struct PendingSide
-  {
-    const Elem * elem;
-    unsigned short int side;
-    std::vector<boundary_id_type> boundary_ids;
-  };
-  std::vector<PendingSide> pending_sides;
+  // meaningful subdomain_id().  We resolve them below by asking
+  // whichever processor owns each element: since that processor owns
+  // the element, its neighbor connectivity for it is guaranteed to be
+  // fully resolved, unlike ours.  For each owning processor we keep
+  // the (elem id, side) queries and, in the same order, the sidesets
+  // each side would be added to.
+  typedef std::pair<dof_id_type, unsigned short int> elem_side_type;
+  std::unordered_map<processor_id_type, std::vector<elem_side_type>> sides_requested;
+  std::unordered_map<processor_id_type, std::vector<std::vector<boundary_id_type>>>
+    requested_boundary_ids;
 
   for (const auto & elem : _mesh->active_element_ptr_range())
     for (auto side : elem->side_index_range())
@@ -3090,22 +3108,13 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
         // subdomain id.
         if (neigh == remote_elem)
           {
-            pending_sides.push_back({elem, side, std::move(matched_ids)});
+            const processor_id_type pid = elem->processor_id();
+            sides_requested[pid].emplace_back(elem->id(), side);
+            requested_boundary_ids[pid].push_back(std::move(matched_ids));
             continue;
           }
 
-        // For any matches, add this side to the sideset, making sure
-        // the sideset inherits the nodeset's name, if there is one.
-        for (const auto & bid : matched_ids)
-          {
-            add_side(elem, side, bid);
-
-            // Let the sideset inherit any non-empty name from the nodeset
-            std::string & nset_name = nodeset_name(bid);
-
-            if (nset_name != "")
-              sideset_name(bid) = nset_name;
-          }
+        add_matched_side(elem, side, matched_ids);
       } // end for side
 
   // If we're not resolving RemoteElem neighbors then nothing was
@@ -3113,94 +3122,61 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
   // above.
   if (!need_parallel_sync)
     {
-      libmesh_assert(pending_sides.empty());
+      libmesh_assert(sides_requested.empty());
       return;
     }
 
-  // Even if this processor has no pending_sides of its own, it may
+  // Even if this processor has no deferred sides of its own, it may
   // still own elements that other processors need to query, so every
   // processor has to participate in the collective communication
   // below rather than skipping it when its own request list is empty.
 
-  // Ask whichever processor owns each pending element to resolve its
-  // side's true neighbor subdomain id.
-  std::unordered_map<processor_id_type, std::vector<dof_id_type>> elem_ids_requested;
-  {
-    std::unordered_map<processor_id_type, std::set<dof_id_type>> ids_seen;
-    for (const auto & pending : pending_sides)
-      if (ids_seen[pending.elem->processor_id()].insert(pending.elem->id()).second)
-        elem_ids_requested[pending.elem->processor_id()].push_back(pending.elem->id());
-  }
-
-  // For a queried element, the side/neighbor-subdomain pairs for
-  // every side that has a neighbor.
-  typedef std::vector<std::pair<unsigned short int, subdomain_id_type>> datum_type;
-
   auto neighbor_subdomain_gather_functor =
     [this]
     (processor_id_type,
-     const std::vector<dof_id_type> & ids,
-     std::vector<datum_type> & data)
+     const std::vector<elem_side_type> & elem_sides,
+     std::vector<subdomain_id_type> & neighbor_subdomains)
     {
-      data.resize(ids.size());
-      for (auto i : index_range(ids))
+      neighbor_subdomains.resize(elem_sides.size());
+      for (auto i : index_range(elem_sides))
         {
-          const Elem * elem = _mesh->elem_ptr(ids[i]);
-          for (auto side : elem->side_index_range())
-            {
-              const Elem * neigh = elem->neighbor_ptr(side);
+          const Elem & elem = _mesh->elem_ref(elem_sides[i].first);
+          const Elem * neigh = elem.neighbor_ptr(elem_sides[i].second);
 
-              // We own elem, so its neighbor connectivity is
-              // guaranteed to be fully resolved.
-              libmesh_assert(neigh != remote_elem);
+          // The requester saw a RemoteElem neighbor here, so there is
+          // a neighbor, and we own elem, so our connectivity for it is
+          // guaranteed to be fully resolved.
+          libmesh_assert(neigh);
+          libmesh_assert(neigh != remote_elem);
 
-              if (neigh)
-                data[i].emplace_back(side, neigh->subdomain_id());
-            }
+          neighbor_subdomains[i] = neigh->subdomain_id();
         }
     };
-
-  std::map<std::pair<dof_id_type, unsigned short int>, subdomain_id_type> neighbor_subdomain;
 
   auto neighbor_subdomain_action_functor =
-    [&neighbor_subdomain]
-    (processor_id_type,
-     const std::vector<dof_id_type> & ids,
-     std::vector<datum_type> & data)
+    [this, &requested_boundary_ids, &add_matched_side]
+    (processor_id_type pid,
+     const std::vector<elem_side_type> & elem_sides,
+     const std::vector<subdomain_id_type> & neighbor_subdomains)
     {
-      for (auto i : index_range(ids))
-        for (const auto & side_subdomain : data[i])
-          neighbor_subdomain[std::make_pair(ids[i], side_subdomain.first)] =
-            side_subdomain.second;
+      const auto & bids = libmesh_map_find(requested_boundary_ids, pid);
+      libmesh_assert_equal_to(bids.size(), elem_sides.size());
+
+      for (auto i : index_range(elem_sides))
+        {
+          const Elem * elem = _mesh->elem_ptr(elem_sides[i].first);
+
+          // If the side turned out to be truly interior after all,
+          // skip it.
+          if (neighbor_subdomains[i] != elem->subdomain_id())
+            add_matched_side(elem, elem_sides[i].second, bids[i]);
+        }
     };
 
-  datum_type * datum_type_ex = nullptr;
+  subdomain_id_type * datum_type_ex = nullptr;
   Parallel::pull_parallel_vector_data
-    (this->comm(), elem_ids_requested, neighbor_subdomain_gather_functor,
+    (this->comm(), sides_requested, neighbor_subdomain_gather_functor,
      neighbor_subdomain_action_functor, datum_type_ex);
-
-  for (const auto & pending : pending_sides)
-    {
-      const auto it =
-        neighbor_subdomain.find(std::make_pair(pending.elem->id(), pending.side));
-      libmesh_error_msg_if(it == neighbor_subdomain.end(),
-                           "Failed to resolve neighbor subdomain id for element "
-                           << pending.elem->id() << ", side " << pending.side);
-
-      // The side turned out to be truly interior after all; skip it.
-      if (it->second == pending.elem->subdomain_id())
-        continue;
-
-      for (const auto & bid : pending.boundary_ids)
-        {
-          add_side(pending.elem, pending.side, bid);
-
-          std::string & nset_name = nodeset_name(bid);
-
-          if (nset_name != "")
-            sideset_name(bid) = nset_name;
-        }
-    }
 }
 
 
