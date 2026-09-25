@@ -1355,9 +1355,9 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
            // Quadrature-weighted average of the variable over elem.  The
            // second argument only selects the value type: Number for
            // scalar variables, Gradient for vector-valued ones.
-           auto element_average = [&con, &system, var](const Elem * elem, auto zero)
+           auto element_average = [&con, &system, var](const Elem * elem, auto zero_value)
              {
-               typedef decltype(zero) OutputType;
+               typedef decltype(zero_value) OutputType;
                typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
 
                con->pre_fe_reinit(system, elem);
@@ -1370,7 +1370,7 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
 
                con->elem_fe_reinit();
 
-               OutputType avg = zero;
+               OutputType avg = zero_value;
                Real vol = 0;
                for (auto qp : index_range(JxW))
                  {
