@@ -962,10 +962,48 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
 
   LibmeshPetscCall(SNESSetFunction (_snes, r->vec(), libmesh_petsc_snes_residual, this));
 
+  // A SNES kept across solves (reuse_preconditioner()) is already set up, so the
+  // SNESSetUp() below returns at its early exit and never redoes the matrix-free setup
+  // -snes_mf_operator or -snes_mf asked for: its operator and its callback are preserved here.
+  bool retained_mf_operator = false; // -snes_mf_operator: the operator is PETSc's, Pmat ours
+  bool retained_mf = false;          // -snes_mf: operator, Pmat and callback are PETSc's
+
+#if !PETSC_VERSION_LESS_THAN(3,8,0) // SNESGetUseMatrixFree() exists from PETSc 3.8 on
+  PetscBool mf_operator = PETSC_FALSE, mf = PETSC_FALSE;
+  {
+    PetscBool amat_is_mf = PETSC_FALSE;
+    Mat amat = LIBMESH_PETSC_NULLPTR, pmat = LIBMESH_PETSC_NULLPTR;
+    LibmeshPetscCall(SNESGetUseMatrixFree(_snes, &mf_operator, &mf));
+    LibmeshPetscCall(SNESGetJacobian(_snes, &amat, &pmat, LIBMESH_PETSC_NULLPTR,
+                                     LIBMESH_PETSC_NULLPTR));
+    if (amat && (mf_operator || mf))
+      LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)amat, MATMFFD, &amat_is_mf));
+
+    // One matrix-free matrix as both Amat and Pmat is the signature of PETSc's ordinary
+    // -snes_mf setup, the only state whose callback and PCNONE may be put back.
+    if (amat_is_mf && mf && !mf_operator && amat == pmat)
+      retained_mf = true;
+    else if (amat_is_mf)
+      retained_mf_operator = true;
+    // reinit() calls force_new_preconditioner(), so no retained operator outlives a mesh change.
+  }
+#endif
+
   // Only set the jacobian function if we've been provided with something to call.
   // This allows a user to set their own jacobian function if they want to
-  if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
-    LibmeshPetscCall(SNESSetJacobian (_snes, jac->mat(), pre->mat(), libmesh_petsc_snes_jacobian, this));
+  if (!retained_mf &&
+      (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object))
+    {
+      if (retained_mf_operator)
+        // A null Amat keeps the matrix-free operator; Pmat and our callback are refreshed.
+        // Under -snes_mf_operator jac_in is never the operator: the first solve's SNESSetUp()
+        // replaced it with the matrix-free one, and later solves keep that operator.
+        LibmeshPetscCall(SNESSetJacobian (_snes, LIBMESH_PETSC_NULLPTR, pre->mat(),
+                                          libmesh_petsc_snes_jacobian, this));
+      else
+        LibmeshPetscCall(SNESSetJacobian (_snes, jac->mat(), pre->mat(),
+                                          libmesh_petsc_snes_jacobian, this));
+    }
 
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
@@ -998,6 +1036,34 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
   LibmeshPetscCall(KSPSetFromOptions(ksp));
 #endif
   LibmeshPetscCall(SNESSetFromOptions(_snes));
+
+#if !PETSC_VERSION_LESS_THAN(3,8,0)
+  // The options database has just been re-read. A matrix-free mode changed between solves
+  // cannot be honored on a retained SNES, because the SNESSetUp() below is a no-op on it.
+  // The check is skipped under a left nonlinear preconditioner: there the first solve's
+  // SNESSetUp() rewrote the flags to mf = true, mf_operator = false, and the options step
+  // reads -snes_mf_operator back, so the comparison would report a change that never happened.
+  PetscBool has_npc = PETSC_FALSE;
+  LibmeshPetscCall(SNESHasNPC(_snes, &has_npc));
+  PCSide npc_side = PC_RIGHT;
+  if (has_npc)
+    LibmeshPetscCall(SNESGetNPCSide(_snes, &npc_side));
+  if ((retained_mf_operator || retained_mf) && !(has_npc && npc_side == PC_LEFT))
+    {
+      PetscBool mf_operator_now = PETSC_FALSE, mf_now = PETSC_FALSE;
+      LibmeshPetscCall(SNESGetUseMatrixFree(_snes, &mf_operator_now, &mf_now));
+      libmesh_error_msg_if(mf_operator_now != mf_operator || mf_now != mf,
+                           "The matrix-free solve mode changed while reuse_preconditioner() kept "
+                           "the SNES. Call force_new_preconditioner() before changing it.");
+    }
+#endif
+
+  if (retained_mf)
+    // Both matrices stay PETSc's; only the callback, which this solve's new DM lacks, goes back.
+    // SNESSetFromOptions() may have installed a finite-difference callback for -snes_fd or
+    // -snes_fd_color, which the first solve's setup superseded and this call supersedes again.
+    LibmeshPetscCall(SNESSetJacobian (_snes, LIBMESH_PETSC_NULLPTR, LIBMESH_PETSC_NULLPTR,
+                                      MatMFFDComputeJacobian, LIBMESH_PETSC_NULLPTR));
 
   PC pc;
   LibmeshPetscCall(KSPGetPC(ksp, &pc));
@@ -1048,6 +1114,30 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
   LibmeshPetscCall(SNESSetSolution(_snes, x->vec()));
 #endif
   LibmeshPetscCall(SNESSetUp(_snes));
+
+  // PETSc releases before 3.26 only: from 3.26 on (PETSc commit f4330cacc5, "Error with
+  // -snes_mf and incompatible pc") the matrix-free setup no longer forces PCNONE,
+  // SNESSetFromOptions() sets it only when no PC type was chosen, and the type the first
+  // solve ended with stays on the retained SNES, so there is nothing to put back.
+#if !PETSC_VERSION_LESS_THAN(3,8,0) && PETSC_VERSION_LESS_THAN(3,26,0)
+  if (retained_mf)
+    {
+      // -snes_mf runs with no preconditioner, which the early-exit SNESSetUp() did not
+      // re-force. The PC is fetched again because the hooks above may have replaced it.
+      KSP mf_ksp;
+      PC mf_pc;
+      PetscBool pc_is_exempt = PETSC_FALSE;
+      LibmeshPetscCall(SNESGetKSP(_snes, &mf_ksp));
+      LibmeshPetscCall(KSPGetPC(mf_ksp, &mf_pc));
+      LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)mf_pc, PCSHELL, &pc_is_exempt));
+#if !PETSC_VERSION_LESS_THAN(3,16,0)
+      if (!pc_is_exempt)
+        LibmeshPetscCall(PetscObjectTypeCompare((PetscObject)mf_pc, PCH2OPUS, &pc_is_exempt));
+#endif
+      if (!pc_is_exempt)
+        LibmeshPetscCall(PCSetType(mf_pc, PCNONE));
+    }
+#endif
 
   Mat J, P;
   LibmeshPetscCall(SNESGetJacobian(_snes, &J, &P,
