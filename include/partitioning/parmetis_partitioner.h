@@ -84,6 +84,12 @@ public:
   }
 
 
+  /**
+   * ParMETIS is called through ParMETIS_V3_AdaptiveRepart, which starts from the
+   * partitioning the mesh already carries.
+   */
+  virtual bool partitions_from_scratch () const override { return false; }
+
 protected:
 
   /**

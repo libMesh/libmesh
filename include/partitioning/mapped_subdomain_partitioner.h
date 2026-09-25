@@ -67,6 +67,12 @@ public:
   }
 
   /**
+   * Elements are assigned from the user-supplied subdomain-to-processor map, with no
+   * reference to the partitioning the mesh arrives with.
+   */
+  virtual bool partitions_from_scratch () const override { return true; }
+
+  /**
    * Before calling partition() or partition_range(), the user must
    * assign all the Mesh subdomains to certain processors by adding
    * them to this std::map.  For example:
