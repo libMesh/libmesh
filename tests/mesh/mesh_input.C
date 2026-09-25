@@ -9,6 +9,7 @@
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/enum_norm_type.h>
 #include <libmesh/enum_to_string.h>
+#include <libmesh/cell_c0polyhedron.h>
 
 #include <libmesh/abaqus_io.h>
 #include <libmesh/dyna_io.h>
@@ -104,6 +105,7 @@ public:
 #ifdef LIBMESH_HAVE_VTK
   CPPUNIT_TEST( testVTKPreserveElemIds );
   CPPUNIT_TEST( testVTKPreserveSubdomainIds );
+  CPPUNIT_TEST( testVTKReadPolyhedra );
 #endif
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -330,6 +332,61 @@ public:
         CPPUNIT_ASSERT_EQUAL(elem->subdomain_id(), expected_id);
       }
     }
+  }
+
+  void testVTKReadPolyhedra ()
+  {
+    LOG_UNIT_TEST;
+
+    // This .vtu file contains a single VTK_POLYHEDRON cell: a hexagonal
+    // prism with 12 vertices and 8 faces (two hexagons and six quads).
+    Mesh mesh(*TestCommWorld);
+    mesh.read("meshes/hex_prism_polyhedron.vtu");
+    mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(dof_id_type(1), mesh.n_elem());
+
+    // The element may live on a single processor when the mesh is
+    // distributed, so guard the checks accordingly.
+    const Elem * elem = mesh.query_elem_ptr(0);
+    bool found_elem = elem;
+    mesh.comm().max(found_elem);
+    CPPUNIT_ASSERT(found_elem);
+
+    if (!elem)
+      return;
+
+    CPPUNIT_ASSERT_EQUAL(C0POLYHEDRON, elem->type());
+    CPPUNIT_ASSERT_EQUAL(12u, elem->n_vertices());
+    CPPUNIT_ASSERT_EQUAL(8u, elem->n_sides());
+
+    // The file has no libmesh_node_id array, so libMesh node ids match
+    // the VTK point ordering, i.e. the coordinates we wrote out.
+    LIBMESH_ASSERT_FP_EQUAL(6.0, elem->volume(), TOLERANCE);
+
+    // Collect the faces (as node-id sets) and compare against the faces
+    // that were written to the file, independent of any reordering the
+    // C0Polyhedron may do to its sides.
+    std::set<std::set<dof_id_type>> faces;
+    for (auto s : elem->side_index_range())
+      {
+        std::set<dof_id_type> face;
+        for (const auto n : elem->nodes_on_side(s))
+          face.insert(elem->node_id(n));
+        faces.insert(std::move(face));
+      }
+
+    const std::set<std::set<dof_id_type>> expected_faces =
+      { {0, 1, 2, 3, 4, 5},
+        {0, 1, 7, 6},
+        {1, 2, 8, 7},
+        {2, 3, 9, 8},
+        {3, 4, 10, 9},
+        {4, 5, 11, 10},
+        {5, 0, 6, 11},
+        {6, 7, 8, 9, 10, 11} };
+
+    CPPUNIT_ASSERT(faces == expected_faces);
   }
 #endif // LIBMESH_HAVE_VTK
 

@@ -25,6 +25,9 @@
 #include "libmesh/system.h"
 #include "libmesh/node.h"
 #include "libmesh/elem.h"
+#include "libmesh/cell_c0polyhedron.h"
+#include "libmesh/face_c0polygon.h"
+#include "libmesh/face_polygon.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/utility.h"
 
@@ -44,6 +47,7 @@
 #include "vtkCellData.h"
 #include "vtkDoubleArray.h"
 #include "vtkGenericCell.h"
+#include "vtkIdList.h"
 #include "vtkPointData.h"
 #include "vtkPoints.h"
 #include "vtkSmartPointer.h"
@@ -183,6 +187,72 @@ std::map<ElemMappingType, VTKIO::ElementMaps> VTKIO::build_element_maps()
 
 
 
+namespace {
+
+// VTK describes a polyhedron by a "face stream" (a list of polygonal
+// faces, each a list of global point ids) rather than by the flat,
+// ordered node list used for every other supported element type.  This
+// helper builds an equivalent libMesh C0Polyhedron from that face
+// stream, assigning its node pointers and adding to \p mesh any interior
+// "mid-element" node the C0Polyhedron construction requires.
+std::unique_ptr<Elem>
+add_vtk_polyhedron(vtkUnstructuredGrid & vtk_grid,
+                   MeshBase & mesh,
+                   const vtkIdType cell_id,
+                   vtkIntArray * node_id,
+                   const std::vector<dof_id_type> & vtk_node_to_libmesh)
+{
+  // GetFaceStream() fills face_stream with
+  //   [ n_faces,
+  //     n_face0_pts, id0, id1, ...,
+  //     n_face1_pts, id0, id1, ..., ]
+  // where all the point ids are global VTK point ids.
+  vtkSmartPointer<vtkIdList> face_stream = vtkSmartPointer<vtkIdList>::New();
+  vtk_grid.GetFaceStream(cell_id, face_stream);
+
+  vtkIdType pos = 0;
+  const vtkIdType n_faces = face_stream->GetId(pos++);
+
+  libmesh_error_msg_if
+    (n_faces < 4,
+     "Error: VTK polyhedron cell " << cell_id << " has only " << n_faces <<
+     " faces, but a polyhedron requires at least 4.");
+
+  std::vector<std::shared_ptr<Polygon>> sides(cast_int<std::size_t>(n_faces));
+  for (std::size_t s = 0; s != sides.size(); ++s)
+    {
+      const vtkIdType n_face_pts = face_stream->GetId(pos++);
+      auto side = std::make_shared<C0Polygon>(cast_int<unsigned int>(n_face_pts));
+
+      for (vtkIdType n = 0; n != n_face_pts; ++n)
+        {
+          const vtkIdType vtk_point_id = face_stream->GetId(pos++);
+          const dof_id_type libmesh_node_id = node_id ?
+            vtk_node_to_libmesh[vtk_point_id] :
+            cast_int<dof_id_type>(vtk_point_id);
+          side->set_node(cast_int<unsigned int>(n),
+                         mesh.node_ptr(libmesh_node_id));
+        }
+
+      sides[s] = std::move(side);
+    }
+
+  // Constructing the C0Polyhedron may create an interior "mid-element"
+  // node for its default tetrahedralization; if so, it is our job to
+  // add it to the mesh.  The polyhedron's vertex node pointers were
+  // already assigned above via its polygonal sides.
+  std::unique_ptr<Node> mid_elem_node;
+  auto elem = std::make_unique<C0Polyhedron>(sides, mid_elem_node);
+  if (mid_elem_node)
+    mesh.add_node(std::move(mid_elem_node));
+
+  return elem;
+}
+
+} // anonymous namespace
+
+
+
 void VTKIO::read (const std::string & name)
 {
   // This is a serial-only process for now;
@@ -286,30 +356,43 @@ void VTKIO::read (const std::string & name)
     {
       _vtk_grid->GetCell(i, cell);
 
-      // Get the libMesh element type corresponding to this VTK element type.
-      ElemType libmesh_elem_type = element_map.find(cell->GetCellType());
-      auto elem = Elem::build(libmesh_elem_type);
+      std::unique_ptr<Elem> elem;
 
-      // get the straightforward numbering from the VTK cells
-      for (auto j : elem->node_index_range())
+      // VTK polyhedra are described by a stream of polygonal faces
+      // rather than by an ordered node list, so they are built
+      // separately as C0Polyhedron elements with their nodes already
+      // assigned via their sides.
+      if (cell->GetCellType() == VTK_POLYHEDRON)
+        elem = add_vtk_polyhedron(*_vtk_grid, mesh,
+                                  static_cast<vtkIdType>(i),
+                                  node_id, vtk_node_to_libmesh);
+      else
         {
-          const auto vtk_point_id = cell->GetPointId(j);
-          const dof_id_type libmesh_node_id = node_id ?
-            vtk_node_to_libmesh[vtk_point_id] : vtk_point_id;
+          // Get the libMesh element type corresponding to this VTK element type.
+          ElemType libmesh_elem_type = element_map.find(cell->GetCellType());
+          elem = Elem::build(libmesh_elem_type);
 
-          elem->set_node(j, mesh.node_ptr(libmesh_node_id));
+          // get the straightforward numbering from the VTK cells
+          for (auto j : elem->node_index_range())
+            {
+              const auto vtk_point_id = cell->GetPointId(j);
+              const dof_id_type libmesh_node_id = node_id ?
+                vtk_node_to_libmesh[vtk_point_id] : vtk_point_id;
+
+              elem->set_node(j, mesh.node_ptr(libmesh_node_id));
+            }
+
+          // then get the connectivity
+          std::vector<dof_id_type> conn;
+          elem->connectivity(0, VTK, conn);
+
+          // then reshuffle the nodes according to the connectivity, this
+          // two-time-assign would evade the definition of the vtk_mapping
+          for (unsigned int j=0,
+               n_conn = cast_int<unsigned int>(conn.size());
+               j != n_conn; ++j)
+            elem->set_node(j, mesh.node_ptr(conn[j]));
         }
-
-      // then get the connectivity
-      std::vector<dof_id_type> conn;
-      elem->connectivity(0, VTK, conn);
-
-      // then reshuffle the nodes according to the connectivity, this
-      // two-time-assign would evade the definition of the vtk_mapping
-      for (unsigned int j=0,
-           n_conn = cast_int<unsigned int>(conn.size());
-           j != n_conn; ++j)
-        elem->set_node(j, mesh.node_ptr(conn[j]));
 
       if (elem_id)
         {
