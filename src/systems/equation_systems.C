@@ -24,6 +24,7 @@
 #include "libmesh/explicit_system.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/fem_context.h"
 #include "libmesh/frequency_system.h"
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
@@ -33,7 +34,6 @@
 #include "libmesh/newmark_system.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/parallel.h"
-#include "libmesh/quadrature.h"
 #include "libmesh/rb_construction.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/tensor_tools.h"
@@ -1334,107 +1334,80 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
       // Loop over all elements in the mesh and index all components of the variable if it's active
       Threads::parallel_for
         (_mesh.active_local_element_stored_range(),
-         [&dof_map, &variable, ne, var, var_ctr, n_comps, &var_type, field_type,
+         [&system, &dof_map, &variable, ne, var, var_ctr, n_comps, field_type,
          need_quadrature_average, &parallel_soln, &sys_soln](const ConstElemRange & range)
          {
            // The DOF indices for the finite element
            std::vector<dof_id_type> dof_indices;
 
-           // FE/quadrature objects for the quadrature-average path, indexed
-           // by element dimension (0-3) and built lazily.  These are
-           // constructed here, inside the parallel_for lambda body, so that
-           // each range invocation (which runs single-threaded) owns its own
-           // objects; sharing an FEBase/QBase across threads would race on
-           // reinit().
-           std::vector<std::unique_ptr<FEBase>> fe_ptrs(4);
-           std::vector<std::unique_ptr<FEVectorBase>> vec_fe_ptrs(4);
-           std::vector<std::unique_ptr<QBase>> q_rules(4);
+           // FE context for the quadrature-average path.  It is built here,
+           // inside the parallel_for lambda body, so that each range
+           // invocation (which runs single-threaded) owns its own; sharing
+           // FE objects across threads would race on reinit().
+           std::unique_ptr<FEMContext> con;
+           if (need_quadrature_average)
+             {
+               const std::vector<unsigned int> active_vars {var};
+               con = std::make_unique<FEMContext>(system, &active_vars,
+                                                  /*allocate_local_matrices=*/false);
+             }
+
+           // Quadrature-weighted average of the variable over elem.  The
+           // second argument only selects the value type: Number for
+           // scalar variables, Gradient for vector-valued ones.
+           auto element_average = [&con, &system, var](const Elem * elem, auto zero)
+             {
+               typedef decltype(zero) OutputType;
+               typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
+
+               con->pre_fe_reinit(system, elem);
+
+               // Request what interior_value() needs before reinit
+               FEGenericBase<OutputShape> * fe = nullptr;
+               con->get_element_fe(var, fe);
+               const std::vector<Real> & JxW = fe->get_JxW();
+               fe->get_phi();
+
+               con->elem_fe_reinit();
+
+               OutputType avg = zero;
+               Real vol = 0;
+               for (auto qp : index_range(JxW))
+                 {
+                   OutputType u_h;
+                   con->interior_value(var, qp, u_h);
+                   avg += JxW[qp] * u_h;
+                   vol += JxW[qp];
+                 }
+               avg /= vol;
+               return avg;
+             };
 
            for (const Elem * elem : range)
              {
                if (variable.active_on_subdomain(elem->subdomain_id()))
                  {
-                   dof_map.dof_indices(elem, dof_indices, var);
-
-                   if (!need_quadrature_average)
+                   if (need_quadrature_average)
                      {
-                       // The number of DOF components needs to be equal to the expected number so that we know
-                       // where to store data to correctly correspond to variable names.
-                       libmesh_assert_equal_to(dof_indices.size(), n_comps);
-
-                       for (unsigned int comp = 0; comp < n_comps; comp++)
-                         parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
-                     }
-                   else
-                     {
-                       const unsigned int dim = elem->dim();
-                       const unsigned int n_sf = cast_int<unsigned int>(dof_indices.size());
-
                        if (field_type == TYPE_SCALAR)
-                         {
-                           if (!fe_ptrs[dim])
-                             {
-                               q_rules[dim] = var_type.default_quadrature_rule(dim);
-                               fe_ptrs[dim] = FEBase::build(dim, var_type);
-                               fe_ptrs[dim]->attach_quadrature_rule(q_rules[dim].get());
-                             }
-
-                           FEBase & fe = *fe_ptrs[dim];
-                           const std::vector<Real> & JxW = fe.get_JxW();
-                           const std::vector<std::vector<Real>> & phi = fe.get_phi();
-
-                           fe.reinit(elem);
-
-                           const unsigned int n_qp = cast_int<unsigned int>(JxW.size());
-
-                           Number avg = 0;
-                           Real vol = 0;
-                           for (unsigned int qp = 0; qp != n_qp; ++qp)
-                             {
-                               Number u_h = 0;
-                               for (unsigned int bf = 0; bf != n_sf; ++bf)
-                                 u_h += phi[bf][qp] * sys_soln(dof_indices[bf]);
-                               avg += JxW[qp] * u_h;
-                               vol += JxW[qp];
-                             }
-                           avg /= vol;
-
-                           parallel_soln.set(ne * var_ctr + elem->id(), avg);
-                         }
+                         parallel_soln.set(ne * var_ctr + elem->id(), element_average(elem, Number()));
                        else
                          {
-                           if (!vec_fe_ptrs[dim])
-                             {
-                               q_rules[dim] = var_type.default_quadrature_rule(dim);
-                               vec_fe_ptrs[dim] = FEVectorBase::build(dim, var_type);
-                               vec_fe_ptrs[dim]->attach_quadrature_rule(q_rules[dim].get());
-                             }
-
-                           FEVectorBase & fe = *vec_fe_ptrs[dim];
-                           const std::vector<Real> & JxW = fe.get_JxW();
-                           const std::vector<std::vector<RealGradient>> & phi = fe.get_phi();
-
-                           fe.reinit(elem);
-
-                           const unsigned int n_qp = cast_int<unsigned int>(JxW.size());
-
-                           typedef TensorTools::MakeNumber<RealGradient>::type OutputNumberGradient;
-                           OutputNumberGradient avg;
-                           Real vol = 0;
-                           for (unsigned int qp = 0; qp != n_qp; ++qp)
-                             {
-                               OutputNumberGradient u_h;
-                               for (unsigned int bf = 0; bf != n_sf; ++bf)
-                                 u_h.add_scaled(phi[bf][qp], sys_soln(dof_indices[bf]));
-                               avg.add_scaled(u_h, JxW[qp]);
-                               vol += JxW[qp];
-                             }
-                           avg /= vol;
-
+                           const Gradient avg = element_average(elem, Gradient());
                            for (unsigned int comp = 0; comp < n_comps; comp++)
                              parallel_soln.set(ne * (var_ctr + comp) + elem->id(), avg(comp));
                          }
+                       continue;
                      }
+
+                   dof_map.dof_indices(elem, dof_indices, var);
+
+                   // The number of DOF components needs to be equal to the expected number so that we know
+                   // where to store data to correctly correspond to variable names.
+                   libmesh_assert_equal_to(dof_indices.size(), n_comps);
+
+                   for (unsigned int comp = 0; comp < n_comps; comp++)
+                     parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
                  }
              }
          });
