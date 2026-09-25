@@ -1213,9 +1213,16 @@ public:
     // Only the two domain endpoint nodes are in the nodeset, like a
     // Neumann-BC-at-the-ends use case.  With enough processors, most
     // ranks won't locally own or ghost either endpoint.
+    //
+    // Pick the endpoints out geometrically rather than by node id:
+    // prepare_for_use() renumbers a DistributedMesh's nodes so that
+    // each processor's are contiguous, so the ids the line was built
+    // with don't survive, and with enough processors ids 0 and 40
+    // land on interior nodes.
     const boundary_id_type nodeset_id = 100;
     for (const auto & node : mesh.node_ptr_range())
-      if (node->id() == 0 || node->id() == 40)
+      if (std::abs((*node)(0) - 0.) < TOLERANCE ||
+          std::abs((*node)(0) - 1.) < TOLERANCE)
         bi.add_node(node, nodeset_id);
 
     bi.build_side_list_from_node_list({nodeset_id}, /*skip_interior_sides=*/true);
