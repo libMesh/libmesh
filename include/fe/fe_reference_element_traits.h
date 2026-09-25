@@ -51,7 +51,7 @@ static constexpr unsigned int unused_side_node = 99;
  * \p values.
  */
 template <unsigned int Rows, unsigned int Cols>
-struct ReferenceElementTable
+struct NodeMapTable
 {
   unsigned int values[Rows][Cols];
 };
@@ -66,19 +66,19 @@ constexpr unsigned int no_face_node (const unsigned int)
 
 /**
  * \returns The edge_nodes_map of the second-order element whose
- * first-order equivalent is \p Linear: each edge's two vertices, then
+ * first-order equivalent is \p FirstOrder: each edge's two vertices, then
  * its mid-edge node, numbered after the vertices in edge order.
  */
-template <class Linear, unsigned int Edges>
-constexpr ReferenceElementTable<Edges, 3>
+template <class FirstOrder, unsigned int Edges>
+constexpr NodeMapTable<Edges, 3>
 derived_edge_nodes ()
 {
-  ReferenceElementTable<Edges, 3> t {};
+  NodeMapTable<Edges, 3> t {};
   for (unsigned int e = 0; e != Edges; ++e)
     {
-      t.values[e][0] = Linear::edge_nodes_map[e][0];
-      t.values[e][1] = Linear::edge_nodes_map[e][1];
-      t.values[e][2] = Linear::num_nodes + e;
+      t.values[e][0] = FirstOrder::edge_nodes_map[e][0];
+      t.values[e][1] = FirstOrder::edge_nodes_map[e][1];
+      t.values[e][2] = FirstOrder::num_nodes + e;
     }
   return t;
 }
@@ -88,12 +88,12 @@ derived_edge_nodes ()
  * element, i.e. the entries of its side_nodes_map row that aren't
  * padding.
  */
-template <class Linear>
+template <class FirstOrder>
 constexpr unsigned int n_side_vertices (const unsigned int s)
 {
   unsigned int n = 0;
-  for (unsigned int k = 0; k != Linear::nodes_per_side; ++k)
-    if (Linear::side_nodes_map[s][k] != unused_side_node)
+  for (unsigned int k = 0; k != FirstOrder::nodes_per_side; ++k)
+    if (FirstOrder::side_nodes_map[s][k] != unused_side_node)
       ++n;
   return n;
 }
@@ -117,27 +117,27 @@ constexpr unsigned int mid_edge_node (const unsigned int (&edges)[Edges][3],
 /**
  * \returns The side_nodes_map of a 3D second-order element with
  * \p Sides sides of up to \p Cols nodes each, whose first-order
- * equivalent is \p Linear, whose edge_nodes_map is \p edges, and whose
+ * equivalent is \p FirstOrder, whose edge_nodes_map is \p edges, and whose
  * \p face_node(s) is the node at the center of side \p s (or
  * \p invalid_uint if there is none).
  */
-template <class Linear, unsigned int Sides, unsigned int Cols,
+template <class FirstOrder, unsigned int Sides, unsigned int Cols,
           unsigned int Edges, class FaceNode>
-constexpr ReferenceElementTable<Sides, Cols>
+constexpr NodeMapTable<Sides, Cols>
 derived_side_nodes (const unsigned int (&edges)[Edges][3],
                     FaceNode face_node)
 {
-  ReferenceElementTable<Sides, Cols> t {};
+  NodeMapTable<Sides, Cols> t {};
   for (unsigned int s = 0; s != Sides; ++s)
     {
-      const unsigned int nv = n_side_vertices<Linear>(s);
+      const unsigned int nv = n_side_vertices<FirstOrder>(s);
       unsigned int n = 0;
       for (unsigned int k = 0; k != nv; ++k)
-        t.values[s][n++] = Linear::side_nodes_map[s][k];
+        t.values[s][n++] = FirstOrder::side_nodes_map[s][k];
       for (unsigned int k = 0; k != nv; ++k)
         t.values[s][n++] = mid_edge_node(edges,
-                                         Linear::side_nodes_map[s][k],
-                                         Linear::side_nodes_map[s][(k+1) % nv]);
+                                         FirstOrder::side_nodes_map[s][k],
+                                         FirstOrder::side_nodes_map[s][(k+1) % nv]);
       if (face_node(s) != invalid_uint)
         t.values[s][n++] = face_node(s);
       for (; n != Cols; ++n)
@@ -148,19 +148,19 @@ derived_side_nodes (const unsigned int (&edges)[Edges][3],
 
 /**
  * \returns The side_nodes_map of a 2D second-order element whose
- * first-order equivalent is \p Linear: each side's two vertices, then
+ * first-order equivalent is \p FirstOrder: each side's two vertices, then
  * its mid-side node, numbered after the vertices in side order.
  */
-template <class Linear, unsigned int Sides>
-constexpr ReferenceElementTable<Sides, 3>
+template <class FirstOrder, unsigned int Sides>
+constexpr NodeMapTable<Sides, 3>
 derived_side_nodes ()
 {
-  ReferenceElementTable<Sides, 3> t {};
+  NodeMapTable<Sides, 3> t {};
   for (unsigned int s = 0; s != Sides; ++s)
     {
-      t.values[s][0] = Linear::side_nodes_map[s][0];
-      t.values[s][1] = Linear::side_nodes_map[s][1];
-      t.values[s][2] = Linear::num_nodes + s;
+      t.values[s][0] = FirstOrder::side_nodes_map[s][0];
+      t.values[s][1] = FirstOrder::side_nodes_map[s][1];
+      t.values[s][2] = FirstOrder::num_nodes + s;
     }
   return t;
 }

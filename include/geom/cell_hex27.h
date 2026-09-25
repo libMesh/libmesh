@@ -238,11 +238,11 @@ public:
    * side to element node numbers.  They are derived from the
    * first-order Hex8 tables; see fe_reference_element_traits.h.
    */
-  static constexpr ReferenceElementTable<num_edges, nodes_per_edge>
+  static constexpr NodeMapTable<num_edges, nodes_per_edge>
   _edge_nodes = derived_edge_nodes<Hex8, num_edges>();
   static constexpr const unsigned int (&edge_nodes_map)[num_edges][nodes_per_edge] = _edge_nodes.values;
 
-  static constexpr ReferenceElementTable<num_sides, nodes_per_side>
+  static constexpr NodeMapTable<num_sides, nodes_per_side>
   _side_nodes = derived_side_nodes<Hex8, num_sides, nodes_per_side>
     (_edge_nodes.values, [](unsigned int s) { return 20 + s; });
   static constexpr const unsigned int (&side_nodes_map)[num_sides][nodes_per_side] = _side_nodes.values;

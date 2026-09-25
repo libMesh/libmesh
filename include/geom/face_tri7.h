@@ -211,7 +211,7 @@ public:
    * element node numbers.  It is derived from the first-order
    * Tri3 tables; see fe_reference_element_traits.h.
    */
-  static constexpr ReferenceElementTable<num_sides, nodes_per_side>
+  static constexpr NodeMapTable<num_sides, nodes_per_side>
   _side_nodes = derived_side_nodes<Tri3, num_sides>();
   static constexpr const unsigned int (&side_nodes_map)[num_sides][nodes_per_side] = _side_nodes.values;
 
